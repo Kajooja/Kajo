@@ -38,7 +38,7 @@ jobs:
         run: npm run smoke
 
   android-apk:
-    name: Build installable Android APK
+    name: Build standalone Android APK
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: validate
     runs-on: ubuntu-latest
@@ -66,16 +66,22 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Build debug APK
+      - name: Build standalone release APK
         working-directory: apps/mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleDebug --no-daemon
+          ./gradlew :app:assembleRelease --no-daemon
 
-      - name: Upload Android APK
+      - name: Verify embedded JavaScript bundle
+        run: |
+          APK="apps/mobile/android/app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK"
+          unzip -l "$APK" | grep -q "assets/index.android.bundle"
+
+      - name: Upload standalone Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: kajo-android-debug-${{ github.sha }}
-          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          name: kajo-android-standalone-${{ github.sha }}
+          path: apps/mobile/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 7
