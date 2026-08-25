@@ -50,7 +50,11 @@ Create a repository and mobile-development foundation strong enough that future 
 
 ## Delivered so far
 
-- Initial product/project documentation bootstrap prepared.
+- Repository project-memory and handoff architecture established.
+- Kajo 0 Product Constitution captured.
+- MVP requirement IDs established.
+- Canonical glossary, domain/event/prediction models and initial ADRs established.
+- Sprint, milestone, Issue, PR and AI conversation handoff processes established.
 
 ## Decisions
 
@@ -58,7 +62,7 @@ See ADR-0001 through ADR-0004.
 
 ## Deferred
 
-None yet; engineering portion of Sprint 001 has not started.
+Engineering portion of Sprint 001 is still pending.
 
 ## Known issues
 
@@ -74,4 +78,4 @@ None in code; no application code exists yet.
 
 ## Handoff
 
-After documentation bootstrap is merged, continue this same sprint by creating the Expo/TypeScript mobile skeleton and baseline CI. Do not start Room feature work until the Foundation Definition of Done is met.
+Continue this same sprint by creating the Expo/TypeScript mobile skeleton, baseline workspace/checks/CI and initial typed domain contracts. Do not start Room feature work until the Foundation Definition of Done is met.
