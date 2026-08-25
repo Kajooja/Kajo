@@ -1,10 +1,5 @@
-import { RoomDestinationPlaceholder } from '@/features/room/RoomDestinationPlaceholder';
+import { DiscoveryScreen } from '@/features/discovery/DiscoveryScreen';
 
-export default function MoviesDiscoveryPlaceholderScreen() {
-  return (
-    <RoomDestinationPlaceholder
-      title="Elokuvat"
-      description="Projektori toimii nyt Roomin navigointirajana. Varsinainen elokuvien discovery-näkymä toteutetaan myöhemmässä sprintissä."
-    />
-  );
+export default function MoviesDiscoveryScreen() {
+  return <DiscoveryScreen itemType="MOVIE" title="Elokuvat" />;
 }
