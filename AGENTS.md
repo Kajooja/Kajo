@@ -77,8 +77,40 @@ Use terms exactly as defined in `GLOSSARY.md`. Do not invent synonyms in code fo
 - Keep changes scoped to the assigned Issue/sprint goal.
 - Do not refactor unrelated code in the same change.
 - Do not create abstractions before they are needed.
-- Add or update tests when behaviour changes and testing is meaningful.
-- Run required lint, typecheck and tests before considering a coding task complete.
+- Add or update tests whenever behavior changes and a deterministic test is practical.
+- Every bug fix should include a regression test when the defect can be reproduced deterministically.
+- Do not consider a code task complete until the canonical repository validation command passes:
+
+```bash
+npm run check
+```
+
+`npm run check` is the minimum automated gate and currently includes lint, TypeScript typecheck, automated tests, and iOS + Android Expo bundle smoke checks.
+
+### Mobile runtime validation
+
+The product target is a **phone-runnable MVP**, not merely code that compiles.
+
+For user-facing mobile changes:
+
+- In addition to `npm run check`, run the relevant app runtime when the execution environment supports it, using `npm start`, `npm run android`, or `npm run ios`.
+- Exercise the changed user flow on a real phone or emulator/simulator when one is available.
+- At sprint/milestone checkpoints, prioritize validating an end-to-end mobile path rather than isolated screens only.
+- If the current agent/environment cannot launch a device runtime, record that limitation explicitly in the PR/handoff. Passing bundle smoke checks must not be described as proof that a real-device interaction was tested.
+- A user-facing MVP requirement must not be marked complete solely because files exist or TypeScript compiles; its acceptance flow must be demonstrably reachable in the mobile app.
+
+### Repository hygiene
+
+Keep the repository minimal and intentional.
+
+- Do not create empty feature folders, `.keep` files, speculative modules, duplicate guides, or placeholder abstractions merely for future architecture.
+- Before creating a new file, prefer extending an existing canonical file when that keeps responsibilities clear.
+- When a real implementation replaces a placeholder, delete the obsolete placeholder in the same scoped change.
+- Remove unused files, dead code, obsolete routes, superseded helpers and abandoned experiments once they are no longer referenced.
+- Do not keep both old and new implementations "just in case"; Git history is the archive.
+- Do not duplicate documentation truth across several files. Put durable rules in their canonical document and link to them where needed.
+- Before closing an Issue or sprint, review changed areas for stale files and remove proven-unused artifacts.
+- Never delete a file only because its name looks temporary. Verify references and current purpose first.
 
 ## 6. Git workflow
 
@@ -89,6 +121,7 @@ After repository bootstrap:
 - Branch names should be descriptive, for example `feat/23-curtain-control`.
 - Pull requests should describe scope, MVP requirement IDs, tests and documentation impact.
 - `main` should remain runnable and internally consistent.
+- Do not merge code changes with a failing `npm run check` / required CI run.
 
 ## 7. Documentation obligations during normal work
 
@@ -112,15 +145,17 @@ A sprint is not complete until the repository can hand the project to a fresh co
 
 At sprint close, perform all of the following:
 
-1. Ensure accepted sprint changes are merged and checks pass.
-2. Update the sprint file: delivered work, decisions, deferred work, known issues and important files.
-3. Mark completed MVP requirement IDs in `MVP.md`.
-4. Update `STATUS.md` with the exact current state, next work and handoff instructions.
-5. Update `GLOSSARY.md` if terminology changed.
-6. Add/update ADRs for durable architecture decisions.
-7. Update `CODEMAP.md` if important paths changed.
-8. Update `ROADMAP.md` only if sequencing changed.
-9. Make sure the next sprint or next action is explicit.
+1. Ensure accepted sprint changes are merged and `npm run check`/CI passes.
+2. For user-facing mobile work, record runtime/device validation evidence or explicitly record why device validation was unavailable.
+3. Review the sprint's changed implementation areas and remove obsolete/unused files, placeholders and dead code that were superseded by the delivered implementation.
+4. Update the sprint file: delivered work, decisions, deferred work, known issues and important files.
+5. Mark completed MVP requirement IDs in `MVP.md`.
+6. Update `STATUS.md` with the exact current state, next work and handoff instructions.
+7. Update `GLOSSARY.md` if terminology changed.
+8. Add/update ADRs for durable architecture decisions.
+9. Update `CODEMAP.md` if important paths changed.
+10. Update `ROADMAP.md` only if sequencing changed.
+11. Make sure the next sprint or next action is explicit.
 
 See `/docs/project/WORKFLOW.md`.
 
@@ -128,13 +163,15 @@ See `/docs/project/WORKFLOW.md`.
 
 At milestone close:
 
-1. Verify milestone acceptance criteria.
-2. Update the milestone document with delivered capabilities and evidence.
-3. Update `STATUS.md`, `ROADMAP.md` and `MVP.md`/future product scope as applicable.
-4. Record any architecture decisions that changed during the milestone.
-5. Confirm documentation and `CODEMAP.md` match the repository.
-6. Record known limitations and migration/debt items.
-7. Create an explicit handoff to the next milestone.
+1. Verify milestone acceptance criteria, including the intended end-to-end mobile MVP flows.
+2. Run the complete automated validation and perform representative device/emulator runtime validation when possible.
+3. Update the milestone document with delivered capabilities and evidence.
+4. Update `STATUS.md`, `ROADMAP.md` and `MVP.md`/future product scope as applicable.
+5. Record any architecture decisions that changed during the milestone.
+6. Confirm documentation and `CODEMAP.md` match the repository.
+7. Remove obsolete implementation artifacts and record only intentional remaining debt.
+8. Record known limitations and migration/debt items.
+9. Create an explicit handoff to the next milestone.
 
 ## 10. Conversation handoff protocol
 
