@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   windowGlow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#B9C1B8',
     opacity: 0.72,
   },
