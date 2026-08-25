@@ -9,19 +9,25 @@ This is the authoritative current-state document.
 
 ## Current state
 
-Kajo 0 product definition and the repository project-memory structure are established.
+Kajo 0 product definition, repository project memory and the Sprint 001 engineering foundation are established on PR #3.
 
-Sprint 001 engineering foundation is now implemented on Issue #2 / branch `feat/2-mobile-foundation` pending dependency lockfile generation, CI validation, review and merge.
+The current branch contains:
 
-The branch currently contains:
-
-- npm monorepo/workspace root,
+- npm monorepo/workspace root with committed npm lockfile,
 - React Native + Expo SDK 57 + TypeScript mobile skeleton under `apps/mobile`,
 - Expo Router root navigation shell,
-- baseline lint/typecheck/test commands,
-- GitHub Actions CI definition,
+- root/mobile commands for lint, typecheck, tests and platform bundle smoke checks,
+- GitHub Actions CI using `npm ci`,
 - initial typed canonical domain contracts,
 - canonical `DiscoveryMode` -> `AmbientPhase` mapping and test.
+
+PR #3 has been validated successfully with:
+
+- dependency installation from the committed lockfile,
+- lint,
+- TypeScript typecheck,
+- unit tests,
+- Expo bundle export for both iOS and Android.
 
 No Room feature implementation exists yet.
 
@@ -29,26 +35,23 @@ No Room feature implementation exists yet.
 
 See `../product/MVP.md`.
 
-No Foundation requirement is marked complete until Issue #2 is validated and merged.
+Foundation implementation is validated but its MVP requirements remain unmarked until PR #3 is merged and the Sprint 001 close protocol is completed.
 
 ## In progress
 
 - Issue #2 — Sprint 001 mobile engineering foundation.
-- Branch: `feat/2-mobile-foundation`.
+- Pull request #3 — validated and awaiting merge.
 
 ## Next
 
-1. Generate and commit the npm dependency lockfile for the workspace.
-2. Run/install dependencies and execute `npm run check`.
-3. Open/validate the Issue #2 pull request and confirm CI passes.
-4. Merge accepted foundation changes.
-5. Mark `MVP-FOUND-001`, `MVP-FOUND-002` and `MVP-FOUND-003` complete only when their acceptance criteria are actually met.
-6. Complete the Sprint 001 close protocol before starting Room feature work.
+1. Merge accepted PR #3.
+2. Complete the Sprint 001 close protocol.
+3. Mark `MVP-FOUND-001`, `MVP-FOUND-002` and `MVP-FOUND-003` complete.
+4. Open Sprint 002 — Room and its first implementation Issue.
+5. Do not start Curtain/Theme or real discovery ranking work during Sprint 002.
 
 ## Known issues / open decisions
 
-- The current CI uses `npm ci`, so a committed dependency lockfile is required before CI can pass.
-- Local validation could not be completed from the current agent runtime because its container could not resolve GitHub/npm hosts; this is an environment limitation, not evidence that the code passes.
 - Final book metadata provider is not yet locked.
 - Exact authentication/onboarding UX is not yet designed.
 - Exact visual art direction of the Room will be iterated during Room sprint; principles are locked, assets are not.
@@ -57,7 +60,9 @@ No Foundation requirement is marked complete until Issue #2 is validated and mer
 ## Important files
 
 - `/AGENTS.md`
+- `/README.md`
 - `/package.json`
+- `/package-lock.json`
 - `/apps/mobile/package.json`
 - `/apps/mobile/app/`
 - `/apps/mobile/src/domain/`
@@ -70,4 +75,4 @@ No Foundation requirement is marked complete until Issue #2 is validated and mer
 
 A new conversation/agent must follow the read order in `/AGENTS.md`.
 
-Continue Issue #2 on `feat/2-mobile-foundation`. Do not start Room work yet. First make dependency installation reproducible, run the baseline checks, validate CI and merge the foundation PR.
+PR #3 is the validated Sprint 001 engineering foundation. The next action is to merge it and immediately perform the mandatory Sprint 001 close documentation before Room feature work begins.
