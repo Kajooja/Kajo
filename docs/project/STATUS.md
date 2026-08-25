@@ -11,9 +11,9 @@ This is the authoritative current-state document.
 
 Sprint 001 Foundation, Sprint 002 Room and Sprint 003 Curtain & Theme are complete.
 
-Sprint 004 implementation is active through Issue #18 on branch `feat/18-discovery-ui`.
+Sprint 004 implementation work from Issue #18 / PR #19 is merged to `main` as commit `1de51bda035d8ad3d7666a95473697c6ff47e772`.
 
-The active branch currently adds:
+The merged application now contains:
 
 - one shared mobile `DiscoveryMode` state boundary used by Room and discovery,
 - local generic BOOK/MOVIE `Item` mock data,
@@ -23,17 +23,24 @@ The active branch currently adds:
 - one generic Item detail route/view,
 - continued use of the Sprint 003 base theme + AmbientPhase mapping in discovery,
 - automated tests for mock filtering/ranking/lookup,
-- removal of the obsolete `RoomDestinationPlaceholder.tsx` after its final references were replaced.
+- no obsolete `RoomDestinationPlaceholder.tsx`; it was removed when its final references were replaced.
 
-Issue #16 / PR #17 also tightened repository rules: code changes require `npm run check`, user-facing runtime/device validation must be reported honestly, and obsolete files must be removed once superseded.
+PR #19 passed the canonical automated gate. The post-merge `main` CI also passed:
 
-Sprint 004 implementation has not yet been validated by its PR CI. This execution environment cannot launch a real phone/emulator Expo runtime, so device/runtime verification is currently **not performed** and must not be claimed as complete.
+- dependency install,
+- lint,
+- TypeScript typecheck,
+- automated tests,
+- iOS Expo bundle smoke,
+- Android Expo bundle smoke.
+
+**Real phone/emulator/simulator runtime verification has not been performed.** The connected AI execution environment cannot launch Expo on a device runtime. Issue #20 is the explicit outstanding Sprint 004 runtime acceptance task.
 
 ## MVP progress
 
 See `../product/MVP.md`.
 
-Completed requirements on `main`:
+Completed requirements already verified from earlier sprints:
 
 - `MVP-FOUND-001`
 - `MVP-FOUND-002`
@@ -44,7 +51,7 @@ Completed requirements on `main`:
 - `MVP-DISC-003`
 - `MVP-DISC-004`
 
-Sprint 004 targets currently under implementation:
+Sprint 004 implementation exists on `main`, but the following requirements remain unmarked until the real runtime acceptance flow is exercised and Sprint 004 is closed:
 
 - `MVP-ROOM-003`
 - `MVP-ROOM-004`
@@ -53,30 +60,28 @@ Sprint 004 targets currently under implementation:
 - `MVP-DISC-005`
 - `MVP-DISC-006`
 
-Do not mark Sprint 004 requirements complete until Issue #18 is validated, merged and the actual acceptance flows are verified. In particular, passing bundle smoke checks is not equivalent to a real device interaction test.
+Passing bundle smoke checks is not equivalent to a real device interaction test.
 
 ## In progress
 
-- Sprint 004 — Discovery UI.
-- Issue #18 — mock discovery grids and Item details.
-- Branch `feat/18-discovery-ui` — implementation pending PR/CI validation.
+- Sprint 004 — Discovery UI acceptance/close.
+- Issue #20 — verify the merged discovery flow on a real phone, Android emulator or iOS simulator.
 
 ## Next
 
-1. Open the Issue #18 pull request.
-2. Run the full CI gate equivalent to `npm run check`: lint, typecheck, tests and iOS/Android bundle smoke checks.
-3. Correct any CI/type/navigation defects before merge.
-4. Review the changed area for stale placeholders/dead files; `RoomDestinationPlaceholder.tsx` has already been removed.
-5. Merge only after automated validation is green.
-6. Perform a real phone/emulator runtime smoke test when an appropriate runtime environment is available and record the result.
-7. Complete Sprint 004 close protocol only after the full Definition of Done and requirement acceptance criteria are met.
+1. Run merged `main` on a real phone/emulator/simulator.
+2. Verify the full Room -> bookshelf/projector -> discovery -> Item detail -> back flow described in Issue #20.
+3. Verify all three DiscoveryModes persist and visibly change deterministic grid ordering.
+4. If a runtime defect appears, create a scoped bug Issue/PR and add a regression test where practical.
+5. Keep `npm run check` green after any fix.
+6. Only after runtime acceptance, update `MVP.md`, close Sprint 004 and open the next sprint.
 
 ## Known issues / open decisions
 
 - Current Room/curtain/theme art and Sprint 004 mock covers are functional/structural, not final production artwork.
 - Sprint 004 uses local fictional mock Items; real provider integration remains later scope.
 - Mode-dependent ordering is explicitly mock discovery logic, not Prediction V0 or `MVP-PRED-003` semantics.
-- Current execution environment cannot perform a real phone/emulator runtime test; only automated CI/bundle validation is available here.
+- Real phone/emulator runtime verification for Sprint 004 is outstanding as Issue #20.
 - Final book metadata provider is not yet locked.
 - Exact authentication/onboarding UX is not yet designed.
 - SharedProfile Room/theme/discovery identity remains later scope.
@@ -103,4 +108,4 @@ Do not mark Sprint 004 requirements complete until Issue #18 is validated, merge
 
 A new conversation/agent must follow the read order in `/AGENTS.md`.
 
-Continue **Sprint 004 — Discovery UI** from Issue #18 / branch `feat/18-discovery-ui`. The branch contains the first real local/mock discovery flow but still requires PR CI validation and later real-device/emulator smoke verification. Do not introduce external providers, backend/event capture or real Prediction V0 semantics into this sprint.
+Continue **Sprint 004 — Discovery UI** from open Issue #20. The implementation is merged and both PR/main automated CI are green. The only Sprint 004 acceptance gap currently recorded is real phone/emulator/simulator runtime verification. Do not mark the Sprint 004 MVP requirements complete or open Sprint 005 until that runtime acceptance has been recorded.
