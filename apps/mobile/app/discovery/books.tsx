@@ -1,10 +1,5 @@
-import { RoomDestinationPlaceholder } from '@/features/room/RoomDestinationPlaceholder';
+import { DiscoveryScreen } from '@/features/discovery/DiscoveryScreen';
 
-export default function BooksDiscoveryPlaceholderScreen() {
-  return (
-    <RoomDestinationPlaceholder
-      title="Kirjat"
-      description="Kirjahylly toimii nyt Roomin navigointirajana. Varsinainen kirjapalvelun discovery-näkymä toteutetaan myöhemmässä sprintissä."
-    />
-  );
+export default function BooksDiscoveryScreen() {
+  return <DiscoveryScreen itemType="BOOK" title="Kirjat" />;
 }

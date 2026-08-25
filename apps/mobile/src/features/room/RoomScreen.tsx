@@ -1,16 +1,15 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { DiscoveryMode } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
+import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { CurtainControl } from './CurtainControl';
 
 export function RoomScreen() {
-  const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>('FOR_YOU');
+  const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
   const styles = createStyles(theme);
@@ -49,7 +48,7 @@ export function RoomScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Open movie discovery"
-              accessibilityHint="Opens the movie discovery placeholder"
+              accessibilityHint="Opens the movie discovery grid"
               onPress={() => router.push('/discovery/movies')}
               style={({ pressed }) => [styles.movieScreen, pressed && styles.pressed]}
             >
@@ -74,7 +73,7 @@ export function RoomScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Open book discovery"
-              accessibilityHint="Opens the book discovery placeholder"
+              accessibilityHint="Opens the book discovery grid"
               onPress={() => router.push('/discovery/books')}
               style={({ pressed }) => [styles.bookshelf, pressed && styles.pressed]}
             >
