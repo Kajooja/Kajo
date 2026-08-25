@@ -75,6 +75,22 @@ See `/docs/product/UX_PRINCIPLES.md` before implementation.
 - Relevant documentation accurately reflects the implemented paths and requirement status.
 - No Sprint 003+ scope has been silently pulled into this sprint.
 
+## Work in progress
+
+### Issue #6 — first 2D Room shell
+
+Branch: `feat/6-room-shell`
+
+Implemented on the branch pending validation/merge:
+
+- first `RoomScreen` composition,
+- window, fireplace, bookshelf and projector/screen vocabulary,
+- app root wired to the Room,
+- accessible/tappable bookshelf and projector controls,
+- temporary book/movie routes that prove the navigation boundary without claiming discovery completion.
+
+`MVP-ROOM-001` and `MVP-ROOM-002` are in progress. `MVP-ROOM-003` and `MVP-ROOM-004` remain incomplete until real discovery destinations exist.
+
 ## Initial implementation sequence
 
 1. Read UX principles and inspect the current Foundation screen.
@@ -100,6 +116,6 @@ See `/docs/product/UX_PRINCIPLES.md` before implementation.
 
 ## Handoff
 
-Start Sprint 002 by creating one scoped GitHub Issue for the first Room shell. Do not code directly on `main`.
+Issue #6 is the active Room work. Validate and merge it before expanding Sprint 002 further.
 
-The first implementation should make Kajo visibly become a Room while preserving a clean boundary to Sprint 003 curtain/theme work and Sprint 004 discovery UI.
+The Room shell must remain a clean boundary to Sprint 003 curtain/theme work and Sprint 004 discovery UI.
