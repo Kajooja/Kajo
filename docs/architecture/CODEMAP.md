@@ -25,9 +25,9 @@ apps/mobile/
 | Area | Canonical path | Current state |
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript foundation merged and validated |
-| Expo Router entry | `apps/mobile/app/` | Minimal root layout and Foundation placeholder screen |
+| Expo Router entry | `apps/mobile/app/` | Root route opens Room; mock book/movie boundary routes live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Initial Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts |
-| Room feature | `apps/mobile/src/features/room/` | Sprint 002 — next implementation area; not created yet |
+| Room feature | `apps/mobile/src/features/room/` | Sprint 002 Room shell and Room navigation-boundary presentation |
 | Discovery feature | `apps/mobile/src/features/discovery/` | Later sprint; not created yet |
 | Swipe | `apps/mobile/src/features/swipe/` | Later sprint; not created yet |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |

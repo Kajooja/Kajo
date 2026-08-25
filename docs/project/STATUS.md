@@ -9,20 +9,19 @@ This is the authoritative current-state document.
 
 ## Current state
 
-Sprint 001 Foundation is complete. PR #3 is merged to `main`, Issue #2 is closed, and the post-merge `main` CI is green.
+Sprint 001 Foundation is complete and `main` is green.
 
-The repository now contains:
+Sprint 002 implementation is active through Issue #7 / PR #9 on branch `feat/7-room-shell`.
 
-- npm monorepo/workspace root with committed lockfile,
-- React Native + Expo SDK 57 + TypeScript mobile skeleton under `apps/mobile`,
-- Expo Router root navigation shell,
-- root/mobile lint, typecheck, unit-test and iOS/Android bundle smoke commands,
-- GitHub Actions CI using `npm ci`,
-- initial typed canonical domain contracts,
-- canonical `DiscoveryMode` -> `AmbientPhase` mapping and test,
-- permanent project-memory, sprint and handoff documentation.
+The Room branch currently contains:
 
-The application currently displays only the Foundation placeholder screen. No Room feature exists yet.
+- first minimalist 2D Room home surface under `apps/mobile/src/features/room/`,
+- window, fireplace, bookshelf and movie screen/projector representations,
+- accessible bookshelf and movie-screen navigation affordances,
+- mock book/movie destination routes that establish navigation boundaries without implementing discovery,
+- updated CODEMAP pointing to the real Room implementation.
+
+The theme engine, curtain interaction, real discovery UI, backend and prediction logic remain intentionally absent.
 
 ## MVP progress
 
@@ -34,27 +33,37 @@ Completed Foundation requirements:
 - `MVP-FOUND-002`
 - `MVP-FOUND-003`
 
-Current product work moves to the Room requirements. Do not mark Room requirements complete until their actual acceptance criteria are met.
+Sprint 002 targets:
+
+- `MVP-ROOM-001`
+- `MVP-ROOM-002`
+
+`MVP-ROOM-003` and `MVP-ROOM-004` are only groundwork in PR #9 because the current destinations are explicit placeholders rather than real discovery experiences.
+
+Do not mark Room requirements complete until PR #9 is validated, accepted and merged and the actual requirement acceptance criteria are verified.
 
 ## In progress
 
 - Sprint 002 — Room.
+- Issue #7 — first Room shell.
+- PR #9 — first Room shell; CI validation pending/current.
 
 ## Next
 
-1. Read `sprints/SPRINT-002.md`, `../product/UX_PRINCIPLES.md` and the relevant architecture/domain documents.
-2. Create the first Sprint 002 implementation Issue and branch.
-3. Replace the Foundation placeholder with the first recognizable minimalist 2D Room home surface.
-4. Establish clear bookshelf and movie-screen interaction/navigation boundaries using mock content only.
-5. Keep CI green and update CODEMAP as Room implementation paths appear.
+1. Confirm PR #9 CI passes locked install, lint, typecheck, tests and iOS/Android bundle smoke checks.
+2. Review the Room shell against Sprint 002 UX constraints and accessibility semantics.
+3. Merge PR #9 only when validated.
+4. Continue Sprint 002 only with work required by its Definition of Done; do not pull Sprint 003 curtain/theme scope forward.
+5. Close Sprint 002 only after its full Definition of Done is met and repository handoff documentation is current.
 
 ## Known issues / open decisions
 
 - Final book metadata provider is not yet locked.
 - Exact authentication/onboarding UX is not yet designed.
-- Exact visual art direction of the Room will be iterated during Sprint 002; UX principles are locked, final assets are not.
-- Theme engine and curtain interaction belong to Sprint 003 and must not be pulled into Sprint 002 prematurely.
-- Prediction V0 implementation remains deferred until the UI/data foundation exists.
+- Exact visual art direction of the Room will continue to iterate during Sprint 002; current Room styling is structural, not final production art.
+- Theme engine and curtain interaction belong to Sprint 003.
+- Real book/movie discovery belongs to a later discovery sprint; PR #9 placeholders must not be interpreted as completed discovery.
+- Prediction V0 implementation remains deferred.
 
 ## Important files
 
@@ -62,19 +71,19 @@ Current product work moves to the Room requirements. Do not mark Room requiremen
 - `/README.md`
 - `/package.json`
 - `/package-lock.json`
-- `/apps/mobile/package.json`
-- `/apps/mobile/app/`
+- `/apps/mobile/app/index.tsx`
+- `/apps/mobile/app/discovery/`
+- `/apps/mobile/src/features/room/`
 - `/apps/mobile/src/domain/`
 - `/.github/workflows/ci.yml`
 - `/docs/product/MVP.md`
 - `/docs/product/UX_PRINCIPLES.md`
 - `/docs/architecture/ARCHITECTURE.md`
 - `/docs/architecture/CODEMAP.md`
-- `/docs/project/sprints/SPRINT-001.md`
 - `/docs/project/sprints/SPRINT-002.md`
 
 ## Handoff
 
 A new conversation/agent must follow the read order in `/AGENTS.md`.
 
-Sprint 001 is closed. Continue **Sprint 002 — Room**. The next concrete action is to create the first Room implementation Issue/branch and build the Room shell from the current Expo placeholder without implementing Sprint 003 curtain/theme behaviour or real discovery/ranking.
+Continue **Sprint 002 — Room** from Issue #7 / PR #9. Validate the current Room shell before merging. Do not mark `MVP-ROOM-003/004` complete from the mock destination routes and do not implement Sprint 003 curtain/theme behaviour in this change.
