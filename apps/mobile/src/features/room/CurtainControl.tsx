@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AccessibilityInfo,
   Animated,
@@ -36,9 +36,9 @@ const ACCESSIBILITY_LABELS: Readonly<Record<DiscoveryMode, string>> = {
 export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: CurtainControlProps) {
   const [trackWidth, setTrackWidth] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const translateX = useRef(new Animated.Value(0)).current;
-  const dragStartPx = useRef(0);
+  const [translateX] = useState(() => new Animated.Value(0));
   const maxTravel = Math.max(0, trackWidth - HANDLE_WIDTH);
+  const dragStartPx = getCurtainPositionForMode(mode) * maxTravel;
 
   useEffect(() => {
     let active = true;
@@ -67,31 +67,24 @@ export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: 
     }).start();
   }, [maxTravel, mode, reduceMotion, translateX]);
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
-        onPanResponderGrant: () => {
-          dragStartPx.current = getCurtainPositionForMode(mode) * maxTravel;
-        },
-        onPanResponderMove: (_, gestureState) => {
-          if (maxTravel <= 0) {
-            return;
-          }
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
+    onPanResponderMove: (_, gestureState) => {
+      if (maxTravel <= 0) {
+        return;
+      }
 
-          const normalized = clampCurtainPosition((dragStartPx.current + gestureState.dx) / maxTravel);
-          translateX.setValue(normalized * maxTravel);
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          onModeChange(getModeForTrackPosition(dragStartPx.current + gestureState.dx, maxTravel));
-        },
-        onPanResponderTerminate: (_, gestureState) => {
-          onModeChange(getModeForTrackPosition(dragStartPx.current + gestureState.dx, maxTravel));
-        },
-      }),
-    [maxTravel, mode, onModeChange, translateX],
-  );
+      const normalized = clampCurtainPosition((dragStartPx + gestureState.dx) / maxTravel);
+      translateX.setValue(normalized * maxTravel);
+    },
+    onPanResponderRelease: (_, gestureState) => {
+      onModeChange(getModeForTrackPosition(dragStartPx + gestureState.dx, maxTravel));
+    },
+    onPanResponderTerminate: (_, gestureState) => {
+      onModeChange(getModeForTrackPosition(dragStartPx + gestureState.dx, maxTravel));
+    },
+  });
 
   function handleLayout(event: LayoutChangeEvent) {
     setTrackWidth(event.nativeEvent.layout.width);
