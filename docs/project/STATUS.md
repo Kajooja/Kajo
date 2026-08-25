@@ -9,9 +9,9 @@ This is the authoritative current-state document.
 
 ## Current state
 
-Kajo 0 product definition has been established and is being transferred from conversation context into repository documentation.
+Kajo 0 product definition and the repository project-memory structure are established.
 
-The repository bootstrap documentation defines:
+The repository documentation defines:
 
 - product constitution,
 - MVP requirements,
@@ -30,21 +30,19 @@ No application code exists yet.
 
 See `../product/MVP.md`.
 
-Current implementation completion: **0 application requirements completed**. Documentation/bootstrap is Sprint 001 foundation work.
+Current implementation completion: **0 application requirements completed**. Documentation/bootstrap is completed foundation work inside Sprint 001.
 
 ## In progress
 
-- Establish repository as Kajo's permanent project memory.
-- Complete and merge documentation bootstrap.
-- Prepare mobile repository skeleton and CI as the next Sprint 001 implementation work.
+- Sprint 001 engineering foundation.
 
 ## Next
 
-1. Review/merge documentation bootstrap PR.
-2. Create Expo + TypeScript mobile skeleton in `apps/mobile`.
-3. Establish workspace/package manager and baseline lint/typecheck/tests.
-4. Add initial CI.
-5. Define the first typed domain contracts for Profile, Item, Event, Context, DiscoveryMode and AmbientPhase.
+1. Create Expo + TypeScript mobile skeleton in `apps/mobile`.
+2. Establish workspace/package manager and baseline lint/typecheck/tests.
+3. Add initial CI.
+4. Define the first typed domain contracts for Profile, Item, Event, Context, DiscoveryMode and AmbientPhase.
+5. Update CODEMAP and close Sprint 001 only after the Foundation Definition of Done is met.
 
 ## Known issues / open decisions
 
@@ -70,4 +68,4 @@ Current implementation completion: **0 application requirements completed**. Doc
 
 A new conversation/agent must follow the read order in `/AGENTS.md`.
 
-The next concrete engineering action after documentation merge is **Sprint 001 mobile foundation**: create the Expo/TypeScript app skeleton without implementing Room visuals yet.
+The next concrete engineering action is **Sprint 001 mobile foundation**: create the Expo/TypeScript app skeleton without implementing Room visuals yet.
