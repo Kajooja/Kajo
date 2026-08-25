@@ -26,13 +26,13 @@ apps/mobile/
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation merged and validated |
 | Expo Router entry | `apps/mobile/app/` | Root route opens Room; mock book/movie boundary routes live under `app/discovery/` |
-| Core domain contracts | `apps/mobile/src/domain/` | Initial Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
-| Room feature | `apps/mobile/src/features/room/` | Merged Sprint 002 2D Room shell and navigation-boundary presentation |
+| Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus Sprint 003 curtain control/state logic |
+| Theme engine | `apps/mobile/src/theme/` | Sprint 003 base Room theme tokens, AmbientPhase overlays and theme tests |
 | Discovery feature | `apps/mobile/src/features/discovery/` | Sprint 004; not created yet |
 | Swipe | `apps/mobile/src/features/swipe/` | Later sprint; not created yet |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Later sprint; not created yet |
-| Theme engine | `apps/mobile/src/theme/` | Sprint 003 next implementation area; not created yet |
 | Mobile data boundary | `apps/mobile/src/data/` | Create when real data access requires it |
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Later sprint |
