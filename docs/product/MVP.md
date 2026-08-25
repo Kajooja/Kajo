@@ -8,9 +8,9 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Foundation
 
-- [ ] `MVP-FOUND-001` Mobile project runs on iOS and Android through React Native + Expo.
-- [ ] `MVP-FOUND-002` Repository has CI for lint/typecheck/tests once code exists.
-- [ ] `MVP-FOUND-003` Core domain contracts use Profile, Item, Event and Context terminology.
+- [x] `MVP-FOUND-001` Mobile project runs on iOS and Android through React Native + Expo.
+- [x] `MVP-FOUND-002` Repository has CI for lint/typecheck/tests once code exists.
+- [x] `MVP-FOUND-003` Core domain contracts use Profile, Item, Event and Context terminology.
 
 ## Room and theme
 

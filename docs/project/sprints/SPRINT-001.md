@@ -1,8 +1,9 @@
 # Sprint 001 — Foundation
 
-Status: **ACTIVE — VALIDATED, MERGE PENDING**
+Status: **COMPLETE**
 Milestone: **MVP 0.1**
 Started: **2026-08-25**
+Completed: **2026-08-25**
 
 ## Goal
 
@@ -29,6 +30,8 @@ Create a repository and mobile-development foundation strong enough that future 
 
 ## Relevant MVP requirements
 
+Completed:
+
 - `MVP-FOUND-001`
 - `MVP-FOUND-002`
 - `MVP-FOUND-003`
@@ -40,25 +43,25 @@ Create a repository and mobile-development foundation strong enough that future 
 - Implementing real recommendation ranking.
 - Supabase schema beyond what is required for the skeleton.
 
-## Definition of Done
+## Definition of Done — result
 
-- New developer/agent can follow repository instructions and run the mobile skeleton.
-- CI validates the baseline project.
-- Core contracts use canonical glossary terms.
-- STATUS/CODEMAP/MVP accurately describe the repository.
-- Sprint close checklist has been completed.
+- [x] New developer/agent can follow repository instructions and run the mobile skeleton.
+- [x] CI validates the baseline project.
+- [x] Core contracts use canonical glossary terms.
+- [x] STATUS/CODEMAP/MVP accurately describe the repository at sprint close.
+- [x] Sprint close checklist completed through Issue #4.
 
-## Delivered so far
+## Delivered
 
 ### Project memory
 
 - Repository project-memory and handoff architecture established.
 - Kajo 0 Product Constitution captured.
 - MVP requirement IDs established.
-- Canonical glossary, domain/event/prediction models and initial ADRs established.
+- Canonical glossary, domain/event/prediction models and ADR-0001 through ADR-0004 established.
 - Sprint, milestone, Issue, PR and AI conversation handoff processes established.
 
-### Engineering foundation — PR #3
+### Engineering foundation — Issue #2 / PR #3
 
 - npm workspace/monorepo root created.
 - Committed npm lockfile created from the validated dependency graph.
@@ -73,7 +76,7 @@ Create a repository and mobile-development foundation strong enough that future 
 
 ## Validation evidence
 
-PR #3 latest Foundation validation passed:
+PR #3 and the post-merge `main` CI both passed:
 
 - `npm ci`
 - lint
@@ -82,19 +85,22 @@ PR #3 latest Foundation validation passed:
 - Expo iOS bundle export
 - Expo Android bundle export
 
+PR #3 was squash-merged to `main` as commit `ba3c551b636d7fc803ded8588f087d56e76bea69`.
+
 ## Decisions
 
-See ADR-0001 through ADR-0004. No new durable architecture decision was required during the engineering implementation.
+See ADR-0001 through ADR-0004. No additional durable architecture decision was required during the engineering implementation.
 
 ## Deferred
 
-- Room feature implementation belongs to Sprint 002.
-- Curtain/theme interaction belongs to Sprint 003.
-- Real external content providers and recommendation ranking remain deferred to later sprints.
+- Room feature implementation -> Sprint 002.
+- Curtain/theme interaction -> Sprint 003.
+- Real external content providers and recommendation ranking -> later sprints.
+- Shared Room/theme identity -> Shared Kajo sprint.
 
 ## Known issues
 
-No blocking Foundation issue is known. Dependency install currently emits non-blocking upstream deprecation warnings; they do not prevent validation and should be reviewed when dependency versions are next upgraded.
+No blocking Foundation issue remains. Dependency installation emits non-blocking upstream deprecation warnings; review them during normal dependency upgrades rather than expanding this completed sprint.
 
 ## Important files
 
@@ -112,6 +118,8 @@ No blocking Foundation issue is known. Dependency install currently emits non-bl
 - `/docs/architecture/ARCHITECTURE.md`
 - `/docs/architecture/CODEMAP.md`
 
-## Handoff
+## Final handoff
 
-PR #3 is validated and ready for merge. After merge, execute the mandatory Sprint 001 close protocol: mark Foundation MVP IDs complete, set this sprint to COMPLETE, update STATUS, and open Sprint 002 — Room before starting Room implementation.
+Sprint 001 is complete and historical. Continue with **Sprint 002 — Room** in `SPRINT-002.md`.
+
+Do not extend Sprint 001 with Room, curtain/theme, provider or recommendation work. A fresh conversation must read `AGENTS.md`, `STATUS.md`, `MVP.md`, the active Sprint 002 file, glossary, relevant UX/architecture documents and actual implementation before coding.
