@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Kajo",
+    "slug": "kajo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "kajo",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.kajo.mobile"
+    },
+    "android": {
+      "package": "app.kajo.mobile",
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

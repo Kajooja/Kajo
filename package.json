@@ -1,0 +1,21 @@
+{
+  "name": "kajo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace @kajo/mobile",
+    "android": "npm run android --workspace @kajo/mobile",
+    "ios": "npm run ios --workspace @kajo/mobile",
+    "lint": "npm run lint --workspace @kajo/mobile",
+    "typecheck": "npm run typecheck --workspace @kajo/mobile",
+    "test": "npm run test --workspace @kajo/mobile",
+    "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run smoke"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
