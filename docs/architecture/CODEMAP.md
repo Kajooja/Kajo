@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-The repository is in Sprint 001 Foundation. The first mobile engineering foundation lives under `apps/mobile/` on Issue #2 / PR #3 and has passed CI validation. Merge and sprint close are still pending.
+Sprint 001 Foundation is merged and validated on `main`. Sprint 002 — Room is the active implementation sprint.
 
 Important current paths:
 
@@ -24,19 +24,19 @@ apps/mobile/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo/TypeScript foundation validated; pending merge |
-| Expo Router entry | `apps/mobile/app/` | Minimal root layout and entry screen |
-| Core domain contracts | `apps/mobile/src/domain/` | Initial Profile/Item/Event/Context/DiscoveryMode/AmbientPhase contracts |
-| Room feature | `apps/mobile/src/features/room/` | Not created yet |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Not created yet |
-| Swipe | `apps/mobile/src/features/swipe/` | Not created yet |
-| Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Not created yet |
-| Memory/history | `apps/mobile/src/features/memories/` | Not created yet |
-| Theme engine | `apps/mobile/src/theme/` | Not created yet |
-| Mobile data boundary | `apps/mobile/src/data/` | Not created yet |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript foundation merged and validated |
+| Expo Router entry | `apps/mobile/app/` | Minimal root layout and Foundation placeholder screen |
+| Core domain contracts | `apps/mobile/src/domain/` | Initial Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts |
+| Room feature | `apps/mobile/src/features/room/` | Sprint 002 — next implementation area; not created yet |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Later sprint; not created yet |
+| Swipe | `apps/mobile/src/features/swipe/` | Later sprint; not created yet |
+| Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
+| Memory/history | `apps/mobile/src/features/memories/` | Later sprint; not created yet |
+| Theme engine | `apps/mobile/src/theme/` | Sprint 003; not created yet |
+| Mobile data boundary | `apps/mobile/src/data/` | Create when real data access requires it |
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Later sprint |
-| Shared contracts | `packages/contracts/` | Create only when real sharing exists |
+| Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke checks |
 
 Do not create empty feature folders merely to match the target architecture.
