@@ -1,11 +1,17 @@
 # Kajo
 
-Kajo is a mobile-first personal and shared discovery platform that learns people rather than isolated content-category preferences.
+Kajo is a mobile-first personal and shared discovery platform. It learns a person as a whole instead of building isolated book, movie or music taste silos.
 
-The product starts with books and movies, while the domain model and prediction architecture remain generic enough to expand later to music, series, events, travel, restaurants and other experiences.
+Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
-## Project memory
+The repository—not a ChatGPT conversation—is the permanent project memory.
 
-This repository is the source of truth for product decisions, terminology, architecture, MVP scope, sprint status and handoffs.
+## Start here
 
-**AI agents and contributors must read `AGENTS.md` before making changes.**
+AI agents and contributors **must read [`AGENTS.md`](AGENTS.md) before doing any work**.
+
+Documentation map: [`docs/README.md`](docs/README.md)
+
+Current project state: [`docs/project/STATUS.md`](docs/project/STATUS.md)
+
+Current MVP scope: [`docs/product/MVP.md`](docs/product/MVP.md)
