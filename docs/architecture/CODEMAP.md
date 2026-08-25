@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprint 001 Foundation and Sprint 002 Room are merged and validated on `main`. Sprint 003 — Curtain & Theme is the active implementation sprint.
+Sprint 001 Foundation, Sprint 002 Room and Sprint 003 Curtain & Theme are merged and validated on `main`. Sprint 004 — Discovery UI is the active implementation sprint.
 
 Important current paths:
 
@@ -25,11 +25,11 @@ apps/mobile/
 | Area | Canonical path | Current state |
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation merged and validated |
-| Expo Router entry | `apps/mobile/app/` | Root route opens Room; mock book/movie boundary routes live under `app/discovery/` |
+| Expo Router entry | `apps/mobile/app/` | Root route opens Room; current book/movie routes are placeholders pending Sprint 004 |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
-| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus Sprint 003 curtain control/state logic |
-| Theme engine | `apps/mobile/src/theme/` | Sprint 003 base Room theme tokens, AmbientPhase overlays and theme tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Sprint 004; not created yet |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus merged three-state curtain control/state logic |
+| Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Sprint 004 next implementation area; not created yet |
 | Swipe | `apps/mobile/src/features/swipe/` | Later sprint; not created yet |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Later sprint; not created yet |

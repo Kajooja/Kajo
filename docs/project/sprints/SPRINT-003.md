@@ -1,117 +1,110 @@
 # Sprint 003 — Curtain & Theme
 
-Status: **ACTIVE**
+Status: **COMPLETE**
 Milestone: **MVP 0.1**
 Started: **2026-08-25**
+Completed: **2026-08-25**
 
 ## Goal
 
 Add Kajo's first reusable theme/ambient architecture and the curtain interaction that moves between the three discovery modes without implementing real discovery ranking or content-provider logic.
 
-Sprint 003 should make the existing Room respond coherently to `DiscoveryMode` while preserving the user's base visual identity and the separation between prediction semantics and visual atmosphere.
+Sprint 003 made the Room respond coherently to `DiscoveryMode` while preserving the base visual identity and the separation between prediction semantics and visual atmosphere.
 
-## Scope
+## Relevant MVP requirements — result
 
-- Introduce reusable mobile theme tokens instead of keeping Room identity in scattered hard-coded component colours.
-- Establish a clear theme/ambient boundary under `apps/mobile/src/theme/` or another justified canonical path.
-- Preserve a base profile-theme layer and apply `AmbientPhase` as a separate visual layer.
-- Add the curtain as a signature Room control.
-- Support three explicit curtain snap states corresponding to:
-  - `FOR_YOU`
-  - `SURPRISE`
-  - `RISK`
-- Use the existing canonical mapping:
-  - `FOR_YOU` -> `DAWN`
-  - `SURPRISE` -> `EVENING`
-  - `RISK` -> `NIGHT`
-- Make ambient changes visible through restrained 2D light/opacity/gradient/shadow/motion changes rather than decorative UI chrome.
-- Provide accessible non-gesture alternatives for changing the curtain state.
-- Respect reduced-motion preferences where animation is introduced.
-- Keep state/mapping/snap logic outside purely visual components where meaningful.
-- Add tests for meaningful state/mapping/snap behavior.
-- Keep existing lint, typecheck, tests and iOS/Android bundle smoke checks green.
-- Update CODEMAP and current-state documentation when implementation paths become real.
+Completed:
 
-## Relevant MVP requirements
-
-Primary Sprint 003 targets:
-
-- `MVP-ROOM-005` — user theme is represented by reusable theme tokens rather than hard-coded component colours.
+- `MVP-ROOM-005` — Room uses reusable theme tokens rather than scattered hard-coded component colours.
 - `MVP-DISC-003` — curtain controls DiscoveryMode with three snap states.
-- `MVP-DISC-004` — DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
+- `MVP-DISC-004` — DiscoveryMode maps visually to dawn, evening and night without replacing the base theme.
 
-Supporting groundwork:
+Groundwork delivered but requirement remains incomplete:
 
-- `MVP-DISC-002` — Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
+- `MVP-DISC-002` — canonical `FOR_YOU`, `SURPRISE` and `RISK` state/control exists, but the real discovery experience does not yet exist. Complete this in Sprint 004.
 
-Do not mark `MVP-DISC-002` complete merely because the Room can switch the domain state; the real discovery experience is Sprint 004 scope.
+## Definition of Done — result
 
-## Non-goals
+- [x] Room presentation consumes reusable base-theme tokens.
+- [x] Theme architecture separates base theme from AmbientPhase overlay tokens.
+- [x] Curtain is present and can select `FOR_YOU`, `SURPRISE` and `RISK`.
+- [x] Curtain has three snap states using the canonical DiscoveryMode -> AmbientPhase mapping.
+- [x] DAWN, EVENING and NIGHT produce distinct restrained atmosphere changes while the base theme persists.
+- [x] Users can change mode through accessible buttons without relying only on drag.
+- [x] Programmatic snapping respects the platform reduced-motion preference.
+- [x] Curtain snap/state logic and theme separation have automated tests.
+- [x] No real ranking/discovery/backend behavior was introduced.
+- [x] PR and post-merge `main` CI pass lint, typecheck, tests and iOS/Android bundle smoke checks.
+- [x] CODEMAP and STATUS describe the real implementation paths/state.
 
-- Real book/movie discovery grids.
-- Real ranking or recommendation changes based on DiscoveryMode.
-- `MVP-PRED-003`; algorithmic exploration semantics remain later prediction scope.
-- Real external content providers.
-- Supabase/backend integration.
-- SharedProfile Room/theme identity (`MVP-ROOM-006`).
-- Production onboarding/authentication.
-- Complex Room editing or 3D rendering.
-- Final production art assets.
+## Delivered — Issue #12 / PR #13
 
-## UX constraints
+- Added `apps/mobile/src/theme/roomTheme.ts` with reusable base Room tokens and separate AmbientPhase tokens.
+- Migrated Room styling away from scattered local colour literals.
+- Added `CurtainControl` with horizontal drag interaction and three canonical snap states.
+- Added accessible mode buttons as a non-gesture control path.
+- Added reduced-motion-aware snap animation using `AccessibilityInfo`.
+- Reused the domain-owned `DiscoveryMode` -> `AmbientPhase` mapping rather than duplicating semantic mapping in presentation code.
+- Added visual ambient wash/window/curtain changes for DAWN, EVENING and NIGHT.
+- Added pure tests for snap-position behavior and theme/base separation.
+- Kept real discovery, backend and prediction semantics outside the sprint.
 
-- Theme identity remains the base visual layer.
-- `DiscoveryMode` and `AmbientPhase` remain separate concepts.
-- Visual darkness must not imply a user's risk preference.
-- The curtain should become learnable as a three-state control without permanent navigation clutter.
-- Motion communicates state and must not compete with content.
-- Gesture interaction requires an accessible alternative.
-- Reduced-motion settings must be respected.
-- The Room remains the home/navigation metaphor.
+## Validation evidence
 
-See `/docs/product/UX_PRINCIPLES.md` and ADR-0004 before implementation.
+The first PR #13 CI run caught a React hooks/ref lint defect in `CurtainControl`. The implementation was corrected before merge.
 
-## Definition of Done
+The corrected PR #13 CI passed:
 
-- Room presentation consumes reusable theme tokens for its base identity rather than scattered local colour literals.
-- Theme architecture clearly separates base theme from ambient phase.
-- Curtain is present in the Room and can select all three canonical DiscoveryModes.
-- Curtain has three explicit/snap states and the selected mode maps through the canonical AmbientPhase mapping.
-- DAWN, EVENING and NIGHT produce visibly distinct but restrained 2D atmosphere changes without replacing the base theme.
-- Users can change mode without relying only on a drag gesture.
-- Introduced motion respects reduced-motion preferences.
-- Meaningful curtain/state logic has automated tests.
-- No real ranking/discovery/backend behavior is silently introduced.
-- `npm run check` passes, including iOS and Android bundle smoke checks.
-- CODEMAP/STATUS/MVP accurately describe the implemented state at sprint close.
+- locked npm install,
+- lint,
+- TypeScript typecheck,
+- unit tests,
+- Expo iOS bundle smoke test,
+- Expo Android bundle smoke test.
 
-## Initial implementation sequence
+PR #13 was squash-merged to `main` as commit `36fad3d51353996112e504db1658e405f702be57`.
 
-1. Inspect the merged Room implementation and current domain mapping.
-2. Create the first Sprint 003 implementation Issue and branch.
-3. Define reusable theme/base/ambient tokens and migrate Room presentation to use them.
-4. Add curtain state/control with three canonical modes.
-5. Add visual AmbientPhase application and accessible alternatives.
-6. Add tests and reduced-motion handling.
-7. Validate through CI.
-8. Update repository project memory and complete the sprint close protocol only when the Definition of Done is met.
+The post-merge `main` CI run also completed successfully.
 
-## Important starting files
+## Decisions
 
-- `/AGENTS.md`
-- `/docs/project/STATUS.md`
-- `/docs/product/MVP.md`
-- `/docs/product/UX_PRINCIPLES.md`
-- `/docs/domain/GLOSSARY.md`
-- `/docs/architecture/ARCHITECTURE.md`
-- `/docs/architecture/CODEMAP.md`
-- `/docs/architecture/decisions/0004-discovery-mode-and-ambient-phase.md`
-- `/apps/mobile/src/domain/contracts.ts`
-- `/apps/mobile/src/domain/discovery.ts`
+No new ADR was required. Sprint 003 implemented the existing ADR-0004 separation:
+
+- `DiscoveryMode` remains domain/discovery state.
+- `AmbientPhase` remains visual state.
+- the mapping stays explicit and domain-owned.
+- the base Room theme persists beneath ambient changes.
+
+## Deferred
+
+- Real book/movie discovery and `MVP-ROOM-003/004` -> Sprint 004.
+- `MVP-DISC-001/002/005/006` -> Sprint 004.
+- Real prediction/ranking semantics and `MVP-PRED-003` -> Prediction V0 sprint.
+- SharedProfile Room/theme identity -> Shared Kajo sprint.
+- Final production artwork -> later iteration/hardening.
+
+## Known limitations
+
+- The current curtain/theme art is an initial functional visual system rather than final production design.
+- DiscoveryMode currently affects Room control/atmosphere only; it does not yet affect a real discovery grid.
+- Theme tokens currently represent the initial personal Room base identity; persisted/user-configurable profile theme data belongs to later backend/profile work.
+
+## Important files
+
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
+- `/apps/mobile/src/features/room/CurtainControl.tsx`
+- `/apps/mobile/src/features/room/curtainState.ts`
+- `/apps/mobile/src/features/room/curtainState.test.ts`
+- `/apps/mobile/src/theme/roomTheme.ts`
+- `/apps/mobile/src/theme/roomTheme.test.ts`
+- `/apps/mobile/src/domain/discovery.ts`
+- `/docs/architecture/decisions/0004-discovery-mode-and-ambient-phase.md`
+- `/docs/architecture/CODEMAP.md`
+- `/docs/product/MVP.md`
+- `/docs/project/STATUS.md`
 
-## Handoff
+## Final handoff
 
-Start Sprint 003 with one scoped Issue for reusable Room theme tokens and the three-state curtain/ambient control. Do not code directly on `main`.
+Sprint 003 is complete and historical. Continue with **Sprint 004 — Discovery UI** in `SPRINT-004.md`.
 
-Do not implement real discovery grids or ranking semantics during this sprint. Sprint 003 owns the visual/control layer; Sprint 004 owns the discovery UI.
+Do not rewrite Sprint 003 to include discovery-grid or prediction work. Sprint 004 owns the first real mock-data discovery experience; later prediction work owns real ranking semantics.
