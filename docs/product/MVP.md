@@ -14,8 +14,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Room and theme
 
-- [ ] `MVP-ROOM-001` A user has a personal minimalist 2D Room.
-- [ ] `MVP-ROOM-002` The Room is the primary home/navigation surface.
+- [x] `MVP-ROOM-001` A user has a personal minimalist 2D Room.
+- [x] `MVP-ROOM-002` The Room is the primary home/navigation surface.
 - [ ] `MVP-ROOM-003` Bookshelf opens book discovery.
 - [ ] `MVP-ROOM-004` Screen/projector opens movie discovery.
 - [ ] `MVP-ROOM-005` User theme is represented by reusable theme tokens rather than hard-coded component colours.
