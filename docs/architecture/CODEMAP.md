@@ -25,11 +25,11 @@ apps/mobile/
 | Area | Canonical path | Current state |
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation merged and validated |
-| Expo Router entry | `apps/mobile/app/` | Root route opens Room; current book/movie routes are placeholders pending Sprint 004 |
+| Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
-| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus merged three-state curtain control/state logic |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus three-state curtain; bookshelf/projector navigate to discovery |
 | Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Sprint 004 next implementation area; not created yet |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Sprint 004 shared DiscoveryMode state, generic mock Items/ranking, reusable grid and generic Item detail presentation |
 | Swipe | `apps/mobile/src/features/swipe/` | Later sprint; not created yet |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Later sprint; not created yet |
