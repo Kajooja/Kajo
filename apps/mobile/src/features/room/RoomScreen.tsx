@@ -21,12 +21,7 @@ export function RoomScreen() {
       <View style={styles.room}>
         <View style={styles.header}>
           <Text style={styles.kicker}>OMA KAJO</Text>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>Huone</Text>
-            <Text accessibilityLabel={`Ambient phase ${ambientPhase}`} style={styles.phaseLabel}>
-              {ambientPhase}
-            </Text>
-          </View>
+          <Text style={styles.title}>Huone</Text>
         </View>
 
         <View style={styles.curtainArea}>
@@ -38,7 +33,10 @@ export function RoomScreen() {
           />
         </View>
 
-        <View style={styles.scene} accessibilityLabel="Kajo Room">
+        <View
+          style={styles.scene}
+          accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
+        >
           <View pointerEvents="none" style={styles.ambientWash} />
 
           <View style={styles.backWall}>
@@ -63,6 +61,8 @@ export function RoomScreen() {
           </View>
 
           <View style={styles.roomFloor}>
+            <View pointerEvents="none" style={styles.floorAmbientWash} />
+
             <View style={styles.fireplace} accessibilityLabel="Fireplace">
               <View style={styles.mantel} />
               <View style={styles.firebox}>
@@ -119,23 +119,11 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '600',
       letterSpacing: 2.2,
     },
-    titleRow: {
-      marginTop: 4,
-      flexDirection: 'row',
-      alignItems: 'baseline',
-      justifyContent: 'space-between',
-    },
     title: {
       color: theme.base.textPrimary,
       fontSize: 34,
       fontWeight: '600',
-    },
-    phaseLabel: {
-      color: theme.base.textMuted,
-      fontSize: 9,
-      fontWeight: '700',
-      letterSpacing: 1.5,
-      opacity: 0.7,
+      marginTop: 4,
     },
     curtainArea: {
       paddingBottom: 6,
@@ -161,7 +149,6 @@ function createStyles(theme: RoomTheme) {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      backgroundColor: theme.base.wall,
     },
     window: {
       width: '38%',
@@ -224,6 +211,12 @@ function createStyles(theme: RoomTheme) {
       justifyContent: 'space-between',
       paddingHorizontal: 24,
       paddingBottom: 24,
+      overflow: 'hidden',
+    },
+    floorAmbientWash: {
+      ...StyleSheet.absoluteFill,
+      backgroundColor: theme.ambient.wash,
+      opacity: theme.ambient.washOpacity * 0.6,
     },
     fireplace: {
       width: '38%',
