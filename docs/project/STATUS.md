@@ -11,41 +11,44 @@ This is the authoritative current-state document.
 
 Kajo 0 product definition and the repository project-memory structure are established.
 
-The repository documentation defines:
+Sprint 001 engineering foundation is now implemented on Issue #2 / branch `feat/2-mobile-foundation` pending dependency lockfile generation, CI validation, review and merge.
 
-- product constitution,
-- MVP requirements,
-- UX principles,
-- canonical terminology,
-- core domain model,
-- event model,
-- prediction/memory thesis,
-- technical target architecture,
-- ADR process,
-- sprint/milestone/handoff workflow.
+The branch currently contains:
 
-No application code exists yet.
+- npm monorepo/workspace root,
+- React Native + Expo SDK 57 + TypeScript mobile skeleton under `apps/mobile`,
+- Expo Router root navigation shell,
+- baseline lint/typecheck/test commands,
+- GitHub Actions CI definition,
+- initial typed canonical domain contracts,
+- canonical `DiscoveryMode` -> `AmbientPhase` mapping and test.
+
+No Room feature implementation exists yet.
 
 ## MVP progress
 
 See `../product/MVP.md`.
 
-Current implementation completion: **0 application requirements completed**. Documentation/bootstrap is completed foundation work inside Sprint 001.
+No Foundation requirement is marked complete until Issue #2 is validated and merged.
 
 ## In progress
 
-- Sprint 001 engineering foundation.
+- Issue #2 — Sprint 001 mobile engineering foundation.
+- Branch: `feat/2-mobile-foundation`.
 
 ## Next
 
-1. Create Expo + TypeScript mobile skeleton in `apps/mobile`.
-2. Establish workspace/package manager and baseline lint/typecheck/tests.
-3. Add initial CI.
-4. Define the first typed domain contracts for Profile, Item, Event, Context, DiscoveryMode and AmbientPhase.
-5. Update CODEMAP and close Sprint 001 only after the Foundation Definition of Done is met.
+1. Generate and commit the npm dependency lockfile for the workspace.
+2. Run/install dependencies and execute `npm run check`.
+3. Open/validate the Issue #2 pull request and confirm CI passes.
+4. Merge accepted foundation changes.
+5. Mark `MVP-FOUND-001`, `MVP-FOUND-002` and `MVP-FOUND-003` complete only when their acceptance criteria are actually met.
+6. Complete the Sprint 001 close protocol before starting Room feature work.
 
 ## Known issues / open decisions
 
+- The current CI uses `npm ci`, so a committed dependency lockfile is required before CI can pass.
+- Local validation could not be completed from the current agent runtime because its container could not resolve GitHub/npm hosts; this is an environment limitation, not evidence that the code passes.
 - Final book metadata provider is not yet locked.
 - Exact authentication/onboarding UX is not yet designed.
 - Exact visual art direction of the Room will be iterated during Room sprint; principles are locked, assets are not.
@@ -54,18 +57,17 @@ Current implementation completion: **0 application requirements completed**. Doc
 ## Important files
 
 - `/AGENTS.md`
-- `/docs/README.md`
-- `/docs/product/PRODUCT.md`
+- `/package.json`
+- `/apps/mobile/package.json`
+- `/apps/mobile/app/`
+- `/apps/mobile/src/domain/`
+- `/.github/workflows/ci.yml`
 - `/docs/product/MVP.md`
-- `/docs/domain/GLOSSARY.md`
-- `/docs/domain/DOMAIN_MODEL.md`
-- `/docs/domain/PREDICTION_MODEL.md`
-- `/docs/architecture/ARCHITECTURE.md`
-- `/docs/project/ROADMAP.md`
+- `/docs/architecture/CODEMAP.md`
 - `/docs/project/sprints/SPRINT-001.md`
 
 ## Handoff
 
 A new conversation/agent must follow the read order in `/AGENTS.md`.
 
-The next concrete engineering action is **Sprint 001 mobile foundation**: create the Expo/TypeScript app skeleton without implementing Room visuals yet.
+Continue Issue #2 on `feat/2-mobile-foundation`. Do not start Room work yet. First make dependency installation reproducible, run the baseline checks, validate CI and merge the foundation PR.
