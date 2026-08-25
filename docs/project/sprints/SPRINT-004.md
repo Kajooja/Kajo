@@ -86,6 +86,7 @@ See `/docs/product/UX_PRINCIPLES.md` before implementation.
 - A user can open a generic Item detail view and return to discovery.
 - Real provider/backend/prediction semantics remain outside the implementation.
 - `npm run check` passes including iOS/Android bundle smoke checks.
+- User-facing acceptance is exercised on a real phone/emulator/simulator when such a runtime is available; unavailable runtime validation must be recorded explicitly and never inferred from bundle smoke success.
 - CODEMAP/STATUS/MVP accurately describe the repository at sprint close.
 
 ## Initial implementation sequence
@@ -117,8 +118,34 @@ See `/docs/product/UX_PRINCIPLES.md` before implementation.
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
 - `/apps/mobile/src/features/room/CurtainControl.tsx`
 
+## Mid-sprint checkpoint — 2026-08-25
+
+Issue #18 / PR #19 delivered the first real local/mock discovery implementation and was squash-merged to `main` as commit `1de51bda035d8ad3d7666a95473697c6ff47e772`.
+
+Delivered implementation:
+
+- shared Room/discovery `DiscoveryMode` ownership,
+- generic BOOK/MOVIE mock Items,
+- deterministic mock ranking for all three modes,
+- generic two-column discovery grid,
+- real book and movie routes,
+- generic Item detail route/view,
+- removal of the obsolete `RoomDestinationPlaceholder.tsx`,
+- automated ranking/filtering/lookup tests.
+
+Validation evidence:
+
+- PR #19 canonical automated gate passed: lint, typecheck, tests, iOS bundle smoke and Android bundle smoke.
+- Post-merge `main` CI for `1de51bda035d8ad3d7666a95473697c6ff47e772` also passed the full gate.
+- Repository hygiene review found no remaining discovery placeholder component or duplicate BOOK/MOVIE screen implementation.
+
+Outstanding acceptance:
+
+- A real phone/emulator/simulator runtime was not available in the connected AI execution environment.
+- Therefore the user-facing flow has **not yet been device/runtime verified**.
+- Issue #20 tracks the exact Room -> discovery -> detail -> back runtime acceptance flow.
+- Do not mark the Sprint 004 MVP requirements complete and do not close this sprint until that result is recorded.
+
 ## Handoff
 
-Start Sprint 004 by creating one scoped Issue for the mock-data discovery flow and shared DiscoveryMode ownership. Do not code directly on `main`.
-
-The first implementation should replace the placeholder routes with real generic-Item grids while preserving a clean boundary to later backend/event/prediction work.
+Continue Sprint 004 from open Issue #20. Application code is merged and automated validation is green. The next action is real runtime verification on a phone/emulator/simulator, followed by scoped fixes if needed and then the mandatory Sprint 004 close protocol.
