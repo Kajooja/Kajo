@@ -139,6 +139,35 @@ Delivered:
 
 CI run #66 for this commit is fully green, including lint, typecheck, tests, iOS/Android bundle smoke, standalone Android release build, embedded JS bundle verification and artifact upload.
 
+### Global curtain / DiscoveryMode — Issue #39 / PR #47
+
+Merged to `main` as commit `bea219aa0c6837bb646ece7d4ccf37bb1e05afc2`.
+
+Delivered:
+
+- curtain control aligned to the top of the Room window,
+- continuous drag plus deterministic left/centre/right tap-to-snap,
+- exactly three settled DiscoveryMode states through one shared app state,
+- duplicate discovery/detail mode selectors removed,
+- deterministic tap-region tests.
+
+Main CI run #70 is fully green, including the standalone Android release build, embedded JS bundle verification and artifact upload.
+
+### Action commit / auto-advance / undo / labels — Issue #40 / PR #48
+
+Merged to `main` as commit `be183d7abe9ceb02b2c420b4f132f5ef326c5f51`.
+
+Delivered:
+
+- visible feedback and selected state for interest, saved and consumed actions,
+- restrained consumed-card exit and automatic next-Item advance separate from ordinary horizontal swipe,
+- deterministic bounded undo for the latest 10 committed interaction changes without active-index movement,
+- consumed history preserved through the existing `Luetut` / `Katsotut` collection,
+- one feature-level source for reused interaction labels,
+- deterministic undo-order, history-bound and no-op tests.
+
+Main CI run #72 is fully green, including `npm run check`, the standalone Android release build, embedded JS bundle verification and artifact upload.
+
 ## Real-device review — 2026-08-26
 
 Issue #34 records the test result.
@@ -150,30 +179,9 @@ Issue #34 records the test result.
 - Room -> discovery -> swipe navigation works,
 - overall MVP structure remains usable.
 
-### Why Sprint 005 remains open
+### Why Sprint 005 remained open after the first review
 
-The phone review identified two required refinement Issues.
-
-#### Issue #39 — global curtain / risk control
-
-- move/align control to the top of the Room window so it reads as a real curtain control,
-- preserve continuous drag,
-- tapping left/centre/right target should smoothly move/snap to that state,
-- keep exactly three settled states,
-- smooth colour/light interpolation,
-- same DiscoveryMode persists through all screens,
-- remove duplicated `Sinulle / Yllätys / Riski` button selector groups from downstream screens,
-- the same state becomes the future Prediction V0 exploration/risk input.
-
-#### Issue #40 — action commit / auto-advance / undo / labels
-
-- action presses need clear visible feedback,
-- `Luettu` / `Katsottu` should make the active card leave subtly and reveal the next card,
-- consumed Item remains in `Luetut` / `Katsotut`,
-- add undo/back-arrow for recent choices,
-- retain at least the latest 10 committed actions for sequential undo as the MVP target,
-- centralize repeated user-facing action labels,
-- keep copy independent from canonical state/event semantics.
+The phone review opened the scoped curtain refinement in Issue #39 and action-loop refinement in Issue #40. Both are now delivered in the checkpoints above. Sprint 005 remains open only until the CI #72 APK passes the repeated real-device acceptance in Issue #34.
 
 ## Later learning/prediction decision captured during device review
 
@@ -197,14 +205,11 @@ The mobile client must not own the production ranking algorithm.
 
 ## Exact continuation order
 
-1. Implement Issue #39.
-2. Run full automated validation + standalone Android build.
-3. Implement Issue #40.
-4. Run full automated validation + standalone Android build.
-5. Repeat Issue #34 real-device acceptance using the new final APK.
-6. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
-7. Perform mandatory Sprint 005 close protocol.
-8. Start Sprint 006 only after the close is merged.
+1. Install the standalone APK from main CI run #72.
+2. Repeat Issue #34 real-device acceptance for the full final Sprint 005 flow.
+3. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
+4. Perform mandatory Sprint 005 close protocol.
+5. Start Sprint 006 only after the close is merged.
 
 ## Important files
 
@@ -223,10 +228,11 @@ The mobile client must not own the production ranking algorithm.
 - `/apps/mobile/src/features/discovery/ItemDetailScreen.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteraction.ts`
+- `/apps/mobile/src/features/discovery/itemInteractionLabels.ts`
 - `/apps/mobile/src/features/discovery/itemInteraction.test.ts`
 
 ## Handoff
 
 A fresh ChatGPT conversation can start with **"jatketaan reposta"**.
 
-Read `AGENTS.md` -> `STATUS.md` -> this sprint file. The next engineering task is **Issue #39**. After #39, implement **Issue #40**. Do **not** start Sprint 006 and do not close Sprint 005 until the revised real-device acceptance in Issue #34 succeeds.
+Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issues #39 and #40 are merged and their main-branch APK builds are green. The next task is the revised real-device acceptance in **Issue #34** using the CI #72 APK. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
