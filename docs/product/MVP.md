@@ -34,18 +34,21 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
 - [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
 - [x] `MVP-DISC-006` User can open Item details.
+- [-] `MVP-DISC-007` Curtain is the single app-wide three-state DiscoveryMode/risk control: it supports drag and tap-to-snap, visually interpolates smoothly, and the selected mode persists through Room, discovery and swipe without duplicate per-screen selectors.
 
 ## Swipe and state
 
-- [ ] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
-- [ ] `MVP-SWIPE-002` User can express positive/negative interest.
-- [ ] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
-- [ ] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
+- [-] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
+- [-] `MVP-SWIPE-002` User can express positive/negative interest.
+- [-] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
+- [-] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
+- [-] `MVP-SWIPE-005` Marking the current Item read/watched visibly commits the action with a restrained exit/advance animation and presents the next Item without an index jump.
+- [-] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions for sequential undo.
 
 ## Saved, consumed and memory
 
-- [ ] `MVP-MEM-001` User can save/unsave an Item.
-- [ ] `MVP-MEM-002` User can view consumed books/movies.
+- [-] `MVP-MEM-001` User can save/unsave an Item.
+- [-] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
 - [ ] `MVP-MEM-003` User can add a simple rating to a consumed Item.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
 
