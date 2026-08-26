@@ -1,22 +1,60 @@
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
+import {
+  getRoomTheme,
+  ROOM_AMBIENT_BY_PHASE,
+  type RoomTheme,
+} from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
-import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { CurtainControl } from './CurtainControl';
+import { getCurtainPositionForMode } from './curtainState';
 
 export function RoomScreen() {
   const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
   const styles = createStyles(theme);
+  const [curtainPosition] = useState(
+    () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
+  );
+  const ambientColor = curtainPosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.wash,
+      ROOM_AMBIENT_BY_PHASE.EVENING.wash,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.wash,
+    ],
+  });
+  const ambientOpacity = curtainPosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.washOpacity * 1.35,
+      ROOM_AMBIENT_BY_PHASE.EVENING.washOpacity * 1.35,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.washOpacity * 1.35,
+    ],
+  });
+  const windowLight = curtainPosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.windowLight,
+      ROOM_AMBIENT_BY_PHASE.EVENING.windowLight,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.windowLight,
+    ],
+  });
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar style="light" />
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.appAmbient, { backgroundColor: ambientColor, opacity: ambientOpacity }]}
+      />
+
       <View style={styles.room}>
         <View style={styles.header}>
           <Text style={styles.kicker}>OMA KAJO</Text>
@@ -27,6 +65,7 @@ export function RoomScreen() {
           <CurtainControl
             mode={discoveryMode}
             onModeChange={setDiscoveryMode}
+            position={curtainPosition}
             baseTheme={theme.base}
             ambientTheme={theme.ambient}
           />
@@ -36,14 +75,18 @@ export function RoomScreen() {
           style={styles.scene}
           accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
         >
-          <View pointerEvents="none" style={styles.ambientWash} />
-
           <View style={styles.backWall}>
-            <View style={styles.window} accessibilityLabel="Window">
-              <View style={styles.windowGlow} />
+            <Animated.View
+              style={[styles.window, { backgroundColor: windowLight }]}
+              accessibilityLabel="Window"
+            >
+              <Animated.View
+                pointerEvents="none"
+                style={[styles.windowGlow, { backgroundColor: windowLight }]}
+              />
               <View style={styles.windowBarVertical} />
               <View style={styles.windowBarHorizontal} />
-            </View>
+            </Animated.View>
 
             <Pressable
               accessibilityRole="button"
@@ -60,8 +103,6 @@ export function RoomScreen() {
           </View>
 
           <View style={styles.roomFloor}>
-            <View pointerEvents="none" style={styles.floorAmbientWash} />
-
             <View style={styles.fireplace} accessibilityLabel="Fireplace">
               <View style={styles.mantel} />
               <View style={styles.firebox}>
@@ -89,6 +130,11 @@ export function RoomScreen() {
               <Text style={styles.objectLabel}>KIRJAT</Text>
             </Pressable>
           </View>
+
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.sceneAmbient, { backgroundColor: ambientColor, opacity: ambientOpacity }]}
+          />
         </View>
 
         <Text style={styles.hint}>Huone on Kajo. Valitse esine tai muuta valoa verholla.</Text>
@@ -102,6 +148,9 @@ function createStyles(theme: RoomTheme) {
     safeArea: {
       flex: 1,
       backgroundColor: theme.base.appBackground,
+    },
+    appAmbient: {
+      ...StyleSheet.absoluteFill,
     },
     room: {
       flex: 1,
@@ -136,10 +185,8 @@ function createStyles(theme: RoomTheme) {
       borderWidth: 1,
       borderColor: theme.base.border,
     },
-    ambientWash: {
+    sceneAmbient: {
       ...StyleSheet.absoluteFill,
-      backgroundColor: theme.ambient.wash,
-      opacity: theme.ambient.washOpacity,
     },
     backWall: {
       flex: 0.62,
@@ -154,12 +201,10 @@ function createStyles(theme: RoomTheme) {
       aspectRatio: 0.78,
       borderWidth: 7,
       borderColor: theme.base.structure,
-      backgroundColor: theme.ambient.windowLight,
       overflow: 'hidden',
     },
     windowGlow: {
       ...StyleSheet.absoluteFill,
-      backgroundColor: theme.ambient.windowLight,
       opacity: 0.82,
     },
     windowBarVertical: {
@@ -211,11 +256,6 @@ function createStyles(theme: RoomTheme) {
       paddingHorizontal: 24,
       paddingBottom: 24,
       overflow: 'hidden',
-    },
-    floorAmbientWash: {
-      ...StyleSheet.absoluteFill,
-      backgroundColor: theme.ambient.wash,
-      opacity: theme.ambient.washOpacity * 0.6,
     },
     fireplace: {
       width: '38%',

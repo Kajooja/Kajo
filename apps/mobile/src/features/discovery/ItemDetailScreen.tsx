@@ -23,6 +23,13 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <StatusBar style="light" />
+        <View
+          pointerEvents="none"
+          style={[
+            styles.ambientBackdrop,
+            { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+          ]}
+        />
         <View style={styles.missing}>
           <Text style={styles.title}>Itemiä ei löytynyt</Text>
           <Pressable
@@ -41,6 +48,13 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar style="light" />
+      <View
+        pointerEvents="none"
+        style={[
+          styles.ambientBackdrop,
+          { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+        ]}
+      />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Pressable
           accessibilityRole="button"
@@ -95,6 +109,9 @@ function createStyles(theme: RoomTheme) {
     safeArea: {
       flex: 1,
       backgroundColor: theme.base.appBackground,
+    },
+    ambientBackdrop: {
+      ...StyleSheet.absoluteFill,
     },
     content: {
       paddingHorizontal: 20,
