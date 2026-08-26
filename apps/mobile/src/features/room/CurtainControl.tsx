@@ -51,6 +51,7 @@ export function CurtainControl({
   const [reduceMotion, setReduceMotion] = useState(false);
   const maxTravel = Math.max(0, trackWidth - HANDLE_WIDTH - TRACK_PADDING * 2);
   const dragStartPosition = getCurtainPositionForMode(mode);
+  let activeDragStart = dragStartPosition;
 
   useEffect(() => {
     let active = true;
@@ -106,7 +107,7 @@ export function CurtainControl({
       return;
     }
 
-    const finalPosition = clampCurtainPosition(dragStartPosition + deltaX / maxTravel);
+    const finalPosition = clampCurtainPosition(activeDragStart + deltaX / maxTravel);
     const nextMode = getModeForCurtainPosition(finalPosition);
 
     if (nextMode === mode) {
@@ -119,13 +120,17 @@ export function CurtainControl({
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
-    onPanResponderGrant: () => position.stopAnimation(),
+    onPanResponderGrant: () => {
+      position.stopAnimation((value) => {
+        activeDragStart = clampCurtainPosition(value);
+      });
+    },
     onPanResponderMove: (_, gestureState) => {
       if (maxTravel <= 0) {
         return;
       }
 
-      const normalized = clampCurtainPosition(dragStartPosition + gestureState.dx / maxTravel);
+      const normalized = clampCurtainPosition(activeDragStart + gestureState.dx / maxTravel);
       position.setValue(normalized);
     },
     onPanResponderRelease: (_, gestureState) => completeDrag(gestureState.dx),
