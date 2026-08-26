@@ -27,9 +27,9 @@ apps/mobile/
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation; Sprint 004 baseline validated on a real Android phone |
 | Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
-| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus continuous three-state curtain with thinner handle and full-scene DiscoveryMode atmosphere; bookshelf/projector navigate to discovery |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus one window-aligned continuous three-state DiscoveryMode curtain with drag and tap-to-snap; bookshelf/projector navigate to discovery |
 | Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state, generic mock Items/ranking, grid, Item detail/horizontal swipe, generic local Item interaction state, interest/saved/consumed actions, consumed suppression/history and tests |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state without downstream selectors; generic mock Items/ranking, grid and horizontal Item swipe; one local interaction state with visible commit feedback, 10-action undo, consumed auto-advance, centralized labels, suppression/history and tests |
 | Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |

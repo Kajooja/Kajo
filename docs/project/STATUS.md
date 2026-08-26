@@ -11,16 +11,16 @@ This is the authoritative current-state document.
 
 Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are complete.
 
-Sprint 005 application implementation is substantially merged and stable, but Sprint 005 remains **ACTIVE** because the 2026-08-26 real-device review identified required interaction refinements before acceptance/close.
+Sprint 005 application implementation, including the refinements from the 2026-08-26 real-device review, is merged and CI-validated. Sprint 005 remains **ACTIVE** only until the final implementation APK passes the repeated real-device acceptance in Issue #34.
 
 Current `main` acceptance baseline:
 
-- commit `1a785a215e29cfd8ecc03e7aa3d05795d88d54d2`,
-- CI run #66 fully green,
+- commit `be183d7abe9ceb02b2c420b4f132f5ef326c5f51`,
+- CI run #72 fully green,
 - standalone Android release APK built successfully,
 - embedded JS bundle verified,
 - APK artifact uploaded,
-- real Android device: app launches, does not crash and Room -> discovery -> swipe navigation works.
+- previous Issue #34 phone review: the earlier APK launched without a crash and Room -> discovery -> swipe navigation worked; the final CI #72 APK still requires the repeat test.
 
 Merged Sprint 005 capabilities already present:
 
@@ -34,38 +34,27 @@ Merged Sprint 005 capabilities already present:
 - consumed suppression from ordinary discovery,
 - `Luetut` / `Katsotut` history collection,
 - active swipe sequence snapshot so consuming an Item does not remove the current FlatList page underneath the user,
-- deterministic interaction/suppression/swipe tests,
+- one window-aligned global curtain control with continuous drag and left/centre/right tap-to-snap,
+- shared three-state DiscoveryMode without duplicate downstream selectors,
+- visible action commit feedback and selected state,
+- restrained consumed-card exit and automatic advance to the next Item,
+- deterministic undo for the latest 10 committed interest/saved/consumed actions without changing the active swipe index,
+- one centralized feature-level source for reused interaction labels,
+- deterministic curtain, interaction, undo, suppression and swipe tests,
 - no duplicate book/movie state model, swipe route or history route.
 
-## Real-device result — Sprint 005 not yet accepted
+## Final implementation checkpoint — phone re-test pending
 
-Issue #34 records the device review. Stability is good, but the interaction model needs two final scoped refinements.
+Issue #34 records the original device review and remains the acceptance thread for the final APK. Its two scoped follow-up Issues are implemented.
 
-### Issue #39 — global curtain / DiscoveryMode / risk control
+Delivered evidence:
 
-Required behavior:
+- Issue #39 / PR #47 merged as commit `bea219aa0c6837bb646ece7d4ccf37bb1e05afc2`; main CI run #70 passed validation, standalone Android build, embedded JS verification and artifact upload.
+- Issue #40 / PR #48 merged as commit `be183d7abe9ceb02b2c420b4f132f5ef326c5f51`; main CI run #72 passed the same full gate.
 
-- visually place/align the curtain control at the top of the Room window so it reads as part of the window/curtain,
-- keep continuous horizontal drag,
-- make left/centre/right areas tappable so the handle smoothly moves/snaps to that target,
-- only three settled logical values exist: `FOR_YOU`, `SURPRISE`, `RISK`,
-- colour/light can interpolate smoothly during movement,
-- one shared DiscoveryMode state follows the user through Room -> discovery -> swipe,
-- remove duplicate downstream `Sinulle / Yllätys / Riski` selector groups,
-- treat this same control as the future prediction exploration/risk selection, while keeping `AmbientPhase` visually separate from algorithmic `DiscoveryMode`.
+### Remaining acceptance gate
 
-### Issue #40 — visible actions, auto-advance, undo and maintainable labels
-
-Required behavior:
-
-- pressing interest/save/consumed must have clear visible state feedback,
-- marking BOOK read or MOVIE watched makes the current card leave with a restrained swipe/exit animation and advances to the next Item,
-- consumed Items remain browsable later in `Luetut` / `Katsotut`,
-- provide a clear undo/back-arrow action for recent choices,
-- MVP target: sequential undo for at least the latest 10 committed interaction actions,
-- undo restores prior state without corrupting the current swipe index,
-- user-facing labels such as `Pidän`, `Ei minulle`, `Tallenna`, `Luettu`, `Katsottu` must be centrally maintained at feature level rather than repeated across screens,
-- UI wording must remain independent from stable canonical state/event semantics.
+Install the CI #72 APK on the real Android phone and repeat Issue #34. Sprint 005 and its remaining MVP requirements stay open until that flow is accepted.
 
 ## MVP progress
 
@@ -109,20 +98,16 @@ Do not implement ranking logic in the mobile client.
 ## Next — exact handoff order
 
 1. Continue **Sprint 005**, not Sprint 006.
-2. Implement Issue **#39** first: global window-aligned curtain/DiscoveryMode control, tap-to-snap, shared state and removal of duplicate per-screen mode buttons.
-3. Run `npm run check`, merge only with green CI and validate the standalone Android build.
-4. Implement Issue **#40**: visible action feedback, consumed auto-advance animation, recent undo stack and centralized feature-level action labels.
-5. Add deterministic tests for tap/snap mapping, action transitions and undo history where practical.
-6. Run full CI + standalone Android build again.
-7. Repeat Issue **#34** real-device acceptance on the new final Sprint 005 APK.
-8. Only after successful phone acceptance: mark the remaining Sprint 005 MVP requirements complete and perform the mandatory Sprint 005 close protocol.
-9. Only then open/start Sprint 006 Backend Foundation.
+2. Install the standalone APK from main CI run #72 and repeat Issue **#34** real-device acceptance.
+3. Verify the global curtain, Room -> discovery -> swipe path, visible actions, read/watched auto-advance, history and sequential undo on the phone.
+4. Only after successful phone acceptance: mark the remaining Sprint 005 MVP requirements complete and perform the mandatory Sprint 005 close protocol.
+5. Only then open/start Sprint 006 Backend Foundation.
 
 ## Known issues / open decisions
 
 - Current interaction state is intentionally in-memory only; persistence belongs to Sprint 006.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
-- Action UI needs the explicit feedback/advance/undo refinement in Issue #40.
+- Final Sprint 005 device acceptance is pending in Issue #34.
 - Exact authentication provider/method mix remains open; MVP requirement is provider-agnostic.
 - Exact nickname/username uniqueness rules remain open.
 - Final book metadata provider is not locked.
@@ -146,6 +131,7 @@ Do not implement ranking logic in the mobile client.
 - `/apps/mobile/src/features/discovery/ItemDetailScreen.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteraction.ts`
+- `/apps/mobile/src/features/discovery/itemInteractionLabels.ts`
 - `/apps/mobile/src/features/discovery/itemInteraction.test.ts`
 - `/apps/mobile/src/theme/roomTheme.ts`
 - `/.github/workflows/ci.yml`
@@ -154,4 +140,4 @@ Do not implement ranking logic in the mobile client.
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-The correct next engineering task is **Issue #39**, followed by **Issue #40**. Sprint 005 must remain active until both are implemented, automatically validated, built as standalone Android APK and accepted on the real phone through Issue #34. Do not start Sprint 006 yet.
+Issues #39 and #40 are merged, automatically validated and built as a standalone Android APK. The single next step is the repeated real-phone acceptance in **Issue #34** using the CI #72 artifact. Keep Sprint 005 active and do not start Sprint 006 until that acceptance and the mandatory sprint close are merged.
