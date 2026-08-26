@@ -62,7 +62,7 @@ Use terms exactly as defined in `GLOSSARY.md`. Do not invent synonyms in code fo
   - `FOR_YOU` -> `DAWN`
   - `SURPRISE` -> `EVENING`
   - `RISK` -> `NIGHT`
-- The curtain is the signature control that moves between discovery modes.
+- The curtain is the signature global control that moves between the three DiscoveryMode states.
 - Visual atmosphere may produce preference signals, but visual preference must not be confused with discovery-risk preference.
 - Prefer subtle light, opacity, gradient, shadow and motion changes over decorative UI chrome.
 
@@ -79,6 +79,7 @@ Use terms exactly as defined in `GLOSSARY.md`. Do not invent synonyms in code fo
 - Do not create abstractions before they are needed.
 - Add or update tests whenever behavior changes and a deterministic test is practical.
 - Every bug fix should include a regression test when the defect can be reproduced deterministically.
+- User-facing copy must not be used as domain/event/state identifiers. Reused action labels should come from one maintained feature-level copy/label source so wording can change without changing canonical semantics. Do not build a general localization framework before it is needed.
 - Do not consider a code task complete until the canonical repository validation command passes:
 
 ```bash
@@ -184,6 +185,6 @@ If work must move to a new conversation while a sprint is active:
 3. Do not mark incomplete requirements as done.
 4. Do not rewrite historical sprint documents.
 
-A new conversation should be able to start with: **"Continue Kajo from the repository."**
+A new conversation should be able to start with: **"Continue Kajo from the repository."** or **"jatketaan reposta"**.
 
 See `/docs/project/HANDOFF_PROTOCOL.md`.
