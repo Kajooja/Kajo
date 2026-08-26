@@ -17,7 +17,7 @@ See `docs/project/ROADMAP.md`.
 
 ## Delivered
 
-None yet; foundation is active.
+Sprints 001–005 are complete. The validated product baseline now includes the mobile foundation, Room, global DiscoveryMode curtain, BOOK/MOVIE grid and optional swipe flow, generic Item interaction state, consumed history and bounded exact-card undo. Sprint 006 Backend Foundation is active; requirement-level truth remains in `docs/product/MVP.md` and current execution state in `docs/project/STATUS.md`.
 
 ## Known milestone risks
 

@@ -1,8 +1,9 @@
 # Sprint 005 — Swipe & History
 
-Status: **ACTIVE**
+Status: **COMPLETED**
 Milestone: **MVP 0.1**
 Started: **2026-08-26**
+Completed: **2026-08-26**
 
 ## Goal
 
@@ -184,23 +185,23 @@ Delivered:
 
 PR CI #76 passed the canonical validation gate. Main CI #77 passed the same validation plus the standalone Android release build, embedded JavaScript bundle verification and artifact upload.
 
-CI #77 artifact: `kajo-android-standalone-3b6d7c703f7574461441f2489bcaa1c0a8048740`; digest `sha256:eecdcf15a6735b9a302a5d851607aaf8944c5b1f485e5474904b1b76822d52a5`. Real-phone acceptance remains required.
+CI #77 artifact: `kajo-android-standalone-3b6d7c703f7574461441f2489bcaa1c0a8048740`; digest `sha256:eecdcf15a6735b9a302a5d851607aaf8944c5b1f485e5474904b1b76822d52a5`. The user accepted this build on a real Android phone on 2026-08-26; Issue #34 records the final result.
 
-## Real-device review — 2026-08-26
+## Real-device acceptance — 2026-08-26
 
-Issue #34 records the test result.
+Issue #34 records the initial findings, corrective follow-up and final accepted result.
 
-### What worked
+Accepted:
 
-- standalone app launches on the real Android phone,
+- standalone app installs and launches on a real Android phone,
 - no crash observed,
 - Room -> discovery -> swipe navigation works,
-- read/watched removes the current card and exposes the next one,
+- all explicit interest, save and consumed choices commit and advance,
+- undo restores the exact previous card and interaction state,
+- read/watched history and discovery suppression remain available,
 - overall MVP structure remains usable.
 
-### Why Sprint 005 remains open after the CI #73 phone test
-
-Interest/save choices needed the same advance behavior, and undo needed to return the exact previous card in addition to restoring state. Issue #51 / PR #52 delivered the single scoped correction. Final production Room artwork remains outside this sprint; only the corrected APK's phone acceptance remains.
+Final production Room artwork remains outside this sprint.
 
 ## Later learning/prediction decision captured during device review
 
@@ -222,13 +223,35 @@ meaningful user action
 
 The mobile client must not own the production ranking algorithm.
 
-## Exact continuation order
+## Decisions
 
-1. Install the standalone APK from main CI run #77.
-2. Repeat Issue #34 real-device acceptance for every action and sequential exact-card undo.
-3. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
-4. Perform mandatory Sprint 005 close protocol.
-5. Start Sprint 006 only after the close is merged.
+- Grid remains the primary discovery surface; optional horizontal swipe stays inside the generic discovery flow.
+- BOOK and MOVIE share one Item interaction model and consumed boundary.
+- DiscoveryMode is one app-wide state and a future prediction-policy input; AmbientPhase remains its visual representation.
+- Interaction undo and navigation back remain separate concepts.
+- The latest 10 committed interaction snapshots are sufficient for the MVP undo target.
+- UI vocabulary is centralized at feature level without introducing a broad localization system.
+
+## Deferred / not done
+
+- Persistent interaction state, authentication and PersonalProfile belong to Sprint 006.
+- Durable Event evidence belongs to Sprint 007.
+- Prediction V0 and behavior-driven ranking refresh belong to Sprint 008.
+- Ratings, SharedProfile flows and final production Room artwork remain later scope.
+
+## Known issues
+
+- Interaction state is intentionally in-memory at this close and is lost when the app process resets.
+- Mode-dependent ordering is deterministic mock discovery behavior, not a production predictor.
+- Current Room/theme/mock covers are structural rather than final artwork.
+
+## Hygiene review
+
+- No duplicate BOOK/MOVIE state models, swipe routes or history routes were introduced.
+- The bounded undo history is the single source for both prior interaction state and target Item.
+- New advance/undo helpers are used by production logic and deterministic tests.
+- No obsolete placeholders, generated native output, empty feature folders or unused sprint files remain.
+- Canonical main CI #77 passed install, lint, typecheck, 21 tests, iOS/Android bundle smoke, Android release build and embedded-bundle verification.
 
 ## Important files
 
@@ -250,8 +273,8 @@ The mobile client must not own the production ranking algorithm.
 - `/apps/mobile/src/features/discovery/itemInteractionLabels.ts`
 - `/apps/mobile/src/features/discovery/itemInteraction.test.ts`
 
-## Handoff
+## Final handoff
 
 A fresh ChatGPT conversation can start with **"jatketaan reposta"**.
 
-Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issue #51 / PR #52 is merged and main CI #77 is fully green. The only next step is to validate its standalone APK through Issue #34. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
+Read `AGENTS.md` -> `STATUS.md` -> `SPRINT-006.md`. Sprint 005 is accepted and complete. Continue only with Sprint 006 Backend Foundation through one scoped Issue/branch/PR at a time.

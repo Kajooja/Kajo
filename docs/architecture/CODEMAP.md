@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are merged and validated. Sprint 005 — Swipe & History implementation is merged and CI-validated; its final standalone-APK device acceptance is pending.
+Sprints 001–005 are merged, CI-validated and complete. The final Sprint 005 standalone APK was accepted on a real phone. Sprint 006 — Backend Foundation is active; no backend implementation path exists until its first scoped Issue adds real code or a migration.
 
 Important current paths:
 
@@ -24,7 +24,7 @@ apps/mobile/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 005 main CI #77 is green and its standalone APK awaits final real-phone acceptance |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 005 main CI #77 is green and its standalone APK is accepted on a real phone |
 | Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
 | Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus one window-aligned continuous three-state DiscoveryMode curtain with drag and tap-to-snap; bookshelf/projector navigate to discovery |
@@ -33,7 +33,7 @@ apps/mobile/
 | Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
-| Mobile data boundary | `apps/mobile/src/data/` | Create when real data access requires it |
+| Mobile data boundary | `apps/mobile/src/data/` | Sprint 006 target; create only with the first real data-boundary implementation |
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Sprint 006 target; not created yet |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
