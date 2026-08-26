@@ -11,6 +11,7 @@ import type { ItemId } from '../../domain/contracts';
 import {
   commitItemInteractionAction,
   EMPTY_ITEM_INTERACTION_STORE,
+  getLatestUndoItemId,
   undoLastItemInteractionAction,
   type ItemInteractionMap,
   type ItemInteractionStore,
@@ -23,6 +24,7 @@ interface ItemInteractionState {
   toggleSaved: (itemId: ItemId) => void;
   setConsumed: (itemId: ItemId, consumed: boolean) => void;
   canUndo: boolean;
+  undoTargetItemId: ItemId | null;
   undo: () => void;
 }
 
@@ -52,6 +54,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const undo = useCallback(() => {
     setStore(undoLastItemInteractionAction);
   }, []);
+  const undoTargetItemId = getLatestUndoItemId(store);
 
   const value = useMemo(
     () => ({
@@ -60,9 +63,18 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       toggleSaved,
       setConsumed,
       canUndo: store.undoStack.length > 0,
+      undoTargetItemId,
       undo,
     }),
-    [setConsumed, setInterest, store.interactions, store.undoStack.length, toggleSaved, undo],
+    [
+      setConsumed,
+      setInterest,
+      store.interactions,
+      store.undoStack.length,
+      toggleSaved,
+      undo,
+      undoTargetItemId,
+    ],
   );
 
   return <ItemInteractionContext.Provider value={value}>{children}</ItemInteractionContext.Provider>;

@@ -23,6 +23,7 @@ import { useItemInteractions } from './ItemInteractionContext';
 import {
   buildSwipeSequence,
   getItemInteraction,
+  getNextSwipeIndex,
   type ItemInteraction,
   type ItemInterest,
 } from './itemInteraction';
@@ -39,8 +40,15 @@ interface ItemDetailScreenProps {
 export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
-  const { interactions, setInterest, toggleSaved, setConsumed, canUndo, undo } =
-    useItemInteractions();
+  const {
+    interactions,
+    setInterest,
+    toggleSaved,
+    setConsumed,
+    canUndo,
+    undoTargetItemId,
+    undo,
+  } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
@@ -72,9 +80,11 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     };
   }, [exitAnimation]);
 
-  function handleInterest(nextItemId: ItemId, interest: ItemInterest | null) {
-    setInterest(nextItemId, interest);
-    setFeedback(
+  function handleInterest(item: Item, index: number, interest: ItemInterest | null) {
+    handleCommittedAction(
+      item,
+      index,
+      () => setInterest(item.id, interest),
       interest === 'LIKED'
         ? ITEM_INTERACTION_LABELS.likedFeedback
         : interest === 'DISLIKED'
@@ -83,9 +93,11 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     );
   }
 
-  function handleSaved(nextItemId: ItemId, currentlySaved: boolean) {
-    toggleSaved(nextItemId);
-    setFeedback(
+  function handleSaved(item: Item, index: number, currentlySaved: boolean) {
+    handleCommittedAction(
+      item,
+      index,
+      () => toggleSaved(item.id),
       currentlySaved
         ? ITEM_INTERACTION_LABELS.unsavedFeedback
         : ITEM_INTERACTION_LABELS.savedFeedback,
@@ -93,21 +105,38 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   }
 
   function handleConsumed(item: Item, index: number, currentlyConsumed: boolean) {
+    const nextConsumed = !currentlyConsumed;
+    const labels = getConsumedItemLabels(item.itemType);
+
+    handleCommittedAction(
+      item,
+      index,
+      () => setConsumed(item.id, nextConsumed),
+      nextConsumed ? labels.markedFeedback : labels.unmarkedFeedback,
+    );
+  }
+
+  function handleCommittedAction(
+    item: Item,
+    index: number,
+    commit: () => void,
+    nextFeedback: string,
+  ) {
     if (exitingItemId) {
       return;
     }
 
-    const nextConsumed = !currentlyConsumed;
-    const labels = getConsumedItemLabels(item.itemType);
-    setConsumed(item.id, nextConsumed);
-    setFeedback(nextConsumed ? labels.markedFeedback : labels.unmarkedFeedback);
+    commit();
+    setFeedback(nextFeedback);
 
-    if (!nextConsumed || index >= items.length - 1) {
+    const nextIndex = getNextSwipeIndex(index, items.length);
+
+    if (nextIndex === null) {
       return;
     }
 
     const advance = () => {
-      listRef.current?.scrollToIndex({ index: index + 1, animated: false });
+      listRef.current?.scrollToIndex({ index: nextIndex, animated: false });
       exitAnimation.setValue(0);
       setExitingItemId(null);
     };
@@ -132,12 +161,23 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   }
 
   function handleUndo() {
-    if (!canUndo || exitingItemId) {
+    if (!canUndo || !undoTargetItemId || exitingItemId) {
       return;
     }
 
+    const targetIndex = items.findIndex((item) => item.id === undoTargetItemId);
     undo();
     setFeedback(ITEM_INTERACTION_LABELS.undoFeedback);
+
+    if (targetIndex >= 0) {
+      listRef.current?.scrollToIndex({ index: targetIndex, animated: false });
+      return;
+    }
+
+    router.replace({
+      pathname: '/discovery/[itemId]',
+      params: { itemId: undoTargetItemId },
+    });
   }
 
   if (!selectedItem) {
@@ -191,7 +231,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={ITEM_INTERACTION_LABELS.undo}
-            accessibilityHint="Palauttaa viimeisimmän item-valinnan muuttamatta nykyistä sivua"
+            accessibilityHint="Palauttaa viimeisimmän valinnan ja sen edellisen kortin"
             accessibilityState={{ disabled: !canUndo || Boolean(exitingItemId) }}
             disabled={!canUndo || Boolean(exitingItemId)}
             onPress={handleUndo}
@@ -262,8 +302,8 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
                 theme={theme}
                 styles={styles}
                 disabled={Boolean(exitingItemId)}
-                onInterest={(interest) => handleInterest(item.id, interest)}
-                onToggleSaved={() => handleSaved(item.id, interaction.saved)}
+                onInterest={(interest) => handleInterest(item, index, interest)}
+                onToggleSaved={() => handleSaved(item, index, interaction.saved)}
                 onConsumedPress={() => handleConsumed(item, index, interaction.consumed)}
               />
             </Animated.View>

@@ -8,6 +8,8 @@ import {
   getConsumedItems,
   getDiscoverableItems,
   getItemInteraction,
+  getLatestUndoItemId,
+  getNextSwipeIndex,
   ITEM_INTERACTION_UNDO_LIMIT,
   setItemConsumed,
   setItemInterest,
@@ -20,6 +22,7 @@ import {
 const BOOK_A: Item = { id: 'book-a', itemType: 'BOOK', title: 'Book A' };
 const BOOK_B: Item = { id: 'book-b', itemType: 'BOOK', title: 'Book B' };
 const BOOK_C: Item = { id: 'book-c', itemType: 'BOOK', title: 'Book C' };
+const MOVIE_A: Item = { id: 'movie-a', itemType: 'MOVIE', title: 'Movie A' };
 const ITEMS: readonly Item[] = [BOOK_A, BOOK_B, BOOK_C];
 
 describe('item interaction state', () => {
@@ -121,6 +124,57 @@ describe('item interaction state', () => {
     store = undoLastItemInteractionAction(store);
     expect(store.interactions).toEqual({});
     expect(store.undoStack).toEqual([]);
+  });
+
+  it('retains the exact Item target for mixed BOOK and MOVIE undo order', () => {
+    let store: ItemInteractionStore = EMPTY_ITEM_INTERACTION_STORE;
+
+    store = commitItemInteractionAction(store, {
+      type: 'SET_INTEREST',
+      itemId: BOOK_A.id,
+      interest: 'LIKED',
+    });
+    store = commitItemInteractionAction(store, {
+      type: 'TOGGLE_SAVED',
+      itemId: MOVIE_A.id,
+    });
+    store = commitItemInteractionAction(store, {
+      type: 'SET_CONSUMED',
+      itemId: BOOK_B.id,
+      consumed: true,
+    });
+
+    expect(getLatestUndoItemId(store)).toBe(BOOK_B.id);
+    store = undoLastItemInteractionAction(store);
+    expect(getLatestUndoItemId(store)).toBe(MOVIE_A.id);
+    store = undoLastItemInteractionAction(store);
+    expect(getLatestUndoItemId(store)).toBe(BOOK_A.id);
+    store = undoLastItemInteractionAction(store);
+    expect(getLatestUndoItemId(store)).toBeNull();
+  });
+
+  it('advances every supported committed action and lets undo target its previous card', () => {
+    const actions = [
+      { type: 'SET_INTEREST', itemId: BOOK_A.id, interest: 'LIKED' },
+      { type: 'SET_INTEREST', itemId: BOOK_A.id, interest: 'DISLIKED' },
+      { type: 'TOGGLE_SAVED', itemId: BOOK_A.id },
+      { type: 'SET_CONSUMED', itemId: BOOK_A.id, consumed: true },
+    ] as const;
+
+    for (const action of actions) {
+      const store = commitItemInteractionAction(EMPTY_ITEM_INTERACTION_STORE, action);
+      const nextIndex = getNextSwipeIndex(0, ITEMS.length);
+
+      expect(nextIndex).toBe(1);
+      expect(getLatestUndoItemId(store)).toBe(BOOK_A.id);
+      expect(ITEMS.findIndex((item) => item.id === getLatestUndoItemId(store))).toBe(0);
+      expect(undoLastItemInteractionAction(store)).toEqual(EMPTY_ITEM_INTERACTION_STORE);
+    }
+  });
+
+  it('commits safely without advancing when the current Item is the last card', () => {
+    expect(getNextSwipeIndex(ITEMS.length - 1, ITEMS.length)).toBeNull();
+    expect(getNextSwipeIndex(-1, ITEMS.length)).toBeNull();
   });
 
   it('retains exactly the latest ten committed actions for sequential undo', () => {
