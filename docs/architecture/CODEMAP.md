@@ -24,7 +24,7 @@ apps/mobile/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation; Sprint 004 baseline validated on a real Android phone |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 005 final implementation is CI-validated and awaits repeated real-phone acceptance |
 | Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
 | Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus one window-aligned continuous three-state DiscoveryMode curtain with drag and tap-to-snap; bookshelf/projector navigate to discovery |
