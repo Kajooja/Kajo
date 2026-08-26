@@ -24,17 +24,25 @@ Books + Movies grids, Item cards/details, mock ranking, DiscoveryMode switching.
 
 Optional swipe, like/dislike, watched/read, saved state and consumed-history suppression. Grid remains the primary discovery surface; opening an Item should be able to flow naturally into the swipe-oriented browsing experience rather than feeling like a disconnected mode.
 
+Sprint 005 close also includes the real-device acceptance refinements identified on 2026-08-26:
+
+- curtain becomes the single global three-state DiscoveryMode/risk control with drag + tap-to-snap,
+- redundant downstream mode selectors are removed,
+- consumed actions visibly auto-advance with restrained motion,
+- recent interaction choices can be undone,
+- reusable action labels are centrally maintained without coupling UI wording to domain semantics.
+
 ### Sprint 006 — Backend Foundation
 
-Supabase/PostgreSQL, lightweight/common register/sign-in authentication, user nickname/username identity, Profile, ProfileMember, Item persistence, migrations and authorization foundations.
+Supabase/PostgreSQL, lightweight/common register/sign-in authentication, user nickname/username identity, Profile, ProfileMember, Item persistence, migrations and authorization foundations. Replace appropriate Sprint 005 in-memory state with a clear persistence boundary without rewriting presentation semantics.
 
 ### Sprint 007 — Event Engine
 
-Generic event capture, sessions, prediction traceability and analytics-quality behavioural contracts.
+Generic event capture, sessions, prediction traceability and analytics-quality behavioural contracts. Persist meaningful interaction evidence such as interest, saved/unsaved, consumed/read/watched and later ratings using stable canonical event/state semantics independent of visible UI copy.
 
 ### Sprint 008 — Prediction V0
 
-First real generic personalized ranking using Item similarity, behavioural history, recency/ShortTermState and exploration policy.
+First real generic personalized ranking using Item similarity, behavioural history, recency/ShortTermState and exploration policy. Rankings should refresh when materially relevant behavioural evidence or the global DiscoveryMode/risk selection changes; the mobile client consumes prediction results rather than owning ranking logic.
 
 ### Sprint 009 — Shared Kajo
 
