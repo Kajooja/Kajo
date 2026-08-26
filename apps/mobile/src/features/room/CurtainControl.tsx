@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
   Animated,
+  Easing,
   PanResponder,
   Pressable,
   StyleSheet,
@@ -10,22 +11,28 @@ import {
 } from 'react-native';
 
 import type { DiscoveryMode } from '../../domain/contracts';
-import type { RoomAmbientTheme, RoomBaseTheme } from '../../theme/roomTheme';
+import {
+  ROOM_AMBIENT_BY_PHASE,
+  type RoomAmbientTheme,
+  type RoomBaseTheme,
+} from '../../theme/roomTheme';
 import {
   CURTAIN_DISCOVERY_MODES,
   clampCurtainPosition,
   getCurtainPositionForMode,
-  getModeForTrackPosition,
+  getModeForCurtainPosition,
 } from './curtainState';
 
 interface CurtainControlProps {
   mode: DiscoveryMode;
   onModeChange: (mode: DiscoveryMode) => void;
+  position: Animated.Value;
   baseTheme: RoomBaseTheme;
   ambientTheme: RoomAmbientTheme;
 }
 
-const HANDLE_WIDTH = 58;
+const HANDLE_WIDTH = 14;
+const TRACK_PADDING = 4;
 
 const ACCESSIBILITY_LABELS: Readonly<Record<DiscoveryMode, string>> = {
   FOR_YOU: 'For you discovery mode',
@@ -33,12 +40,18 @@ const ACCESSIBILITY_LABELS: Readonly<Record<DiscoveryMode, string>> = {
   RISK: 'Risk discovery mode',
 };
 
-export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: CurtainControlProps) {
+export function CurtainControl({
+  mode,
+  onModeChange,
+  position,
+  baseTheme,
+  ambientTheme,
+}: CurtainControlProps) {
   const [trackWidth, setTrackWidth] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [translateX] = useState(() => new Animated.Value(0));
-  const maxTravel = Math.max(0, trackWidth - HANDLE_WIDTH);
-  const dragStartPx = getCurtainPositionForMode(mode) * maxTravel;
+  const currentPositionRef = useRef(getCurtainPositionForMode(mode));
+  const dragStartPositionRef = useRef(currentPositionRef.current);
+  const maxTravel = Math.max(0, trackWidth - HANDLE_WIDTH - TRACK_PADDING * 2);
 
   useEffect(() => {
     let active = true;
@@ -58,37 +71,108 @@ export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: 
   }, []);
 
   useEffect(() => {
-    const target = getCurtainPositionForMode(mode) * maxTravel;
+    const listenerId = position.addListener(({ value }) => {
+      currentPositionRef.current = clampCurtainPosition(value);
+    });
 
-    Animated.timing(translateX, {
+    return () => position.removeListener(listenerId);
+  }, [position]);
+
+  useEffect(() => {
+    const target = getCurtainPositionForMode(mode);
+
+    if (reduceMotion) {
+      position.setValue(target);
+      return;
+    }
+
+    Animated.timing(position, {
       toValue: target,
-      duration: reduceMotion ? 0 : 180,
-      useNativeDriver: true,
+      duration: 240,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
     }).start();
-  }, [maxTravel, mode, reduceMotion, translateX]);
+  }, [mode, position, reduceMotion]);
+
+  function snapToCurrentMode() {
+    const target = getCurtainPositionForMode(mode);
+
+    if (reduceMotion) {
+      position.setValue(target);
+      return;
+    }
+
+    Animated.timing(position, {
+      toValue: target,
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }
+
+  function completeDrag(deltaX: number) {
+    if (maxTravel <= 0) {
+      return;
+    }
+
+    const finalPosition = clampCurtainPosition(
+      dragStartPositionRef.current + deltaX / maxTravel,
+    );
+    const nextMode = getModeForCurtainPosition(finalPosition);
+
+    if (nextMode === mode) {
+      snapToCurrentMode();
+    }
+
+    onModeChange(nextMode);
+  }
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
+    onPanResponderGrant: () => {
+      position.stopAnimation();
+      dragStartPositionRef.current = currentPositionRef.current;
+    },
     onPanResponderMove: (_, gestureState) => {
       if (maxTravel <= 0) {
         return;
       }
 
-      const normalized = clampCurtainPosition((dragStartPx + gestureState.dx) / maxTravel);
-      translateX.setValue(normalized * maxTravel);
+      const normalized = clampCurtainPosition(
+        dragStartPositionRef.current + gestureState.dx / maxTravel,
+      );
+      position.setValue(normalized);
     },
-    onPanResponderRelease: (_, gestureState) => {
-      onModeChange(getModeForTrackPosition(dragStartPx + gestureState.dx, maxTravel));
-    },
-    onPanResponderTerminate: (_, gestureState) => {
-      onModeChange(getModeForTrackPosition(dragStartPx + gestureState.dx, maxTravel));
-    },
+    onPanResponderRelease: (_, gestureState) => completeDrag(gestureState.dx),
+    onPanResponderTerminate: (_, gestureState) => completeDrag(gestureState.dx),
   });
 
   function handleLayout(event: LayoutChangeEvent) {
     setTrackWidth(event.nativeEvent.layout.width);
   }
+
+  const translateX = position.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, maxTravel],
+    extrapolate: 'clamp',
+  });
+  const curtainColor = position.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.curtain,
+      ROOM_AMBIENT_BY_PHASE.EVENING.curtain,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.curtain,
+    ],
+  });
+  const handleColor = position.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.curtainHighlight,
+      ROOM_AMBIENT_BY_PHASE.EVENING.curtainHighlight,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.curtainHighlight,
+    ],
+  });
 
   return (
     <View style={styles.container} accessibilityLabel="Discovery curtain control">
@@ -98,6 +182,11 @@ export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: 
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       >
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.curtainFabric, { backgroundColor: curtainColor }]}
+        />
+
         <View style={styles.markers}>
           {CURTAIN_DISCOVERY_MODES.map((discoveryMode) => (
             <View
@@ -116,17 +205,14 @@ export function CurtainControl({ mode, onModeChange, baseTheme, ambientTheme }: 
         <Animated.View
           {...panResponder.panHandlers}
           style={[
-            styles.curtain,
+            styles.handle,
             {
-              backgroundColor: ambientTheme.curtain,
-              borderColor: ambientTheme.curtainHighlight,
+              backgroundColor: handleColor,
               transform: [{ translateX }],
             },
           ]}
         >
-          <View style={[styles.pleat, { backgroundColor: ambientTheme.curtainHighlight }]} />
-          <View style={[styles.pleat, { backgroundColor: ambientTheme.curtainHighlight }]} />
-          <View style={[styles.pleat, { backgroundColor: ambientTheme.curtainHighlight }]} />
+          <View style={[styles.handleLine, { backgroundColor: baseTheme.textPrimary }]} />
         </Animated.View>
       </View>
 
@@ -166,38 +252,40 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   track: {
-    height: 44,
-    borderRadius: 22,
+    height: 34,
+    borderRadius: 17,
+    paddingHorizontal: TRACK_PADDING,
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  curtainFabric: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.72,
+  },
   markers: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     paddingHorizontal: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   marker: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-  },
-  curtain: {
-    width: HANDLE_WIDTH,
-    height: 38,
-    marginLeft: 3,
-    borderRadius: 19,
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  pleat: {
-    width: 2,
-    height: 22,
+    width: 4,
+    height: 4,
     borderRadius: 2,
-    opacity: 0.45,
+  },
+  handle: {
+    width: HANDLE_WIDTH,
+    height: 26,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  handleLine: {
+    width: 2,
+    height: 14,
+    borderRadius: 1,
+    opacity: 0.52,
   },
   accessibleModes: {
     height: 34,
