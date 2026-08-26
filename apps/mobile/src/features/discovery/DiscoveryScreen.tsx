@@ -31,6 +31,14 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar style="light" />
+      <View
+        pointerEvents="none"
+        style={[
+          styles.ambientBackdrop,
+          { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+        ]}
+      />
+
       <View style={styles.screen}>
         <View style={styles.headerRow}>
           <Pressable
@@ -149,6 +157,9 @@ function createStyles(theme: RoomTheme) {
       flex: 1,
       backgroundColor: theme.base.appBackground,
     },
+    ambientBackdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
     screen: {
       flex: 1,
       paddingHorizontal: 18,
@@ -230,7 +241,7 @@ function createStyles(theme: RoomTheme) {
       overflow: 'hidden',
     },
     coverLight: {
-      ...StyleSheet.absoluteFill,
+      ...StyleSheet.absoluteFillObject,
     },
     coverType: {
       color: theme.base.textPrimary,
