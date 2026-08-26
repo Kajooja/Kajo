@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are merged and validated. Sprint 005 — Swipe & History is active; Issue #51 / PR #52 is the final interaction correction before another standalone-APK device acceptance.
+Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are merged and validated. Sprint 005 — Swipe & History implementation is merged and CI-validated; its final standalone-APK device acceptance is pending.
 
 Important current paths:
 
@@ -24,7 +24,7 @@ apps/mobile/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 005 Issue #51 / PR #52 awaits canonical CI, merge and repeated real-phone acceptance |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 005 main CI #77 is green and its standalone APK awaits final real-phone acceptance |
 | Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
 | Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus one window-aligned continuous three-state DiscoveryMode curtain with drag and tap-to-snap; bookshelf/projector navigate to discovery |
