@@ -14,8 +14,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Authentication and identity
 
-- [ ] `MVP-AUTH-001` User can register and sign in using at least one lightweight/common authentication method.
-- [ ] `MVP-AUTH-002` Every signed-in User has a user-visible nickname/username associated with their identity.
+- [-] `MVP-AUTH-001` User can register and sign in using at least one lightweight/common authentication method.
+- [-] `MVP-AUTH-002` Every signed-in User has a user-visible nickname/username associated with their identity.
 
 ## Room and theme
 
@@ -34,27 +34,27 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
 - [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
 - [x] `MVP-DISC-006` User can open Item details.
-- [-] `MVP-DISC-007` Curtain is the single app-wide three-state DiscoveryMode/risk control: it supports drag and tap-to-snap, visually interpolates smoothly, and the selected mode persists through Room, discovery and swipe without duplicate per-screen selectors.
+- [x] `MVP-DISC-007` Curtain is the single app-wide three-state DiscoveryMode/risk control: it supports drag and tap-to-snap, visually interpolates smoothly, and the selected mode persists through Room, discovery and swipe without duplicate per-screen selectors.
 
 ## Swipe and state
 
-- [-] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
-- [-] `MVP-SWIPE-002` User can express positive/negative interest.
-- [-] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
-- [-] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
-- [-] `MVP-SWIPE-005` Every explicit interest, save or consumed choice visibly commits with a restrained exit/advance animation and presents the next Item without an index jump.
-- [-] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both the prior state and exact previous Item/card.
+- [x] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
+- [x] `MVP-SWIPE-002` User can express positive/negative interest.
+- [x] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
+- [x] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
+- [x] `MVP-SWIPE-005` Every explicit interest, save or consumed choice visibly commits with a restrained exit/advance animation and presents the next Item without an index jump.
+- [x] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both the prior state and exact previous Item/card.
 
 ## Saved, consumed and memory
 
-- [-] `MVP-MEM-001` User can save/unsave an Item.
-- [-] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
+- [x] `MVP-MEM-001` User can save/unsave an Item.
+- [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
 - [ ] `MVP-MEM-003` User can add a simple rating to a consumed Item.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
 
 ## Profiles and social
 
-- [ ] `MVP-PROFILE-001` Every user has a PersonalProfile.
+- [-] `MVP-PROFILE-001` Every user has a PersonalProfile.
 - [ ] `MVP-PROFILE-002` 2-N users can belong to a persistent SharedProfile.
 - [ ] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
 - [ ] `MVP-SOCIAL-001` SharedProfile has joint saved items.
