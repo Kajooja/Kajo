@@ -12,11 +12,10 @@ import {
   type ItemInteractionMap,
 } from './itemInteraction';
 
-const ITEMS: readonly Item[] = [
-  { id: 'book-a', itemType: 'BOOK', title: 'Book A' },
-  { id: 'book-b', itemType: 'BOOK', title: 'Book B' },
-  { id: 'book-c', itemType: 'BOOK', title: 'Book C' },
-];
+const BOOK_A: Item = { id: 'book-a', itemType: 'BOOK', title: 'Book A' };
+const BOOK_B: Item = { id: 'book-b', itemType: 'BOOK', title: 'Book B' };
+const BOOK_C: Item = { id: 'book-c', itemType: 'BOOK', title: 'Book C' };
+const ITEMS: readonly Item[] = [BOOK_A, BOOK_B, BOOK_C];
 
 describe('item interaction state', () => {
   it('keeps interest, saved and consumed state independent', () => {
@@ -59,12 +58,12 @@ describe('item interaction state', () => {
   it('starts swipe at the selected Item and suppresses other consumed Items', () => {
     const interactions = setItemConsumed({}, 'book-b', true);
 
-    expect(buildSwipeSequence(ITEMS[2], ITEMS, interactions).map((item) => item.id)).toEqual([
+    expect(buildSwipeSequence(BOOK_C, ITEMS, interactions).map((item) => item.id)).toEqual([
       'book-c',
       'book-a',
     ]);
 
-    expect(buildSwipeSequence(ITEMS[1], ITEMS, interactions).map((item) => item.id)).toEqual([
+    expect(buildSwipeSequence(BOOK_B, ITEMS, interactions).map((item) => item.id)).toEqual([
       'book-b',
       'book-a',
       'book-c',
