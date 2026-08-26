@@ -172,7 +172,9 @@ Main CI run #72 is fully green, including `npm run check`, the standalone Androi
 
 The final CI #73 APK phone test showed that read/watched advanced correctly, while interest/save choices did not advance and undo restored state without returning the previous card.
 
-PR #52 implements:
+Merged to `main` as commit `3b6d7c703f7574461441f2489bcaa1c0a8048740`.
+
+Delivered:
 
 - one shared commit -> restrained exit -> next-card flow for `Pidän`, `Ei minulle`, `Tallenna` and read/watched,
 - the existing 10-action generic interaction history as the single source for undo state and target Item,
@@ -180,7 +182,9 @@ PR #52 implements:
 - safe final-card commit without an invalid index advance,
 - deterministic BOOK/MOVIE LIFO target, every-action advance, exact-card return and final-card tests.
 
-Local zero-warning lint, TypeScript, all 21 tests and iOS/Android Expo exports pass. Canonical PR CI, merge, standalone APK and real-phone acceptance remain required.
+PR CI #76 passed the canonical validation gate. Main CI #77 passed the same validation plus the standalone Android release build, embedded JavaScript bundle verification and artifact upload.
+
+CI #77 artifact: `kajo-android-standalone-3b6d7c703f7574461441f2489bcaa1c0a8048740`; digest `sha256:eecdcf15a6735b9a302a5d851607aaf8944c5b1f485e5474904b1b76822d52a5`. Real-phone acceptance remains required.
 
 ## Real-device review — 2026-08-26
 
@@ -196,7 +200,7 @@ Issue #34 records the test result.
 
 ### Why Sprint 005 remains open after the CI #73 phone test
 
-Interest/save choices still needed the same advance behavior, and undo needed to return the exact previous card in addition to restoring state. Issue #51 / PR #52 is the single scoped correction. Final production Room artwork remains outside this sprint.
+Interest/save choices needed the same advance behavior, and undo needed to return the exact previous card in addition to restoring state. Issue #51 / PR #52 delivered the single scoped correction. Final production Room artwork remains outside this sprint; only the corrected APK's phone acceptance remains.
 
 ## Later learning/prediction decision captured during device review
 
@@ -220,12 +224,11 @@ The mobile client must not own the production ranking algorithm.
 
 ## Exact continuation order
 
-1. Complete Issue #51 / PR #52 and merge only with green canonical CI.
-2. Install the resulting standalone `main` APK.
-3. Repeat Issue #34 real-device acceptance for every action and sequential exact-card undo.
-4. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
-5. Perform mandatory Sprint 005 close protocol.
-6. Start Sprint 006 only after the close is merged.
+1. Install the standalone APK from main CI run #77.
+2. Repeat Issue #34 real-device acceptance for every action and sequential exact-card undo.
+3. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
+4. Perform mandatory Sprint 005 close protocol.
+5. Start Sprint 006 only after the close is merged.
 
 ## Important files
 
@@ -251,4 +254,4 @@ The mobile client must not own the production ranking algorithm.
 
 A fresh ChatGPT conversation can start with **"jatketaan reposta"**.
 
-Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issue #51 / PR #52 is the only current implementation correction. Merge with green CI, then validate its standalone `main` APK through Issue #34. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
+Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issue #51 / PR #52 is merged and main CI #77 is fully green. The only next step is to validate its standalone APK through Issue #34. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
