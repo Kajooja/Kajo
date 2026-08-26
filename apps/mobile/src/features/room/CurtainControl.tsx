@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AccessibilityInfo,
   Animated,
@@ -49,9 +49,8 @@ export function CurtainControl({
 }: CurtainControlProps) {
   const [trackWidth, setTrackWidth] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const currentPositionRef = useRef(getCurtainPositionForMode(mode));
-  const dragStartPositionRef = useRef(currentPositionRef.current);
   const maxTravel = Math.max(0, trackWidth - HANDLE_WIDTH - TRACK_PADDING * 2);
+  const dragStartPosition = getCurtainPositionForMode(mode);
 
   useEffect(() => {
     let active = true;
@@ -69,14 +68,6 @@ export function CurtainControl({
       subscription.remove();
     };
   }, []);
-
-  useEffect(() => {
-    const listenerId = position.addListener(({ value }) => {
-      currentPositionRef.current = clampCurtainPosition(value);
-    });
-
-    return () => position.removeListener(listenerId);
-  }, [position]);
 
   useEffect(() => {
     const target = getCurtainPositionForMode(mode);
@@ -115,9 +106,7 @@ export function CurtainControl({
       return;
     }
 
-    const finalPosition = clampCurtainPosition(
-      dragStartPositionRef.current + deltaX / maxTravel,
-    );
+    const finalPosition = clampCurtainPosition(dragStartPosition + deltaX / maxTravel);
     const nextMode = getModeForCurtainPosition(finalPosition);
 
     if (nextMode === mode) {
@@ -130,18 +119,13 @@ export function CurtainControl({
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
-    onPanResponderGrant: () => {
-      position.stopAnimation();
-      dragStartPositionRef.current = currentPositionRef.current;
-    },
+    onPanResponderGrant: () => position.stopAnimation(),
     onPanResponderMove: (_, gestureState) => {
       if (maxTravel <= 0) {
         return;
       }
 
-      const normalized = clampCurtainPosition(
-        dragStartPositionRef.current + gestureState.dx / maxTravel,
-      );
+      const normalized = clampCurtainPosition(dragStartPosition + gestureState.dx / maxTravel);
       position.setValue(normalized);
     },
     onPanResponderRelease: (_, gestureState) => completeDrag(gestureState.dx),
