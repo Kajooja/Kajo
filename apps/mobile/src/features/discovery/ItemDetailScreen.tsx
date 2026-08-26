@@ -208,10 +208,6 @@ function SwipeItemPage({
           onPress={() => onSetConsumed(!interaction.consumed)}
         />
       </View>
-
-      <Text style={styles.note}>
-        Tila on tässä sprintissä paikallinen ja muistissa vain sovelluksen ajon ajan. Backend-persistenssi ja tapahtumakirjaus lisätään myöhemmin.
-      </Text>
     </ScrollView>
   );
 }
@@ -377,13 +373,6 @@ function createStyles(theme: RoomTheme) {
     },
     actionTextActive: {
       color: theme.base.textPrimary,
-    },
-    note: {
-      color: theme.base.textMuted,
-      fontSize: 12,
-      lineHeight: 18,
-      marginTop: 28,
-      opacity: 0.72,
     },
     missing: {
       flex: 1,
