@@ -43,7 +43,7 @@ Sprint 006 also provides persistence and authorization foundations for later pro
 Implement in this order, one scoped Issue/branch/PR at a time:
 
 1. Initial User/Profile/ProfileMember/Item/current-interaction migration and authorization foundation — Issue #57.
-2. Package-manager-installed Supabase/Expo dependencies, public configuration contract and one root mobile client/data boundary.
+2. Package-manager-installed Supabase/Expo dependencies, public configuration contract and one root mobile client/data boundary — Issue #59.
 3. Authentication session plus register/sign-in UI with no provider sprawl.
 4. Nickname/username onboarding and automatic PersonalProfile membership.
 5. Persist/hydrate the existing generic Item interaction state through the boundary.
@@ -87,11 +87,24 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - explicit own-User, Profile-membership, authenticated-Item and membership-scoped interaction policies,
 - no Event/prediction schema, mobile client scaffold, secret or empty backend folder.
 
+### Mobile Supabase client boundary — Issue #59
+
+- package-manager-installed `@supabase/supabase-js`, `expo-sqlite` and React Native URL polyfill with a committed lockfile,
+- placeholder-only public Expo environment contract for project URL and publishable key,
+- deterministic unconfigured, invalid and configured states without logging configuration values,
+- no client creation when configuration is absent or invalid,
+- one module-scoped Supabase client with SQLite-backed persistent session storage when configuration is valid,
+- one root provider boundary; presentation screens remain free of direct Supabase calls,
+- deterministic tests for missing, partial, invalid and valid configuration plus single client creation,
+- no auth UI, profile onboarding or Item-interaction persistence in this increment.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
 - Replace in-memory behavior incrementally behind a data boundary so the accepted presentation flow remains stable.
 - Reserve durable generic Event capture for Sprint 007 instead of treating persisted current state as an event engine.
+- Treat absent mobile configuration as an intentional unconfigured state so the accepted mock flow remains runnable until a real project is connected.
+- Keep the Supabase client module-scoped and expose it through one root provider rather than constructing clients or calling Supabase in screens.
 
 ## Deferred / not done
 
@@ -113,10 +126,12 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/docs/architecture/CODEMAP.md`
 - `/docs/project/ROADMAP.md`
 - `/docs/project/STATUS.md`
+- `/apps/mobile/.env.example`
+- `/apps/mobile/src/data/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/.github/workflows/ci.yml`
 
 ## Final handoff
 
-After Issue #57 passes canonical CI and merges, open the next scoped Issue for package-manager-installed Supabase/Expo dependencies, the public configuration contract and one root mobile client/data boundary. Do not begin authentication UI or interaction-state integration in that PR.
+After Issue #59 passes canonical CI and merges, open one scoped Issue for the authentication session and one lightweight/common register/sign-in path. Do not begin nickname/PersonalProfile onboarding or interaction-state integration in that PR.

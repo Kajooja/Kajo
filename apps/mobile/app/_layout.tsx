@@ -1,14 +1,17 @@
 import { Stack } from 'expo-router';
 
+import { SupabaseProvider } from '@/data/SupabaseProvider';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
 
 export default function RootLayout() {
   return (
-    <DiscoveryModeProvider>
-      <ItemInteractionProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </ItemInteractionProvider>
-    </DiscoveryModeProvider>
+    <SupabaseProvider>
+      <DiscoveryModeProvider>
+        <ItemInteractionProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </ItemInteractionProvider>
+      </DiscoveryModeProvider>
+    </SupabaseProvider>
   );
 }
