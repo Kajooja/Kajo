@@ -243,11 +243,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   curtainFabric: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0.72,
   },
   markers: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     paddingHorizontal: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
