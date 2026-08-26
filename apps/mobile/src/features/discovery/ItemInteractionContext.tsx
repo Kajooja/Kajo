@@ -9,10 +9,11 @@ import {
 
 import type { ItemId } from '../../domain/contracts';
 import {
-  setItemConsumed,
-  setItemInterest,
-  toggleItemSaved,
+  commitItemInteractionAction,
+  EMPTY_ITEM_INTERACTION_STORE,
+  undoLastItemInteractionAction,
   type ItemInteractionMap,
+  type ItemInteractionStore,
   type ItemInterest,
 } from './itemInteraction';
 
@@ -21,28 +22,47 @@ interface ItemInteractionState {
   setInterest: (itemId: ItemId, interest: ItemInterest | null) => void;
   toggleSaved: (itemId: ItemId) => void;
   setConsumed: (itemId: ItemId, consumed: boolean) => void;
+  canUndo: boolean;
+  undo: () => void;
 }
 
 const ItemInteractionContext = createContext<ItemInteractionState | null>(null);
 
 export function ItemInteractionProvider({ children }: PropsWithChildren) {
-  const [interactions, setInteractions] = useState<ItemInteractionMap>({});
+  const [store, setStore] = useState<ItemInteractionStore>(EMPTY_ITEM_INTERACTION_STORE);
 
   const setInterest = useCallback((itemId: ItemId, interest: ItemInterest | null) => {
-    setInteractions((current) => setItemInterest(current, itemId, interest));
+    setStore((current) =>
+      commitItemInteractionAction(current, { type: 'SET_INTEREST', itemId, interest }),
+    );
   }, []);
 
   const toggleSaved = useCallback((itemId: ItemId) => {
-    setInteractions((current) => toggleItemSaved(current, itemId));
+    setStore((current) =>
+      commitItemInteractionAction(current, { type: 'TOGGLE_SAVED', itemId }),
+    );
   }, []);
 
   const setConsumed = useCallback((itemId: ItemId, consumed: boolean) => {
-    setInteractions((current) => setItemConsumed(current, itemId, consumed));
+    setStore((current) =>
+      commitItemInteractionAction(current, { type: 'SET_CONSUMED', itemId, consumed }),
+    );
+  }, []);
+
+  const undo = useCallback(() => {
+    setStore(undoLastItemInteractionAction);
   }, []);
 
   const value = useMemo(
-    () => ({ interactions, setInterest, toggleSaved, setConsumed }),
-    [interactions, setConsumed, setInterest, toggleSaved],
+    () => ({
+      interactions: store.interactions,
+      setInterest,
+      toggleSaved,
+      setConsumed,
+      canUndo: store.undoStack.length > 0,
+      undo,
+    }),
+    [setConsumed, setInterest, store.interactions, store.undoStack.length, toggleSaved, undo],
   );
 
   return <ItemInteractionContext.Provider value={value}>{children}</ItemInteractionContext.Provider>;

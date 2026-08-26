@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
   FlatList,
   Pressable,
   ScrollView,
@@ -23,6 +26,10 @@ import {
   type ItemInteraction,
   type ItemInterest,
 } from './itemInteraction';
+import {
+  getConsumedItemLabels,
+  ITEM_INTERACTION_LABELS,
+} from './itemInteractionLabels';
 import { getMockItem, getRankedMockItems } from './mockDiscovery';
 
 interface ItemDetailScreenProps {
@@ -32,7 +39,8 @@ interface ItemDetailScreenProps {
 export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
-  const { interactions, setInterest, toggleSaved, setConsumed } = useItemInteractions();
+  const { interactions, setInterest, toggleSaved, setConsumed, canUndo, undo } =
+    useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
@@ -40,6 +48,97 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const [items] = useState<readonly Item[]>(() =>
     selectedItem ? buildSwipeSequence(selectedItem, rankedItems, interactions) : [],
   );
+  const listRef = useRef<FlatList<Item>>(null);
+  const [exitAnimation] = useState(() => new Animated.Value(0));
+  const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (active) {
+        setReduceMotion(enabled);
+      }
+    });
+
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+
+    return () => {
+      active = false;
+      subscription.remove();
+      exitAnimation.stopAnimation();
+    };
+  }, [exitAnimation]);
+
+  function handleInterest(nextItemId: ItemId, interest: ItemInterest | null) {
+    setInterest(nextItemId, interest);
+    setFeedback(
+      interest === 'LIKED'
+        ? ITEM_INTERACTION_LABELS.likedFeedback
+        : interest === 'DISLIKED'
+          ? ITEM_INTERACTION_LABELS.dislikedFeedback
+          : ITEM_INTERACTION_LABELS.interestClearedFeedback,
+    );
+  }
+
+  function handleSaved(nextItemId: ItemId, currentlySaved: boolean) {
+    toggleSaved(nextItemId);
+    setFeedback(
+      currentlySaved
+        ? ITEM_INTERACTION_LABELS.unsavedFeedback
+        : ITEM_INTERACTION_LABELS.savedFeedback,
+    );
+  }
+
+  function handleConsumed(item: Item, index: number, currentlyConsumed: boolean) {
+    if (exitingItemId) {
+      return;
+    }
+
+    const nextConsumed = !currentlyConsumed;
+    const labels = getConsumedItemLabels(item.itemType);
+    setConsumed(item.id, nextConsumed);
+    setFeedback(nextConsumed ? labels.markedFeedback : labels.unmarkedFeedback);
+
+    if (!nextConsumed || index >= items.length - 1) {
+      return;
+    }
+
+    const advance = () => {
+      listRef.current?.scrollToIndex({ index: index + 1, animated: false });
+      exitAnimation.setValue(0);
+      setExitingItemId(null);
+    };
+
+    if (reduceMotion) {
+      advance();
+      return;
+    }
+
+    setExitingItemId(item.id);
+    exitAnimation.setValue(0);
+    Animated.timing(exitAnimation, {
+      toValue: 1,
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        advance();
+      }
+    });
+  }
+
+  function handleUndo() {
+    if (!canUndo || exitingItemId) {
+      return;
+    }
+
+    undo();
+    setFeedback(ITEM_INTERACTION_LABELS.undoFeedback);
+  }
 
   if (!selectedItem) {
     return (
@@ -88,28 +187,88 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
         >
           <Text style={styles.backText}>← Discovery</Text>
         </Pressable>
-        {items.length > 1 ? <Text style={styles.swipeHint}>Pyyhkäise sivulle →</Text> : null}
+        <View style={styles.topBarActions}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={ITEM_INTERACTION_LABELS.undo}
+            accessibilityHint="Palauttaa viimeisimmän item-valinnan muuttamatta nykyistä sivua"
+            accessibilityState={{ disabled: !canUndo || Boolean(exitingItemId) }}
+            disabled={!canUndo || Boolean(exitingItemId)}
+            onPress={handleUndo}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.undoButton,
+              (!canUndo || exitingItemId) && styles.disabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.undoText}>↶ {ITEM_INTERACTION_LABELS.undo}</Text>
+          </Pressable>
+          {items.length > 1 ? <Text style={styles.swipeHint}>Pyyhkäise →</Text> : null}
+        </View>
+      </View>
+
+      <View style={styles.feedbackRow}>
+        {feedback ? (
+          <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>
+            {feedback}
+          </Text>
+        ) : null}
       </View>
 
       <FlatList
+        ref={listRef}
         data={items}
         horizontal
         pagingEnabled
+        scrollEnabled={!exitingItemId}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
-        renderItem={({ item }) => (
-          <SwipeItemPage
-            item={item}
-            interaction={getItemInteraction(interactions, item.id)}
-            pageWidth={width}
-            theme={theme}
-            styles={styles}
-            onInterest={(interest) => setInterest(item.id, interest)}
-            onToggleSaved={() => toggleSaved(item.id)}
-            onSetConsumed={(consumed) => setConsumed(item.id, consumed)}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const interaction = getItemInteraction(interactions, item.id);
+          const exiting = item.id === exitingItemId;
+
+          return (
+            <Animated.View
+              style={[
+                { width },
+                exiting && {
+                  opacity: exitAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0.12],
+                  }),
+                  transform: [
+                    {
+                      translateX: exitAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -Math.min(width * 0.18, 72)],
+                      }),
+                    },
+                    {
+                      scale: exitAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 0.98],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <SwipeItemPage
+                item={item}
+                interaction={interaction}
+                pageWidth={width}
+                theme={theme}
+                styles={styles}
+                disabled={Boolean(exitingItemId)}
+                onInterest={(interest) => handleInterest(item.id, interest)}
+                onToggleSaved={() => handleSaved(item.id, interaction.saved)}
+                onConsumedPress={() => handleConsumed(item, index, interaction.consumed)}
+              />
+            </Animated.View>
+          );
+        }}
       />
     </SafeAreaView>
   );
@@ -121,9 +280,10 @@ interface SwipeItemPageProps {
   pageWidth: number;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
+  disabled: boolean;
   onInterest: (interest: ItemInterest | null) => void;
   onToggleSaved: () => void;
-  onSetConsumed: (consumed: boolean) => void;
+  onConsumedPress: () => void;
 }
 
 function SwipeItemPage({
@@ -132,12 +292,12 @@ function SwipeItemPage({
   pageWidth,
   theme,
   styles,
+  disabled,
   onInterest,
   onToggleSaved,
-  onSetConsumed,
+  onConsumedPress,
 }: SwipeItemPageProps) {
-  const consumedLabel = item.itemType === 'BOOK' ? 'Luettu' : 'Katsottu';
-  const markConsumedLabel = item.itemType === 'BOOK' ? 'Merkitse luetuksi' : 'Merkitse katsotuksi';
+  const consumedLabels = getConsumedItemLabels(item.itemType);
 
   return (
     <ScrollView
@@ -159,8 +319,16 @@ function SwipeItemPage({
           style={[styles.heroLight, { backgroundColor: theme.ambient.windowLight }]}
         />
         <View style={styles.heroStatusRow}>
-          {interaction.saved ? <Text style={styles.heroStatus}>★ TALLENNETTU</Text> : <View />}
-          {interaction.consumed ? <Text style={styles.heroStatus}>{consumedLabel.toUpperCase()}</Text> : null}
+          {interaction.saved ? (
+            <Text style={styles.heroStatus}>
+              ★ {ITEM_INTERACTION_LABELS.saved.toUpperCase()}
+            </Text>
+          ) : (
+            <View />
+          )}
+          {interaction.consumed ? (
+            <Text style={styles.heroStatus}>{consumedLabels.status}</Text>
+          ) : null}
         </View>
         <Text style={styles.typeLabel}>{item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
         <Text style={styles.heroTitle}>{item.title}</Text>
@@ -181,32 +349,40 @@ function SwipeItemPage({
 
       <View style={styles.actions} accessibilityLabel="Item actions">
         <ActionButton
-          label="Pidän"
+          label={ITEM_INTERACTION_LABELS.liked}
           active={interaction.interest === 'LIKED'}
+          disabled={disabled}
           theme={theme}
           styles={styles}
           onPress={() => onInterest(interaction.interest === 'LIKED' ? null : 'LIKED')}
         />
         <ActionButton
-          label="Ei minulle"
+          label={ITEM_INTERACTION_LABELS.disliked}
           active={interaction.interest === 'DISLIKED'}
+          disabled={disabled}
           theme={theme}
           styles={styles}
           onPress={() => onInterest(interaction.interest === 'DISLIKED' ? null : 'DISLIKED')}
         />
         <ActionButton
-          label={interaction.saved ? 'Tallennettu' : 'Tallenna'}
+          label={
+            interaction.saved ? ITEM_INTERACTION_LABELS.saved : ITEM_INTERACTION_LABELS.save
+          }
           active={interaction.saved}
+          disabled={disabled}
           theme={theme}
           styles={styles}
           onPress={onToggleSaved}
         />
         <ActionButton
-          label={interaction.consumed ? consumedLabel : markConsumedLabel}
+          label={
+            interaction.consumed ? consumedLabels.activeAction : consumedLabels.markAction
+          }
           active={interaction.consumed}
+          disabled={disabled}
           theme={theme}
           styles={styles}
-          onPress={() => onSetConsumed(!interaction.consumed)}
+          onPress={onConsumedPress}
         />
       </View>
     </ScrollView>
@@ -216,17 +392,19 @@ function SwipeItemPage({
 interface ActionButtonProps {
   label: string;
   active: boolean;
+  disabled: boolean;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   onPress: () => void;
 }
 
-function ActionButton({ label, active, theme, styles, onPress }: ActionButtonProps) {
+function ActionButton({ label, active, disabled, theme, styles, onPress }: ActionButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.actionButton,
@@ -234,10 +412,13 @@ function ActionButton({ label, active, theme, styles, onPress }: ActionButtonPro
           backgroundColor: theme.ambient.curtain,
           borderColor: theme.ambient.curtainHighlight,
         },
+        disabled && styles.disabled,
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.actionText, active && styles.actionTextActive]}>{label}</Text>
+      <Text style={[styles.actionText, active && styles.actionTextActive]}>
+        {active ? `✓ ${label}` : label}
+      </Text>
     </Pressable>
   );
 }
@@ -258,6 +439,11 @@ function createStyles(theme: RoomTheme) {
       alignItems: 'center',
       justifyContent: 'space-between',
     },
+    topBarActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
     backButton: {
       minHeight: 44,
       justifyContent: 'center',
@@ -273,6 +459,26 @@ function createStyles(theme: RoomTheme) {
       fontSize: 11,
       fontWeight: '600',
       opacity: 0.78,
+    },
+    undoButton: {
+      minHeight: 40,
+      justifyContent: 'center',
+      paddingHorizontal: 4,
+    },
+    undoText: {
+      color: theme.base.textPrimary,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    feedbackRow: {
+      minHeight: 26,
+      paddingHorizontal: 20,
+      justifyContent: 'center',
+    },
+    feedbackText: {
+      color: theme.ambient.curtainHighlight,
+      fontSize: 12,
+      fontWeight: '600',
     },
     content: {
       paddingHorizontal: 20,
@@ -397,6 +603,9 @@ function createStyles(theme: RoomTheme) {
     },
     pressed: {
       opacity: 0.7,
+    },
+    disabled: {
+      opacity: 0.38,
     },
   });
 }

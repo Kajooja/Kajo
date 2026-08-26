@@ -10,10 +10,32 @@ export interface ItemInteraction {
 
 export type ItemInteractionMap = Readonly<Record<ItemId, ItemInteraction>>;
 
+export type ItemInteractionAction =
+  | { type: 'SET_INTEREST'; itemId: ItemId; interest: ItemInterest | null }
+  | { type: 'TOGGLE_SAVED'; itemId: ItemId }
+  | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean };
+
+interface ItemInteractionUndoEntry {
+  itemId: ItemId;
+  previousInteraction: ItemInteraction | null;
+}
+
+export interface ItemInteractionStore {
+  interactions: ItemInteractionMap;
+  undoStack: readonly ItemInteractionUndoEntry[];
+}
+
+export const ITEM_INTERACTION_UNDO_LIMIT = 10;
+
 export const EMPTY_ITEM_INTERACTION: Readonly<ItemInteraction> = {
   interest: null,
   saved: false,
   consumed: false,
+};
+
+export const EMPTY_ITEM_INTERACTION_STORE: Readonly<ItemInteractionStore> = {
+  interactions: {},
+  undoStack: [],
 };
 
 export function getItemInteraction(
@@ -45,6 +67,50 @@ export function setItemConsumed(
   consumed: boolean,
 ): ItemInteractionMap {
   return updateItemInteraction(interactions, itemId, { consumed });
+}
+
+export function commitItemInteractionAction(
+  store: ItemInteractionStore,
+  action: ItemInteractionAction,
+): ItemInteractionStore {
+  const hadPreviousInteraction = Object.prototype.hasOwnProperty.call(
+    store.interactions,
+    action.itemId,
+  );
+  const previousInteraction = hadPreviousInteraction
+    ? getItemInteraction(store.interactions, action.itemId)
+    : null;
+  const interactions = applyItemInteractionAction(store.interactions, action);
+  const nextInteraction = getItemInteraction(interactions, action.itemId);
+
+  if (areItemInteractionsEqual(previousInteraction ?? EMPTY_ITEM_INTERACTION, nextInteraction)) {
+    return store;
+  }
+
+  return {
+    interactions,
+    undoStack: [
+      ...store.undoStack.slice(-(ITEM_INTERACTION_UNDO_LIMIT - 1)),
+      { itemId: action.itemId, previousInteraction },
+    ],
+  };
+}
+
+export function undoLastItemInteractionAction(store: ItemInteractionStore): ItemInteractionStore {
+  const lastEntry = store.undoStack[store.undoStack.length - 1];
+
+  if (!lastEntry) {
+    return store;
+  }
+
+  const interactions = lastEntry.previousInteraction
+    ? updateItemInteraction(store.interactions, lastEntry.itemId, lastEntry.previousInteraction)
+    : removeItemInteraction(store.interactions, lastEntry.itemId);
+
+  return {
+    interactions,
+    undoStack: store.undoStack.slice(0, -1),
+  };
 }
 
 export function getDiscoverableItems(
@@ -85,4 +151,38 @@ function updateItemInteraction(
       ...patch,
     },
   };
+}
+
+function applyItemInteractionAction(
+  interactions: ItemInteractionMap,
+  action: ItemInteractionAction,
+): ItemInteractionMap {
+  switch (action.type) {
+    case 'SET_INTEREST':
+      return setItemInterest(interactions, action.itemId, action.interest);
+    case 'TOGGLE_SAVED':
+      return toggleItemSaved(interactions, action.itemId);
+    case 'SET_CONSUMED':
+      return setItemConsumed(interactions, action.itemId, action.consumed);
+  }
+}
+
+function areItemInteractionsEqual(
+  first: ItemInteraction,
+  second: ItemInteraction,
+): boolean {
+  return (
+    first.interest === second.interest &&
+    first.saved === second.saved &&
+    first.consumed === second.consumed
+  );
+}
+
+function removeItemInteraction(
+  interactions: ItemInteractionMap,
+  itemId: ItemId,
+): ItemInteractionMap {
+  const nextInteractions = { ...interactions };
+  delete nextInteractions[itemId];
+  return nextInteractions;
 }
