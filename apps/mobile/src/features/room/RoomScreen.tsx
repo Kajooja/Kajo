@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -19,9 +19,9 @@ export function RoomScreen() {
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
   const styles = createStyles(theme);
-  const curtainPosition = useRef(
-    new Animated.Value(getCurtainPositionForMode(discoveryMode)),
-  ).current;
+  const [curtainPosition] = useState(
+    () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
+  );
   const ambientColor = curtainPosition.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [
