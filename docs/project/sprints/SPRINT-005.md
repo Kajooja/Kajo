@@ -25,24 +25,17 @@ The sprint should make interaction feel continuous from grid -> Item -> swipe ra
 - Add deterministic tests for state transitions, filtering/suppression and swipe sequence behavior where practical.
 - Keep `npm run check` green and validate the changed flow on a real phone/emulator when available.
 
-## UX carry-over from Sprint 004 acceptance
-
-Before or alongside swipe implementation, apply the accepted curtain polish without redesigning the control:
-
-- movement between the three curtain states should feel continuous/seamless,
-- the handle/control should be visually thinner than and subordinate to the curtain,
-- the selected DiscoveryMode atmosphere should affect the full underlying Room/discovery experience rather than appearing local to the curtain only.
-
-These are refinements of existing UX principles, not a new discovery mode or new domain concept.
-
 ## Relevant MVP requirements
 
-Primary Sprint 005 targets:
+Primary Sprint 005 targets now include the real-device acceptance refinements:
 
+- `MVP-DISC-007` — one global drag + tap-to-snap DiscoveryMode/risk curtain control shared across the app.
 - `MVP-SWIPE-001` — user can enter an optional swipe mode for books and movies.
 - `MVP-SWIPE-002` — user can express positive/negative interest.
 - `MVP-SWIPE-003` — user can mark a movie as watched and a book as read.
 - `MVP-SWIPE-004` — already-consumed Items are strongly suppressed from ordinary repeated discovery.
+- `MVP-SWIPE-005` — consumed action visibly auto-advances with restrained motion and no index jump.
+- `MVP-SWIPE-006` — recent interaction choices can be undone; MVP target is at least the latest 10 committed actions.
 - `MVP-MEM-001` — user can save/unsave an Item.
 - `MVP-MEM-002` — user can view consumed books/movies.
 
@@ -53,7 +46,7 @@ Preserve completed discovery requirements from Sprint 004.
 - Backend/Supabase persistence; planned for Sprint 006.
 - Register/login implementation; planned for Sprint 006.
 - User nickname/username implementation; planned for Sprint 006.
-- Production recommendation scoring or `MVP-PRED-*` semantics.
+- Production recommendation scoring or `MVP-PRED-*` implementation.
 - Event engine/analytics persistence; planned for Sprint 007.
 - Rating consumed Items; remains later Memory scope.
 - SharedProfile state.
@@ -64,6 +57,9 @@ Preserve completed discovery requirements from Sprint 004.
 - Continue using generic `Item`; do not split swipe state into separate book/movie core models.
 - Keep consumed semantics generic while allowing domain-specific UI labels (`watched` / `read`).
 - Keep mobile interaction state behind one clear feature boundary so later backend persistence can replace storage without rewriting presentation components.
+- User-facing labels are presentation. Stable state/event semantics must not depend on visible wording.
+- Reused action labels should be centrally maintained at feature level; do not introduce a broad localization framework prematurely.
+- `DiscoveryMode` is shared app state and future prediction-policy input; `AmbientPhase` remains a separate visual representation.
 - Do not call local filtering/suppression Prediction V0.
 - Do not create empty backend/data folders before they are needed.
 
@@ -72,7 +68,12 @@ Preserve completed discovery requirements from Sprint 004.
 - Grid remains the default browse surface.
 - Grid -> Item -> swipe should feel like one continuous content flow.
 - Swipe is optional; users must not be forced into it to browse.
+- Curtain is the single global three-state DiscoveryMode/risk selector, not one selector per screen.
+- Curtain drag may be continuous, but settled state is only `FOR_YOU`, `SURPRISE` or `RISK`.
+- Tapping a curtain target region should smoothly animate/snap to the selected state.
 - Actions must have accessible non-gesture alternatives.
+- Marking an Item read/watched should visibly commit and advance with restrained motion.
+- Recent choices must be reversible through a clear undo/back-arrow affordance.
 - Avoid casino/dating-app visual language, excessive counters or gamification.
 - Saved/read/watched state should be understandable without heavy chrome.
 - Respect reduced-motion settings.
@@ -81,103 +82,151 @@ Preserve completed discovery requirements from Sprint 004.
 
 - Existing grid discovery remains functional.
 - A user can enter and leave an optional swipe sequence for both BOOK and MOVIE Items.
-- Positive and negative interest actions work through explicit state logic.
+- Positive and negative interest actions work through explicit state logic and have visible feedback.
 - BOOK can be marked read and MOVIE watched through the generic consumed-state boundary.
+- Consumed commit advances to the next card with restrained feedback and no active-list/index jump.
 - Save/unsave works.
-- Consumed books/movies can be viewed.
+- Consumed books/movies can be viewed after auto-advance.
 - Already-consumed Items are strongly suppressed from normal repeated mock discovery.
-- Curtain acceptance polish is applied without breaking three-state DiscoveryMode behavior.
+- Curtain is window-aligned, draggable, tap-to-snap and shared globally across Room/discovery/swipe without duplicate downstream selector groups.
+- Recent committed interaction actions can be undone predictably, with at least 10-action sequential undo as the MVP target.
+- Reused action labels are maintained from one feature-level source without coupling copy to canonical state/event semantics.
 - Deterministic behavior has automated tests where practical.
 - No obsolete placeholder/duplicate implementation remains.
 - `npm run check` passes.
-- The user-facing path is exercised on a real phone/emulator/simulator before sprint close when available.
+- Standalone Android release APK builds and embeds its JS bundle.
+- The final user-facing path is exercised on a real phone before sprint close.
 - `STATUS.md`, `MVP.md` and `CODEMAP.md` reflect repository truth at close.
 
-## Initial implementation sequence
+## Delivered implementation checkpoint
 
-1. Inspect the merged Sprint 004 discovery/detail/state implementation.
-2. Create one scoped engineering Issue for the curtain acceptance polish and implement it without changing DiscoveryMode semantics.
-3. Create the first scoped Swipe & History implementation Issue.
-4. Define the minimal generic mobile interaction-state boundary.
-5. Implement grid/detail -> optional swipe sequence.
-6. Add interest, saved and consumed actions.
-7. Add consumed-history presentation and mock suppression.
-8. Add tests and run full CI/device acceptance.
-9. Complete the sprint close protocol only after runtime acceptance.
+### Curtain polish — Issue #30 / PR #31
 
-## Important starting files
+Delivered:
+
+- thinner curtain handle,
+- continuous drag/snap behavior,
+- drag continuation from the live animated position,
+- full-scene DiscoveryMode atmosphere in Room/discovery/detail,
+- accessible mode controls and reduced-motion behavior preserved.
+
+This implementation is superseded in UX acceptance by Issue #39 only where the device review asks for window alignment, tap-to-snap and one global selector instead of downstream selector duplication.
+
+### Swipe & History — Issue #32 / PR #33
+
+Delivered:
+
+- grid remains primary discovery,
+- selected grid Item begins the horizontal swipe sequence,
+- one generic in-memory BOOK/MOVIE interaction state,
+- interest, save/unsave and consumed state,
+- consumed suppression,
+- `Luetut` / `Katsotut` collection,
+- deterministic state/suppression/sequence tests,
+- no separate book/movie state models or unnecessary routes/folders.
+
+### Swipe stability — Issue #37 / PR #38
+
+Merged to `main` as commit `1a785a215e29cfd8ecc03e7aa3d05795d88d54d2`.
+
+Delivered:
+
+- active swipe sequence is snapshotted when the session opens,
+- live read/watched changes no longer remove a FlatList page underneath the user,
+- interaction status remains live,
+- consumed suppression applies normally after returning to discovery,
+- regression test added.
+
+CI run #66 for this commit is fully green, including lint, typecheck, tests, iOS/Android bundle smoke, standalone Android release build, embedded JS bundle verification and artifact upload.
+
+## Real-device review — 2026-08-26
+
+Issue #34 records the test result.
+
+### What worked
+
+- standalone app launches on the real Android phone,
+- no crash observed,
+- Room -> discovery -> swipe navigation works,
+- overall MVP structure remains usable.
+
+### Why Sprint 005 remains open
+
+The phone review identified two required refinement Issues.
+
+#### Issue #39 — global curtain / risk control
+
+- move/align control to the top of the Room window so it reads as a real curtain control,
+- preserve continuous drag,
+- tapping left/centre/right target should smoothly move/snap to that state,
+- keep exactly three settled states,
+- smooth colour/light interpolation,
+- same DiscoveryMode persists through all screens,
+- remove duplicated `Sinulle / Yllätys / Riski` button selector groups from downstream screens,
+- the same state becomes the future Prediction V0 exploration/risk input.
+
+#### Issue #40 — action commit / auto-advance / undo / labels
+
+- action presses need clear visible feedback,
+- `Luettu` / `Katsottu` should make the active card leave subtly and reveal the next card,
+- consumed Item remains in `Luetut` / `Katsotut`,
+- add undo/back-arrow for recent choices,
+- retain at least the latest 10 committed actions for sequential undo as the MVP target,
+- centralize repeated user-facing action labels,
+- keep copy independent from canonical state/event semantics.
+
+## Later learning/prediction decision captured during device review
+
+This is **not** extra Sprint 005 implementation scope, but it is now an explicit product/architecture direction:
+
+```text
+meaningful user action
+  -> Event/evidence (Sprint 007)
+  -> ShortTermState / LongTermState changes
+  -> Prediction inputs change
+  -> affected ranking refreshes (Sprint 008)
+```
+
+`DiscoveryMode` is also a live Prediction input:
+
+- `FOR_YOU`: lower exploration / higher expected fit,
+- `SURPRISE`: more novelty with meaningful expected fit,
+- `RISK`: higher uncertainty/variance and bolder exploration.
+
+The mobile client must not own the production ranking algorithm.
+
+## Exact continuation order
+
+1. Implement Issue #39.
+2. Run full automated validation + standalone Android build.
+3. Implement Issue #40.
+4. Run full automated validation + standalone Android build.
+5. Repeat Issue #34 real-device acceptance using the new final APK.
+6. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
+7. Perform mandatory Sprint 005 close protocol.
+8. Start Sprint 006 only after the close is merged.
+
+## Important files
 
 - `/AGENTS.md`
 - `/docs/project/STATUS.md`
 - `/docs/product/MVP.md`
 - `/docs/product/UX_PRINCIPLES.md`
 - `/docs/domain/GLOSSARY.md`
-- `/docs/domain/DOMAIN_MODEL.md`
+- `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/architecture/ARCHITECTURE.md`
 - `/docs/architecture/CODEMAP.md`
 - `/apps/mobile/src/features/room/CurtainControl.tsx`
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
-- `/apps/mobile/src/features/discovery/`
-- `/apps/mobile/app/discovery/`
-
-## Mid-sprint checkpoint — 2026-08-26
-
-### Curtain acceptance polish
-
-Issue #30 / PR #31 delivered the Sprint 004 phone-test carry-over:
-
-- materially thinner curtain handle,
-- continuous drag/snap behavior,
-- drag continuation from the live animated position,
-- full-scene DiscoveryMode atmosphere in Room,
-- DiscoveryMode atmosphere extended through discovery and Item detail,
-- accessible mode controls and reduced-motion behavior preserved.
-
-PR #31 passed lint, typecheck, automated tests and iOS/Android bundle smoke, and the post-merge `main` standalone Android release build also passed.
-
-### Swipe & History implementation
-
-Issue #32 / PR #33 delivered the first generic local interaction flow and was squash-merged to `main` as commit `2b8b10f4cac92113a0d219962162087c8a0544d3`.
-
-Delivered implementation:
-
-- grid remains the primary discovery surface,
-- opening a grid Item starts a horizontally swipeable sequence with the selected Item first,
-- one generic in-memory `Item` interaction state supports BOOK and MOVIE,
-- positive/negative interest,
-- save/unsave,
-- generic consumed state with BOOK=`Luettu` and MOVIE=`Katsottu`,
-- consumed Items suppressed from ordinary discovery,
-- `Luetut` / `Katsotut` history integrated into the existing discovery screen,
-- no separate book/movie interaction models,
-- no separate swipe/history route or speculative feature folder,
-- deterministic state/suppression/swipe-sequence tests.
-
-Validation evidence:
-
-- PR #33 canonical automated gate passed: lint, typecheck, tests, iOS bundle smoke and Android bundle smoke.
-- `main` CI run #62 validates the merged implementation and produces the standalone Android release APK.
-- Issue #35 removes remaining developer/internal wording from the user-facing acceptance build and records the canonical handoff.
-
-### Outstanding acceptance
-
-Real-device validation for the new Sprint 005 flow has **not yet been recorded**.
-
-Issue #34 tracks the exact phone acceptance flow covering:
-
-- curtain behavior,
-- Room -> book/movie discovery,
-- grid -> selected Item -> horizontal swipe,
-- vertical scrolling inside Item content,
-- like/dislike,
-- save/unsave,
-- read/watched,
-- consumed suppression,
-- `Luetut` / `Katsotut` history,
-- clean back navigation and crash/layout checks.
-
-Do not mark `MVP-SWIPE-001..004` or `MVP-MEM-001..002` complete and do not close Sprint 005 until Issue #34 succeeds.
+- `/apps/mobile/src/features/discovery/DiscoveryModeContext.tsx`
+- `/apps/mobile/src/features/discovery/DiscoveryScreen.tsx`
+- `/apps/mobile/src/features/discovery/ItemDetailScreen.tsx`
+- `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
+- `/apps/mobile/src/features/discovery/itemInteraction.ts`
+- `/apps/mobile/src/features/discovery/itemInteraction.test.ts`
 
 ## Handoff
 
-Continue Sprint 005 from Issue #34 after Issue #35 acceptance-readiness cleanup is merged. Application implementation is merged and automated validation is green. The next blocking action is real-device testing using the latest standalone Android APK from `main`, followed by scoped fixes if required and then the mandatory Sprint 005 close protocol.
+A fresh ChatGPT conversation can start with **"jatketaan reposta"**.
+
+Read `AGENTS.md` -> `STATUS.md` -> this sprint file. The next engineering task is **Issue #39**. After #39, implement **Issue #40**. Do **not** start Sprint 006 and do not close Sprint 005 until the revised real-device acceptance in Issue #34 succeeds.
