@@ -34,6 +34,8 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
+Issue #57 is the first implementation step. It adds the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Mobile client dependencies and configuration remain the next separate step so package installation and the lockfile stay package-manager-generated.
+
 ## MVP progress
 
 See `../product/MVP.md`.
@@ -65,9 +67,10 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Create one scoped Issue for the initial Supabase configuration contract, client/data boundary and first real committed migration.
-3. Keep secrets out of the repository and preserve the current presentation API while adding persistence underneath it.
-4. Verify the scoped change through the canonical CI gate; reserve another phone acceptance pass for a meaningful user-facing Sprint 006 checkpoint.
+2. Complete Issue #57: merge the initial migration and authorization foundation only with green canonical CI.
+3. Open the next scoped Issue for package-manager-installed Supabase/Expo dependencies, the public configuration contract and one root mobile client/data boundary.
+4. Keep secrets out of the repository and preserve the current presentation API while adding persistence underneath it.
+5. Reserve another phone acceptance pass for a meaningful user-facing Sprint 006 checkpoint.
 
 ## Known issues / open decisions
 
@@ -93,10 +96,11 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - `/docs/project/sprints/SPRINT-006.md`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
+- `/supabase/migrations/20260826203000_backend_foundation.sql`
 - `/.github/workflows/ci.yml`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Start with its first scoped backend-foundation Issue; do not add empty folders, speculative services or prediction/event work.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #57 is the current change; after its migration passes CI and merges, add the mobile Supabase configuration/client boundary in its own Issue with a package-manager-generated lockfile.
