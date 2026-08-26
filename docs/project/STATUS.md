@@ -11,16 +11,18 @@ This is the authoritative current-state document.
 
 Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are complete.
 
-Sprint 005 application implementation, including the refinements from the 2026-08-26 real-device review, is merged and CI-validated. Sprint 005 remains **ACTIVE** only until the final implementation APK passes the repeated real-device acceptance in Issue #34.
+Sprint 005 remains **ACTIVE**. The 2026-08-26 phone test confirmed that the standalone app and core Room -> discovery -> swipe path work, then identified one final interaction-loop correction: every explicit card choice must advance and undo must return the exact previous card. That correction is Issue #51 / PR #52.
 
-Current `main` acceptance baseline:
+Last phone-tested `main` baseline:
 
-- commit `be183d7abe9ceb02b2c420b4f132f5ef326c5f51`,
-- CI run #72 fully green,
+- commit `b6aa771b02c948eb854fa8d7089074358e4755fd`,
+- CI run #73 fully green,
 - standalone Android release APK built successfully,
 - embedded JS bundle verified,
 - APK artifact uploaded,
-- previous Issue #34 phone review: the earlier APK launched without a crash and Room -> discovery -> swipe navigation worked; the final CI #72 APK still requires the repeat test.
+- real Android device: APK installs, launches and the Room/core flow works,
+- read/watched advances to the next card,
+- remaining acceptance defect: interest/save choices did not advance and undo did not return the previous card.
 
 Merged Sprint 005 capabilities already present:
 
@@ -38,23 +40,25 @@ Merged Sprint 005 capabilities already present:
 - shared three-state DiscoveryMode without duplicate downstream selectors,
 - visible action commit feedback and selected state,
 - restrained consumed-card exit and automatic advance to the next Item,
-- deterministic undo for the latest 10 committed interest/saved/consumed actions without changing the active swipe index,
+- bounded state restoration for the latest 10 committed interest/saved/consumed actions,
 - one centralized feature-level source for reused interaction labels,
 - deterministic curtain, interaction, undo, suppression and swipe tests,
 - no duplicate book/movie state model, swipe route or history route.
 
-## Final implementation checkpoint — phone re-test pending
+## Current correction checkpoint — Issue #51 / PR #52
 
-Issue #34 records the original device review and remains the acceptance thread for the final APK. Its two scoped follow-up Issues are implemented.
+PR #52 routes interest, save and consumed choices through one commit -> exit -> next-card flow. Undo uses the existing bounded interaction history to restore both the previous interaction snapshot and its exact Item/card. The final card commits safely without an invalid advance.
 
 Delivered evidence:
 
 - Issue #39 / PR #47 merged as commit `bea219aa0c6837bb646ece7d4ccf37bb1e05afc2`; main CI run #70 passed validation, standalone Android build, embedded JS verification and artifact upload.
 - Issue #40 / PR #48 merged as commit `be183d7abe9ceb02b2c420b4f132f5ef326c5f51`; main CI run #72 passed the same full gate.
+- Documentation PR #50 merged as commit `b6aa771b02c948eb854fa8d7089074358e4755fd`; main CI run #73 passed the full gate and produced the phone-tested APK.
+- PR #52 local validation: zero-warning lint, TypeScript, all 21 tests and both iOS/Android Expo exports passed. Canonical PR CI remains the merge gate.
 
 ### Remaining acceptance gate
 
-Install the CI #72 APK on the real Android phone and repeat Issue #34. Sprint 005 and its remaining MVP requirements stay open until that flow is accepted.
+Merge PR #52 only with green canonical CI, install its resulting standalone `main` APK, and repeat Issue #34. Sprint 005 and its remaining MVP requirements stay open until every explicit action advances and sequential undo returns the correct previous cards on the phone.
 
 ## MVP progress
 
@@ -98,16 +102,17 @@ Do not implement ranking logic in the mobile client.
 ## Next — exact handoff order
 
 1. Continue **Sprint 005**, not Sprint 006.
-2. Install the standalone APK from main CI run #72 and repeat Issue **#34** real-device acceptance.
-3. Verify the global curtain, Room -> discovery -> swipe path, visible actions, read/watched auto-advance, history and sequential undo on the phone.
-4. Only after successful phone acceptance: mark the remaining Sprint 005 MVP requirements complete and perform the mandatory Sprint 005 close protocol.
-5. Only then open/start Sprint 006 Backend Foundation.
+2. Complete Issue **#51** through PR **#52** and merge only with green canonical CI.
+3. Install the resulting standalone `main` APK and repeat Issue **#34** on the phone.
+4. Verify that every interest/save/consumed choice advances, each undo returns the exact previous card and mixed sequential undo remains stable.
+5. Only after successful phone acceptance: mark the remaining Sprint 005 MVP requirements complete and perform the mandatory Sprint 005 close protocol.
+6. Only then open/start Sprint 006 Backend Foundation.
 
 ## Known issues / open decisions
 
 - Current interaction state is intentionally in-memory only; persistence belongs to Sprint 006.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
-- Final Sprint 005 device acceptance is pending in Issue #34.
+- Issue #51 / PR #52 still requires canonical CI, merge and final device acceptance through Issue #34.
 - Exact authentication provider/method mix remains open; MVP requirement is provider-agnostic.
 - Exact nickname/username uniqueness rules remain open.
 - Final book metadata provider is not locked.
@@ -140,4 +145,4 @@ Do not implement ranking logic in the mobile client.
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Issues #39 and #40 are merged, automatically validated and built as a standalone Android APK. The single next step is the repeated real-phone acceptance in **Issue #34** using the CI #72 artifact. Keep Sprint 005 active and do not start Sprint 006 until that acceptance and the mandatory sprint close are merged.
+Issue #51 / PR #52 is the single current engineering change. Its implementation unifies every explicit card choice and makes undo restore the exact previous card using the existing generic interaction history. Merge it only with green CI, then test the resulting standalone APK through Issue #34. Keep Sprint 005 active and do not start Sprint 006 before that acceptance and the mandatory sprint close are merged.

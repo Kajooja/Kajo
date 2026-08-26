@@ -34,8 +34,8 @@ Primary Sprint 005 targets now include the real-device acceptance refinements:
 - `MVP-SWIPE-002` — user can express positive/negative interest.
 - `MVP-SWIPE-003` — user can mark a movie as watched and a book as read.
 - `MVP-SWIPE-004` — already-consumed Items are strongly suppressed from ordinary repeated discovery.
-- `MVP-SWIPE-005` — consumed action visibly auto-advances with restrained motion and no index jump.
-- `MVP-SWIPE-006` — recent interaction choices can be undone; MVP target is at least the latest 10 committed actions.
+- `MVP-SWIPE-005` — every explicit interest, save or consumed choice visibly auto-advances with restrained motion and no index jump.
+- `MVP-SWIPE-006` — recent interaction choices can be undone; MVP target is at least the latest 10 committed actions with exact state and card restoration.
 - `MVP-MEM-001` — user can save/unsave an Item.
 - `MVP-MEM-002` — user can view consumed books/movies.
 
@@ -72,8 +72,8 @@ Preserve completed discovery requirements from Sprint 004.
 - Curtain drag may be continuous, but settled state is only `FOR_YOU`, `SURPRISE` or `RISK`.
 - Tapping a curtain target region should smoothly animate/snap to the selected state.
 - Actions must have accessible non-gesture alternatives.
-- Marking an Item read/watched should visibly commit and advance with restrained motion.
-- Recent choices must be reversible through a clear undo/back-arrow affordance.
+- Every explicit interest, save or consumed choice should visibly commit and advance with restrained motion.
+- Recent choices must be reversible through a clear undo/back-arrow affordance that restores the exact previous card.
 - Avoid casino/dating-app visual language, excessive counters or gamification.
 - Saved/read/watched state should be understandable without heavy chrome.
 - Respect reduced-motion settings.
@@ -84,12 +84,12 @@ Preserve completed discovery requirements from Sprint 004.
 - A user can enter and leave an optional swipe sequence for both BOOK and MOVIE Items.
 - Positive and negative interest actions work through explicit state logic and have visible feedback.
 - BOOK can be marked read and MOVIE watched through the generic consumed-state boundary.
-- Consumed commit advances to the next card with restrained feedback and no active-list/index jump.
+- Every explicit interest, save or consumed commit advances to the next card with restrained feedback and no active-list/index jump.
 - Save/unsave works.
 - Consumed books/movies can be viewed after auto-advance.
 - Already-consumed Items are strongly suppressed from normal repeated mock discovery.
 - Curtain is window-aligned, draggable, tap-to-snap and shared globally across Room/discovery/swipe without duplicate downstream selector groups.
-- Recent committed interaction actions can be undone predictably, with at least 10-action sequential undo as the MVP target.
+- Recent committed interaction actions can be undone predictably, restoring the exact previous Item/card, with at least 10-action sequential undo as the MVP target.
 - Reused action labels are maintained from one feature-level source without coupling copy to canonical state/event semantics.
 - Deterministic behavior has automated tests where practical.
 - No obsolete placeholder/duplicate implementation remains.
@@ -168,6 +168,20 @@ Delivered:
 
 Main CI run #72 is fully green, including `npm run check`, the standalone Android release build, embedded JS bundle verification and artifact upload.
 
+### Unified action advance and exact-card undo — Issue #51 / PR #52
+
+The final CI #73 APK phone test showed that read/watched advanced correctly, while interest/save choices did not advance and undo restored state without returning the previous card.
+
+PR #52 implements:
+
+- one shared commit -> restrained exit -> next-card flow for `Pidän`, `Ei minulle`, `Tallenna` and read/watched,
+- the existing 10-action generic interaction history as the single source for undo state and target Item,
+- exact previous-card return on undo, including safe routing when the target is outside the active sequence,
+- safe final-card commit without an invalid index advance,
+- deterministic BOOK/MOVIE LIFO target, every-action advance, exact-card return and final-card tests.
+
+Local zero-warning lint, TypeScript, all 21 tests and iOS/Android Expo exports pass. Canonical PR CI, merge, standalone APK and real-phone acceptance remain required.
+
 ## Real-device review — 2026-08-26
 
 Issue #34 records the test result.
@@ -177,11 +191,12 @@ Issue #34 records the test result.
 - standalone app launches on the real Android phone,
 - no crash observed,
 - Room -> discovery -> swipe navigation works,
+- read/watched removes the current card and exposes the next one,
 - overall MVP structure remains usable.
 
-### Why Sprint 005 remained open after the first review
+### Why Sprint 005 remains open after the CI #73 phone test
 
-The phone review opened the scoped curtain refinement in Issue #39 and action-loop refinement in Issue #40. Both are now delivered in the checkpoints above. Sprint 005 remains open only until the CI #72 APK passes the repeated real-device acceptance in Issue #34.
+Interest/save choices still needed the same advance behavior, and undo needed to return the exact previous card in addition to restoring state. Issue #51 / PR #52 is the single scoped correction. Final production Room artwork remains outside this sprint.
 
 ## Later learning/prediction decision captured during device review
 
@@ -205,11 +220,12 @@ The mobile client must not own the production ranking algorithm.
 
 ## Exact continuation order
 
-1. Install the standalone APK from main CI run #72.
-2. Repeat Issue #34 real-device acceptance for the full final Sprint 005 flow.
-3. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
-4. Perform mandatory Sprint 005 close protocol.
-5. Start Sprint 006 only after the close is merged.
+1. Complete Issue #51 / PR #52 and merge only with green canonical CI.
+2. Install the resulting standalone `main` APK.
+3. Repeat Issue #34 real-device acceptance for every action and sequential exact-card undo.
+4. If accepted, mark `MVP-DISC-007`, `MVP-SWIPE-001..006` and `MVP-MEM-001..002` complete as evidence supports.
+5. Perform mandatory Sprint 005 close protocol.
+6. Start Sprint 006 only after the close is merged.
 
 ## Important files
 
@@ -235,4 +251,4 @@ The mobile client must not own the production ranking algorithm.
 
 A fresh ChatGPT conversation can start with **"jatketaan reposta"**.
 
-Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issues #39 and #40 are merged and their main-branch APK builds are green. The next task is the revised real-device acceptance in **Issue #34** using the CI #72 APK. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
+Read `AGENTS.md` -> `STATUS.md` -> this sprint file. Issue #51 / PR #52 is the only current implementation correction. Merge with green CI, then validate its standalone `main` APK through Issue #34. Do **not** start Sprint 006 or close Sprint 005 before that succeeds.
