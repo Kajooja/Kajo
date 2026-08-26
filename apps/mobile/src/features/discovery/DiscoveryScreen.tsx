@@ -158,7 +158,7 @@ function createStyles(theme: RoomTheme) {
       backgroundColor: theme.base.appBackground,
     },
     ambientBackdrop: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     screen: {
       flex: 1,
@@ -241,7 +241,7 @@ function createStyles(theme: RoomTheme) {
       overflow: 'hidden',
     },
     coverLight: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     coverType: {
       color: theme.base.textPrimary,
