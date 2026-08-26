@@ -12,23 +12,28 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-FOUND-002` Repository has CI for lint/typecheck/tests once code exists.
 - [x] `MVP-FOUND-003` Core domain contracts use Profile, Item, Event and Context terminology.
 
+## Authentication and identity
+
+- [ ] `MVP-AUTH-001` User can register and sign in using at least one lightweight/common authentication method.
+- [ ] `MVP-AUTH-002` Every signed-in User has a user-visible nickname/username associated with their identity.
+
 ## Room and theme
 
 - [x] `MVP-ROOM-001` A user has a personal minimalist 2D Room.
 - [x] `MVP-ROOM-002` The Room is the primary home/navigation surface.
-- [ ] `MVP-ROOM-003` Bookshelf opens book discovery.
-- [ ] `MVP-ROOM-004` Screen/projector opens movie discovery.
+- [x] `MVP-ROOM-003` Bookshelf opens book discovery.
+- [x] `MVP-ROOM-004` Screen/projector opens movie discovery.
 - [x] `MVP-ROOM-005` User theme is represented by reusable theme tokens rather than hard-coded component colours.
 - [ ] `MVP-ROOM-006` SharedProfile can have its own shared Room/theme identity.
 
 ## Discovery
 
-- [ ] `MVP-DISC-001` Books and movies have a visual grid discovery experience.
-- [ ] `MVP-DISC-002` Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
+- [x] `MVP-DISC-001` Books and movies have a visual grid discovery experience.
+- [x] `MVP-DISC-002` Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
 - [x] `MVP-DISC-003` The curtain controls DiscoveryMode with three snap states.
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
-- [ ] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
-- [ ] `MVP-DISC-006` User can open Item details.
+- [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
+- [x] `MVP-DISC-006` User can open Item details.
 
 ## Swipe and state
 

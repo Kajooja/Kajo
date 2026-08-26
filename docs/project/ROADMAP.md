@@ -22,11 +22,11 @@ Books + Movies grids, Item cards/details, mock ranking, DiscoveryMode switching.
 
 ### Sprint 005 — Swipe & History
 
-Optional swipe, like/dislike, watched/read, saved state and consumed-history suppression.
+Optional swipe, like/dislike, watched/read, saved state and consumed-history suppression. Grid remains the primary discovery surface; opening an Item should be able to flow naturally into the swipe-oriented browsing experience rather than feeling like a disconnected mode.
 
 ### Sprint 006 — Backend Foundation
 
-Supabase/PostgreSQL, auth, Profile, ProfileMember, Item persistence, migrations and authorization foundations.
+Supabase/PostgreSQL, lightweight/common register/sign-in authentication, user nickname/username identity, Profile, ProfileMember, Item persistence, migrations and authorization foundations.
 
 ### Sprint 007 — Event Engine
 

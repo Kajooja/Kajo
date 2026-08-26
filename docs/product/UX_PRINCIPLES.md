@@ -13,10 +13,10 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 5. **Kajo brings the light.** The product identity is expressed through light and atmosphere rather than many coloured buttons.
 6. **Theme identity persists.** A user's theme is the base visual identity across areas.
 7. **Context transitions are smooth.** Opening the bookshelf should transition the existing scene toward the user's book theme rather than feel like loading an unrelated app page.
-8. **The curtain is a signature control.** It moves horizontally and snaps to three states. The meaning should become learnable without permanent labels.
-9. **DiscoveryMode is visible as time/light.** `FOR_YOU` -> dawn/day, `SURPRISE` -> evening, `RISK` -> night.
+8. **The curtain is a signature control.** It moves horizontally and snaps to three states. Movement between states should feel continuous and seamless. The handle/control should be visually thinner and subordinate to the curtain rather than reading as a second curtain. The meaning should become learnable without permanent labels.
+9. **DiscoveryMode is visible as time/light across the experience.** `FOR_YOU` -> dawn/day, `SURPRISE` -> evening, `RISK` -> night. The selected mode should affect the full scene/content behind the control, not only the curtain itself.
 10. **Visual preference != risk preference.** Loving dark aesthetics must not imply the user wants risky recommendations.
-11. **Grid first, swipe optional.** Grid is the default discovery surface. Swipe is calibration/discovery tooling.
+11. **Grid first, swipe optional.** Grid is the default discovery surface. Opening an Item may transition naturally into a swipe-oriented browsing sequence when swipe mode is available; swipe remains calibration/discovery tooling rather than the only way to browse.
 12. **Shared Kajo feels like a place.** Entering a SharedProfile changes the profile context and shared Room/theme, not merely a filter in a user list.
 13. **Motion communicates state.** Animation should explain transition and atmosphere, not compete for attention.
 14. **Accessibility remains required.** Gesture controls need accessible alternatives; motion must respect reduced-motion settings; meaning must not rely solely on colour.
