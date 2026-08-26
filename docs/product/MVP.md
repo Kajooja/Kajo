@@ -42,8 +42,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [-] `MVP-SWIPE-002` User can express positive/negative interest.
 - [-] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
 - [-] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
-- [-] `MVP-SWIPE-005` Marking the current Item read/watched visibly commits the action with a restrained exit/advance animation and presents the next Item without an index jump.
-- [-] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions for sequential undo.
+- [-] `MVP-SWIPE-005` Every explicit interest, save or consumed choice visibly commits with a restrained exit/advance animation and presents the next Item without an index jump.
+- [-] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both the prior state and exact previous Item/card.
 
 ## Saved, consumed and memory
 

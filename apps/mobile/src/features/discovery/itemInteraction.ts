@@ -113,6 +113,18 @@ export function undoLastItemInteractionAction(store: ItemInteractionStore): Item
   };
 }
 
+export function getLatestUndoItemId(store: ItemInteractionStore): ItemId | null {
+  return store.undoStack[store.undoStack.length - 1]?.itemId ?? null;
+}
+
+export function getNextSwipeIndex(currentIndex: number, itemCount: number): number | null {
+  if (currentIndex < 0 || currentIndex >= itemCount - 1) {
+    return null;
+  }
+
+  return currentIndex + 1;
+}
+
 export function getDiscoverableItems(
   items: readonly Item[],
   interactions: ItemInteractionMap,
