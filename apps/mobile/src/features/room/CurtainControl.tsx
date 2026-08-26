@@ -7,6 +7,8 @@ import {
   Pressable,
   StyleSheet,
   View,
+  type AccessibilityActionEvent,
+  type GestureResponderEvent,
   type LayoutChangeEvent,
 } from 'react-native';
 
@@ -21,6 +23,7 @@ import {
   clampCurtainPosition,
   getCurtainPositionForMode,
   getModeForCurtainPosition,
+  getModeForTrackPosition,
 } from './curtainState';
 
 interface CurtainControlProps {
@@ -35,9 +38,9 @@ const HANDLE_WIDTH = 14;
 const TRACK_PADDING = 4;
 
 const ACCESSIBILITY_LABELS: Readonly<Record<DiscoveryMode, string>> = {
-  FOR_YOU: 'For you discovery mode',
-  SURPRISE: 'Surprise discovery mode',
-  RISK: 'Risk discovery mode',
+  FOR_YOU: 'Sinulle',
+  SURPRISE: 'Yllätys',
+  RISK: 'Riski',
 };
 
 export function CurtainControl({
@@ -117,6 +120,29 @@ export function CurtainControl({
     onModeChange(nextMode);
   }
 
+  function selectMode(nextMode: DiscoveryMode) {
+    if (nextMode === mode) {
+      snapToCurrentMode();
+    }
+
+    onModeChange(nextMode);
+  }
+
+  function handleTrackPress(event: GestureResponderEvent) {
+    selectMode(getModeForTrackPosition(event.nativeEvent.locationX, trackWidth));
+  }
+
+  function handleAccessibilityAction(event: AccessibilityActionEvent) {
+    const currentIndex = CURTAIN_DISCOVERY_MODES.indexOf(mode);
+    const direction = event.nativeEvent.actionName === 'increment' ? 1 : -1;
+    const nextIndex = Math.min(
+      CURTAIN_DISCOVERY_MODES.length - 1,
+      Math.max(0, currentIndex + direction),
+    );
+
+    selectMode(CURTAIN_DISCOVERY_MODES[nextIndex] ?? mode);
+  }
+
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 2,
@@ -164,19 +190,33 @@ export function CurtainControl({
   });
 
   return (
-    <View style={styles.container} accessibilityLabel="Discovery curtain control">
-      <View
+    <View style={styles.container}>
+      <Pressable
         onLayout={handleLayout}
-        style={[styles.track, { backgroundColor: baseTheme.structure }]}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
+        onPress={handleTrackPress}
+        accessibilityRole="adjustable"
+        accessibilityLabel="Löytötilan verho"
+        accessibilityHint="Napauta radan vasenta, keskimmäistä tai oikeaa osaa tai säädä pyyhkäisemällä"
+        accessibilityValue={{ text: ACCESSIBILITY_LABELS[mode] }}
+        accessibilityActions={[
+          { name: 'decrement', label: 'Vähemmän riskiä' },
+          { name: 'increment', label: 'Enemmän riskiä' },
+        ]}
+        onAccessibilityAction={handleAccessibilityAction}
+        style={[
+          styles.track,
+          {
+            backgroundColor: baseTheme.structure,
+            borderColor: baseTheme.structureLight,
+          },
+        ]}
       >
         <Animated.View
           pointerEvents="none"
           style={[styles.curtainFabric, { backgroundColor: curtainColor }]}
         />
 
-        <View style={styles.markers}>
+        <View pointerEvents="none" style={styles.markers}>
           {CURTAIN_DISCOVERY_MODES.map((discoveryMode) => (
             <View
               key={discoveryMode}
@@ -203,35 +243,7 @@ export function CurtainControl({
         >
           <View style={[styles.handleLine, { backgroundColor: baseTheme.textPrimary }]} />
         </Animated.View>
-      </View>
-
-      <View style={styles.accessibleModes}>
-        {CURTAIN_DISCOVERY_MODES.map((discoveryMode) => {
-          const selected = discoveryMode === mode;
-
-          return (
-            <Pressable
-              key={discoveryMode}
-              accessibilityRole="button"
-              accessibilityLabel={ACCESSIBILITY_LABELS[discoveryMode]}
-              accessibilityState={{ selected }}
-              onPress={() => onModeChange(discoveryMode)}
-              hitSlop={8}
-              style={styles.modeButton}
-            >
-              <View
-                style={[
-                  styles.modeDot,
-                  {
-                    backgroundColor: selected ? ambientTheme.curtainHighlight : baseTheme.structureLight,
-                    opacity: selected ? 1 : 0.45,
-                  },
-                ]}
-              />
-            </Pressable>
-          );
-        })}
-      </View>
+      </Pressable>
     </View>
   );
 }
@@ -241,8 +253,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   track: {
-    height: 34,
-    borderRadius: 17,
+    height: 28,
+    borderRadius: 6,
+    borderWidth: 2,
     paddingHorizontal: TRACK_PADDING,
     justifyContent: 'center',
     overflow: 'hidden',
@@ -265,34 +278,15 @@ const styles = StyleSheet.create({
   },
   handle: {
     width: HANDLE_WIDTH,
-    height: 26,
-    borderRadius: 7,
+    height: 22,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   handleLine: {
     width: 2,
-    height: 14,
+    height: 12,
     borderRadius: 1,
     opacity: 0.52,
-  },
-  accessibleModes: {
-    height: 34,
-    marginTop: 3,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  modeButton: {
-    width: 44,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
 });

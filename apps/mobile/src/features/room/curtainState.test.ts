@@ -23,7 +23,17 @@ describe('curtain state', () => {
   it('clamps positions outside the track', () => {
     expect(clampCurtainPosition(-1)).toBe(0);
     expect(clampCurtainPosition(2)).toBe(1);
-    expect(getModeForTrackPosition(75, 100)).toBe('RISK');
     expect(getModeForTrackPosition(0, 0)).toBe('FOR_YOU');
+  });
+
+  it('maps equal left, centre and right tap regions to the three modes', () => {
+    expect(getModeForTrackPosition(-20, 300)).toBe('FOR_YOU');
+    expect(getModeForTrackPosition(0, 300)).toBe('FOR_YOU');
+    expect(getModeForTrackPosition(99, 300)).toBe('FOR_YOU');
+    expect(getModeForTrackPosition(100, 300)).toBe('SURPRISE');
+    expect(getModeForTrackPosition(199, 300)).toBe('SURPRISE');
+    expect(getModeForTrackPosition(200, 300)).toBe('RISK');
+    expect(getModeForTrackPosition(300, 300)).toBe('RISK');
+    expect(getModeForTrackPosition(500, 300)).toBe('RISK');
   });
 });

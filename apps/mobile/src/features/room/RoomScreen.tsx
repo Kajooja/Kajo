@@ -61,32 +61,34 @@ export function RoomScreen() {
           <Text style={styles.title}>Huone</Text>
         </View>
 
-        <View style={styles.curtainArea}>
-          <CurtainControl
-            mode={discoveryMode}
-            onModeChange={setDiscoveryMode}
-            position={curtainPosition}
-            baseTheme={theme.base}
-            ambientTheme={theme.ambient}
-          />
-        </View>
-
         <View
           style={styles.scene}
           accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
         >
           <View style={styles.backWall}>
-            <Animated.View
-              style={[styles.window, { backgroundColor: windowLight }]}
-              accessibilityLabel="Window"
-            >
+            <View style={styles.windowAssembly}>
+              <View style={styles.curtainArea}>
+                <CurtainControl
+                  mode={discoveryMode}
+                  onModeChange={setDiscoveryMode}
+                  position={curtainPosition}
+                  baseTheme={theme.base}
+                  ambientTheme={theme.ambient}
+                />
+              </View>
+
               <Animated.View
-                pointerEvents="none"
-                style={[styles.windowGlow, { backgroundColor: windowLight }]}
-              />
-              <View style={styles.windowBarVertical} />
-              <View style={styles.windowBarHorizontal} />
-            </Animated.View>
+                style={[styles.window, { backgroundColor: windowLight }]}
+                accessibilityLabel="Window"
+              >
+                <Animated.View
+                  pointerEvents="none"
+                  style={[styles.windowGlow, { backgroundColor: windowLight }]}
+                />
+                <View style={styles.windowBarVertical} />
+                <View style={styles.windowBarHorizontal} />
+              </Animated.View>
+            </View>
 
             <Pressable
               accessibilityRole="button"
@@ -173,9 +175,6 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '600',
       marginTop: 4,
     },
-    curtainArea: {
-      paddingBottom: 6,
-    },
     scene: {
       flex: 1,
       minHeight: 390,
@@ -191,13 +190,23 @@ function createStyles(theme: RoomTheme) {
     backWall: {
       flex: 0.62,
       paddingHorizontal: 24,
-      paddingTop: 30,
+      paddingTop: 24,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
     },
+    windowAssembly: {
+      width: '40%',
+      alignItems: 'stretch',
+      zIndex: 1,
+    },
+    curtainArea: {
+      marginHorizontal: -5,
+      marginBottom: -4,
+      zIndex: 2,
+    },
     window: {
-      width: '38%',
+      width: '100%',
       aspectRatio: 0.78,
       borderWidth: 7,
       borderColor: theme.base.structure,
