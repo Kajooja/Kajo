@@ -2,46 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [main, fix/26-expo-worklets-compat]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  refresh-lock:
-    name: Refresh dependency lockfile
-    if: github.event_name == 'push' && github.ref == 'refs/heads/fix/26-expo-worklets-compat'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout dependency branch
-        uses: actions/checkout@v4
-        with:
-          ref: fix/26-expo-worklets-compat
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Regenerate package lock
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-
-      - name: Commit regenerated lock when changed
-        run: |
-          if git diff --quiet -- package-lock.json; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore: regenerate dependency lock"
-          git push origin HEAD:fix/26-expo-worklets-compat
-
   validate:
-    if: github.ref != 'refs/heads/fix/26-expo-worklets-compat'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
