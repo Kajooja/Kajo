@@ -69,4 +69,16 @@ describe('item interaction state', () => {
       'book-c',
     ]);
   });
+
+  it('keeps an already-built swipe sequence independent of later consumed-state changes', () => {
+    const initialInteractions: ItemInteractionMap = {};
+    const swipeSequence = buildSwipeSequence(BOOK_A, ITEMS, initialInteractions);
+    const updatedInteractions = setItemConsumed(initialInteractions, 'book-b', true);
+
+    expect(swipeSequence.map((item) => item.id)).toEqual(['book-a', 'book-b', 'book-c']);
+    expect(getDiscoverableItems(ITEMS, updatedInteractions).map((item) => item.id)).toEqual([
+      'book-a',
+      'book-c',
+    ]);
+  });
 });
