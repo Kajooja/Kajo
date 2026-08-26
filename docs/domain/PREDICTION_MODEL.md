@@ -37,6 +37,30 @@ Recent behavioural state. Signals may cross item domains.
 
 Example: one member recently reads science fiction; another listens to heavy music; their SharedProfile is now choosing a movie. Those signals can contribute to the current shared scenario even though none of them is a recent movie action.
 
+## Behaviour -> state -> refreshed ranking
+
+Kajo's production recommendation loop is intended to remain responsive as evidence changes.
+
+Conceptually:
+
+```text
+User action
+  -> Event / observed outcome
+  -> update relevant ShortTermState and/or LongTermState evidence
+  -> Prediction inputs change
+  -> affected recommendation ranking is refreshed
+```
+
+Examples of useful evidence include explicit positive/negative interest, saved/unsaved, consumed/read/watched outcomes, ratings and later richer memory/context signals.
+
+Important rules:
+
+- UI button wording is not learning semantics. A visible label may change while the underlying canonical event/state meaning remains stable.
+- Recent actions may affect ShortTermState quickly; repeated/historical evidence can gradually affect LongTermState.
+- Re-ranking should occur when materially relevant inputs change rather than requiring a fixed stale recommendation list.
+- "Continuous" means recommendations can be refreshed from the latest available state and context; it does not require an expensive model-training job after every tap.
+- Until Sprint 007 event persistence and Sprint 008 Prediction V0 exist, local mobile mock ordering must not be described as this real learning loop.
+
 ## ScenarioMemory
 
 Future ScenarioMemory should encode a current scenario and retrieve similar historical scenarios from:
@@ -70,7 +94,7 @@ Similar scenarios can be more informative than simply finding globally similar u
 
 ## DiscoveryMode
 
-`DiscoveryMode` changes recommendation policy:
+`DiscoveryMode` changes recommendation policy and is a live Prediction input, not merely a colour/theme preference.
 
 ### FOR_YOU
 
@@ -90,7 +114,9 @@ Similar scenarios can be more informative than simply finding globally similar u
 - strongly increase exploration,
 - surface items that may be exceptional fits or clear misses.
 
-The mode is algorithmic. Its visual representation is handled separately by `AmbientPhase`.
+When the user changes DiscoveryMode, affected recommendation rankings should be refreshed using the new exploration/risk policy once Prediction V0 exists.
+
+The mode is algorithmic. Its visual representation is handled separately by `AmbientPhase`. The same global curtain control may select DiscoveryMode and visually interpolate AmbientPhase, but the two concepts remain separate in the model.
 
 ## Prediction V0
 
@@ -103,6 +129,8 @@ MVP Prediction V0 should be intentionally simple and measurable. Initial signals
 - recency-weighted ShortTermState,
 - novelty preference,
 - DiscoveryMode exploration parameters.
+
+Prediction V0 should support re-ranking after relevant behavioural evidence or DiscoveryMode changes so the user experience becomes progressively more personal during use.
 
 Population scenario retrieval and evolutionary optimization come later after enough outcome data exists.
 
