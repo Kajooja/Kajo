@@ -111,7 +111,7 @@ function createStyles(theme: RoomTheme) {
       backgroundColor: theme.base.appBackground,
     },
     ambientBackdrop: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     content: {
       paddingHorizontal: 20,
@@ -140,7 +140,7 @@ function createStyles(theme: RoomTheme) {
       marginBottom: 22,
     },
     heroLight: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       opacity: 0.36,
     },
     typeLabel: {
