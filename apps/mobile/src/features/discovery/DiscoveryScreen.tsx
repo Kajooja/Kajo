@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { DiscoveryMode, Item, ItemType } from '../../domain/contracts';
+import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from './DiscoveryModeContext';
@@ -22,16 +22,8 @@ interface DiscoveryScreenProps {
   title: string;
 }
 
-const MODE_LABELS: Readonly<Record<DiscoveryMode, string>> = {
-  FOR_YOU: 'Sinulle',
-  SURPRISE: 'Yllätys',
-  RISK: 'Riski',
-};
-
-const DISCOVERY_MODES: readonly DiscoveryMode[] = ['FOR_YOU', 'SURPRISE', 'RISK'];
-
 export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
-  const { mode, setMode } = useDiscoveryMode();
+  const { mode } = useDiscoveryMode();
   const { interactions } = useItemInteractions();
   const [showConsumed, setShowConsumed] = useState(false);
   const theme = getRoomTheme(getAmbientPhase(mode));
@@ -69,31 +61,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         </View>
 
         <Text style={styles.title}>{title}</Text>
-
-        <View style={styles.modeRow} accessibilityLabel="Discovery mode">
-          {DISCOVERY_MODES.map((discoveryMode) => {
-            const selected = discoveryMode === mode;
-
-            return (
-              <Pressable
-                key={discoveryMode}
-                accessibilityRole="button"
-                accessibilityLabel={`${MODE_LABELS[discoveryMode]} discovery mode`}
-                accessibilityState={{ selected }}
-                onPress={() => setMode(discoveryMode)}
-                style={({ pressed }) => [
-                  styles.modeButton,
-                  selected && styles.modeButtonSelected,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={[styles.modeText, selected && styles.modeTextSelected]}>
-                  {MODE_LABELS[discoveryMode]}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
 
         <View style={styles.collectionRow} accessibilityLabel="Discovery collection">
           <Pressable
@@ -264,33 +231,6 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '600',
       marginTop: 8,
       marginBottom: 14,
-    },
-    modeRow: {
-      flexDirection: 'row',
-      gap: 8,
-      marginBottom: 10,
-    },
-    modeButton: {
-      minHeight: 40,
-      flex: 1,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: theme.base.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.base.floor,
-    },
-    modeButtonSelected: {
-      borderColor: theme.ambient.curtainHighlight,
-      backgroundColor: theme.ambient.curtain,
-    },
-    modeText: {
-      color: theme.base.textMuted,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-    modeTextSelected: {
-      color: theme.base.textPrimary,
     },
     collectionRow: {
       flexDirection: 'row',

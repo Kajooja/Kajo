@@ -22,5 +22,11 @@ export function getModeForTrackPosition(positionPx: number, trackWidthPx: number
     return 'FOR_YOU';
   }
 
-  return getModeForCurtainPosition(positionPx / trackWidthPx);
+  const normalizedPosition = clampCurtainPosition(positionPx / trackWidthPx);
+  const regionIndex = Math.min(
+    CURTAIN_DISCOVERY_MODES.length - 1,
+    Math.floor(normalizedPosition * CURTAIN_DISCOVERY_MODES.length),
+  );
+
+  return CURTAIN_DISCOVERY_MODES[regionIndex] ?? 'FOR_YOU';
 }
