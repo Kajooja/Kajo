@@ -17,6 +17,7 @@ package.json
 package-lock.json
 docs/
 apps/mobile/
+supabase/migrations/
 .github/workflows/ci.yml
 ```
 
@@ -35,7 +36,7 @@ apps/mobile/
 | Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
 | Mobile data boundary | `apps/mobile/src/data/` | Sprint 006 target; create only with the first real data-boundary implementation |
 | Prediction service | `services/prediction/` | Later sprint |
-| DB migrations | `supabase/migrations/` | Sprint 006 target; not created yet |
+| DB migrations | `supabase/migrations/` | Sprint 006 User/Profile/ProfileMember/Item/current-interaction schema with explicit grants, membership-based RLS policies, policy indexes and maintained timestamps |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; `main` also builds/verifies/uploads a standalone Android release APK |
 

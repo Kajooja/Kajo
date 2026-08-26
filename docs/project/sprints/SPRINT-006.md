@@ -42,11 +42,12 @@ Sprint 006 also provides persistence and authorization foundations for later pro
 
 Implement in this order, one scoped Issue/branch/PR at a time:
 
-1. Supabase configuration contract, mobile client/data boundary and first real committed migration.
-2. Authentication session plus register/sign-in UI with no provider sprawl.
-3. Nickname/username onboarding and automatic PersonalProfile membership.
-4. Persist/hydrate the existing generic Item interaction state through the boundary.
-5. Reconcile the sprint against its Definition of Done and run one meaningful user-facing acceptance checkpoint.
+1. Initial User/Profile/ProfileMember/Item/current-interaction migration and authorization foundation — Issue #57.
+2. Package-manager-installed Supabase/Expo dependencies, public configuration contract and one root mobile client/data boundary.
+3. Authentication session plus register/sign-in UI with no provider sprawl.
+4. Nickname/username onboarding and automatic PersonalProfile membership.
+5. Persist/hydrate the existing generic Item interaction state through the boundary.
+6. Reconcile the sprint against its Definition of Done and run one meaningful user-facing acceptance checkpoint.
 
 Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend code.
 
@@ -76,7 +77,15 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 ## Delivered
 
-None yet. Issue #55 records the Sprint 005 close and Sprint 006 opening only.
+### Initial schema and authorization foundation — Issue #57
+
+- one committed PostgreSQL migration for canonical User, Profile, ProfileMember, generic BOOK/MOVIE Item and current Item interaction state,
+- separate `actor_user_id` and `profile_id` in persisted interaction state,
+- integrity constraints, relationship/policy indexes and database-maintained update timestamps,
+- RLS on every exposed table,
+- default client grants revoked and only increment-required authenticated operations granted back,
+- explicit own-User, Profile-membership, authenticated-Item and membership-scoped interaction policies,
+- no Event/prediction schema, mobile client scaffold, secret or empty backend folder.
 
 ## Decisions
 
@@ -110,4 +119,4 @@ None yet. Issue #55 records the Sprint 005 close and Sprint 006 opening only.
 
 ## Final handoff
 
-Open the first scoped Sprint 006 implementation Issue for the Supabase configuration contract, client/data boundary and initial migration. Do not begin authentication UI or interaction persistence in the same PR.
+After Issue #57 passes canonical CI and merges, open the next scoped Issue for package-manager-installed Supabase/Expo dependencies, the public configuration contract and one root mobile client/data boundary. Do not begin authentication UI or interaction-state integration in that PR.
