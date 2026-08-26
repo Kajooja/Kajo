@@ -68,6 +68,7 @@ After real prediction/outcome data exists:
 - predictor evaluation framework,
 - evolutionary predictor/genome engine,
 - additional domains such as music, events and travel,
-- richer personal/shared memories including images and context.
+- richer personal/shared memories including images and context,
+- named/dynamic user collections and lists beyond the MVP's single generic `SAVED` state; list names and visible action labels must remain presentation/configuration rather than redefining canonical Item/Event semantics.
 
 Roadmap changes must be deliberate. Do not rewrite completed sprint history when sequencing changes.
