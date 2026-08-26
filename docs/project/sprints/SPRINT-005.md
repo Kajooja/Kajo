@@ -120,6 +120,64 @@ Preserve completed discovery requirements from Sprint 004.
 - `/apps/mobile/src/features/discovery/`
 - `/apps/mobile/app/discovery/`
 
+## Mid-sprint checkpoint — 2026-08-26
+
+### Curtain acceptance polish
+
+Issue #30 / PR #31 delivered the Sprint 004 phone-test carry-over:
+
+- materially thinner curtain handle,
+- continuous drag/snap behavior,
+- drag continuation from the live animated position,
+- full-scene DiscoveryMode atmosphere in Room,
+- DiscoveryMode atmosphere extended through discovery and Item detail,
+- accessible mode controls and reduced-motion behavior preserved.
+
+PR #31 passed lint, typecheck, automated tests and iOS/Android bundle smoke, and the post-merge `main` standalone Android release build also passed.
+
+### Swipe & History implementation
+
+Issue #32 / PR #33 delivered the first generic local interaction flow and was squash-merged to `main` as commit `2b8b10f4cac92113a0d219962162087c8a0544d3`.
+
+Delivered implementation:
+
+- grid remains the primary discovery surface,
+- opening a grid Item starts a horizontally swipeable sequence with the selected Item first,
+- one generic in-memory `Item` interaction state supports BOOK and MOVIE,
+- positive/negative interest,
+- save/unsave,
+- generic consumed state with BOOK=`Luettu` and MOVIE=`Katsottu`,
+- consumed Items suppressed from ordinary discovery,
+- `Luetut` / `Katsotut` history integrated into the existing discovery screen,
+- no separate book/movie interaction models,
+- no separate swipe/history route or speculative feature folder,
+- deterministic state/suppression/swipe-sequence tests.
+
+Validation evidence:
+
+- PR #33 canonical automated gate passed: lint, typecheck, tests, iOS bundle smoke and Android bundle smoke.
+- `main` CI run #62 validates the merged implementation and produces the standalone Android release APK.
+- Issue #35 removes remaining developer/internal wording from the user-facing acceptance build and records the canonical handoff.
+
+### Outstanding acceptance
+
+Real-device validation for the new Sprint 005 flow has **not yet been recorded**.
+
+Issue #34 tracks the exact phone acceptance flow covering:
+
+- curtain behavior,
+- Room -> book/movie discovery,
+- grid -> selected Item -> horizontal swipe,
+- vertical scrolling inside Item content,
+- like/dislike,
+- save/unsave,
+- read/watched,
+- consumed suppression,
+- `Luetut` / `Katsotut` history,
+- clean back navigation and crash/layout checks.
+
+Do not mark `MVP-SWIPE-001..004` or `MVP-MEM-001..002` complete and do not close Sprint 005 until Issue #34 succeeds.
+
 ## Handoff
 
-Start Sprint 005 with the small curtain acceptance polish, then move into the generic swipe/history state boundary. Do not introduce backend persistence or authentication in this sprint; those are explicit Sprint 006 targets.
+Continue Sprint 005 from Issue #34 after Issue #35 acceptance-readiness cleanup is merged. Application implementation is merged and automated validation is green. The next blocking action is real-device testing using the latest standalone Android APK from `main`, followed by scoped fixes if required and then the mandatory Sprint 005 close protocol.

@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are merged and validated. Sprint 005 — Swipe & History is the active sprint.
+Sprint 001 Foundation, Sprint 002 Room, Sprint 003 Curtain & Theme and Sprint 004 Discovery UI are merged and validated. Sprint 005 — Swipe & History is active with application implementation merged and real-device acceptance pending.
 
 Important current paths:
 
@@ -24,15 +24,15 @@ apps/mobile/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation merged and validated on a real Android phone |
-| Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail route live under `app/discovery/` |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application foundation; Sprint 004 baseline validated on a real Android phone |
+| Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping |
-| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus three-state curtain; bookshelf/projector navigate to discovery; curtain acceptance polish is next work |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus continuous three-state curtain with thinner handle and full-scene DiscoveryMode atmosphere; bookshelf/projector navigate to discovery |
 | Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state, generic mock Items/ranking, reusable grid and generic Item detail presentation |
-| Swipe | `apps/mobile/src/features/swipe/` | Sprint 005 target; do not create until the first real swipe implementation requires it |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state, generic mock Items/ranking, grid, Item detail/horizontal swipe, generic local Item interaction state, interest/saved/consumed actions, consumed suppression/history and tests |
+| Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
-| Memory/history | `apps/mobile/src/features/memories/` | Sprint 005 may establish consumed-history presentation/state; create only when implementation begins |
+| Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
 | Mobile data boundary | `apps/mobile/src/data/` | Create when real data access requires it |
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Sprint 006 target; not created yet |

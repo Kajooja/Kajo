@@ -141,7 +141,9 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 ? itemType === 'BOOK'
                   ? 'Ei vielä luettuja kirjoja.'
                   : 'Ei vielä katsottuja elokuvia.'
-                : 'Kaikki tämän mock-listan kohteet on jo merkitty kulutetuiksi.'}
+                : itemType === 'BOOK'
+                  ? 'Kaikki kirjat on jo merkitty luetuiksi.'
+                  : 'Kaikki elokuvat on jo merkitty katsotuiksi.'}
             </Text>
           }
           renderItem={({ item, index }) => (
