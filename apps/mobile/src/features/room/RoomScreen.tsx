@@ -150,7 +150,7 @@ function createStyles(theme: RoomTheme) {
       backgroundColor: theme.base.appBackground,
     },
     appAmbient: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     room: {
       flex: 1,
@@ -186,7 +186,7 @@ function createStyles(theme: RoomTheme) {
       borderColor: theme.base.border,
     },
     sceneAmbient: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     backWall: {
       flex: 0.62,
@@ -204,7 +204,7 @@ function createStyles(theme: RoomTheme) {
       overflow: 'hidden',
     },
     windowGlow: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       opacity: 0.82,
     },
     windowBarVertical: {
