@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -36,9 +37,9 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
   const rankedItems = selectedItem ? getRankedMockItems(selectedItem.itemType, mode) : [];
-  const items = selectedItem
-    ? buildSwipeSequence(selectedItem, rankedItems, interactions)
-    : [];
+  const [items] = useState<readonly Item[]>(() =>
+    selectedItem ? buildSwipeSequence(selectedItem, rankedItems, interactions) : [],
+  );
 
   if (!selectedItem) {
     return (
