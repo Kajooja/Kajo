@@ -15,6 +15,7 @@ import {
   getItemInteraction,
   type ItemInteraction,
 } from './itemInteraction';
+import { getConsumedItemLabels } from './itemInteractionLabels';
 import { getRankedMockItems } from './mockDiscovery';
 
 interface DiscoveryScreenProps {
@@ -33,7 +34,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const items = showConsumed
     ? consumedItems
     : getDiscoverableItems(rankedItems, interactions);
-  const consumedLabel = itemType === 'BOOK' ? 'Luetut' : 'Katsotut';
+  const consumedLabel = getConsumedItemLabels(itemType).history;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -139,7 +140,7 @@ interface ItemCardProps {
 function ItemCard({ item, index, interaction, theme, styles }: ItemCardProps) {
   const tag = item.tags?.[0] ?? item.itemType.toLowerCase();
   const coverOpacity = 0.42 + (index % 3) * 0.12;
-  const consumedLabel = item.itemType === 'BOOK' ? 'LUETTU' : 'KATSOTTU';
+  const consumedLabel = getConsumedItemLabels(item.itemType).status;
 
   return (
     <Pressable
