@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
@@ -10,11 +10,13 @@ import {
   ROOM_AMBIENT_BY_PHASE,
   type RoomTheme,
 } from '../../theme/roomTheme';
+import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { CurtainControl } from './CurtainControl';
 import { getCurtainPositionForMode } from './curtainState';
 
 export function RoomScreen() {
+  const auth = useAuthSession();
   const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
@@ -22,6 +24,7 @@ export function RoomScreen() {
   const [curtainPosition] = useState(
     () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
   );
+  const [signingOut, setSigningOut] = useState(false);
   const ambientColor = curtainPosition.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [
@@ -47,6 +50,20 @@ export function RoomScreen() {
     ],
   });
 
+  async function handleSignOut() {
+    if (signingOut) {
+      return;
+    }
+
+    setSigningOut(true);
+    const result = await auth.signOut();
+
+    if (result.status === 'error') {
+      setSigningOut(false);
+      Alert.alert('Uloskirjautuminen epäonnistui', result.message);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar style="light" />
@@ -57,8 +74,26 @@ export function RoomScreen() {
 
       <View style={styles.room}>
         <View style={styles.header}>
-          <Text style={styles.kicker}>OMA KAJO</Text>
-          <Text style={styles.title}>Huone</Text>
+          <View>
+            <Text style={styles.kicker}>OMA KAJO</Text>
+            <Text style={styles.title}>Huone</Text>
+          </View>
+          {auth.status === 'signed-in' ? (
+            <Pressable
+              accessibilityRole="button"
+              disabled={signingOut}
+              onPress={() => void handleSignOut()}
+              style={({ pressed }) => [
+                styles.signOutButton,
+                pressed && styles.pressed,
+                signingOut && styles.disabled,
+              ]}
+            >
+              <Text style={styles.signOutText}>
+                {signingOut ? 'Kirjaudutaan…' : 'Kirjaudu ulos'}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <View
@@ -162,6 +197,9 @@ function createStyles(theme: RoomTheme) {
     header: {
       paddingTop: 18,
       paddingBottom: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
     kicker: {
       color: theme.base.textMuted,
@@ -174,6 +212,19 @@ function createStyles(theme: RoomTheme) {
       fontSize: 34,
       fontWeight: '600',
       marginTop: 4,
+    },
+    signOutButton: {
+      minHeight: 42,
+      borderColor: theme.base.border,
+      borderRadius: 12,
+      borderWidth: 1,
+      justifyContent: 'center',
+      paddingHorizontal: 14,
+    },
+    signOutText: {
+      color: theme.base.textMuted,
+      fontSize: 12,
+      fontWeight: '600',
     },
     scene: {
       flex: 1,
@@ -365,6 +416,9 @@ function createStyles(theme: RoomTheme) {
     pressed: {
       opacity: 0.7,
       transform: [{ scale: 0.98 }],
+    },
+    disabled: {
+      opacity: 0.5,
     },
   });
 }
