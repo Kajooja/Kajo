@@ -15,15 +15,52 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
+import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
 
 import { useAuthSession } from './AuthSessionProvider';
 import type { AuthEntryMode } from './authOperations';
 
 export function AuthGate({ children }: PropsWithChildren) {
   const auth = useAuthSession();
+  const personalProfile = usePersonalProfile();
 
-  if (auth.status === 'disabled' || auth.status === 'signed-in') {
+  if (auth.status === 'disabled') {
     return children;
+  }
+
+  if (auth.status === 'signed-in') {
+    if (
+      personalProfile.status === 'ready' ||
+      personalProfile.status === 'disabled'
+    ) {
+      return children;
+    }
+
+    if (
+      personalProfile.status === 'loading' ||
+      personalProfile.status === 'inactive'
+    ) {
+      return (
+        <AuthStatusScreen
+          title="Kajo"
+          message="Avataan omaa profiiliasi…"
+          loading
+        />
+      );
+    }
+
+    if (personalProfile.status === 'error') {
+      return (
+        <AuthStatusScreen
+          title="Profiilia ei voitu ladata"
+          message={personalProfile.message}
+          actionLabel="Yritä uudelleen"
+          onAction={() => void personalProfile.retry()}
+        />
+      );
+    }
+
+    return <NicknameEntryScreen />;
   }
 
   if (auth.status === 'configuration-error') {
@@ -57,6 +94,132 @@ export function AuthGate({ children }: PropsWithChildren) {
   }
 
   return <AuthEntryScreen />;
+}
+
+function NicknameEntryScreen() {
+  const auth = useAuthSession();
+  const personalProfile = usePersonalProfile();
+  const [nickname, setNickname] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  async function submit() {
+    if (submitting || signingOut) {
+      return;
+    }
+
+    Keyboard.dismiss();
+    setSubmitting(true);
+    setFeedback(null);
+
+    const result = await personalProfile.complete(nickname);
+
+    if (result.status === 'ready') {
+      return;
+    }
+
+    setFeedback(
+      result.status === 'error'
+        ? result.message
+        : 'Oman Kajo-profiilin luominen epäonnistui. Yritä uudelleen.',
+    );
+    setSubmitting(false);
+  }
+
+  async function signOut() {
+    if (submitting || signingOut) {
+      return;
+    }
+
+    setSigningOut(true);
+    setFeedback(null);
+    const result = await auth.signOut();
+
+    if (result.status === 'error') {
+      setFeedback(result.message);
+      setSigningOut(false);
+    }
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <StatusBar style="light" />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.entryContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.intro}>
+            <Text style={styles.kicker}>OMA KAJO</Text>
+            <Text style={styles.title}>Millä nimellä sinut tunnetaan?</Text>
+            <Text style={styles.message}>
+              Nimimerkki näkyy omassa huoneessasi. Sen ei tarvitse olla
+              yksilöllinen käyttäjätunnus.
+            </Text>
+          </View>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>Nimimerkki</Text>
+            <TextInput
+              accessibilityLabel="Nimimerkki"
+              autoCapitalize="words"
+              autoCorrect={false}
+              maxLength={32}
+              onChangeText={setNickname}
+              onSubmitEditing={() => void submit()}
+              placeholder="Esimerkiksi Kajo Kettu"
+              placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+              returnKeyType="done"
+              style={styles.input}
+              value={nickname}
+            />
+
+            {feedback ? (
+              <Text accessibilityLiveRegion="polite" style={styles.feedback}>
+                {feedback}
+              </Text>
+            ) : null}
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={submitting || signingOut}
+              onPress={() => void submit()}
+              style={({ pressed }) => [
+                styles.primaryButton,
+                pressed && styles.pressed,
+                submitting && styles.disabled,
+              ]}
+            >
+              {submitting ? (
+                <ActivityIndicator color={PERSONAL_ROOM_BASE_THEME.appBackground} />
+              ) : (
+                <Text style={styles.primaryButtonText}>Jatka omaan Kajoosi</Text>
+              )}
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={submitting || signingOut}
+              onPress={() => void signOut()}
+              style={({ pressed }) => [
+                styles.switchButton,
+                pressed && styles.pressed,
+                signingOut && styles.disabled,
+              ]}
+            >
+              <Text style={styles.switchButtonText}>
+                {signingOut ? 'Kirjaudutaan ulos…' : 'Kirjaudu ulos'}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 function AuthEntryScreen() {

@@ -12,11 +12,13 @@ import {
 } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
+import { usePersonalProfile } from '../profiles/PersonalProfileProvider';
 import { CurtainControl } from './CurtainControl';
 import { getCurtainPositionForMode } from './curtainState';
 
 export function RoomScreen() {
   const auth = useAuthSession();
+  const personalProfile = usePersonalProfile();
   const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
@@ -74,8 +76,12 @@ export function RoomScreen() {
 
       <View style={styles.room}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.kicker}>OMA KAJO</Text>
+          <View style={styles.identity}>
+            <Text numberOfLines={1} style={styles.kicker}>
+              {personalProfile.status === 'ready'
+                ? `OMA KAJO · ${personalProfile.identity.user.nickname}`
+                : 'OMA KAJO'}
+            </Text>
             <Text style={styles.title}>Huone</Text>
           </View>
           {auth.status === 'signed-in' ? (
@@ -200,6 +206,10 @@ function createStyles(theme: RoomTheme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+    },
+    identity: {
+      flex: 1,
+      paddingRight: 12,
     },
     kicker: {
       color: theme.base.textMuted,

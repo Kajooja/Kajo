@@ -10,11 +10,15 @@ import {
 function createAuthApi(): EmailPasswordAuthApi {
   return {
     signInWithPassword: vi.fn(async () => ({
-      data: { session: { user: { email: 'reader@example.com' } } },
+      data: {
+        session: { user: { id: 'user-1', email: 'reader@example.com' } },
+      },
       error: null,
     })),
     signUp: vi.fn(async () => ({
-      data: { session: { user: { email: 'reader@example.com' } } },
+      data: {
+        session: { user: { id: 'user-1', email: 'reader@example.com' } },
+      },
       error: null,
     })),
     signOut: vi.fn(async () => ({ error: null })),
@@ -50,6 +54,7 @@ describe('submitEmailPassword', () => {
       submitEmailPassword(auth, 'sign-in', ' Reader@Example.com ', 'secret'),
     ).resolves.toEqual({
       status: 'authenticated',
+      userId: 'user-1',
       email: 'reader@example.com',
     });
     expect(auth.signInWithPassword).toHaveBeenCalledWith({

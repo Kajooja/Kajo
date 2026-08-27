@@ -27,7 +27,9 @@ Profile
 
 ## User
 
-A `User` is an account/human identity. A User performs actions.
+A `User` is an account/human identity. A User performs actions. MVP identity
+includes a user-visible nickname, which is a display name rather than a
+globally unique public handle.
 
 User is intentionally distinct from Profile because the same User can act in a PersonalProfile and several SharedProfiles.
 
@@ -40,6 +42,10 @@ Invariant: every Prediction belongs to exactly one Profile.
 ### PersonalProfile
 
 Represents one user's personal Kajo context.
+
+Invariant: one User owns at most one PersonalProfile. Configured onboarding
+must complete the User, PersonalProfile and ProfileMember identity before the
+User enters the personal Room.
 
 ### SharedProfile
 

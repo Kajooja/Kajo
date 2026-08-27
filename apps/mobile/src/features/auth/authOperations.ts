@@ -11,9 +11,10 @@ interface AuthErrorLike {
 }
 
 interface AuthSessionLike {
-  user?: {
+  user: {
+    id: string;
     email?: string | null;
-  } | null;
+  };
 }
 
 interface AuthOperationResponse {
@@ -36,7 +37,7 @@ export type CredentialValidationResult =
   | { status: 'invalid'; message: string };
 
 export type AuthSubmissionResult =
-  | { status: 'authenticated'; email: string }
+  | { status: 'authenticated'; userId: string; email: string }
   | { status: 'confirmation-required'; email: string }
   | { status: 'error'; message: string };
 
@@ -112,8 +113,9 @@ export async function submitEmailPassword(
 
     return {
       status: 'authenticated',
+      userId: response.data.session.user.id,
       email:
-        response.data.session.user?.email ?? validation.credentials.email,
+        response.data.session.user.email ?? validation.credentials.email,
     };
   } catch {
     return { status: 'error', message: GENERIC_AUTH_ERROR };

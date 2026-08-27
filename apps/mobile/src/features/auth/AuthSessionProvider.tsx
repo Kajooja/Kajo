@@ -24,7 +24,7 @@ export type AuthSessionSnapshot =
   | { status: 'loading' }
   | { status: 'session-error' }
   | { status: 'signed-out' }
-  | { status: 'signed-in' };
+  | { status: 'signed-in'; userId: string };
 
 interface AuthSessionActions {
   signIn: (email: string, password: string) => Promise<AuthSubmissionResult>;
@@ -108,7 +108,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       );
 
       if (result.status === 'authenticated') {
-        setSnapshot({ status: 'signed-in' });
+        setSnapshot({ status: 'signed-in', userId: result.userId });
       }
 
       return result;
@@ -130,7 +130,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       );
 
       if (result.status === 'authenticated') {
-        setSnapshot({ status: 'signed-in' });
+        setSnapshot({ status: 'signed-in', userId: result.userId });
       }
 
       return result;
@@ -196,7 +196,7 @@ function getSnapshotForSession(session: Session | null): AuthSessionSnapshot {
     return { status: 'signed-out' };
   }
 
-  return { status: 'signed-in' };
+  return { status: 'signed-in', userId: session.user.id };
 }
 
 function unavailableAuthResult(): AuthSubmissionResult {

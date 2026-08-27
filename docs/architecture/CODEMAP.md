@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprints 001–005 are merged, CI-validated and complete. The final Sprint 005 standalone APK was accepted on a real phone. Sprint 006 — Backend Foundation is active with the initial schema/RLS migration, one root-scoped mobile Supabase boundary and the first email/password authentication path.
+Sprints 001–005 are merged, CI-validated and complete. The final Sprint 005 standalone APK was accepted on a real phone. Sprint 006 — Backend Foundation is active with the schema/RLS foundation, one root-scoped mobile Supabase boundary, email/password authentication and PersonalProfile identity onboarding.
 
 Important current paths:
 
@@ -32,12 +32,12 @@ supabase/migrations/
 | Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
 | Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state without downstream selectors; generic mock Items/ranking, grid and horizontal Item swipe; one local interaction state with all explicit choices auto-advancing, exact-card 10-action undo, centralized labels, suppression/history and tests |
 | Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
-| Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
+| Personal identity | `apps/mobile/src/features/profiles/` | User-bound profile hydration, nickname onboarding and canonical User/PersonalProfile mapping behind one root provider; SharedProfile product flow remains later scope |
 | Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
 | Mobile data boundary | `apps/mobile/src/data/` | Public Expo configuration validation, testable configured/unconfigured connection factory, one persistent-session Supabase client and root provider; no direct Supabase calls in screens |
 | Authentication | `apps/mobile/src/features/auth/` | Root-scoped persisted session state, email/password registration/sign-in gate and tested auth operations; unconfigured builds preserve the accepted mock flow and authenticated users can sign out from the Room |
 | Prediction service | `services/prediction/` | Later sprint |
-| DB migrations | `supabase/migrations/` | Sprint 006 User/Profile/ProfileMember/Item/current-interaction schema with explicit grants, membership-based RLS policies, policy indexes and maintained timestamps |
+| DB migrations | `supabase/migrations/` | Sprint 006 foundation plus unique PersonalProfile ownership and authenticated atomic identity RPCs; explicit grants and membership-based RLS remain the authorization base |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; `main` also builds/verifies/uploads a standalone Android release APK |
 
