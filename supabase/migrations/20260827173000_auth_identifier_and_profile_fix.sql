@@ -112,3 +112,49 @@ revoke all on function public.complete_personal_profile(text)
   from public, anon, authenticated;
 grant execute on function public.complete_personal_profile(text)
   to authenticated;
+
+create function private.provision_personal_profile_from_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  requested_nickname text := regexp_replace(
+    btrim(new.raw_user_meta_data ->> 'kajo_nickname'),
+    '[[:space:]]+',
+    ' ',
+    'g'
+  );
+  personal_profile_id uuid;
+begin
+  if requested_nickname is null or requested_nickname = '' then
+    return new;
+  end if;
+
+  if char_length(requested_nickname) not between 2 and 32 then
+    raise exception 'Nickname must contain 2 to 32 characters'
+      using errcode = '22023';
+  end if;
+
+  insert into public.users (id, nickname)
+  values (new.id, requested_nickname);
+
+  insert into public.profiles (profile_type, name, owner_user_id)
+  values ('PERSONAL', requested_nickname, new.id)
+  returning id into personal_profile_id;
+
+  insert into public.profile_members (profile_id, user_id)
+  values (personal_profile_id, new.id);
+
+  return new;
+end;
+$$;
+
+revoke all on function private.provision_personal_profile_from_auth_user()
+  from public, anon, authenticated;
+
+drop trigger if exists provision_kajo_personal_profile on auth.users;
+create trigger provision_kajo_personal_profile
+after insert on auth.users
+for each row execute function private.provision_personal_profile_from_auth_user();
