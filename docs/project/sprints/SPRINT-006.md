@@ -98,6 +98,16 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - deterministic tests for missing, partial, invalid and valid configuration plus single client creation,
 - no auth UI, profile onboarding or Item-interaction persistence in this increment.
 
+### Email/password authentication entry — Issue #61
+
+- one root-scoped authentication provider restores the persisted Supabase session and tracks subsequent auth changes,
+- one calm email/password screen supports registration and sign-in without OAuth, magic-link or reset-password sprawl,
+- registration handles both an immediate session and the hosted email-confirmation response,
+- authenticated users can sign out from the Room through the provider boundary,
+- invalid configuration has a deterministic non-secret error state while unconfigured builds preserve the accepted mock flow,
+- auth input normalization, validation, provider-operation selection, confirmation handling, error mapping and sign-out have deterministic credential-free tests,
+- no nickname/PersonalProfile onboarding, interaction persistence, Event or Prediction work is included.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
@@ -105,6 +115,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - Reserve durable generic Event capture for Sprint 007 instead of treating persisted current state as an event engine.
 - Treat absent mobile configuration as an intentional unconfigured state so the accepted mock flow remains runnable until a real project is connected.
 - Keep the Supabase client module-scoped and expose it through one root provider rather than constructing clients or calling Supabase in screens.
+- Use email/password as the one Sprint 006 MVP authentication method; defer additional providers and account-recovery flows until a demonstrated product need.
 
 ## Deferred / not done
 
@@ -114,7 +125,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 ## Known issues
 
 - End-to-end backend validation needs a configured Supabase project and public mobile client values.
-- Authentication method mix and nickname/username uniqueness policy require the smallest implementation decision that satisfies the MVP requirements.
+- Nickname/username uniqueness policy still requires the smallest implementation decision that satisfies the MVP requirements.
 
 ## Important files
 
@@ -128,10 +139,11 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/docs/project/STATUS.md`
 - `/apps/mobile/.env.example`
 - `/apps/mobile/src/data/`
+- `/apps/mobile/src/features/auth/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/.github/workflows/ci.yml`
 
 ## Final handoff
 
-After Issue #59 passes canonical CI and merges, open one scoped Issue for the authentication session and one lightweight/common register/sign-in path. Do not begin nickname/PersonalProfile onboarding or interaction-state integration in that PR.
+After Issue #61 passes canonical CI and merges, open one scoped Issue for nickname/username onboarding and automatic PersonalProfile membership. Do not begin interaction-state integration in that PR.

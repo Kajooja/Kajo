@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprints 001–005 are merged, CI-validated and complete. The final Sprint 005 standalone APK was accepted on a real phone. Sprint 006 — Backend Foundation is active with the initial schema/RLS migration and one root-scoped mobile Supabase boundary.
+Sprints 001–005 are merged, CI-validated and complete. The final Sprint 005 standalone APK was accepted on a real phone. Sprint 006 — Backend Foundation is active with the initial schema/RLS migration, one root-scoped mobile Supabase boundary and the first email/password authentication path.
 
 Important current paths:
 
@@ -35,6 +35,7 @@ supabase/migrations/
 | Profiles/Shared Kajo | `apps/mobile/src/features/profiles/` | Later sprint; not created yet |
 | Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
 | Mobile data boundary | `apps/mobile/src/data/` | Public Expo configuration validation, testable configured/unconfigured connection factory, one persistent-session Supabase client and root provider; no direct Supabase calls in screens |
+| Authentication | `apps/mobile/src/features/auth/` | Root-scoped persisted session state, email/password registration/sign-in gate and tested auth operations; unconfigured builds preserve the accepted mock flow and authenticated users can sign out from the Room |
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Sprint 006 User/Profile/ProfileMember/Item/current-interaction schema with explicit grants, membership-based RLS policies, policy indexes and maintained timestamps |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |

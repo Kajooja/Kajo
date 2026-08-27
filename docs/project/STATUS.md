@@ -34,7 +34,7 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 is the current step: package-manager-installed Supabase/Expo dependencies, a public-only configuration contract and one root-scoped client/data boundary that leaves the existing app runnable when unconfigured.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 is the current step: a persisted authentication session plus one email/password registration, sign-in and sign-out path that still leaves the existing app runnable when Supabase is unconfigured.
 
 ## MVP progress
 
@@ -67,16 +67,16 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Complete Issue #59 through canonical CI and merge the single mobile Supabase client/data boundary.
-3. Open one scoped Issue for the authentication session and one lightweight/common register/sign-in path.
+2. Complete Issue #61 through canonical CI and merge the email/password authentication session and entry flow.
+3. Open one scoped Issue for nickname/username onboarding and automatic PersonalProfile membership.
 4. Keep real credentials out of the repository and preserve the current presentation API while adding persistence underneath it.
-5. Reserve another phone acceptance pass for a meaningful user-facing Sprint 006 checkpoint.
+5. Reserve another phone acceptance pass for the meaningful Sprint 006 authentication + identity checkpoint.
 
 ## Known issues / open decisions
 
 - Current interaction state is still intentionally in-memory; Sprint 006 replaces it incrementally behind a data boundary.
 - A Supabase project and its non-secret public client configuration will be required for end-to-end backend validation.
-- Exact authentication provider/method mix remains open; the MVP requirement is provider-agnostic.
+- Email/password is the single Sprint 006 MVP authentication method; additional providers remain outside the current scope.
 - Exact nickname/username uniqueness rules remain open.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
 - Final book metadata provider is not locked.
@@ -96,6 +96,7 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - `/docs/project/sprints/SPRINT-006.md`
 - `/apps/mobile/.env.example`
 - `/apps/mobile/src/data/`
+- `/apps/mobile/src/features/auth/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/supabase/migrations/20260826203000_backend_foundation.sql`
@@ -105,4 +106,4 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #59 is the current change; after its client/data boundary passes CI and merges, continue to one scoped authentication-session/register-sign-in Issue without beginning profile onboarding or interaction persistence in the same PR.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #61 is the current change; after its authentication session and email/password entry flow pass CI and merge, continue to one scoped nickname/PersonalProfile onboarding Issue without beginning interaction persistence in the same PR.
