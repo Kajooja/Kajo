@@ -184,4 +184,4 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 ## Final handoff
 
-After Issue #67 passes canonical CI and merges, apply `20260826203000_backend_foundation.sql`, `20260827071000_personal_profile_onboarding.sql` and `20260827073000_seed_mvp_items.sql` to one real Supabase project in that order. Set only `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as GitHub Actions repository variables, run the manual `main` workflow and validate its APK on a phone. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.
+Issue #67 / PR #68 passed canonical CI and merged. Complete Issue #69 by applying `20260826203000_backend_foundation.sql`, `20260827071000_personal_profile_onboarding.sql` and `20260827073000_seed_mvp_items.sql` to one real Supabase project in that order. Set only `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as GitHub Actions repository variables, run the manual `main` workflow and validate its APK once on a phone. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.
