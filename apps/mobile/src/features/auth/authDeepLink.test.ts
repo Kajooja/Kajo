@@ -43,24 +43,28 @@ describe('parseAuthDeepLink', () => {
 });
 
 describe('rewriteAuthSystemPath', () => {
-  it('rewrites confirmation links to the Kajo home route before Expo Router evaluates them', () => {
+  it('preserves confirmation tokens in an Expo Router route', () => {
     expect(
       rewriteAuthSystemPath(
         'kajo://auth/confirm#access_token=access-1&refresh_token=refresh-1',
       ),
-    ).toBe('/');
+    ).toBe('/auth/confirm?access_token=access-1&refresh_token=refresh-1');
   });
 
-  it('rewrites recovery links to the Kajo home route while AuthGate handles recovery mode', () => {
+  it('preserves recovery tokens in an Expo Router route', () => {
     expect(
       rewriteAuthSystemPath(
-        'kajo://auth/recovery#access_token=access-1&refresh_token=refresh-1',
+        'kajo://auth/recovery#access_token=access-1&refresh_token=refresh-1&type=recovery',
       ),
-    ).toBe('/');
+    ).toBe(
+      '/auth/recovery?access_token=access-1&refresh_token=refresh-1&type=recovery',
+    );
   });
 
   it('also handles an already normalized auth route', () => {
-    expect(rewriteAuthSystemPath('/auth/confirm?code=test')).toBe('/');
+    expect(rewriteAuthSystemPath('/auth/confirm?code=test')).toBe(
+      '/auth/confirm?code=test',
+    );
   });
 
   it('leaves unrelated links unchanged', () => {

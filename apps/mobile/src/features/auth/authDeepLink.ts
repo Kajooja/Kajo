@@ -12,21 +12,16 @@ export type AuthDeepLinkResult =
     };
 
 export function rewriteAuthSystemPath(path: string): string {
-  const normalizedPath = path.split(/[?#]/, 1)[0];
+  const authUrl = normalizeAuthSystemUrl(path);
 
-  if (
-    normalizedPath === '/auth/confirm' ||
-    normalizedPath === 'auth/confirm' ||
-    normalizedPath === '/auth/recovery' ||
-    normalizedPath === 'auth/recovery'
-  ) {
-    return '/';
+  if (!authUrl) {
+    return path;
   }
 
   let parsed: URL;
 
   try {
-    parsed = new URL(path);
+    parsed = new URL(authUrl);
   } catch {
     return path;
   }
@@ -36,7 +31,23 @@ export function rewriteAuthSystemPath(path: string): string {
   }
 
   const route = parsed.pathname.replace(/^\//, '');
-  return route === 'confirm' || route === 'recovery' ? '/' : path;
+
+  if (route !== 'confirm' && route !== 'recovery') {
+    return path;
+  }
+
+  const params = new URLSearchParams(parsed.search);
+  const fragmentParams = new URLSearchParams(parsed.hash.replace(/^#/, ''));
+
+  fragmentParams.forEach((value, key) => {
+    if (!params.has(key)) {
+      params.append(key, value);
+    }
+  });
+
+  const query = params.toString();
+  const target = `/auth/${route}`;
+  return query ? `${target}?${query}` : target;
 }
 
 export function parseAuthDeepLink(url: string): AuthDeepLinkResult {
@@ -90,4 +101,18 @@ export function parseAuthDeepLink(url: string): AuthDeepLinkResult {
     refreshToken,
     recovery: route === 'recovery',
   };
+}
+
+function normalizeAuthSystemUrl(path: string): string | null {
+  if (path.startsWith('kajo://')) {
+    return path;
+  }
+
+  const match = path.match(/^\/?auth\/(confirm|recovery)(.*)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return `kajo://auth/${match[1]}${match[2] ?? ''}`;
 }

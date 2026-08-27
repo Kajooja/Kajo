@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "scheme": "kajo",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#000000",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
