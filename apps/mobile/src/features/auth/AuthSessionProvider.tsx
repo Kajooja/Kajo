@@ -21,6 +21,7 @@ import {
   signOut as signOutWithApi,
   submitEmailSignUp,
   submitIdentifierPassword,
+  validateEmailPassword,
   type AuthSubmissionResult,
   type PasswordAuthBridge,
   type PasswordRecoveryRequestResult,
@@ -250,6 +251,15 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
         return unavailableAuthResult();
       }
 
+      const emailPasswordValidation = validateEmailPassword(email, password);
+
+      if (emailPasswordValidation.status === 'invalid') {
+        return {
+          status: 'error' as const,
+          message: emailPasswordValidation.message,
+        };
+      }
+
       const nicknameValidation = validateNickname(nicknameInput);
 
       if (nicknameValidation.status === 'invalid') {
@@ -261,7 +271,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
 
       const emailAvailability = await checkAccountAvailability(
         passwordAuthBridge,
-        email,
+        emailPasswordValidation.email,
       );
 
       if (emailAvailability.status === 'error') {
@@ -290,8 +300,8 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
 
       const result = await submitEmailSignUp(
         connection.client.auth,
-        email,
-        password,
+        emailPasswordValidation.email,
+        emailPasswordValidation.password,
         nicknameValidation.nickname,
         AUTH_CONFIRM_REDIRECT,
       );
