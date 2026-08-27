@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-type AuthAction = 'account-exists' | 'sign-in';
+type AuthAction = 'account-exists' | 'request-password-reset' | 'sign-in';
 
 interface RequestBody {
   action?: AuthAction;
@@ -8,13 +8,14 @@ interface RequestBody {
   password?: string;
 }
 
+const RECOVERY_REDIRECT = 'kajo://auth/recovery';
 const headers = {
   'content-type': 'application/json; charset=utf-8',
 };
 
 Deno.serve(async (request) => {
   if (request.method !== 'POST') {
-    return json({ error: 'method_not_allowed' }, 405);
+    return json({ status: 'error' }, 405);
   }
 
   let body: RequestBody;
@@ -22,20 +23,20 @@ Deno.serve(async (request) => {
   try {
     body = await request.json();
   } catch {
-    return json({ error: 'invalid_request' }, 400);
+    return json({ status: 'error' }, 400);
   }
 
   const identifier = normalizeIdentifier(body.identifier);
 
   if (!identifier) {
-    return json({ error: 'invalid_identifier' }, 400);
+    return json({ status: 'invalid-identifier' });
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
   if (!supabaseUrl || !serviceRoleKey) {
-    return json({ error: 'server_configuration_error' }, 500);
+    return json({ status: 'error' }, 500);
   }
 
   const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -51,25 +52,37 @@ Deno.serve(async (request) => {
   );
 
   if (resolutionError) {
-    return json({ error: 'identifier_resolution_failed' }, 500);
+    return json({ status: 'error' }, 500);
   }
 
   const email = typeof resolvedEmail === 'string' ? resolvedEmail : null;
 
   if (body.action === 'account-exists') {
-    return json({ exists: Boolean(email) });
+    return json({ status: email ? 'exists' : 'available' });
+  }
+
+  if (body.action === 'request-password-reset') {
+    if (!email) {
+      return json({ status: 'user-not-found' });
+    }
+
+    const { error } = await serviceClient.auth.resetPasswordForEmail(email, {
+      redirectTo: RECOVERY_REDIRECT,
+    });
+
+    return json({ status: error ? 'error' : 'recovery-sent' }, error ? 500 : 200);
   }
 
   if (body.action !== 'sign-in') {
-    return json({ error: 'invalid_action' }, 400);
+    return json({ status: 'error' }, 400);
   }
 
   if (!email) {
-    return json({ error: 'user_not_found' }, 404);
+    return json({ status: 'user-not-found' });
   }
 
   if (!body.password || body.password.length < 6) {
-    return json({ error: 'wrong_password' }, 401);
+    return json({ status: 'wrong-password' });
   }
 
   const { data, error } = await serviceClient.auth.signInWithPassword({
@@ -77,11 +90,24 @@ Deno.serve(async (request) => {
     password: body.password,
   });
 
-  if (error || !data.session) {
-    return json({ error: 'wrong_password' }, 401);
+  if (error) {
+    if (error.code === 'email_not_confirmed') {
+      return json({ status: 'email-not-confirmed' });
+    }
+
+    if (error.code === 'invalid_credentials') {
+      return json({ status: 'wrong-password' });
+    }
+
+    return json({ status: 'error' }, 500);
+  }
+
+  if (!data.session) {
+    return json({ status: 'error' }, 500);
   }
 
   return json({
+    status: 'authenticated',
     accessToken: data.session.access_token,
     refreshToken: data.session.refresh_token,
     userId: data.user?.id ?? data.session.user.id,
