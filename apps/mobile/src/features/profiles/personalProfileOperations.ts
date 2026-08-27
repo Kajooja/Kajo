@@ -11,6 +11,7 @@ export interface PersonalIdentity {
 }
 
 interface RpcErrorLike {
+  code?: string;
   message: string;
 }
 
@@ -37,6 +38,7 @@ const MINIMUM_NICKNAME_LENGTH = 2;
 const MAXIMUM_NICKNAME_LENGTH = 32;
 const PROFILE_ERROR_MESSAGE =
   'Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.';
+const NICKNAME_EXISTS_MESSAGE = 'Nimimerkki on jo käytössä. Valitse toinen.';
 
 export function validateNickname(value: string): NicknameValidationResult {
   const nickname = value.trim().replace(/\s+/g, ' ');
@@ -88,6 +90,14 @@ async function invokePersonalProfileRpc(
     const response = await rpc(functionName, arguments_);
 
     if (response.error) {
+      if (
+        functionName === PERSONAL_PROFILE_RPC.complete &&
+        (response.error.code === '23505' ||
+          response.error.message.toLowerCase().includes('nickname already exists'))
+      ) {
+        return { status: 'error', message: NICKNAME_EXISTS_MESSAGE };
+      }
+
       return { status: 'error', message: PROFILE_ERROR_MESSAGE };
     }
 
