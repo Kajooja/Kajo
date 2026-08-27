@@ -131,6 +131,14 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - deterministic tests cover row mapping, malformed hydration, upsert/delete selection and write ordering,
 - no Prediction, durable Event history or SharedProfile product flow is included.
 
+### Configured acceptance build — Issue #67
+
+- CI and standalone APK jobs map two optional GitHub Actions repository variables to the existing public Expo Supabase configuration contract,
+- absent variables preserve the accepted unconfigured mock build,
+- no project URL, key, token, password or other environment-specific value is committed,
+- the exact external handoff is: create one Supabase project, apply the three migrations in timestamp order, set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as repository variables, then run the final configured workflow and phone acceptance,
+- no application feature, schema, Event or Prediction scope is added.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
@@ -151,6 +159,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 - End-to-end backend and identity validation needs a configured Supabase project and public mobile client values.
 - The committed migrations have not yet been applied to a real Supabase project in this environment.
+- GitHub Actions repository variables are not yet configured.
 
 ## Important files
 
@@ -175,4 +184,4 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 ## Final handoff
 
-After Issue #65 passes canonical CI and merges, apply all committed migrations to a real Supabase project, configure only the public mobile values and run one representative Sprint 006 phone acceptance. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.
+After Issue #67 passes canonical CI and merges, apply `20260826203000_backend_foundation.sql`, `20260827071000_personal_profile_onboarding.sql` and `20260827073000_seed_mvp_items.sql` to one real Supabase project in that order. Set only `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as GitHub Actions repository variables, run the manual `main` workflow and validate its APK on a phone. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.
