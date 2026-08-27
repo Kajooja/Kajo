@@ -1,0 +1,2 @@
+[functions.password-auth]
+verify_jwt = false
