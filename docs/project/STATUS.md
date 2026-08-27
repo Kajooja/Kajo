@@ -34,7 +34,7 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 is the current step: a persisted authentication session plus one email/password registration, sign-in and sign-out path that still leaves the existing app runnable when Supabase is unconfigured.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 is the current step: user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership.
 
 ## MVP progress
 
@@ -67,8 +67,8 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Complete Issue #61 through canonical CI and merge the email/password authentication session and entry flow.
-3. Open one scoped Issue for nickname/username onboarding and automatic PersonalProfile membership.
+2. Complete Issue #63 through canonical CI and merge nickname onboarding plus automatic PersonalProfile membership.
+3. Open one scoped Issue to persist and hydrate the accepted generic Item interaction state through the existing boundary.
 4. Keep real credentials out of the repository and preserve the current presentation API while adding persistence underneath it.
 5. Reserve another phone acceptance pass for the meaningful Sprint 006 authentication + identity checkpoint.
 
@@ -77,7 +77,7 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - Current interaction state is still intentionally in-memory; Sprint 006 replaces it incrementally behind a data boundary.
 - A Supabase project and its non-secret public client configuration will be required for end-to-end backend validation.
 - Email/password is the single Sprint 006 MVP authentication method; additional providers remain outside the current scope.
-- Exact nickname/username uniqueness rules remain open.
+- Nickname is an MVP display name and is not globally unique; PersonalProfile ownership is unique per User.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
 - Final book metadata provider is not locked.
 - Current Room/theme/mock covers remain structural rather than final production artwork.
@@ -97,13 +97,15 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - `/apps/mobile/.env.example`
 - `/apps/mobile/src/data/`
 - `/apps/mobile/src/features/auth/`
+- `/apps/mobile/src/features/profiles/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/supabase/migrations/20260826203000_backend_foundation.sql`
+- `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
 - `/.github/workflows/ci.yml`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #61 is the current change; after its authentication session and email/password entry flow pass CI and merge, continue to one scoped nickname/PersonalProfile onboarding Issue without beginning interaction persistence in the same PR.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #63 is the current change; after nickname/PersonalProfile onboarding passes CI and merges, continue to one scoped interaction-persistence Issue without beginning Event or Prediction work.

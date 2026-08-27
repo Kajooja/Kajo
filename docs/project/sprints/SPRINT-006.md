@@ -108,6 +108,17 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - auth input normalization, validation, provider-operation selection, confirmation handling, error mapping and sign-out have deterministic credential-free tests,
 - no nickname/PersonalProfile onboarding, interaction persistence, Event or Prediction work is included.
 
+### Nickname and PersonalProfile onboarding — Issue #63
+
+- nickname is a visible display name rather than a globally unique MVP handle,
+- one database owner relation and partial unique index enforce at most one PersonalProfile per User,
+- authenticated RPCs read or atomically reconcile the User, PersonalProfile and ProfileMember identity without client insert grants,
+- the root profile provider binds hydrated identity to the authenticated `userId` so account changes cannot expose stale profile state,
+- configured signed-in users with missing identity receive one nickname onboarding step before entering the Room,
+- the accepted unconfigured mock flow remains unchanged and the hydrated nickname is visible in the Room,
+- deterministic tests cover nickname normalization/bounds, RPC selection, response mapping, missing identity and non-secret failure handling,
+- no interaction persistence, Event, Prediction or SharedProfile product flow is included.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
@@ -116,6 +127,8 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - Treat absent mobile configuration as an intentional unconfigured state so the accepted mock flow remains runnable until a real project is connected.
 - Keep the Supabase client module-scoped and expose it through one root provider rather than constructing clients or calling Supabase in screens.
 - Use email/password as the one Sprint 006 MVP authentication method; defer additional providers and account-recovery flows until a demonstrated product need.
+- Treat nickname as a non-unique display name in MVP 0.1 while enforcing unique PersonalProfile ownership per User.
+- Create User, PersonalProfile and ProfileMember identity atomically through a least-privilege authenticated RPC rather than three client-side inserts.
 
 ## Deferred / not done
 
@@ -124,8 +137,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 ## Known issues
 
-- End-to-end backend validation needs a configured Supabase project and public mobile client values.
-- Nickname/username uniqueness policy still requires the smallest implementation decision that satisfies the MVP requirements.
+- End-to-end backend and identity validation needs a configured Supabase project and public mobile client values.
 
 ## Important files
 
@@ -140,10 +152,12 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/apps/mobile/.env.example`
 - `/apps/mobile/src/data/`
 - `/apps/mobile/src/features/auth/`
+- `/apps/mobile/src/features/profiles/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
+- `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
 - `/.github/workflows/ci.yml`
 
 ## Final handoff
 
-After Issue #61 passes canonical CI and merges, open one scoped Issue for nickname/username onboarding and automatic PersonalProfile membership. Do not begin interaction-state integration in that PR.
+After Issue #63 passes canonical CI and merges, open one scoped Issue for persistence and hydration of the accepted generic Item interaction state. Do not begin Event or Prediction work in that PR.

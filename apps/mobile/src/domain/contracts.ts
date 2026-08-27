@@ -27,6 +27,7 @@ export type EventType =
 
 export interface User {
   id: UserId;
+  nickname: string;
 }
 
 export interface ProfileBase {
