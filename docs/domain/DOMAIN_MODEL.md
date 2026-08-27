@@ -27,9 +27,7 @@ Profile
 
 ## User
 
-A `User` is an account/human identity. A User performs actions. MVP identity
-includes a user-visible nickname, which is a display name rather than a
-globally unique public handle.
+A `User` is an account/human identity. A User performs actions. MVP identity includes one unique nickname and one unique authentication email linked to the same account. The nickname is both user-visible identity and a login identifier. Its stored/display casing is preserved exactly (for example `KeTTu`), while uniqueness, sign-in and later nickname search are case-insensitive (`KeTTu`, `kettu` and `KETTU` resolve to the same nickname identity).
 
 User is intentionally distinct from Profile because the same User can act in a PersonalProfile and several SharedProfiles.
 
