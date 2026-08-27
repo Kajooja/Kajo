@@ -6,189 +6,144 @@ Started: **2026-08-26**
 
 ## Goal
 
-Add the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation needed to move appropriate Sprint 005 in-memory state behind a clear data boundary without rewriting the accepted presentation flow.
+Add the smallest real Supabase/PostgreSQL authentication, identity and persistence foundation needed to move appropriate Sprint 005 in-memory state behind a clear data boundary without rewriting the accepted presentation flow.
 
 ## Scope
 
-- Keep the mobile Supabase configuration public-only and all secrets out of the repository.
-- Use one mobile Supabase client/data boundary rather than direct backend calls scattered through screens.
-- Keep the User/Profile/ProfileMember/Item/current-interaction backend reproducible through committed migrations.
-- Protect profile data with authenticated membership-based authorization.
-- Support MVP password authentication with one unique email and one unique nickname linked to the same User.
-- Preserve nickname display casing while treating nickname uniqueness, sign-in and later search case-insensitively.
-- Support registration, native email confirmation, sign-in with email or nickname and password recovery through the account email.
-- Ensure every signed-in User has a PersonalProfile before entering the Room.
-- Persist and hydrate the existing generic BOOK/MOVIE interaction state through the data boundary.
-- Preserve the accepted Room -> discovery -> Item/swipe presentation semantics.
-- Add deterministic tests for configuration, auth mapping, identity and persistence behavior where practical.
+- Public-only mobile Supabase configuration; no secrets in repository/chat/logs.
+- One root mobile Supabase data/auth boundary instead of scattered backend calls.
+- Reproducible User/Profile/ProfileMember/Item/current-interaction schema through committed migrations.
+- Membership-based authorization for profile data.
+- Password authentication with one unique email and one unique nickname linked to the same User.
+- Preserve nickname display casing while matching uniqueness/sign-in/search case-insensitively.
+- Registration, native email confirmation, sign-in by email or nickname, and password recovery through the account email.
+- A valid PersonalProfile for every signed-in User before the Room.
+- Persist/hydrate existing generic BOOK/MOVIE interaction state.
+- Preserve accepted Room/discovery/Item/swipe semantics.
 
 ## Relevant MVP requirements
 
-- `MVP-AUTH-001` — unique email + nickname registration, mobile email confirmation, email-or-nickname password sign-in and password recovery.
-- `MVP-AUTH-002` — one visible unique nickname linked to the User identity, with preserved display casing and case-insensitive matching.
+- `MVP-AUTH-001` — unique email + nickname registration, mobile confirmation, email-or-nickname password sign-in and password recovery.
+- `MVP-AUTH-002` — one visible unique nickname with preserved display casing and case-insensitive identity matching.
 - `MVP-PROFILE-001` — every user has a PersonalProfile.
 
-Sprint 006 also provides persistence and authorization foundations for later profile, event and prediction requirements without claiming those later requirements complete.
+These remain **in progress** until the corrected full phone path passes.
 
 ## Non-goals
 
-- Google or Apple sign-in; tracked separately in Issue #73 after Sprint 006 acceptance.
-- Generic Event capture or analytics-quality event contracts; Sprint 007.
-- Prediction V0, ranking refresh or learned profile scenarios; Sprint 008.
-- SharedProfile product flows or shared Room UI.
-- Rating, note, photo, people, location or date memories.
-- Final book/movie metadata ingestion.
-- Final Room art or visual redesign.
-- pgvector or evolutionary prediction machinery.
+- Google/Apple sign-in — Issue #73 after Sprint 006 acceptance.
+- Event Engine — Sprint 007.
+- Prediction V0 — Sprint 008.
+- SharedProfile product flows.
+- Rating/note/photo/location memory expansion.
+- Final metadata providers or Room artwork.
+- pgvector/evolutionary prediction machinery.
 
 ## Issue sequence
 
-1. Initial User/Profile/ProfileMember/Item/current-interaction migration and authorization foundation — Issue #57 / PR #58.
-2. Supabase/Expo dependencies, public configuration contract and one root mobile client/data boundary — Issue #59 / PR #60.
-3. Initial email/password authentication session and entry UI — Issue #61 / PR #62.
-4. Initial nickname/PersonalProfile onboarding — Issue #63 / PR #64.
-5. Persist/hydrate generic Item interaction state — Issue #65 / PR #66.
-6. Configured CI/APK support — Issue #67 / PR #68.
-7. Configured real-project and phone acceptance — Issue #69.
-8. Correct the auth and PersonalProfile failures exposed by the Issue #69 phone test — Issue #72 / PR #74.
-
-Issue #55 closed Sprint 005 and opened this sprint; it did not implement backend code.
+1. #57 / PR #58 — initial schema + authorization.
+2. #59 / PR #60 — mobile Supabase boundary/configuration.
+3. #61 / PR #62 — initial password auth/session.
+4. #63 / PR #64 — initial nickname + PersonalProfile onboarding.
+5. #65 / PR #66 — Item interaction persistence/hydration.
+6. #67 / PR #68 — configured CI/APK support.
+7. #69 — real-project/phone acceptance.
+8. #72 / PR #74 — auth/profile correction exposed by #69 acceptance.
 
 ## Architecture constraints
 
-- Use Supabase/PostgreSQL/Auth and repository-committed migrations as specified in `docs/architecture/ARCHITECTURE.md`.
-- Presentation components must not contain arbitrary direct Supabase calls.
-- Nickname-to-email resolution must not be exposed as an unauthenticated mobile/database API. It belongs behind the scoped server-side `password-auth` Edge Function.
-- Privileged Supabase secret/service-role credentials may exist only in the hosted server environment; never in the mobile bundle, repository, Issues or chat.
-- Preserve generic `Item`, `Profile` and `ProfileMember` terminology and BOOK/MOVIE interaction semantics.
-- Keep `actorUserId` and `profileId` conceptually separate so Sprint 007 Events do not require a schema reversal.
-- Use row-level authorization based on authenticated profile membership.
-- Do not add prediction or event abstractions early under the name of future-proofing.
+- Use Supabase/PostgreSQL/Auth and repository-committed migrations.
+- Presentation screens do not own arbitrary backend calls.
+- Nickname-to-email resolution is server-side only behind `supabase/functions/password-auth`; do not expose it as an unauthenticated mobile/database API.
+- Privileged secret/service-role credentials stay only in the hosted server environment.
+- Preserve canonical `User`, `Profile`, `ProfileMember`, `Item` terminology.
+- Keep `actorUserId` separate from `profileId` for Sprint 007.
+- Do not introduce Event/Prediction abstractions early.
+- Corrections to already-applied SQL use new migrations, never ad-hoc rewrites.
 
 ## Definition of Done
 
-- A user can register with a unique email and unique nickname.
-- Confirmation email returns to the native Kajo app instead of localhost/web-only flow.
-- The same User can sign in using either email or nickname with the password.
-- Unknown identifier and wrong password have the agreed deterministic user-facing messages.
-- A user can request password recovery by email or nickname and set a new password from the native recovery link.
-- Every signed-in User has the correct visible nickname and PersonalProfile.
-- Initial backend schema and every correction are reproducible from committed migrations.
-- PersonalProfile data is protected by reviewed membership-based authorization policies.
-- Appropriate Sprint 005 Item interaction state persists and hydrates through one clear data boundary.
-- Existing accepted discovery/swipe presentation semantics remain intact.
-- No direct backend-call sprawl, duplicate state model, empty folder or unused scaffold remains.
-- Canonical CI passes for every merged Issue.
-- The complete final Sprint 006 path passes on a real phone before sprint close.
-- `STATUS.md`, `MVP.md`, `CODEMAP.md` and this sprint file reflect repository truth at close.
+- Unique email + unique nickname registration works.
+- Confirmation email opens the native Kajo app.
+- Email and nickname both sign in to the same User.
+- Unknown identifier -> `Käyttäjätunnusta ei löydy.`
+- Known identifier + wrong password -> `Salasana on väärin.`
+- Duplicate identity -> `Sinulla on jo tili. Unohditko salasanasi?`
+- Password recovery returns to Kajo and allows a new password.
+- Correct nickname and PersonalProfile are available before the Room.
+- Backend state is reproducible from committed migrations/functions.
+- Membership authorization remains intact.
+- BOOK/MOVIE interaction state persists/hydrates; undo and presentation behavior stay intact.
+- No backend-call sprawl, duplicate state model, empty folder or unused scaffold is introduced.
+- Canonical CI is green.
+- The complete corrected configured path passes on a real phone.
+- `STATUS.md`, `MVP.md`, `CODEMAP.md` and this file reflect repository truth.
 
 ## Delivered baseline
 
-### Initial schema and authorization foundation — Issue #57
+- #57: canonical backend/RLS foundation.
+- #59: one configured/unconfigured mobile Supabase boundary.
+- #61: first persisted email/password auth flow.
+- #63: first nickname/PersonalProfile onboarding.
+- #65: configured current interaction persistence/hydration.
+- #67: configured `main` APK workflow support.
 
-- committed PostgreSQL schema for canonical User, Profile, ProfileMember, generic BOOK/MOVIE Item and current Item interaction state,
-- separate `actor_user_id` and `profile_id`, integrity constraints, indexes and update timestamps,
-- RLS on exposed tables with explicit membership-based grants/policies,
-- no premature Event or Prediction schema.
+The first auth/profile implementations were intentionally tested on a real hosted project before being declared complete.
 
-### Mobile Supabase client boundary — Issue #59
+## Acceptance evidence — Issue #69 / CI #96
 
-- package-managed Supabase/Expo dependencies and committed lockfile,
-- public-only Expo environment contract,
-- deterministic configured/unconfigured states,
-- one persistent-session module-scoped Supabase client and root provider,
-- no direct Supabase calls spread through presentation screens.
+The real Supabase project, original three migrations and public repository variables were configured. CI #96 produced a standalone APK from `71a33c0b0fb59ea076b691ecdfad69a073743bb8`.
 
-### Initial email/password authentication — Issue #61
+Real-phone acceptance failed and established the final MVP auth semantics:
 
-- root-scoped persisted auth session/provider,
-- first email/password registration/sign-in entry UI,
-- hosted confirmation response handling,
-- sign-out and deterministic credential-free tests.
+- unique email + unique nickname linked to one User,
+- preserved nickname display casing with case-insensitive matching,
+- distinct unknown-identifier and wrong-password messages,
+- duplicate account recovery guidance,
+- native confirmation instead of `localhost:3000`,
+- email-based password recovery,
+- reliable PersonalProfile creation before entering the Room.
 
-This was an implementation increment, not final acceptance. The later real-phone test in Issue #69 demonstrated that the confirmation/deep-link and identifier/error behavior needed correction in Issue #72.
+The phone also reproduced `Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.` during nickname/profile onboarding. CI #96 is failure evidence, not the final candidate.
 
-### Initial nickname and PersonalProfile onboarding — Issue #63
+## Auth acceptance correction — Issue #72 / PR #74
 
-- one PersonalProfile owner relation and at-most-one-PersonalProfile-per-User rule,
-- authenticated profile RPCs and root profile hydration,
-- first nickname onboarding screen and Room nickname display,
-- deterministic profile mapping/validation tests.
+PR #74 was squash-merged as `50bceadcb7949e5d51020391fb0b76b2593652f3` after final PR CI #107 passed lint, typecheck, tests and iOS/Android bundle smoke.
 
-The original non-unique-display-name assumption was superseded by the product decision recorded during Issue #69 acceptance: nickname is now a unique login identity with case-insensitive matching and preserved display casing. The observed hosted profile-completion failure is corrected in Issue #72 rather than rewriting the already-applied migration.
+Merged correction:
 
-### PersonalProfile Item interaction persistence — Issue #65
+- case-insensitive unique nickname index while preserving display casing,
+- server-side `password-auth` Edge Function for identifier resolution, sign-in and recovery request without returning resolved email or privileged keys,
+- follow-up migration instead of editing already-applied migrations,
+- signup-time PersonalProfile provisioning plus corrected fallback completion RPC,
+- `kajo://auth/confirm` and `kajo://auth/recovery` handling,
+- registration existence checks for email and nickname,
+- deterministic auth error UX,
+- in-app password update after recovery,
+- deterministic auth/deep-link/profile tests,
+- no npm dependency additions or unrelated feature expansion.
 
-- 12 current generic BOOK/MOVIE Items use stable UUIDs shared by mobile and the seed migration,
-- configured PersonalProfile interaction state hydrates/persists through the existing single interaction store,
-- current interest/saved/consumed state uses membership-protected persistence without creating Event history early,
-- ordered writes, retry feedback and exact-card undo semantics remain intact.
-
-### Configured acceptance build support — Issue #67
-
-- optional GitHub Actions repository variables feed the public Expo Supabase configuration,
-- absent variables preserve the unconfigured mock build,
-- `main` can build, verify and upload a standalone Android release APK without committing project values.
-
-## Acceptance evidence — Issue #69
-
-One real Supabase project was created, the original three committed migrations were applied successfully, the two public repository variables were configured, and [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) produced the configured APK from commit `71a33c0b0fb59ea076b691ecdfad69a073743bb8`.
-
-The real-phone test **failed Sprint 006 acceptance** and established these required corrections:
-
-- sign-in must accept either unique email or unique nickname linked to the same User,
-- nickname casing such as `KeTTu` must remain visible exactly while `kettu`, `KETTU` etc. match the same identity,
-- unknown identifier -> `Käyttäjätunnusta ei löydy.`,
-- known identifier + wrong password -> `Salasana on väärin.`,
-- duplicate identity -> `Sinulla on jo tili. Unohditko salasanasi?`,
-- Supabase confirmation incorrectly returned to `localhost:3000`,
-- password recovery through the account email is required,
-- PersonalProfile creation failed with `Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.` and blocked the Room.
-
-CI #96 therefore remains evidence of the failing acceptance attempt, not the final Sprint 006 candidate.
-
-## In progress — auth acceptance correction, Issue #72 / PR #74
-
-PR #74 contains the scoped correction only:
-
-- case-insensitive unique nickname index while preserving stored/display casing,
-- one server-side `password-auth` Edge Function for email/nickname existence resolution, password sign-in and recovery request without exposing resolved email or privileged keys,
-- one follow-up migration rather than editing already-applied migrations,
-- signup-time PersonalProfile provisioning plus corrected fallback profile completion,
-- native `kajo://auth/confirm` and `kajo://auth/recovery` handling,
-- registration availability checks for email and nickname,
-- deterministic not-found, wrong-password, duplicate and unconfirmed-email UX,
-- in-app new-password flow after recovery,
-- deterministic auth, deep-link and profile tests.
-
-PR #74 [CI #99](https://github.com/Kajooja/Kajo/actions/runs/33099264933) passed dependency install, lint, typecheck, tests and iOS/Android bundle smoke at the implementation checkpoint. The latest PR head must also be green after documentation finalization before merge.
+Issue #72 remains open because its Definition of Done includes hosted deployment and fresh real-phone acceptance, not only code merge.
 
 ## Decisions
 
-- Keep the existing Supabase/PostgreSQL/Auth backend direction.
-- Keep the accepted presentation flow and replace state incrementally behind data/auth boundaries.
-- Reserve durable generic Event capture for Sprint 007.
-- Keep absent mobile configuration as an intentional unconfigured/mock state.
-- Keep the Supabase client module-scoped and exposed through root providers rather than constructing clients in screens.
-- Email and nickname are both unique identifiers linked to one User; nickname display casing is preserved while matching is case-insensitive.
-- Password recovery is part of Sprint 006 because the real-phone auth acceptance demonstrated the requirement.
-- Use one server-side identifier auth boundary instead of exposing nickname-to-email lookup to the mobile client.
-- Google and Apple sign-in are deferred to Issue #73 after this sprint; do not expand the current fix.
-- Never edit already-applied hosted SQL ad hoc; corrections use new committed migrations.
+- Keep Supabase/PostgreSQL/Auth.
+- Keep one root mobile data/auth boundary.
+- Email and nickname are unique identifiers for the same User.
+- Nickname display casing is preserved; matching is case-insensitive.
+- Password recovery belongs in Sprint 006 because acceptance demonstrated the need.
+- Identifier-to-email resolution is server-side only.
+- Google/Apple auth is deferred to #73.
+- Durable generic Event capture remains Sprint 007.
 
-## Deferred / not done
+## Remaining gate / exact next order
 
-- Google and Apple authentication — Issue #73 after Sprint 006 acceptance.
-- SharedProfile membership/product flow, shared discovery and shared memory.
-- Event Engine — Sprint 007.
-- Prediction and scenario-memory implementation — Sprint 008+.
-
-## Known issues / remaining gate
-
-- PR #74 code is not yet merged.
-- The new migration, `password-auth` Edge Function/config and native Auth redirect allowlist have not yet been applied/deployed to the hosted Supabase project.
-- No fresh post-fix configured Android APK has been phone-tested.
-- Issue #69 and Issue #72 stay open until the corrected complete phone path passes.
+1. Apply `supabase/migrations/20260827173000_auth_identifier_and_profile_fix.sql` to the real project.
+2. Deploy `supabase/functions/password-auth/index.ts` with committed `supabase/config.toml` (`verify_jwt = false`).
+3. Allow `kajo://**` in Supabase Auth redirect URLs.
+4. Use a fresh configured `main` APK containing merge `50bceadcb7949e5d51020391fb0b76b2593652f3` or later documentation-only commit with identical app code.
+5. Rerun Issue #69 on a real phone: registration, native confirmation, email login, mixed-case nickname login, exact error messages, recovery, Room/profile, BOOK+MOVIE interaction, undo, restart hydration and sign-out/sign-in persistence.
+6. Record evidence in #69/#72 and close Sprint 006 only when the whole path passes.
 
 ## Important files
 
@@ -196,25 +151,17 @@ PR #74 [CI #99](https://github.com/Kajooja/Kajo/actions/runs/33099264933) passed
 - `/docs/product/MVP.md`
 - `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/GLOSSARY.md`
-- `/docs/domain/DATA_EVENTS.md`
 - `/docs/architecture/ARCHITECTURE.md`
 - `/docs/architecture/CODEMAP.md`
-- `/docs/project/ROADMAP.md`
 - `/docs/project/STATUS.md`
-- `/apps/mobile/.env.example`
 - `/apps/mobile/src/data/`
 - `/apps/mobile/src/features/auth/`
 - `/apps/mobile/src/features/profiles/`
-- `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
-- `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
 - `/supabase/config.toml`
 - `/supabase/functions/password-auth/index.ts`
-- `/supabase/migrations/20260826203000_backend_foundation.sql`
-- `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
-- `/supabase/migrations/20260827073000_seed_mvp_items.sql`
 - `/supabase/migrations/20260827173000_auth_identifier_and_profile_fix.sql`
 - `/.github/workflows/ci.yml`
 
 ## Mid-sprint handoff — 2026-08-27
 
-Issue #69 real-phone acceptance exposed blocking auth/profile defects in CI #96. Issue #72 / draft PR #74 contains the scoped correction. Finish PR #74 review with a green latest CI, merge it, then apply the new migration, deploy `password-auth`, allow `kajo://**` in Supabase Auth redirects, run a fresh configured `main` APK and rerun the complete Issue #69 phone path. Do not close Sprint 006 or begin Sprint 007 until that path passes.
+The auth/profile correction is merged and automated validation is green. The next action is hosted Supabase deployment, beginning with the new committed migration. Do not start Sprint 007 or Google/Apple auth before corrected phone acceptance passes.
