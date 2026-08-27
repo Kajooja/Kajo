@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-08-26**
+Last updated: **2026-08-27**
 Current milestone: **MVP 0.1**
 Current sprint: **Sprint 006 — Backend Foundation** (`sprints/SPRINT-006.md`)
 Last completed sprint: **Sprint 005 — Swipe & History** (`sprints/SPRINT-005.md`)
@@ -34,7 +34,7 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 is the current acceptance-preparation step: pass optional public Supabase repository variables into CI and APK builds without committing project values.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 / PR #68 delivered optional public Supabase repository-variable support for CI and APK builds without committing project values. Issue #69 is the single remaining configured-project migration, build and phone-acceptance gate.
 
 ## MVP progress
 
@@ -67,10 +67,10 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Complete Issue #67 through canonical CI and merge configured acceptance-build support.
-3. Apply the three committed migrations to a real Supabase project in timestamp order.
-4. Keep real credentials out of the repository and preserve the current presentation API while adding persistence underneath it.
-5. Run one Sprint 006 phone acceptance across registration/sign-in, nickname/PersonalProfile, interaction persistence after restart and sign-out.
+2. Complete Issue #69 against one real Supabase project.
+3. Apply the three committed migrations in timestamp order and set only the two documented public GitHub Actions repository variables.
+4. Keep passwords, service-role keys and tokens out of the repository, Issues, logs and chat.
+5. Run one configured Sprint 006 phone acceptance across registration/sign-in, nickname/PersonalProfile, interaction persistence after restart and sign-out.
 
 ## Known issues / open decisions
 
@@ -110,4 +110,4 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #65 is the current change; after interaction persistence passes CI and merges, apply the migrations to a real Supabase project and run the single configured Sprint 006 phone acceptance before close. Do not begin Sprint 007 Event work early.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. All repository implementation is merged through PR #68; Issue #69 is the current external migration, configured-build and single phone-acceptance gate. Do not begin Sprint 007 Event work early.
