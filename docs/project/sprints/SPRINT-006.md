@@ -119,6 +119,18 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - deterministic tests cover nickname normalization/bounds, RPC selection, response mapping, missing identity and non-secret failure handling,
 - no interaction persistence, Event, Prediction or SharedProfile product flow is included.
 
+### PersonalProfile Item interaction persistence — Issue #65
+
+- the 12 current generic BOOK/MOVIE MVP Items use stable UUIDs shared by the mobile mock adapter and a committed seed migration,
+- the existing single interaction store remains local for intentionally unconfigured builds and hydrates current PersonalProfile state when configured,
+- `interest`, `saved` and `consumed` changes use the existing membership-protected current-state table without creating an Event model early,
+- meaningful state upserts while a fully default state deletes its row,
+- configured writes are serialized, optimistic state is retained on failure and a non-secret retry path always targets the newest Item state,
+- hydration finishes before configured users enter the accepted Room/discovery flow,
+- undo retains the accepted in-session 10-action/exact-card semantics and persists the restored current state,
+- deterministic tests cover row mapping, malformed hydration, upsert/delete selection and write ordering,
+- no Prediction, durable Event history or SharedProfile product flow is included.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
@@ -138,6 +150,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 ## Known issues
 
 - End-to-end backend and identity validation needs a configured Supabase project and public mobile client values.
+- The committed migrations have not yet been applied to a real Supabase project in this environment.
 
 ## Important files
 
@@ -155,9 +168,11 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/apps/mobile/src/features/profiles/`
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
+- `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
 - `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
+- `/supabase/migrations/20260827073000_seed_mvp_items.sql`
 - `/.github/workflows/ci.yml`
 
 ## Final handoff
 
-After Issue #63 passes canonical CI and merges, open one scoped Issue for persistence and hydration of the accepted generic Item interaction state. Do not begin Event or Prediction work in that PR.
+After Issue #65 passes canonical CI and merges, apply all committed migrations to a real Supabase project, configure only the public mobile values and run one representative Sprint 006 phone acceptance. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.

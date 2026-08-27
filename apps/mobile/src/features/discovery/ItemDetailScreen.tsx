@@ -19,6 +19,7 @@ import type { Item, ItemId } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from './DiscoveryModeContext';
+import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
 import {
   buildSwipeSequence,
@@ -249,6 +250,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
       </View>
 
       <View style={styles.feedbackRow}>
+        <InteractionPersistenceNotice theme={theme} />
         {feedback ? (
           <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>
             {feedback}
@@ -514,6 +516,7 @@ function createStyles(theme: RoomTheme) {
       minHeight: 26,
       paddingHorizontal: 20,
       justifyContent: 'center',
+      gap: 6,
     },
     feedbackText: {
       color: theme.ambient.curtainHighlight,

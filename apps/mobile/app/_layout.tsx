@@ -12,13 +12,13 @@ export default function RootLayout() {
     <SupabaseProvider>
       <AuthSessionProvider>
         <PersonalProfileProvider>
-          <AuthGate>
-            <DiscoveryModeProvider>
-              <ItemInteractionProvider>
+          <ItemInteractionProvider>
+            <AuthGate>
+              <DiscoveryModeProvider>
                 <Stack screenOptions={{ headerShown: false }} />
-              </ItemInteractionProvider>
-            </DiscoveryModeProvider>
-          </AuthGate>
+              </DiscoveryModeProvider>
+            </AuthGate>
+          </ItemInteractionProvider>
         </PersonalProfileProvider>
       </AuthSessionProvider>
     </SupabaseProvider>

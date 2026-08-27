@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
+import { useItemInteractions } from '@/features/discovery/ItemInteractionContext';
 
 import { useAuthSession } from './AuthSessionProvider';
 import type { AuthEntryMode } from './authOperations';
@@ -23,17 +24,46 @@ import type { AuthEntryMode } from './authOperations';
 export function AuthGate({ children }: PropsWithChildren) {
   const auth = useAuthSession();
   const personalProfile = usePersonalProfile();
+  const itemInteractions = useItemInteractions();
 
   if (auth.status === 'disabled') {
     return children;
   }
 
   if (auth.status === 'signed-in') {
-    if (
-      personalProfile.status === 'ready' ||
-      personalProfile.status === 'disabled'
-    ) {
+    if (personalProfile.status === 'disabled') {
       return children;
+    }
+
+    if (personalProfile.status === 'ready') {
+      if (
+        itemInteractions.persistenceStatus === 'ready' ||
+        itemInteractions.persistenceStatus === 'disabled'
+      ) {
+        return children;
+      }
+
+      if (itemInteractions.persistenceStatus === 'error') {
+        return (
+          <AuthStatusScreen
+            title="Valintoja ei voitu ladata"
+            message={
+              itemInteractions.hydrationError ??
+              'Tarkista verkkoyhteys ja yritä uudelleen.'
+            }
+            actionLabel="Yritä uudelleen"
+            onAction={itemInteractions.retryHydration}
+          />
+        );
+      }
+
+      return (
+        <AuthStatusScreen
+          title="Kajo"
+          message="Palautetaan valintojasi…"
+          loading
+        />
+      );
     }
 
     if (

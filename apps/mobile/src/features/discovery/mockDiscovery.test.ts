@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { getMockItem, getRankedMockItems } from './mockDiscovery';
+import {
+  getMockItem,
+  getRankedMockItems,
+  MOCK_ITEM_IDS,
+} from './mockDiscovery';
 
 describe('mock discovery ranking', () => {
   it('returns only the requested generic Item type', () => {
@@ -20,8 +24,8 @@ describe('mock discovery ranking', () => {
   });
 
   it('looks up a generic Item by id', () => {
-    expect(getMockItem('movie-static-summer')).toMatchObject({
-      id: 'movie-static-summer',
+    expect(getMockItem(MOCK_ITEM_IDS.movieStaticSummer)).toMatchObject({
+      id: MOCK_ITEM_IDS.movieStaticSummer,
       itemType: 'MOVIE',
     });
     expect(getMockItem('missing-item')).toBeUndefined();
