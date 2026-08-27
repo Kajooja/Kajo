@@ -11,9 +11,9 @@ import {
 
 const IDENTITY_ROW = {
   user_id: 'user-1',
-  nickname: 'Lukija',
+  nickname: 'KeTTu',
   profile_id: 'profile-1',
-  profile_name: 'Lukija',
+  profile_name: 'KeTTu',
 };
 
 function createRpc(data: unknown = [IDENTITY_ROW]): PersonalProfileRpc {
@@ -21,10 +21,10 @@ function createRpc(data: unknown = [IDENTITY_ROW]): PersonalProfileRpc {
 }
 
 describe('validateNickname', () => {
-  it('trims and collapses whitespace in a display nickname', () => {
-    expect(validateNickname('  Kajo   Kettu  ')).toEqual({
+  it('trims whitespace while preserving display casing', () => {
+    expect(validateNickname('  KeTTu   Kajo  ')).toEqual({
       status: 'valid',
-      nickname: 'Kajo Kettu',
+      nickname: 'KeTTu Kajo',
     });
   });
 
@@ -39,11 +39,11 @@ describe('mapPersonalIdentity', () => {
     expect(mapPersonalIdentity([IDENTITY_ROW])).toEqual({
       status: 'ready',
       identity: {
-        user: { id: 'user-1', nickname: 'Lukija' },
+        user: { id: 'user-1', nickname: 'KeTTu' },
         profile: {
           id: 'profile-1',
           type: 'PERSONAL',
-          name: 'Lukija',
+          name: 'KeTTu',
           ownerUserId: 'user-1',
         },
       },
@@ -52,7 +52,7 @@ describe('mapPersonalIdentity', () => {
 
   it('distinguishes missing identity from malformed backend data', () => {
     expect(mapPersonalIdentity([])).toEqual({ status: 'missing' });
-    expect(mapPersonalIdentity([{ nickname: 'Lukija' }])).toMatchObject({
+    expect(mapPersonalIdentity([{ nickname: 'KeTTu' }])).toMatchObject({
       status: 'error',
     });
   });
@@ -68,14 +68,14 @@ describe('personal profile RPC operations', () => {
     expect(rpc).toHaveBeenCalledWith(PERSONAL_PROFILE_RPC.get, undefined);
   });
 
-  it('completes onboarding with the normalized nickname', async () => {
+  it('completes onboarding with the display-cased normalized nickname', async () => {
     const rpc = createRpc();
 
     await expect(
-      completePersonalIdentity(rpc, '  Kajo   Kettu  '),
+      completePersonalIdentity(rpc, '  KeTTu   Kajo  '),
     ).resolves.toMatchObject({ status: 'ready' });
     expect(rpc).toHaveBeenCalledWith(PERSONAL_PROFILE_RPC.complete, {
-      input_nickname: 'Kajo Kettu',
+      input_nickname: 'KeTTu Kajo',
     });
   });
 
@@ -88,7 +88,19 @@ describe('personal profile RPC operations', () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it('maps backend failures without exposing backend details', async () => {
+  it('maps a unique nickname collision to a specific user-facing message', async () => {
+    const rpc: PersonalProfileRpc = vi.fn(async () => ({
+      data: null,
+      error: { code: '23505', message: 'private duplicate detail' },
+    }));
+
+    await expect(completePersonalIdentity(rpc, 'KeTTu')).resolves.toEqual({
+      status: 'error',
+      message: 'Nimimerkki on jo käytössä. Valitse toinen.',
+    });
+  });
+
+  it('maps other backend failures without exposing backend details', async () => {
     const rpc: PersonalProfileRpc = vi.fn(async () => ({
       data: null,
       error: { message: 'private database detail' },

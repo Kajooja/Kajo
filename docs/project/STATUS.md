@@ -34,18 +34,48 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 / PR #68 delivered optional public Supabase repository-variable support for CI and APK builds without committing project values. Issue #69 is the single remaining configured phone-acceptance gate.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the first persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered the first nickname onboarding and PersonalProfile membership flow. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 / PR #68 delivered optional public Supabase repository-variable support for CI and APK builds.
 
-Configured Sprint 006 backend/build checkpoint:
+Issue #69 began the configured real-phone acceptance against CI #96. That phone test **did not pass** and exposed the auth requirements/defects now tracked in Issue #72 / PR #74. Sprint 006 and `MVP-AUTH-001`, `MVP-AUTH-002`, `MVP-PROFILE-001` remain open.
 
-- one real Supabase project exists and all three committed migrations were applied successfully in timestamp order (user-confirmed),
+## Configured phone-acceptance evidence
+
+Completed before the phone test:
+
+- one real Supabase project exists and the original three committed migrations were applied successfully in timestamp order (user-confirmed),
 - GitHub Actions repository variables `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are set without copying their values into repository documentation or chat,
-- manual `main` workflow [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) passed validation and the standalone Android APK job,
-- commit `71a33c0b0fb59ea076b691ecdfad69a073743bb8`,
-- artifact `kajo-android-standalone-71a33c0b0fb59ea076b691ecdfad69a073743bb8`, 48,408,294 bytes,
-- artifact digest `sha256:b0de89fd08a3618afa5c22473e03d476e84e723faf3ac7a22d3a232da4c66d6c`,
-- artifact expires on 2026-09-03,
-- the configured APK has not yet been validated on a real phone.
+- manual `main` workflow [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) passed validation and standalone Android APK creation,
+- tested build commit `71a33c0b0fb59ea076b691ecdfad69a073743bb8`.
+
+Real-phone findings from that build:
+
+- sign-in must accept either the unique email or the unique nickname linked to the same User,
+- nickname display casing must be preserved while uniqueness/sign-in/search are case-insensitive,
+- unknown identifier must show `Käyttäjätunnusta ei löydy.`, while a known identifier with wrong password must show `Salasana on väärin.`,
+- duplicate registration identity must guide the user with `Sinulla on jo tili. Unohditko salasanasi?`,
+- the hosted confirmation link incorrectly returned to `localhost:3000` instead of the mobile app,
+- password recovery through the account email is required for this MVP auth checkpoint,
+- the first nickname/PersonalProfile completion failed with `Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.` and blocked entry to the Room.
+
+CI #96 is therefore retained only as failure evidence and is **not** the final Sprint 006 acceptance build.
+
+## Active auth correction — Issue #72 / PR #74
+
+PR #74 currently contains:
+
+- one unique case-insensitive nickname key while preserving the stored/display nickname casing,
+- email-or-nickname password sign-in through one server-side identifier boundary,
+- deterministic not-found / wrong-password / unconfirmed-email messages,
+- registration availability checks for both email and nickname,
+- native `kajo://` confirmation and password-recovery deep-link handling,
+- password-reset request and in-app new-password flow,
+- signup-time PersonalProfile provisioning plus a corrected authenticated fallback RPC,
+- one new follow-up migration, one scoped `password-auth` Supabase Edge Function and its function configuration,
+- deterministic auth/deep-link/profile tests.
+
+PR #74 validation [CI #99](https://github.com/Kajooja/Kajo/actions/runs/33099264933) passed dependency install, lint, typecheck, tests and both iOS/Android bundle smoke tests. PR standalone APK creation is intentionally skipped; a fresh configured main APK is required after merge and hosted Supabase deployment.
+
+Google and Apple sign-in are explicitly deferred to Issue #73 after Sprint 006 acceptance; they must not expand PR #74.
 
 ## MVP progress
 
@@ -61,8 +91,8 @@ Completed through Sprint 005:
 
 Active Sprint 006 targets:
 
-- `MVP-AUTH-001` — lightweight/common register/sign-in,
-- `MVP-AUTH-002` — user-visible nickname/username,
+- `MVP-AUTH-001` — unique email + nickname registration, mobile email confirmation, email-or-nickname password sign-in and password recovery,
+- `MVP-AUTH-002` — one visible unique nickname with preserved display casing and case-insensitive identity matching,
 - `MVP-PROFILE-001` — every user has a PersonalProfile.
 
 ## Prediction and learning direction — decided, later implementation
@@ -77,19 +107,19 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 
 ## Next — exact handoff order
 
-1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Download artifact `kajo-android-standalone-71a33c0b0fb59ea076b691ecdfad69a073743bb8` from [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) before it expires on 2026-09-03.
-3. Install the APK on a real phone and run the complete Issue #69 path: registration/sign-in, nickname/PersonalProfile, BOOK and MOVIE interactions, undo, restart hydration, sign-out and sign-in persistence.
-4. Record exact pass evidence or exact reproduction evidence in Issue #69. Keep the three active MVP requirements incomplete and Sprint 006 open until the phone path passes.
-5. Keep passwords, service-role keys and tokens out of the repository, Issues, logs and chat. Do not begin Sprint 007 Event work early.
+1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work or begin Sprint 007.
+2. Finish review of Issue #72 / draft PR #74. Its CI #99 validation is green; keep the change scoped to the demonstrated auth acceptance failures.
+3. Merge PR #74 only after the final diff/repository-hygiene review is clean.
+4. In the real Supabase project, apply the new committed migration `20260827173000_auth_identifier_and_profile_fix.sql`, deploy the committed `password-auth` Edge Function/config, and allow the native `kajo://**` Auth redirect pattern. Do not make uncommitted SQL changes or expose secret/service-role keys.
+5. Run a fresh configured `main` workflow so the standalone Android APK contains the merged auth fix.
+6. Rerun Issue #69 on a real phone, including: unique email+nickname registration, confirmation link returning to Kajo, sign-in by email, sign-in by nickname with mixed casing, exact not-found/wrong-password messages, password recovery, PersonalProfile/Room entry, BOOK+MOVIE interactions, undo, restart hydration and sign-out/sign-in persistence.
+7. Record exact pass/failure evidence in Issues #69 and #72. Close the sprint and mark its three MVP requirements complete only after the whole phone path passes.
 
 ## Known issues / open decisions
 
-- Configured PersonalProfile interaction state hydrates and persists; intentionally unconfigured builds retain the accepted local mock behavior.
-- The configured CI #96 APK has not yet been accepted on a real phone; this is the only remaining Sprint 006 gate.
-- The CI #96 APK artifact expires on 2026-09-03 and must be downloaded before then.
-- Email/password is the single Sprint 006 MVP authentication method; additional providers remain outside the current scope.
-- Nickname is an MVP display name and is not globally unique; PersonalProfile ownership is unique per User.
+- PR #74 code validation is green, but its new migration/Edge Function/Auth redirect configuration has not yet been deployed to the hosted project or phone-tested.
+- The original CI #96 phone build failed Sprint 006 auth acceptance and must not be reused as the final candidate.
+- Google and Apple authentication are tracked in Issue #73 and remain outside the current acceptance fix.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
 - Final book metadata provider is not locked.
 - Current Room/theme/mock covers remain structural rather than final production artwork.
@@ -100,6 +130,7 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - `/AGENTS.md`
 - `/docs/product/MVP.md`
 - `/docs/domain/GLOSSARY.md`
+- `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
 - `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/architecture/ARCHITECTURE.md`
@@ -113,13 +144,16 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
+- `/supabase/config.toml`
+- `/supabase/functions/password-auth/index.ts`
 - `/supabase/migrations/20260826203000_backend_foundation.sql`
 - `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
 - `/supabase/migrations/20260827073000_seed_mvp_items.sql`
+- `/supabase/migrations/20260827173000_auth_identifier_and_profile_fix.sql`
 - `/.github/workflows/ci.yml`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. The Supabase project, three migrations, two public repository variables and configured CI #96 APK are ready. Issue #69 remains open only for the real-phone acceptance. The first action in a new conversation is to download the CI #96 artifact, install it and execute the documented phone path; do not begin Sprint 007 Event work early.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. Issue #69 phone acceptance exposed blocking auth defects; Issue #72 / draft PR #74 contains the scoped correction and CI #99 validation is green. The next work is final PR/hygiene review, merge, hosted Supabase migration/function/redirect deployment, fresh configured APK and the complete real-phone acceptance rerun. Do not begin Sprint 007 early.

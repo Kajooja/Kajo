@@ -78,8 +78,22 @@ Configured CI and standalone APK builds read the optional GitHub Actions
 repository variables `EXPO_PUBLIC_SUPABASE_URL` and
 `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. If both are absent, the accepted local
 mock path remains active. These values are public mobile configuration, but
-project access tokens, service-role keys and database passwords must never be
-stored in repository variables or committed files.
+project access tokens, secret/service-role keys and database passwords must
+never be stored in repository variables or committed files.
+
+Sprint 006 password authentication has one server-side identifier boundary in
+`supabase/functions/password-auth`. The mobile client may submit an email or
+nickname, but nickname-to-email resolution stays inside that Edge Function.
+The function may use Supabase secret/service-role credentials only in its
+hosted environment and must never return the resolved email or privileged key
+to the mobile client. Email/nickname existence checks intentionally support the
+MVP's explicit user-facing not-found/duplicate messages.
+
+Email confirmation and password recovery return to the native app through the
+committed `kajo://` URL scheme. Supabase Auth redirect settings must allow the
+Kajo scheme; the mobile client converts the returned auth tokens into the
+persisted Supabase session. Password recovery then updates the password through
+the authenticated client session.
 
 ## Prediction service
 

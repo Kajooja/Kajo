@@ -6,6 +6,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 |---|---|---|
 | Kajo | `Kajo` | The product/system. |
 | User | `User` | Human account/identity that can act in Kajo. |
+| Nickname / nimimerkki | `nickname` | Unique user-visible login identity linked to the User's unique authentication email. Display casing is preserved; uniqueness, sign-in and search are case-insensitive. |
 | Profile | `Profile` | Prediction and memory context. A profile is Personal or Shared. |
 | Personal profile / oma Kajo | `PersonalProfile` | A Profile representing one user's personal Kajo context. |
 | Shared profile / yhteinen Kajo | `SharedProfile` | Persistent 2-N member Profile with its own learned joint state/history/theme. |

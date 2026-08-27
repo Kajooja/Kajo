@@ -14,8 +14,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Authentication and identity
 
-- [-] `MVP-AUTH-001` User can register and sign in using at least one lightweight/common authentication method.
-- [-] `MVP-AUTH-002` Every signed-in User has a user-visible nickname/username associated with their identity.
+- [-] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
+- [-] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
 
 ## Room and theme
 

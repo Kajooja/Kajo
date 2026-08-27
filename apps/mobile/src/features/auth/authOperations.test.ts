@@ -1,20 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  checkAccountAvailability,
+  normalizeLoginIdentifier,
+  requestPasswordRecovery,
   signOut,
-  submitEmailPassword,
+  submitEmailSignUp,
+  submitIdentifierPassword,
   validateEmailPassword,
   type EmailPasswordAuthApi,
+  type PasswordAuthBridge,
 } from './authOperations';
 
 function createAuthApi(): EmailPasswordAuthApi {
   return {
-    signInWithPassword: vi.fn(async () => ({
-      data: {
-        session: { user: { id: 'user-1', email: 'reader@example.com' } },
-      },
-      error: null,
-    })),
     signUp: vi.fn(async () => ({
       data: {
         session: { user: { id: 'user-1', email: 'reader@example.com' } },
@@ -25,14 +24,24 @@ function createAuthApi(): EmailPasswordAuthApi {
   };
 }
 
+function createBridge(data: unknown): PasswordAuthBridge {
+  return {
+    invoke: vi.fn(async () => ({ data, error: null })),
+  };
+}
+
+describe('identifier normalization', () => {
+  it('matches nickname casing without changing the stored display nickname', () => {
+    expect(normalizeLoginIdentifier('  KeTTu  ')).toBe('kettu');
+  });
+});
+
 describe('validateEmailPassword', () => {
   it('normalizes email without changing the password', () => {
     expect(validateEmailPassword(' Reader@Example.com ', ' secret ')).toEqual({
       status: 'valid',
-      credentials: {
-        email: 'reader@example.com',
-        password: ' secret ',
-      },
+      email: 'reader@example.com',
+      password: ' secret ',
     });
   });
 
@@ -46,22 +55,97 @@ describe('validateEmailPassword', () => {
   });
 });
 
-describe('submitEmailPassword', () => {
-  it('uses password sign-in with normalized credentials', async () => {
+describe('submitIdentifierPassword', () => {
+  it('signs in a mixed-case nickname through the identifier bridge', async () => {
+    const bridge = createBridge({
+      status: 'authenticated',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+      userId: 'user-1',
+    });
+
+    await expect(
+      submitIdentifierPassword(bridge, ' KeTTu ', 'secret'),
+    ).resolves.toEqual({
+      status: 'session',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+      userId: 'user-1',
+    });
+    expect(bridge.invoke).toHaveBeenCalledWith({
+      action: 'sign-in',
+      identifier: 'kettu',
+      password: 'secret',
+    });
+  });
+
+  it('distinguishes a missing identifier from a wrong password', async () => {
+    const missing = createBridge({ status: 'user-not-found' });
+    const wrongPassword = createBridge({ status: 'wrong-password' });
+
+    await expect(
+      submitIdentifierPassword(missing, 'unknown', 'secret'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Käyttäjätunnusta ei löydy.',
+    });
+    await expect(
+      submitIdentifierPassword(wrongPassword, 'KeTTu', 'wrong-secret'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Salasana on väärin.',
+    });
+  });
+
+  it('reports an unconfirmed email separately', async () => {
+    const bridge = createBridge({ status: 'email-not-confirmed' });
+
+    await expect(
+      submitIdentifierPassword(bridge, 'reader@example.com', 'secret'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Sähköpostiosoitetta ei ole vielä vahvistettu. Tarkista sähköpostisi.',
+    });
+  });
+});
+
+describe('registration operations', () => {
+  it('detects an existing email or nickname without exposing account data', async () => {
+    const bridge = createBridge({ status: 'exists' });
+
+    await expect(
+      checkAccountAvailability(bridge, ' KeTTu '),
+    ).resolves.toEqual({ status: 'exists' });
+    expect(bridge.invoke).toHaveBeenCalledWith({
+      action: 'account-exists',
+      identifier: 'kettu',
+    });
+  });
+
+  it('sends the display-cased nickname and mobile confirmation redirect', async () => {
     const auth = createAuthApi();
 
     await expect(
-      submitEmailPassword(auth, 'sign-in', ' Reader@Example.com ', 'secret'),
+      submitEmailSignUp(
+        auth,
+        ' Reader@Example.com ',
+        'secret',
+        'KeTTu',
+        'kajo://auth/confirm',
+      ),
     ).resolves.toEqual({
       status: 'authenticated',
       userId: 'user-1',
       email: 'reader@example.com',
     });
-    expect(auth.signInWithPassword).toHaveBeenCalledWith({
+    expect(auth.signUp).toHaveBeenCalledWith({
       email: 'reader@example.com',
       password: 'secret',
+      options: {
+        data: { kajo_nickname: 'KeTTu' },
+        emailRedirectTo: 'kajo://auth/confirm',
+      },
     });
-    expect(auth.signUp).not.toHaveBeenCalled();
   });
 
   it('reports when registration requires email confirmation', async () => {
@@ -72,38 +156,42 @@ describe('submitEmailPassword', () => {
     });
 
     await expect(
-      submitEmailPassword(auth, 'sign-up', 'reader@example.com', 'secret'),
+      submitEmailSignUp(
+        auth,
+        'reader@example.com',
+        'secret',
+        'KeTTu',
+        'kajo://auth/confirm',
+      ),
     ).resolves.toEqual({
       status: 'confirmation-required',
       email: 'reader@example.com',
     });
   });
+});
 
-  it('maps invalid credentials without exposing a backend error', async () => {
-    const auth = createAuthApi();
-    vi.mocked(auth.signInWithPassword).mockResolvedValueOnce({
-      data: { session: null },
-      error: {
-        code: 'invalid_credentials',
-        message: 'Invalid login credentials',
-      },
+describe('password recovery', () => {
+  it('requests recovery with either login identifier', async () => {
+    const bridge = createBridge({ status: 'recovery-sent' });
+
+    await expect(requestPasswordRecovery(bridge, ' KeTTu ')).resolves.toEqual({
+      status: 'sent',
     });
-
-    await expect(
-      submitEmailPassword(auth, 'sign-in', 'reader@example.com', 'secret'),
-    ).resolves.toEqual({
-      status: 'error',
-      message: 'Sähköposti tai salasana ei täsmää.',
+    expect(bridge.invoke).toHaveBeenCalledWith({
+      action: 'request-password-reset',
+      identifier: 'kettu',
     });
   });
 
-  it('does not call Supabase when local validation fails', async () => {
-    const auth = createAuthApi();
+  it('reports a missing recovery identifier', async () => {
+    const bridge = createBridge({ status: 'user-not-found' });
 
     await expect(
-      submitEmailPassword(auth, 'sign-up', 'reader', 'secret'),
-    ).resolves.toMatchObject({ status: 'error' });
-    expect(auth.signUp).not.toHaveBeenCalled();
+      requestPasswordRecovery(bridge, 'unknown'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Käyttäjätunnusta ei löydy.',
+    });
   });
 });
 
