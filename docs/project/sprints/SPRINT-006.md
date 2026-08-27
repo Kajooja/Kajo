@@ -188,6 +188,7 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/apps/mobile/src/domain/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
+- `/supabase/migrations/20260826203000_backend_foundation.sql`
 - `/supabase/migrations/20260827071000_personal_profile_onboarding.sql`
 - `/supabase/migrations/20260827073000_seed_mvp_items.sql`
 - `/.github/workflows/ci.yml`
