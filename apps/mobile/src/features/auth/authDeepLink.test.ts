@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseAuthDeepLink } from './authDeepLink';
+import { parseAuthDeepLink, rewriteAuthSystemPath } from './authDeepLink';
 
 describe('parseAuthDeepLink', () => {
   it('creates a normal session from a confirmation link', () => {
@@ -39,5 +39,34 @@ describe('parseAuthDeepLink', () => {
       status: 'error',
       message: 'Salasanan palautuslinkki ei ole enää voimassa. Pyydä uusi linkki.',
     });
+  });
+});
+
+describe('rewriteAuthSystemPath', () => {
+  it('rewrites confirmation links to the Kajo home route before Expo Router evaluates them', () => {
+    expect(
+      rewriteAuthSystemPath(
+        'kajo://auth/confirm#access_token=access-1&refresh_token=refresh-1',
+      ),
+    ).toBe('/');
+  });
+
+  it('rewrites recovery links to the Kajo home route while AuthGate handles recovery mode', () => {
+    expect(
+      rewriteAuthSystemPath(
+        'kajo://auth/recovery#access_token=access-1&refresh_token=refresh-1',
+      ),
+    ).toBe('/');
+  });
+
+  it('also handles an already normalized auth route', () => {
+    expect(rewriteAuthSystemPath('/auth/confirm?code=test')).toBe('/');
+  });
+
+  it('leaves unrelated links unchanged', () => {
+    expect(rewriteAuthSystemPath('https://example.com/auth/confirm')).toBe(
+      'https://example.com/auth/confirm',
+    );
+    expect(rewriteAuthSystemPath('/discovery/books')).toBe('/discovery/books');
   });
 });

@@ -11,6 +11,34 @@ export type AuthDeepLinkResult =
       recovery: boolean;
     };
 
+export function rewriteAuthSystemPath(path: string): string {
+  const normalizedPath = path.split(/[?#]/, 1)[0];
+
+  if (
+    normalizedPath === '/auth/confirm' ||
+    normalizedPath === 'auth/confirm' ||
+    normalizedPath === '/auth/recovery' ||
+    normalizedPath === 'auth/recovery'
+  ) {
+    return '/';
+  }
+
+  let parsed: URL;
+
+  try {
+    parsed = new URL(path);
+  } catch {
+    return path;
+  }
+
+  if (parsed.protocol !== 'kajo:' || parsed.hostname !== 'auth') {
+    return path;
+  }
+
+  const route = parsed.pathname.replace(/^\//, '');
+  return route === 'confirm' || route === 'recovery' ? '/' : path;
+}
+
 export function parseAuthDeepLink(url: string): AuthDeepLinkResult {
   let parsed: URL;
 
