@@ -8,6 +8,7 @@ import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from './DiscoveryModeContext';
+import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
 import {
   getConsumedItems,
@@ -95,6 +96,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             </Text>
           </Pressable>
         </View>
+
+        <InteractionPersistenceNotice theme={theme} />
 
         <FlatList
           data={items}
