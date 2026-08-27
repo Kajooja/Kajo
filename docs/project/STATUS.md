@@ -34,7 +34,18 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 / PR #68 delivered optional public Supabase repository-variable support for CI and APK builds without committing project values. Issue #69 is the single remaining configured-project migration, build and phone-acceptance gate.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 / PR #68 delivered optional public Supabase repository-variable support for CI and APK builds without committing project values. Issue #69 is the single remaining configured phone-acceptance gate.
+
+Configured Sprint 006 backend/build checkpoint:
+
+- one real Supabase project exists and all three committed migrations were applied successfully in timestamp order (user-confirmed),
+- GitHub Actions repository variables `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are set without copying their values into repository documentation or chat,
+- manual `main` workflow [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) passed validation and the standalone Android APK job,
+- commit `71a33c0b0fb59ea076b691ecdfad69a073743bb8`,
+- artifact `kajo-android-standalone-71a33c0b0fb59ea076b691ecdfad69a073743bb8`, 48,408,294 bytes,
+- artifact digest `sha256:b0de89fd08a3618afa5c22473e03d476e84e723faf3ac7a22d3a232da4c66d6c`,
+- artifact expires on 2026-09-03,
+- the configured APK has not yet been validated on a real phone.
 
 ## MVP progress
 
@@ -67,15 +78,16 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Complete Issue #69 against one real Supabase project.
-3. Apply the three committed migrations in timestamp order and set only the two documented public GitHub Actions repository variables.
-4. Keep passwords, service-role keys and tokens out of the repository, Issues, logs and chat.
-5. Run one configured Sprint 006 phone acceptance across registration/sign-in, nickname/PersonalProfile, interaction persistence after restart and sign-out.
+2. Download artifact `kajo-android-standalone-71a33c0b0fb59ea076b691ecdfad69a073743bb8` from [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) before it expires on 2026-09-03.
+3. Install the APK on a real phone and run the complete Issue #69 path: registration/sign-in, nickname/PersonalProfile, BOOK and MOVIE interactions, undo, restart hydration, sign-out and sign-in persistence.
+4. Record exact pass evidence or exact reproduction evidence in Issue #69. Keep the three active MVP requirements incomplete and Sprint 006 open until the phone path passes.
+5. Keep passwords, service-role keys and tokens out of the repository, Issues, logs and chat. Do not begin Sprint 007 Event work early.
 
 ## Known issues / open decisions
 
 - Configured PersonalProfile interaction state hydrates and persists; intentionally unconfigured builds retain the accepted local mock behavior.
-- A Supabase project must still be created; the three migrations are not yet applied and the two public GitHub Actions repository variables are not yet set.
+- The configured CI #96 APK has not yet been accepted on a real phone; this is the only remaining Sprint 006 gate.
+- The CI #96 APK artifact expires on 2026-09-03 and must be downloaded before then.
 - Email/password is the single Sprint 006 MVP authentication method; additional providers remain outside the current scope.
 - Nickname is an MVP display name and is not globally unique; PersonalProfile ownership is unique per User.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
@@ -110,4 +122,4 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. All repository implementation is merged through PR #68; Issue #69 is the current external migration, configured-build and single phone-acceptance gate. Do not begin Sprint 007 Event work early.
+Sprint 005 is accepted and complete. Sprint 006 is the only active sprint. The Supabase project, three migrations, two public repository variables and configured CI #96 APK are ready. Issue #69 remains open only for the real-phone acceptance. The first action in a new conversation is to download the CI #96 artifact, install it and execute the documented phone path; do not begin Sprint 007 Event work early.
