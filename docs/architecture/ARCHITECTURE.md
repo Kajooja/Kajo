@@ -74,6 +74,13 @@ MVP backend direction:
 
 Presentation components should use service/data boundaries, not arbitrary direct Supabase calls.
 
+Configured CI and standalone APK builds read the optional GitHub Actions
+repository variables `EXPO_PUBLIC_SUPABASE_URL` and
+`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. If both are absent, the accepted local
+mock path remains active. These values are public mobile configuration, but
+project access tokens, service-role keys and database passwords must never be
+stored in repository variables or committed files.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:

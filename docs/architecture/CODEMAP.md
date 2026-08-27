@@ -39,6 +39,6 @@ supabase/migrations/
 | Prediction service | `services/prediction/` | Later sprint |
 | DB migrations | `supabase/migrations/` | Sprint 006 foundation, unique PersonalProfile ownership, authenticated atomic identity RPCs and 12 stable-UUID MVP Item seeds; explicit grants and membership-based interaction RLS remain the authorization base |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
-| CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; `main` also builds/verifies/uploads a standalone Android release APK |
+| CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; optional public Supabase repository variables feed Expo, and `main` also builds/verifies/uploads a standalone Android release APK |
 
 Do not create empty feature folders merely to match the target architecture.

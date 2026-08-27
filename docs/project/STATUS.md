@@ -34,7 +34,7 @@ Delivered through Sprint 005:
 
 Sprint 006 is **ACTIVE**. Its goal is the smallest real Supabase/PostgreSQL, authentication, identity and persistence foundation that can replace appropriate Sprint 005 in-memory state through a clear data boundary without rewriting presentation semantics.
 
-Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 is the current step: seed the 12 stable-ID MVP Items and persist/hydrate the accepted generic interaction state.
+Issue #57 / PR #58 delivered the reproducible User/Profile/ProfileMember/Item/current-interaction schema and least-privilege RLS foundation. Issue #59 / PR #60 delivered the package-manager-installed Supabase/Expo dependencies, public-only configuration contract and one root-scoped client/data boundary. Issue #61 / PR #62 delivered the persisted email/password authentication session and entry flow. Issue #63 / PR #64 delivered user-visible nickname onboarding plus one atomically created and hydrated PersonalProfile membership. Issue #65 / PR #66 delivered 12 stable-ID MVP Items and configured PersonalProfile interaction persistence/hydration. Issue #67 is the current acceptance-preparation step: pass optional public Supabase repository variables into CI and APK builds without committing project values.
 
 ## MVP progress
 
@@ -67,15 +67,15 @@ Meaningful actions become durable learning evidence in Sprint 007. Sprint 008 in
 ## Next — exact handoff order
 
 1. Follow `sprints/SPRINT-006.md`; do not reopen Sprint 005 work.
-2. Complete Issue #65 through canonical CI and merge generic Item interaction persistence/hydration.
-3. Apply the committed migrations to a real Supabase project and configure the public mobile client values.
+2. Complete Issue #67 through canonical CI and merge configured acceptance-build support.
+3. Apply the three committed migrations to a real Supabase project in timestamp order.
 4. Keep real credentials out of the repository and preserve the current presentation API while adding persistence underneath it.
 5. Run one Sprint 006 phone acceptance across registration/sign-in, nickname/PersonalProfile, interaction persistence after restart and sign-out.
 
 ## Known issues / open decisions
 
 - Configured PersonalProfile interaction state hydrates and persists; intentionally unconfigured builds retain the accepted local mock behavior.
-- A Supabase project and its non-secret public client configuration will be required for end-to-end backend validation.
+- A Supabase project must still be created; the three migrations are not yet applied and the two public GitHub Actions repository variables are not yet set.
 - Email/password is the single Sprint 006 MVP authentication method; additional providers remain outside the current scope.
 - Nickname is an MVP display name and is not globally unique; PersonalProfile ownership is unique per User.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
