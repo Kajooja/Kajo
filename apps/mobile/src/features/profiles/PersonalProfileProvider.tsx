@@ -67,7 +67,7 @@ export function PersonalProfileProvider({ children }: PropsWithChildren) {
 
       return {
         data,
-        error: error ? { message: error.message } : null,
+        error: error ? { code: error.code, message: error.message } : null,
       };
     },
     [connection],
