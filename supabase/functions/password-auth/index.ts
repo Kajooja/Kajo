@@ -33,20 +33,31 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const secretKey =
+    readNamedKey('SUPABASE_SECRET_KEYS') ??
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const publishableKey =
+    readNamedKey('SUPABASE_PUBLISHABLE_KEYS') ??
+    Deno.env.get('SUPABASE_ANON_KEY');
 
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!supabaseUrl || !secretKey || !publishableKey) {
     return json({ status: 'error' }, 500);
   }
 
-  const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
+  const adminClient = createClient(supabaseUrl, secretKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+  const authClient = createClient(supabaseUrl, publishableKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
   });
 
-  const { data: resolvedEmail, error: resolutionError } = await serviceClient.rpc(
+  const { data: resolvedEmail, error: resolutionError } = await adminClient.rpc(
     'resolve_login_email',
     { input_identifier: identifier },
   );
@@ -66,7 +77,7 @@ Deno.serve(async (request) => {
       return json({ status: 'user-not-found' });
     }
 
-    const { error } = await serviceClient.auth.resetPasswordForEmail(email, {
+    const { error } = await authClient.auth.resetPasswordForEmail(email, {
       redirectTo: RECOVERY_REDIRECT,
     });
 
@@ -85,7 +96,7 @@ Deno.serve(async (request) => {
     return json({ status: 'wrong-password' });
   }
 
-  const { data, error } = await serviceClient.auth.signInWithPassword({
+  const { data, error } = await authClient.auth.signInWithPassword({
     email,
     password: body.password,
   });
@@ -121,6 +132,30 @@ function normalizeIdentifier(value: unknown): string | null {
 
   const normalized = value.trim().toLowerCase();
   return normalized.length >= 2 && normalized.length <= 320 ? normalized : null;
+}
+
+function readNamedKey(variableName: string): string | null {
+  const raw = Deno.env.get(variableName);
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const keys = JSON.parse(raw) as Record<string, unknown>;
+    const defaultKey = keys.default;
+
+    if (typeof defaultKey === 'string' && defaultKey.length > 0) {
+      return defaultKey;
+    }
+
+    const firstKey = Object.values(keys).find(
+      (value): value is string => typeof value === 'string' && value.length > 0,
+    );
+    return firstKey ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function json(body: unknown, status = 200): Response {
