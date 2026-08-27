@@ -139,6 +139,17 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - the exact external handoff is: create one Supabase project, apply the three migrations in timestamp order, set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as repository variables, then run the final configured workflow and phone acceptance,
 - no application feature, schema, Event or Prediction scope is added.
 
+### Configured project and CI #96 checkpoint — Issue #69
+
+- one real Supabase project was created and all three committed migrations were applied successfully in timestamp order (user-confirmed),
+- the two documented public GitHub Actions repository variables were set without recording their values,
+- manual `main` workflow [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) passed validation, release APK assembly, embedded-bundle verification and artifact upload,
+- accepted build candidate commit: `71a33c0b0fb59ea076b691ecdfad69a073743bb8`,
+- artifact: `kajo-android-standalone-71a33c0b0fb59ea076b691ecdfad69a073743bb8`,
+- digest: `sha256:b0de89fd08a3618afa5c22473e03d476e84e723faf3ac7a22d3a232da4c66d6c`,
+- artifact expiry: 2026-09-03,
+- real-phone acceptance remains pending, so the sprint and its three active MVP requirements remain open.
+
 ## Decisions
 
 - Follow the existing Supabase/PostgreSQL/Auth direction; this sprint does not reopen the backend choice.
@@ -157,9 +168,8 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 
 ## Known issues
 
-- End-to-end backend and identity validation needs a configured Supabase project and public mobile client values.
-- The committed migrations have not yet been applied to a real Supabase project in this environment.
-- GitHub Actions repository variables are not yet configured.
+- The configured CI #96 APK has not yet passed the Issue #69 real-phone acceptance path.
+- The CI #96 artifact expires on 2026-09-03 and must be downloaded before then.
 
 ## Important files
 
@@ -182,6 +192,6 @@ Issue #55 closes Sprint 005 and opens this sprint; it does not implement backend
 - `/supabase/migrations/20260827073000_seed_mvp_items.sql`
 - `/.github/workflows/ci.yml`
 
-## Final handoff
+## Mid-sprint handoff — 2026-08-27
 
-Issue #67 / PR #68 passed canonical CI and merged. Complete Issue #69 by applying `20260826203000_backend_foundation.sql`, `20260827071000_personal_profile_onboarding.sql` and `20260827073000_seed_mvp_items.sql` to one real Supabase project in that order. Set only `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as GitHub Actions repository variables, run the manual `main` workflow and validate its APK once on a phone. Close the sprint only after that evidence is recorded; do not begin Event or Prediction work early.
+Project creation, all three migrations, the two public repository variables and configured [CI #96](https://github.com/Kajooja/Kajo/actions/runs/33080640204) are complete. Download its identified APK artifact before 2026-09-03, install it on a real phone and execute every acceptance step in Issue #69. Record exact pass evidence or exact reproduction evidence. Do not close Sprint 006, mark `MVP-AUTH-001`, `MVP-AUTH-002` or `MVP-PROFILE-001` complete, or begin Sprint 007 until that phone path passes.
