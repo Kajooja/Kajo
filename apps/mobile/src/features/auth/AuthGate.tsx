@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
-import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
 import { useItemInteractions } from '@/features/discovery/ItemInteractionContext';
+import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
+import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 
 import { useAuthSession } from './AuthSessionProvider';
 import type { AuthEntryMode } from './authOperations';
@@ -31,6 +31,10 @@ export function AuthGate({ children }: PropsWithChildren) {
   }
 
   if (auth.status === 'signed-in') {
+    if (auth.recoveryMode) {
+      return <PasswordRecoveryScreen />;
+    }
+
     if (personalProfile.status === 'disabled') {
       return children;
     }
@@ -116,8 +120,10 @@ export function AuthGate({ children }: PropsWithChildren) {
     return (
       <AuthStatusScreen
         title="Istuntoa ei voitu ladata"
-        message="Tarkista verkkoyhteys ja yritä uudelleen."
-        actionLabel="Yritä uudelleen"
+        message={
+          auth.message ?? 'Tarkista verkkoyhteys ja yritä uudelleen.'
+        }
+        actionLabel="Jatka"
         onAction={() => void auth.retrySession()}
       />
     );
@@ -173,97 +179,66 @@ function NicknameEntryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <StatusBar style="light" />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.entryContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.intro}>
-            <Text style={styles.kicker}>OMA KAJO</Text>
-            <Text style={styles.title}>Millä nimellä sinut tunnetaan?</Text>
-            <Text style={styles.message}>
-              Nimimerkki näkyy omassa huoneessasi. Sen ei tarvitse olla
-              yksilöllinen käyttäjätunnus.
-            </Text>
-          </View>
+    <AuthFormShell>
+      <View style={styles.intro}>
+        <Text style={styles.kicker}>OMA KAJO</Text>
+        <Text style={styles.title}>Luo nimimerkki</Text>
+        <Text style={styles.message}>
+          Nimimerkki on yksilöllinen kirjautumistunnuksesi. Kirjainkoko säilyy
+          näkyvissä, mutta sillä ei ole merkitystä kirjautumisessa tai haussa.
+        </Text>
+      </View>
 
-          <View style={styles.form}>
-            <Text style={styles.label}>Nimimerkki</Text>
-            <TextInput
-              accessibilityLabel="Nimimerkki"
-              autoCapitalize="words"
-              autoCorrect={false}
-              maxLength={32}
-              onChangeText={setNickname}
-              onSubmitEditing={() => void submit()}
-              placeholder="Esimerkiksi Kajo Kettu"
-              placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
-              returnKeyType="done"
-              style={styles.input}
-              value={nickname}
-            />
+      <View style={styles.form}>
+        <Text style={styles.label}>Nimimerkki</Text>
+        <TextInput
+          accessibilityLabel="Nimimerkki"
+          autoCapitalize="none"
+          autoCorrect={false}
+          maxLength={32}
+          onChangeText={setNickname}
+          onSubmitEditing={() => void submit()}
+          placeholder="Esimerkiksi KeTTu"
+          placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+          returnKeyType="done"
+          style={styles.input}
+          value={nickname}
+        />
 
-            {feedback ? (
-              <Text accessibilityLiveRegion="polite" style={styles.feedback}>
-                {feedback}
-              </Text>
-            ) : null}
+        <FeedbackText feedback={feedback} />
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={submitting || signingOut}
-              onPress={() => void submit()}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && styles.pressed,
-                submitting && styles.disabled,
-              ]}
-            >
-              {submitting ? (
-                <ActivityIndicator color={PERSONAL_ROOM_BASE_THEME.appBackground} />
-              ) : (
-                <Text style={styles.primaryButtonText}>Jatka omaan Kajoosi</Text>
-              )}
-            </Pressable>
+        <PrimaryButton
+          label="Jatka omaan Kajoosi"
+          loading={submitting}
+          disabled={submitting || signingOut}
+          onPress={() => void submit()}
+        />
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={submitting || signingOut}
-              onPress={() => void signOut()}
-              style={({ pressed }) => [
-                styles.switchButton,
-                pressed && styles.pressed,
-                signingOut && styles.disabled,
-              ]}
-            >
-              <Text style={styles.switchButtonText}>
-                {signingOut ? 'Kirjaudutaan ulos…' : 'Kirjaudu ulos'}
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <SwitchButton
+          label={signingOut ? 'Kirjaudutaan ulos…' : 'Kirjaudu ulos'}
+          disabled={submitting || signingOut}
+          onPress={() => void signOut()}
+        />
+      </View>
+    </AuthFormShell>
   );
 }
 
 function AuthEntryScreen() {
-  const { signIn, signUp } = useAuthSession();
+  const { signIn, signUp, requestPasswordRecovery } = useAuthSession();
   const [mode, setMode] = useState<AuthEntryMode>('sign-in');
+  const [identifier, setIdentifier] = useState('');
   const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [recoverySubmitting, setRecoverySubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const isSignIn = mode === 'sign-in';
 
   async function submit() {
-    if (submitting) {
+    if (submitting || recoverySubmitting) {
       return;
     }
 
@@ -272,8 +247,8 @@ function AuthEntryScreen() {
     setFeedback(null);
 
     const result = isSignIn
-      ? await signIn(email, password)
-      : await signUp(email, password);
+      ? await signIn(identifier, password)
+      : await signUp(email, nickname, password);
 
     if (result.status === 'authenticated') {
       return;
@@ -283,42 +258,79 @@ function AuthEntryScreen() {
       setFeedback(result.message);
     } else {
       setPassword('');
-      setFeedback(`Vahvistusviesti lähetettiin osoitteeseen ${result.email}.`);
+      setFeedback(
+        `Vahvistusviesti lähetettiin osoitteeseen ${result.email}. ` +
+          'Avaa viestin vahvistuslinkki tällä puhelimella. Kajo avautuu vahvistuksen jälkeen.',
+      );
     }
 
     setSubmitting(false);
   }
 
-  function switchMode() {
-    setMode(isSignIn ? 'sign-up' : 'sign-in');
+  async function requestRecovery() {
+    if (submitting || recoverySubmitting) {
+      return;
+    }
+
+    if (!isSignIn) {
+      switchMode('sign-in');
+      setFeedback('Kirjaudu tai palauta salasana sähköpostilla tai nimimerkillä.');
+      return;
+    }
+
+    Keyboard.dismiss();
+    setRecoverySubmitting(true);
+    setFeedback(null);
+    const result = await requestPasswordRecovery(identifier);
+
+    setFeedback(
+      result.status === 'sent'
+        ? 'Salasanan palautuslinkki lähetettiin tilin sähköpostiin. Avaa linkki tällä puhelimella.'
+        : result.message,
+    );
+    setRecoverySubmitting(false);
+  }
+
+  function switchMode(nextMode?: AuthEntryMode) {
+    const targetMode = nextMode ?? (isSignIn ? 'sign-up' : 'sign-in');
+    setMode(targetMode);
     setPassword('');
     setFeedback(null);
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <StatusBar style="light" />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.entryContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.intro}>
-            <Text style={styles.kicker}>KAJO</Text>
-            <Text style={styles.title}>
-              {isSignIn ? 'Tervetuloa takaisin' : 'Luo oma Kajo'}
-            </Text>
-            <Text style={styles.message}>
-              {isSignIn
-                ? 'Kirjaudu jatkaaksesi omaan huoneeseesi.'
-                : 'Aloita sähköpostilla ja salasanalla.'}
-            </Text>
-          </View>
+    <AuthFormShell>
+      <View style={styles.intro}>
+        <Text style={styles.kicker}>KAJO</Text>
+        <Text style={styles.title}>
+          {isSignIn ? 'Tervetuloa takaisin' : 'Luo oma Kajo'}
+        </Text>
+        <Text style={styles.message}>
+          {isSignIn
+            ? 'Kirjaudu sähköpostilla tai nimimerkillä.'
+            : 'Luo tili sähköpostilla, yksilöllisellä nimimerkillä ja salasanalla.'}
+        </Text>
+      </View>
 
-          <View style={styles.form}>
+      <View style={styles.form}>
+        {isSignIn ? (
+          <>
+            <Text style={styles.label}>Sähköposti tai nimimerkki</Text>
+            <TextInput
+              accessibilityLabel="Sähköposti tai nimimerkki"
+              autoCapitalize="none"
+              autoComplete="username"
+              autoCorrect={false}
+              onChangeText={setIdentifier}
+              placeholder="sinä@esimerkki.fi tai KeTTu"
+              placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+              returnKeyType="next"
+              style={styles.input}
+              value={identifier}
+            />
+          </>
+        ) : (
+          <>
             <Text style={styles.label}>Sähköposti</Text>
             <TextInput
               accessibilityLabel="Sähköposti"
@@ -334,65 +346,233 @@ function AuthEntryScreen() {
               value={email}
             />
 
-            <Text style={styles.label}>Salasana</Text>
+            <Text style={styles.label}>Luo nimimerkki</Text>
             <TextInput
-              accessibilityLabel="Salasana"
+              accessibilityLabel="Luo nimimerkki"
               autoCapitalize="none"
-              autoComplete={isSignIn ? 'current-password' : 'new-password'}
-              onChangeText={setPassword}
-              onSubmitEditing={() => void submit()}
-              placeholder="Vähintään 6 merkkiä"
+              autoComplete="username-new"
+              autoCorrect={false}
+              maxLength={32}
+              onChangeText={setNickname}
+              placeholder="Esimerkiksi KeTTu"
               placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
-              returnKeyType="go"
-              secureTextEntry
+              returnKeyType="next"
               style={styles.input}
-              value={password}
+              value={nickname}
             />
+          </>
+        )}
 
-            {feedback ? (
-              <Text accessibilityLiveRegion="polite" style={styles.feedback}>
-                {feedback}
-              </Text>
-            ) : null}
+        <Text style={styles.label}>Salasana</Text>
+        <TextInput
+          accessibilityLabel="Salasana"
+          autoCapitalize="none"
+          autoComplete={isSignIn ? 'current-password' : 'new-password'}
+          onChangeText={setPassword}
+          onSubmitEditing={() => void submit()}
+          placeholder="Vähintään 6 merkkiä"
+          placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+          returnKeyType="go"
+          secureTextEntry
+          style={styles.input}
+          value={password}
+        />
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={submitting}
-              onPress={() => void submit()}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && styles.pressed,
-                submitting && styles.disabled,
-              ]}
-            >
-              {submitting ? (
-                <ActivityIndicator color={PERSONAL_ROOM_BASE_THEME.appBackground} />
-              ) : (
-                <Text style={styles.primaryButtonText}>
-                  {isSignIn ? 'Kirjaudu' : 'Luo tili'}
-                </Text>
-              )}
-            </Pressable>
+        <FeedbackText feedback={feedback} />
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={submitting}
-              onPress={switchMode}
-              style={({ pressed }) => [
-                styles.switchButton,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={styles.switchButtonText}>
-                {isSignIn
-                  ? 'Ei vielä tiliä? Luo tili'
-                  : 'Onko sinulla jo tili? Kirjaudu'}
-              </Text>
-            </Pressable>
-          </View>
+        <PrimaryButton
+          label={isSignIn ? 'Kirjaudu' : 'Luo tili'}
+          loading={submitting}
+          disabled={submitting || recoverySubmitting}
+          onPress={() => void submit()}
+        />
+
+        <SwitchButton
+          label={
+            recoverySubmitting
+              ? 'Lähetetään palautuslinkkiä…'
+              : 'Unohditko salasanasi?'
+          }
+          disabled={submitting || recoverySubmitting}
+          onPress={() => void requestRecovery()}
+        />
+
+        <SwitchButton
+          label={
+            isSignIn
+              ? 'Ei vielä tiliä? Luo tili'
+              : 'Onko sinulla jo tili? Kirjaudu'
+          }
+          disabled={submitting || recoverySubmitting}
+          onPress={() => switchMode()}
+        />
+      </View>
+    </AuthFormShell>
+  );
+}
+
+function PasswordRecoveryScreen() {
+  const auth = useAuthSession();
+  const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  async function submit() {
+    if (submitting) {
+      return;
+    }
+
+    Keyboard.dismiss();
+    setFeedback(null);
+
+    if (password !== confirmation) {
+      setFeedback('Salasanat eivät täsmää.');
+      return;
+    }
+
+    setSubmitting(true);
+    const result = await auth.updatePassword(password);
+
+    if (result.status === 'error') {
+      setFeedback(result.message);
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <AuthFormShell>
+      <View style={styles.intro}>
+        <Text style={styles.kicker}>KAJO</Text>
+        <Text style={styles.title}>Aseta uusi salasana</Text>
+        <Text style={styles.message}>
+          Palautuslinkki on vahvistettu. Luo tilillesi uusi salasana.
+        </Text>
+      </View>
+
+      <View style={styles.form}>
+        <Text style={styles.label}>Uusi salasana</Text>
+        <TextInput
+          accessibilityLabel="Uusi salasana"
+          autoCapitalize="none"
+          autoComplete="new-password"
+          onChangeText={setPassword}
+          placeholder="Vähintään 6 merkkiä"
+          placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+          returnKeyType="next"
+          secureTextEntry
+          style={styles.input}
+          value={password}
+        />
+
+        <Text style={styles.label}>Uusi salasana uudelleen</Text>
+        <TextInput
+          accessibilityLabel="Uusi salasana uudelleen"
+          autoCapitalize="none"
+          autoComplete="new-password"
+          onChangeText={setConfirmation}
+          onSubmitEditing={() => void submit()}
+          placeholder="Kirjoita salasana uudelleen"
+          placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
+          returnKeyType="done"
+          secureTextEntry
+          style={styles.input}
+          value={confirmation}
+        />
+
+        <FeedbackText feedback={feedback} />
+
+        <PrimaryButton
+          label="Tallenna uusi salasana"
+          loading={submitting}
+          disabled={submitting}
+          onPress={() => void submit()}
+        />
+      </View>
+    </AuthFormShell>
+  );
+}
+
+function AuthFormShell({ children }: PropsWithChildren) {
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <StatusBar style="light" />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.entryContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+function FeedbackText({ feedback }: { feedback: string | null }) {
+  return feedback ? (
+    <Text accessibilityLiveRegion="polite" style={styles.feedback}>
+      {feedback}
+    </Text>
+  ) : null;
+}
+
+interface PrimaryButtonProps {
+  label: string;
+  loading: boolean;
+  disabled: boolean;
+  onPress: () => void;
+}
+
+function PrimaryButton({
+  label,
+  loading,
+  disabled,
+  onPress,
+}: PrimaryButtonProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.primaryButton,
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={PERSONAL_ROOM_BASE_THEME.appBackground} />
+      ) : (
+        <Text style={styles.primaryButtonText}>{label}</Text>
+      )}
+    </Pressable>
+  );
+}
+
+interface SwitchButtonProps {
+  label: string;
+  disabled: boolean;
+  onPress: () => void;
+}
+
+function SwitchButton({ label, disabled, onPress }: SwitchButtonProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.switchButton,
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
+    >
+      <Text style={styles.switchButtonText}>{label}</Text>
+    </Pressable>
   );
 }
 
