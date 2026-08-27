@@ -8,37 +8,69 @@ import {
   type PropsWithChildren,
 } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
+import { validateNickname } from '@/features/profiles/personalProfileOperations';
 
 import {
+  accountExistsMessage,
+  checkAccountAvailability,
+  MINIMUM_PASSWORD_LENGTH,
+  requestPasswordRecovery as requestPasswordRecoveryWithApi,
   signOut as signOutWithApi,
-  submitEmailPassword,
+  submitEmailSignUp,
+  submitIdentifierPassword,
   type AuthSubmissionResult,
+  type PasswordAuthBridge,
+  type PasswordRecoveryRequestResult,
   type SignOutResult,
 } from './authOperations';
+import {
+  AUTH_CONFIRM_REDIRECT,
+  parseAuthDeepLink,
+} from './authDeepLink';
 
 export type AuthSessionSnapshot =
   | { status: 'disabled' }
   | { status: 'configuration-error' }
   | { status: 'loading' }
-  | { status: 'session-error' }
+  | { status: 'session-error'; message?: string }
   | { status: 'signed-out' }
   | { status: 'signed-in'; userId: string };
 
+export type PasswordUpdateResult =
+  | { status: 'updated' }
+  | { status: 'error'; message: string };
+
 interface AuthSessionActions {
-  signIn: (email: string, password: string) => Promise<AuthSubmissionResult>;
-  signUp: (email: string, password: string) => Promise<AuthSubmissionResult>;
+  signIn: (
+    identifier: string,
+    password: string,
+  ) => Promise<AuthSubmissionResult>;
+  signUp: (
+    email: string,
+    nickname: string,
+    password: string,
+  ) => Promise<AuthSubmissionResult>;
+  requestPasswordRecovery: (
+    identifier: string,
+  ) => Promise<PasswordRecoveryRequestResult>;
+  updatePassword: (password: string) => Promise<PasswordUpdateResult>;
   signOut: () => Promise<SignOutResult>;
   retrySession: () => Promise<void>;
 }
 
-type AuthSessionContextValue = AuthSessionSnapshot & AuthSessionActions;
+type AuthSessionContextValue = AuthSessionSnapshot &
+  AuthSessionActions & {
+    recoveryMode: boolean;
+  };
 
 const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
 export function AuthSessionProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [snapshot, setSnapshot] = useState<AuthSessionSnapshot>(() => {
     if (connection.status === 'unconfigured') {
       return { status: 'disabled' };
@@ -51,6 +83,30 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     return { status: 'loading' };
   });
 
+  const passwordAuthBridge = useMemo<PasswordAuthBridge>(
+    () => ({
+      invoke: async (request) => {
+        if (connection.status !== 'configured') {
+          return {
+            data: null,
+            error: { message: 'Supabase connection unavailable' },
+          };
+        }
+
+        const { data, error } = await connection.client.functions.invoke(
+          'password-auth',
+          { body: request },
+        );
+
+        return {
+          data,
+          error: error ? { message: error.message } : null,
+        };
+      },
+    }),
+    [connection],
+  );
+
   useEffect(() => {
     if (connection.status !== 'configured') {
       return;
@@ -61,8 +117,14 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     const { client } = connection;
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
+    } = client.auth.onAuthStateChange((event, session) => {
       authEventObserved = true;
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true);
+      } else if (event === 'SIGNED_OUT') {
+        setRecoveryMode(false);
+      }
 
       if (active) {
         setSnapshot(getSnapshotForSession(session));
@@ -94,46 +156,204 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     };
   }, [connection]);
 
+  useEffect(() => {
+    if (connection.status !== 'configured') {
+      return;
+    }
+
+    let active = true;
+    const { client } = connection;
+
+    async function handleAuthUrl(url: string) {
+      const parsed = parseAuthDeepLink(url);
+
+      if (!active || parsed.status === 'ignored') {
+        return;
+      }
+
+      if (parsed.status === 'error') {
+        setSnapshot({ status: 'session-error', message: parsed.message });
+        return;
+      }
+
+      setRecoveryMode(parsed.recovery);
+      const { data, error } = await client.auth.setSession({
+        access_token: parsed.accessToken,
+        refresh_token: parsed.refreshToken,
+      });
+
+      if (!active) {
+        return;
+      }
+
+      setSnapshot(
+        error || !data.session
+          ? {
+              status: 'session-error',
+              message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
+            }
+          : getSnapshotForSession(data.session),
+      );
+    }
+
+    void Linking.getInitialURL().then((url) => {
+      if (url) {
+        void handleAuthUrl(url);
+      }
+    });
+
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      void handleAuthUrl(url);
+    });
+
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, [connection]);
+
   const signIn = useCallback(
-    async (email: string, password: string) => {
+    async (identifier: string, password: string): Promise<AuthSubmissionResult> => {
       if (connection.status !== 'configured') {
         return unavailableAuthResult();
       }
 
-      const result = await submitEmailPassword(
-        connection.client.auth,
-        'sign-in',
-        email,
+      const result = await submitIdentifierPassword(
+        passwordAuthBridge,
+        identifier,
         password,
       );
 
+      if (result.status === 'error') {
+        return result;
+      }
+
+      const { data, error } = await connection.client.auth.setSession({
+        access_token: result.accessToken,
+        refresh_token: result.refreshToken,
+      });
+
+      if (error || !data.session) {
+        return unavailableAuthResult();
+      }
+
+      setRecoveryMode(false);
+      setSnapshot({ status: 'signed-in', userId: result.userId });
+      return { status: 'authenticated', userId: result.userId };
+    },
+    [connection, passwordAuthBridge],
+  );
+
+  const signUp = useCallback(
+    async (email: string, nicknameInput: string, password: string) => {
+      if (connection.status !== 'configured') {
+        return unavailableAuthResult();
+      }
+
+      const nicknameValidation = validateNickname(nicknameInput);
+
+      if (nicknameValidation.status === 'invalid') {
+        return {
+          status: 'error' as const,
+          message: nicknameValidation.message,
+        };
+      }
+
+      const emailAvailability = await checkAccountAvailability(
+        passwordAuthBridge,
+        email,
+      );
+
+      if (emailAvailability.status === 'error') {
+        return { status: 'error' as const, message: emailAvailability.message };
+      }
+
+      if (emailAvailability.status === 'exists') {
+        return { status: 'error' as const, message: accountExistsMessage() };
+      }
+
+      const nicknameAvailability = await checkAccountAvailability(
+        passwordAuthBridge,
+        nicknameValidation.nickname,
+      );
+
+      if (nicknameAvailability.status === 'error') {
+        return {
+          status: 'error' as const,
+          message: nicknameAvailability.message,
+        };
+      }
+
+      if (nicknameAvailability.status === 'exists') {
+        return { status: 'error' as const, message: accountExistsMessage() };
+      }
+
+      const result = await submitEmailSignUp(
+        connection.client.auth,
+        email,
+        password,
+        nicknameValidation.nickname,
+        AUTH_CONFIRM_REDIRECT,
+      );
+
       if (result.status === 'authenticated') {
+        setRecoveryMode(false);
         setSnapshot({ status: 'signed-in', userId: result.userId });
       }
 
       return result;
     },
-    [connection],
+    [connection, passwordAuthBridge],
   );
 
-  const signUp = useCallback(
-    async (email: string, password: string) => {
+  const requestPasswordRecovery = useCallback(
+    async (identifier: string) => {
       if (connection.status !== 'configured') {
-        return unavailableAuthResult();
+        return {
+          status: 'error' as const,
+          message: 'Salasanan palautusyhteys ei ole käytettävissä.',
+        };
       }
 
-      const result = await submitEmailPassword(
-        connection.client.auth,
-        'sign-up',
-        email,
-        password,
-      );
+      return requestPasswordRecoveryWithApi(passwordAuthBridge, identifier);
+    },
+    [connection.status, passwordAuthBridge],
+  );
 
-      if (result.status === 'authenticated') {
-        setSnapshot({ status: 'signed-in', userId: result.userId });
+  const updatePassword = useCallback(
+    async (password: string): Promise<PasswordUpdateResult> => {
+      if (connection.status !== 'configured') {
+        return {
+          status: 'error',
+          message: 'Salasanan vaihtaminen ei ole käytettävissä.',
+        };
       }
 
-      return result;
+      if (password.length < MINIMUM_PASSWORD_LENGTH) {
+        return {
+          status: 'error',
+          message: `Salasanassa pitää olla vähintään ${MINIMUM_PASSWORD_LENGTH} merkkiä.`,
+        };
+      }
+
+      try {
+        const { error } = await connection.client.auth.updateUser({ password });
+
+        if (error) {
+          return {
+            status: 'error',
+            message: 'Salasanan vaihtaminen epäonnistui. Yritä uudelleen.',
+          };
+        }
+
+        setRecoveryMode(false);
+        return { status: 'updated' };
+      } catch {
+        return {
+          status: 'error',
+          message: 'Salasanan vaihtaminen epäonnistui. Yritä uudelleen.',
+        };
+      }
     },
     [connection],
   );
@@ -146,6 +366,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     const result = await signOutWithApi(connection.client.auth);
 
     if (result.status === 'signed-out') {
+      setRecoveryMode(false);
       setSnapshot({ status: 'signed-out' });
     }
 
@@ -170,8 +391,26 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
   }, [connection]);
 
   const value = useMemo<AuthSessionContextValue>(
-    () => ({ ...snapshot, signIn, signUp, signOut, retrySession }),
-    [retrySession, signIn, signOut, signUp, snapshot],
+    () => ({
+      ...snapshot,
+      recoveryMode,
+      signIn,
+      signUp,
+      requestPasswordRecovery,
+      updatePassword,
+      signOut,
+      retrySession,
+    }),
+    [
+      recoveryMode,
+      requestPasswordRecovery,
+      retrySession,
+      signIn,
+      signOut,
+      signUp,
+      snapshot,
+      updatePassword,
+    ],
   );
 
   return (
