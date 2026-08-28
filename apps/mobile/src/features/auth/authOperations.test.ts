@@ -8,6 +8,8 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
+  verifyAuthEmailLink,
+  type AuthEmailLinkApi,
   type EmailPasswordAuthApi,
   type PasswordAuthBridge,
 } from './authOperations';
@@ -27,6 +29,18 @@ function createAuthApi(): EmailPasswordAuthApi {
 function createBridge(data: unknown): PasswordAuthBridge {
   return {
     invoke: vi.fn(async () => ({ data, error: null })),
+  };
+}
+
+function createEmailLinkApi(): AuthEmailLinkApi {
+  const response = {
+    data: { session: { user: { id: 'user-1' } } },
+    error: null,
+  };
+
+  return {
+    verifyOtp: vi.fn(async () => response),
+    setSession: vi.fn(async () => response),
   };
 }
 
@@ -191,6 +205,55 @@ describe('password recovery', () => {
     ).resolves.toEqual({
       status: 'error',
       message: 'Käyttäjätunnusta ei löydy.',
+    });
+  });
+});
+
+describe('auth email links', () => {
+  it('verifies a scanner-safe signup token hash only inside the app', async () => {
+    const auth = createEmailLinkApi();
+
+    await expect(
+      verifyAuthEmailLink(auth, {
+        tokenHash: 'token-hash-1234567890',
+        type: 'signup',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.verifyOtp).toHaveBeenCalledWith({
+      token_hash: 'token-hash-1234567890',
+      type: 'signup',
+    });
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it('verifies a scanner-safe recovery token before password reset', async () => {
+    const auth = createEmailLinkApi();
+
+    await expect(
+      verifyAuthEmailLink(auth, {
+        tokenHash: 'recovery-token-hash-1234567890',
+        type: 'recovery',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.verifyOtp).toHaveBeenCalledWith({
+      token_hash: 'recovery-token-hash-1234567890',
+      type: 'recovery',
+    });
+  });
+
+  it('still accepts legacy links containing an existing session', async () => {
+    const auth = createEmailLinkApi();
+
+    await expect(
+      verifyAuthEmailLink(auth, {
+        accessToken: 'access-1',
+        refreshToken: 'refresh-1',
+        type: 'recovery',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.setSession).toHaveBeenCalledWith({
+      access_token: 'access-1',
+      refresh_token: 'refresh-1',
     });
   });
 });

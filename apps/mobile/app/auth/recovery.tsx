@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useAuthSession } from '@/features/auth/AuthSessionProvider';
 import { MINIMUM_PASSWORD_LENGTH } from '@/features/auth/authOperations';
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
@@ -23,15 +22,16 @@ import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 type RecoveryState = 'verifying' | 'ready' | 'error';
 
 export default function AuthRecoveryRoute() {
-  const connection = useSupabaseConnection();
-  const auth = useAuthSession();
+  const { updatePassword, verifyEmailLink } = useAuthSession();
   const params = useLocalSearchParams();
   const [state, setState] = useState<RecoveryState>('verifying');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const started = useRef(false);
 
+  const tokenHash = firstParam(params.token_hash);
   const accessToken = firstParam(params.access_token);
   const refreshToken = firstParam(params.refresh_token);
 
@@ -39,26 +39,32 @@ export default function AuthRecoveryRoute() {
     let active = true;
 
     async function verifyRecoverySession() {
-      if (connection.status !== 'configured' || !accessToken || !refreshToken) {
+      const link = tokenHash
+        ? { tokenHash, type: 'recovery' as const }
+        : accessToken && refreshToken
+          ? { accessToken, refreshToken, type: 'recovery' as const }
+          : null;
+
+      if (!link) {
         if (active) setState('error');
         return;
       }
 
-      const { data, error } = await connection.client.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+      const result = await verifyEmailLink(link);
 
       if (!active) return;
-      setState(error || !data.session ? 'error' : 'ready');
+      setState(result.status === 'error' ? 'error' : 'ready');
     }
 
-    void verifyRecoverySession();
+    if (!started.current) {
+      started.current = true;
+      void verifyRecoverySession();
+    }
 
     return () => {
       active = false;
     };
-  }, [accessToken, connection, refreshToken]);
+  }, [accessToken, refreshToken, tokenHash, verifyEmailLink]);
 
   async function submit() {
     if (state !== 'ready' || submitting) return;
@@ -77,7 +83,7 @@ export default function AuthRecoveryRoute() {
     }
 
     setSubmitting(true);
-    const result = await auth.updatePassword(password);
+    const result = await updatePassword(password);
 
     if (result.status === 'error') {
       setFeedback(result.message);

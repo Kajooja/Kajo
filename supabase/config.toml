@@ -1,2 +1,5 @@
 [functions.password-auth]
 verify_jwt = false
+
+[functions.auth-callback]
+verify_jwt = false

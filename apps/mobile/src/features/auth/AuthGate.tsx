@@ -260,7 +260,7 @@ function AuthEntryScreen() {
       setPassword('');
       setFeedback(
         `Vahvistusviesti lähetettiin osoitteeseen ${result.email}. ` +
-          'Avaa viestin vahvistuslinkki tällä puhelimella. Kajo avautuu vahvistuksen jälkeen.',
+          'Avaa viestin linkki tällä puhelimella.',
       );
     }
 
@@ -285,7 +285,7 @@ function AuthEntryScreen() {
 
     setFeedback(
       result.status === 'sent'
-        ? 'Salasanan palautuslinkki lähetettiin tilin sähköpostiin. Avaa linkki tällä puhelimella.'
+        ? 'Salasanan palautuslinkki lähetettiin tilin sähköpostiin. Avaa linkki tällä puhelimella ja jatka salasanan vaihtoon.'
         : result.message,
     );
     setRecoverySubmitting(false);

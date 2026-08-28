@@ -35,6 +35,32 @@ export interface EmailPasswordAuthApi {
   signOut(): PromiseLike<{ error: AuthErrorLike | null }>;
 }
 
+export type AuthEmailLink =
+  | {
+      tokenHash: string;
+      type: 'signup' | 'recovery';
+    }
+  | {
+      accessToken: string;
+      refreshToken: string;
+      type: 'signup' | 'recovery';
+    };
+
+export interface AuthEmailLinkApi {
+  verifyOtp(credentials: {
+    token_hash: string;
+    type: 'signup' | 'recovery';
+  }): PromiseLike<AuthOperationResponse>;
+  setSession(credentials: {
+    access_token: string;
+    refresh_token: string;
+  }): PromiseLike<AuthOperationResponse>;
+}
+
+export type AuthEmailLinkResult =
+  | { status: 'verified'; userId: string }
+  | { status: 'error'; message: string };
+
 export type PasswordAuthAction =
   | 'account-exists'
   | 'request-password-reset'
@@ -296,6 +322,41 @@ export async function requestPasswordRecovery(
     return {
       status: 'error',
       message: 'Salasanan palautusviestin lähettäminen epäonnistui. Yritä uudelleen.',
+    };
+  }
+}
+
+export async function verifyAuthEmailLink(
+  auth: AuthEmailLinkApi,
+  link: AuthEmailLink,
+): Promise<AuthEmailLinkResult> {
+  try {
+    const { data, error } =
+      'tokenHash' in link
+        ? await auth.verifyOtp({
+            token_hash: link.tokenHash,
+            type: link.type,
+          })
+        : await auth.setSession({
+            access_token: link.accessToken,
+            refresh_token: link.refreshToken,
+          });
+
+    if (error || !data.session) {
+      return {
+        status: 'error',
+        message:
+          link.type === 'recovery'
+            ? 'Palautuslinkki on vanhentunut tai jo käytetty. Pyydä uusi linkki.'
+            : 'Vahvistuslinkki on vanhentunut tai jo käytetty. Palaa kirjautumiseen.',
+      };
+    }
+
+    return { status: 'verified', userId: data.session.user.id };
+  } catch {
+    return {
+      status: 'error',
+      message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
     };
   }
 }

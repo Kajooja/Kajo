@@ -89,11 +89,16 @@ hosted environment and must never return the resolved email or privileged key
 to the mobile client. Email/nickname existence checks intentionally support the
 MVP's explicit user-facing not-found/duplicate messages.
 
-Email confirmation and password recovery return to the native app through the
-committed `kajo://` URL scheme. Supabase Auth redirect settings must allow the
-Kajo scheme; the mobile client converts the returned auth tokens into the
-persisted Supabase session. Password recovery then updates the password through
-the authenticated client session.
+Email confirmation and password recovery first open the public
+`auth-callback` Edge Function. The email template passes `{{ .TokenHash }}` and
+the fixed `signup` or `recovery` type to that HTTPS endpoint. The endpoint does
+not consume the token: it redirects Android browsers through an app-specific
+intent (and other clients through the `kajo://` scheme) to the committed
+`kajo://auth/confirm` or `kajo://auth/recovery` route. Only the mobile client
+verifies the token hash and persists the resulting session, so mail scanners
+and tracking redirects cannot invalidate the link. Recovery then opens the
+native new-password form and updates the password through the authenticated
+client session.
 
 ## Prediction service
 

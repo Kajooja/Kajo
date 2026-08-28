@@ -8,7 +8,6 @@ import {
   type PropsWithChildren,
 } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import * as Linking from 'expo-linking';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { validateNickname } from '@/features/profiles/personalProfileOperations';
@@ -22,15 +21,15 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
+  verifyAuthEmailLink,
+  type AuthEmailLink,
+  type AuthEmailLinkResult,
   type AuthSubmissionResult,
   type PasswordAuthBridge,
   type PasswordRecoveryRequestResult,
   type SignOutResult,
 } from './authOperations';
-import {
-  AUTH_CONFIRM_REDIRECT,
-  parseAuthDeepLink,
-} from './authDeepLink';
+import { AUTH_CONFIRM_REDIRECT } from './authDeepLink';
 
 export type AuthSessionSnapshot =
   | { status: 'disabled' }
@@ -57,6 +56,7 @@ interface AuthSessionActions {
   requestPasswordRecovery: (
     identifier: string,
   ) => Promise<PasswordRecoveryRequestResult>;
+  verifyEmailLink: (link: AuthEmailLink) => Promise<AuthEmailLinkResult>;
   updatePassword: (password: string) => Promise<PasswordUpdateResult>;
   signOut: () => Promise<SignOutResult>;
   retrySession: () => Promise<void>;
@@ -154,62 +154,6 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
       subscription.unsubscribe();
-    };
-  }, [connection]);
-
-  useEffect(() => {
-    if (connection.status !== 'configured') {
-      return;
-    }
-
-    let active = true;
-    const { client } = connection;
-
-    async function handleAuthUrl(url: string) {
-      const parsed = parseAuthDeepLink(url);
-
-      if (!active || parsed.status === 'ignored') {
-        return;
-      }
-
-      if (parsed.status === 'error') {
-        setSnapshot({ status: 'session-error', message: parsed.message });
-        return;
-      }
-
-      setRecoveryMode(parsed.recovery);
-      const { data, error } = await client.auth.setSession({
-        access_token: parsed.accessToken,
-        refresh_token: parsed.refreshToken,
-      });
-
-      if (!active) {
-        return;
-      }
-
-      setSnapshot(
-        error || !data.session
-          ? {
-              status: 'session-error',
-              message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
-            }
-          : getSnapshotForSession(data.session),
-      );
-    }
-
-    void Linking.getInitialURL().then((url) => {
-      if (url) {
-        void handleAuthUrl(url);
-      }
-    });
-
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      void handleAuthUrl(url);
-    });
-
-    return () => {
-      active = false;
-      subscription.remove();
     };
   }, [connection]);
 
@@ -330,6 +274,27 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     [connection.status, passwordAuthBridge],
   );
 
+  const verifyEmailLink = useCallback(
+    async (link: AuthEmailLink): Promise<AuthEmailLinkResult> => {
+      if (connection.status !== 'configured') {
+        return {
+          status: 'error',
+          message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
+        };
+      }
+
+      const result = await verifyAuthEmailLink(connection.client.auth, link);
+
+      if (result.status === 'verified') {
+        setRecoveryMode(link.type === 'recovery');
+        setSnapshot({ status: 'signed-in', userId: result.userId });
+      }
+
+      return result;
+    },
+    [connection],
+  );
+
   const updatePassword = useCallback(
     async (password: string): Promise<PasswordUpdateResult> => {
       if (connection.status !== 'configured') {
@@ -407,6 +372,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signIn,
       signUp,
       requestPasswordRecovery,
+      verifyEmailLink,
       updatePassword,
       signOut,
       retrySession,
@@ -420,6 +386,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signUp,
       snapshot,
       updatePassword,
+      verifyEmailLink,
     ],
   );
 
