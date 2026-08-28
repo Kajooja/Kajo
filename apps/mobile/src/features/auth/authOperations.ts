@@ -38,12 +38,14 @@ export interface EmailPasswordAuthApi {
 export type PasswordAuthAction =
   | 'account-exists'
   | 'request-password-reset'
-  | 'sign-in';
+  | 'sign-in'
+  | 'verify-password-reset';
 
 export interface PasswordAuthRequest {
   action: PasswordAuthAction;
   identifier: string;
   password?: string;
+  token?: string;
 }
 
 export interface PasswordAuthBridge {
@@ -77,6 +79,15 @@ export type AccountAvailabilityResult =
 
 export type PasswordRecoveryRequestResult =
   | { status: 'sent' }
+  | { status: 'error'; message: string };
+
+export type PasswordRecoveryVerificationResult =
+  | {
+      status: 'session';
+      accessToken: string;
+      refreshToken: string;
+      userId: string;
+    }
   | { status: 'error'; message: string };
 
 export type SignOutResult =
@@ -296,6 +307,76 @@ export async function requestPasswordRecovery(
     return {
       status: 'error',
       message: 'Salasanan palautusviestin lähettäminen epäonnistui. Yritä uudelleen.',
+    };
+  }
+}
+
+export async function verifyPasswordRecoveryCode(
+  bridge: PasswordAuthBridge,
+  identifierInput: string,
+  tokenInput: string,
+): Promise<PasswordRecoveryVerificationResult> {
+  const identifier = normalizeLoginIdentifier(identifierInput);
+  const token = tokenInput.replace(/\s/g, '');
+
+  if (!identifier) {
+    return { status: 'error', message: 'Anna sähköposti tai nimimerkki.' };
+  }
+
+  if (!/^\d{6}$/.test(token)) {
+    return {
+      status: 'error',
+      message: 'Anna sähköpostiin lähetetty 6-numeroinen koodi.',
+    };
+  }
+
+  try {
+    const response = await bridge.invoke({
+      action: 'verify-password-reset',
+      identifier,
+      token,
+    });
+
+    if (response.error || !isRecord(response.data)) {
+      return {
+        status: 'error',
+        message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
+      };
+    }
+
+    if (response.data.status === 'user-not-found') {
+      return { status: 'error', message: 'Käyttäjätunnusta ei löydy.' };
+    }
+
+    if (response.data.status === 'invalid-token') {
+      return {
+        status: 'error',
+        message: 'Koodi on virheellinen tai vanhentunut. Pyydä tarvittaessa uusi koodi.',
+      };
+    }
+
+    if (
+      response.data.status === 'recovery-authenticated' &&
+      isNonEmptyString(response.data.accessToken) &&
+      isNonEmptyString(response.data.refreshToken) &&
+      isNonEmptyString(response.data.userId)
+    ) {
+      return {
+        status: 'session',
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+        userId: response.data.userId,
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
+    };
+  } catch {
+    return {
+      status: 'error',
+      message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
     };
   }
 }

@@ -22,6 +22,7 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
+  verifyPasswordRecoveryCode,
   type AuthSubmissionResult,
   type PasswordAuthBridge,
   type PasswordRecoveryRequestResult,
@@ -44,6 +45,10 @@ export type PasswordUpdateResult =
   | { status: 'updated' }
   | { status: 'error'; message: string };
 
+export type PasswordRecoveryCodeResult =
+  | { status: 'verified' }
+  | { status: 'error'; message: string };
+
 interface AuthSessionActions {
   signIn: (
     identifier: string,
@@ -57,6 +62,10 @@ interface AuthSessionActions {
   requestPasswordRecovery: (
     identifier: string,
   ) => Promise<PasswordRecoveryRequestResult>;
+  verifyPasswordRecovery: (
+    identifier: string,
+    token: string,
+  ) => Promise<PasswordRecoveryCodeResult>;
   updatePassword: (password: string) => Promise<PasswordUpdateResult>;
   signOut: () => Promise<SignOutResult>;
   retrySession: () => Promise<void>;
@@ -330,6 +339,47 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     [connection.status, passwordAuthBridge],
   );
 
+  const verifyPasswordRecovery = useCallback(
+    async (
+      identifier: string,
+      token: string,
+    ): Promise<PasswordRecoveryCodeResult> => {
+      if (connection.status !== 'configured') {
+        return {
+          status: 'error',
+          message: 'Palautuskoodin tarkistaminen ei ole käytettävissä.',
+        };
+      }
+
+      const result = await verifyPasswordRecoveryCode(
+        passwordAuthBridge,
+        identifier,
+        token,
+      );
+
+      if (result.status === 'error') {
+        return result;
+      }
+
+      const { data, error } = await connection.client.auth.setSession({
+        access_token: result.accessToken,
+        refresh_token: result.refreshToken,
+      });
+
+      if (error || !data.session) {
+        return {
+          status: 'error',
+          message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
+        };
+      }
+
+      setRecoveryMode(true);
+      setSnapshot({ status: 'signed-in', userId: result.userId });
+      return { status: 'verified' };
+    },
+    [connection, passwordAuthBridge],
+  );
+
   const updatePassword = useCallback(
     async (password: string): Promise<PasswordUpdateResult> => {
       if (connection.status !== 'configured') {
@@ -407,6 +457,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signIn,
       signUp,
       requestPasswordRecovery,
+      verifyPasswordRecovery,
       updatePassword,
       signOut,
       retrySession,
@@ -420,6 +471,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signUp,
       snapshot,
       updatePassword,
+      verifyPasswordRecovery,
     ],
   );
 

@@ -89,11 +89,17 @@ hosted environment and must never return the resolved email or privileged key
 to the mobile client. Email/nickname existence checks intentionally support the
 MVP's explicit user-facing not-found/duplicate messages.
 
-Email confirmation and password recovery return to the native app through the
-committed `kajo://` URL scheme. Supabase Auth redirect settings must allow the
-Kajo scheme; the mobile client converts the returned auth tokens into the
-persisted Supabase session. Password recovery then updates the password through
-the authenticated client session.
+Email confirmation returns to the native app through the committed `kajo://`
+URL scheme. Supabase Auth redirect settings must allow the Kajo scheme, and the
+mobile client converts the returned auth tokens into the persisted session.
+
+Password recovery uses a six-digit email OTP instead of a clickable auth link.
+The recovery email template must show `{{ .Token }}` and must not include
+`{{ .ConfirmationURL }}`, so email scanners and tracking redirects cannot
+consume the one-time credential. The `password-auth` function verifies the OTP
+without exposing the resolved account email, returns the resulting session to
+the mobile auth boundary, and the authenticated client then updates the
+password.
 
 ## Prediction service
 

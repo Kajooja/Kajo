@@ -8,6 +8,7 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
+  verifyPasswordRecoveryCode,
   type EmailPasswordAuthApi,
   type PasswordAuthBridge,
 } from './authOperations';
@@ -191,6 +192,48 @@ describe('password recovery', () => {
     ).resolves.toEqual({
       status: 'error',
       message: 'Käyttäjätunnusta ei löydy.',
+    });
+  });
+
+  it('verifies the emailed recovery code through the identifier bridge', async () => {
+    const bridge = createBridge({
+      status: 'recovery-authenticated',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+      userId: 'user-1',
+    });
+
+    await expect(
+      verifyPasswordRecoveryCode(bridge, ' KeTTu ', ' 123456 '),
+    ).resolves.toEqual({
+      status: 'session',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+      userId: 'user-1',
+    });
+    expect(bridge.invoke).toHaveBeenCalledWith({
+      action: 'verify-password-reset',
+      identifier: 'kettu',
+      token: '123456',
+    });
+  });
+
+  it('rejects malformed and expired recovery codes', async () => {
+    const bridge = createBridge({ status: 'invalid-token' });
+
+    await expect(
+      verifyPasswordRecoveryCode(bridge, 'KeTTu', '12345'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Anna sähköpostiin lähetetty 6-numeroinen koodi.',
+    });
+    expect(bridge.invoke).not.toHaveBeenCalled();
+
+    await expect(
+      verifyPasswordRecoveryCode(bridge, 'KeTTu', '123456'),
+    ).resolves.toMatchObject({
+      status: 'error',
+      message: expect.stringContaining('virheellinen tai vanhentunut'),
     });
   });
 });
