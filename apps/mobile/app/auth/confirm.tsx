@@ -1,44 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSupabaseConnection } from '@/data/SupabaseProvider';
+import { useAuthSession } from '@/features/auth/AuthSessionProvider';
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 
 type CallbackState = 'verifying' | 'error';
 
 export default function AuthConfirmRoute() {
-  const connection = useSupabaseConnection();
+  const { verifyEmailLink } = useAuthSession();
   const params = useLocalSearchParams();
   const [state, setState] = useState<CallbackState>('verifying');
+  const started = useRef(false);
 
   useEffect(() => {
     let active = true;
 
     async function confirm() {
-      if (connection.status !== 'configured') {
-        if (active) setState('error');
-        return;
-      }
-
+      const tokenHash = firstParam(params.token_hash);
       const accessToken = firstParam(params.access_token);
       const refreshToken = firstParam(params.refresh_token);
+      const link = tokenHash
+        ? { tokenHash, type: 'signup' as const }
+        : accessToken && refreshToken
+          ? { accessToken, refreshToken, type: 'signup' as const }
+          : null;
 
-      if (!accessToken || !refreshToken) {
+      if (!link) {
         if (active) setState('error');
         return;
       }
 
-      const { data, error } = await connection.client.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+      const result = await verifyEmailLink(link);
 
       if (!active) return;
 
-      if (error || !data.session) {
+      if (result.status === 'error') {
         setState('error');
         return;
       }
@@ -46,12 +45,15 @@ export default function AuthConfirmRoute() {
       router.replace('/');
     }
 
-    void confirm();
+    if (!started.current) {
+      started.current = true;
+      void confirm();
+    }
 
     return () => {
       active = false;
     };
-  }, [connection, params.access_token, params.refresh_token]);
+  }, [params.access_token, params.refresh_token, params.token_hash, verifyEmailLink]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>

@@ -8,7 +8,6 @@ import {
   type PropsWithChildren,
 } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import * as Linking from 'expo-linking';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { validateNickname } from '@/features/profiles/personalProfileOperations';
@@ -22,16 +21,15 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
-  verifyPasswordRecoveryCode,
+  verifyAuthEmailLink,
+  type AuthEmailLink,
+  type AuthEmailLinkResult,
   type AuthSubmissionResult,
   type PasswordAuthBridge,
   type PasswordRecoveryRequestResult,
   type SignOutResult,
 } from './authOperations';
-import {
-  AUTH_CONFIRM_REDIRECT,
-  parseAuthDeepLink,
-} from './authDeepLink';
+import { AUTH_CONFIRM_REDIRECT } from './authDeepLink';
 
 export type AuthSessionSnapshot =
   | { status: 'disabled' }
@@ -43,10 +41,6 @@ export type AuthSessionSnapshot =
 
 export type PasswordUpdateResult =
   | { status: 'updated' }
-  | { status: 'error'; message: string };
-
-export type PasswordRecoveryCodeResult =
-  | { status: 'verified' }
   | { status: 'error'; message: string };
 
 interface AuthSessionActions {
@@ -62,10 +56,7 @@ interface AuthSessionActions {
   requestPasswordRecovery: (
     identifier: string,
   ) => Promise<PasswordRecoveryRequestResult>;
-  verifyPasswordRecovery: (
-    identifier: string,
-    token: string,
-  ) => Promise<PasswordRecoveryCodeResult>;
+  verifyEmailLink: (link: AuthEmailLink) => Promise<AuthEmailLinkResult>;
   updatePassword: (password: string) => Promise<PasswordUpdateResult>;
   signOut: () => Promise<SignOutResult>;
   retrySession: () => Promise<void>;
@@ -163,62 +154,6 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
       subscription.unsubscribe();
-    };
-  }, [connection]);
-
-  useEffect(() => {
-    if (connection.status !== 'configured') {
-      return;
-    }
-
-    let active = true;
-    const { client } = connection;
-
-    async function handleAuthUrl(url: string) {
-      const parsed = parseAuthDeepLink(url);
-
-      if (!active || parsed.status === 'ignored') {
-        return;
-      }
-
-      if (parsed.status === 'error') {
-        setSnapshot({ status: 'session-error', message: parsed.message });
-        return;
-      }
-
-      setRecoveryMode(parsed.recovery);
-      const { data, error } = await client.auth.setSession({
-        access_token: parsed.accessToken,
-        refresh_token: parsed.refreshToken,
-      });
-
-      if (!active) {
-        return;
-      }
-
-      setSnapshot(
-        error || !data.session
-          ? {
-              status: 'session-error',
-              message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
-            }
-          : getSnapshotForSession(data.session),
-      );
-    }
-
-    void Linking.getInitialURL().then((url) => {
-      if (url) {
-        void handleAuthUrl(url);
-      }
-    });
-
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      void handleAuthUrl(url);
-    });
-
-    return () => {
-      active = false;
-      subscription.remove();
     };
   }, [connection]);
 
@@ -339,45 +274,25 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     [connection.status, passwordAuthBridge],
   );
 
-  const verifyPasswordRecovery = useCallback(
-    async (
-      identifier: string,
-      token: string,
-    ): Promise<PasswordRecoveryCodeResult> => {
+  const verifyEmailLink = useCallback(
+    async (link: AuthEmailLink): Promise<AuthEmailLinkResult> => {
       if (connection.status !== 'configured') {
         return {
           status: 'error',
-          message: 'Palautuskoodin tarkistaminen ei ole käytettävissä.',
+          message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
         };
       }
 
-      const result = await verifyPasswordRecoveryCode(
-        passwordAuthBridge,
-        identifier,
-        token,
-      );
+      const result = await verifyAuthEmailLink(connection.client.auth, link);
 
-      if (result.status === 'error') {
-        return result;
+      if (result.status === 'verified') {
+        setRecoveryMode(link.type === 'recovery');
+        setSnapshot({ status: 'signed-in', userId: result.userId });
       }
 
-      const { data, error } = await connection.client.auth.setSession({
-        access_token: result.accessToken,
-        refresh_token: result.refreshToken,
-      });
-
-      if (error || !data.session) {
-        return {
-          status: 'error',
-          message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
-        };
-      }
-
-      setRecoveryMode(true);
-      setSnapshot({ status: 'signed-in', userId: result.userId });
-      return { status: 'verified' };
+      return result;
     },
-    [connection, passwordAuthBridge],
+    [connection],
   );
 
   const updatePassword = useCallback(
@@ -457,7 +372,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signIn,
       signUp,
       requestPasswordRecovery,
-      verifyPasswordRecovery,
+      verifyEmailLink,
       updatePassword,
       signOut,
       retrySession,
@@ -471,7 +386,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signUp,
       snapshot,
       updatePassword,
-      verifyPasswordRecovery,
+      verifyEmailLink,
     ],
   );
 

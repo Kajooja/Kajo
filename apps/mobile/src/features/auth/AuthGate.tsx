@@ -233,9 +233,6 @@ function AuthEntryScreen() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [recoverySubmitting, setRecoverySubmitting] = useState(false);
-  const [recoveryIdentifier, setRecoveryIdentifier] = useState<string | null>(
-    null,
-  );
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const isSignIn = mode === 'sign-in';
@@ -263,7 +260,7 @@ function AuthEntryScreen() {
       setPassword('');
       setFeedback(
         `Vahvistusviesti lähetettiin osoitteeseen ${result.email}. ` +
-          'Avaa vahvistuslinkki ja palaa sen jälkeen Kajo-sovellukseen.',
+          'Avaa viestin linkki tällä puhelimella.',
       );
     }
 
@@ -286,12 +283,11 @@ function AuthEntryScreen() {
     setFeedback(null);
     const result = await requestPasswordRecovery(identifier);
 
-    if (result.status === 'sent') {
-      setPassword('');
-      setRecoveryIdentifier(identifier.trim());
-    } else {
-      setFeedback(result.message);
-    }
+    setFeedback(
+      result.status === 'sent'
+        ? 'Salasanan palautuslinkki lähetettiin tilin sähköpostiin. Avaa linkki tällä puhelimella ja jatka salasanan vaihtoon.'
+        : result.message,
+    );
     setRecoverySubmitting(false);
   }
 
@@ -300,15 +296,6 @@ function AuthEntryScreen() {
     setMode(targetMode);
     setPassword('');
     setFeedback(null);
-  }
-
-  if (recoveryIdentifier) {
-    return (
-      <PasswordRecoveryCodeScreen
-        identifier={recoveryIdentifier}
-        onCancel={() => setRecoveryIdentifier(null)}
-      />
-    );
   }
 
   return (
@@ -403,7 +390,7 @@ function AuthEntryScreen() {
         <SwitchButton
           label={
             recoverySubmitting
-              ? 'Lähetetään palautuskoodia…'
+              ? 'Lähetetään palautuslinkkiä…'
               : 'Unohditko salasanasi?'
           }
           disabled={submitting || recoverySubmitting}
@@ -418,79 +405,6 @@ function AuthEntryScreen() {
           }
           disabled={submitting || recoverySubmitting}
           onPress={() => switchMode()}
-        />
-      </View>
-    </AuthFormShell>
-  );
-}
-
-function PasswordRecoveryCodeScreen({
-  identifier,
-  onCancel,
-}: {
-  identifier: string;
-  onCancel: () => void;
-}) {
-  const { verifyPasswordRecovery } = useAuthSession();
-  const [code, setCode] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
-
-  async function submit() {
-    if (submitting) {
-      return;
-    }
-
-    Keyboard.dismiss();
-    setSubmitting(true);
-    setFeedback(null);
-    const result = await verifyPasswordRecovery(identifier, code);
-
-    if (result.status === 'error') {
-      setFeedback(result.message);
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <AuthFormShell>
-      <View style={styles.intro}>
-        <Text style={styles.kicker}>KAJO</Text>
-        <Text style={styles.title}>Tarkista palautuskoodi</Text>
-        <Text style={styles.message}>
-          Syötä tilin sähköpostiin lähetetty 6-numeroinen koodi. Linkkiä ei tarvitse avata.
-        </Text>
-      </View>
-
-      <View style={styles.form}>
-        <Text style={styles.label}>Palautuskoodi</Text>
-        <TextInput
-          accessibilityLabel="Palautuskoodi"
-          autoComplete="one-time-code"
-          keyboardType="number-pad"
-          maxLength={6}
-          onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
-          onSubmitEditing={() => void submit()}
-          placeholder="123456"
-          placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
-          returnKeyType="done"
-          style={styles.input}
-          value={code}
-        />
-
-        <FeedbackText feedback={feedback} />
-
-        <PrimaryButton
-          label="Jatka salasanan vaihtoon"
-          loading={submitting}
-          disabled={submitting}
-          onPress={() => void submit()}
-        />
-
-        <SwitchButton
-          label="Palaa kirjautumiseen"
-          disabled={submitting}
-          onPress={onCancel}
         />
       </View>
     </AuthFormShell>
@@ -532,7 +446,7 @@ function PasswordRecoveryScreen() {
         <Text style={styles.kicker}>KAJO</Text>
         <Text style={styles.title}>Aseta uusi salasana</Text>
         <Text style={styles.message}>
-          Palautuskoodi on vahvistettu. Luo tilillesi uusi salasana.
+          Palautuslinkki on vahvistettu. Luo tilillesi uusi salasana.
         </Text>
       </View>
 

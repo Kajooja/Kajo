@@ -35,17 +35,41 @@ export interface EmailPasswordAuthApi {
   signOut(): PromiseLike<{ error: AuthErrorLike | null }>;
 }
 
+export type AuthEmailLink =
+  | {
+      tokenHash: string;
+      type: 'signup' | 'recovery';
+    }
+  | {
+      accessToken: string;
+      refreshToken: string;
+      type: 'signup' | 'recovery';
+    };
+
+export interface AuthEmailLinkApi {
+  verifyOtp(credentials: {
+    token_hash: string;
+    type: 'signup' | 'recovery';
+  }): PromiseLike<AuthOperationResponse>;
+  setSession(credentials: {
+    access_token: string;
+    refresh_token: string;
+  }): PromiseLike<AuthOperationResponse>;
+}
+
+export type AuthEmailLinkResult =
+  | { status: 'verified'; userId: string }
+  | { status: 'error'; message: string };
+
 export type PasswordAuthAction =
   | 'account-exists'
   | 'request-password-reset'
-  | 'sign-in'
-  | 'verify-password-reset';
+  | 'sign-in';
 
 export interface PasswordAuthRequest {
   action: PasswordAuthAction;
   identifier: string;
   password?: string;
-  token?: string;
 }
 
 export interface PasswordAuthBridge {
@@ -79,15 +103,6 @@ export type AccountAvailabilityResult =
 
 export type PasswordRecoveryRequestResult =
   | { status: 'sent' }
-  | { status: 'error'; message: string };
-
-export type PasswordRecoveryVerificationResult =
-  | {
-      status: 'session';
-      accessToken: string;
-      refreshToken: string;
-      userId: string;
-    }
   | { status: 'error'; message: string };
 
 export type SignOutResult =
@@ -311,72 +326,37 @@ export async function requestPasswordRecovery(
   }
 }
 
-export async function verifyPasswordRecoveryCode(
-  bridge: PasswordAuthBridge,
-  identifierInput: string,
-  tokenInput: string,
-): Promise<PasswordRecoveryVerificationResult> {
-  const identifier = normalizeLoginIdentifier(identifierInput);
-  const token = tokenInput.replace(/\s/g, '');
-
-  if (!identifier) {
-    return { status: 'error', message: 'Anna sähköposti tai nimimerkki.' };
-  }
-
-  if (!/^\d{6}$/.test(token)) {
-    return {
-      status: 'error',
-      message: 'Anna sähköpostiin lähetetty 6-numeroinen koodi.',
-    };
-  }
-
+export async function verifyAuthEmailLink(
+  auth: AuthEmailLinkApi,
+  link: AuthEmailLink,
+): Promise<AuthEmailLinkResult> {
   try {
-    const response = await bridge.invoke({
-      action: 'verify-password-reset',
-      identifier,
-      token,
-    });
+    const { data, error } =
+      'tokenHash' in link
+        ? await auth.verifyOtp({
+            token_hash: link.tokenHash,
+            type: link.type,
+          })
+        : await auth.setSession({
+            access_token: link.accessToken,
+            refresh_token: link.refreshToken,
+          });
 
-    if (response.error || !isRecord(response.data)) {
+    if (error || !data.session) {
       return {
         status: 'error',
-        message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
+        message:
+          link.type === 'recovery'
+            ? 'Palautuslinkki on vanhentunut tai jo käytetty. Pyydä uusi linkki.'
+            : 'Vahvistuslinkki on vanhentunut tai jo käytetty. Palaa kirjautumiseen.',
       };
     }
 
-    if (response.data.status === 'user-not-found') {
-      return { status: 'error', message: 'Käyttäjätunnusta ei löydy.' };
-    }
-
-    if (response.data.status === 'invalid-token') {
-      return {
-        status: 'error',
-        message: 'Koodi on virheellinen tai vanhentunut. Pyydä tarvittaessa uusi koodi.',
-      };
-    }
-
-    if (
-      response.data.status === 'recovery-authenticated' &&
-      isNonEmptyString(response.data.accessToken) &&
-      isNonEmptyString(response.data.refreshToken) &&
-      isNonEmptyString(response.data.userId)
-    ) {
-      return {
-        status: 'session',
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-        userId: response.data.userId,
-      };
-    }
-
-    return {
-      status: 'error',
-      message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
-    };
+    return { status: 'verified', userId: data.session.user.id };
   } catch {
     return {
       status: 'error',
-      message: 'Palautuskoodin tarkistaminen epäonnistui. Yritä uudelleen.',
+      message: 'Kirjautumislinkkiä ei voitu vahvistaa. Yritä uudelleen.',
     };
   }
 }

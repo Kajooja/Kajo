@@ -1,16 +1,11 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-type AuthAction =
-  | 'account-exists'
-  | 'request-password-reset'
-  | 'sign-in'
-  | 'verify-password-reset';
+type AuthAction = 'account-exists' | 'request-password-reset' | 'sign-in';
 
 interface RequestBody {
   action?: AuthAction;
   identifier?: string;
   password?: string;
-  token?: string;
 }
 
 const RECOVERY_REDIRECT = 'kajo://auth/recovery';
@@ -87,35 +82,6 @@ Deno.serve(async (request) => {
     });
 
     return json({ status: error ? 'error' : 'recovery-sent' }, error ? 500 : 200);
-  }
-
-  if (body.action === 'verify-password-reset') {
-    if (!email) {
-      return json({ status: 'user-not-found' });
-    }
-
-    const token = typeof body.token === 'string' ? body.token.trim() : '';
-
-    if (!/^\d{6}$/.test(token)) {
-      return json({ status: 'invalid-token' });
-    }
-
-    const { data, error } = await authClient.auth.verifyOtp({
-      email,
-      token,
-      type: 'recovery',
-    });
-
-    if (error || !data.session) {
-      return json({ status: 'invalid-token' });
-    }
-
-    return json({
-      status: 'recovery-authenticated',
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token,
-      userId: data.user?.id ?? data.session.user.id,
-    });
   }
 
   if (body.action !== 'sign-in') {

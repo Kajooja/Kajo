@@ -8,7 +8,8 @@ import {
   submitEmailSignUp,
   submitIdentifierPassword,
   validateEmailPassword,
-  verifyPasswordRecoveryCode,
+  verifyAuthEmailLink,
+  type AuthEmailLinkApi,
   type EmailPasswordAuthApi,
   type PasswordAuthBridge,
 } from './authOperations';
@@ -28,6 +29,18 @@ function createAuthApi(): EmailPasswordAuthApi {
 function createBridge(data: unknown): PasswordAuthBridge {
   return {
     invoke: vi.fn(async () => ({ data, error: null })),
+  };
+}
+
+function createEmailLinkApi(): AuthEmailLinkApi {
+  const response = {
+    data: { session: { user: { id: 'user-1' } } },
+    error: null,
+  };
+
+  return {
+    verifyOtp: vi.fn(async () => response),
+    setSession: vi.fn(async () => response),
   };
 }
 
@@ -194,46 +207,53 @@ describe('password recovery', () => {
       message: 'Käyttäjätunnusta ei löydy.',
     });
   });
+});
 
-  it('verifies the emailed recovery code through the identifier bridge', async () => {
-    const bridge = createBridge({
-      status: 'recovery-authenticated',
-      accessToken: 'access-1',
-      refreshToken: 'refresh-1',
-      userId: 'user-1',
-    });
+describe('auth email links', () => {
+  it('verifies a scanner-safe signup token hash only inside the app', async () => {
+    const auth = createEmailLinkApi();
 
     await expect(
-      verifyPasswordRecoveryCode(bridge, ' KeTTu ', ' 123456 '),
-    ).resolves.toEqual({
-      status: 'session',
-      accessToken: 'access-1',
-      refreshToken: 'refresh-1',
-      userId: 'user-1',
+      verifyAuthEmailLink(auth, {
+        tokenHash: 'token-hash-1234567890',
+        type: 'signup',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.verifyOtp).toHaveBeenCalledWith({
+      token_hash: 'token-hash-1234567890',
+      type: 'signup',
     });
-    expect(bridge.invoke).toHaveBeenCalledWith({
-      action: 'verify-password-reset',
-      identifier: 'kettu',
-      token: '123456',
+    expect(auth.setSession).not.toHaveBeenCalled();
+  });
+
+  it('verifies a scanner-safe recovery token before password reset', async () => {
+    const auth = createEmailLinkApi();
+
+    await expect(
+      verifyAuthEmailLink(auth, {
+        tokenHash: 'recovery-token-hash-1234567890',
+        type: 'recovery',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.verifyOtp).toHaveBeenCalledWith({
+      token_hash: 'recovery-token-hash-1234567890',
+      type: 'recovery',
     });
   });
 
-  it('rejects malformed and expired recovery codes', async () => {
-    const bridge = createBridge({ status: 'invalid-token' });
+  it('still accepts legacy links containing an existing session', async () => {
+    const auth = createEmailLinkApi();
 
     await expect(
-      verifyPasswordRecoveryCode(bridge, 'KeTTu', '12345'),
-    ).resolves.toEqual({
-      status: 'error',
-      message: 'Anna sähköpostiin lähetetty 6-numeroinen koodi.',
-    });
-    expect(bridge.invoke).not.toHaveBeenCalled();
-
-    await expect(
-      verifyPasswordRecoveryCode(bridge, 'KeTTu', '123456'),
-    ).resolves.toMatchObject({
-      status: 'error',
-      message: expect.stringContaining('virheellinen tai vanhentunut'),
+      verifyAuthEmailLink(auth, {
+        accessToken: 'access-1',
+        refreshToken: 'refresh-1',
+        type: 'recovery',
+      }),
+    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    expect(auth.setSession).toHaveBeenCalledWith({
+      access_token: 'access-1',
+      refresh_token: 'refresh-1',
     });
   });
 });
