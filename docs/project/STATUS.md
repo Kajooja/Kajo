@@ -62,22 +62,22 @@ Both committed migrations are applied to the configured Supabase project. Schema
 
 Issue #89 is the active user-facing integration: emit the existing impression/open/interest/save/consume/DiscoveryMode behavior with session and prediction correlation, define explicit undo compensation, and include the two deferred auth-return/startup-logo polish fixes in the same acceptance build. Prediction V0 remains Sprint 008; Sprint 007 must not move ranking logic into the mobile client.
 
-The Issue #89 implementation now provides the root-scoped mobile session and
+PR #91 merged the Issue #89 implementation after green CI #137. It provides the root-scoped mobile session and
 retry queue, meaningful-impression deduplication, mock-ranking correlation,
 canonical interaction/mode Events and append-only undo compensation. It also
 adds Android task reuse plus callback-stack clearing for auth return actions and
-enlarges the visible startup lettering. These changes still require green PR
-CI, hosted migration/callback deployment and one configured phone acceptance;
-the three active MVP requirements remain in progress until that evidence exists.
+enlarges the visible startup lettering. The reversal-vocabulary migration is
+applied, `auth-callback` v7 is active and the hosted constraint/advisors are
+verified. One configured phone acceptance is still required; the three active
+MVP requirements remain in progress until that evidence exists.
 
 ## Exact next actions
 
-1. Run the complete `npm run check` gate for Issue #89 and merge only with green PR CI.
-2. Apply `20260829214500_interaction_reversal_events.sql` and deploy the merged `auth-callback` function.
-3. Let `main` produce one configured Android acceptance build; do not treat bundle smoke as device evidence.
-4. Phone-test grid/detail impressions, open/mode/interaction/undo Events, current interaction persistence and exact undo.
-5. In the same build, confirm both auth email flows still pass, their return actions stay in Kajo login and startup lettering is nearly full width.
-6. Inspect the resulting Event/session rows for actor/Profile/session/prediction/undo linkage, then close Issue #89 and Sprint 007 only if all acceptance passes.
+1. Let merged `main` produce one configured Android acceptance build; do not treat bundle smoke as device evidence.
+2. Phone-test grid/detail impressions, open/mode/interaction/undo Events, current interaction persistence and exact undo.
+3. In the same build, confirm both auth email flows still pass, their return actions stay in Kajo login and startup lettering is nearly full width.
+4. Inspect the resulting Event/session rows for actor/Profile/session/prediction/undo linkage.
+5. Close Issue #89 and Sprint 007, mark the three MVP requirements complete and open Sprint 008 only if all acceptance passes.
 
 ## Known issues / open decisions
 
@@ -125,4 +125,4 @@ the three active MVP requirements remain in progress until that evidence exists.
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Issue #85's generic Event/session persistence foundation is merged, deployed and RLS/advisor verified. Issue #89's mobile Event integration and two explicitly bundled phone-polish fixes are implemented and awaiting the green merge/deploy/build/phone-acceptance sequence above. Preserve the accepted auth/current-interaction flows, and do not begin Prediction V0 or SharedProfile work early.
+Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Issue #85's generic Event/session persistence foundation is merged, deployed and RLS/advisor verified. Issue #89's mobile Event integration and two explicitly bundled phone-polish fixes are merged and deployed; Issue #89 remains open only for the configured build, phone and resulting database-row acceptance above. Preserve the accepted auth/current-interaction flows, and do not begin Prediction V0 or SharedProfile work early.

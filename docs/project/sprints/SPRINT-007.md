@@ -92,6 +92,13 @@ Hosted validation after PRs #87 and #88:
 Real-phone and configured database-row acceptance remain required before the
 Sprint 007 MVP requirements are marked complete.
 
+PR #91 merged after green CI #137 with lint, TypeScript, 87 tests and both
+platform bundle smokes. The reversal-vocabulary migration is applied, the live
+Event constraint contains all three new compensation/reversal types and
+`auth-callback` v7 is active. Hosted advisors report no Event-specific security
+finding or unindexed Event foreign key. This is deployment evidence, not phone
+acceptance.
+
 ## Decisions
 
 - `DATA_EVENTS.md` remains the canonical Event vocabulary and payload-semantics source.
@@ -144,7 +151,7 @@ Sprint 007 MVP requirements are marked complete.
 
 ## Mid-sprint handoff
 
-Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Issue #89 implements mobile Event emission, explicit undo compensation, session/prediction correlation and both recorded Sprint 006 phone-polish fixes. Merge only after the full gate is green, deploy the committed migration/callback, then use one configured Android build for Event-row and UI acceptance. Do not begin Prediction V0 early.
+Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Issue #89's mobile Event emission, explicit undo compensation, session/prediction correlation and both recorded Sprint 006 phone-polish fixes are also merged and deployed. Use the next configured Android build for Event-row and UI acceptance, then close Issue #89/Sprint 007 only if the phone flow passes. Do not begin Prediction V0 early.
 
 ## Final handoff
 
