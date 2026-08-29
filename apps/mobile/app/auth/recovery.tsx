@@ -31,7 +31,7 @@ export default function AuthRecoveryRoute() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const started = useRef(false);
 
-  const tokenHash = firstParam(params.token_hash);
+  const tokenHash = firstParam(params.token_hash) ?? firstParam(params.token);
   const accessToken = firstParam(params.access_token);
   const refreshToken = firstParam(params.refresh_token);
 
