@@ -64,7 +64,7 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 - optional canonical Item, prediction and DiscoveryMode traceability fields,
 - UTC occurrence time plus a separate server-side ingestion timestamp,
 - membership-scoped RLS and least-privilege authenticated `SELECT`/`INSERT` grants with no client update/delete path,
-- indexed Profile, actor, Item, session and prediction access paths,
+- indexed Profile, actor, Item, session and prediction access paths, including composite indexes that cover both multi-column foreign keys,
 - one typed Supabase persistence boundary with deterministic serialization/error/retry tests,
 - current Item-interaction snapshots retained as mutable UI hydration state rather than misrepresented as Event history.
 
@@ -110,6 +110,7 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 - `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
 - `/supabase/migrations/`
 - `/supabase/migrations/20260829211800_event_persistence_foundation.sql`
+- `/supabase/migrations/20260829213200_event_foreign_key_indexes.sql`
 
 ## Mid-sprint handoff
 
