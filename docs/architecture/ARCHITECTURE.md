@@ -112,6 +112,13 @@ form, updates the password, discards the temporary session and returns to
 signed-out login. An unconfirmed login also offers a server-side resend action
 without exposing the resolved account email to the mobile client.
 
+Sprint 007 Event persistence uses append-only `event_sessions` and `events`
+tables behind one typed mobile persistence boundary. Authenticated clients have
+membership-scoped `SELECT` and `INSERT` only; they cannot update or delete
+behavioural evidence. Stable client-generated IDs make retries idempotent with
+insert-or-ignore semantics. Current `item_interactions` remains the mutable
+UI hydration projection and is intentionally not treated as Event history.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:

@@ -56,7 +56,17 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 
 ## Delivered
 
-Fill during the sprint.
+### Event/session persistence foundation — Issue #85
+
+- committed append-only `event_sessions` and generic `events` schema,
+- stable client-supplied Event/session IDs with retry-safe insert-or-ignore behavior,
+- separate actor User and Profile context with session/Event consistency enforced by the database,
+- optional canonical Item, prediction and DiscoveryMode traceability fields,
+- UTC occurrence time plus a separate server-side ingestion timestamp,
+- membership-scoped RLS and least-privilege authenticated `SELECT`/`INSERT` grants with no client update/delete path,
+- indexed Profile, actor, Item, session and prediction access paths,
+- one typed Supabase persistence boundary with deterministic serialization/error/retry tests,
+- current Item-interaction snapshots retained as mutable UI hydration state rather than misrepresented as Event history.
 
 ## Decisions
 
@@ -93,14 +103,17 @@ Fill during the sprint.
 - `/docs/project/STATUS.md`
 - `/apps/mobile/src/domain/contracts.ts`
 - `/apps/mobile/src/data/`
+- `/apps/mobile/src/features/events/eventPersistence.ts`
+- `/apps/mobile/src/features/events/eventPersistence.test.ts`
 - `/apps/mobile/src/features/discovery/DiscoveryModeContext.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
 - `/supabase/migrations/`
+- `/supabase/migrations/20260829211800_event_persistence_foundation.sql`
 
 ## Mid-sprint handoff
 
-Sprint 007 opened after the configured Sprint 006 phone flow passed. Start with Issue #85. Do not wire presentation events or change current interaction behavior until the append-only schema, RLS and typed persistence boundary are established and tested.
+Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85 establishes the append-only schema, RLS and typed persistence boundary. After it is merged and the committed migration is verified against the configured project, open the next Issue for mobile Event emission and the two recorded Sprint 006 UI-polish items. Do not begin Prediction V0 early.
 
 ## Final handoff
 

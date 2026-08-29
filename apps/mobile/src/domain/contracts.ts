@@ -63,6 +63,14 @@ export interface Context {
   attributes?: Readonly<Record<string, string | number | boolean | null>>;
 }
 
+export interface EventSession {
+  sessionId: SessionId;
+  actorUserId: UserId;
+  profileId: ProfileId;
+  startedAt: string;
+  context: Context;
+}
+
 export interface Event {
   eventId: EventId;
   actorUserId: UserId;

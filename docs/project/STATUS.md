@@ -48,25 +48,24 @@ Still later in MVP: rating/memory extension, SharedProfiles/social behavior, Pre
 
 Sprint 007 turns meaningful behavior into append-only learning evidence without replacing the current interaction snapshot used to render/hydrate the UI.
 
-Issue #85 is the first scoped implementation step:
+Issue #85 delivers the first scoped implementation step:
 
-- add reproducible generic Event and session persistence,
-- retain actor User and Profile context separately,
-- keep event names domain-agnostic and independent of visible labels,
-- protect reads/writes through authenticated profile membership,
-- add one typed/testable data boundary,
-- preserve the accepted auth, PersonalProfile and current-interaction behavior.
+- reproducible generic Event and session persistence,
+- separate actor User and Profile context with database-enforced session consistency,
+- domain-agnostic Event names independent of visible labels,
+- authenticated membership-scoped append/read access with no client update/delete path,
+- stable retry IDs and indexed Profile/actor/Item/session/prediction paths,
+- one typed/testable Supabase persistence boundary,
+- unchanged accepted auth, PersonalProfile and current-interaction behavior.
 
 After that foundation is merged, open the next Issue to emit the existing impression/open/interest/save/consume/DiscoveryMode actions with session and prediction correlation. Prediction V0 remains Sprint 008; Sprint 007 must not move ranking logic into the mobile client.
 
 ## Exact next actions
 
-1. Follow Issue #85 and `sprints/SPRINT-007.md`.
-2. Add the append-only Event/session migration and least-privilege authorization without editing already-applied migrations.
-3. Add the smallest typed persistence boundary and deterministic contract/security tests.
-4. Run `npm run check`, review repository hygiene and merge the scoped PR only when green.
-5. Deploy the committed migration to the configured Supabase project and verify append/read authorization.
-6. Then open the mobile event-emission Issue; in that next user-facing mobile change also fix the two accepted Sprint 006 polish items listed below.
+1. Finish Issue #85 review with `npm run check` and green PR CI.
+2. Merge its scoped migration, typed boundary, tests and documentation.
+3. Apply the committed Event migration to the configured Supabase project and verify schema/advisor results plus membership-scoped append/read behavior.
+4. Then open the mobile event-emission Issue; in that next user-facing mobile change also fix the two accepted Sprint 006 polish items listed below.
 
 ## Known issues / open decisions
 
@@ -93,6 +92,7 @@ After that foundation is merged, open the next Issue to emit the existing impres
 - `/docs/project/sprints/SPRINT-007.md`
 - `/apps/mobile/src/domain/contracts.ts`
 - `/apps/mobile/src/data/`
+- `/apps/mobile/src/features/events/eventPersistence.ts`
 - `/apps/mobile/src/features/auth/`
 - `/apps/mobile/src/features/profiles/`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
@@ -101,10 +101,11 @@ After that foundation is merged, open the next Issue to emit the existing impres
 - `/supabase/functions/auth-callback/index.ts`
 - `/supabase/functions/password-auth/index.ts`
 - `/supabase/migrations/`
+- `/supabase/migrations/20260829211800_event_persistence_foundation.sql`
 - `/.github/workflows/ci.yml`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Begin with Issue #85 and keep it limited to the generic append-only Event/session persistence foundation. Preserve the accepted phone-tested auth and interaction flows, and do not begin Prediction V0 or SharedProfile work early.
+Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Issue #85 adds the generic append-only Event/session persistence foundation. Merge and verify that foundation before opening mobile Event emission. Preserve the accepted phone-tested auth and interaction flows, and do not begin Prediction V0 or SharedProfile work early.
