@@ -54,7 +54,7 @@ Issue #85 delivers the first scoped implementation step:
 - separate actor User and Profile context with database-enforced session consistency,
 - domain-agnostic Event names independent of visible labels,
 - authenticated membership-scoped append/read access with no client update/delete path,
-- stable retry IDs and indexed Profile/actor/Item/session/prediction paths,
+- stable retry IDs and indexed Profile/actor/Item/session/prediction paths, including both composite foreign keys,
 - one typed/testable Supabase persistence boundary,
 - unchanged accepted auth, PersonalProfile and current-interaction behavior.
 
@@ -102,6 +102,7 @@ After that foundation is merged, open the next Issue to emit the existing impres
 - `/supabase/functions/password-auth/index.ts`
 - `/supabase/migrations/`
 - `/supabase/migrations/20260829211800_event_persistence_foundation.sql`
+- `/supabase/migrations/20260829213200_event_foreign_key_indexes.sql`
 - `/.github/workflows/ci.yml`
 
 ## Handoff
