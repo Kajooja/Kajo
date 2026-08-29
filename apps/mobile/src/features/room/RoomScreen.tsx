@@ -12,6 +12,7 @@ import {
 } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
+import { useEventTracking } from '../events/EventTrackingContext';
 import { usePersonalProfile } from '../profiles/PersonalProfileProvider';
 import { CurtainControl } from './CurtainControl';
 import { getCurtainPositionForMode } from './curtainState';
@@ -20,6 +21,7 @@ export function RoomScreen() {
   const auth = useAuthSession();
   const personalProfile = usePersonalProfile();
   const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
+  const { recordEvent } = useEventTracking();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
   const styles = createStyles(theme);
@@ -64,6 +66,18 @@ export function RoomScreen() {
       setSigningOut(false);
       Alert.alert('Uloskirjautuminen epäonnistui', result.message);
     }
+  }
+
+  function handleDiscoveryModeChange(nextMode: typeof discoveryMode) {
+    if (nextMode !== discoveryMode) {
+      recordEvent({
+        eventType: 'DISCOVERY_MODE_CHANGED',
+        discoveryMode: nextMode,
+        properties: { previousDiscoveryMode: discoveryMode },
+      });
+    }
+
+    setDiscoveryMode(nextMode);
   }
 
   return (
@@ -111,7 +125,7 @@ export function RoomScreen() {
               <View style={styles.curtainArea}>
                 <CurtainControl
                   mode={discoveryMode}
-                  onModeChange={setDiscoveryMode}
+                  onModeChange={handleDiscoveryModeChange}
                   position={curtainPosition}
                   baseTheme={theme.base}
                   ambientTheme={theme.ambient}

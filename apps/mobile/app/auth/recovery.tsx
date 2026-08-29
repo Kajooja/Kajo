@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthSession } from '@/features/auth/AuthSessionProvider';
 import { MINIMUM_PASSWORD_LENGTH } from '@/features/auth/authOperations';
+import { returnToSignedOutLogin } from '@/features/auth/authNavigation';
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 
 type RecoveryState = 'verifying' | 'ready' | 'error';
@@ -91,7 +92,7 @@ export default function AuthRecoveryRoute() {
       return;
     }
 
-    router.replace('/');
+    returnToSignedOutLogin(router);
   }
 
   if (state === 'verifying') {
@@ -115,7 +116,10 @@ export default function AuthRecoveryRoute() {
           <Text style={styles.message}>
             Linkki voi olla vanhentunut tai jo käytetty. Pyydä uusi palautuslinkki kirjautumisnäkymästä.
           </Text>
-          <Pressable style={styles.secondaryButton} onPress={() => router.replace('/')}>
+          <Pressable
+            style={styles.secondaryButton}
+            onPress={() => returnToSignedOutLogin(router)}
+          >
             <Text style={styles.secondaryButtonText}>Palaa kirjautumiseen</Text>
           </Pressable>
         </View>

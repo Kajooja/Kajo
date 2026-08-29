@@ -31,7 +31,7 @@ Deno.serve((request) => {
   const otpType = recovery ? 'recovery' : 'email';
   const query = new URLSearchParams({ token_hash: tokenHash, type: otpType });
   const location = /Android/i.test(request.headers.get('user-agent') ?? '')
-    ? `intent://auth/${route}/${tokenHash}?${query.toString()}#Intent;scheme=kajo;package=app.kajo.mobile;end`
+    ? `intent://auth/${route}/${tokenHash}?${query.toString()}#Intent;scheme=kajo;package=app.kajo.mobile;launchFlags=0x14000000;end`
     : `kajo://auth/${route}/${tokenHash}?${query.toString()}`;
 
   // The HTTPS hop intentionally does not verify the one-time token. Automated

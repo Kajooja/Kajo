@@ -77,12 +77,30 @@ Hosted validation after PRs #87 and #88:
 - rollback left zero Event/session test rows,
 - performance advisor reports no unindexed Event foreign keys.
 
+### Mobile Event integration and deferred phone polish — Issue #89
+
+- one root-scoped mobile Event tracker creates the active User/Profile session and persists it lazily before queued Events,
+- stable UUIDv7-compatible client Event/session identities retain retry safety, while one recommendation correlation follows grid impressions, Item opens and subsequent Item actions,
+- meaningful grid and Item-sequence impressions are deduplicated by prediction/Item trace,
+- existing interest, save/unsave, consume/reverse and DiscoveryMode behavior maps to the canonical generic Event vocabulary through the typed persistence boundary,
+- exact undo retains the original Event identity and appends `ITEM_INTERACTION_UNDONE` with the restored current-state snapshot,
+- current interaction snapshot hydration and serialized persistence remain unchanged,
+- Android auth callbacks foreground/reuse Kajo's task and callback buttons clear the callback stack before signed-out login,
+- visible startup lettering is enlarged to nearly the full phone width without changing the Android-compatible PNG asset,
+- deterministic mapping, correlation, retry, undo-link and auth-navigation regression tests cover the new pure behavior.
+
+Real-phone and configured database-row acceptance remain required before the
+Sprint 007 MVP requirements are marked complete.
+
 ## Decisions
 
 - `DATA_EVENTS.md` remains the canonical Event vocabulary and payload-semantics source.
 - Event history is immutable learning evidence; `item_interactions` remains a mutable current-state projection for fast UI hydration.
 - Visible labels such as `Pidän`, `Tallenna`, `Luettu` and `Katsottu` never become Event identifiers.
 - Prediction traceability is a correlation contract in Sprint 007, not permission to implement Prediction V0 or ranking logic in the mobile client.
+- A mobile Event session is scoped to the active actor/Profile context, created in memory with the root provider and persisted only when its first Event is queued.
+- One meaningful Item impression is retained per `predictionId` + `itemId` pair in an active Event-tracking scope; opening or acting on an Item remains independently observable.
+- Mock ranking gets stable per-view/type/mode correlation IDs for traceability, but those IDs do not turn the mock ordering into Prediction V0.
 - Add a new implementation location only when Issue #85 establishes its real responsibility; do not scaffold empty folders.
 
 ## Deferred / not done
@@ -95,9 +113,8 @@ Hosted validation after PRs #87 and #88:
 
 ## Known issues
 
-- After a successful auth email flow, `Palaa Kajoon` can return to the email app rather than foregrounding Kajo login.
-- Startup Kajo lettering is not yet nearly full-screen width.
-- Fix both accepted Sprint 006 polish items in the first Sprint 007 user-facing mobile integration change, then phone-check them alongside Event emission. They are not part of Issue #85's persistence-only scope.
+- The Android auth task-return and enlarged startup lettering fixes require confirmation in the next configured standalone build.
+- The integrated mobile Event sequence and hosted rows have not yet been exercised from a real phone; automated bundle checks are not device evidence.
 
 ## Important files
 
@@ -114,16 +131,20 @@ Hosted validation after PRs #87 and #88:
 - `/apps/mobile/src/data/`
 - `/apps/mobile/src/features/events/eventPersistence.ts`
 - `/apps/mobile/src/features/events/eventPersistence.test.ts`
+- `/apps/mobile/src/features/events/EventTrackingContext.tsx`
+- `/apps/mobile/src/features/events/eventTracking.ts`
+- `/apps/mobile/src/features/events/itemInteractionEvents.ts`
 - `/apps/mobile/src/features/discovery/DiscoveryModeContext.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/discovery/itemInteractionPersistence.ts`
 - `/supabase/migrations/`
 - `/supabase/migrations/20260829211800_event_persistence_foundation.sql`
 - `/supabase/migrations/20260829213200_event_foreign_key_indexes.sql`
+- `/supabase/migrations/20260829214500_interaction_reversal_events.sql`
 
 ## Mid-sprint handoff
 
-Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Continue with Issue #89: mobile Event emission, explicit undo compensation, session/prediction correlation and the two recorded Sprint 006 UI-polish items in one phone acceptance build. Do not begin Prediction V0 early.
+Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Issue #89 implements mobile Event emission, explicit undo compensation, session/prediction correlation and both recorded Sprint 006 phone-polish fixes. Merge only after the full gate is green, deploy the committed migration/callback, then use one configured Android build for Event-row and UI acceptance. Do not begin Prediction V0 early.
 
 ## Final handoff
 
