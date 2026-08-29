@@ -3,12 +3,14 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 export function StartupSplash() {
   return (
     <View style={styles.splash}>
-      <Image
-        accessibilityLabel="Kajo"
-        resizeMode="contain"
-        source={require('../../../assets/kajo-logo-color.png')}
-        style={styles.splashLogo}
-      />
+      <View style={styles.splashLogoViewport}>
+        <Image
+          accessibilityLabel="Kajo"
+          resizeMode="contain"
+          source={require('../../../assets/kajo-logo-color.png')}
+          style={styles.splashLogo}
+        />
+      </View>
     </View>
   );
 }
@@ -35,10 +37,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#000000',
   },
+  splashLogoViewport: {
+    width: '98%',
+    aspectRatio: 71 / 27,
+    overflow: 'hidden',
+  },
   splashLogo: {
-    width: '195%',
-    maxWidth: 960,
+    position: 'absolute',
+    width: '135.22%',
     aspectRatio: 1,
+    left: '-25.35%',
+    top: '-129.63%',
   },
   mark: {
     width: 102,
