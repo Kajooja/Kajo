@@ -17,7 +17,7 @@ See `docs/project/ROADMAP.md`.
 
 ## Delivered
 
-Sprints 001–005 are complete. The validated product baseline now includes the mobile foundation, Room, global DiscoveryMode curtain, BOOK/MOVIE grid and optional swipe flow, generic Item interaction state, consumed history and bounded exact-card undo. Sprint 006 Backend Foundation is active; requirement-level truth remains in `docs/product/MVP.md` and current execution state in `docs/project/STATUS.md`.
+Sprints 001–006 are complete. The validated product baseline includes the mobile foundation, Room, global DiscoveryMode curtain, BOOK/MOVIE grid and optional swipe flow, generic Item interaction state, consumed history, bounded exact-card undo, configured Supabase authentication, one PersonalProfile per User and persisted BOOK/MOVIE current interactions. Sprint 006's registration/confirmation/login and password-recovery flows were accepted on a real Android phone. Sprint 007 Event Engine is active; requirement-level truth remains in `docs/product/MVP.md` and current execution state in `docs/project/STATUS.md`.
 
 ## Known milestone risks
 
