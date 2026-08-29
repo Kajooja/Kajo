@@ -48,7 +48,7 @@ Still later in MVP: rating/memory extension, SharedProfiles/social behavior, Pre
 
 Sprint 007 turns meaningful behavior into append-only learning evidence without replacing the current interaction snapshot used to render/hydrate the UI.
 
-Issue #85 delivers the first scoped implementation step:
+Issue #85 / PRs #87 and #88 delivered and deployed the first scoped implementation step:
 
 - reproducible generic Event and session persistence,
 - separate actor User and Profile context with database-enforced session consistency,
@@ -58,19 +58,23 @@ Issue #85 delivers the first scoped implementation step:
 - one typed/testable Supabase persistence boundary,
 - unchanged accepted auth, PersonalProfile and current-interaction behavior.
 
-After that foundation is merged, open the next Issue to emit the existing impression/open/interest/save/consume/DiscoveryMode actions with session and prediction correlation. Prediction V0 remains Sprint 008; Sprint 007 must not move ranking logic into the mobile client.
+Both committed migrations are applied to the configured Supabase project. Schema, RLS, grants and constraints were inspected after deployment. A rollback-only RLS smoke proved that the permitted Profile member can append/read a session and Event, an unrelated identity sees neither row, and no test rows remain. The performance advisor reports no unindexed Event foreign keys; new-table unused-index INFO entries are expected until Event emission starts.
+
+Issue #89 is the active user-facing integration: emit the existing impression/open/interest/save/consume/DiscoveryMode behavior with session and prediction correlation, define explicit undo compensation, and include the two deferred auth-return/startup-logo polish fixes in the same acceptance build. Prediction V0 remains Sprint 008; Sprint 007 must not move ranking logic into the mobile client.
 
 ## Exact next actions
 
-1. Finish Issue #85 review with `npm run check` and green PR CI.
-2. Merge its scoped migration, typed boundary, tests and documentation.
-3. Apply the committed Event migration to the configured Supabase project and verify schema/advisor results plus membership-scoped append/read behavior.
-4. Then open the mobile event-emission Issue; in that next user-facing mobile change also fix the two accepted Sprint 006 polish items listed below.
+1. Follow Issue #89 and `sprints/SPRINT-007.md`.
+2. Define the explicit append-only undo compensation semantics in `DATA_EVENTS.md` before emitting reversal behavior.
+3. Add stable mobile session/recommendation correlation and meaningful deduplicated Event emission through the existing boundary.
+4. In the same user-facing change, fix auth return-to-login task behavior and enlarge the visible startup lettering to nearly full phone width.
+5. Run `npm run check`, merge only with green PR CI, deploy any committed callback change and produce one configured Android acceptance build.
+6. Phone-test the integrated Event rows, existing interaction persistence/undo, both auth email flows/return action and startup logo before closing Sprint 007.
 
 ## Known issues / open decisions
 
-- Auth success is correct, but `Palaa Kajoon` can return to the email app's previous task instead of foregrounding Kajo login. Fix this in the next user-facing mobile change.
-- Startup lettering must be enlarged to nearly the full screen width while retaining Android-compatible PNG output. Fix and phone-check it in the same next user-facing mobile change.
+- Auth success is correct, but `Palaa Kajoon` can return to the email app's previous task instead of foregrounding Kajo login. Issue #89 owns the fix.
+- Startup lettering must be enlarged to nearly the full screen width while retaining Android-compatible PNG output. Issue #89 owns the fix and phone check.
 - Google and Apple authentication remain separately tracked in Issue #73 and are not a Sprint 007 prerequisite.
 - Current mode-dependent Item ordering is mock discovery logic, not Prediction V0.
 - Final book/movie metadata providers are not locked.
@@ -109,4 +113,4 @@ After that foundation is merged, open the next Issue to emit the existing impres
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Issue #85 adds the generic append-only Event/session persistence foundation. Merge and verify that foundation before opening mobile Event emission. Preserve the accepted phone-tested auth and interaction flows, and do not begin Prediction V0 or SharedProfile work early.
+Sprint 006 is accepted and complete. Sprint 007 is the only active sprint. Issue #85's generic Event/session persistence foundation is merged, deployed and RLS/advisor verified. Continue with Issue #89's mobile Event integration plus the two explicitly bundled phone-polish fixes. Preserve the accepted auth/current-interaction flows, and do not begin Prediction V0 or SharedProfile work early.

@@ -38,7 +38,7 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 ## Planned Issues
 
 - #85 — generic append-only Event/session schema, authorization and typed persistence foundation.
-- Open the mobile event-emission Issue only after #85 fixes the persisted contract and boundary.
+- #89 — mobile Event emission, session/prediction correlation and the two deferred auth/splash phone-polish fixes.
 
 ## Definition of Done
 
@@ -67,6 +67,15 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 - indexed Profile, actor, Item, session and prediction access paths, including composite indexes that cover both multi-column foreign keys,
 - one typed Supabase persistence boundary with deterministic serialization/error/retry tests,
 - current Item-interaction snapshots retained as mutable UI hydration state rather than misrepresented as Event history.
+
+Hosted validation after PRs #87 and #88:
+
+- both committed migrations applied successfully,
+- RLS enabled with authenticated `SELECT`/`INSERT` only,
+- expected membership policies, generic constraints and access-path indexes present,
+- transaction-scoped member append/read and unrelated-user isolation passed,
+- rollback left zero Event/session test rows,
+- performance advisor reports no unindexed Event foreign keys.
 
 ## Decisions
 
@@ -114,7 +123,7 @@ Turn meaningful Kajo behavior into a durable, generic and analytics-quality evid
 
 ## Mid-sprint handoff
 
-Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85 establishes the append-only schema, RLS and typed persistence boundary. After it is merged and the committed migration is verified against the configured project, open the next Issue for mobile Event emission and the two recorded Sprint 006 UI-polish items. Do not begin Prediction V0 early.
+Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Continue with Issue #89: mobile Event emission, explicit undo compensation, session/prediction correlation and the two recorded Sprint 006 UI-polish items in one phone acceptance build. Do not begin Prediction V0 early.
 
 ## Final handoff
 
