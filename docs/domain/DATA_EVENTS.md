@@ -81,3 +81,12 @@ This means User A saved Movie X while acting inside the joint A+B Kajo. It is no
 - Event names and semantics are canonical contracts, not analytics-only labels.
 - Do not create domain-specific duplicates such as `BOOK_SAVED` and `MOVIE_SAVED` when `ITEM_SAVED` is sufficient.
 - Sensitive/contextual fields must be collected only when needed and permitted.
+
+## MVP persistence contract
+
+- The client supplies stable UUIDs for Event and session identity. A retry with the same ID is an insert-or-ignore operation, so a transient failure cannot create duplicate evidence.
+- `occurredAt` is the UTC action time supplied by the Event contract. The database also records a separate server-side creation time for ingestion/audit purposes.
+- An Event session belongs to one acting User and one Profile context. A session-linked Event must retain that same actor/Profile pair.
+- When an Event references an Item, its `itemId` and `itemType` are stored together and must match the canonical Item row.
+- Authenticated clients may append and read Events only for permitted Profile contexts. They receive no update or delete capability for Event/session rows.
+- The mutable `item_interactions` row is the current projection used for UI hydration. It does not replace or rewrite the append-only Event evidence stream.
