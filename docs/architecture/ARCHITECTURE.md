@@ -91,14 +91,20 @@ MVP's explicit user-facing not-found/duplicate messages.
 
 Email confirmation and password recovery first open the public
 `auth-callback` Edge Function. The email template passes `{{ .TokenHash }}` and
-the fixed `signup` or `recovery` type to that HTTPS endpoint. The endpoint does
-not consume the token: it redirects Android browsers through an app-specific
-intent (and other clients through the `kajo://` scheme) to the committed
-`kajo://auth/confirm` or `kajo://auth/recovery` route. Only the mobile client
-verifies the token hash and persists the resulting session, so mail scanners
-and tracking redirects cannot invalidate the link. Recovery then opens the
-native new-password form and updates the password through the authenticated
-client session.
+the fixed `email` or `recovery` type to that HTTPS endpoint. For compatibility,
+the callback also maps the earlier `signup` value to Supabase's documented
+`email` verification type. The endpoint does not consume the token: it carries
+the token in both the Android intent path and query string (and uses the
+`kajo://` scheme on other clients) before routing to `auth/confirm` or
+`auth/recovery`. Only the mobile client verifies the token hash, so mail
+scanners and tracking redirects cannot invalidate the link.
+
+Auth callbacks use a non-persisting Supabase client. Signup verification shows
+an explicit success state and returns to signed-out login. Recovery keeps its
+temporary session credentials in memory only, opens the native new-password
+form, updates the password, discards the temporary session and returns to
+signed-out login. An unconfirmed login also offers a server-side resend action
+without exposing the resolved account email to the mobile client.
 
 ## Prediction service
 

@@ -7,7 +7,7 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
-import type { Session } from '@supabase/supabase-js';
+import { createClient, type Session } from '@supabase/supabase-js';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { validateNickname } from '@/features/profiles/personalProfileOperations';
@@ -16,6 +16,7 @@ import {
   accountExistsMessage,
   checkAccountAvailability,
   MINIMUM_PASSWORD_LENGTH,
+  requestEmailConfirmation as requestEmailConfirmationWithApi,
   requestPasswordRecovery as requestPasswordRecoveryWithApi,
   signOut as signOutWithApi,
   submitEmailSignUp,
@@ -25,6 +26,7 @@ import {
   type AuthEmailLink,
   type AuthEmailLinkResult,
   type AuthSubmissionResult,
+  type EmailConfirmationRequestResult,
   type PasswordAuthBridge,
   type PasswordRecoveryRequestResult,
   type SignOutResult,
@@ -56,6 +58,9 @@ interface AuthSessionActions {
   requestPasswordRecovery: (
     identifier: string,
   ) => Promise<PasswordRecoveryRequestResult>;
+  requestEmailConfirmation: (
+    identifier: string,
+  ) => Promise<EmailConfirmationRequestResult>;
   verifyEmailLink: (link: AuthEmailLink) => Promise<AuthEmailLinkResult>;
   updatePassword: (password: string) => Promise<PasswordUpdateResult>;
   signOut: () => Promise<SignOutResult>;
@@ -69,9 +74,16 @@ type AuthSessionContextValue = AuthSessionSnapshot &
 
 const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
 
+interface RecoveryCredentials {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export function AuthSessionProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoveryCredentials, setRecoveryCredentials] =
+    useState<RecoveryCredentials | null>(null);
   const [snapshot, setSnapshot] = useState<AuthSessionSnapshot>(() => {
     if (connection.status === 'unconfigured') {
       return { status: 'disabled' };
@@ -274,6 +286,20 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     [connection.status, passwordAuthBridge],
   );
 
+  const requestEmailConfirmation = useCallback(
+    async (identifier: string) => {
+      if (connection.status !== 'configured') {
+        return {
+          status: 'error' as const,
+          message: 'Vahvistusviestin lähettäminen ei ole käytettävissä.',
+        };
+      }
+
+      return requestEmailConfirmationWithApi(passwordAuthBridge, identifier);
+    },
+    [connection.status, passwordAuthBridge],
+  );
+
   const verifyEmailLink = useCallback(
     async (link: AuthEmailLink): Promise<AuthEmailLinkResult> => {
       if (connection.status !== 'configured') {
@@ -283,11 +309,25 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
         };
       }
 
-      const result = await verifyAuthEmailLink(connection.client.auth, link);
+      const callbackClient = createTransientAuthClient(
+        connection.config.url,
+        connection.config.publishableKey,
+      );
+      const result = await verifyAuthEmailLink(callbackClient.auth, link);
 
       if (result.status === 'verified') {
-        setRecoveryMode(link.type === 'recovery');
-        setSnapshot({ status: 'signed-in', userId: result.userId });
+        if (link.type === 'recovery') {
+          setRecoveryCredentials({
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+          });
+          setRecoveryMode(true);
+        } else {
+          setRecoveryCredentials(null);
+          setRecoveryMode(false);
+        }
+
+        setSnapshot({ status: 'signed-out' });
       }
 
       return result;
@@ -312,7 +352,28 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       }
 
       try {
-        const { error } = await connection.client.auth.updateUser({ password });
+        const passwordClient = recoveryCredentials
+          ? createTransientAuthClient(
+              connection.config.url,
+              connection.config.publishableKey,
+            )
+          : connection.client;
+
+        if (recoveryCredentials) {
+          const { data, error } = await passwordClient.auth.setSession({
+            access_token: recoveryCredentials.accessToken,
+            refresh_token: recoveryCredentials.refreshToken,
+          });
+
+          if (error || !data.session) {
+            return {
+              status: 'error',
+              message: 'Palautusistunto on vanhentunut. Pyydä uusi palautuslinkki.',
+            };
+          }
+        }
+
+        const { error } = await passwordClient.auth.updateUser({ password });
 
         if (error) {
           return {
@@ -321,7 +382,13 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
           };
         }
 
+        if (!recoveryCredentials) {
+          await connection.client.auth.signOut({ scope: 'local' });
+        }
+
+        setRecoveryCredentials(null);
         setRecoveryMode(false);
+        setSnapshot({ status: 'signed-out' });
         return { status: 'updated' };
       } catch {
         return {
@@ -330,7 +397,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
         };
       }
     },
-    [connection],
+    [connection, recoveryCredentials],
   );
 
   const signOut = useCallback(async () => {
@@ -341,6 +408,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     const result = await signOutWithApi(connection.client.auth);
 
     if (result.status === 'signed-out') {
+      setRecoveryCredentials(null);
       setRecoveryMode(false);
       setSnapshot({ status: 'signed-out' });
     }
@@ -372,6 +440,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       signIn,
       signUp,
       requestPasswordRecovery,
+      requestEmailConfirmation,
       verifyEmailLink,
       updatePassword,
       signOut,
@@ -379,6 +448,7 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
     }),
     [
       recoveryMode,
+      requestEmailConfirmation,
       requestPasswordRecovery,
       retrySession,
       signIn,
@@ -395,6 +465,16 @@ export function AuthSessionProvider({ children }: PropsWithChildren) {
       {children}
     </AuthSessionContext.Provider>
   );
+}
+
+function createTransientAuthClient(url: string, publishableKey: string) {
+  return createClient(url, publishableKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  });
 }
 
 export function useAuthSession(): AuthSessionContextValue {

@@ -23,6 +23,11 @@ interface AuthSessionLike {
   };
 }
 
+interface AuthEmailLinkSessionLike extends AuthSessionLike {
+  access_token: string;
+  refresh_token: string;
+}
+
 interface AuthOperationResponse {
   data: {
     session: AuthSessionLike | null;
@@ -38,31 +43,44 @@ export interface EmailPasswordAuthApi {
 export type AuthEmailLink =
   | {
       tokenHash: string;
-      type: 'signup' | 'recovery';
+      type: 'email' | 'recovery';
     }
   | {
       accessToken: string;
       refreshToken: string;
-      type: 'signup' | 'recovery';
+      type: 'email' | 'recovery';
     };
+
+interface AuthEmailLinkResponse {
+  data: {
+    session: AuthEmailLinkSessionLike | null;
+  };
+  error: AuthErrorLike | null;
+}
 
 export interface AuthEmailLinkApi {
   verifyOtp(credentials: {
     token_hash: string;
-    type: 'signup' | 'recovery';
-  }): PromiseLike<AuthOperationResponse>;
+    type: 'email' | 'recovery';
+  }): PromiseLike<AuthEmailLinkResponse>;
   setSession(credentials: {
     access_token: string;
     refresh_token: string;
-  }): PromiseLike<AuthOperationResponse>;
+  }): PromiseLike<AuthEmailLinkResponse>;
 }
 
 export type AuthEmailLinkResult =
-  | { status: 'verified'; userId: string }
+  | {
+      status: 'verified';
+      userId: string;
+      accessToken: string;
+      refreshToken: string;
+    }
   | { status: 'error'; message: string };
 
 export type PasswordAuthAction =
   | 'account-exists'
+  | 'resend-confirmation'
   | 'request-password-reset'
   | 'sign-in';
 
@@ -85,7 +103,11 @@ export type CredentialValidationResult =
 export type AuthSubmissionResult =
   | { status: 'authenticated'; userId: string; email?: string }
   | { status: 'confirmation-required'; email: string }
-  | { status: 'error'; message: string };
+  | {
+      status: 'error';
+      message: string;
+      code?: 'email-not-confirmed';
+    };
 
 export type IdentifierSignInResult =
   | {
@@ -94,7 +116,11 @@ export type IdentifierSignInResult =
       refreshToken: string;
       userId: string;
     }
-  | { status: 'error'; message: string };
+  | {
+      status: 'error';
+      message: string;
+      code?: 'email-not-confirmed';
+    };
 
 export type AccountAvailabilityResult =
   | { status: 'available' }
@@ -102,6 +128,10 @@ export type AccountAvailabilityResult =
   | { status: 'error'; message: string };
 
 export type PasswordRecoveryRequestResult =
+  | { status: 'sent' }
+  | { status: 'error'; message: string };
+
+export type EmailConfirmationRequestResult =
   | { status: 'sent' }
   | { status: 'error'; message: string };
 
@@ -213,6 +243,7 @@ export async function submitIdentifierPassword(
       case 'email-not-confirmed':
         return {
           status: 'error',
+          code: 'email-not-confirmed',
           message: 'Sähköpostiosoitetta ei ole vielä vahvistettu. Tarkista sähköpostisi.',
         };
       case 'authenticated':
@@ -326,6 +357,45 @@ export async function requestPasswordRecovery(
   }
 }
 
+export async function requestEmailConfirmation(
+  bridge: PasswordAuthBridge,
+  identifierInput: string,
+): Promise<EmailConfirmationRequestResult> {
+  const identifier = normalizeLoginIdentifier(identifierInput);
+
+  if (!identifier) {
+    return { status: 'error', message: 'Anna sähköposti tai nimimerkki.' };
+  }
+
+  try {
+    const response = await bridge.invoke({
+      action: 'resend-confirmation',
+      identifier,
+    });
+
+    if (response.error || !isRecord(response.data)) {
+      return {
+        status: 'error',
+        message: 'Vahvistusviestin lähettäminen epäonnistui. Yritä uudelleen.',
+      };
+    }
+
+    if (response.data.status === 'confirmation-sent') {
+      return { status: 'sent' };
+    }
+
+    return {
+      status: 'error',
+      message: 'Vahvistusviestin lähettäminen epäonnistui. Yritä uudelleen.',
+    };
+  } catch {
+    return {
+      status: 'error',
+      message: 'Vahvistusviestin lähettäminen epäonnistui. Yritä uudelleen.',
+    };
+  }
+}
+
 export async function verifyAuthEmailLink(
   auth: AuthEmailLinkApi,
   link: AuthEmailLink,
@@ -352,7 +422,12 @@ export async function verifyAuthEmailLink(
       };
     }
 
-    return { status: 'verified', userId: data.session.user.id };
+    return {
+      status: 'verified',
+      userId: data.session.user.id,
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+    };
   } catch {
     return {
       status: 'error',

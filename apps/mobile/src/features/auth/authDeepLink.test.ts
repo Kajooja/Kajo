@@ -31,6 +31,26 @@ describe('rewriteAuthSystemPath', () => {
     );
   });
 
+  it('recovers the token from an Android intent path', () => {
+    expect(
+      rewriteAuthSystemPath(
+        'intent://auth/confirm/token-hash-1234567890?type=email#Intent;scheme=kajo;package=app.kajo.mobile;end',
+      ),
+    ).toBe(
+      '/auth/confirm?type=email&token_hash=token-hash-1234567890',
+    );
+  });
+
+  it('also accepts the previous query-only Android intent format', () => {
+    expect(
+      rewriteAuthSystemPath(
+        'intent://auth/recovery?token_hash=token-hash-1234567890&type=recovery#Intent;scheme=kajo;package=app.kajo.mobile;end',
+      ),
+    ).toBe(
+      '/auth/recovery?token_hash=token-hash-1234567890&type=recovery',
+    );
+  });
+
   it('also handles an already normalized auth route', () => {
     expect(rewriteAuthSystemPath('/auth/confirm?code=test')).toBe(
       '/auth/confirm?code=test',

@@ -1,4 +1,4 @@
-type CallbackType = 'signup' | 'recovery';
+type CallbackType = 'email' | 'signup' | 'recovery';
 
 const responseHeaders = {
   'cache-control': 'no-store',
@@ -26,11 +26,13 @@ Deno.serve((request) => {
     });
   }
 
-  const route = type === 'recovery' ? 'recovery' : 'confirm';
-  const query = new URLSearchParams({ token_hash: tokenHash, type });
+  const recovery = type === 'recovery';
+  const route = recovery ? 'recovery' : 'confirm';
+  const otpType = recovery ? 'recovery' : 'email';
+  const query = new URLSearchParams({ token_hash: tokenHash, type: otpType });
   const location = /Android/i.test(request.headers.get('user-agent') ?? '')
-    ? `intent://auth/${route}?${query.toString()}#Intent;scheme=kajo;package=app.kajo.mobile;end`
-    : `kajo://auth/${route}?${query.toString()}`;
+    ? `intent://auth/${route}/${tokenHash}?${query.toString()}#Intent;scheme=kajo;package=app.kajo.mobile;end`
+    : `kajo://auth/${route}/${tokenHash}?${query.toString()}`;
 
   // The HTTPS hop intentionally does not verify the one-time token. Automated
   // email scanners may follow this redirect, but only Kajo consumes the token.
@@ -44,7 +46,9 @@ Deno.serve((request) => {
 });
 
 function normalizeCallbackType(value: string | null): CallbackType | null {
-  return value === 'signup' || value === 'recovery' ? value : null;
+  return value === 'email' || value === 'signup' || value === 'recovery'
+    ? value
+    : null;
 }
 
 function normalizeTokenHash(value: string | null): string | null {
