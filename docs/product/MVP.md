@@ -14,8 +14,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Authentication and identity
 
-- [-] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
-- [-] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
+- [x] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
+- [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
 
 ## Room and theme
 
@@ -54,17 +54,17 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Profiles and social
 
-- [-] `MVP-PROFILE-001` Every user has a PersonalProfile.
+- [x] `MVP-PROFILE-001` Every user has a PersonalProfile.
 - [ ] `MVP-PROFILE-002` 2-N users can belong to a persistent SharedProfile.
-- [ ] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
+- [-] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
 - [ ] `MVP-SOCIAL-001` SharedProfile has joint saved items.
 - [ ] `MVP-SOCIAL-002` Members can browse/swipe in the SharedProfile context.
 - [ ] `MVP-SOCIAL-003` A member can suggest an Item within a SharedProfile.
 
 ## Data and prediction
 
-- [ ] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
-- [ ] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
+- [-] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
+- [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [ ] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
 - [ ] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
 - [ ] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
