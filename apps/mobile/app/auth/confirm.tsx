@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthSession } from '@/features/auth/AuthSessionProvider';
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 
-type CallbackState = 'verifying' | 'error';
+type CallbackState = 'verifying' | 'success' | 'error';
 
 export default function AuthConfirmRoute() {
   const { verifyEmailLink } = useAuthSession();
@@ -23,9 +23,9 @@ export default function AuthConfirmRoute() {
       const accessToken = firstParam(params.access_token);
       const refreshToken = firstParam(params.refresh_token);
       const link = tokenHash
-        ? { tokenHash, type: 'signup' as const }
+        ? { tokenHash, type: 'email' as const }
         : accessToken && refreshToken
-          ? { accessToken, refreshToken, type: 'signup' as const }
+          ? { accessToken, refreshToken, type: 'email' as const }
           : null;
 
       if (!link) {
@@ -42,7 +42,7 @@ export default function AuthConfirmRoute() {
         return;
       }
 
-      router.replace('/');
+      setState('success');
     }
 
     if (!started.current) {
@@ -63,7 +63,17 @@ export default function AuthConfirmRoute() {
           <>
             <ActivityIndicator color={PERSONAL_ROOM_BASE_THEME.textPrimary} />
             <Text style={styles.title}>Vahvistetaan sähköpostia…</Text>
-            <Text style={styles.message}>Kajo avautuu hetken kuluttua.</Text>
+            <Text style={styles.message}>Tarkistetaan vahvistuslinkkiä.</Text>
+          </>
+        ) : state === 'success' ? (
+          <>
+            <Text style={styles.title}>Sähköposti vahvistettu</Text>
+            <Text style={styles.message}>
+              Tilisi on valmis. Kirjaudu sisään juuri luomillasi tunnuksilla.
+            </Text>
+            <Pressable style={styles.button} onPress={() => router.replace('/')}>
+              <Text style={styles.buttonText}>Siirry kirjautumiseen</Text>
+            </Pressable>
           </>
         ) : (
           <>

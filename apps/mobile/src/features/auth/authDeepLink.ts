@@ -19,13 +19,23 @@ export function rewriteAuthSystemPath(path: string): string {
     return path;
   }
 
-  const route = parsed.pathname.replace(/^\//, '');
+  const [route, tokenHashFromPath, ...rest] = parsed.pathname
+    .replace(/^\//, '')
+    .split('/');
 
-  if (route !== 'confirm' && route !== 'recovery') {
+  if (
+    (route !== 'confirm' && route !== 'recovery') ||
+    rest.length > 0
+  ) {
     return path;
   }
 
   const params = new URLSearchParams(parsed.search);
+
+  if (tokenHashFromPath && !params.has('token_hash')) {
+    params.set('token_hash', tokenHashFromPath);
+  }
+
   const fragmentParams = new URLSearchParams(parsed.hash.replace(/^#/, ''));
 
   fragmentParams.forEach((value, key) => {
@@ -40,6 +50,12 @@ export function rewriteAuthSystemPath(path: string): string {
 }
 
 function normalizeAuthSystemUrl(path: string): string | null {
+  if (path.startsWith('intent://auth/')) {
+    const intentMarker = path.indexOf('#Intent;');
+    const dataUrl = intentMarker >= 0 ? path.slice(0, intentMarker) : path;
+    return dataUrl.replace(/^intent:\/\//, 'kajo://');
+  }
+
   if (path.startsWith('kajo://')) {
     return path;
   }

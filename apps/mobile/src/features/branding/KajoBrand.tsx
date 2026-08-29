@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   splashLogo: {
-    width: '145%',
-    maxWidth: 700,
+    width: '155%',
+    maxWidth: 760,
     aspectRatio: 1,
   },
   mark: {

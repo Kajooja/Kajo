@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   checkAccountAvailability,
   normalizeLoginIdentifier,
+  requestEmailConfirmation,
   requestPasswordRecovery,
   signOut,
   submitEmailSignUp,
@@ -34,7 +35,13 @@ function createBridge(data: unknown): PasswordAuthBridge {
 
 function createEmailLinkApi(): AuthEmailLinkApi {
   const response = {
-    data: { session: { user: { id: 'user-1' } } },
+    data: {
+      session: {
+        user: { id: 'user-1' },
+        access_token: 'access-1',
+        refresh_token: 'refresh-1',
+      },
+    },
     error: null,
   };
 
@@ -118,6 +125,7 @@ describe('submitIdentifierPassword', () => {
       submitIdentifierPassword(bridge, 'reader@example.com', 'secret'),
     ).resolves.toEqual({
       status: 'error',
+      code: 'email-not-confirmed',
       message: 'Sähköpostiosoitetta ei ole vielä vahvistettu. Tarkista sähköpostisi.',
     });
   });
@@ -216,12 +224,17 @@ describe('auth email links', () => {
     await expect(
       verifyAuthEmailLink(auth, {
         tokenHash: 'token-hash-1234567890',
-        type: 'signup',
+        type: 'email',
       }),
-    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    ).resolves.toEqual({
+      status: 'verified',
+      userId: 'user-1',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+    });
     expect(auth.verifyOtp).toHaveBeenCalledWith({
       token_hash: 'token-hash-1234567890',
-      type: 'signup',
+      type: 'email',
     });
     expect(auth.setSession).not.toHaveBeenCalled();
   });
@@ -234,7 +247,12 @@ describe('auth email links', () => {
         tokenHash: 'recovery-token-hash-1234567890',
         type: 'recovery',
       }),
-    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    ).resolves.toEqual({
+      status: 'verified',
+      userId: 'user-1',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+    });
     expect(auth.verifyOtp).toHaveBeenCalledWith({
       token_hash: 'recovery-token-hash-1234567890',
       type: 'recovery',
@@ -250,10 +268,29 @@ describe('auth email links', () => {
         refreshToken: 'refresh-1',
         type: 'recovery',
       }),
-    ).resolves.toEqual({ status: 'verified', userId: 'user-1' });
+    ).resolves.toEqual({
+      status: 'verified',
+      userId: 'user-1',
+      accessToken: 'access-1',
+      refreshToken: 'refresh-1',
+    });
     expect(auth.setSession).toHaveBeenCalledWith({
       access_token: 'access-1',
       refresh_token: 'refresh-1',
+    });
+  });
+});
+
+describe('email confirmation resend', () => {
+  it('requests a new signup confirmation by email or nickname', async () => {
+    const bridge = createBridge({ status: 'confirmation-sent' });
+
+    await expect(requestEmailConfirmation(bridge, ' KeTTu ')).resolves.toEqual({
+      status: 'sent',
+    });
+    expect(bridge.invoke).toHaveBeenCalledWith({
+      action: 'resend-confirmation',
+      identifier: 'kettu',
     });
   });
 });

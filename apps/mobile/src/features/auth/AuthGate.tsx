@@ -225,26 +225,35 @@ function NicknameEntryScreen() {
 }
 
 function AuthEntryScreen() {
-  const { signIn, signUp, requestPasswordRecovery } = useAuthSession();
+  const {
+    signIn,
+    signUp,
+    requestEmailConfirmation,
+    requestPasswordRecovery,
+  } = useAuthSession();
   const [mode, setMode] = useState<AuthEntryMode>('sign-in');
   const [identifier, setIdentifier] = useState('');
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [confirmationSubmitting, setConfirmationSubmitting] = useState(false);
+  const [confirmationResendAvailable, setConfirmationResendAvailable] =
+    useState(false);
   const [recoverySubmitting, setRecoverySubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const isSignIn = mode === 'sign-in';
 
   async function submit() {
-    if (submitting || recoverySubmitting) {
+    if (submitting || confirmationSubmitting || recoverySubmitting) {
       return;
     }
 
     Keyboard.dismiss();
     setSubmitting(true);
     setFeedback(null);
+    setConfirmationResendAvailable(false);
 
     const result = isSignIn
       ? await signIn(identifier, password)
@@ -256,6 +265,9 @@ function AuthEntryScreen() {
 
     if (result.status === 'error') {
       setFeedback(result.message);
+      setConfirmationResendAvailable(
+        isSignIn && result.code === 'email-not-confirmed',
+      );
     } else {
       setPassword('');
       setFeedback(
@@ -268,7 +280,7 @@ function AuthEntryScreen() {
   }
 
   async function requestRecovery() {
-    if (submitting || recoverySubmitting) {
+    if (submitting || confirmationSubmitting || recoverySubmitting) {
       return;
     }
 
@@ -281,6 +293,7 @@ function AuthEntryScreen() {
     Keyboard.dismiss();
     setRecoverySubmitting(true);
     setFeedback(null);
+    setConfirmationResendAvailable(false);
     const result = await requestPasswordRecovery(identifier);
 
     setFeedback(
@@ -291,11 +304,35 @@ function AuthEntryScreen() {
     setRecoverySubmitting(false);
   }
 
+  async function resendConfirmation() {
+    if (
+      submitting ||
+      confirmationSubmitting ||
+      recoverySubmitting ||
+      !confirmationResendAvailable
+    ) {
+      return;
+    }
+
+    Keyboard.dismiss();
+    setConfirmationSubmitting(true);
+    setFeedback(null);
+    const result = await requestEmailConfirmation(identifier);
+
+    setFeedback(
+      result.status === 'sent'
+        ? 'Uusi vahvistusviesti lähetettiin. Avaa vain uusin viesti tällä puhelimella.'
+        : result.message,
+    );
+    setConfirmationSubmitting(false);
+  }
+
   function switchMode(nextMode?: AuthEntryMode) {
     const targetMode = nextMode ?? (isSignIn ? 'sign-up' : 'sign-in');
     setMode(targetMode);
     setPassword('');
     setFeedback(null);
+    setConfirmationResendAvailable(false);
   }
 
   return (
@@ -383,9 +420,25 @@ function AuthEntryScreen() {
         <PrimaryButton
           label={isSignIn ? 'Kirjaudu' : 'Luo tili'}
           loading={submitting}
-          disabled={submitting || recoverySubmitting}
+          disabled={
+            submitting || confirmationSubmitting || recoverySubmitting
+          }
           onPress={() => void submit()}
         />
+
+        {confirmationResendAvailable ? (
+          <SwitchButton
+            label={
+              confirmationSubmitting
+                ? 'Lähetetään vahvistusviestiä…'
+                : 'Lähetä vahvistusviesti uudelleen'
+            }
+            disabled={
+              submitting || confirmationSubmitting || recoverySubmitting
+            }
+            onPress={() => void resendConfirmation()}
+          />
+        ) : null}
 
         <SwitchButton
           label={
@@ -393,7 +446,9 @@ function AuthEntryScreen() {
               ? 'Lähetetään palautuslinkkiä…'
               : 'Unohditko salasanasi?'
           }
-          disabled={submitting || recoverySubmitting}
+          disabled={
+            submitting || confirmationSubmitting || recoverySubmitting
+          }
           onPress={() => void requestRecovery()}
         />
 
@@ -403,7 +458,9 @@ function AuthEntryScreen() {
               ? 'Ei vielä tiliä? Luo tili'
               : 'Onko sinulla jo tili? Kirjaudu'
           }
-          disabled={submitting || recoverySubmitting}
+          disabled={
+            submitting || confirmationSubmitting || recoverySubmitting
+          }
           onPress={() => switchMode()}
         />
       </View>

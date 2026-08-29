@@ -1,6 +1,10 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-type AuthAction = 'account-exists' | 'request-password-reset' | 'sign-in';
+type AuthAction =
+  | 'account-exists'
+  | 'resend-confirmation'
+  | 'request-password-reset'
+  | 'sign-in';
 
 interface RequestBody {
   action?: AuthAction;
@@ -9,6 +13,7 @@ interface RequestBody {
 }
 
 const RECOVERY_REDIRECT = 'kajo://auth/recovery';
+const CONFIRM_REDIRECT = 'kajo://auth/confirm';
 const headers = {
   'content-type': 'application/json; charset=utf-8',
 };
@@ -82,6 +87,23 @@ Deno.serve(async (request) => {
     });
 
     return json({ status: error ? 'error' : 'recovery-sent' }, error ? 500 : 200);
+  }
+
+  if (body.action === 'resend-confirmation') {
+    if (!email) {
+      return json({ status: 'user-not-found' });
+    }
+
+    const { error } = await authClient.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: CONFIRM_REDIRECT },
+    });
+
+    return json(
+      { status: error ? 'error' : 'confirmation-sent' },
+      error ? 500 : 200,
+    );
   }
 
   if (body.action !== 'sign-in') {
