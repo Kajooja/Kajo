@@ -99,6 +99,12 @@ the token in both the Android intent path and query string (and uses the
 `auth/recovery`. Only the mobile client verifies the token hash, so mail
 scanners and tracking redirects cannot invalidate the link.
 
+The native router has explicit token-path routes under both auth callbacks in
+addition to the URL rewrite. If an Android launch reaches Expo Router before
+the rewrite is applied, `/auth/confirm/:token` and `/auth/recovery/:token`
+still resolve to the same verification screens instead of the unmatched-route
+fallback.
+
 Auth callbacks use a non-persisting Supabase client. Signup verification shows
 an explicit success state and returns to signed-out login. Recovery keeps its
 temporary session credentials in memory only, opens the native new-password

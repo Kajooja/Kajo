@@ -19,7 +19,8 @@ export default function AuthConfirmRoute() {
     let active = true;
 
     async function confirm() {
-      const tokenHash = firstParam(params.token_hash);
+      const tokenHash =
+        firstParam(params.token_hash) ?? firstParam(params.token);
       const accessToken = firstParam(params.access_token);
       const refreshToken = firstParam(params.refresh_token);
       const link = tokenHash
@@ -53,7 +54,13 @@ export default function AuthConfirmRoute() {
     return () => {
       active = false;
     };
-  }, [params.access_token, params.refresh_token, params.token_hash, verifyEmailLink]);
+  }, [
+    params.access_token,
+    params.refresh_token,
+    params.token,
+    params.token_hash,
+    verifyEmailLink,
+  ]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
