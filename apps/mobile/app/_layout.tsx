@@ -7,6 +7,7 @@ import { AuthSessionProvider } from '@/features/auth/AuthSessionProvider';
 import { StartupSplash } from '@/features/branding/KajoBrand';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
+import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 
 const STARTUP_SPLASH_DURATION_MS = 2000;
@@ -39,9 +40,11 @@ export default function RootLayout() {
     <SupabaseProvider>
       <AuthSessionProvider>
         <PersonalProfileProvider>
-          <ItemInteractionProvider>
-            {isAuthCallbackRoute ? navigator : <AuthGate>{navigator}</AuthGate>}
-          </ItemInteractionProvider>
+          <EventTrackingProvider>
+            <ItemInteractionProvider>
+              {isAuthCallbackRoute ? navigator : <AuthGate>{navigator}</AuthGate>}
+            </ItemInteractionProvider>
+          </EventTrackingProvider>
         </PersonalProfileProvider>
       </AuthSessionProvider>
     </SupabaseProvider>

@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthSession } from '@/features/auth/AuthSessionProvider';
+import { returnToSignedOutLogin } from '@/features/auth/authNavigation';
 import { PERSONAL_ROOM_BASE_THEME } from '@/theme/roomTheme';
 
 type CallbackState = 'verifying' | 'success' | 'error';
@@ -78,7 +79,10 @@ export default function AuthConfirmRoute() {
             <Text style={styles.message}>
               Tilisi on valmis. Kirjaudu sisään juuri luomillasi tunnuksilla.
             </Text>
-            <Pressable style={styles.button} onPress={() => router.replace('/')}>
+            <Pressable
+              style={styles.button}
+              onPress={() => returnToSignedOutLogin(router)}
+            >
               <Text style={styles.buttonText}>Siirry kirjautumiseen</Text>
             </Pressable>
           </>
@@ -88,7 +92,10 @@ export default function AuthConfirmRoute() {
             <Text style={styles.message}>
               Linkki voi olla vanhentunut tai jo käytetty. Palaa kirjautumiseen ja yritä uudelleen.
             </Text>
-            <Pressable style={styles.button} onPress={() => router.replace('/')}>
+            <Pressable
+              style={styles.button}
+              onPress={() => returnToSignedOutLogin(router)}
+            >
               <Text style={styles.buttonText}>Palaa Kajoon</Text>
             </Pressable>
           </>

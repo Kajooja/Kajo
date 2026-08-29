@@ -12,11 +12,12 @@ import {
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
 
-import type { ItemId, ProfileId, UserId } from '../../domain/contracts';
+import type { EventId, ItemId, ProfileId, UserId } from '../../domain/contracts';
 import {
   commitItemInteractionAction,
   EMPTY_ITEM_INTERACTION_STORE,
   getItemInteraction,
+  getLatestUndoEntry,
   getLatestUndoItemId,
   undoLastItemInteractionAction,
   type ItemInteractionAction,
@@ -44,17 +45,31 @@ export type ItemInteractionPersistenceStatus =
 
 interface ItemInteractionState {
   interactions: ItemInteractionMap;
-  setInterest: (itemId: ItemId, interest: ItemInterest | null) => void;
-  toggleSaved: (itemId: ItemId) => void;
-  setConsumed: (itemId: ItemId, consumed: boolean) => void;
+  setInterest: (
+    itemId: ItemId,
+    interest: ItemInterest | null,
+    eventId?: EventId,
+  ) => boolean;
+  toggleSaved: (itemId: ItemId, eventId?: EventId) => boolean;
+  setConsumed: (
+    itemId: ItemId,
+    consumed: boolean,
+    eventId?: EventId,
+  ) => boolean;
   canUndo: boolean;
   undoTargetItemId: ItemId | null;
-  undo: () => void;
+  undo: () => ItemInteractionUndoResult | null;
   persistenceStatus: ItemInteractionPersistenceStatus;
   hydrationError: string | null;
   persistenceError: string | null;
   retryHydration: () => void;
   retryPersistence: () => void;
+}
+
+export interface ItemInteractionUndoResult {
+  itemId: ItemId;
+  reversedEventId: EventId | null;
+  restoredInteraction: ReturnType<typeof getItemInteraction>;
 }
 
 interface PersistedStoreScope {
@@ -224,13 +239,13 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const commitAction = useCallback(
     (action: ItemInteractionAction) => {
       if (persistenceStatus !== 'disabled' && persistenceStatus !== 'ready') {
-        return;
+        return false;
       }
 
       const nextStore = commitItemInteractionAction(store, action);
 
       if (nextStore === store) {
-        return;
+        return false;
       }
 
       replaceStore(nextStore);
@@ -242,6 +257,8 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
           interaction: getItemInteraction(nextStore.interactions, action.itemId),
         });
       }
+
+      return true;
     },
     [
       configuredScope,
@@ -253,35 +270,49 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   );
 
   const setInterest = useCallback(
-    (itemId: ItemId, interest: ItemInterest | null) => {
-      commitAction({ type: 'SET_INTEREST', itemId, interest });
+    (itemId: ItemId, interest: ItemInterest | null, eventId?: EventId) => {
+      return commitAction({
+        type: 'SET_INTEREST',
+        itemId,
+        interest,
+        ...(eventId ? { eventId } : {}),
+      });
     },
     [commitAction],
   );
 
   const toggleSaved = useCallback(
-    (itemId: ItemId) => {
-      commitAction({ type: 'TOGGLE_SAVED', itemId });
+    (itemId: ItemId, eventId?: EventId) => {
+      return commitAction({
+        type: 'TOGGLE_SAVED',
+        itemId,
+        ...(eventId ? { eventId } : {}),
+      });
     },
     [commitAction],
   );
 
   const setConsumed = useCallback(
-    (itemId: ItemId, consumed: boolean) => {
-      commitAction({ type: 'SET_CONSUMED', itemId, consumed });
+    (itemId: ItemId, consumed: boolean, eventId?: EventId) => {
+      return commitAction({
+        type: 'SET_CONSUMED',
+        itemId,
+        consumed,
+        ...(eventId ? { eventId } : {}),
+      });
     },
     [commitAction],
   );
 
   const undo = useCallback(() => {
     if (persistenceStatus !== 'disabled' && persistenceStatus !== 'ready') {
-      return;
+      return null;
     }
 
-    const itemId = getLatestUndoItemId(store);
+    const undoEntry = getLatestUndoEntry(store);
 
-    if (!itemId) {
-      return;
+    if (!undoEntry) {
+      return null;
     }
 
     const nextStore = undoLastItemInteractionAction(store);
@@ -290,10 +321,22 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     if (configuredScope) {
       enqueuePersistence({
         ...configuredScope,
-        itemId,
-        interaction: getItemInteraction(nextStore.interactions, itemId),
+        itemId: undoEntry.itemId,
+        interaction: getItemInteraction(
+          nextStore.interactions,
+          undoEntry.itemId,
+        ),
       });
     }
+
+    return {
+      itemId: undoEntry.itemId,
+      reversedEventId: undoEntry.eventId,
+      restoredInteraction: getItemInteraction(
+        nextStore.interactions,
+        undoEntry.itemId,
+      ),
+    };
   }, [
     configuredScope,
     enqueuePersistence,

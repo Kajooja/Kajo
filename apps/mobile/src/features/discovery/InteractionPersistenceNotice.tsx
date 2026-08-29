@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useEventTracking } from '../events/EventTrackingContext';
 import type { RoomTheme } from '../../theme/roomTheme';
 import { useItemInteractions } from './ItemInteractionContext';
 
@@ -11,9 +12,19 @@ export function InteractionPersistenceNotice({
   theme,
 }: InteractionPersistenceNoticeProps) {
   const { persistenceError, retryPersistence } = useItemInteractions();
+  const {
+    persistenceError: eventPersistenceError,
+    retryPersistence: retryEventPersistence,
+  } = useEventTracking();
+  const error = persistenceError ?? eventPersistenceError;
 
-  if (!persistenceError) {
+  if (!error) {
     return null;
+  }
+
+  function retry() {
+    if (persistenceError) retryPersistence();
+    if (eventPersistenceError) retryEventPersistence();
   }
 
   return (
@@ -22,11 +33,11 @@ export function InteractionPersistenceNotice({
       style={[styles.notice, { borderColor: theme.base.border }]}
     >
       <Text style={[styles.message, { color: theme.base.textPrimary }]}>
-        {persistenceError}
+        {error}
       </Text>
       <Pressable
         accessibilityRole="button"
-        onPress={retryPersistence}
+        onPress={retry}
         style={({ pressed }) => [styles.retry, pressed && styles.pressed]}
       >
         <Text style={[styles.retryText, { color: theme.ambient.curtainHighlight }]}>

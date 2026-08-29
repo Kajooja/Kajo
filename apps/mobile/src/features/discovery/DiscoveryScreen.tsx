@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type ViewToken,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
+import { useEventTracking } from '../events/EventTrackingContext';
+import {
+  createCorrelationId,
+  createUuidV7,
+} from '../events/eventTracking';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -27,6 +39,7 @@ interface DiscoveryScreenProps {
 export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const { mode } = useDiscoveryMode();
   const { interactions } = useItemInteractions();
+  const eventTracking = useEventTracking();
   const [showConsumed, setShowConsumed] = useState(false);
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
@@ -36,6 +49,81 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     ? consumedItems
     : getDiscoverableItems(rankedItems, interactions);
   const consumedLabel = getConsumedItemLabels(itemType).history;
+  const [traceSeed] = useState(() => createUuidV7());
+  const predictionId = createCorrelationId(
+    traceSeed,
+    `${itemType}:${mode}`,
+  );
+  const visibleItems = useRef<readonly Item[]>([]);
+  const impressionContext = useRef<ImpressionContext>({
+    mode,
+    predictionId,
+    showConsumed,
+    recordEvent: eventTracking.recordEvent,
+  });
+  useEffect(() => {
+    impressionContext.current = {
+      mode,
+      predictionId,
+      showConsumed,
+      recordEvent: eventTracking.recordEvent,
+    };
+  }, [eventTracking.recordEvent, mode, predictionId, showConsumed]);
+  const viewabilityConfig = useMemo(
+    () => ({
+      itemVisiblePercentThreshold: 60,
+      minimumViewTime: 400,
+    }),
+    [],
+  );
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken<Item>[] }) => {
+      visibleItems.current = viewableItems
+        .filter((token) => token.isViewable)
+        .map((token) => token.item);
+      recordVisibleImpressions(
+        visibleItems.current,
+        impressionContext.current,
+      );
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (eventTracking.status === 'ready') {
+      recordVisibleImpressions(
+        visibleItems.current,
+        {
+          mode,
+          predictionId,
+          showConsumed,
+          recordEvent: eventTracking.recordEvent,
+        },
+      );
+    }
+  }, [
+    eventTracking.status,
+    eventTracking.recordEvent,
+    mode,
+    predictionId,
+    showConsumed,
+  ]);
+
+  function openItem(item: Item) {
+    eventTracking.recordEvent({
+      eventType: 'ITEM_OPENED',
+      itemId: item.id,
+      itemType: item.itemType,
+      predictionId,
+      discoveryMode: mode,
+      properties: { source: 'DISCOVERY_GRID' },
+    });
+
+    router.push({
+      pathname: '/discovery/[itemId]',
+      params: { itemId: item.id, predictionId },
+    });
+  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -106,6 +194,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.gridRow}
           contentContainerStyle={[styles.gridContent, items.length === 0 && styles.emptyGrid]}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
               {showConsumed
@@ -124,6 +214,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               interaction={getItemInteraction(interactions, item.id)}
               theme={theme}
               styles={styles}
+              onOpen={() => openItem(item)}
             />
           )}
         />
@@ -138,9 +229,17 @@ interface ItemCardProps {
   interaction: ItemInteraction;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
+  onOpen: () => void;
 }
 
-function ItemCard({ item, index, interaction, theme, styles }: ItemCardProps) {
+function ItemCard({
+  item,
+  index,
+  interaction,
+  theme,
+  styles,
+  onOpen,
+}: ItemCardProps) {
   const tag = item.tags?.[0] ?? item.itemType.toLowerCase();
   const coverOpacity = 0.42 + (index % 3) * 0.12;
   const consumedLabel = getConsumedItemLabels(item.itemType).status;
@@ -150,12 +249,7 @@ function ItemCard({ item, index, interaction, theme, styles }: ItemCardProps) {
       accessibilityRole="button"
       accessibilityLabel={`Open ${item.title}`}
       accessibilityHint="Opens swipe browsing and item details"
-      onPress={() =>
-        router.push({
-          pathname: '/discovery/[itemId]',
-          params: { itemId: item.id },
-        })
-      }
+      onPress={onOpen}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View
@@ -191,6 +285,31 @@ function ItemCard({ item, index, interaction, theme, styles }: ItemCardProps) {
       </Text>
     </Pressable>
   );
+}
+
+interface ImpressionContext {
+  mode: ReturnType<typeof useDiscoveryMode>['mode'];
+  predictionId: string;
+  showConsumed: boolean;
+  recordEvent: ReturnType<typeof useEventTracking>['recordEvent'];
+}
+
+function recordVisibleImpressions(
+  items: readonly Item[],
+  context: ImpressionContext,
+) {
+  if (context.showConsumed) return;
+
+  for (const item of items) {
+    context.recordEvent({
+      eventType: 'ITEM_IMPRESSION',
+      itemId: item.id,
+      itemType: item.itemType,
+      predictionId: context.predictionId,
+      discoveryMode: context.mode,
+      properties: { source: 'DISCOVERY_GRID' },
+    });
+  }
 }
 
 function createStyles(theme: RoomTheme) {

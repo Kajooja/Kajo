@@ -8,6 +8,7 @@ import {
   getConsumedItems,
   getDiscoverableItems,
   getItemInteraction,
+  getLatestUndoEntry,
   getLatestUndoItemId,
   getNextSwipeIndex,
   ITEM_INTERACTION_UNDO_LIMIT,
@@ -151,6 +152,19 @@ describe('item interaction state', () => {
     expect(getLatestUndoItemId(store)).toBe(BOOK_A.id);
     store = undoLastItemInteractionAction(store);
     expect(getLatestUndoItemId(store)).toBeNull();
+  });
+
+  it('retains the original Event ID for a traceable undo', () => {
+    const store = commitItemInteractionAction(EMPTY_ITEM_INTERACTION_STORE, {
+      type: 'SET_INTEREST',
+      itemId: BOOK_A.id,
+      interest: 'LIKED',
+      eventId: '01992d6a-20c0-7000-8000-000000000001',
+    });
+
+    expect(getLatestUndoEntry(store)?.eventId).toBe(
+      '01992d6a-20c0-7000-8000-000000000001',
+    );
   });
 
   it('advances every supported committed action and lets undo target its previous card', () => {

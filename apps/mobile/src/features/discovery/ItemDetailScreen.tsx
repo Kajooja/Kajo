@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -6,6 +6,8 @@ import {
   Animated,
   Easing,
   FlatList,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,9 +17,22 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { Item, ItemId } from '../../domain/contracts';
+import type {
+  EventId,
+  Item,
+  ItemId,
+  PredictionId,
+} from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
+import { useEventTracking } from '../events/EventTrackingContext';
+import {
+  createUuidV7,
+} from '../events/eventTracking';
+import {
+  getInteractionEventType,
+  getUndoEventProperties,
+} from '../events/itemInteractionEvents';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -26,6 +41,7 @@ import {
   getItemInteraction,
   getNextSwipeIndex,
   type ItemInteraction,
+  type ItemInteractionAction,
   type ItemInterest,
 } from './itemInteraction';
 import {
@@ -36,11 +52,16 @@ import { getMockItem, getRankedMockItems } from './mockDiscovery';
 
 interface ItemDetailScreenProps {
   itemId: ItemId;
+  predictionId?: PredictionId;
 }
 
-export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
+export function ItemDetailScreen({
+  itemId,
+  predictionId,
+}: ItemDetailScreenProps) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
+  const eventTracking = useEventTracking();
   const {
     interactions,
     setInterest,
@@ -53,6 +74,9 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
+  const [recommendationTraceId] = useState<PredictionId>(
+    () => predictionId ?? createUuidV7(),
+  );
   const rankedItems = selectedItem ? getRankedMockItems(selectedItem.itemType, mode) : [];
   const [items] = useState<readonly Item[]>(() =>
     selectedItem ? buildSwipeSequence(selectedItem, rankedItems, interactions) : [],
@@ -62,6 +86,29 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const recordItemImpression = useCallback(
+    (item: Item) => {
+      eventTracking.recordEvent({
+        eventType: 'ITEM_IMPRESSION',
+        itemId: item.id,
+        itemType: item.itemType,
+        predictionId: recommendationTraceId,
+        discoveryMode: mode,
+        properties: { source: 'ITEM_SEQUENCE' },
+      });
+    },
+    [eventTracking, mode, recommendationTraceId],
+  );
+
+  useEffect(() => {
+    if (selectedItem && eventTracking.status === 'ready') {
+      recordItemImpression(selectedItem);
+    }
+  }, [
+    eventTracking.status,
+    recordItemImpression,
+    selectedItem,
+  ]);
 
   useEffect(() => {
     let active = true;
@@ -81,11 +128,23 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     };
   }, [exitAnimation]);
 
-  function handleInterest(item: Item, index: number, interest: ItemInterest | null) {
+  function handleInterest(
+    item: Item,
+    index: number,
+    interaction: ItemInteraction,
+    interest: ItemInterest | null,
+  ) {
+    const action: ItemInteractionAction = {
+      type: 'SET_INTEREST',
+      itemId: item.id,
+      interest,
+    };
     handleCommittedAction(
       item,
       index,
-      () => setInterest(item.id, interest),
+      action,
+      { ...interaction, interest },
+      (eventId) => setInterest(item.id, interest, eventId),
       interest === 'LIKED'
         ? ITEM_INTERACTION_LABELS.likedFeedback
         : interest === 'DISLIKED'
@@ -94,25 +153,46 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     );
   }
 
-  function handleSaved(item: Item, index: number, currentlySaved: boolean) {
+  function handleSaved(
+    item: Item,
+    index: number,
+    interaction: ItemInteraction,
+  ) {
+    const action: ItemInteractionAction = {
+      type: 'TOGGLE_SAVED',
+      itemId: item.id,
+    };
     handleCommittedAction(
       item,
       index,
-      () => toggleSaved(item.id),
-      currentlySaved
+      action,
+      { ...interaction, saved: !interaction.saved },
+      (eventId) => toggleSaved(item.id, eventId),
+      interaction.saved
         ? ITEM_INTERACTION_LABELS.unsavedFeedback
         : ITEM_INTERACTION_LABELS.savedFeedback,
     );
   }
 
-  function handleConsumed(item: Item, index: number, currentlyConsumed: boolean) {
-    const nextConsumed = !currentlyConsumed;
+  function handleConsumed(
+    item: Item,
+    index: number,
+    interaction: ItemInteraction,
+  ) {
+    const nextConsumed = !interaction.consumed;
     const labels = getConsumedItemLabels(item.itemType);
+    const action: ItemInteractionAction = {
+      type: 'SET_CONSUMED',
+      itemId: item.id,
+      consumed: nextConsumed,
+    };
 
     handleCommittedAction(
       item,
       index,
-      () => setConsumed(item.id, nextConsumed),
+      action,
+      { ...interaction, consumed: nextConsumed },
+      (eventId) => setConsumed(item.id, nextConsumed, eventId),
       nextConsumed ? labels.markedFeedback : labels.unmarkedFeedback,
     );
   }
@@ -120,14 +200,38 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   function handleCommittedAction(
     item: Item,
     index: number,
-    commit: () => void,
+    action: ItemInteractionAction,
+    nextInteraction: ItemInteraction,
+    commit: (eventId?: EventId) => boolean,
     nextFeedback: string,
   ) {
     if (exitingItemId) {
       return;
     }
 
-    commit();
+    const eventId =
+      eventTracking.status === 'ready'
+        ? eventTracking.createEventId()
+        : undefined;
+
+    if (!commit(eventId)) {
+      return;
+    }
+
+    if (eventId) {
+      eventTracking.recordEvent(
+        {
+          eventType: getInteractionEventType(action, nextInteraction),
+          itemId: item.id,
+          itemType: item.itemType,
+          predictionId: recommendationTraceId,
+          discoveryMode: mode,
+          properties: { source: 'ITEM_DETAIL' },
+        },
+        eventId,
+      );
+    }
+
     setFeedback(nextFeedback);
 
     const nextIndex = getNextSwipeIndex(index, items.length);
@@ -138,6 +242,12 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
 
     const advance = () => {
       listRef.current?.scrollToIndex({ index: nextIndex, animated: false });
+      const nextItem = items[nextIndex];
+
+      if (nextItem) {
+        recordItemImpression(nextItem);
+      }
+
       exitAnimation.setValue(0);
       setExitingItemId(null);
     };
@@ -167,7 +277,28 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
     }
 
     const targetIndex = items.findIndex((item) => item.id === undoTargetItemId);
-    undo();
+    const result = undo();
+
+    if (!result) {
+      return;
+    }
+
+    const targetItem = getMockItem(result.itemId);
+
+    if (result.reversedEventId && targetItem) {
+      eventTracking.recordEvent({
+        eventType: 'ITEM_INTERACTION_UNDONE',
+        itemId: targetItem.id,
+        itemType: targetItem.itemType,
+        predictionId: recommendationTraceId,
+        discoveryMode: mode,
+        properties: getUndoEventProperties(
+          result.reversedEventId,
+          result.restoredInteraction,
+        ),
+      });
+    }
+
     setFeedback(ITEM_INTERACTION_LABELS.undoFeedback);
 
     if (targetIndex >= 0) {
@@ -177,8 +308,22 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
 
     router.replace({
       pathname: '/discovery/[itemId]',
-      params: { itemId: undoTargetItemId },
+      params: {
+        itemId: undoTargetItemId,
+        predictionId: recommendationTraceId,
+      },
     });
+  }
+
+  function handleSequenceScrollEnd(
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) {
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    const item = items[index];
+
+    if (item) {
+      recordItemImpression(item);
+    }
   }
 
   if (!selectedItem) {
@@ -267,6 +412,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+        onMomentumScrollEnd={handleSequenceScrollEnd}
         renderItem={({ item, index }) => {
           const interaction = getItemInteraction(interactions, item.id);
           const exiting = item.id === exitingItemId;
@@ -304,9 +450,13 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
                 theme={theme}
                 styles={styles}
                 disabled={Boolean(exitingItemId)}
-                onInterest={(interest) => handleInterest(item, index, interest)}
-                onToggleSaved={() => handleSaved(item, index, interaction.saved)}
-                onConsumedPress={() => handleConsumed(item, index, interaction.consumed)}
+                onInterest={(interest) =>
+                  handleInterest(item, index, interaction, interest)
+                }
+                onToggleSaved={() => handleSaved(item, index, interaction)}
+                onConsumedPress={() =>
+                  handleConsumed(item, index, interaction)
+                }
               />
             </Animated.View>
           );

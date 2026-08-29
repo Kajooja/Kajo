@@ -1,4 +1,4 @@
-import type { Item, ItemId } from '../../domain/contracts';
+import type { EventId, Item, ItemId } from '../../domain/contracts';
 
 export type ItemInterest = 'LIKED' | 'DISLIKED';
 
@@ -11,13 +11,16 @@ export interface ItemInteraction {
 export type ItemInteractionMap = Readonly<Record<ItemId, ItemInteraction>>;
 
 export type ItemInteractionAction =
-  | { type: 'SET_INTEREST'; itemId: ItemId; interest: ItemInterest | null }
-  | { type: 'TOGGLE_SAVED'; itemId: ItemId }
-  | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean };
+  (
+    | { type: 'SET_INTEREST'; itemId: ItemId; interest: ItemInterest | null }
+    | { type: 'TOGGLE_SAVED'; itemId: ItemId }
+    | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean }
+  ) & { eventId?: EventId };
 
-interface ItemInteractionUndoEntry {
+export interface ItemInteractionUndoEntry {
   itemId: ItemId;
   previousInteraction: ItemInteraction | null;
+  eventId: EventId | null;
 }
 
 export interface ItemInteractionStore {
@@ -91,7 +94,11 @@ export function commitItemInteractionAction(
     interactions,
     undoStack: [
       ...store.undoStack.slice(-(ITEM_INTERACTION_UNDO_LIMIT - 1)),
-      { itemId: action.itemId, previousInteraction },
+      {
+        itemId: action.itemId,
+        previousInteraction,
+        eventId: action.eventId ?? null,
+      },
     ],
   };
 }
@@ -115,6 +122,12 @@ export function undoLastItemInteractionAction(store: ItemInteractionStore): Item
 
 export function getLatestUndoItemId(store: ItemInteractionStore): ItemId | null {
   return store.undoStack[store.undoStack.length - 1]?.itemId ?? null;
+}
+
+export function getLatestUndoEntry(
+  store: ItemInteractionStore,
+): ItemInteractionUndoEntry | null {
+  return store.undoStack[store.undoStack.length - 1] ?? null;
 }
 
 export function getNextSwipeIndex(currentIndex: number, itemCount: number): number | null {

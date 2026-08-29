@@ -37,6 +37,7 @@ properties?
 
 - `ITEM_LIKED`
 - `ITEM_DISLIKED`
+- `ITEM_INTEREST_CLEARED` — a prior explicit like/dislike was explicitly returned to neutral.
 - `ITEM_SAVED`
 - `ITEM_UNSAVED`
 - `ITEM_SUGGESTED`
@@ -44,6 +45,8 @@ properties?
 ### Consumption / outcome
 
 - `ITEM_CONSUMED` — generic underlying semantic; UI wording may be watched/read/attended.
+- `ITEM_CONSUMPTION_REVERSED` — a prior consumed/read/watched mark was explicitly removed.
+- `ITEM_INTERACTION_UNDONE` — the latest committed Item interaction was undone; `properties.reversedEventId` identifies the compensated Event and restored interaction fields describe the resulting current state.
 - `ITEM_RATED`
 
 ### Search/session
@@ -78,6 +81,7 @@ This means User A saved Movie X while acting inside the joint A+B Kajo. It is no
 
 - Use UTC timestamps in storage.
 - Prefer append-only behavioural events; corrections should be explicit rather than silently rewriting behavioural history.
+- Undo appends `ITEM_INTERACTION_UNDONE`; it never deletes the original Event. Directly clearing interest or removing a consumed mark uses its own explicit canonical Event instead of pretending that the original action never happened.
 - Event names and semantics are canonical contracts, not analytics-only labels.
 - Do not create domain-specific duplicates such as `BOOK_SAVED` and `MOVIE_SAVED` when `ITEM_SAVED` is sufficient.
 - Sensitive/contextual fields must be collected only when needed and permitted.

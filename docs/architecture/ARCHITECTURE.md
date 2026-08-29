@@ -103,7 +103,10 @@ The native router has explicit token-path routes under both auth callbacks in
 addition to the URL rewrite. If an Android launch reaches Expo Router before
 the rewrite is applied, `/auth/confirm/:token` and `/auth/recovery/:token`
 still resolve to the same verification screens instead of the unmatched-route
-fallback.
+fallback. The Android callback intent foregrounds and clears to Kajo's existing
+task, and the callback actions clear the callback route stack before returning
+to signed-out login. This prevents the visible return action from dropping the
+user back into the email application's task.
 
 Auth callbacks use a non-persisting Supabase client. Signup verification shows
 an explicit success state and returns to signed-out login. Recovery keeps its
@@ -118,6 +121,15 @@ membership-scoped `SELECT` and `INSERT` only; they cannot update or delete
 behavioural evidence. Stable client-generated IDs make retries idempotent with
 insert-or-ignore semantics. Current `item_interactions` remains the mutable
 UI hydration projection and is intentionally not treated as Event history.
+
+The root-scoped mobile Event tracker creates one session for the active
+User/Profile context and persists it lazily before the first queued Event. It
+uses stable UUIDv7-compatible client IDs, retries the same rows, deduplicates
+meaningful impressions within one recommendation trace and carries the trace
+from discovery into Item actions. Current mock ranking receives correlation
+IDs for evaluation but remains explicitly separate from Prediction V0.
+Interaction undo appends a compensating `ITEM_INTERACTION_UNDONE` Event that
+references the original Event ID; it never deletes or rewrites evidence.
 
 ## Prediction service
 
