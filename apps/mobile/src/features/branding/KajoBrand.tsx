@@ -1,16 +1,44 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+
+const SPLASH_SOURCE_SIZE = 96;
+const SPLASH_VISIBLE_LEFT = 20;
+const SPLASH_VISIBLE_WIDTH = 67;
+const SPLASH_VISIBLE_CENTER_X =
+  SPLASH_VISIBLE_LEFT + SPLASH_VISIBLE_WIDTH / 2;
+const SPLASH_VISIBLE_SCREEN_WIDTH = 0.94;
 
 export function StartupSplash() {
+  const { height, width } = useWindowDimensions();
+  const imageSize =
+    (width * SPLASH_VISIBLE_SCREEN_WIDTH * SPLASH_SOURCE_SIZE) /
+    SPLASH_VISIBLE_WIDTH;
+  const imageLeft =
+    width / 2 -
+    (imageSize * SPLASH_VISIBLE_CENTER_X) / SPLASH_SOURCE_SIZE;
+  const imageTop = (height - imageSize) / 2;
+
   return (
     <View style={styles.splash}>
-      <View style={styles.splashLogoViewport}>
-        <Image
-          accessibilityLabel="Kajo"
-          resizeMode="contain"
-          source={require('../../../assets/kajo-logo-color.png')}
-          style={styles.splashLogo}
-        />
-      </View>
+      <Image
+        accessibilityLabel="Kajo"
+        resizeMode="contain"
+        source={require('../../../assets/kajo-logo-color.png')}
+        style={[
+          styles.splashLogo,
+          {
+            height: imageSize,
+            left: imageLeft,
+            top: imageTop,
+            width: imageSize,
+          },
+        ]}
+      />
     </View>
   );
 }
@@ -37,17 +65,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#000000',
   },
-  splashLogoViewport: {
-    width: '98%',
-    aspectRatio: 71 / 27,
-    overflow: 'hidden',
-  },
   splashLogo: {
     position: 'absolute',
-    width: '135.22%',
-    aspectRatio: 1,
-    left: '-25.35%',
-    top: '-129.63%',
   },
   mark: {
     width: 102,
