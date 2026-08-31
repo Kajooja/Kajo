@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profileTint: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0.06,
   },
 });
