@@ -1,5 +1,9 @@
 import { useState, type PropsWithChildren } from 'react';
-import { useRouter } from 'expo-router';
+import {
+  useGlobalSearchParams,
+  usePathname,
+  useRouter,
+} from 'expo-router';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,6 +15,10 @@ import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
 import { useDiscoveryMode } from './DiscoveryModeContext';
+import {
+  createSharedSuggestionEventInput,
+  resolveSharedSuggestionItem,
+} from './sharedSuggestion';
 
 const MODE_LABELS = {
   FOR_YOU: 'SINULLE',
@@ -18,19 +26,39 @@ const MODE_LABELS = {
   RISK: 'RISKI',
 } as const;
 
+interface SuggestionReceipt {
+  profileId: string;
+  itemId: string;
+}
+
 export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { itemId } = useGlobalSearchParams<{ itemId?: string | string[] }>();
   const { mode, setMode } = useDiscoveryMode();
-  const { recordEvent } = useEventTracking();
+  const eventTracking = useEventTracking();
   const { activeProfile } = useActiveProfile();
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile);
+  const suggestionItem = resolveSharedSuggestionItem(
+    activeProfile,
+    pathname,
+    itemId,
+  );
+  const [suggestionReceipt, setSuggestionReceipt] =
+    useState<SuggestionReceipt | null>(null);
+  const suggestionSent = Boolean(
+    suggestionItem &&
+      activeProfile?.type === 'SHARED' &&
+      suggestionReceipt?.profileId === activeProfile.id &&
+      suggestionReceipt.itemId === suggestionItem.id,
+  );
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
 
   function changeMode(nextMode: typeof mode) {
     if (nextMode !== mode) {
-      recordEvent({
+      eventTracking.recordEvent({
         eventType: 'DISCOVERY_MODE_CHANGED',
         discoveryMode: nextMode,
         properties: {
@@ -41,6 +69,30 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     }
 
     setMode(nextMode);
+  }
+
+  function suggestCurrentItem() {
+    if (
+      !suggestionItem ||
+      activeProfile?.type !== 'SHARED' ||
+      eventTracking.status !== 'ready' ||
+      suggestionSent
+    ) {
+      return;
+    }
+
+    const eventId = eventTracking.recordEvent(
+      createSharedSuggestionEventInput(suggestionItem, mode),
+    );
+
+    if (!eventId) {
+      return;
+    }
+
+    setSuggestionReceipt({
+      profileId: activeProfile.id,
+      itemId: suggestionItem.id,
+    });
   }
 
   return (
@@ -92,6 +144,71 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               { backgroundColor: theme.base.sceneBackground },
             ]}
           />
+        ) : null}
+        {suggestionItem && activeProfile?.type === 'SHARED' ? (
+          <View
+            style={[
+              styles.suggestionPanel,
+              {
+                backgroundColor: theme.base.sceneBackground,
+                borderColor: theme.base.border,
+              },
+            ]}
+          >
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                suggestionSent ? 'Ehdotettu yhteiseen Kajoon' : 'Ehdota yhteiseen Kajoon'
+              }
+              accessibilityState={{
+                disabled: suggestionSent || eventTracking.status !== 'ready',
+              }}
+              disabled={suggestionSent || eventTracking.status !== 'ready'}
+              onPress={suggestCurrentItem}
+              style={({ pressed }) => [
+                styles.suggestionButton,
+                pressed && styles.brandPressed,
+                (suggestionSent || eventTracking.status !== 'ready') && styles.disabled,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.suggestionText,
+                  { color: theme.base.textPrimary },
+                ]}
+              >
+                {suggestionSent ? 'EHDOTETTU' : 'EHDOTA YHTEISEEN'}
+              </Text>
+            </Pressable>
+            {eventTracking.persistenceError ? (
+              <View style={styles.suggestionErrorRow}>
+                <Text
+                  numberOfLines={2}
+                  style={[
+                    styles.suggestionErrorText,
+                    { color: theme.base.textMuted },
+                  ]}
+                >
+                  Tallennus kesken.
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Yritä ehdotuksen tallennusta uudelleen"
+                  onPress={eventTracking.retryPersistence}
+                  style={({ pressed }) => [pressed && styles.brandPressed]}
+                >
+                  <Text
+                    style={[
+                      styles.retryText,
+                      { color: theme.base.textPrimary },
+                    ]}
+                  >
+                    Yritä uudelleen
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+          </View>
         ) : null}
       </View>
     </View>
@@ -148,5 +265,41 @@ const styles = StyleSheet.create({
   profileTint: {
     ...StyleSheet.absoluteFill,
     opacity: 0.06,
+  },
+  suggestionPanel: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    zIndex: 20,
+    maxWidth: 190,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    gap: 6,
+  },
+  suggestionButton: {
+    minHeight: 30,
+    justifyContent: 'center',
+  },
+  suggestionText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.1,
+  },
+  suggestionErrorRow: {
+    gap: 4,
+  },
+  suggestionErrorText: {
+    fontSize: 10,
+    lineHeight: 13,
+  },
+  retryText: {
+    fontSize: 10,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  disabled: {
+    opacity: 0.55,
   },
 });
