@@ -228,10 +228,10 @@ describe('SharedProfile RPC operations', () => {
     });
   });
 
-  it('maps missing users specifically and hides other backend details', async () => {
+  it('maps a missing nickname specifically while keeping stale-profile errors generic', async () => {
     const missingRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
-      error: { code: 'P0002', message: 'private missing detail' },
+      error: { code: 'P0002', message: 'Kajo user not found' },
     }));
 
     await expect(
@@ -241,6 +241,20 @@ describe('SharedProfile RPC operations', () => {
       message: 'Tällä nimimerkillä ei löytynyt Kajo-käyttäjää.',
     });
 
+    const staleProfileRpc: SharedProfileRpc = vi.fn(async () => ({
+      data: null,
+      error: { code: 'P0002', message: 'Shared profile not found' },
+    }));
+
+    await expect(
+      addSharedProfileMember(staleProfileRpc, 'shared-old', 'Susi'),
+    ).resolves.toEqual({
+      status: 'error',
+      message: 'Jäsenen lisääminen yhteiseen Kajoon epäonnistui. Yritä uudelleen.',
+    });
+  });
+
+  it('does not expose backend details on list or create failures', async () => {
     const failingRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
       error: { message: 'private database detail' },
