@@ -56,6 +56,12 @@ interface ItemInteractionState {
     consumed: boolean,
     eventId?: EventId,
   ) => boolean;
+  setRating: (itemId: ItemId, rating: number, eventId?: EventId) => boolean;
+  setNotInterested: (
+    itemId: ItemId,
+    notInterested: boolean,
+    eventId?: EventId,
+  ) => boolean;
   canUndo: boolean;
   undoTargetItemId: ItemId | null;
   undo: () => ItemInteractionUndoResult | null;
@@ -304,6 +310,30 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     [commitAction],
   );
 
+  const setRating = useCallback(
+    (itemId: ItemId, rating: number, eventId?: EventId) => {
+      return commitAction({
+        type: 'SET_RATING',
+        itemId,
+        rating,
+        ...(eventId ? { eventId } : {}),
+      });
+    },
+    [commitAction],
+  );
+
+  const setNotInterested = useCallback(
+    (itemId: ItemId, notInterested: boolean, eventId?: EventId) => {
+      return commitAction({
+        type: 'SET_NOT_INTERESTED',
+        itemId,
+        notInterested,
+        ...(eventId ? { eventId } : {}),
+      });
+    },
+    [commitAction],
+  );
+
   const undo = useCallback(() => {
     if (persistenceStatus !== 'disabled' && persistenceStatus !== 'ready') {
       return null;
@@ -390,6 +420,8 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       setInterest,
       toggleSaved,
       setConsumed,
+      setRating,
+      setNotInterested,
       canUndo: store.undoStack.length > 0,
       undoTargetItemId,
       undo,
@@ -407,6 +439,8 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       retryPersistence,
       setConsumed,
       setInterest,
+      setNotInterested,
+      setRating,
       store.interactions,
       store.undoStack.length,
       toggleSaved,
