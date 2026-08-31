@@ -80,6 +80,12 @@ be evaluated through Sprint 007 Events.
   DiscoveryMode orderings, consumed suppression, one response-level
   `predictionId`, BOOK/MOVIE-generic output, least-privilege execution grants
   and unrelated-User denial without retaining test rows.
+- PR #97 merged and the exact migration is deployed. Hosted function ACL,
+  configured ranking, mode-order, suppression and security/performance advisor
+  verification passed; Issue #95 is complete.
+- Issue #98 is active for typed mobile consumption, stale-response protection,
+  controlled Event/state refresh, explicit mock fallback and configured-phone
+  correlation acceptance.
 
 ## Decisions
 
@@ -122,9 +128,11 @@ be evaluated through Sprint 007 Events.
 
 ## Mid-sprint handoff
 
-Sprint 008 begins with Issue #95. Do not integrate ranking into mobile or create
-an empty `services/prediction/` tree before the server-owned scorer boundary is
-selected, implemented, tested and hosted.
+Issue #95's server-owned scorer is merged, deployed and hosted-verified. Continue
+Issue #98 from `apps/mobile/src/features/discovery/`: configured discovery must
+consume `rank_items_v0`, preserve its response-level `predictionId` through
+Events and retain mock ranking only as an explicit fallback. Do not create an
+empty `services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
 
 ## Final handoff
 
