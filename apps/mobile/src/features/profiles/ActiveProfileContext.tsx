@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
@@ -48,9 +47,14 @@ interface ActiveProfileContextValue {
 
 interface SharedProfilesSnapshot {
   actorUserId: UserId;
-  status: 'loading' | 'ready' | 'error';
+  status: 'ready' | 'error';
   profiles: readonly SharedProfileMembership[];
   message: string | null;
+}
+
+interface ActiveSelection {
+  actorUserId: UserId;
+  profileId: ProfileId;
 }
 
 const EMPTY_SHARED_PROFILES: readonly SharedProfileMembership[] = [];
@@ -59,11 +63,12 @@ const ActiveProfileContext = createContext<ActiveProfileContextValue | null>(nul
 export function ActiveProfileProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const personal = usePersonalProfile();
-  const [activeProfileId, setActiveProfileId] = useState<ProfileId | null>(null);
+  const [selection, setSelection] = useState<ActiveSelection | null>(null);
   const [sharedSnapshot, setSharedSnapshot] =
     useState<SharedProfilesSnapshot | null>(null);
   const [sharedAttempt, setSharedAttempt] = useState(0);
-  const previousActorUserId = useRef<UserId | null>(null);
+  const [refreshingActorUserId, setRefreshingActorUserId] =
+    useState<UserId | null>(null);
 
   const personalIdentity = personal.status === 'ready' ? personal.identity : null;
   const actorUserId = personalIdentity?.user.id ?? null;
@@ -88,16 +93,6 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    if (previousActorUserId.current === actorUserId) {
-      return;
-    }
-
-    previousActorUserId.current = actorUserId;
-    setActiveProfileId(personalProfile?.id ?? null);
-    setSharedSnapshot(null);
-  }, [actorUserId, personalProfile?.id]);
-
-  useEffect(() => {
     if (!actorUserId || !rpc) {
       return;
     }
@@ -105,18 +100,12 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     let active = true;
     const scopeActorUserId = actorUserId;
 
-    setSharedSnapshot((current) => ({
-      actorUserId: scopeActorUserId,
-      status: 'loading',
-      profiles:
-        current?.actorUserId === scopeActorUserId
-          ? current.profiles
-          : EMPTY_SHARED_PROFILES,
-      message: null,
-    }));
-
     void loadSharedProfiles(rpc).then((result) => {
       if (!active) return;
+
+      setRefreshingActorUserId((current) =>
+        current === scopeActorUserId ? null : current,
+      );
 
       if (result.status === 'error') {
         setSharedSnapshot((current) => ({
@@ -152,29 +141,38 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     () => getSelectableProfiles(personalProfile, visibleSharedProfiles),
     [personalProfile, visibleSharedProfiles],
   );
+  const requestedProfileId =
+    actorUserId && selection?.actorUserId === actorUserId
+      ? selection.profileId
+      : personalProfile?.id ?? null;
   const activeProfile = resolveActiveProfile(
-    activeProfileId,
+    requestedProfileId,
     personalProfile,
     visibleSharedProfiles,
   );
 
   const selectProfile = useCallback(
     (profileId: ProfileId) => {
+      if (!actorUserId) return false;
+
       const selectable = selectableProfiles.some(
         (profile) => profile.id === profileId,
       );
 
       if (!selectable) return false;
 
-      setActiveProfileId(profileId);
+      setSelection({ actorUserId, profileId });
       return true;
     },
-    [selectableProfiles],
+    [actorUserId, selectableProfiles],
   );
 
   const retrySharedProfiles = useCallback(() => {
+    if (!actorUserId) return;
+
+    setRefreshingActorUserId(actorUserId);
     setSharedAttempt((current) => current + 1);
-  }, []);
+  }, [actorUserId]);
 
   const status = getActiveProfileStatus(personal.status);
   const sharedProfilesStatus = getSharedProfilesStatus(
@@ -182,9 +180,12 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     connection.status,
     actorUserId,
     sharedSnapshot,
+    refreshingActorUserId,
   );
   const sharedProfilesError =
-    sharedProfilesStatus === 'error' ? sharedSnapshot?.message ?? null : null;
+    sharedProfilesStatus === 'error' && sharedSnapshot?.actorUserId === actorUserId
+      ? sharedSnapshot.message
+      : null;
 
   const value = useMemo<ActiveProfileContextValue>(
     () => ({
@@ -275,6 +276,7 @@ function getSharedProfilesStatus(
   connectionStatus: ReturnType<typeof useSupabaseConnection>['status'],
   actorUserId: UserId | null,
   snapshot: SharedProfilesSnapshot | null,
+  refreshingActorUserId: UserId | null,
 ): SharedProfilesStatus {
   if (personalStatus === 'disabled' || connectionStatus === 'unconfigured') {
     return 'disabled';
@@ -282,6 +284,10 @@ function getSharedProfilesStatus(
 
   if (!actorUserId || connectionStatus !== 'configured') {
     return 'inactive';
+  }
+
+  if (refreshingActorUserId === actorUserId) {
+    return 'loading';
   }
 
   if (!snapshot || snapshot.actorUserId !== actorUserId) {
