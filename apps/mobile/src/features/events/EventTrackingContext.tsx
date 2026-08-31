@@ -12,7 +12,7 @@ import {
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
-import type { EventId } from '../../domain/contracts';
+import type { EventId, ProfileId, UserId } from '../../domain/contracts';
 import {
   createSupabaseEventPersistenceApi,
   type EventPersistenceApi,
@@ -67,9 +67,15 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
         : null,
     [connection],
   );
+  const profileId =
+    activeProfile.status === 'ready'
+      ? activeProfile.activeProfile?.id ?? null
+      : null;
+  const actorUserId =
+    activeProfile.status === 'ready' ? activeProfile.actorUserId : null;
   const scope = useMemo(
-    () => getTrackingScope(activeProfile, persistenceApi),
-    [activeProfile, persistenceApi],
+    () => getTrackingScope(profileId, actorUserId, persistenceApi),
+    [actorUserId, persistenceApi, profileId],
   );
   const scopeKey = scope
     ? `${scope.profileId}:${scope.actorUserId}`
@@ -192,22 +198,15 @@ export function useEventTracking(): EventTrackingState {
 }
 
 function getTrackingScope(
-  activeProfile: ReturnType<typeof useActiveProfile>,
+  profileId: ProfileId | null,
+  actorUserId: UserId | null,
   persistenceApi: EventPersistenceApi | null,
 ): EventTrackingScope | null {
-  if (
-    activeProfile.status !== 'ready' ||
-    !activeProfile.activeProfile ||
-    !activeProfile.actorUserId ||
-    !persistenceApi
-  ) {
+  if (!profileId || !actorUserId || !persistenceApi) {
     return null;
   }
 
-  return {
-    profileId: activeProfile.activeProfile.id,
-    actorUserId: activeProfile.actorUserId,
-  };
+  return { profileId, actorUserId };
 }
 
 function getRuntimeContext() {
