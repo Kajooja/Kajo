@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprints 001–007 are merged, validated and complete. The configured Android app has accepted authentication, persisted BOOK/MOVIE interaction and generic Event/undo flows. Sprint 008 — Prediction V0 is active; Issue #95 establishes the first server-owned generic scorer boundary before mobile integration.
+Sprints 001–008 are merged, validated and complete. Sprint 009 — Shared Kajo is active. The app now has one generic active Profile scope shared by PersonalProfile and ready SharedProfiles; visible Shared Kajo setup/selection is the current implementation slice.
 
 Important current paths:
 
@@ -26,24 +26,26 @@ supabase/functions/password-auth/
 
 | Area | Canonical path | Current state |
 |---|---|---|
-| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 006 configured auth, profile and persistence flows are accepted on a real Android phone |
-| Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent DiscoveryMode shell above the Stack, while auth/callback routes stay outside it; book/movie discovery and generic Item detail routes live under `app/discovery/` |
-| Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping; Sprint 007 persists the existing Event contract rather than inventing domain-specific variants |
-| Room feature | `apps/mobile/src/features/room/` | 2D Room shell whose ambient phase follows the global DiscoveryMode; the duplicate window control is removed until post-MVP Room design, while bookshelf/projector navigate to discovery |
-| Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state exposed by one persistent app-shell curtain, typed Prediction V0 RPC mapping/refresh boundary, hosted ranking in configured grids and explicit mock fallback; generic grid/detail/swipe plus a tap/drag 0–10 rating control, compact expandable-description detail layout and one interaction store with ordered persistence, retry feedback and exact-card undo |
-| Event Engine | `apps/mobile/src/features/events/` | Root-scoped session/correlation tracker, meaningful-impression deduplication, canonical interaction/undo mapping and retry-safe append boundary for generic Event/session rows |
-| Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
-| Personal identity | `apps/mobile/src/features/profiles/` | User-bound profile hydration, unique display-cased nickname onboarding/fallback and canonical User/PersonalProfile mapping behind one root provider; SharedProfile product flow remains later scope |
-| Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; Sprint 005 consumed-history presentation/state currently lives at the generic discovery interaction boundary until persistent memory work requires a separate area |
-| Mobile data boundary | `apps/mobile/src/data/` | Public Expo configuration validation, testable configured/unconfigured connection factory, one persistent-session Supabase client and root provider; no direct Supabase calls in screens |
-| Authentication | `apps/mobile/app/auth/`, `apps/mobile/src/features/auth/` | Root-scoped persisted login state, email-or-nickname password sign-in, email+nickname registration, explicit static and token-path Android callback routes, redundant intent token parsing, explicit confirmation success, in-memory recovery sessions and callback-stack-clearing return-to-login actions; unconfigured builds preserve the accepted mock flow |
-| Password auth boundary | `supabase/functions/password-auth/` | One public Edge Function resolves email/nickname identifiers server-side, checks account existence, signs in against Supabase Auth, resends signup confirmation and requests recovery without returning resolved email or privileged keys |
-| Auth email callback | `supabase/functions/auth-callback/` | Scanner-safe HTTPS hop maps signup to the documented email OTP type, forwards token hashes redundantly without consuming them and foregrounds/reuses Kajo's Android task; only the app verifies the token |
-| Supabase function config | `supabase/config.toml` | `password-auth` is explicitly callable before login (`verify_jwt = false`); credential validation remains inside the auth function/Supabase Auth flow |
-| Prediction service | `public.rank_items_v0` via `supabase/migrations/20260831093000_prediction_v0_foundation.sql` | Server-owned generic Prediction V0 scorer with authenticated Profile membership, response-level traceability, inspectable signals and deterministic mode-aware ranking; mobile integration follows separately |
-| DB migrations | `supabase/migrations/` | Sprint 006 identity/current-state foundation, Sprint 007 append-only Event/session tables and Sprint 008 Prediction V0 plus rating/not-interested state; explicit grants, membership-based RLS, stable retry IDs and actor/Profile consistency constraints form the authorization/data-quality base |
+| Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; configured auth, persistence, Event and Prediction V0 flows are accepted on Android; Sprint 009 extends the same app with SharedProfile context |
+| Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent DiscoveryMode shell above the Stack; book/movie discovery lives under `app/discovery/` and Shared Kajo setup/selection under `app/profiles/shared.tsx` |
+| Core domain contracts | `apps/mobile/src/domain/` | Generic Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts; `Profile` remains Personal or Shared without media/social-specific duplicates |
+| Room feature | `apps/mobile/src/features/room/` | 2D Room home/navigation surface with bookshelf, projector and a restrained Shared Kajo wall object; active Profile identity is visible while final SharedProfile-specific Room/theme identity remains later Sprint 009 scope |
+| Theme engine | `apps/mobile/src/theme/` | Reusable Room base tokens plus AmbientPhase overlays; no separate hard-coded SharedProfile theme system |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Global DiscoveryMode, generic grid/detail/swipe, hosted Prediction V0, rating/not-interested/save state, ordered persistence and exact undo; ranking/interaction scope now follows the active Profile |
+| Event Engine | `apps/mobile/src/features/events/` | Root-scoped session/correlation tracker and append boundary; active Profile changes `profileId` while the signed-in User remains `actorUserId` |
+| Profiles | `apps/mobile/src/features/profiles/` | Personal identity, typed SharedProfile list/create/member RPC operations, pure active-profile selection rules, `ActiveProfileProvider`, and `SharedProfilesScreen`; screens do not call Supabase directly |
+| Shared Kajo route | `apps/mobile/app/profiles/shared.tsx` | Minimal Shared Kajo setup/selection surface: personal fallback, ready/provisional SharedProfiles, member display, creation, nickname member add and ready-profile activation |
+| Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; optional swipe behavior stays in the generic discovery flow |
+| Memory/history | `apps/mobile/src/features/memories/` | Intentionally not created; current saved/consumed state remains at the generic interaction boundary until Sprint 010 persistent list navigation requires a separate area |
+| Mobile data boundary | `apps/mobile/src/data/` | Configured/unconfigured Supabase connection and root provider; direct Supabase calls stay out of presentation screens |
+| Authentication | `apps/mobile/app/auth/`, `apps/mobile/src/features/auth/` | Persisted auth, unique email/nickname registration, email-or-nickname login, confirmation/recovery callbacks and safe unconfigured fallback |
+| Password auth boundary | `supabase/functions/password-auth/` | Server-side email/nickname resolution and auth operations without returning resolved email or privileged keys |
+| Auth email callback | `supabase/functions/auth-callback/` | Scanner-safe HTTPS callback hop that forwards token hashes to the mobile app for verification |
+| Supabase function config | `supabase/config.toml` | Edge Function auth configuration; credential validation remains inside auth/Supabase flows |
+| Prediction service | `public.rank_items_v0` via `supabase/migrations/20260831093000_prediction_v0_foundation.sql` | Server-owned generic scorer targeting any authorized Profile; mobile requests now use the active Profile |
+| SharedProfile persistence | `supabase/migrations/20260831171000_shared_profile_membership_foundation.sql`, `20260831172000_fix_shared_profile_member_conflict.sql` | Existing `profiles` + `profile_members` model, membership-protected create/add/list RPCs, 2+ readiness and private privileged helpers with public SECURITY INVOKER wrappers |
+| DB migrations | `supabase/migrations/` | Identity/current state, Event/session persistence, Prediction V0, canonical feedback/cooldown and SharedProfile membership foundations with explicit grants/RLS |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
-| CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; optional public Supabase repository variables feed Expo, and `main` also builds/verifies/uploads a standalone Android release APK |
+| CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; `main` also builds/verifies/uploads a standalone Android APK |
 
 Do not create empty feature folders merely to match the target architecture.
