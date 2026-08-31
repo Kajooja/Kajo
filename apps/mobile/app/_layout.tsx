@@ -9,6 +9,7 @@ import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext
 import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
+import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 
 const STARTUP_SPLASH_DURATION_MS = 2000;
@@ -37,19 +38,21 @@ export default function RootLayout() {
     <SupabaseProvider>
       <AuthSessionProvider>
         <PersonalProfileProvider>
-          <EventTrackingProvider>
-            <ItemInteractionProvider>
-              <DiscoveryModeProvider>
-                {isAuthCallbackRoute ? (
-                  navigator
-                ) : (
-                  <AuthGate>
-                    <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
-                  </AuthGate>
-                )}
-              </DiscoveryModeProvider>
-            </ItemInteractionProvider>
-          </EventTrackingProvider>
+          <ActiveProfileProvider>
+            <EventTrackingProvider>
+              <ItemInteractionProvider>
+                <DiscoveryModeProvider>
+                  {isAuthCallbackRoute ? (
+                    navigator
+                  ) : (
+                    <AuthGate>
+                      <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                    </AuthGate>
+                  )}
+                </DiscoveryModeProvider>
+              </ItemInteractionProvider>
+            </EventTrackingProvider>
+          </ActiveProfileProvider>
         </PersonalProfileProvider>
       </AuthSessionProvider>
     </SupabaseProvider>

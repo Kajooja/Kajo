@@ -40,8 +40,8 @@ with 2-N members, its own state/history and actor-specific Events.
 
 ## Implementation order
 
-1. SharedProfile creation/member persistence + RLS/RPC boundary.
-2. Typed mobile SharedProfile operations and active Profile context.
+1. SharedProfile creation/member persistence + RLS/RPC boundary. **Complete.**
+2. Typed mobile SharedProfile operations and active Profile context. **Active (#115).**
 3. Shared discovery/saved/current interaction behavior through existing boundaries.
 4. Shared Room/theme identity and suggestion Event/state behavior.
 5. Configured Android and hosted authorization acceptance.
@@ -58,7 +58,7 @@ with 2-N members, its own state/history and actor-specific Events.
 - One member can create a traceable suggestion in SharedProfile context.
 - CI, hosted advisors/RLS verification and configured Android acceptance pass.
 
-## Active issue
+## Delivered
 
 ### #111 — SharedProfile membership foundation
 
@@ -75,9 +75,27 @@ operation boundary:
 - One-member profiles are persisted but reported `isReady = false`; accepted UI
   must not treat the SharedProfile as usable until member count reaches at least two.
 - Privileged writes/lookups live only in the non-exposed `private` schema.
-  Public authenticated RPC wrappers remain `SECURITY INVOKER`, avoiding a new
-  exposed SECURITY DEFINER API surface.
+  Public authenticated RPC wrappers remain `SECURITY INVOKER`.
 - No email or auth credential is returned by the SharedProfile boundary.
+- PR #113 merged and deployed. Hosted rollback testing found one PL/pgSQL conflict
+  target ambiguity; PR #114 fixed it using the named `profile_members_pkey`.
+- The corrected rollback-only hosted acceptance passed all checks: provisional
+  creation, case-insensitive second-member addition, 2+ readiness, duplicate
+  idempotency, creator/member listing, outsider isolation, non-member add denial
+  and email-free member payload. Test rows were rolled back.
+- Security/performance advisors showed no new SharedProfile-specific warning.
+
+## Active issue
+
+### #115 — Active Profile context in mobile
+
+- Add typed mapping for `get_my_shared_profiles()`.
+- Keep PersonalProfile as the default active Profile.
+- Only ready 2+ member SharedProfiles are selectable.
+- Shared-list loading/errors stay independent from the personal flow.
+- Refactor Event, Item-interaction and Prediction scopes to use one active Profile
+  while preserving the signed-in User as `actorUserId`.
+- Visible Profile selection UI remains a later bounded slice.
 
 ## Decisions
 
@@ -88,6 +106,8 @@ operation boundary:
 - Nickname is the MVP member-discovery identifier; authentication email remains
   outside the SharedProfile API.
 - Existing `private.is_profile_member` remains the authorization primitive.
+- PersonalProfile remains the safe default active context; SharedProfile loading
+  must never block the existing personal app flow.
 
 ## Important files
 
@@ -95,14 +115,16 @@ operation boundary:
 - `/docs/domain/DATA_EVENTS.md`
 - `/docs/product/MVP.md`
 - `/apps/mobile/src/domain/contracts.ts`
-- `/apps/mobile/src/features/profiles/`
+- `/apps/mobile/src/features/profiles/ActiveProfileContext.tsx`
+- `/apps/mobile/src/features/profiles/sharedProfileOperations.ts`
 - `/apps/mobile/src/features/events/`
 - `/apps/mobile/src/features/discovery/`
 - `/supabase/migrations/20260831171000_shared_profile_membership_foundation.sql`
+- `/supabase/migrations/20260831172000_fix_shared_profile_member_conflict.sql`
 
 ## Handoff
 
-#111 is the active implementation. After its CI/deploy/hosted authorization
-verification, add typed mobile SharedProfile operations and active Profile-context
-selection. Preserve Profile-targeted Prediction and actor-vs-profile Event separation;
-do not begin ScenarioMemory or a separate shared predictor.
+#111 is complete and host-verified. #115 is active. Finish the generic mobile
+Profile scope and tests before exposing Profile switching in UI. Preserve
+Profile-targeted Prediction and actor-vs-profile Event separation; do not begin
+ScenarioMemory or a separate shared predictor.

@@ -10,9 +10,9 @@ import {
 } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
-import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
+import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
-import type { EventId } from '../../domain/contracts';
+import type { EventId, ProfileId, UserId } from '../../domain/contracts';
 import {
   createSupabaseEventPersistenceApi,
   type EventPersistenceApi,
@@ -56,7 +56,7 @@ const EventTrackingContext = createContext<EventTrackingState | null>(null);
 
 export function EventTrackingProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
-  const personalProfile = usePersonalProfile();
+  const activeProfile = useActiveProfile();
   const [failure, setFailure] = useState<ScopedFailure | null>(null);
   const impressionKeys = useRef(new Set<string>());
   const defaultContext = useMemo(() => getRuntimeContext(), []);
@@ -67,9 +67,15 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
         : null,
     [connection],
   );
+  const profileId =
+    activeProfile.status === 'ready'
+      ? activeProfile.activeProfile?.id ?? null
+      : null;
+  const actorUserId =
+    activeProfile.status === 'ready' ? activeProfile.actorUserId : null;
   const scope = useMemo(
-    () => getTrackingScope(personalProfile, persistenceApi),
-    [persistenceApi, personalProfile],
+    () => getTrackingScope(profileId, actorUserId, persistenceApi),
+    [actorUserId, persistenceApi, profileId],
   );
   const scopeKey = scope
     ? `${scope.profileId}:${scope.actorUserId}`
@@ -101,7 +107,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   }, [defaultContext, persistenceApi, scope, scopeKey]);
   const status = getEventTrackingStatus(
     connection.status,
-    personalProfile.status,
+    activeProfile.status,
     Boolean(scopedCoordinator),
   );
   const persistenceError =
@@ -192,17 +198,15 @@ export function useEventTracking(): EventTrackingState {
 }
 
 function getTrackingScope(
-  personalProfile: ReturnType<typeof usePersonalProfile>,
+  profileId: ProfileId | null,
+  actorUserId: UserId | null,
   persistenceApi: EventPersistenceApi | null,
 ): EventTrackingScope | null {
-  if (personalProfile.status !== 'ready' || !persistenceApi) {
+  if (!profileId || !actorUserId || !persistenceApi) {
     return null;
   }
 
-  return {
-    profileId: personalProfile.identity.profile.id,
-    actorUserId: personalProfile.identity.user.id,
-  };
+  return { profileId, actorUserId };
 }
 
 function getRuntimeContext() {
@@ -216,7 +220,7 @@ function getRuntimeContext() {
 
 function getEventTrackingStatus(
   connectionStatus: ReturnType<typeof useSupabaseConnection>['status'],
-  profileStatus: ReturnType<typeof usePersonalProfile>['status'],
+  profileStatus: ReturnType<typeof useActiveProfile>['status'],
   hasScope: boolean,
 ): EventTrackingStatus {
   if (connectionStatus === 'unconfigured' || profileStatus === 'disabled') {
