@@ -22,7 +22,11 @@ import {
   resolveActiveProfile,
 } from './activeProfileState';
 import {
+  addSharedProfileMember as addSharedProfileMemberOperation,
+  createSharedProfile as createSharedProfileOperation,
   loadSharedProfiles,
+  type SharedProfileAddMemberResult,
+  type SharedProfileCreateResult,
   type SharedProfileMembership,
   type SharedProfileRpc,
 } from './sharedProfileOperations';
@@ -47,6 +51,11 @@ interface ActiveProfileContextValue {
   sharedProfilesError: string | null;
   selectProfile: (profileId: ProfileId) => boolean;
   retrySharedProfiles: () => void;
+  createSharedProfile: (name: string) => Promise<SharedProfileCreateResult>;
+  addSharedProfileMember: (
+    profileId: ProfileId,
+    nickname: string,
+  ) => Promise<SharedProfileAddMemberResult>;
 }
 
 interface SharedProfilesSnapshot {
@@ -62,6 +71,8 @@ interface ActiveSelection {
 }
 
 const EMPTY_SHARED_PROFILES: readonly SharedProfileMembership[] = [];
+const SHARED_PROFILE_UNAVAILABLE_MESSAGE =
+  'Yhteinen Kajo ei ole käytettävissä tällä hetkellä.';
 const ActiveProfileContext = createContext<ActiveProfileContextValue | null>(null);
 
 export function ActiveProfileProvider({ children }: PropsWithChildren) {
@@ -89,7 +100,9 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
 
             return {
               data,
-              error: error ? { message: error.message } : null,
+              error: error
+                ? { code: error.code, message: error.message }
+                : null,
             };
           }
         : null,
@@ -178,6 +191,47 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     setSharedAttempt((current) => current + 1);
   }, [actorUserId]);
 
+  const createSharedProfile = useCallback(
+    async (name: string): Promise<SharedProfileCreateResult> => {
+      if (!rpc || !actorUserId) {
+        return { status: 'error', message: SHARED_PROFILE_UNAVAILABLE_MESSAGE };
+      }
+
+      const result = await createSharedProfileOperation(rpc, name);
+
+      if (result.status === 'success') {
+        retrySharedProfiles();
+      }
+
+      return result;
+    },
+    [actorUserId, retrySharedProfiles, rpc],
+  );
+
+  const addSharedProfileMember = useCallback(
+    async (
+      profileId: ProfileId,
+      nickname: string,
+    ): Promise<SharedProfileAddMemberResult> => {
+      if (!rpc || !actorUserId) {
+        return { status: 'error', message: SHARED_PROFILE_UNAVAILABLE_MESSAGE };
+      }
+
+      const result = await addSharedProfileMemberOperation(
+        rpc,
+        profileId,
+        nickname,
+      );
+
+      if (result.status === 'success') {
+        retrySharedProfiles();
+      }
+
+      return result;
+    },
+    [actorUserId, retrySharedProfiles, rpc],
+  );
+
   const status = getActiveProfileStatus(personal.status);
   const sharedProfilesStatus = getSharedProfilesStatus(
     personal.status,
@@ -203,10 +257,14 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
       sharedProfilesError,
       selectProfile,
       retrySharedProfiles,
+      createSharedProfile,
+      addSharedProfileMember,
     }),
     [
       activeProfile,
       actorUserId,
+      addSharedProfileMember,
+      createSharedProfile,
       personalProfile,
       retrySharedProfiles,
       selectProfile,
