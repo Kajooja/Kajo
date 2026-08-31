@@ -134,6 +134,36 @@ Prediction V0 should support re-ranking after relevant behavioural evidence or D
 
 Population scenario retrieval and evolutionary optimization come later after enough outcome data exists.
 
+### V0.1 scorer contract
+
+The first server-owned implementation is `public.rank_items_v0`:
+
+```text
+profileId + DiscoveryMode + optional ItemType + limit + Context
+  -> one predictionId + ordered generic Item Predictions
+```
+
+The score is deliberately inspectable rather than learned. It combines:
+
+- current explicit interest/save state as a direct signal,
+- append-only positive and negative Event evidence after undo compensation,
+- a slowly decaying tag-affinity signal for LongTermState,
+- a stronger 14-day recency-weighted tag signal for ShortTermState,
+- deterministic content novelty and exploration signals,
+- a strong consumed penalty,
+- different fit/novelty/exploration weights for each DiscoveryMode.
+
+`FOR_YOU` emphasizes fit and recent evidence, `SURPRISE` increases novelty and
+exploration while retaining fit, and `RISK` accepts substantially more
+exploration. Hash-based exploration is stable for a Profile/Item pair, so fixed
+evidence produces deterministic ordering even though each response receives a
+new traceable `predictionId`. The response exposes component values for
+measurement/debugging; they are not user-facing psychological labels.
+
+The RPC is `SECURITY INVOKER` and validates authenticated Profile membership.
+It is a transport/deployment choice for V0, not a permanent rejection of the
+later Python prediction service.
+
 ## Future evolution engine
 
 The architecture should later support populations of predictor configurations/genomes with parameters such as long-term weight, short-term weight, scenario weight, population weight, novelty weight, decay rate, memory depth and similarity thresholds.
