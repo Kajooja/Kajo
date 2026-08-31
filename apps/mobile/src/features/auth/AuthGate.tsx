@@ -42,7 +42,8 @@ export function AuthGate({ children }: PropsWithChildren) {
     if (personalProfile.status === 'ready') {
       if (
         itemInteractions.persistenceStatus === 'ready' ||
-        itemInteractions.persistenceStatus === 'disabled'
+        itemInteractions.persistenceStatus === 'disabled' ||
+        itemInteractions.hasHydratedCurrentActor
       ) {
         return children;
       }
