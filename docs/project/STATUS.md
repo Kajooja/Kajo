@@ -46,7 +46,7 @@ Sprint 008 targets:
 - `MVP-PRED-002` — combine longer-term behavior, recent context and Item similarity,
 - `MVP-PRED-003` — make DiscoveryMode change ranking semantics.
 
-The 1–10 rating input is now active Sprint 008 scope; Saved/Consumed list navigation remains Sprint 010. SharedProfiles/social behavior and scenario-memory foundations remain later MVP work. See `../product/MVP.md` for the complete executable boundary.
+The 0–10 rating input is now active Sprint 008 scope; Saved/Consumed list navigation remains Sprint 010. SharedProfiles/social behavior and scenario-memory foundations remain later MVP work. See `../product/MVP.md` for the complete executable boundary.
 
 ## Active Sprint 008 — Prediction V0
 
@@ -62,18 +62,17 @@ Sprint 008 replaces mock ordering with the first real generic, server-owned pers
 PR #97 is merged and the migration is deployed. Hosted functional, mode,
 suppression, authorization, grant and advisor checks passed without retaining
 test data. Issue #95 is complete and Issue #98 is merged. Configured-phone
-feedback now drives #100 (persistent mode bar), #101
+feedback drove #100 (persistent mode bar), while #101
 (rating/not-interested/save drawer) and #103 (cooldown/catalog). #102 records
 later Saved/Consumed list navigation. The mobile client consumes ranking
 results; it does not own ranking logic.
 
 ## Exact next actions
 
-1. Merge #100's implemented persistent global DiscoveryMode bar and bundled #78 logo-size correction after the full repository port.
-2. Implement #101's canonical rating/not-interested/save state, migrations, Events, drawer and scorer inputs.
-3. Implement #103's impression cooldown and broader normalized test catalog.
-4. Produce a configured Android build and verify mode persistence, queue rotation plus hosted `predictionId`/feedback Events.
-5. Close Sprint 008 and its reopened/Prediction MVP requirements only after configured acceptance passes.
+1. Complete #101's 0–10 slider drawer and Prediction V0 scorer inputs on top of the deployed canonical state foundation.
+2. Implement #103's impression cooldown and broader normalized test catalog.
+3. Produce a configured Android build and verify mode persistence, queue rotation plus hosted `predictionId`/feedback Events.
+4. Close Sprint 008 and its reopened/Prediction MVP requirements only after configured acceptance passes.
 
 ## Known issues / open decisions
 
@@ -111,4 +110,8 @@ results; it does not own ranking logic.
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 007 is accepted and complete. Sprint 008's scorer (#95) and mobile consumption (#98) are merged; configured feedback made #100 the exact next implementation, followed by #101 and #103. #102 belongs to Sprint 010. Do not move scoring into the mobile client or begin ScenarioMemory/SharedProfile work early.
+Sprint 007 is accepted and complete. Sprint 008's scorer (#95), mobile
+consumption (#98), persistent mode bar (#100) and #101 state foundation are
+merged. Complete #101's slider/scorer slices, then #103. #102 belongs to Sprint
+010. Do not move scoring into the mobile client or begin
+ScenarioMemory/SharedProfile work early.
