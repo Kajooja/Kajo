@@ -34,6 +34,8 @@ export interface PersistedItemInteractionRow {
   interest: ItemInterest | null;
   saved: boolean;
   consumed: boolean;
+  rating: number | null;
+  not_interested: boolean;
 }
 
 export interface ItemInteractionWriteRequest {
@@ -84,7 +86,7 @@ export function createSupabaseItemInteractionPersistenceApi(
     async load(profileId) {
       const { data, error } = await client
         .from('item_interactions')
-        .select('item_id, interest, saved, consumed')
+        .select('item_id, interest, saved, consumed, rating, not_interested')
         .eq('profile_id', profileId);
 
       return {
@@ -154,6 +156,8 @@ export async function persistItemInteraction(
           interest: request.interaction.interest,
           saved: request.interaction.saved,
           consumed: request.interaction.consumed,
+          rating: request.interaction.rating,
+          not_interested: request.interaction.notInterested,
         });
 
     return response.error
@@ -229,6 +233,8 @@ export function isDefaultInteraction(interaction: ItemInteraction): boolean {
     interaction.interest === EMPTY_ITEM_INTERACTION.interest &&
     interaction.saved === EMPTY_ITEM_INTERACTION.saved &&
     interaction.consumed === EMPTY_ITEM_INTERACTION.consumed
+    && interaction.rating === EMPTY_ITEM_INTERACTION.rating
+    && interaction.notInterested === EMPTY_ITEM_INTERACTION.notInterested
   );
 }
 
@@ -240,7 +246,9 @@ function mapPersistedInteraction(
     !isNonEmptyString(value.item_id) ||
     !isItemInterest(value.interest) ||
     typeof value.saved !== 'boolean' ||
-    typeof value.consumed !== 'boolean'
+    typeof value.consumed !== 'boolean' ||
+    !isRating(value.rating) ||
+    typeof value.not_interested !== 'boolean'
   ) {
     return null;
   }
@@ -251,6 +259,8 @@ function mapPersistedInteraction(
       interest: value.interest,
       saved: value.saved,
       consumed: value.consumed,
+      rating: value.rating,
+      notInterested: value.not_interested,
     },
   };
 }
@@ -265,6 +275,13 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isItemInterest(value: unknown): value is ItemInterest | null {
   return value === null || value === 'LIKED' || value === 'DISLIKED';
+}
+
+function isRating(value: unknown): value is number | null {
+  return (
+    value === null ||
+    (typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 10)
+  );
 }
 
 function getWriteKey(request: ItemInteractionWriteRequest): string {
