@@ -505,12 +505,14 @@ function SwipeItemPage({
   onToggleSaved,
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   return (
     <ScrollView
       style={{ width: pageWidth }}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
+      scrollEnabled={descriptionExpanded}
     >
       <View
         style={[
@@ -546,7 +548,6 @@ function SwipeItemPage({
       </View>
 
       <Text style={styles.title}>{item.title}</Text>
-      {item.description ? <Text style={styles.description}>{item.description}</Text> : null}
 
       {item.tags?.length ? (
         <View style={styles.tags} accessibilityLabel="Item tags">
@@ -559,9 +560,6 @@ function SwipeItemPage({
       ) : null}
 
       <View style={styles.feedbackDrawer} accessibilityLabel="Arvioi kohde">
-        <Text style={styles.drawerTitle}>
-          {ITEM_INTERACTION_LABELS.rating.toUpperCase()}
-        </Text>
         <RatingControl
           rating={interaction.rating}
           disabled={disabled}
@@ -591,6 +589,40 @@ function SwipeItemPage({
           />
         </View>
       </View>
+
+      {item.description ? (
+        <View style={styles.descriptionBlock}>
+          <Pressable
+            accessibilityRole={descriptionExpanded ? undefined : 'button'}
+            accessibilityLabel={
+              descriptionExpanded ? undefined : 'Laajenna kuvaus'
+            }
+            disabled={descriptionExpanded}
+            onPress={() => setDescriptionExpanded(true)}
+          >
+            <Text
+              ellipsizeMode="tail"
+              numberOfLines={descriptionExpanded ? undefined : 3}
+              style={styles.description}
+            >
+              {item.description}
+            </Text>
+          </Pressable>
+          {descriptionExpanded ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Tiivistä kuvaus"
+              onPress={() => setDescriptionExpanded(false)}
+              style={({ pressed }) => [
+                styles.collapseDescription,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.collapseDescriptionText}>Näytä vähemmän</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -689,16 +721,16 @@ function createStyles(theme: RoomTheme) {
     },
     content: {
       paddingHorizontal: 20,
-      paddingBottom: 32,
+      paddingBottom: 18,
     },
     hero: {
-      minHeight: 310,
+      minHeight: 235,
       borderRadius: 24,
       borderWidth: 1,
       overflow: 'hidden',
       padding: 22,
       justifyContent: 'flex-end',
-      marginBottom: 22,
+      marginBottom: 14,
     },
     heroLight: {
       ...StyleSheet.absoluteFill,
@@ -740,15 +772,28 @@ function createStyles(theme: RoomTheme) {
     },
     description: {
       color: theme.base.textMuted,
-      fontSize: 16,
-      lineHeight: 24,
-      marginTop: 12,
+      fontSize: 14,
+      lineHeight: 20,
+    },
+    descriptionBlock: {
+      marginTop: 14,
+    },
+    collapseDescription: {
+      alignSelf: 'flex-start',
+      minHeight: 36,
+      justifyContent: 'center',
+      marginTop: 4,
+    },
+    collapseDescriptionText: {
+      color: theme.ambient.curtainHighlight,
+      fontSize: 12,
+      fontWeight: '700',
     },
     tags: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: 8,
-      marginTop: 20,
+      marginTop: 12,
     },
     tag: {
       borderRadius: 16,
@@ -767,23 +812,12 @@ function createStyles(theme: RoomTheme) {
       gap: 10,
     },
     feedbackDrawer: {
-      marginTop: 24,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: theme.base.border,
-      backgroundColor: theme.base.floor,
-      padding: 16,
-      gap: 14,
-    },
-    drawerTitle: {
-      color: theme.base.textPrimary,
-      fontSize: 11,
-      fontWeight: '700',
-      letterSpacing: 1.4,
+      marginTop: 14,
+      gap: 10,
     },
     actionButton: {
       width: '48%',
-      minHeight: 48,
+      minHeight: 42,
       borderRadius: 18,
       borderWidth: 1,
       borderColor: theme.base.border,
