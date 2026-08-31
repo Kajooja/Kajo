@@ -18,6 +18,8 @@ function createApi(): ItemInteractionPersistenceApi {
           interest: 'LIKED',
           saved: true,
           consumed: false,
+          rating: null,
+          not_interested: false,
         },
       ],
       error: null,
@@ -32,7 +34,13 @@ function createRequest(itemId = 'item-1'): ItemInteractionWriteRequest {
     profileId: 'profile-1',
     actorUserId: 'user-1',
     itemId,
-    interaction: { interest: 'LIKED', saved: true, consumed: false },
+    interaction: {
+      interest: 'LIKED',
+      saved: true,
+      consumed: false,
+      rating: null,
+      notInterested: false,
+    },
   };
 }
 
@@ -45,7 +53,13 @@ describe('loadPersistedItemInteractions', () => {
     ).resolves.toEqual({
       status: 'success',
       interactions: {
-        'item-1': { interest: 'LIKED', saved: true, consumed: false },
+        'item-1': {
+          interest: 'LIKED',
+          saved: true,
+          consumed: false,
+          rating: null,
+          notInterested: false,
+        },
       },
     });
     expect(api.load).toHaveBeenCalledWith('profile-1');
@@ -78,6 +92,8 @@ describe('persistItemInteraction', () => {
       interest: 'LIKED',
       saved: true,
       consumed: false,
+      rating: null,
+      not_interested: false,
     });
     expect(api.remove).not.toHaveBeenCalled();
   });
@@ -85,7 +101,13 @@ describe('persistItemInteraction', () => {
   it('deletes the row when undo restores the default interaction', async () => {
     const api = createApi();
     const request = createRequest();
-    request.interaction = { interest: null, saved: false, consumed: false };
+    request.interaction = {
+      interest: null,
+      saved: false,
+      consumed: false,
+      rating: null,
+      notInterested: false,
+    };
 
     await expect(persistItemInteraction(api, request)).resolves.toEqual({
       status: 'success',
@@ -140,7 +162,13 @@ describe('createItemInteractionWriteFailureTracker', () => {
     const older = createRequest();
     const newer = {
       ...createRequest(),
-      interaction: { interest: 'DISLIKED' as const, saved: false, consumed: true },
+      interaction: {
+        interest: 'DISLIKED' as const,
+        saved: false,
+        consumed: true,
+        rating: null,
+        notInterested: false,
+      },
     };
 
     tracker.queued(older);
@@ -161,7 +189,13 @@ describe('createItemInteractionWriteFailureTracker', () => {
     const tracker = createItemInteractionWriteFailureTracker();
     const older = createRequest();
     const newer = createRequest();
-    newer.interaction = { interest: null, saved: true, consumed: true };
+    newer.interaction = {
+      interest: null,
+      saved: true,
+      consumed: true,
+      rating: 8,
+      notInterested: false,
+    };
 
     tracker.queued(older);
     tracker.settled(older, { status: 'error', message: 'failed' });

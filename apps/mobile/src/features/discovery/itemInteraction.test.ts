@@ -14,6 +14,8 @@ import {
   ITEM_INTERACTION_UNDO_LIMIT,
   setItemConsumed,
   setItemInterest,
+  setItemNotInterested,
+  setItemRating,
   toggleItemSaved,
   undoLastItemInteractionAction,
   type ItemInteractionMap,
@@ -38,6 +40,8 @@ describe('item interaction state', () => {
       interest: 'LIKED',
       saved: true,
       consumed: true,
+      rating: null,
+      notInterested: false,
     });
   });
 
@@ -51,7 +55,29 @@ describe('item interaction state', () => {
       interest: null,
       saved: true,
       consumed: false,
+      rating: null,
+      notInterested: false,
     });
+  });
+
+  it('makes rating consumed and not-interested explicitly unconsumed', () => {
+    let interactions = setItemNotInterested({}, 'book-a', true);
+
+    expect(getItemInteraction(interactions, 'book-a')).toMatchObject({
+      consumed: false,
+      rating: null,
+      notInterested: true,
+    });
+
+    interactions = setItemRating(interactions, 'book-a', 9);
+
+    expect(getItemInteraction(interactions, 'book-a')).toMatchObject({
+      interest: null,
+      consumed: true,
+      rating: 9,
+      notInterested: false,
+    });
+    expect(setItemRating(interactions, 'book-a', 11)).toBe(interactions);
   });
 
   it('suppresses consumed Items from ordinary discovery and exposes them in history', () => {
@@ -113,6 +139,8 @@ describe('item interaction state', () => {
       interest: 'LIKED',
       saved: true,
       consumed: false,
+      rating: null,
+      notInterested: false,
     });
 
     store = undoLastItemInteractionAction(store);
@@ -120,6 +148,8 @@ describe('item interaction state', () => {
       interest: 'LIKED',
       saved: false,
       consumed: false,
+      rating: null,
+      notInterested: false,
     });
 
     store = undoLastItemInteractionAction(store);

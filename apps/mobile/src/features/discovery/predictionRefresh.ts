@@ -20,7 +20,14 @@ export function getInteractionEvidenceKey(
   return Object.entries(interactions)
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([itemId, interaction]) =>
-      [itemId, interaction.interest ?? '', interaction.saved, interaction.consumed].join(':'),
+      [
+        itemId,
+        interaction.interest ?? '',
+        interaction.saved,
+        interaction.consumed,
+        interaction.rating ?? '',
+        interaction.notInterested,
+      ].join(':'),
     )
     .join('|');
 }

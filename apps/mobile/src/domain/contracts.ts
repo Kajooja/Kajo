@@ -18,6 +18,7 @@ export type EventType =
   | 'ITEM_LIKED'
   | 'ITEM_DISLIKED'
   | 'ITEM_INTEREST_CLEARED'
+  | 'ITEM_NOT_INTERESTED'
   | 'ITEM_SAVED'
   | 'ITEM_UNSAVED'
   | 'ITEM_SUGGESTED'

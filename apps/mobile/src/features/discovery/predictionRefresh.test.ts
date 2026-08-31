@@ -17,19 +17,19 @@ describe('Prediction refresh coordination', () => {
 
   it('creates a stable key independent of interaction insertion order', () => {
     const first = getInteractionEvidenceKey({
-      'item-b': { interest: null, saved: true, consumed: false },
-      'item-a': { interest: 'LIKED', saved: false, consumed: false },
+      'item-b': { interest: null, saved: true, consumed: false, rating: null, notInterested: false },
+      'item-a': { interest: 'LIKED', saved: false, consumed: false, rating: null, notInterested: false },
     });
     const second = getInteractionEvidenceKey({
-      'item-a': { interest: 'LIKED', saved: false, consumed: false },
-      'item-b': { interest: null, saved: true, consumed: false },
+      'item-a': { interest: 'LIKED', saved: false, consumed: false, rating: null, notInterested: false },
+      'item-b': { interest: null, saved: true, consumed: false, rating: null, notInterested: false },
     });
 
     expect(first).toBe(second);
     expect(
       getInteractionEvidenceKey({
-        'item-a': { interest: 'DISLIKED', saved: false, consumed: false },
-        'item-b': { interest: null, saved: true, consumed: false },
+        'item-a': { interest: 'DISLIKED', saved: false, consumed: false, rating: null, notInterested: false },
+        'item-b': { interest: null, saved: true, consumed: false, rating: null, notInterested: false },
       }),
     ).not.toBe(first);
   });
