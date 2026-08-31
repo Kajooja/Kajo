@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import type { PersonalProfile } from '@/domain/contracts';
-
+import type { PersonalProfile } from '../../domain/contracts';
 import {
   getSelectableProfiles,
   resolveActiveProfile,
-} from './ActiveProfileContext';
+} from './activeProfileState';
 import type { SharedProfileMembership } from './sharedProfileOperations';
 
 const PERSONAL: PersonalProfile = {
