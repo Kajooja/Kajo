@@ -69,7 +69,7 @@ results; it does not own ranking logic.
 
 ## Exact next actions
 
-1. Complete #101's 0–10 slider drawer and Prediction V0 scorer inputs on top of the deployed canonical state foundation.
+1. Merge the compact detail/splash/Room correction, then complete #101's Prediction V0 scorer inputs on top of the deployed canonical state foundation.
 2. Implement #103's impression cooldown and broader normalized test catalog.
 3. Produce a configured Android build and verify mode persistence, queue rotation plus hosted `predictionId`/feedback Events.
 4. Close Sprint 008 and its reopened/Prediction MVP requirements only after configured acceptance passes.
@@ -82,6 +82,9 @@ results; it does not own ranking logic.
 - Hosted Prediction V0 consumption is merged, but configured Event evidence with `predictionSource = hosted` remains pending in the next acceptance build.
 - Current Room/theme/mock covers remain structural rather than final production artwork.
 - The current Item feature set and Event volume are small, so Prediction V0 needs an explicit cold-start prior.
+- Sparse evidence can produce the same hosted order for multiple DiscoveryModes;
+  do not fake differentiation. Validate it with #103's broader catalog and
+  configured evidence before closing `MVP-DISC-005`/Sprint 008 acceptance.
 - Prediction V0.1 uses an authenticated Postgres RPC; a dedicated Python service remains a later scale/tooling decision.
 - SharedProfile Room/theme/discovery identity remains later scope.
 
