@@ -280,7 +280,7 @@ function isItemInterest(value: unknown): value is ItemInterest | null {
 function isRating(value: unknown): value is number | null {
   return (
     value === null ||
-    (typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 10)
+    (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 10)
   );
 }
 
