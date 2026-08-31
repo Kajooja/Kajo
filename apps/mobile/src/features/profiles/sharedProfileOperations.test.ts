@@ -1,12 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
-  addSharedProfileMember,
   createSharedProfile,
+  inviteSharedProfileMember,
+  loadSharedProfileInvitations,
   loadSharedProfiles,
   mapSharedProfileCreation,
-  mapSharedProfileMemberAddition,
+  mapSharedProfileInvitationCreation,
+  mapSharedProfileInvitationResponse,
+  mapSharedProfileInvitations,
   mapSharedProfiles,
+  respondSharedProfileInvitation,
   SHARED_PROFILE_RPC,
   validateSharedProfileName,
   validateSharedProfileNickname,
@@ -39,13 +43,33 @@ const CREATE_ROW = {
   is_ready: false,
 };
 
-const ADD_MEMBER_ROW = {
+const INVITATION_ROW = {
+  invitation_id: 'invite-1',
   profile_id: 'shared-new',
-  user_id: 'user-2',
+  profile_name: 'Meidän Kajo',
+  inviter_user_id: 'user-1',
+  inviter_nickname: 'KeTTu',
+  created_at: '2026-08-31T20:00:00.000Z',
+};
+
+const INVITE_ROW = {
+  profile_id: 'shared-new',
+  invitation_id: 'invite-1',
+  invited_user_id: 'user-2',
   nickname: 'Susi',
+  member_count: 1,
+  is_ready: false,
+  invitation_created: true,
+  already_member: false,
+};
+
+const ACCEPT_ROW = {
+  invitation_id: 'invite-1',
+  profile_id: 'shared-new',
+  profile_name: 'Meidän Kajo',
+  accepted: true,
   member_count: 2,
   is_ready: true,
-  added: true,
 };
 
 describe('SharedProfile validation', () => {
@@ -60,7 +84,7 @@ describe('SharedProfile validation', () => {
     });
   });
 
-  it('rejects invalid name and nickname boundaries', () => {
+  it('rejects invalid boundaries', () => {
     expect(validateSharedProfileName('K')).toMatchObject({ status: 'invalid' });
     expect(validateSharedProfileName('K'.repeat(65))).toMatchObject({
       status: 'invalid',
@@ -74,8 +98,8 @@ describe('SharedProfile validation', () => {
   });
 });
 
-describe('mapSharedProfiles', () => {
-  it('maps ready and provisional shared profiles to generic contracts', () => {
+describe('SharedProfile mapping', () => {
+  it('maps ready and provisional memberships', () => {
     expect(mapSharedProfiles([READY_ROW, PROVISIONAL_ROW])).toEqual({
       status: 'success',
       profiles: [
@@ -106,21 +130,7 @@ describe('mapSharedProfiles', () => {
     });
   });
 
-  it('rejects inconsistent readiness, member counts and malformed member payloads', () => {
-    expect(
-      mapSharedProfiles([{ ...READY_ROW, member_count: 3 }]),
-    ).toMatchObject({ status: 'error' });
-    expect(
-      mapSharedProfiles([{ ...READY_ROW, is_ready: false }]),
-    ).toMatchObject({ status: 'error' });
-    expect(
-      mapSharedProfiles([{ ...READY_ROW, members: [{ userId: 'user-1' }] }]),
-    ).toMatchObject({ status: 'error' });
-  });
-});
-
-describe('SharedProfile mutation mapping', () => {
-  it('maps the provisional creation response', () => {
+  it('maps creation and incoming invitations', () => {
     expect(mapSharedProfileCreation([CREATE_ROW])).toEqual({
       status: 'success',
       creation: {
@@ -130,68 +140,136 @@ describe('SharedProfile mutation mapping', () => {
         isReady: false,
       },
     });
+
+    expect(mapSharedProfileInvitations([INVITATION_ROW])).toEqual({
+      status: 'success',
+      invitations: [
+        {
+          id: 'invite-1',
+          profileId: 'shared-new',
+          profileName: 'Meidän Kajo',
+          inviter: { id: 'user-1', nickname: 'KeTTu' },
+          createdAt: '2026-08-31T20:00:00.000Z',
+        },
+      ],
+    });
   });
 
-  it('maps ready and idempotent member-add responses', () => {
-    expect(mapSharedProfileMemberAddition([ADD_MEMBER_ROW])).toEqual({
+  it('maps invite creation, duplicate and already-member responses', () => {
+    expect(mapSharedProfileInvitationCreation([INVITE_ROW])).toEqual({
       status: 'success',
-      addition: {
+      invitation: {
         profileId: 'shared-new',
+        invitationId: 'invite-1',
         user: { id: 'user-2', nickname: 'Susi' },
-        memberCount: 2,
-        isReady: true,
-        added: true,
+        memberCount: 1,
+        isReady: false,
+        invitationCreated: true,
+        alreadyMember: false,
       },
     });
 
     expect(
-      mapSharedProfileMemberAddition([{ ...ADD_MEMBER_ROW, added: false }]),
+      mapSharedProfileInvitationCreation([
+        { ...INVITE_ROW, invitation_created: false },
+      ]),
     ).toMatchObject({
       status: 'success',
-      addition: { added: false, isReady: true },
+      invitation: { invitationCreated: false, alreadyMember: false },
+    });
+
+    expect(
+      mapSharedProfileInvitationCreation([
+        {
+          ...INVITE_ROW,
+          invitation_id: null,
+          member_count: 2,
+          is_ready: true,
+          invitation_created: false,
+          already_member: true,
+        },
+      ]),
+    ).toMatchObject({
+      status: 'success',
+      invitation: { invitationId: null, alreadyMember: true, isReady: true },
     });
   });
 
-  it('rejects malformed or inconsistent mutation payloads', () => {
+  it('maps accept and reject responses', () => {
+    expect(mapSharedProfileInvitationResponse([ACCEPT_ROW])).toEqual({
+      status: 'success',
+      response: {
+        invitationId: 'invite-1',
+        profileId: 'shared-new',
+        profileName: 'Meidän Kajo',
+        accepted: true,
+        memberCount: 2,
+        isReady: true,
+      },
+    });
+
     expect(
-      mapSharedProfileCreation([{ ...CREATE_ROW, member_count: 2 }]),
+      mapSharedProfileInvitationResponse([
+        { ...ACCEPT_ROW, accepted: false, member_count: 1, is_ready: false },
+      ]),
+    ).toMatchObject({
+      status: 'success',
+      response: { accepted: false, memberCount: 1, isReady: false },
+    });
+  });
+
+  it('rejects inconsistent invitation payloads', () => {
+    expect(
+      mapSharedProfileInvitations([{ ...INVITATION_ROW, created_at: 'bad-date' }]),
     ).toMatchObject({ status: 'error' });
     expect(
-      mapSharedProfileCreation([{ ...CREATE_ROW, is_ready: true }]),
+      mapSharedProfileInvitationCreation([
+        { ...INVITE_ROW, member_count: 2, is_ready: false },
+      ]),
     ).toMatchObject({ status: 'error' });
     expect(
-      mapSharedProfileMemberAddition([{ ...ADD_MEMBER_ROW, is_ready: false }]),
+      mapSharedProfileInvitationCreation([
+        { ...INVITE_ROW, invitation_id: null, already_member: false },
+      ]),
+    ).toMatchObject({ status: 'error' });
+    expect(
+      mapSharedProfileInvitationResponse([
+        { ...ACCEPT_ROW, member_count: 1, is_ready: true },
+      ]),
     ).toMatchObject({ status: 'error' });
   });
 });
 
 describe('SharedProfile RPC operations', () => {
-  it('uses the membership-protected list RPC', async () => {
-    const rpc: SharedProfileRpc = vi.fn(async () => ({
-      data: [READY_ROW],
-      error: null,
-    }));
+  it('uses list and invitation-list RPCs', async () => {
+    const rpc: SharedProfileRpc = vi
+      .fn()
+      .mockResolvedValueOnce({ data: [READY_ROW], error: null })
+      .mockResolvedValueOnce({ data: [INVITATION_ROW], error: null });
 
     await expect(loadSharedProfiles(rpc)).resolves.toMatchObject({
       status: 'success',
     });
-    expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.list, undefined);
+    await expect(loadSharedProfileInvitations(rpc)).resolves.toMatchObject({
+      status: 'success',
+    });
+
+    expect(rpc).toHaveBeenNthCalledWith(1, SHARED_PROFILE_RPC.list, undefined);
+    expect(rpc).toHaveBeenNthCalledWith(
+      2,
+      SHARED_PROFILE_RPC.listInvitations,
+      undefined,
+    );
   });
 
-  it('creates with a normalized name and does not call the backend for invalid input', async () => {
+  it('creates with normalized name and avoids backend on invalid input', async () => {
     const rpc: SharedProfileRpc = vi.fn(async () => ({
       data: [CREATE_ROW],
       error: null,
     }));
 
-    await expect(createSharedProfile(rpc, '  Meidän   Kajo  ')).resolves.toEqual({
+    await expect(createSharedProfile(rpc, '  Meidän   Kajo  ')).resolves.toMatchObject({
       status: 'success',
-      creation: {
-        profileId: 'shared-new',
-        profileName: 'Meidän Kajo',
-        memberCount: 1,
-        isReady: false,
-      },
     });
     expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.create, {
       input_name: 'Meidän Kajo',
@@ -204,69 +282,86 @@ describe('SharedProfile RPC operations', () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it('adds a member by normalized nickname and retains display casing from the response', async () => {
+  it('invites by normalized nickname without direct membership semantics', async () => {
     const rpc: SharedProfileRpc = vi.fn(async () => ({
-      data: [ADD_MEMBER_ROW],
+      data: [INVITE_ROW],
       error: null,
     }));
 
     await expect(
-      addSharedProfileMember(rpc, 'shared-new', '  SuSi  '),
-    ).resolves.toEqual({
+      inviteSharedProfileMember(rpc, 'shared-new', '  SuSi  '),
+    ).resolves.toMatchObject({
       status: 'success',
-      addition: {
-        profileId: 'shared-new',
+      invitation: {
+        invitationId: 'invite-1',
         user: { id: 'user-2', nickname: 'Susi' },
-        memberCount: 2,
-        isReady: true,
-        added: true,
+        invitationCreated: true,
+        alreadyMember: false,
       },
     });
-    expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.addMember, {
+    expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.inviteMember, {
       target_profile_id: 'shared-new',
       input_nickname: 'SuSi',
     });
   });
 
-  it('maps a missing nickname specifically while keeping stale-profile errors generic', async () => {
+  it('responds to an invitation with explicit accept boolean', async () => {
+    const rpc: SharedProfileRpc = vi.fn(async () => ({
+      data: [ACCEPT_ROW],
+      error: null,
+    }));
+
+    await expect(
+      respondSharedProfileInvitation(rpc, 'invite-1', true),
+    ).resolves.toMatchObject({
+      status: 'success',
+      response: { accepted: true, isReady: true },
+    });
+    expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.respondInvitation, {
+      target_invitation_id: 'invite-1',
+      input_accept: true,
+    });
+  });
+
+  it('maps missing user and self-invite errors without leaking backend detail', async () => {
     const missingRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
       error: { code: 'P0002', message: 'Kajo user not found' },
     }));
-
     await expect(
-      addSharedProfileMember(missingRpc, 'shared-new', 'Susi'),
+      inviteSharedProfileMember(missingRpc, 'shared-new', 'Susi'),
     ).resolves.toEqual({
       status: 'error',
       message: 'Tällä nimimerkillä ei löytynyt Kajo-käyttäjää.',
     });
 
-    const staleProfileRpc: SharedProfileRpc = vi.fn(async () => ({
+    const selfRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
-      error: { code: 'P0002', message: 'Shared profile not found' },
+      error: { code: '22023', message: 'Cannot invite yourself' },
     }));
-
     await expect(
-      addSharedProfileMember(staleProfileRpc, 'shared-old', 'Susi'),
+      inviteSharedProfileMember(selfRpc, 'shared-new', 'KeTTu'),
     ).resolves.toEqual({
       status: 'error',
-      message: 'Jäsenen lisääminen yhteiseen Kajoon epäonnistui. Yritä uudelleen.',
+      message: 'Et voi kutsua itseäsi ryhmään.',
     });
   });
 
-  it('does not expose backend details on list or create failures', async () => {
+  it('keeps generic backend failures generic', async () => {
     const failingRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
       error: { message: 'private database detail' },
     }));
 
-    await expect(loadSharedProfiles(failingRpc)).resolves.toEqual({
+    await expect(loadSharedProfileInvitations(failingRpc)).resolves.toEqual({
       status: 'error',
-      message: 'Yhteisten Kajo-profiilien lataaminen epäonnistui. Yritä uudelleen.',
+      message: 'Ryhmäkutsujen lataaminen epäonnistui. Yritä uudelleen.',
     });
-    await expect(createSharedProfile(failingRpc, 'Meidän Kajo')).resolves.toEqual({
+    await expect(
+      respondSharedProfileInvitation(failingRpc, 'invite-1', false),
+    ).resolves.toEqual({
       status: 'error',
-      message: 'Yhteisen Kajon luominen epäonnistui. Yritä uudelleen.',
+      message: 'Ryhmäkutsuun vastaaminen epäonnistui. Yritä uudelleen.',
     });
   });
 });
