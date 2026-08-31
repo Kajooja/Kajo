@@ -141,6 +141,18 @@ Profile + Context + DiscoveryMode -> ranked Items / Predictions
 
 Python is the preferred language for the later dedicated prediction service because of ML/data tooling. FastAPI is a likely transport layer when a separate service is necessary.
 
+Sprint 008 Prediction V0 begins as the authenticated Postgres RPC
+`public.rank_items_v0`. This is the smallest real server-owned boundary for the
+current twelve normalized Items and early Event volume: scoring executes beside
+the RLS-protected evidence, avoids shipping personal history to the mobile
+client and does not create an otherwise empty service deployment. The function
+is `SECURITY INVOKER`, explicitly checks Profile membership, grants execution
+only to `authenticated` and returns one response-level `predictionId` with
+ranked generic Items and inspectable score components. The transport may move
+behind a dedicated Python/FastAPI service once model/tooling or scale requires
+it; the conceptual request/response contract must remain stable when that
+happens.
+
 ## External content
 
 External providers are adapters/data sources, not the Kajo domain model. TMDB/Open Library or future sources must be normalized into Kajo `Item` representations.

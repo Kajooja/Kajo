@@ -74,6 +74,12 @@ be evaluated through Sprint 007 Events.
 
 - Sprint opened after configured Sprint 007 Event acceptance.
 - Issue #95 created as the first bounded implementation step.
+- Issue #95 selected an authenticated Postgres RPC as the smallest real
+  server-owned V0 boundary and added the generic scorer migration.
+- Rollback-only hosted smokes proved deterministic ordering, separate
+  DiscoveryMode orderings, consumed suppression, one response-level
+  `predictionId`, BOOK/MOVIE-generic output, least-privilege execution grants
+  and unrelated-User denial without retaining test rows.
 
 ## Decisions
 
@@ -83,6 +89,9 @@ be evaluated through Sprint 007 Events.
 - Issue #95 must select and document the smallest real server deployment
   boundary before creating new service structure.
 - A prediction identifier is evaluation correlation, not merely a UI render ID.
+- Prediction V0.1 uses a `SECURITY INVOKER` Postgres RPC while the data and
+  model are small; a later dedicated service may replace its transport without
+  changing the conceptual contract.
 
 ## Deferred / not done
 
