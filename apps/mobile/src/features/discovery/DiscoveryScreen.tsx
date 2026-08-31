@@ -15,10 +15,6 @@ import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
-import {
-  createCorrelationId,
-  createUuidV7,
-} from '../events/eventTracking';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -29,7 +25,7 @@ import {
   type ItemInteraction,
 } from './itemInteraction';
 import { getConsumedItemLabels } from './itemInteractionLabels';
-import { getRankedMockItems } from './mockDiscovery';
+import { usePredictionRanking } from './usePredictionRanking';
 
 interface DiscoveryScreenProps {
   itemType: ItemType;
@@ -43,21 +39,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const [showConsumed, setShowConsumed] = useState(false);
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
-  const rankedItems = getRankedMockItems(itemType, mode);
+  const ranking = usePredictionRanking(itemType, mode, interactions);
+  const rankedItems = ranking.items;
   const consumedItems = getConsumedItems(rankedItems, interactions);
   const items = showConsumed
     ? consumedItems
     : getDiscoverableItems(rankedItems, interactions);
   const consumedLabel = getConsumedItemLabels(itemType).history;
-  const [traceSeed] = useState(() => createUuidV7());
-  const predictionId = createCorrelationId(
-    traceSeed,
-    `${itemType}:${mode}`,
-  );
+  const predictionId = ranking.predictionId;
   const visibleItems = useRef<readonly Item[]>([]);
   const impressionContext = useRef<ImpressionContext>({
     mode,
     predictionId,
+    predictionSource: ranking.source,
     showConsumed,
     recordEvent: eventTracking.recordEvent,
   });
@@ -65,10 +59,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     impressionContext.current = {
       mode,
       predictionId,
+      predictionSource: ranking.source,
       showConsumed,
       recordEvent: eventTracking.recordEvent,
     };
-  }, [eventTracking.recordEvent, mode, predictionId, showConsumed]);
+  }, [eventTracking.recordEvent, mode, predictionId, ranking.source, showConsumed]);
   const viewabilityConfig = useMemo(
     () => ({
       itemVisiblePercentThreshold: 60,
@@ -96,6 +91,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         {
           mode,
           predictionId,
+          predictionSource: ranking.source,
           showConsumed,
           recordEvent: eventTracking.recordEvent,
         },
@@ -106,6 +102,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     eventTracking.recordEvent,
     mode,
     predictionId,
+    ranking.source,
     showConsumed,
   ]);
 
@@ -116,12 +113,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       itemType: item.itemType,
       predictionId,
       discoveryMode: mode,
-      properties: { source: 'DISCOVERY_GRID' },
+      properties: {
+        source: 'DISCOVERY_GRID',
+        predictionSource: ranking.source,
+      },
     });
 
     router.push({
       pathname: '/discovery/[itemId]',
-      params: { itemId: item.id, predictionId },
+      params: {
+        itemId: item.id,
+        predictionId,
+        predictionSource: ranking.source,
+      },
     });
   }
 
@@ -186,6 +190,22 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         </View>
 
         <InteractionPersistenceNotice theme={theme} />
+
+        {ranking.status === 'error' ? (
+          <View style={styles.predictionNotice}>
+            <Text accessibilityLiveRegion="polite" style={styles.predictionNoticeText}>
+              {ranking.message}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Retry recommendations"
+              onPress={ranking.retry}
+              style={({ pressed }) => [styles.retryButton, pressed && styles.pressed]}
+            >
+              <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <FlatList
           data={items}
@@ -290,6 +310,7 @@ function ItemCard({
 interface ImpressionContext {
   mode: ReturnType<typeof useDiscoveryMode>['mode'];
   predictionId: string;
+  predictionSource: ReturnType<typeof usePredictionRanking>['source'];
   showConsumed: boolean;
   recordEvent: ReturnType<typeof useEventTracking>['recordEvent'];
 }
@@ -307,7 +328,10 @@ function recordVisibleImpressions(
       itemType: item.itemType,
       predictionId: context.predictionId,
       discoveryMode: context.mode,
-      properties: { source: 'DISCOVERY_GRID' },
+      properties: {
+        source: 'DISCOVERY_GRID',
+        predictionSource: context.predictionSource,
+      },
     });
   }
 }
@@ -359,6 +383,31 @@ function createStyles(theme: RoomTheme) {
       flexDirection: 'row',
       gap: 8,
       marginBottom: 18,
+    },
+    predictionNotice: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      marginBottom: 10,
+    },
+    predictionNoticeText: {
+      flex: 1,
+      color: theme.base.textMuted,
+      fontSize: 12,
+    },
+    retryButton: {
+      minHeight: 36,
+      justifyContent: 'center',
+      paddingHorizontal: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.base.border,
+    },
+    retryButtonText: {
+      color: theme.base.textPrimary,
+      fontSize: 12,
+      fontWeight: '700',
     },
     collectionButton: {
       minHeight: 36,
