@@ -334,7 +334,7 @@ export function ItemDetailScreen({
 
   if (!selectedItem) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <StatusBar style="light" />
         <View
           pointerEvents="none"
@@ -359,7 +359,7 @@ export function ItemDetailScreen({
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <StatusBar style="light" />
       <View
         pointerEvents="none"
