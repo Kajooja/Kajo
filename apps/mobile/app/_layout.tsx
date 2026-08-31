@@ -6,6 +6,7 @@ import { AuthGate } from '@/features/auth/AuthGate';
 import { AuthSessionProvider } from '@/features/auth/AuthSessionProvider';
 import { StartupSplash } from '@/features/branding/KajoBrand';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
+import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
@@ -29,11 +30,7 @@ export default function RootLayout() {
     return <StartupSplash />;
   }
 
-  const navigator = (
-    <DiscoveryModeProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </DiscoveryModeProvider>
-  );
+  const navigator = <Stack screenOptions={{ headerShown: false }} />;
   const isAuthCallbackRoute = segments[0] === 'auth';
 
   return (
@@ -42,7 +39,15 @@ export default function RootLayout() {
         <PersonalProfileProvider>
           <EventTrackingProvider>
             <ItemInteractionProvider>
-              {isAuthCallbackRoute ? navigator : <AuthGate>{navigator}</AuthGate>}
+              <DiscoveryModeProvider>
+                {isAuthCallbackRoute ? (
+                  navigator
+                ) : (
+                  <AuthGate>
+                    <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                  </AuthGate>
+                )}
+              </DiscoveryModeProvider>
             </ItemInteractionProvider>
           </EventTrackingProvider>
         </PersonalProfileProvider>
