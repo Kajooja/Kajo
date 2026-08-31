@@ -9,18 +9,15 @@ import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
-import { usePersonalProfile } from '../profiles/PersonalProfileProvider';
 
 export function RoomScreen() {
   const auth = useAuthSession();
   const activeProfile = useActiveProfile();
-  const personalProfile = usePersonalProfile();
   const { mode: discoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase, activeProfile.activeProfile);
   const styles = createStyles(theme);
   const [signingOut, setSigningOut] = useState(false);
-  const identityLabel = getRoomIdentityLabel(activeProfile, personalProfile);
 
   async function handleSignOut() {
     if (signingOut) {
@@ -52,12 +49,7 @@ export function RoomScreen() {
 
       <View style={styles.room}>
         <View style={styles.header}>
-          <View style={styles.identity}>
-            <Text numberOfLines={1} style={styles.kicker}>
-              {identityLabel}
-            </Text>
-            <Text style={styles.title}>Huone</Text>
-          </View>
+          <Text style={styles.title}>Huone</Text>
           {auth.status === 'signed-in' ? (
             <Pressable
               accessibilityRole="button"
@@ -100,23 +92,6 @@ export function RoomScreen() {
                 <View style={styles.windowBarHorizontal} />
               </View>
             </View>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Avaa yhteiset Kajot"
-              accessibilityHint="Näyttää yhteiset Kajo-profiilit ja niiden jäsenet"
-              onPress={() => router.push('/profiles/shared')}
-              style={({ pressed }) => [
-                styles.sharedFrame,
-                pressed && styles.pressed,
-              ]}
-            >
-              <View style={styles.sharedPortraitRow}>
-                <View style={styles.sharedPerson} />
-                <View style={styles.sharedPerson} />
-              </View>
-              <Text style={styles.sharedObjectLabel}>YHTEINEN</Text>
-            </Pressable>
 
             <Pressable
               accessibilityRole="button"
@@ -174,24 +149,11 @@ export function RoomScreen() {
         </View>
 
         <Text style={styles.hint}>
-          Huone on Kajo. Valitse kirjat, elokuvat tai yhteinen Kajo.
+          Huone on Kajo. Valitse kirjat tai elokuvat.
         </Text>
       </View>
     </SafeAreaView>
   );
-}
-
-function getRoomIdentityLabel(
-  activeProfile: ReturnType<typeof useActiveProfile>,
-  personalProfile: ReturnType<typeof usePersonalProfile>,
-): string {
-  if (activeProfile.activeProfile?.type === 'SHARED') {
-    return `YHTEINEN KAJO · ${activeProfile.activeProfile.name}`;
-  }
-
-  return personalProfile.status === 'ready'
-    ? `OMA KAJO · ${personalProfile.identity.user.nickname}`
-    : 'OMA KAJO';
 }
 
 function createStyles(theme: RoomTheme) {
@@ -215,21 +177,10 @@ function createStyles(theme: RoomTheme) {
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    identity: {
-      flex: 1,
-      paddingRight: 12,
-    },
-    kicker: {
-      color: theme.base.textMuted,
-      fontSize: 11,
-      fontWeight: '600',
-      letterSpacing: 2.2,
-    },
     title: {
       color: theme.base.textPrimary,
       fontSize: 34,
       fontWeight: '600',
-      marginTop: 4,
     },
     signOutButton: {
       minHeight: 42,
@@ -297,38 +248,6 @@ function createStyles(theme: RoomTheme) {
       top: '50%',
       marginTop: -2,
       backgroundColor: theme.base.structure,
-    },
-    sharedFrame: {
-      position: 'absolute',
-      left: '44%',
-      bottom: 16,
-      width: 58,
-      minHeight: 58,
-      zIndex: 3,
-      borderWidth: 3,
-      borderColor: theme.base.structureLight,
-      backgroundColor: theme.base.appBackground,
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 6,
-      paddingVertical: 7,
-    },
-    sharedPortraitRow: {
-      flexDirection: 'row',
-      gap: 5,
-    },
-    sharedPerson: {
-      width: 13,
-      height: 13,
-      borderRadius: 7,
-      borderWidth: 2,
-      borderColor: theme.base.textMuted,
-    },
-    sharedObjectLabel: {
-      color: theme.base.textMuted,
-      fontSize: 7,
-      fontWeight: '700',
-      letterSpacing: 0.8,
     },
     movieScreen: {
       width: '46%',
