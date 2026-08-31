@@ -17,7 +17,7 @@ export function RoomScreen() {
   const personalProfile = usePersonalProfile();
   const { mode: discoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
-  const theme = getRoomTheme(ambientPhase);
+  const theme = getRoomTheme(ambientPhase, activeProfile.activeProfile);
   const styles = createStyles(theme);
   const [signingOut, setSigningOut] = useState(false);
   const identityLabel = getRoomIdentityLabel(activeProfile, personalProfile);

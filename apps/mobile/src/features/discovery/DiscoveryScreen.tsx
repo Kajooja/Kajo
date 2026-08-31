@@ -15,6 +15,7 @@ import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
+import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -34,10 +35,11 @@ interface DiscoveryScreenProps {
 
 export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const { mode } = useDiscoveryMode();
+  const activeProfile = useActiveProfile();
   const { interactions } = useItemInteractions();
   const eventTracking = useEventTracking();
   const [showConsumed, setShowConsumed] = useState(false);
-  const theme = getRoomTheme(getAmbientPhase(mode));
+  const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const ranking = usePredictionRanking(itemType, mode, interactions);
   const rankedItems = ranking.items;

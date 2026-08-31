@@ -1,4 +1,4 @@
-import type { AmbientPhase } from '../domain/contracts';
+import type { AmbientPhase, Profile } from '../domain/contracts';
 
 export interface RoomBaseTheme {
   appBackground: string;
@@ -45,6 +45,54 @@ export const PERSONAL_ROOM_BASE_THEME: Readonly<RoomBaseTheme> = {
   flame: '#C68A4A',
 };
 
+export const SHARED_ROOM_BASE_THEMES: readonly Readonly<RoomBaseTheme>[] = [
+  {
+    appBackground: '#151817',
+    sceneBackground: '#222826',
+    wall: '#222826',
+    floor: '#1C2220',
+    border: '#343E3A',
+    textPrimary: '#EEF2ED',
+    textMuted: '#96A29C',
+    structure: '#43534D',
+    structureLight: '#5C7068',
+    screen: '#101412',
+    book: '#697A72',
+    ember: '#815C3F',
+    flame: '#B98555',
+  },
+  {
+    appBackground: '#181617',
+    sceneBackground: '#292327',
+    wall: '#292327',
+    floor: '#221D20',
+    border: '#40353C',
+    textPrimary: '#F2ECEF',
+    textMuted: '#A2949D',
+    structure: '#56454F',
+    structureLight: '#705A67',
+    screen: '#131013',
+    book: '#7B6873',
+    ember: '#86523F',
+    flame: '#BC7655',
+  },
+  {
+    appBackground: '#161719',
+    sceneBackground: '#24272C',
+    wall: '#24272C',
+    floor: '#1E2025',
+    border: '#373C45',
+    textPrimary: '#EDF0F4',
+    textMuted: '#969DA8',
+    structure: '#48515D',
+    structureLight: '#606C7A',
+    screen: '#101216',
+    book: '#6C7481',
+    ember: '#80563E',
+    flame: '#B77D55',
+  },
+] as const;
+
 export const ROOM_AMBIENT_BY_PHASE: Readonly<Record<AmbientPhase, RoomAmbientTheme>> = {
   DAWN: {
     wash: '#E6D5B5',
@@ -69,9 +117,33 @@ export const ROOM_AMBIENT_BY_PHASE: Readonly<Record<AmbientPhase, RoomAmbientThe
   },
 };
 
-export function getRoomTheme(ambientPhase: AmbientPhase): RoomTheme {
+export function getRoomTheme(
+  ambientPhase: AmbientPhase,
+  profile?: Profile | null,
+): RoomTheme {
   return {
-    base: PERSONAL_ROOM_BASE_THEME,
+    base: getRoomBaseTheme(profile),
     ambient: ROOM_AMBIENT_BY_PHASE[ambientPhase],
   };
+}
+
+export function getRoomBaseTheme(
+  profile?: Profile | null,
+): Readonly<RoomBaseTheme> {
+  if (!profile || profile.type === 'PERSONAL') {
+    return PERSONAL_ROOM_BASE_THEME;
+  }
+
+  const sharedTheme = SHARED_ROOM_BASE_THEMES[getStableThemeIndex(profile.id)];
+  return sharedTheme ?? PERSONAL_ROOM_BASE_THEME;
+}
+
+function getStableThemeIndex(profileId: string): number {
+  let hash = 0;
+
+  for (let index = 0; index < profileId.length; index += 1) {
+    hash = (hash * 31 + profileId.charCodeAt(index)) >>> 0;
+  }
+
+  return hash % SHARED_ROOM_BASE_THEMES.length;
 }
