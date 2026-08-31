@@ -34,8 +34,8 @@ Completed through Sprint 007:
 - `MVP-FOUND-001..003`
 - `MVP-AUTH-001..002`
 - `MVP-ROOM-001..005`
-- `MVP-DISC-001..007`
-- `MVP-SWIPE-001..006`
+- `MVP-DISC-001..006`; `MVP-DISC-007` reopened for the persistent shared-mode control
+- `MVP-SWIPE-001`, `MVP-SWIPE-006`; `MVP-SWIPE-002..005` reopened for the rating-drawer/queue model
 - `MVP-MEM-001..002`
 - `MVP-PROFILE-001`, `MVP-PROFILE-003`
 - `MVP-DATA-001..002`
@@ -46,7 +46,7 @@ Sprint 008 targets:
 - `MVP-PRED-002` — combine longer-term behavior, recent context and Item similarity,
 - `MVP-PRED-003` — make DiscoveryMode change ranking semantics.
 
-Rating/memory extension, SharedProfiles/social behavior and scenario-memory foundations remain later MVP work. See `../product/MVP.md` for the complete executable boundary.
+The 1–10 rating input is now active Sprint 008 scope; Saved/Consumed list navigation remains Sprint 010. SharedProfiles/social behavior and scenario-memory foundations remain later MVP work. See `../product/MVP.md` for the complete executable boundary.
 
 ## Active Sprint 008 — Prediction V0
 
@@ -61,25 +61,26 @@ Sprint 008 replaces mock ordering with the first real generic, server-owned pers
 
 PR #97 is merged and the migration is deployed. Hosted functional, mode,
 suppression, authorization, grant and advisor checks passed without retaining
-test data. Issue #95 is complete. Issue #98 now connects configured mobile
-discovery to the RPC through a typed boundary while preserving the unconfigured
-mock fallback. The mobile client consumes ranking results; it does not own
-ranking logic.
+test data. Issue #95 is complete and Issue #98 is merged. Configured-phone
+feedback now drives #100 (persistent mode bar), #101
+(rating/not-interested/save drawer) and #103 (cooldown/catalog). #102 records
+later Saved/Consumed list navigation. The mobile client consumes ranking
+results; it does not own ranking logic.
 
 ## Exact next actions
 
-1. Complete Issue #98's typed mobile ranking, stale-response/fallback and Event-correlation implementation.
-2. Run the full repository port and merge the scoped mobile PR.
-3. Produce one configured Android build and phone-test BOOK/MOVIE mode order plus interaction refresh.
-4. Verify hosted Events retain the server response's `predictionId` and `predictionSource = hosted` without recording account identifiers.
-5. Close Sprint 008 and its three MVP Prediction requirements only after configured acceptance passes.
+1. Implement #100's persistent global DiscoveryMode top bar and bundle the #78 logo-size correction.
+2. Implement #101's canonical rating/not-interested/save state, migrations, Events, drawer and scorer inputs.
+3. Implement #103's impression cooldown and broader normalized test catalog.
+4. Produce a configured Android build and verify queue rotation plus hosted `predictionId`/feedback Events.
+5. Close Sprint 008 and its reopened/Prediction MVP requirements only after configured acceptance passes.
 
 ## Known issues / open decisions
 
 - Startup-logo sizing is optional visual polish under Issue #78 and does not block MVP work.
 - Google and Apple authentication remain separately tracked in Issue #73.
 - Final book/movie metadata providers are not locked.
-- Current mode-dependent Item ordering remains mock logic until Sprint 008 integration replaces it.
+- Hosted Prediction V0 consumption is merged, but configured Event evidence with `predictionSource = hosted` remains pending in the next acceptance build.
 - Current Room/theme/mock covers remain structural rather than final production artwork.
 - The current Item feature set and Event volume are small, so Prediction V0 needs an explicit cold-start prior.
 - Prediction V0.1 uses an authenticated Postgres RPC; a dedicated Python service remains a later scale/tooling decision.
@@ -110,4 +111,4 @@ ranking logic.
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Sprint 007 is accepted and complete; Issue #89 can close with the configured-phone and hosted-row evidence above. Startup-logo sizing stays non-blocking under Issue #78. Sprint 008 is active under product parent #46, and Issue #95 is the exact next implementation. Do not move scoring into the mobile client or begin ScenarioMemory/SharedProfile work early.
+Sprint 007 is accepted and complete. Sprint 008's scorer (#95) and mobile consumption (#98) are merged; configured feedback made #100 the exact next implementation, followed by #101 and #103. #102 belongs to Sprint 010. Do not move scoring into the mobile client or begin ScenarioMemory/SharedProfile work early.

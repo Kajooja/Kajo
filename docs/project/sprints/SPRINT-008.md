@@ -33,6 +33,8 @@ be evaluated through Sprint 007 Events.
 - `MVP-PRED-001`
 - `MVP-PRED-002`
 - `MVP-PRED-003`
+- reopened `MVP-DISC-007`, `MVP-SWIPE-002..005`
+- `MVP-MEM-003`
 
 ## Non-goals
 
@@ -40,7 +42,7 @@ be evaluated through Sprint 007 Events.
 - Evolutionary optimization or model training.
 - Separate BOOK/MOVIE user models or predictors.
 - SharedProfile product UI.
-- Ratings, search or dwell measurement.
+- Search or dwell measurement.
 - Final external book/movie provider selection.
 - Recommendation logic in mobile presentation components.
 
@@ -48,8 +50,12 @@ be evaluated through Sprint 007 Events.
 
 - #46 — product parent for adaptive ranking and DiscoveryMode semantics.
 - #95 — server-owned generic scorer contract, authorization and foundation.
-- A later scoped Issue will connect accepted Prediction V0 responses to mobile
-  discovery and configured-phone re-ranking after #95 is hosted and verified.
+- #98 — typed mobile consumption and Event correlation; merged, configured
+  hosted-Event acceptance remains pending.
+- #100 — persistent global DiscoveryMode top bar.
+- #101 — rating/not-interested/save feedback drawer and canonical persistence.
+- #103 — impression cooldown and broader normalized MVP candidate catalog.
+- #102 — Saved/Consumed navigation recorded for Sprint 010.
 
 ## Definition of Done
 
@@ -59,7 +65,7 @@ be evaluated through Sprint 007 Events.
 - Fixed evidence produces deterministic, inspectable and testable scores.
 - Item similarity/features, longer-term behaviour and recency-weighted recent
   behaviour have measurable tested effects.
-- Consumed suppression and explicit likes/dislikes affect subsequent ranking.
+- Consumed suppression, 1–10 rating magnitude, not-interested evidence and save state affect subsequent ranking/queue placement without conflating consumption.
 - DiscoveryMode changes exploration/risk semantics, not only ambient visuals.
 - A relevant user action or mode change can refresh later ranking at a
   controlled cadence.
@@ -83,9 +89,14 @@ be evaluated through Sprint 007 Events.
 - PR #97 merged and the exact migration is deployed. Hosted function ACL,
   configured ranking, mode-order, suppression and security/performance advisor
   verification passed; Issue #95 is complete.
-- Issue #98 is active for typed mobile consumption, stale-response protection,
-  controlled Event/state refresh, explicit mock fallback and configured-phone
-  correlation acceptance.
+- Issue #98 merged typed mobile consumption, stale-response protection,
+  controlled Event/state refresh and explicit mock fallback; configured-phone
+  hosted correlation acceptance remains pending.
+- Configured phone feedback reopened the interaction/mode acceptance boundary:
+  #100 adds the persistent shared-mode top bar, #101 replaces binary reactions
+  with the 1–10/not-interested/save drawer, and #103 adds impression cooldown
+  plus enough candidates for observable testing. #102 records Saved/Consumed
+  navigation for Sprint 010.
 
 ## Decisions
 
@@ -128,11 +139,10 @@ be evaluated through Sprint 007 Events.
 
 ## Mid-sprint handoff
 
-Issue #95's server-owned scorer is merged, deployed and hosted-verified. Continue
-Issue #98 from `apps/mobile/src/features/discovery/`: configured discovery must
-consume `rank_items_v0`, preserve its response-level `predictionId` through
-Events and retain mock ranking only as an explicit fallback. Do not create an
-empty `services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
+Issue #95's server-owned scorer and Issue #98's mobile consumption are merged.
+Continue with #100, then #101 and #103. Preserve one global DiscoveryMode state,
+server-owned ranking and response-level `predictionId`. Do not create an empty
+`services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
 
 ## Final handoff
 

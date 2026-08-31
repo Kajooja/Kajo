@@ -44,13 +44,20 @@ Generic event capture, sessions, prediction traceability and analytics-quality b
 
 First real generic personalized ranking using Item similarity, behavioural history, recency/ShortTermState and exploration policy. Rankings should refresh when materially relevant behavioural evidence or the global DiscoveryMode/risk selection changes; the mobile client consumes prediction results rather than owning ranking logic.
 
+Configured-phone feedback on 2026-08-31 adds these acceptance refinements before Sprint 008 closes:
+
+- expose the one shared DiscoveryMode as a compact persistent app-shell control while retaining the Room curtain as its spatial representation,
+- replace ambiguous binary like/dislike/consumed controls with a feedback drawer: 1–10 rating (always consumed), not interested (not consumed) and save,
+- move every explicitly reacted Item out of the immediate queue and apply a temporary impression cooldown to unreacted Items,
+- expand the normalized MVP candidate set enough to observe ranking/cooldown behaviour on a configured phone.
+
 ### Sprint 009 — Shared Kajo
 
 Persistent SharedProfiles, shared Room/theme, joint saved/history/discovery and member suggestions.
 
 ### Sprint 010 — Memory
 
-Consumed experience history, ratings and initial memory/note extension point.
+Saved and consumed/rated list navigation, basic sorting and the initial memory/note extension point. The rating input itself moves into Sprint 008 because it is required as Prediction V0 outcome evidence.
 
 ### Sprint 011 — Scenario Memory
 

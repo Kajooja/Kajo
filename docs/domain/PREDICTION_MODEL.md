@@ -123,7 +123,9 @@ The mode is algorithmic. Its visual representation is handled separately by `Amb
 MVP Prediction V0 should be intentionally simple and measurable. Initial signals may include:
 
 - generic Item similarity/features,
-- explicit likes/dislikes,
+- legacy explicit likes/dislikes plus the replacement feedback model,
+- 1–10 ratings whose magnitude and polarity are stronger outcome evidence,
+- explicit not-interested evidence that does not imply consumption,
 - consumed/history suppression,
 - LongTermState derived from history,
 - recency-weighted ShortTermState,
@@ -133,6 +135,12 @@ MVP Prediction V0 should be intentionally simple and measurable. Initial signals
 Prediction V0 should support re-ranking after relevant behavioural evidence or DiscoveryMode changes so the user experience becomes progressively more personal during use.
 
 Population scenario retrieval and evolutionary optimization come later after enough outcome data exists.
+
+Prediction V0 queue policy distinguishes outcome from exposure. An explicit
+rating, not-interested action or save rotates the Item out of the immediate
+queue. A mere impression receives only a recency cooldown: it may return later
+when no explicit reaction exists. Consumed/rated Items remain strongly
+suppressed from ordinary discovery and available through history instead.
 
 ### V0.1 scorer contract
 

@@ -34,23 +34,24 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
 - [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
 - [x] `MVP-DISC-006` User can open Item details.
-- [x] `MVP-DISC-007` Curtain is the single app-wide three-state DiscoveryMode/risk control: it supports drag and tap-to-snap, visually interpolates smoothly, and the selected mode persists through Room, discovery and swipe without duplicate per-screen selectors.
+- [-] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; the Room curtain and a compact persistent app-shell control both manipulate that same state without screen-local copies.
 
 ## Swipe and state
 
 - [x] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
-- [x] `MVP-SWIPE-002` User can express positive/negative interest.
-- [x] `MVP-SWIPE-003` User can mark a movie as watched and a book as read.
-- [x] `MVP-SWIPE-004` Already-consumed Items are strongly suppressed from ordinary repeated discovery.
-- [x] `MVP-SWIPE-005` Every explicit interest, save or consumed choice visibly commits with a restrained exit/advance animation and presents the next Item without an index jump.
+- [-] `MVP-SWIPE-002` User can give consumed Items a 1–10 rating or mark an unconsumed Item as not currently interesting; these are distinct canonical signals.
+- [-] `MVP-SWIPE-003` A 1–10 rating always marks a movie watched or a book read; consumption is not a separate ambiguous action.
+- [-] `MVP-SWIPE-004` Consumed Items are strongly suppressed, explicitly reacted Items leave the immediate queue, and unreacted impressions use a temporary cooldown so they may return later.
+- [-] `MVP-SWIPE-005` Rating, not-interested and save actions live in one restrained feedback drawer, visibly commit and advance without an index jump.
 - [x] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both the prior state and exact previous Item/card.
 
 ## Saved, consumed and memory
 
 - [x] `MVP-MEM-001` User can save/unsave an Item.
 - [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
-- [ ] `MVP-MEM-003` User can add a simple rating to a consumed Item.
+- [-] `MVP-MEM-003` User can add a 1–10 rating to an Item, which always records that Item as consumed.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
+- [ ] `MVP-MEM-005` User can open Profile-scoped Saved and Consumed lists from persistent navigation and sort them by supported generic metadata; named custom lists remain post-MVP.
 
 ## Profiles and social
 
