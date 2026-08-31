@@ -24,10 +24,11 @@ export function SharedProfilesScreen() {
   const styles = createStyles(theme);
   const [newProfileName, setNewProfileName] = useState('');
   const [creating, setCreating] = useState(false);
-  const [addingToProfileId, setAddingToProfileId] = useState<string | null>(null);
+  const [invitingToProfileId, setInvitingToProfileId] = useState<string | null>(null);
   const [memberNickname, setMemberNickname] = useState('');
-  const [addingMember, setAddingMember] = useState(false);
+  const [sendingInvite, setSendingInvite] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
   const personalProfile = profiles.personalProfile;
   const personalProfileId = personalProfile?.id ?? null;
 
@@ -46,6 +47,7 @@ export function SharedProfilesScreen() {
 
     setCreating(true);
     setActionError(null);
+    setActionNotice(null);
     const result = await profiles.createSharedProfile(newProfileName);
     setCreating(false);
 
@@ -55,36 +57,41 @@ export function SharedProfilesScreen() {
     }
 
     setNewProfileName('');
-    setAddingToProfileId(result.creation.profileId);
+    setInvitingToProfileId(result.creation.profileId);
     setMemberNickname('');
   }
 
-  async function handleAddMember(profileId: string) {
-    if (addingMember) return;
+  async function handleInviteMember(profileId: string) {
+    if (sendingInvite) return;
 
-    setAddingMember(true);
+    setSendingInvite(true);
     setActionError(null);
-    const result = await profiles.addSharedProfileMember(
+    setActionNotice(null);
+    const result = await profiles.inviteSharedProfileMember(
       profileId,
       memberNickname,
     );
-    setAddingMember(false);
+    setSendingInvite(false);
 
     if (result.status === 'error') {
       setActionError(result.message);
       return;
     }
 
-    if (!result.addition.added) {
-      setActionError('Tämä käyttäjä kuuluu jo tähän Kajoon.');
+    if (result.invitation.alreadyMember) {
+      setActionNotice('Tämä käyttäjä kuuluu jo tähän ryhmään.');
+      setMemberNickname('');
+      setInvitingToProfileId(null);
       return;
     }
 
+    setActionNotice(
+      result.invitation.invitationCreated
+        ? `Kutsu lähetetty käyttäjälle ${result.invitation.user.nickname}.`
+        : `Kutsu käyttäjälle ${result.invitation.user.nickname} odottaa jo hyväksyntää.`,
+    );
     setMemberNickname('');
-
-    if (result.addition.isReady) {
-      setAddingToProfileId(null);
-    }
+    setInvitingToProfileId(null);
   }
 
   const canUseSharedProfiles =
@@ -166,14 +173,14 @@ export function SharedProfilesScreen() {
         {profiles.sharedProfiles.map((membership) => {
           const { profile } = membership;
           const isActive = profiles.activeProfile?.id === profile.id;
-          const showMemberForm = addingToProfileId === profile.id;
+          const showInviteForm = invitingToProfileId === profile.id;
 
           return (
             <View key={profile.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View style={styles.cardTitleGroup}>
                   <Text style={styles.cardKicker}>
-                    {membership.isReady ? 'YHTEINEN KAJO' : 'ODOTTAA JÄSENTÄ'}
+                    {membership.isReady ? 'YHTEINEN KAJO' : 'ODOTTAA HYVÄKSYNTÄÄ'}
                   </Text>
                   <Text style={styles.cardTitle}>{profile.name}</Text>
                 </View>
@@ -184,13 +191,13 @@ export function SharedProfilesScreen() {
                 {membership.members.map((member) => member.nickname).join(' · ')}
               </Text>
 
-              {showMemberForm ? (
+              {showInviteForm ? (
                 <View style={styles.memberForm}>
                   <TextInput
-                    accessibilityLabel={`Lisättävän jäsenen nimimerkki profiiliin ${profile.name}`}
+                    accessibilityLabel={`Kutsuttavan jäsenen nimimerkki ryhmään ${profile.name}`}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    editable={!addingMember && canUseSharedProfiles}
+                    editable={!sendingInvite && canUseSharedProfiles}
                     onChangeText={setMemberNickname}
                     placeholder="Nimimerkki"
                     placeholderTextColor={theme.base.textMuted}
@@ -199,16 +206,16 @@ export function SharedProfilesScreen() {
                   />
                   <Pressable
                     accessibilityRole="button"
-                    disabled={addingMember || !canUseSharedProfiles}
-                    onPress={() => void handleAddMember(profile.id)}
+                    disabled={sendingInvite || !canUseSharedProfiles}
+                    onPress={() => void handleInviteMember(profile.id)}
                     style={({ pressed }) => [
                       styles.primaryButton,
                       pressed && styles.pressed,
-                      (addingMember || !canUseSharedProfiles) && styles.disabled,
+                      (sendingInvite || !canUseSharedProfiles) && styles.disabled,
                     ]}
                   >
                     <Text style={styles.primaryButtonText}>
-                      {addingMember ? 'Lisätään…' : 'Lisää jäsen'}
+                      {sendingInvite ? 'Lähetetään…' : 'Lähetä kutsu'}
                     </Text>
                   </Pressable>
                 </View>
@@ -216,16 +223,17 @@ export function SharedProfilesScreen() {
                 <Pressable
                   accessibilityRole="button"
                   onPress={() => {
-                    setAddingToProfileId(profile.id);
+                    setInvitingToProfileId(profile.id);
                     setMemberNickname('');
                     setActionError(null);
+                    setActionNotice(null);
                   }}
                   style={({ pressed }) => [
                     styles.textButton,
                     pressed && styles.pressed,
                   ]}
                 >
-                  <Text style={styles.textButtonText}>Lisää jäsen</Text>
+                  <Text style={styles.textButtonText}>Kutsu jäsen</Text>
                 </Pressable>
               )}
 
@@ -245,20 +253,21 @@ export function SharedProfilesScreen() {
                 </Pressable>
               ) : (
                 <Text style={styles.pendingText}>
-                  Lisää vähintään yksi toinen jäsen ennen kuin tämän Kajon voi avata.
+                  Ryhmä avautuu, kun vähintään yksi kutsuttu käyttäjä hyväksyy kutsun.
                 </Text>
               )}
             </View>
           );
         })}
 
-        {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
+        {actionError ? <Text style={styles.actionMessage}>{actionError}</Text> : null}
+        {actionNotice ? <Text style={styles.actionMessage}>{actionNotice}</Text> : null}
 
         <View style={styles.createSection}>
           <Text style={styles.sectionTitle}>Luo yhteinen Kajo</Text>
           <Text style={styles.helperText}>
-            Anna paikalle nimi. Se syntyy ensin sinulle, minkä jälkeen lisäät
-            vähintään yhden toisen Kajo-käyttäjän nimimerkillä.
+            Anna ryhmälle nimi. Se syntyy ensin sinulle, minkä jälkeen lähetät
+            vähintään yhdelle toiselle Kajo-käyttäjälle kutsun nimimerkillä.
           </Text>
           <TextInput
             accessibilityLabel="Uuden yhteisen Kajon nimi"
@@ -457,7 +466,7 @@ function createStyles(theme: RoomTheme) {
       fontSize: 13,
       paddingVertical: 8,
     },
-    actionError: {
+    actionMessage: {
       color: theme.base.textPrimary,
       fontSize: 13,
       lineHeight: 18,

@@ -3,7 +3,9 @@ import type { SharedProfile, User } from '@/domain/contracts';
 export const SHARED_PROFILE_RPC = {
   list: 'get_my_shared_profiles',
   create: 'create_shared_profile',
-  addMember: 'add_shared_profile_member',
+  inviteMember: 'invite_shared_profile_member',
+  listInvitations: 'get_my_shared_profile_invitations',
+  respondInvitation: 'respond_shared_profile_invitation',
 } as const;
 
 interface RpcErrorLike {
@@ -34,12 +36,31 @@ export interface SharedProfileCreation {
   isReady: boolean;
 }
 
-export interface SharedProfileMemberAddition {
+export interface SharedProfileInvitation {
+  id: string;
   profileId: string;
+  profileName: string;
+  inviter: User;
+  createdAt: string;
+}
+
+export interface SharedProfileInvitationCreation {
+  profileId: string;
+  invitationId: string | null;
   user: User;
   memberCount: number;
   isReady: boolean;
-  added: boolean;
+  invitationCreated: boolean;
+  alreadyMember: boolean;
+}
+
+export interface SharedProfileInvitationResponse {
+  invitationId: string;
+  profileId: string;
+  profileName: string;
+  accepted: boolean;
+  memberCount: number;
+  isReady: boolean;
 }
 
 export type SharedProfileListResult =
@@ -50,8 +71,16 @@ export type SharedProfileCreateResult =
   | { status: 'success'; creation: SharedProfileCreation }
   | { status: 'error'; message: string };
 
-export type SharedProfileAddMemberResult =
-  | { status: 'success'; addition: SharedProfileMemberAddition }
+export type SharedProfileInvitationListResult =
+  | { status: 'success'; invitations: readonly SharedProfileInvitation[] }
+  | { status: 'error'; message: string };
+
+export type SharedProfileInviteResult =
+  | { status: 'success'; invitation: SharedProfileInvitationCreation }
+  | { status: 'error'; message: string };
+
+export type SharedProfileInvitationResponseResult =
+  | { status: 'success'; response: SharedProfileInvitationResponse }
   | { status: 'error'; message: string };
 
 export type SharedProfileNameValidationResult =
@@ -66,10 +95,15 @@ const SHARED_PROFILE_ERROR_MESSAGE =
   'Yhteisten Kajo-profiilien lataaminen epäonnistui. Yritä uudelleen.';
 const SHARED_PROFILE_CREATE_ERROR_MESSAGE =
   'Yhteisen Kajon luominen epäonnistui. Yritä uudelleen.';
-const SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE =
-  'Jäsenen lisääminen yhteiseen Kajoon epäonnistui. Yritä uudelleen.';
+const SHARED_PROFILE_INVITE_ERROR_MESSAGE =
+  'Kutsun lähettäminen yhteiseen Kajoon epäonnistui. Yritä uudelleen.';
+const SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE =
+  'Ryhmäkutsujen lataaminen epäonnistui. Yritä uudelleen.';
+const SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE =
+  'Ryhmäkutsuun vastaaminen epäonnistui. Yritä uudelleen.';
 const SHARED_PROFILE_USER_NOT_FOUND_MESSAGE =
   'Tällä nimimerkillä ei löytynyt Kajo-käyttäjää.';
+const SHARED_PROFILE_SELF_INVITE_MESSAGE = 'Et voi kutsua itseäsi ryhmään.';
 const MINIMUM_SHARED_PROFILE_NAME_LENGTH = 2;
 const MAXIMUM_SHARED_PROFILE_NAME_LENGTH = 64;
 const MINIMUM_NICKNAME_LENGTH = 2;
@@ -174,13 +208,35 @@ export async function createSharedProfile(
   }
 }
 
-export async function addSharedProfileMember(
+export async function loadSharedProfileInvitations(
+  rpc: SharedProfileRpc,
+): Promise<SharedProfileInvitationListResult> {
+  try {
+    const response = await rpc(SHARED_PROFILE_RPC.listInvitations, undefined);
+
+    if (response.error) {
+      return {
+        status: 'error',
+        message: SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE,
+      };
+    }
+
+    return mapSharedProfileInvitations(response.data);
+  } catch {
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE,
+    };
+  }
+}
+
+export async function inviteSharedProfileMember(
   rpc: SharedProfileRpc,
   profileId: string,
   nicknameInput: string,
-): Promise<SharedProfileAddMemberResult> {
+): Promise<SharedProfileInviteResult> {
   if (!isNonEmptyString(profileId)) {
-    return { status: 'error', message: SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE };
+    return { status: 'error', message: SHARED_PROFILE_INVITE_ERROR_MESSAGE };
   }
 
   const validation = validateSharedProfileNickname(nicknameInput);
@@ -190,22 +246,62 @@ export async function addSharedProfileMember(
   }
 
   try {
-    const response = await rpc(SHARED_PROFILE_RPC.addMember, {
+    const response = await rpc(SHARED_PROFILE_RPC.inviteMember, {
       target_profile_id: profileId,
       input_nickname: validation.nickname,
     });
 
     if (response.error) {
-      if (response.error.message.toLowerCase().includes('kajo user not found')) {
+      const message = response.error.message.toLowerCase();
+
+      if (message.includes('kajo user not found')) {
         return { status: 'error', message: SHARED_PROFILE_USER_NOT_FOUND_MESSAGE };
       }
 
-      return { status: 'error', message: SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE };
+      if (message.includes('cannot invite yourself')) {
+        return { status: 'error', message: SHARED_PROFILE_SELF_INVITE_MESSAGE };
+      }
+
+      return { status: 'error', message: SHARED_PROFILE_INVITE_ERROR_MESSAGE };
     }
 
-    return mapSharedProfileMemberAddition(response.data);
+    return mapSharedProfileInvitationCreation(response.data);
   } catch {
-    return { status: 'error', message: SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE };
+    return { status: 'error', message: SHARED_PROFILE_INVITE_ERROR_MESSAGE };
+  }
+}
+
+export async function respondSharedProfileInvitation(
+  rpc: SharedProfileRpc,
+  invitationId: string,
+  accept: boolean,
+): Promise<SharedProfileInvitationResponseResult> {
+  if (!isNonEmptyString(invitationId)) {
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
+    };
+  }
+
+  try {
+    const response = await rpc(SHARED_PROFILE_RPC.respondInvitation, {
+      target_invitation_id: invitationId,
+      input_accept: accept,
+    });
+
+    if (response.error) {
+      return {
+        status: 'error',
+        message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
+      };
+    }
+
+    return mapSharedProfileInvitationResponse(response.data);
+  } catch {
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
+    };
   }
 }
 
@@ -261,37 +357,134 @@ export function mapSharedProfileCreation(
   };
 }
 
-export function mapSharedProfileMemberAddition(
+export function mapSharedProfileInvitations(
   data: unknown,
-): SharedProfileAddMemberResult {
+): SharedProfileInvitationListResult {
+  if (!Array.isArray(data)) {
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE,
+    };
+  }
+
+  const invitations: SharedProfileInvitation[] = [];
+
+  for (const row of data) {
+    if (
+      !isRecord(row) ||
+      !isNonEmptyString(row.invitation_id) ||
+      !isNonEmptyString(row.profile_id) ||
+      !isNonEmptyString(row.profile_name) ||
+      !isNonEmptyString(row.inviter_user_id) ||
+      !isNonEmptyString(row.inviter_nickname) ||
+      !isNonEmptyString(row.created_at) ||
+      Number.isNaN(Date.parse(row.created_at))
+    ) {
+      return {
+        status: 'error',
+        message: SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE,
+      };
+    }
+
+    invitations.push({
+      id: row.invitation_id,
+      profileId: row.profile_id,
+      profileName: row.profile_name,
+      inviter: {
+        id: row.inviter_user_id,
+        nickname: row.inviter_nickname,
+      },
+      createdAt: row.created_at,
+    });
+  }
+
+  return { status: 'success', invitations };
+}
+
+export function mapSharedProfileInvitationCreation(
+  data: unknown,
+): SharedProfileInviteResult {
   const row = getSingleRow(data);
 
   if (
     !row ||
     !isNonEmptyString(row.profile_id) ||
-    !isNonEmptyString(row.user_id) ||
+    !isNonEmptyString(row.invited_user_id) ||
     !isNonEmptyString(row.nickname) ||
     !Number.isInteger(row.member_count) ||
     typeof row.is_ready !== 'boolean' ||
-    typeof row.added !== 'boolean'
+    typeof row.invitation_created !== 'boolean' ||
+    typeof row.already_member !== 'boolean' ||
+    (row.invitation_id !== null && !isNonEmptyString(row.invitation_id))
   ) {
-    return { status: 'error', message: SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE };
+    return { status: 'error', message: SHARED_PROFILE_INVITE_ERROR_MESSAGE };
+  }
+
+  const memberCount = row.member_count as number;
+  const alreadyMember = row.already_member;
+  const invitationId = row.invitation_id as string | null;
+
+  if (
+    memberCount < 1 ||
+    row.is_ready !== (memberCount >= 2) ||
+    (alreadyMember && (invitationId !== null || row.invitation_created)) ||
+    (!alreadyMember && invitationId === null)
+  ) {
+    return { status: 'error', message: SHARED_PROFILE_INVITE_ERROR_MESSAGE };
+  }
+
+  return {
+    status: 'success',
+    invitation: {
+      profileId: row.profile_id,
+      invitationId,
+      user: { id: row.invited_user_id, nickname: row.nickname },
+      memberCount,
+      isReady: row.is_ready,
+      invitationCreated: row.invitation_created,
+      alreadyMember,
+    },
+  };
+}
+
+export function mapSharedProfileInvitationResponse(
+  data: unknown,
+): SharedProfileInvitationResponseResult {
+  const row = getSingleRow(data);
+
+  if (
+    !row ||
+    !isNonEmptyString(row.invitation_id) ||
+    !isNonEmptyString(row.profile_id) ||
+    !isNonEmptyString(row.profile_name) ||
+    typeof row.accepted !== 'boolean' ||
+    !Number.isInteger(row.member_count) ||
+    typeof row.is_ready !== 'boolean'
+  ) {
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
+    };
   }
 
   const memberCount = row.member_count as number;
 
   if (memberCount < 1 || row.is_ready !== (memberCount >= 2)) {
-    return { status: 'error', message: SHARED_PROFILE_ADD_MEMBER_ERROR_MESSAGE };
+    return {
+      status: 'error',
+      message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
+    };
   }
 
   return {
     status: 'success',
-    addition: {
+    response: {
+      invitationId: row.invitation_id,
       profileId: row.profile_id,
-      user: { id: row.user_id, nickname: row.nickname },
+      profileName: row.profile_name,
+      accepted: row.accepted,
       memberCount,
       isReady: row.is_ready,
-      added: row.added,
     },
   };
 }
