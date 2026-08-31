@@ -59,20 +59,20 @@ Sprint 008 replaces mock ordering with the first real generic, server-owned pers
 - deterministic fallback behavior for sparse/cold-start evidence,
 - authorization, explainability and hosted verification without writing test data to a real Profile.
 
-The migration is locally implemented and has passed rollback-only hosted
-functional, mode, suppression, authorization and grant smokes without retaining
-test data. It is not deployed until the implementation PR is reviewed and
-merged. Mobile ranking integration follows as a separate scoped Issue after the
-hosted scorer foundation is accepted. The mobile client must consume ranking
-results; it must not own ranking logic.
+PR #97 is merged and the migration is deployed. Hosted functional, mode,
+suppression, authorization, grant and advisor checks passed without retaining
+test data. Issue #95 is complete. Issue #98 now connects configured mobile
+discovery to the RPC through a typed boundary while preserving the unconfigured
+mock fallback. The mobile client consumes ranking results; it does not own
+ranking logic.
 
 ## Exact next actions
 
-1. Complete Issue #95's code/documentation review and full repository port.
-2. Merge its migration, then deploy the exact merged file to the hosted project.
-3. Re-run functional, authorization, grant and advisor checks without adding test rows to a real user Profile.
-4. Close Issue #95 with hosted evidence.
-5. Open the separate mobile-consumption Issue only after the hosted foundation passes.
+1. Complete Issue #98's typed mobile ranking, stale-response/fallback and Event-correlation implementation.
+2. Run the full repository port and merge the scoped mobile PR.
+3. Produce one configured Android build and phone-test BOOK/MOVIE mode order plus interaction refresh.
+4. Verify hosted Events retain the server response's `predictionId` and `predictionSource = hosted` without recording account identifiers.
+5. Close Sprint 008 and its three MVP Prediction requirements only after configured acceptance passes.
 
 ## Known issues / open decisions
 
