@@ -5,44 +5,64 @@ import {
   getUndoEventProperties,
 } from './itemInteractionEvents';
 
+const emptyInteraction = {
+  interest: null,
+  saved: false,
+  consumed: false,
+  rating: null,
+  notInterested: false,
+} as const;
+
 describe('Item interaction Event semantics', () => {
   it('maps every direct current-state change to a canonical Event', () => {
     expect(
       getInteractionEventType(
         { type: 'SET_INTEREST', itemId: 'item-1', interest: 'LIKED' },
-        { interest: 'LIKED', saved: false, consumed: false },
+        { ...emptyInteraction, interest: 'LIKED' },
       ),
     ).toBe('ITEM_LIKED');
     expect(
       getInteractionEventType(
         { type: 'SET_INTEREST', itemId: 'item-1', interest: null },
-        { interest: null, saved: false, consumed: false },
+        emptyInteraction,
       ),
     ).toBe('ITEM_INTEREST_CLEARED');
     expect(
       getInteractionEventType(
         { type: 'TOGGLE_SAVED', itemId: 'item-1' },
-        { interest: null, saved: true, consumed: false },
+        { ...emptyInteraction, saved: true },
       ),
     ).toBe('ITEM_SAVED');
     expect(
       getInteractionEventType(
         { type: 'TOGGLE_SAVED', itemId: 'item-1' },
-        { interest: null, saved: false, consumed: false },
+        emptyInteraction,
       ),
     ).toBe('ITEM_UNSAVED');
     expect(
       getInteractionEventType(
         { type: 'SET_CONSUMED', itemId: 'item-1', consumed: true },
-        { interest: null, saved: false, consumed: true },
+        { ...emptyInteraction, consumed: true },
       ),
     ).toBe('ITEM_CONSUMED');
     expect(
       getInteractionEventType(
         { type: 'SET_CONSUMED', itemId: 'item-1', consumed: false },
-        { interest: null, saved: false, consumed: false },
+        emptyInteraction,
       ),
     ).toBe('ITEM_CONSUMPTION_REVERSED');
+    expect(
+      getInteractionEventType(
+        { type: 'SET_RATING', itemId: 'item-1', rating: 9 },
+        { ...emptyInteraction, consumed: true, rating: 9 },
+      ),
+    ).toBe('ITEM_RATED');
+    expect(
+      getInteractionEventType(
+        { type: 'SET_NOT_INTERESTED', itemId: 'item-1', notInterested: true },
+        { ...emptyInteraction, notInterested: true },
+      ),
+    ).toBe('ITEM_NOT_INTERESTED');
   });
 
   it('retains the compensated Event and exact restored snapshot for undo', () => {
@@ -51,12 +71,16 @@ describe('Item interaction Event semantics', () => {
         interest: 'DISLIKED',
         saved: true,
         consumed: false,
+        rating: null,
+        notInterested: false,
       }),
     ).toEqual({
       reversedEventId: 'event-1',
       restoredInterest: 'DISLIKED',
       restoredSaved: true,
       restoredConsumed: false,
+      restoredRating: null,
+      restoredNotInterested: false,
     });
   });
 });
