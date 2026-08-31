@@ -97,6 +97,10 @@ be evaluated through Sprint 007 Events.
   with the 1–10/not-interested/save drawer, and #103 adds impression cooldown
   plus enough candidates for observable testing. #102 records Saved/Consumed
   navigation for Sprint 010.
+- Issue #100 implementation adds one authenticated app-shell mode bar above the
+  navigation Stack, keeps auth/callback screens outside it, reuses the Room
+  curtain state/gesture semantics and reduces splash lettering to 88% visible
+  screen width for a thin black margin. Configured-phone acceptance remains.
 
 ## Decisions
 

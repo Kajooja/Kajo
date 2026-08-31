@@ -69,10 +69,10 @@ results; it does not own ranking logic.
 
 ## Exact next actions
 
-1. Implement #100's persistent global DiscoveryMode top bar and bundle the #78 logo-size correction.
+1. Merge #100's implemented persistent global DiscoveryMode bar and bundled #78 logo-size correction after the full repository port.
 2. Implement #101's canonical rating/not-interested/save state, migrations, Events, drawer and scorer inputs.
 3. Implement #103's impression cooldown and broader normalized test catalog.
-4. Produce a configured Android build and verify queue rotation plus hosted `predictionId`/feedback Events.
+4. Produce a configured Android build and verify mode persistence, queue rotation plus hosted `predictionId`/feedback Events.
 5. Close Sprint 008 and its reopened/Prediction MVP requirements only after configured acceptance passes.
 
 ## Known issues / open decisions

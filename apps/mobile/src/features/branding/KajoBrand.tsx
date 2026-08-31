@@ -11,7 +11,7 @@ const SPLASH_VISIBLE_LEFT = 20;
 const SPLASH_VISIBLE_WIDTH = 67;
 const SPLASH_VISIBLE_CENTER_X =
   SPLASH_VISIBLE_LEFT + SPLASH_VISIBLE_WIDTH / 2;
-const SPLASH_VISIBLE_SCREEN_WIDTH = 0.94;
+const SPLASH_VISIBLE_SCREEN_WIDTH = 0.88;
 
 export function StartupSplash() {
   const { height, width } = useWindowDimensions();

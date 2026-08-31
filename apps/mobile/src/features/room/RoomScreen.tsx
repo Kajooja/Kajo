@@ -81,7 +81,7 @@ export function RoomScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <StatusBar style="light" />
       <Animated.View
         pointerEvents="none"

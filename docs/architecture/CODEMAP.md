@@ -27,11 +27,11 @@ supabase/functions/password-auth/
 | Area | Canonical path | Current state |
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; Sprint 006 configured auth, profile and persistence flows are accepted on a real Android phone |
-| Expo Router entry | `apps/mobile/app/` | Root opens Room; book/movie discovery routes and one generic Item detail/swipe route live under `app/discovery/` |
+| Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent DiscoveryMode shell above the Stack, while auth/callback routes stay outside it; book/movie discovery and generic Item detail routes live under `app/discovery/` |
 | Core domain contracts | `apps/mobile/src/domain/` | Profile/Item/Event/Context/Prediction/DiscoveryMode/AmbientPhase contracts and canonical mode mapping; Sprint 007 persists the existing Event contract rather than inventing domain-specific variants |
 | Room feature | `apps/mobile/src/features/room/` | 2D Room shell plus one window-aligned continuous three-state DiscoveryMode curtain with drag and tap-to-snap; bookshelf/projector navigate to discovery |
 | Theme engine | `apps/mobile/src/theme/` | Reusable personal Room base tokens plus AmbientPhase overlays and tests |
-| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state, typed Prediction V0 RPC mapping/refresh boundary, hosted ranking in configured grids and explicit mock fallback when unconfigured/unavailable; generic grid/detail/swipe plus one interaction store with ordered persistence, retry feedback and exact-card undo |
+| Discovery feature | `apps/mobile/src/features/discovery/` | Shared DiscoveryMode state exposed by the Room curtain and persistent app-shell bar, typed Prediction V0 RPC mapping/refresh boundary, hosted ranking in configured grids and explicit mock fallback; generic grid/detail/swipe plus one interaction store with ordered persistence, retry feedback and exact-card undo |
 | Event Engine | `apps/mobile/src/features/events/` | Root-scoped session/correlation tracker, meaningful-impression deduplication, canonical interaction/undo mapping and retry-safe append boundary for generic Event/session rows |
 | Swipe | `apps/mobile/src/features/swipe/` | Intentionally not created; current optional swipe behavior is part of the existing generic discovery flow rather than a duplicate feature tree |
 | Personal identity | `apps/mobile/src/features/profiles/` | User-bound profile hydration, unique display-cased nickname onboarding/fallback and canonical User/PersonalProfile mapping behind one root provider; SharedProfile product flow remains later scope |
