@@ -28,6 +28,8 @@ export function SharedProfilesScreen() {
   const [memberNickname, setMemberNickname] = useState('');
   const [addingMember, setAddingMember] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const personalProfile = profiles.personalProfile;
+  const personalProfileId = personalProfile?.id ?? null;
 
   function openProfile(profileId: string) {
     if (!profiles.selectProfile(profileId)) {
@@ -73,6 +75,11 @@ export function SharedProfilesScreen() {
       return;
     }
 
+    if (!result.addition.added) {
+      setActionError('Tämä käyttäjä kuuluu jo tähän Kajoon.');
+      return;
+    }
+
     setMemberNickname('');
 
     if (result.addition.isReady) {
@@ -99,28 +106,28 @@ export function SharedProfilesScreen() {
           </Text>
         </View>
 
-        {profiles.personalProfile ? (
+        {personalProfile && personalProfileId ? (
           <View style={[styles.card, styles.personalCard]}>
             <View style={styles.cardHeader}>
               <View style={styles.cardTitleGroup}>
                 <Text style={styles.cardKicker}>OMA KAJO</Text>
-                <Text style={styles.cardTitle}>{profiles.personalProfile.name}</Text>
+                <Text style={styles.cardTitle}>{personalProfile.name}</Text>
               </View>
-              {profiles.activeProfile?.id === profiles.personalProfile.id ? (
+              {profiles.activeProfile?.id === personalProfileId ? (
                 <Text style={styles.activeBadge}>AKTIIVINEN</Text>
               ) : null}
             </View>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Avaa oma Kajo"
-              onPress={() => openProfile(profiles.personalProfile!.id)}
+              onPress={() => openProfile(personalProfileId)}
               style={({ pressed }) => [
                 styles.secondaryButton,
                 pressed && styles.pressed,
               ]}
             >
               <Text style={styles.secondaryButtonText}>
-                {profiles.activeProfile?.id === profiles.personalProfile.id
+                {profiles.activeProfile?.id === personalProfileId
                   ? 'Palaa omaan huoneeseen'
                   : 'Avaa oma Kajo'}
               </Text>
@@ -159,8 +166,7 @@ export function SharedProfilesScreen() {
         {profiles.sharedProfiles.map((membership) => {
           const { profile } = membership;
           const isActive = profiles.activeProfile?.id === profile.id;
-          const showMemberForm =
-            !membership.isReady || addingToProfileId === profile.id;
+          const showMemberForm = addingToProfileId === profile.id;
 
           return (
             <View key={profile.id} style={styles.card}>
@@ -189,12 +195,7 @@ export function SharedProfilesScreen() {
                     placeholder="Nimimerkki"
                     placeholderTextColor={theme.base.textMuted}
                     style={styles.input}
-                    value={
-                      addingToProfileId === profile.id || !membership.isReady
-                        ? memberNickname
-                        : ''
-                    }
-                    onFocus={() => setAddingToProfileId(profile.id)}
+                    value={memberNickname}
                   />
                   <Pressable
                     accessibilityRole="button"
@@ -207,9 +208,7 @@ export function SharedProfilesScreen() {
                     ]}
                   >
                     <Text style={styles.primaryButtonText}>
-                      {addingMember && addingToProfileId === profile.id
-                        ? 'Lisätään…'
-                        : 'Lisää jäsen'}
+                      {addingMember ? 'Lisätään…' : 'Lisää jäsen'}
                     </Text>
                   </Pressable>
                 </View>
@@ -219,6 +218,7 @@ export function SharedProfilesScreen() {
                   onPress={() => {
                     setAddingToProfileId(profile.id);
                     setMemberNickname('');
+                    setActionError(null);
                   }}
                   style={({ pressed }) => [
                     styles.textButton,
