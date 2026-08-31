@@ -1,6 +1,6 @@
 # Sprint 009 — Shared Kajo
 
-Status: **ACTIVE**
+Status: **ACTIVE — FINAL ACCEPTANCE (#125)**
 Milestone: **MVP 0.1**
 Started: **2026-08-31**
 
@@ -18,36 +18,16 @@ with 2-N members, its own state/history and actor-specific Events.
 - `MVP-SOCIAL-002`
 - `MVP-SOCIAL-003`
 
-## Scope
+## Implementation status
 
-- Create/manage persistent SharedProfiles with at least two members.
-- Reuse existing `profiles` + `profile_members` and Profile membership authorization.
-- Let the authenticated user select the active PersonalProfile or a SharedProfile.
-- Keep `actorUserId` separate from active `profileId` for every shared-context Event/action.
-- Reuse existing generic Item interaction persistence and Prediction V0 for SharedProfiles.
-- Provide shared saved/history/discovery semantics through the same generic boundaries.
-- Add a minimal shared Room/theme identity and member suggestion action.
-- Validate membership isolation and configured Android flows.
-
-## Non-goals
-
-- Public social graph, followers, feed or influencer mechanics.
-- General messaging/chat.
-- Separate SharedProfile-specific prediction model.
-- ScenarioMemory or vector retrieval.
-- Named/custom lists.
-- Complex Room editor or final art assets.
-
-## Implementation order
-
-1. SharedProfile creation/member persistence + RLS/RPC boundary. **Complete (#111).**
-2. Typed mobile SharedProfile listing and active Profile context. **Complete (#115).**
+1. SharedProfile creation/member persistence + authorization. **Complete (#111).**
+2. Typed SharedProfile listing and generic active Profile scope. **Complete (#115).**
 3. Typed create/member mutation boundary. **Complete (#118).**
-4. Room entry + visible SharedProfile setup/selection flow. **Complete (#117).**
+4. Room entry + visible setup/selection flow. **Complete (#117).**
 5. Stable SharedProfile-specific Room/theme identity. **Complete (#121).**
-6. Traceable SharedProfile Item suggestion behavior. **Active (#123).**
-7. Verify shared discovery/saved/current-interaction/Prediction/Event behavior in configured runtime.
-8. Configured Android and hosted authorization/Event acceptance.
+6. Traceable SharedProfile Item suggestion behavior. **Complete (#123).**
+7. Hosted SharedProfile pre-acceptance. **Complete — 14/14 rollback checks passed.**
+8. Configured Android end-to-end acceptance. **Active (#125).**
 
 ## Definition of Done
 
@@ -66,65 +46,88 @@ with 2-N members, its own state/history and actor-specific Events.
 ### #111 — SharedProfile membership foundation
 
 - Reuses `profiles.profile_type = 'SHARED'` and `profile_members`; no parallel SharedProfile table.
-- `create_shared_profile(name)` creates a provisional one-member SharedProfile.
-- `add_shared_profile_member(profileId, nickname)` resolves existing Kajo Users by case-insensitive nickname and requires existing membership from the actor.
-- `get_my_shared_profiles()` returns only memberships visible to the current User and exposes member user id + display-cased nickname, never auth email.
+- Provisional creation, nickname-based member addition and membership-only listing are server-owned RPC operations.
 - Product-ready SharedProfile semantics begin at 2+ members.
-- Public authenticated RPC wrappers are `SECURITY INVOKER`; privileged helpers remain in `private`.
-- Hosted rollback-only acceptance passed membership/readiness/isolation/email-free payload checks.
+- Public authenticated wrappers remain `SECURITY INVOKER`; privileged helpers stay in `private`.
+- Auth email is not exposed through the SharedProfile boundary.
 
-### #115 — Active Profile context
+### #115 / #118 — Mobile Profile/data boundaries
 
-- PR #116 merged after full CI.
-- PersonalProfile remains the safe default.
-- Only ready 2+ member SharedProfiles are selectable.
-- Event tracking, Item interaction hydration/persistence and Prediction V0 use the active `profileId` while keeping the signed-in User as `actorUserId`.
+- `ActiveProfileProvider` keeps PersonalProfile as the safe default and only exposes ready SharedProfiles as selectable.
+- Event tracking, Item interaction hydration/persistence and Prediction V0 use active `profileId`; signed-in User remains `actorUserId`.
+- `sharedProfileOperations` owns typed list/create/add-member calls, validation and user-facing error mapping.
 
-### #118 — Typed SharedProfile mutations
+### #117 — Visible Shared Kajo flow
 
-- PR #119 merged after full CI.
-- `sharedProfileOperations` owns typed list/create/add-member RPC calls and payload validation.
-- Shared Kajo name is validated at 2–64 characters and member nickname at 2–32 characters before backend calls.
-- Display casing is preserved and backend details are not exposed in presentation errors.
+- Room has one restrained Shared Kajo entrance.
+- `/profiles/shared` supports Personal fallback, ready/provisional SharedProfiles, member display, creation, nickname member add and ready-profile activation.
+- Screens do not call Supabase directly.
+- PR #120 main APK built and embedded JS bundle verification passed.
 
-### #117 — Room entry and Shared Kajo setup/selection flow
+### #121 — Shared Room identity
 
-- PR #120 merged after full CI.
-- Main standalone Android APK built successfully, embedded JS bundle verification passed and the artifact uploaded.
-- Adds the Room Shared Kajo object, `/profiles/shared`, creation/member setup, ready/provisional cards, Personal fallback and ready-profile activation.
-- Screens remain Supabase-free.
-
-### #121 — Stable Shared Room theme identity
-
-- PR #122 merged after lint, TypeScript, all tests and both bundle smokes passed.
+- PR #122 merged after full CI.
 - PersonalProfile base tokens remain unchanged.
-- SharedProfile base identity is selected deterministically from `profileId` from a small restrained palette set, requiring no new persistence.
-- DiscoveryMode ambient phases remain independent from Profile visual identity.
-- Global shell, Room and discovery grid follow active Profile identity; shell-level tint carries the identity across remaining content surfaces without a parallel theme provider.
-
-## Active issue
+- SharedProfile base identity is deterministic from `profileId` using a small restrained palette set, requiring no persistence.
+- DiscoveryMode ambient/risk remains independent from visual identity.
 
 ### #123 — Traceable Item suggestion
 
-- Reuse canonical `ITEM_SUGGESTED`; no schema/EventType expansion is needed.
-- The action appears only for a valid Item detail while a ready SharedProfile is active.
-- The shell resolves the current Item using route context, avoiding a parallel social implementation inside the large Item detail component.
-- One tap records `ITEM_SUGGESTED` through existing `EventTrackingContext`, preserving the real actor User and active SharedProfile.
-- `properties.source = 'ITEM_DETAIL'` and current `DiscoveryMode` are retained.
-- Suggestion does not mutate save/rating/not-interested/consumed state and creates no message/feed/read-state table.
-- Existing Event persistence retry behavior is reused.
-- Pure eligibility/Event-input tests are included.
+- PR #124 merged after lint, TypeScript, tests and both bundle smokes passed.
+- A valid Item detail inside a SharedProfile exposes one restrained `Ehdota yhteiseen` action.
+- The action writes canonical append-only `ITEM_SUGGESTED` through existing EventTracking.
+- Event retains active SharedProfile, actual actor User, Item, ItemType, DiscoveryMode and `properties.source = 'ITEM_DETAIL'`.
+- Suggestion does not mutate save/rating/not-interested/consumed state and creates no chat/feed/read-state table.
+- Existing retry-safe Event persistence is reused.
+
+## Hosted pre-acceptance — passed 14/14
+
+A rollback-only transaction created temporary Users A/B/C through the real auth provisioning trigger and exercised production RLS/RPCs as the `authenticated` role with JWT subjects.
+
+Passed checks:
+
+- all three PersonalProfiles provisioned,
+- SharedProfile created provisional at one member,
+- B added case-insensitively and SharedProfile became ready at two members,
+- A's shared saved/rated Item state stayed separate from A's PersonalProfile,
+- A's `ITEM_SUGGESTED` Event retained correct actor/Profile/Item/type/mode/source,
+- B listed the SharedProfile,
+- B read A's shared Item state,
+- B read the suggestion while actor remained A,
+- Prediction V0 returned ranked Items for B in the SharedProfile,
+- outsider C could not list the SharedProfile,
+- C could not read shared interactions,
+- C could not read shared Events,
+- C's Prediction request was denied with `42501`,
+- C's shared interaction write was rejected by RLS.
+
+All test rows were rolled back.
+
+Security/performance advisors showed no new Sprint 009-specific findings. Existing warnings remain separately tracked technical debt: public/authenticated legacy SECURITY DEFINER functions, leaked-password protection disabled, and currently unused Event/session indexes. Do not delete indexes solely because this small test workload has not exercised them.
+
+## Active issue — #125 configured SharedProfile end-to-end acceptance
+
+The remaining gate is real Android behavior with two Kajo accounts. Validate:
+
+1. A creates/adds B and both see the same ready SharedProfile without auth email exposure.
+2. Personal ↔ Shared switching changes Room identity/theme and restores the correct context without restart.
+3. Shared save/rating state persists and is isolated from PersonalProfile.
+4. B sees the same shared current Item state while B's PersonalProfile remains separate.
+5. Prediction V0 ranks the SharedProfile for both members.
+6. `Ehdota yhteiseen` persists `ITEM_SUGGESTED` without changing Item current state.
+7. Logo → Room, DiscoveryMode and existing personal flows remain intact.
+
+Only after this device acceptance should Sprint 009 and its MVP requirements be marked complete.
 
 ## Decisions
 
-- Do not add a second SharedProfile table or predictor.
-- Provisional one-member SharedProfiles are setup state only; product-ready use begins at two members.
+- No second SharedProfile table or predictor.
+- One-member SharedProfile is setup state only.
 - Nickname is the MVP member-discovery identifier; auth email stays outside SharedProfile UI/API.
-- PersonalProfile remains the safe default active context.
-- Shared Kajo is entered from the Room and should feel like another place, not a filter.
-- SharedProfile visual identity and DiscoveryMode/risk remain separate concepts.
-- MVP shared theme identity is deterministic rather than persisted; later customization can replace it without changing Profile/DiscoveryMode contracts.
-- `ITEM_SUGGESTED` is append-only behavioral evidence, not chat or Item current state.
+- Shared Kajo is a Profile/place, not a filter.
+- Shared visual identity and DiscoveryMode remain separate.
+- `ITEM_SUGGESTED` is behavioral evidence, not messaging or current Item state.
+- ScenarioMemory remains out of Sprint 009.
 
 ## Important files
 
@@ -135,7 +138,6 @@ with 2-N members, its own state/history and actor-specific Events.
 - `/apps/mobile/src/features/profiles/SharedProfilesScreen.tsx`
 - `/apps/mobile/src/features/discovery/DiscoveryModeShell.tsx`
 - `/apps/mobile/src/features/discovery/sharedSuggestion.ts`
-- `/apps/mobile/src/features/discovery/sharedSuggestion.test.ts`
 - `/apps/mobile/src/features/events/`
 - `/apps/mobile/src/theme/roomTheme.ts`
 - `/supabase/migrations/20260831171000_shared_profile_membership_foundation.sql`
@@ -143,7 +145,7 @@ with 2-N members, its own state/history and actor-specific Events.
 
 ## Handoff
 
-#111, #115, #118, #117 and #121 are complete. #123 is active. Finish its CI gate,
-then verify SharedProfile save/rating/Prediction/Event behavior in configured Android/
-hosted runtime before closing Sprint 009. Preserve the generic Profile architecture and
-do not begin ScenarioMemory or a separate shared predictor.
+All Sprint 009 implementation slices are merged. #125 is the final configured Android
+acceptance gate. Hosted pre-acceptance is 14/14 green and rollback-clean. Do not add new
+social architecture before device acceptance; fix only concrete failures. Do not begin
+ScenarioMemory early.
