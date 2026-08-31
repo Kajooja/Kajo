@@ -78,6 +78,7 @@ declare
   normalized_nickname text := lower(btrim(input_nickname));
   target_user_id uuid;
   target_nickname text;
+  affected_rows integer := 0;
   membership_added boolean := false;
   current_member_count integer;
 begin
@@ -123,7 +124,8 @@ begin
   values (target_profile_id, target_user_id)
   on conflict (profile_id, user_id) do nothing;
 
-  get diagnostics membership_added = row_count;
+  get diagnostics affected_rows = row_count;
+  membership_added := affected_rows > 0;
 
   select count(*)::integer
   into current_member_count
