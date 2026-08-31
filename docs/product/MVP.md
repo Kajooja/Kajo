@@ -56,15 +56,15 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 - [x] `MVP-PROFILE-001` Every user has a PersonalProfile.
 - [ ] `MVP-PROFILE-002` 2-N users can belong to a persistent SharedProfile.
-- [-] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
+- [x] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
 - [ ] `MVP-SOCIAL-001` SharedProfile has joint saved items.
 - [ ] `MVP-SOCIAL-002` Members can browse/swipe in the SharedProfile context.
 - [ ] `MVP-SOCIAL-003` A member can suggest an Item within a SharedProfile.
 
 ## Data and prediction
 
-- [-] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
-- [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
+- [x] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
+- [x] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [ ] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
 - [ ] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
 - [ ] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
