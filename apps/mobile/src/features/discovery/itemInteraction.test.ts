@@ -77,6 +77,8 @@ describe('item interaction state', () => {
       rating: 9,
       notInterested: false,
     });
+    interactions = setItemRating(interactions, 'book-a', 0);
+    expect(getItemInteraction(interactions, 'book-a').rating).toBe(0);
     expect(setItemRating(interactions, 'book-a', 11)).toBe(interactions);
   });
 

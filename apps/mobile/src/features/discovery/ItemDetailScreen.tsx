@@ -42,13 +42,13 @@ import {
   getNextSwipeIndex,
   type ItemInteraction,
   type ItemInteractionAction,
-  type ItemInterest,
 } from './itemInteraction';
 import {
   getConsumedItemLabels,
   ITEM_INTERACTION_LABELS,
 } from './itemInteractionLabels';
 import { getMockItem, getRankedMockItems } from './mockDiscovery';
+import { RatingControl } from './RatingControl';
 
 interface ItemDetailScreenProps {
   itemId: ItemId;
@@ -66,9 +66,9 @@ export function ItemDetailScreen({
   const eventTracking = useEventTracking();
   const {
     interactions,
-    setInterest,
     toggleSaved,
-    setConsumed,
+    setRating,
+    setNotInterested,
     canUndo,
     undoTargetItemId,
     undo,
@@ -130,28 +130,57 @@ export function ItemDetailScreen({
     };
   }, [exitAnimation]);
 
-  function handleInterest(
+  function handleRating(
     item: Item,
     index: number,
     interaction: ItemInteraction,
-    interest: ItemInterest | null,
+    rating: number,
   ) {
     const action: ItemInteractionAction = {
-      type: 'SET_INTEREST',
+      type: 'SET_RATING',
       itemId: item.id,
-      interest,
+      rating,
     };
     handleCommittedAction(
       item,
       index,
       action,
-      { ...interaction, interest },
-      (eventId) => setInterest(item.id, interest, eventId),
-      interest === 'LIKED'
-        ? ITEM_INTERACTION_LABELS.likedFeedback
-        : interest === 'DISLIKED'
-          ? ITEM_INTERACTION_LABELS.dislikedFeedback
-          : ITEM_INTERACTION_LABELS.interestClearedFeedback,
+      {
+        ...interaction,
+        interest: null,
+        consumed: true,
+        rating,
+        notInterested: false,
+      },
+      (eventId) => setRating(item.id, rating, eventId),
+      `Arvosana ${rating}/10 tallennettu.`,
+      { rating },
+    );
+  }
+
+  function handleNotInterested(
+    item: Item,
+    index: number,
+    interaction: ItemInteraction,
+  ) {
+    const action: ItemInteractionAction = {
+      type: 'SET_NOT_INTERESTED',
+      itemId: item.id,
+      notInterested: true,
+    };
+    handleCommittedAction(
+      item,
+      index,
+      action,
+      {
+        ...interaction,
+        interest: null,
+        consumed: false,
+        rating: null,
+        notInterested: true,
+      },
+      (eventId) => setNotInterested(item.id, true, eventId),
+      ITEM_INTERACTION_LABELS.notInterestedFeedback,
     );
   }
 
@@ -176,29 +205,6 @@ export function ItemDetailScreen({
     );
   }
 
-  function handleConsumed(
-    item: Item,
-    index: number,
-    interaction: ItemInteraction,
-  ) {
-    const nextConsumed = !interaction.consumed;
-    const labels = getConsumedItemLabels(item.itemType);
-    const action: ItemInteractionAction = {
-      type: 'SET_CONSUMED',
-      itemId: item.id,
-      consumed: nextConsumed,
-    };
-
-    handleCommittedAction(
-      item,
-      index,
-      action,
-      { ...interaction, consumed: nextConsumed },
-      (eventId) => setConsumed(item.id, nextConsumed, eventId),
-      nextConsumed ? labels.markedFeedback : labels.unmarkedFeedback,
-    );
-  }
-
   function handleCommittedAction(
     item: Item,
     index: number,
@@ -206,6 +212,7 @@ export function ItemDetailScreen({
     nextInteraction: ItemInteraction,
     commit: (eventId?: EventId) => boolean,
     nextFeedback: string,
+    eventProperties: Readonly<Record<string, unknown>> = {},
   ) {
     if (exitingItemId) {
       return;
@@ -228,7 +235,11 @@ export function ItemDetailScreen({
           itemType: item.itemType,
           predictionId: recommendationTraceId,
           discoveryMode: mode,
-          properties: { source: 'ITEM_DETAIL', predictionSource },
+          properties: {
+            source: 'ITEM_DETAIL',
+            predictionSource,
+            ...eventProperties,
+          },
         },
         eventId,
       );
@@ -456,13 +467,11 @@ export function ItemDetailScreen({
                 theme={theme}
                 styles={styles}
                 disabled={Boolean(exitingItemId)}
-                onInterest={(interest) =>
-                  handleInterest(item, index, interaction, interest)
+                onRating={(rating) => handleRating(item, index, interaction, rating)}
+                onNotInterested={() =>
+                  handleNotInterested(item, index, interaction)
                 }
                 onToggleSaved={() => handleSaved(item, index, interaction)}
-                onConsumedPress={() =>
-                  handleConsumed(item, index, interaction)
-                }
               />
             </Animated.View>
           );
@@ -479,9 +488,9 @@ interface SwipeItemPageProps {
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   disabled: boolean;
-  onInterest: (interest: ItemInterest | null) => void;
+  onRating: (rating: number) => void;
+  onNotInterested: () => void;
   onToggleSaved: () => void;
-  onConsumedPress: () => void;
 }
 
 function SwipeItemPage({
@@ -491,9 +500,9 @@ function SwipeItemPage({
   theme,
   styles,
   disabled,
-  onInterest,
+  onRating,
+  onNotInterested,
   onToggleSaved,
-  onConsumedPress,
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
 
@@ -524,7 +533,11 @@ function SwipeItemPage({
           ) : (
             <View />
           )}
-          {interaction.consumed ? (
+          {interaction.rating !== null ? (
+            <Text style={styles.heroStatus}>ARVOSANA {interaction.rating}/10</Text>
+          ) : interaction.notInterested ? (
+            <Text style={styles.heroStatus}>EI KIINNOSTA</Text>
+          ) : interaction.consumed ? (
             <Text style={styles.heroStatus}>{consumedLabels.status}</Text>
           ) : null}
         </View>
@@ -545,43 +558,38 @@ function SwipeItemPage({
         </View>
       ) : null}
 
-      <View style={styles.actions} accessibilityLabel="Item actions">
-        <ActionButton
-          label={ITEM_INTERACTION_LABELS.liked}
-          active={interaction.interest === 'LIKED'}
+      <View style={styles.feedbackDrawer} accessibilityLabel="Arvioi kohde">
+        <Text style={styles.drawerTitle}>
+          {ITEM_INTERACTION_LABELS.rating.toUpperCase()}
+        </Text>
+        <RatingControl
+          rating={interaction.rating}
           disabled={disabled}
           theme={theme}
-          styles={styles}
-          onPress={() => onInterest(interaction.interest === 'LIKED' ? null : 'LIKED')}
+          onRatingChange={onRating}
         />
-        <ActionButton
-          label={ITEM_INTERACTION_LABELS.disliked}
-          active={interaction.interest === 'DISLIKED'}
-          disabled={disabled}
-          theme={theme}
-          styles={styles}
-          onPress={() => onInterest(interaction.interest === 'DISLIKED' ? null : 'DISLIKED')}
-        />
-        <ActionButton
-          label={
-            interaction.saved ? ITEM_INTERACTION_LABELS.saved : ITEM_INTERACTION_LABELS.save
-          }
-          active={interaction.saved}
-          disabled={disabled}
-          theme={theme}
-          styles={styles}
-          onPress={onToggleSaved}
-        />
-        <ActionButton
-          label={
-            interaction.consumed ? consumedLabels.activeAction : consumedLabels.markAction
-          }
-          active={interaction.consumed}
-          disabled={disabled}
-          theme={theme}
-          styles={styles}
-          onPress={onConsumedPress}
-        />
+        <View style={styles.actions} accessibilityLabel="Muut valinnat">
+          <ActionButton
+            label={ITEM_INTERACTION_LABELS.notInterested}
+            active={interaction.notInterested}
+            disabled={disabled}
+            theme={theme}
+            styles={styles}
+            onPress={onNotInterested}
+          />
+          <ActionButton
+            label={
+              interaction.saved
+                ? ITEM_INTERACTION_LABELS.saved
+                : ITEM_INTERACTION_LABELS.save
+            }
+            active={interaction.saved}
+            disabled={disabled}
+            theme={theme}
+            styles={styles}
+            onPress={onToggleSaved}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -756,9 +764,22 @@ function createStyles(theme: RoomTheme) {
     },
     actions: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
       gap: 10,
+    },
+    feedbackDrawer: {
       marginTop: 24,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: theme.base.border,
+      backgroundColor: theme.base.floor,
+      padding: 16,
+      gap: 14,
+    },
+    drawerTitle: {
+      color: theme.base.textPrimary,
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 1.4,
     },
     actionButton: {
       width: '48%',
@@ -766,7 +787,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 18,
       borderWidth: 1,
       borderColor: theme.base.border,
-      backgroundColor: theme.base.floor,
+      backgroundColor: theme.base.structure,
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: 10,

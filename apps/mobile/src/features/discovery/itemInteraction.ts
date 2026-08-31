@@ -83,7 +83,7 @@ export function setItemRating(
   itemId: ItemId,
   rating: number | null,
 ): ItemInteractionMap {
-  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 10)) {
+  if (rating !== null && (!Number.isInteger(rating) || rating < 0 || rating > 10)) {
     return interactions;
   }
 

@@ -48,7 +48,7 @@ properties?
 - `ITEM_CONSUMED` — generic underlying semantic retained for historical/direct integrations; the new rating UI records consumption through `ITEM_RATED`.
 - `ITEM_CONSUMPTION_REVERSED` — a prior consumed/read/watched mark was explicitly removed.
 - `ITEM_INTERACTION_UNDONE` — the latest committed Item interaction was undone; `properties.reversedEventId` identifies the compensated Event and restored interaction fields describe the resulting current state.
-- `ITEM_RATED` — `properties.rating` is an integer 1–10 and the Event always implies consumed/read/watched state.
+- `ITEM_RATED` — `properties.rating` is an integer 0–10 and the Event always implies consumed/read/watched state.
 
 ### Search/session
 

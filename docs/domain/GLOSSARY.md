@@ -33,7 +33,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Night | `NIGHT` | Ambient visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Generic state meaning the experience was actually consumed/attended/read/watched as appropriate. |
 | Saved | `SAVED` | Item intentionally stored for later consideration. |
-| Rating | `rating` | Integer 1–10 outcome for an Item; recording it always means the Item was consumed. |
+| Rating | `rating` | Integer 0–10 outcome for an Item; recording it always means the Item was consumed. |
 | Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an Item the actor has not consumed. |
 | List | `ItemList` | Profile-scoped presentation of saved or consumed Items; named custom lists remain a later extension. |
 

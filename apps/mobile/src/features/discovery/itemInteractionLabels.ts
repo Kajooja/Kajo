@@ -10,6 +10,11 @@ export const ITEM_INTERACTION_LABELS = {
   likedFeedback: 'Pidät tästä.',
   dislikedFeedback: 'Tämä ei ole sinulle.',
   interestClearedFeedback: 'Kiinnostusvalinta poistettu.',
+  rating: 'Arvosana',
+  ratingLow: 'En pidä',
+  ratingHigh: 'Pidän',
+  notInterested: 'Ei kiinnosta',
+  notInterestedFeedback: 'Ei kiinnosta juuri nyt.',
   undo: 'Kumoa',
   undoFeedback: 'Viimeisin valinta kumottu.',
 } as const;
