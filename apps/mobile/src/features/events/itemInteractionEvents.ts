@@ -22,6 +22,14 @@ export function getInteractionEventType(
       return action.consumed
         ? 'ITEM_CONSUMED'
         : 'ITEM_CONSUMPTION_REVERSED';
+    case 'SET_RATING':
+      return action.rating === null
+        ? 'ITEM_CONSUMPTION_REVERSED'
+        : 'ITEM_RATED';
+    case 'SET_NOT_INTERESTED':
+      return action.notInterested
+        ? 'ITEM_NOT_INTERESTED'
+        : 'ITEM_INTEREST_CLEARED';
   }
 }
 
@@ -34,5 +42,7 @@ export function getUndoEventProperties(
     restoredInterest: restoredInteraction.interest,
     restoredSaved: restoredInteraction.saved,
     restoredConsumed: restoredInteraction.consumed,
+    restoredRating: restoredInteraction.rating,
+    restoredNotInterested: restoredInteraction.notInterested,
   };
 }
