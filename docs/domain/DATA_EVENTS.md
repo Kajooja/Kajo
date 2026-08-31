@@ -41,7 +41,7 @@ properties?
 - `ITEM_INTEREST_CLEARED` — a prior explicit like/dislike was explicitly returned to neutral.
 - `ITEM_SAVED`
 - `ITEM_UNSAVED`
-- `ITEM_SUGGESTED`
+- `ITEM_SUGGESTED` — the acting User explicitly suggests an Item while inside a SharedProfile. In the MVP this is append-only behavioral evidence for the shared Kajo, not a message, recipient inbox or mutable Item state.
 
 ### Consumption / outcome
 
@@ -78,6 +78,18 @@ eventType   = ITEM_SAVED
 
 This means User A saved Movie X while acting inside the joint A+B Kajo. It is not identical to saving the same movie in User A's PersonalProfile.
 
+A suggestion follows the same actor/Profile separation:
+
+```text
+actorUserId = user_A
+profileId   = shared_profile_A_B
+itemId      = movie_Y
+eventType   = ITEM_SUGGESTED
+properties.source = ITEM_DETAIL
+```
+
+This means User A suggested Movie Y to the shared A+B Kajo while browsing that SharedProfile. The MVP suggestion does **not** create chat content, a per-recipient delivery/read state or a second suggestion table. It also does not change `saved`, `rating`, `notInterested` or `consumed` current state. If later product behavior needs notifications or an inbox, that must be modeled explicitly rather than inferred from the Event.
+
 ## Data quality rules
 
 - Use UTC timestamps in storage.
@@ -85,6 +97,7 @@ This means User A saved Movie X while acting inside the joint A+B Kajo. It is no
 - Undo appends `ITEM_INTERACTION_UNDONE`; it never deletes the original Event. Directly clearing interest or removing a consumed mark uses its own explicit canonical Event instead of pretending that the original action never happened.
 - Rating and not-interested are mutually distinct: rating means consumed, while not-interested explicitly means not consumed.
 - Save state is orthogonal to rating/not-interested even though any explicit reaction may rotate the Item out of the immediate discovery queue.
+- `ITEM_SUGGESTED` is orthogonal to current Item interaction state. It records the suggestion act only.
 - Event names and semantics are canonical contracts, not analytics-only labels.
 - Do not create domain-specific duplicates such as `BOOK_SAVED` and `MOVIE_SAVED` when `ITEM_SAVED` is sufficient.
 - Sensitive/contextual fields must be collected only when needed and permitted.
