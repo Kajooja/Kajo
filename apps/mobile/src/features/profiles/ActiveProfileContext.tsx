@@ -92,6 +92,7 @@ interface ActiveSelection {
 
 const EMPTY_SHARED_PROFILES: readonly SharedProfileMembership[] = [];
 const EMPTY_INVITATIONS: readonly SharedProfileInvitation[] = [];
+const INVITATION_REFRESH_INTERVAL_MS = 30_000;
 const SHARED_PROFILE_UNAVAILABLE_MESSAGE =
   'Yhteinen Kajo ei ole käytettävissä tällä hetkellä.';
 const ActiveProfileContext = createContext<ActiveProfileContextValue | null>(null);
@@ -213,6 +214,16 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     };
   }, [actorUserId, invitationAttempt, rpc]);
 
+  useEffect(() => {
+    if (!actorUserId || !rpc) return;
+
+    const intervalId = setInterval(() => {
+      setInvitationAttempt((current) => current + 1);
+    }, INVITATION_REFRESH_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+  }, [actorUserId, rpc]);
+
   const visibleSharedProfiles =
     actorUserId && sharedSnapshot?.actorUserId === actorUserId
       ? sharedSnapshot.profiles
@@ -310,13 +321,25 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
       );
 
       if (result.status === 'success') {
-        retryInvitations();
+        setInvitationsSnapshot((current) =>
+          current?.actorUserId === actorUserId
+            ? {
+                actorUserId,
+                status: 'ready',
+                invitations: current.invitations.filter(
+                  (invitation) => invitation.id !== invitationId,
+                ),
+                message: null,
+              }
+            : current,
+        );
+        setInvitationAttempt((current) => current + 1);
         retrySharedProfiles();
       }
 
       return result;
     },
-    [actorUserId, retryInvitations, retrySharedProfiles, rpc],
+    [actorUserId, retrySharedProfiles, rpc],
   );
 
   const status = getActiveProfileStatus(personal.status);
