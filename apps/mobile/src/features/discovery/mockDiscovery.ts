@@ -12,12 +12,24 @@ export const MOCK_ITEM_IDS = {
   bookPaperKingdoms: '00000000-0000-4000-8000-000000000004',
   bookSmallWeather: '00000000-0000-4000-8000-000000000005',
   bookGlassAnimal: '00000000-0000-4000-8000-000000000006',
+  bookTideSignal: '00000000-0000-4000-8000-000000000007',
+  bookEmberAtlas: '00000000-0000-4000-8000-000000000008',
+  bookZeroChorus: '00000000-0000-4000-8000-000000000009',
+  bookWinterOrchard: '00000000-0000-4000-8000-000000000010',
+  bookSignalBelow: '00000000-0000-4000-8000-000000000011',
+  bookBorrowedHours: '00000000-0000-4000-8000-000000000012',
   movieLastLightHouse: '00000000-0000-4000-8000-000000000101',
   movieStaticSummer: '00000000-0000-4000-8000-000000000102',
   movieQuietOrbit: '00000000-0000-4000-8000-000000000103',
   movieRedMuseum: '00000000-0000-4000-8000-000000000104',
   movieAfterRain: '00000000-0000-4000-8000-000000000105',
   movieMirrorRun: '00000000-0000-4000-8000-000000000106',
+  movieBlueStatic: '00000000-0000-4000-8000-000000000107',
+  movieSoftGravity: '00000000-0000-4000-8000-000000000108',
+  movieMidnightOrchard: '00000000-0000-4000-8000-000000000109',
+  moviePaperPlanets: '00000000-0000-4000-8000-000000000110',
+  movieNorthGlass: '00000000-0000-4000-8000-000000000111',
+  movieUncommonFrequency: '00000000-0000-4000-8000-000000000112',
 } as const;
 
 const MOCK_DISCOVERY_ENTRIES: readonly MockDiscoveryEntry[] = [
@@ -83,6 +95,66 @@ const MOCK_DISCOVERY_ENTRIES: readonly MockDiscoveryEntry[] = [
   },
   {
     item: {
+      id: MOCK_ITEM_IDS.bookTideSignal,
+      itemType: 'BOOK',
+      title: 'Tide Signal',
+      description: 'A coastal suspense novel about a radio operator who starts receiving warnings from tomorrow.',
+      tags: ['thriller', 'coastal', 'tense'],
+    },
+    scores: { FOR_YOU: 0.76, SURPRISE: 0.88, RISK: 0.81 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.bookEmberAtlas,
+      itemType: 'BOOK',
+      title: 'Ember Atlas',
+      description: 'An adventurous fantasy about cartographers mapping a warm volcanic archipelago that keeps changing shape.',
+      tags: ['fantasy', 'adventure', 'warm'],
+    },
+    scores: { FOR_YOU: 0.79, SURPRISE: 0.84, RISK: 0.72 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.bookZeroChorus,
+      itemType: 'BOOK',
+      title: 'Zero Chorus',
+      description: 'Experimental science fiction told through the rehearsals of a choir trying to communicate with a silent machine.',
+      tags: ['science-fiction', 'experimental', 'music'],
+    },
+    scores: { FOR_YOU: 0.61, SURPRISE: 0.95, RISK: 0.9 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.bookWinterOrchard,
+      itemType: 'BOOK',
+      title: 'Winter Orchard',
+      description: 'A reflective family novel about three generations returning to an orchard during its final winter.',
+      tags: ['literary', 'family', 'reflective'],
+    },
+    scores: { FOR_YOU: 0.9, SURPRISE: 0.57, RISK: 0.35 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.bookSignalBelow,
+      itemType: 'BOOK',
+      title: 'Signal Below',
+      description: 'A psychological horror story about a research team hearing impossible messages beneath polar ice.',
+      tags: ['horror', 'psychological', 'dark'],
+    },
+    scores: { FOR_YOU: 0.43, SURPRISE: 0.7, RISK: 0.97 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.bookBorrowedHours,
+      itemType: 'BOOK',
+      title: 'Borrowed Hours',
+      description: 'A playful contemporary romance in which two strangers repeatedly inherit the same hour of free time.',
+      tags: ['romance', 'playful', 'contemporary'],
+    },
+    scores: { FOR_YOU: 0.86, SURPRISE: 0.77, RISK: 0.46 },
+  },
+  {
+    item: {
       id: MOCK_ITEM_IDS.movieLastLightHouse,
       itemType: 'MOVIE',
       title: 'Last Light House',
@@ -140,6 +212,66 @@ const MOCK_DISCOVERY_ENTRIES: readonly MockDiscoveryEntry[] = [
       tags: ['surreal', 'adventure', 'bold'],
     },
     scores: { FOR_YOU: 0.51, SURPRISE: 0.81, RISK: 1 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.movieBlueStatic,
+      itemType: 'MOVIE',
+      title: 'Blue Static',
+      description: 'A tense technology thriller about a citywide signal that appears only on abandoned television channels.',
+      tags: ['thriller', 'technology', 'tense'],
+    },
+    scores: { FOR_YOU: 0.74, SURPRISE: 0.87, RISK: 0.86 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.movieSoftGravity,
+      itemType: 'MOVIE',
+      title: 'Soft Gravity',
+      description: 'Hopeful science-fiction romance following two engineers maintaining a drifting research habitat.',
+      tags: ['science-fiction', 'romance', 'hopeful'],
+    },
+    scores: { FOR_YOU: 0.87, SURPRISE: 0.8, RISK: 0.52 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.movieMidnightOrchard,
+      itemType: 'MOVIE',
+      title: 'Midnight Orchard',
+      description: 'An atmospheric slow-burn horror film set in an orchard where the trees bloom only after midnight.',
+      tags: ['horror', 'atmospheric', 'slow-burn'],
+    },
+    scores: { FOR_YOU: 0.58, SURPRISE: 0.72, RISK: 0.95 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.moviePaperPlanets,
+      itemType: 'MOVIE',
+      title: 'Paper Planets',
+      description: 'An imaginative animated family film about siblings building a universe from discarded maps.',
+      tags: ['animation', 'family', 'imaginative'],
+    },
+    scores: { FOR_YOU: 0.85, SURPRISE: 0.89, RISK: 0.49 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.movieNorthGlass,
+      itemType: 'MOVIE',
+      title: 'North Glass',
+      description: 'A reflective documentary following winter light, wildlife and isolated communities above the Arctic Circle.',
+      tags: ['documentary', 'nature', 'reflective'],
+    },
+    scores: { FOR_YOU: 0.8, SURPRISE: 0.69, RISK: 0.44 },
+  },
+  {
+    item: {
+      id: MOCK_ITEM_IDS.movieUncommonFrequency,
+      itemType: 'MOVIE',
+      title: 'Uncommon Frequency',
+      description: 'A bold experimental music film assembled from one concert heard differently by every person in the room.',
+      tags: ['experimental', 'music', 'bold'],
+    },
+    scores: { FOR_YOU: 0.56, SURPRISE: 0.93, RISK: 0.92 },
   },
 ];
 
