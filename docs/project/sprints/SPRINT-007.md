@@ -1,8 +1,9 @@
 # Sprint 007 — Event Engine
 
-Status: **ACTIVE**
+Status: **COMPLETED**
 Milestone: **MVP 0.1**
 Started: **2026-08-29**
+Completed: **2026-08-31**
 
 ## Goal
 
@@ -89,15 +90,28 @@ Hosted validation after PRs #87 and #88:
 - visible startup lettering is enlarged to nearly the full phone width without changing the Android-compatible PNG asset,
 - deterministic mapping, correlation, retry, undo-link and auth-navigation regression tests cover the new pure behavior.
 
-Real-phone and configured database-row acceptance remain required before the
-Sprint 007 MVP requirements are marked complete.
+Configured real-phone acceptance passed. The user exercised BOOK and MOVIE
+discovery, a DiscoveryMode change, Item opens/actions and exact undo in the
+standalone Android app. The existing current-interaction flow remained usable,
+and the user reported the Event/undo behavior working correctly.
 
 PR #91 merged after green CI #137 with lint, TypeScript, 87 tests and both
 platform bundle smokes. The reversal-vocabulary migration is applied, the live
 Event constraint contains all three new compensation/reversal types and
 `auth-callback` v7 is active. Hosted advisors report no Event-specific security
-finding or unindexed Event foreign key. This is deployment evidence, not phone
-acceptance.
+finding or unindexed Event foreign key.
+
+The configured phone run produced 34 hosted Events for one actor, one Profile
+and one session. All 34 rows matched the session actor/Profile identity, all 32
+Item-linked Events retained `predictionId`, and zero Item-linked Events lacked
+correlation. The rows included BOOK and MOVIE impressions, opens and actions,
+two DiscoveryMode changes and four `ITEM_INTERACTION_UNDONE` Events. All four
+undo rows referenced an existing original Event for the same Item,
+actor/Profile and session. No account identifier is stored in documentation.
+
+The startup-logo sizing follow-ups in PRs #93 and #94 are presentation polish.
+The user explicitly removed logo sizing from the MVP acceptance gate; Issue #78
+continues to own optional brand treatment rather than blocking Prediction V0.
 
 ## Decisions
 
@@ -120,8 +134,8 @@ acceptance.
 
 ## Known issues
 
-- The Android auth task-return and enlarged startup lettering fixes require confirmation in the next configured standalone build.
-- The integrated mobile Event sequence and hosted rows have not yet been exercised from a real phone; automated bundle checks are not device evidence.
+- Startup-logo sizing remains non-blocking visual polish under Issue #78.
+- Final book/movie metadata providers remain intentionally undecided.
 
 ## Important files
 
@@ -149,10 +163,14 @@ acceptance.
 - `/supabase/migrations/20260829213200_event_foreign_key_indexes.sql`
 - `/supabase/migrations/20260829214500_interaction_reversal_events.sql`
 
-## Mid-sprint handoff
+## Historical mid-sprint handoff
 
-Sprint 007 opened after the configured Sprint 006 phone flow passed. Issue #85's append-only schema, RLS and typed persistence boundary are merged, deployed and verified. Issue #89's mobile Event emission, explicit undo compensation, session/prediction correlation and both recorded Sprint 006 phone-polish fixes are also merged and deployed. Use the next configured Android build for Event-row and UI acceptance, then close Issue #89/Sprint 007 only if the phone flow passes. Do not begin Prediction V0 early.
+Before final acceptance, Issue #85's append-only schema, RLS and typed persistence boundary and Issue #89's mobile Event integration were merged and deployed. The configured Android and hosted-row acceptance described above subsequently passed, so this checkpoint is superseded by the final handoff.
 
 ## Final handoff
 
-Fill at sprint close with the exact next sprint/action and device/database evidence.
+Sprint 007 is complete. `MVP-DATA-001`, `MVP-DATA-002` and
+`MVP-PROFILE-003` are accepted through automated, hosted and configured-phone
+evidence. Sprint 008 — Prediction V0 is active. Issue #46 remains its product
+parent and Issue #95 is the first scoped implementation: create the
+server-owned generic scorer foundation before any mobile ranking integration.
