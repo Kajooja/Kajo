@@ -74,7 +74,6 @@ const MINIMUM_SHARED_PROFILE_NAME_LENGTH = 2;
 const MAXIMUM_SHARED_PROFILE_NAME_LENGTH = 64;
 const MINIMUM_NICKNAME_LENGTH = 2;
 const MAXIMUM_NICKNAME_LENGTH = 32;
-const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/;
 
 export function validateSharedProfileName(
   value: string,
@@ -95,7 +94,7 @@ export function validateSharedProfileName(
     };
   }
 
-  if (CONTROL_CHARACTER_PATTERN.test(name)) {
+  if (hasControlCharacter(name)) {
     return {
       status: 'invalid',
       message: 'Yhteisen Kajon nimessä on merkkejä, joita ei voi käyttää.',
@@ -124,7 +123,7 @@ export function validateSharedProfileNickname(
     };
   }
 
-  if (CONTROL_CHARACTER_PATTERN.test(nickname)) {
+  if (hasControlCharacter(nickname)) {
     return {
       status: 'invalid',
       message: 'Nimimerkissä on merkkejä, joita ei voi käyttää.',
@@ -197,10 +196,7 @@ export async function addSharedProfileMember(
     });
 
     if (response.error) {
-      if (
-        response.error.code === 'P0002' ||
-        response.error.message.toLowerCase().includes('kajo user not found')
-      ) {
+      if (response.error.message.toLowerCase().includes('kajo user not found')) {
         return { status: 'error', message: SHARED_PROFILE_USER_NOT_FOUND_MESSAGE };
       }
 
@@ -358,6 +354,18 @@ function getSingleRow(data: unknown): Record<string, unknown> | null {
 
 function normalizeDisplayText(value: string): string {
   return value.trim().replace(/\s+/g, ' ');
+}
+
+function hasControlCharacter(value: string): boolean {
+  for (const character of value) {
+    const codePoint = character.codePointAt(0);
+
+    if (codePoint !== undefined && (codePoint < 32 || codePoint === 127)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
