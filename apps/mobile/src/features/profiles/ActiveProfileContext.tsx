@@ -14,7 +14,6 @@ import type {
   PersonalProfile,
   Profile,
   ProfileId,
-  SharedProfile,
   UserId,
 } from '@/domain/contracts';
 
@@ -54,6 +53,7 @@ interface SharedProfilesSnapshot {
   message: string | null;
 }
 
+const EMPTY_SHARED_PROFILES: readonly SharedProfileMembership[] = [];
 const ActiveProfileContext = createContext<ActiveProfileContextValue | null>(null);
 
 export function ActiveProfileProvider({ children }: PropsWithChildren) {
@@ -105,23 +105,29 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     let active = true;
     const scopeActorUserId = actorUserId;
 
-    setSharedSnapshot({
+    setSharedSnapshot((current) => ({
       actorUserId: scopeActorUserId,
       status: 'loading',
-      profiles: [],
+      profiles:
+        current?.actorUserId === scopeActorUserId
+          ? current.profiles
+          : EMPTY_SHARED_PROFILES,
       message: null,
-    });
+    }));
 
     void loadSharedProfiles(rpc).then((result) => {
       if (!active) return;
 
       if (result.status === 'error') {
-        setSharedSnapshot({
+        setSharedSnapshot((current) => ({
           actorUserId: scopeActorUserId,
           status: 'error',
-          profiles: [],
+          profiles:
+            current?.actorUserId === scopeActorUserId
+              ? current.profiles
+              : EMPTY_SHARED_PROFILES,
           message: result.message,
-        });
+        }));
         return;
       }
 
@@ -141,7 +147,7 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
   const visibleSharedProfiles =
     actorUserId && sharedSnapshot?.actorUserId === actorUserId
       ? sharedSnapshot.profiles
-      : [];
+      : EMPTY_SHARED_PROFILES;
   const selectableProfiles = useMemo(
     () => getSelectableProfiles(personalProfile, visibleSharedProfiles),
     [personalProfile, visibleSharedProfiles],
@@ -284,5 +290,3 @@ function getSharedProfilesStatus(
 
   return snapshot.status;
 }
-
-export type { SharedProfile };
