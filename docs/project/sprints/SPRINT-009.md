@@ -58,10 +58,36 @@ with 2-N members, its own state/history and actor-specific Events.
 - One member can create a traceable suggestion in SharedProfile context.
 - CI, hosted advisors/RLS verification and configured Android acceptance pass.
 
-## Planned first issue
+## Active issue
 
-Create one bounded backend foundation for SharedProfile creation, member lookup/addition
-and membership-protected reads before introducing active-profile UI state.
+### #111 — SharedProfile membership foundation
+
+The first slice reuses the existing generic tables and adds a small server-owned
+operation boundary:
+
+- `create_shared_profile(name)` creates a `SHARED` Profile and adds the actor as
+  the first member.
+- `add_shared_profile_member(profileId, nickname)` resolves an existing Kajo User
+  by case-insensitive nickname and adds them only when the actor is already a
+  member of that SharedProfile.
+- `get_my_shared_profiles()` returns only SharedProfiles the actor belongs to,
+  member count/readiness and member `userId` + display-cased nickname.
+- One-member profiles are persisted but reported `isReady = false`; accepted UI
+  must not treat the SharedProfile as usable until member count reaches at least two.
+- Privileged writes/lookups live only in the non-exposed `private` schema.
+  Public authenticated RPC wrappers remain `SECURITY INVOKER`, avoiding a new
+  exposed SECURITY DEFINER API surface.
+- No email or auth credential is returned by the SharedProfile boundary.
+
+## Decisions
+
+- Do not add a second SharedProfile table: `profiles.profile_type = 'SHARED'` and
+  `profile_members` already represent the required core relation.
+- Creation with one provisional member is allowed as setup state; product-ready
+  SharedProfile semantics begin at two members.
+- Nickname is the MVP member-discovery identifier; authentication email remains
+  outside the SharedProfile API.
+- Existing `private.is_profile_member` remains the authorization primitive.
 
 ## Important files
 
@@ -72,11 +98,11 @@ and membership-protected reads before introducing active-profile UI state.
 - `/apps/mobile/src/features/profiles/`
 - `/apps/mobile/src/features/events/`
 - `/apps/mobile/src/features/discovery/`
-- `/supabase/migrations/`
+- `/supabase/migrations/20260831171000_shared_profile_membership_foundation.sql`
 
 ## Handoff
 
-Sprint 008 is complete. Start with existing `profiles`/`profile_members`; do not add
-a parallel SharedProfile table unless a verified invariant cannot be represented by
-the current generic Profile model. Preserve Profile-targeted Prediction and
-actor-vs-profile Event separation.
+#111 is the active implementation. After its CI/deploy/hosted authorization
+verification, add typed mobile SharedProfile operations and active Profile-context
+selection. Preserve Profile-targeted Prediction and actor-vs-profile Event separation;
+do not begin ScenarioMemory or a separate shared predictor.
