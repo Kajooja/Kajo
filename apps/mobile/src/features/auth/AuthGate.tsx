@@ -1,4 +1,9 @@
-import { useState, type PropsWithChildren } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
@@ -25,6 +30,25 @@ export function AuthGate({ children }: PropsWithChildren) {
   const auth = useAuthSession();
   const personalProfile = usePersonalProfile();
   const itemInteractions = useItemInteractions();
+  const hydratedActorUserIdRef = useRef<string | null>(null);
+  const signedInUserId = auth.status === 'signed-in' ? auth.userId : null;
+
+  useEffect(() => {
+    if (!signedInUserId) {
+      hydratedActorUserIdRef.current = null;
+      return;
+    }
+
+    if (
+      itemInteractions.persistenceStatus === 'ready' ||
+      itemInteractions.persistenceStatus === 'disabled'
+    ) {
+      hydratedActorUserIdRef.current = signedInUserId;
+    }
+  }, [itemInteractions.persistenceStatus, signedInUserId]);
+
+  const hasHydratedCurrentActor =
+    signedInUserId !== null && hydratedActorUserIdRef.current === signedInUserId;
 
   if (auth.status === 'disabled') {
     return children;
@@ -42,7 +66,8 @@ export function AuthGate({ children }: PropsWithChildren) {
     if (personalProfile.status === 'ready') {
       if (
         itemInteractions.persistenceStatus === 'ready' ||
-        itemInteractions.persistenceStatus === 'disabled'
+        itemInteractions.persistenceStatus === 'disabled' ||
+        hasHydratedCurrentActor
       ) {
         return children;
       }
