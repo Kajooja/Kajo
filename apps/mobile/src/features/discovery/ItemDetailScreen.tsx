@@ -53,11 +53,13 @@ import { getMockItem, getRankedMockItems } from './mockDiscovery';
 interface ItemDetailScreenProps {
   itemId: ItemId;
   predictionId?: PredictionId;
+  predictionSource?: 'hosted' | 'fallback';
 }
 
 export function ItemDetailScreen({
   itemId,
   predictionId,
+  predictionSource = 'fallback',
 }: ItemDetailScreenProps) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
@@ -94,10 +96,10 @@ export function ItemDetailScreen({
         itemType: item.itemType,
         predictionId: recommendationTraceId,
         discoveryMode: mode,
-        properties: { source: 'ITEM_SEQUENCE' },
+        properties: { source: 'ITEM_SEQUENCE', predictionSource },
       });
     },
-    [eventTracking, mode, recommendationTraceId],
+    [eventTracking, mode, predictionSource, recommendationTraceId],
   );
 
   useEffect(() => {
@@ -226,7 +228,7 @@ export function ItemDetailScreen({
           itemType: item.itemType,
           predictionId: recommendationTraceId,
           discoveryMode: mode,
-          properties: { source: 'ITEM_DETAIL' },
+          properties: { source: 'ITEM_DETAIL', predictionSource },
         },
         eventId,
       );
@@ -292,10 +294,13 @@ export function ItemDetailScreen({
         itemType: targetItem.itemType,
         predictionId: recommendationTraceId,
         discoveryMode: mode,
-        properties: getUndoEventProperties(
-          result.reversedEventId,
-          result.restoredInteraction,
-        ),
+        properties: {
+          ...getUndoEventProperties(
+            result.reversedEventId,
+            result.restoredInteraction,
+          ),
+          predictionSource,
+        },
       });
     }
 
@@ -311,6 +316,7 @@ export function ItemDetailScreen({
       params: {
         itemId: undoTargetItemId,
         predictionId: recommendationTraceId,
+        predictionSource,
       },
     });
   }
