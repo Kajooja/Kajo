@@ -140,11 +140,11 @@ export function RatingControl({
   return (
     <View style={styles.container}>
       <View style={styles.labels} pointerEvents="none">
-        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>EN PIDÄ</Text>
+        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>0 · EN PIDÄ</Text>
         <Text style={[styles.value, { color: theme.base.textPrimary }]}>
           {rating === null ? '–' : rating}
         </Text>
-        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>PIDÄN</Text>
+        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>PIDÄN · 10</Text>
       </View>
       <Pressable
         disabled={disabled}
@@ -201,10 +201,6 @@ export function RatingControl({
           />
         </Animated.View>
       </Pressable>
-      <View style={styles.numbers} pointerEvents="none">
-        <Text style={[styles.number, { color: theme.base.textMuted }]}>0</Text>
-        <Text style={[styles.number, { color: theme.base.textMuted }]}>10</Text>
-      </View>
     </View>
   );
 }
@@ -242,7 +238,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   handleLine: { width: 2, height: 16, borderRadius: 1, opacity: 0.56 },
-  numbers: { flexDirection: 'row', justifyContent: 'space-between' },
-  number: { fontSize: 10, fontWeight: '600' },
   disabled: { opacity: 0.4 },
 });
