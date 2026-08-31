@@ -47,7 +47,7 @@ First real generic personalized ranking using Item similarity, behavioural histo
 Configured-phone feedback on 2026-08-31 adds these acceptance refinements before Sprint 008 closes:
 
 - expose the one shared DiscoveryMode as a compact persistent app-shell control while retaining the Room curtain as its spatial representation,
-- replace ambiguous binary like/dislike/consumed controls with a feedback drawer: 1–10 rating (always consumed), not interested (not consumed) and save,
+- replace ambiguous binary like/dislike/consumed controls with a feedback drawer: 0–10 rating (always consumed), not interested (not consumed) and save,
 - move every explicitly reacted Item out of the immediate queue and apply a temporary impression cooldown to unreacted Items,
 - expand the normalized MVP candidate set enough to observe ranking/cooldown behaviour on a configured phone.
 
