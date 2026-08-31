@@ -50,7 +50,7 @@ Rating/memory extension, SharedProfiles/social behavior and scenario-memory foun
 
 ## Active Sprint 008 — Prediction V0
 
-Sprint 008 replaces mock ordering with the first real generic, server-owned personalized scorer. Issue #46 remains the product-loop parent. Issue #95 is the first bounded implementation and establishes:
+Sprint 008 replaces mock ordering with the first real generic, server-owned personalized scorer. Issue #46 remains the product-loop parent. Issue #95 establishes the first bounded implementation as the authenticated `public.rank_items_v0` Postgres RPC:
 
 - an authenticated request boundary for Profile, Context, DiscoveryMode and candidate scope,
 - a traceable `predictionId` for every returned ranking,
@@ -59,14 +59,19 @@ Sprint 008 replaces mock ordering with the first real generic, server-owned pers
 - deterministic fallback behavior for sparse/cold-start evidence,
 - authorization, explainability and hosted verification without writing test data to a real Profile.
 
-Mobile ranking integration follows as a separate scoped Issue after the hosted scorer foundation is accepted. The mobile client must consume ranking results; it must not own ranking logic.
+The migration is locally implemented and has passed rollback-only hosted
+functional, mode, suppression, authorization and grant smokes without retaining
+test data. It is not deployed until the implementation PR is reviewed and
+merged. Mobile ranking integration follows as a separate scoped Issue after the
+hosted scorer foundation is accepted. The mobile client must consume ranking
+results; it must not own ranking logic.
 
 ## Exact next actions
 
-1. Implement Issue #95's real server-owned request/scoring boundary and document the selected deployment location.
-2. Validate the scorer against the committed Item/Event schema, authentication and Profile membership.
-3. Cover deterministic ordering, mode semantics, cold start, consumed suppression and prediction traceability with tests.
-4. Deploy and verify the boundary, RLS/grants and advisors without adding test rows to a real user Profile.
+1. Complete Issue #95's code/documentation review and full repository port.
+2. Merge its migration, then deploy the exact merged file to the hosted project.
+3. Re-run functional, authorization, grant and advisor checks without adding test rows to a real user Profile.
+4. Close Issue #95 with hosted evidence.
 5. Open the separate mobile-consumption Issue only after the hosted foundation passes.
 
 ## Known issues / open decisions
@@ -77,7 +82,7 @@ Mobile ranking integration follows as a separate scoped Issue after the hosted s
 - Current mode-dependent Item ordering remains mock logic until Sprint 008 integration replaces it.
 - Current Room/theme/mock covers remain structural rather than final production artwork.
 - The current Item feature set and Event volume are small, so Prediction V0 needs an explicit cold-start prior.
-- Issue #95 selects the exact real server-owned deployment boundary; no empty service scaffold is created beforehand.
+- Prediction V0.1 uses an authenticated Postgres RPC; a dedicated Python service remains a later scale/tooling decision.
 - SharedProfile Room/theme/discovery identity remains later scope.
 
 ## Important files
