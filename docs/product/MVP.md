@@ -30,11 +30,11 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 - [x] `MVP-DISC-001` Books and movies have a visual grid discovery experience.
 - [x] `MVP-DISC-002` Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
-- [x] `MVP-DISC-003` The curtain controls DiscoveryMode with three snap states.
+- [x] `MVP-DISC-003` The persistent curtain control selects DiscoveryMode with three snap states.
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
-- [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes.
+- [-] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes; configured acceptance remains pending with #103's broader catalog because sparse hosted evidence may currently converge.
 - [x] `MVP-DISC-006` User can open Item details.
-- [-] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; the Room curtain and a compact persistent app-shell control both manipulate that same state without screen-local copies.
+- [-] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; one compact persistent app-shell curtain manipulates that state without screen-local copies or a duplicate Room control.
 
 ## Swipe and state
 
