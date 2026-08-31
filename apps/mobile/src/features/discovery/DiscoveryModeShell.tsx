@@ -1,5 +1,6 @@
 import { useState, type PropsWithChildren } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
@@ -17,6 +18,7 @@ const MODE_LABELS = {
 } as const;
 
 export function DiscoveryModeShell({ children }: PropsWithChildren) {
+  const router = useRouter();
   const { mode, setMode } = useDiscoveryMode();
   const { recordEvent } = useEventTracking();
   const theme = getRoomTheme(getAmbientPhase(mode));
@@ -46,9 +48,15 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
         style={[styles.safeHeader, { backgroundColor: theme.base.appBackground }]}
       >
         <View style={styles.bar}>
-          <View style={styles.brand} pointerEvents="none">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Palaa huoneeseen"
+            hitSlop={8}
+            onPress={() => router.replace('/')}
+            style={({ pressed }) => [styles.brand, pressed && styles.brandPressed]}
+          >
             <KajoMark />
-          </View>
+          </Pressable>
           <View style={styles.control}>
             <View style={styles.labelRow} pointerEvents="none">
               <Text style={[styles.label, { color: theme.base.textMuted }]}>LÖYTÖTILA</Text>
@@ -92,6 +100,10 @@ const styles = StyleSheet.create({
     width: 104,
     height: 40,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandPressed: {
+    opacity: 0.72,
   },
   control: {
     flex: 1,

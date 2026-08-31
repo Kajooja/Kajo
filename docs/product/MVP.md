@@ -20,7 +20,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 ## Room and theme
 
 - [x] `MVP-ROOM-001` A user has a personal minimalist 2D Room.
-- [x] `MVP-ROOM-002` The Room is the primary home/navigation surface.
+- [x] `MVP-ROOM-002` The Room is the primary home/navigation surface; the persistent Kajo brand mark always returns the signed-in user to the Room.
 - [x] `MVP-ROOM-003` Bookshelf opens book discovery.
 - [x] `MVP-ROOM-004` Screen/projector opens movie discovery.
 - [x] `MVP-ROOM-005` User theme is represented by reusable theme tokens rather than hard-coded component colours.
@@ -32,24 +32,24 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-DISC-002` Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
 - [x] `MVP-DISC-003` The persistent curtain control selects DiscoveryMode with three snap states.
 - [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
-- [-] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes; configured acceptance remains pending with #103's broader catalog because sparse hosted evidence may currently converge.
+- [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes through the hosted generic scorer; configured Android acceptance passed with the broader normalized catalog.
 - [x] `MVP-DISC-006` User can open Item details.
-- [-] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; one compact persistent app-shell curtain manipulates that state without screen-local copies or a duplicate Room control.
+- [x] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; one compact persistent app-shell curtain manipulates that state without screen-local copies or a duplicate Room control.
 
 ## Swipe and state
 
 - [x] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
-- [-] `MVP-SWIPE-002` User can give consumed Items a 0–10 rating or mark an unconsumed Item as not currently interesting; these are distinct canonical signals.
-- [-] `MVP-SWIPE-003` A 0–10 rating always marks a movie watched or a book read; consumption is not a separate ambiguous action.
-- [-] `MVP-SWIPE-004` Consumed Items are strongly suppressed, explicitly reacted Items leave the immediate queue, and unreacted impressions use a temporary cooldown so they may return later.
-- [-] `MVP-SWIPE-005` Rating, not-interested and save actions live in one restrained feedback drawer, visibly commit and advance without an index jump.
+- [x] `MVP-SWIPE-002` User can give consumed Items a 0–10 rating or mark an unconsumed Item as not currently interesting; these are distinct canonical signals.
+- [x] `MVP-SWIPE-003` A 0–10 rating always marks a movie watched or a book read; consumption is not a separate ambiguous action.
+- [x] `MVP-SWIPE-004` Consumed Items are strongly suppressed, explicitly reacted Items leave the immediate queue, and unreacted impressions use a temporary cooldown so they may return later.
+- [x] `MVP-SWIPE-005` Rating, not-interested and save actions live in one restrained feedback drawer, visibly commit and advance without an index jump.
 - [x] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both the prior state and exact previous Item/card.
 
 ## Saved, consumed and memory
 
 - [x] `MVP-MEM-001` User can save/unsave an Item.
 - [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
-- [-] `MVP-MEM-003` User can add a 0–10 rating to an Item, which always records that Item as consumed.
+- [x] `MVP-MEM-003` User can add a 0–10 rating to an Item, which always records that Item as consumed.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
 - [ ] `MVP-MEM-005` User can open Profile-scoped Saved and Consumed lists from persistent navigation and sort them by supported generic metadata; named custom lists remain post-MVP.
 
@@ -66,9 +66,9 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 - [x] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
 - [x] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
-- [ ] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
-- [ ] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
-- [ ] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
+- [x] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
+- [x] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
+- [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
 - [ ] `MVP-PRED-004` Architecture supports later scenario-memory retrieval without redesigning the core contracts.
 
 ## Explicitly outside MVP 0.1
