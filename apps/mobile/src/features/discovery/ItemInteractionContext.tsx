@@ -66,6 +66,7 @@ interface ItemInteractionState {
   undoTargetItemId: ItemId | null;
   undo: () => ItemInteractionUndoResult | null;
   persistenceStatus: ItemInteractionPersistenceStatus;
+  hasHydratedCurrentActor: boolean;
   hydrationError: string | null;
   persistenceError: string | null;
   retryHydration: () => void;
@@ -115,6 +116,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const [hydrationAttempt, setHydrationAttempt] = useState(0);
   const [persistenceFailure, setPersistenceFailure] =
     useState<PersistenceFailure | null>(null);
+  const [hydratedActorUserId, setHydratedActorUserId] = useState<UserId | null>(
+    null,
+  );
   const failureTracker = useRef(createItemInteractionWriteFailureTracker());
   const scopedWriter = useRef<ScopedWriter | null>(null);
 
@@ -157,6 +161,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
             undoStack: [],
           },
         });
+        setHydratedActorUserId(actorUserId);
       },
     );
 
@@ -172,6 +177,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       persistedStore &&
       persistedStore.profileId === configuredScope.profileId &&
       persistedStore.actorUserId === configuredScope.actorUserId,
+  );
+  const hasHydratedCurrentActor = Boolean(
+    configuredScope && hydratedActorUserId === configuredScope.actorUserId,
   );
   const store = isLocalMode
     ? localStore
@@ -426,12 +434,14 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       undoTargetItemId,
       undo,
       persistenceStatus,
+      hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
       retryHydration,
       retryPersistence,
     }),
     [
+      hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
       persistenceStatus,
