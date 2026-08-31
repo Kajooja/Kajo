@@ -82,7 +82,18 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           </View>
         </View>
       </SafeAreaView>
-      <View style={styles.content}>{children}</View>
+      <View style={styles.content}>
+        {children}
+        {activeProfile?.type === 'SHARED' ? (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.profileTint,
+              { backgroundColor: theme.base.sceneBackground },
+            ]}
+          />
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -132,5 +143,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    position: 'relative',
+  },
+  profileTint: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.06,
   },
 });
