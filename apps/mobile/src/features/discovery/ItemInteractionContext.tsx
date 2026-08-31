@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
-import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
+import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
 import type { EventId, ItemId, ProfileId, UserId } from '../../domain/contracts';
 import {
@@ -104,7 +104,7 @@ const ItemInteractionContext = createContext<ItemInteractionState | null>(null);
 
 export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
-  const personalProfile = usePersonalProfile();
+  const activeProfile = useActiveProfile();
   const [localStore, setLocalStore] = useState<ItemInteractionStore>(
     EMPTY_ITEM_INTERACTION_STORE,
   );
@@ -126,7 +126,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     [connection],
   );
 
-  const configuredScope = getConfiguredScope(personalProfile, persistenceApi);
+  const configuredScope = getConfiguredScope(activeProfile, persistenceApi);
   const profileId = configuredScope?.profileId ?? null;
   const actorUserId = configuredScope?.actorUserId ?? null;
 
@@ -166,7 +166,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   }, [actorUserId, hydrationAttempt, persistenceApi, profileId]);
 
   const isLocalMode =
-    connection.status === 'unconfigured' || personalProfile.status === 'disabled';
+    connection.status === 'unconfigured' || activeProfile.status === 'disabled';
   const hasHydratedConfiguredStore = Boolean(
     configuredScope &&
       persistedStore &&
@@ -469,16 +469,21 @@ export function useItemInteractions(): ItemInteractionState {
 }
 
 function getConfiguredScope(
-  personalProfile: ReturnType<typeof usePersonalProfile>,
+  activeProfile: ReturnType<typeof useActiveProfile>,
   persistenceApi: ItemInteractionPersistenceApi | null,
 ): Omit<PersistedStoreScope, 'store'> | null {
-  if (personalProfile.status !== 'ready' || !persistenceApi) {
+  if (
+    activeProfile.status !== 'ready' ||
+    !activeProfile.activeProfile ||
+    !activeProfile.actorUserId ||
+    !persistenceApi
+  ) {
     return null;
   }
 
   return {
-    profileId: personalProfile.identity.profile.id,
-    actorUserId: personalProfile.identity.user.id,
+    profileId: activeProfile.activeProfile.id,
+    actorUserId: activeProfile.actorUserId,
   };
 }
 
