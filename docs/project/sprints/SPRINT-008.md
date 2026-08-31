@@ -65,7 +65,7 @@ be evaluated through Sprint 007 Events.
 - Fixed evidence produces deterministic, inspectable and testable scores.
 - Item similarity/features, longer-term behaviour and recency-weighted recent
   behaviour have measurable tested effects.
-- Consumed suppression, 1–10 rating magnitude, not-interested evidence and save state affect subsequent ranking/queue placement without conflating consumption.
+- Consumed suppression, 0–10 rating magnitude, not-interested evidence and save state affect subsequent ranking/queue placement without conflating consumption.
 - DiscoveryMode changes exploration/risk semantics, not only ambient visuals.
 - A relevant user action or mode change can refresh later ranking at a
   controlled cadence.
@@ -94,13 +94,16 @@ be evaluated through Sprint 007 Events.
   hosted correlation acceptance remains pending.
 - Configured phone feedback reopened the interaction/mode acceptance boundary:
   #100 adds the persistent shared-mode top bar, #101 replaces binary reactions
-  with the 1–10/not-interested/save drawer, and #103 adds impression cooldown
+  with the 0–10/not-interested/save drawer, and #103 adds impression cooldown
   plus enough candidates for observable testing. #102 records Saved/Consumed
   navigation for Sprint 010.
 - Issue #100 implementation adds one authenticated app-shell mode bar above the
   navigation Stack, keeps auth/callback screens outside it, reuses the Room
   curtain state/gesture semantics and reduces splash lettering to 88% visible
   screen width for a thin black margin. Configured-phone acceptance remains.
+- PR #106 adds and deploys the canonical rating/not-interested projection and
+  Event foundation. Rating implies consumed, not-interested remains unconsumed,
+  save stays orthogonal and legacy binary evidence remains readable.
 
 ## Decisions
 
@@ -110,6 +113,9 @@ be evaluated through Sprint 007 Events.
 - Issue #95 must select and document the smallest real server deployment
   boundary before creating new service structure.
 - A prediction identifier is evaluation correlation, not merely a UI render ID.
+- The rating control mirrors the curtain interaction: one handle supports taps
+  and drag gestures, snaps to integer 0–10 positions and commits only a snapped
+  value. Every rating, including 0, implies consumed.
 - Prediction V0.1 uses a `SECURITY INVOKER` Postgres RPC while the data and
   model are small; a later dedicated service may replace its transport without
   changing the conceptual contract.
