@@ -6,6 +6,8 @@ export interface ItemInteraction {
   interest: ItemInterest | null;
   saved: boolean;
   consumed: boolean;
+  rating: number | null;
+  notInterested: boolean;
 }
 
 export type ItemInteractionMap = Readonly<Record<ItemId, ItemInteraction>>;
@@ -15,6 +17,8 @@ export type ItemInteractionAction =
     | { type: 'SET_INTEREST'; itemId: ItemId; interest: ItemInterest | null }
     | { type: 'TOGGLE_SAVED'; itemId: ItemId }
     | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean }
+    | { type: 'SET_RATING'; itemId: ItemId; rating: number | null }
+    | { type: 'SET_NOT_INTERESTED'; itemId: ItemId; notInterested: boolean }
   ) & { eventId?: EventId };
 
 export interface ItemInteractionUndoEntry {
@@ -34,6 +38,8 @@ export const EMPTY_ITEM_INTERACTION: Readonly<ItemInteraction> = {
   interest: null,
   saved: false,
   consumed: false,
+  rating: null,
+  notInterested: false,
 };
 
 export const EMPTY_ITEM_INTERACTION_STORE: Readonly<ItemInteractionStore> = {
@@ -70,6 +76,36 @@ export function setItemConsumed(
   consumed: boolean,
 ): ItemInteractionMap {
   return updateItemInteraction(interactions, itemId, { consumed });
+}
+
+export function setItemRating(
+  interactions: ItemInteractionMap,
+  itemId: ItemId,
+  rating: number | null,
+): ItemInteractionMap {
+  if (rating !== null && (!Number.isInteger(rating) || rating < 1 || rating > 10)) {
+    return interactions;
+  }
+
+  return updateItemInteraction(interactions, itemId, {
+    rating,
+    ...(rating === null
+      ? {}
+      : { consumed: true, notInterested: false, interest: null }),
+  });
+}
+
+export function setItemNotInterested(
+  interactions: ItemInteractionMap,
+  itemId: ItemId,
+  notInterested: boolean,
+): ItemInteractionMap {
+  return updateItemInteraction(interactions, itemId, {
+    notInterested,
+    ...(notInterested
+      ? { consumed: false, rating: null, interest: null }
+      : {}),
+  });
 }
 
 export function commitItemInteractionAction(
@@ -189,6 +225,14 @@ function applyItemInteractionAction(
       return toggleItemSaved(interactions, action.itemId);
     case 'SET_CONSUMED':
       return setItemConsumed(interactions, action.itemId, action.consumed);
+    case 'SET_RATING':
+      return setItemRating(interactions, action.itemId, action.rating);
+    case 'SET_NOT_INTERESTED':
+      return setItemNotInterested(
+        interactions,
+        action.itemId,
+        action.notInterested,
+      );
   }
 }
 
@@ -199,7 +243,9 @@ function areItemInteractionsEqual(
   return (
     first.interest === second.interest &&
     first.saved === second.saved &&
-    first.consumed === second.consumed
+    first.consumed === second.consumed &&
+    first.rating === second.rating &&
+    first.notInterested === second.notInterested
   );
 }
 
