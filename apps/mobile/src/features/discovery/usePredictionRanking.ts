@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
-import { usePersonalProfile } from '@/features/profiles/PersonalProfileProvider';
+import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
 import type {
   DiscoveryMode,
@@ -50,7 +50,7 @@ export function usePredictionRanking(
   interactions: ItemInteractionMap,
 ): VisiblePredictionRanking {
   const connection = useSupabaseConnection();
-  const personalProfile = usePersonalProfile();
+  const activeProfile = useActiveProfile();
   const [fallbackSeed] = useState(() => createUuidV7());
   const [attempt, setAttempt] = useState(0);
   const [hostedState, setHostedState] = useState<HostedRankingState>({
@@ -59,8 +59,8 @@ export function usePredictionRanking(
   const requestGate = useRef(createLatestRequestGate());
   const evidenceKey = getInteractionEvidenceKey(interactions);
   const profileId =
-    personalProfile.status === 'ready'
-      ? personalProfile.identity.profile.id
+    activeProfile.status === 'ready'
+      ? activeProfile.activeProfile?.id ?? null
       : null;
   const requestKey = profileId ? `${profileId}:${itemType}:${mode}` : null;
   const fallback = useMemo<PredictionRanking>(
