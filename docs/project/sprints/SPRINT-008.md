@@ -99,8 +99,8 @@ be evaluated through Sprint 007 Events.
   navigation for Sprint 010.
 - Issue #100 implementation adds one authenticated app-shell mode bar above the
   navigation Stack, keeps auth/callback screens outside it, reuses the Room
-  curtain state/gesture semantics and reduces splash lettering to 88% visible
-  screen width for a thin black margin. Configured-phone acceptance remains.
+  curtain state/gesture semantics. Configured-phone feedback removes the
+  duplicate Room control and keeps this one global bar as the sole selector.
 - PR #106 adds and deploys the canonical rating/not-interested projection and
   Event foundation. Rating implies consumed, not-interested remains unconsumed,
   save stays orthogonal and legacy binary evidence remains readable.
@@ -116,6 +116,9 @@ be evaluated through Sprint 007 Events.
 - The rating control mirrors the curtain interaction: one handle supports taps
   and drag gestures, snaps to integer 0–10 positions and commits only a snapped
   value. Every rating, including 0, implies consumed.
+- Hosted mode rankings are allowed to converge with sparse evidence. The UI
+  must not fake a reorder; #103 broadens the catalog and configured acceptance
+  proves differentiation when the evidence/candidate set is sufficient.
 - Prediction V0.1 uses a `SECURITY INVOKER` Postgres RPC while the data and
   model are small; a later dedicated service may replace its transport without
   changing the conceptual contract.
@@ -149,10 +152,11 @@ be evaluated through Sprint 007 Events.
 
 ## Mid-sprint handoff
 
-Issue #95's server-owned scorer and Issue #98's mobile consumption are merged.
-Continue with #100, then #101 and #103. Preserve one global DiscoveryMode state,
-server-owned ranking and response-level `predictionId`. Do not create an empty
-`services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
+Issue #95's server-owned scorer, Issue #98's mobile consumption, #100's global
+mode control and #101's state/slider slices are merged. Finish the current UX
+correction and scorer slice, then #103. Preserve one global DiscoveryMode
+state, server-owned ranking and response-level `predictionId`. Do not create an
+empty `services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
 
 ## Final handoff
 
