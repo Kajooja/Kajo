@@ -92,7 +92,7 @@ interface ActiveSelection {
 
 const EMPTY_SHARED_PROFILES: readonly SharedProfileMembership[] = [];
 const EMPTY_INVITATIONS: readonly SharedProfileInvitation[] = [];
-const INVITATION_REFRESH_INTERVAL_MS = 30_000;
+const SHARED_REMOTE_REFRESH_INTERVAL_MS = 30_000;
 const SHARED_PROFILE_UNAVAILABLE_MESSAGE =
   'Yhteinen Kajo ei ole käytettävissä tällä hetkellä.';
 const ActiveProfileContext = createContext<ActiveProfileContextValue | null>(null);
@@ -218,8 +218,9 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     if (!actorUserId || !rpc) return;
 
     const intervalId = setInterval(() => {
+      setSharedAttempt((current) => current + 1);
       setInvitationAttempt((current) => current + 1);
-    }, INVITATION_REFRESH_INTERVAL_MS);
+    }, SHARED_REMOTE_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
   }, [actorUserId, rpc]);
