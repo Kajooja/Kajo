@@ -46,10 +46,15 @@ First real generic personalized ranking using Item similarity, behavioural histo
 
 Configured-phone feedback on 2026-08-31 adds these acceptance refinements before Sprint 008 closes:
 
-- expose the one shared DiscoveryMode as a compact persistent app-shell control while retaining the Room curtain as its spatial representation,
+- expose the one shared DiscoveryMode as one compact persistent app-shell control; remove the duplicate Room control until the post-MVP Room redesign,
 - replace ambiguous binary like/dislike/consumed controls with a feedback drawer: 0–10 rating (always consumed), not interested (not consumed) and save,
 - move every explicitly reacted Item out of the immediate queue and apply a temporary impression cooldown to unreacted Items,
 - expand the normalized MVP candidate set enough to observe ranking/cooldown behaviour on a configured phone.
+
+With the small seed catalog and sparse evidence, hosted mode orderings may
+legitimately converge. Sprint 008 must not fake a visible reorder: #103 expands
+the test catalog and configured acceptance verifies differentiation only after
+enough Item/evidence variation exists.
 
 ### Sprint 009 — Shared Kajo
 
