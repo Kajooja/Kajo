@@ -7,6 +7,7 @@ import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme } from '../../theme/roomTheme';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
+import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
 import { useDiscoveryMode } from './DiscoveryModeContext';
@@ -21,7 +22,8 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const router = useRouter();
   const { mode, setMode } = useDiscoveryMode();
   const { recordEvent } = useEventTracking();
-  const theme = getRoomTheme(getAmbientPhase(mode));
+  const { activeProfile } = useActiveProfile();
+  const theme = getRoomTheme(getAmbientPhase(mode), activeProfile);
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
@@ -42,10 +44,16 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   }
 
   return (
-    <View style={styles.shell}>
+    <View style={[styles.shell, { backgroundColor: theme.base.appBackground }]}>
       <SafeAreaView
         edges={['top']}
-        style={[styles.safeHeader, { backgroundColor: theme.base.appBackground }]}
+        style={[
+          styles.safeHeader,
+          {
+            backgroundColor: theme.base.appBackground,
+            borderBottomColor: theme.base.border,
+          },
+        ]}
       >
         <View style={styles.bar}>
           <Pressable
@@ -82,11 +90,9 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
 const styles = StyleSheet.create({
   shell: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   safeHeader: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#38342F',
   },
   bar: {
     minHeight: 58,
