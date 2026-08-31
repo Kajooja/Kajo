@@ -134,7 +134,8 @@ export function getRoomBaseTheme(
     return PERSONAL_ROOM_BASE_THEME;
   }
 
-  return SHARED_ROOM_BASE_THEMES[getStableThemeIndex(profile.id)];
+  const sharedTheme = SHARED_ROOM_BASE_THEMES[getStableThemeIndex(profile.id)];
+  return sharedTheme ?? PERSONAL_ROOM_BASE_THEME;
 }
 
 function getStableThemeIndex(profileId: string): number {
