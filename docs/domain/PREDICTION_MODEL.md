@@ -124,7 +124,7 @@ MVP Prediction V0 should be intentionally simple and measurable. Initial signals
 
 - generic Item similarity/features,
 - legacy explicit likes/dislikes plus the replacement feedback model,
-- 1–10 ratings whose magnitude and polarity are stronger outcome evidence,
+- 0–10 ratings whose magnitude and polarity are stronger outcome evidence,
 - explicit not-interested evidence that does not imply consumption,
 - consumed/history suppression,
 - LongTermState derived from history,
