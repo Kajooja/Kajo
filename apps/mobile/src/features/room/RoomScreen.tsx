@@ -1,58 +1,23 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Alert, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
-import {
-  getRoomTheme,
-  ROOM_AMBIENT_BY_PHASE,
-  type RoomTheme,
-} from '../../theme/roomTheme';
+import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
-import { useEventTracking } from '../events/EventTrackingContext';
 import { usePersonalProfile } from '../profiles/PersonalProfileProvider';
-import { CurtainControl } from './CurtainControl';
-import { getCurtainPositionForMode } from './curtainState';
 
 export function RoomScreen() {
   const auth = useAuthSession();
   const personalProfile = usePersonalProfile();
-  const { mode: discoveryMode, setMode: setDiscoveryMode } = useDiscoveryMode();
-  const { recordEvent } = useEventTracking();
+  const { mode: discoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase);
   const styles = createStyles(theme);
-  const [curtainPosition] = useState(
-    () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
-  );
   const [signingOut, setSigningOut] = useState(false);
-  const ambientColor = curtainPosition.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [
-      ROOM_AMBIENT_BY_PHASE.DAWN.wash,
-      ROOM_AMBIENT_BY_PHASE.EVENING.wash,
-      ROOM_AMBIENT_BY_PHASE.NIGHT.wash,
-    ],
-  });
-  const ambientOpacity = curtainPosition.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [
-      ROOM_AMBIENT_BY_PHASE.DAWN.washOpacity * 1.35,
-      ROOM_AMBIENT_BY_PHASE.EVENING.washOpacity * 1.35,
-      ROOM_AMBIENT_BY_PHASE.NIGHT.washOpacity * 1.35,
-    ],
-  });
-  const windowLight = curtainPosition.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [
-      ROOM_AMBIENT_BY_PHASE.DAWN.windowLight,
-      ROOM_AMBIENT_BY_PHASE.EVENING.windowLight,
-      ROOM_AMBIENT_BY_PHASE.NIGHT.windowLight,
-    ],
-  });
 
   async function handleSignOut() {
     if (signingOut) {
@@ -68,24 +33,18 @@ export function RoomScreen() {
     }
   }
 
-  function handleDiscoveryModeChange(nextMode: typeof discoveryMode) {
-    if (nextMode !== discoveryMode) {
-      recordEvent({
-        eventType: 'DISCOVERY_MODE_CHANGED',
-        discoveryMode: nextMode,
-        properties: { previousDiscoveryMode: discoveryMode },
-      });
-    }
-
-    setDiscoveryMode(nextMode);
-  }
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <StatusBar style="light" />
-      <Animated.View
+      <View
         pointerEvents="none"
-        style={[styles.appAmbient, { backgroundColor: ambientColor, opacity: ambientOpacity }]}
+        style={[
+          styles.appAmbient,
+          {
+            backgroundColor: theme.ambient.wash,
+            opacity: theme.ambient.washOpacity * 1.35,
+          },
+        ]}
       />
 
       <View style={styles.room}>
@@ -122,27 +81,23 @@ export function RoomScreen() {
         >
           <View style={styles.backWall}>
             <View style={styles.windowAssembly}>
-              <View style={styles.curtainArea}>
-                <CurtainControl
-                  mode={discoveryMode}
-                  onModeChange={handleDiscoveryModeChange}
-                  position={curtainPosition}
-                  baseTheme={theme.base}
-                  ambientTheme={theme.ambient}
-                />
-              </View>
-
-              <Animated.View
-                style={[styles.window, { backgroundColor: windowLight }]}
+              <View
+                style={[
+                  styles.window,
+                  { backgroundColor: theme.ambient.windowLight },
+                ]}
                 accessibilityLabel="Window"
               >
-                <Animated.View
+                <View
                   pointerEvents="none"
-                  style={[styles.windowGlow, { backgroundColor: windowLight }]}
+                  style={[
+                    styles.windowGlow,
+                    { backgroundColor: theme.ambient.windowLight },
+                  ]}
                 />
                 <View style={styles.windowBarVertical} />
                 <View style={styles.windowBarHorizontal} />
-              </Animated.View>
+              </View>
             </View>
 
             <Pressable
@@ -188,13 +143,19 @@ export function RoomScreen() {
             </Pressable>
           </View>
 
-          <Animated.View
+          <View
             pointerEvents="none"
-            style={[styles.sceneAmbient, { backgroundColor: ambientColor, opacity: ambientOpacity }]}
+            style={[
+              styles.sceneAmbient,
+              {
+                backgroundColor: theme.ambient.wash,
+                opacity: theme.ambient.washOpacity * 1.35,
+              },
+            ]}
           />
         </View>
 
-        <Text style={styles.hint}>Huone on Kajo. Valitse esine tai muuta valoa verholla.</Text>
+        <Text style={styles.hint}>Huone on Kajo. Valitse kirjat tai elokuvat.</Text>
       </View>
     </SafeAreaView>
   );
@@ -274,11 +235,6 @@ function createStyles(theme: RoomTheme) {
       width: '40%',
       alignItems: 'stretch',
       zIndex: 1,
-    },
-    curtainArea: {
-      marginHorizontal: -5,
-      marginBottom: -4,
-      zIndex: 2,
     },
     window: {
       width: '100%',
