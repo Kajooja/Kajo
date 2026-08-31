@@ -7,9 +7,14 @@ import {
 } from './mockDiscovery';
 
 describe('mock discovery ranking', () => {
-  it('returns only the requested generic Item type', () => {
-    expect(getRankedMockItems('BOOK', 'FOR_YOU').every((item) => item.itemType === 'BOOK')).toBe(true);
-    expect(getRankedMockItems('MOVIE', 'FOR_YOU').every((item) => item.itemType === 'MOVIE')).toBe(true);
+  it('returns the expanded requested generic Item type', () => {
+    const books = getRankedMockItems('BOOK', 'FOR_YOU');
+    const movies = getRankedMockItems('MOVIE', 'FOR_YOU');
+
+    expect(books).toHaveLength(12);
+    expect(movies).toHaveLength(12);
+    expect(books.every((item) => item.itemType === 'BOOK')).toBe(true);
+    expect(movies.every((item) => item.itemType === 'MOVIE')).toBe(true);
   });
 
   it('changes deterministic ordering by DiscoveryMode', () => {
@@ -27,6 +32,10 @@ describe('mock discovery ranking', () => {
     expect(getMockItem(MOCK_ITEM_IDS.movieStaticSummer)).toMatchObject({
       id: MOCK_ITEM_IDS.movieStaticSummer,
       itemType: 'MOVIE',
+    });
+    expect(getMockItem(MOCK_ITEM_IDS.bookSignalBelow)).toMatchObject({
+      id: MOCK_ITEM_IDS.bookSignalBelow,
+      itemType: 'BOOK',
     });
     expect(getMockItem('missing-item')).toBeUndefined();
   });

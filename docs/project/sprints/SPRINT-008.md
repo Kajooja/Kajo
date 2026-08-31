@@ -104,6 +104,18 @@ be evaluated through Sprint 007 Events.
 - PR #106 adds and deploys the canonical rating/not-interested projection and
   Event foundation. Rating implies consumed, not-interested remains unconsumed,
   save stays orthogonal and legacy binary evidence remains readable.
+- PR #108 configured APK acceptance passed for the compact rating drawer and
+  corrected item-detail layout.
+- PR #109 teaches Prediction V0 to consume canonical `ITEM_RATED` magnitude and
+  `ITEM_NOT_INTERESTED` evidence while preserving legacy evidence, undo
+  compensation, consumed suppression and least-privilege Profile authorization.
+  Its repository CI passed, the migration is deployed to hosted Supabase, and
+  the hosted function definition verifies the new evidence paths.
+- PR #110 implements #103 on top of the clean post-#109 main: the normalized MVP
+  catalog grows to 12 BOOK and 12 MOVIE candidates, unreacted impressions get a
+  decaying 30-minute cooldown, and explicit reaction state receives a stronger
+  immediate queue penalty without becoming permanent suppression. Configured
+  Android acceptance remains the gate before #103/Sprint 008 close.
 
 ## Decisions
 
@@ -119,14 +131,17 @@ be evaluated through Sprint 007 Events.
 - Hosted mode rankings are allowed to converge with sparse evidence. The UI
   must not fake a reorder; #103 broadens the catalog and configured acceptance
   proves differentiation when the evidence/candidate set is sufficient.
-- Prediction V0.1 uses a `SECURITY INVOKER` Postgres RPC while the data and
-  model are small; a later dedicated service may replace its transport without
+- Prediction V0 uses a `SECURITY INVOKER` Postgres RPC while the data and model
+  are small; a later dedicated service may replace its transport without
   changing the conceptual contract.
+- A mere impression is temporary queue evidence, not a permanent rejection.
+  Explicit reaction state rotates an Item out more strongly; consumed state
+  remains the strongest suppression in Prediction V0.
 
 ## Deferred / not done
 
-- Mobile Prediction V0 consumption and phone re-ranking acceptance follow the
-  hosted scorer foundation.
+- Configured Android acceptance of the broader catalog, cooldown, Event
+  correlation and observable DiscoveryMode behavior remains before sprint close.
 - ScenarioMemory, population learning and evolutionary optimization remain later.
 
 ## Known issues
@@ -136,6 +151,9 @@ be evaluated through Sprint 007 Events.
   production metadata.
 - The amount of real behavioural evidence is still small, so deterministic
   fallback/prior behavior remains necessary for cold start.
+- Supabase advisors currently expose pre-existing security hardening and unused
+  index notices outside the Prediction V0 change set; they should be handled in
+  a separately scoped hygiene/security task rather than mixed into #103.
 
 ## Important files
 
@@ -148,15 +166,17 @@ be evaluated through Sprint 007 Events.
 - `/docs/project/STATUS.md`
 - `/apps/mobile/src/domain/contracts.ts`
 - `/apps/mobile/src/features/events/`
+- `/apps/mobile/src/features/discovery/`
 - `/supabase/migrations/`
 
 ## Mid-sprint handoff
 
-Issue #95's server-owned scorer, Issue #98's mobile consumption, #100's global
-mode control and #101's state/slider slices are merged. Finish the current UX
-correction and scorer slice, then #103. Preserve one global DiscoveryMode
-state, server-owned ranking and response-level `predictionId`. Do not create an
-empty `services/prediction/` tree or begin ScenarioMemory/SharedProfile work.
+#101 scorer input is merged and deployed. #103 is the active implementation:
+keep the broader generic catalog, temporary impression cooldown and stronger
+reaction queue rotation server-owned. After #110 passes CI and hosted deploy,
+build the configured Android APK and verify mode persistence, queue rotation,
+`predictionId` correlation and rating/not-interested Event effects. Do not begin
+ScenarioMemory/SharedProfile work before Sprint 008 closes.
 
 ## Final handoff
 
