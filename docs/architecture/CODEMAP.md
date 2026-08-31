@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprints 001–006 are merged, validated and complete. The final Sprint 006 configured standalone APK was accepted on a real phone with registration/confirmation, email-or-nickname login, password recovery, PersonalProfile entry and persisted BOOK/MOVIE interactions. Sprint 007 — Event Engine is active; Issue #85 established persistence and Issue #89 integrates mobile Event emission for phone acceptance.
+Sprints 001–007 are merged, validated and complete. The configured Android app has accepted authentication, persisted BOOK/MOVIE interaction and generic Event/undo flows. Sprint 008 — Prediction V0 is active; Issue #95 establishes the first server-owned generic scorer boundary before mobile integration.
 
 Important current paths:
 
@@ -41,7 +41,7 @@ supabase/functions/password-auth/
 | Password auth boundary | `supabase/functions/password-auth/` | One public Edge Function resolves email/nickname identifiers server-side, checks account existence, signs in against Supabase Auth, resends signup confirmation and requests recovery without returning resolved email or privileged keys |
 | Auth email callback | `supabase/functions/auth-callback/` | Scanner-safe HTTPS hop maps signup to the documented email OTP type, forwards token hashes redundantly without consuming them and foregrounds/reuses Kajo's Android task; only the app verifies the token |
 | Supabase function config | `supabase/config.toml` | `password-auth` is explicitly callable before login (`verify_jwt = false`); credential validation remains inside the auth function/Supabase Auth flow |
-| Prediction service | `services/prediction/` | Later sprint |
+| Prediction service | Server-owned boundary selected by Issue #95 | Sprint 008 active; do not create `services/prediction/` or another service path until the chosen deployment boundary has real implementation |
 | DB migrations | `supabase/migrations/` | Sprint 006 identity/current-state foundation plus Sprint 007 append-only Event/session tables and explicit reversal vocabulary; explicit grants, membership-based RLS, stable retry IDs and actor/Profile consistency constraints form the authorization/data-quality base |
 | Shared contracts | `packages/contracts/` | Create only when real cross-package sharing exists |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; optional public Supabase repository variables feed Expo, and `main` also builds/verifies/uploads a standalone Android release APK |
