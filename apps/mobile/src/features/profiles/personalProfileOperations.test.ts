@@ -4,6 +4,7 @@ import {
   completePersonalIdentity,
   loadPersonalIdentity,
   mapPersonalIdentity,
+  MAXIMUM_NICKNAME_LENGTH,
   PERSONAL_PROFILE_RPC,
   validateNickname,
   type PersonalProfileRpc,
@@ -28,9 +29,18 @@ describe('validateNickname', () => {
     });
   });
 
+  it('accepts the 24 character maximum', () => {
+    expect(validateNickname('K'.repeat(MAXIMUM_NICKNAME_LENGTH))).toEqual({
+      status: 'valid',
+      nickname: 'K'.repeat(MAXIMUM_NICKNAME_LENGTH),
+    });
+  });
+
   it('rejects nicknames outside the MVP length boundary', () => {
     expect(validateNickname('K')).toMatchObject({ status: 'invalid' });
-    expect(validateNickname('K'.repeat(33))).toMatchObject({ status: 'invalid' });
+    expect(validateNickname('K'.repeat(MAXIMUM_NICKNAME_LENGTH + 1))).toMatchObject({
+      status: 'invalid',
+    });
   });
 });
 
