@@ -125,6 +125,8 @@ Onboarding, performance, accessibility, end-to-end flows, quality and privacy ch
 
 The milestone closes only with a genuinely shareable store release: stable production identifiers/versioning/signing, production authentication email delivery, privacy/support and store metadata/assets, least-privilege client configuration, and verified clean install/update flows on representative real devices through an official app store.
 
+Primary production-security issue: #160. Production email delivery remains coordinated with #127.
+
 ## Post-MVP direction
 
 After real prediction/outcome data exists:

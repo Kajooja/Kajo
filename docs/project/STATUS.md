@@ -103,6 +103,7 @@ Do not implement #102 before #151 is stable. Do not start chat before the List m
 
 ## Other open work
 
+- #160 — production Supabase security hardening: privileged function execution grants, leaked-password protection, explicit Data API grants and store-install authorization verification.
 - #156 — Prediction Core / EvoBot architecture design gate. Common-fit coefficients, final LongTerm/ShortTermState, ScenarioMemory and EvoBot remain blocked until the user-approved MVP core design is documented.
 - #127 — production-ready auth email delivery; production SMTP/domain and confirmation/recovery tests remain required before external beta.
 - #78 — optional splash/in-app logo polish.
