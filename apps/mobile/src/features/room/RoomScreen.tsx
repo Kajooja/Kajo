@@ -1,37 +1,19 @@
-import { useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
-import { useAuthSession } from '../auth/AuthSessionProvider';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 
 export function RoomScreen() {
-  const auth = useAuthSession();
   const activeProfile = useActiveProfile();
   const { mode: discoveryMode } = useDiscoveryMode();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase, activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const [signingOut, setSigningOut] = useState(false);
-
-  async function handleSignOut() {
-    if (signingOut) {
-      return;
-    }
-
-    setSigningOut(true);
-    const result = await auth.signOut();
-
-    if (result.status === 'error') {
-      setSigningOut(false);
-      Alert.alert('Uloskirjautuminen epäonnistui', result.message);
-    }
-  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
@@ -48,26 +30,6 @@ export function RoomScreen() {
       />
 
       <View style={styles.room}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Huone</Text>
-          {auth.status === 'signed-in' ? (
-            <Pressable
-              accessibilityRole="button"
-              disabled={signingOut}
-              onPress={() => void handleSignOut()}
-              style={({ pressed }) => [
-                styles.signOutButton,
-                pressed && styles.pressed,
-                signingOut && styles.disabled,
-              ]}
-            >
-              <Text style={styles.signOutText}>
-                {signingOut ? 'Kirjaudutaan…' : 'Kirjaudu ulos'}
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-
         <View
           style={styles.scene}
           accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
@@ -147,10 +109,6 @@ export function RoomScreen() {
             ]}
           />
         </View>
-
-        <Text style={styles.hint}>
-          Huone on Kajo. Valitse kirjat tai elokuvat.
-        </Text>
       </View>
     </SafeAreaView>
   );
@@ -168,32 +126,7 @@ function createStyles(theme: RoomTheme) {
     room: {
       flex: 1,
       paddingHorizontal: 20,
-      paddingBottom: 16,
-    },
-    header: {
-      paddingTop: 18,
-      paddingBottom: 10,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    title: {
-      color: theme.base.textPrimary,
-      fontSize: 34,
-      fontWeight: '600',
-    },
-    signOutButton: {
-      minHeight: 42,
-      borderColor: theme.base.border,
-      borderRadius: 12,
-      borderWidth: 1,
-      justifyContent: 'center',
-      paddingHorizontal: 14,
-    },
-    signOutText: {
-      color: theme.base.textMuted,
-      fontSize: 12,
-      fontWeight: '600',
+      paddingVertical: 16,
     },
     scene: {
       flex: 1,
@@ -370,19 +303,9 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '700',
       letterSpacing: 1.7,
     },
-    hint: {
-      color: theme.base.textMuted,
-      fontSize: 13,
-      lineHeight: 19,
-      marginTop: 12,
-      paddingHorizontal: 4,
-    },
     pressed: {
       opacity: 0.7,
       transform: [{ scale: 0.98 }],
-    },
-    disabled: {
-      opacity: 0.5,
     },
   });
 }
