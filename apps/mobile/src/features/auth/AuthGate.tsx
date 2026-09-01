@@ -196,7 +196,7 @@ function NicknameEntryScreen() {
           accessibilityLabel="Nimimerkki"
           autoCapitalize="none"
           autoCorrect={false}
-          maxLength={32}
+          maxLength={24}
           onChangeText={setNickname}
           onSubmitEditing={() => void submit()}
           placeholder="Esimerkiksi KeTTu"
@@ -390,7 +390,7 @@ function AuthEntryScreen() {
               autoCapitalize="none"
               autoComplete="username-new"
               autoCorrect={false}
-              maxLength={32}
+              maxLength={24}
               onChangeText={setNickname}
               placeholder="Esimerkiksi KeTTu"
               placeholderTextColor={PERSONAL_ROOM_BASE_THEME.textMuted}
