@@ -10,7 +10,9 @@ Repository memory, mobile skeleton, workspace, CI, domain contracts.
 
 ### Sprint 002 — Room
 
-First recognisable minimalist 2D fireplace Room with window, fireplace, bookshelf and movie screen using mock data.
+First recognisable minimalist illustrated Room with window, fireplace, bookshelf and movie screen using mock data.
+
+Canonical visual direction now remains a warm simple cabin/living-room illustration: 2D first with only lightly layered 2.5D depth, never a navigable 3D world or futuristic control surface. Fireplace, window, bookshelf, TV/screen and the single DiscoveryMode curtain remain the MVP vocabulary.
 
 ### Sprint 003 — Curtain & Theme
 
@@ -42,33 +44,32 @@ Persistent SharedProfiles, consent-based invitations, Shared Room/theme identity
 
 The first configured Android acceptance exposed real membership/persistence/navigation failures. Those were corrected and then accepted through configured-device use plus hosted verification. Issue #125 is closed.
 
-The initial separate `Ehdota yhteiseen` experiment is historical and was retired during the 2026-09-01 product review. Its replacement is the Sprint 011 endorsement model, not a parallel suggestion list.
+The initial separate `Ehdota yhteiseen` experiment is historical and retired. Its replacement is the Sprint 011 Endorsement model, not a parallel suggestion list.
 
-### Sprint 010 — Navigation & Profile Lifecycle
+### Sprint 010 — Navigation & Profile Lifecycle — COMPLETE
 
-Build and polish the durable shell before adding more destination surfaces.
+Durable shell before adding more destination surfaces.
 
-Delivered core:
+Accepted on configured Android 2026-09-01:
 
 - persistent top Kajo mark returns to the active Profile Room,
-- restrained bottom dock with menu + active Profile identity + Inbox,
+- restrained bottom dock with menu + active Profile identity/Home + Inbox,
 - Profile-aware side drawer instead of a conventional multi-tab bottom bar,
 - drawer owns Profile switching plus Profile/Lists/Groups destinations as they become real,
 - nickname max 24 and SharedProfile name max 32,
-- safe `Poistu ryhmästä` confirmation, membership removal and PersonalProfile fallback.
+- safe `Poistu ryhmästä` confirmation and PersonalProfile fallback,
+- bottom-center active Profile identity also returns Home,
+- `Kirjaudu ulos` lives at drawer bottom,
+- Room has no standalone heading/helper copy,
+- obsolete separate `Ehdota yhteiseen` UI is removed.
 
-Final polish under #149 / PR #150:
+Further visual Room work must preserve this accepted shell and the simple illustrated Room contract; it must not reopen Sprint 010.
 
-- bottom-center active Profile identity also returns to Room,
-- `Kirjaudu ulos` lives at the bottom of the side drawer,
-- Room has no standalone heading/helper copy outside the visual scene,
-- obsolete separate `Ehdota yhteiseen` panel is removed.
-
-### Sprint 011 — Shared Curation & Named Lists
+### Sprint 011 — Shared Curation & Named Lists — ACTIVE
 
 Sprint 011 deliberately has **two ordered slices**.
 
-#### 11A — Shared discovery + endorsement consensus — #151
+#### 11A — Shared discovery + Endorsement consensus — #151
 
 Make Shared discovery behave like a joint decision surface without creating a separate social recommender.
 
@@ -88,7 +89,7 @@ No majority voting, chat or custom-list voting is introduced here.
 
 After #151 is stable:
 
-- PersonalProfile and SharedProfile own generic system/custom `ItemList` records,
+- PersonalProfile and SharedProfile own generic system/custom Lists,
 - List names are 1–40 characters,
 - one List may contain BOOK, MOVIE and future ItemTypes together,
 - every Profile has one system `Tallennetut` List,
