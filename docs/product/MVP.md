@@ -16,6 +16,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 - [x] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
 - [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
+- [ ] `MVP-AUTH-003` New nicknames are limited to 2–24 characters consistently in mobile and backend validation so persistent navigation never depends on truncating arbitrarily long identity labels.
 
 ## Room and theme
 
@@ -25,6 +26,12 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-ROOM-004` Screen/projector opens movie discovery.
 - [x] `MVP-ROOM-005` User theme is represented by reusable theme tokens rather than hard-coded component colours.
 - [ ] `MVP-ROOM-006` SharedProfile can have its own shared Room/theme identity.
+
+## Navigation shell
+
+- [ ] `MVP-NAV-001` The persistent top Kajo logo always returns to the currently active Profile's Room; changing Personal/Shared Profile does not change this contract.
+- [ ] `MVP-NAV-002` A small persistent bottom dock provides a menu control that opens a Profile-aware side drawer and an envelope control that opens Inbox; Kajo does not use a conventional multi-tab bottom navigation bar.
+- [ ] `MVP-NAV-003` General account/content navigation is reachable from the Room or side drawer; the drawer owns active Profile switching plus Profile, Lists and Groups destinations when those destinations exist, without duplicate/dead navigation entries.
 
 ## Discovery
 
@@ -51,16 +58,32 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from the active swipe after being marked read/watched.
 - [x] `MVP-MEM-003` User can add a 0–10 rating to an Item, which always records that Item as consumed.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
-- [ ] `MVP-MEM-005` User can open Profile-scoped Saved and Consumed lists from persistent navigation and sort them by supported generic metadata; named custom lists remain post-MVP.
+- [ ] `MVP-MEM-005` User can open Profile-scoped Saved and watched/read/consumed collections from persistent navigation and see current consumed/rating state without duplicating that state into collection rows.
+
+## Named Lists
+
+- [ ] `MVP-LIST-001` PersonalProfile and SharedProfile can own multiple Profile-scoped named Lists; List names are 1–40 characters and one List may contain mixed generic Item types such as BOOK and MOVIE.
+- [ ] `MVP-LIST-002` `Tallenna` opens a destination picker, can create/name/rename a List and allows the same Item to belong to multiple Lists while preserving existing saved behaviour/prediction evidence.
+- [ ] `MVP-LIST-003` List detail can toggle between list and card/grid presentation, sort deterministically by added order and supported generic metadata, and filter by generic ItemType (`Kaikki`, `Kirjat`, `Elokuvat`, later domains without schema redesign).
+- [ ] `MVP-LIST-004` Every list membership stores `addedByUserId` and `addedAt`; SharedProfile UI displays who added the Item and when, while PersonalProfile hides redundant actor identity. Current watched/read/consumed state and rating are joined from canonical Profile interaction state.
+- [ ] `MVP-LIST-005` SharedProfile List read/write access follows accepted membership authorization and a former member loses access after leaving the group.
 
 ## Profiles and social
 
 - [x] `MVP-PROFILE-001` Every user has a PersonalProfile.
 - [ ] `MVP-PROFILE-002` 2-N users can belong to a persistent SharedProfile.
 - [x] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
-- [ ] `MVP-SOCIAL-001` SharedProfile has joint saved items.
+- [ ] `MVP-PROFILE-004` New SharedProfile names are limited to 2–32 characters consistently in mobile/backend validation.
+- [ ] `MVP-PROFILE-005` An accepted member can leave a SharedProfile only after an `Oletko varma?` confirmation; leaving removes membership/access, falls back safely from an active group and preserves shared history for remaining members.
+- [ ] `MVP-SOCIAL-001` SharedProfile has joint saved/current Item state.
 - [ ] `MVP-SOCIAL-002` Members can browse/swipe in the SharedProfile context.
 - [ ] `MVP-SOCIAL-003` A member can suggest an Item within a SharedProfile.
+
+## Profile messaging
+
+- [ ] `MVP-MSG-001` Each Profile can expose one narrow chat/thread surface: PersonalProfile thread is owner-only and SharedProfile thread is accepted-member-only while retaining the actual sending `actorUserId`.
+- [ ] `MVP-MSG-002` The persistent envelope Inbox surfaces pending invitations and message activity without adding Room clutter; unread/message state is user-facing delivery state rather than generic Item interaction state.
+- [ ] `MVP-MSG-003` Saving an Item to a List may include an optional message that references the correct `profileId`, `listId` and `itemId`; List membership remains independent from message persistence and chat text is not Prediction evidence by default.
 
 ## Data and prediction
 
@@ -76,7 +99,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - Full evolutionary predictor population/genetic optimization.
 - Music, series, games, restaurants, travel and live-event production domains.
 - Public follower/feed/influencer mechanics.
-- General chat/messaging.
+- Arbitrary direct messages between unrelated Users; MVP messaging is limited to the active Profile context.
+- Public Lists, folders, advanced smart-list rules and rich list media attachments.
 - Complex 3D or game-like Room editor.
 - Full photo-rich life journal.
 - Advanced demographic personalization beyond optional cold-start prior.
