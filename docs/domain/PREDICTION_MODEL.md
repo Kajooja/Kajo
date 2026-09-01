@@ -4,7 +4,7 @@ This document defines prediction semantics, not a final ML algorithm.
 
 ## Thesis
 
-Kajo should not learn separate isolated models of "what books I read" and "what movies I watch". It should learn a changing representation of the person/Profile and use evidence across domains.
+Kajo should not learn isolated models of "what books I read" and "what movies I watch". It should learn changing representations of Profile/person behavior and use evidence across domains.
 
 ## Core input/output
 
@@ -21,80 +21,44 @@ Profile
 Prediction
 ```
 
-A Prediction should eventually be able to expose one or more outcome probabilities, a ranking score and confidence/uncertainty.
+A Prediction eventually exposes outcome probabilities, score and confidence/uncertainty.
 
 ## HumanState
 
 ### LongTermState
 
-Slowly changing evidence about the person/Profile. It may represent latent dimensions such as novelty appetite, intensity, complexity tolerance, darkness/lightness, pacing and experimental/familiar preferences.
+Slowly changing evidence about a Profile/person: novelty appetite, intensity, complexity tolerance, pacing, darkness/lightness, experimental/familiar preference and similar latent dimensions.
 
-LongTermState is evidence with confidence and recency, not a permanent identity label.
+Evidence has confidence/recency; it is not a permanent identity label.
 
 ### ShortTermState
 
-Recent behavioural state. Signals may cross item domains.
+Recent behavioral state. Signals may cross Item domains.
 
-Example: one member recently reads science fiction; another listens to heavy music; their SharedProfile is now choosing a movie. Those signals can contribute to the current shared scenario even though none of them is a recent movie action.
+Example: recent book/music/movie behavior can affect a current movie recommendation without creating domain-specific user models.
 
-## Behaviour -> state -> refreshed ranking
-
-Kajo's production recommendation loop is intended to remain responsive as evidence changes.
-
-Conceptually:
+## Behavior -> state -> refreshed ranking
 
 ```text
 User action
   -> Event / observed outcome
   -> update relevant ShortTermState and/or LongTermState evidence
   -> Prediction inputs change
-  -> affected recommendation ranking is refreshed
+  -> affected recommendation ranking refreshes
 ```
 
-Examples of useful evidence include explicit positive/negative interest, saved/unsaved, consumed/read/watched outcomes, ratings and later richer memory/context signals.
+Useful evidence includes explicit positive/negative feedback, saved/unsaved, consumed outcomes, ratings and later richer memory/context signals.
 
-Important rules:
+Rules:
 
-- UI button wording is not learning semantics. A visible label may change while the underlying canonical event/state meaning remains stable.
-- Recent actions may affect ShortTermState quickly; repeated/historical evidence can gradually affect LongTermState.
-- Re-ranking should occur when materially relevant inputs change rather than requiring a fixed stale recommendation list.
-- "Continuous" means recommendations can be refreshed from the latest available state and context; it does not require an expensive model-training job after every tap.
-- Until Sprint 007 event persistence and Sprint 008 Prediction V0 exist, local mobile mock ordering must not be described as this real learning loop.
-
-## ScenarioMemory
-
-Future ScenarioMemory should encode a current scenario and retrieve similar historical scenarios from:
-
-- personal history,
-- SharedProfile history,
-- population history.
-
-Conceptual retrieval:
-
-```text
-CurrentScenario
-   -> similarity retrieval
-   -> top N historical scenarios
-   -> weight by similarity, outcome quality, recency and confidence
-   -> scenario signal
-```
-
-This signal contributes to ranking; it does not override the rest of the model.
-
-## Population learning
-
-Cold start begins with generic/content-based signals and optionally weak demographic priors. As behavioural evidence grows:
-
-```text
-actual behaviour > demographic prior
-personal evidence increasingly > generic population prior
-```
-
-Similar scenarios can be more informative than simply finding globally similar users.
+- UI button wording is not learning semantics.
+- Recent actions may affect ShortTermState quickly; repeated/historical evidence can affect LongTermState gradually.
+- Re-ranking occurs when materially relevant inputs change rather than requiring one stale list.
+- Continuous responsiveness does not require expensive model training after every tap.
 
 ## DiscoveryMode
 
-`DiscoveryMode` changes recommendation policy and is a live Prediction input, not merely a colour/theme preference.
+`DiscoveryMode` changes recommendation policy and is a live Prediction input.
 
 ### FOR_YOU
 
@@ -104,76 +68,153 @@ Similar scenarios can be more informative than simply finding globally similar u
 
 ### SURPRISE
 
-- maintain meaningful expected fit,
+- keep meaningful expected fit,
 - increase novelty/exploration,
 - allow indirect cross-domain relationships.
 
 ### RISK
 
-- deliberately accept greater uncertainty/variance,
+- accept greater uncertainty/variance,
 - strongly increase exploration,
-- surface items that may be exceptional fits or clear misses.
+- surface possible exceptional fits and clear misses.
 
-When the user changes DiscoveryMode, affected recommendation rankings should be refreshed using the new exploration/risk policy once Prediction V0 exists.
-
-The mode is algorithmic. Its visual representation is handled separately by `AmbientPhase`. The same global curtain control may select DiscoveryMode and visually interpolate AmbientPhase, but the two concepts remain separate in the model.
+`AmbientPhase` is presentation; DiscoveryMode is algorithmic policy.
 
 ## Prediction V0
 
-MVP Prediction V0 should be intentionally simple and measurable. Initial signals may include:
+MVP V0 is intentionally simple and inspectable. Initial signals include:
 
 - generic Item similarity/features,
-- legacy explicit likes/dislikes plus the replacement feedback model,
-- 0–10 ratings whose magnitude and polarity are stronger outcome evidence,
-- explicit not-interested evidence that does not imply consumption,
+- explicit feedback and 0–10 ratings,
+- not-interested evidence,
+- save state,
 - consumed/history suppression,
-- LongTermState derived from history,
-- recency-weighted ShortTermState,
-- novelty preference,
-- DiscoveryMode exploration parameters.
+- long-term tag affinity,
+- recency-weighted short-term tag evidence,
+- novelty/exploration,
+- DiscoveryMode.
 
-Prediction V0 should support re-ranking after relevant behavioural evidence or DiscoveryMode changes so the user experience becomes progressively more personal during use.
+Prediction V0 queue policy distinguishes outcome from exposure. Explicit rating/not-interested/save rotates an Item out of the immediate queue. Mere impressions use temporary cooldown. Consumed/rated Items remain strongly suppressed from ordinary discovery and available through history instead.
 
-Population scenario retrieval and evolutionary optimization come later after enough outcome data exists.
+### V0 scorer contract
 
-Prediction V0 queue policy distinguishes outcome from exposure. An explicit
-rating, not-interested action or save rotates the Item out of the immediate
-queue. A mere impression receives only a recency cooldown: it may return later
-when no explicit reaction exists. Consumed/rated Items remain strongly
-suppressed from ordinary discovery and available through history instead.
-
-### V0.1 scorer contract
-
-The first server-owned implementation is `public.rank_items_v0`:
+Current server-owned implementation is `public.rank_items_v0`:
 
 ```text
 profileId + DiscoveryMode + optional ItemType + limit + Context
   -> one predictionId + ordered generic Item Predictions
 ```
 
-The score is deliberately inspectable rather than learned. It combines:
+The RPC is SECURITY INVOKER and validates authenticated Profile membership. It is an MVP transport/deployment choice, not a permanent rejection of a later dedicated prediction service.
 
-- current explicit interest/save state as a direct signal,
-- append-only positive and negative Event evidence after undo compensation,
-- a slowly decaying tag-affinity signal for LongTermState,
-- a stronger 14-day recency-weighted tag signal for ShortTermState,
-- deterministic content novelty and exploration signals,
-- a strong consumed penalty,
-- different fit/novelty/exploration weights for each DiscoveryMode.
+The current inspectable score combines current state, weighted append-only Event evidence, LongTerm/ShortTerm tag evidence, novelty/exploration, reaction penalties and impression cooldown.
 
-`FOR_YOU` emphasizes fit and recent evidence, `SURPRISE` increases novelty and
-exploration while retaining fit, and `RISK` accepts substantially more
-exploration. Hash-based exploration is stable for a Profile/Item pair, so fixed
-evidence produces deterministic ordering even though each response receives a
-new traceable `predictionId`. The response exposes component values for
-measurement/debugging; they are not user-facing psychological labels.
+## SharedProfile common-fit model — Sprint 011/#151
 
-The RPC is `SECURITY INVOKER` and validates authenticated Profile membership.
-It is a transport/deployment choice for V0, not a permanent rejection of the
-later Python prediction service.
+A SharedProfile remains a **single Prediction target**. Kajo must not create one Book/Movie recommender per member and merge lists afterward.
+
+However, a genuinely shared recommendation needs evidence about all accepted members, not only Events already produced while explicitly acting inside the SharedProfile.
+
+For SharedProfile V0, ranking may combine:
+
+1. **Shared joint evidence** — behavior/events/current state produced directly in the SharedProfile. This remains the strongest evidence about the group's established joint taste.
+2. **Accepted-member PersonalProfile evidence** — authorized taste signals from each current member's PersonalProfile.
+3. **Common-fit aggregation** — an inspectable aggregate designed to favor Items that fit the group rather than only one extreme member.
+4. **Disagreement penalty** — explicit penalty/uncertainty when member-specific fit signals diverge strongly.
+
+Do not lock an opaque ML aggregation before enough evidence exists. V0 should expose component values in `explanation` so common-fit/disagreement behavior can be verified on configured accounts.
+
+A simple V0 approach may use average member fit plus a penalty based on range/variance; the exact coefficient is an implementation detail to validate, not a new domain concept.
+
+### Shared discovery eligibility from member history
+
+For active SharedProfile, an Item is excluded from **ordinary Shared discovery** if any currently accepted member has already consumed/rated it in that member's PersonalProfile.
+
+Conceptually:
+
+```text
+for candidate Item:
+  if SharedProfile itself consumed/rated Item -> ineligible
+  else if any accepted member PersonalProfile consumed/rated Item -> ineligible
+  else -> eligible for ranking
+```
+
+This is not Event copying. Personal events remain PersonalProfile evidence. The scorer/eligibility query reads authorized state to decide whether the Item is still useful as a shared recommendation.
+
+This rule does not remove the Item from Lists, Saved history or consumed history.
+
+## Actor-specific pending Endorsement delivery
+
+Sprint 011/#151 introduces collaboration delivery on top of the SharedProfile Prediction.
+
+Example A+B:
+
+1. A endorses Item X.
+2. X is no longer part of A's ordinary Shared discovery queue.
+3. B has not endorsed X, so X is delivered ahead of ordinary Shared recommendations to B.
+4. B sees restrained provenance (`A tykkäsi` or equivalent presentation copy).
+5. If B endorses too, consensus saves X to Shared current/system-saved state and X leaves ordinary Shared discovery.
+
+Important architecture rule:
+
+**This actor-specific delivery priority is not an actor-specific taste model.**
+
+The shared fit/risk Prediction still targets the SharedProfile. Authenticated actor identity is used only to overlay pending collaboration state:
+
+```text
+SharedProfile Prediction ranking
++ pending Endorsements from other members
+- Items already endorsed by current actor
+= actor-visible Shared discovery queue
+```
+
+Prediction output/explanation should make this priority inspectable, e.g. pending endorsement flags/actor IDs or a clear delivery-priority component, without leaking auth email.
+
+## Shared consensus and Saved evidence
+
+One Endorsement must not set Shared `item_interactions.saved=true`.
+
+When all currently accepted members have active Endorsements:
+
+- consensus is reached,
+- Shared Saved projection becomes true,
+- canonical `ITEM_SAVED` evidence is appended with `source = SHARED_CONSENSUS`,
+- once Lists exist the Item is present exactly once in Shared `SYSTEM_SAVED`,
+- future new membership does not retroactively revoke the historical consensus.
+
+Custom Shared Lists do not affect the prediction model as unanimous votes by default. They are organizational state unless later evidence semantics are explicitly defined.
+
+## ScenarioMemory
+
+Future ScenarioMemory encodes a current scenario and retrieves similar historical scenarios from:
+
+- PersonalProfile history,
+- SharedProfile history,
+- population history.
+
+Conceptually:
+
+```text
+CurrentScenario
+   -> similarity retrieval
+   -> top N historical scenarios
+   -> weight by similarity, outcome quality, recency and confidence
+   -> scenario signal
+```
+
+This contributes to ranking; it does not override the rest of the model.
+
+## Population learning
+
+Cold start begins with generic/content-based signals and optionally weak demographic priors. As behavioral evidence grows:
+
+```text
+actual behavior > demographic prior
+personal/shared evidence increasingly > generic population prior
+```
 
 ## Future evolution engine
 
-The architecture should later support populations of predictor configurations/genomes with parameters such as long-term weight, short-term weight, scenario weight, population weight, novelty weight, decay rate, memory depth and similarity thresholds.
+Architecture later supports populations of predictor configurations/genomes with parameters such as long-term weight, short-term weight, scenario weight, population weight, novelty weight, decay rate, memory depth and similarity thresholds.
 
-Evolution must optimize measurable prediction outcomes. The MVP must collect the prediction/outcome linkage needed for that later step.
+Evolution optimizes measurable prediction outcomes. MVP must retain prediction/outcome linkage needed for that later step.
