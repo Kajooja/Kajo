@@ -3,13 +3,17 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createSharedProfile,
   inviteSharedProfileMember,
+  leaveSharedProfile,
   loadSharedProfileInvitations,
   loadSharedProfiles,
   mapSharedProfileCreation,
   mapSharedProfileInvitationCreation,
   mapSharedProfileInvitationResponse,
   mapSharedProfileInvitations,
+  mapSharedProfileLeave,
   mapSharedProfiles,
+  MAXIMUM_SHARED_PROFILE_NAME_LENGTH,
+  MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH,
   respondSharedProfileInvitation,
   SHARED_PROFILE_RPC,
   validateSharedProfileName,
@@ -72,6 +76,13 @@ const ACCEPT_ROW = {
   is_ready: true,
 };
 
+const LEAVE_ROW = {
+  profile_id: 'shared-1',
+  profile_name: 'Meidän Kajo',
+  remaining_member_count: 1,
+  profile_deleted: false,
+};
+
 describe('SharedProfile validation', () => {
   it('normalizes display text while preserving casing', () => {
     expect(validateSharedProfileName('  Meidän   Kajo  ')).toEqual({
@@ -84,17 +95,32 @@ describe('SharedProfile validation', () => {
     });
   });
 
+  it('accepts the compact maximum boundaries', () => {
+    expect(
+      validateSharedProfileName('R'.repeat(MAXIMUM_SHARED_PROFILE_NAME_LENGTH)),
+    ).toMatchObject({ status: 'valid' });
+    expect(
+      validateSharedProfileNickname(
+        'N'.repeat(MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH),
+      ),
+    ).toMatchObject({ status: 'valid' });
+  });
+
   it('rejects invalid boundaries', () => {
     expect(validateSharedProfileName('K')).toMatchObject({ status: 'invalid' });
-    expect(validateSharedProfileName('K'.repeat(65))).toMatchObject({
-      status: 'invalid',
-    });
+    expect(
+      validateSharedProfileName(
+        'K'.repeat(MAXIMUM_SHARED_PROFILE_NAME_LENGTH + 1),
+      ),
+    ).toMatchObject({ status: 'invalid' });
     expect(validateSharedProfileNickname('K')).toMatchObject({
       status: 'invalid',
     });
-    expect(validateSharedProfileNickname('K'.repeat(33))).toMatchObject({
-      status: 'invalid',
-    });
+    expect(
+      validateSharedProfileNickname(
+        'K'.repeat(MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH + 1),
+      ),
+    ).toMatchObject({ status: 'invalid' });
   });
 });
 
@@ -218,7 +244,28 @@ describe('SharedProfile mapping', () => {
     });
   });
 
-  it('rejects inconsistent invitation payloads', () => {
+  it('maps leave results for retained and deleted profiles', () => {
+    expect(mapSharedProfileLeave([LEAVE_ROW])).toEqual({
+      status: 'success',
+      leave: {
+        profileId: 'shared-1',
+        profileName: 'Meidän Kajo',
+        remainingMemberCount: 1,
+        profileDeleted: false,
+      },
+    });
+
+    expect(
+      mapSharedProfileLeave([
+        { ...LEAVE_ROW, remaining_member_count: 0, profile_deleted: true },
+      ]),
+    ).toMatchObject({
+      status: 'success',
+      leave: { remainingMemberCount: 0, profileDeleted: true },
+    });
+  });
+
+  it('rejects inconsistent invitation and leave payloads', () => {
     expect(
       mapSharedProfileInvitations([{ ...INVITATION_ROW, created_at: 'bad-date' }]),
     ).toMatchObject({ status: 'error' });
@@ -235,6 +282,11 @@ describe('SharedProfile mapping', () => {
     expect(
       mapSharedProfileInvitationResponse([
         { ...ACCEPT_ROW, member_count: 1, is_ready: true },
+      ]),
+    ).toMatchObject({ status: 'error' });
+    expect(
+      mapSharedProfileLeave([
+        { ...LEAVE_ROW, remaining_member_count: 0, profile_deleted: false },
       ]),
     ).toMatchObject({ status: 'error' });
   });
@@ -323,6 +375,21 @@ describe('SharedProfile RPC operations', () => {
     });
   });
 
+  it('leaves the target SharedProfile through the typed RPC', async () => {
+    const rpc: SharedProfileRpc = vi.fn(async () => ({
+      data: [LEAVE_ROW],
+      error: null,
+    }));
+
+    await expect(leaveSharedProfile(rpc, 'shared-1')).resolves.toMatchObject({
+      status: 'success',
+      leave: { profileId: 'shared-1', remainingMemberCount: 1 },
+    });
+    expect(rpc).toHaveBeenCalledWith(SHARED_PROFILE_RPC.leave, {
+      target_profile_id: 'shared-1',
+    });
+  });
+
   it('maps missing user and self-invite errors without leaking backend detail', async () => {
     const missingRpc: SharedProfileRpc = vi.fn(async () => ({
       data: null,
@@ -362,6 +429,10 @@ describe('SharedProfile RPC operations', () => {
     ).resolves.toEqual({
       status: 'error',
       message: 'Ryhmäkutsuun vastaaminen epäonnistui. Yritä uudelleen.',
+    });
+    await expect(leaveSharedProfile(failingRpc, 'shared-1')).resolves.toEqual({
+      status: 'error',
+      message: 'Ryhmästä poistuminen epäonnistui. Yritä uudelleen.',
     });
   });
 });
