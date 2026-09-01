@@ -1,6 +1,6 @@
 # Sprint 010 — Navigation & Profile lifecycle
 
-Status: **ACTIVE — FINAL NAVIGATION POLISH (#149 / PR #150)**
+Status: **ACTIVE — RUNTIME COMPLETE, FINAL DEVICE ACCEPTANCE PENDING**
 Milestone: **MVP 0.1**
 
 ## Goal
@@ -33,7 +33,7 @@ Main navigation commit: `646999330758cf15a4cef6b929fef2b76990048d`.
 - `Poistu ryhmästä` requires destructive `Oletko varma?` confirmation,
 - leaving active SharedProfile falls back to PersonalProfile,
 - one remaining member keeps provisional SharedProfile/history,
-- final member leaving deletes the zero-member SharedProfile,
+- final member leaving deletes zero-member SharedProfile,
 - pending invitations involving departing member are cleaned,
 - privileged PersonalProfile completion logic lives in `private` behind a public SECURITY INVOKER wrapper.
 
@@ -47,39 +47,33 @@ Verification:
 
 ### Nickname input consistency — #143 / PR #147
 
-Both AuthGate nickname inputs stop at 24 characters. Final runtime main before polish: `60db8aae63bd1f86e8cc1cabb132294643b17a4b`.
+Both AuthGate nickname inputs stop at 24 characters.
 
-Its final-main workflow passed:
+Runtime main before final polish: `60db8aae63bd1f86e8cc1cabb132294643b17a4b`.
+Its main workflow passed lint, typecheck, tests, iOS/Android bundle smoke, standalone release APK and embedded JavaScript bundle verification. Configured Android review reported this build working.
 
-- lint,
-- typecheck,
-- tests,
-- iOS + Android bundle smoke,
-- standalone release APK,
-- embedded JavaScript bundle verification.
+## Final polish — #149 / PR #150 — MERGED
 
-Configured Android review reported this build working.
+Merged main commit: **`c10a4edc736965f3184cca3e477e2e4ccb9210ca`**.
 
-## Final polish — #149 / PR #150
+PR #150 CI passed lint, TypeScript, tests and iOS/Android bundle smoke.
 
-The final device review refined the shell without adding new navigation concepts:
+Delivered after configured Android review:
 
-1. bottom-center active Profile name becomes another Home action and returns to the active Profile Room,
-2. `Kirjaudu ulos` moves from Room to the bottom of the side drawer,
-3. standalone `Huone` heading is removed,
-4. `Huone on Kajo. Valitse kirjat tai elokuvat.` helper copy is removed,
+1. bottom-center active Profile name is another Home action and returns to the active Profile Room,
+2. `Kirjaudu ulos` moved from Room to the bottom of the side drawer,
+3. standalone `Huone` heading removed,
+4. `Huone on Kajo. Valitse kirjat tai elokuvat.` helper copy removed,
 5. home content between global bars is only the visual Room/navigation objects,
-6. the obsolete separate `Ehdota yhteiseen` panel/helper/tests are removed before Sprint 011's new Shared endorsement model.
-
-PR #150 must pass normal CI before merge. The next combined Android acceptance should verify only these polish changes plus existing shell regressions; there is no need to retest the retired `ITEM_SUGGESTED` behavior.
+6. obsolete separate `Ehdota yhteiseen` panel/helper/tests removed before Sprint 011's Shared Endorsement model.
 
 ## Sprint 009 dependency resolved
 
-Sprint 009/#125 is now **closed and accepted**. The old residual `ITEM_SUGGESTED` requirement was intentionally superseded rather than force-tested because the separate suggestion UI is no longer part of the product.
+Sprint 009/#125 is closed and accepted. The old residual `ITEM_SUGGESTED` requirement was intentionally superseded rather than force-tested because the separate suggestion UI is no longer part of the product.
 
-## Device acceptance for final polish
+## Final device acceptance
 
-After PR #150 is merged/buildable, verify:
+Use a standalone Android build from current main containing `c10a4ed` and verify:
 
 - top Kajo mark returns Home,
 - center active Profile identity also returns Home,
@@ -92,11 +86,13 @@ After PR #150 is merged/buildable, verify:
 - BOOK/MOVIE navigation and DiscoveryMode remain intact,
 - no `Ehdota yhteiseen` panel remains.
 
+No new runtime architecture should be added to Sprint 010 after this check. If this passes, close Sprint 010 and start #151.
+
 ## Next sprint
 
-Sprint 011 starts with **#151 Shared discovery member-history suppression + endorsement consensus** before **#102 named Lists**.
+Sprint 011 starts with **#151 Shared discovery member-history suppression + Endorsement consensus** before **#102 named Lists**.
 
-Do not implement #102 first: the system `Tallennetut` semantics for SharedProfile depend on #151 unanimity/pending-endorsement behavior.
+Do not implement #102 first: Shared `Tallennetut` system-list semantics depend on #151 unanimity/pending-Endorsement behavior.
 
 After #151:
 
