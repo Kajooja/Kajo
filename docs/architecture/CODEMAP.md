@@ -42,14 +42,14 @@ supabase/functions/password-auth/
 | Authentication | `apps/mobile/app/auth/`, `apps/mobile/src/features/auth/` | Persisted auth, unique email/nickname registration, email-or-nickname login, confirmation/recovery callbacks |
 | Password auth boundary | `supabase/functions/password-auth/` | Server-side email/nickname resolution without returning resolved auth email or privileged keys |
 | Auth email callback | `supabase/functions/auth-callback/` | HTTPS callback hop forwarding verification token hashes to mobile app |
-| Prediction service | `public.rank_items_v0` via `supabase/migrations/20260831093000_prediction_v0_foundation.sql` and later scorer migrations | Server-owned generic scorer targeting authorized Profile; #151 will extend Shared eligibility/common-fit and actor-specific pending-Endorsement delivery without creating a second predictor |
+| Prediction service | `public.rank_items_v0` via `supabase/migrations/20260831093000_prediction_v0_foundation.sql` and later scorer migrations | Server-owned generic scorer targeting authorized Profile; the temporary V0 core remains unchanged while #151 adds prediction-core-independent eligibility/collaboration composition. Common-fit formula work is gated by #156 |
 | Shared membership | `supabase/migrations/20260831171000_shared_profile_membership_foundation.sql`, `20260831172000_fix_shared_profile_member_conflict.sql` | Existing `profiles` + accepted `profile_members`, membership-scoped visibility and 2+ readiness |
 | Shared invitations | `supabase/migrations/20260831200429_shared_profile_invitations.sql` | Pending consent separate from accepted membership; invite/list/respond RPCs and authorization |
 | Profile lifecycle | `supabase/migrations/20260901082902_profile_lifecycle_limits_and_leave.sql` | 24/32 identity limits, safe Shared leave lifecycle and hardened PersonalProfile completion wrapper |
 | Lists | planned under #102 | Do not create implementation before #151. Planned generic `ItemList`/entries with `SYSTEM_SAVED` + `CUSTOM` |
-| Shared Endorsement | planned under #151 | Will require current actor/Profile/Item endorsement state, RLS, new canonical Events, scorer eligibility/common-fit/delivery integration and consensus -> Shared Saved projection |
+| Shared Endorsement | `supabase/migrations/20260901122000_shared_endorsement_state.sql`, `20260901124000_shared_endorsement_item_index.sql` | #151 backend foundation: membership-scoped actor/Profile/Item state, idempotent endorse/reverse RPCs, unanimous consensus -> Shared Saved projection, Event vocabulary and leave cleanup. Mobile Event/delivery integration remains next |
 | Messaging | planned under #138 | Starts after Lists; Profile-scoped narrow chat/thread only |
-| DB migrations | `supabase/migrations/` | Identity/current state, Event persistence, Prediction V0, feedback/cooldown, Shared membership/invitations/lifecycle with explicit grants/RLS |
+| DB migrations | `supabase/migrations/` | Identity/current state, Event persistence, Prediction V0, feedback/cooldown, Shared membership/invitations/lifecycle and Shared Endorsement state with explicit grants/RLS |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; main also builds/verifies/uploads standalone Android APK |
 
 Do not create empty feature folders merely to match future architecture. #151 should extend the generic Profile/Prediction boundaries rather than create `GroupTaste`, media-specific queues or a second recommender.
