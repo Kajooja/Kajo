@@ -69,6 +69,8 @@ Sprint 011 has two ordered slices.
 
 ### 11A — #151 Shared discovery + Endorsement consensus
 
+Backend state/consensus foundation is merged in PR #157. The next delivery slice adds the authorized member-history/pending overlay and mobile `Tykkää`/provenance flow without changing `rank_items_v0` core weights. Configured Android acceptance is still required before 11A can be marked complete.
+
 1. Any accepted member's PersonalProfile consumed/rated Item is excluded from ordinary Shared discovery.
 2. Shared Prediction remains Profile-targeted while using inspectable common-fit evidence from accepted members plus disagreement handling.
 3. One member's Shared positive quick action becomes actor-specific `Endorsement`, not Shared saved state.
@@ -99,6 +101,7 @@ Do not implement #102 before #151 is stable. Do not start chat before the List m
 
 ## Other open work
 
+- #156 — Prediction Core / EvoBot architecture design gate. Common-fit coefficients, final LongTerm/ShortTermState, ScenarioMemory and EvoBot remain blocked until the user-approved MVP core design is documented.
 - #127 — production-ready auth email delivery; production SMTP/domain and confirmation/recovery tests remain required before external beta.
 - #78 — optional splash/in-app logo polish.
 - #73 — Google/Apple sign-in future work.

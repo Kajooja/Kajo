@@ -26,6 +26,7 @@ import type {
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
+import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import {
   createUuidV7,
 } from '../events/eventTracking';
@@ -36,6 +37,7 @@ import {
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
+import { useSharedEndorsements } from './SharedEndorsementContext';
 import {
   buildSwipeSequence,
   getItemInteraction,
@@ -49,6 +51,34 @@ import {
 } from './itemInteractionLabels';
 import { getMockItem, getRankedMockItems } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
+import {
+  applySharedDiscoveryOverlay,
+  formatEndorsementProvenance,
+  getPendingEndorserNicknames,
+  type SharedDiscoveryStateMap,
+} from './sharedEndorsement';
+
+function buildEligibleSwipeSequence(
+  selectedItem: Item | undefined,
+  mode: ReturnType<typeof useDiscoveryMode>['mode'],
+  interactions: Parameters<typeof buildSwipeSequence>[2],
+  isSharedProfile: boolean,
+  sharedOverlayReady: boolean,
+  sharedStateByItemId: SharedDiscoveryStateMap,
+): readonly Item[] {
+  if (!selectedItem || !sharedOverlayReady) return [];
+
+  const rankedItems = getRankedMockItems(selectedItem.itemType, mode);
+  const eligibleItems = isSharedProfile
+    ? applySharedDiscoveryOverlay(
+        rankedItems,
+        selectedItem.itemType,
+        sharedStateByItemId,
+      )
+    : rankedItems;
+
+  return buildSwipeSequence(selectedItem, eligibleItems, interactions);
+}
 
 interface ItemDetailScreenProps {
   itemId: ItemId;
@@ -59,11 +89,63 @@ interface ItemDetailScreenProps {
 export function ItemDetailScreen({
   itemId,
   predictionId,
+  predictionSource,
+}: ItemDetailScreenProps) {
+  const { mode } = useDiscoveryMode();
+  const activeProfile = useActiveProfile();
+  const sharedEndorsements = useSharedEndorsements();
+  const isSharedProfile = activeProfile.activeProfile?.type === 'SHARED';
+
+  if (isSharedProfile && sharedEndorsements.status !== 'ready') {
+    const theme = getRoomTheme(getAmbientPhase(mode));
+    const styles = createStyles(theme);
+
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+        <StatusBar style="light" />
+        <View style={styles.missing}>
+          <Text accessibilityLiveRegion="polite" style={styles.title}>
+            {sharedEndorsements.status === 'error'
+              ? 'Yhteisiä valintoja ei saatu ladattua.'
+              : 'Yhteisiä valintoja päivitetään…'}
+          </Text>
+          {sharedEndorsements.status === 'error' ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Retry shared choices"
+              onPress={sharedEndorsements.retry}
+              style={({ pressed }) => [
+                styles.primaryButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.primaryButtonText}>Yritä uudelleen</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <ItemDetailContent
+      itemId={itemId}
+      {...(predictionId ? { predictionId } : {})}
+      {...(predictionSource ? { predictionSource } : {})}
+    />
+  );
+}
+
+function ItemDetailContent({
+  itemId,
+  predictionId,
   predictionSource = 'fallback',
 }: ItemDetailScreenProps) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
+  const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
+  const sharedEndorsements = useSharedEndorsements();
   const {
     interactions,
     toggleSaved,
@@ -72,22 +154,40 @@ export function ItemDetailScreen({
     canUndo,
     undoTargetItemId,
     undo,
+    retryHydration,
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode));
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
+  const activeSharedMembership =
+    activeProfile.activeProfile?.type === 'SHARED'
+      ? activeProfile.sharedProfiles.find(
+          (membership) =>
+            membership.profile.id === activeProfile.activeProfile?.id,
+        ) ?? null
+      : null;
   const [recommendationTraceId] = useState<PredictionId>(
     () => predictionId ?? createUuidV7(),
   );
-  const rankedItems = selectedItem ? getRankedMockItems(selectedItem.itemType, mode) : [];
+  const sharedOverlayReady =
+    !activeSharedMembership || sharedEndorsements.status === 'ready';
   const [items] = useState<readonly Item[]>(() =>
-    selectedItem ? buildSwipeSequence(selectedItem, rankedItems, interactions) : [],
+    buildEligibleSwipeSequence(
+      selectedItem,
+      mode,
+      interactions,
+      Boolean(activeSharedMembership),
+      sharedOverlayReady,
+      sharedEndorsements.stateByItemId,
+    ),
   );
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
+  const [endorsingItemId, setEndorsingItemId] = useState<ItemId | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+
   const recordItemImpression = useCallback(
     (item: Item) => {
       eventTracking.recordEvent({
@@ -205,6 +305,60 @@ export function ItemDetailScreen({
     );
   }
 
+  async function handleEndorsement(item: Item, index: number) {
+    if (exitingItemId || endorsingItemId) return;
+
+    setEndorsingItemId(item.id);
+    const result = await sharedEndorsements.endorse(item.id);
+    setEndorsingItemId(null);
+
+    if (result.status === 'error') {
+      setFeedback(result.message);
+      return;
+    }
+
+    if (result.commit.endorsementCreated) {
+      eventTracking.recordEvent({
+        eventType: 'ITEM_ENDORSED',
+        itemId: item.id,
+        itemType: item.itemType,
+        predictionId: recommendationTraceId,
+        discoveryMode: mode,
+        properties: {
+          source: 'SHARED_DISCOVERY',
+          predictionSource,
+          endorsementCount: result.commit.endorsementCount,
+          requiredMemberCount: result.commit.requiredMemberCount,
+        },
+      });
+    }
+
+    if (result.commit.consensusReached) {
+      eventTracking.recordEvent({
+        eventType: 'ITEM_SAVED',
+        itemId: item.id,
+        itemType: item.itemType,
+        predictionId: recommendationTraceId,
+        discoveryMode: mode,
+        properties: {
+          source: 'SHARED_CONSENSUS',
+          predictionSource,
+          endorsementCount: result.commit.endorsementCount,
+          requiredMemberCount: result.commit.requiredMemberCount,
+        },
+      });
+      retryHydration();
+    }
+
+    advanceAfterAction(
+      item,
+      index,
+      result.commit.consensusReached
+        ? ITEM_INTERACTION_LABELS.consensusFeedback
+        : ITEM_INTERACTION_LABELS.endorsedFeedback,
+    );
+  }
+
   function handleCommittedAction(
     item: Item,
     index: number,
@@ -245,6 +399,14 @@ export function ItemDetailScreen({
       );
     }
 
+    advanceAfterAction(item, index, nextFeedback);
+  }
+
+  function advanceAfterAction(
+    item: Item,
+    index: number,
+    nextFeedback: string,
+  ) {
     setFeedback(nextFeedback);
 
     const nextIndex = getNextSwipeIndex(index, items.length);
@@ -418,6 +580,20 @@ export function ItemDetailScreen({
             {feedback}
           </Text>
         ) : null}
+        {activeSharedMembership && sharedEndorsements.status === 'error' ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Retry shared choices"
+            onPress={sharedEndorsements.retry}
+          >
+            <Text style={styles.feedbackText}>{sharedEndorsements.error}</Text>
+          </Pressable>
+        ) : null}
+        {activeSharedMembership && sharedEndorsements.status === 'loading' ? (
+          <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>
+            Yhteisiä valintoja päivitetään…
+          </Text>
+        ) : null}
       </View>
 
       <FlatList
@@ -433,6 +609,14 @@ export function ItemDetailScreen({
         renderItem={({ item, index }) => {
           const interaction = getItemInteraction(interactions, item.id);
           const exiting = item.id === exitingItemId;
+          const sharedState = sharedEndorsements.stateByItemId[item.id];
+          const endorsementProvenance = formatEndorsementProvenance(
+            getPendingEndorserNicknames(
+              sharedState,
+              activeSharedMembership?.members ?? [],
+              activeProfile.actorUserId,
+            ),
+          );
 
           return (
             <Animated.View
@@ -466,12 +650,20 @@ export function ItemDetailScreen({
                 pageWidth={width}
                 theme={theme}
                 styles={styles}
-                disabled={Boolean(exitingItemId)}
+                disabled={Boolean(exitingItemId || endorsingItemId)}
+                isSharedProfile={Boolean(activeSharedMembership)}
+                currentActorEndorsed={Boolean(sharedState?.currentActorEndorsed)}
+                endorsementDisabled={
+                  Boolean(activeSharedMembership) &&
+                  sharedEndorsements.status !== 'ready'
+                }
+                endorsementProvenance={endorsementProvenance}
                 onRating={(rating) => handleRating(item, index, interaction, rating)}
                 onNotInterested={() =>
                   handleNotInterested(item, index, interaction)
                 }
                 onToggleSaved={() => handleSaved(item, index, interaction)}
+                onEndorse={() => void handleEndorsement(item, index)}
               />
             </Animated.View>
           );
@@ -488,9 +680,14 @@ interface SwipeItemPageProps {
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   disabled: boolean;
+  isSharedProfile: boolean;
+  currentActorEndorsed: boolean;
+  endorsementDisabled: boolean;
+  endorsementProvenance: string | null;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
   onToggleSaved: () => void;
+  onEndorse: () => void;
 }
 
 function SwipeItemPage({
@@ -500,9 +697,14 @@ function SwipeItemPage({
   theme,
   styles,
   disabled,
+  isSharedProfile,
+  currentActorEndorsed,
+  endorsementDisabled,
+  endorsementProvenance,
   onRating,
   onNotInterested,
   onToggleSaved,
+  onEndorse,
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
@@ -559,6 +761,12 @@ function SwipeItemPage({
         </View>
       ) : null}
 
+      {endorsementProvenance ? (
+        <Text style={styles.endorsementProvenance}>
+          {endorsementProvenance}
+        </Text>
+      ) : null}
+
       <View style={styles.feedbackDrawer} accessibilityLabel="Arvioi kohde">
         <RatingControl
           rating={interaction.rating}
@@ -577,15 +785,23 @@ function SwipeItemPage({
           />
           <ActionButton
             label={
-              interaction.saved
-                ? ITEM_INTERACTION_LABELS.saved
-                : ITEM_INTERACTION_LABELS.save
+              isSharedProfile
+                ? currentActorEndorsed
+                  ? ITEM_INTERACTION_LABELS.endorsed
+                  : ITEM_INTERACTION_LABELS.endorse
+                : interaction.saved
+                  ? ITEM_INTERACTION_LABELS.saved
+                  : ITEM_INTERACTION_LABELS.save
             }
-            active={interaction.saved}
-            disabled={disabled}
+            active={isSharedProfile ? currentActorEndorsed : interaction.saved}
+            disabled={
+              disabled ||
+              (isSharedProfile &&
+                (endorsementDisabled || currentActorEndorsed))
+            }
             theme={theme}
             styles={styles}
-            onPress={onToggleSaved}
+            onPress={isSharedProfile ? onEndorse : onToggleSaved}
           />
         </View>
       </View>
@@ -814,6 +1030,12 @@ function createStyles(theme: RoomTheme) {
     feedbackDrawer: {
       marginTop: 14,
       gap: 10,
+    },
+    endorsementProvenance: {
+      color: theme.ambient.curtainHighlight,
+      fontSize: 12,
+      fontWeight: '700',
+      marginTop: 12,
     },
     actionButton: {
       width: '48%',

@@ -47,7 +47,7 @@ properties?
 - `ITEM_ENDORSED` — actual actor, while acting inside a SharedProfile, marks an Item worth doing together. This is **actor-specific pending state**, not Shared `saved=true`.
 - `ITEM_ENDORSEMENT_REVERSED` — actor explicitly removes their active pre-consensus Endorsement if reversal is exposed.
 
-These Event types are canonical product semantics but require the #151 persistence migration before runtime emission. Do not emit them until database constraints/grants and current-state storage support them.
+The #151 persistence migration supports these Event types. Mobile runtime emits `ITEM_ENDORSED` only after the actor-specific endorsement RPC succeeds. It emits the consensus `ITEM_SAVED` evidence only when the same RPC reports the one successful consensus transition.
 
 At unanimous accepted-member consensus, Kajo also appends canonical Shared save evidence:
 

@@ -19,6 +19,7 @@ import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
+import { useSharedEndorsements } from './SharedEndorsementContext';
 import {
   getConsumedItems,
   getDiscoverableItems,
@@ -26,6 +27,11 @@ import {
   type ItemInteraction,
 } from './itemInteraction';
 import { getConsumedItemLabels } from './itemInteractionLabels';
+import {
+  applySharedDiscoveryOverlay,
+  formatEndorsementProvenance,
+  getPendingEndorserNicknames,
+} from './sharedEndorsement';
 import { usePredictionRanking } from './usePredictionRanking';
 
 interface DiscoveryScreenProps {
@@ -37,16 +43,36 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const { interactions } = useItemInteractions();
+  const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const [showConsumed, setShowConsumed] = useState(false);
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const ranking = usePredictionRanking(itemType, mode, interactions);
-  const rankedItems = ranking.items;
-  const consumedItems = getConsumedItems(rankedItems, interactions);
+  const activeSharedMembership =
+    activeProfile.activeProfile?.type === 'SHARED'
+      ? activeProfile.sharedProfiles.find(
+          (membership) =>
+            membership.profile.id === activeProfile.activeProfile?.id,
+        ) ?? null
+      : null;
+  const isSharedDiscovery = Boolean(activeSharedMembership);
+  const sharedOverlayReady =
+    !isSharedDiscovery || sharedEndorsements.status === 'ready';
+  const rankedItems =
+    isSharedDiscovery && sharedEndorsements.status === 'ready'
+      ? applySharedDiscoveryOverlay(
+          ranking.items,
+          itemType,
+          sharedEndorsements.stateByItemId,
+        )
+      : ranking.items;
+  const consumedItems = getConsumedItems(ranking.items, interactions);
   const items = showConsumed
     ? consumedItems
-    : getDiscoverableItems(rankedItems, interactions);
+    : sharedOverlayReady
+      ? getDiscoverableItems(rankedItems, interactions)
+      : [];
   const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
   const visibleItems = useRef<readonly Item[]>([]);
@@ -109,6 +135,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   ]);
 
   function openItem(item: Item) {
+    const sharedState = sharedEndorsements.stateByItemId[item.id];
+
     eventTracking.recordEvent({
       eventType: 'ITEM_OPENED',
       itemId: item.id,
@@ -118,6 +146,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       properties: {
         source: 'DISCOVERY_GRID',
         predictionSource: ranking.source,
+        pendingEndorsement: Boolean(sharedState?.pendingEndorsement),
       },
     });
 
@@ -209,6 +238,26 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           </View>
         ) : null}
 
+        {isSharedDiscovery && sharedEndorsements.status !== 'ready' ? (
+          <View style={styles.predictionNotice}>
+            <Text accessibilityLiveRegion="polite" style={styles.predictionNoticeText}>
+              {sharedEndorsements.status === 'error'
+                ? sharedEndorsements.error
+                : 'Yhteisiä valintoja päivitetään…'}
+            </Text>
+            {sharedEndorsements.status === 'error' ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Retry shared choices"
+                onPress={sharedEndorsements.retry}
+                style={({ pressed }) => [styles.retryButton, pressed && styles.pressed]}
+              >
+                <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
+
         <FlatList
           data={items}
           keyExtractor={(item) => item.id}
@@ -229,16 +278,25 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                   : 'Kaikki elokuvat on jo merkitty katsotuiksi.'}
             </Text>
           }
-          renderItem={({ item, index }) => (
-            <ItemCard
-              item={item}
-              index={index}
-              interaction={getItemInteraction(interactions, item.id)}
-              theme={theme}
-              styles={styles}
-              onOpen={() => openItem(item)}
-            />
-          )}
+          renderItem={({ item, index }) => {
+            const nicknames = getPendingEndorserNicknames(
+              sharedEndorsements.stateByItemId[item.id],
+              activeSharedMembership?.members ?? [],
+              activeProfile.actorUserId,
+            );
+
+            return (
+              <ItemCard
+                item={item}
+                index={index}
+                interaction={getItemInteraction(interactions, item.id)}
+                endorsementProvenance={formatEndorsementProvenance(nicknames)}
+                theme={theme}
+                styles={styles}
+                onOpen={() => openItem(item)}
+              />
+            );
+          }}
         />
       </View>
     </SafeAreaView>
@@ -249,6 +307,7 @@ interface ItemCardProps {
   item: Item;
   index: number;
   interaction: ItemInteraction;
+  endorsementProvenance: string | null;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   onOpen: () => void;
@@ -258,6 +317,7 @@ function ItemCard({
   item,
   index,
   interaction,
+  endorsementProvenance,
   theme,
   styles,
   onOpen,
@@ -299,6 +359,11 @@ function ItemCard({
           {item.title}
         </Text>
       </View>
+      {endorsementProvenance ? (
+        <Text numberOfLines={1} style={styles.endorsementProvenance}>
+          {endorsementProvenance}
+        </Text>
+      ) : null}
       <Text numberOfLines={2} style={styles.cardTitle}>
         {item.title}
       </Text>
@@ -496,6 +561,12 @@ function createStyles(theme: RoomTheme) {
       lineHeight: 18,
       fontWeight: '600',
       marginTop: 8,
+    },
+    endorsementProvenance: {
+      color: theme.ambient.curtainHighlight,
+      fontSize: 11,
+      fontWeight: '700',
+      marginTop: 7,
     },
     cardTag: {
       color: theme.base.textMuted,

@@ -127,6 +127,13 @@ Start only after 11A is stable.
 6. Update STATUS/MVP/CODEMAP/Event/Prediction docs at each completed slice.
 7. Close Sprint 011 only when both 11A and 11B are accepted.
 
+## Progress
+
+- PR #157 merged the prediction-core-independent Endorsement current state, membership authorization, idempotent endorse/reverse RPCs, unanimity -> Shared Saved projection, Event vocabulary and leave cleanup.
+- The active follow-up implements the separate authorized Shared discovery overlay plus mobile `Tykkää`, pending provenance and queue composition.
+- #156 gates common-fit coefficients and all final EvoBot/LongTermState/ShortTermState/ScenarioMemory algorithm work until the user-approved Prediction Core MVP design is canonical.
+- 11A remains open until hosted overlay/RLS verification, CI and configured Android acceptance pass.
+
 ## Room/navigation constraint during this sprint
 
 Preserve the accepted Sprint 010 shell and approved Room direction:
