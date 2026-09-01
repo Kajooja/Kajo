@@ -19,15 +19,23 @@ Profile
   +--> HumanState
   +--> Theme
   +--> Memory
+  +--> ItemList
   +--> Prediction ----> Item
          |
          +--> Context
          +--> DiscoveryMode
+
+SharedProfile
+  +--> Endorsement (actor-specific, Item-specific)
+         |
+         +--> unanimous accepted-member consensus
+                  |
+                  +--> Shared Saved / SYSTEM_SAVED
 ```
 
 ## User
 
-A `User` is an account/human identity. A User performs actions. MVP identity includes one unique nickname and one unique authentication email linked to the same account. The nickname is both user-visible identity and a login identifier. Its stored/display casing is preserved exactly (for example `KeTTu`), while uniqueness, sign-in and later nickname search are case-insensitive (`KeTTu`, `kettu` and `KETTU` resolve to the same nickname identity).
+A `User` is an account/human identity. A User performs actions. MVP identity includes one unique nickname and one unique authentication email linked to the same account. Nickname display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
 
 User is intentionally distinct from Profile because the same User can act in a PersonalProfile and several SharedProfiles.
 
@@ -39,17 +47,65 @@ Invariant: every Prediction belongs to exactly one Profile.
 
 ### PersonalProfile
 
-Represents one user's personal Kajo context.
+Represents one User's personal Kajo context.
 
-Invariant: one User owns at most one PersonalProfile. Configured onboarding
-must complete the User, PersonalProfile and ProfileMember identity before the
-User enters the personal Room.
+Invariant: one User owns at most one PersonalProfile. Configured onboarding completes User, PersonalProfile and ProfileMember identity before entering the personal Room.
 
 ### SharedProfile
 
-Represents 2-N users together. It has its own learned state and may develop preferences that do not equal any simple average of member PersonalProfiles.
+Represents 2-N accepted Users together. It has its own learned state and may develop preferences that do not equal a simple average of member PersonalProfiles.
 
-Invariant: an Event in SharedProfile context still retains the acting `actorUserId`.
+Invariants:
+
+- an Event in SharedProfile context retains the actual acting `actorUserId`,
+- `profile_members` represents accepted membership only,
+- pending invitations are not membership,
+- prediction target remains the SharedProfile even when accepted-member PersonalProfile evidence contributes to an inspectable common-fit signal,
+- actor-specific collaboration delivery may change which pending endorsed Item a member sees first without creating a separate per-member recommender.
+
+## Shared discovery eligibility
+
+Ordinary SharedProfile discovery must not recommend an Item that any currently accepted member has already consumed in that member's PersonalProfile.
+
+For MVP, either `consumed = true` or a non-null rating is sufficient consumed evidence.
+
+This is a **discovery eligibility rule**, not data deletion:
+
+- the Item may remain in a named List,
+- the Item may remain in Saved/history,
+- the UI may continue to show watched/read/rating state on those historical/organizational surfaces.
+
+A PersonalProfile save alone does not make the Item ineligible for Shared discovery.
+
+## Endorsement and SharedConsensus
+
+An `Endorsement` is an actor-specific positive decision made while acting inside a SharedProfile: this Item is worth doing together.
+
+A single Endorsement is intentionally not the same thing as Shared `saved=true`.
+
+Current-state invariant:
+
+```text
+one active Endorsement per (profileId, itemId, actorUserId)
+```
+
+Pending behavior:
+
+- after User A endorses Item X, X leaves A's ordinary Shared discovery queue,
+- accepted members who have not endorsed X may receive X ahead of ordinary recommendations,
+- delivery provenance identifies the real endorser,
+- this actor-specific priority is collaboration state layered onto the SharedProfile Prediction, not a separate taste model.
+
+`SharedConsensus` is reached when every currently accepted member has an active Endorsement for the Item.
+
+At consensus:
+
+- SharedProfile Saved/current-state projection becomes true,
+- the Item is promoted once to the Shared `SYSTEM_SAVED` / `Tallennetut` List when Lists exist,
+- the Item leaves ordinary Shared discovery,
+- the reached consensus becomes durable shared history; a later new member does not retroactively revoke it.
+
+Custom Shared Lists are not consensus-vote mechanisms. Accepted members may explicitly curate custom Lists according to List authorization rules and real `addedByUserId` provenance.
 
 ## Item
 
@@ -63,11 +119,22 @@ Domain-specific metadata may extend Item:
 - MOVIE: runtime, director, cast.
 - EVENT later: location, start/end time, price.
 
-Prediction code should consume generic features/contracts rather than be coupled to external provider schemas.
+Prediction code should consume generic features/contracts rather than external provider schemas.
+
+## ItemList
+
+An `ItemList` is owned by exactly one Profile.
+
+MVP planned List kinds:
+
+- `SYSTEM_SAVED` — exactly one system `Tallennetut` List per Profile,
+- `CUSTOM` — user-named collaborative/personal Lists.
+
+`ItemListEntry` stores List/Item relation plus adding actor/time. It does not copy consumed/rating state.
 
 ## Event
 
-An Event records something meaningful that happened. At minimum event semantics should be capable of retaining:
+An Event records something meaningful that happened. At minimum it can retain:
 
 - actor User,
 - Profile context,
@@ -86,8 +153,8 @@ HumanState is a learned representation used by Prediction.
 
 Conceptually it contains:
 
-- `LongTermState`: slowly changing identity/taste tendencies.
-- `ShortTermState`: recent/current tendencies.
+- `LongTermState`: slowly changing identity/taste tendencies,
+- `ShortTermState`: recent/current tendencies,
 - optional session-level state later.
 
 It must remain capable of cross-domain learning.
@@ -100,6 +167,8 @@ A Prediction is defined conceptually by:
 Profile + HumanState + Context + Item + DiscoveryMode -> predicted outcomes / score / confidence
 ```
 
+For SharedProfile, accepted-member PersonalProfile evidence may contribute to a common-fit component while the Prediction still belongs to the SharedProfile.
+
 ## Scenario
 
 A Scenario is historical evidence combining state, context, candidate/pattern, prediction and observed outcome.
@@ -108,8 +177,12 @@ ScenarioMemory later retrieves similar scenarios across personal/shared/populati
 
 ## Consumed experience / memory
 
-Consumed Items form history. The MVP stores consumed state and simple rating. The model must leave extension points for future note, memory text, images, date, location and people.
+Consumed Items form history. The MVP stores consumed state and simple rating. The model leaves extension points for future note, memory text, images, date, location and people.
 
-## Important separation
+## Important separations
 
-An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile. Kajo needs both actor identity and profile context to learn this distinction.
+- An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile.
+- A PersonalProfile consumed outcome may still suppress the same Item from Shared discovery because it changes joint eligibility, not because the Shared action is copied into Personal state.
+- Pending Endorsement is not Shared Saved state.
+- Custom Shared List membership is not unanimous consensus.
+- Actor-specific pending delivery is not a separate per-User Prediction model.
