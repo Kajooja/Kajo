@@ -6,6 +6,7 @@ export const SHARED_PROFILE_RPC = {
   inviteMember: 'invite_shared_profile_member',
   listInvitations: 'get_my_shared_profile_invitations',
   respondInvitation: 'respond_shared_profile_invitation',
+  leave: 'leave_shared_profile',
 } as const;
 
 interface RpcErrorLike {
@@ -63,6 +64,13 @@ export interface SharedProfileInvitationResponse {
   isReady: boolean;
 }
 
+export interface SharedProfileLeave {
+  profileId: string;
+  profileName: string;
+  remainingMemberCount: number;
+  profileDeleted: boolean;
+}
+
 export type SharedProfileListResult =
   | { status: 'success'; profiles: readonly SharedProfileMembership[] }
   | { status: 'error'; message: string };
@@ -83,6 +91,10 @@ export type SharedProfileInvitationResponseResult =
   | { status: 'success'; response: SharedProfileInvitationResponse }
   | { status: 'error'; message: string };
 
+export type SharedProfileLeaveResult =
+  | { status: 'success'; leave: SharedProfileLeave }
+  | { status: 'error'; message: string };
+
 export type SharedProfileNameValidationResult =
   | { status: 'valid'; name: string }
   | { status: 'invalid'; message: string };
@@ -101,13 +113,15 @@ const SHARED_PROFILE_INVITATION_LIST_ERROR_MESSAGE =
   'Ryhmäkutsujen lataaminen epäonnistui. Yritä uudelleen.';
 const SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE =
   'Ryhmäkutsuun vastaaminen epäonnistui. Yritä uudelleen.';
+const SHARED_PROFILE_LEAVE_ERROR_MESSAGE =
+  'Ryhmästä poistuminen epäonnistui. Yritä uudelleen.';
 const SHARED_PROFILE_USER_NOT_FOUND_MESSAGE =
   'Tällä nimimerkillä ei löytynyt Kajo-käyttäjää.';
 const SHARED_PROFILE_SELF_INVITE_MESSAGE = 'Et voi kutsua itseäsi ryhmään.';
 const MINIMUM_SHARED_PROFILE_NAME_LENGTH = 2;
-const MAXIMUM_SHARED_PROFILE_NAME_LENGTH = 64;
+export const MAXIMUM_SHARED_PROFILE_NAME_LENGTH = 32;
 const MINIMUM_NICKNAME_LENGTH = 2;
-const MAXIMUM_NICKNAME_LENGTH = 32;
+export const MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH = 24;
 
 export function validateSharedProfileName(
   value: string,
@@ -150,10 +164,10 @@ export function validateSharedProfileNickname(
     };
   }
 
-  if (nickname.length > MAXIMUM_NICKNAME_LENGTH) {
+  if (nickname.length > MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH) {
     return {
       status: 'invalid',
-      message: `Nimimerkissä voi olla enintään ${MAXIMUM_NICKNAME_LENGTH} merkkiä.`,
+      message: `Nimimerkissä voi olla enintään ${MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH} merkkiä.`,
     };
   }
 
@@ -302,6 +316,29 @@ export async function respondSharedProfileInvitation(
       status: 'error',
       message: SHARED_PROFILE_INVITATION_RESPONSE_ERROR_MESSAGE,
     };
+  }
+}
+
+export async function leaveSharedProfile(
+  rpc: SharedProfileRpc,
+  profileId: string,
+): Promise<SharedProfileLeaveResult> {
+  if (!isNonEmptyString(profileId)) {
+    return { status: 'error', message: SHARED_PROFILE_LEAVE_ERROR_MESSAGE };
+  }
+
+  try {
+    const response = await rpc(SHARED_PROFILE_RPC.leave, {
+      target_profile_id: profileId,
+    });
+
+    if (response.error) {
+      return { status: 'error', message: SHARED_PROFILE_LEAVE_ERROR_MESSAGE };
+    }
+
+    return mapSharedProfileLeave(response.data);
+  } catch {
+    return { status: 'error', message: SHARED_PROFILE_LEAVE_ERROR_MESSAGE };
   }
 }
 
@@ -485,6 +522,40 @@ export function mapSharedProfileInvitationResponse(
       accepted: row.accepted,
       memberCount,
       isReady: row.is_ready,
+    },
+  };
+}
+
+export function mapSharedProfileLeave(data: unknown): SharedProfileLeaveResult {
+  const row = getSingleRow(data);
+
+  if (
+    !row ||
+    !isNonEmptyString(row.profile_id) ||
+    !isNonEmptyString(row.profile_name) ||
+    !Number.isInteger(row.remaining_member_count) ||
+    typeof row.profile_deleted !== 'boolean'
+  ) {
+    return { status: 'error', message: SHARED_PROFILE_LEAVE_ERROR_MESSAGE };
+  }
+
+  const remainingMemberCount = row.remaining_member_count as number;
+
+  if (
+    remainingMemberCount < 0 ||
+    (row.profile_deleted && remainingMemberCount !== 0) ||
+    (!row.profile_deleted && remainingMemberCount < 1)
+  ) {
+    return { status: 'error', message: SHARED_PROFILE_LEAVE_ERROR_MESSAGE };
+  }
+
+  return {
+    status: 'success',
+    leave: {
+      profileId: row.profile_id,
+      profileName: row.profile_name,
+      remainingMemberCount,
+      profileDeleted: row.profile_deleted,
     },
   };
 }
