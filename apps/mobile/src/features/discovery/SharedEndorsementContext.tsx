@@ -42,6 +42,7 @@ interface SharedEndorsementSnapshot {
   profileId: ProfileId;
   actorUserId: UserId;
   stateByItemId: SharedDiscoveryStateMap;
+  hasLoaded: boolean;
   error: string | null;
 }
 
@@ -91,14 +92,32 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     void loadSharedDiscoveryOverlay(rpc, profileId).then((result) => {
       if (!active) return;
 
-      setSnapshot({
-        profileId,
-        actorUserId,
-        stateByItemId:
-          result.status === 'success'
-            ? result.stateByItemId
-            : EMPTY_SHARED_DISCOVERY_STATE,
-        error: result.status === 'error' ? result.message : null,
+      setSnapshot((current) => {
+        if (result.status === 'success') {
+          return {
+            profileId,
+            actorUserId,
+            stateByItemId: result.stateByItemId,
+            hasLoaded: true,
+            error: null,
+          };
+        }
+
+        const currentState =
+          current?.profileId === profileId &&
+          current.actorUserId === actorUserId &&
+          current.hasLoaded
+            ? current
+            : null;
+
+        return {
+          profileId,
+          actorUserId,
+          stateByItemId:
+            currentState?.stateByItemId ?? EMPTY_SHARED_DISCOVERY_STATE,
+          hasLoaded: Boolean(currentState),
+          error: result.message,
+        };
       });
     });
 
@@ -130,6 +149,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     Boolean(activeSharedProfile),
     Boolean(rpc),
     hasCurrentSnapshot,
+    hasCurrentSnapshot ? snapshot?.hasLoaded ?? false : false,
     hasCurrentSnapshot ? snapshot?.error ?? null : null,
   );
   const stateByItemId =
@@ -223,6 +243,7 @@ function getStatus(
   isSharedProfile: boolean,
   hasRpc: boolean,
   hasSnapshot: boolean,
+  hasLoaded: boolean,
   error: string | null,
 ): SharedEndorsementStatus {
   if (connectionStatus === 'unconfigured' || profileStatus === 'disabled') {
@@ -232,5 +253,6 @@ function getStatus(
   if (!isSharedProfile) return 'inactive';
   if (!hasRpc || profileStatus !== 'ready') return 'inactive';
   if (!hasSnapshot) return 'loading';
-  return error ? 'error' : 'ready';
+  if (!hasLoaded && error) return 'error';
+  return hasLoaded ? 'ready' : 'loading';
 }

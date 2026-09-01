@@ -580,7 +580,7 @@ function ItemDetailContent({
             {feedback}
           </Text>
         ) : null}
-        {activeSharedMembership && sharedEndorsements.status === 'error' ? (
+        {activeSharedMembership && sharedEndorsements.error ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Retry shared choices"

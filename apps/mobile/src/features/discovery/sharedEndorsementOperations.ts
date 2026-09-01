@@ -118,7 +118,7 @@ export function mapSharedEndorsementCommit(
     !isNonEmptyString(row.item_id) ||
     !isNonEmptyString(row.actor_user_id) ||
     typeof row.endorsement_created !== 'boolean' ||
-    !isPositiveInteger(row.endorsement_count) ||
+    !isNonNegativeInteger(row.endorsement_count) ||
     !isPositiveInteger(row.required_member_count) ||
     typeof row.consensus_reached !== 'boolean' ||
     typeof row.consensus_saved !== 'boolean'
@@ -131,7 +131,9 @@ export function mapSharedEndorsementCommit(
 
   if (
     endorsementCount > requiredMemberCount ||
-    row.consensus_reached && !row.consensus_saved
+    row.endorsement_created && endorsementCount < 1 ||
+    row.consensus_reached &&
+      (!row.consensus_saved || endorsementCount !== requiredMemberCount)
   ) {
     return endorsementError();
   }
@@ -225,4 +227,8 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isPositiveInteger(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) >= 1;
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0;
 }

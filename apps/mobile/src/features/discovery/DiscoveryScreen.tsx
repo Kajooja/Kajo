@@ -238,14 +238,15 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           </View>
         ) : null}
 
-        {isSharedDiscovery && sharedEndorsements.status !== 'ready' ? (
+        {isSharedDiscovery &&
+        (sharedEndorsements.status !== 'ready' || sharedEndorsements.error) ? (
           <View style={styles.predictionNotice}>
             <Text accessibilityLiveRegion="polite" style={styles.predictionNoticeText}>
-              {sharedEndorsements.status === 'error'
+              {sharedEndorsements.error
                 ? sharedEndorsements.error
                 : 'Yhteisiä valintoja päivitetään…'}
             </Text>
-            {sharedEndorsements.status === 'error' ? (
+            {sharedEndorsements.error ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Retry shared choices"

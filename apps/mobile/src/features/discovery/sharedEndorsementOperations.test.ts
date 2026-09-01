@@ -102,6 +102,18 @@ describe('Shared endorsement RPC boundary', () => {
       },
     });
 
+    expect(
+      mapSharedEndorsementCommit([
+        {
+          ...COMMIT_ROW,
+          endorsement_created: false,
+          endorsement_count: 0,
+          consensus_reached: false,
+          consensus_saved: true,
+        },
+      ]),
+    ).toMatchObject({ status: 'success' });
+
     const rpc: SharedEndorsementRpc = vi.fn(async () => ({
       data: null,
       error: { message: 'private database detail' },
