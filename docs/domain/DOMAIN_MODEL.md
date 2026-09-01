@@ -65,12 +65,17 @@ Invariants:
 
 ## Shared discovery eligibility
 
-Ordinary SharedProfile discovery must not recommend an Item that any currently accepted member has already consumed in that member's PersonalProfile.
+Ordinary SharedProfile discovery may retain an Item that a currently accepted member has already consumed in that member's PersonalProfile, but it must not present that Item as an unseen recommendation.
 
 For MVP, either `consumed = true` or a non-null rating is sufficient consumed evidence.
 
-This is a **discovery eligibility rule**, not data deletion:
+This is a **collaboration delivery rule**, not Event copying or data deletion:
 
+- pending Endorsements are delivered first,
+- ordinary unseen SharedProfile Predictions follow in their Prediction order,
+- accepted-member PersonalProfile history follows as a lower tier with restrained real-member provenance,
+- a higher member rating may reorder only this lower history tier,
+- SharedProfile's own consumed/rated state and consensus-saved state remain suppressed from ordinary discovery,
 - the Item may remain in a named List,
 - the Item may remain in Saved/history,
 - the UI may continue to show watched/read/rating state on those historical/organizational surfaces.
@@ -182,7 +187,7 @@ Consumed Items form history. The MVP stores consumed state and simple rating. Th
 ## Important separations
 
 - An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile.
-- A PersonalProfile consumed outcome may still suppress the same Item from Shared discovery because it changes joint eligibility, not because the Shared action is copied into Personal state.
+- A PersonalProfile consumed outcome may lower and annotate the same Item in Shared discovery without copying the Personal action into Shared state.
 - Pending Endorsement is not Shared Saved state.
 - Custom Shared List membership is not unanimous consensus.
 - Actor-specific pending delivery is not a separate per-User Prediction model.

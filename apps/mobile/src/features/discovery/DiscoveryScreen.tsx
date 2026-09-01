@@ -30,6 +30,8 @@ import { getConsumedItemLabels } from './itemInteractionLabels';
 import {
   applySharedDiscoveryOverlay,
   formatEndorsementProvenance,
+  formatMemberHistoryProvenance,
+  getMemberHistoryNicknames,
   getPendingEndorserNicknames,
 } from './sharedEndorsement';
 import { usePredictionRanking } from './usePredictionRanking';
@@ -280,10 +282,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             </Text>
           }
           renderItem={({ item, index }) => {
-            const nicknames = getPendingEndorserNicknames(
-              sharedEndorsements.stateByItemId[item.id],
-              activeSharedMembership?.members ?? [],
-              activeProfile.actorUserId,
+            const sharedState = sharedEndorsements.stateByItemId[item.id];
+            const endorsementProvenance = formatEndorsementProvenance(
+              getPendingEndorserNicknames(
+                sharedState,
+                activeSharedMembership?.members ?? [],
+                activeProfile.actorUserId,
+              ),
+            );
+            const memberHistoryProvenance = formatMemberHistoryProvenance(
+              getMemberHistoryNicknames(
+                sharedState,
+                activeSharedMembership?.members ?? [],
+              ),
             );
 
             return (
@@ -291,7 +302,9 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 item={item}
                 index={index}
                 interaction={getItemInteraction(interactions, item.id)}
-                endorsementProvenance={formatEndorsementProvenance(nicknames)}
+                sharedProvenance={
+                  endorsementProvenance ?? memberHistoryProvenance
+                }
                 theme={theme}
                 styles={styles}
                 onOpen={() => openItem(item)}
@@ -308,7 +321,7 @@ interface ItemCardProps {
   item: Item;
   index: number;
   interaction: ItemInteraction;
-  endorsementProvenance: string | null;
+  sharedProvenance: string | null;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   onOpen: () => void;
@@ -318,7 +331,7 @@ function ItemCard({
   item,
   index,
   interaction,
-  endorsementProvenance,
+  sharedProvenance,
   theme,
   styles,
   onOpen,
@@ -360,9 +373,9 @@ function ItemCard({
           {item.title}
         </Text>
       </View>
-      {endorsementProvenance ? (
+      {sharedProvenance ? (
         <Text numberOfLines={1} style={styles.endorsementProvenance}>
-          {endorsementProvenance}
+          {sharedProvenance}
         </Text>
       ) : null}
       <Text numberOfLines={2} style={styles.cardTitle}>

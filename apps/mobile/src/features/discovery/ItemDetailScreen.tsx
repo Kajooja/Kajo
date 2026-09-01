@@ -54,6 +54,8 @@ import { RatingControl } from './RatingControl';
 import {
   applySharedDiscoveryOverlay,
   formatEndorsementProvenance,
+  formatMemberHistoryProvenance,
+  getMemberHistoryNicknames,
   getPendingEndorserNicknames,
   type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
@@ -617,6 +619,12 @@ function ItemDetailContent({
               activeProfile.actorUserId,
             ),
           );
+          const memberHistoryProvenance = formatMemberHistoryProvenance(
+            getMemberHistoryNicknames(
+              sharedState,
+              activeSharedMembership?.members ?? [],
+            ),
+          );
 
           return (
             <Animated.View
@@ -657,7 +665,9 @@ function ItemDetailContent({
                   Boolean(activeSharedMembership) &&
                   sharedEndorsements.status !== 'ready'
                 }
-                endorsementProvenance={endorsementProvenance}
+                sharedProvenance={
+                  endorsementProvenance ?? memberHistoryProvenance
+                }
                 onRating={(rating) => handleRating(item, index, interaction, rating)}
                 onNotInterested={() =>
                   handleNotInterested(item, index, interaction)
@@ -683,7 +693,7 @@ interface SwipeItemPageProps {
   isSharedProfile: boolean;
   currentActorEndorsed: boolean;
   endorsementDisabled: boolean;
-  endorsementProvenance: string | null;
+  sharedProvenance: string | null;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
   onToggleSaved: () => void;
@@ -700,7 +710,7 @@ function SwipeItemPage({
   isSharedProfile,
   currentActorEndorsed,
   endorsementDisabled,
-  endorsementProvenance,
+  sharedProvenance,
   onRating,
   onNotInterested,
   onToggleSaved,
@@ -761,9 +771,9 @@ function SwipeItemPage({
         </View>
       ) : null}
 
-      {endorsementProvenance ? (
+      {sharedProvenance ? (
         <Text style={styles.endorsementProvenance}>
-          {endorsementProvenance}
+          {sharedProvenance}
         </Text>
       ) : null}
 

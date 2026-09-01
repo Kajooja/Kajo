@@ -16,6 +16,8 @@ const OVERLAY_ROW = {
   description: null,
   tags: ['quiet'],
   ineligible_for_discovery: false,
+  member_consumed_user_ids: ['user-a'],
+  member_max_rating: 9,
   current_actor_endorsed: false,
   pending_endorsement: true,
   consensus_saved: false,
@@ -48,6 +50,8 @@ describe('Shared discovery overlay mapping', () => {
             tags: ['quiet'],
           },
           ineligibleForDiscovery: false,
+          memberConsumedUserIds: ['user-a'],
+          memberMaxRating: 9,
           currentActorEndorsed: false,
           pendingEndorsement: true,
           consensusSaved: false,
@@ -66,6 +70,11 @@ describe('Shared discovery overlay mapping', () => {
     expect(
       mapSharedDiscoveryOverlay([
         { ...OVERLAY_ROW, endorser_user_ids: [], pending_endorsement: true },
+      ]),
+    ).toMatchObject({ status: 'error' });
+    expect(
+      mapSharedDiscoveryOverlay([
+        { ...OVERLAY_ROW, member_max_rating: 11 },
       ]),
     ).toMatchObject({ status: 'error' });
   });

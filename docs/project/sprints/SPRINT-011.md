@@ -18,10 +18,13 @@ Sprint 011 has two ordered slices. **11A must be stable before 11B.**
 
 ### Discovery eligibility
 
-- When active Profile is `SHARED`, an Item already consumed/rated in any currently accepted member's PersonalProfile is not eligible for ordinary Shared discovery.
-- SharedProfile's own consumed/rated state also suppresses the Item.
+- When active Profile is `SHARED`, an Item already consumed/rated in any currently accepted member's PersonalProfile remains available in a clearly attributed lower-priority member-history tier instead of disappearing.
+- Pending Endorsements remain first, ordinary unseen recommendations remain next in Prediction order, and member-history Items follow them.
+- A higher accepted-member PersonalProfile rating may lift an Item only within the member-history tier; it does not become a hidden common-fit/EvoBot coefficient.
+- SharedProfile's own consumed/rated state still suppresses the Item from ordinary Shared discovery.
 - Personal save alone does not suppress Shared discovery.
-- Suppression affects discovery only; Lists/history retain the Item and may show current consumed/rating state.
+- Member-history provenance uses accepted-member identity only (for example `Mirri nähnyt`) and must not expose auth email.
+- Delivery affects discovery only; Lists/history retain the Item and may show current consumed/rating state.
 - Rules remain generic across BOOK, MOVIE and future ItemTypes.
 
 ### Common-fit ranking
@@ -67,7 +70,11 @@ Do not reuse one member's Endorsement as `item_interactions.saved=true` before c
 
 ### 11A acceptance
 
-- member PersonalProfile consumed/rated Item absent from ordinary Shared discovery,
+- pending Endorsements appear before ordinary unseen recommendations,
+- unseen recommendations preserve Prediction order ahead of member-history Items,
+- member PersonalProfile consumed/rated Item appears later with real-member provenance,
+- higher member rating orders only the member-history tier,
+- SharedProfile-consumed/rated and consensus-saved Items remain absent from ordinary discovery,
 - common-fit ranking uses accepted-member evidence without media-specific architecture,
 - first Endorsement persists only for that actor,
 - pending Item prioritized for another non-endorsing member with actor provenance,
@@ -130,7 +137,8 @@ Start only after 11A is stable.
 ## Progress
 
 - PR #157 merged the prediction-core-independent Endorsement current state, membership authorization, idempotent endorse/reverse RPCs, unanimity -> Shared Saved projection, Event vocabulary and leave cleanup.
-- The active follow-up implements the separate authorized Shared discovery overlay plus mobile `Tykkää`, pending provenance and queue composition.
+- PR #158 merged the authorized Shared discovery overlay plus mobile `Tykkää`, pending provenance, resilient refresh and queue composition. Configured Android testing confirmed endorsement, consensus, Personal isolation and retry behavior.
+- Configured Android feedback changed member PersonalProfile history from full suppression to a lower attributed delivery tier. The active #151 follow-up implements that policy without changing core Prediction weights.
 - #156 gates common-fit coefficients and all final EvoBot/LongTermState/ShortTermState/ScenarioMemory algorithm work until the user-approved Prediction Core MVP design is canonical.
 - 11A remains open until hosted overlay/RLS verification, CI and configured Android acceptance pass.
 
