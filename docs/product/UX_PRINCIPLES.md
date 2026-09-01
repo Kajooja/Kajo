@@ -2,7 +2,7 @@
 
 ## Core feeling
 
-Kajo should feel calm, personal, atmospheric and intelligent. It should not feel like a dashboard, analytics tool, casino UI or 3D game.
+Kajo should feel calm, personal, atmospheric and intelligent. It should not feel like a dashboard, analytics tool, casino UI, futuristic control panel or 3D game.
 
 ## Principles
 
@@ -11,13 +11,13 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 3. **Minimal persistent shell.** Top: Kajo Home mark + global DiscoveryMode curtain. Bottom: menu + active Profile identity/Home + Inbox. Do not add a conventional multi-tab bar unless an explicit later product decision reverses this rule.
 4. **Home is redundant in a useful way.** Both the top Kajo mark and the bottom-center active Profile identity return to the active Profile Room. They do not change Profile context.
 5. **Sign out is secondary account navigation.** `Kirjaudu ulos` belongs at the bottom of the side drawer, not in the Room scene.
-6. **2D only.** Use layered 2D surfaces, light, gradients, opacity, blur, shadow and subtle movement. No virtual walking or 3D world interaction.
+6. **Illustrated 2D first.** The Room may use lightly layered 2.5D depth through perspective, overlap, light, gradients, opacity, blur and shadow, but it must remain a simple illustrated surface. No virtual walking, free camera, rendered 3D world or game-like room interaction.
 7. **Content is more important than chrome.** Posters/covers and Room atmosphere carry visual interest.
 8. **Kajo brings the light.** Product identity is expressed through light and atmosphere rather than many colored buttons.
 9. **Theme identity persists.** Active Profile theme is the base visual identity across areas.
 10. **Context transitions are smooth.** Opening bookshelf/screen should feel like moving deeper into the same Kajo, not loading an unrelated app.
 11. **Curtain is Kajo's global DiscoveryMode control.** Exactly `FOR_YOU`, `SURPRISE`, `RISK`; drag/tap settles on one canonical state. Downstream screens inherit it and do not add competing selectors.
-12. **DiscoveryMode is visible as time/light.** FOR_YOU -> dawn/day, SURPRISE -> evening, RISK -> night. AmbientPhase is presentation; DiscoveryMode is recommendation policy.
+12. **DiscoveryMode is visible as restrained atmosphere.** FOR_YOU -> calm dawn/day, SURPRISE -> warmer sunset/evening, RISK -> night/moon with a restrained cooler fireplace accent. AmbientPhase is presentation; DiscoveryMode is recommendation policy.
 13. **Visual preference != risk preference.** Dark aesthetics do not imply risky recommendations.
 14. **Grid first, swipe optional.** Grid is default discovery. Swipe is optional calibration/browsing tooling.
 15. **Committed choices behave consistently.** Explicit feedback gives restrained visual confirmation and rotates the current Item appropriately without game-like effects.
@@ -32,13 +32,34 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 24. **Motion communicates state.** Animation explains transition/atmosphere, not attention capture.
 25. **Accessibility remains required.** Gesture controls need accessible alternatives; motion respects reduced-motion settings; meaning must not rely solely on color.
 
+## Approved MVP Room visual direction
+
+The canonical visual reference is a **warm, simple cabin/living-room illustration**, not a modern smart-home interface.
+
+- **Fireplace + rug/bench** provide the main feeling of warmth and identity.
+- **Bookshelf** is the clear BOOK entrance.
+- **Low shelf with TV/screen** is the clear MOVIE entrance.
+- **Window** carries outside light, sky and time-of-day atmosphere.
+- **Curtain** remains the single global DiscoveryMode control; it is functional, not decorative duplication.
+- The Room should have enough perspective/overlap to feel like a place, but every navigation object must remain immediately readable and easy to tap.
+- Prefer warm materials, soft edges, restrained shadows and illustration-like depth over glossy surfaces, neon, glassmorphism or sci-fi chrome.
+- Do not add decorative objects merely to fill space. New Room objects require a real content-domain/navigation purpose.
+- Do not introduce heavy animation, parallax spectacle, complex moving scenery, avatars or game mechanics for MVP.
+- No standalone `Huone` heading or helper instructions are needed inside the scene.
+
+DiscoveryMode atmosphere may alter the same scene without rebuilding it:
+
+- `FOR_YOU`: soft warm flame, calm dawn/day window light.
+- `SURPRISE`: slightly stronger warmth, sunset/evening light.
+- `RISK`: night/moon/stars and a restrained cooler/blue fireplace accent while keeping the Room inviting rather than ominous.
+
 ## Initial Room vocabulary
 
 - Fireplace: ambient warmth / identity light.
 - Window: outside light and scene.
 - Curtain: global DiscoveryMode control.
 - Bookshelf: books.
-- Screen/projector: movies.
+- TV/screen: movies.
 
 SharedProfile switching, Inbox, Lists, Groups and account actions belong to the persistent shell/drawer rather than adding more Room wall objects.
 
