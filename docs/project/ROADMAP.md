@@ -22,91 +22,100 @@ Books + Movies grids, Item cards/details, mock ranking, DiscoveryMode switching.
 
 ### Sprint 005 — Swipe & History
 
-Optional swipe, like/dislike, watched/read, saved state and consumed-history suppression. Grid remains the primary discovery surface; opening an Item should be able to flow naturally into the swipe-oriented browsing experience rather than feeling like a disconnected mode.
-
-Sprint 005 close also includes the real-device acceptance refinements identified on 2026-08-26:
-
-- curtain becomes the single global three-state DiscoveryMode/risk control with drag + tap-to-snap,
-- redundant downstream mode selectors are removed,
-- consumed actions visibly auto-advance with restrained motion,
-- recent interaction choices can be undone,
-- reusable action labels are centrally maintained without coupling UI wording to domain semantics.
+Optional swipe, watched/read, saved/current state, feedback drawer, consumed-history suppression, exact recent undo and one shared DiscoveryMode control.
 
 ### Sprint 006 — Backend Foundation
 
-Supabase/PostgreSQL, lightweight/common register/sign-in authentication, user nickname/username identity, Profile, ProfileMember, Item persistence, migrations and authorization foundations. Replace appropriate Sprint 005 in-memory state with a clear persistence boundary without rewriting presentation semantics.
+Supabase/PostgreSQL, authentication, unique nickname identity, Profile/ProfileMember, Item persistence, migrations and authorization foundations.
 
 ### Sprint 007 — Event Engine
 
-Generic event capture, sessions, prediction traceability and analytics-quality behavioural contracts. Persist meaningful interaction evidence such as interest, saved/unsaved, consumed/read/watched and later ratings using stable canonical event/state semantics independent of visible UI copy.
+Generic append-only event capture, sessions, actor/Profile separation, prediction traceability and analytics-quality behavioural contracts.
 
 ### Sprint 008 — Prediction V0
 
-First real generic personalized ranking using Item similarity, behavioural history, recency/ShortTermState and exploration policy. Rankings should refresh when materially relevant behavioural evidence or the global DiscoveryMode/risk selection changes; the mobile client consumes prediction results rather than owning ranking logic.
+First real generic personalized ranking using Item similarity, behavioural history, LongTermState, ShortTermState, DiscoveryMode exploration policy, explicit feedback and impression cooldown. Mobile consumes server-owned rankings rather than owning recommendation logic.
 
-Configured-phone feedback on 2026-08-31 adds these acceptance refinements before Sprint 008 closes:
+### Sprint 009 — Shared Kajo — COMPLETE
 
-- expose the one shared DiscoveryMode as one compact persistent app-shell control; remove the duplicate Room control until the post-MVP Room redesign,
-- replace ambiguous binary like/dislike/consumed controls with a feedback drawer: 0–10 rating (always consumed), not interested (not consumed) and save,
-- move every explicitly reacted Item out of the immediate queue and apply a temporary impression cooldown to unreacted Items,
-- expand the normalized MVP candidate set enough to observe ranking/cooldown behaviour on a configured phone.
+Persistent SharedProfiles, consent-based invitations, Shared Room/theme identity, generic Shared interaction/Event/Prediction context and seamless Personal/Shared switching.
 
-With the small seed catalog and sparse evidence, hosted mode orderings may legitimately converge. Sprint 008 must not fake a visible reorder: #103 expands the test catalog and configured acceptance verifies differentiation only after enough Item/evidence variation exists.
+The first configured Android acceptance exposed real membership/persistence/navigation failures. Those were corrected and then accepted through configured-device use plus hosted verification. Issue #125 is closed.
 
-### Sprint 009 — Shared Kajo
-
-Persistent SharedProfiles, consent-based invitations, shared Room/theme, joint interaction/discovery context and traceable member suggestions. Sprint 009 closes only after configured two-account Android re-acceptance and hosted verification of SharedProfile-scoped interactions/Events.
+The initial separate `Ehdota yhteiseen` experiment is historical and was retired during the 2026-09-01 product review. Its replacement is the Sprint 011 endorsement model, not a parallel suggestion list.
 
 ### Sprint 010 — Navigation & Profile Lifecycle
 
-Build the durable navigation shell before adding more destination surfaces.
+Build and polish the durable shell before adding more destination surfaces.
 
-- the persistent top Kajo logo always returns to the currently active Profile's Room,
-- a restrained bottom dock owns global navigation controls rather than cluttering the Room/header,
-- left bottom menu button opens the Profile-aware side drawer,
-- right bottom envelope opens Inbox; invitations live there now and messages later,
-- general navigation originates from the Room or side drawer rather than a conventional multi-tab app bar,
-- drawer owns Profile switching plus Profile, Lists and Groups destinations as they become real,
-- nickname max length becomes 24 characters and SharedProfile name max length 32 characters,
-- SharedProfile member can leave a group only after an `Oletko varma?` confirmation; authorization and active-Profile fallback remain safe.
+Delivered core:
 
-Primary issues: #136 and #137.
+- persistent top Kajo mark returns to the active Profile Room,
+- restrained bottom dock with menu + active Profile identity + Inbox,
+- Profile-aware side drawer instead of a conventional multi-tab bottom bar,
+- drawer owns Profile switching plus Profile/Lists/Groups destinations as they become real,
+- nickname max 24 and SharedProfile name max 32,
+- safe `Poistu ryhmästä` confirmation, membership removal and PersonalProfile fallback.
 
-### Sprint 011 — Named Lists & Collaborative Curation
+Final polish under #149 / PR #150:
 
-Turn Lists into a first-class generic Profile capability instead of only a `saved` boolean/history view.
+- bottom-center active Profile identity also returns to Room,
+- `Kirjaudu ulos` lives at the bottom of the side drawer,
+- Room has no standalone heading/helper copy outside the visual scene,
+- obsolete separate `Ehdota yhteiseen` panel is removed.
 
-- PersonalProfile and SharedProfile can own multiple named Lists,
+### Sprint 011 — Shared Curation & Named Lists
+
+Sprint 011 deliberately has **two ordered slices**.
+
+#### 11A — Shared discovery + endorsement consensus — #151
+
+Make Shared discovery behave like a joint decision surface without creating a separate social recommender.
+
+- ordinary Shared discovery excludes any Item already consumed/rated in any currently accepted member's PersonalProfile,
+- this suppression affects discovery only; existing Lists/history keep the Item and may show consumed/rating state,
+- Shared Prediction remains targeted to the SharedProfile,
+- Prediction V0 may combine Shared joint evidence with accepted members' PersonalProfile evidence using an inspectable common-fit aggregate plus disagreement penalty,
+- one member's Shared quick positive action becomes an actor-specific `Endorsement`, not Shared `saved=true`,
+- the pending Item leaves the endorser's own ordinary queue,
+- members who have not endorsed it receive it ahead of normal recommendations with restrained real-actor provenance,
+- unanimity among currently accepted members promotes the Item once to Shared saved state,
+- later new membership does not retroactively revoke an already-reached consensus.
+
+No majority voting, chat or custom-list voting is introduced here.
+
+#### 11B — Named Lists & collaborative browsing — #102
+
+After #151 is stable:
+
+- PersonalProfile and SharedProfile own generic system/custom `ItemList` records,
 - List names are 1–40 characters,
-- a List may contain any generic Item type in the same collection,
-- `Tallenna` opens a destination picker and can create/name a List,
+- one List may contain BOOK, MOVIE and future ItemTypes together,
+- every Profile has one system `Tallennetut` List,
+- Personal `Tallenna` opens a destination picker and can create/name/rename Lists,
+- Shared unanimous endorsement from #151 auto-promotes only to system `Tallennetut`,
+- custom Shared Lists can be explicitly curated by accepted members without unanimity,
 - one Item may belong to multiple Lists,
-- existing saved/consumed/rating semantics remain canonical and are not duplicated into list rows,
-- list detail supports list/card presentation toggle,
-- deterministic sorting includes added newest/oldest and supported generic metadata,
-- filtering supports all Items, books, movies and future ItemTypes without schema redesign,
-- every SharedProfile list membership stores and displays who added the Item and when; PersonalProfile hides redundant actor display,
-- current watched/read/consumed state and rating are shown from the active Profile's interaction state,
-- Saved and watched/read history remain reachable alongside named Lists.
-
-Primary issue: #102.
+- List detail supports list/card presentation, added-order sorting, generic ItemType filters and current consumed/rating display,
+- Shared list entries show real added-by + added-at provenance; Personal hides redundant actor identity,
+- existing saved/consumed/rating state remains canonical and is not duplicated into List rows.
 
 ### Sprint 012 — Profile Messaging
 
-Add a deliberately narrow messaging layer after Lists are stable so messages can reference established Profile/List/Item identities.
+Add narrow messaging only after Lists are stable so messages can reference established Profile/List/Item identities.
 
-- PersonalProfile has a private owner-only thread/note stream,
-- SharedProfile has a member-only group chat retaining the actual sending User as actor,
-- bottom-envelope Inbox combines invitation and message activity without adding Room clutter,
-- optional message when saving an Item to a List references the Profile, List and Item rather than duplicating text into list membership,
-- messaging persistence stays separate from behavioural Event/prediction evidence by default,
-- no arbitrary user-to-user DM graph, public feed or follower model is introduced for MVP.
+- PersonalProfile owner-only note/thread stream,
+- SharedProfile accepted-member group chat retaining actual sending User,
+- Inbox combines invitations and message activity,
+- optional message when adding/saving an Item references Profile/List/Item,
+- messaging persistence stays separate from behavioural Prediction evidence by default,
+- no unrelated-user DM graph, public feed or follower model.
 
 Primary issue: #138.
 
 ### Sprint 013 — Scenario Memory
 
-Vector/scenario representation and similarity retrieval over historical situations. This starts only after navigation, Lists and the narrow Profile messaging model are stable enough that later memory/context features do not force their redesign.
+Vector/scenario representation and similarity retrieval over historical situations. Starts only after navigation, Shared curation, Lists and narrow Profile messaging are stable.
 
 ### Sprint 014 — MVP Hardening
 
@@ -123,6 +132,6 @@ After real prediction/outcome data exists:
 - richer personal/shared memories including images, people, location and context,
 - richer Item/List comments and media attachments built on the MVP message reference model,
 - public/shared discovery features only after privacy/product rules are intentionally designed,
-- advanced list features such as folders, smart rules and public sharing.
+- advanced List features such as folders, smart rules and public sharing.
 
 Roadmap changes must be deliberate. Do not rewrite completed sprint history when sequencing changes.

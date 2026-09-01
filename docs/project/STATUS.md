@@ -2,184 +2,132 @@
 
 Last updated: **2026-09-01**
 Current milestone: **MVP 0.1**
-Current sprint: **Sprint 010 — Navigation & Profile lifecycle, device acceptance pending** (`sprints/SPRINT-010.md`)
-Last fully accepted sprint: **Sprint 008 — Prediction V0** (`sprints/SPRINT-008.md`)
+Current sprint: **Sprint 010 — Navigation & Profile lifecycle, final device acceptance** (`sprints/SPRINT-010.md`)
+Last accepted sprint: **Sprint 009 — Shared Kajo** (`sprints/SPRINT-009.md`)
 
-This is the authoritative current-state document. Sprint-specific history belongs in the sprint documents.
+This is the authoritative current-state document. Sprint files preserve execution history; this file states what is true now and what comes next.
 
-## Current state
+## Current product state
 
 Kajo is a phone-runnable Expo/React Native app with:
 
-- a minimalist 2D Room as the visual home of the active Profile,
-- a persistent top Kajo mark that returns to the active Profile Room,
-- a restrained bottom dock for global navigation,
-- a Profile-aware side drawer opened from the bottom-left three-line control,
-- a bottom-right Inbox/mail control with invitation badge,
+- minimalist 2D Room home/navigation for the active Profile,
+- one persistent top Kajo Home mark and one global DiscoveryMode curtain,
+- restrained bottom dock and Profile-aware side drawer,
 - BOOK/MOVIE grid discovery, Item detail and optional swipe-style browsing,
-- one global three-state DiscoveryMode curtain,
-- hosted generic Prediction V0 targeting Profile,
-- 0–10 consumed rating, not-interested and save semantics with exact recent undo,
+- hosted generic Prediction V0 targeting `Profile`,
+- 0–10 rating/consumed, not-interested, save and exact recent undo semantics,
 - Supabase/PostgreSQL/Auth behind typed mobile boundaries,
-- unique email + unique nickname identity and email-or-nickname login,
+- unique email + nickname identity and email-or-nickname login,
 - append-only Event/session persistence with actor/Profile/prediction correlation,
-- PersonalProfile and invitation-based 2-N SharedProfile support.
+- PersonalProfile plus consent-based 2-N SharedProfiles.
 
-## Sprint 009 — Shared Kajo residual acceptance
+## Sprint 009 — accepted
 
-Sprint 009 implementation is merged. The original configured-device failure was corrected through invitation consent, actor-scoped active Profile switching and seamless interaction hydration.
+Issue #125 is closed after corrected configured Android use plus hosted verification.
 
-Current real hosted evidence after the corrected Android use confirms:
+The first Shared Kajo device build had real failures: invitation consent was missing, Shared actions persisted into PersonalProfile instead of SharedProfile, Profile switching showed startup/loading state, and the original Room wall-object navigation was wrong.
 
-- SharedProfile `Jeejee` has two accepted members,
-- SharedProfile has **4 persisted item_interactions** and **62 Events** where the earlier failed build had 0/0,
-- Shared Events contain both members as their real `actorUserId` values,
-- PersonalProfile and SharedProfile interaction state remain separate even for the same Item IDs,
-- Shared prediction impressions are traceable: **53/53 impressions** carried a prediction ID across 9 predictions.
+Those failures were corrected through:
 
-Issue **#125 remains open for one residual device proof only**: there is still no real-device `ITEM_SUGGESTED` Event in hosted Events. During the next Android acceptance, activate a ready SharedProfile, open an Item detail and press **Ehdota yhteiseen** once. Then inspect the hosted Event fields before closing Sprint 009.
+- #128 / PR #131 — invitation-based membership consent,
+- #130 / PR #132 — seamless post-initial Profile hydration,
+- #129 / PR #133 — global Profile switching + invitation Inbox.
 
-## Sprint 010 — implementation complete, device acceptance pending
+Final hosted evidence from configured use confirmed:
 
-### Navigation shell — #136 / PR #142
+- ready SharedProfile `Jeejee` has persisted Shared `item_interactions` and Events where the failed build had 0/0,
+- both real members remain distinct `actorUserId` values inside the same Shared `profileId`,
+- Personal/Shared interaction state stays isolated for the same Item,
+- Shared Prediction V0 impressions remain prediction-traceable.
 
-Merged main commit: `646999330758cf15a4cef6b929fef2b76990048d`.
+The former separate `Ehdota yhteiseen` / `ITEM_SUGGESTED` UI requirement was intentionally retired during the 2026-09-01 product review. No obsolete Event was manufactured merely to close acceptance. Replacement semantics are Sprint 011/#151 Shared member Endorsement + consensus.
 
-- Top Kajo mark always returns to the Room of the active Profile.
-- Persistent profile/inbox controls were removed from the top header.
-- Bottom dock:
-  - left: three-line menu opens side drawer,
-  - center: restrained active Profile identity,
-  - right: mailbox opens Inbox and shows invitation badge.
-- Side drawer owns Profile switching and navigation sections `Profiili`, `Listat`, `Ryhmät`.
-- `Listat` is intentionally marked `TULOSSA` until Sprint 011; no dead route is exposed.
-- Up to five ready SharedProfiles are available for direct switching.
-- Personal ↔ Shared switching keeps the current view mounted.
+## Sprint 010 — runtime implementation complete
 
-### Profile lifecycle — #137 / PR #141
+Core delivered:
 
-Canonical implementation was merged before the navigation PR. Hosted migration: `20260901082902_profile_lifecycle_limits_and_leave`.
+- #136 / PR #142 — bottom dock + side drawer; Profile switching remains in place,
+- #137 / PR #141 — nickname 2–24, SharedProfile name 2–32, safe `Poistu ryhmästä` confirmation and lifecycle hardening,
+- #143 / PR #147 — AuthGate nickname input max 24.
 
-- nickname length: **2–24**,
-- SharedProfile name length: **2–32**,
-- PostgreSQL, signup provisioning and typed mobile validation enforce the limits,
-- `leave_shared_profile` removes the actor's membership after authorization checks,
-- `Poistu ryhmästä` requires an **Oletko varma?** destructive confirmation,
-- leaving an active SharedProfile falls back to PersonalProfile,
-- one remaining member keeps the SharedProfile/history as provisional,
-- the last member leaving deletes the zero-member SharedProfile,
-- pending invitations involving the departing member are cleaned,
-- privileged `complete_personal_profile` logic moved to `private`; its public RPC is now a SECURITY INVOKER wrapper.
+Hosted lifecycle verification passed rollback/security smoke suites. Runtime main `60db8aae63bd1f86e8cc1cabb132294643b17a4b` produced a standalone Android APK whose lint/typecheck/tests/bundle smoke/release APK/embedded-JS verification all passed.
 
-Verification:
+Configured Android review then requested one final shell cleanup.
 
-- lifecycle/leave rollback suite: **11/11 pass**,
-- PersonalProfile private/public wrapper suite: **3/3 pass**,
-- post-migration hosted leave smoke: **5/5 pass** with rollback/no QA residue,
-- security advisor no longer reports `public.complete_personal_profile` as an exposed SECURITY DEFINER function.
+### Final navigation polish — #149 / PR #150 — MERGED
 
-### Nickname UI consistency — #143 / PR #147
+Merged main commit: **`c10a4edc736965f3184cca3e477e2e4ccb9210ca`**.
 
-Merged main commit: `60db8aae63bd1f86e8cc1cabb132294643b17a4b`.
+PR CI passed.
 
-- both AuthGate nickname TextInputs now stop at 24 characters,
-- PR CI passed lint, typecheck, tests and iOS/Android bundle smoke,
-- no auth/backend behavior changed.
+Delivered:
 
-A later duplicate lifecycle merge commit `0db2ec37ef2b9d90585ec21c7614d1083cde88d6` had an identical tree to its parent and introduced no code changes; canonical lifecycle work remains **PR #141**.
+- bottom-center active Profile identity is now another Home action,
+- `Kirjaudu ulos` moved from Room to the bottom of the side drawer,
+- standalone `Huone` heading was removed,
+- `Huone on Kajo. Valitse kirjat tai elokuvat.` helper copy was removed,
+- Room content between global bars is now only the visual Room/domain objects,
+- obsolete separate `Ehdota yhteiseen` panel/helper/tests were removed.
 
-## Current Android build
+The next device build should verify only these final polish changes and existing shell regressions. Do not reintroduce the removed suggestion action.
 
-Final Sprint 010 runtime main is `60db8aae63bd1f86e8cc1cabb132294643b17a4b`.
+## Product decision — Shared discovery and saving
 
-GitHub Actions run `33496770667`:
+Shared Kajo is not a separate recommendation/suggestion list. The active SharedProfile remains the recommendation target.
 
-- lint: pass,
-- typecheck: pass,
-- tests: pass,
-- iOS + Android bundle smoke: pass,
-- standalone Android APK: building/upload pending at the time of this status update.
+Sprint 011 starts with **#151 Shared discovery member-history suppression + Endorsement consensus** before named Lists:
 
-Use only the standalone APK produced by this final main for Sprint 010 device acceptance.
+1. **Member consumption suppresses Shared discovery.** If any accepted member has consumed/rated an Item in their PersonalProfile, that Item is excluded from ordinary Shared discovery. This does not delete it from Lists/history.
+2. **Common taste uses all members.** Shared Prediction remains Profile-targeted but V0 may combine SharedProfile joint evidence with accepted members' PersonalProfile taste evidence and an explicit disagreement penalty.
+3. **One member Endorsement is pending, not Shared Saved state.** A Shared quick positive action (`Tykkää` or equivalent copy) records the real actor's Endorsement.
+4. **Pending Endorsement is delivered to others.** The endorser stops receiving it in their own normal queue; members who have not endorsed it receive it ahead of ordinary recommendations with restrained actor provenance such as `Mirri tykkäsi`.
+5. **Unanimity creates Shared Saved state.** When every currently accepted member has endorsed, Shared `saved` becomes true and the Item is promoted once to the Shared system `Tallennetut` List when #102 Lists exist.
+6. **Custom Shared Lists remain collaborative, not unanimous voting.** Any accepted member can explicitly add an Item to a custom List with `addedBy`/`addedAt` provenance.
 
-## Sprint 010 device gate
+The predictor remains generic. Actor-specific pending-Endorsement delivery is a collaboration overlay, not a separate per-User/media recommender.
 
-On the fresh final-main APK verify:
+## Next MVP sequence
 
-1. top Kajo mark returns to active Profile Room,
-2. top header has no duplicate profile/inbox navigation,
-3. bottom-left three-line control opens the side drawer,
-4. drawer shows active identity plus `Profiili`, `Listat`, `Ryhmät`,
-5. `Listat` does not navigate to a dead screen before Sprint 011,
-6. up to five ready SharedProfiles can be selected,
-7. Personal ↔ Shared switching is seamless,
-8. bottom-right mailbox opens invitation Inbox and badge count is correct,
-9. invitation Accept/Reject still works,
-10. group management offers `Poistu ryhmästä`,
-11. cancel leaves state unchanged,
-12. confirmed leave removes membership and active Shared falls back to Personal,
-13. a one-member SharedProfile becomes provisional and a zero-member orphan is deleted,
-14. nickname input stops at 24 and SharedProfile name at 32,
-15. BOOK/MOVIE discovery, rating, save, DiscoveryMode and Room navigation still work,
-16. while SharedProfile is active, press **Ehdota yhteiseen** once so #125 can be closed from hosted evidence.
+1. Build/test current main after `c10a4ed` and close Sprint 010 device acceptance if the navigation polish behaves correctly.
+2. **Sprint 011 / #151** — Shared discovery eligibility, common-fit evidence and Endorsement consensus.
+3. **Sprint 011 / #102** — system + named Profile-scoped Lists, list/card view, filters/sort, provenance and Personal save destination picker.
+4. **Sprint 012 / #138** — Profile messaging/chat after Lists are stable.
+5. **Sprint 013** — ScenarioMemory.
+6. **Sprint 014** — MVP hardening/release readiness.
 
-## MVP sequence after acceptance
+Do not implement #102 before #151 is stable. Do not start chat before the List model is stable.
 
-1. **Sprint 011 — Named Lists & Collaborative Curation** (`#102`)
-   - Profile-owned named generic `ItemList`, name length 1–40,
-   - PersonalProfile and SharedProfile may own multiple Lists,
-   - `Tallenna` chooses/creates a destination List,
-   - an Item may belong to multiple Lists,
-   - mixed BOOK/MOVIE and future Item types may coexist in a List,
-   - list/card view toggle, ItemType filters and sort by added order/supported metadata,
-   - Shared List shows who added an Item and when; Personal List hides redundant actor identity,
-   - consumed/read/watched state and rating continue to come from canonical `item_interactions`, not copied List fields.
+## Other open work
 
-2. **Sprint 012 — Profile Messaging** (`#138`)
-   - PersonalProfile private owner-only note/thread stream,
-   - SharedProfile accepted-member group chat with sender identity,
-   - Inbox combines invitation and message activity,
-   - saving an Item to a List can optionally create a message referencing Profile/List/Item,
-   - no arbitrary user DMs, public feed or follower model in MVP 0.1.
-
-3. **Sprint 013 — ScenarioMemory**
-4. **Sprint 014 — MVP Hardening**
-
-Do not start chat before the list model is stable. Do not skip directly to ScenarioMemory.
-
-## Known open work
-
-- **#125** — residual Sprint 009 real-device `ITEM_SUGGESTED` acceptance.
-- **#127** — production-ready auth email delivery; verify a production sending domain/SMTP and test confirmation + password recovery to unrelated Gmail and Outlook/Hotmail addresses before external beta.
-- **#102** — Sprint 011 named Lists.
-- **#138** — Sprint 012 Profile messaging.
-- **#78** — optional splash/in-app logo polish.
-- **#73** — Google/Apple sign-in future work.
-- Supabase advisor technical debt still includes `rls_auto_enable`, public `get_my_personal_profile`, leaked-password protection disabled and low-traffic unused-index notices.
+- #127 — production-ready auth email delivery; production SMTP/domain and confirmation/recovery tests remain required before external beta.
+- #78 — optional splash/in-app logo polish.
+- #73 — Google/Apple sign-in future work.
+- Existing Supabase advisor/security hygiene items remain separately scoped technical debt.
 
 ## Important files
 
 - `/AGENTS.md`
-- `/docs/project/STATUS.md`
 - `/docs/product/MVP.md`
 - `/docs/project/ROADMAP.md`
 - `/docs/project/sprints/SPRINT-009.md`
 - `/docs/project/sprints/SPRINT-010.md`
 - `/docs/domain/GLOSSARY.md`
+- `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
+- `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/architecture/CODEMAP.md`
 - `/apps/mobile/src/features/discovery/DiscoveryModeShell.tsx`
+- `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/profiles/ActiveProfileContext.tsx`
 - `/apps/mobile/src/features/profiles/sharedProfileOperations.ts`
 - `/apps/mobile/src/features/profiles/SharedProfilesScreen.tsx`
-- `/apps/mobile/src/features/auth/AuthGate.tsx`
-- `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
+- `/apps/mobile/src/features/room/RoomScreen.tsx`
 - `/supabase/migrations/20260831200429_shared_profile_invitations.sql`
 - `/supabase/migrations/20260901082902_profile_lifecycle_limits_and_leave.sql`
-- `/.github/workflows/ci.yml`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate next action: finish/fetch the final Sprint 010 APK, run the device checklist including one **Ehdota yhteiseen** action, verify hosted evidence, close #125 + Sprint 010 acceptance, then start Sprint 011 / #102.
+Immediate order: final Sprint 010 device check → #151 → #102. The old `Ehdota yhteiseen` action must not be reintroduced.
