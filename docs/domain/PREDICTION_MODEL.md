@@ -122,9 +122,7 @@ For SharedProfile V0, ranking may combine:
 3. **Common-fit aggregation** — an inspectable aggregate designed to favor Items that fit the group rather than only one extreme member.
 4. **Disagreement penalty** — explicit penalty/uncertainty when member-specific fit signals diverge strongly.
 
-Do not lock an opaque ML aggregation before enough evidence exists. V0 should expose component values in `explanation` so common-fit/disagreement behavior can be verified on configured accounts.
-
-A simple V0 approach may use average member fit plus a penalty based on range/variance; the exact coefficient is an implementation detail to validate, not a new domain concept.
+Do not lock an opaque ML aggregation before enough evidence exists. The exact common-fit/disagreement formula is gated by #156 and the approved Prediction Core design. When implemented, its component values must remain inspectable in `explanation` so behavior can be verified on configured accounts.
 
 ### Shared discovery eligibility from member history
 
@@ -169,6 +167,8 @@ SharedProfile Prediction ranking
 ```
 
 Prediction output/explanation should make this priority inspectable, e.g. pending endorsement flags/actor IDs or a clear delivery-priority component, without leaking auth email.
+
+The MVP implementation keeps this composition outside `rank_items_v0`: an authorized Shared discovery overlay returns discovery eligibility, current-actor endorsement state, pending Items and accepted-member actor IDs. Mobile prepends eligible pending Items and filters actor/member-history exclusions around the unchanged temporary V0 ranking. This overlay contains no taste weights and can remain in place when the core predictor is replaced.
 
 ## Shared consensus and Saved evidence
 

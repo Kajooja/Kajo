@@ -107,7 +107,7 @@ export function usePredictionRanking(
         profileId,
         mode,
         itemType,
-        limit: 20,
+        limit: activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20,
         context: getRuntimeContext(),
       }).then((result) => {
         if (!active || !requestGate.current.isLatest(token)) return;
@@ -130,7 +130,16 @@ export function usePredictionRanking(
       active = false;
       clearTimeout(timeout);
     };
-  }, [attempt, evidenceKey, itemType, mode, profileId, requestKey, rpc]);
+  }, [
+    activeProfile.activeProfile?.type,
+    attempt,
+    evidenceKey,
+    itemType,
+    mode,
+    profileId,
+    requestKey,
+    rpc,
+  ]);
 
   const retry = useCallback(() => setAttempt((current) => current + 1), []);
   const matchingRanking = requestKey

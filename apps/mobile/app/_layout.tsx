@@ -8,6 +8,7 @@ import { StartupSplash } from '@/features/branding/KajoBrand';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
 import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
+import { SharedEndorsementProvider } from '@/features/discovery/SharedEndorsementContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
 import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
@@ -40,17 +41,19 @@ export default function RootLayout() {
         <PersonalProfileProvider>
           <ActiveProfileProvider>
             <EventTrackingProvider>
-              <ItemInteractionProvider>
-                <DiscoveryModeProvider>
-                  {isAuthCallbackRoute ? (
-                    navigator
-                  ) : (
-                    <AuthGate>
-                      <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
-                    </AuthGate>
-                  )}
-                </DiscoveryModeProvider>
-              </ItemInteractionProvider>
+              <SharedEndorsementProvider>
+                <ItemInteractionProvider>
+                  <DiscoveryModeProvider>
+                    {isAuthCallbackRoute ? (
+                      navigator
+                    ) : (
+                      <AuthGate>
+                        <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                      </AuthGate>
+                    )}
+                  </DiscoveryModeProvider>
+                </ItemInteractionProvider>
+              </SharedEndorsementProvider>
             </EventTrackingProvider>
           </ActiveProfileProvider>
         </PersonalProfileProvider>
