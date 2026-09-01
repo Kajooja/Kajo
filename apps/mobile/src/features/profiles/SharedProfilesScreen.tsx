@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,10 @@ import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from './ActiveProfileContext';
+import {
+  MAXIMUM_SHARED_PROFILE_NAME_LENGTH,
+  MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH,
+} from './sharedProfileOperations';
 
 export function SharedProfilesScreen() {
   const profiles = useActiveProfile();
@@ -27,6 +32,7 @@ export function SharedProfilesScreen() {
   const [invitingToProfileId, setInvitingToProfileId] = useState<string | null>(null);
   const [memberNickname, setMemberNickname] = useState('');
   const [sendingInvite, setSendingInvite] = useState(false);
+  const [leavingProfileId, setLeavingProfileId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const personalProfile = profiles.personalProfile;
@@ -92,6 +98,45 @@ export function SharedProfilesScreen() {
     );
     setMemberNickname('');
     setInvitingToProfileId(null);
+  }
+
+  function confirmLeave(profileId: string, profileName: string) {
+    if (leavingProfileId) return;
+
+    Alert.alert(
+      'Poistu ryhmästä',
+      `Oletko varma, että haluat poistua ryhmästä ${profileName}?`,
+      [
+        { text: 'Peruuta', style: 'cancel' },
+        {
+          text: 'Poistu',
+          style: 'destructive',
+          onPress: () => void handleLeave(profileId, profileName),
+        },
+      ],
+    );
+  }
+
+  async function handleLeave(profileId: string, profileName: string) {
+    if (leavingProfileId) return;
+
+    setLeavingProfileId(profileId);
+    setActionError(null);
+    setActionNotice(null);
+    const result = await profiles.leaveSharedProfile(profileId);
+    setLeavingProfileId(null);
+
+    if (result.status === 'error') {
+      setActionError(result.message);
+      return;
+    }
+
+    if (invitingToProfileId === profileId) {
+      setInvitingToProfileId(null);
+      setMemberNickname('');
+    }
+
+    setActionNotice(`Poistuit ryhmästä ${profileName}.`);
   }
 
   const canUseSharedProfiles =
@@ -174,6 +219,7 @@ export function SharedProfilesScreen() {
           const { profile } = membership;
           const isActive = profiles.activeProfile?.id === profile.id;
           const showInviteForm = invitingToProfileId === profile.id;
+          const isLeaving = leavingProfileId === profile.id;
 
           return (
             <View key={profile.id} style={styles.card}>
@@ -198,6 +244,7 @@ export function SharedProfilesScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                     editable={!sendingInvite && canUseSharedProfiles}
+                    maxLength={MAXIMUM_SHARED_PROFILE_NICKNAME_LENGTH}
                     onChangeText={setMemberNickname}
                     placeholder="Nimimerkki"
                     placeholderTextColor={theme.base.textMuted}
@@ -256,6 +303,22 @@ export function SharedProfilesScreen() {
                   Ryhmä avautuu, kun vähintään yksi kutsuttu käyttäjä hyväksyy kutsun.
                 </Text>
               )}
+
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Poistu ryhmästä ${profile.name}`}
+                disabled={isLeaving || leavingProfileId !== null}
+                onPress={() => confirmLeave(profile.id, profile.name)}
+                style={({ pressed }) => [
+                  styles.leaveButton,
+                  pressed && styles.pressed,
+                  (isLeaving || leavingProfileId !== null) && styles.disabled,
+                ]}
+              >
+                <Text style={styles.leaveButtonText}>
+                  {isLeaving ? 'Poistutaan…' : 'Poistu ryhmästä'}
+                </Text>
+              </Pressable>
             </View>
           );
         })}
@@ -273,6 +336,7 @@ export function SharedProfilesScreen() {
             accessibilityLabel="Uuden yhteisen Kajon nimi"
             autoCorrect={false}
             editable={!creating && canUseSharedProfiles}
+            maxLength={MAXIMUM_SHARED_PROFILE_NAME_LENGTH}
             onChangeText={setNewProfileName}
             placeholder="Esim. Meidän Kajo"
             placeholderTextColor={theme.base.textMuted}
@@ -443,6 +507,17 @@ function createStyles(theme: RoomTheme) {
       fontSize: 12,
       fontWeight: '600',
       textDecorationLine: 'underline',
+    },
+    leaveButton: {
+      alignSelf: 'flex-start',
+      minHeight: 34,
+      justifyContent: 'center',
+      paddingHorizontal: 2,
+    },
+    leaveButtonText: {
+      color: theme.base.textMuted,
+      fontSize: 12,
+      fontWeight: '600',
     },
     pendingText: {
       color: theme.base.textMuted,

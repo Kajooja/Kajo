@@ -35,7 +35,7 @@ export type NicknameValidationResult =
   | { status: 'invalid'; message: string };
 
 const MINIMUM_NICKNAME_LENGTH = 2;
-const MAXIMUM_NICKNAME_LENGTH = 32;
+export const MAXIMUM_NICKNAME_LENGTH = 24;
 const PROFILE_ERROR_MESSAGE =
   'Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.';
 const NICKNAME_EXISTS_MESSAGE = 'Nimimerkki on jo käytössä. Valitse toinen.';
