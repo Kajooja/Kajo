@@ -139,11 +139,11 @@ properties.source = SHARED_CONSENSUS
 
 This records Profile-level transition to Shared Saved state. Pending member Endorsement evidence remains independently traceable.
 
-## Shared discovery consumption rule
+## Shared discovery member-history rule
 
-An Item already consumed/rated in any accepted member's PersonalProfile is ineligible for ordinary Shared discovery under #151.
+An Item already consumed/rated in an accepted member's PersonalProfile may appear in Shared discovery only as an attributed lower-priority member-history delivery tier under #151. Higher rating may order that tier but must not move it ahead of ordinary unseen recommendations.
 
-Do not copy that Personal Event into the Shared Event stream merely to implement suppression. The scorer/eligibility layer may read authorized member PersonalProfile state while preserving original Profile provenance.
+Do not copy that Personal Event into the Shared Event stream merely to implement delivery. The authorized overlay may read member PersonalProfile current state while preserving original Profile provenance. SharedProfile-consumed/rated and consensus-saved Items remain outside ordinary discovery.
 
 This rule does not delete the Item from Saved, named Lists or history.
 

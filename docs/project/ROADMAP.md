@@ -73,8 +73,9 @@ Sprint 011 deliberately has **two ordered slices**.
 
 Make Shared discovery behave like a joint decision surface without creating a separate social recommender.
 
-- ordinary Shared discovery excludes any Item already consumed/rated in any currently accepted member's PersonalProfile,
-- this suppression affects discovery only; existing Lists/history keep the Item and may show consumed/rating state,
+- pending Endorsements remain first, ordinary unseen recommendations retain Prediction order next, and Items already consumed/rated in an accepted member's PersonalProfile form an attributed lower-priority tier,
+- higher accepted-member ratings may reorder only that history tier; this does not define common-fit or EvoBot weights,
+- SharedProfile-consumed/rated and consensus-saved Items remain suppressed from ordinary discovery; existing Lists/history keep the Item and may show consumed/rating state,
 - Shared Prediction remains targeted to the SharedProfile,
 - Prediction V0 may combine Shared joint evidence with accepted members' PersonalProfile evidence using an inspectable common-fit aggregate plus disagreement penalty,
 - one member's Shared quick positive action becomes an actor-specific `Endorsement`, not Shared `saved=true`,
@@ -118,9 +119,11 @@ Primary issue: #138.
 
 Vector/scenario representation and similarity retrieval over historical situations. Starts only after navigation, Shared curation, Lists and narrow Profile messaging are stable.
 
-### Sprint 014 — MVP Hardening
+### Sprint 014 — MVP Hardening & Store Release
 
-Onboarding, performance, accessibility, end-to-end flows, quality, privacy checks and release readiness across PersonalProfile, SharedProfile, navigation, Lists, messaging and Prediction.
+Onboarding, performance, accessibility, end-to-end flows, quality and privacy checks across PersonalProfile, SharedProfile, navigation, Lists, messaging and Prediction.
+
+The milestone closes only with a genuinely shareable store release: stable production identifiers/versioning/signing, production authentication email delivery, privacy/support and store metadata/assets, least-privilege client configuration, and verified clean install/update flows on representative real devices through an official app store.
 
 ## Post-MVP direction
 

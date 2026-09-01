@@ -69,14 +69,16 @@ Sprint 011 has two ordered slices.
 
 ### 11A — #151 Shared discovery + Endorsement consensus
 
-Backend state/consensus foundation is merged in PR #157. The next delivery slice adds the authorized member-history/pending overlay and mobile `Tykkää`/provenance flow without changing `rank_items_v0` core weights. Configured Android acceptance is still required before 11A can be marked complete.
+Backend state/consensus foundation is merged in PR #157 and authorized mobile delivery in PR #158. Configured Android testing confirmed endorsement, consensus, Personal isolation and resilient retry. User feedback changed member PersonalProfile history from full suppression to a lower attributed queue tier; that narrow #151 correction is active without changing `rank_items_v0` core weights.
 
-1. Any accepted member's PersonalProfile consumed/rated Item is excluded from ordinary Shared discovery.
+1. Pending Endorsements are delivered first, unseen ordinary Predictions next and accepted-member PersonalProfile consumed/rated Items afterward with real-member `nähnyt` provenance; higher member ratings order only that final tier.
 2. Shared Prediction remains Profile-targeted while using inspectable common-fit evidence from accepted members plus disagreement handling.
 3. One member's Shared positive quick action becomes actor-specific `Endorsement`, not Shared saved state.
 4. The endorsing actor stops receiving that Item in their own ordinary queue.
 5. Non-endorsing members receive the pending Item ahead of ordinary recommendations with restrained real-actor provenance.
 6. Unanimity promotes once to Shared saved state.
+
+The MVP endpoint is now a genuinely shareable production application downloadable through an official app store, not only a locally installable APK. Sprint 014 therefore includes signing/versioning, production auth/email, privacy/support/store assets and clean install/update acceptance.
 
 ### 11B — #102 Profile-scoped Lists
 

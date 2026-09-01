@@ -2,6 +2,7 @@ node_modules/
 .expo/
 dist/
 coverage/
+supabase/.temp/
 .env
 .env.*
 !.env.example

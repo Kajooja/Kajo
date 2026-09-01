@@ -164,6 +164,11 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
     !Array.isArray(value.tags) ||
     !value.tags.every((tag) => typeof tag === 'string') ||
     typeof value.ineligible_for_discovery !== 'boolean' ||
+    !Array.isArray(value.member_consumed_user_ids) ||
+    !value.member_consumed_user_ids.every(isNonEmptyString) ||
+    (value.member_max_rating !== null &&
+      (!isNonNegativeInteger(value.member_max_rating) ||
+        (value.member_max_rating as number) > 10)) ||
     typeof value.current_actor_endorsed !== 'boolean' ||
     typeof value.pending_endorsement !== 'boolean' ||
     typeof value.consensus_saved !== 'boolean' ||
@@ -195,6 +200,8 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
       tags: value.tags as string[],
     },
     ineligibleForDiscovery: value.ineligible_for_discovery,
+    memberConsumedUserIds: value.member_consumed_user_ids as string[],
+    memberMaxRating: value.member_max_rating as number | null,
     currentActorEndorsed: value.current_actor_endorsed,
     pendingEndorsement: value.pending_endorsement,
     consensusSaved: value.consensus_saved,

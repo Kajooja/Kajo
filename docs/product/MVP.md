@@ -72,7 +72,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [ ] `MVP-SOCIAL-003` In SharedProfile discovery, one member can endorse an Item as worth doing together; the endorsement is actor-specific pending state, not shared `saved=true`.
 - [ ] `MVP-SOCIAL-004` A pending endorsement is suppressed for the endorser and prioritized ahead of ordinary recommendations for accepted members who have not endorsed it, with restrained real-actor provenance.
 - [ ] `MVP-SOCIAL-005` Unanimous endorsement by all currently accepted members promotes the Item once to Shared saved state / system `Tallennetut`; a later new member does not retroactively revoke that historical consensus.
-- [ ] `MVP-SOCIAL-006` Ordinary Shared discovery excludes an Item if any currently accepted member has already consumed/rated it in that member's PersonalProfile, without deleting the Item from Lists/history.
+- [ ] `MVP-SOCIAL-006` Ordinary Shared discovery retains Items consumed/rated in an accepted member's PersonalProfile as a clearly attributed lower-priority history tier; higher member ratings may lift Items only inside that tier. SharedProfile-consumed and consensus-saved Items remain outside ordinary discovery, and no history/List data is deleted.
 
 ## Named Lists
 
@@ -98,6 +98,12 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
 - [ ] `MVP-PRED-004` Architecture supports later scenario-memory retrieval without redesigning core contracts.
 - [ ] `MVP-PRED-005` SharedProfile Prediction V0 can combine Shared joint evidence with accepted members' PersonalProfile taste evidence using an inspectable common-fit aggregation/disagreement penalty while the Prediction target remains the SharedProfile.
+
+## Production release
+
+- [ ] `MVP-REL-001` Kajo has stable production application identifiers, versioning, signing and release configuration for its supported mobile platforms; no development-only secret or service-role credential is embedded in a client build.
+- [ ] `MVP-REL-002` Production authentication email delivery, privacy/support information, store assets, required permissions and account/data lifecycle flows are verified for an external user.
+- [ ] `MVP-REL-003` A signed production release is downloadable through an official app store, and clean install, authentication, PersonalProfile, SharedProfile, discovery, Lists and update flows pass on representative real devices.
 
 ## Explicitly outside MVP 0.1
 

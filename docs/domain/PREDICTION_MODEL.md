@@ -124,20 +124,23 @@ For SharedProfile V0, ranking may combine:
 
 Do not lock an opaque ML aggregation before enough evidence exists. The exact common-fit/disagreement formula is gated by #156 and the approved Prediction Core design. When implemented, its component values must remain inspectable in `explanation` so behavior can be verified on configured accounts.
 
-### Shared discovery eligibility from member history
+### Shared discovery delivery from member history
 
-For active SharedProfile, an Item is excluded from **ordinary Shared discovery** if any currently accepted member has already consumed/rated it in that member's PersonalProfile.
+For active SharedProfile, an Item already consumed/rated by a currently accepted member's PersonalProfile remains useful collaboration context but is not treated as an unseen ordinary recommendation.
 
 Conceptually:
 
 ```text
 for candidate Item:
-  if SharedProfile itself consumed/rated Item -> ineligible
-  else if any accepted member PersonalProfile consumed/rated Item -> ineligible
-  else -> eligible for ranking
+  if SharedProfile itself consumed/rated or consensus-saved Item -> ineligible
+  else if pending Endorsement for current actor -> collaboration-first tier
+  else if no accepted member PersonalProfile consumed/rated Item -> ordinary Prediction tier
+  else -> attributed member-history tier after ordinary Items
 ```
 
-This is not Event copying. Personal events remain PersonalProfile evidence. The scorer/eligibility query reads authorized state to decide whether the Item is still useful as a shared recommendation.
+Within the member-history tier, the highest accepted-member rating may provide a small deterministic ordering signal. It never lifts history above unseen ordinary recommendations and is not a hidden common-fit, ScenarioMemory or EvoBot weight.
+
+This is not Event copying. Personal Events remain PersonalProfile evidence. The authorized delivery overlay returns only accepted-member IDs and an aggregate maximum rating needed for ordering; mobile resolves already-authorized member nicknames and never receives auth emails.
 
 This rule does not remove the Item from Lists, Saved history or consumed history.
 
@@ -168,7 +171,7 @@ SharedProfile Prediction ranking
 
 Prediction output/explanation should make this priority inspectable, e.g. pending endorsement flags/actor IDs or a clear delivery-priority component, without leaking auth email.
 
-The MVP implementation keeps this composition outside `rank_items_v0`: an authorized Shared discovery overlay returns discovery eligibility, current-actor endorsement state, pending Items and accepted-member actor IDs. Mobile prepends eligible pending Items and filters actor/member-history exclusions around the unchanged temporary V0 ranking. This overlay contains no taste weights and can remain in place when the core predictor is replaced.
+The MVP implementation keeps this composition outside `rank_items_v0`: an authorized Shared discovery overlay returns Shared eligibility, current-actor endorsement state, pending Items, accepted-member actor IDs and minimal member-history delivery metadata. Mobile prepends eligible pending Items, preserves unseen Prediction order and appends attributed member-history Items ordered by their aggregate rating signal. This overlay contains no common-fit weights and can remain in place when the core predictor is replaced.
 
 ## Shared consensus and Saved evidence
 
