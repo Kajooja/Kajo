@@ -1,11 +1,8 @@
 import { useState, type PropsWithChildren } from 'react';
-import {
-  useGlobalSearchParams,
-  usePathname,
-  useRouter,
-} from 'expo-router';
+import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Pressable,
   ScrollView,
@@ -17,16 +14,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme } from '../../theme/roomTheme';
+import { useAuthSession } from '../auth/AuthSessionProvider';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
 import { useDiscoveryMode } from './DiscoveryModeContext';
-import {
-  createSharedSuggestionEventInput,
-  resolveSharedSuggestionItem,
-} from './sharedSuggestion';
 
 const MODE_LABELS = {
   FOR_YOU: 'SINULLE',
@@ -37,27 +31,14 @@ const MAX_DRAWER_GROUPS = 5;
 
 type ShellOverlay = 'navigation' | 'inbox' | null;
 
-interface SuggestionReceipt {
-  profileId: string;
-  itemId: string;
-}
-
 export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const router = useRouter();
-  const pathname = usePathname();
-  const { itemId } = useGlobalSearchParams<{ itemId?: string | string[] }>();
+  const auth = useAuthSession();
   const { mode, setMode } = useDiscoveryMode();
   const eventTracking = useEventTracking();
   const profiles = useActiveProfile();
   const { activeProfile } = profiles;
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile);
-  const suggestionItem = resolveSharedSuggestionItem(
-    activeProfile,
-    pathname,
-    itemId,
-  );
-  const [suggestionReceipt, setSuggestionReceipt] =
-    useState<SuggestionReceipt | null>(null);
   const [overlay, setOverlay] = useState<ShellOverlay>(null);
   const [respondingInvitationId, setRespondingInvitationId] = useState<
     string | null
@@ -65,12 +46,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const [invitationActionError, setInvitationActionError] = useState<
     string | null
   >(null);
-  const suggestionSent = Boolean(
-    suggestionItem &&
-      activeProfile?.type === 'SHARED' &&
-      suggestionReceipt?.profileId === activeProfile.id &&
-      suggestionReceipt.itemId === suggestionItem.id,
-  );
+  const [signingOut, setSigningOut] = useState(false);
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
@@ -98,6 +74,11 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     }
 
     setMode(nextMode);
+  }
+
+  function goHome() {
+    setOverlay(null);
+    router.replace('/');
   }
 
   function toggleOverlay(nextOverlay: Exclude<ShellOverlay, null>) {
@@ -133,26 +114,16 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     }
   }
 
-  function suggestCurrentItem() {
-    if (
-      !suggestionItem ||
-      activeProfile?.type !== 'SHARED' ||
-      eventTracking.status !== 'ready' ||
-      suggestionSent
-    ) {
-      return;
+  async function handleSignOut() {
+    if (signingOut) return;
+
+    setSigningOut(true);
+    const result = await auth.signOut();
+
+    if (result.status === 'error') {
+      setSigningOut(false);
+      Alert.alert('Uloskirjautuminen epäonnistui', result.message);
     }
-
-    const eventId = eventTracking.recordEvent(
-      createSharedSuggestionEventInput(suggestionItem, mode),
-    );
-
-    if (!eventId) return;
-
-    setSuggestionReceipt({
-      profileId: activeProfile.id,
-      itemId: suggestionItem.id,
-    });
   }
 
   return (
@@ -172,7 +143,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
             accessibilityRole="button"
             accessibilityLabel={`Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
             hitSlop={8}
-            onPress={() => router.replace('/')}
+            onPress={goHome}
             style={({ pressed }) => [styles.brand, pressed && styles.brandPressed]}
           >
             <View style={styles.brandMark}>
@@ -209,75 +180,6 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               { backgroundColor: theme.base.sceneBackground },
             ]}
           />
-        ) : null}
-
-        {suggestionItem && activeProfile?.type === 'SHARED' ? (
-          <View
-            style={[
-              styles.suggestionPanel,
-              {
-                backgroundColor: theme.base.sceneBackground,
-                borderColor: theme.base.border,
-              },
-            ]}
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={
-                suggestionSent
-                  ? 'Ehdotettu yhteiseen Kajoon'
-                  : 'Ehdota yhteiseen Kajoon'
-              }
-              accessibilityState={{
-                disabled: suggestionSent || eventTracking.status !== 'ready',
-              }}
-              disabled={suggestionSent || eventTracking.status !== 'ready'}
-              onPress={suggestCurrentItem}
-              style={({ pressed }) => [
-                styles.suggestionButton,
-                pressed && styles.brandPressed,
-                (suggestionSent || eventTracking.status !== 'ready') &&
-                  styles.disabled,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.suggestionText,
-                  { color: theme.base.textPrimary },
-                ]}
-              >
-                {suggestionSent ? 'EHDOTETTU' : 'EHDOTA YHTEISEEN'}
-              </Text>
-            </Pressable>
-            {eventTracking.persistenceError ? (
-              <View style={styles.suggestionErrorRow}>
-                <Text
-                  numberOfLines={2}
-                  style={[
-                    styles.suggestionErrorText,
-                    { color: theme.base.textMuted },
-                  ]}
-                >
-                  Tallennus kesken.
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Yritä ehdotuksen tallennusta uudelleen"
-                  onPress={eventTracking.retryPersistence}
-                  style={({ pressed }) => [pressed && styles.brandPressed]}
-                >
-                  <Text
-                    style={[
-                      styles.retryText,
-                      { color: theme.base.textPrimary },
-                    ]}
-                  >
-                    Yritä uudelleen
-                  </Text>
-                </Pressable>
-              </View>
-            ) : null}
-          </View>
         ) : null}
 
         {overlay === 'navigation' ? (
@@ -494,6 +396,36 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                     ) : null}
                   </View>
                 </View>
+
+                {auth.status === 'signed-in' ? (
+                  <View
+                    style={[
+                      styles.signOutSection,
+                      { borderTopColor: theme.base.border },
+                    ]}
+                  >
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Kirjaudu ulos Kajosta"
+                      disabled={signingOut}
+                      onPress={() => void handleSignOut()}
+                      style={({ pressed }) => [
+                        styles.signOutButton,
+                        pressed && styles.rowPressed,
+                        signingOut && styles.disabled,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.signOutText,
+                          { color: theme.base.textMuted },
+                        ]}
+                      >
+                        {signingOut ? 'Kirjaudutaan…' : 'Kirjaudu ulos'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : null}
               </ScrollView>
             </View>
           </View>
@@ -724,14 +656,23 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               </View>
             </Pressable>
 
-            <View style={styles.dockContext} pointerEvents="none">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
+              hitSlop={8}
+              onPress={goHome}
+              style={({ pressed }) => [
+                styles.dockContext,
+                pressed && styles.brandPressed,
+              ]}
+            >
               <Text
                 numberOfLines={1}
                 style={[styles.dockIdentity, { color: theme.base.textMuted }]}
               >
                 {identityName}
               </Text>
-            </View>
+            </Pressable>
 
             <Pressable
               accessibilityRole="button"
@@ -824,39 +765,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     opacity: 0.06,
   },
-  suggestionPanel: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-    zIndex: 20,
-    maxWidth: 190,
-    borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    gap: 6,
-  },
-  suggestionButton: {
-    minHeight: 30,
-    justifyContent: 'center',
-  },
-  suggestionText: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.1,
-  },
-  suggestionErrorRow: {
-    gap: 4,
-  },
-  suggestionErrorText: {
-    fontSize: 10,
-    lineHeight: 13,
-  },
-  retryText: {
-    fontSize: 10,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
   overlayLayer: {
     ...StyleSheet.absoluteFill,
     zIndex: 80,
@@ -873,6 +781,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
   },
   drawerContent: {
+    flexGrow: 1,
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 26,
@@ -963,6 +872,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 15,
     marginTop: 8,
+  },
+  signOutSection: {
+    marginTop: 'auto',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 14,
+  },
+  signOutButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  signOutText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   inboxPanel: {
     position: 'absolute',
@@ -1070,7 +992,9 @@ const styles = StyleSheet.create({
   dockContext: {
     flex: 1,
     minWidth: 0,
+    minHeight: 42,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 10,
   },
   dockIdentity: {
