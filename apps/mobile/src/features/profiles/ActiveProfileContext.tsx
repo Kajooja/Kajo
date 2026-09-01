@@ -24,6 +24,7 @@ import {
 import {
   createSharedProfile as createSharedProfileOperation,
   inviteSharedProfileMember as inviteSharedProfileMemberOperation,
+  leaveSharedProfile as leaveSharedProfileOperation,
   loadSharedProfileInvitations,
   loadSharedProfiles,
   respondSharedProfileInvitation as respondSharedProfileInvitationOperation,
@@ -31,6 +32,7 @@ import {
   type SharedProfileInvitation,
   type SharedProfileInvitationResponseResult,
   type SharedProfileInviteResult,
+  type SharedProfileLeaveResult,
   type SharedProfileMembership,
   type SharedProfileRpc,
 } from './sharedProfileOperations';
@@ -69,6 +71,9 @@ interface ActiveProfileContextValue {
     invitationId: string,
     accept: boolean,
   ) => Promise<SharedProfileInvitationResponseResult>;
+  leaveSharedProfile: (
+    profileId: ProfileId,
+  ) => Promise<SharedProfileLeaveResult>;
 }
 
 interface SharedProfilesSnapshot {
@@ -343,6 +348,39 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
     [actorUserId, retrySharedProfiles, rpc],
   );
 
+  const leaveSharedProfile = useCallback(
+    async (profileId: ProfileId): Promise<SharedProfileLeaveResult> => {
+      if (!rpc || !actorUserId) {
+        return { status: 'error', message: SHARED_PROFILE_UNAVAILABLE_MESSAGE };
+      }
+
+      const result = await leaveSharedProfileOperation(rpc, profileId);
+
+      if (result.status === 'success') {
+        if (activeProfile?.id === profileId && personalProfile) {
+          setSelection({ actorUserId, profileId: personalProfile.id });
+        }
+
+        setSharedSnapshot((current) =>
+          current?.actorUserId === actorUserId
+            ? {
+                actorUserId,
+                status: 'ready',
+                profiles: current.profiles.filter(
+                  (membership) => membership.profile.id !== profileId,
+                ),
+                message: null,
+              }
+            : current,
+        );
+        setSharedAttempt((current) => current + 1);
+      }
+
+      return result;
+    },
+    [activeProfile?.id, actorUserId, personalProfile, rpc],
+  );
+
   const status = getActiveProfileStatus(personal.status);
   const sharedProfilesStatus = getRemoteStatus(
     personal.status,
@@ -387,6 +425,7 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
       createSharedProfile,
       inviteSharedProfileMember,
       respondSharedProfileInvitation,
+      leaveSharedProfile,
     }),
     [
       activeProfile,
@@ -395,6 +434,7 @@ export function ActiveProfileProvider({ children }: PropsWithChildren) {
       invitationsError,
       invitationsStatus,
       inviteSharedProfileMember,
+      leaveSharedProfile,
       personalProfile,
       respondSharedProfileInvitation,
       retryInvitations,
