@@ -35,7 +35,7 @@ const MODE_LABELS = {
 } as const;
 const MAX_DRAWER_GROUPS = 5;
 
-type ShellOverlay = 'profiles' | 'inbox' | null;
+type ShellOverlay = 'navigation' | 'inbox' | null;
 
 interface SuggestionReceipt {
   profileId: string;
@@ -78,9 +78,12 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     activeProfile?.type === 'SHARED'
       ? activeProfile.name
       : profiles.personalProfile?.name ?? 'OMA KAJO';
+  const identityType = activeProfile?.type === 'SHARED' ? 'RYHMÄ' : 'OMA PROFIILI';
   const drawerSharedProfiles = profiles.selectableProfiles
     .filter((profile) => profile.type === 'SHARED')
     .slice(0, MAX_DRAWER_GROUPS);
+  const invitationBadgeLabel =
+    profiles.invitations.length > 9 ? '9+' : String(profiles.invitations.length);
 
   function changeMode(nextMode: typeof mode) {
     if (nextMode !== mode) {
@@ -144,9 +147,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
       createSharedSuggestionEventInput(suggestionItem, mode),
     );
 
-    if (!eventId) {
-      return;
-    }
+    if (!eventId) return;
 
     setSuggestionReceipt({
       profileId: activeProfile.id,
@@ -169,7 +170,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
         <View style={styles.bar}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Palaa huoneeseen"
+            accessibilityLabel={`Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
             hitSlop={8}
             onPress={() => router.replace('/')}
             style={({ pressed }) => [styles.brand, pressed && styles.brandPressed]}
@@ -194,48 +195,6 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               ambientTheme={theme.ambient}
             />
           </View>
-
-          {profiles.status === 'ready' ? (
-            <View style={styles.accountControls}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={
-                  profiles.invitations.length > 0
-                    ? `Avaa kutsut. ${profiles.invitations.length} uutta kutsua.`
-                    : 'Avaa kutsut'
-                }
-                hitSlop={6}
-                onPress={() => toggleOverlay('inbox')}
-                style={({ pressed }) => [
-                  styles.mailButton,
-                  pressed && styles.brandPressed,
-                ]}
-              >
-                <Text style={[styles.mailIcon, { color: theme.base.textPrimary }]}>✉</Text>
-                {profiles.invitations.length > 0 ? (
-                  <View style={styles.notificationDot} />
-                ) : null}
-              </Pressable>
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Vaihda Kajo-profiilia. Aktiivinen ${identityName}.`}
-                hitSlop={6}
-                onPress={() => toggleOverlay('profiles')}
-                style={({ pressed }) => [
-                  styles.identityButton,
-                  pressed && styles.brandPressed,
-                ]}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={[styles.identityText, { color: theme.base.textPrimary }]}
-                >
-                  {identityName}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
         </View>
       </SafeAreaView>
 
@@ -265,7 +224,9 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={
-                suggestionSent ? 'Ehdotettu yhteiseen Kajoon' : 'Ehdota yhteiseen Kajoon'
+                suggestionSent
+                  ? 'Ehdotettu yhteiseen Kajoon'
+                  : 'Ehdota yhteiseen Kajoon'
               }
               accessibilityState={{
                 disabled: suggestionSent || eventTracking.status !== 'ready',
@@ -275,7 +236,8 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               style={({ pressed }) => [
                 styles.suggestionButton,
                 pressed && styles.brandPressed,
-                (suggestionSent || eventTracking.status !== 'ready') && styles.disabled,
+                (suggestionSent || eventTracking.status !== 'ready') &&
+                  styles.disabled,
               ]}
             >
               <Text
@@ -318,11 +280,11 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           </View>
         ) : null}
 
-        {overlay === 'profiles' ? (
+        {overlay === 'navigation' ? (
           <View style={styles.overlayLayer}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Sulje profiilivalikko"
+              accessibilityLabel="Sulje valikko"
               onPress={() => setOverlay(null)}
               style={styles.overlayBackdrop}
             />
@@ -335,102 +297,204 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 },
               ]}
             >
-              <View style={styles.drawerTop}>
-                <Text style={[styles.drawerKicker, { color: theme.base.textMuted }]}>KAJO</Text>
-                {profiles.personalProfile ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={`Vaihda omaan Kajoon ${profiles.personalProfile.name}`}
-                    onPress={() => switchProfile(profiles.personalProfile!.id)}
-                    style={({ pressed }) => [
-                      styles.profileRow,
-                      pressed && styles.rowPressed,
-                    ]}
-                  >
-                    <Text
-                      numberOfLines={1}
-                      style={[styles.profileName, { color: theme.base.textPrimary }]}
-                    >
-                      {profiles.personalProfile.name}
-                    </Text>
-                    {activeProfile?.id === profiles.personalProfile.id ? (
-                      <View
-                        style={[
-                          styles.activeProfileDot,
-                          { backgroundColor: theme.base.textPrimary },
-                        ]}
-                      />
-                    ) : null}
-                  </Pressable>
-                ) : null}
-              </View>
-
-              <View style={[styles.drawerDivider, { backgroundColor: theme.base.border }]} />
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Avaa kaikki ryhmät ja ryhmien luonti"
-                onPress={openGroups}
-                style={({ pressed }) => [
-                  styles.groupsHeading,
-                  pressed && styles.rowPressed,
-                ]}
+              <ScrollView
+                contentContainerStyle={styles.drawerContent}
+                showsVerticalScrollIndicator={false}
               >
-                <Text style={[styles.groupsTitle, { color: theme.base.textPrimary }]}>Ryhmät</Text>
-                <Text style={[styles.groupsArrow, { color: theme.base.textMuted }]}>›</Text>
-              </Pressable>
+                <View style={styles.drawerIdentity}>
+                  <Text
+                    style={[styles.drawerKicker, { color: theme.base.textMuted }]}
+                  >
+                    {identityType}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.drawerIdentityName,
+                      { color: theme.base.textPrimary },
+                    ]}
+                  >
+                    {identityName}
+                  </Text>
+                </View>
 
-              <View style={styles.groupList}>
-                {drawerSharedProfiles.map((profile) => (
+                <View
+                  style={[
+                    styles.drawerDivider,
+                    { backgroundColor: theme.base.border },
+                  ]}
+                />
+
+                <View style={styles.drawerSection}>
+                  <Text
+                    style={[
+                      styles.sectionHeading,
+                      { color: theme.base.textPrimary },
+                    ]}
+                  >
+                    Profiili
+                  </Text>
+                  {profiles.personalProfile ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Vaihda omaan Kajoon ${profiles.personalProfile.name}`}
+                      onPress={() => switchProfile(profiles.personalProfile!.id)}
+                      style={({ pressed }) => [
+                        styles.profileRow,
+                        pressed && styles.rowPressed,
+                      ]}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        style={[
+                          styles.profileName,
+                          { color: theme.base.textPrimary },
+                        ]}
+                      >
+                        {profiles.personalProfile.name}
+                      </Text>
+                      {activeProfile?.id === profiles.personalProfile.id ? (
+                        <View
+                          style={[
+                            styles.activeProfileDot,
+                            { backgroundColor: theme.base.textPrimary },
+                          ]}
+                        />
+                      ) : null}
+                    </Pressable>
+                  ) : null}
+                </View>
+
+                <View style={styles.drawerSection}>
+                  <View style={styles.staticSectionHeading}>
+                    <Text
+                      style={[
+                        styles.sectionHeading,
+                        { color: theme.base.textPrimary },
+                      ]}
+                    >
+                      Listat
+                    </Text>
+                    <Text
+                      style={[
+                        styles.sectionStatus,
+                        { color: theme.base.textMuted },
+                      ]}
+                    >
+                      TULOSSA
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.drawerSection}>
                   <Pressable
-                    key={profile.id}
                     accessibilityRole="button"
-                    accessibilityLabel={`Vaihda ryhmään ${profile.name}`}
-                    onPress={() => switchProfile(profile.id)}
+                    accessibilityLabel="Avaa kaikki ryhmät ja ryhmien luonti"
+                    onPress={openGroups}
                     style={({ pressed }) => [
-                      styles.profileRow,
+                      styles.sectionActionHeading,
                       pressed && styles.rowPressed,
                     ]}
                   >
                     <Text
-                      numberOfLines={1}
-                      style={[styles.groupName, { color: theme.base.textPrimary }]}
+                      style={[
+                        styles.sectionHeading,
+                        { color: theme.base.textPrimary },
+                      ]}
                     >
-                      {profile.name}
+                      Ryhmät
                     </Text>
-                    {activeProfile?.id === profile.id ? (
-                      <View
-                        style={[
-                          styles.activeProfileDot,
-                          { backgroundColor: theme.base.textPrimary },
+                    <Text
+                      style={[
+                        styles.sectionArrow,
+                        { color: theme.base.textMuted },
+                      ]}
+                    >
+                      ›
+                    </Text>
+                  </Pressable>
+
+                  <View style={styles.groupList}>
+                    {drawerSharedProfiles.map((profile) => (
+                      <Pressable
+                        key={profile.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Vaihda ryhmään ${profile.name}`}
+                        onPress={() => switchProfile(profile.id)}
+                        style={({ pressed }) => [
+                          styles.profileRow,
+                          pressed && styles.rowPressed,
                         ]}
+                      >
+                        <Text
+                          numberOfLines={1}
+                          style={[
+                            styles.groupName,
+                            { color: theme.base.textPrimary },
+                          ]}
+                        >
+                          {profile.name}
+                        </Text>
+                        {activeProfile?.id === profile.id ? (
+                          <View
+                            style={[
+                              styles.activeProfileDot,
+                              { backgroundColor: theme.base.textPrimary },
+                            ]}
+                          />
+                        ) : null}
+                      </Pressable>
+                    ))}
+
+                    {drawerSharedProfiles.length === 0 ? (
+                      <Text
+                        style={[
+                          styles.emptyDrawerText,
+                          { color: theme.base.textMuted },
+                        ]}
+                      >
+                        Ei vielä aktiivisia ryhmiä.
+                      </Text>
+                    ) : null}
+
+                    {profiles.sharedProfilesStatus === 'loading' ? (
+                      <ActivityIndicator
+                        size="small"
+                        color={theme.base.textMuted}
                       />
                     ) : null}
-                  </Pressable>
-                ))}
 
-                {drawerSharedProfiles.length === 0 ? (
-                  <Text style={[styles.emptyDrawerText, { color: theme.base.textMuted }]}>Ei vielä aktiivisia ryhmiä.</Text>
-                ) : null}
+                    {profiles.sharedProfilesError ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={profiles.retrySharedProfiles}
+                        style={({ pressed }) => [pressed && styles.rowPressed]}
+                      >
+                        <Text
+                          style={[
+                            styles.drawerError,
+                            { color: theme.base.textMuted },
+                          ]}
+                        >
+                          Ryhmät eivät päivittyneet. Yritä uudelleen.
+                        </Text>
+                      </Pressable>
+                    ) : null}
 
-                {profiles.sharedProfilesStatus === 'loading' ? (
-                  <ActivityIndicator size="small" color={theme.base.textMuted} />
-                ) : null}
-
-                {profiles.sharedProfilesError ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={profiles.retrySharedProfiles}
-                    style={({ pressed }) => [pressed && styles.rowPressed]}
-                  >
-                    <Text style={[styles.drawerError, { color: theme.base.textMuted }]}>Ryhmät eivät päivittyneet. Yritä uudelleen.</Text>
-                  </Pressable>
-                ) : null}
-
-                {profiles.sharedProfiles.length > drawerSharedProfiles.length ? (
-                  <Text style={[styles.moreGroupsText, { color: theme.base.textMuted }]}>Kaikki ryhmät ja odottavat kutsut löytyvät Ryhmät-kohdasta.</Text>
-                ) : null}
-              </View>
+                    {profiles.sharedProfiles.length >
+                    drawerSharedProfiles.length ? (
+                      <Text
+                        style={[
+                          styles.moreGroupsText,
+                          { color: theme.base.textMuted },
+                        ]}
+                      >
+                        Kaikki ryhmät löytyvät Ryhmät-kohdasta.
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </ScrollView>
             </View>
           </View>
         ) : null}
@@ -439,7 +503,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           <View style={styles.overlayLayer}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Sulje kutsut"
+              accessibilityLabel="Sulje postilaatikko"
               onPress={() => setOverlay(null)}
               style={styles.overlayBackdrop}
             />
@@ -453,9 +517,29 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               ]}
             >
               <View style={styles.inboxHeader}>
-                <Text style={[styles.inboxTitle, { color: theme.base.textPrimary }]}>Kutsut</Text>
+                <View>
+                  <Text
+                    style={[
+                      styles.inboxKicker,
+                      { color: theme.base.textMuted },
+                    ]}
+                  >
+                    POSTILAATIKKO
+                  </Text>
+                  <Text
+                    style={[
+                      styles.inboxTitle,
+                      { color: theme.base.textPrimary },
+                    ]}
+                  >
+                    Kutsut
+                  </Text>
+                </View>
                 {profiles.invitationsStatus === 'loading' ? (
-                  <ActivityIndicator size="small" color={theme.base.textMuted} />
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.base.textMuted}
+                  />
                 ) : null}
               </View>
 
@@ -465,17 +549,38 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                   onPress={profiles.retryInvitations}
                   style={({ pressed }) => [pressed && styles.rowPressed]}
                 >
-                  <Text style={[styles.inboxError, { color: theme.base.textMuted }]}>{profiles.invitationsError} Yritä uudelleen.</Text>
+                  <Text
+                    style={[
+                      styles.inboxError,
+                      { color: theme.base.textMuted },
+                    ]}
+                  >
+                    {profiles.invitationsError} Yritä uudelleen.
+                  </Text>
                 </Pressable>
               ) : null}
 
               {invitationActionError ? (
-                <Text style={[styles.inboxError, { color: theme.base.textPrimary }]}>{invitationActionError}</Text>
+                <Text
+                  style={[
+                    styles.inboxError,
+                    { color: theme.base.textPrimary },
+                  ]}
+                >
+                  {invitationActionError}
+                </Text>
               ) : null}
 
               {profiles.invitations.length === 0 &&
               profiles.invitationsStatus !== 'loading' ? (
-                <Text style={[styles.emptyInboxText, { color: theme.base.textMuted }]}>Ei uusia kutsuja.</Text>
+                <Text
+                  style={[
+                    styles.emptyInboxText,
+                    { color: theme.base.textMuted },
+                  ]}
+                >
+                  Ei uusia kutsuja.
+                </Text>
               ) : null}
 
               <ScrollView
@@ -494,10 +599,20 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                         { borderColor: theme.base.border },
                       ]}
                     >
-                      <Text style={[styles.invitationText, { color: theme.base.textPrimary }]}>
+                      <Text
+                        style={[
+                          styles.invitationText,
+                          { color: theme.base.textPrimary },
+                        ]}
+                      >
                         Sinut on kutsuttu ryhmään {invitation.profileName}.
                       </Text>
-                      <Text style={[styles.inviterText, { color: theme.base.textMuted }]}>
+                      <Text
+                        style={[
+                          styles.inviterText,
+                          { color: theme.base.textMuted },
+                        ]}
+                      >
                         Kutsuja {invitation.inviter.nickname}
                       </Text>
 
@@ -505,7 +620,9 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                         <Pressable
                           accessibilityRole="button"
                           disabled={responseLocked}
-                          onPress={() => void respondToInvitation(invitation.id, true)}
+                          onPress={() =>
+                            void respondToInvitation(invitation.id, true)
+                          }
                           style={({ pressed }) => [
                             styles.acceptButton,
                             { backgroundColor: theme.base.structureLight },
@@ -533,7 +650,9 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                         <Pressable
                           accessibilityRole="button"
                           disabled={responseLocked}
-                          onPress={() => void respondToInvitation(invitation.id, false)}
+                          onPress={() =>
+                            void respondToInvitation(invitation.id, false)
+                          }
                           style={({ pressed }) => [
                             styles.rejectButton,
                             { borderColor: theme.base.border },
@@ -541,7 +660,14 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                             responseLocked && styles.disabled,
                           ]}
                         >
-                          <Text style={[styles.rejectButtonText, { color: theme.base.textPrimary }]}>Hylkää</Text>
+                          <Text
+                            style={[
+                              styles.rejectButtonText,
+                              { color: theme.base.textPrimary },
+                            ]}
+                          >
+                            Hylkää
+                          </Text>
                         </Pressable>
                       </View>
                     </View>
@@ -552,6 +678,92 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           </View>
         ) : null}
       </View>
+
+      {profiles.status === 'ready' ? (
+        <SafeAreaView
+          edges={['bottom']}
+          style={[
+            styles.safeDock,
+            {
+              backgroundColor: theme.base.appBackground,
+              borderTopColor: theme.base.border,
+            },
+          ]}
+        >
+          <View style={styles.bottomDock}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Avaa valikko"
+              accessibilityState={{ expanded: overlay === 'navigation' }}
+              hitSlop={8}
+              onPress={() => toggleOverlay('navigation')}
+              style={({ pressed }) => [
+                styles.dockButton,
+                pressed && styles.brandPressed,
+              ]}
+            >
+              <View style={styles.menuGlyph}>
+                <View
+                  style={[
+                    styles.menuLine,
+                    { backgroundColor: theme.base.textPrimary },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.menuLine,
+                    { backgroundColor: theme.base.textPrimary },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.menuLine,
+                    { backgroundColor: theme.base.textPrimary },
+                  ]}
+                />
+              </View>
+            </Pressable>
+
+            <View style={styles.dockContext} pointerEvents="none">
+              <Text
+                numberOfLines={1}
+                style={[styles.dockIdentity, { color: theme.base.textMuted }]}
+              >
+                {identityName}
+              </Text>
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                profiles.invitations.length > 0
+                  ? `Avaa postilaatikko. ${profiles.invitations.length} uutta kutsua.`
+                  : 'Avaa postilaatikko'
+              }
+              accessibilityState={{ expanded: overlay === 'inbox' }}
+              hitSlop={8}
+              onPress={() => toggleOverlay('inbox')}
+              style={({ pressed }) => [
+                styles.dockButton,
+                pressed && styles.brandPressed,
+              ]}
+            >
+              <Text
+                style={[styles.mailIcon, { color: theme.base.textPrimary }]}
+              >
+                ✉
+              </Text>
+              {profiles.invitations.length > 0 ? (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {invitationBadgeLabel}
+                  </Text>
+                </View>
+              ) : null}
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      ) : null}
     </View>
   );
 }
@@ -603,46 +815,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 0.8,
-  },
-  accountControls: {
-    maxWidth: 112,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 4,
-  },
-  mailButton: {
-    width: 34,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mailIcon: {
-    fontSize: 19,
-    lineHeight: 22,
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 5,
-    right: 3,
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: '#E24A4A',
-  },
-  identityButton: {
-    minWidth: 46,
-    maxWidth: 74,
-    minHeight: 36,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  identityText: {
-    maxWidth: 74,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-    textAlign: 'right',
   },
   content: {
     flex: 1,
@@ -699,21 +871,56 @@ const styles = StyleSheet.create({
     maxWidth: 310,
     height: '100%',
     borderRightWidth: 1,
+  },
+  drawerContent: {
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 22,
+    paddingBottom: 26,
   },
-  drawerTop: {
-    gap: 8,
+  drawerIdentity: {
+    gap: 5,
   },
   drawerKicker: {
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 1.8,
   },
+  drawerIdentityName: {
+    fontSize: 24,
+    fontWeight: '600',
+  },
   drawerDivider: {
     height: StyleSheet.hairlineWidth,
-    marginVertical: 16,
+    marginVertical: 18,
+  },
+  drawerSection: {
+    marginBottom: 20,
+  },
+  sectionHeading: {
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  staticSectionHeading: {
+    minHeight: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionStatus: {
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 1.1,
+  },
+  sectionActionHeading: {
+    minHeight: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionArrow: {
+    fontSize: 25,
+    lineHeight: 26,
+    fontWeight: '300',
   },
   profileRow: {
     minHeight: 42,
@@ -725,28 +932,13 @@ const styles = StyleSheet.create({
   },
   profileName: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
   },
   activeProfileDot: {
     width: 7,
     height: 7,
     borderRadius: 4,
-  },
-  groupsHeading: {
-    minHeight: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  groupsTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-  },
-  groupsArrow: {
-    fontSize: 25,
-    lineHeight: 26,
-    fontWeight: '300',
   },
   groupList: {
     marginTop: 4,
@@ -774,8 +966,8 @@ const styles = StyleSheet.create({
   },
   inboxPanel: {
     position: 'absolute',
-    top: 8,
     right: 10,
+    bottom: 8,
     width: '88%',
     maxWidth: 360,
     maxHeight: 390,
@@ -785,10 +977,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   inboxHeader: {
-    minHeight: 26,
+    minHeight: 34,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  inboxKicker: {
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 1.3,
+    marginBottom: 2,
   },
   inboxTitle: {
     fontSize: 16,
@@ -852,6 +1050,65 @@ const styles = StyleSheet.create({
   rejectButtonText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  safeDock: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  bottomDock: {
+    minHeight: 46,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dockButton: {
+    width: 46,
+    height: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dockContext: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  dockIdentity: {
+    maxWidth: 190,
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  menuGlyph: {
+    width: 19,
+    gap: 4,
+  },
+  menuLine: {
+    width: 19,
+    height: 1.5,
+    borderRadius: 1,
+  },
+  mailIcon: {
+    fontSize: 20,
+    lineHeight: 23,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E24A4A',
+  },
+  notificationBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    lineHeight: 11,
   },
   rowPressed: {
     opacity: 0.68,
