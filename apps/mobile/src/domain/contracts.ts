@@ -1,6 +1,7 @@
 export type UserId = string;
 export type ProfileId = string;
 export type ItemId = string;
+export type ItemListId = string;
 export type EventId = string;
 export type PredictionId = string;
 export type SessionId = string;
@@ -28,6 +29,11 @@ export type EventType =
   | 'ITEM_CONSUMPTION_REVERSED'
   | 'ITEM_INTERACTION_UNDONE'
   | 'ITEM_RATED'
+  | 'ITEM_ADDED_TO_LIST'
+  | 'ITEM_REMOVED_FROM_LIST'
+  | 'LIST_CREATED'
+  | 'LIST_RENAMED'
+  | 'LIST_DELETED'
   | 'SEARCH_PERFORMED'
   | 'DISCOVERY_MODE_CHANGED';
 
@@ -60,6 +66,19 @@ export interface Item {
   title: string;
   description?: string;
   tags?: readonly string[];
+}
+
+export type ItemListKind = 'SYSTEM_SAVED' | 'CUSTOM';
+
+export interface ItemList {
+  id: ItemListId;
+  profileId: ProfileId;
+  kind: ItemListKind;
+  name: string;
+  itemCount: number;
+  containsItem: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Context {

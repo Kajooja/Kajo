@@ -131,6 +131,15 @@ IDs for evaluation but remains explicitly separate from Prediction V0.
 Interaction undo appends a compensating `ITEM_INTERACTION_UNDONE` Event that
 references the original Event ID; it never deletes or rewrites evidence.
 
+Sprint 011 Lists persist through Profile-scoped `item_lists` and
+`item_list_entries` behind security-invoker RPC wrappers. RLS and explicit
+grants require Profile ownership/accepted membership. One system
+`Tallennetut` List projects canonical Saved state; custom List memberships are
+orthogonal and never overwrite `item_interactions`. Shared consensus may write
+the system projection, while direct member writes are limited to custom Lists.
+Presentation joins current consumed/rating state instead of copying it into
+membership rows.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:

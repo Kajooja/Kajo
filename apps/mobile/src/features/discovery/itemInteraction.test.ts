@@ -16,6 +16,7 @@ import {
   setItemInterest,
   setItemNotInterested,
   setItemRating,
+  setItemSaved,
   toggleItemSaved,
   undoLastItemInteractionAction,
   type ItemInteractionMap,
@@ -58,6 +59,13 @@ describe('item interaction state', () => {
       rating: null,
       notInterested: false,
     });
+  });
+
+  it('sets saved state exactly for list destination synchronization', () => {
+    const saved = setItemSaved({}, 'book-a', true);
+    expect(getItemInteraction(saved, 'book-a').saved).toBe(true);
+    expect(setItemSaved(saved, 'book-a', true)).toEqual(saved);
+    expect(getItemInteraction(setItemSaved(saved, 'book-a', false), 'book-a').saved).toBe(false);
   });
 
   it('makes rating consumed and not-interested explicitly unconsumed', () => {

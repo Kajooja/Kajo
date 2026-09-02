@@ -138,9 +138,13 @@ Start only after 11A is stable.
 
 - PR #157 merged the prediction-core-independent Endorsement current state, membership authorization, idempotent endorse/reverse RPCs, unanimity -> Shared Saved projection, Event vocabulary and leave cleanup.
 - PR #158 merged the authorized Shared discovery overlay plus mobile `Tykkää`, pending provenance, resilient refresh and queue composition. Configured Android testing confirmed endorsement, consensus, Personal isolation and retry behavior.
-- Configured Android feedback changed member PersonalProfile history from full suppression to a lower attributed delivery tier. The active #151 follow-up implements that policy without changing core Prediction weights.
+- PR #159 delivered the accepted lower attributed member-history tier without changing core Prediction weights. Configured Android acceptance passed and #151 closed on 2026-09-02.
 - #156 gates common-fit coefficients and all final EvoBot/LongTermState/ShortTermState/ScenarioMemory algorithm work until the user-approved Prediction Core MVP design is canonical.
-- 11A remains open until hosted overlay/RLS verification, CI and configured Android acceptance pass.
+- 11A is accepted.
+- #102 backend foundation is applied through `20260901204135_profile_scoped_item_lists.sql`: system/custom Lists, safe Saved/consensus projection, explicit grants/RLS and Profile-scoped RPCs passed hosted rollback/outsider verification.
+- #102 mobile implementation provides List home/history, destination picker, multi-List membership, create/rename/delete, list/card views, added-order sorting, ItemType filters, current interaction joins and Shared added-by provenance.
+- Full `npm run check` passes with 133 tests and iOS/Android bundle smoke. 11B remains active until configured Android acceptance.
+- Hosted Events, Event sessions, Item interactions and Shared Endorsements were reset after verification on 2026-09-02; identities, Profiles, memberships, Items and system Lists remain intact for clean testing.
 
 ## Room/navigation constraint during this sprint
 
@@ -157,4 +161,4 @@ Preserve the accepted Sprint 010 shell and approved Room direction:
 
 A fresh conversation starts by reading `/AGENTS.md`, `/docs/project/STATUS.md`, `/docs/product/MVP.md`, this file, glossary/domain docs and CODEMAP.
 
-Immediate implementation target: **#151**. Do not start #102 first.
+Immediate target: **configured Android acceptance for #102**. #151 is accepted; do not start Sprint 012 messaging before Lists are accepted.

@@ -10,6 +10,7 @@ import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
 import { SharedEndorsementProvider } from '@/features/discovery/SharedEndorsementContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
+import { ItemListsProvider } from '@/features/lists/ItemListsContext';
 import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 
@@ -40,21 +41,23 @@ export default function RootLayout() {
       <AuthSessionProvider>
         <PersonalProfileProvider>
           <ActiveProfileProvider>
-            <EventTrackingProvider>
-              <SharedEndorsementProvider>
-                <ItemInteractionProvider>
-                  <DiscoveryModeProvider>
-                    {isAuthCallbackRoute ? (
-                      navigator
-                    ) : (
-                      <AuthGate>
-                        <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
-                      </AuthGate>
-                    )}
-                  </DiscoveryModeProvider>
-                </ItemInteractionProvider>
-              </SharedEndorsementProvider>
-            </EventTrackingProvider>
+            <ItemListsProvider>
+              <EventTrackingProvider>
+                <SharedEndorsementProvider>
+                  <ItemInteractionProvider>
+                    <DiscoveryModeProvider>
+                      {isAuthCallbackRoute ? (
+                        navigator
+                      ) : (
+                        <AuthGate>
+                          <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                        </AuthGate>
+                      )}
+                    </DiscoveryModeProvider>
+                  </ItemInteractionProvider>
+                </SharedEndorsementProvider>
+              </EventTrackingProvider>
+            </ItemListsProvider>
           </ActiveProfileProvider>
         </PersonalProfileProvider>
       </AuthSessionProvider>

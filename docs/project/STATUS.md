@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-01**
+Last updated: **2026-09-02**
 Current milestone: **MVP 0.1**
 Current sprint: **Sprint 011 — Shared Curation & Named Lists** (`sprints/SPRINT-011.md`)
 Last accepted sprint: **Sprint 010 — Navigation & Profile lifecycle** (`sprints/SPRINT-010.md`)
@@ -20,7 +20,9 @@ Kajo is a phone-runnable Expo/React Native app with:
 - Supabase/PostgreSQL/Auth behind typed mobile boundaries,
 - unique email + nickname identity and email-or-nickname login,
 - append-only Event/session persistence with actor/Profile/prediction correlation,
-- PersonalProfile plus consent-based 2-N SharedProfiles.
+- PersonalProfile plus consent-based 2-N SharedProfiles,
+- accepted Shared Endorsement/consensus delivery,
+- hosted Profile-scoped system/custom Lists foundation with mobile browsing and destination flow awaiting configured-device acceptance.
 
 ## Sprint 010 — accepted
 
@@ -69,7 +71,7 @@ Sprint 011 has two ordered slices.
 
 ### 11A — #151 Shared discovery + Endorsement consensus
 
-Backend state/consensus foundation is merged in PR #157 and authorized mobile delivery in PR #158. Configured Android testing confirmed endorsement, consensus, Personal isolation and resilient retry. User feedback changed member PersonalProfile history from full suppression to a lower attributed queue tier; that narrow #151 correction is active without changing `rank_items_v0` core weights.
+Backend state/consensus foundation is merged in PR #157, authorized mobile delivery in PR #158 and member-history delivery in PR #159. Configured Android testing confirmed endorsement, consensus, Personal isolation, lower attributed member-history delivery and resilient retry. Issue #151 was accepted and closed on 2026-09-02 without changing `rank_items_v0` core weights.
 
 1. Pending Endorsements are delivered first, unseen ordinary Predictions next and accepted-member PersonalProfile consumed/rated Items afterward with real-member `nähnyt` provenance; higher member ratings order only that final tier.
 2. Shared Prediction remains Profile-targeted while using inspectable common-fit evidence from accepted members plus disagreement handling.
@@ -82,7 +84,7 @@ The MVP endpoint is now a genuinely shareable production application downloadabl
 
 ### 11B — #102 Profile-scoped Lists
 
-Only after #151 is stable:
+#151 is stable and #102 is now the active implementation slice:
 
 - one system `Tallennetut` List per Profile,
 - generic custom Lists across Item types,
@@ -91,15 +93,18 @@ Only after #151 is stable:
 - list/card presentation, filters/sort and current consumed/rating display,
 - real added-by/added-at provenance in Shared Lists.
 
+The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, destination picker, custom-list management and list/card/filter/sort detail are implemented locally. Full lint, TypeScript, 133 tests and both platform bundle smokes pass. Configured Android acceptance is still required before #102/Sprint 011 can close.
+
+Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
+
 ## Next MVP sequence
 
-1. **#151** — Shared discovery eligibility, common-fit evidence and Endorsement consensus.
-2. **#102** — system + named Profile-scoped Lists and browsing.
+1. **#102** — configured Android acceptance for system + named Profile-scoped Lists and browsing.
 3. **#138 / Sprint 012** — Profile messaging/chat after Lists are stable.
 4. **Sprint 013** — ScenarioMemory.
 5. **Sprint 014** — MVP hardening/release readiness.
 
-Do not implement #102 before #151 is stable. Do not start chat before the List model is stable. Do not let Room visual polish block these MVP behavior slices.
+Do not start chat before the List model is stable and accepted. Do not let Room visual polish block these MVP behavior slices.
 
 ## Other open work
 
@@ -128,10 +133,13 @@ Do not implement #102 before #151 is stable. Do not start chat before the List m
 - `/apps/mobile/src/features/profiles/ActiveProfileContext.tsx`
 - `/apps/mobile/src/features/profiles/sharedProfileOperations.ts`
 - `/apps/mobile/src/features/profiles/SharedProfilesScreen.tsx`
+- `/apps/mobile/src/features/lists/`
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
+- `/supabase/migrations/20260901204135_profile_scoped_item_lists.sql`
+- `/supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate order: **#151 → #102**. Sprint 010 is accepted. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: **#102 configured Android acceptance**. #151 is accepted and closed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

@@ -106,7 +106,8 @@ Pending behavior:
 At consensus:
 
 - SharedProfile Saved/current-state projection becomes true,
-- the Item is promoted once to the Shared `SYSTEM_SAVED` / `Tallennetut` List when Lists exist,
+- a durable `(profileId, itemId)` SharedConsensus record preserves the reached decision even if membership later changes,
+- the Item is promoted once to the Shared `SYSTEM_SAVED` / `Tallennetut` List,
 - the Item leaves ordinary Shared discovery,
 - the reached consensus becomes durable shared history; a later new member does not retroactively revoke it.
 
@@ -130,12 +131,25 @@ Prediction code should consume generic features/contracts rather than external p
 
 An `ItemList` is owned by exactly one Profile.
 
-MVP planned List kinds:
+MVP List kinds:
 
 - `SYSTEM_SAVED` — exactly one system `Tallennetut` List per Profile,
 - `CUSTOM` — user-named collaborative/personal Lists.
 
 `ItemListEntry` stores List/Item relation plus adding actor/time. It does not copy consumed/rating state.
+
+Current invariants:
+
+- one `SYSTEM_SAVED` List exists per Profile and cannot be renamed/deleted,
+- a custom name is 1–40 characters and case-insensitively unique inside its Profile,
+- one Item may belong once to each of several Lists,
+- Personal Saved state and Shared unanimous consensus project into `SYSTEM_SAVED`,
+- custom List membership never changes canonical Saved state,
+- direct Shared writes to `SYSTEM_SAVED` are denied; consensus owns that transition,
+- direct Shared interaction writes cannot forge, clear or delete Saved state unless it matches the durable SharedConsensus record,
+- accepted Shared members may collaborate on custom Lists, and former/outsider members have no read/write access,
+- `addedByUserId` may remain nullable only for safely backfilled historical rows where no truthful actor exists,
+- current consumed/rating state is joined from `item_interactions`, not copied into List entries.
 
 ## Event
 
