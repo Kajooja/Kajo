@@ -17,6 +17,7 @@ export function getInteractionEventType(
       if (action.interest === 'DISLIKED') return 'ITEM_DISLIKED';
       return 'ITEM_INTEREST_CLEARED';
     case 'TOGGLE_SAVED':
+    case 'SET_SAVED':
       return nextInteraction.saved ? 'ITEM_SAVED' : 'ITEM_UNSAVED';
     case 'SET_CONSUMED':
       return action.consumed

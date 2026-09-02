@@ -58,7 +58,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from active swipe after being marked read/watched.
 - [x] `MVP-MEM-003` User can add a 0–10 rating to an Item, which always records that Item as consumed.
 - [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
-- [ ] `MVP-MEM-005` User can open Profile-scoped Saved and watched/read/consumed collections from persistent navigation and see current consumed/rating state without duplicating that state into collection rows.
+- [-] `MVP-MEM-005` User can open Profile-scoped Saved and watched/read/consumed collections from persistent navigation and see current consumed/rating state without duplicating that state into collection rows.
 
 ## Profiles and Shared Kajo
 
@@ -69,19 +69,19 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-PROFILE-005` An accepted member can leave a SharedProfile only after an `Oletko varma?` confirmation; leaving removes membership/access, falls back safely from an active group and preserves history for remaining members.
 - [x] `MVP-SOCIAL-001` SharedProfile has joint current Item state and actor/Profile-separated persistence.
 - [x] `MVP-SOCIAL-002` Members can browse/swipe and receive Prediction V0 in SharedProfile context without a separate media/social predictor.
-- [ ] `MVP-SOCIAL-003` In SharedProfile discovery, one member can endorse an Item as worth doing together; the endorsement is actor-specific pending state, not shared `saved=true`.
-- [ ] `MVP-SOCIAL-004` A pending endorsement is suppressed for the endorser and prioritized ahead of ordinary recommendations for accepted members who have not endorsed it, with restrained real-actor provenance.
-- [ ] `MVP-SOCIAL-005` Unanimous endorsement by all currently accepted members promotes the Item once to Shared saved state / system `Tallennetut`; a later new member does not retroactively revoke that historical consensus.
-- [ ] `MVP-SOCIAL-006` Ordinary Shared discovery retains Items consumed/rated in an accepted member's PersonalProfile as a clearly attributed lower-priority history tier; higher member ratings may lift Items only inside that tier. SharedProfile-consumed and consensus-saved Items remain outside ordinary discovery, and no history/List data is deleted.
+- [x] `MVP-SOCIAL-003` In SharedProfile discovery, one member can endorse an Item as worth doing together; the endorsement is actor-specific pending state, not shared `saved=true`.
+- [x] `MVP-SOCIAL-004` A pending endorsement is suppressed for the endorser and prioritized ahead of ordinary recommendations for accepted members who have not endorsed it, with restrained real-actor provenance.
+- [x] `MVP-SOCIAL-005` Unanimous endorsement by all currently accepted members promotes the Item once to Shared saved state / system `Tallennetut`; a later new member does not retroactively revoke that historical consensus.
+- [x] `MVP-SOCIAL-006` Ordinary Shared discovery retains Items consumed/rated in an accepted member's PersonalProfile as a clearly attributed lower-priority history tier; higher member ratings may lift Items only inside that tier. SharedProfile-consumed and consensus-saved Items remain outside ordinary discovery, and no history/List data is deleted.
 
 ## Named Lists
 
-- [ ] `MVP-LIST-001` PersonalProfile and SharedProfile can own multiple Profile-scoped named Lists; List names are 1–40 characters and one List may contain mixed generic Item types such as BOOK and MOVIE.
-- [ ] `MVP-LIST-002` PersonalProfile `Tallenna` opens a destination picker, can create/name/rename a List and allows the same Item to belong to multiple Lists while preserving existing saved/prediction evidence.
-- [ ] `MVP-LIST-003` Shared unanimous endorsement integrates with exactly one system `Tallennetut` List, while accepted members may add Items to custom Shared Lists without unanimity through explicit list-management flow.
-- [ ] `MVP-LIST-004` List detail can toggle between list and card/grid presentation, sort deterministically by added order/supported generic metadata, and filter by generic ItemType (`Kaikki`, `Kirjat`, `Elokuvat`, later domains without schema redesign).
-- [ ] `MVP-LIST-005` Every list membership stores `addedByUserId` and `addedAt`; SharedProfile UI displays who added the Item and when, while PersonalProfile hides redundant actor identity. Current watched/read/consumed state and rating are joined from canonical Profile interaction state.
-- [ ] `MVP-LIST-006` SharedProfile List read/write access follows accepted membership authorization and a former member loses access after leaving the group.
+- [-] `MVP-LIST-001` PersonalProfile and SharedProfile can own multiple Profile-scoped named Lists; List names are 1–40 characters and one List may contain mixed generic Item types such as BOOK and MOVIE.
+- [-] `MVP-LIST-002` PersonalProfile `Tallenna` opens a destination picker, can create/name/rename a List and allows the same Item to belong to multiple Lists while preserving existing saved/prediction evidence.
+- [-] `MVP-LIST-003` Shared unanimous endorsement integrates with exactly one system `Tallennetut` List, while accepted members may add Items to custom Shared Lists without unanimity through explicit list-management flow.
+- [-] `MVP-LIST-004` List detail can toggle between list and card/grid presentation, sort deterministically by added order/supported generic metadata, and filter by generic ItemType (`Kaikki`, `Kirjat`, `Elokuvat`, later domains without schema redesign).
+- [-] `MVP-LIST-005` Every list membership stores `addedByUserId` and `addedAt`; SharedProfile UI displays who added the Item and when, while PersonalProfile hides redundant actor identity. Current watched/read/consumed state and rating are joined from canonical Profile interaction state.
+- [-] `MVP-LIST-006` SharedProfile List read/write access follows accepted membership authorization and a former member loses access after leaving the group.
 
 ## Profile messaging
 

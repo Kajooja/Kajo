@@ -71,6 +71,8 @@ Sprint 011 deliberately has **two ordered slices**.
 
 #### 11A — Shared discovery + Endorsement consensus — #151
 
+Accepted and closed on configured Android 2026-09-02.
+
 Make Shared discovery behave like a joint decision surface without creating a separate social recommender.
 
 - pending Endorsements remain first, ordinary unseen recommendations retain Prediction order next, and Items already consumed/rated in an accepted member's PersonalProfile form an attributed lower-priority tier,
@@ -88,7 +90,7 @@ No majority voting, chat or custom-list voting is introduced here.
 
 #### 11B — Named Lists & collaborative browsing — #102
 
-After #151 is stable:
+#151 is stable. Backend and mobile implementation are complete locally; configured Android acceptance remains:
 
 - PersonalProfile and SharedProfile own generic system/custom Lists,
 - List names are 1–40 characters,

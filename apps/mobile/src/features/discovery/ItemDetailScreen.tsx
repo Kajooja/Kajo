@@ -26,6 +26,8 @@ import type {
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
+import { ListDestinationSheet } from '../lists/ListDestinationSheet';
+import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import {
   createUuidV7,
@@ -150,7 +152,7 @@ function ItemDetailContent({
   const sharedEndorsements = useSharedEndorsements();
   const {
     interactions,
-    toggleSaved,
+    setSaved,
     setRating,
     setNotInterested,
     canUndo,
@@ -189,6 +191,11 @@ function ItemDetailContent({
   const [endorsingItemId, setEndorsingItemId] = useState<ItemId | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [listPickerTarget, setListPickerTarget] = useState<{
+    item: Item;
+    index: number;
+    interaction: ItemInteraction;
+  } | null>(null);
 
   const recordItemImpression = useCallback(
     (item: Item) => {
@@ -286,25 +293,45 @@ function ItemDetailContent({
     );
   }
 
-  function handleSaved(
+  function handleListDestinationCommit(commit: {
+    systemSaved: boolean;
+    changed: boolean;
+  }) {
+    const target = listPickerTarget;
+    setListPickerTarget(null);
+
+    if (!target) return;
+
+    if (!activeSharedMembership && commit.systemSaved !== target.interaction.saved) {
+      const { item, index, interaction } = target;
+      const action: ItemInteractionAction = {
+        type: 'SET_SAVED',
+        itemId: item.id,
+        saved: commit.systemSaved,
+      };
+      handleCommittedAction(
+        item,
+        index,
+        action,
+        { ...interaction, saved: commit.systemSaved },
+        (eventId) => setSaved(item.id, commit.systemSaved, eventId),
+        commit.systemSaved
+          ? ITEM_INTERACTION_LABELS.savedFeedback
+          : ITEM_INTERACTION_LABELS.unsavedFeedback,
+      );
+      return;
+    }
+
+    setFeedback(commit.changed ? 'Listavalinnat tallennettu.' : 'Listavalinnat ennallaan.');
+  }
+
+  function openListPicker(
     item: Item,
     index: number,
     interaction: ItemInteraction,
   ) {
-    const action: ItemInteractionAction = {
-      type: 'TOGGLE_SAVED',
-      itemId: item.id,
-    };
-    handleCommittedAction(
-      item,
-      index,
-      action,
-      { ...interaction, saved: !interaction.saved },
-      (eventId) => toggleSaved(item.id, eventId),
-      interaction.saved
-        ? ITEM_INTERACTION_LABELS.unsavedFeedback
-        : ITEM_INTERACTION_LABELS.savedFeedback,
-    );
+    if (exitingItemId || endorsingItemId) return;
+    setListPickerTarget({ item, index, interaction });
   }
 
   async function handleEndorsement(item: Item, index: number) {
@@ -672,12 +699,20 @@ function ItemDetailContent({
                 onNotInterested={() =>
                   handleNotInterested(item, index, interaction)
                 }
-                onToggleSaved={() => handleSaved(item, index, interaction)}
+                onOpenLists={() => openListPicker(item, index, interaction)}
                 onEndorse={() => void handleEndorsement(item, index)}
               />
             </Animated.View>
           );
         }}
+      />
+      <ListDestinationSheet
+        visible={Boolean(listPickerTarget)}
+        item={listPickerTarget?.item ?? null}
+        isSharedProfile={Boolean(activeSharedMembership)}
+        theme={theme}
+        onClose={() => setListPickerTarget(null)}
+        onCommitted={handleListDestinationCommit}
       />
     </SafeAreaView>
   );
@@ -696,7 +731,7 @@ interface SwipeItemPageProps {
   sharedProvenance: string | null;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
-  onToggleSaved: () => void;
+  onOpenLists: () => void;
   onEndorse: () => void;
 }
 
@@ -713,7 +748,7 @@ function SwipeItemPage({
   sharedProvenance,
   onRating,
   onNotInterested,
-  onToggleSaved,
+  onOpenLists,
   onEndorse,
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
@@ -811,8 +846,18 @@ function SwipeItemPage({
             }
             theme={theme}
             styles={styles}
-            onPress={isSharedProfile ? onEndorse : onToggleSaved}
+            onPress={isSharedProfile ? onEndorse : onOpenLists}
           />
+          {isSharedProfile ? (
+            <ActionButton
+              label={ITEM_LIST_LABELS.addToList}
+              active={false}
+              disabled={disabled}
+              theme={theme}
+              styles={styles}
+              onPress={onOpenLists}
+            />
+          ) : null}
         </View>
       </View>
 
@@ -1035,6 +1080,7 @@ function createStyles(theme: RoomTheme) {
     },
     actions: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 10,
     },
     feedbackDrawer: {
@@ -1048,7 +1094,8 @@ function createStyles(theme: RoomTheme) {
       marginTop: 12,
     },
     actionButton: {
-      width: '48%',
+      flexGrow: 1,
+      flexBasis: '30%',
       minHeight: 42,
       borderRadius: 18,
       borderWidth: 1,

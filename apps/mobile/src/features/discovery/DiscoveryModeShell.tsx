@@ -18,6 +18,7 @@ import { useAuthSession } from '../auth/AuthSessionProvider';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
+import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
 import { useDiscoveryMode } from './DiscoveryModeContext';
@@ -96,6 +97,11 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   function openGroups() {
     setOverlay(null);
     router.push('/profiles/shared');
+  }
+
+  function openLists() {
+    setOverlay(null);
+    router.push('/lists');
   }
 
   async function respondToInvitation(invitationId: string, accept: boolean) {
@@ -268,24 +274,32 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 </View>
 
                 <View style={styles.drawerSection}>
-                  <View style={styles.staticSectionHeading}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Avaa aktiivisen Kajon listat"
+                    onPress={openLists}
+                    style={({ pressed }) => [
+                      styles.sectionActionHeading,
+                      pressed && styles.rowPressed,
+                    ]}
+                  >
                     <Text
                       style={[
                         styles.sectionHeading,
                         { color: theme.base.textPrimary },
                       ]}
                     >
-                      Listat
+                      {ITEM_LIST_LABELS.lists}
                     </Text>
                     <Text
                       style={[
-                        styles.sectionStatus,
+                        styles.sectionArrow,
                         { color: theme.base.textMuted },
                       ]}
                     >
-                      TULOSSA
+                      ›
                     </Text>
-                  </View>
+                  </Pressable>
                 </View>
 
                 <View style={styles.drawerSection}>
@@ -808,17 +822,6 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 17,
     fontWeight: '800',
-  },
-  staticSectionHeading: {
-    minHeight: 36,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionStatus: {
-    fontSize: 8,
-    fontWeight: '700',
-    letterSpacing: 1.1,
   },
   sectionActionHeading: {
     minHeight: 40,

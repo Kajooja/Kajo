@@ -62,6 +62,16 @@ properties.requiredMemberCount = ...
 
 The exact actor for an automatic membership-change recomputation must remain traceable and intentionally defined in implementation; do not invent a fake User actor.
 
+### Lists — Sprint 011/#102
+
+- `LIST_CREATED` — actor created a custom Profile List.
+- `LIST_RENAMED` — actor renamed a custom Profile List.
+- `LIST_DELETED` — actor deleted a custom Profile List; Item/current interaction state is unchanged.
+- `ITEM_ADDED_TO_LIST` — actor explicitly added an Item to a custom List.
+- `ITEM_REMOVED_FROM_LIST` — actor explicitly removed an Item from a custom List.
+
+System `Tallennetut` remains the Saved projection and uses canonical `ITEM_SAVED` / `ITEM_UNSAVED` evidence. Shared consensus continues to emit `ITEM_SAVED` with `properties.source = SHARED_CONSENSUS`; it must not be relabeled as a manual custom-List event. One Item may produce multiple custom List membership Events because the memberships are independent.
+
 ### Historical/deprecated Shared suggestion
 
 - `ITEM_SUGGESTED` — historical Sprint 009 experiment where a member explicitly used the removed `Ehdota yhteiseen` Item-detail action.
@@ -167,4 +177,4 @@ This rule does not delete the Item from Saved, named Lists or history.
 - Event session belongs to one acting User and one Profile context. Session-linked Event retains same actor/Profile pair.
 - Item Event stores `itemId` + `itemType` matching canonical Item row.
 - Authenticated clients may append/read Events only for permitted Profile contexts; no update/delete capability for Event/session rows.
-- Mutable current-state tables (`item_interactions`, future endorsement/list state) are projections. They do not rewrite append-only Event evidence.
+- Mutable current-state tables (`item_interactions`, endorsement/List state) are projections. Durable SharedConsensus prevents direct current-state writes from forging or clearing unanimous Shared Saved state. These projections do not rewrite append-only Event evidence.
