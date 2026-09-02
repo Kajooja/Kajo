@@ -4,7 +4,6 @@ import {
   createCustomItemList,
   loadItemListEntries,
   loadProfileItemLists,
-  setItemListDestinations,
   validateItemListName,
   type ItemListRpc,
 } from './itemListOperations';
@@ -75,30 +74,6 @@ describe('item list operations', () => {
     await expect(createCustomItemList(duplicateRpc, 'profile-a', 'Meidän')).resolves.toEqual({
       status: 'error',
       message: 'Samanniminen lista on jo olemassa.',
-    });
-  });
-
-  it('deduplicates destination IDs and preserves system saved result', async () => {
-    const rpc = vi.fn<ItemListRpc>().mockResolvedValue({
-      data: [{ list_ids: ['list-a', 'list-b'], system_saved: true }],
-      error: null,
-    });
-
-    const result = await setItemListDestinations(
-      rpc,
-      'profile-a',
-      'item-a',
-      ['list-a', 'list-a', 'list-b'],
-    );
-
-    expect(rpc).toHaveBeenCalledWith('set_item_list_destinations', {
-      target_profile_id: 'profile-a',
-      target_item_id: 'item-a',
-      target_list_ids: ['list-a', 'list-b'],
-    });
-    expect(result).toEqual({
-      status: 'success',
-      commit: { listIds: ['list-a', 'list-b'], systemSaved: true },
     });
   });
 

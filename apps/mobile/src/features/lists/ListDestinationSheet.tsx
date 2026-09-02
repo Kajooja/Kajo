@@ -10,16 +10,20 @@ import {
   View,
 } from 'react-native';
 
-import type { Item, ItemList, ItemListId } from '../../domain/contracts';
+import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
-import { haveSelectableDestinationsChanged } from './listPresentation';
+import { loadRecentListIds, rememberRecentList } from './listRecentUse';
+import {
+  orderListDestinationsByRecentUse,
+  selectVisibleListDestinations,
+} from './listPresentation';
 
-interface DestinationCommit {
-  systemSaved: boolean;
-  changed: boolean;
+export interface ListDestinationCommit {
+  list: ItemList;
+  added: boolean;
 }
 
 interface ListDestinationSheetProps {
@@ -28,7 +32,7 @@ interface ListDestinationSheetProps {
   isSharedProfile: boolean;
   theme: RoomTheme;
   onClose: () => void;
-  onCommitted: (commit: DestinationCommit) => void;
+  onCommitted: (commit: ListDestinationCommit) => void;
 }
 
 export function ListDestinationSheet({
@@ -39,13 +43,12 @@ export function ListDestinationSheet({
   onClose,
   onCommitted,
 }: ListDestinationSheetProps) {
-  const itemLists = useItemLists();
-  const { loadForItem, createList: createItemList, setDestinations } = itemLists;
+  const { loadForItem, createList: createItemList, setEntry } = useItemLists();
   const eventTracking = useEventTracking();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [availableLists, setAvailableLists] = useState<readonly ItemList[]>([]);
-  const [initialIds, setInitialIds] = useState<readonly ItemListId[]>([]);
-  const [selectedIds, setSelectedIds] = useState<readonly ItemListId[]>([]);
+  const [expanded, setExpanded] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +58,8 @@ export function ListDestinationSheet({
     ? `${itemId}:${isSharedProfile ? 'shared' : 'personal'}`
     : null;
   const loading = visible && requestKey !== null && loadedKey !== requestKey;
+  const visibleLists = selectVisibleListDestinations(availableLists, expanded);
+  const hiddenCount = availableLists.length - visibleLists.length;
 
   useEffect(() => {
     if (!visible || !itemId || !requestKey) return;
@@ -62,11 +67,12 @@ export function ListDestinationSheet({
 
     void loadForItem(itemId).then((result) => {
       if (!active) return;
+      setExpanded(false);
+      setCreating(false);
+      setNewListName('');
       if (result.status === 'error') {
         setError(result.message);
         setAvailableLists([]);
-        setInitialIds([]);
-        setSelectedIds([]);
         setLoadedKey(requestKey);
         return;
       }
@@ -74,79 +80,31 @@ export function ListDestinationSheet({
       const selectable = isSharedProfile
         ? result.lists.filter((list) => list.kind === 'CUSTOM')
         : result.lists;
-      const existing = selectable
-        .filter((list) => list.containsItem)
-        .map((list) => list.id);
-      const defaultSystemList = !isSharedProfile && existing.length === 0
-        ? selectable.find((list) => list.kind === 'SYSTEM_SAVED')
-        : null;
-      const selected = defaultSystemList ? [defaultSystemList.id] : existing;
+      const profileId = result.lists[0]?.profileId;
+      const recentListIds = profileId ? loadRecentListIds(profileId) : [];
 
-      setAvailableLists(selectable);
-      setInitialIds(existing);
-      setSelectedIds(selected);
+      setAvailableLists(orderListDestinationsByRecentUse(selectable, recentListIds));
       setError(null);
-      setNewListName('');
       setLoadedKey(requestKey);
     });
 
     return () => { active = false; };
   }, [isSharedProfile, itemId, loadForItem, requestKey, visible]);
 
-  function toggleList(listId: ItemListId) {
-    setSelectedIds((current) => current.includes(listId)
-      ? current.filter((id) => id !== listId)
-      : [...current, listId]);
-  }
+  async function persistDestination(list: ItemList) {
+    if (!item) return false;
 
-  async function createList() {
-    if (!item || loading || status !== 'idle') return;
-    setStatus('saving');
-    setError(null);
-    const result = await createItemList(newListName);
-    setStatus('idle');
-
+    const result = await setEntry(list.id, item.id, true);
     if (result.status === 'error') {
       setError(result.message);
-      return;
+      return false;
     }
 
-    setAvailableLists((current) => [...current, result.list]);
-    setSelectedIds((current) => [...current, result.list.id]);
-    setNewListName('');
-    eventTracking.recordEvent({
-      eventType: 'LIST_CREATED',
-      properties: {
-        listId: result.list.id,
-        listName: result.list.name,
-        source: 'ITEM_DESTINATION_PICKER',
-      },
-    });
-  }
+    rememberRecentList(list.profileId, list.id);
 
-  async function saveDestinations() {
-    if (!item || loading || status !== 'idle') return;
-    setStatus('saving');
-    setError(null);
-    const result = await setDestinations(item.id, selectedIds);
-    setStatus('idle');
-
-    if (result.status === 'error') {
-      setError(result.message);
-      return;
-    }
-
-    const initial = new Set(initialIds);
-    const current = new Set(result.commit.listIds);
-    const customLists = availableLists.filter((list) => list.kind === 'CUSTOM');
-
-    for (const list of customLists) {
-      const wasSelected = initial.has(list.id);
-      const isSelected = current.has(list.id);
-      if (wasSelected === isSelected) continue;
-
+    if (list.kind === 'CUSTOM' && !list.containsItem) {
       eventTracking.recordEvent({
-        eventType: isSelected ? 'ITEM_ADDED_TO_LIST' : 'ITEM_REMOVED_FROM_LIST',
+        eventType: 'ITEM_ADDED_TO_LIST',
         itemId: item.id,
         itemType: item.itemType,
         properties: {
@@ -157,21 +115,48 @@ export function ListDestinationSheet({
       });
     }
 
-    const changed = haveSelectableDestinationsChanged(
-      initialIds,
-      result.commit.listIds,
-      availableLists.map((list) => list.id),
-    );
-    onCommitted({ systemSaved: result.commit.systemSaved, changed });
+    onCommitted({ list, added: !list.containsItem });
+    return true;
+  }
+
+  async function chooseList(list: ItemList) {
+    if (loading || status !== 'idle') return;
+    setStatus('saving');
+    setError(null);
+    await persistDestination(list);
+    setStatus('idle');
+  }
+
+  async function createAndChooseList() {
+    if (!item || loading || status !== 'idle') return;
+    setStatus('saving');
+    setError(null);
+
+    const result = await createItemList(newListName);
+    if (result.status === 'error') {
+      setStatus('idle');
+      setError(result.message);
+      return;
+    }
+
+    eventTracking.recordEvent({
+      eventType: 'LIST_CREATED',
+      properties: {
+        listId: result.list.id,
+        listName: result.list.name,
+        source: 'ITEM_DESTINATION_PICKER',
+      },
+    });
+
+    const committed = await persistDestination(result.list);
+    if (!committed) {
+      setAvailableLists((current) => [result.list, ...current]);
+    }
+    setStatus('idle');
   }
 
   return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onClose}
-      transparent
-      visible={visible}
-    >
+    <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
       <View style={styles.backdrop}>
         <Pressable
           accessibilityLabel="Sulje listavalinta"
@@ -182,8 +167,8 @@ export function ListDestinationSheet({
         <View style={styles.sheet}>
           <View style={styles.header}>
             <View style={styles.headingGroup}>
-              <Text style={styles.kicker}>{isSharedProfile ? 'YHTEINEN LISTA' : 'TALLENNA'}</Text>
-              <Text numberOfLines={2} style={styles.title}>{item?.title ?? ''}</Text>
+              <Text style={styles.title}>Lisää listaan</Text>
+              <Text numberOfLines={1} style={styles.itemTitle}>{item?.title ?? ''}</Text>
             </View>
             <Pressable accessibilityRole="button" onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeText}>×</Text>
@@ -192,7 +177,7 @@ export function ListDestinationSheet({
 
           {isSharedProfile ? (
             <Text style={styles.helper}>
-              Tallennetut syntyy yhteisestä tykkäyksestä. Tähän voit valita yhteisiä nimettyjä listoja.
+              Valinta on samalla tykkäyksesi. Tallennetut syntyy yhteisestä päätöksestä.
             </Text>
           ) : null}
 
@@ -200,67 +185,71 @@ export function ListDestinationSheet({
             <ActivityIndicator color={theme.base.textMuted} />
           ) : (
             <ScrollView style={styles.listArea}>
-              {availableLists.map((list) => {
-                const selected = selectedIds.includes(list.id);
-                return (
-                  <Pressable
-                    key={list.id}
-                    accessibilityRole="checkbox"
-                    accessibilityState={{ checked: selected }}
-                    onPress={() => toggleList(list.id)}
-                    style={({ pressed }) => [
-                      styles.listRow,
-                      selected && styles.listRowSelected,
-                      pressed && styles.pressed,
-                    ]}
-                  >
-                    <Text style={styles.check}>{selected ? '✓' : '○'}</Text>
-                    <View style={styles.listTextGroup}>
-                      <Text style={styles.listName}>{list.name}</Text>
-                      <Text style={styles.listCount}>{list.itemCount} kohdetta</Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
+              {visibleLists.map((list) => (
+                <Pressable
+                  key={list.id}
+                  accessibilityHint="Lisää kohteen tähän listaan ja siirry seuraavaan korttiin"
+                  accessibilityRole="button"
+                  disabled={status !== 'idle'}
+                  onPress={() => void chooseList(list)}
+                  style={({ pressed }) => [styles.listRow, pressed && styles.pressed]}
+                >
+                  <Text style={styles.listName} numberOfLines={1}>{list.name}</Text>
+                  {list.containsItem ? <Text style={styles.existing}>Jo listalla</Text> : null}
+                  <Text style={styles.addMark}>{status === 'saving' ? '·' : '+'}</Text>
+                </Pressable>
+              ))}
               {availableLists.length === 0 ? (
                 <Text style={styles.empty}>Ei vielä nimettyjä listoja.</Text>
               ) : null}
             </ScrollView>
           )}
 
-          <View style={styles.createRow}>
-            <TextInput
-              accessibilityLabel="Uuden listan nimi"
-              editable={!loading && status === 'idle'}
-              maxLength={MAXIMUM_ITEM_LIST_NAME_LENGTH}
-              onChangeText={setNewListName}
-              placeholder="Uusi lista"
-              placeholderTextColor={theme.base.textMuted}
-              style={styles.input}
-              value={newListName}
-            />
+          {hiddenCount > 0 ? (
             <Pressable
               accessibilityRole="button"
-              disabled={loading || status !== 'idle' || newListName.trim().length === 0}
-              onPress={() => void createList()}
-              style={({ pressed }) => [styles.smallButton, pressed && styles.pressed]}
+              onPress={() => setExpanded(true)}
+              style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
             >
-              <Text style={styles.smallButtonText}>Luo</Text>
+              <Text style={styles.textButtonText}>Lisää ({hiddenCount})</Text>
             </Pressable>
-          </View>
+          ) : null}
+
+          {creating ? (
+            <View style={styles.createRow}>
+              <TextInput
+                accessibilityLabel="Uuden listan nimi"
+                autoFocus
+                editable={!loading && status === 'idle'}
+                maxLength={MAXIMUM_ITEM_LIST_NAME_LENGTH}
+                onChangeText={setNewListName}
+                onSubmitEditing={() => void createAndChooseList()}
+                placeholder="Uuden listan nimi"
+                placeholderTextColor={theme.base.textMuted}
+                returnKeyType="done"
+                style={styles.input}
+                value={newListName}
+              />
+              <Pressable
+                accessibilityRole="button"
+                disabled={loading || status !== 'idle' || newListName.trim().length === 0}
+                onPress={() => void createAndChooseList()}
+                style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
+              >
+                <Text style={styles.createButtonText}>Luo</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setCreating(true)}
+              style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
+            >
+              <Text style={styles.textButtonText}>+ Uusi lista</Text>
+            </Pressable>
+          )}
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
-
-          <Pressable
-            accessibilityRole="button"
-            disabled={loading || status !== 'idle'}
-            onPress={() => void saveDestinations()}
-            style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.primaryButtonText}>
-              {status === 'saving' ? 'Tallennetaan…' : 'Tallenna valinnat'}
-            </Text>
-          </Pressable>
         </View>
       </View>
     </Modal>
@@ -272,74 +261,67 @@ function createStyles(theme: RoomTheme) {
     backdrop: {
       flex: 1,
       justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,0.64)',
+      backgroundColor: 'rgba(0,0,0,0.52)',
     },
     sheet: {
-      maxHeight: '82%',
-      padding: 20,
-      paddingBottom: 28,
-      gap: 14,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      maxHeight: '72%',
+      paddingHorizontal: 16,
+      paddingTop: 14,
+      paddingBottom: 20,
+      gap: 9,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
       borderWidth: 1,
       borderColor: theme.base.border,
       backgroundColor: theme.base.sceneBackground,
     },
-    header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-    headingGroup: { flex: 1, gap: 3 },
-    kicker: { color: theme.base.textMuted, fontSize: 11, fontWeight: '800', letterSpacing: 1.4 },
-    title: { color: theme.base.textPrimary, fontSize: 21, fontWeight: '800' },
-    closeButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-    closeText: { color: theme.base.textPrimary, fontSize: 30, lineHeight: 32 },
-    helper: { color: theme.base.textMuted, fontSize: 13, lineHeight: 19 },
-    listArea: { maxHeight: 260 },
+    header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    headingGroup: { flex: 1, gap: 1 },
+    title: { color: theme.base.textPrimary, fontSize: 18, fontWeight: '800' },
+    itemTitle: { color: theme.base.textMuted, fontSize: 12 },
+    closeButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
+    closeText: { color: theme.base.textPrimary, fontSize: 28, lineHeight: 30 },
+    helper: { color: theme.base.textMuted, fontSize: 12, lineHeight: 17 },
+    listArea: { maxHeight: 250 },
     listRow: {
-      minHeight: 58,
-      paddingHorizontal: 13,
-      marginBottom: 8,
+      minHeight: 44,
+      paddingHorizontal: 12,
+      marginBottom: 5,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      borderRadius: 13,
+      gap: 8,
+      borderRadius: 11,
       borderWidth: 1,
       borderColor: theme.base.border,
       backgroundColor: theme.base.structure,
     },
-    listRowSelected: { borderColor: theme.ambient.curtainHighlight },
-    check: { width: 22, color: theme.ambient.curtainHighlight, fontSize: 20, fontWeight: '800' },
-    listTextGroup: { flex: 1, gap: 2 },
-    listName: { color: theme.base.textPrimary, fontSize: 15, fontWeight: '700' },
-    listCount: { color: theme.base.textMuted, fontSize: 12 },
-    empty: { paddingVertical: 18, color: theme.base.textMuted, textAlign: 'center' },
-    createRow: { flexDirection: 'row', gap: 8 },
+    listName: { flex: 1, color: theme.base.textPrimary, fontSize: 14, fontWeight: '700' },
+    existing: { color: theme.base.textMuted, fontSize: 11 },
+    addMark: { width: 18, color: theme.ambient.curtainHighlight, fontSize: 20, fontWeight: '800' },
+    empty: { paddingVertical: 8, color: theme.base.textMuted, fontSize: 13, textAlign: 'center' },
+    textButton: { minHeight: 34, alignItems: 'flex-start', justifyContent: 'center' },
+    textButtonText: { color: theme.ambient.curtainHighlight, fontSize: 13, fontWeight: '800' },
+    createRow: { flexDirection: 'row', gap: 7 },
     input: {
       flex: 1,
-      minHeight: 46,
-      paddingHorizontal: 13,
-      borderRadius: 11,
+      minHeight: 42,
+      paddingHorizontal: 12,
+      borderRadius: 10,
       borderWidth: 1,
       borderColor: theme.base.border,
       color: theme.base.textPrimary,
       backgroundColor: theme.base.structure,
     },
-    smallButton: {
-      minWidth: 64,
-      minHeight: 46,
+    createButton: {
+      minWidth: 58,
+      minHeight: 42,
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 11,
+      borderRadius: 10,
       backgroundColor: theme.ambient.curtain,
     },
-    smallButtonText: { color: theme.base.textPrimary, fontWeight: '800' },
-    error: { color: '#f2a6a6', fontSize: 13 },
-    primaryButton: {
-      minHeight: 50,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: 13,
-      backgroundColor: theme.ambient.curtain,
-    },
-    primaryButtonText: { color: theme.base.textPrimary, fontSize: 15, fontWeight: '800' },
-    pressed: { opacity: 0.72 },
+    createButtonText: { color: theme.base.textPrimary, fontWeight: '800' },
+    error: { color: '#f2a6a6', fontSize: 12 },
+    pressed: { opacity: 0.7 },
   });
 }

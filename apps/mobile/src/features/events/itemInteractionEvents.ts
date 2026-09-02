@@ -19,6 +19,8 @@ export function getInteractionEventType(
     case 'TOGGLE_SAVED':
     case 'SET_SAVED':
       return nextInteraction.saved ? 'ITEM_SAVED' : 'ITEM_UNSAVED';
+    case 'SET_LIST_LIKE':
+      return action.systemSaved ? 'ITEM_SAVED' : 'ITEM_LIKED';
     case 'SET_CONSUMED':
       return action.consumed
         ? 'ITEM_CONSUMED'

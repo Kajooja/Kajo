@@ -20,17 +20,18 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 12. **DiscoveryMode is visible as restrained atmosphere.** FOR_YOU -> calm dawn/day, SURPRISE -> warmer sunset/evening, RISK -> night/moon with a restrained cooler fireplace accent. AmbientPhase is presentation; DiscoveryMode is recommendation policy.
 13. **Visual preference != risk preference.** Dark aesthetics do not imply risky recommendations.
 14. **Grid first, swipe optional.** Grid is default discovery. Swipe is optional calibration/browsing tooling.
-15. **Committed choices behave consistently.** Explicit feedback gives restrained visual confirmation and rotates the current Item appropriately without game-like effects.
+15. **Committed choices behave consistently.** Explicit feedback gives restrained visual confirmation and rotates the current Item appropriately without game-like effects. A successful `Lisää listaan` is the positive/like action and immediately advances; a separate Like button must not duplicate it.
 16. **Recent choices are reversible.** Undo/back restores prior current state and exact Item/card when deterministic reversal exists.
 17. **Copy is presentation, not domain semantics.** Labels such as `Tykkää`, `Tallenna`, `Luettu` may differ by Profile context while canonical Event/state meaning remains explicit and stable.
 18. **Shared Kajo feels like a place.** Switching to SharedProfile changes Profile context/theme and joint recommendation behavior, not merely a filter.
 19. **Shared recommendations are already shared.** Do not add a parallel `Ehdota yhteiseen` recommendation surface. The normal Shared discovery feed is the common-taste surface.
-20. **Shared positive action is collaborative.** In Shared discovery one member's quick positive action is an actor-specific Endorsement. It should disappear from that actor's normal queue and be surfaced prominently to other non-endorsing members with subtle provenance.
+20. **Shared positive action is collaborative.** In Shared discovery adding an Item to one custom List is also that member's actor-specific Endorsement. It should disappear from that actor's normal queue and be surfaced prominently to other non-endorsing members with subtle provenance.
 21. **Consensus is visually distinct from one person's opinion.** A single `Mirri tykkäsi` marker means pending collaboration; it must not look like the whole SharedProfile has saved/agreed. Only unanimity promotes to Shared `Tallennetut`.
 22. **Lists and discovery are different surfaces.** An Item consumed by any member disappears from ordinary Shared discovery but may remain visible in Saved/custom Lists/history with current watched/read/rating state.
 23. **Custom Shared Lists are collaborative organization, not votes.** Accepted members may add Items to custom Lists with added-by/added-at provenance without unanimous endorsement.
-24. **Motion communicates state.** Animation explains transition/atmosphere, not attention capture.
-25. **Accessibility remains required.** Gesture controls need accessible alternatives; motion respects reduced-motion settings; meaning must not rely solely on color.
+24. **List choice stays lightweight.** Discovery opens a single-destination bottom bar, ordered by the actor's most recently used List. Show at most five choices initially; `Lisää` expands the rest and new-List creation stays collapsed until requested.
+25. **Motion communicates state.** Animation explains transition/atmosphere, not attention capture.
+26. **Accessibility remains required.** Gesture controls need accessible alternatives; motion respects reduced-motion settings; meaning must not rely solely on color.
 
 ## Approved MVP Room visual direction
 

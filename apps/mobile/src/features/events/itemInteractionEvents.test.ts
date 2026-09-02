@@ -41,6 +41,18 @@ describe('Item interaction Event semantics', () => {
     ).toBe('ITEM_UNSAVED');
     expect(
       getInteractionEventType(
+        { type: 'SET_LIST_LIKE', itemId: 'item-1', systemSaved: false },
+        { ...emptyInteraction, interest: 'LIKED' },
+      ),
+    ).toBe('ITEM_LIKED');
+    expect(
+      getInteractionEventType(
+        { type: 'SET_LIST_LIKE', itemId: 'item-1', systemSaved: true },
+        { ...emptyInteraction, interest: 'LIKED', saved: true },
+      ),
+    ).toBe('ITEM_SAVED');
+    expect(
+      getInteractionEventType(
         { type: 'SET_CONSUMED', itemId: 'item-1', consumed: true },
         { ...emptyInteraction, consumed: true },
       ),

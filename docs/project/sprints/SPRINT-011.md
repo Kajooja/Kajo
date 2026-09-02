@@ -99,7 +99,8 @@ Start only after 11A is stable.
 
 ### Behavior
 
-- Personal `Tallenna` can choose destination and create/rename Lists.
+- `Lisää listaan` chooses exactly one destination per action through a compact most-recently-used picker (five rows before expansion) and can create/rename Lists.
+- Successful List addition is the positive action and advances to the next card; Personal custom addition records Like, while Shared custom addition records the actor's Endorsement.
 - Shared unanimous Endorsement auto-promotes only to system `Tallennetut`.
 - Custom Shared Lists remain collaborative organization: accepted members may add Items without unanimity.
 - Same Item may exist in multiple different Lists, once per List.
@@ -142,8 +143,8 @@ Start only after 11A is stable.
 - #156 gates common-fit coefficients and all final EvoBot/LongTermState/ShortTermState/ScenarioMemory algorithm work until the user-approved Prediction Core MVP design is canonical.
 - 11A is accepted.
 - #102 backend foundation is applied through `20260901204135_profile_scoped_item_lists.sql`: system/custom Lists, safe Saved/consensus projection, explicit grants/RLS and Profile-scoped RPCs passed hosted rollback/outsider verification.
-- #102 mobile implementation provides List home/history, destination picker, multi-List membership, create/rename/delete, list/card views, added-order sorting, ItemType filters, current interaction joins and Shared added-by provenance.
-- Full `npm run check` passes with 133 tests and iOS/Android bundle smoke. 11B remains active until configured Android acceptance.
+- Configured Android feedback found that the first destination picker was too large, preselected `Tallennetut` together with a newly created List and duplicated Shared `Tykkää`. The follow-up mobile implementation uses one immediate destination, a compact five-row MRU expansion, collapsed List creation, no separate Like button and automatic next-card advance while preserving Shared consensus boundaries.
+- Full `npm run check` passes for the follow-up with lint, TypeScript, 136 deterministic tests and iOS/Android bundle smoke. Refreshed configured Android acceptance remains required before 11B closes.
 - Hosted Events, Event sessions, Item interactions and Shared Endorsements were reset after verification on 2026-09-02; identities, Profiles, memberships, Items and system Lists remain intact for clean testing.
 
 ## Room/navigation constraint during this sprint

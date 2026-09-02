@@ -49,7 +49,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-SWIPE-002` User can give consumed Items a 0–10 rating or mark an unconsumed Item as not currently interesting; these are distinct canonical signals.
 - [x] `MVP-SWIPE-003` A 0–10 rating always marks a movie watched or a book read; consumption is not a separate ambiguous action.
 - [x] `MVP-SWIPE-004` Consumed Items are strongly suppressed, explicitly reacted Items leave the immediate queue, and unreacted impressions use a temporary cooldown so they may return later.
-- [x] `MVP-SWIPE-005` Rating, not-interested and save actions live in one restrained feedback drawer, visibly commit and advance without an index jump.
+- [x] `MVP-SWIPE-005` Rating, not-interested and `Lisää listaan` actions live in one restrained feedback drawer, visibly commit and advance without an index jump. List addition is the positive/like action; there is no separate Like button.
 - [x] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both prior state and exact previous Item/card.
 
 ## Saved, consumed and memory
@@ -77,8 +77,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 ## Named Lists
 
 - [-] `MVP-LIST-001` PersonalProfile and SharedProfile can own multiple Profile-scoped named Lists; List names are 1–40 characters and one List may contain mixed generic Item types such as BOOK and MOVIE.
-- [-] `MVP-LIST-002` PersonalProfile `Tallenna` opens a destination picker, can create/name/rename a List and allows the same Item to belong to multiple Lists while preserving existing saved/prediction evidence.
-- [-] `MVP-LIST-003` Shared unanimous endorsement integrates with exactly one system `Tallennetut` List, while accepted members may add Items to custom Shared Lists without unanimity through explicit list-management flow.
+- [-] `MVP-LIST-002` `Lisää listaan` opens a compact single-destination picker ordered by the current actor's most recent use, shows at most five Lists before `Lisää`, and can create/name/rename a List. One action chooses exactly one destination; separate later actions may still place the same Item in multiple Lists without silently removing existing memberships.
+- [-] `MVP-LIST-003` A successful List addition is also the positive discovery action and advances to the next card. In PersonalProfile it records Like evidence while only `SYSTEM_SAVED` sets Saved; in SharedProfile a custom-List addition also creates the actor's Endorsement, and only unanimous Endorsement promotes to system `Tallennetut`.
 - [-] `MVP-LIST-004` List detail can toggle between list and card/grid presentation, sort deterministically by added order/supported generic metadata, and filter by generic ItemType (`Kaikki`, `Kirjat`, `Elokuvat`, later domains without schema redesign).
 - [-] `MVP-LIST-005` Every list membership stores `addedByUserId` and `addedAt`; SharedProfile UI displays who added the Item and when, while PersonalProfile hides redundant actor identity. Current watched/read/consumed state and rating are joined from canonical Profile interaction state.
 - [-] `MVP-LIST-006` SharedProfile List read/write access follows accepted membership authorization and a former member loses access after leaving the group.

@@ -14,7 +14,6 @@ export const ITEM_LIST_RPC = {
   create: 'create_custom_item_list',
   rename: 'rename_custom_item_list',
   remove: 'delete_custom_item_list',
-  setDestinations: 'set_item_list_destinations',
   setEntry: 'set_item_list_entry',
   entries: 'get_item_list_entries',
   consumed: 'get_profile_consumed_items',
@@ -58,11 +57,6 @@ export interface ConsumedItem {
   updatedAt: string;
 }
 
-export interface ItemListDestinationCommit {
-  listIds: readonly ItemListId[];
-  systemSaved: boolean;
-}
-
 export type ItemListsResult =
   | { status: 'success'; lists: readonly ItemList[] }
   | { status: 'error'; message: string };
@@ -71,9 +65,6 @@ export type ItemListMutationResult =
   | { status: 'error'; message: string };
 export type ItemListDeleteResult =
   | { status: 'success' }
-  | { status: 'error'; message: string };
-export type ItemListDestinationResult =
-  | { status: 'success'; commit: ItemListDestinationCommit }
   | { status: 'error'; message: string };
 export type ItemListEntryMutationResult =
   | { status: 'success'; present: boolean }
@@ -210,27 +201,6 @@ export async function deleteCustomItemList(
   }
 }
 
-export async function setItemListDestinations(
-  rpc: ItemListRpc,
-  profileId: ProfileId,
-  itemId: ItemId,
-  listIds: readonly ItemListId[],
-): Promise<ItemListDestinationResult> {
-  try {
-    const response = await rpc(ITEM_LIST_RPC.setDestinations, {
-      target_profile_id: profileId,
-      target_item_id: itemId,
-      target_list_ids: [...new Set(listIds)],
-    });
-    if (response.error) {
-      return { status: 'error', message: LIST_DESTINATION_ERROR };
-    }
-    return mapDestinationCommit(response.data);
-  } catch {
-    return { status: 'error', message: LIST_DESTINATION_ERROR };
-  }
-}
-
 export async function setItemListEntry(
   rpc: ItemListRpc,
   listId: ItemListId,
@@ -312,22 +282,6 @@ function mapSingleList(data: unknown): ItemListMutationResult {
   return list
     ? { status: 'success', list }
     : { status: 'error', message: LIST_SAVE_ERROR };
-}
-
-function mapDestinationCommit(data: unknown): ItemListDestinationResult {
-  const row = getSingleRow(data);
-  if (
-    !row ||
-    !Array.isArray(row.list_ids) ||
-    !row.list_ids.every(isNonEmptyString) ||
-    typeof row.system_saved !== 'boolean'
-  ) {
-    return { status: 'error', message: LIST_DESTINATION_ERROR };
-  }
-  return {
-    status: 'success',
-    commit: { listIds: row.list_ids as string[], systemSaved: row.system_saved },
-  };
 }
 
 function mapItemList(value: unknown): ItemList | null {
@@ -426,12 +380,6 @@ function mapItem(value: Record<string, unknown>): Item | null {
     ...(value.description ? { description: value.description } : {}),
     tags: value.tags as string[],
   };
-}
-
-function getSingleRow(data: unknown): Record<string, unknown> | null {
-  return Array.isArray(data) && data.length === 1 && isRecord(data[0])
-    ? data[0]
-    : null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

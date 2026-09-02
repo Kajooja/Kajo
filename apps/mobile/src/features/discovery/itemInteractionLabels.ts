@@ -1,22 +1,9 @@
 import type { ItemType } from '../../domain/contracts';
 
 export const ITEM_INTERACTION_LABELS = {
-  liked: 'Pidän',
-  disliked: 'Ei minulle',
-  save: 'Tallenna',
   saved: 'Tallennettu',
-  savedFeedback: 'Tallennettu myöhempää varten.',
-  unsavedFeedback: 'Poistettu tallennetuista.',
-  endorse: 'Tykkää',
-  endorsed: 'Tykätty',
   endorsedFeedback: 'Valintasi välitettiin muille.',
   consensusFeedback: 'Yhteinen valinta tallennettiin.',
-  likedFeedback: 'Pidät tästä.',
-  dislikedFeedback: 'Tämä ei ole sinulle.',
-  interestClearedFeedback: 'Kiinnostusvalinta poistettu.',
-  rating: 'Arvosana',
-  ratingLow: 'En pidä',
-  ratingHigh: 'Pidän',
   notInterested: 'Ei kiinnosta',
   notInterestedFeedback: 'Ei kiinnosta juuri nyt.',
   undo: 'Kumoa',

@@ -17,6 +17,7 @@ export type ItemInteractionAction =
     | { type: 'SET_INTEREST'; itemId: ItemId; interest: ItemInterest | null }
     | { type: 'TOGGLE_SAVED'; itemId: ItemId }
     | { type: 'SET_SAVED'; itemId: ItemId; saved: boolean }
+    | { type: 'SET_LIST_LIKE'; itemId: ItemId; systemSaved: boolean }
     | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean }
     | { type: 'SET_RATING'; itemId: ItemId; rating: number | null }
     | { type: 'SET_NOT_INTERESTED'; itemId: ItemId; notInterested: boolean }
@@ -77,6 +78,17 @@ export function setItemSaved(
   saved: boolean,
 ): ItemInteractionMap {
   return updateItemInteraction(interactions, itemId, { saved });
+}
+
+export function setItemListLike(
+  interactions: ItemInteractionMap,
+  itemId: ItemId,
+  systemSaved: boolean,
+): ItemInteractionMap {
+  return updateItemInteraction(interactions, itemId, {
+    interest: 'LIKED',
+    ...(systemSaved ? { saved: true } : {}),
+  });
 }
 
 export function setItemConsumed(
@@ -234,6 +246,12 @@ function applyItemInteractionAction(
       return toggleItemSaved(interactions, action.itemId);
     case 'SET_SAVED':
       return setItemSaved(interactions, action.itemId, action.saved);
+    case 'SET_LIST_LIKE':
+      return setItemListLike(
+        interactions,
+        action.itemId,
+        action.systemSaved,
+      );
     case 'SET_CONSUMED':
       return setItemConsumed(interactions, action.itemId, action.consumed);
     case 'SET_RATING':
