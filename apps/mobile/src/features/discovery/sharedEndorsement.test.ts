@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applySharedDiscoveryOverlay,
-  formatEndorsementProvenance,
   formatMemberHistoryProvenance,
+  formatPendingListApproval,
   getMemberHistoryNicknames,
-  getPendingEndorserNicknames,
+  getPendingListApproval,
   type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
 
@@ -27,6 +27,9 @@ const STATE: SharedDiscoveryStateMap = {
     consensusSaved: false,
     endorserUserIds: ['user-b'],
     firstEndorsedAt: '2026-09-01T10:00:00.000Z',
+    proposedListId: 'list-together',
+    proposedListName: 'Meidän illat',
+    proposedByUserId: 'user-b',
   },
   'seen-low': {
     item: ITEMS[1]!,
@@ -38,6 +41,9 @@ const STATE: SharedDiscoveryStateMap = {
     consensusSaved: false,
     endorserUserIds: [],
     firstEndorsedAt: null,
+    proposedListId: null,
+    proposedListName: null,
+    proposedByUserId: null,
   },
   'endorsed-by-me': {
     item: ITEMS[2]!,
@@ -49,6 +55,9 @@ const STATE: SharedDiscoveryStateMap = {
     consensusSaved: false,
     endorserUserIds: ['user-a'],
     firstEndorsedAt: '2026-09-01T11:00:00.000Z',
+    proposedListId: 'list-mine',
+    proposedListName: 'Minun ehdotus',
+    proposedByUserId: 'user-a',
   },
   'seen-high': {
     item: { id: 'seen-high', itemType: 'MOVIE', title: 'Seen high' },
@@ -60,6 +69,9 @@ const STATE: SharedDiscoveryStateMap = {
     consensusSaved: false,
     endorserUserIds: [],
     firstEndorsedAt: null,
+    proposedListId: null,
+    proposedListName: null,
+    proposedByUserId: null,
   },
   'shared-consumed': {
     item: ITEMS[3]!,
@@ -71,6 +83,9 @@ const STATE: SharedDiscoveryStateMap = {
     consensusSaved: false,
     endorserUserIds: [],
     firstEndorsedAt: null,
+    proposedListId: null,
+    proposedListName: null,
+    proposedByUserId: null,
   },
 };
 
@@ -81,8 +96,8 @@ describe('Shared discovery collaboration overlay', () => {
     ).toEqual(['pending', 'ordinary', 'seen-high', 'seen-low']);
   });
 
-  it('uses only real member nicknames for pending provenance', () => {
-    const nicknames = getPendingEndorserNicknames(
+  it('names the proposer and target List in the pending approval banner', () => {
+    const approval = getPendingListApproval(
       STATE.pending,
       [
         { id: 'user-a', nickname: 'KajoA' },
@@ -91,9 +106,27 @@ describe('Shared discovery collaboration overlay', () => {
       'user-a',
     );
 
-    expect(nicknames).toEqual(['Mirri']);
-    expect(formatEndorsementProvenance(nicknames)).toBe('Mirri tykkäsi');
-    expect(formatEndorsementProvenance([])).toBeNull();
+    expect(approval).toEqual({
+      listId: 'list-together',
+      listName: 'Meidän illat',
+      proposedByUserId: 'user-b',
+      proposedByNickname: 'Mirri',
+    });
+    expect(formatPendingListApproval(approval)).toBe(
+      'Mirri lisäsi listaan Meidän illat',
+    );
+    expect(
+      getPendingListApproval(STATE['endorsed-by-me'], [
+        { id: 'user-a', nickname: 'KajoA' },
+      ], 'user-a'),
+    ).toBeNull();
+    expect(
+      getPendingListApproval(
+        { ...STATE.pending!, currentActorEndorsed: true },
+        [{ id: 'user-b', nickname: 'Mirri' }],
+        'user-a',
+      ),
+    ).toBeNull();
   });
 
   it('uses accepted member nicknames for restrained consumed provenance', () => {

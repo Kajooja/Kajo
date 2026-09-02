@@ -86,19 +86,20 @@ Make Shared discovery behave like a joint decision surface without creating a se
 - unanimity among currently accepted members promotes the Item once to Shared saved state,
 - later new membership does not retroactively revoke an already-reached consensus.
 
-No majority voting, chat or custom-list voting is introduced here.
+No majority voting or chat is introduced here. The later #102 List slice attaches a target custom List to the same unanimous Endorsement flow rather than creating a second voting model.
 
 #### 11B — Named Lists & collaborative browsing — #102
 
-#151 is stable. Backend and mobile implementation are complete locally; configured Android acceptance remains:
+#151 is stable. The compact picker is accepted; final Shared target-List approval implementation and configured Android acceptance remain:
 
 - PersonalProfile and SharedProfile own generic system/custom Lists,
 - List names are 1–40 characters,
 - one List may contain BOOK, MOVIE and future ItemTypes together,
 - every Profile has one system `Tallennetut` List,
-- Personal `Tallenna` opens a destination picker and can create/name/rename Lists,
-- Shared unanimous endorsement from #151 auto-promotes only to system `Tallennetut`,
-- custom Shared Lists can be explicitly curated by accepted members without unanimity,
+- `Lisää listaan` opens a compact one-destination picker and can create/name/rename Lists,
+- Shared discovery stores the first actor's custom-List choice as pending Endorsement state,
+- other non-endorsing members see proposer/List provenance and approve the same choice,
+- unanimity commits the chosen custom membership and auto-promotes to system `Tallennetut`,
 - one Item may belong to multiple Lists,
 - List detail supports list/card presentation, added-order sorting, generic ItemType filters and current consumed/rating display,
 - Shared list entries show real added-by + added-at provenance; Personal hides redundant actor identity,

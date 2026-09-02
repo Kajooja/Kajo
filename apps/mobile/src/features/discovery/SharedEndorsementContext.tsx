@@ -11,7 +11,7 @@ import {
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
-import type { ItemId, ProfileId, UserId } from '../../domain/contracts';
+import type { ItemId, ItemListId, ProfileId, UserId } from '../../domain/contracts';
 import {
   EMPTY_SHARED_DISCOVERY_STATE,
   type SharedDiscoveryStateMap,
@@ -34,7 +34,10 @@ interface SharedEndorsementContextValue {
   status: SharedEndorsementStatus;
   stateByItemId: SharedDiscoveryStateMap;
   error: string | null;
-  endorse: (itemId: ItemId) => Promise<SharedEndorsementCommitResult>;
+  endorse: (
+    itemId: ItemId,
+    listId?: ItemListId,
+  ) => Promise<SharedEndorsementCommitResult>;
   retry: () => void;
 }
 
@@ -159,12 +162,20 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
   const error = hasCurrentSnapshot ? snapshot?.error ?? null : null;
 
   const endorse = useCallback(
-    async (itemId: ItemId): Promise<SharedEndorsementCommitResult> => {
+    async (
+      itemId: ItemId,
+      listId?: ItemListId,
+    ): Promise<SharedEndorsementCommitResult> => {
       if (!rpc || !activeSharedProfile || !actorUserId || status !== 'ready') {
         return { status: 'error', message: UNAVAILABLE_MESSAGE };
       }
 
-      const result = await endorseSharedItem(rpc, activeSharedProfile.id, itemId);
+      const result = await endorseSharedItem(
+        rpc,
+        activeSharedProfile.id,
+        itemId,
+        listId ?? null,
+      );
 
       if (result.status === 'error') return result;
 
@@ -197,6 +208,15 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
               endorserUserIds,
               firstEndorsedAt:
                 currentState.firstEndorsedAt ?? new Date().toISOString(),
+              proposedListId: result.commit.consensusSaved
+                ? null
+                : result.commit.proposalListId,
+              proposedListName: result.commit.consensusSaved
+                ? null
+                : result.commit.proposalListName,
+              proposedByUserId: result.commit.consensusSaved
+                ? null
+                : result.commit.proposedByUserId,
             },
           },
         };

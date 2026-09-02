@@ -153,8 +153,8 @@ Example A+B:
 1. A endorses Item X.
 2. X is no longer part of A's ordinary Shared discovery queue.
 3. B has not endorsed X, so X is delivered ahead of ordinary Shared recommendations to B.
-4. B sees restrained provenance (`A tykkäsi` or equivalent presentation copy).
-5. If B endorses too, consensus saves X to Shared current/system-saved state and X leaves ordinary Shared discovery.
+4. B sees a restrained approval card naming A and A's selected custom List.
+5. If B approves too, consensus saves X to the selected custom List and Shared current/system-saved state; X leaves ordinary Shared discovery.
 
 Important architecture rule:
 
@@ -171,7 +171,7 @@ SharedProfile Prediction ranking
 
 Prediction output/explanation should make this priority inspectable, e.g. pending endorsement flags/actor IDs or a clear delivery-priority component, without leaking auth email.
 
-The MVP implementation keeps this composition outside `rank_items_v0`: an authorized Shared discovery overlay returns Shared eligibility, current-actor endorsement state, pending Items, accepted-member actor IDs and minimal member-history delivery metadata. Mobile prepends eligible pending Items, preserves unseen Prediction order and appends attributed member-history Items ordered by their aggregate rating signal. This overlay contains no common-fit weights and can remain in place when the core predictor is replaced.
+The MVP implementation keeps this composition outside `rank_items_v0`: an authorized Shared discovery overlay returns Shared eligibility, current-actor endorsement state, pending Items, proposer/target-List approval provenance, accepted-member actor IDs and minimal member-history delivery metadata. Mobile prepends eligible pending Items, preserves unseen Prediction order and appends attributed member-history Items ordered by their aggregate rating signal. This overlay contains no common-fit weights and can remain in place when the core predictor is replaced.
 
 ## Shared consensus and Saved evidence
 
@@ -185,7 +185,7 @@ When all currently accepted members have active Endorsements:
 - once Lists exist the Item is present exactly once in Shared `SYSTEM_SAVED`,
 - future new membership does not retroactively revoke the historical consensus.
 
-Custom List membership rows remain organizational state and are not unanimous votes. The explicit discovery action that creates a membership is separately traceable positive evidence: Personal custom-List addition records Like evidence, while Shared custom-List addition records the actual actor's Endorsement. This does not turn one member's action into Shared Saved state or introduce a new ranking coefficient outside the #156 design gate.
+Custom List membership rows remain organizational state. Personal membership commits immediately and records Like evidence. Shared discovery instead stores one pending target List and the actual actor's Endorsement; only unanimous accepted-member approval commits that membership and Shared Saved state. This does not introduce a new ranking coefficient outside the #156 design gate.
 
 ## ScenarioMemory
 

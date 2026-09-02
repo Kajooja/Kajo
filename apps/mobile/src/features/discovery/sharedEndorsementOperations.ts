@@ -7,7 +7,7 @@ import {
 
 export const SHARED_ENDORSEMENT_RPC = {
   overlay: 'get_shared_discovery_overlay',
-  endorse: 'endorse_shared_item',
+  endorse: 'endorse_shared_list_item',
 } as const;
 
 interface RpcErrorLike {
@@ -38,6 +38,10 @@ export interface SharedEndorsementCommit {
   requiredMemberCount: number;
   consensusReached: boolean;
   consensusSaved: boolean;
+  proposalListId: string;
+  proposalListName: string;
+  proposedByUserId: string;
+  listEntryCreated: boolean;
 }
 
 export type SharedEndorsementCommitResult =
@@ -70,11 +74,13 @@ export async function endorseSharedItem(
   rpc: SharedEndorsementRpc,
   profileId: ProfileId,
   itemId: string,
+  listId: string | null = null,
 ): Promise<SharedEndorsementCommitResult> {
   try {
     const response = await rpc(SHARED_ENDORSEMENT_RPC.endorse, {
       target_profile_id: profileId,
       target_item_id: itemId,
+      target_list_id: listId,
     });
 
     if (response.error) return endorsementError();
@@ -121,7 +127,11 @@ export function mapSharedEndorsementCommit(
     !isNonNegativeInteger(row.endorsement_count) ||
     !isPositiveInteger(row.required_member_count) ||
     typeof row.consensus_reached !== 'boolean' ||
-    typeof row.consensus_saved !== 'boolean'
+    typeof row.consensus_saved !== 'boolean' ||
+    !isNonEmptyString(row.proposal_list_id) ||
+    !isNonEmptyString(row.proposal_list_name) ||
+    !isNonEmptyString(row.proposed_by_user_id) ||
+    typeof row.list_entry_created !== 'boolean'
   ) {
     return endorsementError();
   }
@@ -133,7 +143,8 @@ export function mapSharedEndorsementCommit(
     endorsementCount > requiredMemberCount ||
     row.endorsement_created && endorsementCount < 1 ||
     row.consensus_reached &&
-      (!row.consensus_saved || endorsementCount !== requiredMemberCount)
+      (!row.consensus_saved || endorsementCount !== requiredMemberCount) ||
+    row.list_entry_created && !row.consensus_saved
   ) {
     return endorsementError();
   }
@@ -149,6 +160,10 @@ export function mapSharedEndorsementCommit(
       requiredMemberCount,
       consensusReached: row.consensus_reached,
       consensusSaved: row.consensus_saved,
+      proposalListId: row.proposal_list_id,
+      proposalListName: row.proposal_list_name,
+      proposedByUserId: row.proposed_by_user_id,
+      listEntryCreated: row.list_entry_created,
     },
   };
 }
@@ -176,7 +191,10 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
     !value.endorser_user_ids.every(isNonEmptyString) ||
     (value.first_endorsed_at !== null &&
       (!isNonEmptyString(value.first_endorsed_at) ||
-        Number.isNaN(Date.parse(value.first_endorsed_at))))
+        Number.isNaN(Date.parse(value.first_endorsed_at)))) ||
+    (value.proposed_list_id !== null && !isNonEmptyString(value.proposed_list_id)) ||
+    (value.proposed_list_name !== null && !isNonEmptyString(value.proposed_list_name)) ||
+    (value.proposed_by_user_id !== null && !isNonEmptyString(value.proposed_by_user_id))
   ) {
     return null;
   }
@@ -184,7 +202,12 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
   if (
     value.pending_endorsement && value.endorser_user_ids.length === 0 ||
     value.current_actor_endorsed && value.endorser_user_ids.length === 0 ||
-    value.endorser_user_ids.length === 0 && value.first_endorsed_at !== null
+    value.endorser_user_ids.length === 0 && value.first_endorsed_at !== null ||
+    value.pending_endorsement && (
+      value.proposed_list_id === null ||
+      value.proposed_list_name === null ||
+      value.proposed_by_user_id === null
+    )
   ) {
     return null;
   }
@@ -207,6 +230,9 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
     consensusSaved: value.consensus_saved,
     endorserUserIds: value.endorser_user_ids as string[],
     firstEndorsedAt: value.first_endorsed_at as string | null,
+    proposedListId: value.proposed_list_id as string | null,
+    proposedListName: value.proposed_list_name as string | null,
+    proposedByUserId: value.proposed_by_user_id as string | null,
   };
 }
 

@@ -94,15 +94,19 @@ export function ListDestinationSheet({
   async function persistDestination(list: ItemList) {
     if (!item) return false;
 
-    const result = await setEntry(list.id, item.id, true);
-    if (result.status === 'error') {
-      setError(result.message);
-      return false;
+    if (!isSharedProfile) {
+      const result = await setEntry(list.id, item.id, true);
+      if (result.status === 'error') {
+        setError(result.message);
+        return false;
+      }
     }
 
-    rememberRecentList(list.profileId, list.id);
+    if (!isSharedProfile) {
+      rememberRecentList(list.profileId, list.id);
+    }
 
-    if (list.kind === 'CUSTOM' && !list.containsItem) {
+    if (!isSharedProfile && list.kind === 'CUSTOM' && !list.containsItem) {
       eventTracking.recordEvent({
         eventType: 'ITEM_ADDED_TO_LIST',
         itemId: item.id,
