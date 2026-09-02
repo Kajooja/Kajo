@@ -35,7 +35,7 @@ properties?
 
 ### Preference / discovery
 
-- `ITEM_LIKED`
+- `ITEM_LIKED` — PersonalProfile positive preference. In current discovery UI this is emitted when an Item is added to a custom List; the same action advances to the next card.
 - `ITEM_DISLIKED` — legacy binary signal retained for historical rows; current rating-drawer UI does not emit it.
 - `ITEM_NOT_INTERESTED` — actor has not consumed the Item but marks it currently irrelevant.
 - `ITEM_INTEREST_CLEARED` — prior explicit like/dislike returned to neutral.
@@ -71,6 +71,14 @@ The exact actor for an automatic membership-change recomputation must remain tra
 - `ITEM_REMOVED_FROM_LIST` — actor explicitly removed an Item from a custom List.
 
 System `Tallennetut` remains the Saved projection and uses canonical `ITEM_SAVED` / `ITEM_UNSAVED` evidence. Shared consensus continues to emit `ITEM_SAVED` with `properties.source = SHARED_CONSENSUS`; it must not be relabeled as a manual custom-List event. One Item may produce multiple custom List membership Events because the memberships are independent.
+
+Current discovery commits one destination per action:
+
+- Personal custom List: append `ITEM_ADDED_TO_LIST` for a new membership and `ITEM_LIKED` for the positive action; keep Saved unchanged.
+- Personal system `Tallennetut`: append `ITEM_SAVED` when Saved becomes true and persist the action as positive current preference.
+- Shared custom List: append `ITEM_ADDED_TO_LIST` for a new membership and create actor-specific `ITEM_ENDORSED`; only later unanimity may append `ITEM_SAVED`.
+
+Selecting an already-present membership is idempotent and must not duplicate membership Events. A later action may add the same Item to another List; the single-destination picker does not silently delete earlier memberships.
 
 ### Historical/deprecated Shared suggestion
 

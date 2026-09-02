@@ -25,11 +25,9 @@ import {
   loadItemListEntries,
   loadProfileItemLists,
   renameCustomItemList,
-  setItemListDestinations,
   setItemListEntry,
   type ConsumedItemsResult,
   type ItemListDeleteResult,
-  type ItemListDestinationResult,
   type ItemListEntriesResult,
   type ItemListMutationResult,
   type ItemListRpc,
@@ -55,10 +53,6 @@ interface ItemListsContextValue {
     name: string,
   ) => Promise<ItemListMutationResult>;
   deleteList: (listId: ItemListId) => Promise<ItemListDeleteResult>;
-  setDestinations: (
-    itemId: ItemId,
-    listIds: readonly ItemListId[],
-  ) => Promise<ItemListDestinationResult>;
   setEntry: (
     listId: ItemListId,
     itemId: ItemId,
@@ -166,23 +160,6 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     [refresh, rpc],
   );
 
-  const setDestinations = useCallback(
-    async (itemId: ItemId, listIds: readonly ItemListId[]) => {
-      const result = await runForProfile(
-        (currentRpc, currentProfileId) => setItemListDestinations(
-          currentRpc,
-          currentProfileId,
-          itemId,
-          listIds,
-        ),
-        { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDestinationResult,
-      );
-      if (result.status === 'success') refresh();
-      return result;
-    },
-    [refresh, runForProfile],
-  );
-
   const setEntry = useCallback(
     async (listId: ItemListId, itemId: ItemId, present: boolean) => {
       if (!rpc) return { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDeleteResult;
@@ -228,7 +205,6 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     createList,
     renameList,
     deleteList,
-    setDestinations,
     setEntry,
     loadEntries,
     loadConsumed,
@@ -242,7 +218,6 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     loadForItem,
     refresh,
     renameList,
-    setDestinations,
     setEntry,
     status,
   ]);

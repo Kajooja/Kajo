@@ -140,6 +140,15 @@ the system projection, while direct member writes are limited to custom Lists.
 Presentation joins current consumed/rating state instead of copying it into
 membership rows.
 
+Discovery uses the single-entry `set_item_list_entry` boundary rather than the
+legacy bulk destination mutation: one tap adds to one destination and never
+silently removes memberships created by earlier actions. Per-actor recent-List
+ordering is presentation state persisted on-device through Expo SQLite-backed
+`localStorage`; it is scoped by Profile and does not let one Shared member's UI
+ordering rewrite another member's ordering. Personal custom-List addition maps
+to current Like state, Personal system addition maps to Like + Saved, and Shared
+custom addition is followed by the existing actor-specific Endorsement boundary.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:

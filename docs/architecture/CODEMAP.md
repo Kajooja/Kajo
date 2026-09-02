@@ -36,7 +36,7 @@ supabase/functions/password-auth/
 | Interaction persistence | `apps/mobile/src/features/discovery/ItemInteractionContext.tsx` | Active-Profile current-state hydration/persistence; later Profile switches keep UI mounted while writes wait for target Profile readiness |
 | Event Engine | `apps/mobile/src/features/events/` | Root-scoped session/correlation append boundary; active Profile changes `profileId`, signed-in User remains `actorUserId` |
 | Profiles | `apps/mobile/src/features/profiles/` | Personal identity, Shared list/create/invite/respond/leave operations, active Profile rules/provider, invitation/membership refresh and Shared management UI |
-| Lists | `apps/mobile/src/features/lists/`, `apps/mobile/app/lists/` | #102 Profile-scoped system/custom List operations/provider, destination picker, Saved/consumed browsing, custom management, list/card/filter/sort detail and Shared provenance |
+| Lists | `apps/mobile/src/features/lists/`, `apps/mobile/app/lists/` | #102 Profile-scoped system/custom List operations/provider, compact one-destination recent-use picker, Saved/consumed browsing, custom management, list/card/filter/sort detail and Shared provenance |
 | Shared Kajo route | `apps/mobile/app/profiles/shared.tsx` | Full Shared management: ready/provisional groups, accepted members, creation, nickname invitations and leave confirmation |
 | Auth gate | `apps/mobile/src/features/auth/AuthGate.tsx` | Auth/profile onboarding; nickname max 24; first configured hydration blocking only, later Profile switches seamless |
 | Mobile data boundary | `apps/mobile/src/data/` | Supabase configured/unconfigured connection and root provider; presentation avoids scattered DB access |

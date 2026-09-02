@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import type { ItemListEntry } from './itemListOperations';
 import {
-  haveSelectableDestinationsChanged,
+  COMPACT_LIST_DESTINATION_LIMIT,
+  orderListDestinationsByRecentUse,
+  selectVisibleListDestinations,
   selectPresentedListEntries,
 } from './listPresentation';
+import type { ItemList } from '../../domain/contracts';
 
 const entries: readonly ItemListEntry[] = [
   {
@@ -43,16 +46,39 @@ describe('list presentation', () => {
       .toEqual(['book-a']);
   });
 
-  it('ignores a non-selectable Shared system List when comparing custom destinations', () => {
-    expect(haveSelectableDestinationsChanged(
-      ['custom-a'],
-      ['custom-a', 'system-saved'],
-      ['custom-a', 'custom-b'],
-    )).toBe(false);
-    expect(haveSelectableDestinationsChanged(
-      ['custom-a'],
-      ['custom-b', 'system-saved'],
-      ['custom-a', 'custom-b'],
-    )).toBe(true);
+  it('orders destinations by per-Profile recent use before deterministic fallback order', () => {
+    const lists: readonly ItemList[] = [
+      createList('system', 'Tallennetut', '2026-09-02T08:00:00.000Z'),
+      createList('older', 'Aiempi', '2026-09-01T08:00:00.000Z'),
+      createList('newer', 'Uudempi', '2026-09-02T09:00:00.000Z'),
+    ];
+
+    expect(orderListDestinationsByRecentUse(lists, ['older', 'system']).map((list) => list.id))
+      .toEqual(['older', 'system', 'newer']);
+    expect(orderListDestinationsByRecentUse(lists, []).map((list) => list.id))
+      .toEqual(['newer', 'system', 'older']);
+  });
+
+  it('shows at most five destinations until the compact selector is expanded', () => {
+    const lists = Array.from(
+      { length: COMPACT_LIST_DESTINATION_LIMIT + 2 },
+      (_, index) => createList(`list-${index}`, `Lista ${index}`, '2026-09-02T08:00:00.000Z'),
+    );
+
+    expect(selectVisibleListDestinations(lists, false)).toHaveLength(5);
+    expect(selectVisibleListDestinations(lists, true)).toHaveLength(7);
   });
 });
+
+function createList(id: string, name: string, updatedAt: string): ItemList {
+  return {
+    id,
+    profileId: 'profile-a',
+    kind: id === 'system' ? 'SYSTEM_SAVED' : 'CUSTOM',
+    name,
+    itemCount: 0,
+    containsItem: false,
+    createdAt: updatedAt,
+    updatedAt,
+  };
+}

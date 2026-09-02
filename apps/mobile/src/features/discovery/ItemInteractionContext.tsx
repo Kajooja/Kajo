@@ -52,6 +52,11 @@ interface ItemInteractionState {
   ) => boolean;
   toggleSaved: (itemId: ItemId, eventId?: EventId) => boolean;
   setSaved: (itemId: ItemId, saved: boolean, eventId?: EventId) => boolean;
+  setListLike: (
+    itemId: ItemId,
+    systemSaved: boolean,
+    eventId?: EventId,
+  ) => boolean;
   setConsumed: (
     itemId: ItemId,
     consumed: boolean,
@@ -330,6 +335,17 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     [commitAction],
   );
 
+  const setListLike = useCallback(
+    (itemId: ItemId, systemSaved: boolean, eventId?: EventId) =>
+      commitAction({
+        type: 'SET_LIST_LIKE',
+        itemId,
+        systemSaved,
+        ...(eventId ? { eventId } : {}),
+      }),
+    [commitAction],
+  );
+
   const setRating = useCallback(
     (itemId: ItemId, rating: number, eventId?: EventId) => {
       return commitAction({
@@ -440,6 +456,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       setInterest,
       toggleSaved,
       setSaved,
+      setListLike,
       setConsumed,
       setRating,
       setNotInterested,
@@ -468,6 +485,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       store.undoStack.length,
       toggleSaved,
       setSaved,
+      setListLike,
       undo,
       undoTargetItemId,
     ],

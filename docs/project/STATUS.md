@@ -88,12 +88,13 @@ The MVP endpoint is now a genuinely shareable production application downloadabl
 
 - one system `Tallennetut` List per Profile,
 - generic custom Lists across Item types,
-- Personal save destination picker,
+- compact one-destination picker (five recent Lists before expansion),
+- List addition as the positive/like action with automatic next-card advance,
 - collaborative Shared Lists without unanimity requirement,
 - list/card presentation, filters/sort and current consumed/rating display,
 - real added-by/added-at provenance in Shared Lists.
 
-The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, destination picker, custom-list management and list/card/filter/sort detail are implemented locally. Full lint, TypeScript, 133 tests and both platform bundle smokes pass. Configured Android acceptance is still required before #102/Sprint 011 can close.
+The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to a follow-up compact one-destination MRU picker: it no longer preselects `Tallennetut`, new List creation commits only that List, and List addition replaces the separate Like button while advancing the card. Full `npm run check` passes with lint, TypeScript, 136 tests and both platform bundle smokes; refreshed configured Android acceptance is still required before #102/Sprint 011 can close.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 

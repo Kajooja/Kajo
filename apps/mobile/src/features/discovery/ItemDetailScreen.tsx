@@ -26,7 +26,10 @@ import type {
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
-import { ListDestinationSheet } from '../lists/ListDestinationSheet';
+import {
+  ListDestinationSheet,
+  type ListDestinationCommit,
+} from '../lists/ListDestinationSheet';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import {
@@ -152,7 +155,7 @@ function ItemDetailContent({
   const sharedEndorsements = useSharedEndorsements();
   const {
     interactions,
-    setSaved,
+    setListLike,
     setRating,
     setNotInterested,
     canUndo,
@@ -293,36 +296,42 @@ function ItemDetailContent({
     );
   }
 
-  function handleListDestinationCommit(commit: {
-    systemSaved: boolean;
-    changed: boolean;
-  }) {
+  function handleListDestinationCommit(commit: ListDestinationCommit) {
     const target = listPickerTarget;
     setListPickerTarget(null);
 
     if (!target) return;
 
-    if (!activeSharedMembership && commit.systemSaved !== target.interaction.saved) {
-      const { item, index, interaction } = target;
-      const action: ItemInteractionAction = {
-        type: 'SET_SAVED',
-        itemId: item.id,
-        saved: commit.systemSaved,
-      };
-      handleCommittedAction(
+    if (activeSharedMembership) {
+      void handleEndorsement(target.item, target.index);
+      return;
+    }
+
+    const { item, index, interaction } = target;
+    const systemSaved = commit.list.kind === 'SYSTEM_SAVED';
+    if (interaction.interest === 'LIKED' && (!systemSaved || interaction.saved)) {
+      advanceAfterAction(
         item,
         index,
-        action,
-        { ...interaction, saved: commit.systemSaved },
-        (eventId) => setSaved(item.id, commit.systemSaved, eventId),
-        commit.systemSaved
-          ? ITEM_INTERACTION_LABELS.savedFeedback
-          : ITEM_INTERACTION_LABELS.unsavedFeedback,
+        `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`,
       );
       return;
     }
 
-    setFeedback(commit.changed ? 'Listavalinnat tallennettu.' : 'Listavalinnat ennallaan.');
+    const action: ItemInteractionAction = {
+      type: 'SET_LIST_LIKE',
+      itemId: item.id,
+      systemSaved,
+    };
+    handleCommittedAction(
+      item,
+      index,
+      action,
+      { ...interaction, interest: 'LIKED', ...(systemSaved ? { saved: true } : {}) },
+      (eventId) => setListLike(item.id, systemSaved, eventId),
+      `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`,
+      { listId: commit.list.id, listName: commit.list.name },
+    );
   }
 
   function openListPicker(
@@ -686,12 +695,6 @@ function ItemDetailContent({
                 theme={theme}
                 styles={styles}
                 disabled={Boolean(exitingItemId || endorsingItemId)}
-                isSharedProfile={Boolean(activeSharedMembership)}
-                currentActorEndorsed={Boolean(sharedState?.currentActorEndorsed)}
-                endorsementDisabled={
-                  Boolean(activeSharedMembership) &&
-                  sharedEndorsements.status !== 'ready'
-                }
                 sharedProvenance={
                   endorsementProvenance ?? memberHistoryProvenance
                 }
@@ -700,7 +703,6 @@ function ItemDetailContent({
                   handleNotInterested(item, index, interaction)
                 }
                 onOpenLists={() => openListPicker(item, index, interaction)}
-                onEndorse={() => void handleEndorsement(item, index)}
               />
             </Animated.View>
           );
@@ -725,14 +727,10 @@ interface SwipeItemPageProps {
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   disabled: boolean;
-  isSharedProfile: boolean;
-  currentActorEndorsed: boolean;
-  endorsementDisabled: boolean;
   sharedProvenance: string | null;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
   onOpenLists: () => void;
-  onEndorse: () => void;
 }
 
 function SwipeItemPage({
@@ -742,14 +740,10 @@ function SwipeItemPage({
   theme,
   styles,
   disabled,
-  isSharedProfile,
-  currentActorEndorsed,
-  endorsementDisabled,
   sharedProvenance,
   onRating,
   onNotInterested,
   onOpenLists,
-  onEndorse,
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
@@ -829,35 +823,13 @@ function SwipeItemPage({
             onPress={onNotInterested}
           />
           <ActionButton
-            label={
-              isSharedProfile
-                ? currentActorEndorsed
-                  ? ITEM_INTERACTION_LABELS.endorsed
-                  : ITEM_INTERACTION_LABELS.endorse
-                : interaction.saved
-                  ? ITEM_INTERACTION_LABELS.saved
-                  : ITEM_INTERACTION_LABELS.save
-            }
-            active={isSharedProfile ? currentActorEndorsed : interaction.saved}
-            disabled={
-              disabled ||
-              (isSharedProfile &&
-                (endorsementDisabled || currentActorEndorsed))
-            }
+            label={ITEM_LIST_LABELS.addToList}
+            active={false}
+            disabled={disabled}
             theme={theme}
             styles={styles}
-            onPress={isSharedProfile ? onEndorse : onOpenLists}
+            onPress={onOpenLists}
           />
-          {isSharedProfile ? (
-            <ActionButton
-              label={ITEM_LIST_LABELS.addToList}
-              active={false}
-              disabled={disabled}
-              theme={theme}
-              styles={styles}
-              onPress={onOpenLists}
-            />
-          ) : null}
         </View>
       </View>
 

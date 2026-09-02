@@ -185,7 +185,7 @@ When all currently accepted members have active Endorsements:
 - once Lists exist the Item is present exactly once in Shared `SYSTEM_SAVED`,
 - future new membership does not retroactively revoke the historical consensus.
 
-Custom Shared Lists do not affect the prediction model as unanimous votes by default. They are organizational state unless later evidence semantics are explicitly defined.
+Custom List membership rows remain organizational state and are not unanimous votes. The explicit discovery action that creates a membership is separately traceable positive evidence: Personal custom-List addition records Like evidence, while Shared custom-List addition records the actual actor's Endorsement. This does not turn one member's action into Shared Saved state or introduce a new ranking coefficient outside the #156 design gate.
 
 ## ScenarioMemory
 

@@ -14,6 +14,7 @@ import {
   ITEM_INTERACTION_UNDO_LIMIT,
   setItemConsumed,
   setItemInterest,
+  setItemListLike,
   setItemNotInterested,
   setItemRating,
   setItemSaved,
@@ -66,6 +67,20 @@ describe('item interaction state', () => {
     expect(getItemInteraction(saved, 'book-a').saved).toBe(true);
     expect(setItemSaved(saved, 'book-a', true)).toEqual(saved);
     expect(getItemInteraction(setItemSaved(saved, 'book-a', false), 'book-a').saved).toBe(false);
+  });
+
+  it('persists a List action as a like and only system Tallennetut as Saved', () => {
+    const customListLike = setItemListLike({}, 'book-a', false);
+    expect(getItemInteraction(customListLike, 'book-a')).toMatchObject({
+      interest: 'LIKED',
+      saved: false,
+    });
+
+    const systemListLike = setItemListLike({}, 'book-a', true);
+    expect(getItemInteraction(systemListLike, 'book-a')).toMatchObject({
+      interest: 'LIKED',
+      saved: true,
+    });
   });
 
   it('makes rating consumed and not-interested explicitly unconsumed', () => {

@@ -1,9 +1,46 @@
-import type { ItemListId, ItemType } from '../../domain/contracts';
+import type { ItemList, ItemListId, ItemType } from '../../domain/contracts';
 import type { ItemListEntry } from './itemListOperations';
 
 export type ItemListTypeFilter = 'ALL' | ItemType;
 export type ItemListSort = 'NEWEST' | 'OLDEST';
 export type ItemListView = 'LIST' | 'GRID';
+
+export const COMPACT_LIST_DESTINATION_LIMIT = 5;
+
+export function orderListDestinationsByRecentUse(
+  lists: readonly ItemList[],
+  recentListIds: readonly ItemListId[],
+): readonly ItemList[] {
+  const recentOrder = new Map(
+    recentListIds.map((listId, index) => [listId, index]),
+  );
+
+  return lists.slice().sort((first, second) => {
+    const firstRecentIndex = recentOrder.get(first.id);
+    const secondRecentIndex = recentOrder.get(second.id);
+
+    if (firstRecentIndex !== undefined || secondRecentIndex !== undefined) {
+      if (firstRecentIndex === undefined) return 1;
+      if (secondRecentIndex === undefined) return -1;
+      if (firstRecentIndex !== secondRecentIndex) {
+        return firstRecentIndex - secondRecentIndex;
+      }
+    }
+
+    const updatedDifference = Date.parse(second.updatedAt) - Date.parse(first.updatedAt);
+    if (updatedDifference !== 0) return updatedDifference;
+
+    const nameDifference = first.name.localeCompare(second.name, 'fi');
+    return nameDifference !== 0 ? nameDifference : first.id.localeCompare(second.id);
+  });
+}
+
+export function selectVisibleListDestinations(
+  lists: readonly ItemList[],
+  expanded: boolean,
+): readonly ItemList[] {
+  return expanded ? lists : lists.slice(0, COMPACT_LIST_DESTINATION_LIMIT);
+}
 
 export function selectPresentedListEntries(
   entries: readonly ItemListEntry[],
@@ -26,17 +63,4 @@ export function formatListEntryDate(value: string, locale = 'fi-FI'): string {
     month: 'short',
     year: 'numeric',
   }).format(new Date(value));
-}
-
-export function haveSelectableDestinationsChanged(
-  initialIds: readonly ItemListId[],
-  committedIds: readonly ItemListId[],
-  selectableIds: readonly ItemListId[],
-): boolean {
-  const initial = new Set(initialIds);
-  const selectable = new Set(selectableIds);
-  const committed = new Set(committedIds.filter((id) => selectable.has(id)));
-
-  return initial.size !== committed.size
-    || [...initial].some((id) => !committed.has(id));
 }
