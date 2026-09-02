@@ -23,6 +23,9 @@ const OVERLAY_ROW = {
   consensus_saved: false,
   endorser_user_ids: ['user-b'],
   first_endorsed_at: '2026-09-01T10:00:00.000Z',
+  proposed_list_id: 'list-1',
+  proposed_list_name: 'Meidän illat',
+  proposed_by_user_id: 'user-b',
 };
 
 const COMMIT_ROW = {
@@ -35,6 +38,10 @@ const COMMIT_ROW = {
   required_member_count: 2,
   consensus_reached: true,
   consensus_saved: true,
+  proposal_list_id: 'list-1',
+  proposal_list_name: 'Meidän illat',
+  proposed_by_user_id: 'user-b',
+  list_entry_created: true,
 };
 
 describe('Shared discovery overlay mapping', () => {
@@ -57,6 +64,9 @@ describe('Shared discovery overlay mapping', () => {
           consensusSaved: false,
           endorserUserIds: ['user-b'],
           firstEndorsedAt: '2026-09-01T10:00:00.000Z',
+          proposedListId: 'list-1',
+          proposedListName: 'Meidän illat',
+          proposedByUserId: 'user-b',
         },
       },
     });
@@ -108,6 +118,10 @@ describe('Shared endorsement RPC boundary', () => {
         requiredMemberCount: 2,
         consensusReached: true,
         consensusSaved: true,
+        proposalListId: 'list-1',
+        proposalListName: 'Meidän illat',
+        proposedByUserId: 'user-b',
+        listEntryCreated: true,
       },
     });
 
@@ -119,6 +133,7 @@ describe('Shared endorsement RPC boundary', () => {
           endorsement_count: 0,
           consensus_reached: false,
           consensus_saved: true,
+          list_entry_created: false,
         },
       ]),
     ).toMatchObject({ status: 'success' });
@@ -133,6 +148,27 @@ describe('Shared endorsement RPC boundary', () => {
     ).resolves.toEqual({
       status: 'error',
       message: 'Yhteisen valinnan tallentaminen epäonnistui. Yritä uudelleen.',
+    });
+  });
+
+  it('sends a List only for the proposing action and null for approval', async () => {
+    const rpc = vi.fn<SharedEndorsementRpc>().mockResolvedValue({
+      data: [COMMIT_ROW],
+      error: null,
+    });
+
+    await endorseSharedItem(rpc, 'profile-1', 'item-1', 'list-1');
+    await endorseSharedItem(rpc, 'profile-1', 'item-1');
+
+    expect(rpc).toHaveBeenNthCalledWith(1, 'endorse_shared_list_item', {
+      target_profile_id: 'profile-1',
+      target_item_id: 'item-1',
+      target_list_id: 'list-1',
+    });
+    expect(rpc).toHaveBeenNthCalledWith(2, 'endorse_shared_list_item', {
+      target_profile_id: 'profile-1',
+      target_item_id: 'item-1',
+      target_list_id: null,
     });
   });
 });

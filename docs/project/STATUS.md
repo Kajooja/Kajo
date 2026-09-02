@@ -90,17 +90,17 @@ The MVP endpoint is now a genuinely shareable production application downloadabl
 - generic custom Lists across Item types,
 - compact one-destination picker (five recent Lists before expansion),
 - List addition as the positive/like action with automatic next-card advance,
-- collaborative Shared Lists without unanimity requirement,
+- Shared custom-List choices that commit only after accepted-member unanimity,
 - list/card presentation, filters/sort and current consumed/rating display,
 - real added-by/added-at provenance in Shared Lists.
 
-The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to a follow-up compact one-destination MRU picker: it no longer preselects `Tallennetut`, new List creation commits only that List, and List addition replaces the separate Like button while advancing the card. Full `npm run check` passes with lint, TypeScript, 136 tests and both platform bundle smokes; refreshed configured Android acceptance is still required before #102/Sprint 011 can close.
+The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to a compact one-destination MRU picker, which is accepted. A second accepted product correction is implemented locally: Shared custom-List choice becomes pending, shows another member a green proposer/List `Hyväksy` bar, and commits the selected custom membership plus `Tallennetut` only at unanimity. `npm run check` passes with 137 tests and both platform bundle smokes. Migration `20260902134621_shared_list_approval_flow.sql` passed a full hosted-schema A→B authorization/atomicity/idempotency smoke inside a rolled-back transaction, so production remains unchanged. Migration application and refreshed configured Android acceptance are still required before #102/Sprint 011 can close.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **#102** — configured Android acceptance for system + named Profile-scoped Lists and browsing.
+1. **#102** — finish, host-verify and configured-Android accept Shared proposer/List approval plus named Profile-scoped Lists and browsing.
 3. **#138 / Sprint 012** — Profile messaging/chat after Lists are stable.
 4. **Sprint 013** — ScenarioMemory.
 5. **Sprint 014** — MVP hardening/release readiness.

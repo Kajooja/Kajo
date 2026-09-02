@@ -96,9 +96,10 @@ one active Endorsement per (profileId, itemId, actorUserId)
 
 Pending behavior:
 
-- after User A endorses Item X, X leaves A's ordinary Shared discovery queue,
-- accepted members who have not endorsed X may receive X ahead of ordinary recommendations,
-- delivery provenance identifies the real endorser,
+- User A selects one target custom List and endorses Item X; the List membership is not written yet,
+- X leaves A's ordinary Shared discovery queue,
+- accepted members who have not endorsed X receive an approval card ahead of ordinary recommendations,
+- delivery provenance identifies the real proposer and selected List,
 - this actor-specific priority is collaboration state layered onto the SharedProfile Prediction, not a separate taste model.
 
 `SharedConsensus` is reached when every currently accepted member has an active Endorsement for the Item.
@@ -107,11 +108,12 @@ At consensus:
 
 - SharedProfile Saved/current-state projection becomes true,
 - a durable `(profileId, itemId)` SharedConsensus record preserves the reached decision even if membership later changes,
+- the Item is added once to the custom List selected by the original proposer, retaining that proposer/time provenance,
 - the Item is promoted once to the Shared `SYSTEM_SAVED` / `Tallennetut` List,
 - the Item leaves ordinary Shared discovery,
 - the reached consensus becomes durable shared history; a later new member does not retroactively revoke it.
 
-Custom Shared Lists are not consensus-vote mechanisms. Accepted members may explicitly curate custom Lists according to List authorization rules and real `addedByUserId` provenance.
+Shared discovery uses approval rather than direct custom-List insertion. The first member selects the List; other accepted members approve the same choice, and unanimous approval commits the membership. List membership remains organizational state and is not a separate ranking coefficient.
 
 ## Item
 
@@ -144,8 +146,9 @@ Current invariants:
 - a custom name is 1–40 characters and case-insensitively unique inside its Profile,
 - one Item may belong once to each of several Lists,
 - Personal Saved state and Shared unanimous consensus project into `SYSTEM_SAVED`,
-- custom List membership never changes canonical Saved state,
+- Personal custom List membership never changes canonical Saved state; Shared discovery approval reaches consensus and therefore also creates canonical Shared Saved state,
 - direct Shared writes to `SYSTEM_SAVED` are denied; consensus owns that transition,
+- direct Shared custom-List insertion from discovery is denied; the approval boundary owns that transition,
 - direct Shared interaction writes cannot forge, clear or delete Saved state unless it matches the durable SharedConsensus record,
 - accepted Shared members may collaborate on custom Lists, and former/outsider members have no read/write access,
 - `addedByUserId` may remain nullable only for safely backfilled historical rows where no truthful actor exists,
@@ -203,5 +206,5 @@ Consumed Items form history. The MVP stores consumed state and simple rating. Th
 - An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile.
 - A PersonalProfile consumed outcome may lower and annotate the same Item in Shared discovery without copying the Personal action into Shared state.
 - Pending Endorsement is not Shared Saved state.
-- Custom Shared List membership is not unanimous consensus.
+- Pending Shared custom-List choice is not membership; unanimous approval commits both the chosen membership and SharedConsensus.
 - Actor-specific pending delivery is not a separate per-User Prediction model.

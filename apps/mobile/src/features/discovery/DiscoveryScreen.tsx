@@ -29,10 +29,10 @@ import {
 import { getConsumedItemLabels } from './itemInteractionLabels';
 import {
   applySharedDiscoveryOverlay,
-  formatEndorsementProvenance,
   formatMemberHistoryProvenance,
+  formatPendingListApproval,
   getMemberHistoryNicknames,
-  getPendingEndorserNicknames,
+  getPendingListApproval,
 } from './sharedEndorsement';
 import { usePredictionRanking } from './usePredictionRanking';
 
@@ -283,8 +283,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           }
           renderItem={({ item, index }) => {
             const sharedState = sharedEndorsements.stateByItemId[item.id];
-            const endorsementProvenance = formatEndorsementProvenance(
-              getPendingEndorserNicknames(
+            const pendingApprovalLabel = formatPendingListApproval(
+              getPendingListApproval(
                 sharedState,
                 activeSharedMembership?.members ?? [],
                 activeProfile.actorUserId,
@@ -302,9 +302,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 item={item}
                 index={index}
                 interaction={getItemInteraction(interactions, item.id)}
-                sharedProvenance={
-                  endorsementProvenance ?? memberHistoryProvenance
-                }
+                pendingApprovalLabel={pendingApprovalLabel}
+                sharedProvenance={memberHistoryProvenance}
                 theme={theme}
                 styles={styles}
                 onOpen={() => openItem(item)}
@@ -321,6 +320,7 @@ interface ItemCardProps {
   item: Item;
   index: number;
   interaction: ItemInteraction;
+  pendingApprovalLabel: string | null;
   sharedProvenance: string | null;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
@@ -331,6 +331,7 @@ function ItemCard({
   item,
   index,
   interaction,
+  pendingApprovalLabel,
   sharedProvenance,
   theme,
   styles,
@@ -348,6 +349,13 @@ function ItemCard({
       onPress={onOpen}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
+      {pendingApprovalLabel ? (
+        <View style={styles.approvalBanner}>
+          <Text numberOfLines={2} style={styles.approvalBannerText}>
+            {pendingApprovalLabel}
+          </Text>
+        </View>
+      ) : null}
       <View
         style={[
           styles.cover,
@@ -529,6 +537,23 @@ function createStyles(theme: RoomTheme) {
     card: {
       flex: 1,
       minWidth: 0,
+    },
+    approvalBanner: {
+      minHeight: 42,
+      marginBottom: 7,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      justifyContent: 'center',
+      borderRadius: 11,
+      borderWidth: 1,
+      borderColor: 'rgba(117, 190, 132, 0.72)',
+      backgroundColor: 'rgba(54, 119, 72, 0.34)',
+    },
+    approvalBannerText: {
+      color: '#c9efd1',
+      fontSize: 10,
+      lineHeight: 14,
+      fontWeight: '700',
     },
     cover: {
       aspectRatio: 0.72,

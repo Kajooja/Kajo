@@ -21,6 +21,7 @@ import type {
   EventId,
   Item,
   ItemId,
+  ItemList,
   PredictionId,
 } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
@@ -31,6 +32,8 @@ import {
   type ListDestinationCommit,
 } from '../lists/ListDestinationSheet';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
+import { useItemLists } from '../lists/ItemListsContext';
+import { rememberRecentList } from '../lists/listRecentUse';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import {
   createUuidV7,
@@ -58,10 +61,10 @@ import { getMockItem, getRankedMockItems } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
 import {
   applySharedDiscoveryOverlay,
-  formatEndorsementProvenance,
   formatMemberHistoryProvenance,
+  formatPendingListApproval,
   getMemberHistoryNicknames,
-  getPendingEndorserNicknames,
+  getPendingListApproval,
   type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
 
@@ -153,6 +156,7 @@ function ItemDetailContent({
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
+  const { refresh: refreshLists } = useItemLists();
   const {
     interactions,
     setListLike,
@@ -303,7 +307,7 @@ function ItemDetailContent({
     if (!target) return;
 
     if (activeSharedMembership) {
-      void handleEndorsement(target.item, target.index);
+      void handleEndorsement(target.item, target.index, commit.list);
       return;
     }
 
@@ -343,16 +347,24 @@ function ItemDetailContent({
     setListPickerTarget({ item, index, interaction });
   }
 
-  async function handleEndorsement(item: Item, index: number) {
+  async function handleEndorsement(
+    item: Item,
+    index: number,
+    proposedList?: ItemList,
+  ) {
     if (exitingItemId || endorsingItemId) return;
 
     setEndorsingItemId(item.id);
-    const result = await sharedEndorsements.endorse(item.id);
+    const result = await sharedEndorsements.endorse(item.id, proposedList?.id);
     setEndorsingItemId(null);
 
     if (result.status === 'error') {
       setFeedback(result.message);
       return;
+    }
+
+    if (proposedList) {
+      rememberRecentList(proposedList.profileId, proposedList.id);
     }
 
     if (result.commit.endorsementCreated) {
@@ -367,6 +379,8 @@ function ItemDetailContent({
           predictionSource,
           endorsementCount: result.commit.endorsementCount,
           requiredMemberCount: result.commit.requiredMemberCount,
+          listId: result.commit.proposalListId,
+          listName: result.commit.proposalListName,
         },
       });
     }
@@ -385,15 +399,35 @@ function ItemDetailContent({
           requiredMemberCount: result.commit.requiredMemberCount,
         },
       });
+      if (result.commit.listEntryCreated) {
+        eventTracking.recordEvent({
+          eventType: 'ITEM_ADDED_TO_LIST',
+          itemId: item.id,
+          itemType: item.itemType,
+          predictionId: recommendationTraceId,
+          discoveryMode: mode,
+          properties: {
+            source: 'SHARED_CONSENSUS',
+            predictionSource,
+            listId: result.commit.proposalListId,
+            listName: result.commit.proposalListName,
+            proposedByUserId: result.commit.proposedByUserId,
+          },
+        });
+      }
+    }
+
+    if (result.commit.consensusSaved) {
       retryHydration();
+      refreshLists();
     }
 
     advanceAfterAction(
       item,
       index,
-      result.commit.consensusReached
-        ? ITEM_INTERACTION_LABELS.consensusFeedback
-        : ITEM_INTERACTION_LABELS.endorsedFeedback,
+      result.commit.consensusSaved
+        ? `Pari! Tallennettu listaan ${result.commit.proposalListName}.`
+        : `Odottaa muiden hyväksyntää listalle ${result.commit.proposalListName}.`,
     );
   }
 
@@ -648,12 +682,13 @@ function ItemDetailContent({
           const interaction = getItemInteraction(interactions, item.id);
           const exiting = item.id === exitingItemId;
           const sharedState = sharedEndorsements.stateByItemId[item.id];
-          const endorsementProvenance = formatEndorsementProvenance(
-            getPendingEndorserNicknames(
-              sharedState,
-              activeSharedMembership?.members ?? [],
-              activeProfile.actorUserId,
-            ),
+          const pendingListApproval = getPendingListApproval(
+            sharedState,
+            activeSharedMembership?.members ?? [],
+            activeProfile.actorUserId,
+          );
+          const pendingApprovalLabel = formatPendingListApproval(
+            pendingListApproval,
           );
           const memberHistoryProvenance = formatMemberHistoryProvenance(
             getMemberHistoryNicknames(
@@ -695,9 +730,14 @@ function ItemDetailContent({
                 theme={theme}
                 styles={styles}
                 disabled={Boolean(exitingItemId || endorsingItemId)}
-                sharedProvenance={
-                  endorsementProvenance ?? memberHistoryProvenance
-                }
+                listActionHidden={Boolean(
+                  sharedState?.currentActorEndorsed || sharedState?.consensusSaved,
+                )}
+                pendingApprovalLabel={pendingApprovalLabel}
+                sharedProvenance={memberHistoryProvenance}
+                {...(pendingListApproval
+                  ? { onApprove: () => void handleEndorsement(item, index) }
+                  : {})}
                 onRating={(rating) => handleRating(item, index, interaction, rating)}
                 onNotInterested={() =>
                   handleNotInterested(item, index, interaction)
@@ -727,7 +767,10 @@ interface SwipeItemPageProps {
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
   disabled: boolean;
+  listActionHidden: boolean;
+  pendingApprovalLabel: string | null;
   sharedProvenance: string | null;
+  onApprove?: () => void;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
   onOpenLists: () => void;
@@ -740,7 +783,10 @@ function SwipeItemPage({
   theme,
   styles,
   disabled,
+  listActionHidden,
+  pendingApprovalLabel,
   sharedProvenance,
+  onApprove,
   onRating,
   onNotInterested,
   onOpenLists,
@@ -755,6 +801,26 @@ function SwipeItemPage({
       showsVerticalScrollIndicator={false}
       scrollEnabled={descriptionExpanded}
     >
+      {pendingApprovalLabel && onApprove ? (
+        <View style={styles.approvalBanner}>
+          <Text numberOfLines={2} style={styles.approvalBannerText}>
+            {pendingApprovalLabel}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Hyväksy ${pendingApprovalLabel}`}
+            disabled={disabled}
+            onPress={onApprove}
+            style={({ pressed }) => [
+              styles.approvalButton,
+              disabled && styles.disabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.approvalButtonText}>Hyväksy</Text>
+          </Pressable>
+        </View>
+      ) : null}
       <View
         style={[
           styles.hero,
@@ -822,14 +888,16 @@ function SwipeItemPage({
             styles={styles}
             onPress={onNotInterested}
           />
-          <ActionButton
-            label={ITEM_LIST_LABELS.addToList}
-            active={false}
-            disabled={disabled}
-            theme={theme}
-            styles={styles}
-            onPress={onOpenLists}
-          />
+          {!pendingApprovalLabel && !listActionHidden ? (
+            <ActionButton
+              label={ITEM_LIST_LABELS.addToList}
+              active={false}
+              disabled={disabled}
+              theme={theme}
+              styles={styles}
+              onPress={onOpenLists}
+            />
+          ) : null}
         </View>
       </View>
 
@@ -965,6 +1033,39 @@ function createStyles(theme: RoomTheme) {
     content: {
       paddingHorizontal: 20,
       paddingBottom: 18,
+    },
+    approvalBanner: {
+      minHeight: 52,
+      marginBottom: 10,
+      paddingHorizontal: 13,
+      paddingVertical: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: 'rgba(117, 190, 132, 0.72)',
+      backgroundColor: 'rgba(54, 119, 72, 0.34)',
+    },
+    approvalBannerText: {
+      flex: 1,
+      color: '#c9efd1',
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '700',
+    },
+    approvalButton: {
+      minHeight: 36,
+      paddingHorizontal: 13,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 18,
+      backgroundColor: '#4d9660',
+    },
+    approvalButtonText: {
+      color: '#ffffff',
+      fontSize: 12,
+      fontWeight: '800',
     },
     hero: {
       minHeight: 235,

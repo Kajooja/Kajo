@@ -55,7 +55,7 @@ Do not create separate per-member or media-specific recommenders.
 - On unanimity, promote once to Shared saved state.
 - Preserve endorsement/consensus provenance.
 - A later new member does not retroactively revoke already-reached consensus.
-- No majority voting or custom-List voting in MVP.
+- No majority voting or separate custom-List voting model in MVP; the target List is carried by the same unanimous Endorsement flow.
 
 ### Events/state
 
@@ -102,10 +102,11 @@ Start only after 11A is stable.
 - `Lisää listaan` chooses exactly one destination per action through a compact most-recently-used picker (five rows before expansion) and can create/rename Lists.
 - Successful List addition is the positive action and advances to the next card; Personal custom addition records Like, while Shared custom addition records the actor's Endorsement.
 - Shared unanimous Endorsement auto-promotes only to system `Tallennetut`.
-- Custom Shared Lists remain collaborative organization: accepted members may add Items without unanimity.
+- A Shared custom-List choice creates a pending target List and actor Endorsement; non-endorsing members approve that same choice, and unanimity commits the membership plus Shared `Tallennetut`.
 - Same Item may exist in multiple different Lists, once per List.
 - List detail supports list/card views, added-order sorting, ItemType filters and current consumed/rating display.
 - Shared List UI can show real add provenance; Personal can hide redundant actor identity.
+- Pending Shared cards show a restrained green proposer/List bar with an explicit `Hyväksy` action; consensus feedback uses `Pari!`.
 
 ### 11B acceptance
 
@@ -144,7 +145,11 @@ Start only after 11A is stable.
 - 11A is accepted.
 - #102 backend foundation is applied through `20260901204135_profile_scoped_item_lists.sql`: system/custom Lists, safe Saved/consensus projection, explicit grants/RLS and Profile-scoped RPCs passed hosted rollback/outsider verification.
 - Configured Android feedback found that the first destination picker was too large, preselected `Tallennetut` together with a newly created List and duplicated Shared `Tykkää`. The follow-up mobile implementation uses one immediate destination, a compact five-row MRU expansion, collapsed List creation, no separate Like button and automatic next-card advance while preserving Shared consensus boundaries.
-- Full `npm run check` passes for the follow-up with lint, TypeScript, 136 deterministic tests and iOS/Android bundle smoke. Refreshed configured Android acceptance remains required before 11B closes.
+- The compact picker follow-up passed configured Android acceptance on 2026-09-02.
+- Device feedback then clarified the final Shared flow: A's List choice must remain pending and leave A's immediate queue; B sees `A lisäsi listaan <nimi>`, approves it, receives `Pari!`, and only then does the Item enter the chosen custom List and leave both immediate queues. This is implemented locally through `20260902134621_shared_list_approval_flow.sql` plus the Shared overlay/card UI.
+- `npm run check` passes with lint, TypeScript, 137 deterministic tests and iOS/Android bundle smoke.
+- The migration passed hosted-schema syntax plus A→B pending/overlay/consensus/custom+system List/idempotent retry/outsider-denial checks inside a transaction that was rolled back; hosted production state was not changed.
+- Migration application and refreshed configured Android acceptance for this final approval flow remain required before 11B closes. This environment had no device/emulator runtime.
 - Hosted Events, Event sessions, Item interactions and Shared Endorsements were reset after verification on 2026-09-02; identities, Profiles, memberships, Items and system Lists remain intact for clean testing.
 
 ## Room/navigation constraint during this sprint
@@ -162,4 +167,4 @@ Preserve the accepted Sprint 010 shell and approved Room direction:
 
 A fresh conversation starts by reading `/AGENTS.md`, `/docs/project/STATUS.md`, `/docs/product/MVP.md`, this file, glossary/domain docs and CODEMAP.
 
-Immediate target: **configured Android acceptance for #102**. #151 is accepted; do not start Sprint 012 messaging before Lists are accepted.
+Immediate target: **complete and verify the Shared proposer/List approval flow, then run configured Android acceptance for #102**. #151 is accepted; do not start Sprint 012 messaging before Lists are accepted.

@@ -135,19 +135,23 @@ Sprint 011 Lists persist through Profile-scoped `item_lists` and
 `item_list_entries` behind security-invoker RPC wrappers. RLS and explicit
 grants require Profile ownership/accepted membership. One system
 `Tallennetut` List projects canonical Saved state; custom List memberships are
-orthogonal and never overwrite `item_interactions`. Shared consensus may write
-the system projection, while direct member writes are limited to custom Lists.
+orthogonal and never overwrite `item_interactions`. Shared consensus writes
+the system projection and the chosen pending custom membership atomically;
+direct Shared custom insertion from discovery is denied.
 Presentation joins current consumed/rating state instead of copying it into
 membership rows.
 
-Discovery uses the single-entry `set_item_list_entry` boundary rather than the
-legacy bulk destination mutation: one tap adds to one destination and never
-silently removes memberships created by earlier actions. Per-actor recent-List
+Personal discovery uses the single-entry `set_item_list_entry` boundary rather
+than the legacy bulk destination mutation: one tap adds to one destination and
+never silently removes memberships created by earlier actions. Shared discovery
+uses `endorse_shared_list_item`: the first actor stores one pending target List
+plus Endorsement, and unanimous approval atomically commits the custom membership
+and Shared Saved/system-List projection. Direct Shared custom insertion is guarded.
+Per-actor recent-List
 ordering is presentation state persisted on-device through Expo SQLite-backed
 `localStorage`; it is scoped by Profile and does not let one Shared member's UI
 ordering rewrite another member's ordering. Personal custom-List addition maps
-to current Like state, Personal system addition maps to Like + Saved, and Shared
-custom addition is followed by the existing actor-specific Endorsement boundary.
+to current Like state and Personal system addition maps to Like + Saved.
 
 ## Prediction service
 

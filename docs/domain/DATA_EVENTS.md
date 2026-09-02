@@ -67,7 +67,7 @@ The exact actor for an automatic membership-change recomputation must remain tra
 - `LIST_CREATED` — actor created a custom Profile List.
 - `LIST_RENAMED` — actor renamed a custom Profile List.
 - `LIST_DELETED` — actor deleted a custom Profile List; Item/current interaction state is unchanged.
-- `ITEM_ADDED_TO_LIST` — actor explicitly added an Item to a custom List.
+- `ITEM_ADDED_TO_LIST` — an Item was committed to a custom List. Personal commit is immediate; Shared discovery commit occurs when the approving actor completes unanimity and retains the original proposer in properties/projection provenance.
 - `ITEM_REMOVED_FROM_LIST` — actor explicitly removed an Item from a custom List.
 
 System `Tallennetut` remains the Saved projection and uses canonical `ITEM_SAVED` / `ITEM_UNSAVED` evidence. Shared consensus continues to emit `ITEM_SAVED` with `properties.source = SHARED_CONSENSUS`; it must not be relabeled as a manual custom-List event. One Item may produce multiple custom List membership Events because the memberships are independent.
@@ -76,9 +76,10 @@ Current discovery commits one destination per action:
 
 - Personal custom List: append `ITEM_ADDED_TO_LIST` for a new membership and `ITEM_LIKED` for the positive action; keep Saved unchanged.
 - Personal system `Tallennetut`: append `ITEM_SAVED` when Saved becomes true and persist the action as positive current preference.
-- Shared custom List: append `ITEM_ADDED_TO_LIST` for a new membership and create actor-specific `ITEM_ENDORSED`; only later unanimity may append `ITEM_SAVED`.
+- Shared custom List proposal: append actor-specific `ITEM_ENDORSED` with target List provenance, but do not append `ITEM_ADDED_TO_LIST` or create membership yet.
+- Shared approval: append the approving actor's `ITEM_ENDORSED`; on unanimity append `ITEM_ADDED_TO_LIST` for the chosen custom List and `ITEM_SAVED` for SharedConsensus.
 
-Selecting an already-present membership is idempotent and must not duplicate membership Events. A later action may add the same Item to another List; the single-destination picker does not silently delete earlier memberships.
+Selecting an already-present membership is idempotent and must not duplicate membership Events. A later action may add the same Item to another List; the single-destination picker does not silently delete earlier memberships. Pending Shared approval is not reported as existing membership.
 
 ### Historical/deprecated Shared suggestion
 

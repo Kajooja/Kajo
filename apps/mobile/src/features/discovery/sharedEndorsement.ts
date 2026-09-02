@@ -10,6 +10,16 @@ export interface SharedDiscoveryItemState {
   consensusSaved: boolean;
   endorserUserIds: readonly string[];
   firstEndorsedAt: string | null;
+  proposedListId: string | null;
+  proposedListName: string | null;
+  proposedByUserId: string | null;
+}
+
+export interface PendingListApproval {
+  listId: string;
+  listName: string;
+  proposedByUserId: string;
+  proposedByNickname: string;
 }
 
 export type SharedDiscoveryStateMap = Readonly<
@@ -67,30 +77,42 @@ export function applySharedDiscoveryOverlay(
   return [...pendingItems, ...ordinaryItems, ...memberHistoryItems];
 }
 
-export function getPendingEndorserNicknames(
+export function getPendingListApproval(
   state: SharedDiscoveryItemState | undefined,
   members: readonly User[],
   currentActorUserId: string | null,
-): readonly string[] {
-  if (!state?.pendingEndorsement) return [];
+): PendingListApproval | null {
+  if (
+    !state?.pendingEndorsement ||
+    state.currentActorEndorsed ||
+    !state.proposedListId ||
+    !state.proposedListName ||
+    !state.proposedByUserId ||
+    state.proposedByUserId === currentActorUserId
+  ) {
+    return null;
+  }
 
-  const nicknamesById = new Map(
-    members.map((member) => [member.id, member.nickname]),
-  );
+  const proposedByNickname = members.find(
+    (member) => member.id === state.proposedByUserId,
+  )?.nickname;
 
-  return state.endorserUserIds
-    .filter((userId) => userId !== currentActorUserId)
-    .map((userId) => nicknamesById.get(userId))
-    .filter((nickname): nickname is string => Boolean(nickname));
+  return proposedByNickname
+    ? {
+        listId: state.proposedListId,
+        listName: state.proposedListName,
+        proposedByUserId: state.proposedByUserId,
+        proposedByNickname,
+      }
+    : null;
 }
 
-export function formatEndorsementProvenance(
-  nicknames: readonly string[],
+export function formatPendingListApproval(
+  approval: PendingListApproval | null,
 ): string | null {
-  if (nicknames.length === 0) return null;
-  if (nicknames.length === 1) return `${nicknames[0]} tykkäsi`;
-  if (nicknames.length === 2) return `${nicknames[0]} ja ${nicknames[1]} tykkäsivät`;
-  return `${nicknames[0]} ja ${nicknames.length - 1} muuta tykkäsivät`;
+  return approval
+    ? `${approval.proposedByNickname} lisäsi listaan ${approval.listName}`
+    : null;
 }
 
 export function getMemberHistoryNicknames(
