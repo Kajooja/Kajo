@@ -140,6 +140,13 @@ the system projection, while direct member writes are limited to custom Lists.
 Presentation joins current consumed/rating state instead of copying it into
 membership rows.
 
+Production Data API access is deny-by-default for newly created public tables,
+sequences and functions. Client-callable RPCs expose only explicitly granted
+`SECURITY INVOKER` wrappers; privileged implementations live in the unexposed
+`private` schema, use an empty `search_path`, qualify relation names and check
+`auth.uid()`. Supabase's automatic RLS event trigger remains active, but its
+`SECURITY DEFINER` function is private and has no client-role execute grant.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:
