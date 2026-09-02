@@ -19,6 +19,7 @@ import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
+import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
 import { useDiscoveryMode } from './DiscoveryModeContext';
@@ -38,6 +39,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const { mode, setMode } = useDiscoveryMode();
   const eventTracking = useEventTracking();
   const profiles = useActiveProfile();
+  const messages = useProfileMessages();
   const { activeProfile } = profiles;
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile);
   const [overlay, setOverlay] = useState<ShellOverlay>(null);
@@ -59,8 +61,8 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const drawerSharedProfiles = profiles.selectableProfiles
     .filter((profile) => profile.type === 'SHARED')
     .slice(0, MAX_DRAWER_GROUPS);
-  const invitationBadgeLabel =
-    profiles.invitations.length > 9 ? '9+' : String(profiles.invitations.length);
+  const inboxUnreadCount = profiles.invitations.length + messages.unreadTotal;
+  const inboxBadgeLabel = inboxUnreadCount > 9 ? '9+' : String(inboxUnreadCount);
 
   function changeMode(nextMode: typeof mode) {
     if (nextMode !== mode) {
@@ -84,7 +86,16 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
 
   function toggleOverlay(nextOverlay: Exclude<ShellOverlay, null>) {
     setInvitationActionError(null);
+    if (nextOverlay === 'inbox' && overlay !== 'inbox') {
+      profiles.retryInvitations();
+      messages.refresh();
+    }
     setOverlay((current) => (current === nextOverlay ? null : nextOverlay));
+  }
+
+  function openMessageThread(profileId: string) {
+    setOverlay(null);
+    router.push(`/messages/${profileId}`);
   }
 
   function switchProfile(profileId: string) {
@@ -478,10 +489,10 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                       { color: theme.base.textPrimary },
                     ]}
                   >
-                    Kutsut
+                    Kutsut ja viestit
                   </Text>
                 </View>
-                {profiles.invitationsStatus === 'loading' ? (
+                {profiles.invitationsStatus === 'loading' || messages.status === 'loading' ? (
                   <ActivityIndicator
                     size="small"
                     color={theme.base.textMuted}
@@ -517,15 +528,27 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 </Text>
               ) : null}
 
-              {profiles.invitations.length === 0 &&
-              profiles.invitationsStatus !== 'loading' ? (
+              {messages.error ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={messages.refresh}
+                  style={({ pressed }) => [pressed && styles.rowPressed]}
+                >
+                  <Text style={[styles.inboxError, { color: theme.base.textMuted }]}>
+                    {messages.error} Yritä uudelleen.
+                  </Text>
+                </Pressable>
+              ) : null}
+
+              {profiles.invitations.length === 0 && messages.threads.length === 0 &&
+              profiles.invitationsStatus !== 'loading' && messages.status !== 'loading' ? (
                 <Text
                   style={[
                     styles.emptyInboxText,
                     { color: theme.base.textMuted },
                   ]}
                 >
-                  Ei uusia kutsuja.
+                  Ei uusia kutsuja tai viestejä.
                 </Text>
               ) : null}
 
@@ -619,6 +642,54 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                     </View>
                   );
                 })}
+
+                {messages.threads.map((thread) => (
+                  <Pressable
+                    key={thread.profileId}
+                    accessibilityHint="Avaa viestiketju"
+                    accessibilityRole="button"
+                    onPress={() => openMessageThread(thread.profileId)}
+                    style={({ pressed }) => [
+                      styles.threadCard,
+                      { borderColor: theme.base.border },
+                      pressed && styles.rowPressed,
+                    ]}
+                  >
+                    <View style={styles.threadHeader}>
+                      <Text
+                        numberOfLines={1}
+                        style={[styles.threadName, { color: theme.base.textPrimary }]}
+                      >
+                        {thread.profileName}
+                      </Text>
+                      {thread.unreadCount > 0 ? (
+                        <View style={styles.threadBadge}>
+                          <Text style={styles.threadBadgeText}>
+                            {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </View>
+                    <Text
+                      numberOfLines={2}
+                      style={[styles.threadPreview, { color: theme.base.textMuted }]}
+                    >
+                      {thread.latestMessage
+                        ? `${thread.latestMessage.actorNickname}: ${thread.latestMessage.body}`
+                        : 'Aloita keskustelu'}
+                    </Text>
+                    {thread.latestMessage?.itemTitle || thread.latestMessage?.listName ? (
+                      <Text
+                        numberOfLines={1}
+                        style={[styles.threadContext, { color: theme.ambient.curtainHighlight }]}
+                      >
+                        {[thread.latestMessage.listName, thread.latestMessage.itemTitle]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </Text>
+                    ) : null}
+                  </Pressable>
+                ))}
               </ScrollView>
             </View>
           </View>
@@ -691,8 +762,8 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={
-                profiles.invitations.length > 0
-                  ? `Avaa postilaatikko. ${profiles.invitations.length} uutta kutsua.`
+                inboxUnreadCount > 0
+                  ? `Avaa postilaatikko. ${inboxUnreadCount} uutta kutsua tai viestiä.`
                   : 'Avaa postilaatikko'
               }
               accessibilityState={{ expanded: overlay === 'inbox' }}
@@ -708,10 +779,10 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               >
                 ✉
               </Text>
-              {profiles.invitations.length > 0 ? (
+              {inboxUnreadCount > 0 ? (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.notificationBadgeText}>
-                    {invitationBadgeLabel}
+                    {inboxBadgeLabel}
                   </Text>
                 </View>
               ) : null}
@@ -950,6 +1021,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginTop: 5,
+  },
+  threadCard: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 10,
+    gap: 4,
+  },
+  threadHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  threadName: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  threadPreview: {
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  threadContext: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  threadBadge: {
+    minWidth: 21,
+    height: 21,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 11,
+    backgroundColor: '#5f9f72',
+  },
+  threadBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '800',
   },
   acceptButton: {
     minHeight: 36,

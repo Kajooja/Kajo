@@ -11,6 +11,7 @@ import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionCon
 import { SharedEndorsementProvider } from '@/features/discovery/SharedEndorsementContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
 import { ItemListsProvider } from '@/features/lists/ItemListsContext';
+import { ProfileMessagesProvider } from '@/features/messages/ProfileMessagesContext';
 import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 
@@ -42,21 +43,23 @@ export default function RootLayout() {
         <PersonalProfileProvider>
           <ActiveProfileProvider>
             <ItemListsProvider>
-              <EventTrackingProvider>
-                <SharedEndorsementProvider>
-                  <ItemInteractionProvider>
-                    <DiscoveryModeProvider>
-                      {isAuthCallbackRoute ? (
-                        navigator
-                      ) : (
-                        <AuthGate>
-                          <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
-                        </AuthGate>
-                      )}
-                    </DiscoveryModeProvider>
-                  </ItemInteractionProvider>
-                </SharedEndorsementProvider>
-              </EventTrackingProvider>
+              <ProfileMessagesProvider>
+                <EventTrackingProvider>
+                  <SharedEndorsementProvider>
+                    <ItemInteractionProvider>
+                      <DiscoveryModeProvider>
+                        {isAuthCallbackRoute ? (
+                          navigator
+                        ) : (
+                          <AuthGate>
+                            <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                          </AuthGate>
+                        )}
+                      </DiscoveryModeProvider>
+                    </ItemInteractionProvider>
+                  </SharedEndorsementProvider>
+                </EventTrackingProvider>
+              </ProfileMessagesProvider>
             </ItemListsProvider>
           </ActiveProfileProvider>
         </PersonalProfileProvider>

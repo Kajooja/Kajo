@@ -20,6 +20,7 @@ Profile
   +--> Theme
   +--> Memory
   +--> ItemList
+  +--> ProfileMessage ----> User (actor)
   +--> Prediction ----> Item
          |
          +--> Context
@@ -169,6 +170,19 @@ An Event records something meaningful that happened. At minimum it can retain:
 
 Events are the main evidence stream for learning and outcome evaluation.
 
+## ProfileMessage
+
+A `ProfileMessage` is short user-facing communication scoped to exactly one Profile. It retains the actual sending `actorUserId` and may optionally reference one List owned by that same Profile plus one generic Item.
+
+Invariants:
+
+- a PersonalProfile message is visible/sendable only to its owner,
+- a SharedProfile message is visible/sendable only to currently accepted members,
+- message IDs are stable and retry-safe; the same ID cannot be reused for different content,
+- per-User/Profile read state owns unread delivery and never becomes generic Item interaction state,
+- List membership and message persistence are independent: a failed optional message cannot roll back or repeat a successful List mutation,
+- message text is not an Event or Prediction evidence by default.
+
 ## HumanState
 
 HumanState is a learned representation used by Prediction.
@@ -208,3 +222,4 @@ Consumed Items form history. The MVP stores consumed state and simple rating. Th
 - Pending Endorsement is not Shared Saved state.
 - Pending Shared custom-List choice is not membership; unanimous approval commits both the chosen membership and SharedConsensus.
 - Actor-specific pending delivery is not a separate per-User Prediction model.
+- Profile message delivery/read state is not behavioural Event or Prediction state.

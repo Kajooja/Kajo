@@ -153,6 +153,16 @@ ordering is presentation state persisted on-device through Expo SQLite-backed
 ordering rewrite another member's ordering. Personal custom-List addition maps
 to current Like state and Personal system addition maps to Like + Saved.
 
+Sprint 012 messaging uses `profile_messages` plus per-User/Profile
+`profile_message_read_states` behind four narrow RPCs. Direct authenticated
+mutation grants remain closed; membership-checked definer functions implement
+retry-safe sending, chronological thread reads and monotonic read cursors while
+public wrappers remain security-invoker boundaries. The root-scoped mobile
+message provider owns Inbox thread/unread hydration and failed outgoing drafts.
+Profile thread UI never reads tables directly. Optional List messages run only
+after the List/proposal RPC succeeds and retry with the same message ID, so a
+message failure cannot roll back or duplicate List membership.
+
 ## Prediction service
 
 Prediction logic belongs outside the mobile UI. Initial implementation may evolve, but the boundary must preserve a stable conceptual request:

@@ -106,6 +106,8 @@ Rules:
 
 More Event types require explicit semantics here before broad use.
 
+Profile chat text, message delivery and unread/read cursors are intentionally not Event types. They persist through `ProfileMessage` and per-User/Profile read state; recommendation learning must not ingest message content by default.
+
 ## Prediction traceability
 
 When Kajo chooses an Item through Prediction, the impression should carry `predictionId`. Subsequent events should preserve traceability when feasible:
