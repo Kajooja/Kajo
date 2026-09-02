@@ -85,9 +85,9 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 
 ## Profile messaging
 
-- [ ] `MVP-MSG-001` Each Profile can expose one narrow chat/thread surface: PersonalProfile thread is owner-only and SharedProfile thread is accepted-member-only while retaining actual sending `actorUserId`.
-- [ ] `MVP-MSG-002` The persistent envelope Inbox surfaces pending invitations and message activity without adding Room clutter; unread/message state is user-facing delivery state rather than generic Item interaction state.
-- [ ] `MVP-MSG-003` Saving/adding an Item to a List may include an optional message that references the correct `profileId`, `listId` and `itemId`; List membership remains independent from message persistence and chat text is not Prediction evidence by default.
+- [-] `MVP-MSG-001` Each Profile can expose one narrow chat/thread surface: PersonalProfile thread is owner-only and SharedProfile thread is accepted-member-only while retaining actual sending `actorUserId`.
+- [-] `MVP-MSG-002` The persistent envelope Inbox surfaces pending invitations and message activity without adding Room clutter; unread/message state is user-facing delivery state rather than generic Item interaction state.
+- [-] `MVP-MSG-003` Saving/adding an Item to a List may include an optional message that references the correct `profileId`, `listId` and `itemId`; List membership remains independent from message persistence and chat text is not Prediction evidence by default.
 
 ## Data and prediction
 

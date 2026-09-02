@@ -90,7 +90,7 @@ No majority voting or chat is introduced here. The later #102 List slice attache
 
 #### 11B — Named Lists & collaborative browsing — #102
 
-#151 is stable. The compact picker is accepted; final Shared target-List approval implementation and configured Android acceptance remain:
+#151 is stable. The compact picker and final Shared target-List approval are merged and hosted; refreshed configured Android acceptance remains explicitly deferred:
 
 - PersonalProfile and SharedProfile own generic system/custom Lists,
 - List names are 1–40 characters,

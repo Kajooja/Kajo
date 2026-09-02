@@ -1,6 +1,6 @@
 # Sprint 011 — Shared Curation & Named Lists
 
-Status: **ACTIVE**
+Status: **DELIVERED — DEVICE ACCEPTANCE DEFERRED**
 Milestone: **MVP 0.1**
 Started: **2026-09-01**
 
@@ -149,7 +149,8 @@ Start only after 11A is stable.
 - Device feedback then clarified the final Shared flow: A's List choice must remain pending and leave A's immediate queue; B sees `A lisäsi listaan <nimi>`, approves it, receives `Pari!`, and only then does the Item enter the chosen custom List and leave both immediate queues. This is implemented locally through `20260902134621_shared_list_approval_flow.sql` plus the Shared overlay/card UI.
 - `npm run check` passes with lint, TypeScript, 137 deterministic tests and iOS/Android bundle smoke.
 - The migration passed hosted-schema syntax plus A→B pending/overlay/consensus/custom+system List/idempotent retry/outsider-denial checks inside a transaction that was rolled back; hosted production state was not changed.
-- Migration application and refreshed configured Android acceptance for this final approval flow remain required before 11B closes. This environment had no device/emulator runtime.
+- PR #164 merged the final Shared proposer/List approval flow. Hosted migration `20260902134621_shared_list_approval_flow.sql` is applied; RLS/grants plus A→B pending/approval, atomic custom + system List completion, provenance, retry and outsider denial passed a rolled-back production smoke.
+- Main CI #246 passed and the verified `326de6c` standalone APK was retained. Refreshed configured Android acceptance remains required before 11B can be accepted. The product owner explicitly deferred that test on 2026-09-02 and directed Sprint 012 development to begin; the deferral is not acceptance.
 - Hosted Events, Event sessions, Item interactions and Shared Endorsements were reset after verification on 2026-09-02; identities, Profiles, memberships, Items and system Lists remain intact for clean testing.
 
 ## Room/navigation constraint during this sprint
@@ -167,4 +168,4 @@ Preserve the accepted Sprint 010 shell and approved Room direction:
 
 A fresh conversation starts by reading `/AGENTS.md`, `/docs/project/STATUS.md`, `/docs/product/MVP.md`, this file, glossary/domain docs and CODEMAP.
 
-Immediate target: **complete and verify the Shared proposer/List approval flow, then run configured Android acceptance for #102**. #151 is accepted; do not start Sprint 012 messaging before Lists are accepted.
+The Shared proposer/List approval flow is merged, hosted and automatically verified. Preserve the refreshed configured Android flow as deferred acceptance work while Sprint 012 proceeds under the product owner's explicit sequencing decision.

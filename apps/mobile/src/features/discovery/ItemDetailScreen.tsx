@@ -34,6 +34,7 @@ import {
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useItemLists } from '../lists/ItemListsContext';
 import { rememberRecentList } from '../lists/listRecentUse';
+import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import {
   createUuidV7,
@@ -156,6 +157,7 @@ function ItemDetailContent({
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
+  const profileMessages = useProfileMessages();
   const { refresh: refreshLists } = useItemLists();
   const {
     interactions,
@@ -307,12 +309,25 @@ function ItemDetailContent({
     if (!target) return;
 
     if (activeSharedMembership) {
-      void handleEndorsement(target.item, target.index, commit.list);
+      void handleEndorsement(
+        target.item,
+        target.index,
+        commit.list,
+        commit.message,
+      );
       return;
     }
 
     const { item, index, interaction } = target;
     const systemSaved = commit.list.kind === 'SYSTEM_SAVED';
+    if (commit.message && activeProfile.activeProfile) {
+      void profileMessages.send({
+        profileId: activeProfile.activeProfile.id,
+        body: commit.message,
+        listId: commit.list.id,
+        itemId: item.id,
+      });
+    }
     if (interaction.interest === 'LIKED' && (!systemSaved || interaction.saved)) {
       advanceAfterAction(
         item,
@@ -351,6 +366,7 @@ function ItemDetailContent({
     item: Item,
     index: number,
     proposedList?: ItemList,
+    message?: string | null,
   ) {
     if (exitingItemId || endorsingItemId) return;
 
@@ -365,6 +381,15 @@ function ItemDetailContent({
 
     if (proposedList) {
       rememberRecentList(proposedList.profileId, proposedList.id);
+    }
+
+    if (message && activeProfile.activeProfile) {
+      void profileMessages.send({
+        profileId: activeProfile.activeProfile.id,
+        body: message,
+        listId: result.commit.proposalListId,
+        itemId: item.id,
+      });
     }
 
     if (result.commit.endorsementCreated) {

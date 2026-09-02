@@ -27,7 +27,7 @@ supabase/functions/password-auth/
 | Area | Canonical path | Current state |
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; configured Personal/Shared auth, persistence, Event and Prediction V0 flows are phone-runnable |
-| Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent `DiscoveryModeShell`; discovery under `app/discovery/`; Lists under `app/lists/`; Shared management under `app/profiles/shared.tsx` |
+| Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent `DiscoveryModeShell`; discovery under `app/discovery/`; Lists under `app/lists/`; Profile threads under `app/messages/`; Shared management under `app/profiles/shared.tsx` |
 | Global app shell | `apps/mobile/src/features/discovery/DiscoveryModeShell.tsx` | Top Kajo Home mark + global curtain; bottom menu/active-Profile/Inbox dock; side drawer owns Profile/Lists/Groups and final sign-out placement under #149 |
 | Core domain contracts | `apps/mobile/src/domain/` | Generic Profile/Item/Event/Context/Prediction/DiscoveryMode contracts; no media-specific user/predictor architecture |
 | Room feature | `apps/mobile/src/features/room/RoomScreen.tsx` | 2D Room home with bookshelf/projector. #149 removes standalone title/helper/sign-out so Room remains only visual domain navigation between global bars |
@@ -50,7 +50,7 @@ supabase/functions/password-auth/
 | List persistence | `supabase/migrations/20260901204135_profile_scoped_item_lists.sql`, `20260902134621_shared_list_approval_flow.sql` | Generic Lists plus pending Shared target-List approval: one member proposes, other accepted members approve, and unanimity atomically commits the chosen custom entry + Shared `Tallennetut`; explicit grants/RLS and guarded direct Shared insertion |
 | Shared Endorsement | `supabase/migrations/20260901122000_shared_endorsement_state.sql`, `20260901124000_shared_endorsement_item_index.sql`, `20260901150500_shared_discovery_overlay.sql`, `20260901182156_shared_member_history_delivery.sql` | #151 foundation + prediction-core-independent delivery: membership-scoped actor/Profile/Item state, idempotent RPCs, consensus -> Shared Saved, pending provenance and mobile queue integration. Member Personal history is a lower attributed delivery tier; Shared current state remains suppressing. Common-fit stays gated by #156 |
 | Shared Saved integrity | `supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql` | Durable reached-consensus record and RLS guard prevent direct Shared interaction writes from forging, clearing or deleting unanimity-owned Saved state |
-| Messaging | planned under #138 | Starts after Lists; Profile-scoped narrow chat/thread only |
+| Messaging | `apps/mobile/src/features/messages/`, `apps/mobile/app/messages/`, `supabase/migrations/20260902182643_profile_messaging_foundation.sql` | #138 local foundation: typed retry-safe RPC boundary/provider, combined Inbox activity/unread state, Profile thread UI, failed drafts and optional Profile/List/Item contextual message; hosted migration and device acceptance remain gated |
 | DB migrations | `supabase/migrations/` | Identity/current state, Event persistence, Prediction V0, feedback/cooldown, Shared membership/invitations/lifecycle, Endorsement and Profile-scoped Lists with explicit grants/RLS |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; main also builds/verifies/uploads standalone Android APK |
 

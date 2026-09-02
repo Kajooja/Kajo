@@ -30,8 +30,9 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 22. **Lists and discovery are different surfaces.** An Item consumed by any member disappears from ordinary Shared discovery but may remain visible in Saved/custom Lists/history with current watched/read/rating state.
 23. **Shared List provenance begins with the proposer.** Discovery approval commits the chosen custom-List entry only at unanimity while preserving the first actor and proposal time as added-by/added-at provenance.
 24. **List choice stays lightweight.** Discovery opens a single-destination bottom bar, ordered by the actor's most recently used List. Show at most five choices initially; `Lisää` expands the rest and new-List creation stays collapsed until requested.
-25. **Motion communicates state.** Animation explains transition/atmosphere, not attention capture.
-26. **Accessibility remains required.** Gesture controls need accessible alternatives; motion respects reduced-motion settings; meaning must not rely solely on color.
+25. **Messaging stays Profile-scoped and quiet.** Inbox combines invitations and unread Profile threads. A List message is optional and collapsed by default; a failed send remains retryable without changing the successful List action.
+26. **Motion communicates state.** Animation explains transition/atmosphere, not attention capture.
+27. **Accessibility remains required.** Gesture controls need accessible alternatives; motion respects reduced-motion settings; meaning must not rely solely on color.
 
 ## Approved MVP Room visual direction
 

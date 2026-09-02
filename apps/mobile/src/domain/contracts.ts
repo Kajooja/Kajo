@@ -2,6 +2,7 @@ export type UserId = string;
 export type ProfileId = string;
 export type ItemId = string;
 export type ItemListId = string;
+export type ProfileMessageId = string;
 export type EventId = string;
 export type PredictionId = string;
 export type SessionId = string;

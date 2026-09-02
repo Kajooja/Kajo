@@ -2,7 +2,7 @@
 
 Last updated: **2026-09-02**
 Current milestone: **MVP 0.1**
-Current sprint: **Sprint 011 — Shared Curation & Named Lists** (`sprints/SPRINT-011.md`)
+Current sprint: **Sprint 012 — Profile Messaging** (`sprints/SPRINT-012.md`)
 Last accepted sprint: **Sprint 010 — Navigation & Profile lifecycle** (`sprints/SPRINT-010.md`)
 
 This is the authoritative current-state document. Sprint files preserve execution history; this file states what is true now and what comes next.
@@ -22,7 +22,7 @@ Kajo is a phone-runnable Expo/React Native app with:
 - append-only Event/session persistence with actor/Profile/prediction correlation,
 - PersonalProfile plus consent-based 2-N SharedProfiles,
 - accepted Shared Endorsement/consensus delivery,
-- hosted Profile-scoped system/custom Lists foundation with mobile browsing and destination flow awaiting configured-device acceptance.
+- hosted Profile-scoped system/custom Lists with mobile browsing, compact destination flow and unanimous Shared approval; refreshed configured-device acceptance is intentionally deferred.
 
 ## Sprint 010 — accepted
 
@@ -65,7 +65,7 @@ The first Shared Kajo device build exposed invitation consent, persistence and s
 
 The former separate `Ehdota yhteiseen` / `ITEM_SUGGESTED` UI is intentionally retired. Replacement semantics belong to Sprint 011/#151 Endorsement + consensus.
 
-## Sprint 011 — current
+## Sprint 011 — delivered, device acceptance deferred
 
 Sprint 011 has two ordered slices.
 
@@ -94,18 +94,30 @@ The MVP endpoint is now a genuinely shareable production application downloadabl
 - list/card presentation, filters/sort and current consumed/rating display,
 - real added-by/added-at provenance in Shared Lists.
 
-The hosted migrations `20260901204135_profile_scoped_item_lists.sql` and `20260902074500_shared_saved_consensus_integrity.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to a compact one-destination MRU picker, which is accepted. A second accepted product correction is implemented locally: Shared custom-List choice becomes pending, shows another member a green proposer/List `Hyväksy` bar, and commits the selected custom membership plus `Tallennetut` only at unanimity. `npm run check` passes with 137 tests and both platform bundle smokes. Migration `20260902134621_shared_list_approval_flow.sql` passed a full hosted-schema A→B authorization/atomicity/idempotency smoke inside a rolled-back transaction, so production remains unchanged. Migration application and refreshed configured Android acceptance are still required before #102/Sprint 011 can close.
+The hosted migrations `20260901204135_profile_scoped_item_lists.sql`, `20260902074500_shared_saved_consensus_integrity.sql` and `20260902134621_shared_list_approval_flow.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to an accepted compact one-destination MRU picker. The final Shared correction is merged in PR #164: A's custom-List choice stays pending, B sees the green proposer/List `Hyväksy` bar, and unanimity commits the selected custom membership plus `Tallennetut`. Production verification covered A→B pending/approval, authorization, atomicity and idempotency inside a rolled-back transaction. Main CI #246 passed and produced the verified `326de6c` APK. The product owner explicitly deferred refreshed configured-Android acceptance and directed work to continue into Sprint 012; this is not recorded as device acceptance, and #102/Sprint 011 remain unaccepted until that check is later completed.
+
+## Sprint 012 — current
+
+Issue #138 adds one deliberately narrow message thread per Profile:
+
+- PersonalProfile thread is owner-only.
+- SharedProfile thread is accepted-member-only and retains the real sending User.
+- Inbox combines invitations and Profile message activity/unread state.
+- a short optional message may reference the List and Item involved in a successful List addition, while message failure never rolls back the membership.
+- chat text stays separate from behavioural Events and Prediction evidence.
+
+The complete #138 slice is now implemented locally: ProfileMessage/read-state schema and narrow RPCs, typed mobile operations/provider, combined Inbox activity/unread state, Profile thread UI, retryable failed drafts, and an optional collapsed List message whose failure cannot roll back the successful List action. The migration passed a hosted-schema rollback smoke without leaving tables or migration history behind. `npm run check` passes with lint, TypeScript, 144 tests and both platform bundle exports. The local commit remains to be cut; permanent hosted application, push/PR/merge and configured-device acceptance stay approval-gated.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **#102** — finish, host-verify and configured-Android accept Shared proposer/List approval plus named Profile-scoped Lists and browsing.
-3. **#138 / Sprint 012** — Profile messaging/chat after Lists are stable.
-4. **Sprint 013** — ScenarioMemory.
-5. **Sprint 014** — MVP hardening/release readiness.
+1. **#138 / Sprint 012** — Profile messaging/chat on the now-hosted stable List identity model.
+2. **Deferred acceptance** — run the refreshed #102 configured-Android flow without treating its deferral as prior acceptance.
+3. **Sprint 013** — ScenarioMemory.
+4. **Sprint 014** — MVP hardening/release readiness.
 
-Do not start chat before the List model is stable and accepted. Do not let Room visual polish block these MVP behavior slices.
+The List model is hosted and stable enough for #138. Its final configured-device acceptance remains an explicit deferred check. Do not let Room visual polish block these MVP behavior slices.
 
 ## Other open work
 
@@ -124,6 +136,7 @@ Do not start chat before the List model is stable and accepted. Do not let Room 
 - `/docs/project/ROADMAP.md`
 - `/docs/project/sprints/SPRINT-010.md`
 - `/docs/project/sprints/SPRINT-011.md`
+- `/docs/project/sprints/SPRINT-012.md`
 - `/docs/domain/GLOSSARY.md`
 - `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
@@ -143,4 +156,4 @@ Do not start chat before the List model is stable and accepted. Do not let Room 
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: **#102 configured Android acceptance**. #151 is accepted and closed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: **#138 Profile messaging foundation and Inbox/thread delivery**. Keep #102 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

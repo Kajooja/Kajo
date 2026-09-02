@@ -13,6 +13,10 @@ import {
 import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
+import {
+  MAXIMUM_PROFILE_MESSAGE_LENGTH,
+  validateProfileMessage,
+} from '../messages/profileMessageOperations';
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
 import { loadRecentListIds, rememberRecentList } from './listRecentUse';
@@ -24,6 +28,7 @@ import {
 export interface ListDestinationCommit {
   list: ItemList;
   added: boolean;
+  message: string | null;
 }
 
 interface ListDestinationSheetProps {
@@ -50,6 +55,8 @@ export function ListDestinationSheet({
   const [expanded, setExpanded] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [messageExpanded, setMessageExpanded] = useState(false);
+  const [messageDraft, setMessageDraft] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
@@ -70,6 +77,8 @@ export function ListDestinationSheet({
       setExpanded(false);
       setCreating(false);
       setNewListName('');
+      setMessageExpanded(false);
+      setMessageDraft('');
       if (result.status === 'error') {
         setError(result.message);
         setAvailableLists([]);
@@ -93,6 +102,13 @@ export function ListDestinationSheet({
 
   async function persistDestination(list: ItemList) {
     if (!item) return false;
+    const messageValidation = messageDraft.trim().length > 0
+      ? validateProfileMessage(messageDraft)
+      : null;
+    if (messageValidation?.status === 'invalid') {
+      setError(messageValidation.message);
+      return false;
+    }
 
     if (!isSharedProfile) {
       const result = await setEntry(list.id, item.id, true);
@@ -119,7 +135,11 @@ export function ListDestinationSheet({
       });
     }
 
-    onCommitted({ list, added: !list.containsItem });
+    onCommitted({
+      list,
+      added: !list.containsItem,
+      message: messageValidation?.status === 'valid' ? messageValidation.body : null,
+    });
     return true;
   }
 
@@ -184,6 +204,36 @@ export function ListDestinationSheet({
               Valinta on samalla tykkäyksesi. Tallennetut syntyy yhteisestä päätöksestä.
             </Text>
           ) : null}
+
+          {messageExpanded ? (
+            <View style={styles.messageRow}>
+              <TextInput
+                accessibilityLabel="Listalisäyksen viesti"
+                editable={!loading && status === 'idle'}
+                maxLength={MAXIMUM_PROFILE_MESSAGE_LENGTH}
+                onChangeText={(value) => {
+                  setMessageDraft(value);
+                  setError(null);
+                }}
+                placeholder="Lyhyt viesti (valinnainen)"
+                placeholderTextColor={theme.base.textMuted}
+                returnKeyType="done"
+                style={styles.input}
+                value={messageDraft}
+              />
+              <Text style={styles.messageCounter}>
+                {messageDraft.length}/{MAXIMUM_PROFILE_MESSAGE_LENGTH}
+              </Text>
+            </View>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setMessageExpanded(true)}
+              style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
+            >
+              <Text style={styles.textButtonText}>+ Lisää viesti</Text>
+            </Pressable>
+          )}
 
           {loading ? (
             <ActivityIndicator color={theme.base.textMuted} />
@@ -286,6 +336,8 @@ function createStyles(theme: RoomTheme) {
     closeButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
     closeText: { color: theme.base.textPrimary, fontSize: 28, lineHeight: 30 },
     helper: { color: theme.base.textMuted, fontSize: 12, lineHeight: 17 },
+    messageRow: { gap: 3 },
+    messageCounter: { color: theme.base.textMuted, fontSize: 9, textAlign: 'right' },
     listArea: { maxHeight: 250 },
     listRow: {
       minHeight: 44,
