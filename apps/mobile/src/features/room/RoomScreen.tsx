@@ -1,15 +1,244 @@
+import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { getAmbientPhase } from '../../domain/discovery';
 import {
   getRoomTheme,
-  withColorAlpha,
-  type RoomTheme,
+  ROOM_AMBIENT_BY_PHASE,
 } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
+import { getCurtainPositionForMode } from './curtainState';
+
+const CABIN_ROOM_ART = require('../../../assets/room-cabin-2d.png');
+
+const PHASE_SHADE_OPACITY = {
+  DAWN: 0.02,
+  EVENING: 0.1,
+  NIGHT: 0.27,
+} as const;
+
+const WINDOW_GLOW_OPACITY = {
+  DAWN: 0.18,
+  EVENING: 0.22,
+  NIGHT: 0.16,
+} as const;
+
+const FIRE_GLOW_OPACITY = {
+  DAWN: 0.17,
+  EVENING: 0.22,
+  NIGHT: 0.16,
+} as const;
+
+const MODE_TRANSITION_DURATION_MS = 680;
+
+function useReduceMotionPreference() {
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (active) {
+        setReduceMotion(enabled);
+      }
+    });
+
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion,
+    );
+
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, []);
+
+  return reduceMotion;
+}
+
+function WindowKajo({
+  phasePosition,
+  pulse,
+}: {
+  phasePosition: Animated.Value;
+  pulse: Animated.Value;
+}) {
+  const lightColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.windowLight,
+      ROOM_AMBIENT_BY_PHASE.EVENING.windowLight,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.windowLight,
+    ],
+  });
+  const pulseOpacity = pulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.84, 1],
+  });
+  const pulseScale = pulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.98, 1.025],
+  });
+  const haloOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [
+        WINDOW_GLOW_OPACITY.DAWN,
+        WINDOW_GLOW_OPACITY.EVENING,
+        WINDOW_GLOW_OPACITY.NIGHT,
+      ],
+    }),
+    pulseOpacity,
+  );
+  const wideBeamOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0.07, 0.1, 0.07],
+    }),
+    pulseOpacity,
+  );
+  const narrowBeamOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0.08, 0.11, 0.08],
+    }),
+    pulseOpacity,
+  );
+
+  return (
+    <View pointerEvents="none" style={styles.kajoLayer}>
+      <Animated.View
+        style={[
+          styles.windowHalo,
+          {
+            backgroundColor: lightColor,
+            opacity: haloOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.windowBeamWide,
+          {
+            backgroundColor: lightColor,
+            opacity: wideBeamOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.windowBeamNarrow,
+          {
+            backgroundColor: lightColor,
+            opacity: narrowBeamOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+    </View>
+  );
+}
+
+function FireplaceKajo({
+  color,
+  phasePosition,
+  pulse,
+}: {
+  color: string;
+  phasePosition: Animated.Value;
+  pulse: Animated.Value;
+}) {
+  const fireColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      color,
+      color,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.curtainHighlight,
+    ],
+  });
+  const pulseOpacity = pulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.68, 1],
+  });
+  const pulseScale = pulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.96, 1.035],
+  });
+  const haloOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [
+        FIRE_GLOW_OPACITY.DAWN,
+        FIRE_GLOW_OPACITY.EVENING,
+        FIRE_GLOW_OPACITY.NIGHT,
+      ],
+    }),
+    pulseOpacity,
+  );
+  const midOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0.12, 0.15, 0.11],
+    }),
+    pulseOpacity,
+  );
+  const coreOpacity = Animated.multiply(
+    phasePosition.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0.18, 0.22, 0.16],
+    }),
+    pulseOpacity,
+  );
+
+  return (
+    <View pointerEvents="none" style={styles.kajoLayer}>
+      <Animated.View
+        style={[
+          styles.fireHalo,
+          {
+            backgroundColor: fireColor,
+            opacity: haloOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.fireMidGlow,
+          {
+            backgroundColor: fireColor,
+            opacity: midOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.fireCore,
+          {
+            backgroundColor: fireColor,
+            opacity: coreOpacity,
+            transform: [{ scale: pulseScale }],
+          },
+        ]}
+      />
+    </View>
+  );
+}
 
 export function RoomScreen() {
   return (
@@ -22,208 +251,157 @@ export function RoomScreen() {
 export function RoomBackdrop() {
   const activeProfile = useActiveProfile();
   const { mode: discoveryMode } = useDiscoveryMode();
+  const reduceMotion = useReduceMotionPreference();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase, activeProfile.activeProfile);
-  const themedStyles = createThemedStyles(theme);
+  const [phasePosition] = useState(
+    () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
+  );
+  const [windowPulse] = useState(() => new Animated.Value(0));
+  const [firePulse] = useState(() => new Animated.Value(0));
+
+  useEffect(() => {
+    const target = getCurtainPositionForMode(discoveryMode);
+
+    if (reduceMotion) {
+      phasePosition.setValue(target);
+      return;
+    }
+
+    Animated.timing(phasePosition, {
+      toValue: target,
+      duration: MODE_TRANSITION_DURATION_MS,
+      easing: Easing.inOut(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [discoveryMode, phasePosition, reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      windowPulse.setValue(0.5);
+      firePulse.setValue(0.5);
+      return;
+    }
+
+    windowPulse.setValue(0);
+    firePulse.setValue(0);
+
+    const windowAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(windowPulse, {
+          toValue: 1,
+          duration: 2800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+        Animated.timing(windowPulse, {
+          toValue: 0,
+          duration: 3200,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    const fireAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(firePulse, {
+          toValue: 1,
+          duration: 460,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+        Animated.timing(firePulse, {
+          toValue: 0,
+          duration: 680,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+
+    windowAnimation.start();
+    fireAnimation.start();
+
+    return () => {
+      windowAnimation.stop();
+      fireAnimation.stop();
+    };
+  }, [firePulse, reduceMotion, windowPulse]);
+
+  const phaseShadeColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.wash,
+      ROOM_AMBIENT_BY_PHASE.EVENING.wash,
+      '#101927',
+    ],
+  });
+  const phaseShadeOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      PHASE_SHADE_OPACITY.DAWN,
+      PHASE_SHADE_OPACITY.EVENING,
+      PHASE_SHADE_OPACITY.NIGHT,
+    ],
+  });
+  const ambientWashColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.wash,
+      ROOM_AMBIENT_BY_PHASE.EVENING.wash,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.wash,
+    ],
+  });
+  const ambientWashOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      ROOM_AMBIENT_BY_PHASE.DAWN.washOpacity * 0.72,
+      ROOM_AMBIENT_BY_PHASE.EVENING.washOpacity * 0.72,
+      ROOM_AMBIENT_BY_PHASE.NIGHT.washOpacity * 0.72,
+    ],
+  });
 
   return (
-    <View style={styles.backdrop}>
-      <View
-        pointerEvents="none"
-        style={[
-          styles.appAmbient,
-          {
-            backgroundColor: theme.ambient.wash,
-            opacity: theme.ambient.washOpacity * 1.35,
-          },
-        ]}
-      />
-
-      <View
-        style={themedStyles.scene}
+    <View style={[styles.backdrop, { backgroundColor: theme.base.appBackground }]}>
+      <ImageBackground
         accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
+        imageStyle={styles.roomImage}
+        resizeMode="cover"
+        source={CABIN_ROOM_ART}
+        style={styles.roomImageFrame}
       >
-        <View style={styles.backWall}>
-          <View style={styles.windowAssembly}>
-            <View
-              style={[
-                styles.window,
-                themedStyles.window,
-                { backgroundColor: theme.ambient.windowLight },
-              ]}
-              accessibilityLabel="Window"
-            >
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.skyUpper,
-                  { backgroundColor: withColorAlpha(theme.ambient.wash, 0.34) },
-                ]}
-              />
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.skyHorizon,
-                  { backgroundColor: withColorAlpha(theme.base.flame, 0.2) },
-                ]}
-              />
-              {ambientPhase === 'NIGHT' ? (
-                <>
-                  <View
-                    pointerEvents="none"
-                    style={[
-                      styles.moon,
-                      { backgroundColor: withColorAlpha(theme.base.textPrimary, 0.82) },
-                    ]}
-                  />
-                  <View style={[styles.star, styles.starOne]} />
-                  <View style={[styles.star, styles.starTwo]} />
-                  <View style={[styles.star, styles.starThree]} />
-                </>
-              ) : (
-                <View
-                  pointerEvents="none"
-                  style={[
-                    styles.sun,
-                    {
-                      backgroundColor: withColorAlpha(
-                        theme.base.flame,
-                        ambientPhase === 'EVENING' ? 0.72 : 0.42,
-                      ),
-                    },
-                  ]}
-                />
-              )}
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.distantHill,
-                  { backgroundColor: withColorAlpha(theme.base.structure, 0.58) },
-                ]}
-              />
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.nearHill,
-                  { backgroundColor: withColorAlpha(theme.base.floor, 0.78) },
-                ]}
-              />
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.windowGlow,
-                  { backgroundColor: theme.ambient.windowLight },
-                ]}
-              />
-              <View style={[styles.windowBarVertical, themedStyles.structure]} />
-              <View style={[styles.windowBarHorizontal, themedStyles.structure]} />
-            </View>
-          </View>
-
-          <View style={styles.movieScreen}>
-            <View style={[styles.screenSurface, themedStyles.screenSurface]}>
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.screenGlow,
-                  { backgroundColor: withColorAlpha(theme.ambient.windowLight, 0.1) },
-                ]}
-              />
-              <Text style={[styles.objectLabel, themedStyles.objectLabel]}>ELOKUVAT</Text>
-            </View>
-            <View style={[styles.mediaConsoleTop, themedStyles.structureLight]} />
-            <View style={[styles.mediaConsole, themedStyles.structure]}>
-              <View
-                style={[
-                  styles.consoleDoor,
-                  { borderColor: withColorAlpha(theme.base.structureLight, 0.7) },
-                ]}
-              />
-              <View
-                style={[
-                  styles.consoleDoor,
-                  { borderColor: withColorAlpha(theme.base.structureLight, 0.7) },
-                ]}
-              />
-            </View>
-            <View style={styles.consoleLegs}>
-              <View style={[styles.consoleLeg, themedStyles.structure]} />
-              <View style={[styles.consoleLeg, themedStyles.structure]} />
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.roomFloor, themedStyles.roomFloor]}>
-          <View
-            pointerEvents="none"
-            style={[
-              styles.rug,
-              {
-                backgroundColor: withColorAlpha(theme.base.ember, 0.34),
-                borderColor: withColorAlpha(theme.base.flame, 0.28),
-              },
-            ]}
-          />
-          <View
-            pointerEvents="none"
-            style={[
-              styles.floorLight,
-              { backgroundColor: withColorAlpha(theme.ambient.windowLight, 0.08) },
-            ]}
-          />
-          <View style={styles.fireplace} accessibilityLabel="Fireplace">
-            <View style={[styles.mantel, themedStyles.structureLight]} />
-            <View style={[styles.firebox, themedStyles.firebox]}>
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.fireGlow,
-                  { backgroundColor: withColorAlpha(theme.base.flame, 0.18) },
-                ]}
-              />
-              <View style={[styles.ember, { backgroundColor: theme.base.ember }]} />
-              <View style={[styles.flame, { backgroundColor: theme.base.flame }]} />
-            </View>
-          </View>
-
-          <View style={styles.bench} pointerEvents="none">
-            <View
-              style={[
-                styles.benchCushion,
-                { backgroundColor: withColorAlpha(theme.base.book, 0.86) },
-              ]}
-            />
-            <View style={styles.benchLegs}>
-              <View style={[styles.benchLeg, themedStyles.structure]} />
-              <View style={[styles.benchLeg, themedStyles.structure]} />
-            </View>
-          </View>
-
-          <View style={[styles.bookshelf, themedStyles.bookshelf]}>
-            <View style={[styles.shelfTop, themedStyles.structureLight]} />
-            <View style={styles.booksRow}>
-              <View style={[styles.book, styles.bookTall, themedStyles.book]} />
-              <View style={[styles.book, themedStyles.book]} />
-              <View style={[styles.book, styles.bookShort, themedStyles.book]} />
-              <View style={[styles.book, styles.bookTall, themedStyles.book]} />
-              <View style={[styles.book, themedStyles.book]} />
-            </View>
-            <View style={[styles.shelfLine, themedStyles.structureLight]} />
-            <Text style={[styles.objectLabel, themedStyles.objectLabel]}>KIRJAT</Text>
-          </View>
-        </View>
-
-        <View
+        <Animated.View
           pointerEvents="none"
           style={[
-            styles.sceneAmbient,
+            styles.phaseShade,
             {
-              backgroundColor: theme.ambient.wash,
-              opacity: theme.ambient.washOpacity * 1.35,
+              backgroundColor: phaseShadeColor,
+              opacity: phaseShadeOpacity,
             },
           ]}
         />
-      </View>
+
+        <WindowKajo
+          phasePosition={phasePosition}
+          pulse={windowPulse}
+        />
+        <FireplaceKajo
+          color={theme.base.flame}
+          phasePosition={phasePosition}
+          pulse={firePulse}
+        />
+
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.ambientWash,
+            {
+              backgroundColor: ambientWashColor,
+              opacity: ambientWashOpacity,
+            },
+          ]}
+        />
+      </ImageBackground>
     </View>
   );
 }
@@ -255,47 +433,6 @@ export function RoomInteractionLayer() {
   );
 }
 
-function createThemedStyles(theme: RoomTheme) {
-  return StyleSheet.create({
-    scene: {
-      flex: 1,
-      overflow: 'hidden',
-      backgroundColor: theme.base.sceneBackground,
-    },
-    window: {
-      borderColor: theme.base.structure,
-    },
-    structure: {
-      backgroundColor: theme.base.structure,
-    },
-    structureLight: {
-      backgroundColor: theme.base.structureLight,
-    },
-    screenSurface: {
-      borderColor: theme.base.structure,
-      backgroundColor: theme.base.screen,
-    },
-    roomFloor: {
-      borderTopColor: theme.base.border,
-      backgroundColor: theme.base.floor,
-    },
-    firebox: {
-      backgroundColor: theme.base.appBackground,
-      borderColor: theme.base.structure,
-    },
-    bookshelf: {
-      borderColor: theme.base.structure,
-      backgroundColor: theme.base.floor,
-    },
-    book: {
-      backgroundColor: theme.base.book,
-    },
-    objectLabel: {
-      color: theme.base.textPrimary,
-    },
-  });
-}
-
 const styles = StyleSheet.create({
   route: {
     flex: 1,
@@ -303,304 +440,71 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
-  },
-  appAmbient: {
-    ...StyleSheet.absoluteFill,
-  },
-  backWall: {
-    flex: 0.62,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  windowAssembly: {
-    width: '40%',
-    alignItems: 'stretch',
-    zIndex: 1,
-  },
-  window: {
-    width: '100%',
-    aspectRatio: 0.78,
-    borderWidth: 7,
-    borderRadius: 4,
     overflow: 'hidden',
   },
-  skyUpper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: '58%',
+  roomImageFrame: {
+    flex: 1,
+    overflow: 'hidden',
   },
-  skyHorizon: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: '48%',
-    bottom: 0,
+  roomImage: {
+    width: '100%',
+    height: '100%',
   },
-  windowGlow: {
+  phaseShade: {
     ...StyleSheet.absoluteFill,
-    opacity: 0.28,
   },
-  sun: {
+  kajoLayer: {
+    ...StyleSheet.absoluteFill,
+  },
+  windowHalo: {
     position: 'absolute',
-    width: 25,
-    height: 25,
-    right: 12,
-    top: 18,
-    borderRadius: 13,
+    width: '54%',
+    height: '36%',
+    left: '-11%',
+    top: '13%',
+    borderRadius: 320,
   },
-  moon: {
+  windowBeamWide: {
     position: 'absolute',
-    width: 23,
-    height: 23,
-    right: 13,
-    top: 16,
-    borderRadius: 12,
-  },
-  star: {
-    position: 'absolute',
-    width: 3,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: 'rgba(241, 237, 229, 0.78)',
-  },
-  starOne: {
-    left: 17,
-    top: 18,
-  },
-  starTwo: {
-    left: 40,
-    top: 35,
-  },
-  starThree: {
-    right: 42,
-    top: 11,
-  },
-  distantHill: {
-    position: 'absolute',
-    left: -12,
-    right: '26%',
-    bottom: -18,
-    height: '46%',
-    borderTopRightRadius: 80,
-    transform: [{ rotate: '-5deg' }],
-  },
-  nearHill: {
-    position: 'absolute',
-    left: '30%',
-    right: -18,
-    bottom: -21,
-    height: '42%',
-    borderTopLeftRadius: 80,
-    transform: [{ rotate: '5deg' }],
-  },
-  windowBarVertical: {
-    position: 'absolute',
-    width: 4,
-    top: 0,
-    bottom: 0,
-    left: '50%',
-    marginLeft: -2,
-  },
-  windowBarHorizontal: {
-    position: 'absolute',
-    height: 4,
-    left: 0,
-    right: 0,
-    top: '50%',
-    marginTop: -2,
-  },
-  movieScreen: {
     width: '46%',
-    alignItems: 'center',
+    height: '24%',
+    left: '-2%',
+    top: '25%',
+    borderRadius: 100,
   },
-  screenSurface: {
-    width: '100%',
-    aspectRatio: 1.45,
-    borderRadius: 8,
-    borderWidth: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  screenGlow: {
-    ...StyleSheet.absoluteFill,
-  },
-  mediaConsoleTop: {
-    width: '112%',
-    height: 8,
-    marginTop: 9,
-    borderRadius: 3,
-  },
-  mediaConsole: {
-    width: '102%',
-    height: 35,
-    flexDirection: 'row',
-    gap: 5,
-    padding: 5,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
-  },
-  consoleDoor: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 2,
-  },
-  consoleLegs: {
-    width: '88%',
-    height: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  consoleLeg: {
-    width: 5,
-    height: 10,
-    borderBottomLeftRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  roomFloor: {
-    flex: 0.38,
-    minHeight: 165,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    overflow: 'hidden',
-  },
-  floorLight: {
+  windowBeamNarrow: {
     position: 'absolute',
-    width: '56%',
-    height: '130%',
-    top: -28,
-    left: '3%',
-    borderRadius: 120,
-    transform: [{ rotate: '-17deg' }],
+    width: '35%',
+    height: '15%',
+    left: '1%',
+    top: '23%',
+    borderRadius: 80,
   },
-  rug: {
+  fireHalo: {
     position: 'absolute',
-    width: '58%',
-    height: 76,
-    left: '21%',
-    bottom: 8,
-    borderWidth: 2,
-    borderRadius: 48,
-    transform: [{ scaleY: 0.72 }],
+    width: '52%',
+    aspectRatio: 1,
+    left: '-12%',
+    top: '39%',
+    borderRadius: 360,
   },
-  fireplace: {
+  fireMidGlow: {
+    position: 'absolute',
     width: '34%',
-    alignItems: 'center',
-    zIndex: 2,
+    aspectRatio: 1,
+    left: '1%',
+    top: '45%',
+    borderRadius: 240,
   },
-  mantel: {
-    width: '112%',
-    height: 12,
-    borderRadius: 3,
-  },
-  firebox: {
-    width: '88%',
-    height: 88,
-    borderWidth: 6,
-    borderTopWidth: 4,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-  },
-  fireGlow: {
-    ...StyleSheet.absoluteFill,
-    borderRadius: 40,
-    transform: [{ scale: 1.4 }],
-  },
-  ember: {
+  fireCore: {
     position: 'absolute',
-    bottom: 12,
-    width: '62%',
-    height: 8,
-    borderRadius: 8,
+    width: '19%',
+    height: '12%',
+    left: '10%',
+    top: '51%',
+    borderRadius: 100,
   },
-  flame: {
-    width: 28,
-    height: 42,
-    marginBottom: 15,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 5,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 18,
-    transform: [{ rotate: '10deg' }],
-  },
-  bench: {
-    position: 'absolute',
-    width: '27%',
-    left: '36.5%',
-    bottom: 20,
-    zIndex: 3,
-  },
-  benchCushion: {
-    height: 24,
-    borderRadius: 10,
-  },
-  benchLegs: {
-    height: 28,
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  benchLeg: {
-    width: 6,
-    height: 28,
-    borderBottomLeftRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  bookshelf: {
-    width: '42%',
-    minHeight: 126,
-    borderWidth: 4,
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    justifyContent: 'flex-end',
-    zIndex: 2,
-  },
-  shelfTop: {
-    position: 'absolute',
-    left: -7,
-    right: -7,
-    top: -7,
-    height: 10,
-    borderRadius: 2,
-  },
-  booksRow: {
-    height: 66,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 5,
-  },
-  book: {
-    flex: 1,
-    height: 49,
-    borderRadius: 2,
-  },
-  bookTall: {
-    height: 62,
-  },
-  bookShort: {
-    height: 40,
-  },
-  shelfLine: {
-    height: 5,
-    marginTop: 5,
-    marginBottom: 8,
-  },
-  objectLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.7,
-  },
-  sceneAmbient: {
+  ambientWash: {
     ...StyleSheet.absoluteFill,
   },
   interactionLayer: {
@@ -609,19 +513,23 @@ const styles = StyleSheet.create({
   },
   movieHitTarget: {
     position: 'absolute',
-    top: 18,
-    right: 16,
-    width: '52%',
-    height: '42%',
+    top: '40%',
+    right: '25%',
+    width: '40%',
+    height: '27%',
+    borderRadius: 18,
   },
   booksHitTarget: {
     position: 'absolute',
-    right: 14,
-    bottom: 12,
-    width: '54%',
-    height: '33%',
+    top: '32%',
+    right: '3%',
+    width: '23%',
+    height: '38%',
+    borderRadius: 16,
   },
   pressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 243, 218, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 243, 218, 0.22)',
   },
 });

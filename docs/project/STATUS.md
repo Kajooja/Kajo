@@ -42,7 +42,7 @@ Do not reopen Sprint 010 for visual experimentation. Further Room art changes mu
 
 ## Approved Room direction
 
-The Room remains a **simple illustrated 2D / lightly layered 2.5D cabin-living-room**, not a 3D world or futuristic interface.
+The Room remains one fixed **illustrated 2D cabin-living-room surface**, not a navigable 3D world, video-game room or futuristic interface. Its approved composition uses a minimalist straight-on view, small muted palette, mobile-safe complete bookshelf and two independent runtime Kajo sources: the window and fireplace.
 
 Canonical MVP scene:
 
@@ -121,13 +121,15 @@ Main CI #252 passed with 147 tests and produced the standalone Android artifact.
 
 The correction merged in PR #168 at main commit `56fae50`: one edge-to-edge Room is now the persistent authenticated backdrop, the navigator canvas is transparent and secondary routes blur/dim the same Room. Main CI #254 passed with 148 tests and produced the standalone Android artifact. Configured-device review on 2026-09-03 accepted this full-screen persistent/blurred backdrop: the product owner reported that it otherwise works perfectly.
 
-A focused follow-up on `fix/immediate-navigation-room-art` removes Stack transition animation so returning Home and opening an Item never leave old/new screens briefly overlapping. It also delivers the documented Room art vocabulary more clearly through the same code-native scene: a rug/bench, low TV console, layered window sky for dawn/evening/night and restrained light/depth. `npm run check` passes with lint, TypeScript, 149 tests and both platform bundle exports. Device acceptance has not yet been claimed for this follow-up.
+PR #169 merged the immediate-transition/Room-art follow-up at main commit `7bccc2a`; main CI #256 passed with lint, TypeScript, 149 tests, both platform bundle exports and the standalone Android APK build. Configured-device review confirmed the navigation and layout look good. The art follow-up was then refined away from realism, perspective and video-game/pixel styling toward a softer, mildly abstract straight-on 2D cabin with separately rendered window and fireplace Kajo.
+
+The focused `feat/minimalist-2d-room` follow-up replaces the structural code-drawn furnishings with one optimized portrait minimalist Room illustration. Its neutral-lit, limited-palette asset deliberately keeps the window and fireplace bloom/cast light out of the bitmap; named, independent phase-aware UI layers animate the slowly breathing window Kajo and gently flickering fireplace Kajo. DiscoveryMode changes cross-fade shade, ambient wash and both light-source colors over 680 ms; reduced-motion settles them without continuous animation. Precise Home-only TV/bookcase interaction targets follow the mobile-safe composition. `npm run check` passes with lint, TypeScript, 149 tests, both platform bundle exports and verified inclusion of the optimized 560 KB Room asset. It has not yet received configured-device acceptance.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **Sprint 012 navigation/Room follow-up** — cut and review the immediate route transitions plus documented Room-art refinement.
+1. **Sprint 012 2D Room follow-up** — validate and cut the minimalist front-facing cabin plus animated independent window/fireplace Kajo lighting.
 2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
 3. **Sprint 013** — ScenarioMemory.
 4. **Sprint 014** — MVP hardening/release readiness.
@@ -172,4 +174,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: cut the immediate-transition/Room-art follow-up, then request one refreshed configured-Android review covering the changed navigation/Room presentation plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: cut the minimalist straight-on 2D cabin follow-up, then request one refreshed configured-Android review covering the Room presentation plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the fixed illustrated/non-navigable Room contract must be preserved.

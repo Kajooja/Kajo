@@ -76,7 +76,9 @@ Sprint 011 Lists are merged, hosted and automatically verified. Their refreshed 
 - Configured-device review found that the Room still had outer gutters and secondary routes exposed a white navigator canvas instead of the intended Room atmosphere. This build is not visually accepted.
 - PR #168 merged the edge-to-edge persistent/blurred Room correction at main commit `56fae50`; main CI #254 passed with 148 tests and produced the standalone Android artifact.
 - Configured-device review on 2026-09-03 accepted the corrected full-screen Room/backdrop behavior. The remaining navigation finding is the default Stack animation: returning Home or opening an Item briefly leaves both routes visible.
-- The focused `fix/immediate-navigation-room-art` follow-up disables route-transition animation and refines the same code-native Room with the documented rug/bench, low TV console, window sky and restrained light/depth layers. `npm run check` passes with lint, TypeScript, 149 tests and both platform bundle exports. This follow-up has not yet received configured-device acceptance.
+- PR #169 merged the immediate-transition/Room-art follow-up at main commit `7bccc2a`; main CI #256 passed with lint, TypeScript, 149 tests, both platform bundle exports and the standalone Android APK build.
+- Configured-device review confirmed the navigation/layout look good and refined the art target away from realism, perspective and video-game/pixel styling toward a softer, mildly abstract straight-on 2D cabin. The complete bookshelf must remain inside tall-phone crop boundaries; window and fireplace Kajo render separately.
+- The focused `feat/minimalist-2d-room` follow-up uses one optimized portrait limited-palette Room illustration with neutral baked lighting, a mobile-safe full bookshelf, independent Profile/DiscoveryMode-aware window/fireplace light layers and precise Home-only TV/bookcase interaction targets. Window Kajo breathes slowly, fireplace Kajo flickers gently and DiscoveryMode changes cross-fade the complete atmosphere over 680 ms; reduced-motion settles the presentation without continuous motion. `npm run check` passes with lint, TypeScript, 149 tests, both platform bundle exports and verified inclusion of the optimized 560 KB Room asset. This follow-up has not yet received configured-device acceptance.
 
 ## Pre-acceptance UI polish
 
@@ -93,4 +95,4 @@ The most-used drawer order is deliberately separate from the destination picker 
 
 ## Handoff
 
-Current target: cut the immediate-transition/Room-art follow-up, then request one explicit push/PR/merge authorization. The full-screen persistent backdrop is device-accepted; do not extend that claim to this new follow-up or the deferred complete Lists/messaging acceptance flows.
+Current target: validate and cut the straight-on minimalist 2D cabin follow-up, then request one explicit push/PR/merge authorization. Do not extend earlier visual acceptance to this new Room asset or the deferred complete Lists/messaging acceptance flows.
