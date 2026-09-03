@@ -17,6 +17,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
     "expo": "~57.0.9",
+    "expo-blur": "~57.0.2",
     "expo-constants": "~57.0.8",
     "expo-linking": "~57.0.4",
     "expo-router": "~57.0.9",
