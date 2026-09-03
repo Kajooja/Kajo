@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Sprints 001–010 are accepted. Sprint 011/#151 Shared discovery/Endorsement is accepted; #102 named Lists is implemented and awaiting configured Android acceptance.
+Sprints 001–010 are accepted. Sprint 011/#151 Shared discovery/Endorsement is accepted; #102 named Lists and Sprint 012/#138 messaging are hosted and awaiting refreshed configured Android acceptance.
 
 Important current paths:
 
@@ -28,15 +28,15 @@ supabase/functions/password-auth/
 |---|---|---|
 | Mobile app | `apps/mobile/` | Expo SDK 57 / TypeScript application; configured Personal/Shared auth, persistence, Event and Prediction V0 flows are phone-runnable |
 | Expo Router entry | `apps/mobile/app/` | Root opens Room; authenticated routes share one persistent `DiscoveryModeShell`; discovery under `app/discovery/`; Lists under `app/lists/`; Profile threads under `app/messages/`; Shared management under `app/profiles/shared.tsx` |
-| Global app shell | `apps/mobile/src/features/discovery/DiscoveryModeShell.tsx` | Top Kajo Home mark + global curtain; bottom menu/active-Profile/Inbox dock; side drawer owns Profile/Lists/Groups and final sign-out placement under #149 |
+| Global app shell | `apps/mobile/src/features/discovery/DiscoveryModeShell.tsx` | Top Kajo Home mark + global curtain; bottom menu/active-Profile/Inbox dock; translucent atmospheric chrome; side drawer owns Profile/Lists/Groups, fixed List/history shortcuts, three most-used custom Lists and final sign-out placement |
 | Core domain contracts | `apps/mobile/src/domain/` | Generic Profile/Item/Event/Context/Prediction/DiscoveryMode contracts; no media-specific user/predictor architecture |
 | Room feature | `apps/mobile/src/features/room/RoomScreen.tsx` | 2D Room home with bookshelf/projector. #149 removes standalone title/helper/sign-out so Room remains only visual domain navigation between global bars |
-| Theme engine | `apps/mobile/src/theme/` | Personal/Shared stable base identity with separate DiscoveryMode-driven AmbientPhase |
+| Theme engine | `apps/mobile/src/theme/` | Personal/Shared stable base identity with separate DiscoveryMode-driven AmbientPhase plus centralized translucent surface-color tokens |
 | Discovery feature | `apps/mobile/src/features/discovery/` | Grid/detail/swipe, hosted Prediction V0, rating/not-interested/save state, ordered persistence, undo, cooldown and global shell. `SharedEndorsementContext.tsx`, `sharedEndorsementOperations.ts` and `sharedEndorsement.ts` own the separate #151 collaboration overlay |
 | Interaction persistence | `apps/mobile/src/features/discovery/ItemInteractionContext.tsx` | Active-Profile current-state hydration/persistence; later Profile switches keep UI mounted while writes wait for target Profile readiness |
 | Event Engine | `apps/mobile/src/features/events/` | Root-scoped session/correlation append boundary; active Profile changes `profileId`, signed-in User remains `actorUserId` |
 | Profiles | `apps/mobile/src/features/profiles/` | Personal identity, Shared list/create/invite/respond/leave operations, active Profile rules/provider, invitation/membership refresh and Shared management UI |
-| Lists | `apps/mobile/src/features/lists/`, `apps/mobile/app/lists/` | #102 Profile-scoped system/custom List operations/provider, compact one-destination recent-use picker, Saved/consumed browsing, custom management, list/card/filter/sort detail and Shared provenance |
+| Lists | `apps/mobile/src/features/lists/`, `apps/mobile/app/lists/` | #102 Profile-scoped system/custom List operations/provider, compact latest-use destination picker, actor-local frequency/recency drawer ranking, Saved/consumed browsing, custom management, list/card/filter/sort detail and Shared provenance |
 | Shared Kajo route | `apps/mobile/app/profiles/shared.tsx` | Full Shared management: ready/provisional groups, accepted members, creation, nickname invitations and leave confirmation |
 | Auth gate | `apps/mobile/src/features/auth/AuthGate.tsx` | Auth/profile onboarding; nickname max 24; first configured hydration blocking only, later Profile switches seamless |
 | Mobile data boundary | `apps/mobile/src/data/` | Supabase configured/unconfigured connection and root provider; presentation avoids scattered DB access |
@@ -50,8 +50,8 @@ supabase/functions/password-auth/
 | List persistence | `supabase/migrations/20260901204135_profile_scoped_item_lists.sql`, `20260902134621_shared_list_approval_flow.sql` | Generic Lists plus pending Shared target-List approval: one member proposes, other accepted members approve, and unanimity atomically commits the chosen custom entry + Shared `Tallennetut`; explicit grants/RLS and guarded direct Shared insertion |
 | Shared Endorsement | `supabase/migrations/20260901122000_shared_endorsement_state.sql`, `20260901124000_shared_endorsement_item_index.sql`, `20260901150500_shared_discovery_overlay.sql`, `20260901182156_shared_member_history_delivery.sql` | #151 foundation + prediction-core-independent delivery: membership-scoped actor/Profile/Item state, idempotent RPCs, consensus -> Shared Saved, pending provenance and mobile queue integration. Member Personal history is a lower attributed delivery tier; Shared current state remains suppressing. Common-fit stays gated by #156 |
 | Shared Saved integrity | `supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql` | Durable reached-consensus record and RLS guard prevent direct Shared interaction writes from forging, clearing or deleting unanimity-owned Saved state |
-| Messaging | `apps/mobile/src/features/messages/`, `apps/mobile/app/messages/`, `supabase/migrations/20260902182643_profile_messaging_foundation.sql` | #138 local foundation: typed retry-safe RPC boundary/provider, combined Inbox activity/unread state, Profile thread UI, failed drafts and optional Profile/List/Item contextual message; hosted migration and device acceptance remain gated |
-| DB migrations | `supabase/migrations/` | Identity/current state, Event persistence, Prediction V0, feedback/cooldown, Shared membership/invitations/lifecycle, Endorsement and Profile-scoped Lists with explicit grants/RLS |
+| Messaging | `apps/mobile/src/features/messages/`, `apps/mobile/app/messages/`, `supabase/migrations/20260902182643_profile_messaging_foundation.sql` | #138 hosted foundation: typed retry-safe RPC boundary/provider, combined Inbox activity/unread state, Profile thread UI, failed drafts and optional Profile/List/Item contextual message; configured-device acceptance remains deferred |
+| DB migrations | `supabase/migrations/` | Identity/current state, Event persistence, Prediction V0, feedback/cooldown, Shared membership/invitations/lifecycle, Endorsement, Profile-scoped Lists and Profile messaging with explicit grants/RLS |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; main also builds/verifies/uploads standalone Android APK |
 
 Do not create empty feature folders merely to match future architecture. Shared collaboration and Lists extend generic Profile/Item boundaries rather than creating `GroupTaste`, media-specific queues or a second recommender.

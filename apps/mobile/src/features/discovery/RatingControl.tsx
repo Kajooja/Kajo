@@ -6,7 +6,6 @@ import {
   PanResponder,
   Pressable,
   StyleSheet,
-  Text,
   View,
   type AccessibilityActionEvent,
   type GestureResponderEvent,
@@ -28,8 +27,8 @@ interface RatingControlProps {
   onRatingChange: (rating: number) => void;
 }
 
-const HANDLE_WIDTH = 24;
-const TRACK_PADDING = 4;
+const HANDLE_WIDTH = 22;
+const TRACK_PADDING = 2;
 
 export function RatingControl({
   rating,
@@ -123,9 +122,11 @@ export function RatingControl({
     },
     onPanResponderMove: (_, gestureState) => {
       if (maxTravel <= 0) return;
-      position.setValue(
-        Math.min(1, Math.max(0, activeDragStart + gestureState.dx / maxTravel)),
+      const nextPosition = Math.min(
+        1,
+        Math.max(0, activeDragStart + gestureState.dx / maxTravel),
       );
+      position.setValue(nextPosition);
     },
     onPanResponderRelease: (_, gestureState) => completeDrag(gestureState.dx),
     onPanResponderTerminate: (_, gestureState) => completeDrag(gestureState.dx),
@@ -139,12 +140,41 @@ export function RatingControl({
 
   return (
     <View style={styles.container}>
-      <View style={styles.labels} pointerEvents="none">
-        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>0 · EN PIDÄ</Text>
-        <Text style={[styles.value, { color: theme.base.textPrimary }]}>
-          {rating === null ? '–' : rating}
-        </Text>
-        <Text style={[styles.edgeLabel, { color: theme.base.textMuted }]}>PIDÄN · 10</Text>
+      <View style={styles.previewRail} pointerEvents="none">
+        <Animated.View style={[styles.previewBubble, { transform: [{ translateX }] }]}>
+          {Array.from({ length: MAX_ITEM_RATING + 1 }, (_, value) => {
+            const center = value / MAX_ITEM_RATING;
+            const opacity = value === 0
+              ? position.interpolate({
+                  inputRange: [0, 0.055],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                })
+              : value === MAX_ITEM_RATING
+                ? position.interpolate({
+                    inputRange: [0.945, 1],
+                    outputRange: [0, 1],
+                    extrapolate: 'clamp',
+                  })
+                : position.interpolate({
+                    inputRange: [center - 0.055, center, center + 0.055],
+                    outputRange: [0, 1, 0],
+                    extrapolate: 'clamp',
+                  });
+
+            return (
+              <Animated.Text
+                key={value}
+                style={[
+                  styles.value,
+                  { color: theme.base.textPrimary, opacity },
+                ]}
+              >
+                {value}
+              </Animated.Text>
+            );
+          })}
+        </Animated.View>
       </View>
       <Pressable
         disabled={disabled}
@@ -159,30 +189,19 @@ export function RatingControl({
           min: 0,
           max: 10,
           now: rating ?? 5,
-          text: rating === null ? 'Ei arvosanaa' : `${rating} / 10`,
+          text: rating === null ? 'Valitse arvosana, lähtöarvo 5' : `${rating} / 10`,
         }}
         accessibilityActions={[{ name: 'decrement' }, { name: 'increment' }]}
         onAccessibilityAction={handleAccessibilityAction}
         style={[
           styles.track,
           {
-            backgroundColor: theme.base.structure,
+            backgroundColor: theme.surface.raised,
             borderColor: theme.base.structureLight,
           },
           disabled && styles.disabled,
         ]}
       >
-        <View pointerEvents="none" style={styles.markers}>
-          {Array.from({ length: 11 }, (_, value) => (
-            <View
-              key={value}
-              style={[
-                styles.marker,
-                { backgroundColor: theme.base.structureLight },
-              ]}
-            />
-          ))}
-        </View>
         <Animated.View
           {...panResponder.panHandlers}
           style={[
@@ -206,37 +225,37 @@ export function RatingControl({
 }
 
 const styles = StyleSheet.create({
-  container: { width: '100%', gap: 6 },
-  labels: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  container: { width: '100%', gap: 2 },
+  previewRail: {
+    height: 18,
+    paddingHorizontal: TRACK_PADDING,
   },
-  edgeLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1.1 },
-  value: { minWidth: 24, textAlign: 'center', fontSize: 15, fontWeight: '800' },
+  previewBubble: {
+    width: HANDLE_WIDTH,
+    height: 18,
+    alignItems: 'center',
+  },
+  value: {
+    position: 'absolute',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '800',
+  },
   track: {
-    height: 34,
-    borderRadius: 9,
-    borderWidth: 2,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1,
     paddingHorizontal: TRACK_PADDING,
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  markers: {
-    ...StyleSheet.absoluteFill,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  marker: { width: 3, height: 6, borderRadius: 2 },
   handle: {
     width: HANDLE_WIDTH,
-    height: 28,
-    borderRadius: 7,
+    height: 18,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  handleLine: { width: 2, height: 16, borderRadius: 1, opacity: 0.56 },
+  handleLine: { width: 2, height: 10, borderRadius: 1, opacity: 0.56 },
   disabled: { opacity: 0.4 },
 });

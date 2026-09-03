@@ -25,7 +25,7 @@ import {
 export function SharedProfilesScreen() {
   const profiles = useActiveProfile();
   const { mode } = useDiscoveryMode();
-  const theme = getRoomTheme(getAmbientPhase(mode));
+  const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const [newProfileName, setNewProfileName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -367,7 +367,7 @@ function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: theme.base.appBackground,
+      backgroundColor: 'transparent',
     },
     content: {
       paddingHorizontal: 20,
@@ -412,7 +412,7 @@ function createStyles(theme: RoomTheme) {
       borderWidth: 1,
       borderColor: theme.base.border,
       borderRadius: 18,
-      backgroundColor: theme.base.sceneBackground,
+      backgroundColor: theme.surface.panel,
       padding: 16,
       gap: 12,
     },
@@ -466,7 +466,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 12,
       paddingHorizontal: 13,
       color: theme.base.textPrimary,
-      backgroundColor: theme.base.appBackground,
+      backgroundColor: theme.surface.appChrome,
       fontSize: 14,
     },
     primaryButton: {

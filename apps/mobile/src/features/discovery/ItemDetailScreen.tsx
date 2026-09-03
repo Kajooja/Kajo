@@ -69,6 +69,8 @@ import {
   type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
 
+const RATING_COMMIT_FEEDBACK_DURATION_MS = 500;
+
 function buildEligibleSwipeSequence(
   selectedItem: Item | undefined,
   mode: ReturnType<typeof useDiscoveryMode>['mode'],
@@ -108,7 +110,7 @@ export function ItemDetailScreen({
   const isSharedProfile = activeProfile.activeProfile?.type === 'SHARED';
 
   if (isSharedProfile && sharedEndorsements.status !== 'ready') {
-    const theme = getRoomTheme(getAmbientPhase(mode));
+    const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
     const styles = createStyles(theme);
 
     return (
@@ -169,7 +171,7 @@ function ItemDetailContent({
     undo,
     retryHydration,
   } = useItemInteractions();
-  const theme = getRoomTheme(getAmbientPhase(mode));
+  const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const selectedItem = getMockItem(itemId);
   const activeSharedMembership =
@@ -199,6 +201,11 @@ function ItemDetailContent({
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
   const [endorsingItemId, setEndorsingItemId] = useState<ItemId | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [ratingConfirmation, setRatingConfirmation] = useState<{
+    itemId: ItemId;
+    rating: number;
+  } | null>(null);
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [listPickerTarget, setListPickerTarget] = useState<{
     item: Item;
@@ -245,6 +252,9 @@ function ItemDetailContent({
       active = false;
       subscription.remove();
       exitAnimation.stopAnimation();
+      if (advanceTimerRef.current) {
+        clearTimeout(advanceTimerRef.current);
+      }
     };
   }, [exitAnimation]);
 
@@ -259,7 +269,7 @@ function ItemDetailContent({
       itemId: item.id,
       rating,
     };
-    handleCommittedAction(
+    const committed = handleCommittedAction(
       item,
       index,
       action,
@@ -273,7 +283,12 @@ function ItemDetailContent({
       (eventId) => setRating(item.id, rating, eventId),
       `Arvosana ${rating}/10 tallennettu.`,
       { rating },
+      RATING_COMMIT_FEEDBACK_DURATION_MS,
     );
+
+    if (committed) {
+      setRatingConfirmation({ itemId: item.id, rating });
+    }
   }
 
   function handleNotInterested(
@@ -464,9 +479,10 @@ function ItemDetailContent({
     commit: (eventId?: EventId) => boolean,
     nextFeedback: string,
     eventProperties: Readonly<Record<string, unknown>> = {},
-  ) {
+    advanceDelayMs = 0,
+  ): boolean {
     if (exitingItemId) {
-      return;
+      return false;
     }
 
     const eventId =
@@ -475,7 +491,7 @@ function ItemDetailContent({
         : undefined;
 
     if (!commit(eventId)) {
-      return;
+      return false;
     }
 
     if (eventId) {
@@ -496,19 +512,34 @@ function ItemDetailContent({
       );
     }
 
-    advanceAfterAction(item, index, nextFeedback);
+    advanceAfterAction(item, index, nextFeedback, advanceDelayMs);
+    return true;
   }
 
   function advanceAfterAction(
     item: Item,
     index: number,
     nextFeedback: string,
+    delayMs = 0,
   ) {
     setFeedback(nextFeedback);
+
+    if (advanceTimerRef.current) {
+      clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = null;
+    }
 
     const nextIndex = getNextSwipeIndex(index, items.length);
 
     if (nextIndex === null) {
+      if (delayMs > 0) {
+        setExitingItemId(item.id);
+        advanceTimerRef.current = setTimeout(() => {
+          advanceTimerRef.current = null;
+          setRatingConfirmation(null);
+          setExitingItemId(null);
+        }, delayMs);
+      }
       return;
     }
 
@@ -521,32 +552,50 @@ function ItemDetailContent({
       }
 
       exitAnimation.setValue(0);
+      setRatingConfirmation(null);
       setExitingItemId(null);
     };
 
-    if (reduceMotion) {
-      advance();
+    setExitingItemId(item.id);
+    const startAdvance = () => {
+      advanceTimerRef.current = null;
+
+      if (reduceMotion) {
+        advance();
+        return;
+      }
+
+      exitAnimation.setValue(0);
+      Animated.timing(exitAnimation, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          advance();
+        }
+      });
+    };
+
+    if (delayMs > 0) {
+      advanceTimerRef.current = setTimeout(startAdvance, delayMs);
       return;
     }
 
-    setExitingItemId(item.id);
-    exitAnimation.setValue(0);
-    Animated.timing(exitAnimation, {
-      toValue: 1,
-      duration: 220,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (finished) {
-        advance();
-      }
-    });
+    startAdvance();
   }
 
   function handleUndo() {
     if (!canUndo || !undoTargetItemId || exitingItemId) {
       return;
     }
+
+    if (advanceTimerRef.current) {
+      clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = null;
+    }
+    setRatingConfirmation(null);
 
     const targetIndex = items.findIndex((item) => item.id === undoTargetItemId);
     const result = undo();
@@ -760,6 +809,11 @@ function ItemDetailContent({
                 )}
                 pendingApprovalLabel={pendingApprovalLabel}
                 sharedProvenance={memberHistoryProvenance}
+                ratingConfirmation={
+                  ratingConfirmation?.itemId === item.id
+                    ? ratingConfirmation.rating
+                    : null
+                }
                 {...(pendingListApproval
                   ? { onApprove: () => void handleEndorsement(item, index) }
                   : {})}
@@ -795,6 +849,7 @@ interface SwipeItemPageProps {
   listActionHidden: boolean;
   pendingApprovalLabel: string | null;
   sharedProvenance: string | null;
+  ratingConfirmation: number | null;
   onApprove?: () => void;
   onRating: (rating: number) => void;
   onNotInterested: () => void;
@@ -811,6 +866,7 @@ function SwipeItemPage({
   listActionHidden,
   pendingApprovalLabel,
   sharedProvenance,
+  ratingConfirmation,
   onApprove,
   onRating,
   onNotInterested,
@@ -899,6 +955,7 @@ function SwipeItemPage({
 
       <View style={styles.feedbackDrawer} accessibilityLabel="Arvioi kohde">
         <RatingControl
+          key={`${item.id}:${interaction.rating ?? 'unrated'}`}
           rating={interaction.rating}
           disabled={disabled}
           theme={theme}
@@ -913,6 +970,17 @@ function SwipeItemPage({
             styles={styles}
             onPress={onNotInterested}
           />
+          {ratingConfirmation !== null ? (
+            <View
+              accessibilityLiveRegion="polite"
+              accessibilityLabel={`Arvosana ${ratingConfirmation} tallennettu`}
+              style={styles.ratingConfirmation}
+            >
+              <Text style={styles.ratingConfirmationText}>
+                {ratingConfirmation}
+              </Text>
+            </View>
+          ) : null}
           {!pendingApprovalLabel && !listActionHidden ? (
             <ActionButton
               label={ITEM_LIST_LABELS.addToList}
@@ -1001,7 +1069,7 @@ function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: theme.base.appBackground,
+      backgroundColor: 'transparent',
     },
     ambientBackdrop: {
       ...StyleSheet.absoluteFill,
@@ -1168,7 +1236,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 16,
       borderWidth: 1,
       borderColor: theme.base.border,
-      backgroundColor: theme.base.floor,
+      backgroundColor: theme.surface.floor,
       paddingHorizontal: 12,
       paddingVertical: 7,
     },
@@ -1179,11 +1247,12 @@ function createStyles(theme: RoomTheme) {
     actions: {
       flexDirection: 'row',
       flexWrap: 'wrap',
+      alignItems: 'center',
       gap: 10,
     },
     feedbackDrawer: {
-      marginTop: 14,
-      gap: 10,
+      marginTop: 8,
+      gap: 8,
     },
     endorsementProvenance: {
       color: theme.ambient.curtainHighlight,
@@ -1198,7 +1267,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 18,
       borderWidth: 1,
       borderColor: theme.base.border,
-      backgroundColor: theme.base.structure,
+      backgroundColor: theme.surface.raised,
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: 10,
@@ -1211,6 +1280,21 @@ function createStyles(theme: RoomTheme) {
     },
     actionTextActive: {
       color: theme.base.textPrimary,
+    },
+    ratingConfirmation: {
+      minWidth: 28,
+      height: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: theme.ambient.curtainHighlight,
+      backgroundColor: theme.surface.panel,
+    },
+    ratingConfirmationText: {
+      color: theme.base.textPrimary,
+      fontSize: 13,
+      fontWeight: '900',
     },
     missing: {
       flex: 1,

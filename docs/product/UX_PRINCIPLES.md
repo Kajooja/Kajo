@@ -7,20 +7,20 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 ## Principles
 
 1. **The Room is home.** The home scene is not decorative wallpaper; its objects are the primary entrances to content domains. The Room itself should stay visually clean rather than accumulating account/settings controls.
-2. **Navigation has two sources: Room or side drawer.** Domain discovery begins from Room objects. Account/Profile/Lists/Groups navigation belongs in the restrained side drawer opened from the bottom dock.
+2. **Navigation has two sources: Room or side drawer.** Domain discovery begins from Room objects. Account/Profile/Lists/Groups navigation belongs in the restrained side drawer opened from the bottom dock. The drawer's Lists section may expose fixed Saved/consumed-history routes plus at most three actor-local most-used custom Lists without duplicating the full Lists screen.
 3. **Minimal persistent shell.** Top: Kajo Home mark + global DiscoveryMode curtain. Bottom: menu + active Profile identity/Home + Inbox. Do not add a conventional multi-tab bar unless an explicit later product decision reverses this rule.
 4. **Home is redundant in a useful way.** Both the top Kajo mark and the bottom-center active Profile identity return to the active Profile Room. They do not change Profile context.
 5. **Sign out is secondary account navigation.** `Kirjaudu ulos` belongs at the bottom of the side drawer, not in the Room scene.
 6. **Illustrated 2D first.** The Room may use lightly layered 2.5D depth through perspective, overlap, light, gradients, opacity, blur and shadow, but it must remain a simple illustrated surface. No virtual walking, free camera, rendered 3D world or game-like room interaction.
 7. **Content is more important than chrome.** Posters/covers and Room atmosphere carry visual interest.
 8. **Kajo brings the light.** Product identity is expressed through light and atmosphere rather than many colored buttons.
-9. **Theme identity persists.** Active Profile theme is the base visual identity across areas.
+9. **Theme identity persists.** Active Profile theme is the base visual identity across areas. Approximately 70%-opaque surface-color tokens keep text fully opaque while allowing the Kajo/DiscoveryMode light to remain subtly visible through headers, drawers, cards and secondary screens.
 10. **Context transitions are smooth.** Opening bookshelf/screen should feel like moving deeper into the same Kajo, not loading an unrelated app.
 11. **Curtain is Kajo's global DiscoveryMode control.** Exactly `FOR_YOU`, `SURPRISE`, `RISK`; drag/tap settles on one canonical state. Downstream screens inherit it and do not add competing selectors.
 12. **DiscoveryMode is visible as restrained atmosphere.** FOR_YOU -> calm dawn/day, SURPRISE -> warmer sunset/evening, RISK -> night/moon with a restrained cooler fireplace accent. AmbientPhase is presentation; DiscoveryMode is recommendation policy.
 13. **Visual preference != risk preference.** Dark aesthetics do not imply risky recommendations.
 14. **Grid first, swipe optional.** Grid is default discovery. Swipe is optional calibration/browsing tooling.
-15. **Committed choices behave consistently.** Explicit feedback gives restrained visual confirmation and rotates the current Item appropriately without game-like effects. A successful `Lisää listaan` is the positive/like action and immediately advances; a separate Like button must not duplicate it.
+15. **Committed choices behave consistently.** Explicit feedback gives restrained visual confirmation and rotates the current Item appropriately without game-like effects. Rating preview is 0–10, but persistence happens only on tap/release; the committed value remains visible for about 500 ms before advancing. A successful `Lisää listaan` is the positive/like action and advances after visible confirmation; a separate Like button must not duplicate it.
 16. **Recent choices are reversible.** Undo/back restores prior current state and exact Item/card when deterministic reversal exists.
 17. **Copy is presentation, not domain semantics.** Labels such as `Tykkää`, `Tallenna`, `Luettu` may differ by Profile context while canonical Event/state meaning remains explicit and stable.
 18. **Shared Kajo feels like a place.** Switching to SharedProfile changes Profile context/theme and joint recommendation behavior, not merely a filter.

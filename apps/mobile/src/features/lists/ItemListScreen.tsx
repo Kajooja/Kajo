@@ -291,7 +291,7 @@ function EntryCard({ entry, isShared, grid, styles, onOpen, onRemove }: { entry:
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: theme.base.appBackground },
+    safeArea: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: 20, paddingBottom: 44, gap: 18 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
@@ -302,7 +302,7 @@ function createStyles(theme: RoomTheme) {
     management: { gap: 8 },
     managementActions: { flexDirection: 'row', justifyContent: 'space-between' },
     renameRow: { flexDirection: 'row', gap: 8 },
-    input: { flex: 1, minHeight: 44, paddingHorizontal: 12, borderRadius: 11, borderWidth: 1, borderColor: theme.base.border, color: theme.base.textPrimary, backgroundColor: theme.base.sceneBackground },
+    input: { flex: 1, minHeight: 44, paddingHorizontal: 12, borderRadius: 11, borderWidth: 1, borderColor: theme.base.border, color: theme.base.textPrimary, backgroundColor: theme.surface.panel },
     smallButton: { minWidth: 88, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: theme.ambient.curtain },
     smallButtonText: { color: theme.base.textPrimary, fontWeight: '800' },
     link: { color: theme.ambient.curtainHighlight, fontSize: 13, fontWeight: '700' },
@@ -318,7 +318,7 @@ function createStyles(theme: RoomTheme) {
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
     list: { gap: 10 },
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    entry: { minHeight: 124, padding: 14, gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.base.sceneBackground },
+    entry: { minHeight: 124, padding: 14, gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.surface.panel },
     gridEntry: { width: '48%', minHeight: 180 },
     entryBody: { flex: 1, gap: 4 },
     entryType: { color: theme.base.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },

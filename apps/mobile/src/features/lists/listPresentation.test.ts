@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import type { ItemListEntry } from './itemListOperations';
 import {
   COMPACT_LIST_DESTINATION_LIMIT,
+  DRAWER_MOST_USED_LIST_LIMIT,
   orderListDestinationsByRecentUse,
+  selectDrawerQuickLists,
   selectVisibleListDestinations,
   selectPresentedListEntries,
 } from './listPresentation';
@@ -67,6 +69,21 @@ describe('list presentation', () => {
 
     expect(selectVisibleListDestinations(lists, false)).toHaveLength(5);
     expect(selectVisibleListDestinations(lists, true)).toHaveLength(7);
+  });
+
+  it('keeps the drawer compact with three most-used custom Lists', () => {
+    const lists: readonly ItemList[] = [
+      createList('system', 'Tallennetut', '2026-09-02T10:00:00.000Z'),
+      createList('a', 'A', '2026-09-02T08:00:00.000Z'),
+      createList('b', 'B', '2026-09-02T09:00:00.000Z'),
+      createList('c', 'C', '2026-09-02T07:00:00.000Z'),
+      createList('d', 'D', '2026-09-02T11:00:00.000Z'),
+    ];
+
+    const quickLists = selectDrawerQuickLists(lists, ['c', 'a', 'b', 'd']);
+
+    expect(quickLists).toHaveLength(DRAWER_MOST_USED_LIST_LIMIT);
+    expect(quickLists.map((list) => list.id)).toEqual(['c', 'a', 'b']);
   });
 });
 

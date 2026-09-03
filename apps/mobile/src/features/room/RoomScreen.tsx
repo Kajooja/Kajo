@@ -118,7 +118,7 @@ function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: theme.base.appBackground,
+      backgroundColor: 'transparent',
     },
     appAmbient: {
       ...StyleSheet.absoluteFill,
