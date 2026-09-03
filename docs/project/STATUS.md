@@ -150,6 +150,8 @@ The List model is hosted and stable enough for #138. Its final configured-device
 - `/docs/product/MVP.md`
 - `/docs/product/UX_PRINCIPLES.md`
 - `/docs/project/ROADMAP.md`
+- `/docs/project/HANDOFF_PROTOCOL.md`
+- `/docs/project/milestones/MILESTONE-001-MVP.md`
 - `/docs/project/sprints/SPRINT-010.md`
 - `/docs/project/sprints/SPRINT-011.md`
 - `/docs/project/sprints/SPRINT-012.md`

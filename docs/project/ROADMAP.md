@@ -138,6 +138,8 @@ Onboarding, performance, accessibility, end-to-end flows, quality and privacy ch
 
 The milestone closes only with a genuinely shareable store release: stable production identifiers/versioning/signing, production authentication email delivery, privacy/support and store metadata/assets, least-privilege client configuration, and verified clean install/update flows on representative real devices through an official app store.
 
+Sprint 014 ends with the full `MILESTONE-001-MVP.md` completion gate. In particular, all MVP requirements must be accepted, required code must be on `main`, hosted state must match migrations, end-to-end Personal/Shared/Prediction flows must pass on real devices, operational/privacy/rollback paths must exist and the product owner must accept the installed store build. Only then may `MVP 0.1` and the milestone be marked `COMPLETE`.
+
 Primary production-security issue: #160. Production email delivery remains coordinated with #127.
 
 ## Post-MVP direction
