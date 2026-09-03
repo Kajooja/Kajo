@@ -46,6 +46,30 @@ export interface EventWriteCoordinator {
   dispose(): void;
 }
 
+export const MIN_MEANINGFUL_DWELL_MS = 1_000;
+export const MAX_RECORDED_DWELL_MS = 30 * 60 * 1_000;
+
+export function getDwellEventProperties(
+  startedAtMs: number,
+  endedAtMs: number,
+  endReason: 'ITEM_CHANGED' | 'SCREEN_EXIT' | 'APP_BACKGROUND',
+): Readonly<Record<string, unknown>> | null {
+  const dwellMs = Math.min(
+    MAX_RECORDED_DWELL_MS,
+    Math.max(0, Math.round(endedAtMs - startedAtMs)),
+  );
+
+  if (dwellMs < MIN_MEANINGFUL_DWELL_MS) {
+    return null;
+  }
+
+  return {
+    source: 'ITEM_DETAIL',
+    dwellMs,
+    endReason,
+  };
+}
+
 export function createEventSession(
   scope: EventTrackingScope,
   sessionId: SessionId,

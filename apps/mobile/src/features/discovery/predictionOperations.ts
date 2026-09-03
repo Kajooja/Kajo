@@ -8,7 +8,7 @@ import type {
   ProfileId,
 } from '../../domain/contracts';
 
-export const PREDICTION_V0_RPC = 'rank_items_v0';
+export const PREDICTION_V1_RPC = 'rank_items_v1';
 
 export interface PredictionRpcResponse {
   data: unknown;
@@ -16,7 +16,7 @@ export interface PredictionRpcResponse {
 }
 
 export type PredictionRpc = (
-  functionName: typeof PREDICTION_V0_RPC,
+  functionName: typeof PREDICTION_V1_RPC,
   arguments_: Readonly<Record<string, unknown>>,
 ) => Promise<PredictionRpcResponse>;
 
@@ -53,7 +53,7 @@ export async function loadPredictionRanking(
   },
 ): Promise<PredictionRankingResult> {
   try {
-    const response = await rpc(PREDICTION_V0_RPC, {
+    const response = await rpc(PREDICTION_V1_RPC, {
       target_profile_id: input.profileId,
       requested_mode: input.mode,
       requested_item_type: input.itemType,
@@ -139,6 +139,7 @@ function isPredictionRow(value: unknown): value is PredictionRow {
 
 function serializeContext(context: Context): Readonly<Record<string, unknown>> {
   return {
+    ...(context.sessionId ? { sessionId: context.sessionId } : {}),
     ...(context.locale ? { locale: context.locale } : {}),
     ...(context.timezone ? { timezone: context.timezone } : {}),
     ...(context.occurredAt ? { occurredAt: context.occurredAt } : {}),

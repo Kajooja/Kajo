@@ -33,6 +33,17 @@ properties?
 - `ITEM_OPENED` — details opened.
 - `ITEM_DWELL` — meaningful dwell/visibility measurement where technically reliable.
 
+`ITEM_DWELL` MVP payload:
+
+```text
+properties.source = ITEM_DETAIL
+properties.dwellMs = integer, 1,000..1,800,000
+properties.endReason = ITEM_CHANGED | SCREEN_EXIT | APP_BACKGROUND
+properties.predictionSource = hosted | fallback
+```
+
+Durations shorter than one second are not persisted and durations are capped at 30 minutes. Dwell supports intent/UX analysis but is not a direct positive Outcome or V1 Scenario reward.
+
 ### Preference / discovery
 
 - `ITEM_LIKED` — PersonalProfile positive preference. In current discovery UI this is emitted when an Item is added to a custom List; the same action advances to the next card.
@@ -116,6 +127,45 @@ When Kajo chooses an Item through Prediction, the impression should carry `predi
 prediction -> impression -> actor action -> actual outcome
 ```
 
+Hosted Prediction V1 also persists an internal `PredictionRun` and complete `PredictionCandidate` pool before learning from the result. This distinguishes:
+
+```text
+considered candidate
+  -> selected for delivery
+     -> meaningfully impressed
+        -> opened/dwelled
+           -> preference action
+              -> consumed/delayed rating
+```
+
+Do not infer that an Item was seen merely because it was in the returned slate. Do not infer rejection from a meaningful impression alone.
+
+### Required trace dimensions
+
+- `predictionId`, `profileId`, `actorUserId` and optional `sessionId`,
+- request Context and MemoryStateSnapshot,
+- model/base-model/policy/feature/reward versions as applicable,
+- every candidate's source/final rank and score,
+- final delivery selection,
+- selection probability once stochastic exploration exists,
+- Event timestamps and eventual Outcome latency.
+
+Fallback/mock `predictionId` values may correlate mobile Events but do not claim a hosted PredictionRun. Analytics must keep `predictionSource` separate.
+
+## Evidence classes and Outcome attribution
+
+Events remain raw facts. Learning derives versioned evidence/outcomes rather than changing Event meaning.
+
+| Evidence class | Event examples | Interpretation |
+|---|---|---|
+| exposure | `ITEM_IMPRESSION` | the denominator; not preference |
+| attention | `ITEM_OPENED`, `ITEM_DWELL` | weak intent, not satisfaction |
+| preference | `ITEM_RATED`, `ITEM_NOT_INTERESTED`, List/save/Endorsement | direct decision evidence |
+| consumption | consumed/rating/reversal | actual experience |
+| correction | undo, clear, unsave, reversal | prior evidence changed or was compensated |
+
+For ScenarioMemory V1, one strongest Outcome is selected per `(predictionId, itemId)`. Rating outranks earlier consumption/list/save evidence; explicit negative/reversal outranks weaker positive intent; `ITEM_INTERACTION_UNDONE` removes its referenced Event from derived evidence. The reward formula and precedence are versioned in `PREDICTION_MODEL.md` and must not be retroactively changed without a new version.
+
 ## SharedProfile examples
 
 ### Current Shared interaction
@@ -180,6 +230,10 @@ This rule does not delete the Item from Saved, named Lists or history.
 - Event names are canonical contracts, not analytics-only labels.
 - Do not create media-specific duplicates such as `BOOK_ENDORSED` or `MOVIE_SAVED`.
 - Sensitive/contextual fields are collected only when needed and permitted.
+- Context attributes are allowlisted. Arbitrary client JSON must not silently become a learning feature.
+- Raw touch coordinates, contact data, advertising IDs, precise location and background sensors are outside the V1 Event contract.
+- Profile chat text is never copied into Event properties for recommendation learning.
+- Exposure-position bias must be evaluated from actual impressions and stored candidate ranks, not only selected Items.
 
 ## MVP persistence contract
 

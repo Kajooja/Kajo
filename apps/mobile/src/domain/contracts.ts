@@ -83,6 +83,7 @@ export interface ItemList {
 }
 
 export interface Context {
+  sessionId?: SessionId;
   locale?: string;
   timezone?: string;
   occurredAt?: string;

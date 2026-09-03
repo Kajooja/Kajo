@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   loadPredictionRanking,
   mapPredictionRows,
-  PREDICTION_V0_RPC,
+  PREDICTION_V1_RPC,
   type PredictionRpc,
 } from './predictionOperations';
 
@@ -32,7 +32,7 @@ const ROWS = [
   },
 ];
 
-describe('Prediction V0 mapping', () => {
+describe('Prediction V1 mapping', () => {
   it('maps rank order, generic Items and one shared prediction trace', () => {
     expect(mapPredictionRows(ROWS, 'profile-1', 'SURPRISE')).toEqual({
       status: 'success',
@@ -92,7 +92,7 @@ describe('Prediction V0 mapping', () => {
   });
 });
 
-describe('Prediction V0 RPC boundary', () => {
+describe('Prediction V1 RPC boundary', () => {
   it('sends the Profile, mode, generic candidate scope and bounded Context', async () => {
     const rpc: PredictionRpc = vi.fn(async () => ({ data: ROWS, error: null }));
 
@@ -102,16 +102,36 @@ describe('Prediction V0 RPC boundary', () => {
         mode: 'RISK',
         itemType: 'MOVIE',
         limit: 12,
-        context: { locale: 'fi-FI', timezone: 'Europe/Helsinki' },
+        context: {
+          sessionId: 'session-1',
+          locale: 'fi-FI',
+          timezone: 'Europe/Helsinki',
+          occurredAt: '2026-09-02T19:30:00.000Z',
+          attributes: {
+            localHour: 22,
+            dayOfWeek: 3,
+            surface: 'DISCOVERY_GRID',
+          },
+        },
       }),
     ).resolves.toMatchObject({ status: 'success' });
 
-    expect(rpc).toHaveBeenCalledWith(PREDICTION_V0_RPC, {
+    expect(rpc).toHaveBeenCalledWith(PREDICTION_V1_RPC, {
       target_profile_id: 'profile-1',
       requested_mode: 'RISK',
       requested_item_type: 'MOVIE',
       result_limit: 12,
-      request_context: { locale: 'fi-FI', timezone: 'Europe/Helsinki' },
+      request_context: {
+        sessionId: 'session-1',
+        locale: 'fi-FI',
+        timezone: 'Europe/Helsinki',
+        occurredAt: '2026-09-02T19:30:00.000Z',
+        attributes: {
+          localHour: 22,
+          dayOfWeek: 3,
+          surface: 'DISCOVERY_GRID',
+        },
+      },
     });
   });
 

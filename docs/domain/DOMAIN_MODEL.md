@@ -19,11 +19,16 @@ Profile
   +--> HumanState
   +--> Theme
   +--> Memory
+  |      |-- WorkingState
+  |      |-- ShortTermState
+  |      |-- LongTermState
+  |      `-- ScenarioMemory
   +--> ItemList
   +--> ProfileMessage ----> User (actor)
-  +--> Prediction ----> Item
+  +--> PredictionRun ----> PredictionCandidate ----> Item
          |
          +--> Context
+         +--> MemoryStateSnapshot
          +--> DiscoveryMode
 
 SharedProfile
@@ -189,11 +194,14 @@ HumanState is a learned representation used by Prediction.
 
 Conceptually it contains:
 
+- `WorkingState`: active-session ordered intent,
 - `LongTermState`: slowly changing identity/taste tendencies,
 - `ShortTermState`: recent/current tendencies,
-- optional session-level state later.
+- versioned `MemoryStateSnapshot` values captured at prediction time.
 
 It must remain capable of cross-domain learning.
+
+Current MVP V1 does not persist one mutable “truth row” for HumanState. It derives a rebuildable state snapshot from append-only Events for each hosted Prediction. Later online feature-store projections may cache the same versioned semantics.
 
 ## Prediction
 
@@ -205,11 +213,32 @@ Profile + HumanState + Context + Item + DiscoveryMode -> predicted outcomes / sc
 
 For SharedProfile, accepted-member PersonalProfile evidence may contribute to a common-fit component while the Prediction still belongs to the SharedProfile.
 
+### PredictionRun and PredictionCandidate
+
+A `PredictionRun` is the durable decision trace for one hosted request. It owns one candidate pool of `PredictionCandidate` rows.
+
+Invariants:
+
+- one run has one `predictionId`, actor, target Profile, Context, state snapshot and immutable model/policy versions,
+- every candidate has one source rank and one final rank inside that run,
+- `selectedForDelivery` means the policy returned the candidate, not that the user saw it,
+- meaningful exposure is proven separately by `ITEM_IMPRESSION`,
+- a later action/outcome may be joined only when Profile, prediction and Item identity agree,
+- trace persistence is internal and cannot be forged through direct mobile table writes.
+
 ## Scenario
 
 A Scenario is historical evidence combining state, context, candidate/pattern, prediction and observed outcome.
 
 ScenarioMemory later retrieves similar scenarios across personal/shared/population history.
+
+MVP V1 reconstructs a Scenario from `PredictionRun` + `PredictionCandidate` + correlated append-only Events. It retrieves only Scenarios belonging to the same target Profile. Future population retrieval is aggregated and privacy-gated; it never changes the ownership/provenance of the original Scenario.
+
+## EvolutionEngine
+
+`EvolutionEngine` manages immutable PredictorGenome candidates. A genome may describe features, reward, decays, retrieval, model artifact and DiscoveryMode policy. It is evaluated offline, in shadow and through guarded online experiments before explicit champion promotion.
+
+Production state never rewrites its own weights merely because a recent Event occurred. Fast adaptation happens through Working/ShortTermState; model evolution follows versioned evaluation and rollback.
 
 ## Consumed experience / memory
 

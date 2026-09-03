@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-09-02**
+Last updated: **2026-09-03**
 Current milestone: **MVP 0.1**
-Current sprint: **Sprint 012 — Profile Messaging** (`sprints/SPRINT-012.md`)
+Current sprint: **Sprint 013 — Prediction nervous system / ScenarioMemory** (`sprints/SPRINT-013.md`)
 Last accepted sprint: **Sprint 010 — Navigation & Profile lifecycle** (`sprints/SPRINT-010.md`)
 
 This is the authoritative current-state document. Sprint files preserve execution history; this file states what is true now and what comes next.
@@ -96,7 +96,7 @@ The MVP endpoint is now a genuinely shareable production application downloadabl
 
 The hosted migrations `20260901204135_profile_scoped_item_lists.sql`, `20260902074500_shared_saved_consensus_integrity.sql` and `20260902134621_shared_list_approval_flow.sql` are applied and rollback-tested. They create exactly one system List for every existing/new Profile, keep custom membership separate from Saved state, project Personal save and Shared consensus safely into system `Tallennetut`, enforce accepted-membership authorization and prevent direct interaction writes from forging/clearing Shared consensus Saved state. The mobile List home, consumed history, custom-list management and list/card/filter/sort detail are implemented. Configured Android feedback led to an accepted compact one-destination MRU picker. The final Shared correction is merged in PR #164: A's custom-List choice stays pending, B sees the green proposer/List `Hyväksy` bar, and unanimity commits the selected custom membership plus `Tallennetut`. Production verification covered A→B pending/approval, authorization, atomicity and idempotency inside a rolled-back transaction. Main CI #246 passed and produced the verified `326de6c` APK. The product owner explicitly deferred refreshed configured-Android acceptance and directed work to continue into Sprint 012; this is not recorded as device acceptance, and #102/Sprint 011 remain unaccepted until that check is later completed.
 
-## Sprint 012 — current
+## Sprint 012 — delivered, device acceptance deferred
 
 Issue #138 adds one deliberately narrow message thread per Profile:
 
@@ -106,23 +106,39 @@ Issue #138 adds one deliberately narrow message thread per Profile:
 - a short optional message may reference the List and Item involved in a successful List addition, while message failure never rolls back the membership.
 - chat text stays separate from behavioural Events and Prediction evidence.
 
-The complete #138 slice is now implemented locally: ProfileMessage/read-state schema and narrow RPCs, typed mobile operations/provider, combined Inbox activity/unread state, Profile thread UI, retryable failed drafts, and an optional collapsed List message whose failure cannot roll back the successful List action. The migration passed a hosted-schema rollback smoke without leaving tables or migration history behind. `npm run check` passes with lint, TypeScript, 144 tests and both platform bundle exports. The local commit remains to be cut; permanent hosted application, push/PR/merge and configured-device acceptance stay approval-gated.
+The complete #138 slice is merged on `main` in commit `07f62dd`: ProfileMessage/read-state schema and narrow RPCs, typed mobile operations/provider, combined Inbox activity/unread state, Profile thread UI, retryable failed drafts, and an optional collapsed List message whose failure cannot roll back the successful List action. Earlier hosted-schema rollback smoke left no tables or migration history behind. Permanent hosted application and configured-device acceptance remain explicit deferred checks; their absence is not recorded as acceptance.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
+## Sprint 013 — current
+
+Issue #156 defines and begins the versioned Prediction nervous system. The design gate is now resolved in the feature branch by a canonical architecture covering WorkingState, ShortTermState, LongTermState, ScenarioMemory, privacy-gated PopulationMemory and the controlled SleepLayer/EvolutionEngine.
+
+The first implementation slice adds:
+
+- an immutable `PredictionRun` + `PredictionCandidate` trace for every candidate set, rank, score component, model version and delivered recommendation,
+- Prediction V1 as an authorization-preserving wrapper around the proven V0 candidate pool,
+- reconstructable session/context snapshots and Item dwell evidence,
+- deterministic short/long memory construction and inspectable ScenarioMemory retrieval,
+- a precise champion–challenger SleepLayer specification with prospective shadow predictions, outcome maturity, global/cohort/Profile evaluation, shrinkage and rollback rules,
+- manual promotion only for MVP; no challenger can silently mutate or replace production behavior.
+
+The schema/migration and mobile V1 wiring are implemented on the #156 feature branch. Repository lint, TypeScript, all 145 tests and both platform export smokes pass. They have not been applied to hosted Supabase and have not received configured-device acceptance. Sprint 013B and 013C retain those gates and the first executable genome/shadow/promotion persistence respectively.
+
 ## Next MVP sequence
 
-1. **#138 / Sprint 012** — Profile messaging/chat on the now-hosted stable List identity model.
-2. **Deferred acceptance** — run the refreshed #102 configured-Android flow without treating its deferral as prior acceptance.
-3. **Sprint 013** — ScenarioMemory.
-4. **Sprint 014** — MVP hardening/release readiness.
+1. **#156 / Sprint 013A** — review and merge the Prediction V1 evidence spine and canonical design.
+2. **Sprint 013B** — apply/rollback-test the migration in the hosted project and run configured-device trace acceptance.
+3. **Sprint 013C** — implement immutable PredictorGenome, prospective ShadowPrediction, EvaluationWindow and manual PromotionDecision persistence.
+4. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flows without treating their deferral as prior acceptance.
+5. **Sprint 014** — MVP hardening/release readiness.
 
 The List model is hosted and stable enough for #138. Its final configured-device acceptance remains an explicit deferred check. Do not let Room visual polish block these MVP behavior slices.
 
 ## Other open work
 
 - #160 — production Supabase security hardening: privileged function execution grants, leaked-password protection, explicit Data API grants and store-install authorization verification.
-- #156 — Prediction Core / EvoBot architecture design gate. Common-fit coefficients, final LongTerm/ShortTermState, ScenarioMemory and EvoBot remain blocked until the user-approved MVP core design is documented.
+- #156 — Prediction Core / SleepLayer implementation. The architecture design gate is resolved in Sprint 013; hosted verification, executable challenger evaluation and promotion tooling remain open.
 - #127 — production-ready auth email delivery; production SMTP/domain and confirmation/recovery tests remain required before external beta.
 - #78 — optional splash/in-app logo polish.
 - #73 — Google/Apple sign-in future work.
@@ -137,11 +153,13 @@ The List model is hosted and stable enough for #138. Its final configured-device
 - `/docs/project/sprints/SPRINT-010.md`
 - `/docs/project/sprints/SPRINT-011.md`
 - `/docs/project/sprints/SPRINT-012.md`
+- `/docs/project/sprints/SPRINT-013.md`
 - `/docs/domain/GLOSSARY.md`
 - `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
 - `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/architecture/CODEMAP.md`
+- `/docs/architecture/decisions/0005-versioned-prediction-nervous-system.md`
 - `/apps/mobile/src/features/discovery/DiscoveryModeShell.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/profiles/ActiveProfileContext.tsx`
@@ -151,9 +169,10 @@ The List model is hosted and stable enough for #138. Its final configured-device
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
 - `/supabase/migrations/20260901204135_profile_scoped_item_lists.sql`
 - `/supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql`
+- `/supabase/migrations/20260902223000_prediction_nervous_system_v1.sql`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: **#138 Profile messaging foundation and Inbox/thread delivery**. Keep #102 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: **#156 Sprint 013A Prediction V1 evidence spine and design review**, followed by hosted migration/device trace verification. Keep #102 and #138 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

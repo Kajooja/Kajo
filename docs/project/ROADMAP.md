@@ -65,7 +65,7 @@ Accepted on configured Android 2026-09-01:
 
 Further visual Room work must preserve this accepted shell and the simple illustrated Room contract; it must not reopen Sprint 010.
 
-### Sprint 011 — Shared Curation & Named Lists — ACTIVE
+### Sprint 011 — Shared Curation & Named Lists — DELIVERED, DEVICE ACCEPTANCE DEFERRED
 
 Sprint 011 deliberately has **two ordered slices**.
 
@@ -105,7 +105,7 @@ No majority voting or chat is introduced here. The later #102 List slice attache
 - Shared list entries show real added-by + added-at provenance; Personal hides redundant actor identity,
 - existing saved/consumed/rating state remains canonical and is not duplicated into List rows.
 
-### Sprint 012 — Profile Messaging
+### Sprint 012 — Profile Messaging — DELIVERED, DEVICE ACCEPTANCE DEFERRED
 
 Add narrow messaging only after Lists are stable so messages can reference established Profile/List/Item identities.
 
@@ -118,9 +118,19 @@ Add narrow messaging only after Lists are stable so messages can reference estab
 
 Primary issue: #138.
 
-### Sprint 013 — Scenario Memory
+### Sprint 013 — Prediction Nervous System & ScenarioMemory — ACTIVE
 
-Vector/scenario representation and similarity retrieval over historical situations. Starts only after navigation, Shared curation, Lists and narrow Profile messaging are stable.
+Issue #156 defines the full memory, prediction and controlled evolution architecture and delivers the first evidence-backed MVP slice:
+
+- WorkingState, ShortTermState, LongTermState, ScenarioMemory and later PopulationMemory,
+- versioned full PredictionRun/candidate trace including alternatives, Context and delivery/exposure separation,
+- same-Profile ScenarioMemory V1 on the existing inspectable scorer,
+- meaningful dwell evidence without treating dwell as satisfaction,
+- SleepLayer design for prospective ShadowPredictions and leakage-safe as-of replay,
+- global/cohort/Profile Champions selected through immutable PredictorGenomes and versioned PolicyAssignments,
+- automatic production promotion disabled through MVP 0.1; shadow winners require guarded canary/A/B evidence and rollback.
+
+Sprint 013 is delivered in ordered evidence gates. Full traceability lands before SleepLayer tables/workers; transparent scalar-genome evaluation lands before learned sequence/LLM Challengers; pgvector lands only with real embeddings and a measured need.
 
 ### Sprint 014 — MVP Hardening & Store Release
 
@@ -134,9 +144,9 @@ Primary production-security issue: #160. Production email delivery remains coord
 
 After real prediction/outcome data exists:
 
-- population scenario learning at scale,
-- predictor evaluation framework,
-- evolutionary predictor/genome engine,
+- SleepLayer background worker, shadow evaluation and controlled genome promotion,
+- population scenario learning at scale behind privacy/minimum-cohort gates,
+- learned sequence, semantic-ID and LLM-backed Challenger families,
 - additional domains such as music, events and travel,
 - richer personal/shared memories including images, people, location and context,
 - richer Item/List comments and media attachments built on the MVP message reference model,

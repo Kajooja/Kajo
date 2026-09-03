@@ -12,7 +12,12 @@ import {
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
-import type { EventId, ProfileId, UserId } from '../../domain/contracts';
+import type {
+  EventId,
+  ProfileId,
+  SessionId,
+  UserId,
+} from '../../domain/contracts';
 import {
   createSupabaseEventPersistenceApi,
   type EventPersistenceApi,
@@ -35,6 +40,7 @@ export type EventTrackingStatus =
 
 interface EventTrackingState {
   status: EventTrackingStatus;
+  sessionId: SessionId | null;
   persistenceError: string | null;
   createEventId: () => EventId;
   recordEvent: (input: EventRecordInput, eventId?: EventId) => EventId | null;
@@ -164,6 +170,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   const value = useMemo<EventTrackingState>(
     () => ({
       status,
+      sessionId: scopedCoordinator?.session.sessionId ?? null,
       persistenceError,
       createEventId,
       recordEvent,
@@ -174,6 +181,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       persistenceError,
       recordEvent,
       retryPersistence,
+      scopedCoordinator?.session.sessionId,
       status,
     ],
   );
