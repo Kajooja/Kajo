@@ -119,13 +119,15 @@ Product-owner feedback after that merge was handled in PR #167 and merged at mai
 
 Main CI #252 passed with 147 tests and produced the standalone Android artifact. Configured-device review then exposed a visual acceptance defect: the Room retained card-like outer gutters and transparent secondary screens resolved against the navigator's white canvas instead of a blurred Room.
 
-A focused local correction on `fix/fullscreen-room-backdrop` now makes one edge-to-edge Room the persistent authenticated backdrop, removes the navigator's opaque canvas and places a blurred/dimmed version of that Room beneath secondary routes. It passes `npm run check`: lint, TypeScript, 148 tests and both platform bundle exports. No configured-device acceptance has been claimed for the correction.
+The correction merged in PR #168 at main commit `56fae50`: one edge-to-edge Room is now the persistent authenticated backdrop, the navigator canvas is transparent and secondary routes blur/dim the same Room. Main CI #254 passed with 148 tests and produced the standalone Android artifact. Configured-device review on 2026-09-03 accepted this full-screen persistent/blurred backdrop: the product owner reported that it otherwise works perfectly.
+
+A focused follow-up on `fix/immediate-navigation-room-art` removes Stack transition animation so returning Home and opening an Item never leave old/new screens briefly overlapping. It also delivers the documented Room art vocabulary more clearly through the same code-native scene: a rug/bench, low TV console, layered window sky for dawn/evening/night and restrained light/depth. `npm run check` passes with lint, TypeScript, 149 tests and both platform bundle exports. Device acceptance has not yet been claimed for this follow-up.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **Sprint 012 visual acceptance correction** — verify/merge the full-screen persistent Room backdrop after the PR #167 device finding.
+1. **Sprint 012 navigation/Room follow-up** — cut and review the immediate route transitions plus documented Room-art refinement.
 2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
 3. **Sprint 013** — ScenarioMemory.
 4. **Sprint 014** — MVP hardening/release readiness.
@@ -170,4 +172,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: finish the full-screen persistent/blurred Room backdrop correction, then request one release approval and one refreshed configured-Android review covering #102 Lists and #138 messaging. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: cut the immediate-transition/Room-art follow-up, then request one refreshed configured-Android review covering the changed navigation/Room presentation plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

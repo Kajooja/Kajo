@@ -14,6 +14,7 @@ import { ItemListsProvider } from '@/features/lists/ItemListsContext';
 import { ProfileMessagesProvider } from '@/features/messages/ProfileMessagesContext';
 import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
+import { ROUTE_TRANSITION_ANIMATION } from '@/features/room/roomPresentation';
 
 const STARTUP_SPLASH_DURATION_MS = 2000;
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
   const navigator = (
     <Stack
       screenOptions={{
+        animation: ROUTE_TRANSITION_ANIMATION,
         headerShown: false,
         contentStyle: { backgroundColor: 'transparent' },
       }}

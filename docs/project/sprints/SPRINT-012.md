@@ -74,7 +74,9 @@ Sprint 011 Lists are merged, hosted and automatically verified. Their refreshed 
 - Shared A→B send/read, contextual Profile/List/Item reference, stable-ID retry, per-User unread/read cursor and Personal/Shared outsider denial passed post-apply inside a rolled-back smoke transaction.
 - The pre-acceptance polish merged in PR #167 at main commit `4377987`; main CI #252 passed with 147 tests and produced the standalone Android artifact.
 - Configured-device review found that the Room still had outer gutters and secondary routes exposed a white navigator canvas instead of the intended Room atmosphere. This build is not visually accepted.
-- The focused `fix/fullscreen-room-backdrop` correction makes the Room edge-to-edge, keeps it as one persistent backdrop and blurs/dims it beneath secondary routes. `npm run check` passes with lint, TypeScript, 148 tests and both platform bundle exports.
+- PR #168 merged the edge-to-edge persistent/blurred Room correction at main commit `56fae50`; main CI #254 passed with 148 tests and produced the standalone Android artifact.
+- Configured-device review on 2026-09-03 accepted the corrected full-screen Room/backdrop behavior. The remaining navigation finding is the default Stack animation: returning Home or opening an Item briefly leaves both routes visible.
+- The focused `fix/immediate-navigation-room-art` follow-up disables route-transition animation and refines the same code-native Room with the documented rug/bench, low TV console, window sky and restrained light/depth layers. `npm run check` passes with lint, TypeScript, 149 tests and both platform bundle exports. This follow-up has not yet received configured-device acceptance.
 
 ## Pre-acceptance UI polish
 
@@ -91,4 +93,4 @@ The most-used drawer order is deliberately separate from the destination picker 
 
 ## Handoff
 
-Current target: validate and cut the full-screen Room backdrop correction, then request one explicit push/PR/merge authorization. Do not claim configured-device acceptance until the refreshed build is actually reviewed.
+Current target: cut the immediate-transition/Room-art follow-up, then request one explicit push/PR/merge authorization. The full-screen persistent backdrop is device-accepted; do not extend that claim to this new follow-up or the deferred complete Lists/messaging acceptance flows.
