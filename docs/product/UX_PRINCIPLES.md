@@ -36,7 +36,7 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 
 ## Approved MVP Room visual direction
 
-The canonical visual reference is a **warm, simple cabin/living-room illustration**, not a modern smart-home interface.
+The canonical visual reference is a **warm, minimalist straight-on 2D cabin/living-room illustration**, not a modern smart-home interface or a video-game room. It uses softly rounded shapes, low contrast, restrained paper-like texture and a small muted palette. Window, fireplace, TV console and the fully visible bookshelf form one calm front elevation; a narrow floor strip, rug and bench add just enough depth without perspective. It remains one fixed illustrated mobile surface rather than a navigable 3D space.
 
 - **Fireplace + rug/bench** provide the main feeling of warmth and identity.
 - **Bookshelf** is the clear BOOK entrance.
@@ -44,7 +44,9 @@ The canonical visual reference is a **warm, simple cabin/living-room illustratio
 - **Window** carries outside light, sky and time-of-day atmosphere.
 - **Curtain** remains the single global DiscoveryMode control; it is functional, not decorative duplication.
 - The Room should have enough perspective/overlap to feel like a place, but every navigation object must remain immediately readable and easy to tap.
-- Prefer warm materials, soft edges, restrained shadows and illustration-like depth over glossy surfaces, neon, glassmorphism or sci-fi chrome.
+- Furnishings should read as calm, simplified cabin symbols rather than rectangular UI placeholders. Keep the composition flat, balanced and safely inside tall-phone crop boundaries.
+- Window and fireplace are two independent runtime Kajo sources. The base Room asset must not bake either source's bloom, beam or cast light into the scene; their phase-aware light layers are positioned and animated separately in the mobile UI. Window Kajo breathes slowly, fireplace Kajo flickers gently and DiscoveryMode changes cross-fade the full atmosphere. Reduced-motion preference disables continuous motion and settles immediately.
+- Prefer broad matte shapes, soft geometry, generous calm areas and restrained shadows over photorealism, pixel/game art, painterly concept art, glossy surfaces, neon, glassmorphism or sci-fi chrome.
 - Do not add decorative objects merely to fill space. New Room objects require a real content-domain/navigation purpose.
 - Do not introduce heavy animation, parallax spectacle, complex moving scenery, avatars or game mechanics for MVP.
 - No standalone `Huone` heading or helper instructions are needed inside the scene.
