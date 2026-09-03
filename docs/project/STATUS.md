@@ -109,7 +109,7 @@ Issue #138 adds one deliberately narrow message thread per Profile:
 
 The complete #138 foundation is merged in PR #165 at main commit `07f62dd`. The hosted `20260902185821_profile_messaging_foundation` migration is permanently applied and passed post-apply authorization, idempotency, contextual-reference and read-cursor verification inside a rolled-back smoke transaction. Main CI #248 passed and produced the standalone Android artifact. Configured-device acceptance remains deliberately deferred and must not be inferred from CI.
 
-Product-owner feedback after that merge is being handled as one local pre-acceptance polish slice on `fix/discovery-sidebar-polish`:
+Product-owner feedback after that merge was handled in PR #167 and merged at main commit `4377987`:
 
 - the global Kajo/DiscoveryMode atmosphere continues behind approximately 70%-opaque chrome and content surfaces,
 - discovery removes duplicate `Huone`/`Discover` chrome and uses a smaller domain title,
@@ -117,13 +117,15 @@ Product-owner feedback after that merge is being handled as one local pre-accept
 - the drawer removes its duplicated identity block and shows fixed `Tallennetut`, `Luetut` and `Katsotut` routes plus at most three actor-local most-used custom Lists,
 - most-used ranking is frequency-first with latest use as the tie-break; the destination picker remains ordered strictly by latest use.
 
-The local polish passes `npm run check`: lint, TypeScript, 147 tests and both platform bundle exports. No configured-device review has been claimed.
+Main CI #252 passed with 147 tests and produced the standalone Android artifact. Configured-device review then exposed a visual acceptance defect: the Room retained card-like outer gutters and transparent secondary screens resolved against the navigator's white canvas instead of a blurred Room.
+
+A focused local correction on `fix/fullscreen-room-backdrop` now makes one edge-to-edge Room the persistent authenticated backdrop, removes the navigator's opaque canvas and places a blurred/dimmed version of that Room beneath secondary routes. It passes `npm run check`: lint, TypeScript, 148 tests and both platform bundle exports. No configured-device acceptance has been claimed for the correction.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **Sprint 012 pre-acceptance polish** — review/merge the local discovery, atmospheric surface and drawer-List corrections.
+1. **Sprint 012 visual acceptance correction** — verify/merge the full-screen persistent Room backdrop after the PR #167 device finding.
 2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
 3. **Sprint 013** — ScenarioMemory.
 4. **Sprint 014** — MVP hardening/release readiness.
@@ -168,4 +170,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: finish the local pre-acceptance UI polish, then request one release approval and one refreshed configured-Android review covering #102 Lists and #138 messaging. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: finish the full-screen persistent/blurred Room backdrop correction, then request one release approval and one refreshed configured-Android review covering #102 Lists and #138 messaging. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

@@ -1,5 +1,6 @@
-import { useState, type PropsWithChildren } from 'react';
-import { useRouter } from 'expo-router';
+import { useRef, useState, type PropsWithChildren } from 'react';
+import { usePathname, useRouter } from 'expo-router';
+import { BlurTargetView, BlurView } from 'expo-blur';
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
-import { getRoomTheme } from '../../theme/roomTheme';
+import { getRoomTheme, withColorAlpha } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
@@ -24,7 +25,12 @@ import { loadMostUsedListIds, rememberRecentList } from '../lists/listRecentUse'
 import { selectDrawerQuickLists } from '../lists/listPresentation';
 import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { CurtainControl } from '../room/CurtainControl';
+import {
+  RoomBackdrop,
+  RoomInteractionLayer,
+} from '../room/RoomScreen';
 import { getCurtainPositionForMode } from '../room/curtainState';
+import { isRoomPathname } from '../room/roomPresentation';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 
 const MODE_LABELS = {
@@ -38,6 +44,7 @@ type ShellOverlay = 'navigation' | 'inbox' | null;
 
 export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const router = useRouter();
+  const pathname = usePathname();
   const auth = useAuthSession();
   const { mode, setMode } = useDiscoveryMode();
   const eventTracking = useEventTracking();
@@ -60,6 +67,8 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
+  const roomBlurTarget = useRef<View>(null);
+  const roomIsHome = isRoomPathname(pathname);
   const identityName =
     activeProfile?.type === 'SHARED'
       ? activeProfile.name
@@ -229,7 +238,43 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
       </SafeAreaView>
 
       <View style={styles.content}>
-        {children}
+        <BlurTargetView
+          ref={roomBlurTarget}
+          pointerEvents="none"
+          style={styles.roomBackdrop}
+        >
+          <RoomBackdrop />
+        </BlurTargetView>
+
+        {!roomIsHome ? (
+          <>
+            <BlurView
+              blurTarget={roomBlurTarget}
+              blurMethod="dimezisBlurViewSdk31Plus"
+              blurReductionFactor={2}
+              intensity={72}
+              tint="dark"
+              pointerEvents="none"
+              style={styles.roomBlur}
+            />
+            <View
+              pointerEvents="none"
+              style={[
+                styles.roomVeil,
+                {
+                  backgroundColor: withColorAlpha(
+                    theme.base.appBackground,
+                    0.4,
+                  ),
+                },
+              ]}
+            />
+          </>
+        ) : null}
+
+        <View style={styles.navigatorLayer}>{children}</View>
+
+        {roomIsHome ? <RoomInteractionLayer /> : null}
 
         {activeProfile?.type === 'SHARED' ? (
           <View
@@ -932,6 +977,20 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     position: 'relative',
+    overflow: 'hidden',
+  },
+  roomBackdrop: {
+    ...StyleSheet.absoluteFill,
+  },
+  roomBlur: {
+    ...StyleSheet.absoluteFill,
+  },
+  roomVeil: {
+    ...StyleSheet.absoluteFill,
+  },
+  navigatorLayer: {
+    flex: 1,
+    backgroundColor: 'transparent',
   },
   profileTint: {
     ...StyleSheet.absoluteFill,

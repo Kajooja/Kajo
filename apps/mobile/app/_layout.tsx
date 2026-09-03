@@ -34,7 +34,14 @@ export default function RootLayout() {
     return <StartupSplash />;
   }
 
-  const navigator = <Stack screenOptions={{ headerShown: false }} />;
+  const navigator = (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: 'transparent' },
+      }}
+    />
+  );
   const isAuthCallbackRoute = segments[0] === 'auth';
 
   return (

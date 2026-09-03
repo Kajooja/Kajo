@@ -72,21 +72,23 @@ Sprint 011 Lists are merged, hosted and automatically verified. Their refreshed 
 - PR #165 is merged at main commit `07f62dd`; main CI #248 completed successfully and produced the standalone Android artifact.
 - Hosted migration `20260902185821_profile_messaging_foundation` is permanently applied.
 - Shared A→B send/read, contextual Profile/List/Item reference, stable-ID retry, per-User unread/read cursor and Personal/Shared outsider denial passed post-apply inside a rolled-back smoke transaction.
-- The local pre-acceptance polish on `fix/discovery-sidebar-polish` passes `npm run check`: lint, TypeScript, 147 tests, and both iOS/Android bundle exports.
-- Configured-device acceptance remains unrun and must not be inferred from automated checks.
+- The pre-acceptance polish merged in PR #167 at main commit `4377987`; main CI #252 passed with 147 tests and produced the standalone Android artifact.
+- Configured-device review found that the Room still had outer gutters and secondary routes exposed a white navigator canvas instead of the intended Room atmosphere. This build is not visually accepted.
+- The focused `fix/fullscreen-room-backdrop` correction makes the Room edge-to-edge, keeps it as one persistent backdrop and blurs/dims it beneath secondary routes. `npm run check` passes with lint, TypeScript, 148 tests and both platform bundle exports.
 
 ## Pre-acceptance UI polish
 
-The product owner requested that the next device build also include:
+The product owner requested that the next device build include:
 
 - approximately 70%-opaque surfaces so the active Profile and DiscoveryMode atmosphere remains visible across screens,
 - no duplicate `Huone`/`Discover` row above discovery content and a smaller BOOK/MOVIE title,
 - a lightweight 0–10 ribbon with live numeric preview, commit on tap/release and a 500 ms committed-value pause before card advance,
 - removal of the repeated drawer identity block,
 - fixed Saved/read/watched List shortcuts and at most three actor-local most-used custom List shortcuts in the drawer.
+- no white gutters or page canvas: one full-screen Room remains sharp on Home and blurred/dimmed below every secondary authenticated route.
 
 The most-used drawer order is deliberately separate from the destination picker contract: drawer ranking is use count first and latest use second, while the compact picker remains latest-use-first.
 
 ## Handoff
 
-Current target: retain the verified local polish commit after it is cut and request one explicit push/PR/merge authorization. Do not claim configured-device acceptance until the refreshed build is actually reviewed.
+Current target: validate and cut the full-screen Room backdrop correction, then request one explicit push/PR/merge authorization. Do not claim configured-device acceptance until the refreshed build is actually reviewed.
