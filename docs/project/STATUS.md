@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-02**
+Last updated: **2026-09-03**
 Current milestone: **MVP 0.1**
 Current sprint: **Sprint 012 — Profile Messaging** (`sprints/SPRINT-012.md`)
 Last accepted sprint: **Sprint 010 — Navigation & Profile lifecycle** (`sprints/SPRINT-010.md`)
@@ -23,6 +23,7 @@ Kajo is a phone-runnable Expo/React Native app with:
 - PersonalProfile plus consent-based 2-N SharedProfiles,
 - accepted Shared Endorsement/consensus delivery,
 - hosted Profile-scoped system/custom Lists with mobile browsing, compact destination flow and unanimous Shared approval; refreshed configured-device acceptance is intentionally deferred.
+- hosted Profile-scoped messaging with combined invitation/message Inbox, unread state and optional List-context messages; configured-device acceptance is intentionally deferred.
 
 ## Sprint 010 — accepted
 
@@ -106,14 +107,24 @@ Issue #138 adds one deliberately narrow message thread per Profile:
 - a short optional message may reference the List and Item involved in a successful List addition, while message failure never rolls back the membership.
 - chat text stays separate from behavioural Events and Prediction evidence.
 
-The complete #138 slice is now implemented locally: ProfileMessage/read-state schema and narrow RPCs, typed mobile operations/provider, combined Inbox activity/unread state, Profile thread UI, retryable failed drafts, and an optional collapsed List message whose failure cannot roll back the successful List action. The migration passed a hosted-schema rollback smoke without leaving tables or migration history behind. `npm run check` passes with lint, TypeScript, 144 tests and both platform bundle exports. The local commit remains to be cut; permanent hosted application, push/PR/merge and configured-device acceptance stay approval-gated.
+The complete #138 foundation is merged in PR #165 at main commit `07f62dd`. The hosted `20260902185821_profile_messaging_foundation` migration is permanently applied and passed post-apply authorization, idempotency, contextual-reference and read-cursor verification inside a rolled-back smoke transaction. Main CI #248 passed and produced the standalone Android artifact. Configured-device acceptance remains deliberately deferred and must not be inferred from CI.
+
+Product-owner feedback after that merge is being handled as one local pre-acceptance polish slice on `fix/discovery-sidebar-polish`:
+
+- the global Kajo/DiscoveryMode atmosphere continues behind approximately 70%-opaque chrome and content surfaces,
+- discovery removes duplicate `Huone`/`Discover` chrome and uses a smaller domain title,
+- the 0–10 ribbon previews a small live value, commits only on tap/release and holds the committed number for 500 ms before advancing,
+- the drawer removes its duplicated identity block and shows fixed `Tallennetut`, `Luetut` and `Katsotut` routes plus at most three actor-local most-used custom Lists,
+- most-used ranking is frequency-first with latest use as the tie-break; the destination picker remains ordered strictly by latest use.
+
+The local polish passes `npm run check`: lint, TypeScript, 147 tests and both platform bundle exports. No configured-device review has been claimed.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **#138 / Sprint 012** — Profile messaging/chat on the now-hosted stable List identity model.
-2. **Deferred acceptance** — run the refreshed #102 configured-Android flow without treating its deferral as prior acceptance.
+1. **Sprint 012 pre-acceptance polish** — review/merge the local discovery, atmospheric surface and drawer-List corrections.
+2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
 3. **Sprint 013** — ScenarioMemory.
 4. **Sprint 014** — MVP hardening/release readiness.
 
@@ -151,9 +162,10 @@ The List model is hosted and stable enough for #138. Its final configured-device
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
 - `/supabase/migrations/20260901204135_profile_scoped_item_lists.sql`
 - `/supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql`
+- `/supabase/migrations/20260902182643_profile_messaging_foundation.sql`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: **#138 Profile messaging foundation and Inbox/thread delivery**. Keep #102 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: finish the local pre-acceptance UI polish, then request one release approval and one refreshed configured-Android review covering #102 Lists and #138 messaging. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.

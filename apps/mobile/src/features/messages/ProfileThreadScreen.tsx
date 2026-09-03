@@ -260,7 +260,7 @@ function formatMessageTime(value: string): string {
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: theme.base.sceneBackground },
+    safeArea: { flex: 1, backgroundColor: 'transparent' },
     container: { flex: 1 },
     centered: { flex: 1 },
     centeredPanel: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 },
@@ -288,7 +288,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 15,
       borderWidth: 1,
       borderColor: theme.base.border,
-      backgroundColor: theme.base.structure,
+      backgroundColor: theme.surface.raised,
       gap: 4,
     },
     ownBubble: { alignSelf: 'flex-end', backgroundColor: theme.ambient.curtain },
@@ -325,7 +325,7 @@ function createStyles(theme: RoomTheme) {
       borderWidth: 1,
       borderColor: theme.base.border,
       color: theme.base.textPrimary,
-      backgroundColor: theme.base.structure,
+      backgroundColor: theme.surface.raised,
     },
     sendButton: {
       minWidth: 72,

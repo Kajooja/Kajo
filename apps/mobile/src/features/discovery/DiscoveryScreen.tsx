@@ -174,19 +174,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       />
 
       <View style={styles.screen}>
-        <View style={styles.headerRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Back to Room"
-            onPress={() => router.back()}
-            hitSlop={10}
-            style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.backText}>← Huone</Text>
-          </Pressable>
-          <Text style={styles.kicker}>DISCOVERY</Text>
-        </View>
-
         <Text style={styles.title}>{title}</Text>
 
         <View style={styles.collectionRow} accessibilityLabel="Discovery collection">
@@ -429,7 +416,7 @@ function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: theme.base.appBackground,
+      backgroundColor: 'transparent',
     },
     ambientBackdrop: {
       ...StyleSheet.absoluteFill,
@@ -437,41 +424,19 @@ function createStyles(theme: RoomTheme) {
     screen: {
       flex: 1,
       paddingHorizontal: 18,
-    },
-    headerRow: {
-      minHeight: 40,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginTop: 8,
-    },
-    backButton: {
-      minHeight: 40,
-      justifyContent: 'center',
-      paddingRight: 12,
-    },
-    backText: {
-      color: theme.base.textMuted,
-      fontSize: 14,
-      fontWeight: '600',
-    },
-    kicker: {
-      color: theme.base.textMuted,
-      fontSize: 10,
-      fontWeight: '700',
-      letterSpacing: 1.8,
+      paddingTop: 7,
     },
     title: {
       color: theme.base.textPrimary,
-      fontSize: 34,
-      fontWeight: '600',
-      marginTop: 8,
-      marginBottom: 14,
+      fontSize: 21,
+      lineHeight: 25,
+      fontWeight: '700',
+      marginBottom: 10,
     },
     collectionRow: {
       flexDirection: 'row',
       gap: 8,
-      marginBottom: 18,
+      marginBottom: 12,
     },
     predictionNotice: {
       flexDirection: 'row',

@@ -20,6 +20,7 @@ import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
 import { ITEM_LIST_LABELS } from './itemListLabels';
+import { rememberRecentList } from './listRecentUse';
 
 export function ListsScreen() {
   const { mode } = useDiscoveryMode();
@@ -56,6 +57,10 @@ export function ListsScreen() {
   }
 
   function openList(listId: string) {
+    const list = itemLists.lists.find((candidate) => candidate.id === listId);
+    if (list?.kind === 'CUSTOM') {
+      rememberRecentList(list.profileId, list.id);
+    }
     router.push({ pathname: '/lists/[listId]', params: { listId } });
   }
 
@@ -185,7 +190,7 @@ function ListRow({ label, count, symbol, styles, onPress }: ListRowProps) {
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: theme.base.appBackground },
+    safeArea: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: 20, paddingBottom: 42, gap: 24 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
@@ -204,7 +209,7 @@ function createStyles(theme: RoomTheme) {
       borderRadius: 15,
       borderWidth: 1,
       borderColor: theme.base.border,
-      backgroundColor: theme.base.sceneBackground,
+      backgroundColor: theme.surface.panel,
     },
     symbol: {
       width: 38,
@@ -212,7 +217,7 @@ function createStyles(theme: RoomTheme) {
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: 11,
-      backgroundColor: theme.base.structure,
+      backgroundColor: theme.surface.raised,
     },
     symbolText: { color: theme.ambient.curtainHighlight, fontSize: 16, fontWeight: '900' },
     rowText: { flex: 1, gap: 2 },
@@ -229,7 +234,7 @@ function createStyles(theme: RoomTheme) {
       borderWidth: 1,
       borderColor: theme.base.border,
       color: theme.base.textPrimary,
-      backgroundColor: theme.base.sceneBackground,
+      backgroundColor: theme.surface.panel,
     },
     createButton: {
       minWidth: 72,

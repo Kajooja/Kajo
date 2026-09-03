@@ -6,6 +6,7 @@ export type ItemListSort = 'NEWEST' | 'OLDEST';
 export type ItemListView = 'LIST' | 'GRID';
 
 export const COMPACT_LIST_DESTINATION_LIMIT = 5;
+export const DRAWER_MOST_USED_LIST_LIMIT = 3;
 
 export function orderListDestinationsByRecentUse(
   lists: readonly ItemList[],
@@ -40,6 +41,16 @@ export function selectVisibleListDestinations(
   expanded: boolean,
 ): readonly ItemList[] {
   return expanded ? lists : lists.slice(0, COMPACT_LIST_DESTINATION_LIMIT);
+}
+
+export function selectDrawerQuickLists(
+  lists: readonly ItemList[],
+  mostUsedListIds: readonly ItemListId[],
+): readonly ItemList[] {
+  return orderListDestinationsByRecentUse(
+    lists.filter((list) => list.kind === 'CUSTOM'),
+    mostUsedListIds,
+  ).slice(0, DRAWER_MOST_USED_LIST_LIMIT);
 }
 
 export function selectPresentedListEntries(

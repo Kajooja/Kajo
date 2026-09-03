@@ -19,6 +19,9 @@ import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
+import { useItemLists } from '../lists/ItemListsContext';
+import { loadMostUsedListIds, rememberRecentList } from '../lists/listRecentUse';
+import { selectDrawerQuickLists } from '../lists/listPresentation';
 import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { CurtainControl } from '../room/CurtainControl';
 import { getCurtainPositionForMode } from '../room/curtainState';
@@ -39,6 +42,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const { mode, setMode } = useDiscoveryMode();
   const eventTracking = useEventTracking();
   const profiles = useActiveProfile();
+  const itemLists = useItemLists();
   const messages = useProfileMessages();
   const { activeProfile } = profiles;
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile);
@@ -50,6 +54,9 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     string | null
   >(null);
   const [signingOut, setSigningOut] = useState(false);
+  const [drawerMostUsedListIds, setDrawerMostUsedListIds] = useState<
+    readonly string[]
+  >([]);
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
@@ -57,7 +64,13 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     activeProfile?.type === 'SHARED'
       ? activeProfile.name
       : profiles.personalProfile?.name ?? 'OMA KAJO';
-  const identityType = activeProfile?.type === 'SHARED' ? 'RYHMÄ' : 'OMA PROFIILI';
+  const drawerQuickLists = selectDrawerQuickLists(
+    itemLists.lists,
+    drawerMostUsedListIds,
+  );
+  const systemSavedList = itemLists.lists.find(
+    (list) => list.kind === 'SYSTEM_SAVED',
+  );
   const drawerSharedProfiles = profiles.selectableProfiles
     .filter((profile) => profile.type === 'SHARED')
     .slice(0, MAX_DRAWER_GROUPS);
@@ -86,6 +99,11 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
 
   function toggleOverlay(nextOverlay: Exclude<ShellOverlay, null>) {
     setInvitationActionError(null);
+    if (nextOverlay === 'navigation' && overlay !== 'navigation') {
+      setDrawerMostUsedListIds(
+        activeProfile ? loadMostUsedListIds(activeProfile.id) : [],
+      );
+    }
     if (nextOverlay === 'inbox' && overlay !== 'inbox') {
       profiles.retryInvitations();
       messages.refresh();
@@ -113,6 +131,20 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   function openLists() {
     setOverlay(null);
     router.push('/lists');
+  }
+
+  function openList(listId: string) {
+    const list = itemLists.lists.find((candidate) => candidate.id === listId);
+    if (list?.kind === 'CUSTOM') {
+      rememberRecentList(list.profileId, list.id);
+    }
+    setOverlay(null);
+    router.push({ pathname: '/lists/[listId]', params: { listId } });
+  }
+
+  function openHistory(itemType: 'BOOK' | 'MOVIE') {
+    setOverlay(null);
+    router.push({ pathname: '/lists/history', params: { itemType } });
   }
 
   async function respondToInvitation(invitationId: string, accept: boolean) {
@@ -145,12 +177,22 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
 
   return (
     <View style={[styles.shell, { backgroundColor: theme.base.appBackground }]}>
+      <View
+        pointerEvents="none"
+        style={[
+          styles.shellAmbient,
+          {
+            backgroundColor: theme.ambient.wash,
+            opacity: theme.ambient.washOpacity * 1.2,
+          },
+        ]}
+      />
       <SafeAreaView
         edges={['top']}
         style={[
           styles.safeHeader,
           {
-            backgroundColor: theme.base.appBackground,
+            backgroundColor: theme.surface.appChrome,
             borderBottomColor: theme.base.border,
           },
         ]}
@@ -211,7 +253,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               style={[
                 styles.drawer,
                 {
-                  backgroundColor: theme.base.sceneBackground,
+                  backgroundColor: theme.surface.panel,
                   borderRightColor: theme.base.border,
                 },
               ]}
@@ -220,30 +262,6 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 contentContainerStyle={styles.drawerContent}
                 showsVerticalScrollIndicator={false}
               >
-                <View style={styles.drawerIdentity}>
-                  <Text
-                    style={[styles.drawerKicker, { color: theme.base.textMuted }]}
-                  >
-                    {identityType}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.drawerIdentityName,
-                      { color: theme.base.textPrimary },
-                    ]}
-                  >
-                    {identityName}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.drawerDivider,
-                    { backgroundColor: theme.base.border },
-                  ]}
-                />
-
                 <View style={styles.drawerSection}>
                   <Text
                     style={[
@@ -311,6 +329,40 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                       ›
                     </Text>
                   </Pressable>
+
+                  <View style={styles.drawerListLinks}>
+                    {systemSavedList ? (
+                      <DrawerListLink
+                        label={ITEM_LIST_LABELS.saved}
+                        meta={`${systemSavedList.itemCount}`}
+                        textColor={theme.base.textPrimary}
+                        mutedColor={theme.base.textMuted}
+                        onPress={() => openList(systemSavedList.id)}
+                      />
+                    ) : null}
+                    {drawerQuickLists.map((list) => (
+                      <DrawerListLink
+                        key={list.id}
+                        label={list.name}
+                        meta={`${list.itemCount}`}
+                        textColor={theme.base.textPrimary}
+                        mutedColor={theme.base.textMuted}
+                        onPress={() => openList(list.id)}
+                      />
+                    ))}
+                    <DrawerListLink
+                      label="Luetut"
+                      textColor={theme.base.textPrimary}
+                      mutedColor={theme.base.textMuted}
+                      onPress={() => openHistory('BOOK')}
+                    />
+                    <DrawerListLink
+                      label="Katsotut"
+                      textColor={theme.base.textPrimary}
+                      mutedColor={theme.base.textMuted}
+                      onPress={() => openHistory('MOVIE')}
+                    />
+                  </View>
                 </View>
 
                 <View style={styles.drawerSection}>
@@ -468,7 +520,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               style={[
                 styles.inboxPanel,
                 {
-                  backgroundColor: theme.base.sceneBackground,
+                  backgroundColor: theme.surface.panel,
                   borderColor: theme.base.border,
                 },
               ]}
@@ -702,7 +754,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           style={[
             styles.safeDock,
             {
-              backgroundColor: theme.base.appBackground,
+              backgroundColor: theme.surface.appChrome,
               borderTopColor: theme.base.border,
             },
           ]}
@@ -794,9 +846,44 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   );
 }
 
+interface DrawerListLinkProps {
+  label: string;
+  meta?: string;
+  textColor: string;
+  mutedColor: string;
+  onPress: () => void;
+}
+
+function DrawerListLink({
+  label,
+  meta,
+  textColor,
+  mutedColor,
+  onPress,
+}: DrawerListLinkProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Avaa lista ${label}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.drawerListRow, pressed && styles.rowPressed]}
+    >
+      <Text numberOfLines={1} style={[styles.drawerListName, { color: textColor }]}>
+        {label}
+      </Text>
+      {meta ? (
+        <Text style={[styles.drawerListMeta, { color: mutedColor }]}>{meta}</Text>
+      ) : null}
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   shell: {
     flex: 1,
+  },
+  shellAmbient: {
+    ...StyleSheet.absoluteFill,
   },
   safeHeader: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -868,24 +955,8 @@ const styles = StyleSheet.create({
   drawerContent: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 18,
     paddingBottom: 26,
-  },
-  drawerIdentity: {
-    gap: 5,
-  },
-  drawerKicker: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 1.8,
-  },
-  drawerIdentityName: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  drawerDivider: {
-    height: StyleSheet.hairlineWidth,
-    marginVertical: 18,
   },
   drawerSection: {
     marginBottom: 20,
@@ -904,6 +975,26 @@ const styles = StyleSheet.create({
     fontSize: 25,
     lineHeight: 26,
     fontWeight: '300',
+  },
+  drawerListLinks: {
+    gap: 1,
+    paddingLeft: 2,
+  },
+  drawerListRow: {
+    minHeight: 34,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 5,
+  },
+  drawerListName: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  drawerListMeta: {
+    fontSize: 10,
+    fontWeight: '600',
   },
   profileRow: {
     minHeight: 42,

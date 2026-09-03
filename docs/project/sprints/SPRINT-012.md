@@ -64,16 +64,29 @@ Sprint 011 Lists are merged, hosted and automatically verified. Their refreshed 
 2. [x] Add typed mobile operations/provider with deterministic mapping/error tests.
 3. [x] Extend Inbox and add the Profile thread route.
 4. [x] Add optional contextual List message with independent failure/retry semantics.
-5. [-] Run full automated, hosted authorization and configured-device acceptance.
+5. [x] Apply the hosted migration, merge PR #165 and pass main CI.
+6. [-] Finish product-owner-requested UI polish and configured-device acceptance.
 
 ## Current verification
 
-- The local migration compiles against the current hosted schema inside a transaction that is always rolled back.
-- Shared A→B send/read, contextual Profile/List/Item reference, stable-ID retry, per-User unread/read cursor and outsider denial pass in that rollback smoke.
-- A post-smoke catalog check confirms that neither new table exists in hosted production; permanent migration application remains approval-gated.
-- `npm run check` passes: lint, TypeScript, 144 tests, and both iOS/Android bundle exports.
+- PR #165 is merged at main commit `07f62dd`; main CI #248 completed successfully and produced the standalone Android artifact.
+- Hosted migration `20260902185821_profile_messaging_foundation` is permanently applied.
+- Shared A→B send/read, contextual Profile/List/Item reference, stable-ID retry, per-User unread/read cursor and Personal/Shared outsider denial passed post-apply inside a rolled-back smoke transaction.
+- The local pre-acceptance polish on `fix/discovery-sidebar-polish` passes `npm run check`: lint, TypeScript, 147 tests, and both iOS/Android bundle exports.
 - Configured-device acceptance remains unrun and must not be inferred from automated checks.
+
+## Pre-acceptance UI polish
+
+The product owner requested that the next device build also include:
+
+- approximately 70%-opaque surfaces so the active Profile and DiscoveryMode atmosphere remains visible across screens,
+- no duplicate `Huone`/`Discover` row above discovery content and a smaller BOOK/MOVIE title,
+- a lightweight 0–10 ribbon with live numeric preview, commit on tap/release and a 500 ms committed-value pause before card advance,
+- removal of the repeated drawer identity block,
+- fixed Saved/read/watched List shortcuts and at most three actor-local most-used custom List shortcuts in the drawer.
+
+The most-used drawer order is deliberately separate from the destination picker contract: drawer ranking is use count first and latest use second, while the compact picker remains latest-use-first.
 
 ## Handoff
 
-Current target: retain the verified local #138 commit and request the next release authorization. Do not apply the messaging migration, push, open a PR or merge without the product owner's explicit approval.
+Current target: retain the verified local polish commit after it is cut and request one explicit push/PR/merge authorization. Do not claim configured-device acceptance until the refreshed build is actually reviewed.

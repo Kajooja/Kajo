@@ -103,7 +103,7 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: theme.base.appBackground },
+    safeArea: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: 20, paddingBottom: 44, gap: 18 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
@@ -116,7 +116,7 @@ function createStyles(theme: RoomTheme) {
     link: { color: theme.ambient.curtainHighlight, fontWeight: '700' },
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
     list: { gap: 10 },
-    row: { minHeight: 94, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.base.sceneBackground },
+    row: { minHeight: 94, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.surface.panel },
     rowText: { flex: 1, gap: 4 },
     type: { color: theme.base.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
     rowTitle: { color: theme.base.textPrimary, fontSize: 16, fontWeight: '800' },

@@ -24,10 +24,20 @@ export interface RoomAmbientTheme {
   curtainHighlight: string;
 }
 
+export interface RoomSurfaceTheme {
+  appChrome: string;
+  panel: string;
+  raised: string;
+  floor: string;
+}
+
 export interface RoomTheme {
   base: RoomBaseTheme;
   ambient: RoomAmbientTheme;
+  surface: RoomSurfaceTheme;
 }
+
+const ATMOSPHERIC_SURFACE_OPACITY = 0.72;
 
 export const PERSONAL_ROOM_BASE_THEME: Readonly<RoomBaseTheme> = {
   appBackground: '#171716',
@@ -121,10 +131,28 @@ export function getRoomTheme(
   ambientPhase: AmbientPhase,
   profile?: Profile | null,
 ): RoomTheme {
+  const base = getRoomBaseTheme(profile);
+
   return {
-    base: getRoomBaseTheme(profile),
+    base,
     ambient: ROOM_AMBIENT_BY_PHASE[ambientPhase],
+    surface: {
+      appChrome: withColorAlpha(base.appBackground, ATMOSPHERIC_SURFACE_OPACITY),
+      panel: withColorAlpha(base.sceneBackground, ATMOSPHERIC_SURFACE_OPACITY),
+      raised: withColorAlpha(base.structure, 0.76),
+      floor: withColorAlpha(base.floor, ATMOSPHERIC_SURFACE_OPACITY),
+    },
   };
+}
+
+export function withColorAlpha(hexColor: string, opacity: number): string {
+  const normalized = hexColor.replace('#', '');
+  const red = Number.parseInt(normalized.slice(0, 2), 16);
+  const green = Number.parseInt(normalized.slice(2, 4), 16);
+  const blue = Number.parseInt(normalized.slice(4, 6), 16);
+  const alpha = Math.min(1, Math.max(0, opacity));
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 export function getRoomBaseTheme(

@@ -5,6 +5,7 @@ import {
   getRoomBaseTheme,
   getRoomTheme,
   PERSONAL_ROOM_BASE_THEME,
+  withColorAlpha,
 } from './roomTheme';
 
 const PERSONAL: PersonalProfile = {
@@ -56,5 +57,15 @@ describe('room theme', () => {
     expect(evening.ambient.wash).not.toBe(night.ambient.wash);
     expect(dawn.base).toBe(evening.base);
     expect(evening.base).toBe(night.base);
+  });
+
+  it('derives translucent surfaces without fading their child content', () => {
+    const theme = getRoomTheme('DAWN', PERSONAL);
+
+    expect(theme.surface.appChrome).toBe('rgba(23, 23, 22, 0.72)');
+    expect(theme.surface.panel).toBe('rgba(38, 36, 33, 0.72)');
+    expect(theme.surface.raised).toBe('rgba(74, 68, 61, 0.76)');
+    expect(withColorAlpha('#171716', 2)).toBe('rgba(23, 23, 22, 1)');
+    expect(withColorAlpha('#171716', -1)).toBe('rgba(23, 23, 22, 0)');
   });
 });
