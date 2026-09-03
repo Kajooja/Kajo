@@ -139,6 +139,7 @@ All numeric choices are versioned V1 hypotheses. Hosted evaluation may tune them
 - Documentation and local implementation are complete for review on `feat/156-prediction-core-nervous-system`.
 - `npm run check` passes: lint, TypeScript, all 145 tests and both platform export smokes.
 - `git diff --check` passes.
+- Draft PR #166 is published; implementation commit `755971a` passed GitHub Actions CI #249.
 - Supabase/PostgreSQL security and indexing patterns were reviewed against current documentation.
 - Hosted migration execution, advisors, database query-plan evidence and configured-device validation remain pending and must not be inferred from `npm run check`.
 
@@ -159,4 +160,4 @@ All numeric choices are versioned V1 hypotheses. Hosted evaluation may tune them
 
 ## Handoff
 
-Review and merge the #156/13A branch, then perform the explicitly gated hosted migration and configured-device trace acceptance. The next implementation slice after accepted 13A is SleepLayer persistence/worker design, not an immediate LLM or uncontrolled genetic optimizer.
+Continue from draft PR #166 / `feat/156-prediction-core-nervous-system`. Perform the explicitly gated hosted migration and configured-device trace acceptance before marking it ready and merging. The next implementation slice after accepted 13A is SleepLayer persistence/worker design, not an immediate LLM or uncontrolled genetic optimizer.

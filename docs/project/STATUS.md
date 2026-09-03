@@ -123,11 +123,11 @@ The first implementation slice adds:
 - a precise champion–challenger SleepLayer specification with prospective shadow predictions, outcome maturity, global/cohort/Profile evaluation, shrinkage and rollback rules,
 - manual promotion only for MVP; no challenger can silently mutate or replace production behavior.
 
-The schema/migration and mobile V1 wiring are implemented on the #156 feature branch. Repository lint, TypeScript, all 145 tests and both platform export smokes pass. They have not been applied to hosted Supabase and have not received configured-device acceptance. Sprint 013B and 013C retain those gates and the first executable genome/shadow/promotion persistence respectively.
+The schema/migration and mobile V1 wiring are published in draft PR #166 on `feat/156-prediction-core-nervous-system` (implementation commit `755971a`). GitHub Actions CI #249 passes, including lint, TypeScript, all 145 tests and both platform export smokes. They have not been applied to hosted Supabase and have not received configured-device acceptance. Sprint 013B and 013C retain those gates and the first executable genome/shadow/promotion persistence respectively.
 
 ## Next MVP sequence
 
-1. **#156 / Sprint 013A** — review and merge the Prediction V1 evidence spine and canonical design.
+1. **PR #166 / Sprint 013A** — review the Prediction V1 evidence spine and canonical design, complete the explicit hosted/device gates, then mark ready and merge.
 2. **Sprint 013B** — apply/rollback-test the migration in the hosted project and run configured-device trace acceptance.
 3. **Sprint 013C** — implement immutable PredictorGenome, prospective ShadowPrediction, EvaluationWindow and manual PromotionDecision persistence.
 4. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flows without treating their deferral as prior acceptance.
@@ -175,4 +175,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: **#156 Sprint 013A Prediction V1 evidence spine and design review**, followed by hosted migration/device trace verification. Keep #102 and #138 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
+Immediate target: continue from **draft PR #166** on `feat/156-prediction-core-nervous-system`. Review the Prediction V1 evidence spine, then perform hosted migration/device trace verification before marking the PR ready. Keep #102 and #138 configured Android acceptance explicitly deferred, not completed. The old `Ehdota yhteiseen` action must not be reintroduced, and the approved simple illustrated Room direction must be preserved.
