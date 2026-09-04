@@ -32,7 +32,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-NAV-001` The persistent top Kajo logo returns to the currently active Profile's Room; changing Personal/Shared Profile does not change this contract.
 - [x] `MVP-NAV-002` A small persistent bottom dock provides a menu control that opens a Profile-aware side drawer and an envelope control that opens Inbox; Kajo does not use a conventional multi-tab bottom navigation bar.
 - [x] `MVP-NAV-003` General account/content navigation is reachable from the Room or side drawer; the drawer owns active Profile switching plus Profile, Lists and Groups destinations when those destinations exist, without duplicate/dead navigation entries.
-- [-] `MVP-NAV-004` Tapping the bottom-center active Profile identity opens a lightweight actor-local quick switcher with at most five recent/most-used SharedProfiles; selecting one activates that existing Profile and `Näytä lisää` opens the canonical Groups page without a duplicate Profile/membership model. Configured-Android acceptance is required before completion.
+- [x] `MVP-NAV-004` Tapping the bottom-center active Profile identity opens a lightweight actor-local quick switcher with at most five recent/most-used SharedProfiles; selecting one activates that existing Profile and `Näytä lisää` opens the canonical Groups page without a duplicate Profile/membership model. Configured-Android acceptance passed on the merged main APK.
 
 ## Discovery
 
