@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -85,6 +86,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     showConsumed,
     recordEvent: eventTracking.recordEvent,
   });
+
   useEffect(() => {
     impressionContext.current = {
       mode,
@@ -94,6 +96,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       recordEvent: eventTracking.recordEvent,
     };
   }, [eventTracking.recordEvent, mode, predictionId, ranking.source, showConsumed]);
+
   const viewabilityConfig = useMemo(
     () => ({
       itemVisiblePercentThreshold: 60,
@@ -169,14 +172,20 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         pointerEvents="none"
         style={[
           styles.ambientBackdrop,
-          { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+          {
+            backgroundColor: theme.ambient.wash,
+            opacity: theme.ambient.washOpacity * 1.35,
+          },
         ]}
       />
 
       <View style={styles.screen}>
         <Text style={styles.title}>{title}</Text>
 
-        <View style={styles.collectionRow} accessibilityLabel="Discovery collection">
+        <View
+          style={styles.collectionRow}
+          accessibilityLabel="Discovery collection"
+        >
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Show discovery items"
@@ -188,7 +197,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               pressed && styles.pressed,
             ]}
           >
-            <Text style={[styles.collectionText, !showConsumed && styles.collectionTextSelected]}>
+            <Text
+              style={[
+                styles.collectionText,
+                !showConsumed && styles.collectionTextSelected,
+              ]}
+            >
               Löydä
             </Text>
           </Pressable>
@@ -203,7 +217,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               pressed && styles.pressed,
             ]}
           >
-            <Text style={[styles.collectionText, showConsumed && styles.collectionTextSelected]}>
+            <Text
+              style={[
+                styles.collectionText,
+                showConsumed && styles.collectionTextSelected,
+              ]}
+            >
               {consumedLabel} {consumedItems.length > 0 ? consumedItems.length : ''}
             </Text>
           </Pressable>
@@ -213,14 +232,20 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 
         {ranking.status === 'error' ? (
           <View style={styles.predictionNotice}>
-            <Text accessibilityLiveRegion="polite" style={styles.predictionNoticeText}>
+            <Text
+              accessibilityLiveRegion="polite"
+              style={styles.predictionNoticeText}
+            >
               {ranking.message}
             </Text>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Retry recommendations"
               onPress={ranking.retry}
-              style={({ pressed }) => [styles.retryButton, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.retryButton,
+                pressed && styles.pressed,
+              ]}
             >
               <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
             </Pressable>
@@ -230,7 +255,10 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         {isSharedDiscovery &&
         (sharedEndorsements.status !== 'ready' || sharedEndorsements.error) ? (
           <View style={styles.predictionNotice}>
-            <Text accessibilityLiveRegion="polite" style={styles.predictionNoticeText}>
+            <Text
+              accessibilityLiveRegion="polite"
+              style={styles.predictionNoticeText}
+            >
               {sharedEndorsements.error
                 ? sharedEndorsements.error
                 : 'Yhteisiä valintoja päivitetään…'}
@@ -240,7 +268,10 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 accessibilityRole="button"
                 accessibilityLabel="Retry shared choices"
                 onPress={sharedEndorsements.retry}
-                style={({ pressed }) => [styles.retryButton, pressed && styles.pressed]}
+                style={({ pressed }) => [
+                  styles.retryButton,
+                  pressed && styles.pressed,
+                ]}
               >
                 <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
               </Pressable>
@@ -254,7 +285,10 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           numColumns={2}
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.gridRow}
-          contentContainerStyle={[styles.gridContent, items.length === 0 && styles.emptyGrid]}
+          contentContainerStyle={[
+            styles.gridContent,
+            items.length === 0 && styles.emptyGrid,
+          ]}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
           ListEmptyComponent={
@@ -325,6 +359,7 @@ function ItemCard({
   onOpen,
 }: ItemCardProps) {
   const tag = item.tags?.[0] ?? item.itemType.toLowerCase();
+  const byline = getItemByline(item);
   const coverOpacity = 0.42 + (index % 3) * 0.12;
   const consumedLabel = getConsumedItemLabels(item.itemType).status;
 
@@ -352,21 +387,48 @@ function ItemCard({
           },
         ]}
       >
-        <View
-          pointerEvents="none"
-          style={[
-            styles.coverLight,
-            { backgroundColor: theme.ambient.windowLight, opacity: coverOpacity },
-          ]}
-        />
+        {item.imageUrl ? (
+          <>
+            <Image
+              accessibilityIgnoresInvertColors
+              source={{ uri: item.imageUrl }}
+              resizeMode="cover"
+              style={styles.coverImage}
+            />
+            <View pointerEvents="none" style={styles.coverImageShade} />
+          </>
+        ) : (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.coverLight,
+              {
+                backgroundColor: theme.ambient.windowLight,
+                opacity: coverOpacity,
+              },
+            ]}
+          />
+        )}
         <View style={styles.cardStatusRow}>
-          {interaction.saved ? <Text style={styles.cardStatus}>★</Text> : <View />}
-          {interaction.consumed ? <Text style={styles.cardStatus}>{consumedLabel}</Text> : null}
+          {interaction.saved ? (
+            <Text style={styles.cardStatus}>★</Text>
+          ) : (
+            <View />
+          )}
+          {interaction.consumed ? (
+            <Text style={styles.cardStatus}>{consumedLabel}</Text>
+          ) : null}
         </View>
-        <Text style={styles.coverType}>{item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
-        <Text numberOfLines={3} style={styles.coverTitle}>
-          {item.title}
-        </Text>
+        {!item.imageUrl ? (
+          <>
+            <Text style={styles.coverType}>
+              {item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}
+            </Text>
+            <Text numberOfLines={3} style={styles.coverTitle}>
+              {item.title}
+            </Text>
+          </>
+        ) : null}
       </View>
       {sharedProvenance ? (
         <Text numberOfLines={1} style={styles.endorsementProvenance}>
@@ -376,8 +438,13 @@ function ItemCard({
       <Text numberOfLines={2} style={styles.cardTitle}>
         {item.title}
       </Text>
+      {byline ? (
+        <Text numberOfLines={1} style={styles.cardByline}>
+          {byline}
+        </Text>
+      ) : null}
       <Text numberOfLines={1} style={styles.cardTag}>
-        {tag}
+        {tag.replaceAll('-', ' ')}
       </Text>
     </Pressable>
   );
@@ -410,6 +477,16 @@ function recordVisibleImpressions(
       },
     });
   }
+}
+
+function getItemByline(item: Item): string | null {
+  const parts: string[] = [];
+  const creator = item.creators?.[0]?.trim();
+
+  if (creator) parts.push(creator);
+  if (item.releaseYear) parts.push(String(item.releaseYear));
+
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 function createStyles(theme: RoomTheme) {
@@ -528,6 +605,15 @@ function createStyles(theme: RoomTheme) {
       justifyContent: 'flex-end',
       overflow: 'hidden',
     },
+    coverImage: {
+      ...StyleSheet.absoluteFill,
+      width: '100%',
+      height: '100%',
+    },
+    coverImageShade: {
+      ...StyleSheet.absoluteFill,
+      backgroundColor: 'rgba(0, 0, 0, 0.14)',
+    },
     coverLight: {
       ...StyleSheet.absoluteFill,
     },
@@ -545,6 +631,9 @@ function createStyles(theme: RoomTheme) {
       fontSize: 10,
       fontWeight: '700',
       letterSpacing: 0.8,
+      textShadowColor: 'rgba(0, 0, 0, 0.72)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
     },
     coverType: {
       color: theme.base.textPrimary,
@@ -572,10 +661,16 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '700',
       marginTop: 7,
     },
+    cardByline: {
+      color: theme.base.textMuted,
+      fontSize: 11,
+      lineHeight: 15,
+      marginTop: 3,
+    },
     cardTag: {
       color: theme.base.textMuted,
       fontSize: 11,
-      marginTop: 3,
+      marginTop: 2,
       textTransform: 'capitalize',
     },
     pressed: {

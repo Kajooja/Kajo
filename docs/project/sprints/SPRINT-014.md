@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A CATALOG FOUNDATION HOSTED; REAL PROVIDER IMPORT NEXT**
+Status: **ACTIVE — 14A IMPORT INFRASTRUCTURE HOSTED; REAL PROVIDER DATA + DEVICE ACCEPTANCE NEXT**
 
 ## Outcome
 
@@ -32,20 +32,23 @@ Repository migrations:
 
 - `20260904193000_catalog_provider_foundation.sql`
 - `20260904193200_fix_catalog_upsert_source_conflict.sql`
+- `20260904162000_catalog_batch_import_boundary.sql`
 
 Hosted migrations:
 
 - `20260904155839 catalog_provider_foundation`
 - `20260904160033 fix_catalog_upsert_source_conflict`
+- `20260904163011 catalog_batch_import_boundary`
 
-Foundation now provides:
+Foundation/import infrastructure now provides:
 
 - generic `public.items.discoverable`, `creators`, `release_year`, `image_url` and `original_language`,
 - private server-owned `ItemSource` provenance with unique `(providerKey, providerItemId)`,
 - private namespaced `ItemExternalId` aliases with unique `(namespace, externalId)`,
 - service-role-only `public.upsert_catalog_item_v1` as the validated atomic importer boundary,
+- bounded service-role-only `public.upsert_catalog_batch_v1` for max-50 importer batches,
 - canonical Prediction baseline candidate generation filters `candidate.discoverable` without creating another recommender,
-- all 24 existing `KAJO_MOCK` Items retain stable IDs and gained `kajo_mock` source + `kajo_mock_slug` alias provenance,
+- all 24 existing `KAJO_MOCK` Items retain stable IDs and `kajo_mock` provenance,
 - mocks deliberately remain discoverable until enough accepted real data exists to replace them.
 
 Hosted rollback-controlled verification proved:
@@ -56,13 +59,66 @@ Hosted rollback-controlled verification proved:
 - `discoverable=false` removes the synthetic Item from `rank_items_v1` delivery,
 - switching the same Item back to `discoverable=true` makes it eligible again,
 - authenticated/anon cannot read private source tables or execute catalog upsert; service role can,
+- batch import accepts normal bounded batches and idempotent refresh while >50 entries fail closed,
+- authenticated/anon cannot execute the batch RPC and service role can,
 - synthetic verification left 0 Items, source rows or external aliases after rollback.
 
-The first hosted smoke found a PL/pgSQL conflict-target ambiguity in the new upsert. Because the base migration was already deployed, it was corrected through the ordered forward migration above rather than rewriting hosted history.
+The first hosted smoke found a PL/pgSQL conflict-target ambiguity in the base upsert. Because the migration was already deployed, it was corrected through the ordered forward migration rather than rewriting hosted history.
 
-Security/performance advisors introduced no new WARN-level catalog finding. The new private tables report the expected `RLS enabled/no policy` INFO because client grants are absent; fresh FK indexes report unused-index INFO until provider traffic exists.
+#### 14A provider importer/mobile slice — implemented + hosted infrastructure 2026-09-04
 
-**Next 14A action:** implement and run the first real provider import through this boundary. Do not mark mocks non-discoverable until real BOOK/MOVIE coverage and mobile presentation have been verified.
+Repository implementation:
+
+- `supabase/functions/catalog-import/index.ts`
+- `supabase/functions/_shared/catalog-normalizers.mjs`
+- `scripts/catalog/import-open-library.mjs`
+- `scripts/catalog/catalog-normalizers.test.mjs`
+- mobile `catalogItemOperations.ts`, `predictionRankingCache.ts`, `usePredictionRanking.ts`, `DiscoveryScreen.tsx` and real-Item compatibility in the existing detail/mock boundary.
+
+TMDB path:
+
+- `catalog-import` Edge Function deployed ACTIVE version 1,
+- provider credentials remain server-only,
+- bounded page imports with Finnish `fi-FI` / `FI` defaults,
+- controlled `en-US` fallback for missing localized title/overview/poster,
+- TMDB genre IDs map to stable generic Kajo tags independent of localized provider labels,
+- details normalize directors, cast metadata, year, poster, original language, TMDB ID and IMDb title ID into one canonical Item,
+- importer calls the bounded batch RPC and never writes provider-specific Item tables.
+
+Open Library path:
+
+- repository importer is bulk-dump based rather than using Open Library's public API as Kajo's high-volume backend,
+- parser accepts edition dump rows and filters to useful language/year/ISBN/cover/work combinations,
+- normalized aliases include Open Library work/edition and ISBN IDs,
+- cover metadata uses the provider cover URL and remains replaceable through the same Item source boundary,
+- first actual bulk data load still needs to be run.
+
+Mobile real-catalog path:
+
+- Prediction V1 remains the ranking authority and continues returning the same Prediction ID / candidate ordering,
+- after hosted ranking, mobile performs one canonical `public.items` batch enrichment for image/creator/year/language metadata,
+- enrichment never reorders the delivered slate,
+- an eight-slate bounded process cache preserves delivered hosted Item order for detail/swipe,
+- real Items are registered into the existing discovery lookup so a hosted card does not fall back to a mock detail sequence,
+- fallback source remains explicitly mock/fallback and analytically distinguishable,
+- discovery grid can render real remote poster/cover imagery plus creator/year; mock cards retain the current Kajo graphic when no image exists.
+
+CI / hosted evidence:
+
+- early draft CI correctly caught a React `set-state-in-effect` violation and one untyped Supabase select boundary; both were fixed without lint/type suppressions,
+- PR #189 CI #294 passed lint, TypeScript, tests and iOS/Android bundle smoke on the importer/mobile implementation head before final documentation changes,
+- batch-RPC hosted smoke passed and rolled back fully,
+- `catalog-import` is ACTIVE in hosted Supabase.
+
+Known gate:
+
+- `TMDB_READ_ACCESS_TOKEN` is not yet configured in the hosted Edge Function environment, so no real TMDB rows have intentionally been imported yet,
+- the current execution environment could deploy/list the Edge Function but could not call the public endpoint back over HTTP; therefore 403/`tmdb-not-configured` live HTTP acceptance remains to be performed when the provider secret is configured or from a normal network client,
+- no mocks are retired before real BOOK/MOVIE coverage and configured-device presentation are accepted.
+
+Security/performance advisors introduced no new WARN-level catalog finding. The private catalog tables still report the expected `RLS enabled/no policy` INFO because client grants are absent. The existing leaked-password-protection WARN remains Sprint 015 auth/security scope.
+
+**Next 14A action:** configure `TMDB_READ_ACCESS_TOKEN`, import the first curated TMDB pages, run the first curated Open Library bulk import, inspect coverage/dedup/metadata, build configured-device acceptance with real posters/covers, and only then mark `KAJO_MOCK` rows non-discoverable.
 
 ### 14B — PersonalProfile bootstrap/import — #185
 
@@ -123,7 +179,7 @@ Required flows:
 
 ## Acceptance
 
-- [-] `MVP-CAT-001..003` foundation exists; provider data/presentation/device acceptance still open.
+- [-] `MVP-CAT-001..003` foundation/import infrastructure exists; real provider data, mock retirement and configured-device acceptance still open.
 - [ ] `MVP-BOOT-001..004` complete.
 - [ ] `MVP-PRED-005` complete.
 - [ ] deferred List/messaging/Room device gates relevant to beta are accepted.
@@ -134,4 +190,4 @@ Required flows:
 
 ## Immediate next action
 
-Continue **14A / #182** with the first real provider importer and mobile presentation of normalized catalog fields. Do not mix #185 import parsing or #177 common-fit scoring into the same PR.
+Continue **14A / #182** with first real provider data loads and configured-device acceptance. Do not mix #185 import parsing or #177 common-fit scoring into the same PR.

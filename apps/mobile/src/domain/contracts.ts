@@ -67,6 +67,10 @@ export interface Item {
   title: string;
   description?: string;
   tags?: readonly string[];
+  creators?: readonly string[];
+  releaseYear?: number;
+  imageUrl?: string;
+  originalLanguage?: string;
 }
 
 export type ItemListKind = 'SYSTEM_SAVED' | 'CUSTOM';
