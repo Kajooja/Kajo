@@ -26,6 +26,7 @@ import {
   createLatestRequestGate,
   getInteractionEvidenceKey,
 } from './predictionRefresh';
+import { rememberPredictionItems } from './predictionRankingCache';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
 
@@ -134,6 +135,7 @@ export function usePredictionRanking(
                 }
               : result.ranking;
 
+          rememberPredictionItems(ranking.predictionId, ranking.items);
           setHostedState({ status: 'ready', key: requestKey, ranking });
           return;
         }
