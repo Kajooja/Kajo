@@ -238,6 +238,8 @@ inspectable explanation
 
 `selectedForDelivery` is not proof of exposure. `ITEM_IMPRESSION` is emitted only when the UI's visibility threshold is met. This distinction prevents unseen lower-screen cards from being treated as rejections.
 
+For `resurfacing-v1`, the internal explanation also records the candidate's resurfacing classification, eligibility, reason, save age and reminder-history counters. A suppressed Item may remain in the internal candidate trace for evaluation/debugging while `selectedForDelivery=false`; Lists and history remain independent read surfaces and are not filtered by discovery eligibility.
+
 ### Why full slates matter
 
 Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can learn that B won against A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice.
@@ -325,6 +327,25 @@ The long-term online pipeline has separate responsibilities:
 7. **Delivery overlay:** apply pending Endorsement/member-history collaboration semantics without creating another taste model.
 
 MVP V1 combines steps 2–5 inside PostgreSQL because the catalog and event volume are small. A later Python/FastAPI service may replace the transport without changing the conceptual contract.
+
+### 8.1 Reacted-Item resurfacing policy — `resurfacing-v1`
+
+Normal discovery must not repeatedly spend slate capacity on Items for which the same Profile has already given a strong/terminal reaction. This is a serving policy, not deletion of evidence or List/history state.
+
+MVP `resurfacing-v1` rules are:
+
+- consumed/read/watched, rated and `not interested` Items are terminally suppressed from normal discovery,
+- a saved-only Item is normally suppressed while it is still recent,
+- a saved-only Item may become one reminder candidate after it has remained saved, unconsumed and unrated for at least **30 days**,
+- a reminder is suppressed for **30 days** after an actually logged reminder impression,
+- a saved Item may receive at most **2 reminder impressions in a rolling 90-day window**,
+- at most **1 saved reminder** may be eligible in one Prediction candidate pool,
+- ordinary eligible candidates rank ahead of the reminder; the reminder ranks ahead of suppressed candidates,
+- suppressed candidates may stay in the complete internal trace but can never be `selectedForDelivery=true`,
+- all decisions are Profile-scoped; PersonalProfile and SharedProfile state/reminder history do not cross,
+- explicit Lists/Saved/history views remain unaffected by discovery suppression.
+
+The thresholds are versioned hypotheses, not permanent truth. A future policy version may tune age/cooldown/frequency through measured outcomes, but a PredictorGenome cannot bypass hard authorization or terminal-consumption/suppression invariants. `PredictionRun.policyVersion` records `scenario-memory-v1+resurfacing-v1`, and `PredictionCandidate.explanation.resurfacingPolicy` makes the decision reconstructable.
 
 ## 9. DiscoveryMode policy
 
@@ -680,7 +701,7 @@ The SleepLayer also consolidates memory without rewriting evidence:
 
 Original Events, PredictionRuns, ShadowPredictions and Outcomes remain immutable. Consolidated memories are versioned derivatives.
 
-### 13.13 SleepLayer data model (planned)
+### 13.13 SleepLayer data model
 
 ```text
 PredictorGenome
@@ -693,7 +714,7 @@ PromotionDecision
 ModelArtifact
 ```
 
-Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty. No schema is created until the first background worker/replay slice uses it.
+The MVP foundation now implements all listed relational artifacts except `ModelArtifact`. Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty.
 
 ### 13.14 Evolution cycle
 
@@ -756,6 +777,17 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - exact replay test from stored traces,
 - no-evidence equivalence to base behavior.
 
+### Resurfacing-specific
+
+- reminder impressions and downstream positive/negative Outcomes by saved age,
+- reminder cooldown/frequency-cap suppression counts,
+- repeated-reacted Item rate in normal discovery,
+- share of slates containing a saved reminder,
+- later consumption/rating after a reminder versus comparable saved Items without a reminder,
+- Profile-isolation and trace-completeness checks.
+
+The purpose is to tune reminder usefulness without optimizing for reminder clicks alone.
+
 ## 15. Data quality and observability
 
 Required monitoring:
@@ -768,11 +800,12 @@ Required monitoring:
 - outcome latency distribution,
 - fraction of fallback predictions,
 - scenario support and influence distribution,
+- resurfacing classification/reason distribution,
 - model/policy version traffic,
 - feature/state drift,
 - trace storage growth.
 
-Every material score component remains available in internal explanation JSON during MVP development. User-facing explanations later use a safe, concise subset and never expose other members' private evidence.
+Every material score/policy component remains available in internal explanation JSON during MVP development. User-facing explanations later use a safe, concise subset and never expose other members' private evidence.
 
 ## 16. Privacy, control and retention
 
@@ -801,18 +834,20 @@ The exact periods require a DPIA/legal decision before public beta; code must no
 
 ## 17. MVP V1 implementation
 
-`public.rank_items_v1` is the first nervous-system slice:
+`public.rank_items_v1` is the accepted nervous-system serving boundary:
 
-- calls the existing inspectable `rank_items_v0` as base candidate scorer,
-- builds a versioned short/long `MemoryStateSnapshot`,
-- retrieves same-Profile traced outcomes,
-- computes bounded ScenarioMemory signal,
-- re-ranks based on DiscoveryMode-specific scenario weight,
-- persists internal `private.prediction_runs` and `private.prediction_candidates`,
-- returns the existing mobile row contract with richer explanation,
-- revokes direct mobile execution of V0 so hosted learning traffic is traced.
+```text
+private V0.3 baseline candidate generator
+  -> assigned-genome scalar policy reranker
+  -> resurfacing-v1 eligibility/classification
+  -> same-Profile ScenarioMemory scoring
+  -> resurfacing-aware final slate ordering/delivery predicate
+  -> immutable PredictionRun + complete PredictionCandidate trace
+```
 
-The mobile request now carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward.
+The baseline genome preserves exact V0.3 behavior before the resurfacing eligibility layer. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
+
+The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Current policy version is `scenario-memory-v1+resurfacing-v1`.
 
 Known V1 limits:
 
@@ -821,13 +856,13 @@ Known V1 limits:
 - no learned embeddings or pgvector yet,
 - no population retrieval,
 - no stochastic propensity because V1 policy is deterministic,
-- no final Shared common-fit coefficient,
+- no final Shared common-fit coefficient (`MVP-PRED-005` / #177 remains open),
 - Context includes time/surface but not explicit mood/available-time input,
-- hosted migration/device acceptance is still required.
+- saved-reminder thresholds are first versioned heuristics and require real outcome calibration.
 
 ## 18. Delivery sequence
 
-### Phase A — evidence spine (MVP V1)
+### Phase A — evidence spine (MVP V1) — delivered
 
 - PredictionRun/Candidate persistence,
 - Context/session correlation,
@@ -857,7 +892,7 @@ Known V1 limits:
 - pgvector/ANN Scenario retrieval,
 - candidate-generator union and diversity policy.
 
-### Phase E — controlled evolution
+### Phase E — controlled evolution — MVP foundation delivered, later expansion gated
 
 - model/feature/reward registry,
 - offline replay evaluator,
