@@ -137,14 +137,15 @@ Transparent scalar-genome evaluation landed before learned sequence/LLM Challeng
 
 ### MVP follow-ups after Sprint 013
 
-Two product observations are next as separate scopes before final hardening:
+Three product/MVP scopes remain deliberately separate before final hardening:
 
 - **#174 — bounded resurfacing of already-reacted Items.** Normal discovery should strongly suppress repeatedly reacted/terminal Items. A saved-only Item may intentionally return as an occasional reminder when still unconsumed/unrated, behind versioned cooldown/frequency rules and inspectable Prediction trace reasons. Extend the existing generic Prediction policy; do not create a second recommender.
 - **#175 — recent SharedProfiles from the bottom Profile control.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles and a `Näytä lisää` route to the existing canonical group page. Reuse current Profile/navigation state rather than introducing duplicate group management.
+- **#177 — SharedProfile common-fit / `MVP-PRED-005`.** Compose Shared joint evidence with authorized accepted-member PersonalProfile fit plus minimum-member/consensus and disagreement terms inside the same generic Prediction V1 trace. Keep the target as SharedProfile, do not copy Personal evidence into Shared history and do not create a second Shared recommender.
 
-Order: #174 first, then #175. Both must be resolved before the final MVP completion gate unless explicitly deferred by the product owner.
+Order: #174 first, #175 second, #177 third. All are required before the final MVP completion gate unless explicitly deferred by the product owner.
 
-After these follow-ups, close the explicitly deferred configured-device acceptance for #102, #138 and the current Room follow-up without reopening accepted architecture.
+After these follow-ups, close the explicitly deferred configured-device acceptance for #102, #138 and the current Room follow-up without reopening accepted architecture. `MVP-MEM-004` must also be explicitly resolved/documented before the final gate.
 
 ### Sprint 014 — MVP Hardening & Store Release
 
