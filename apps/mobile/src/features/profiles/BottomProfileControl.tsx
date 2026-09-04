@@ -39,13 +39,13 @@ export function BottomProfileControl({
   const profiles = useActiveProfile();
   const rememberedActiveKey = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [useState, setUseState] = useState(() =>
+  const [usageState, setUsageState] = useState(() =>
     loadSharedProfileUse(profiles.actorUserId),
   );
 
   useEffect(() => {
     rememberedActiveKey.current = null;
-    setUseState(loadSharedProfileUse(profiles.actorUserId));
+    setUsageState(loadSharedProfileUse(profiles.actorUserId));
   }, [profiles.actorUserId]);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function BottomProfileControl({
     if (rememberedActiveKey.current === activeKey) return;
     rememberedActiveKey.current = activeKey;
 
-    setUseState(
+    setUsageState(
       rememberSharedProfileUse(
         profiles.actorUserId,
         profiles.activeProfile.id,
@@ -74,13 +74,13 @@ export function BottomProfileControl({
   ]);
 
   const quickProfiles = useMemo(
-    () => selectQuickSharedProfiles(profiles.selectableProfiles, useState, 5),
-    [profiles.selectableProfiles, useState],
+    () => selectQuickSharedProfiles(profiles.selectableProfiles, usageState, 5),
+    [profiles.selectableProfiles, usageState],
   );
 
   function openSwitcher() {
     onOpen?.();
-    setUseState(loadSharedProfileUse(profiles.actorUserId));
+    setUsageState(loadSharedProfileUse(profiles.actorUserId));
     setOpen(true);
   }
 
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.42)',
   },
   panel: {
