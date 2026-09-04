@@ -125,16 +125,17 @@ PR #169 merged the immediate-transition/Room-art follow-up at main commit `7bccc
 
 PR #170 merged the minimalist straight-on Room at main commit `d4375c4`. Its neutral-lit, limited-palette illustration keeps the window and fireplace bloom/cast light out of the bitmap; named, independent phase-aware UI layers animate the slowly breathing window Kajo and gently flickering fireplace Kajo. The standalone main APK was downloaded and the configured-device review accepted the Room direction on 2026-09-04, while identifying three focused follow-ups: more natural source-local falloff/time-of-day contrast, exact TV/bookshelf targets and a transient first profile-load failure immediately after login.
 
-The current `fix/room-light-profile-load` follow-up maps window scenery, light layers, flame and interaction targets through the source illustration's real `cover` geometry. It changes the window from morning sun/clouds through afternoon to moon/stars, deepens phase shadows, grows the flame by risk level and makes the highest flame slightly blue. A soft irregular alpha mask replaces hard light ellipses. Initial PersonalProfile loading gets one delayed automatic retry after an error; a genuinely missing profile is never retried and persistent failures still expose the manual retry state. No database migration is required. `npm run check` passes with lint, TypeScript, 155 tests and both platform bundle exports including the new 35 KB light mask.
+PR #171 merged the focused Room-lighting/profile-load correction at main commit `344009c`; PR CI #259 passed with lint, TypeScript, 155 tests and both platform bundle exports including the new 35 KB light mask. Window scenery, light layers, flame and interaction targets now map through the source illustration's real `cover` geometry. The window progresses from morning sun/clouds through afternoon to moon/stars, phase shadows deepen, the flame grows by risk level and the highest flame is slightly blue. A soft irregular alpha mask replaces hard light ellipses. Initial PersonalProfile loading gets one delayed automatic retry after an error; a genuinely missing profile is never retried and persistent failures still expose the manual retry state. No database migration was required. The product owner approved the implementation/handoff, but this conversation intentionally did not poll, download or run the new main APK; refreshed device validation must not be inferred.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **Sprint 012 Room lighting follow-up** — cut and validate phase-aware window/fireplace lighting, exact object targets and post-login profile hydration resilience.
+1. **Latest main APK review** — when resumed, obtain the latest main artifact containing the `344009c` feature delivery and validate morning/afternoon/night lighting, exact TV/bookshelf targets and first-login profile hydration on Android.
 2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
-3. **Sprint 013** — ScenarioMemory.
-4. **Sprint 014** — MVP hardening/release readiness.
+3. **Sprint 012 decision** — close Profile Messaging only after the deferred acceptance evidence is recorded; otherwise continue the remaining acceptance correction.
+4. **Sprint 013** — ScenarioMemory.
+5. **Sprint 014** — MVP hardening/release readiness.
 
 The List model is hosted and stable enough for #138. Its final configured-device acceptance remains an explicit deferred check. Do not let Room visual polish block these MVP behavior slices.
 
@@ -164,10 +165,12 @@ The List model is hosted and stable enough for #138. Its final configured-device
 - `/apps/mobile/src/features/discovery/DiscoveryModeShell.tsx`
 - `/apps/mobile/src/features/discovery/ItemInteractionContext.tsx`
 - `/apps/mobile/src/features/profiles/ActiveProfileContext.tsx`
+- `/apps/mobile/src/features/profiles/PersonalProfileProvider.tsx`
 - `/apps/mobile/src/features/profiles/sharedProfileOperations.ts`
 - `/apps/mobile/src/features/profiles/SharedProfilesScreen.tsx`
 - `/apps/mobile/src/features/lists/`
 - `/apps/mobile/src/features/room/RoomScreen.tsx`
+- `/apps/mobile/src/features/room/roomGeometry.ts`
 - `/supabase/migrations/20260901204135_profile_scoped_item_lists.sql`
 - `/supabase/migrations/20260902074500_shared_saved_consensus_integrity.sql`
 - `/supabase/migrations/20260902182643_profile_messaging_foundation.sql`
@@ -176,4 +179,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: cut the focused Room-lighting/profile-load follow-up, then request one refreshed configured-Android review covering its three reported findings plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the fixed illustrated/non-navigable Room contract must be preserved.
+The PR #171 feature delivery is on main at `344009c`, and the repository handoff is clean. Start the next conversation with **"jatketaan reposta"**. First obtain and test the latest main APK when the product owner is ready: verify all three PR #171 findings, then perform the still-deferred #102 Lists and #138 messaging acceptance. Do not claim device acceptance from CI alone. The old `Ehdota yhteiseen` action must not be reintroduced, and the fixed illustrated/non-navigable Room contract must be preserved.
