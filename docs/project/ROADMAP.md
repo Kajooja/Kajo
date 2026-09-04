@@ -130,7 +130,18 @@ Issue #156 defines the full memory, prediction and controlled evolution architec
 - global/cohort/Profile Champions selected through immutable PredictorGenomes and versioned PolicyAssignments,
 - automatic production promotion disabled through MVP 0.1; shadow winners require guarded canary/A/B evidence and rollback.
 
-Sprint 013 is delivered in ordered evidence gates. Full traceability lands before SleepLayer tables/workers; transparent scalar-genome evaluation lands before learned sequence/LLM Challengers; pgvector lands only with real embeddings and a measured need.
+13A is integrated and 13B hosted/configured-Android trace acceptance passed on 2026-09-04. The immediate next slice is 13C: executable immutable Challenger/SleepLayer persistence, evaluation and manual promotion/rollback.
+
+Sprint 013 remains delivered in ordered evidence gates. Full traceability lands before SleepLayer tables/workers; transparent scalar-genome evaluation lands before learned sequence/LLM Challengers; pgvector lands only with real embeddings and a measured need.
+
+### MVP follow-ups after Sprint 013C
+
+Two configured-device product observations are queued as separate scopes before final hardening:
+
+- **#174 — bounded resurfacing of already-reacted Items.** Normal discovery should strongly suppress repeatedly reacted/terminal Items. A saved-only Item may intentionally return as an occasional reminder when still unconsumed/unrated, behind versioned cooldown/frequency rules and inspectable Prediction trace reasons. Extend the existing generic Prediction policy; do not create a second recommender.
+- **#175 — recent SharedProfiles from the bottom Profile control.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles and a `Näytä lisää` route to the existing canonical group page. Reuse current Profile/navigation state rather than introducing duplicate group management.
+
+These follow 13C so the active Prediction architecture is not interrupted mid-gate. They must be resolved before the final MVP completion gate unless explicitly deferred by the product owner.
 
 ### Sprint 014 — MVP Hardening & Store Release
 
