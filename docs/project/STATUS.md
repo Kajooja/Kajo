@@ -41,7 +41,7 @@ Kajo already has:
 - hosted service-only catalog batch-import boundary and ACTIVE `catalog-import` Edge Function,
 - mobile catalog enrichment for cover/poster, creators, release year and original language while Prediction V1 remains the ranking authority.
 
-Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets the Profile; recommendable things remain `Item`s. Provider imports normalize into these same boundaries rather than creating Letterboxd/IMDb/TMDB/Book-specific user or predictor models.
+Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets the Profile`; recommendable things remain `Item`s. Provider imports normalize into these same boundaries rather than creating Letterboxd/IMDb/TMDB/Book-specific user or predictor models.
 
 ## Acceptance truth
 
@@ -97,7 +97,7 @@ Hosted rollback smoke proved source idempotency, cross-provider alias merging, a
 
 `catalog-import` deployed successfully as ACTIVE version 1. This execution environment could not perform an external HTTP request back into the Edge endpoint, so do not claim its 403/503 runtime paths as live-call accepted yet. The code itself validates the server secret before provider access. `TMDB_READ_ACCESS_TOKEN` is not yet configured, so a real TMDB import remains intentionally blocked until that server secret is supplied.
 
-Automated PR #189 CI #294 passed lint, TypeScript, tests and iOS/Android bundle smoke for the importer/mobile slice before the handoff documentation update. Re-run the final head CI before merge.
+PR #189 implementation CI #294 passed lint, TypeScript, tests and iOS/Android bundle smoke. Final documentation commits require the normal latest-head CI to pass before merge.
 
 Advisor status: no new catalog WARN. New private source tables report expected `RLS enabled/no policy` INFO because authenticated/anon have no table grants; their FK indexes are present. The existing leaked-password-protection WARN remains separate auth/security work.
 
