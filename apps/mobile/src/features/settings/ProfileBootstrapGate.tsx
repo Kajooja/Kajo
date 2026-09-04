@@ -1,3 +1,4 @@
+import { useRouter, useSegments } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import {
   ActivityIndicator,
@@ -33,6 +34,10 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const profiles = useActiveProfile();
   const { mode } = useDiscoveryMode();
+  const router = useRouter();
+  const segments = useSegments();
+  const routeKey = segments.join('/');
+  const isSettingsRoute = segments[0] === 'settings';
   const personalProfile = profiles.personalProfile;
   const activeIsPersonal = Boolean(
     personalProfile && profiles.activeProfile?.id === personalProfile.id,
@@ -79,7 +84,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [activeIsPersonal, personalProfile, rpc]);
+  }, [activeIsPersonal, personalProfile, routeKey, rpc]);
 
   const status =
     personalProfile && loadedStatus?.profileId === personalProfile.id
@@ -87,6 +92,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
       : null;
 
   if (
+    isSettingsRoute ||
     !rpc ||
     !personalProfile ||
     !activeIsPersonal ||
@@ -105,6 +111,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
       rpc={rpc}
       theme={theme}
       status={status}
+      onOpenImport={() => router.push('/settings')}
       onFailOpen={() => setFailedOpenProfileId(personalProfile.id)}
       onCompleted={() => {
         setFailedOpenProfileId(personalProfile.id);
@@ -119,6 +126,7 @@ function ProfileCalibrationScreen({
   rpc,
   theme,
   status,
+  onOpenImport,
   onFailOpen,
   onCompleted,
 }: {
@@ -126,6 +134,7 @@ function ProfileCalibrationScreen({
   rpc: ProfileCalibrationRpc;
   theme: ReturnType<typeof getRoomTheme>;
   status: ProfileBootstrapStatus;
+  onOpenImport: () => void;
   onFailOpen: () => void;
   onCompleted: () => void;
 }) {
@@ -229,9 +238,14 @@ function ProfileCalibrationScreen({
         {!started ? (
           <View style={styles.panel}>
             <Text style={styles.kicker}>OMA KAJO</Text>
-            <Text style={styles.title}>Opetetaan Kajolle, mistä pidät</Text>
+            <Text style={styles.title}>Anna Kajolle lähtötuntuma</Text>
             <Text style={styles.body}>
-              Kajo aloittaa yleisesti tunnetuista, suosituista ja juuri nyt
+              Jos sinulla on Letterboxd-, IMDb- tai kirjahistoriaa, voit tuoda sen
+              ensin. Muuten Kajo profiloi makusi lyhyellä oikean katalogin
+              kierroksella.
+            </Text>
+            <Text style={styles.body}>
+              Profilointi alkaa yleisesti tunnetuista, suosituista ja juuri nyt
               kiinnostusta keräävistä teoksista. Arvioi vähintään{' '}
               {status.minimumStrongEvidence} sellaista, jotka tunnet.
             </Text>
@@ -246,6 +260,17 @@ function ProfileCalibrationScreen({
               pitkäaikaista makua; tavallinen Kajo-käyttö alkaa nopeasti painaa
               enemmän.
             </Text>
+            <Pressable
+              accessibilityRole="button"
+              disabled={busy}
+              onPress={onOpenImport}
+              style={({ pressed }) => [
+                styles.secondaryWideButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.secondaryButtonText}>Tuo historia</Text>
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               disabled={busy}
@@ -491,6 +516,15 @@ function createStyles(theme: ReturnType<typeof getRoomTheme>) {
       color: theme.base.appBackground,
       fontSize: 13,
       fontWeight: '800',
+    },
+    secondaryWideButton: {
+      minHeight: 44,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: theme.base.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 16,
     },
     secondaryButton: {
       flex: 1,
