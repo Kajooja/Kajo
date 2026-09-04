@@ -40,15 +40,15 @@ export default function RootLayout() {
                   <SharedEndorsementProvider>
                     <ItemInteractionProvider>
                       <DiscoveryModeProvider>
-                        <BootstrapLoadingGate>
-                          {isAuthCallbackRoute ? (
-                            navigator
-                          ) : (
+                        {isAuthCallbackRoute ? (
+                          navigator
+                        ) : (
+                          <BootstrapLoadingGate>
                             <AuthGate>
                               <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
                             </AuthGate>
-                          )}
-                        </BootstrapLoadingGate>
+                          </BootstrapLoadingGate>
+                        )}
                       </DiscoveryModeProvider>
                     </ItemInteractionProvider>
                   </SharedEndorsementProvider>
