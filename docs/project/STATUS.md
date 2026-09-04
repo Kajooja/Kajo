@@ -86,7 +86,7 @@ The implementation contains:
 
 Hosted rollback smokes proved:
 
-- baseline compatibility: **36/36** compared BOOK/MOVIE-mode rows across FOR_YOU/SURPRISE/RISK had identical ranks, scores and confidence between the proven V0.3 baseline and the new baseline wrapper in the same transaction,
+- baseline compatibility: **36/36** compared rows across FOR_YOU/SURPRISE/RISK had identical ranks, scores and confidence between the proven V0.3 baseline and the new baseline wrapper in the same transaction,
 - authenticated users cannot execute V0 or the private scalar scorer; authenticated V1 remains allowed,
 - a V1 baseline run attaches the baseline genome and queues three global shadow Challengers,
 - the worker produced complete frozen shadow pools and the evaluator correctly reacted to controlled positive/negative rank changes,
@@ -99,7 +99,7 @@ Hosted rollback smokes proved:
 
 Automatic production promotion remains **disabled in MVP 0.1**. Full autonomous genetic optimization, global auto-promotion, cohort production assignment and learned/LLM Challenger families remain post-MVP evidence work.
 
-Supabase security guidance is followed for privileged internal functions: private schema, pinned empty `search_path` and explicit execution grants. Current advisors add no new exposed-API blocker from the serving gate. Private SleepLayer tables intentionally show `RLS enabled/no policy` INFO because direct client grants are absent. Existing leaked-password protection and unrelated Shared/List advisor items remain #160/release scope. See the Supabase database function and API-security guidance referenced during implementation.
+Supabase security guidance is followed for privileged internal functions: private schema, pinned empty `search_path` and explicit execution grants. Current advisors add no new exposed-API blocker from the serving gate. Private SleepLayer tables intentionally show `RLS enabled/no policy` INFO because direct client grants are absent. Existing leaked-password protection and unrelated Shared/List advisor items remain #160/release scope.
 
 ## Immediate product follow-ups
 
@@ -111,7 +111,11 @@ Normal discovery must strongly suppress repeatedly reacted/terminal Items. A sav
 
 Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles plus `Näytä lisää`, which routes to the existing canonical group page. Reuse current Profile/navigation state and membership source; do not create duplicate group management.
 
-These remain separate scopes. #174 is Prediction policy; #175 is navigation.
+### #177 — SharedProfile common-fit / `MVP-PRED-005`
+
+The Sprint 013 design gate is now resolved, but this MVP requirement is still open. Implement an inspectable Shared-only common-fit component using Shared joint evidence plus authorized accepted-member PersonalProfile fit, minimum-member/consensus behavior and disagreement penalty. The Prediction target stays the SharedProfile; Personal Events/Scenarios are not copied into Shared history and no second Shared recommender is allowed.
+
+These remain separate scopes: #174 is Prediction resurfacing policy, #175 is navigation, and #177 is the remaining Shared Prediction composition requirement.
 
 ## Other open MVP work
 
@@ -120,6 +124,7 @@ These remain separate scopes. #174 is Prediction policy; #175 is navigation.
 - #102 — refreshed configured-Android List acceptance.
 - #138 — configured-Android messaging acceptance.
 - PR #171/current main APK — refreshed Room lighting/targets/profile-hydration acceptance.
+- `MVP-MEM-004` — confirm/document future memory-extension point before final MVP gate.
 - #78 — optional logo polish only if it does not delay functional MVP.
 - #73 — Google/Apple sign-in remains future unless explicitly promoted into MVP.
 
@@ -127,9 +132,10 @@ These remain separate scopes. #174 is Prediction policy; #175 is navigation.
 
 1. **#174 reacted-Item resurfacing policy** through the existing versioned Prediction path.
 2. **#175 bottom Profile quick switcher** through the existing Profile/navigation architecture.
-3. **Deferred configured-device acceptance** for #102/#138/current Room follow-up without reopening accepted architecture.
-4. **Sprint 014** — production hardening, privacy/support/operations, auth delivery, signing/versioning, store assets, clean install/update acceptance and official store release.
-5. **MVP COMPLETE gate** — all accepted requirements/code on `main`, hosted state matches migrations, end-to-end Personal/Shared/Prediction flows pass, security/rollback/monitoring are ready, official store availability exists and the product owner accepts the installed release.
+3. **#177 SharedProfile common-fit / MVP-PRED-005** through the existing canonical Prediction V1 path.
+4. **Deferred configured-device acceptance** for #102/#138/current Room follow-up without reopening accepted architecture.
+5. **Sprint 014** — production hardening, privacy/support/operations, auth delivery, signing/versioning, store assets, clean install/update acceptance and official store release; also close any remaining explicit MVP requirement such as `MVP-MEM-004`.
+6. **MVP COMPLETE gate** — all accepted requirements/code on `main`, hosted state matches migrations, end-to-end Personal/Shared/Prediction flows pass, security/rollback/monitoring are ready, official store availability exists and the product owner accepts the installed release.
 
 ## Repository hygiene / non-duplication rules
 
@@ -164,4 +170,4 @@ These remain separate scopes. #174 is Prediction policy; #175 is navigation.
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target after this Sprint 013 acceptance branch lands: **#174**, then **#175**. Do not rebuild Prediction V1/SleepLayer, enable automatic promotion, create a second scorer, or fold #160 into these product follow-ups.
+Immediate target after this Sprint 013 acceptance branch lands: **#174**, then **#175**, then **#177**. Do not rebuild Prediction V1/SleepLayer, enable automatic promotion, create a second scorer, or fold #160 into these product follow-ups.
