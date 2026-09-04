@@ -3,6 +3,7 @@ import { Stack, useSegments } from 'expo-router';
 import { SupabaseProvider } from '@/data/SupabaseProvider';
 import { AuthGate } from '@/features/auth/AuthGate';
 import { AuthSessionProvider } from '@/features/auth/AuthSessionProvider';
+import { BootstrapLoadingGate } from '@/features/auth/BootstrapLoadingGate';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
 import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
@@ -39,13 +40,15 @@ export default function RootLayout() {
                   <SharedEndorsementProvider>
                     <ItemInteractionProvider>
                       <DiscoveryModeProvider>
-                        {isAuthCallbackRoute ? (
-                          navigator
-                        ) : (
-                          <AuthGate>
-                            <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
-                          </AuthGate>
-                        )}
+                        <BootstrapLoadingGate>
+                          {isAuthCallbackRoute ? (
+                            navigator
+                          ) : (
+                            <AuthGate>
+                              <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                            </AuthGate>
+                          )}
+                        </BootstrapLoadingGate>
                       </DiscoveryModeProvider>
                     </ItemInteractionProvider>
                   </SharedEndorsementProvider>
