@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -115,7 +116,7 @@ export function BottomProfileControl({
       >
         <Text
           numberOfLines={1}
-          style={[styles.dockIdentity, { color: textMuted }]}
+          style={[styles.dockIdentity, { color: textPrimary }]}
         >
           {identityName}
         </Text>
@@ -234,9 +235,15 @@ const styles = StyleSheet.create({
   },
   dockIdentity: {
     maxWidth: 190,
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.2,
+    fontFamily: Platform.select({
+      android: 'sans-serif-rounded',
+      ios: 'Avenir Next',
+      default: undefined,
+    }),
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.35,
+    lineHeight: 17,
   },
   modalLayer: {
     flex: 1,

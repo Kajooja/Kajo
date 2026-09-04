@@ -2,15 +2,26 @@ import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 const SPLASH_MARK_SCREEN_WIDTH = 0.72;
 
-export function StartupSplash() {
+interface StartupSplashProps {
+  message?: string;
+}
+
+export function StartupSplash({ message }: StartupSplashProps) {
   const { width } = useWindowDimensions();
   const scale = (width * SPLASH_MARK_SCREEN_WIDTH) / 102;
 
   return (
     <View style={styles.splash}>
-      <View style={{ transform: [{ scale }] }}>
-        <KajoMark />
+      <View style={styles.splashMarkFrame}>
+        <View style={{ transform: [{ scale }] }}>
+          <KajoMark />
+        </View>
       </View>
+      {message ? (
+        <Text accessibilityLiveRegion="polite" style={styles.splashMessage}>
+          {message}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -36,12 +47,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#000000',
+    paddingHorizontal: 28,
+  },
+  splashMarkFrame: {
+    width: '100%',
+    minHeight: 108,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashMessage: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 20,
+    marginTop: 22,
+    opacity: 0.9,
+    textAlign: 'center',
   },
   mark: {
     width: 102,
     height: 42,
     alignItems: 'center',
     justifyContent: 'flex-start',
+    transform: [{ translateY: 2 }],
   },
   wordRow: {
     flexDirection: 'row',

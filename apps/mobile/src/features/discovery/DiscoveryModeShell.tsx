@@ -632,7 +632,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                   onPress={messages.refresh}
                   style={({ pressed }) => [pressed && styles.rowPressed]}
                 >
-                  <Text style={[styles.inboxError, { color: theme.base.textMuted }]}>
+                  <Text style={[styles.inboxError, { color: theme.base.textMuted }]}> 
                     {messages.error} Yritä uudelleen.
                   </Text>
                 </Pressable>
@@ -863,11 +863,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 pressed && styles.brandPressed,
               ]}
             >
-              <Text
-                style={[styles.mailIcon, { color: theme.base.textPrimary }]}
-              >
-                ✉
-              </Text>
+              <MailGlyph color={theme.base.textPrimary} />
               {inboxUnreadCount > 0 ? (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.notificationBadgeText}>
@@ -879,6 +875,25 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           </View>
         </SafeAreaView>
       ) : null}
+    </View>
+  );
+}
+
+function MailGlyph({ color }: { color: string }) {
+  return (
+    <View style={[styles.mailGlyph, { borderColor: color }]}>
+      <View
+        style={[
+          styles.mailFlapLeft,
+          { backgroundColor: color },
+        ]}
+      />
+      <View
+        style={[
+          styles.mailFlapRight,
+          { backgroundColor: color },
+        ]}
+      />
     </View>
   );
 }
@@ -905,7 +920,7 @@ function DrawerListLink({
       onPress={onPress}
       style={({ pressed }) => [styles.drawerListRow, pressed && styles.rowPressed]}
     >
-      <Text numberOfLines={1} style={[styles.drawerListName, { color: textColor }]}>
+      <Text numberOfLines={1} style={[styles.drawerListName, { color: textColor }]}> 
         {label}
       </Text>
       {meta ? (
@@ -941,6 +956,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   brandMark: {
+    top: 3,
     transform: [{ scale: 0.72 }],
   },
   brandPressed: {
@@ -1251,9 +1267,30 @@ const styles = StyleSheet.create({
     height: 1.5,
     borderRadius: 1,
   },
-  mailIcon: {
-    fontSize: 20,
-    lineHeight: 23,
+  mailGlyph: {
+    width: 24,
+    height: 18,
+    borderWidth: 1.7,
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  mailFlapLeft: {
+    position: 'absolute',
+    top: 4,
+    left: 1,
+    width: 12,
+    height: 1.5,
+    borderRadius: 1,
+    transform: [{ rotate: '29deg' }],
+  },
+  mailFlapRight: {
+    position: 'absolute',
+    top: 4,
+    right: 1,
+    width: 12,
+    height: 1.5,
+    borderRadius: 1,
+    transform: [{ rotate: '-29deg' }],
   },
   notificationBadge: {
     position: 'absolute',
