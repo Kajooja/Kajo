@@ -191,11 +191,11 @@ Future components:
 - collaborative Item embeddings from co-occurrence and outcomes,
 - Profile/Scenario clusters rather than exposed identities,
 - cross-domain semantic Item space,
-- popularity priors corrected for exposure bias,
+- Kajo-derived popularity/trend priors corrected for exposure bias,
 - cold-start transfer,
 - cohort and global scenario retrieval.
 
-PopulationMemory never permits the mobile client to inspect other Profiles. Retrieval returns aggregated features/signals only. Sensitive/special-category inference is prohibited.
+PopulationMemory never permits the mobile client to inspect other Profiles. Retrieval returns aggregated features/signals only. Sensitive/special-category inference is prohibited. Provider-owned aggregate popularity/trend metadata used by `ColdStartPrior` is not PopulationMemory because it is not derived from other Kajo Profiles.
 
 ## 5. Prediction trace: the system's causal spine
 
@@ -416,21 +416,49 @@ One Endorsement does not set Shared Saved state. Unanimity among currently accep
 
 ## 11. Cold start and external history
 
-Cold-start order:
+A sparse Profile must not start from random Items or from fabricated demographic certainty. MVP bootstrap has two explicit PersonalProfile paths:
 
-1. generic catalog quality/availability,
-2. explicit onboarding selections and constraints,
-3. imported user-owned ratings/history,
-4. weak demographic/locale prior where lawful and useful,
-5. native behavior rapidly supersedes priors.
+1. user-authorized external history import when the user has it,
+2. otherwise a bounded real-catalog profiling pass.
 
-Preferred first import path:
+If imported/native strong evidence is already sufficient, the profiling gate is skipped. If the user opens import but returns without enough evidence, the profiling gate returns.
+
+### `ColdStartPrior` — `cold-start-prior-v1`
+
+The profiling candidate slate is ordered by a versioned non-personal Item prior:
+
+1. provider/catalog trend or popularity when available,
+2. provider/catalog recognition when available,
+3. an explicit recognition-only fallback for the temporary curated beta catalog,
+4. only a weak freshness component.
+
+The curated beta fallback must never be labelled as live trend data. Provider aggregate popularity/trend is catalog metadata and may be used in MVP. A trend derived from aggregate Kajo Profile behaviour is different: that is future privacy-gated `PopulationMemory` and requires minimum-cohort, consent/deletion-lineage and exposure-bias controls before it may influence cold start.
+
+### Bounded no-import profiling
+
+MVP `cold-start-v1` rules:
+
+- PersonalProfile only,
+- minimum completion target: **6 ratings of known Items**,
+- show **12 high-prior real Items first** across BOOK/MOVIE,
+- unknown Items may be skipped without creating negative evidence,
+- if fewer than 6 known Items are found, extend the same deterministic slate up to **24 Items**,
+- completion is allowed immediately once 6 ratings exist; the user is never required to rate all 12/24,
+- if the bounded maximum/catalog availability still cannot yield six known Items, fail open instead of trapping the user,
+- `KAJO_MOCK` is never eligible,
+- image availability is presentation enrichment, not calibration eligibility,
+- no demographic fields are required.
+
+Calibration responses persist as source-tagged `KAJO_CALIBRATION` bootstrap evidence. They initialize `LongTermState` only; they are not native Kajo Events and do not enter WorkingState, ShortTermState or ScenarioMemory. Native Kajo behaviour then progressively supersedes the bootstrap signal.
+
+Preferred import paths:
 
 - Letterboxd export ZIP/CSV,
 - IMDb ratings/list CSV,
-- later book-service user exports where terms permit.
+- Goodreads/StoryGraph-style user exports,
+- documented generic Kajo CSV fallback.
 
-Imports are user-initiated; Kajo does not scrape accounts or depend on unofficial login automation. Imported ratings map to canonical rating/consumed evidence with `properties.source`, `importBatchId`, original scale/date and mapping confidence. Uncertain Item matches require review or exclusion.
+Imports are user-initiated; Kajo does not scrape accounts or depend on unofficial login automation. Imported ratings map to canonical rating/consumed evidence with source/import provenance and mapping confidence. Uncertain Item matches require review or exclusion. Imported Personal evidence is never copied into SharedProfile history.
 
 ## 12. Representation roadmap: what Kajo borrows from modern systems
 
