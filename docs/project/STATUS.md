@@ -62,31 +62,44 @@ Issue #156 owns the versioned Prediction nervous system and controlled evolution
 
 ### 13B — accepted on configured Android
 
-Hosted Supabase contains the ordered Prediction V1 migrations, including the forward-only fix for the hosted PL/pgSQL `prediction_id` collision. Authorization, Scenario reward precedence, undo exclusion, cross-Profile isolation, candidate persistence and representative query plans were already verified against hosted data.
+Hosted Supabase contains the ordered Prediction V1 migrations, including the forward-only fix for the hosted PL/pgSQL `prediction_id` collision. Authorization, Scenario reward precedence, undo exclusion, cross-Profile isolation, candidate persistence and representative query plans were verified against hosted data.
 
-Configured Android acceptance on 2026-09-04 then proved the real mobile path:
+Configured Android acceptance on 2026-09-04 proved the real mobile path for PersonalProfile and SharedProfile: hosted actions matched their PredictionRun on Profile, actor and session; the acted Items existed as delivered PredictionCandidates; and earlier immediate fallback actions remained analytically distinguishable.
 
-- PersonalProfile rating produced a `hosted` Event tied to a real `prediction-v1.0` PredictionRun,
-- SharedProfile rating produced the same complete hosted chain independently,
-- for both actions `profile_id`, `actor_user_id` and `session_id` matched the PredictionRun,
-- matching PredictionCandidate rows existed and were `selected_for_delivery = true`,
-- the earlier immediate actions remained explicitly marked `predictionSource=fallback`, proving hosted and fallback traces are analytically distinguishable,
-- the mobile hook has an intentional 600 ms refresh delay; accepted follow-up hosted impression persistence was observed roughly 0.56–1.40 s after the server run timestamp at current development scale. This is a device/development baseline, not a production SLO.
+### 13C — executable SleepLayer foundation hosted; serving promotion still gated
 
-No duplicate predictor, schema or client-side recommendation path was introduced.
+The first controlled evolution slice is now implemented and hosted through ordered migrations:
 
-### 13C — next implementation slice
+- repository `20260904170000_sleep_layer_v1_foundation.sql` -> hosted `20260904134409 sleep_layer_v1_foundation`,
+- repository `20260904172000_sleep_layer_v1_fk_indexes.sql` -> hosted `20260904134901 sleep_layer_v1_fk_indexes`.
 
-Continue the same Prediction architecture with:
+It adds one canonical extension of the existing Prediction V1 trace:
 
-- immutable `PredictorGenome` registry and constrained weight schemas,
-- prospective `ShadowPrediction` persistence/worker using frozen production-run input,
-- immutable `EvaluationWindow` plus outcome maturity/comparable-episode/coverage rules,
-- global/cohort/Profile `GenomeEvaluation` with hierarchical shrinkage,
-- versioned `PolicyAssignment` and `PromotionDecision` audit,
-- manual promotion + reversible rollback only for MVP.
+- immutable `PredictorGenome` registry with constrained `scalar-genome-v1` configs,
+- the exact current Prediction V1 baseline recorded as the global `Champion`,
+- three bounded transparent `SHADOW` Challengers: short-term tilt, Scenario tilt and novelty/exploration tilt,
+- future PredictionRuns tagged with the resolved baseline genome and PolicyAssignment,
+- prospective `ShadowPrediction` job/run/candidate persistence using only the frozen production candidate trace and prediction-time Context/state,
+- an internal worker that produces complete hypothetical Challenger rankings without changing delivery,
+- immutable `EvaluationWindow`, `GenomeEvaluation`, `PolicyAssignment` and `PromotionDecision` audit structures,
+- mature exposed-outcome evaluation with explicit coverage and Profile shrinkage toward broader evidence,
+- no client read/write access to SleepLayer tables; only bounded service-role worker/evaluator execution,
+- immutable artifact guards for genomes, windows, shadows, evaluations, assignments and decisions.
 
-Automatic production promotion remains disabled until external-beta/online experiment gates exist. Do not create a second recommender, live genetic mutation loop or LLM serving path.
+Hosted rollback verification proved:
+
+- one authenticated V1 run attached `prediction-v1-baseline`,
+- exactly three Challenger jobs queued,
+- worker processed 3/3 with no failures,
+- all three shadows retained the exact source as-of timestamp and complete 12-candidate frozen pool,
+- controlled ShortTerm evidence intentionally reversed two ranks and the mature evaluator scored the Challenger above production using only two exposed Items with real synthetic Outcomes,
+- GLOBAL and PROFILE evaluations were both written; the Profile record used hierarchical shrinkage logic,
+- genome UPDATE was rejected by the immutability guard,
+- all synthetic smoke data rolled back; hosted shadow/evaluation tables were empty afterward.
+
+Supabase security advisors show only expected `private.* RLS enabled/no policy` INFO because direct client grants are absent. New SleepLayer foreign-key advisor findings were corrected by the forward index migration. Immediate `unused index` INFO on new indexes is expected before real worker traffic.
+
+**Remaining 13C gate:** a Challenger cannot yet become a real serving policy. This is deliberate. The next slice must wire reviewed genome configuration into serving without changing the accepted baseline result, then add an explicit manual promotion + rollback operation and verify that a promoted Profile/global assignment is actually what `rank_items_v1` serves. Automatic promotion remains disabled.
 
 ## Product findings queued without changing the 13C boundary
 
@@ -109,7 +122,7 @@ These are separate scopes. #174 belongs to the existing Prediction policy path; 
 
 ## Next MVP sequence
 
-1. **Sprint 013C** — implement executable immutable Challenger/SleepLayer persistence, evaluation and manual promotion/rollback path.
+1. **Finish Sprint 013C** — serving-aware genome resolution plus explicit manual promotion/rollback, then hosted verification.
 2. **Prediction/UI follow-ups** — integrate #174 through the same versioned prediction policy and implement #175 through the existing Profile/navigation architecture.
 3. **Deferred device acceptance** — close #102/#138 and refreshed PR #171 checks without reopening accepted navigation/Room architecture.
 4. **Sprint 014** — production hardening, privacy/support/operations, signing/versioning, store assets, clean install/update acceptance and official store release.
@@ -145,9 +158,11 @@ These are separate scopes. #174 belongs to the existing Prediction policy path; 
 - `/apps/mobile/src/features/events/`
 - `/supabase/migrations/20260902223000_prediction_nervous_system_v1.sql`
 - `/supabase/migrations/20260904120420_fix_prediction_v1_candidate_returning.sql`
+- `/supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql`
+- `/supabase/migrations/20260904172000_sleep_layer_v1_fk_indexes.sql`
 
 ## Handoff
 
 A fresh conversation must follow `/AGENTS.md` and may start with **"jatketaan reposta"**.
 
-Immediate target: **Sprint 013C SleepLayer implementation** on top of the accepted hosted/device-verified Prediction V1. Do not reapply Prediction V1, recreate the scorer, fold #160 security work into this sprint, or mix #175 navigation work into the SleepLayer branch.
+Immediate target: finish **Sprint 013C serving-aware manual promotion/rollback** on top of the hosted shadow/evaluation foundation. Do not reapply the hosted SleepLayer migrations, create a second recommender, enable automatic promotion, fold #160 security work into this sprint, or mix #175 navigation work into the SleepLayer branch.
