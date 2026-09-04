@@ -1,16 +1,33 @@
 -- Sprint 013C serving gate.
 --
--- Keep one canonical Prediction V1 boundary while making its transparent scalar
--- score weights resolve from the versioned PolicyAssignment/PredictorGenome.
+-- Keep one canonical Prediction V1 boundary and one proven V0.3 feature/base
+-- scorer. The existing V0 scorer is moved to the private schema and becomes
+-- the fixed candidate generator. A scalar PredictorGenome may rerank only that
+-- frozen candidate pool; ScenarioMemory is still applied by Prediction V1.
+--
 -- Production stays on the exact seeded baseline until a service-only manual
--- Profile canary passes the documented evidence gates. Global automatic or
--- manual Challenger promotion remains disabled in MVP 0.1.
+-- Profile canary passes the documented evidence gates. Global Challenger
+-- promotion and automatic promotion remain disabled in MVP 0.1.
 
 -- -----------------------------------------------------------------------------
--- Canonical scalar base scorer. This is the parameterized form of the proven
--- Prediction V0.3 scoring logic. ScenarioMemory remains layered by V1 after the
--- base score. A forced genome is used only by the legacy V0 compatibility
--- wrapper; normal V1 serving resolves the current Profile/global assignment.
+-- Preserve the proven V0.3 implementation as one private baseline generator.
+-- Direct mobile V0 execution was already revoked by Sprint 013A.
+-- -----------------------------------------------------------------------------
+
+alter function public.rank_items_v0(uuid, text, text, integer, jsonb)
+  set schema private;
+
+revoke all on function private.rank_items_v0(uuid, text, text, integer, jsonb)
+  from public, anon, authenticated, service_role;
+
+-- -----------------------------------------------------------------------------
+-- Genome-aware scalar policy layer.
+--
+-- The baseline genome returns the exact stored V0.3 score. Challenger genomes
+-- recompute the transparent scalar score from the already-versioned V0.3
+-- explanation components. This is intentionally the same formula used by the
+-- prospective ShadowPrediction worker. No current/future state is read beyond
+-- what the baseline request itself legitimately sees at serving time.
 -- -----------------------------------------------------------------------------
 
 create or replace function private.rank_items_scalar_v1(
@@ -55,26 +72,6 @@ begin
     raise exception 'Profile access denied' using errcode = '42501';
   end if;
 
-  if requested_mode is null
-     or requested_mode not in ('FOR_YOU', 'SURPRISE', 'RISK') then
-    raise exception 'Unsupported discovery mode' using errcode = '22023';
-  end if;
-
-  if requested_item_type is not null
-     and requested_item_type not in ('BOOK', 'MOVIE') then
-    raise exception 'Unsupported item type' using errcode = '22023';
-  end if;
-
-  if result_limit < 1 or result_limit > 50 then
-    raise exception 'Result limit must be between 1 and 50'
-      using errcode = '22023';
-  end if;
-
-  if request_context is null or jsonb_typeof(request_context) <> 'object' then
-    raise exception 'Request context must be a JSON object'
-      using errcode = '22023';
-  end if;
-
   if forced_genome_id is null then
     select resolved.genome_id
       into resolved_genome_id
@@ -99,273 +96,104 @@ begin
   end if;
 
   return query
-  with prediction as (
-    select gen_random_uuid() as id
+  with baseline_pool as materialized (
+    select baseline.*
+    from private.rank_items_v0(
+      target_profile_id,
+      requested_mode,
+      requested_item_type,
+      result_limit,
+      request_context
+    ) as baseline
   ),
-  reversed_events as (
-    select (event.properties ->> 'reversedEventId')::uuid as event_id
-    from public.events as event
-    where event.profile_id = target_profile_id
-      and event.event_type = 'ITEM_INTERACTION_UNDONE'
-      and event.properties ? 'reversedEventId'
-      and (event.properties ->> 'reversedEventId') ~*
-        '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-  ),
-  weighted_events as (
+  rescored as (
     select
-      event.item_id,
-      event.occurred_at,
-      case event.event_type
-        when 'ITEM_RATED' then
-          case
-            when event.properties ->> 'rating' ~ '^(10|[0-9])$'
-              then (((event.properties ->> 'rating')::double precision - 5.0) * 1.2)
-            else 0.0
-          end
-        when 'ITEM_NOT_INTERESTED' then -5.5
-        when 'ITEM_LIKED' then 3.0
-        when 'ITEM_DISLIKED' then -4.0
-        when 'ITEM_INTEREST_CLEARED' then -1.0
-        when 'ITEM_SAVED' then 2.0
-        when 'ITEM_UNSAVED' then -1.5
-        when 'ITEM_OPENED' then 0.35
-        when 'ITEM_CONSUMED' then 0.75
-        when 'ITEM_CONSUMPTION_REVERSED' then -0.5
-        else 0.0
-      end as event_weight
-    from public.events as event
-    where event.profile_id = target_profile_id
-      and event.item_id is not null
-      and event.event_type in (
-        'ITEM_RATED',
-        'ITEM_NOT_INTERESTED',
-        'ITEM_LIKED',
-        'ITEM_DISLIKED',
-        'ITEM_INTEREST_CLEARED',
-        'ITEM_SAVED',
-        'ITEM_UNSAVED',
-        'ITEM_OPENED',
-        'ITEM_CONSUMED',
-        'ITEM_CONSUMPTION_REVERSED'
-      )
-      and not exists (
-        select 1
-        from reversed_events
-        where reversed_events.event_id = event.id
-      )
-  ),
-  tag_evidence as (
-    select
-      tag,
-      sum(
-        weighted_events.event_weight
-        * exp(
-            -least(
-              365.0,
-              greatest(
-                0.0,
-                extract(epoch from (now() - weighted_events.occurred_at))
-                  / 86400.0
-              )
-            )
-            / 180.0
-          )
-      ) as long_term_score,
-      sum(
-        case
-          when weighted_events.occurred_at >= now() - interval '14 days'
-            then weighted_events.event_weight
-              * exp(
-                  -greatest(
-                    0.0,
-                    extract(epoch from (now() - weighted_events.occurred_at))
-                      / 86400.0
-                  )
-                  / 7.0
-                )
-          else 0.0
-        end
-      ) as short_term_score,
-      count(*)::integer as evidence_count
-    from weighted_events
-    join public.items as evidence_item
-      on evidence_item.id = weighted_events.item_id
-    cross join lateral unnest(evidence_item.tags) as tag
-    where weighted_events.event_weight <> 0
-    group by tag
-  ),
-  recent_impressions as (
-    select
-      event.item_id,
-      max(event.occurred_at) as last_impression_at
-    from public.events as event
-    where event.profile_id = target_profile_id
-      and event.event_type = 'ITEM_IMPRESSION'
-      and event.item_id is not null
-      and event.occurred_at >= now() - interval '30 minutes'
-    group by event.item_id
-  ),
-  candidate_signals as (
-    select
-      candidate.id,
-      candidate.item_type,
-      candidate.title,
-      candidate.description,
-      candidate.tags,
-      coalesce(sum(tag_evidence.long_term_score), 0.0) as long_term_score,
-      coalesce(sum(tag_evidence.short_term_score), 0.0) as short_term_score,
-      coalesce(sum(tag_evidence.evidence_count), 0)::integer as evidence_count,
-      coalesce(
-        case interaction.interest
-          when 'LIKED' then 4.0
-          when 'DISLIKED' then -6.0
-          else 0.0
-        end,
-        0.0
-      )
-      + case when interaction.saved then 2.5 else 0.0 end
-      + case
-          when interaction.rating is not null
-            then (interaction.rating::double precision - 5.0) * 1.2
-          else 0.0
-        end
-      - case when interaction.not_interested then 7.0 else 0.0 end
-        as direct_score,
-      coalesce(interaction.rating, null) as rating,
-      coalesce(interaction.not_interested, false) as not_interested,
-      coalesce(interaction.saved, false) as saved,
-      interaction.interest as interest,
-      coalesce(interaction.consumed, false) as consumed,
-      recent_impressions.last_impression_at,
+      baseline_pool.*,
       case
-        when coalesce(interaction.consumed, false) then 100.0
-        when interaction.rating is not null
-          or coalesce(interaction.not_interested, false)
-          or coalesce(interaction.saved, false)
-          or interaction.interest is not null
-          then 18.0
-        else 0.0
-      end as reaction_queue_penalty,
-      case
-        when recent_impressions.last_impression_at is null
-          or coalesce(interaction.consumed, false)
-          or interaction.rating is not null
-          or coalesce(interaction.not_interested, false)
-          or coalesce(interaction.saved, false)
-          or interaction.interest is not null
-          then 0.0
-        else 12.0 * greatest(
+        when resolved_genome_key = 'prediction-v1-baseline'
+          then baseline_pool.score
+        else private.shadow_candidate_score_v1(
+          requested_mode,
+          baseline_pool.explanation,
           0.0,
-          1.0 - least(
-            1800.0,
-            greatest(
-              0.0,
-              extract(epoch from (now() - recent_impressions.last_impression_at))
-            )
-          ) / 1800.0
+          resolved_genome_config
         )
-      end as impression_cooldown_penalty,
-      case
-        when coalesce(cardinality(candidate.tags), 0) = 0 then 0.0
-        else 1.0 - least(
-          1.0,
-          coalesce(count(tag_evidence.tag), 0)::double precision
-            / cardinality(candidate.tags)::double precision
-        )
-      end as novelty_score,
-      (
-        ('x' || substr(md5(target_profile_id::text || ':' || candidate.id::text), 1, 8))
-          ::bit(32)::bigint::double precision
-        / 4294967295.0
-      ) as exploration_score
-    from public.items as candidate
-    left join public.item_interactions as interaction
-      on interaction.profile_id = target_profile_id
-     and interaction.item_id = candidate.id
-    left join recent_impressions
-      on recent_impressions.item_id = candidate.id
-    left join lateral unnest(candidate.tags) as candidate_tag on true
-    left join tag_evidence on tag_evidence.tag = candidate_tag
-    where requested_item_type is null
-       or candidate.item_type = requested_item_type
-    group by
-      candidate.id,
-      candidate.item_type,
-      candidate.title,
-      candidate.description,
-      candidate.tags,
-      interaction.interest,
-      interaction.saved,
-      interaction.rating,
-      interaction.not_interested,
-      interaction.consumed,
-      recent_impressions.last_impression_at
+      end as scalar_score
+    from baseline_pool
   ),
-  scored as (
+  reranked as (
     select
-      candidate_signals.*,
-      direct_score
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'direct')
-      + long_term_score
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'longTerm')
-      + short_term_score
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'shortTerm')
-      + novelty_score
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'novelty')
-      + exploration_score
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'exploration')
-      - reaction_queue_penalty
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'reactionPenalty')
-      - impression_cooldown_penalty
-        * private.genome_weight_v1(resolved_genome_config, requested_mode, 'impressionCooldown')
-        as final_score
-    from candidate_signals
-  ),
-  ranked as (
-    select
-      scored.*,
-      row_number() over (order by final_score desc, id)::integer as result_rank
-    from scored
+      rescored.*,
+      row_number() over (
+        order by rescored.scalar_score desc, rescored.item_id
+      )::integer as scalar_rank
+    from rescored
   )
   select
-    prediction.id,
-    ranked.id,
-    ranked.item_type,
-    ranked.title,
-    ranked.description,
-    ranked.tags,
-    ranked.final_score,
-    least(1.0, ranked.evidence_count::double precision / 8.0),
-    ranked.result_rank,
-    jsonb_build_object(
-      'version', 'prediction-scalar-v1',
-      'baseVersion', 'prediction-v0.3',
-      'genomeId', resolved_genome_id,
-      'genomeKey', resolved_genome_key,
-      'mode', requested_mode,
-      'longTerm', round(ranked.long_term_score::numeric, 4),
-      'shortTerm', round(ranked.short_term_score::numeric, 4),
-      'direct', round(ranked.direct_score::numeric, 4),
-      'novelty', round(ranked.novelty_score::numeric, 4),
-      'exploration', round(ranked.exploration_score::numeric, 4),
-      'rating', ranked.rating,
-      'notInterested', ranked.not_interested,
-      'saved', ranked.saved,
-      'consumedSuppressed', ranked.consumed,
-      'lastImpressionAt', ranked.last_impression_at,
-      'reactionQueuePenalty', round(ranked.reaction_queue_penalty::numeric, 4),
-      'impressionCooldownPenalty', round(ranked.impression_cooldown_penalty::numeric, 4),
-      'evidenceCount', ranked.evidence_count,
-      'contextAccepted', request_context <> '{}'::jsonb
+    reranked.prediction_id,
+    reranked.item_id,
+    reranked.item_type,
+    reranked.title,
+    reranked.description,
+    reranked.tags,
+    reranked.scalar_score,
+    reranked.confidence,
+    reranked.scalar_rank,
+    reranked.explanation || jsonb_build_object(
+      'scalarGenome', jsonb_build_object(
+        'genomeId', resolved_genome_id,
+        'genomeKey', resolved_genome_key,
+        'baselineEquivalent', resolved_genome_key = 'prediction-v1-baseline'
+      )
     )
-  from ranked
-  cross join prediction
-  where ranked.result_rank <= result_limit
-  order by ranked.result_rank;
+  from reranked
+  order by reranked.scalar_rank;
 end;
 $$;
 
 revoke all on function private.rank_items_scalar_v1(uuid, text, text, integer, jsonb, uuid)
+  from public, anon, authenticated, service_role;
+
+-- Keep the historical public V0 symbol only as a non-serving compatibility
+-- wrapper. It is still not executable by mobile roles and always forces the
+-- immutable baseline genome. The scoring formula itself now exists only in the
+-- private V0.3 baseline generator above.
+create or replace function public.rank_items_v0(
+  target_profile_id uuid,
+  requested_mode text,
+  requested_item_type text default null,
+  result_limit integer default 20,
+  request_context jsonb default '{}'::jsonb
+)
+returns table (
+  prediction_id uuid,
+  item_id uuid,
+  item_type text,
+  title text,
+  description text,
+  tags text[],
+  score double precision,
+  confidence double precision,
+  rank integer,
+  explanation jsonb
+)
+language sql
+volatile
+security invoker
+set search_path = ''
+as $$
+  select *
+  from private.rank_items_scalar_v1(
+    target_profile_id,
+    requested_mode,
+    requested_item_type,
+    result_limit,
+    request_context,
+    md5('kajo:predictor-genome:prediction-v1-baseline')::uuid
+  );
+$$;
+
+revoke all on function public.rank_items_v0(uuid, text, text, integer, jsonb)
   from public, anon, authenticated, service_role;
 
 create or replace function private.serving_scenario_weight_v1(
@@ -388,9 +216,9 @@ $$;
 revoke all on function private.serving_scenario_weight_v1(uuid, text, timestamptz)
   from public, anon, authenticated, service_role;
 
--- Patch the already-deployed canonical V1 function rather than cloning a second
--- V1 implementation. The first replacement swaps only the base scorer call;
--- the second replaces the fixed Scenario multiplier with the assigned genome.
+-- Patch the already-deployed canonical V1 implementation in place rather than
+-- introducing another V1 function. Only the base scorer call and fixed Scenario
+-- multiplier change; trace/outcome/Scenario retrieval semantics stay intact.
 do $$
 declare
   definition text;
@@ -425,9 +253,9 @@ begin
 end;
 $$;
 
--- The queue's Challenger pool is the latest GLOBAL state for each genome.
--- A Profile-specific canary must not accidentally remove a genome from the
--- global shadow pool used for all other Profiles.
+-- A Profile CANARY decision must not remove that genome from the global shadow
+-- pool for other Profiles. Queue candidates from each genome's latest GLOBAL
+-- state only.
 create or replace function private.enqueue_prediction_shadows_v1()
 returns trigger
 language plpgsql
@@ -469,7 +297,6 @@ revoke all on function private.enqueue_prediction_shadows_v1()
 -- -----------------------------------------------------------------------------
 -- Manual Profile canary. This is the only Challenger-to-serving operation in
 -- MVP 0.1. It is evidence-gated, service-only, Profile-scoped and reversible.
--- Global Challenger promotion remains intentionally unavailable.
 -- -----------------------------------------------------------------------------
 
 create or replace function private.manual_profile_canary_v1(
