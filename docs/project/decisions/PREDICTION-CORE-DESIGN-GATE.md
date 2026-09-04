@@ -1,22 +1,28 @@
-# Prediction Core / EvoBot design gate
+# Prediction Core / SleepLayer design gate
 
-Status: **OPEN — implementation gate**
+Status: **RESOLVED 2026-09-03 — implementation follows ADR-0005**
 Tracking issue: **#156**
 
-Kajo's current `Prediction V0` is an inspectable, replaceable MVP baseline. It is not the final EvoBot architecture.
+This file preserves the historical gate that prevented premature hard-coding during Sprint 011. Issue #156 resolves the gate through:
 
-Do not implement or hard-code the following until #156 has an explicitly approved design:
+- `/docs/domain/PREDICTION_MODEL.md`,
+- `/docs/architecture/decisions/0005-versioned-prediction-nervous-system.md`,
+- `/docs/project/sprints/SPRINT-013.md`.
 
-- final `LongTermState` representation or update algorithm,
-- final `ShortTermState` / near-memory representation,
+Kajo's current `Prediction V0` remains an inspectable, replaceable baseline inside Prediction V1. `SleepLayer` is the canonical name for the controlled background champion–challenger mechanism; `EvolutionEngine` is the evaluator/promotion subsystem. The former `EvoBot` name is historical shorthand, not a separate domain object.
+
+The gate originally covered:
+
+- `LongTermState` representation and update rules,
+- `ShortTermState` / near-memory representation,
 - Scenario creation schema and lifecycle,
 - Scenario similarity/retrieval,
 - population ScenarioMemory,
-- EvoBot genome structure,
+- PredictorGenome structure,
 - mutation/crossover/selection rules,
 - champion/challenger lifecycle,
-- final objective/outcome function,
-- final Personal/Shared/population signal composition.
+- objective/outcome versioning,
+- Personal/Shared/population signal composition.
 
 Sprint 011 may continue with prediction-core-independent collaboration mechanics:
 
@@ -27,6 +33,6 @@ Sprint 011 may continue with prediction-core-independent collaboration mechanics
 - unanimous consensus -> Shared Saved state,
 - actor-specific pending collaboration delivery layered outside the core taste model.
 
-`MVP-PRED-005` common-fit coefficient/formula work remains gated until #156 clarifies how member evidence composes with the future core predictor.
+The design gate is resolved, but implementation maturity gates remain. In particular, `MVP-PRED-005` common-fit coefficients still require real Shared outcome evidence, and PopulationMemory, automatic promotion and unrestricted cross-Profile retrieval remain outside MVP 0.1.
 
-The permanent architecture requirement is replaceability: candidate generation, state/memory retrieval, core outcome prediction, DiscoveryMode policy and collaboration/eligibility delivery must remain separable/versioned enough that the temporary V0 scorer can later be replaced without rewriting mobile interaction state or core domain contracts.
+The permanent architecture requirement is replaceability: candidate generation, state/memory retrieval, core outcome prediction, DiscoveryMode policy and collaboration/eligibility delivery remain separable and versioned so the V0 base scorer can later be replaced without rewriting mobile interaction state or core domain contracts.

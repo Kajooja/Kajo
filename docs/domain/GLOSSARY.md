@@ -16,13 +16,28 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Event | `Event` | Recorded behaviour/exposure/outcome involving an actor, Profile context and usually an Item. |
 | Context | `Context` | Situation surrounding a prediction or event. |
 | Human state | `HumanState` | Current learned representation of a person/Profile used by Prediction. |
+| Working state / työmuisti | `WorkingState` | Active-session representation of ordered recent actions and immediate intent. It is fast and temporary, and must not be mistaken for durable taste. |
 | Long-term state / kaukomuisti | `LongTermState` | Slowly changing learned state based on longer history. |
 | Short-term state / lähimuisti | `ShortTermState` | Recent/current learned state with stronger recency sensitivity. |
+| Memory state snapshot | `MemoryStateSnapshot` | Versioned, point-in-time summary of Working/Short/Long state captured with a Prediction so its decision can later be replayed. |
 | Memory | `Memory` | Historical evidence available to the system; not immutable truth. |
 | Scenario | `Scenario` | Historical state + context + candidate/pattern + prediction + observed outcome. |
 | Scenario memory | `ScenarioMemory` | Retrieval layer for similar historical Scenarios. |
+| Population memory | `PopulationMemory` | Privacy-gated aggregate/collaborative evidence across Profiles. It never exposes another Profile's raw history and is post-MVP. |
 | Prediction | `Prediction` | Estimated outcome/suitability for Profile + Item + Context. |
 | Prediction ID | `predictionId` | Identifier connecting recommendations/impressions to later outcomes. |
+| Prediction run | `PredictionRun` | One versioned hosted prediction request including actor, Profile, session, Context, MemoryStateSnapshot, model/policy versions and candidate/result counts. |
+| Prediction candidate | `PredictionCandidate` | One Item considered in a PredictionRun with source/final rank, score, confidence, delivery state and inspectable components. |
+| Outcome | `Outcome` | Strongest currently observed result attributed to one predicted Item/Scenario; may be replaced by a higher-priority delayed outcome such as a rating. |
+| Reward | `Reward` | Versioned bounded numeric evaluation derived from an Outcome for learning/evaluation; it is not the raw Event itself. |
+| Predictor genome | `PredictorGenome` | Immutable configuration/artifact references for one EvolutionEngine challenger or champion. Production mutation is forbidden. |
+| Evolution engine | `EvolutionEngine` | Offline-to-online controlled process that evaluates predictor genomes through replay, shadow, canary/A/B and explicit promotion/rollback. |
+| Sleep layer / unikerros | `SleepLayer` | Background evaluation and consolidation layer that freezes or reconstructs prediction-time evidence, runs multiple PredictorGenomes without affecting delivery, and scores them only after Outcomes mature. It is scheduled/asynchronous, not tied to a person's literal sleep. |
+| Champion | `Champion` | PredictorGenome currently selected to serve a defined scope: global, cohort or one Profile. |
+| Challenger | `Challenger` | Non-serving PredictorGenome evaluated against the same eligible evidence as the Champion. |
+| Shadow prediction | `ShadowPrediction` | Frozen Challenger ranking for the same as-of Context, state and candidate pool as a production Prediction; it never changes what the user sees. |
+| Policy assignment | `PolicyAssignment` | Versioned selection of a Champion for a global, cohort or Profile scope, with fallback, effective dates and rollback target. |
+| Evaluation window | `EvaluationWindow` | Immutable cutoff and outcome-maturity interval used to compare Champion and Challengers without future-data leakage. |
 | Discovery mode | `DiscoveryMode` | Recommendation exploration policy: FOR_YOU, SURPRISE or RISK. |
 | Ambient phase | `AmbientPhase` | Visual phase DAWN, EVENING or NIGHT. Separate from DiscoveryMode. |
 | For you | `FOR_YOU` | High expected fit / relatively high confidence discovery policy. |

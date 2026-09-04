@@ -185,6 +185,75 @@ behind a dedicated Python/FastAPI service once model/tooling or scale requires
 it; the conceptual request/response contract must remain stable when that
 happens.
 
+Sprint 013 introduces the versioned `public.rank_items_v1` boundary. It keeps
+V0 as an internal base scorer, adds same-Profile ScenarioMemory retrieval and
+persists the full decision trace in non-client-readable
+`private.prediction_runs` and `private.prediction_candidates`. Direct
+authenticated execution of V0 is revoked so hosted mobile traffic cannot
+bypass trace persistence. V1 returns the same row shape as V0, allowing the
+mobile boundary to remain stable while model/policy versions evolve.
+
+The MVP V1 data flow is:
+
+```text
+mobile Context + sessionId
+  -> rank_items_v1
+     -> derive MemoryStateSnapshot from append-only Events
+     -> V0 candidate pool
+     -> retrieve traced same-Profile Outcomes
+     -> ScenarioMemory re-score
+     -> persist PredictionRun + all PredictionCandidates
+  -> returned slate
+  -> meaningful ITEM_IMPRESSION / OPENED / DWELL / actions
+  -> correlated delayed Outcome
+```
+
+At scale, the boundary separates into candidate retrieval, online feature
+store, ranker, policy/slate builder, trace sink and offline evaluation/training.
+This decomposition does not change the canonical Profile + Context +
+DiscoveryMode request.
+
+### Memory storage strategy
+
+- `WorkingState`: reconstructed/cached per active session.
+- `ShortTermState` and `LongTermState`: rebuildable versioned projections from Events; V1 captures a compact JSON snapshot per Prediction.
+- `ScenarioMemory`: V1 reconstructs episodes by joining Prediction traces to correlated Events and uses transparent sparse similarity.
+- `PopulationMemory`: post-MVP aggregate/embedding service behind privacy and minimum-cohort gates.
+- pgvector/ANN is introduced only when learned/licensed embeddings and volume justify it; opaque fake vectors are not an MVP requirement.
+
+### Learning and experimentation separation
+
+Online serving never promotes its own changed weights. Offline evaluation owns
+challenger generation, replay and shadow results; experimentation owns guarded
+canary/A/B comparison; an explicit model registry promotion changes the
+champion. Every transition retains feature/reward/model/policy versions and a
+rollback target. See ADR-0005 and `PREDICTION_MODEL.md`.
+
+### SleepLayer target architecture
+
+The SleepLayer consumes immutable Prediction traces and matured Outcomes through
+a background worker, never through the mobile request latency path.
+
+```text
+PredictionRun + frozen MemoryStateSnapshot + candidate pool
+  -> N prospective ShadowPredictions / strict as-of replays
+  -> wait for domain-specific Outcome maturity
+  -> comparable-episode scoring + coverage
+  -> global / cohort / Profile GenomeEvaluation
+  -> candidate recommendation
+  -> canary/A/B approval
+  -> versioned PolicyAssignment
+```
+
+Assignment resolution is Profile -> eligible cohort -> global fallback. One
+SharedProfile may earn its own Champion, but never inherits a member's Personal
+assignment implicitly. MVP keeps automatic promotion disabled.
+
+The eventual background service owns `PredictorGenome`, shadow,
+`EvaluationWindow`, evaluation, promotion and assignment persistence. Those
+tables are not created speculatively in Sprint 013A; the PredictionRun evidence
+spine lands first so the worker has trustworthy inputs when implemented.
+
 ## External content
 
 External providers are adapters/data sources, not the Kajo domain model. TMDB/Open Library or future sources must be normalized into Kajo `Item` representations.
@@ -193,9 +262,20 @@ External providers are adapters/data sources, not the Kajo domain model. TMDB/Op
 
 Every recommendation intended for learning should be traceable through `predictionId` into Event outcomes.
 
+Monitor trace completeness, unknown hosted prediction IDs, candidate/exposure
+mismatches, outcome delay, Scenario support/influence, fallback rate, model
+version traffic, latency and trace storage growth. Engagement-only gains are
+not sufficient promotion evidence.
+
 ## Security/privacy
 
 - No secrets in repository.
 - `.env.example` documents required configuration only.
 - Access to personal/shared data must follow profile membership/authorization rules.
 - Location/demographic/context data should be minimized and permission-aware.
+- Prediction Context is server-sanitized to an allowlist before internal trace
+  persistence.
+- Internal Prediction traces are not granted to `anon` or `authenticated`;
+  user export/deletion is implemented through an explicit audited boundary.
+- Population learning is blocked until purpose, retention, deletion lineage,
+  cohort privacy and legal basis are documented.

@@ -8,6 +8,7 @@ import {
   createEventWriteCoordinator,
   createTrackedEvent,
   createUuidV7,
+  getDwellEventProperties,
   getImpressionDeduplicationKey,
 } from './eventTracking';
 
@@ -94,6 +95,18 @@ describe('Event tracking contracts', () => {
         predictionId: 'prediction-1',
       }),
     ).toBeNull();
+  });
+
+  it('records bounded meaningful dwell without treating a flash as evidence', () => {
+    expect(getDwellEventProperties(1_000, 1_999, 'ITEM_CHANGED')).toBeNull();
+    expect(getDwellEventProperties(1_000, 16_000, 'ITEM_CHANGED')).toEqual({
+      source: 'ITEM_DETAIL',
+      dwellMs: 15_000,
+      endReason: 'ITEM_CHANGED',
+    });
+    expect(
+      getDwellEventProperties(0, 60 * 60 * 1_000, 'SCREEN_EXIT'),
+    ).toMatchObject({ dwellMs: 30 * 60 * 1_000 });
   });
 });
 

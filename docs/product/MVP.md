@@ -96,8 +96,10 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
 - [x] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
 - [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
-- [ ] `MVP-PRED-004` Architecture supports later scenario-memory retrieval without redesigning core contracts.
+- [x] `MVP-PRED-004` Architecture supports scenario-memory retrieval without redesigning core Profile/Item/Event/Prediction contracts.
 - [ ] `MVP-PRED-005` SharedProfile Prediction V0 can combine Shared joint evidence with accepted members' PersonalProfile taste evidence using an inspectable common-fit aggregation/disagreement penalty while the Prediction target remains the SharedProfile.
+- [-] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
+- [-] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
 
 ## Production release
 

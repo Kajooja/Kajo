@@ -10,6 +10,16 @@ If conversation context conflicts with repository documentation, stop and resolv
 
 ## 2. Mandatory read order before any work
 
+First synchronize repository metadata with `git fetch --all --prune`. Do not assume the default `main` checkout contains the newest active mid-sprint work.
+
+Resolve the continuation source before the read order:
+
+- if the user names a branch or pull request, check out that exact head,
+- if the user says only "continue" / "jatka reposta", inspect the current tracking branch plus open GitHub pull-request/Issue handoffs connected to `STATUS.md`,
+- when exactly one newer active handoff exists, continue from that branch before reading its `STATUS.md`,
+- when multiple active branches could own the next step, stop and ask which one to use instead of combining them,
+- never treat an unmerged branch as accepted `main` truth; preserve its explicit pending gates.
+
 Before editing code, data models, documentation or configuration, read in this order:
 
 1. `/AGENTS.md` — this file.

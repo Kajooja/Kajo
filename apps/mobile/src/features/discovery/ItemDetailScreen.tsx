@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   AccessibilityInfo,
+  AppState,
   Animated,
   Easing,
   FlatList,
@@ -28,6 +29,14 @@ import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import {
+  createUuidV7,
+  getDwellEventProperties,
+} from '../events/eventTracking';
+import {
+  getInteractionEventType,
+  getUndoEventProperties,
+} from '../events/itemInteractionEvents';
+import {
   ListDestinationSheet,
   type ListDestinationCommit,
 } from '../lists/ListDestinationSheet';
@@ -36,13 +45,6 @@ import { useItemLists } from '../lists/ItemListsContext';
 import { rememberRecentList } from '../lists/listRecentUse';
 import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
-import {
-  createUuidV7,
-} from '../events/eventTracking';
-import {
-  getInteractionEventType,
-  getUndoEventProperties,
-} from '../events/itemInteractionEvents';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -212,9 +214,64 @@ function ItemDetailContent({
     index: number;
     interaction: ItemInteraction;
   } | null>(null);
+  const dwellState = useRef<{
+    item: Item;
+    startedAtMs: number;
+  } | null>(null);
+  const visibleDwellItem = useRef<Item | null>(null);
+  const dwellEventContext = useRef({
+    recordEvent: eventTracking.recordEvent,
+    predictionId: recommendationTraceId,
+    discoveryMode: mode,
+    predictionSource,
+  });
+  dwellEventContext.current = {
+    recordEvent: eventTracking.recordEvent,
+    predictionId: recommendationTraceId,
+    discoveryMode: mode,
+    predictionSource,
+  };
+
+  const finishDwell = useCallback(
+    (endReason: 'ITEM_CHANGED' | 'SCREEN_EXIT' | 'APP_BACKGROUND') => {
+      const activeDwell = dwellState.current;
+      dwellState.current = null;
+
+      if (!activeDwell) return;
+
+      const properties = getDwellEventProperties(
+        activeDwell.startedAtMs,
+        Date.now(),
+        endReason,
+      );
+
+      if (!properties) return;
+
+      const current = dwellEventContext.current;
+      current.recordEvent({
+        eventType: 'ITEM_DWELL',
+        itemId: activeDwell.item.id,
+        itemType: activeDwell.item.itemType,
+        predictionId: current.predictionId,
+        discoveryMode: current.discoveryMode,
+        properties: {
+          ...properties,
+          predictionSource: current.predictionSource,
+        },
+      });
+    },
+    [],
+  );
 
   const recordItemImpression = useCallback(
     (item: Item) => {
+      visibleDwellItem.current = item;
+
+      if (dwellState.current?.item.id !== item.id) {
+        finishDwell('ITEM_CHANGED');
+        dwellState.current = { item, startedAtMs: Date.now() };
+      }
+
       eventTracking.recordEvent({
         eventType: 'ITEM_IMPRESSION',
         itemId: item.id,
@@ -224,7 +281,37 @@ function ItemDetailContent({
         properties: { source: 'ITEM_SEQUENCE', predictionSource },
       });
     },
-    [eventTracking, mode, predictionSource, recommendationTraceId],
+    [eventTracking, finishDwell, mode, predictionSource, recommendationTraceId],
+  );
+
+  useEffect(() => {
+    let previousState = AppState.currentState;
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (previousState === 'active' && nextState !== 'active') {
+        finishDwell('APP_BACKGROUND');
+      } else if (
+        previousState !== 'active' &&
+        nextState === 'active' &&
+        visibleDwellItem.current &&
+        !dwellState.current
+      ) {
+        dwellState.current = {
+          item: visibleDwellItem.current,
+          startedAtMs: Date.now(),
+        };
+      }
+
+      previousState = nextState;
+    });
+
+    return () => subscription.remove();
+  }, [finishDwell]);
+
+  useEffect(
+    () => () => {
+      finishDwell('SCREEN_EXIT');
+    },
+    [finishDwell],
   );
 
   useEffect(() => {

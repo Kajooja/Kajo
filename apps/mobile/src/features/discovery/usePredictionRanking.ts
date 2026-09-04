@@ -10,6 +10,7 @@ import type {
   PredictionId,
 } from '../../domain/contracts';
 import { createCorrelationId, createUuidV7 } from '../events/eventTracking';
+import { useEventTracking } from '../events/EventTrackingContext';
 import type { ItemInteractionMap } from './itemInteraction';
 import { getRankedMockItems } from './mockDiscovery';
 import {
@@ -51,6 +52,7 @@ export function usePredictionRanking(
 ): VisiblePredictionRanking {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
+  const eventTracking = useEventTracking();
   const [fallbackSeed] = useState(() => createUuidV7());
   const [attempt, setAttempt] = useState(0);
   const [hostedState, setHostedState] = useState<HostedRankingState>({
@@ -108,7 +110,7 @@ export function usePredictionRanking(
         mode,
         itemType,
         limit: activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20,
-        context: getRuntimeContext(),
+        context: getRuntimeContext(eventTracking.sessionId),
       }).then((result) => {
         if (!active || !requestGate.current.isLatest(token)) return;
 
@@ -134,6 +136,7 @@ export function usePredictionRanking(
     activeProfile.activeProfile?.type,
     attempt,
     evidenceKey,
+    eventTracking.sessionId,
     itemType,
     mode,
     profileId,
@@ -185,10 +188,19 @@ function getMatchingRanking(
   return state.status === 'ready' ? state.ranking : state.previous;
 }
 
-function getRuntimeContext() {
+function getRuntimeContext(sessionId: string | null) {
   const resolved = Intl.DateTimeFormat().resolvedOptions();
+  const now = new Date();
+
   return {
+    ...(sessionId ? { sessionId } : {}),
     ...(resolved.locale ? { locale: resolved.locale } : {}),
     ...(resolved.timeZone ? { timezone: resolved.timeZone } : {}),
+    occurredAt: now.toISOString(),
+    attributes: {
+      localHour: now.getHours(),
+      dayOfWeek: now.getDay(),
+      surface: 'DISCOVERY_GRID',
+    },
   };
 }
