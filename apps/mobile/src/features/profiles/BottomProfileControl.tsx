@@ -26,6 +26,11 @@ interface BottomProfileControlProps {
   onOpen?: () => void;
 }
 
+interface UsageSnapshot {
+  actorUserId: string | null;
+  use: ReturnType<typeof loadSharedProfileUse>;
+}
+
 export function BottomProfileControl({
   identityName,
   textPrimary,
@@ -39,14 +44,10 @@ export function BottomProfileControl({
   const profiles = useActiveProfile();
   const rememberedActiveKey = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [usageState, setUsageState] = useState(() =>
-    loadSharedProfileUse(profiles.actorUserId),
-  );
-
-  useEffect(() => {
-    rememberedActiveKey.current = null;
-    setUsageState(loadSharedProfileUse(profiles.actorUserId));
-  }, [profiles.actorUserId]);
+  const [usageSnapshot, setUsageSnapshot] = useState<UsageSnapshot>(() => ({
+    actorUserId: profiles.actorUserId,
+    use: loadSharedProfileUse(profiles.actorUserId),
+  }));
 
   useEffect(() => {
     if (
@@ -61,11 +62,9 @@ export function BottomProfileControl({
     if (rememberedActiveKey.current === activeKey) return;
     rememberedActiveKey.current = activeKey;
 
-    setUsageState(
-      rememberSharedProfileUse(
-        profiles.actorUserId,
-        profiles.activeProfile.id,
-      ),
+    rememberSharedProfileUse(
+      profiles.actorUserId,
+      profiles.activeProfile.id,
     );
   }, [
     profiles.activeProfile?.id,
@@ -73,14 +72,21 @@ export function BottomProfileControl({
     profiles.actorUserId,
   ]);
 
+  const currentUsage =
+    usageSnapshot.actorUserId === profiles.actorUserId
+      ? usageSnapshot.use
+      : loadSharedProfileUse(profiles.actorUserId);
   const quickProfiles = useMemo(
-    () => selectQuickSharedProfiles(profiles.selectableProfiles, usageState, 5),
-    [profiles.selectableProfiles, usageState],
+    () => selectQuickSharedProfiles(profiles.selectableProfiles, currentUsage, 5),
+    [profiles.selectableProfiles, currentUsage],
   );
 
   function openSwitcher() {
     onOpen?.();
-    setUsageState(loadSharedProfileUse(profiles.actorUserId));
+    setUsageSnapshot({
+      actorUserId: profiles.actorUserId,
+      use: loadSharedProfileUse(profiles.actorUserId),
+    });
     setOpen(true);
   }
 
