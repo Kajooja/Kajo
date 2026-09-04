@@ -7,6 +7,7 @@ export const HISTORY_IMPORT_RPC = {
   commit: 'commit_profile_import_job_v1',
   remove: 'remove_profile_import_job_v1',
   get: 'get_profile_import_job_v1',
+  list: 'list_profile_import_jobs_v1',
 } as const;
 
 interface RpcResponse {
@@ -56,7 +57,35 @@ export type HistoryImportJobResult =
   | { status: 'success'; job: HistoryImportJob }
   | { status: 'error'; message: string };
 
+export type HistoryImportListResult =
+  | { status: 'success'; jobs: readonly HistoryImportJob[] }
+  | { status: 'error'; message: string };
+
 const IMPORT_ERROR = 'Historian tuonti epäonnistui. Yritä uudelleen.';
+
+export async function loadHistoryImports(
+  rpc: HistoryImportRpc,
+  profileId: string,
+): Promise<HistoryImportListResult> {
+  try {
+    const response = await rpc(HISTORY_IMPORT_RPC.list, {
+      target_profile_id: profileId,
+    });
+    if (response.error || !Array.isArray(response.data)) {
+      return { status: 'error', message: IMPORT_ERROR };
+    }
+    const jobs = response.data.map(mapHistoryImportJob);
+    if (jobs.some((job) => job === null)) {
+      return { status: 'error', message: IMPORT_ERROR };
+    }
+    return {
+      status: 'success',
+      jobs: jobs.filter((job): job is HistoryImportJob => job !== null),
+    };
+  } catch {
+    return { status: 'error', message: IMPORT_ERROR };
+  }
+}
 
 export async function stageHistoryImport(
   rpc: HistoryImportRpc,
