@@ -35,6 +35,15 @@ export type HistoryImportParseResult =
 
 const MAX_IMPORT_ROWS = 5000;
 
+type CsvRecord = Record<string, string>;
+type RowInput = {
+  provider: HistoryImportProvider;
+  datasetKind: string;
+  preferredKind: HistoryImportKind;
+  record: CsvRecord;
+  rowNumber: number;
+};
+
 export function parseHistoryImportCsv(input: {
   fileName: string;
   text: string;
@@ -42,12 +51,15 @@ export function parseHistoryImportCsv(input: {
   preferredProvider?: HistoryImportProvider;
 }): HistoryImportParseResult {
   const table = parseCsv(input.text);
-  if (table.length < 2) {
+  const headerRow = table[0];
+  if (!headerRow || table.length < 2) {
     return { status: 'error', message: 'CSV-tiedostossa ei ole tuotavia rivejä.' };
   }
 
-  const headers = table[0].map(normalizeHeader);
-  const records = table.slice(1).filter((row) => row.some((value) => value.trim() !== ''));
+  const headers = headerRow.map(normalizeHeader);
+  const records = table
+    .slice(1)
+    .filter((row) => row.some((value) => value.trim() !== ''));
   if (records.length > MAX_IMPORT_ROWS) {
     return {
       status: 'error',
@@ -56,18 +68,18 @@ export function parseHistoryImportCsv(input: {
   }
 
   const provider =
-    input.preferredProvider ?? inferProvider(headers, input.fileName, input.preferredKind);
+    input.preferredProvider ??
+    inferProvider(headers, input.fileName, input.preferredKind);
   const datasetKind = inferDatasetKind(provider, input.fileName, headers);
   const rows: NormalizedHistoryImportRow[] = [];
   let skippedRows = 0;
 
   records.forEach((values, index) => {
-    const record = recordFromRow(headers, values);
     const normalized = normalizeProviderRow({
       provider,
       datasetKind,
       preferredKind: input.preferredKind,
-      record,
+      record: recordFromRow(headers, values),
       rowNumber: index + 2,
     });
     if (normalized) rows.push(normalized);
@@ -77,7 +89,8 @@ export function parseHistoryImportCsv(input: {
   if (rows.length === 0) {
     return {
       status: 'error',
-      message: 'Tiedostosta ei löytynyt Kajoon sopivaa katselu- tai lukuhistoriaa.',
+      message:
+        'Tiedostosta ei löytynyt Kajoon sopivaa katselu- tai lukuhistoriaa.',
     };
   }
 
@@ -101,9 +114,9 @@ export function parseCsv(text: string): string[][] {
   let quoted = false;
 
   for (let index = 0; index < source.length; index += 1) {
-    const character = source[index];
+    const character = source.charAt(index);
     if (quoted) {
-      if (character === '"' && source[index + 1] === '"') {
+      if (character === '"' && source.charAt(index + 1) === '"') {
         field += '"';
         index += 1;
       } else if (character === '"') {
@@ -114,9 +127,8 @@ export function parseCsv(text: string): string[][] {
       continue;
     }
 
-    if (character === '"') {
-      quoted = true;
-    } else if (character === ',') {
+    if (character === '"') quoted = true;
+    else if (character === ',') {
       row.push(field);
       field = '';
     } else if (character === '\n') {
@@ -124,9 +136,7 @@ export function parseCsv(text: string): string[][] {
       rows.push(row);
       row = [];
       field = '';
-    } else {
-      field += character;
-    }
+    } else field += character;
   }
 
   if (field.length > 0 || row.length > 0) {
@@ -136,13 +146,7 @@ export function parseCsv(text: string): string[][] {
   return rows;
 }
 
-function normalizeProviderRow(input: {
-  provider: HistoryImportProvider;
-  datasetKind: string;
-  preferredKind: HistoryImportKind;
-  record: Record<string, string>;
-  rowNumber: number;
-}): NormalizedHistoryImportRow | null {
+function normalizeProviderRow(input: RowInput): NormalizedHistoryImportRow | null {
   switch (input.provider) {
     case 'LETTERBOXD':
       return normalizeLetterboxd(input.record, input.datasetKind, input.rowNumber);
@@ -153,38 +157,42 @@ function normalizeProviderRow(input: {
     case 'STORYGRAPH':
       return normalizeStoryGraph(input.record, input.rowNumber);
     case 'KAJO_CSV':
-      return normalizeKajoCsv(input.record, input.preferredKind, input.rowNumber);
+      return normalizeKajoCsv(
+        input.record,
+        input.preferredKind,
+        input.rowNumber,
+      );
+    default:
+      return null;
   }
 }
 
 function normalizeLetterboxd(
-  record: Record<string, string>,
+  record: CsvRecord,
   datasetKind: string,
   rowNumber: number,
 ): NormalizedHistoryImportRow | null {
   const title = read(record, 'name', 'title');
   if (!title) return null;
-  const year = parseYear(read(record, 'year'));
   const stars = parseNumber(read(record, 'rating'));
   const rating = stars === null ? null : clampRating(Math.round(stars * 2));
-  const isWatchlist = datasetKind.includes('WATCHLIST');
-  const evidenceKind: ImportEvidenceKind = rating !== null
-    ? 'RATED'
-    : isWatchlist
-      ? 'SAVED'
-      : 'CONSUMED';
-  const occurredAt = normalizeDate(
-    read(record, 'watched date', 'date rated', 'date'),
-  );
+  const evidenceKind: ImportEvidenceKind =
+    rating !== null
+      ? 'RATED'
+      : datasetKind.includes('WATCHLIST')
+        ? 'SAVED'
+        : 'CONSUMED';
 
   return makeRow({
     rowNumber,
     itemType: 'MOVIE',
     title,
-    releaseYear: year,
+    releaseYear: parseYear(read(record, 'year')),
     evidenceKind,
     rating,
-    sourceOccurredAt: occurredAt,
+    sourceOccurredAt: normalizeDate(
+      read(record, 'watched date', 'date rated', 'date'),
+    ),
     externalIds: {},
     creators: [],
     sourceMetadata: compact({
@@ -196,24 +204,28 @@ function normalizeLetterboxd(
 }
 
 function normalizeImdb(
-  record: Record<string, string>,
+  record: CsvRecord,
   datasetKind: string,
   rowNumber: number,
 ): NormalizedHistoryImportRow | null {
   const title = read(record, 'title', 'name');
   if (!title) return null;
   const ratingValue = parseNumber(read(record, 'your rating', 'rating'));
-  const rating = ratingValue === null ? null : clampRating(Math.round(ratingValue));
-  const consumedDataset = datasetKind.includes('CHECKIN');
-  const savedDataset = datasetKind.includes('WATCHLIST') || datasetKind.includes('LIST');
-  const evidenceKind: ImportEvidenceKind = rating !== null
-    ? 'RATED'
-    : consumedDataset
-      ? 'CONSUMED'
-      : savedDataset
-        ? 'SAVED'
-        : 'CONSUMED';
-  const imdbId = normalizeImdbId(read(record, 'const', 'imdb id', 'imdb title'));
+  const rating =
+    ratingValue === null ? null : clampRating(Math.round(ratingValue));
+  const savedDataset =
+    datasetKind.includes('WATCHLIST') || datasetKind.includes('LIST');
+  const evidenceKind: ImportEvidenceKind =
+    rating !== null
+      ? 'RATED'
+      : datasetKind.includes('CHECKIN')
+        ? 'CONSUMED'
+        : savedDataset
+          ? 'SAVED'
+          : 'CONSUMED';
+  const imdbId = normalizeImdbId(
+    read(record, 'const', 'imdb id', 'imdb title'),
+  );
 
   return makeRow({
     rowNumber,
@@ -222,7 +234,9 @@ function normalizeImdb(
     releaseYear: parseYear(read(record, 'year')),
     evidenceKind,
     rating,
-    sourceOccurredAt: normalizeDate(read(record, 'date rated', 'created', 'date')),
+    sourceOccurredAt: normalizeDate(
+      read(record, 'date rated', 'created', 'date'),
+    ),
     externalIds: imdbId ? { imdb_title: imdbId } : {},
     creators: splitPeople(read(record, 'directors', 'director')),
     sourceMetadata: compact({
@@ -234,54 +248,63 @@ function normalizeImdb(
 }
 
 function normalizeGoodreads(
-  record: Record<string, string>,
+  record: CsvRecord,
   rowNumber: number,
 ): NormalizedHistoryImportRow | null {
   const title = read(record, 'title');
   if (!title) return null;
   const shelf = read(record, 'exclusive shelf', 'bookshelves').toLowerCase();
   const rawRating = parseNumber(read(record, 'my rating', 'rating'));
-  const rating = rawRating !== null && rawRating > 0
-    ? clampRating(Math.round(rawRating * 2))
-    : null;
-  const evidenceKind: ImportEvidenceKind = rating !== null
-    ? 'RATED'
-    : shelf.includes('to-read') || shelf.includes('want-to-read')
-      ? 'SAVED'
-      : 'CONSUMED';
-  const isbn13 = normalizeIsbn(read(record, 'isbn13'));
-  const isbn10 = normalizeIsbn(read(record, 'isbn'));
+  const rating =
+    rawRating !== null && rawRating > 0
+      ? clampRating(Math.round(rawRating * 2))
+      : null;
+  const evidenceKind: ImportEvidenceKind =
+    rating !== null
+      ? 'RATED'
+      : shelf.includes('to-read') || shelf.includes('want-to-read')
+        ? 'SAVED'
+        : 'CONSUMED';
 
   return makeRow({
     rowNumber,
     itemType: 'BOOK',
     title,
-    releaseYear: parseYear(read(record, 'original publication year', 'year published')),
+    releaseYear: parseYear(
+      read(record, 'original publication year', 'year published'),
+    ),
     evidenceKind,
     rating,
     sourceOccurredAt: normalizeDate(read(record, 'date read', 'date added')),
-    externalIds: compactStrings({ isbn13, isbn10 }),
+    externalIds: compactStrings({
+      isbn13: normalizeIsbn(read(record, 'isbn13')),
+      isbn10: normalizeIsbn(read(record, 'isbn')),
+    }),
     creators: splitPeople(read(record, 'author', 'authors')),
     sourceMetadata: compact({ shelf }),
   });
 }
 
 function normalizeStoryGraph(
-  record: Record<string, string>,
+  record: CsvRecord,
   rowNumber: number,
 ): NormalizedHistoryImportRow | null {
   const title = read(record, 'title');
   if (!title) return null;
   const status = read(record, 'read status', 'status').toLowerCase();
   const rawRating = parseNumber(read(record, 'star rating', 'rating'));
-  const rating = rawRating !== null && rawRating > 0
-    ? clampRating(Math.round(rawRating * 2))
-    : null;
-  const evidenceKind: ImportEvidenceKind = rating !== null
-    ? 'RATED'
-    : status.includes('to read') || status.includes('to-read') || status.includes('want')
-      ? 'SAVED'
-      : 'CONSUMED';
+  const rating =
+    rawRating !== null && rawRating > 0
+      ? clampRating(Math.round(rawRating * 2))
+      : null;
+  const evidenceKind: ImportEvidenceKind =
+    rating !== null
+      ? 'RATED'
+      : status.includes('to read') ||
+          status.includes('to-read') ||
+          status.includes('want')
+        ? 'SAVED'
+        : 'CONSUMED';
   const isbn = normalizeIsbn(read(record, 'isbn/uid', 'isbn13', 'isbn'));
 
   return makeRow({
@@ -291,7 +314,9 @@ function normalizeStoryGraph(
     releaseYear: parseYear(read(record, 'publication year', 'year')),
     evidenceKind,
     rating,
-    sourceOccurredAt: normalizeDate(read(record, 'last date read', 'date read', 'date added')),
+    sourceOccurredAt: normalizeDate(
+      read(record, 'last date read', 'date read', 'date added'),
+    ),
     externalIds: isbn
       ? isbn.length === 13
         ? { isbn13: isbn }
@@ -303,43 +328,49 @@ function normalizeStoryGraph(
 }
 
 function normalizeKajoCsv(
-  record: Record<string, string>,
+  record: CsvRecord,
   preferredKind: HistoryImportKind,
   rowNumber: number,
 ): NormalizedHistoryImportRow | null {
   const title = read(record, 'title', 'name');
   if (!title) return null;
   const typeText = read(record, 'item type', 'item_type', 'type').toUpperCase();
-  const itemType: HistoryImportKind = typeText === 'BOOK' || typeText === 'MOVIE'
-    ? typeText
-    : preferredKind;
+  const itemType: HistoryImportKind =
+    typeText === 'BOOK' || typeText === 'MOVIE' ? typeText : preferredKind;
   const rawRating = parseNumber(read(record, 'rating'));
   const rating = rawRating === null ? null : clampRating(Math.round(rawRating));
   const consumed = isTruthy(read(record, 'consumed', 'watched', 'read'));
   const saved = isTruthy(read(record, 'saved', 'watchlist', 'to read'));
-  const evidenceKind: ImportEvidenceKind = rating !== null
-    ? 'RATED'
-    : consumed
-      ? 'CONSUMED'
-      : saved
-        ? 'SAVED'
-        : 'CONSUMED';
+  const evidenceKind: ImportEvidenceKind =
+    rating !== null ? 'RATED' : consumed ? 'CONSUMED' : saved ? 'SAVED' : 'CONSUMED';
 
   return makeRow({
     rowNumber,
     itemType,
     title,
-    releaseYear: parseYear(read(record, 'release year', 'release_year', 'year')),
+    releaseYear: parseYear(
+      read(record, 'release year', 'release_year', 'year'),
+    ),
     evidenceKind,
     rating,
-    sourceOccurredAt: normalizeDate(read(record, 'source occurred at', 'date', 'date read', 'date watched')),
+    sourceOccurredAt: normalizeDate(
+      read(record, 'source occurred at', 'date', 'date read', 'date watched'),
+    ),
     externalIds: compactStrings({
-      imdb_title: normalizeImdbId(read(record, 'imdb title', 'imdb_title', 'imdb id')),
-      tmdb_movie: cleanIdentifier(read(record, 'tmdb movie', 'tmdb_movie', 'tmdb id')),
+      imdb_title: normalizeImdbId(
+        read(record, 'imdb title', 'imdb_title', 'imdb id'),
+      ),
+      tmdb_movie: cleanIdentifier(
+        read(record, 'tmdb movie', 'tmdb_movie', 'tmdb id'),
+      ),
       isbn13: normalizeIsbn(read(record, 'isbn13')),
       isbn10: normalizeIsbn(read(record, 'isbn10', 'isbn')),
-      open_library_work: cleanIdentifier(read(record, 'open library work', 'open_library_work')),
-      open_library_edition: cleanIdentifier(read(record, 'open library edition', 'open_library_edition')),
+      open_library_work: cleanIdentifier(
+        read(record, 'open library work', 'open_library_work'),
+      ),
+      open_library_edition: cleanIdentifier(
+        read(record, 'open library edition', 'open_library_edition'),
+      ),
     }),
     creators: splitPeople(read(record, 'creators', 'authors', 'director')),
     sourceMetadata: {},
@@ -368,7 +399,9 @@ function makeRow(input: {
     externalIds: input.externalIds,
     evidenceKind: input.evidenceKind,
     ...(input.rating !== null ? { rating: input.rating } : {}),
-    ...(input.sourceOccurredAt ? { sourceOccurredAt: input.sourceOccurredAt } : {}),
+    ...(input.sourceOccurredAt
+      ? { sourceOccurredAt: input.sourceOccurredAt }
+      : {}),
     sourceMetadata: input.sourceMetadata,
   };
 }
@@ -379,15 +412,29 @@ function inferProvider(
   kind: HistoryImportKind,
 ): HistoryImportProvider {
   const names = new Set(headers);
+  const name = fileName.toLowerCase();
   if (kind === 'MOVIE') {
-    if (names.has('letterboxd uri')) return 'LETTERBOXD';
-    if (names.has('const') || names.has('your rating') || names.has('title type')) return 'IMDB';
-    if (fileName.toLowerCase().includes('letterboxd')) return 'LETTERBOXD';
-    if (fileName.toLowerCase().includes('imdb')) return 'IMDB';
+    if (names.has('letterboxd uri') || name.includes('letterboxd')) {
+      return 'LETTERBOXD';
+    }
+    if (
+      names.has('const') ||
+      names.has('your rating') ||
+      names.has('title type') ||
+      name.includes('imdb')
+    ) {
+      return 'IMDB';
+    }
     return 'KAJO_CSV';
   }
   if (names.has('exclusive shelf') || names.has('book id')) return 'GOODREADS';
-  if (names.has('read status') || names.has('star rating') || names.has('isbn/uid')) return 'STORYGRAPH';
+  if (
+    names.has('read status') ||
+    names.has('star rating') ||
+    names.has('isbn/uid')
+  ) {
+    return 'STORYGRAPH';
+  }
   return 'KAJO_CSV';
 }
 
@@ -402,7 +449,8 @@ function inferDatasetKind(
     if (name.includes('ratings')) return 'RATINGS';
     if (name.includes('diary')) return 'DIARY';
     if (name.includes('watched')) return 'WATCHED';
-    return headers.includes('rewatch') ? 'DIARY' : headers.includes('rating') ? 'RATINGS' : 'WATCHED';
+    if (headers.includes('rewatch')) return 'DIARY';
+    return headers.includes('rating') ? 'RATINGS' : 'WATCHED';
   }
   if (provider === 'IMDB') {
     if (name.includes('rating')) return 'RATINGS';
@@ -414,9 +462,9 @@ function inferDatasetKind(
 }
 
 function parseYear(value: string): number | null {
-  const match = value.match(/\b(1[4-9]\d{2}|20\d{2}|21\d{2})\b/);
-  if (!match) return null;
-  const year = Number(match[1]);
+  const yearText = value.match(/\b(1[4-9]\d{2}|20\d{2}|21\d{2})\b/)?.[1];
+  if (!yearText) return null;
+  const year = Number(yearText);
   return year >= 1400 && year <= new Date().getUTCFullYear() + 2 ? year : null;
 }
 
@@ -433,8 +481,7 @@ function normalizeIsbn(value: string): string | null {
 }
 
 function normalizeImdbId(value: string): string | null {
-  const match = value.trim().match(/tt\d{5,12}/i);
-  return match ? match[0].toLowerCase() : null;
+  return value.trim().match(/tt\d{5,12}/i)?.[0]?.toLowerCase() ?? null;
 }
 
 function cleanIdentifier(value: string): string | null {
@@ -443,7 +490,14 @@ function cleanIdentifier(value: string): string | null {
 }
 
 function splitPeople(value: string): string[] {
-  return [...new Set(value.split(/[;|]/).map((entry) => entry.trim()).filter(Boolean))].slice(0, 12);
+  return [
+    ...new Set(
+      value
+        .split(/[;|]/)
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, 12);
 }
 
 function parseNumber(value: string): number | null {
@@ -457,18 +511,27 @@ function clampRating(value: number): number {
 }
 
 function isTruthy(value: string): boolean {
-  return ['1', 'true', 'yes', 'y', 'kyllä', 'read', 'watched'].includes(value.trim().toLowerCase());
+  return ['1', 'true', 'yes', 'y', 'kyllä', 'read', 'watched'].includes(
+    value.trim().toLowerCase(),
+  );
 }
 
 function normalizeHeader(value: string): string {
-  return value.replace(/^\uFEFF/, '').trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
+  return value
+    .replace(/^\uFEFF/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ');
 }
 
-function recordFromRow(headers: string[], values: string[]): Record<string, string> {
-  return Object.fromEntries(headers.map((header, index) => [header, values[index]?.trim() ?? '']));
+function recordFromRow(headers: string[], values: string[]): CsvRecord {
+  return Object.fromEntries(
+    headers.map((header, index) => [header, values[index]?.trim() ?? '']),
+  );
 }
 
-function read(record: Record<string, string>, ...keys: string[]): string {
+function read(record: CsvRecord, ...keys: string[]): string {
   for (const key of keys) {
     const value = record[normalizeHeader(key)];
     if (value?.trim()) return value.trim();
@@ -477,17 +540,29 @@ function read(record: Record<string, string>, ...keys: string[]): string {
 }
 
 function compact(value: Record<string, unknown>): Record<string, unknown> {
-  return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== '' && entry !== null && entry !== undefined));
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([, entry]) => entry !== '' && entry !== null && entry !== undefined,
+    ),
+  );
 }
 
-function compactStrings(value: Record<string, string | null>): Record<string, string> {
-  return Object.fromEntries(Object.entries(value).filter((entry): entry is [string, string] => Boolean(entry[1])));
+function compactStrings(
+  value: Record<string, string | null>,
+): Record<string, string> {
+  const entries: [string, string][] = [];
+  for (const [key, entry] of Object.entries(value)) {
+    if (entry) entries.push([key, entry]);
+  }
+  return Object.fromEntries(entries);
 }
 
 function createFileFingerprint(fileName: string, text: string): string {
   const left = hash32(`${fileName}|${text}`);
   const right = hash32(`${text.length}|${text}|${fileName}`);
-  return `csv_${left.toString(16).padStart(8, '0')}${right.toString(16).padStart(8, '0')}`;
+  return `csv_${left.toString(16).padStart(8, '0')}${right
+    .toString(16)
+    .padStart(8, '0')}`;
 }
 
 function hash32(value: string): number {
