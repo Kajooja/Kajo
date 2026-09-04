@@ -80,6 +80,7 @@ revoke all on table private.item_external_ids from public, anon, authenticated;
 grant usage on schema private to service_role;
 grant select, insert, update, delete on table private.item_sources to service_role;
 grant select, insert, update, delete on table private.item_external_ids to service_role;
+grant select, insert, update on table public.items to service_role;
 
 -- Reuse the existing private timestamp helper without exposing it.
 drop trigger if exists item_sources_set_updated_at on private.item_sources;
@@ -229,7 +230,7 @@ begin
     target_item_id := existing_source_item_id;
   else
     select
-      min(alias.item_id),
+      (array_agg(distinct alias.item_id order by alias.item_id))[1],
       count(distinct alias.item_id)::integer
     into matching_alias_item_id, matching_alias_item_count
     from private.item_external_ids as alias
