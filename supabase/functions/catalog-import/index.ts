@@ -38,10 +38,13 @@ Deno.serve(async (request) => {
     return json({ status: 'error', code: 'server-not-configured' }, 500);
   }
 
-  // This function is deliberately deployed with gateway JWT verification disabled:
-  // modern Supabase secret keys are not JWTs. The function itself only accepts the
-  // server-side project secret and never exposes provider credentials to clients.
-  if (request.headers.get('authorization') !== `Bearer ${secretKey}`) {
+  // Modern sb_secret_ keys are API keys rather than JWTs. The Edge gateway is
+  // therefore bypassed for this internal function and authorization is enforced
+  // here against the server-only key. Legacy service_role Bearer calls remain
+  // accepted during the 2026 key migration window.
+  const suppliedApiKey = request.headers.get('apikey');
+  const suppliedBearer = readBearerToken(request.headers.get('authorization'));
+  if (suppliedApiKey !== secretKey && suppliedBearer !== secretKey) {
     return json({ status: 'error', code: 'forbidden' }, 403);
   }
 
@@ -266,6 +269,12 @@ function normalizeRegion(value: unknown, fallback: string): string {
   if (typeof value !== 'string') return fallback;
   const normalized = value.trim().toUpperCase();
   return /^[A-Z]{2}$/.test(normalized) ? normalized : fallback;
+}
+
+function readBearerToken(value: string | null): string | null {
+  if (!value?.startsWith('Bearer ')) return null;
+  const token = value.slice('Bearer '.length).trim();
+  return token.length > 0 ? token : null;
 }
 
 function readNamedKey(variableName: string): string | null {
