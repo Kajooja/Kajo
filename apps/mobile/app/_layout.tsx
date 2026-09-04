@@ -14,6 +14,7 @@ import { ProfileMessagesProvider } from '@/features/messages/ProfileMessagesCont
 import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext';
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 import { ROUTE_TRANSITION_ANIMATION } from '@/features/room/roomPresentation';
+import { ProfileBootstrapGate } from '@/features/settings/ProfileBootstrapGate';
 
 export default function RootLayout() {
   const segments = useSegments();
@@ -45,7 +46,9 @@ export default function RootLayout() {
                         ) : (
                           <BootstrapLoadingGate>
                             <AuthGate>
-                              <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                              <ProfileBootstrapGate>
+                                <DiscoveryModeShell>{navigator}</DiscoveryModeShell>
+                              </ProfileBootstrapGate>
                             </AuthGate>
                           </BootstrapLoadingGate>
                         )}
