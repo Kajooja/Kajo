@@ -13,6 +13,9 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Profile member | `ProfileMember` | Accepted membership relation between User and Profile. Pending invitation is not membership. |
 | Item | `Item` | Any recommendable thing or experience regardless of domain. |
 | Item type | `ItemType` | Domain classification such as BOOK or MOVIE; must not redefine the core Item model. |
+| Item source | `ItemSource` | Server-owned provenance linking one canonical Item to one provider record. Provider payloads/IDs are import metadata, never a second recommendable Item model. |
+| External item ID | `ItemExternalId` | Namespaced stable provider/domain identifier such as `tmdb_movie`, `imdb_title`, `isbn13` or `open_library_work` used for safe cross-provider matching and history import. One namespace+ID may resolve to only one canonical Item. |
+| Discoverable | `discoverable` | Item lifecycle flag controlling eligibility for normal recommendation candidate generation. False preserves historical Event/List/Prediction references while removing the Item from ordinary discovery. |
 | Event | `Event` | Recorded behaviour/exposure/outcome involving an actor, Profile context and usually an Item. |
 | Context | `Context` | Situation surrounding a prediction or event. |
 | Human state | `HumanState` | Current learned representation of a person/Profile used by Prediction. |
@@ -56,7 +59,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Shared consensus | `SharedConsensus` | State reached when every currently accepted SharedProfile member has endorsed the Item. Consensus promotes the Item once to Shared Saved/system `Tallennetut`; later new members do not retroactively revoke it. |
 | List / lista | `ItemList` | Profile-scoped collection of generic Items. A List may contain mixed ItemTypes and is independent from consumed/rating state. MVP custom List name length 1–40. |
 | System saved list / Tallennetut | `SYSTEM_SAVED` | Exactly one Profile-owned system ItemList representing Saved Items. Personal saving may add directly; Shared automatic promotion comes from SharedConsensus. |
-| Custom list | `CUSTOM` | User-named ItemList. Personal additions commit immediately. A Shared discovery addition is pending until all accepted members approve the same Item/List choice; the final membership remains collaborative organizational state. |
+| Custom list | `CUSTOM` | User-named ItemList. Personal additions commit immediately. A SharedProfile discovery addition is pending until all accepted members approve the same Item/List choice; the final membership remains collaborative organizational state. |
 | List membership | `ItemListEntry` | Relation placing one Item in one ItemList. One picker action targets exactly one List and preserves other existing memberships. Personal membership commits immediately; Shared discovery membership commits only at unanimous approval. It stores the original proposing actor and proposal time for traceability and does not copy rating/consumed state. |
 | Inbox / postilaatikko | `Inbox` | User-facing delivery surface for pending Profile invitations and later message activity. Inbox/unread state is not generic Item interaction state. |
 | Profile message / viesti | `ProfileMessage` | Message scoped to one Profile. PersonalProfile messages are owner-only; SharedProfile messages are accepted-member-only and retain sending actor. May reference ItemList and Item. |
@@ -65,7 +68,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 
 Do not introduce alternative core terms such as `GroupTaste`, `JointProfile`, `FriendProfile`, `RecommendationUser`, `MediaUser`, `BookTasteProfile` or `MovieTasteProfile` for concepts already defined above.
 
-Do not create media-specific List, endorsement or chat types such as `BookList`, `MovieList`, `MovieVote` or `SharedMovieChat`. ItemType remains metadata inside generic models.
+Do not create media-specific List, endorsement, catalog or chat types such as `BookList`, `MovieList`, `MovieVote`, `TmdbMovieItem`, `OpenLibraryBookItem` or `SharedMovieChat`. Provider identity belongs to ItemSource/ItemExternalId; ItemType remains metadata inside generic models.
 
 `ITEM_SUGGESTED` is historical/deprecated Event vocabulary from the removed Sprint 009 experiment. Do not use `Suggestion` as the new canonical name for Shared Endorsement.
 
