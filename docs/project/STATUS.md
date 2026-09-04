@@ -36,9 +36,10 @@ Kajo already has:
 - Profile-scoped system/custom Lists and messaging,
 - combined invitation/message Inbox,
 - accepted bottom Profile identity quick switcher for recent/used SharedProfiles,
-- email + nickname identity and email-or-nickname login.
+- email + nickname identity and email-or-nickname login,
+- hosted generic catalog provenance/dedup/discoverability foundation ready for real provider imports.
 
-Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets the Profile; recommendable things remain `Item`s. Provider imports must normalize into these same boundaries rather than creating Letterboxd/IMDb/TMDB/Book-specific user or predictor models.
+Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets the Profile; recommendable things remain `Item`s. Provider imports normalize into these same boundaries rather than creating Letterboxd/IMDb/TMDB/Book-specific user or predictor models.
 
 ## Acceptance truth
 
@@ -62,20 +63,34 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 
 ## Sprint 014 — ACTIVE
 
-### 14A — #182 real catalog — immediate implementation target
+### 14A — #182 real catalog — foundation hosted, provider import next
 
-The current discovery catalog is still a tiny seeded `KAJO_MOCK` set. Replace normal discovery with a real provider-backed catalog while preserving `public.items` as the only canonical recommendable Item table.
+The catalog-write/lifecycle foundation is now hosted while the actual discovery catalog is still the 24 seeded `KAJO_MOCK` Items.
 
-Direction:
+Hosted repository migrations:
 
-- MOVIE: TMDB server-side provider import/refresh with localization fallback,
-- BOOK: Open Library bulk-based initial import; optional Finna bibliographic enrichment for Finnish metadata where rights permit,
-- generic provider provenance/external-ID dedup/lifecycle/discoverability,
-- real cover/poster metadata only under accepted provider rights,
-- normalize provider genres/subjects into Kajo tags,
-- preserve historical mock Items for Event/List/Prediction referential integrity but remove them from normal discovery after acceptance,
-- start with hundreds/thousands of useful Items rather than millions,
-- Prediction V1/SleepLayer remain generic and unchanged by provider identity.
+- repo `20260904193000_catalog_provider_foundation.sql` -> hosted `20260904155839 catalog_provider_foundation`,
+- repo `20260904193200_fix_catalog_upsert_source_conflict.sql` -> hosted `20260904160033 fix_catalog_upsert_source_conflict`.
+
+Current foundation:
+
+- `public.items` remains the only canonical recommendable table,
+- generic Item presentation/lifecycle fields now include `discoverable`, `creators`, `release_year`, `image_url` and `original_language`,
+- private `ItemSource` stores provider provenance with unique provider+provider-item identity,
+- private `ItemExternalId` stores namespaced stable aliases such as future TMDB/IMDb/ISBN/Open Library IDs,
+- service-role-only `public.upsert_catalog_item_v1` provides validated atomic import/dedup while provider secrets remain server-side,
+- shared external aliases can merge another provider record into the same canonical Item,
+- aliases that resolve to multiple existing Items fail closed rather than silently merging,
+- normal Prediction candidate generation now requires `candidate.discoverable` through the same private V0.3 baseline used by V1/SleepLayer,
+- all 24 historical mock Items received durable `kajo_mock` source + slug alias provenance and remain discoverable until accepted real coverage exists.
+
+Hosted rollback smoke proved source idempotency, cross-provider alias merging, ambiguous-merge rejection, service-role-only write access and `discoverable=false/true` behavior through the actual `rank_items_v1` path. Synthetic smoke rows were fully rolled back.
+
+The first hosted call exposed one PL/pgSQL `ON CONFLICT` parameter/column ambiguity. Because the base migration had already deployed, it was repaired through the ordered forward migration above rather than rewriting migration history.
+
+Advisor status: no new catalog WARN. New private source tables report expected `RLS enabled/no policy` INFO because authenticated/anon have no table grants; their FK indexes are present.
+
+**Immediate 14A target:** run the first real TMDB/Open Library provider imports through this foundation, expose normalized image/creator/year fields in mobile Prediction results, verify useful real coverage, then retire mock Items from ordinary discovery without deleting them.
 
 ### 14B — #185 PersonalProfile bootstrap/import
 
@@ -142,6 +157,7 @@ Events / imported bootstrap evidence
   -> Working / Short / Long state
   -> Prediction V1 + same-Profile ScenarioMemory
   -> resurfacing-v1 eligibility/slate policy
+  -> generic Item lifecycle/discoverability
   -> immutable PredictionRun + complete Candidate pool
   -> prospective frozen Challenger shadows
   -> mature exposed-outcome EvaluationWindow / GenomeEvaluation
@@ -153,7 +169,7 @@ Automatic production genome promotion remains **disabled in MVP 0.1**. Imported 
 
 ## Current ordered work
 
-1. **#182 / Sprint 014A — real catalog foundation and provider import.**
+1. **#182 / Sprint 014A — real TMDB/Open Library import + mobile real-catalog presentation; foundation is already hosted.**
 2. **#185 / Sprint 014B — Letterboxd/IMDb/book history import + no-import calibration.**
 3. **#177 / Sprint 014C — SharedProfile common-fit.**
 4. Close deferred #102/#138/Room/shell configured-device gates required for beta.
@@ -178,16 +194,16 @@ Automatic production genome promotion remains **disabled in MVP 0.1**. Imported 
 - `/docs/project/ROADMAP.md`
 - `/docs/project/sprints/SPRINT-014.md`
 - `/docs/product/MVP.md`
+- `/docs/domain/GLOSSARY.md`
 - `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
 - `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/architecture/CODEMAP.md`
-- `/supabase/migrations/20260826203000_backend_foundation.sql`
-- `/supabase/migrations/20260827073000_seed_mvp_items.sql`
-- `/supabase/migrations/20260831163000_expand_mvp_candidate_catalog.sql`
+- `/supabase/migrations/20260904193000_catalog_provider_foundation.sql`
+- `/supabase/migrations/20260904193200_fix_catalog_upsert_source_conflict.sql`
 
 ## Handoff
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **Sprint 014A / #182 real catalog**. Do not mix #185 import parsing or #177 common-fit scoring into the same PR, delete historical mock Items, rebuild Prediction V1/SleepLayer, or begin monetization work.
+Immediate target: **Sprint 014A / #182 real provider import + normalized mobile presentation**. Do not mix #185 history import or #177 common-fit scoring into the same PR, delete historical mock Items, rebuild Prediction V1/SleepLayer, or begin monetization work.
