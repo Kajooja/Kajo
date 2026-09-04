@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
@@ -35,12 +35,14 @@ export function BottomProfileControl({
 }: BottomProfileControlProps) {
   const router = useRouter();
   const profiles = useActiveProfile();
+  const rememberedActiveKey = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
   const [useState, setUseState] = useState(() =>
     loadSharedProfileUse(profiles.actorUserId),
   );
 
   useEffect(() => {
+    rememberedActiveKey.current = null;
     setUseState(loadSharedProfileUse(profiles.actorUserId));
   }, [profiles.actorUserId]);
 
@@ -49,8 +51,13 @@ export function BottomProfileControl({
       profiles.activeProfile?.type !== 'SHARED' ||
       !profiles.actorUserId
     ) {
+      rememberedActiveKey.current = null;
       return;
     }
+
+    const activeKey = `${profiles.actorUserId}:${profiles.activeProfile.id}`;
+    if (rememberedActiveKey.current === activeKey) return;
+    rememberedActiveKey.current = activeKey;
 
     setUseState(
       rememberSharedProfileUse(
@@ -162,7 +169,7 @@ export function BottomProfileControl({
 
               {quickProfiles.length === 0 &&
               profiles.sharedProfilesStatus !== 'loading' ? (
-                <Text style={[styles.emptyText, { color: textMuted }]}> 
+                <Text style={[styles.emptyText, { color: textMuted }]}>
                   Ei vielä aktiivisia ryhmiä.
                 </Text>
               ) : null}
@@ -177,7 +184,7 @@ export function BottomProfileControl({
                     pressed && styles.pressed,
                   ]}
                 >
-                  <Text style={[styles.retryText, { color: textMuted }]}> 
+                  <Text style={[styles.retryText, { color: textMuted }]}>
                     Ryhmät eivät päivittyneet. Yritä uudelleen.
                   </Text>
                 </Pressable>
