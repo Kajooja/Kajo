@@ -33,6 +33,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - Sprint 011/#151 Shared discovery + Endorsement consensus is accepted.
 - The persistent full-screen Room/backdrop/navigation direction is accepted.
 - The current minimalist straight-on Room direction is accepted as the durable visual contract.
+- **Sprint 013B Prediction V1 hosted + configured-Android trace gate is accepted.**
 
 ### Implemented/hosted but configured-device acceptance deferred
 
@@ -48,7 +49,7 @@ Issue #156 owns the versioned Prediction nervous system and controlled evolution
 
 ### 13A — integrated
 
-`main` contains the canonical five-layer design and the first executable nervous-system slice:
+`main` contains the canonical five-layer design and first executable nervous-system slice:
 
 - `WorkingState`, `ShortTermState`, `LongTermState`, `ScenarioMemory`, privacy-gated future `PopulationMemory`,
 - immutable `PredictionRun` and complete `PredictionCandidate` trace,
@@ -59,48 +60,40 @@ Issue #156 owns the versioned Prediction nervous system and controlled evolution
 - controlled `SleepLayer`/`EvolutionEngine` design with immutable genomes, prospective shadows, mature outcome windows, scoped Champions and rollback,
 - no automatic production self-modification in MVP 0.1.
 
-The integrated local gate passed lint, TypeScript, 156 tests and iOS/Android export smokes before the hosted phase.
+### 13B — accepted on configured Android
 
-### 13B — hosted database gate verified; device acceptance pending
+Hosted Supabase contains the ordered Prediction V1 migrations, including the forward-only fix for the hosted PL/pgSQL `prediction_id` collision. Authorization, Scenario reward precedence, undo exclusion, cross-Profile isolation, candidate persistence and representative query plans were already verified against hosted data.
 
-Hosted Supabase project `Kajo` now contains:
+Configured Android acceptance on 2026-09-04 then proved the real mobile path:
 
-- `20260904120025 prediction_nervous_system_v1`, corresponding to repository migration `20260902223000_prediction_nervous_system_v1.sql`,
-- `20260904120420 fix_prediction_v1_candidate_returning`, preserved in the repository as the forward migration `20260904120420_fix_prediction_v1_candidate_returning.sql`.
+- PersonalProfile rating produced a `hosted` Event tied to a real `prediction-v1.0` PredictionRun,
+- SharedProfile rating produced the same complete hosted chain independently,
+- for both actions `profile_id`, `actor_user_id` and `session_id` matched the PredictionRun,
+- matching PredictionCandidate rows existed and were `selected_for_delivery = true`,
+- the earlier immediate actions remained explicitly marked `predictionSource=fallback`, proving hosted and fallback traces are analytically distinguishable,
+- the mobile hook has an intentional 600 ms refresh delay; accepted follow-up hosted impression persistence was observed roughly 0.56–1.40 s after the server run timestamp at current development scale. This is a device/development baseline, not a production SLO.
 
-The first hosted authenticated smoke exposed a real PL/pgSQL name collision in the candidate-write CTE: `RETURNING prediction_id` conflicted with the function OUT parameter of the same name. The original deployed migration remains immutable; the second forward migration qualifies the returned table column. No parallel predictor, replacement schema or duplicate recommendation path was introduced.
-
-Post-fix hosted rollback verification proves:
-
-- authenticated direct execution of `rank_items_v0` is denied,
-- authenticated `rank_items_v1` is allowed only for an authorized Profile member,
-- anonymous V1 and outsider V1 calls are denied,
-- authenticated/anonymous clients have no direct SELECT/INSERT access to private Prediction trace tables,
-- one PersonalProfile V1 request returning 5 results created exactly one `PredictionRun`, 15 candidates and 5 delivered candidates,
-- one SharedProfile V1 request returning 4 results created exactly one matching Shared run and 12 candidates,
-- controlled exact-Item delayed rating evidence produced Scenario reward `1.0` and support `1`, superseding the weaker earlier save,
-- undo of that rating excluded the rating and correctly fell back to the still-valid weaker save reward (`0.5`),
-- a second PersonalProfile received zero Scenario support from the first Profile's controlled evidence,
-- all synthetic verification data was rolled back.
-
-Representative query plans also use the intended Prediction run/candidate indexes. Current small-data baselines were approximately 9.9 ms for rebuilding one Profile memory snapshot and 0.24 ms for indexed run/candidate retrieval; these are development baselines, not scale SLOs.
-
-Supabase advisors introduced no new exposed-API security blocker from Prediction V1. The `private.prediction_runs` / `private.prediction_candidates` “RLS enabled with no policy” INFO is intentional defense in depth because clients have no direct table grants. Existing leaked-password protection and unrelated performance advisories remain separately scoped release/security work.
-
-**Remaining 13B gate:** configured Android acceptance must execute real discovery/actions and inspect resulting hosted run/candidate/Event correlation. Do not mark Sprint 013 accepted before that device evidence exists.
+No duplicate predictor, schema or client-side recommendation path was introduced.
 
 ### 13C — next implementation slice
 
-After configured-device trace acceptance, continue the same prediction architecture with:
+Continue the same Prediction architecture with:
 
-- immutable `PredictorGenome` registry,
-- prospective `ShadowPrediction` persistence/worker boundary,
-- immutable `EvaluationWindow` and outcome-maturity rules,
-- global/cohort/Profile evaluation with hierarchical shrinkage,
-- versioned `PolicyAssignment` / `PromotionDecision`,
+- immutable `PredictorGenome` registry and constrained weight schemas,
+- prospective `ShadowPrediction` persistence/worker using frozen production-run input,
+- immutable `EvaluationWindow` plus outcome maturity/comparable-episode/coverage rules,
+- global/cohort/Profile `GenomeEvaluation` with hierarchical shrinkage,
+- versioned `PolicyAssignment` and `PromotionDecision` audit,
 - manual promotion + reversible rollback only for MVP.
 
-Do not create a second recommender, live genetic mutation loop or LLM serving path.
+Automatic production promotion remains disabled until external-beta/online experiment gates exist. Do not create a second recommender, live genetic mutation loop or LLM serving path.
+
+## Product findings queued without changing the 13C boundary
+
+- **#174 — reacted Item resurfacing policy.** Normal discovery should suppress repeatedly reacted/terminal Items. A saved-only Item may occasionally return as a reminder after meaningful age if still unconsumed/unrated, with versioned cooldown/frequency limits and inspectable trace reasons.
+- **#175 — bottom Profile control SharedProfile quick switcher.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles and `Näytä lisää`, which routes to the existing canonical Groups/SharedProfile page. Reuse current Profile state/navigation; do not create duplicate group UI or membership state.
+
+These are separate scopes. #174 belongs to the existing Prediction policy path; #175 is a navigation follow-up and must not be mixed into SleepLayer persistence work.
 
 ## Other open MVP work
 
@@ -109,21 +102,23 @@ Do not create a second recommender, live genetic mutation loop or LLM serving pa
 - #102 — refreshed configured-Android List acceptance.
 - #138 — configured-Android messaging acceptance.
 - PR #171/current main APK — refreshed Room lighting/targets/profile-hydration acceptance.
+- #174 — bounded resurfacing of already-reacted Items.
+- #175 — recent SharedProfiles from bottom Profile control.
 - #78 — optional logo polish only if it does not delay functional MVP.
 - #73 — Google/Apple sign-in is future work unless promoted into MVP explicitly.
 
 ## Next MVP sequence
 
-1. **Finish Sprint 013B on Android** — run real Personal + Shared Prediction V1 discovery/action flow and inspect hosted trace/Event correlation.
-2. **Sprint 013C** — implement the executable immutable Challenger/SleepLayer persistence and manual promotion/rollback path.
-3. **Deferred device acceptance** — close #102/#138 and the PR #171 refreshed device checks without reopening accepted navigation/Room architecture.
+1. **Sprint 013C** — implement executable immutable Challenger/SleepLayer persistence, evaluation and manual promotion/rollback path.
+2. **Prediction/UI follow-ups** — integrate #174 through the same versioned prediction policy and implement #175 through the existing Profile/navigation architecture.
+3. **Deferred device acceptance** — close #102/#138 and refreshed PR #171 checks without reopening accepted navigation/Room architecture.
 4. **Sprint 014** — production hardening, privacy/support/operations, signing/versioning, store assets, clean install/update acceptance and official store release.
-5. **MVP COMPLETE gate** — accepted requirements and code on `main`, permanent hosted backend, Personal/Shared/Prediction end-to-end verification, real-device acceptance, security/rollback/monitoring readiness, official store availability and final product-owner acceptance.
+5. **MVP COMPLETE gate** — accepted requirements/code on `main`, permanent hosted backend, Personal/Shared/Prediction end-to-end verification, real-device acceptance, security/rollback/monitoring readiness, official store availability and final product-owner acceptance.
 
 ## Repository hygiene / non-duplication rules
 
 - Continue from `main` only after checking open PR/Issue handoffs per `/AGENTS.md` and `/docs/project/HANDOFF_PROTOCOL.md`.
-- One canonical implementation per capability; extend the generic Profile/Item/Event/Prediction architecture rather than introducing parallel media-specific versions.
+- One canonical implementation per capability; extend generic Profile/Item/Event/Prediction architecture rather than introducing parallel media-specific versions.
 - Deployed migrations are immutable. Corrections use ordered forward migrations.
 - `STATUS.md` states current truth; sprint files hold execution detail; `ROADMAP.md` holds ordered future work. Do not copy the same historical narrative into all three.
 - Do not merge speculative empty feature folders, duplicate documentation or unused abstraction layers.
@@ -155,4 +150,4 @@ Do not create a second recommender, live genetic mutation loop or LLM serving pa
 
 A fresh conversation must follow `/AGENTS.md` and may start with **"jatketaan reposta"**.
 
-Immediate target: finish **Sprint 013B configured-device trace acceptance** against the already-hosted Prediction V1. When that passes, move linearly to **Sprint 013C**. Do not reapply the hosted base migration, do not recreate the V1 scorer, do not duplicate #160 security hardening, and do not claim deferred #102/#138/Room acceptance from CI alone.
+Immediate target: **Sprint 013C SleepLayer implementation** on top of the accepted hosted/device-verified Prediction V1. Do not reapply Prediction V1, recreate the scorer, fold #160 security work into this sprint, or mix #175 navigation work into the SleepLayer branch.
