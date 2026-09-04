@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-04**  
+Last updated: **2026-09-05**  
 Current milestone: **MVP 0.1 — complete non-commercial store release**  
 Current sprint: **Sprint 014 — Real Catalog, Profile Bootstrap & External Beta** (`sprints/SPRINT-014.md`)  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory** (`sprints/SPRINT-013.md`)
@@ -30,10 +30,15 @@ Kajo already has:
 - PersonalProfile + consent-based SharedProfiles, Endorsement consensus, Lists and messaging,
 - accepted bottom SharedProfile quick switcher,
 - hosted generic provider catalog foundation + batch importer + ACTIVE `catalog-import` Edge Function,
+- **first real hosted beta catalog: 30 MOVIE + 30 BOOK Items with `KAJO_CURATED_BETA` provenance**,
+- historical 24 `KAJO_MOCK` Items retained but now `discoverable=false`,
+- hosted V1 proof of 10/10 real MOVIE + 10/10 real BOOK delivery and 0 mock delivery,
 - mobile real-catalog presentation fields without a second recommender,
 - hosted PersonalProfile bootstrap-evidence foundation for imported viewing/reading history,
 - Letterboxd/IMDb/Goodreads/StoryGraph/generic-CSV normalization,
 - PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports.
+
+A bootstrap/resurfacing integration bug discovered by real-data acceptance is also fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
 
 Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets a `Profile`; recommendable content remains `Item`. Personal evidence is never copied into Shared history. Shared common-fit (#177) may read authorized accepted members' Personal taste through the Prediction boundary.
 
@@ -54,12 +59,13 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - Sprint 012/#138 Profile messaging.
 - PR #171/current Room-lighting/target/profile-hydration follow-up.
 - latest shell/bootstrap visual polish.
-- #182 real-catalog mobile presentation/import infrastructure; physical real provider data/device acceptance still open.
-- #185 PersonalProfile history import backend/parser/Settings slice; device acceptance and no-import calibration still open.
+- #182 first real 30+30 catalog + mock retirement hosted; device acceptance and provider enrichment still open.
+- #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
+- PR #191 no-import cold-start calibration; branch implementation/hosted backend exists but must be rebased/final-CI/device-tested after the real-catalog fix.
 
 ## Sprint 014 — ACTIVE
 
-### 14A — #182 real catalog
+### 14A — #182 real catalog — FIRST REAL CATALOG HOSTED
 
 Implemented/hosted:
 
@@ -70,15 +76,19 @@ Implemented/hosted:
 - Open Library monthly-dump importer,
 - Prediction V1 mobile enrichment with covers/posters, creators and year,
 - real hosted Item detail/swipe preserves the delivered Prediction slate,
-- `discoverable` remains part of the one canonical Prediction candidate generator.
+- `discoverable` remains part of the one canonical Prediction candidate generator,
+- guarded `KAJO_CURATED_BETA` seed contains 30 real movies and 30 real books,
+- old 24 mock Items are non-discoverable but not deleted,
+- all 930 historical mock Event references still resolve,
+- V1 hosted acceptance returns only real curated Items after the NULL bootstrap fix.
 
 Still required:
 
+- configured-device confirmation of real Item delivery,
+- real posters/covers/descriptions through provider enrichment,
 - configure server-only `TMDB_READ_ACCESS_TOKEN`,
-- load useful real TMDB and Open Library data,
-- inspect coverage/dedup/metadata,
-- configured-device real-card acceptance,
-- then set historical `KAJO_MOCK` Items non-discoverable without deleting them.
+- expand beyond the bounded first seed with TMDB/Open Library,
+- beta-scale coverage/dedup/metadata review.
 
 ### 14B — #185 PersonalProfile bootstrap/import — IMPLEMENTED/HOSTED, DEVICE GATE + CALIBRATION NEXT
 
@@ -130,7 +140,9 @@ Hosted acceptance already proved:
 - 5,000-row guard is active,
 - new FK index advisor finding was corrected forward.
 
-**Next 14B target:** configured-device Settings/CSV import acceptance, then implement the real-catalog no-import cold-start calibration flow. #185 remains open until both paths are accepted.
+PR #191 cold-start follow-up is implemented on `feat/185-cold-start-calibration`: only real non-mock Items, minimum six known ratings, PersonalProfile LongTerm bootstrap only, no demographics, no Shared direct write. Its first CI found a React `set-state-in-effect` lint issue; that branch now contains the clean Profile-ID-scoped state fix. It is intentionally not merged until this real-catalog branch reaches `main`, after which #191 is rebased and revalidated.
+
+**Next 14B target:** configured-device real-card + Settings/CSV + cold-start acceptance against the hosted real catalog. #185 remains open until both import and no-import paths are accepted.
 
 ### 14C — #177 SharedProfile common-fit
 
@@ -175,13 +187,14 @@ Imported history affects LongTerm only. Automatic production genome promotion re
 
 ## Current ordered work
 
-1. **Finish #185 device import acceptance + no-import real-catalog calibration.**
-2. **#177 SharedProfile common-fit using authorized member Personal taste.**
-3. In parallel unblock #182 physical real data: TMDB secret + TMDB/Open Library loads + device acceptance + retire mock discovery.
-4. Close deferred #102/#138/Room/shell device gates required for beta.
-5. **#186 roughly 10-person external beta acceptance.**
-6. **Sprint 015 — production auth/security/signing/store release.**
-7. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
+1. **Merge #182 first real catalog + NULL bootstrap eligibility fix and device-test real delivery.**
+2. **Rebase/finalize PR #191 cold-start calibration; device-test import + no-import bootstrap.**
+3. **#177 SharedProfile common-fit using authorized member Personal taste.**
+4. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
+5. Close deferred #102/#138/Room/shell device gates required for beta.
+6. **#186 roughly 10-person external beta acceptance.**
+7. **Sprint 015 — production auth/security/signing/store release.**
+8. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
 
 ## Repository hygiene
 
@@ -201,11 +214,12 @@ Imported history affects LongTerm only. Automatic production genome promotion re
 - `/apps/mobile/src/features/settings/SettingsScreen.tsx`
 - `/apps/mobile/src/features/settings/historyImportParser.ts`
 - `/apps/mobile/src/features/settings/historyImportOperations.ts`
-- `/supabase/migrations/20260904203000_profile_bootstrap_import_foundation.sql`
+- `/supabase/migrations/20260905003000_seed_curated_beta_catalog.sql`
+- `/supabase/migrations/20260905003500_fix_resurfacing_null_bootstrap.sql`
 - `/supabase/functions/catalog-import/index.ts`
 
 ## Handoff
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **Sprint 014B / #185 device import acceptance + cold-start calibration**, then #177 SharedProfile common-fit. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, or begin monetization work.
+Immediate target: **merge first real catalog fix, rebase/finalize PR #191, then configured-device real-content/import/calibration acceptance**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, or begin monetization work.
