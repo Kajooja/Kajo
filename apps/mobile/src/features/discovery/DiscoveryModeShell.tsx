@@ -143,6 +143,11 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
     router.push('/lists');
   }
 
+  function openSettings() {
+    setOverlay(null);
+    router.push('/settings');
+  }
+
   function openList(listId: string) {
     const list = itemLists.lists.find((candidate) => candidate.id === listId);
     if (list?.kind === 'CUSTOM') {
@@ -521,33 +526,68 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
                 </View>
 
                 {auth.status === 'signed-in' ? (
-                  <View
-                    style={[
-                      styles.signOutSection,
-                      { borderTopColor: theme.base.border },
-                    ]}
-                  >
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel="Kirjaudu ulos Kajosta"
-                      disabled={signingOut}
-                      onPress={() => void handleSignOut()}
-                      style={({ pressed }) => [
-                        styles.signOutButton,
-                        pressed && styles.rowPressed,
-                        signingOut && styles.disabled,
+                  <>
+                    <View
+                      style={[
+                        styles.settingsSection,
+                        { borderTopColor: theme.base.border },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.signOutText,
-                          { color: theme.base.textMuted },
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Avaa asetukset"
+                        onPress={openSettings}
+                        style={({ pressed }) => [
+                          styles.settingsButton,
+                          pressed && styles.rowPressed,
                         ]}
                       >
-                        {signingOut ? 'Kirjaudutaan…' : 'Kirjaudu ulos'}
-                      </Text>
-                    </Pressable>
-                  </View>
+                        <Text
+                          style={[
+                            styles.settingsText,
+                            { color: theme.base.textPrimary },
+                          ]}
+                        >
+                          Asetukset
+                        </Text>
+                        <Text
+                          style={[
+                            styles.sectionArrow,
+                            { color: theme.base.textMuted },
+                          ]}
+                        >
+                          ›
+                        </Text>
+                      </Pressable>
+                    </View>
+                    <View
+                      style={[
+                        styles.signOutSection,
+                        { borderTopColor: theme.base.border },
+                      ]}
+                    >
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Kirjaudu ulos Kajosta"
+                        disabled={signingOut}
+                        onPress={() => void handleSignOut()}
+                        style={({ pressed }) => [
+                          styles.signOutButton,
+                          pressed && styles.rowPressed,
+                          signingOut && styles.disabled,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.signOutText,
+                            { color: theme.base.textMuted },
+                          ]}
+                        >
+                          {signingOut ? 'Kirjaudutaan…' : 'Kirjaudu ulos'}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </>
                 ) : null}
               </ScrollView>
             </View>
@@ -1105,10 +1145,24 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     marginTop: 8,
   },
-  signOutSection: {
+  settingsSection: {
     marginTop: 'auto',
     borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 14,
+    paddingTop: 10,
+  },
+  settingsButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  settingsText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  signOutSection: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 8,
   },
   signOutButton: {
     minHeight: 44,
