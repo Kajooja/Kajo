@@ -21,6 +21,7 @@ describe('historyImportParser', () => {
     expect(result.status).toBe('success');
     if (result.status !== 'success') return;
     expect(result.import.datasetKind).toBe('RATINGS');
+    expect(result.import.rows).toHaveLength(1);
     expect(result.import.rows[0]).toMatchObject({
       itemType: 'MOVIE',
       title: 'Arrival',
@@ -40,7 +41,7 @@ describe('historyImportParser', () => {
 
     expect(result.status).toBe('success');
     if (result.status !== 'success') return;
-    expect(result.import.rows[0].evidenceKind).toBe('SAVED');
+    expect(result.import.rows.at(0)?.evidenceKind).toBe('SAVED');
   });
 
   it('uses IMDb Const as a canonical external alias and preserves 1-10 rating', () => {
@@ -53,6 +54,7 @@ describe('historyImportParser', () => {
 
     expect(result.status).toBe('success');
     if (result.status !== 'success') return;
+    expect(result.import.rows).toHaveLength(1);
     expect(result.import.rows[0]).toMatchObject({
       title: 'The Matrix',
       evidenceKind: 'RATED',
@@ -76,7 +78,7 @@ describe('historyImportParser', () => {
       rating: 10,
       externalIds: { isbn13: '9780441172719' },
     });
-    expect(result.import.rows[1].evidenceKind).toBe('SAVED');
+    expect(result.import.rows.at(1)?.evidenceKind).toBe('SAVED');
   });
 
   it('detects StoryGraph shape and maps star ratings', () => {
@@ -89,11 +91,14 @@ describe('historyImportParser', () => {
     expect(result.status).toBe('success');
     if (result.status !== 'success') return;
     expect(result.import.provider).toBe('STORYGRAPH');
-    expect(result.import.rows[0].rating).toBe(9);
+    expect(result.import.rows.at(0)?.rating).toBe(9);
   });
 
   it('rejects an import larger than the hosted 5000-row stage boundary', () => {
-    const rows = Array.from({ length: 5001 }, (_, index) => `Movie ${index},2020,true`).join('\n');
+    const rows = Array.from(
+      { length: 5001 },
+      (_, index) => `Movie ${index},2020,true`,
+    ).join('\n');
     const result = parseHistoryImportCsv({
       fileName: 'kajo.csv',
       preferredKind: 'MOVIE',
