@@ -8,8 +8,8 @@ do $$
 declare
   function_oid oid;
   definition text;
-  old_guard text := 'jsonb_array_length(input_rows) < 1 or jsonb_array_length(input_rows) > 500';
-  new_guard text := 'jsonb_array_length(input_rows) < 1 or jsonb_array_length(input_rows) > 5000';
+  old_guard text := 'jsonb_array_length(input_rows)<1 or jsonb_array_length(input_rows)>500';
+  new_guard text := 'jsonb_array_length(input_rows)<1 or jsonb_array_length(input_rows)>5000';
   old_message text := 'Import batch must contain between 1 and 500 rows';
   new_message text := 'Import batch must contain between 1 and 5000 rows';
 begin
