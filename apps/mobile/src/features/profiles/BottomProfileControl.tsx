@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useActiveProfile } from './ActiveProfileContext';
 import {
@@ -34,6 +35,7 @@ export function BottomProfileControl({
   onOpen,
 }: BottomProfileControlProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const profiles = useActiveProfile();
   const rememberedActiveKey = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -130,7 +132,11 @@ export function BottomProfileControl({
           <View
             style={[
               styles.panel,
-              { backgroundColor: panelColor, borderColor },
+              {
+                backgroundColor: panelColor,
+                borderColor,
+                marginBottom: insets.bottom + 54,
+              },
             ]}
           >
             <View style={styles.header}>
@@ -236,7 +242,6 @@ const styles = StyleSheet.create({
   },
   panel: {
     marginHorizontal: 20,
-    marginBottom: 70,
     borderWidth: 1,
     borderRadius: 16,
     paddingHorizontal: 15,
