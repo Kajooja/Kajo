@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Stack, useSegments } from 'expo-router';
 
 import { SupabaseProvider } from '@/data/SupabaseProvider';
 import { AuthGate } from '@/features/auth/AuthGate';
 import { AuthSessionProvider } from '@/features/auth/AuthSessionProvider';
-import { StartupSplash } from '@/features/branding/KajoBrand';
 import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext';
 import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
@@ -16,24 +14,8 @@ import { ActiveProfileProvider } from '@/features/profiles/ActiveProfileContext'
 import { PersonalProfileProvider } from '@/features/profiles/PersonalProfileProvider';
 import { ROUTE_TRANSITION_ANIMATION } from '@/features/room/roomPresentation';
 
-const STARTUP_SPLASH_DURATION_MS = 2000;
-
 export default function RootLayout() {
   const segments = useSegments();
-  const [showStartupSplash, setShowStartupSplash] = useState(true);
-
-  useEffect(() => {
-    const timeout = setTimeout(
-      () => setShowStartupSplash(false),
-      STARTUP_SPLASH_DURATION_MS,
-    );
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  if (showStartupSplash) {
-    return <StartupSplash />;
-  }
 
   const navigator = (
     <Stack
