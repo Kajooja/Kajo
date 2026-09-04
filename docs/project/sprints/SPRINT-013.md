@@ -1,6 +1,6 @@
 # Sprint 013 — Prediction Nervous System & ScenarioMemory
 
-Status: **ACTIVE — 13A INTEGRATED, 13B HOSTED DB VERIFIED; DEVICE ACCEPTANCE PENDING**
+Status: **ACTIVE — 13A INTEGRATED, 13B ACCEPTED; 13C NEXT**
 Milestone: **MVP 0.1**
 Started: **2026-09-03**
 Primary issue: **#156**
@@ -9,7 +9,7 @@ Primary issue: **#156**
 
 Define the complete Kajo prediction nervous system and deliver its first truthful MVP slice: versioned PredictionRun/candidate tracing, Working/Short/Long memory Context, same-Profile ScenarioMemory V1 and meaningful dwell evidence. Preserve an explicit extension path for the SleepLayer/EvolutionEngine without allowing uncontrolled production mutation.
 
-Sprint 012 Profile Messaging is merged and automatically verified but its configured-device acceptance remains deferred. The product owner explicitly prioritized the Prediction Core design; Sprint 013 may proceed without misreporting Sprint 012 as device-accepted.
+Sprint 012 Profile Messaging is merged and automatically verified but its configured-device acceptance remains deferred. The product owner explicitly prioritized the Prediction Core design; Sprint 013 proceeds without misreporting deferred work as accepted.
 
 ## Durable design outcome
 
@@ -31,7 +31,7 @@ ADR-0005 makes the versioned nervous-system/SleepLayer contract durable.
 
 ## Scope
 
-### 13A — Evidence spine + ScenarioMemory V1
+### 13A — Evidence spine + ScenarioMemory V1 — integrated
 
 - Internal `PredictionRun` stores actor, target Profile, session correlation, bounded Context, MemoryStateSnapshot and immutable model/policy versions.
 - Internal `PredictionCandidate` stores the full candidate pool, source/final ranks, base/final scores, confidence, Scenario components and delivery selection.
@@ -40,18 +40,18 @@ ADR-0005 makes the versioned nervous-system/SleepLayer contract durable.
 - Direct mobile execution of `rank_items_v0` is revoked; V0 remains the V1 base scorer.
 - V1 retrieves only same-Profile traced episodes and degrades to the base scorer with no evidence.
 - V1 considers at most 30 episodes with a 0.25 similarity floor and 180-day recency decay.
-- Mobile carries the Event sessionId plus allowlisted time/surface Context.
+- Mobile carries Event `sessionId` plus allowlisted time/surface Context.
 - Item detail emits meaningful 1-second-minimum, 30-minute-capped dwell evidence.
-- Dwell is not V1 reward.
+- Dwell is evidence, not V1 reward.
 
-### 13B — Hosted correctness and acceptance
+### 13B — Hosted correctness + configured Android acceptance — accepted
 
-Hosted database verification is complete. Configured Android acceptance remains open.
+Hosted database verification and real-device acceptance are complete.
 
-Completed:
+Completed hosted gates:
 
 - base Prediction V1 migration applied to hosted Supabase,
-- forward fix applied after hosted smoke exposed a PL/pgSQL `prediction_id` name collision,
+- ordered forward fix applied after hosted smoke exposed the PL/pgSQL `prediction_id` name collision,
 - authenticated Personal member execution verified,
 - authenticated Shared member execution verified,
 - unauthenticated and outsider access denied,
@@ -64,20 +64,28 @@ Completed:
 - representative `EXPLAIN (ANALYZE, BUFFERS)` checks completed,
 - post-DDL security/performance advisors reviewed.
 
-Still required:
+Configured Android acceptance on **2026-09-04** then proved:
 
-- configured Android Personal + Shared discovery/action acceptance,
-- inspect real hosted `PredictionRun`/`PredictionCandidate`/Event/session correlation produced by that device flow,
-- confirm fallback/mock correlations remain analytically distinguishable from hosted Prediction runs on the real app path.
+- real PersonalProfile discovery reached `predictionSource=hosted`,
+- a PersonalProfile rating was tied to an existing `prediction-v1.0` PredictionRun,
+- real SharedProfile discovery reached `predictionSource=hosted`,
+- a SharedProfile rating was tied to an existing `prediction-v1.0` PredictionRun,
+- both actions matched their PredictionRun on `profile_id`, `actor_user_id` and `session_id`,
+- both acted Items had matching PredictionCandidate rows,
+- both Candidate rows were `selected_for_delivery=true`,
+- earlier immediate actions in the same device test remained explicitly `predictionSource=fallback`, so fallback and hosted traces are distinguishable rather than silently conflated.
 
-### 13C — SleepLayer implementation (after device evidence gate)
+The mobile ranking hook intentionally waits **600 ms** before an interaction-triggered hosted refresh. On the accepted follow-up runs, hosted impression persistence was observed roughly **0.56–1.40 s** after the corresponding server run timestamp at the current development scale. This is recorded as a device/development baseline only, not a production latency SLO.
+
+### 13C — SleepLayer implementation — next
 
 - Add immutable PredictorGenome registry and constrained weight schemas.
-- Add prospective ShadowPrediction queue/worker using the frozen production run input.
-- Add EvaluationWindow outcome maturity and comparable-episode/coverage rules.
+- Add prospective ShadowPrediction queue/worker using frozen production-run input.
+- Add immutable EvaluationWindow outcome maturity and comparable-episode/coverage rules.
 - Add global/cohort/Profile GenomeEvaluation with hierarchical shrinkage.
 - Add versioned PolicyAssignment and PromotionDecision audit.
 - Keep automatic promotion disabled until external-beta data and online experiment gates exist.
+- Manual promotion and rollback must be explicit, versioned and reversible.
 
 ### 13D — Later learned models
 
@@ -130,7 +138,7 @@ All numeric choices are versioned V1 hypotheses. Future tuning requires a new Pr
 
 ### Applied migrations
 
-Hosted project `Kajo` now contains:
+Hosted project `Kajo` contains:
 
 - `20260904120025 prediction_nervous_system_v1` — repository source `20260902223000_prediction_nervous_system_v1.sql`,
 - `20260904120420 fix_prediction_v1_candidate_returning` — repository forward fix `20260904120420_fix_prediction_v1_candidate_returning.sql`.
@@ -174,7 +182,7 @@ scenario raw reward = 0.5000
 support = 1
 ```
 
-This is expected: the rating was excluded and the still-valid weaker save became the strongest remaining Outcome. A second PersonalProfile had maximum Scenario support `0`, proving the controlled evidence did not cross the Profile boundary. All controlled Events/runs/candidates were rolled back.
+This is expected: the rating was excluded and the still-valid weaker save became the strongest remaining Outcome. A second PersonalProfile had maximum Scenario support `0`, proving controlled evidence did not cross the Profile boundary. All controlled Events/runs/candidates were rolled back.
 
 ### Query-plan baseline
 
@@ -190,6 +198,15 @@ These values are smoke baselines only; they are not production scale SLOs.
 
 No new exposed-API security blocker was introduced by Prediction V1. Supabase reports private trace tables as “RLS enabled with no policy”; this is intentional because clients have no direct grants and access is through the checked server-owned function boundary. The pre-existing leaked-password protection warning and unrelated index advisories stay in separate security/release scope (#160/Sprint 014).
 
+## Product findings from configured-device acceptance
+
+Two observations were deliberately split out instead of expanding the 13B acceptance patch:
+
+- **#174 — already-reacted Item resurfacing.** Strong/terminal reactions should normally suppress repeated discovery. Saved-only Items may occasionally resurface as reminders after meaningful age when still unconsumed/unrated, but only behind versioned cooldown/frequency rules with inspectable reasons.
+- **#175 — bottom Profile control quick SharedProfile switcher.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles plus `Näytä lisää`, routing to the existing canonical group page.
+
+#174 may be integrated through the versioned Prediction policy path. #175 is navigation scope and must remain separate from the SleepLayer implementation.
+
 ## Acceptance
 
 - [x] Canonical docs contain no conflicting memory/evolution terminology.
@@ -199,9 +216,9 @@ No new exposed-API security blocker was introduced by Prediction V1. Supabase re
 - [x] delayed rating supersedes weaker earlier Outcome; undone evidence is excluded.
 - [x] full candidate set and selected delivery set remain distinguishable in trace persistence.
 - [x] hosted query-plan baseline and advisor review recorded.
-- [ ] configured Android Personal/Shared V1 flow passes and creates inspectable real traces/Events.
-- [ ] final device evidence confirms hosted-vs-fallback trace distinction.
-- [ ] measured real-device request latency is recorded.
+- [x] configured Android Personal/Shared V1 flow passes and creates inspectable real traces/Events.
+- [x] final device evidence confirms hosted-vs-fallback trace distinction.
+- [x] real-device/development hosted timing baseline is recorded.
 
 ## Non-goals
 
@@ -231,4 +248,4 @@ No new exposed-API security blocker was introduced by Prediction V1. Supabase re
 
 ## Handoff
 
-Continue from `main` with the remaining **Sprint 013B configured-device acceptance** after this hosted-verification PR lands. Do not reapply or duplicate Prediction V1. Once real Android trace/Event evidence passes, proceed directly to **Sprint 013C SleepLayer persistence/worker implementation**, not to an LLM ranker or uncontrolled genetic optimizer.
+Continue from `main` after this acceptance-doc update lands. **13B is accepted.** Proceed directly to **Sprint 013C SleepLayer persistence/evaluation/manual-promotion implementation**. Do not reapply or duplicate Prediction V1, do not rewrite deployed migrations, do not merge #160 security work into this branch, and do not mix #175 navigation work into the SleepLayer implementation.
