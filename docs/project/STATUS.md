@@ -14,7 +14,7 @@ MVP 0.1 is the first complete, non-commercial BOOK/MOVIE Kajo that can be downlo
 Required before completion:
 
 - real BOOK/MOVIE catalog,
-- useful first-session PersonalProfile through imported history or bounded calibration,
+- useful first-session PersonalProfile through imported history or bounded profiling,
 - complete Personal/Shared core flows for roughly 10 external testers,
 - production authentication/security/privacy/signing/store readiness,
 - official store availability and product-owner acceptance.
@@ -31,14 +31,15 @@ Kajo already has:
 - accepted bottom SharedProfile quick switcher,
 - hosted generic provider catalog foundation + batch importer + ACTIVE `catalog-import` Edge Function,
 - **first real hosted beta catalog: 30 MOVIE + 30 BOOK Items with `KAJO_CURATED_BETA` provenance**,
-- historical 24 `KAJO_MOCK` Items retained but now `discoverable=false`,
+- historical 24 `KAJO_MOCK` Items retained but `discoverable=false`,
 - hosted V1 proof of 10/10 real MOVIE + 10/10 real BOOK delivery and 0 mock delivery,
 - mobile real-catalog presentation fields without a second recommender,
 - hosted PersonalProfile bootstrap-evidence foundation for imported viewing/reading history,
 - Letterboxd/IMDb/Goodreads/StoryGraph/generic-CSV normalization,
-- PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports.
+- PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports,
+- hosted `cold-start-v1` PersonalProfile profiling backend with versioned `cold-start-prior-v1` and bounded 6-of-12-to-24 contract.
 
-A bootstrap/resurfacing integration bug discovered by real-data acceptance is also fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
+A bootstrap/resurfacing integration bug discovered by real-data acceptance is fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
 
 Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets a `Profile`; recommendable content remains `Item`. Personal evidence is never copied into Shared history. Shared common-fit (#177) may read authorized accepted members' Personal taste through the Prediction boundary.
 
@@ -59,13 +60,13 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - Sprint 012/#138 Profile messaging.
 - PR #171/current Room-lighting/target/profile-hydration follow-up.
 - latest shell/bootstrap visual polish.
-- #182 first real 30+30 catalog + mock retirement hosted; device acceptance and provider enrichment still open.
+- #182 first real 30+30 catalog + mock retirement hosted/merged through #192; device acceptance and provider enrichment still open.
 - #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
-- PR #191 no-import cold-start calibration; branch implementation/hosted backend exists but must be rebased/final-CI/device-tested after the real-catalog fix.
+- PR #191 rebuilt on current `main`: no-import cold-start profiling backend is hosted and mobile gate is implemented; final CI/merge and configured-device acceptance remain open.
 
 ## Sprint 014 — ACTIVE
 
-### 14A — #182 real catalog — FIRST REAL CATALOG HOSTED
+### 14A — #182 real catalog — FIRST REAL CATALOG HOSTED/MAIN
 
 Implemented/hosted:
 
@@ -80,7 +81,8 @@ Implemented/hosted:
 - guarded `KAJO_CURATED_BETA` seed contains 30 real movies and 30 real books,
 - old 24 mock Items are non-discoverable but not deleted,
 - all 930 historical mock Event references still resolve,
-- V1 hosted acceptance returns only real curated Items after the NULL bootstrap fix.
+- V1 hosted acceptance returns only real curated Items after the NULL bootstrap fix,
+- PR #192 is merged to `main` at `c08513a3b00cda764004ed8c295466f26dc61e32`.
 
 Still required:
 
@@ -90,9 +92,9 @@ Still required:
 - expand beyond the bounded first seed with TMDB/Open Library,
 - beta-scale coverage/dedup/metadata review.
 
-### 14B — #185 PersonalProfile bootstrap/import — IMPLEMENTED/HOSTED, DEVICE GATE + CALIBRATION NEXT
+### 14B — #185 PersonalProfile bootstrap/import + no-import profiling — HOSTED, FINAL CI + DEVICE GATES OPEN
 
-Hosted repository migrations:
+Hosted import migrations:
 
 - `20260904203000_profile_bootstrap_import_foundation.sql`,
 - `20260904203200_harden_bootstrap_rating_constraints.sql`,
@@ -100,7 +102,11 @@ Hosted repository migrations:
 - `20260904211000_profile_bootstrap_actor_index.sql`,
 - `20260904212000_list_profile_import_jobs.sql`.
 
-Current contract:
+Hosted profiling migration:
+
+- `20260905010000_profile_cold_start_calibration.sql` (`profile_cold_start_calibration` hosted migration).
+
+Import contract:
 
 - imports are PersonalProfile-owner-only,
 - imported provider history is **not** appended as native Kajo Events,
@@ -118,7 +124,29 @@ Current contract:
 - staged import bound is 5,000 normalized rows,
 - prior imports can be reloaded in Settings and removed after app restart.
 
-Mobile Settings:
+No-import `cold-start-v1` contract:
+
+- import and profiling are the two intended sparse-PersonalProfile bootstrap paths,
+- Settings/import is reachable from the profiling gate; returning without sufficient import evidence brings the gate back,
+- minimum completion is **6 ratings of known real Items**,
+- first slate is **12** deterministic high-prior Items; unknown Items are skipped without negative evidence,
+- if needed the same slate extends to at most **24** Items,
+- the user may finish as soon as six ratings exist and never needs to rate all cards,
+- after the bounded maximum/technical insufficiency, fail open rather than trap the user,
+- image is presentation enrichment, not eligibility,
+- `KAJO_MOCK` and demographic profiling are excluded,
+- calibration is source-tagged `KAJO_CALIBRATION` LongTerm bootstrap evidence, not native Events/ShortTerm/ScenarioMemory.
+
+`ColdStartPrior` / `cold-start-prior-v1`:
+
+1. provider/catalog trend or popularity when available,
+2. provider/catalog recognition when available,
+3. explicit recognition-only fallback for the first curated beta seed,
+4. weak freshness component.
+
+Curated Items deliberately report `trend=0` and `KAJO_CURATED_RECOGNITION`; no fake live trend is created. Kajo-wide aggregate user trend is not MVP `ColdStartPrior`; it belongs to later privacy-gated `PopulationMemory`. Provider aggregate trend/popularity can be added without changing the UI/contract.
+
+Mobile Settings/import:
 
 - `Asetukset` is second from bottom in the side drawer, immediately above `Kirjaudu ulos`,
 - import controls/instructions are available only while PersonalProfile is active,
@@ -129,31 +157,34 @@ Mobile Settings:
 
 Hosted acceptance already proved:
 
-- controlled stage sample: 3 matched / 1 ambiguous / 1 unmatched,
+- controlled import stage sample: 3 matched / 1 ambiguous / 1 unmatched,
 - manual resolution + commit,
 - SharedProfile import/listing denied,
 - Profile isolation,
 - imported rating suppression,
 - old saved-import reminder eligibility,
 - import removal deactivates bootstrap evidence,
-- empty-profile bootstrap adds LongTerm taste while ShortTerm remains empty,
+- empty-profile import adds LongTerm taste while ShortTerm remains empty,
 - 5,000-row guard is active,
-- new FK index advisor finding was corrected forward.
+- new FK index advisor finding was corrected forward,
+- profiling status sees 30 real movies + 30 real books without requiring images,
+- 12-card candidate slate is deterministic and remains the prefix of the 24-card extension,
+- current curated candidates are inspectably recognition-prior only (`trend=0`),
+- controlled six-rating calibration executes without native calibration Events and rollback leaves zero active test rows.
 
-PR #191 cold-start follow-up is implemented on `feat/185-cold-start-calibration`: only real non-mock Items, minimum six known ratings, PersonalProfile LongTerm bootstrap only, no demographics, no Shared direct write. Its first CI found a React `set-state-in-effect` lint issue; that branch now contains the clean Profile-ID-scoped state fix. It is intentionally not merged until this real-catalog branch reaches `main`, after which #191 is rebased and revalidated.
-
-**Next 14B target:** configured-device real-card + Settings/CSV + cold-start acceptance against the hosted real catalog. #185 remains open until both import and no-import paths are accepted.
+**Next 14B target:** final-head PR #191 CI/merge, then configured-device real-card + Settings/CSV + no-import profiling acceptance. #185 remains open until both import and no-import paths are accepted.
 
 ### 14C — #177 SharedProfile common-fit
 
 After useful Personal evidence exists, extend the existing Prediction V1 path so SharedProfile ranking can combine:
 
+- neutral `ColdStartPrior` while Shared joint evidence is sparse,
 - Shared joint evidence,
 - authorized accepted-member PersonalProfile fit (including bootstrap-derived LongTerm taste),
 - inspectable minimum-member/consensus behavior,
 - disagreement penalty.
 
-The Prediction target remains the SharedProfile. Personal Events/bootstrap history are read through the authorized scoring boundary and are not copied into Shared history. No second Shared recommender.
+The Prediction target remains the SharedProfile. Personal Events/bootstrap history are read through the authorized scoring boundary and are not copied into Shared history. New SharedProfiles may shrink toward the non-personal catalog prior plus accepted-member fit; this is not PopulationMemory and not a second recommender.
 
 ### 14D — #186 external beta
 
@@ -174,7 +205,8 @@ Required before store submission:
 ## Prediction / evolution state
 
 ```text
-Native Events + imported Personal bootstrap evidence
+provider/catalog ColdStartPrior (only while sparse)
++ Native Events + imported/calibration Personal bootstrap evidence
   -> Working / Short / Long state
   -> Prediction V1 + same-Profile ScenarioMemory
   -> reacted/resurfacing + generic Item discoverability
@@ -183,24 +215,24 @@ Native Events + imported Personal bootstrap evidence
   -> manual Profile canary / rollback
 ```
 
-Imported history affects LongTerm only. Automatic production genome promotion remains disabled in MVP 0.1.
+Imported/calibration history affects LongTerm only. Automatic production genome promotion remains disabled in MVP 0.1. Kajo-derived cross-Profile trend remains future PopulationMemory until privacy/cohort gates exist.
 
 ## Current ordered work
 
-1. **Merge #182 first real catalog + NULL bootstrap eligibility fix and device-test real delivery.**
-2. **Rebase/finalize PR #191 cold-start calibration; device-test import + no-import bootstrap.**
-3. **#177 SharedProfile common-fit using authorized member Personal taste.**
-4. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
-5. Close deferred #102/#138/Room/shell device gates required for beta.
-6. **#186 roughly 10-person external beta acceptance.**
-7. **Sprint 015 — production auth/security/signing/store release.**
-8. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
+1. **Finalize PR #191: CI -> merge -> configured-device import + no-import profiling acceptance.**
+2. **#177 SharedProfile common-fit using neutral ColdStartPrior + authorized member Personal taste.**
+3. Expand #182 catalog with TMDB/Open Library covers/posters/metadata and device-confirm real delivery before beta.
+4. Close deferred #102/#138/Room/shell device gates required for beta.
+5. **#186 roughly 10-person external beta acceptance.**
+6. **Sprint 015 — production auth/security/signing/store release.**
+7. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
 
 ## Repository hygiene
 
 - Follow `/AGENTS.md` and `/docs/project/HANDOFF_PROTOCOL.md`.
 - One canonical implementation per capability.
 - Provider imports normalize into generic Items/bootstrap evidence.
+- `ColdStartPrior` is a sparse-evidence Item prior, not a second recommender or PopulationMemory shortcut.
 - Personal evidence remains Personal; Shared common-fit reads it rather than copying it.
 - Deployed migrations are immutable; fixes are ordered forward migrations.
 - `STATUS.md` = current truth, sprint docs = execution/history, `ROADMAP.md` = planned sequence.
@@ -210,16 +242,20 @@ Imported history affects LongTerm only. Automatic production genome promotion re
 - `/docs/product/MVP.md`
 - `/docs/project/sprints/SPRINT-014.md`
 - `/docs/domain/PREDICTION_MODEL.md`
+- `/docs/domain/GLOSSARY.md`
 - `/docs/architecture/CODEMAP.md`
+- `/apps/mobile/src/features/settings/ProfileBootstrapGate.tsx`
+- `/apps/mobile/src/features/settings/profileCalibrationOperations.ts`
 - `/apps/mobile/src/features/settings/SettingsScreen.tsx`
 - `/apps/mobile/src/features/settings/historyImportParser.ts`
 - `/apps/mobile/src/features/settings/historyImportOperations.ts`
 - `/supabase/migrations/20260905003000_seed_curated_beta_catalog.sql`
 - `/supabase/migrations/20260905003500_fix_resurfacing_null_bootstrap.sql`
+- `/supabase/migrations/20260905010000_profile_cold_start_calibration.sql`
 - `/supabase/functions/catalog-import/index.ts`
 
 ## Handoff
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **merge first real catalog fix, rebase/finalize PR #191, then configured-device real-content/import/calibration acceptance**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, or begin monetization work.
+Immediate target: **finish PR #191 CI/merge and configured-device real-content/import/cold-start profiling acceptance, then #177 Shared common-fit**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
