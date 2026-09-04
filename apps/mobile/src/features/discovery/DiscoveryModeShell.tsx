@@ -18,6 +18,7 @@ import { getRoomTheme, withColorAlpha } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
+import { BottomProfileControl } from '../profiles/BottomProfileControl';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useItemLists } from '../lists/ItemListsContext';
@@ -838,23 +839,14 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               </View>
             </Pressable>
 
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
-              hitSlop={8}
-              onPress={goHome}
-              style={({ pressed }) => [
-                styles.dockContext,
-                pressed && styles.brandPressed,
-              ]}
-            >
-              <Text
-                numberOfLines={1}
-                style={[styles.dockIdentity, { color: theme.base.textMuted }]}
-              >
-                {identityName}
-              </Text>
-            </Pressable>
+            <BottomProfileControl
+              borderColor={theme.base.border}
+              identityName={identityName}
+              onOpen={() => setOverlay(null)}
+              panelColor={theme.surface.panel}
+              textMuted={theme.base.textMuted}
+              textPrimary={theme.base.textPrimary}
+            />
 
             <Pressable
               accessibilityRole="button"
@@ -1249,20 +1241,6 @@ const styles = StyleSheet.create({
     height: 42,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  dockContext: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-  },
-  dockIdentity: {
-    maxWidth: 190,
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.2,
   },
   menuGlyph: {
     width: 19,
