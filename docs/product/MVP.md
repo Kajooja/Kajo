@@ -70,7 +70,7 @@ Commercial monetization, autonomous predictor promotion and additional media/lif
 
 - [ ] `MVP-BOOT-001` A user can import Letterboxd and IMDb movie-history exports through a user-authorized file flow; watched/check-in/rating/watchlist data is matched to canonical Items and normalized into Kajo state/evidence with source provenance.
 - [ ] `MVP-BOOT-002` A user has at least one practical book-history import path (for example Goodreads-style or StoryGraph CSV plus a documented generic Kajo CSV fallback) that matches books safely by ISBN/external ID/title metadata and normalizes read/rating/to-read state.
-- [ ] `MVP-BOOT-003` A user without enough import evidence completes a short real-catalog cold-start calibration so first-session recommendations are useful without requiring demographic profiling; optional demographic/context data may only be a weak prior.
+- [ ] `MVP-BOOT-003` A user without enough imported/native evidence completes a bounded real-catalog cold-start profiling pass: provider/catalog trend or popularity and recognition determine the first candidates, 12 Items are shown first, unknown Items may be skipped, at least 6 known Items are rated, and the deterministic slate may extend to at most 24 before a fail-open. The flow requires no demographic profiling and never substitutes `KAJO_MOCK`; Kajo-derived cross-Profile trend remains future privacy-gated PopulationMemory rather than an MVP shortcut.
 - [ ] `MVP-BOOT-004` Imported/calibration evidence is idempotent, distinguishable from native Kajo Events, correctable/removable, initializes PersonalProfile taste, and is progressively superseded by real Kajo behaviour rather than becoming permanent truth.
 
 ## Swipe and state
@@ -146,6 +146,7 @@ Commercial monetization, autonomous predictor promotion and additional media/lif
 
 - Monetization/commercial subscription or advertising systems.
 - Full autonomous evolutionary predictor population/genetic optimization and automatic production promotion.
+- Kajo-derived cross-Profile `PopulationMemory` trend/collaborative transfer before consent, minimum-cohort, deletion-lineage and exposure-bias gates; provider aggregate popularity/trend remains allowed as `ColdStartPrior` catalog metadata.
 - Music, series, games, restaurants, travel and live-event production domains.
 - Public follower/feed/influencer mechanics.
 - Arbitrary direct messages between unrelated Users; MVP messaging is limited to active Profile context.
@@ -153,4 +154,4 @@ Commercial monetization, autonomous predictor promotion and additional media/lif
 - Majority-vote automatic Shared saving; MVP automatic Shared promotion uses unanimity.
 - Complex 3D or game-like Room editor.
 - Full photo-rich life journal.
-- Advanced demographic personalization beyond optional weak cold-start prior.
+- Advanced demographic personalization; MVP bootstrap does not require demographics and any later demographic/context prior remains optional and weak.
