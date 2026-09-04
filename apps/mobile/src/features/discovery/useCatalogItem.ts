@@ -10,40 +10,52 @@ export type CatalogItemState =
   | { status: 'ready'; item: Item | null }
   | { status: 'error'; item: Item | null };
 
+interface LoadedCatalogItemState {
+  itemId: ItemId;
+  state: CatalogItemState;
+}
+
 export function useCatalogItem(
   itemId: ItemId,
   seedItem: Item | null = null,
 ): CatalogItemState {
   const connection = useSupabaseConnection();
-  const [state, setState] = useState<CatalogItemState>(() =>
-    seedItem?.id === itemId
-      ? { status: 'ready', item: seedItem }
-      : { status: 'loading', item: null },
-  );
+  const seededItem = seedItem?.id === itemId ? seedItem : null;
+  const [loaded, setLoaded] = useState<LoadedCatalogItemState | null>(null);
 
   useEffect(() => {
-    if (seedItem?.id === itemId) {
-      setState({ status: 'ready', item: seedItem });
-      return;
-    }
-
-    if (connection.status !== 'configured') {
-      setState({ status: 'ready', item: null });
+    if (seededItem || connection.status !== 'configured') {
       return;
     }
 
     let active = true;
-    setState((current) => ({ status: 'loading', item: current.item }));
 
     void loadCatalogItem(connection.client, itemId).then((item) => {
       if (!active) return;
-      setState(item ? { status: 'ready', item } : { status: 'error', item: null });
+      setLoaded({
+        itemId,
+        state: item
+          ? { status: 'ready', item }
+          : { status: 'error', item: null },
+      });
     });
 
     return () => {
       active = false;
     };
-  }, [connection, itemId, seedItem]);
+  }, [connection, itemId, seededItem]);
 
-  return state;
+  if (seededItem) {
+    return { status: 'ready', item: seededItem };
+  }
+
+  if (connection.status !== 'configured') {
+    return { status: 'ready', item: null };
+  }
+
+  if (loaded?.itemId === itemId) {
+    return loaded.state;
+  }
+
+  return { status: 'loading', item: null };
 }
