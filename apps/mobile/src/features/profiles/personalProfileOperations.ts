@@ -25,6 +25,12 @@ export type PersonalProfileRpc = (
   arguments_?: Record<string, unknown>,
 ) => PromiseLike<RpcResponse>;
 
+interface PersonalProfileRetryOptions {
+  maxAttempts?: number;
+  retryDelayMs?: number;
+  wait?: (durationMs: number) => Promise<void>;
+}
+
 export type PersonalProfileOperationResult =
   | { status: 'ready'; identity: PersonalIdentity }
   | { status: 'missing' }
@@ -39,6 +45,7 @@ export const MAXIMUM_NICKNAME_LENGTH = 24;
 const PROFILE_ERROR_MESSAGE =
   'Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.';
 const NICKNAME_EXISTS_MESSAGE = 'Nimimerkki on jo käytössä. Valitse toinen.';
+export const INITIAL_PROFILE_RETRY_DELAY_MS = 300;
 
 export function validateNickname(value: string): NicknameValidationResult {
   const nickname = value.trim().replace(/\s+/g, ' ');
@@ -64,6 +71,27 @@ export async function loadPersonalIdentity(
   rpc: PersonalProfileRpc,
 ): Promise<PersonalProfileOperationResult> {
   return invokePersonalProfileRpc(rpc, PERSONAL_PROFILE_RPC.get);
+}
+
+export async function loadPersonalIdentityWithRetry(
+  rpc: PersonalProfileRpc,
+  options: PersonalProfileRetryOptions = {},
+): Promise<PersonalProfileOperationResult> {
+  const maxAttempts = Math.max(1, options.maxAttempts ?? 2);
+  const retryDelayMs = options.retryDelayMs ?? INITIAL_PROFILE_RETRY_DELAY_MS;
+  const wait = options.wait ?? waitFor;
+  let result = await loadPersonalIdentity(rpc);
+
+  for (
+    let attempt = 1;
+    attempt < maxAttempts && result.status === 'error';
+    attempt += 1
+  ) {
+    await wait(retryDelayMs);
+    result = await loadPersonalIdentity(rpc);
+  }
+
+  return result;
 }
 
 export async function completePersonalIdentity(
@@ -153,4 +181,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function waitFor(durationMs: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, durationMs));
 }

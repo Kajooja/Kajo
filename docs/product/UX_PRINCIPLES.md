@@ -43,9 +43,10 @@ The canonical visual reference is a **warm, minimalist straight-on 2D cabin/livi
 - **Low shelf with TV/screen** is the clear MOVIE entrance.
 - **Window** carries outside light, sky and time-of-day atmosphere.
 - **Curtain** remains the single global DiscoveryMode control; it is functional, not decorative duplication.
-- The Room should have enough perspective/overlap to feel like a place, but every navigation object must remain immediately readable and easy to tap.
+- The Room should use restrained overlap and light to feel like a place without introducing perspective; every navigation object must remain immediately readable and easy to tap.
 - Furnishings should read as calm, simplified cabin symbols rather than rectangular UI placeholders. Keep the composition flat, balanced and safely inside tall-phone crop boundaries.
-- Window and fireplace are two independent runtime Kajo sources. The base Room asset must not bake either source's bloom, beam or cast light into the scene; their phase-aware light layers are positioned and animated separately in the mobile UI. Window Kajo breathes slowly, fireplace Kajo flickers gently and DiscoveryMode changes cross-fade the full atmosphere. Reduced-motion preference disables continuous motion and settles immediately.
+- Window and fireplace are two independent runtime Kajo sources. The base Room asset must not bake either source's bloom, beam or cast light into the scene; their phase-aware light layers are positioned and animated separately in the mobile UI. Both sources use soft, uneven alpha falloff rather than hard-edged flat overlays, while the rest of the Room gains progressively deeper shadow. Window Kajo breathes slowly, fireplace Kajo flickers gently and DiscoveryMode changes cross-fade the full atmosphere. Reduced-motion preference disables continuous motion and settles immediately.
+- Home interaction geometry is anchored to the source illustration and mapped through the actual `cover` crop. The MOVIE target covers the TV screen only, and the BOOK target covers the bookshelf only; visual press feedback remains nearly transparent.
 - Prefer broad matte shapes, soft geometry, generous calm areas and restrained shadows over photorealism, pixel/game art, painterly concept art, glossy surfaces, neon, glassmorphism or sci-fi chrome.
 - Do not add decorative objects merely to fill space. New Room objects require a real content-domain/navigation purpose.
 - Do not introduce heavy animation, parallax spectacle, complex moving scenery, avatars or game mechanics for MVP.
@@ -53,9 +54,9 @@ The canonical visual reference is a **warm, minimalist straight-on 2D cabin/livi
 
 DiscoveryMode atmosphere may alter the same scene without rebuilding it:
 
-- `FOR_YOU`: soft warm flame, calm dawn/day window light.
-- `SURPRISE`: slightly stronger warmth, sunset/evening light.
-- `RISK`: night/moon/stars and a restrained cooler/blue fireplace accent while keeping the Room inviting rather than ominous.
+- `FOR_YOU`: bright morning, low sun, calm clouds and the smallest warm flame.
+- `SURPRISE`: slightly darker afternoon, changed cloud position and a larger warm flame.
+- `RISK`: dark night, moon/stars and the largest restrained cooler/blue flame while keeping the Room inviting rather than ominous.
 
 ## Initial Room vocabulary
 

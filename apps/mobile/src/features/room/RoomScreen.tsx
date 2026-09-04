@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -9,6 +9,7 @@ import {
   Pressable,
   StyleSheet,
   View,
+  type LayoutChangeEvent,
 } from 'react-native';
 
 import { getAmbientPhase } from '../../domain/discovery';
@@ -19,28 +20,57 @@ import {
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { getCurtainPositionForMode } from './curtainState';
+import {
+  mapRoomRectForCover,
+  ROOM_ART_RECTS,
+  type RoomRect,
+  type RoomSize,
+} from './roomGeometry';
 
 const CABIN_ROOM_ART = require('../../../assets/room-cabin-2d.png');
+const SOFT_KAJO_MASK = require('../../../assets/soft-kajo-mask.png');
 
 const PHASE_SHADE_OPACITY = {
   DAWN: 0.02,
-  EVENING: 0.1,
-  NIGHT: 0.27,
+  EVENING: 0.16,
+  NIGHT: 0.43,
 } as const;
 
 const WINDOW_GLOW_OPACITY = {
-  DAWN: 0.18,
+  DAWN: 0.3,
   EVENING: 0.22,
-  NIGHT: 0.16,
+  NIGHT: 0.13,
 } as const;
 
 const FIRE_GLOW_OPACITY = {
-  DAWN: 0.17,
-  EVENING: 0.22,
-  NIGHT: 0.16,
+  DAWN: 0.12,
+  EVENING: 0.24,
+  NIGHT: 0.4,
 } as const;
 
 const MODE_TRANSITION_DURATION_MS = 680;
+
+function useRoomLayout() {
+  const [layout, setLayout] = useState<RoomSize | null>(null);
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+
+    setLayout((current) =>
+      current?.width === width && current.height === height
+        ? current
+        : { width, height },
+    );
+  }, []);
+
+  return { layout, onLayout };
+}
+
+function getMappedStyle(layout: RoomSize, rect: RoomRect) {
+  return {
+    position: 'absolute' as const,
+    ...mapRoomRectForCover(layout, rect),
+  };
+}
 
 function useReduceMotionPreference() {
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -68,10 +98,127 @@ function useReduceMotionPreference() {
   return reduceMotion;
 }
 
+function WindowScene({
+  layout,
+  phasePosition,
+}: {
+  layout: RoomSize;
+  phasePosition: Animated.Value;
+}) {
+  const paneColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [
+      'rgba(225, 216, 188, 0.12)',
+      'rgba(205, 137, 105, 0.2)',
+      'rgba(20, 35, 58, 0.82)',
+    ],
+  });
+  const sunOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.5, 0.78, 1],
+    outputRange: [0.72, 0.9, 0.18, 0],
+  });
+  const moonOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.62, 1],
+    outputRange: [0, 0, 0.92],
+  });
+  const starsOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.7, 1],
+    outputRange: [0, 0, 0.55],
+  });
+  const cloudOpacity = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.5, 0.34, 0.22],
+  });
+  const topRight = mapRoomRectForCover(layout, ROOM_ART_RECTS.windowTopRight);
+  const topLeft = mapRoomRectForCover(layout, ROOM_ART_RECTS.windowTopLeft);
+  const cloudShift = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [-topLeft.width * 0.08, topLeft.width * 0.08, topLeft.width * 0.2],
+  });
+  const sunShiftX = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [-topRight.width * 0.2, topRight.width * 0.08, topRight.width * 0.08],
+  });
+  const sunShiftY = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [topRight.height * 0.28, topRight.height * 0.05, topRight.height * 0.05],
+  });
+
+  return (
+    <View pointerEvents="none" style={styles.kajoLayer}>
+      {[
+        ROOM_ART_RECTS.windowTopLeft,
+        ROOM_ART_RECTS.windowTopRight,
+        ROOM_ART_RECTS.windowBottomLeft,
+        ROOM_ART_RECTS.windowBottomRight,
+      ].map((pane, index) => (
+        <Animated.View
+          key={index}
+          style={[
+            getMappedStyle(layout, pane),
+            styles.windowPane,
+            { backgroundColor: paneColor },
+          ]}
+        />
+      ))}
+
+      <View
+        style={[
+          getMappedStyle(layout, ROOM_ART_RECTS.windowTopLeft),
+          styles.windowPane,
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.cloud,
+            {
+              opacity: cloudOpacity,
+              transform: [{ translateX: cloudShift }],
+            },
+          ]}
+        >
+          <View style={[styles.cloudLobe, styles.cloudLobeLeft]} />
+          <View style={[styles.cloudLobe, styles.cloudLobeRight]} />
+        </Animated.View>
+        <Animated.View style={[styles.stars, { opacity: starsOpacity }]}>
+          <View style={[styles.star, styles.starOne]} />
+          <View style={[styles.star, styles.starTwo]} />
+          <View style={[styles.star, styles.starThree]} />
+        </Animated.View>
+      </View>
+
+      <View
+        style={[
+          getMappedStyle(layout, ROOM_ART_RECTS.windowTopRight),
+          styles.windowPane,
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.sun,
+            {
+              opacity: sunOpacity,
+              transform: [
+                { translateX: sunShiftX },
+                { translateY: sunShiftY },
+              ],
+            },
+          ]}
+        />
+        <Animated.View style={[styles.moon, { opacity: moonOpacity }]}>
+          <View style={styles.moonShade} />
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
 function WindowKajo({
+  layout,
   phasePosition,
   pulse,
 }: {
+  layout: RoomSize;
   phasePosition: Animated.Value;
   pulse: Animated.Value;
 }) {
@@ -102,50 +249,37 @@ function WindowKajo({
     }),
     pulseOpacity,
   );
-  const wideBeamOpacity = Animated.multiply(
+  const beamOpacity = Animated.multiply(
     phasePosition.interpolate({
       inputRange: [0, 0.5, 1],
-      outputRange: [0.07, 0.1, 0.07],
-    }),
-    pulseOpacity,
-  );
-  const narrowBeamOpacity = Animated.multiply(
-    phasePosition.interpolate({
-      inputRange: [0, 0.5, 1],
-      outputRange: [0.08, 0.11, 0.08],
+      outputRange: [0.16, 0.12, 0.07],
     }),
     pulseOpacity,
   );
 
   return (
     <View pointerEvents="none" style={styles.kajoLayer}>
-      <Animated.View
+      <Animated.Image
+        resizeMode="stretch"
+        source={SOFT_KAJO_MASK}
         style={[
-          styles.windowHalo,
+          getMappedStyle(layout, ROOM_ART_RECTS.windowLight),
           {
-            backgroundColor: lightColor,
             opacity: haloOpacity,
+            tintColor: lightColor,
             transform: [{ scale: pulseScale }],
           },
         ]}
       />
-      <Animated.View
+      <Animated.Image
+        resizeMode="stretch"
+        source={SOFT_KAJO_MASK}
         style={[
-          styles.windowBeamWide,
+          getMappedStyle(layout, { x: 45, y: 430, width: 650, height: 430 }),
           {
-            backgroundColor: lightColor,
-            opacity: wideBeamOpacity,
-            transform: [{ scale: pulseScale }],
-          },
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.windowBeamNarrow,
-          {
-            backgroundColor: lightColor,
-            opacity: narrowBeamOpacity,
-            transform: [{ scale: pulseScale }],
+            opacity: beamOpacity,
+            tintColor: lightColor,
+            transform: [{ rotate: '-7deg' }, { scale: pulseScale }],
           },
         ]}
       />
@@ -154,21 +288,21 @@ function WindowKajo({
 }
 
 function FireplaceKajo({
-  color,
+  layout,
   phasePosition,
   pulse,
 }: {
-  color: string;
+  layout: RoomSize;
   phasePosition: Animated.Value;
   pulse: Animated.Value;
 }) {
   const fireColor = phasePosition.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [
-      color,
-      color,
-      ROOM_AMBIENT_BY_PHASE.NIGHT.curtainHighlight,
-    ],
+    outputRange: ['#D39B58', '#D9824F', '#79A9D5'],
+  });
+  const fireCoreColor = phasePosition.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: ['#F2C36E', '#F3AE61', '#C9E2F2'],
   });
   const pulseOpacity = pulse.interpolate({
     inputRange: [0, 1],
@@ -192,50 +326,73 @@ function FireplaceKajo({
   const midOpacity = Animated.multiply(
     phasePosition.interpolate({
       inputRange: [0, 0.5, 1],
-      outputRange: [0.12, 0.15, 0.11],
+      outputRange: [0.08, 0.16, 0.28],
     }),
     pulseOpacity,
   );
-  const coreOpacity = Animated.multiply(
+  const flameScale = Animated.multiply(
     phasePosition.interpolate({
       inputRange: [0, 0.5, 1],
-      outputRange: [0.18, 0.22, 0.16],
+      outputRange: [0.68, 0.98, 1.28],
     }),
-    pulseOpacity,
+    pulse.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.94, 1.06],
+    }),
   );
 
   return (
     <View pointerEvents="none" style={styles.kajoLayer}>
-      <Animated.View
+      <View
         style={[
-          styles.fireHalo,
+          getMappedStyle(layout, { x: 161, y: 912, width: 70, height: 103 }),
+          styles.originalFlameCover,
+        ]}
+      />
+      <Animated.Image
+        resizeMode="stretch"
+        source={SOFT_KAJO_MASK}
+        style={[
+          getMappedStyle(layout, ROOM_ART_RECTS.fireplaceLight),
           {
-            backgroundColor: fireColor,
             opacity: haloOpacity,
+            tintColor: fireColor,
             transform: [{ scale: pulseScale }],
           },
         ]}
       />
-      <Animated.View
+      <Animated.Image
+        resizeMode="stretch"
+        source={SOFT_KAJO_MASK}
         style={[
-          styles.fireMidGlow,
+          getMappedStyle(layout, { x: 72, y: 790, width: 360, height: 430 }),
           {
-            backgroundColor: fireColor,
             opacity: midOpacity,
+            tintColor: fireColor,
             transform: [{ scale: pulseScale }],
           },
         ]}
       />
-      <Animated.View
+      <View
         style={[
-          styles.fireCore,
-          {
-            backgroundColor: fireColor,
-            opacity: coreOpacity,
-            transform: [{ scale: pulseScale }],
-          },
+          getMappedStyle(layout, ROOM_ART_RECTS.flame),
+          styles.flameAnchor,
         ]}
-      />
+      >
+        <Animated.View
+          style={[
+            styles.flameOuter,
+            {
+              backgroundColor: fireColor,
+              transform: [{ scale: flameScale }, { rotate: '45deg' }],
+            },
+          ]}
+        >
+          <Animated.View
+            style={[styles.flameInner, { backgroundColor: fireCoreColor }]}
+          />
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -254,6 +411,7 @@ export function RoomBackdrop() {
   const reduceMotion = useReduceMotionPreference();
   const ambientPhase = getAmbientPhase(discoveryMode);
   const theme = getRoomTheme(ambientPhase, activeProfile.activeProfile);
+  const { layout, onLayout } = useRoomLayout();
   const [phasePosition] = useState(
     () => new Animated.Value(getCurtainPositionForMode(discoveryMode)),
   );
@@ -328,14 +486,6 @@ export function RoomBackdrop() {
     };
   }, [firePulse, reduceMotion, windowPulse]);
 
-  const phaseShadeColor = phasePosition.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [
-      ROOM_AMBIENT_BY_PHASE.DAWN.wash,
-      ROOM_AMBIENT_BY_PHASE.EVENING.wash,
-      '#101927',
-    ],
-  });
   const phaseShadeOpacity = phasePosition.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [
@@ -366,31 +516,15 @@ export function RoomBackdrop() {
       <ImageBackground
         accessibilityLabel={`Kajo Room, ${ambientPhase.toLowerCase()} ambient phase`}
         imageStyle={styles.roomImage}
+        onLayout={onLayout}
         resizeMode="cover"
         source={CABIN_ROOM_ART}
         style={styles.roomImageFrame}
       >
         <Animated.View
           pointerEvents="none"
-          style={[
-            styles.phaseShade,
-            {
-              backgroundColor: phaseShadeColor,
-              opacity: phaseShadeOpacity,
-            },
-          ]}
+          style={[styles.phaseShade, { opacity: phaseShadeOpacity }]}
         />
-
-        <WindowKajo
-          phasePosition={phasePosition}
-          pulse={windowPulse}
-        />
-        <FireplaceKajo
-          color={theme.base.flame}
-          phasePosition={phasePosition}
-          pulse={firePulse}
-        />
-
         <Animated.View
           pointerEvents="none"
           style={[
@@ -401,34 +535,62 @@ export function RoomBackdrop() {
             },
           ]}
         />
+
+        {layout ? (
+          <>
+            <WindowScene layout={layout} phasePosition={phasePosition} />
+            <WindowKajo
+              layout={layout}
+              phasePosition={phasePosition}
+              pulse={windowPulse}
+            />
+            <FireplaceKajo
+              layout={layout}
+              phasePosition={phasePosition}
+              pulse={firePulse}
+            />
+          </>
+        ) : null}
       </ImageBackground>
     </View>
   );
 }
 
 export function RoomInteractionLayer() {
+  const { layout, onLayout } = useRoomLayout();
+
   return (
-    <View pointerEvents="box-none" style={styles.interactionLayer}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Open movie discovery"
-        accessibilityHint="Opens the movie discovery grid"
-        onPress={() => router.push('/discovery/movies')}
-        style={({ pressed }) => [
-          styles.movieHitTarget,
-          pressed && styles.pressed,
-        ]}
-      />
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Open book discovery"
-        accessibilityHint="Opens the book discovery grid"
-        onPress={() => router.push('/discovery/books')}
-        style={({ pressed }) => [
-          styles.booksHitTarget,
-          pressed && styles.pressed,
-        ]}
-      />
+    <View
+      onLayout={onLayout}
+      pointerEvents="box-none"
+      style={styles.interactionLayer}
+    >
+      {layout ? (
+        <>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open movie discovery"
+            accessibilityHint="Opens the movie discovery grid"
+            onPress={() => router.push('/discovery/movies')}
+            style={({ pressed }) => [
+              getMappedStyle(layout, ROOM_ART_RECTS.tv),
+              styles.hitTarget,
+              pressed && styles.pressed,
+            ]}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open book discovery"
+            accessibilityHint="Opens the book discovery grid"
+            onPress={() => router.push('/discovery/books')}
+            style={({ pressed }) => [
+              getMappedStyle(layout, ROOM_ART_RECTS.bookshelf),
+              styles.hitTarget,
+              pressed && styles.pressed,
+            ]}
+          />
+        </>
+      ) : null}
     </View>
   );
 }
@@ -452,84 +614,131 @@ const styles = StyleSheet.create({
   },
   phaseShade: {
     ...StyleSheet.absoluteFill,
+    backgroundColor: '#101927',
+  },
+  ambientWash: {
+    ...StyleSheet.absoluteFill,
   },
   kajoLayer: {
     ...StyleSheet.absoluteFill,
   },
-  windowHalo: {
-    position: 'absolute',
-    width: '54%',
-    height: '36%',
-    left: '-11%',
-    top: '13%',
-    borderRadius: 320,
+  windowPane: {
+    overflow: 'hidden',
   },
-  windowBeamWide: {
+  cloud: {
     position: 'absolute',
-    width: '46%',
-    height: '24%',
-    left: '-2%',
-    top: '25%',
+    left: '6%',
+    top: '52%',
+    width: '58%',
+    height: '14%',
     borderRadius: 100,
+    backgroundColor: 'rgba(220, 224, 218, 0.72)',
   },
-  windowBeamNarrow: {
+  cloudLobe: {
     position: 'absolute',
-    width: '35%',
-    height: '15%',
-    left: '1%',
-    top: '23%',
-    borderRadius: 80,
+    bottom: '18%',
+    borderRadius: 100,
+    backgroundColor: 'rgba(220, 224, 218, 0.72)',
   },
-  fireHalo: {
-    position: 'absolute',
-    width: '52%',
-    aspectRatio: 1,
-    left: '-12%',
-    top: '39%',
-    borderRadius: 360,
-  },
-  fireMidGlow: {
-    position: 'absolute',
+  cloudLobeLeft: {
+    left: '16%',
     width: '34%',
-    aspectRatio: 1,
-    left: '1%',
-    top: '45%',
-    borderRadius: 240,
+    height: '155%',
   },
-  fireCore: {
-    position: 'absolute',
-    width: '19%',
-    height: '12%',
-    left: '10%',
-    top: '51%',
-    borderRadius: 100,
+  cloudLobeRight: {
+    right: '12%',
+    width: '28%',
+    height: '120%',
   },
-  ambientWash: {
+  stars: {
     ...StyleSheet.absoluteFill,
+  },
+  star: {
+    position: 'absolute',
+    width: 2,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: '#DCE6ED',
+  },
+  starOne: {
+    left: '18%',
+    top: '20%',
+  },
+  starTwo: {
+    left: '62%',
+    top: '34%',
+  },
+  starThree: {
+    left: '38%',
+    top: '58%',
+  },
+  sun: {
+    position: 'absolute',
+    left: '34%',
+    top: '8%',
+    width: '25%',
+    aspectRatio: 1,
+    borderRadius: 100,
+    backgroundColor: '#F2D49A',
+  },
+  moon: {
+    position: 'absolute',
+    right: '16%',
+    top: '13%',
+    width: '25%',
+    aspectRatio: 1,
+    overflow: 'hidden',
+    borderRadius: 100,
+    backgroundColor: '#D5DEE3',
+  },
+  moonShade: {
+    position: 'absolute',
+    left: '-26%',
+    top: '-12%',
+    width: '88%',
+    height: '88%',
+    borderRadius: 100,
+    backgroundColor: '#26384F',
+  },
+  originalFlameCover: {
+    borderRadius: 40,
+    backgroundColor: '#37322A',
+  },
+  flameAnchor: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  flameOuter: {
+    width: '43%',
+    height: '43%',
+    marginBottom: '16%',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    borderTopLeftRadius: 90,
+    borderTopRightRadius: 90,
+    borderBottomLeftRadius: 76,
+    borderBottomRightRadius: 18,
+  },
+  flameInner: {
+    width: '48%',
+    height: '52%',
+    marginRight: '8%',
+    marginBottom: '5%',
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+    borderBottomLeftRadius: 48,
+    borderBottomRightRadius: 12,
   },
   interactionLayer: {
     ...StyleSheet.absoluteFill,
     zIndex: 10,
   },
-  movieHitTarget: {
-    position: 'absolute',
-    top: '40%',
-    right: '25%',
-    width: '40%',
-    height: '27%',
-    borderRadius: 18,
-  },
-  booksHitTarget: {
-    position: 'absolute',
-    top: '32%',
-    right: '3%',
-    width: '23%',
-    height: '38%',
-    borderRadius: 16,
+  hitTarget: {
+    borderRadius: 12,
   },
   pressed: {
-    backgroundColor: 'rgba(255, 243, 218, 0.1)',
+    backgroundColor: 'rgba(255, 243, 218, 0.035)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 243, 218, 0.22)',
+    borderColor: 'rgba(255, 243, 218, 0.08)',
   },
 });

@@ -78,7 +78,8 @@ Sprint 011 Lists are merged, hosted and automatically verified. Their refreshed 
 - Configured-device review on 2026-09-03 accepted the corrected full-screen Room/backdrop behavior. The remaining navigation finding is the default Stack animation: returning Home or opening an Item briefly leaves both routes visible.
 - PR #169 merged the immediate-transition/Room-art follow-up at main commit `7bccc2a`; main CI #256 passed with lint, TypeScript, 149 tests, both platform bundle exports and the standalone Android APK build.
 - Configured-device review confirmed the navigation/layout look good and refined the art target away from realism, perspective and video-game/pixel styling toward a softer, mildly abstract straight-on 2D cabin. The complete bookshelf must remain inside tall-phone crop boundaries; window and fireplace Kajo render separately.
-- The focused `feat/minimalist-2d-room` follow-up uses one optimized portrait limited-palette Room illustration with neutral baked lighting, a mobile-safe full bookshelf, independent Profile/DiscoveryMode-aware window/fireplace light layers and precise Home-only TV/bookcase interaction targets. Window Kajo breathes slowly, fireplace Kajo flickers gently and DiscoveryMode changes cross-fade the complete atmosphere over 680 ms; reduced-motion settles the presentation without continuous motion. `npm run check` passes with lint, TypeScript, 149 tests, both platform bundle exports and verified inclusion of the optimized 560 KB Room asset. This follow-up has not yet received configured-device acceptance.
+- PR #170 merged the optimized portrait minimalist Room at main commit `d4375c4`. Its standalone APK was downloaded and configured-device review on 2026-09-04 accepted the overall result. The review requested a focused follow-up: morning/afternoon/night window scenery, stronger phase shadows, source-local soft light falloff, a risk-sized warm-to-blue flame, exact TV/bookshelf hit targets and removal of a transient first profile-load error after login.
+- The current `fix/room-light-profile-load` follow-up implements those findings without a schema change. Room overlays and Home hit targets are mapped through the source image's real `cover` geometry; the first PersonalProfile load gets exactly one short delayed retry only after an error, while missing and persistent-error semantics remain unchanged. `npm run check` passes with lint, TypeScript, 155 tests and both platform bundle exports including the new 35 KB light mask.
 
 ## Pre-acceptance UI polish
 
@@ -95,4 +96,4 @@ The most-used drawer order is deliberately separate from the destination picker 
 
 ## Handoff
 
-Current target: validate and cut the straight-on minimalist 2D cabin follow-up, then request one explicit push/PR/merge authorization. Do not extend earlier visual acceptance to this new Room asset or the deferred complete Lists/messaging acceptance flows.
+Current target: verify and cut the focused Room-lighting/profile-load correction, then request one explicit push/PR/merge authorization. The accepted PR #170 Room direction does not imply acceptance of this new correction or of the deferred complete Lists/messaging flows.
