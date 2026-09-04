@@ -1,4 +1,8 @@
 import type { DiscoveryMode, Item, ItemId, ItemType } from '../../domain/contracts';
+import {
+  getMostRecentRememberedItems,
+  getRememberedItem,
+} from './predictionRankingCache';
 
 interface MockDiscoveryEntry {
   item: Item;
@@ -275,7 +279,10 @@ const MOCK_DISCOVERY_ENTRIES: readonly MockDiscoveryEntry[] = [
   },
 ];
 
-export function getRankedMockItems(itemType: ItemType, mode: DiscoveryMode): readonly Item[] {
+export function getStaticMockItems(
+  itemType: ItemType,
+  mode: DiscoveryMode,
+): readonly Item[] {
   return MOCK_DISCOVERY_ENTRIES.filter(({ item }) => item.itemType === itemType)
     .sort((left, right) => {
       const scoreDifference = right.scores[mode] - left.scores[mode];
@@ -284,6 +291,17 @@ export function getRankedMockItems(itemType: ItemType, mode: DiscoveryMode): rea
     .map(({ item }) => item);
 }
 
+export function getRankedMockItems(
+  itemType: ItemType,
+  mode: DiscoveryMode,
+): readonly Item[] {
+  const remembered = getMostRecentRememberedItems(itemType);
+  return remembered.length > 0 ? remembered : getStaticMockItems(itemType, mode);
+}
+
 export function getMockItem(itemId: ItemId): Item | undefined {
-  return MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item;
+  return (
+    getRememberedItem(itemId) ??
+    MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item
+  );
 }
