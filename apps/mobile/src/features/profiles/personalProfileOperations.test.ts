@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   completePersonalIdentity,
+  INITIAL_PROFILE_RETRY_DELAY_MS,
   loadPersonalIdentity,
+  loadPersonalIdentityWithRetry,
   mapPersonalIdentity,
   MAXIMUM_NICKNAME_LENGTH,
   PERSONAL_PROFILE_RPC,
@@ -120,5 +122,48 @@ describe('personal profile RPC operations', () => {
       status: 'error',
       message: 'Oman Kajo-profiilin lataaminen epäonnistui. Yritä uudelleen.',
     });
+  });
+
+  it('retries one transient initial profile error after a short delay', async () => {
+    const rpc: PersonalProfileRpc = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: null,
+        error: { message: 'session not ready' },
+      })
+      .mockResolvedValueOnce({ data: [IDENTITY_ROW], error: null });
+    const wait = vi.fn(async () => undefined);
+
+    await expect(
+      loadPersonalIdentityWithRetry(rpc, { wait }),
+    ).resolves.toMatchObject({ status: 'ready' });
+    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(wait).toHaveBeenCalledOnce();
+    expect(wait).toHaveBeenCalledWith(INITIAL_PROFILE_RETRY_DELAY_MS);
+  });
+
+  it('keeps the automatic initial retry bounded', async () => {
+    const rpc: PersonalProfileRpc = vi.fn(async () => ({
+      data: null,
+      error: { message: 'persistent failure' },
+    }));
+    const wait = vi.fn(async () => undefined);
+
+    await expect(
+      loadPersonalIdentityWithRetry(rpc, { wait }),
+    ).resolves.toMatchObject({ status: 'error' });
+    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(wait).toHaveBeenCalledOnce();
+  });
+
+  it('does not retry a genuinely missing profile', async () => {
+    const rpc = createRpc([]);
+    const wait = vi.fn(async () => undefined);
+
+    await expect(
+      loadPersonalIdentityWithRetry(rpc, { wait }),
+    ).resolves.toEqual({ status: 'missing' });
+    expect(rpc).toHaveBeenCalledOnce();
+    expect(wait).not.toHaveBeenCalled();
   });
 });

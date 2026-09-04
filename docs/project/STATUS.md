@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-03**
+Last updated: **2026-09-04**
 Current milestone: **MVP 0.1**
 Current sprint: **Sprint 012 — Profile Messaging** (`sprints/SPRINT-012.md`)
 Last accepted sprint: **Sprint 010 — Navigation & Profile lifecycle** (`sprints/SPRINT-010.md`)
@@ -54,7 +54,7 @@ Canonical MVP scene:
 - no standalone Room title/instruction text,
 - no heavy 3D, free camera, virtual walking, glossy sci-fi chrome, excessive animation or decorative clutter.
 
-DiscoveryMode may change restrained atmosphere only: calm dawn/day for `FOR_YOU`, warmer sunset/evening for `SURPRISE`, night/moon/stars with a restrained cooler fireplace accent for `RISK`. The Room must remain inviting and easy to navigate in every mode.
+DiscoveryMode may change restrained atmosphere only: bright morning and a small flame for `FOR_YOU`, darker afternoon and a larger flame for `SURPRISE`, then night/moon/stars and the largest restrained cooler fireplace accent for `RISK`. Window/fireplace light fades softly and unevenly from its real source while the rest of the Room gains phase-appropriate shadow. The Room must remain inviting and easy to navigate in every mode.
 
 The detailed visual contract lives in `/docs/product/UX_PRINCIPLES.md`.
 
@@ -123,13 +123,15 @@ The correction merged in PR #168 at main commit `56fae50`: one edge-to-edge Room
 
 PR #169 merged the immediate-transition/Room-art follow-up at main commit `7bccc2a`; main CI #256 passed with lint, TypeScript, 149 tests, both platform bundle exports and the standalone Android APK build. Configured-device review confirmed the navigation and layout look good. The art follow-up was then refined away from realism, perspective and video-game/pixel styling toward a softer, mildly abstract straight-on 2D cabin with separately rendered window and fireplace Kajo.
 
-The focused `feat/minimalist-2d-room` follow-up replaces the structural code-drawn furnishings with one optimized portrait minimalist Room illustration. Its neutral-lit, limited-palette asset deliberately keeps the window and fireplace bloom/cast light out of the bitmap; named, independent phase-aware UI layers animate the slowly breathing window Kajo and gently flickering fireplace Kajo. DiscoveryMode changes cross-fade shade, ambient wash and both light-source colors over 680 ms; reduced-motion settles them without continuous animation. Precise Home-only TV/bookcase interaction targets follow the mobile-safe composition. `npm run check` passes with lint, TypeScript, 149 tests, both platform bundle exports and verified inclusion of the optimized 560 KB Room asset. It has not yet received configured-device acceptance.
+PR #170 merged the minimalist straight-on Room at main commit `d4375c4`. Its neutral-lit, limited-palette illustration keeps the window and fireplace bloom/cast light out of the bitmap; named, independent phase-aware UI layers animate the slowly breathing window Kajo and gently flickering fireplace Kajo. The standalone main APK was downloaded and the configured-device review accepted the Room direction on 2026-09-04, while identifying three focused follow-ups: more natural source-local falloff/time-of-day contrast, exact TV/bookshelf targets and a transient first profile-load failure immediately after login.
+
+The current `fix/room-light-profile-load` follow-up maps window scenery, light layers, flame and interaction targets through the source illustration's real `cover` geometry. It changes the window from morning sun/clouds through afternoon to moon/stars, deepens phase shadows, grows the flame by risk level and makes the highest flame slightly blue. A soft irregular alpha mask replaces hard light ellipses. Initial PersonalProfile loading gets one delayed automatic retry after an error; a genuinely missing profile is never retried and persistent failures still expose the manual retry state. No database migration is required. `npm run check` passes with lint, TypeScript, 155 tests and both platform bundle exports including the new 35 KB light mask.
 
 Hosted reaction/test evidence was reset on 2026-09-02 for clean device testing: Events, Event sessions, Item interactions and Shared Endorsements were removed; auth accounts, public User rows, Profiles, memberships, Items and system Lists were preserved.
 
 ## Next MVP sequence
 
-1. **Sprint 012 2D Room follow-up** — validate and cut the minimalist front-facing cabin plus animated independent window/fireplace Kajo lighting.
+1. **Sprint 012 Room lighting follow-up** — cut and validate phase-aware window/fireplace lighting, exact object targets and post-login profile hydration resilience.
 2. **Deferred acceptance** — run the refreshed #102/#138 configured-Android flow without treating its deferral as prior acceptance.
 3. **Sprint 013** — ScenarioMemory.
 4. **Sprint 014** — MVP hardening/release readiness.
@@ -174,4 +176,4 @@ The List model is hosted and stable enough for #138. Its final configured-device
 
 A fresh conversation must follow `/AGENTS.md` and can start with **"jatketaan reposta"**.
 
-Immediate target: cut the minimalist straight-on 2D cabin follow-up, then request one refreshed configured-Android review covering the Room presentation plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the fixed illustrated/non-navigable Room contract must be preserved.
+Immediate target: cut the focused Room-lighting/profile-load follow-up, then request one refreshed configured-Android review covering its three reported findings plus the still-deferred #102 Lists and #138 messaging flows. The old `Ehdota yhteiseen` action must not be reintroduced, and the fixed illustrated/non-navigable Room contract must be preserved.

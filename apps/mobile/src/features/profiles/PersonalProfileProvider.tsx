@@ -14,6 +14,7 @@ import { useAuthSession } from '@/features/auth/AuthSessionProvider';
 import {
   completePersonalIdentity,
   loadPersonalIdentity,
+  loadPersonalIdentityWithRetry,
   type PersonalIdentity,
   type PersonalProfileOperationResult,
   type PersonalProfileRpc,
@@ -81,7 +82,7 @@ export function PersonalProfileProvider({ children }: PropsWithChildren) {
     let active = true;
     const userId = authenticatedUserId;
 
-    void loadPersonalIdentity(rpc).then((result) => {
+    void loadPersonalIdentityWithRetry(rpc).then((result) => {
       if (active) {
         setUserSnapshot(toUserSnapshot(result, userId));
       }
