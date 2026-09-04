@@ -7,7 +7,7 @@ User
   |
   | acts as actor
   v
-Event ----------------------> Item
+Event ----------------------> Item <----- ItemSource / ItemExternalId
   |
   | occurs within
   v
@@ -123,17 +123,53 @@ Shared discovery uses approval rather than direct custom-List insertion. The fir
 
 ## Item
 
-`Item` is domain-agnostic.
+`Item` is the single domain-agnostic recommendable entity. Provider records never become parallel Item types.
 
-Common fields will eventually include ID, ItemType, title, description, tags/features/embedding and optional availability/context metadata.
+Current generic catalog fields include:
+
+- stable Kajo `id` + `ItemType`,
+- title + optional description,
+- normalized `tags`,
+- normalized creator names,
+- optional release year, image URL and original language,
+- provider/domain-specific `metadata`,
+- `discoverable` lifecycle state.
+
+`discoverable=false` means the Item is excluded from **normal Prediction candidate generation** while the same stable Item remains valid for Events, Lists, interactions, messages and historical Prediction traces. This is how Kajo retires seeded/mock or stale provider content without deleting referential history.
 
 Domain-specific metadata may extend Item:
 
-- BOOK: author, pages, publication data.
-- MOVIE: runtime, director, cast.
+- BOOK: author roles, pages, publication/edition data, ISBNs.
+- MOVIE: runtime, director/cast details, release/availability data.
 - EVENT later: location, start/end time, price.
 
-Prediction code should consume generic features/contracts rather than external provider schemas.
+Prediction code consumes generic features/contracts rather than external provider schemas.
+
+### ItemSource and ItemExternalId
+
+`ItemSource` is server-owned provenance from one provider record to one canonical Item. It records a provider key + provider item ID and may retain source URL, provider update timestamp, sync timestamp, source hash and raw provider payload for repeatable/idempotent import.
+
+`ItemExternalId` maps a namespaced external identifier to exactly one canonical Item. Examples include:
+
+- `tmdb_movie`,
+- `imdb_title`,
+- `open_library_work`,
+- `open_library_edition`,
+- `isbn13`,
+- `isbn10`,
+- `finna_record`.
+
+Invariants:
+
+- `(providerKey, providerItemId)` is unique,
+- `(namespace, externalId)` resolves to at most one canonical Item,
+- a provider refresh of the same source is idempotent,
+- a second provider may resolve to the existing Item through a shared external ID,
+- an import whose external IDs point to more than one existing Item fails as ambiguous rather than silently merging them,
+- provider payload/source tables are server-only; mobile reads normalized Item output, not provider secrets/raw payloads,
+- existing seeded `KAJO_MOCK` Items keep stable IDs and source provenance until safely retired from discovery.
+
+This external-ID boundary is also the matching anchor for later Letterboxd, IMDb and book-history imports. Imported user history resolves to canonical Item IDs; it must not create provider-specific Profile state.
 
 ## ItemList
 
@@ -246,6 +282,7 @@ Consumed Items form history. The MVP stores consumed state and simple rating. Th
 
 ## Important separations
 
+- Provider identity/provenance is not a second Item hierarchy or recommendation model.
 - An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile.
 - A PersonalProfile consumed outcome may lower and annotate the same Item in Shared discovery without copying the Personal action into Shared state.
 - Pending Endorsement is not Shared Saved state.

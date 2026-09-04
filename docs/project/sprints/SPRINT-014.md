@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — PRODUCT SCOPE DEFINED; #182 IMPLEMENTATION NEXT**
+Status: **ACTIVE — 14A CATALOG FOUNDATION HOSTED; REAL PROVIDER IMPORT NEXT**
 
 ## Outcome
 
@@ -14,6 +14,8 @@ This sprint does **not** own monetization or final public-store hardening. Produ
 
 ### 14A — Real provider-backed catalog — #182
 
+Target:
+
 - keep `public.items` as the only canonical recommendable Item table,
 - add generic provider provenance/external-ID dedup/lifecycle/discoverability,
 - MOVIE source: TMDB server-side import/refresh with localization fallback and attribution/license notes,
@@ -23,6 +25,44 @@ This sprint does **not** own monetization or final public-store hardening. Produ
 - preserve historical `KAJO_MOCK` rows but exclude them from normal discovery after acceptance,
 - start with a curated useful catalog of hundreds/thousands rather than ingesting every provider record,
 - Prediction V1 and SleepLayer continue consuming generic Items unchanged.
+
+#### 14A foundation — hosted 2026-09-04
+
+Repository migrations:
+
+- `20260904193000_catalog_provider_foundation.sql`
+- `20260904193200_fix_catalog_upsert_source_conflict.sql`
+
+Hosted migrations:
+
+- `20260904155839 catalog_provider_foundation`
+- `20260904160033 fix_catalog_upsert_source_conflict`
+
+Foundation now provides:
+
+- generic `public.items.discoverable`, `creators`, `release_year`, `image_url` and `original_language`,
+- private server-owned `ItemSource` provenance with unique `(providerKey, providerItemId)`,
+- private namespaced `ItemExternalId` aliases with unique `(namespace, externalId)`,
+- service-role-only `public.upsert_catalog_item_v1` as the validated atomic importer boundary,
+- canonical Prediction baseline candidate generation filters `candidate.discoverable` without creating another recommender,
+- all 24 existing `KAJO_MOCK` Items retain stable IDs and gained `kajo_mock` source + `kajo_mock_slug` alias provenance,
+- mocks deliberately remain discoverable until enough accepted real data exists to replace them.
+
+Hosted rollback-controlled verification proved:
+
+- same provider + provider item ID is idempotent and produces one source row,
+- another provider sharing an existing external ID resolves to the same canonical Item,
+- external IDs resolving to more than one existing Item are rejected rather than silently merged,
+- `discoverable=false` removes the synthetic Item from `rank_items_v1` delivery,
+- switching the same Item back to `discoverable=true` makes it eligible again,
+- authenticated/anon cannot read private source tables or execute catalog upsert; service role can,
+- synthetic verification left 0 Items, source rows or external aliases after rollback.
+
+The first hosted smoke found a PL/pgSQL conflict-target ambiguity in the new upsert. Because the base migration was already deployed, it was corrected through the ordered forward migration above rather than rewriting hosted history.
+
+Security/performance advisors introduced no new WARN-level catalog finding. The new private tables report the expected `RLS enabled/no policy` INFO because client grants are absent; fresh FK indexes report unused-index INFO until provider traffic exists.
+
+**Next 14A action:** implement and run the first real provider import through this boundary. Do not mark mocks non-discoverable until real BOOK/MOVIE coverage and mobile presentation have been verified.
 
 ### 14B — PersonalProfile bootstrap/import — #185
 
@@ -83,7 +123,7 @@ Required flows:
 
 ## Acceptance
 
-- [ ] `MVP-CAT-001..003` complete.
+- [-] `MVP-CAT-001..003` foundation exists; provider data/presentation/device acceptance still open.
 - [ ] `MVP-BOOT-001..004` complete.
 - [ ] `MVP-PRED-005` complete.
 - [ ] deferred List/messaging/Room device gates relevant to beta are accepted.
@@ -94,4 +134,4 @@ Required flows:
 
 ## Immediate next action
 
-Implement **14A / #182 real catalog foundation** on a dedicated branch. Do not mix #185 import parsing or #177 common-fit scoring into the same PR.
+Continue **14A / #182** with the first real provider importer and mobile presentation of normalized catalog fields. Do not mix #185 import parsing or #177 common-fit scoring into the same PR.
