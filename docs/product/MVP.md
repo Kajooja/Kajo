@@ -15,7 +15,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 ## Authentication and identity
 
 - [x] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
-- [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
+- [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and search are case-insensitive.
 - [x] `MVP-AUTH-003` New nicknames are limited to 2–24 characters consistently in mobile and backend validation so persistent navigation never depends on arbitrary truncation.
 
 ## Room and theme
@@ -98,8 +98,8 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
 - [x] `MVP-PRED-004` Architecture supports scenario-memory retrieval without redesigning core Profile/Item/Event/Prediction contracts.
 - [ ] `MVP-PRED-005` SharedProfile Prediction V0 can combine Shared joint evidence with accepted members' PersonalProfile taste evidence using an inspectable common-fit aggregation/disagreement penalty while the Prediction target remains the SharedProfile.
-- [-] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
-- [-] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
+- [x] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
+- [x] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
 
 ## Production release
 

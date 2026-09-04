@@ -118,30 +118,34 @@ Add narrow messaging only after Lists are stable so messages can reference estab
 
 Primary issue: #138.
 
-### Sprint 013 — Prediction Nervous System & ScenarioMemory — ACTIVE
+### Sprint 013 — Prediction Nervous System & ScenarioMemory — COMPLETE
 
-Issue #156 defines the full memory, prediction and controlled evolution architecture and delivers the first evidence-backed MVP slice:
+Accepted 2026-09-04. Issue #156 defines the full memory/prediction/controlled-evolution architecture and the accepted MVP slice now includes:
 
-- WorkingState, ShortTermState, LongTermState, ScenarioMemory and later PopulationMemory,
-- versioned full PredictionRun/candidate trace including alternatives, Context and delivery/exposure separation,
-- same-Profile ScenarioMemory V1 on the existing inspectable scorer,
-- meaningful dwell evidence without treating dwell as satisfaction,
-- SleepLayer design for prospective ShadowPredictions and leakage-safe as-of replay,
-- global/cohort/Profile Champions selected through immutable PredictorGenomes and versioned PolicyAssignments,
-- automatic production promotion disabled through MVP 0.1; shadow winners require guarded canary/A/B evidence and rollback.
+- WorkingState, ShortTermState, LongTermState and same-Profile ScenarioMemory,
+- versioned complete PredictionRun/candidate trace including alternatives, Context and delivery/exposure separation,
+- configured-Android Personal/Shared Prediction V1 acceptance,
+- immutable PredictorGenomes and global baseline Champion audit,
+- three bounded scalar SHADOW Challengers,
+- prospective frozen ShadowPredictions and leakage-safe mature exposed-outcome evaluation,
+- GLOBAL/PROFILE GenomeEvaluation with Profile shrinkage,
+- one canonical V1 serving path with exact baseline equivalence,
+- service-only evidence-gated manual Profile canary and reversible rollback,
+- automatic/global Challenger promotion disabled through MVP 0.1.
 
-13A is integrated and 13B hosted/configured-Android trace acceptance passed on 2026-09-04. The immediate next slice is 13C: executable immutable Challenger/SleepLayer persistence, evaluation and manual promotion/rollback.
+Transparent scalar-genome evaluation landed before learned sequence/LLM Challengers, and pgvector remains blocked until real embeddings plus a measured need exist. Full autonomous evolution remains post-MVP.
 
-Sprint 013 remains delivered in ordered evidence gates. Full traceability lands before SleepLayer tables/workers; transparent scalar-genome evaluation lands before learned sequence/LLM Challengers; pgvector lands only with real embeddings and a measured need.
+### MVP follow-ups after Sprint 013
 
-### MVP follow-ups after Sprint 013C
-
-Two configured-device product observations are queued as separate scopes before final hardening:
+Three product/MVP scopes remain deliberately separate before final hardening:
 
 - **#174 — bounded resurfacing of already-reacted Items.** Normal discovery should strongly suppress repeatedly reacted/terminal Items. A saved-only Item may intentionally return as an occasional reminder when still unconsumed/unrated, behind versioned cooldown/frequency rules and inspectable Prediction trace reasons. Extend the existing generic Prediction policy; do not create a second recommender.
 - **#175 — recent SharedProfiles from the bottom Profile control.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles and a `Näytä lisää` route to the existing canonical group page. Reuse current Profile/navigation state rather than introducing duplicate group management.
+- **#177 — SharedProfile common-fit / `MVP-PRED-005`.** Compose Shared joint evidence with authorized accepted-member PersonalProfile fit plus minimum-member/consensus and disagreement terms inside the same generic Prediction V1 trace. Keep the target as SharedProfile, do not copy Personal evidence into Shared history and do not create a second Shared recommender.
 
-These follow 13C so the active Prediction architecture is not interrupted mid-gate. They must be resolved before the final MVP completion gate unless explicitly deferred by the product owner.
+Order: #174 first, #175 second, #177 third. All are required before the final MVP completion gate unless explicitly deferred by the product owner.
+
+After these follow-ups, close the explicitly deferred configured-device acceptance for #102, #138 and the current Room follow-up without reopening accepted architecture. `MVP-MEM-004` must also be explicitly resolved/documented before the final gate.
 
 ### Sprint 014 — MVP Hardening & Store Release
 
@@ -155,7 +159,7 @@ Primary production-security issue: #160. Production email delivery remains coord
 
 ## Post-MVP direction
 
-After real prediction/outcome data exists:
+After sufficient real prediction/outcome data exists:
 
 - scale Sprint 013C's constrained SleepLayer shadow worker and manual promotion audit into sustained evaluation, guarded canary/A/B rollout and eventually controlled automatic genome promotion,
 - population scenario learning at scale behind privacy/minimum-cohort gates,

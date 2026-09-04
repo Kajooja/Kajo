@@ -1,119 +1,62 @@
 # Sprint 013 — Prediction Nervous System & ScenarioMemory
 
-Status: **ACTIVE — 13A INTEGRATED, 13B ACCEPTED; 13C NEXT**
-Milestone: **MVP 0.1**
-Started: **2026-09-03**
+Status: **ACCEPTED — 13A / 13B / 13C COMPLETE; 13D FUTURE**  
+Milestone: **MVP 0.1**  
+Started: **2026-09-03**  
+Accepted: **2026-09-04**  
 Primary issue: **#156**
 
 ## Goal
 
-Define the complete Kajo prediction nervous system and deliver its first truthful MVP slice: versioned PredictionRun/candidate tracing, Working/Short/Long memory Context, same-Profile ScenarioMemory V1 and meaningful dwell evidence. Preserve an explicit extension path for the SleepLayer/EvolutionEngine without allowing uncontrolled production mutation.
+Define Kajo's complete prediction nervous-system architecture and deliver the first truthful, runnable MVP slice: traceable Prediction V1, Working/Short/Long memory, same-Profile ScenarioMemory and a controlled SleepLayer that can compare immutable Challengers and perform only evidence-gated, reversible manual Profile canaries.
 
-Sprint 012 Profile Messaging is merged and automatically verified but its configured-device acceptance remains deferred. The product owner explicitly prioritized the Prediction Core design; Sprint 013 proceeds without misreporting deferred work as accepted.
+Sprint 013 deliberately stops before uncontrolled genetic optimization, automatic production promotion, population learning and learned/LLM serving models.
 
-## Durable design outcome
+## Durable architecture
 
-The canonical design in `docs/domain/PREDICTION_MODEL.md` specifies:
+Canonical design remains in `docs/domain/PREDICTION_MODEL.md` and ADR-0005:
 
-- WorkingState, ShortTermState, LongTermState, ScenarioMemory and PopulationMemory,
-- complete request/candidate/exposure/action/delayed-Outcome traceability,
-- bounded Context and privacy/retention rules,
-- candidate generation, ranking, DiscoveryMode policy and Shared common-fit boundary,
-- cold-start imports and representation roadmap,
-- exact V1 Scenario similarity, outcome precedence and reward,
-- SleepLayer prospective shadows and strict as-of replay,
-- global/cohort/Profile Champion resolution,
-- PredictorGenome, EvaluationWindow, PolicyAssignment and promotion state machine,
-- offline, shadow, canary/A/B, rollback and multi-objective guardrails,
-- sequential Transformer, semantic-ID and LLM challengers only after evidence maturity.
+- `WorkingState`, `ShortTermState`, `LongTermState`, `ScenarioMemory`, future privacy-gated `PopulationMemory`,
+- complete PredictionRun/candidate/exposure/action/delayed-Outcome traceability,
+- bounded Context and point-in-time `MemoryStateSnapshot`,
+- generic Profile/Item/Event/Prediction boundaries across domains,
+- same-Profile Scenario retrieval and explicit outcome precedence/reward versions,
+- immutable `PredictorGenome`, prospective `ShadowPrediction`, `EvaluationWindow`, `GenomeEvaluation`, `PolicyAssignment` and `PromotionDecision`,
+- global/cohort/Profile Champion resolution as a long-term architecture,
+- first MVP serving change limited to manual reversible **Profile** canary,
+- automatic promotion disabled through MVP 0.1,
+- sequence/semantic-ID/LLM Challengers only after evidence maturity.
 
-ADR-0005 makes the versioned nervous-system/SleepLayer contract durable.
+## 13A — Evidence spine + ScenarioMemory V1 — accepted
 
-## Scope
+Implemented:
 
-### 13A — Evidence spine + ScenarioMemory V1 — integrated
+- private immutable `PredictionRun` and complete `PredictionCandidate` trace,
+- actor/Profile/session Context and state snapshots,
+- public `rank_items_v1` as the authorized server-owned mobile boundary,
+- V0.3 retained as the proven transparent baseline under V1,
+- same-Profile ScenarioMemory with bounded retrieval, recency decay and inspectable score components,
+- Personal/Shared memory isolation,
+- meaningful Item impression/detail dwell evidence,
+- delayed Outcome precedence and undo exclusion.
 
-- Internal `PredictionRun` stores actor, target Profile, session correlation, bounded Context, MemoryStateSnapshot and immutable model/policy versions.
-- Internal `PredictionCandidate` stores the full candidate pool, source/final ranks, base/final scores, confidence, Scenario components and delivery selection.
-- Prediction trace tables live in the private schema, have RLS defense in depth and no direct mobile table grants.
-- Public `rank_items_v1` remains a security-invoker API wrapper over a private, identity/member-checking implementation.
-- Direct mobile execution of `rank_items_v0` is revoked; V0 remains the V1 base scorer.
-- V1 retrieves only same-Profile traced episodes and degrades to the base scorer with no evidence.
-- V1 considers at most 30 episodes with a 0.25 similarity floor and 180-day recency decay.
-- Mobile carries Event `sessionId` plus allowlisted time/surface Context.
-- Item detail emits meaningful 1-second-minimum, 30-minute-capped dwell evidence.
-- Dwell is evidence, not V1 reward.
+V1 Scenario contract:
 
-### 13B — Hosted correctness + configured Android acceptance — accepted
-
-Hosted database verification and real-device acceptance are complete.
-
-Completed hosted gates:
-
-- base Prediction V1 migration applied to hosted Supabase,
-- ordered forward fix applied after hosted smoke exposed the PL/pgSQL `prediction_id` name collision,
-- authenticated Personal member execution verified,
-- authenticated Shared member execution verified,
-- unauthenticated and outsider access denied,
-- direct internal trace-table client access denied,
-- direct authenticated V0 execution denied while V1 is allowed,
-- one request -> one run + exact candidate pool/result counts verified,
-- controlled Scenario reward precedence verified,
-- undo exclusion verified,
-- cross-Profile isolation verified,
-- representative `EXPLAIN (ANALYZE, BUFFERS)` checks completed,
-- post-DDL security/performance advisors reviewed.
-
-Configured Android acceptance on **2026-09-04** then proved:
-
-- real PersonalProfile discovery reached `predictionSource=hosted`,
-- a PersonalProfile rating was tied to an existing `prediction-v1.0` PredictionRun,
-- real SharedProfile discovery reached `predictionSource=hosted`,
-- a SharedProfile rating was tied to an existing `prediction-v1.0` PredictionRun,
-- both actions matched their PredictionRun on `profile_id`, `actor_user_id` and `session_id`,
-- both acted Items had matching PredictionCandidate rows,
-- both Candidate rows were `selected_for_delivery=true`,
-- earlier immediate actions in the same device test remained explicitly `predictionSource=fallback`, so fallback and hosted traces are distinguishable rather than silently conflated.
-
-The mobile ranking hook intentionally waits **600 ms** before an interaction-triggered hosted refresh. On the accepted follow-up runs, hosted impression persistence was observed roughly **0.56–1.40 s** after the corresponding server run timestamp at the current development scale. This is recorded as a device/development baseline only, not a production latency SLO.
-
-### 13C — SleepLayer implementation — next
-
-- Add immutable PredictorGenome registry and constrained weight schemas.
-- Add prospective ShadowPrediction queue/worker using frozen production-run input.
-- Add immutable EvaluationWindow outcome maturity and comparable-episode/coverage rules.
-- Add global/cohort/Profile GenomeEvaluation with hierarchical shrinkage.
-- Add versioned PolicyAssignment and PromotionDecision audit.
-- Keep automatic promotion disabled until external-beta data and online experiment gates exist.
-- Manual promotion and rollback must be explicit, versioned and reversible.
-
-### 13D — Later learned models
-
-- Add licensed content and collaborative Item embeddings.
-- Move Scenario retrieval to pgvector/ANN only after benchmarks justify it.
-- Add sequence baseline (SASRec/HSTU class).
-- Add semantic-ID/generative and LLM-backed ranker Challengers.
-- Compare every new family through the same frozen evidence and promotion gates.
-
-## V1 Scenario contract
-
-Similarity:
-
-| Component | Share |
+| Component | V1 share |
 |---|---:|
 | MemoryStateSnapshot overlap | 40% |
 | candidate generic tag overlap | 35% |
 | DiscoveryMode match | 15% |
 | temporal Context | 10% |
 
-Outcome priority:
+Outcome precedence:
 
 ```text
 rating > consumption reversal > not interested > consumed
   > list addition > endorsement/like > saved/unsaved
 ```
 
-DiscoveryMode Scenario multiplier:
+Baseline Scenario multiplier:
 
 ```text
 FOR_YOU 2.2
@@ -121,131 +64,210 @@ SURPRISE 1.6
 RISK 1.0
 ```
 
-All numeric choices are versioned V1 hypotheses. Future tuning requires a new PredictorGenome/model-policy version; historical traces are not rewritten.
+These remain versioned hypotheses rather than permanent constants.
 
-## SleepLayer acceptance principles
+## 13B — Hosted correctness + configured Android acceptance — accepted
 
-- A ShadowPrediction is frozen before its Outcome is known, or rebuilt with a strict historical as-of boundary.
-- A shadow-only, unexposed Item is neither a hit nor a miss.
-- Every accuracy percentage names metric, denominator, coverage, sample/Profile counts, outcome window and uncertainty.
-- Global success may promote a global Champion; repeated Profile-specific success may assign a reversible Profile Champion.
-- SharedProfile has its own assignment/evidence.
-- Sparse Profile evidence is shrunk toward cohort/global evidence.
-- No winner is promoted on engagement alone or without latency/privacy/diversity/Shared guardrails.
-- First promotions require product-owner approval; automatic promotion is outside MVP 0.1.
+Hosted verification proved:
 
-## Hosted verification — 2026-09-04
+- authorized Personal and Shared V1 execution,
+- anonymous/outsider denial,
+- direct client denial for private trace tables and V0,
+- exact run/candidate/result persistence,
+- controlled rating precedence and undo behavior,
+- Scenario evidence does not cross Profile boundaries,
+- intended indexes/query paths operate at current development scale.
 
-### Applied migrations
+The first hosted V1 smoke exposed a PL/pgSQL `RETURNING prediction_id` name collision. The deployed migration was not rewritten; an ordered forward migration qualified the returned table column.
 
-Hosted project `Kajo` contains:
+Configured Android acceptance on 2026-09-04 proved real PersonalProfile and SharedProfile actions reached `predictionSource=hosted`, linked to matching PredictionRun/Candidate/Profile/actor/session data and remained distinguishable from immediate fallback actions.
 
-- `20260904120025 prediction_nervous_system_v1` — repository source `20260902223000_prediction_nervous_system_v1.sql`,
-- `20260904120420 fix_prediction_v1_candidate_returning` — repository forward fix `20260904120420_fix_prediction_v1_candidate_returning.sql`.
+## 13C — Controlled SleepLayer / EvolutionEngine — accepted
 
-The first authenticated smoke found:
+### Persistence and shadow execution
 
-```text
-ERROR 42702: column reference "prediction_id" is ambiguous
-```
+Implemented:
 
-The conflict was inside the `candidate_write` CTE where `RETURNING prediction_id` collided with the PL/pgSQL table-return OUT parameter. The deployed base migration was not rewritten. The forward migration qualifies the returned column as `private.prediction_candidates.prediction_id`, preserving linear migration history and one canonical V1 implementation.
+- immutable constrained `PredictorGenome` registry using `scalar-genome-v1`,
+- current Prediction V1 baseline recorded as global `Champion`,
+- three transparent `SHADOW` Challengers:
+  - `short-term-tilt-v1`,
+  - `scenario-tilt-v1`,
+  - `novelty-tilt-v1`,
+- every new production PredictionRun tagged with resolved genome + PolicyAssignment,
+- prospective queue/worker that evaluates only the frozen production candidate pool and exact production `requested_at` / Context / state trace,
+- immutable complete `ShadowPredictionRun` + `ShadowPredictionCandidate` persistence,
+- immutable `EvaluationWindow` + `GenomeEvaluation`,
+- comparison only on actually exposed Items with observed mature Outcomes,
+- explicit coverage and GLOBAL/PROFILE aggregation,
+- Profile advantage shrunk toward broader evidence using the documented reliability pattern,
+- append-only immutable PolicyAssignment/PromotionDecision audit,
+- service-only bounded worker/evaluator operations.
 
-### Authorization / trace smoke
+A shadow-only Item that was never exposed remains unlabelled; it is never invented as a hit or miss.
 
-Rollback-tested results:
+### One canonical serving path
 
-- authenticated direct V0 denied: **true**,
-- outsider V1 denied: **true**,
-- anonymous V1 denied: **true**,
-- authenticated/anonymous direct trace-table SELECT/INSERT: **denied**,
-- Personal V1: **5 returned / 1 run / 15 candidates / 5 selected**,
-- Shared V1: **4 returned / 1 matching Shared run / 12 candidates**.
-
-Synthetic runs were rolled back.
-
-### Scenario correctness
-
-A controlled exact-Item episode received a weaker save and then a later rating `10`.
-
-Next V1 evaluation produced:
+The serving gate intentionally avoids a duplicate predictor:
 
 ```text
-scenario raw reward = 1.0000
-support = 1
+private V0.3 baseline candidate generator
+  -> genome-aware scalar reranker over that same bounded pool
+  -> existing canonical Prediction V1 ScenarioMemory stage
+  -> trace + delivery
 ```
 
-This proves the later rating superseded the weaker save. After an `ITEM_INTERACTION_UNDONE` referencing that rating, the following V1 evaluation produced:
+The historical public `rank_items_v0` symbol is now only a non-serving baseline compatibility wrapper. Authenticated mobile clients cannot execute V0 or the private scalar function; they continue through `public.rank_items_v1` only.
+
+The baseline genome special-cases the proven V0.3 score, so the accepted baseline remains exact. Challenger scalar scoring uses the same persisted V0.3 explanation components as the shadow worker; Scenario weight is resolved from the assigned genome inside the existing V1 stage.
+
+### Manual Profile canary + rollback
+
+MVP 0.1 exposes only service-role manual Profile canary/rollback operations.
+
+A canary requires:
+
+- matching immutable mature Profile GenomeEvaluation,
+- `MATURE_COMPARABLE_EXPOSED_OUTCOME`,
+- at least 30 mature Outcomes,
+- coverage >= 0.50,
+- shrunk advantage >= 0.05,
+- EvaluationWindow duration >= 14 days,
+- matured outcome cutoff,
+- Challenger state eligible for canary,
+- explicit approver identity + reason,
+- existing rollback assignment.
+
+The resulting assignment changes only that Profile. Global and unrelated Profile assignments remain unchanged. Rollback appends a `ROLLED_BACK` decision and a new assignment restoring the recorded rollback target.
+
+There is no global Challenger promotion function and no automatic promotion path in MVP 0.1.
+
+## Hosted migrations
+
+Hosted project `Kajo` contains the ordered Prediction/SleepLayer chain:
+
+- `20260904120025 prediction_nervous_system_v1` <- repository `20260902223000_prediction_nervous_system_v1.sql`,
+- `20260904120420 fix_prediction_v1_candidate_returning` <- repository `20260904120420_fix_prediction_v1_candidate_returning.sql`,
+- `20260904134409 sleep_layer_v1_foundation` <- repository `20260904170000_sleep_layer_v1_foundation.sql`,
+- `20260904134901 sleep_layer_v1_fk_indexes` <- repository `20260904172000_sleep_layer_v1_fk_indexes.sql`,
+- `20260904140919 sleep_layer_v1_serving_and_profile_canary` <- repository `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql`.
+
+Deployed migrations remain immutable. The FK advisor correction was deliberately a forward migration.
+
+## Acceptance evidence
+
+### Shadow/evaluation smoke
+
+Rollback-controlled tests proved:
 
 ```text
-scenario raw reward = 0.5000
-support = 1
+baseline genome                 prediction-v1-baseline
+policy assignment attached      true
+queued challengers               3
+worker processed                 3
+worker failed                    0
+source candidate pool            12
+complete frozen shadows          3 / 3
+immutable genome guard           true
 ```
 
-This is expected: the rating was excluded and the still-valid weaker save became the strongest remaining Outcome. A second PersonalProfile had maximum Scenario support `0`, proving controlled evidence did not cross the Profile boundary. All controlled Events/runs/candidates were rolled back.
+A controlled ShortTerm Challenger moved one negative Item rank `1 -> 2` and one positive Item `2 -> 1`. With two exposed mature synthetic Outcomes, the evaluator produced 100% coverage and the expected arithmetic advantage. This test proves data flow/math only; it is not production-quality evidence that the genome is better.
 
-### Query-plan baseline
+### Exact baseline equivalence
 
-Representative hosted checks:
+After the serving migration, the legacy private V0.3 baseline and the public baseline compatibility wrapper were executed in the same transaction across FOR_YOU/SURPRISE/RISK.
 
-- rebuild one current Profile memory snapshot: approximately **9.9 ms** at current development data volume,
-- indexed run/candidate retrieval: approximately **0.24 ms**,
-- planner used `prediction_runs_profile_requested_at_idx` and the Prediction candidate `(prediction_id, final_rank)` index.
+```text
+rows compared          36
+rank mismatches         0
+max score delta         0
+max confidence delta    0
+```
 
-These values are smoke baselines only; they are not production scale SLOs.
+This is the defined baseline equivalence gate.
 
-### Advisors
+### Canary / rollback smoke
 
-No new exposed-API security blocker was introduced by Prediction V1. Supabase reports private trace tables as “RLS enabled with no policy”; this is intentional because clients have no direct grants and access is through the checked server-owned function boundary. The pre-existing leaked-password protection warning and unrelated index advisories stay in separate security/release scope (#160/Sprint 014).
+A rollback-controlled mature synthetic Profile evaluation was inserted solely to exercise the gate.
 
-## Product findings from configured-device acceptance
+Results:
 
-Two observations were deliberately split out instead of expanding the 13B acceptance patch:
+- canary assignment resolved to `short-term-tilt-v1`,
+- real `rank_items_v1` output/Prediction trace reported that Challenger genome,
+- unrelated Profile remained on baseline,
+- global assignment remained baseline,
+- canary run queued only the other two global SHADOW Challengers,
+- manual rollback restored `prediction-v1-baseline`,
+- following V1 output/trace reported baseline,
+- baseline run again queued all three global SHADOW Challengers,
+- authenticated execute on canary/rollback functions: denied,
+- service-role execute: allowed.
 
-- **#174 — already-reacted Item resurfacing.** Strong/terminal reactions should normally suppress repeated discovery. Saved-only Items may occasionally resurface as reminders after meaningful age when still unconsumed/unrated, but only behind versioned cooldown/frequency rules with inspectable reasons.
-- **#175 — bottom Profile control quick SharedProfile switcher.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles plus `Näytä lisää`, routing to the existing canonical group page.
+A deliberately insufficient evaluation with **29** mature Outcomes was rejected with SQLSTATE `55000`, proving the minimum-evidence gate is enforced.
 
-#174 may be integrated through the versioned Prediction policy path. #175 is navigation scope and must remain separate from the SleepLayer implementation.
+All synthetic windows/evaluations/assignments/decisions/runs used for these acceptance smokes were rolled back.
+
+## Security / advisor outcome
+
+Privileged internal functions remain in `private`, use `SECURITY DEFINER` only where required, pin `search_path=''`, schema-qualify relations and have explicit execution grants. This matches current Supabase guidance for privileged database functions.
+
+The post-DDL security advisor adds no new exposed-API blocker. `private.* RLS enabled/no policy` INFO is intentional because the Data API roles have no direct table grants. The existing leaked-password protection warning remains release/security scope (#160/#127).
+
+The SleepLayer FK warnings found after the first migration were corrected by `20260904172000_sleep_layer_v1_fk_indexes.sql`. New `unused index` INFO is expected before sustained worker traffic; unrelated Shared/List performance advisories remain separate scope.
 
 ## Acceptance
 
-- [x] Canonical docs contain no conflicting memory/evolution terminology.
-- [x] A fresh agent can explain the full data flow and each memory layer from repository truth.
-- [x] Migration passes hosted authorization/integrity smoke tests after the ordered forward fix.
-- [x] Scenario evidence changes only its owning Profile's ranking/evidence.
-- [x] delayed rating supersedes weaker earlier Outcome; undone evidence is excluded.
-- [x] full candidate set and selected delivery set remain distinguishable in trace persistence.
-- [x] hosted query-plan baseline and advisor review recorded.
-- [x] configured Android Personal/Shared V1 flow passes and creates inspectable real traces/Events.
-- [x] final device evidence confirms hosted-vs-fallback trace distinction.
-- [x] real-device/development hosted timing baseline is recorded.
+- [x] canonical docs contain no conflicting memory/evolution terminology.
+- [x] full V1 Prediction run/candidate/exposure/outcome trace is hosted.
+- [x] ScenarioMemory is bounded, inspectable and Profile-isolated.
+- [x] configured Android Personal/Shared V1 trace acceptance passes.
+- [x] immutable PredictorGenome + prospective ShadowPrediction persistence is hosted.
+- [x] worker produces complete leakage-safe shadows from frozen production traces.
+- [x] mature exposed-outcome evaluation records coverage and GLOBAL/PROFILE evaluation.
+- [x] SleepLayer private access boundary and immutability guards pass hosted smoke.
+- [x] baseline genome has exact equivalence to accepted V0.3 behavior.
+- [x] assigned Challenger can be served through the canonical V1 boundary without a second recommender.
+- [x] explicit evidence-gated manual Profile canary and rollback are hosted and rollback-tested.
+- [x] Profile canary does not change global/unrelated Profile assignment.
+- [x] weak evidence is rejected.
+- [x] automatic/global Challenger promotion remains unavailable in MVP 0.1.
 
-## Non-goals
+## 13D — future learned/evolution work, not Sprint 013 acceptance scope
 
-- automatic production genome promotion,
-- population/cross-Profile Scenario retrieval,
-- sensitive demographic cohorts,
-- live LLM inference in the MVP ranker,
-- pgvector before learned embeddings/scale evidence,
-- raw touch coordinates, precise location, sensor surveillance or message-text learning,
-- final Shared common-fit coefficients without real group Outcome evidence.
+After sufficient real data and release maturity:
+
+- licensed content/collaborative embeddings,
+- pgvector/ANN only when benchmarks justify it,
+- sequential SASRec/HSTU-class Challenger,
+- semantic-ID/generative Challenger,
+- LLM-backed ranker Challenger,
+- sustained shadow/canary/A/B infrastructure,
+- privacy-safe cohort/population learning,
+- eventually controlled automatic promotion only behind explicit new gates.
+
+## Product observations split out from Sprint 013
+
+- #174 — bounded resurfacing of already-reacted Items; saved-only reminders may return under versioned cooldown/frequency rules.
+- #175 — bottom Profile control shows up to five recent/used SharedProfiles + `Näytä lisää` to the existing group page.
+
+These are separate product scopes and must not be folded back into SleepLayer architecture.
 
 ## Important files
 
 - `/docs/domain/PREDICTION_MODEL.md`
 - `/docs/domain/DATA_EVENTS.md`
-- `/docs/domain/DOMAIN_MODEL.md`
 - `/docs/domain/GLOSSARY.md`
-- `/docs/architecture/ARCHITECTURE.md`
+- `/docs/architecture/CODEMAP.md`
 - `/docs/architecture/decisions/0005-versioned-prediction-nervous-system.md`
 - `/supabase/migrations/20260902223000_prediction_nervous_system_v1.sql`
 - `/supabase/migrations/20260904120420_fix_prediction_v1_candidate_returning.sql`
+- `/supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql`
+- `/supabase/migrations/20260904172000_sleep_layer_v1_fk_indexes.sql`
+- `/supabase/migrations/20260904180000_sleep_layer_v1_serving_and_profile_canary.sql`
 - `/apps/mobile/src/features/discovery/predictionOperations.ts`
 - `/apps/mobile/src/features/discovery/usePredictionRanking.ts`
-- `/apps/mobile/src/features/events/EventTrackingContext.tsx`
-- `/apps/mobile/src/features/events/eventTracking.ts`
-- `/apps/mobile/src/features/discovery/ItemDetailScreen.tsx`
+- `/apps/mobile/src/features/events/`
 
 ## Handoff
 
-Continue from `main` after this acceptance-doc update lands. **13B is accepted.** Proceed directly to **Sprint 013C SleepLayer persistence/evaluation/manual-promotion implementation**. Do not reapply or duplicate Prediction V1, do not rewrite deployed migrations, do not merge #160 security work into this branch, and do not mix #175 navigation work into the SleepLayer implementation.
+Sprint 013 is accepted after this branch lands on `main`. Continue with **#174**, then **#175**, then deferred device-acceptance/release-hardening work. Do not reapply Prediction/SleepLayer migrations, create a second recommender, enable automatic promotion, or mix #160 security work into the product follow-ups.
