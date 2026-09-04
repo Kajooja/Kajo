@@ -4,6 +4,8 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 ## Milestone: MVP 0.1
 
+MVP 0.1 now means the first **complete, store-downloadable BOOK/MOVIE Kajo**, not a mock-data prototype. Monetization is not required. Before completion the product must use real catalog data, establish useful first-session taste, pass a small external beta and then satisfy production auth/security/signing/store-release gates.
+
 ### Sprint 001 — Foundation
 
 Repository memory, mobile skeleton, workspace, CI, domain contracts.
@@ -135,27 +137,86 @@ Accepted 2026-09-04. Issue #156 defines the full memory/prediction/controlled-ev
 
 Transparent scalar-genome evaluation landed before learned sequence/LLM Challengers, and pgvector remains blocked until real embeddings plus a measured need exist. Full autonomous evolution remains post-MVP.
 
-### MVP follow-ups after Sprint 013
+### Accepted post-Sprint-013 follow-ups
 
-Three product/MVP scopes remain deliberately separate before final hardening:
+- **#174 — reacted-Item resurfacing** is accepted: terminal reactions are suppressed and saved-only reminders are bounded/versioned.
+- **#175 / MVP-NAV-004 — bottom SharedProfile quick switcher** is accepted on configured Android.
 
-- **#174 — bounded resurfacing of already-reacted Items.** Normal discovery should strongly suppress repeatedly reacted/terminal Items. A saved-only Item may intentionally return as an occasional reminder when still unconsumed/unrated, behind versioned cooldown/frequency rules and inspectable Prediction trace reasons. Extend the existing generic Prediction policy; do not create a second recommender.
-- **#175 — recent SharedProfiles from the bottom Profile control.** Tapping the bottom Profile name/control should show up to five recent/used SharedProfiles and a `Näytä lisää` route to the existing canonical group page. Reuse current Profile/navigation state rather than introducing duplicate group management.
-- **#177 — SharedProfile common-fit / `MVP-PRED-005`.** Compose Shared joint evidence with authorized accepted-member PersonalProfile fit plus minimum-member/consensus and disagreement terms inside the same generic Prediction V1 trace. Keep the target as SharedProfile, do not copy Personal evidence into Shared history and do not create a second Shared recommender.
+The current shell/bootstrap visual polish is on `main` and still needs configured-device visual acceptance, but it does not block backend catalog work.
 
-Order: #174 first, #175 second, #177 third. All are required before the final MVP completion gate unless explicitly deferred by the product owner.
+### Sprint 014 — Real Catalog, Profile Bootstrap & External Beta — ACTIVE
 
-After these follow-ups, close the explicitly deferred configured-device acceptance for #102, #138 and the current Room follow-up without reopening accepted architecture. `MVP-MEM-004` must also be explicitly resolved/documented before the final gate.
+Canonical sprint file: `sprints/SPRINT-014.md`.
 
-### Sprint 014 — MVP Hardening & Store Release
+Sprint 014 turns the technically working app into the first product-complete BOOK/MOVIE version that can be given to roughly 10 external testers.
 
-Onboarding, performance, accessibility, end-to-end flows, quality and privacy checks across PersonalProfile, SharedProfile, navigation, Lists, messaging and Prediction.
+#### 14A — Real provider-backed catalog — #182
 
-The milestone closes only with a genuinely shareable store release: stable production identifiers/versioning/signing, production authentication email delivery, privacy/support and store metadata/assets, least-privilege client configuration, and verified clean install/update flows on representative real devices through an official app store.
+- replace normal `KAJO_MOCK` discovery with real BOOK/MOVIE Items,
+- preserve one generic `public.items` architecture,
+- add generic provider provenance, external-ID deduplication, lifecycle/discoverability and repeatable refresh,
+- TMDB is the first MOVIE provider path,
+- Open Library bulk data is the first broad BOOK path, with optional Finna metadata enrichment where rights permit,
+- real covers/posters and normalized metadata are presented under provider terms,
+- historical mock Items stay for referential integrity but become non-discoverable.
 
-Sprint 014 ends with the full `MILESTONE-001-MVP.md` completion gate. In particular, all MVP requirements must be accepted, required code must be on `main`, hosted state must match migrations, end-to-end Personal/Shared/Prediction flows must pass on real devices, operational/privacy/rollback paths must exist and the product owner must accept the installed store build. Only then may `MVP 0.1` and the milestone be marked `COMPLETE`.
+#### 14B — Imported history + cold-start PersonalProfile — #185
 
-Primary production-security issue: #160. Production email delivery remains coordinated with #127.
+- Letterboxd export ZIP/CSV and IMDb export CSV for movie history,
+- at least one practical book-history CSV path plus generic Kajo fallback,
+- imported watched/read/ratings/watchlist/to-read normalize into canonical Kajo evidence with provenance,
+- no scraping or assumed public personal-history API,
+- no-import users get a short real-catalog calibration instead of mandatory demographic profiling,
+- imported/calibration evidence initializes PersonalProfile taste and is progressively superseded by real Kajo behaviour.
+
+#### 14C — SharedProfile common-fit — #177 / MVP-PRED-005
+
+Implement only after the real catalog/bootstrap foundation exists so quality can be judged against meaningful evidence:
+
+- Shared joint evidence + authorized accepted-member PersonalProfile fit,
+- minimum-member/consensus and disagreement terms,
+- same Prediction V1 trace and SleepLayer,
+- target remains SharedProfile and Personal history is not copied into Shared history.
+
+#### 14D — External beta gate — #186
+
+Before leaving Sprint 014:
+
+- clean install and stable account flow for external users,
+- useful first-session PersonalProfile via import or calibration,
+- real BOOK/MOVIE discovery/detail/swipe/rating/save/List/history,
+- Shared create/invite/join/switch/common-fit/Endorsement/List flows,
+- messaging where already in MVP scope,
+- deferred #102/#138/current Room device acceptances closed as relevant,
+- failures diagnosable without developer access to tester phones,
+- product owner accepts the build for roughly 10-person testing.
+
+### Sprint 015 — Production Auth, Hardening & Store Release
+
+Sprint 015 starts only after the external-beta product is coherent. It owns the final transition from beta-ready to officially downloadable MVP 0.1.
+
+#### Production authentication — #184 + #127
+
+- reliable production SMTP/domain for email confirmation and recovery,
+- Google sign-in through the existing Supabase/Kajo User boundary,
+- Sign in with Apple for iOS when third-party social login is offered,
+- safe account linking so providers do not create duplicate Kajo Users/PersonalProfiles/nicknames,
+- account deletion/data lifecycle across linked identities.
+
+Apple App Review Guideline 4.8 is treated as a release requirement when Google/social login is enabled on iOS; do not ship a Google-only primary social-login choice on iOS.
+
+#### Security / operations / store
+
+- #160 production Supabase security hardening,
+- performance/accessibility/end-to-end quality checks,
+- privacy/support/account deletion and operational/error-monitoring readiness,
+- stable production identifiers, versioning and signing,
+- provider attribution/licensing decisions required for the non-commercial store release,
+- store metadata/assets/permissions,
+- representative clean install and update testing,
+- official Google Play and/or Apple App Store release.
+
+Sprint 015 ends with the full `MILESTONE-001-MVP.md` completion gate. All MVP requirements must be accepted, code must be on `main`, hosted state must match migrations, end-to-end Personal/Shared/Prediction flows must pass on real devices, and the product owner must accept the installed store build.
 
 ## Post-MVP direction
 
@@ -168,6 +229,7 @@ After sufficient real prediction/outcome data exists:
 - richer personal/shared memories including images, people, location and context,
 - richer Item/List comments and media attachments built on the MVP message reference model,
 - public/shared discovery features only after privacy/product rules are intentionally designed,
-- advanced List features such as folders, smart rules and public sharing.
+- advanced List features such as folders, smart rules and public sharing,
+- monetization only after the non-commercial first release is stable and licensing/product decisions are explicit.
 
 Roadmap changes must be deliberate. Do not rewrite completed sprint history when sequencing changes.

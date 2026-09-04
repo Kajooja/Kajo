@@ -6,6 +6,21 @@ Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
 This file defines the MVP boundary. Adding a new MVP requirement requires an explicit product decision; implementation convenience is not enough.
 
+## MVP completion meaning
+
+`MVP 0.1` is the first **complete, store-downloadable BOOK/MOVIE Kajo**, not a mock-data prototype and not yet a monetized commercial product.
+
+Before the milestone may be marked complete:
+
+- normal discovery uses real provider-backed BOOK and MOVIE Items rather than `KAJO_MOCK`,
+- a new user can establish useful PersonalProfile taste in the first session through imported history or bounded Kajo calibration,
+- core PersonalProfile and SharedProfile flows work end-to-end for external users without developer intervention,
+- the product is validated with a small external beta (target roughly 10 people),
+- production authentication, security, privacy/support, signing/versioning and store requirements are complete,
+- a signed build is downloadable through Google Play and/or the Apple App Store and accepted by the product owner.
+
+Commercial monetization, autonomous predictor promotion and additional media/life domains remain outside this milestone unless explicitly promoted later.
+
 ## Foundation
 
 - [x] `MVP-FOUND-001` Mobile project runs on iOS and Android through React Native + Expo.
@@ -17,6 +32,7 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
 - [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and search are case-insensitive.
 - [x] `MVP-AUTH-003` New nicknames are limited to 2–24 characters consistently in mobile and backend validation so persistent navigation never depends on arbitrary truncation.
+- [ ] `MVP-AUTH-004` Store release uses production email delivery and supports Google plus Sign in with Apple through the same canonical Kajo User identity; linked providers must not create duplicate PersonalProfiles or nicknames.
 
 ## Room and theme
 
@@ -43,6 +59,19 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes through the hosted generic scorer; configured Android acceptance passed with the broader normalized catalog.
 - [x] `MVP-DISC-006` User can open Item details.
 - [x] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; one compact persistent app-shell curtain manipulates that state without screen-local copies or duplicate Room controls.
+
+## Real catalog
+
+- [ ] `MVP-CAT-001` Normal BOOK/MOVIE discovery uses a useful real provider-backed catalog with at least hundreds of Items per domain and enough Finnish/international diversity for external testing; historical `KAJO_MOCK` rows remain referentially intact but are not normally discoverable.
+- [ ] `MVP-CAT-002` Every provider-backed Item has generic source/provenance, external-ID deduplication, lifecycle/discoverability and refresh semantics while `public.items` remains the single canonical recommendable Item table.
+- [ ] `MVP-CAT-003` BOOK/MOVIE presentation can show legally usable cover/poster metadata and normalized title/creator/release/genre-or-subject information without provider-specific recommender branches in the mobile client.
+
+## Profile bootstrap and history import
+
+- [ ] `MVP-BOOT-001` A user can import Letterboxd and IMDb movie-history exports through a user-authorized file flow; watched/check-in/rating/watchlist data is matched to canonical Items and normalized into Kajo state/evidence with source provenance.
+- [ ] `MVP-BOOT-002` A user has at least one practical book-history import path (for example Goodreads-style or StoryGraph CSV plus a documented generic Kajo CSV fallback) that matches books safely by ISBN/external ID/title metadata and normalizes read/rating/to-read state.
+- [ ] `MVP-BOOT-003` A user without enough import evidence completes a short real-catalog cold-start calibration so first-session recommendations are useful without requiring demographic profiling; optional demographic/context data may only be a weak prior.
+- [ ] `MVP-BOOT-004` Imported/calibration evidence is idempotent, distinguishable from native Kajo Events, correctable/removable, initializes PersonalProfile taste, and is progressively superseded by real Kajo behaviour rather than becoming permanent truth.
 
 ## Swipe and state
 
@@ -102,15 +131,21 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - [x] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
 - [x] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
 
+## External beta readiness
+
+- [ ] `MVP-BETA-001` A clean install can be given to roughly 10 external testers without developer setup, and PersonalProfile plus SharedProfile BOOK/MOVIE flows use real content and useful first-session personalization.
+- [ ] `MVP-BETA-002` External-beta failures are diagnosable through production-like backend/Prediction/error observability, and beta feedback is used for bounded fixes/calibration rather than silently changing core architecture.
+
 ## Production release
 
 - [ ] `MVP-REL-001` Kajo has stable production application identifiers, versioning, signing and release configuration for its supported mobile platforms; no development-only secret or service-role credential is embedded in a client build.
-- [ ] `MVP-REL-002` Production authentication email delivery, privacy/support information, store assets, required permissions and account/data lifecycle flows are verified for an external user.
-- [ ] `MVP-REL-003` A signed production release is downloadable through an official app store, and clean install, authentication, PersonalProfile, SharedProfile, discovery, Lists and update flows pass on representative real devices.
+- [ ] `MVP-REL-002` Production authentication email delivery, social-login configuration, privacy/support information, store assets, required permissions and account/data lifecycle flows are verified for an external user.
+- [ ] `MVP-REL-003` A signed production release is downloadable through Google Play and/or the Apple App Store, and clean install, authentication, PersonalProfile, SharedProfile, real BOOK/MOVIE discovery, Lists and update flows pass on representative real devices.
 
 ## Explicitly outside MVP 0.1
 
-- Full evolutionary predictor population/genetic optimization.
+- Monetization/commercial subscription or advertising systems.
+- Full autonomous evolutionary predictor population/genetic optimization and automatic production promotion.
 - Music, series, games, restaurants, travel and live-event production domains.
 - Public follower/feed/influencer mechanics.
 - Arbitrary direct messages between unrelated Users; MVP messaging is limited to active Profile context.
@@ -118,4 +153,4 @@ This file defines the MVP boundary. Adding a new MVP requirement requires an exp
 - Majority-vote automatic Shared saving; MVP automatic Shared promotion uses unanimity.
 - Complex 3D or game-like Room editor.
 - Full photo-rich life journal.
-- Advanced demographic personalization beyond optional cold-start prior.
+- Advanced demographic personalization beyond optional weak cold-start prior.
