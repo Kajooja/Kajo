@@ -1,4 +1,9 @@
-import type { Item, PredictionId } from '../../domain/contracts';
+import type {
+  Item,
+  ItemId,
+  ItemType,
+  PredictionId,
+} from '../../domain/contracts';
 
 const MAX_CACHED_PREDICTIONS = 8;
 const cachedItemsByPrediction = new Map<PredictionId, readonly Item[]>();
@@ -26,11 +31,42 @@ export function getRememberedPredictionItems(
   const items = cachedItemsByPrediction.get(predictionId);
   if (!items) return [];
 
-  cachedItemsByPrediction.delete(predictionId);
-  cachedItemsByPrediction.set(predictionId, items);
+  touchPrediction(predictionId, items);
   return items;
+}
+
+export function getRememberedItem(itemId: ItemId): Item | undefined {
+  const entries = [...cachedItemsByPrediction.entries()].reverse();
+
+  for (const [predictionId, items] of entries) {
+    const item = items.find((candidate) => candidate.id === itemId);
+    if (!item) continue;
+    touchPrediction(predictionId, items);
+    return item;
+  }
+
+  return undefined;
+}
+
+export function getMostRecentRememberedItems(
+  itemType: ItemType,
+): readonly Item[] {
+  const entries = [...cachedItemsByPrediction.entries()].reverse();
+
+  for (const [predictionId, items] of entries) {
+    if (!items.some((item) => item.itemType === itemType)) continue;
+    touchPrediction(predictionId, items);
+    return items.filter((item) => item.itemType === itemType);
+  }
+
+  return [];
 }
 
 export function clearPredictionItemCacheForTests() {
   cachedItemsByPrediction.clear();
+}
+
+function touchPrediction(predictionId: PredictionId, items: readonly Item[]) {
+  cachedItemsByPrediction.delete(predictionId);
+  cachedItemsByPrediction.set(predictionId, items);
 }
