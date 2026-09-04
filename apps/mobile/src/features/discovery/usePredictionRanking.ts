@@ -16,7 +16,7 @@ import {
   loadCatalogItems,
 } from './catalogItemOperations';
 import type { ItemInteractionMap } from './itemInteraction';
-import { getRankedMockItems } from './mockDiscovery';
+import { getStaticMockItems } from './mockDiscovery';
 import {
   loadPredictionRanking,
   type PredictionRanking,
@@ -73,7 +73,7 @@ export function usePredictionRanking(
   const fallback = useMemo<PredictionRanking>(
     () => ({
       predictionId: createCorrelationId(fallbackSeed, `${itemType}:${mode}`),
-      items: getRankedMockItems(itemType, mode),
+      items: getStaticMockItems(itemType, mode),
       predictions: [],
     }),
     [fallbackSeed, itemType, mode],
