@@ -11,6 +11,10 @@ import type {
 } from '../../domain/contracts';
 import { createCorrelationId, createUuidV7 } from '../events/eventTracking';
 import { useEventTracking } from '../events/EventTrackingContext';
+import {
+  enrichItemsFromCatalog,
+  loadCatalogItems,
+} from './catalogItemOperations';
 import type { ItemInteractionMap } from './itemInteraction';
 import { getRankedMockItems } from './mockDiscovery';
 import {
@@ -73,25 +77,23 @@ export function usePredictionRanking(
     }),
     [fallbackSeed, itemType, mode],
   );
+  const client = connection.status === 'configured' ? connection.client : null;
   const rpc = useMemo<PredictionRpc | null>(
     () =>
-      connection.status === 'configured'
+      client
         ? async (functionName, arguments_) => {
-            const { data, error } = await connection.client.rpc(
-              functionName,
-              arguments_,
-            );
+            const { data, error } = await client.rpc(functionName, arguments_);
             return {
               data,
               error: error ? { message: error.message } : null,
             };
           }
         : null,
-    [connection],
+    [client],
   );
 
   useEffect(() => {
-    if (!rpc || !profileId || !requestKey) {
+    if (!rpc || !client || !profileId || !requestKey) {
       return;
     }
 
@@ -111,11 +113,28 @@ export function usePredictionRanking(
         itemType,
         limit: activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20,
         context: getRuntimeContext(eventTracking.sessionId),
-      }).then((result) => {
+      }).then(async (result) => {
         if (!active || !requestGate.current.isLatest(token)) return;
 
         if (result.status === 'success') {
-          setHostedState({ status: 'ready', key: requestKey, ranking: result.ranking });
+          const catalog = await loadCatalogItems(
+            client,
+            result.ranking.items.map((item) => item.id),
+          );
+          if (!active || !requestGate.current.isLatest(token)) return;
+
+          const ranking =
+            catalog.status === 'success'
+              ? {
+                  ...result.ranking,
+                  items: enrichItemsFromCatalog(
+                    result.ranking.items,
+                    catalog.items,
+                  ),
+                }
+              : result.ranking;
+
+          setHostedState({ status: 'ready', key: requestKey, ranking });
           return;
         }
 
@@ -135,6 +154,7 @@ export function usePredictionRanking(
   }, [
     activeProfile.activeProfile?.type,
     attempt,
+    client,
     evidenceKey,
     eventTracking.sessionId,
     itemType,
