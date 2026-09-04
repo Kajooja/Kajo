@@ -44,13 +44,14 @@ export async function loadCatalogItems(
       .from('items')
       .select(CATALOG_ITEM_SELECT)
       .in('id', uniqueIds);
+    const rawData: unknown = data;
 
-    if (error || !Array.isArray(data)) {
+    if (error || !Array.isArray(rawData)) {
       return { status: 'error' };
     }
 
-    const rows = data.filter(isCatalogItemRow);
-    if (rows.length !== data.length) {
+    const rows = rawData.filter(isCatalogItemRow);
+    if (rows.length !== rawData.length) {
       return { status: 'error' };
     }
 
