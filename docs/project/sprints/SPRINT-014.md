@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A FIRST REAL CATALOG ON MAIN; 14B IMPORT HOSTED + COLD-START PR #191 HOSTED, FINAL CI/DEVICE GATES OPEN**
+Status: **ACTIVE — 14A FIRST REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN, CONFIGURED-DEVICE GATES OPEN**
 
 ## Outcome
 
@@ -38,7 +38,7 @@ The curated beta seed is a controlled first real catalog, not a replacement for 
 
 ## 14B — PersonalProfile bootstrap/import + no-import profiling — #185
 
-### History import — implemented/hosted
+### History import — implemented/hosted/main
 
 Repository migrations:
 
@@ -104,9 +104,9 @@ Hosted import verification:
 - bootstrap actor FK advisor finding was fixed with a forward index,
 - PR #190 merged to `main` at `d140cab3151530e40688fd95164997ece9de1009` after lint, TypeScript, tests and iOS/Android bundle smoke passed.
 
-### No-import cold start — PR #191 / `cold-start-v1`
+### No-import cold start — merged PR #191 / `cold-start-v1`
 
-PR #191 was rebuilt cleanly on #192 main rather than carrying the old random/image-gated implementation forward. Hosted migration:
+PR #191 was rebuilt cleanly on #192 main rather than carrying the old random/image-gated implementation forward, passed final-head lint/typecheck/tests/iOS+Android bundle smoke, and merged to `main` at `0cfa9e73d14f66e309bae937d66124b88c0477c2`. Hosted migration:
 
 - `20260905010000_profile_cold_start_calibration.sql` / hosted `profile_cold_start_calibration`.
 
@@ -133,7 +133,7 @@ Product contract:
 3. explicit recognition-only fallback for the temporary curated beta seed,
 4. weak freshness component.
 
-Curated fallback is deliberately inspectable as `KAJO_CURATED_RECOGNITION` with `trend=0`; it must not masquerade as live trend. Provider aggregate popularity/trend is permitted catalog metadata. Kajo-derived cross-Profile trend belongs to future privacy-gated `PopulationMemory`, not this MVP prior.
+Curated fallback is deliberately inspectable as `KAJO_CURATED_RECOGNITION` with `trend=0`; it must not masquerade as live trend. Provider aggregate popularity/trend is permitted catalog metadata. TMDB normalization already writes `popularity` and `voteCount` into generic Item metadata, so real provider imports feed the same prior automatically. Kajo-derived cross-Profile trend belongs to future privacy-gated `PopulationMemory`, not this MVP prior.
 
 Hosted cold-start verification:
 
@@ -144,11 +144,11 @@ Hosted cold-start verification:
 - current curated slate reports recognition fallback rather than fake trend,
 - controlled 6-rating commit executes through the real RPC without producing native calibration Events,
 - rollback leaves zero active calibration test rows,
-- no `KAJO_MOCK` path exists in calibration eligibility.
+- no `KAJO_MOCK` path exists in calibration eligibility,
+- merged-main validate passed on CI #324.
 
 ### Remaining 14B gate
 
-- final-head PR #191 lint/typecheck/tests/bundle smoke and merge,
 - configured-device Settings/drawer/file-picker/import acceptance,
 - real CSV acceptance against canonical real Items,
 - configured-device 6-of-12-to-24 cold-start acceptance with recognizable BOOK/MOVIE Items,
@@ -208,8 +208,8 @@ Required flows:
 
 - [-] `MVP-CAT-001..003`: first real 30+30 catalog hosted/main and mock delivery retired; device acceptance/provider enrichment still open.
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
-- [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted on PR #191; final CI/merge/device acceptance open.
-- [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted; device acceptance open.
+- [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
+- [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
 - [ ] `MVP-PRED-005`: Shared common-fit.
 - [ ] deferred List/messaging/Room device gates relevant to beta accepted.
 - [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation still required.
@@ -219,4 +219,4 @@ Required flows:
 
 ## Immediate next action
 
-Finish **PR #191 final CI/merge**, then run configured-device real-content/import/cold-start profiling acceptance. After that implement **#177 SharedProfile common-fit**. Do not copy Personal history into Shared history, create a second recommender, treat curated recognition as live trend or bypass PopulationMemory privacy gates.
+Run configured-device **real-content + Settings/import + 6-of-12-to-24 cold-start profiling acceptance from merged main**. After that implement **#177 SharedProfile common-fit**. Do not copy Personal history into Shared history, create a second recommender, treat curated recognition as live trend or bypass PopulationMemory privacy gates.
