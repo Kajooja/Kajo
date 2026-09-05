@@ -240,6 +240,8 @@ inspectable explanation
 
 For `resurfacing-v1`, the internal explanation also records the candidate's resurfacing classification, eligibility, reason, save age and reminder-history counters. A suppressed Item may remain in the internal candidate trace for evaluation/debugging while `selectedForDelivery=false`; Lists and history remain independent read surfaces and are not filtered by discovery eligibility.
 
+For `shared-common-fit-v1.1`, a Shared candidate explanation also records only safe aggregate fields: accepted-member count/coverage, aggregate mean/minimum fit, consensus component, disagreement range/penalty, neutral prior, direct Shared-evidence count and final common-fit contribution. Raw Personal histories, member User IDs and PersonalProfile IDs are never written into the Shared candidate explanation.
+
 ### Why full slates matter
 
 Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can learn that B won against A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice.
@@ -345,7 +347,7 @@ MVP `resurfacing-v1` rules are:
 - all decisions are Profile-scoped; PersonalProfile and SharedProfile state/reminder history do not cross,
 - explicit Lists/Saved/history views remain unaffected by discovery suppression.
 
-The thresholds are versioned hypotheses, not permanent truth. A future policy version may tune age/cooldown/frequency through measured outcomes, but a PredictorGenome cannot bypass hard authorization or terminal-consumption/suppression invariants. `PredictionRun.policyVersion` records `scenario-memory-v1+resurfacing-v1`, and `PredictionCandidate.explanation.resurfacingPolicy` makes the decision reconstructable.
+The thresholds are versioned hypotheses, not permanent truth. A future policy version may tune age/cooldown/frequency through measured outcomes, but a PredictorGenome cannot bypass hard authorization or terminal-consumption/suppression invariants. Personal `PredictionRun.policyVersion` records `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`. `PredictionCandidate.explanation.resurfacingPolicy` makes the resurfacing decision reconstructable.
 
 ## 9. DiscoveryMode policy
 
@@ -376,27 +378,51 @@ The thresholds are versioned hypotheses, not permanent truth. A future policy ve
 
 A SharedProfile remains one Prediction target. Kajo must not rank separately for each member and merely interleave lists.
 
-### Future common-fit decomposition
+### MVP common-fit — `shared-common-fit-v1.1`
+
+The hosted MVP composition is:
 
 ```text
-Shared joint evidence
-+ each accepted member's authorized PersonalProfile fit estimate
-+ minimum-member/consensus term
+existing Shared joint/base score
++ existing Shared ScenarioMemory
++ sparse neutral ColdStartPrior
++ aggregate accepted-member Personal fit
++ minimum-member / consensus term
 - disagreement penalty
-+ Shared ScenarioMemory
-= Shared candidate score
+= final Shared Prediction V1 score
 ```
 
-Required inspectable outputs:
+Member Personal evidence stays Personal. Accepted members are resolved through canonical membership; their Personal memory summaries are read inside the private serving boundary. Imported/calibration evidence may influence Personal LongTermState, native recent behaviour may influence Personal ShortTermState, but no Personal Event/bootstrap row or Personal Scenario is copied into Shared history.
 
-- Shared joint score,
-- anonymous/member-authorized fit components,
-- minimum and mean member fit,
-- disagreement/uncertainty,
-- ScenarioMemory support,
+For each member, the candidate fit is built from LongTerm and native ShortTerm tag overlap and then reliability-shrunk toward the neutral `ColdStartPrior` when evidence is sparse. At Shared level:
+
+- mean/minimum fit above the neutral prior may lift the candidate,
+- common agreement above the prior creates a consensus component,
+- member-fit range creates a bounded disagreement penalty,
+- the neutral prior contribution is strongest for a sparse SharedProfile and decays as direct Shared evidence accumulates,
+- existing Shared Working/Short/Long state and same-Profile ScenarioMemory remain first-class independent inputs.
+
+The v1.1 common-fit contribution is deliberately bounded relative to the existing V1 score scale. It is a versioned MVP hypothesis and must be calibrated against delayed Shared outcomes rather than treated as a permanent formula.
+
+Inspectable aggregate outputs:
+
+- accepted member count and evidence coverage,
+- aggregate mean and minimum member fit,
+- consensus delta/component,
+- disagreement range/penalty,
+- neutral prior source/version/component,
+- direct Shared evidence count,
 - final common-fit contribution.
 
-The formula remains gated until enough real member outcomes exist. V1 ScenarioMemory uses only direct SharedProfile history and therefore cannot leak PersonalProfile Scenarios.
+Privacy/authorization invariants:
+
+- only accepted members can request the Shared Prediction through the existing Profile authorization boundary,
+- private common-fit helpers are not executable by authenticated/anon clients,
+- Shared candidate explanations never contain another member's User ID, PersonalProfile ID, raw tags or raw Event/bootstrap history,
+- PersonalProfile Prediction is explicit no-op for common-fit and preserves the old Personal policy/version,
+- there is no second Shared recommender and no PopulationMemory shortcut.
+
+Current Shared policy version is `scenario-memory-v1+resurfacing-v1+shared-common-fit-v1.1`. Personal remains `scenario-memory-v1+resurfacing-v1`.
 
 ### Current collaboration delivery
 
@@ -814,7 +840,15 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - later consumption/rating after a reminder versus comparable saved Items without a reminder,
 - Profile-isolation and trace-completeness checks.
 
-The purpose is to tune reminder usefulness without optimizing for reminder clicks alone.
+### Shared common-fit-specific
+
+- aggregate minimum-member and mean-member outcome calibration,
+- disagreement penalty versus later Shared consensus/rating outcomes,
+- sparse-member shrinkage calibration,
+- neutral-prior contribution by direct Shared evidence-count bucket,
+- PersonalProfile no-op equivalence,
+- member-history privacy/authorization regression tests,
+- latency by accepted-member count.
 
 ## 15. Data quality and observability
 
@@ -829,6 +863,7 @@ Required monitoring:
 - fraction of fallback predictions,
 - scenario support and influence distribution,
 - resurfacing classification/reason distribution,
+- Shared common-fit coverage/contribution/disagreement distribution,
 - model/policy version traffic,
 - feature/state drift,
 - trace storage growth.
@@ -869,22 +904,24 @@ private V0.3 baseline candidate generator
   -> assigned-genome scalar policy reranker
   -> resurfacing-v1 eligibility/classification
   -> same-Profile ScenarioMemory scoring
+  -> SharedProfile-only shared-common-fit-v1.1 aggregate scoring
   -> resurfacing-aware final slate ordering/delivery predicate
   -> immutable PredictionRun + complete PredictionCandidate trace
 ```
 
-The baseline genome preserves exact V0.3 behavior before the resurfacing eligibility layer. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
+The baseline genome preserves exact V0.3 behavior before the resurfacing eligibility layer. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
 
-The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Current policy version is `scenario-memory-v1+resurfacing-v1`.
+The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Personal policy version is `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`.
 
 Known V1 limits:
 
 - tag features are sparse/manual,
 - Scenario retrieval is SQL scan-based and same-Profile only,
+- Shared common-fit uses tag-summary fit rather than learned member/candidate embeddings,
 - no learned embeddings or pgvector yet,
 - no population retrieval,
 - no stochastic propensity because V1 policy is deterministic,
-- no final Shared common-fit coefficient (`MVP-PRED-005` / #177 remains open),
+- common-fit v1.1 coefficients are conservative hypotheses and require configured-device plus real Shared outcome calibration,
 - Context includes time/surface but not explicit mood/available-time input,
 - saved-reminder thresholds are first versioned heuristics and require real outcome calibration.
 
@@ -906,12 +943,14 @@ Known V1 limits:
 - user-owned IMDb/Letterboxd import,
 - explicit situational intent inputs.
 
-### Phase C — Shared core
+### Phase C — Shared core — hosted v1.1, device gate open
 
-- member fit estimates behind authorized service boundary,
-- common-fit/disagreement formula,
-- Shared outcome metrics,
-- Personal/Shared transfer ablations.
+- accepted-member Personal fit estimates behind authorized private service boundary,
+- bounded common-fit/consensus/disagreement formula,
+- sparse-member shrinkage toward neutral `ColdStartPrior`,
+- aggregate-only Shared candidate explanation with no raw member-history leakage,
+- PersonalProfile no-op isolation,
+- configured-device acceptance and later Shared outcome calibration still required.
 
 ### Phase D — learned retrieval
 
@@ -947,7 +986,7 @@ Primary references reviewed for this design:
 - Google Research, *Transformers in music recommendation* (2024): ranking from ordered user-action sequences and current context. <https://research.google/blog/transformers-in-music-recommendation/>
 - Meta, *Generative Recommenders / HSTU* (ICML 2024): sequential generative recommendation and scaling behavior. <https://github.com/meta-recsys/generative-recommenders>
 - Netflix, *GenRec: An LLM-Backed Recommendation Ranker at Netflix* (2026): verbalized history/context, reward alignment and constrained serving. <https://arxiv.org/abs/2608.10257>
-- LinkedIn, *360Brew* (2025): a shared decoder-only foundation model across ranking tasks. <https://arxiv.org/abs/2501.16450>
+- LinkedIn, *360Brew* (2025): a shared decoder-only foundation model across many ranking tasks. <https://arxiv.org/abs/2501.16450>
 - MemGPT (2023): hierarchical virtual context and explicit movement between fast/slow memory tiers. <https://arxiv.org/abs/2310.08560>
 - *Episodic Memory is the Missing Piece for Long-Term LLM Agents* (2025): instance-specific episodic retrieval for adaptive behavior. <https://arxiv.org/abs/2502.06975>
 - Qloo/Taste AI: commercial cross-domain taste graph as market/architecture validation. <https://www.qloo.com/>
