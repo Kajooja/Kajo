@@ -49,6 +49,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const [showConsumed, setShowConsumed] = useState(false);
+  const [imageWindow, setImageWindow] = useState({ first: 0, last: 5 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const ranking = usePredictionRanking(itemType, mode, interactions);
@@ -106,9 +107,24 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   );
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<Item>[] }) => {
-      visibleItems.current = viewableItems
-        .filter((token) => token.isViewable)
-        .map((token) => token.item);
+      const visibleTokens = viewableItems.filter(
+        (token) => token.isViewable && token.index !== null,
+      );
+      visibleItems.current = visibleTokens.map((token) => token.item);
+
+      if (visibleTokens.length > 0) {
+        const indexes = visibleTokens
+          .map((token) => token.index)
+          .filter((index): index is number => index !== null);
+        const first = Math.max(0, Math.min(...indexes) - 2);
+        const last = Math.max(...indexes) + 4;
+        setImageWindow((current) =>
+          current.first === first && current.last === last
+            ? current
+            : { first, last },
+        );
+      }
+
       recordVisibleImpressions(
         visibleItems.current,
         impressionContext.current,
@@ -283,6 +299,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           data={items}
           keyExtractor={(item) => item.id}
           numColumns={2}
+          initialNumToRender={6}
+          maxToRenderPerBatch={4}
+          updateCellsBatchingPeriod={50}
+          windowSize={5}
+          removeClippedSubviews
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.gridRow}
           contentContainerStyle={[
@@ -293,13 +314,17 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           viewabilityConfig={viewabilityConfig}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              {showConsumed
-                ? itemType === 'BOOK'
-                  ? 'Ei vielä luettuja kirjoja.'
-                  : 'Ei vielä katsottuja elokuvia.'
-                : itemType === 'BOOK'
-                  ? 'Kaikki kirjat on jo merkitty luetuiksi.'
-                  : 'Kaikki elokuvat on jo merkitty katsotuiksi.'}
+              {ranking.status === 'loading' && !showConsumed
+                ? 'Haetaan suosituksia…'
+                : !sharedOverlayReady && !showConsumed
+                  ? 'Yhteisiä valintoja päivitetään…'
+                  : showConsumed
+                    ? itemType === 'BOOK'
+                      ? 'Ei vielä luettuja kirjoja.'
+                      : 'Ei vielä katsottuja elokuvia.'
+                    : itemType === 'BOOK'
+                      ? 'Kaikki kirjat on jo merkitty luetuiksi.'
+                      : 'Kaikki elokuvat on jo merkitty katsotuiksi.'}
             </Text>
           }
           renderItem={({ item, index }) => {
@@ -322,6 +347,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               <ItemCard
                 item={item}
                 index={index}
+                loadImage={index >= imageWindow.first && index <= imageWindow.last}
                 interaction={getItemInteraction(interactions, item.id)}
                 pendingApprovalLabel={pendingApprovalLabel}
                 sharedProvenance={memberHistoryProvenance}
@@ -340,6 +366,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 interface ItemCardProps {
   item: Item;
   index: number;
+  loadImage: boolean;
   interaction: ItemInteraction;
   pendingApprovalLabel: string | null;
   sharedProvenance: string | null;
@@ -351,6 +378,7 @@ interface ItemCardProps {
 function ItemCard({
   item,
   index,
+  loadImage,
   interaction,
   pendingApprovalLabel,
   sharedProvenance,
@@ -362,6 +390,7 @@ function ItemCard({
   const byline = getItemByline(item);
   const coverOpacity = 0.42 + (index % 3) * 0.12;
   const consumedLabel = getConsumedItemLabels(item.itemType).status;
+  const renderRemoteImage = Boolean(item.imageUrl && loadImage);
 
   return (
     <Pressable
@@ -387,12 +416,13 @@ function ItemCard({
           },
         ]}
       >
-        {item.imageUrl ? (
+        {renderRemoteImage && item.imageUrl ? (
           <>
             <Image
               accessibilityIgnoresInvertColors
-              source={{ uri: item.imageUrl }}
+              source={{ uri: item.imageUrl, cache: 'force-cache' }}
               resizeMode="cover"
+              fadeDuration={120}
               style={styles.coverImage}
             />
             <View pointerEvents="none" style={styles.coverImageShade} />
@@ -419,15 +449,15 @@ function ItemCard({
             <Text style={styles.cardStatus}>{consumedLabel}</Text>
           ) : null}
         </View>
-        {!item.imageUrl ? (
-          <>
+        {!renderRemoteImage ? (
+          <View style={styles.coverPlaceholderContent}>
             <Text style={styles.coverType}>
               {item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}
             </Text>
             <Text numberOfLines={3} style={styles.coverTitle}>
               {item.title}
             </Text>
-          </>
+          </View>
         ) : null}
       </View>
       {sharedProvenance ? (
@@ -601,14 +631,11 @@ function createStyles(theme: RoomTheme) {
       aspectRatio: 0.72,
       borderRadius: 14,
       borderWidth: 1,
-      padding: 12,
       justifyContent: 'flex-end',
       overflow: 'hidden',
     },
     coverImage: {
       ...StyleSheet.absoluteFill,
-      width: '100%',
-      height: '100%',
     },
     coverImageShade: {
       ...StyleSheet.absoluteFill,
@@ -616,6 +643,9 @@ function createStyles(theme: RoomTheme) {
     },
     coverLight: {
       ...StyleSheet.absoluteFill,
+    },
+    coverPlaceholderContent: {
+      padding: 12,
     },
     cardStatusRow: {
       position: 'absolute',
