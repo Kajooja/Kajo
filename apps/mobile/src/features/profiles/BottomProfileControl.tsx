@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Modal,
@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useActiveProfile } from './ActiveProfileContext';
+import { getBottomProfileControlAction } from './bottomProfileControlBehavior';
 import {
   loadSharedProfileUse,
   rememberSharedProfileUse,
@@ -41,6 +42,7 @@ export function BottomProfileControl({
   onOpen,
 }: BottomProfileControlProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const profiles = useActiveProfile();
   const rememberedActiveKey = useRef<string | null>(null);
@@ -78,9 +80,16 @@ export function BottomProfileControl({
       ? usageSnapshot.use
       : loadSharedProfileUse(profiles.actorUserId);
   const quickProfiles = useMemo(
-    () => selectQuickSharedProfiles(profiles.selectableProfiles, currentUsage, 5),
+    () =>
+      selectQuickSharedProfiles(
+        profiles.selectableProfiles,
+        currentUsage,
+        5,
+      ),
     [profiles.selectableProfiles, currentUsage],
   );
+  const centerAction = getBottomProfileControlAction(pathname);
+  const isHome = centerAction === 'SWITCHER';
 
   function openSwitcher() {
     onOpen?.();
@@ -89,6 +98,16 @@ export function BottomProfileControl({
       use: loadSharedProfileUse(profiles.actorUserId),
     });
     setOpen(true);
+  }
+
+  function handleCenterPress() {
+    onOpen?.();
+    if (centerAction === 'HOME') {
+      setOpen(false);
+      router.replace('/');
+      return;
+    }
+    openSwitcher();
   }
 
   function switchProfile(profileId: string) {
@@ -105,10 +124,14 @@ export function BottomProfileControl({
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Avaa ryhmien pikavalinta. Aktiivinen Kajo ${identityName}.`}
+        accessibilityLabel={
+          isHome
+            ? `Avaa profiilien pikavalinta. Aktiivinen Kajo ${identityName}.`
+            : `Palaa aktiivisen Kajon ${identityName} etusivulle.`
+        }
         accessibilityState={{ expanded: open }}
         hitSlop={8}
-        onPress={openSwitcher}
+        onPress={handleCenterPress}
         style={({ pressed }) => [
           styles.dockContext,
           pressed && styles.pressed,
@@ -131,7 +154,7 @@ export function BottomProfileControl({
         <View style={styles.modalLayer}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Sulje ryhmien pikavalinta"
+            accessibilityLabel="Sulje profiilien pikavalinta"
             onPress={() => setOpen(false)}
             style={styles.backdrop}
           />
@@ -147,13 +170,50 @@ export function BottomProfileControl({
             ]}
           >
             <View style={styles.header}>
-              <Text style={[styles.kicker, { color: textMuted }]}>RYHMÄT</Text>
+              <Text style={[styles.kicker, { color: textMuted }]}>PROFIILIT</Text>
               {profiles.sharedProfilesStatus === 'loading' ? (
                 <ActivityIndicator size="small" color={textMuted} />
               ) : null}
             </View>
 
             <View style={styles.profileList}>
+              {profiles.personalProfile ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Vaihda omaan Kajoon ${profiles.personalProfile.name}`}
+                  onPress={() => switchProfile(profiles.personalProfile!.id)}
+                  style={({ pressed }) => [
+                    styles.profileRow,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <View style={styles.profileIdentity}>
+                    <Text
+                      numberOfLines={1}
+                      style={[styles.profileName, { color: textPrimary }]}
+                    >
+                      {profiles.personalProfile.name}
+                    </Text>
+                    <Text style={[styles.profileMeta, { color: textMuted }]}>OMA KAJO</Text>
+                  </View>
+                  {profiles.activeProfile?.id === profiles.personalProfile.id ? (
+                    <View
+                      accessibilityLabel="Aktiivinen profiili"
+                      style={[styles.activeDot, { backgroundColor: textPrimary }]}
+                    />
+                  ) : null}
+                </Pressable>
+              ) : null}
+
+              <View
+                style={[
+                  styles.groupDivider,
+                  { borderTopColor: borderColor },
+                ]}
+              >
+                <Text style={[styles.groupKicker, { color: textMuted }]}>RYHMÄT</Text>
+              </View>
+
               {quickProfiles.map((profile) => (
                 <Pressable
                   key={profile.id}
@@ -182,9 +242,7 @@ export function BottomProfileControl({
 
               {quickProfiles.length === 0 &&
               profiles.sharedProfilesStatus !== 'loading' ? (
-                <Text style={[styles.emptyText, { color: textMuted }]}>
-                  Ei vielä aktiivisia ryhmiä.
-                </Text>
+                <Text style={[styles.emptyText, { color: textMuted }]}>Ei vielä aktiivisia ryhmiä.</Text>
               ) : null}
 
               {profiles.sharedProfilesError ? (
@@ -197,9 +255,7 @@ export function BottomProfileControl({
                     pressed && styles.pressed,
                   ]}
                 >
-                  <Text style={[styles.retryText, { color: textMuted }]}>
-                    Ryhmät eivät päivittyneet. Yritä uudelleen.
-                  </Text>
+                  <Text style={[styles.retryText, { color: textMuted }]}>Ryhmät eivät päivittyneet. Yritä uudelleen.</Text>
                 </Pressable>
               ) : null}
             </View>
@@ -283,10 +339,31 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 7,
   },
+  profileIdentity: {
+    flex: 1,
+    minWidth: 0,
+  },
   profileName: {
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
+  },
+  profileMeta: {
+    marginTop: 2,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  groupDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 4,
+    paddingTop: 10,
+    paddingBottom: 2,
+  },
+  groupKicker: {
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.1,
   },
   activeDot: {
     width: 7,

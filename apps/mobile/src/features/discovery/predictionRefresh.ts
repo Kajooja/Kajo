@@ -14,6 +14,13 @@ export function createLatestRequestGate() {
   };
 }
 
+export function getPredictionRefreshDelay(
+  hasLoadedRequest: boolean,
+  interactionRefreshDelayMs: number,
+): number {
+  return hasLoadedRequest ? interactionRefreshDelayMs : 0;
+}
+
 export function getInteractionEvidenceKey(
   interactions: ItemInteractionMap,
 ): string {
