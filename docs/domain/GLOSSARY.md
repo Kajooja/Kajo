@@ -27,6 +27,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Scenario | `Scenario` | Historical state + context + candidate/pattern + prediction + observed outcome. |
 | Scenario memory | `ScenarioMemory` | Retrieval layer for similar historical Scenarios. |
 | Population memory | `PopulationMemory` | Privacy-gated aggregate/collaborative evidence across Profiles. It never exposes another Profile's raw history and is post-MVP. |
+| Cold-start prior / lähtöpriori | `ColdStartPrior` | Versioned non-personal Item prior used while Profile evidence is sparse. MVP v1 uses provider/catalog trend or popularity first, recognition next, and an explicit recognition-only curated fallback; it never reads another Kajo Profile's raw history. It fades behind imported/calibration/native Profile evidence and is distinct from privacy-gated PopulationMemory. |
 | Prediction | `Prediction` | Estimated outcome/suitability for Profile + Item + Context. |
 | Prediction ID | `predictionId` | Identifier connecting recommendations/impressions to later outcomes. |
 | Prediction run | `PredictionRun` | One versioned hosted prediction request including actor, Profile, session, Context, MemoryStateSnapshot, model/policy versions and candidate/result counts. |
