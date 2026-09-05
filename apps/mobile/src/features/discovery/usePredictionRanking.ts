@@ -64,6 +64,7 @@ export function usePredictionRanking(
     status: 'idle',
   });
   const requestGate = useRef(createLatestRequestGate());
+  const loadedRequestKeys = useRef(new Set<string>());
   const evidenceKey = getInteractionEvidenceKey(interactions);
   const profileId =
     activeProfile.status === 'ready'
@@ -100,6 +101,9 @@ export function usePredictionRanking(
 
     const token = requestGate.current.start();
     let active = true;
+    const delayMs = loadedRequestKeys.current.has(requestKey)
+      ? INTERACTION_REFRESH_DELAY_MS
+      : 0;
 
     const timeout = setTimeout(() => {
       setHostedState((current) => ({
@@ -135,6 +139,7 @@ export function usePredictionRanking(
                 }
               : result.ranking;
 
+          loadedRequestKeys.current.add(requestKey);
           rememberPredictionItems(ranking.predictionId, ranking.items);
           setHostedState({ status: 'ready', key: requestKey, ranking });
           return;
@@ -147,7 +152,7 @@ export function usePredictionRanking(
           message: result.message,
         }));
       });
-    }, INTERACTION_REFRESH_DELAY_MS);
+    }, delayMs);
 
     return () => {
       active = false;
@@ -187,17 +192,23 @@ export function usePredictionRanking(
     };
   }
 
+  if (rpc && profileId) {
+    return {
+      items: [],
+      predictionId: fallback.predictionId,
+      source: 'hosted',
+      status: hostedState.status === 'error' ? 'error' : 'loading',
+      message: hostedState.status === 'error' ? hostedState.message : null,
+      retry,
+    };
+  }
+
   return {
     items: fallback.items,
     predictionId: fallback.predictionId,
     source: 'fallback',
-    status:
-      rpc && profileId
-        ? hostedState.status === 'error'
-          ? 'error'
-          : 'loading'
-        : 'ready',
-    message: hostedState.status === 'error' ? hostedState.message : null,
+    status: 'ready',
+    message: null,
     retry,
   };
 }
