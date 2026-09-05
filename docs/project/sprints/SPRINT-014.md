@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT HOSTED, DEVICE GATE OPEN**
+Status: **ACTIVE — 14A REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATE OPEN**
 
 ## Outcome
 
@@ -157,7 +157,7 @@ Hosted cold-start verification:
 
 ## 14C — SharedProfile common-fit — #177 / MVP-PRED-005
 
-Implemented/hosted on branch `feat/177-shared-common-fit-v1`; device acceptance still open.
+Implemented/hosted/main; configured-device acceptance still open.
 
 The implementation extends the existing `private.rank_items_v1_internal` / `public.rank_items_v1` path. Prediction target remains SharedProfile and no second recommender exists.
 
@@ -183,7 +183,7 @@ Hosted implementation history is immutable:
 - `20260905114500_harden_shared_common_fit_v1_1.sql` — v1.1 context/reliability/ShortTerm/prior-decay hardening,
 - `20260905115500_fix_shared_common_fit_personal_policy.sql` — forward fix preserving the PersonalProfile policy-version/no-op branch.
 
-Hosted acceptance evidence:
+Hosted/repository acceptance evidence:
 
 - deterministic agreement control: contribution **+4.088**,
 - deterministic sparse control: neutral-prior-only contribution **+0.0675**,
@@ -195,11 +195,12 @@ Hosted acceptance evidence:
 - authenticated/anon cannot execute private common-fit config/context/candidate helpers; authenticated can still execute `public.rank_items_v1`,
 - 10-result Shared hosted smoke measured about **136 ms** in the current development environment; this is a development baseline, not a production SLO,
 - test PredictionRuns/candidates were removed after acceptance; zero tagged test-run residue remains,
-- advisor pass introduced no new #177 WARN-level findings; existing leaked-password WARN remains separate #160/#184 release scope.
+- advisor pass introduced no new #177 WARN-level findings; existing leaked-password WARN remains separate #160/#184 release scope,
+- PR #194 final-head CI #327 passed lint, TypeScript, tests and iOS/Android bundle smoke,
+- PR #194 squash-merged to `main` at `5e1dc9cc993887ab19b943ac0f2a5943d53aa908`.
 
 ### Remaining 14C gate
 
-- repository PR/CI/merge to `main`,
 - configured Android SharedProfile acceptance with real Items and a persisted V1 trace,
 - only then mark `MVP-PRED-005` complete and close #177.
 
@@ -240,7 +241,7 @@ Required flows:
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
 - [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
 - [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
-- [-] `MVP-PRED-005`: Shared common-fit v1.1 implemented/hosted; repository merge and configured-Android acceptance open.
+- [-] `MVP-PRED-005`: Shared common-fit v1.1 implemented/hosted/main; configured-Android acceptance open.
 - [ ] deferred List/messaging/Room device gates relevant to beta accepted.
 - [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation still required.
 - [ ] import and no-import users both receive useful first-session recommendations on device.
@@ -249,4 +250,4 @@ Required flows:
 
 ## Immediate next action
 
-Finish #177 repository PR/CI/merge, then run one configured-device acceptance pass covering **real content + Settings/import + cold-start profiling + Shared common-fit**. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, and do not bypass PopulationMemory privacy gates.
+Run one configured-device acceptance pass covering **real content + Settings/import + 6-of-12-to-24 cold-start profiling + Shared common-fit** from merged main. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, and do not bypass PopulationMemory privacy gates.
