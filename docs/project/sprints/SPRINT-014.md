@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A FIRST REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN, CONFIGURED-DEVICE GATES OPEN**
+Status: **ACTIVE — 14A REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT HOSTED, DEVICE GATE OPEN**
 
 ## Outcome
 
@@ -157,21 +157,51 @@ Hosted cold-start verification:
 
 ## 14C — SharedProfile common-fit — #177 / MVP-PRED-005
 
-Personal choices must influence Shared recommendations without copying Personal history into the SharedProfile.
+Implemented/hosted on branch `feat/177-shared-common-fit-v1`; device acceptance still open.
 
-Implement in the existing Prediction V1 path:
+The implementation extends the existing `private.rank_items_v1_internal` / `public.rank_items_v1` path. Prediction target remains SharedProfile and no second recommender exists.
 
-- target remains SharedProfile,
-- sparse/new SharedProfile may use the same neutral non-personal `ColdStartPrior` as fallback,
-- combine Shared joint evidence with authorized accepted-member PersonalProfile taste,
-- Personal taste includes normal Personal Events and bootstrap-derived LongTerm state,
-- minimum-member/coverage behavior is inspectable,
-- disagreement penalty prevents one member's strong preference from hiding poor fit for another,
-- sparse member fit shrinks toward the neutral catalog prior rather than letting one member dominate,
-- keep Personal and Shared ScenarioMemory separate,
-- persist explanation/trace in the existing Prediction candidate architecture,
-- no Personal bootstrap rows are copied into Shared history,
-- no second Shared recommender and no PopulationMemory shortcut.
+Current `shared-common-fit-v1.1` contract:
+
+- sparse/new SharedProfile receives a small neutral `ColdStartPrior` component,
+- accepted members are resolved through `profile_members` and each member's canonical PersonalProfile,
+- Personal fit uses source-tagged bootstrap/native LongTerm plus native ShortTerm summaries without copying Personal rows into Shared history,
+- sparse member estimates shrink toward the neutral catalog prior using evidence-strength reliability,
+- aggregate mean/member-minimum fit contributes positively only when it exceeds the neutral prior,
+- agreement above the prior earns a consensus component,
+- member-fit range produces a bounded disagreement penalty,
+- neutral prior contribution decays as SharedProfile's own evidence count grows,
+- Shared joint state and same-Profile ScenarioMemory remain first-class existing V1 inputs,
+- PersonalProfile ranking is an explicit no-op: old `scenario-memory-v1+resurfacing-v1` policy remains and common-fit contribution is zero,
+- Shared PredictionRun policy version is `scenario-memory-v1+resurfacing-v1+shared-common-fit-v1.1`,
+- PredictionCandidate explanation exposes only safe aggregates (`memberCount`, coverage, mean/min fit, consensus, disagreement, neutral prior, contribution), never member IDs, PersonalProfile IDs or raw history,
+- private helper functions have no authenticated/anon execute grants; mobile continues through `public.rank_items_v1` only.
+
+Hosted implementation history is immutable:
+
+- `20260905113000_shared_common_fit_v1.sql` — first hosted common-fit version,
+- `20260905114500_harden_shared_common_fit_v1_1.sql` — v1.1 context/reliability/ShortTerm/prior-decay hardening,
+- `20260905115500_fix_shared_common_fit_personal_policy.sql` — forward fix preserving the PersonalProfile policy-version/no-op branch.
+
+Hosted acceptance evidence:
+
+- deterministic agreement control: contribution **+4.088**,
+- deterministic sparse control: neutral-prior-only contribution **+0.0675**,
+- deterministic disagreement control: contribution **−2.5945**, including **2.5** disagreement penalty,
+- real hosted two-member SharedProfile run returns `shared-common-fit-v1.1` inside the canonical Prediction V1 trace,
+- real run shows item-specific disagreement penalties and positive consensus components,
+- candidate explanations contain no actor User ID or PersonalProfile ID and declare `AGGREGATE_ONLY`,
+- PersonalProfile control returns `sharedCommonFit.applicable=false`, contribution `0`, and preserves `scenario-memory-v1+resurfacing-v1`,
+- authenticated/anon cannot execute private common-fit config/context/candidate helpers; authenticated can still execute `public.rank_items_v1`,
+- 10-result Shared hosted smoke measured about **136 ms** in the current development environment; this is a development baseline, not a production SLO,
+- test PredictionRuns/candidates were removed after acceptance; zero tagged test-run residue remains,
+- advisor pass introduced no new #177 WARN-level findings; existing leaked-password WARN remains separate #160/#184 release scope.
+
+### Remaining 14C gate
+
+- repository PR/CI/merge to `main`,
+- configured Android SharedProfile acceptance with real Items and a persisted V1 trace,
+- only then mark `MVP-PRED-005` complete and close #177.
 
 ## 14D — External beta gate — #186
 
@@ -210,7 +240,7 @@ Required flows:
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
 - [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
 - [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
-- [ ] `MVP-PRED-005`: Shared common-fit.
+- [-] `MVP-PRED-005`: Shared common-fit v1.1 implemented/hosted; repository merge and configured-Android acceptance open.
 - [ ] deferred List/messaging/Room device gates relevant to beta accepted.
 - [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation still required.
 - [ ] import and no-import users both receive useful first-session recommendations on device.
@@ -219,4 +249,4 @@ Required flows:
 
 ## Immediate next action
 
-Run configured-device **real-content + Settings/import + 6-of-12-to-24 cold-start profiling acceptance from merged main**. After that implement **#177 SharedProfile common-fit**. Do not copy Personal history into Shared history, create a second recommender, treat curated recognition as live trend or bypass PopulationMemory privacy gates.
+Finish #177 repository PR/CI/merge, then run one configured-device acceptance pass covering **real content + Settings/import + cold-start profiling + Shared common-fit**. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, and do not bypass PopulationMemory privacy gates.
