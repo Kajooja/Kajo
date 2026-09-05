@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useActiveProfile } from './ActiveProfileContext';
+import { getBottomProfileControlAction } from './bottomProfileControlBehavior';
 import {
   loadSharedProfileUse,
   rememberSharedProfileUse,
@@ -79,10 +80,16 @@ export function BottomProfileControl({
       ? usageSnapshot.use
       : loadSharedProfileUse(profiles.actorUserId);
   const quickProfiles = useMemo(
-    () => selectQuickSharedProfiles(profiles.selectableProfiles, currentUsage, 5),
+    () =>
+      selectQuickSharedProfiles(
+        profiles.selectableProfiles,
+        currentUsage,
+        5,
+      ),
     [profiles.selectableProfiles, currentUsage],
   );
-  const isHome = pathname === '/';
+  const centerAction = getBottomProfileControlAction(pathname);
+  const isHome = centerAction === 'SWITCHER';
 
   function openSwitcher() {
     onOpen?.();
@@ -95,7 +102,7 @@ export function BottomProfileControl({
 
   function handleCenterPress() {
     onOpen?.();
-    if (!isHome) {
+    if (centerAction === 'HOME') {
       setOpen(false);
       router.replace('/');
       return;
@@ -198,7 +205,12 @@ export function BottomProfileControl({
                 </Pressable>
               ) : null}
 
-              <View style={[styles.groupDivider, { borderTopColor: borderColor }]}>
+              <View
+                style={[
+                  styles.groupDivider,
+                  { borderTopColor: borderColor },
+                ]}
+              >
                 <Text style={[styles.groupKicker, { color: textMuted }]}>RYHMÄT</Text>
               </View>
 
