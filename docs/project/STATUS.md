@@ -30,9 +30,10 @@ Kajo already has:
 - PersonalProfile + consent-based SharedProfiles, Endorsement consensus, Lists and messaging,
 - accepted bottom SharedProfile quick switcher,
 - hosted generic provider catalog foundation + batch importer + ACTIVE `catalog-import` Edge Function,
-- **first real hosted beta catalog: 30 MOVIE + 30 BOOK Items with `KAJO_CURATED_BETA` provenance**,
+- **hosted beta catalog with 30 real MOVIE Items and 415 real BOOK Items**: 30 guarded `KAJO_CURATED_BETA` books plus 385 Open Library books,
+- **385/385 Open Library beta books have provider covers + creators, 383/385 have release years, 57 expose Finnish editions and 65 Swedish editions**,
 - historical 24 `KAJO_MOCK` Items retained but `discoverable=false`,
-- hosted V1 proof of 10/10 real MOVIE + 10/10 real BOOK delivery and 0 mock delivery,
+- hosted V1 proof of real BOOK/MOVIE delivery and 0 mock delivery,
 - mobile real-catalog presentation fields without a second recommender,
 - hosted PersonalProfile bootstrap-evidence foundation for imported viewing/reading history,
 - Letterboxd/IMDb/Goodreads/StoryGraph/generic-CSV normalization,
@@ -62,14 +63,14 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - Sprint 012/#138 Profile messaging.
 - PR #171/current Room-lighting/target/profile-hydration follow-up.
 - latest shell/bootstrap visual polish.
-- #182 first real 30+30 catalog + mock retirement hosted/merged through #192; device acceptance and provider enrichment still open.
+- #182 real catalog foundation + mock retirement + **415-book beta coverage** are hosted/main through #192/#196; configured-device acceptance and movie-provider expansion remain open.
 - #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
 - #191 no-import cold-start profiling backend + mobile gate is hosted and merged to `main`; configured-device acceptance remains open.
 - #177 SharedProfile common-fit v1.1 is hosted and merged to `main` through #194; configured-Android acceptance remains open.
 
 ## Sprint 014 — ACTIVE
 
-### 14A — #182 real catalog — FIRST REAL CATALOG HOSTED/MAIN
+### 14A — #182 real catalog — BOOK BETA COVERAGE HOSTED/MAIN
 
 Implemented/hosted:
 
@@ -77,23 +78,31 @@ Implemented/hosted:
 - private provider provenance + namespaced external IDs,
 - service-only atomic and max-50 batch catalog upsert,
 - TMDB Edge importer with server-side credential boundary, Finnish localization and English fallback,
-- Open Library monthly-dump importer,
+- Open Library monthly-dump importer as the long-term bulk path,
 - Prediction V1 mobile enrichment with covers/posters, creators and year,
 - real hosted Item detail/swipe preserves the delivered Prediction slate,
 - `discoverable` remains part of the one canonical Prediction candidate generator,
 - guarded `KAJO_CURATED_BETA` seed contains 30 real movies and 30 real books,
 - old 24 mock Items are non-discoverable but not deleted,
 - all 930 historical mock Event references still resolve,
-- V1 hosted acceptance returns only real curated Items after the NULL bootstrap fix,
-- PR #192 is merged to `main` at `c08513a3b00cda764004ed8c295466f26dc61e32`.
+- V1 hosted acceptance returns real Items after the NULL bootstrap fix,
+- PR #192 is merged to `main` at `c08513a3b00cda764004ed8c295466f26dc61e32`,
+- bounded Open Library Search beta bootstrap ran 13 explicit genre/language buckets and normalized **650 raw rows -> 385 new Work-ID-deduplicated BOOK Items**,
+- current discoverable BOOK total is **415** (`385 open_library + 30 kajo_curated`),
+- Open Library quality gate: **385 covers, 385 creators, 383 years, 57 Finnish-edition Items, 65 Swedish-edition Items, 0 duplicate discoverable BOOK title groups, 0 discoverable mocks**,
+- language-preferred Open Library Edition enrichment matched all 385 provider Items, changed 159 display titles and selected 385 display covers without title collisions,
+- Open Library `readinglog_count`/`ratings_count` normalize into generic `popularity`/`voteCount`, so existing `ColdStartPrior` uses `PROVIDER_POPULARITY` without a provider-specific recommender,
+- `metadata.openLibraryWorkId` mirrors the public admin-refresh identity while private external-ID aliases remain canonical,
+- repeatable admin tooling lives in `scripts/catalog/open-library-search-beta.mjs` + `import-open-library-search-beta.mjs`; it uses explicit language-preferred Edition fields, work/title dedup, a fail-closed coverage gate (default 180 Items / 8 buckets), rate spacing and only `upsert_catalog_batch_v1`,
+- PR #196 final-head CI passed lint/typecheck/catalog tests/iOS+Android bundle smoke and squash-merged to `main` at `d3fe79865f855b8b3df5f42ae1027ed006169687`.
 
 Still required:
 
-- configured-device confirmation of real Item delivery,
-- real posters/covers/descriptions through provider enrichment,
+- configured-device confirmation of real cover/title delivery,
 - configure server-only `TMDB_READ_ACCESS_TOKEN`,
-- expand beyond the bounded first seed with TMDB/Open Library,
-- beta-scale coverage/dedup/metadata review.
+- expand MOVIE coverage from the current 30-title seed to beta-scale provider data with real posters/descriptions,
+- enrich BOOK descriptions/ISBN-edition matching through the existing Open Library dump path and optional Finna metadata where useful,
+- provider attribution/licensing review before external/store release.
 
 ### 14B — #185 PersonalProfile bootstrap/import + no-import profiling — HOSTED/MAIN, DEVICE GATES OPEN
 
@@ -147,7 +156,7 @@ No-import `cold-start-v1` contract:
 3. explicit recognition-only fallback for the first curated beta seed,
 4. weak freshness component.
 
-Curated Items deliberately report `trend=0` and `KAJO_CURATED_RECOGNITION`; no fake live trend is created. Kajo-wide aggregate user trend is not MVP `ColdStartPrior`; it belongs to later privacy-gated `PopulationMemory`. TMDB metadata already normalizes provider `popularity` and `voteCount` into generic Item metadata, so real provider imports can feed this prior without a second recommender or mobile change.
+Curated Items deliberately report `trend=0` and `KAJO_CURATED_RECOGNITION`; no fake live trend is created. Kajo-wide aggregate user trend is not MVP `ColdStartPrior`; it belongs to later privacy-gated `PopulationMemory`. TMDB metadata and Open Library beta metadata both normalize provider popularity/recognition into generic fields, so real provider imports feed this prior without a second recommender or mobile change.
 
 Mobile Settings/import:
 
@@ -170,9 +179,9 @@ Hosted acceptance already proved:
 - empty-profile import adds LongTerm taste while ShortTerm remains empty,
 - 5,000-row guard is active,
 - new FK index advisor finding was corrected forward,
-- profiling status sees 30 real movies + 30 real books without requiring images,
+- profiling status sees real movies + hundreds of real books without requiring images,
 - 12-card candidate slate is deterministic and remains the prefix of the 24-card extension,
-- current curated candidates are inspectably recognition-prior only (`trend=0`),
+- curated candidates are inspectably recognition-prior only (`trend=0`) while Open Library Items use provider popularity,
 - controlled six-rating calibration executes without native calibration Events and rollback leaves zero active test rows,
 - #191 final-head lint/typecheck/tests/iOS+Android bundle smoke passed before merge,
 - merged-main validate passed.
@@ -260,8 +269,8 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 
 ## Current ordered work
 
-1. **Run configured-device acceptance covering real-content delivery + Settings/CSV import + no-import profiling + Shared common-fit.**
-2. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
+1. **Run configured-device acceptance covering 415-book real-content delivery + Settings/CSV import + no-import profiling + Shared common-fit.**
+2. **Configure TMDB server credential and expand #182 MOVIE coverage with real posters/descriptions before external beta.**
 3. Close deferred #102/#138/Room/shell device gates required for beta.
 4. **#186 roughly 10-person external beta acceptance.**
 5. **Sprint 015 — production auth/security/signing/store release.**
@@ -272,6 +281,7 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 - Follow `/AGENTS.md` and `/docs/project/HANDOFF_PROTOCOL.md`.
 - One canonical implementation per capability.
 - Provider imports normalize into generic Items/bootstrap evidence.
+- Open Library Search beta bootstrap is a bounded cached seed/refresh adapter; monthly dumps remain the broad catalog path.
 - `ColdStartPrior` is a sparse-evidence Item prior, not a second recommender or PopulationMemory shortcut.
 - Personal evidence remains Personal; Shared common-fit reads authorized memory summaries rather than copying evidence.
 - Shared common-fit explanation stays aggregate-only; do not expose member raw history.
@@ -290,6 +300,9 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 - `/apps/mobile/src/features/settings/SettingsScreen.tsx`
 - `/apps/mobile/src/features/settings/historyImportParser.ts`
 - `/apps/mobile/src/features/settings/historyImportOperations.ts`
+- `/scripts/catalog/open-library-search-beta.mjs`
+- `/scripts/catalog/import-open-library-search-beta.mjs`
+- `/scripts/catalog/import-open-library.mjs`
 - `/supabase/migrations/20260905003000_seed_curated_beta_catalog.sql`
 - `/supabase/migrations/20260905003500_fix_resurfacing_null_bootstrap.sql`
 - `/supabase/migrations/20260905010000_profile_cold_start_calibration.sql`
@@ -302,4 +315,4 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **configured-device real-content/import/cold-start/Shared-common-fit acceptance from merged main**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, expose member raw evidence, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
+Immediate target: **configured-device real-content/import/cold-start/Shared-common-fit acceptance from merged main, then TMDB MOVIE expansion**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, expose member raw evidence, treat curated recognition as live trend, use Open Library Search as Kajo's runtime backend, bypass PopulationMemory privacy gates, or begin monetization work.

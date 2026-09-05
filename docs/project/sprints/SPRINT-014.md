@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A REAL CATALOG ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATE OPEN**
+Status: **ACTIVE — 14A BOOK BETA COVERAGE ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATE OPEN**
 
 ## Outcome
 
@@ -17,24 +17,33 @@ Implemented/hosted/main:
 - generic discoverability/presentation lifecycle,
 - service-only atomic and bounded batch import,
 - ACTIVE TMDB Edge importer with server-side secrets/localization fallback,
-- Open Library bulk-dump importer,
+- Open Library monthly bulk-dump importer as the long-term broad import path,
 - mobile poster/cover/creator/year enrichment without changing Prediction rank/ID,
 - real hosted Item detail/swipe remains on the delivered Prediction slate,
-- first guarded beta seed: **30 real MOVIE + 30 real BOOK Items** with `KAJO_CURATED_BETA` provenance,
+- first guarded seed: **30 real MOVIE + 30 real BOOK Items** with `KAJO_CURATED_BETA` provenance,
 - historical 24 `KAJO_MOCK` rows remain stored but are `discoverable=false`,
-- hosted Prediction V1 acceptance returned 10/10 MOVIE + 10/10 BOOK real Items with **0 mock deliveries**,
+- hosted Prediction V1 acceptance returned real BOOK/MOVIE Items with **0 mock deliveries**,
 - all 930 historical Event references to old mock Item IDs still resolve,
 - forward fix `20260905003500_fix_resurfacing_null_bootstrap.sql` corrected bootstrap NULL propagation that had incorrectly classified untouched Items as `SAVED_SUPPRESSED` and caused mobile to fall back to mock cards,
-- PR #192 merged to `main` at `c08513a3b00cda764004ed8c295466f26dc61e32` after final CI passed.
+- PR #192 merged to `main` at `c08513a3b00cda764004ed8c295466f26dc61e32` after final CI passed,
+- bounded Open Library Search beta bootstrap used **13** explicit genre/language buckets and normalized **650 raw rows -> 385 new Work-ID/title-deduplicated BOOK Items**,
+- current discoverable BOOK total is **415** (`385 open_library + 30 kajo_curated`),
+- Open Library quality gate passed with **385/385 covers, 385/385 creators, 383/385 release years, 57 Items with Finnish editions, 65 with Swedish editions, 0 duplicate discoverable BOOK title groups and 0 discoverable mocks**,
+- language-preferred Open Library Edition enrichment matched all 385 provider Items, changed 159 display titles and selected 385 display covers without introducing title collisions,
+- provider `readinglog_count`/`ratings_count` normalize into generic `popularity`/`voteCount`, so the existing `ColdStartPrior` uses `PROVIDER_POPULARITY` without a provider-specific ranker,
+- `metadata.openLibraryWorkId` mirrors the provider Work ID for repeat-safe admin refresh while private external-ID aliases remain authoritative,
+- repeatable beta tooling is `scripts/catalog/open-library-search-beta.mjs` + `import-open-library-search-beta.mjs`: fixed bucket contract, fi/sv language-preferred editions, Work/title dedup, fail-closed coverage gate, provider-friendly request spacing and writes only through `upsert_catalog_batch_v1`,
+- PR #196 passed final-head lint/typecheck/catalog tests/iOS+Android bundle smoke and squash-merged to `main` at `d3fe79865f855b8b3df5f42ae1027ed006169687`.
 
 Still open:
 
-- configured-device acceptance that the APK renders real titles through the hosted path,
-- add real covers/posters and richer descriptions through TMDB/Open Library,
-- configure `TMDB_READ_ACCESS_TOKEN` and expand beyond the bounded curated seed,
-- run useful coverage/dedup/metadata acceptance at beta scale.
+- configured-device acceptance that the APK renders real provider titles/covers through the hosted path,
+- configure `TMDB_READ_ACCESS_TOKEN` and expand MOVIE coverage beyond the 30-title seed with real posters/descriptions,
+- enrich BOOK descriptions and stronger ISBN/Edition matching through the monthly Open Library dump path,
+- optional Finnish bibliographic enrichment through Finna while respecting separate cover rights,
+- provider attribution/licensing review before external/store release.
 
-The curated beta seed is a controlled first real catalog, not a replacement for provider ingestion. Historical mock rows are never deleted because Events/Lists/Prediction traces may reference them.
+The bounded Search API importer is a beta seed/refresh mechanism, not Kajo's runtime book backend. The monthly Open Library dumps remain the intended large-scale persisted catalog path. Historical mock rows are never deleted because Events/Lists/Prediction traces may reference them.
 
 ## 14B — PersonalProfile bootstrap/import + no-import profiling — #185
 
@@ -133,15 +142,15 @@ Product contract:
 3. explicit recognition-only fallback for the temporary curated beta seed,
 4. weak freshness component.
 
-Curated fallback is deliberately inspectable as `KAJO_CURATED_RECOGNITION` with `trend=0`; it must not masquerade as live trend. Provider aggregate popularity/trend is permitted catalog metadata. TMDB normalization already writes `popularity` and `voteCount` into generic Item metadata, so real provider imports feed the same prior automatically. Kajo-derived cross-Profile trend belongs to future privacy-gated `PopulationMemory`, not this MVP prior.
+Curated fallback is deliberately inspectable as `KAJO_CURATED_RECOGNITION` with `trend=0`; it must not masquerade as live trend. Provider aggregate popularity/trend is permitted catalog metadata. TMDB and the bounded Open Library beta adapter both normalize provider popularity/recognition into generic metadata, so real provider imports feed the same prior automatically. Kajo-derived cross-Profile trend belongs to future privacy-gated `PopulationMemory`, not this MVP prior.
 
 Hosted cold-start verification:
 
-- status sees 30 real MOVIE + 30 real BOOK Items even though curated images are currently null,
+- status sees 30 real MOVIE + **415 real BOOK** Items; 385 BOOK Items now also have provider covers,
 - calibration is available without image dependency,
 - first 12 candidates are deterministic, balanced and high-prior,
 - requesting 24 preserves the first 12 as an exact prefix and extends the slate,
-- current curated slate reports recognition fallback rather than fake trend,
+- curated fallback reports recognition rather than fake trend; Open Library Items report `PROVIDER_POPULARITY`,
 - controlled 6-rating commit executes through the real RPC without producing native calibration Events,
 - rollback leaves zero active calibration test rows,
 - no `KAJO_MOCK` path exists in calibration eligibility,
@@ -226,18 +235,19 @@ Required flows:
 - Letterboxd/IMDb import is user-authorized file import, not scraping.
 - Personal import/calibration evidence remains Personal. Shared common-fit reads authorized Personal taste rather than copying evidence.
 - Provider aggregate popularity/trend may seed sparse profiles; Kajo-wide aggregate behaviour remains PopulationMemory-gated.
+- Open Library Search beta bootstrap is bounded/cached admin ingestion; the app never uses Open Library Search as its runtime backend.
 - Do not judge common-fit quality on the historical mock catalog.
 
 ## Dependencies
 
-- #182 configured-device real-card acceptance and provider expansion remain required for beta.
+- #182 configured-device real-card acceptance and **TMDB MOVIE provider expansion** remain required for beta; BOOK beta already has 415 discoverable Items.
 - #102 Lists, #138 messaging and Room/shell refreshed device gates remain before beta acceptance.
 - stable email auth is needed for beta; production SMTP + Google/Apple store auth is finalized through #127/#184 before store release.
 - #160 production security hardening remains release scope unless a blocking beta-safety issue appears.
 
 ## Acceptance
 
-- [-] `MVP-CAT-001..003`: first real 30+30 catalog hosted/main and mock delivery retired; device acceptance/provider enrichment still open.
+- [-] `MVP-CAT-001..003`: BOOK beta coverage now has 415 real Items with 385 provider covers; MOVIE remains 30-title seed, configured-device acceptance and provider expansion are open.
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
 - [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
 - [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
@@ -250,4 +260,4 @@ Required flows:
 
 ## Immediate next action
 
-Run one configured-device acceptance pass covering **real content + Settings/import + 6-of-12-to-24 cold-start profiling + Shared common-fit** from merged main. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, and do not bypass PopulationMemory privacy gates.
+Run one configured-device acceptance pass covering **real 415-book content + Settings/import + 6-of-12-to-24 cold-start profiling + Shared common-fit** from merged main. After that configure TMDB and expand MOVIE coverage. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, do not use Open Library Search as a runtime backend, and do not bypass PopulationMemory privacy gates.
