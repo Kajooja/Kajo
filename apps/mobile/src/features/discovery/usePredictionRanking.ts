@@ -25,6 +25,7 @@ import {
 import {
   createLatestRequestGate,
   getInteractionEvidenceKey,
+  getPredictionRefreshDelay,
 } from './predictionRefresh';
 import { rememberPredictionItems } from './predictionRankingCache';
 
@@ -101,9 +102,10 @@ export function usePredictionRanking(
 
     const token = requestGate.current.start();
     let active = true;
-    const delayMs = loadedRequestKeys.current.has(requestKey)
-      ? INTERACTION_REFRESH_DELAY_MS
-      : 0;
+    const delayMs = getPredictionRefreshDelay(
+      loadedRequestKeys.current.has(requestKey),
+      INTERACTION_REFRESH_DELAY_MS,
+    );
 
     const timeout = setTimeout(() => {
       setHostedState((current) => ({
