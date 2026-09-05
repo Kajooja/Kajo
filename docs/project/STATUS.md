@@ -38,11 +38,12 @@ Kajo already has:
 - Letterboxd/IMDb/Goodreads/StoryGraph/generic-CSV normalization,
 - PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports,
 - hosted `cold-start-v1` PersonalProfile profiling backend with versioned `cold-start-prior-v1` and bounded 6-of-12-to-24 contract,
-- **PR #191 merged to `main` at `0cfa9e73d14f66e309bae937d66124b88c0477c2`; final-head PR CI and main validate both passed**.
+- #191 cold-start merged to `main` at `0cfa9e73d14f66e309bae937d66124b88c0477c2`,
+- **hosted SharedProfile common-fit v1.1 inside the same canonical Prediction V1 path**, with accepted-member Personal taste read through an aggregate-only boundary, sparse shrinkage toward `ColdStartPrior`, consensus/minimum-member behavior and disagreement penalty.
 
 A bootstrap/resurfacing integration bug discovered by real-data acceptance is fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
 
-Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets a `Profile`; recommendable content remains `Item`. Personal evidence is never copied into Shared history. Shared common-fit (#177) may read authorized accepted members' Personal taste through the Prediction boundary.
+Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` targets a `Profile`; recommendable content remains `Item`. Personal evidence is never copied into Shared history. Shared common-fit reads authorized accepted members' Personal taste through the Prediction boundary and stores only aggregate fit components in the Shared Prediction trace.
 
 ## Acceptance truth
 
@@ -55,7 +56,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - #174 reacted-Item resurfacing policy.
 - #175 / `MVP-NAV-004` bottom SharedProfile quick switcher on configured Android.
 
-### Implemented/hosted/main but configured-device acceptance still open
+### Implemented/hosted/main or branch but configured-device acceptance still open
 
 - #102 Profile-scoped Lists.
 - Sprint 012/#138 Profile messaging.
@@ -64,6 +65,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - #182 first real 30+30 catalog + mock retirement hosted/merged through #192; device acceptance and provider enrichment still open.
 - #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
 - #191 no-import cold-start profiling backend + mobile gate is hosted and merged to `main`; configured-device acceptance remains open.
+- #177 SharedProfile common-fit v1.1 is implemented/hosted on `feat/177-shared-common-fit-v1`; repository merge and configured-Android acceptance remain open.
 
 ## Sprint 014 — ACTIVE
 
@@ -172,22 +174,56 @@ Hosted acceptance already proved:
 - 12-card candidate slate is deterministic and remains the prefix of the 24-card extension,
 - current curated candidates are inspectably recognition-prior only (`trend=0`),
 - controlled six-rating calibration executes without native calibration Events and rollback leaves zero active test rows,
-- PR #191 final-head lint/typecheck/tests/iOS+Android bundle smoke passed before merge,
-- merged-main validate passed on CI #324.
+- #191 final-head lint/typecheck/tests/iOS+Android bundle smoke passed before merge,
+- merged-main validate passed.
 
 **Next 14B target:** configured-device real-card + Settings/CSV + no-import profiling acceptance from the merged main APK. #185 remains open until both import and no-import paths are accepted.
 
-### 14C — #177 SharedProfile common-fit
+### 14C — #177 SharedProfile common-fit — IMPLEMENTED/HOSTED, REPO + DEVICE GATES OPEN
 
-After useful Personal evidence exists, extend the existing Prediction V1 path so SharedProfile ranking can combine:
+Current `shared-common-fit-v1.1` extends the same Prediction V1 candidate pool, score and trace. It does not create a second Shared recommender.
 
-- neutral `ColdStartPrior` while Shared joint evidence is sparse,
-- Shared joint evidence,
-- authorized accepted-member PersonalProfile fit (including bootstrap-derived LongTerm taste),
-- inspectable minimum-member/consensus behavior,
-- disagreement penalty.
+Inputs and behavior:
 
-The Prediction target remains the SharedProfile. Personal Events/bootstrap history are read through the authorized scoring boundary and are not copied into Shared history. New SharedProfiles may shrink toward the non-personal catalog prior plus accepted-member fit; this is not PopulationMemory and not a second recommender.
+- target remains SharedProfile,
+- sparse/new SharedProfile receives a small neutral non-personal `ColdStartPrior` component,
+- accepted members are resolved from `profile_members`; each member contributes only through their canonical PersonalProfile memory summary,
+- member fit combines LongTerm taste with native ShortTerm state; imported/calibration evidence can influence LongTerm but is never copied into Shared history,
+- sparse member evidence shrinks toward the neutral prior,
+- aggregate mean/minimum member fit above the neutral prior can add score,
+- common agreement receives a consensus bonus,
+- member-fit range creates a disagreement penalty,
+- neutral prior weight decays as direct SharedProfile evidence accumulates,
+- existing Shared joint state and same-Profile ScenarioMemory remain first-class V1 inputs,
+- PersonalProfile ranking is unchanged: common-fit is explicit no-op and old Personal policy version remains,
+- Shared trace policy version is `scenario-memory-v1+resurfacing-v1+shared-common-fit-v1.1`,
+- candidate explanation is aggregate-only and does not expose member identifiers, PersonalProfile IDs or raw histories,
+- private common-fit helpers are not executable by authenticated/anon users; mobile still uses `public.rank_items_v1`.
+
+Hosted migrations/fixes:
+
+- `20260905113000_shared_common_fit_v1.sql`,
+- `20260905114500_harden_shared_common_fit_v1_1.sql`,
+- `20260905115500_fix_shared_common_fit_personal_policy.sql`.
+
+Hosted acceptance:
+
+- agreement control contribution **+4.088**,
+- sparse control prior-only contribution **+0.0675**,
+- disagreement control contribution **−2.5945** with **2.5** disagreement penalty,
+- real two-member SharedProfile run persisted `shared-common-fit-v1.1` in the canonical V1 trace,
+- item-level disagreement and consensus components were visible in aggregate explanation,
+- no User ID / PersonalProfile ID leakage in explanations,
+- PersonalProfile control: `applicable=false`, contribution `0`, original policy version preserved,
+- 10-result Shared hosted smoke around **136 ms** in current development environment,
+- all tagged #177 test PredictionRuns/candidates cleaned to zero residue,
+- advisor pass introduced no new #177 WARN-level finding; existing leaked-password WARN remains #160/#184 scope.
+
+Remaining:
+
+- PR/CI/merge to `main`,
+- configured Android SharedProfile acceptance with real Items and persisted V1 trace,
+- then complete `MVP-PRED-005` and close #177.
 
 ### 14D — #186 external beta
 
@@ -211,20 +247,21 @@ Required before store submission:
 provider/catalog ColdStartPrior (only while sparse)
 + Native Events + imported/calibration Personal bootstrap evidence
   -> Working / Short / Long state
-  -> Prediction V1 + same-Profile ScenarioMemory
+  -> Personal Prediction V1 / Shared Prediction V1 common-fit aggregation
+  -> same-Profile ScenarioMemory
   -> reacted/resurfacing + generic Item discoverability
   -> immutable PredictionRun/Candidate trace
   -> frozen Challenger shadows + mature evaluation
   -> manual Profile canary / rollback
 ```
 
-Imported/calibration history affects LongTerm only. Automatic production genome promotion remains disabled in MVP 0.1. Kajo-derived cross-Profile trend remains future PopulationMemory until privacy/cohort gates exist.
+Imported/calibration history affects Personal LongTerm only. Shared common-fit reads authorized Personal memory summaries but never copies their evidence. Automatic production genome promotion remains disabled in MVP 0.1. Kajo-derived cross-Profile trend remains future PopulationMemory until privacy/cohort gates exist.
 
 ## Current ordered work
 
-1. **Configured-device real-content + Settings/CSV import + no-import profiling acceptance from merged main; then close the remaining #185 / `MVP-BOOT-001..004` gates that pass.**
-2. **#177 SharedProfile common-fit using neutral ColdStartPrior + authorized member Personal taste.**
-3. Expand #182 catalog with TMDB/Open Library covers/posters/metadata and device-confirm real delivery before beta.
+1. **Finish #177 repository PR/CI/merge.**
+2. **Run configured-device acceptance covering real-content delivery + Settings/CSV import + no-import profiling + Shared common-fit.**
+3. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
 4. Close deferred #102/#138/Room/shell device gates required for beta.
 5. **#186 roughly 10-person external beta acceptance.**
 6. **Sprint 015 — production auth/security/signing/store release.**
@@ -236,7 +273,8 @@ Imported/calibration history affects LongTerm only. Automatic production genome 
 - One canonical implementation per capability.
 - Provider imports normalize into generic Items/bootstrap evidence.
 - `ColdStartPrior` is a sparse-evidence Item prior, not a second recommender or PopulationMemory shortcut.
-- Personal evidence remains Personal; Shared common-fit reads it rather than copying it.
+- Personal evidence remains Personal; Shared common-fit reads authorized memory summaries rather than copying evidence.
+- Shared common-fit explanation stays aggregate-only; do not expose member raw history.
 - Deployed migrations are immutable; fixes are ordered forward migrations.
 - `STATUS.md` = current truth, sprint docs = execution/history, `ROADMAP.md` = planned sequence.
 
@@ -255,10 +293,13 @@ Imported/calibration history affects LongTerm only. Automatic production genome 
 - `/supabase/migrations/20260905003000_seed_curated_beta_catalog.sql`
 - `/supabase/migrations/20260905003500_fix_resurfacing_null_bootstrap.sql`
 - `/supabase/migrations/20260905010000_profile_cold_start_calibration.sql`
+- `/supabase/migrations/20260905113000_shared_common_fit_v1.sql`
+- `/supabase/migrations/20260905114500_harden_shared_common_fit_v1_1.sql`
+- `/supabase/migrations/20260905115500_fix_shared_common_fit_personal_policy.sql`
 - `/supabase/functions/catalog-import/index.ts`
 
 ## Handoff
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **configured-device real-content/import/cold-start profiling acceptance from merged main, then #177 Shared common-fit**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
+Immediate target: **finish #177 PR/CI/merge, then configured-device real-content/import/cold-start/Shared-common-fit acceptance**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, expose member raw evidence, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
