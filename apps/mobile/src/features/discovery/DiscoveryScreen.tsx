@@ -17,6 +17,7 @@ import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
+import { getDiscoveryImageUrl } from './catalogImageUrl';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -420,7 +421,10 @@ function ItemCard({
           <>
             <Image
               accessibilityIgnoresInvertColors
-              source={{ uri: item.imageUrl, cache: 'force-cache' }}
+              source={{
+                uri: getDiscoveryImageUrl(item.imageUrl),
+                cache: 'force-cache',
+              }}
               resizeMode="cover"
               fadeDuration={120}
               style={styles.coverImage}
