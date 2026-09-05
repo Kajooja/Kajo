@@ -39,7 +39,7 @@ Kajo already has:
 - PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports,
 - hosted `cold-start-v1` PersonalProfile profiling backend with versioned `cold-start-prior-v1` and bounded 6-of-12-to-24 contract,
 - #191 cold-start merged to `main` at `0cfa9e73d14f66e309bae937d66124b88c0477c2`,
-- **hosted SharedProfile common-fit v1.1 inside the same canonical Prediction V1 path**, with accepted-member Personal taste read through an aggregate-only boundary, sparse shrinkage toward `ColdStartPrior`, consensus/minimum-member behavior and disagreement penalty.
+- **SharedProfile common-fit v1.1 hosted and merged to `main` through PR #194 at `5e1dc9cc993887ab19b943ac0f2a5943d53aa908`**, inside the same canonical Prediction V1 path with accepted-member Personal taste read through an aggregate-only boundary, sparse shrinkage toward `ColdStartPrior`, consensus/minimum-member behavior and disagreement penalty.
 
 A bootstrap/resurfacing integration bug discovered by real-data acceptance is fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
 
@@ -56,7 +56,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - #174 reacted-Item resurfacing policy.
 - #175 / `MVP-NAV-004` bottom SharedProfile quick switcher on configured Android.
 
-### Implemented/hosted/main or branch but configured-device acceptance still open
+### Implemented/hosted/main but configured-device acceptance still open
 
 - #102 Profile-scoped Lists.
 - Sprint 012/#138 Profile messaging.
@@ -65,7 +65,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - #182 first real 30+30 catalog + mock retirement hosted/merged through #192; device acceptance and provider enrichment still open.
 - #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
 - #191 no-import cold-start profiling backend + mobile gate is hosted and merged to `main`; configured-device acceptance remains open.
-- #177 SharedProfile common-fit v1.1 is implemented/hosted on `feat/177-shared-common-fit-v1`; repository merge and configured-Android acceptance remain open.
+- #177 SharedProfile common-fit v1.1 is hosted and merged to `main` through #194; configured-Android acceptance remains open.
 
 ## Sprint 014 — ACTIVE
 
@@ -179,7 +179,7 @@ Hosted acceptance already proved:
 
 **Next 14B target:** configured-device real-card + Settings/CSV + no-import profiling acceptance from the merged main APK. #185 remains open until both import and no-import paths are accepted.
 
-### 14C — #177 SharedProfile common-fit — IMPLEMENTED/HOSTED, REPO + DEVICE GATES OPEN
+### 14C — #177 SharedProfile common-fit — HOSTED/MAIN, DEVICE GATE OPEN
 
 Current `shared-common-fit-v1.1` extends the same Prediction V1 candidate pool, score and trace. It does not create a second Shared recommender.
 
@@ -206,7 +206,7 @@ Hosted migrations/fixes:
 - `20260905114500_harden_shared_common_fit_v1_1.sql`,
 - `20260905115500_fix_shared_common_fit_personal_policy.sql`.
 
-Hosted acceptance:
+Hosted/repository acceptance:
 
 - agreement control contribution **+4.088**,
 - sparse control prior-only contribution **+0.0675**,
@@ -217,11 +217,12 @@ Hosted acceptance:
 - PersonalProfile control: `applicable=false`, contribution `0`, original policy version preserved,
 - 10-result Shared hosted smoke around **136 ms** in current development environment,
 - all tagged #177 test PredictionRuns/candidates cleaned to zero residue,
-- advisor pass introduced no new #177 WARN-level finding; existing leaked-password WARN remains #160/#184 scope.
+- advisor pass introduced no new #177 WARN-level finding; existing leaked-password WARN remains #160/#184 scope,
+- PR #194 final-head CI #327 passed lint, TypeScript, tests and iOS/Android bundle smoke,
+- PR #194 squash-merged to `main` at `5e1dc9cc993887ab19b943ac0f2a5943d53aa908`.
 
 Remaining:
 
-- PR/CI/merge to `main`,
 - configured Android SharedProfile acceptance with real Items and persisted V1 trace,
 - then complete `MVP-PRED-005` and close #177.
 
@@ -259,13 +260,12 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 
 ## Current ordered work
 
-1. **Finish #177 repository PR/CI/merge.**
-2. **Run configured-device acceptance covering real-content delivery + Settings/CSV import + no-import profiling + Shared common-fit.**
-3. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
-4. Close deferred #102/#138/Room/shell device gates required for beta.
-5. **#186 roughly 10-person external beta acceptance.**
-6. **Sprint 015 — production auth/security/signing/store release.**
-7. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
+1. **Run configured-device acceptance covering real-content delivery + Settings/CSV import + no-import profiling + Shared common-fit.**
+2. Expand #182 catalog with TMDB/Open Library covers/posters/metadata before beta.
+3. Close deferred #102/#138/Room/shell device gates required for beta.
+4. **#186 roughly 10-person external beta acceptance.**
+5. **Sprint 015 — production auth/security/signing/store release.**
+6. Mark MVP 0.1 complete only after the installed store build is accepted by the product owner.
 
 ## Repository hygiene
 
@@ -302,4 +302,4 @@ Imported/calibration history affects Personal LongTerm only. Shared common-fit r
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **finish #177 PR/CI/merge, then configured-device real-content/import/cold-start/Shared-common-fit acceptance**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, expose member raw evidence, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
+Immediate target: **configured-device real-content/import/cold-start/Shared-common-fit acceptance from merged main**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, expose member raw evidence, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
