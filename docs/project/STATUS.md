@@ -37,7 +37,8 @@ Kajo already has:
 - hosted PersonalProfile bootstrap-evidence foundation for imported viewing/reading history,
 - Letterboxd/IMDb/Goodreads/StoryGraph/generic-CSV normalization,
 - PersonalProfile-only Settings import workflow with reviewable ambiguous matches and removable persisted imports,
-- hosted `cold-start-v1` PersonalProfile profiling backend with versioned `cold-start-prior-v1` and bounded 6-of-12-to-24 contract.
+- hosted `cold-start-v1` PersonalProfile profiling backend with versioned `cold-start-prior-v1` and bounded 6-of-12-to-24 contract,
+- **PR #191 merged to `main` at `0cfa9e73d14f66e309bae937d66124b88c0477c2`; final-head PR CI and main validate both passed**.
 
 A bootstrap/resurfacing integration bug discovered by real-data acceptance is fixed forward: missing bootstrap evidence had propagated SQL NULL into boolean state and incorrectly classified untouched Items as `SAVED_SUPPRESSED`, causing hosted V1 to return no delivery and mobile to fall back to mocks. Untouched real Items now classify `ORDINARY/eligible=true`.
 
@@ -54,7 +55,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - #174 reacted-Item resurfacing policy.
 - #175 / `MVP-NAV-004` bottom SharedProfile quick switcher on configured Android.
 
-### Implemented/hosted but configured-device acceptance still open
+### Implemented/hosted/main but configured-device acceptance still open
 
 - #102 Profile-scoped Lists.
 - Sprint 012/#138 Profile messaging.
@@ -62,7 +63,7 @@ Core architecture remains generic: `User` acts inside a `Profile`; `Prediction` 
 - latest shell/bootstrap visual polish.
 - #182 first real 30+30 catalog + mock retirement hosted/merged through #192; device acceptance and provider enrichment still open.
 - #185 PersonalProfile history import backend/parser/Settings slice; device acceptance open.
-- PR #191 rebuilt on current `main`: no-import cold-start profiling backend is hosted and mobile gate is implemented; final CI/merge and configured-device acceptance remain open.
+- #191 no-import cold-start profiling backend + mobile gate is hosted and merged to `main`; configured-device acceptance remains open.
 
 ## Sprint 014 — ACTIVE
 
@@ -92,7 +93,7 @@ Still required:
 - expand beyond the bounded first seed with TMDB/Open Library,
 - beta-scale coverage/dedup/metadata review.
 
-### 14B — #185 PersonalProfile bootstrap/import + no-import profiling — HOSTED, FINAL CI + DEVICE GATES OPEN
+### 14B — #185 PersonalProfile bootstrap/import + no-import profiling — HOSTED/MAIN, DEVICE GATES OPEN
 
 Hosted import migrations:
 
@@ -144,7 +145,7 @@ No-import `cold-start-v1` contract:
 3. explicit recognition-only fallback for the first curated beta seed,
 4. weak freshness component.
 
-Curated Items deliberately report `trend=0` and `KAJO_CURATED_RECOGNITION`; no fake live trend is created. Kajo-wide aggregate user trend is not MVP `ColdStartPrior`; it belongs to later privacy-gated `PopulationMemory`. Provider aggregate trend/popularity can be added without changing the UI/contract.
+Curated Items deliberately report `trend=0` and `KAJO_CURATED_RECOGNITION`; no fake live trend is created. Kajo-wide aggregate user trend is not MVP `ColdStartPrior`; it belongs to later privacy-gated `PopulationMemory`. TMDB metadata already normalizes provider `popularity` and `voteCount` into generic Item metadata, so real provider imports can feed this prior without a second recommender or mobile change.
 
 Mobile Settings/import:
 
@@ -170,9 +171,11 @@ Hosted acceptance already proved:
 - profiling status sees 30 real movies + 30 real books without requiring images,
 - 12-card candidate slate is deterministic and remains the prefix of the 24-card extension,
 - current curated candidates are inspectably recognition-prior only (`trend=0`),
-- controlled six-rating calibration executes without native calibration Events and rollback leaves zero active test rows.
+- controlled six-rating calibration executes without native calibration Events and rollback leaves zero active test rows,
+- PR #191 final-head lint/typecheck/tests/iOS+Android bundle smoke passed before merge,
+- merged-main validate passed on CI #324.
 
-**Next 14B target:** final-head PR #191 CI/merge, then configured-device real-card + Settings/CSV + no-import profiling acceptance. #185 remains open until both import and no-import paths are accepted.
+**Next 14B target:** configured-device real-card + Settings/CSV + no-import profiling acceptance from the merged main APK. #185 remains open until both import and no-import paths are accepted.
 
 ### 14C — #177 SharedProfile common-fit
 
@@ -219,7 +222,7 @@ Imported/calibration history affects LongTerm only. Automatic production genome 
 
 ## Current ordered work
 
-1. **Finalize PR #191: CI -> merge -> configured-device import + no-import profiling acceptance.**
+1. **Configured-device real-content + Settings/CSV import + no-import profiling acceptance from merged main; then close the remaining #185 / `MVP-BOOT-001..004` gates that pass.**
 2. **#177 SharedProfile common-fit using neutral ColdStartPrior + authorized member Personal taste.**
 3. Expand #182 catalog with TMDB/Open Library covers/posters/metadata and device-confirm real delivery before beta.
 4. Close deferred #102/#138/Room/shell device gates required for beta.
@@ -258,4 +261,4 @@ Imported/calibration history affects LongTerm only. Automatic production genome 
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **finish PR #191 CI/merge and configured-device real-content/import/cold-start profiling acceptance, then #177 Shared common-fit**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
+Immediate target: **configured-device real-content/import/cold-start profiling acceptance from merged main, then #177 Shared common-fit**. Do not copy Personal history into Shared history, delete historical mock Items, build a second recommender, treat curated recognition as live trend, bypass PopulationMemory privacy gates, or begin monetization work.
