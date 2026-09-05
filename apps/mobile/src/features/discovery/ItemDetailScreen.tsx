@@ -7,6 +7,7 @@ import {
   Animated,
   Easing,
   FlatList,
+  Image,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   Pressable,
@@ -72,6 +73,7 @@ import {
 } from './sharedEndorsement';
 
 const RATING_COMMIT_FEEDBACK_DURATION_MS = 500;
+const COLLAPSED_TAG_COUNT = 2;
 
 function buildEligibleSwipeSequence(
   selectedItem: Item | undefined,
@@ -333,7 +335,10 @@ function ItemDetailContent({
       }
     });
 
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion,
+    );
 
     return () => {
       active = false;
@@ -430,7 +435,10 @@ function ItemDetailContent({
         itemId: item.id,
       });
     }
-    if (interaction.interest === 'LIKED' && (!systemSaved || interaction.saved)) {
+    if (
+      interaction.interest === 'LIKED' &&
+      (!systemSaved || interaction.saved)
+    ) {
       advanceAfterAction(
         item,
         index,
@@ -448,7 +456,11 @@ function ItemDetailContent({
       item,
       index,
       action,
-      { ...interaction, interest: 'LIKED', ...(systemSaved ? { saved: true } : {}) },
+      {
+        ...interaction,
+        interest: 'LIKED',
+        ...(systemSaved ? { saved: true } : {}),
+      },
       (eventId) => setListLike(item.id, systemSaved, eventId),
       `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`,
       { listId: commit.list.id, listName: commit.list.name },
@@ -473,7 +485,10 @@ function ItemDetailContent({
     if (exitingItemId || endorsingItemId) return;
 
     setEndorsingItemId(item.id);
-    const result = await sharedEndorsements.endorse(item.id, proposedList?.id);
+    const result = await sharedEndorsements.endorse(
+      item.id,
+      proposedList?.id,
+    );
     setEndorsingItemId(null);
 
     if (result.status === 'error') {
@@ -684,7 +699,9 @@ function ItemDetailContent({
     }
     setRatingConfirmation(null);
 
-    const targetIndex = items.findIndex((item) => item.id === undoTargetItemId);
+    const targetIndex = items.findIndex(
+      (item) => item.id === undoTargetItemId,
+    );
     const result = undo();
 
     if (!result) {
@@ -713,7 +730,10 @@ function ItemDetailContent({
     setFeedback(ITEM_INTERACTION_LABELS.undoFeedback);
 
     if (targetIndex >= 0) {
-      listRef.current?.scrollToIndex({ index: targetIndex, animated: false });
+      listRef.current?.scrollToIndex({
+        index: targetIndex,
+        animated: false,
+      });
       return;
     }
 
@@ -746,7 +766,10 @@ function ItemDetailContent({
           pointerEvents="none"
           style={[
             styles.ambientBackdrop,
-            { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+            {
+              backgroundColor: theme.ambient.wash,
+              opacity: theme.ambient.washOpacity * 1.35,
+            },
           ]}
         />
         <View style={styles.missing}>
@@ -755,7 +778,10 @@ function ItemDetailContent({
             accessibilityRole="button"
             accessibilityLabel="Back to discovery"
             onPress={() => router.back()}
-            style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.primaryButtonText}>Takaisin</Text>
           </Pressable>
@@ -771,7 +797,10 @@ function ItemDetailContent({
         pointerEvents="none"
         style={[
           styles.ambientBackdrop,
-          { backgroundColor: theme.ambient.wash, opacity: theme.ambient.washOpacity * 1.35 },
+          {
+            backgroundColor: theme.ambient.wash,
+            opacity: theme.ambient.washOpacity * 1.35,
+          },
         ]}
       />
 
@@ -781,7 +810,10 @@ function ItemDetailContent({
           accessibilityLabel="Back to discovery"
           onPress={() => router.back()}
           hitSlop={10}
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && styles.pressed,
+          ]}
         >
           <Text style={styles.backText}>← Discovery</Text>
         </Pressable>
@@ -790,7 +822,9 @@ function ItemDetailContent({
             accessibilityRole="button"
             accessibilityLabel={ITEM_INTERACTION_LABELS.undo}
             accessibilityHint="Palauttaa viimeisimmän valinnan ja sen edellisen kortin"
-            accessibilityState={{ disabled: !canUndo || Boolean(exitingItemId) }}
+            accessibilityState={{
+              disabled: !canUndo || Boolean(exitingItemId),
+            }}
             disabled={!canUndo || Boolean(exitingItemId)}
             onPress={handleUndo}
             hitSlop={8}
@@ -800,16 +834,23 @@ function ItemDetailContent({
               pressed && styles.pressed,
             ]}
           >
-            <Text style={styles.undoText}>↶ {ITEM_INTERACTION_LABELS.undo}</Text>
+            <Text style={styles.undoText}>
+              ↶ {ITEM_INTERACTION_LABELS.undo}
+            </Text>
           </Pressable>
-          {items.length > 1 ? <Text style={styles.swipeHint}>Pyyhkäise →</Text> : null}
+          {items.length > 1 ? (
+            <Text style={styles.swipeHint}>Pyyhkäise →</Text>
+          ) : null}
         </View>
       </View>
 
       <View style={styles.feedbackRow}>
         <InteractionPersistenceNotice theme={theme} />
         {feedback ? (
-          <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>
+          <Text
+            accessibilityLiveRegion="polite"
+            style={styles.feedbackText}
+          >
             {feedback}
           </Text>
         ) : null}
@@ -819,11 +860,17 @@ function ItemDetailContent({
             accessibilityLabel="Retry shared choices"
             onPress={sharedEndorsements.retry}
           >
-            <Text style={styles.feedbackText}>{sharedEndorsements.error}</Text>
+            <Text style={styles.feedbackText}>
+              {sharedEndorsements.error}
+            </Text>
           </Pressable>
         ) : null}
-        {activeSharedMembership && sharedEndorsements.status === 'loading' ? (
-          <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>
+        {activeSharedMembership &&
+        sharedEndorsements.status === 'loading' ? (
+          <Text
+            accessibilityLiveRegion="polite"
+            style={styles.feedbackText}
+          >
             Yhteisiä valintoja päivitetään…
           </Text>
         ) : null}
@@ -837,7 +884,11 @@ function ItemDetailContent({
         scrollEnabled={!exitingItemId}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
         onMomentumScrollEnd={handleSequenceScrollEnd}
         renderItem={({ item, index }) => {
           const interaction = getItemInteraction(interactions, item.id);
@@ -871,7 +922,10 @@ function ItemDetailContent({
                     {
                       translateX: exitAnimation.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [0, -Math.min(width * 0.18, 72)],
+                        outputRange: [
+                          0,
+                          -Math.min(width * 0.18, 72),
+                        ],
                       }),
                     },
                     {
@@ -892,7 +946,8 @@ function ItemDetailContent({
                 styles={styles}
                 disabled={Boolean(exitingItemId || endorsingItemId)}
                 listActionHidden={Boolean(
-                  sharedState?.currentActorEndorsed || sharedState?.consensusSaved,
+                  sharedState?.currentActorEndorsed ||
+                    sharedState?.consensusSaved,
                 )}
                 pendingApprovalLabel={pendingApprovalLabel}
                 sharedProvenance={memberHistoryProvenance}
@@ -902,13 +957,20 @@ function ItemDetailContent({
                     : null
                 }
                 {...(pendingListApproval
-                  ? { onApprove: () => void handleEndorsement(item, index) }
+                  ? {
+                      onApprove: () =>
+                        void handleEndorsement(item, index),
+                    }
                   : {})}
-                onRating={(rating) => handleRating(item, index, interaction, rating)}
+                onRating={(rating) =>
+                  handleRating(item, index, interaction, rating)
+                }
                 onNotInterested={() =>
                   handleNotInterested(item, index, interaction)
                 }
-                onOpenLists={() => openListPicker(item, index, interaction)}
+                onOpenLists={() =>
+                  openListPicker(item, index, interaction)
+                }
               />
             </Animated.View>
           );
@@ -961,13 +1023,19 @@ function SwipeItemPage({
 }: SwipeItemPageProps) {
   const consumedLabels = getConsumedItemLabels(item.itemType);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [tagsExpanded, setTagsExpanded] = useState(false);
+  const tags = item.tags ?? [];
+  const visibleTags = tagsExpanded
+    ? tags
+    : tags.slice(0, COLLAPSED_TAG_COUNT);
+  const contentExpanded = descriptionExpanded || tagsExpanded;
 
   return (
     <ScrollView
       style={{ width: pageWidth }}
       contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={descriptionExpanded}
+      showsVerticalScrollIndicator={contentExpanded}
+      scrollEnabled={contentExpanded}
     >
       {pendingApprovalLabel && onApprove ? (
         <View style={styles.approvalBanner}>
@@ -998,10 +1066,29 @@ function SwipeItemPage({
           },
         ]}
       >
-        <View
-          pointerEvents="none"
-          style={[styles.heroLight, { backgroundColor: theme.ambient.windowLight }]}
-        />
+        {item.imageUrl ? (
+          <>
+            <Image
+              accessibilityIgnoresInvertColors
+              source={{ uri: item.imageUrl, cache: 'force-cache' }}
+              resizeMode="cover"
+              fadeDuration={120}
+              style={styles.heroImage}
+            />
+            <View
+              pointerEvents="none"
+              style={styles.heroImageShade}
+            />
+          </>
+        ) : (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.heroLight,
+              { backgroundColor: theme.ambient.windowLight },
+            ]}
+          />
+        )}
         <View style={styles.heroStatusRow}>
           {interaction.saved ? (
             <Text style={styles.heroStatus}>
@@ -1011,36 +1098,72 @@ function SwipeItemPage({
             <View />
           )}
           {interaction.rating !== null ? (
-            <Text style={styles.heroStatus}>ARVOSANA {interaction.rating}/10</Text>
+            <Text style={styles.heroStatus}>
+              ARVOSANA {interaction.rating}/10
+            </Text>
           ) : interaction.notInterested ? (
             <Text style={styles.heroStatus}>EI KIINNOSTA</Text>
           ) : interaction.consumed ? (
             <Text style={styles.heroStatus}>{consumedLabels.status}</Text>
           ) : null}
         </View>
-        <Text style={styles.typeLabel}>{item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
-        <Text style={styles.heroTitle}>{item.title}</Text>
+        <Text style={styles.typeLabel}>
+          {item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}
+        </Text>
+        <Text numberOfLines={3} style={styles.heroTitle}>
+          {item.title}
+        </Text>
       </View>
 
-      <Text style={styles.title}>{item.title}</Text>
+      <Text numberOfLines={2} style={styles.title}>
+        {item.title}
+      </Text>
 
-      {item.tags?.length ? (
-        <View style={styles.tags} accessibilityLabel="Item tags">
-          {item.tags.map((tag) => (
+      {tags.length ? (
+        <View
+          style={[
+            styles.tags,
+            !tagsExpanded && styles.tagsCollapsed,
+          ]}
+          accessibilityLabel="Item tags"
+        >
+          {visibleTags.map((tag) => (
             <View key={tag} style={styles.tag}>
-              <Text style={styles.tagText}>{tag}</Text>
+              <Text numberOfLines={1} style={styles.tagText}>
+                {tag}
+              </Text>
             </View>
           ))}
+          {tags.length > COLLAPSED_TAG_COUNT ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                tagsExpanded ? 'Tiivistä tagit' : 'Näytä kaikki tagit'
+              }
+              onPress={() => setTagsExpanded((current) => !current)}
+              style={({ pressed }) => [
+                styles.tagMore,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.tagMoreText}>
+                {tagsExpanded ? 'Vähemmän' : '…'}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
 
       {sharedProvenance ? (
-        <Text style={styles.endorsementProvenance}>
+        <Text numberOfLines={1} style={styles.endorsementProvenance}>
           {sharedProvenance}
         </Text>
       ) : null}
 
-      <View style={styles.feedbackDrawer} accessibilityLabel="Arvioi kohde">
+      <View
+        style={styles.feedbackDrawer}
+        accessibilityLabel="Arvioi kohde"
+      >
         <RatingControl
           key={`${item.id}:${interaction.rating ?? 'unrated'}`}
           rating={interaction.rating}
@@ -1084,16 +1207,17 @@ function SwipeItemPage({
       {item.description ? (
         <View style={styles.descriptionBlock}>
           <Pressable
-            accessibilityRole={descriptionExpanded ? undefined : 'button'}
+            accessibilityRole="button"
             accessibilityLabel={
-              descriptionExpanded ? undefined : 'Laajenna kuvaus'
+              descriptionExpanded ? 'Tiivistä kuvaus' : 'Laajenna kuvaus'
             }
-            disabled={descriptionExpanded}
-            onPress={() => setDescriptionExpanded(true)}
+            onPress={() =>
+              setDescriptionExpanded((current) => !current)
+            }
           >
             <Text
               ellipsizeMode="tail"
-              numberOfLines={descriptionExpanded ? undefined : 3}
+              numberOfLines={descriptionExpanded ? undefined : 2}
               style={styles.description}
             >
               {item.description}
@@ -1109,7 +1233,9 @@ function SwipeItemPage({
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.collapseDescriptionText}>Näytä vähemmän</Text>
+              <Text style={styles.collapseDescriptionText}>
+                Näytä vähemmän
+              </Text>
             </Pressable>
           ) : null}
         </View>
@@ -1127,7 +1253,14 @@ interface ActionButtonProps {
   onPress: () => void;
 }
 
-function ActionButton({ label, active, disabled, theme, styles, onPress }: ActionButtonProps) {
+function ActionButton({
+  label,
+  active,
+  disabled,
+  theme,
+  styles,
+  onPress,
+}: ActionButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -1145,7 +1278,12 @@ function ActionButton({ label, active, disabled, theme, styles, onPress }: Actio
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.actionText, active && styles.actionTextActive]}>
+      <Text
+        style={[
+          styles.actionText,
+          active && styles.actionTextActive,
+        ]}
+      >
         {active ? `✓ ${label}` : label}
       </Text>
     </Pressable>
@@ -1248,13 +1386,20 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '800',
     },
     hero: {
-      minHeight: 235,
+      minHeight: 200,
       borderRadius: 24,
       borderWidth: 1,
       overflow: 'hidden',
-      padding: 22,
+      padding: 18,
       justifyContent: 'flex-end',
-      marginBottom: 14,
+      marginBottom: 10,
+    },
+    heroImage: {
+      ...StyleSheet.absoluteFill,
+    },
+    heroImageShade: {
+      ...StyleSheet.absoluteFill,
+      backgroundColor: 'rgba(0, 0, 0, 0.34)',
     },
     heroLight: {
       ...StyleSheet.absoluteFill,
@@ -1262,9 +1407,9 @@ function createStyles(theme: RoomTheme) {
     },
     heroStatusRow: {
       position: 'absolute',
-      top: 18,
-      left: 18,
-      right: 18,
+      top: 14,
+      left: 14,
+      right: 14,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -1274,39 +1419,48 @@ function createStyles(theme: RoomTheme) {
       fontSize: 10,
       fontWeight: '700',
       letterSpacing: 1,
+      textShadowColor: 'rgba(0, 0, 0, 0.76)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
     },
     typeLabel: {
       color: theme.base.textPrimary,
       fontSize: 10,
       fontWeight: '700',
       letterSpacing: 1.6,
-      marginBottom: 8,
+      marginBottom: 6,
+      textShadowColor: 'rgba(0, 0, 0, 0.76)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
     },
     heroTitle: {
       color: theme.base.textPrimary,
-      fontSize: 34,
-      lineHeight: 38,
+      fontSize: 29,
+      lineHeight: 33,
       fontWeight: '700',
+      textShadowColor: 'rgba(0, 0, 0, 0.76)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 4,
     },
     title: {
       color: theme.base.textPrimary,
-      fontSize: 27,
-      lineHeight: 32,
+      fontSize: 24,
+      lineHeight: 28,
       fontWeight: '600',
     },
     description: {
       color: theme.base.textMuted,
-      fontSize: 14,
-      lineHeight: 20,
+      fontSize: 13,
+      lineHeight: 18,
     },
     descriptionBlock: {
-      marginTop: 14,
+      marginTop: 10,
     },
     collapseDescription: {
       alignSelf: 'flex-start',
-      minHeight: 36,
+      minHeight: 32,
       justifyContent: 'center',
-      marginTop: 4,
+      marginTop: 2,
     },
     collapseDescriptionText: {
       color: theme.ambient.curtainHighlight,
@@ -1316,41 +1470,62 @@ function createStyles(theme: RoomTheme) {
     tags: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
-      marginTop: 12,
+      alignItems: 'center',
+      gap: 6,
+      marginTop: 8,
+    },
+    tagsCollapsed: {
+      flexWrap: 'nowrap',
+      overflow: 'hidden',
     },
     tag: {
-      borderRadius: 16,
+      maxWidth: '42%',
+      borderRadius: 14,
       borderWidth: 1,
       borderColor: theme.base.border,
       backgroundColor: theme.surface.floor,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
+      paddingHorizontal: 9,
+      paddingVertical: 5,
     },
     tagText: {
       color: theme.base.textMuted,
-      fontSize: 12,
+      fontSize: 11,
+    },
+    tagMore: {
+      minWidth: 30,
+      minHeight: 28,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: theme.base.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 8,
+    },
+    tagMoreText: {
+      color: theme.ambient.curtainHighlight,
+      fontSize: 13,
+      fontWeight: '800',
     },
     actions: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       alignItems: 'center',
-      gap: 10,
+      gap: 8,
     },
     feedbackDrawer: {
-      marginTop: 8,
-      gap: 8,
+      marginTop: 6,
+      gap: 6,
     },
     endorsementProvenance: {
       color: theme.ambient.curtainHighlight,
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: '700',
-      marginTop: 12,
+      marginTop: 8,
     },
     actionButton: {
       flexGrow: 1,
       flexBasis: '30%',
-      minHeight: 42,
+      minHeight: 40,
       borderRadius: 18,
       borderWidth: 1,
       borderColor: theme.base.border,
