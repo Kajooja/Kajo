@@ -13,6 +13,7 @@
     "typecheck": "npm run typecheck --workspace @kajo/mobile",
     "test:mobile": "npm run test --workspace @kajo/mobile",
     "test:catalog": "node --test scripts/catalog/*.test.mjs",
+    "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
     "test": "npm run test:mobile && npm run test:catalog",
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke"
