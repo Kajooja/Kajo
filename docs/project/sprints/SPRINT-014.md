@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A BOOK BETA COVERAGE ON MAIN; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATE OPEN**
+Status: **ACTIVE — 14A BOOK BETA COVERAGE ON MAIN; DEVICE FOLLOW-UP #199 ACTIVE; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATES OPEN**
 
 ## Outcome
 
@@ -8,7 +8,7 @@ Turn Kajo into the first product-complete BOOK/MOVIE version suitable for roughl
 
 Monetization and final public-store hardening are Sprint 015 scope.
 
-## 14A — Real provider-backed catalog — #182
+## 14A — Real provider-backed catalog — #182 / device follow-up #199
 
 Implemented/hosted/main:
 
@@ -33,17 +33,43 @@ Implemented/hosted/main:
 - provider `readinglog_count`/`ratings_count` normalize into generic `popularity`/`voteCount`, so the existing `ColdStartPrior` uses `PROVIDER_POPULARITY` without a provider-specific ranker,
 - `metadata.openLibraryWorkId` mirrors the provider Work ID for repeat-safe admin refresh while private external-ID aliases remain authoritative,
 - repeatable beta tooling is `scripts/catalog/open-library-search-beta.mjs` + `import-open-library-search-beta.mjs`: fixed bucket contract, fi/sv language-preferred editions, Work/title dedup, fail-closed coverage gate, provider-friendly request spacing and writes only through `upsert_catalog_batch_v1`,
-- PR #196 passed final-head lint/typecheck/catalog tests/iOS+Android bundle smoke and squash-merged to `main` at `d3fe79865f855b8b3df5f42ae1027ed006169687`.
+- PR #196 passed final-head lint/typecheck/catalog tests/iOS+Android bundle smoke and squash-merged to `main` at `d3fe79865f855b8b3df5f42ae1027ed006169687`,
+- PR #198 removed initial fallback-to-hosted reorder flash, kept the 600 ms delay only for interaction-driven reranking, virtualized the discovery grid, mounted only near-visible remote images, used Open Library `-M.jpg` grid thumbnails, preserved full detail images, added hero covers/posters, compacted detail metadata and corrected the bottom Profile control contract,
+- main run **#346** passed and produced the configured standalone Android APK used for the 2026-09-06 device follow-up,
+- hosted catalog recheck on 2026-09-06 confirmed **BOOK 415 discoverable / 385 images** and **MOVIE 30 discoverable / 0 images**.
 
 Still open:
 
-- configured-device acceptance that the APK renders real provider titles/covers through the hosted path,
+- configured-device acceptance of #199 dense-grid + warm-image-cache follow-up,
 - configure `TMDB_READ_ACCESS_TOKEN` and expand MOVIE coverage beyond the 30-title seed with real posters/descriptions,
 - enrich BOOK descriptions and stronger ISBN/Edition matching through the monthly Open Library dump path,
 - optional Finnish bibliographic enrichment through Finna while respecting separate cover rights,
 - provider attribution/licensing review before external/store release.
 
 The bounded Search API importer is a beta seed/refresh mechanism, not Kajo's runtime book backend. The monthly Open Library dumps remain the intended large-scale persisted catalog path. Historical mock rows are never deleted because Events/Lists/Prediction traces may reference them.
+
+### Configured-device follow-up 2026-09-06 — #199
+
+The run #346 APK proved that real BOOK covers arrive, but the current presentation/perceived-loading quality is not yet accepted:
+
+- BOOK scrolling still feels image-limited under continuous downward movement,
+- the small image mount window intentionally allowed already-browsed covers to revert to placeholders once outside that window,
+- the two-column surface still reads as separated cards instead of a dense visual browse grid,
+- MOVIE has no posters because hosted canonical MOVIE image metadata is **0/30**, not because the generic mobile image renderer is missing.
+
+#199 is the bounded follow-up and must preserve the existing Prediction/Event/Profile architecture:
+
+- nearly edge-to-edge two-column rectangular tiles,
+- minimal outer margin/gutter and sharp/minimal corners,
+- `cover` image fill across the whole tile,
+- restrained title/creator presentation as an image overlay instead of large text blocks between cards,
+- bounded FlatList virtualization remains,
+- once a discovery image URL is loaded/prefetched during the app session it may stay warm for later rows/revisits; this is UI cache only and must not become Prediction evidence,
+- prefetch farther ahead than the mounted image window without mounting/downloading the whole 415-item catalog at once,
+- add deterministic tests around image-window planning,
+- device acceptance is required before #199 is closed.
+
+Do not solve MOVIE posters by scraping or an unofficial image source. Configure the existing server-side TMDB credential/import path.
 
 ## 14B — PersonalProfile bootstrap/import + no-import profiling — #185
 
@@ -237,27 +263,30 @@ Required flows:
 - Provider aggregate popularity/trend may seed sparse profiles; Kajo-wide aggregate behaviour remains PopulationMemory-gated.
 - Open Library Search beta bootstrap is bounded/cached admin ingestion; the app never uses Open Library Search as its runtime backend.
 - Do not judge common-fit quality on the historical mock catalog.
+- Future contextual discovery List navigation is captured as #200 and catalog title/creator search + generic filters as #201. These are not MVP blockers unless external-beta evidence explicitly promotes them.
 
 ## Dependencies
 
-- #182 configured-device real-card acceptance and **TMDB MOVIE provider expansion** remain required for beta; BOOK beta already has 415 discoverable Items.
+- #182 + #199 configured-device real-card/dense-grid acceptance and **TMDB MOVIE provider expansion** remain required for beta; BOOK beta already has 415 discoverable Items.
 - #102 Lists, #138 messaging and Room/shell refreshed device gates remain before beta acceptance.
 - stable email auth is needed for beta; production SMTP + Google/Apple store auth is finalized through #127/#184 before store release.
-- #160 production security hardening remains release scope unless a blocking beta-safety issue appears.
+- #160 production security hardening remains release scope unless a blocking beta-safety issue appears. Repository/hosted migration parity for `harden_production_function_boundaries` was restored through PR #162; leaked-password protection remains the known release WARN.
 
 ## Acceptance
 
-- [-] `MVP-CAT-001..003`: BOOK beta coverage now has 415 real Items with 385 provider covers; MOVIE remains 30-title seed, configured-device acceptance and provider expansion are open.
+- [-] `MVP-CAT-001..003`: BOOK beta coverage now has 415 real Items with 385 provider covers; MOVIE remains 30-title seed with 0 images, #199 device presentation/cache acceptance and provider expansion are open.
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
 - [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
 - [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
 - [-] `MVP-PRED-005`: Shared common-fit v1.1 implemented/hosted/main; configured-Android acceptance open.
 - [ ] deferred List/messaging/Room device gates relevant to beta accepted.
-- [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation still required.
+- [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation of current product presentation remains open.
 - [ ] import and no-import users both receive useful first-session recommendations on device.
 - [ ] #186 external beta accepted by product owner.
 - [ ] deterministic handoff to Sprint 015.
 
 ## Immediate next action
 
-Run one configured-device acceptance pass covering **real 415-book content + Settings/import + 6-of-12-to-24 cold-start profiling + Shared common-fit** from merged main. After that configure TMDB and expand MOVIE coverage. Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, do not use Open Library Search as a runtime backend, and do not bypass PopulationMemory privacy gates.
+Finish #199, merge only after `npm run check`/CI passes, and build a new configured Android APK. Accept the dense BOOK/MOVIE grid, bounded warm image cache and scroll behavior first. Then run the remaining Settings/import + 6-of-12-to-24 cold-start + Shared common-fit/deferred core device gates. Configure TMDB and expand MOVIE coverage before external beta.
+
+Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, do not use Open Library Search as a runtime backend, do not add unofficial movie-poster scraping, and do not bypass PopulationMemory privacy gates.

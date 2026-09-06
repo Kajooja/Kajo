@@ -17,7 +17,10 @@ import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
-import { getDiscoveryImageUrl } from './catalogImageUrl';
+import {
+  getDiscoveryImagePlan,
+  getDiscoveryImageUrl,
+} from './catalogImageUrl';
 import { useDiscoveryMode } from './DiscoveryModeContext';
 import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
@@ -38,6 +41,10 @@ import {
 } from './sharedEndorsement';
 import { usePredictionRanking } from './usePredictionRanking';
 
+const INITIAL_IMAGE_PREFETCH_COUNT = 14;
+const warmedDiscoveryImageUrls = new Set<string>();
+const prefetchedDiscoveryImageUrls = new Set<string>();
+
 interface DiscoveryScreenProps {
   itemType: ItemType;
   title: string;
@@ -50,7 +57,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const [showConsumed, setShowConsumed] = useState(false);
-  const [imageWindow, setImageWindow] = useState({ first: 0, last: 5 });
+  const [imageWindow, setImageWindow] = useState({ first: 0, last: 7 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const ranking = usePredictionRanking(itemType, mode, interactions);
@@ -81,6 +88,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
   const visibleItems = useRef<readonly Item[]>([]);
+  const itemsRef = useRef<readonly Item[]>(items);
   const impressionContext = useRef<ImpressionContext>({
     mode,
     predictionId,
@@ -98,6 +106,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       recordEvent: eventTracking.recordEvent,
     };
   }, [eventTracking.recordEvent, mode, predictionId, ranking.source, showConsumed]);
+
+  useEffect(() => {
+    itemsRef.current = items;
+    prefetchDiscoveryImages(items.slice(0, INITIAL_IMAGE_PREFETCH_COUNT));
+  }, [items]);
 
   const viewabilityConfig = useMemo(
     () => ({
@@ -117,13 +130,25 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         const indexes = visibleTokens
           .map((token) => token.index)
           .filter((index): index is number => index !== null);
-        const first = Math.max(0, Math.min(...indexes) - 2);
-        const last = Math.max(...indexes) + 4;
-        setImageWindow((current) =>
-          current.first === first && current.last === last
-            ? current
-            : { first, last },
+        const imagePlan = getDiscoveryImagePlan(
+          indexes,
+          itemsRef.current.length,
         );
+
+        if (imagePlan) {
+          setImageWindow((current) =>
+            current.first === imagePlan.mount.first &&
+            current.last === imagePlan.mount.last
+              ? current
+              : imagePlan.mount,
+          );
+          prefetchDiscoveryImages(
+            itemsRef.current.slice(
+              imagePlan.prefetch.first,
+              imagePlan.prefetch.lastExclusive,
+            ),
+          );
+        }
       }
 
       recordVisibleImpressions(
@@ -197,94 +222,70 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       />
 
       <View style={styles.screen}>
-        <Text style={styles.title}>{title}</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>{title}</Text>
 
-        <View
-          style={styles.collectionRow}
-          accessibilityLabel="Discovery collection"
-        >
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Show discovery items"
-            accessibilityState={{ selected: !showConsumed }}
-            onPress={() => setShowConsumed(false)}
-            style={({ pressed }) => [
-              styles.collectionButton,
-              !showConsumed && styles.collectionButtonSelected,
-              pressed && styles.pressed,
-            ]}
+          <View
+            style={styles.collectionRow}
+            accessibilityLabel="Discovery collection"
           >
-            <Text
-              style={[
-                styles.collectionText,
-                !showConsumed && styles.collectionTextSelected,
-              ]}
-            >
-              Löydä
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Show ${consumedLabel.toLowerCase()}`}
-            accessibilityState={{ selected: showConsumed }}
-            onPress={() => setShowConsumed(true)}
-            style={({ pressed }) => [
-              styles.collectionButton,
-              showConsumed && styles.collectionButtonSelected,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text
-              style={[
-                styles.collectionText,
-                showConsumed && styles.collectionTextSelected,
-              ]}
-            >
-              {consumedLabel} {consumedItems.length > 0 ? consumedItems.length : ''}
-            </Text>
-          </Pressable>
-        </View>
-
-        <InteractionPersistenceNotice theme={theme} />
-
-        {ranking.status === 'error' ? (
-          <View style={styles.predictionNotice}>
-            <Text
-              accessibilityLiveRegion="polite"
-              style={styles.predictionNoticeText}
-            >
-              {ranking.message}
-            </Text>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Retry recommendations"
-              onPress={ranking.retry}
+              accessibilityLabel="Show discovery items"
+              accessibilityState={{ selected: !showConsumed }}
+              onPress={() => setShowConsumed(false)}
               style={({ pressed }) => [
-                styles.retryButton,
+                styles.collectionButton,
+                !showConsumed && styles.collectionButtonSelected,
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
+              <Text
+                style={[
+                  styles.collectionText,
+                  !showConsumed && styles.collectionTextSelected,
+                ]}
+              >
+                Löydä
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Show ${consumedLabel.toLowerCase()}`}
+              accessibilityState={{ selected: showConsumed }}
+              onPress={() => setShowConsumed(true)}
+              style={({ pressed }) => [
+                styles.collectionButton,
+                showConsumed && styles.collectionButtonSelected,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.collectionText,
+                  showConsumed && styles.collectionTextSelected,
+                ]}
+              >
+                {consumedLabel}{' '}
+                {consumedItems.length > 0 ? consumedItems.length : ''}
+              </Text>
             </Pressable>
           </View>
-        ) : null}
 
-        {isSharedDiscovery &&
-        (sharedEndorsements.status !== 'ready' || sharedEndorsements.error) ? (
-          <View style={styles.predictionNotice}>
-            <Text
-              accessibilityLiveRegion="polite"
-              style={styles.predictionNoticeText}
-            >
-              {sharedEndorsements.error
-                ? sharedEndorsements.error
-                : 'Yhteisiä valintoja päivitetään…'}
-            </Text>
-            {sharedEndorsements.error ? (
+          <InteractionPersistenceNotice theme={theme} />
+
+          {ranking.status === 'error' ? (
+            <View style={styles.predictionNotice}>
+              <Text
+                accessibilityLiveRegion="polite"
+                style={styles.predictionNoticeText}
+              >
+                {ranking.message}
+              </Text>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Retry shared choices"
-                onPress={sharedEndorsements.retry}
+                accessibilityLabel="Retry recommendations"
+                onPress={ranking.retry}
                 style={({ pressed }) => [
                   styles.retryButton,
                   pressed && styles.pressed,
@@ -292,18 +293,45 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               >
                 <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
               </Pressable>
-            ) : null}
-          </View>
-        ) : null}
+            </View>
+          ) : null}
+
+          {isSharedDiscovery &&
+          (sharedEndorsements.status !== 'ready' || sharedEndorsements.error) ? (
+            <View style={styles.predictionNotice}>
+              <Text
+                accessibilityLiveRegion="polite"
+                style={styles.predictionNoticeText}
+              >
+                {sharedEndorsements.error
+                  ? sharedEndorsements.error
+                  : 'Yhteisiä valintoja päivitetään…'}
+              </Text>
+              {sharedEndorsements.error ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Retry shared choices"
+                  onPress={sharedEndorsements.retry}
+                  style={({ pressed }) => [
+                    styles.retryButton,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
 
         <FlatList
           data={items}
           keyExtractor={(item) => item.id}
           numColumns={2}
           initialNumToRender={6}
-          maxToRenderPerBatch={4}
-          updateCellsBatchingPeriod={50}
-          windowSize={5}
+          maxToRenderPerBatch={6}
+          updateCellsBatchingPeriod={32}
+          windowSize={7}
           removeClippedSubviews
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.gridRow}
@@ -343,17 +371,33 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 activeSharedMembership?.members ?? [],
               ),
             );
+            const discoveryImageUrl = item.imageUrl
+              ? getDiscoveryImageUrl(item.imageUrl)
+              : null;
+            const imageIsWarm = Boolean(
+              discoveryImageUrl &&
+                warmedDiscoveryImageUrls.has(discoveryImageUrl),
+            );
 
             return (
               <ItemCard
                 item={item}
                 index={index}
-                loadImage={index >= imageWindow.first && index <= imageWindow.last}
+                discoveryImageUrl={discoveryImageUrl}
+                loadImage={
+                  imageIsWarm ||
+                  (index >= imageWindow.first && index <= imageWindow.last)
+                }
                 interaction={getItemInteraction(interactions, item.id)}
                 pendingApprovalLabel={pendingApprovalLabel}
                 sharedProvenance={memberHistoryProvenance}
                 theme={theme}
                 styles={styles}
+                onImageLoaded={() => {
+                  if (discoveryImageUrl) {
+                    warmedDiscoveryImageUrls.add(discoveryImageUrl);
+                  }
+                }}
                 onOpen={() => openItem(item)}
               />
             );
@@ -367,31 +411,34 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 interface ItemCardProps {
   item: Item;
   index: number;
+  discoveryImageUrl: string | null;
   loadImage: boolean;
   interaction: ItemInteraction;
   pendingApprovalLabel: string | null;
   sharedProvenance: string | null;
   theme: RoomTheme;
   styles: ReturnType<typeof createStyles>;
+  onImageLoaded: () => void;
   onOpen: () => void;
 }
 
 function ItemCard({
   item,
   index,
+  discoveryImageUrl,
   loadImage,
   interaction,
   pendingApprovalLabel,
   sharedProvenance,
   theme,
   styles,
+  onImageLoaded,
   onOpen,
 }: ItemCardProps) {
-  const tag = item.tags?.[0] ?? item.itemType.toLowerCase();
   const byline = getItemByline(item);
   const coverOpacity = 0.42 + (index % 3) * 0.12;
   const consumedLabel = getConsumedItemLabels(item.itemType).status;
-  const renderRemoteImage = Boolean(item.imageUrl && loadImage);
+  const renderRemoteImage = Boolean(discoveryImageUrl && loadImage);
 
   return (
     <Pressable
@@ -401,13 +448,6 @@ function ItemCard({
       onPress={onOpen}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      {pendingApprovalLabel ? (
-        <View style={styles.approvalBanner}>
-          <Text numberOfLines={2} style={styles.approvalBannerText}>
-            {pendingApprovalLabel}
-          </Text>
-        </View>
-      ) : null}
       <View
         style={[
           styles.cover,
@@ -417,16 +457,17 @@ function ItemCard({
           },
         ]}
       >
-        {renderRemoteImage && item.imageUrl ? (
+        {renderRemoteImage && discoveryImageUrl ? (
           <>
             <Image
               accessibilityIgnoresInvertColors
               source={{
-                uri: getDiscoveryImageUrl(item.imageUrl),
+                uri: discoveryImageUrl,
                 cache: 'force-cache',
               }}
               resizeMode="cover"
-              fadeDuration={120}
+              fadeDuration={80}
+              onLoad={onImageLoaded}
               style={styles.coverImage}
             />
             <View pointerEvents="none" style={styles.coverImageShade} />
@@ -443,7 +484,21 @@ function ItemCard({
             ]}
           />
         )}
-        <View style={styles.cardStatusRow}>
+
+        {pendingApprovalLabel ? (
+          <View style={styles.approvalBanner}>
+            <Text numberOfLines={2} style={styles.approvalBannerText}>
+              {pendingApprovalLabel}
+            </Text>
+          </View>
+        ) : null}
+
+        <View
+          style={[
+            styles.cardStatusRow,
+            pendingApprovalLabel && styles.cardStatusRowWithApproval,
+          ]}
+        >
           {interaction.saved ? (
             <Text style={styles.cardStatus}>★</Text>
           ) : (
@@ -453,6 +508,7 @@ function ItemCard({
             <Text style={styles.cardStatus}>{consumedLabel}</Text>
           ) : null}
         </View>
+
         {!renderRemoteImage ? (
           <View style={styles.coverPlaceholderContent}>
             <Text style={styles.coverType}>
@@ -461,25 +517,35 @@ function ItemCard({
             <Text numberOfLines={3} style={styles.coverTitle}>
               {item.title}
             </Text>
+            {byline ? (
+              <Text numberOfLines={1} style={styles.cardByline}>
+                {byline}
+              </Text>
+            ) : null}
+            {sharedProvenance ? (
+              <Text numberOfLines={1} style={styles.endorsementProvenance}>
+                {sharedProvenance}
+              </Text>
+            ) : null}
           </View>
-        ) : null}
+        ) : (
+          <View pointerEvents="none" style={styles.cardMetaOverlay}>
+            {sharedProvenance ? (
+              <Text numberOfLines={1} style={styles.endorsementProvenance}>
+                {sharedProvenance}
+              </Text>
+            ) : null}
+            <Text numberOfLines={2} style={styles.cardTitle}>
+              {item.title}
+            </Text>
+            {byline ? (
+              <Text numberOfLines={1} style={styles.cardByline}>
+                {byline}
+              </Text>
+            ) : null}
+          </View>
+        )}
       </View>
-      {sharedProvenance ? (
-        <Text numberOfLines={1} style={styles.endorsementProvenance}>
-          {sharedProvenance}
-        </Text>
-      ) : null}
-      <Text numberOfLines={2} style={styles.cardTitle}>
-        {item.title}
-      </Text>
-      {byline ? (
-        <Text numberOfLines={1} style={styles.cardByline}>
-          {byline}
-        </Text>
-      ) : null}
-      <Text numberOfLines={1} style={styles.cardTag}>
-        {tag.replaceAll('-', ' ')}
-      </Text>
     </Pressable>
   );
 }
@@ -513,6 +579,33 @@ function recordVisibleImpressions(
   }
 }
 
+function prefetchDiscoveryImages(items: readonly Item[]) {
+  for (const item of items) {
+    if (!item.imageUrl) continue;
+
+    const imageUrl = getDiscoveryImageUrl(item.imageUrl);
+    if (
+      warmedDiscoveryImageUrls.has(imageUrl) ||
+      prefetchedDiscoveryImageUrls.has(imageUrl)
+    ) {
+      continue;
+    }
+
+    prefetchedDiscoveryImageUrls.add(imageUrl);
+    void Image.prefetch(imageUrl)
+      .then((success) => {
+        if (success) {
+          warmedDiscoveryImageUrls.add(imageUrl);
+          return;
+        }
+        prefetchedDiscoveryImageUrls.delete(imageUrl);
+      })
+      .catch(() => {
+        prefetchedDiscoveryImageUrls.delete(imageUrl);
+      });
+  }
+}
+
 function getItemByline(item: Item): string | null {
   const parts: string[] = [];
   const creator = item.creators?.[0]?.trim();
@@ -534,8 +627,10 @@ function createStyles(theme: RoomTheme) {
     },
     screen: {
       flex: 1,
-      paddingHorizontal: 18,
       paddingTop: 7,
+    },
+    headerContent: {
+      paddingHorizontal: 18,
     },
     title: {
       color: theme.base.textPrimary,
@@ -547,7 +642,7 @@ function createStyles(theme: RoomTheme) {
     collectionRow: {
       flexDirection: 'row',
       gap: 8,
-      marginBottom: 12,
+      marginBottom: 10,
     },
     predictionNotice: {
       flexDirection: 'row',
@@ -593,6 +688,7 @@ function createStyles(theme: RoomTheme) {
       color: theme.base.textPrimary,
     },
     gridContent: {
+      paddingHorizontal: 3,
       paddingBottom: 24,
     },
     emptyGrid: {
@@ -607,34 +703,38 @@ function createStyles(theme: RoomTheme) {
       paddingHorizontal: 28,
     },
     gridRow: {
-      gap: 12,
-      marginBottom: 18,
+      gap: 3,
+      marginBottom: 3,
     },
     card: {
       flex: 1,
       minWidth: 0,
     },
     approvalBanner: {
-      minHeight: 42,
-      marginBottom: 7,
-      paddingHorizontal: 10,
-      paddingVertical: 7,
+      position: 'absolute',
+      top: 6,
+      left: 6,
+      right: 6,
+      zIndex: 4,
+      minHeight: 36,
+      paddingHorizontal: 9,
+      paddingVertical: 6,
       justifyContent: 'center',
-      borderRadius: 11,
+      borderRadius: 5,
       borderWidth: 1,
-      borderColor: 'rgba(117, 190, 132, 0.72)',
-      backgroundColor: 'rgba(54, 119, 72, 0.34)',
+      borderColor: 'rgba(117, 190, 132, 0.78)',
+      backgroundColor: 'rgba(34, 94, 51, 0.78)',
     },
     approvalBannerText: {
-      color: '#c9efd1',
+      color: '#d5f5dc',
       fontSize: 10,
-      lineHeight: 14,
+      lineHeight: 13,
       fontWeight: '700',
     },
     cover: {
-      aspectRatio: 0.72,
-      borderRadius: 14,
-      borderWidth: 1,
+      aspectRatio: 0.8,
+      borderRadius: 2,
+      borderWidth: 0.5,
       justifyContent: 'flex-end',
       overflow: 'hidden',
     },
@@ -643,7 +743,7 @@ function createStyles(theme: RoomTheme) {
     },
     coverImageShade: {
       ...StyleSheet.absoluteFill,
-      backgroundColor: 'rgba(0, 0, 0, 0.14)',
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
     },
     coverLight: {
       ...StyleSheet.absoluteFill,
@@ -651,14 +751,28 @@ function createStyles(theme: RoomTheme) {
     coverPlaceholderContent: {
       padding: 12,
     },
+    cardMetaOverlay: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      paddingHorizontal: 8,
+      paddingTop: 8,
+      paddingBottom: 7,
+      backgroundColor: 'rgba(0, 0, 0, 0.56)',
+    },
     cardStatusRow: {
       position: 'absolute',
-      top: 10,
-      left: 10,
-      right: 10,
+      zIndex: 3,
+      top: 8,
+      left: 8,
+      right: 8,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+    },
+    cardStatusRowWithApproval: {
+      top: 49,
     },
     cardStatus: {
       color: theme.base.textPrimary,
@@ -683,32 +797,29 @@ function createStyles(theme: RoomTheme) {
       fontWeight: '700',
     },
     cardTitle: {
-      color: theme.base.textPrimary,
-      fontSize: 14,
-      lineHeight: 18,
-      fontWeight: '600',
-      marginTop: 8,
+      color: '#ffffff',
+      fontSize: 13,
+      lineHeight: 16,
+      fontWeight: '700',
+      textShadowColor: 'rgba(0, 0, 0, 0.66)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
     },
     endorsementProvenance: {
-      color: theme.ambient.curtainHighlight,
-      fontSize: 11,
+      color: '#d2f3d9',
+      fontSize: 10,
+      lineHeight: 13,
       fontWeight: '700',
-      marginTop: 7,
+      marginBottom: 3,
     },
     cardByline: {
-      color: theme.base.textMuted,
-      fontSize: 11,
-      lineHeight: 15,
+      color: 'rgba(255, 255, 255, 0.78)',
+      fontSize: 10,
+      lineHeight: 13,
       marginTop: 3,
     },
-    cardTag: {
-      color: theme.base.textMuted,
-      fontSize: 11,
-      marginTop: 2,
-      textTransform: 'capitalize',
-    },
     pressed: {
-      opacity: 0.7,
+      opacity: 0.78,
     },
   });
 }
