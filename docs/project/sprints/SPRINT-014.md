@@ -287,6 +287,10 @@ Required flows:
 
 ## Immediate next action
 
-Finish #199, merge only after `npm run check`/CI passes, and build a new configured Android APK. Accept the dense BOOK/MOVIE grid, bounded warm image cache and scroll behavior first. Then run the remaining Settings/import + 6-of-12-to-24 cold-start + Shared common-fit/deferred core device gates. Configure TMDB and expand MOVIE coverage before external beta.
+PR #202 is already merged; the owner is testing Android APK run #350 for #199 dense-grid, warm-cache and scroll acceptance. Do not rebuild its implementation or close #199 before owner acceptance. Then run the remaining Settings/import + 6-of-12-to-24 cold-start + Shared common-fit/deferred core device gates. Configure TMDB and expand MOVIE coverage before external beta.
 
 Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, do not use Open Library Search as a runtime backend, do not add unofficial movie-poster scraping, and do not bypass PopulationMemory privacy gates.
+
+## Continuation checkpoint — 2026-09-06
+
+PR #205 delivered the bounded TMDB beta orchestrator (`scripts/catalog/import-tmdb-beta.mjs`, `npm run catalog:tmdb-beta`) at `41c537eb`. Main #352 validation passed including both bundle smoke checks; its APK job was still running at the check. Hosted import has not run in this continuation. Current coverage, credential prerequisites and the executable next step are maintained in `../STATUS.md`. The SQL recheck also found zero nonblank BOOK descriptions. #182 and #199 were reopened because their actual catalog/device acceptance remains pending. Partial PRs must not auto-close these parent gates. No MVP requirement was marked complete.

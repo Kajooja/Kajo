@@ -51,16 +51,24 @@ Do not create media-specific Profile, List or recommender cores.
 
 Hosted `public.items` currently contains:
 
-| ItemType | Discoverable | With image |
-|---|---:|---:|
-| BOOK | **415** | **385** |
-| MOVIE | **30** | **0** |
+| ItemType | Discoverable | With image | With nonblank description |
+|---|---:|---:|---:|
+| BOOK | **415** | **385** | **0** |
+| MOVIE | **30** | **0** | **0** |
 
 BOOK beta inventory is 385 Open Library provider Items plus 30 curated real BOOK seed Items. Historical mock Items remain stored for referential integrity but are non-discoverable.
 
 MOVIE poster rendering is already generic in mobile, but there are currently **zero hosted MOVIE image URLs**. This is a catalog-data gap, not a mobile rendering fallback. The next canonical fix is to configure server-only `TMDB_READ_ACCESS_TOKEN` for the existing hosted TMDB importer and expand MOVIE provider coverage with real posters/descriptions. Do not add scraping or an unofficial image source.
 
-## Latest configured-device feedback
+## Latest implementation and validation
+
+- PR #202 is merged at `0cf8a9f1ba962e81c58e128951d8a8b9fa018eed`; standalone Android run **#350** passed and is the current owner device-test baseline. #199 implementation is complete; device acceptance is pending.
+- PR #205 / #204 is merged at `41c537eb568e679685fe26f440ae85664a4a0c0c`. `npm run catalog:tmdb-beta` orchestrates 15 pages in five sequential requests of at most three pages. This does not prove a hosted import has run.
+- Main run **#352** passed lint, typecheck, tests and iOS/Android bundle smoke. Its APK job was still running at this check.
+- #182 and #199 were found closed despite explicit outstanding acceptance gates and reopened on 2026-09-06. Keep them open until their actual acceptance passes; reference them without closing keywords in partial implementation PRs.
+- Hosted SQL recheck found no nonblank `public.items.description` values in either discoverable domain. BOOK description enrichment remains a real data-quality gap.
+
+## Earlier configured-device feedback
 
 PR #198 (`Polish real catalog cards and profile switching`) is merged. Main validation passed and standalone Android APK run **#346** was built successfully.
 
@@ -71,7 +79,7 @@ That APK confirmed the next Sprint 014 product-quality work:
 - the old small image mount window intentionally allowed already-seen covers to fall back to placeholders when they left the window,
 - the discovery grid still feels like spaced cards rather than a dense visual browse surface.
 
-Issue **#199** is the active device-feedback follow-up. Its implementation must:
+Issue **#199** is the active device-feedback follow-up. Its merged implementation preserves these requirements:
 
 - preserve Prediction order and all Event/Profile semantics,
 - keep bounded FlatList virtualization,
@@ -149,9 +157,9 @@ Deferred #102 Lists, #138 messaging and current Room/shell device gates must be 
 
 ## Current ordered work
 
-1. **Finish #199 and accept the dense BOOK/MOVIE discovery grid + bounded warm image cache on a new configured Android APK.**
+1. **Collect owner acceptance of #199 using Android APK run #350; implement only confirmed follow-up defects.**
 2. **Run the remaining configured-device Sprint 014 acceptance:** Settings/CSV import, no-import cold start, Shared common-fit and deferred core List/message/shell gates.
-3. **Configure TMDB server credential and expand MOVIE catalog/poster/description coverage before external beta.**
+3. **While device tests proceed, configure the TMDB server credential and run the existing beta importer; verify MOVIE coverage and deduplication before external beta.**
 4. **Run #186 roughly 10-person external beta and fix bounded product-quality defects.**
 5. **Sprint 015:** production SMTP/social auth/security/privacy/signing/store release.
 6. Mark MVP 0.1 complete only after an installed store build is accepted.
@@ -196,6 +204,8 @@ Current hygiene rules and state:
 - `/apps/mobile/src/features/settings/SettingsScreen.tsx`
 - `/apps/mobile/src/features/settings/historyImportParser.ts`
 - `/apps/mobile/src/features/settings/historyImportOperations.ts`
+- `/scripts/catalog/import-tmdb-beta.mjs`
+- `/scripts/catalog/import-tmdb-beta.test.mjs`
 - `/scripts/catalog/open-library-search-beta.mjs`
 - `/scripts/catalog/import-open-library-search-beta.mjs`
 - `/scripts/catalog/import-open-library.mjs`
@@ -212,6 +222,8 @@ Current hygiene rules and state:
 
 A fresh conversation may start with **"jatketaan reposta"** and must follow `/AGENTS.md`.
 
-Immediate target: **finish/accept #199 dense discovery + warm image cache, then complete the configured-device Sprint 014 import/cold-start/Shared acceptance and expand MOVIE through the canonical TMDB importer.**
+Immediate target: **owner tests APK #350 while catalog work proceeds through the existing TMDB importer. #199 and #182 remain open. Then complete Sprint 014 import/cold-start/Shared device acceptance.**
+
+TMDB execution prerequisites: project `mwrnvfosrzwygrunrltm` needs server-only `TMDB_READ_ACCESS_TOKEN` in Edge Function secrets. Run `npm run catalog:tmdb-beta -- --dry-run` first, then `npm run catalog:tmdb-beta` in a trusted admin shell with `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`). No privileged credentials were available in the continuation shell, and the connected Supabase tools do not expose secret configuration or Edge invocation. No import was executed. Do not request secrets in chat or bypass the importer authorization boundary. Recheck nonblank image/description coverage and canonical external-ID uniqueness after the import; importedCount is an upsert count, not necessarily a count of new unique Items. Required TMDB attribution remains an external-release gate in #182.
 
 Do not copy Personal history into Shared history, delete historical mock rows that still carry references, build a second recommender, expose member-level raw evidence, use Open Library Search as a runtime backend, introduce unofficial movie-poster scraping, bypass PopulationMemory privacy gates, or begin monetization work before MVP product/release gates are complete.
