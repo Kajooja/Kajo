@@ -1,98 +1,245 @@
 # Kajo Domain Model
 
+This file defines canonical domain relationships and invariants. Detailed launch UX is in `product/LAUNCH_LOOP.md`; prediction math/evaluation remains in `PREDICTION_MODEL.md`.
+
 ## Core model
 
 ```text
-User
-  |
-  | acts as actor
-  v
-Event ----------------------> Item <----- ItemSource / ItemExternalId
-  |
-  | occurs within
-  v
-Profile
-  |\
-  | \-- PersonalProfile
-  | \-- SharedProfile
-  |
-  +--> HumanState
-  +--> Theme
-  +--> Memory
-  |      |-- WorkingState
-  |      |-- ShortTermState
-  |      |-- LongTermState
-  |      `-- ScenarioMemory
-  +--> ItemList
-  +--> ProfileMessage ----> User (actor)
-  +--> PredictionRun ----> PredictionCandidate ----> Item
-         |
-         +--> Context
-         +--> MemoryStateSnapshot
-         +--> DiscoveryMode
+AnonymousIdentity ── upgrade/link ──> User ── owns ──> PersonalProfile
+       |                           |                    |
+       |                           |                    +--> Memory
+       |                           |                    +--> PredictionRun
+       |                           |                    +--> ItemList
+       |                           |
+       +--> TasteSession           +--> Friendship <--> User
+               |                   |
+               +--> TasteResponse  +--> FriendInvite
+               +--> TasteChallenge |
+                                   +--> ProfileMember --> SharedProfile
+                                                         |
+                                                         +--> Memory
+                                                         +--> PredictionRun
+                                                         +--> ItemList
+                                                         +--> Endorsement
+                                                         +--> ProfileMessage
 
-SharedProfile
-  +--> Endorsement (actor-specific, Item-specific)
-         |
-         +--> unanimous accepted-member consensus
-                  |
-                  +--> Shared Saved / SYSTEM_SAVED
+Item <----- ItemSource / ItemExternalId
+ ^
+ |
+PredictionCandidate
+
+Event records actor + Profile + Item/context where recommendation semantics apply.
+Acquisition/funnel telemetry is separately classified and cannot silently become taste evidence.
 ```
 
-## User
+## Identity
 
-A `User` is an account/human identity. A User performs actions. MVP identity includes one unique nickname and one unique authentication email linked to the same account. Nickname display casing is preserved while uniqueness, sign-in and nickname search are case-insensitive.
+### User
 
-User is intentionally distinct from Profile because the same User can act in a PersonalProfile and several SharedProfiles.
+A `User` is the canonical human/account identity. A User may authenticate through one or more `AuthIdentity` providers. Permanent provider linking must not create duplicate Kajo Users or duplicate PersonalProfiles.
 
-## Profile
+### AnonymousIdentity
 
-A `Profile` is the unit for prediction, learned state and profile-context history.
-
-Invariant: every Prediction belongs to exactly one Profile.
-
-### PersonalProfile
-
-Represents one User's personal Kajo context.
-
-Invariant: one User owns at most one PersonalProfile. Configured onboarding completes User, PersonalProfile and ProfileMember identity before entering the personal Room.
-
-### SharedProfile
-
-Represents 2-N accepted Users together. It has its own learned state and may develop preferences that do not equal a simple average of member PersonalProfiles.
+An `AnonymousIdentity` is a server-backed temporary identity used for Taste-first acquisition before permanent authentication.
 
 Invariants:
 
-- an Event in SharedProfile context retains the actual acting `actorUserId`,
-- `profile_members` represents accepted membership only,
+- it has bounded retention/deletion,
+- it may own/resume one logical Taste/PersonalProfile context,
+- permanent auth upgrades/links it instead of copying Taste data into a new person,
+- it cannot be used to merge two unrelated existing permanent Users,
+- auth failure/abandonment must not silently destroy accepted Taste progress inside retention limits.
+
+## Profile
+
+A `Profile` is the unit for prediction, learned state and Profile-context history.
+
+Invariant: every hosted Prediction belongs to exactly one Profile.
+
+### PersonalProfile
+
+Represents one person's personal Kajo context.
+
+For Taste-first acquisition, an anonymous visitor may begin building the same logical PersonalProfile/taste state before permanent sign-in. Account conversion must preserve this continuity.
+
+### SharedProfile
+
+Represents 2-N accepted Users together. It has its own learned state and may develop preferences that do not equal a simple average of members.
+
+Invariants:
+
+- an Event in Shared context retains actual `actorUserId`,
+- `ProfileMember` represents accepted membership only,
 - pending invitations are not membership,
-- prediction target remains the SharedProfile even when accepted-member PersonalProfile evidence contributes to an inspectable common-fit signal,
-- actor-specific collaboration delivery may change which pending endorsed Item a member sees first without creating a separate per-member recommender.
+- Prediction target remains SharedProfile even when aggregate member Personal evidence contributes to common-fit,
+- Personal evidence is not copied into Shared history merely to compute fit,
+- SharedProfile is created explicitly and never as an automatic side effect of becoming Friends.
+
+## Taste-first acquisition model
+
+### TasteSession
+
+A `TasteSession` is a bounded/versioned cold-start/acquisition session.
+
+Conceptual fields:
+
+```text
+tasteSessionId
+anonymousIdentityId / userId
+personalProfileId
+source / campaign / friendInviteId?
+questionPolicyVersion
+model/feature versions
+startedAt
+completedAt?
+status
+```
+
+A TasteSession is not a second Profile and not a media-specific taste silo.
+
+### TasteResponse
+
+A `TasteResponse` records a canonical response to a real Item presented during Taste Test.
+
+Supported semantics reuse Kajo concepts:
+
+- known + 0–10 rating,
+- unknown/skip,
+- not-interest where appropriate.
+
+Only responses with explicit taste semantics may enter bootstrap/Memory evidence. A link open/auth click is never a TasteResponse.
+
+### TasteChallenge
+
+A `TasteChallenge` evaluates held-out known Items.
+
+Invariant sequence:
+
+```text
+freeze Profile/taste snapshot
+→ freeze model/policy version
+→ predict held-out Item
+→ then accept actual answer
+→ compute error/evaluation
+→ only afterward allow answer to join future taste evidence
+```
+
+A challenge Item cannot improve the prediction that is being scored.
+
+### AcquisitionAttribution
+
+Stores bounded campaign/referral/source metadata for funnel analysis. It is operational/growth state, not preference evidence.
+
+## Friend graph
+
+### FriendInvite
+
+A `FriendInvite` is a personal relationship invitation created by one permanent User.
+
+Invariants:
+
+- opaque server-owned token,
+- expiry/revocation/use limit,
+- idempotent under repeated open/accept,
+- rate-limited/anti-enumeration protected,
+- opening may start the same Taste-first flow,
+- invite acceptance does not itself grant SharedProfile membership,
+- blocked/removed relationship rules cannot be bypassed by replaying an old token.
+
+### Friendship
+
+A `Friendship` is reciprocal active relationship state between two permanent Users.
+
+Invariants:
+
+- at most one active canonical relation per unordered User pair,
+- pending invite is not Friendship,
+- Friendship grants no read access to another User's private PersonalProfile Events, Memory, imports, messages or raw taste state,
+- Friendship and ProfileMember lifecycles are independent,
+- removal/block semantics are explicit.
+
+Canonical transition:
+
+```text
+FriendInvite accepted
++ permanent identity resolved
+→ Friendship ACTIVE
+```
+
+## SharedProfile creation from Friends
+
+Friendship is a convenient source of candidate members, not group membership itself.
+
+Two-person path:
+
+```text
+Friend A + Friend B
+→ explicit "create yhteinen Kajo"
+→ SharedProfile
+→ membership acceptance/creation under canonical Shared rules
+```
+
+For 3+ users, selected Friends still pass through explicit Shared membership acceptance.
+
+Friend removal does not silently remove or rewrite existing SharedProfile history/membership. Any desired membership change uses SharedProfile lifecycle rules.
+
+## Item
+
+`Item` is the single domain-agnostic recommendable entity.
+
+Current generic fields include stable Kajo ID, ItemType, title/description, normalized tags/creators, optional year/image/language, provider metadata and discoverability.
+
+`discoverable=false` excludes an Item from ordinary candidate generation while preserving historical Event/List/Prediction references.
+
+Domain metadata may extend Item but prediction consumes normalized generic features rather than provider schemas.
+
+### ItemSource and ItemExternalId
+
+`ItemSource` links canonical Item to provider provenance. `ItemExternalId` maps namespaced stable IDs to canonical Item.
+
+Invariants:
+
+- provider source key is unique,
+- namespace+external ID resolves to at most one canonical Item,
+- refresh is idempotent,
+- ambiguous multi-Item matches fail rather than silently merge,
+- raw provider payloads/secrets are server-owned,
+- history imports resolve to canonical Items rather than provider-specific Profile state.
+
+## ItemList
+
+An `ItemList` is owned by one Profile.
+
+MVP kinds:
+
+- `SYSTEM_SAVED`,
+- `CUSTOM`.
+
+`ItemListEntry` stores List/Item relation plus truthful adding actor/time; it does not copy consumed/rating state.
+
+Current invariants:
+
+- one system Saved List per Profile,
+- custom names unique within Profile under canonical normalization,
+- one Item may belong to several Lists,
+- Personal save and Shared unanimous consensus project into system Saved,
+- Shared discovery custom List addition remains pending until consensus,
+- former/outsider members lose Shared List access,
+- canonical interaction state remains separate from membership rows.
 
 ## Shared discovery eligibility
 
-Ordinary SharedProfile discovery may retain an Item that a currently accepted member has already consumed in that member's PersonalProfile, but it must not present that Item as an unseen recommendation.
+Ordinary Shared discovery order remains:
 
-For MVP, either `consumed = true` or a non-null rating is sufficient consumed evidence.
+1. pending Endorsements for members who have not endorsed,
+2. ordinary unseen Shared Predictions,
+3. accepted-member Personal consumed/rated history as clearly attributed lower tier.
 
-This is a **collaboration delivery rule**, not Event copying or data deletion:
-
-- pending Endorsements are delivered first,
-- ordinary unseen SharedProfile Predictions follow in their Prediction order,
-- accepted-member PersonalProfile history follows as a lower tier with restrained real-member provenance,
-- a higher member rating may reorder only this lower history tier,
-- SharedProfile's own consumed/rated state and consensus-saved state remain suppressed from ordinary discovery,
-- the Item may remain in a named List,
-- the Item may remain in Saved/history,
-- the UI may continue to show watched/read/rating state on those historical/organizational surfaces.
-
-A PersonalProfile save alone does not make the Item ineligible for Shared discovery.
+A higher member rating may reorder only the lower history tier. Shared consumed/rated and consensus-saved Items remain suppressed from ordinary Shared discovery. Lists/history are not deleted.
 
 ## Endorsement and SharedConsensus
 
-An `Endorsement` is an actor-specific positive decision made while acting inside a SharedProfile: this Item is worth doing together.
-
-A single Endorsement is intentionally not the same thing as Shared `saved=true`.
+`Endorsement` is actor-specific positive decision inside SharedProfile.
 
 Current-state invariant:
 
@@ -100,192 +247,54 @@ Current-state invariant:
 one active Endorsement per (profileId, itemId, actorUserId)
 ```
 
-Pending behavior:
+The first actor may bind a target custom List. Until unanimity the Item is pending and not Shared Saved.
 
-- User A selects one target custom List and endorses Item X; the List membership is not written yet,
-- X leaves A's ordinary Shared discovery queue,
-- accepted members who have not endorsed X receive an approval card ahead of ordinary recommendations,
-- delivery provenance identifies the real proposer and selected List,
-- this actor-specific priority is collaboration state layered onto the SharedProfile Prediction, not a separate taste model.
+`SharedConsensus` is reached when every currently accepted member endorses. At consensus:
 
-`SharedConsensus` is reached when every currently accepted member has an active Endorsement for the Item.
-
-At consensus:
-
-- SharedProfile Saved/current-state projection becomes true,
-- a durable `(profileId, itemId)` SharedConsensus record preserves the reached decision even if membership later changes,
-- the Item is added once to the custom List selected by the original proposer, retaining that proposer/time provenance,
-- the Item is promoted once to the Shared `SYSTEM_SAVED` / `Tallennetut` List,
-- the Item leaves ordinary Shared discovery,
-- the reached consensus becomes durable shared history; a later new member does not retroactively revoke it.
-
-Shared discovery uses approval rather than direct custom-List insertion. The first member selects the List; other accepted members approve the same choice, and unanimous approval commits the membership. List membership remains organizational state and is not a separate ranking coefficient.
-
-## Item
-
-`Item` is the single domain-agnostic recommendable entity. Provider records never become parallel Item types.
-
-Current generic catalog fields include:
-
-- stable Kajo `id` + `ItemType`,
-- title + optional description,
-- normalized `tags`,
-- normalized creator names,
-- optional release year, image URL and original language,
-- provider/domain-specific `metadata`,
-- `discoverable` lifecycle state.
-
-`discoverable=false` means the Item is excluded from **normal Prediction candidate generation** while the same stable Item remains valid for Events, Lists, interactions, messages and historical Prediction traces. This is how Kajo retires seeded/mock or stale provider content without deleting referential history.
-
-Domain-specific metadata may extend Item:
-
-- BOOK: author roles, pages, publication/edition data, ISBNs.
-- MOVIE: runtime, director/cast details, release/availability data.
-- EVENT later: location, start/end time, price.
-
-Prediction code consumes generic features/contracts rather than external provider schemas.
-
-### ItemSource and ItemExternalId
-
-`ItemSource` is server-owned provenance from one provider record to one canonical Item. It records a provider key + provider item ID and may retain source URL, provider update timestamp, sync timestamp, source hash and raw provider payload for repeatable/idempotent import.
-
-`ItemExternalId` maps a namespaced external identifier to exactly one canonical Item. Examples include:
-
-- `tmdb_movie`,
-- `imdb_title`,
-- `open_library_work`,
-- `open_library_edition`,
-- `isbn13`,
-- `isbn10`,
-- `finna_record`.
-
-Invariants:
-
-- `(providerKey, providerItemId)` is unique,
-- `(namespace, externalId)` resolves to at most one canonical Item,
-- a provider refresh of the same source is idempotent,
-- a second provider may resolve to the existing Item through a shared external ID,
-- an import whose external IDs point to more than one existing Item fails as ambiguous rather than silently merging them,
-- provider payload/source tables are server-only; mobile reads normalized Item output, not provider secrets/raw payloads,
-- existing seeded `KAJO_MOCK` Items keep stable IDs and source provenance until safely retired from discovery.
-
-This external-ID boundary is also the matching anchor for later Letterboxd, IMDb and book-history imports. Imported user history resolves to canonical Item IDs; it must not create provider-specific Profile state.
-
-## ItemList
-
-An `ItemList` is owned by exactly one Profile.
-
-MVP List kinds:
-
-- `SYSTEM_SAVED` — exactly one system `Tallennetut` List per Profile,
-- `CUSTOM` — user-named collaborative/personal Lists.
-
-`ItemListEntry` stores List/Item relation plus adding actor/time. It does not copy consumed/rating state.
-
-Current invariants:
-
-- one `SYSTEM_SAVED` List exists per Profile and cannot be renamed/deleted,
-- a custom name is 1–40 characters and case-insensitively unique inside its Profile,
-- one Item may belong once to each of several Lists,
-- Personal Saved state and Shared unanimous consensus project into `SYSTEM_SAVED`,
-- Personal custom List membership never changes canonical Saved state; Shared discovery approval reaches consensus and therefore also creates canonical Shared Saved state,
-- direct Shared writes to `SYSTEM_SAVED` are denied; consensus owns that transition,
-- direct Shared custom-List insertion from discovery is denied; the approval boundary owns that transition,
-- direct Shared interaction writes cannot forge, clear or delete Saved state unless it matches the durable SharedConsensus record,
-- accepted Shared members may collaborate on custom Lists, and former/outsider members have no read/write access,
-- `addedByUserId` may remain nullable only for safely backfilled historical rows where no truthful actor exists,
-- current consumed/rating state is joined from `item_interactions`, not copied into List entries.
+- Shared Saved becomes true,
+- durable consensus remains even if membership later changes,
+- selected custom List membership is committed once,
+- Item is promoted to system Saved,
+- Item leaves ordinary Shared discovery.
 
 ## Event
 
-An Event records something meaningful that happened. At minimum it can retain:
+An `Event` records meaningful recommendation-related evidence and at minimum may retain actor User, Profile context, Item, type, time, session, Context and predictionId.
 
-- actor User,
-- Profile context,
-- Item when relevant,
-- event type,
-- timestamp,
-- Context,
-- session identity when relevant,
-- predictionId when the event resulted from a Kajo prediction.
-
-Events are the main evidence stream for learning and outcome evaluation.
+Item/Prediction Events are the main evidence stream for learning/outcomes. Acquisition-only telemetry has its own event classification and may reference TasteSession/FriendInvite but does not become Item reward by default.
 
 ## ProfileMessage
 
-A `ProfileMessage` is short user-facing communication scoped to exactly one Profile. It retains the actual sending `actorUserId` and may optionally reference one List owned by that same Profile plus one generic Item.
+A `ProfileMessage` is communication scoped to one Profile and retains actual sending actor. Personal messages are owner-only; Shared messages are accepted-member-only. Message text is not Prediction evidence by default.
 
-Invariants:
+## Prediction and memory
 
-- a PersonalProfile message is visible/sendable only to its owner,
-- a SharedProfile message is visible/sendable only to currently accepted members,
-- message IDs are stable and retry-safe; the same ID cannot be reused for different content,
-- per-User/Profile read state owns unread delivery and never becomes generic Item interaction state,
-- List membership and message persistence are independent: a failed optional message cannot roll back or repeat a successful List mutation,
-- message text is not an Event or Prediction evidence by default.
+A `PredictionRun` targets one Profile and owns `PredictionCandidate` rows for considered Items. It captures Context, MemoryStateSnapshot and versioned model/policy information sufficient for evaluation.
 
-## HumanState
+Memory hierarchy:
 
-HumanState is a learned representation used by Prediction.
+- `WorkingState`: active session,
+- `ShortTermState`: recent drift,
+- `LongTermState`: durable tendencies,
+- `ScenarioMemory`: similar historical episodes,
+- future `PopulationMemory`: privacy-gated aggregate/collaborative layer.
 
-Conceptually it contains:
+Taste/import evidence initializes Personal state but must remain source-provenanced and supersedable by native behavior.
 
-- `WorkingState`: active-session ordered intent,
-- `LongTermState`: slowly changing identity/taste tendencies,
-- `ShortTermState`: recent/current tendencies,
-- versioned `MemoryStateSnapshot` values captured at prediction time.
+## Separation invariants
 
-It must remain capable of cross-domain learning.
-
-Current MVP V1 does not persist one mutable “truth row” for HumanState. It derives a rebuildable state snapshot from append-only Events for each hosted Prediction. Later online feature-store projections may cache the same versioned semantics.
-
-## Prediction
-
-A Prediction is defined conceptually by:
+These relations must remain distinct:
 
 ```text
-Profile + HumanState + Context + Item + DiscoveryMode -> predicted outcomes / score / confidence
+AuthIdentity != User
+AnonymousIdentity != permanent User until linked/upgraded
+TasteSession != PersonalProfile
+FriendInvite != Friendship
+Friendship != ProfileMember
+Friendship != SharedProfile
+ProfileMember != private PersonalProfile access
+AcquisitionAttribution != taste evidence
+SharedProfile != average(PersonalProfiles)
 ```
 
-For SharedProfile, accepted-member PersonalProfile evidence may contribute to a common-fit component while the Prediction still belongs to the SharedProfile.
-
-### PredictionRun and PredictionCandidate
-
-A `PredictionRun` is the durable decision trace for one hosted request. It owns one candidate pool of `PredictionCandidate` rows.
-
-Invariants:
-
-- one run has one `predictionId`, actor, target Profile, Context, state snapshot and immutable model/policy versions,
-- every candidate has one source rank and one final rank inside that run,
-- `selectedForDelivery` means the policy returned the candidate, not that the user saw it,
-- meaningful exposure is proven separately by `ITEM_IMPRESSION`,
-- a later action/outcome may be joined only when Profile, prediction and Item identity agree,
-- trace persistence is internal and cannot be forged through direct mobile table writes.
-
-## Scenario
-
-A Scenario is historical evidence combining state, context, candidate/pattern, prediction and observed outcome.
-
-ScenarioMemory later retrieves similar scenarios across personal/shared/population history.
-
-MVP V1 reconstructs a Scenario from `PredictionRun` + `PredictionCandidate` + correlated append-only Events. It retrieves only Scenarios belonging to the same target Profile. Future population retrieval is aggregated and privacy-gated; it never changes the ownership/provenance of the original Scenario.
-
-## EvolutionEngine
-
-`EvolutionEngine` manages immutable PredictorGenome candidates. A genome may describe features, reward, decays, retrieval, model artifact and DiscoveryMode policy. It is evaluated offline, in shadow and through guarded online experiments before explicit champion promotion.
-
-Production state never rewrites its own weights merely because a recent Event occurred. Fast adaptation happens through Working/ShortTermState; model evolution follows versioned evaluation and rollback.
-
-## Consumed experience / memory
-
-Consumed Items form history. The MVP stores consumed state and simple rating. The model leaves extension points for future note, memory text, images, date, location and people.
-
-## Important separations
-
-- Provider identity/provenance is not a second Item hierarchy or recommendation model.
-- An action made in a SharedProfile does not automatically carry identical evidence weight into a member's PersonalProfile.
-- A PersonalProfile consumed outcome may lower and annotate the same Item in Shared discovery without copying the Personal action into Shared state.
-- Pending Endorsement is not Shared Saved state.
-- Pending Shared custom-List choice is not membership; unanimous approval commits both the chosen membership and SharedConsensus.
-- Actor-specific pending delivery is not a separate per-User Prediction model.
-- Profile message delivery/read state is not behavioural Event or Prediction state.
+Any implementation that collapses these concepts requires an explicit ADR change.
