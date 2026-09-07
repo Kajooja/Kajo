@@ -2,11 +2,26 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createLatestRequestGate,
+  getBootstrapEvidenceRevision,
+  subscribeToBootstrapEvidence,
+  notifyBootstrapEvidenceChanged,
   getInteractionEvidenceKey,
   getPredictionRefreshDelay,
 } from './predictionRefresh';
 
 describe('Prediction refresh coordination', () => {
+  it('notifies mounted slates and preserves the revision for later subscribers', () => {
+    const before = getBootstrapEvidenceRevision();
+    let notified = 0;
+    const unsubscribe = subscribeToBootstrapEvidence(() => { notified += 1; });
+    notifyBootstrapEvidenceChanged();
+    expect(notified).toBe(1);
+    expect(getBootstrapEvidenceRevision()).toBe(before + 1);
+    unsubscribe();
+    notifyBootstrapEvidenceChanged();
+    expect(notified).toBe(1);
+    expect(getBootstrapEvidenceRevision()).toBe(before + 2);
+  });
   it('accepts only the latest response token', () => {
     const gate = createLatestRequestGate();
     const first = gate.start();

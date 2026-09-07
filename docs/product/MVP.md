@@ -137,7 +137,7 @@ Commercial monetization, autonomous predictor promotion and additional media/lif
 
 The existing V0/V1 completion marks describe delivered foundations. They do not waive the following acceptance gates. `PREDICTION_MODEL.md` owns the technical contract; `ROADMAP.md` owns order.
 
-- [ ] `MVP-ALG-001` Imported and calibrated taste directly changes unseen PersonalProfile ranking without native Events or prior Scenarios; opposite bootstrap preferences produce explainably different orders over the same candidate pool. Removing/correcting imports recomputes that influence.
+- [-] `MVP-ALG-001` Imported and calibrated taste directly changes unseen PersonalProfile ranking without native Events or prior Scenarios; opposite bootstrap preferences produce explainably different orders over the same candidate pool. Removing/correcting imports recomputes that influence.
 - [ ] `MVP-ALG-002` Serving and shadow use the same versioned feature, score, eligibility and delivery-policy semantics. Baseline replay matches scores within an explicit numerical tolerance and exactly matches eligibility, selected Items and ordering in Personal and Shared controls.
 - [ ] `MVP-ALG-003` Bounded candidate generation can refill after suppression and combine taste, recent intent, novelty and Shared fit. Cursor/slate delivery can continue beyond the first 20/50 results without duplicates, cross-Profile leakage or falsely labelled exhaustion.
 - [ ] `MVP-ALG-004` WorkingState represents ordered active-session intent; ShortTerm and LongTerm use consistent source-aware decay/support. Repeated taps or many tags do not manufacture independent confidence. Native contradictory evidence can supersede old imports; one unusual session does not erase durable taste.
@@ -145,7 +145,7 @@ The existing V0/V1 completion marks describe delivered foundations. They do not 
 - [ ] `MVP-ALG-006` FOR_YOU emphasizes supported fit, SURPRISE meaningful novelty, RISK relevant uncertainty. A bounded inspectable context-dependent memory/policy weighting rule is evaluated against a fixed baseline; learned gating is optional. No unsupported confidence-as-probability claim or automatic model promotion.
 - [ ] `MVP-ALG-007` Calibration preserves the 6-known-of-12-to-24 bound, unknown skips and fail-open while selecting recognizable, diverse and informative real Items; recognition, completion and first-session usefulness are measured.
 - [ ] `MVP-ALG-008` SleepLayer has a scheduled, bounded, retry-safe worker, mature-outcome evaluation, queue monitoring and tested manual canary/rollback. Chronological evaluation reports sample size, missing exposure/support and delayed corrections; no promotion from shadow-only unexposed outcomes or a tiny beta percentage.
-- [ ] `MVP-ALG-009` Database migration replay and deterministic SQL regression tests run in CI, including bootstrap, score/policy parity, suppression/refill, time/undo/outcome reconciliation and owner/member/former-member/outsider authorization.
+- [-] `MVP-ALG-009` Database migration replay and deterministic SQL regression tests run in CI, including bootstrap, score/policy parity, suppression/refill, time/undo/outcome reconciliation and owner/member/former-member/outsider authorization.
 
 ## Reliable evidence and synchronization
 

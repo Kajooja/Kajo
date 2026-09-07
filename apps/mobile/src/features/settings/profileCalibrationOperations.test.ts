@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { getBootstrapEvidenceRevision } from '../discovery/predictionRefresh';
+
 import {
+  commitProfileCalibration,
   mapProfileBootstrapStatus,
   mapProfileCalibrationCandidates,
   shouldOfferProfileCalibration,
@@ -101,4 +104,14 @@ describe('profileCalibrationOperations', () => {
       mapProfileCalibrationCandidates([{ itemId: 'x', itemType: 'GAME' }]),
     ).toBeNull();
   });
+});
+
+
+it('refreshes bootstrap evidence only after a successful calibration commit', async () => {
+  const before = getBootstrapEvidenceRevision();
+  const responses = Array.from({ length: 6 }, (_, index) => ({ itemId: `item-${index}`, rating: 8 }));
+  await commitProfileCalibration(async () => ({ data: { ratingCount: 6, version: 'cold-start-v1' }, error: null }), 'profile-1', responses, 6);
+  expect(getBootstrapEvidenceRevision()).toBe(before + 1);
+  await commitProfileCalibration(async () => ({ data: null, error: { message: 'denied' } }), 'profile-1', responses, 6);
+  expect(getBootstrapEvidenceRevision()).toBe(before + 1);
 });

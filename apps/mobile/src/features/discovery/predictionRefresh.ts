@@ -38,3 +38,23 @@ export function getInteractionEvidenceKey(
     )
     .join('|');
 }
+
+// Imports/calibration also change authorized Shared common-fit. Invalidate all
+// mounted slates in this app session; each hook still fetches its own Profile.
+// The counter contains no Profile data and keeps no unbounded cache.
+let bootstrapRevision = 0;
+const bootstrapListeners = new Set<() => void>();
+
+export function getBootstrapEvidenceRevision() {
+  return bootstrapRevision;
+}
+
+export function subscribeToBootstrapEvidence(listener: () => void) {
+  bootstrapListeners.add(listener);
+  return () => { bootstrapListeners.delete(listener); };
+}
+
+export function notifyBootstrapEvidenceChanged() {
+  bootstrapRevision += 1;
+  bootstrapListeners.forEach((listener) => listener());
+}

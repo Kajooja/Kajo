@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
@@ -24,6 +24,8 @@ import {
 } from './predictionOperations';
 import {
   createLatestRequestGate,
+  getBootstrapEvidenceRevision,
+  subscribeToBootstrapEvidence,
   getInteractionEvidenceKey,
   getPredictionRefreshDelay,
 } from './predictionRefresh';
@@ -66,6 +68,11 @@ export function usePredictionRanking(
   });
   const requestGate = useRef(createLatestRequestGate());
   const loadedRequestKeys = useRef(new Set<string>());
+  const bootstrapRevision = useSyncExternalStore(
+    subscribeToBootstrapEvidence,
+    getBootstrapEvidenceRevision,
+    getBootstrapEvidenceRevision,
+  );
   const evidenceKey = getInteractionEvidenceKey(interactions);
   const profileId =
     activeProfile.status === 'ready'
@@ -163,6 +170,7 @@ export function usePredictionRanking(
   }, [
     activeProfile.activeProfile?.type,
     attempt,
+    bootstrapRevision,
     client,
     evidenceKey,
     eventTracking.sessionId,

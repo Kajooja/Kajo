@@ -1,3 +1,4 @@
+import { notifyBootstrapEvidenceChanged } from '../discovery/predictionRefresh';
 import type { Item } from '@/domain/contracts';
 
 export type ProfileCalibrationRpc = (
@@ -107,6 +108,7 @@ export async function commitProfileCalibration(
     return { status: 'error', message: 'Kalibroinnin tulosta ei voitu tulkita.' };
   }
 
+  notifyBootstrapEvidenceChanged();
   return { status: 'success', ratingCount, version };
 }
 
