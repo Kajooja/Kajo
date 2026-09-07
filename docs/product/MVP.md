@@ -1,29 +1,36 @@
 # Kajo MVP
 
-Milestone: **MVP 0.1**
+Milestone: **MVP 0.1 — first public Kajo**
 
-Product decision **2026-09-07**: algorithm correctness, bounded adaptive memory, sustained SleepLayer evaluation, browse suggestions #200/#201/#203 and complete operational/data lifecycle are required for this release. These are planned acceptance gates, not claims of delivered behavior. Graphics may evolve through the existing theme/assets boundary.
+Product decision **2026-09-07**: algorithm correctness remains the critical path, but the first public release must also include Kajo's complete Taste-first acquisition loop. This file defines release blockers; it does not claim newly planned behavior is implemented. Graphics and detailed copy may evolve through existing theme/UX boundaries without changing the release contract.
 
 Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
-This file defines the MVP boundary. Adding a new MVP requirement requires an explicit product decision; implementation convenience is not enough.
+Canonical launch flow: [LAUNCH_LOOP.md](LAUNCH_LOOP.md). Execution order: [ROADMAP.md](../project/ROADMAP.md). Long-term vision: [FUTURE_PLAN.md](FUTURE_PLAN.md).
 
 ## MVP completion meaning
 
-`MVP 0.1` is the first **complete, store-downloadable BOOK/MOVIE Kajo**, not a mock-data prototype and not yet a monetized commercial product.
+`MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.
 
 Before the milestone may be marked complete:
 
-- normal discovery uses real provider-backed BOOK and MOVIE Items rather than `KAJO_MOCK`,
-- a new user can establish useful PersonalProfile taste in the first session through imported history or bounded Kajo calibration,
-- core PersonalProfile and SharedProfile flows work end-to-end for external users without developer intervention,
-- the product is validated with a small external beta (target roughly 10 people),
-- production authentication, security, privacy/support, signing/versioning and store requirements are complete,
-- a signed build is downloadable through Google Play and/or the Apple App Store and accepted by the product owner.
+- normal discovery uses a useful real BOOK/MOVIE catalog,
+- the recommendation/evidence system passes algorithm correctness, memory, trace, SleepLayer and replay gates,
+- a previously unknown visitor can begin a real Taste Test from a public link without registration,
+- Taste Test creates useful first-session PersonalProfile taste and an honest holdout prediction challenge,
+- a small personalized recommendation preview is shown before registration,
+- anonymous taste state survives Google/Apple conversion without duplicate identity/Profile creation,
+- a personal invite can convert the receiver into an accepted Friend of the inviter,
+- accepting a Friend invite does **not** automatically create a SharedProfile,
+- Friends can explicitly create a SharedProfile through a short consent-based flow,
+- the full link → Taste → auth → Friend → Shared loop is measurable, privacy-safe and abuse-resistant,
+- core PersonalProfile/SharedProfile/Lists/search flows work end-to-end,
+- a controlled external beta validates the complete intended acquisition path,
+- production auth/security/privacy/support/retention/recovery/signing/store requirements pass,
+- a store/public destination is usable and accepted by the owner,
+- the `ROADMAP.md` **Share Link Gate** is explicitly accepted before broad distribution.
 
-Commercial monetization, autonomous predictor promotion and additional media/life domains remain outside this milestone unless explicitly promoted later.
-
-The owner's complete-product direction (2026-09-07) is preserved in [FUTURE_PLAN.md](FUTURE_PLAN.md), with dependencies in [ROADMAP.md](../project/ROADMAP.md#post-mvp-execution-queue). It requires eventual availability in **both** mobile stores and adds series, albums, hyperlocal events and gated social/research extensions after this queue. A one-store MVP release does not fulfill that two-store final target. This planning addition does not mark any current requirement complete or silently expand MVP 0.1 to the distant research scope.
+Commercial monetization, public stranger discovery, dating, extra production domains and automatic global predictor promotion remain outside MVP unless explicitly promoted later.
 
 ## Foundation
 
@@ -33,165 +40,218 @@ The owner's complete-product direction (2026-09-07) is preserved in [FUTURE_PLAN
 
 ## Authentication and identity
 
-- [x] `MVP-AUTH-001` User can register with a unique email + unique nickname, confirm the email in the mobile flow, sign in with either email or nickname plus password, and recover a forgotten password through the account email.
-- [x] `MVP-AUTH-002` Every signed-in User has one user-visible unique nickname linked to the same identity as their authentication email; stored/display casing is preserved while uniqueness, sign-in and search are case-insensitive.
-- [x] `MVP-AUTH-003` New nicknames are limited to 2–24 characters consistently in mobile and backend validation so persistent navigation never depends on arbitrary truncation.
-- [ ] `MVP-AUTH-004` Store release uses production email delivery and supports Google plus Sign in with Apple through the same canonical Kajo User identity; linked providers must not create duplicate PersonalProfiles or nicknames.
+- [x] `MVP-AUTH-001` User can register with a unique email + nickname, confirm email, sign in and recover password.
+- [x] `MVP-AUTH-002` Nickname belongs to the same canonical identity; uniqueness/search/sign-in are case-insensitive while display casing is preserved.
+- [x] `MVP-AUTH-003` Nickname length is consistently bounded to 2–24 characters.
+- [ ] `MVP-AUTH-004` Production supports Google plus Sign in with Apple through the same canonical Kajo User; linked providers must not create duplicate PersonalProfiles or nicknames.
+- [ ] `MVP-AUTH-005` Anonymous Taste identity can be upgraded/linked to a permanent Google/Apple User while preserving the same logical PersonalProfile/taste state and without unsafe merging of two permanent Users.
 
 ## Room and theme
 
 - [x] `MVP-ROOM-001` A user has a personal minimalist 2D Room.
-- [x] `MVP-ROOM-002` The Room is the primary home/navigation surface; the persistent Kajo brand mark always returns to the active Profile Room.
+- [x] `MVP-ROOM-002` Room is the primary home/navigation surface.
 - [x] `MVP-ROOM-003` Bookshelf opens book discovery.
 - [x] `MVP-ROOM-004` Screen/projector opens movie discovery.
-- [x] `MVP-ROOM-005` User theme is represented by reusable theme tokens rather than hard-coded component colours.
-- [x] `MVP-ROOM-006` SharedProfile has its own restrained shared Room/theme identity.
+- [x] `MVP-ROOM-005` Theme is represented by reusable tokens rather than screen-local hard coding.
+- [x] `MVP-ROOM-006` SharedProfile has its own restrained Room/theme identity.
 
 ## Navigation shell
 
-- [x] `MVP-NAV-001` The persistent top Kajo logo returns to the currently active Profile's Room; changing Personal/Shared Profile does not change this contract.
-- [x] `MVP-NAV-002` A small persistent bottom dock provides a menu control that opens a Profile-aware side drawer and an envelope control that opens Inbox; Kajo does not use a conventional multi-tab bottom navigation bar.
-- [x] `MVP-NAV-003` General account/content navigation is reachable from the Room or side drawer; the drawer owns active Profile switching plus Profile, Lists and Groups destinations when those destinations exist, without duplicate/dead navigation entries.
-- [x] `MVP-NAV-004` Tapping the bottom-center active Profile identity opens a lightweight actor-local quick switcher with at most five recent/most-used SharedProfiles; selecting one activates that existing Profile and `Näytä lisää` opens the canonical Groups page without a duplicate Profile/membership model. Configured-Android acceptance passed on the merged main APK.
+- [x] `MVP-NAV-001` Persistent Kajo mark returns to the currently active Profile Room.
+- [x] `MVP-NAV-002` Persistent bottom dock exposes menu + Inbox without conventional multi-tab navigation.
+- [x] `MVP-NAV-003` Drawer owns Profile switching plus Profile/Lists/Groups destinations without duplicate/dead entries.
+- [x] `MVP-NAV-004` Bottom-center Profile identity opens the accepted lightweight SharedProfile quick switcher.
+- [ ] `MVP-NAV-005` Canonical Groups/Profile surface filters only already-authorized Profile names; unrelated/private Profiles are never exposed.
 
 ## Discovery
 
-- [x] `MVP-DISC-001` Books and movies have a visual grid discovery experience.
+- [x] `MVP-DISC-001` Books and movies have visual grid discovery.
 - [x] `MVP-DISC-002` Discovery supports `FOR_YOU`, `SURPRISE` and `RISK`.
-- [x] `MVP-DISC-003` The persistent curtain control selects DiscoveryMode with three snap states.
-- [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn, evening and night without replacing the base user theme.
-- [x] `MVP-DISC-005` Grid ranking changes when DiscoveryMode changes through the hosted generic scorer; configured Android acceptance passed with the broader normalized catalog.
-- [x] `MVP-DISC-006` User can open Item details.
-- [x] `MVP-DISC-007` One shared three-state DiscoveryMode/risk value persists through Room, discovery and Item browsing; one compact persistent app-shell curtain manipulates that state without screen-local copies or duplicate Room controls.
+- [x] `MVP-DISC-003` Curtain control selects DiscoveryMode with three snap states.
+- [x] `MVP-DISC-004` DiscoveryMode maps visually to dawn/evening/night.
+- [x] `MVP-DISC-005` Ranking changes through hosted scorer when DiscoveryMode changes.
+- [x] `MVP-DISC-006` Item details are reachable.
+- [x] `MVP-DISC-007` One shared DiscoveryMode value persists through Room/discovery/detail.
+- [ ] `MVP-DISC-008` Discovery exposes a bounded contextual row of active Profile Lists with canonical overflow.
+- [ ] `MVP-DISC-009` Canonical catalog supports title/creator search plus normalized tag/year/language/ItemType filtering with bounded server pagination and truthful provenance.
 
 ## Real catalog
 
-- [ ] `MVP-CAT-001` Normal BOOK/MOVIE discovery uses a useful real provider-backed catalog with at least hundreds of Items per domain and enough Finnish/international diversity for external testing; historical `KAJO_MOCK` rows remain referentially intact but are not normally discoverable.
-- [ ] `MVP-CAT-002` Every provider-backed Item has generic source/provenance, external-ID deduplication, lifecycle/discoverability and refresh semantics while `public.items` remains the single canonical recommendable Item table.
-- [ ] `MVP-CAT-003` BOOK/MOVIE presentation can show legally usable cover/poster metadata and normalized title/creator/release/genre-or-subject information without provider-specific recommender branches in the mobile client.
+- [ ] `MVP-CAT-001` Normal BOOK/MOVIE discovery uses a useful real provider-backed catalog with at least hundreds of Items/domain and sufficient Finnish/international diversity; `KAJO_MOCK` is not normally discoverable.
+- [ ] `MVP-CAT-002` Provider-backed Items have canonical provenance, external-ID deduplication, lifecycle/discoverability and repeatable refresh semantics.
+- [ ] `MVP-CAT-003` Presentation can show legally usable image/title/creator/release/genre-or-subject metadata without provider-specific recommender branches.
 
 ## Profile bootstrap and history import
 
-- [ ] `MVP-BOOT-001` A user can import Letterboxd and IMDb movie-history exports through a user-authorized file flow; watched/check-in/rating/watchlist data is matched to canonical Items and normalized into Kajo state/evidence with source provenance.
-- [ ] `MVP-BOOT-002` A user has at least one practical book-history import path (for example Goodreads-style or StoryGraph CSV plus a documented generic Kajo CSV fallback) that matches books safely by ISBN/external ID/title metadata and normalizes read/rating/to-read state.
-- [ ] `MVP-BOOT-003` A user without enough imported/native evidence completes a bounded real-catalog cold-start profiling pass: provider/catalog trend or popularity and recognition determine the first candidates, 12 Items are shown first, unknown Items may be skipped, at least 6 known Items are rated, and the deterministic slate may extend to at most 24 before a fail-open. The flow requires no demographic profiling and never substitutes `KAJO_MOCK`; Kajo-derived cross-Profile trend remains future privacy-gated PopulationMemory rather than an MVP shortcut.
-- [ ] `MVP-BOOT-004` Imported/calibration evidence is idempotent, distinguishable from native Kajo Events, correctable/removable, initializes PersonalProfile taste, and is progressively superseded by real Kajo behaviour rather than becoming permanent truth.
+- [ ] `MVP-BOOT-001` User can import Letterboxd/IMDb movie history through a user-authorized file flow.
+- [ ] `MVP-BOOT-002` User has at least one practical book-history import path plus a generic fallback.
+- [ ] `MVP-BOOT-003` No-import user can establish initial taste from recognizable real Items, with unknown skips and bounded fail-open behavior.
+- [ ] `MVP-BOOT-004` Imported/calibration evidence is idempotent, removable/correctable, source-provenanced and progressively superseded by native behavior.
+
+## Taste-first acquisition — release blockers
+
+These requirements implement [LAUNCH_LOOP.md](LAUNCH_LOOP.md).
+
+- [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
+- [ ] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required.
+- [ ] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics and initialize the visitor's PersonalProfile-compatible taste state without pretending campaign/auth behavior is recommendation evidence.
+- [ ] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward.
+- [ ] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted.
+- [ ] `MVP-TASTE-006` After the challenge, Kajo shows a small unseen recommendation preview generated through the canonical production ranking boundary, including safe explanation and optional FOR_YOU/SURPRISE/RISK contrast.
+- [ ] `MVP-TASTE-007` A completed Taste session produces useful first-session recommendations compared with a fixed transparent baseline/reference set; if evidence does not show usefulness, public launch remains blocked.
+
+## Acquisition links, web continuation and conversion
+
+- [ ] `MVP-ACQ-001` A public/reusable Taste link opens the Taste flow in a normal browser when the app is absent and the equivalent route in the installed app where supported; campaign attribution grants no Friend/Shared permission.
+- [ ] `MVP-ACQ-002` A personal Friend invite uses a separate opaque server-owned token with inviter reference, expiry, revocation, bounded use and anti-replay semantics. It never exposes private Profile data in the URL.
+- [ ] `MVP-ACQ-003` Anonymous Taste state is server-backed and survives browser/app/auth continuation according to retention rules; local state is only a cache/continuation aid, not the sole canonical record.
+- [ ] `MVP-ACQ-004` Google/Apple conversion preserves Taste responses, attribution and the same logical PersonalProfile exactly once; failed/abandoned auth can resume safely.
+- [ ] `MVP-ACQ-005` Taste completion presents the recommendation preview before the primary Google/Apple continuation CTA; registration is not required to discover whether Kajo provides value.
+- [ ] `MVP-ACQ-006` Campaign/referral/invite attribution is versioned, bounded and separately queryable from recommendation evidence.
+- [ ] `MVP-ACQ-007` Web/app/auth/link continuation passes clean-session, installed/not-installed, expired/revoked token, duplicate-open and account-collision tests.
+
+## Friends and viral loop — release blockers
+
+`Friendship` is a lightweight social relationship and is intentionally separate from SharedProfile membership.
+
+- [ ] `MVP-FRIEND-001` Activated User can create a personal Friend invite that sends the receiver through the same Taste-first flow.
+- [ ] `MVP-FRIEND-002` Receiver explicitly accepts the inviter connection after/through permanent identity conversion; pending invite is not Friendship.
+- [ ] `MVP-FRIEND-003` Successful acceptance creates at most one reciprocal active Friendship for the pair and is idempotent under retries/replayed links.
+- [ ] `MVP-FRIEND-004` Friendship grants no access to the Friend's private PersonalProfile Events, Memory, imports, messages or raw taste state.
+- [ ] `MVP-FRIEND-005` Both users see the accepted Friend on the canonical Friends surface.
+- [ ] `MVP-FRIEND-006` Remove/block/reinvite behavior is explicit; blocked/removed states cannot be bypassed with old tokens.
+- [ ] `MVP-FRIEND-007` Invite creation/open/accept and nickname/search surfaces use enumeration/spam/rate-limit controls suitable for public release.
+
+## Shared Kajo creation from Friends
+
+Existing SharedProfile learning semantics remain canonical.
+
+- [x] `MVP-PROFILE-001` Every permanent User has a PersonalProfile.
+- [x] `MVP-PROFILE-002` 2-N Users can belong to persistent SharedProfile through accepted membership.
+- [x] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
+- [x] `MVP-PROFILE-004` SharedProfile name length is 2–32 characters.
+- [x] `MVP-PROFILE-005` Member can leave SharedProfile safely with confirmation and correct fallback/access loss.
+- [ ] `MVP-GROUP-001` Two Friends can explicitly create a new SharedProfile through one short consent-based flow; accepting a Friend invite never creates it automatically.
+- [ ] `MVP-GROUP-002` 3+ SharedProfile creation can select Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent.
+- [ ] `MVP-GROUP-003` Newly created SharedProfile immediately uses the existing canonical joint/common-fit prediction boundary; no pair-specific duplicate recommender is introduced.
+
+## Existing Shared discovery
+
+- [x] `MVP-SOCIAL-001` SharedProfile has joint current Item state and actor/Profile-separated persistence.
+- [x] `MVP-SOCIAL-002` Members can browse/swipe and receive Prediction in Shared context without a separate media/social predictor.
+- [x] `MVP-SOCIAL-003` Member can create actor-specific pending Endorsement.
+- [x] `MVP-SOCIAL-004` Pending Endorsement is hidden for endorser and prioritized for non-endorsing accepted members with provenance.
+- [x] `MVP-SOCIAL-005` Unanimous endorsement promotes once to Shared Saved/system `Tallennetut` and remains durable after later membership changes.
+- [x] `MVP-SOCIAL-006` Accepted-member Personal consumed/rated history may appear only as an attributed lower Shared discovery tier; Shared consumed/consensus-saved Items remain suppressed.
 
 ## Swipe and state
 
-- [x] `MVP-SWIPE-001` User can enter an optional swipe mode for books and movies.
-- [x] `MVP-SWIPE-002` User can give consumed Items a 0–10 rating or mark an unconsumed Item as not currently interesting; these are distinct canonical signals.
-- [x] `MVP-SWIPE-003` A 0–10 rating always marks a movie watched or a book read; consumption is not a separate ambiguous action.
-- [x] `MVP-SWIPE-004` Consumed Items are strongly suppressed, explicitly reacted Items leave the immediate queue, and unreacted impressions use a temporary cooldown so they may return later.
-- [x] `MVP-SWIPE-005` Rating, not-interested and `Lisää listaan` actions live in one restrained feedback drawer, visibly commit and advance without an index jump. List addition is the positive/like action; there is no separate Like button.
-- [x] `MVP-SWIPE-006` User can undo recent interaction choices through a clear back/undo control; the MVP interaction layer retains at least the latest 10 committed actions and restores both prior state and exact previous Item/card.
+- [x] `MVP-SWIPE-001` Optional swipe mode exists for books/movies.
+- [x] `MVP-SWIPE-002` Consumed rating 0–10 and unconsumed not-interest are distinct.
+- [x] `MVP-SWIPE-003` Rating implies consumed/read/watched.
+- [x] `MVP-SWIPE-004` Consumed/reacted Items are suppressed appropriately; impressions have bounded cooldown.
+- [x] `MVP-SWIPE-005` Rating, not-interest and List addition use one restrained action drawer; List add is positive action.
+- [x] `MVP-SWIPE-006` Recent interactions can be undone with exact Item/state restoration.
 
 ## Saved, consumed and memory
 
-- [x] `MVP-MEM-001` User can save/unsave an Item.
-- [x] `MVP-MEM-002` User can view consumed books/movies, including Items advanced away from active swipe after being marked read/watched.
-- [x] `MVP-MEM-003` User can add a 0–10 rating to an Item, which always records that Item as consumed.
-- [ ] `MVP-MEM-004` Data model leaves a clear extension point for future note/photo/people/location/date memories.
-- [-] `MVP-MEM-005` User can open Profile-scoped Saved and watched/read/consumed collections from persistent navigation and see current consumed/rating state without duplicating that state into collection rows.
-
-## Profiles and Shared Kajo
-
-- [x] `MVP-PROFILE-001` Every User has a PersonalProfile.
-- [x] `MVP-PROFILE-002` 2-N Users can belong to a persistent SharedProfile through consent-based accepted membership.
-- [x] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
-- [x] `MVP-PROFILE-004` New SharedProfile names are limited to 2–32 characters consistently in mobile/backend validation.
-- [x] `MVP-PROFILE-005` An accepted member can leave a SharedProfile only after an `Oletko varma?` confirmation; leaving removes membership/access, falls back safely from an active group and preserves history for remaining members.
-- [x] `MVP-SOCIAL-001` SharedProfile has joint current Item state and actor/Profile-separated persistence.
-- [x] `MVP-SOCIAL-002` Members can browse/swipe and receive Prediction V0 in SharedProfile context without a separate media/social predictor.
-- [x] `MVP-SOCIAL-003` In SharedProfile discovery, one member can endorse an Item as worth doing together; the endorsement is actor-specific pending state, not shared `saved=true`.
-- [x] `MVP-SOCIAL-004` A pending endorsement is suppressed for the endorser and prioritized ahead of ordinary recommendations for accepted members who have not endorsed it, with restrained real-actor provenance.
-- [x] `MVP-SOCIAL-005` Unanimous endorsement by all currently accepted members promotes the Item once to Shared saved state / system `Tallennetut`; a later new member does not retroactively revoke that historical consensus.
-- [x] `MVP-SOCIAL-006` Ordinary Shared discovery retains Items consumed/rated in an accepted member's PersonalProfile as a clearly attributed lower-priority history tier; higher member ratings may lift Items only inside that tier. SharedProfile-consumed and consensus-saved Items remain outside ordinary discovery, and no history/List data is deleted.
+- [x] `MVP-MEM-001` User can save/unsave Item.
+- [x] `MVP-MEM-002` User can view consumed books/movies.
+- [x] `MVP-MEM-003` Rating 0–10 records consumed.
+- [ ] `MVP-MEM-004` Data model retains an extension point for future note/photo/people/location/date memories.
+- [-] `MVP-MEM-005` Profile-scoped Saved and consumed collections are reachable without duplicating canonical interaction state.
 
 ## Named Lists
 
-- [-] `MVP-LIST-001` PersonalProfile and SharedProfile can own multiple Profile-scoped named Lists; List names are 1–40 characters and one List may contain mixed generic Item types such as BOOK and MOVIE.
-- [-] `MVP-LIST-002` `Lisää listaan` opens a compact single-destination picker ordered by the current actor's most recent use, shows at most five Lists before `Lisää`, and can create/name/rename a List. One action chooses exactly one destination; separate later actions may still place the same Item in multiple Lists without silently removing existing memberships.
-- [-] `MVP-LIST-003` A successful Personal List addition is the positive discovery action and advances to the next card. In SharedProfile the first actor's custom-List choice creates a pending Endorsement and advances/hides the card for that actor; another member sees a green proposer/List approval bar. Unanimous approval produces `Pari!`, commits the chosen custom-List membership and promotes to system `Tallennetut`, then advances/hides the card for the approving members.
-- [-] `MVP-LIST-004` List detail can toggle between list and card/grid presentation, sort deterministically by added order/supported generic metadata, and filter by generic ItemType (`Kaikki`, `Kirjat`, `Elokuvat`, later domains without schema redesign).
-- [-] `MVP-LIST-005` Every list membership stores `addedByUserId` and `addedAt`; SharedProfile UI displays who added the Item and when, while PersonalProfile hides redundant actor identity. Current watched/read/consumed state and rating are joined from canonical Profile interaction state.
-- [-] `MVP-LIST-006` SharedProfile List read/write access follows accepted membership authorization and a former member loses access after leaving the group.
+- [-] `MVP-LIST-001` Personal/Shared Profiles can own multiple named generic Lists plus one system Saved List.
+- [-] `MVP-LIST-002` Compact one-destination List picker supports recent Lists and create/name/rename.
+- [-] `MVP-LIST-003` Personal add is positive action; Shared custom List proposal/approval follows Endorsement unanimity and then system Saved promotion.
+- [-] `MVP-LIST-004` List detail supports list/card presentation, deterministic sort and generic ItemType filters.
+- [-] `MVP-LIST-005` Membership stores truthful added-by/time while canonical consumed/rating state stays elsewhere.
+- [-] `MVP-LIST-006` Shared List access follows accepted membership authorization.
 
 ## Profile messaging
 
-- [-] `MVP-MSG-001` Each Profile can expose one narrow chat/thread surface: PersonalProfile thread is owner-only and SharedProfile thread is accepted-member-only while retaining actual sending `actorUserId`.
-- [-] `MVP-MSG-002` The persistent envelope Inbox surfaces pending invitations and message activity without adding Room clutter; unread/message state is user-facing delivery state rather than generic Item interaction state.
-- [-] `MVP-MSG-003` Saving/adding an Item to a List may include an optional message that references the correct `profileId`, `listId` and `itemId`; List membership remains independent from message persistence and chat text is not Prediction evidence by default.
+- [-] `MVP-MSG-001` Profile exposes narrow owner/member-only thread retaining real actor.
+- [-] `MVP-MSG-002` Inbox surfaces invitations/message activity without Room clutter.
+- [-] `MVP-MSG-003` Optional Item/List message references canonical Profile/List/Item while message text is not prediction evidence by default.
 
 ## Data and prediction
 
-- [-] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
+- [-] `MVP-DATA-001` Meaningful discovery behavior is captured through canonical generic event interface.
 - [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
-- [x] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
-- [x] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
-- [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
-- [x] `MVP-PRED-004` Architecture supports scenario-memory retrieval without redesigning core Profile/Item/Event/Prediction contracts.
-- [-] `MVP-PRED-005` SharedProfile Prediction V1 combines Shared joint evidence with accepted members' authorized PersonalProfile LongTerm/native ShortTerm fit through an inspectable aggregate common-fit component: sparse member estimates shrink toward a neutral `ColdStartPrior`, agreement/minimum-member fit can lift candidates, disagreement is penalized, the Prediction target remains the SharedProfile, Personal evidence is never copied into Shared history, and candidate explanations expose only aggregate components. Hosted v1.1 acceptance is complete; configured-device acceptance remains required before marking this complete.
-- [-] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
-- [x] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
+- [ ] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely.
+- [ ] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
+- [x] `MVP-PRED-001` Prediction ranks generic Items for a Profile.
+- [x] `MVP-PRED-002` Prediction includes long-term, recent and Item-similarity signals.
+- [x] `MVP-PRED-003` DiscoveryMode changes ranking/exploration semantics.
+- [x] `MVP-PRED-004` Core supports ScenarioMemory without redesigning Profile/Item/Event/Prediction contracts.
+- [-] `MVP-PRED-005` Shared Prediction combines direct Shared evidence and authorized aggregate member fit/disagreement while retaining privacy and Shared target identity.
+- [-] `MVP-PRED-006` Learnable hosted recommendation persists versioned PredictionRun + complete candidate trace before correlated learning.
+- [x] `MVP-PRED-007` V1 uses bounded inspectable same-Profile ScenarioMemory and safe fallback.
 
 ## Algorithm correctness and adaptation — release blockers
 
-The existing V0/V1 completion marks describe delivered foundations. They do not waive the following acceptance gates. `PREDICTION_MODEL.md` owns the technical contract; `ROADMAP.md` owns order.
+- [-] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence.
+- [ ] `MVP-ALG-002` Serving/shadow share versioned feature/score/eligibility/delivery semantics and baseline replay parity.
+- [ ] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
+- [ ] `MVP-ALG-004` Working/Short/Long state use ordered, source-aware, evidence-aware decay/support; contradictions can change taste without one session erasing durable state.
+- [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with bounded cross-domain transfer and safe neutral fallback.
+- [ ] `MVP-ALG-006` FOR_YOU/SURPRISE/RISK have evaluated context-dependent policy differences; unsupported confidence/probability claims are forbidden.
+- [ ] `MVP-ALG-007` Cold-start/Taste selection is recognizable, diverse and informative with measured completion/usefulness.
+- [ ] `MVP-ALG-008` SleepLayer has scheduled bounded retry-safe worker, mature-outcome evaluation, monitoring and tested manual canary/rollback; no tiny-sample promotion.
+- [-] `MVP-ALG-009` Clean database/replay and deterministic SQL regression tests cover bootstrap, parity, suppression/refill, time/undo/outcome reconciliation and authorization.
 
-- [-] `MVP-ALG-001` Imported and calibrated taste directly changes unseen PersonalProfile ranking without native Events or prior Scenarios; opposite bootstrap preferences produce explainably different orders over the same candidate pool. Removing/correcting imports recomputes that influence.
-- [ ] `MVP-ALG-002` Serving and shadow use the same versioned feature, score, eligibility and delivery-policy semantics. Baseline replay matches scores within an explicit numerical tolerance and exactly matches eligibility, selected Items and ordering in Personal and Shared controls.
-- [ ] `MVP-ALG-003` Bounded candidate generation can refill after suppression and combine taste, recent intent, novelty and Shared fit. Cursor/slate delivery can continue beyond the first 20/50 results without duplicates, cross-Profile leakage or falsely labelled exhaustion.
-- [ ] `MVP-ALG-004` WorkingState represents ordered active-session intent; ShortTerm and LongTerm use consistent source-aware decay/support. Repeated taps or many tags do not manufacture independent confidence. Native contradictory evidence can supersede old imports; one unusual session does not erase durable taste.
-- [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with domain-specific metadata and bounded transfer reliability. Tests show helpful cross-domain transfer and safe neutral fallback for missing/contradictory features; provider free-text tags alone are insufficient acceptance.
-- [ ] `MVP-ALG-006` FOR_YOU emphasizes supported fit, SURPRISE meaningful novelty, RISK relevant uncertainty. A bounded inspectable context-dependent memory/policy weighting rule is evaluated against a fixed baseline; learned gating is optional. No unsupported confidence-as-probability claim or automatic model promotion.
-- [ ] `MVP-ALG-007` Calibration preserves the 6-known-of-12-to-24 bound, unknown skips and fail-open while selecting recognizable, diverse and informative real Items; recognition, completion and first-session usefulness are measured.
-- [ ] `MVP-ALG-008` SleepLayer has a scheduled, bounded, retry-safe worker, mature-outcome evaluation, queue monitoring and tested manual canary/rollback. Chronological evaluation reports sample size, missing exposure/support and delayed corrections; no promotion from shadow-only unexposed outcomes or a tiny beta percentage.
-- [-] `MVP-ALG-009` Database migration replay and deterministic SQL regression tests run in CI, including bootstrap, score/policy parity, suppression/refill, time/undo/outcome reconciliation and owner/member/former-member/outsider authorization.
+## Growth/funnel measurement — release blockers
 
-## Reliable evidence and synchronization
+- [ ] `MVP-GROWTH-001` Funnel telemetry can reconstruct public link/open → Taste start/response/completion → challenge → preview → auth conversion → Friend invite/open/accept → Friendship → SharedProfile creation.
+- [ ] `MVP-GROWTH-002` Funnel events are semantically separate from Item preference/consumption evidence; growth clicks cannot become recommender reward by default.
+- [ ] `MVP-GROWTH-003` Taste policy, model/policy versions, campaign/referral source and relevant experiment assignment are traceable for evaluation.
+- [ ] `MVP-GROWTH-004` Release metrics include Taste completion, recognition, holdout error/hit rate, account conversion, D1/D7, invites/activated User, invite→Friend conversion, Friends→Shared creation and successful discoveries; installs/time-spent alone are not success.
 
-- [ ] `MVP-DATA-003` A meaningful action commits its canonical Event(s) and current-state projection atomically through an idempotent authorized boundary. Persistent actor/Profile-scoped client outbox survives app termination, retries without duplicate effects, and reports pending/failed status. Concurrent actions, undo and lost acknowledgements are covered.
-- [ ] `MVP-DATA-004` Grid/detail/swipe use the exact delivered Profile/prediction/slate context. Shared collaboration overlays, search, Lists/history and fallback have truthful delivery origins; they cannot fabricate hosted candidate selection. Delayed outcomes preserve valid provenance, with unmatched cases explicitly excluded from evaluation.
+## UX and accessibility
 
-## Promoted browse and product-quality requirements
-
-- [ ] `MVP-DISC-008` #200: BOOK/MOVIE discovery exposes a bounded contextual row of the active Profile's existing Lists with canonical Lists overflow; mixed Lists and Profile switching remain correct.
-- [ ] `MVP-DISC-009` #201: persisted canonical catalog supports title/creator search and normalized tag, year, language and ItemType filters where data exists, with bounded server pagination, reset/empty/error states and truthful search provenance. Search constraints do not become durable taste by themselves.
-- [ ] `MVP-NAV-005` #203: canonical Groups/Profile surface filters already-authorized Profile names; invitation nickname lookup remains separate and unrelated/private Profiles are never exposed.
-- [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast and reduced motion; loading, empty, offline, permission-denied and recovery states are usable on representative devices. Graphics remain replaceable without changing domain/Event contracts.
+- [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast/reduced motion plus usable loading/empty/offline/permission/recovery states on representative devices.
+- [ ] `MVP-UX-002` Taste-first link flow is usable on representative mobile browsers and inside the installed app, with clear continuation when an external browser/app-store/auth round-trip occurs.
 
 ## Production services and data lifecycle
 
-`ARCHITECTURE.md` owns the service inventory, retention decisions and operational evidence checklist.
-
-- [ ] `MVP-OPS-001` Every required production service has an actual owner, environment/project ID, region, access/recovery route, cost cap/alert and deployment/configuration record; staging and production data/secrets are isolated. No unspecified runtime server or storage dependency remains at release.
-- [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups. Automated expiry and deletion are tested, including former-member access and recovery without resurrecting deleted data.
-- [ ] `MVP-OPS-003` Backup and isolated restore drills meet recorded recovery objectives and verify database, required objects, configuration and signing-key recovery. A database backup alone is not proof of file/object recovery.
-- [ ] `MVP-OPS-004` Alerts and runbooks cover API/auth/import/worker failures, crash rate, queue age, Prediction quality/latency, database/storage growth and spend. Representative load and rollback drills pass; sensitive payloads and tokens are redacted.
-- [ ] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete. Release builds reject missing production configuration and cannot silently ship mock discovery.
+- [ ] `MVP-OPS-001` Every production service has owner/environment/region/access/recovery/cost/deployment record; staging and production data/secrets are isolated.
+- [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, anonymous identities/Taste sessions, attribution/invites/Friendship, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups.
+- [ ] `MVP-OPS-003` Backup and isolated restore drills meet recorded objectives for database/objects/config/signing recovery.
+- [ ] `MVP-OPS-004` Alerts/runbooks cover API/auth/Taste/link/import/worker failures, crash rate, queue age, Prediction quality/latency, database/storage growth and spend.
+- [ ] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete; production builds fail closed on missing production config/mock discovery.
+- [ ] `MVP-OPS-006` Anonymous Taste and Friend-invite creation/open/accept have abuse/rate limits, anti-enumeration, revoke/expiry, block handling and redacted diagnostics suitable for public links.
 
 ## External beta readiness
 
-- [ ] `MVP-BETA-001` A clean install can be given to roughly 10 external testers without developer setup, and PersonalProfile plus SharedProfile BOOK/MOVIE flows use real content and useful first-session personalization.
-- [ ] `MVP-BETA-002` External-beta failures are diagnosable through production-like backend/Prediction/error observability, and beta feedback is used for bounded fixes/calibration rather than silently changing core architecture.
+- [ ] `MVP-BETA-001` A clean external visitor can use the **actual intended flow** without developer setup: link → Taste → challenge → preview → Google/Apple → Kajo → invite Friend → accepted Friendship → explicit SharedProfile → joint recommendation.
+- [ ] `MVP-BETA-002` Failures are diagnosable and beta outcomes drive bounded fixes/calibration rather than silent architecture changes; small beta percentages are not treated as proof of small statistical lifts.
+- [ ] `MVP-BETA-003` Owner accepts the complete link-to-app flow on representative Android/iOS devices before the Share Link Gate.
 
 ## Production release
 
-- [ ] `MVP-REL-001` Kajo has stable production application identifiers, versioning, signing and release configuration for its supported mobile platforms; no development-only secret or service-role credential is embedded in a client build.
-- [ ] `MVP-REL-002` Production authentication email delivery, social-login configuration, privacy/support information, store assets, required permissions and account/data lifecycle flows are verified for an external user.
-- [ ] `MVP-REL-003` A signed production release is downloadable through Google Play and/or the Apple App Store, and clean install, authentication, PersonalProfile, SharedProfile, real BOOK/MOVIE discovery, Lists and update flows pass on representative real devices.
+- [ ] `MVP-REL-001` Stable production identifiers/versioning/signing/release config exist; no privileged credential is embedded in clients.
+- [ ] `MVP-REL-002` Production email/social auth, privacy/support, store assets, permissions and account/data lifecycle are verified for external users.
+- [ ] `MVP-REL-003` Signed production release is downloadable through Google Play and/or Apple App Store and clean install/auth/Personal/Shared/real discovery/Lists/update flows pass on representative real devices.
+- [ ] `MVP-REL-004` `ROADMAP.md` Share Link Gate is explicitly accepted. Before this requirement is complete, agents must not claim Kajo is ready for broad Taste-link distribution.
 
 ## Explicitly outside MVP 0.1
 
-- Monetization/commercial subscription or advertising systems.
-- Full autonomous evolutionary predictor population/genetic optimization and automatic production promotion.
-- Kajo-derived cross-Profile `PopulationMemory` trend/collaborative transfer before consent, minimum-cohort, deletion-lineage and exposure-bias gates; provider aggregate popularity/trend remains allowed as `ColdStartPrior` catalog metadata.
+- Monetization/subscriptions/ads.
+- Full autonomous genetic/evolutionary production promotion.
+- Privacy-gated cross-Profile PopulationMemory before consent/cohort/deletion/exposure-bias gates.
 - Music, series, games, restaurants, travel and live-event production domains.
-- Public follower/feed/influencer mechanics.
-- Arbitrary direct messages between unrelated Users; MVP messaging is limited to active Profile context.
-- Public Lists, folders, advanced smart-list rules and rich list media attachments.
-- Majority-vote automatic Shared saving; MVP automatic Shared promotion uses unanimity.
-- Complex 3D or game-like Room editor.
+- Public follower/influencer/global feed mechanics.
+- Local stranger discovery or matching.
+- Dating/relationship compatibility product.
+- Arbitrary DMs between unrelated Users.
+- Public Lists/advanced smart-list rules/rich list media.
+- Majority-vote Shared automatic saving; current automatic promotion remains unanimity.
+- Complex 3D/game-like Room editor.
 - Full photo-rich life journal.
-- Advanced demographic personalization; MVP bootstrap does not require demographics and any later demographic/context prior remains optional and weak.
+- Advanced demographic personalization.
+- Continuous precise-location tracking.
+- Speculative Kafka/Kubernetes/graph-database/microservice infrastructure solely for hypothetical scale.
+
+The complete long-term vision—including series, music, hyperlocal activities/events, richer memories, friend-review feeds, local/global discovery, possible people matching/dating research, compact learning infrastructure and distributed research ideas—remains preserved in `FUTURE_PLAN.md` and must not displace the release sequence above.
