@@ -77,3 +77,14 @@ Rejected because future Events would leak into historical predictions and make C
 ### Create separate movie, book and Shared recommenders
 
 Rejected by ADR-0002 and ADR-0003. Domain and Profile context are inputs to one generic prediction system.
+
+
+## Completion decision — 2026-09-07
+
+Status: accepted MVP implementation target; not yet deployed/verified. This extends the original architecture without rewriting its delivery history.
+
+The owner prioritized a complete adaptive algorithm and operated store release. Serving, memory snapshots and SleepLayer must share one versioned feature/scoring/policy definition, including bootstrap and Shared fit. Baseline equivalence includes eligibility and delivered order. Meaningful actions require atomic Event/projection persistence and a durable actor/Profile-scoped device outbox; delivery provenance must match the actual slate.
+
+Fast adaptation uses ordered WorkingState and evidence-aware Short/LongTerm state with bounded context-dependent weighting. Model promotion remains a separate evaluated, reversible decision. PostgreSQL plus bounded server workers remains the MVP boundary; an additional predictor server or vector store requires measured justification and a further ADR.
+
+Implementation and acceptance details are canonical in `../ARCHITECTURE.md`, `../../domain/PREDICTION_MODEL.md`, `../../domain/DATA_EVENTS.md` and MVP ALG/DATA/OPS requirements. Operational retention/recovery is mandatory; current persistence is not proof of functioning evaluation or production readiness.

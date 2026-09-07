@@ -5,7 +5,7 @@ Started: **2026-08-25**
 
 ## Outcome
 
-Deliver the first small but genuine Kajo product: two people can each have a personal Kajo, form a Shared Kajo, discover books/movies through the Room and grid/swipe experiences, build history, and receive generic personalized recommendations whose data model can later evolve into ScenarioMemory and evolutionary prediction.
+Deliver the complete non-commercial store-downloadable BOOK/MOVIE Kajo: useful and measurably adaptive Personal/Shared recommendations, coherent core browsing/collaboration, reliable evidence, accepted real-device flows and operated production services with tested data lifecycle and recovery. Graphics may evolve without changing those behavioral contracts.
 
 ## Acceptance source
 
@@ -19,7 +19,7 @@ See `docs/project/ROADMAP.md`.
 
 Sprints 001–010 are accepted. The validated baseline includes the mobile foundation, Room and navigation shell, global DiscoveryMode curtain, BOOK/MOVIE grid and optional swipe flow, generic Item interaction/history/undo, configured Supabase authentication, PersonalProfile and consent-based SharedProfiles, append-only Event/session persistence, hosted Prediction V0 and accepted Shared Endorsement delivery.
 
-Sprint 011 named Lists and Sprint 012 Profile messaging are delivered; their explicitly recorded refreshed device/hosted acceptance work remains open. Sprint 013A Prediction nervous-system/ScenarioMemory evidence and the complete controlled-evolution design are integrated into `main`; Sprint 013B hosted verification and Sprint 013C executable SleepLayer persistence remain open. Requirement-level truth remains in `docs/product/MVP.md`, current execution state in `docs/project/STATUS.md` and continuation rules in `docs/project/HANDOFF_PROTOCOL.md`.
+Sprint 011 Lists and Sprint 012 messaging foundations are delivered with refreshed acceptance pending. Sprint 013 architecture/persistence was accepted; current algorithm reliability and operational evaluation gates are explicitly open. Sprint 014 is active. Current implementation/acceptance truth belongs to `STATUS.md` and requirement-level truth to `MVP.md`; do not infer completion from historical sprint labels.
 
 ## Known milestone risks
 
@@ -49,4 +49,4 @@ MVP 0.1 may be marked **COMPLETE** only when every gate below is satisfied. A dr
 | Operations | Crash/error/latency and critical backend health are observable; support, account deletion/data handling and release rollback paths are documented and tested at the agreed MVP level |
 | Repository truth | `main` documentation, status, glossary, ADRs, code map, migrations and release state match reality; obsolete files/branches and superseded placeholders are cleaned safely |
 
-The milestone closes only after a final product-owner acceptance of the installed store build. Closing Sprint 014 and changing this milestone to `COMPLETE` are the final roadmap actions, not administrative follow-ups.
+The milestone closes only after a final product-owner acceptance of the installed store build. Sprint 014 closes at external-beta acceptance. Sprint 015 and this milestone close only at the final installed-store and operational acceptance gate in ROADMAP 15.3.

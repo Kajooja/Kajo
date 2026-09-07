@@ -1,6 +1,6 @@
 # Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
 
-Status: **ACTIVE — 14A BOOK BETA COVERAGE ON MAIN; DEVICE FOLLOW-UP #199 ACTIVE; 14B IMPORT + COLD-START ON MAIN; 14C SHARED COMMON-FIT ON MAIN, DEVICE GATES OPEN**
+Status: **ACTIVE — ALGORITHM COMPLETION GATES ADDED; CATALOG/BOOTSTRAP/SHARED FOUNDATIONS ON MAIN; DEVICE AND EXTERNAL-BETA ACCEPTANCE OPEN**
 
 ## Outcome
 
@@ -19,7 +19,7 @@ Implemented/hosted/main:
 - ACTIVE TMDB Edge importer with server-side secrets/localization fallback,
 - Open Library monthly bulk-dump importer as the long-term broad import path,
 - mobile poster/cover/creator/year enrichment without changing Prediction rank/ID,
-- real hosted Item detail/swipe remains on the delivered Prediction slate,
+- hosted detail/swipe uses remembered catalog Items; exact delivered-slate identity now requires MVP-DATA-004 regression/fix,
 - first guarded seed: **30 real MOVIE + 30 real BOOK Items** with `KAJO_CURATED_BETA` provenance,
 - historical 24 `KAJO_MOCK` rows remain stored but are `discoverable=false`,
 - hosted Prediction V1 acceptance returned real BOOK/MOVIE Items with **0 mock deliveries**,
@@ -263,7 +263,7 @@ Required flows:
 - Provider aggregate popularity/trend may seed sparse profiles; Kajo-wide aggregate behaviour remains PopulationMemory-gated.
 - Open Library Search beta bootstrap is bounded/cached admin ingestion; the app never uses Open Library Search as its runtime backend.
 - Do not judge common-fit quality on the historical mock catalog.
-- Future contextual discovery List navigation is captured as #200 and catalog title/creator search + generic filters as #201. These are not MVP blockers unless external-beta evidence explicitly promotes them.
+- Product decision 2026-09-07 promotes #200 contextual Lists, #201 catalog search/filters and #203 authorized Profile-name search into MVP; see ROADMAP 14.6.
 
 ## Dependencies
 
@@ -287,6 +287,15 @@ Required flows:
 
 ## Immediate next action
 
-Finish #199, merge only after `npm run check`/CI passes, and build a new configured Android APK. Accept the dense BOOK/MOVIE grid, bounded warm image cache and scroll behavior first. Then run the remaining Settings/import + 6-of-12-to-24 cold-start + Shared common-fit/deferred core device gates. Configure TMDB and expand MOVIE coverage before external beta.
+Follow `STATUS.md` and ROADMAP 14.0: bootstrap-only Personal serving correction with SQL regression foundation. Owner APK #350 testing and existing TMDB ingestion can proceed independently. Do not close #199/#182 or claim first-session quality before acceptance. Required algorithm/evidence work now precedes the external-beta gate.
 
-Keep Personal history in PersonalProfile, do not create a second Shared recommender, do not expose member-level raw evidence, do not use Open Library Search as a runtime backend, do not add unofficial movie-poster scraping, and do not bypass PopulationMemory privacy gates.
+## Continuation checkpoint — 2026-09-06
+
+PR #205 delivered the bounded TMDB beta orchestrator (`scripts/catalog/import-tmdb-beta.mjs`, `npm run catalog:tmdb-beta`) at `41c537eb`. Main #352 validation passed including both bundle smoke checks; its APK job was still running at the check. Hosted import has not run in this continuation. Current coverage, credential prerequisites and the executable next step are maintained in `../STATUS.md`. The SQL recheck also found zero nonblank BOOK descriptions. #182 and #199 were reopened because their actual catalog/device acceptance remains pending. Partial PRs must not auto-close these parent gates. No MVP requirement was marked complete.
+
+
+## Scope and reliability checkpoint — 2026-09-07
+
+The owner made algorithm correctness/adaptation and production completeness the priority. ROADMAP 14.0–14.8 now owns the remaining order within this active sprint. Earlier 14A–14D sections record delivered foundations; they do not waive the newly required ALG/DATA/OPS/UX and browse acceptance in MVP.md.
+
+Before external beta, additionally require bootstrap-driven serving, exact/atomic evidence, serving-shadow parity, refill/continuation, adaptive state/common features, running bounded SleepLayer evaluation, promoted browse suggestions and safe-beta lifecycle/operations. Documentation-only changes have not fixed these code gaps or provisioned services. Current findings and the exact active handoff live in STATUS.md.

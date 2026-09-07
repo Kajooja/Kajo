@@ -27,7 +27,7 @@ Kajo should feel calm, personal, atmospheric and intelligent. It should not feel
 19. **Shared recommendations are already shared.** Do not add a parallel `Ehdota yhteiseen` recommendation surface. The normal Shared discovery feed is the common-taste surface.
 20. **Shared positive action is collaborative.** In Shared discovery choosing one custom List creates that member's actor-specific Endorsement and a pending List choice, not immediate membership. It disappears from that actor's normal queue and is surfaced first to other non-endorsing members.
 21. **Pending and consensus are visually distinct.** A pending card uses a restrained green top bar such as `Mirri lisäsi listaan Meidän illat` with an explicit `Hyväksy` action. Only unanimity produces `Pari!`, commits the chosen custom-List membership and promotes to Shared `Tallennetut`; meaning must remain readable without relying on green alone.
-22. **Lists and discovery are different surfaces.** An Item consumed by any member disappears from ordinary Shared discovery but may remain visible in Saved/custom Lists/history with current watched/read/rating state.
+22. **Lists and discovery are different surfaces.** SharedProfile-consumed Items disappear from ordinary discovery. Accepted-member Personal history may appear only in the attributed lower history tier; Saved/custom Lists/history retain canonical current state.
 23. **Shared List provenance begins with the proposer.** Discovery approval commits the chosen custom-List entry only at unanimity while preserving the first actor and proposal time as added-by/added-at provenance.
 24. **List choice stays lightweight.** Discovery opens a single-destination bottom bar, ordered by the actor's most recently used List. Show at most five choices initially; `Lisää` expands the rest and new-List creation stays collapsed until requested.
 25. **Messaging stays Profile-scoped and quiet.** Inbox combines invitations and unread Profile threads. A List message is optional and collapsed by default; a failed send remains retryable without changing the successful List action.
@@ -69,3 +69,8 @@ DiscoveryMode atmosphere may alter the same scene without rebuilding it:
 SharedProfile switching, Inbox, Lists, Groups and account actions belong to the persistent shell/drawer rather than adding more Room wall objects.
 
 Additional Room objects should be added only when a new content domain genuinely benefits from a clear spatial navigation metaphor.
+
+
+## MVP browse completion — approved 2026-09-07
+
+Discovery may show a bounded contextual row of the active Profile's existing Lists with overflow to canonical Lists (#200). Catalog search/normalized filters (#201) are browse constraints with explicit reset, not durable taste. Canonical Groups supports authorized Profile-name filtering (#203). These reuse existing navigation and generic models. New graphics must preserve target geometry, accessible alternatives, reduced motion, Profile identity and traceable action semantics.

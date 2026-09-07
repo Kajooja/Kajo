@@ -243,3 +243,14 @@ This rule does not delete the Item from Saved, named Lists or history.
 - Item Event stores `itemId` + `itemType` matching canonical Item row.
 - Authenticated clients may append/read Events only for permitted Profile contexts; no update/delete capability for Event/session rows.
 - Mutable current-state tables (`item_interactions`, endorsement/List state) are projections. Durable SharedConsensus prevents direct current-state writes from forging or clearing unanimous Shared Saved state. These projections do not rewrite append-only Event evidence.
+
+
+## Required reliability completion — planned 2026-09-07
+
+`MVP-DATA-003/004` extend the delivered persistence foundation; implementation is not yet accepted.
+
+A meaningful user command must atomically append its canonical Event(s) and change the relevant current-state projection through one authorized idempotent server boundary. Use stable action identity and validate identical retry payloads; reject identity reuse with different content. Do not change existing List/Shared consensus semantics or couple an optional message transaction to a successful List action.
+
+A persistent actor/Profile-scoped device outbox retains unacknowledged explicit actions across process death. Define retry/backoff, dependency ordering, bounded passive-impression batches, authorization loss and sign-out/account-switch handling. Never upload an old user's queued payload under a new identity. Pending versus committed status remains visible; refresh after acknowledgement or a known committed-state version rather than assuming a debounce proves persistence.
+
+Freeze actual delivery origin and order independently from score order. Correlation requires the exact Profile, prediction, Item and delivered slate; cached Items from a different Profile/mode/run cannot inherit a hosted ID. Shared approval/history overlays and search/List entry paths must record truthful origin. Preserve valid delayed-outcome links where available; do not guess an attribution to the latest run. Update typed contracts, vocabulary/glossary where needed, SQL and mobile tests in the implementation PR.
