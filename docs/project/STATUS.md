@@ -178,6 +178,12 @@ Successful import commit/removal/calibration now invalidates mounted hosted rank
 
 The diagnostic is intentionally separate from the existing function-unit `npm run check`; green unit tests do not mean replay passed. A later forward migration cannot repair a failure reached before it. Next evaluate an explicit, schema-only clean-install baseline with preserved historical archive, provenance/checksum manifest and schema/function parity validation in a pinned Supabase stack. Do not generate it from private user data, silently reorder/normalize historical SQL, mark skipped history applied, or change deployed history. Document the baseline decision before implementation. #208 remains open; no fresh-install recovery strategy is accepted yet.
 
+**Migration metadata recheck — 2026-09-07:** read-only comparison found 47 repository migrations and 44 hosted history rows: 5 exact `(version,name)` matches, 38 repository entries with a matching hosted name but different version, and 4 repository names absent from hosted history. One hosted name occurs at two versions. This is tracking drift, not proof that corresponding schema is absent. Earlier blanket claims of repository/hosted migration parity are not valid. Do not run automatic history repair, rename protected files or treat name-only matching as proof of equivalent SQL.
+
+`node scripts/database/migration-parity.mjs <metadata.json>` compares a plain JSON array from `SELECT version,name FROM supabase_migrations.schema_migrations ORDER BY version`. It exits 1 on mismatch and 2 on invalid input. It is read-only and reports both unmatched sides and ambiguous hosted names; no raw hosted export is committed. Four regression tests cover order, same-name/different-version drift, missing/duplicate-name records and invalid/duplicate-version inputs. The actual hosted metadata returned MISMATCH (exit 1).
+
+PR #212 CI #363 passed on its earlier head, but automatic approval review rejected merging because it required explicit approval for that PR. The PR remains open and this parity work extends the same branch. Obtain explicit owner approval for #212 before merging; do not bypass the rejected action. New head needs CI. Schema-only baseline extraction has not been completed: this workspace lacks pg_dump/Docker and a direct database export connection. Next establish the pinned export environment and reconcile tracking/schema differences before any baseline deployment decision.
+
 **History protection checkpoint:** `scripts/database/migration-history.json` fingerprints all 47 SQL files at accepted #211. Two tests in the canonical `npm run check` reject altered/deleted historical files, duplicate versions and backdated additions. This protects repository bytes; it does not prove hosted version/statement parity. The manifest itself requires normal Git review. `docs/architecture/decisions/0006-clean-install-database-baseline.md` is **Proposed**, with exact schema/ACL/system-seed parity and empty-install/forward-upgrade gates. No baseline installation route or acceptance-contract change has been activated. Next capture schema-only definitions with a pinned toolchain and review every difference; never export user rows or apply a baseline to the existing hosted database.
 
 Required first-task acceptance:
@@ -215,8 +221,8 @@ Current hygiene rules and state:
 
 - `main` remains the only accepted product truth; one scoped Issue -> branch -> PR is preferred,
 - deployed Supabase migrations are immutable; fixes use forward migrations,
-- repository and hosted migration history must match,
-- PR #162 restored the already-hosted `20260902064431_harden_production_function_boundaries.sql` migration to Git; hosted function hardening and repository history are now aligned,
+- repository and hosted migration history must match; the new metadata audit below finds that this gate currently fails,
+- PR #162 restored the already-hosted `20260902064431_harden_production_function_boundaries.sql` migration to Git; that one hardening migration is aligned; this does not establish whole-history parity,
 - current Supabase security advisor no longer reports the previous exposed SECURITY DEFINER function warnings,
 - leaked-password protection remains the known WARN and belongs to #160 / Sprint 015 release hardening,
 - historical mock Items/migrations are not deleted when Event/List/Prediction referential integrity depends on them,
