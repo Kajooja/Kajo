@@ -2,45 +2,78 @@
 
 This file is mandatory for every AI agent, coding agent and contributor working in this repository.
 
-## 1. Source of truth
+## 1. Repository is permanent memory
 
 The Git repository is Kajo's permanent project memory. Chat conversations are temporary working contexts and must never be the only place where an important product, architecture, terminology or project-state decision exists.
 
-If conversation context conflicts with repository documentation, stop and resolve the conflict before coding. Do not silently overwrite established project rules.
+If conversation context conflicts with repository documentation, resolve the conflict explicitly before coding. Do not silently create a parallel truth.
 
-## 2. Mandatory read order before any work
+## 2. Mandatory continuation/read order
 
-First synchronize repository metadata with `git fetch --all --prune`. Do not assume the default `main` checkout contains the newest active mid-sprint work.
+First synchronize repository metadata (`git fetch --all --prune` where a local checkout exists). Do not assume a stale `main` checkout contains the active handoff.
 
-Resolve the continuation source before the read order:
+Resolve continuation source:
 
-- if the user names a branch or pull request, check out that exact head,
-- if the user says only "continue" / "jatka reposta", inspect the current tracking branch plus open GitHub pull-request/Issue handoffs connected to `STATUS.md`,
-- when exactly one newer active handoff exists, continue from that branch before reading its `STATUS.md`,
-- when multiple active branches could own the next step, stop and ask which one to use instead of combining them,
-- never treat an unmerged branch as accepted `main` truth; preserve its explicit pending gates.
+- if owner names a branch/PR, use that exact head,
+- if owner says only **"jatka reposta" / "continue from repository"**, inspect `main`, `STATUS.md` and any single active PR/Issue handoff named there,
+- continue one explicit active handoff; never combine unrelated active branches,
+- never treat an unmerged branch as accepted `main` truth.
 
-Before editing code, data models, documentation or configuration, read in this order:
+Before implementation read, in order:
 
-1. `/AGENTS.md` — this file.
-2. `/docs/README.md` — documentation map.
-3. `/docs/project/STATUS.md` — authoritative current state and handoff.
-4. `/docs/product/MVP.md` — current MVP boundary and requirement IDs.
-5. The current sprint file named in `STATUS.md`.
-6. `/docs/domain/GLOSSARY.md` — canonical terminology.
-7. Documentation relevant to the task, for example `DOMAIN_MODEL.md`, `DATA_EVENTS.md`, `PREDICTION_MODEL.md`, `UX_PRINCIPLES.md` or `ARCHITECTURE.md`.
-8. `/docs/architecture/CODEMAP.md` — where relevant implementation lives.
-9. Relevant ADRs in `/docs/architecture/decisions/`.
-10. Inspect the actual existing implementation before proposing or making changes.
+1. `/AGENTS.md`
+2. `/docs/README.md`
+3. `/docs/project/STATUS.md`
+4. `/docs/product/MVP.md`
+5. current sprint/Issue handoff named in STATUS
+6. `/docs/project/ROADMAP.md`
+7. `/docs/domain/GLOSSARY.md`
+8. task-relevant canonical docs
+9. `/docs/architecture/CODEMAP.md`
+10. relevant ADRs
+11. actual existing implementation
 
-Do not start implementation until the current sprint, task scope and affected domain terms are understood.
+If work touches onboarding, public links, anonymous identity, auth conversion, Friends or Shared creation, also read:
 
-## 3. Canonical domain rules
+- `/docs/product/LAUNCH_LOOP.md`
+- `/docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
 
-Kajo's core abstractions are:
+Do not start implementation until current phase, dependencies and acceptance gates are understood.
+
+## 3. Current release march is mandatory
+
+`ROADMAP.md` owns order. The first public Kajo follows this dependency direction:
+
+```text
+trustworthy algorithm/evidence/catalog
+→ adaptive Taste Test + honest holdout challenge
+→ anonymous web/app entry + Google/Apple conversion
+→ recommendation preview/funnel
+→ Friend invite + Friends safety lifecycle
+→ explicit Friends → SharedProfile
+→ core UX/telemetry/privacy/operations
+→ closed beta of actual link-to-app flow
+→ production/store acceptance
+→ Share Link Gate
+```
+
+Do not jump to distant FUTURE_PLAN ideas while release blockers remain.
+
+Do not claim broad public-link readiness before `MVP-REL-004` / the ROADMAP **Share Link Gate** is explicitly accepted. The phrase **“Nyt on aika jakaa käyttäjille linkki”** is reserved for that accepted state.
+
+## 4. Canonical domain rules
+
+Core abstractions include:
 
 - `User`
+- `AuthIdentity`
+- `AnonymousIdentity`
 - `Profile`
+- `PersonalProfile`
+- `SharedProfile`
+- `FriendInvite`
+- `Friendship`
+- `TasteSession`
 - `Item`
 - `Event`
 - `Context`
@@ -51,150 +84,174 @@ Kajo's core abstractions are:
 
 Rules:
 
-- Predictions target a `Profile`, not directly a `User`.
-- A `Profile` may be `PersonalProfile` or `SharedProfile`.
-- A `SharedProfile` is a first-class learned profile, not merely an average of its members.
-- `Item` is domain-agnostic. Do not introduce separate core models such as `BookProfile`, `MovieProfile`, `BookPrediction` or `MoviePrediction` unless an ADR explicitly changes this rule.
-- Cross-domain learning is a core product requirement.
-- Meaningful user behaviour must be represented through the event model.
-- Demographic data may be used only as a weak cold-start prior. Behaviour must supersede demographic priors as real user data accumulates.
-- Memory is evidence, not immutable truth. Learned state must be able to change.
+- Prediction targets `Profile`, never User directly.
+- Personal and Shared Profiles are distinct learned contexts.
+- SharedProfile is not a simple average of members.
+- Friendship is not SharedProfile membership and grants no private PersonalProfile access.
+- Personal Friend invite does not automatically create SharedProfile.
+- Anonymous Taste conversion must preserve the same logical PersonalProfile/taste state rather than duplicating it.
+- `Item` is domain-agnostic; do not create BookProfile/MovieProfile/BookPrediction/etc.
+- Cross-domain learning is core.
+- Meaningful recommendation behavior must be represented through canonical evidence/Event contracts.
+- Growth telemetry is not taste evidence by default.
+- Demographic data may only be a weak optional prior and is not required for Taste cold start.
+- Memory is evidence, not immutable identity.
 
-Use terms exactly as defined in `GLOSSARY.md`. Do not invent synonyms in code for existing domain concepts.
+Use terms exactly as defined in `GLOSSARY.md`.
 
-## 4. UI rules
+## 5. Algorithm rules
 
-- Kajo is a **2D mobile application**, not a 3D room or game.
-- The Room is the home and primary navigation metaphor.
-- Keep navigation minimal.
-- The user's identity theme remains the base visual layer.
-- `DiscoveryMode` and `AmbientPhase` are separate concepts:
-  - `FOR_YOU` -> `DAWN`
-  - `SURPRISE` -> `EVENING`
-  - `RISK` -> `NIGHT`
-- The curtain is the signature global control that moves between the three DiscoveryMode states.
-- Visual atmosphere may produce preference signals, but visual preference must not be confused with discovery-risk preference.
-- Prefer subtle light, opacity, gradient, shadow and motion changes over decorative UI chrome.
+Algorithm quality is the critical first-release dependency.
 
-## 5. Coding rules
+- Do not defer known correctness/evidence/cold-start defects with “later” merely because UI works.
+- Prefer inspectable baseline + deterministic tests before opaque complexity.
+- New learned components must be compared against a fixed baseline/ablation and may be rejected if they do not improve defined outcomes.
+- Serving and shadow semantics must remain versioned/comparable.
+- Complete Prediction trace/delivery provenance precedes learning from outcomes.
+- Taste challenge predictions are frozen before held-out answers enter learning.
+- Never fabricate an accuracy/confidence percentage.
+- Synthetic/counterfactual SleepLayer outcomes never become historical Events.
+- Automatic/global Challenger promotion remains gated by explicit evidence and rollback rules.
 
-- Use English for code, file names, identifiers and canonical technical terminology.
-- Prefer feature-oriented code organization.
+## 6. UI/UX rules
+
+- Kajo is a 2D mobile product, not a 3D room/game.
+- Room is authenticated home/navigation metaphor.
+- Public Taste link is the external front door; do not force registration before value.
+- Registration continues a Taste session; it must not reset cold start.
+- Navigation remains restrained.
+- `DiscoveryMode` and `AmbientPhase` are separate:
+  - FOR_YOU → DAWN
+  - SURPRISE → EVENING
+  - RISK → NIGHT
+- Curtain is the signature global DiscoveryMode control.
+- Grid is default discovery; swipe is optional.
+- Graphics may evolve without changing domain/Event/Prediction semantics.
+- Accessibility/reduced motion/error recovery are release requirements.
+
+## 7. Coding rules
+
+- Use English for code, paths, identifiers and canonical technical terminology.
+- Prefer feature-oriented organization.
 - Keep business/domain logic out of presentation components.
-- Mobile UI must not scatter direct database access through components; use a defined data/service boundary.
-- Recommendation/prediction logic must not live in the mobile client.
-- Database schema changes must be committed as migrations.
-- Keep changes scoped to the assigned Issue/sprint goal.
-- Do not refactor unrelated code in the same change.
-- Do not create abstractions before they are needed.
-- Add or update tests whenever behavior changes and a deterministic test is practical.
-- Every bug fix should include a regression test when the defect can be reproduced deterministically.
-- User-facing copy must not be used as domain/event/state identifiers. Reused action labels should come from one maintained feature-level copy/label source so wording can change without changing canonical semantics. Do not build a general localization framework before it is needed.
-- Do not consider a code task complete until the canonical repository validation command passes:
+- Mobile/web presentation must use defined service/data boundaries rather than scattered database calls.
+- Recommendation logic stays server-owned.
+- Database schema changes are migrations.
+- Deployed migration history is immutable unless an accepted explicit migration-history procedure says otherwise.
+- Keep one Issue/PR narrowly scoped; do not refactor unrelated code.
+- Avoid speculative abstractions/services/folders.
+- Add deterministic regression tests for behavior changes/bugs where practical.
+- User-facing copy is not domain/event/state identity.
+
+Minimum automated gate for code changes:
 
 ```bash
 npm run check
 ```
 
-`npm run check` is the minimum automated gate and currently includes lint, TypeScript typecheck, automated tests, and iOS + Android Expo bundle smoke checks.
+Passing compilation/bundle smoke is not proof of real-device acceptance.
 
-### Mobile runtime validation
+## 8. Runtime/device validation
 
-The product target is a **phone-runnable MVP**, not merely code that compiles.
+For user-facing mobile/web changes:
 
-For user-facing mobile changes:
+- run the relevant runtime when environment supports it,
+- exercise changed flow on real device/emulator/browser where available,
+- record exactly what was and was not tested,
+- never mark a user-facing requirement complete only because files compile.
 
-- In addition to `npm run check`, run the relevant app runtime when the execution environment supports it, using `npm start`, `npm run android`, or `npm run ios`.
-- Exercise the changed user flow on a real phone or emulator/simulator when one is available.
-- At sprint/milestone checkpoints, prioritize validating an end-to-end mobile path rather than isolated screens only.
-- If the current agent/environment cannot launch a device runtime, record that limitation explicitly in the PR/handoff. Passing bundle smoke checks must not be described as proof that a real-device interaction was tested.
-- A user-facing MVP requirement must not be marked complete solely because files exist or TypeScript compiles; its acceptance flow must be demonstrably reachable in the mobile app.
+Taste/auth/link work additionally requires representative browser/app round-trip testing before release acceptance.
 
-### Repository hygiene
+## 9. Repository hygiene
 
-Keep the repository minimal and intentional.
+Keep repository minimal and intentional.
 
-- Do not create empty feature folders, `.keep` files, speculative modules, duplicate guides, or placeholder abstractions merely for future architecture.
-- Before creating a new file, prefer extending an existing canonical file when that keeps responsibilities clear.
-- When a real implementation replaces a placeholder, delete the obsolete placeholder in the same scoped change.
-- Remove unused files, dead code, obsolete routes, superseded helpers and abandoned experiments once they are no longer referenced.
-- Do not keep both old and new implementations "just in case"; Git history is the archive.
-- Do not duplicate documentation truth across several files. Put durable rules in their canonical document and link to them where needed.
-- Before closing an Issue or sprint, review changed areas for stale files and remove proven-unused artifacts.
-- Never delete a file only because its name looks temporary. Verify references and current purpose first.
+- no empty feature folders, `.keep` placeholders or speculative modules,
+- prefer extending canonical files over duplicate guides,
+- remove obsolete/dead implementation when safely replaced,
+- Git history is the archive; do not keep duplicate old/new code “just in case”,
+- verify references before deleting,
+- do not duplicate documentation truth across files.
 
-## 6. Git workflow
+Canonical ownership:
 
-After repository bootstrap:
+- `STATUS.md` — exact current state/next task,
+- `ROADMAP.md` — execution order,
+- `MVP.md` — first-release requirements,
+- `LAUNCH_LOOP.md` — Taste/link/Friend launch semantics,
+- `FUTURE_PLAN.md` — later ambitions/research,
+- domain/architecture docs — durable technical semantics.
+
+## 10. Git workflow
 
 - Never develop directly on `main`.
-- One Issue should normally map to one branch and one pull request.
-- Branch names should be descriptive, for example `feat/23-curtain-control`.
-- Pull requests should describe scope, MVP requirement IDs, tests and documentation impact.
-- `main` should remain runnable and internally consistent.
-- Do not merge code changes with a failing `npm run check` / required CI run.
+- One Issue normally maps to one branch + one PR.
+- `main` remains runnable/internally consistent.
+- Do not merge code with failing required CI.
+- Documentation-only planning changes still use branch/PR when they materially redefine project truth.
 
-## 7. Documentation obligations during normal work
+## 11. Documentation obligations
 
-Do not update every document on every PR. Update only the documents whose truth changed.
+Update only documents whose truth changed, but update all canonical owners that did change.
 
-You MUST update:
+- `GLOSSARY.md` for canonical terminology.
+- `DOMAIN_MODEL.md` for relationships/invariants.
+- `DATA_EVENTS.md` for event/evidence semantics.
+- `PREDICTION_MODEL.md` when prediction inputs/outputs/learning semantics change.
+- `UX_PRINCIPLES.md` for product-wide UX rules.
+- `ARCHITECTURE.md` / ADR for durable technical boundaries.
+- `CODEMAP.md` when important implementation paths are created/moved.
+- `MVP.md` when release scope/status changes.
+- `ROADMAP.md` when sequence changes.
+- `LAUNCH_LOOP.md` when acquisition/Taste/Friend launch semantics change.
+- `FUTURE_PLAN.md` when distant vision/order changes.
 
-- `GLOSSARY.md` if a new canonical domain term is introduced or meaning changes.
-- `DOMAIN_MODEL.md` if domain relationships or invariants change.
-- `DATA_EVENTS.md` if event semantics or payload requirements change.
-- `PREDICTION_MODEL.md` if prediction inputs, outputs or learning semantics change.
-- `UX_PRINCIPLES.md` if a product-wide UX rule changes.
-- `CODEMAP.md` if an important implementation area is created, moved or renamed.
-- an ADR if a durable architectural decision is made or reversed.
-- `MVP.md` only when MVP scope/status changes.
-- `ROADMAP.md` only when planned sequencing materially changes.
+Do not mark planned documentation as delivered runtime behavior.
 
-## 8. Mandatory sprint close protocol
+## 12. Sprint close protocol
 
-A sprint is not complete until the repository can hand the project to a fresh conversation or agent without hidden context.
+A sprint is not complete until a fresh agent can continue without chat-only context.
 
-At sprint close, perform all of the following:
+At close:
 
-1. Ensure accepted sprint changes are merged and `npm run check`/CI passes.
-2. For user-facing mobile work, record runtime/device validation evidence or explicitly record why device validation was unavailable.
-3. Review the sprint's changed implementation areas and remove obsolete/unused files, placeholders and dead code that were superseded by the delivered implementation.
-4. Update the sprint file: delivered work, decisions, deferred work, known issues and important files.
-5. Mark completed MVP requirement IDs in `MVP.md`.
-6. Update `STATUS.md` with the exact current state, next work and handoff instructions.
-7. Update `GLOSSARY.md` if terminology changed.
-8. Add/update ADRs for durable architecture decisions.
-9. Update `CODEMAP.md` if important paths changed.
-10. Update `ROADMAP.md` only if sequencing changed.
-11. Make sure the next sprint or next action is explicit.
+1. accepted changes merged; required CI/checks pass,
+2. runtime/device evidence recorded or limitation stated,
+3. obsolete artifacts removed,
+4. sprint file updated with delivered/deferred/known issues/files,
+5. completed MVP IDs updated,
+6. `STATUS.md` updated with exact next action,
+7. terminology/domain/ADR/CODEMAP updated where truth changed,
+8. next phase/action explicit.
 
-See `/docs/project/WORKFLOW.md`.
+Do not rewrite historical completed sprint truth casually.
 
-## 9. Mandatory milestone close protocol
+## 13. Milestone / Share Link close protocol
 
-At milestone close:
+Before the first-public milestone or Share Link Gate closes:
 
-1. Verify milestone acceptance criteria, including the intended end-to-end mobile MVP flows.
-2. Run the complete automated validation and perform representative device/emulator runtime validation when possible.
-3. Update the milestone document with delivered capabilities and evidence.
-4. Update `STATUS.md`, `ROADMAP.md` and `MVP.md`/future product scope as applicable.
-5. Record any architecture decisions that changed during the milestone.
-6. Confirm documentation and `CODEMAP.md` match the repository.
-7. Remove obsolete implementation artifacts and record only intentional remaining debt.
-8. Record known limitations and migration/debt items.
-9. Create an explicit handoff to the next milestone.
+1. verify every required MVP ID with evidence,
+2. validate actual link → Taste → challenge → auth → app → Friend → Shared flow,
+3. validate recommendation quality/evidence and delayed outcomes,
+4. validate privacy/retention/abuse/restore/rollback/monitoring,
+5. validate store/public install/update path,
+6. record owner acceptance,
+7. update STATUS/ROADMAP/MVP and maintenance/recovery ownership.
 
-## 10. Conversation handoff protocol
+Only then may broad acquisition begin.
 
-A chat ending is NOT a reason to close a sprint.
+## 14. Conversation handoff
 
-If work must move to a new conversation while a sprint is active:
+A chat ending is not a sprint close.
 
-1. Update `STATUS.md` only as needed to state what is complete, in progress and next.
-2. Add a concise mid-sprint handoff to the active sprint document if meaningful context would otherwise be lost.
-3. Do not mark incomplete requirements as done.
-4. Do not rewrite historical sprint documents.
+If work moves to a new conversation:
 
-A new conversation should be able to start with: **"Continue Kajo from the repository."** or **"jatketaan reposta"**.
+- update `STATUS.md` only as needed so current branch/task/next dependency is explicit,
+- keep incomplete requirements incomplete,
+- preserve branch/PR/Issue reference,
+- do not rely on chat history for a critical decision.
 
-See `/docs/project/HANDOFF_PROTOCOL.md`.
+A fresh conversation must be able to start with:
+
+> **“jatketaan reposta”**
+
+and continue the correct next work package from repository truth alone.
