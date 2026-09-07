@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapHistoryImportJob } from './historyImportOperations';
+import { getBootstrapEvidenceRevision } from '../discovery/predictionRefresh';
+import { commitHistoryImport, removeHistoryImport, mapHistoryImportJob } from './historyImportOperations';
 
 describe('historyImportOperations', () => {
   it('maps a staged import summary and unresolved rows', () => {
@@ -50,4 +51,27 @@ describe('historyImportOperations', () => {
   it('fails closed on malformed job payloads', () => {
     expect(mapHistoryImportJob({ status: 'STAGED' })).toBeNull();
   });
+});
+
+
+describe('bootstrap ranking refresh', () => {
+  for (const [operation, status] of [
+    [commitHistoryImport, 'COMMITTED'],
+    [removeHistoryImport, 'REMOVED'],
+  ] as const) {
+    it(`refreshes after ${status}, but not after failed or malformed responses`, async () => {
+      const before = getBootstrapEvidenceRevision();
+      const data = {
+        jobId: 'job-1', profileId: 'profile-1', sourceProvider: 'IMDB',
+        datasetKind: 'RATINGS', fileFingerprint: 'test', status,
+        totalRows: 1, matchedRows: 1, ambiguousRows: 0, unmatchedRows: 0,
+        skippedRows: 0, rows: [],
+      };
+      expect((await operation(async () => ({ data, error: null }), 'job-1')).status).toBe('success');
+      expect(getBootstrapEvidenceRevision()).toBe(before + 1);
+      await operation(async () => ({ data: null, error: { message: 'denied' } }), 'job-1');
+      await operation(async () => ({ data: {}, error: null }), 'job-1');
+      expect(getBootstrapEvidenceRevision()).toBe(before + 1);
+    });
+  }
 });

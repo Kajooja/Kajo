@@ -1,3 +1,4 @@
+import { notifyBootstrapEvidenceChanged } from '../discovery/predictionRefresh';
 import type { ParsedHistoryImport } from './historyImportParser';
 
 export const HISTORY_IMPORT_RPC = {
@@ -143,7 +144,9 @@ export async function commitHistoryImport(
       target_job_id: jobId,
     });
     if (response.error) return { status: 'error', message: IMPORT_ERROR };
-    return mapJobResult(response.data);
+    const result = mapJobResult(response.data);
+    if (result.status === 'success') notifyBootstrapEvidenceChanged();
+    return result;
   } catch {
     return { status: 'error', message: IMPORT_ERROR };
   }
@@ -158,7 +161,9 @@ export async function removeHistoryImport(
       target_job_id: jobId,
     });
     if (response.error) return { status: 'error', message: IMPORT_ERROR };
-    return mapJobResult(response.data);
+    const result = mapJobResult(response.data);
+    if (result.status === 'success') notifyBootstrapEvidenceChanged();
+    return result;
   } catch {
     return { status: 'error', message: IMPORT_ERROR };
   }
