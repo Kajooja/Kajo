@@ -144,79 +144,49 @@ Transparent scalar-genome evaluation landed before learned sequence/LLM Challeng
 
 The current shell/bootstrap visual polish is on `main` and still needs configured-device visual acceptance, but it does not block backend catalog work.
 
-### Sprint 014 — Real Catalog, Profile Bootstrap & External Beta — ACTIVE
+### Remaining execution order — product decision 2026-09-07
 
-Canonical sprint file: `sprints/SPRINT-014.md`.
+Algorithm quality is the critical path. Preserve completed sprint history; the sequence below supersedes earlier future-phase suggestions in domain documents. Each row is a bounded work package, normally split into one Issue/PR per independently reviewable behavior. Do not implement all rows in one branch.
 
-Sprint 014 turns the technically working app into the first product-complete BOOK/MOVIE version that can be given to roughly 10 external testers.
+| Order | Work package and requirement IDs | Depends on / acceptance before proceeding |
+|---|---|---|
+| 14.0 | **Bootstrap serving + SQL regression foundation** — #207, ALG-001, ALG-009; existing #185/#191 context | First coding task. Reproduce the bootstrap-only failure; fix through shared feature semantics and a forward migration. Opposite-preference fresh Profiles rank the same unseen pool differently, import removal restores control, no Personal/Shared leakage. Start SQL CI here and extend it in later PRs. |
+| 14.1 | **Trustworthy action and delivery evidence** — DATA-001..004, PRED-006 | After 14.0; persistent outbox + atomic action/Event boundary, exact Profile/prediction/slate cache and truthful Shared/search/List origins. Kill/retry/undo/switch/concurrency tests and device traces pass. |
+| 14.2 | **Serving/shadow equivalence + candidate availability** — ALG-002..003 | Reliable evidence. One score/policy implementation for Personal/Shared, frozen versioned features, baseline parity; suppressed top candidates trigger bounded refill; stable pagination and realistic catalog exhaustion. No worker promotion before parity. |
+| 14.3 | **Real catalog and common features** — CAT-001..003, ALG-005; #182 | Import/poster enrichment can proceed alongside 14.0–14.2 without blocking those fixes. Execute existing TMDB batches, enrich BOOK descriptions, establish repeatable provider refresh and normalized shared feature mapping with provenance. Hundreds/domain, licensed imagery/attribution and quality report required. |
+| 14.4 | **Adaptive state and discovery policy** — ALG-004..007, BOOT-001..004, PRED-005 | 14.0–14.3. Ordered session state, evidence-aware forgetting/confidence, bounded cross-domain transfer, informative calibration and context-dependent weighting. Compare fixed control, ablations, contradictory-history and Shared disagreement cases; reject changes without useful evidence. |
+| 14.5 | **Operating SleepLayer + evaluation** — ALG-008, BETA-002 | 14.1–14.4. Schedule bounded workers; drain/retry deterministically, reconcile delayed outcomes, freeze chronological evaluation. Manual canary/rollback rehearsal; automatic/global promotion stays disabled. Sparse outcomes mean insufficient evidence, not permission to lower the gate. |
+| 14.6 | **Complete browse/core UX** — DISC-008..009, NAV-005, UX-001; #200/#201/#203, #102/#138/#199/#78 | Reuse stable catalog/evidence contracts. Complete contextual Lists, search/filters and authorized Profile-name search; accept Lists/messages/Room/import/Shared/device flows and accessibility. Owner APK testing can proceed throughout. |
+| 14.7 | **Beta operations prerequisite** — OPS-001..004 minimum safe beta slice, AUTH/REL lifecycle; #160/#127/#184 | Before inviting external testers: isolated environment, reliable email, privacy/support/deletion/retention, backups, diagnostics and abuse controls operate. Inventory final hosting choices early; do not defer data architecture until release. |
+| 14.8 | **External beta** — BETA-001..002; #186 | 14.0–14.7 accepted. Roughly 10 people use clean-install Personal/Shared BOOK/MOVIE without developer setup; collect useful delayed outcomes and fix defects. Sample size does not establish small statistical lifts. Owner accepts beta; close Sprint 014 only now. |
+| 15.1 | **Production configuration and recovery** — AUTH-004, OPS-001..005, REL-001..002; #160/#184/#127 | Finalize production project/domain/SMTP/social linking, privileges, secrets, data lifecycle jobs, alerts/budget and verified restore. Recheck staged release against actual production configuration; no placeholder inventory values remain. |
+| 15.2 | **Store release candidate** — REL-001..003, UX-001 | Signed immutable builds, store privacy/permissions/attribution/assets, account linking/deletion, clean install/update/device and load/rollback gates. Recheck current store/provider requirements at submission. |
+| 15.3 | **Installed store acceptance and handoff** — all MVP IDs | All required code on main, CI/backend/device/ops evidence recorded, store-distributed build accepted by owner. Close Sprint 015 and milestone; document maintenance/recovery ownership. |
 
-#### 14A — Real provider-backed catalog — #182
+### Sprint 014 — algorithm reliability, real catalog and external beta — ACTIVE
 
-- replace normal `KAJO_MOCK` discovery with real BOOK/MOVIE Items,
-- preserve one generic `public.items` architecture,
-- add generic provider provenance, external-ID deduplication, lifecycle/discoverability and repeatable refresh,
-- TMDB is the first MOVIE provider path,
-- Open Library bulk data is the first broad BOOK path, with optional Finna metadata enrichment where rights permit,
-- real covers/posters and normalized metadata are presented under provider terms,
-- historical mock Items stay for referential integrity but become non-discoverable.
+Canonical execution record remains `sprints/SPRINT-014.md`. The 14.x identifiers above are work-package order, not claims that old 14A–14D implementation was absent. Newly discovered correctness work is required before closing those existing acceptance gates.
 
-#### 14B — Imported history + cold-start PersonalProfile — #185
+The exact next task and active PR live only in `STATUS.md`. Reuse existing issues when their scope matches; reopen an implementation issue only for an actual unresolved acceptance defect. Create a scoped follow-up when the old issue was correctly closed. Never close #182/#199 from partial PRs.
 
-- Letterboxd export ZIP/CSV and IMDb export CSV for movie history,
-- at least one practical book-history CSV path plus generic Kajo fallback,
-- imported watched/read/ratings/watchlist/to-read normalize into canonical Kajo evidence with provenance,
-- no scraping or assumed public personal-history API,
-- no-import users get a short real-catalog calibration instead of mandatory demographic profiling,
-- imported/calibration evidence initializes PersonalProfile taste and is progressively superseded by real Kajo behaviour.
+### Sprint 015 — production operations and store acceptance — PLANNED
 
-#### 14C — SharedProfile common-fit — #177 / MVP-PRED-005
+Create its execution file when activated; do not create speculative sprint folders. Infrastructure/retention decisions and safe-beta provisioning start in 14.7 or earlier; Sprint 015 verifies and finalizes them for the store. `ARCHITECTURE.md` owns the service/data checklist and `MVP.md` owns completion requirements.
 
-Implement only after the real catalog/bootstrap foundation exists so quality can be judged against meaningful evidence:
+### Suggestions reconciled into scope
 
-- Shared joint evidence + authorized accepted-member PersonalProfile fit,
-- minimum-member/consensus and disagreement terms,
-- same Prediction V1 trace and SleepLayer,
-- target remains SharedProfile and Personal history is not copied into Shared history.
-
-#### 14D — External beta gate — #186
-
-Before leaving Sprint 014:
-
-- clean install and stable account flow for external users,
-- useful first-session PersonalProfile via import or calibration,
-- real BOOK/MOVIE discovery/detail/swipe/rating/save/List/history,
-- Shared create/invite/join/switch/common-fit/Endorsement/List flows,
-- messaging where already in MVP scope,
-- deferred #102/#138/current Room device acceptances closed as relevant,
-- failures diagnosable without developer access to tester phones,
-- product owner accepts the build for roughly 10-person testing.
-
-### Sprint 015 — Production Auth, Hardening & Store Release
-
-Sprint 015 starts only after the external-beta product is coherent. It owns the final transition from beta-ready to officially downloadable MVP 0.1.
-
-#### Production authentication — #184 + #127
-
-- reliable production SMTP/domain for email confirmation and recovery,
-- Google sign-in through the existing Supabase/Kajo User boundary,
-- Sign in with Apple for iOS when third-party social login is offered,
-- safe account linking so providers do not create duplicate Kajo Users/PersonalProfiles/nicknames,
-- account deletion/data lifecycle across linked identities.
-
-Apple App Review Guideline 4.8 is treated as a release requirement when Google/social login is enabled on iOS; do not ship a Google-only primary social-login choice on iOS.
-
-#### Security / operations / store
-
-- #160 production Supabase security hardening,
-- performance/accessibility/end-to-end quality checks,
-- privacy/support/account deletion and operational/error-monitoring readiness,
-- stable production identifiers, versioning and signing,
-- provider attribution/licensing decisions required for the non-commercial store release,
-- store metadata/assets/permissions,
-- representative clean install and update testing,
-- official Google Play and/or Apple App Store release.
-
-Sprint 015 ends with the full `MILESTONE-001-MVP.md` completion gate. All MVP requirements must be accepted, code must be on `main`, hosted state must match migrations, end-to-end Personal/Shared/Prediction flows must pass on real devices, and the product owner must accept the installed store build.
+| Existing source / suggestion | Disposition |
+|---|---|
+| #200 contextual discovery Lists | Required: MVP-DISC-008, 14.6 |
+| #201 catalog search/filters | Required: MVP-DISC-009, 14.6; normalized data before filters |
+| #203 Profile-name search | Required bounded authorized-name filtering: MVP-NAV-005, 14.6 |
+| Prediction model Phase B: WorkingState, multi-timescale memory, delayed outcomes | Required: ALG-004/006 and DATA-003/004, 14.1/14.4 |
+| Candidate union previously grouped with learned retrieval | Required now: ALG-003, 14.2; does not require embeddings |
+| SleepLayer persistence and proposed evaluation/retention | Operational evaluator required: ALG-008 and OPS-002/004, 14.5/14.7 |
+| Optional explicit mood/time/context controls | Use bounded contextual policy/session inputs in 14.4; add a UI control only when useful and tested. No sensitive inference or mandatory demographics. |
+| MEM-004 richer memory extension point | Document generic extension compatibility in domain model; no photo journal/storage feature required |
+| Learned embeddings, sequence/LLM challengers, learned gating, stochastic bandit | Keep as replaceable evaluation extensions; bounded transparent adaptation is required now. Introduce only if measured need justifies complexity and evidence gates pass. |
+| PopulationMemory, extra domains, monetization, public social features | Remain explicitly outside MVP; preserve privacy/licensing gates |
 
 ## Post-MVP direction
 

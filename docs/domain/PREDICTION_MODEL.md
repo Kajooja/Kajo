@@ -65,7 +65,7 @@ Evidence:
 - current ItemType/surface,
 - recent impressions, opens and explicit actions in sequence order,
 - current DiscoveryMode and mode changes,
-- current search/query constraints when later implemented,
+- current search/query constraints when implemented through MVP-DISC-009,
 - session depth and time since the last action.
 
 Lifetime: session-scoped; a new session starts after an intentional app/session boundary or prolonged inactivity. It can be reconstructed from Events and should not require model retraining.
@@ -84,7 +84,7 @@ MVP V1 basis:
 - positive and negative tag evidence are retained separately,
 - cross-domain evidence is allowed when features share meaning.
 
-Future multi-scale representation should preserve approximately session, week and month summaries rather than one arbitrary cutoff. The time scales are feature versions, not hard-coded truths.
+The required MVP-ALG-004 multi-scale representation should preserve approximately session, week and month summaries rather than one arbitrary cutoff. The time scales are feature versions, not hard-coded truths.
 
 Update behavior:
 
@@ -884,16 +884,7 @@ Kajo uses privacy by design:
 - retention is purpose-specific, documented and reviewable,
 - population datasets need deletion lineage and minimum cohort thresholds.
 
-Proposed retention policy for legal/product review:
-
-| Data | Proposed retention |
-|---|---|
-| explicit ratings, consumed state, Lists and user memories | account lifetime or until user deletion |
-| raw behavioral Events and Prediction traces | rolling 13 months online |
-| derived Personal/Shared memory state | rebuildable; delete with source Profile |
-| de-identified population aggregates/model artifacts | versioned policy with deletion lineage and re-training thresholds |
-
-The exact periods require a DPIA/legal decision before public beta; code must not silently assume “keep everything forever”.
+Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#data-lifecycle-and-retention-gate). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission.
 
 ## 17. MVP V1 implementation
 
@@ -925,55 +916,47 @@ Known V1 limits:
 - Context includes time/surface but not explicit mood/available-time input,
 - saved-reminder thresholds are first versioned heuristics and require real outcome calibration.
 
-## 18. Delivery sequence
+## 18. Required MVP algorithm completion contract
 
-### Phase A — evidence spine (MVP V1) — delivered
+Status: **required target, implementation open as of 2026-09-07**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#remaining-execution-order--product-decision-2026-09-07).
 
-- PredictionRun/Candidate persistence,
-- Context/session correlation,
-- meaningful dwell,
-- trace integrity checks,
-- ScenarioMemory V1 and inspectable explanation.
+### One feature and policy definition
 
-### Phase B — state quality
+Serving, memory snapshots and SleepLayer must agree on source-tagged evidence and as-of time. Refactor through forward migrations, preserving one `public.rank_items_v1` boundary. Imported/calibration LongTerm evidence must contribute directly to unseen Personal ranking, even when no native Events or Scenarios exist. Removing a source rebuilds its derived contribution.
 
-- real WorkingState projection,
-- multi-bucket short/long features,
-- outcome-delay reconciliation,
-- user-owned IMDb/Letterboxd import,
-- explicit situational intent inputs.
+Reuse canonical feature calculation and pure scoring/policy helpers rather than independently reproducing formulas in baseline, snapshots, Shared fit and shadow. Eligibility and Shared collaboration delivery remain explicit policy, distinct from taste score, but both must be faithfully replayable. Freeze feature/schema/policy versions and candidate features at prediction time; current mutable catalog tags cannot silently replace historical features.
 
-### Phase C — Shared core — hosted v1.1, device gate open
+A baseline shadow must match Personal and Shared production eligibility, final order and selected Items exactly; declare score tolerance for rounding. Tests cover common-fit, reminder tiers, suppression, ties and empty/refilled pools. A score-only match is insufficient.
 
-- accepted-member Personal fit estimates behind authorized private service boundary,
-- bounded common-fit/consensus/disagreement formula,
-- sparse-member shrinkage toward neutral `ColdStartPrior`,
-- aggregate-only Shared candidate explanation with no raw member-history leakage,
-- PersonalProfile no-op isolation,
-- configured-device acceptance and later Shared outcome calibration still required.
+### Candidate generation and delivery
 
-### Phase D — learned retrieval
+Use bounded candidate sources for durable fit, recent/session fit, prior, novelty and Shared agreement, then deduplicate and apply hard eligibility with bounded refill. Trace source membership and considered alternatives. Do not restrict every policy to a fixed baseline top-50 before eligibility or Shared scoring.
 
-- licensed Item content embeddings,
-- collaborative embeddings,
-- pgvector/ANN Scenario retrieval,
-- candidate-generator union and diversity policy.
+Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
-### Phase E — controlled evolution — MVP foundation delivered, later expansion gated
+### Adaptive memory without unstable taste
 
-- model/feature/reward registry,
-- offline replay evaluator,
-- shadow/champion-challenger pipeline,
-- experiment assignments and metrics,
-- contextual bandit with logged propensity.
+- WorkingState: ordered active-session actions and allowlisted current intent; reset/expire explicitly across session/Profile changes.
+- ShortTerm: recent independent evidence across useful time buckets; adapt rapidly but distinguish unknown/attention from negative preference.
+- LongTerm: weighted support by feature/source and repeat experience; adapt slowly to sustained contradiction. Imported history is an initial prior, not a permanent minimum weight.
+- Record effective support and uncertainty. Repeated taps or one Event joining many tags are not independent observations. Undo/removal/revised ratings invalidate or compensate prior evidence consistently.
+- Use one decay definition. The existing 365-day age clamp and bootstrap 20% floor require deliberate replacement or explicit evaluated justification; snapshots and serving cannot disagree.
+- Common normalized features allow BOOK/MOVIE transfer, while domain metadata and transfer reliability prevent false equivalence. Preserve evidence strengths, not only top-tag names. Missing features yield a neutral bounded fallback.
+- Begin with a transparent bounded context-dependent weighting rule over these states; compare it with a static baseline. Learned gating may later replace it behind the same versioned contract.
+- FOR_YOU optimizes supported fit; SURPRISE adds relevant novelty; RISK allocates bounded exploration to relevant uncertain candidates. Deterministic hash jitter alone is not evidence of epistemic uncertainty. Log propensities if stochastic selection is introduced.
+- Calibration balances recognizability, feature coverage and information gain within the accepted six-known/12-to-24 UX. Measure skips and completion, not just number of stored ratings.
 
-### Phase F — generative/sequential challengers
+SharedProfile retains its own joint history and same-Profile Scenarios. Authorized member fit is a bounded aggregate input; leaving/deletion removes access and invalidates derived dependencies. Shared learned state is never merely the average of members or a copy of Personal Events.
 
-- semantic Item IDs,
-- SASRec/HSTU-class sequential baseline,
-- language-steerable or LLM ranker challenger,
-- unified search/recommendation evaluation,
-- never promote without online evidence and cost/latency gates.
+### Evaluation and consolidation
+
+Run bounded prospective shadow/evaluation jobs with idempotent claims, leases, retries, dead-letter diagnosis and recorded model versions. Monitor completed throughput and oldest pending job, not only whether a schedule exists. Derive/rebuild memory projections incrementally only when parity with full recomputation is demonstrated.
+
+Outcome reconciliation handles delayed ratings, unsave/removal and undo without a stale early positive becoming permanent. Fixes receive new reward/feature versions; historical comparisons must declare eligibility and maturity windows. Use chronological holdouts and ablations (bootstrap/session/Scenario/Shared/transfer on/off), with sample sizes and uncertainty. Measure useful consumption/rating, coverage, repetition, calibration, Shared disagreement and cost/latency; taps alone do not define success.
+
+Shadow compares alternatives only where observed exposure supports evaluation; it cannot establish how users would have reacted to unseen Items. No global/automatic promotion in MVP. Manual canary needs mature supported evidence, explicit authorization and a rehearsed rollback. Insufficient data keeps the baseline active while evaluation operates.
+
+Learned embeddings/pgvector, sequential/LLM challengers, population learning and full autonomous evolution retain their existing later gates. None is a prerequisite for fixing the current evidence and scoring defects.
 
 ## 19. Research basis
 

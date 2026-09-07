@@ -2,6 +2,8 @@
 
 Milestone: **MVP 0.1**
 
+Product decision **2026-09-07**: algorithm correctness, bounded adaptive memory, sustained SleepLayer evaluation, browse suggestions #200/#201/#203 and complete operational/data lifecycle are required for this release. These are planned acceptance gates, not claims of delivered behavior. Graphics may evolve through the existing theme/assets boundary.
+
 Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
 This file defines the MVP boundary. Adding a new MVP requirement requires an explicit product decision; implementation convenience is not enough.
@@ -121,15 +123,51 @@ Commercial monetization, autonomous predictor promotion and additional media/lif
 
 ## Data and prediction
 
-- [x] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
-- [x] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
+- [-] `MVP-DATA-001` Meaningful discovery behaviour is captured through a generic event interface.
+- [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [x] `MVP-PRED-001` Prediction V0 ranks generic Items for a Profile rather than using separate book/movie user models.
 - [x] `MVP-PRED-002` Prediction V0 includes long-term behaviour, recent behaviour and Item similarity signals.
 - [x] `MVP-PRED-003` DiscoveryMode changes exploration/ranking semantics, not only UI.
 - [x] `MVP-PRED-004` Architecture supports scenario-memory retrieval without redesigning core Profile/Item/Event/Prediction contracts.
 - [-] `MVP-PRED-005` SharedProfile Prediction V1 combines Shared joint evidence with accepted members' authorized PersonalProfile LongTerm/native ShortTerm fit through an inspectable aggregate common-fit component: sparse member estimates shrink toward a neutral `ColdStartPrior`, agreement/minimum-member fit can lift candidates, disagreement is penalized, the Prediction target remains the SharedProfile, Personal evidence is never copied into Shared history, and candidate explanations expose only aggregate components. Hosted v1.1 acceptance is complete; configured-device acceptance remains required before marking this complete.
-- [x] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
+- [-] `MVP-PRED-006` Every hosted learnable recommendation persists a versioned PredictionRun and complete candidate pool with actor/Profile/session Context, MemoryStateSnapshot, source/final ordering and delivery selection before correlated exposure/outcome learning.
 - [x] `MVP-PRED-007` Prediction V1 uses a bounded, inspectable same-Profile ScenarioMemory signal and degrades safely to the base scorer when no traced Scenario evidence exists; Personal and Shared memories remain isolated.
+
+## Algorithm correctness and adaptation — release blockers
+
+The existing V0/V1 completion marks describe delivered foundations. They do not waive the following acceptance gates. `PREDICTION_MODEL.md` owns the technical contract; `ROADMAP.md` owns order.
+
+- [ ] `MVP-ALG-001` Imported and calibrated taste directly changes unseen PersonalProfile ranking without native Events or prior Scenarios; opposite bootstrap preferences produce explainably different orders over the same candidate pool. Removing/correcting imports recomputes that influence.
+- [ ] `MVP-ALG-002` Serving and shadow use the same versioned feature, score, eligibility and delivery-policy semantics. Baseline replay matches scores within an explicit numerical tolerance and exactly matches eligibility, selected Items and ordering in Personal and Shared controls.
+- [ ] `MVP-ALG-003` Bounded candidate generation can refill after suppression and combine taste, recent intent, novelty and Shared fit. Cursor/slate delivery can continue beyond the first 20/50 results without duplicates, cross-Profile leakage or falsely labelled exhaustion.
+- [ ] `MVP-ALG-004` WorkingState represents ordered active-session intent; ShortTerm and LongTerm use consistent source-aware decay/support. Repeated taps or many tags do not manufacture independent confidence. Native contradictory evidence can supersede old imports; one unusual session does not erase durable taste.
+- [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with domain-specific metadata and bounded transfer reliability. Tests show helpful cross-domain transfer and safe neutral fallback for missing/contradictory features; provider free-text tags alone are insufficient acceptance.
+- [ ] `MVP-ALG-006` FOR_YOU emphasizes supported fit, SURPRISE meaningful novelty, RISK relevant uncertainty. A bounded inspectable context-dependent memory/policy weighting rule is evaluated against a fixed baseline; learned gating is optional. No unsupported confidence-as-probability claim or automatic model promotion.
+- [ ] `MVP-ALG-007` Calibration preserves the 6-known-of-12-to-24 bound, unknown skips and fail-open while selecting recognizable, diverse and informative real Items; recognition, completion and first-session usefulness are measured.
+- [ ] `MVP-ALG-008` SleepLayer has a scheduled, bounded, retry-safe worker, mature-outcome evaluation, queue monitoring and tested manual canary/rollback. Chronological evaluation reports sample size, missing exposure/support and delayed corrections; no promotion from shadow-only unexposed outcomes or a tiny beta percentage.
+- [ ] `MVP-ALG-009` Database migration replay and deterministic SQL regression tests run in CI, including bootstrap, score/policy parity, suppression/refill, time/undo/outcome reconciliation and owner/member/former-member/outsider authorization.
+
+## Reliable evidence and synchronization
+
+- [ ] `MVP-DATA-003` A meaningful action commits its canonical Event(s) and current-state projection atomically through an idempotent authorized boundary. Persistent actor/Profile-scoped client outbox survives app termination, retries without duplicate effects, and reports pending/failed status. Concurrent actions, undo and lost acknowledgements are covered.
+- [ ] `MVP-DATA-004` Grid/detail/swipe use the exact delivered Profile/prediction/slate context. Shared collaboration overlays, search, Lists/history and fallback have truthful delivery origins; they cannot fabricate hosted candidate selection. Delayed outcomes preserve valid provenance, with unmatched cases explicitly excluded from evaluation.
+
+## Promoted browse and product-quality requirements
+
+- [ ] `MVP-DISC-008` #200: BOOK/MOVIE discovery exposes a bounded contextual row of the active Profile's existing Lists with canonical Lists overflow; mixed Lists and Profile switching remain correct.
+- [ ] `MVP-DISC-009` #201: persisted canonical catalog supports title/creator search and normalized tag, year, language and ItemType filters where data exists, with bounded server pagination, reset/empty/error states and truthful search provenance. Search constraints do not become durable taste by themselves.
+- [ ] `MVP-NAV-005` #203: canonical Groups/Profile surface filters already-authorized Profile names; invitation nickname lookup remains separate and unrelated/private Profiles are never exposed.
+- [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast and reduced motion; loading, empty, offline, permission-denied and recovery states are usable on representative devices. Graphics remain replaceable without changing domain/Event contracts.
+
+## Production services and data lifecycle
+
+`ARCHITECTURE.md` owns the service inventory, retention decisions and operational evidence checklist.
+
+- [ ] `MVP-OPS-001` Every required production service has an actual owner, environment/project ID, region, access/recovery route, cost cap/alert and deployment/configuration record; staging and production data/secrets are isolated. No unspecified runtime server or storage dependency remains at release.
+- [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups. Automated expiry and deletion are tested, including former-member access and recovery without resurrecting deleted data.
+- [ ] `MVP-OPS-003` Backup and isolated restore drills meet recorded recovery objectives and verify database, required objects, configuration and signing-key recovery. A database backup alone is not proof of file/object recovery.
+- [ ] `MVP-OPS-004` Alerts and runbooks cover API/auth/import/worker failures, crash rate, queue age, Prediction quality/latency, database/storage growth and spend. Representative load and rollback drills pass; sensitive payloads and tokens are redacted.
+- [ ] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete. Release builds reject missing production configuration and cannot silently ship mock discovery.
 
 ## External beta readiness
 

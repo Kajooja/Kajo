@@ -11,14 +11,14 @@ This directory is the permanent project memory for Kajo.
 | Understand visual/interaction principles | `product/UX_PRINCIPLES.md` |
 | Know where the project is right now | `project/STATUS.md` |
 | Know what is being built now | Current sprint linked from `project/STATUS.md` |
-| Know what comes next | `project/ROADMAP.md` |
+| Know algorithm-first work order and promoted MVP suggestions | `project/ROADMAP.md` |
 | Understand sprint/milestone rules | `project/WORKFLOW.md` |
 | Continue in a new AI conversation | `project/HANDOFF_PROTOCOL.md` |
 | Use the correct terms | `domain/GLOSSARY.md` |
 | Understand User/Profile/Item/Event relationships | `domain/DOMAIN_MODEL.md` |
 | Understand behaviour tracking | `domain/DATA_EVENTS.md` |
 | Understand prediction and memory concepts | `domain/PREDICTION_MODEL.md` |
-| Understand technical boundaries | `architecture/ARCHITECTURE.md` |
+| Understand technical boundaries, production services, retention and recovery | `architecture/ARCHITECTURE.md` |
 | Find important code | `architecture/CODEMAP.md` |
 | Understand why an architecture choice exists | `architecture/decisions/` |
 
