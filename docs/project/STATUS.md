@@ -7,7 +7,7 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## New product truth — 2026-09-07 / #215
+## New product truth — 2026-09-07 / #215 / #216
 
 The first public Kajo must ship as a complete acquisition + recommendation system, not only as an installable recommender.
 
@@ -38,15 +38,15 @@ Important social decision:
 
 Scale principle: **design contracts for one million users; provision infrastructure for measured demand.** No speculative Kafka/Kubernetes/graph-database/microservice requirement is introduced.
 
-Canonical planning documents on branch `docs/215-taste-first-launch-loop`:
+Canonical documents for this decision:
 
 - `docs/product/LAUNCH_LOOP.md`
 - `docs/product/MVP.md`
 - `docs/project/ROADMAP.md`
 - `docs/product/PRODUCT.md`
-- ADR-0007
+- `docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
 
-These planning changes do not claim runtime implementation is complete.
+The planning delivery is tracked by Issue #215 / PR #216. Once merged, `main` is the authoritative truth; while the PR is open, treat the PR as pending planning rather than delivered runtime behavior. The documentation does not claim Taste/Friend runtime implementation exists yet.
 
 ## Current implementation truth
 
@@ -125,6 +125,7 @@ The owner explicitly wants the algorithm driven toward the strongest reasonable 
 - Helsinki-first events/things to do,
 - broader activities/restaurants/travel,
 - richer experience memory,
+- stronger post-MVP friend/group learning,
 - optional friend-review feed,
 - local/global discovery,
 - PopulationMemory / more advanced evolutionary learning,
