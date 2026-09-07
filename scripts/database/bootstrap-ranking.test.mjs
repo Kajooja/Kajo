@@ -78,7 +78,7 @@ test('bootstrap Personal ranking SQL regressions (isolated function fixtures)', 
     const v1Definition = async () => (await db.query(
       "select pg_get_functiondef('private.rank_items_v1_internal(uuid,text,text,integer,jsonb)'::regprocedure) as sql")).rows[0].sql;
     const historicalV1 = await v1Definition();
-    const migration = await read('20260907130756_bootstrap_personal_ranking.sql');
+    const migration = await read('20260907155201_bootstrap_personal_ranking.sql');
     await db.exec(migration);
     await db.exec(migration); // CREATE OR REPLACE/ACL forward change can be reapplied.
     await t.test('V1 preserves the complete policy/trace function and records the new base version', async () => {
