@@ -73,6 +73,8 @@ supabase/functions/password-auth/
 | Shared Saved integrity | `20260902074500_shared_saved_consensus_integrity.sql` | Consensus record + RLS guard prevent forging/clearing unanimity-owned Shared Saved state |
 | Messaging | `apps/mobile/src/features/messages/`, `apps/mobile/app/messages/`, `20260902182643_profile_messaging_foundation.sql` | Profile-scoped messaging + Inbox; configured-device acceptance deferred |
 | Offline migration diagnostic | `scripts/database/migration-replay.mjs`, `npm run diagnose:database-replay` | Runs full unmodified files until first failure; exit 1 at known #208. Minimal platform fixtures, not Supabase replay acceptance |
+| Migration metadata parity | `scripts/database/migration-parity.mjs`, `migration-parity.test.mjs` | Read-only exact version/name comparison; exit 1 on drift, 2 on invalid input. Never repairs or maps by name alone |
+| Migration history integrity | `scripts/database/migration-history.json`, `migration-history.test.mjs`; proposed ADR-0006 | SHA-256 protection for 47 repository migrations; detects edits/deletions, duplicate versions and backdated additions in npm test. Does not assert hosted parity |
 | DB migrations | `supabase/migrations/` | Ordered canonical source for hosted schema; deployed migrations are immutable and corrections use forward migrations |
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint + typecheck + tests + iOS/Android bundle smoke; main also builds/verifies/uploads standalone Android APK |
 
