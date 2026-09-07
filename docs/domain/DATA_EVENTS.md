@@ -1,18 +1,18 @@
 # Kajo Event Model
 
-Status: canonical behavioral contract for MVP implementation.
+Status: canonical behavioral + growth telemetry contract.
 
-## Why events matter
+Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
-Kajo must know not only what it predicted but what actually happened. Event data powers current-state reconstruction, learning, scenario memory, evaluation and future evolution of predictors.
+## 1. Recommendation Event contract
 
-## Required conceptual fields
+Conceptual fields:
 
 ```text
 eventId
 actorUserId
 profileId
-itemId?                 # optional for non-item events
+itemId?
 itemType?
 eventType
 timestamp
@@ -25,232 +25,279 @@ properties?
 
 `actorUserId` and `profileId` are intentionally separate.
 
-## Event vocabulary
+## 2. Recommendation event vocabulary
 
 ### Exposure
 
-- `ITEM_IMPRESSION` — Item was meaningfully presented.
-- `ITEM_OPENED` — details opened.
-- `ITEM_DWELL` — meaningful dwell/visibility measurement where technically reliable.
+- `ITEM_IMPRESSION`
+- `ITEM_OPENED`
+- `ITEM_DWELL`
 
-`ITEM_DWELL` MVP payload:
+Meaningful dwell is weak attention evidence, not direct satisfaction.
 
-```text
-properties.source = ITEM_DETAIL
-properties.dwellMs = integer, 1,000..1,800,000
-properties.endReason = ITEM_CHANGED | SCREEN_EXIT | APP_BACKGROUND
-properties.predictionSource = hosted | fallback
-```
+### Preference/discovery
 
-Durations shorter than one second are not persisted and durations are capped at 30 minutes. Dwell supports intent/UX analysis but is not a direct positive Outcome or V1 Scenario reward.
+- `ITEM_LIKED`
+- `ITEM_DISLIKED` — legacy only
+- `ITEM_NOT_INTERESTED`
+- `ITEM_INTEREST_CLEARED`
+- `ITEM_SAVED`
+- `ITEM_UNSAVED`
 
-### Preference / discovery
+### Shared
 
-- `ITEM_LIKED` — PersonalProfile positive preference. In current discovery UI this is emitted when an Item is added to a custom List; the same action advances to the next card.
-- `ITEM_DISLIKED` — legacy binary signal retained for historical rows; current rating-drawer UI does not emit it.
-- `ITEM_NOT_INTERESTED` — actor has not consumed the Item but marks it currently irrelevant.
-- `ITEM_INTEREST_CLEARED` — prior explicit like/dislike returned to neutral.
-- `ITEM_SAVED` — Profile-level Saved state became true.
-- `ITEM_UNSAVED` — Profile-level Saved state became false.
+- `ITEM_ENDORSED`
+- `ITEM_ENDORSEMENT_REVERSED`
+- historical `ITEM_SUGGESTED` is deprecated and must not be reused.
 
-### Shared endorsement — Sprint 011/#151
+At unanimous Shared consensus, canonical Shared save evidence is emitted with source `SHARED_CONSENSUS`.
 
-- `ITEM_ENDORSED` — actual actor, while acting inside a SharedProfile, marks an Item worth doing together. This is **actor-specific pending state**, not Shared `saved=true`.
-- `ITEM_ENDORSEMENT_REVERSED` — actor explicitly removes their active pre-consensus Endorsement if reversal is exposed.
+### Lists
 
-The #151 persistence migration supports these Event types. Mobile runtime emits `ITEM_ENDORSED` only after the actor-specific endorsement RPC succeeds. It emits the consensus `ITEM_SAVED` evidence only when the same RPC reports the one successful consensus transition.
+- `LIST_CREATED`
+- `LIST_RENAMED`
+- `LIST_DELETED`
+- `ITEM_ADDED_TO_LIST`
+- `ITEM_REMOVED_FROM_LIST`
 
-At unanimous accepted-member consensus, Kajo also appends canonical Shared save evidence:
+Shared discovery custom-List membership is committed only when the Endorsement consensus boundary reaches unanimity.
 
-```text
-eventType = ITEM_SAVED
-profileId = shared_profile_id
-actorUserId = actor_who_completed_or_triggered_consensus
-properties.source = SHARED_CONSENSUS
-properties.endorsementCount = ...
-properties.requiredMemberCount = ...
-```
+### Consumption/outcome
 
-The exact actor for an automatic membership-change recomputation must remain traceable and intentionally defined in implementation; do not invent a fake User actor.
+- `ITEM_CONSUMED`
+- `ITEM_CONSUMPTION_REVERSED`
+- `ITEM_INTERACTION_UNDONE`
+- `ITEM_RATED`
 
-### Lists — Sprint 011/#102
+Rating 0–10 always implies consumed/read/watched.
 
-- `LIST_CREATED` — actor created a custom Profile List.
-- `LIST_RENAMED` — actor renamed a custom Profile List.
-- `LIST_DELETED` — actor deleted a custom Profile List; Item/current interaction state is unchanged.
-- `ITEM_ADDED_TO_LIST` — an Item was committed to a custom List. Personal commit is immediate; Shared discovery commit occurs when the approving actor completes unanimity and retains the original proposer in properties/projection provenance.
-- `ITEM_REMOVED_FROM_LIST` — actor explicitly removed an Item from a custom List.
-
-System `Tallennetut` remains the Saved projection and uses canonical `ITEM_SAVED` / `ITEM_UNSAVED` evidence. Shared consensus continues to emit `ITEM_SAVED` with `properties.source = SHARED_CONSENSUS`; it must not be relabeled as a manual custom-List event. One Item may produce multiple custom List membership Events because the memberships are independent.
-
-Current discovery commits one destination per action:
-
-- Personal custom List: append `ITEM_ADDED_TO_LIST` for a new membership and `ITEM_LIKED` for the positive action; keep Saved unchanged.
-- Personal system `Tallennetut`: append `ITEM_SAVED` when Saved becomes true and persist the action as positive current preference.
-- Shared custom List proposal: append actor-specific `ITEM_ENDORSED` with target List provenance, but do not append `ITEM_ADDED_TO_LIST` or create membership yet.
-- Shared approval: append the approving actor's `ITEM_ENDORSED`; on unanimity append `ITEM_ADDED_TO_LIST` for the chosen custom List and `ITEM_SAVED` for SharedConsensus.
-
-Selecting an already-present membership is idempotent and must not duplicate membership Events. A later action may add the same Item to another List; the single-destination picker does not silently delete earlier memberships. Pending Shared approval is not reported as existing membership.
-
-### Historical/deprecated Shared suggestion
-
-- `ITEM_SUGGESTED` — historical Sprint 009 experiment where a member explicitly used the removed `Ehdota yhteiseen` Item-detail action.
-
-Rules:
-
-- retain old rows for history/analytics,
-- do not delete or reinterpret old `ITEM_SUGGESTED` Events as Endorsements,
-- new UI must not emit `ITEM_SUGGESTED`,
-- new Shared collaboration uses `ITEM_ENDORSED` semantics instead.
-
-### Consumption / outcome
-
-- `ITEM_CONSUMED` — generic historical/direct semantic; current rating UI records consumption through `ITEM_RATED`.
-- `ITEM_CONSUMPTION_REVERSED` — prior consumed/read/watched mark explicitly removed.
-- `ITEM_INTERACTION_UNDONE` — latest committed Item interaction undone; `properties.reversedEventId` identifies compensated Event and restored fields describe current state.
-- `ITEM_RATED` — `properties.rating` integer 0–10 and always implies consumed/read/watched state.
-
-### Search/session
+### Session/search
 
 - `SEARCH_PERFORMED`
 - `DISCOVERY_MODE_CHANGED`
 
-More Event types require explicit semantics here before broad use.
+New recommendation event types require explicit semantics before broad use.
 
-Profile chat text, message delivery and unread/read cursors are intentionally not Event types. They persist through `ProfileMessage` and per-User/Profile read state; recommendation learning must not ingest message content by default.
+## 3. Taste evidence
 
-## Prediction traceability
+Taste Test must reuse canonical taste semantics rather than inventing a parallel marketing score.
 
-When Kajo chooses an Item through Prediction, the impression should carry `predictionId`. Subsequent events should preserve traceability when feasible:
-
-```text
-prediction -> impression -> actor action -> actual outcome
-```
-
-Hosted Prediction V1 also persists an internal `PredictionRun` and complete `PredictionCandidate` pool before learning from the result. This distinguishes:
+A TasteSession response may become bootstrap evidence only when it expresses one of the defined recommendation meanings:
 
 ```text
-considered candidate
-  -> selected for delivery
-     -> meaningfully impressed
-        -> opened/dwelled
-           -> preference action
-              -> consumed/delayed rating
+known Item + rating 0..10
+unknown/skip
+not-interest when explicitly offered and semantically valid
 ```
 
-Do not infer that an Item was seen merely because it was in the returned slate. Do not infer rejection from a meaningful impression alone.
+Unknown/skip is useful for recognition/question-selection analysis but is not negative preference.
 
-### Required trace dimensions
+Taste evidence must retain at least:
 
-- `predictionId`, `profileId`, `actorUserId` and optional `sessionId`,
-- request Context and MemoryStateSnapshot,
-- model/base-model/policy/feature/reward versions as applicable,
-- every candidate's source/final rank and score,
-- final delivery selection,
-- selection probability once stochastic exploration exists,
-- Event timestamps and eventual Outcome latency.
+```text
+tasteSessionId
+itemId
+questionIndex
+questionPolicyVersion
+response semantic
+occurredAt
+source = TASTE_TEST
+```
 
-Fallback/mock `predictionId` values may correlate mobile Events but do not claim a hosted PredictionRun. Analytics must keep `predictionSource` separate.
+When a Taste response is projected into PersonalProfile bootstrap/Memory state, it remains distinguishable from native post-activation Kajo behavior and from imported history.
 
-## Evidence classes and Outcome attribution
+## 4. TasteChallenge evaluation
 
-Events remain raw facts. Learning derives versioned evidence/outcomes rather than changing Event meaning.
+A held-out challenge prediction must be frozen before the actual answer can influence the state being scored.
 
-| Evidence class | Event examples | Interpretation |
+Canonical order:
+
+```text
+1. freeze PersonalProfile/Taste state snapshot
+2. freeze model/policy/feature versions
+3. persist challenge Prediction / expected rating or fit
+4. present held-out known Item
+5. collect actual answer
+6. persist evaluation result
+7. only then allow answer to influence future Profile state
+```
+
+Required challenge audit fields include:
+
+```text
+tasteChallengeId
+tasteSessionId
+itemId
+predictionId / challengePredictionId
+stateSnapshotVersion
+modelVersion
+policyVersion
+predictedValue
+actualValue
+evaluationMetricVersion
+error / hit result
+predictedAt
+answeredAt
+```
+
+A challenge prediction whose answer was already in training evidence is invalid and excluded from user-facing accuracy/evaluation.
+
+## 5. Acquisition/growth telemetry
+
+Growth telemetry is a separate event class/stream/table boundary or an explicitly typed system event contract. It may correlate sessions/attribution but does not require `profileId`/`itemId` when those concepts do not apply.
+
+Canonical growth concepts:
+
+- `TASTE_LINK_OPENED`
+- `TASTE_SESSION_STARTED`
+- `TASTE_ITEM_PRESENTED`
+- `TASTE_ITEM_RESPONDED`
+- `TASTE_SESSION_COMPLETED`
+- `TASTE_CHALLENGE_PREDICTED`
+- `TASTE_CHALLENGE_ANSWERED`
+- `TASTE_PREVIEW_SHOWN`
+- `AUTH_CONVERSION_STARTED`
+- `AUTH_CONVERSION_COMPLETED`
+- `FRIEND_INVITE_CREATED`
+- `FRIEND_INVITE_OPENED`
+- `FRIEND_INVITE_ACCEPTED`
+- `FRIEND_RELATIONSHIP_CREATED`
+- `FRIEND_RELATIONSHIP_REMOVED`
+- `FRIEND_BLOCKED`
+- `SHARED_PROFILE_CREATE_STARTED`
+- `SHARED_PROFILE_CREATED`
+
+These names describe telemetry concepts. Implementation may group them in a typed acquisition table rather than the recommendation `events` table if that better preserves authorization/retention semantics.
+
+### Growth telemetry rules
+
+- link open is not preference,
+- auth conversion is not preference,
+- Friend acceptance is not preference,
+- SharedProfile creation is not proof that any Item was liked,
+- campaign source is not a model feature by default,
+- experiment assignment may explain funnel outcomes but cannot silently change raw Event meaning.
+
+## 6. Acquisition attribution
+
+Bounded attribution may include:
+
+```text
+acquisitionSessionId
+tasteSessionId?
+friendInviteId?
+campaignId?
+referralSource?
+landingVariant?
+experimentAssignments?
+firstSeenAt
+convertedAt?
+```
+
+Do not store secrets/private Profile state in URLs or analytics payloads. Raw invite tokens must not be copied into logs/analytics; use server-side IDs/hashes designed for correlation where needed.
+
+Attribution retention has an explicit lifecycle and deletion policy.
+
+## 7. Friend-invite telemetry
+
+A personal invite has operational lifecycle distinct from Friendship.
+
+Relevant states/events:
+
+```text
+CREATED
+OPENED
+REVOKED
+EXPIRED
+ACCEPTED
+CONSUMED
+```
+
+Repeated link opens must not create multiple Friendships. `FRIEND_RELATIONSHIP_CREATED` is emitted only for the one successful canonical transition.
+
+Remove/block actions are social lifecycle facts, not taste evidence.
+
+## 8. Prediction traceability
+
+When Kajo chooses an Item through Prediction, subsequent relevant Events should preserve:
+
+```text
+PredictionRun
+→ candidate selected for delivery
+→ meaningful ITEM_IMPRESSION
+→ ITEM_OPENED / DWELL
+→ preference action
+→ consumed / delayed rating
+```
+
+Do not infer that returned = seen. Do not infer rejection from impression alone.
+
+Required trace dimensions include predictionId, profileId, actorUserId, sessionId, Context, MemoryStateSnapshot, model/base-model/policy/feature/reward versions, candidate source/final ranks, delivery state and Outcome latency.
+
+Fallback correlation IDs cannot pretend a hosted PredictionRun exists.
+
+## 9. Evidence classes
+
+| Class | Examples | Interpretation |
 |---|---|---|
-| exposure | `ITEM_IMPRESSION` | the denominator; not preference |
-| attention | `ITEM_OPENED`, `ITEM_DWELL` | weak intent, not satisfaction |
-| preference | `ITEM_RATED`, `ITEM_NOT_INTERESTED`, List/save/Endorsement | direct decision evidence |
+| exposure | impression | denominator/bias correction |
+| attention | open/dwell | weak intent |
+| preference | rating/not-interest/list/save/endorsement | direct decision evidence |
 | consumption | consumed/rating/reversal | actual experience |
-| correction | undo, clear, unsave, reversal | prior evidence changed or was compensated |
+| correction | undo/clear/unsave/reversal | changed prior evidence |
+| taste bootstrap | Taste rating/known response | cold-start evidence with explicit source |
+| growth | link/auth/invite/friend/group funnel | product acquisition telemetry, not taste |
 
-For ScenarioMemory V1, one strongest Outcome is selected per `(predictionId, itemId)`. Rating outranks earlier consumption/list/save evidence; explicit negative/reversal outranks weaker positive intent; `ITEM_INTERACTION_UNDONE` removes its referenced Event from derived evidence. The reward formula and precedence are versioned in `PREDICTION_MODEL.md` and must not be retroactively changed without a new version.
+Outcome precedence/reward remains versioned in `PREDICTION_MODEL.md`.
 
-## SharedProfile examples
+## 10. SharedProfile evidence rules
 
-### Current Shared interaction
+Personal evidence read for Shared common-fit remains Personal and is never copied to Shared Event history.
 
-```text
-actorUserId = user_A
-profileId   = shared_profile_A_B
-itemId      = movie_X
-eventType   = ITEM_RATED
-```
+Pending Endorsement is actor-specific. Unanimous consensus produces one canonical Shared save transition. Accepted-member Personal consumed/rated history may be displayed in the lower attributed Shared tier without duplicating those Personal Events.
 
-This is User A acting inside the joint A+B Kajo. It is not identical to rating Movie X in A's PersonalProfile.
+Friendship does not grant authorization to read another User's Personal Event stream.
 
-### Pending Endorsement
+## 11. Reliability contract
 
-```text
-actorUserId = user_A
-profileId   = shared_profile_A_B
-itemId      = movie_Y
-eventType   = ITEM_ENDORSED
-properties.source = SHARED_DISCOVERY
-```
+A meaningful explicit recommendation action must atomically/idempotently update its canonical current-state projection and append corresponding evidence through one authorized boundary.
 
-This means A wants Movie Y considered together. It does **not** mean the SharedProfile has saved Movie Y yet.
+Persistent actor/Profile-scoped device outbox requirements:
 
-Until B endorses too:
+- stable action IDs,
+- retry/backoff,
+- process-death survival,
+- dependency ordering,
+- account/Profile switch safety,
+- authorization-loss behavior,
+- no duplicate effects under lost acknowledgements,
+- pending/failed visibility where relevant.
 
-- A should not keep receiving Y in ordinary Shared discovery,
-- B may receive Y ahead of normal recommendations with A provenance,
-- current Shared `saved` remains false.
+Delivery provenance is frozen independently from score order. Cached data from another Profile/mode/run cannot inherit the current predictionId.
 
-### Consensus
+## 12. Taste/acquisition reliability contract
 
-When all accepted members endorse:
+Taste/acquisition paths require equivalent discipline:
 
-```text
-profileId   = shared_profile_A_B
-itemId      = movie_Y
-eventType   = ITEM_SAVED
-properties.source = SHARED_CONSENSUS
-```
+- stable TasteSession ID,
+- idempotent response submission,
+- no duplicate response under browser retry,
+- server-owned question order/policy version sufficient for evaluation,
+- auth conversion cannot duplicate the PersonalProfile/taste evidence,
+- friend invite acceptance is idempotent,
+- revoked/expired/blocked invite cannot transition Friendship,
+- analytics delivery failure cannot roll back a successful auth/Friend/Profile action,
+- raw token values are redacted.
 
-This records Profile-level transition to Shared Saved state. Pending member Endorsement evidence remains independently traceable.
+## 13. Data quality and privacy
 
-## Shared discovery member-history rule
-
-An Item already consumed/rated in an accepted member's PersonalProfile may appear in Shared discovery only as an attributed lower-priority member-history delivery tier under #151. Higher rating may order that tier but must not move it ahead of ordinary unseen recommendations.
-
-Do not copy that Personal Event into the Shared Event stream merely to implement delivery. The authorized overlay may read member PersonalProfile current state while preserving original Profile provenance. SharedProfile-consumed/rated and consensus-saved Items remain outside ordinary discovery.
-
-This rule does not delete the Item from Saved, named Lists or history.
-
-## Data quality rules
-
-- Use UTC timestamps in storage.
-- Prefer append-only behavioural Events; corrections should be explicit rather than silently rewriting history.
-- Undo/reversal appends compensating evidence; it does not delete original Event rows.
-- Rating and not-interested are distinct: rating means consumed, not-interested means not consumed.
-- Save is orthogonal to rating/not-interested.
-- Pending Endorsement is orthogonal to Shared saved/rating/not-interested/consumed current state until consensus.
-- UI wording is not Event semantics. `Tykkää`, `Tallenna` or later copy must map intentionally to canonical state depending on Profile context.
-- Event names are canonical contracts, not analytics-only labels.
-- Do not create media-specific duplicates such as `BOOK_ENDORSED` or `MOVIE_SAVED`.
-- Sensitive/contextual fields are collected only when needed and permitted.
-- Context attributes are allowlisted. Arbitrary client JSON must not silently become a learning feature.
-- Raw touch coordinates, contact data, advertising IDs, precise location and background sensors are outside the V1 Event contract.
-- Profile chat text is never copied into Event properties for recommendation learning.
-- Exposure-position bias must be evaluated from actual impressions and stored candidate ranks, not only selected Items.
-
-## MVP persistence contract
-
-- Client supplies stable UUIDs for Event/session identity. Retry with same ID is insert-or-ignore so transient failures cannot create duplicate evidence.
-- `occurredAt` is UTC action time from Event contract; database also stores server-side creation time.
-- Event session belongs to one acting User and one Profile context. Session-linked Event retains same actor/Profile pair.
-- Item Event stores `itemId` + `itemType` matching canonical Item row.
-- Authenticated clients may append/read Events only for permitted Profile contexts; no update/delete capability for Event/session rows.
-- Mutable current-state tables (`item_interactions`, endorsement/List state) are projections. Durable SharedConsensus prevents direct current-state writes from forging or clearing unanimous Shared Saved state. These projections do not rewrite append-only Event evidence.
-
-
-## Required reliability completion — planned 2026-09-07
-
-`MVP-DATA-003/004` extend the delivered persistence foundation; implementation is not yet accepted.
-
-A meaningful user command must atomically append its canonical Event(s) and change the relevant current-state projection through one authorized idempotent server boundary. Use stable action identity and validate identical retry payloads; reject identity reuse with different content. Do not change existing List/Shared consensus semantics or couple an optional message transaction to a successful List action.
-
-A persistent actor/Profile-scoped device outbox retains unacknowledged explicit actions across process death. Define retry/backoff, dependency ordering, bounded passive-impression batches, authorization loss and sign-out/account-switch handling. Never upload an old user's queued payload under a new identity. Pending versus committed status remains visible; refresh after acknowledgement or a known committed-state version rather than assuming a debounce proves persistence.
-
-Freeze actual delivery origin and order independently from score order. Correlation requires the exact Profile, prediction, Item and delivered slate; cached Items from a different Profile/mode/run cannot inherit a hosted ID. Shared approval/history overlays and search/List entry paths must record truthful origin. Preserve valid delayed-outcome links where available; do not guess an attribution to the latest run. Update typed contracts, vocabulary/glossary where needed, SQL and mobile tests in the implementation PR.
+- UTC in storage.
+- Prefer append-only facts and explicit compensating/correction events.
+- Rating vs. not-interest vs. save remain distinct.
+- User-facing wording is not event semantics.
+- No media-specific duplicate event vocabulary.
+- Profile chat text is not copied into recommendation events.
+- Raw touch/contact/advertising-ID/precise-location/background sensor data remains outside V1 unless later explicitly approved.
+- Friends cannot read each other's private Personal event/taste history.
+- Anonymous/Taste/acquisition data has bounded retention and deletion.
+- Growth telemetry must support product analysis without becoming a covert personalization feature.
