@@ -1,188 +1,463 @@
-# Kajo complete product and research backlog
+# Kajo Complete Product and Research Backlog
 
-Product direction recorded **2026-09-07**, planning delivery #213. This is permanent project memory for the owner's complete vision and the preceding catalog/SleepLayer/distributed-network discussion. It specifies future work, not delivered features, purchased licenses or demonstrated model performance.
+Status: **permanent long-term product memory**  
+Product direction consolidated: **2026-09-07**
 
-[ROADMAP.md](../project/ROADMAP.md#post-mvp-execution-queue) owns execution order; [MVP.md](MVP.md) owns the first release boundary; [STATUS.md](../project/STATUS.md) owns the next active task. Do not replace the unfinished 14.0–15.3 queue with this backlog. The final product target exceeds MVP 0.1 and requires **both Apple App Store and Google Play**, even if the first milestone ships through one store first.
+This file preserves Kajo's complete ambition without allowing distant ideas to displace the first public release.
 
-## Completion target and recording rules
+Execution authority:
 
-Kajo should offer books, movies, series, music albums and Helsinki-first hyperlocal events with useful names, creators, legally usable imagery, normalized tags, search and Personal/Shared discovery. The algorithm learns the person and the dynamics of each SharedProfile. Fast response, a quiet accessible mobile interface, privacy, reliable synchronization and bounded device/server resource use apply to every increment.
+- `MVP.md` — first public release boundary,
+- `LAUNCH_LOOP.md` — Taste-first acquisition loop,
+- `ROADMAP.md` — exact build order and Share Link Gate,
+- `STATUS.md` — exact current task.
 
-Friend discovery and groups lead to optional relevant review feeds. Local/global feeds and real-world friendship or dating are later possibilities; neither compatibility accuracy nor a public people network is promised by the first release. Research can legitimately conclude that an idea should not ship.
+Everything in this file is **after or conditional on the first-release gates** unless a requirement is explicitly promoted into MVP.
 
-- `PLANNED`: accepted direction, implementation and acceptance outstanding.
-- `CONDITIONAL`: useful extension only after the named product/evidence gates.
-- `RESEARCH`: experiment with explicit comparison and stop criteria; no production commitment.
-- Keep stable IDs below when splitting an activated package into Issues. Add the Issue/evidence links here; avoid copying the specification into many competing documents.
-- Every future idea records purpose, dependency, smallest experiment, acceptance/stop decision and evidence date. Keep rejected/deferred rationale in this file or linked ADR; Git retains old revisions. Do not silently delete an idea because it is distant.
-- Activate only the next ready package from ROADMAP; create a sprint file only when work begins. Feature flags, small PRs and reversible rollouts preserve the current product. Current MVP acceptance marks remain unchanged.
+## 1. Long-term product thesis
 
-## FUT-CAT-001 — Broad canonical catalog — PLANNED
+Kajo is a personal/shared discovery and memory layer that learns a person's deeper preference structure across experiences.
 
-Build on MVP-CAT-001..003 / MVP-DISC-009 and the existing importers, `ItemSource`, `ItemExternalId` and canonical `Item`. Aim for very high findability in declared markets, not an unverifiable claim to every work worldwide.
+The long-term progression is:
 
-| Domain | Candidate source and ingestion | Identity and rights gates |
-|---|---|---|
-| BOOK | Open Library monthly dumps for breadth; Finna/Fennica for Finnish bibliographic enrichment; additional licensed sources only for measured gaps | Work, translation and edition relationships; ISBN identifies an edition, not all versions of a work. Keep edition language/title/cover consistent. Metadata rights do not grant cover rights. |
-| MOVIE | Existing TMDB adapter, bounded expansion and refresh | Namespace movie IDs; preserve alternate titles, creator roles and localization. Confirm API/data/image use, attribution and commercial license before monetization. |
-| SERIES | TMDB TV is a source candidate to validate at activation | Separate TV/movie ID namespaces. Start with series-level discovery; season/episode progress must not imply whole-series consumption. |
-| ALBUM | Evaluate MusicBrainz release-group/release data and Cover Art Archive; commercial provider adapters only if needed and permitted | Distinguish album concept, release/edition and artist identity. Metadata, cover art, playback and recommendation-training permissions are separate. No audio streaming is implied. |
+```text
+things for me
+→ things for us
+→ things to do now / nearby
+→ richer memories of what happened
+→ useful social discovery
+→ only much later, evidence-gated people compatibility
+```
 
-Future type labels in this document are planning labels; production `ItemType` currently supports BOOK/MOVIE only. Each domain activation must update compatible backend/client contracts and migrations together. Never add a second domain-specific Profile, List or prediction core.
+Kajo should eventually answer:
 
-Ingestion design:
+- What should I watch?
+- What should I read?
+- What should I listen to?
+- What should we do tonight?
+- Where should we go?
+- What would make a good date/activity?
+- Which experiences would fit this group?
+- Much later: are there people nearby whose interests/dynamics suggest a useful friendship or other connection?
 
-1. Fetch provider snapshots/changes through a bounded, checkpointed adapter with rate limits, conditional requests where supported, retry backoff and per-source cost ceilings.
-2. Validate and normalize into the existing authorized catalog boundary. Store provenance, provider update/last-check timestamps, rights/attribution and lifecycle. Quarantine ambiguous cross-provider matches; title alone is not an identity key.
-3. Maintain versioned shared tags/features with provider mappings, aliases, language and missing-value semantics. Generated enrichment keeps model/source provenance and cannot invent factual credits or become behavioral evidence.
-4. Merge safe aliases into a canonical Item while preserving List/Event/Prediction references. Source removal affects eligibility and refresh, not historical referential integrity.
-5. Serve normal search/discovery from Kajo's persisted index. A search miss may schedule bounded enrichment; it must not turn every keystroke into external crawling or block normal queries on provider uptime.
-6. Retrieve a bounded union of candidates, then rank for the Profile. Cache allowed image sizes separately from metadata and private ranking; never download the whole catalog to a phone.
+The final product should remain quiet and choice-oriented rather than becoming an endless engagement feed.
 
-Acceptance: reproducible import/update/delete-source tests; multilingual title/creator/tag searches with bounded pagination; zero silent ambiguous merges; measured duplicate, image, description and language coverage by domain; provider-outage fallback; discoverability of a versioned owner-reviewed reference set. Define numerical coverage targets before implementation, including Finnish and long-tail cases. Missing imagery has a usable fallback and never uses unlicensed substitute scraping.
+## 2. What moved into the first release
 
-## FUT-DOM-001 — Series — PLANNED
+The following are **no longer future-only ideas**:
 
-Depends on FUT-CAT-001 and accepted generic evidence/search contracts. Deliver series detail, tags, creator search, save/rating/undo and Personal/Shared recommendations using the same core. Define ongoing/finished status and partial viewing explicitly before adding progress controls. Do not interpret opening a season or watching one episode as liking/consuming the entire series.
+- Taste-first public link,
+- anonymous Taste Test,
+- honest holdout prediction challenge,
+- recommendation preview before registration,
+- Google/Apple identity conversion preserving cold start,
+- personal Friend invite,
+- reciprocal lightweight Friendship,
+- Friends surface and basic remove/block/abuse lifecycle,
+- explicit Friends → SharedProfile creation,
+- complete acquisition/funnel telemetry,
+- one-million-user-compatible identity/taste/social contracts.
 
-Acceptance: mixed BOOK/MOVIE/SERIES Lists, correct namespaced imports, unknown-type behavior on supported older clients, cross-domain transfer compared with a no-transfer baseline and safe neutral fallback. Actual store-device flows and delayed-outcome semantics must pass.
+Do not duplicate these here. Their canonical specs are `MVP.md` and `LAUNCH_LOOP.md`.
 
-## FUT-DOM-002 — Music albums — PLANNED
+## 3. FUT-REL-001 — Both public mobile stores — PLANNED
 
-Depends on the catalog/domain extension proven by FUT-DOM-001. Start with album discovery, artist/title/tag search, cover display, save/rating and optional links to external listening services. Evaluate MusicBrainz bulk/API suitability, licenses, rate limits and actual Finnish/international coverage before choosing a provider. Do not require installing a music connector to browse Kajo's catalog.
+If MVP closes with only one public store, complete public distribution in both Google Play and Apple App Store next.
 
-Acceptance: multiple releases of an album do not manufacture duplicate taste evidence; artist aliases and same-title albums resolve safely; missing covers work; listening-link clicks are intent rather than confirmed listening/enjoyment. Licensed image attribution and Personal/Shared mixed-domain flows pass. Playback, account-history import and tracks are separate later scope.
+Acceptance:
 
-## FUT-LOC-001 — Helsinki event ingestion — PLANNED
+- clean install/update/auth/account deletion,
+- Taste link continuation,
+- Friends/Shared flows,
+- real content discovery,
+- representative Android/iOS device evidence,
+- current store privacy/data-safety/provider requirements rechecked at submission time.
 
-Depends on FUT-CAT-001, generic new-domain contracts and existing OPS privacy/worker gates. Start with Helsinki Linked Events; it is an existing event/place API, not proof that every Helsinki happening is covered. A real-world event is recommendable `Item` metadata; canonical `Event` continues to mean recorded user behavior.
+## 4. FUT-CAT-001 — Broad canonical catalog — PLANNED
 
-Incremental source order:
+Expand persisted canonical catalog breadth and findability while preserving one generic Item model.
 
-1. Linked Events upcoming Helsinki inventory, places, updates and cancellations.
-2. Measured coverage gaps filled by selected venues, galleries, libraries, neighborhood associations and organizers through official API, iCalendar/RSS or agreed feeds.
-3. Allowlisted public-page extraction only after source-specific permission/terms/rights review. Prefer structured Event data; bounded text extraction may propose missing fields but cannot fabricate date, venue, price or cancellation state. Protect fetchers from private-network URLs, oversized payloads and instruction injection in source text.
-4. Organizer submission/edit channel with verification, moderation, duplicate review and correction/takedown route. Keep original source links visible.
+Candidate domains/sources must be revalidated at implementation time for current terms, rights and coverage. Current directions include:
 
-Record title, description, tags, organizer, venue/coordinates, start/end with timezone, occurrence/series linkage, price/currency or unknown, language/accessibility/age details where supplied, ticket/source URL, image rights, status, provenance and last verification. Store timestamps consistently and display Europe/Helsinki including DST. Unknown is not free, accessible, sold out or cancelled.
+- BOOK: Open Library breadth plus Finnish bibliographic enrichment such as Finna/Fennica where permitted,
+- MOVIE: current TMDB adapter plus any licensed gap-filling needed,
+- SERIES: compatible TV metadata provider,
+- MUSIC: MusicBrainz/release-group style metadata and legally usable cover sources where permitted,
+- EVENTS: Helsinki-first official/structured event sources.
 
-Match source IDs first; compare normalized name, venue and time for cross-source duplicates, with review for uncertain matches. A recurring series and its distinct occurrences are not duplicates. Define refresh tiers and an explicit freshness SLA before the pilot; near-term events refresh more frequently within provider limits. Stale or cancelled entries cannot silently remain actionable. Updating an event invalidates relevant cached availability.
+Required architecture:
 
-Acceptance: fixed Helsinki reference sample and coverage-gap report; repeat imports are idempotent; cancellation/reschedule/timezone/recurrence tests; provider outage and stale-state presentation; auditable rights; organizer correction. Operational cancellation freshness and maintenance cost must be measured before expanding cities or sources.
+```text
+provider
+→ checkpointed bounded ingestion
+→ validation/provenance/rights
+→ ItemSource + ItemExternalId
+→ canonical Item
+→ normalized versioned features
+→ Kajo search/retrieval/ranking
+```
 
-## FUT-LOC-002 — Hyperlocal Personal/Shared discovery — PLANNED
+Do not make external provider availability part of every user interaction.
 
-Depends on FUT-LOC-001 and accepted context/Shared prediction. Eligibility considers whether the event is still available and reachable in time; rank then combines taste with time, optional travel-time/radius, price, language and explicit group constraints. Start with location/radius and time; add routing/weather dependencies only after measured benefit and provider review.
+Acceptance includes coverage/duplicate/image/description/language reports, provider outage behavior, safe alias/work/edition matching and legally usable imagery/attribution.
 
-Location is optional and purpose-bound. Manual neighborhood/place selection is a complete path; no continuous location tracking or member-location disclosure. Source-derived event location is separate from a person's private location. Saving/ticket click is intent; attendance or enjoyment requires appropriate actual evidence, never proximity alone.
+## 5. FUT-DOM-001 — Series — PLANNED
 
-Acceptance: realistic Helsinki scenarios for tonight/weekend, cancelled/past/unknown-time events, denied location, low connectivity and groups with conflicting constraints. Compare cross-domain transfer against neutral event priors, track useful choices and actual outcomes, and avoid claiming no interest when travel/time made attendance impossible.
+Add series through the same generic Profile/Item/Event/Prediction/List architecture.
 
-## FUT-SOC-001 — Friends and learned group dynamics — PLANNED
+Define series vs season/episode identity and consumption semantics carefully. Watching one episode is not automatically consuming/rating the entire series.
 
-Depends on accepted SharedProfile/Lists/messaging/authorization gates. Existing group-name filtering #203 is not global friend discovery. Extend the existing nickname invitation route into a deliberately consent-based friend relationship with search discoverability settings, invitation accept/decline/revoke, remove/block/report, enumeration/spam limits and clear audience controls. Friendship never grants membership or private memory access automatically.
+Acceptance:
 
-SharedProfile remains a first-class learner. Improve prediction using real joint choices, member agreement/disagreement, membership changes and bounded aggregate member fit; do not merely average Personal taste. Avoid allowing one very active member or duplicate actions to dominate confidence. A member leaving revokes access and removes that member's future private contribution while retaining authorized shared history under the existing lifecycle policy.
+- mixed BOOK/MOVIE/SERIES Lists,
+- search/tags/creators,
+- Personal/Shared recommendations,
+- cross-domain transfer compared with no-transfer baseline,
+- real-device acceptance.
 
-Acceptance: full two-person and 3+ member flows, blocked/former-member/outsider tests, invitation abuse controls, no private-history exposure in explanations, and group-outcome evaluation against current common-fit and simple-average controls. Assess whether all members find choices acceptable, not only whether one person clicks. Do not infer private conversation content as taste by default.
+## 6. FUT-SOC-001 — Stronger friendship and group learning — PLANNED
 
-## FUT-SOC-002 — Relevant friend review feed — CONDITIONAL
+Basic Friendship is MVP. This future package strengthens the social/product intelligence **after real usage exists**.
 
-Depends on FUT-SOC-001, explicit review publishing/audience model and operated moderation. Begin with a small optional feed of reviews friends intentionally publish. An ordinary private rating is not automatically a public review. Use approved Item/taste features for relevance; retain author, Item, audience and spoiler handling. Provide hide/mute/report/block, audience change/deletion propagation, bounded pagination and notification controls.
+Possible extensions:
 
-Acceptance: no private reviews in queries or caches; revoked friendship/visibility is honored; edit/delete/blocked-user propagation passes; helpful-review feedback and successful discoveries improve without making endless scrolling the product goal. Friend-feed reading alone must not be counted as consuming or endorsing the reviewed Item.
+- friend discovery preferences / nickname discoverability controls,
+- richer friend invitation management,
+- useful friend-based discovery surfaces that do not expose private taste,
+- better SharedProfile dynamics for 3+ groups,
+- membership-change-aware group learning,
+- fairness/minimum-member satisfaction,
+- detecting when one very active member is dominating evidence,
+- improved pair/group recommendation explanations.
 
-## FUT-SOC-003 — Local/global review discovery — CONDITIONAL
+Acceptance compares improved group policy against current common-fit and simple-average controls using actual delayed group outcomes. Do not ship complexity merely because a graph exists.
 
-Depends on FUT-SOC-002 usefulness, sufficient opted-in public content, moderation capacity and PopulationMemory privacy gates where population-derived ranking is used. Add opt-in local/global scopes with coarse/manual locality and no disclosure of someone's home or live location. Protect against brigading, fake reviews, coordinated engagement and popularity dominance. Preserve the quiet Room and an easy feed-off path.
+## 7. FUT-LOC-001 — Helsinki event ingestion — PLANNED
 
-Acceptance: privacy/cache and abuse tests, moderated pilot, useful diversity/quality compared with friends-only, sustainable moderation cost and no private-to-public default conversion. If the feed adds noise without helping choices, defer expansion.
+Build a high-quality Helsinki-first event/activity inventory before attempting broad geographic expansion.
 
-## FUT-REL-001 — Both public mobile stores — PLANNED
+Preferred source order:
 
-MVP-REL-001..003 remain the current release contract. This target closes the eventual two-platform gap: Kajo must be publicly downloadable in the declared launch market from **both Google Play and Apple App Store**, with usable clean install, auth/linking, account deletion, Personal/Shared flows and updates on real Android and iOS devices. Internal testing, TestFlight, APK artifacts or submission alone do not complete public availability.
+1. official/structured Helsinki event data,
+2. measured coverage gaps from selected venues/organizers through permitted structured feeds/APIs,
+3. organizer submission/correction channel if justified,
+4. allowlisted extraction only after explicit source/rights/security review.
 
-Carry forward existing signing, ownership, production email, privacy/support, accessibility, backup/recovery and dependency gates. Recheck current store rules, permissions, data-safety/privacy declarations and provider licenses at each relevant submission. Review/moderation/report/block requirements must be satisfied before introducing public user content. Record both listing URLs, accepted versions, devices, update/rollback evidence and operating owner. A later domain/feature release must preserve both stores' compatibility.
+Event data should include title, description, tags, organizer, place, time/timezone, recurrence, price/unknown, language/accessibility/age where available, source/ticket URL, image rights, cancellation/status, provenance and freshness.
 
-## FUT-ALG-001 — Evidence-gated evolution — PLANNED, automatic promotion CONDITIONAL
+Acceptance includes idempotency, recurrence/duplicate handling, cancellation/reschedule freshness, Europe/Helsinki timezone correctness, outage behavior and measurable coverage/maintenance cost.
 
-Current ALG-001..009 / DATA gates and [PREDICTION_MODEL.md](../domain/PREDICTION_MODEL.md#13-sleeplayer-and-evolutionengine) already own the main design. Finish them first; this is their continuation, not a competing algorithm.
+## 8. FUT-LOC-002 — Hyperlocal “what should we do?” — PLANNED
 
-The owner's metaphor maps to existing concepts: dreams = bounded Challenger simulations/shadows; DNA = immutable PredictorGenome plus referenced artifacts; learned subconscious = versioned derived Working/Short/LongTerm state and PolicyAssignment. Simulations may vary weights, memory horizons, feature subsets or model families. Counterfactual synthetic situations are model assumptions, not historical observations.
+Once event data is trustworthy, rank real-world activities for PersonalProfile and SharedProfile.
 
-Never store imagined outcomes as real Events, Outcomes or historical Scenarios. Promote a tested policy/configuration; consolidate patterns into memory only with real provenance. Preserve chronological holdouts, actual exposures, selection probabilities if randomization is introduced, uncertainty, multiple-comparison controls and domain-specific mature outcomes. Off-policy estimates require adequate overlap/support and truthful propensities; unexposed alternatives cannot be declared wins. Ratings/consumption/group satisfaction outweigh raw clicks.
+Context may include:
 
-Acceptance: same serving/shadow semantics; fixed-control and component-ablation comparisons; uncertainty/support reports; replay-safe deletion/correction; scoped canary/A/B; tested rollback and latency/cost/privacy/fairness guardrails. Per-Profile Champions require evidence and shrinkage; SharedProfile earns its own assignment. Automatic/global promotion requires a later explicit decision and sustained evidence, not this plan or a small beta lift.
+- tonight/weekend,
+- available time,
+- optional manual location/radius,
+- travel time,
+- price/budget,
+- language,
+- group constraints.
 
-## FUT-OPS-001 — Fast, lightweight growth and compact memory — PLANNED
+Location remains optional and purpose-bound. Manual place/neighborhood selection is a complete path. No continuous background tracking is required.
 
-Build on the canonical [service inventory, retention and performance gates](../architecture/ARCHITECTURE.md#mvp-production-service-inventory). Online serving, evidence ingestion and background learning have separate resource budgets. Continue server-owned Prediction; phone storage initially holds only authorized delivered slates, bounded presentation caches, preferences and durable pending commands.
+Critical evidence distinction:
 
-Use bounded retrieval before scoring, indexed catalog search, incremental profile projections and invalidatable Profile/model/slate caches. Never key private results by ItemType alone or acknowledge a durable save merely because it entered a volatile queue. Keep the UI responsive with explicit pending/error state. Provider refresh, image enrichment, compaction and dreams stay off the interaction path; backpressure can pause learning before it harms serving.
+- event shown ≠ attended,
+- ticket/link click ≠ enjoyed,
+- proximity ≠ interest.
 
-Measure cold/warm p50/p95/p99, first usable slate, action acknowledgement, image bytes/cache hit rate, crash/error rates, outbox recovery, memory/disk/battery and background activity on reference low/mid-range Android and iOS devices. Existing numerical budgets live in ARCHITECTURE; record baseline and tighter targets there when evidence supports them. Declare workload/network/catalog/history/active-profile assumptions for every performance claim.
+This package begins to solve the common “what should we do today?” and date-idea problem using the same Kajo taste model.
 
-Plan capacity at 10k, 100k and 1m registered users without confusing registrations with concurrent sessions. Model active users, sessions, ranking requests, candidates per trace, Events, shadow multiplier and retention; measure at increasing synthetic load before provisioning. Report monthly compute, storage, replicas, backups, image egress, provider licenses and support/moderation costs separately. Add services, partitions or regions only for a measured bottleneck and record owner/recovery/ADR.
+## 9. FUT-DOM-002 — Music — PLANNED
 
-Compact representation candidates:
+Start with albums/releases/artists and discovery, not necessarily streaming.
 
-| Representation | Suitable information | Constraint |
-|---|---|---|
-| Sparse features / vectors | Taste and Item similarity summaries | Version and benchmark against transparent baseline; neither anonymous nor lossless by default |
-| Relational links / graph | Item/creator/tag and authorized relationship structure | A graph database is not automatically needed |
-| Immutable genome/artifact references | Model version, weights, ancestry, changes and random seed | Store shared base once; bounded deltas/checkpoints and integrity hashes; reproduce only with retained versioned inputs/runtime |
-| Bounded trace / representative Scenario | Context, alternatives, actual exposure/outcome and uncertainty | Preserve evaluation support and rare/negative cases; clustering must not inflate confidence |
-| Images / media objects | Covers and future explicit user memories | Rights, size variants and access controls; not a default encoding of structured learning data |
+Potential capabilities:
 
-Two 256-dimensional float32 vectors are 2,048 bytes/Profile, roughly 2.048 GB for one million Profiles before indexes/copies. This illustrates only a compact projection: users can have several Profiles, and catalog, trace candidates, raw evidence, backups and imagery can dominate total cost. Do not budget the service from vector size alone.
+- album/artist search,
+- save/rating/history,
+- external listening links,
+- Personal/Shared music recommendations,
+- cross-domain transfer between music and other experience types.
 
-Acceptance: representative load and failure/restore tests, cost forecast with real measured row/object sizes, bounded worker queues, source deletion propagated through derived state, and no indefinite raw history. Trial compression must retain defined replay/quality ability within the retention window. Expired evidence makes an old experiment non-replayable; do not invent replacement evidence. User-requested explicit history, operational records and model audit have separate purposes/lifecycles.
+Later separately evaluate:
 
-## RES-NET-001 — Planet / folded-space network — RESEARCH
+- track-level modeling,
+- streaming-service history import,
+- listening-provider integrations,
+- rights/licensing implications.
 
-Preserved owner concept from 2024-10-13, recalled and refined 2026-09-07: a ledger distributed in virtual 4D space from an origin, vectors routed toward predicted nearby online nodes, returned confirmations, parallel transactions and cross-validation by separate neighborhoods (earlier suggestion: 2–3 groups). Users could retain encrypted fragments of recent transactions/data. This is a conceptual topology, not a proven secure consensus protocol or physical shortcut.
+Acceptance requires safe artist/release identity, duplicate-release handling, legal cover path and measured benefit from cross-domain learning.
 
-Investigate latency/load/availability-aware placement and routing, DHT discovery, content-addressed immutable blocks, signed manifests, replication/erasure recovery and bounded caching. Distinguish semantic similarity, network latency and independently controlled trust groups. Virtual distance alone cannot establish any of them. Several confirmations do not prove full history validity or independence.
+## 10. FUT-MEM-001 — Experience memory layer — PLANNED
 
-Smallest experiment: isolated public/licensed catalog or synthetic blocks on controlled nodes, with a normal object-store/CDN baseline and then a standard DHT baseline. Define what is being verified: bytes/integrity, durable availability, authorized update ordering or consensus. Storage checks do not prove a recommendation is useful. No production user fragments, blockchain dependency, token economy or mandatory phone node.
+Kajo should become not only a predictor of future experiences but a memory layer for past ones.
 
-Test churn, offline peers, network partitions, stale versions, adversarial/Sybil identities, colluding neighborhoods, corrupt/replayed data, repair traffic and hot keys. Compare p95/p99 read/write latency, durability/availability, bandwidth, replication overhead, total operator + device cost and deletion/key-loss recovery. Encryption is not availability, anonymity or automatic cheap computation over ciphertext.
+Possible consumed-experience memory fields:
 
-Go only if a reproducible report shows a material advantage on a declared workload without weakening privacy, correctness or recovery. Stop/defer if overhead erases savings, independent trust cannot be established or reliable service depends on phones staying online. Any production adoption needs a new threat model, ADR and bounded opt-in deployment; this research never blocks Kajo delivery.
+- note,
+- rating/reflection,
+- date,
+- people,
+- location,
+- image/photo,
+- occasion/trip/group,
+- later edits/corrections.
 
-## RES-EDGE-001 — On-device prediction and federated learning — RESEARCH
+This must remain optional and private by default. Memories are human records, not automatically raw model features. Each field needs an explicit reason before entering Prediction.
 
-Separate this from storing other people's encrypted data. Hypothesis: an optional compact model learns from the owner's local evidence; privacy-protected aggregate model updates can improve the common model. Current AGENTS/ADR server-owned scoring remains binding. This plan does not authorize mobile scoring or downloading private model/evidence artifacts.
+Long-term value:
 
-Experiment after FUT-ALG-001/FUT-OPS-001: synthetic or explicitly consented local data, signed/versioned compact models and safe server fallback. Compare quality/latency, synchronization/replay parity, update bytes, charging/network constraints, battery and operational cost with server-only serving. Evaluate model-update leakage, poisoning, secure aggregation and any needed privacy/noise budget; federated learning alone is not a privacy guarantee. Cover offline/stale models, revoked membership, device theft/key recovery and deletion/retraining lineage.
+> “What have I experienced, what did I think, and with whom?”
 
-Go only with measurable benefit, tested controls and an accepted architecture change updating AGENTS and ADRs. Fail/disable safely on unsupported devices. No phone must serve other users' requests or run continuous background work for Kajo to function.
+## 11. FUT-SOC-002 — Optional friend-review feed — CONDITIONAL
 
-## RES-PEOPLE-001 — Real-world friendship and relationship compatibility — DISTANT RESEARCH
+Only after Friendship usage and publishing/privacy/moderation foundations are mature.
 
-Preserve the owner's idea: help consenting people meet nearby, exploring both shared interests and complementary differences; much later investigate who may fit as a friend or romantic partner. Depends on FUT-SOC-003 and operated safety/moderation, not merely a good movie recommender.
+A private rating is **not automatically a public review**.
 
-Start with optional shared-interest activity introductions, then separately evaluate whether outcome evidence supports any compatibility model. Similar media tastes do not establish relationship success; different tastes do not establish incompatibility. Friendship and dating have separate stated intent, eligibility, consent and evaluation. Never treat humans as public catalog Items or activate an identity recommendation model under the existing Item scorer without a dedicated domain/privacy/product design.
+If built, feed should be small and relevance-oriented:
 
-Before a human pilot: opt-in visibility and contact, mutual acceptance, coarse location, hide/block/report, anti-stalking/harassment controls, safety escalation ownership and age-appropriate access; dating requires an adult-only design. Do not infer sexuality, health or other sensitive traits from consumption; do not expose private taste/history or rank human worth. No meeting or contact occurs automatically.
+> “A friend rated this highly and Kajo believes it may fit you.”
 
-Smallest pilot asks whether consenting adults find introductions useful and safe, with voluntary outcome feedback and a neutral baseline. Stop if safety cannot be operated, participation is insufficient, or an asserted compatibility score has no supported value. No guaranteed romantic success, manufactured compatibility percentage or engagement-only success metric. Independent legal/store review occurs at activation.
+Required controls:
 
-## Other preserved directions
+- explicit publish/audience,
+- edit/delete propagation,
+- spoiler handling,
+- hide/mute/block/report,
+- bounded pagination/notifications,
+- no private rating leakage.
 
-Existing product ideas remain conditional: richer notes/photos/dates/places/people memories, Item/List comments and attachments, smart Lists/folders/public sharing, artists/tracks/podcasts/games/restaurants/activities/travel, learned sequence/semantic-ID/LLM challengers and monetization. Reuse existing contracts and the relevant privacy/licensing/evaluation gates. No speculative modules or photo buckets are required now. Reconsider each during the roadmap review rather than dropping it or silently treating it as MVP scope.
+Stop criterion: if feed increases scrolling/noise without improving successful discoveries, do not expand it.
 
-## Source register
+## 12. FUT-SOC-003 — Local/global review discovery — CONDITIONAL
 
-References inspected in the planning conversation on 2026-09-07. Recheck terms, quotas, availability and store rules at activation; links do not constitute a granted license or implementation verification.
+Only after friend feed proves useful and moderation capacity exists.
 
-- [TMDB API and commercial-use FAQ](https://developer.themoviedb.org/docs/faq)
-- [Open Library API usage](https://openlibrary.org/developers/api) and [monthly dumps](https://openlibrary.org/developers/dumps)
-- [Finna API](https://www.kiwi.fi/spaces/Finna/pages/53839221/Finna%2BAPI%2Bin%2BEnglish) and [metadata/resource rights](https://www.kiwi.fi/spaces/Finna/pages/53839699/Finna%2BAPI%2BTerms%2Bof%2BUse)
-- [Helsinki Linked Events](https://developer.hel.ninja/apis/linkedevents/) and [city-maintained implementation](https://github.com/City-of-Helsinki/linkedevents)
-- [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API), [data licenses](https://musicbrainz.org/doc/About/Data_License) and [Cover Art Archive](https://coverartarchive.org/)
-- [Apple review guidelines](https://developer.apple.com/app-store/review/guidelines/) and [account deletion](https://developer.apple.com/support/offering-account-deletion-in-your-app/)
-- [Google Play user content](https://support.google.com/googleplay/android-developer/answer/9876937?hl=en) and [account deletion](https://support.google.com/googleplay/android-developer/answer/13327111?hl=en-GB)
-- [Off-policy evaluation research](https://arxiv.org/abs/1612.01205)
-- [Kademlia DHT](https://libp2p.io/docs/kademlia-dht/), [DHT security](https://libp2p.io/docs/dht/) and [IPFS persistence](https://docs.ipfs.tech/concepts/persistence/)
-- [Federated learning research](https://research.google/pubs/communication-efficient-learning-of-deep-networks-from-decentralized-data/) and [Android background restrictions](https://developer.android.com/develop/background-work/background-tasks/bg-work-restrictions)
+Potential scopes:
+
+- friends,
+- local/coarse area,
+- global.
+
+Protect against brigading, fake reviews, popularity dominance and location/privacy leakage. The user must be able to keep Kajo feed-light or feed-off.
+
+## 13. FUT-ALG-001 — PopulationMemory — CONDITIONAL
+
+Current first release learns from the Profile itself plus permitted provider/catalog priors. Cross-user PopulationMemory becomes possible only when consent, data volume, deletion lineage, minimum-cohort privacy and exposure-bias correction are mature.
+
+Potential components:
+
+- collaborative Item representations,
+- Profile/Scenario clusters rather than exposed identities,
+- cross-domain semantic space,
+- aggregate trend priors,
+- sparse-user transfer.
+
+PopulationMemory never means one mobile client can inspect another Profile's raw history.
+
+Acceptance requires fixed controls, cohort/privacy thresholds, deletion propagation, exposure-bias handling, fairness/concentration metrics and real downstream outcome benefit.
+
+## 14. FUT-ALG-002 — Evidence-gated EvolutionEngine expansion — PLANNED / CONDITIONAL
+
+The first release already requires trustworthy SleepLayer evaluation and controlled Challenger architecture. Later evolution may become more powerful.
+
+Possible Challenger families:
+
+- alternative scalar weights,
+- memory horizons,
+- feature subsets,
+- retrieval variants,
+- learned ranking models,
+- sequence models,
+- calibrated uncertainty models,
+- contextual gating/policy models,
+- stochastic exploration/bandit variants where propensities can be recorded truthfully.
+
+Owner metaphor:
+
+- dreams = bounded alternate simulations/shadows,
+- DNA = immutable PredictorGenome/artifact lineage,
+- subconscious = derived versioned state/policy.
+
+Hard rule:
+
+> **Imagined/counterfactual outcomes never become historical Events.**
+
+Automatic/global promotion remains conditional on sustained leakage-safe evidence, canary/A/B discipline, rollback, support/uncertainty, latency/cost/privacy/fairness guardrails.
+
+Per-Profile or SharedProfile Champions are allowed only when evidence is sufficient and shrunk appropriately toward safer baselines.
+
+## 15. FUT-OPS-001 — Scale to 10k / 100k / 1M users — PLANNED
+
+First-release contracts already anticipate scale. This package is about **measured infrastructure evolution**, not redesigning the domain.
+
+Track separately:
+
+- registered Users,
+- MAU/DAU,
+- concurrent sessions,
+- Taste sessions/conversion,
+- Prediction requests,
+- candidates/traces,
+- Events,
+- Friends/SharedProfiles,
+- image egress,
+- SleepLayer/shadow multiplier,
+- storage/backup/analytics retention,
+- provider/license/support/moderation costs.
+
+Potential measured transitions:
+
+- read replicas / larger Postgres compute,
+- dedicated candidate retrieval/vector service,
+- dedicated ranking service,
+- event stream/warehouse,
+- background worker queues,
+- regional/service decomposition.
+
+Do not introduce these by calendar date. Introduce when the measured bottleneck justifies operational complexity.
+
+## 16. FUT-PERSON-001 — Local people discovery for friendship — RESEARCH
+
+This is a distant extension of Kajo's strongest long-term insight: years of voluntary behavioral taste data may describe compatibility more richly than a short questionnaire.
+
+Research question:
+
+> Can Kajo identify people who are likely to enjoy being friends/activity partners because of compatible or complementary interest structures?
+
+This is **not** equivalent to “both like the same movie.”
+
+Potential future signals might include only explicitly permitted, non-sensitive representations such as:
+
+- shared latent taste structure,
+- complementarity,
+- novelty/risk appetite,
+- activity preferences,
+- group choice history,
+- successful shared outcomes.
+
+Hard gates before even a pilot:
+
+- explicit opt-in,
+- adult/safety/abuse model where relevant,
+- no raw private history exposure,
+- location minimization/coarse/manual options,
+- block/report/moderation,
+- measurable predictive validity,
+- careful fairness/harms review,
+- legal/privacy review.
+
+Stop if compatibility signal does not outperform simple baselines or creates unacceptable safety/privacy risk.
+
+## 17. FUT-PERSON-002 — Dating / relationship compatibility — RESEARCH, VERY DISTANT
+
+Potentially build only after friendship/activity matching has demonstrated genuine predictive validity and operational safety.
+
+The concept is not “Tinder with movie tags”. The research hypothesis is that a long-lived voluntary Kajo profile could support better compatibility signals than photos/bios alone.
+
+This requires its own product, consent, safety, moderation, age, sensitive-data, fairness and legal design. Never infer sexual orientation, relationship intent or other sensitive attributes from entertainment behavior. Ask explicitly where needed.
+
+No current roadmap milestone should depend on this research.
+
+## 18. RES-NET-001 — Planet / folded-space distributed network — RESEARCH
+
+Preserve the owner's distributed-network concept as research memory: a ledger/network represented in virtual higher-dimensional/folded space, routing work toward predicted online nearby nodes, parallel confirmation and cross-validation.
+
+Possible research questions:
+
+- can a geometry/embedding-based routing model reduce coordination cost,
+- can distributed validation remain secure under churn/adversaries,
+- can compact state/history be reconstructed safely,
+- does the model offer any real benefit over established distributed systems.
+
+This is not required for Kajo service scaling. Conventional cloud infrastructure remains the default until a prototype demonstrates a clear advantage.
+
+## 19. RES-EDGE-001 — On-device / federated learning — RESEARCH
+
+Explore only if privacy/cost/offline evidence makes it worthwhile.
+
+Potential ideas:
+
+- local PersonalProfile adaptation,
+- privacy-preserving aggregation,
+- compact model/state deltas,
+- offline recommendation cache.
+
+Do not imply that on-device training automatically improves privacy; model updates can leak information and require their own threat/privacy design.
+
+## 20. FUT-MEM-002 — Compact memory / representation research — PLANNED RESEARCH
+
+Kajo may eventually store compact learned representations rather than replay every raw interaction forever.
+
+Candidate representations:
+
+- sparse feature summaries,
+- vectors/embeddings,
+- Scenario prototypes,
+- immutable genome/artifact references,
+- bounded trace retention,
+- graph/relational links.
+
+Retention/compression must preserve defined audit/replay/deletion guarantees. “Compressing” evidence cannot fabricate missing history or make expired experiments magically replayable.
+
+## 21. Idea recording rule
+
+New ambitious ideas belong here when they are not first-release blockers.
+
+Every major future idea should eventually record:
+
+- purpose,
+- dependencies,
+- smallest credible experiment,
+- success metric,
+- stop criterion,
+- privacy/safety/licensing implications,
+- scale/cost implications.
+
+Do not delete a distant idea merely because it is not ready. Do not promote it into the active roadmap merely because it sounds exciting.
+
+## 22. Default long-term order
+
+Unless evidence changes priorities, the post-release sequence is:
+
+```text
+public Kajo / Share Link Gate
+→ both stores if needed
+→ broader BOOK/MOVIE catalog
+→ series
+→ stronger Friends/Shared learning
+→ Helsinki events + things to do
+→ music
+→ richer experience memory
+→ optional friend-review feed
+→ conditional local/global discovery
+→ PopulationMemory/evolution improvements
+→ measured 10k/100k/1M infrastructure scaling as needed
+→ only much later people/friendship research
+→ dating only after separate evidence/safety gates
+```
+
+Distributed-network and on-device learning remain independent research tracks and never block the product sequence.
+
+## 23. Final vision
+
+If the long path succeeds, Kajo becomes a single evolving model of experiences rather than a collection of disconnected recommendation apps.
+
+A user can ask Kajo:
+
+> What should I experience next?
+
+A couple/group can ask:
+
+> What should we experience together?
+
+And only after years of product/evidence maturity, Kajo may investigate:
+
+> Who might I genuinely enjoy experiencing life with?
+
+The first step remains much narrower and measurable: make the Taste-first BOOK/MOVIE Kajo good enough that a real person sends the next person a link voluntarily.
