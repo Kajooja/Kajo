@@ -258,6 +258,14 @@ spine lands first so the worker has trustworthy inputs when implemented.
 
 External providers are adapters/data sources, not the Kajo domain model. TMDB/Open Library or future sources must be normalized into Kajo `Item` representations.
 
+The appended catalog/series/album/Helsinki plan is in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md); ROADMAP owns its activation order. Its proposed provider choices and licenses must be checked before use. Public event metadata remains Item data, distinct from behavioral Event records.
+
+### Future scale and storage research boundary
+
+[FUT-OPS-001 and the research backlog](../product/FUTURE_PLAN.md#fut-ops-001--fast-lightweight-growth-and-compact-memory--planned) preserve compact vector/graph/genome representations, growth workload/cost modeling, the owner's virtual 4D planet network and optional federated learning. These are planned measurements/experiments, not activated infrastructure. Reuse this document's service inventory, retention and performance gates rather than creating a second operations source of truth.
+
+The current server-owned Prediction contract stays unchanged. Device caches/outbox do not authorize mobile scoring; a local model needs a new ADR and matching AGENTS/domain/privacy updates after measured benefit. An experimental peer network starts with public/licensed or synthetic data and compares with ordinary storage/CDN plus standard DHT controls. No production durability, user evidence or core app availability may depend on volunteer phones. Encryption, virtual proximity and multiple confirmations alone do not establish availability, independent consensus or prediction quality.
+
 ## Observability and learning
 
 Every recommendation intended for learning should be traceable through `predictionId` into Event outcomes.

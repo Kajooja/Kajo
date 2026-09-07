@@ -127,6 +127,12 @@ See `MVP.md` for executable requirements.
 
 ## 15. North star
 
+Owner clarification **2026-09-07**: the complete product target is a fast, safe, lightweight and easy-to-use Kajo available through **both Apple App Store and Google Play**, with books, movies, series, music albums and Helsinki-first hyperlocal events, normalized tags, creator/title search and legally usable imagery. The core learns each PersonalProfile and the actual dynamics of each SharedProfile. Broad catalog findability is the goal; literal worldwide completeness is not a supportable promise.
+
+Groups and consent-based friend discovery precede optional relevant friend-review feeds, then conditional local/global review discovery. Real-world friendship and dating compatibility remain distant, separately consented research with no assumed predictive validity. Compact memory, controlled SleepLayer evolution and measured infrastructure efficiency support the whole product; the planet-network and on-device-learning ideas remain experiments rather than release dependencies.
+
+The durable specifications, acceptance/stop criteria and idea-recording rules are in [FUTURE_PLAN.md](FUTURE_PLAN.md). [ROADMAP.md](../project/ROADMAP.md#post-mvp-execution-queue) appends their execution queue after the current MVP. Existing MVP and server-owned Prediction boundaries remain in force.
+
 Kajo should become both:
 
 1. a prediction engine for future experiences, and

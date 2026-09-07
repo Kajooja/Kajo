@@ -188,18 +188,24 @@ Create its execution file when activated; do not create speculative sprint folde
 | Learned embeddings, sequence/LLM challengers, learned gating, stochastic bandit | Keep as replaceable evaluation extensions; bounded transparent adaptation is required now. Introduce only if measured need justifies complexity and evidence gates pass. |
 | PopulationMemory, extra domains, monetization, public social features | Remain explicitly outside MVP; preserve privacy/licensing gates |
 
-## Post-MVP direction
+## Post-MVP execution queue
 
-After sufficient real prediction/outcome data exists:
+Owner direction **2026-09-07**, planning #213: the complete product extends beyond MVP 0.1. This queue is appended after **14.0–15.3**; it does not reset the active sprint or move unproven research onto the current critical path. Detailed scope, source options and measurable acceptance/stop criteria live once in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md). Every ID below is planned, conditional or research, never a completion claim.
 
-- scale Sprint 013C's constrained SleepLayer shadow worker and manual promotion audit into sustained evaluation, guarded canary/A/B rollout and eventually controlled automatic genome promotion,
-- population scenario learning at scale behind privacy/minimum-cohort gates,
-- learned sequence, semantic-ID and LLM-backed Challenger families,
-- additional domains such as music, events and travel,
-- richer personal/shared memories including images, people, location and context,
-- richer Item/List comments and media attachments built on the MVP message reference model,
-- public/shared discovery features only after privacy/product rules are intentionally designed,
-- advanced List features such as folders, smart rules and public sharing,
-- monetization only after the non-commercial first release is stable and licensing/product decisions are explicit.
+| Order | Package / durable IDs | Dependencies and exit gate |
+|---|---|---|
+| 16 | **Two-store completion and measured scale baseline** — FUT-REL-001, FUT-OPS-001 | Accepted MVP 15.3. Complete public Android **and** iOS distribution if either is still missing; verify install/update/core flows. Establish workload, latency/resource/cost/retention measurements. If both stores already passed, reuse evidence rather than building again. |
+| 17 | **Catalog breadth, identity and search** — FUT-CAT-001 | 16 and existing CAT/DISC gates. Expand persisted BOOK/MOVIE breadth and Finnish enrichment, safe work/edition/alias matching, licensed images, normalized tags, provider refresh and bounded search. Coverage and outage behavior demonstrated. |
+| 18 | **Series** — FUT-DOM-001 | 17. Compatible generic Item extension, series-level consumption semantics, search/Lists/Personal/Shared and real-device acceptance. No separate recommender. |
+| 19 | **Friends and stronger group learning** — FUT-SOC-001 | 16 plus accepted Shared/evidence/privacy foundations. Consent-based nickname discovery and friend lifecycle, abuse controls, useful group-dynamics evaluation. Existing authorized Profile-name filtering is not global friend search. |
+| 20 | **Helsinki pilot** — FUT-LOC-001, then FUT-LOC-002 | 17–19. Linked Events first, selected source-gap filling, recurrence/duplicates/cancellation freshness, then location-optional Personal/Shared event discovery. Accept one city before expanding. |
+| 21 | **Music albums** — FUT-DOM-002 | Domain extension from 18; complete 20 as the default sequence. Provider/cover-rights gate, release identity and generic mixed-domain discovery/search/Lists; no implied streaming feature. |
+| 22 | **Optional friend-review feed** — FUT-SOC-002 | 19, mature evidence and operated publishing/privacy/moderation. Accept useful audience-controlled review discovery; do not auto-publish private ratings. |
+| 23 | **Conditional local/global feed** — FUT-SOC-003 | 22, opt-in public inventory, moderation capacity and applicable PopulationMemory gates. Pilot usefulness, privacy, abuse and sustainable cost; defer if not supported. |
+| Continuous after 16 | **Evidence-gated evolution and compact memory** — FUT-ALG-001, FUT-OPS-001 | Finish current ALG/DATA/OPS gates first. Re-evaluate quality, latency, spend and retention at each domain/scale increment. Automatic promotion needs an explicit later decision plus sustained controlled evidence; new features do not waive the gate. |
+| Research after operational baseline | **Planet network / local learning** — RES-NET-001, RES-EDGE-001 | Measured 16 baseline; edge learning also needs FUT-ALG-001 evidence. Separate public/synthetic experiments with normal infrastructure controls, security/failure/cost tests and go/no-go ADR. Never block ordinary delivery. |
+| Distant research after 23 | **Real-world friendship / dating** — RES-PEOPLE-001 | Consenting users, separate purpose/age/safety/product design and operated moderation. Start with useful introductions; compatibility claims require real evidence and may be rejected. No automatic implementation when earlier rows finish. |
+
+At each package close, record achieved requirements, exact evidence and deferred IDs; create the next bounded Issue/sprint from the first ready row. Do not create empty future sprint folders or one speculative code module per idea. Review the research backlog explicitly without treating `RESEARCH` as approved implementation. Existing richer memories, advanced Lists, other domains, learned-model families and monetization remain preserved in FUTURE_PLAN's other-directions section and keep their prior privacy/licensing/product gates.
 
 Roadmap changes must be deliberate. Do not rewrite completed sprint history when sequencing changes.

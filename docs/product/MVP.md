@@ -23,6 +23,8 @@ Before the milestone may be marked complete:
 
 Commercial monetization, autonomous predictor promotion and additional media/life domains remain outside this milestone unless explicitly promoted later.
 
+The owner's complete-product direction (2026-09-07) is preserved in [FUTURE_PLAN.md](FUTURE_PLAN.md), with dependencies in [ROADMAP.md](../project/ROADMAP.md#post-mvp-execution-queue). It requires eventual availability in **both** mobile stores and adds series, albums, hyperlocal events and gated social/research extensions after this queue. A one-store MVP release does not fulfill that two-store final target. This planning addition does not mark any current requirement complete or silently expand MVP 0.1 to the distant research scope.
+
 ## Foundation
 
 - [x] `MVP-FOUND-001` Mobile project runs on iOS and Android through React Native + Expo.
