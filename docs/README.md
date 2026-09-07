@@ -12,6 +12,7 @@ This directory is the permanent project memory for Kajo.
 | Know where the project is right now | `project/STATUS.md` |
 | Know what is being built now | Current sprint linked from `project/STATUS.md` |
 | Know algorithm-first work order and promoted MVP suggestions | `project/ROADMAP.md` |
+| Find the complete product target, future acceptance criteria and preserved research ideas | `product/FUTURE_PLAN.md` (execution order remains in `project/ROADMAP.md`) |
 | Understand sprint/milestone rules | `project/WORKFLOW.md` |
 | Continue in a new AI conversation | `project/HANDOFF_PROTOCOL.md` |
 | Use the correct terms | `domain/GLOSSARY.md` |

@@ -751,6 +751,8 @@ Hard guardrails:
 
 ### 13.12 Memory consolidation during sleep
 
+The owner's dream/subconscious/DNA metaphor is retained as the future direction in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#fut-alg-001--evidence-gated-evolution--planned-automatic-promotion-conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
+
 The SleepLayer also consolidates memory without rewriting evidence:
 
 - decays or expires Working/ShortTerm projections,
