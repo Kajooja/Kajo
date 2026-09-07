@@ -64,7 +64,7 @@ MOVIE poster rendering is already generic in mobile, but there are currently **z
 
 - PR #202 is merged at `0cf8a9f1ba962e81c58e128951d8a8b9fa018eed`; standalone Android run **#350** passed and is the current owner device-test baseline. #199 implementation is complete; device acceptance is pending.
 - PR #205 / #204 is merged at `41c537eb568e679685fe26f440ae85664a4a0c0c`. `npm run catalog:tmdb-beta` orchestrates 15 pages in five sequential requests of at most three pages. This does not prove a hosted import has run.
-- Main run **#352** passed lint, typecheck, tests and iOS/Android bundle smoke. Its APK job was still running at the 2026-09-06 check; this is historical evidence, not a fresh run-status claim.
+- Main run **#352** ([run](https://github.com/Kajooja/Kajo/actions/runs/34049794368)) was freshly checked on 2026-09-07: CI and standalone APK completed successfully. Artifact `kajo-android-standalone-41c537eb568e679685fe26f440ae85664a4a0c0c` is available and unexpired. This is the newest main APK; #350 remains the earlier device-feedback baseline. Neither has new owner acceptance recorded.
 - #182 and #199 were found closed despite explicit outstanding acceptance gates and reopened on 2026-09-06. Keep them open until their actual acceptance passes; reference them without closing keywords in partial implementation PRs.
 - Hosted SQL recheck found no nonblank `public.items.description` values in either discoverable domain. BOOK description enrichment remains a real data-quality gap.
 
@@ -161,7 +161,11 @@ Accepted main baseline at this documentation checkpoint: `41c537eb568e679685fe26
 
 The product owner requested on 2026-09-07 that algorithm reliability/adaptation, documentation suggestions and final service/data operations become explicit full-MVP gates. Scope is in `MVP.md`; exact dependency order is in `ROADMAP.md` (14.0–15.3). No newly added requirement is complete.
 
-**First coding task: [#207](https://github.com/Kajooja/Kajo/issues/207), roadmap 14.0, `MVP-ALG-001` + initial `MVP-ALG-009`.** Reproduce and fix bootstrap-only Personal ranking before more adaptive complexity. Issue #207 is open; create its scoped implementation branch/PR after resolving this documentation handoff. It relates to #185/#191 without reopening correctly completed implementation history merely for tracking.
+**First algorithm coding task: [#207](https://github.com/Kajooja/Kajo/issues/207), roadmap 14.0, `MVP-ALG-001` + initial `MVP-ALG-009`.** Reproduce and fix bootstrap-only Personal ranking before more adaptive complexity. Issue #207 is open; create its scoped implementation branch/PR after resolving this documentation handoff. It relates to #185/#191 without reopening correctly completed implementation history merely for tracking.
+
+**Pre-APK continuation (2026-09-07):** branch `fix/pre-apk-import-dependency` builds on the still-pending #206 documentation head. It declares the Settings CSV picker’s existing `expo-file-system` 57.0.5 as a direct mobile dependency, matching the installed Expo 57 compatibility map; the lockfile resolves the same package version. Review this as a dependent PR, resolve #206 first, then retarget to main. No algorithm fix or database migration is included.
+
+**New #207 prerequisite: [#208](https://github.com/Kajooja/Kajo/issues/208).** Public-source inspection found that the catalog migration’s literal single-line candidate-filter replacement does not match the earlier V0 function’s multiline body. Resolve reproducible database replay under the immutable-migration rule before claiming SQL CI acceptance. Do not skip failing history or silently edit deployed migrations. The original #207 bootstrap correction remains unimplemented. APK grid/cache testing may proceed independently.
 
 Required first-task acceptance:
 
@@ -215,7 +219,7 @@ Current hygiene rules and state:
 | Acceptance claims | Reopened three foundation requirements and added explicit ALG/DATA/OPS gates instead of claiming architecture persistence proves end-to-end behavior. Catalog/cache code-map wording now identifies known gaps. |
 | DB verification | Current CI runs mobile/catalog tests and bundle smoke but no SQL regression suite/migration-reset gate exists. Add at 14.0 and extend per fix. Existing hosted migration files remain immutable. |
 | Duplicate logic / old fallback | Base scoring, memory projection and shadow diverge; consolidate in 14.0–14.4. `mockDiscovery` still supplies runtime detail lookup, so deleting it blindly would break behavior. Remove only superseded paths with references and regression evidence; production fallback must be explicit and non-mock. |
-| Dependencies | `SettingsScreen.tsx` directly imports `expo-file-system` without a direct mobile dependency declaration; Edge imports use floating `npm:@supabase/supabase-js@2`. Resolve with compatible explicit dependencies/pinning and verification in OPS-005, not an unrelated docs patch. Lockfile exists. |
+| Dependencies | Pre-APK branch declares the `expo-file-system` dependency used by `SettingsScreen.tsx` (pending merge); Edge imports use floating `npm:@supabase/supabase-js@2`. Resolve with compatible explicit dependencies/pinning and verification in OPS-005, not an unrelated docs patch. Lockfile exists. |
 | Migrations/configuration | SQL string-replacement migrations make subsequent function changes fragile. Prefer complete forward definitions/shared helpers; retain deployed history. Record actual hosted configuration/version parity at deployment, including JWT/function secret names. |
 | Assets / old data | Graphics remain isolated in assets/theme; no file is removed without a reference audit. Historical mock database rows with FKs remain non-discoverable. No blanket deletion of assets, migrations, branches or user data is authorized by a hygiene label. |
 | Security/operations | This task reviewed source/configuration and prior read-only audit findings; it did not run a new comprehensive vulnerability/license scan, provision infrastructure or verify backups. OPS-001..005 require those results before acceptance. |
