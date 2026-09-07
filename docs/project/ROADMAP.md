@@ -2,210 +2,349 @@
 
 Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint ends when its defined scope and handoff are complete.
 
-## Milestone: MVP 0.1
+This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
-MVP 0.1 now means the first **complete, store-downloadable BOOK/MOVIE Kajo**, not a mock-data prototype. Monetization is not required. Before completion the product must use real catalog data, establish useful first-session taste, pass a small external beta and then satisfy production auth/security/signing/store-release gates.
+## Product decision — 2026-09-07
 
-### Sprint 001 — Foundation
+The first public Kajo is no longer defined only as a store-downloadable BOOK/MOVIE recommender. It must also contain the complete **Taste-first launch loop**:
 
-Repository memory, mobile skeleton, workspace, CI, domain contracts.
+```text
+external Taste/Friend link
+→ anonymous Taste Test
+→ useful cold-start PersonalProfile
+→ honest holdout prediction challenge
+→ recommendation preview
+→ Google/Apple conversion without resetting taste
+→ full Kajo
+→ Friend invite / friend list
+→ explicit SharedProfile creation from Friends
+→ next invite
+```
 
-### Sprint 002 — Room
+Algorithm quality remains the critical path. Do not build growth mechanics on top of a recommendation system that cannot yet produce trustworthy first-session value.
 
-First recognisable minimalist illustrated Room with window, fireplace, bookshelf and movie screen using mock data.
+Scale principle: **design contracts for one million users; provision infrastructure for measured demand.** Do not add speculative distributed infrastructure before measured need.
 
-Canonical visual direction now remains a warm simple cabin/living-room illustration: 2D first with only lightly layered 2.5D depth, never a navigable 3D world or futuristic control surface. Fireplace, window, bookshelf, TV/screen and the single DiscoveryMode curtain remain the MVP vocabulary.
+## Milestone: MVP 0.1 — first public Kajo
 
-### Sprint 003 — Curtain & Theme
+MVP 0.1 means the first complete, externally usable BOOK/MOVIE Kajo that can acquire a new person from a link, learn them before registration, preserve that learning through account creation and turn the activated user into the next potential inviter.
 
-Theme engine, user theme tokens, draggable curtain, three snap states, DAWN/EVENING/NIGHT transitions.
+The milestone may close only after:
 
-### Sprint 004 — Discovery UI
+- real BOOK/MOVIE catalog and legally usable presentation are production-ready,
+- the algorithm and evidence spine pass correctness/evaluation gates,
+- Taste Test establishes useful first-session taste,
+- the holdout prediction challenge is mathematically truthful,
+- anonymous → Google/Apple conversion preserves the same PersonalProfile/taste state,
+- personal invite → accepted Friend relationship works without automatically creating a SharedProfile,
+- Friends → explicit SharedProfile creation is easy and consent-based,
+- the complete link-to-app funnel is observable and abuse-safe,
+- a closed external beta validates the complete flow,
+- production operations, privacy, recovery and store gates pass,
+- the owner explicitly accepts the **Share Link Gate**.
 
-Books + Movies grids, Item cards/details, mock ranking, DiscoveryMode switching.
+Only after the Share Link Gate may the project say: **“Nyt on aika jakaa käyttäjille linkki.”**
 
-### Sprint 005 — Swipe & History
+## Completed foundation — Sprints 001–013
 
-Optional swipe, watched/read, saved/current state, feedback drawer, consumed-history suppression, exact recent undo and one shared DiscoveryMode control.
+The following foundations already exist and remain valid. Detailed truth lives in the historical sprint files and current requirement statuses.
 
-### Sprint 006 — Backend Foundation
+1. **Sprint 001 — Foundation**: repository memory, mobile skeleton, CI, domain contracts.
+2. **Sprint 002 — Room**: recognizable minimalist 2D Room.
+3. **Sprint 003 — Curtain & Theme**: global DiscoveryMode / ambient phase.
+4. **Sprint 004 — Discovery UI**: BOOK/MOVIE discovery foundations.
+5. **Sprint 005 — Swipe & History**: rating, not-interested, save/list/undo state foundations.
+6. **Sprint 006 — Backend Foundation**: Supabase/Postgres/auth/Profile persistence.
+7. **Sprint 007 — Event Engine**: actor/Profile-separated append-only evidence foundations.
+8. **Sprint 008 — Prediction V0**: first generic server-owned ranking.
+9. **Sprint 009 — Shared Kajo**: persistent SharedProfiles and membership foundations.
+10. **Sprint 010 — Navigation & Profile Lifecycle**: stable Room/shell/Profile switching.
+11. **Sprint 011 — Shared Curation & Named Lists**: Endorsement consensus + Lists foundations.
+12. **Sprint 012 — Profile Messaging**: narrow Profile-scoped messaging foundations.
+13. **Sprint 013 — Prediction Nervous System & ScenarioMemory**: Working/Short/Long/Scenario memory, versioned traces, PredictorGenome/SleepLayer architecture and controlled challenger foundations.
 
-Supabase/PostgreSQL, authentication, unique nickname identity, Profile/ProfileMember, Item persistence, migrations and authorization foundations.
+Accepted historical work is not reopened merely because later release gates are stricter.
 
-### Sprint 007 — Event Engine
+# Release march order
 
-Generic append-only event capture, sessions, actor/Profile separation, prediction traceability and analytics-quality behavioural contracts.
+## Phase 14 — Make the algorithm trustworthy
 
-### Sprint 008 — Prediction V0
+This phase remains first. Taste Test is not allowed to hide algorithm defects behind attractive onboarding.
 
-First real generic personalized ranking using Item similarity, behavioural history, LongTermState, ShortTermState, DiscoveryMode exploration policy, explicit feedback and impression cooldown. Mobile consumes server-owned rankings rather than owning recommendation logic.
+### 14.0 — Clean database/replay and bootstrap-ranking truth
 
-### Sprint 009 — Shared Kajo — COMPLETE
+Requirements: `MVP-ALG-001`, `MVP-ALG-009`, current #207/#208 lineage.
 
-Persistent SharedProfiles, consent-based invitations, Shared Room/theme identity, generic Shared interaction/Event/Prediction context and seamless Personal/Shared switching.
+Exit gate:
 
-The first configured Android acceptance exposed real membership/persistence/navigation failures. Those were corrected and then accepted through configured-device use plus hosted verification. Issue #125 is closed.
+- clean install/replay strategy is accepted,
+- opposite fresh PersonalProfiles with opposite bootstrap evidence rank the same unseen pool differently,
+- correcting/removing bootstrap evidence changes ranking predictably,
+- no Personal/Shared leakage,
+- deterministic SQL regression coverage exists.
 
-The initial separate `Ehdota yhteiseen` experiment is historical and retired. Its replacement is the Sprint 011 Endorsement model, not a parallel suggestion list.
+### 14.1 — Trustworthy action and delivery evidence
 
-### Sprint 010 — Navigation & Profile Lifecycle — COMPLETE
+Requirements: `MVP-DATA-001..004`, `MVP-PRED-006`.
 
-Durable shell before adding more destination surfaces.
+Exit gate:
 
-Accepted on configured Android 2026-09-01:
+- canonical action + current-state change is idempotent/atomic,
+- persistent outbox survives termination/retry/account switch safely,
+- exact delivered Profile/prediction/slate origin is preserved,
+- delayed outcomes cannot be guessed onto the wrong prediction,
+- Shared/search/List overlays keep truthful provenance.
 
-- persistent top Kajo mark returns to the active Profile Room,
-- restrained bottom dock with menu + active Profile identity/Home + Inbox,
-- Profile-aware side drawer instead of a conventional multi-tab bottom bar,
-- drawer owns Profile switching plus Profile/Lists/Groups destinations as they become real,
-- nickname max 24 and SharedProfile name max 32,
-- safe `Poistu ryhmästä` confirmation and PersonalProfile fallback,
-- bottom-center active Profile identity also returns Home,
-- `Kirjaudu ulos` lives at drawer bottom,
-- Room has no standalone heading/helper copy,
-- obsolete separate `Ehdota yhteiseen` UI is removed.
+### 14.2 — Serving/shadow equivalence and candidate availability
 
-Further visual Room work must preserve this accepted shell and the simple illustrated Room contract; it must not reopen Sprint 010.
+Requirements: `MVP-ALG-002..003`.
 
-### Sprint 011 — Shared Curation & Named Lists — DELIVERED, DEVICE ACCEPTANCE DEFERRED
+Exit gate:
 
-Sprint 011 deliberately has **two ordered slices**.
+- one versioned scoring/eligibility/policy contract serves Personal and Shared controls,
+- shadow replay matches baseline semantics within documented tolerance,
+- suppressed candidates trigger bounded refill,
+- pagination does not duplicate or falsely exhaust the catalog.
 
-#### 11A — Shared discovery + Endorsement consensus — #151
+### 14.3 — Real catalog and normalized shared features
 
-Accepted and closed on configured Android 2026-09-02.
+Requirements: `MVP-CAT-001..003`, `MVP-ALG-005`.
 
-Make Shared discovery behave like a joint decision surface without creating a separate social recommender.
+May proceed alongside 14.0–14.2 where independent.
 
-- pending Endorsements remain first, ordinary unseen recommendations retain Prediction order next, and Items already consumed/rated in an accepted member's PersonalProfile form an attributed lower-priority tier,
-- higher accepted-member ratings may reorder only that history tier; this does not define common-fit or EvoBot weights,
-- SharedProfile-consumed/rated and consensus-saved Items remain suppressed from ordinary discovery; existing Lists/history keep the Item and may show consumed/rating state,
-- Shared Prediction remains targeted to the SharedProfile,
-- Prediction V0 may combine Shared joint evidence with accepted members' PersonalProfile evidence using an inspectable common-fit aggregate plus disagreement penalty,
-- one member's Shared quick positive action becomes an actor-specific `Endorsement`, not Shared `saved=true`,
-- the pending Item leaves the endorser's own ordinary queue,
-- members who have not endorsed it receive it ahead of normal recommendations with restrained real-actor provenance,
-- unanimity among currently accepted members promotes the Item once to Shared saved state,
-- later new membership does not retroactively revoke an already-reached consensus.
+Exit gate:
 
-No majority voting or chat is introduced here. The later #102 List slice attaches a target custom List to the same unanimous Endorsement flow rather than creating a second voting model.
+- useful BOOK and MOVIE beta breadth,
+- legal image/attribution path,
+- descriptions/creator/year/language/tags sufficient for product and model use,
+- repeatable provider refresh,
+- versioned normalized cross-domain feature mapping with provenance.
 
-#### 11B — Named Lists & collaborative browsing — #102
+### 14.4 — Adaptive memory and discovery policy
 
-#151 is stable. The compact picker and final Shared target-List approval are merged and hosted; refreshed configured Android acceptance remains explicitly deferred:
+Requirements: `MVP-ALG-004..007`, bootstrap requirements.
 
-- PersonalProfile and SharedProfile own generic system/custom Lists,
-- List names are 1–40 characters,
-- one List may contain BOOK, MOVIE and future ItemTypes together,
-- every Profile has one system `Tallennetut` List,
-- `Lisää listaan` opens a compact one-destination picker and can create/name/rename Lists,
-- Shared discovery stores the first actor's custom-List choice as pending Endorsement state,
-- other non-endorsing members see proposer/List provenance and approve the same choice,
-- unanimity commits the chosen custom membership and auto-promotes to system `Tallennetut`,
-- one Item may belong to multiple Lists,
-- List detail supports list/card presentation, added-order sorting, generic ItemType filters and current consumed/rating display,
-- Shared list entries show real added-by + added-at provenance; Personal hides redundant actor identity,
-- existing saved/consumed/rating state remains canonical and is not duplicated into List rows.
+Exit gate:
 
-### Sprint 012 — Profile Messaging — DELIVERED, DEVICE ACCEPTANCE DEFERRED
+- WorkingState represents ordered session intent,
+- Short/Long state use evidence-aware decay/support,
+- native contradictory behavior can supersede old imports,
+- one unusual session cannot erase durable taste,
+- cross-domain transfer is bounded and ablated against no-transfer control,
+- FOR_YOU/SURPRISE/RISK produce meaningfully different, tested policies,
+- cold-start question selection is informative and recognition-aware.
 
-Add narrow messaging only after Lists are stable so messages can reference established Profile/List/Item identities.
+### 14.5 — Operating SleepLayer and evaluation
 
-- PersonalProfile owner-only note/thread stream,
-- SharedProfile accepted-member group chat retaining actual sending User,
-- Inbox combines invitations and message activity,
-- optional message when adding/saving an Item references Profile/List/Item,
-- messaging persistence stays separate from behavioural Prediction evidence by default,
-- no unrelated-user DM graph, public feed or follower model.
+Requirements: `MVP-ALG-008`, `MVP-BETA-002` foundations.
 
-Primary issue: #138.
+Exit gate:
 
-### Sprint 013 — Prediction Nervous System & ScenarioMemory — COMPLETE
+- bounded scheduled worker runs retry-safely,
+- delayed outcomes reconcile correctly,
+- chronological evaluation and sample/support reporting work,
+- manual canary and rollback are rehearsed,
+- automatic/global promotion remains disabled until a later explicit evidence gate.
 
-Accepted 2026-09-04. Issue #156 defines the full memory/prediction/controlled-evolution architecture and the accepted MVP slice now includes:
+## Phase 15 — Taste-first acquisition foundation
 
-- WorkingState, ShortTermState, LongTermState and same-Profile ScenarioMemory,
-- versioned complete PredictionRun/candidate trace including alternatives, Context and delivery/exposure separation,
-- configured-Android Personal/Shared Prediction V1 acceptance,
-- immutable PredictorGenomes and global baseline Champion audit,
-- three bounded scalar SHADOW Challengers,
-- prospective frozen ShadowPredictions and leakage-safe mature exposed-outcome evaluation,
-- GLOBAL/PROFILE GenomeEvaluation with Profile shrinkage,
-- one canonical V1 serving path with exact baseline equivalence,
-- service-only evidence-gated manual Profile canary and reversible rollback,
-- automatic/global Challenger promotion disabled through MVP 0.1.
+This phase converts the good algorithm into a product that can acquire users. Canonical product contract: `docs/product/LAUNCH_LOOP.md`. Architecture decision: ADR-0007.
 
-Transparent scalar-genome evaluation landed before learned sequence/LLM Challengers, and pgvector remains blocked until real embeddings plus a measured need exist. Full autonomous evolution remains post-MVP.
+### 15.0 — Adaptive Taste Test + honest prediction challenge
 
-### Accepted post-Sprint-013 follow-ups
+Requirements: `MVP-TASTE-001..005`.
 
-- **#174 — reacted-Item resurfacing** is accepted: terminal reactions are suppressed and saved-only reminders are bounded/versioned.
-- **#175 / MVP-NAV-004 — bottom SharedProfile quick switcher** is accepted on configured Android.
+Build the Taste Test on the same real catalog, feature versions and prediction semantics proven in Phase 14.
 
-The current shell/bootstrap visual polish is on `main` and still needs configured-device visual acceptance, but it does not block backend catalog work.
+Exit gate:
 
-### Remaining execution order — product decision 2026-09-07
+- anonymous visitor can complete a bounded 12–24-opportunity adaptive test,
+- unknown Items can be skipped without poisoning taste,
+- question selection balances recognition and information gain,
+- held-out known Items are predicted before their answers enter learning,
+- challenge quality uses a documented honest metric and sample size,
+- unseen preview recommendations come from the canonical production ranking boundary,
+- first-session usefulness is validated against a fixed transparent baseline.
 
-Algorithm quality is the critical path. Preserve completed sprint history; the sequence below supersedes earlier future-phase suggestions in domain documents. Each row is a bounded work package, normally split into one Issue/PR per independently reviewable behavior. Do not implement all rows in one branch.
+### 15.1 — Anonymous identity and web/app continuation
 
-| Order | Work package and requirement IDs | Depends on / acceptance before proceeding |
-|---|---|---|
-| 14.0 | **Bootstrap serving + SQL regression foundation** — #207, ALG-001, ALG-009; existing #185/#191 context | First coding task. Reproduce the bootstrap-only failure; fix through shared feature semantics and a forward migration. Opposite-preference fresh Profiles rank the same unseen pool differently, import removal restores control, no Personal/Shared leakage. Start SQL CI here and extend it in later PRs. |
-| 14.1 | **Trustworthy action and delivery evidence** — DATA-001..004, PRED-006 | After 14.0; persistent outbox + atomic action/Event boundary, exact Profile/prediction/slate cache and truthful Shared/search/List origins. Kill/retry/undo/switch/concurrency tests and device traces pass. |
-| 14.2 | **Serving/shadow equivalence + candidate availability** — ALG-002..003 | Reliable evidence. One score/policy implementation for Personal/Shared, frozen versioned features, baseline parity; suppressed top candidates trigger bounded refill; stable pagination and realistic catalog exhaustion. No worker promotion before parity. |
-| 14.3 | **Real catalog and common features** — CAT-001..003, ALG-005; #182 | Import/poster enrichment can proceed alongside 14.0–14.2 without blocking those fixes. Execute existing TMDB batches, enrich BOOK descriptions, establish repeatable provider refresh and normalized shared feature mapping with provenance. Hundreds/domain, licensed imagery/attribution and quality report required. |
-| 14.4 | **Adaptive state and discovery policy** — ALG-004..007, BOOT-001..004, PRED-005 | 14.0–14.3. Ordered session state, evidence-aware forgetting/confidence, bounded cross-domain transfer, informative calibration and context-dependent weighting. Compare fixed control, ablations, contradictory-history and Shared disagreement cases; reject changes without useful evidence. |
-| 14.5 | **Operating SleepLayer + evaluation** — ALG-008, BETA-002 | 14.1–14.4. Schedule bounded workers; drain/retry deterministically, reconcile delayed outcomes, freeze chronological evaluation. Manual canary/rollback rehearsal; automatic/global promotion stays disabled. Sparse outcomes mean insufficient evidence, not permission to lower the gate. |
-| 14.6 | **Complete browse/core UX** — DISC-008..009, NAV-005, UX-001; #200/#201/#203, #102/#138/#199/#78 | Reuse stable catalog/evidence contracts. Complete contextual Lists, search/filters and authorized Profile-name search; accept Lists/messages/Room/import/Shared/device flows and accessibility. Owner APK testing can proceed throughout. |
-| 14.7 | **Beta operations prerequisite** — OPS-001..004 minimum safe beta slice, AUTH/REL lifecycle; #160/#127/#184 | Before inviting external testers: isolated environment, reliable email, privacy/support/deletion/retention, backups, diagnostics and abuse controls operate. Inventory final hosting choices early; do not defer data architecture until release. |
-| 14.8 | **External beta** — BETA-001..002; #186 | 14.0–14.7 accepted. Roughly 10 people use clean-install Personal/Shared BOOK/MOVIE without developer setup; collect useful delayed outcomes and fix defects. Sample size does not establish small statistical lifts. Owner accepts beta; close Sprint 014 only now. |
-| 15.1 | **Production configuration and recovery** — AUTH-004, OPS-001..005, REL-001..002; #160/#184/#127 | Finalize production project/domain/SMTP/social linking, privileges, secrets, data lifecycle jobs, alerts/budget and verified restore. Recheck staged release against actual production configuration; no placeholder inventory values remain. |
-| 15.2 | **Store release candidate** — REL-001..003, UX-001 | Signed immutable builds, store privacy/permissions/attribution/assets, account linking/deletion, clean install/update/device and load/rollback gates. Recheck current store/provider requirements at submission. |
-| 15.3 | **Installed store acceptance and handoff** — all MVP IDs | All required code on main, CI/backend/device/ops evidence recorded, store-distributed build accepted by owner. Close Sprint 015 and milestone; document maintenance/recovery ownership. |
+Requirements: `MVP-ACQ-001..004`, `MVP-AUTH-004`.
 
-### Sprint 014 — algorithm reliability, real catalog and external beta — ACTIVE
+Exit gate:
 
-Canonical execution record remains `sprints/SPRINT-014.md`. The 14.x identifiers above are work-package order, not claims that old 14A–14D implementation was absent. Newly discovered correctness work is required before closing those existing acceptance gates.
+- public Taste link works in a browser without installed app,
+- installed app can receive the same canonical link route,
+- anonymous identity/taste state is server-backed and recoverable within retention rules,
+- Google/Apple conversion links/upgrades the identity without duplicate User/PersonalProfile,
+- abandoned/failed auth does not destroy Taste progress,
+- account-collision cases are safe.
 
-The exact next task and active PR live only in `STATUS.md`. Reuse existing issues when their scope matches; reopen an implementation issue only for an actual unresolved acceptance defect. Create a scoped follow-up when the old issue was correctly closed. Never close #182/#199 from partial PRs.
+### 15.2 — Recommendation preview and conversion funnel
 
-### Sprint 015 — production operations and store acceptance — PLANNED
+Requirements: `MVP-ACQ-005..007`.
 
-Create its execution file when activated; do not create speculative sprint folders. Infrastructure/retention decisions and safe-beta provisioning start in 14.7 or earlier; Sprint 015 verifies and finalizes them for the store. `ARCHITECTURE.md` owns the service/data checklist and `MVP.md` owns completion requirements.
+Exit gate:
 
-### Suggestions reconciled into scope
+- Taste completion shows a small personalized preview,
+- CTA to Apple/Google does not reset cold start,
+- campaign/referral attribution survives exactly once,
+- funnel events are measurable without being misused as taste evidence,
+- experiments are versioned.
 
-| Existing source / suggestion | Disposition |
-|---|---|
-| #200 contextual discovery Lists | Required: MVP-DISC-008, 14.6 |
-| #201 catalog search/filters | Required: MVP-DISC-009, 14.6; normalized data before filters |
-| #203 Profile-name search | Required bounded authorized-name filtering: MVP-NAV-005, 14.6 |
-| Prediction model Phase B: WorkingState, multi-timescale memory, delayed outcomes | Required: ALG-004/006 and DATA-003/004, 14.1/14.4 |
-| Candidate union previously grouped with learned retrieval | Required now: ALG-003, 14.2; does not require embeddings |
-| SleepLayer persistence and proposed evaluation/retention | Operational evaluator required: ALG-008 and OPS-002/004, 14.5/14.7 |
-| Optional explicit mood/time/context controls | Use bounded contextual policy/session inputs in 14.4; add a UI control only when useful and tested. No sensitive inference or mandatory demographics. |
-| MEM-004 richer memory extension point | Document generic extension compatibility in domain model; no photo journal/storage feature required |
-| Learned embeddings, sequence/LLM challengers, learned gating, stochastic bandit | Keep as replaceable evaluation extensions; bounded transparent adaptation is required now. Introduce only if measured need justifies complexity and evidence gates pass. |
-| PopulationMemory, extra domains, monetization, public social features | Remain explicitly outside MVP; preserve privacy/licensing gates |
+## Phase 16 — Friend viral loop and Shared creation
 
-## Post-MVP execution queue
+### 16.0 — Personal Friend invite
 
-Owner direction **2026-09-07**, planning #213: the complete product extends beyond MVP 0.1. This queue is appended after **14.0–15.3**; it does not reset the active sprint or move unproven research onto the current critical path. Detailed scope, source options and measurable acceptance/stop criteria live once in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md). Every ID below is planned, conditional or research, never a completion claim.
+Requirements: `MVP-FRIEND-001..004`.
 
-| Order | Package / durable IDs | Dependencies and exit gate |
-|---|---|---|
-| 16 | **Two-store completion and measured scale baseline** — FUT-REL-001, FUT-OPS-001 | Accepted MVP 15.3. Complete public Android **and** iOS distribution if either is still missing; verify install/update/core flows. Establish workload, latency/resource/cost/retention measurements. If both stores already passed, reuse evidence rather than building again. |
-| 17 | **Catalog breadth, identity and search** — FUT-CAT-001 | 16 and existing CAT/DISC gates. Expand persisted BOOK/MOVIE breadth and Finnish enrichment, safe work/edition/alias matching, licensed images, normalized tags, provider refresh and bounded search. Coverage and outage behavior demonstrated. |
-| 18 | **Series** — FUT-DOM-001 | 17. Compatible generic Item extension, series-level consumption semantics, search/Lists/Personal/Shared and real-device acceptance. No separate recommender. |
-| 19 | **Friends and stronger group learning** — FUT-SOC-001 | 16 plus accepted Shared/evidence/privacy foundations. Consent-based nickname discovery and friend lifecycle, abuse controls, useful group-dynamics evaluation. Existing authorized Profile-name filtering is not global friend search. |
-| 20 | **Helsinki pilot** — FUT-LOC-001, then FUT-LOC-002 | 17–19. Linked Events first, selected source-gap filling, recurrence/duplicates/cancellation freshness, then location-optional Personal/Shared event discovery. Accept one city before expanding. |
-| 21 | **Music albums** — FUT-DOM-002 | Domain extension from 18; complete 20 as the default sequence. Provider/cover-rights gate, release identity and generic mixed-domain discovery/search/Lists; no implied streaming feature. |
-| 22 | **Optional friend-review feed** — FUT-SOC-002 | 19, mature evidence and operated publishing/privacy/moderation. Accept useful audience-controlled review discovery; do not auto-publish private ratings. |
-| 23 | **Conditional local/global feed** — FUT-SOC-003 | 22, opt-in public inventory, moderation capacity and applicable PopulationMemory gates. Pilot usefulness, privacy, abuse and sustainable cost; defer if not supported. |
-| Continuous after 16 | **Evidence-gated evolution and compact memory** — FUT-ALG-001, FUT-OPS-001 | Finish current ALG/DATA/OPS gates first. Re-evaluate quality, latency, spend and retention at each domain/scale increment. Automatic promotion needs an explicit later decision plus sustained controlled evidence; new features do not waive the gate. |
-| Research after operational baseline | **Planet network / local learning** — RES-NET-001, RES-EDGE-001 | Measured 16 baseline; edge learning also needs FUT-ALG-001 evidence. Separate public/synthetic experiments with normal infrastructure controls, security/failure/cost tests and go/no-go ADR. Never block ordinary delivery. |
-| Distant research after 23 | **Real-world friendship / dating** — RES-PEOPLE-001 | Consenting users, separate purpose/age/safety/product design and operated moderation. Start with useful introductions; compatibility claims require real evidence and may be rejected. No automatic implementation when earlier rows finish. |
+Exit gate:
 
-At each package close, record achieved requirements, exact evidence and deferred IDs; create the next bounded Issue/sprint from the first ready row. Do not create empty future sprint folders or one speculative code module per idea. Review the research backlog explicitly without treating `RESEARCH` as approved implementation. Existing richer memories, advanced Lists, other domains, learned-model families and monetization remain preserved in FUTURE_PLAN's other-directions section and keep their prior privacy/licensing/product gates.
+- activated User can create a personal invite link,
+- opaque token has expiry/revocation/use/rate limits,
+- receiver follows the same Taste-first flow,
+- receiver explicitly accepts after/auth conversion,
+- one reciprocal Friend relationship is created idempotently,
+- friendship exposes no private PersonalProfile evidence.
 
-Roadmap changes must be deliberate. Do not rewrite completed sprint history when sequencing changes.
+### 16.1 — Friend list and safety lifecycle
+
+Requirements: `MVP-FRIEND-005..007`.
+
+Exit gate:
+
+- both users see each other in Friends,
+- remove/block/reinvite rules are explicit and tested,
+- enumeration/spam controls exist,
+- Friendship remains distinct from SharedProfile membership.
+
+### 16.2 — SharedProfile creation from Friends
+
+Requirements: `MVP-GROUP-001..003` plus existing SharedProfile requirements.
+
+Exit gate:
+
+- two Friends can create a SharedProfile in one short explicit flow,
+- 3+ member creation uses explicit member acceptance,
+- no personal invite creates a group automatically,
+- SharedProfile immediately uses the existing joint-learning/common-fit Prediction path,
+- friend removal does not silently rewrite existing SharedProfile membership/history.
+
+## Phase 17 — Complete core product and operational quality
+
+### 17.0 — Browse/core UX completion
+
+Requirements: existing `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, Lists/messages/Room/device acceptance.
+
+Exit gate:
+
+- contextual Lists, search/filters and authorized Profile surfaces are complete,
+- accessibility/reduced-motion/error/offline states are usable,
+- deferred Lists/messages/Room/device gates are accepted,
+- graphics may continue to be tuned without changing domain contracts.
+
+### 17.1 — Launch telemetry and experimentation
+
+Requirements: `MVP-GROWTH-001..004`.
+
+Exit gate:
+
+- complete funnel is observable from link open through Taste, auth, Friend conversion and SharedProfile creation,
+- model/Taste/campaign/CTA experiment versions are traceable,
+- dashboards/queries can calculate completion, activation, D1/D7, invite conversion and successful discoveries,
+- growth telemetry is not automatically recommendation reward.
+
+### 17.2 — Privacy, abuse and beta operations
+
+Requirements: `MVP-OPS-001..005`, Taste/Friend privacy requirements.
+
+Exit gate:
+
+- staging/production isolation,
+- anonymous/Taste/invite retention and deletion,
+- backups and restore,
+- crash/queue/prediction/funnel diagnostics,
+- invite rate limits, anti-enumeration, block/report paths,
+- cost alerts/budgets,
+- release build rejects development/mock configuration.
+
+## Phase 18 — Closed beta of the complete growth loop
+
+Target: first ~10–50 controlled external testers, expanding only when defects are diagnosable.
+
+Beta must test **the actual intended acquisition flow**, not only pre-created accounts:
+
+```text
+link
+→ Taste Test
+→ challenge
+→ preview
+→ Google/Apple
+→ Kajo
+→ invite friend
+→ Friend
+→ create SharedProfile
+→ joint recommendation
+```
+
+Exit gate:
+
+- clean external users complete the flow without developer intervention,
+- first-session recommendations are useful enough to continue,
+- no critical identity/taste/invite duplication or privacy defects,
+- delayed recommendation outcomes are collected,
+- obvious funnel drop-offs and UX defects are fixed,
+- owner accepts the beta behavior on representative Android/iOS devices.
+
+A small beta does not prove small statistical model lifts. Sparse evidence remains insufficient evidence.
+
+## Phase 19 — Production/store release candidate
+
+### 19.0 — Production configuration and recovery
+
+Finalize production project/domain/email/social auth, secrets, data lifecycle jobs, diagnostics, budget, restore and rollback.
+
+### 19.1 — Store release candidate
+
+Signed immutable builds, privacy/data-safety declarations, permissions, attribution, store assets, account linking/deletion, clean install/update and representative load/rollback gates.
+
+### 19.2 — Installed store acceptance
+
+The owner accepts the store-distributed build and all required code/evidence is on `main`.
+
+## Phase 20 — Share Link Gate
+
+This is a **decision gate**, not another feature sprint.
+
+The assistant/agent may tell the owner **“Nyt on aika jakaa käyttäjille linkki”** only when all of the following are true:
+
+- Phase 14 algorithm gates pass,
+- Taste challenge is honest and useful,
+- anonymous → permanent identity conversion is proven,
+- Friend invite and Shared creation are proven,
+- the full link-to-app funnel passes closed beta,
+- production privacy/abuse/retention/recovery gates pass,
+- store/public destination is usable,
+- monitoring can detect failures and spend,
+- owner has accepted the release build.
+
+At that point Kajo may begin controlled real acquisition through Taste links, personal invites and measured campaigns.
+
+# After first release
+
+The long-term product vision is preserved in `docs/product/FUTURE_PLAN.md`. It does not block the first release unless explicitly promoted into MVP.
+
+Default post-release order:
+
+1. two-store completion if one platform is still pending,
+2. broader BOOK/MOVIE catalog/search quality,
+3. series,
+4. stronger friend/group learning,
+5. Helsinki hyperlocal events pilot,
+6. music albums,
+7. optional friend-review feed,
+8. conditional local/global review discovery,
+9. richer experience-memory layer,
+10. evidence-gated PopulationMemory/evolution extensions,
+11. only much later: consented local people discovery / friendship matching / dating research.
+
+Distant ideas such as stranger compatibility, dating, planet/distributed network experiments and on-device learning remain preserved research directions. They must never displace the algorithm → Taste → Friend → Shared → public-release sequence above.
