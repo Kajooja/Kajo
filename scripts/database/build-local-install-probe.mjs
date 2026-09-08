@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { loadSystemSeedSource } from './system-seed-source.mjs';
 
 try {
   assert.equal(process.argv.length, 4,
@@ -15,12 +16,7 @@ try {
   const auth = await readFile(new URL('20260827173000_auth_identifier_and_profile_fix.sql', migrations), 'utf8');
   const trigger = auth.match(/^create trigger provision_kajo_personal_profile\nafter insert on auth\.users\nfor each row execute function private\.provision_personal_profile_from_auth_user\(\);$/m)?.[0];
   assert.ok(trigger, 'Canonical Auth trigger not found');
-  const sleep = await readFile(new URL('20260904170000_sleep_layer_v1_foundation.sql', migrations), 'utf8');
-  const start = sleep.indexOf('\ninsert into private.predictor_genomes (');
-  const end = sleep.indexOf("where genome.genome_key = 'prediction-v1-baseline';", start);
-  assert.ok(start >= 0 && end > start, 'Canonical system seed boundaries not found');
-  const seeds = sleep.slice(start, end + "where genome.genome_key = 'prediction-v1-baseline';".length);
-  assert.equal((seeds.match(/^insert into /gm) ?? []).length, 3);
+  const seeds = (await loadSystemSeedSource()).sql;
   const smoke = await readFile(new URL('bootstrap-ranking.hosted-smoke.sql', import.meta.url), 'utf8');
   const sharedSmoke = await readFile(new URL('shared-install-smoke.sql', import.meta.url), 'utf8');
   assert.equal((smoke.match(/^begin;$/gm) ?? []).length, 1);

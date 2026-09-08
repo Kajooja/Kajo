@@ -194,6 +194,33 @@ PGlite with rollback, but has not yet run on the owner's Mac.
 Complete canonical schema comparison, deterministic seeds, platform event-trigger
 reconciliation, repeatable installed baseline and forward-upgrade gates remain open.
 
+## Reconstructed system-seed source — 2026-09-08
+
+`scripts/database/system-seed-source.mjs` reconstructs only the three initial
+SleepLayer seed statements from immutable migration
+`20260904170000_sleep_layer_v1_foundation.sql`. It verifies the boundaries,
+the four semantic genome keys and the baseline genome UUID derivation before it
+writes an output file. It prints the complete source and seed SHA-256 values;
+an existing output file is never overwritten.
+
+```bash
+node scripts/database/system-seed-source.mjs /tmp/kajo-system-seeds.sql
+```
+
+At this checkpoint its source hash is
+`77a0a81ed37552003c62fd13cbdd557d8795feb87cda796c3965cb27da014ade`, and the
+reconstructed SQL hash is
+`8fc0a15d9769715152985f46cde3e73edb7f441ef25eccb857aaae288f91689d`.
+The source defines four semantic-ID PredictorGenomes, four audit decisions and
+one initial GLOBAL baseline PolicyAssignment. Its `effective_from` remains
+installation time (`clock_timestamp()`), intentionally: the first policy must
+be effective at the actual baseline installation and is later comparable by
+genome key/version rather than wall-clock time. This is deterministic source
+provenance and model identity, not byte-identical timestamp metadata.
+
+The generated SQL remains a supplement to the schema export. It contains no
+User, Profile, Event, import, prediction-run or hosted-learning row.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.
