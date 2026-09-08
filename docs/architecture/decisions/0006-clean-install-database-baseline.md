@@ -83,15 +83,16 @@ input or incompatible PostgreSQL major versions. Input row/ACL order is irreleva
 overloads remain separate. A matching name alone never establishes code parity.
 Review differences rather than normalizing away function text or ownership changes.
 
-For the four functions defined by `20260907155201_bootstrap_personal_ranking.sql`,
-the existing isolated regression fixture can also produce a scoped reference:
+For the four functions defined by `20260907155201_bootstrap_personal_ranking.sql`
+plus the complete reconstructed `private.rank_items_v1_internal`, the existing
+isolated regression fixture can also produce a scoped reference:
 
 ```bash
 KAJO_BOOTSTRAP_SCHEMA_SNAPSHOT=/tmp/bootstrap-functions.json node --test scripts/database/bootstrap-ranking.test.mjs
 ```
 
-The output path must not already exist. Compare only the same four explicit
-identities from the hosted snapshot, and report the four-function scope. The
+The output path must not already exist. Compare only the same five explicit
+identities from the hosted snapshot, and report the five-function scope. The
 fixture is PGlite 0.3.14 / PostgreSQL 17; it is not a complete installation.
 
 The first read-only hosted check captured 123 function/procedure fingerprints
@@ -102,6 +103,12 @@ committed or accepted as canonical source. This result does not cover the other
 default privileges for future objects, Auth/platform event triggers or system
 seeds. It does not repair migration tracking, replace the schema-only export, or
 close #208 / MVP-ALG-009.
+
+On 2026-09-08 the scope was extended to V1's complete reconstructed definition
+after ScenarioMemory, SleepLayer, resurfacing, Shared common-fit and bootstrap
+patches. All five definitions/owners/ACLs matched hosted truth. The earlier
+four-function checkpoint remains historical; 118 other functions and all
+non-function schema/installation gates remain unverified by this comparison.
 
 ## Alternatives considered
 

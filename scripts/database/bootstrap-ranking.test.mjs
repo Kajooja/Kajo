@@ -200,12 +200,12 @@ test('bootstrap Personal ranking SQL regressions (isolated function fixtures)', 
       }
     });
     // Optional read-only diagnostic output from the existing canonical SQL fixtures.
-    // This is explicitly a four-function scope, never a full replay/schema claim.
+    // This is explicitly a five-function scope, never a full replay/schema claim.
     if (process.env.KAJO_BOOTSTRAP_SCHEMA_SNAPSHOT) {
       const results = await db.exec(await readFile(new URL('function-schema-snapshot.sql', import.meta.url), 'utf8'));
       const snapshot = results.find(result => result.rows[0]?.snapshot).rows[0].snapshot;
-      snapshot.functions = snapshot.functions.filter(row => /^private\.(bootstrap_decay_v1|bootstrap_weighted_evidence_v1|build_profile_memory_state_v1|rank_items_v0)\(/.test(row.identity));
-      assert.equal(snapshot.functions.length, 4);
+      snapshot.functions = snapshot.functions.filter(row => /^private\.(bootstrap_decay_v1|bootstrap_weighted_evidence_v1|build_profile_memory_state_v1|rank_items_v0|rank_items_v1_internal)\(/.test(row.identity));
+      assert.equal(snapshot.functions.length, 5);
       await writeFile(process.env.KAJO_BOOTSTRAP_SCHEMA_SNAPSHOT, JSON.stringify(snapshot, null, 2) + '\n', { flag: 'wx' });
     }
   } finally { await db.close(); }
