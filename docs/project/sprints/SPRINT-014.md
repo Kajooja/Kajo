@@ -442,3 +442,7 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - Final validation: `npm run check` passed lint, TypeScript, mobile/catalog tests,
   29 database tests and iOS/Android bundles. Exact export trigger parity passed in
   two disposable databases; the expanded rollback probe passed twice separately.
+- Added read-only table-definition/direct-ACL fingerprints and same-count drift
+  regressions. Exact export fingerprints match across two independent installs
+  for all 30 tables. This strengthens export repeatability only; remaining
+  canonical schema/platform/upgrade gates remain open (ADR-0006).

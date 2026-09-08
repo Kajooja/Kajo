@@ -155,6 +155,13 @@ epoch. Both full probe runs and exact seed-row comparisons pass in PGlite. Detai
 and provenance are in ADR-0006. Mac execution of this revised probe is pending;
 the owner's earlier PASS remains valid only for the original Personal/Auth probe.
 
+Table-definition fingerprints now also match across both export installations:
+columns/defaults, constraints, indexes, RLS policies/flags, ownership and direct
+table/column grants. Mutation regressions catch definition drift with unchanged
+object counts. This is export repeatability, not remaining canonical source parity;
+schema/default grants, roles, views/sequences and platform objects remain outside
+this comparator. ADR-0006 records the diagnostic and exact limitations.
+
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 
 1. Finish clean-install database/replay strategy and schema parity work.

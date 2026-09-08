@@ -6,11 +6,12 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { compareFunctionSchemas } from './function-schema-parity.mjs';
 import { verifyExportTriggers } from './trigger-source.mjs';
+import { compareRelationSchemas } from './relation-schema-parity.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
-  if (process.argv.length < 4 || process.argv.length > 5) {
-    throw new Error('Usage: node scripts/database/schema-export-diagnostic.mjs <schema.sql> <expected-sha256> [function-snapshot.json]');
+  if (process.argv.length < 4 || process.argv.length > 6) {
+    throw new Error('Usage: node scripts/database/schema-export-diagnostic.mjs <schema.sql> <expected-sha256> [function-snapshot.json] [relation-snapshot.json]');
   }
   const bytes = await readFile(process.argv[2]);
   const checksum = hash(bytes);
@@ -19,6 +20,8 @@ try {
   }
   const snapshotSql = await readFile(new URL('function-schema-snapshot.sql', import.meta.url), 'utf8');
   let first;
+  const relationSql = await readFile(new URL('relation-schema-snapshot.sql', import.meta.url), 'utf8');
+  let firstRelations;
   let firstInventory;
   for (let install = 1; install <= 2; install++) {
     const db = new PGlite();
@@ -45,6 +48,7 @@ try {
         assert.equal(count, '0', `Schema export contains data in ${table.name}`);
       }
       const snapshot = (await db.exec(snapshotSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
+      const relations = (await db.exec(relationSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
       const inventory = {
         triggerParity,
         tables: tables.length,
@@ -63,14 +67,16 @@ try {
       };
       if (first) {
         assert.equal(compareFunctionSchemas(first, snapshot).status, 'MATCH');
+        assert.equal(compareRelationSchemas(firstRelations, relations).status, 'MATCH');
         assert.deepEqual(inventory, firstInventory);
-      } else { first = snapshot; firstInventory = inventory; }
+      } else { first = snapshot; firstRelations = relations; firstInventory = inventory; }
     } finally { await db.close(); }
   }
   if (process.argv[4]) await writeFile(process.argv[4], JSON.stringify(first, null, 2) + '\n', { flag: 'wx' });
+  if (process.argv[5]) await writeFile(process.argv[5], JSON.stringify(firstRelations, null, 2) + '\n', { flag: 'wx' });
   console.log(JSON.stringify({ status: 'PASS', engine: 'PGlite 0.3.14', postgresMajor: first.serverMajor,
     exportSha256: checksum, installs: 2, inventory: firstInventory,
-    scope: 'Unmodified export loads twice; application tables empty; function/owner/direct ACL parity between installs. Not canonical repository parity, complete schema parity, seed or Supabase platform acceptance.' }, null, 2));
+    scope: 'Unmodified export loads twice; application tables empty; function and table-definition/direct ACL parity between installs; application trigger parity with pinned source. Not canonical full repository parity, complete schema parity, seed or Supabase platform acceptance.' }, null, 2));
 } catch (error) {
   console.error(JSON.stringify({ status: 'FAIL', code: error.code, message: error.message }));
   process.exitCode = 1;

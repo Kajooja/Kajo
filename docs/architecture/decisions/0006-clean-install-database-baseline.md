@@ -261,6 +261,38 @@ reinstall. Full export + deterministic seeds + Auth/Personal/Shared rollback smo
 also passed twice. The revised Mac probe and real repeated pinned installations,
 complete remaining schema parity and independent forward upgrade remain pending.
 
+## Table-definition repeatability diagnostic
+
+`relation-schema-snapshot.sql` captures read-only SHA-256 fingerprints for each
+ordinary/partitioned `public`/`private` table. Covered fields include column order,
+types, defaults, nullability, identity/generated flags and collation; constraint
+definitions/validation/deferral; index definitions and validity/readiness;
+partition keys/bounds/parents; RLS policy expressions, roles, permissiveness and
+table flags; owner and normalized direct table/column ACL. Object/role OIDs are
+resolved to names before hashing. No application rows or expression bodies are
+returned in the snapshot.
+
+The export diagnostic now compares these fingerprints across both installations.
+An optional fifth CLI argument (after the function snapshot path) writes the
+relation JSON with no overwrite. Compare two snapshots using:
+
+```sh
+node scripts/database/relation-schema-parity.mjs expected-relations.json actual-relations.json
+```
+
+Exit codes: 0 match, 1 drift, 2 malformed/empty snapshots or different PostgreSQL
+major versions. Regressions use independent PGlite fixtures without the owner's
+attachment and check altered definitions with unchanged object counts, ACL
+insertion-order independence and OID independence. The exact owner export passed
+twice with all 30 table fingerprints matching.
+
+This proves repeatability of the exported definitions, **not** reconciliation to
+all canonical migrations or production. It excludes views, sequences, schema and
+default ACL, inherited/effective role privileges, type/domain definitions,
+extensions, triggers (separate diagnostic), platform objects and physical storage
+settings such as tablespaces/index options. Same-major deparser fingerprints also
+need matching engine versions for acceptance. Remaining #208 gates stay open.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.
