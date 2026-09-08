@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
-import { loadSystemSeedSource } from './system-seed-source.mjs';
+import { buildDeterministicSeedSql } from './system-seed-source.mjs';
 
 try {
   assert.equal(process.argv.length, 4,
@@ -12,11 +12,11 @@ try {
   assert.equal(createHash('sha256').update(bytes).digest('hex'),
     '3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e',
     'Unexpected schema export; review it before generating an executable probe');
+  const seeds = await buildDeterministicSeedSql();
   const migrations = new URL('../../supabase/migrations/', import.meta.url);
   const auth = await readFile(new URL('20260827173000_auth_identifier_and_profile_fix.sql', migrations), 'utf8');
   const trigger = auth.match(/^create trigger provision_kajo_personal_profile\nafter insert on auth\.users\nfor each row execute function private\.provision_personal_profile_from_auth_user\(\);$/m)?.[0];
   assert.ok(trigger, 'Canonical Auth trigger not found');
-  const seeds = (await loadSystemSeedSource()).sql;
   const smoke = await readFile(new URL('bootstrap-ranking.hosted-smoke.sql', import.meta.url), 'utf8');
   const sharedSmoke = await readFile(new URL('shared-install-smoke.sql', import.meta.url), 'utf8');
   assert.equal((smoke.match(/^begin;$/gm) ?? []).length, 1);
@@ -35,10 +35,11 @@ begin
 end;
 $guard$;
 ${bytes.toString('utf8')}
--- Missing cross-schema Auth trigger, copied from canonical source unchanged.
+-- The filtered export already contains application-table triggers. Its omitted
+-- Auth trigger is reconstructed here from canonical source.
 ${trigger}
--- Canonical system seeds, not hosted data. IDs/times retain migration defaults
--- for this rollback-only experiment; this is NOT a deterministic seed bundle.
+-- Proposed deterministic system seeds from hash-verified canonical source.
+-- Empty-system-table guard; logical epoch is the schema cutoff. Not deployment.
 ${seeds}
 -- Verify the copied trigger actually provisions a PersonalProfile on Auth insert.
 do $auth_probe$

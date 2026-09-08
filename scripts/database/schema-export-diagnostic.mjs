@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { compareFunctionSchemas } from './function-schema-parity.mjs';
+import { verifyExportTriggers } from './trigger-source.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -31,6 +32,7 @@ try {
         $$;`);
       // Execute the complete export unchanged. Any statement failure stops the run.
       await db.exec(bytes.toString('utf8'));
+      const triggerParity = await verifyExportTriggers(db);
       const tables = (await db.query(`select format('%I.%I', n.nspname,c.relname) as name,
           c.relrowsecurity as rls
         from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -44,6 +46,7 @@ try {
       }
       const snapshot = (await db.exec(snapshotSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
       const inventory = {
+        triggerParity,
         tables: tables.length,
         tablesWithoutRls: tables.filter(t => !t.rls).map(t => t.name),
         functions: snapshot.functions.length,

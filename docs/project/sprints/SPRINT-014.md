@@ -411,3 +411,34 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   complete pinned installs/platform/forward-upgrade gates remain open under #208.
 - Validation: `npm run check` passed lint, TypeScript, mobile/catalog/database
   tests and iOS/Android bundle smoke. Expanded export probe passed separately twice.
+
+### System-seed source checkpoint — 2026-09-08
+
+- Added a checksum-verified source reconstruction for the initial four
+  PredictorGenomes, four promotion decisions and baseline PolicyAssignment. It
+  reads only the immutable SleepLayer migration and refuses to overwrite output.
+- Source/model identities are deterministic; the initial policy's effective time
+  remains installation time by design. No hosted data or learning rows are used.
+- Validation: 24 database tests passed, including source-boundary, semantic-key
+  and no-overwrite regressions. Pinned full-install/platform/upgrade gates remain
+  open.
+
+### Prior-change audit — 2026-09-08 / #219
+
+- Restored STATUS and this checkpoint after truncated API payloads corrupted the
+  remote documentation. Future uploads must match the entire tested Git tree SHA.
+- Fixed seed source verification: changed source/weight now fails on checksum.
+- Removed the CI test's hard-coded conversation attachment. The explicit offline
+  export diagnostic now checks all 21 application-table trigger definitions and
+  enabled states against protected migration source; both export installs pass.
+- Preserved immutable history, public/privileged boundaries and #208's open gates.
+- Correction: promotion/policy seed IDs are also random, not only timestamps;
+  the deterministic metadata gate was never completed by the extraction tool.
+- Added proposed deterministic empty-install seeds with explicit audit/assignment
+  identities and schema-cutoff epoch. Two independent seed installs match every
+  field and preserve original genome/policy semantics. Nonempty reinstall fails
+  without changing rows. Full Auth/Personal/Shared probe passes twice with these
+  seeds. Revised Mac/full-platform/forward-upgrade gates remain pending.
+- Final validation: `npm run check` passed lint, TypeScript, mobile/catalog tests,
+  29 database tests and iOS/Android bundles. Exact export trigger parity passed in
+  two disposable databases; the expanded rollback probe passed twice separately.

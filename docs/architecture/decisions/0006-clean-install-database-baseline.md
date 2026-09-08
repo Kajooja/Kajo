@@ -173,6 +173,8 @@ The seed statements retain their original ID/time defaults in this experiment;
 this is not the final deterministic seed bundle. No platform event trigger is
 recreated or disabled. Two sequential PGlite runs passed, including empty-state
 restoration; an existing table/data guard rejected execution and preserved data.
+This describes the original probe. The audited revision uses the proposed
+deterministic supplement below; owner Mac evidence does not cover that revision.
 Owner-reported original probe result on 2026-09-08: PASS, with all changes rolled
 back. Runtime: local Docker Desktop macOS arm64, CLI 2.117.0; image
 `public.ecr.aws/supabase/postgres:17.6.1.167`, image ID
@@ -212,14 +214,52 @@ At this checkpoint its source hash is
 reconstructed SQL hash is
 `8fc0a15d9769715152985f46cde3e73edb7f441ef25eccb857aaae288f91689d`.
 The source defines four semantic-ID PredictorGenomes, four audit decisions and
-one initial GLOBAL baseline PolicyAssignment. Its `effective_from` remains
-installation time (`clock_timestamp()`), intentionally: the first policy must
-be effective at the actual baseline installation and is later comparable by
-genome key/version rather than wall-clock time. This is deterministic source
-provenance and model identity, not byte-identical timestamp metadata.
+one initial GLOBAL baseline PolicyAssignment. The experimental source keeps
+random UUID defaults for promotion decisions and policy assignments, plus
+installation-time `created_at` and `effective_from` fields. Only genome identities
+and source bytes are deterministic. These defaults still need an explicit reviewed
+resolution before claiming the deterministic baseline metadata gate is complete.
 
 The generated SQL remains a supplement to the schema export. It contains no
 User, Profile, Event, import, prediction-run or hosted-learning row.
+
+## Audit corrections and trigger definition parity — 2026-09-08
+
+- The previous API upload at `87fd3f8` corrupted STATUS and omitted the latest
+  sprint checkpoint. Restored both from the verified local commit `61d1974`.
+- Original claims that the export contained zero ordinary triggers were caused
+  by a case-sensitive text search that also missed `CREATE OR REPLACE TRIGGER`.
+  The export contains 21 application-table triggers; only the Auth trigger is
+  omitted. The export still omits platform event triggers.
+- `schema-export-diagnostic.mjs` now compares all 21 trigger definitions and
+  enabled states against the protected migration sources using PostgreSQL's own
+  deparser in a rolled-back disposable transaction. This covers table identity,
+  timing, events, column lists, conditions, called functions and enabled state.
+  The previous name-only check did not establish definition parity.
+- CI no longer depends on an uncommitted conversation attachment. The exact export
+  remains an explicit argument of the offline diagnostic. Seed generation now
+  actually rejects a mismatching source checksum before emitting executable SQL.
+- These corrections do not change deployed migrations or the serving algorithm.
+  Roadmap remains 14.0 → 14.1 (evidence) → 14.2 (serving/shadow and candidates).
+
+## Deterministic empty-install seed proposal — audited continuation
+
+`buildDeterministicSeedSql()` in `system-seed-source.mjs` now builds the probe's
+empty-install supplement from the hash-verified seed statements. Genome IDs,
+weights, parent relationships, versions, audit reasons and Champion/SHADOW states
+are unchanged. New promotion IDs derive from `kajo:baseline-v1:promotion:<key>`;
+the initial assignment ID derives from `kajo:baseline-v1:global-policy`. All initial
+timestamps use the explicit schema cutoff `2026-09-07T15:52:01Z`. This is a logical
+baseline epoch, not the date of an actual production promotion or installation.
+An eventual installer must record its actual execution time separately.
+
+The supplement refuses nonempty genome, promotion or assignment tables. Two
+independent PGlite tests prove exact equality of every stored seed field, semantic
+equality to the original source (excluding the intentionally replaced audit IDs
+and times), preserved genome IDs/configuration and unchanged rows after a rejected
+reinstall. Full export + deterministic seeds + Auth/Personal/Shared rollback smoke
+also passed twice. The revised Mac probe and real repeated pinned installations,
+complete remaining schema parity and independent forward upgrade remain pending.
 
 ## Alternatives considered
 
