@@ -110,8 +110,11 @@ canonical repository parity for the remaining 118 functions or other objects.
 
 Exact next work:
 
-1. Start an empty local Supabase stack on the owner's Mac in the separate export
-   directory using CLI 2.117.0; retain its image/version evidence.
+1. Owner confirmed that local Supabase started successfully on the Mac. Run the
+   rollback-only probe with `scripts/database/run-local-install-probe.mjs` against
+   the supplied export (usage in ADR-0006). Capture PASS/error and image identity.
+   The runner requires exactly one local Docker Desktop Supabase database and
+   empty Auth/public/private tables. PGlite smoke passed; Mac execution is pending.
 2. Reconcile exported DDL against repository sources. Prepare reviewed separate
    supplements for `auth.users`'s `provision_kajo_personal_profile` trigger and
    deterministic system seeds from SleepLayer source migrations. Account for
@@ -124,6 +127,10 @@ Exact next work:
 The export omits the Auth trigger, all event triggers, PredictorGenome and
 PolicyAssignment rows. It is not yet an accepted installation baseline. The
 connected hosted project has only main; never use it as an installation target.
+The probe temporarily supplies the canonical Auth trigger and three system-seed
+INSERT statements, exercises Auth provisioning and the existing bootstrap V1
+smoke, then rolls everything back. It does not supply or change platform event
+triggers, establish deterministic seed metadata, or close the full replay gate.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 

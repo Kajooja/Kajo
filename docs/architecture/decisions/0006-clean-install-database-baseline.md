@@ -147,6 +147,36 @@ The owner now has a Docker-capable Mac. Next run real empty Supabase installatio
 tests after source reconciliation and supplements; the PGlite diagnostic does not
 close #208 and does not repair chronological migration replay.
 
+## Local rollback-only probe
+
+The owner confirmed the empty local Supabase stack starts. From a checkout of
+the active #219 branch, with the export path supplied explicitly:
+
+```bash
+node scripts/database/run-local-install-probe.mjs /path/to/kajo-schema.sql
+```
+
+The Mac-only runner requires Docker Desktop's `desktop-linux` context to use a
+local Unix socket and exactly one running `supabase_db_` container. It prints the
+container/image identity, accepts no database URL/password, and runs psql with
+`ON_ERROR_STOP`. It builds a temporary SQL probe and removes that file afterward.
+
+`build-local-install-probe.mjs` verifies the exact recorded export SHA-256, opens
+one transaction, rejects nonempty Auth or public/private table schemas, loads the
+export unchanged, adds the exact canonical Auth trigger, and copies the three
+system-seed INSERT statements from SleepLayer's foundation migration. It checks
+automatic Auth-to-PersonalProfile provisioning and executes the existing hosted
+bootstrap smoke body. The smoke's final ROLLBACK also removes the schema and seeds;
+a subsequent assertion verifies the application schema disappeared.
+
+The seed statements retain their original ID/time defaults in this experiment;
+this is not the final deterministic seed bundle. No platform event trigger is
+recreated or disabled. Two sequential PGlite runs passed, including empty-state
+restoration; an existing table/data guard rejected execution and preserved data.
+Real Docker/platform results are still pending and must be recorded before
+claiming that acceptance. SharedProfile, complete canonical schema comparison,
+repeatable installed baseline, and forward-upgrade gates remain open.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.
