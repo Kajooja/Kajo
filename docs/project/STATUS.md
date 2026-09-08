@@ -80,9 +80,10 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 
 PR #217 is accepted and merged at `42d605a`; CI #371 passed. PR #212 and planning
 PR #216 are also merged; older open-PR statements are historical checkpoints.
-Current follow-up: `test/208-v1-definition-parity`, based on `42d605a`. If its PR
-is open, continue that branch; if merged, proceed with the environment prerequisite
-below rather than repeating function fingerprint checks.
+PR #218 is also accepted and merged at `2d1b0d5`; CI #373 passed.
+Current follow-up: `test/208-export-install-diagnostic`, based on `2d1b0d5`.
+Continue its PR if open; if merged, proceed with the clean-install supplements
+below rather than repeating completed fingerprint checks.
 
 Read-only 2026-09-07 verification: hosted PostgreSQL 17.6 exposes 123 public/private
 function/procedure fingerprints. The four functions defined in the latest bootstrap
@@ -95,16 +96,34 @@ Read-only 2026-09-08 follow-up also verified the complete reconstructed
 All five checked functions match, including the V1 policy/trace implementation;
 this is definition parity, not execution/quality or complete schema acceptance.
 
-The full schema-only export and repeatable pinned Supabase installation remain
-blocked here by absent Docker/pg_dump and a configured direct export connection.
-Next use an export-capable environment for ADR-0006 steps 2–5: capture schema-only
-DDL, reconcile all differences (including the remaining functions, tables/RLS/ACL,
-Auth/platform triggers and system seeds), then verify two empty installs and the
-independent forward-upgrade path. Function fingerprints alone do not close #208.
-The 2026-09-08 environment check found no Docker, pg_dump, psql or Supabase CLI,
-and the connected project has only its default main branch. The next prerequisite
-is a disposable pinned Supabase environment plus an authorized schema-export
-connection; do not use the existing main database as an installation test target.
+The owner now has Docker Desktop 4.90.0 / Engine 29.7.2 on macOS arm64, Node
+22.20.0 and npm 11.6.1. Supabase CLI 2.117.0 was selected for the export workflow.
+The supplied `kajo-schema.sql` is available as the conversation attachment
+(SHA-256 `3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e`).
+Do not request another export or commit this unreviewed hosted DDL as canonical.
+
+The complete unchanged export loaded into two independent PGlite 0.3.14 databases:
+30 empty application tables, all with RLS enabled, 205 constraints, 19 policies,
+123 functions. All 123 function definitions/owners/direct ACLs matched a fresh
+read-only hosted snapshot. This proves export-to-hosted function parity, not
+canonical repository parity for the remaining 118 functions or other objects.
+
+Exact next work:
+
+1. Start an empty local Supabase stack on the owner's Mac in the separate export
+   directory using CLI 2.117.0; retain its image/version evidence.
+2. Reconcile exported DDL against repository sources. Prepare reviewed separate
+   supplements for `auth.users`'s `provision_kajo_personal_profile` trigger and
+   deterministic system seeds from SleepLayer source migrations. Account for
+   platform event triggers, especially hosted `ensure_rls` calling
+   `private.rls_auto_enable`, without overwriting platform-owned objects blindly.
+3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
+   run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
+   database's independent forward-upgrade path before closing #208.
+
+The export omits the Auth trigger, all event triggers, PredictorGenome and
+PolicyAssignment rows. It is not yet an accepted installation baseline. The
+connected hosted project has only main; never use it as an installation target.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 

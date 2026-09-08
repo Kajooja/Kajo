@@ -110,6 +110,43 @@ patches. All five definitions/owners/ACLs matched hosted truth. The earlier
 four-function checkpoint remains historical; 118 other functions and all
 non-function schema/installation gates remain unverified by this comparison.
 
+## Owner-supplied export diagnostic — 2026-09-08
+
+The owner supplied a CLI 2.117.0 public/private schema export with SHA-256
+`3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e`.
+The original remains an attachment; it is not promoted to canonical repository DDL.
+
+```bash
+node scripts/database/schema-export-diagnostic.mjs /path/to/kajo-schema.sql 3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e /tmp/export-functions.json
+```
+
+This executes the whole file unchanged in two disposable PGlite databases, using
+explicit signature-only Auth fixtures. It rejects checksum mismatch, SQL errors,
+nonempty application tables and differences between function snapshots/inventory.
+The optional output must not exist. It does not connect to any hosted database.
+
+Observed: 30 empty tables (all RLS-enabled), 205 constraints, 19 policies and 123
+functions. Both installations matched; all 123 exported function definitions,
+owners and direct ACLs also matched the live hosted snapshot. This is
+export-to-hosted parity, not proof of canonical repository equivalence or complete
+schema/behavior parity. Inventory counts alone do not compare object definitions.
+
+Required missing pieces confirmed before platform acceptance:
+
+- Auth trigger `provision_kajo_personal_profile` on `auth.users`: present hosted,
+  absent from this schema-filtered export; reconstruct from
+  `20260827173000_auth_identifier_and_profile_fix.sql` through reviewed supplement.
+- Platform event triggers: none exported. Hosted includes `ensure_rls` invoking
+  `private.rls_auto_enable` and six extension-owned platform triggers. Reconcile
+  against the actual pinned Supabase stack rather than copying blindly.
+- System seeds: `private.predictor_genomes` and `private.policy_assignments` are
+  empty. Reconstruct reviewed defaults from `20260904170000_sleep_layer_v1_foundation.sql`
+  and subsequent applicable migrations; never copy live learning/history rows.
+
+The owner now has a Docker-capable Mac. Next run real empty Supabase installation
+tests after source reconciliation and supplements; the PGlite diagnostic does not
+close #208 and does not repair chronological migration replay.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.
