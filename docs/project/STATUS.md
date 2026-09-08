@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-07**  
+Last updated: **2026-09-08**
 Current milestone: **MVP 0.1 — first public Kajo**  
 Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -78,10 +78,11 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 
 ### Next task now
 
-Active continuation branch: `test/208-function-schema-parity` (based on accepted
-`main` `32a3a3f`, #208 follow-up). Review/merge this diagnostic work through its PR
-before starting another branch. PR #212 and planning PR #216 are already merged;
-older sprint statements that they are open are historical checkpoints.
+PR #217 is accepted and merged at `42d605a`; CI #371 passed. PR #212 and planning
+PR #216 are also merged; older open-PR statements are historical checkpoints.
+Current follow-up: `test/208-v1-definition-parity`, based on `42d605a`. If its PR
+is open, continue that branch; if merged, proceed with the environment prerequisite
+below rather than repeating function fingerprint checks.
 
 Read-only 2026-09-07 verification: hosted PostgreSQL 17.6 exposes 123 public/private
 function/procedure fingerprints. The four functions defined in the latest bootstrap
@@ -89,12 +90,21 @@ migration match repository fixture definitions, owners and direct ACLs exactly.
 The new comparator detects body/configuration/ownership/permission/missing-function
 drift; usage and scope are in ADR-0006. No hosted schema/history changed.
 
+Read-only 2026-09-08 follow-up also verified the complete reconstructed
+`private.rank_items_v1_internal` definition, owner and ACL against hosted truth.
+All five checked functions match, including the V1 policy/trace implementation;
+this is definition parity, not execution/quality or complete schema acceptance.
+
 The full schema-only export and repeatable pinned Supabase installation remain
 blocked here by absent Docker/pg_dump and a configured direct export connection.
 Next use an export-capable environment for ADR-0006 steps 2–5: capture schema-only
 DDL, reconcile all differences (including the remaining functions, tables/RLS/ACL,
 Auth/platform triggers and system seeds), then verify two empty installs and the
 independent forward-upgrade path. Function fingerprints alone do not close #208.
+The 2026-09-08 environment check found no Docker, pg_dump, psql or Supabase CLI,
+and the connected project has only its default main branch. The next prerequisite
+is a disposable pinned Supabase environment plus an authorized schema-export
+connection; do not use the existing main database as an installation test target.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 
