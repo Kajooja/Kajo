@@ -22,6 +22,7 @@ try {
   const seeds = sleep.slice(start, end + "where genome.genome_key = 'prediction-v1-baseline';".length);
   assert.equal((seeds.match(/^insert into /gm) ?? []).length, 3);
   const smoke = await readFile(new URL('bootstrap-ranking.hosted-smoke.sql', import.meta.url), 'utf8');
+  const sharedSmoke = await readFile(new URL('shared-install-smoke.sql', import.meta.url), 'utf8');
   assert.equal((smoke.match(/^begin;$/gm) ?? []).length, 1);
   assert.ok(smoke.trimEnd().endsWith('rollback;'));
   // One outer transaction includes export, supplements and unchanged smoke body.
@@ -55,6 +56,7 @@ begin
   end if;
 end;
 $auth_probe$;
+${sharedSmoke}
 ${smoke.replace(/^begin;$/m, '-- Outer transaction already active.')}
 do $rollback_probe$
 begin

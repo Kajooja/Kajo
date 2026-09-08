@@ -35,6 +35,7 @@ try {
     'psql finished without the expected probe result');
   console.log('KAJO LOCAL INSTALL PROBE PASS - all probe changes rolled back');
   console.log('Verified: Auth provisioning, authenticated V1 bootstrap ranking, import removal, outsider denial, persisted trace version.');
+  console.log('Verified: Shared member ranking, aggregate explanation, outsider/revoked-member denial, Shared trace versions.');
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

@@ -110,11 +110,12 @@ canonical repository parity for the remaining 118 functions or other objects.
 
 Exact next work:
 
-1. Owner confirmed that local Supabase started successfully on the Mac. Run the
-   rollback-only probe with `scripts/database/run-local-install-probe.mjs` against
-   the supplied export (usage in ADR-0006). Capture PASS/error and image identity.
-   The runner requires exactly one local Docker Desktop Supabase database and
-   empty Auth/public/private tables. PGlite smoke passed; Mac execution is pending.
+1. Owner reported PASS for the original rollback-only Personal/Auth probe on
+   2026-09-08, using Supabase Postgres `17.6.1.167`; exact image evidence is in
+   ADR-0006. Do not repeat that completed probe. The same #219 branch now adds
+   Shared member ranking, aggregate-only explanation, outsider/revoked-member
+   denial and versioned Shared traces. The expanded probe passed twice in PGlite;
+   its Mac execution is pending and is distinct from the accepted original run.
 2. Reconcile exported DDL against repository sources. Prepare reviewed separate
    supplements for `auth.users`'s `provision_kajo_personal_profile` trigger and
    deterministic system seeds from SleepLayer source migrations. Account for

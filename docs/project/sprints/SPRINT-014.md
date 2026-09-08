@@ -395,3 +395,19 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - Owner confirmed CLI 2.117.0 local Supabase starts on Mac. Same #219 branch now includes a Mac-only local Docker runner and exact-export probe builder; no additional dependency.
 - Temporarily loads schema, canonical Auth trigger and three SleepLayer seed statements, verifies automatic PersonalProfile membership, runs authenticated bootstrap V1/import-removal/outsider/trace smoke, then rolls back the entire experiment. Existing Auth/application tables prevent execution.
 - Full probe passed twice in PGlite; rollback restored empty state. Nonempty-database guard preserved an existing test table/row. Mac/platform execution is pending. Probe seeds are not a deterministic baseline bundle; Shared/platform/upgrade/replay gates remain open.
+
+### Owner Mac result and Shared probe extension — 2026-09-08
+
+- Owner reported original #219 probe PASS on local Supabase Postgres 17.6.1.167;
+  all changes rolled back. ADR-0006 retains exact image ID and scope. This
+  supersedes the preceding pending-Mac statement for the original probe only.
+- Expanded rollback-only probe covers both accepted Shared members, aggregate-only
+  explanation without member/PersonalProfile IDs, outsider and revoked-member
+  denial, and exactly two versioned Shared traces. Synthetic membership setup does
+  not validate invitations/consent or recommendation quality.
+- Expanded full export + Auth + Shared + Personal probe passed twice in PGlite;
+  expanded Mac run remains pending. No historical migration or hosted data changed.
+- Next continue export/source reconciliation and deterministic seed supplements;
+  complete pinned installs/platform/forward-upgrade gates remain open under #208.
+- Validation: `npm run check` passed lint, TypeScript, mobile/catalog/database
+  tests and iOS/Android bundle smoke. Expanded export probe passed separately twice.

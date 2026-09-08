@@ -173,9 +173,26 @@ The seed statements retain their original ID/time defaults in this experiment;
 this is not the final deterministic seed bundle. No platform event trigger is
 recreated or disabled. Two sequential PGlite runs passed, including empty-state
 restoration; an existing table/data guard rejected execution and preserved data.
-Real Docker/platform results are still pending and must be recorded before
-claiming that acceptance. SharedProfile, complete canonical schema comparison,
-repeatable installed baseline, and forward-upgrade gates remain open.
+Owner-reported original probe result on 2026-09-08: PASS, with all changes rolled
+back. Runtime: local Docker Desktop macOS arm64, CLI 2.117.0; image
+`public.ecr.aws/supabase/postgres:17.6.1.167`, image ID
+`sha256:6942962433a569e87f228b4d4ab7e11db5deca64e43babb3a038443ad6c4f1bb`.
+The report verifies Auth provisioning, authenticated Personal V1 bootstrap ranking,
+import removal, outsider denial and persisted trace version. It is owner-reported
+execution of the original probe at #219 head `4ba1fe9`, not agent-run Docker proof.
+
+The expanded probe additionally loads `scripts/database/shared-install-smoke.sql`
+inside the same transaction before the Personal smoke. Synthetic accepted members
+both rank through public V1; the common-fit explanation must have two members,
+aggregate-only privacy, no copied evidence flag and no member/PersonalProfile IDs.
+Outsider and removed-member calls must fail with insufficient privilege. Exactly
+two versioned Shared traces must exist; denied calls must add none. Membership
+fixtures bypass invitation creation deliberately: invitation/consent lifecycle and
+statistical ranking quality are not covered. The expanded probe passed twice in
+PGlite with rollback, but has not yet run on the owner's Mac.
+
+Complete canonical schema comparison, deterministic seeds, platform event-trigger
+reconciliation, repeatable installed baseline and forward-upgrade gates remain open.
 
 ## Alternatives considered
 
