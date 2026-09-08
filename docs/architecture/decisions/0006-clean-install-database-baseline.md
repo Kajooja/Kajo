@@ -62,6 +62,47 @@ The first delivered part is the historical integrity check in `npm run check`.
 No baseline SQL, seed bundle, deployment switch or accepted recovery procedure is
 delivered by this ADR. Next perform the schema-only capture and difference review.
 
+## Function parity diagnostic — 2026-09-07
+
+`scripts/database/function-schema-snapshot.sql` is a read-only catalog query for
+public/private functions and procedures. It returns qualified identities, SHA-256
+of `pg_get_functiondef`, owners and direct ACLs (including implicit defaults).
+It fixes the deparser search path to `pg_catalog`, preserves all body whitespace
+(including string literals), resolves role names rather than comparing database
+OIDs, and exports neither function bodies nor application records.
+
+Run the complete SQL transaction on each database with an authorized administrative
+reader and save the single `snapshot` JSON value. Compare with:
+
+```bash
+node scripts/database/function-schema-parity.mjs /tmp/expected.json /tmp/actual.json
+```
+
+Exit codes: 0 = exact match within this scope, 1 = differences, 2 = invalid/empty
+input or incompatible PostgreSQL major versions. Input row/ACL order is irrelevant;
+overloads remain separate. A matching name alone never establishes code parity.
+Review differences rather than normalizing away function text or ownership changes.
+
+For the four functions defined by `20260907155201_bootstrap_personal_ranking.sql`,
+the existing isolated regression fixture can also produce a scoped reference:
+
+```bash
+KAJO_BOOTSTRAP_SCHEMA_SNAPSHOT=/tmp/bootstrap-functions.json node --test scripts/database/bootstrap-ranking.test.mjs
+```
+
+The output path must not already exist. Compare only the same four explicit
+identities from the hosted snapshot, and report the four-function scope. The
+fixture is PGlite 0.3.14 / PostgreSQL 17; it is not a complete installation.
+
+The first read-only hosted check captured 123 function/procedure fingerprints
+(40 public, 83 private) on PostgreSQL 17.6. The four bootstrap functions matched
+repository fixtures in definition, owner and ACL. Raw hosted snapshots are not
+committed or accepted as canonical source. This result does not cover the other
+119 functions, tables, constraints, RLS, schema privileges, role inheritance,
+default privileges for future objects, Auth/platform event triggers or system
+seeds. It does not repair migration tracking, replace the schema-only export, or
+close #208 / MVP-ALG-009.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.

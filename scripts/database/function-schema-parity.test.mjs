@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import test from 'node:test';
+import { PGlite } from '@electric-sql/pglite';
+import { compareFunctionSchemas } from './function-schema-parity.mjs';
+
+test('function schema diagnostic detects code, configuration, ownership and grant drift', async () => {
+  const db = new PGlite();
+  const sql = await readFile(new URL('function-schema-snapshot.sql', import.meta.url), 'utf8');
+  const snapshot = async () => (await db.exec(sql)).find(result => result.rows[0]?.snapshot)?.rows[0].snapshot;
+  try {
+    await db.exec(`create schema private; create role diagnostic_reader;
+      create function private.example(n integer) returns text language sql as $$ select 'a  b'::text $$;
+      create function private.example(n text) returns text language sql as $$ select n $$;`);
+    const baseline = await snapshot();
+    assert.equal(baseline.functions.length, 2);
+    assert.equal(JSON.stringify(baseline).includes('a  b'), false);
+    assert.equal(compareFunctionSchemas(baseline, await snapshot()).status, 'MATCH');
+    const reordered = structuredClone(baseline);
+    reordered.functions.reverse().forEach(row => row.acl.reverse());
+    assert.equal(compareFunctionSchemas(baseline, reordered).status, 'MATCH');
+    await db.exec(`create or replace function private.example(n integer) returns text language sql as $$ select 'a b'::text $$;`);
+    assert.deepEqual(compareFunctionSchemas(baseline, await snapshot()).changed[0].fields, ['definitionSha256']);
+    const changedBody = await snapshot();
+    await db.exec(`alter function private.example(integer) security definer;
+      alter function private.example(integer) set search_path = pg_catalog;`);
+    assert.deepEqual(compareFunctionSchemas(changedBody, await snapshot()).changed[0].fields, ['definitionSha256']);
+    const configured = await snapshot();
+    await db.exec('revoke execute on function private.example(integer) from public');
+    assert.deepEqual(compareFunctionSchemas(configured, await snapshot()).changed[0].fields, ['acl']);
+    const restricted = await snapshot();
+    await db.exec('grant execute on function private.example(integer) to diagnostic_reader with grant option');
+    assert.deepEqual(compareFunctionSchemas(restricted, await snapshot()).changed[0].fields, ['acl']);
+    const granted = await snapshot();
+    await db.exec('alter function private.example(integer) owner to diagnostic_reader');
+    assert.ok(compareFunctionSchemas(granted, await snapshot()).changed[0].fields.includes('owner'));
+    await db.exec('drop function private.example(text)');
+    assert.equal(compareFunctionSchemas(baseline, await snapshot()).missing.length, 1);
+    assert.equal(compareFunctionSchemas(await snapshot(), baseline).unexpected.length, 1);
+    assert.throws(() => compareFunctionSchemas(baseline, { ...baseline, serverMajor: 999 }), /major/);
+    assert.throws(() => compareFunctionSchemas(baseline, { ...baseline, functions: [] }), /empty/);
+    assert.throws(() => compareFunctionSchemas(baseline, { ...baseline, functions: [baseline.functions[0], baseline.functions[0]] }), /Duplicate function/);
+    const invalid = structuredClone(baseline);
+    invalid.functions[0].acl = [{ grantee: 'PUBLIC' }];
+    assert.throws(() => compareFunctionSchemas(baseline, invalid), /ACL/);
+    await db.exec('revoke all on function private.example(integer) from diagnostic_reader');
+    const noGrants = await snapshot();
+    assert.deepEqual(noGrants.functions[0].acl, []);
+    assert.equal(compareFunctionSchemas(noGrants, noGrants).status, 'MATCH');
+  } finally { await db.close(); }
+});
