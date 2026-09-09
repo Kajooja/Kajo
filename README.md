@@ -16,6 +16,8 @@ Current project state: [`docs/project/STATUS.md`](docs/project/STATUS.md)
 
 Current MVP scope: [`docs/product/MVP.md`](docs/product/MVP.md)
 
+The first public release includes the Taste-first link → anonymous learning → account conversion → Friend → explicit SharedProfile loop. Its runtime and release acceptance remain open; see [`STATUS.md`](docs/project/STATUS.md).
+
 ## Development quick start
 
 Prerequisites:
@@ -39,3 +41,5 @@ npm run check     # lint + typecheck + tests + iOS/Android bundle smoke checks
 ```
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.
+
+For database setup, first read the [current installation decision](docs/project/STATUS.md#remaining-decision-and-exact-next-implementation) and [ADR-0006](docs/architecture/decisions/0006-clean-install-database-baseline.md). Unmodified historical migration replay currently fails; the tested source-derived fresh-install proposal has not yet been adopted as the canonical installer.

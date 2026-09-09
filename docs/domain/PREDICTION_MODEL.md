@@ -492,7 +492,7 @@ The forward correction versions the extended base as `prediction-v0.4-bootstrap`
 
 Memory and serving reuse the same strongest-active-per-Item bootstrap selection, canonical evidence weights and bootstrap age decay. Bootstrap contributes only to LongTerm, never native ShortTerm or native confidence. Authorized Shared common-fit still reads Personal memory summaries; Shared base does not consume copied Personal bootstrap rows. Removing/replacing a source recomputes current influence; the mobile success boundary invalidates mounted ranking requests.
 
-This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. SQL function fixtures and mobile regression tests are initial evidence; full Supabase replay/public V1/device acceptance remain required.
+This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. PR #210 merged the correction and recorded bounded hosted public V1 smoke evidence; PR #219 added public V1 runtime checks on independent isolated Supabase installations. Unmodified chronological replay still fails, and configured-device/first-session recommendation-quality acceptance remains open. See [STATUS.md](../project/STATUS.md) for the exact remaining #207/#208 gates.
 
 ## 12. Representation roadmap: what Kajo borrows from modern systems
 
@@ -751,7 +751,7 @@ Hard guardrails:
 
 ### 13.12 Memory consolidation during sleep
 
-The owner's dream/subconscious/DNA metaphor is retained as the future direction in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#fut-alg-001--evidence-gated-evolution--planned-automatic-promotion-conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
+The owner's dream/subconscious/DNA metaphor is retained as the future direction in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#14-fut-alg-002--evidence-gated-evolutionengine-expansion--planned--conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
 
 The SleepLayer also consolidates memory without rewriting evidence:
 
@@ -894,14 +894,14 @@ Kajo uses privacy by design:
 - retention is purpose-specific, documented and reviewable,
 - population datasets need deletion lineage and minimum cohort thresholds.
 
-Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#data-lifecycle-and-retention-gate). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission.
+Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#17-retentiondeletion). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission.
 
 ## 17. MVP V1 implementation
 
 `public.rank_items_v1` is the accepted nervous-system serving boundary:
 
 ```text
-private V0.3 baseline candidate generator
+private prediction-v0.4-bootstrap baseline candidate generator
   -> assigned-genome scalar policy reranker
   -> resurfacing-v1 eligibility/classification
   -> same-Profile ScenarioMemory scoring
@@ -910,7 +910,7 @@ private V0.3 baseline candidate generator
   -> immutable PredictionRun + complete PredictionCandidate trace
 ```
 
-The baseline genome preserves exact V0.3 behavior before the resurfacing eligibility layer. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
+The baseline genome preserves its scalar policy controls; the current base includes the forward bootstrap correction from #207/PR #210. Earlier V0.3 descriptions are historical checkpoints. This version update does not establish serving/shadow equivalence. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
 
 The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Personal policy version is `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`.
 
@@ -928,7 +928,7 @@ Known V1 limits:
 
 ## 18. Required MVP algorithm completion contract
 
-Status: **required target, implementation open as of 2026-09-07**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#remaining-execution-order--product-decision-2026-09-07).
+Status: **required target; partial implementation, acceptance open as of 2026-09-09**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy).
 
 ### One feature and policy definition
 
@@ -954,7 +954,7 @@ Bound request/slate size, memory and queries; support continuation through a fro
 - Common normalized features allow BOOK/MOVIE transfer, while domain metadata and transfer reliability prevent false equivalence. Preserve evidence strengths, not only top-tag names. Missing features yield a neutral bounded fallback.
 - Begin with a transparent bounded context-dependent weighting rule over these states; compare it with a static baseline. Learned gating may later replace it behind the same versioned contract.
 - FOR_YOU optimizes supported fit; SURPRISE adds relevant novelty; RISK allocates bounded exploration to relevant uncertain candidates. Deterministic hash jitter alone is not evidence of epistemic uncertainty. Log propensities if stochastic selection is introduced.
-- Calibration balances recognizability, feature coverage and information gain within the accepted six-known/12-to-24 UX. Measure skips and completion, not just number of stored ratings.
+- The implemented logged-in `cold-start-v1` calibration uses six known ratings within a 12-to-24 slate. The planned anonymous adaptive Taste Test has its own versioned stopping/support rules and held-out challenge in [LAUNCH_LOOP.md](../product/LAUNCH_LOOP.md); do not transfer the six-rating gate or claim adaptive selection is already delivered. Measure recognizability, information gain, skips and completion, not just stored ratings.
 
 SharedProfile retains its own joint history and same-Profile Scenarios. Authorized member fit is a bounded aggregate input; leaving/deletion removes access and invalidates derived dependencies. Shared learned state is never merely the average of members or a copy of Personal Events.
 

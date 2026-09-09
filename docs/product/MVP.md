@@ -60,7 +60,7 @@ Commercial monetization, public stranger discovery, dating, extra production dom
 - [x] `MVP-NAV-001` Persistent Kajo mark returns to the currently active Profile Room.
 - [x] `MVP-NAV-002` Persistent bottom dock exposes menu + Inbox without conventional multi-tab navigation.
 - [x] `MVP-NAV-003` Drawer owns Profile switching plus Profile/Lists/Groups destinations without duplicate/dead entries.
-- [x] `MVP-NAV-004` Bottom-center Profile identity opens the accepted lightweight SharedProfile quick switcher.
+- [x] `MVP-NAV-004` Bottom-center Profile identity returns to the active Room from other routes and opens the accepted lightweight Profile quick switcher when already home.
 - [ ] `MVP-NAV-005` Canonical Groups/Profile surface filters only already-authorized Profile names; unrelated/private Profiles are never exposed.
 
 ## Discovery

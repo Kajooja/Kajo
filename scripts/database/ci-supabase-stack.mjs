@@ -12,6 +12,19 @@ const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
 const imageId = 'sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f';
 
+// Return fixed diagnostic labels only: CLI output can include local credentials.
+// These are observed symptoms, not a claimed root cause or an automatic retry rule.
+export function classifySupabaseStartFailure(output) {
+  const signals = [
+    ['image-download', /failed to pull|pull access denied|manifest unknown|toomanyrequests|error pulling/i],
+    ['port-binding', /address already in use|port is already allocated|ports are not available/i],
+    ['container-health', /unhealthy|health check failed|failed to become healthy/i],
+    ['resource-pressure', /no space left|out of memory|cannot allocate memory/i],
+    ['network', /connection refused|connection reset|network is unreachable|TLS handshake timeout|i\/o timeout|temporary failure in name resolution/i],
+  ].filter(([, pattern]) => pattern.test(output)).map(([label]) => label);
+  return signals.length ? signals : ['unclassified'];
+}
+
 export function verifyCiPostgresImage(image) {
   const [reference, digest, ...extra] = image.split(' ');
   assert.equal(extra.length, 0, 'Unexpected Docker image identity format');
@@ -43,6 +56,9 @@ export async function withCiSupabaseStack(projectId, work) {
       // SQL is repository-owned metadata/probe input. CLI output can contain
       // development keys/connection strings, so is never logged here.
       let detail = command === 'docker' && args.includes('psql') ? `: ${result.stderr.trim().slice(-3000)}` : '';
+      if (command === 'npx' && args.includes('start')) {
+        detail = `: start signals=${classifySupabaseStartFailure(result.stdout + '\n' + result.stderr).join(',')}; raw CLI output withheld`;
+      }
       if (command === 'npx' && args.includes('reset')) {
         // Reset diagnostics include only SQL error/flag lines, not CLI status
         // output with development connection strings or keys.

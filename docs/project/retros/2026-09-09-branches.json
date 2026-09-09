@@ -1,0 +1,1132 @@
+{
+  "reviewed_main": "0b2e8d76d453890689023e60493d04fe134262cb",
+  "issue": 220,
+  "date": "2026-09-09",
+  "branches": [
+    {
+      "branch": "chore/131-sprint-009-acceptance-update",
+      "sha": "f0c9f6ca993d13d3180a49c59e6044a66d5b7704",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "chore/16-validation-hygiene",
+      "sha": "76bec27bb146bfbb97df998dcc51c1560bbfe0a2",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        17
+      ]
+    },
+    {
+      "branch": "chore/35-sprint-005-acceptance-handoff",
+      "sha": "566cde3f1e1760f1f9873d884cece1c5309f1831",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        36
+      ]
+    },
+    {
+      "branch": "chore/67-configured-acceptance-build",
+      "sha": "847c070aea2e629e62721e4080de2e286c096a6d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        68
+      ]
+    },
+    {
+      "branch": "chore/close-sprint-008-home-logo",
+      "sha": "a5d33d05e4ec0840bb35fc98487ceb6ad3bbc370",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        112
+      ]
+    },
+    {
+      "branch": "chore/sprint-010-handoff",
+      "sha": "7bf84b83b7a21ec5f327a339ea23577277866d3f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        144
+      ]
+    },
+    {
+      "branch": "chore/sprint-012-handoff-hygiene",
+      "sha": "f67d6516073dc50f82971179b4b8b52c585ca150",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        172
+      ]
+    },
+    {
+      "branch": "ci/22-android-apk",
+      "sha": "c27edd4721deafa11a4b99b0ab807faf54bbe49d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        23
+      ]
+    },
+    {
+      "branch": "docs/10-close-sprint-002",
+      "sha": "f4f1ce3475b8584702df523c0c278482215f9628",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        11
+      ]
+    },
+    {
+      "branch": "docs/125-shared-acceptance-status",
+      "sha": "d0a05b3f0d7d62b648d61d416f11db767081d14d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        126
+      ]
+    },
+    {
+      "branch": "docs/134-shared-kajo-acceptance-update",
+      "sha": "493937972d2a7b0101020b13ddab3d29f53679b7",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        135
+      ]
+    },
+    {
+      "branch": "docs/139-mvp-navigation-lists-roadmap",
+      "sha": "198df77d78144a1f65a5791e2b1b39e7a93b1df3",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        140
+      ]
+    },
+    {
+      "branch": "docs/14-close-sprint-003",
+      "sha": "8ffc0796ac794bdbe4520bbc8addc500376d1ba9",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        15
+      ]
+    },
+    {
+      "branch": "docs/148-sprint-010-status",
+      "sha": "9d25f2c2afdeeaf414f8bbe98836896a40436a57",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        148
+      ]
+    },
+    {
+      "branch": "docs/152-shared-endorsement-model",
+      "sha": "c9dd270dfad968d5286171eb5c55edd8d8330660",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        153
+      ]
+    },
+    {
+      "branch": "docs/154-room-direction-sprint-011",
+      "sha": "f92bac98c7a40aa6d7dc465c755faa99e49c4742",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        155
+      ]
+    },
+    {
+      "branch": "docs/156-accept-13b-device-gate",
+      "sha": "a23ee4dd5afaab6e61400dc548833c431277d083",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        176
+      ]
+    },
+    {
+      "branch": "docs/177-main-handoff",
+      "sha": "0c8eaa33031dc2601ec00162d3ec1de06cfd1587",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        195
+      ]
+    },
+    {
+      "branch": "docs/182-catalog-device-handoff",
+      "sha": "6d9134ec8445d567d7b62d9095f68b0d106a81fa",
+      "reason": "reachable-from-main",
+      "prs": [
+        206
+      ]
+    },
+    {
+      "branch": "docs/182-open-library-beta-handoff",
+      "sha": "95afb018a9b1ac887de98e2f596c86cb25e8b353",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        197
+      ]
+    },
+    {
+      "branch": "docs/185-accept-cold-start-merge",
+      "sha": "7d462d04d702f132cbceb2d716d8260527f9dbd3",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        193
+      ]
+    },
+    {
+      "branch": "docs/20-sprint-004-runtime-handoff",
+      "sha": "cc9b5b4010f0d205d7601c85d7a2d2cb9759bfa9",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        21
+      ]
+    },
+    {
+      "branch": "docs/215-taste-first-launch-loop",
+      "sha": "1b549708c648e4584bd49f4ec10327e1c3014e04",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        216
+      ]
+    },
+    {
+      "branch": "docs/28-close-sprint-004",
+      "sha": "3d45429834d762f63f83fef19badefe12719da8a",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        29
+      ]
+    },
+    {
+      "branch": "docs/4-close-sprint-001",
+      "sha": "25c4aad85e530453ac46b1381abf709ea45aff9f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        5
+      ]
+    },
+    {
+      "branch": "docs/41-device-feedback-handoff",
+      "sha": "59f08a67d5e76f3f8801175cb35c56d25eafa853",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        42
+      ]
+    },
+    {
+      "branch": "docs/43-device-feedback-handoff",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/49-sprint-005-final-apk-handoff",
+      "sha": "ca7e227ffc09bf16bd95dc6b2ef716e0be85af1e",
+      "reason": "reachable-from-main",
+      "prs": [
+        50
+      ]
+    },
+    {
+      "branch": "docs/53-ci77-apk-handoff",
+      "sha": "7c2a934d76a567adc32fad3aaa390c8760e41f84",
+      "reason": "reachable-from-main",
+      "prs": [
+        54
+      ]
+    },
+    {
+      "branch": "docs/55-close-sprint-005-open-006",
+      "sha": "742da9a34aed9ea6fe1ac58871a04625997b68e6",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        56
+      ]
+    },
+    {
+      "branch": "docs/69-ci96-phone-handoff",
+      "sha": "24aeb5f385e8b28055920e546fc43afb2ada5ea5",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        71
+      ]
+    },
+    {
+      "branch": "docs/69-sprint-006-acceptance-handoff",
+      "sha": "a7d11250e6b091594ee81924c2187381e48e3c37",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        70
+      ]
+    },
+    {
+      "branch": "docs/72-auth-deploy-handoff",
+      "sha": "07c343b32907b641f750b2d2ea0d6423f9fc7fab",
+      "reason": "reviewed-superseded-draft",
+      "prs": [],
+      "review": "Superseded by accepted Sprint 006 deployment/device record and PRs #76–84.",
+      "superseded_by": "3f7d79018d8bbdeacaec01e472e57b8d62d83d0c"
+    },
+    {
+      "branch": "docs/89-deployment-handoff",
+      "sha": "ba5e95f43063a1d67aec419c5b088d92bcdef86f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        92
+      ]
+    },
+    {
+      "branch": "docs/bootstrap-project-memory",
+      "sha": "0c71a5fd2992f96d13e6300b06e02a9773163ddc",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        1
+      ]
+    },
+    {
+      "branch": "docs/close-sprint-006",
+      "sha": "8b42376d51fe2158687e90a9af2e3dd9aa65c115",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        86
+      ]
+    },
+    {
+      "branch": "docs/close-sprint-007",
+      "sha": "d36f9362ce969c234bc200f602f5036958b6a034",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        96
+      ]
+    },
+    {
+      "branch": "docs/complete-event-foundation",
+      "sha": "08c45e34fadb066c19d1a238f1b37e66e6314516",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        90
+      ]
+    },
+    {
+      "branch": "docs/device-feedback-handoff",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-2",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-3",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-4",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-5",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-6",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-final",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-issue39",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-issue40",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/device-feedback-handoff-issue41",
+      "sha": "cda85b7ac1402caabf9f5b55d0932648bba90af6",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "docs/long-term-product-queue",
+      "sha": "d6938dcb07040c3ab61d44ced6ff7572690cba16",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        214
+      ]
+    },
+    {
+      "branch": "docs/record-feedback-model",
+      "sha": "8fba0b8c24bdf0c385f7faba1c64c2218a4999ae",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        104
+      ]
+    },
+    {
+      "branch": "docs/store-ready-mvp-roadmap",
+      "sha": "1ef871c3757ca2dd004e79299b409c95e9e1c2c2",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        187
+      ]
+    },
+    {
+      "branch": "feat/100-global-discovery-mode-bar",
+      "sha": "17168575fcd564c14084f2388d64bf51074ad39d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        105
+      ]
+    },
+    {
+      "branch": "feat/101-feedback-slider",
+      "sha": "7878770d6845007c57b65d21006cdaf295e86f18",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        107
+      ]
+    },
+    {
+      "branch": "feat/101-feedback-state-foundation",
+      "sha": "ef58ad30e8e18adf7f95bc386672948d74a4e0ea",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        106
+      ]
+    },
+    {
+      "branch": "feat/101-prediction-feedback-scoring",
+      "sha": "8fe95b6602b2b79e79747c4e4690acaf2f7caa6d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        109
+      ]
+    },
+    {
+      "branch": "feat/102-profile-lists",
+      "sha": "a316580e1ea2542d82a9bb7d9a72f06bee615de0",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        161
+      ]
+    },
+    {
+      "branch": "feat/102-shared-list-approval",
+      "sha": "c8b074ca704074e84f945dd9d140ba6d7aef2cd7",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        164
+      ]
+    },
+    {
+      "branch": "feat/103-discovery-cooldown-catalog",
+      "sha": "8eb2e03563799f503e5d8689949de324e46e9779",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        110
+      ]
+    },
+    {
+      "branch": "feat/111-shared-profile-membership",
+      "sha": "0849b2cfe063e93224345c3ccc262d2b16b9b1f8",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        113
+      ]
+    },
+    {
+      "branch": "feat/115-active-profile-context",
+      "sha": "737ae4c9235a0f863fbc0e3091222e4597f946b7",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        116
+      ]
+    },
+    {
+      "branch": "feat/117-shared-kajo-room-flow",
+      "sha": "d4ec3bd986a7f85b528b4ed5405209f2e26e6884",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        120
+      ]
+    },
+    {
+      "branch": "feat/118-shared-profile-mutations",
+      "sha": "d4c8f8673765b6a397334573ef1b18197f38b3e2",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        119
+      ]
+    },
+    {
+      "branch": "feat/12-curtain-theme",
+      "sha": "3850d722be239de432bcdfb757f790acd865a3c9",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        13
+      ]
+    },
+    {
+      "branch": "feat/121-shared-room-theme",
+      "sha": "3d4a9f98d65de75de9ccde5ca66b94a2eed70160",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        122
+      ]
+    },
+    {
+      "branch": "feat/123-shared-item-suggestion",
+      "sha": "304ec68a1ea6ef540314e253cd997fb1c6e89533",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        124
+      ]
+    },
+    {
+      "branch": "feat/128-shared-profile-invitations",
+      "sha": "e130f07cd8d8e3e4a7e979aff3c2501ee72559d9",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        131
+      ]
+    },
+    {
+      "branch": "feat/129-profile-switcher-inbox",
+      "sha": "5b5bf3a521db0ac04cb164bb50afc86f9154d83d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        133
+      ]
+    },
+    {
+      "branch": "feat/136-bottom-dock-navigation",
+      "sha": "5bb77ccc064ec1bb4428c8efeb15e2346bc69f2b",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        142
+      ]
+    },
+    {
+      "branch": "feat/137-profile-lifecycle-limits",
+      "sha": "73f8a9dd91433e1c0e4d88714096d6c3a45262bf",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        145,
+        141
+      ]
+    },
+    {
+      "branch": "feat/138-profile-messaging",
+      "sha": "55653eff9bfa896add9b2a28992d7d05c48d8353",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        165
+      ]
+    },
+    {
+      "branch": "feat/151-member-history-delivery",
+      "sha": "ac8bf6ecd59586149b18ed9517488f832a0b01c3",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        159
+      ]
+    },
+    {
+      "branch": "feat/151-shared-delivery-overlay",
+      "sha": "d3376bcbdfa99a2806535cde84d42412e1a1baff",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        158
+      ]
+    },
+    {
+      "branch": "feat/151-shared-endorsement-backend",
+      "sha": "f8719d86078499943576c76f4b93806744ac2ac6",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        157
+      ]
+    },
+    {
+      "branch": "feat/156-prediction-core-nervous-system",
+      "sha": "3a8058a5643778552caba4d08fc6297f6d3127b7",
+      "reason": "reviewed-superseded-draft",
+      "prs": [],
+      "review": "Integrated at d349a93: 17 of 24 changed files identical; remaining differences preserve integrated UI and update handoff, not missing Prediction behavior.",
+      "superseded_by": "d349a93b5858b05ed19e25f0c95b4e3f43c695fa"
+    },
+    {
+      "branch": "feat/156-sleep-layer-v1",
+      "sha": "7784ae3dfa560a55faffcba03e09c0c42d2ebb61",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        179
+      ]
+    },
+    {
+      "branch": "feat/160-supabase-security",
+      "sha": "0d6a7b9e14bdc18f2d2a0113126e23143a7585f4",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        162
+      ]
+    },
+    {
+      "branch": "feat/174-reacted-item-resurfacing-policy",
+      "sha": "2faa305c1673a863a965e080e494335e9ce7f3e3",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        180
+      ]
+    },
+    {
+      "branch": "feat/175-profile-quick-switcher",
+      "sha": "41bd65995b5a9a53b2c21cc608e0af0cd68119b5",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        181
+      ]
+    },
+    {
+      "branch": "feat/177-shared-common-fit-v1",
+      "sha": "0b5335816ab4abb1346872269afa244755f6721e",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        194
+      ]
+    },
+    {
+      "branch": "feat/18-discovery-ui",
+      "sha": "4a8702b29de472612e0757232f3b39b540994edb",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        19
+      ]
+    },
+    {
+      "branch": "feat/182-curated-beta-catalog",
+      "sha": "3976307aeba4f0f07e095c392ebb56f7aad378d1",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        192
+      ]
+    },
+    {
+      "branch": "feat/182-open-library-beta-expansion",
+      "sha": "676563391f1e7ebaf7e9d88ce49ff7f2829c46a2",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        196
+      ]
+    },
+    {
+      "branch": "feat/182-real-catalog-foundation",
+      "sha": "713e6db92f8cdbf89296dd986c305cbc9114f859",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        188
+      ]
+    },
+    {
+      "branch": "feat/182-real-catalog-importers",
+      "sha": "0334021ecba897fa8ad0e015cffaa4e86b3a6447",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        189
+      ]
+    },
+    {
+      "branch": "feat/185-cold-start-calibration",
+      "sha": "53d60c920ecbb0829f672c2b3f0d89b69c7be501",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        191
+      ]
+    },
+    {
+      "branch": "feat/185-profile-bootstrap-import",
+      "sha": "689587fb5964dce09f5ef5fa6b74e93b06bc8229",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        190
+      ]
+    },
+    {
+      "branch": "feat/2-mobile-foundation",
+      "sha": "6e9238ceab8a09568809fe5235e467f04a75373f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        3
+      ]
+    },
+    {
+      "branch": "feat/204-tmdb-beta-import-orchestrator",
+      "sha": "85899a5ff9451ed393ed9af8a072b0a2a2b68795",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        205
+      ]
+    },
+    {
+      "branch": "feat/32-swipe-history",
+      "sha": "5665c30fdad15f6e36352a4db0326f5deaecf39e",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        33
+      ]
+    },
+    {
+      "branch": "feat/39-global-curtain-control",
+      "sha": "343fabc61b959dd47a6117c65304aca7bf5f2d7b",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        47
+      ]
+    },
+    {
+      "branch": "feat/40-action-undo-auto-advance",
+      "sha": "78bc58045eb0f6d21a8d173f76ae60096957a8f3",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        48
+      ]
+    },
+    {
+      "branch": "feat/57-supabase-foundation",
+      "sha": "f9a2a71afec4347dd7b7783a082d2e87342fb5c7",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        58
+      ]
+    },
+    {
+      "branch": "feat/59-supabase-client-boundary",
+      "sha": "257a7e35ec81386841c523c7a1c75f4f824e4d8b",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        60
+      ]
+    },
+    {
+      "branch": "feat/6-room-shell",
+      "sha": "ab4ba3368ed7f993635aa4d1ee7cdb9937a3f688",
+      "reason": "reviewed-superseded-draft",
+      "prs": [],
+      "review": "Alternate initial Room prototype replaced by merged PR #9; both implement the same two destinations and 2D objects, with no extra domain behavior.",
+      "superseded_by": "6f0e8dc4a031755a174b083b8fc8ba0e90bb2960"
+    },
+    {
+      "branch": "feat/61-email-password-auth",
+      "sha": "89b6b403e13a3cb733c9ec47dc982e748ef3bfbe",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        62
+      ]
+    },
+    {
+      "branch": "feat/63-personal-profile-onboarding",
+      "sha": "b9ae69d1f5ed81148d672080bc359dfd826f954e",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        64
+      ]
+    },
+    {
+      "branch": "feat/65-interaction-persistence",
+      "sha": "baee642b92d7952e51f5ffcdec7e593c5762084f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        66
+      ]
+    },
+    {
+      "branch": "feat/7-room-shell",
+      "sha": "ccb2316921ef820a8b789246bd0facb2900be190",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        9
+      ]
+    },
+    {
+      "branch": "feat/85-event-persistence-foundation",
+      "sha": "570a2c639515762a66073c11f291492fb6481349",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        87
+      ]
+    },
+    {
+      "branch": "feat/89-mobile-event-integration",
+      "sha": "5f6e211e6ffb7c71aa936a57fbeb877a3b0b4b5d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        91
+      ]
+    },
+    {
+      "branch": "feat/95-prediction-v0-scorer",
+      "sha": "5cd75e874d9f8c467a5ce8f2d4399c65ea7d7e72",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        97
+      ]
+    },
+    {
+      "branch": "feat/98-mobile-prediction-integration",
+      "sha": "1fdc3b2d55586b9ac02ff0cc3756f8faf5793f06",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        99
+      ]
+    },
+    {
+      "branch": "feat/minimalist-2d-room",
+      "sha": "4f1f580f002819416f8183e83bc209a900063d1b",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        170
+      ]
+    },
+    {
+      "branch": "feat/shell-loading-polish",
+      "sha": "a0e5e11dd577ae30015848ae3c9d7be1e857bbd8",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        183
+      ]
+    },
+    {
+      "branch": "fix/102-compact-list-like-flow",
+      "sha": "a16395f2efad6e4a67fb4dbfa61ac7bf46cf93d8",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        163
+      ]
+    },
+    {
+      "branch": "fix/111-shared-member-conflict",
+      "sha": "0f0ee2775eb926d3a2fa747daaf607ed61132f18",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        114
+      ]
+    },
+    {
+      "branch": "fix/130-seamless-profile-hydration",
+      "sha": "b8548fc39d8c33df85fe6aec4229ff3495547567",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        132
+      ]
+    },
+    {
+      "branch": "fix/143-nickname-input-limit",
+      "sha": "d889909be71fa21180fbd70cd8743e285b857984",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        147
+      ]
+    },
+    {
+      "branch": "fix/149-room-dock-polish",
+      "sha": "b785b98b81dd9f163f57fce1b09a985393aad658",
+      "reason": "reachable-from-main",
+      "prs": [
+        150
+      ]
+    },
+    {
+      "branch": "fix/156-prediction-v1-hosted-smoke",
+      "sha": "06c6d252ce9582c4ed23024b068d72d17f048b53",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        173
+      ]
+    },
+    {
+      "branch": "fix/199-dense-discovery-image-cache",
+      "sha": "1fdf6f25ea14a5647f2c0f02d0d4b69c83fdc24b",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        202
+      ]
+    },
+    {
+      "branch": "fix/207-bootstrap-personal-ranking",
+      "sha": "f634c73f82f09603bd12755e9874512486adcd5c",
+      "reason": "reachable-from-main",
+      "prs": [
+        210
+      ]
+    },
+    {
+      "branch": "fix/22-android-apk-java-cache",
+      "sha": "e21a28bbd597ff6c755ca48a78743be16f72f512",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        24
+      ]
+    },
+    {
+      "branch": "fix/22-standalone-android-apk",
+      "sha": "ed8af03d403783e9dba0b3d91bf386ba887fd02a",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        25
+      ]
+    },
+    {
+      "branch": "fix/26-expo-worklets-compat",
+      "sha": "62f5414035193c34ddedc76a8a6a145e409733bb",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        27
+      ]
+    },
+    {
+      "branch": "fix/30-curtain-polish",
+      "sha": "2f0a0a6b51c05d7c442c3261d796fe1c72000583",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        31
+      ]
+    },
+    {
+      "branch": "fix/37-stable-swipe-sequence",
+      "sha": "7ce9ba1971a34e6df9a7850f8d6164526df65996",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        38
+      ]
+    },
+    {
+      "branch": "fix/51-card-action-advance-undo",
+      "sha": "85705afd859cd0a543a1db52f99dfb6fae459b38",
+      "reason": "reachable-from-main",
+      "prs": [
+        52
+      ]
+    },
+    {
+      "branch": "fix/72-auth-acceptance",
+      "sha": "e31f67a975f0b8ea65f32bfe74346f1f03f70d7f",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        74
+      ]
+    },
+    {
+      "branch": "fix/72-auth-deep-link-routes",
+      "sha": "60bcfbd53d82b53bbfbcf6c1593477be1ac9f344",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        76
+      ]
+    },
+    {
+      "branch": "fix/72-native-auth-intent",
+      "sha": "43259a650773625323a9a3d179f537630186e38e",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        77
+      ]
+    },
+    {
+      "branch": "fix/72-recovery-otp",
+      "sha": "8d1d8dada0881d1868dfd42161690302f53b9259",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        82
+      ]
+    },
+    {
+      "branch": "fix/72-recovery-signup-brand",
+      "sha": "5235bd7d2a1f93d96bf21ecbf659a7a271af81ba",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        79
+      ]
+    },
+    {
+      "branch": "fix/78-android-logo-png",
+      "sha": "0b204eff41163762f493aac06a549a4019c193be",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        80
+      ]
+    },
+    {
+      "branch": "fix/78-larger-splash-logo",
+      "sha": "4e438718584859a6f083dc2d741ee135fcacfe67",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        81
+      ]
+    },
+    {
+      "branch": "fix/85-event-foreign-key-indexes",
+      "sha": "851a7dcd151d9a856458747e25778ca74ac74abb",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        88
+      ]
+    },
+    {
+      "branch": "fix/auth-dynamic-route-fallback",
+      "sha": "803071b64ccf26d52964909ce4dc71ec17458fea",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        84
+      ]
+    },
+    {
+      "branch": "fix/auth-email-flows",
+      "sha": "48472ce20dc8619d7d5f29bc0362670e1966b121",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        83
+      ]
+    },
+    {
+      "branch": "fix/configured-ux-corrections",
+      "sha": "692c8d61c9cdb4e2408d69fa9884c12502f26a8a",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        108
+      ]
+    },
+    {
+      "branch": "fix/discovery-sidebar-polish",
+      "sha": "96341adb819972651a5ab299714541fac7bba266",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        167
+      ]
+    },
+    {
+      "branch": "fix/fullscreen-room-backdrop",
+      "sha": "0573fa90555920414a638e4483e4dc675990e941",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        168
+      ]
+    },
+    {
+      "branch": "fix/immediate-navigation-room-art",
+      "sha": "7b22f43d344988cf8704622668800792dd548156",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        169
+      ]
+    },
+    {
+      "branch": "fix/mobile-card-loading-and-profile-switcher",
+      "sha": "f0ebb13821dfc9da4db3e6b88f127101b55e2cc7",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        198
+      ]
+    },
+    {
+      "branch": "fix/pre-apk-import-dependency",
+      "sha": "f61208c3e7447f9b1ebeb1cb7546f24004f63d0c",
+      "reason": "reachable-from-main",
+      "prs": [
+        209
+      ]
+    },
+    {
+      "branch": "fix/room-light-profile-load",
+      "sha": "633a13c4bfd047f1b088f09f632fa2ad1b343527",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        171
+      ]
+    },
+    {
+      "branch": "fix/startup-logo-explicit-layout",
+      "sha": "22198614f2d14c7a9e899fca8000ecffdf92f6cb",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        94
+      ]
+    },
+    {
+      "branch": "fix/startup-logo-visible-width",
+      "sha": "13bec9f1c31425e961566b65de52a8d37a9d033d",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        93
+      ]
+    },
+    {
+      "branch": "noop",
+      "sha": "f0c9f6ca993d13d3180a49c59e6044a66d5b7704",
+      "reason": "reachable-from-main",
+      "prs": []
+    },
+    {
+      "branch": "test/208-export-install-diagnostic",
+      "sha": "05512aeb24c9cf64a282a372e3edcd6117658d44",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        219
+      ]
+    },
+    {
+      "branch": "test/208-function-schema-parity",
+      "sha": "9923014618f3451afa7fc57f3040dc1b363f39e6",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        217
+      ]
+    },
+    {
+      "branch": "test/208-migration-history-integrity",
+      "sha": "86c0966b4a279ff91b24eb187cd5dfcb5a0c874e",
+      "reason": "reachable-from-main",
+      "prs": [
+        212
+      ]
+    },
+    {
+      "branch": "test/208-migration-replay-diagnostic",
+      "sha": "97cd3a18d8d9a57654fa8081c08f9127d2a233fe",
+      "reason": "reachable-from-main",
+      "prs": [
+        211
+      ]
+    },
+    {
+      "branch": "test/208-v1-definition-parity",
+      "sha": "36de1fc6b4226cb4283bb215dd2fc84a6467be3e",
+      "reason": "exact-merged-PR-head",
+      "prs": [
+        218
+      ]
+    },
+    {
+      "branch": "tmp",
+      "sha": "f0c9f6ca993d13d3180a49c59e6044a66d5b7704",
+      "reason": "reachable-from-main",
+      "prs": []
+    }
+  ]
+}

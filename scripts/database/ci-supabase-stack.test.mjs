@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { verifyCiPostgresImage } from './ci-supabase-stack.mjs';
+import { classifySupabaseStartFailure, verifyCiPostgresImage } from './ci-supabase-stack.mjs';
 
 test('CI accepts verified Supabase registry aliases but rejects changed content, version or registry', () => {
   const digest = 'sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f';
@@ -10,4 +10,13 @@ test('CI accepts verified Supabase registry aliases but rejects changed content,
   assert.throws(() => verifyCiPostgresImage(`public.ecr.aws/supabase/postgres:17.6.1.167 ${digest.replace('660892', '000000')}`), /content changed/);
   assert.throws(() => verifyCiPostgresImage(`ghcr.io/supabase/postgres:latest ${digest}`), /Unreviewed/);
   assert.throws(() => verifyCiPostgresImage(`unreviewed.invalid/supabase/postgres:17.6.1.167 ${digest}`), /Unreviewed/);
+});
+
+test('failed startup reports bounded symptoms without echoing CLI credentials', () => {
+  const privateOutput = 'postgresql://postgres:synthetic-secret@localhost/postgres key=synthetic-key';
+  assert.deepEqual(classifySupabaseStartFailure(`failed to pull image: connection reset ${privateOutput}`), ['image-download', 'network']);
+  assert.deepEqual(classifySupabaseStartFailure(`port is already allocated ${privateOutput}`), ['port-binding']);
+  assert.deepEqual(classifySupabaseStartFailure(`container is unhealthy: no space left ${privateOutput}`), ['container-health', 'resource-pressure']);
+  assert.deepEqual(classifySupabaseStartFailure(privateOutput), ['unclassified']);
+  assert.deepEqual(classifySupabaseStartFailure(''), ['unclassified']);
 });

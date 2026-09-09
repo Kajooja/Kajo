@@ -16,6 +16,7 @@ This directory is Kajo's permanent project memory. Chat conversations are tempor
 | Find the complete product target and preserved distant ideas | `product/FUTURE_PLAN.md` |
 | Understand sprint/milestone rules | `project/WORKFLOW.md` |
 | Continue in a new AI conversation | `project/HANDOFF_PROTOCOL.md` |
+| See the latest history/release-truth audit and recovered ideas | [2026-09-09 retrospective](project/retros/2026-09-09.md) |
 | Use the correct terms | `domain/GLOSSARY.md` |
 | Understand User/Profile/Item/Event/Friend relationships | `domain/DOMAIN_MODEL.md` |
 | Understand behavioral/growth event semantics | `domain/DATA_EVENTS.md` |
