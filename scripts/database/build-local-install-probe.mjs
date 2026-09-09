@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { buildDeterministicSeedSql } from './system-seed-source.mjs';
+import { buildBaselineFunctions } from './baseline-functions.mjs';
 
 try {
   assert.equal(process.argv.length, 4,
@@ -13,12 +14,14 @@ try {
     '3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e',
     'Unexpected schema export; review it before generating an executable probe');
   const seeds = await buildDeterministicSeedSql();
+  const functions = await buildBaselineFunctions();
   const migrations = new URL('../../supabase/migrations/', import.meta.url);
   const auth = await readFile(new URL('20260827173000_auth_identifier_and_profile_fix.sql', migrations), 'utf8');
   const trigger = auth.match(/^create trigger provision_kajo_personal_profile\nafter insert on auth\.users\nfor each row execute function private\.provision_personal_profile_from_auth_user\(\);$/m)?.[0];
   assert.ok(trigger, 'Canonical Auth trigger not found');
   const smoke = await readFile(new URL('bootstrap-ranking.hosted-smoke.sql', import.meta.url), 'utf8');
   const sharedSmoke = await readFile(new URL('shared-install-smoke.sql', import.meta.url), 'utf8');
+  const functionSmoke = await readFile(new URL('baseline-function-smoke.sql', import.meta.url), 'utf8');
   assert.equal((smoke.match(/^begin;$/gm) ?? []).length, 1);
   assert.ok(smoke.trimEnd().endsWith('rollback;'));
   // One outer transaction includes export, supplements and unchanged smoke body.
@@ -35,6 +38,10 @@ begin
 end;
 $guard$;
 ${bytes.toString('utf8')}
+-- Use the reviewed repository function definitions, including both explicit
+-- source-patch resolutions. No exported function body is accepted by default.
+-- Function supplement SHA-256: ${functions.sha256}
+${functions.sql}
 -- The filtered export already contains application-table triggers. Its omitted
 -- Auth trigger is reconstructed here from canonical source.
 ${trigger}
@@ -53,6 +60,7 @@ begin
   end if;
 end;
 $auth_probe$;
+${functionSmoke}
 ${sharedSmoke}
 ${smoke.replace(/^begin;$/m, '-- Outer transaction already active.')}
 do $rollback_probe$

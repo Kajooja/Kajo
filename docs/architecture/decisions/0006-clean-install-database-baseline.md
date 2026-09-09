@@ -330,7 +330,7 @@ Observed against the exact owner export, repeated in both disposable installatio
   `BLOCKED` while other differences are collected. This continuation is diagnostic
   reporting only, never successful migration replay or a skipped-error install.
 
-Difference ledger (all remain bytewise mismatches):
+Checkpoint difference ledger (before the source-derived resolution below; all remain bytewise mismatches):
 
 | Source migration | Functions | Review/resolution |
 | --- | --- | --- |
@@ -347,11 +347,68 @@ definition handling. The previous export/Mac PASS checkpoints remain historical
 evidence of their stated scope. Original chronological replay still stops at the
 earlier catalog migration after 33 successful files; no history was changed.
 
-Next review the remaining 18 function differences, prepare explicitly reviewed
-source-derived baseline resolutions for both broken patches, and continue source
-table/RLS/ACL/platform reconciliation before repeated real installations and the
-independent forward-upgrade gate. This checkpoint does not change serving behavior,
-approve a baseline/history transition or close #208 / MVP-ALG-009.
+This checkpoint left 18 function reviews and both broken patch resolutions open.
+The next section records their resolution. Source table/RLS/ACL/platform
+reconciliation, repeated real installations and independent forward-upgrade proof
+remain separate gates. No baseline/history transition or #208 closure was approved.
+
+## Source-derived function supplement — 2026-09-09
+
+The complete 26-definition review is now resolved for the **proposed empty-install
+route**. Full-definition inspection, with lexical diffs used only as a review aid,
+classified the differences as follows; exact fingerprint comparison still preserves
+all text and does not normalize the export to claim a match.
+
+| Difference | Count | Resolution |
+| --- | --- | --- |
+| Formatting/comments, including all nine SleepLayer functions | 19 | Use complete repository definitions; constants, conditions, expressions and statements are unchanged. |
+| Alias declarations/references and optional `AS` in private import ownership/read/resolve/commit/remove functions | 5 | Use repository names. Reviewed alias scopes preserve the same joins, ownership predicates, projections and writes. |
+| Import staging and resurfacing, including the intended forward changes | 2 | Use repository bodies plus the explicit corrections below; retain canonical alias names. |
+
+`baseline-functions.mjs` builds all 122 final application definitions from the
+existing checksum-verified source loader. It implements exactly these two intended
+corrections in the separate supplement:
+
+- Stage guard/message: accept 1–5000 rows; reject 0 and 5001 before deleting staged
+  rows. The original 500-row fragment must occur exactly once before replacement.
+- Resurfacing: wrap the three nullable bootstrap predicates for consumed/rated/
+  saved in `coalesce(..., false)`. Absent bootstrap evidence cannot turn a native
+  false into SQL NULL. Native terminal/saved evidence still applies.
+
+The catalog upsert conflict patch is appended unchanged and applies successfully.
+Historical migrations and the raw-source diagnostic remain unchanged. The proposal
+neither skips historical migration failures nor applies the baseline to production.
+Other functions use their complete final repository definitions. Body validation
+is explicitly enabled against the export's table/type scaffolding.
+
+The generated function bundle has SHA-256
+`d2748da4cc432d689af11c86cad0bc494da50460168910e0af4ffb75f11862be`, records the source
+checkpoint/cutoff, and is embedded in the existing rollback-only local probe after
+its empty-database guard and schema load. It is not emitted as a deployment file.
+CREATE OR REPLACE deliberately retains export ownership/ACL: this still does not
+prove source-derived permissions. Platform `rls_auto_enable` is not replaced.
+
+Verification:
+
+- Two independent empty PGlite installations produce identical post-supplement
+  function fingerprints. Exactly 26 definitions change from the supplied export;
+  every function identity, owner and direct ACL remains unchanged.
+- The complete source-function + deterministic seed + Auth/Personal/Shared probe
+  passes twice with rollback, including existing opposite-bootstrap ranking,
+  import removal, membership/privacy and versioned-trace checks.
+- `baseline-function-smoke.sql`, shared by that probe and repository-only CI
+  fixtures, stages 5000 rows through public RPCs, rejects 5001/empty batches without
+  changing staged data, skips/corrects a row, commits twice without duplicate taste
+  evidence or native Events, and verifies import removal restores ordinary
+  eligibility. Outsider writes/removal and unauthenticated reads fail.
+- The same behavior smoke fails with each original unresolved function body.
+  This proves both resolutions affect the intended behavior. Fixture Auth/table
+  signatures are explicitly limited; they do not establish full Supabase acceptance.
+
+The revised Mac probe is pending. Next reconcile source ownership/ACL and remaining
+non-function schema/platform definitions, then complete real repeated installation
+and independent forward-upgrade acceptance. Do not repeat the 26-function review
+or describe the raw-source diagnostic's expected failure as an unfixed supplement.
 
 ## Alternatives considered
 

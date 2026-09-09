@@ -36,6 +36,7 @@ try {
   console.log('KAJO LOCAL INSTALL PROBE PASS - all probe changes rolled back');
   console.log('Verified: Auth provisioning, authenticated V1 bootstrap ranking, import removal, outsider denial, persisted trace version.');
   console.log('Verified: Shared member ranking, aggregate explanation, outsider/revoked-member denial, Shared trace versions.');
+  console.log('Verified: source-derived functions, 5000-row import, 5001-row rejection, import correction/removal, null-bootstrap eligibility.');
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

@@ -464,3 +464,21 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - Validation: `npm run check` passed (191 mobile, 14 catalog and 36 database
   tests, lint/typecheck, iOS/Android bundles). The exact export loaded twice with
   repeatability PASS and source status REQUIRES_RECONCILIATION as documented.
+
+### 2026-09-09 — Source-derived function resolutions
+
+- Completed all 26 definition reviews: 19 formatting/comments, five alias-only
+  changes and two intended import-stage/null-bootstrap corrections. ADR-0006 owns
+  the resolution and provenance; the previous remaining-18 statement is superseded.
+- Added the deterministic 122-function supplement and connected it to the guarded
+  rollback-only probe. Original historical files and hosted runtime are unchanged.
+- Two independent installations match all post-supplement fingerprints; exactly
+  26 definitions change and all owners/direct ACL remain unchanged. The expanded
+  Auth/Personal/Shared plus 5000-row import probe passes twice with rollback.
+- Added repository-only behavior tests for boundary rejection without data loss,
+  row correction, repeated commit, removal/eligibility and unauthorized access.
+  The same smoke rejects both original broken definitions.
+- Next: source owner/ACL and remaining non-function/platform reconciliation,
+  revised Mac probe, repeated pinned full installation and independent upgrade.
+- Validation: `npm run check` passed after the interrupted run was restarted:
+  191 mobile, 14 catalog and 39 database tests, lint/typecheck and both bundles.

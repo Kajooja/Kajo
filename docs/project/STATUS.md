@@ -123,19 +123,19 @@ Exact next work:
    2026-09-08, using Supabase Postgres `17.6.1.167`; exact image evidence is in
    ADR-0006. Do not repeat that completed probe. The same #219 branch now adds
    Shared member ranking, aggregate-only explanation, outsider/revoked-member
-   denial and versioned Shared traces. The expanded probe passed twice in PGlite;
-   its Mac execution is pending and is distinct from the accepted original run.
-2. Continue source reconciliation from the **2026-09-09 function checkpoint** in
-   ADR-0006: 96/122 application definitions match exactly, 26 differ, and two
-   additional historical text patches fail against their original source bodies.
-   Six public import wrappers and both Shared functions differ only in inspected
-   formatting/comments; the remaining 18 definitions need semantic review and
-   proposed-baseline resolution. Do not normalize away differences or edit old
-   migrations. Reconcile the remaining non-function DDL as well. Prepare separate
-   supplements for `auth.users`'s `provision_kajo_personal_profile` trigger and
-   deterministic-provenance system seeds from SleepLayer source migrations. The
-   source reconstruction/checksum tool is delivered; it still must be used in two
-   pinned full installs. Account for
+   denial and versioned Shared traces. It now also uses 122 source-derived
+   functions and tests 5000-row import/correction/removal and null-bootstrap
+   eligibility. This revised full probe passed twice in PGlite; its Mac execution
+   is pending and is distinct from the accepted original run.
+2. **Continue non-function source reconciliation.** All 26 function differences
+   have now been reviewed and resolved in the proposed empty-install function
+   supplement: 19 formatting/comment changes, five alias-only changes and two
+   intended source-patch corrections. Do not repeat that completed review. ADR-0006
+   owns the explicit resolutions and source provenance. Source ownership/ACL,
+   remaining table/RLS/schema/default grants and other non-function DDL still need
+   reconciliation. Auth-trigger and deterministic system-seed supplements are
+   already delivered for the probe and need real pinned installation acceptance.
+   Account for
    platform event triggers, especially hosted `ensure_rls` calling
    `private.rls_auto_enable`, without overwriting platform-owned objects blindly.
 3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
@@ -145,10 +145,10 @@ Exact next work:
 The export omits the Auth trigger, all event triggers, PredictorGenome and
 PolicyAssignment rows. It is not yet an accepted installation baseline. The
 connected hosted project has only main; never use it as an installation target.
-The probe temporarily supplies the canonical Auth trigger and three system-seed
-INSERT statements, exercises Auth provisioning and the existing bootstrap V1
-smoke, then rolls everything back. It does not supply or change platform event
-triggers, establish deterministic seed metadata, or close the full replay gate.
+The probe temporarily supplies the source-derived function bundle, canonical Auth
+trigger and deterministic system seeds, exercises Auth/Personal/Shared plus import
+lifecycle behavior, then rolls everything back. It does not supply/change platform
+event triggers or close the full replay gate.
 
 The exact canonical system-seed source is now reconstructable without hosted
 data through `scripts/database/system-seed-source.mjs`; ADR-0006 records its
@@ -168,12 +168,14 @@ object counts. This is export repeatability, not remaining canonical source pari
 schema/default grants, roles, views/sequences and platform objects remain outside
 this comparator. ADR-0006 records the diagnostic and exact limitations.
 
-The export diagnostic now reports `REQUIRES_RECONCILIATION` (exit 1) despite
-`exportRepeatability: PASS`: exact source comparison found unresolved function
-differences and non-replayable patches. This is a newly exposed source discrepancy,
-not a regression in loading the export or the owner's earlier Mac probe. The
-fixture tests intentionally prove these defects and stay green; historical replay
-still stops at the original catalog migration. No runtime algorithm was changed.
+The raw export diagnostic still reports `REQUIRES_RECONCILIATION` (exit 1) with
+`exportRepeatability: PASS`: unmodified export bytes and historical text patches
+remain different. The separate function supplement now implements their reviewed
+resolution for the proposed installation. Its post-supplement fingerprints match
+across two empty PGlite installations, changing exactly 26 definitions and no
+function owner/direct ACL. Regression tests reject both original broken bodies and
+pass with the supplement. Historical replay still stops at the original catalog
+migration; no hosted runtime or migration history changed.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 
