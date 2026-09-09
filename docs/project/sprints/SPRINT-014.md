@@ -1,12 +1,18 @@
-# Sprint 014 — Real Catalog, Profile Bootstrap & External Beta
+# Sprint 014 — Algorithm Reliability, Real Catalog & Profile Bootstrap
 
-Status: **ACTIVE — ALGORITHM COMPLETION GATES ADDED; CATALOG/BOOTSTRAP/SHARED FOUNDATIONS ON MAIN; DEVICE AND EXTERNAL-BETA ACCEPTANCE OPEN**
+Status: **ACTIVE — PHASE 14 ACCEPTANCE OPEN; DELIVERED FOUNDATIONS ON MAIN**
 
-## Outcome
+## Outcome and current scope
 
-Turn Kajo into the first product-complete BOOK/MOVIE version suitable for roughly 10 external testers. Sprint 014 closes only when normal discovery uses useful real content, a new PersonalProfile becomes useful in the first session, Shared common-fit exists in the canonical Prediction path, and the product owner accepts an external-beta build.
+Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy action/delivery evidence, serving/shadow parity and candidate availability, real catalog/features, adaptive memory/policy and operating bounded SleepLayer evaluation. Current requirements and acceptance belong to [MVP.md](../../product/MVP.md) and [ROADMAP.md](../ROADMAP.md).
 
-Monetization and final public-store hardening are Sprint 015 scope.
+The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
+
+[STATUS.md](../STATUS.md) owns the exact next task: resolve adoption/operational wiring of the already-tested fresh-install proposal and remaining #207/#208 acceptance. The database verification package is merged in PR #219; do not restart its completed experiments.
+
+## How to read this record
+
+The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
 ## 14A — Real provider-backed catalog — #182 / device follow-up #199
 
@@ -263,31 +269,37 @@ Required flows:
 - Provider aggregate popularity/trend may seed sparse profiles; Kajo-wide aggregate behaviour remains PopulationMemory-gated.
 - Open Library Search beta bootstrap is bounded/cached admin ingestion; the app never uses Open Library Search as its runtime backend.
 - Do not judge common-fit quality on the historical mock catalog.
-- Product decision 2026-09-07 promotes #200 contextual Lists, #201 catalog search/filters and #203 authorized Profile-name search into MVP; see ROADMAP 14.6.
+- Product decision 2026-09-07 promotes #200 contextual Lists, #201 catalog search/filters and #203 authorized Profile-name search into MVP; see current ROADMAP 17.0.
 
 ## Dependencies
 
 - #182 + #199 configured-device real-card/dense-grid acceptance and **TMDB MOVIE provider expansion** remain required for beta; BOOK beta already has 415 discoverable Items.
 - #102 Lists, #138 messaging and Room/shell refreshed device gates remain before beta acceptance.
-- stable email auth is needed for beta; production SMTP + Google/Apple store auth is finalized through #127/#184 before store release.
+- #127 owns production email; #184 owns Google/Apple identity linking and taste-preserving conversion in Phase 15.1. Both precede the complete-flow beta in Phase 18.
 - #160 production security hardening remains release scope unless a blocking beta-safety issue appears. Repository/hosted migration parity for `harden_production_function_boundaries` was restored through PR #162; leaked-password protection remains the known release WARN.
 
-## Acceptance
+## Current acceptance
+
+Phase 14 exits only when its ROADMAP 14.0–14.5 gates have evidence, including the following still-open work:
+
+- [-] `MVP-ALG-001..009`: bootstrap/replay foundations are implemented in part; serving/shadow, candidates, adaptive state/features/modes/cold start and operating evaluation acceptance remain open. Individual statuses are in MVP.md.
+- [ ] `MVP-DATA-003..004`: atomic actions, durable outbox and exact delivery provenance.
+- [-] `MVP-PRED-006`: trace foundation exists; complete delivery/evidence acceptance remains open.
 
 - [-] `MVP-CAT-001..003`: BOOK beta coverage now has 415 real Items with 385 provider covers; MOVIE remains 30-title seed with 0 images, #199 device presentation/cache acceptance and provider expansion are open.
 - [-] `MVP-BOOT-001..002`: parser/backend/Settings implemented; real-data device acceptance open.
 - [-] `MVP-BOOT-003`: bounded popularity-led no-import profiling implemented/hosted/main; configured-device acceptance open.
 - [-] `MVP-BOOT-004`: idempotent/source-tagged/removable LongTerm contract hosted/main; device acceptance open.
 - [-] `MVP-PRED-005`: Shared common-fit v1.1 implemented/hosted/main; configured-Android acceptance open.
-- [ ] deferred List/messaging/Room device gates relevant to beta accepted.
 - [x] hosted normal Prediction delivery contains no `KAJO_MOCK` Items; configured-device confirmation of current product presentation remains open.
 - [ ] import and no-import users both receive useful first-session recommendations on device.
-- [ ] #186 external beta accepted by product owner.
-- [ ] deterministic handoff to Sprint 015.
+- [ ] deterministic handoff to Phase 15 Taste acquisition after Phase 14 acceptance.
+
+Deferred release gates retain their own owners: refreshed List/messaging/Room acceptance in Phase 17; #186 full-flow closed beta in Phase 18. They are not claimed complete here.
 
 ## Immediate next action
 
-Follow `STATUS.md` and ROADMAP 14.0: bootstrap-only Personal serving correction with SQL regression foundation. Owner APK #350 testing and existing TMDB ingestion can proceed independently. Do not close #199/#182 or claim first-session quality before acceptance. Required algorithm/evidence work now precedes the external-beta gate.
+Follow [STATUS.md](../STATUS.md), ROADMAP 14.0 and the adoption proposal in ADR-0006. The bootstrap serving correction and SQL verification package are merged; installation-procedure adoption and remaining bootstrap/device/quality acceptance stay open. Do not close #207/#208/#199/#182 from green checks alone.
 
 ## Continuation checkpoint — 2026-09-06
 
@@ -296,7 +308,7 @@ PR #205 delivered the bounded TMDB beta orchestrator (`scripts/catalog/import-tm
 
 ## Scope and reliability checkpoint — 2026-09-07
 
-The owner made algorithm correctness/adaptation and production completeness the priority. ROADMAP 14.0–14.8 now owns the remaining order within this active sprint. Earlier 14A–14D sections record delivered foundations; they do not waive the newly required ALG/DATA/OPS/UX and browse acceptance in MVP.md.
+The owner made algorithm correctness/adaptation and production completeness the priority. At that checkpoint ROADMAP 14.0–14.8 owned the order; the later Taste-first decision superseded those phase numbers with the current Phase 14–20 sequence. Earlier 14A–14D sections record delivered foundations; they do not waive the newly required ALG/DATA/OPS/UX and browse acceptance in MVP.md.
 
 Before external beta, additionally require bootstrap-driven serving, exact/atomic evidence, serving-shadow parity, refill/continuation, adaptive state/common features, running bounded SleepLayer evaluation, promoted browse suggestions and safe-beta lifecycle/operations. Documentation-only changes have not fixed these code gaps or provisioned services. Current findings and the exact active handoff live in STATUS.md.
 

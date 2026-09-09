@@ -27,7 +27,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 
 11. **Navigation stays compact.** Domain discovery begins from Room objects. Account/Profile/Lists/Friends/Groups management belongs in restrained persistent navigation rather than Room clutter.
 12. **Minimal persistent shell.** Top: Kajo Home mark + global DiscoveryMode curtain. Bottom: menu + active Profile identity/SharedProfile quick switcher + Inbox. Do not add a conventional multi-tab bar without explicit product decision.
-13. **Home and Profile switching have distinct controls.** Top Kajo mark returns to active Profile Room. Bottom-center identity opens lightweight recent SharedProfile switching; full management remains on canonical Groups/Friends surfaces.
+13. **Profile switching starts at home.** Top Kajo mark returns to the active Profile Room. Bottom-center identity also returns home from other routes; when already home, it opens the lightweight Profile quick switcher. Full management remains on canonical Groups surfaces; the planned Friends surface follows the launch contract.
 14. **Sign out is secondary account navigation.** `Kirjaudu ulos` belongs in account/drawer navigation, not the Room.
 15. **Illustrated 2D first.** The Room may use restrained 2.5D depth through overlap/light/blur/shadow but remains a fixed illustrated mobile surface. No free camera, virtual walking or game-like 3D world.
 16. **Content is more important than chrome.** Posters/covers and atmosphere carry visual interest.

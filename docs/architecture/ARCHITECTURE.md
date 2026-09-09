@@ -211,9 +211,13 @@ explicit user command
 → durable acknowledgement
 ```
 
-Mobile maintains a bounded persistent outbox for unacknowledged explicit commands. Process death/retry/account switch may not duplicate or leak actions.
+The first release requires a bounded persistent mobile outbox for unacknowledged explicit commands. Process death/retry/account switch may not duplicate or leak actions.
+
+Implementation checkpoint, 2026-09-09: `EventTrackingContext.tsx`/`eventTracking.ts` currently coordinate an in-memory queue that is disposed on scope changes. `eventPersistence.ts` writes Events separately from current-state persistence. Persistent outbox and atomic command/Event commits remain **open** under `MVP-DATA-003` (ROADMAP 14.1). Existing ordered retries do not establish process-death durability.
 
 Recommendation delivery origin is frozen truthfully. A cached Item from another Profile/mode/run cannot inherit a hosted `predictionId`.
+
+This is also a release requirement: `predictionRankingCache.ts` still has fallback lookups across remembered runs without a Profile filter. Exact Profile/run/slate retrieval and overlay provenance remain open under `MVP-DATA-004`; the current cache is not evidence of their acceptance.
 
 Growth/acquisition telemetry has separate semantics and retention. Analytics failure must not roll back auth, Friendship, Taste or SharedProfile state.
 

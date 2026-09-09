@@ -82,12 +82,11 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 work is adoption and operational wiring of the tested fresh-install procedure,
 not another round of export, fingerprint, platform or upgrade discovery.
 
-Publication is tracked in [PR #219](https://github.com/Kajooja/Kajo/pull/219),
-branch `test/208-export-install-diagnostic`. On continuation, check its state once:
-if merged, use current `main`; otherwise finish that PR's publication from its
-actual head. PR #217 (`42d605a`) and #218 (`2d1b0d5`) are already merged.
-Do not create another documentation commit merely to record this closeout's own
-merge SHA or CI run number; GitHub is the authority for those changing fields.
+[PR #219](https://github.com/Kajooja/Kajo/pull/219) is merged on `main` as
+`0b2e8d76d453890689023e60493d04fe134262cb`. Continue from current `main`;
+its old feature branch is historical. PR #217 (`42d605a`) and #218 (`2d1b0d5`)
+are also merged. Do not create another documentation commit merely to record
+this audit's own merge SHA or CI number; GitHub owns those changing fields.
 
 Completed evidence (full provenance and report hashes are in
 [ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md)):
@@ -100,11 +99,28 @@ Completed evidence (full provenance and report hashes are in
 | Actual Supabase CLI fresh lineage | PASS: two resets, exact version/name history, source parity and failed-migration atomicity |
 | Canonical automated check | PASS: 191 mobile + 14 catalog + 55 database tests (260 total), TypeScript, lint with zero errors/one existing Hook warning, iOS/Android bundles |
 
-All five required jobs passed together in
-[CI #393](https://github.com/Kajooja/Kajo/actions/runs/34375412870) for code head
-`9fcbbb4a43b81be5b7754d4abe31e286f6365387`. The publication closeout changes only
-documentation; its final required CI must still pass before merge. APK was skipped
-for the PR event. A main-triggered APK build is not the next work item to poll.
+The final PR #219 head passed all five required jobs in
+[CI #394](https://github.com/Kajooja/Kajo/actions/runs/34382607596).
+Main [CI #395](https://github.com/Kajooja/Kajo/actions/runs/34383277848) first
+failed during isolated Supabase stack startup; the one requested rerun passed
+all five required checks. The original startup cause is unproven because the
+old log withheld its detail. The [2026-09-09 retro](retros/2026-09-09.md) records
+this distinction and the audit corrections. APK/device acceptance is separate;
+a main-triggered APK build is not the next product work item to poll.
+
+### Repository audit and blocked cleanup — #220
+
+The retrospective reconciles current code, release requirements and historical
+ideas. The [144-branch retirement manifest](retros/2026-09-09-branches.json)
+contains 23 main ancestors, 118 exact merged PR heads and three individually
+reviewed superseded drafts. No missing accepted feature needs an old branch
+merged wholesale.
+
+No remote refs were deleted. Automatic approval review blocked the bulk deletion
+pending explicit owner confirmation of the exact 144-branch scope. Issue #220
+retains that cleanup gate; it does not replace the product continuation below.
+Recheck recorded tips/PR state before any approved deletion and preserve any new
+work. No deletion workflow is installed on `main`.
 
 ### Remaining decision and exact next implementation
 
@@ -150,7 +166,7 @@ requirement or Sprint 014 acceptance is closed by this verification delivery.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 
-1. Finish clean-install database/replay strategy and schema parity work.
+1. Resolve fresh-install adoption and operational wiring; source/schema parity evidence is already complete.
 2. Close bootstrap ranking correctness/regression gates.
 3. Continue `ROADMAP.md` Phase 14 in order: evidence reliability → serving/shadow parity → catalog/features → adaptive memory/policy → operating SleepLayer.
 

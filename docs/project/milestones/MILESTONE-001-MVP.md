@@ -5,7 +5,7 @@ Started: **2026-08-25**
 
 ## Outcome
 
-Deliver the complete non-commercial store-downloadable BOOK/MOVIE Kajo: useful and measurably adaptive Personal/Shared recommendations, coherent core browsing/collaboration, reliable evidence, accepted real-device flows and operated production services with tested data lifecycle and recovery. Graphics may evolve without changing those behavioral contracts.
+Deliver the complete non-commercial first public BOOK/MOVIE Kajo: anonymous Taste/link entry, an honest held-out prediction challenge, taste-preserving Google/Apple conversion, useful and measurably adaptive Personal/Shared recommendations, personal Friend invitations and explicit consent-based Shared creation. Core browsing/collaboration, reliable evidence, real-device flows and operated production services with tested data lifecycle and recovery must pass the Share Link Gate. Graphics may evolve without changing these behavioral contracts.
 
 ## Acceptance source
 
@@ -42,11 +42,11 @@ MVP 0.1 may be marked **COMPLETE** only when every gate below is satisfied. A dr
 | Scope | Every in-scope ID in `docs/product/MVP.md` is `[x]`, or scope removal is an explicit documented product decision; no `[-]` remains hidden as complete |
 | Accepted code | All MVP implementation is reviewed and merged to `main`; no required behavior exists only in an open branch, local workspace or chat |
 | Hosted backend | Required migrations/functions/configuration are permanently applied, authorization/RLS and rollback/recovery checks pass, and client roles have least privilege |
-| End-to-end behavior | Clean account creation/login/recovery, PersonalProfile, Shared invitation/switching, all DiscoveryModes, Prediction, rating/consumption, Lists, Endorsement consensus, messaging, restart persistence and failure/retry paths are exercised |
+| End-to-end behavior | Anonymous link → adaptive Taste → frozen holdout challenge → unseen preview → Google/Apple conversion preserves taste; personal invite → accepted Friendship → explicit Shared creation is exercised, alongside login/recovery, all DiscoveryModes, rating/consumption, Lists, Endorsement, messaging, restart and failure/retry paths |
 | Prediction evidence | Hosted PredictionRun/candidate/session/Event/Outcome correlation is verified without Personal/Shared leakage; fallback remains distinguishable and rollback is documented |
 | Real devices | Representative supported real-device flows pass; compilation or emulator-only evidence is insufficient for final acceptance |
-| Release | A signed production build with stable identifiers, versioning, production email, privacy/support/store metadata and no embedded privileged secret is downloadable through an official app store |
+| Release | A signed production build with stable identifiers, versioning, production email, privacy/support/store metadata and no embedded privileged secret is downloadable through an official app store; the corresponding browser-to-app link/identity flow is accepted |
 | Operations | Crash/error/latency and critical backend health are observable; support, account deletion/data handling and release rollback paths are documented and tested at the agreed MVP level |
 | Repository truth | `main` documentation, status, glossary, ADRs, code map, migrations and release state match reality; obsolete files/branches and superseded placeholders are cleaned safely |
 
-The milestone closes only after a final product-owner acceptance of the installed store build. Sprint 014 closes at external-beta acceptance. Sprint 015 and this milestone close only at the final installed-store and operational acceptance gate in ROADMAP 15.3.
+The milestone closes only after explicit product-owner acceptance of ROADMAP Phase 20, the Share Link Gate. Sprint 014 owns Phase 14 algorithm/catalog reliability. Taste acquisition follows in Phase 15, Friends/Shared in Phase 16, UX/operations in Phase 17, full-flow closed beta in Phase 18 and production/store acceptance in Phase 19. The old Sprint 014 external-beta / Sprint 015 store-close schedule is superseded by the 2026-09-07 release decision. Monetization is outside MVP 0.1.
