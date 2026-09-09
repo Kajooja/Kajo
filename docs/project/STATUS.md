@@ -129,7 +129,7 @@ Exact next work:
    default correction and a read-only platform report. This revised full probe
    passed twice in PGlite; its Mac execution is pending and is distinct from the
    accepted original run.
-2. **Run the revised Mac probe and reconcile its platform report.** The 26 function
+2. **Build and test the proposed source-only application installation in CI.** The 26 function
    differences are resolved in the proposed supplement. Source comparison now
    also matches all 30 table structures, 205 constraints, 112 indexes and 19 RLS
    policies exactly. Do not repeat those reviews. ADR-0006 owns the evidence.
@@ -144,12 +144,18 @@ Exact next work:
    intact; the global control also affects future postgres-created platform/
    extension functions, which need their intended grants. It is prepared and tested
    locally, not applied hosted; it does not fix the earlier historical replay.
-   Update the existing Mac tool checkout, run the same probe command, then collect
-   its `kajo-install-report-*.json`. ADR-0006 has the commands and remaining scope.
-   Compare its schema/default ACL, role and event-trigger metadata with hosted
-   catalogs, especially `ensure_rls` / `private.rls_auto_enable`. The six other
-   hosted event triggers are owned by `supabase_admin`; none of the seven has
-   extension membership. Do not replace platform objects from schema names alone.
+   CI #385 now passed on a real unlinked Supabase CLI 2.117.0/Postgres 17.6.1.167
+   stack: future-function execution, repeated migration, all 99 existing platform
+   functions, unaffected metadata, rollback and cleanup passed. Its report is
+   downloaded and compared with hosted catalogs; do not request a manual platform
+   capture or repeat this discovery. ADR-0006 records image/report identities and
+   all observed differences. Native platform callbacks have six different body
+   hashes and stay provider-owned; semantic equality is not claimed. Fresh CI has
+   no private schema or `ensure_rls` helper/event trigger. The proposed application
+   installation must create source schema/grants, explicitly enable source RLS and
+   apply source default REVOKEs before creating objects so fresh-stack auto-grants
+   do not survive. Preserve native platform roles/callbacks rather than copying
+   hosted definitions. Full installation acceptance is still pending.
 3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
    run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
    database's independent forward-upgrade path before closing #208.
@@ -163,11 +169,11 @@ system seeds. It exercises Auth/Personal/Shared, imports and future-function gra
 then rolls everything back and checks platform metadata is restored. It does not
 supply/change platform event triggers or close the full replay gate.
 
-Pause checkpoint requested by the owner: current changes are ready for PR #219.
-`npm run check` passed 191 mobile, 14 catalog and 45 database tests, TypeScript,
-lint (zero errors; one existing Hook warning) and both platform bundles. CI #383
-passed the preceding published head; check the new head's CI when resuming. The
-next external evidence is the revised Mac report, not another schema export.
+The default/compatibility checkpoint is published in PR #219 at `d98e652`; CI #384
+passed. The automated platform continuation is at `533cc54`; CI #385 passed both
+validation and the real Supabase job. `npm run check` passed 191 mobile, 14 catalog
+and 47 database tests, TypeScript, lint (zero errors; one existing Hook warning)
+and both bundles. The owner resumed work after the earlier pause request.
 
 The exact canonical system-seed source is now reconstructable without hosted
 data through `scripts/database/system-seed-source.mjs`; ADR-0006 records its

@@ -534,3 +534,27 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - Validation: `npm run check` passed 191 mobile, 14 catalog and 45 database tests,
   TypeScript, lint (zero errors; one existing Hook warning) and both bundles.
   No historical migration was edited and no hosted change or APK build was made.
+
+### 2026-09-09 — Automated platform runtime continuation
+
+- Owner resumed work after the pause request. Default/compatibility checkpoint
+  `d98e652` is published in #219; CI #384 passed.
+- Added a separate GitHub Ubuntu job that starts an unlinked Supabase CLI 2.117.0
+  stack, requires Postgres 17.6.1.167 and reports actual image/config/commit metadata.
+  This removes the need for a manual Mac capture before platform discovery.
+- Shared SQL probe tests actual future-function execution, repeat migration,
+  unchanged existing platform functions and unaffected schema/role/event/default
+  metadata. All changes roll back; only the newly created stack is stopped/deleted.
+- `npm run check` passed 191 mobile, 14 catalog and 47 database tests, TypeScript,
+  lint with one existing Hook warning and both bundles. CI #385 passed the same
+  validation and the real Supabase job at `533cc54`, retaining 99 native function
+  definitions/owners/ACLs and verifying execution, rollback and cleanup.
+- Retrieved report and compared hosted catalogs: four shared schema owner/ACL sets
+  and selected role flags match. Differences are private schema/ensure_rls absence,
+  native function callback hashes, initial public defaults and native
+  supabase_functions role/default additions. ADR-0006 preserves the exact ledger,
+  image/report hashes and boundaries; do not repeat platform discovery on Mac.
+- Next build the candidate application installation from reviewed source with
+  source default REVOKEs applied before object creation and explicit source RLS.
+  Repeated full installs and independent existing-application upgrade still gate
+  #208; no hosted write or native platform callback replacement.

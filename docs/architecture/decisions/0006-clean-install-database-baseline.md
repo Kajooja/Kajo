@@ -574,6 +574,84 @@ upgrade remain required. No canonical baseline, history transition or #208 closu
 is accepted. `npm run check` passed 191 mobile, 14 catalog and 45 database tests,
 TypeScript, lint with one existing Hook warning, and iOS/Android bundles.
 
+## Automated pinned-platform verification — 2026-09-09
+
+The owner resumed work after the pause request. CI can provide the Docker runtime
+missing from the coding workspace, as documented in Supabase's
+[GitHub Actions setup](https://supabase.com/docs/guides/deployment/managing-environments#configure-github-actions).
+The new `database-platform` job creates a separate temporary, unlinked project
+using CLI 2.117.0 and requires Postgres image tag 17.6.1.167. It records the actual
+image ID, architecture, generated config hash and workflow commit; it does not
+infer that Linux and the owner's arm64 image IDs are identical.
+
+`platform-default-probe.mjs` runs the unchanged forward default migration twice
+in one transaction. Real denied/explicitly granted function calls, idempotence,
+unchanged existing non-system function definitions/owners/direct ACLs and
+unaffected role/event-trigger/schema/default metadata must all pass. A temporary
+private schema is allowed only when absent, and rollback must restore the complete
+initial platform snapshot. Existing application tables/Auth accounts reject the
+probe. The executor is restricted to GitHub Linux, a local Unix Docker socket and
+a newly created stack; it accepts no database URL, reuses no existing stack and
+never copies or repairs historical application migrations. Cleanup stops the
+new project without backup before the PASS report is written.
+
+The report is uploaded as `kajo-platform-<workflow commit>` with
+`kajo-platform-report.json` inside. It contains only metadata/fingerprints; CLI
+output containing development keys/connection strings is kept out of logs.
+This job also gates the existing main APK job. Tests exercise the same SQL with
+PGlite, including repeated rollback and refusal to change an existing test row.
+`npm run check` passed 191 mobile, 14 catalog and 47 database tests, TypeScript,
+lint with one existing Hook warning, and both platform bundles. The real CI result
+and catalog comparison follow; this is scoped evidence, not a full baseline gate.
+
+This supersedes the manual Mac prerequisite for **platform discovery and the
+scoped default correction only**. The expanded application-function/import/Shared
+Mac probe, two complete pinned application installations and the independent
+existing-application upgrade remain separate gates. No hosted deployment or
+canonical baseline/history transition is authorized by this test job.
+
+### Real CI result and platform difference ledger
+
+[CI #385](https://github.com/Kajooja/Kajo/actions/runs/34361244321) passed both jobs
+for PR head `533cc54522bedbc0c70db5ee18f362050d30e8d4` (workflow merge commit
+`c70efd1bedf695a8f51c763ab5bac6a88ee23569`). The new job completed in about 80
+seconds. It retained all **99 non-system platform function** definitions, owners
+and direct ACLs, passed denied/explicitly granted execution and repeated migration,
+restored metadata through rollback and removed its own stack. No APK was built.
+
+- CLI: 2.117.0; PostgreSQL: 17.6; architecture: Linux x64.
+- Image: `public.ecr.aws/supabase/postgres:17.6.1.167`.
+- Actual image ID: `sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+- Artifact ID: `10107958813`; name: `kajo-platform-c70efd1bedf695a8f51c763ab5bac6a88ee23569`.
+- Report SHA-256: `aee5aa37a3c5d6dd4a925423204ec4f6aea4373ca4c76eb55b7d71ae4de197a6`.
+- ZIP SHA-256: `5ab0cb609b151e96425edc1cd846bfa9fbf23cfe9d63bd5a96dd9de5617a49be`.
+
+The report was retrieved and compared with a read-only hosted snapshot produced by
+the same SQL on 2026-09-09. Artifact retention is seven days; this ledger preserves
+the result and exact provenance after expiry.
+
+| Scope | Observed difference and proposed application-install boundary |
+| --- | --- |
+| auth/extensions/public/storage schema owners and direct ACLs | Exact match. Fresh CI has no private schema; canonical source supplies its postgres ownership and authenticated/service usage. |
+| Selected role flags | Exact match, including postgres non-superuser status and service-role RLS bypass. |
+| Memberships | CI additionally gives postgres membership in native `supabase_functions_admin`. Do not remove provider roles or depend on that extra membership for application ACLs. |
+| postgres public table/sequence/function defaults | CI initially grants anon/authenticated/service_role broad rights; hosted has owner-only schema additions. Apply canonical source default REVOKEs before creating candidate application objects, then source direct grants and explicit compatibility grants. New global function hardening remains the normal post-cutoff migration. |
+| Other creator defaults | Matching except three additional native `supabase_admin` default rows for CI's `supabase_functions` schema. Keep native provider defaults; the forward probe proves they are unaffected. |
+| Six native event triggers | Names, events, tags, enabled states, function identities and owners match; all six function-definition hashes differ. They have no extension membership. No semantic equality is inferred and no hosted body is copied over native callbacks. |
+| Hosted `ensure_rls` / private.rls_auto_enable | Absent in the fresh pinned stack. It is not an implicit local-platform prerequisite. The candidate application installation must explicitly enable RLS from source and verify all tables; relying on or silently fabricating this best-effort callback is insufficient. Its existing hosted definition remains untouched. |
+
+Additional read-only hosted inventory found no public/private views, sequences,
+foreign tables, standalone composite relations or standalone base/domain/enum/range
+types. Table row types are covered by table definitions. Installed extensions are
+pg_stat_statements 1.11, pgcrypto 1.3, plpgsql 1.0, supabase_vault 0.3.1 and uuid-ossp
+1.1. This inventory does not replace source/actual-install fingerprint checks.
+
+Next prepare the application candidate from the already reviewed source DDL,
+functions, direct grants, triggers and seeds, leaving native callbacks intact.
+Prove repeat installation and runtime behavior on the pinned CI stack. The
+independent existing-application upgrade still needs separate evidence; passing
+this scoped platform/default test does not establish that broader gate.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.
