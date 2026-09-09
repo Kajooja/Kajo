@@ -446,3 +446,21 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   regressions. Exact export fingerprints match across two independent installs
   for all 30 tables. This strengthens export repeatability only; remaining
   canonical schema/platform/upgrade gates remain open (ADR-0006).
+
+### 2026-09-09 — Canonical function source discrepancies
+
+- Reconstructed all 122 application function definitions from the immutable
+  checkpoint. Both export installs show 96 exact matches, 26 definition differences
+  and no missing/unexpected application functions; platform RLS function excluded.
+- Reproduced two additional source-patch failures: import stage-limit expansion
+  and null-bootstrap resurfacing both expect compact text absent from the earlier
+  repository definitions. Catalog upsert's conflict patch applies unchanged.
+- Six public import wrappers and two Shared functions have inspected formatting/
+  comment-only diffs. ADR-0006 owns the complete difference ledger and remaining
+  18-function semantic review. No historical bytes or serving logic were changed.
+- Export diagnostic now exits 1 with `REQUIRES_RECONCILIATION` while preserving
+  separate successful export-repeatability evidence. Added repository-only
+  regressions for both defects, drift detection, checksum guards and rollback.
+- Validation: `npm run check` passed (191 mobile, 14 catalog and 36 database
+  tests, lint/typecheck, iOS/Android bundles). The exact export loaded twice with
+  repeatability PASS and source status REQUIRES_RECONCILIATION as documented.

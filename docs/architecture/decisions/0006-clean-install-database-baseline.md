@@ -293,6 +293,66 @@ extensions, triggers (separate diagnostic), platform objects and physical storag
 settings such as tablespaces/index options. Same-major deparser fingerprints also
 need matching engine versions for acceptance. Remaining #208 gates stay open.
 
+## Canonical function source reconciliation — 2026-09-09
+
+`function-source.mjs` reconstructs the latest 122 literal application function
+definitions through cutoff `20260907155201_bootstrap_personal_ranking.sql`,
+plus the three still-applicable source DO patches for catalog upsert, import stage
+limit and bootstrap resurfacing. The complete 47-file source checksum must match
+`755d0b0b4787bec834ed184b85b2fe56cbd095c26090c8aec37342a71f3df6af` before extraction.
+This is a restricted checkpoint-specific definition fixture, not a general SQL
+parser or a migration runner. V0/V1 and Shared already have complete final literal
+definitions, so their superseded intermediate text patches are not replayed here.
+
+The comparison replaces function definitions in the diagnostic's disposable
+PGlite transaction, executes the three source patches unchanged, reads PostgreSQL
+fingerprints and rolls back. Function-body validation is off because the existing
+export supplies type/signature scaffolding; this does not test function behavior.
+CREATE OR REPLACE retains input ownership/ACL, so **this proves definitions only**,
+not source-derived ownership/privileges. Missing/unexpected functions and overloads
+fail closed. Platform `private.rls_auto_enable()` is explicitly excluded and must
+be reconciled separately. No hosted DB is accessed and no SQL baseline is emitted.
+
+Observed against the exact owner export, repeated in both disposable installations:
+
+- 96 application definitions match exactly; 26 differ. No application function
+  is missing or unexpected. Report entries include identity, source migration,
+  applicable patches and both SHA-256 fingerprints; function bodies are not output.
+- The catalog upsert conflict-target patch applies unchanged.
+- `20260904210000_expand_profile_import_stage_limit.sql` fails with
+  `Expected profile import stage limit guard was not found`: it expects
+  `jsonb_array_length(input_rows)<1 or jsonb_array_length(input_rows)>500`, while
+  its original source uses spaces around `<` and `>`.
+- `20260905003500_fix_resurfacing_null_bootstrap.sql` fails with
+  `Expected bootstrap boolean fragment was not found`: its compact four-assignment
+  string does not match the original multiline/space-separated assignments.
+- Each failed patch is rolled back to its savepoint and explicitly remains
+  `BLOCKED` while other differences are collected. This continuation is diagnostic
+  reporting only, never successful migration replay or a skipped-error install.
+
+Difference ledger (all remain bytewise mismatches):
+
+| Source migration | Functions | Review/resolution |
+| --- | --- | --- |
+| `20260904203000_profile_bootstrap_import_foundation.sql` | Public wrappers: `create_profile_import_job_v1`, `stage_profile_import_rows_v1`, `resolve_profile_import_row_v1`, `commit_profile_import_job_v1`, `remove_profile_import_job_v1`, `get_profile_import_job_v1` | Inspected full diffs: formatting only. Preserve exact fingerprints; a future baseline should take reviewed repository definitions rather than normalize the export. |
+| Same import foundation | Private: `assert_personal_profile_owner_v1`, `bootstrap_evidence_weight_v1`, `create_profile_import_job_v1`, `stage_profile_import_rows_v1`, `resolve_profile_import_row_v1`, `commit_profile_import_job_v1`, `remove_profile_import_job_v1`, `get_profile_import_job_v1`, `resurfacing_policy_decision_v1` | Nine definitions need semantic reconciliation. Includes alias/format changes and the two blocked patches; neither patch may be silently omitted from the proposed baseline. |
+| `20260904170000_sleep_layer_v1_foundation.sql` | Private: `attach_prediction_policy_v1`, `evaluate_shadow_genome_v1`, `genome_config_is_valid_v1`, `genome_weight_v1`, `jsonb_numeric_component_v1`, `process_shadow_prediction_jobs_v1`, `reject_immutable_prediction_artifact_change_v1`, `resolve_policy_assignment_v1`, `shadow_candidate_score_v1` | Nine definitions need semantic reconciliation; compressed bodies alone do not prove equivalence. |
+| `20260905114500_harden_shared_common_fit_v1_1.sql` | Private: `shared_common_fit_candidate_v1_1`, `shared_common_fit_v1` | Inspected full diffs: formatting/comments only, including unchanged prior/member/consensus/disagreement arithmetic. No Shared scoring fix inferred from these differences. |
+
+The same export command now returns `REQUIRES_RECONCILIATION`, exit 1, and separate
+`exportRepeatability: PASS`. It no longer permits a top-level PASS to be mistaken
+for source acceptance. CI uses repository-only fixtures to reproduce both blocked
+patches, check input rollback, source checksum protection and missing/extra/changed
+definition handling. The previous export/Mac PASS checkpoints remain historical
+evidence of their stated scope. Original chronological replay still stops at the
+earlier catalog migration after 33 successful files; no history was changed.
+
+Next review the remaining 18 function differences, prepare explicitly reviewed
+source-derived baseline resolutions for both broken patches, and continue source
+table/RLS/ACL/platform reconciliation before repeated real installations and the
+independent forward-upgrade gate. This checkpoint does not change serving behavior,
+approve a baseline/history transition or close #208 / MVP-ALG-009.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.

@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-08**
+Last updated: **2026-09-09**
 Current milestone: **MVP 0.1 — first public Kajo**  
 Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -125,7 +125,13 @@ Exact next work:
    Shared member ranking, aggregate-only explanation, outsider/revoked-member
    denial and versioned Shared traces. The expanded probe passed twice in PGlite;
    its Mac execution is pending and is distinct from the accepted original run.
-2. Reconcile exported DDL against repository sources. Prepare reviewed separate
+2. Continue source reconciliation from the **2026-09-09 function checkpoint** in
+   ADR-0006: 96/122 application definitions match exactly, 26 differ, and two
+   additional historical text patches fail against their original source bodies.
+   Six public import wrappers and both Shared functions differ only in inspected
+   formatting/comments; the remaining 18 definitions need semantic review and
+   proposed-baseline resolution. Do not normalize away differences or edit old
+   migrations. Reconcile the remaining non-function DDL as well. Prepare separate
    supplements for `auth.users`'s `provision_kajo_personal_profile` trigger and
    deterministic-provenance system seeds from SleepLayer source migrations. The
    source reconstruction/checksum tool is delivered; it still must be used in two
@@ -161,6 +167,13 @@ table/column grants. Mutation regressions catch definition drift with unchanged
 object counts. This is export repeatability, not remaining canonical source parity;
 schema/default grants, roles, views/sequences and platform objects remain outside
 this comparator. ADR-0006 records the diagnostic and exact limitations.
+
+The export diagnostic now reports `REQUIRES_RECONCILIATION` (exit 1) despite
+`exportRepeatability: PASS`: exact source comparison found unresolved function
+differences and non-replayable patches. This is a newly exposed source discrepancy,
+not a regression in loading the export or the owner's earlier Mac probe. The
+fixture tests intentionally prove these defects and stay green; historical replay
+still stops at the original catalog migration. No runtime algorithm was changed.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 

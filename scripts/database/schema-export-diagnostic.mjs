@@ -7,6 +7,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { compareFunctionSchemas } from './function-schema-parity.mjs';
 import { verifyExportTriggers } from './trigger-source.mjs';
 import { compareRelationSchemas } from './relation-schema-parity.mjs';
+import { compareExportFunctionSource } from './function-source.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -36,6 +37,7 @@ try {
       // Execute the complete export unchanged. Any statement failure stops the run.
       await db.exec(bytes.toString('utf8'));
       const triggerParity = await verifyExportTriggers(db);
+      const functionSourceParity = await compareExportFunctionSource(db);
       const tables = (await db.query(`select format('%I.%I', n.nspname,c.relname) as name,
           c.relrowsecurity as rls
         from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -51,6 +53,7 @@ try {
       const relations = (await db.exec(relationSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
       const inventory = {
         triggerParity,
+        functionSourceParity,
         tables: tables.length,
         tablesWithoutRls: tables.filter(t => !t.rls).map(t => t.name),
         functions: snapshot.functions.length,
@@ -74,9 +77,12 @@ try {
   }
   if (process.argv[4]) await writeFile(process.argv[4], JSON.stringify(first, null, 2) + '\n', { flag: 'wx' });
   if (process.argv[5]) await writeFile(process.argv[5], JSON.stringify(firstRelations, null, 2) + '\n', { flag: 'wx' });
-  console.log(JSON.stringify({ status: 'PASS', engine: 'PGlite 0.3.14', postgresMajor: first.serverMajor,
+  const sourceMatched = firstInventory.functionSourceParity.status === 'MATCH';
+  console.log(JSON.stringify({ status: sourceMatched ? 'PASS' : 'REQUIRES_RECONCILIATION',
+    exportRepeatability: 'PASS', engine: 'PGlite 0.3.14', postgresMajor: first.serverMajor,
     exportSha256: checksum, installs: 2, inventory: firstInventory,
-    scope: 'Unmodified export loads twice; application tables empty; function and table-definition/direct ACL parity between installs; application trigger parity with pinned source. Not canonical full repository parity, complete schema parity, seed or Supabase platform acceptance.' }, null, 2));
+    scope: 'Unmodified export loads twice; application tables empty; function and table-definition/direct ACL parity between installs; source reconciliation reported separately. Not canonical full repository parity, complete schema parity, seed or Supabase platform acceptance.' }, null, 2));
+  if (!sourceMatched) process.exitCode = 1;
 } catch (error) {
   console.error(JSON.stringify({ status: 'FAIL', code: error.code, message: error.message }));
   process.exitCode = 1;
