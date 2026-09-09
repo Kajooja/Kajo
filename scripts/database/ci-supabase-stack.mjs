@@ -7,7 +7,6 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
 import { bufferedSqlCommand } from './buffered-sql-command.mjs';
-import { validateMigrationFiles } from './fresh-installation.mjs';
 
 const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
@@ -134,6 +133,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
     let applied = false;
     const applyMigrations = async files => {
       assert.equal(applied, false, 'Fresh installation can execute only once');
+      const { validateMigrationFiles } = await import('./fresh-installation.mjs');
       validateMigrationFiles(files);
       const path = join(directory, 'supabase', 'migrations');
       await mkdir(path, { recursive: true });
@@ -148,6 +148,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
     };
     const resetFromMigrations = async files => {
       assert.equal(projectId, 'kajo_ci_cli_install', 'CLI reset is restricted to its newly owned test stack');
+      const { validateMigrationFiles } = await import('./fresh-installation.mjs');
       validateMigrationFiles(files);
       // This directory belongs only to the freshly created CI workspace above.
       // No repository migration directory or existing Supabase project is used.

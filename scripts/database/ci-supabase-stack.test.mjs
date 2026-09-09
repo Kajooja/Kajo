@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { execFileSync } from 'node:child_process';
+import { copyFile, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { classifySupabaseStartFailure, verifyCiPostgresImage, verifyLocalPostgresImage,
   withLocalSupabaseStack } from './ci-supabase-stack.mjs';
 
@@ -28,4 +32,15 @@ test('local installation requires a new absolute workspace and the reviewed arch
   assert.doesNotThrow(() => verifyLocalPostgresImage(mac, 'darwin', 'arm64'));
   assert.throws(() => verifyLocalPostgresImage(mac, 'linux', 'x64'), /content changed/);
   assert.throws(() => verifyLocalPostgresImage(mac, 'linux', 'arm64'), /No reviewed/);
+});
+
+test('platform-only stack lifecycle loads without application source modules or npm dependencies', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'kajo-platform-module-'));
+  try {
+    for (const name of ['ci-supabase-stack.mjs', 'buffered-sql-command.mjs']) {
+      await copyFile(new URL(name, import.meta.url), join(directory, name));
+    }
+    execFileSync(process.execPath, ['--input-type=module', '-e', "await import('./ci-supabase-stack.mjs')"],
+      { cwd: directory, stdio: 'pipe' });
+  } finally { await rm(directory, { recursive: true, force: true }); }
 });
