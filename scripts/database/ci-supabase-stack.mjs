@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { bufferedSqlCommand } from './buffered-sql-command.mjs';
@@ -20,7 +20,7 @@ export async function withCiSupabaseStack(projectId, work) {
   assert.match(projectId, /^kajo_ci_[a-z_]+$/);
   const container = `supabase_db_${projectId}`;
   const environment = { ...process.env };
-  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID',
+  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID', 'SUPABASE_WORKDIR',
     'PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'PGSERVICE', 'PGSERVICEFILE', 'PGPASSFILE',
     'DOCKER_HOST', 'DOCKER_CONTEXT', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']) delete environment[name];
   Object.assign(environment, { DOCKER_HOST: 'unix:///var/run/docker.sock',
@@ -34,12 +34,18 @@ export async function withCiSupabaseStack(projectId, work) {
     if (result.status !== 0) {
       // SQL is repository-owned metadata/probe input. CLI output can contain
       // development keys/connection strings, so is never logged here.
-      const detail = command === 'docker' && args.includes('psql') ? `: ${result.stderr.trim().slice(-3000)}` : '';
+      let detail = command === 'docker' && args.includes('psql') ? `: ${result.stderr.trim().slice(-3000)}` : '';
+      if (command === 'npx' && args.includes('reset')) {
+        // Reset diagnostics include only SQL error/flag lines, not CLI status
+        // output with development connection strings or keys.
+        detail = ': ' + result.stderr.split('\n').filter(line => /ERROR:|SQLSTATE|unknown flag:/.test(line))
+          .join('\n').replace(/postgres(?:ql)?:\/\/\S+/gi, '[local connection]').slice(-3000);
+      }
       throw new Error(`${command} ${args[0]} failed with exit ${result.status}${detail}`);
     }
     return result.stdout;
   }
-  const cli = (args, options) => run('npx', ['--yes', `supabase@${cliVersion}`, ...args], options);
+  const cli = (args, options) => run('npx', ['--yes', `supabase@${cliVersion}`, '--workdir', directory, ...args], options);
   const docker = (args, options) => run('docker', ['--host', 'unix:///var/run/docker.sock', ...args], options);
   try {
     const names = docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n');
@@ -66,7 +72,26 @@ export async function withCiSupabaseStack(projectId, work) {
         '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
       return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
     };
-    const result = await work(execSnapshots);
+    const resetFromMigrations = async files => {
+      assert.equal(projectId, 'kajo_ci_cli_install', 'CLI reset is restricted to its newly owned test stack');
+      assert.ok(files.length > 0);
+      assert.equal(new Set(files.map(file => file.name)).size, files.length);
+      for (const file of files) {
+        assert.match(file.name, /^\d{14}_[a-z0-9_]+\.sql$/);
+        assert.equal(typeof file.sql, 'string');
+      }
+      // This directory belongs only to the freshly created CI workspace above.
+      // No repository migration directory or existing Supabase project is used.
+      const path = join(directory, 'supabase', 'migrations');
+      await rm(path, { recursive: true, force: true });
+      await mkdir(path);
+      for (const file of files) await writeFile(join(path, file.name), file.sql, { flag: 'wx' });
+      cli(['db', 'reset', '--local', '--no-seed', '--yes'], { timeout: 360_000 });
+      const resetImage = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
+      assert.equal(resetImage, image, 'CLI reset changed the pinned database image');
+      return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
+    };
+    const result = await work(execSnapshots, { resetFromMigrations });
     cli(['stop', '--no-backup'], { timeout: 120_000 });
     started = false;
     assert.ok(!docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n').includes(container),

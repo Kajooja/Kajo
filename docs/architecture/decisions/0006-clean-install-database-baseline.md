@@ -773,8 +773,7 @@ against the existing 16-character minimum. The corrected fixture also records
 one matched staging row and consistent import counts. The workspace recovered;
 all four local upgrade regressions now pass. The full `npm run check` also passed
 191 mobile, 14 catalog and 54 database tests, TypeScript/lint and both bundles.
-The corrected real CI result must
-still be recorded before accepting the native upgrade experiment. No hosted
+The corrected native upgrade experiment passed in CI #390, as recorded below. No hosted
 migration or canonical installer/history transition is activated.
 
 ## Upgrade rollback and unchanged-export evidence — 2026-09-09
@@ -838,6 +837,70 @@ before declaring it accepted. The currently passing candidate runner uses direct
 SQL in isolated stacks; it does not claim that ordinary historical `db reset`
 or `db push` has been repaired. Do not silently turn the test candidate into a
 canonical migration or mark historical failures applied.
+
+## Native existing-application upgrade PASS — 2026-09-09
+
+[CI #390](https://github.com/Kajooja/Kajo/actions/runs/34371882375) passed at branch
+head `7507d3501d08b38478250e5437c0dd08892d9cb6`, tested merge commit
+`7de4d11835a06753eb606299dfb3a664e0100355`. Validation, platform/defaults, both
+application installations and the independent populated upgrade all passed.
+
+The upgrade used the same pinned CLI 2.117.0/Linux x64/Postgres image identity as
+CI #388. Container `8eb91864ceb9a32702c0081cb7db549e6e459ab22329df95167c5a011b967463`
+was newly created and removed successfully. All 221 existing application/native
+functions and complete fixture row hashes survived the migration, repeated
+application, runtime smoke, exact default-grant rollback and reapplication.
+The populated fixture covers the same row categories as the unchanged-export
+experiment above, on actual Supabase Auth/platform schema and roles.
+
+Verified artifact `10112411268`,
+`kajo-upgrade-7de4d11835a06753eb606299dfb3a664e0100355`:
+
+- ZIP SHA-256 `d75ffc49323860b0daca349529731d73cb379f5963b936ede8c4c55099e4dce7`.
+- Report SHA-256 `41b1b98b382dbd087228702aa6995b867c0a3552beb5c0857e67a972885f03ea`.
+- Source-fixture SHA-256 `0ac203d8aaa7e2209277d5d10ec40a6fcfd50dd7a6de11f03a432b3587d2d778`.
+- Existing snapshot SHA-256 `323d085e48dc54b9186bcecea84720ed677deecb7a0541998bc0f634ad7b16e1`.
+- Corrected snapshot SHA-256 `8d42160e0b6a3d5515e0e8cff77e416c1e3ce798f3708ea6f1086d66f5f121f5`.
+
+The ZIP digest, single expected JSON entry and report fields were checked after
+download. This completes the scoped independent native upgrade/rollback experiment;
+it does not deploy the migration or reconcile existing hosted migration IDs.
+
+## Proposed CLI lineage experiment — prepared, not activated
+
+The remaining installation boundary is now exercised through Supabase's own
+migration executor and history table. The [CLI reference](https://supabase.com/docs/reference/cli/supabase-db-reset)
+describes local reset as a fresh local database plus the workspace's migrations;
+`--local` and `--no-seed` keep this test explicit and exclude extra seed files.
+
+`run-ci-cli-installation-probe.mjs` generates a test-only file named
+`20260907155201_kajo_source_baseline.sql`, containing the reviewed source candidate,
+and copies only ordinary post-cutoff SQL unchanged. These files exist solely in
+a newly created, unlinked CI workspace. The 47 protected repository files are not
+moved/edited, no replacement canonical directory is installed, and no old hosted
+migration is marked applied. This proposed fresh lineage deliberately records one
+baseline identity instead of pretending all 47 historical statements were replayed.
+
+CLI execution owns the transaction/history boundary; the baseline does not insert
+an inner COMMIT. The test checks two clean reset results against the independent
+source reference and actual CLI version/name rows. Between successful resets, an
+extra future-dated **test-only** migration creates a table then deliberately fails.
+Both that table and its history record must be absent afterward. This verifies
+failure atomicity instead of accepting skipped errors. Full Auth/Personal/Shared/
+import/default smokes and native function/role/callback preservation still apply.
+
+The shared runner exposes reset only to its newly owned `kajo_ci_cli_install`
+project. It pins the workspace explicitly, clears inherited Supabase workdir and
+hosted connection settings, validates migration basenames, checks the actual image
+after reset and removes the entire owned stack/workspace at exit. No remote reset,
+link or migration-repair option is exposed. Only SQL error lines are surfaced from
+CLI reset failures; connection/status output is suppressed.
+
+The full local check passed 259 tests and both bundles after adding this runner.
+The first actual CLI job remains pending and must pass before the proposed lineage
+can be considered for adoption. Existing-database deployment continues to need its
+own accepted append-only procedure; a successful fresh lineage does not resolve
+legacy hosted/repository tracking mismatches automatically.
 
 ## Alternatives considered
 

@@ -613,3 +613,17 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - The workspace connection recovered. Full `npm run check` passed 191 mobile, 14 catalog and 54 database tests,
   TypeScript/lint and both bundles. Corrected native CI is the next evidence; canonical CLI/history activation is
   still separately gated and is not inferred from these SQL experiments.
+
+### Native upgrade PASS; CLI lineage experiment prepared — 2026-09-09
+
+- CI #390 at `7507d35` passed validation, platform/default checks, both application
+  installations and the separate populated upgrade/rollback/reapplication job.
+  Its downloaded report preserves 221 existing functions and all synthetic row
+  hashes; ZIP/report/source/runtime identities are recorded in ADR-0006.
+- Added a restricted CI-only CLI reset experiment. A generated source baseline
+  plus unchanged forward files must yield matching clean installs and exact CLI
+  history. A deliberately failed extra test migration must leave no table/history
+  entry. Repository history and hosted state remain untouched.
+- Full local `npm run check` passed 191 mobile, 14 catalog and 54 database tests,
+  lint/typecheck and both bundles. The first real CLI job is pending. Proposed
+  lineage adoption and existing hosted-history procedure remain separate gates.

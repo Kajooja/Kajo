@@ -102,28 +102,35 @@ temporary file on exit. Both CI and Mac use the correction. The full local
 TypeScript, lint (zero errors; one existing DiscoveryScreen Hook warning), and
 iOS/Android bundles.
 
-**Finish the independent populated-application upgrade next.** The new
-`database-upgrade` job reconstructs a separate source-checkpoint fixture with
-existing Auth users, Personal/Shared memberships, native and imported evidence,
-committed traces and system seeds. It does not call the candidate installer.
-The probe must first demonstrate the old global PUBLIC function default, apply
-only the unchanged forward migration, then preserve complete row hashes,
-definitions, owners/ACLs, triggers and native platform metadata. It also checks
-existing ranking/import-removal/authorization and new Auth provisioning after
-the upgrade. It now rehearses restoring the exact captured default grants and
-reapplying the migration, including grant-option restoration. CI #389 caught a
-15-character synthetic import fingerprint against the existing 16-character
-minimum; the fixture now has a valid fingerprint and consistent import counts/
-rows. The restored workspace passed all four upgrade regressions. The full `npm run check` then passed 191 mobile +
-14 catalog + 54 database tests (259 total), TypeScript/lint and both bundles.
-Finish the corrected real CI run; do not infer it from the clean installation job.
+**The independent populated-application upgrade and rollback now PASS.**
+[CI #390](https://github.com/Kajooja/Kajo/actions/runs/34371882375) at
+`7507d3501d08b38478250e5437c0dd08892d9cb6` passed validation, platform/defaults,
+both application installations and the separate upgrade job. The source-checkpoint
+fixture committed Auth/Profile/membership, native/imported evidence, predictions,
+shadow jobs, Lists and seeds before applying only the ordinary forward migration.
+All complete row hashes, 221 existing application/native functions, table/trigger
+metadata and unrelated defaults stayed unchanged. Old-to-new function defaults,
+runtime, exact rollback, reapplication and cleanup passed. The report was downloaded
+and its ZIP/report hashes verified. Do not repeat this completed upgrade discovery.
 
-The independent unchanged-export variant also passed offline in PGlite with all
-123 original function bodies/owners/ACLs preserved, complete populated row hashes,
-before/after runtime, rollback and reapplication. It supplies only the missing
-Auth trigger and deterministic seeds, not the function/compatibility supplement.
-The export's restore-session row_security setting is returned to ON before
-running authenticated SQL. ADR-0006 records the reproducible command and hashes.
+The optional unchanged-export variant separately passed in PGlite with all 123
+original application functions and populated row hashes preserved, without the
+function/compatibility supplement. It restores pg_dump's client row_security
+setting to ON before authenticated runtime checks. ADR-0006 records both scopes,
+commands, source identities and final report hashes. The invalid synthetic import
+fingerprint caught in CI #389 was corrected; all four upgrade regressions and the
+full `npm run check` passed (191 mobile + 14 catalog + 54 database = 259 tests,
+TypeScript/lint and both bundles).
+
+**Verify the proposed CLI installation lineage and history next.** The new
+`database-cli-installation` job generates only a source baseline at the protected
+cutoff plus unchanged post-cutoff migrations inside its own disposable workspace.
+It invokes pinned Supabase `db reset --local --no-seed` twice, compares source
+schema/ACL/seeds and runtime, and checks the CLI's actual version/name history.
+An intentionally failing extra test migration must leave neither its table nor
+an applied-history row. This is test-only: the repository's canonical migrations
+and existing hosted history stay intact. Its first real CI result is pending;
+passing the direct-SQL installation jobs does not establish this CLI/tracking gate.
 
 Completed reviews must not be restarted:
 
