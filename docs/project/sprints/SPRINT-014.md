@@ -8,7 +8,7 @@ Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy act
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
-[STATUS.md](../STATUS.md) owns the exact next task. The #208 operational delivery adopts the verified source lineage for new local/CI databases; after its required CI/merge, continue Phase 14.1 action/delivery evidence. PR #219's source/platform experiments are completed evidence.
+[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Lists/Shared command completion and exact delivered provenance follow. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
@@ -693,3 +693,55 @@ merge number. Complete publication, then pause as requested by the owner.
 - Local `npm run check` passed: 191 mobile, 14 catalog and 59 database tests
   (264 total), lint/typecheck and both bundles. The existing Hook warning remains;
   native operational installation is verified by the required PR CI gate.
+
+
+### Atomic rating/not-interest/undo and durable outbox — 2026-09-09 / #224
+
+- The CLI-created `*_atomic_item_actions.sql` forward adds the public invoker/private
+  authorized command, private receipt/head tables with RLS and an undo-invalidation
+  trigger. Current state, session, canonical Event and receipt are transactional.
+  Cached replies still require current actor/Profile authorization; altered payloads
+  cannot reuse an ID. Server-recorded undo predecessors prevent intervening/legacy
+  updates from being erased, including changes back to the same values.
+- Mobile rating/not-interest/undo enters one persisted command path before optimistic
+  feedback. SQLite keys include environment/actor/Profile; FIFO retry, immutable
+  payloads, restart recovery, storage failure and stale-scope callback/dispatch guards
+  have deterministic tests. A rejected stale undo has an explicit discard/reload
+  action; uncertain acknowledgements and permission failures remain queued.
+- SQL acceptance runs on the complete source-plus-forward schema and in the required
+  native CLI job. A populated old-schema rehearsal applies the exact new file with
+  hosted-style global defaults and requires unchanged hashes for every existing
+  application/Auth table. Rolled-back command smoke covers retry, failure after
+  projection write, ordered undo, actor/member denial and trace guards.
+- Correlation validates existing selected candidate + actor/Profile/session/mode +
+  prior impression. Unverified IDs yield unattributed native Events; undo keeps its
+  original accepted trace. This does not complete frozen client slate provenance.
+- Lists/Endorsement atomicity and durable exposure delivery remain the next 14.1
+  package. Their legacy detail List projection cannot overtake pending atomic
+  commands. Full DATA-003/004 and real-device process-death acceptance remain open.
+- Verification: local `npm run check` passed 207 mobile, 14 catalog and 61 database
+  tests (282 total), lint/typecheck and both bundles. All five required jobs in
+  [CI #403](https://github.com/Kajooja/Kajo/actions/runs/34402219263) passed at
+  `55b025a0805e65a639295132026461a18057b020`, including the native populated forward
+  rehearsal and full command smoke on the pinned Supabase stack.
+- Hosted rollout: Kajo `mwrnvfosrzwygrunrltm` accepted only the new forward under
+  actual version `20260909204512_atomic_item_actions.sql`. The CLI-created filename
+  was synchronized to that provider identity without changing SQL bytes; SHA-256
+  `81bc4304d24dc063b04fdd567b1b1c3cc8c2a0bda4ecaff286395701b84f1cdb`.
+  All 31 existing application/Auth table hashes, 123 function fingerprints, 21
+  triggers, defaults and 44 old migration rows remained unchanged. All three new
+  function definitions/owners/ACLs match the reviewed source; the two private RLS
+  tables deny all API-role table access and only authenticated can call the command.
+- Hosted command acceptance passed using rollback-only fixture DML: retry, ordered
+  undo, legacy invalidation, authorization and accepted/fabricated trace cases.
+  It selected an actual ranked Item for the synthetic Profile. Forced late Event
+  failure was exercised only in isolated native CI, avoiding a hosted test trigger.
+  The complete post-smoke snapshot matched pre-smoke state and left zero receipts
+  or heads. Security advisors added only the two expected private RLS-without-policy
+  INFO notices; the pre-existing [Auth password-protection WARN](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) is unchanged.
+- The separate global-default forward and old tracking remain untouched. Rollback
+  preserves accepted commands/evidence and uses the previous client or narrowly
+  disables the new endpoint. PR #225 / #224 own final-head CI and merge evidence;
+  filename/documentation synchronization is subject to those same required gates.
+- No emulator/phone interaction or physical process-kill/SQLite recovery test was
+  available in this workspace. Type/JS/SQL/bundle checks do not claim that acceptance.

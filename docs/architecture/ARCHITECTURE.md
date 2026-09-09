@@ -213,7 +213,9 @@ explicit user command
 
 The first release requires a bounded persistent mobile outbox for unacknowledged explicit commands. Process death/retry/account switch may not duplicate or leak actions.
 
-Implementation checkpoint, 2026-09-09: `EventTrackingContext.tsx`/`eventTracking.ts` currently coordinate an in-memory queue that is disposed on scope changes. `eventPersistence.ts` writes Events separately from current-state persistence. Persistent outbox and atomic command/Event commits remain **open** under `MVP-DATA-003` (ROADMAP 14.1). Existing ordered retries do not establish process-death durability.
+Implementation checkpoint, 2026-09-09 / #224: rating, not-interest and their undo use `commit_item_action_v1` plus a SQLite-backed command outbox. The server patches current state and appends one canonical Event and an immutable receipt in one transaction. Actor/membership checks precede cached replies. A per-Item undo head is invalidated by every legacy projection write; undo restores the server-recorded predecessor instead of accepting a client state snapshot. The public wrapper is SECURITY INVOKER; its private command implementation has explicit authorization and narrowly granted execution. Private receipt/head tables have RLS and no API-role table access.
+
+The mobile outbox persists before optimistic acknowledgement, preserves FIFO through lost replies/restarts and suspends stale actor/Profile/environment scopes. `DATA_EVENTS.md` owns retry/rejection and attribution details. Lists/Endorsements and the exposure-only `EventTrackingContext.tsx` queue still use their older separate/in-memory paths. Full `MVP-DATA-003` (ROADMAP 14.1), device process-death acceptance and complete delivered-slate provenance remain open; #224's deployment and CI state are recorded in its PR/Issue and Sprint 014.
 
 Recommendation delivery origin is frozen truthfully. A cached Item from another Profile/mode/run cannot inherit a hosted `predictionId`.
 

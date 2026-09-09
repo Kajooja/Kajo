@@ -21,12 +21,13 @@ export type ItemInteractionAction =
     | { type: 'SET_CONSUMED'; itemId: ItemId; consumed: boolean }
     | { type: 'SET_RATING'; itemId: ItemId; rating: number | null }
     | { type: 'SET_NOT_INTERESTED'; itemId: ItemId; notInterested: boolean }
-  ) & { eventId?: EventId };
+  ) & { eventId?: EventId; atomicActionId?: EventId };
 
 export interface ItemInteractionUndoEntry {
   itemId: ItemId;
   previousInteraction: ItemInteraction | null;
   eventId: EventId | null;
+  atomicActionId?: EventId;
 }
 
 export interface ItemInteractionStore {
@@ -155,6 +156,7 @@ export function commitItemInteractionAction(
         itemId: action.itemId,
         previousInteraction,
         eventId: action.eventId ?? null,
+        ...(action.atomicActionId ? { atomicActionId: action.atomicActionId } : {}),
       },
     ],
   };

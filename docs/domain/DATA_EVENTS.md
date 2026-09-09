@@ -275,6 +275,51 @@ Persistent actor/Profile-scoped device outbox requirements:
 
 Delivery provenance is frozen independently from score order. Cached data from another Profile/mode/run cannot inherit the current predictionId.
 
+### Implemented command slice — #224 / Phase 14.1
+
+`public.commit_item_action_v1(request)` accepts version 1 rating, not-interest and
+undo commands for a generic Item. The envelope freezes action ID, actor/Profile,
+Item, occurrence time, session ID/start/context and optional prediction/mode.
+The server derives the Event type/properties and patches only the owned taste
+fields; Saved and other unrelated fields come from locked current state. Rating
+implies consumed. The state, session, Event and `private.item_action_receipts` row
+commit together. Equal JSON payload under the same ID returns its original receipt;
+a different payload is rejected. Current membership/actor authorization is checked
+before execution **and** receipt replay.
+
+`private.item_action_heads` protects undo against intervening actions and legacy
+writes, including changes that later return to the same field values. Undo restores
+the server's recorded prior state, appends `ITEM_INTERACTION_UNDONE` with the exact
+reversed Event ID and restores the preceding undo head. It cannot undo another
+actor's action or forge Shared consensus Saved state. A stale undo returns `KJ001`;
+the UI can explicitly discard that rejected undo and reload authoritative state.
+Uncertain network replies and authorization failures are retained, not discarded.
+
+`itemActionOutbox.ts` persists commands synchronously through SQLite before the UI
+accepts them. Keys include backend environment, actor and Profile; each bounded
+queue holds at most 256 commands / 1,048,576 serialized characters. It sends FIFO,
+stops at the first failure and retries transient failures after 1–30 seconds.
+Lost acknowledgements reuse the original payload/ID. Corrupt/full/unwritable
+storage rejects new acceptance without erasing queued data. Scope changes stop
+subsequent dispatch and stale UI callbacks; a completed in-flight acknowledgement
+may remove only its own command. Pending commands are reapplied over hydration
+after restart, and pending/errors stay visible. Acknowledged commands are removed;
+logout suspends the actor's remaining queue. Account/deletion/retention acceptance
+still belongs to `MVP-OPS-002`.
+
+For this slice, correlation requires an existing selected candidate, the same
+actor/Profile/session/mode and a recorded impression preceding the action. An
+unverified/fallback ID becomes an unattributed native Event without blocking the
+preference itself. Undo retains its target action's original accepted trace and
+mode. This is a validation guard, **not** proof of complete frozen delivered-slate
+provenance: grid/detail/swipe cache/overlay origin and durable exposure delivery
+remain `MVP-DATA-004` work.
+
+Lists and Shared Endorsements are the next command slice. Their existing server
+state writes and client Events are still separate. The detail List picker waits
+for this slice's pending actions so its legacy whole-state projection cannot
+overtake the new queue. Full Phase 14.1 and `MVP-DATA-003/004` remain open.
+
 ## 12. Taste/acquisition reliability contract
 
 Taste/acquisition paths require equivalent discipline:

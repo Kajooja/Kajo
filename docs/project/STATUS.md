@@ -78,40 +78,42 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 
 ### Current delivery and next task
 
-Phase 14.0's source/schema/platform verification is complete (merged #219).
-The #208 operational delivery explicitly adopts that verified lineage for new
-**local/CI** databases and makes it operational
-through `npm run database:install -- /absolute/new/workspace`. See the adopted
-[ADR-0006 procedure](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure).
-The required PR checks gate this delivery; GitHub owns its exact merge/run state.
+Phase 14.0 is accepted: #219 supplied source/schema/platform verification and
+#223 (`fd7b82d`) delivered the operational fresh local/CI installation. #207 and
+#208 are closed with their precise technical evidence. `MVP-ALG-001` is complete;
+BOOT/device/catalog/usefulness and full `MVP-ALG-009` remain separate open gates.
+The 47 protected historical files and their failing chronological diagnostic are
+unchanged. [ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)
+owns the adopted fresh lineage and existing-database forward procedure.
 
-The procedure preserves the 47 historical files, refuses an existing application,
-checks source/image/history/runtime and cleans failed newly owned installations.
-The CI installation path now includes ordinary unchanged post-cutoff migrations
-and verifies new application tables/functions as well as the baseline. The original
-unmodified chronology remains a truthful failing diagnostic; #208's replacement
-criterion is an explicit installation decision, not a claim that history was fixed.
+The latest **14.1 delivery is #224 / PR #225**:
+rating, not-interest and their undo now have an idempotent/atomic server command
+and a SQLite-backed actor/Profile/environment outbox. The command persists state,
+Event and receipt together, preserves unrelated Saved state, rejects stale undo
+and validates any supplied trace before correlation. The queue persists before
+optimistic acceptance, survives restart/lost replies, preserves FIFO and stops
+stale-scope dispatch/callbacks. A definitively rejected undo can be explicitly
+discarded before reloading current server state. `DATA_EVENTS.md` owns the contract.
+The reviewed server forward `20260909204512_atomic_item_actions.sql` is deployed
+and its rollback-only command acceptance passed. All five gates in CI #403 passed
+for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
+records exact rollout/source verification and the remaining device limitations.
 
-The #207 bootstrap correction already has deterministic opposite imported and
-calibrated tastes, removal/correction, native/undo, cross-domain and authorization
-regressions plus the recorded hosted public V1 smoke. Its technical gate can close
-with accepted fresh installation. Device import/calibration/Shared acceptance and
-measured recommendation usefulness remain separately open under BOOT/PRED/CAT.
+Continue **14.1** after this delivery:
 
-Continue **14.1** from accepted main:
+1. Extend the same command discipline to List create/rename/delete/membership and
+   Shared Endorsement/consensus. Their current state/Event writes are still separate;
+   do not close `MVP-DATA-003` merely because rating/not-interest are durable.
+2. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
+   swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
+   exposure delivery durable; the old exposure-only Event queue remains in memory.
+3. Verify late outcomes, real device process-death/reconnect/account switches and
+   complete atomic List/Shared rollback/duplicate/undo authorization cases.
+4. Then proceed to **14.2 serving/shadow/candidate availability**.
 
-1. Commit explicit action, current-state projection and canonical Events atomically
-   and idempotently through one authorized server boundary.
-2. Persist unacknowledged actions on device with stable IDs and actor/Profile scope;
-   retry safely after process death and account/Profile switches.
-3. Preserve the exact delivered Profile, prediction and slate origin in grid/detail/
-   swipe/Lists/Shared overlays. Unattributed actions must never guess a prediction.
-4. Verify rollback, duplicate delivery, undo, stale responses and scope isolation,
-   then proceed to **14.2 serving/shadow/candidate availability**.
-
-`MVP-ALG-009` remains in progress for those additional regressions; Sprint 014 and
-Phase 14 quality/evaluation acceptance remain open. No Taste/Friend implementation
-starts ahead of the remaining algorithm requirements.
+`MVP-DATA-003/004`, full `MVP-ALG-009`, Sprint 014 and Phase 14 quality/evaluation
+acceptance remain open. No Taste/Friend implementation starts ahead of those
+algorithm requirements. Do not restart completed source export/platform experiments.
 
 ### Existing hosted database and repository hygiene
 
@@ -119,7 +121,10 @@ The existing hosted database stays on the separately reviewed forward-only
 procedure in ADR-0006. Its known tracking mismatch is not repaired by local-lineage
 adoption. Forward file `20260909131913_close_postgres_function_defaults.sql` has
 not been applied hosted; deployment must capture its own prior defaults/rollback.
-No hosted schema/data/history change is part of this local installer delivery.
+The #223 local installer did not change hosted state. #224 applied only its new
+atomic-action forward: all 31 old application/Auth table hashes, 123 existing
+function fingerprints, 21 triggers, defaults and 44 old tracking rows remained
+unchanged. The new tracking row uses the provider's actual version above.
 
 The [2026-09-09 retrospective](retros/2026-09-09.md) and recovery manifest preserve
 the completed #220 audit and removal of all 145 approved old remote branches.

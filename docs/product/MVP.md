@@ -180,7 +180,7 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [-] `MVP-DATA-001` Meaningful discovery behavior is captured through canonical generic event interface.
 - [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
-- [ ] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely.
+- [-] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely. #224 delivers the rating/not-interest/undo slice; Lists/Endorsements and device acceptance remain open.
 - [ ] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
 - [x] `MVP-PRED-001` Prediction ranks generic Items for a Profile.
 - [x] `MVP-PRED-002` Prediction includes long-term, recent and Item-similarity signals.
@@ -192,7 +192,7 @@ Existing SharedProfile learning semantics remain canonical.
 
 ## Algorithm correctness and adaptation — release blockers
 
-- [-] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence.
+- [x] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence. Technical acceptance: #207/#210 and adopted fresh-install gate #208/#223; device/bootstrap usability and measured quality remain separate BOOT/CAT/TASTE gates.
 - [ ] `MVP-ALG-002` Serving/shadow share versioned feature/score/eligibility/delivery semantics and baseline replay parity.
 - [ ] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
 - [ ] `MVP-ALG-004` Working/Short/Long state use ordered, source-aware, evidence-aware decay/support; contradictions can change taste without one session erasing durable state.
