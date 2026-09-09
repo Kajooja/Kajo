@@ -122,15 +122,32 @@ fingerprint caught in CI #389 was corrected; all four upgrade regressions and th
 full `npm run check` passed (191 mobile + 14 catalog + 54 database = 259 tests,
 TypeScript/lint and both bundles).
 
-**Verify the proposed CLI installation lineage and history next.** The new
+**The proposed CLI installation lineage and atomic history now PASS.** The
 `database-cli-installation` job generates only a source baseline at the protected
 cutoff plus unchanged post-cutoff migrations inside its own disposable workspace.
 It invokes pinned Supabase `db reset --local --no-seed` twice, compares source
 schema/ACL/seeds and runtime, and checks the CLI's actual version/name history.
 An intentionally failing extra test migration must leave neither its table nor
 an applied-history row. This is test-only: the repository's canonical migrations
-and existing hosted history stay intact. Its first real CI result is pending;
-passing the direct-SQL installation jobs does not establish this CLI/tracking gate.
+and existing hosted history stay intact. The actual CLI job in CI #391 passed:
+its two successful resets matched the source snapshot, and the deliberate failing
+migration left neither DDL nor a history row. The report was downloaded and
+verified; ADR-0006 records its identifiers. Do not repeat the completed CLI proof.
+
+CI #391 as a whole was not green: the separate upgrade job received the identical
+Postgres image from ghcr.io instead of public.ecr.aws. The strict reference-string
+check stopped before application SQL, despite the exact same pinned content ID.
+The corrected check accepts only those two observed Supabase references, the same
+17.6.1.167 tag and the exact reviewed image ID. Changed content/version/registry
+still fails; the added regression and full check passed 260 tests (55 database)
+and both bundles. Verify its complete CI rerun before merging.
+
+After that, review adoption of the explicit fresh-install lineage in ADR-0006.
+Issue #208 currently requires successful unmodified chronological replay; that
+literal criterion remains unsatisfied. The tested source baseline is an explicit
+alternative, not evidence that the original chain passed. Keep #208/MVP-ALG-009
+open until the acceptance/installation procedure is explicitly resolved. PR #219
+is still open; its test results are not accepted main truth.
 
 Completed reviews must not be restarted:
 

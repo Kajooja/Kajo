@@ -12,6 +12,14 @@ const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
 const imageId = 'sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f';
 
+export function verifyCiPostgresImage(image) {
+  const [reference, digest, ...extra] = image.split(' ');
+  assert.equal(extra.length, 0, 'Unexpected Docker image identity format');
+  assert.ok(['public.ecr.aws/supabase/postgres:17.6.1.167',
+    'ghcr.io/supabase/postgres:17.6.1.167'].includes(reference), 'Unreviewed Postgres image reference');
+  assert.equal(digest, imageId, 'Postgres image content changed; review its actual digest before running application SQL');
+}
+
 export async function withCiSupabaseStack(projectId, work) {
   assert.equal(process.platform, 'linux', 'This runner requires GitHub Ubuntu');
   assert.equal(process.arch, 'x64', 'This image checkpoint is for Linux x64');
@@ -64,8 +72,7 @@ export async function withCiSupabaseStack(projectId, work) {
     cli(['start', '--exclude', 'studio,postgres-meta,edge-runtime,imgproxy,logflare,vector,supavisor'], { timeout: 720_000 });
     const image = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
     console.log(`Image: ${image}`);
-    assert.equal(image, `public.ecr.aws/supabase/postgres:17.6.1.167 ${imageId}`,
-      'Postgres image changed; review its actual digest before running application SQL');
+    verifyCiPostgresImage(image);
     const containerId = docker(['inspect', '--format', '{{.Id}}', container]).trim();
     const execSnapshots = async sql => {
       const output = docker(['exec', '-i', container, ...bufferedSqlCommand(['psql', '-X', '-qAt',
@@ -88,7 +95,7 @@ export async function withCiSupabaseStack(projectId, work) {
       for (const file of files) await writeFile(join(path, file.name), file.sql, { flag: 'wx' });
       cli(['db', 'reset', '--local', '--no-seed', '--yes'], { timeout: 360_000 });
       const resetImage = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
-      assert.equal(resetImage, image, 'CLI reset changed the pinned database image');
+      verifyCiPostgresImage(resetImage);
       return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
     };
     const result = await work(execSnapshots, { resetFromMigrations });

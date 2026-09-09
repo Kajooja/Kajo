@@ -627,3 +627,17 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - Full local `npm run check` passed 191 mobile, 14 catalog and 54 database tests,
   lint/typecheck and both bundles. The first real CLI job is pending. Proposed
   lineage adoption and existing hosted-history procedure remain separate gates.
+
+### CLI lineage PASS and identical-image registry correction — 2026-09-09
+
+- The actual CLI job in CI #391 passed two resets, source/runtime/seed/default
+  parity and failure atomicity: the deliberately failed migration left no table
+  or history row. Its verified report and exact two-row history are in ADR-0006.
+- The same run's upgrade job stopped before application SQL because Supabase
+  used its GHCR reference with the exact reviewed ECR image content ID. The check
+  now accepts those two observed references only, retaining the exact tag/digest
+  requirement. Changed image content/version/registry regression passes.
+- Full local check passed 191 mobile, 14 catalog and 55 database tests plus
+  lint/typecheck and both bundles. Complete corrected CI remains pending.
+- #208's literal unmodified-replay criterion is still unsatisfied. Fresh-lineage
+  adoption/acceptance is explicit; no historical or hosted mutation is inferred.

@@ -897,10 +897,59 @@ link or migration-repair option is exposed. Only SQL error lines are surfaced fr
 CLI reset failures; connection/status output is suppressed.
 
 The full local check passed 259 tests and both bundles after adding this runner.
-The first actual CLI job remains pending and must pass before the proposed lineage
-can be considered for adoption. Existing-database deployment continues to need its
+The actual CLI experiment passed in CI #391, as recorded below. Its adoption
+remains an explicit decision rather than an automatic claim of historical replay. Existing-database deployment continues to need its
 own accepted append-only procedure; a successful fresh lineage does not resolve
 legacy hosted/repository tracking mismatches automatically.
+
+## Actual CLI lineage and failure atomicity PASS — 2026-09-09
+
+The CLI job in [CI #391](https://github.com/Kajooja/Kajo/actions/runs/34373211240)
+passed at `91364779bc3e5d890f44383b16cf856252918922`, tested merge commit
+`f551709c471a3e4df2d014382df75343dc7b2b9a`. Two successful local resets used
+distinct replacement database containers (`e043b14d2733...`, `953920c31181...`).
+Both produced the reviewed application snapshot SHA-256
+`3986d51b67f3862d4681b3347f4da5ce4f5590257cb69e9ac52cd19cff096fe4`, matched source
+schema/permissions/seeds, and passed runtime/default checks. All 99 native
+functions and native roles/callbacks remained equivalent to the fresh stack.
+
+The deliberately failing extra migration left neither its newly created table
+nor an applied history record. The final CLI history contains exactly:
+
+| Version | Name |
+| --- | --- |
+| 20260907155201 | kajo_source_baseline |
+| 20260909131913 | close_postgres_function_defaults |
+
+The baseline SQL SHA-256 is
+`03e362d3f27a890b4c581eb24342837179e14ac9916d92e8106a79a4c4511a95`; the ordinary
+forward file remains
+`167420864b8cf673788ee740691679581b8247ba15ea8410d660032990e5628e`.
+Artifact `10113010481`,
+`kajo-cli-installation-f551709c471a3e4df2d014382df75343dc7b2b9a`, was downloaded and
+verified: ZIP SHA-256
+`672499304d6641ccb36668044512e9a291105a79546f181c4397e21a2c82ea72`, report SHA-256
+`c714e035abe21509b3e983cafe5fb7ac3dfc367cc1a14051f6e0d8d0019a3492`.
+Cleanup passed. No old history file or hosted row was changed.
+
+CI #391 overall failed only because its separate upgrade job encountered the
+same reviewed image through Supabase's GHCR reference rather than its ECR
+reference. The logged actual content ID was still
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`, and the
+runner stopped before application SQL. The correction accepts only
+`public.ecr.aws/supabase/postgres:17.6.1.167` and
+`ghcr.io/supabase/postgres:17.6.1.167` with that exact content ID, including after
+CLI reset. Actual reference names remain in reports. A regression rejects changed
+content, tags and unreviewed registries. Full local check passed 191 mobile,
+14 catalog and 55 database tests (260 total), TypeScript/lint and both bundles.
+The complete corrected CI rerun remains to be recorded.
+
+The original [Issue #208 acceptance](https://github.com/Kajooja/Kajo/issues/208)
+requires successful unmodified migration replay. This experiment proves a separate
+source-derived fresh lineage, not that original criterion. Adopting it must be
+explicit in the installation/acceptance procedure; neither a green experiment nor
+a doc update silently changes the issue's contract. Existing hosted tracking stays
+untouched and needs its own ordinary forward-deployment procedure.
 
 ## Alternatives considered
 
