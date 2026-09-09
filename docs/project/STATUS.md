@@ -110,9 +110,20 @@ The probe must first demonstrate the old global PUBLIC function default, apply
 only the unchanged forward migration, then preserve complete row hashes,
 definitions, owners/ACLs, triggers and native platform metadata. It also checks
 existing ranking/import-removal/authorization and new Auth provisioning after
-the upgrade. Its CI result is pending; do not label it passed from the clean
-installation job. The local workspace disconnected during this continuation,
-so this new test package is being validated by CI rather than claimed locally run.
+the upgrade. It now rehearses restoring the exact captured default grants and
+reapplying the migration, including grant-option restoration. CI #389 caught a
+15-character synthetic import fingerprint against the existing 16-character
+minimum; the fixture now has a valid fingerprint and consistent import counts/
+rows. The restored workspace passed all four upgrade regressions. The full `npm run check` then passed 191 mobile +
+14 catalog + 54 database tests (259 total), TypeScript/lint and both bundles.
+Finish the corrected real CI run; do not infer it from the clean installation job.
+
+The independent unchanged-export variant also passed offline in PGlite with all
+123 original function bodies/owners/ACLs preserved, complete populated row hashes,
+before/after runtime, rollback and reapplication. It supplies only the missing
+Auth trigger and deterministic seeds, not the function/compatibility supplement.
+The export's restore-session row_security setting is returned to ON before
+running authenticated SQL. ADR-0006 records the reproducible command and hashes.
 
 Completed reviews must not be restarted:
 

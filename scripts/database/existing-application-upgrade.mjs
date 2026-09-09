@@ -85,6 +85,29 @@ export function assertUpgradePreserved(before, after) {
   assert.deepEqual(unaffected(afterDefaults), unaffected(beforeDefaults), 'Upgrade changed unrelated defaults');
 }
 
+// Restore only grants that this migration removes, from the captured prior ACLs.
+// Missing global ACL means PostgreSQL's factory PUBLIC EXECUTE; a missing schema
+// addition means no extra grants. No role/schema name comes from executable input.
+function functionDefaultRollback(platform) {
+  const statements = [];
+  for (const schema of ['*', 'public', 'private']) {
+    const rows = (platform.creatorDefaults ?? []).filter(row => row.creator === 'postgres'
+      && row.kind === 'f' && row.schema === schema);
+    assert.ok(rows.length <= 1);
+    const acl = rows.length ? (rows[0].acl ?? []) : (schema === '*' ? [['postgres', 'PUBLIC', 'EXECUTE', false]] : []);
+    for (const [grantor, grantee, privilege, grantable] of acl) {
+      if (!['PUBLIC', 'anon', 'authenticated', 'service_role'].includes(grantee)) continue;
+      assert.equal(grantor, 'postgres');
+      assert.equal(privilege, 'EXECUTE');
+      assert.equal(typeof grantable, 'boolean');
+      assert.ok(grantee !== 'PUBLIC' || !grantable);
+      statements.push(`alter default privileges for role postgres${schema === '*' ? '' : ` in schema ${schema}`}
+        grant execute on functions to ${grantee === 'PUBLIC' ? 'PUBLIC' : `"${grantee}"`}${grantable ? ' with grant option' : ''};`);
+    }
+  }
+  return statements.join('\n');
+}
+
 export async function probeExistingApplicationUpgrade(exec) {
   const [migration, defaultsSmoke, runtimeSmoke] = await Promise.all([
     read('../../supabase/migrations/20260909131913_close_postgres_function_defaults.sql'),
@@ -93,7 +116,7 @@ export async function probeExistingApplicationUpgrade(exec) {
   const before = await snapshotExistingApplication(exec);
   assert.equal(before.relations.relations.length, 30, 'Expected the full existing application');
   for (const table of ['auth.users', 'public.profiles', 'public.profile_members', 'public.items',
-    'public.events', 'public.item_interactions', 'private.profile_import_jobs',
+    'public.events', 'public.item_interactions', 'private.profile_import_jobs', 'private.profile_import_rows',
     'private.profile_bootstrap_evidence', 'private.prediction_runs', 'private.prediction_candidates',
     'private.predictor_genomes', 'private.policy_assignments', 'private.promotion_decisions']) {
     assert.ok(before.rows[table]?.count > 0, `Existing fixture is missing rows in ${table}`);
@@ -116,7 +139,13 @@ export async function probeExistingApplicationUpgrade(exec) {
   assert.deepEqual(await snapshotExistingApplication(exec), after, 'Repeated upgrade changed state');
   await exec(`begin; ${defaultsSmoke} ${runtimeSmoke} rollback;`);
   assert.deepEqual(await snapshotExistingApplication(exec), after, 'Post-upgrade smoke changed existing state');
+  const rollbackSql = functionDefaultRollback(before.platform);
+  await exec(`begin; ${rollbackSql} commit;`);
+  assert.deepEqual(await snapshotExistingApplication(exec), before, 'Reviewed default rollback did not restore the exact prior state');
+  await exec(`begin; ${migration} commit;`);
+  assert.deepEqual(await snapshotExistingApplication(exec), after, 'Reapplying after rollback did not restore the corrected state');
   return { format: 'kajo-existing-application-upgrade-v1', status: 'PASS',
     migrationSha256: hash(migration), existingSnapshotSha256: hash(JSON.stringify(before)),
-    correctedSnapshotSha256: hash(JSON.stringify(after)), before, after };
+    correctedSnapshotSha256: hash(JSON.stringify(after)), rollback: { status: 'PASS',
+      sql: rollbackSql, sha256: hash(rollbackSql), scope: 'Only captured removed default grants; existing object ACLs remain unchanged' }, before, after };
 }

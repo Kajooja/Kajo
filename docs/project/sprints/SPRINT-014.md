@@ -599,3 +599,17 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   its CI result is pending. No independent upgrade PASS is inferred from the
   installation job. Historical and hosted SQL/history remain unchanged; canonical
   installer/history transition, #208 and MVP-ALG-009 remain open.
+
+### Populated upgrade and rollback local proof — 2026-09-09
+
+- CI #389 caught an invalid synthetic import fingerprint; the fixture now meets
+  the existing minimum length and includes a matched staging row/counts.
+  Four local upgrade regressions passed, including exact restoration of global/
+  per-schema default grants and their grant options, followed by reapplication.
+- Optional checksum-gated unchanged-export upgrade passed in PGlite with all
+  123 original function bodies/owners/ACLs, populated row hashes and runtime
+  preserved. It applies no function/compatibility supplement. ADR-0006 records
+  the command, final report hashes and exact provider/fixture scope.
+- The workspace connection recovered. Full `npm run check` passed 191 mobile, 14 catalog and 54 database tests,
+  TypeScript/lint and both bundles. Corrected native CI is the next evidence; canonical CLI/history activation is
+  still separately gated and is not inferred from these SQL experiments.

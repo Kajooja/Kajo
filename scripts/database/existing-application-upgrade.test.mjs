@@ -31,6 +31,18 @@ test('independent populated application upgrade preserves complete rows, schema,
     assert.equal(result.after.rows['public.events'].count, 1);
     assert.notDeepEqual(result.before.platform.creatorDefaults, result.after.platform.creatorDefaults);
     assert.equal(result.before.applicationFunctions.functions.length, 122);
+    assert.equal(result.rollback.status, 'PASS');
+  } finally { await db.close(); }
+});
+
+test('upgrade rollback restores explicit global/schema grants and grant options exactly', async () => {
+  const db = await existingFixture();
+  try {
+    await db.exec(`alter default privileges for role postgres grant execute on functions to service_role with grant option;
+      alter default privileges for role postgres in schema private grant execute on functions to authenticated with grant option;
+      alter default privileges for role postgres in schema public grant execute on functions to anon;`);
+    const result = await probeExistingApplicationUpgrade(execFor(db));
+    assert.equal(result.rollback.status, 'PASS');
   } finally { await db.close(); }
 });
 

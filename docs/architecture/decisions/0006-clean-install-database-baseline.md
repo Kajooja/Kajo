@@ -768,10 +768,76 @@ fixture that could otherwise produce a false upgrade PASS.
 The new `database-upgrade` CI job uses a third independent unlinked stack and
 the same verified image pin, then uploads a metadata/hash-only report after
 cleanup. These are synthetic source-checkpoint fixtures, not copied hosted rows
-or a claim that every original exported function body is byte-identical. The
-local workspace disconnected while preparing this package; its automated CI
-result is pending and must be recorded before accepting the upgrade experiment.
-No hosted migration or canonical installer/history transition is activated.
+or a claim that every original exported function body is byte-identical. CI #389 rejected the initial test fixture's 15-character import fingerprint
+against the existing 16-character minimum. The corrected fixture also records
+one matched staging row and consistent import counts. The workspace recovered;
+all four local upgrade regressions now pass. The full `npm run check` also passed
+191 mobile, 14 catalog and 54 database tests, TypeScript/lint and both bundles.
+The corrected real CI result must
+still be recorded before accepting the native upgrade experiment. No hosted
+migration or canonical installer/history transition is activated.
+
+## Upgrade rollback and unchanged-export evidence — 2026-09-09
+
+The upgrade probe now derives its rollback solely from the pre-upgrade default
+ACL snapshot. It regrants only the PUBLIC/anon/authenticated/service_role function
+defaults that this migration removed, preserving global versus schema scope and
+any original grant options. An absent global row means PostgreSQL's factory
+PUBLIC EXECUTE; an absent per-schema row means no additional grant. Other
+creators, grant recipients and object kinds are not rewritten. All identifiers
+are selected from a fixed reviewed allowlist.
+
+After runtime checks, the exact corrected snapshot must still match before the
+rollback commits. The complete prior snapshot must then be restored, followed by
+a reapplication that restores the corrected snapshot. Both source and unchanged
+export fixtures passed. A regression with explicit global service_role and private
+schema authenticated grant options verifies their exact restoration. This is a
+rehearsed rollback of future-object defaults; it never changes permissions of
+already existing functions, including any functions created after hardening.
+These test helpers remain isolated; a deployment must capture/review its own prior
+and corrected ACLs and cannot blindly use a fixture's rollback SQL.
+
+The optional offline command is reproducible from the exact already supplied file:
+
+```sh
+node scripts/database/run-export-upgrade-probe.mjs kajo-schema.sql new-upgrade-report.json
+```
+
+It checksum-gates the export before creating an in-memory PGlite database,
+executes all export bytes unchanged, and adds only the omitted canonical Auth
+trigger, deterministic system seeds and synthetic populated state. It does not
+apply the source function or compatibility supplement. pg_dump's session-level
+row_security/body-check settings are restored to ordinary ON values before
+runtime calls; no export bytes or stored function definitions are patched.
+
+The full upgrade/rollback/reapplication probe passed with all **123 original
+application functions** (plus the minimal Auth fixture function), 30 application
+tables, their triggers and complete row hashes unchanged. The preserved state
+includes 3 Auth users, 4 Profiles, 5 memberships, native rating/current state,
+import job/staging/evidence, 2 committed prediction runs/candidates, 6 shadow jobs,
+4 Lists and all 9 system seed rows. These are synthetic rows, never hosted data.
+The test's Auth signatures/event-trigger environment remains PGlite-scoped;
+the separate pinned native CI job covers the actual provider stack.
+
+Final offline report SHA-256:
+`a48cc45b61ce2b53145de299998066f64184488504309fecb697e205f6513010`.
+Existing and corrected snapshot SHA-256 respectively:
+`8b22d535d300f897821136e44dbddd8a026d215d5d14aaa8c9f7ef4a35ed1cc5` and
+`0d95575984bdcecbefc4be9f11adc69a10b41f5bba0c136765fdf729e0b30975`.
+Fixture SQL SHA-256:
+`d094fb3496800db76c4cefd09c0d278b0fcc56707989c397e0b113e91e72fdfc`.
+For this specific captured prior state the rollback restores global PUBLIC
+EXECUTE; the report contains its exact SQL and SHA-256
+`db87a261d01e4934c04eefa3c017f68ba37b583ea66bf8500954c7ce6717b64d`.
+
+No canonical CLI/history transition is activated by this evidence. That remaining
+procedure must keep the 47 protected files and existing hosted history intact,
+select an explicit empty-database-only installation lineage, apply ordinary
+post-cutoff migrations unchanged, and verify the actual CLI tracking/reset path
+before declaring it accepted. The currently passing candidate runner uses direct
+SQL in isolated stacks; it does not claim that ordinary historical `db reset`
+or `db push` has been repaired. Do not silently turn the test candidate into a
+canonical migration or mark historical failures applied.
 
 ## Alternatives considered
 

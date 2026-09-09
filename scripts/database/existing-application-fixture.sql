@@ -27,8 +27,11 @@ begin
     (candidate,'BOOK','Unseen candidate',array['upgrade-fixture'],true),
     (native_item,'BOOK','Native rating',array['native-fixture'],false);
   insert into private.profile_import_jobs(id,actor_user_id,profile_id,source_provider,
-    dataset_kind,file_fingerprint,status,committed_at)
-  values(job,actor,profile,'KAJO_CSV','UPGRADE_FIXTURE','upgrade-fixture','COMMITTED',now());
+    dataset_kind,file_fingerprint,status,total_rows,matched_rows,committed_at)
+  values(job,actor,profile,'KAJO_CSV','UPGRADE_FIXTURE','upgrade-fixture-208','COMMITTED',1,1,now());
+  insert into private.profile_import_rows(job_id,source_row_key,item_type,title,evidence_kind,
+    rating,match_status,matched_item_id)
+  values(job,'1','BOOK','Imported evidence','RATED',10,'MATCHED',evidence);
   insert into private.profile_bootstrap_evidence(actor_user_id,profile_id,item_id,item_type,
     source_provider,dataset_kind,source_job_id,source_row_key,evidence_kind,rating)
   values(actor,profile,evidence,'BOOK','KAJO_CSV','UPGRADE_FIXTURE',job,'1','RATED',10);
