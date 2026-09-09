@@ -18,6 +18,7 @@
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke",
     "test:database": "node --test scripts/database/*.test.mjs",
+    "database:install": "node scripts/database/install-local-database.mjs",
     "diagnose:database-replay": "node scripts/database/migration-replay.mjs"
   },
   "engines": {

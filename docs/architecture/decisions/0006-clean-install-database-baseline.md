@@ -1,40 +1,83 @@
 # ADR-0006: Verifiable clean-install database baseline
 
-Status: Proposed installation procedure; verification implementation complete
-Date: 2026-09-07
+Status: Accepted for new local/CI databases; existing hosted deployment remains separate
+Date: 2026-09-09
 
-## Current decision boundary — 2026-09-09
+## Adopted installation procedure
 
-PR #219 completes the verification implementation. All five required jobs passed
-in [CI #393](https://github.com/Kajooja/Kajo/actions/runs/34375412870) at
-`9fcbbb4a43b81be5b7754d4abe31e286f6365387`, including both installations,
-independent populated upgrade/rollback and actual CLI history/atomicity. Detailed
-source, platform and report identities are retained below. Earlier dated sections
-record how that evidence was obtained; their pending next steps are superseded
-by this section and `STATUS.md`.
+The engineering decision for the owner's instruction to finish the algorithm is
+explicit: new **local/CI** databases use the reviewed source-derived
+`20260907155201_kajo_source_baseline.sql` followed by unchanged post-cutoff files.
+This replaces #208's original *successful unmodified chronological replay*
+criterion with **successful accepted fresh-lineage installation**, exact CLI
+history, source parity, failure atomicity and the #207 SQL regressions. The original
+chronology still fails after 33 migrations; its diagnostic and all 47 protected
+files remain unchanged. It is not reclassified as a successful replay.
 
-Merging the verification package records its implementation and tests. It does
-not activate a canonical installer, deploy the forward migration, reconcile
-hosted tracking or change #208/MVP-ALG-009 acceptance.
+The verified source, platform, repeated-install and populated-upgrade evidence
+below remains valid. Adoption does not depend on repeating those investigations.
+The operational path uses the same builder and is exercised by the existing
+required CLI CI job before merge. GitHub owns the final PR/run acceptance state.
 
-**Concrete adoption proposal for the next decision:** use the tested source-derived
-`20260907155201_kajo_source_baseline.sql` plus unchanged post-cutoff migrations as
-the installation lineage for new empty databases. Preserve the 47 historical
-files byte-for-byte and retain the original chronological diagnostic with its
-truthful failure. Existing databases stay on a separately reviewed forward-only
-upgrade path and never receive the baseline. Accepting this proposal must
-explicitly update #208's clean-install criterion; it cannot be inferred from
-passing tests or from merging #219.
+### New local development database
 
-After that decision, the next implementation is a canonical empty-install
-workspace/entry point reusing the current builder and verified CLI path, with
-source/image/empty-state preflights, exact history checks and failure cleanup.
-Existing hosted version/name mismatches and deployment rollback need their own
-reviewed procedure. Validate the new operational wiring, then the remaining
-Phase 14.0 bootstrap gates. Completed export/source/platform/install/upgrade/CLI
-discovery is not a new task unless changed code or concrete contradictory
-evidence invalidates it. Device/HTTP Auth and recommendation-quality gates remain
-separate and open.
+Prerequisites: Node 22+, npm, local Docker on Linux x64 or Docker Desktop on macOS
+arm64. The actual reviewed Postgres 17.6.1.167 image IDs for those architectures
+are enforced; CLI is pinned to 2.117.0. From the repository:
+
+```sh
+npm run database:install -- /absolute/new/kajo-workspace
+```
+
+The destination must not exist. The tool creates its own unlinked project,
+refuses existing containers/volumes, clears inherited connection settings and
+starts an empty platform. It checks the actual image **before application SQL**,
+checks the empty application/Auth guard even if history could skip a migration,
+then uses `migration up --local`. No remote URL, project link, reset or history
+repair option is accepted by this entry point.
+
+It verifies every generated/copied file hash, exact CLI version/name rows,
+independent source-plus-forward schema/ACL/seed fingerprints, empty application
+state and rolled-back Auth/Personal/Shared/import runtime checks. Forward-created
+tables/functions are included in that comparison, and new tables must have RLS
+and no unexpected rows. Failure removes only the newly owned stack/workspace;
+success keeps it running and saves metadata/hashes in `kajo-installation.json`.
+The manifest's cutoff timestamp is seed provenance; `installedAt` is execution time.
+
+Use the pinned CLI with the printed workspace for normal local `status`/`stop`/
+`start` operations. Author new forward migrations in this repository and install
+a new disposable workspace to test the complete updated chain. Never edit the
+generated baseline as a second schema source. macOS image identity is from the
+recorded owner checkpoint; new operational runtime evidence is Linux CI, not a
+new Mac/device acceptance claim.
+
+### Existing database forward deployment
+
+Existing databases never receive the fresh baseline or a reset. Before each
+forward deployment, identify the exact target and Git SQL hash, inspect actual
+version/name tracking and the affected object definitions/ACLs, and rehearse the
+unchanged file against an isolated representative existing database. Apply only
+the reviewed new forward file and record its actual deployment identity. Verify
+its intended behavior, unchanged unrelated state and access boundaries afterward.
+
+Known hosted/repository tracking differences are **not repaired by name matching**.
+They remain a separate reviewed operational task under `MVP-OPS-005`; do not run
+an ordinary whole-history `db push` against that mismatched project. New local
+lineage adoption authorizes no hosted schema/data/history mutation.
+
+For `20260909131913_close_postgres_function_defaults.sql`, capture the target's
+own prior and corrected default ACL snapshots using `platform-schema-snapshot.sql`.
+Derive/review rollback with the existing `existing-application-upgrade.mjs`
+procedure; retain grant options and global versus schema scope. Never reuse a
+synthetic fixture's rollback blindly. It changes future postgres-created function
+grants globally, including future platform functions; existing functions and
+other creators retain their rights. The file is still not applied hosted.
+
+The remaining algorithm work proceeds in ROADMAP order: 14.1 evidence, 14.2
+serving/shadow/candidates, 14.3 catalog/features, 14.4 memory/policy and 14.5 worker/
+evaluation. Full `MVP-ALG-009`, device/HTTP Auth, useful recommendation quality and
+release acceptance remain open. The dated sections below are historical evidence;
+this section supersedes their former pending adoption instructions.
 
 ## Context
 

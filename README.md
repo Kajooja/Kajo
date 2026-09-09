@@ -42,4 +42,8 @@ npm run check     # lint + typecheck + tests + iOS/Android bundle smoke checks
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.
 
-For database setup, first read the [current installation decision](docs/project/STATUS.md#remaining-decision-and-exact-next-implementation) and [ADR-0006](docs/architecture/decisions/0006-clean-install-database-baseline.md). Unmodified historical migration replay currently fails; the tested source-derived fresh-install proposal has not yet been adopted as the canonical installer.
+For a new local database, use `npm run database:install -- /absolute/new/workspace`.
+The [installation procedure](docs/architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)
+uses the verified source baseline plus unchanged forward migrations on pinned
+local Supabase. Existing hosted databases follow the separate forward-deployment
+procedure. The original historical replay remains a failing diagnostic.
