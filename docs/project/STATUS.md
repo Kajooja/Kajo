@@ -99,7 +99,7 @@ and its rollback-only command acceptance passed. All five gates in CI #403 passe
 for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
 records exact rollout/source verification and the remaining device limitations.
 
-The active continuation is **Issue #226**, branch
+The active continuation is **Issue #226 / PR #227**, branch
 `feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
 It implements atomic List/Shared commands and the same durable mobile queue,
 including mixed undo, no-op receipts and cancellation of all affected outcome

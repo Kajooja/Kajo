@@ -24,6 +24,23 @@ export type InteractionLoadResult =
   | { status: 'success'; interactions: ItemInteractionMap }
   | { status: 'error'; message: string };
 
+// A replayed receipt describes its original commit. Once the queue drains,
+// reload current state without allowing an old read to replace a newer action.
+export function createAcknowledgedInteractionRefresh(options: {
+  load: () => Promise<InteractionLoadResult>;
+  canApply: () => boolean;
+  onLoaded: (interactions: ItemInteractionMap) => void;
+}) {
+  let generation = 0;
+  return async () => {
+    const requestedGeneration = ++generation;
+    const result = await options.load();
+    if (requestedGeneration === generation && options.canApply() && result.status === 'success') {
+      options.onLoaded(result.interactions);
+    }
+  };
+}
+
 const LOAD_ERROR_MESSAGE =
   'Valintojen lataaminen epäonnistui. Tarkista yhteys ja yritä uudelleen.';
 

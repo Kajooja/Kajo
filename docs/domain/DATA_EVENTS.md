@@ -361,7 +361,10 @@ receipt before reporting success, sending an optional message or starting a
 dependent operation. While a collection choice awaits acknowledgement, new actions
 wait; collection submission also waits for earlier commands. This prevents duplicate
 creation and use of an unconfirmed List while preserving one FIFO after restart.
-Background acknowledgements refresh List/Shared views. Pending/error/discard controls
+Background acknowledgements refresh List/Shared views. After the queue drains,
+a guarded read reconciles the current interaction state even when a replayed
+receipt describes an older commit; it cannot overwrite a newer read, queued action
+or another scope. Pending/error/discard controls
 are visible on Lists, List detail, the picker and discovery. An optional message is
 still a separate message action and is not replayed after a lost collection reply.
 

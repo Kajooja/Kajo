@@ -764,6 +764,8 @@ merge number. Complete publication, then pause as requested by the owner.
   receipts drive state, refreshes and Undo; uncertain actions cannot launch dependent
   creation/messaging or report success. Hung calls have a 20-second reply deadline.
   Old whole-state mobile writes and duplicate mutation Event calls are removed.
+  After the queue drains, a guarded current-state read reconciles replayed receipts
+  without overwriting newer pending actions, a newer read or another scope.
 - Targeted mobile tests cover old payload compatibility, mixed FIFO/restart,
   acknowledgements, timeouts/late replies, scopes/environments, malformed receipts,
   shared consensus counts and discard authorization. SQL smoke additionally covers
@@ -774,8 +776,8 @@ merge number. Complete publication, then pause as requested by the owner.
   column, exact old cached replies and undo. It verifies all unrelated function
   bodies/ACLs and the single intended Item guard replacement. Both rehearsals and
   collection smoke are wired into native CLI CI; all fixtures/DDL/grants roll back.
-- Publication checkpoint: local full check passed 211 mobile + 14 catalog + 61
-  database tests (286 total), lint/typecheck and iOS/Android bundles; the existing
+- Publication checkpoint: local full check passed 212 mobile + 14 catalog + 61
+  database tests (287 total), lint/typecheck and iOS/Android bundles; the existing
   Discovery Hook warning remains. The final correction SQL also passed the full
   schema/rehearsal smoke. Required native CI and scoped hosted deployment are still
   pending at this checkpoint; the PR will own final-head run and merge identities.
@@ -783,3 +785,8 @@ merge number. Complete publication, then pause as requested by the owner.
   DATA-003/004, late-outcome/frozen delivery and exposure acceptance remain open.
   Next after #226: exact delivered provenance plus durable exposure, then device
   acceptance and 14.2. The separate hosted global-default forward is still excluded.
+- PR #227 initial CI #406 reached a CLI startup failure before application SQL
+  (bounded signals: image-download/port-binding; exact cause unproven). General
+  validation, platform/defaults and existing-application upgrade passed. The next
+  head includes the receipt replay reconciliation and must pass all required jobs;
+  no database failure is waived and no hosted DDL has been applied at this point.

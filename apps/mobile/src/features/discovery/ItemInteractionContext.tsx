@@ -38,6 +38,7 @@ import {
   type ItemInteractionStore,
 } from './itemInteraction';
 import {
+  createAcknowledgedInteractionRefresh,
   createSupabaseItemInteractionPersistenceApi,
   loadPersistedItemInteractions,
   type ItemInteractionPersistenceApi,
@@ -180,6 +181,17 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
           collectionWaiters.current.get(receipt.actionId)?.resolve({ status: 'success', receipt });
           collectionWaiters.current.delete(receipt.actionId);
         }
+        storeRef.current = nextStore;
+        setPersistedStore({ actorUserId, profileId, store: nextStore });
+        if (coordinator.pending().length === 0) void refreshAcknowledgedState();
+      },
+    });
+    const refreshAcknowledgedState = createAcknowledgedInteractionRefresh({
+      load: () => loadPersistedItemInteractions(persistenceApi, profileId),
+      canApply: () => active && activeScopeKey.current === key
+        && outbox.current?.coordinator === coordinator && coordinator.pending().length === 0,
+      onLoaded: (interactions) => {
+        const nextStore = { ...storeRef.current, interactions };
         storeRef.current = nextStore;
         setPersistedStore({ actorUserId, profileId, store: nextStore });
       },
