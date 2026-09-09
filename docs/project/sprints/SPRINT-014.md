@@ -8,7 +8,7 @@ Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy act
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
-[STATUS.md](../STATUS.md) owns the exact next task: resolve adoption/operational wiring of the already-tested fresh-install proposal and remaining #207/#208 acceptance. The database verification package is merged in PR #219; do not restart its completed experiments.
+[STATUS.md](../STATUS.md) owns the exact next task. The #208 operational delivery adopts the verified source lineage for new local/CI databases; after its required CI/merge, continue Phase 14.1 action/delivery evidence. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
@@ -299,7 +299,7 @@ Deferred release gates retain their own owners: refreshed List/messaging/Room ac
 
 ## Immediate next action
 
-Follow [STATUS.md](../STATUS.md), ROADMAP 14.0 and the adoption proposal in ADR-0006. The bootstrap serving correction and SQL verification package are merged; installation-procedure adoption and remaining bootstrap/device/quality acceptance stay open. Do not close #207/#208/#199/#182 from green checks alone.
+Finish the current #208 operational PR according to [STATUS.md](../STATUS.md), then implement ROADMAP 14.1 atomic actions, persistent outbox and exact delivery origin. ADR-0006 explicitly adopts the local/CI lineage and the replacement clean-install criterion. #207/#208 technical closure does not close #199/#182, device, catalog or algorithm-quality gates.
 
 ## Continuation checkpoint — 2026-09-06
 
@@ -672,3 +672,24 @@ open; no hosted schema/data/history change or new device acceptance occurred.
 Do not restart completed export/fingerprint/platform/install/upgrade/CLI discovery
 or create another docs-only commit merely to record this closeout's own CI or
 merge number. Complete publication, then pause as requested by the owner.
+
+
+### Operational local lineage adoption — 2026-09-09 / #208
+
+- Added `npm run database:install` for a new, unlinked local workspace. Reuses the
+  reviewed builder and pinned stack lifecycle; checks image/source/empty-state,
+  actual CLI history, independent source-plus-forward snapshots and runtime smoke.
+- Success retains the owned local stack with a metadata manifest; failure cleans
+  only that stack/workspace. Existing containers/volumes and application/Auth state
+  are refused. CI runs the same install boundary before its reset/atomicity checks.
+- Forward-added tables/functions participate in full snapshots. Regressions reject
+  changed source bytes, duplicate versions/unsafe ordering, unexpected new rows,
+  missing RLS and reuse of an existing application even if CLI history could skip it.
+- ADR-0006 explicitly replaces #208's impossible unchanged-history success criterion
+  with accepted fresh-lineage installation. The original failing diagnostic and
+  protected bytes remain intact; existing hosted forward deployment is separate.
+- No hosted migration, HTTP Auth, device or quality acceptance is inferred. Finish
+  required CI/merge, then proceed to 14.1; GitHub owns exact run/merge identities.
+- Local `npm run check` passed: 191 mobile, 14 catalog and 59 database tests
+  (264 total), lint/typecheck and both bundles. The existing Hook warning remains;
+  native operational installation is verified by the required PR CI gate.

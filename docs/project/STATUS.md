@@ -76,107 +76,57 @@ Do not treat these numbers as permanent; re-query hosted truth when catalog work
 
 The new launch work **does not jump ahead of current algorithm correctness**.
 
-### Next task now
+### Current delivery and next task
 
-**PR #219's database verification work is complete.** The remaining Phase 14.0
-work is adoption and operational wiring of the tested fresh-install procedure,
-not another round of export, fingerprint, platform or upgrade discovery.
+Phase 14.0's source/schema/platform verification is complete (merged #219).
+The #208 operational delivery explicitly adopts that verified lineage for new
+**local/CI** databases and makes it operational
+through `npm run database:install -- /absolute/new/workspace`. See the adopted
+[ADR-0006 procedure](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure).
+The required PR checks gate this delivery; GitHub owns its exact merge/run state.
 
-[PR #219](https://github.com/Kajooja/Kajo/pull/219) is merged on `main` as
-`0b2e8d76d453890689023e60493d04fe134262cb`. Continue from current `main`;
-its old feature branch is historical. PR #217 (`42d605a`) and #218 (`2d1b0d5`)
-are also merged. Do not create another documentation commit merely to record
-this audit's own merge SHA or CI number; GitHub owns those changing fields.
+The procedure preserves the 47 historical files, refuses an existing application,
+checks source/image/history/runtime and cleans failed newly owned installations.
+The CI installation path now includes ordinary unchanged post-cutoff migrations
+and verifies new application tables/functions as well as the baseline. The original
+unmodified chronology remains a truthful failing diagnostic; #208's replacement
+criterion is an explicit installation decision, not a claim that history was fixed.
 
-Completed evidence (full provenance and report hashes are in
-[ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md)):
+The #207 bootstrap correction already has deterministic opposite imported and
+calibrated tastes, removal/correction, native/undo, cross-domain and authorization
+regressions plus the recorded hosted public V1 smoke. Its technical gate can close
+with accepted fresh installation. Device import/calibration/Shared acceptance and
+measured recommendation usefulness remain separately open under BOOT/PRED/CAT.
 
-| Verification | Result |
-| --- | --- |
-| Two independent pinned Supabase application installations | PASS: 30 tables, 122 application functions, 22 application/Auth triggers, exact schema/owners/ACLs/seeds, Auth/Personal/Shared/import runtime, reinstall refusal and cleanup |
-| Populated existing-application forward upgrade | PASS: complete synthetic row hashes and all 221 existing application/native functions preserved through migration, rollback and reapplication |
-| Unchanged owner-export upgrade in PGlite | PASS: all 123 original application functions preserved without the source function/compatibility supplement |
-| Actual Supabase CLI fresh lineage | PASS: two resets, exact version/name history, source parity and failed-migration atomicity |
-| Canonical automated check | PASS: 191 mobile + 14 catalog + 55 database tests (260 total), TypeScript, lint with zero errors/one existing Hook warning, iOS/Android bundles |
+Continue **14.1** from accepted main:
 
-The final PR #219 head passed all five required jobs in
-[CI #394](https://github.com/Kajooja/Kajo/actions/runs/34382607596).
-Main [CI #395](https://github.com/Kajooja/Kajo/actions/runs/34383277848) first
-failed during isolated Supabase stack startup; the one requested rerun passed
-all five required checks. The original startup cause is unproven because the
-old log withheld its detail. The [2026-09-09 retro](retros/2026-09-09.md) records
-this distinction and the audit corrections. APK/device acceptance is separate;
-a main-triggered APK build is not the next product work item to poll.
+1. Commit explicit action, current-state projection and canonical Events atomically
+   and idempotently through one authorized server boundary.
+2. Persist unacknowledged actions on device with stable IDs and actor/Profile scope;
+   retry safely after process death and account/Profile switches.
+3. Preserve the exact delivered Profile, prediction and slate origin in grid/detail/
+   swipe/Lists/Shared overlays. Unattributed actions must never guess a prediction.
+4. Verify rollback, duplicate delivery, undo, stale responses and scope isolation,
+   then proceed to **14.2 serving/shadow/candidate availability**.
 
-### Repository audit and completed cleanup — #220
+`MVP-ALG-009` remains in progress for those additional regressions; Sprint 014 and
+Phase 14 quality/evaluation acceptance remain open. No Taste/Friend implementation
+starts ahead of the remaining algorithm requirements.
 
-The retrospective reconciles current code, release requirements and historical
-ideas. The [144-branch retirement manifest](retros/2026-09-09-branches.json)
-contains 23 main ancestors, 118 exact merged PR heads and three individually
-reviewed superseded drafts. No missing accepted feature needs an old branch
-merged wholesale.
+### Existing hosted database and repository hygiene
 
-The owner explicitly approved retirement of those 144 refs plus the merged
-PR #221 branch, `docs/220-retro-hygiene`: **145 approved branches removed**.
-[The completed cleanup run](https://github.com/Kajooja/Kajo/actions/runs/34388959963)
-verified the exact tips and PR/replacement evidence. It resumed after 33 recorded
-REST deletions with an atomic, expected-SHA-guarded Git deletion of the remaining
-112 refs and its own temporary branch. Remote verification then found only
-`main`, unchanged at `cd5aaabca3c0a990756f51c82a63398ea4fb71aa`.
+The existing hosted database stays on the separately reviewed forward-only
+procedure in ADR-0006. Its known tracking mismatch is not repaired by local-lineage
+adoption. Forward file `20260909131913_close_postgres_function_defaults.sql` has
+not been applied hosted; deployment must capture its own prior defaults/rollback.
+No hosted schema/data/history change is part of this local installer delivery.
 
-The manifest preserves original commit IDs and execution provenance. The initial
-approval block is resolved. Issue #220 records the final housekeeping/closeout;
-no cleanup workflow is installed on `main`. Product continuation remains below.
-
-### Remaining decision and exact next implementation
-
-[Issue #208](https://github.com/Kajooja/Kajo/issues/208) explicitly requires
-successful **unmodified chronological replay**. That chain still fails after 33
-migrations at the catalog text patch. The tested alternative is a separate
-source-derived baseline at cutoff `20260907155201`, followed by unchanged newer
-migrations. Green baseline tests do not satisfy the issue's current literal
-criterion. **#208, #207 and MVP-ALG-009 remain open.**
-
-The concrete adoption proposal is recorded at the top of ADR-0006. Resolve that
-acceptance/installation-procedure decision explicitly before activating a
-canonical installer or changing #208's criterion. After adoption:
-
-1. Wire the already-tested baseline builder and unchanged post-cutoff migrations
-   into the agreed empty-database installation workspace, with source/image
-   preflight checks, empty-database refusal, CLI history verification and cleanup.
-   Reuse the existing implementation; do not rebuild the reconciliation pipeline.
-2. Record the separate existing-database forward-deployment/rollback procedure.
-   Preserve the 47 protected historical files and existing hosted tracking; the
-   fresh baseline must never be applied to an existing database. Known hosted
-   version/name differences still require their own reviewed procedure.
-3. Validate only the new operational path and remaining bootstrap acceptance,
-   then continue ROADMAP **14.0 → 14.1 evidence → 14.2 serving/shadow/candidates**.
-
-The verified baseline, source/function/ACL reconciliation, platform ledger, two
-installations, populated upgrade and CLI experiment are completed evidence. Do
-not request another copy of the owner's export or a repeat Mac probe to reopen
-those gates. Normal validation still applies when implementation changes.
-
-Forward migration `20260909131913_close_postgres_function_defaults.sql` is present
-as repository source and has **not been applied hosted**. It changes only future
-postgres-created function grants; its global scope includes future platform
-functions, which need explicit intended grants. Existing functions/other creators
-are preserved. The actual deployment must capture its own prior defaults for
-rollback instead of blindly reusing synthetic-fixture rollback SQL.
-
-Hosted schema/data/history and the 47 protected migration files are unchanged.
-Native platform callbacks remain intact; differing hosted/native callback hashes
-are not a claim of semantic equality. SQL checks and bundles do not establish
-HTTP Auth, real-device acceptance or recommendation quality. No new MVP
-requirement or Sprint 014 acceptance is closed by this verification delivery.
-
-Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
-
-1. Resolve fresh-install adoption and operational wiring; source/schema parity evidence is already complete.
-2. Close bootstrap ranking correctness/regression gates.
-3. Continue `ROADMAP.md` Phase 14 in order: evidence reliability → serving/shadow parity → catalog/features → adaptive memory/policy → operating SleepLayer.
-
-Do not start public Taste-link implementation before these foundations are sufficiently stable for a trustworthy first-session algorithm.
+The [2026-09-09 retrospective](retros/2026-09-09.md) and recovery manifest preserve
+the completed #220 audit and removal of all 145 approved old remote branches.
+The cleanup is finished; its old approval block and temporary branches are not
+continuation work. Main CI #395 originally failed at isolated startup and passed
+on one requested rerun; the original cause remains unproven. APK/device acceptance
+is separate, and a main APK build is not a task to poll.
 
 ### After Phase 14
 

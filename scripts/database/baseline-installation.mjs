@@ -1,4 +1,4 @@
-// Proposed application installation for disposable test databases only.
+// Reviewed source baseline for new empty local/CI databases only.
 // Reconstructs reviewed source; never imports a hosted dump or replays history.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -74,7 +74,7 @@ export async function buildBaselineInstallation() {
   return { sql, inventorySql, metadata, tables };
 }
 
-export async function snapshotApplication(execSnapshots, candidate) {
+export async function snapshotApplication(execSnapshots, candidate, { forward = false } = {}) {
   const [relationsSql, functionsSql] = await Promise.all([
     readFile(new URL('relation-schema-snapshot.sql', import.meta.url), 'utf8'),
     readFile(new URL('function-schema-snapshot.sql', import.meta.url), 'utf8'),
@@ -82,10 +82,22 @@ export async function snapshotApplication(execSnapshots, candidate) {
   const snapshots = await execSnapshots(relationsSql + '\n' + functionsSql + '\n' + candidate.inventorySql);
   assert.equal(snapshots.length, 3);
   const [relations, functions, inventory] = snapshots;
-  assert.deepEqual(relations.relations.map(row => row.identity), candidate.tables);
-  assert.equal(functions.functions.length, 122);
+  if (!forward) {
+    assert.deepEqual(relations.relations.map(row => row.identity), candidate.tables);
+    assert.equal(functions.functions.length, 122);
+    assert.equal(inventory.triggers.length, 22);
+  } else {
+    // New forward migrations may add application tables/functions. Include their
+    // rows in the empty-install check instead of comparing only the old 30 tables.
+    const extra = relations.relations.map(row => row.identity).filter(name => !candidate.tables.includes(name));
+    for (const name of extra) {
+      assert.match(name, /^(public|private)\.[a-z_][a-z0-9_]*$/);
+      const identifier = name.split('.').map(part => `"${part}"`).join('.');
+      const [count] = await execSnapshots(`begin read only; select jsonb_build_object('rows',count(*)) as snapshot from ${identifier}; rollback;`);
+      inventory.rowCounts[name] = count.rows;
+    }
+  }
   assert.deepEqual(inventory.tablesWithoutRls, []);
-  assert.equal(inventory.triggers.length, 22);
   return { relations, functions, inventory };
 }
 
@@ -99,7 +111,7 @@ export function assertEmptyApplication(snapshot) {
 
 // Independent source-only reference: plain PostgreSQL grants, literal source
 // DDL and separately reviewed supplements, without the candidate's install path.
-export async function sourceApplicationReference(candidate) {
+export async function sourceApplicationReference(candidate, forwardFiles = []) {
   const { db } = await createSourceRelationDatabase();
   try {
     const [functions, triggers, seeds, compatibility] = await Promise.all([
@@ -107,8 +119,9 @@ export async function sourceApplicationReference(candidate) {
       readFile(new URL('baseline-compatibility-grants.sql', import.meta.url), 'utf8'),
     ]);
     await db.exec(`begin; ${functions.sql} ${compatibility} ${triggers.sql} ${seeds} commit;`);
+    for (const file of forwardFiles) await db.exec(`begin; ${file.sql} commit;`);
     return await snapshotApplication(async sql => (await db.exec(sql)).flatMap(result => result.rows
-      .filter(row => Object.hasOwn(row, 'snapshot')).map(row => row.snapshot)), candidate);
+      .map(row => Object.hasOwn(row, 'snapshot') ? row.snapshot : row)), candidate, { forward: forwardFiles.length > 0 });
   } finally { await db.close(); }
 }
 
