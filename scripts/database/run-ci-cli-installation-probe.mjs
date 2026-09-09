@@ -9,6 +9,7 @@ import { applicationSmokeSql, assertEmptyApplication,
 import { functionDigestSql } from './platform-default-probe.mjs';
 import { buildFreshInstallation, installFreshDatabase, installationHistorySql } from './fresh-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
+import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -31,6 +32,11 @@ try {
     await resetFromMigrations(files.slice(0, actionIndex));
     const [itemActionUpgrade] = await exec(itemActionUpgradeSql(files[actionIndex], candidate.tables));
     assert.match(itemActionUpgrade?.itemActionUpgrade, /^PASS: unchanged populated/);
+    const collectionIndex = files.findIndex(file => file.name.endsWith('_atomic_collection_actions.sql'));
+    assert.ok(collectionIndex > actionIndex);
+    await resetFromMigrations(files.slice(0, collectionIndex));
+    const [collectionActionUpgrade] = await exec(collectionActionUpgradeSql(files[collectionIndex], candidate.tables));
+    assert.match(collectionActionUpgrade?.collectionActionUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -52,6 +58,8 @@ try {
     assert.match(results[0]?.smoke, /^PASS: authenticated public V1/);
     const [itemActions] = await exec(await readFile(new URL('item-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(itemActions?.itemActions, /^PASS: atomic/);
+    const [collectionActions] = await exec(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);
@@ -63,7 +71,8 @@ try {
     const nativeDefaults = rows => (rows ?? []).filter(row => !(row.creator === 'postgres'
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
-    return { operationalInstall, itemActions, itemActionUpgrade, resets: [firstRuntime, secondRuntime], history: expectedHistory,
+    return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
+      resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };
   });

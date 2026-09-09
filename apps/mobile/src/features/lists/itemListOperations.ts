@@ -149,7 +149,7 @@ export async function createCustomItemList(
         status: 'error',
         message: response.error.code === '23505'
           ? 'Samanniminen lista on jo olemassa.'
-          : LIST_SAVE_ERROR,
+          : response.error.code === 'KAJO_ACTION' ? response.error.message : LIST_SAVE_ERROR,
       };
     }
     return mapSingleList(response.data);
@@ -178,7 +178,7 @@ export async function renameCustomItemList(
         status: 'error',
         message: response.error.code === '23505'
           ? 'Samanniminen lista on jo olemassa.'
-          : LIST_SAVE_ERROR,
+          : response.error.code === 'KAJO_ACTION' ? response.error.message : LIST_SAVE_ERROR,
       };
     }
     return mapSingleList(response.data);
@@ -194,7 +194,7 @@ export async function deleteCustomItemList(
   try {
     const response = await rpc(ITEM_LIST_RPC.remove, { target_list_id: listId });
     return response.error || response.data !== true
-      ? { status: 'error', message: LIST_DELETE_ERROR }
+      ? { status: 'error', message: response.error?.code === 'KAJO_ACTION' ? response.error.message : LIST_DELETE_ERROR }
       : { status: 'success' };
   } catch {
     return { status: 'error', message: LIST_DELETE_ERROR };
@@ -214,7 +214,7 @@ export async function setItemListEntry(
       requested_present: present,
     });
     return response.error || typeof response.data !== 'boolean'
-      ? { status: 'error', message: LIST_DESTINATION_ERROR }
+      ? { status: 'error', message: response.error?.code === 'KAJO_ACTION' ? response.error.message : LIST_DESTINATION_ERROR }
       : { status: 'success', present: response.data };
   } catch {
     return { status: 'error', message: LIST_DESTINATION_ERROR };

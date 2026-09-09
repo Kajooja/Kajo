@@ -299,6 +299,8 @@ Uncertain network replies and authorization failures are retained, not discarded
 accepts them. Keys include backend environment, actor and Profile; each bounded
 queue holds at most 256 commands / 1,048,576 serialized characters. It sends FIFO,
 stops at the first failure and retries transient failures after 1–30 seconds.
+A request without a reply times out after 20 seconds; retries retain the original
+ID and a late reply cannot acknowledge it twice.
 Lost acknowledgements reuse the original payload/ID. Corrupt/full/unwritable
 storage rejects new acceptance without erasing queued data. Scope changes stop
 subsequent dispatch and stale UI callbacks; a completed in-flight acknowledgement
@@ -315,10 +317,60 @@ mode. This is a validation guard, **not** proof of complete frozen delivered-sla
 provenance: grid/detail/swipe cache/overlay origin and durable exposure delivery
 remain `MVP-DATA-004` work.
 
-Lists and Shared Endorsements are the next command slice. Their existing server
-state writes and client Events are still separate. The detail List picker waits
-for this slice's pending actions so its legacy whole-state projection cannot
-overtake the new queue. Full Phase 14.1 and `MVP-DATA-003/004` remain open.
+### Collection commands — #226 / Phase 14.1
+
+`public.commit_collection_action_v1(request)` extends the same versioned envelope
+and the same private receipt/head lineage with List create/rename/delete,
+`SET_LIST_ENTRY`, `UNDO_LIST_ENTRY`, Shared Endorsement and pending withdrawal.
+It also freezes `source` and the relevant name/List/presence/positive intent.
+Metadata commands have no Item. Target Lists must belong to the exact authorized
+Profile. Session, state, all canonical Events and the receipt commit together.
+
+The server derives transitions from locked state. Custom membership emits
+`ITEM_ADDED_TO_LIST` / `ITEM_REMOVED_FROM_LIST`; system Saved emits its Saved
+transition. A Personal destination-picker action also sets positive interest and
+emits `ITEM_LIKED` when needed, without doubling a simultaneous Saved transition.
+An unchanged action gets a replayable receipt and no invented Event. Receipt IDs
+therefore no longer require an Event FK; a changed command uses its action ID for
+the first Event and records all additional Event IDs in its receipt. List deletion
+preserves its receipt for retries. Account/Profile/Item deletion still cascades;
+coordinated receipt/Event retention remains an OPS acceptance requirement.
+
+List undo restores the recorded membership including its original adding actor,
+time and source, plus the prior interaction. It emits one exact
+`ITEM_INTERACTION_UNDONE.reversedEventId` correction for **each** Event of the
+reversed command, so existing Memory/outcome readers cannot retain half of a
+List+Like action. Item and List commands share ordered undo predecessors. Legacy
+membership/projection changes invalidate that head, including delete/reinsert ABA.
+The Item RPC cannot undo a List receipt because it cannot restore membership.
+
+The first Shared actor proposes a custom List; another member accepts the existing
+proposal without supplying a replacement List. Only the last required endorsement
+emits consensus Saved and committed custom membership. Completed consensus remains
+durable after List deletion/member changes. Pending withdrawal clears an empty
+proposal. Deleting a pending proposal's List records cancellation under the actual
+deleting actor, with `endorsementActorUserId` and `reason=LIST_DELETED`; it is not a
+negative preference attributed to that member. Withdrawal/cancellation also adds
+exact Undo references to active Endorsement Events so outcome rewards are cancelled.
+These administrative corrections carry no borrowed current-view prediction.
+
+Mobile Lists, destination picker and Shared discovery use the same SQLite queue as
+ratings. The old whole-state interaction writer and duplicate client mutation
+Events are removed. Collection UI waits for a validated, durably acknowledged
+receipt before reporting success, sending an optional message or starting a
+dependent operation. While a collection choice awaits acknowledgement, new actions
+wait; collection submission also waits for earlier commands. This prevents duplicate
+creation and use of an unconfirmed List while preserving one FIFO after restart.
+Background acknowledgements refresh List/Shared views. Pending/error/discard controls
+are visible on Lists, List detail, the picker and discovery. An optional message is
+still a separate message action and is not replayed after a lost collection reply.
+
+Only explicit domain rejection `KJ002` or stale undo `KJ001` permits user discard,
+followed by authoritative reload before resuming. Auth/identity/invalid receipt and
+uncertain replies stay queued. Collection origin uses the same validated trace
+guard as Item actions, and undo retains accepted original attribution. Full frozen
+delivery, durable exposure, physical process-kill/reconnect acceptance and
+`MVP-DATA-003/004` remain open. Sprint 014 and the PR own rollout/verification status.
 
 ## 12. Taste/acquisition reliability contract
 

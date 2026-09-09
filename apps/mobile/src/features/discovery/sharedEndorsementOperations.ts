@@ -83,7 +83,8 @@ export async function endorseSharedItem(
       target_list_id: listId,
     });
 
-    if (response.error) return endorsementError();
+    if (response.error) return response.error.code === 'KAJO_ACTION'
+      ? { status: 'error', message: response.error.message } : endorsementError();
     return mapSharedEndorsementCommit(response.data);
   } catch {
     return endorsementError();

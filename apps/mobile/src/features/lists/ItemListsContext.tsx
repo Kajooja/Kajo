@@ -4,6 +4,8 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useLayoutEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
@@ -17,6 +19,9 @@ import type {
   ProfileId,
 } from '@/domain/contracts';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
+import { useItemInteractions } from '@/features/discovery/ItemInteractionContext';
+import { createCollectionMutationRpc, type CollectionActionSource } from '@/features/events/collectionActions';
+import type { EventRecordInput } from '@/features/events/eventTracking';
 
 import {
   createCustomItemList,
@@ -43,11 +48,13 @@ export type ItemListsStatus =
 
 interface ItemListsContextValue {
   status: ItemListsStatus;
+  scopeKey: string | null;
+  revision: number;
   lists: readonly ItemList[];
   error: string | null;
   refresh: () => void;
   loadForItem: (itemId: ItemId) => Promise<ItemListsResult>;
-  createList: (name: string) => Promise<ItemListMutationResult>;
+  createList: (name: string, source?: CollectionActionSource) => Promise<ItemListMutationResult>;
   renameList: (
     listId: ItemListId,
     name: string,
@@ -57,13 +64,14 @@ interface ItemListsContextValue {
     listId: ItemListId,
     itemId: ItemId,
     present: boolean,
+    options?: { positive?: boolean; origin?: EventRecordInput },
   ) => Promise<ItemListDeleteResult>;
   loadEntries: (listId: ItemListId) => Promise<ItemListEntriesResult>;
   loadConsumed: (itemType: ItemType | null) => Promise<ConsumedItemsResult>;
 }
 
 interface ListSnapshot {
-  profileId: ProfileId;
+  scopeKey: string;
   status: 'ready' | 'error';
   lists: readonly ItemList[];
   error: string | null;
@@ -76,11 +84,18 @@ const ItemListsContext = createContext<ItemListsContextValue | null>(null);
 export function ItemListsProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const profiles = useActiveProfile();
+  const { submitCollectionAction, collectionRevision } = useItemInteractions();
   const [snapshot, setSnapshot] = useState<ListSnapshot | null>(null);
   const [attempt, setAttempt] = useState(0);
   const profileId = profiles.status === 'ready'
     ? profiles.activeProfile?.id ?? null
     : null;
+
+  const namespace = connection.status === 'configured' ? connection.config.url : '';
+  const scopeKey = profileId && profiles.actorUserId ? `${namespace}:${profiles.actorUserId}:${profileId}` : null;
+  const scopeToken = useMemo(() => ({ scopeKey }), [scopeKey]);
+  const currentScope = useRef(scopeToken);
+  useLayoutEffect(() => { currentScope.current = scopeToken; }, [scopeToken]);
 
   const rpc = useMemo<ItemListRpc | null>(
     () => connection.status === 'configured'
@@ -99,105 +114,75 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    if (!rpc || !profileId) return;
+    if (!rpc || !profileId || !scopeKey) return;
     let active = true;
 
     void loadProfileItemLists(rpc, profileId).then((result) => {
-      if (!active) return;
+      if (!active || currentScope.current !== scopeToken) return;
       setSnapshot(result.status === 'success'
-        ? { profileId, status: 'ready', lists: result.lists, error: null }
-        : { profileId, status: 'error', lists: EMPTY_LISTS, error: result.message });
+        ? { scopeKey, status: 'ready', lists: result.lists, error: null }
+        : { scopeKey, status: 'error', lists: EMPTY_LISTS, error: result.message });
     });
 
     return () => { active = false; };
-  }, [attempt, profileId, rpc]);
+  }, [attempt, collectionRevision, profileId, rpc, scopeKey, scopeToken]);
 
   const refresh = useCallback(() => setAttempt((current) => current + 1), []);
   const runForProfile = useCallback(
-    async <T,>(operation: (currentRpc: ItemListRpc, currentProfileId: ProfileId) => Promise<T>, fallback: T) => {
-      return rpc && profileId ? operation(rpc, profileId) : fallback;
+    async <T,>(operation: (currentRpc: ItemListRpc, currentProfileId: ProfileId) => Promise<T>, fallback: T,
+      mutation?: { source: CollectionActionSource; positive?: boolean; origin?: EventRecordInput }) => {
+      if (!rpc || !profileId || !scopeKey || currentScope.current !== scopeToken) return fallback;
+      const api = mutation ? createCollectionMutationRpc(submitCollectionAction, profileId,
+        mutation.source, mutation.origin, mutation.positive) : rpc;
+      const result = await operation(api, profileId);
+      return currentScope.current === scopeToken ? result : fallback;
     },
-    [profileId, rpc],
+    [profileId, rpc, scopeKey, scopeToken, submitCollectionAction],
   );
-
   const loadForItem = useCallback(
     (itemId: ItemId) => runForProfile(
-      (currentRpc, currentProfileId) => loadProfileItemLists(currentRpc, currentProfileId, itemId),
-      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListsResult,
-    ),
-    [runForProfile],
-  );
-
+      (api, id) => loadProfileItemLists(api, id, itemId),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListsResult), [runForProfile]);
   const createList = useCallback(
-    async (name: string) => {
-      const result = await runForProfile(
-        (currentRpc, currentProfileId) => createCustomItemList(currentRpc, currentProfileId, name),
-        { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListMutationResult,
-      );
-      if (result.status === 'success') refresh();
-      return result;
-    },
-    [refresh, runForProfile],
-  );
-
+    (name: string, source: CollectionActionSource = 'LISTS') => runForProfile(
+      (api, id) => createCustomItemList(api, id, name),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListMutationResult, { source }), [runForProfile]);
   const renameList = useCallback(
-    async (listId: ItemListId, name: string) => {
-      if (!rpc) return { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListMutationResult;
-      const result = await renameCustomItemList(rpc, listId, name);
-      if (result.status === 'success') refresh();
-      return result;
-    },
-    [refresh, rpc],
-  );
-
+    (listId: ItemListId, name: string) => runForProfile(
+      api => renameCustomItemList(api, listId, name),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListMutationResult, { source: 'LIST_DETAIL' }), [runForProfile]);
   const deleteList = useCallback(
-    async (listId: ItemListId) => {
-      if (!rpc) return { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDeleteResult;
-      const result = await deleteCustomItemList(rpc, listId);
-      if (result.status === 'success') refresh();
-      return result;
-    },
-    [refresh, rpc],
-  );
-
+    (listId: ItemListId) => runForProfile(api => deleteCustomItemList(api, listId),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDeleteResult, { source: 'LIST_DETAIL' }), [runForProfile]);
   const setEntry = useCallback(
-    async (listId: ItemListId, itemId: ItemId, present: boolean) => {
-      if (!rpc) return { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDeleteResult;
-      const result = await setItemListEntry(rpc, listId, itemId, present);
-      if (result.status === 'success') refresh();
-      return result.status === 'success'
-        ? { status: 'success' } as const
-        : result;
-    },
-    [refresh, rpc],
-  );
-
+    (listId: ItemListId, itemId: ItemId, present: boolean,
+      options?: { positive?: boolean; origin?: EventRecordInput }) => runForProfile(
+      api => setItemListEntry(api, listId, itemId, present),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListDeleteResult,
+      { source: options?.positive ? 'ITEM_DESTINATION_PICKER' : 'LIST_DETAIL', ...options }), [runForProfile]);
   const loadEntries = useCallback(
-    (listId: ItemListId) => rpc
-      ? loadItemListEntries(rpc, listId)
-      : Promise.resolve({ status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListEntriesResult),
-    [rpc],
-  );
-
+    (listId: ItemListId) => runForProfile(async (api, id) => {
+      const result = await loadItemListEntries(api, listId);
+      return result.status === 'success' && result.entries.some(entry => entry.profileId !== id)
+        ? { status: 'error', message: UNAVAILABLE_MESSAGE } as const : result;
+    }, { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListEntriesResult), [runForProfile]);
   const loadConsumed = useCallback(
-    (itemType: ItemType | null) => runForProfile(
-      (currentRpc, currentProfileId) => loadConsumedItems(currentRpc, currentProfileId, itemType),
-      { status: 'error', message: UNAVAILABLE_MESSAGE } as ConsumedItemsResult,
-    ),
-    [runForProfile],
-  );
+    (itemType: ItemType | null) => runForProfile((api, id) => loadConsumedItems(api, id, itemType),
+      { status: 'error', message: UNAVAILABLE_MESSAGE } as ConsumedItemsResult), [runForProfile]);
 
   const status: ItemListsStatus = connection.status === 'unconfigured'
     ? 'disabled'
     : !profileId
       ? 'inactive'
-      : snapshot?.profileId !== profileId
+      : snapshot?.scopeKey !== scopeKey
         ? 'loading'
         : snapshot.status;
-  const lists = snapshot?.profileId === profileId ? snapshot.lists : EMPTY_LISTS;
-  const error = snapshot?.profileId === profileId ? snapshot.error : null;
+  const lists = snapshot?.scopeKey === scopeKey ? snapshot.lists : EMPTY_LISTS;
+  const error = snapshot?.scopeKey === scopeKey ? snapshot.error : null;
   const value = useMemo<ItemListsContextValue>(() => ({
     status,
+    scopeKey,
+    revision: collectionRevision,
     lists,
     error,
     refresh,
@@ -209,6 +194,8 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     loadEntries,
     loadConsumed,
   }), [
+    collectionRevision,
+    scopeKey,
     createList,
     deleteList,
     error,

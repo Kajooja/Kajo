@@ -99,11 +99,19 @@ and its rollback-only command acceptance passed. All five gates in CI #403 passe
 for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
 records exact rollout/source verification and the remaining device limitations.
 
+The active continuation is **Issue #226**, branch
+`feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
+It implements atomic List/Shared commands and the same durable mobile queue,
+including mixed undo, no-op receipts and cancellation of all affected outcome
+Events. Local targeted mobile/full-schema tests and populated forward rehearsal
+pass; full checks, native CI, reviewed hosted forward and merge are the publication
+gates. This branch is not accepted main or hosted truth until those gates complete.
+The migration has not yet been applied hosted. Finish #226 before another package.
+
 Continue **14.1** after this delivery:
 
 1. Extend the same command discipline to List create/rename/delete/membership and
-   Shared Endorsement/consensus. Their current state/Event writes are still separate;
-   do not close `MVP-DATA-003` merely because rating/not-interest are durable.
+   Shared Endorsement/consensus in active #226; do not close `MVP-DATA-003` merely because rating/not-interest are durable.
 2. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
    swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
    exposure delivery durable; the old exposure-only Event queue remains in memory.

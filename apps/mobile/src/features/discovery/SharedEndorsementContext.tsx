@@ -4,12 +4,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useLayoutEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
+import type { EventRecordInput } from '@/features/events/eventTracking';
+import { useItemInteractions } from './ItemInteractionContext';
 
 import type { ItemId, ItemListId, ProfileId, UserId } from '../../domain/contracts';
 import {
@@ -37,6 +41,7 @@ interface SharedEndorsementContextValue {
   endorse: (
     itemId: ItemId,
     listId?: ItemListId,
+    origin?: EventRecordInput,
   ) => Promise<SharedEndorsementCommitResult>;
   retry: () => void;
 }
@@ -58,6 +63,7 @@ const SharedEndorsementContext =
 export function SharedEndorsementProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
+  const { submitCollectionAction, collectionRevision } = useItemInteractions();
   const [snapshot, setSnapshot] = useState<SharedEndorsementSnapshot | null>(null);
   const [attempt, setAttempt] = useState(0);
   const activeSharedProfile =
@@ -66,6 +72,11 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
       ? activeProfile.activeProfile
       : null;
   const actorUserId = activeProfile.actorUserId;
+  const namespace = connection.status === 'configured' ? connection.config.url : '';
+  const profileId = activeSharedProfile?.id;
+  const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId }), [namespace, actorUserId, profileId]);
+  const currentScope = useRef(scopeToken);
+  useLayoutEffect(() => { currentScope.current = scopeToken; }, [scopeToken]);
   const rpc = useMemo<SharedEndorsementRpc | null>(
     () =>
       connection.status === 'configured'
@@ -93,7 +104,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     const profileId = activeSharedProfile.id;
 
     void loadSharedDiscoveryOverlay(rpc, profileId).then((result) => {
-      if (!active) return;
+      if (!active || currentScope.current !== scopeToken) return;
 
       setSnapshot((current) => {
         if (result.status === 'success') {
@@ -127,7 +138,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [activeSharedProfile, actorUserId, attempt, rpc]);
+  }, [activeSharedProfile, actorUserId, attempt, collectionRevision, rpc, scopeToken]);
 
   useEffect(() => {
     if (!activeSharedProfile || !actorUserId || !rpc) return;
@@ -165,18 +176,25 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     async (
       itemId: ItemId,
       listId?: ItemListId,
+      origin?: EventRecordInput,
     ): Promise<SharedEndorsementCommitResult> => {
-      if (!rpc || !activeSharedProfile || !actorUserId || status !== 'ready') {
+      if (!rpc || !activeSharedProfile || !actorUserId || status !== 'ready' || currentScope.current !== scopeToken) {
         return { status: 'error', message: UNAVAILABLE_MESSAGE };
       }
 
       const result = await endorseSharedItem(
-        rpc,
+        async () => {
+          const response = await submitCollectionAction({ kind: 'ENDORSE_SHARED_ITEM', itemId, listId: listId ?? null },
+            listId ? 'ITEM_DESTINATION_PICKER' : 'SHARED_DISCOVERY', origin);
+          return response.status === 'success' ? { data: response.receipt.result, error: null }
+            : { data: null, error: { code: 'KAJO_ACTION', message: response.message } };
+        },
         activeSharedProfile.id,
         itemId,
         listId ?? null,
       );
 
+      if (currentScope.current !== scopeToken) return { status: 'error', message: UNAVAILABLE_MESSAGE };
       if (result.status === 'error') return result;
 
       setSnapshot((current) => {
@@ -224,7 +242,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
       setAttempt((current) => current + 1);
 
       return result;
-    }, [activeSharedProfile, actorUserId, rpc, status]);
+    }, [activeSharedProfile, actorUserId, rpc, scopeToken, status, submitCollectionAction]);
 
   const retry = useCallback(() => {
     if (!activeSharedProfile || !actorUserId || !rpc) return;

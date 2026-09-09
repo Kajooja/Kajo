@@ -8,7 +8,7 @@ Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy act
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
-[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Lists/Shared command completion and exact delivered provenance follow. PR #219's source/platform experiments are completed evidence.
+[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Active #226 completes List/Shared commands and their durable mobile path; exact delivered provenance follows. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
@@ -745,3 +745,41 @@ merge number. Complete publication, then pause as requested by the owner.
   filename/documentation synchronization is subject to those same required gates.
 - No emulator/phone interaction or physical process-kill/SQLite recovery test was
   available in this workspace. Type/JS/SQL/bundle checks do not claim that acceptance.
+
+
+### Atomic List/Shared commands and durable mobile integration — 2026-09-09 / #226
+
+- Branch `feat/226-atomic-collection-actions` starts from accepted `e0d7610` (#225).
+  The new CLI-created collection forward extends existing private Item receipts and
+  undo heads; no old deployed file is edited. Nullable List metadata supports
+  no-op/deleted-List replay without fabricating Events. The only old function change
+  restricts Item undo to Item command kinds; List undo also restores membership.
+- List create/rename/delete/membership and Shared proposal/endorsement/unanimity/
+  pending withdrawal commit state, all transition Events and receipt atomically.
+  Mixed List/rating undo and legacy membership ABA are protected. Undo corrects
+  every Event of a List+Like action; withdrawal/cancelled proposals also cancel
+  original Endorsement outcome reward with exact correction references.
+- Mobile uses one SQLite actor/Profile/environment FIFO. List/Shared screens and
+  picker show pending/errors with explicit safe rejection recovery. Confirmed
+  receipts drive state, refreshes and Undo; uncertain actions cannot launch dependent
+  creation/messaging or report success. Hung calls have a 20-second reply deadline.
+  Old whole-state mobile writes and duplicate mutation Event calls are removed.
+- Targeted mobile tests cover old payload compatibility, mixed FIFO/restart,
+  acknowledgements, timeouts/late replies, scopes/environments, malformed receipts,
+  shared consensus counts and discard authorization. SQL smoke additionally covers
+  exact Entry actor/time restoration, no-op evidence, consensus late failure rollback,
+  membership loss, pending cancellation, complete undo evidence and valid/fake traces.
+  Actual Memory returns to zero native evidence after the mixed undone sequence.
+- Populated forward rehearsal preserves every existing application/Auth/receipt/head
+  column, exact old cached replies and undo. It verifies all unrelated function
+  bodies/ACLs and the single intended Item guard replacement. Both rehearsals and
+  collection smoke are wired into native CLI CI; all fixtures/DDL/grants roll back.
+- Publication checkpoint: local full check passed 211 mobile + 14 catalog + 61
+  database tests (286 total), lint/typecheck and iOS/Android bundles; the existing
+  Discovery Hook warning remains. The final correction SQL also passed the full
+  schema/rehearsal smoke. Required native CI and scoped hosted deployment are still
+  pending at this checkpoint; the PR will own final-head run and merge identities.
+- No phone/emulator or physical process-kill/SQLite test was available. Full
+  DATA-003/004, late-outcome/frozen delivery and exposure acceptance remain open.
+  Next after #226: exact delivered provenance plus durable exposure, then device
+  acceptance and 14.2. The separate hosted global-default forward is still excluded.

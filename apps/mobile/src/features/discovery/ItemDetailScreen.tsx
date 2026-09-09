@@ -112,6 +112,7 @@ export function ItemDetailScreen({
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const sharedEndorsements = useSharedEndorsements();
+  const { scopeKey } = useItemLists();
   const isSharedProfile = activeProfile.activeProfile?.type === 'SHARED';
 
   if (isSharedProfile && sharedEndorsements.status !== 'ready') {
@@ -147,6 +148,7 @@ export function ItemDetailScreen({
 
   return (
     <ItemDetailContent
+      key={`${scopeKey}:${itemId}`}
       itemId={itemId}
       {...(predictionId ? { predictionId } : {})}
       {...(predictionSource ? { predictionSource } : {})}
@@ -165,16 +167,13 @@ function ItemDetailContent({
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
   const profileMessages = useProfileMessages();
-  const { refresh: refreshLists } = useItemLists();
   const {
     interactions,
-    setListLike,
     setRating,
     setNotInterested,
     canUndo,
     undoTargetItemId,
     undo,
-    retryHydration,
     atomicPendingCount,
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
@@ -217,6 +216,7 @@ function ItemDetailContent({
     item: Item;
     index: number;
     interaction: ItemInteraction;
+    origin: EventRecordInput;
   } | null>(null);
   const dwellState = useRef<{
     item: Item;
@@ -423,50 +423,17 @@ function ItemDetailContent({
         target.index,
         commit.list,
         commit.message,
+        target.origin,
       );
       return;
     }
 
-    const { item, index, interaction } = target;
-    const systemSaved = commit.list.kind === 'SYSTEM_SAVED';
-    if (commit.message && activeProfile.activeProfile) {
-      void profileMessages.send({
-        profileId: activeProfile.activeProfile.id,
-        body: commit.message,
-        listId: commit.list.id,
-        itemId: item.id,
-      });
+    const { item, index } = target;
+    if (commit.message) {
+      void profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
+        listId: commit.list.id, itemId: item.id });
     }
-    if (
-      interaction.interest === 'LIKED' &&
-      (!systemSaved || interaction.saved)
-    ) {
-      advanceAfterAction(
-        item,
-        index,
-        `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`,
-      );
-      return;
-    }
-
-    const action: ItemInteractionAction = {
-      type: 'SET_LIST_LIKE',
-      itemId: item.id,
-      systemSaved,
-    };
-    handleCommittedAction(
-      item,
-      index,
-      action,
-      {
-        ...interaction,
-        interest: 'LIKED',
-        ...(systemSaved ? { saved: true } : {}),
-      },
-      (eventId) => setListLike(item.id, systemSaved, eventId),
-      `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`,
-      { listId: commit.list.id, listName: commit.list.name },
-    );
+    advanceAfterAction(item, index, `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`);
   }
 
   function openListPicker(
@@ -479,7 +446,8 @@ function ItemDetailContent({
       setFeedback('Odota valintojen tallentumista ennen listamuutosta.');
       return;
     }
-    setListPickerTarget({ item, index, interaction });
+    setListPickerTarget({ item, index, interaction, origin: { eventType: 'ITEM_LIKED',
+      itemId: item.id, itemType: item.itemType, predictionId: recommendationTraceId, discoveryMode: mode } });
   }
 
   async function handleEndorsement(
@@ -487,6 +455,7 @@ function ItemDetailContent({
     index: number,
     proposedList?: ItemList,
     message?: string | null,
+    origin?: EventRecordInput,
   ) {
     if (exitingItemId || endorsingItemId) return;
 
@@ -494,6 +463,8 @@ function ItemDetailContent({
     const result = await sharedEndorsements.endorse(
       item.id,
       proposedList?.id,
+      origin ?? { eventType: 'ITEM_ENDORSED', itemId: item.id, itemType: item.itemType,
+        predictionId: recommendationTraceId, discoveryMode: mode },
     );
     setEndorsingItemId(null);
 
@@ -506,68 +477,13 @@ function ItemDetailContent({
       rememberRecentList(proposedList.profileId, proposedList.id);
     }
 
-    if (message && activeProfile.activeProfile) {
+    if (message) {
       void profileMessages.send({
-        profileId: activeProfile.activeProfile.id,
+        profileId: result.commit.profileId,
         body: message,
         listId: result.commit.proposalListId,
         itemId: item.id,
       });
-    }
-
-    if (result.commit.endorsementCreated) {
-      eventTracking.recordEvent({
-        eventType: 'ITEM_ENDORSED',
-        itemId: item.id,
-        itemType: item.itemType,
-        predictionId: recommendationTraceId,
-        discoveryMode: mode,
-        properties: {
-          source: 'SHARED_DISCOVERY',
-          predictionSource,
-          endorsementCount: result.commit.endorsementCount,
-          requiredMemberCount: result.commit.requiredMemberCount,
-          listId: result.commit.proposalListId,
-          listName: result.commit.proposalListName,
-        },
-      });
-    }
-
-    if (result.commit.consensusReached) {
-      eventTracking.recordEvent({
-        eventType: 'ITEM_SAVED',
-        itemId: item.id,
-        itemType: item.itemType,
-        predictionId: recommendationTraceId,
-        discoveryMode: mode,
-        properties: {
-          source: 'SHARED_CONSENSUS',
-          predictionSource,
-          endorsementCount: result.commit.endorsementCount,
-          requiredMemberCount: result.commit.requiredMemberCount,
-        },
-      });
-      if (result.commit.listEntryCreated) {
-        eventTracking.recordEvent({
-          eventType: 'ITEM_ADDED_TO_LIST',
-          itemId: item.id,
-          itemType: item.itemType,
-          predictionId: recommendationTraceId,
-          discoveryMode: mode,
-          properties: {
-            source: 'SHARED_CONSENSUS',
-            predictionSource,
-            listId: result.commit.proposalListId,
-            listName: result.commit.proposalListName,
-            proposedByUserId: result.commit.proposedByUserId,
-          },
-        });
-      }
-    }
-
-    if (result.commit.consensusSaved) {
-      retryHydration();
-      refreshLists();
     }
 
     advanceAfterAction(
@@ -980,6 +896,7 @@ function ItemDetailContent({
         visible={Boolean(listPickerTarget)}
         item={listPickerTarget?.item ?? null}
         isSharedProfile={Boolean(activeSharedMembership)}
+        origin={listPickerTarget?.origin}
         theme={theme}
         onClose={() => setListPickerTarget(null)}
         onCommitted={handleListDestinationCommit}

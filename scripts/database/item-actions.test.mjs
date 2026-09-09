@@ -5,6 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { assertEmptyApplication, snapshotApplication } from './baseline-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
+import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 
 test('atomic Item actions on the full fresh schema (PGlite; native smoke also runs in required CLI CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -22,11 +23,18 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     for (const file of installation.files.slice(0, actionIndex)) await db.exec(`begin; ${file.sql} commit;`);
     const upgrade = await snapshots(itemActionUpgradeSql(installation.files[actionIndex], installation.candidate.tables));
     assert.match(upgrade[0]?.itemActionUpgrade, /^PASS: unchanged populated/);
-    for (const file of installation.files.slice(actionIndex)) await db.exec(`begin; ${file.sql} commit;`);
+    const collectionIndex = installation.files.findIndex(file => file.name.endsWith('_atomic_collection_actions.sql'));
+    assert.ok(collectionIndex > actionIndex);
+    for (const file of installation.files.slice(actionIndex, collectionIndex)) await db.exec(`begin; ${file.sql} commit;`);
+    const collectionUpgrade = await snapshots(collectionActionUpgradeSql(installation.files[collectionIndex], installation.candidate.tables));
+    assert.match(collectionUpgrade[0]?.collectionActionUpgrade, /^PASS: unchanged populated/);
+    for (const file of installation.files.slice(collectionIndex)) await db.exec(`begin; ${file.sql} commit;`);
     const before = await snapshotApplication(snapshots, installation.candidate, { forward: true });
     assertEmptyApplication(before);
     const result = await snapshots(await readFile(new URL('item-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(result[0]?.itemActions, /^PASS: atomic/);
+    const collections = await snapshots(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(collections[0]?.collectionActions, /^PASS: atomic/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Command acceptance must roll back all test objects, accounts, state and evidence');
   } finally { await db.close(); }

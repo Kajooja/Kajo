@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAmbientPhase } from '../../domain/discovery';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
-import { useEventTracking } from '../events/EventTrackingContext';
+import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
@@ -23,10 +23,14 @@ import { ITEM_LIST_LABELS } from './itemListLabels';
 import { rememberRecentList } from './listRecentUse';
 
 export function ListsScreen() {
+  const { scopeKey } = useItemLists();
+  return <ListsContent key={scopeKey} />;
+}
+
+function ListsContent() {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
-  const eventTracking = useEventTracking();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const [newListName, setNewListName] = useState('');
@@ -46,14 +50,7 @@ export function ListsScreen() {
     }
 
     setNewListName('');
-    eventTracking.recordEvent({
-      eventType: 'LIST_CREATED',
-      properties: {
-        listId: result.list.id,
-        listName: result.list.name,
-        source: 'LISTS_HOME',
-      },
-    });
+
   }
 
   function openList(listId: string) {
@@ -71,6 +68,7 @@ export function ListsScreen() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
+      <InteractionPersistenceNotice theme={theme} />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
