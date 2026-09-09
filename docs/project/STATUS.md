@@ -101,12 +101,32 @@ records exact rollout/source verification and the remaining device limitations.
 
 The active continuation is **Issue #226 / PR #227**, branch
 `feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
-It implements atomic List/Shared commands and the same durable mobile queue,
-including mixed undo, no-op receipts and cancellation of all affected outcome
-Events. Local targeted mobile/full-schema tests and populated forward rehearsal
-pass; full checks, native CI, reviewed hosted forward and merge are the publication
-gates. This branch is not accepted main or hosted truth until those gates complete.
-The migration has not yet been applied hosted. Finish #226 before another package.
+Implementation `0d299d5` passes all five required jobs in
+[CI #407](https://github.com/Kajooja/Kajo/actions/runs/34410390133), including native
+populated collection-forward rehearsal and full command smoke. Local check passes
+287 tests plus lint/typecheck and both bundles. The PR owns final-head CI evidence.
+
+**Publication blocker: automatic approval review rejected the hosted DDL action.**
+It did not accept the earlier general fix/merge authorization as explicit approval
+for this hosted target/side effect. No collection migration has been applied and
+main still contains #225. Do not bypass the rejection through another execution path.
+The exact pending action is `apply_migration` named `atomic_collection_actions` to
+hosted **Kajo `mwrnvfosrzwygrunrltm`**, using only
+`20260909211222_atomic_collection_actions.sql`, SHA-256
+`fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`.
+It extends private receipts with nullable List metadata/no-Event receipts, adds
+List undo-head triggers and collection commands, and restricts the existing Item
+undo function to Item command kinds. Existing data is not rewritten by the forward.
+
+Next: obtain explicit owner approval for that concrete hosted action. Then refresh
+preflight, apply only those reviewed bytes under ADR-0006, record the provider's
+actual version, verify old columns/functions/ACLs/history and rollback-only command
+smoke, synchronize the filename/docs, pass final CI, merge #227 and retire its branch.
+Do not merge the client before the required server endpoint exists. Do not apply the
+separate global-default forward or repair old tracking. The preflight verified the
+original repo/target, 33 unchanged table fingerprints, 126 functions, 22 triggers
+and 45 old tracking rows. Prior approval context retrieval was unavailable; the
+block is from automatic review, not a newly invented repository permission rule.
 
 Continue **14.1** after this delivery:
 

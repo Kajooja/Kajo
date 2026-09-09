@@ -790,3 +790,34 @@ merge number. Complete publication, then pause as requested by the owner.
   validation, platform/defaults and existing-application upgrade passed. The next
   head includes the receipt replay reconciliation and must pass all required jobs;
   no database failure is waived and no hosted DDL has been applied at this point.
+
+- Implementation head `0d299d5157cee2d8c20b2db64405b23ff646655d` passed all five
+  required [CI #407](https://github.com/Kajooja/Kajo/actions/runs/34410390133) jobs.
+  Its merge-check tree exactly equals `97949e3823e2364f21054703fecab3ade3556771`;
+  native CLI logs confirm reset/history/atomicity/runtime verification. The artifact
+  was published by CI; a workspace download returned HTTP 403, so no local artifact
+  digest inspection is claimed. Native job success/logs and exact tested tree were
+  verified through GitHub. Local final check is 287 tests and both bundles.
+- Hosted preflight: Kajo `mwrnvfosrzwygrunrltm`, PostgreSQL 17.6; all 33 old
+  application/Auth/receipt/head table hashes, 126 functions, 22 triggers, defaults
+  and 45 tracking rows were stable. Object-key order was normalized when comparing
+  connector JSON; the SQL fingerprints were identical. Existing receipt/head counts
+  were zero. Security advisors remain 18 intended RLS-without-policy INFO findings
+  and the existing Auth leaked-password-protection WARN.
+- **Deployment was not executed:** automatic approval review rejected
+  `apply_migration(atomic_collection_actions)` because it did not find explicit
+  authorization for the hosted target/DDL side effect. STATUS records the exact
+  source/hash/target to approve; no alternative write path was attempted. Main merge
+  and current branch retirement wait for that approval plus successful deployment.
+- On approval, preserve SQL SHA-256
+  `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`, synchronize only
+  the filename to the actual provider version, verify all old columns/125 unrelated
+  functions/22 old triggers/defaults/history, the one intended Item undo guard,
+  three new functions and two new triggers. Hosted smoke must omit isolated-only
+  failure-injection DDL and choose an actual delivered Item for trace acceptance;
+  that rollback-only variant was rehearsed locally without residue.
+- Rollback must preserve accepted receipts/Events/List data and device queues. A
+  narrow forward can disable the collection entrypoints while retaining pending
+  commands for a corrected deployment. Do not blindly reinstall #225 over devices
+  with collection commands: its old queue validator cannot interpret those entries.
+  No rollback or separate global-default migration is part of this pending action.
