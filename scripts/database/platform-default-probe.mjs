@@ -4,14 +4,18 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
-const functionsSql = `select jsonb_build_object('count',count(*),'sha256',
+export function functionDigestSql({ includeApplication = true } = {}) {
+  return `select jsonb_build_object('count',count(*),'sha256',
   encode(sha256(convert_to(coalesce(jsonb_agg(jsonb_build_array(
     format('%I.%I(%s)',n.nspname,p.proname,pg_get_function_identity_arguments(p.oid)),
     pg_get_functiondef(p.oid),pg_get_userbyid(p.proowner),
     coalesce(p.proacl,acldefault('f',p.proowner))) order by n.nspname,p.proname,
       pg_get_function_identity_arguments(p.oid)),'[]'::jsonb)::text,'UTF8')),'hex')) as snapshot
   from pg_proc p join pg_namespace n on n.oid=p.pronamespace
-  where n.nspname !~ '^pg_' and n.nspname <> 'information_schema' and p.prokind in ('f','p');`;
+  where n.nspname !~ '^pg_' and n.nspname <> 'information_schema' and p.prokind in ('f','p')
+  ${includeApplication ? '' : "and n.nspname not in ('public','private')"};`;
+}
+const functionsSql = functionDigestSql();
 
 export async function probePlatformDefaults(execSnapshots) {
   const [platformSql, correction, smoke] = await Promise.all([

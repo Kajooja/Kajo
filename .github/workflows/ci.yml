@@ -65,10 +65,39 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  database-installation:
+    name: Two clean Supabase application installations
+    needs: database-platform
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify two isolated application installations
+        run: node scripts/database/run-ci-installation-probe.mjs "$RUNNER_TEMP/kajo-installation-report.json"
+
+      - name: Upload application installation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: kajo-installation-${{ github.sha }}
+          path: ${{ runner.temp }}/kajo-installation-report.json
+          if-no-files-found: error
+          retention-days: 7
+
   android-apk:
     name: Build standalone Android APK
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    needs: [validate, database-platform]
+    needs: [validate, database-platform, database-installation]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
