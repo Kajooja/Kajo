@@ -6,6 +6,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bufferedSqlCommand } from './buffered-sql-command.mjs';
 
 function run(command, args, input) {
   const result = spawnSync(command, args, { encoding: 'utf8', input, maxBuffer: 8 * 1024 * 1024 });
@@ -27,15 +28,15 @@ try {
   const image = run('docker', docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', name])).trim();
   console.log(`Local database: ${name}\nImage: ${image}`);
   const platformSql = await readFile(new URL('platform-schema-snapshot.sql', import.meta.url), 'utf8');
-  const platformSnapshot = () => JSON.parse(run('docker', docker(['exec', '-i', name, 'psql', '-X', '-qAt',
-    '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres']), platformSql));
+  const platformSnapshot = () => JSON.parse(run('docker', docker(['exec', '-i', name, ...bufferedSqlCommand(['psql', '-X', '-qAt',
+    '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])]), platformSql));
   const platformBefore = platformSnapshot();
   directory = await mkdtemp(join(tmpdir(), 'kajo-local-probe-'));
   const probe = join(directory, 'probe.sql');
   run(process.execPath, [fileURLToPath(new URL('build-local-install-probe.mjs', import.meta.url)), process.argv[2], probe]);
   const sql = await readFile(probe, 'utf8');
-  const output = run('docker', docker(['exec', '-i', name, 'psql', '-X', '--set=ON_ERROR_STOP=1',
-    '--username=postgres', '--dbname=postgres']), sql);
+  const output = run('docker', docker(['exec', '-i', name, ...bufferedSqlCommand(['psql', '-X', '--set=ON_ERROR_STOP=1',
+    '--username=postgres', '--dbname=postgres'])]), sql);
   assert.ok(output.includes('KAJO LOCAL INSTALL PROBE PASS - all probe changes rolled back'),
     'psql finished without the expected probe result');
   assert.deepEqual(platformSnapshot(), platformBefore, 'Probe rollback changed platform/schema/default-privilege metadata');

@@ -652,6 +652,56 @@ Prove repeat installation and runtime behavior on the pinned CI stack. The
 independent existing-application upgrade still needs separate evidence; passing
 this scoped platform/default test does not establish that broader gate.
 
+## Source-only application installation candidate — 2026-09-09
+
+`baseline-installation.mjs` now assembles the candidate entirely from the protected
+source DDL, reviewed function supplement, source direct privileges, explicit
+compatibility grants, all 22 source application/Auth triggers and deterministic
+system seeds. There is no dump input. The four source default-privilege REVOKEs
+run before object creation to prevent native auto-grants surviving the final
+direct-grant contract. Function signatures are temporarily created with body
+validation off for CHECK/policy dependencies, then all reviewed bodies are
+recreated with validation on before commit. The existing catalog final patch runs
+unchanged. No source migration byte, native callback or migration-history row is
+rewritten, skipped or marked applied by this candidate.
+
+The candidate requires creator postgres and empty application relation/function/
+standalone-type namespaces plus empty Auth users. The caller owns its transaction.
+`sourceApplicationReference` independently constructs the plain-PostgreSQL source
+reference and supplements without the candidate's installation ordering. Exact
+table/function owner/direct-ACL fingerprints, all trigger definitions/enabled
+states, full deterministic seed rows and application/Auth row counts are compared.
+Native schema defaults are explicitly broad in the regression fixture, proving
+they do not leak into the installed ACLs. Two independent committed PGlite
+installations match, pass source parity and Auth/Personal/Shared/import smokes,
+restore every synthetic row through rollback and reject reinstall without change.
+
+The `database-installation` CI job owns two distinct unlinked Supabase projects.
+Each commits the candidate, applies the unchanged post-cutoff default migration,
+checks unchanged application definitions/ACL/seeds, runs the same runtime smoke,
+rejects reinstall and verifies native functions/roles/callbacks remain intact.
+Both results must match and both stacks must be removed. The shared lifecycle now
+checks the actual Linux image ID recorded in CI #385, so a moved image tag fails
+before application SQL. This is repeated candidate installation and a forward
+step on that new candidate, **not the independent existing-application upgrade**.
+
+`npm run check` passed 191 mobile, 14 catalog and 49 database tests, lint/typecheck
+and both bundles. CI #387 at `b829b32702794e84e96924d349281b910b7d2577` passed
+validation and the platform job. The first application installation passed its
+source/schema/seed/default/runtime comparisons and then hit a transport failure
+at the negative reinstall test: psql's early ON_ERROR_STOP exit closed Docker
+stdin while Node was still sending the large SQL body, surfacing EPIPE instead of
+the expected SQL error. Consequently the full two-installation gate did not pass.
+
+The correction buffers SQL into a private container temporary file before starting
+psql and removes the file on exit. The shell executes only a fixed program and
+quoted command arguments, never the SQL input. Both CI and Mac runners use it.
+A multi-megabyte Unicode/literal regression verifies complete delivery, mode 0600,
+exact successful/failed exit status, preserved error output and file cleanup. The
+database guard and expected error are unchanged. The full check passed with 191
+mobile, 14 catalog and 50 database tests, TypeScript/lint and both bundles. Real CI
+rerun evidence remains to be recorded before accepting the repeated native runs.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.

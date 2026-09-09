@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { bufferedSqlCommand } from './buffered-sql-command.mjs';
 
 const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
@@ -61,8 +62,8 @@ export async function withCiSupabaseStack(projectId, work) {
       'Postgres image changed; review its actual digest before running application SQL');
     const containerId = docker(['inspect', '--format', '{{.Id}}', container]).trim();
     const execSnapshots = async sql => {
-      const output = docker(['exec', '-i', container, 'psql', '-X', '-qAt',
-        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'], { input: sql });
+      const output = docker(['exec', '-i', container, ...bufferedSqlCommand(['psql', '-X', '-qAt',
+        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
       return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
     };
     const result = await work(execSnapshots);

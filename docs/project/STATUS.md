@@ -129,7 +129,7 @@ Exact next work:
    default correction and a read-only platform report. This revised full probe
    passed twice in PGlite; its Mac execution is pending and is distinct from the
    accepted original run.
-2. **Build and test the proposed source-only application installation in CI.** The 26 function
+2. **Finish the two source-only application installations in CI, then prove the independent upgrade.** The 26 function
    differences are resolved in the proposed supplement. Source comparison now
    also matches all 30 table structures, 205 constraints, 112 indexes and 19 RLS
    policies exactly. Do not repeat those reviews. ADR-0006 owns the evidence.
@@ -155,7 +155,13 @@ Exact next work:
    installation must create source schema/grants, explicitly enable source RLS and
    apply source default REVOKEs before creating objects so fresh-stack auto-grants
    do not survive. Preserve native platform roles/callbacks rather than copying
-   hosted definitions. Full installation acceptance is still pending.
+   hosted definitions. The source-only candidate is now implemented at `b829b32`:
+   two committed PGlite installs, source reference parity and full rollback smokes
+   passed. CI #387 passed validation/platform checks and reached the first native
+   installation's reinstall guard after schema/seed/source/runtime checks. Its
+   expected early SQL failure surfaced as Docker stdin EPIPE, so the full two-run
+   gate did not pass. A tested SQL-buffering correction is prepared; finish its CI
+   rerun before claiming the real repeated-install gate. No guard is weakened.
 3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
    run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
    database's independent forward-upgrade path before closing #208.
@@ -174,6 +180,13 @@ passed. The automated platform continuation is at `533cc54`; CI #385 passed both
 validation and the real Supabase job. `npm run check` passed 191 mobile, 14 catalog
 and 47 database tests, TypeScript, lint (zero errors; one existing Hook warning)
 and both bundles. The owner resumed work after the earlier pause request.
+
+Application-candidate validation subsequently passed 191 mobile, 14 catalog and 49
+database tests plus both bundles. The CI transport fix also passed the full check
+with 50 database tests, including multi-megabyte SQL, original error status and
+temporary-file cleanup. Record its corrected real CI result next. Source installation paths
+are in CODEMAP. The independent existing-application upgrade and any accepted
+canonical installer/history transition remain open under ADR-0006.
 
 The exact canonical system-seed source is now reconstructable without hosted
 data through `scripts/database/system-seed-source.mjs`; ADR-0006 records its

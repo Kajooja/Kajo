@@ -558,3 +558,24 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   source default REVOKEs applied before object creation and explicit source RLS.
   Repeated full installs and independent existing-application upgrade still gate
   #208; no hosted write or native platform callback replacement.
+
+### 2026-09-09 — Source-only installation candidate and CI transport correction
+
+- Added the proposed full application candidate from reviewed source, with source
+  default REVOKEs applied before object creation. All 30 tables, 122 functions,
+  22 triggers and deterministic seed rows match the independent source reference.
+- Two committed PGlite installations match exactly; full Auth/Personal/Shared and
+  import smokes pass with rollback, and reinstall preserves the existing state.
+  `npm run check` passed 191 mobile, 14 catalog and 49 database tests, TypeScript,
+  lint with the existing Hook warning and both bundles.
+- Added two distinct real Supabase installation runs to CI. Shared lifecycle pins
+  the actual Linux Postgres image ID and owns/cleans only each new unlinked stack.
+- CI #387 passed validation/platform. The first application run reached the
+  negative reinstall check after its source/runtime comparisons, but Docker stdin
+  EPIPE masked psql's early error. The full repeated-install gate remains pending.
+- Added buffered SQL transport for CI/Mac with a regression for large Unicode
+  input, real child exit status and private temporary-file cleanup. The SQL guard
+  remains strict. The complete check passed with 191 mobile, 14 catalog and 50
+  database tests plus both bundles; record the corrected real CI result next.
+- Independent existing-application upgrade and accepted installer/history
+  procedure are still open; no hosted write or migration-history change.
