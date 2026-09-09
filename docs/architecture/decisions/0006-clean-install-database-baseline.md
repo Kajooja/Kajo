@@ -942,7 +942,13 @@ runner stopped before application SQL. The correction accepts only
 CLI reset. Actual reference names remain in reports. A regression rejects changed
 content, tags and unreviewed registries. Full local check passed 191 mobile,
 14 catalog and 55 database tests (260 total), TypeScript/lint and both bundles.
-The complete corrected CI rerun remains to be recorded.
+[CI #392](https://github.com/Kajooja/Kajo/actions/runs/34374555078) then passed all
+five required jobs at `bbe4dd53dd3ce81ee9793eb77e6f386daa74856c`: validation,
+platform/defaults, repeated application installs, populated upgrade/rollback and
+CLI reset/history/atomicity. The registry-reference correction retains the exact
+content pin and resolves CI #391's environment-label failure. The proposal is now
+ready for its explicit acceptance/installation-procedure decision; repeating the
+completed discovery and runtime experiments is not the next task.
 
 The original [Issue #208 acceptance](https://github.com/Kajooja/Kajo/issues/208)
 requires successful unmodified migration replay. This experiment proves a separate

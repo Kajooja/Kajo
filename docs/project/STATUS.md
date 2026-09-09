@@ -140,14 +140,20 @@ check stopped before application SQL, despite the exact same pinned content ID.
 The corrected check accepts only those two observed Supabase references, the same
 17.6.1.167 tag and the exact reviewed image ID. Changed content/version/registry
 still fails; the added regression and full check passed 260 tests (55 database)
-and both bundles. Verify its complete CI rerun before merging.
+and both bundles. [CI #392](https://github.com/Kajooja/Kajo/actions/runs/34374555078)
+then passed every required job at `bbe4dd53dd3ce81ee9793eb77e6f386daa74856c`:
+validation, platform/defaults, both installations, populated upgrade/rollback and
+CLI history/atomicity. APK was intentionally skipped for this PR event.
 
-After that, review adoption of the explicit fresh-install lineage in ADR-0006.
+**Next: resolve adoption of the tested fresh-install lineage in ADR-0006.**
 Issue #208 currently requires successful unmodified chronological replay; that
 literal criterion remains unsatisfied. The tested source baseline is an explicit
 alternative, not evidence that the original chain passed. Keep #208/MVP-ALG-009
-open until the acceptance/installation procedure is explicitly resolved. PR #219
-is still open; its test results are not accepted main truth.
+open until the acceptance/installation procedure is explicitly resolved. The
+proposal and its concrete CLI file/history identities are ready for owner review;
+no further repeat of these completed diagnostics is needed. PR #219 is still open.
+After acceptance, record the chosen procedure and continue Phase 14.0/14.1 from
+that decision. Do not treat an unmerged proposal as accepted main truth.
 
 Completed reviews must not be restarted:
 

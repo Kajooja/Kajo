@@ -638,6 +638,14 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   now accepts those two observed references only, retaining the exact tag/digest
   requirement. Changed image content/version/registry regression passes.
 - Full local check passed 191 mobile, 14 catalog and 55 database tests plus
-  lint/typecheck and both bundles. Complete corrected CI remains pending.
+  lint/typecheck and both bundles. CI #392 at `bbe4dd5` then passed all five
+  required jobs, including the repeated installs, populated upgrade/rollback and
+  CLI history/atomicity. APK was skipped for the PR event.
 - #208's literal unmodified-replay criterion is still unsatisfied. Fresh-lineage
   adoption/acceptance is explicit; no historical or hosted mutation is inferred.
+
+Current decision handoff: the fully tested source-derived fresh lineage is ready
+for explicit adoption review in PR #219. The issue's existing original-replay
+criterion is not silently replaced, and no hosted history repair or deployment
+has occurred. Continue from the acceptance/installation-procedure decision,
+then the remaining Phase 14 gates; do not restart completed fingerprint/probe work.
