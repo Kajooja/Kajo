@@ -137,7 +137,7 @@ Required missing pieces confirmed before platform acceptance:
   absent from this schema-filtered export; reconstruct from
   `20260827173000_auth_identifier_and_profile_fix.sql` through reviewed supplement.
 - Platform event triggers: none exported. Hosted includes `ensure_rls` invoking
-  `private.rls_auto_enable` and six extension-owned platform triggers. Reconcile
+  `private.rls_auto_enable` and six `supabase_admin`-owned platform triggers. Reconcile
   against the actual pinned Supabase stack rather than copying blindly.
 - System seeds: `private.predictor_genomes` and `private.policy_assignments` are
   empty. Reconstruct reviewed defaults from `20260904170000_sleep_layer_v1_foundation.sql`
@@ -494,6 +494,85 @@ forward upgrade. Historical migrations remain immutable, the existing probe's
 export ACLs are unchanged, and #208 remains open. The raw export diagnostic still
 returns `REQUIRES_RECONCILIATION`, with separate `exportRepeatability: PASS` and
 `relationSourceParity: MATCH`; this is the expected result, not a failed test suite.
+
+## Explicit compatibility grants and forward defaults — 2026-09-09
+
+This checkpoint supersedes the unresolved retention/default decision above. The
+proposed empty-install contract explicitly preserves the accepted export's extra
+`service_role` rights on the 12 named tables and 18 exact function signatures in
+`scripts/database/baseline-compatibility-grants.sql`. Its SHA-256 is
+`dea675709e4bee50443522b1ed6b5ed5d2a2dedc80bb6021be679cf6c161e4f2`.
+No other caller, grant option or future-object default is added. This is a reviewed
+compatibility choice, not a claim those grants came from application migrations.
+Supabase's [initial schema source](https://github.com/supabase/postgres/blob/3a68ef75aabc583b11030e5eea29216d0d44c5b9/migrations/db/init-scripts/00000000000000-initial-schema.sql)
+contains broad initial public-schema defaults, but does not prove the exact history
+of this hosted project or pinned image. Preserve current service capabilities
+explicitly rather than making that inference an installation requirement.
+
+After the contract, both exact export installations match **all 30 table
+definitions/owners/direct ACLs and all 122 application-function owners/direct
+ACLs**, with no missing, unexpected or changed objects in those comparisons.
+`schema-export-diagnostic.mjs` records this as `reviewedPrivilegeParity`; raw source
+differences remain separately visible. Its overall `REQUIRES_RECONCILIATION`/exit 1
+still reflects historical function text differences, with export repeatability
+PASS. It does not reject the separately resolved function supplement.
+
+New forward migration
+`20260909131913_close_postgres_function_defaults.sql`, generated with Supabase CLI
+2.117.0, revokes the global future-function defaults of creator `postgres` from
+PUBLIC/anon/authenticated/service_role, then clears additions in public/private.
+The global control applies **across schemas**, including future platform/extension
+functions created by postgres. Their intended callers need explicit grants;
+existing outside-schema default additions and other creators' defaults remain
+unchanged. The migration changes no existing function body, owner or ACL. It is
+included in the rollback probe and prepared for a separately verified forward
+upgrade, **not applied hosted**. It cannot repair the earlier chronological replay
+failure; the protected 47 historical files remain unchanged.
+
+Tests reproduce the original PUBLIC-execution defect and verify the correction,
+actual denied anon execution followed by an explicit successful authenticated
+grant, idempotence, rollback of all default-ACL rows, unchanged existing function
+fingerprints, retained table defaults, other creators and outside-schema explicit
+grants. Compatibility tests verify exactly the 12/18 object differences, unchanged
+non-service grants and no grants on unlisted/future objects. The complete revised
+Auth/Personal/Shared/import/default probe passed twice in PGlite; both rollbacks
+restored the empty application state and original default privileges.
+
+Read-only hosted catalogs confirm PostgreSQL 17.6, no global default row for
+postgres and owner-only public-schema function defaults. This leaves the global
+implicit PUBLIC default for future functions; current RPCs have explicit ACLs.
+Audit correction: six platform event triggers are **owned by supabase_admin**, not
+extension-owned. All seven, including postgres-owned `ensure_rls`, have no
+`pg_depend` extension membership. Their functions' `extensions` schema does not
+establish extension ownership. `ensure_rls` calls `private.rls_auto_enable` for new
+public tables; that function catches/logs ALTER failures, so its existence alone
+does not prove every table has RLS. No hosted object or role was modified.
+
+### Exact continuation after the pause
+
+From the owner's existing Mac export directory, with local Supabase running:
+
+```sh
+git -C kajo-testityokalut pull --ff-only
+node kajo-testityokalut/scripts/database/run-local-install-probe.mjs ./kajo-schema.sql
+```
+
+The runner writes `kajo-install-report-*.json` only after success and equality of
+the before/after platform snapshots. Collect that file and the PASS output. The
+report records the actual image, generated probe hash, schema owner/direct ACLs,
+creator defaults, event-trigger definitions as hashes and true extension membership,
+selected role flags and memberships. It contains no application rows, function
+bodies, passwords, connection strings or API keys. The snapshot uses read-only
+transactions and PostgreSQL 17 catalogs; tests normalize OIDs, detect changed
+defaults/event triggers and verify rollback without leaking fixture data.
+
+Revised Mac/Docker execution remains pending. Compare its platform metadata with
+hosted truth before choosing platform supplements; the report is not a complete
+type/schema/effective-privilege audit. Two real pinned installations with full
+schema/seed/runtime comparison and an independent existing-database forward
+upgrade remain required. No canonical baseline, history transition or #208 closure
+is accepted. `npm run check` passed 191 mobile, 14 catalog and 45 database tests,
+TypeScript, lint with one existing Hook warning, and iOS/Android bundles.
 
 ## Alternatives considered
 

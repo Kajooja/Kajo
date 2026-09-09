@@ -506,3 +506,31 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   database tests, TypeScript, lint (zero errors; one existing DiscoveryScreen Hook
   warning) and both iOS/Android bundles. The exact export diagnostic completed two
   installs with structural MATCH and explicitly unresolved privilege/source status.
+
+### 2026-09-09 — Explicit compatibility/default contract and pause checkpoint
+
+- CI #383 passed the preceding published head. Owner requested a pause after this
+  checkpoint; resume from STATUS and the existing #219 branch, not a new workstream.
+- Proposed compatibility SQL preserves only the exported service_role rights on
+  12 named tables and 18 functions. Both export installations now match reviewed
+  source owner/direct ACLs for all 30 tables and 122 application functions. Raw
+  historical differences stay visible; exact platform provenance is not invented.
+- Prepared CLI-generated forward migration to close future postgres-created
+  function defaults globally and clear public/private additions. Existing function
+  ACLs and other creators remain unchanged. Global scope includes future platform
+  functions; real-platform and independent upgrade verification remain pending.
+- Read-only hosted catalogs confirmed the global PUBLIC default gap. Corrected an
+  earlier audit error: six platform event triggers have supabase_admin ownership,
+  and none of the seven triggers is extension-owned. Hosted objects are unchanged.
+- Full revised rollback probe passed twice in PGlite, including compatibility,
+  defaults, Auth/Personal/Shared and import checks; application tables and default
+  privileges were restored. New regressions verify execution boundaries,
+  idempotence, unchanged existing rights and OID-independent platform metadata.
+- Mac runner now saves image/probe hash and read-only platform metadata after
+  checking before/after equality. Next run the revised probe on the owner's pinned
+  local stack and collect `kajo-install-report-*.json`; ADR-0006 has exact commands.
+  Prior Mac PASS covers only the original probe. Repeated full installations,
+  platform reconciliation and independent forward upgrade still gate #208.
+- Validation: `npm run check` passed 191 mobile, 14 catalog and 45 database tests,
+  TypeScript, lint (zero errors; one existing Hook warning) and both bundles.
+  No historical migration was edited and no hosted change or APK build was made.

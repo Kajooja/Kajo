@@ -125,23 +125,31 @@ Exact next work:
    Shared member ranking, aggregate-only explanation, outsider/revoked-member
    denial and versioned Shared traces. It now also uses 122 source-derived
    functions and tests 5000-row import/correction/removal and null-bootstrap
-   eligibility. This revised full probe passed twice in PGlite; its Mac execution
-   is pending and is distinct from the accepted original run.
-2. **Resolve privilege defaults and platform provenance.** The 26 function
+   eligibility. It now includes the reviewed compatibility grants, future-function
+   default correction and a read-only platform report. This revised full probe
+   passed twice in PGlite; its Mac execution is pending and is distinct from the
+   accepted original run.
+2. **Run the revised Mac probe and reconcile its platform report.** The 26 function
    differences are resolved in the proposed supplement. Source comparison now
    also matches all 30 table structures, 205 constraints, 112 indexes and 19 RLS
    policies exactly. Do not repeat those reviews. ADR-0006 owns the evidence.
-   The new source-only privilege reference deliberately has no Supabase initial
-   grants: export differences are additional `service_role` permissions on 12
-   tables and 18 public functions. Their platform/history provenance and proposed
-   retention/removal still need resolution; direct `anon`/`authenticated` grants
-   and postgres ownership match this reference. A regression also reproduces that
-   the source's per-schema default REVOKEs do not remove PostgreSQL's global
-   PUBLIC EXECUTE default for future functions. Resolve that default contract
-   with platform scope accounted for; it is not evidence of a current RPC leak.
-   Reconcile schema/default ACL and platform event triggers, especially
-   `ensure_rls` / `private.rls_auto_enable`, without blindly replacing platform
-   objects. Auth-trigger and deterministic seed supplements are already prepared.
+   The proposed baseline now explicitly retains the exported `service_role`
+   permissions on 12 named tables and 18 named public functions. With this reviewed
+   compatibility contract, all 30 table and 122 application-function owner/direct
+   ACL comparisons match. This resolves proposed retention, not exact historical
+   platform provenance. Do not repeat the completed direct-ACL review.
+   Forward migration `20260909131913_close_postgres_function_defaults.sql` closes
+   future function grants globally for creator `postgres`, then clears public/
+   private schema additions. Existing functions and other creators' defaults stay
+   intact; the global control also affects future postgres-created platform/
+   extension functions, which need their intended grants. It is prepared and tested
+   locally, not applied hosted; it does not fix the earlier historical replay.
+   Update the existing Mac tool checkout, run the same probe command, then collect
+   its `kajo-install-report-*.json`. ADR-0006 has the commands and remaining scope.
+   Compare its schema/default ACL, role and event-trigger metadata with hosted
+   catalogs, especially `ensure_rls` / `private.rls_auto_enable`. The six other
+   hosted event triggers are owned by `supabase_admin`; none of the seven has
+   extension membership. Do not replace platform objects from schema names alone.
 3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
    run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
    database's independent forward-upgrade path before closing #208.
@@ -149,10 +157,17 @@ Exact next work:
 The export omits the Auth trigger, all event triggers, PredictorGenome and
 PolicyAssignment rows. It is not yet an accepted installation baseline. The
 connected hosted project has only main; never use it as an installation target.
-The probe temporarily supplies the source-derived function bundle, canonical Auth
-trigger and deterministic system seeds, exercises Auth/Personal/Shared plus import
-lifecycle behavior, then rolls everything back. It does not supply/change platform
-event triggers or close the full replay gate.
+The probe temporarily supplies source-derived functions, explicit compatibility
+grants, the forward default correction, canonical Auth trigger and deterministic
+system seeds. It exercises Auth/Personal/Shared, imports and future-function grants,
+then rolls everything back and checks platform metadata is restored. It does not
+supply/change platform event triggers or close the full replay gate.
+
+Pause checkpoint requested by the owner: current changes are ready for PR #219.
+`npm run check` passed 191 mobile, 14 catalog and 45 database tests, TypeScript,
+lint (zero errors; one existing Hook warning) and both platform bundles. CI #383
+passed the preceding published head; check the new head's CI when resuming. The
+next external evidence is the revised Mac report, not another schema export.
 
 The exact canonical system-seed source is now reconstructable without hosted
 data through `scripts/database/system-seed-source.mjs`; ADR-0006 records its

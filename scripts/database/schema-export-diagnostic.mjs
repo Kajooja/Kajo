@@ -26,9 +26,15 @@ try {
   const { db: sourceDb, source } = await createSourceRelationDatabase();
   let sourceRelations;
   let sourceFunctions;
+  let reviewedRelations;
+  let reviewedFunctions;
+  const compatibility = await readFile(new URL('baseline-compatibility-grants.sql', import.meta.url), 'utf8');
   try {
     sourceRelations = (await sourceDb.exec(relationSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
     sourceFunctions = (await sourceDb.exec(snapshotSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
+    await sourceDb.exec(compatibility);
+    reviewedRelations = (await sourceDb.exec(relationSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
+    reviewedFunctions = (await sourceDb.exec(snapshotSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
   }
   finally { await sourceDb.close(); }
   let firstRelations;
@@ -76,6 +82,13 @@ try {
           functions: compareFunctionPrivileges(sourceFunctions, { ...snapshot,
             functions: snapshot.functions.filter(row => row.identity !== 'private.rls_auto_enable()') }),
         },
+        reviewedPrivilegeParity: {
+          contract: 'Source grants plus explicit existing-service-role compatibility; ADR-0006',
+          compatibilitySha256: hash(compatibility),
+          tables: compareRelationSchemas(reviewedRelations, relations),
+          functions: compareFunctionPrivileges(reviewedFunctions, { ...snapshot,
+            functions: snapshot.functions.filter(row => row.identity !== 'private.rls_auto_enable()') }),
+        },
         tables: tables.length,
         tablesWithoutRls: tables.filter(t => !t.rls).map(t => t.name),
         functions: snapshot.functions.length,
@@ -101,8 +114,8 @@ try {
   if (process.argv[5]) await writeFile(process.argv[5], JSON.stringify(firstRelations, null, 2) + '\n', { flag: 'wx' });
   const sourceMatched = firstInventory.functionSourceParity.status === 'MATCH'
     && firstInventory.relationSourceParity.status === 'MATCH'
-    && firstInventory.sourcePrivilegeReference.tables.status === 'MATCH'
-    && firstInventory.sourcePrivilegeReference.functions.status === 'MATCH';
+    && firstInventory.reviewedPrivilegeParity.tables.status === 'MATCH'
+    && firstInventory.reviewedPrivilegeParity.functions.status === 'MATCH';
   console.log(JSON.stringify({ status: sourceMatched ? 'PASS' : 'REQUIRES_RECONCILIATION',
     exportRepeatability: 'PASS', engine: 'PGlite 0.3.14', postgresMajor: first.serverMajor,
     exportSha256: checksum, installs: 2, inventory: firstInventory,

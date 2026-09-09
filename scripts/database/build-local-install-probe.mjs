@@ -22,6 +22,9 @@ try {
   const smoke = await readFile(new URL('bootstrap-ranking.hosted-smoke.sql', import.meta.url), 'utf8');
   const sharedSmoke = await readFile(new URL('shared-install-smoke.sql', import.meta.url), 'utf8');
   const functionSmoke = await readFile(new URL('baseline-function-smoke.sql', import.meta.url), 'utf8');
+  const functionDefaults = await readFile(new URL('20260909131913_close_postgres_function_defaults.sql', migrations), 'utf8');
+  const defaultsSmoke = await readFile(new URL('function-defaults-smoke.sql', import.meta.url), 'utf8');
+  const compatibility = await readFile(new URL('baseline-compatibility-grants.sql', import.meta.url), 'utf8');
   assert.equal((smoke.match(/^begin;$/gm) ?? []).length, 1);
   assert.ok(smoke.trimEnd().endsWith('rollback;'));
   // One outer transaction includes export, supplements and unchanged smoke body.
@@ -42,6 +45,12 @@ ${bytes.toString('utf8')}
 -- source-patch resolutions. No exported function body is accepted by default.
 -- Function supplement SHA-256: ${functions.sha256}
 ${functions.sql}
+-- Explicit preservation of reviewed existing service-role grants (ADR-0006).
+${compatibility}
+-- Apply the post-cutoff forward default-privilege migration unchanged. Its
+-- metadata and all synthetic probe functions are part of the outer rollback.
+${functionDefaults}
+${defaultsSmoke}
 -- The filtered export already contains application-table triggers. Its omitted
 -- Auth trigger is reconstructed here from canonical source.
 ${trigger}
