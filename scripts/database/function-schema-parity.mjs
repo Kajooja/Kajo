@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const format = 'kajo-function-schema-v1';
-const fields = ['definitionSha256', 'owner', 'acl'];
 function validate(snapshot) {
   if (snapshot?.format !== format || !Number.isInteger(snapshot.serverMajor)
       || snapshot.serverMajor < 14 || !Array.isArray(snapshot.functions) || !snapshot.functions.length) {
@@ -27,7 +26,7 @@ function validate(snapshot) {
   return rows;
 }
 
-export function compareFunctionSchemas(expected, actual) {
+function compare(expected, actual, fields, scope) {
   const left = validate(expected);
   const right = validate(actual);
   if (expected.serverMajor !== actual.serverMajor) throw new Error('PostgreSQL major versions differ');
@@ -38,8 +37,18 @@ export function compareFunctionSchemas(expected, actual) {
     return differences.length ? [{ identity, fields: differences }] : [];
   });
   return { status: missing.length || unexpected.length || changed.length ? 'MISMATCH' : 'MATCH',
-    scope: 'Functions and direct ACL (including defaults) only; not complete schema or behavioral parity',
+    scope,
     expectedCount: left.size, actualCount: right.size, missing, unexpected, changed };
+}
+
+export function compareFunctionSchemas(expected, actual) {
+  return compare(expected, actual, ['definitionSha256', 'owner', 'acl'],
+    'Functions and direct ACL (including defaults) only; not complete schema or behavioral parity');
+}
+
+export function compareFunctionPrivileges(expected, actual) {
+  return compare(expected, actual, ['owner', 'acl'],
+    'Function identities, owners and direct ACL only; definitions and effective/inherited privileges excluded');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

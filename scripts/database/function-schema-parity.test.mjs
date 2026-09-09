@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
-import { compareFunctionSchemas } from './function-schema-parity.mjs';
+import { compareFunctionSchemas, compareFunctionPrivileges } from './function-schema-parity.mjs';
 
 test('function schema diagnostic detects code, configuration, ownership and grant drift', async () => {
   const db = new PGlite();
@@ -22,6 +22,7 @@ test('function schema diagnostic detects code, configuration, ownership and gran
     await db.exec(`create or replace function private.example(n integer) returns text language sql as $$ select 'a b'::text $$;`);
     assert.deepEqual(compareFunctionSchemas(baseline, await snapshot()).changed[0].fields, ['definitionSha256']);
     const changedBody = await snapshot();
+    assert.equal(compareFunctionPrivileges(baseline, changedBody).status, 'MATCH');
     await db.exec(`alter function private.example(integer) security definer;
       alter function private.example(integer) set search_path = pg_catalog;`);
     assert.deepEqual(compareFunctionSchemas(changedBody, await snapshot()).changed[0].fields, ['definitionSha256']);
@@ -29,11 +30,13 @@ test('function schema diagnostic detects code, configuration, ownership and gran
     await db.exec('revoke execute on function private.example(integer) from public');
     assert.deepEqual(compareFunctionSchemas(configured, await snapshot()).changed[0].fields, ['acl']);
     const restricted = await snapshot();
+    assert.deepEqual(compareFunctionPrivileges(configured, restricted).changed[0].fields, ['acl']);
     await db.exec('grant execute on function private.example(integer) to diagnostic_reader with grant option');
     assert.deepEqual(compareFunctionSchemas(restricted, await snapshot()).changed[0].fields, ['acl']);
     const granted = await snapshot();
     await db.exec('alter function private.example(integer) owner to diagnostic_reader');
     assert.ok(compareFunctionSchemas(granted, await snapshot()).changed[0].fields.includes('owner'));
+    assert.ok(compareFunctionPrivileges(granted, await snapshot()).changed[0].fields.includes('owner'));
     await db.exec('drop function private.example(text)');
     assert.equal(compareFunctionSchemas(baseline, await snapshot()).missing.length, 1);
     assert.equal(compareFunctionSchemas(await snapshot(), baseline).unexpected.length, 1);
