@@ -86,7 +86,7 @@ The 47 protected historical files and their failing chronological diagnostic are
 unchanged. [ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)
 owns the adopted fresh lineage and existing-database forward procedure.
 
-The current **14.1 delivery is #224**, branch `feat/224-atomic-item-actions`:
+The latest **14.1 delivery is #224 / PR #225**:
 rating, not-interest and their undo now have an idempotent/atomic server command
 and a SQLite-backed actor/Profile/environment outbox. The command persists state,
 Event and receipt together, preserves unrelated Saved state, rejects stale undo
@@ -94,8 +94,10 @@ and validates any supplied trace before correlation. The queue persists before
 optimistic acceptance, survives restart/lost replies, preserves FIFO and stops
 stale-scope dispatch/callbacks. A definitively rejected undo can be explicitly
 discarded before reloading current server state. `DATA_EVENTS.md` owns the contract.
-The PR's required CI and explicit forward rollout gate this delivery; GitHub owns
-its exact head/merge/run state. Sprint 014 records rollout and device limitations.
+The reviewed server forward `20260909204512_atomic_item_actions.sql` is deployed
+and its rollback-only command acceptance passed. All five gates in CI #403 passed
+for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
+records exact rollout/source verification and the remaining device limitations.
 
 Continue **14.1** after this delivery:
 
@@ -119,7 +121,10 @@ The existing hosted database stays on the separately reviewed forward-only
 procedure in ADR-0006. Its known tracking mismatch is not repaired by local-lineage
 adoption. Forward file `20260909131913_close_postgres_function_defaults.sql` has
 not been applied hosted; deployment must capture its own prior defaults/rollback.
-No hosted schema/data/history change is part of this local installer delivery.
+The #223 local installer did not change hosted state. #224 applied only its new
+atomic-action forward: all 31 old application/Auth table hashes, 123 existing
+function fingerprints, 21 triggers, defaults and 44 old tracking rows remained
+unchanged. The new tracking row uses the provider's actual version above.
 
 The [2026-09-09 retrospective](retros/2026-09-09.md) and recovery manifest preserve
 the completed #220 audit and removal of all 145 approved old remote branches.
