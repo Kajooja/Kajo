@@ -699,8 +699,79 @@ quoted command arguments, never the SQL input. Both CI and Mac runners use it.
 A multi-megabyte Unicode/literal regression verifies complete delivery, mode 0600,
 exact successful/failed exit status, preserved error output and file cleanup. The
 database guard and expected error are unchanged. The full check passed with 191
-mobile, 14 catalog and 50 database tests, TypeScript/lint and both bundles. Real CI
-rerun evidence remains to be recorded before accepting the repeated native runs.
+mobile, 14 catalog and 50 database tests, TypeScript/lint and both bundles. The
+corrected real CI rerun passed, as recorded below.
+
+## Repeated native application installations PASS — 2026-09-09
+
+[CI #388](https://github.com/Kajooja/Kajo/actions/runs/34366985506) passed at branch
+head `0c9a4808ca79fb5e145c97ab96c1d0b8bada706a`; tested merge commit
+`b9fbb65606250146c39be230f0b469d50d08d116`. Validation and both real database jobs
+passed. The corrected SQL transport exposed the expected reinstall refusal and
+allowed both independent application runs to finish.
+
+Both installations used Supabase CLI 2.117.0 on Linux x64 and
+`public.ecr.aws/supabase/postgres:17.6.1.167`, image ID
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+Their container IDs were distinct (`1d7f1bf6ba62...` and `a38a2ff58fd2...`),
+and cleanup passed for both. All 30 table/122 function fingerprints, 22 triggers,
+explicit RLS and deterministic seed rows matched the independent source reference
+and each other. Auth/Personal/Shared/import/default smokes passed and rolled back
+without changing committed state; native function bodies/owners/ACLs, roles,
+memberships and callbacks were preserved.
+
+Evidence identities:
+
+- Artifact `10110465545`,
+  `kajo-installation-b9fbb65606250146c39be230f0b469d50d08d116`.
+- Downloaded ZIP SHA-256
+  `6baf8e1e495ec5b3aefa5c0a06dea59f3c7c1b1ba49543b13c593bf141c18500`.
+- Extracted report SHA-256
+  `79eafd409326d9df16396029e26b812f730db3931eb5ad083f68c08e5f38f043`.
+- Generated installation SQL SHA-256
+  `03e362d3f27a890b4c581eb24342837179e14ac9916d92e8106a79a4c4511a95`.
+- Application snapshot SHA-256
+  `3986d51b67f3862d4681b3347f4da5ce4f5590257cb69e9ac52cd19cff096fe4`.
+- Unchanged forward migration SHA-256
+  `167420864b8cf673788ee740691679581b8247ba15ea8410d660032990e5628e`.
+
+The report was downloaded, its ZIP digest verified and its single expected JSON
+entry inspected. Source hashes are included in that report and match the reviewed
+checkpoint/function/trigger/seed/compatibility identities above. This completes
+the repeated pinned candidate-installation experiment, not historical CLI replay
+repair or deployment acceptance.
+
+## Independent populated application upgrade — implementation prepared
+
+`existing-application-upgrade.mjs` supplies a separate pre-upgrade fixture from
+the reviewed source reference and compatibility contract. It shares protected
+source extractors, but never calls `buildBaselineInstallation` or the installation
+runner. It commits existing Auth users, Personal/Shared memberships, native rating
+Events, imported bootstrap evidence, PredictionRun/candidate traces and seeds
+before the upgrade starts. The old global PUBLIC function default remains open.
+
+The probe first executes an anonymous canary under that old default and verifies
+runtime behavior. It applies only the unchanged forward default migration,
+commits it, compares all application table/function metadata, all non-system
+function definitions/owners/ACLs and table trigger definitions/enabled states,
+and hashes complete existing rows including nested evidence/trace payloads and
+timestamps. Any present CLI migration-history rows are read and hashed only.
+Unrelated default grants and platform metadata must remain identical.
+
+The migration is committed a second time to prove idempotence. Separate rollback
+smokes verify denied future function access, explicit grants, existing Personal/
+Shared ranking, import removal preserving native evidence, outsider/revoked-member
+denial and new Auth provisioning. Regression coverage checks changed row content
+at constant counts, changed function grants and rejection of an already-hardened
+fixture that could otherwise produce a false upgrade PASS.
+
+The new `database-upgrade` CI job uses a third independent unlinked stack and
+the same verified image pin, then uploads a metadata/hash-only report after
+cleanup. These are synthetic source-checkpoint fixtures, not copied hosted rows
+or a claim that every original exported function body is byte-identical. The
+local workspace disconnected while preparing this package; its automated CI
+result is pending and must be recorded before accepting the upgrade experiment.
+No hosted migration or canonical installer/history transition is activated.
 
 ## Alternatives considered
 

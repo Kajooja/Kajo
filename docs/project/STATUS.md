@@ -78,142 +78,85 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 
 ### Next task now
 
-Audit correction: STATUS was corrupted during the `87fd3f8` API upload and is now
-restored from the verified `61d1974` local content. The #219 follow-up fixes that
-upload, removes CI's dependency on a conversation attachment and checks seed hashes
-instead of merely reporting them. Export/source comparison now proves all 21
-application-table trigger definitions and enabled states; Auth is the separate
-22nd trigger. Full schema/platform/upgrade acceptance remains open. The earlier
-chat-only proposal to jump straight to candidate pagination does not override
-ROADMAP's 14.0 → 14.1 → 14.2 dependency order.
+Continue **Issue #208 / PR #219**, branch
+`test/208-export-install-diagnostic`. PR #217 (`42d605a`) and PR #218
+(`2d1b0d5`) are accepted and merged; #219 remains a proposal on top of main.
+The earlier upload corruption was repaired, and subsequent published blobs/trees
+were checked against their intended contents. ROADMAP order remains
+**14.0 clean installation → 14.1 evidence → 14.2 serving/shadow/candidates**.
 
-PR #217 is accepted and merged at `42d605a`; CI #371 passed. PR #212 and planning
-PR #216 are also merged; older open-PR statements are historical checkpoints.
-PR #218 is also accepted and merged at `2d1b0d5`; CI #373 passed.
-Current follow-up: `test/208-export-install-diagnostic`, based on `2d1b0d5`.
-Continue its PR if open; if merged, proceed with the clean-install supplements
-below rather than repeating completed fingerprint checks.
+**The two real clean installations now PASS.** [CI #388](https://github.com/Kajooja/Kajo/actions/runs/34366985506)
+at `0c9a4808ca79fb5e145c97ab96c1d0b8bada706a` passed validation, platform/default
+checks and both independently committed application installations. Each had
+30 tables, 122 application functions and 22 application/Auth triggers; schema,
+owners/direct ACLs, deterministic seeds and runtime checks matched the separate
+source reference and each other. Auth provisioning, Personal bootstrap ranking,
+Shared common-fit/privacy/denial, 5000-row import/correction/removal, future
+function grants, reinstall refusal, rollback and cleanup passed. Native functions,
+roles and callbacks stayed unchanged. ADR-0006 records exact image/report hashes.
 
-Read-only 2026-09-07 verification: hosted PostgreSQL 17.6 exposes 123 public/private
-function/procedure fingerprints. The four functions defined in the latest bootstrap
-migration match repository fixture definitions, owners and direct ACLs exactly.
-The new comparator detects body/configuration/ownership/permission/missing-function
-drift; usage and scope are in ADR-0006. No hosted schema/history changed.
+CI #387's expected reinstall error had been masked by Docker stdin EPIPE. The
+shared SQL transport now buffers input before psql starts and deletes its private
+temporary file on exit. Both CI and Mac use the correction. The full local
+`npm run check` and CI #388 passed 191 mobile + 14 catalog + 50 database tests,
+TypeScript, lint (zero errors; one existing DiscoveryScreen Hook warning), and
+iOS/Android bundles.
 
-Read-only 2026-09-08 follow-up also verified the complete reconstructed
-`private.rank_items_v1_internal` definition, owner and ACL against hosted truth.
-All five checked functions match, including the V1 policy/trace implementation;
-this is definition parity, not execution/quality or complete schema acceptance.
+**Finish the independent populated-application upgrade next.** The new
+`database-upgrade` job reconstructs a separate source-checkpoint fixture with
+existing Auth users, Personal/Shared memberships, native and imported evidence,
+committed traces and system seeds. It does not call the candidate installer.
+The probe must first demonstrate the old global PUBLIC function default, apply
+only the unchanged forward migration, then preserve complete row hashes,
+definitions, owners/ACLs, triggers and native platform metadata. It also checks
+existing ranking/import-removal/authorization and new Auth provisioning after
+the upgrade. Its CI result is pending; do not label it passed from the clean
+installation job. The local workspace disconnected during this continuation,
+so this new test package is being validated by CI rather than claimed locally run.
 
-The owner now has Docker Desktop 4.90.0 / Engine 29.7.2 on macOS arm64, Node
-22.20.0 and npm 11.6.1. Supabase CLI 2.117.0 was selected for the export workflow.
-The supplied `kajo-schema.sql` is available as the conversation attachment
-(SHA-256 `3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e`).
-Do not request another export or commit this unreviewed hosted DDL as canonical.
+Completed reviews must not be restarted:
 
-The complete unchanged export loaded into two independent PGlite 0.3.14 databases:
-30 empty application tables, all with RLS enabled, 205 constraints, 19 policies,
-123 functions. All 123 function definitions/owners/direct ACLs matched a fresh
-read-only hosted snapshot. This proves export-to-hosted function parity, not
-canonical repository parity for the remaining 118 functions or other objects.
+- The exact owner export (SHA-256
+  `3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e`)
+  loaded unchanged twice in PGlite; all 123 exported function definitions,
+  owners and direct ACLs matched the earlier read-only hosted snapshot.
+  Keep it as the supplied diagnostic input; do not request another export or
+  promote it to canonical DDL.
+- Protected history/source reconstruction proves all 30 table structures,
+  205 constraints, 112 indexes and 19 RLS policies. All 21 application triggers
+  match; the omitted Auth trigger is reconstructed separately.
+- All 26 function differences have reviewed resolutions in the proposed
+  122-function source supplement. Compatibility grants explicitly preserve
+  existing service_role rights on 12 named tables and 18 named public functions.
+  Reviewed table/function owner/direct ACL comparisons match.
+- CI #385's pinned platform report was downloaded and compared with hosted
+  catalogs. Fresh Supabase lacks private schema and the hosted ensure_rls helper.
+  Candidate RLS is explicit source DDL. Six native callback function hashes
+  differ from hosted; native callbacks/roles remain intact and no semantic
+  equality is inferred. Schema/direct/default-grant differences and provenance
+  are documented in ADR-0006.
+- System seeds are source-derived, checksum checked and deterministic:
+  four genomes, four promotion decisions and one initial GLOBAL assignment.
 
-Exact next work:
+Forward migration `20260909131913_close_postgres_function_defaults.sql` closes
+future postgres-created function grants globally and clears public/private
+additions. Existing functions and other creators' defaults are preserved. Its
+global scope also affects future postgres-created platform/extension functions,
+which need their own intended grants. It is **not applied hosted**.
 
-1. Owner reported PASS for the original rollback-only Personal/Auth probe on
-   2026-09-08, using Supabase Postgres `17.6.1.167`; exact image evidence is in
-   ADR-0006. Do not repeat that completed probe. The same #219 branch now adds
-   Shared member ranking, aggregate-only explanation, outsider/revoked-member
-   denial and versioned Shared traces. It now also uses 122 source-derived
-   functions and tests 5000-row import/correction/removal and null-bootstrap
-   eligibility. It now includes the reviewed compatibility grants, future-function
-   default correction and a read-only platform report. This revised full probe
-   passed twice in PGlite; its Mac execution is pending and is distinct from the
-   accepted original run.
-2. **Finish the two source-only application installations in CI, then prove the independent upgrade.** The 26 function
-   differences are resolved in the proposed supplement. Source comparison now
-   also matches all 30 table structures, 205 constraints, 112 indexes and 19 RLS
-   policies exactly. Do not repeat those reviews. ADR-0006 owns the evidence.
-   The proposed baseline now explicitly retains the exported `service_role`
-   permissions on 12 named tables and 18 named public functions. With this reviewed
-   compatibility contract, all 30 table and 122 application-function owner/direct
-   ACL comparisons match. This resolves proposed retention, not exact historical
-   platform provenance. Do not repeat the completed direct-ACL review.
-   Forward migration `20260909131913_close_postgres_function_defaults.sql` closes
-   future function grants globally for creator `postgres`, then clears public/
-   private schema additions. Existing functions and other creators' defaults stay
-   intact; the global control also affects future postgres-created platform/
-   extension functions, which need their intended grants. It is prepared and tested
-   locally, not applied hosted; it does not fix the earlier historical replay.
-   CI #385 now passed on a real unlinked Supabase CLI 2.117.0/Postgres 17.6.1.167
-   stack: future-function execution, repeated migration, all 99 existing platform
-   functions, unaffected metadata, rollback and cleanup passed. Its report is
-   downloaded and compared with hosted catalogs; do not request a manual platform
-   capture or repeat this discovery. ADR-0006 records image/report identities and
-   all observed differences. Native platform callbacks have six different body
-   hashes and stay provider-owned; semantic equality is not claimed. Fresh CI has
-   no private schema or `ensure_rls` helper/event trigger. The proposed application
-   installation must create source schema/grants, explicitly enable source RLS and
-   apply source default REVOKEs before creating objects so fresh-stack auto-grants
-   do not survive. Preserve native platform roles/callbacks rather than copying
-   hosted definitions. The source-only candidate is now implemented at `b829b32`:
-   two committed PGlite installs, source reference parity and full rollback smokes
-   passed. CI #387 passed validation/platform checks and reached the first native
-   installation's reinstall guard after schema/seed/source/runtime checks. Its
-   expected early SQL failure surfaced as Docker stdin EPIPE, so the full two-run
-   gate did not pass. A tested SQL-buffering correction is prepared; finish its CI
-   rerun before claiming the real repeated-install gate. No guard is weakened.
-3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
-   run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
-   database's independent forward-upgrade path before closing #208.
+The owner previously passed the original Personal/Auth rollback probe on Mac
+arm64 (Supabase CLI 2.117.0, Postgres 17.6.1.167). The expanded Mac report remains
+unrun; CI now provides the repeated Linux x64 installation proof, so do not block
+that completed gate on another manual Mac run. Neither SQL checks nor bundles
+establish HTTP Auth, device acceptance or recommendation quality.
 
-The export omits the Auth trigger, all event triggers, PredictorGenome and
-PolicyAssignment rows. It is not yet an accepted installation baseline. The
-connected hosted project has only main; never use it as an installation target.
-The probe temporarily supplies source-derived functions, explicit compatibility
-grants, the forward default correction, canonical Auth trigger and deterministic
-system seeds. It exercises Auth/Personal/Shared, imports and future-function grants,
-then rolls everything back and checks platform metadata is restored. It does not
-supply/change platform event triggers or close the full replay gate.
-
-The default/compatibility checkpoint is published in PR #219 at `d98e652`; CI #384
-passed. The automated platform continuation is at `533cc54`; CI #385 passed both
-validation and the real Supabase job. `npm run check` passed 191 mobile, 14 catalog
-and 47 database tests, TypeScript, lint (zero errors; one existing Hook warning)
-and both bundles. The owner resumed work after the earlier pause request.
-
-Application-candidate validation subsequently passed 191 mobile, 14 catalog and 49
-database tests plus both bundles. The CI transport fix also passed the full check
-with 50 database tests, including multi-megabyte SQL, original error status and
-temporary-file cleanup. Record its corrected real CI result next. Source installation paths
-are in CODEMAP. The independent existing-application upgrade and any accepted
-canonical installer/history transition remain open under ADR-0006.
-
-The exact canonical system-seed source is now reconstructable without hosted
-data through `scripts/database/system-seed-source.mjs`; ADR-0006 records its
-hashes and the intentional installation-time PolicyAssignment timestamp. It does
-not yet establish a full baseline or platform/forward-upgrade parity.
-
-Audited continuation supersedes that experimental timestamp choice: the probe now
-uses deterministic initial promotion/assignment IDs and the explicit schema-cutoff
-epoch. Both full probe runs and exact seed-row comparisons pass in PGlite. Details
-and provenance are in ADR-0006. Mac execution of this revised probe is pending;
-the owner's earlier PASS remains valid only for the original Personal/Auth probe.
-
-Table-definition fingerprints now also match across both export installations:
-columns/defaults, constraints, indexes, RLS policies/flags, ownership and direct
-table/column grants. Mutation regressions catch definition drift with unchanged
-object counts. This is export repeatability, not remaining canonical source parity;
-schema/default grants, roles, views/sequences and platform objects remain outside
-this comparator. ADR-0006 records the diagnostic and exact limitations.
-
-The raw export diagnostic still reports `REQUIRES_RECONCILIATION` (exit 1) with
-`exportRepeatability: PASS`: unmodified export bytes and historical text patches
-remain different. The separate function supplement now implements their reviewed
-resolution for the proposed installation. Its post-supplement fingerprints match
-across two empty PGlite installations, changing exactly 26 definitions and no
-function owner/direct ACL. Regression tests reject both original broken bodies and
-pass with the supplement. Historical replay still stops at the original catalog
-migration; no hosted runtime or migration history changed.
+Historical migration bytes and hosted schema/data/history remain unchanged.
+Unmodified chronological replay still fails after 33 migrations at the known
+catalog patch; the raw export diagnostic still reports
+`REQUIRES_RECONCILIATION`, with separate reviewed resolutions. #208 and
+MVP-ALG-009 stay open until upgrade evidence and a separately reviewed canonical
+installer/history transition and rollback procedure satisfy ADR-0006. Do not
+reset hosted main, repair tracking or treat the proposed installer as accepted.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 

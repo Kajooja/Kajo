@@ -94,10 +94,39 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  database-upgrade:
+    name: Existing Supabase application forward upgrade
+    needs: [validate, database-platform]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify populated application upgrade
+        run: node scripts/database/run-ci-upgrade-probe.mjs "$RUNNER_TEMP/kajo-upgrade-report.json"
+
+      - name: Upload existing application upgrade report
+        uses: actions/upload-artifact@v4
+        with:
+          name: kajo-upgrade-${{ github.sha }}
+          path: ${{ runner.temp }}/kajo-upgrade-report.json
+          if-no-files-found: error
+          retention-days: 7
+
   android-apk:
     name: Build standalone Android APK
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    needs: [validate, database-platform, database-installation]
+    needs: [validate, database-platform, database-installation, database-upgrade]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

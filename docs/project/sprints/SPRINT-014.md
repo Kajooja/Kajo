@@ -579,3 +579,23 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   database tests plus both bundles; record the corrected real CI result next.
 - Independent existing-application upgrade and accepted installer/history
   procedure are still open; no hosted write or migration-history change.
+
+### Repeated native installation accepted as test evidence; independent upgrade prepared — 2026-09-09
+
+- CI #388 at `0c9a480` passed validation, platform/default checks and both real
+  application installations after the buffered SQL transport correction.
+  All 30 tables, 122 functions, 22 triggers, seed rows, runtime behavior and
+  rollback/reinstall/cleanup checks matched. ADR-0006 records verified report and
+  image identities. This supersedes CI #387's EPIPE-blocked experiment.
+- The tested checkpoint passed 191 mobile + 14 catalog + 50 database tests,
+  TypeScript/lint and both bundles. The expanded Mac run is distinct and unrun;
+  the repeated Linux CI gate no longer needs another manual Mac capture.
+- Added a separate populated pre-upgrade fixture/probe and CI job. Existing
+  Auth/Profile/membership, native/imported evidence, committed predictions and
+  system seeds must survive the unchanged forward migration exactly. It checks
+  complete row hashes, schema/function/trigger metadata, native defaults/platform
+  and runtime before/after, with repeated commit and negative regressions.
+- The local workspace disconnected while preparing the new upgrade package;
+  its CI result is pending. No independent upgrade PASS is inferred from the
+  installation job. Historical and hosted SQL/history remain unchanged; canonical
+  installer/history transition, #208 and MVP-ALG-009 remain open.
