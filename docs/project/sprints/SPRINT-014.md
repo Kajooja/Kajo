@@ -8,7 +8,7 @@ Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy act
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
-[STATUS.md](../STATUS.md) owns the exact next task. The #208 operational delivery adopts the verified source lineage for new local/CI databases; after its required CI/merge, continue Phase 14.1 action/delivery evidence. PR #219's source/platform experiments are completed evidence.
+[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Current delivery #224 implements the first Phase 14.1 atomic/durable Item actions; Lists/Shared command completion and exact delivered provenance follow. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
@@ -693,3 +693,36 @@ merge number. Complete publication, then pause as requested by the owner.
 - Local `npm run check` passed: 191 mobile, 14 catalog and 59 database tests
   (264 total), lint/typecheck and both bundles. The existing Hook warning remains;
   native operational installation is verified by the required PR CI gate.
+
+
+### Atomic rating/not-interest/undo and durable outbox — 2026-09-09 / #224
+
+- The CLI-created `*_atomic_item_actions.sql` forward adds the public invoker/private
+  authorized command, private receipt/head tables with RLS and an undo-invalidation
+  trigger. Current state, session, canonical Event and receipt are transactional.
+  Cached replies still require current actor/Profile authorization; altered payloads
+  cannot reuse an ID. Server-recorded undo predecessors prevent intervening/legacy
+  updates from being erased, including changes back to the same values.
+- Mobile rating/not-interest/undo enters one persisted command path before optimistic
+  feedback. SQLite keys include environment/actor/Profile; FIFO retry, immutable
+  payloads, restart recovery, storage failure and stale-scope callback/dispatch guards
+  have deterministic tests. A rejected stale undo has an explicit discard/reload
+  action; uncertain acknowledgements and permission failures remain queued.
+- SQL acceptance runs on the complete source-plus-forward schema and in the required
+  native CLI job. A populated old-schema rehearsal applies the exact new file with
+  hosted-style global defaults and requires unchanged hashes for every existing
+  application/Auth table. Rolled-back command smoke covers retry, failure after
+  projection write, ordered undo, actor/member denial and trace guards.
+- Correlation validates existing selected candidate + actor/Profile/session/mode +
+  prior impression. Unverified IDs yield unattributed native Events; undo keeps its
+  original accepted trace. This does not complete frozen client slate provenance.
+- Lists/Endorsement atomicity and durable exposure delivery remain the next 14.1
+  package. Their legacy detail List projection cannot overtake pending atomic
+  commands. Full DATA-003/004 and real-device process-death acceptance remain open.
+- Deployment checkpoint: the new forward has been prepared and the hosted target's
+  affected columns/helper privileges inspected read-only. Native CI and the explicit
+  hosted forward rollout must complete before publishing a client that requires the
+  new RPC. No old history or the separate global-default migration is deployed by
+  this change. Final PR/Issue records own the current verification/merge result.
+- No emulator/phone interaction or physical process-kill/SQLite recovery test was
+  available in this workspace. Type/JS/SQL/bundle checks do not claim that acceptance.

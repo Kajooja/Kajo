@@ -14,6 +14,7 @@ import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 
 import type {
   EventId,
+  EventSession,
   ProfileId,
   SessionId,
   UserId,
@@ -41,6 +42,7 @@ export type EventTrackingStatus =
 interface EventTrackingState {
   status: EventTrackingStatus;
   sessionId: SessionId | null;
+  session: EventSession | null;
   persistenceError: string | null;
   createEventId: () => EventId;
   recordEvent: (input: EventRecordInput, eventId?: EventId) => EventId | null;
@@ -171,6 +173,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     () => ({
       status,
       sessionId: scopedCoordinator?.session.sessionId ?? null,
+      session: scopedCoordinator?.session ?? null,
       persistenceError,
       createEventId,
       recordEvent,
@@ -181,7 +184,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       persistenceError,
       recordEvent,
       retryPersistence,
-      scopedCoordinator?.session.sessionId,
+      scopedCoordinator?.session,
       status,
     ],
   );

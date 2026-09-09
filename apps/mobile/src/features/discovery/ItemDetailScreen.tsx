@@ -32,6 +32,7 @@ import { useEventTracking } from '../events/EventTrackingContext';
 import {
   createUuidV7,
   getDwellEventProperties,
+  type EventRecordInput,
 } from '../events/eventTracking';
 import {
   getInteractionEventType,
@@ -174,6 +175,7 @@ function ItemDetailContent({
     undoTargetItemId,
     undo,
     retryHydration,
+    atomicPendingCount,
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
@@ -372,7 +374,7 @@ function ItemDetailContent({
         rating,
         notInterested: false,
       },
-      (eventId) => setRating(item.id, rating, eventId),
+      (eventId, origin) => setRating(item.id, rating, eventId, origin),
       `Arvosana ${rating}/10 tallennettu.`,
       { rating },
       RATING_COMMIT_FEEDBACK_DURATION_MS,
@@ -404,7 +406,7 @@ function ItemDetailContent({
         rating: null,
         notInterested: true,
       },
-      (eventId) => setNotInterested(item.id, true, eventId),
+      (eventId, origin) => setNotInterested(item.id, true, eventId, origin),
       ITEM_INTERACTION_LABELS.notInterestedFeedback,
     );
   }
@@ -473,6 +475,10 @@ function ItemDetailContent({
     interaction: ItemInteraction,
   ) {
     if (exitingItemId || endorsingItemId) return;
+    if (atomicPendingCount > 0) {
+      setFeedback('Odota valintojen tallentumista ennen listamuutosta.');
+      return;
+    }
     setListPickerTarget({ item, index, interaction });
   }
 
@@ -578,7 +584,7 @@ function ItemDetailContent({
     index: number,
     action: ItemInteractionAction,
     nextInteraction: ItemInteraction,
-    commit: (eventId?: EventId) => boolean,
+    commit: (eventId?: EventId, origin?: EventRecordInput) => boolean,
     nextFeedback: string,
     eventProperties: Readonly<Record<string, unknown>> = {},
     advanceDelayMs = 0,
@@ -592,26 +598,20 @@ function ItemDetailContent({
         ? eventTracking.createEventId()
         : undefined;
 
-    if (!commit(eventId)) {
+    const eventInput: EventRecordInput = {
+      eventType: getInteractionEventType(action, nextInteraction),
+      itemId: item.id,
+      itemType: item.itemType,
+      predictionId: recommendationTraceId,
+      discoveryMode: mode,
+      properties: { source: 'ITEM_DETAIL', predictionSource, ...eventProperties },
+    };
+    if (!commit(eventId, eventInput)) {
       return false;
     }
 
-    if (eventId) {
-      eventTracking.recordEvent(
-        {
-          eventType: getInteractionEventType(action, nextInteraction),
-          itemId: item.id,
-          itemType: item.itemType,
-          predictionId: recommendationTraceId,
-          discoveryMode: mode,
-          properties: {
-            source: 'ITEM_DETAIL',
-            predictionSource,
-            ...eventProperties,
-          },
-        },
-        eventId,
-      );
+    if (eventId && action.type !== 'SET_RATING' && action.type !== 'SET_NOT_INTERESTED') {
+      eventTracking.recordEvent(eventInput, eventId);
     }
 
     advanceAfterAction(item, index, nextFeedback, advanceDelayMs);
@@ -710,7 +710,7 @@ function ItemDetailContent({
 
     const targetItem = getMockItem(result.itemId);
 
-    if (result.reversedEventId && targetItem) {
+    if (!result.atomic && result.reversedEventId && targetItem) {
       eventTracking.recordEvent({
         eventType: 'ITEM_INTERACTION_UNDONE',
         itemId: targetItem.id,
