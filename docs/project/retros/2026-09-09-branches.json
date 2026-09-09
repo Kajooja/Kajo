@@ -259,7 +259,9 @@
       "branch": "docs/72-auth-deploy-handoff",
       "sha": "07c343b32907b641f750b2d2ea0d6423f9fc7fab",
       "reason": "reviewed-superseded-draft",
-      "prs": [],
+      "prs": [
+        75
+      ],
       "review": "Superseded by accepted Sprint 006 deployment/device record and PRs #76–84.",
       "superseded_by": "3f7d79018d8bbdeacaec01e472e57b8d62d83d0c"
     },
@@ -568,7 +570,9 @@
       "branch": "feat/156-prediction-core-nervous-system",
       "sha": "3a8058a5643778552caba4d08fc6297f6d3127b7",
       "reason": "reviewed-superseded-draft",
-      "prs": [],
+      "prs": [
+        166
+      ],
       "review": "Integrated at d349a93: 17 of 24 changed files identical; remaining differences preserve integrated UI and update handoff, not missing Prediction behavior.",
       "superseded_by": "d349a93b5858b05ed19e25f0c95b4e3f43c695fa"
     },
@@ -728,7 +732,9 @@
       "branch": "feat/6-room-shell",
       "sha": "ab4ba3368ed7f993635aa4d1ee7cdb9937a3f688",
       "reason": "reviewed-superseded-draft",
-      "prs": [],
+      "prs": [
+        8
+      ],
       "review": "Alternate initial Room prototype replaced by merged PR #9; both implement the same two destinations and 2D objects, with no extra domain behavior.",
       "superseded_by": "6f0e8dc4a031755a174b083b8fc8ba0e90bb2960"
     },
@@ -1128,5 +1134,38 @@
       "reason": "reachable-from-main",
       "prs": []
     }
-  ]
+  ],
+  "retirement": {
+    "status": "completed",
+    "approved_count": 145,
+    "verified_main": "cd5aaabca3c0a990756f51c82a63398ea4fb71aa",
+    "additional_branches": [
+      {
+        "branch": "docs/220-retro-hygiene",
+        "sha": "bd6312f804df2561a141014b8650e3f0121106be",
+        "reason": "exact-merged-PR-head",
+        "prs": [
+          221
+        ]
+      }
+    ],
+    "preflight_correction": "Added previously omitted numeric PR IDs #8, #75, #166 without changing approved refs or SHAs.",
+    "runs": [
+      {
+        "url": "https://github.com/Kajooja/Kajo/actions/runs/34388194325",
+        "approved_refs_deleted": 33,
+        "result": "HTTP 500 after 33 acknowledged deletions; confirmed absent before resume"
+      },
+      {
+        "url": "https://github.com/Kajooja/Kajo/actions/runs/34388959963",
+        "approved_refs_deleted": 112,
+        "result": "PASS: atomic expected-SHA deletion; own temporary execution ref also removed"
+      }
+    ],
+    "verification": "All 145 approved refs absent; only main present and unchanged immediately after retirement. Closeout housekeeping is recorded in issue #220.",
+    "artifact": {
+      "id": 10118844190,
+      "digest": "sha256:00d8f9b078f15dbe5b70767f068e038cb29309c0661b907bd0262f95c8b4a534"
+    }
+  }
 }
