@@ -410,6 +410,91 @@ non-function schema/platform definitions, then complete real repeated installati
 and independent forward-upgrade acceptance. Do not repeat the 26-function review
 or describe the raw-source diagnostic's expected failure as an unfixed supplement.
 
+## Source table definitions and privilege reference — 2026-09-09
+
+`relation-source.mjs` builds a disposable, source-only PostgreSQL reference using
+the same protected 47-file checkpoint/cutoff as the function reconstruction. Its
+188 literal CREATE/ALTER/DROP table/index/policy statements are applied unchanged.
+Their concatenated SQL SHA-256 is
+`07014005ed10f101d61e37446a204285c19e6907818437af32e3ec4ceafba6c5`, checked before
+execution. Final function signatures supply CHECK/policy dependencies. This is a
+restricted definition reconstruction, not historical replay, a complete schema
+installer or proof of the function bodies' behavior.
+
+The relation snapshot now adds `structureSha256`, excluding only owner and direct
+table/column ACL from the existing definition representation. It retains column
+order, constraints, indexes, RLS roles/conditions and other recorded table fields.
+The default comparator/CLI still uses the original full `definitionSha256`;
+structural comparison requires an explicit option and rejects missing hashes.
+Existing v1 snapshots remain valid for the full comparison.
+
+Both unchanged export installations match **all 30 source table structures**:
+205 constraints, 112 indexes and 19 policies, with no missing/unexpected tables.
+This completes source reconciliation for those structural fields, not for the
+excluded schema/platform/privilege objects. CI uses no attachment: real synthetic
+membership reads isolate Profiles, bad unique/FK/check writes fail, and the
+fingerprint catches an altered policy that actually exposes the other Profile.
+
+The reference additionally applies 296 literal source privilege statements,
+including four per-schema default REVOKEs. One source REVOKE for the absent
+platform `private.rls_auto_enable()` is explicitly reported as excluded. Objects
+are created by `postgres` with plain PostgreSQL defaults; no initial Supabase
+grants are copied from the export. Final default statements are applied after
+object creation, so this is a source privilege reference, not reconstruction of
+historical platform defaults or proof of future default behavior.
+
+Observed differences against the owner export, identical in both runs:
+
+| Scope | Result |
+| --- | --- |
+| Owners of 30 tables and 122 application functions | All are `postgres`, matching the explicit reference creator assumption. |
+| Table definitions + direct ACL | 18 match; 12 have additional exported `service_role` privileges. |
+| Function owners + direct ACL, bodies compared separately | 104 match; 18 public functions have additional exported `service_role` EXECUTE. |
+| Direct `anon`, `authenticated` and PUBLIC grants on compared objects | No difference. Effective privileges, schema usage and role inheritance are outside this comparison. |
+
+The 12 tables are `public.event_sessions`, `events`, `item_interactions`,
+`item_list_entries`, `item_lists`, `items`, `profile_invitations`, `profile_members`,
+`profiles`, `shared_item_consensus`, `shared_item_endorsements` and `users`. Export
+grants `service_role` all table privileges. Source explicitly grants that role
+SELECT/INSERT/UPDATE on `items`; the other 11 have no source-only service grant.
+The 18 public functions are `add_shared_profile_member`, `complete_personal_profile`,
+`create_custom_item_list`, `create_shared_profile`, `delete_custom_item_list`,
+`endorse_shared_item`, `get_item_list_entries`, `get_my_shared_profile_invitations`,
+`get_my_shared_profiles`, `get_profile_consumed_items`, `get_profile_item_lists`,
+`invite_shared_profile_member`, `leave_shared_profile`, `rename_custom_item_list`,
+`respond_shared_profile_invitation`, `reverse_shared_item_endorsement`,
+`set_item_list_destinations` and `set_item_list_entry`. The diagnostic prints full
+identities. These extra grants are consistent with inherited installation defaults,
+but that explanation is an **inference**, not verified pinned-platform provenance.
+Neither retaining nor removing them is accepted by this comparison.
+
+### Future-function default gap
+
+The closed-default comment in
+`20260902064431_harden_production_function_boundaries.sql` overstates what its
+per-schema function REVOKEs establish. In a plain PostgreSQL database, newly
+created public/private functions still grant PUBLIC EXECUTE after those source
+statements. PostgreSQL documents that per-schema defaults add to global defaults;
+they cannot revoke a globally granted privilege. See the
+[PostgreSQL 17 default-privilege documentation](https://www.postgresql.org/docs/17/sql-alterdefaultprivileges.html).
+
+The new regression reproduces this with harmless functions. In the disposable
+fixture only, a global default REVOKE followed by an explicit authenticated grant
+closes anon/service execution as intended. That demonstration is **not** a shipped
+default-privilege correction: a global change affects future functions created by
+`postgres` beyond application schemas and must be reconciled with platform needs.
+Current application functions have separate explicit ACLs; this result does not
+establish a current hosted RPC exposure. The export also cannot establish all
+global defaults outside its schema filter.
+
+Next resolve initial/global/schema-default privileges and the platform RLS event
+trigger from the pinned stack, choose the explicit proposed baseline/forward
+privilege contract, then prove repeated real installations and the independent
+forward upgrade. Historical migrations remain immutable, the existing probe's
+export ACLs are unchanged, and #208 remains open. The raw export diagnostic still
+returns `REQUIRES_RECONCILIATION`, with separate `exportRepeatability: PASS` and
+`relationSourceParity: MATCH`; this is the expected result, not a failed test suite.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.

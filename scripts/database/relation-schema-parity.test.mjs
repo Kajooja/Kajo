@@ -21,7 +21,11 @@ test('relation fingerprints are independent of object OIDs and ACL insertion ord
     await b.exec(fixture);
     await a.exec('grant select on public.items to reader; grant update on public.items to writer;');
     await b.exec('grant update on public.items to writer; grant select on public.items to reader;');
-    assert.equal(compareRelationSchemas(await snapshot(a), await snapshot(b)).status, 'MATCH');
+    await a.exec('create table public.empty_table();');
+    await b.exec('create table public.empty_table();');
+    const left = await snapshot(a); const right = await snapshot(b);
+    assert.equal(compareRelationSchemas(left, right).status, 'MATCH');
+    assert.equal(compareRelationSchemas(left, right, { fingerprint: 'structureSha256' }).status, 'MATCH');
   } finally { await a.close(); await b.close(); }
 });
 
@@ -53,10 +57,14 @@ test('definition drift is detected even when table/index/policy counts stay equa
       try {
         await changedDb.exec(fixture);
         await changedDb.exec(mutation);
-        const report = compareRelationSchemas(baseline, await snapshot(changedDb));
+        const actual = await snapshot(changedDb);
+        const report = compareRelationSchemas(baseline, actual);
         assert.equal(report.status, 'MISMATCH', mutation);
         assert.deepEqual(report.changed, ['public.items'], mutation);
         assert.equal(report.expectedCount, report.actualCount);
+        const structural = compareRelationSchemas(baseline, actual, { fingerprint: 'structureSha256' });
+        const permissionOnly = mutation.startsWith('grant ') || mutation.includes(' owner to ');
+        assert.equal(structural.status, permissionOnly ? 'MATCH' : 'MISMATCH', mutation);
       } finally { await changedDb.close(); }
     }
   } finally { await db.close(); }
@@ -72,4 +80,6 @@ test('relation comparison fails closed on malformed inputs and reports added/mis
   const report = compareRelationSchemas(base, { ...base, relations: [{ ...row, identity: 'private.other' }] });
   assert.deepEqual(report.missing, ['public.items']);
   assert.deepEqual(report.unexpected, ['private.other']);
+  assert.throws(() => compareRelationSchemas(base, base, { fingerprint: 'structureSha256' }), /Invalid relation metadata/);
+  assert.throws(() => compareRelationSchemas(base, base, { fingerprint: 'unknown' }), /Unknown relation fingerprint/);
 });

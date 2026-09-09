@@ -127,17 +127,21 @@ Exact next work:
    functions and tests 5000-row import/correction/removal and null-bootstrap
    eligibility. This revised full probe passed twice in PGlite; its Mac execution
    is pending and is distinct from the accepted original run.
-2. **Continue non-function source reconciliation.** All 26 function differences
-   have now been reviewed and resolved in the proposed empty-install function
-   supplement: 19 formatting/comment changes, five alias-only changes and two
-   intended source-patch corrections. Do not repeat that completed review. ADR-0006
-   owns the explicit resolutions and source provenance. Source ownership/ACL,
-   remaining table/RLS/schema/default grants and other non-function DDL still need
-   reconciliation. Auth-trigger and deterministic system-seed supplements are
-   already delivered for the probe and need real pinned installation acceptance.
-   Account for
-   platform event triggers, especially hosted `ensure_rls` calling
-   `private.rls_auto_enable`, without overwriting platform-owned objects blindly.
+2. **Resolve privilege defaults and platform provenance.** The 26 function
+   differences are resolved in the proposed supplement. Source comparison now
+   also matches all 30 table structures, 205 constraints, 112 indexes and 19 RLS
+   policies exactly. Do not repeat those reviews. ADR-0006 owns the evidence.
+   The new source-only privilege reference deliberately has no Supabase initial
+   grants: export differences are additional `service_role` permissions on 12
+   tables and 18 public functions. Their platform/history provenance and proposed
+   retention/removal still need resolution; direct `anon`/`authenticated` grants
+   and postgres ownership match this reference. A regression also reproduces that
+   the source's per-schema default REVOKEs do not remove PostgreSQL's global
+   PUBLIC EXECUTE default for future functions. Resolve that default contract
+   with platform scope accounted for; it is not evidence of a current RPC leak.
+   Reconcile schema/default ACL and platform event triggers, especially
+   `ensure_rls` / `private.rls_auto_enable`, without blindly replacing platform
+   objects. Auth-trigger and deterministic seed supplements are already prepared.
 3. Install in two empty pinned Supabase databases, verify schema/ACL/seed parity,
    run synthetic Personal/Shared/Auth and ranking tests, and prove the existing
    database's independent forward-upgrade path before closing #208.

@@ -4,10 +4,11 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { compareFunctionSchemas } from './function-schema-parity.mjs';
+import { compareFunctionSchemas, compareFunctionPrivileges } from './function-schema-parity.mjs';
 import { verifyExportTriggers } from './trigger-source.mjs';
 import { compareRelationSchemas } from './relation-schema-parity.mjs';
 import { compareExportFunctionSource } from './function-source.mjs';
+import { createSourceRelationDatabase } from './relation-source.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -22,6 +23,14 @@ try {
   const snapshotSql = await readFile(new URL('function-schema-snapshot.sql', import.meta.url), 'utf8');
   let first;
   const relationSql = await readFile(new URL('relation-schema-snapshot.sql', import.meta.url), 'utf8');
+  const { db: sourceDb, source } = await createSourceRelationDatabase();
+  let sourceRelations;
+  let sourceFunctions;
+  try {
+    sourceRelations = (await sourceDb.exec(relationSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
+    sourceFunctions = (await sourceDb.exec(snapshotSql)).find(r => r.rows[0]?.snapshot).rows[0].snapshot;
+  }
+  finally { await sourceDb.close(); }
   let firstRelations;
   let firstInventory;
   for (let install = 1; install <= 2; install++) {
@@ -54,6 +63,19 @@ try {
       const inventory = {
         triggerParity,
         functionSourceParity,
+        relationSourceParity: {
+          ...compareRelationSchemas(sourceRelations, relations, { fingerprint: 'structureSha256' }),
+          checkpoint: source.sourceCheckpoint, cutoff: source.cutoff,
+          statements: source.statements.length, ddlSha256: source.ddlSha256,
+        },
+        sourcePrivilegeReference: {
+          scope: 'Plain PostgreSQL defaults and postgres-owned source objects; Supabase initial/default grants, schema ACL and role inheritance NOT reconstructed',
+          statements: source.privileges.length,
+          excludedPlatformStatements: source.platformPrivileges,
+          tables: compareRelationSchemas(sourceRelations, relations),
+          functions: compareFunctionPrivileges(sourceFunctions, { ...snapshot,
+            functions: snapshot.functions.filter(row => row.identity !== 'private.rls_auto_enable()') }),
+        },
         tables: tables.length,
         tablesWithoutRls: tables.filter(t => !t.rls).map(t => t.name),
         functions: snapshot.functions.length,
@@ -77,7 +99,10 @@ try {
   }
   if (process.argv[4]) await writeFile(process.argv[4], JSON.stringify(first, null, 2) + '\n', { flag: 'wx' });
   if (process.argv[5]) await writeFile(process.argv[5], JSON.stringify(firstRelations, null, 2) + '\n', { flag: 'wx' });
-  const sourceMatched = firstInventory.functionSourceParity.status === 'MATCH';
+  const sourceMatched = firstInventory.functionSourceParity.status === 'MATCH'
+    && firstInventory.relationSourceParity.status === 'MATCH'
+    && firstInventory.sourcePrivilegeReference.tables.status === 'MATCH'
+    && firstInventory.sourcePrivilegeReference.functions.status === 'MATCH';
   console.log(JSON.stringify({ status: sourceMatched ? 'PASS' : 'REQUIRES_RECONCILIATION',
     exportRepeatability: 'PASS', engine: 'PGlite 0.3.14', postgresMajor: first.serverMajor,
     exportSha256: checksum, installs: 2, inventory: firstInventory,

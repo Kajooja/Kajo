@@ -482,3 +482,27 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
   revised Mac probe, repeated pinned full installation and independent upgrade.
 - Validation: `npm run check` passed after the interrupted run was restarted:
   191 mobile, 14 catalog and 39 database tests, lint/typecheck and both bundles.
+
+### 2026-09-09 — Source table definitions and privilege reference
+
+- CI #382 for the previous published head passed; development continued on #219.
+- Reconstructed 188 literal DDL statements from the protected source checkpoint.
+  Both unchanged export installations match all 30 source table structures,
+  including 205 constraints, 112 indexes and 19 RLS policies. No structural fix
+  was needed; ownership/ACL are checked separately and not silently normalized.
+- Added a plain-PostgreSQL source privilege reference from 296 literal statements.
+  It exposes additional exported `service_role` rights on 12 tables and 18 public
+  functions. Platform default/history provenance remains unresolved; there is no
+  direct anon/authenticated grant difference in the compared objects.
+- Reproduced the source future-function default gap: per-schema REVOKE does not
+  remove the global PUBLIC EXECUTE default. Current explicit function ACLs are a
+  separate matter. ADR-0006 owns the finding, correction boundary and remaining
+  platform/default/installation/upgrade gates; no historical or hosted SQL changed.
+- Source-only regressions enforce real membership isolation, unique/FK/check
+  constraints and explicit grants, and detect an altered policy that really leaks
+  the other synthetic Profile. Existing same-count fingerprint regressions also
+  verify that only the explicit structural mode excludes ownership/ACL.
+- Validation: `npm run check` completed all stages: 191 mobile, 14 catalog and 41
+  database tests, TypeScript, lint (zero errors; one existing DiscoveryScreen Hook
+  warning) and both iOS/Android bundles. The exact export diagnostic completed two
+  installs with structural MATCH and explicitly unresolved privilege/source status.

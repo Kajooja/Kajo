@@ -2,6 +2,8 @@
 -- Scope: ordinary/partitioned tables, columns, constraints, indexes, policies,
 -- owners and direct table/column ACL. Not views, sequences, schema/default ACL,
 -- role inheritance, extensions, platform objects or canonical migration parity.
+-- structureSha256 additionally omits owner and table/column ACL for explicit
+-- source-DDL comparison. It still includes all RLS flags, roles and expressions.
 begin read only;
 set local search_path = pg_catalog;
 with relations as (
@@ -54,10 +56,17 @@ with relations as (
         'check', pg_get_expr(p.polwithcheck, p.polrelid)) order by p.polname)
         from pg_policy p where p.polrelid = c.oid)
     ) as definition from relations c
+), structures as (
+  select identity, definition, (definition - 'owner' - 'acl') ||
+    jsonb_build_object('columns', (select jsonb_agg(col.value - 'acl' order by col.ordinality)
+      from jsonb_array_elements(nullif(definition->'columns', 'null'::jsonb))
+        with ordinality col(value, ordinality))) as structure
+  from definitions
 )
 select jsonb_build_object('format', 'kajo-relation-schema-v1',
   'serverMajor', current_setting('server_version_num')::integer / 10000,
   'relations', coalesce(jsonb_agg(jsonb_build_object('identity', identity,
-    'definitionSha256', encode(sha256(convert_to(definition::text, 'UTF8')), 'hex'))
-    order by identity), '[]'::jsonb)) as snapshot from definitions;
+    'definitionSha256', encode(sha256(convert_to(definition::text, 'UTF8')), 'hex'),
+    'structureSha256', encode(sha256(convert_to(structure::text, 'UTF8')), 'hex'))
+    order by identity), '[]'::jsonb)) as snapshot from structures;
 rollback;
