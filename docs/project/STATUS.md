@@ -46,7 +46,7 @@ Canonical documents for this decision:
 - `docs/product/PRODUCT.md`
 - `docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
 
-The planning delivery is tracked by Issue #215 / PR #216. Once merged, `main` is the authoritative truth; while the PR is open, treat the PR as pending planning rather than delivered runtime behavior. The documentation does not claim Taste/Friend runtime implementation exists yet.
+The planning delivery from Issue #215 / PR #216 is merged on `main`. Taste/Friend runtime implementation remains planned; accepted documentation is not runtime acceptance.
 
 ## Current implementation truth
 
@@ -78,126 +78,75 @@ The new launch work **does not jump ahead of current algorithm correctness**.
 
 ### Next task now
 
-Continue **Issue #208 / PR #219**, branch
-`test/208-export-install-diagnostic`. PR #217 (`42d605a`) and PR #218
-(`2d1b0d5`) are accepted and merged; #219 remains a proposal on top of main.
-The earlier upload corruption was repaired, and subsequent published blobs/trees
-were checked against their intended contents. ROADMAP order remains
-**14.0 clean installation → 14.1 evidence → 14.2 serving/shadow/candidates**.
+**PR #219's database verification work is complete.** The remaining Phase 14.0
+work is adoption and operational wiring of the tested fresh-install procedure,
+not another round of export, fingerprint, platform or upgrade discovery.
 
-**The two real clean installations now PASS.** [CI #388](https://github.com/Kajooja/Kajo/actions/runs/34366985506)
-at `0c9a4808ca79fb5e145c97ab96c1d0b8bada706a` passed validation, platform/default
-checks and both independently committed application installations. Each had
-30 tables, 122 application functions and 22 application/Auth triggers; schema,
-owners/direct ACLs, deterministic seeds and runtime checks matched the separate
-source reference and each other. Auth provisioning, Personal bootstrap ranking,
-Shared common-fit/privacy/denial, 5000-row import/correction/removal, future
-function grants, reinstall refusal, rollback and cleanup passed. Native functions,
-roles and callbacks stayed unchanged. ADR-0006 records exact image/report hashes.
+Publication is tracked in [PR #219](https://github.com/Kajooja/Kajo/pull/219),
+branch `test/208-export-install-diagnostic`. On continuation, check its state once:
+if merged, use current `main`; otherwise finish that PR's publication from its
+actual head. PR #217 (`42d605a`) and #218 (`2d1b0d5`) are already merged.
+Do not create another documentation commit merely to record this closeout's own
+merge SHA or CI run number; GitHub is the authority for those changing fields.
 
-CI #387's expected reinstall error had been masked by Docker stdin EPIPE. The
-shared SQL transport now buffers input before psql starts and deletes its private
-temporary file on exit. Both CI and Mac use the correction. The full local
-`npm run check` and CI #388 passed 191 mobile + 14 catalog + 50 database tests,
-TypeScript, lint (zero errors; one existing DiscoveryScreen Hook warning), and
-iOS/Android bundles.
+Completed evidence (full provenance and report hashes are in
+[ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md)):
 
-**The independent populated-application upgrade and rollback now PASS.**
-[CI #390](https://github.com/Kajooja/Kajo/actions/runs/34371882375) at
-`7507d3501d08b38478250e5437c0dd08892d9cb6` passed validation, platform/defaults,
-both application installations and the separate upgrade job. The source-checkpoint
-fixture committed Auth/Profile/membership, native/imported evidence, predictions,
-shadow jobs, Lists and seeds before applying only the ordinary forward migration.
-All complete row hashes, 221 existing application/native functions, table/trigger
-metadata and unrelated defaults stayed unchanged. Old-to-new function defaults,
-runtime, exact rollback, reapplication and cleanup passed. The report was downloaded
-and its ZIP/report hashes verified. Do not repeat this completed upgrade discovery.
+| Verification | Result |
+| --- | --- |
+| Two independent pinned Supabase application installations | PASS: 30 tables, 122 application functions, 22 application/Auth triggers, exact schema/owners/ACLs/seeds, Auth/Personal/Shared/import runtime, reinstall refusal and cleanup |
+| Populated existing-application forward upgrade | PASS: complete synthetic row hashes and all 221 existing application/native functions preserved through migration, rollback and reapplication |
+| Unchanged owner-export upgrade in PGlite | PASS: all 123 original application functions preserved without the source function/compatibility supplement |
+| Actual Supabase CLI fresh lineage | PASS: two resets, exact version/name history, source parity and failed-migration atomicity |
+| Canonical automated check | PASS: 191 mobile + 14 catalog + 55 database tests (260 total), TypeScript, lint with zero errors/one existing Hook warning, iOS/Android bundles |
 
-The optional unchanged-export variant separately passed in PGlite with all 123
-original application functions and populated row hashes preserved, without the
-function/compatibility supplement. It restores pg_dump's client row_security
-setting to ON before authenticated runtime checks. ADR-0006 records both scopes,
-commands, source identities and final report hashes. The invalid synthetic import
-fingerprint caught in CI #389 was corrected; all four upgrade regressions and the
-full `npm run check` passed (191 mobile + 14 catalog + 54 database = 259 tests,
-TypeScript/lint and both bundles).
+All five required jobs passed together in
+[CI #393](https://github.com/Kajooja/Kajo/actions/runs/34375412870) for code head
+`9fcbbb4a43b81be5b7754d4abe31e286f6365387`. The publication closeout changes only
+documentation; its final required CI must still pass before merge. APK was skipped
+for the PR event. A main-triggered APK build is not the next work item to poll.
 
-**The proposed CLI installation lineage and atomic history now PASS.** The
-`database-cli-installation` job generates only a source baseline at the protected
-cutoff plus unchanged post-cutoff migrations inside its own disposable workspace.
-It invokes pinned Supabase `db reset --local --no-seed` twice, compares source
-schema/ACL/seeds and runtime, and checks the CLI's actual version/name history.
-An intentionally failing extra test migration must leave neither its table nor
-an applied-history row. This is test-only: the repository's canonical migrations
-and existing hosted history stay intact. The actual CLI job in CI #391 passed:
-its two successful resets matched the source snapshot, and the deliberate failing
-migration left neither DDL nor a history row. The report was downloaded and
-verified; ADR-0006 records its identifiers. Do not repeat the completed CLI proof.
+### Remaining decision and exact next implementation
 
-CI #391 as a whole was not green: the separate upgrade job received the identical
-Postgres image from ghcr.io instead of public.ecr.aws. The strict reference-string
-check stopped before application SQL, despite the exact same pinned content ID.
-The corrected check accepts only those two observed Supabase references, the same
-17.6.1.167 tag and the exact reviewed image ID. Changed content/version/registry
-still fails; the added regression and full check passed 260 tests (55 database)
-and both bundles. [CI #392](https://github.com/Kajooja/Kajo/actions/runs/34374555078)
-then passed every required job at `bbe4dd53dd3ce81ee9793eb77e6f386daa74856c`:
-validation, platform/defaults, both installations, populated upgrade/rollback and
-CLI history/atomicity. APK was intentionally skipped for this PR event.
+[Issue #208](https://github.com/Kajooja/Kajo/issues/208) explicitly requires
+successful **unmodified chronological replay**. That chain still fails after 33
+migrations at the catalog text patch. The tested alternative is a separate
+source-derived baseline at cutoff `20260907155201`, followed by unchanged newer
+migrations. Green baseline tests do not satisfy the issue's current literal
+criterion. **#208, #207 and MVP-ALG-009 remain open.**
 
-**Next: resolve adoption of the tested fresh-install lineage in ADR-0006.**
-Issue #208 currently requires successful unmodified chronological replay; that
-literal criterion remains unsatisfied. The tested source baseline is an explicit
-alternative, not evidence that the original chain passed. Keep #208/MVP-ALG-009
-open until the acceptance/installation procedure is explicitly resolved. The
-proposal and its concrete CLI file/history identities are ready for owner review;
-no further repeat of these completed diagnostics is needed. PR #219 is still open.
-After acceptance, record the chosen procedure and continue Phase 14.0/14.1 from
-that decision. Do not treat an unmerged proposal as accepted main truth.
+The concrete adoption proposal is recorded at the top of ADR-0006. Resolve that
+acceptance/installation-procedure decision explicitly before activating a
+canonical installer or changing #208's criterion. After adoption:
 
-Completed reviews must not be restarted:
+1. Wire the already-tested baseline builder and unchanged post-cutoff migrations
+   into the agreed empty-database installation workspace, with source/image
+   preflight checks, empty-database refusal, CLI history verification and cleanup.
+   Reuse the existing implementation; do not rebuild the reconciliation pipeline.
+2. Record the separate existing-database forward-deployment/rollback procedure.
+   Preserve the 47 protected historical files and existing hosted tracking; the
+   fresh baseline must never be applied to an existing database. Known hosted
+   version/name differences still require their own reviewed procedure.
+3. Validate only the new operational path and remaining bootstrap acceptance,
+   then continue ROADMAP **14.0 → 14.1 evidence → 14.2 serving/shadow/candidates**.
 
-- The exact owner export (SHA-256
-  `3f29a88a8937f38fd2014b3c8b8c4e2f9a46a0ee49b71bec680b5cdad7170c3e`)
-  loaded unchanged twice in PGlite; all 123 exported function definitions,
-  owners and direct ACLs matched the earlier read-only hosted snapshot.
-  Keep it as the supplied diagnostic input; do not request another export or
-  promote it to canonical DDL.
-- Protected history/source reconstruction proves all 30 table structures,
-  205 constraints, 112 indexes and 19 RLS policies. All 21 application triggers
-  match; the omitted Auth trigger is reconstructed separately.
-- All 26 function differences have reviewed resolutions in the proposed
-  122-function source supplement. Compatibility grants explicitly preserve
-  existing service_role rights on 12 named tables and 18 named public functions.
-  Reviewed table/function owner/direct ACL comparisons match.
-- CI #385's pinned platform report was downloaded and compared with hosted
-  catalogs. Fresh Supabase lacks private schema and the hosted ensure_rls helper.
-  Candidate RLS is explicit source DDL. Six native callback function hashes
-  differ from hosted; native callbacks/roles remain intact and no semantic
-  equality is inferred. Schema/direct/default-grant differences and provenance
-  are documented in ADR-0006.
-- System seeds are source-derived, checksum checked and deterministic:
-  four genomes, four promotion decisions and one initial GLOBAL assignment.
+The verified baseline, source/function/ACL reconciliation, platform ledger, two
+installations, populated upgrade and CLI experiment are completed evidence. Do
+not request another copy of the owner's export or a repeat Mac probe to reopen
+those gates. Normal validation still applies when implementation changes.
 
-Forward migration `20260909131913_close_postgres_function_defaults.sql` closes
-future postgres-created function grants globally and clears public/private
-additions. Existing functions and other creators' defaults are preserved. Its
-global scope also affects future postgres-created platform/extension functions,
-which need their own intended grants. It is **not applied hosted**.
+Forward migration `20260909131913_close_postgres_function_defaults.sql` is present
+as repository source and has **not been applied hosted**. It changes only future
+postgres-created function grants; its global scope includes future platform
+functions, which need explicit intended grants. Existing functions/other creators
+are preserved. The actual deployment must capture its own prior defaults for
+rollback instead of blindly reusing synthetic-fixture rollback SQL.
 
-The owner previously passed the original Personal/Auth rollback probe on Mac
-arm64 (Supabase CLI 2.117.0, Postgres 17.6.1.167). The expanded Mac report remains
-unrun; CI now provides the repeated Linux x64 installation proof, so do not block
-that completed gate on another manual Mac run. Neither SQL checks nor bundles
-establish HTTP Auth, device acceptance or recommendation quality.
-
-Historical migration bytes and hosted schema/data/history remain unchanged.
-Unmodified chronological replay still fails after 33 migrations at the known
-catalog patch; the raw export diagnostic still reports
-`REQUIRES_RECONCILIATION`, with separate reviewed resolutions. #208 and
-MVP-ALG-009 stay open until upgrade evidence and a separately reviewed canonical
-installer/history transition and rollback procedure satisfy ADR-0006. Do not
-reset hosted main, repair tracking or treat the proposed installer as accepted.
+Hosted schema/data/history and the 47 protected migration files are unchanged.
+Native platform callbacks remain intact; differing hosted/native callback hashes
+are not a claim of semantic equality. SQL checks and bundles do not establish
+HTTP Auth, real-device acceptance or recommendation quality. No new MVP
+requirement or Sprint 014 acceptance is closed by this verification delivery.
 
 Continue the existing Sprint 014 algorithm/database path from the current #207/#208 lineage:
 

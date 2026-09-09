@@ -1,7 +1,40 @@
 # ADR-0006: Verifiable clean-install database baseline
 
-Status: Proposed
+Status: Proposed installation procedure; verification implementation complete
 Date: 2026-09-07
+
+## Current decision boundary — 2026-09-09
+
+PR #219 completes the verification implementation. All five required jobs passed
+in [CI #393](https://github.com/Kajooja/Kajo/actions/runs/34375412870) at
+`9fcbbb4a43b81be5b7754d4abe31e286f6365387`, including both installations,
+independent populated upgrade/rollback and actual CLI history/atomicity. Detailed
+source, platform and report identities are retained below. Earlier dated sections
+record how that evidence was obtained; their pending next steps are superseded
+by this section and `STATUS.md`.
+
+Merging the verification package records its implementation and tests. It does
+not activate a canonical installer, deploy the forward migration, reconcile
+hosted tracking or change #208/MVP-ALG-009 acceptance.
+
+**Concrete adoption proposal for the next decision:** use the tested source-derived
+`20260907155201_kajo_source_baseline.sql` plus unchanged post-cutoff migrations as
+the installation lineage for new empty databases. Preserve the 47 historical
+files byte-for-byte and retain the original chronological diagnostic with its
+truthful failure. Existing databases stay on a separately reviewed forward-only
+upgrade path and never receive the baseline. Accepting this proposal must
+explicitly update #208's clean-install criterion; it cannot be inferred from
+passing tests or from merging #219.
+
+After that decision, the next implementation is a canonical empty-install
+workspace/entry point reusing the current builder and verified CLI path, with
+source/image/empty-state preflights, exact history checks and failure cleanup.
+Existing hosted version/name mismatches and deployment rollback need their own
+reviewed procedure. Validate the new operational wiring, then the remaining
+Phase 14.0 bootstrap gates. Completed export/source/platform/install/upgrade/CLI
+discovery is not a new task unless changed code or concrete contradictory
+evidence invalidates it. Device/HTTP Auth and recommendation-quality gates remain
+separate and open.
 
 ## Context
 

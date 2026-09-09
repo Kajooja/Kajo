@@ -644,8 +644,19 @@ Report the APK/run identifier, Profile type, exact steps and screenshot for any 
 - #208's literal unmodified-replay criterion is still unsatisfied. Fresh-lineage
   adoption/acceptance is explicit; no historical or hosted mutation is inferred.
 
-Current decision handoff: the fully tested source-derived fresh lineage is ready
-for explicit adoption review in PR #219. The issue's existing original-replay
-criterion is not silently replaced, and no hosted history repair or deployment
-has occurred. Continue from the acceptance/installation-procedure decision,
-then the remaining Phase 14 gates; do not restart completed fingerprint/probe work.
+### Verification package completion and pause — 2026-09-09
+
+PR #219's verification implementation is complete. Its code head `9fcbbb4` passed
+all five required jobs in CI #393. The final closeout updates documentation only:
+STATUS now separates completed evidence from the adoption decision, ADR-0006
+states the concrete proposed fresh lineage, and CODEMAP reflects the populated
+upgrade and five CI gates. Resolve #219's current publication state from GitHub;
+a merged PR is continued from `main`, not from an obsolete local branch.
+
+The next work is the explicit acceptance/installation-procedure decision and its
+operational wiring, as specified in STATUS and ADR-0006. #208's literal original
+replay criterion remains unsatisfied. #207/#208/MVP-ALG-009 and Sprint 014 remain
+open; no hosted schema/data/history change or new device acceptance occurred.
+Do not restart completed export/fingerprint/platform/install/upgrade/CLI discovery
+or create another docs-only commit merely to record this closeout's own CI or
+merge number. Complete publication, then pause as requested by the owner.
