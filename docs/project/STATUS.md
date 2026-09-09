@@ -108,7 +108,7 @@ old log withheld its detail. The [2026-09-09 retro](retros/2026-09-09.md) record
 this distinction and the audit corrections. APK/device acceptance is separate;
 a main-triggered APK build is not the next product work item to poll.
 
-### Repository audit and blocked cleanup — #220
+### Repository audit and completed cleanup — #220
 
 The retrospective reconciles current code, release requirements and historical
 ideas. The [144-branch retirement manifest](retros/2026-09-09-branches.json)
@@ -116,11 +116,17 @@ contains 23 main ancestors, 118 exact merged PR heads and three individually
 reviewed superseded drafts. No missing accepted feature needs an old branch
 merged wholesale.
 
-No remote refs were deleted. Automatic approval review blocked the bulk deletion
-pending explicit owner confirmation of the exact 144-branch scope. Issue #220
-retains that cleanup gate; it does not replace the product continuation below.
-Recheck recorded tips/PR state before any approved deletion and preserve any new
-work. No deletion workflow is installed on `main`.
+The owner explicitly approved retirement of those 144 refs plus the merged
+PR #221 branch, `docs/220-retro-hygiene`: **145 approved branches removed**.
+[The completed cleanup run](https://github.com/Kajooja/Kajo/actions/runs/34388959963)
+verified the exact tips and PR/replacement evidence. It resumed after 33 recorded
+REST deletions with an atomic, expected-SHA-guarded Git deletion of the remaining
+112 refs and its own temporary branch. Remote verification then found only
+`main`, unchanged at `cd5aaabca3c0a990756f51c82a63398ea4fb71aa`.
+
+The manifest preserves original commit IDs and execution provenance. The initial
+approval block is resolved. Issue #220 records the final housekeeping/closeout;
+no cleanup workflow is installed on `main`. Product continuation remains below.
 
 ### Remaining decision and exact next implementation
 
