@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **third owner APK result recorded: only multi-List selection reported missing; correction awaits its own APK acceptance**.
+Status: **multi-List correction and hosted rollout verified; ready for its focused owner APK test**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -243,12 +243,13 @@ first-release canonical requirements. It is not part of this picker APK.
 
 ### Next multi-destination APK check
 
-**Blocked prerequisite:** CI #442 passed the implementation, but automatic approval
-review rejected its hosted database forward for lack of explicit database-mutation
-authorization. STATUS owns that request. The new app needs overlay v2, so obtain
-approval, deploy and verify the forward before treating a new APK as test-ready.
+The owner approved the hosted forward after the earlier automatic approval block.
+`20260910190243_shared_list_destinations` is deployed and verified; overlay v2 and
+the actual two-List approval/rollback/replay/authorization checks pass, and existing
+application/Auth data is unchanged. CI #442 passed all five implementation gates.
+The filename alignment retains identical app/SQL bytes. STATUS owns rollout details.
 
-After that server checkpoint, the owner starts the CI workflow. Install the latest branch artifact on both test
+The owner can now start the CI workflow. Install the latest branch artifact on both test
 accounts/devices; earlier versions cannot approve a multi-List proposal. Preserve
 current profiles and test data; no reset or local Docker is needed for a standalone
 APK using the hosted backend.

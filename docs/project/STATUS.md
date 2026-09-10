@@ -22,7 +22,7 @@ while unresolved destinations remain selected before Done. Shared approvers see
 every target name and confirm the exact set; memberships and transition Events
 commit together only at unanimity. Scope changes stop remaining message sends.
 
-Server forward prepared: `20260910180903_shared_list_destinations.sql`, SHA-256
+Hosted forward deployed: `20260910190243_shared_list_destinations.sql`, SHA-256
 `c6196e699b3720755652f6b61c7dc8776333be0ebce1df592e6487d828757b4f`.
 It adds one private destination relation and six functions, and replaces four
 existing definitions while preserving their identity/owner/ACLs. Both legacy
@@ -42,33 +42,46 @@ Implementation head `e4a28bfae6e9edaa507242e4374d4d9ca0dd971a` passed all five
 required jobs in [CI #442](https://github.com/Kajooja/Kajo/actions/runs/34515831721),
 including the native populated-forward and command probes. The APK job was skipped
 as designed. Physical multi-selection acceptance remains open; any later docs-only
-head does not change the tested app/SQL bytes.
+head does not change the tested app/SQL bytes. The complete 338-test check and
+both exports also pass after the provider filename alignment.
 
-Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four affected source function
-bodies; migration history ends at `20260910153737_bootstrap_history_projection`.
-**Multi-destination forward is not deployed. Automatic approval review rejected**
-`supabase.apply_migration(shared_list_destinations)` after CI passed. The stated
-reason was that publishing code had been authorized, but this hosted/shared
-migration adds a private table and changes security-sensitive functions without
-explicit database-mutation approval. Do not retry through another execution path.
-Ask the owner to approve this exact reviewed forward on `mwrnvfosrzwygrunrltm`.
-A read-only post-rejection check confirms no new target table/overlay v2 exists
-and hosted migration history still ends at `20260910153737`.
-After explicit authorization, recheck current history/affected definitions, apply
-only the same file, record provider version/hash, and verify actual command,
-authorization and unchanged data/function boundaries. Do not apply the fresh baseline, repair history or deploy
-the separate global function-default forward. For recovery, retain the new server
-consent guards and pending sets even if reverting the client; prefer a narrow
-forward correction. Never restore an unsafe old approval path over pending sets.
+The owner explicitly approved the hosted migration after automatic approval review
+had blocked the earlier attempt. The approved forward is now **deployed and
+verified** on `mwrnvfosrzwygrunrltm`, provider version/name
+`20260910190243_shared_list_destinations`. Its original CLI-generated filename was
+aligned to the provider version without changing SQL bytes or older migration
+history. The separate global function-default forward remains undeployed.
 
-Do not present this branch’s new APK as ready for Shared testing: its overlay v2
-requires the currently blocked forward. The existing installed APK and server
-remain usable for their prior single-List behavior.
+Hosted verification:
 
-After the server forward is authorized and verified, the owner starts the manual APK workflow
-and installs the new build on both accounts. DEVICE_TEST owns the four focused
-multi-destination cases. A standalone hosted-backend APK does not need local
-Docker. Do not dispatch/poll the APK or reset current test data.
+- all 132 existing function identities/owners/ACLs/security settings and 128
+  unrelated definitions are unchanged; the four intended replacements and six
+  new function bodies match the tested source;
+- all 32 existing table identities/owners/ACLs/RLS and creator defaults are unchanged;
+- data fingerprints/counts across 16 existing application/Auth/history/List tables
+  match before deployment, after deployment and after the rolled-back runtime probe;
+- the actual authenticated command probe passes exact target consent, atomic
+  two-List consensus, forced second-List Event failure rollback, replay, pending
+  cancellation and outsider/legacy-route rejection; no fixture rows/trigger remain;
+- overlay v2 is callable by authenticated members through its authorized wrapper;
+  anon and direct table/internal-core/bundle access remain denied;
+- advisors show the expected private-table RLS-without-policy INFO (access is only
+  through authorized functions). The existing leaked-password-protection warning
+  and two old unindexed-FK notices remain separate operational work; no extra grant
+  or unrelated security/default change was made for this rollout.
+
+Recovery: prefer a narrow corrective forward. Retain the new server consent guards
+and pending destination sets if reverting the client. Never restore an unsafe old
+approval path over pending multi-List proposals. No fresh baseline, history repair,
+account reset or persistent test fixture was applied.
+
+**Next action:** the owner can now start the manual branch APK workflow and install
+the new build on both accounts/devices. DEVICE_TEST owns the four focused cases.
+A standalone APK using the hosted backend does not need local Docker. Preserve
+current test data; do not dispatch/poll the APK. Keep PR #229 draft/main unchanged
+until remaining required CI/owner acceptance and #228 evidence gates are accepted.
+The filename/rollout documentation checkpoint retains the tested app and SQL bytes;
+GitHub owns any later final-head CI result.
 
 New required product truth: [#232](https://github.com/Kajooja/Kajo/issues/232),
 `MVP-SOCIAL-007..009`, defines SharedRatingRound and controlled rewatch. Personal

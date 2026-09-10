@@ -1437,3 +1437,32 @@ being authorized. No alternative mutation path is allowed. The forward remains
 undeployed and needs a direct owner approval; the new app’s overlay v2 depends on
 it. Keep the PR draft, preserve current data and complete no new APK acceptance
 claim. STATUS records the exact SQL hash/target and post-approval continuation.
+
+### Owner approval and hosted multi-destination rollout — 2026-09-10
+
+The owner explicitly approved the previously blocked hosted migration. Applied the
+unchanged reviewed SQL on `mwrnvfosrzwygrunrltm`; provider version/name is
+`20260910190243_shared_list_destinations`, SHA-256
+`c6196e699b3720755652f6b61c7dc8776333be0ebce1df592e6487d828757b4f`.
+Aligned only this new filename to the provider record, without altering SQL or old
+history. Native CI #442 already passed the identical implementation/forward.
+After alignment, npm run check again passes all 338 tests, lint/TypeScript and
+both iOS/Android exports.
+
+Postflight preserves all 132 old function identities/owners/ACLs/security settings,
+128 unrelated definitions, 32 old table identities/ACLs/RLS and creator defaults.
+Four intended replacements plus six new bodies match source. Sixteen existing
+application/Auth/history/List data fingerprints and counts are identical before,
+after and after the rolled-back authenticated command probe. That probe passes
+exact consent, two-List atomic consensus, forced second-List Event failure/retry,
+old receipt replay, whole pending cancellation and outsider/legacy rejection.
+No fixture trigger or destination rows remain; new private data/internal-core
+access is denied and authorized overlay v2 works. Advisors report expected
+private-table RLS-without-policy INFO; the existing Auth password warning/old FK
+notices do not change this rollout’s access contract.
+
+The earlier approval block is resolved. The owner may start the manual APK workflow
+on the active branch and test the four DEVICE_TEST cases with both accounts on the
+new build. No reset or local Docker is required. No APK was dispatched/polled and
+no phone or merge acceptance is claimed. Retain server consent guards if reverting
+the client; prefer a narrow corrective forward over erasing pending/history data.
