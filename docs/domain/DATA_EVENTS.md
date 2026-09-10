@@ -478,3 +478,23 @@ recording callback, mode and descriptor at start. Unknown undo targets cannot
 inherit the current slate's run. Server authorization and selected-candidate /
 exposure validation remain required. Remaining async/session boundary review,
 late-outcome reconciliation and representative runtime acceptance are still open.
+
+
+### Deferred origin/session admission checkpoint — #228
+
+`EventRecordInput.originSessionId` is a client-only admission guard captured by
+Detail and its destination picker. `null` means an explicitly local origin;
+omission keeps ordinary fresh, non-delivered actions compatible. Event recording
+and explicit Item/collection enqueue reject a supplied mismatched session; explicit
+actions also reject an origin for another Item. This field is not persisted as
+an Event property and does not rewrite the actual Event/command session envelope.
+Atomic commands still carry the existing Prediction/mode fields; `deliveryTier`
+is client origin and exposure/attention Event metadata, not a new RPC schema field.
+
+The active action session invalidates at layout time, preventing old hydration,
+receipt projection or dispatch from surviving the interval before passive queue
+cleanup. Lists/Shared pending completions also expire on session change/unmount.
+The destination sheet scopes loading/saving to each open request and rejects
+obsolete completions. Accepted persisted commands still replay their original
+session through a current coordinator. Server late-outcome verification and
+representative device/reopen/process-death acceptance remain open.

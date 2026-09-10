@@ -144,8 +144,15 @@ impressions, dwell and Item/collection actions use that frozen origin. Dwell kee
 its start-time callback/mode, and undo navigation cannot borrow an unrelated run.
 Prior head `dd6d86b` passed CI #413; current validation belongs to the draft PR.
 
-Next on that branch: finish async callback/session boundary review; verify
-missing/already-committed exposure and late outcomes
+The fifth checkpoint adds a client admission guard for frozen origin session/Item.
+Events and explicit Item/collection actions refuse mismatches before enqueue.
+Layout-time session invalidation also blocks old dispatch/hydration/receipt callbacks
+before passive cleanup. Lists/Shared completion tokens include the Event session
+and invalidate on unmount. Destination loading/saving belongs to the current open
+request, so closing during save cannot strand a reopened sheet. Direct detail is
+remounted for a new session. Existing durable commands retain their original session.
+
+Next on that branch: verify missing/already-committed exposure and late outcomes
 at the server boundary, then complete relevant runtime/CI acceptance. Record representative
 runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
 

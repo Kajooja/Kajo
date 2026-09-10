@@ -917,3 +917,21 @@ merge number. Complete publication, then pause as requested by the owner.
   PR owns full-check/current CI evidence. No hosted migration or physical-device
   acceptance. Remaining: async/session boundary review, late-outcome/server
   verification and runtime acceptance. Keep #228/#229 in progress.
+
+
+### Async session admission checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Detail/picker origins capture a client-only session admission token. Event and
+  explicit Item/collection admission reject mismatched sessions; explicit actions
+  also reject another Item. Actual persisted session envelopes remain unchanged.
+- Action dispatch, hydration and receipt projection check layout-time session
+  identity. Lists/Shared completion tokens include session and unmount cleanup.
+  Direct Detail remounts on session change. Destination loading/saving belongs to
+  one open request, fixing close-during-save/reopen state leakage.
+- Five admission regressions cover session/Item mismatch, a deferred destination
+  completed through a new session, local-to-auth transition, fresh non-delivered
+  actions and omission of the guard token from persisted Events. PR owns the full
+  check/CI evidence. Interactive session switch, reopen and process-death checks
+  remain untested. No hosted migration or server reconciliation is claimed.
+- Next: missing/already-committed exposure and delayed outcome verification at
+  the server boundary, then representative runtime acceptance. Keep #228/#229 open.

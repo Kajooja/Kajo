@@ -1,3 +1,4 @@
+import { useEventTracking } from '../events/EventTrackingContext';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -59,12 +60,13 @@ export function ListDestinationSheet({
   const [newListName, setNewListName] = useState('');
   const [messageExpanded, setMessageExpanded] = useState(false);
   const [messageDraft, setMessageDraft] = useState('');
-  const [status, setStatus] = useState<'idle' | 'saving'>('idle');
+  const [savingRequest, setSavingRequest] = useState<object | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const [loadedRequest, setLoadedRequest] = useState<object | null>(null);
+  const { sessionId } = useEventTracking();
   const itemId = item?.id ?? null;
   const requestKey = itemId
-    ? `${scopeKey}:${itemId}:${isSharedProfile ? 'shared' : 'personal'}`
+    ? `${scopeKey}:${sessionId}:${itemId}:${isSharedProfile ? 'shared' : 'personal'}`
     : null;
   const requestToken = useMemo(() => ({ requestKey, visible }), [requestKey, visible]);
   const currentRequest = useRef<typeof requestToken | null>(requestToken);
@@ -72,7 +74,11 @@ export function ListDestinationSheet({
     currentRequest.current = requestToken;
     return () => { currentRequest.current = null; };
   }, [requestToken]);
-  const loading = visible && requestKey !== null && loadedKey !== requestKey;
+  const loading = visible && requestKey !== null && loadedRequest !== requestToken;
+  const status = savingRequest === requestToken ? 'saving' : 'idle';
+  function setStatus(next: 'idle' | 'saving') {
+    setSavingRequest(next === 'saving' ? requestToken : null);
+  }
   const visibleLists = selectVisibleListDestinations(availableLists, expanded);
   const hiddenCount = availableLists.length - visibleLists.length;
 
@@ -81,7 +87,7 @@ export function ListDestinationSheet({
     let active = true;
 
     void loadForItem(itemId).then((result) => {
-      if (!active) return;
+      if (!active || currentRequest.current !== requestToken) return;
       setExpanded(false);
       setCreating(false);
       setNewListName('');
@@ -90,7 +96,7 @@ export function ListDestinationSheet({
       if (result.status === 'error') {
         setError(result.message);
         setAvailableLists([]);
-        setLoadedKey(requestKey);
+        setLoadedRequest(requestToken);
         return;
       }
 
@@ -102,11 +108,11 @@ export function ListDestinationSheet({
 
       setAvailableLists(orderListDestinationsByRecentUse(selectable, recentListIds));
       setError(null);
-      setLoadedKey(requestKey);
+      setLoadedRequest(requestToken);
     });
 
     return () => { active = false; };
-  }, [isSharedProfile, itemId, loadForItem, requestKey, revision, visible]);
+  }, [isSharedProfile, itemId, loadForItem, requestKey, requestToken, revision, visible]);
 
   async function persistDestination(list: ItemList) {
     if (!item || !visible || currentRequest.current !== requestToken) return false;

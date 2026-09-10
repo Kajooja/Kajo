@@ -146,7 +146,7 @@ export function ItemDetailScreen({
 
   return (
     <ItemDetailContent
-      key={`${scopeKey}:${itemId}:${deliveryId ?? "direct"}`}
+      key={`${scopeKey}:${eventTracking.sessionId}:${itemId}:${deliveryId ?? "direct"}`}
       itemId={itemId}
       {...(slate ? { slate } : {})}
       {...(predictionSource ? { predictionSource } : {})}
@@ -193,7 +193,9 @@ function ItemDetailContent({
   const [origins] = useState(() => slate?.origins ?? buildDeliveredItemOrigins(
     items, items, recommendationTraceId, 'fallback', {},
   ));
-  const originFor = useCallback((item: Item) => getDeliveredItemOrigin(origins, item.id), [origins]);
+  const [originSessionId] = useState(() => slate?.sessionId ?? eventTracking.sessionId);
+  const originFor = useCallback((item: Item) => ({ ...getDeliveredItemOrigin(origins, item.id),
+    originSessionId }), [origins, originSessionId]);
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);

@@ -20,6 +20,8 @@ export interface EventTrackingScope {
 }
 
 export interface EventRecordInput {
+  // Client admission guard only; persisted Events keep the actual session envelope.
+  originSessionId?: SessionId | null;
   eventType: EventType;
   itemId?: ItemId;
   itemType?: ItemType;
@@ -113,6 +115,16 @@ export function createTrackedEvent(
     ...(input.discoveryMode ? { discoveryMode: input.discoveryMode } : {}),
     ...(input.properties ? { properties: input.properties } : {}),
   };
+}
+
+export function canUseEventOrigin(
+  origin: EventRecordInput | undefined,
+  sessionId: SessionId | null,
+  itemId?: ItemId | null,
+): boolean {
+  if (!origin) return true;
+  if (origin.originSessionId !== undefined && origin.originSessionId !== sessionId) return false;
+  return !origin.itemId || itemId === undefined || origin.itemId === itemId;
 }
 
 export function getImpressionDeduplicationKey(

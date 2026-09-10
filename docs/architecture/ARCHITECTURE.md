@@ -219,7 +219,7 @@ The mobile outbox persists before optimistic acknowledgement, preserves FIFO thr
 
 Recommendation delivery origin is frozen truthfully. A cached Item from another Profile/mode/run cannot inherit a hosted `predictionId`.
 
-The #228 draft replaces detail latest-pool guessing with a bounded, scope/session-checked delivered snapshot. Per-Item Shared tiers are frozen; injected pending/member-history Items cannot borrow the ranking Prediction. Detail actions and dwell use the captured descriptor, while live consensus controls remain current. Dwell retains its start-time recording callback. Full `MVP-DATA-004` acceptance still requires remaining async/session, late-outcome and runtime verification; this client snapshot does not replace server trace validation.
+The #228 draft replaces detail latest-pool guessing with a bounded, scope/session-checked delivered snapshot. Per-Item Shared tiers are frozen; injected pending/member-history Items cannot borrow the ranking Prediction. Detail actions and dwell use the captured descriptor, while live consensus controls remain current. Dwell retains its start-time recording callback. A client-only origin session/Item guard rejects stale Event/action admission; action dispatch and result projection invalidate at layout-time session changes. Lists/Shared async completion tokens expire on session changes and unmount, and destination loading/saving is specific to the current open request. Full `MVP-DATA-004` acceptance still requires late-outcome and representative async/session runtime verification; this client snapshot does not replace server trace validation.
 
 Growth/acquisition telemetry has separate semantics and retention. Analytics failure must not roll back auth, Friendship, Taste or SharedProfile state.
 

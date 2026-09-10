@@ -1,3 +1,4 @@
+import { useEventTracking } from '../events/EventTrackingContext';
 import {
   createContext,
   useCallback,
@@ -74,9 +75,13 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
   const actorUserId = activeProfile.actorUserId;
   const namespace = connection.status === 'configured' ? connection.config.url : '';
   const profileId = activeSharedProfile?.id;
-  const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId }), [namespace, actorUserId, profileId]);
-  const currentScope = useRef(scopeToken);
-  useLayoutEffect(() => { currentScope.current = scopeToken; }, [scopeToken]);
+  const { sessionId } = useEventTracking();
+  const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId, sessionId }), [namespace, actorUserId, profileId, sessionId]);
+  const currentScope = useRef<typeof scopeToken | null>(scopeToken);
+  useLayoutEffect(() => {
+    currentScope.current = scopeToken;
+    return () => { currentScope.current = null; };
+  }, [scopeToken]);
   const rpc = useMemo<SharedEndorsementRpc | null>(
     () =>
       connection.status === 'configured'

@@ -27,6 +27,7 @@ import {
   type EventPersistenceApi,
 } from './eventPersistence';
 import {
+  canUseEventOrigin,
   createEventSession,
   createTrackedEvent,
   createUuidV7,
@@ -145,7 +146,8 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     (input: EventRecordInput, suppliedEventId?: EventId) => {
       const current = scopedCoordinator;
 
-      if (!current || currentCoordinator.current !== current.coordinator) return null;
+      if (!current || currentCoordinator.current !== current.coordinator
+        || !canUseEventOrigin(input, current.session.sessionId)) return null;
 
       const deduplicationKey = getImpressionDeduplicationKey(input);
 

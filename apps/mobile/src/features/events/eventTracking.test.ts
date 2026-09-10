@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Event, EventSession } from '../../domain/contracts';
 import {
+  canUseEventOrigin,
   createEventSession,
   createCorrelationId,
   createTrackedEvent,
@@ -98,5 +99,51 @@ describe('Event tracking contracts', () => {
     expect(
       getDwellEventProperties(0, 60 * 60 * 1_000, 'SCREEN_EXIT'),
     ).toMatchObject({ dwellMs: 30 * 60 * 1_000 });
+  });
+});
+
+
+describe('deferred Event/action origin admission', () => {
+  const origin = { eventType: 'ITEM_LIKED' as const, itemId: 'item-a',
+    predictionId: 'run-a', originSessionId: 'session-a' };
+
+  it('accepts a retained destination only for its original session and Item', () => {
+    expect(canUseEventOrigin(origin, 'session-a', 'item-a')).toBe(true);
+    expect(canUseEventOrigin(origin, 'session-b', 'item-a')).toBe(false);
+    expect(canUseEventOrigin(origin, 'session-a', 'item-b')).toBe(false);
+    expect(canUseEventOrigin(origin, 'session-a', null)).toBe(false);
+  });
+
+  it('rejects a delayed origin even when submitted through a new-session callback', async () => {
+    let currentSession = 'session-a';
+    const accepted: string[] = [];
+    let finish!: () => void;
+    const delayedDestination = new Promise<void>(resolve => { finish = resolve; });
+    const complete = delayedDestination.then(() => {
+      if (canUseEventOrigin(origin, currentSession, 'item-a')) accepted.push(currentSession);
+    });
+    currentSession = 'session-b';
+    finish();
+    await complete;
+    expect(accepted).toEqual([]);
+  });
+
+  it('does not attach a local origin to a later authenticated session', () => {
+    const local = { ...origin, originSessionId: null };
+    expect(canUseEventOrigin(local, null, 'item-a')).toBe(true);
+    expect(canUseEventOrigin(local, 'session-a', 'item-a')).toBe(false);
+  });
+
+  it('leaves fresh non-delivered actions available without claiming a frozen session', () => {
+    expect(canUseEventOrigin(undefined, 'session-b', 'item-b')).toBe(true);
+    expect(canUseEventOrigin({ eventType: 'ITEM_LIKED', itemId: 'item-b' }, 'session-b', 'item-b')).toBe(true);
+  });
+
+  it('keeps the admission token out of persisted Event properties and identity', () => {
+    const tracked = createTrackedEvent(session, { ...origin, originSessionId: session.sessionId, properties: { source: 'ITEM_DETAIL' } },
+      'event-id', '2026-09-10T08:00:00.000Z', {});
+    expect(tracked.sessionId).toBe(session.sessionId);
+    expect(tracked).not.toHaveProperty('originSessionId');
+    expect(tracked.properties).not.toHaveProperty('originSessionId');
   });
 });
