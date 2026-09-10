@@ -8,7 +8,7 @@ Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy act
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
-[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Active #226 completes List/Shared commands and their durable mobile path; exact delivered provenance follows. PR #219's source/platform experiments are completed evidence.
+[STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Delivery #226 implements List/Shared commands and their durable mobile path; exact delivered provenance follows. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
@@ -821,3 +821,33 @@ merge number. Complete publication, then pause as requested by the owner.
   commands for a corrected deployment. Do not blindly reinstall #225 over devices
   with collection commands: its old queue validator cannot interpret those entries.
   No rollback or separate global-default migration is part of this pending action.
+
+
+### Approved collection deployment — 2026-09-10 / #226 / PR #227
+
+- Owner explicitly approved the exact hosted migration and subsequent verification/
+  merge. `apply_migration` succeeded on Kajo `mwrnvfosrzwygrunrltm` with actual
+  version `20260910071110_atomic_collection_actions.sql`. SQL SHA-256 remains
+  `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`;
+  the repository filename alone was synchronized. Do not deploy it again.
+- Fresh metadata comparison preserved all 125 unrelated function definitions and
+  all 126 old owners/ACLs, the exact intended Item undo guard replacement, all
+  23 inventoried noninternal public/private/Auth-user triggers, global defaults,
+  and all 45 previous tracking rows. Three functions, two triggers and one tracking
+  row were added. Function/table API access checks passed.
+- The approval reviewer rejected export of table-wide counts/data hashes during
+  this fresh preflight. A safer metadata-only check succeeded. No fresh hosted
+  whole-data fingerprint comparison is claimed; the earlier isolated populated
+  forward rehearsal remains the data-preservation proof. No alternative path
+  exported the rejected private/Auth row-derived snapshot.
+- Hosted rollback-only collection smoke passed List lifecycle/membership, exact
+  membership undo, mixed Item/List undo and Memory correction, repeat/no-op/denial,
+  real delivered-item trace versus fabricated attribution, Shared consensus and
+  pending cancellation. It selected an actual ranked MOVIE and omitted isolated-only
+  failure-injection DDL. The transaction rolled back its synthetic data.
+- Security advisors retain the same 18 intended RLS-without-policy INFO findings
+  and existing Auth leaked-password-protection WARN. The unrelated global-default
+  migration and historical tracking are untouched. No physical-device acceptance.
+- CI #408 passed the prior handoff head. PR #227 owns the final filename/docs CI
+  and merge result. Next is exact delivered provenance and durable exposure in
+  14.1; DATA-003/004 and Sprint 014 remain open. Work continues in short checkpoints.

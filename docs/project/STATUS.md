@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-09**
+Last updated: **2026-09-10**
 Current milestone: **MVP 0.1 — first public Kajo**  
 Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -99,45 +99,31 @@ and its rollback-only command acceptance passed. All five gates in CI #403 passe
 for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
 records exact rollout/source verification and the remaining device limitations.
 
-The active continuation is **Issue #226 / PR #227**, branch
+The latest collection delivery is **Issue #226 / PR #227**, branch
 `feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
-Implementation `0d299d5` passes all five required jobs in
-[CI #407](https://github.com/Kajooja/Kajo/actions/runs/34410390133), including native
-populated collection-forward rehearsal and full command smoke. Local check passes
-287 tests plus lint/typecheck and both bundles. The PR owns final-head CI evidence.
+Implementation `0d299d5` passed all five required jobs in CI #407; the prior
+handoff head `876f1b6` passed CI #408. Local implementation check passed 287 tests
+plus lint/typecheck and both bundles. PR #227 owns final-head CI and merge evidence.
 
-**Publication blocker: automatic approval review rejected the hosted DDL action.**
-It did not accept the earlier general fix/merge authorization as explicit approval
-for this hosted target/side effect. No collection migration has been applied and
-main still contains #225. Do not bypass the rejection through another execution path.
-The exact pending action is `apply_migration` named `atomic_collection_actions` to
-hosted **Kajo `mwrnvfosrzwygrunrltm`**, using only
-`20260909211222_atomic_collection_actions.sql`, SHA-256
-`fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`.
-It extends private receipts with nullable List metadata/no-Event receipts, adds
-List undo-head triggers and collection commands, and restricts the existing Item
-undo function to Item command kinds. Existing data is not rewritten by the forward.
+The owner explicitly approved hosted deployment on **2026-09-10**. Kajo
+`mwrnvfosrzwygrunrltm` accepted `20260910071110_atomic_collection_actions.sql`,
+SHA-256 `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`.
+Only the filename changed to match the actual provider version. The prior hosted
+approval blocker is resolved. Rollback-only hosted List/Shared command acceptance
+and access-boundary checks passed; Sprint 014 records exact scope and limitations.
 
-Next: obtain explicit owner approval for that concrete hosted action. Then refresh
-preflight, apply only those reviewed bytes under ADR-0006, record the provider's
-actual version, verify old columns/functions/ACLs/history and rollback-only command
-smoke, synchronize the filename/docs, pass final CI, merge #227 and retire its branch.
-Do not merge the client before the required server endpoint exists. Do not apply the
-separate global-default forward or repair old tracking. The preflight verified the
-original repo/target, 33 unchanged table fingerprints, 126 functions, 22 triggers
-and 45 old tracking rows. Prior approval context retrieval was unavailable; the
-block is from automatic review, not a newly invented repository permission rule.
+Publication: finish final-head CI, merge #227, then retire its task branch. If #227
+is already merged, continue from main with the next 14.1 task below; do not repeat
+the deployment. No separate global-default forward or old tracking repair is included.
 
 Continue **14.1** after this delivery:
 
-1. Extend the same command discipline to List create/rename/delete/membership and
-   Shared Endorsement/consensus in active #226; do not close `MVP-DATA-003` merely because rating/not-interest are durable.
-2. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
+1. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
    swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
    exposure delivery durable; the old exposure-only Event queue remains in memory.
-3. Verify late outcomes, real device process-death/reconnect/account switches and
+2. Verify late outcomes, real device process-death/reconnect/account switches and
    complete atomic List/Shared rollback/duplicate/undo authorization cases.
-4. Then proceed to **14.2 serving/shadow/candidate availability**.
+3. Then proceed to **14.2 serving/shadow/candidate availability**.
 
 `MVP-DATA-003/004`, full `MVP-ALG-009`, Sprint 014 and Phase 14 quality/evaluation
 acceptance remain open. No Taste/Friend implementation starts ahead of those
