@@ -1010,9 +1010,49 @@ data/function boundaries. Native CI and hosted rollout remain separate gates.
 
 This comparison is conditional on the frozen source pool and actual source result
 count. It does not establish parity with a challenger's independently generated
-live pool. The fixed baseline top-50, truncation/refill and zero-result worker
-contract remain open under `MVP-ALG-002..003`; no promotion or measured quality
-claim follows from this correction.
+live pool. The following admission correction handles suppression before the
+cutoff and zero-result replay. Independent candidate sources, bounded retrieval,
+continuation and rollout remain open under `MVP-ALG-002..003`; no promotion or
+measured quality claim follows from these corrections.
+
+### Candidate admission checkpoint — #228, prepared / not hosted
+
+The forward `20260910210520_eligibility_first_candidate_pool.sql` corrects a
+reproduced case where 70 consumed high-fit Items displaced all 24 ordinary
+alternatives from the raw baseline top-50. V0 now evaluates the canonical
+`resurfacing_policy_decision_v1` at one recorded time before retaining candidates.
+Ordinary Items precede eligible aged reminders, then suppressed Items, with the
+same baseline score and Item-id ordering within tiers. Scalar scoring reuses this
+frozen input; each genome still applies the one-reminder cap over its retained pool.
+Final Scenario/common-fit scoring and shadow share the preceding replay contract.
+
+New serving policies append `+eligibility-first-v1`. Candidate explanations record
+`candidatePool.version`, `eligibilityAt`, considered/ordinary/reminder/suppressed
+counts, retained limit/count, original `baselineScoreRank` and `admissionRank`.
+These are baseline-admission counters: V0 retains at most 50, after which scalar
+and final scoring retain at most `min(50, 3 × requested limit)` for expensive
+Scenario/common-fit and trace persistence. A suppressed candidate in that trace
+is still not selected or exposed. No genome weight or public RPC signature changes.
+
+Zero-result runs with a complete versioned source are valid frozen comparisons.
+The worker accepts all-suppressed pools and explicit empty-pool controls with zero
+hypothetical selections; automatic challenger queueing still omits an empty pool.
+Pre-admission `frozen-replay-v2` sources remain comparable, while pre-v2 inputs
+still fail diagnostically. Stored history is never backfilled or rewritten.
+
+Full-schema controls reproduce the original zero-result defect across both
+Profile types, BOOK/MOVIE and three modes, then verify 36 nonempty limit controls,
+two mixed-domain controls, exhausted/empty pools, reminder caps, exact baseline
+score/rank/selection replay and authorization. Populated forward rehearsal retains
+data, old frozen comparisons, all function identities/ACLs/configuration and
+unrelated constraints; unexpected source rolls back the entire forward.
+
+This fixes admission starvation, not retrieval scale or source diversity. The
+existing full-catalog raw-feature scan remains and now evaluates admission before
+the cutoff; expensive downstream work alone is bounded. Independent Shared/novelty/
+Scenario sources and indexed retrieval still need cost and quality evidence.
+The current client treats an empty RPC array as failure; a versioned empty/continuation
+response and duplicate-free navigation remain required before `MVP-ALG-003` closes.
 
 ### Candidate generation and delivery
 

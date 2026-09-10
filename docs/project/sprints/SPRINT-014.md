@@ -1620,3 +1620,62 @@ The preceding checkpoint's hash identifies the earlier undeployed revision.
 both platform exports. Native CI for this correction is still required. No
 hosted mutation, APK action or phase acceptance is implied; candidate availability
 remains the active continuation.
+
+### Candidate admission and empty replay — 2026-09-10
+
+Owner instruction remains to continue development while the Personal Add/latency
+APK regression is deferred. Same branch `feat/228-delivered-origin`, draft #229 /
+Issue #228; accepted main `6dd1fec` and all hosted/device acceptance gates remain.
+
+The new full-schema fixture first reproduces the defect on preceding source:
+70 consumed high-fit Items fill raw baseline top-50 and public ranking returns
+zero although 24 ordinary alternatives exist. This occurs in all 12 Personal/
+Shared × BOOK/MOVIE × DiscoveryMode requests. The forward moves canonical
+admission before retention and reuses that decision during scalar scoring; all
+12 requests then deliver 20. Ordinary Items precede reminders and suppression;
+the genome still chooses at most one reminder from its frozen retained pool.
+
+CLI-created forward `20260910210520_eligibility_first_candidate_pool.sql` is
+**undeployed**, SHA-256
+`92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46`.
+It replaces five existing bodies through guarded anchors and permits zero in the
+shadow result-count constraint. No table/function, public signature, genome weight
+or historical data is added/changed. New source policy and admission metadata use
+`eligibility-first-v1`; counts/ranks identify the baseline-admission stage.
+V0 retains at most 50 and expensive Scenario/common-fit plus persisted traces
+retain at most `min(50, 3 × requested limit)`. All-suppressed and explicit empty
+source controls complete with zero hypothetical selections. Automatic challenger
+queueing still omits an empty pool. Pre-admission frozen v2 sources remain replayable.
+
+`candidate-pool-smoke.sql` checks 36 Profile/domain/mode/limit combinations, two
+mixed-domain pools, four exhausted and four empty controls. It verifies available
+Items below the old top-50, member-Personal consumption versus Shared eligibility,
+one-reminder limits, bounded traces, exact baseline scores/ranks/selection after
+later consumption/catalog changes and denied outsider/missing-actor calls. No
+synthetic Events or historical trace rewrites occur. The populated upgrade keeps
+application/Auth/receipt rows and old frozen results, every existing function
+identity/owner/ACL/configuration and unrelated constraint; old v2 replay remains
+exact. Unexpected source rolls back the constraint and all prior replacements.
+Both runtime and populated probes are wired into required native CLI CI.
+
+CI for the preceding precision correction `5b9efd3` passed four required gates;
+run 34529961511's native job completed the populated SQL but failed parsing a bare
+UUID emitted by fixture `SELECT set_config`. Setup now uses `DO` / `PERFORM` with
+no output. Both local probe adapters reject non-snapshot rows, closing the gap
+where PGlite silently filtered output that native CI rejected. The precise replay
+migration bytes and exact-score assertions remain unchanged.
+
+`EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **349 tests** (270 mobile,
+14 catalog, 65 database), clean lint/TypeScript and both platform exports.
+New-head required CI remains to be observed. No local Docker/phone/emulator,
+hosted mutation, reset, APK dispatch/poll or merge occurred. Hosted stays on
+`20260910190243`; rollout dependencies are late Outcome attribution → precise
+frozen replay → candidate admission, each still subject to its reviewed rollout.
+
+This is a suppression-admission correction, not completion of `MVP-ALG-002..003`.
+The existing full-catalog feature scan remains and admission now runs before the
+cutoff; bounded indexed retrieval, independent Shared/novelty/Scenario sources,
+cost/quality evidence and duplicate-free continuation remain open. Next source
+slice is the versioned server/client continuation and empty-result contract:
+the client currently treats an empty array as failure. Keep Phase 14.1 recovery
+and deferred Personal two-List APK gates; no release checkbox is closed here.

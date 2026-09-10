@@ -7,7 +7,51 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## Immediate continuation checkpoint — 2026-09-10 / frozen replay parity
+## Immediate continuation checkpoint — 2026-09-10 / candidate availability
+
+Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted
+main remains `6dd1fec`. The owner deferred the Personal Add/latency APK regression
+and asked source development to continue. The current packet corrects a reproduced
+Phase 14.2 availability defect; no phase, hosted rollout or device gate is accepted.
+
+Before the correction, 70 consumed high-fit Items occupied the retained top-50:
+public ranking returned **zero despite 24 ordinary alternatives**, in both
+Personal/Shared Profiles, BOOK/MOVIE and all three modes. The **undeployed** forward
+`20260910210520_eligibility_first_candidate_pool.sql` applies canonical admission
+before that cutoff and reuses the frozen decision in scalar scoring. Those same
+12 requests now return 20 Items. The retained pool remains 50; expensive
+Scenario/common-fit and persisted traces remain capped at `min(50, 3 × limit)`.
+New traces carry admission version, counts and before/after ranks. Fully suppressed
+and empty source pools replay with zero selected Items; preceding v2 sources stay
+compatible. Five existing bodies and one count constraint change, with no new
+tables/functions, public signature, genome weights or historical data changes.
+
+The full-schema probe covers 36 Profile/domain/mode/limit controls, two mixed-domain
+controls, eight exhausted/empty controls, exact frozen baseline replay after later
+state changes, one-reminder limits, authorization and populated upgrade preservation.
+Both the upgrade and runtime probes are wired into required native CLI CI.
+The complete repository gate and current CI result are recorded in Sprint 014.
+
+CI on replay precision head `5b9efd3` passed four gates; the native populated SQL
+completed but its result parser rejected a bare UUID from fixture setup. Setup now
+uses a no-output `DO` block, and local probe adapters reject stray output instead
+of silently ignoring it. The preceding precision fix remains intact; new-head
+native acceptance is required for the combined packet.
+
+**Next action:** verify required CI for this packet, then specify and implement the
+versioned continuation/empty-result contract through the server and client. The
+client still treats an empty array as failure. Independent bounded candidate
+sources, admission cost at catalog scale and duplicate-free continuation remain
+open under `MVP-ALG-002..003`; the existing full-catalog feature scan now also
+evaluates admission before retaining candidates. This packet does not accept
+scalable retrieval or independently generated challenger pools.
+
+Hosted remains on `20260910190243_shared_list_destinations`. Reviewed rollout order
+is late Outcome attribution → precise replay → candidate admission. Keep the
+separate Phase 14.1 recovery gates and deferred Personal two-List APK cases open.
+No reset, APK action, hosted mutation or merge was performed; keep PR draft.
+
+## Frozen replay checkpoint — 2026-09-10
 
 Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted
 main remains `6dd1fec`. The owner explicitly deferred the Personal Add/latency APK
@@ -51,12 +95,9 @@ Its owner-started APK regression is explicitly deferred. Hosted remains on
 `20260910190243_shared_list_destinations`; late Outcome attribution and this replay
 forward both remain undeployed, in that dependency order.
 
-**Next action:** verify required CI for the published replay source, then continue
-the bounded candidate-pool/starvation/refill part of Phase 14.2 (`MVP-ALG-003`) with
-a reproducible suppressed-top-50 case. Keep `MVP-ALG-002` open for empty/refilled
-pools and rollout acceptance. Retain separately reviewed hosted rollout and
-Phase 14.1 process-death/reconnect/account-switch gates; resume the deferred
-Personal two-List APK cases when the owner returns. Keep PR draft.
+The subsequent candidate-availability correction and native CI parser finding are
+recorded in the immediate continuation above. `MVP-ALG-002..003`, separately
+reviewed hosted rollout and Phase 14.1 recovery/device acceptance remain open.
 
 ## Personal Add and latency checkpoint — 2026-09-10
 

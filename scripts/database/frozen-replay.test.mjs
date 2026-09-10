@@ -9,7 +9,10 @@ import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
 test('frozen serving/shadow replay parity, populated upgrade and incompatible-history isolation (full schema)', async () => {
   const installation = await buildFreshInstallation();
   const db = new PGlite();
-  const snapshots = async sql => (await db.exec(sql)).flatMap(r => r.rows.filter(row => Object.hasOwn(row, 'snapshot')).map(row => row.snapshot));
+  const snapshots = async sql => (await db.exec(sql)).flatMap(r => r.rows.map(row => {
+    assert.deepEqual(Object.keys(row), ['snapshot'], 'Native SQL probes accept only JSON snapshot output');
+    return row.snapshot;
+  }));
   try {
     await db.exec(`create role anon; create role authenticated; create role service_role;
       create schema auth;

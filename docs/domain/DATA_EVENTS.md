@@ -247,6 +247,15 @@ queued legacy jobs fail diagnostically and new evaluations exclude incompatible
 old shadows. Historical evaluations remain intact. Full calculation and version
 ownership is in `PREDICTION_MODEL.md`; hosted rollout is still pending.
 
+The subsequent prepared candidate-admission forward
+(`20260910210520_eligibility_first_candidate_pool.sql`) records `candidatePool`
+version/time, considered and eligibility counts, baseline retention limits/counts,
+and baseline/admission ranks on each retained candidate. These describe the
+pre-Scenario admission stage, not impressions or additional taste evidence.
+Suppressed candidates remain unselected; exhausted and empty versioned sources
+can have zero-result shadow comparisons without synthetic Events. Pre-admission
+v2 traces keep their original pool and replay semantics.
+
 ## 9. Evidence classes
 
 | Class | Examples | Interpretation |

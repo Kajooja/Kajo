@@ -14,6 +14,7 @@ import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
 import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
 import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
+import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -63,6 +64,11 @@ try {
     const [frozenReplayUpgrade] = await exec('set extra_float_digits=0;\n'
       + frozenReplayUpgradeSql(files[replayIndex], projectionFixture, candidate.tables));
     assert.match(frozenReplayUpgrade?.frozenReplayUpgrade, /^PASS: unchanged populated/);
+    const poolIndex = files.findIndex(file => file.name.endsWith('_eligibility_first_candidate_pool.sql'));
+    assert.ok(poolIndex > replayIndex);
+    await resetFromMigrations(files.slice(0, poolIndex));
+    const [candidatePoolUpgrade] = await exec(candidatePoolUpgradeSql(files[poolIndex], projectionFixture, candidate.tables));
+    assert.match(candidatePoolUpgrade?.candidatePoolUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -93,6 +99,8 @@ try {
     const [frozenReplay] = await exec('set extra_float_digits=0;\n'
       + await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
     assert.match(frozenReplay?.frozenReplay, /^PASS: 18 Personal\/Shared/);
+    const [candidatePool] = await exec(await candidatePoolSmokeSql());
+    assert.match(candidatePool?.candidatePool, /^PASS: 36 mode\/domain\/Profile\/limit/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -115,6 +123,7 @@ try {
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
+      candidatePool, candidatePoolUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

@@ -53,7 +53,9 @@ export function frozenReplayUpgradeSql(migration, fixture, tables) {
         'actorUserId',actor,'profileId',profile,'itemId',item,'kind','SET_RATING','rating',8,
         'occurredAt',now(),'session',jsonb_build_object('sessionId',gen_random_uuid(),'startedAt',now(),'context','{}'::jsonb)));
     end; $legacy$;
-    select set_config('request.jwt.claim.sub','a2080000-0000-4000-8000-000000000001',true);
+    do $actor$ begin
+      perform set_config('request.jwt.claim.sub','a2080000-0000-4000-8000-000000000001',true);
+    end; $actor$;
     create temp table replay_baseline_before on commit drop as ${baselineScores};
     alter default privileges for role postgres grant execute on functions to public;
     create temp table replay_rows_before on commit drop as ${fingerprints};
