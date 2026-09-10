@@ -992,3 +992,16 @@ Primary references reviewed for this design:
 - EDPB, data protection by design/default: minimization and continuous privacy controls from system design onward. <https://www.edpb.europa.eu/topics/ai-and-technology/privacy-by-design-and-by-default_en>
 
 References inform direction; Kajo's decisions remain governed by its own evidence, licensing, privacy and product constraints.
+
+
+### Named-list delivery correction required by device feedback (2026-09-10)
+
+Owner-confirmed behavior: adding an Item to a named List is a positive reaction
+and excludes it from ordinary Discovery. The existing Saved-only resurfacing
+check does not satisfy this for CUSTOM Lists. Active authorized List membership
+must participate in eligibility and the existing bounded reminder policy.
+Removing the last membership restores ordinary eligibility only if no other
+reaction suppresses the Item; remaining membership in another List still counts.
+This correction is pending on #228/#229, not delivered server behavior. List
+removal need not have an undo UX. A separate “Mitä tänään” List-only ranking idea
+is tracked in FUTURE_PLAN and does not replace ordinary Discovery suppression.

@@ -107,7 +107,7 @@ export function createExposureOrderedSender<T extends EventActionOrigin, R>(
 ): (command: T) => Promise<ItemActionResult<R>> {
   return async command => {
     if (!isCurrent() || !canSendAction(command)) {
-      return { status: 'error', retryable: true,
+      return { status: 'error', retryable: true, waitingForExposure: true,
         message: 'Valinta odottaa suosituksen näyttötiedon tallennusta. Yritämme uudelleen.' };
     }
     return send(command);

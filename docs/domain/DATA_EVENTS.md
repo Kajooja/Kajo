@@ -516,3 +516,13 @@ immutable history: it is not a retrospective reconciliation implementation. The
 mobile exposure-order guard prevents this ordering for locally pending impressions;
 missing evidence is never invented. Both command families and secondary collection
 Events are covered by 14 rollback-only cases in PGlite and required native CLI CI.
+
+
+### Exposure waiting presentation correction — #228 device feedback
+
+A local pending impression is a queue dependency, not a rejected action.
+`waitingForExposure` keeps normal retry/backoff and persistence but suppresses the
+error snapshot. Collection callers therefore continue waiting for the actual
+receipt instead of receiving a premature failure. Genuine persistence errors
+still publish their message. This does not discard actions, weaken trace checks
+or invent exposure.

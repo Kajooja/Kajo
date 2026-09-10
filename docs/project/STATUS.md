@@ -159,15 +159,30 @@ exposure occurring after the action, another session/mode, and an unselected
 candidate. Retry and undo preserve the original accepted attribution. No migration:
 late exposure does not retrofit immutable unattributed receipts.
 
-Next on that branch: run the current-head native CI, prepare its standalone APK
-and give the owner the Sprint 014 device checklist below. On 2026-09-10 the owner
-confirmed they will download the APK and perform tests when explicitly told it is
-ready. Do not call an export an APK or claim device acceptance. Record the exact
-build SHA/artifact and owner results. APK dispatch is currently blocked by tooling:
-the GitHub connector exposes no workflow-dispatch action and the cloud browser is
-signed out. The existing CI workflow can be manually run on
-`feat/228-delivered-origin`; no workflow/security changes are needed. Keep #228/#229 and DATA-003/004 open through
-runtime acceptance; do not start 14.2 yet.
+Owner device feedback is now recorded in Sprint 014 (expected test APK: #417,
+`e7c84a7`; device/build details not supplied). Card sequence, close-during-save and
+background/login were reported working; the offline case was tentative. Lists
+remain a release blocker: named-list additions can remain in ordinary Discovery,
+undo appeared ineffective, and normal exposure waiting was presented as an error.
+A transient ranking change after undo was not reproducible. Do not infer complete
+Shared/cross-Profile/device acceptance from this report.
+
+The current feedback checkpoint distinguishes ordinary exposure waiting from real
+persistence errors. It keeps the action pending and retries automatically instead
+of publishing an error that prematurely resolves collection waiters. Real errors
+remain visible; server correlation and durable queue semantics are unchanged.
+
+Next on the SAME #228/#229 branch: fix named-list membership in server resurfacing
+eligibility and immediate client slate refresh. Existing policy only checks Saved,
+so CUSTOM membership can escape suppression. List addition is a positive reaction
+and removes the Item from ordinary Discovery. Removing its last active membership
+restores eligibility unless another reaction suppresses it; another remaining List
+must continue suppression. Retain bounded, explicitly separated reminders after
+the policy interval. No undo of List removal is required by the owner; retained
+undo controls must work. Cover multi-list removal, delete, reload and Shared.
+Then prepare a focused replacement APK and retest these failures. Keep #228/#229
+and DATA-003/004 open. The separate “Mitä tänään” List idea is in FUTURE_PLAN and
+must not displace these corrections.
 
 Continue **14.1** after this delivery:
 

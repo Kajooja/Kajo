@@ -117,7 +117,9 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
         catch { result = { status: 'error', retryable: true, message: 'Valinta odottaa yhteyttä. Yritämme tallennusta uudelleen.' }; }
         finally { if (deadline) clearTimeout(deadline); }
         if (result.status === 'error') {
-          message = result.message;
+          // Waiting for our own exposure queue is normal pending work. Publishing
+          // it as an error also settles collection waiters before the real receipt.
+          message = result.retryable && result.waitingForExposure ? null : result.message;
           blocked = !result.retryable;
           rejectedEntry = result.rejectedAction === true || (result.rejectedUndo === true && entry.command.kind === 'UNDO') ? entry : null;
           if (active && result.retryable) {

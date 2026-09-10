@@ -976,3 +976,37 @@ out. The owner can start CI using Run workflow on `feat/228-delivered-origin`.
 Its APK job already depends on all five validation jobs; do not bypass those
 gates or change workflow triggers merely to start a build. Keep #228/#229 and
 DATA-003/004 open.
+
+
+### Owner APK feedback and correction checkpoint — 2026-09-10 / #228
+
+Expected candidate: run #417 / `e7c84a7`. The owner reported results after receiving
+that download target; phone/Android/build confirmation was not supplied.
+
+| Report | Acceptance interpretation |
+|---|---|
+| Cards/order worked | Owner-observed pass |
+| Recommendations seemed to change after actions/undo, then did not change on repeat | Non-reproducible observation; do not invent a cause or close ranking quality |
+| List addition did not remove the Item from Discovery | Confirmed product failure; named List membership must suppress ordinary delivery |
+| Undo appeared to do nothing | Open; List-removal undo is not required, but retained undo must work |
+| Closing while saving worked | Owner-observed pass |
+| Offline/restart “seems to work” | Tentative pass; retain server evidence/device follow-up |
+| Rejection showed exposure-wait error; a new choice eventually worked despite it | Normal queue wait was incorrectly presented as failure; correcting below |
+| Background/login worked | Owner-observed pass |
+
+Correction in this checkpoint: `waitingForExposure` distinguishes a local queue
+dependency from an actual persistence error. The action remains pending with
+normal automatic backoff; no error snapshot prematurely settles collection
+waiters. Real network/storage/authorization failures remain visible. Tests verify
+silent pending state, automatic retry after exposure acknowledgement, and a real
+subsequent error. PR owns complete validation. No hosted migration in this part.
+
+Next bounded package: active named-list membership in resurfacing and immediate
+Discovery refresh; last-list removal/reappearance, multiple Lists, deletion and
+Shared behavior; review ineffective undo and omit List-removal undo from required
+UX. Preserve the existing bounded reminder interval/caps, without treating an
+Item still in another List as new. Do not mark device acceptance complete yet.
+
+Owner idea: “Mitä tänään” chooses from a saved List using the active Personal or
+Shared Profile and current context, with an explicitly distinct List-card browsing
+surface. Captured in FUTURE_PLAN; it is a product idea, not another reported defect.

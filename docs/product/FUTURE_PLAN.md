@@ -461,3 +461,25 @@ And only after years of product/evidence maturity, Kajo may investigate:
 > Who might I genuinely enjoy experiencing life with?
 
 The first step remains much narrower and measurable: make the Taste-first BOOK/MOVIE Kajo good enough that a real person sends the next person a link voluntarily.
+
+
+## List choice for today — “Mitä tänään” (owner idea, 2026-09-10)
+
+Offer an explicit action on a List: recommend the best Item from that List for
+today, followed by a browsable ordered card sequence from the same List. This is
+especially useful for an existing Shared Profile deciding what to watch/read
+from jointly saved options. Personal Lists use the active PersonalProfile;
+Shared choices use the existing SharedProfile model, never a simple member average.
+
+- Keep the List name and a clear “saved List” presentation visible, so this cannot
+  be confused with ordinary Discovery or treated as a newly discovered Item.
+- Rank only authorized current List members, using the active Profile, current
+  context and existing canonical Prediction/Item architecture. Freeze the delivered
+  order/origin and distinguish this surface in evidence and evaluation.
+- Browsing or opening this mode must not itself remove List entries, mark Items
+  consumed or fabricate consensus. Preserve explicit decision/consumption actions.
+- Empty Lists, unavailable Items, membership changes and no suitable choice need
+  honest handling; do not claim objective certainty that one Item is “best”.
+- Schedule after current algorithm/evidence and List correctness gates, as part of
+  a separately scoped List/Shared UX package. The owner supplied this as an idea,
+  not as a new release blocker or authorization to bypass the roadmap.

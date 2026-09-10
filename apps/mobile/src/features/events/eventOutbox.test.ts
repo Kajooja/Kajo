@@ -148,10 +148,42 @@ describe('exposure before action delivery', () => {
     const send = vi.fn(async () => ({ status: 'success' as const, receipt: 'ok' }));
     const q = actionQueue(store, evidence.coordinator, send); q.enqueue({ command: action() });
     await q.waitForIdle(); expect(send).not.toHaveBeenCalled(); expect(q.pending()).toHaveLength(1);
+    expect(q.snapshot()).toMatchObject({ pendingCount: 1, message: null,
+      canDiscardAction: false, canDiscardUndo: false });
     resolve({ error: null }); await evidence.coordinator.waitForIdle();
     q.retry(); await q.waitForIdle();
     expect(send).toHaveBeenCalledWith(action()); expect(q.pending()).toEqual([]);
   });
+  it('retries normal exposure waiting automatically, without asking the user to retry', async () => {
+    vi.useFakeTimers();
+    const store = storage(), connection = api();
+    let release!: (result: { error: null }) => void;
+    connection.appendEvent.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    const evidence = setup(store, connection);
+    evidence.coordinator.enqueue(event());
+    await vi.advanceTimersByTimeAsync(0);
+    const send = vi.fn(async () => ({ status: 'success' as const, receipt: 'ok' }));
+    const q = actionQueue(store, evidence.coordinator, send);
+    q.enqueue({ command: action() }); await q.waitForIdle();
+    expect(q.snapshot().message).toBeNull();
+    release({ error: null }); await evidence.coordinator.waitForIdle();
+    await vi.advanceTimersByTimeAsync(1000); await q.waitForIdle();
+    expect(send).toHaveBeenCalledOnce();
+    expect(q.pending()).toEqual([]);
+  });
+
+  it('still exposes a real action persistence error after exposure is acknowledged', async () => {
+    const store = storage(), evidence = setup(store);
+    evidence.coordinator.enqueue(event()); await evidence.coordinator.waitForIdle();
+    const q = createItemActionOutbox({ namespace: 'real-failure', storage: store,
+      scope: { actorUserId: id(1), profileId: id(2) }, onChange() {}, onCommitted() {},
+      send: createExposureOrderedSender(origin => evidence.coordinator.canSendAction(origin),
+        async () => ({ status: 'error' as const, retryable: true, message: 'Network unavailable' }), () => true) });
+    actionQueues.push(q); q.start(); q.enqueue({ command: action() }); await q.waitForIdle();
+    expect(q.snapshot().message).toBe('Network unavailable');
+    expect(q.pending()).toHaveLength(1);
+  });
+
   it('restores both queues and orders an old-session action behind its lost-reply impression', async () => {
     const store = storage(), firstApi = api();
     firstApi.appendEvent.mockResolvedValue({ error: { message: 'lost reply' } });
