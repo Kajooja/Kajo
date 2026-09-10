@@ -343,6 +343,10 @@ reversed command, so existing Memory/outcome readers cannot retain half of a
 List+Like action. Item and List commands share ordered undo predecessors. Legacy
 membership/projection changes invalidate that head, including delete/reinsert ABA.
 The Item RPC cannot undo a List receipt because it cannot restore membership.
+The client offers undo only after its current-session durable queue is ready and
+empty. It does not offer List-removal undo: a changed removal invalidates prior
+same-Item client undo entries; a List deletion clears session history because the
+receipt omits affected Item IDs. Server reversal contracts remain unchanged.
 
 The first Shared actor proposes a custom List; another member accepts the existing
 proposal without supplying a replacement List. Only the last required endorsement

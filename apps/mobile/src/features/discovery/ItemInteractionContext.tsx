@@ -28,8 +28,9 @@ import {
 import type { EventId, ItemId, ProfileId, UserId } from '../../domain/contracts';
 import {
   commitItemInteractionAction,
+  applyCollectionUndoReceipt,
+  canUndoItemInteraction,
   EMPTY_ITEM_INTERACTION_STORE,
-  ITEM_INTERACTION_UNDO_LIMIT,
   getItemInteraction,
   getLatestUndoEntry,
   getLatestUndoItemId,
@@ -119,7 +120,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const outbox = useRef<{ key: string; sessionId: string; coordinator: ItemActionOutbox<PendingProfileAction> } | null>(null);
   const collectionWaiters = useRef(new Map<string, { key: string; resolve: (result: CollectionSubmissionResult) => void }>());
   const [collectionRevision, setCollectionRevision] = useState(0);
-  const [outboxState, setOutboxState] = useState<(ItemActionOutboxSnapshot & { key: string }) | null>(null);
+  const [outboxState, setOutboxState] = useState<(ItemActionOutboxSnapshot & { key: string; sessionId: string }) | null>(null);
   const activeScopeKey = useRef<string | null>(null);
   const activeSessionId = useRef<string | null>(null);
   const storeRef = useRef<ItemInteractionStore>(EMPTY_ITEM_INTERACTION_STORE);
@@ -168,23 +169,19 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       isPendingAction: isPendingProfileAction,
       isCurrent: () => active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId && outbox.current?.coordinator === coordinator,
       onChange: (snapshot) => {
-        if (active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId) setOutboxState({ key, ...snapshot });
+        if (active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId) setOutboxState({ key, sessionId: activeSession.sessionId, ...snapshot });
         if (snapshot.message) settleWaiting(snapshot.message);
       },
       onCommitted: (receipt) => {
         if (!active || activeScopeKey.current !== key || activeSessionId.current !== activeSession.sessionId) return;
         const currentStore = storeRef.current;
-        const nextStore: ItemInteractionStore = { ...currentStore, interactions: projectPendingProfileActions(
+        let nextStore: ItemInteractionStore = { ...currentStore, interactions: projectPendingProfileActions(
           receipt.itemId && receipt.interaction
             ? { ...currentStore.interactions, [receipt.itemId]: receipt.interaction } : currentStore.interactions,
           coordinator.pending(),
         ) };
         if ('kind' in receipt) {
-          if (receipt.undoable && receipt.itemId && receipt.beforeInteraction) {
-            nextStore.undoStack = [...nextStore.undoStack, { itemId: receipt.itemId,
-              previousInteraction: receipt.beforeInteraction, eventId: receipt.actionId,
-              collectionActionId: receipt.actionId }].slice(-ITEM_INTERACTION_UNDO_LIMIT);
-          }
+          nextStore = applyCollectionUndoReceipt(nextStore, receipt);
           setCollectionRevision(revision => revision + 1);
           collectionWaiters.current.get(receipt.actionId)?.resolve({ status: 'success', receipt });
           collectionWaiters.current.delete(receipt.actionId);
@@ -388,6 +385,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     const currentStore = storeRef.current;
     const undoEntry = getLatestUndoEntry(currentStore);
 
+    if (configuredScope && (outbox.current?.key !== currentScopeKey
+      || !outbox.current || outbox.current.coordinator.pending().length > 0)) return null;
+
     if (!undoEntry) {
       return null;
     }
@@ -455,7 +455,10 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     configuredScope && hydrationFailure?.profileId === configuredScope.profileId
       ? hydrationFailure.message
       : null;
-  const atomicState = outboxState?.key === currentScopeKey ? outboxState : null;
+  const atomicState = outboxState?.key === currentScopeKey && outboxState?.sessionId === eventTracking.sessionId ? outboxState : null;
+  const canUndo = canUndoItemInteraction(store,
+    isLocalMode || (persistenceStatus === 'ready' && atomicState?.ready === true),
+    atomicState?.pendingCount ?? 0);
   const persistenceError = atomicState?.message ?? (atomicState?.pendingCount
     ? `${atomicState.pendingCount} valintaa odottaa tallennusta. Valinnat säilyvät tällä laitteella.` : null);
 
@@ -464,7 +467,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       interactions: store.interactions,
       setRating,
       setNotInterested,
-      canUndo: store.undoStack.length > 0,
+      canUndo,
       undoTargetItemId,
       undo,
       persistenceStatus,
@@ -498,7 +501,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       setNotInterested,
       setRating,
       store.interactions,
-      store.undoStack.length,
+      canUndo,
       undo,
       undoTargetItemId,
     ],

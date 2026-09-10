@@ -607,6 +607,7 @@ function ItemDetailContent({
     const result = undo();
 
     if (!result) {
+      setFeedback('Kumoamista ei voitu aloittaa. Odota tallennusta ja yritä uudelleen.');
       return;
     }
 

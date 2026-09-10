@@ -1067,3 +1067,29 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: full `npm run check` passed (241 mobile, 14 catalog, 61 database
   tests; both platform exports). Separate captured-prior upgrade/recovery rehearsal
   passed. Latest native CI and new device acceptance remain separate gates.
+
+
+### Undo availability and Shared removal review — 2026-09-10 / #228 / #229
+
+- Confirmed UI bug: canUndo used only stack length while the dispatch boundary
+  could refuse pending collection work. Availability now uses current-session
+  outbox readiness and zero pending commands; the handler also checks the current
+  queue synchronously. A refused start shows feedback. The original phone symptom
+  has not yet been reproduced/accepted on the replacement build.
+- No List-removal undo affordance: a changed removal discards same-Item undo entries
+  now behind its server head, while retaining other Items. List deletion clears
+  session history because the receipt does not enumerate affected Item IDs.
+  No-op receipts preserve history, and successful undo receipts do not repush it.
+  Added five deterministic history/readiness regressions; server RPC semantics
+  and immutable receipts are unchanged.
+- Reviewed Shared withdrawal: existing REVERSE_ENDORSEMENT only handles a pending
+  proposal. Completed consensus raises an explicit refusal. The Shared Saved view
+  now explains that completed removal is unavailable and omits the invalid direct
+  remove action. Custom Shared Lists retain direct removal; consent Saved survives.
+  This is honest UI, not implementation/acceptance of completed-consensus removal.
+- Next: required CI and a manually dispatched replacement APK from this branch;
+  focused owner device acceptance, without build polling. Keep PR draft. Full
+  completed-consensus removal needs a scoped lifecycle decision; keep it visible.
+- Validation: `npm run check` passed all 321 tests (246 mobile, 14 catalog,
+  61 database), TypeScript/lint and both exports. No emulator/phone test was
+  available in this workspace; native CI and owner device acceptance are pending.

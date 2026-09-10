@@ -49,6 +49,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const summary = itemLists.lists.find((list) => list.id === listId) ?? null;
+  const sharedSaved = profiles.activeProfile?.type === 'SHARED' && summary?.kind === 'SYSTEM_SAVED';
   const [entrySnapshot, setEntrySnapshot] = useState<{
     key: string;
     entries: readonly ItemListEntry[];
@@ -93,7 +94,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   );
 
   async function removeEntry(entry: ItemListEntry) {
-    if (saving) return;
+    if (saving || !summary || sharedSaved) return;
     setSaving(true);
     setActionError(null);
     const result = await itemLists.setEntry(listId, entry.item.id, false);
@@ -222,6 +223,9 @@ function ItemListContent({ listId }: ItemListScreenProps) {
           </View>
         ) : null}
         {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
+        {sharedSaved ? (
+          <Text style={styles.empty}>Tallennetut ovat ryhmän yhdessä hyväksymiä. Yhteisen tallennuksen poistaminen ei ole vielä käytettävissä.</Text>
+        ) : null}
 
         {!loading && !loadError && presentedEntries.length === 0 ? (
           <Text style={styles.empty}>Tällä listalla ei ole vielä kohteita.</Text>
@@ -237,6 +241,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
               styles={styles}
               onOpen={() => router.push({ pathname: '/discovery/[itemId]', params: { itemId: entry.item.id } })}
               onRemove={() => void removeEntry(entry)}
+              canRemove={Boolean(summary) && !sharedSaved && !saving}
             />
           ))}
         </View>
@@ -253,7 +258,7 @@ function ControlButton({ label, active, styles, onPress }: { label: string; acti
   );
 }
 
-function EntryCard({ entry, isShared, grid, styles, onOpen, onRemove }: { entry: ItemListEntry; isShared: boolean; grid: boolean; styles: ReturnType<typeof createStyles>; onOpen: () => void; onRemove: () => void }) {
+function EntryCard({ entry, isShared, grid, styles, onOpen, onRemove, canRemove }: { entry: ItemListEntry; isShared: boolean; grid: boolean; styles: ReturnType<typeof createStyles>; onOpen: () => void; onRemove: () => void; canRemove: boolean }) {
   return (
     <View style={[styles.entry, grid && styles.gridEntry]}>
       <Pressable accessibilityRole="button" onPress={onOpen} style={styles.entryBody}>
@@ -267,9 +272,9 @@ function EntryCard({ entry, isShared, grid, styles, onOpen, onRemove }: { entry:
           <Text style={styles.provenance}>{entry.addedByNickname ? `${entry.addedByNickname} lisäsi` : 'Aiempi jäsen lisäsi'}</Text>
         ) : null}
       </Pressable>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Poista ${entry.item.title} listalta`} onPress={onRemove} style={styles.removeButton}>
+      {canRemove ? <Pressable accessibilityRole="button" accessibilityLabel={`Poista ${entry.item.title} listalta`} onPress={onRemove} style={styles.removeButton}>
         <Text style={styles.removeText}>Poista</Text>
-      </Pressable>
+      </Pressable> : null}
     </View>
   );
 }

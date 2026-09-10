@@ -39,7 +39,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 22. **Visual preference is not risk preference.** Dark aesthetic choice does not imply risky recommendations.
 23. **Grid first, swipe optional.** Grid is default discovery. Swipe is calibration/browsing tooling, not the product itself.
 24. **Committed choices behave consistently.** Rating/not-interest/List actions give restrained confirmation and advance appropriately. List addition remains the positive/like action; no duplicate Like control.
-25. **Recent choices are reversible.** Undo restores prior state and exact Item/card when deterministic reversal exists.
+25. **Recent choices are reversible.** Undo restores prior state and exact Item/card when deterministic reversal exists. It waits for pending saves; List removals are not offered for undo. Shared Saved must explain unavailable completed-consensus removal instead of exposing a guaranteed failing action.
 26. **Copy is presentation, not domain semantics.** User-facing labels may change while canonical Event/state meanings remain stable.
 
 ## Shared Kajo principles

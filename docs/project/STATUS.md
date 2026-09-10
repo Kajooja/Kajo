@@ -207,11 +207,30 @@ required. Both failed and successful probes rolled back. Recovery SQL is capture
 in `scripts/database/list-membership-rollback.sql` for a new reviewed forward
 migration if needed, never a history deletion.
 
-Next: inspect the owner's ineffective undo and Shared withdrawal/removal UX,
-then prepare the replacement APK from `feat/228-delivered-origin`. Device behavior
-is NOT accepted. Keep #228/#229 and DATA-003/004 open. No undo of List removal is
-required by the owner; retained undo controls must work. “Mitä tänään” remains a
-separate FUTURE_PLAN idea.
+The next device-feedback patch corrects a confirmed client mismatch: Undo was
+advertised from stack length even while the durable queue rejected dispatch.
+Undo availability now requires current-session readiness and zero pending actions;
+its handler rechecks the live queue and reports a refused start. Changed List
+removals are not offered for undo and invalidate earlier same-Item history; List
+deletion clears session undo history because its receipt omits affected Item IDs.
+Other Items remain reversible after a single entry removal. List additions and
+mixed Item/List undo retain their order. This is a concrete defect fix, not proof
+that every owner-reported ineffective undo had this cause.
+
+Shared review confirmed that pending endorsement withdrawal exists but completed
+consensus cannot be reversed through that API. Shared SYSTEM_SAVED no longer
+advertises direct removal; the screen states the missing capability honestly.
+Custom Shared List removal remains available and does not erase durable consensus.
+A completed-consensus removal lifecycle remains unimplemented and needs a scoped
+product/domain decision; no consent boundary was weakened or server SQL changed.
+
+Next: after this head's required CI, manually run the standalone APK workflow on
+`feat/228-delivered-origin` and perform focused owner tests: add → wait → undo,
+reject/rate → wait → undo, rapid taps while saving, multiple Lists/final removal,
+restart/reconnect, and the explicit Shared Saved limitation. Do not poll APK.
+Device behavior is NOT accepted. Keep #228/#229 and DATA-003/004 open; continue
+14.1 attribution/reconnect acceptance after this checkpoint. “Mitä tänään” remains
+a separate FUTURE_PLAN idea.
 
 Continue **14.1** after this delivery:
 
