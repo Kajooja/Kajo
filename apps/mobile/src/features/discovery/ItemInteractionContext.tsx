@@ -107,6 +107,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
+  const { subscribeToAcknowledgements } = eventTracking;
   const [localStore, setLocalStore] = useState<ItemInteractionStore>(
     EMPTY_ITEM_INTERACTION_STORE,
   );
@@ -203,6 +204,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       },
     });
     outbox.current = { key, sessionId: activeSession.sessionId, coordinator };
+    const unsubscribeExposure = subscribeToAcknowledgements(() => coordinator.resumeAfterExposure());
 
     void loadPersistedItemInteractions(persistenceApi, profileId).then(
       (result) => {
@@ -245,9 +247,10 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       settleWaiting('Profiili tai istunto vaihtui. Odottava valinta säilyy alkuperäisen profiilin jonossa.');
       subscription.remove();
       unsubscribeBootstrap();
+      unsubscribeExposure();
       if (outbox.current?.coordinator === coordinator) outbox.current = null;
     };
-  }, [actorUserId, atomicSender, eventTracking.canSendAction, eventTracking.session, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
+  }, [actorUserId, atomicSender, eventTracking.canSendAction, eventTracking.session, subscribeToAcknowledgements, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
 
   const isLocalMode =
     connection.status === 'unconfigured' || activeProfile.status === 'disabled';

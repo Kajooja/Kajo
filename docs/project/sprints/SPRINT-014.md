@@ -1506,3 +1506,41 @@ forward while the owner completes that APK test. Then verify required native CI
 and prepare a separately reviewed exact-SQL rollout. Keep physical recovery and
 remaining Phase 14.1 gates open before Phase 14.2; no SharedRatingRound, Stats or
 multi-Item feature starts ahead of those dependencies.
+
+### One-confirmation Personal Lists and queue latency — 2026-09-10
+
+The fourth owner APK report says the rest is good but adding to two Lists feels
+frozen and Personal Add must save the entire selection and open the next card
+without Valmis. Requested prior source was `50bd1a8`; actual installed SHA/run and
+timed device measurements were not supplied. Preserve that distinction and the
+existing profiles/data; do not repeat account resets or dispatch/poll APK CI.
+
+`commitPersonalListDestinations` now freezes the user's choice, awaits the existing
+durable per-List acknowledgements and invokes completion once. The sheet removes
+Done, displays confirmed progress/activity and suppresses intermediate destination
+reloads. A partial failure keeps acknowledged saves and unresolved choices; only
+newly acknowledged destinations receive optional messages, and scope changes stop
+old callbacks/later commands. Shared continues through its existing exact-set
+proposal/consent path.
+
+The Event coordinator reuses a session only after its actual server acknowledgement,
+with a fresh confirmation after restart/new scope. Six impressions need seven
+session/Event writes instead of twelve. A scoped acknowledgement subscription wakes
+only actions waiting for exposure, including acknowledgement while the waiting
+result is still in flight. The guard rereads durable dependencies; network failures
+keep backoff and rejected/stopped actions do not resume. No Event/command identity,
+server API, migration or hosted data changed in this step.
+
+Validation: 44 focused tests pass; `npm run check` exits 0 with **347 tests**
+(270 mobile, 14 catalog, 63 database), clean lint, TypeScript and both platform exports. No
+Docker/phone/emulator or measured physical timing is claimed. DEVICE_TEST records
+the short one-confirmation/responsiveness/recovery/Shared regression for the next
+owner-started APK. Native CI for this client source remains a publication gate.
+
+Separately verified all five required CI jobs for algorithm commit
+`316bd0858972e2e7bc4abc2d3e2360c89c83a97f` at
+[run 34521599718](https://github.com/Kajooja/Kajo/actions/runs/34521599718), including
+the native CLI late-outcome serving/evaluation and populated-forward probes.
+That forward's tested SQL/hash is unchanged and still undeployed. Continue its
+own reviewed hosted rollout plus remaining Phase 14.1 device recovery gates
+before Phase 14.2. No merge, automatic APK action or distant feature work occurred.

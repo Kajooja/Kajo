@@ -42,6 +42,22 @@ describe('durable event delivery', () => {
     expect(order).toEqual(['session', 'event']);
     expect([...store.rows.values()]).toEqual(['[]']);
   });
+  it('acknowledges one session for a slate of six impressions and retries without redundant session writes', async () => {
+    const store = storage(), connection = api(), current = setup(store, connection);
+    for (let n = 10; n < 16; n++) current.coordinator.enqueue(event(session(), n));
+    await current.coordinator.waitForIdle();
+    expect(connection.appendSession).toHaveBeenCalledOnce();
+    expect(connection.appendEvent).toHaveBeenCalledTimes(6);
+    connection.appendEvent.mockResolvedValueOnce({ error: { message: 'Lost reply' } });
+    current.coordinator.enqueue(event(session(), 16)); await current.coordinator.waitForIdle();
+    current.coordinator.retry(); await current.coordinator.waitForIdle();
+    expect(connection.appendSession).toHaveBeenCalledOnce();
+    expect(connection.appendEvent.mock.calls[6]).toEqual(connection.appendEvent.mock.calls[7]);
+    current.coordinator.dispose();
+    const restarted = setup(store, api());
+    restarted.coordinator.enqueue(event(session(), 17)); await restarted.coordinator.waitForIdle();
+    expect(restarted.connection.appendSession).toHaveBeenCalledOnce();
+  });
   it('restarts under a new session but retries the exact old Event/session before new evidence', async () => {
     const store = storage(), firstApi = api();
     firstApi.appendEvent.mockResolvedValue({ error: { message: 'lost acknowledgement' } });
@@ -135,6 +151,7 @@ function actionQueue(store: ItemActionStorage, evidence: EventWriteCoordinator, 
   const q = createItemActionOutbox<PendingItemAction, string>({ namespace: 'env', storage: store,
     scope: { actorUserId: id(1), profileId: id(2) }, onChange() {}, onCommitted() {},
     send: createExposureOrderedSender(origin => evidence.canSendAction(origin), send, () => true) });
+  evidence.subscribeToAcknowledgements(() => q.resumeAfterExposure());
   actionQueues.push(q); q.start(); return q;
 }
 
@@ -153,7 +170,7 @@ describe('exposure before action delivery', () => {
     q.retry(); await q.waitForIdle();
     expect(send).toHaveBeenCalledWith(action()); expect(q.pending()).toEqual([]);
   });
-  it('retries normal exposure waiting automatically, without asking the user to retry', async () => {
+  it('sends immediately on exposure acknowledgement without waiting for the fallback timer', async () => {
     vi.useFakeTimers();
     const store = storage(), connection = api();
     let release!: (result: { error: null }) => void;
@@ -166,9 +183,11 @@ describe('exposure before action delivery', () => {
     q.enqueue({ command: action() }); await q.waitForIdle();
     expect(q.snapshot().message).toBeNull();
     release({ error: null }); await evidence.coordinator.waitForIdle();
-    await vi.advanceTimersByTimeAsync(1000); await q.waitForIdle();
+    await q.waitForIdle();
     expect(send).toHaveBeenCalledOnce();
     expect(q.pending()).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(send).toHaveBeenCalledOnce();
   });
 
   it('still exposes a real action persistence error after exposure is acknowledged', async () => {

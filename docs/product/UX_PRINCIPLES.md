@@ -50,7 +50,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 30. **Pending and consensus are visually distinct.** Pending proposer/List provenance and explicit approval remain readable without relying on color alone. Only unanimity produces durable consensus and Shared Saved/list commit.
 31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item. Collections reuse Discovery covers, show given ratings, and provide Ruudukko / Kortit browsing while keeping their own collection context.
 32. **Shared provenance is truthful.** List membership retains original proposer/added time where defined; UI does not invent actor provenance.
-33. **List choice stays lightweight.** Personal users can add an Item to multiple Lists in one open picker. Each confirmed addition saves immediately; Valmis advances once. Closing keeps completed saves. Recent choices stay bounded with expansion/new-list creation on demand. Shared proposals retain their existing single-destination consent flow.
+33. **List choice stays lightweight.** Personal users check all destinations and press Lisää valituille listoille once; all acknowledged additions advance to the next card without a separate Valmis action. Show save progress, retain confirmed additions and unresolved choices on partial failure. Recent choices stay bounded with expansion/new-list creation on demand. Shared members approve the same explicit destination set before unanimous commit.
 34. **Messaging stays Profile-scoped and quiet.** Inbox combines relevant invitation/message activity. Message failure must not roll back successful List action.
 
 ## Motion and accessibility
@@ -146,8 +146,12 @@ Use independent checkboxes and a selected count for one or more destinations in
 both Personal and Shared. Creating another List preserves earlier checks. An
 intentional empty selection stays empty. Explicit confirmation commits the set;
 Shared approvers must be able to read every target name before confirming.
-Personal Done follows confirmed additions; a partial failure retains the unresolved
-choices. A message failure is reported and does not undo a successful List action.
+Personal Add is the final confirmation: after every selected destination is
+acknowledged, close the picker and advance once without a separate Done button.
+Do not make the interface appear frozen: show an activity indicator and confirmed
+destination count while saving. A partial failure retains the unresolved choices
+and completed saves. A message failure is reported and does not undo a successful
+List action.
 
 Refreshing discovery may vary equal-fit candidates and apply the existing recent
 exposure cooldown. The owner explicitly accepts tie variation. Preserve server

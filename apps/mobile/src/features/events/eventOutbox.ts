@@ -49,6 +49,8 @@ export function createEventWriteCoordinator(
 ): EventWriteCoordinator {
   let active = false;
   let sessionPersisted = false;
+  const confirmedSessions = new Set<string>();
+  const acknowledgementListeners = new Set<() => void>();
   const isCurrent = () => active && options.isCurrent?.() !== false;
   const queue = createItemActionOutbox<PendingEvent, string>({
     // Separate storage identity, same bounded/retry-safe queue implementation.
@@ -58,8 +60,14 @@ export function createEventWriteCoordinator(
     isPendingAction: isPendingEvent,
     isCurrent,
     async send(command) {
-      const sessionResult = await persistEventSession(api, command.session);
-      if (sessionResult.status === 'error') return { ...sessionResult, retryable: true };
+      if (!confirmedSessions.has(command.session.sessionId)) {
+        const sessionResult = await persistEventSession(api, command.session);
+        if (sessionResult.status === 'error') return { ...sessionResult, retryable: true };
+        if (!isCurrent()) return { status: 'error', retryable: true, message: 'Tapahtuma odottaa alkuperäistä profiilia.' };
+        // Only this coordinator's acknowledged immutable sessions are cached.
+        // A restart or new scope confirms its original sessions again.
+        confirmedSessions.add(command.session.sessionId);
+      }
       if (!isCurrent()) return { status: 'error', retryable: true, message: 'Tapahtuma odottaa alkuperäistä profiilia.' };
       if (command.session.sessionId === session.sessionId) sessionPersisted = true;
       const result = await persistEvent(api, command.event);
@@ -67,13 +75,19 @@ export function createEventWriteCoordinator(
         ? { status: 'success', receipt: command.actionId }
         : { ...result, retryable: true };
     },
-    onCommitted() {},
+    onCommitted() {
+      for (const listener of acknowledgementListeners) listener();
+    },
     onChange(snapshot) {
       onChange({ sessionPersisted, pendingEventCount: snapshot.pendingCount,
         message: snapshot.message ? 'Tapahtumien tallennus odottaa. Tarkista yhteys ja yritä uudelleen.' : null });
     },
   });
   return {
+    subscribeToAcknowledgements(listener) {
+      acknowledgementListeners.add(listener);
+      return () => { acknowledgementListeners.delete(listener); };
+    },
     canSendAction(origin) {
       if (!isCurrent() || origin.actorUserId !== session.actorUserId || origin.profileId !== session.profileId) return false;
       if (!origin.predictionId || !origin.itemId) return true;
@@ -95,7 +109,7 @@ export function createEventWriteCoordinator(
     },
     retry: () => queue.retry(),
     waitForIdle: () => queue.waitForIdle(),
-    dispose() { active = false; queue.stop(); },
+    dispose() { active = false; queue.stop(); confirmedSessions.clear(); acknowledgementListeners.clear(); },
   };
 }
 

@@ -468,7 +468,19 @@ checks the current action scope and `EventTracking.canSendAction`. A correlated
 Item command waits while the durable Event queue contains an impression for the
 same actor/Profile, original session, prediction and Item with timestamp no later
 than the action. A pending/lost acknowledgement is not delivery: the command stays
-unchanged in its own queue and retries through the existing bounded backoff.
+unchanged in its own queue. An acknowledged Event wakes only exposure-waiting
+actions immediately; the guard then rereads exact persisted dependencies. The
+notification also survives the race where acknowledgement precedes classification
+of the waiting result. A one-second fallback remains; ordinary network failures
+retain exponential backoff and rejected actions remain blocked. Scope disposal
+removes the subscription and cannot wake old-profile work.
+
+The Event coordinator confirms each immutable session once per active coordinator,
+after an actual successful session acknowledgement. Subsequent Events and Event
+retries reuse that confirmation; restart/new scope confirms original sessions
+again. A six-impression slate therefore needs one session write plus six Event
+writes, instead of six repeated session writes. No local acceptance is mistaken
+for a server acknowledgement, and original Event IDs/envelopes remain unchanged.
 
 The check reloads persisted evidence, including older sessions restored after
 restart. An unreadable/corrupt exposure queue blocks correlated dispatch. Unrelated
@@ -615,12 +627,16 @@ not a ranked recommendation delivery. Existing atomic action/attribution rules
 remain in force. History-clear uses the candidate atomic contract below; mobile wiring and hosted rollout are implemented; device acceptance remains pending.
 
 
-The Personal multi-destination picker dispatches one existing durable SET_LIST_ENTRY
-command per tapped List. Each acknowledged addition is independent; a later failure
-cannot reverse it. Valmis only advances/closes the UI and emits no duplicate action
-or message. Optional per-addition messages are dispatched on acknowledgement; Done
-never resends them. Closing invalidates UI callbacks but does not cancel queued
-commands. Shared single-proposal consent semantics are unchanged.
+The Personal multi-destination picker freezes the checked set on one explicit Add
+and dispatches one existing durable SET_LIST_ENTRY command per List in order.
+After all acknowledgements, a single completion closes the picker and advances
+the card; there is no separate Valmis command. While saving, receipt progress
+updates locally and intermediate destination reads are suppressed. Each confirmed
+addition remains independent: partial failure keeps completed saves and unresolved
+choices. The completion sends optional messages only for the newly acknowledged
+destinations; retry does not repeat earlier saves/messages. Closing invalidates UI
+callbacks but does not cancel queued commands. Shared still submits one proposal
+for its exact set and waits for its existing unanimous consent contract.
 
 
 `CLEAR_HISTORY` extends `commit_collection_action_v1`: clear native rating/consumed

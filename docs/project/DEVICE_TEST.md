@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **multi-List correction and hosted rollout verified; ready for its focused owner APK test**.
+Status: **owner reports multi-List flow otherwise good; Personal confirmation/latency correction prepared for the next APK**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -64,8 +64,8 @@ must not return. Test-only choices should be made only after the reset checkpoin
    list contents or Shared groups remain; Personal List names may remain. Cards
    load, and opening/swiping preserves the delivered collection order. Switch all
    three risk modes; judge stability, not a requirement that every order differ.
-2. **Two Lists.** Select a Personal List and press Add; repeat for a second List
-   in the same picker, then press Done. The saved Item disappears from ordinary
+2. **Two Lists.** Check two Personal Lists and press Lisää valituille listoille
+   once. After both saves, the next card opens without Done. The saved Item disappears from ordinary
    Discovery. Remove it from one List: the remaining List still suppresses it.
    Remove its final membership: it can return unless another reaction suppresses it.
 3. **History.** Rate an Item (also test 0/10). Open Luetut/Katsotut from both
@@ -249,14 +249,15 @@ the actual two-List approval/rollback/replay/authorization checks pass, and exis
 application/Auth data is unchanged. CI #442 passed all five implementation gates.
 The filename alignment retains identical app/SQL bytes. STATUS owns rollout details.
 
-The owner can now start the CI workflow. Install the latest branch artifact on both test
+For the next confirmation/latency correction, the owner starts the CI workflow. Install the latest branch artifact on both test
 accounts/devices; earlier versions cannot approve a multi-List proposal. Preserve
 current profiles and test data; no reset or local Docker is needed for a standalone
 APK using the hosted backend.
 
 1. Personal: check two Lists before pressing Add. Both retain the Item. Create a
    third List while checks exist: earlier checks stay selected and creation alone
-   keeps the card open. Add, then Done. Optional message references the chosen Lists.
+   keeps the card open. Press Add once: show progress, retain both memberships and
+   open the next card without Done. Optional message references the chosen Lists.
 2. Shared: A chooses two Lists, optionally writes a message and proposes once.
    B sees both names, then approves; both memberships appear together with A’s
    provenance. A’s pending proposal alone must not put the Item in either List.
@@ -267,3 +268,23 @@ APK using the hosted backend.
 4. Briefly recheck picker/dock/keyboard placement, new-List→message→confirm and a
    saved 8/0 history card’s initial rating position. Record exact build/device and
    pass/fail; automated checks do not replace this device acceptance.
+
+### Fourth owner report and Personal follow-up — 2026-09-10
+
+The owner reports that adding to two Lists feels briefly frozen and that Personal
+Add should both commit the choice and open the next card without another Valmis.
+Otherwise the tested flow is reported good. The requested earlier source was
+`50bd1a8`; actual installed SHA/run and timed measurements were not supplied.
+Do not infer comprehensive offline/process-death or exact-build acceptance.
+
+The client correction removes Done, completes once after all selected receipts,
+shows confirmed progress and suspends intermediate picker refreshes. It reuses
+acknowledged Event sessions and wakes the action queue immediately when exposure
+is acknowledged. No new backend migration is needed for this client flow; the
+separate late-outcome learning forward remains undeployed.
+
+Next focused checks: (1) select two Personal Lists → Add once → next card, verify
+both memberships; (2) repeat immediately after opening a card and with an optional
+message, check visible progress and responsiveness; (3) briefly disconnect during
+saving, verify confirmed entries survive and unresolved work is not duplicated;
+(4) confirm Shared still shows/approves the exact target set. Preserve current data.

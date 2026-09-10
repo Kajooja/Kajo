@@ -27,22 +27,14 @@ import {
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
 import { loadRecentListIds, rememberRecentList } from './listRecentUse';
-import { includeCreatedDestination, resolveListDestinations, toggleListDestination } from './listDestinationSelection';
+import { commitPersonalListDestinations, includeCreatedDestination, resolveListDestinations, toggleListDestination,
+  type ListDestinationCommit, type ListDestinationCommitResult } from './listDestinationSelection';
 import {
   orderListDestinationsByRecentUse,
   selectVisibleListDestinations,
 } from './listPresentation';
 
-export interface ListDestinationCommit {
-  lists: readonly ItemList[];
-  added: boolean;
-  message: string | null;
-  stayOpen?: boolean;
-}
-
-export type ListDestinationCommitResult =
-  | { status: 'success'; notice?: string }
-  | { status: 'error'; message: string };
+export type { ListDestinationCommit, ListDestinationCommitResult } from './listDestinationSelection';
 
 interface ListDestinationSheetProps {
   visible: boolean;
@@ -79,7 +71,7 @@ export function ListDestinationSheet({
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loadedRequest, setLoadedRequest] = useState<object | null>(null);
-  const [lastSaved, setLastSaved] = useState<{ request: object; commit: ListDestinationCommit } | null>(null);
+  const [saveProgress, setSaveProgress] = useState<{ request: object; completed: number; total: number } | null>(null);
   const activeSave = useRef<object | null>(null);
   const initializedRequest = useRef<object | null>(null);
   const { sessionId } = useEventTracking();
@@ -115,7 +107,7 @@ export function ListDestinationSheet({
   }, [onClose, requestToken, visible]);
 
   useEffect(() => {
-    if (!visible || !itemId || !requestKey) return;
+    if (!visible || !itemId || !requestKey || status === 'saving') return;
     let active = true;
 
     void loadForItem(itemId).then((result) => {
@@ -150,49 +142,11 @@ export function ListDestinationSheet({
     });
 
     return () => { active = false; };
-  }, [isSharedProfile, itemId, loadForItem, requestKey, requestToken, revision, visible]);
-
-  async function persistDestinations(lists: readonly ItemList[], message: string | null) {
-    if (!item || !visible || currentRequest.current !== requestToken) return false;
-    const list = lists[0];
-    if (!list) return false;
-
-    if (!isSharedProfile) {
-      const result = await setEntry(list.id, item.id, true, { positive: true, ...(origin ? { origin } : {}) });
-      if (currentRequest.current !== requestToken) return false;
-      if (result.status === 'error') {
-        setError(result.message);
-        return false;
-      }
-    }
-
-    if (!isSharedProfile) {
-      rememberRecentList(list.profileId, list.id);
-    }
-
-    const commit: ListDestinationCommit = {
-      lists,
-      added: !list.containsItem,
-      message,
-      stayOpen: !isSharedProfile,
-    };
-    if (!isSharedProfile) {
-      setLastSaved({ request: requestToken, commit });
-      setAvailableLists(current => current.map(candidate => candidate.id === list.id
-        ? { ...candidate, containsItem: true } : candidate));
-    }
-    const result = await onCommitted(commit);
-    if (currentRequest.current !== requestToken) return false;
-    if (result.status === 'error') {
-      setError(result.message);
-      return false;
-    }
-    if (result.notice) setError(result.notice);
-    return true;
-  }
+  }, [isSharedProfile, itemId, loadForItem, requestKey, requestToken, revision, status, visible]);
 
   async function chooseLists() {
-    if (loading || savingBlocked || activeSave.current === requestToken || !hasSelection) return;
+    if (!item || !visible || currentRequest.current !== requestToken || loading
+      || savingBlocked || activeSave.current === requestToken || !hasSelection) return;
     const messageValidation = messageDraft.trim().length > 0 ? validateProfileMessage(messageDraft) : null;
     if (messageValidation?.status === 'invalid') { setError(messageValidation.message); return; }
     const message = messageValidation?.status === 'valid' ? messageValidation.body : null;
@@ -201,24 +155,35 @@ export function ListDestinationSheet({
     setSelectedListIds(destinations.map(list => list.id));
     activeSave.current = requestToken;
     setStatus('saving');
+    setSaveProgress(isSharedProfile ? null : { request: requestToken, completed: 0, total: destinations.length });
     setError(null);
     Keyboard.dismiss();
     try {
-      if (isSharedProfile) {
-        await persistDestinations(destinations, message);
-      } else {
-        for (const list of destinations) {
-          if (currentRequest.current !== requestToken || !await persistDestinations([list], message)) return;
-          setSelectedListIds(current => (current ?? []).filter(id => id !== list.id));
-        }
-        setMessageDraft('');
-      }
+      const result = isSharedProfile
+        ? await onCommitted({ lists: destinations, message, added: destinations.some(list => !list.containsItem) })
+        : await commitPersonalListDestinations({
+            lists: destinations, message,
+            isCurrent: () => currentRequest.current === requestToken,
+            save: list => setEntry(list.id, item.id, true, { positive: true, ...(origin ? { origin } : {}) }),
+            onSaved: (list, completed) => {
+              rememberRecentList(list.profileId, list.id);
+              setAvailableLists(current => current.map(candidate => candidate.id === list.id
+                ? { ...candidate, containsItem: true } : candidate));
+              setSelectedListIds(current => (current ?? []).filter(id => id !== list.id));
+              setSaveProgress({ request: requestToken, completed, total: destinations.length });
+            },
+            onCommitted,
+          });
+      if (currentRequest.current !== requestToken) return;
+      if (result.status === 'error') setError(result.message);
+      else { setMessageDraft(''); if (result.notice) setError(result.notice); }
     } catch {
       if (currentRequest.current === requestToken) setError('Kaikkien lisäysten tilaa ei voitu varmistaa. Tarkista tallennuksen tila ennen jatkamista.');
     } finally {
       if (currentRequest.current === requestToken) {
         activeSave.current = null;
         setStatus('idle');
+        setSaveProgress(null);
       }
     }
   }
@@ -285,7 +250,7 @@ export function ListDestinationSheet({
             <Text style={styles.helper}>
               Valitse yksi tai useampi lista ja vahvista ehdotus. Muut hyväksyvät samat listat ennen tallennusta.
             </Text>
-          ) : <Text style={styles.helper}>Valitse yksi tai useampi lista ja paina Lisää valituille listoille. Valmis sulkee valinnan lisäysten jälkeen.</Text>}
+          ) : <Text style={styles.helper}>Valitse yksi tai useampi lista. Lisää valituille listoille tallentaa valinnan ja siirtää seuraavaan korttiin.</Text>}
 
           {messageExpanded ? (
             <View style={styles.messageRow}>
@@ -396,24 +361,19 @@ export function ListDestinationSheet({
 
           {error || loadError ? <Text style={styles.error}>{error ?? loadError}</Text> : null}
           </ScrollView>
-          <Text accessibilityLiveRegion="polite" style={styles.helper}>{selectedLists.length} listaa valittu</Text>
+          <Text accessibilityLiveRegion="polite" style={styles.helper}>
+            {status === 'saving' && saveProgress?.request === requestToken
+              ? `Tallennettu ${saveProgress.completed}/${saveProgress.total} listaan`
+              : `${selectedLists.length} listaa valittu`}
+          </Text>
           {selectedLists.length >= 32 ? <Text style={styles.helper}>Voit valita kerralla enintään 32 listaa.</Text> : null}
           <Pressable accessibilityRole="button" disabled={!hasSelection || savingBlocked}
+            accessibilityState={{ busy: status === 'saving', disabled: !hasSelection || savingBlocked }}
             onPress={() => void chooseLists()}
             style={({ pressed }) => [styles.createButton, (!hasSelection || savingBlocked) && styles.disabled, pressed && styles.pressed]}>
+            {status === 'saving' ? <ActivityIndicator color={theme.base.textPrimary} size="small" /> : null}
             <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : isSharedProfile ? 'Ehdota valituille listoille' : 'Lisää valituille listoille'}</Text>
           </Pressable>
-          {!isSharedProfile && lastSaved?.request === requestToken ? (
-            <Pressable accessibilityRole="button" disabled={loading || savingBlocked || hasSelection}
-              onPress={() => {
-                if (activeSave.current === requestToken) return;
-                if (lastSaved?.request === requestToken) {
-                  void onCommitted({ ...lastSaved.commit, message: null, stayOpen: false });
-                } else onClose();
-              }} style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}>
-              <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : 'Valmis'}</Text>
-            </Pressable>
-          ) : null}
         </View>
       </View>
       </KeyboardAvoidingView>
@@ -484,6 +444,8 @@ function createStyles(theme: RoomTheme) {
     createButton: {
       minWidth: 58,
       minHeight: 42,
+      flexDirection: 'row',
+      gap: 8,
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: 10,

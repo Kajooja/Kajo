@@ -7,13 +7,54 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## Immediate continuation checkpoint — 2026-09-10 / owner APK running
+## Immediate continuation checkpoint — 2026-09-10 / Personal Add and latency
+
+Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted
+main remains `6dd1fec`. The owner completed the next APK test and reports the flow
+otherwise good, with two requested changes: adding to two Lists feels frozen, and
+Personal Lisää valituille listoille must open the next card without a second Valmis.
+The requested earlier source was `50bd1a8`; actual installed run/SHA and measured
+latency were not supplied. DEVICE_TEST owns the report and next focused cases.
+
+The client correction freezes the checked set, sends existing durable per-List
+commands in order and completes once after every acknowledgement. Partial failure
+retains completed saves and unresolved choices. Messages target newly acknowledged
+destinations only. Done is removed; a spinner and confirmed-count progress remain
+visible during saving, and intermediate destination reloads are suppressed.
+
+Two concrete queue delays are removed: a six-impression slate reuses one actually
+acknowledged session instead of writing it six times, and an Event acknowledgement
+immediately wakes only exposure-waiting actions. In-flight notification races are
+handled, exact persisted exposure is still checked, and ordinary network backoff,
+rejection and account/Profile/session boundaries are preserved. Restart confirms
+original sessions again. This client change uses the already deployed APIs and
+requires no new database mutation.
+
+Validation: `npm run check` exits 0 with **347 tests** (270 mobile, 14 catalog,
+63 database), clean lint, TypeScript and both iOS/Android exports.
+Regressions verify all-selected completion, partial failure/retry, scoped callbacks,
+messages, session-write counts and immediate/racing/blocked exposure wake-up.
+No local phone/emulator or measured device latency is claimed.
+
+The preceding algorithm commit `316bd0858972e2e7bc4abc2d3e2360c89c83a97f` passed
+all five required checks in [CI](https://github.com/Kajooja/Kajo/actions/runs/34521599718),
+including native CLI serving/evaluation and populated upgrade acceptance. Its
+late-outcome forward below remains **undeployed**, separate from this client fix.
+
+**Next action:** finish required CI for the new client head, then the owner starts
+the next manual branch APK and checks Personal two-List Add → next card,
+responsiveness/progress, optional message/recovery and unchanged Shared consent.
+Do not dispatch/poll the APK or reset existing data. Continue Phase 14.1 with the
+separately reviewed late-outcome hosted rollout and representative process-death/
+reconnect/account-switch acceptance; Phase 14.2 follows those gates. Keep PR draft.
+
+## Late Outcome checkpoint — 2026-09-10 / preceding APK continuation
 
 Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228. The owner
-has started the manual APK CI and will return with the device result. The requested
-APK source checkpoint is `50bd1a8dd20f6ab617c266599be185d8b8d42412`; the actual
-manual run/installed SHA has not been supplied. Do not dispatch/poll the APK,
-reset accounts or alter its hosted backend while this test is in progress.
+started manual APK CI while this algorithm correction was prepared. The requested
+APK source checkpoint was `50bd1a8dd20f6ab617c266599be185d8b8d42412`; the actual
+manual run/installed SHA was not supplied. The latest owner feedback and next
+client correction are recorded above; no APK dispatch/poll or reset was performed.
 
 Parallel continuation stays within Phase 14.1: the new **undeployed** forward
 `20260910192630_late_outcome_attribution.sql` closes the already-committed late
@@ -33,10 +74,9 @@ function identities/ACLs and all unrelated definitions. Both probes are wired in
 required native CLI CI; an unexpected installed source anchor fails closed.
 The full repository check is recorded in the appended Sprint 014 checkpoint.
 
-**Next action:** finish the required native CI for this new forward and wait for
-the owner's current four-case DEVICE_TEST result. Keep this forward undeployed
-during that APK checkpoint; then prepare its own reviewed hosted rollout with
-the exact tested SQL and populated pre/postflight evidence. Hosted remains on
+Native CI for this forward has now passed on `316bd08`. Prepare its own reviewed
+hosted rollout with the exact tested SQL and populated pre/postflight evidence.
+Hosted remains on
 `20260910190243_shared_list_destinations`; mobile code is unchanged by this work.
 Physical process-death/reconnect/account-switch evidence and remaining 14.1
 acceptance still precede Phase 14.2. Keep PR draft and accepted main `6dd1fec`.
@@ -51,8 +91,8 @@ SHA/run was not supplied; see DEVICE_TEST for the exact reported scope.
 The multi-destination correction follows runtime `07b12ea` and documentation head
 `494f823`. Both Personal and Shared pickers now use independent checkboxes and one
 explicit confirmation. Creating another List preserves earlier checks; message
-input requires a usable selection. Personal completed additions stay confirmed
-while unresolved destinations remain selected before Done. Shared approvers see
+input requires a usable selection. That APK retained confirmed Personal additions
+and required Done afterward; the current client correction above removes that extra step. Shared approvers see
 every target name and confirm the exact set; memberships and transition Events
 commit together only at unanimity. Scope changes stop remaining message sends.
 
@@ -405,8 +445,8 @@ history query and loaded authorized Item snapshots. Collection snapshots have no
 Prediction ID, are bound to Profile/session, retain consumed Items while swiping,
 and label the return destination. History loading keys include Profile/collection
 revision and reload after interaction changes. Pull refresh is wired on Discovery,
-Lists and history; the green Shared flag is implemented. The Personal multi-destination picker now keeps the sheet open after each
-acknowledged addition. Each tap uses its own durable command; Valmis advances once.
+Lists and history; the green Shared flag is implemented. At that earlier checkpoint the Personal multi-destination picker kept the sheet open after each
+acknowledged addition, with Valmis advancing once. The current one-confirmation flow supersedes that behavior.
 Completed additions survive later failure or close. Duplicate taps are synchronously
 guarded, existing memberships are marked, and a collection refresh does not erase
 the in-progress message/create draft. Shared proposal flow is unchanged. The common collection cover grid/card entry is now implemented: Lists and history
@@ -510,7 +550,7 @@ Continue **14.1** after this delivery:
    verify durable exposure delivery and its ordering with action/outcome writes; the
    draft now persists Event evidence and guards matching pending impressions before
    Item/collection dispatch. The new late-attribution read projection is locally
-   verified but still requires native CI and its own hosted rollout; absent proof
+   and native-CI verified but still requires its own hosted rollout; absent proof
    remains unattributed.
 2. Verify deployed late outcomes, real device process-death/reconnect/account switches and
    complete atomic List/Shared rollback/duplicate/undo authorization cases.

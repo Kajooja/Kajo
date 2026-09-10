@@ -48,6 +48,7 @@ export interface EventActionOrigin {
 
 export interface EventWriteCoordinator {
   canSendAction(origin: EventActionOrigin): boolean;
+  subscribeToAcknowledgements(listener: () => void): () => void;
   start(): void;
   enqueue(event: Event): boolean;
   retry(): void;

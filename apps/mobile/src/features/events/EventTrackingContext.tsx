@@ -45,6 +45,7 @@ export type EventTrackingStatus =
 
 interface EventTrackingState {
   canSendAction: (origin: EventActionOrigin) => boolean;
+  subscribeToAcknowledgements: (listener: () => void) => () => void;
   status: EventTrackingStatus;
   sessionId: SessionId | null;
   session: EventSession | null;
@@ -181,6 +182,12 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     return Boolean(coordinator && currentCoordinator.current === coordinator && coordinator.canSendAction(origin));
   }, [scopedCoordinator]);
 
+  const subscribeToAcknowledgements = useCallback((listener: () => void) => {
+    const coordinator = scopedCoordinator?.coordinator;
+    if (!coordinator || currentCoordinator.current !== coordinator) return () => {};
+    return coordinator.subscribeToAcknowledgements(listener);
+  }, [scopedCoordinator]);
+
   const retryPersistence = useCallback(() => {
     scopedCoordinator?.coordinator.retry();
   }, [scopedCoordinator]);
@@ -188,6 +195,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   const value = useMemo<EventTrackingState>(
     () => ({
       canSendAction,
+      subscribeToAcknowledgements,
       status,
       sessionId: scopedCoordinator?.session.sessionId ?? null,
       session: scopedCoordinator?.session ?? null,
@@ -198,6 +206,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     }),
     [
       canSendAction,
+      subscribeToAcknowledgements,
       createEventId,
       persistenceError,
       recordEvent,
