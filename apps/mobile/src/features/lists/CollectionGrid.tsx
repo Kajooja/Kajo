@@ -32,7 +32,7 @@ export function CollectionGrid({ entries, theme, header, refreshing, onRefresh, 
   }, []);
   return <FlatList ref={list} data={entries} numColumns={2} keyExtractor={entry => entry.item.id}
     initialNumToRender={6} maxToRenderPerBatch={6} windowSize={7}
-    refreshing={refreshing} onRefresh={onRefresh} alwaysBounceVertical
+    refreshing={refreshing} onRefresh={onRefresh} alwaysBounceVertical overScrollMode="always"
     onViewableItemsChanged={onViewableItemsChanged}
     contentContainerStyle={{ paddingHorizontal: 3, paddingBottom: 32, flexGrow: 1 }}
     columnWrapperStyle={{ gap: 3, marginBottom: 3 }}

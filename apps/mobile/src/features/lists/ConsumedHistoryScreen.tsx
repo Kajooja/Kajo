@@ -117,7 +117,7 @@ function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
         {error ? (
           <View style={styles.notice}>
             <Text style={styles.error}>{error}</Text>
-            <Pressable onPress={() => setAttempt((current) => current + 1)}><Text style={styles.link}>Yritä uudelleen</Text></Pressable>
+            <Text style={styles.link}>Päivitä vetämällä alaspäin.</Text>
           </View>
         ) : null}
         {!loading && !error && items.length === 0 ? (

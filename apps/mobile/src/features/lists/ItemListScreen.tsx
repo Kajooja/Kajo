@@ -229,7 +229,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
         {loadError ? (
           <View style={styles.notice}>
             <Text style={styles.error}>{loadError}</Text>
-            <Pressable onPress={() => setAttempt((current) => current + 1)}><Text style={styles.link}>Yritä uudelleen</Text></Pressable>
+            <Text style={styles.link}>Päivitä vetämällä alaspäin.</Text>
           </View>
         ) : null}
         {actionError ? <Text style={styles.error}>{actionError}</Text> : null}

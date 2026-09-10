@@ -264,11 +264,11 @@ the in-progress message/create draft. Shared proposal flow is unchanged. The com
 reuse DiscoveryItemCard, show rating badges (including zero), dates and Shared
 provenance, and expose Ruudukko / Kortit controls. Images/cells are virtualized in
 bounded batches; card browsing keeps the loaded collection. The history-clear server candidate is implemented and tested locally; its mobile
-command/UI wiring and hosted rollout are implemented; final retry UX remains pending; the new UI needs device validation. Reset remains scheduled for the
+command/UI wiring, hosted rollout and ordinary pull-refresh UX are implemented; the new UI needs device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: complete refresh UX, then the authorized data reset
-and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
+Next: prepare and execute the already authorized data reset with stale-client
+protection, then a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Publication approval: the owner explicitly approved publishing this Personal
 multi-destination correction to the existing public Kajooja/Kajo repository,
@@ -337,8 +337,22 @@ already committed corrections/receipts; do not delete deployed history or rewrit
 user evidence. This disables new CLEAR_HISTORY commands until fixed.
 After filename alignment, full `npm run check` passed 325 tests, lint/TypeScript
 and both platform exports (exit 0).
-This rollout supersedes the earlier pending-hosted notes above. Next: final refresh
-UX, then the already authorized choice/group reset immediately before device tests.
+This rollout supersedes the earlier pending-hosted notes above. Next: the already authorized choice/group reset with stale-client protection
+immediately before device tests.
+
+Pull-refresh checkpoint: Discovery, List index, individual Lists and history
+now refresh by pulling down. Ordinary load errors show a pull instruction instead
+of a retry button. Lists index now has a native RefreshControl; cover grids allow
+vertical overscroll with short/empty content. Shared Discovery's refresh indicator
+waits for both recommendation and Shared-choice loading. Durable command recovery
+controls remain separate; refresh does not discard or resend mutations as new
+commands. No device acceptance is claimed.
+Next reset must cover native choices, imported evidence, derived learning, receipts
+and all Shared groups while preserving Auth/accounts/catalog. Invalidate stale
+client sessions/queued envelopes before clearing data so old clients cannot
+repopulate reset choices. The reset is authorized but NOT executed in this step.
+Validation: full `npm run check` passed 325 tests, lint/TypeScript and both
+platform exports (exit 0); pull gestures still need a phone/emulator test.
 
 Continue **14.1** after this delivery:
 

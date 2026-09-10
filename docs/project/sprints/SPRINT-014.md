@@ -1213,3 +1213,15 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   next task: final refresh UX, authorized reset, combined real-device acceptance.
 - Validation after filename alignment: full `npm run check` passed all 325 tests,
   lint/TypeScript and both platform exports (exit 0). Device acceptance remains open.
+
+
+### Ordinary pull-refresh completion — 2026-09-10 / #228 / #229
+
+- Added native pull refresh to the List index and vertical overscroll support to
+  Discovery/collection grids. Shared refresh reflects both read requests.
+- Replaced ordinary load retry buttons with pull guidance in Discovery, Lists
+  and consumed history. Durable command recovery remains intact.
+- Next: authorized all-Profile choices/Shared-group reset with stale-client queue
+  protection, then combined device acceptance. No reset/APK performed here.
+- Validation: full `npm run check` passed 325 tests, lint/TypeScript and both
+  platform exports (exit 0); actual pull gestures remain device acceptance.

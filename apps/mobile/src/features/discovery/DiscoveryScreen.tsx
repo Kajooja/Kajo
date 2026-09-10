@@ -277,17 +277,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               >
                 {ranking.message}
               </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Retry recommendations"
-                onPress={ranking.retry}
-                style={({ pressed }) => [
-                  styles.retryButton,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
-              </Pressable>
+              <Text style={styles.predictionNoticeText}>Päivitä vetämällä alaspäin.</Text>
             </View>
           ) : null}
 
@@ -303,24 +293,16 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                   : 'Yhteisiä valintoja päivitetään…'}
               </Text>
               {sharedEndorsements.error ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Retry shared choices"
-                  onPress={sharedEndorsements.retry}
-                  style={({ pressed }) => [
-                    styles.retryButton,
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <Text style={styles.retryButtonText}>Yritä uudelleen</Text>
-                </Pressable>
+                <Text style={styles.predictionNoticeText}>Päivitä vetämällä alaspäin.</Text>
               ) : null}
             </View>
           ) : null}
         </View>
 
         <FlatList
-          refreshing={ranking.status === 'loading'}
+          alwaysBounceVertical
+          overScrollMode="always"
+          refreshing={ranking.status === 'loading' || (isSharedDiscovery && sharedEndorsements.status === 'loading')}
           onRefresh={() => { ranking.retry(); if (isSharedDiscovery) sharedEndorsements.retry(); }}
           data={items}
           keyExtractor={(item) => item.id}
@@ -495,19 +477,6 @@ function createStyles(theme: RoomTheme) {
       flex: 1,
       color: theme.base.textMuted,
       fontSize: 12,
-    },
-    retryButton: {
-      minHeight: 36,
-      justifyContent: 'center',
-      paddingHorizontal: 10,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: theme.base.border,
-    },
-    retryButtonText: {
-      color: theme.base.textPrimary,
-      fontSize: 12,
-      fontWeight: '700',
     },
     collectionButton: {
       minHeight: 36,

@@ -117,3 +117,12 @@ open link
 ```
 
 A polished Room cannot compensate for a broken acquisition path. Conversely, acquisition polish must not compensate for weak or dishonest recommendation quality.
+
+
+Discovery, the List index, individual Lists and consumed history use native
+pull-to-refresh for ordinary loading/reloading. Load errors explain the downward
+pull rather than presenting a normal retry button. Short and empty collections
+retain the gesture. Shared Discovery keeps its loading indicator active while
+either recommendations or Shared choices load. Durable mutation recovery remains
+a distinct action; refreshing never discards queued choices. Gesture behavior
+requires the combined real-device acceptance checkpoint.
