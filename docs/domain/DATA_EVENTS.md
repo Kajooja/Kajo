@@ -439,3 +439,23 @@ Exposure and Item/collection commands still use separate queues. This checkpoint
 does not guarantee exposure-before-action delivery or fix delayed attribution by
 itself. Persistent replay, frozen Shared origins, causal ordering/reconciliation
 and physical-device acceptance must be evaluated together before DATA-003/004 close.
+
+
+### Exposure-before-command checkpoint — #228 / draft PR #229
+
+Immediately before Item/collection RPC dispatch, `createExposureOrderedSender`
+checks the current action scope and `EventTracking.canSendAction`. A correlated
+Item command waits while the durable Event queue contains an impression for the
+same actor/Profile, original session, prediction and Item with timestamp no later
+than the action. A pending/lost acknowledgement is not delivery: the command stays
+unchanged in its own queue and retries through the existing bounded backoff.
+
+The check reloads persisted evidence, including older sessions restored after
+restart. An unreadable/corrupt exposure queue blocks correlated dispatch. Unrelated
+impressions and non-predicted/metadata commands do not wait; stopped/mismatched
+contexts cannot dispatch. The server's existing trace validation remains required.
+
+This guard orders evidence that was successfully enqueued. It does not fabricate
+missing impressions, revise already committed unattributed receipts or prove client
+origin authenticity. Missing/already-committed late outcomes and frozen Shared
+item-specific/async origins remain separate acceptance work on the same Issue.

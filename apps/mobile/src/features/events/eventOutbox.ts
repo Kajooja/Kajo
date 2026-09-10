@@ -1,8 +1,9 @@
+import type { ItemActionResult } from './itemActionPersistence';
 import type { Event, EventSession } from '../../domain/contracts';
 import { isRecord, isTimestamp, isUuid, type ItemActionScope } from './itemActionCommands';
 import { createItemActionOutbox, type ItemActionStorage } from './itemActionOutbox';
 import { persistEvent, persistEventSession, type EventPersistenceApi } from './eventPersistence';
-import type { EventWriteCoordinator, EventWriteSnapshot } from './eventTracking';
+import type { EventActionOrigin, EventWriteCoordinator, EventWriteSnapshot } from './eventTracking';
 
 interface PendingEvent {
   command: ItemActionScope & {
@@ -73,6 +74,18 @@ export function createEventWriteCoordinator(
     },
   });
   return {
+    canSendAction(origin) {
+      if (!isCurrent() || origin.actorUserId !== session.actorUserId || origin.profileId !== session.profileId) return false;
+      if (!origin.predictionId || !origin.itemId) return true;
+      // Read durable state on every dispatch, including after restart or a lost
+      // acknowledgement. Removal happens only after the Event is acknowledged.
+      const pending = queue.pending();
+      if (!queue.snapshot().ready) return false;
+      return !pending.some(({ command: { event } }) => event.eventType === 'ITEM_IMPRESSION'
+        && event.sessionId === origin.session.sessionId && event.itemId === origin.itemId
+        && event.predictionId === origin.predictionId
+        && Date.parse(event.timestamp) <= Date.parse(origin.occurredAt));
+    },
     start() { active = true; queue.start(); },
     enqueue(event) {
       if (event.sessionId !== session.sessionId || event.actorUserId !== session.actorUserId
@@ -83,5 +96,20 @@ export function createEventWriteCoordinator(
     retry: () => queue.retry(),
     waitForIdle: () => queue.waitForIdle(),
     dispose() { active = false; queue.stop(); },
+  };
+}
+
+
+export function createExposureOrderedSender<T extends EventActionOrigin, R>(
+  canSendAction: (origin: EventActionOrigin) => boolean,
+  send: (command: T) => Promise<ItemActionResult<R>>,
+  isCurrent: () => boolean,
+): (command: T) => Promise<ItemActionResult<R>> {
+  return async command => {
+    if (!isCurrent() || !canSendAction(command)) {
+      return { status: 'error', retryable: true,
+        message: 'Valinta odottaa suosituksen näyttötiedon tallennusta. Yritämme uudelleen.' };
+    }
+    return send(command);
   };
 }

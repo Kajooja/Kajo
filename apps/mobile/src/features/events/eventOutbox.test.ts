@@ -3,7 +3,9 @@ import type { Event, EventSession } from '../../domain/contracts';
 import type { PersistedEventRow, PersistedEventSessionRow } from './eventPersistence';
 import type { ItemActionStorage } from './itemActionOutbox';
 import type { EventWriteCoordinator } from './eventTracking';
-import { createEventWriteCoordinator } from './eventOutbox';
+import { createItemActionOutbox, type ItemActionOutbox } from './itemActionOutbox';
+import type { PendingItemAction, ItemActionCommand } from './itemActionCommands';
+import { createEventWriteCoordinator, createExposureOrderedSender } from './eventOutbox';
 
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const session = (n = 3): EventSession => ({ actorUserId: id(1), profileId: id(2), sessionId: id(n),
@@ -19,6 +21,7 @@ const storage = () => {
 const api = () => ({ appendSession: vi.fn<(row: PersistedEventSessionRow) => Promise<{ error: { message: string } | null }>>(async () => ({ error: null })),
   appendEvent: vi.fn<(row: PersistedEventRow) => Promise<{ error: { message: string } | null }>>(async () => ({ error: null })) });
 const coordinators: EventWriteCoordinator[] = [];
+const actionQueues: ItemActionOutbox[] = [];
 function setup(store: ItemActionStorage, connection = api(), s = session(), namespace = 'env', isCurrent?: () => boolean) {
   const onChange = vi.fn();
   const coordinator = createEventWriteCoordinator(connection, s, onChange,
@@ -26,7 +29,7 @@ function setup(store: ItemActionStorage, connection = api(), s = session(), name
   coordinators.push(coordinator); coordinator.start();
   return { coordinator, connection, onChange };
 }
-afterEach(() => { coordinators.splice(0).forEach(c => c.dispose()); vi.useRealTimers(); });
+afterEach(() => { coordinators.splice(0).forEach(c => c.dispose()); actionQueues.splice(0).forEach(q => q.stop()); vi.useRealTimers(); });
 
 describe('durable event delivery', () => {
   it('persists before acceptance and sends original session before Event', async () => {
@@ -121,5 +124,72 @@ describe('durable event delivery', () => {
     expect(connection.appendEvent.mock.calls[0]).toEqual(connection.appendEvent.mock.calls[1]);
     resolve({ error: null }); await Promise.resolve();
     expect([...store.rows.values()]).toEqual(['[]']);
+  });
+});
+
+
+const action = (): ItemActionCommand => ({ version: 1, actionId: id(70), actorUserId: id(1), profileId: id(2),
+  itemId: id(5), kind: 'SET_RATING', rating: 8, predictionId: id(6), discoveryMode: 'SURPRISE',
+  occurredAt: '2026-09-10T00:02:00Z', session: session() });
+
+function actionQueue(store: ItemActionStorage, evidence: EventWriteCoordinator, send: (c: ItemActionCommand) => Promise<{ status: 'success'; receipt: string }>) {
+  const q = createItemActionOutbox<PendingItemAction, string>({ namespace: 'env', storage: store,
+    scope: { actorUserId: id(1), profileId: id(2) }, onChange() {}, onCommitted() {},
+    send: createExposureOrderedSender(origin => evidence.canSendAction(origin), send, () => true) });
+  actionQueues.push(q); q.start(); return q;
+}
+
+describe('exposure before action delivery', () => {
+  it('persists the action but does not dispatch it until its impression acknowledgement', async () => {
+    const store = storage(), connection = api(); let resolve!: (result: { error: null }) => void;
+    connection.appendEvent.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
+    const evidence = setup(store, connection); evidence.coordinator.enqueue(event());
+    await vi.waitFor(() => expect(connection.appendEvent).toHaveBeenCalledOnce());
+    const send = vi.fn(async () => ({ status: 'success' as const, receipt: 'ok' }));
+    const q = actionQueue(store, evidence.coordinator, send); q.enqueue({ command: action() });
+    await q.waitForIdle(); expect(send).not.toHaveBeenCalled(); expect(q.pending()).toHaveLength(1);
+    resolve({ error: null }); await evidence.coordinator.waitForIdle();
+    q.retry(); await q.waitForIdle();
+    expect(send).toHaveBeenCalledWith(action()); expect(q.pending()).toEqual([]);
+  });
+  it('restores both queues and orders an old-session action behind its lost-reply impression', async () => {
+    const store = storage(), firstApi = api();
+    firstApi.appendEvent.mockResolvedValue({ error: { message: 'lost reply' } });
+    const first = setup(store, firstApi); first.coordinator.enqueue(event()); await first.coordinator.waitForIdle();
+    const send = vi.fn(async () => ({ status: 'success' as const, receipt: 'ok' }));
+    const oldQueue = actionQueue(store, first.coordinator, send); oldQueue.enqueue({ command: action() });
+    await oldQueue.waitForIdle(); oldQueue.stop(); first.coordinator.dispose();
+    let resolve!: (result: { error: null }) => void; const nextApi = api();
+    nextApi.appendEvent.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
+    const next = setup(store, nextApi, session(30));
+    await vi.waitFor(() => expect(nextApi.appendEvent).toHaveBeenCalledOnce());
+    const nextQueue = actionQueue(store, next.coordinator, send); await nextQueue.waitForIdle();
+    expect(send).not.toHaveBeenCalled();
+    expect(nextApi.appendEvent.mock.calls[0]).toEqual(firstApi.appendEvent.mock.calls[0]);
+    resolve({ error: null }); await next.coordinator.waitForIdle(); nextQueue.retry(); await nextQueue.waitForIdle();
+    expect(send).toHaveBeenCalledOnce(); expect(send).toHaveBeenCalledWith(action());
+  });
+  it('only waits for the original matching exposure, never manufactures missing exposure', async () => {
+    const connection = api(); connection.appendSession.mockResolvedValue({ error: { message: 'offline' } });
+    const evidence = setup(storage(), connection); evidence.coordinator.enqueue(event()); await evidence.coordinator.waitForIdle();
+    expect(evidence.coordinator.canSendAction(action())).toBe(false);
+    for (const change of [{ predictionId: null }, { itemId: null }, { itemId: id(80) },
+      { predictionId: id(81) }, { session: { sessionId: id(82) } }, { occurredAt: '2026-09-10T00:00:30Z' }]) {
+      expect(evidence.coordinator.canSendAction({ ...action(), ...change })).toBe(true);
+    }
+    expect(evidence.coordinator.canSendAction({ ...action(), profileId: id(99) })).toBe(false);
+    evidence.coordinator.dispose(); expect(evidence.coordinator.canSendAction(action())).toBe(false);
+  });
+  it('blocks correlated actions if persisted exposure cannot be read', async () => {
+    const store = storage(), evidence = setup(store);
+    store.getItemSync = () => { throw new Error('disk unavailable'); };
+    expect(evidence.coordinator.canSendAction(action())).toBe(false);
+    expect(evidence.coordinator.canSendAction({ ...action(), predictionId: null })).toBe(true);
+  });
+  it('does not dispatch through a stale action coordinator even when exposure is ready', async () => {
+    const send = vi.fn(async () => ({ status: 'success' as const, receipt: 'ok' }));
+    const guarded = createExposureOrderedSender(() => true, send, () => false);
+    expect(await guarded(action())).toMatchObject({ status: 'error', retryable: true });
+    expect(send).not.toHaveBeenCalled();
   });
 });

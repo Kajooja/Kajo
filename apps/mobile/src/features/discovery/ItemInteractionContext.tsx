@@ -1,3 +1,4 @@
+import { createExposureOrderedSender } from '../events/eventOutbox';
 import {
   createContext,
   useCallback,
@@ -156,7 +157,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       }
     };
     const coordinator: ItemActionOutbox<PendingProfileAction> = createItemActionOutbox<PendingProfileAction, ProfileActionReceipt>({
-      namespace: outboxNamespace, scope: { actorUserId, profileId }, storage: Storage, send: atomicSender,
+      namespace: outboxNamespace, scope: { actorUserId, profileId }, storage: Storage,
+      send: createExposureOrderedSender(eventTracking.canSendAction, atomicSender,
+        () => active && activeScopeKey.current === key && outbox.current?.coordinator === coordinator),
       isPendingAction: isPendingProfileAction,
       isCurrent: () => active && activeScopeKey.current === key && outbox.current?.coordinator === coordinator,
       onChange: (snapshot) => {
@@ -234,7 +237,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       subscription.remove();
       if (outbox.current?.coordinator === coordinator) outbox.current = null;
     };
-  }, [actorUserId, atomicSender, eventTracking.session, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
+  }, [actorUserId, atomicSender, eventTracking.canSendAction, eventTracking.session, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
 
   const isLocalMode =
     connection.status === 'unconfigured' || activeProfile.status === 'disabled';

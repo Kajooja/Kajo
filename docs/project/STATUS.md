@@ -131,9 +131,15 @@ separate environment/actor/Profile storage identity. Accepted enqueue now means
 persisted bytes; restart replays the original session/ID/timestamp, and stale scope
 callbacks cannot start the subsequent Event write. Impression dedup follows storage.
 
-Next on that branch: finish review/CI, freeze item-specific Shared overlay provenance
-and remaining async callback origins, then coordinate exposure with action delivery
-and late-outcome reconciliation. Record representative
+The third checkpoint guards both Item and collection dispatch against matching
+pending impressions in the durable Event queue. It preserves command IDs and
+original sessions on restart; failed exposure storage blocks correlated dispatch.
+Unrelated/non-predicted actions do not wait for this guard. CI #412 passed the prior
+`2e0c068` checkpoint; the PR owns current-head CI.
+
+Next on that branch: freeze item-specific Shared overlay provenance and remaining
+async callback origins; verify missing/already-committed exposure and late outcomes
+at the server boundary, then complete relevant runtime/CI acceptance. Record representative
 runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
 
 Continue **14.1** after this delivery:
@@ -141,7 +147,8 @@ Continue **14.1** after this delivery:
 1. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
    swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
    verify durable exposure delivery and its ordering with action/outcome writes; the
-   draft now persists the separate Event queue, but does not yet coordinate both queues.
+   draft now persists Event evidence and guards matching pending impressions before
+   Item/collection dispatch; missing/already-committed late attribution remains open.
 2. Verify late outcomes, real device process-death/reconnect/account switches and
    complete atomic List/Shared rollback/duplicate/undo authorization cases.
 3. Then proceed to **14.2 serving/shadow/candidate availability**.

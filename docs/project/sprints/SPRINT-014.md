@@ -886,3 +886,18 @@ merge number. Complete publication, then pause as requested by the owner.
   Exposure/action queue coordination and late outcomes are explicitly not solved
   by persisting a separate queue. Continue the same draft branch; do not merge or
   close #228 until the remaining provenance/delivery gates are met.
+
+
+### Exposure/action ordering checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Prior durable Event head `2e0c068` passed all required CI #412 jobs.
+- Both Item and collection senders now check durable matching impressions before
+  RPC dispatch. The exact queued command remains pending until acknowledgement;
+  a restarted action can wait for its original older session's exposure.
+- Five regressions add delayed acknowledgement, both-queue restart/lost reply,
+  exact matching/no invented evidence, unreadable storage and stale coordinator
+  coverage. Unrelated/non-predicted actions are not globally blocked.
+- No hosted migration. Missing impressions and already-committed unattributed
+  outcomes are not retroactively manufactured/fixed. Next: Shared per-Item origin,
+  remaining async callback review and server late-outcome/runtime acceptance.
+  Keep #228 and PR #229 in progress; PR owns current full-check/CI evidence.

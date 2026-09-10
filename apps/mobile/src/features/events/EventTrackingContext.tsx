@@ -32,6 +32,7 @@ import {
   createUuidV7,
   getImpressionDeduplicationKey,
   type EventRecordInput,
+  type EventActionOrigin,
   type EventTrackingScope,
   type EventWriteCoordinator,
 } from './eventTracking';
@@ -42,6 +43,7 @@ export type EventTrackingStatus =
   | 'ready';
 
 interface EventTrackingState {
+  canSendAction: (origin: EventActionOrigin) => boolean;
   status: EventTrackingStatus;
   sessionId: SessionId | null;
   session: EventSession | null;
@@ -172,12 +174,18 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     [defaultContext, scopedCoordinator],
   );
 
+  const canSendAction = useCallback((origin: EventActionOrigin) => {
+    const coordinator = scopedCoordinator?.coordinator;
+    return Boolean(coordinator && currentCoordinator.current === coordinator && coordinator.canSendAction(origin));
+  }, [scopedCoordinator]);
+
   const retryPersistence = useCallback(() => {
     scopedCoordinator?.coordinator.retry();
   }, [scopedCoordinator]);
 
   const value = useMemo<EventTrackingState>(
     () => ({
+      canSendAction,
       status,
       sessionId: scopedCoordinator?.session.sessionId ?? null,
       session: scopedCoordinator?.session ?? null,
@@ -187,6 +195,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       retryPersistence,
     }),
     [
+      canSendAction,
       createEventId,
       persistenceError,
       recordEvent,

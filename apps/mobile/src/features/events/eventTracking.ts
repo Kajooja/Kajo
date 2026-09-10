@@ -35,7 +35,17 @@ export interface EventWriteSnapshot {
   message: string | null;
 }
 
+export interface EventActionOrigin {
+  actorUserId: string;
+  profileId: string;
+  itemId: string | null;
+  predictionId: string | null;
+  occurredAt: string;
+  session: { sessionId: string };
+}
+
 export interface EventWriteCoordinator {
+  canSendAction(origin: EventActionOrigin): boolean;
   start(): void;
   enqueue(event: Event): boolean;
   retry(): void;
