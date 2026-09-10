@@ -104,3 +104,9 @@ supabase/functions/password-auth/
 | CI | `.github/workflows/ci.yml` | `npm ci` + lint/typecheck/tests/both bundles, isolated platform/default probe, two application installations, independent populated upgrade and CLI installation/history. All five jobs must pass before main builds/verifies/uploads the standalone Android APK |
 
 Do not create empty feature folders merely to match future architecture. Shared collaboration, Lists, SleepLayer, resurfacing, quick access, provider-backed catalogs, Personal bootstrap imports and Shared common-fit extend generic Profile/Item/Event/Prediction/Memory boundaries rather than creating media/provider-specific queues, duplicate group state or a second recommender. Deployed migrations are never rewritten after hosting.
+
+
+Collection navigation uses `apps/mobile/src/features/lists/useCollectionNavigation.ts`
+and `discovery/deliveredSlate.ts` to carry authorized List/history Items into Detail,
+without a Prediction or mock lookup. Collection snapshots preserve consumed Items
+and the current Profile/session; common collection grid/card controls remain pending.

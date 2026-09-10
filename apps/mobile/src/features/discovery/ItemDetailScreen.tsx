@@ -1,4 +1,4 @@
-import { buildDeliveredItemOrigins, getDeliveredItemOrigin, type DeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
+import { buildCollectionSequence, buildDeliveredItemOrigins, getDeliveredItemOrigin, type DeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -188,7 +188,8 @@ function ItemDetailContent({
     () => slate?.predictionId ?? createUuidV7(),
   );
   const [items] = useState<readonly Item[]>(() => selectedItem
-    ? buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
+    ? slate?.source === 'collection' ? buildCollectionSequence(selectedItem, slate.items)
+      : buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
     : []);
   const [origins] = useState(() => slate?.origins ?? buildDeliveredItemOrigins(
     items, items, recommendationTraceId, 'fallback', {},
@@ -708,7 +709,7 @@ function ItemDetailContent({
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to discovery"
+          accessibilityLabel={slate?.collectionTitle ? `Takaisin: ${slate.collectionTitle}` : 'Back to discovery'}
           onPress={() => router.back()}
           hitSlop={10}
           style={({ pressed }) => [
@@ -716,7 +717,7 @@ function ItemDetailContent({
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.backText}>← Discovery</Text>
+          <Text style={styles.backText}>← {slate?.collectionTitle ?? 'Discovery'}</Text>
         </Pressable>
         <View style={styles.topBarActions}>
           <Pressable

@@ -28,7 +28,6 @@ import { InteractionPersistenceNotice } from './InteractionPersistenceNotice';
 import { useItemInteractions } from './ItemInteractionContext';
 import { useSharedEndorsements } from './SharedEndorsementContext';
 import {
-  getConsumedItems,
   getDiscoverableItems,
   getItemInteraction,
   type ItemInteraction,
@@ -59,7 +58,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const { scopeKey } = useItemLists();
-  const [showConsumed, setShowConsumed] = useState(false);
   const [imageWindow, setImageWindow] = useState({ first: 0, last: 7 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
@@ -86,12 +84,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     rankedItems, ranking.items, ranking.predictionId, ranking.source,
     isSharedDiscovery ? sharedEndorsements.stateByItemId : {},
   ), [rankedItems, ranking.items, ranking.predictionId, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
-  const consumedItems = getConsumedItems(ranking.items, interactions);
-  const items = showConsumed
-    ? consumedItems
-    : sharedOverlayReady
-      ? getDiscoverableItems(rankedItems, interactions)
-      : [];
+  const items = useMemo(() => sharedOverlayReady
+    ? getDiscoverableItems(rankedItems, interactions) : [], [sharedOverlayReady, rankedItems, interactions]);
   const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
   const visibleItems = useRef<readonly Item[]>([]);
@@ -99,7 +93,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const impressionContext = useRef<ImpressionContext>({
     mode,
     origins,
-    showConsumed,
     recordEvent: eventTracking.recordEvent,
   });
 
@@ -107,10 +100,9 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     impressionContext.current = {
       mode,
       origins,
-      showConsumed,
       recordEvent: eventTracking.recordEvent,
     };
-  }, [eventTracking.recordEvent, mode, origins, showConsumed]);
+  }, [eventTracking.recordEvent, mode, origins]);
 
   useEffect(() => {
     itemsRef.current = items;
@@ -171,7 +163,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         {
           mode,
           origins,
-          showConsumed,
           recordEvent: eventTracking.recordEvent,
         },
       );
@@ -183,7 +174,6 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     predictionId,
     ranking.source,
     origins,
-    showConsumed,
   ]);
 
   function openItem(item: Item) {
@@ -240,18 +230,18 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Show discovery items"
-              accessibilityState={{ selected: !showConsumed }}
-              onPress={() => setShowConsumed(false)}
+              accessibilityState={{ selected: true }}
+              onPress={() => ranking.retry()}
               style={({ pressed }) => [
                 styles.collectionButton,
-                !showConsumed && styles.collectionButtonSelected,
+                styles.collectionButtonSelected,
                 pressed && styles.pressed,
               ]}
             >
               <Text
                 style={[
                   styles.collectionText,
-                  !showConsumed && styles.collectionTextSelected,
+                  styles.collectionTextSelected,
                 ]}
               >
                 Löydä
@@ -260,22 +250,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`Show ${consumedLabel.toLowerCase()}`}
-              accessibilityState={{ selected: showConsumed }}
-              onPress={() => setShowConsumed(true)}
+              accessibilityState={{ selected: false }}
+              onPress={() => router.push({ pathname: '/lists/history', params: { itemType } })}
               style={({ pressed }) => [
                 styles.collectionButton,
-                showConsumed && styles.collectionButtonSelected,
                 pressed && styles.pressed,
               ]}
             >
               <Text
                 style={[
                   styles.collectionText,
-                  showConsumed && styles.collectionTextSelected,
                 ]}
               >
-                {consumedLabel}{' '}
-                {consumedItems.length > 0 ? consumedItems.length : ''}
+                {consumedLabel}
               </Text>
             </Pressable>
           </View>
@@ -333,6 +320,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         </View>
 
         <FlatList
+          refreshing={ranking.status === 'loading'}
+          onRefresh={() => { ranking.retry(); if (isSharedDiscovery) sharedEndorsements.retry(); }}
           data={items}
           keyExtractor={(item) => item.id}
           numColumns={2}
@@ -351,17 +340,13 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           viewabilityConfig={viewabilityConfig}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              {ranking.status === 'loading' && !showConsumed
+              {ranking.status === 'loading'
                 ? 'Haetaan suosituksia…'
-                : !sharedOverlayReady && !showConsumed
+                : !sharedOverlayReady
                   ? 'Yhteisiä valintoja päivitetään…'
-                  : showConsumed
-                    ? itemType === 'BOOK'
-                      ? 'Ei vielä luettuja kirjoja.'
-                      : 'Ei vielä katsottuja elokuvia.'
-                    : itemType === 'BOOK'
-                      ? 'Kaikki kirjat on jo merkitty luetuiksi.'
-                      : 'Kaikki elokuvat on jo merkitty katsotuiksi.'}
+                  : itemType === 'BOOK'
+                    ? 'Ei uusia kirjasuosituksia juuri nyt.'
+                    : 'Ei uusia elokuvasuosituksia juuri nyt.'}
             </Text>
           }
           renderItem={({ item, index }) => {
@@ -561,7 +546,6 @@ function ItemCard({
 interface ImpressionContext {
   mode: ReturnType<typeof useDiscoveryMode>['mode'];
   origins: Readonly<Record<string, DeliveredItemOrigin>>;
-  showConsumed: boolean;
   recordEvent: ReturnType<typeof useEventTracking>['recordEvent'];
 }
 
@@ -569,8 +553,6 @@ function recordVisibleImpressions(
   items: readonly Item[],
   context: ImpressionContext,
 ) {
-  if (context.showConsumed) return;
-
   for (const item of items) {
     // FlatList can report an old visible token while a collection refresh has
     // invalidated the grid. It cannot establish a new delivered impression.

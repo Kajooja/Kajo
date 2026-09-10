@@ -4,8 +4,8 @@ import type { DiscoveryMode, Item } from '../../domain/contracts';
 export interface DeliveredItemOrigin {
   readonly predictionId?: string;
   readonly properties: {
-    readonly predictionSource: 'hosted' | 'fallback' | 'shared_overlay' | 'unattributed';
-    readonly deliveryTier: 'RANKED' | 'SHARED_PENDING' | 'SHARED_MEMBER_HISTORY' | 'UNATTRIBUTED';
+    readonly predictionSource: 'hosted' | 'fallback' | 'shared_overlay' | 'unattributed' | 'collection';
+    readonly deliveryTier: 'RANKED' | 'SHARED_PENDING' | 'SHARED_MEMBER_HISTORY' | 'UNATTRIBUTED' | 'COLLECTION';
   };
 }
 
@@ -43,8 +43,9 @@ export interface DeliveredSlate {
   readonly id: string;
   readonly scopeKey: string | null;
   readonly sessionId: string | null;
-  readonly predictionId: string;
-  readonly source: 'hosted' | 'fallback';
+  readonly predictionId: string | null;
+  readonly source: 'hosted' | 'fallback' | 'collection';
+  readonly collectionTitle?: string;
   readonly mode: DiscoveryMode;
   readonly items: readonly Item[];
   readonly origins: Readonly<Record<string, DeliveredItemOrigin>>;
@@ -80,7 +81,18 @@ export function canUseDeliveredSlate(
   sessionId: string | null,
   itemId: string,
 ): boolean {
-  if (slate.source === 'hosted' && (!scopeKey || !sessionId)) return false;
+  if (slate.source !== 'fallback' && (!scopeKey || !sessionId)) return false;
   return slate.scopeKey === scopeKey && slate.sessionId === sessionId
     && slate.items.some(item => item.id === itemId);
+}
+
+export function rememberCollectionSlate(input: Omit<DeliveredSlate, 'source' | 'predictionId' | 'origins'>): void {
+  rememberDeliveredSlate({ ...input, source: 'collection', predictionId: null,
+    origins: Object.fromEntries(input.items.map(item => [item.id, {
+      properties: { predictionSource: 'collection', deliveryTier: 'COLLECTION' },
+    }])) });
+}
+
+export function buildCollectionSequence(selected: Item, items: readonly Item[]): readonly Item[] {
+  return [selected, ...items.filter(item => item.id !== selected.id)];
 }

@@ -1093,3 +1093,31 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: `npm run check` passed all 321 tests (246 mobile, 14 catalog,
   61 database), TypeScript/lint and both exports. No emulator/phone test was
   available in this workspace; native CI and owner device acceptance are pending.
+
+
+### Second owner device report and collection-source correction — 2026-09-10
+
+- Owner reports b51f962 List behavior, undo (List/rating/rejection) and reconnect
+  working; old choices still failed with “item not found”. This does not accept
+  historical navigation or close all DATA-003/004 gates.
+- Root causes found: Discovery's history tab filtered the serving recommendation
+  pool that intentionally excludes consumed Items; Lists/history opened only an
+  ID and Detail fell back to the mock catalog. History now uses the existing real
+  collection route; collection navigation carries loaded Item snapshots into Detail.
+- Collection transport is bound to Profile/session, has explicit COLLECTION origin
+  and no Prediction ID, keeps consumed Items in swipe browsing, and labels the
+  destination. History scope/revision keys prevent reuse across Profiles; interaction
+  changes reload current history. Added two transport/order regressions.
+- Pull refresh now works on Discovery, Lists and history. Green RYHMÄTILA appears
+  beneath the global mode selector only for a Shared Profile.
+- Remaining owner scope: multi-List addition before card advance; common cover
+  grid/card selector on all Lists/history; visible rating and explicit history
+  removal via atomic evidence; finish replacing ordinary retry UI. Completed Shared
+  consensus removal remains a distinct unresolved lifecycle boundary.
+- Owner authorizes all-Profile choice and Shared-group reset before the next test.
+  Preserve accounts/catalog, review derived evidence and local outbox handling;
+  reset has NOT run and no new APK is requested at this partial checkpoint.
+  STATUS owns exact order and all requirements. Continue short saved work periods.
+- Validation: full `npm run check` passed 323 tests (248 mobile, 14 catalog,
+  61 database), TypeScript/lint and iOS/Android exports. No new device or visual
+  runtime acceptance claimed; the next test waits for the remaining owner scope.

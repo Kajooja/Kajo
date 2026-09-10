@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +18,8 @@ import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
+import { useCollectionNavigation } from './useCollectionNavigation';
+import { useItemInteractions } from '../discovery/ItemInteractionContext';
 import type { ConsumedItem } from './itemListOperations';
 import { formatListEntryDate } from './listPresentation';
 
@@ -25,6 +28,8 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadConsumed } = itemLists;
+  const openCollectionItem = useCollectionNavigation();
+  const { interactions } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const [snapshot, setSnapshot] = useState<{
@@ -33,7 +38,7 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
     error: string | null;
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const requestKey = `${itemType}:${attempt}`;
+  const requestKey = `${itemLists.scopeKey}:${itemType}:${itemLists.revision}:${attempt}`;
   const loading = snapshot?.key !== requestKey;
   const error = snapshot?.key === requestKey ? snapshot.error : null;
   const items = snapshot?.key === requestKey ? snapshot.items : [];
@@ -47,14 +52,15 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
         : { key: requestKey, items: [], error: result.message });
     });
     return () => { active = false; };
-  }, [itemType, loadConsumed, requestKey]);
+  }, [itemType, loadConsumed, requestKey, interactions]);
 
   const title = itemType === 'BOOK' ? 'Luetut' : 'Katsotut';
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => setAttempt(current => current + 1)} tintColor={theme.base.textMuted} />}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -81,7 +87,7 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
             <Pressable
               key={item.item.id}
               accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/discovery/[itemId]', params: { itemId: item.item.id } })}
+              onPress={() => openCollectionItem(item.item, items.map(candidate => candidate.item), title)}
               style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             >
               <View style={styles.rowText}>

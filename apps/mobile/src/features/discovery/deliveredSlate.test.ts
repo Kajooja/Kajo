@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildDeliveredItemOrigins, getDeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, rememberDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
+import { buildCollectionSequence, rememberCollectionSlate, buildDeliveredItemOrigins, getDeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, rememberDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
 
 const slate = (id: string): DeliveredSlate => ({ id, scopeKey: 'env:actor:profile', sessionId: 'session',
   predictionId: `prediction-${id}`, source: 'hosted', mode: 'SURPRISE', origins: {},
@@ -108,5 +108,27 @@ describe('Shared per-Item delivery origin', () => {
     origin.predictionId = 'changed';
     expect(getDeliveredSlate('origin-copy')!.origins.ranked?.predictionId).toBe('run');
     expect(getDeliveredSlate('origin-copy')!.origins.other).toBeUndefined();
+  });
+});
+
+describe('loaded collection navigation', () => {
+  it('carries server-only Items without a borrowed Prediction or mock lookup', () => {
+    rememberCollectionSlate({ id: 'collection-one', scopeKey: 'env:actor:profile', sessionId: 'session',
+      mode: 'RISK', collectionTitle: 'Luetut', items: [{ id: 'server-book', title: 'Server book', itemType: 'BOOK' }] });
+    const result = getDeliveredSlate('collection-one')!;
+    expect(result.items[0]?.title).toBe('Server book');
+    expect(result.predictionId).toBeNull();
+    expect(getDeliveredItemOrigin(result.origins, 'server-book')).toEqual({
+      properties: { predictionSource: 'collection', deliveryTier: 'COLLECTION' },
+    });
+    expect(canUseDeliveredSlate(result, 'env:actor:profile', 'session', 'server-book')).toBe(true);
+    expect(canUseDeliveredSlate(result, 'env:actor:other', 'session', 'server-book')).toBe(false);
+    expect(canUseDeliveredSlate(result, 'env:actor:profile', 'new-session', 'server-book')).toBe(false);
+  });
+
+  it('retains every collection Item for swiping, including previously consumed Items', () => {
+    const items = slate('collection-order').items;
+    expect(buildCollectionSequence(items[1]!, items).map(item => item.id)).toEqual(['b', 'a']);
+    expect(items.map(item => item.id)).toEqual(['a', 'b']);
   });
 });

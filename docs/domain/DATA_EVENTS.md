@@ -547,3 +547,10 @@ arrives. Late viewability tokens from that grid do not establish new impressions
 Shared SYSTEM_SAVED remains governed by consensus: deleting a named Shared List
 is not permission to bypass that separate state. Candidate forward is not yet
 hosted/device acceptance; STATUS and Sprint 014 own the rollout/remaining undo work.
+
+
+List/history navigation carries explicit `predictionSource=collection` and
+`deliveryTier=COLLECTION` metadata without a Prediction ID. Loaded authorized Item
+snapshots are scoped to Profile and Event session; this is collection browsing,
+not a ranked recommendation delivery. Existing atomic action/attribution rules
+remain in force. History-clear evidence is still a pending explicit action contract.

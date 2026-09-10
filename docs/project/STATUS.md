@@ -224,13 +224,46 @@ Custom Shared List removal remains available and does not erase durable consensu
 A completed-consensus removal lifecycle remains unimplemented and needs a scoped
 product/domain decision; no consent boundary was weakened or server SQL changed.
 
-Next: after this head's required CI, manually run the standalone APK workflow on
-`feat/228-delivered-origin` and perform focused owner tests: add → wait → undo,
-reject/rate → wait → undo, rapid taps while saving, multiple Lists/final removal,
-restart/reconnect, and the explicit Shared Saved limitation. Do not poll APK.
-Device behavior is NOT accepted. Keep #228/#229 and DATA-003/004 open; continue
-14.1 attribution/reconnect acceptance after this checkpoint. “Mitä tänään” remains
-a separate FUTURE_PLAN idea.
+Owner device checkpoint at `b51f962`: current List suppression/restoration,
+List-add undo, rejection/rating undo and reconnect passed. Older choices still
+reported “item not found”; do not mark all historical navigation accepted. New
+owner requirements are part of the next bounded #228/#229 corrections, not the
+distant “Mitä tänään” idea:
+
+1. Personal destination selection must allow adding one Item to multiple Lists
+   before leaving the card. Preserve completed saves on partial failure; Shared
+   proposals must retain consent semantics rather than silently duplicating them.
+2. Discovery and Lists must open the same Luetut/Katsotut collection of already
+   rated/consumed Items, show the current rating, and allow List addition, rating
+   changes and explicit history removal. Removal clears the terminal reaction and
+   restores Discovery eligibility unless another active reason still suppresses it;
+   it needs a canonical atomic action/evidence contract, not direct row deletion.
+3. All collections need the same cover grid and swipe-card browsing as Discovery,
+   with a shared top view selector and an explicit saved/history context.
+4. Pull down to refresh Discovery/Lists/history; finish replacing ordinary retry
+   presentation while retaining accessible recovery for persistence failures.
+5. Small green RYHMÄTILA flag below the risk selector identifies Shared mode.
+6. Before the NEXT device test, the owner explicitly authorizes clearing all
+   Profiles' choices and all Shared groups. Preserve login accounts and catalog.
+   Prepare a reviewed scoped cleanup covering derived evidence/queues so old local
+   actions cannot repopulate reset state. Reset is NOT performed yet; do it after
+   these changes are ready, immediately before the next test. No new APK now.
+
+Current code checkpoint fixes two concrete source bugs: Luetut previously filtered
+an already suppression-filtered recommendation pool, and List/history detail
+navigation searched only the mock catalog. Both entry points now use the actual
+history query and loaded authorized Item snapshots. Collection snapshots have no
+Prediction ID, are bound to Profile/session, retain consumed Items while swiping,
+and label the return destination. History loading keys include Profile/collection
+revision and reload after interaction changes. Pull refresh is wired on Discovery,
+Lists and history; the green Shared flag is implemented. The existing row/grid
+layout, multi-destination picker, explicit history-clear action and final retry UX
+still need implementation and device validation. Reset remains scheduled for the
+next test checkpoint, not this partial delivery.
+
+Next: multi-destination Personal picker, shared collection grid/card controls and
+canonical history-clear action; then complete refresh UX, authorized data reset
+and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Continue **14.1** after this delivery:
 

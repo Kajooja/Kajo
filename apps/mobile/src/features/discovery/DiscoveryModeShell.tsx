@@ -239,6 +239,13 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               baseTheme={theme.base}
               ambientTheme={theme.ambient}
             />
+            {activeProfile?.type === 'SHARED' ? (
+              <View accessibilityLiveRegion="polite" style={{ alignSelf: 'flex-start', borderRadius: 5,
+                paddingHorizontal: 7, paddingVertical: 2, marginTop: 3, backgroundColor: '#215638' }}>
+                <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
+                  style={{ color: '#c5f6d5', fontSize: 10, fontWeight: '800' }}>RYHMÄTILA</Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </SafeAreaView>

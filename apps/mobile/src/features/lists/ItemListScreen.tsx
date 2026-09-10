@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,6 +21,7 @@ import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
+import { useCollectionNavigation } from './useCollectionNavigation';
 import {
   MAXIMUM_ITEM_LIST_NAME_LENGTH,
   type ItemListEntry,
@@ -46,6 +48,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadEntries } = itemLists;
+  const openCollectionItem = useCollectionNavigation();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const summary = itemLists.lists.find((list) => list.id === listId) ?? null;
@@ -157,7 +160,8 @@ function ItemListContent({ listId }: ItemListScreenProps) {
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
       <InteractionPersistenceNotice theme={theme} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => setAttempt(current => current + 1)} tintColor={theme.base.textMuted} />}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -239,7 +243,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
               isShared={profiles.activeProfile?.type === 'SHARED'}
               grid={view === 'GRID'}
               styles={styles}
-              onOpen={() => router.push({ pathname: '/discovery/[itemId]', params: { itemId: entry.item.id } })}
+              onOpen={() => openCollectionItem(entry.item, presentedEntries.map(candidate => candidate.item), summary?.name ?? 'Lista')}
               onRemove={() => void removeEntry(entry)}
               canRemove={Boolean(summary) && !sharedSaved && !saving}
             />
