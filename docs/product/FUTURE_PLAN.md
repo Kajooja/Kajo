@@ -483,3 +483,161 @@ Shared choices use the existing SharedProfile model, never a simple member avera
 - Schedule after current algorithm/evidence and List correctness gates, as part of
   a separately scoped List/Shared UX package. The owner supplied this as an idea,
   not as a new release blocker or authorization to bypass the roadmap.
+
+## FUT-UX-001 — Personal category statistics — PLANNED / #230
+
+Owner idea recorded **2026-09-10**. Give the person a readable account of their
+taste and activity, with light progression and a reason to return. Open
+**Tilastot** below **Profiili** in the drawer and through the Profile surface.
+Keep the Room and primary navigation restrained.
+
+Execution slot: a separately scoped Phase 17.0 increment after reliable history,
+atomic actions and delivered-origin gates. Weekly aggregation and comparisons
+also depend on Phase 17.1/17.2 telemetry/operations/privacy. This records a
+candidate for that phase, not a new Phase 14 task or an automatic MVP release
+blocker. [Issue #230](https://github.com/Kajooja/Kajo/issues/230) tracks delivery.
+
+### Personal summary and unlock
+
+Each generic ItemType has independent progress, initially MOVIE and BOOK.
+Use the active PersonalProfile's authorized state; do not mix Shared activity
+or other members' personal history into "your" totals.
+
+| Measure | Planned meaning |
+| --- | --- |
+| Rated | Distinct canonical Items with a current rating; 0 is a real rating |
+| Mean rating | Mean of those ratings, including 0; not-interest is excluded; no rated Items means no invented average |
+| Not interested | Distinct currently rejected Items, separate from consumed/rated |
+| On Lists | Distinct Items currently on one or more of this Profile's Lists; one Item on several Lists counts once |
+| Unlock progress | Distinct Items with a qualifying rating or not-interest reaction in this category; saves alone do not qualify |
+
+The owner first suggested 50 reactions, then explicitly suggested starting at 30.
+Working configuration: **30 to unlock**, **5 new reactions for a weekly update**;
+keep these versioned/tunable rather than hard-coded in copy. The earlier 50 is
+retained as a possible tuning value. A category with 22/30 shows "8 reaktiota
+tilastoihin"; unlocking movies does not unlock books.
+
+Accepted calibration/import ratings contribute once to initial historical totals
+and unlock progress through source-aware projection. Consumed-only imports have
+no invented rating. Working weekly rule: count new explicit Kajo ratings or
+not-interest choices on previously uncounted Items; importing old history is not
+five new weekly actions. Settle/document this source rule in the implementation
+contract before rollout. Preserve bootstrap/native provenance; no copied Events.
+
+Repeated requests, edited ratings, undo/re-rating of the same Item and overlapping
+imports cannot manufacture progress. An Item contributes at most once to unlock
+and as a new weekly qualifying Item; rating and rejecting the same Item cannot
+count twice. Pending local actions do not become published progress until server
+acceptance. Reversals/deletions reconcile current totals and uncommitted weekly
+eligibility; already unlocked access is retained.
+
+### Weekly summaries
+
+The first summary is available when the category first reaches the threshold.
+Afterward show its last-update date, the next-update countdown and the independent
+reaction counter, for example "3/5 uutta reaktiota tällä viikolla".
+
+Working calendar: Monday 00:00 **Europe/Helsinki**, shown explicitly and calculated
+by the server with daylight-saving rules. Store one versioned schedule/timezone;
+do not let each phone's clock/timezone choose a different week. A future timezone
+change must have explicit transition semantics.
+
+- At the next boundary, refresh only categories with at least five eligible new
+  Items since the preceding weekly boundary (or first unlock, for a partial week).
+- Fewer than five keeps the previous dated summary visible and explains why it
+  did not update. Start the next week's counter at zero; no streak penalty,
+  re-locking or implicit carry-over. This is the working interpretation of the
+  owner's weekly minimum.
+- Count a durable action in the window where the server first accepts it.
+  A lost reply/retry keeps that original acceptance; a queued offline choice
+  accepted after the boundary belongs to the following window.
+- Publish one idempotent snapshot per Profile/category/window with a known cutoff.
+  A delayed worker catches up consistently; countdown zero must not imply an
+  unfinished update has completed.
+- Corrections and deletion must reconcile or invalidate affected cached summaries
+  promptly. Weekly scheduling does not justify retaining removed private data.
+
+### Wrapped-style comparison and delivery slices
+
+First ship useful private counts/means/progress. Add a compact comparison with
+other users only when authorized anonymous aggregates have enough independent
+Profiles and sufficient support per category. Specify the cohort, period,
+minimum sample, deletion propagation and safe suppression rule before enabling
+percentiles; the personal unlock threshold is not a cohort privacy threshold.
+Sparse beta data shows that comparison is not available yet. Friendship alone
+grants no private-history access, and this does not introduce PopulationMemory
+or change ranking.
+
+Smallest delivery: personal category summary and independent unlock counters,
+then retry-safe weekly snapshots/countdowns, then evidence-gated comparisons.
+Opening stats or an unlock card is product telemetry, not taste/reward evidence.
+Judge usefulness by understandable summaries and returning users with meaningful
+choices; do not optimize raw reaction volume at the expense of recommendation
+quality. Keep aggregation incremental/bounded and avoid scanning all raw Events
+on every screen open.
+
+Acceptance covers 0/30/50 boundaries, independent categories, ratings including 0,
+mean denominators, multi-List deduplication, import/native overlap, edits/undo,
+4/5 weekly transitions, Monday/DST, delayed/offline/retried writes, stale snapshots,
+deletion, scope changes and sparse community cohorts. No runtime is delivered by
+this planning entry.
+
+## FUT-UX-002 — Long-press multi-select — PLANNED / #231
+
+Owner idea recorded **2026-09-10**. Reduce repeated work directly in Discovery and
+List grids. Delivery belongs to a separately scoped Phase 17.0 browse/List
+increment after MVP-DATA-003/004 and current List/history correctness.
+[Issue #231](https://github.com/Kajooja/Kajo/issues/231) tracks implementation;
+this is not an automatic additional MVP gate.
+
+### Selection and actions
+
+Long-press selects that card and enters selection mode, with a checked box in its
+upper-left corner. Show checkboxes on selectable cards, a selection count and
+clear Cancel/deselect controls. Further taps toggle selection. Normal taps outside
+selection mode still open the card. Provide an accessible explicit Select action
+so long-press is not the only entry.
+
+| Surface | Explicit bulk actions |
+| --- | --- |
+| Discovery grid | Ei kiinnosta; Lisää listaan |
+| A List's grid | Siirrä toiselle listalle; Poista tältä listalta |
+
+Entering/toggling selection never opens a card, records a preference or hides it.
+Creating a destination only creates/selects the List; the sole/new usable
+destination selects automatically and a separate confirmation performs the bulk
+action. Do not revive the create-List → premature Item advancement defect.
+
+List removal affects only selected memberships. It does not delete canonical
+Items, remove other memberships, erase consumed/rating history or mean
+not-interest. Bulk history deletion is a separate operation, not implied here.
+
+### Durable execution
+
+- Freeze selected canonical Item IDs and their actual per-Item delivered origin,
+  actor/Profile/session and source surface. Reordering cannot retarget an action.
+  No guessed Prediction, blanket source or fake Item-open Event for a batch.
+- Keep selection stable by ID across a same-scope refresh; explain/prune targets
+  that have become unavailable. Account/Profile/session changes clear the draft
+  and late reads/completions cannot act in the new scope.
+- Initial moves stay within the active Profile. A move atomically commits target
+  membership plus source removal per Item, with authorization, provenance and
+  idempotent receipts; it never removes the source before securing the target.
+  Existing separate add/remove UI calls do not establish that atomic contract.
+- Shared actions retain the canonical actor-specific Endorsement and unanimity
+  rules. A bulk proposal cannot force consensus or silently move a Shared choice;
+  unavailable consensus-Saved removal stays unavailable with an explanation.
+- Reuse durable command ordering/replay protection, with bounded dispatch and
+  pending/succeeded/failed counts. Retain unresolved selections and retry their
+  original commands; do not repeat already acknowledged successes.
+- Whole-batch atomicity is not implied. Explain partial results, advance/remove
+  cards only after their action reaches the existing accepted durability point,
+  and do not offer an unsupported whole-batch Undo.
+
+Delivery slices: accessible selection + Discovery actions; then per-Item atomic
+List move and membership removal; Shared cases pass their existing consent/access
+gates before exposure. Verify long-press versus scroll/open, empty selection,
+refresh/reorder, first destination, partial success, offline/restart/retry,
+concurrent List changes, Profile isolation and large-text/screen-reader use.
+Success is less repeated tapping with accurate outcomes; stop or simplify if
+accidental reactions or failed/misleading moves increase.

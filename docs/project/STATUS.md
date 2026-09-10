@@ -20,6 +20,28 @@ opened too low, and creating a destination List immediately endorsed the Item.
 The requested source was `621a03c`; the owner did not supply its installed run/SHA.
 Keep physical acceptance open for these two corrected interactions.
 
+Additional owner report while the next APK is building: in Katsotut card browsing,
+start the rating handle at the saved value (for example 8), including 0. This
+report is **open, not fixed or reproduced here**. Source inspection shows the
+control already maps its rating prop, while the history grid loads fresh collection
+ratings and Detail reads the separately hydrated interaction map. Compare those
+values before choosing a correction; do not claim the slider itself is proven
+faulty. DEVICE_TEST adds a focused initial-value/edit/Undo/reopen regression.
+
+The owner will test when the APK is ready. Runtime checkpoint remains
+`07b12ea86f3952844d475de9e8f02670a8381ffb`; this subsequent planning update changes
+only documentation. The local execution environment became disconnected, so no
+new runtime test or npm check was run. The prior 333-test result below still
+belongs to that unchanged runtime. Do not dispatch/poll or replace the ongoing
+APK test, merge, redeploy, or reset the current test data.
+
+New ideas are recorded in FUTURE_PLAN and the Phase 17.0 follow-up queue:
+[#230](https://github.com/Kajooja/Kajo/issues/230) category statistics (working
+30-reaction unlock, five new weekly reactions, Monday countdown; comparisons gated
+by anonymous cohort support) and [#231](https://github.com/Kajooja/Kajo/issues/231)
+Discovery/List long-press multi-select. These remain planned, with no new MVP
+release blocker or Stats/bulk runtime in this checkpoint.
+
 Current corrections and retained history rollout:
 
 - Initial/calibration/import ratings were absent from both consumed history and
@@ -100,9 +122,12 @@ Next actions:
    need their own final-head result. Hosted rollout is already verified; do not
    repeat deployment or apply the separate global-default forward.
 2. The owner starts the next manual branch APK CI; do not dispatch/poll it. Run
-   DEVICE_TEST's latest four cases with the actual installed SHA: OnePlus panel
+   DEVICE_TEST's latest five cases with the actual installed SHA: OnePlus panel
    alignment/keyboard, create first Shared List→message→explicit proposal, failure/
-   scope recovery and multiple Personal additions. Preserve current test data.
+   scope recovery, multiple Personal additions and the newly reported saved-rating
+   start position. Preserve current test data. Record the actual build for the
+   rating report; compare collection read versus hydrated Detail state and fix any
+   reproduced discrepancy before closing this checkpoint.
 3. Consider merge only after required CI and owner acceptance. Keep #228/#229,
    DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
 

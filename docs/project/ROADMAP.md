@@ -246,6 +246,22 @@ Exit gate:
 
 Requirements: existing `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, Lists/messages/Room/device acceptance.
 
+Owner follow-up ideas recorded 2026-09-10, to size as separate increments here
+once the existing dependencies pass:
+
+- [#231](https://github.com/Kajooja/Kajo/issues/231): long-press selection in
+  Discovery/Lists, grid not-interest/List add, then safe List moves/removals.
+  Requires the canonical atomic/durable commands and truthful per-Item origin.
+- [#230](https://github.com/Kajooja/Kajo/issues/230): private category statistics
+  and independent unlock progress; weekly updates follow the 17.1/17.2 scheduling,
+  measurement and privacy contracts. Enable community comparisons only with
+  sufficiently supported anonymous aggregates.
+
+Detailed rules and provisional 30/5 thresholds live in
+[FUTURE_PLAN.md](../product/FUTURE_PLAN.md#fut-ux-001--personal-category-statistics--planned--230).
+These are planned phase candidates, not delivered behavior or automatic new MVP
+release blockers. They do not displace Phase 14 correctness, Taste or Friends.
+
 Exit gate:
 
 - contextual Lists, search/filters and authorized Profile surfaces are complete,

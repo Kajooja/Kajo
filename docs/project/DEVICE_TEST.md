@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **second owner results recorded; picker corrections implemented, acceptance open**.
+Status: **second owner results recorded; picker acceptance and saved-rating start-position report open**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -15,8 +15,11 @@ Status: **second owner results recorded; picker corrections implemented, accepta
 - First history-correction runtime: `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df`, all five required
   CI #434 / run 34496017165 jobs passed. Later filename/docs changes retain its
   app code. This PR CI run did not build an APK; use the manual workflow below.
-- The second destination-picker correction changes app code; build the current
-  PR branch head for its new follow-up. Earlier APKs cannot validate these fixes.
+- The second destination-picker runtime is `07b12ea86f3952844d475de9e8f02670a8381ffb`.
+  The owner reports its next APK is building and will test when ready; installed
+  run/SHA remains to be recorded. The later statistics/selection/rating-report
+  planning update changes only docs and does not require replacing that APK.
+  Earlier APKs cannot validate the destination-picker correction.
 - Hydration forward `20260910153737_bootstrap_history_projection` is deployed;
   hosted behavior and access checks passed. No repeat deployment needed; the
   owner's subsequent repeat reset is recorded below.
@@ -195,6 +198,35 @@ Use the latest branch APK and existing test data; the owner starts its CI manual
 4. Personal mode: select → Add for two Lists, then Done. Both memberships survive.
    Creating a third List alone never saves/hides the current Item. Check the
    preserved initial-history edit/clear and Shared attribution as a brief regression.
+5. Katsotut/Luetut → Kortit: an Item saved as 8 starts with the handle at 8 and
+   the rating badge agrees before touching the control. Repeat with 0 and 10,
+   native and initial/import ratings where available, adjacent cards, reopening
+   and pull refresh. Edit 8→6, reopen to 6, Undo and confirm the saved predecessor
+   reappears. Opening/browsing must not submit a new rating. A consumed-only Item
+   has no fabricated rating. Check Personal/Shared isolation. This newly reported
+   case is open; no correction is claimed by the planning update.
 
 Report the run/installed SHA, device/OS and pass/fail. Longer Taste/unknown control
 work remains planned; no new reset is needed for these picker corrections.
+
+## Additional owner report — saved rating start position
+
+Reported **2026-09-10** while the next APK is still building; the owner will test
+when ready. In Katsotut card browsing, the rating handle should initially sit at
+the last saved score, for example 8. The installed version for this report is
+unknown. This is a current history correctness follow-up under #228/#229,
+not part of the future statistics or multi-select feature.
+
+Source inspection at runtime `07b12ea`: RatingControl initializes its animated
+position with getRatingPosition(rating); ItemDetailScreen passes
+interaction.rating and keys the control by Item/rating. ConsumedHistoryScreen
+renders ratings returned by loadConsumed, but useCollectionNavigation carries only
+Items and collection identity; Detail reads the independently hydrated
+ItemInteractionContext. A stale/missing map entry is a plausible investigation
+path, not a reproduced root cause. Verify both data values and the actual visual
+position before adding a targeted regression/fix.
+
+The execution environment disconnected during this follow-up. No local runtime,
+npm check or real-device reproduction was possible, and no speculative code fix
+was published. Preserve the report and existing test data; the five cases above
+are the next owner acceptance checkpoint.

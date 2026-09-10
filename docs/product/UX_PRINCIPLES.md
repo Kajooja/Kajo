@@ -50,7 +50,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 30. **Pending and consensus are visually distinct.** Pending proposer/List provenance and explicit approval remain readable without relying on color alone. Only unanimity produces durable consensus and Shared Saved/list commit.
 31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item. Collections reuse Discovery covers, show given ratings, and provide Ruudukko / Kortit browsing while keeping their own collection context.
 32. **Shared provenance is truthful.** List membership retains original proposer/added time where defined; UI does not invent actor provenance.
-33. **List choice stays lightweight.** Personal users can add an Item to multiple Lists in one open picker. Each addition saves immediately; Valmis advances once. Closing keeps completed saves. Recent choices stay bounded with expansion/new-list creation on demand. Shared proposals retain their existing single-destination consent flow.
+33. **List choice stays lightweight.** Personal users can add an Item to multiple Lists in one open picker. Each confirmed addition saves immediately; Valmis advances once. Closing keeps completed saves. Recent choices stay bounded with expansion/new-list creation on demand. Shared proposals retain their existing single-destination consent flow.
 34. **Messaging stays Profile-scoped and quiet.** Inbox combines relevant invitation/message activity. Message failure must not roll back successful List action.
 
 ## Motion and accessibility
@@ -149,3 +149,30 @@ Refreshing discovery may vary equal-fit candidates and apply the existing recent
 exposure cooldown. The owner explicitly accepts tie variation. Preserve server
 rank and truthful slate provenance; do not replace scored priorities with an
 unconditional client shuffle or lock the whole slate to hide a scoring defect.
+
+## History rating position
+
+Opening a previously rated Item from Katsotut/Luetut or a named List must place
+the rating handle at that Profile's current saved value on first display:
+8 means position 8; 0 means position 0. Swiping between collection cards,
+reopening, refresh, edit and Undo must preserve this agreement with the visible
+rating badge. Consumed-only/unrated Items have no invented saved rating.
+Opening the control must never submit the starting value as a new rating.
+Shared member-history attribution must not prefill another member's rating as a
+SharedProfile rating. The owner's 2026-09-10 mismatch report remains open in
+[DEVICE_TEST.md](../project/DEVICE_TEST.md#additional-owner-report--saved-rating-start-position).
+
+## Planned personal statistics and selection
+
+The owner accepts light progression through a separate Tilastot destination,
+reachable below Profiili and from the Profile surface. Independent category
+unlock/weekly counters may encourage returning while keeping the existing
+Room/navigation restrained. This is a planned opt-in view, not a delivered
+analytics dashboard. Exact count/source/schedule rules and comparison gates
+belong to [FUTURE_PLAN.md](FUTURE_PLAN.md#fut-ux-001--personal-category-statistics--planned--230).
+
+Planned long-press selection uses an upper-left checkbox, visible selected count,
+explicit bulk actions and a non-gesture accessibility entry. Selecting alone
+creates no rating, not-interest or List mutation. The complete Discovery/List
+and partial-failure contract is
+[FUTURE_PLAN.md](FUTURE_PLAN.md#fut-ux-002--long-press-multi-select--planned--231).

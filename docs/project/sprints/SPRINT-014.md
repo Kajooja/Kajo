@@ -1367,3 +1367,28 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Local validation: `npm run check` passed 333 tests (256 mobile, 14 catalog,
   63 database), lint/TypeScript and both platform exports. Existing duplicate-import
   lint warnings remain unchanged. Publication/final-head CI belong to the PR.
+
+### Owner ideas and rating-position report — 2026-09-10 / #228 / #229
+
+- The owner reports the next APK is building and will test it when ready.
+  Runtime remains `07b12ea86f3952844d475de9e8f02670a8381ffb`; this entry and its
+  related canonical updates are documentation only.
+- Recorded personal category statistics as FUT-UX-001 / #230: drawer/Profile
+  destination, independent unlock, rated/mean/not-interest/List totals, working
+  thresholds of 30 initial reactions and five new reactions per category/week,
+  Monday countdown/snapshots, source deduplication and conditional comparisons.
+  The earlier suggested 50 remains a tunable alternative.
+- Recorded long-press multi-select as FUT-UX-002 / #231: upper-left checkbox,
+  Discovery reject/List-add and List move/remove, accessible selection, preserved
+  per-Item origin, atomic moves and partial/durable/Shared permission semantics.
+- ROADMAP places both as separately scoped Phase 17.0 candidates, with weekly
+  stats/comparisons dependent on 17.1/17.2. No new MVP blocker, future feature
+  implementation or change to the current Phase 14 dependency order.
+- Added the owner's current Katsotut card report to STATUS/DEVICE_TEST/UX: start
+  the rating handle at the saved value, including 8 and 0. Existing control/prop
+  initialization already expresses that rule; history versus Detail hydration
+  needs reproduction before asserting a root cause. The report remains open.
+- Local execution became unavailable (environment disconnected). Source inspection
+  and document consistency checks used the exact GitHub branch snapshot; no new
+  runtime test or npm check was run. The prior 333 tests apply to the unchanged
+  runtime only. No APK dispatch/polling, merge, migration or reset.
