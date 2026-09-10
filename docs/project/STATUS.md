@@ -39,7 +39,11 @@ forward preserves raw baseline scores, data/receipts/frozen results, old functio
 identities/ACLs and unrelated bodies; divergent source rolls back all changes.
 Both probes are wired into required native CLI CI. `npm run check` passes
 **348 tests** (270 mobile, 14 catalog, 64 database), lint/TypeScript and both
-platform exports. Required CI for this new source remains to be verified.
+platform exports. CI for `99bdecc` passed four gates but failed the native populated
+upgrade's exact raw-score check. Reproducing with `extra_float_digits=0` exposed
+lossy float-to-JSON serialization. The still-undeployed forward now pins precise
+output only inside V0's function scope and restores the caller setting; tests
+cover both rounded and precise callers. The correction needs new-head native CI.
 
 The preceding client head `1102d92e25ac973909b073fdcdaa8f2cdc9fcf22` passed all five
 required jobs in [CI](https://github.com/Kajooja/Kajo/actions/runs/34524399404).

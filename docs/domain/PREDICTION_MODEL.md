@@ -974,7 +974,10 @@ final scoring in the pure private `prediction_candidate_score_v2` helper. New V0
 candidate explanations carry `scoringFeatures.version = prediction-features-v2`
 with unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty,
 exploration and both penalty inputs. Rounded top-level display fields remain
-compatible. The accepted raw baseline weights/scores are preserved. Scalar and
+compatible. The feature serializer pins `extra_float_digits=3` within V0's function
+scope: a caller's rounded JSON float setting must not erase binary precision, and
+the caller setting is restored on return. The accepted raw baseline weights/scores
+are preserved. Scalar and
 Scenario weights use the same immutable genome recorded on the PredictionRun.
 Final scoring adds the stored raw Scenario score with its genome weight and the
 frozen aggregate Shared common-fit contribution. Personal common-fit stays zero.

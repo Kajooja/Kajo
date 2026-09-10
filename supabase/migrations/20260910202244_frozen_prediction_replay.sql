@@ -89,6 +89,11 @@ begin
   ] loop
     definition := pg_get_functiondef(target);
     for patch in select * from (values
+      -- JSON float output otherwise inherits the caller's rounding setting.
+      -- Pin only this serializer's function scope; restore the caller on return.
+      ('private.rank_items_v0(uuid,text,text,integer,jsonb)', $old$ SET search_path TO ''$old$,
+        $new$ SET search_path TO ''
+ SET extra_float_digits TO '3'$new$, 1),
       ('private.rank_items_v0(uuid,text,text,integer,jsonb)', $old$AS $function$
 begin$old$, $new$AS $function$
 declare

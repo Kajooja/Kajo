@@ -60,7 +60,8 @@ try {
     const replayIndex = files.findIndex(file => file.name.endsWith('_frozen_prediction_replay.sql'));
     assert.ok(replayIndex > lateIndex);
     await resetFromMigrations(files.slice(0, replayIndex));
-    const [frozenReplayUpgrade] = await exec(frozenReplayUpgradeSql(files[replayIndex], projectionFixture, candidate.tables));
+    const [frozenReplayUpgrade] = await exec('set extra_float_digits=0;\n'
+      + frozenReplayUpgradeSql(files[replayIndex], projectionFixture, candidate.tables));
     assert.match(frozenReplayUpgrade?.frozenReplayUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
@@ -89,7 +90,8 @@ try {
     assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
     const [lateOutcomes] = await exec(await readFile(new URL('late-outcome-smoke.sql', import.meta.url), 'utf8'));
     assert.match(lateOutcomes?.lateOutcomes, /^PASS: exact late Shared/);
-    const [frozenReplay] = await exec(await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
+    const [frozenReplay] = await exec('set extra_float_digits=0;\n'
+      + await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
     assert.match(frozenReplay?.frozenReplay, /^PASS: 18 Personal\/Shared/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);

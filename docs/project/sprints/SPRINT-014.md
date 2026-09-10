@@ -1600,3 +1600,23 @@ reproduction and correction (`MVP-ALG-003`). This slice only proves parity on th
 frozen source pool; empty/refilled pools, zero-result worker behavior and rollout
 acceptance keep `MVP-ALG-002` open. Preserve Phase 14.1 recovery gates, the deferred
 APK cases and the same draft #228/#229 handoff.
+
+### Native replay precision correction — 2026-09-10
+
+CI on `99bdecc` passed four required gates but failed native populated-upgrade
+baseline-score equality in run 34527872429. The same failure is reproducible in
+PGlite with `extra_float_digits=0` or -1: JSON construction rounds float inputs,
+although the old direct scorer retains the binary value. V0 now pins
+`extra_float_digits=3` in its own function configuration, restoring the caller's
+setting on return. Existing identities/owners/ACLs and every other configuration
+remain unchanged. Exact baseline equality is retained, not replaced by tolerance.
+The complete upgrade/replay tests run with both rounded and precise callers;
+native CLI acceptance explicitly exercises a rounded caller as well.
+
+The still-undeployed replay migration was corrected in place; its current SHA-256
+is `22d42dce06240092faec75550adcf70de75846079ac48ade0a80231671511f4a`.
+The preceding checkpoint's hash identifies the earlier undeployed revision.
+`EXPO_OFFLINE=1 CI=1 npm run check` passes all **348 tests**, lint/TypeScript and
+both platform exports. Native CI for this correction is still required. No
+hosted mutation, APK action or phase acceptance is implied; candidate availability
+remains the active continuation.

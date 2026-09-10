@@ -8,7 +8,9 @@ export function frozenReplayUpgradeSql(migration, fixture, tables) {
     return `select '${name}' as identity,md5(coalesce((select jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text)
       from ${name} r),'[]'::jsonb)::text) as digest`;
   }).join('\nunion all\n');
-  const functions = `select p.oid,p.oid::regprocedure::text as identity,p.proowner,p.proacl,p.prosecdef,p.proconfig,
+  const functions = `select p.oid,p.oid::regprocedure::text as identity,p.proowner,p.proacl,p.prosecdef,
+    case when p.oid='private.rank_items_v0(uuid,text,text,integer,jsonb)'::regprocedure
+      then array_remove(p.proconfig,'extra_float_digits=3') else p.proconfig end as proconfig,
     case when p.oid in (
       'private.rank_items_v0(uuid,text,text,integer,jsonb)'::regprocedure,
       'private.rank_items_scalar_v1(uuid,text,text,integer,jsonb,uuid)'::regprocedure,
@@ -67,6 +69,10 @@ export function frozenReplayUpgradeSql(migration, fixture, tables) {
       end if;
       if (select count(*) from (${functions}) f)<>(select count(*)+3 from pg_temp.replay_functions_before) then
         raise exception 'Unexpected new replay functions';
+      end if;
+      if not (select proconfig @> array['extra_float_digits=3'] from pg_proc
+        where oid='private.rank_items_v0(uuid,text,text,integer,jsonb)'::regprocedure) then
+        raise exception 'Raw feature serialization must pin full precision in its own function scope';
       end if;
       if exists((${baselineScores}) except select * from pg_temp.replay_baseline_before)
         or exists(select * from pg_temp.replay_baseline_before except (${baselineScores})) then

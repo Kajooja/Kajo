@@ -22,8 +22,13 @@ test('frozen serving/shadow replay parity, populated upgrade and incompatible-hi
     for (const file of installation.files.slice(0, index)) await db.exec(`begin; ${file.sql} commit;`);
     const migration = installation.files[index];
     const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
-    const upgrade = await snapshots(frozenReplayUpgradeSql(migration, fixture, installation.candidate.tables));
-    assert.match(upgrade[0]?.frozenReplayUpgrade, /^PASS: unchanged populated/);
+    for (const digits of [0, 1]) {
+      await db.exec(`set extra_float_digits=${digits}`);
+      const upgrade = await snapshots(frozenReplayUpgradeSql(migration, fixture, installation.candidate.tables));
+      assert.match(upgrade[0]?.frozenReplayUpgrade, /^PASS: unchanged populated/);
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits),
+        'Feature serializer must restore the caller rounding setting');
+    }
     const before = await snapshotApplication(snapshots, installation.candidate, { forward: true });
     await db.exec('begin');
     try {
@@ -35,8 +40,12 @@ test('frozen serving/shadow replay parity, populated upgrade and incompatible-hi
       'Unexpected installed source must roll back every helper and previous replacement');
     for (const file of installation.files.slice(index)) await db.exec(`begin; ${file.sql} commit;`);
     const installed = await snapshotApplication(snapshots, installation.candidate, { forward: true });
-    const replay = await snapshots(await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
-    assert.match(replay[0]?.frozenReplay, /^PASS: 18 Personal\/Shared/);
+    for (const digits of [0, 1]) {
+      await db.exec(`set extra_float_digits=${digits}`);
+      const replay = await snapshots(await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
+      assert.match(replay[0]?.frozenReplay, /^PASS: 18 Personal\/Shared/);
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits));
+    }
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), installed,
       'Replay acceptance must leave no fixture accounts, Events or traces');
   } finally { await db.close(); }
