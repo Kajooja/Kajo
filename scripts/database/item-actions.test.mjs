@@ -8,6 +8,7 @@ import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
 import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
+import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 
 test('atomic Item actions on the full fresh schema (PGlite; native smoke also runs in required CLI CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -31,6 +32,20 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     const collectionUpgrade = await snapshots(collectionActionUpgradeSql(installation.files[collectionIndex], installation.candidate.tables));
     assert.match(collectionUpgrade[0]?.collectionActionUpgrade, /^PASS: unchanged populated/);
     for (const file of installation.files.slice(collectionIndex)) {
+      if (file.name.endsWith('_late_outcome_attribution.sql')) {
+        const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+        const upgrade = await snapshots(lateOutcomeUpgradeSql(file, fixture, installation.candidate.tables));
+        assert.match(upgrade[0]?.lateOutcomeUpgrade, /^PASS: unchanged populated/);
+        // A differently installed reader must fail closed, including rollback of
+        // the helper and the first reader replacement in this same forward.
+        await db.exec('begin');
+        try {
+          const [{ definition }] = (await db.query("select pg_get_functiondef('private.evaluate_shadow_genome_v1(uuid,uuid)'::regprocedure) as definition")).rows;
+          await db.exec(definition.replace('join public.events as outcome', 'join public.events  as outcome'));
+          await assert.rejects(db.exec(file.sql), /Late outcome forward: unexpected source anchor/);
+        } finally { await db.exec('rollback'); }
+        assert.equal((await db.query("select to_regprocedure('private.prediction_outcome_events_v1(uuid,timestamptz,timestamptz)') as helper")).rows[0].helper, null);
+      }
       if (file.name.endsWith('_bootstrap_history_projection.sql')) {
         const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
         const upgrade = await snapshots(historyProjectionUpgradeSql(file, fixture, installation.candidate.tables));
@@ -65,6 +80,8 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     assert.match(collections[0]?.collectionActions, /^PASS: atomic/);
     const delivery = await snapshots(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
     assert.match(delivery[0]?.deliveryOrder, /^PASS: 14 Item/);
+    const late = await snapshots(await readFile(new URL('late-outcome-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(late[0]?.lateOutcomes, /^PASS: exact late Shared/);
     const listed = await snapshots(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listed[0]?.listMembership, /^PASS: public delivery/);
     const history = await snapshots(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));

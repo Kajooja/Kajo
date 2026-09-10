@@ -477,8 +477,9 @@ contexts cannot dispatch. The server's existing trace validation remains require
 
 This guard orders evidence that was successfully enqueued. It does not fabricate
 missing impressions, revise already committed unattributed receipts or prove client
-origin authenticity. Missing/already-committed late outcomes and frozen Shared
-item-specific/async origins remain separate acceptance work on the same Issue.
+origin authenticity. The read-time reconciliation below handles already-committed
+late outcomes only after exact proof exists. Missing evidence and representative
+device/async-origin acceptance remain separate work on the same Issue.
 
 
 ### Shared per-Item origin checkpoint — #228
@@ -497,7 +498,7 @@ current consensus controls can still reflect live state. Dwell freezes its
 recording callback, mode and descriptor at start. Unknown undo targets cannot
 inherit the current slate's run. Server authorization and selected-candidate /
 exposure validation remain required. Remaining async/session boundary review,
-late-outcome reconciliation and representative runtime acceptance are still open.
+deployed late-outcome reconciliation and representative runtime acceptance are still open.
 
 
 ### Deferred origin/session admission checkpoint — #228
@@ -516,7 +517,7 @@ receipt projection or dispatch from surviving the interval before passive queue
 cleanup. Lists/Shared pending completions also expire on session change/unmount.
 The destination sheet scopes loading/saving to each open request and rejects
 obsolete completions. Accepted persisted commands still replay their original
-session through a current coordinator. Server late-outcome verification and
+session through a current coordinator. Hosted late-outcome verification and
 representative device/reopen/process-death acceptance remain open.
 
 
@@ -532,10 +533,52 @@ and unselected candidates produce `UNATTRIBUTED` preference Events.
 An impression inserted after the action receipt does not retrofit attribution,
 even when its occurrence time precedes the action. Exact retries return the same
 receipt/Event; undo inherits the accepted attribution. This intentionally preserves
-immutable history: it is not a retrospective reconciliation implementation. The
+immutable history; the command write path never retrofits attribution. The
 mobile exposure-order guard prevents this ordering for locally pending impressions;
 missing evidence is never invented. Both command families and secondary collection
 Events are covered by 14 rollback-only cases in PGlite and required native CLI CI.
+
+### Read-time late Outcome attribution — #228, prepared / not hosted
+
+`20260910192630_late_outcome_attribution.sql` adds the private, non-RPC
+`prediction_outcome_events_v1` read projection. Already recorded attribution stays
+compatible. For an unattributed Item/collection Outcome, the original private
+action receipt must own that Event (primary ID or exact recorded `eventIds`) and
+retain the requested Prediction. A client `actionId` property alone is insufficient.
+Receipt/Event actor, Profile, Item, occurrence time, session and mode must agree;
+the exact run must belong to that actor/Profile/session/mode, select the Item and
+precede the action. An actual matching impression must have occurred between that
+run and the action. Another member, Item, session or later run never substitutes.
+
+Only supported preference/List/Shared-endorsement command outcomes participate.
+Metadata, history clearing and undo commands do not acquire a new Prediction.
+Multiple impressions produce one effective Event; secondary collection Events
+require membership in their receipt. `RECORDED` and `LATE_EXPOSURE_V1` describe the
+read result. Raw Events retain their original `prediction_id` and attribution
+status, and exact command replay still returns the original immutable receipt.
+No new Event, impression, receipt, preference weight or synthetic outcome is made.
+
+Both ScenarioMemory and SleepLayer use the same reader and retain existing
+selected-candidate, outcome-priority and exact reversal rules. A later impression
+can therefore restore a legitimate outcome's learning effect; undo still removes
+it. A stored rating of 0 remains a negative outcome. This does not implement the
+planned SharedRatingRound, alter joint-rating semantics or copy Shared Events into
+Personal history.
+
+The reader separates the Outcome occurrence cutoff from the evidence-read cutoff.
+It considers only visible rows with recorded `created_at` no later than that read
+cutoff, including the receipt and qualifying impression. Serving uses request time;
+evaluation captures server time when it starts and records it with attribution
+version `outcome-attribution-v1`. Its mature occurrence window is unchanged. Proof
+arriving after an earlier evaluation can enter a new evaluation; it never rewrites
+old evaluations or prediction-time inputs. This is not a new authenticated arrival
+timestamp or a proof of client-origin authenticity.
+
+`late-outcome-smoke.sql` exercises actual serving and frozen-shadow evaluation,
+cutoffs, Shared isolation, zero/undo, duplicate impressions and forged receipt
+references. The unchanged-file populated upgrade preserves data/receipts and old
+function identities/ACLs. Both regressions run in PGlite and required native CLI CI;
+hosted deployment and physical recovery acceptance remain open.
 
 
 ### Exposure waiting presentation correction — #228 device feedback

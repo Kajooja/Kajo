@@ -12,6 +12,7 @@ import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
 import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
+import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -50,6 +51,11 @@ try {
     await resetFromMigrations(files.slice(0, destinationsIndex));
     const [sharedListDestinationsUpgrade] = await exec(sharedListDestinationsUpgradeSql(files[destinationsIndex], projectionFixture, candidate.tables));
     assert.match(sharedListDestinationsUpgrade?.sharedListDestinationsUpgrade, /^PASS: unchanged populated/);
+    const lateIndex = files.findIndex(file => file.name.endsWith('_late_outcome_attribution.sql'));
+    assert.ok(lateIndex > destinationsIndex);
+    await resetFromMigrations(files.slice(0, lateIndex));
+    const [lateOutcomeUpgrade] = await exec(lateOutcomeUpgradeSql(files[lateIndex], projectionFixture, candidate.tables));
+    assert.match(lateOutcomeUpgrade?.lateOutcomeUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -75,6 +81,8 @@ try {
     assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
     const [deliveryOrder] = await exec(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
     assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
+    const [lateOutcomes] = await exec(await readFile(new URL('late-outcome-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(lateOutcomes?.lateOutcomes, /^PASS: exact late Shared/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -96,6 +104,7 @@ try {
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
+      lateOutcomes, lateOutcomeUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

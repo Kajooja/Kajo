@@ -78,11 +78,29 @@ begin
           (case when scenario='DELAYED_VALID' then 'VALIDATED_TRACE' else 'UNATTRIBUTED' end) then
         raise exception '% / %: Event lost original envelope or attribution status',family,scenario;
       end if;
+      perform set_config('role','postgres',true);
       if scenario='LATE_ARRIVAL' then
+        if exists(select 1 from private.prediction_outcome_events_v1(profile,clock_timestamp(),clock_timestamp()) e
+          where e.id=(command->>'actionId')::uuid) then
+          raise exception '%: missing exposure was invented',family;
+        end if;
         -- Its occurrence precedes the action, but its INSERT follows the immutable receipt.
         insert into public.events(id,actor_user_id,profile_id,item_id,item_type,event_type,occurred_at,session_id,prediction_id)
           values(gen_random_uuid(),actor,profile,item,'MOVIE','ITEM_IMPRESSION',exposed,session,prediction);
       end if;
+      perform set_config('role','postgres',true);
+      if (select count(*) from private.prediction_outcome_events_v1(profile,clock_timestamp(),clock_timestamp()) e
+        where e.id=(command->>'actionId')::uuid and e.prediction_id=prediction) <>
+          (case when scenario in ('DELAYED_VALID','LATE_ARRIVAL') then 1 else 0 end) then
+        raise exception '% / %: effective Outcome failed exact origin proof',family,scenario;
+      end if;
+      if family='COLLECTION' and scenario='LATE_ARRIVAL' and
+        (select count(*) from private.prediction_outcome_events_v1(profile,clock_timestamp(),clock_timestamp()) e
+          where e.id in (select value::uuid from jsonb_array_elements_text(receipt->'eventIds'))
+            and e.prediction_id=prediction and e.attribution_source='LATE_EXPOSURE_V1')<>2 then
+        raise exception 'Late collection exposure did not recover both owned Outcome Events';
+      end if;
+      perform set_config('role','authenticated',true);
       repeated := case when family='ITEM' then public.commit_item_action_v1(command)
         else public.commit_collection_action_v1(command) end;
       if repeated is distinct from receipt or (select to_jsonb(e) from public.events e

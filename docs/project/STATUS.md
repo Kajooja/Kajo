@@ -7,7 +7,41 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## Immediate continuation checkpoint — 2026-09-10 / third APK result
+## Immediate continuation checkpoint — 2026-09-10 / owner APK running
+
+Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228. The owner
+has started the manual APK CI and will return with the device result. The requested
+APK source checkpoint is `50bd1a8dd20f6ab617c266599be185d8b8d42412`; the actual
+manual run/installed SHA has not been supplied. Do not dispatch/poll the APK,
+reset accounts or alter its hosted backend while this test is in progress.
+
+Parallel continuation stays within Phase 14.1: the new **undeployed** forward
+`20260910192630_late_outcome_attribution.sql` closes the already-committed late
+exposure learning gap. One private read projection validates the original private
+receipt, its exact Event membership, actor/Profile/Item/session/mode, selected
+Prediction candidate and an actual pre-action impression. It never changes the
+original Event or receipt. ScenarioMemory and frozen-shadow evaluation share this
+projection, preserve outcome precedence/reversals and record attribution version
+`outcome-attribution-v1`. Evaluation also records its evidence-read cutoff; old
+evaluations and frozen prediction-time inputs stay immutable.
+
+Local full-schema acceptance covers the 14 Item/collection delivery-order cases,
+late Shared rating → serving and shadow outcomes → undo, zero rating, duplicate
+impressions, forged receipt references, wrong member/Profile/Item and occurrence/
+recorded-creation cutoffs. A populated forward rehearsal retains old data/receipts,
+function identities/ACLs and all unrelated definitions. Both probes are wired into
+required native CLI CI; an unexpected installed source anchor fails closed.
+The full repository check is recorded in the appended Sprint 014 checkpoint.
+
+**Next action:** finish the required native CI for this new forward and wait for
+the owner's current four-case DEVICE_TEST result. Keep this forward undeployed
+during that APK checkpoint; then prepare its own reviewed hosted rollout with
+the exact tested SQL and populated pre/postflight evidence. Hosted remains on
+`20260910190243_shared_list_destinations`; mobile code is unchanged by this work.
+Physical process-death/reconnect/account-switch evidence and remaining 14.1
+acceptance still precede Phase 14.2. Keep PR draft and accepted main `6dd1fec`.
+
+## Multi-destination deployment checkpoint — 2026-09-10 / third APK result
 
 Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
 Main remains accepted `6dd1fec`; this branch is not merged. The owner reports the
@@ -75,7 +109,7 @@ and pending destination sets if reverting the client. Never restore an unsafe ol
 approval path over pending multi-List proposals. No fresh baseline, history repair,
 account reset or persistent test fixture was applied.
 
-**Next action:** the owner can now start the manual branch APK workflow and install
+The owner has now started the manual branch APK workflow and will install
 the new build on both accounts/devices. DEVICE_TEST owns the four focused cases.
 A standalone APK using the hosted backend does not need local Docker. Preserve
 current test data; do not dispatch/poll the APK. Keep PR #229 draft/main unchanged
@@ -475,8 +509,10 @@ Continue **14.1** after this delivery:
    swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
    verify durable exposure delivery and its ordering with action/outcome writes; the
    draft now persists Event evidence and guards matching pending impressions before
-   Item/collection dispatch; missing/already-committed late attribution remains open.
-2. Verify late outcomes, real device process-death/reconnect/account switches and
+   Item/collection dispatch. The new late-attribution read projection is locally
+   verified but still requires native CI and its own hosted rollout; absent proof
+   remains unattributed.
+2. Verify deployed late outcomes, real device process-death/reconnect/account switches and
    complete atomic List/Shared rollback/duplicate/undo authorization cases.
 3. Then proceed to **14.2 serving/shadow/candidate availability**.
 

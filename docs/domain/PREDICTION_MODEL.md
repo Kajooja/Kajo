@@ -973,6 +973,30 @@ Use bounded candidate sources for durable fit, recent/session fit, prior, novelt
 
 Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
+### Late exposure attribution checkpoint — #228, prepared / not hosted
+
+The forward `20260910192630_late_outcome_attribution.sql` makes ScenarioMemory and
+mature SleepLayer labels read the same effective Outcome projection. A committed
+unattributed action becomes learnable only when its private immutable receipt and
+an actual pre-action impression prove the exact originally requested run. The
+receipt, stored Event, old evaluations and frozen production/shadow inputs remain
+unchanged. Missing or mismatched proof contributes no Scenario label; duplicate
+impressions do not multiply support, and existing priority/undo rules still apply.
+Ordinary Personal/Shared preference memory is not duplicated by this projection.
+
+Serving policy versions gain `+outcome-attribution-v1`; evaluation metrics declare
+`outcomeAttributionVersion` and the server-captured `evidenceCutoff`. Outcome
+occurrence must fit the existing mature window, while the stored receipt/impression
+must be visible and have recorded creation times within the evidence-read cutoff.
+A newly created evaluation may include later-arriving proof; an already frozen
+evaluation never changes. This records read semantics without changing reward
+values, scalar weights or shadow choices. The full-schema regression compares
+missing-proof, exact late-proof and undo on the same frozen shadow, including a
+zero rating and same-Profile serving support. Native/hosted/device acceptance is
+tracked in STATUS; authenticated arrival timestamps and large-history read costs
+are not established by this bounded correctness test. See DATA_EVENTS for proof
+membership and cutoff details.
+
 ### Adaptive memory without unstable taste
 
 - WorkingState: ordered active-session actions and allowlisted current intent; reset/expire explicitly across session/Profile changes.

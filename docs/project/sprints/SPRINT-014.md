@@ -1466,3 +1466,43 @@ on the active branch and test the four DEVICE_TEST cases with both accounts on t
 new build. No reset or local Docker is required. No APK was dispatched/polled and
 no phone or merge acceptance is claimed. Retain server consent guards if reverting
 the client; prefer a narrow corrective forward over erasing pending/history data.
+
+### Late Outcome continuation while owner APK runs — 2026-09-10
+
+The owner started manual APK CI after the multi-destination deployment. Its
+requested source is `50bd1a8dd20f6ab617c266599be185d8b8d42412`; actual run/installed
+SHA and four-case device result have not been supplied. No APK dispatch/poll,
+account reset, hosted mutation, mobile edit or merge was performed in this step.
+
+Closed the next bounded Phase 14.1 source gap: already committed unattributed
+actions previously stayed absent from ScenarioMemory/SleepLayer even after their
+exact pre-action impression arrived. The new CLI-generated forward is
+`20260910192630_late_outcome_attribution.sql`, SHA-256
+`36cffca7490bc46ba94882de52def69c1d0618cea0e4a33175d70bccb5256d9b`.
+It adds one private invoker read helper and replaces only the serving/evaluation
+readers, preserving existing function identities/owners/ACLs. Exact private
+receipt ownership, original actor/Profile/Item/session/mode, selected run and
+actual impression are required. Raw Events/receipts and old evaluations stay
+unchanged. Both consumers use the same versioned attribution rule and existing
+reward/priority/undo semantics; evaluation records its separate evidence-read
+cutoff without modifying frozen prediction inputs.
+
+Validation: `npm run check` exits 0 with **338 tests** (261 mobile, 14 catalog,
+63 database), lint/TypeScript and both iOS/Android exports. Extended the existing
+14-case full-schema delivery matrix to verify effective attribution. The new
+`late-outcome-smoke.sql` exercises actual Shared serving and frozen-shadow labels
+before proof, after proof and after undo, including zero rating, occurrence/read
+cutoffs, wrong member/Profile/Item, duplicate impressions, forged receipt IDs and
+unchanged historical results. `late-outcome-upgrade.mjs` applies the unchanged
+forward over populated synthetic data including a real prior receipt, checks data
+and old function boundaries and rolls back. Open creator defaults do not expose
+the helper; a missing installed source anchor fails and rolls back partial DDL.
+Both full-schema acceptance and populated upgrade are wired into required native
+CLI CI. There is no local Docker, emulator or phone; native CI for this new source
+and its separate hosted rollout remain pending at publication.
+
+Continue the same #228/#229 handoff. Hosted stays on the accepted multi-destination
+forward while the owner completes that APK test. Then verify required native CI
+and prepare a separately reviewed exact-SQL rollout. Keep physical recovery and
+remaining Phase 14.1 gates open before Phase 14.2; no SharedRatingRound, Stats or
+multi-Item feature starts ahead of those dependencies.
