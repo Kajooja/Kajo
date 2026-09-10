@@ -35,11 +35,11 @@ export default function RootLayout() {
       <AuthSessionProvider>
         <PersonalProfileProvider>
           <ActiveProfileProvider>
-            <ItemListsProvider>
-              <ProfileMessagesProvider>
-                <EventTrackingProvider>
-                  <SharedEndorsementProvider>
-                    <ItemInteractionProvider>
+            <EventTrackingProvider>
+              <ItemInteractionProvider>
+                <ItemListsProvider>
+                  <ProfileMessagesProvider>
+                    <SharedEndorsementProvider>
                       <DiscoveryModeProvider>
                         {isAuthCallbackRoute ? (
                           navigator
@@ -53,11 +53,11 @@ export default function RootLayout() {
                           </BootstrapLoadingGate>
                         )}
                       </DiscoveryModeProvider>
-                    </ItemInteractionProvider>
-                  </SharedEndorsementProvider>
-                </EventTrackingProvider>
-              </ProfileMessagesProvider>
-            </ItemListsProvider>
+                    </SharedEndorsementProvider>
+                  </ProfileMessagesProvider>
+                </ItemListsProvider>
+              </ItemInteractionProvider>
+            </EventTrackingProvider>
           </ActiveProfileProvider>
         </PersonalProfileProvider>
       </AuthSessionProvider>

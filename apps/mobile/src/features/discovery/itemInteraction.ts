@@ -28,6 +28,7 @@ export interface ItemInteractionUndoEntry {
   previousInteraction: ItemInteraction | null;
   eventId: EventId | null;
   atomicActionId?: EventId;
+  collectionActionId?: EventId;
 }
 
 export interface ItemInteractionStore {

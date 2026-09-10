@@ -1,6 +1,5 @@
 import {
   isPendingItemAction,
-  type ItemActionCommand,
   type ItemActionReceipt,
   type ItemActionScope,
   type PendingItemAction,
@@ -17,15 +16,21 @@ export interface ItemActionOutboxSnapshot {
   message: string | null;
   ready: boolean;
   canDiscardUndo: boolean;
+  canDiscardAction: boolean;
 }
 
-export interface ItemActionOutbox {
+export interface PendingQueuedAction {
+  command: ItemActionScope & { actionId: string; kind: string };
+}
+
+export interface ItemActionOutbox<TEntry extends PendingQueuedAction = PendingItemAction> {
   start(): void;
   stop(): void;
-  enqueue(entry: PendingItemAction): boolean;
+  enqueue(entry: TEntry): boolean;
   retry(): void;
   discardRejectedUndo(): boolean;
-  pending(): readonly PendingItemAction[];
+  discardRejectedAction(): boolean;
+  pending(): readonly TEntry[];
   snapshot(): ItemActionOutboxSnapshot;
   waitForIdle(): Promise<void>;
 }
@@ -34,39 +39,42 @@ const STORAGE_ERROR = 'Valintajonon avaaminen tai tallentaminen epäonnistui. Va
 const MAX_PENDING = 256;
 const MAX_STORED_BYTES = 1_048_576;
 
-export function createItemActionOutbox(options: {
+export function createItemActionOutbox<TEntry extends PendingQueuedAction = PendingItemAction, TReceipt = ItemActionReceipt>(options: {
   namespace: string;
   scope: ItemActionScope;
   storage: ItemActionStorage;
-  send: (command: ItemActionCommand) => Promise<ItemActionResult>;
+  send: (command: TEntry['command']) => Promise<ItemActionResult<TReceipt>>;
   onChange: (snapshot: ItemActionOutboxSnapshot) => void;
-  onCommitted: (receipt: ItemActionReceipt) => void;
+  onCommitted: (receipt: TReceipt) => void;
   isCurrent?: () => boolean;
-}): ItemActionOutbox {
+  isPendingAction?: (value: unknown, scope: ItemActionScope) => value is TEntry;
+}): ItemActionOutbox<TEntry> {
   const key = `kajo:item-actions:v1:${encodeURIComponent(options.namespace)}:${options.scope.actorUserId}:${options.scope.profileId}`;
   let active = false;
   let ready = true;
   let blocked = false;
-  let rejectedUndo = false;
-  let pending: PendingItemAction[] = [];
+  let rejectedEntry: TEntry | null = null;
+  let pending: TEntry[] = [];
   let message: string | null = null;
   let attempt = 0;
   let flight: Promise<void> | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
+  const isValid = options.isPendingAction ?? (isPendingItemAction as unknown as
+    (value: unknown, scope: ItemActionScope) => value is TEntry);
 
-  function read(): PendingItemAction[] {
+  function read(): TEntry[] {
     const raw = options.storage.getItemSync(key);
     if (raw && raw.length > MAX_STORED_BYTES) throw new Error('Outbox too large');
     const parsed: unknown = raw === null ? [] : JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length > MAX_PENDING
-      || !parsed.every(entry => isPendingItemAction(entry, options.scope))
+      || !parsed.every(entry => isValid(entry, options.scope))
       || new Set(parsed.map(entry => entry.command.actionId)).size !== parsed.length) {
       throw new Error('Invalid persisted action queue');
     }
     return parsed;
   }
 
-  function write(entries: PendingItemAction[]) {
+  function write(entries: TEntry[]) {
     const serialized = JSON.stringify(entries);
     if (entries.length > MAX_PENDING || serialized.length > MAX_STORED_BYTES) throw new Error('Outbox full');
     options.storage.setItemSync(key, serialized);
@@ -74,7 +82,9 @@ export function createItemActionOutbox(options: {
   }
 
   function snapshot(): ItemActionOutboxSnapshot {
-    return { pendingCount: pending.length, message, ready, canDiscardUndo: blocked && rejectedUndo };
+    return { pendingCount: pending.length, message, ready,
+      canDiscardUndo: blocked && rejectedEntry?.command.kind === 'UNDO',
+      canDiscardAction: blocked && rejectedEntry !== null };
   }
 
   function publish() {
@@ -93,13 +103,23 @@ export function createItemActionOutbox(options: {
         reload();
         const entry = pending[0];
         if (!ready || !entry) break;
-        let result: ItemActionResult;
-        try { result = await options.send(entry.command); }
+        let result: ItemActionResult<TReceipt>;
+        let deadline: ReturnType<typeof setTimeout> | undefined;
+        try {
+          result = await Promise.race([
+            options.send(entry.command),
+            new Promise<ItemActionResult<TReceipt>>(resolve => {
+              deadline = setTimeout(() => resolve({ status: 'error', retryable: true,
+                message: 'Tallennuksen vahvistus viipyy. Valinta säilyy jonossa ja sitä yritetään uudelleen.' }), 20_000);
+            }),
+          ]);
+        }
         catch { result = { status: 'error', retryable: true, message: 'Valinta odottaa yhteyttä. Yritämme tallennusta uudelleen.' }; }
+        finally { if (deadline) clearTimeout(deadline); }
         if (result.status === 'error') {
           message = result.message;
           blocked = !result.retryable;
-          rejectedUndo = result.rejectedUndo === true && entry.command.kind === 'UNDO';
+          rejectedEntry = result.rejectedAction === true || (result.rejectedUndo === true && entry.command.kind === 'UNDO') ? entry : null;
           if (active && result.retryable) {
             const delay = Math.min(30_000, 1_000 * 2 ** Math.min(attempt++, 5));
             timer = setTimeout(() => { timer = null; drain(); }, delay);
@@ -127,6 +147,17 @@ export function createItemActionOutbox(options: {
   }
 
   reload();
+  function discardRejectedAction() {
+    if (!active || options.isCurrent?.() === false || !blocked || !rejectedEntry) return false;
+    try {
+      const current = read();
+      if (!current[0] || JSON.stringify(current[0]) !== JSON.stringify(rejectedEntry)) return false;
+      write(current.slice(1));
+    } catch { ready = false; message = STORAGE_ERROR; publish(); return false; }
+    // Rehydrate before the remaining queue resumes; this is never an uncertain ack.
+    active = false;
+    return true;
+  }
   return {
     snapshot,
     start() { active = true; publish(); drain(); },
@@ -141,7 +172,7 @@ export function createItemActionOutbox(options: {
       if (!active || options.isCurrent?.() === false || !ready) return false;
       try {
         const copy: unknown = JSON.parse(JSON.stringify(entry));
-        if (!isPendingItemAction(copy, options.scope)) throw new Error('Invalid action');
+        if (!isValid(copy, options.scope)) throw new Error('Invalid action');
         const current = read();
         const existing = current.find(row => row.command.actionId === copy.command.actionId);
         if (existing && JSON.stringify(existing) !== JSON.stringify(copy)) throw new Error('Action ID reused');
@@ -156,23 +187,16 @@ export function createItemActionOutbox(options: {
       if (timer) clearTimeout(timer);
       timer = null;
       blocked = false;
-      rejectedUndo = false;
+      rejectedEntry = null;
       message = null;
       reload();
       publish();
       drain();
     },
     discardRejectedUndo() {
-      if (!active || !blocked || !rejectedUndo) return false;
-      try {
-        const current = read();
-        if (current[0]?.command.kind !== 'UNDO') return false;
-        write(current.slice(1));
-      } catch { ready = false; message = STORAGE_ERROR; publish(); return false; }
-      // Caller reloads authoritative state before starting the remaining queue.
-      active = false;
-      return true;
+      return rejectedEntry?.command.kind === 'UNDO' && discardRejectedAction();
     },
+    discardRejectedAction,
     pending() { reload(); return pending; },
     async waitForIdle() { while (flight) await flight; },
   };

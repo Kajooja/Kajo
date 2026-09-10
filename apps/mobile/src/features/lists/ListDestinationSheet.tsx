@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -12,7 +12,8 @@ import {
 
 import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
-import { useEventTracking } from '../events/EventTrackingContext';
+import type { EventRecordInput } from '../events/eventTracking';
+import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
 import {
   MAXIMUM_PROFILE_MESSAGE_LENGTH,
   validateProfileMessage,
@@ -36,6 +37,7 @@ interface ListDestinationSheetProps {
   item: Item | null;
   isSharedProfile: boolean;
   theme: RoomTheme;
+  origin?: EventRecordInput | undefined;
   onClose: () => void;
   onCommitted: (commit: ListDestinationCommit) => void;
 }
@@ -45,11 +47,11 @@ export function ListDestinationSheet({
   item,
   isSharedProfile,
   theme,
+  origin,
   onClose,
   onCommitted,
 }: ListDestinationSheetProps) {
-  const { loadForItem, createList: createItemList, setEntry } = useItemLists();
-  const eventTracking = useEventTracking();
+  const { loadForItem, createList: createItemList, setEntry, scopeKey, revision } = useItemLists();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [availableLists, setAvailableLists] = useState<readonly ItemList[]>([]);
   const [expanded, setExpanded] = useState(false);
@@ -62,8 +64,14 @@ export function ListDestinationSheet({
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const itemId = item?.id ?? null;
   const requestKey = itemId
-    ? `${itemId}:${isSharedProfile ? 'shared' : 'personal'}`
+    ? `${scopeKey}:${itemId}:${isSharedProfile ? 'shared' : 'personal'}`
     : null;
+  const requestToken = useMemo(() => ({ requestKey, visible }), [requestKey, visible]);
+  const currentRequest = useRef<typeof requestToken | null>(requestToken);
+  useLayoutEffect(() => {
+    currentRequest.current = requestToken;
+    return () => { currentRequest.current = null; };
+  }, [requestToken]);
   const loading = visible && requestKey !== null && loadedKey !== requestKey;
   const visibleLists = selectVisibleListDestinations(availableLists, expanded);
   const hiddenCount = availableLists.length - visibleLists.length;
@@ -98,10 +106,10 @@ export function ListDestinationSheet({
     });
 
     return () => { active = false; };
-  }, [isSharedProfile, itemId, loadForItem, requestKey, visible]);
+  }, [isSharedProfile, itemId, loadForItem, requestKey, revision, visible]);
 
   async function persistDestination(list: ItemList) {
-    if (!item) return false;
+    if (!item || !visible || currentRequest.current !== requestToken) return false;
     const messageValidation = messageDraft.trim().length > 0
       ? validateProfileMessage(messageDraft)
       : null;
@@ -111,7 +119,8 @@ export function ListDestinationSheet({
     }
 
     if (!isSharedProfile) {
-      const result = await setEntry(list.id, item.id, true);
+      const result = await setEntry(list.id, item.id, true, { positive: true, ...(origin ? { origin } : {}) });
+      if (currentRequest.current !== requestToken) return false;
       if (result.status === 'error') {
         setError(result.message);
         return false;
@@ -120,19 +129,6 @@ export function ListDestinationSheet({
 
     if (!isSharedProfile) {
       rememberRecentList(list.profileId, list.id);
-    }
-
-    if (!isSharedProfile && list.kind === 'CUSTOM' && !list.containsItem) {
-      eventTracking.recordEvent({
-        eventType: 'ITEM_ADDED_TO_LIST',
-        itemId: item.id,
-        itemType: item.itemType,
-        properties: {
-          listId: list.id,
-          listName: list.name,
-          source: 'ITEM_DESTINATION_PICKER',
-        },
-      });
     }
 
     onCommitted({
@@ -148,6 +144,7 @@ export function ListDestinationSheet({
     setStatus('saving');
     setError(null);
     await persistDestination(list);
+    if (currentRequest.current !== requestToken) return;
     setStatus('idle');
   }
 
@@ -156,23 +153,16 @@ export function ListDestinationSheet({
     setStatus('saving');
     setError(null);
 
-    const result = await createItemList(newListName);
+    const result = await createItemList(newListName, 'ITEM_DESTINATION_PICKER');
+    if (currentRequest.current !== requestToken) return;
     if (result.status === 'error') {
       setStatus('idle');
       setError(result.message);
       return;
     }
 
-    eventTracking.recordEvent({
-      eventType: 'LIST_CREATED',
-      properties: {
-        listId: result.list.id,
-        listName: result.list.name,
-        source: 'ITEM_DESTINATION_PICKER',
-      },
-    });
-
     const committed = await persistDestination(result.list);
+    if (currentRequest.current !== requestToken) return;
     if (!committed) {
       setAvailableLists((current) => [result.list, ...current]);
     }
@@ -189,6 +179,7 @@ export function ListDestinationSheet({
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.sheet}>
+          <InteractionPersistenceNotice theme={theme} />
           <View style={styles.header}>
             <View style={styles.headingGroup}>
               <Text style={styles.title}>Lisää listaan</Text>

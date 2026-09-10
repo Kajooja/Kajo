@@ -6,9 +6,9 @@ import {
   type ItemActionReceipt,
 } from './itemActionCommands';
 
-export type ItemActionResult =
-  | { status: 'success'; receipt: ItemActionReceipt }
-  | { status: 'error'; retryable: boolean; message: string; rejectedUndo?: boolean };
+export type ItemActionResult<TReceipt = ItemActionReceipt> =
+  | { status: 'success'; receipt: TReceipt }
+  | { status: 'error'; retryable: boolean; message: string; rejectedUndo?: boolean; rejectedAction?: boolean };
 
 export function createItemActionSender(client: SupabaseClient) {
   return async (command: ItemActionCommand): Promise<ItemActionResult> => {

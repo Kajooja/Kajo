@@ -11,7 +11,7 @@ interface InteractionPersistenceNoticeProps {
 export function InteractionPersistenceNotice({
   theme,
 }: InteractionPersistenceNoticeProps) {
-  const { persistenceError, retryPersistence, canDiscardUndo, discardRejectedUndo } = useItemInteractions();
+  const { persistenceError, retryPersistence, canDiscardUndo, canDiscardAction, discardRejectedAction } = useItemInteractions();
   const {
     persistenceError: eventPersistenceError,
     retryPersistence: retryEventPersistence,
@@ -37,11 +37,11 @@ export function InteractionPersistenceNotice({
       </Text>
       <Pressable
         accessibilityRole="button"
-        onPress={canDiscardUndo ? discardRejectedUndo : retry}
+        onPress={canDiscardAction ? discardRejectedAction : retry}
         style={({ pressed }) => [styles.retry, pressed && styles.pressed]}
       >
         <Text style={[styles.retryText, { color: theme.ambient.curtainHighlight }]}>
-          {canDiscardUndo ? 'Hylkää peruminen' : 'Yritä uudelleen'}
+          {canDiscardUndo ? 'Hylkää peruminen' : canDiscardAction ? 'Hylkää valinta' : 'Yritä uudelleen'}
         </Text>
       </Pressable>
     </View>

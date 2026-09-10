@@ -225,7 +225,9 @@ Current invariants:
 - Personal save and Shared unanimous consensus project into system Saved,
 - Shared discovery custom List addition remains pending until consensus,
 - former/outsider members lose Shared List access,
-- canonical interaction state remains separate from membership rows.
+- canonical interaction state remains separate from membership rows,
+- one authorized collection command commits membership/state, all transition Events and a replayable receipt,
+- List undo restores exact prior entry provenance and corrects every Event of the target action; Item/List undo share one predecessor lineage.
 
 ## Shared discovery eligibility
 
@@ -256,6 +258,11 @@ The first actor may bind a target custom List. Until unanimity the Item is pendi
 - selected custom List membership is committed once,
 - Item is promoted to system Saved,
 - Item leaves ordinary Shared discovery.
+
+Pending withdrawal removes the actor’s Endorsement and cancels its outcome evidence.
+Deleting a pending proposal’s List records administrative cancellation with the
+real deleting actor and affected endorsing actor separately. Completed consensus
+and Saved survive List deletion.
 
 ## Event
 

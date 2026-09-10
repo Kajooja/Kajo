@@ -17,8 +17,7 @@ import { getAmbientPhase } from '../../domain/discovery';
 import type { ItemListId } from '../../domain/contracts';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
-import { useItemInteractions } from '../discovery/ItemInteractionContext';
-import { useEventTracking } from '../events/EventTrackingContext';
+import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
 import {
@@ -37,13 +36,16 @@ interface ItemListScreenProps {
   listId: ItemListId;
 }
 
-export function ItemListScreen({ listId }: ItemListScreenProps) {
+export function ItemListScreen(props: ItemListScreenProps) {
+  const { scopeKey } = useItemLists();
+  return <ItemListContent key={`${scopeKey}:${props.listId}`} {...props} />;
+}
+
+function ItemListContent({ listId }: ItemListScreenProps) {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadEntries } = itemLists;
-  const interactions = useItemInteractions();
-  const eventTracking = useEventTracking();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const summary = itemLists.lists.find((list) => list.id === listId) ?? null;
@@ -61,7 +63,7 @@ export function ItemListScreen({ listId }: ItemListScreenProps) {
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const requestKey = `${listId}:${attempt}`;
+  const requestKey = `${itemLists.scopeKey}:${listId}:${attempt}:${itemLists.revision}`;
   const loading = Boolean(listId) && entrySnapshot?.key !== requestKey;
   const loadError = !listId
     ? 'Listaa ei löytynyt.'
@@ -107,19 +109,7 @@ export function ItemListScreen({ listId }: ItemListScreenProps) {
           entries: current.entries.filter((candidate) => candidate.item.id !== entry.item.id),
         }
       : current);
-    eventTracking.recordEvent({
-      eventType: entry.listKind === 'SYSTEM_SAVED'
-        ? 'ITEM_UNSAVED'
-        : 'ITEM_REMOVED_FROM_LIST',
-      itemId: entry.item.id,
-      itemType: entry.item.itemType,
-      properties: {
-        listId,
-        listName: entry.listName,
-        source: 'LIST_DETAIL',
-      },
-    });
-    if (entry.listKind === 'SYSTEM_SAVED') interactions.retryHydration();
+
   }
 
   async function renameList() {
@@ -134,10 +124,7 @@ export function ItemListScreen({ listId }: ItemListScreenProps) {
     }
     setName(result.list.name);
     setRenaming(false);
-    eventTracking.recordEvent({
-      eventType: 'LIST_RENAMED',
-      properties: { listId, listName: result.list.name },
-    });
+
   }
 
   function confirmDelete() {
@@ -161,16 +148,14 @@ export function ItemListScreen({ listId }: ItemListScreenProps) {
       setActionError(result.message);
       return;
     }
-    eventTracking.recordEvent({
-      eventType: 'LIST_DELETED',
-      properties: { listId, listName: summary.name },
-    });
+
     router.replace('/lists');
   }
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
+      <InteractionPersistenceNotice theme={theme} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
