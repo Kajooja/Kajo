@@ -12,8 +12,11 @@ Status: **owner results recorded; corrections implemented, follow-up acceptance 
 - Historical CI #429 / run 34485606516 succeeded for the previous runtime.
   New-head CI/rollout truth belongs to STATUS; local `npm run check` now passes
   326 tests. Never treat the previous runtime's CI as the new correction's CI.
-- The new hydration RPC requires the `bootstrap_history_projection` forward.
-  Confirm its rollout in STATUS before installing the follow-up APK.
+- Correction runtime: `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df`, all five required
+  CI #434 / run 34496017165 jobs passed. Later filename/docs changes retain its
+  app code. This PR CI run did not build an APK; use the manual workflow below.
+- Hydration forward `20260910153737_bootstrap_history_projection` is deployed;
+  hosted behavior and access checks passed. No repeat deployment/reset needed.
 - Hosted history-clear migration: `20260910134428_clear_consumed_history`, verified.
 - Select **Actions → CI → Run workflow**, choose
   **feat/228-delivered-origin** and run it once. Download the artifact

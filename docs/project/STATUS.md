@@ -39,23 +39,46 @@ actual calibration/read/atomic command APIs; the unchanged forward also passes a
 populated data/old-function-identity/ACL preservation rehearsal. Both probes are
 wired into required native CLI CI. No phone/emulator is available locally.
 
-Server candidate: `20260910151335_bootstrap_history_projection.sql`. It adds three
+Server forward: `20260910153737_bootstrap_history_projection.sql`. It adds three
 read functions and replaces only consumed-history, List-entry and Shared-overlay
 read definitions. All three old definitions/owners/ACLs match hosted preflight.
 It changes no rows, tables, command/Memory functions or old migration bytes.
-**Hosted rollout and new-head native CI are still pending at this checkpoint.**
-The new mobile hydration RPC requires that forward before installing the new APK.
+Implementation head `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df` passed all five
+required jobs in [CI #434](https://github.com/Kajooja/Kajo/actions/runs/34496017165),
+including populated-forward and native calibration/history acceptance. The APK
+job was skipped as designed for a PR run. Later filename/docs alignment does not
+change app code or SQL bytes; the PR owns any later final-head CI result.
+
+Hosted rollout is **complete** on `mwrnvfosrzwygrunrltm`, provider version/name
+`20260910153737_bootstrap_history_projection`, SQL SHA-256
+`40a6e3b32fe6e1555acb2ac85293b8235484f737c08d50172ddf6d19272b24b9`.
+The generated filename was aligned to the actual provider version without editing
+SQL. All 129 old function identities/owners/ACLs, 126 unrelated definitions,
+triggers/defaults and 48 old migration identities are preserved. All three new
+functions and three intended replacements match the isolated source exactly.
+Hosted rollback-only calibration/import/native/edit/undo/clear/List/Memory/Shared
+acceptance passed. A separate read confirmed no remaining missing initial-history
+Items and no fixture Item/Shared residue. Security findings remain unchanged.
+No whole-user-data parity claim is made; populated row preservation was rehearsed
+in the isolated tests. The owner's current test data was retained.
+
+Recovery if required: use the previous APK, then a separately reviewed new forward
+restoring the three old private read definitions from
+`20260901204135_profile_scoped_item_lists.sql` and
+`20260902134621_shared_list_approval_flow.sql`, and revoke authenticated EXECUTE
+on the new public/private `get_profile_item_states_v1(uuid)` boundaries. Keep the
+internal helper and stored evidence/receipts; do not delete deployed history or
+reset data. Prefer a narrow corrective forward if the old client is unavailable.
 
 Next actions:
 
-1. Publish this checked correction to the same PR and verify required new-head CI.
-2. Apply only the reviewed new history-projection forward under ADR-0006; verify
-   object metadata/access and rollback-only behavior, then record its actual
-   provider version/name and hash. Do not apply the separate global-default file.
-3. Run the focused APK follow-up in DEVICE_TEST, capturing its installed SHA:
+1. Confirm final PR-head CI before any merge; the implementation's five required
+   gates and hosted rollout are already verified. Do not repeat the deployment
+   or apply the separate global-default forward.
+2. Run the focused APK follow-up in DEVICE_TEST, capturing its installed SHA:
    existing initial history/edit/clear, Shared attribution/isolation, and OnePlus
    picker with gesture/three-button navigation and keyboard. Do not poll builds.
-4. Consider merge only after required CI and owner acceptance. Keep #228/#229,
+3. Consider merge only after required CI and owner acceptance. Keep #228/#229,
    DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
 
 **Do not run another reset.** The owner-approved reset completed at

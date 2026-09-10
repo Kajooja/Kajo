@@ -1294,3 +1294,24 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   cases are in DEVICE_TEST. Publication, new-head native CI and hosted rollout
   are pending at this checkpoint; STATUS owns their current state. Keep draft,
   preserve new test data, and do not infer DATA-003/004 or phase acceptance.
+
+
+### Initial-history rollout verified — 2026-09-10 / #228 / #229
+
+- Published implementation `b8ff101` has the exact locally tested tree
+  `00c5872bc4b82580f8fa1f682f1b8042f46e405f`. All five required CI #434 jobs passed,
+  including native CLI calibration/history behavior and populated-forward checks.
+- Applied only the reviewed read-functions forward as actual provider version
+  `20260910153737`; SQL SHA-256 remains
+  `40a6e3b32fe6e1555acb2ac85293b8235484f737c08d50172ddf6d19272b24b9`.
+  Aligned the filename using the same SQL bytes; historical migration files remain
+  unchanged. The new mobile hydration RPC is now available.
+- Postflight preserved all 129 old function identities/owners/ACLs, 126 unrelated
+  definitions, inventoried triggers/defaults and 48 previous migration identities.
+  Three new functions and three replacement definitions match the source exactly.
+- Unmodified rollback-only hosted history probe passed; a separate read confirmed
+  initial history coverage and no fixture Item/Shared residue. Security advisor
+  findings are unchanged. Real user data was not reset; no whole-data parity claim.
+- STATUS owns the exact recovery procedure and next APK checkpoint. CI #434 skipped
+  APK building by design; no new APK was dispatched or polled. Draft/owner device
+  acceptance and full DATA-003/004 remain open.
