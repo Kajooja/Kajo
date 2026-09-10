@@ -417,3 +417,25 @@ This transport is not durable exposure or full delivery acceptance. Item-specifi
 Shared overlay provenance, asynchronous callback/session boundaries, persisted
 exposure and exposure-before-outcome reconciliation remain #228 work. Existing
 server trace authorization remains required; a client snapshot is not server proof.
+
+
+### Durable Event checkpoint — #228 / draft PR #229
+
+`eventOutbox.ts` replaces the old in-memory write coordinator. Before recordEvent
+returns an ID, SQLite stores an immutable Event and its complete original session.
+The existing bounded outbox supplies FIFO, size limits, backoff, reply deadlines,
+validated restore, exact-ID replay and acknowledged-entry removal. Its storage
+namespace is distinct from explicit commands and includes environment/actor/Profile;
+all restored session/Event identities must agree. Failed storage is not accepted
+and does not consume the in-process impression dedup key.
+
+Restart under a new Event session still replays each queued Event with its own old
+session and timestamps. Session persistence precedes that Event; a stopped context
+cannot proceed from a delayed session reply into an Event write. Scope cleanup
+stops dispatch/callbacks and retains unacknowledged evidence for authorized retry.
+Auth/domain errors are retained with visible retry state, not silently discarded.
+
+Exposure and Item/collection commands still use separate queues. This checkpoint
+does not guarantee exposure-before-action delivery or fix delayed attribution by
+itself. Persistent replay, frozen Shared origins, causal ordering/reconciliation
+and physical-device acceptance must be evaluated together before DATA-003/004 close.

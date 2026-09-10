@@ -117,7 +117,7 @@ collection branch is retired; remote branch deletion was unavailable (the connec
 has no delete-ref operation and shell Git has no write credentials). Do not repeat
 the already accepted hosted deployment.
 
-The active continuation is **Issue #228**, branch `feat/228-delivered-origin`,
+The active continuation is **Issue #228 / draft PR #229**, branch `feat/228-delivered-origin`,
 based on main `6dd1fec`. Its first checkpoint freezes the grid-to-detail/sliding
 Item sequence, prediction/source, mode, environment/actor/Profile scope and session
 in a bounded navigation snapshot. Detail refuses expired/mismatched snapshots,
@@ -125,16 +125,23 @@ keeps mounted origin through reranking and drops the latest-media-pool guessing.
 Direct non-predicted entries remain a single Item; route query prediction IDs alone
 are not trusted. This is a partial implementation, not DATA-004 acceptance.
 
-Next on that branch: finish review/CI of the navigation slice, freeze item-specific
-Shared overlay provenance and async callback origins, then implement durable
-exposure plus action ordering/late-outcome reconciliation. Record representative
+The second checkpoint replaces the memory-only Event queue with SQLite-backed
+Event/session envelopes using the existing bounded outbox implementation and a
+separate environment/actor/Profile storage identity. Accepted enqueue now means
+persisted bytes; restart replays the original session/ID/timestamp, and stale scope
+callbacks cannot start the subsequent Event write. Impression dedup follows storage.
+
+Next on that branch: finish review/CI, freeze item-specific Shared overlay provenance
+and remaining async callback origins, then coordinate exposure with action delivery
+and late-outcome reconciliation. Record representative
 runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
 
 Continue **14.1** after this delivery:
 
 1. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
    swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
-   exposure delivery durable; the old exposure-only Event queue remains in memory.
+   verify durable exposure delivery and its ordering with action/outcome writes; the
+   draft now persists the separate Event queue, but does not yet coordinate both queues.
 2. Verify late outcomes, real device process-death/reconnect/account switches and
    complete atomic List/Shared rollback/duplicate/undo authorization cases.
 3. Then proceed to **14.2 serving/shadow/candidate availability**.

@@ -1,11 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import type { Event, EventSession } from '../../domain/contracts';
-import type { EventPersistenceApi } from './eventPersistence';
 import {
   createEventSession,
   createCorrelationId,
-  createEventWriteCoordinator,
   createTrackedEvent,
   createUuidV7,
   getDwellEventProperties,
@@ -32,13 +30,6 @@ const event: Event = createTrackedEvent(
   '2026-08-29T21:45:01.000Z',
   { locale: 'fi-FI' },
 );
-
-function createApi(): EventPersistenceApi {
-  return {
-    appendSession: vi.fn(async () => ({ error: null })),
-    appendEvent: vi.fn(async () => ({ error: null })),
-  };
-}
 
 describe('Event tracking contracts', () => {
   it('creates time-ordered UUIDv7-compatible identifiers', () => {
@@ -107,68 +98,5 @@ describe('Event tracking contracts', () => {
     expect(
       getDwellEventProperties(0, 60 * 60 * 1_000, 'SCREEN_EXIT'),
     ).toMatchObject({ dwellMs: 30 * 60 * 1_000 });
-  });
-});
-
-describe('Event write coordinator', () => {
-  it('persists the session before flushing queued Events', async () => {
-    let finishSession: (() => void) | undefined;
-    const order: string[] = [];
-    const api = createApi();
-    vi.mocked(api.appendSession).mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          order.push('session:start');
-          finishSession = () => {
-            order.push('session:finish');
-            resolve({ error: null });
-          };
-        }),
-    );
-    vi.mocked(api.appendEvent).mockImplementation(async () => {
-      order.push('event');
-      return { error: null };
-    });
-    const coordinator = createEventWriteCoordinator(api, session, vi.fn());
-
-    coordinator.enqueue(event);
-    await Promise.resolve();
-    expect(order).toEqual(['session:start']);
-
-    finishSession?.();
-    await coordinator.waitForIdle();
-
-    expect(order).toEqual(['session:start', 'session:finish', 'event']);
-  });
-
-  it('retries the same stable Event after a transient failure', async () => {
-    const api = createApi();
-    vi.mocked(api.appendEvent)
-      .mockResolvedValueOnce({ error: { message: 'offline' } })
-      .mockResolvedValueOnce({ error: null });
-    const snapshots: unknown[] = [];
-    const coordinator = createEventWriteCoordinator(
-      api,
-      session,
-      (snapshot) => snapshots.push(snapshot),
-    );
-
-    coordinator.enqueue(event);
-    await coordinator.waitForIdle();
-    coordinator.retry();
-    await coordinator.waitForIdle();
-
-    expect(api.appendEvent).toHaveBeenCalledTimes(2);
-    expect(api.appendEvent).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      id: event.eventId,
-    }));
-    expect(api.appendEvent).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      id: event.eventId,
-    }));
-    expect(snapshots).toContainEqual({
-      sessionPersisted: true,
-      pendingEventCount: 0,
-      message: null,
-    });
   });
 });

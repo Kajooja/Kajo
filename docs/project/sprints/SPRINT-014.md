@@ -868,3 +868,21 @@ merge number. Complete publication, then pause as requested by the owner.
   is claimed. Shared item-specific overlay origin, async callback boundaries,
   durable exposure and delayed action reconciliation remain open on #228. Keep
   DATA-003/004 and the Issue open; resume this branch in the next short work period.
+
+
+### Durable Event queue checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Replaced the disposable memory Event map with the existing bounded SQLite outbox
+  mechanism under a separate environment/actor/Profile key. Each entry retains the
+  complete original Event and session; new sessions never rewrite older entries.
+- recordEvent acknowledges only successful durable enqueue. Impression dedup occurs
+  afterward, so a failed disk write can be retried. Provider layout lifecycle stops
+  old coordinators and rejects stale callbacks; delayed session completion checks
+  scope before starting Event delivery. No hosted schema/API change.
+- Seven queue regressions replace two old memory-coordinator tests: session ordering,
+  restart/lost reply, scope change during session persistence, namespace separation,
+  storage failure/recovery, payload/corruption checks and timeout/late acknowledgement.
+- PR owns full check/CI evidence. Physical process-death/device testing remains open.
+  Exposure/action queue coordination and late outcomes are explicitly not solved
+  by persisting a separate queue. Continue the same draft branch; do not merge or
+  close #228 until the remaining provenance/delivery gates are met.

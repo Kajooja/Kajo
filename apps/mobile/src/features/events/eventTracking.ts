@@ -12,11 +12,7 @@ import type {
   SessionId,
   UserId,
 } from '../../domain/contracts';
-import {
-  persistEvent,
-  persistEventSession,
-  type EventPersistenceApi,
-} from './eventPersistence';
+
 
 export interface EventTrackingScope {
   actorUserId: UserId;
@@ -40,7 +36,8 @@ export interface EventWriteSnapshot {
 }
 
 export interface EventWriteCoordinator {
-  enqueue(event: Event): void;
+  start(): void;
+  enqueue(event: Event): boolean;
   retry(): void;
   waitForIdle(): Promise<void>;
   dispose(): void;
@@ -181,134 +178,4 @@ export function createCorrelationId(seed: string, key: string): string {
     hex.slice(8, 10).join(''),
     hex.slice(10).join(''),
   ].join('-');
-}
-
-export function createEventWriteCoordinator(
-  api: EventPersistenceApi,
-  session: EventSession,
-  onChange: (snapshot: EventWriteSnapshot) => void,
-): EventWriteCoordinator {
-  let active = true;
-  let sessionPersisted = false;
-  let sessionInFlight = false;
-  let message: string | null = null;
-  let tail: Promise<void> = Promise.resolve();
-  const pendingEvents = new Map<EventId, Event>();
-  const inFlightEvents = new Set<EventId>();
-
-  function publish() {
-    if (!active) return;
-
-    onChange({
-      sessionPersisted,
-      pendingEventCount: pendingEvents.size,
-      message,
-    });
-  }
-
-  function schedule(
-    operation: () => Promise<void>,
-  ): void {
-    const next = tail.then(operation);
-    tail = next.catch(() => undefined);
-  }
-
-  function ensureSession() {
-    if (!active || sessionPersisted || sessionInFlight) return;
-
-    sessionInFlight = true;
-    publish();
-
-    schedule(async () => {
-      const result = await persistEventSession(api, session);
-
-      if (!active) return;
-
-      sessionInFlight = false;
-
-      if (result.status === 'error') {
-        message = result.message;
-        publish();
-        return;
-      }
-
-      sessionPersisted = true;
-      message = null;
-      publish();
-      flushEvents();
-    });
-  }
-
-  function flushEvents() {
-    if (!active || !sessionPersisted) return;
-
-    for (const event of pendingEvents.values()) {
-      if (inFlightEvents.has(event.eventId)) continue;
-
-      inFlightEvents.add(event.eventId);
-      schedule(async () => {
-        const result = await persistEvent(api, event);
-
-        if (!active) return;
-
-        inFlightEvents.delete(event.eventId);
-
-        if (result.status === 'error') {
-          message = result.message;
-          publish();
-          return;
-        }
-
-        pendingEvents.delete(event.eventId);
-
-        if (pendingEvents.size === 0) {
-          message = null;
-        }
-
-        publish();
-      });
-    }
-  }
-
-  return {
-    enqueue(event) {
-      if (!active) return;
-
-      pendingEvents.set(event.eventId, event);
-      publish();
-      ensureSession();
-
-      if (sessionPersisted) {
-        flushEvents();
-      }
-    },
-    retry() {
-      if (!active) return;
-
-      message = null;
-
-      if (!sessionPersisted) {
-        ensureSession();
-      } else {
-        flushEvents();
-      }
-
-      publish();
-    },
-    async waitForIdle() {
-      while (active) {
-        const observedTail = tail;
-        await observedTail;
-
-        if (observedTail === tail) {
-          return;
-        }
-      }
-    },
-    dispose() {
-      active = false;
-      pendingEvents.clear();
-      inFlightEvents.clear();
-    },
-  };
 }

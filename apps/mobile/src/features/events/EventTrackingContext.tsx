@@ -2,12 +2,15 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
+
+import Storage from 'expo-sqlite/kv-store';
+import { createEventWriteCoordinator } from './eventOutbox';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
@@ -25,7 +28,6 @@ import {
 } from './eventPersistence';
 import {
   createEventSession,
-  createEventWriteCoordinator,
   createTrackedEvent,
   createUuidV7,
   getImpressionDeduplicationKey,
@@ -67,6 +69,8 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   const activeProfile = useActiveProfile();
   const [failure, setFailure] = useState<ScopedFailure | null>(null);
   const impressionKeys = useRef(new Set<string>());
+  const currentCoordinator = useRef<EventWriteCoordinator | null>(null);
+  const namespace = connection.status === 'configured' ? connection.config.url : '';
   const defaultContext = useMemo(() => getRuntimeContext(), []);
   const persistenceApi = useMemo<EventPersistenceApi | null>(
     () =>
@@ -86,7 +90,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     [actorUserId, persistenceApi, profileId],
   );
   const scopeKey = scope
-    ? `${scope.profileId}:${scope.actorUserId}`
+    ? `${namespace}:${scope.profileId}:${scope.actorUserId}`
     : null;
   const scopedCoordinator = useMemo<ScopedCoordinator | null>(() => {
     if (!scope || !scopeKey || !persistenceApi) {
@@ -99,7 +103,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       new Date().toISOString(),
       defaultContext,
     );
-    const coordinator = createEventWriteCoordinator(
+    const coordinator: EventWriteCoordinator = createEventWriteCoordinator(
       persistenceApi,
       session,
       (snapshot) => {
@@ -109,10 +113,11 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
             : null,
         );
       },
+      { namespace, storage: Storage },
     );
 
     return { key: scopeKey, coordinator, session };
-  }, [defaultContext, persistenceApi, scope, scopeKey]);
+  }, [defaultContext, namespace, persistenceApi, scope, scopeKey]);
   const status = getEventTrackingStatus(
     connection.status,
     activeProfile.status,
@@ -121,11 +126,14 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   const persistenceError =
     failure?.key === scopeKey ? failure.message : null;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const coordinator = scopedCoordinator?.coordinator ?? null;
+    currentCoordinator.current = coordinator;
     impressionKeys.current.clear();
-
+    coordinator?.start();
     return () => {
-      scopedCoordinator?.coordinator.dispose();
+      coordinator?.dispose();
+      if (currentCoordinator.current === coordinator) currentCoordinator.current = null;
     };
   }, [scopedCoordinator]);
 
@@ -135,7 +143,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
     (input: EventRecordInput, suppliedEventId?: EventId) => {
       const current = scopedCoordinator;
 
-      if (!current) return null;
+      if (!current || currentCoordinator.current !== current.coordinator) return null;
 
       const deduplicationKey = getImpressionDeduplicationKey(input);
 
@@ -155,11 +163,10 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
         defaultContext,
       );
 
+      if (!current.coordinator.enqueue(event)) return null;
       if (deduplicationKey) {
         impressionKeys.current.add(deduplicationKey);
       }
-
-      current.coordinator.enqueue(event);
       return eventId;
     },
     [defaultContext, scopedCoordinator],
