@@ -60,6 +60,8 @@ try {
     assert.match(itemActions?.itemActions, /^PASS: atomic/);
     const [collectionActions] = await exec(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
+    const [deliveryOrder] = await exec(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);

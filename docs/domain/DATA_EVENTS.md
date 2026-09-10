@@ -498,3 +498,21 @@ The destination sheet scopes loading/saving to each open request and rejects
 obsolete completions. Accepted persisted commands still replay their original
 session through a current coordinator. Server late-outcome verification and
 representative device/reopen/process-death acceptance remain open.
+
+
+### Server delivery-order verification — #228
+
+`delivery-order-smoke.sql` checks the installed server contracts through the
+public authenticated RPCs. A selected run with matching actor/Profile/session,
+mode and an already stored pre-action impression remains attributable when the
+command arrives a day later, even after another session has requested a new run.
+Missing exposure, an impression occurring after the action, wrong session/mode
+and unselected candidates produce `UNATTRIBUTED` preference Events.
+
+An impression inserted after the action receipt does not retrofit attribution,
+even when its occurrence time precedes the action. Exact retries return the same
+receipt/Event; undo inherits the accepted attribution. This intentionally preserves
+immutable history: it is not a retrospective reconciliation implementation. The
+mobile exposure-order guard prevents this ordering for locally pending impressions;
+missing evidence is never invented. Both command families and secondary collection
+Events are covered by 14 rollback-only cases in PGlite and required native CLI CI.

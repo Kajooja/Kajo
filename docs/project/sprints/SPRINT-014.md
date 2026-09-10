@@ -935,3 +935,44 @@ merge number. Complete publication, then pause as requested by the owner.
   remain untested. No hosted migration or server reconciliation is claimed.
 - Next: missing/already-committed exposure and delayed outcome verification at
   the server boundary, then representative runtime acceptance. Keep #228/#229 open.
+
+
+### Server delivery matrix / next APK checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Added `delivery-order-smoke.sql` to PGlite and required native CLI installation
+  acceptance. Fourteen cases exercise authenticated Item and collection RPCs with
+  old-session delayed-valid, absent, late-arriving, post-action, wrong-session,
+  wrong-mode and unselected exposure. Secondary collection Events agree with the
+  receipt, and retries/undo preserve accepted attribution.
+- Existing server behavior passes the targeted matrix. Late-arriving exposure
+  does not rewrite an immutable unattributed receipt. No new reconciliation or
+  schema migration is claimed. PR owns full-check/current native CI evidence.
+- Owner is ready to download and test the next APK when explicitly notified.
+  Next: exact-head native CI + standalone APK, then the checklist below. Do not
+  wait in a build-poll loop. Record build SHA, artifact URL and results here/PR.
+
+#### #228 device acceptance checklist (pending)
+
+Use the next explicitly identified #228 APK; bundle exports and older main APKs
+are not this acceptance build. Record phone/Android version, build SHA and test
+time. Use a few recognizable test Items/Lists. Report each row PASS/FAIL and any
+screenshots or exact unexpected behavior. The developer checks server evidence
+for these operations afterward; the owner need not inspect Event IDs or SQL.
+
+| Test | Actions | Expected visible behavior |
+|---|---|---|
+| Grid/detail/mode | Open a card, swipe forward/back, change global mode and reopen from grid | Stable opened sequence; the next newly opened sequence follows the new grid; no flash of another cached sequence |
+| Item action/undo | Rate an Item, mark another not interested, undo in order | State and undo target remain correct; no duplicate operations |
+| Lists | Create a test List, add/remove an Item and undo | One intended transition each time; consistent state on reopening |
+| Close while saving | Select a List, close promptly, reopen the same Item's picker | Picker recovers and responds; no stuck saving indicator or duplicate addition |
+| Offline/restart | Open online, disable network, make one action, force-close, reopen and restore network | Pending action remains visible and completes once; correct state after reload |
+| Profile switch with pending action | Queue an offline action in Profile A, switch to B, reconnect, then return to A | B never receives A's action; A's pending state eventually resolves correctly |
+| Shared | With an existing Shared Profile, inspect a pending suggestion, endorse, then complete consensus with the other member | Correct pending/consensus state and destination; no Personal Profile state leakage |
+| Background/session | Open Detail/picker, background/foreground; also sign out/in and switch Profiles while a picker is open | Old screen either recovers explicitly or reloads correctly; stale callbacks do not advance or save into the new context |
+
+The exact APK and all results remain pending. Dispatch limitation: the GitHub
+connector has no workflow-dispatch capability and the cloud browser is signed
+out. The owner can start CI using Run workflow on `feat/228-delivered-origin`.
+Its APK job already depends on all five validation jobs; do not bypass those
+gates or change workflow triggers merely to start a build. Keep #228/#229 and
+DATA-003/004 open.

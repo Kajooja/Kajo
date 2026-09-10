@@ -35,6 +35,8 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     assert.match(result[0]?.itemActions, /^PASS: atomic/);
     const collections = await snapshots(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(collections[0]?.collectionActions, /^PASS: atomic/);
+    const delivery = await snapshots(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(delivery[0]?.deliveryOrder, /^PASS: 14 Item/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Command acceptance must roll back all test objects, accounts, state and evidence');
   } finally { await db.close(); }

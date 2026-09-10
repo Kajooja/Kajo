@@ -152,9 +152,22 @@ and invalidate on unmount. Destination loading/saving belongs to the current ope
 request, so closing during save cannot strand a reopened sheet. Direct detail is
 remounted for a new session. Existing durable commands retain their original session.
 
-Next on that branch: verify missing/already-committed exposure and late outcomes
-at the server boundary, then complete relevant runtime/CI acceptance. Record representative
-runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
+The sixth checkpoint adds a rollback-only server delivery-order matrix to both
+PGlite acceptance and the required native CLI installation probe. Fourteen cases
+cover Item/collection delayed-valid delivery, missing/late-arriving exposure,
+exposure occurring after the action, another session/mode, and an unselected
+candidate. Retry and undo preserve the original accepted attribution. No migration:
+late exposure does not retrofit immutable unattributed receipts.
+
+Next on that branch: run the current-head native CI, prepare its standalone APK
+and give the owner the Sprint 014 device checklist below. On 2026-09-10 the owner
+confirmed they will download the APK and perform tests when explicitly told it is
+ready. Do not call an export an APK or claim device acceptance. Record the exact
+build SHA/artifact and owner results. APK dispatch is currently blocked by tooling:
+the GitHub connector exposes no workflow-dispatch action and the cloud browser is
+signed out. The existing CI workflow can be manually run on
+`feat/228-delivered-origin`; no workflow/security changes are needed. Keep #228/#229 and DATA-003/004 open through
+runtime acceptance; do not start 14.2 yet.
 
 Continue **14.1** after this delivery:
 
