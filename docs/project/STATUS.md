@@ -256,14 +256,23 @@ history query and loaded authorized Item snapshots. Collection snapshots have no
 Prediction ID, are bound to Profile/session, retain consumed Items while swiping,
 and label the return destination. History loading keys include Profile/collection
 revision and reload after interaction changes. Pull refresh is wired on Discovery,
-Lists and history; the green Shared flag is implemented. The existing row/grid
-layout, multi-destination picker, explicit history-clear action and final retry UX
-still need implementation and device validation. Reset remains scheduled for the
+Lists and history; the green Shared flag is implemented. The Personal multi-destination picker now keeps the sheet open after each
+acknowledged addition. Each tap uses its own durable command; Valmis advances once.
+Completed additions survive later failure or close. Duplicate taps are synchronously
+guarded, existing memberships are marked, and a collection refresh does not erase
+the in-progress message/create draft. Shared proposal flow is unchanged. The common
+row/grid layout, explicit history-clear action and final retry UX still need
+implementation and device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: multi-destination Personal picker, shared collection grid/card controls and
-canonical history-clear action; then complete refresh UX, authorized data reset
+Next: shared collection grid/card controls and canonical history-clear action; then complete refresh UX, authorized data reset
 and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
+
+Publication approval: the owner explicitly approved publishing this Personal
+multi-destination correction to the existing public Kajooja/Kajo repository,
+`feat/228-delivered-origin` / PR #229. The earlier automatic-review publication
+block is resolved by that approval. Continue from this PR, not the old remote
+9f82165 checkpoint; remaining work and test/reset ordering are listed above.
 
 Continue **14.1** after this delivery:
 

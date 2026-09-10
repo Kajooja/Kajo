@@ -1121,3 +1121,26 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: full `npm run check` passed 323 tests (248 mobile, 14 catalog,
   61 database), TypeScript/lint and iOS/Android exports. No new device or visual
   runtime acceptance claimed; the next test waits for the remaining owner scope.
+
+
+### Personal multi-destination picker — 2026-09-10 / #228 / #229
+
+- A successful Personal List addition keeps the picker open, marks the membership,
+  and allows another destination. Valmis advances once and sends no duplicate
+  command/message. Each List addition is independently durable; failure on the
+  second destination does not reverse the first. Close keeps committed/queued work.
+- In-flight guards block repeated same-render taps. A new open request has distinct
+  saved/progress identity, and stale completions cannot close it. Collection revision
+  reloads no longer reset the user's message/create/expanded state. Optional messages
+  attach to acknowledged additions; Done does not send them again.
+- New-list creation also stays in the Personal picker after saving. Existing
+  memberships are marked and cannot be added twice through the same open picker.
+  Shared endorsement/proposal remains the existing single destination consent flow.
+- Added a durable regression: first destination acknowledges, second fails offline,
+  restart retries only the unchanged second command and preserves the first receipt.
+- Next: common cover-grid/swipe selector on Lists/history, canonical history-clear
+  action and remaining refresh UI. Then the already authorized all-Profile choice /
+  Shared-group reset and combined device test. No reset or new APK in this step.
+- Validation: full `npm run check` passed 324 tests (249 mobile, 14 catalog,
+  61 database), TypeScript/lint and both platform exports. New picker interaction
+  still needs the planned combined device test; no emulator/device was available.

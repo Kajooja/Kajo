@@ -31,6 +31,7 @@ export interface ListDestinationCommit {
   list: ItemList;
   added: boolean;
   message: string | null;
+  stayOpen?: boolean;
 }
 
 interface ListDestinationSheetProps {
@@ -63,6 +64,9 @@ export function ListDestinationSheet({
   const [savingRequest, setSavingRequest] = useState<object | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadedRequest, setLoadedRequest] = useState<object | null>(null);
+  const [lastSaved, setLastSaved] = useState<{ request: object; commit: ListDestinationCommit } | null>(null);
+  const activeSave = useRef<object | null>(null);
+  const initializedRequest = useRef<object | null>(null);
   const { sessionId } = useEventTracking();
   const itemId = item?.id ?? null;
   const requestKey = itemId
@@ -88,11 +92,14 @@ export function ListDestinationSheet({
 
     void loadForItem(itemId).then((result) => {
       if (!active || currentRequest.current !== requestToken) return;
-      setExpanded(false);
-      setCreating(false);
-      setNewListName('');
-      setMessageExpanded(false);
-      setMessageDraft('');
+      if (initializedRequest.current !== requestToken) {
+        initializedRequest.current = requestToken;
+        setExpanded(false);
+        setCreating(false);
+        setNewListName('');
+        setMessageExpanded(false);
+        setMessageDraft('');
+      }
       if (result.status === 'error') {
         setError(result.message);
         setAvailableLists([]);
@@ -137,31 +144,43 @@ export function ListDestinationSheet({
       rememberRecentList(list.profileId, list.id);
     }
 
-    onCommitted({
+    const commit: ListDestinationCommit = {
       list,
       added: !list.containsItem,
       message: messageValidation?.status === 'valid' ? messageValidation.body : null,
-    });
+      stayOpen: !isSharedProfile,
+    };
+    if (!isSharedProfile) {
+      setLastSaved({ request: requestToken, commit });
+      setAvailableLists(current => current.map(candidate => candidate.id === list.id
+        ? { ...candidate, containsItem: true } : candidate));
+      setMessageDraft('');
+    }
+    onCommitted(commit);
     return true;
   }
 
   async function chooseList(list: ItemList) {
-    if (loading || status !== 'idle') return;
+    if (loading || status !== 'idle' || activeSave.current === requestToken || (!isSharedProfile && list.containsItem)) return;
+    activeSave.current = requestToken;
     setStatus('saving');
     setError(null);
     await persistDestination(list);
     if (currentRequest.current !== requestToken) return;
+    activeSave.current = null;
     setStatus('idle');
   }
 
   async function createAndChooseList() {
-    if (!item || loading || status !== 'idle') return;
+    if (!item || loading || status !== 'idle' || activeSave.current === requestToken) return;
+    activeSave.current = requestToken;
     setStatus('saving');
     setError(null);
 
     const result = await createItemList(newListName, 'ITEM_DESTINATION_PICKER');
     if (currentRequest.current !== requestToken) return;
     if (result.status === 'error') {
+      activeSave.current = null;
       setStatus('idle');
       setError(result.message);
       return;
@@ -169,8 +188,11 @@ export function ListDestinationSheet({
 
     const committed = await persistDestination(result.list);
     if (currentRequest.current !== requestToken) return;
+    activeSave.current = null;
+    setCreating(false);
+    setNewListName('');
     if (!committed) {
-      setAvailableLists((current) => [result.list, ...current]);
+      setAvailableLists((current) => [result.list, ...current.filter(list => list.id !== result.list.id)]);
     }
     setStatus('idle');
   }
@@ -188,7 +210,7 @@ export function ListDestinationSheet({
           <InteractionPersistenceNotice theme={theme} />
           <View style={styles.header}>
             <View style={styles.headingGroup}>
-              <Text style={styles.title}>Lisää listaan</Text>
+              <Text style={styles.title}>{isSharedProfile ? 'Ehdota listaan' : 'Lisää listoille'}</Text>
               <Text numberOfLines={1} style={styles.itemTitle}>{item?.title ?? ''}</Text>
             </View>
             <Pressable accessibilityRole="button" onPress={onClose} style={styles.closeButton}>
@@ -200,7 +222,7 @@ export function ListDestinationSheet({
             <Text style={styles.helper}>
               Valinta on samalla tykkäyksesi. Tallennetut syntyy yhteisestä päätöksestä.
             </Text>
-          ) : null}
+          ) : <Text style={styles.helper}>Voit lisätä teoksen usealle listalle. Jokainen lisäys tallentuu heti. Jatka lopuksi painamalla Valmis.</Text>}
 
           {messageExpanded ? (
             <View style={styles.messageRow}>
@@ -239,15 +261,15 @@ export function ListDestinationSheet({
               {visibleLists.map((list) => (
                 <Pressable
                   key={list.id}
-                  accessibilityHint="Lisää kohteen tähän listaan ja siirry seuraavaan korttiin"
+                  accessibilityHint={isSharedProfile ? 'Ehdota kohdetta tähän yhteiseen listaan' : 'Tallentaa kohteen tähän listaan. Voit sen jälkeen valita toisen listan.'}
                   accessibilityRole="button"
-                  disabled={status !== 'idle'}
+                  disabled={status !== 'idle' || (!isSharedProfile && list.containsItem)}
                   onPress={() => void chooseList(list)}
                   style={({ pressed }) => [styles.listRow, pressed && styles.pressed]}
                 >
                   <Text style={styles.listName} numberOfLines={1}>{list.name}</Text>
                   {list.containsItem ? <Text style={styles.existing}>Jo listalla</Text> : null}
-                  <Text style={styles.addMark}>{status === 'saving' ? '·' : '+'}</Text>
+                  <Text style={styles.addMark}>{list.containsItem ? '✓' : status === 'saving' ? '·' : '+'}</Text>
                 </Pressable>
               ))}
               {availableLists.length === 0 ? (
@@ -301,6 +323,17 @@ export function ListDestinationSheet({
           )}
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
+          {!isSharedProfile ? (
+            <Pressable accessibilityRole="button" disabled={loading || status !== 'idle'}
+              onPress={() => {
+                if (activeSave.current === requestToken) return;
+                if (lastSaved?.request === requestToken) {
+                  onCommitted({ ...lastSaved.commit, message: null, stayOpen: false });
+                } else onClose();
+              }} style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}>
+              <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : 'Valmis'}</Text>
+            </Pressable>
+          ) : null}
         </View>
       </View>
     </Modal>

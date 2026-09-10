@@ -180,3 +180,31 @@ describe('atomic collection service and shared durable queue', () => {
     expect(projectPendingProfileActions(initial, [undo])[id(6)]).toEqual(EMPTY_ITEM_INTERACTION);
   });
 });
+
+describe('multiple destinations with independent durable saves', () => {
+  it('keeps the first acknowledged List and retries only the second after restart', async () => {
+    const store = storage();
+    const firstCommand = command(80, { kind: 'SET_LIST_ENTRY', itemId: id(9), listId: id(5), present: true, positive: true });
+    const secondCommand = command(81, { kind: 'SET_LIST_ENTRY', itemId: id(9), listId: id(6), present: true, positive: true });
+    firstCommand.source = 'ITEM_DESTINATION_PICKER';
+    secondCommand.source = 'ITEM_DESTINATION_PICKER';
+    const send = vi.fn(async (c: PendingProfileAction['command']): Promise<ItemActionResult<ProfileActionReceipt>> =>
+      c.actionId === secondCommand.actionId
+        ? { status: 'error', retryable: true, message: 'offline' }
+        : { status: 'success', receipt: receipt(firstCommand) });
+    const first = setup(store, send);
+    expect(first.queue.enqueue({ command: firstCommand })).toBe(true);
+    await first.queue.waitForIdle();
+    expect(first.onCommitted).toHaveBeenCalledTimes(1);
+    expect(first.queue.enqueue({ command: secondCommand })).toBe(true);
+    await first.queue.waitForIdle();
+    expect(first.queue.pending().map(entry => entry.command.actionId)).toEqual([secondCommand.actionId]);
+    first.queue.stop();
+    const retry = vi.fn(async (): Promise<ItemActionResult<ProfileActionReceipt>> => ({ status: 'success', receipt: receipt(secondCommand) }));
+    const restarted = setup(store, retry);
+    await restarted.queue.waitForIdle();
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(retry.mock.calls[0]).toEqual([secondCommand]);
+    expect(restarted.queue.pending()).toEqual([]);
+  });
+});

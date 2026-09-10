@@ -50,7 +50,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 30. **Pending and consensus are visually distinct.** Pending proposer/List provenance and explicit approval remain readable without relying on color alone. Only unanimity produces durable consensus and Shared Saved/list commit.
 31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item.
 32. **Shared provenance is truthful.** List membership retains original proposer/added time where defined; UI does not invent actor provenance.
-33. **List choice stays lightweight.** Compact single-destination picker shows bounded recent choices with expansion/new-list creation on demand.
+33. **List choice stays lightweight.** Personal users can add an Item to multiple Lists in one open picker. Each addition saves immediately; Valmis advances once. Closing keeps completed saves. Recent choices stay bounded with expansion/new-list creation on demand. Shared proposals retain their existing single-destination consent flow.
 34. **Messaging stays Profile-scoped and quiet.** Inbox combines relevant invitation/message activity. Message failure must not roll back successful List action.
 
 ## Motion and accessibility

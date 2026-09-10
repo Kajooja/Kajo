@@ -400,7 +400,7 @@ function ItemDetailContent({
 
   function handleListDestinationCommit(commit: ListDestinationCommit) {
     const target = listPickerTarget;
-    setListPickerTarget(null);
+    if (!commit.stayOpen) setListPickerTarget(null);
 
     if (!target) return;
 
@@ -420,7 +420,9 @@ function ItemDetailContent({
       void profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
         listId: commit.list.id, itemId: item.id });
     }
-    advanceAfterAction(item, index, `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`);
+    if (commit.stayOpen) return;
+    advanceAfterAction(item, index, commit.stayOpen === false
+      ? 'Listalisäykset tallennettu.' : `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`);
   }
 
   function openListPicker(

@@ -554,3 +554,11 @@ List/history navigation carries explicit `predictionSource=collection` and
 snapshots are scoped to Profile and Event session; this is collection browsing,
 not a ranked recommendation delivery. Existing atomic action/attribution rules
 remain in force. History-clear evidence is still a pending explicit action contract.
+
+
+The Personal multi-destination picker dispatches one existing durable SET_LIST_ENTRY
+command per tapped List. Each acknowledged addition is independent; a later failure
+cannot reverse it. Valmis only advances/closes the UI and emits no duplicate action
+or message. Optional per-addition messages are dispatched on acknowledgement; Done
+never resends them. Closing invalidates UI callbacks but does not cancel queued
+commands. Shared single-proposal consent semantics are unchanged.
