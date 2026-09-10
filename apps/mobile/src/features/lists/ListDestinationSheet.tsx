@@ -18,6 +18,7 @@ import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import type { EventRecordInput } from '../events/eventTracking';
 import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
+import { useItemInteractions } from '../discovery/ItemInteractionContext';
 import { DOCK_PANEL_GAP } from '../discovery/shellLayout';
 import {
   MAXIMUM_PROFILE_MESSAGE_LENGTH,
@@ -26,14 +27,14 @@ import {
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
 import { loadRecentListIds, rememberRecentList } from './listRecentUse';
-import { includeCreatedDestination, resolveListDestination } from './listDestinationSelection';
+import { includeCreatedDestination, resolveListDestinations, toggleListDestination } from './listDestinationSelection';
 import {
   orderListDestinationsByRecentUse,
   selectVisibleListDestinations,
 } from './listPresentation';
 
 export interface ListDestinationCommit {
-  list: ItemList;
+  lists: readonly ItemList[];
   added: boolean;
   message: string | null;
   stayOpen?: boolean;
@@ -63,9 +64,10 @@ export function ListDestinationSheet({
   onCommitted,
 }: ListDestinationSheetProps) {
   const { loadForItem, createList: createItemList, setEntry, scopeKey, revision } = useItemLists();
+  const { atomicPendingCount } = useItemInteractions();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [availableLists, setAvailableLists] = useState<readonly ItemList[]>([]);
-  const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const [selectedListIds, setSelectedListIds] = useState<readonly string[] | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const viewportRef = useRef<View>(null);
   const [expanded, setExpanded] = useState(false);
@@ -75,6 +77,7 @@ export function ListDestinationSheet({
   const [messageDraft, setMessageDraft] = useState('');
   const [savingRequest, setSavingRequest] = useState<object | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loadedRequest, setLoadedRequest] = useState<object | null>(null);
   const [lastSaved, setLastSaved] = useState<{ request: object; commit: ListDestinationCommit } | null>(null);
   const activeSave = useRef<object | null>(null);
@@ -97,7 +100,9 @@ export function ListDestinationSheet({
   }
   const visibleLists = selectVisibleListDestinations(availableLists, expanded);
   const hiddenCount = availableLists.length - visibleLists.length;
-  const selectedList = loading ? null : resolveListDestination(availableLists, selectedListId, isSharedProfile);
+  const selectedLists = loading ? [] : resolveListDestinations(availableLists, selectedListIds, isSharedProfile);
+  const hasSelection = selectedLists.length > 0;
+  const savingBlocked = status !== 'idle' || atomicPendingCount > 0;
 
   useEffect(() => {
     if (!visible) return;
@@ -122,10 +127,12 @@ export function ListDestinationSheet({
         setNewListName('');
         setMessageExpanded(false);
         setMessageDraft('');
-        setSelectedListId(null);
+        setSelectedListIds(null);
+        setError(null);
+        setLoadError(null);
       }
       if (result.status === 'error') {
-        setError(result.message);
+        setLoadError(result.message);
         setAvailableLists([]);
         setLoadedRequest(requestToken);
         return;
@@ -138,22 +145,17 @@ export function ListDestinationSheet({
       const recentListIds = profileId ? loadRecentListIds(profileId) : [];
 
       setAvailableLists(orderListDestinationsByRecentUse(selectable, recentListIds));
-      setError(null);
+      setLoadError(null);
       setLoadedRequest(requestToken);
     });
 
     return () => { active = false; };
   }, [isSharedProfile, itemId, loadForItem, requestKey, requestToken, revision, visible]);
 
-  async function persistDestination(list: ItemList) {
+  async function persistDestinations(lists: readonly ItemList[], message: string | null) {
     if (!item || !visible || currentRequest.current !== requestToken) return false;
-    const messageValidation = messageDraft.trim().length > 0
-      ? validateProfileMessage(messageDraft)
-      : null;
-    if (messageValidation?.status === 'invalid') {
-      setError(messageValidation.message);
-      return false;
-    }
+    const list = lists[0];
+    if (!list) return false;
 
     if (!isSharedProfile) {
       const result = await setEntry(list.id, item.id, true, { positive: true, ...(origin ? { origin } : {}) });
@@ -169,16 +171,15 @@ export function ListDestinationSheet({
     }
 
     const commit: ListDestinationCommit = {
-      list,
+      lists,
       added: !list.containsItem,
-      message: messageValidation?.status === 'valid' ? messageValidation.body : null,
+      message,
       stayOpen: !isSharedProfile,
     };
     if (!isSharedProfile) {
       setLastSaved({ request: requestToken, commit });
       setAvailableLists(current => current.map(candidate => candidate.id === list.id
         ? { ...candidate, containsItem: true } : candidate));
-      setMessageDraft('');
     }
     const result = await onCommitted(commit);
     if (currentRequest.current !== requestToken) return false;
@@ -190,23 +191,40 @@ export function ListDestinationSheet({
     return true;
   }
 
-  async function chooseList(list: ItemList) {
-    if (loading || status !== 'idle' || activeSave.current === requestToken || (!isSharedProfile && list.containsItem)) return;
+  async function chooseLists() {
+    if (loading || savingBlocked || activeSave.current === requestToken || !hasSelection) return;
+    const messageValidation = messageDraft.trim().length > 0 ? validateProfileMessage(messageDraft) : null;
+    if (messageValidation?.status === 'invalid') { setError(messageValidation.message); return; }
+    const message = messageValidation?.status === 'valid' ? messageValidation.body : null;
+    const destinations = [...selectedLists];
+    // Freeze this explicit selection before any receipt refresh changes ordering.
+    setSelectedListIds(destinations.map(list => list.id));
     activeSave.current = requestToken;
     setStatus('saving');
     setError(null);
     Keyboard.dismiss();
-    const committed = await persistDestination(list);
-    if (currentRequest.current !== requestToken) return;
-    if (committed) {
-      setSelectedListId(null);
+    try {
+      if (isSharedProfile) {
+        await persistDestinations(destinations, message);
+      } else {
+        for (const list of destinations) {
+          if (currentRequest.current !== requestToken || !await persistDestinations([list], message)) return;
+          setSelectedListIds(current => (current ?? []).filter(id => id !== list.id));
+        }
+        setMessageDraft('');
+      }
+    } catch {
+      if (currentRequest.current === requestToken) setError('Kaikkien lisäysten tilaa ei voitu varmistaa. Tarkista tallennuksen tila ennen jatkamista.');
+    } finally {
+      if (currentRequest.current === requestToken) {
+        activeSave.current = null;
+        setStatus('idle');
+      }
     }
-    activeSave.current = null;
-    setStatus('idle');
   }
 
   async function createDestination() {
-    if (!item || loading || status !== 'idle' || activeSave.current === requestToken) return;
+    if (!item || loading || savingBlocked || selectedLists.length >= 32 || activeSave.current === requestToken) return;
     activeSave.current = requestToken;
     setStatus('saving');
     setError(null);
@@ -222,7 +240,7 @@ export function ListDestinationSheet({
 
     // Creating the container is separate from explicitly adding the Item.
     setAvailableLists(current => includeCreatedDestination(current, result.list));
-    setSelectedListId(result.list.id);
+    setSelectedListIds([...new Set([...selectedLists.map(list => list.id), result.list.id])]);
     activeSave.current = null;
     setCreating(false);
     setNewListName('');
@@ -254,7 +272,7 @@ export function ListDestinationSheet({
           <InteractionPersistenceNotice theme={theme} />
           <View style={styles.header}>
             <View style={styles.headingGroup}>
-              <Text style={styles.title}>{isSharedProfile ? 'Ehdota listaan' : 'Lisää listoille'}</Text>
+              <Text style={styles.title}>{isSharedProfile ? 'Ehdota listoille' : 'Lisää listoille'}</Text>
               <Text numberOfLines={1} style={styles.itemTitle}>{item?.title ?? ''}</Text>
             </View>
             <Pressable accessibilityRole="button" disabled={status !== 'idle'} onPress={onClose} style={styles.closeButton}>
@@ -265,15 +283,15 @@ export function ListDestinationSheet({
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
           {isSharedProfile ? (
             <Text style={styles.helper}>
-              Valitse lista, lisää halutessasi viesti ja vahvista ehdotus. Tallennetut syntyy yhteisestä päätöksestä.
+              Valitse yksi tai useampi lista ja vahvista ehdotus. Muut hyväksyvät samat listat ennen tallennusta.
             </Text>
-          ) : <Text style={styles.helper}>Valitse lista, kirjoita halutessasi viesti ja paina Lisää listaan. Voit tämän jälkeen lisätä teoksen toiselle listalle.</Text>}
+          ) : <Text style={styles.helper}>Valitse yksi tai useampi lista ja paina Lisää valituille listoille. Valmis sulkee valinnan lisäysten jälkeen.</Text>}
 
           {messageExpanded ? (
             <View style={styles.messageRow}>
               <TextInput
                 accessibilityLabel="Listalisäyksen viesti"
-                editable={Boolean(selectedList) && status === 'idle'}
+                editable={hasSelection && status === 'idle'}
                 maxLength={MAXIMUM_PROFILE_MESSAGE_LENGTH}
                 onChangeText={(value) => {
                   setMessageDraft(value);
@@ -292,15 +310,15 @@ export function ListDestinationSheet({
           ) : (
             <Pressable
               accessibilityRole="button"
-              accessibilityState={{ disabled: !selectedList || status !== 'idle' }}
-              disabled={!selectedList || status !== 'idle'}
+              accessibilityState={{ disabled: !hasSelection || status !== 'idle' }}
+              disabled={!hasSelection || status !== 'idle'}
               onPress={() => setMessageExpanded(true)}
-              style={({ pressed }) => [styles.textButton, !selectedList && styles.disabled, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.textButton, !hasSelection && styles.disabled, pressed && styles.pressed]}
             >
               <Text style={styles.textButtonText}>+ Lisää viesti</Text>
             </Pressable>
           )}
-          {!selectedList && !loading ? <Text style={styles.helper}>
+          {!hasSelection && !loading ? <Text style={styles.helper}>
             {availableLists.length === 0 ? 'Luo ensin lista.' : 'Valitse ensin lista.'}
           </Text> : null}
 
@@ -312,15 +330,17 @@ export function ListDestinationSheet({
                 <Pressable
                   key={list.id}
                   accessibilityHint="Valitsee kohteen. Vahvista lisäys alareunan painikkeella."
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selectedList?.id === list.id, disabled: status !== 'idle' || (!isSharedProfile && list.containsItem) }}
-                  disabled={status !== 'idle' || (!isSharedProfile && list.containsItem)}
-                  onPress={() => setSelectedListId(list.id)}
-                  style={({ pressed }) => [styles.listRow, selectedList?.id === list.id && styles.selectedRow, pressed && styles.pressed]}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: selectedLists.some(selected => selected.id === list.id), disabled: status !== 'idle' || (!isSharedProfile && list.containsItem)
+                    || (selectedLists.length >= 32 && !selectedLists.some(selected => selected.id === list.id)) }}
+                  disabled={status !== 'idle' || (!isSharedProfile && list.containsItem)
+                    || (selectedLists.length >= 32 && !selectedLists.some(selected => selected.id === list.id))}
+                  onPress={() => setSelectedListIds(toggleListDestination(selectedLists.map(selected => selected.id), list.id))}
+                  style={({ pressed }) => [styles.listRow, selectedLists.some(selected => selected.id === list.id) && styles.selectedRow, pressed && styles.pressed]}
                 >
                   <Text style={styles.listName} numberOfLines={1}>{list.name}</Text>
                   {list.containsItem ? <Text style={styles.existing}>Jo listalla</Text> : null}
-                  <Text style={styles.addMark}>{list.containsItem ? '✓' : selectedList?.id === list.id ? '●' : '○'}</Text>
+                  <Text style={styles.addMark}>{(!isSharedProfile && list.containsItem) || selectedLists.some(selected => selected.id === list.id) ? '☑' : '☐'}</Text>
                 </Pressable>
               ))}
               {availableLists.length === 0 ? (
@@ -356,7 +376,7 @@ export function ListDestinationSheet({
               />
               <Pressable
                 accessibilityRole="button"
-                disabled={loading || status !== 'idle' || newListName.trim().length === 0}
+                disabled={loading || savingBlocked || selectedLists.length >= 32 || newListName.trim().length === 0}
                 onPress={() => void createDestination()}
                 style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
               >
@@ -366,7 +386,7 @@ export function ListDestinationSheet({
           ) : (
             <Pressable
               accessibilityRole="button"
-              disabled={loading || status !== 'idle'}
+              disabled={loading || savingBlocked || selectedLists.length >= 32}
               onPress={() => setCreating(true)}
               style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
             >
@@ -374,15 +394,17 @@ export function ListDestinationSheet({
             </Pressable>
           )}
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error || loadError ? <Text style={styles.error}>{error ?? loadError}</Text> : null}
           </ScrollView>
-          <Pressable accessibilityRole="button" disabled={!selectedList || status !== 'idle'}
-            onPress={() => { if (selectedList) void chooseList(selectedList); }}
-            style={({ pressed }) => [styles.createButton, !selectedList && styles.disabled, pressed && styles.pressed]}>
-            <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : isSharedProfile ? 'Ehdota listaan' : 'Lisää listaan'}</Text>
+          <Text accessibilityLiveRegion="polite" style={styles.helper}>{selectedLists.length} listaa valittu</Text>
+          {selectedLists.length >= 32 ? <Text style={styles.helper}>Voit valita kerralla enintään 32 listaa.</Text> : null}
+          <Pressable accessibilityRole="button" disabled={!hasSelection || savingBlocked}
+            onPress={() => void chooseLists()}
+            style={({ pressed }) => [styles.createButton, (!hasSelection || savingBlocked) && styles.disabled, pressed && styles.pressed]}>
+            <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : isSharedProfile ? 'Ehdota valituille listoille' : 'Lisää valituille listoille'}</Text>
           </Pressable>
           {!isSharedProfile && lastSaved?.request === requestToken ? (
-            <Pressable accessibilityRole="button" disabled={loading || status !== 'idle'}
+            <Pressable accessibilityRole="button" disabled={loading || savingBlocked || hasSelection}
               onPress={() => {
                 if (activeSave.current === requestToken) return;
                 if (lastSaved?.request === requestToken) {

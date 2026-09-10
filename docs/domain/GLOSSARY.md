@@ -60,11 +60,12 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Night | `NIGHT` | Ambient visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Generic state meaning experience was actually consumed/read/watched/attended as appropriate. |
 | Saved | `SAVED` | Profile-level current state meaning an Item is intentionally stored. Pending Shared Endorsement is not Shared Saved. |
-| Rating | `rating` | Integer 0–10 outcome; recording it means the Item was consumed. |
+| Rating | `rating` | Integer 0–10 outcome of an actual experience. Personal ratings imply consumed; a planned SharedRatingRound response alone does not complete joint history. |
 | Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an Item the actor has not consumed. |
 | Endorsement / yhteinen tykkäys | `Endorsement` | Actor-specific positive SharedProfile decision that an Item is worth doing together. |
 | Pending endorsement | `PendingEndorsement` | Shared Item with at least one active Endorsement but without unanimous accepted-member consensus. |
-| Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` choice binding the first Endorsement to one target custom List until unanimity. |
+| Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` choice binding the first Endorsement to an explicit set of custom Lists. Every member confirms the same set before unanimity commits all memberships. |
+| Shared rating round / yhteinen arviointikierros | `SharedRatingRound` | Planned, separately identified SharedProfile experience of one generic Item, with an explicit participant set and each actor’s own rating. All required responses precede completed joint consumed history; a rewatch starts a new round. |
 | Shared consensus | `SharedConsensus` | State reached when every currently accepted SharedProfile member endorsed the Item; promotes once to Shared Saved/system list. |
 | List / lista | `ItemList` | Profile-scoped collection of generic Items; may contain mixed ItemTypes. |
 | System saved list / Tallennetut | `SYSTEM_SAVED` | Exactly one Profile-owned system List representing Saved Items. |

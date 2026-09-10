@@ -7,6 +7,7 @@ import { assertEmptyApplication, snapshotApplication } from './baseline-installa
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
+import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
 
 test('atomic Item actions on the full fresh schema (PGlite; native smoke also runs in required CLI CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -34,6 +35,11 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
         const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
         const upgrade = await snapshots(historyProjectionUpgradeSql(file, fixture, installation.candidate.tables));
         assert.match(upgrade[0]?.historyProjectionUpgrade, /^PASS: unchanged populated/);
+      }
+      if (file.name.endsWith('_shared_list_destinations.sql')) {
+        const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+        const upgrade = await snapshots(sharedListDestinationsUpgradeSql(file, fixture, installation.candidate.tables));
+        assert.match(upgrade[0]?.sharedListDestinationsUpgrade, /^PASS: unchanged populated/);
       }
       const historyClear = file.name.endsWith('_clear_consumed_history.sql');
       if (!file.name.endsWith('_list_membership_resurfacing.sql') && !historyClear) {
@@ -65,6 +71,8 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     assert.match(history[0]?.historyClear, /^PASS: atomic correction/);
     const bootstrap = await snapshots(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
     assert.match(bootstrap[0]?.bootstrapHistory, /^PASS: calibration/);
+    const multi = await snapshots(await readFile(new URL('shared-list-destinations-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(multi[0]?.sharedListDestinations, /^PASS: exact target consent/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Command acceptance must roll back all test objects, accounts, state and evidence');
   } finally { await db.close(); }

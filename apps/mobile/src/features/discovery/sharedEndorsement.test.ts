@@ -113,7 +113,7 @@ describe('Shared discovery collaboration overlay', () => {
       proposedByNickname: 'Mirri',
     });
     expect(formatPendingListApproval(approval)).toBe(
-      'Mirri lisäsi listaan Meidän illat',
+      'Mirri ehdottaa listoille: Meidän illat',
     );
     expect(
       getPendingListApproval(STATE['endorsed-by-me'], [

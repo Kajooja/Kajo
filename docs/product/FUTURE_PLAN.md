@@ -641,3 +641,12 @@ refresh/reorder, first destination, partial success, offline/restart/retry,
 concurrent List changes, Profile isolation and large-text/screen-reader use.
 Success is less repeated tapping with accurate outcomes; stop or simplify if
 accidental reactions or failed/misleading moves increase.
+
+## Scope clarification — Shared rating rounds, 2026-09-10
+
+The owner’s A-rates → B-responds → joint-history flow, separate Personal history
+and controlled rewatch behavior are promoted to required first-release scope:
+`MVP-SOCIAL-007..009`, ROADMAP Phase 16.3, Issue #232. DOMAIN_MODEL,
+DATA_EVENTS and PREDICTION_MODEL own their contracts. They are not deferred
+behind optional statistics, bulk selection or later social research. Personal
+statistics must not silently count Shared round responses as Personal reactions.

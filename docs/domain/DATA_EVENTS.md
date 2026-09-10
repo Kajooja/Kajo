@@ -70,7 +70,7 @@ Shared discovery custom-List membership is committed only when the Endorsement c
 - `ITEM_INTERACTION_UNDONE`
 - `ITEM_RATED`
 
-Rating 0–10 always implies consumed/read/watched.
+Personal rating 0–10 implies consumed/read/watched. A planned SharedRatingRound response records that actor’s experience; joint consumed state requires the completed round (section 10).
 
 ### Session/search
 
@@ -258,6 +258,21 @@ Personal evidence read for Shared common-fit remains Personal and is never copie
 Pending Endorsement is actor-specific. Unanimous consensus produces one canonical Shared save transition. Accepted-member Personal consumed/rated history may be displayed in the lower attributed Shared tier without duplicating those Personal Events.
 
 Friendship does not grant authorization to read another User's Personal Event stream.
+
+Required #232 round semantics are planned, not existing Event names/API fields.
+Each response must carry round ID, actor, SharedProfile, Item, participant-set
+version and truthful delivered origin. Persist pending responses without emitting
+a completed joint consumption/reward. Final completion, its joint state and
+outcome Events commit atomically once; retries cannot create another completion.
+Rating 0 is valid. Retain all actor responses/disagreement instead of attributing
+one actor’s score to the group or importing private Personal Events.
+
+Response edit/Undo, cancellation and changed membership must correct/reconcile
+prior outcomes. A rewatch uses a new round ID; old action receipts and earlier
+experiences remain immutable historical evidence. A pending or merely completed
+round is not automatically a positive preference or predictor success. Version
+reward interpretation and test delayed attribution, participant loss, legacy
+single-actor history and Personal isolation before Phase 16.3 acceptance.
 
 ## 11. Reliability contract
 
@@ -604,3 +619,21 @@ tier rather than ordinary unmarked delivery. Member history is never projected
 into Shared consumed state, never supplies a borrowed Prediction, and never grants
 access to another member's complete private history. Removed-member attribution
 disappears; Shared consumption/consensus and pending-proposal rules stay intact.
+
+### Multi-destination List selection — #228/#229
+
+`ENDORSE_SHARED_ITEM` carries `listIds` for the exact reviewed set (1–32 unique
+custom Lists in the same SharedProfile). The primary `listId` remains for older
+single-List commands. Receipts and overlay v2 include `proposal_lists`; the client
+accepts a receipt only when it confirms every requested destination. Both legacy
+endorsement RPCs reject multi-destination proposals they cannot review.
+
+One pending `ITEM_ENDORSED` retains the destination set. Unanimity commits all
+memberships, one Shared save transition and one `ITEM_ADDED_TO_LIST` Event per
+new membership in the same receipt transaction. Original proposer/time remain
+truthful. Any failure rolls back the whole approval. Deleting any pending target
+cancels all pending endorsements and corrects their outcomes; completed other
+memberships/Saved survive. Personal multi-selection uses existing durable
+per-List commands: completed destinations remain confirmed, unresolved ones stay
+selected, and Done does not advance an unresolved selection. No client bulk action
+is misreported as a new atomic server API.

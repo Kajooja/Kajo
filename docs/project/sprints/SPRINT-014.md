@@ -1392,3 +1392,35 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   and document consistency checks used the exact GitHub branch snapshot; no new
   runtime test or npm check was run. The prior 333 tests apply to the unchanged
   runtime only. No APK dispatch/polling, merge, migration or reset.
+
+## Third APK result and multi-destination correction — 2026-09-10 / #228
+
+The owner reports the APK tested with only multi-List selection missing; exact
+installed SHA/run was not supplied. Both Profile types now expose checkboxes and
+one confirmation. Personal uses existing durable per-List commands with retained
+unresolved choices. Shared binds the exact reviewed set, displays every target to
+approvers and atomically commits all memberships/Events at unanimity. Creating a
+List preserves earlier checks and never advances the card. Remaining messages
+stop if the scoped view unmounts.
+
+The new forward adds a private destination relation and six functions; four old
+function definitions are intentionally replaced with identities/owners/ACLs kept.
+Both legacy endorsement RPCs reject hidden multi-List consent. Full-schema tests
+cover second-List Event failure rollback, exact replay, unchanged old receipts,
+foreign/duplicate targets and whole pending cancellation when any target is deleted.
+The populated-upgrade rehearsal preserves existing data/old function boundaries.
+`npm run check`: 338 tests (261 mobile, 14 catalog, 63 database), lint/TypeScript
+and both exports. Native CI and hosted rollout belong to the live STATUS checkpoint;
+no local Docker/device runtime is claimed. DEVICE_TEST owns the next manual APK
+cases; preserve current test data and let the owner start its workflow.
+
+Issue #232 records required SharedRatingRound/rewatch semantics in the canonical
+domain, evidence, prediction, UX and launch documents and `MVP-SOCIAL-007..009`.
+Personal setup precedes joint responses; A’s rating is pending until the required
+others answer; only completion enters joint history. Individual responses and
+Personal history remain separate, and new experiences preserve earlier history.
+Strong member-seen recommendations and controlled rewatch require a versioned,
+validated policy. Phase 14 establishes correctness; Phase 16.3 delivers the full
+flow before beta. No round API/schema/UI or rewatch-policy change is implemented
+in this multi-List correction. Optional #230 statistics and #231 multi-Item actions
+retain their Phase 17 candidate status.

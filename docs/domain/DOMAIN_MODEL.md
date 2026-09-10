@@ -231,7 +231,7 @@ Current invariants:
 
 ## Shared discovery eligibility
 
-Ordinary Shared discovery order remains:
+Current delivered V1 Shared discovery order remains (the required #232 successor is specified below):
 
 1. pending Endorsements for members who have not endorsed,
 2. ordinary unseen Shared Predictions,
@@ -249,20 +249,54 @@ Current-state invariant:
 one active Endorsement per (profileId, itemId, actorUserId)
 ```
 
-The first actor may bind a target custom List. Until unanimity the Item is pending and not Shared Saved.
+The first actor binds one or more custom Lists in one explicit selection. All accepted members must review and confirm exactly that set; a subset, a changed set or an older client that cannot show every destination cannot approve it. Until unanimity the Item is pending and not Shared Saved. Legacy single-List proposals remain valid.
 
 `SharedConsensus` is reached when every currently accepted member endorses. At consensus:
 
 - Shared Saved becomes true,
 - durable consensus remains even if membership later changes,
-- selected custom List membership is committed once,
+- every selected custom List membership is committed once in the same transaction,
 - Item is promoted to system Saved,
 - Item leaves ordinary Shared discovery.
 
 Pending withdrawal removes the actor’s Endorsement and cancels its outcome evidence.
-Deleting a pending proposal’s List records administrative cancellation with the
+Deleting any destination of a pending proposal cancels the whole proposal and records administrative cancellation with the
 real deleting actor and affected endorsing actor separately. Completed consensus
 and Saved survive List deletion.
+
+## SharedRatingRound — required first release, planned #232
+
+Personal Taste setup comes first; an existing completed setup is retained. Joint
+experience then learns in SharedProfile, without overwriting Personal history.
+This contract is required by `MVP-SOCIAL-007..009`, not implemented by the
+multi-List picker correction. Current Shared `SET_RATING` is still a single-actor
+state transition and does not satisfy the round contract.
+
+A round identifies one SharedProfile, generic Item, new experience ID and an
+explicit snapshot of accepted participants. A submits 5: this records A’s response
+and prompts B, “A antoi arvosanan 5, minkä sinä annat?” It does not mark the joint
+experience complete. In a pair, B’s own 0–10 response completes the round; in an
+N-member round every required participant must respond. Unknown, decline and
+silence are never a zero rating or agreement. A membership change cannot silently
+reduce the required set: cancel or explicitly reconfirm the participant set.
+
+Only a completed round enters joint Katsotut/Luetut and supplies completed joint
+outcome evidence. Keep individual responses and disagreement; SharedProfile is
+not their simple average. The prompt discloses the rating explicitly submitted
+in this Shared context, never an otherwise private Personal rating.
+
+Editing/undoing a response corrects that round and its outcomes. Watching the same
+Item again creates a new round, preserving earlier Personal and joint experiences.
+Legacy Shared ratings with only one known actor remain identifiable legacy history;
+never fabricate other participants’ responses or silently treat them as completed
+new rounds. List Endorsement/SharedConsensus and a completed SharedRatingRound are
+separate decisions, even if the UI uses “Pari!” for both.
+
+Member-seen Items remain eligible for a strong, truthfully explained joint fit.
+Previously joint-consumed Items may reappear only through a versioned, bounded
+rewatch policy. Existing history stays intact. Exact eligibility, cooldown and
+frequency gates belong to PREDICTION_MODEL; neither a personal watch nor opening
+a new round is itself a positive joint outcome.
 
 ## Event
 

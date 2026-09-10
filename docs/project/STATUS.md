@@ -7,145 +7,92 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## Immediate continuation checkpoint — 2026-09-10
+## Immediate continuation checkpoint — 2026-09-10 / third APK result
 
 Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
-Main remains accepted `6dd1fec`; this branch is not merged. The owner’s last
-reported APK results are in [DEVICE_TEST.md](DEVICE_TEST.md); its installed
-SHA/run was not supplied. Do not infer exact-build or full device acceptance.
+Main remains accepted `6dd1fec`; this branch is not merged. The owner reports the
+latest APK tested and names only choosing multiple Lists as missing. Its installed
+SHA/run was not supplied; see DEVICE_TEST for the exact reported scope.
 
-Second APK feedback is recorded in DEVICE_TEST: reset/initial profiling, initial
-history/edit/undo, history removal and Shared attribution work. The picker still
-opened too low, and creating a destination List immediately endorsed the Item.
-The requested source was `621a03c`; the owner did not supply its installed run/SHA.
-Keep physical acceptance open for these two corrected interactions.
+The multi-destination correction follows runtime `07b12ea` and documentation head
+`494f823`. Both Personal and Shared pickers now use independent checkboxes and one
+explicit confirmation. Creating another List preserves earlier checks; message
+input requires a usable selection. Personal completed additions stay confirmed
+while unresolved destinations remain selected before Done. Shared approvers see
+every target name and confirm the exact set; memberships and transition Events
+commit together only at unanimity. Scope changes stop remaining message sends.
 
-Additional owner report while the next APK is building: in Katsotut card browsing,
-start the rating handle at the saved value (for example 8), including 0. This
-report is **open, not fixed or reproduced here**. Source inspection shows the
-control already maps its rating prop, while the history grid loads fresh collection
-ratings and Detail reads the separately hydrated interaction map. Compare those
-values before choosing a correction; do not claim the slider itself is proven
-faulty. DEVICE_TEST adds a focused initial-value/edit/Undo/reopen regression.
+Server forward prepared: `20260910180903_shared_list_destinations.sql`, SHA-256
+`c6196e699b3720755652f6b61c7dc8776333be0ebce1df592e6487d828757b4f`.
+It adds one private destination relation and six functions, and replaces four
+existing definitions while preserving their identity/owner/ACLs. Both legacy
+endorsement paths reject multi-List proposals they cannot display. Existing
+single-List commands/receipts remain compatible. Deleting any pending destination
+cancels the whole pending proposal and its outcome evidence; completed other
+memberships/Saved survive.
 
-The owner will test when the APK is ready. Runtime checkpoint remains
-`07b12ea86f3952844d475de9e8f02670a8381ffb`; this subsequent planning update changes
-only documentation. The local execution environment became disconnected, so no
-new runtime test or npm check was run. The prior 333-test result below still
-belongs to that unchanged runtime. Do not dispatch/poll or replace the ongoing
-APK test, merge, redeploy, or reset the current test data.
+Validation checkpoint: `npm run check` passes **338 tests** (261 mobile,
+14 catalog, 63 database), lint/TypeScript and both iOS/Android exports. The actual
+full-schema command probe covers exact consent, foreign/duplicate targets, forced
+second-membership Event failure with full rollback, exact retries, old receipts,
+legacy RPC rejection and cancellation. An unchanged-file populated upgrade probe
+preserves existing data and old function identities/ACLs; both probes are wired
+into required native CLI CI. No Docker, phone or emulator is available locally.
+CI for this new head and physical multi-selection acceptance remain open.
 
-New ideas are recorded in FUTURE_PLAN and the Phase 17.0 follow-up queue:
-[#230](https://github.com/Kajooja/Kajo/issues/230) category statistics (working
-30-reaction unlock, five new weekly reactions, Monday countdown; comparisons gated
-by anonymous cohort support) and [#231](https://github.com/Kajooja/Kajo/issues/231)
-Discovery/List long-press multi-select. These remain planned, with no new MVP
-release blocker or Stats/bulk runtime in this checkpoint.
+Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four affected source function
+bodies; migration history ends at `20260910153737_bootstrap_history_projection`.
+**Multi-destination forward is not deployed at this checkpoint.** Next: publish
+this candidate to the same PR, obtain native CI evidence, apply only the reviewed
+forward, record provider version/hash and verify actual behavior/access/unchanged
+function boundaries. Do not apply the fresh baseline, repair history or deploy
+the separate global function-default forward. For recovery, retain the new server
+consent guards and pending sets even if reverting the client; prefer a narrow
+forward correction. Never restore an unsafe old approval path over pending sets.
 
-Current corrections and retained history rollout:
+After the server forward is verified, the owner starts the manual APK workflow
+and installs the new build on both accounts. DEVICE_TEST owns the four focused
+multi-destination cases. A standalone hosted-backend APK does not need local
+Docker. Do not dispatch/poll the APK or reset current test data.
 
-- Initial/calibration/import ratings were absent from both consumed history and
-  Shared member history because those queries read only `item_interactions`.
-  A read-only hosted check confirmed the bootstrap-only missing-history case.
-- New `get_profile_item_states_v1` hydrates native + initial history in one
-  authorized snapshot. Consumed history, named-List badges and the attributed
-  lower Shared member-history tier use the same private projection. A native
-  rating takes display precedence; zero, source deduplication, edit/undo/clear,
-  Memory cancellation and remaining-List suppression have full-schema probes.
-  No initial evidence is copied into native Events or Shared consumed state.
-- The first Modal-inset attempt failed OnePlus acceptance. The destination picker
-  now anchors inside the shell content above the dock, using Inbox's bottom gap.
-  Keyboard, scrolling, Android Back and close/confirm/Done controls are retained.
-- Destination creation now only creates/selects the List; the sole/new destination
-  is selected automatically. A usable selection enables the optional message.
-  Add/Propose is a separate explicit action. Shared errors retain the Item/draft;
-  only acknowledgement advances the card. Personal users can add another List
-  before Done. Message failure is reported without undoing a successful choice.
-  Read-only action inspection confirmed the premature create→endorse sequence.
-  This was a List inside an existing SharedProfile, not new membership behavior.
-- Refresh variation remains intentional. The owner welcomes ties varying; current
-  SQL also applies a decaying 30-minute impression cooldown. A bounded hosted
-  comparison found no unequal-score descending-order violations. The client keeps
-  server rank. Added regression covers unchanged unequal taste priorities, exposure
-  rotation, expiry and Profile isolation; no scorer or deployed SQL was changed.
-- The 10 movies → transition → 10 books proposal has a concrete current-calibration
-  evaluation in LAUNCH_LOOP. Current completion stays six known ratings; the
-  versioned longer/adaptive progression remains Phase 15.0, without resetting
-  completed profiles or forcing 20 recognized ratings. Its required unknown/skip
-  action must remain available after an accidental rating-wheel movement and
-  discard an unsubmitted draft. This is recorded in LAUNCH_LOOP and Phase 15.0.
+New required product truth: [#232](https://github.com/Kajooja/Kajo/issues/232),
+`MVP-SOCIAL-007..009`, defines SharedRatingRound and controlled rewatch. Personal
+Taste setup comes first; A’s Shared rating prompts B’s own response; only all
+required responses complete joint history. Retain each participant’s rating and
+disagreement, keep Personal history separate and preserve previous experiences
+when a strong joint recommendation permits seeing an Item again. Canonical
+contracts live in DOMAIN_MODEL/DATA_EVENTS/PREDICTION_MODEL. Evidence and policy
+correctness belong in Phase 14; end-to-end delivery is Phase 16.3, before beta.
+**This is planned required behavior, not implemented by the multi-List patch.**
 
-Validation: `npm run check` passed **333 tests** (256 mobile, 14 catalog,
-63 database), lint/TypeScript and both iOS/Android exports. The history SQL probe uses
-actual calibration/read/atomic command APIs; the unchanged forward also passes a
-populated data/old-function-identity/ACL preservation rehearsal. Both probes are
-wired into required native CLI CI. No phone/emulator is available locally.
-The destination-selection cases and exposure/refresh SQL regressions pass;
-the latter are isolated canonical-function fixtures, not a live user-flow test.
+Retained decisions and prior acceptance:
 
-Server forward: `20260910153737_bootstrap_history_projection.sql`. It adds three
-read functions and replaces only consumed-history, List-entry and Shared-overlay
-read definitions. All three old definitions/owners/ACLs match hosted preflight.
-It changes no rows, tables, command/Memory functions or old migration bytes.
-Implementation head `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df` passed all five
-required jobs in [CI #434](https://github.com/Kajooja/Kajo/actions/runs/34496017165),
-including populated-forward and native calibration/history acceptance. The APK
-job was skipped as designed for a PR run. Later filename/docs alignment does not
-change app code or SQL bytes; the PR owns any later final-head CI result.
+- The third owner report names no other remaining APK defect. Do not invent a
+  dedicated saved-rating-slider reproduction/fix; retain the 8/0 initial-value
+  regression in the next short device check.
+- The shell-anchored picker and create→select→message→confirm flow remain in place.
+- Bootstrap history projection `20260910153737` and history clear `20260910134428`
+  remain deployed and verified. No initial evidence is copied to native Events or
+  Shared consumed state; native rating wins display, including zero.
+- Refresh variation among ties is welcomed. The existing 30-minute exposure
+  cooldown and server order remain; the bounded hosted comparison found no
+  descending-order violations among unequal scored candidates.
+- The longer movies→books Taste proposal and always-available unknown/skip action
+  remain Phase 15.0; current completion remains six known ratings. Do not reset
+  completed profiles or require 20 recognized ratings.
+- Optional [#230](https://github.com/Kajooja/Kajo/issues/230) category statistics
+  and [#231](https://github.com/Kajooja/Kajo/issues/231) long-press multi-Item selection
+  remain Phase 17 candidates in FUTURE_PLAN. Multi-Item selection is distinct from
+  this one-Item→multiple-Lists correction.
+- The second explicit test reset completed at **2026-09-10 15:54:09 UTC**. It kept
+  Auth, nicknames/catalog and two Personal custom List names, with two fresh
+  PersonalProfiles. All subsequent legitimate test data must now be preserved.
+  The historical reset script has a deliberately missing approval digest and
+  must not be rerun from this handoff.
 
-Hosted rollout is **complete** on `mwrnvfosrzwygrunrltm`, provider version/name
-`20260910153737_bootstrap_history_projection`, SQL SHA-256
-`40a6e3b32fe6e1555acb2ac85293b8235484f737c08d50172ddf6d19272b24b9`.
-The generated filename was aligned to the actual provider version without editing
-SQL. All 129 old function identities/owners/ACLs, 126 unrelated definitions,
-triggers/defaults and 48 old migration identities are preserved. All three new
-functions and three intended replacements match the isolated source exactly.
-Hosted rollback-only calibration/import/native/edit/undo/clear/List/Memory/Shared
-acceptance passed. A separate read confirmed no remaining missing initial-history
-Items and no fixture Item/Shared residue. Security findings remain unchanged.
-No whole-user-data parity claim is made; populated row preservation was rehearsed
-in the isolated tests. Test data was retained during this rollout; the later
-owner-requested repeat reset is recorded below.
-
-Recovery if required: use the previous APK, then a separately reviewed new forward
-restoring the three old private read definitions from
-`20260901204135_profile_scoped_item_lists.sql` and
-`20260902134621_shared_list_approval_flow.sql`, and revoke authenticated EXECUTE
-on the new public/private `get_profile_item_states_v1(uuid)` boundaries. Keep the
-internal helper and stored evidence/receipts; do not delete deployed history or
-reset data. Prefer a narrow corrective forward if the old client is unavailable.
-
-Next actions:
-
-1. Confirm all five required CI jobs for the newest PR head before any merge.
-   CI #434 belongs to the first history correction; the later picker changes
-   need their own final-head result. Hosted rollout is already verified; do not
-   repeat deployment or apply the separate global-default forward.
-2. The owner starts the next manual branch APK CI; do not dispatch/poll it. Run
-   DEVICE_TEST's latest five cases with the actual installed SHA: OnePlus panel
-   alignment/keyboard, create first Shared List→message→explicit proposal, failure/
-   scope recovery, multiple Personal additions and the newly reported saved-rating
-   start position. Preserve current test data. Record the actual build for the
-   rating report; compare collection read versus hydrated Detail state and fix any
-   reproduced discrepancy before closing this checkpoint.
-3. Consider merge only after required CI and owner acceptance. Keep #228/#229,
-   DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
-
-The owner explicitly requested the **same full test reset again** after the
-correction rollout, superseding the previous instruction to preserve test data.
-The reviewed second reset was committed and independently verified at
-**2026-09-10 15:54:09 UTC**: 2 accounts, 2 fresh PersonalProfiles, zero Shared groups,
-Events/interactions/bootstrap evidence/List entries/imports/receipts/Predictions/
-invitations/messages. Auth records, nicknames, catalog and 2 Personal custom List
-names were preserved. Both accounts report zero strong evidence and available,
-required calibration through the authenticated app API. Old Profile-bound replay
-is rejected; a new-Profile rating succeeds in a rolled-back probe. The retained
-operational script defaults to ROLLBACK and requires a separately reviewed scope
-digest that is deliberately omitted from version control, so the saved script
-cannot be reused accidentally. No migration or app behavior changed.
-Preserve subsequent test data unless the owner requests another reset.
-The invitation reveal/copy-link idea remains Phase 16. Historical sections below
-do not override this checkpoint.
+The dated sections below preserve earlier evidence; they do not override this
+checkpoint. Required CI/owner acceptance and remaining #228 origin/evidence work
+still gate merge and progression through ROADMAP.
 
 ## New product truth — 2026-09-07 / #215 / #216
 

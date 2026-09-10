@@ -438,7 +438,36 @@ Pending collaboration priority is not actor-specific taste modeling. Personal Ev
 
 ### Shared consensus
 
-One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and the chosen custom List membership. Later membership changes do not revoke reached historical consensus.
+One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and all explicitly approved custom List memberships atomically. Later membership changes do not revoke reached historical consensus.
+
+### Required Shared round and rewatch successor — planned #232
+
+The existing lower member-history tier and terminal joint-consumed suppression
+above describe delivered V1. The owner’s first-release requirement supersedes
+those restrictions only through a tested policy/feature version, not a client
+shuffle or history deletion (`MVP-SOCIAL-007..009`).
+
+A member’s Personal consumption is not Shared consumption. With strong authorized
+joint fit, that Item may compete for a joint recommendation with truthful
+member-seen attribution; Personal evidence remains private and separately owned.
+A completed joint experience can later become a rewatch candidate with its earlier
+history intact. Define and test an explicit cooldown, frequency cap, candidate
+budget and context/reason before enabling that route. Do not reuse saved-only
+reminder constants as unreviewed rewatch defaults. Not-interest, access, availability
+and safety exclusions remain respected; expose no borrowed Personal Prediction.
+
+Personal Taste setup supplies the initial member-fit inputs. Actual joint learning
+uses the participant responses and disagreement from completed SharedRatingRounds,
+not whichever member rated first and not a simple average masquerading as joint
+identity. Pending responses are not completed joint rewards. Completion itself
+is not success: low/zero ratings remain negative evidence. Correction and later
+rounds reconcile independently without erasing earlier experiences.
+
+Phase 14 must establish truthful evidence and the eligibility/reward contract;
+Phase 16.3 delivers the end-to-end round/rewatch flow after Personal Taste and
+Friends/Shared creation. Serving and shadow must share the same versioned policy,
+with member-seen, joint-seen, pending, low-fit, cooldown, repeat-cap, correction,
+legacy-history and Personal-isolation regressions before beta acceptance.
 
 ## 11. Cold start and external history
 

@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **second owner results recorded; picker acceptance and saved-rating start-position report open**.
+Status: **third owner APK result recorded: only multi-List selection reported missing; correction awaits its own APK acceptance**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -10,16 +10,15 @@ Status: **second owner results recorded; picker acceptance and saved-rating star
   The current PR adds initial-history and picker corrections. Use the new PR
   head for the follow-up and record the actual artifact SHA before testing.
 - Historical CI #429 / run 34485606516 succeeded for the previous runtime.
-  New-head CI/rollout truth belongs to STATUS; local `npm run check` now passes
-  333 tests. Never treat the previous runtime's CI as the new correction's CI.
+  New-head CI/rollout truth belongs to STATUS. The earlier runtime passed 333
+  local tests; never treat its CI as the new correction’s CI.
 - First history-correction runtime: `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df`, all five required
   CI #434 / run 34496017165 jobs passed. Later filename/docs changes retain its
   app code. This PR CI run did not build an APK; use the manual workflow below.
 - The second destination-picker runtime is `07b12ea86f3952844d475de9e8f02670a8381ffb`.
-  The owner reports its next APK is building and will test when ready; installed
-  run/SHA remains to be recorded. The later statistics/selection/rating-report
-  planning update changes only docs and does not require replacing that APK.
-  Earlier APKs cannot validate the destination-picker correction.
+  The owner now reports the APK tested, with only multi-List selection missing.
+  Installed run/SHA was not supplied. The multi-destination correction changes app
+  and server code; use the latest branch build on both accounts for its next test.
 - Hydration forward `20260910153737_bootstrap_history_projection` is deployed;
   hosted behavior and access checks passed. No repeat deployment needed; the
   owner's subsequent repeat reset is recorded below.
@@ -230,3 +229,35 @@ The execution environment disconnected during this follow-up. No local runtime,
 npm check or real-device reproduction was possible, and no speculative code fix
 was published. Preserve the report and existing test data; the five cases above
 are the next owner acceptance checkpoint.
+
+## Third owner results — 2026-09-10 / APK tested
+
+The owner reports the APK tested and names only inability to choose multiple
+Lists as remaining. Treat the earlier picker placement/create→message interaction
+as working per this report, without inventing an installed SHA or comprehensive
+termination/offline/slider test evidence. The earlier saved-rating-position report
+is no longer separately reported as failing; no speculative slider fix was made.
+
+The requested Shared rating-round/rewatch flow is recorded in Issue #232 and
+first-release canonical requirements. It is not part of this picker APK.
+
+### Next multi-destination APK check
+
+The owner starts the CI workflow. Install the latest branch artifact on both test
+accounts/devices; earlier versions cannot approve a multi-List proposal. Preserve
+current profiles and test data; no reset or local Docker is needed for a standalone
+APK using the hosted backend.
+
+1. Personal: check two Lists before pressing Add. Both retain the Item. Create a
+   third List while checks exist: earlier checks stay selected and creation alone
+   keeps the card open. Add, then Done. Optional message references the chosen Lists.
+2. Shared: A chooses two Lists, optionally writes a message and proposes once.
+   B sees both names, then approves; both memberships appear together with A’s
+   provenance. A’s pending proposal alone must not put the Item in either List.
+3. Disconnect during the decision: recover the original pending command, without
+   duplicates or a half-completed Shared approval. Personal completed destinations
+   remain confirmed while unresolved choices stay selected. Changing Profile
+   discards the old draft and never sends it under the new Profile.
+4. Briefly recheck picker/dock/keyboard placement, new-List→message→confirm and a
+   saved 8/0 history card’s initial rating position. Record exact build/device and
+   pass/fail; automated checks do not replace this device acceptance.

@@ -1,9 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Event, EventSession } from '../../domain/contracts';
 import type { PersistedEventRow, PersistedEventSessionRow } from './eventPersistence';
-import type { ItemActionStorage } from './itemActionOutbox';
 import type { EventWriteCoordinator } from './eventTracking';
-import { createItemActionOutbox, type ItemActionOutbox } from './itemActionOutbox';
+import { createItemActionOutbox, type ItemActionOutbox, type ItemActionStorage } from './itemActionOutbox';
 import type { PendingItemAction, ItemActionCommand } from './itemActionCommands';
 import { createEventWriteCoordinator, createExposureOrderedSender } from './eventOutbox';
 

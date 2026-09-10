@@ -95,6 +95,12 @@ Exit gate:
 - delayed outcomes cannot be guessed onto the wrong prediction,
 - Shared/search/List overlays keep truthful provenance.
 
+The #232 SharedRatingRound contract is a first-release evidence dependency:
+participant/round provenance, pending versus completed outcome, corrections and
+member-seen/rewatch eligibility must be specified and supported here. The full
+user flow follows in Phase 16.3; do not defer an already discovered evidence or
+ranking defect behind that later UI milestone.
+
 ### 14.2 — Serving/shadow equivalence and candidate availability
 
 Requirements: `MVP-ALG-002..003`.
@@ -239,6 +245,22 @@ Exit gate:
 - no personal invite creates a group automatically,
 - SharedProfile immediately uses the existing joint-learning/common-fit Prediction path,
 - friend removal does not silently rewrite existing SharedProfile membership/history.
+
+### 16.3 — Shared experience rating and controlled rewatch
+
+Requirements: `MVP-SOCIAL-007..009`, [#232](https://github.com/Kajooja/Kajo/issues/232).
+This is required first-release behavior, before closed beta. Personal Taste/setup
+and the Phase 14 evidence/policy contracts precede it.
+
+Exit gate:
+
+- A’s Shared rating prompts the other required participants with A’s attributed score;
+- only all required individual responses complete the round and joint history;
+- personal and joint histories remain separate, with responses/disagreement retained;
+- edits, retries, member changes and new rewatch rounds preserve truthful outcomes;
+- strong member-seen recommendations and bounded joint rewatches use one tested,
+  versioned serving/shadow policy without deleting earlier history;
+- representative two-account/device round-trip acceptance passes.
 
 ## Phase 17 — Complete core product and operational quality
 

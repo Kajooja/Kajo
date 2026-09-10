@@ -135,15 +135,19 @@ The first #228/#229 Modal-inset correction failed the owner's OnePlus follow-up.
 The picker now lives inside the same shell content bounds above the dock as
 Inbox, with the same bottom gap, rather than calculating a second Android window's
 position. Its body scrolls, the keyboard is avoided, and Back closes the picker.
-Representative OnePlus navigation/keyboard acceptance is still required.
+The third owner APK report lists only multi-destination selection as remaining; its exact installed SHA was not supplied. Retain a short navigation/keyboard regression for the new picker.
 
 Creating a destination only creates/selects the List. It must not add, endorse or
 advance an Item. A sole available destination is selected automatically; an
 explicitly created destination is selected for the pending draft. Message input
 requires a selected, usable destination. The separate Add/Propose button commits
 the choice; Shared failure keeps the picker, Item and message draft available.
-Personal users can confirm another List addition before Done. A message failure
-is reported and does not undo a successful List action.
+Use independent checkboxes and a selected count for one or more destinations in
+both Personal and Shared. Creating another List preserves earlier checks. An
+intentional empty selection stays empty. Explicit confirmation commits the set;
+Shared approvers must be able to read every target name before confirming.
+Personal Done follows confirmed additions; a partial failure retains the unresolved
+choices. A message failure is reported and does not undo a successful List action.
 
 Refreshing discovery may vary equal-fit candidates and apply the existing recent
 exposure cooldown. The owner explicitly accepts tie variation. Preserve server
@@ -159,7 +163,7 @@ reopening, refresh, edit and Undo must preserve this agreement with the visible
 rating badge. Consumed-only/unrated Items have no invented saved rating.
 Opening the control must never submit the starting value as a new rating.
 Shared member-history attribution must not prefill another member's rating as a
-SharedProfile rating. The owner's 2026-09-10 mismatch report remains open in
+SharedProfile rating. The owner’s third report says only multi-List selection remains; no specific slider reproduction/fix is claimed. Keep the regression recorded in
 [DEVICE_TEST.md](../project/DEVICE_TEST.md#additional-owner-report--saved-rating-start-position).
 
 ## Planned personal statistics and selection
@@ -176,3 +180,13 @@ explicit bulk actions and a non-gesture accessibility entry. Selecting alone
 creates no rating, not-interest or List mutation. The complete Discovery/List
 and partial-failure contract is
 [FUTURE_PLAN.md](FUTURE_PLAN.md#fut-ux-002--long-press-multi-select--planned--231).
+
+## Planned Shared rating rounds — required #232
+
+A submits 5 in Shared context. The other participant sees “A antoi arvosanan 5,
+minkä sinä annat?” with a separate, initially unrated control for their own answer;
+do not prefill 5 as agreement. Show pending participants until the round completes,
+then “Pari!” and joint Katsotut/Luetut. Display whose ratings belong to that round.
+A new joint viewing uses a new round and retains the earlier experience. Existing
+Personal setup/history survives. This is a release requirement, not functionality
+delivered by the multi-destination picker.

@@ -43,6 +43,7 @@ interface SharedEndorsementContextValue {
     itemId: ItemId,
     listId?: ItemListId,
     origin?: EventRecordInput,
+    listIds?: readonly ItemListId[],
   ) => Promise<SharedEndorsementCommitResult>;
   retry: () => void;
 }
@@ -182,6 +183,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
       itemId: ItemId,
       listId?: ItemListId,
       origin?: EventRecordInput,
+      listIds?: readonly ItemListId[],
     ): Promise<SharedEndorsementCommitResult> => {
       if (!rpc || !activeSharedProfile || !actorUserId || status !== 'ready' || currentScope.current !== scopeToken) {
         return { status: 'error', message: UNAVAILABLE_MESSAGE };
@@ -189,7 +191,8 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
 
       const result = await endorseSharedItem(
         async () => {
-          const response = await submitCollectionAction({ kind: 'ENDORSE_SHARED_ITEM', itemId, listId: listId ?? null },
+          const response = await submitCollectionAction({ kind: 'ENDORSE_SHARED_ITEM', itemId, listId: listId ?? null,
+            ...(listIds ? { listIds } : {}) },
             listId ? 'ITEM_DESTINATION_PICKER' : 'SHARED_DISCOVERY', origin);
           return response.status === 'success' ? { data: response.receipt.result, error: null }
             : { data: null, error: { code: 'KAJO_ACTION', message: response.message } };
@@ -240,6 +243,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
               proposedByUserId: result.commit.consensusSaved
                 ? null
                 : result.commit.proposedByUserId,
+              ...(result.commit.proposalLists ? { proposedLists: result.commit.consensusSaved ? [] : result.commit.proposalLists } : {}),
             },
           },
         };

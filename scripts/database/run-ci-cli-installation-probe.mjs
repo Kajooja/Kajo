@@ -11,6 +11,7 @@ import { buildFreshInstallation, installFreshDatabase, installationHistorySql } 
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
+import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -44,6 +45,11 @@ try {
     const projectionFixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
     const [historyProjectionUpgrade] = await exec(historyProjectionUpgradeSql(files[projectionIndex], projectionFixture, candidate.tables));
     assert.match(historyProjectionUpgrade?.historyProjectionUpgrade, /^PASS: unchanged populated/);
+    const destinationsIndex = files.findIndex(file => file.name.endsWith('_shared_list_destinations.sql'));
+    assert.ok(destinationsIndex > projectionIndex);
+    await resetFromMigrations(files.slice(0, destinationsIndex));
+    const [sharedListDestinationsUpgrade] = await exec(sharedListDestinationsUpgradeSql(files[destinationsIndex], projectionFixture, candidate.tables));
+    assert.match(sharedListDestinationsUpgrade?.sharedListDestinationsUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -73,6 +79,8 @@ try {
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
     assert.match(bootstrapHistory?.bootstrapHistory, /^PASS: calibration/);
+    const [sharedListDestinations] = await exec(await readFile(new URL('shared-list-destinations-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(sharedListDestinations?.sharedListDestinations, /^PASS: exact target consent/);
     const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listMembership?.listMembership, /^PASS: public delivery/);
     await exec(`begin; ${defaults} rollback;`);
@@ -87,7 +95,7 @@ try {
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
-      bootstrapHistory, historyProjectionUpgrade,
+      bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

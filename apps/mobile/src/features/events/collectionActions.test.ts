@@ -48,6 +48,29 @@ function setup(store: ReturnType<typeof storage>, send: (c: PendingProfileAction
 function client(rpc: unknown) { return { rpc } as SupabaseClient; }
 
 describe('atomic collection service and shared durable queue', () => {
+  it('persists exact Shared destination sets and rejects empty, duplicate or unrelated primary selections', () => {
+    const c = command(40, { kind: 'ENDORSE_SHARED_ITEM', itemId: id(6), listId: id(5), listIds: [id(5), id(7)] });
+    expect(isPendingProfileAction(JSON.parse(JSON.stringify({ command: c })), scope)).toBe(true);
+    for (const listIds of [[], [id(5), id(5)], [id(7)], ['invalid'], Array.from({ length: 33 }, (_, i) => id(i + 5))]) {
+      expect(isPendingProfileAction({ command: { ...c, listIds } }, scope)).toBe(false);
+    }
+    expect(isPendingProfileAction({ command: { ...c, listId: null } }, scope)).toBe(true);
+  });
+
+  it('refuses an acknowledgement that omits any confirmed Shared destination', async () => {
+    const c = command(41, { kind: 'ENDORSE_SHARED_ITEM', itemId: id(6), listId: id(5), listIds: [id(5), id(7)] });
+    const row = { profile_id: scope.profileId, item_id: id(6), actor_user_id: scope.actorUserId,
+      endorsement_created: true, endorsement_count: 1, required_member_count: 2,
+      consensus_reached: false, consensus_saved: false, proposal_list_id: id(5), proposal_list_name: 'First',
+      proposed_by_user_id: scope.actorUserId, list_entry_created: false };
+    const data = { ...receipt(c), undoable: false, result: [{ ...row,
+      proposal_lists: [{ id: id(5), name: 'First' }, { id: id(7), name: 'Second' }] }] };
+    const send = createProfileActionSender(client(vi.fn().mockResolvedValue({ data, error: null })));
+    expect((await send(c)).status).toBe('success');
+    const incomplete = { ...data, result: [row] };
+    const retry = createProfileActionSender(client(vi.fn().mockResolvedValue({ data: incomplete, error: null })));
+    expect((await retry(c)).status).not.toBe('success');
+  });
   it('accepts all command kinds and keeps old persisted Item payloads compatible', () => {
     const intents: CollectionActionIntent[] = [
       { kind: 'CREATE_LIST', itemId: null, name: 'Books' },

@@ -259,6 +259,13 @@ For 3+ people, the creator selects Friends and sends/collects explicit membershi
 
 Do not make every friendship a SharedProfile. This keeps the friend graph lightweight and makes joint learning intentional.
 
+Personal Taste setup precedes joint rating. Preserve an existing completed setup
+and the bounded recognition-aware cold-start exit; do not force a repeat test or
+20 recognized Items to unlock a group. The required next step is SharedRatingRound
+(#232, ROADMAP 16.3): one member’s Shared score invites the others’ own responses,
+then the completed joint experience enters Shared history. Personal history stays
+separate. DOMAIN_MODEL and PREDICTION_MODEL own the round and rewatch contracts.
+
 ## 10. Funnel and event measurement
 
 Kajo must know where the launch loop succeeds or fails. Acquisition/product funnel telemetry is distinct from taste evidence when semantics differ.

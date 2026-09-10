@@ -142,13 +142,16 @@ Existing SharedProfile learning semantics remain canonical.
 - [x] `MVP-SOCIAL-003` Member can create actor-specific pending Endorsement.
 - [x] `MVP-SOCIAL-004` Pending Endorsement is hidden for endorser and prioritized for non-endorsing accepted members with provenance.
 - [x] `MVP-SOCIAL-005` Unanimous endorsement promotes once to Shared Saved/system `Tallennetut` and remains durable after later membership changes.
-- [x] `MVP-SOCIAL-006` Accepted-member Personal consumed/rated history may appear only as an attributed lower Shared discovery tier; Shared consumed/consensus-saved Items remain suppressed.
+- [x] `MVP-SOCIAL-006` Delivered V1: accepted-member Personal history appears as an attributed lower Shared tier; Shared consumed/consensus-saved Items are suppressed. Required successor eligibility is tracked separately in `MVP-SOCIAL-009`.
+- [ ] `MVP-SOCIAL-007` After Personal Taste setup, SharedRatingRound retains each participant’s own 0–10 response: A’s rating prompts B; all required responses precede completed joint Katsotut/Luetut. #232, Phase 16.3.
+- [ ] `MVP-SOCIAL-008` Joint learning keeps actor/round provenance and disagreement, with atomic completion, correction/Undo, retry and membership-change semantics; Personal history remains separate and legacy single-actor history is not fabricated into confirmed rounds. #232.
+- [ ] `MVP-SOCIAL-009` A member-seen Item may rank strongly for joint use; a bounded/versioned rewatch policy permits a new joint experience of the same Item while retaining all prior history. Serving/shadow eligibility and delayed outcomes agree. #232.
 
 ## Swipe and state
 
 - [x] `MVP-SWIPE-001` Optional swipe mode exists for books/movies.
 - [x] `MVP-SWIPE-002` Consumed rating 0–10 and unconsumed not-interest are distinct.
-- [x] `MVP-SWIPE-003` Rating implies consumed/read/watched.
+- [x] `MVP-SWIPE-003` Personal rating implies consumed/read/watched; joint completion additionally requires `MVP-SOCIAL-007`.
 - [x] `MVP-SWIPE-004` Consumed/reacted Items are suppressed appropriately; impressions have bounded cooldown.
 - [x] `MVP-SWIPE-005` Rating, not-interest and List addition use one restrained action drawer; List add is positive action.
 - [x] `MVP-SWIPE-006` Recent interactions can be undone with exact Item/state restoration.
@@ -157,15 +160,15 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [x] `MVP-MEM-001` User can save/unsave Item.
 - [x] `MVP-MEM-002` User can view consumed books/movies.
-- [x] `MVP-MEM-003` Rating 0–10 records consumed.
+- [x] `MVP-MEM-003` Personal rating 0–10 records consumed; the Shared round requirement is tracked in `MVP-SOCIAL-007`.
 - [ ] `MVP-MEM-004` Data model retains an extension point for future note/photo/people/location/date memories.
 - [-] `MVP-MEM-005` Profile-scoped Saved and consumed collections are reachable without duplicating canonical interaction state.
 
 ## Named Lists
 
 - [-] `MVP-LIST-001` Personal/Shared Profiles can own multiple named generic Lists plus one system Saved List.
-- [-] `MVP-LIST-002` Compact one-destination List picker supports recent Lists and create/name/rename.
-- [-] `MVP-LIST-003` Personal add is positive action; Shared custom List proposal/approval follows Endorsement unanimity and then system Saved promotion.
+- [-] `MVP-LIST-002` Compact multi-destination List picker supports recent Lists and create/name/rename in Personal and Shared Profiles; Shared members review the exact full set before atomic unanimous addition.
+- [-] `MVP-LIST-003` Personal add is positive action; Shared custom List proposal/approval follows Endorsement unanimity for the exact selected set and then system Saved promotion.
 - [-] `MVP-LIST-004` List detail supports list/card presentation, deterministic sort and generic ItemType filters.
 - [-] `MVP-LIST-005` Membership stores truthful added-by/time while canonical consumed/rating state stays elsewhere.
 - [-] `MVP-LIST-006` Shared List access follows accepted membership authorization.

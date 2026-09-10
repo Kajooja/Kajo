@@ -1,5 +1,7 @@
 import type { Item, ItemId, ItemType, User } from '../../domain/contracts';
 
+export interface SharedListDestination { id: string; name: string }
+
 export interface SharedDiscoveryItemState {
   item: Item;
   ineligibleForDiscovery: boolean;
@@ -13,6 +15,7 @@ export interface SharedDiscoveryItemState {
   proposedListId: string | null;
   proposedListName: string | null;
   proposedByUserId: string | null;
+  proposedLists?: readonly SharedListDestination[];
 }
 
 export interface PendingListApproval {
@@ -100,7 +103,7 @@ export function getPendingListApproval(
   return proposedByNickname
     ? {
         listId: state.proposedListId,
-        listName: state.proposedListName,
+        listName: state.proposedLists?.map(list => list.name).join(', ') || state.proposedListName,
         proposedByUserId: state.proposedByUserId,
         proposedByNickname,
       }
@@ -111,7 +114,7 @@ export function formatPendingListApproval(
   approval: PendingListApproval | null,
 ): string | null {
   return approval
-    ? `${approval.proposedByNickname} lisäsi listaan ${approval.listName}`
+    ? `${approval.proposedByNickname} ehdottaa listoille: ${approval.listName}`
     : null;
 }
 

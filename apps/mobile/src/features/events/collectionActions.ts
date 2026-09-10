@@ -16,7 +16,7 @@ export type CollectionActionIntent =
   | { kind: 'DELETE_LIST'; itemId: null; listId: string }
   | { kind: 'SET_LIST_ENTRY'; itemId: string; listId: string; present: boolean; positive: boolean }
   | { kind: 'UNDO_LIST_ENTRY'; itemId: string; reversesActionId: string }
-  | { kind: 'ENDORSE_SHARED_ITEM'; itemId: string; listId: string | null }
+  | { kind: 'ENDORSE_SHARED_ITEM'; itemId: string; listId: string | null; listIds?: readonly string[] }
   | { kind: 'REVERSE_ENDORSEMENT'; itemId: string };
 
 export type CollectionActionSource = 'LISTS' | 'LIST_DETAIL' | 'ITEM_DESTINATION_PICKER' | 'SHARED_DISCOVERY';
@@ -105,7 +105,10 @@ export function isPendingProfileAction(value: unknown, scope: ItemActionScope): 
       && typeof c.present === 'boolean' && typeof c.positive === 'boolean'
       && (!c.positive || (c.present && c.source === 'ITEM_DESTINATION_PICKER'));
     case 'UNDO_LIST_ENTRY': return isUuid(c.itemId) && isUuid(c.reversesActionId) && isItemInteraction(value.restoredInteraction);
-    case 'ENDORSE_SHARED_ITEM': return isUuid(c.itemId) && (c.listId === null || isUuid(c.listId));
+    case 'ENDORSE_SHARED_ITEM': return isUuid(c.itemId) && (c.listId === null || isUuid(c.listId))
+      && (c.listIds === undefined || (Array.isArray(c.listIds) && c.listIds.length > 0 && c.listIds.length <= 32
+        && c.listIds.every(isUuid) && new Set(c.listIds).size === c.listIds.length
+        && (c.listId === null || c.listIds.includes(c.listId))));
     case 'REVERSE_ENDORSEMENT': return isUuid(c.itemId);
     default: return false;
   }
@@ -144,7 +147,9 @@ function validReceipt(data: unknown, command: CollectionActionCommand): data is 
       const mapped = mapSharedEndorsementCommit(data.result);
       return mapped.status === 'success' && mapped.commit.profileId === command.profileId
         && mapped.commit.itemId === command.itemId && mapped.commit.actorUserId === command.actorUserId
-        && mapped.commit.proposalListId === data.listId;
+        && mapped.commit.proposalListId === data.listId
+        && (command.listIds === undefined || (mapped.commit.proposalLists?.length === command.listIds.length
+          && mapped.commit.proposalLists.every(list => command.listIds!.includes(list.id))));
     }
     case 'REVERSE_ENDORSEMENT': {
       const row = Array.isArray(data.result) && data.result.length === 1 ? data.result[0] : null;

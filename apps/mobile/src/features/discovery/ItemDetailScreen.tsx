@@ -1,5 +1,5 @@
 import { buildCollectionSequence, buildDeliveredItemOrigins, getDeliveredItemOrigin, type DeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -166,6 +166,11 @@ function ItemDetailContent({
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
   const profileMessages = useProfileMessages();
+  const currentView = useRef(true);
+  useLayoutEffect(() => {
+    currentView.current = true;
+    return () => { currentView.current = false; };
+  }, []);
   const {
     interactions,
     setRating,
@@ -400,15 +405,16 @@ function ItemDetailContent({
   }
 
   async function handleListDestinationCommit(commit: ListDestinationCommit): Promise<ListDestinationCommitResult> {
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
     const target = listPickerTarget;
 
-    if (!target) return { status: 'error', message: 'Avaa listavalinta uudelleen.' };
+    if (!target || !commit.lists.length) return { status: 'error', message: 'Avaa listavalinta uudelleen.' };
 
     if (activeSharedMembership) {
       const result = await handleEndorsement(
         target.item,
         target.index,
-        commit.list,
+        commit.lists,
         commit.message,
         target.origin,
       );
@@ -419,14 +425,18 @@ function ItemDetailContent({
     const { item, index } = target;
     let notice: string | undefined;
     if (commit.message) {
-      const messageResult = await profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
-        listId: commit.list.id, itemId: item.id });
-      if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
+      for (const list of commit.lists) {
+        if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista tallentuneet lisäykset.' };
+        const messageResult = await profileMessages.send({ profileId: list.profileId, body: commit.message,
+          listId: list.id, itemId: item.id });
+        if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
+      }
     }
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista tallentuneet lisäykset.' };
     if (!commit.stayOpen) {
       setListPickerTarget(null);
       advanceAfterAction(item, index, notice ?? (commit.stayOpen === false
-        ? 'Listalisäykset tallennettu.' : `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`));
+        ? 'Listalisäykset tallennettu.' : `Lisätty listoille ${commit.lists.map(list => list.name).join(', ')}.`));
     }
     return { status: 'success', ...(notice ? { notice } : {}) };
   }
@@ -448,47 +458,53 @@ function ItemDetailContent({
   async function handleEndorsement(
     item: Item,
     index: number,
-    proposedList?: ItemList,
+    proposedLists?: readonly ItemList[],
     message?: string | null,
     origin?: EventRecordInput,
+    confirmedListIds?: readonly string[],
   ): Promise<ListDestinationCommitResult> {
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
     if (exitingItemId || endorsingItemId) return { status: 'error', message: 'Odota nykyisen valinnan tallentumista.' };
 
     setEndorsingItemId(item.id);
     const result = await sharedEndorsements.endorse(
       item.id,
-      proposedList?.id,
+      proposedLists?.[0]?.id,
       origin ?? { eventType: 'ITEM_ENDORSED', itemId: item.id, itemType: item.itemType,
         ...originFor(item), discoveryMode: mode },
+      proposedLists?.map(list => list.id) ?? confirmedListIds,
     );
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
     if (result.status === 'error') {
       setEndorsingItemId(null);
       setFeedback(result.message);
       return result;
     }
 
-    if (proposedList) {
-      rememberRecentList(proposedList.profileId, proposedList.id);
+    for (const list of proposedLists ?? []) {
+      rememberRecentList(list.profileId, list.id);
     }
 
     let notice: string | undefined;
+    const destinations = result.commit.proposalLists ?? [{ id: result.commit.proposalListId, name: result.commit.proposalListName }];
     if (message) {
-      const messageResult = await profileMessages.send({
-        profileId: result.commit.profileId,
-        body: message,
-        listId: result.commit.proposalListId,
-        itemId: item.id,
-      });
-      if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
+      for (const list of destinations) {
+        if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
+        const messageResult = await profileMessages.send({
+          profileId: result.commit.profileId, body: message, listId: list.id, itemId: item.id,
+        });
+        if (messageResult.status === 'error') notice = 'Lisäykset tallentuivat, mutta kaikkia viestejä ei lähetetty. Voit lähettää puuttuvat viestit postilaatikosta.';
+      }
     }
 
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
     setEndorsingItemId(null);
     advanceAfterAction(
       item,
       index,
       notice ?? (result.commit.consensusSaved
-        ? `Pari! Tallennettu listaan ${result.commit.proposalListName}.`
-        : `Odottaa muiden hyväksyntää listalle ${result.commit.proposalListName}.`),
+        ? `Pari! Tallennettu listoille ${destinations.map(list => list.name).join(', ')}.`
+        : `Odottaa muiden hyväksyntää listoille ${destinations.map(list => list.name).join(', ')}.`),
     );
     return { status: 'success', ...(notice ? { notice } : {}) };
   }
@@ -873,7 +889,8 @@ function ItemDetailContent({
                 {...(pendingListApproval
                   ? {
                       onApprove: () =>
-                        void handleEndorsement(item, index),
+                        void handleEndorsement(item, index, undefined, undefined, undefined,
+                          sharedState?.proposedLists?.map(list => list.id)),
                     }
                   : {})}
                 onRating={(rating) =>
@@ -943,7 +960,7 @@ function SwipeItemPage({
   const visibleTags = tagsExpanded
     ? tags
     : tags.slice(0, COLLAPSED_TAG_COUNT);
-  const contentExpanded = descriptionExpanded || tagsExpanded;
+  const contentExpanded = descriptionExpanded || tagsExpanded || pendingApprovalLabel !== null;
 
   return (
     <ScrollView
@@ -954,7 +971,7 @@ function SwipeItemPage({
     >
       {pendingApprovalLabel && onApprove ? (
         <View style={styles.approvalBanner}>
-          <Text numberOfLines={2} style={styles.approvalBannerText}>
+          <Text style={styles.approvalBannerText}>
             {pendingApprovalLabel}
           </Text>
           <Pressable
