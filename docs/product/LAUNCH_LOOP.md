@@ -123,6 +123,14 @@ The user reacts to recognizable real Items one at a time. Current rating semanti
 
 The test should normally remain within roughly **12–24 informative known-item opportunities**, adapting to recognition and information gain. Exact thresholds are versioned and must be measured rather than hard-coded forever.
 
+Owner device preference (2026-09-10): make initial profiling visibly longer,
+using approximately **10 movies followed by 10 books**, with a distinct transition
+card announcing book profiling. Treat this as the proposed default progression
+for Phase 15.0, compatible with the 12–24-opportunity adaptive range above, not a
+requirement to force 20 known ratings. Keep unknown-item skips, recognition-aware
+selection and honest progress. The current logged-in calibration flow also needs
+this proposal evaluated after its evidence/history defects are corrected.
+
 The question-selection policy should optimize information gained about the Profile while retaining:
 
 - high recognition probability,
@@ -204,6 +212,12 @@ Friendship invariants:
 - either user can remove/block according to the MVP friend lifecycle,
 - blocked/removed relationships cannot be recreated through replayed invite tokens,
 - user enumeration and invitation spam are rate-limited.
+
+Future invite presentation (owner idea, 2026-09-10): place a small “lähetä linkki”
+action below Send invitation. Tapping reveals the invitation URL and a one-tap
+copy button. Deliver with Phase 16 link flows, not the current collection fixes.
+Apply the presentation to the appropriate invitation type only once its URL,
+consent and lifecycle exist; a Friend link must not silently join a SharedProfile.
 
 ## 9. SharedProfile creation from Friends
 

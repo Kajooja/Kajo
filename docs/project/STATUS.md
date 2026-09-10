@@ -11,9 +11,35 @@ This file is the authoritative current-state handoff. `ROADMAP.md` owns dependen
 
 Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
 Runtime code is `2cb204f`; CI #429 succeeded. Main remains accepted `6dd1fec`.
-All requested collection UI corrections and hosted history-clear are implemented.
-**The explicitly approved reset is now committed and verified. Next: owner APK
-testing**, using [DEVICE_TEST.md](DEVICE_TEST.md). No new APK was started or polled.
+Owner APK feedback is now recorded in [DEVICE_TEST.md](DEVICE_TEST.md). The actual
+installed SHA/run was not supplied; runtime `2cb204f` is the planned checkpoint,
+not a verified device-build identity. Tests 1–6 and scope switching in 8 were
+reported working, with specific exceptions below; answer 7 is a future UX idea.
+**Current instruction: documentation only. Do not implement corrections in this
+turn. On the next “jatka reposta”, continue the follow-up work below.**
+
+Next work, in order:
+
+1. Investigate initial-profile/bootstrap ratings missing from Luetut/Katsotut and
+   initial-profile member ratings appearing in Shared cards. Verify history-source
+   coverage, bootstrap/native parity and the actual Shared delivery tier. Preserve
+   separate Personal/Shared evidence and the intentional attributed member-history
+   tier; do not assume every such Shared card is invalid. Add targeted regressions
+   and ensure edit/clear keeps history, Memory and recommendation eligibility aligned.
+2. Fix the OnePlus destination picker's bottom clearance: action buttons must sit
+   above system navigation and the Kajo bottom bar, like the other panels. Verify
+   safe-area/keyboard handling for gesture and three-button navigation.
+3. Evaluate the owner's longer initial profiling preference: about 10 movies then
+   10 books, with a transition card before books. Record how this applies to current
+   calibration; the full adaptive Taste interaction remains Phase 15.0. It fits
+   the existing 12–24-opportunity range and must preserve skip/recognition behavior.
+4. Re-test the affected flows, capture the installed APK SHA, record acceptance,
+   then consider merge with required CI. Keep #228/#229 and DATA-003/004 open.
+
+Future invitation idea is saved in LAUNCH_LOOP and ROADMAP Phase 16: small
+“lähetä linkki” below Send invitation reveals a copyable link. It is explicitly
+not a current fix and must respect separate Friend/Shared invitation semantics.
+Do not run another reset; retain the owner's new test data for reproduction.
 
 The owner explicitly approved fresh PersonalProfile identities and clearing all
 Profile-scoped choices, Events, imports, Predictions and Shared groups/messages.
@@ -29,15 +55,10 @@ baseline/model configuration remains unchanged. Do not run the reset again: the
 script remains ROLLBACK by default and its prior-scope guard now fails deliberately.
 New legitimate device actions will of course make these zero counts increase.
 
-The repository is ready for a new conversation: read this checkpoint and
-DEVICE_TEST.md, obtain/record the actual APK run and commit plus owner test results,
-fix failures first, and keep this PR draft until required CI and device acceptance
-are satisfied. Build manually using Actions → CI → Run workflow on the active
-branch; a normal PR run intentionally skips the APK job. Do not poll completion.
-No device acceptance, merge or broad release readiness is claimed. After accepted
-results, merge/perform supported branch cleanup and continue Phase 14.1 before
-Taste/Friends. All 325 tests, lint/TypeScript and both exports passed at the
-preceding handoff; this checkpoint changes documentation and reset state only.
+The repository is ready for a new conversation: start with the follow-up order
+above and the owner results in DEVICE_TEST.md. Do not restart reset/build work or
+claim full device acceptance. Previously passing runtime checks remain 325 tests,
+lint/TypeScript and both exports; this feedback checkpoint changes docs only.
 The sections below preserve implementation history and do not override this
 immediate continuation checkpoint.
 

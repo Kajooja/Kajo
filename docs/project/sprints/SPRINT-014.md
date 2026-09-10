@@ -1253,3 +1253,19 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   transaction's rolled-back probe. No repeat reset; DEVICE_TEST.md and STATUS
   now direct the next conversation to the manual branch APK and owner tests.
 - No app changes, APK dispatch/polling, merge or device acceptance in this step.
+
+
+### Owner device feedback, documentation only — 2026-09-10 / #228 / #229
+
+- Recorded numbered results in DEVICE_TEST.md; installed APK SHA/run unspecified.
+  Core flows work, including multi-list saving, history removal, refresh, durability
+  and scope switching. Initial-profiling ratings are missing from history and
+  appear in Shared cards; determine the actual tier/evidence semantics before fixes.
+- OnePlus destination picker overlaps bottom navigation. Fix after evidence parity;
+  preserve accepted list/history behavior and new test data (no additional reset).
+- Longer profiling proposal (~10 movies + 10 books with transition card) is recorded
+  in LAUNCH_LOOP/Phase 15.0, with current calibration impact to be evaluated.
+- Deferred invitation reveal/copy-link idea belongs to Phase 16, not this sprint fix.
+- User explicitly requested no implementation now. STATUS gives the next
+  “jatka reposta” order. No code/database changes, APK build, tests or merge performed
+  for this documentation-only feedback update; prior checks remain historical.

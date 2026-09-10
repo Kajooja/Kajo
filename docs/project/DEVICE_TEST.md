@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **reset committed and verified; ready for owner APK testing**.
+Status: **owner results recorded; follow-up defects open**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -77,3 +77,30 @@ Report each number as pass/fail plus exact error text/screenshot and the APK SHA
 After results, record them in Sprint 014 and STATUS, fix failures first, and only
 then consider merge/branch cleanup. This checkpoint does not close DATA-003/004,
 all algorithm quality gates, or the Share Link Gate automatically.
+
+
+## Owner results — 2026-09-10
+
+Owner requested documentation only; fixes will start in the next conversation
+with “jatka reposta”. The actual installed APK SHA/run was not supplied, so these
+are owner-reported device results, not verified exact-build acceptance. The planned
+branch/runtime remains the one above. OnePlus system navigation was explicitly
+reported; OS/model details are not yet known.
+
+| Test | Owner result | Follow-up |
+| --- | --- | --- |
+| 1 | Works | Initial profiling feels too short. Suggested approximately 10 movies then 10 books, with a clear transition card before the book section. Product proposal, not an implemented fixed limit. |
+| 2 | Multi-list saving works | On OnePlus, the destination picker opens under the system bottom navigation and buttons are hard to press. It should rise above Kajo's bottom navigation like other panels. |
+| 3 | History flow works | Ratings entered during initial profiling are missing from Luetut/Katsotut. |
+| 4 | History removal works exactly as requested | Retain this accepted behavior. |
+| 5 | Layouts/pull refresh work | No new defect reported. |
+| 6 | Durability/undo works | No new defect reported. |
+| 7 | Future invitation UX idea | Add small “lähetä linkki” text below Send invitation, revealing a link with one-tap copy. Implement only in the appropriate future link phase. Do not infer acceptance of every group subcase from this answer alone. |
+| 8 | Scope switching works | Shared views still contain Items rated by a member during initial profiling. Investigate bootstrap/native eligibility and provenance; not a cross-account data leak claim. |
+
+Next regression focus: picker bottom clearance with gesture and three-button
+navigation; initial-profile ratings visible/editable/removable in history; equivalent
+initial-profile evidence respected in Shared eligibility. Preserve the explicit
+attributed member-history tier where intended rather than blindly hiding every
+member-rated Item. Record which tier the reported cards use. Do not reset the
+new test data again: it is useful evidence for reproducing these defects.

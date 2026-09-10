@@ -156,6 +156,10 @@ Requirements: `MVP-TASTE-001..005`.
 
 Build the Taste Test on the same real catalog, feature versions and prediction semantics proven in Phase 14.
 
+Owner proposal (2026-09-10): roughly 10 movies then 10 books, with a clear
+transition card before books; preserve the adaptive bounds and skip behavior
+in LAUNCH_LOOP. Current calibration evidence defects remain Phase 14 priorities.
+
 Exit gate:
 
 - anonymous visitor can complete a bounded 12–24-opportunity adaptive test,
@@ -194,6 +198,10 @@ Exit gate:
 ## Phase 16 — Friend viral loop and Shared creation
 
 ### 16.0 — Personal Friend invite
+
+Include the deferred owner UX idea: small “lähetä linkki” below Send invitation,
+revealing the URL with one-tap copy. LAUNCH_LOOP owns the distinction between
+Friend and Shared links; no premature public link implementation in Phase 14.
 
 Requirements: `MVP-FRIEND-001..004`.
 

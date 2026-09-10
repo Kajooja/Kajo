@@ -126,3 +126,10 @@ retain the gesture. Shared Discovery keeps its loading indicator active while
 either recommendations or Shared choices load. Durable mutation recovery remains
 a distinct action; refreshing never discards queued choices. Gesture behavior
 requires the combined real-device acceptance checkpoint.
+
+
+Destination-picker panels must keep all action buttons above Android system
+navigation and Kajo's bottom navigation, consistent with the other panels.
+Respect safe-area and keyboard insets with gesture and three-button navigation.
+Owner OnePlus testing (2026-09-10) reports overlap in the current picker; this is
+a recorded defect, not a completed fix.
