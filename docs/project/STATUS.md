@@ -172,8 +172,8 @@ persistence errors. It keeps the action pending and retries automatically instea
 of publishing an error that prematurely resolves collection waiters. Real errors
 remain visible; server correlation and durable queue semantics are unchanged.
 
-The named-list correction is now a candidate on the same #228/#229 branch:
-`20260910104420_list_membership_resurfacing.sql` replaces only the existing private
+The named-list correction is deployed server-side; its mobile changes remain on #228/#229:
+`20260910110344_list_membership_resurfacing.sql` replaces only the existing private
 resurfacing decision function. Current Profile-scoped memberships participate in
 suppression and reminder age; removing the final Personal membership restores
 ordinary eligibility unless Saved/bootstrap/terminal reactions still suppress it.
@@ -188,12 +188,30 @@ SYSTEM_SAVED membership: it correctly remains suppressed. Direct Personal-style
 Shared Saved removal is rejected by existing consent rules; this patch does not
 weaken that boundary. Function identity/ACL and unrelated definitions are checked.
 
-Next: review/deploy the exact candidate forward to the hosted project, including
-metadata/advisor/rollback-only acceptance, then inspect the owner's ineffective
-undo and the Shared withdrawal/removal UX before the replacement APK. The new
-migration is NOT deployed and device behavior is NOT accepted. Keep #228/#229 and
-DATA-003/004 open. No undo of List removal is required by the owner; retained undo
-controls must work. “Mitä tänään” remains a separate FUTURE_PLAN idea.
+Hosted rollout passed on `mwrnvfosrzwygrunrltm`: provider version
+`20260910110344`, name `list_membership_resurfacing`, exact SQL SHA-256
+`889e424c3ebefa4145534e2cca0a531d107947b187d7c225f6d355dcc9f26711`.
+Only the filename was aligned to the actual provider version; SQL is unchanged.
+The affected private function retained owner, ACL, security mode and search path;
+128 unrelated function fingerprints, 21 application triggers, default ACLs and
+all 46 previous migration identities stayed unchanged. No whole user-data parity
+claim is made. Security advisors retained the existing 18 no-policy informational
+findings and disabled leaked-password-protection warning; no new finding.
+
+The rollback-only hosted List probe passed, including actual authenticated
+mutations and public suppression. The original fixture incorrectly required its
+synthetic book to reach the top 20 in the populated catalog. The corrected probe
+always verifies eligibility restoration; exact top-20 return remains mandatory
+only in the small isolated fixture. Hosted top-20 return was not observed or
+required. Both failed and successful probes rolled back. Recovery SQL is captured
+in `scripts/database/list-membership-rollback.sql` for a new reviewed forward
+migration if needed, never a history deletion.
+
+Next: inspect the owner's ineffective undo and Shared withdrawal/removal UX,
+then prepare the replacement APK from `feat/228-delivered-origin`. Device behavior
+is NOT accepted. Keep #228/#229 and DATA-003/004 open. No undo of List removal is
+required by the owner; retained undo controls must work. “Mitä tänään” remains a
+separate FUTURE_PLAN idea.
 
 Continue **14.1** after this delivery:
 

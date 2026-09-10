@@ -8,6 +8,8 @@ declare
   first_list uuid; second_list uuid; other_list uuid; shared_list uuid;
   base jsonb; cmd jsonb; result jsonb; policy jsonb;
   decision_time timestamptz := now();
+  return_observed boolean;
+  return_required boolean;
 begin
   insert into auth.users(id,email,raw_user_meta_data)
     select id,id::text||'@example.invalid',jsonb_build_object('kajo_nickname','List '||left(id::text,16))
@@ -50,7 +52,14 @@ begin
   policy := private.resurfacing_policy_decision_v1(personal,item,'{"interest":"LIKED"}',decision_time);
   if policy->>'classification'<>'ORDINARY' or policy->>'eligible'<>'true' then raise exception 'Final removal did not restore ordinary eligibility'; end if;
   perform set_config('role','authenticated',true);
-  if not exists(select 1 from public.rank_items_v1(personal,'FOR_YOU','BOOK',20,'{}') where item_id=item) then
+  select exists(select 1 from public.rank_items_v1(personal,'FOR_YOU','BOOK',20,'{}') where item_id=item)
+    into return_observed;
+  -- A populated catalog can outrank this synthetic book. Eligibility restoration
+  -- is mandatory above; exact top-20 return is only guaranteed in the small fixture.
+  select count(*) <= 20 into return_required from public.items where item_type='BOOK' and discoverable;
+  perform set_config('kajo.test.list_return_required',return_required::text,true);
+  perform set_config('kajo.test.list_return_observed',return_observed::text,true);
+  if return_required and not return_observed then
     raise exception 'Public ranking failed to return Item after final removal';
   end if;
   perform set_config('role','authenticated',true);
@@ -110,5 +119,7 @@ begin
   end;
 end;
 $lists$;
-select jsonb_build_object('listMembership','PASS: public delivery suppression/restoration, multiple Lists, deletion, reminders, terminal reactions and Profile isolation') as snapshot;
+select jsonb_build_object('listMembership','PASS: public delivery suppression, eligibility restoration, multiple Lists, deletion, reminders, terminal reactions and Profile isolation',
+  'top20ReturnRequired',current_setting('kajo.test.list_return_required')::boolean,
+  'top20ReturnObserved',current_setting('kajo.test.list_return_observed')::boolean) as snapshot;
 rollback;

@@ -1014,7 +1014,7 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 
 ### Named List eligibility candidate — 2026-09-10 / #228 / draft PR #229
 
-- New forward `20260910104420_list_membership_resurfacing.sql` changes only the
+- New forward `20260910110344_list_membership_resurfacing.sql` changes only the
   existing private resurfacing decision. It includes current target-Profile List
   entries in saved-like suppression and their latest added_at in reminder age.
   Existing native/bootstrap/terminal precedence, reminder limits and ranking
@@ -1038,3 +1038,32 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - No hosted deployment, hosted advisor run or new-device acceptance yet. PR owns
   current full-check/native CI. Next: exact-forward hosted rollout/verification,
   remaining undo/Shared UX correction, then a focused replacement APK.
+
+
+### Hosted List eligibility rollout — 2026-09-10 / #228 / draft PR #229
+
+- Supersedes the preceding pending-hosted checkpoint. Exact candidate SQL SHA-256
+  `889e424c3ebefa4145534e2cca0a531d107947b187d7c225f6d355dcc9f26711`
+  deployed to `mwrnvfosrzwygrunrltm` as provider version `20260910110344` /
+  `list_membership_resurfacing`. Repository filename aligned; SQL bytes unchanged.
+- Captured the actual prior function and rehearsed its replacement in the full
+  isolated PGlite schema. The manual recovery file restores its original function
+  fingerprint `06da0244916a790932288371e71686a9`; recovery is a new forward migration,
+  not deletion of deployed history. No recovery was applied hosted.
+- Hosted metadata comparison: only the intended function definition changed;
+  its owner/ACL/security/search path, 128 unrelated functions, 21 application
+  triggers, default ACLs and all 46 old version/name rows remained unchanged.
+  No application records were exported or whole-data parity asserted.
+- The first hosted smoke rolled back on a fixture assumption: an eligible
+  synthetic book need not reach the top 20 of the populated catalog. Corrected
+  the probe to require exact return only with at most 20 discoverable books;
+  eligibility restoration is unconditional. The corrected rollback-only hosted
+  probe passed all Personal/List/reminder/terminal/isolation/Shared assertions,
+  with top20ReturnRequired=false and top20ReturnObserved=false.
+- Security advisors unchanged: 18 existing RLS-without-policy INFO findings and
+  existing leaked-password-protection WARN. No permissions or Auth setting changed.
+- Next: ineffective undo and Shared withdrawal/removal UX, then replacement APK
+  and owner device tests. Keep the PR draft and DATA-003/004 open.
+- Validation: full `npm run check` passed (241 mobile, 14 catalog, 61 database
+  tests; both platform exports). Separate captured-prior upgrade/recovery rehearsal
+  passed. Latest native CI and new device acceptance remain separate gates.
