@@ -7,6 +7,46 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
+## Immediate continuation checkpoint — 2026-09-10
+
+Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
+Runtime code is `2cb204f`; CI #429 succeeded. Main remains accepted `6dd1fec`.
+All requested collection UI corrections and hosted history-clear are implemented;
+real-device acceptance remains pending. [DEVICE_TEST.md](DEVICE_TEST.md) owns the
+exact APK build/download steps and eight test scenarios. No new APK was started.
+
+**Blocking next action:** obtain explicit approval for the reviewed reset scope
+below, then execute it and mark the actual result here. Automatic approval review
+rejected COMMIT because rotating Profile IDs and clearing their Events/imports/
+messages was judged broader than the earlier permission to reset choices/groups.
+No bypass was attempted; both hosted rehearsals ended in ROLLBACK. Existing data
+therefore remains intact. Do not tell the owner reset or APK acceptance is complete.
+
+Prepared `scripts/database/owner-device-reset.sql` defaults to ROLLBACK and is NOT
+part of the migration chain. It preserves the two Auth/accounts/nicknames, catalog
+and Personal custom List names. It creates fresh PersonalProfile IDs, removes old
+choices/List contents/history/receipts/imports/Predictions, and deletes the Shared
+group with its invitations/messages. This deliberately resets learned Profile
+identity while preserving User identity. Old queued envelopes cannot target new
+Profiles. Hosted rehearsal proved rejection of real old rating, collection and
+Event-session writes, successful new-Profile rating, empty evidence/group state,
+and unchanged accounts/catalog. Global baseline/model configuration survives;
+unexpected learned Profile assignments/evaluations make the script abort.
+
+Before reset: 2 Users, 2 PersonalProfiles, 1 SharedProfile, 53 interactions,
+2,558 Events and 1 import job. These are preflight counts, not a frozen user-data
+snapshot; recheck if scope changes. Permanent reset was **not** executed. Current
+prior runtime tests and the reset rehearsal are separate evidence. Final handoff
+check passed all 325 tests, lint/TypeScript and both exports (exit 0).
+
+After approval: execute the reviewed reset once (final COMMIT only), verify,
+update this handoff/test plan, then let the owner manually build the branch APK.
+Do not poll APK completion. Keep main/PR draft until owner device results and
+required CI are accepted. Then resolve failures, record exact APK/results, merge
+and perform supported branch cleanup; continue Phase 14.1 before Taste/Friends.
+The sections below preserve implementation history and do not override this
+immediate continuation checkpoint.
+
 ## New product truth — 2026-09-07 / #215 / #216
 
 The first public Kajo must ship as a complete acquisition + recommendation system, not only as an installable recommender.

@@ -1225,3 +1225,18 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   protection, then combined device acceptance. No reset/APK performed here.
 - Validation: full `npm run check` passed 325 tests, lint/TypeScript and both
   platform exports (exit 0); actual pull gestures remain device acceptance.
+
+
+### Reset rehearsal and portable device handoff — 2026-09-10 / #228 / #229
+
+- Runtime head 2cb204f passed CI #429. Prepared DEVICE_TEST.md with manual branch
+  APK instructions, reset prerequisite and eight owner scenarios; linked in docs map.
+- Rehearsed owner-device-reset.sql twice on hosted with ROLLBACK. Fresh Personal
+  IDs reject old rating/collection/Event-session writes while preserving accounts,
+  catalog and Personal custom List names; empty new Profiles can rate normally.
+- Permanent COMMIT was rejected by automatic approval review as broader than the
+  prior choices/groups permission. No data was reset. STATUS records exact scope
+  and next approval/action so another conversation can continue without chat.
+- No schema change, new app code, APK dispatch or device acceptance in this step.
+- Final handoff validation: full `npm run check` passed 325 tests, lint/TypeScript
+  and both platform exports (exit 0).
