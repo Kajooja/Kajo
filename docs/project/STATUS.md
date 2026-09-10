@@ -264,10 +264,10 @@ the in-progress message/create draft. Shared proposal flow is unchanged. The com
 reuse DiscoveryItemCard, show rating badges (including zero), dates and Shared
 provenance, and expose Ruudukko / Kortit controls. Images/cells are virtualized in
 bounded batches; card browsing keeps the loaded collection. The history-clear server candidate is implemented and tested locally; its mobile
-command/UI wiring is now implemented; hosted rollout and final retry UX remain pending; the new UI needs device validation. Reset remains scheduled for the
+command/UI wiring and hosted rollout are implemented; final retry UX remains pending; the new UI needs device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: review/apply the history-clear hosted forward migration, then complete refresh UX, authorized data reset
+Next: complete refresh UX, then the authorized data reset
 and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Publication approval: the owner explicitly approved publishing this Personal
@@ -283,7 +283,7 @@ history-clear hosted rollout and the remaining refresh/reset/device sequence
 above; no new APK or data reset was performed at this publication checkpoint.
 
 History-clear server checkpoint (2026-09-10): candidate forward
-`20260910130156_clear_consumed_history.sql` preserves existing function identity/ACLs,
+`20260910134428_clear_consumed_history.sql` preserves existing function identity/ACLs,
 adds non-undoable CLEAR_HISTORY and ITEM_HISTORY_CLEARED, corrects all active native
 rated/consumed Events, and deactivates matching terminal bootstrap evidence.
 Saved/interest/rejection/List memberships and other Profiles survive. Rollback-only
@@ -315,6 +315,30 @@ The owner explicitly approved publication of this mobile history-clear checkpoin
 `feat/228-delivered-origin`, draft PR #229. This resolves the earlier automatic
 publication-review boundary. Hosted rollout remains the next task, followed by
 remaining refresh UX and the authorized reset/combined device checkpoint.
+
+Hosted history-clear rollout completed (2026-09-10): deployed version/name
+`20260910134428_clear_consumed_history`, unchanged SQL SHA-256
+`2801b3702715b4c9e79025c056f5eb115d6311300bae9333c8441bac5c578b57`.
+The candidate filename was aligned from 20260910130156 to the provider-assigned
+version; SQL bytes and earlier migration history are unchanged. Preflight matched
+the old collection function body exactly. Postflight matches the candidate body
+MD5 `61b539deba7fbaca79a182842b816769`; all 129 function identities/ACLs and
+128 unrelated definitions retain their combined metadata digest.
+Hosted rollback-only smoke passed actual Memory cancellation, import/independent
+state preservation, idempotent retry/rerating, stale undo and nonmember denial.
+The temporary Event-failure injection was omitted on hosted; it remains covered
+in isolated full-schema tests. No real user/group reset or APK was performed.
+Security advisors remain the existing 18 RLS/no-policy INFO and one leaked-password
+protection WARN, with no new finding.
+Recovery, if needed: use a reviewed new forward migration to restore only the
+private collection function from `20260910071110_atomic_collection_actions.sql`
+(the captured preflight body matched exactly). Preserve the added Event type and
+already committed corrections/receipts; do not delete deployed history or rewrite
+user evidence. This disables new CLEAR_HISTORY commands until fixed.
+After filename alignment, full `npm run check` passed 325 tests, lint/TypeScript
+and both platform exports (exit 0).
+This rollout supersedes the earlier pending-hosted notes above. Next: final refresh
+UX, then the already authorized choice/group reset immediately before device tests.
 
 Continue **14.1** after this delivery:
 

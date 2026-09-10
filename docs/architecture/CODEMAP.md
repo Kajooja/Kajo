@@ -113,10 +113,10 @@ and the current Profile/session. `lists/CollectionGrid.tsx` provides the common
 virtualized grid and card-mode entry; `discovery/DiscoveryItemCard.tsx` owns the
 shared cover/status/rating presentation used by Discovery, Lists and history.
 
-History-clear server candidate: `supabase/migrations/20260910130156_clear_consumed_history.sql`
+History-clear deployed server: `supabase/migrations/20260910134428_clear_consumed_history.sql`
 extends the existing atomic collection command and Event constraint, preserving
 function identity/ACLs. `scripts/database/history-clear-smoke.sql` exercises the
 public RPC and actual Memory cancellation; it runs in the full-schema PGlite test
 and required native CLI CI. ConsumedHistoryScreen submits CLEAR_HISTORY through collectionActions and the
 existing durable queue; the content is keyed by Profile/session/Item type and
-reloads after acknowledgement. Hosted rollout and device acceptance are pending.
+reloads after acknowledgement. Hosted rollout is verified; device acceptance remains pending.

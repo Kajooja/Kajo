@@ -1199,3 +1199,17 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
   choice/group reset and combined device checkpoint. No hosted writes/reset/APK here.
 - Validation: `npm run check` passed 325 tests, lint/TypeScript and both platform
   exports (exit 0). Phone/emulator interaction remains untested.
+
+
+### History-clear hosted rollout — 2026-09-10 / #228 / #229
+
+- Applied unchanged reviewed SQL as provider version 20260910134428; aligned the
+  candidate filename without editing SQL bytes or historical tracking.
+- Preflight matched the old function exactly; postflight matched the new body and
+  preserved all function identities/ACLs plus 128 unrelated definitions.
+- Rollback-only hosted acceptance passed Memory cancellation, import/state
+  preservation, retry/rerating and authorization. Failure injection stays isolated.
+- Security findings are unchanged. STATUS records hashes, recovery and exact
+  next task: final refresh UX, authorized reset, combined real-device acceptance.
+- Validation after filename alignment: full `npm run check` passed all 325 tests,
+  lint/TypeScript and both platform exports (exit 0). Device acceptance remains open.

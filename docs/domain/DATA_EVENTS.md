@@ -554,7 +554,7 @@ List/history navigation carries explicit `predictionSource=collection` and
 `deliveryTier=COLLECTION` metadata without a Prediction ID. Loaded authorized Item
 snapshots are scoped to Profile and Event session; this is collection browsing,
 not a ranked recommendation delivery. Existing atomic action/attribution rules
-remain in force. History-clear uses the candidate atomic contract below; mobile wiring is implemented and hosted rollout remains pending.
+remain in force. History-clear uses the candidate atomic contract below; mobile wiring and hosted rollout are implemented; device acceptance remains pending.
 
 
 The Personal multi-destination picker dispatches one existing durable SET_LIST_ENTRY
@@ -577,6 +577,6 @@ immutable Event log. A no-op returns an immutable receipt without Events. The
 action is not undoable and advances the Item action head when changed, preventing
 stale undo. Retrying its exact ID returns its original receipt, including after a
 later rating. State, bootstrap changes, corrections and receipt commit together.
-Candidate server implementation is locally tested. The history grid now submits
+Server implementation is locally tested and deployed. The history grid now submits
 CLEAR_HISTORY through the durable collection queue and validates cleared state in
-the receipt. Hosted deployment and real-device acceptance remain pending.
+the receipt. Hosted deployment is verified; real-device acceptance remains pending.
