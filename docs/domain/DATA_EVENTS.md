@@ -526,3 +526,20 @@ error snapshot. Collection callers therefore continue waiting for the actual
 receipt instead of receiving a premature failure. Genuine persistence errors
 still publish their message. This does not discard actions, weaken trace checks
 or invent exposure.
+
+
+### Active List membership delivery correction — #228 candidate
+
+Ordinary eligibility now considers current List entries belonging to the target
+Profile, rather than treating historical ITEM_ADDED_TO_LIST/LIKED Events as
+permanent membership. The latest active entry time participates in existing saved
+reminder age. Removing the final Personal membership restores ordinary eligibility
+unless another current Saved/bootstrap/terminal state suppresses it. Historical
+taste evidence and receipts are unchanged.
+
+A collection receipt changes the mobile ranking identity even when projection
+fields stay unchanged; the old grid is invalidated until the updated ranking
+arrives. Late viewability tokens from that grid do not establish new impressions.
+Shared SYSTEM_SAVED remains governed by consensus: deleting a named Shared List
+is not permission to bypass that separate state. Candidate forward is not yet
+hosted/device acceptance; STATUS and Sprint 014 own the rollout/remaining undo work.

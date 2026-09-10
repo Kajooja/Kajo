@@ -172,17 +172,28 @@ persistence errors. It keeps the action pending and retries automatically instea
 of publishing an error that prematurely resolves collection waiters. Real errors
 remain visible; server correlation and durable queue semantics are unchanged.
 
-Next on the SAME #228/#229 branch: fix named-list membership in server resurfacing
-eligibility and immediate client slate refresh. Existing policy only checks Saved,
-so CUSTOM membership can escape suppression. List addition is a positive reaction
-and removes the Item from ordinary Discovery. Removing its last active membership
-restores eligibility unless another reaction suppresses it; another remaining List
-must continue suppression. Retain bounded, explicitly separated reminders after
-the policy interval. No undo of List removal is required by the owner; retained
-undo controls must work. Cover multi-list removal, delete, reload and Shared.
-Then prepare a focused replacement APK and retest these failures. Keep #228/#229
-and DATA-003/004 open. The separate “Mitä tänään” List idea is in FUTURE_PLAN and
-must not displace these corrections.
+The named-list correction is now a candidate on the same #228/#229 branch:
+`20260910104420_list_membership_resurfacing.sql` replaces only the existing private
+resurfacing decision function. Current Profile-scoped memberships participate in
+suppression and reminder age; removing the final Personal membership restores
+ordinary eligibility unless Saved/bootstrap/terminal reactions still suppress it.
+The mobile ranking key includes collection revision, so a receipt invalidates stale
+grid results even if LIKED/state fields did not change. Obsolete visible tokens
+cannot create impressions in that invalidated grid.
+
+The full-schema List probe covers actual authenticated add/remove/delete and
+ranking, multiple Lists, reminder eligibility, terminal precedence, Profile
+isolation and real Shared consensus. Deleting a Shared named List can leave its
+SYSTEM_SAVED membership: it correctly remains suppressed. Direct Personal-style
+Shared Saved removal is rejected by existing consent rules; this patch does not
+weaken that boundary. Function identity/ACL and unrelated definitions are checked.
+
+Next: review/deploy the exact candidate forward to the hosted project, including
+metadata/advisor/rollback-only acceptance, then inspect the owner's ineffective
+undo and the Shared withdrawal/removal UX before the replacement APK. The new
+migration is NOT deployed and device behavior is NOT accepted. Keep #228/#229 and
+DATA-003/004 open. No undo of List removal is required by the owner; retained undo
+controls must work. “Mitä tänään” remains a separate FUTURE_PLAN idea.
 
 Continue **14.1** after this delivery:
 

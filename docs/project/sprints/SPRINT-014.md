@@ -1010,3 +1010,31 @@ Item still in another List as new. Do not mark device acceptance complete yet.
 Owner idea: “Mitä tänään” chooses from a saved List using the active Personal or
 Shared Profile and current context, with an explicitly distinct List-card browsing
 surface. Captured in FUTURE_PLAN; it is a product idea, not another reported defect.
+
+
+### Named List eligibility candidate — 2026-09-10 / #228 / draft PR #229
+
+- New forward `20260910104420_list_membership_resurfacing.sql` changes only the
+  existing private resurfacing decision. It includes current target-Profile List
+  entries in saved-like suppression and their latest added_at in reminder age.
+  Existing native/bootstrap/terminal precedence, reminder limits and ranking
+  order remain. Historical Events, receipts, tables and migration history are not
+  rewritten. Policy metadata gains `listMembershipPolicyVersion: active-list-v1`.
+- A collection revision changes the mobile grid request identity and forces a
+  current ranking even when LIKED/interaction fields are unchanged by removal.
+  Loading cannot reuse the prior grid; its late visible tokens cannot create new
+  impressions. Opened Detail retains its frozen delivery snapshot as before.
+- `list-membership-smoke.sql` runs in PGlite and required native CLI acceptance:
+  authenticated Personal add and public ranking suppression, two memberships,
+  last removal and public ranking return, List deletion, older reminder eligibility,
+  terminal precedence, Profile isolation and two-member Shared consensus.
+  PGlite also verifies the forward preserves function identity/ACL/security
+  metadata and every unrelated definition.
+- Shared nuance verified: deleting the named consensus destination leaves the
+  separate SYSTEM_SAVED membership, so suppression continues. Direct Personal-style
+  removal from Shared Tallennetut is rejected by existing consent rules. Do not
+  relabel that as a successful final Shared removal test; withdrawal/removal UX
+  still needs review together with the owner's ineffective undo report.
+- No hosted deployment, hosted advisor run or new-device acceptance yet. PR owns
+  current full-check/native CI. Next: exact-forward hosted rollout/verification,
+  remaining undo/Shared UX correction, then a focused replacement APK.

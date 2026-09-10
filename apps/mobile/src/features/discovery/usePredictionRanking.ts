@@ -1,3 +1,4 @@
+import { useItemInteractions } from './ItemInteractionContext';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
@@ -73,12 +74,14 @@ export function usePredictionRanking(
     getBootstrapEvidenceRevision,
     getBootstrapEvidenceRevision,
   );
+  const { collectionRevision } = useItemInteractions();
   const evidenceKey = getInteractionEvidenceKey(interactions);
   const profileId =
     activeProfile.status === 'ready'
       ? activeProfile.activeProfile?.id ?? null
       : null;
-  const requestKey = profileId ? `${profileId}:${itemType}:${mode}` : null;
+  const rankingScopeKey = profileId ? `${profileId}:${itemType}:${mode}` : null;
+  const requestKey = rankingScopeKey ? `${rankingScopeKey}:collections:${collectionRevision}` : null;
   const fallback = useMemo<PredictionRanking>(
     () => ({
       predictionId: createCorrelationId(fallbackSeed, `${itemType}:${mode}`),
@@ -103,14 +106,14 @@ export function usePredictionRanking(
   );
 
   useEffect(() => {
-    if (!rpc || !client || !profileId || !requestKey) {
+    if (!rpc || !client || !profileId || !requestKey || !rankingScopeKey) {
       return;
     }
 
     const token = requestGate.current.start();
     let active = true;
     const delayMs = getPredictionRefreshDelay(
-      loadedRequestKeys.current.has(requestKey),
+      loadedRequestKeys.current.has(rankingScopeKey),
       INTERACTION_REFRESH_DELAY_MS,
     );
 
@@ -148,7 +151,7 @@ export function usePredictionRanking(
                 }
               : result.ranking;
 
-          loadedRequestKeys.current.add(requestKey);
+          loadedRequestKeys.current.add(rankingScopeKey);
           rememberPredictionItems(ranking.predictionId, ranking.items);
           setHostedState({ status: 'ready', key: requestKey, ranking });
           return;
@@ -178,6 +181,7 @@ export function usePredictionRanking(
     mode,
     profileId,
     requestKey,
+    rankingScopeKey,
     rpc,
   ]);
 

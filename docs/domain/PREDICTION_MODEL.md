@@ -1002,6 +1002,11 @@ check does not satisfy this for CUSTOM Lists. Active authorized List membership
 must participate in eligibility and the existing bounded reminder policy.
 Removing the last membership restores ordinary eligibility only if no other
 reaction suppresses the Item; remaining membership in another List still counts.
-This correction is pending on #228/#229, not delivered server behavior. List
+The #228/#229 candidate forward now includes active List membership and its latest
+active added_at in the existing resurfacing decision. It preserves the 30-day
+minimum age/cooldown, frequency cap and ordinary-before-reminder ordering, and
+adds listMembershipPolicyVersion=active-list-v1 to policy metadata. Native Saved,
+bootstrap Saved and terminal reactions remain independent suppression reasons.
+This is implemented in the branch but not yet deployed or device-accepted. List
 removal need not have an undo UX. A separate “Mitä tänään” List-only ranking idea
 is tracked in FUTURE_PLAN and does not replace ordinary Discovery suppression.

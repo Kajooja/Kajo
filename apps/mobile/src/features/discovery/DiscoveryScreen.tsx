@@ -572,6 +572,9 @@ function recordVisibleImpressions(
   if (context.showConsumed) return;
 
   for (const item of items) {
+    // FlatList can report an old visible token while a collection refresh has
+    // invalidated the grid. It cannot establish a new delivered impression.
+    if (!Object.hasOwn(context.origins, item.id)) continue;
     const origin = getDeliveredItemOrigin(context.origins, item.id);
     context.recordEvent({
       eventType: 'ITEM_IMPRESSION',
