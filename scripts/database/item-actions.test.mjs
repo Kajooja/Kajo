@@ -29,18 +29,21 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     const collectionUpgrade = await snapshots(collectionActionUpgradeSql(installation.files[collectionIndex], installation.candidate.tables));
     assert.match(collectionUpgrade[0]?.collectionActionUpgrade, /^PASS: unchanged populated/);
     for (const file of installation.files.slice(collectionIndex)) {
-      if (!file.name.endsWith('_list_membership_resurfacing.sql')) {
+      const historyClear = file.name.endsWith('_clear_consumed_history.sql');
+      if (!file.name.endsWith('_list_membership_resurfacing.sql') && !historyClear) {
         await db.exec(`begin; ${file.sql} commit;`); continue;
       }
+      const target = historyClear ? 'private.commit_collection_action_v1(jsonb)'
+        : 'private.resurfacing_policy_decision_v1(uuid,uuid,jsonb,timestamptz)';
       const definitions = `select n.nspname,p.proname,p.oid,p.proowner,p.proacl,p.prosecdef,p.proconfig,
-        case when p.oid='private.resurfacing_policy_decision_v1(uuid,uuid,jsonb,timestamptz)'::regprocedure
+        case when p.oid='${target}'::regprocedure
           then null else pg_get_functiondef(p.oid) end as definition
         from pg_proc p join pg_namespace n on n.oid=p.pronamespace
         where n.nspname in ('public','private') and p.prokind='f' order by p.oid`;
       const beforeFunctions = (await db.query(definitions)).rows;
       await db.exec(`begin; ${file.sql} commit;`);
       assert.deepEqual((await db.query(definitions)).rows, beforeFunctions,
-        'List forward must preserve all function identities/ACLs and every unrelated definition');
+        'Collection forward must preserve all function identities/ACLs and every unrelated definition');
     }
     const before = await snapshotApplication(snapshots, installation.candidate, { forward: true });
     assertEmptyApplication(before);
@@ -52,6 +55,8 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     assert.match(delivery[0]?.deliveryOrder, /^PASS: 14 Item/);
     const listed = await snapshots(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listed[0]?.listMembership, /^PASS: public delivery/);
+    const history = await snapshots(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(history[0]?.historyClear, /^PASS: atomic correction/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Command acceptance must roll back all test objects, accounts, state and evidence');
   } finally { await db.close(); }

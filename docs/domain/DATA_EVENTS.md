@@ -66,6 +66,7 @@ Shared discovery custom-List membership is committed only when the Endorsement c
 
 - `ITEM_CONSUMED`
 - `ITEM_CONSUMPTION_REVERSED`
+- `ITEM_HISTORY_CLEARED`
 - `ITEM_INTERACTION_UNDONE`
 - `ITEM_RATED`
 
@@ -553,7 +554,7 @@ List/history navigation carries explicit `predictionSource=collection` and
 `deliveryTier=COLLECTION` metadata without a Prediction ID. Loaded authorized Item
 snapshots are scoped to Profile and Event session; this is collection browsing,
 not a ranked recommendation delivery. Existing atomic action/attribution rules
-remain in force. History-clear evidence is still a pending explicit action contract.
+remain in force. History-clear uses the candidate atomic contract below; mobile wiring and hosted rollout remain pending.
 
 
 The Personal multi-destination picker dispatches one existing durable SET_LIST_ENTRY
@@ -562,3 +563,19 @@ cannot reverse it. Valmis only advances/closes the UI and emits no duplicate act
 or message. Optional per-addition messages are dispatched on acknowledgement; Done
 never resends them. Closing invalidates UI callbacks but does not cancel queued
 commands. Shared single-proposal consent semantics are unchanged.
+
+
+`CLEAR_HISTORY` extends `commit_collection_action_v1`: clear native rating/consumed
+state and deactivate active RATED/CONSUMED bootstrap evidence for this Profile/Item.
+Keep Saved, interest, rejection, List memberships and other Profiles unchanged.
+A changed action emits `ITEM_HISTORY_CLEARED`, followed by exact
+`ITEM_INTERACTION_UNDONE.reversedEventId` corrections for every still-active
+ITEM_RATED/ITEM_CONSUMED Event. Existing Memory/outcome readers therefore exclude
+older ratings too. Corrections borrow no Prediction or DiscoveryMode. The marker
+is administrative evidence with no taste weight. This is not a deletion of the
+immutable Event log. A no-op returns an immutable receipt without Events. The
+action is not undoable and advances the Item action head when changed, preventing
+stale undo. Retrying its exact ID returns its original receipt, including after a
+later rating. State, bootstrap changes, corrections and receipt commit together.
+Candidate server implementation is locally tested; it is not yet exposed in the
+mobile UI or deployed to the hosted database.

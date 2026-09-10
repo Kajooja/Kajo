@@ -62,6 +62,8 @@ try {
     assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
     const [deliveryOrder] = await exec(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
     assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
+    const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listMembership?.listMembership, /^PASS: public delivery/);
     await exec(`begin; ${defaults} rollback;`);

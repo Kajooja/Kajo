@@ -1167,3 +1167,21 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: `npm run check` passed all 324 tests, TypeScript/lint and both
   platform exports. Existing collection-origin/order tests remain passing; visual
   and gesture acceptance stays with the planned combined device checkpoint.
+
+
+### History-clear server candidate — 2026-09-10 / #228 / #229
+
+- Added atomic non-undoable CLEAR_HISTORY to the existing collection RPC; native
+  rating/consumed and terminal import evidence clear together with corrective
+  Events and the immutable receipt. Saved/List/interest/rejection state survives.
+- Exact corrections remove every active old rating/consumption Event from Memory
+  and outcome readers. No fabricated current-view attribution is attached.
+- Rollback-only full-schema acceptance covers actual Memory, retry after rerating,
+  no-op, stale undo, authorization, independent state and injected write failure.
+  Forward metadata checks preserve all function identities/ACLs and unrelated bodies.
+- Next: mobile durable command/UI wiring and reviewed hosted rollout, final
+  refresh UX, authorized choice/group reset immediately before combined device test.
+  Hosted database and accounts are unchanged; no APK/device acceptance claimed.
+- Validation: full `npm run check` passed all 324 tests, lint/TypeScript and
+  both platform exports (exit 0). Native CLI acceptance is wired for CI but was
+  not executed locally; no device/emulator was available.

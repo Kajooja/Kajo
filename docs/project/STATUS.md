@@ -263,11 +263,12 @@ guarded, existing memberships are marked, and a collection refresh does not eras
 the in-progress message/create draft. Shared proposal flow is unchanged. The common collection cover grid/card entry is now implemented: Lists and history
 reuse DiscoveryItemCard, show rating badges (including zero), dates and Shared
 provenance, and expose Ruudukko / Kortit controls. Images/cells are virtualized in
-bounded batches; card browsing keeps the loaded collection. Explicit history-clear
-action and final retry UX still need implementation; the new UI needs device validation. Reset remains scheduled for the
+bounded batches; card browsing keeps the loaded collection. The history-clear server candidate is implemented and tested locally; its mobile
+command/UI wiring, hosted rollout and final retry UX remain pending; the new UI needs device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: canonical history-clear action; then complete refresh UX, authorized data reset
+Next: wire CLEAR_HISTORY into the durable mobile command path and history UI,
+review/apply its hosted forward migration, then complete refresh UX, authorized data reset
 and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Publication approval: the owner explicitly approved publishing this Personal
@@ -279,8 +280,26 @@ work and test/reset ordering are listed above.
 The owner explicitly approved publication of the subsequent common collection
 grid/card code and documentation to this same public repository, branch and PR.
 The grid/card publication approval boundary is resolved. Continue with the
-canonical history-clear action and the remaining refresh/reset/device sequence
+history-clear mobile wiring/hosted rollout and the remaining refresh/reset/device sequence
 above; no new APK or data reset was performed at this publication checkpoint.
+
+History-clear server checkpoint (2026-09-10): candidate forward
+`20260910130156_clear_consumed_history.sql` preserves existing function identity/ACLs,
+adds non-undoable CLEAR_HISTORY and ITEM_HISTORY_CLEARED, corrects all active native
+rated/consumed Events, and deactivates matching terminal bootstrap evidence.
+Saved/interest/rejection/List memberships and other Profiles survive. Rollback-only
+acceptance verifies Memory cancellation, immutable retries/no-op, rerating, stale
+undo rejection, nonmember denial and injected Event-failure atomicity.
+Validation: full `npm run check` passed 324 tests (249 mobile, 14 catalog,
+61 database), lint/TypeScript and both platform exports; exit status 0.
+No hosted migration, user/group reset or APK was performed in this checkpoint.
+The owner explicitly approved publication of this history-clear server candidate,
+Event contract, regression/CI wiring and canonical documentation to public
+`Kajooja/Kajo`, branch `feat/228-delivered-origin`, draft PR #229. This resolves
+the earlier automatic-review publication boundary. Next work remains mobile
+command/UI wiring and reviewed hosted rollout, followed by refresh/reset/device
+acceptance in the order above.
+
 
 Continue **14.1** after this delivery:
 
