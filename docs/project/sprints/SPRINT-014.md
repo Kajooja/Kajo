@@ -851,3 +851,20 @@ merge number. Complete publication, then pause as requested by the owner.
 - CI #408 passed the prior handoff head. PR #227 owns the final filename/docs CI
   and merge result. Next is exact delivered provenance and durable exposure in
   14.1; DATA-003/004 and Sprint 014 remain open. Work continues in short checkpoints.
+
+
+### Delivered navigation first checkpoint — 2026-09-10 / #228
+
+- Continues merged #227 (`6dd1fec`), whose final CI #409 passed all five gates.
+- Grid captures the visible, already overlaid sequence and source/mode/run with
+  environment/actor/Profile scope and Event session. Detail pins the snapshot and
+  refuses mismatched scope/session or evicted navigation tokens. Ambient visuals
+  still follow global mode; event/action origin keeps the delivered mode.
+- Removed the latest-media-ranking cache fallback. Direct entries remain one Item
+  with fallback origin; query prediction IDs alone cannot establish correlation.
+- Six deterministic regressions cover reranking, source mutation, cross-scope/
+  session/Item rejection, missing hosted identity, eviction and token reuse.
+- The PR owns local/full CI validation results. No emulator/phone/runtime acceptance
+  is claimed. Shared item-specific overlay origin, async callback boundaries,
+  durable exposure and delayed action reconciliation remain open on #228. Keep
+  DATA-003/004 and the Issue open; resume this branch in the next short work period.

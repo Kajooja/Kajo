@@ -1,7 +1,6 @@
 import type {
   Item,
   ItemId,
-  ItemType,
   PredictionId,
 } from '../../domain/contracts';
 
@@ -46,20 +45,6 @@ export function getRememberedItem(itemId: ItemId): Item | undefined {
   }
 
   return undefined;
-}
-
-export function getMostRecentRememberedItems(
-  itemType: ItemType,
-): readonly Item[] {
-  const entries = [...cachedItemsByPrediction.entries()].reverse();
-
-  for (const [predictionId, items] of entries) {
-    if (!items.some((item) => item.itemType === itemType)) continue;
-    touchPrediction(predictionId, items);
-    return items.filter((item) => item.itemType === itemType);
-  }
-
-  return [];
 }
 
 export function clearPredictionItemCacheForTests() {

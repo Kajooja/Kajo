@@ -401,3 +401,19 @@ Taste/acquisition paths require equivalent discipline:
 - Friends cannot read each other's private Personal event/taste history.
 - Anonymous/Taste/acquisition data has bounded retention and deletion.
 - Growth telemetry must support product analysis without becoming a covert personalization feature.
+
+
+### Delivered navigation checkpoint — #228
+
+Grid opening now captures a bounded in-process navigation snapshot of the exact
+visible Item sequence, prediction/source, DiscoveryMode, environment/actor/Profile
+scope and Event session. Detail pins that snapshot; its successor Items cannot be
+borrowed from another cached ranking. A mismatched/expired origin returns a retry
+navigation surface. Unproven route prediction IDs are ignored; direct non-predicted
+entries browse only their selected Item. Ambient presentation still follows the
+global mode while evidence retains the mode at delivery.
+
+This transport is not durable exposure or full delivery acceptance. Item-specific
+Shared overlay provenance, asynchronous callback/session boundaries, persisted
+exposure and exposure-before-outcome reconciliation remain #228 work. Existing
+server trace authorization remains required; a client snapshot is not server proof.

@@ -112,9 +112,23 @@ Only the filename changed to match the actual provider version. The prior hosted
 approval blocker is resolved. Rollback-only hosted List/Shared command acceptance
 and access-boundary checks passed; Sprint 014 records exact scope and limitations.
 
-Publication: finish final-head CI, merge #227, then retire its task branch. If #227
-is already merged, continue from main with the next 14.1 task below; do not repeat
-the deployment. No separate global-default forward or old tracking repair is included.
+PR #227 passed all five CI #409 gates and is merged as `6dd1fec`. The local
+collection branch is retired; remote branch deletion was unavailable (the connector
+has no delete-ref operation and shell Git has no write credentials). Do not repeat
+the already accepted hosted deployment.
+
+The active continuation is **Issue #228**, branch `feat/228-delivered-origin`,
+based on main `6dd1fec`. Its first checkpoint freezes the grid-to-detail/sliding
+Item sequence, prediction/source, mode, environment/actor/Profile scope and session
+in a bounded navigation snapshot. Detail refuses expired/mismatched snapshots,
+keeps mounted origin through reranking and drops the latest-media-pool guessing.
+Direct non-predicted entries remain a single Item; route query prediction IDs alone
+are not trusted. This is a partial implementation, not DATA-004 acceptance.
+
+Next on that branch: finish review/CI of the navigation slice, freeze item-specific
+Shared overlay provenance and async callback origins, then implement durable
+exposure plus action ordering/late-outcome reconciliation. Record representative
+runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
 
 Continue **14.1** after this delivery:
 

@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { Item } from '../../domain/contracts';
 import {
   clearPredictionItemCacheForTests,
-  getMostRecentRememberedItems,
   getRememberedItem,
   getRememberedPredictionItems,
   rememberPredictionItems,
@@ -26,17 +25,12 @@ describe('prediction ranking cache', () => {
     ).toEqual(['a', 'b', 'c']);
   });
 
-  it('resolves a delivered real Item and the most recent slate for detail browsing', () => {
+  it('resolves catalog presentation without assigning a delivery origin', () => {
     rememberPredictionItems('prediction-books', [item('book-a', 'BOOK')]);
     rememberPredictionItems('prediction-movies', [item('movie-a'), item('movie-b')]);
 
     expect(getRememberedItem('movie-b')?.id).toBe('movie-b');
-    expect(
-      getMostRecentRememberedItems('MOVIE').map((candidate) => candidate.id),
-    ).toEqual(['movie-a', 'movie-b']);
-    expect(getMostRecentRememberedItems('BOOK').map((candidate) => candidate.id)).toEqual([
-      'book-a',
-    ]);
+
   });
 
   it('bounds process memory to the newest eight prediction slates', () => {

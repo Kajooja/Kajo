@@ -1,6 +1,5 @@
 import type { DiscoveryMode, Item, ItemId, ItemType } from '../../domain/contracts';
 import {
-  getMostRecentRememberedItems,
   getRememberedItem,
 } from './predictionRankingCache';
 
@@ -289,14 +288,6 @@ export function getStaticMockItems(
       return scoreDifference !== 0 ? scoreDifference : left.item.id.localeCompare(right.item.id);
     })
     .map(({ item }) => item);
-}
-
-export function getRankedMockItems(
-  itemType: ItemType,
-  mode: DiscoveryMode,
-): readonly Item[] {
-  const remembered = getMostRecentRememberedItems(itemType);
-  return remembered.length > 0 ? remembered : getStaticMockItems(itemType, mode);
 }
 
 export function getMockItem(itemId: ItemId): Item | undefined {

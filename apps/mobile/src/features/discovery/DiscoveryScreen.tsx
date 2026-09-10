@@ -1,3 +1,5 @@
+import { useItemLists } from '../lists/ItemListsContext';
+import { rememberDeliveredSlate } from './deliveredSlate';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -56,6 +58,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const { interactions } = useItemInteractions();
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
+  const { scopeKey } = useItemLists();
   const [showConsumed, setShowConsumed] = useState(false);
   const [imageWindow, setImageWindow] = useState({ first: 0, last: 7 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
@@ -197,10 +200,14 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       },
     });
 
+    const deliveryId = eventTracking.createEventId();
+    rememberDeliveredSlate({ id: deliveryId, scopeKey, sessionId: eventTracking.sessionId,
+      predictionId, source: ranking.source, mode, items });
     router.push({
       pathname: '/discovery/[itemId]',
       params: {
         itemId: item.id,
+        deliveryId,
         predictionId,
         predictionSource: ranking.source,
       },

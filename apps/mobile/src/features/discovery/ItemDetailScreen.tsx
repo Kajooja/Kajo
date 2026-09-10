@@ -1,3 +1,4 @@
+import { canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -62,57 +63,54 @@ import {
   getConsumedItemLabels,
   ITEM_INTERACTION_LABELS,
 } from './itemInteractionLabels';
-import { getMockItem, getRankedMockItems } from './mockDiscovery';
+import { getMockItem } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
 import {
-  applySharedDiscoveryOverlay,
   formatMemberHistoryProvenance,
   formatPendingListApproval,
   getMemberHistoryNicknames,
   getPendingListApproval,
-  type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
 
 const RATING_COMMIT_FEEDBACK_DURATION_MS = 500;
 const COLLAPSED_TAG_COUNT = 2;
 
-function buildEligibleSwipeSequence(
-  selectedItem: Item | undefined,
-  mode: ReturnType<typeof useDiscoveryMode>['mode'],
-  interactions: Parameters<typeof buildSwipeSequence>[2],
-  isSharedProfile: boolean,
-  sharedOverlayReady: boolean,
-  sharedStateByItemId: SharedDiscoveryStateMap,
-): readonly Item[] {
-  if (!selectedItem || !sharedOverlayReady) return [];
-
-  const rankedItems = getRankedMockItems(selectedItem.itemType, mode);
-  const eligibleItems = isSharedProfile
-    ? applySharedDiscoveryOverlay(
-        rankedItems,
-        selectedItem.itemType,
-        sharedStateByItemId,
-      )
-    : rankedItems;
-
-  return buildSwipeSequence(selectedItem, eligibleItems, interactions);
-}
-
 interface ItemDetailScreenProps {
   itemId: ItemId;
+  deliveryId?: string;
   predictionId?: PredictionId;
   predictionSource?: 'hosted' | 'fallback';
 }
 
 export function ItemDetailScreen({
   itemId,
-  predictionId,
+  deliveryId,
   predictionSource,
 }: ItemDetailScreenProps) {
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const sharedEndorsements = useSharedEndorsements();
   const { scopeKey } = useItemLists();
+  const eventTracking = useEventTracking();
+  const [slate] = useState(() => getDeliveredSlate(deliveryId));
+  const invalidOrigin = deliveryId
+    ? !slate || !canUseDeliveredSlate(slate, scopeKey, eventTracking.sessionId, itemId)
+    : predictionSource === 'hosted';
+  if (invalidOrigin) {
+    const styles = createStyles(getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile));
+    return (
+      <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+        <View style={styles.missing}>
+          <Text accessibilityLiveRegion="polite" style={styles.title}>
+            Tämä näkymä ei ole enää käytettävissä. Avaa teos uudelleen.
+          </Text>
+          <Pressable accessibilityRole="button" style={styles.primaryButton} onPress={() => router.back()}>
+            <Text style={styles.primaryButtonText}>Takaisin</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
   const isSharedProfile = activeProfile.activeProfile?.type === 'SHARED';
 
   if (isSharedProfile && sharedEndorsements.status !== 'ready') {
@@ -148,9 +146,9 @@ export function ItemDetailScreen({
 
   return (
     <ItemDetailContent
-      key={`${scopeKey}:${itemId}`}
+      key={`${scopeKey}:${itemId}:${deliveryId ?? "direct"}`}
       itemId={itemId}
-      {...(predictionId ? { predictionId } : {})}
+      {...(slate ? { slate } : {})}
       {...(predictionSource ? { predictionSource } : {})}
     />
   );
@@ -158,11 +156,12 @@ export function ItemDetailScreen({
 
 function ItemDetailContent({
   itemId,
-  predictionId,
-  predictionSource = 'fallback',
-}: ItemDetailScreenProps) {
+  slate,
+}: ItemDetailScreenProps & { slate?: DeliveredSlate }) {
   const { width } = useWindowDimensions();
-  const { mode } = useDiscoveryMode();
+  const { mode: currentMode } = useDiscoveryMode();
+  const [mode] = useState(() => slate?.mode ?? currentMode);
+  const predictionSource = slate?.source ?? 'fallback';
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
@@ -176,9 +175,9 @@ function ItemDetailContent({
     undo,
     atomicPendingCount,
   } = useItemInteractions();
-  const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
+  const theme = getRoomTheme(getAmbientPhase(currentMode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const selectedItem = getMockItem(itemId);
+  const selectedItem = slate?.items.find(item => item.id === itemId) ?? getMockItem(itemId);
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
       ? activeProfile.sharedProfiles.find(
@@ -187,20 +186,11 @@ function ItemDetailContent({
         ) ?? null
       : null;
   const [recommendationTraceId] = useState<PredictionId>(
-    () => predictionId ?? createUuidV7(),
+    () => slate?.predictionId ?? createUuidV7(),
   );
-  const sharedOverlayReady =
-    !activeSharedMembership || sharedEndorsements.status === 'ready';
-  const [items] = useState<readonly Item[]>(() =>
-    buildEligibleSwipeSequence(
-      selectedItem,
-      mode,
-      interactions,
-      Boolean(activeSharedMembership),
-      sharedOverlayReady,
-      sharedEndorsements.stateByItemId,
-    ),
-  );
+  const [items] = useState<readonly Item[]>(() => selectedItem
+    ? buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
+    : []);
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
