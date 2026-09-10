@@ -45,6 +45,7 @@ import {
   loadPersistedItemInteractions,
   type ItemInteractionPersistenceApi,
 } from './itemInteractionPersistence';
+import { subscribeToBootstrapEvidence } from './predictionRefresh';
 
 export type ItemInteractionPersistenceStatus =
   | 'inactive'
@@ -229,14 +230,21 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       },
     );
 
+    const unsubscribeBootstrap = subscribeToBootstrapEvidence(() => {
+      void refreshAcknowledgedState();
+    });
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') coordinator.retry();
+      if (state === 'active') {
+        coordinator.retry();
+        void refreshAcknowledgedState();
+      }
     });
     return () => {
       active = false;
       coordinator.stop();
       settleWaiting('Profiili tai istunto vaihtui. Odottava valinta säilyy alkuperäisen profiilin jonossa.');
       subscription.remove();
+      unsubscribeBootstrap();
       if (outbox.current?.coordinator === coordinator) outbox.current = null;
     };
   }, [actorUserId, atomicSender, eventTracking.canSendAction, eventTracking.session, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);

@@ -345,6 +345,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 sharedState,
                 activeSharedMembership?.members ?? [],
               ),
+              item.itemType,
             );
             const discoveryImageUrl = item.imageUrl
               ? getDiscoveryImageUrl(item.imageUrl)

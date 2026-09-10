@@ -1,6 +1,7 @@
 import { useRef, useState, type PropsWithChildren } from 'react';
 import { usePathname, useRouter } from 'expo-router';
 import { BlurTargetView, BlurView } from 'expo-blur';
+import { BOTTOM_DOCK_HEIGHT } from './shellLayout';
 import {
   ActivityIndicator,
   Alert,
@@ -1307,7 +1308,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   bottomDock: {
-    minHeight: 46,
+    minHeight: BOTTOM_DOCK_HEIGHT,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',

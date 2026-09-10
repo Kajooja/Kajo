@@ -10,6 +10,7 @@ import { functionDigestSql } from './platform-default-probe.mjs';
 import { buildFreshInstallation, installFreshDatabase, installationHistorySql } from './fresh-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
+import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -37,6 +38,12 @@ try {
     await resetFromMigrations(files.slice(0, collectionIndex));
     const [collectionActionUpgrade] = await exec(collectionActionUpgradeSql(files[collectionIndex], candidate.tables));
     assert.match(collectionActionUpgrade?.collectionActionUpgrade, /^PASS: unchanged populated/);
+    const projectionIndex = files.findIndex(file => file.name.endsWith('_bootstrap_history_projection.sql'));
+    assert.ok(projectionIndex > collectionIndex);
+    await resetFromMigrations(files.slice(0, projectionIndex));
+    const projectionFixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+    const [historyProjectionUpgrade] = await exec(historyProjectionUpgradeSql(files[projectionIndex], projectionFixture, candidate.tables));
+    assert.match(historyProjectionUpgrade?.historyProjectionUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -64,6 +71,8 @@ try {
     assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
+    const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(bootstrapHistory?.bootstrapHistory, /^PASS: calibration/);
     const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listMembership?.listMembership, /^PASS: public delivery/);
     await exec(`begin; ${defaults} rollback;`);
@@ -78,6 +87,7 @@ try {
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
+      bootstrapHistory, historyProjectionUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

@@ -131,6 +131,18 @@ requirement to force 20 known ratings. Keep unknown-item skips, recognition-awar
 selection and honest progress. The current logged-in calibration flow also needs
 this proposal evaluated after its evidence/history defects are corrected.
 
+Current-calibration evaluation (2026-09-10, #228/#229): the server already accepts
+6–24 known ratings and can select 20 balanced candidates, but currently returns
+an interleaved MOVIE/BOOK sequence and offers completion after six ratings. The
+proposed 10 MOVIE → transition → 10 BOOK progression therefore needs a versioned
+presentation/stop rule, not just a higher numeric minimum. Retain unknown skips,
+bounded extension to 24 opportunities, and fail-open behavior when recognition or
+catalog coverage is insufficient. Freeze the presented order when extending so
+already answered Items do not move or repeat. Existing completed profiles must
+not be forced through calibration again. Implement this progression in Phase 15.0
+with the adaptive Taste interaction; the current history correction does not
+change the six-rating completion rule or claim the longer flow is delivered.
+
 The question-selection policy should optimize information gained about the Profile while retaining:
 
 - high recognition probability,

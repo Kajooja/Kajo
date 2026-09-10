@@ -580,3 +580,27 @@ later rating. State, bootstrap changes, corrections and receipt commit together.
 Server implementation is locally tested and deployed. The history grid now submits
 CLEAR_HISTORY through the durable collection queue and validates cleared state in
 the receipt. Hosted deployment is verified; real-device acceptance remains pending.
+
+### Initial-history read projection — #228/#229
+
+`private.profile_item_state_projection_v1` combines native Item state with active,
+already-imported RATED/CONSUMED bootstrap evidence only for the same PersonalProfile.
+It chooses one bootstrap row per Item using the existing RATED > CONSUMED,
+source-time/import-time/ID order. A current native rating takes display precedence;
+0 remains a rating and consumed-only evidence receives no invented rating. Native
+Saved/interest/not-interest flags retain their ownership. Bootstrap SAVED is not
+misrepresented as consumption, and inactive/future-imported evidence is excluded.
+
+The authenticated `get_profile_item_states_v1` boundary loads this projection in
+one snapshot for mobile hydration, including after calibration/import changes.
+Consumed history and List badges reuse it. Reads create no interaction, Event,
+receipt or Memory. Atomic edits/undo/CLEAR_HISTORY retain their existing contracts;
+undoing a native edit reveals the surviving bootstrap rating, while history clear
+deactivates initial history and corrects native evidence together.
+
+Shared overlays aggregate this same read projection for accepted members' Personal
+profiles. Initial ratings receive the existing attributed lower member-history
+tier rather than ordinary unmarked delivery. Member history is never projected
+into Shared consumed state, never supplies a borrowed Prediction, and never grants
+access to another member's complete private history. Removed-member attribution
+disappears; Shared consumption/consensus and pending-proposal rules stay intact.

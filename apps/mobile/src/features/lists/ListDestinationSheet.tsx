@@ -2,7 +2,9 @@ import { useEventTracking } from '../events/EventTrackingContext';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,11 +12,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import type { EventRecordInput } from '../events/eventTracking';
 import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
+import { getDockPanelBottomInset } from '../discovery/shellLayout';
 import {
   MAXIMUM_PROFILE_MESSAGE_LENGTH,
   validateProfileMessage,
@@ -53,6 +57,7 @@ export function ListDestinationSheet({
   onClose,
   onCommitted,
 }: ListDestinationSheetProps) {
+  const insets = useSafeAreaInsets();
   const { loadForItem, createList: createItemList, setEntry, scopeKey, revision } = useItemLists();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [availableLists, setAvailableLists] = useState<readonly ItemList[]>([]);
@@ -198,8 +203,13 @@ export function ListDestinationSheet({
   }
 
   return (
-    <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
-      <View style={styles.backdrop}>
+    <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}
+      statusBarTranslucent navigationBarTranslucent>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardArea}>
+      <View style={[styles.backdrop, {
+        paddingTop: insets.top + 12,
+        paddingBottom: getDockPanelBottomInset(insets.bottom),
+      }]}>
         <Pressable
           accessibilityLabel="Sulje listavalinta"
           accessibilityRole="button"
@@ -218,6 +228,7 @@ export function ListDestinationSheet({
             </Pressable>
           </View>
 
+          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
           {isSharedProfile ? (
             <Text style={styles.helper}>
               Valinta on samalla tykkäyksesi. Tallennetut syntyy yhteisestä päätöksestä.
@@ -257,7 +268,7 @@ export function ListDestinationSheet({
           {loading ? (
             <ActivityIndicator color={theme.base.textMuted} />
           ) : (
-            <ScrollView style={styles.listArea}>
+            <View>
               {visibleLists.map((list) => (
                 <Pressable
                   key={list.id}
@@ -275,7 +286,7 @@ export function ListDestinationSheet({
               {availableLists.length === 0 ? (
                 <Text style={styles.empty}>Ei vielä nimettyjä listoja.</Text>
               ) : null}
-            </ScrollView>
+            </View>
           )}
 
           {hiddenCount > 0 ? (
@@ -323,6 +334,7 @@ export function ListDestinationSheet({
           )}
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
+          </ScrollView>
           {!isSharedProfile ? (
             <Pressable accessibilityRole="button" disabled={loading || status !== 'idle'}
               onPress={() => {
@@ -336,19 +348,20 @@ export function ListDestinationSheet({
           ) : null}
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
+    keyboardArea: { flex: 1, backgroundColor: 'rgba(0,0,0,0.52)' },
     backdrop: {
       flex: 1,
       justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,0.52)',
     },
     sheet: {
-      maxHeight: '72%',
+      maxHeight: '100%',
       paddingHorizontal: 16,
       paddingTop: 14,
       paddingBottom: 20,
@@ -368,7 +381,7 @@ function createStyles(theme: RoomTheme) {
     helper: { color: theme.base.textMuted, fontSize: 12, lineHeight: 17 },
     messageRow: { gap: 3 },
     messageCounter: { color: theme.base.textMuted, fontSize: 9, textAlign: 'right' },
-    listArea: { maxHeight: 250 },
+    body: { gap: 9, paddingBottom: 4 },
     listRow: {
       minHeight: 44,
       paddingHorizontal: 12,

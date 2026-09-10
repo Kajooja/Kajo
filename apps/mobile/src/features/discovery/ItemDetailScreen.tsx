@@ -811,6 +811,7 @@ function ItemDetailContent({
               sharedState,
               activeSharedMembership?.members ?? [],
             ),
+            item.itemType,
           );
 
           return (

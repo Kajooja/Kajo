@@ -1,15 +1,19 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **owner results recorded; follow-up defects open**.
+Status: **owner results recorded; corrections implemented, follow-up acceptance open**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
 
 - Active branch: `feat/228-delivered-origin`; draft PR #229, Issue #228.
-- Runtime code checkpoint: `2cb204f1666229c3391d9e467c47c33e00c16c12`.
-  Later handoff/reset-script commits do not change the app code.
-- CI #429 / run 34485606516 succeeded for that runtime checkpoint. Required native
-  database checks belong to that CI run; local `npm run check` passed 325 tests.
+- Previous device-plan runtime: `2cb204f1666229c3391d9e467c47c33e00c16c12`.
+  The current PR adds initial-history and picker corrections. Use the new PR
+  head for the follow-up and record the actual artifact SHA before testing.
+- Historical CI #429 / run 34485606516 succeeded for the previous runtime.
+  New-head CI/rollout truth belongs to STATUS; local `npm run check` now passes
+  326 tests. Never treat the previous runtime's CI as the new correction's CI.
+- The new hydration RPC requires the `bootstrap_history_projection` forward.
+  Confirm its rollout in STATUS before installing the follow-up APK.
 - Hosted history-clear migration: `20260910134428_clear_consumed_history`, verified.
 - Select **Actions → CI → Run workflow**, choose
   **feat/228-delivered-origin** and run it once. Download the artifact
@@ -104,3 +108,28 @@ initial-profile evidence respected in Shared eligibility. Preserve the explicit
 attributed member-history tier where intended rather than blindly hiding every
 member-rated Item. Record which tier the reported cards use. Do not reset the
 new test data again: it is useful evidence for reproducing these defects.
+
+## Focused follow-up after correction rollout
+
+Use existing test data; no reset or forced repeat of profiling is needed.
+
+1. Open Luetut/Katsotut: initial ratings now appear alongside native ratings.
+   Open an initial Item from history and from a named List; both show the same
+   rating. Edit it, undo the native edit, and confirm the initial rating returns.
+   Check a zero rating and an imported consumed-only Item if available.
+2. Remove an initial-rated Item from history. It disappears from consumed views,
+   its rating disappears on Lists, and List memberships survive. After the final
+   List membership is removed it becomes eligible if otherwise unreacted; a top
+   ranked return is not guaranteed. Re-rate and verify the new rating.
+3. Switch to Shared. Initial-rated member Items are marked “name nähnyt/lukenut”
+   in the lower member-history tier, after ordinary unseen candidates. A pending
+   proposal may still take priority under the accepted rules. Such Items must
+   not appear in Shared's own consumed history merely because a member rated them.
+   Clearing one member's history must preserve the other member's attribution.
+4. On OnePlus, test the destination picker with both gesture and three-button
+   navigation. All buttons sit above Kajo's dock and the system bar. Open “Uusi
+   lista” and the message field: keyboard, scrolling, close, creation, multiple
+   saves and Done remain usable, including a short screen/larger text setting.
+
+Record device/OS, exact installed APK SHA, and pass/fail for each item. The local
+environment has no phone/emulator, so layout and keyboard acceptance are still open.

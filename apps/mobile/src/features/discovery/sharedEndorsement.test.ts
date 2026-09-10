@@ -139,9 +139,13 @@ describe('Shared discovery collaboration overlay', () => {
     );
 
     expect(nicknames).toEqual(['Mirri']);
-    expect(formatMemberHistoryProvenance(nicknames)).toBe('Mirri nähnyt');
-    expect(formatMemberHistoryProvenance(['A', 'B'])).toBe(
+    expect(formatMemberHistoryProvenance(nicknames, 'MOVIE')).toBe('Mirri nähnyt');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'MOVIE')).toBe(
       'A ja B nähneet',
     );
+    expect(formatMemberHistoryProvenance(['A'], 'BOOK')).toBe('A lukenut');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'BOOK')).toBe('A ja B lukeneet');
+    expect(formatMemberHistoryProvenance(['A', 'B', 'C'], 'BOOK')).toBe('A ja 2 muuta lukeneet');
+    expect(formatMemberHistoryProvenance([], 'BOOK')).toBeNull();
   });
 });

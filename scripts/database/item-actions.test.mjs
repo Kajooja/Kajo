@@ -6,6 +6,7 @@ import { buildFreshInstallation } from './fresh-installation.mjs';
 import { assertEmptyApplication, snapshotApplication } from './baseline-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
+import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
 
 test('atomic Item actions on the full fresh schema (PGlite; native smoke also runs in required CLI CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -29,6 +30,11 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     const collectionUpgrade = await snapshots(collectionActionUpgradeSql(installation.files[collectionIndex], installation.candidate.tables));
     assert.match(collectionUpgrade[0]?.collectionActionUpgrade, /^PASS: unchanged populated/);
     for (const file of installation.files.slice(collectionIndex)) {
+      if (file.name.endsWith('_bootstrap_history_projection.sql')) {
+        const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+        const upgrade = await snapshots(historyProjectionUpgradeSql(file, fixture, installation.candidate.tables));
+        assert.match(upgrade[0]?.historyProjectionUpgrade, /^PASS: unchanged populated/);
+      }
       const historyClear = file.name.endsWith('_clear_consumed_history.sql');
       if (!file.name.endsWith('_list_membership_resurfacing.sql') && !historyClear) {
         await db.exec(`begin; ${file.sql} commit;`); continue;
@@ -57,6 +63,8 @@ test('atomic Item actions on the full fresh schema (PGlite; native smoke also ru
     assert.match(listed[0]?.listMembership, /^PASS: public delivery/);
     const history = await snapshots(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(history[0]?.historyClear, /^PASS: atomic correction/);
+    const bootstrap = await snapshots(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(bootstrap[0]?.bootstrapHistory, /^PASS: calibration/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Command acceptance must roll back all test objects, accounts, state and evidence');
   } finally { await db.close(); }

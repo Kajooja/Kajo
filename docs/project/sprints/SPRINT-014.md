@@ -1269,3 +1269,28 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - User explicitly requested no implementation now. STATUS gives the next
   “jatka reposta” order. No code/database changes, APK build, tests or merge performed
   for this documentation-only feedback update; prior checks remain historical.
+
+### Initial-history and OnePlus correction — 2026-09-10 / #228 / #229
+
+- Continued the explicit next-conversation handoff. Both consumed history and
+  Shared member overlay omitted bootstrap evidence; a read-only hosted check
+  confirmed the missing-history case without resetting or altering user data.
+- Added one private native/terminal-bootstrap read projection and authorized
+  hydration RPC; reused it for history, List badges and accepted-member Shared
+  attribution. Native edits take display precedence, zero remains valid, and
+  reads never synthesize Events or Shared state. Existing clear/undo/Memory and
+  suppression contracts remain intact.
+- Added full-schema calibration/import/native/Shared/privacy/clear regression
+  and unchanged populated-forward rehearsal. Both are in required native CLI CI.
+  Hosted preflight matches all three old target definitions/owners/ACLs.
+- Fixed picker safe-area/dock clearance and keyboard/scroll behavior through a
+  shared dock constant; book member-history labels now say lukenut/lukeneet.
+- Evaluated the longer profiling request in LAUNCH_LOOP: current server supports
+  20 balanced opportunities, but progression/order/stop behavior needs its own
+  versioned Taste change in Phase 15.0. No forced repeat or higher known-rating
+  minimum is introduced in this correction.
+- `npm run check` passed 326 tests (251 mobile, 14 catalog, 61 database), lint,
+  TypeScript and both platform exports. No local phone/emulator; focused device
+  cases are in DEVICE_TEST. Publication, new-head native CI and hosted rollout
+  are pending at this checkpoint; STATUS owns their current state. Keep draft,
+  preserve new test data, and do not infer DATA-003/004 or phase acceptance.

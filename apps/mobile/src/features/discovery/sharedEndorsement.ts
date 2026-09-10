@@ -132,11 +132,14 @@ export function getMemberHistoryNicknames(
 
 export function formatMemberHistoryProvenance(
   nicknames: readonly string[],
+  itemType: ItemType,
 ): string | null {
   if (nicknames.length === 0) return null;
-  if (nicknames.length === 1) return `${nicknames[0]} nähnyt`;
-  if (nicknames.length === 2) return `${nicknames[0]} ja ${nicknames[1]} nähneet`;
-  return `${nicknames[0]} ja ${nicknames.length - 1} muuta nähneet`;
+  const singular = itemType === 'BOOK' ? 'lukenut' : 'nähnyt';
+  const plural = itemType === 'BOOK' ? 'lukeneet' : 'nähneet';
+  if (nicknames.length === 1) return `${nicknames[0]} ${singular}`;
+  if (nicknames.length === 2) return `${nicknames[0]} ja ${nicknames[1]} ${plural}`;
+  return `${nicknames[0]} ja ${nicknames.length - 1} muuta ${plural}`;
 }
 
 function comparePendingItems(

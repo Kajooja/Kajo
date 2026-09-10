@@ -10,57 +10,57 @@ This file is the authoritative current-state handoff. `ROADMAP.md` owns dependen
 ## Immediate continuation checkpoint — 2026-09-10
 
 Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
-Runtime code is `2cb204f`; CI #429 succeeded. Main remains accepted `6dd1fec`.
-Owner APK feedback is now recorded in [DEVICE_TEST.md](DEVICE_TEST.md). The actual
-installed SHA/run was not supplied; runtime `2cb204f` is the planned checkpoint,
-not a verified device-build identity. Tests 1–6 and scope switching in 8 were
-reported working, with specific exceptions below; answer 7 is a future UX idea.
-**Current instruction: documentation only. Do not implement corrections in this
-turn. On the next “jatka reposta”, continue the follow-up work below.**
+Main remains accepted `6dd1fec`; this branch is not merged. The owner’s last
+reported APK results are in [DEVICE_TEST.md](DEVICE_TEST.md); its installed
+SHA/run was not supplied. Do not infer exact-build or full device acceptance.
 
-Next work, in order:
+The next-conversation corrections are implemented and locally verified:
 
-1. Investigate initial-profile/bootstrap ratings missing from Luetut/Katsotut and
-   initial-profile member ratings appearing in Shared cards. Verify history-source
-   coverage, bootstrap/native parity and the actual Shared delivery tier. Preserve
-   separate Personal/Shared evidence and the intentional attributed member-history
-   tier; do not assume every such Shared card is invalid. Add targeted regressions
-   and ensure edit/clear keeps history, Memory and recommendation eligibility aligned.
-2. Fix the OnePlus destination picker's bottom clearance: action buttons must sit
-   above system navigation and the Kajo bottom bar, like the other panels. Verify
-   safe-area/keyboard handling for gesture and three-button navigation.
-3. Evaluate the owner's longer initial profiling preference: about 10 movies then
-   10 books, with a transition card before books. Record how this applies to current
-   calibration; the full adaptive Taste interaction remains Phase 15.0. It fits
-   the existing 12–24-opportunity range and must preserve skip/recognition behavior.
-4. Re-test the affected flows, capture the installed APK SHA, record acceptance,
-   then consider merge with required CI. Keep #228/#229 and DATA-003/004 open.
+- Initial/calibration/import ratings were absent from both consumed history and
+  Shared member history because those queries read only `item_interactions`.
+  A read-only hosted check confirmed the bootstrap-only missing-history case.
+- New `get_profile_item_states_v1` hydrates native + initial history in one
+  authorized snapshot. Consumed history, named-List badges and the attributed
+  lower Shared member-history tier use the same private projection. A native
+  rating takes display precedence; zero, source deduplication, edit/undo/clear,
+  Memory cancellation and remaining-List suppression have full-schema probes.
+  No initial evidence is copied into native Events or Shared consumed state.
+- The destination picker now reserves system safe area plus the actual Kajo dock
+  height/gap, handles the keyboard and scrolls its content while retaining close
+  and Done controls. Shared book attribution says “lukenut/lukeneet”.
+- The 10 movies → transition → 10 books proposal has a concrete current-calibration
+  evaluation in LAUNCH_LOOP. Current completion stays six known ratings; the
+  versioned longer/adaptive progression remains Phase 15.0, without resetting
+  completed profiles or forcing 20 recognized ratings.
 
-Future invitation idea is saved in LAUNCH_LOOP and ROADMAP Phase 16: small
-“lähetä linkki” below Send invitation reveals a copyable link. It is explicitly
-not a current fix and must respect separate Friend/Shared invitation semantics.
-Do not run another reset; retain the owner's new test data for reproduction.
+Validation: `npm run check` passed **326 tests** (251 mobile, 14 catalog,
+61 database), lint/TypeScript and both iOS/Android exports. The new SQL probe uses
+actual calibration/read/atomic command APIs; the unchanged forward also passes a
+populated data/old-function-identity/ACL preservation rehearsal. Both probes are
+wired into required native CLI CI. No phone/emulator is available locally.
 
-The owner explicitly approved fresh PersonalProfile identities and clearing all
-Profile-scoped choices, Events, imports, Predictions and Shared groups/messages.
-The earlier automatic-review boundary is resolved. Executed the twice-rehearsed
-`scripts/database/owner-device-reset.sql` with only final ROLLBACK changed to COMMIT.
-Separate post-commit verification at **2026-09-10 14:19:19 UTC** found 2 Users,
-2 fresh PersonalProfiles, 0 SharedProfiles, 0 Events, 0 interactions, 0 List entries,
-0 import jobs, 0 action receipts and 0 Prediction runs.
-Auth/accounts/nicknames, catalog and Personal custom List names were preserved.
-Old Profile-bound rating, collection and Event-session replay was rejected; a
-new Profile successfully rated via the real API in a rolled-back probe. Global
-baseline/model configuration remains unchanged. Do not run the reset again: the
-script remains ROLLBACK by default and its prior-scope guard now fails deliberately.
-New legitimate device actions will of course make these zero counts increase.
+Server candidate: `20260910151335_bootstrap_history_projection.sql`. It adds three
+read functions and replaces only consumed-history, List-entry and Shared-overlay
+read definitions. All three old definitions/owners/ACLs match hosted preflight.
+It changes no rows, tables, command/Memory functions or old migration bytes.
+**Hosted rollout and new-head native CI are still pending at this checkpoint.**
+The new mobile hydration RPC requires that forward before installing the new APK.
 
-The repository is ready for a new conversation: start with the follow-up order
-above and the owner results in DEVICE_TEST.md. Do not restart reset/build work or
-claim full device acceptance. Previously passing runtime checks remain 325 tests,
-lint/TypeScript and both exports; this feedback checkpoint changes docs only.
-The sections below preserve implementation history and do not override this
-immediate continuation checkpoint.
+Next actions:
+
+1. Publish this checked correction to the same PR and verify required new-head CI.
+2. Apply only the reviewed new history-projection forward under ADR-0006; verify
+   object metadata/access and rollback-only behavior, then record its actual
+   provider version/name and hash. Do not apply the separate global-default file.
+3. Run the focused APK follow-up in DEVICE_TEST, capturing its installed SHA:
+   existing initial history/edit/clear, Shared attribution/isolation, and OnePlus
+   picker with gesture/three-button navigation and keyboard. Do not poll builds.
+4. Consider merge only after required CI and owner acceptance. Keep #228/#229,
+   DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
+
+**Do not run another reset.** The owner-approved reset completed at
+2026-09-10 14:19:19 UTC; preserve the new test data. The invitation reveal/copy-link
+idea remains Phase 16. Historical sections below do not override this checkpoint.
 
 ## New product truth — 2026-09-07 / #215 / #216
 
