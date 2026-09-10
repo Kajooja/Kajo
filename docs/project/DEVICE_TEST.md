@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **owner results recorded; corrections implemented, follow-up acceptance open**.
+Status: **second owner results recorded; picker corrections implemented, acceptance open**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -11,10 +11,12 @@ Status: **owner results recorded; corrections implemented, follow-up acceptance 
   head for the follow-up and record the actual artifact SHA before testing.
 - Historical CI #429 / run 34485606516 succeeded for the previous runtime.
   New-head CI/rollout truth belongs to STATUS; local `npm run check` now passes
-  326 tests. Never treat the previous runtime's CI as the new correction's CI.
-- Correction runtime: `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df`, all five required
+  333 tests. Never treat the previous runtime's CI as the new correction's CI.
+- First history-correction runtime: `b8ff101d5284f23cc90b42fd94cd5d24ca4de7df`, all five required
   CI #434 / run 34496017165 jobs passed. Later filename/docs changes retain its
   app code. This PR CI run did not build an APK; use the manual workflow below.
+- The second destination-picker correction changes app code; build the current
+  PR branch head for its new follow-up. Earlier APKs cannot validate these fixes.
 - Hydration forward `20260910153737_bootstrap_history_projection` is deployed;
   hosted behavior and access checks passed. No repeat deployment needed; the
   owner's subsequent repeat reset is recorded below.
@@ -60,8 +62,8 @@ must not return. Test-only choices should be made only after the reset checkpoin
    list contents or Shared groups remain; Personal List names may remain. Cards
    load, and opening/swiping preserves the delivered collection order. Switch all
    three risk modes; judge stability, not a requirement that every order differ.
-2. **Two Lists.** Add one Item to two Personal Lists in the same picker. Each List
-   shows its saved state and Done closes once. It disappears from ordinary
+2. **Two Lists.** Select a Personal List and press Add; repeat for a second List
+   in the same picker, then press Done. The saved Item disappears from ordinary
    Discovery. Remove it from one List: the remaining List still suppresses it.
    Remove its final membership: it can return unless another reaction suppresses it.
 3. **History.** Rate an Item (also test 0/10). Open Luetut/Katsotut from both
@@ -147,3 +149,52 @@ six-known-rating completion rule or implement the planned longer Taste flow.
 
 Record device/OS, exact installed APK SHA, and pass/fail for each item. The local
 environment has no phone/emulator, so layout and keyboard acceptance are still open.
+
+## Second owner results — 2026-09-10 / after the requested repeat reset
+
+The owner ran the manual APK workflow and reported these six cases; the actual
+run/installed SHA was not supplied. The requested branch checkpoint was `621a03c`;
+do not infer exact-build acceptance from that expected source alone.
+
+| Case | Owner result | Current follow-up |
+| --- | --- | --- |
+| 1 — reset/initial profiling | Works | With the planned longer Taste flow, keep unknown/skip usable after accidental rating-wheel movement; LAUNCH_LOOP owns this requirement. |
+| 2 — initial history/edit/undo | Works | Preserve accepted behavior. |
+| 3 — history removal/re-rating | Works | Preserve accepted behavior. |
+| 4 — picker bottom alignment | Fails | The panel is still too low; align its lower edge with the other panels above the Kajo dock. |
+| 5 — Shared attribution/isolation | Works | Preserve accepted behavior. |
+| 6 — create destination while adding an Item | Fails | Creating the first List immediately endorsed the Item and advanced the card. Require create/select → optional message → explicit Add/Propose. |
+
+A read-only action check confirmed that List creation was followed immediately by
+a Shared endorsement from the picker. This case concerns the destination List
+inside an already active SharedProfile; it does not redefine group membership.
+The Item was hidden from the endorser's Discovery by the accepted pending-choice
+policy, not deleted from the catalog. Do not undo/reset the owner's test actions.
+
+Additional owner observation: refresh changes the order. The owner explicitly
+welcomes variation for ties; investigate only unexpected scored ordering. Current
+SQL applies a decaying 30-minute impression cooldown, and the client uses server
+rank. A bounded read of recent delivered ordinary candidates found no descending
+score violations and did find cooldown effects. Isolated regression must cover
+unequal taste priority with unchanged evidence, exposure-driven rotation, cooldown
+expiry and Profile isolation. This is not a broad algorithm-quality acceptance.
+
+## Next focused APK check
+
+Use the latest branch APK and existing test data; the owner starts its CI manually.
+
+1. On OnePlus, the picker sits above the Kajo dock like Inbox. Check gesture and
+   three-button navigation, larger text, scrolling, keyboard, Back and close.
+2. In a SharedProfile with no custom Lists, message and Propose are unavailable.
+   Create its first List: it is selected, the same Item stays open and no proposal
+   has been made. Write a message and press Propose; only success advances the card.
+   Verify the proposal and message from the other accepted member's account.
+3. Disconnect before Propose: retain the Item/draft and show failure. Reconnect
+   and retry without losing the intended destination; distinguish pending delivery
+   recovery from a new command. Changing account/Profile must not reuse the draft.
+4. Personal mode: select → Add for two Lists, then Done. Both memberships survive.
+   Creating a third List alone never saves/hides the current Item. Check the
+   preserved initial-history edit/clear and Shared attribution as a brief regression.
+
+Report the run/installed SHA, device/OS and pass/fail. Longer Taste/unknown control
+work remains planned; no new reset is needed for these picker corrections.

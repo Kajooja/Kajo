@@ -14,7 +14,13 @@ Main remains accepted `6dd1fec`; this branch is not merged. The owner’s last
 reported APK results are in [DEVICE_TEST.md](DEVICE_TEST.md); its installed
 SHA/run was not supplied. Do not infer exact-build or full device acceptance.
 
-The next-conversation corrections are implemented and locally verified:
+Second APK feedback is recorded in DEVICE_TEST: reset/initial profiling, initial
+history/edit/undo, history removal and Shared attribution work. The picker still
+opened too low, and creating a destination List immediately endorsed the Item.
+The requested source was `621a03c`; the owner did not supply its installed run/SHA.
+Keep physical acceptance open for these two corrected interactions.
+
+Current corrections and retained history rollout:
 
 - Initial/calibration/import ratings were absent from both consumed history and
   Shared member history because those queries read only `item_interactions`.
@@ -25,19 +31,35 @@ The next-conversation corrections are implemented and locally verified:
   rating takes display precedence; zero, source deduplication, edit/undo/clear,
   Memory cancellation and remaining-List suppression have full-schema probes.
   No initial evidence is copied into native Events or Shared consumed state.
-- The destination picker now reserves system safe area plus the actual Kajo dock
-  height/gap, handles the keyboard and scrolls its content while retaining close
-  and Done controls. Shared book attribution says “lukenut/lukeneet”.
+- The first Modal-inset attempt failed OnePlus acceptance. The destination picker
+  now anchors inside the shell content above the dock, using Inbox's bottom gap.
+  Keyboard, scrolling, Android Back and close/confirm/Done controls are retained.
+- Destination creation now only creates/selects the List; the sole/new destination
+  is selected automatically. A usable selection enables the optional message.
+  Add/Propose is a separate explicit action. Shared errors retain the Item/draft;
+  only acknowledgement advances the card. Personal users can add another List
+  before Done. Message failure is reported without undoing a successful choice.
+  Read-only action inspection confirmed the premature create→endorse sequence.
+  This was a List inside an existing SharedProfile, not new membership behavior.
+- Refresh variation remains intentional. The owner welcomes ties varying; current
+  SQL also applies a decaying 30-minute impression cooldown. A bounded hosted
+  comparison found no unequal-score descending-order violations. The client keeps
+  server rank. Added regression covers unchanged unequal taste priorities, exposure
+  rotation, expiry and Profile isolation; no scorer or deployed SQL was changed.
 - The 10 movies → transition → 10 books proposal has a concrete current-calibration
   evaluation in LAUNCH_LOOP. Current completion stays six known ratings; the
   versioned longer/adaptive progression remains Phase 15.0, without resetting
-  completed profiles or forcing 20 recognized ratings.
+  completed profiles or forcing 20 recognized ratings. Its required unknown/skip
+  action must remain available after an accidental rating-wheel movement and
+  discard an unsubmitted draft. This is recorded in LAUNCH_LOOP and Phase 15.0.
 
-Validation: `npm run check` passed **326 tests** (251 mobile, 14 catalog,
-61 database), lint/TypeScript and both iOS/Android exports. The new SQL probe uses
+Validation: `npm run check` passed **333 tests** (256 mobile, 14 catalog,
+63 database), lint/TypeScript and both iOS/Android exports. The history SQL probe uses
 actual calibration/read/atomic command APIs; the unchanged forward also passes a
 populated data/old-function-identity/ACL preservation rehearsal. Both probes are
 wired into required native CLI CI. No phone/emulator is available locally.
+The destination-selection cases and exposure/refresh SQL regressions pass;
+the latter are isolated canonical-function fixtures, not a live user-flow test.
 
 Server forward: `20260910153737_bootstrap_history_projection.sql`. It adds three
 read functions and replaces only consumed-history, List-entry and Shared-overlay
@@ -73,13 +95,14 @@ reset data. Prefer a narrow corrective forward if the old client is unavailable.
 
 Next actions:
 
-1. Confirm final PR-head CI before any merge; the implementation's five required
-   gates and hosted rollout are already verified. Do not repeat the deployment
-   or apply the separate global-default forward.
-2. Run the focused APK follow-up in DEVICE_TEST, capturing its installed SHA:
-   redo initial profiling after the requested reset, then initial history/edit/clear,
-   Shared attribution/isolation, and OnePlus picker with gesture/three-button
-   navigation and keyboard. Do not poll builds.
+1. Confirm all five required CI jobs for the newest PR head before any merge.
+   CI #434 belongs to the first history correction; the later picker changes
+   need their own final-head result. Hosted rollout is already verified; do not
+   repeat deployment or apply the separate global-default forward.
+2. The owner starts the next manual branch APK CI; do not dispatch/poll it. Run
+   DEVICE_TEST's latest four cases with the actual installed SHA: OnePlus panel
+   alignment/keyboard, create first Shared List→message→explicit proposal, failure/
+   scope recovery and multiple Personal additions. Preserve current test data.
 3. Consider merge only after required CI and owner acceptance. Keep #228/#229,
    DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
 

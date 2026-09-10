@@ -131,7 +131,21 @@ requires the combined real-device acceptance checkpoint.
 Destination-picker panels must keep all action buttons above Android system
 navigation and Kajo's bottom navigation, consistent with the other panels.
 Respect safe-area and keyboard insets with gesture and three-button navigation.
-The #228/#229 correction shares the dock-height/gap contract with Profile quick
-access, adds safe-area clearance and keyboard avoidance, and scrolls the picker
-body while keeping close/Done reachable. Code checks pass; representative OnePlus
-gesture/three-button navigation and keyboard acceptance remain device gates.
+The first #228/#229 Modal-inset correction failed the owner's OnePlus follow-up.
+The picker now lives inside the same shell content bounds above the dock as
+Inbox, with the same bottom gap, rather than calculating a second Android window's
+position. Its body scrolls, the keyboard is avoided, and Back closes the picker.
+Representative OnePlus navigation/keyboard acceptance is still required.
+
+Creating a destination only creates/selects the List. It must not add, endorse or
+advance an Item. A sole available destination is selected automatically; an
+explicitly created destination is selected for the pending draft. Message input
+requires a selected, usable destination. The separate Add/Propose button commits
+the choice; Shared failure keeps the picker, Item and message draft available.
+Personal users can confirm another List addition before Done. A message failure
+is reported and does not undo a successful List action.
+
+Refreshing discovery may vary equal-fit candidates and apply the existing recent
+exposure cooldown. The owner explicitly accepts tie variation. Preserve server
+rank and truthful slate provenance; do not replace scored priorities with an
+unconditional client shuffle or lock the whole slate to hide a scoring defect.

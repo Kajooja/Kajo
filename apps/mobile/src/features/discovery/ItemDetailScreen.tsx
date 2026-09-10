@@ -42,6 +42,7 @@ import {
 import {
   ListDestinationSheet,
   type ListDestinationCommit,
+  type ListDestinationCommitResult,
 } from '../lists/ListDestinationSheet';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useItemLists } from '../lists/ItemListsContext';
@@ -398,31 +399,36 @@ function ItemDetailContent({
     );
   }
 
-  function handleListDestinationCommit(commit: ListDestinationCommit) {
+  async function handleListDestinationCommit(commit: ListDestinationCommit): Promise<ListDestinationCommitResult> {
     const target = listPickerTarget;
-    if (!commit.stayOpen) setListPickerTarget(null);
 
-    if (!target) return;
+    if (!target) return { status: 'error', message: 'Avaa listavalinta uudelleen.' };
 
     if (activeSharedMembership) {
-      void handleEndorsement(
+      const result = await handleEndorsement(
         target.item,
         target.index,
         commit.list,
         commit.message,
         target.origin,
       );
-      return;
+      if (result.status === 'success') setListPickerTarget(null);
+      return result;
     }
 
     const { item, index } = target;
+    let notice: string | undefined;
     if (commit.message) {
-      void profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
+      const messageResult = await profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
         listId: commit.list.id, itemId: item.id });
+      if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
     }
-    if (commit.stayOpen) return;
-    advanceAfterAction(item, index, commit.stayOpen === false
-      ? 'Listalisäykset tallennettu.' : `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`);
+    if (!commit.stayOpen) {
+      setListPickerTarget(null);
+      advanceAfterAction(item, index, notice ?? (commit.stayOpen === false
+        ? 'Listalisäykset tallennettu.' : `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`));
+    }
+    return { status: 'success', ...(notice ? { notice } : {}) };
   }
 
   function openListPicker(
@@ -445,8 +451,8 @@ function ItemDetailContent({
     proposedList?: ItemList,
     message?: string | null,
     origin?: EventRecordInput,
-  ) {
-    if (exitingItemId || endorsingItemId) return;
+  ): Promise<ListDestinationCommitResult> {
+    if (exitingItemId || endorsingItemId) return { status: 'error', message: 'Odota nykyisen valinnan tallentumista.' };
 
     setEndorsingItemId(item.id);
     const result = await sharedEndorsements.endorse(
@@ -455,33 +461,36 @@ function ItemDetailContent({
       origin ?? { eventType: 'ITEM_ENDORSED', itemId: item.id, itemType: item.itemType,
         ...originFor(item), discoveryMode: mode },
     );
-    setEndorsingItemId(null);
-
     if (result.status === 'error') {
+      setEndorsingItemId(null);
       setFeedback(result.message);
-      return;
+      return result;
     }
 
     if (proposedList) {
       rememberRecentList(proposedList.profileId, proposedList.id);
     }
 
+    let notice: string | undefined;
     if (message) {
-      void profileMessages.send({
+      const messageResult = await profileMessages.send({
         profileId: result.commit.profileId,
         body: message,
         listId: result.commit.proposalListId,
         itemId: item.id,
       });
+      if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
     }
 
+    setEndorsingItemId(null);
     advanceAfterAction(
       item,
       index,
-      result.commit.consensusSaved
+      notice ?? (result.commit.consensusSaved
         ? `Pari! Tallennettu listaan ${result.commit.proposalListName}.`
-        : `Odottaa muiden hyväksyntää listalle ${result.commit.proposalListName}.`,
+        : `Odottaa muiden hyväksyntää listalle ${result.commit.proposalListName}.`),
     );
+    return { status: 'success', ...(notice ? { notice } : {}) };
   }
 
   function handleCommittedAction(

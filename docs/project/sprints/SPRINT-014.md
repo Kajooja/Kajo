@@ -1337,3 +1337,33 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: `npm run check` logs confirm 326 passing tests, lint/TypeScript and
   both platform exports; hosted reset rehearsal and independent app-API checks
   passed. The two existing duplicate-import lint warnings remain unchanged.
+
+### Second device feedback and destination correction — 2026-09-10 / #228 / #229
+
+- Owner reports initial profiling/reset, initial history/edit/undo, history removal
+  and Shared attribution working. The requested source was `621a03c`; the installed
+  APK/run remains unspecified. OnePlus picker alignment and first-destination
+  creation remained failing cases; record the next exact build during retest.
+- Replaced the destination picker's separate native Modal with an overlay inside
+  the shell content bounds above the dock, matching Inbox's bottom gap. Retained
+  keyboard avoidance, scrolling and Back/close/confirmation controls.
+- Read-only action inspection confirmed create-List immediately triggered Shared
+  endorsement. Creation/selection now prepares a draft; sole/new destinations
+  select automatically, optional message requires a usable target, and explicit
+  Add/Propose is the only Item mutation. Shared failures keep the Item and draft;
+  acknowledgement precedes advancement. Personal multi-List addition remains
+  available; a message error is reported without undoing the successful List add.
+- Owner accepts equal-score variation. Existing 30-minute exposure cooldown also
+  explains refresh rotation; a bounded hosted trace read found expected descending
+  unequal-score order. Added SQL regressions for unchanged taste priorities,
+  exposure rotation/expiry and Profile isolation; serving SQL remains unchanged.
+- Added draft-selection regressions for no destination, sole/new selection,
+  refreshed ordering, already-saved Personal choices and creation/refresh races.
+- Added the always-available unknown action after wheel movement to LAUNCH_LOOP
+  and Phase 15.0 alongside longer Taste progression. Current calibration remains
+  unchanged. No reset, migration, APK dispatch/polling or merge in this correction.
+- STATUS/DEVICE_TEST own the next narrow APK gate. Physical layout/keyboard and
+  the full device create→message→proposal flow still need owner acceptance.
+- Local validation: `npm run check` passed 333 tests (256 mobile, 14 catalog,
+  63 database), lint/TypeScript and both platform exports. Existing duplicate-import
+  lint warnings remain unchanged. Publication/final-head CI belong to the PR.

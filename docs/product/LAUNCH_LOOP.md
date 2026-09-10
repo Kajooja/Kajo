@@ -143,6 +143,16 @@ not be forced through calibration again. Implement this progression in Phase 15.
 with the adaptive Taste interaction; the current history correction does not
 change the six-rating completion rule or claim the longer flow is delivered.
 
+Owner follow-up (2026-09-10): keep an independent **“En tunne” / skip** action
+visible and usable after the rating wheel has moved, including accidental touches.
+“Next” with a draft rating and “unknown” must be separate, unambiguous actions.
+Choosing unknown discards that Item's unsubmitted draft rating and advances or
+extends the opportunity sequence without creating rating/not-interest evidence.
+Cover accidental drag, deliberate zero rating, previous/next and the last-card
+extension/fail-open case. Deliver this with the longer Phase 15.0 Taste flow;
+the current six-rating calibration still switches its combined label after a
+draft rating and has not yet received this interaction correction.
+
 The question-selection policy should optimize information gained about the Profile while retaining:
 
 - high recognition probability,

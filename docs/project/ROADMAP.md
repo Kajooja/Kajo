@@ -158,7 +158,10 @@ Build the Taste Test on the same real catalog, feature versions and prediction s
 
 Owner proposal (2026-09-10): roughly 10 movies then 10 books, with a clear
 transition card before books; preserve the adaptive bounds and skip behavior
-in LAUNCH_LOOP. Current calibration evidence defects remain Phase 14 priorities.
+in LAUNCH_LOOP. The later device follow-up requires an always-available unknown
+action even after accidental rating-wheel movement; unknown clears an unsubmitted
+draft rather than becoming a rating. Current calibration evidence defects remain
+Phase 14 priorities.
 
 Exit gate:
 

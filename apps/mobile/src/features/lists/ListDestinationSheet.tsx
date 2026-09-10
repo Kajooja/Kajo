@@ -2,8 +2,9 @@ import { useEventTracking } from '../events/EventTrackingContext';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -12,13 +13,12 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Item, ItemList } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import type { EventRecordInput } from '../events/eventTracking';
 import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
-import { getDockPanelBottomInset } from '../discovery/shellLayout';
+import { DOCK_PANEL_GAP } from '../discovery/shellLayout';
 import {
   MAXIMUM_PROFILE_MESSAGE_LENGTH,
   validateProfileMessage,
@@ -26,6 +26,7 @@ import {
 import { useItemLists } from './ItemListsContext';
 import { MAXIMUM_ITEM_LIST_NAME_LENGTH } from './itemListOperations';
 import { loadRecentListIds, rememberRecentList } from './listRecentUse';
+import { includeCreatedDestination, resolveListDestination } from './listDestinationSelection';
 import {
   orderListDestinationsByRecentUse,
   selectVisibleListDestinations,
@@ -38,6 +39,10 @@ export interface ListDestinationCommit {
   stayOpen?: boolean;
 }
 
+export type ListDestinationCommitResult =
+  | { status: 'success'; notice?: string }
+  | { status: 'error'; message: string };
+
 interface ListDestinationSheetProps {
   visible: boolean;
   item: Item | null;
@@ -45,7 +50,7 @@ interface ListDestinationSheetProps {
   theme: RoomTheme;
   origin?: EventRecordInput | undefined;
   onClose: () => void;
-  onCommitted: (commit: ListDestinationCommit) => void;
+  onCommitted: (commit: ListDestinationCommit) => Promise<ListDestinationCommitResult>;
 }
 
 export function ListDestinationSheet({
@@ -57,10 +62,12 @@ export function ListDestinationSheet({
   onClose,
   onCommitted,
 }: ListDestinationSheetProps) {
-  const insets = useSafeAreaInsets();
   const { loadForItem, createList: createItemList, setEntry, scopeKey, revision } = useItemLists();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [availableLists, setAvailableLists] = useState<readonly ItemList[]>([]);
+  const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const viewportRef = useRef<View>(null);
   const [expanded, setExpanded] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newListName, setNewListName] = useState('');
@@ -90,6 +97,17 @@ export function ListDestinationSheet({
   }
   const visibleLists = selectVisibleListDestinations(availableLists, expanded);
   const hiddenCount = availableLists.length - visibleLists.length;
+  const selectedList = loading ? null : resolveListDestination(availableLists, selectedListId, isSharedProfile);
+
+  useEffect(() => {
+    if (!visible) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (activeSave.current === requestToken) return true;
+      onClose();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [onClose, requestToken, visible]);
 
   useEffect(() => {
     if (!visible || !itemId || !requestKey) return;
@@ -104,6 +122,7 @@ export function ListDestinationSheet({
         setNewListName('');
         setMessageExpanded(false);
         setMessageDraft('');
+        setSelectedListId(null);
       }
       if (result.status === 'error') {
         setError(result.message);
@@ -161,7 +180,13 @@ export function ListDestinationSheet({
         ? { ...candidate, containsItem: true } : candidate));
       setMessageDraft('');
     }
-    onCommitted(commit);
+    const result = await onCommitted(commit);
+    if (currentRequest.current !== requestToken) return false;
+    if (result.status === 'error') {
+      setError(result.message);
+      return false;
+    }
+    if (result.notice) setError(result.notice);
     return true;
   }
 
@@ -170,13 +195,17 @@ export function ListDestinationSheet({
     activeSave.current = requestToken;
     setStatus('saving');
     setError(null);
-    await persistDestination(list);
+    Keyboard.dismiss();
+    const committed = await persistDestination(list);
     if (currentRequest.current !== requestToken) return;
+    if (committed) {
+      setSelectedListId(null);
+    }
     activeSave.current = null;
     setStatus('idle');
   }
 
-  async function createAndChooseList() {
+  async function createDestination() {
     if (!item || loading || status !== 'idle' || activeSave.current === requestToken) return;
     activeSave.current = requestToken;
     setStatus('saving');
@@ -191,28 +220,33 @@ export function ListDestinationSheet({
       return;
     }
 
-    const committed = await persistDestination(result.list);
-    if (currentRequest.current !== requestToken) return;
+    // Creating the container is separate from explicitly adding the Item.
+    setAvailableLists(current => includeCreatedDestination(current, result.list));
+    setSelectedListId(result.list.id);
     activeSave.current = null;
     setCreating(false);
     setNewListName('');
-    if (!committed) {
-      setAvailableLists((current) => [result.list, ...current.filter(list => list.id !== result.list.id)]);
-    }
     setStatus('idle');
+    Keyboard.dismiss();
   }
 
+  if (!visible) return null;
+
   return (
-    <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}
-      statusBarTranslucent navigationBarTranslucent>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardArea}>
-      <View style={[styles.backdrop, {
-        paddingTop: insets.top + 12,
-        paddingBottom: getDockPanelBottomInset(insets.bottom),
-      }]}>
+    // This route fills the shell content above the dock, exactly like Inbox.
+    // A separate Android Modal uses a different window/system-navigation origin.
+    <KeyboardAvoidingView accessibilityViewIsModal
+      keyboardVerticalOffset={keyboardOffset}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardArea}>
+      <View ref={viewportRef} collapsable={false} style={styles.backdrop}
+        onLayout={() => {
+          // Keyboard coordinates include the persistent header above this route.
+          viewportRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y));
+        }}>
         <Pressable
           accessibilityLabel="Sulje listavalinta"
           accessibilityRole="button"
+          disabled={status !== 'idle'}
           onPress={onClose}
           style={StyleSheet.absoluteFill}
         />
@@ -223,7 +257,7 @@ export function ListDestinationSheet({
               <Text style={styles.title}>{isSharedProfile ? 'Ehdota listaan' : 'Lisää listoille'}</Text>
               <Text numberOfLines={1} style={styles.itemTitle}>{item?.title ?? ''}</Text>
             </View>
-            <Pressable accessibilityRole="button" onPress={onClose} style={styles.closeButton}>
+            <Pressable accessibilityRole="button" disabled={status !== 'idle'} onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeText}>×</Text>
             </Pressable>
           </View>
@@ -231,15 +265,15 @@ export function ListDestinationSheet({
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
           {isSharedProfile ? (
             <Text style={styles.helper}>
-              Valinta on samalla tykkäyksesi. Tallennetut syntyy yhteisestä päätöksestä.
+              Valitse lista, lisää halutessasi viesti ja vahvista ehdotus. Tallennetut syntyy yhteisestä päätöksestä.
             </Text>
-          ) : <Text style={styles.helper}>Voit lisätä teoksen usealle listalle. Jokainen lisäys tallentuu heti. Jatka lopuksi painamalla Valmis.</Text>}
+          ) : <Text style={styles.helper}>Valitse lista, kirjoita halutessasi viesti ja paina Lisää listaan. Voit tämän jälkeen lisätä teoksen toiselle listalle.</Text>}
 
           {messageExpanded ? (
             <View style={styles.messageRow}>
               <TextInput
                 accessibilityLabel="Listalisäyksen viesti"
-                editable={!loading && status === 'idle'}
+                editable={Boolean(selectedList) && status === 'idle'}
                 maxLength={MAXIMUM_PROFILE_MESSAGE_LENGTH}
                 onChangeText={(value) => {
                   setMessageDraft(value);
@@ -258,12 +292,17 @@ export function ListDestinationSheet({
           ) : (
             <Pressable
               accessibilityRole="button"
+              accessibilityState={{ disabled: !selectedList || status !== 'idle' }}
+              disabled={!selectedList || status !== 'idle'}
               onPress={() => setMessageExpanded(true)}
-              style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.textButton, !selectedList && styles.disabled, pressed && styles.pressed]}
             >
               <Text style={styles.textButtonText}>+ Lisää viesti</Text>
             </Pressable>
           )}
+          {!selectedList && !loading ? <Text style={styles.helper}>
+            {availableLists.length === 0 ? 'Luo ensin lista.' : 'Valitse ensin lista.'}
+          </Text> : null}
 
           {loading ? (
             <ActivityIndicator color={theme.base.textMuted} />
@@ -272,15 +311,16 @@ export function ListDestinationSheet({
               {visibleLists.map((list) => (
                 <Pressable
                   key={list.id}
-                  accessibilityHint={isSharedProfile ? 'Ehdota kohdetta tähän yhteiseen listaan' : 'Tallentaa kohteen tähän listaan. Voit sen jälkeen valita toisen listan.'}
-                  accessibilityRole="button"
+                  accessibilityHint="Valitsee kohteen. Vahvista lisäys alareunan painikkeella."
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selectedList?.id === list.id, disabled: status !== 'idle' || (!isSharedProfile && list.containsItem) }}
                   disabled={status !== 'idle' || (!isSharedProfile && list.containsItem)}
-                  onPress={() => void chooseList(list)}
-                  style={({ pressed }) => [styles.listRow, pressed && styles.pressed]}
+                  onPress={() => setSelectedListId(list.id)}
+                  style={({ pressed }) => [styles.listRow, selectedList?.id === list.id && styles.selectedRow, pressed && styles.pressed]}
                 >
                   <Text style={styles.listName} numberOfLines={1}>{list.name}</Text>
                   {list.containsItem ? <Text style={styles.existing}>Jo listalla</Text> : null}
-                  <Text style={styles.addMark}>{list.containsItem ? '✓' : status === 'saving' ? '·' : '+'}</Text>
+                  <Text style={styles.addMark}>{list.containsItem ? '✓' : selectedList?.id === list.id ? '●' : '○'}</Text>
                 </Pressable>
               ))}
               {availableLists.length === 0 ? (
@@ -307,7 +347,7 @@ export function ListDestinationSheet({
                 editable={!loading && status === 'idle'}
                 maxLength={MAXIMUM_ITEM_LIST_NAME_LENGTH}
                 onChangeText={setNewListName}
-                onSubmitEditing={() => void createAndChooseList()}
+                onSubmitEditing={() => void createDestination()}
                 placeholder="Uuden listan nimi"
                 placeholderTextColor={theme.base.textMuted}
                 returnKeyType="done"
@@ -317,7 +357,7 @@ export function ListDestinationSheet({
               <Pressable
                 accessibilityRole="button"
                 disabled={loading || status !== 'idle' || newListName.trim().length === 0}
-                onPress={() => void createAndChooseList()}
+                onPress={() => void createDestination()}
                 style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
               >
                 <Text style={styles.createButtonText}>Luo</Text>
@@ -326,6 +366,7 @@ export function ListDestinationSheet({
           ) : (
             <Pressable
               accessibilityRole="button"
+              disabled={loading || status !== 'idle'}
               onPress={() => setCreating(true)}
               style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
             >
@@ -335,12 +376,17 @@ export function ListDestinationSheet({
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
           </ScrollView>
-          {!isSharedProfile ? (
+          <Pressable accessibilityRole="button" disabled={!selectedList || status !== 'idle'}
+            onPress={() => { if (selectedList) void chooseList(selectedList); }}
+            style={({ pressed }) => [styles.createButton, !selectedList && styles.disabled, pressed && styles.pressed]}>
+            <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : isSharedProfile ? 'Ehdota listaan' : 'Lisää listaan'}</Text>
+          </Pressable>
+          {!isSharedProfile && lastSaved?.request === requestToken ? (
             <Pressable accessibilityRole="button" disabled={loading || status !== 'idle'}
               onPress={() => {
                 if (activeSave.current === requestToken) return;
                 if (lastSaved?.request === requestToken) {
-                  onCommitted({ ...lastSaved.commit, message: null, stayOpen: false });
+                  void onCommitted({ ...lastSaved.commit, message: null, stayOpen: false });
                 } else onClose();
               }} style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}>
               <Text style={styles.createButtonText}>{status === 'saving' ? 'Tallennetaan…' : 'Valmis'}</Text>
@@ -349,16 +395,18 @@ export function ListDestinationSheet({
         </View>
       </View>
       </KeyboardAvoidingView>
-    </Modal>
   );
 }
 
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    keyboardArea: { flex: 1, backgroundColor: 'rgba(0,0,0,0.52)' },
+    keyboardArea: { ...StyleSheet.absoluteFill, zIndex: 10, backgroundColor: 'rgba(0,0,0,0.52)' },
     backdrop: {
       flex: 1,
       justifyContent: 'flex-end',
+      paddingTop: 12,
+      paddingHorizontal: 10,
+      paddingBottom: DOCK_PANEL_GAP,
     },
     sheet: {
       maxHeight: '100%',
@@ -366,8 +414,7 @@ function createStyles(theme: RoomTheme) {
       paddingTop: 14,
       paddingBottom: 20,
       gap: 9,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderRadius: 16,
       borderWidth: 1,
       borderColor: theme.base.border,
       backgroundColor: theme.surface.panel,
@@ -395,6 +442,7 @@ function createStyles(theme: RoomTheme) {
       backgroundColor: theme.surface.raised,
     },
     listName: { flex: 1, color: theme.base.textPrimary, fontSize: 14, fontWeight: '700' },
+    selectedRow: { borderColor: theme.ambient.curtainHighlight },
     existing: { color: theme.base.textMuted, fontSize: 11 },
     addMark: { width: 18, color: theme.ambient.curtainHighlight, fontSize: 20, fontWeight: '800' },
     empty: { paddingVertical: 8, color: theme.base.textMuted, fontSize: 13, textAlign: 'center' },
@@ -422,5 +470,6 @@ function createStyles(theme: RoomTheme) {
     createButtonText: { color: theme.base.textPrimary, fontWeight: '800' },
     error: { color: '#f2a6a6', fontSize: 12 },
     pressed: { opacity: 0.7 },
+    disabled: { opacity: 0.4 },
   });
 }
