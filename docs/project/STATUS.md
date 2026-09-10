@@ -38,19 +38,34 @@ second-membership Event failure with full rollback, exact retries, old receipts,
 legacy RPC rejection and cancellation. An unchanged-file populated upgrade probe
 preserves existing data and old function identities/ACLs; both probes are wired
 into required native CLI CI. No Docker, phone or emulator is available locally.
-CI for this new head and physical multi-selection acceptance remain open.
+Implementation head `e4a28bfae6e9edaa507242e4374d4d9ca0dd971a` passed all five
+required jobs in [CI #442](https://github.com/Kajooja/Kajo/actions/runs/34515831721),
+including the native populated-forward and command probes. The APK job was skipped
+as designed. Physical multi-selection acceptance remains open; any later docs-only
+head does not change the tested app/SQL bytes.
 
 Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four affected source function
 bodies; migration history ends at `20260910153737_bootstrap_history_projection`.
-**Multi-destination forward is not deployed at this checkpoint.** Next: publish
-this candidate to the same PR, obtain native CI evidence, apply only the reviewed
-forward, record provider version/hash and verify actual behavior/access/unchanged
-function boundaries. Do not apply the fresh baseline, repair history or deploy
+**Multi-destination forward is not deployed. Automatic approval review rejected**
+`supabase.apply_migration(shared_list_destinations)` after CI passed. The stated
+reason was that publishing code had been authorized, but this hosted/shared
+migration adds a private table and changes security-sensitive functions without
+explicit database-mutation approval. Do not retry through another execution path.
+Ask the owner to approve this exact reviewed forward on `mwrnvfosrzwygrunrltm`.
+A read-only post-rejection check confirms no new target table/overlay v2 exists
+and hosted migration history still ends at `20260910153737`.
+After explicit authorization, recheck current history/affected definitions, apply
+only the same file, record provider version/hash, and verify actual command,
+authorization and unchanged data/function boundaries. Do not apply the fresh baseline, repair history or deploy
 the separate global function-default forward. For recovery, retain the new server
 consent guards and pending sets even if reverting the client; prefer a narrow
 forward correction. Never restore an unsafe old approval path over pending sets.
 
-After the server forward is verified, the owner starts the manual APK workflow
+Do not present this branch’s new APK as ready for Shared testing: its overlay v2
+requires the currently blocked forward. The existing installed APK and server
+remain usable for their prior single-List behavior.
+
+After the server forward is authorized and verified, the owner starts the manual APK workflow
 and installs the new build on both accounts. DEVICE_TEST owns the four focused
 multi-destination cases. A standalone hosted-backend APK does not need local
 Docker. Do not dispatch/poll the APK or reset current test data.

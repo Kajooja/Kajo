@@ -243,7 +243,12 @@ first-release canonical requirements. It is not part of this picker APK.
 
 ### Next multi-destination APK check
 
-The owner starts the CI workflow. Install the latest branch artifact on both test
+**Blocked prerequisite:** CI #442 passed the implementation, but automatic approval
+review rejected its hosted database forward for lack of explicit database-mutation
+authorization. STATUS owns that request. The new app needs overlay v2, so obtain
+approval, deploy and verify the forward before treating a new APK as test-ready.
+
+After that server checkpoint, the owner starts the CI workflow. Install the latest branch artifact on both test
 accounts/devices; earlier versions cannot approve a multi-List proposal. Preserve
 current profiles and test data; no reset or local Docker is needed for a standalone
 APK using the hosted backend.

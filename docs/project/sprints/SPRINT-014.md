@@ -1424,3 +1424,16 @@ validated policy. Phase 14 establishes correctness; Phase 16.3 delivers the full
 flow before beta. No round API/schema/UI or rewatch-policy change is implemented
 in this multi-List correction. Optional #230 statistics and #231 multi-Item actions
 retain their Phase 17 candidate status.
+
+### Publication gate — CI passed, hosted approval blocked
+
+Implementation `e4a28bfae6e9edaa507242e4374d4d9ca0dd971a`, exact locally tested tree
+`cd71b7035b31be4cac1daba1e8860fb3341bb573`, passed all five required jobs in
+[CI #442](https://github.com/Kajooja/Kajo/actions/runs/34515831721); APK skipped.
+Automatic approval review then rejected the exact hosted `shared_list_destinations`
+forward: it classified the table/security-sensitive function changes as a shared
+database mutation without explicit owner authorization, despite code publication
+being authorized. No alternative mutation path is allowed. The forward remains
+undeployed and needs a direct owner approval; the new app’s overlay v2 depends on
+it. Keep the PR draft, preserve current data and complete no new APK acceptance
+claim. STATUS records the exact SQL hash/target and post-approval continuation.
