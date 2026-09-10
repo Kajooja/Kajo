@@ -260,19 +260,27 @@ Lists and history; the green Shared flag is implemented. The Personal multi-dest
 acknowledged addition. Each tap uses its own durable command; Valmis advances once.
 Completed additions survive later failure or close. Duplicate taps are synchronously
 guarded, existing memberships are marked, and a collection refresh does not erase
-the in-progress message/create draft. Shared proposal flow is unchanged. The common
-row/grid layout, explicit history-clear action and final retry UX still need
-implementation and device validation. Reset remains scheduled for the
+the in-progress message/create draft. Shared proposal flow is unchanged. The common collection cover grid/card entry is now implemented: Lists and history
+reuse DiscoveryItemCard, show rating badges (including zero), dates and Shared
+provenance, and expose Ruudukko / Kortit controls. Images/cells are virtualized in
+bounded batches; card browsing keeps the loaded collection. Explicit history-clear
+action and final retry UX still need implementation; the new UI needs device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: shared collection grid/card controls and canonical history-clear action; then complete refresh UX, authorized data reset
+Next: canonical history-clear action; then complete refresh UX, authorized data reset
 and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Publication approval: the owner explicitly approved publishing this Personal
 multi-destination correction to the existing public Kajooja/Kajo repository,
-`feat/228-delivered-origin` / PR #229. The earlier automatic-review publication
-block is resolved by that approval. Continue from this PR, not the old remote
-9f82165 checkpoint; remaining work and test/reset ordering are listed above.
+`feat/228-delivered-origin` / PR #229. That delivery is published as `4e8e301`;
+the earlier automatic-review block is resolved. Continue from this PR; remaining
+work and test/reset ordering are listed above.
+
+The owner explicitly approved publication of the subsequent common collection
+grid/card code and documentation to this same public repository, branch and PR.
+The grid/card publication approval boundary is resolved. Continue with the
+canonical history-clear action and the remaining refresh/reset/device sequence
+above; no new APK or data reset was performed at this publication checkpoint.
 
 Continue **14.1** after this delivery:
 

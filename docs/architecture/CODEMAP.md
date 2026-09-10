@@ -109,4 +109,6 @@ Do not create empty feature folders merely to match future architecture. Shared 
 Collection navigation uses `apps/mobile/src/features/lists/useCollectionNavigation.ts`
 and `discovery/deliveredSlate.ts` to carry authorized List/history Items into Detail,
 without a Prediction or mock lookup. Collection snapshots preserve consumed Items
-and the current Profile/session; common collection grid/card controls remain pending.
+and the current Profile/session. `lists/CollectionGrid.tsx` provides the common
+virtualized grid and card-mode entry; `discovery/DiscoveryItemCard.tsx` owns the
+shared cover/status/rating presentation used by Discovery, Lists and history.

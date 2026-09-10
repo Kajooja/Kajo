@@ -1,11 +1,12 @@
+import { CollectionGrid } from './CollectionGrid';
+import { formatListEntryDate } from './listPresentation';
+import { EMPTY_ITEM_INTERACTION } from '../discovery/itemInteraction';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
   Pressable,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -21,7 +22,6 @@ import { useItemLists } from './ItemListsContext';
 import { useCollectionNavigation } from './useCollectionNavigation';
 import { useItemInteractions } from '../discovery/ItemInteractionContext';
 import type { ConsumedItem } from './itemListOperations';
-import { formatListEntryDate } from './listPresentation';
 
 export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
   const { mode } = useDiscoveryMode();
@@ -59,8 +59,11 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => setAttempt(current => current + 1)} tintColor={theme.base.textMuted} />}>
+      <CollectionGrid theme={theme} refreshing={loading} onRefresh={() => setAttempt(current => current + 1)}
+        entries={items.map(entry => ({ item: entry.item, caption: formatListEntryDate(entry.updatedAt),
+          interaction: { ...EMPTY_ITEM_INTERACTION, saved: entry.saved, consumed: entry.consumed, rating: entry.rating } }))}
+        onOpen={item => openCollectionItem(item, items.map(entry => entry.item), title)}
+        header={<View style={styles.content}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -82,27 +85,8 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
           <Text style={styles.empty}>Ei vielä {title.toLowerCase()} kohteita.</Text>
         ) : null}
 
-        <View style={styles.list}>
-          {items.map((item) => (
-            <Pressable
-              key={item.item.id}
-              accessibilityRole="button"
-              onPress={() => openCollectionItem(item.item, items.map(candidate => candidate.item), title)}
-              style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-            >
-              <View style={styles.rowText}>
-                <Text style={styles.type}>{itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
-                <Text style={styles.rowTitle}>{item.item.title}</Text>
-                <Text style={styles.meta}>
-                  {item.rating !== null ? `Arvosana ${item.rating}/10 · ` : ''}
-                  {formatListEntryDate(item.updatedAt)}
-                </Text>
-              </View>
-              <Text style={styles.arrow}>›</Text>
-            </Pressable>
-          ))}
-        </View>
-      </ScrollView>
+        </View>}
+      />
     </SafeAreaView>
   );
 }
@@ -110,7 +94,7 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: 'transparent' },
-    content: { padding: 20, paddingBottom: 44, gap: 18 },
+    content: { padding: 18, paddingBottom: 12, gap: 14 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
     backText: { color: theme.base.textPrimary, fontSize: 34 },
@@ -121,13 +105,5 @@ function createStyles(theme: RoomTheme) {
     error: { color: '#f2a6a6', fontSize: 13 },
     link: { color: theme.ambient.curtainHighlight, fontWeight: '700' },
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
-    list: { gap: 10 },
-    row: { minHeight: 94, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.surface.panel },
-    rowText: { flex: 1, gap: 4 },
-    type: { color: theme.base.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-    rowTitle: { color: theme.base.textPrimary, fontSize: 16, fontWeight: '800' },
-    meta: { color: theme.base.textMuted, fontSize: 12 },
-    arrow: { color: theme.base.textMuted, fontSize: 28 },
-    pressed: { opacity: 0.72 },
   });
 }

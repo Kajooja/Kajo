@@ -1144,3 +1144,26 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: full `npm run check` passed 324 tests (249 mobile, 14 catalog,
   61 database), TypeScript/lint and both platform exports. New picker interaction
   still needs the planned combined device test; no emulator/device was available.
+
+
+### Shared collection cover grid — 2026-09-10 / #228 / #229
+
+- Published the explicitly approved Personal multi-destination correction as
+  `4e8e301`; remote/local publication handoff is resolved.
+- Extracted DiscoveryItemCard without copying a parallel card design. Discovery,
+  named Lists, Saved and Luetut/Katsotut now reuse the cover presentation. Rating
+  badges render numeric zero as well as other ratings; consumed labels remain for
+  unrated entries. Collection dates and original Shared provenance remain visible.
+- CollectionGrid replaces ScrollView row maps with a bounded FlatList: six-cell
+  initial/batch rendering, two columns and near-visible image mounting. Both List
+  and history headers offer Ruudukko / Kortit; card mode opens the loaded collection
+  and preserves its Profile/session/collection origin. Return goes back to that grid.
+- List filters/sort, rename/delete and permitted entry removal remain available;
+  completed Shared Saved removal is still explicitly unavailable. Removed obsolete
+  row styles and the unused old LIST/GRID view type.
+- Next: canonical atomic history-clear action, final ordinary retry/refresh UX,
+  then the authorized choice/group reset and combined device test. No reset or new
+  APK here; new card layout has not been accepted on a phone/emulator.
+- Validation: `npm run check` passed all 324 tests, TypeScript/lint and both
+  platform exports. Existing collection-origin/order tests remain passing; visual
+  and gesture acceptance stays with the planned combined device checkpoint.
