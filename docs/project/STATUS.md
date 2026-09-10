@@ -30,21 +30,32 @@ The full-schema probe covers 36 Profile/domain/mode/limit controls, two mixed-do
 controls, eight exhausted/empty controls, exact frozen baseline replay after later
 state changes, one-reminder limits, authorization and populated upgrade preservation.
 Both the upgrade and runtime probes are wired into required native CLI CI.
-The complete repository gate and current CI result are recorded in Sprint 014.
+`npm run check` passes **349 tests**, lint/TypeScript and both platform exports.
+Implementation head `9fb48c286ecbcd6c706427819fadb61500dccb5c` passed all five
+required jobs in [CI](https://github.com/Kajooja/Kajo/actions/runs/34531767919),
+including the native populated-forward and replay/admission probes. Sprint 014
+records this source acceptance and the local catalog-cost diagnostic.
 
 CI on replay precision head `5b9efd3` passed four gates; the native populated SQL
 completed but its result parser rejected a bare UUID from fixture setup. Setup now
 uses a no-output `DO` block, and local probe adapters reject stray output instead
-of silently ignoring it. The preceding precision fix remains intact; new-head
-native acceptance is required for the combined packet.
+of silently ignoring it. The preceding precision fix remains intact; the combined
+packet's native acceptance is now verified in the CI run above.
 
-**Next action:** verify required CI for this packet, then specify and implement the
-versioned continuation/empty-result contract through the server and client. The
+**Next action:** specify and implement the versioned continuation/empty-result
+contract through the server and client. The
 client still treats an empty array as failure. Independent bounded candidate
 sources, admission cost at catalog scale and duplicate-free continuation remain
 open under `MVP-ALG-002..003`; the existing full-catalog feature scan now also
 evaluates admission before retaining candidates. This packet does not accept
 scalable retrieval or independently generated challenger pools.
+
+The next contract must preserve a real PredictionRun identity even for zero Items,
+distinguish a valid empty result from a transport/authorization failure, and scope
+continuation to the captured Profile/mode/session without duplicates or rewriting
+old selected ranks. Start at `predictionOperations.ts`, `usePredictionRanking.ts`,
+the server trace boundary and `deliveredSlate.ts`; keep equal-score rotation and
+existing durable exposure/action attribution intact.
 
 Hosted remains on `20260910190243_shared_list_destinations`. Reviewed rollout order
 is late Outcome attribution → precise replay → candidate admission. Keep the

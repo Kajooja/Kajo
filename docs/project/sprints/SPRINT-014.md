@@ -1639,8 +1639,8 @@ CLI-created forward `20260910210520_eligibility_first_candidate_pool.sql` is
 **undeployed**, SHA-256
 `92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46`.
 It replaces five existing bodies through guarded anchors and permits zero in the
-shadow result-count constraint. No table/function, public signature, genome weight
-or historical data is added/changed. New source policy and admission metadata use
+shadow result-count constraint. It adds no tables/functions and preserves public
+signatures, genome weights and historical data. New source policy and admission metadata use
 `eligibility-first-v1`; counts/ranks identify the baseline-admission stage.
 V0 retains at most 50 and expensive Scenario/common-fit plus persisted traces
 retain at most `min(50, 3 × requested limit)`. All-suppressed and explicit empty
@@ -1679,3 +1679,29 @@ cost/quality evidence and duplicate-free continuation remain open. Next source
 slice is the versioned server/client continuation and empty-result contract:
 the client currently treats an empty array as failure. Keep Phase 14.1 recovery
 and deferred Personal two-List APK gates; no release checkbox is closed here.
+
+A bounded local cost diagnostic also compared unchanged versus admitted full-schema
+Personal `FOR_YOU` calls with 100, 1,000 and 5,000 ordinary MOVIE Items and no taste
+history. Median of three warm PGlite samples after one warm-up: **50 → 47 ms**,
+**115 → 144 ms**, **387 → 609 ms**, respectively. Each returned 20 and rolled back
+its trace. This is a WASM fixture measurement, not hosted/device latency or a scale
+acceptance result. It confirms that evaluating admission across the entire catalog
+has a growing cost; indexed bounded sources remain necessary.
+
+### Native candidate/replay acceptance — 2026-09-10
+
+Implementation head `9fb48c286ecbcd6c706427819fadb61500dccb5c`, tested tree
+`06691e988bff49a51a5913410be9941c22dbd461`, passed all five required jobs in
+[CI run 34531767919](https://github.com/Kajooja/Kajo/actions/runs/34531767919).
+The native CLI job 103054841812 reports `KAJO CI CLI INSTALL PASS` on pinned
+Supabase Postgres `17.6.1.167`, image
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+This includes rounded-caller replay precision, populated replay/admission upgrades,
+runtime parity/admission/empty controls, repeated fresh installs, failed-migration
+atomicity, defaults and unchanged native platform boundaries. The two preceding
+native failures are resolved; no tolerance or gate was weakened.
+
+This follow-up changes documentation only. Source/SQL bytes match the accepted
+implementation head. Hosted rollout, physical device acceptance and the remaining
+`MVP-ALG-002..003` retrieval/continuation gates remain open. Continue from STATUS's
+versioned server/client continuation and empty-result slice on the same draft PR.
