@@ -11,39 +11,33 @@ This file is the authoritative current-state handoff. `ROADMAP.md` owns dependen
 
 Continue **only** `feat/228-delivered-origin`, draft PR #229 / Issue #228.
 Runtime code is `2cb204f`; CI #429 succeeded. Main remains accepted `6dd1fec`.
-All requested collection UI corrections and hosted history-clear are implemented;
-real-device acceptance remains pending. [DEVICE_TEST.md](DEVICE_TEST.md) owns the
-exact APK build/download steps and eight test scenarios. No new APK was started.
+All requested collection UI corrections and hosted history-clear are implemented.
+**The explicitly approved reset is now committed and verified. Next: owner APK
+testing**, using [DEVICE_TEST.md](DEVICE_TEST.md). No new APK was started or polled.
 
-**Blocking next action:** obtain explicit approval for the reviewed reset scope
-below, then execute it and mark the actual result here. Automatic approval review
-rejected COMMIT because rotating Profile IDs and clearing their Events/imports/
-messages was judged broader than the earlier permission to reset choices/groups.
-No bypass was attempted; both hosted rehearsals ended in ROLLBACK. Existing data
-therefore remains intact. Do not tell the owner reset or APK acceptance is complete.
+The owner explicitly approved fresh PersonalProfile identities and clearing all
+Profile-scoped choices, Events, imports, Predictions and Shared groups/messages.
+The earlier automatic-review boundary is resolved. Executed the twice-rehearsed
+`scripts/database/owner-device-reset.sql` with only final ROLLBACK changed to COMMIT.
+Separate post-commit verification at **2026-09-10 14:19:19 UTC** found 2 Users,
+2 fresh PersonalProfiles, 0 SharedProfiles, 0 Events, 0 interactions, 0 List entries,
+0 import jobs, 0 action receipts and 0 Prediction runs.
+Auth/accounts/nicknames, catalog and Personal custom List names were preserved.
+Old Profile-bound rating, collection and Event-session replay was rejected; a
+new Profile successfully rated via the real API in a rolled-back probe. Global
+baseline/model configuration remains unchanged. Do not run the reset again: the
+script remains ROLLBACK by default and its prior-scope guard now fails deliberately.
+New legitimate device actions will of course make these zero counts increase.
 
-Prepared `scripts/database/owner-device-reset.sql` defaults to ROLLBACK and is NOT
-part of the migration chain. It preserves the two Auth/accounts/nicknames, catalog
-and Personal custom List names. It creates fresh PersonalProfile IDs, removes old
-choices/List contents/history/receipts/imports/Predictions, and deletes the Shared
-group with its invitations/messages. This deliberately resets learned Profile
-identity while preserving User identity. Old queued envelopes cannot target new
-Profiles. Hosted rehearsal proved rejection of real old rating, collection and
-Event-session writes, successful new-Profile rating, empty evidence/group state,
-and unchanged accounts/catalog. Global baseline/model configuration survives;
-unexpected learned Profile assignments/evaluations make the script abort.
-
-Before reset: 2 Users, 2 PersonalProfiles, 1 SharedProfile, 53 interactions,
-2,558 Events and 1 import job. These are preflight counts, not a frozen user-data
-snapshot; recheck if scope changes. Permanent reset was **not** executed. Current
-prior runtime tests and the reset rehearsal are separate evidence. Final handoff
-check passed all 325 tests, lint/TypeScript and both exports (exit 0).
-
-After approval: execute the reviewed reset once (final COMMIT only), verify,
-update this handoff/test plan, then let the owner manually build the branch APK.
-Do not poll APK completion. Keep main/PR draft until owner device results and
-required CI are accepted. Then resolve failures, record exact APK/results, merge
-and perform supported branch cleanup; continue Phase 14.1 before Taste/Friends.
+The repository is ready for a new conversation: read this checkpoint and
+DEVICE_TEST.md, obtain/record the actual APK run and commit plus owner test results,
+fix failures first, and keep this PR draft until required CI and device acceptance
+are satisfied. Build manually using Actions → CI → Run workflow on the active
+branch; a normal PR run intentionally skips the APK job. Do not poll completion.
+No device acceptance, merge or broad release readiness is claimed. After accepted
+results, merge/perform supported branch cleanup and continue Phase 14.1 before
+Taste/Friends. All 325 tests, lint/TypeScript and both exports passed at the
+preceding handoff; this checkpoint changes documentation and reset state only.
 The sections below preserve implementation history and do not override this
 immediate continuation checkpoint.
 

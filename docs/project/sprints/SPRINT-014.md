@@ -1240,3 +1240,16 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - No schema change, new app code, APK dispatch or device acceptance in this step.
 - Final handoff validation: full `npm run check` passed 325 tests, lint/TypeScript
   and both platform exports (exit 0).
+
+
+### Approved reset committed — 2026-09-10 / #228 / #229
+
+- Owner explicitly approved the full identity/history/group reset; the earlier
+  automatic-review block is resolved. Ran the reviewed transaction with COMMIT.
+- Independent post-commit verification at 14:19:19 UTC: 2 Users, 2 new Personal
+  Profiles, no Shared groups/Events/interactions/List entries/imports/receipts/
+  Predictions. Accounts/catalog/Personal List names were preserved.
+- Old Profile-bound replay was denied and new Profile writes succeeded in the
+  transaction's rolled-back probe. No repeat reset; DEVICE_TEST.md and STATUS
+  now direct the next conversation to the manual branch APK and owner tests.
+- No app changes, APK dispatch/polling, merge or device acceptance in this step.

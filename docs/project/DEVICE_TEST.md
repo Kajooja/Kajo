@@ -1,6 +1,6 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **prepared; reset approval pending, device acceptance not started**.
+Status: **reset committed and verified; ready for owner APK testing**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 
 ## Version and build
@@ -11,7 +11,7 @@ Status: **prepared; reset approval pending, device acceptance not started**.
 - CI #429 / run 34485606516 succeeded for that runtime checkpoint. Required native
   database checks belong to that CI run; local `npm run check` passed 325 tests.
 - Hosted history-clear migration: `20260910134428_clear_consumed_history`, verified.
-- After reset approval/execution, select **Actions → CI → Run workflow**, choose
+- Select **Actions → CI → Run workflow**, choose
   **feat/228-delivered-origin** and run it once. Download the artifact
   `kajo-android-standalone-<run commit SHA>` containing `app-release.apk`.
 - Ordinary PR runs skip the APK job by design. Manual workflow_dispatch builds it
@@ -23,24 +23,18 @@ Status: **prepared; reset approval pending, device acceptance not started**.
 ## Reset prerequisite
 
 `scripts/database/owner-device-reset.sql` is a one-time operational script, not a
-migration. Its default final statement is ROLLBACK. It was rehearsed on hosted
-Postgres, but the committed form was rejected by automatic approval review.
-**No permanent reset has occurred.**
+migration. After explicit owner approval, its reviewed transaction was executed
+with final COMMIT. Separate verification at **2026-09-10 14:19:19 UTC** confirmed
+2 accounts, 2 fresh PersonalProfiles and zero Shared groups, Events, interactions,
+List entries, imports, receipts and Predictions. **Do not execute the reset again.**
+The retained script defaults to ROLLBACK and rejects the now-changed reset scope.
 
-The reviewed scope is both current accounts: preserve Auth/accounts/nicknames,
-catalog and Personal List names; replace PersonalProfile IDs, empty their list
-contents and choices, and remove all Shared groups and their invitations/messages.
-Old Events/sessions, receipts/undo heads, imports/bootstrap evidence, Predictions
-and dependent shadow state are cleared. Global baseline/model configuration is
-preserved; the script refuses unexpected learned Profile assignments/evaluations.
-
-New Profile IDs are the stale-client boundary. The rehearsal verifies a real old
-rating envelope, an old collection command and an old Event session cannot write;
-a new Profile can rate through the real API. No queue namespace or schema change
-is needed. The identity/count guard prevents an accidental immediate second reset.
-After explicit approval of this scope, recheck scope, execute the same reviewed
-transaction with only its final ROLLBACK changed to COMMIT, and verify the result.
-Then update this status and STATUS before asking for device testing.
+Auth/accounts/nicknames, catalog and Personal custom List names were preserved.
+PersonalProfile IDs were replaced; old choices/history/import evidence and group
+invitations/messages were removed. Global baseline/model configuration survives.
+The reset verified rejection of real old rating/collection/Event-session writes
+and successful new-Profile rating in a rolled-back probe. No new schema or queue
+namespace was needed. Current legitimate testing will increase the zero counts.
 
 On the phone, fully close the old app and open the new APK; sign out/in if the
 old profile remains displayed. Existing login accounts remain valid. Old selections
