@@ -1,4 +1,43 @@
+import type { SharedDiscoveryStateMap } from './sharedEndorsement';
 import type { DiscoveryMode, Item } from '../../domain/contracts';
+
+export interface DeliveredItemOrigin {
+  readonly predictionId?: string;
+  readonly properties: {
+    readonly predictionSource: 'hosted' | 'fallback' | 'shared_overlay' | 'unattributed';
+    readonly deliveryTier: 'RANKED' | 'SHARED_PENDING' | 'SHARED_MEMBER_HISTORY' | 'UNATTRIBUTED';
+  };
+}
+
+const UNATTRIBUTED: DeliveredItemOrigin = Object.freeze({
+  properties: Object.freeze({ predictionSource: 'unattributed', deliveryTier: 'UNATTRIBUTED' }),
+});
+
+export function getDeliveredItemOrigin(
+  origins: Readonly<Record<string, DeliveredItemOrigin>>, itemId: string,
+): DeliveredItemOrigin {
+  return Object.hasOwn(origins, itemId) ? origins[itemId]! : UNATTRIBUTED;
+}
+
+export function buildDeliveredItemOrigins(
+  items: readonly Item[], rankedItems: readonly Item[], predictionId: string,
+  source: 'hosted' | 'fallback', shared: SharedDiscoveryStateMap,
+): Readonly<Record<string, DeliveredItemOrigin>> {
+  const rankedIds = new Set(rankedItems.map(item => item.id));
+  return Object.freeze(Object.fromEntries(items.map(item => {
+    const state = shared[item.id];
+    const deliveryTier = state?.pendingEndorsement ? 'SHARED_PENDING'
+      : state?.memberConsumedUserIds.length ? 'SHARED_MEMBER_HISTORY' : 'RANKED';
+    const ranked = rankedIds.has(item.id);
+    return [item.id, Object.freeze({
+      ...(ranked ? { predictionId } : {}),
+      properties: Object.freeze({
+        predictionSource: ranked ? source : deliveryTier === 'RANKED' ? 'unattributed' : 'shared_overlay',
+        deliveryTier: !ranked && deliveryTier === 'RANKED' ? 'UNATTRIBUTED' : deliveryTier,
+      }),
+    })];
+  })));
+}
 
 export interface DeliveredSlate {
   readonly id: string;
@@ -8,6 +47,7 @@ export interface DeliveredSlate {
   readonly source: 'hosted' | 'fallback';
   readonly mode: DiscoveryMode;
   readonly items: readonly Item[];
+  readonly origins: Readonly<Record<string, DeliveredItemOrigin>>;
 }
 
 // Navigation transport only. Mounted detail retains its own snapshot; neither
@@ -19,6 +59,10 @@ export function rememberDeliveredSlate(input: DeliveredSlate): void {
   if (slates.has(input.id)) throw new Error('Delivered slate identity already used');
   const snapshot: DeliveredSlate = Object.freeze({
     ...input,
+    origins: Object.freeze(Object.fromEntries(input.items.map(item => {
+      const origin = getDeliveredItemOrigin(input.origins, item.id);
+      return [item.id, Object.freeze({ ...origin, properties: Object.freeze({ ...origin.properties }) })];
+    }))),
     items: Object.freeze(input.items.map(item => Object.freeze({ ...item, ...(item.tags ? { tags: Object.freeze([...item.tags]) } : {}),
       ...(item.creators ? { creators: Object.freeze([...item.creators]) } : {}) }))),
   });

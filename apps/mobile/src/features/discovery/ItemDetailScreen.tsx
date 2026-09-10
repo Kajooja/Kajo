@@ -1,4 +1,4 @@
-import { canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
+import { buildDeliveredItemOrigins, getDeliveredItemOrigin, type DeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -161,7 +161,6 @@ function ItemDetailContent({
   const { width } = useWindowDimensions();
   const { mode: currentMode } = useDiscoveryMode();
   const [mode] = useState(() => slate?.mode ?? currentMode);
-  const predictionSource = slate?.source ?? 'fallback';
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
@@ -191,6 +190,10 @@ function ItemDetailContent({
   const [items] = useState<readonly Item[]>(() => selectedItem
     ? buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
     : []);
+  const [origins] = useState(() => slate?.origins ?? buildDeliveredItemOrigins(
+    items, items, recommendationTraceId, 'fallback', {},
+  ));
+  const originFor = useCallback((item: Item) => getDeliveredItemOrigin(origins, item.id), [origins]);
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
@@ -211,20 +214,15 @@ function ItemDetailContent({
   const dwellState = useRef<{
     item: Item;
     startedAtMs: number;
+    origin: DeliveredItemOrigin;
+    recordEvent: typeof eventTracking.recordEvent;
+    discoveryMode: typeof mode;
   } | null>(null);
   const visibleDwellItem = useRef<Item | null>(null);
-  const dwellEventContext = useRef({
-    recordEvent: eventTracking.recordEvent,
-    predictionId: recommendationTraceId,
-    discoveryMode: mode,
-    predictionSource,
-  });
-  dwellEventContext.current = {
-    recordEvent: eventTracking.recordEvent,
-    predictionId: recommendationTraceId,
-    discoveryMode: mode,
-    predictionSource,
-  };
+  const startDwell = useCallback((item: Item) => {
+    dwellState.current = { item, startedAtMs: Date.now(), origin: originFor(item),
+      recordEvent: eventTracking.recordEvent, discoveryMode: mode };
+  }, [eventTracking.recordEvent, mode, originFor]);
 
   const finishDwell = useCallback(
     (endReason: 'ITEM_CHANGED' | 'SCREEN_EXIT' | 'APP_BACKGROUND') => {
@@ -241,16 +239,15 @@ function ItemDetailContent({
 
       if (!properties) return;
 
-      const current = dwellEventContext.current;
-      current.recordEvent({
+      activeDwell.recordEvent({
         eventType: 'ITEM_DWELL',
         itemId: activeDwell.item.id,
         itemType: activeDwell.item.itemType,
-        predictionId: current.predictionId,
-        discoveryMode: current.discoveryMode,
+        ...activeDwell.origin,
+        discoveryMode: activeDwell.discoveryMode,
         properties: {
           ...properties,
-          predictionSource: current.predictionSource,
+          ...activeDwell.origin.properties,
         },
       });
     },
@@ -263,19 +260,19 @@ function ItemDetailContent({
 
       if (dwellState.current?.item.id !== item.id) {
         finishDwell('ITEM_CHANGED');
-        dwellState.current = { item, startedAtMs: Date.now() };
+        startDwell(item);
       }
 
       eventTracking.recordEvent({
         eventType: 'ITEM_IMPRESSION',
         itemId: item.id,
         itemType: item.itemType,
-        predictionId: recommendationTraceId,
+        ...originFor(item),
         discoveryMode: mode,
-        properties: { source: 'ITEM_SEQUENCE', predictionSource },
+        properties: { source: 'ITEM_SEQUENCE', ...originFor(item).properties },
       });
     },
-    [eventTracking, finishDwell, mode, predictionSource, recommendationTraceId],
+    [eventTracking, finishDwell, mode, originFor, startDwell],
   );
 
   useEffect(() => {
@@ -289,17 +286,14 @@ function ItemDetailContent({
         visibleDwellItem.current &&
         !dwellState.current
       ) {
-        dwellState.current = {
-          item: visibleDwellItem.current,
-          startedAtMs: Date.now(),
-        };
+        startDwell(visibleDwellItem.current);
       }
 
       previousState = nextState;
     });
 
     return () => subscription.remove();
-  }, [finishDwell]);
+  }, [finishDwell, startDwell]);
 
   useEffect(
     () => () => {
@@ -437,7 +431,7 @@ function ItemDetailContent({
       return;
     }
     setListPickerTarget({ item, index, interaction, origin: { eventType: 'ITEM_LIKED',
-      itemId: item.id, itemType: item.itemType, predictionId: recommendationTraceId, discoveryMode: mode } });
+      itemId: item.id, itemType: item.itemType, ...originFor(item), discoveryMode: mode } });
   }
 
   async function handleEndorsement(
@@ -454,7 +448,7 @@ function ItemDetailContent({
       item.id,
       proposedList?.id,
       origin ?? { eventType: 'ITEM_ENDORSED', itemId: item.id, itemType: item.itemType,
-        predictionId: recommendationTraceId, discoveryMode: mode },
+        ...originFor(item), discoveryMode: mode },
     );
     setEndorsingItemId(null);
 
@@ -508,9 +502,9 @@ function ItemDetailContent({
       eventType: getInteractionEventType(action, nextInteraction),
       itemId: item.id,
       itemType: item.itemType,
-      predictionId: recommendationTraceId,
+      ...originFor(item),
       discoveryMode: mode,
-      properties: { source: 'ITEM_DETAIL', predictionSource, ...eventProperties },
+      properties: { source: 'ITEM_DETAIL', ...originFor(item).properties, ...eventProperties },
     };
     if (!commit(eventId, eventInput)) {
       return false;
@@ -621,14 +615,14 @@ function ItemDetailContent({
         eventType: 'ITEM_INTERACTION_UNDONE',
         itemId: targetItem.id,
         itemType: targetItem.itemType,
-        predictionId: recommendationTraceId,
+        ...originFor(targetItem),
         discoveryMode: mode,
         properties: {
           ...getUndoEventProperties(
             result.reversedEventId,
             result.restoredInteraction,
           ),
-          predictionSource,
+          ...originFor(targetItem).properties,
         },
       });
     }
@@ -647,8 +641,6 @@ function ItemDetailContent({
       pathname: '/discovery/[itemId]',
       params: {
         itemId: undoTargetItemId,
-        predictionId: recommendationTraceId,
-        predictionSource,
       },
     });
   }

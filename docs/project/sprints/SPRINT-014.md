@@ -901,3 +901,19 @@ merge number. Complete publication, then pause as requested by the owner.
   outcomes are not retroactively manufactured/fixed. Next: Shared per-Item origin,
   remaining async callback review and server late-outcome/runtime acceptance.
   Keep #228 and PR #229 in progress; PR owns current full-check/CI evidence.
+
+
+### Shared per-Item origin checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Prior head `dd6d86b` passed CI #413. The snapshot now captures each Item's
+  ranking membership and Shared tier without private member/history payloads.
+  Overlay-injected Items carry no ranking Prediction; ranked Items preserve
+  the run even when the overlay changes their order.
+- Grid/detail evidence and Item/collection action origins use those descriptors.
+  Detail remains frozen through Shared updates. Dwell keeps its start-time
+  callback/mode/origin, and undo navigation no longer borrows an unrelated run.
+- Six new origin regressions cover injected pending/history, ranked reordering,
+  Shared mutation/reranking, unknown origins, fallback and defensive copying.
+  PR owns full-check/current CI evidence. No hosted migration or physical-device
+  acceptance. Remaining: async/session boundary review, late-outcome/server
+  verification and runtime acceptance. Keep #228/#229 in progress.

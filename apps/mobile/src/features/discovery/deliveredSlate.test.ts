@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { canUseDeliveredSlate, getDeliveredSlate, rememberDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
+import { buildDeliveredItemOrigins, getDeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, rememberDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
 
 const slate = (id: string): DeliveredSlate => ({ id, scopeKey: 'env:actor:profile', sessionId: 'session',
-  predictionId: `prediction-${id}`, source: 'hosted', mode: 'SURPRISE',
+  predictionId: `prediction-${id}`, source: 'hosted', mode: 'SURPRISE', origins: {},
   items: [{ id: 'a', title: 'A', itemType: 'BOOK', tags: ['quiet'] },
     { id: 'b', title: 'B', itemType: 'BOOK', tags: [] }] });
 
@@ -49,5 +49,64 @@ describe('delivered navigation origin', () => {
     rememberDeliveredSlate(slate('duplicate'));
     expect(() => rememberDeliveredSlate({ ...slate('duplicate'), mode: 'RISK' })).toThrow();
     expect(getDeliveredSlate('duplicate')!.mode).toBe('SURPRISE');
+  });
+});
+
+describe('Shared per-Item delivery origin', () => {
+  const ranked = { id: 'ranked', title: 'Ranked', itemType: 'BOOK' as const };
+  const pending = { id: 'pending', title: 'Pending', itemType: 'BOOK' as const };
+  const history = { id: 'history', title: 'History', itemType: 'BOOK' as const };
+  const state = (item: typeof ranked, pendingEndorsement: boolean) => ({
+    item, pendingEndorsement, ineligibleForDiscovery: false, currentActorEndorsed: false,
+    consensusSaved: false, memberConsumedUserIds: pendingEndorsement ? [] : ['private-member'],
+    memberMaxRating: 5, endorserUserIds: ['private-endorser'], firstEndorsedAt: null,
+    proposedListId: 'private-list', proposedListName: 'Private list', proposedByUserId: 'private-author',
+  });
+
+  it('does not assign a ranking Prediction to injected pending/history Items', () => {
+    const origins = buildDeliveredItemOrigins([ranked, pending, history], [ranked], 'run', 'hosted', {
+      pending: state(pending, true), history: state(history, false),
+    });
+    expect(origins.ranked).toEqual({ predictionId: 'run', properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } });
+    expect(origins.pending).toEqual({ properties: { predictionSource: 'shared_overlay', deliveryTier: 'SHARED_PENDING' } });
+    expect(origins.history).toEqual({ properties: { predictionSource: 'shared_overlay', deliveryTier: 'SHARED_MEMBER_HISTORY' } });
+    expect(JSON.stringify(origins)).not.toContain('private');
+  });
+
+  it('retains selected-run provenance when Shared reorders an actual ranked Item', () => {
+    const origins = buildDeliveredItemOrigins([pending], [pending], 'run', 'hosted', { pending: state(pending, true) });
+    expect(origins.pending).toEqual({ predictionId: 'run', properties: { predictionSource: 'hosted', deliveryTier: 'SHARED_PENDING' } });
+  });
+
+  it('freezes the opened tier and Prediction through Shared updates and reranking', () => {
+    const shared = { pending: state(pending, true) };
+    const origins = buildDeliveredItemOrigins([pending], [], 'old-run', 'hosted', shared);
+    rememberDeliveredSlate({ ...slate('shared-frozen'), items: [pending], origins });
+    shared.pending.pendingEndorsement = false;
+    const next = buildDeliveredItemOrigins([pending], [pending], 'new-run', 'hosted', shared);
+    expect(next.pending?.predictionId).toBe('new-run');
+    expect(getDeliveredSlate('shared-frozen')!.origins.pending).toEqual({ properties: { predictionSource: 'shared_overlay', deliveryTier: 'SHARED_PENDING' } });
+    expect(Object.isFrozen(getDeliveredSlate('shared-frozen')!.origins.pending!.properties)).toBe(true);
+  });
+
+  it('fails closed for missing origins without borrowing the slate Prediction', () => {
+    expect(getDeliveredItemOrigin({}, 'missing')).toEqual({ properties: { predictionSource: 'unattributed', deliveryTier: 'UNATTRIBUTED' } });
+    expect(getDeliveredItemOrigin({}, 'toString').predictionId).toBeUndefined();
+  });
+
+  it('keeps fallback correlation local to Items actually in the fallback ranking', () => {
+    const origins = buildDeliveredItemOrigins([ranked, pending], [ranked], 'local-run', 'fallback', { pending: state(pending, true) });
+    expect(origins.ranked?.predictionId).toBe('local-run');
+    expect(origins.ranked?.properties.predictionSource).toBe('fallback');
+    expect(origins.pending?.predictionId).toBeUndefined();
+  });
+
+  it('copies caller-owned origin properties and excludes Items outside the delivered slate', () => {
+    const origin = { predictionId: 'run', properties: { predictionSource: 'hosted' as const, deliveryTier: 'RANKED' as const } };
+    const origins = { ranked: origin, other: origin };
+    rememberDeliveredSlate({ ...slate('origin-copy'), items: [ranked], origins });
+    origin.predictionId = 'changed';
+    expect(getDeliveredSlate('origin-copy')!.origins.ranked?.predictionId).toBe('run');
+    expect(getDeliveredSlate('origin-copy')!.origins.other).toBeUndefined();
   });
 });

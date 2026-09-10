@@ -1,5 +1,5 @@
 import { useItemLists } from '../lists/ItemListsContext';
-import { rememberDeliveredSlate } from './deliveredSlate';
+import { buildDeliveredItemOrigins, getDeliveredItemOrigin, rememberDeliveredSlate, type DeliveredItemOrigin } from './deliveredSlate';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -74,14 +74,18 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const isSharedDiscovery = Boolean(activeSharedMembership);
   const sharedOverlayReady =
     !isSharedDiscovery || sharedEndorsements.status === 'ready';
-  const rankedItems =
+  const rankedItems = useMemo(() =>
     isSharedDiscovery && sharedEndorsements.status === 'ready'
       ? applySharedDiscoveryOverlay(
           ranking.items,
           itemType,
           sharedEndorsements.stateByItemId,
         )
-      : ranking.items;
+      : ranking.items, [isSharedDiscovery, sharedEndorsements.status, sharedEndorsements.stateByItemId, ranking.items, itemType]);
+  const origins = useMemo(() => buildDeliveredItemOrigins(
+    rankedItems, ranking.items, ranking.predictionId, ranking.source,
+    isSharedDiscovery ? sharedEndorsements.stateByItemId : {},
+  ), [rankedItems, ranking.items, ranking.predictionId, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
   const consumedItems = getConsumedItems(ranking.items, interactions);
   const items = showConsumed
     ? consumedItems
@@ -94,8 +98,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const itemsRef = useRef<readonly Item[]>(items);
   const impressionContext = useRef<ImpressionContext>({
     mode,
-    predictionId,
-    predictionSource: ranking.source,
+    origins,
     showConsumed,
     recordEvent: eventTracking.recordEvent,
   });
@@ -103,12 +106,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   useEffect(() => {
     impressionContext.current = {
       mode,
-      predictionId,
-      predictionSource: ranking.source,
+      origins,
       showConsumed,
       recordEvent: eventTracking.recordEvent,
     };
-  }, [eventTracking.recordEvent, mode, predictionId, ranking.source, showConsumed]);
+  }, [eventTracking.recordEvent, mode, origins, showConsumed]);
 
   useEffect(() => {
     itemsRef.current = items;
@@ -168,8 +170,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         visibleItems.current,
         {
           mode,
-          predictionId,
-          predictionSource: ranking.source,
+          origins,
           showConsumed,
           recordEvent: eventTracking.recordEvent,
         },
@@ -181,28 +182,28 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     mode,
     predictionId,
     ranking.source,
+    origins,
     showConsumed,
   ]);
 
   function openItem(item: Item) {
-    const sharedState = sharedEndorsements.stateByItemId[item.id];
+    const origin = getDeliveredItemOrigin(origins, item.id);
 
     eventTracking.recordEvent({
       eventType: 'ITEM_OPENED',
       itemId: item.id,
       itemType: item.itemType,
-      predictionId,
+      ...origin,
       discoveryMode: mode,
       properties: {
         source: 'DISCOVERY_GRID',
-        predictionSource: ranking.source,
-        pendingEndorsement: Boolean(sharedState?.pendingEndorsement),
+        ...origin.properties,
       },
     });
 
     const deliveryId = eventTracking.createEventId();
     rememberDeliveredSlate({ id: deliveryId, scopeKey, sessionId: eventTracking.sessionId,
-      predictionId, source: ranking.source, mode, items });
+      predictionId, source: ranking.source, mode, items, origins });
     router.push({
       pathname: '/discovery/[itemId]',
       params: {
@@ -559,8 +560,7 @@ function ItemCard({
 
 interface ImpressionContext {
   mode: ReturnType<typeof useDiscoveryMode>['mode'];
-  predictionId: string;
-  predictionSource: ReturnType<typeof usePredictionRanking>['source'];
+  origins: Readonly<Record<string, DeliveredItemOrigin>>;
   showConsumed: boolean;
   recordEvent: ReturnType<typeof useEventTracking>['recordEvent'];
 }
@@ -572,15 +572,16 @@ function recordVisibleImpressions(
   if (context.showConsumed) return;
 
   for (const item of items) {
+    const origin = getDeliveredItemOrigin(context.origins, item.id);
     context.recordEvent({
       eventType: 'ITEM_IMPRESSION',
       itemId: item.id,
       itemType: item.itemType,
-      predictionId: context.predictionId,
+      ...origin,
       discoveryMode: context.mode,
       properties: {
         source: 'DISCOVERY_GRID',
-        predictionSource: context.predictionSource,
+        ...origin.properties,
       },
     });
   }

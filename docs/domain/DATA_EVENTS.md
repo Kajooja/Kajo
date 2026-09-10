@@ -459,3 +459,22 @@ This guard orders evidence that was successfully enqueued. It does not fabricate
 missing impressions, revise already committed unattributed receipts or prove client
 origin authenticity. Missing/already-committed late outcomes and frozen Shared
 item-specific/async origins remain separate acceptance work on the same Issue.
+
+
+### Shared per-Item origin checkpoint — #228
+
+The delivered snapshot now contains an immutable per-Item origin. `deliveryTier`
+is `RANKED`, `SHARED_PENDING` or `SHARED_MEMBER_HISTORY`; unknown origins are
+`UNATTRIBUTED`. An Item receives the delivered ranking's `predictionId` only when
+it was actually in that ranking. Shared-injected Items carry `shared_overlay`
+predictionSource and no Prediction ID. A ranked Item moved by the overlay keeps
+its original run and its Shared tier. This descriptor contains no member IDs,
+private ratings, List names or author identities.
+
+Grid open/impression and detail impression/dwell/Item/collection actions use the
+per-Item descriptor. The detail copy survives Shared changes and reranking;
+current consensus controls can still reflect live state. Dwell freezes its
+recording callback, mode and descriptor at start. Unknown undo targets cannot
+inherit the current slate's run. Server authorization and selected-candidate /
+exposure validation remain required. Remaining async/session boundary review,
+late-outcome reconciliation and representative runtime acceptance are still open.

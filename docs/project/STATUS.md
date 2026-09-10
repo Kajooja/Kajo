@@ -137,8 +137,15 @@ original sessions on restart; failed exposure storage blocks correlated dispatch
 Unrelated/non-predicted actions do not wait for this guard. CI #412 passed the prior
 `2e0c068` checkpoint; the PR owns current-head CI.
 
-Next on that branch: freeze item-specific Shared overlay provenance and remaining
-async callback origins; verify missing/already-committed exposure and late outcomes
+The fourth checkpoint freezes per-Item Shared delivery tiers with the navigation
+snapshot. Injected pending/member-history Items have no borrowed Prediction ID;
+actual ranked Items retain their run even when the overlay reorders them. Detail
+impressions, dwell and Item/collection actions use that frozen origin. Dwell keeps
+its start-time callback/mode, and undo navigation cannot borrow an unrelated run.
+Prior head `dd6d86b` passed CI #413; current validation belongs to the draft PR.
+
+Next on that branch: finish async callback/session boundary review; verify
+missing/already-committed exposure and late outcomes
 at the server boundary, then complete relevant runtime/CI acceptance. Record representative
 runtime/device checks. Do not close #228 or start 14.2 on this first checkpoint.
 
