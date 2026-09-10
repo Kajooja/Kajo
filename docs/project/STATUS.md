@@ -60,7 +60,8 @@ Hosted rollback-only calibration/import/native/edit/undo/clear/List/Memory/Share
 acceptance passed. A separate read confirmed no remaining missing initial-history
 Items and no fixture Item/Shared residue. Security findings remain unchanged.
 No whole-user-data parity claim is made; populated row preservation was rehearsed
-in the isolated tests. The owner's current test data was retained.
+in the isolated tests. Test data was retained during this rollout; the later
+owner-requested repeat reset is recorded below.
 
 Recovery if required: use the previous APK, then a separately reviewed new forward
 restoring the three old private read definitions from
@@ -76,14 +77,27 @@ Next actions:
    gates and hosted rollout are already verified. Do not repeat the deployment
    or apply the separate global-default forward.
 2. Run the focused APK follow-up in DEVICE_TEST, capturing its installed SHA:
-   existing initial history/edit/clear, Shared attribution/isolation, and OnePlus
-   picker with gesture/three-button navigation and keyboard. Do not poll builds.
+   redo initial profiling after the requested reset, then initial history/edit/clear,
+   Shared attribution/isolation, and OnePlus picker with gesture/three-button
+   navigation and keyboard. Do not poll builds.
 3. Consider merge only after required CI and owner acceptance. Keep #228/#229,
    DATA-003/004 and remaining Phase 14.1 evidence/device gates open.
 
-**Do not run another reset.** The owner-approved reset completed at
-2026-09-10 14:19:19 UTC; preserve the new test data. The invitation reveal/copy-link
-idea remains Phase 16. Historical sections below do not override this checkpoint.
+The owner explicitly requested the **same full test reset again** after the
+correction rollout, superseding the previous instruction to preserve test data.
+The reviewed second reset was committed and independently verified at
+**2026-09-10 15:54:09 UTC**: 2 accounts, 2 fresh PersonalProfiles, zero Shared groups,
+Events/interactions/bootstrap evidence/List entries/imports/receipts/Predictions/
+invitations/messages. Auth records, nicknames, catalog and 2 Personal custom List
+names were preserved. Both accounts report zero strong evidence and available,
+required calibration through the authenticated app API. Old Profile-bound replay
+is rejected; a new-Profile rating succeeds in a rolled-back probe. The retained
+operational script defaults to ROLLBACK and requires a separately reviewed scope
+digest that is deliberately omitted from version control, so the saved script
+cannot be reused accidentally. No migration or app behavior changed.
+Preserve subsequent test data unless the owner requests another reset.
+The invitation reveal/copy-link idea remains Phase 16. Historical sections below
+do not override this checkpoint.
 
 ## New product truth — 2026-09-07 / #215 / #216
 

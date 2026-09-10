@@ -1315,3 +1315,25 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - STATUS owns the exact recovery procedure and next APK checkpoint. CI #434 skipped
   APK building by design; no new APK was dispatched or polled. Draft/owner device
   acceptance and full DATA-003/004 remain open.
+
+### Owner-requested repeat test reset — 2026-09-10 / #228 / #229
+
+- After the correction rollout, the owner explicitly requested the same full
+  reset again to rerun the tests. This supersedes the earlier preservation
+  instruction; it is not a reset caused automatically by the new app version.
+- Scoped the retained operational script to the current Profile identity digest,
+  added Auth-record preservation and both accounts' real calibration-API checks,
+  rehearsed with ROLLBACK, and committed the exact reviewed transaction.
+  The published script uses a blocking placeholder instead of the private digest;
+  any future authorized use requires an independently reviewed current scope.
+- Independent verification at 15:54:09 UTC: 2 accounts, 2 new PersonalProfiles,
+  zero choices/bootstrap evidence/Events/List entries/imports/receipts/Predictions/
+  Shared groups/invitations/messages. Both accounts can start calibration again.
+  Auth/nicknames/catalog and 2 Personal custom List names survive. Old Profile-bound
+  replay is denied; a new-Profile rating succeeds only in a rolled-back probe.
+- STATUS and DEVICE_TEST now start from this second reset. Preserve subsequent
+  legitimate test data unless the owner asks again. No schema/app change, APK
+  dispatch/polling, merge or additional device acceptance in this checkpoint.
+- Validation: `npm run check` logs confirm 326 passing tests, lint/TypeScript and
+  both platform exports; hosted reset rehearsal and independent app-API checks
+  passed. The two existing duplicate-import lint warnings remain unchanged.

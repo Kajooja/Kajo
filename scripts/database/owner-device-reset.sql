@@ -1,7 +1,11 @@
--- One-time owner-authorized device reset, 2026-09-10 / #228.
+-- One-time owner-authorized repeat device reset, 2026-09-10 / #228.
 -- Default is a rehearsal: retain ROLLBACK. Execute COMMIT only after reviewing
 -- the rehearsal and exact current scope. Never include in migrations or CI reset.
 -- New PersonalProfile IDs invalidate old Profile-bound queues without a new API.
+-- The owner explicitly requested a second reset after the correction rollout.
+-- The exact pre-reset Profile identity digest prevents accidental reuse.
+-- Keep the reviewed digest out of version control; supply it only in the
+-- explicitly authorized operational copy after inspecting the current scope.
 begin;
 set local lock_timeout='5s';
 set local statement_timeout='30s';
@@ -9,6 +13,7 @@ lock table public.users, public.profiles in share row exclusive mode;
 do $reset$
 declare
   personal jsonb; personal_lists jsonb; old_ids uuid[]; saved_users jsonb; catalog_hash text;
+  auth_hash text;
   row jsonb; replacement uuid; actor uuid; item uuid; cmd jsonb; old_cmd jsonb;
   result jsonb; old_profile uuid;
 begin
@@ -17,11 +22,16 @@ begin
     or (select count(*) from public.profiles where profile_type='SHARED')<>1 then
     raise exception 'Reset scope changed or reset already executed; review before proceeding';
   end if;
+  if (select md5(string_agg(id::text||':'||profile_type::text||':'||coalesce(owner_user_id::text,''),',' order by id))
+      from public.profiles) is distinct from 'REVIEWED_SCOPE_DIGEST_REQUIRED' then
+    raise exception 'Profile identity scope changed; this reviewed reset cannot be reused';
+  end if;
   if exists(select 1 from private.policy_assignments where scope_type='PROFILE')
     or exists(select 1 from private.genome_evaluations) then
     raise exception 'Learned policy/evaluation state requires a separate reset review';
   end if;
   select jsonb_agg(to_jsonb(u) order by id) into saved_users from public.users u;
+  select md5(string_agg(md5(to_jsonb(u)::text),'' order by id)) into auth_hash from auth.users u;
   select md5(string_agg(md5(to_jsonb(i)::text),'' order by id)) into catalog_hash from public.items i;
   select array_agg(id) into old_ids from public.profiles;
   select jsonb_agg(jsonb_build_object('owner',owner_user_id,'name',name)) into personal
@@ -75,8 +85,21 @@ begin
   if jsonb_array_length(personal_lists)<>(select count(*) from public.item_lists where list_kind='CUSTOM') then
     raise exception 'Personal List names were not preserved'; end if;
   if saved_users is distinct from (select jsonb_agg(to_jsonb(u) order by id) from public.users u)
+    or auth_hash is distinct from (select md5(string_agg(md5(to_jsonb(u)::text),'' order by id)) from auth.users u)
     or catalog_hash is distinct from (select md5(string_agg(md5(to_jsonb(i)::text),'' order by id)) from public.items i) then
     raise exception 'Reset changed accounts or catalog'; end if;
+  -- Both accounts must be able to start calibration again through the app API.
+  for row in select jsonb_build_object('id',id,'owner',owner_user_id) from public.profiles loop
+    perform set_config('request.jwt.claim.sub',row->>'owner',true);
+    perform set_config('role','authenticated',true);
+    result:=public.get_profile_bootstrap_status_v1((row->>'id')::uuid);
+    if result->>'needsCalibration' is distinct from 'true'
+      or result->>'calibrationAvailable' is distinct from 'true'
+      or result->>'strongEvidenceCount' is distinct from '0' then
+      raise exception 'New PersonalProfile is not ready for fresh calibration';
+    end if;
+    perform set_config('role','postgres',true);
+  end loop;
   -- Prove that a real previously stored envelope cannot replay into a new Profile.
   actor:=(old_cmd->>'actorUserId')::uuid; old_profile:=(old_cmd->>'profileId')::uuid;
   perform set_config('request.jwt.claim.sub',actor::text,true);

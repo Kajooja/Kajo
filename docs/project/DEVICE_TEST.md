@@ -16,7 +16,8 @@ Status: **owner results recorded; corrections implemented, follow-up acceptance 
   CI #434 / run 34496017165 jobs passed. Later filename/docs changes retain its
   app code. This PR CI run did not build an APK; use the manual workflow below.
 - Hydration forward `20260910153737_bootstrap_history_projection` is deployed;
-  hosted behavior and access checks passed. No repeat deployment/reset needed.
+  hosted behavior and access checks passed. No repeat deployment needed; the
+  owner's subsequent repeat reset is recorded below.
 - Hosted history-clear migration: `20260910134428_clear_consumed_history`, verified.
 - Select **Actions → CI → Run workflow**, choose
   **feat/228-delivered-origin** and run it once. Download the artifact
@@ -29,12 +30,18 @@ Status: **owner results recorded; corrections implemented, follow-up acceptance 
 
 ## Reset prerequisite
 
-`scripts/database/owner-device-reset.sql` is a one-time operational script, not a
-migration. After explicit owner approval, its reviewed transaction was executed
-with final COMMIT. Separate verification at **2026-09-10 14:19:19 UTC** confirmed
-2 accounts, 2 fresh PersonalProfiles and zero Shared groups, Events, interactions,
-List entries, imports, receipts and Predictions. **Do not execute the reset again.**
-The retained script defaults to ROLLBACK and rejects the now-changed reset scope.
+`scripts/database/owner-device-reset.sql` is a scoped operational script, not a
+migration. The first explicitly approved reset was verified at 14:19:19 UTC.
+After the correction rollout the owner explicitly requested the same full reset
+again to repeat testing. The second reviewed transaction was rehearsed with
+ROLLBACK, then executed with final COMMIT. Separate verification at
+**2026-09-10 15:54:09 UTC** confirmed 2 accounts, 2 fresh PersonalProfiles and zero
+Shared groups, Events, interactions, bootstrap evidence, List entries, imports,
+receipts, Predictions, invitations and messages. Both authenticated app API checks
+report available/required calibration with zero strong evidence.
+The retained script defaults to ROLLBACK and requires a separately reviewed scope
+digest, deliberately omitted from version control; the saved script cannot run.
+Preserve subsequent test data unless the owner explicitly requests another reset.
 
 Auth/accounts/nicknames, catalog and Personal custom List names were preserved.
 PersonalProfile IDs were replaced; old choices/history/import evidence and group
@@ -109,12 +116,16 @@ Next regression focus: picker bottom clearance with gesture and three-button
 navigation; initial-profile ratings visible/editable/removable in history; equivalent
 initial-profile evidence respected in Shared eligibility. Preserve the explicit
 attributed member-history tier where intended rather than blindly hiding every
-member-rated Item. Record which tier the reported cards use. Do not reset the
-new test data again: it is useful evidence for reproducing these defects.
+member-rated Item. Record which tier the reported cards use. At this feedback
+checkpoint the owner asked to preserve test data for reproduction; the later
+explicit repeat-reset request above supersedes that instruction.
 
 ## Focused follow-up after correction rollout
 
-Use existing test data; no reset or forced repeat of profiling is needed.
+The owner-requested repeat reset is complete. Fully restart the app, sign out/in
+if needed, and complete initial profiling again. Recreate a Shared group with the
+second account for the Shared cases. This reset does not change the current
+six-known-rating completion rule or implement the planned longer Taste flow.
 
 1. Open Luetut/Katsotut: initial ratings now appear alongside native ratings.
    Open an initial Item from history and from a named List; both show the same
