@@ -237,6 +237,16 @@ Required trace dimensions include predictionId, profileId, actorUserId, sessionI
 
 Fallback correlation IDs cannot pretend a hosted PredictionRun exists.
 
+The prepared frozen-replay forward (`20260910202244_frozen_prediction_replay.sql`)
+stores unrounded, versioned scoring features and pre-cap resurfacing decisions on
+new candidate traces. Serving and shadow use the same frozen Scenario/common-fit
+inputs and recorded genome; replay creates no Events and never rewrites original
+predictions. `shadow-replay-v2` comparisons are explicitly conditional on the
+frozen source pool. Legacy traces lacking precise inputs are not reconstructed;
+queued legacy jobs fail diagnostically and new evaluations exclude incompatible
+old shadows. Historical evaluations remain intact. Full calculation and version
+ownership is in `PREDICTION_MODEL.md`; hosted rollout is still pending.
+
 ## 9. Evidence classes
 
 | Class | Examples | Interpretation |

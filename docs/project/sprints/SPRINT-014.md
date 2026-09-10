@@ -1544,3 +1544,59 @@ the native CLI late-outcome serving/evaluation and populated-forward probes.
 That forward's tested SQL/hash is unchanged and still undeployed. Continue its
 own reviewed hosted rollout plus remaining Phase 14.1 device recovery gates
 before Phase 14.2. No merge, automatic APK action or distant feature work occurred.
+
+### Frozen serving/shadow replay while APK acceptance is deferred — 2026-09-10
+
+The owner explicitly deferred the Personal Add/latency APK regression and asked
+continued development. Required client CI is now verified on
+`1102d92e25ac973909b073fdcdaa8f2cdc9fcf22`,
+[run 34524399404](https://github.com/Kajooja/Kajo/actions/runs/34524399404), all five
+jobs successful. No APK dispatch/poll, reset, hosted mutation or merge occurred.
+This checkpoint prepares the independent Phase 14.2 correctness slice; Phase 14.1
+rollout and physical recovery gates remain open, and neither phase is accepted.
+
+The full-schema reproduction gave the baseline Shared candidate −1.0406 in
+serving and 0.1 in shadow because common-fit was omitted. Shadow also scored from
+rounded display features and ignored resurfacing eligibility/tier ordering. The
+CLI-generated forward `20260910202244_frozen_prediction_replay.sql` (SHA-256
+`4ff3feab61d522d4763a63c23c7da8454d32322c7326c5b833b4db52f768dd7a`)
+adds three private pure helpers and replaces five installed bodies with guarded
+anchors. It changes no table data, existing identities/ACLs or immutable genomes.
+The baseline generator, assigned scalar scorer, final serving and shadow share
+full-precision scoring, including frozen Scenario/common-fit inputs. The run's
+recorded genome controls both scalar and Scenario weights. Shared reminder-cap
+and delivery-tier helpers preserve ordinary-before-reminder order and suppress
+ineligible cards. The challenger recalculates its reminder choice from frozen
+pre-cap input and its scalar weights.
+
+Versioning is explicit: new raw inputs `prediction-features-v2`, serving policy
+`+frozen-replay-v2`, shadow/evaluation `shadow-replay-v2`, comparison scope
+`FROZEN_SOURCE_POOL`. Original traces/evaluations remain intact; pending legacy
+jobs fail diagnostically and new comparisons exclude incompatible old shadows.
+They are never reconstructed from later catalog/taste/member state. No automatic
+promotion or accuracy claim is introduced.
+
+The new full-schema `frozen-replay-smoke.sql` checks 18 Personal/Shared × three
+modes × three page sizes with exact score/rank/policy/selection equality, nonzero
+Scenario/common-fit, raw precision boundaries, deterministic ties, suppression,
+one-reminder cap, an actual challenger reminder flip and later-state isolation.
+An independent accepted-formula check uses 1e-12 arithmetic tolerance. The
+`frozen-replay-upgrade.mjs` rehearsal preserves populated data, durable receipts,
+old frozen shadows/evaluations, raw baseline scores across modes and all existing
+function identities/ACLs/unrelated bodies. It verifies closed helper access even
+with open creator defaults, diagnostic legacy-job failure and exclusion from a
+new evaluation. A divergent source anchor rolls back all changes. Both probes
+are wired into required native CLI CI; the prior late-attribution smoke accepts
+its version token with the added replay suffix.
+
+Repository gate: `EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **348 tests**
+(270 mobile, 14 catalog, 64 database), clean lint/TypeScript and both platform
+exports. New-head native CLI CI and the separate hosted rollout remain open gates.
+There is no local Docker, emulator or phone. Hosted remains on multi-destination
+`20260910190243`; the unchanged late-outcome forward must precede this new forward.
+
+Next source work is the bounded baseline-top-50 starvation/eligibility/refill
+reproduction and correction (`MVP-ALG-003`). This slice only proves parity on the
+frozen source pool; empty/refilled pools, zero-result worker behavior and rollout
+acceptance keep `MVP-ALG-002` open. Preserve Phase 14.1 recovery gates, the deferred
+APK cases and the same draft #228/#229 handoff.

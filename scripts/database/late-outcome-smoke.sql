@@ -104,7 +104,7 @@ begin
       raise exception 'Zero rating did not have a negative Scenario reward';
     end if;
     if (select policy_version from private.prediction_runs where id=ranked.prediction_id)
-      not like '%+outcome-attribution-v1' then raise exception 'Missing serving attribution version'; end if;
+      not like '%+outcome-attribution-v1%' then raise exception 'Missing serving attribution version'; end if;
     window_id := gen_random_uuid();
     insert into private.evaluation_windows(id,window_key,prediction_from,prediction_until,input_cutoff,outcome_cutoff,created_by)
       values(window_id,window_id::text,started-interval '1 hour',started+interval '1 hour',

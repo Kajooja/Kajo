@@ -1,7 +1,9 @@
 # Collection device checkpoint — #228 / #229
 
-Status: **owner reports multi-List flow otherwise good; Personal confirmation/latency correction prepared for the next APK**.
+Status: **owner reports multi-List flow otherwise good; Personal confirmation/latency APK regression explicitly deferred on 2026-09-10 while development continues**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
+The client correction at `1102d92` passed all required CI checks. The cases below
+remain open until the owner resumes testing and supplies the actual artifact SHA.
 
 ## Version and build
 

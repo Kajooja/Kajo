@@ -7,7 +7,54 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
-## Immediate continuation checkpoint — 2026-09-10 / Personal Add and latency
+## Immediate continuation checkpoint — 2026-09-10 / frozen replay parity
+
+Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted
+main remains `6dd1fec`. The owner explicitly deferred the Personal Add/latency APK
+test and asked development to continue. This authorizes an independent Phase 14.2
+source correction while the Phase 14.1 hosted/device gates remain open; it does
+not accept either phase or the deferred APK. No account reset or APK action.
+
+The complete-schema baseline control reproduced Shared serving score **−1.0406**
+versus shadow **0.1**: shadow omitted common-fit, used rounded taste features and
+ignored resurfacing order/selection. The new, **undeployed** forward
+`20260910202244_frozen_prediction_replay.sql` introduces three private pure helpers
+and replaces five existing bodies. Candidate generation, assigned scalar scoring,
+final serving and shadow share full-precision `prediction-features-v2` scoring.
+The run's recorded genome also supplies its scalar and Scenario weights.
+Frozen pre-cap eligibility drives the same ordinary/reminder/suppressed ordering,
+one-reminder cap and selected predicate. Shadow replays its own reminder choice.
+
+New shadow/evaluation metadata identifies `shadow-replay-v2` and the explicit
+`FROZEN_SOURCE_POOL` comparison scope. Old traces/genomes/evaluations are unchanged;
+queued legacy inputs fail with a diagnostic, and new evaluations exclude the
+incompatible old shadow version. No historical features are reconstructed from
+current catalog, taste or membership. This is conditional parity on the frozen
+pool, not full candidate-generation or recommendation-quality acceptance.
+
+Full-schema acceptance covers 18 Personal/Shared × mode × page-size controls,
+nonzero Scenario/common-fit, exact scores/ranks/selected sets, precision/ties,
+suppression, a challenger reminder flip and later-state isolation. The populated
+forward preserves raw baseline scores, data/receipts/frozen results, old function
+identities/ACLs and unrelated bodies; divergent source rolls back all changes.
+Both probes are wired into required native CLI CI. `npm run check` passes
+**348 tests** (270 mobile, 14 catalog, 64 database), lint/TypeScript and both
+platform exports. Required CI for this new source remains to be verified.
+
+The preceding client head `1102d92e25ac973909b073fdcdaa8f2cdc9fcf22` passed all five
+required jobs in [CI](https://github.com/Kajooja/Kajo/actions/runs/34524399404).
+Its owner-started APK regression is explicitly deferred. Hosted remains on
+`20260910190243_shared_list_destinations`; late Outcome attribution and this replay
+forward both remain undeployed, in that dependency order.
+
+**Next action:** verify required CI for the published replay source, then continue
+the bounded candidate-pool/starvation/refill part of Phase 14.2 (`MVP-ALG-003`) with
+a reproducible suppressed-top-50 case. Keep `MVP-ALG-002` open for empty/refilled
+pools and rollout acceptance. Retain separately reviewed hosted rollout and
+Phase 14.1 process-death/reconnect/account-switch gates; resume the deferred
+Personal two-List APK cases when the owner returns. Keep PR draft.
+
+## Personal Add and latency checkpoint — 2026-09-10
 
 Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted
 main remains `6dd1fec`. The owner completed the next APK test and reports the flow
@@ -41,12 +88,10 @@ all five required checks in [CI](https://github.com/Kajooja/Kajo/actions/runs/34
 including native CLI serving/evaluation and populated upgrade acceptance. Its
 late-outcome forward below remains **undeployed**, separate from this client fix.
 
-**Next action:** finish required CI for the new client head, then the owner starts
-the next manual branch APK and checks Personal two-List Add → next card,
-responsiveness/progress, optional message/recovery and unchanged Shared consent.
-Do not dispatch/poll the APK or reset existing data. Continue Phase 14.1 with the
-separately reviewed late-outcome hosted rollout and representative process-death/
-reconnect/account-switch acceptance; Phase 14.2 follows those gates. Keep PR draft.
+CI subsequently passed on `1102d92`; the owner then deferred this APK regression.
+Personal two-List Add → next card, responsiveness/progress, optional message/
+recovery and Shared consent remain the next focused device cases. The current
+continuation and unchanged phase-acceptance gates are recorded above.
 
 ## Late Outcome checkpoint — 2026-09-10 / preceding APK continuation
 

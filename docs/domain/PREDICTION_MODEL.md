@@ -957,7 +957,7 @@ Known V1 limits:
 
 ## 18. Required MVP algorithm completion contract
 
-Status: **required target; partial implementation, acceptance open as of 2026-09-09**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy).
+Status: **required target; partial implementation, acceptance open as of 2026-09-10**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy).
 
 ### One feature and policy definition
 
@@ -966,6 +966,50 @@ Serving, memory snapshots and SleepLayer must agree on source-tagged evidence an
 Reuse canonical feature calculation and pure scoring/policy helpers rather than independently reproducing formulas in baseline, snapshots, Shared fit and shadow. Eligibility and Shared collaboration delivery remain explicit policy, distinct from taste score, but both must be faithfully replayable. Freeze feature/schema/policy versions and candidate features at prediction time; current mutable catalog tags cannot silently replace historical features.
 
 A baseline shadow must match Personal and Shared production eligibility, final order and selected Items exactly; declare score tolerance for rounding. Tests cover common-fit, reminder tiers, suppression, ties and empty/refilled pools. A score-only match is insufficient.
+
+### Frozen replay parity checkpoint — #228, prepared / not hosted
+
+The forward `20260910202244_frozen_prediction_replay.sql` unifies candidate and
+final scoring in the pure private `prediction_candidate_score_v2` helper. New V0
+candidate explanations carry `scoringFeatures.version = prediction-features-v2`
+with unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty,
+exploration and both penalty inputs. Rounded top-level display fields remain
+compatible. The accepted raw baseline weights/scores are preserved. Scalar and
+Scenario weights use the same immutable genome recorded on the PredictionRun.
+Final scoring adds the stored raw Scenario score with its genome weight and the
+frozen aggregate Shared common-fit contribution. Personal common-fit stays zero.
+
+New candidate traces also retain `resurfacingInput` before the reminder cap.
+Serving and shadow reuse `finalize_resurfacing_policy_v1` and
+`prediction_delivery_tier_v1`: ordinary eligible Items precede the one eligible
+saved reminder, then suppressed Items; score descends within each tier and exact
+ties use Item id. Each genome chooses its reminder by scalar score before
+Scenario/common-fit, so replay can select a different reminder. Suppressed Items
+can remain in the trace but never satisfy the selected predicate.
+
+The worker uses frozen inputs only. New shadows record code `shadow-replay-v2`,
+feature `prediction-features-v2` and `comparisonScope = FROZEN_SOURCE_POOL`; serving
+policy appends `+frozen-replay-v2`. The preceding attribution forward retains
+`+outcome-attribution-v1`. Immutable genome configuration versions remain their
+original registry values; worker metadata identifies the actual replay code and
+input schema separately. Old traces and evaluations are never rewritten. Queued
+pre-v2 sources fail with an unsupported-input diagnostic rather than reconstructing
+features from mutable data. New evaluations accept only compatible v2 shadows
+and record the replay version/scope, including the no-comparable-outcomes result.
+
+Full-schema controls require **exact double-precision score equality**, exact
+rank/selection and policy equality for 18 Personal/Shared × mode × page-size
+cases. An independent accepted-formula check allows `1e-12` arithmetic tolerance.
+Coverage includes real Scenario and common-fit signals, rounding boundaries,
+ties, suppression, reminder re-selection and later catalog/taste/member changes.
+Populated upgrade checks preserve old raw baseline scores and all historical
+data/function boundaries. Native CI and hosted rollout remain separate gates.
+
+This comparison is conditional on the frozen source pool and actual source result
+count. It does not establish parity with a challenger's independently generated
+live pool. The fixed baseline top-50, truncation/refill and zero-result worker
+contract remain open under `MVP-ALG-002..003`; no promotion or measured quality
+claim follows from this correction.
 
 ### Candidate generation and delivery
 
