@@ -264,11 +264,10 @@ the in-progress message/create draft. Shared proposal flow is unchanged. The com
 reuse DiscoveryItemCard, show rating badges (including zero), dates and Shared
 provenance, and expose Ruudukko / Kortit controls. Images/cells are virtualized in
 bounded batches; card browsing keeps the loaded collection. The history-clear server candidate is implemented and tested locally; its mobile
-command/UI wiring, hosted rollout and final retry UX remain pending; the new UI needs device validation. Reset remains scheduled for the
+command/UI wiring is now implemented; hosted rollout and final retry UX remain pending; the new UI needs device validation. Reset remains scheduled for the
 next test checkpoint, not this partial delivery.
 
-Next: wire CLEAR_HISTORY into the durable mobile command path and history UI,
-review/apply its hosted forward migration, then complete refresh UX, authorized data reset
+Next: review/apply the history-clear hosted forward migration, then complete refresh UX, authorized data reset
 and a combined device test. Keep #228/#229 and DATA-003/004 open and the PR draft.
 
 Publication approval: the owner explicitly approved publishing this Personal
@@ -280,7 +279,7 @@ work and test/reset ordering are listed above.
 The owner explicitly approved publication of the subsequent common collection
 grid/card code and documentation to this same public repository, branch and PR.
 The grid/card publication approval boundary is resolved. Continue with the
-history-clear mobile wiring/hosted rollout and the remaining refresh/reset/device sequence
+history-clear hosted rollout and the remaining refresh/reset/device sequence
 above; no new APK or data reset was performed at this publication checkpoint.
 
 History-clear server checkpoint (2026-09-10): candidate forward
@@ -296,10 +295,26 @@ No hosted migration, user/group reset or APK was performed in this checkpoint.
 The owner explicitly approved publication of this history-clear server candidate,
 Event contract, regression/CI wiring and canonical documentation to public
 `Kajooja/Kajo`, branch `feat/228-delivered-origin`, draft PR #229. This resolves
-the earlier automatic-review publication boundary. Next work remains mobile
-command/UI wiring and reviewed hosted rollout, followed by refresh/reset/device
+the earlier automatic-review publication boundary. Mobile command/UI wiring is now implemented. Next work is reviewed hosted rollout,
+followed by refresh/reset/device
 acceptance in the order above.
 
+
+History-clear mobile checkpoint: Luetut/Katsotut exposes Poista historiasta through
+the existing durable collection queue, with no borrowed Prediction or DiscoveryMode.
+The collection reloads after acknowledgement; duplicate taps are locked.
+Profile/Event-session keyed content ignores stale completion feedback after a switch
+or unmount. A malformed receipt retaining rating/consumed state is rejected.
+Regression coverage includes offline persistence/restart with the exact command
+and receipt validation. Full `npm run check` passed 325 tests (250 mobile,
+14 catalog, 61 database), lint/TypeScript and both platform exports (exit 0). Hosted rollout, native CI and real-device acceptance remain
+pending; do not start the combined APK checkpoint before rollout and remaining UX.
+
+The owner explicitly approved publication of this mobile history-clear checkpoint
+(command/UI/test and canonical documentation) to public `Kajooja/Kajo`, branch
+`feat/228-delivered-origin`, draft PR #229. This resolves the earlier automatic
+publication-review boundary. Hosted rollout remains the next task, followed by
+remaining refresh UX and the authorized reset/combined device checkpoint.
 
 Continue **14.1** after this delivery:
 

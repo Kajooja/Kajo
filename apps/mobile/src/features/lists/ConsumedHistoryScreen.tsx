@@ -1,7 +1,8 @@
+import { useEventTracking } from '../events/EventTrackingContext';
 import { CollectionGrid } from './CollectionGrid';
 import { formatListEntryDate } from './listPresentation';
 import { EMPTY_ITEM_INTERACTION } from '../discovery/itemInteraction';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -24,12 +25,18 @@ import { useItemInteractions } from '../discovery/ItemInteractionContext';
 import type { ConsumedItem } from './itemListOperations';
 
 export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
+  const { scopeKey } = useItemLists();
+  const { sessionId } = useEventTracking();
+  return <ConsumedHistoryContent key={`${scopeKey}:${sessionId}:${itemType}`} itemType={itemType} />;
+}
+
+function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadConsumed } = itemLists;
   const openCollectionItem = useCollectionNavigation();
-  const { interactions } = useItemInteractions();
+  const { interactions, submitCollectionAction } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const [snapshot, setSnapshot] = useState<{
@@ -38,6 +45,30 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
     error: string | null;
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [clearing, setClearing] = useState<string | null>(null);
+  const [clearError, setClearError] = useState<string | null>(null);
+  const clearingRef = useRef(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  const clearHistory = async (itemId: string) => {
+    if (clearingRef.current) return;
+    clearingRef.current = true;
+    setClearing(itemId);
+    setClearError(null);
+    try {
+      const result = await submitCollectionAction({ kind: 'CLEAR_HISTORY', itemId }, 'LIST_DETAIL');
+      if (!active.current) return;
+      if (result.status === 'error') setClearError(result.message);
+      else setAttempt(current => current + 1);
+    } catch {
+      if (active.current) setClearError('Poiston tilaa ei voitu varmistaa. Päivitä näkymä vetämällä alaspäin.');
+    } finally {
+      if (active.current) { clearingRef.current = false; setClearing(null); }
+    }
+  };
   const requestKey = `${itemLists.scopeKey}:${itemType}:${itemLists.revision}:${attempt}`;
   const loading = snapshot?.key !== requestKey;
   const error = snapshot?.key === requestKey ? snapshot.error : null;
@@ -63,6 +94,12 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
         entries={items.map(entry => ({ item: entry.item, caption: formatListEntryDate(entry.updatedAt),
           interaction: { ...EMPTY_ITEM_INTERACTION, saved: entry.saved, consumed: entry.consumed, rating: entry.rating } }))}
         onOpen={item => openCollectionItem(item, items.map(entry => entry.item), title)}
+        renderActions={item => <Pressable accessibilityRole="button"
+          accessibilityLabel={`Poista historiasta: ${item.title}`}
+          accessibilityState={{ disabled: clearing !== null }} disabled={clearing !== null}
+          onPress={() => { void clearHistory(item.id); }} style={{ paddingVertical: 12 }}>
+          <Text style={styles.link}>{clearing === item.id ? 'Poistetaan…' : 'Poista historiasta'}</Text>
+        </Pressable>}
         header={<View style={styles.content}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
@@ -74,6 +111,8 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
           </View>
         </View>
 
+        <Text style={styles.help}>Historiasta poistaminen poistaa arvosanan ja luettu-/katsottu-merkinnän. Tallennukset listoille säilyvät.</Text>
+        {clearError ? <Text accessibilityRole="alert" style={styles.error}>{clearError}</Text> : null}
         {loading ? <ActivityIndicator color={theme.base.textMuted} /> : null}
         {error ? (
           <View style={styles.notice}>
@@ -104,6 +143,7 @@ function createStyles(theme: RoomTheme) {
     notice: { gap: 6 },
     error: { color: '#f2a6a6', fontSize: 13 },
     link: { color: theme.ambient.curtainHighlight, fontWeight: '700' },
+    help: { color: theme.base.textMuted, fontSize: 12 },
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
   });
 }

@@ -68,6 +68,31 @@ describe('atomic collection service and shared durable queue', () => {
       present: true, positive: true }) }, scope)).toBe(false);
   });
 
+  it('persists history clear across restart and accepts only a fully cleared uncorrelated receipt', async () => {
+    vi.useFakeTimers();
+    const c: CollectionActionCommand = { ...command(25, { kind: 'CLEAR_HISTORY', itemId: id(6) }),
+      source: 'LIST_DETAIL', predictionId: null, discoveryMode: null };
+    expect(isPendingProfileAction({ command: c }, scope)).toBe(true);
+    expect(isPendingProfileAction({ command: { ...c, predictionId: id(4) } }, scope)).toBe(false);
+    expect(isPendingProfileAction({ command: c }, { ...scope, profileId: id(99) })).toBe(false);
+    const store = storage();
+    const first = setup(store, async () => ({ status: 'error', retryable: true, message: 'offline' }));
+    first.queue.enqueue({ command: c }); await first.queue.waitForIdle(); first.queue.stop();
+    const ack: CollectionActionReceipt = { ...receipt(c), listId: null };
+    const rpc = vi.fn(async () => ({ data: ack, error: null }));
+    const send = createProfileActionSender(client(rpc));
+    const restarted = setup(store, send); await restarted.queue.waitForIdle();
+    expect(rpc).toHaveBeenCalledExactlyOnceWith('commit_collection_action_v1', { request: c });
+    expect(restarted.queue.pending()).toEqual([]);
+    expect(restarted.onCommitted).toHaveBeenCalled();
+    for (const invalid of [{ undoable: true }, { listId: id(5) }, { predictionId: id(4) },
+      { interaction: { ...EMPTY_ITEM_INTERACTION, rating: 8 } },
+      { interaction: { ...EMPTY_ITEM_INTERACTION, consumed: true } }]) {
+      rpc.mockResolvedValueOnce({ data: { ...ack, ...invalid }, error: null });
+      expect(await send(c)).toMatchObject({ status: 'error', retryable: false });
+    }
+  });
+
   it('uses only the atomic RPC and validates metadata acknowledgements including their List/Profile', async () => {
     const c = command();
     const rpc = vi.fn(async () => ({ data: receipt(c), error: null }));

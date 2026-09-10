@@ -1185,3 +1185,17 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 - Validation: full `npm run check` passed all 324 tests, lint/TypeScript and
   both platform exports (exit 0). Native CLI acceptance is wired for CI but was
   not executed locally; no device/emulator was available.
+
+
+### History-clear mobile wiring — 2026-09-10 / #228 / #229
+
+- Luetut/Katsotut grid exposes Poista historiasta through the existing durable
+  collection action queue. Saved lists remain independent; copy explains this.
+- Synchronous duplicate-tap guard, acknowledgement-driven refresh and content
+  keyed by Profile/Event session protect against stale completion feedback.
+- Command/receipt validation requires uncorrelated, fully cleared history state.
+  Offline/restart regression verifies the exact persisted command reaches the RPC.
+- Next: reviewed hosted history-clear rollout, final refresh UX, then authorized
+  choice/group reset and combined device checkpoint. No hosted writes/reset/APK here.
+- Validation: `npm run check` passed 325 tests, lint/TypeScript and both platform
+  exports (exit 0). Phone/emulator interaction remains untested.

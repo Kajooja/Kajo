@@ -117,4 +117,6 @@ History-clear server candidate: `supabase/migrations/20260910130156_clear_consum
 extends the existing atomic collection command and Event constraint, preserving
 function identity/ACLs. `scripts/database/history-clear-smoke.sql` exercises the
 public RPC and actual Memory cancellation; it runs in the full-schema PGlite test
-and required native CLI CI. Hosted rollout and mobile command/UI wiring are pending.
+and required native CLI CI. ConsumedHistoryScreen submits CLEAR_HISTORY through collectionActions and the
+existing durable queue; the content is keyed by Profile/session/Item type and
+reloads after acknowledgement. Hosted rollout and device acceptance are pending.

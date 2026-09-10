@@ -10,6 +10,7 @@ import {
 import { createItemActionSender, type ItemActionResult } from './itemActionPersistence';
 
 export type CollectionActionIntent =
+  | { kind: 'CLEAR_HISTORY'; itemId: string }
   | { kind: 'CREATE_LIST'; itemId: null; name: string }
   | { kind: 'RENAME_LIST'; itemId: null; listId: string; name: string }
   | { kind: 'DELETE_LIST'; itemId: null; listId: string }
@@ -78,7 +79,7 @@ export function createCollectionMutationRpc(submit: SubmitCollectionAction, prof
 
 export function isCollectionCommand(command: { kind: string }): command is CollectionActionCommand {
   return ['CREATE_LIST', 'RENAME_LIST', 'DELETE_LIST', 'SET_LIST_ENTRY', 'UNDO_LIST_ENTRY',
-    'ENDORSE_SHARED_ITEM', 'REVERSE_ENDORSEMENT'].includes(command.kind);
+    'ENDORSE_SHARED_ITEM', 'REVERSE_ENDORSEMENT', 'CLEAR_HISTORY'].includes(command.kind);
 }
 
 export function isPendingProfileAction(value: unknown, scope: ItemActionScope): value is PendingProfileAction {
@@ -95,6 +96,8 @@ export function isPendingProfileAction(value: unknown, scope: ItemActionScope): 
     || !['LISTS', 'LIST_DETAIL', 'ITEM_DESTINATION_PICKER', 'SHARED_DISCOVERY'].includes(String(c.source))) return false;
   const validName = typeof c.name === 'string' && validateItemListName(c.name).status === 'valid';
   switch (c.kind) {
+    case 'CLEAR_HISTORY': return isUuid(c.itemId) && c.predictionId === null && c.discoveryMode === null
+      && (c.listId === undefined || c.listId === null);
     case 'CREATE_LIST': return c.itemId === null && validName;
     case 'RENAME_LIST': return c.itemId === null && isUuid(c.listId) && validName;
     case 'DELETE_LIST': return c.itemId === null && isUuid(c.listId);
@@ -149,6 +152,9 @@ function validReceipt(data: unknown, command: CollectionActionCommand): data is 
         && row.actor_user_id === command.actorUserId && typeof row.endorsement_reversed === 'boolean'
         && Number.isInteger(row.endorsement_count) && (row.endorsement_count as number) >= 0;
     }
+    case 'CLEAR_HISTORY': return data.result === true && data.listId === null
+      && data.predictionId === null && data.discoveryMode === null
+      && isItemInteraction(data.interaction) && data.interaction.rating === null && !data.interaction.consumed;
     case 'SET_LIST_ENTRY': return data.result === command.present;
     case 'DELETE_LIST':
     case 'UNDO_LIST_ENTRY': return data.result === true;
