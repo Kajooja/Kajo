@@ -7,6 +7,39 @@ Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemor
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
 
+## Resume checkpoint — bounded pause, 2026-09-11
+
+Owner explicitly approved publication of the two-file JSON-probe correction and
+this handoff to `Kajooja/Kajo`, `feat/228-delivered-origin`, PR #229 after automatic
+review initially blocked it. This checkpoint is the approved bounded follow-up;
+resume with CI verification below, not another approval request for this upload.
+
+Owner requested a small work unit and a resumable stop before token exhaustion.
+Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228. Source
+`9b65cca` contains the completed private frozen-window cache; no public next-page
+RPC or client activation exists yet. Keep all five forwards undeployed and preserve
+current hosted/test data. Do not launch or poll an APK now.
+
+CI run 34575684407 on `91d07ee` finished with four passed required jobs and the
+CLI/native-race job failed with **Unexpected end of JSON input**. Inspection found
+that the new lock-observation SQL emitted a bare PostgreSQL boolean (`t`/`f`) into
+an adapter that parses every output line as JSON. This follow-up wraps that EXISTS
+result in `to_jsonb`, preserving the lock assertion while fixing the output type.
+Both true/false JSON text representations were checked locally. Full
+`EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with 377 tests, lint/TypeScript and
+both platform exports. Native retry/race
+acceptance remains open until the corrected source passes CI. Run 34576586302 on
+`9b65cca` was still running when inspected and contains the same pre-fix query.
+
+Next small unit: inspect the corrected head's required CI and diagnose any remaining
+failure before claiming native acceptance. Then implement **atomic next-page
+commit** from `prediction_continuation_windows`: exact request scope/cursor and
+current eligibility checks, no repeated seen Items, immutable per-page run/ranks,
+receipt retry and page-aware frozen/shadow replay. Keep the first-page capability
+false until that complete boundary passes. After reviewed rollout, connect the
+prepared client and schedule a useful device test. Do not start a broad refactor
+or repeat already completed foundation work merely to reconstruct chat context.
+
 ## Latest owner feedback — 2026-09-11
 
 Owner reports all exercised tests appear to work. DEVICE_TEST.md records this

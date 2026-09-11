@@ -23,8 +23,8 @@ export async function verifyPredictionPageConcurrency(exec) {
     ${hold ? 'do $$ begin perform pg_sleep(3); end $$;' : ''} commit;`;
   const waitForLock = async (name, granted) => {
     for (let attempt=0; attempt<40; attempt++) {
-      const [found] = await exec(`select exists(select 1 from pg_locks l join pg_stat_activity a on a.pid=l.pid
-        where a.application_name='${name}' and l.locktype='advisory' and l.granted=${granted});`);
+      const [found] = await exec(`select to_jsonb(exists(select 1 from pg_locks l join pg_stat_activity a on a.pid=l.pid
+        where a.application_name='${name}' and l.locktype='advisory' and l.granted=${granted}));`);
       if (found) return;
       await delay(50);
     }
