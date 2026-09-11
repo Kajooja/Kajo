@@ -1127,8 +1127,12 @@ later catalog changes do not rewrite retries. Receipts cascade with their actor,
 Profile or PredictionRun; a time-based receipt retention policy is not yet added.
 
 This source packet does not switch mobile readers or implement continuation
-windows/cursors. Real multi-connection concurrency, native migration acceptance,
-populated hosted upgrade and rollout remain gates. Client empty-state rendering,
+windows/cursors. First-page source `c7a4ddd` passed native migration/behavior CI. A populated
+upgrade preservation probe also passes locally and is wired into CI. New native
+race probes require observed lock contention between independent PostgreSQL
+connections for identical retries and changed-payload rejection; their CI results
+and populated native upgrade acceptance remain pending. Hosted upgrade and rollout
+remain gates. Client empty-state rendering,
 duplicate-free paging, per-Item append attribution and bounded source scalability
 remain open. Deploy after the three preceding pending forwards; Phase 14.1
 device/recovery gates remain separate.

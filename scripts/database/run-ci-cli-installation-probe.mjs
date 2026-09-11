@@ -15,7 +15,8 @@ import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upg
 import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
 import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
-import { predictionPageSmokeSql } from './prediction-page.mjs';
+import { predictionPageSmokeSql, predictionPageUpgradeSql } from './prediction-page.mjs';
+import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -30,7 +31,7 @@ try {
   const historySql = installationHistorySql;
   const nativeSql = `begin read only; set local search_path=pg_catalog;
     ${functionDigestSql({ includeApplication: false })} rollback;`;
-  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations }) => {
+  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrent }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
@@ -70,6 +71,11 @@ try {
     await resetFromMigrations(files.slice(0, poolIndex));
     const [candidatePoolUpgrade] = await exec(candidatePoolUpgradeSql(files[poolIndex], projectionFixture, candidate.tables));
     assert.match(candidatePoolUpgrade?.candidatePoolUpgrade, /^PASS: unchanged populated/);
+    const pageIndex = files.findIndex(file => file.name.endsWith('_identified_prediction_page.sql'));
+    assert.ok(pageIndex > poolIndex);
+    await resetFromMigrations(files.slice(0, pageIndex));
+    const [predictionPageUpgrade] = await exec(predictionPageUpgradeSql(files[pageIndex], projectionFixture));
+    assert.match(predictionPageUpgrade?.predictionPageUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -84,6 +90,7 @@ try {
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Failed CLI migration left partial application changes');
     assert.deepEqual((await exec(historySql))[0], expectedHistory, 'Failed CLI migration was recorded as applied');
 
+    const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrent);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -126,7 +133,7 @@ try {
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
-      candidatePool, candidatePoolUpgrade, predictionPage,
+      candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

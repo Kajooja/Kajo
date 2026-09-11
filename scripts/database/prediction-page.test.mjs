@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { predictionPageSmokeSql } from './prediction-page.mjs';
+import { predictionPageSmokeSql, predictionPageUpgradeSql } from './prediction-page.mjs';
 
 test('identified first page preserves the scorer, immutable retries and empty run identity (full schema)', async () => {
   const db = new PGlite();
@@ -25,6 +26,13 @@ test('identified first page preserves the scorer, immutable retries and empty ru
       await assert.rejects(db.exec(files[index].sql), /unexpected ranking source/);
     } finally { await db.exec('rollback'); }
     assert.equal(await definition('private.rank_items_v1_internal(uuid,text,text,integer,jsonb)'), oldCore);
+    const fixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+    const upgrade = (await db.exec(predictionPageUpgradeSql(files[index], fixture)))
+      .flatMap(r => r.rows.map(row => {
+        assert.deepEqual(Object.keys(row), ['snapshot']);
+        return row.snapshot;
+      }));
+    assert.match(upgrade[0]?.predictionPageUpgrade, /^PASS: unchanged populated/);
     for (const file of files.slice(index)) await db.exec(`begin; ${file.sql} commit;`);
     assert.equal(await definition('private.rank_items_with_identity_v1(uuid,uuid,text,text,integer,jsonb)'),
       oldCore.replace('FUNCTION private.rank_items_v1_internal(',

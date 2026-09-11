@@ -1755,3 +1755,39 @@ continuation window and captured-scope client contract in PREDICTION_MODEL. Depl
 this fourth pending forward only after late Outcome attribution → frozen replay
 → candidate admission. Keep Phase 14.1 recovery/device gates and scalable retrieval
 open. STATUS owns current branch/next action; CODEMAP includes the new paths.
+
+
+### First-page upgrade and concurrency verification — 2026-09-11
+
+Prior source `c7a4dddad31b54305a24fb0a71111d134e2ed191` passed all five required
+jobs in [CI run 34573673279](https://github.com/Kajooja/Kajo/actions/runs/34573673279),
+including native first-page behavior and CLI migration history. APK was skipped
+as expected; no device or hosted acceptance is inferred.
+
+This bounded follow-up changes test infrastructure only. The populated upgrade
+probe in `prediction-page.mjs` fingerprints every existing application/Auth-user
+table and preserves old function identities/owners/ACLs/configuration, unrelated
+bodies and constraints. It permits exactly three added function identities,
+checks no unsolicited receipts, and executes both public ranking contracts after
+upgrade. It runs in the existing full-schema PGlite test and in native CLI CI.
+
+`prediction-page-concurrency.mjs` uses independent native sessions through a new
+asynchronous SQL adapter in the already owned, image-verified CI stack. The adapter
+has 10-second statement and 30-second process timeouts, bounded output and no
+external database URL. Each of two cases requires observing an actual ungranted
+advisory lock for the waiting request: identical retry must return the same response;
+changed-payload reuse must reject. Two accepted requests must create exactly two
+receipts and two new runs. Synthetic committed fixture data is removed by the
+next existing CLI reset; the normal complete-snapshot comparison follows it.
+
+`EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **350 tests** (270 mobile,
+14 catalog, 66 database), lint/TypeScript and both exports. The expanded populated
+upgrade probe passes locally. New native concurrency and populated upgrade CI
+results remain pending; PGlite is not evidence of concurrent execution. No runtime
+migration bytes, hosted data, app behavior or APK were changed. All four pending
+forwards keep their existing order and hashes.
+
+Next: inspect this head’s required CI, fix any native probe failure, then continue
+bounded immutable continuation windows and the captured-scope mobile contract.
+Keep #229 draft; no merge, reset of hosted users or APK polling. STATUS remains
+the continuation authority.

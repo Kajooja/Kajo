@@ -96,8 +96,23 @@ requests, all six domain/mode suppressed results, catalog-empty identity, immuta
 retries after catalog changes, outsider/revoked access, ACLs and failure atomicity.
 The same behavioral SQL is wired into native CLI CI.
 `EXPO_OFFLINE=1 CI=1 npm run check` passes **350 tests** (270 mobile, 14 catalog,
-66 database), lint/TypeScript and both platform exports. Native multi-connection concurrency and
-populated upgrade remain unverified; do not call this hosted/device acceptance.
+66 database), lint/TypeScript and both platform exports. Source `c7a4ddd` passed
+all five required checks in [CI run 34573673279](https://github.com/Kajooja/Kajo/actions/runs/34573673279),
+including native first-page behavior and CLI migration history. This does not
+accept hosted deployment or device behavior.
+
+The follow-up adds a populated first-page upgrade probe: every existing application
+and Auth-user table is fingerprinted, existing function identities/ACLs/configuration
+and constraints are preserved, and both public ranking contracts execute after the
+forward. It passes locally against the full schema and is wired into native CLI CI.
+A separate native concurrency probe starts independent PostgreSQL connections and
+requires an observed advisory-lock wait for both identical retry and changed-payload
+reuse. It asserts two receipts/two new runs across those cases. The concurrent SQL
+adapter is restricted to the already owned, verified local CI stack and has process
+and statement timeouts. Fixture writes are removed by the next existing CLI reset.
+The follow-up also passes the full local `npm run check` (350 tests and both exports).
+These **new populated/native race CI results are pending**; do not infer parallel
+acceptance from PGlite, which queues operations. No migration bytes changed.
 This is the fourth pending forward, after late Outcome → frozen replay → candidate
 admission. No current test data or APK was changed.
 
