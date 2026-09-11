@@ -180,7 +180,10 @@ analytics dashboard. Exact count/source/schedule rules and comparison gates
 belong to [FUTURE_PLAN.md](FUTURE_PLAN.md#fut-ux-001--personal-category-statistics--planned--230).
 
 Planned long-press selection uses an upper-left checkbox, visible selected count,
-explicit bulk actions and a non-gesture accessibility entry. Selecting alone
+explicit bulk actions and a non-gesture accessibility entry. This includes
+Luetut/Katsotut: a trash icon appears in selection mode and replaces permanent
+per-card “Poista historiasta” text only when the new interaction is implemented.
+History clearing and removing a List membership remain distinct operations. Selecting alone
 creates no rating, not-interest or List mutation. The complete Discovery/List
 and partial-failure contract is
 [FUTURE_PLAN.md](FUTURE_PLAN.md#fut-ux-002--long-press-multi-select--planned--231).

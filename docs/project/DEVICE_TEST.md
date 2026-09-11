@@ -290,3 +290,23 @@ both memberships; (2) repeat immediately after opening a card and with an option
 message, check visible progress and responsiveness; (3) briefly disconnect during
 saving, verify confirmed entries survive and unresolved work is not duplicated;
 (4) confirm Shared still shows/approves the exact target set. Preserve current data.
+
+
+## Owner report — 2026-09-11
+
+The owner reports everything appears to work in the tests. Record this as positive
+owner feedback for the exercised flows, including the previously requested Add
+confirmation/responsiveness correction, without inventing an exact APK SHA/run,
+latency measurement or individually verified offline/process-death controls.
+**Empty/fresh-account state was not tested:** the owner cannot currently create
+additional accounts. This is a reported testing constraint, not a diagnosed Auth
+defect. Full fresh-start acceptance remains open. A future full reset and a small
+group of testers may cover it; do not reset current accounts/data now.
+
+Future UX: long-press/multi-select must also cover Lists and Luetut/Katsotut, with
+a trash icon appearing in selection mode instead of permanent per-card history
+removal text. FUTURE_PLAN FUT-UX-002 / #231 owns this Phase 17 proposal. No current
+implementation or acceptance is inferred for long-press selection.
+
+Continue algorithm source work from STATUS; do not reopen already addressed UI
+defects merely because earlier reports remain in this historical document.

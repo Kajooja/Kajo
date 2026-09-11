@@ -1054,6 +1054,57 @@ Scenario sources and indexed retrieval still need cost and quality evidence.
 The current client treats an empty RPC array as failure; a versioned empty/continuation
 response and duplicate-free navigation remain required before `MVP-ALG-003` closes.
 
+### Versioned result/continuation contract — specified 2026-09-11, not implemented
+
+Phase 14.2 next implementation must deliver these boundaries together, rather
+than treating the old RPC's bare empty array as a successful identifiable run.
+
+- Introduce a versioned object response with `version`, `requestId`,
+  `predictionId`, captured `profileId`, `discoveryMode`, `itemType`, `sessionId`,
+  ordered `items`, `nextCursor` (nullable) and an explicit availability result.
+  An empty page still owns a committed PredictionRun. Transport/auth/malformed
+  replies remain errors; they must not become empty successes or mock fallback.
+- A client-generated request ID identifies an immutable request envelope. Exact
+  retries return the same committed response; reused IDs with changed scope,
+  parameters or cursor are rejected. Obtain the run ID directly from the core
+  operation, never by selecting the latest run or fabricating a client Prediction.
+- Preserve the old row RPC for old clients. Introduce a versioned endpoint/wrapper
+  backed by the same ranking implementation, not a forked scorer. The server
+  contract and its migration precede switching the mobile reader.
+- Cursor is opaque/server-validated and bound to actor, Profile, Event session,
+  mode, Item type, source version and a bounded continuation window. Never trust
+  client-provided selected ranks or arbitrary excluded IDs as admission authority.
+- Each accepted continuation page owns a new immutable PredictionRun with its
+  exact selected ranks and per-Item origins. Record parent/window linkage. A
+  replayed page changes neither seen Items nor historical ranks. No duplicate
+  canonical Item may reappear within a window; a new explicit refresh starts a
+  new window and may legitimately repeat still-eligible Items.
+- Freeze the source pool/version for a continuation window; do not silently mix
+  newly scored candidates into it. Recheck current membership/eligibility before
+  delivery; fail an invalidated window explicitly instead of rewriting earlier
+  evidence. Later independent candidate-source work may extend the window under
+  a new version. Limit retained/seen state and cursor lifetime; never grow an
+  unbounded exclusion list or materialize the whole catalog for paging.
+- A bounded source window being exhausted is not proof of an empty catalog.
+  Distinguish `ITEMS`, `WINDOW_EXHAUSTED` and proven `CATALOG_EMPTY`; record the
+  source/admission counts supporting the decision. Use neutral client empty copy
+  for window exhaustion. Do not claim there are no suitable Items globally.
+- Append only after matching the captured request scope/revision. Mode/Profile/
+  session changes invalidate in-flight append. Detail retains its captured slate;
+  newly appended grid pages must carry each Item's own Prediction origin.
+
+Required deterministic acceptance: identified empty run; malformed/unauthorized
+reply; same request retry and payload mismatch; concurrent pages/retry; duplicate
+Item and rank rejection; changed Profile/session/mode; suppressed-only source
+versus empty catalog; page/window bounds and reminder limits; final-page retry;
+late response after refresh; per-Item grid→detail→exposure attribution. Existing
+frozen replay and candidate admission controls must remain passing.
+
+This is a concrete design handoff, not a delivered RPC/client feature. Endpoint
+signature, storage representation, numerical limits and invalidation mechanism
+must be reviewed with the implementation. The three already pending hosted
+forwards and Phase 14.1 device/recovery gates remain separate and unchanged.
+
 ### Candidate generation and delivery
 
 Use bounded candidate sources for durable fit, recent/session fit, prior, novelty and Shared agreement, then deduplicate and apply hard eligibility with bounded refill. Trace source membership and considered alternatives. Do not restrict every policy to a fixed baseline top-50 before eligibility or Shared scoring.

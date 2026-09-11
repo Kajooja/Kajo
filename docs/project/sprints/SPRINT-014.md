@@ -1705,3 +1705,18 @@ This follow-up changes documentation only. Source/SQL bytes match the accepted
 implementation head. Hosted rollout, physical device acceptance and the remaining
 `MVP-ALG-002..003` retrieval/continuation gates remain open. Continue from STATUS's
 versioned server/client continuation and empty-result slice on the same draft PR.
+
+
+### Owner acceptance update and continuation contract — 2026-09-11
+
+- Owner reports exercised tests working. Fresh/empty-account state could not be
+  tested because additional accounts are unavailable; no cause or exact APK SHA
+  is inferred. Future small-group reset/testing stays deferred; preserve data now.
+- Extended planned #231 to history long-press/multi-select/trash, replacing the
+  permanent removal label only after implementation. No selection code changed.
+- Specified the next Phase 14.2 result/continuation contract in PREDICTION_MODEL:
+  identifiable empty runs, immutable retry identity, bounded scoped cursors,
+  distinct source-window exhaustion and per-page Prediction origins. Acceptance
+  matrix is explicit; server/client implementation remains the next source task.
+- Documentation-only checkpoint; no new runtime tests, hosted rollout, reset, APK
+  polling or merge. Prior source 9fb48c2 passed 349 tests and all five CI gates.

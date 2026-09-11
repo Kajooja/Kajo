@@ -602,6 +602,7 @@ so long-press is not the only entry.
 | --- | --- |
 | Discovery grid | Ei kiinnosta; Lisää listaan |
 | A List's grid | Siirrä toiselle listalle; Poista tältä listalta |
+| Luetut/Katsotut history grid | Poista historiasta (trash icon in selection mode) |
 
 Entering/toggling selection never opens a card, records a preference or hides it.
 Creating a destination only creates/selects the List; the sole/new usable
@@ -610,7 +611,15 @@ action. Do not revive the create-List → premature Item advancement defect.
 
 List removal affects only selected memberships. It does not delete canonical
 Items, remove other memberships, erase consumed/rating history or mean
-not-interest. Bulk history deletion is a separate operation, not implied here.
+not-interest. Owner extension (2026-09-11): history is explicitly included. Long-press in
+Luetut/Katsotut enters the same multi-selection mode and reveals a trash icon.
+Once this accessible mode is delivered, remove the permanent per-card
+“Poista historiasta” text. The trash operation must dispatch history clearing,
+not List-entry deletion: preserve Saved/other memberships, clear rated/consumed
+and corresponding bootstrap/native evidence through the canonical correction
+contract. Apply the existing durable partial-failure rules to selected Items;
+never erase unselected Items. Until implementation and device acceptance, retain
+the current working history-removal action. This remains planned Phase 17.0 / #231.
 
 ### Durable execution
 

@@ -1,11 +1,25 @@
 # Kajo Current Status
 
-Last updated: **2026-09-10**
+Last updated: **2026-09-11**
 Current milestone: **MVP 0.1 — first public Kajo**  
 Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
 
 This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
+
+## Latest owner feedback — 2026-09-11
+
+Owner reports all exercised tests appear to work. DEVICE_TEST.md records this
+positive feedback and its limits: installed APK SHA/run and timings were not
+supplied; empty/fresh-account state was explicitly **not tested** because the owner
+cannot create more accounts currently. Do not diagnose the cause without evidence.
+Fresh-start acceptance stays open for a future small-group reset/test, not a reset
+now. Preserve current data and continue the algorithm source packet below.
+
+Extended planned Phase 17.0 / #231 selection to Lists and Luetut/Katsotut: long
+press → multi-select → trash icon. Replace permanent “Poista historiasta” text
+only when that workflow is implemented; keep canonical history-clearing semantics.
+FUTURE_PLAN and UX_PRINCIPLES own this planned behavior.
 
 ## Immediate continuation checkpoint — 2026-09-10 / candidate availability
 
@@ -42,8 +56,9 @@ uses a no-output `DO` block, and local probe adapters reject stray output instea
 of silently ignoring it. The preceding precision fix remains intact; the combined
 packet's native acceptance is now verified in the CI run above.
 
-**Next action:** specify and implement the versioned continuation/empty-result
-contract through the server and client. The
+**Next action:** implement the versioned continuation/empty-result contract
+through the server and client. The concrete contract and acceptance matrix are
+now specified in PREDICTION_MODEL under “Versioned result/continuation contract”. The
 client still treats an empty array as failure. Independent bounded candidate
 sources, admission cost at catalog scale and duplicate-free continuation remain
 open under `MVP-ALG-002..003`; the existing full-catalog feature scan now also
