@@ -1823,3 +1823,41 @@ response parsing, not delivered pagination or empty-state UI. Next: clear native
 upgrade/race gates, implement bounded immutable server continuation windows and
 per-page runs, then activate captured-scope append/empty rendering and validate
 per-Item origins on device. STATUS owns exact continuation; #229 remains draft.
+
+
+### Bounded frozen continuation source — 2026-09-11
+
+Prepared CLI-created forward `20260911074543_prediction_continuation_windows.sql`,
+SHA-256 `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415`.
+It is the fifth undeployed forward, after the identified first-page boundary.
+Source `91d07ee` has four passed jobs in CI 34575684407; the CLI/native-race job was
+still running at this checkpoint. The preceding platform-start symptom did not
+recur, but the pending job must still be inspected before claiming acceptance.
+
+The new private derived cache retains a committed first-page source's exact run,
+ordered candidate rows, scope and initial seen Item IDs. Owner-only open/read
+helpers check actor and current Profile membership, reject expired/drifted sources,
+and reuse the same window without reranking or fabricating Events/PredictionRuns.
+No API grants, public endpoint, first-page receipt changes or mobile activation.
+
+Bounds: 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from source ranking and
+16 windows per actor/Profile. Scope advisory locking serializes creation. New
+requests reclaim expired cache rows only; receipt/run/Event history stays intact.
+Parent actor/Profile/run/receipt deletion cascades. No background cleanup job is
+claimed; dormant scopes retain at most 16 expired rows until reopen/parent removal.
+
+The rollback-only full-schema probe checks exact first-page seen IDs and source,
+idempotence, later catalog/taste state, historical trace drift, empty sources,
+expiry, capacity/reclamation, outsider/missing/revoked actor and API-role denial.
+The same SQL is wired into native CLI CI. `EXPO_OFFLINE=1 CI=1 npm run check` exits
+0 with **377 tests** (296 mobile, 14 catalog, 67 database), lint/TypeScript and both
+platform exports. New native CI, real concurrent window-cap behavior and populated
+window-forward acceptance remain open. No hosted mutation, reset, device test,
+APK dispatch/poll or merge occurred.
+
+Next: atomic page delivery against this frozen ledger, with current eligibility,
+captured-scope/cursor validation, seen-set advancement, independent page run/ranks
+and page-aware frozen/shadow replay. Raw cached candidates include suppressed and
+already selected alternatives: they are not a deliverable page. Keep the public
+first-page capability false until the whole page boundary is implemented and
+verified; then activate the prepared client. STATUS owns the continuation.

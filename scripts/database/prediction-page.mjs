@@ -6,6 +6,12 @@ export async function predictionPageSmokeSql() {
   return `begin; ${fixture}\n${smoke}\nrollback;`;
 }
 
+export async function predictionWindowSmokeSql() {
+  const fixture = await readFile(new URL('candidate-pool-fixture.sql', import.meta.url), 'utf8');
+  const smoke = await readFile(new URL('prediction-window-smoke.sql', import.meta.url), 'utf8');
+  return `begin; ${fixture}\n${smoke}\nrollback;`;
+}
+
 export function predictionPageUpgradeSql(migration, fixture) {
   if (!migration.name.endsWith('_identified_prediction_page.sql')) throw new Error('Expected identified page forward');
   const functions = `select p.oid,p.oid::regprocedure::text as identity,p.proowner,p.proacl,p.prosecdef,p.proconfig,p.provolatile,

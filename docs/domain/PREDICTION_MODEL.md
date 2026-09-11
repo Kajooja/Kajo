@@ -1147,6 +1147,29 @@ rejects duplicate Items/ranks and the legacy loader checks domain and requested 
 `usePredictionRanking` still uses the legacy RPC. This is not delivered empty-state
 UI, paging, in-flight append invalidation or per-page exposure acceptance.
 
+The undeployed `20260911074543_prediction_continuation_windows.sql` prepares the
+private `frozen-window-v1` source cache. Owner-only helpers open an actor-owned
+first-page receipt and preserve its full immutable run/candidate snapshot, scope
+and exact initially selected Item IDs. They do not rerank, generate Events, create
+another PredictionRun or rewrite a receipt. Repeated opening uses the same window;
+reads require current actor/membership, an unexpired lifetime and unchanged original
+run/candidate rows. Later catalog/taste state does not replace the snapshot.
+
+Limits are 50 candidates/seen IDs, 2 MiB per source snapshot, 15 minutes from the
+original run and 16 retained windows per actor/Profile. New-window creation is
+serialized per scope. New requests reclaim expired derived cache rows only, while
+source age prevents reopening an expired run as a fresh window. Actor/Profile/run/
+receipt deletion cascades to this cache. Inactive scopes retain at most 16 expired
+rows until another open or parent deletion; no background cleanup job is claimed.
+
+These helpers intentionally have no API-role execution grants. Their raw frozen
+candidate ledger includes suppressed and already selected alternatives and is not
+a deliverable next page. The next page commit must verify current eligibility and
+exact requested scope, exclude previously delivered Items, bind cursor/retry state,
+create immutable per-page run/rank origins and preserve page-aware replay semantics.
+No cursor/public pagination, new eligibility decision or seen-set advancement is
+implemented by this source-cache slice. Existing first-page capability stays false.
+
 ### Candidate generation and delivery
 
 Use bounded candidate sources for durable fit, recent/session fit, prior, novelty and Shared agreement, then deduplicate and apply hard eligibility with bounded refill. Trace source membership and considered alternatives. Do not restrict every policy to a fixed baseline top-50 before eligibility or Shared scoring.

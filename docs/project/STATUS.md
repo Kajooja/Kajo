@@ -145,6 +145,42 @@ Next: obtain native upgrade/race CI evidence, implement bounded immutable server
 windows with duplicate-free pages, then activate the captured-scope reader and
 validate per-Item append origins. Keep rollout order, hosted data and device gates.
 
+### Bounded continuation source — 2026-09-11
+
+Source `91d07ee` reached [CI 34575684407](https://github.com/Kajooja/Kajo/actions/runs/34575684407):
+validation, platform, two installations and existing-application upgrade passed.
+The CLI migration-history/native race job was still running at this checkpoint;
+its result remains to be inspected. The prior platform-start symptom did not recur.
+
+Undeployed CLI-created `20260911074543_prediction_continuation_windows.sql`
+prepares the private frozen source required for paging. It adds a derived window
+cache and owner-only open/read/source helpers; no public RPC or active client is
+changed. Opening a committed first-page request captures its exact run/candidate
+rows and initially seen Item IDs, without creating a new run or rewriting evidence.
+Source/actor/Profile/session/mode/domain/version are retained. Reads recheck actor,
+current membership, expiry and unchanged historical source. Current candidate
+eligibility is deliberately a future page-delivery check, not inferred from this
+frozen cache.
+
+Bounds: at most 50 candidates/seen IDs, 2 MiB per snapshot, 15 minutes from source
+ranking and 16 windows per actor/Profile. Scope locking serializes new-window
+creation; opening a newer request reclaims expired cache rows only. Requests/runs
+and historical Events are preserved. The full-schema rollback probe covers
+idempotent opening, exact seen IDs, later catalog/taste changes, historical drift,
+empty sources, expiry, cap/cleanup and outsider/revoked access; it is wired into
+native CLI CI. Full local `EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with
+**377 tests** (296 mobile, 14 catalog, 67 database), lint/TypeScript and both exports.
+New-source native CI, concurrent window-cap behavior and populated-window forward
+acceptance remain pending. No hosted or device acceptance is claimed.
+
+**Next implementation:** atomic page delivery from this frozen source, including
+current eligibility and captured request-scope validation, opaque one-use/replayable
+cursor state, a separate PredictionRun and page-aware frozen/shadow replay. Do not
+copy old selected flags/ranks into a new run without those semantics. Then extend
+the prepared mobile reader and activate it after reviewed hosted rollout.
+`continuationSupported: false` remains correct today. This is the fifth pending
+forward, after identified first page; hosted and device gates remain open.
+
 ## Frozen replay checkpoint — 2026-09-10
 
 Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted

@@ -15,7 +15,7 @@ import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upg
 import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
 import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
-import { predictionPageSmokeSql, predictionPageUpgradeSql } from './prediction-page.mjs';
+import { predictionPageSmokeSql, predictionPageUpgradeSql, predictionWindowSmokeSql } from './prediction-page.mjs';
 import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -111,6 +111,8 @@ try {
     assert.match(candidatePool?.candidatePool, /^PASS: 36 mode\/domain\/Profile\/limit/);
     const [predictionPage] = await exec(await predictionPageSmokeSql());
     assert.match(predictionPage?.predictionPage, /^PASS: identified/);
+    const [predictionWindow] = await exec(await predictionWindowSmokeSql());
+    assert.match(predictionWindow?.predictionWindow, /^PASS: bounded frozen/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -133,7 +135,7 @@ try {
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
-      candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency,
+      candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };
