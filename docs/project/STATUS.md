@@ -116,6 +116,35 @@ acceptance from PGlite, which queues operations. No migration bytes changed.
 This is the fourth pending forward, after late Outcome → frozen replay → candidate
 admission. No current test data or APK was changed.
 
+### Client identified-response boundary — 2026-09-11
+
+The latest native verification attempt on `1a07dd5`,
+[CI 34574927760](https://github.com/Kajooja/Kajo/actions/runs/34574927760), failed
+while starting the isolated platform stack, before application SQL. Its diagnostic
+labels were `image-download,port-binding`; these are symptoms, not a diagnosed root
+cause or algorithm failure. Native populated-upgrade and concurrent-retry gates
+remain pending. A subsequent source CI run must execute them; do not accept skipped
+jobs as passes.
+
+Prepared `predictionPageOperations.ts` implements the client service boundary for
+the existing server first-page envelope: immutable captured request/context across
+retries, exact scope/run checks, ordered unique Items/ranks, bounded source counts,
+consistent availability and a real empty-run identity. Unsupported continuation
+capability is rejected explicitly. Network/auth/malformed responses stay errors.
+The active legacy reader also rejects duplicate Items/ranks, wrong-domain responses
+and responses larger than requested. It still treats bare empty arrays as errors.
+
+`EXPO_OFFLINE=1 CI=1 npm run check` passes **376 tests** (296 mobile, 14 catalog,
+66 database), lint/TypeScript and both platform exports. No runtime/device test
+was performed for this source slice.
+
+The new endpoint is **not wired into `usePredictionRanking`**: its server forward
+is undeployed, and bounded windows/cursors remain unimplemented. Client response
+parsing is prepared, not acceptance of empty-state UI or end-to-end continuation.
+Next: obtain native upgrade/race CI evidence, implement bounded immutable server
+windows with duplicate-free pages, then activate the captured-scope reader and
+validate per-Item append origins. Keep rollout order, hosted data and device gates.
+
 ## Frozen replay checkpoint — 2026-09-10
 
 Continue only `feat/228-delivered-origin`, draft PR #229 / Issue #228; accepted

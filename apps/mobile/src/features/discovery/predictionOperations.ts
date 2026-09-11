@@ -65,7 +65,10 @@ export async function loadPredictionRanking(
       return predictionError();
     }
 
-    return mapPredictionRows(response.data, input.profileId, input.mode);
+    const result = mapPredictionRows(response.data, input.profileId, input.mode);
+    if (result.status === 'success' && (result.ranking.items.length > (input.limit ?? 20) ||
+      result.ranking.items.some((item) => item.itemType !== input.itemType))) return predictionError();
+    return result;
   } catch {
     return predictionError();
   }
@@ -86,7 +89,9 @@ export function mapPredictionRows(
   if (
     rows.length !== data.length ||
     !predictionId ||
-    rows.some((row) => row.prediction_id !== predictionId)
+    rows.some((row) => row.prediction_id !== predictionId) ||
+    new Set(rows.map((row) => row.item_id)).size !== rows.length ||
+    new Set(rows.map((row) => row.rank)).size !== rows.length
   ) {
     return predictionError();
   }
@@ -100,7 +105,7 @@ export function mapPredictionRows(
         itemType: row.item_type,
         title: row.title,
         ...(row.description ? { description: row.description } : {}),
-        tags: row.tags,
+        tags: [...row.tags],
       })),
       predictions: rows.map((row) => ({
         predictionId,
@@ -121,7 +126,7 @@ function isPredictionRow(value: unknown): value is PredictionRow {
 
   return (
     typeof row.prediction_id === 'string' &&
-    typeof row.item_id === 'string' &&
+    typeof row.item_id === 'string' && row.item_id.length > 0 &&
     (row.item_type === 'BOOK' || row.item_type === 'MOVIE') &&
     typeof row.title === 'string' &&
     (row.description === null || typeof row.description === 'string') &&

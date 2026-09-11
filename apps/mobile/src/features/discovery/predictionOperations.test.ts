@@ -33,6 +33,12 @@ const ROWS = [
 ];
 
 describe('Prediction V1 mapping', () => {
+  it('rejects duplicate Items and ambiguous ranks in the active legacy reader', () => {
+    for (const rows of [[ROWS[0], ROWS[0]], [ROWS[0], { ...ROWS[1], item_id: ROWS[0]!.item_id }],
+      [ROWS[0], { ...ROWS[1], rank: ROWS[0]!.rank }]]) {
+      expect(mapPredictionRows(rows, 'profile-1', 'FOR_YOU').status).toBe('error');
+    }
+  });
   it('maps rank order, generic Items and one shared prediction trace', () => {
     expect(mapPredictionRows(ROWS, 'profile-1', 'SURPRISE')).toEqual({
       status: 'success',
@@ -93,6 +99,11 @@ describe('Prediction V1 mapping', () => {
 });
 
 describe('Prediction V1 RPC boundary', () => {
+  it('rejects a response outside its requested domain or size', async () => {
+    const rpc: PredictionRpc = vi.fn(async () => ({ data: ROWS, error: null }));
+    expect((await loadPredictionRanking(rpc, { profileId: 'profile-1', mode: 'FOR_YOU', itemType: 'BOOK' })).status).toBe('error');
+    expect((await loadPredictionRanking(rpc, { profileId: 'profile-1', mode: 'FOR_YOU', itemType: 'MOVIE', limit: 1 })).status).toBe('error');
+  });
   it('sends the Profile, mode, generic candidate scope and bounded Context', async () => {
     const rpc: PredictionRpc = vi.fn(async () => ({ data: ROWS, error: null }));
 

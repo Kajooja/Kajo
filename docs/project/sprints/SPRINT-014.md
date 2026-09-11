@@ -1791,3 +1791,35 @@ Next: inspect this head’s required CI, fix any native probe failure, then cont
 bounded immutable continuation windows and the captured-scope mobile contract.
 Keep #229 draft; no merge, reset of hosted users or APK polling. STATUS remains
 the continuation authority.
+
+
+### Client first-page response validation — 2026-09-11
+
+The new verification source `1a07dd5` reached CI run 34574927760, but its platform
+stack failed at startup with `image-download,port-binding` diagnostic labels before
+application SQL. These are observed symptoms only. Native populated-upgrade and
+concurrent-retry acceptance remains pending; skipped downstream jobs are not passes.
+
+Continued the independent client boundary while preserving the undeployed server
+contract. `predictionPageOperations.ts` creates an immutable captured request/context
+for reuse across transport retries, normalizes UUID scope and consumes the server's
+identified first-page envelope. It verifies Profile/session/mode/domain/request/run,
+ordered unique Item origins, source counts, size, availability and explicit unsupported
+continuation. Valid empty responses preserve the server run ID; transport, auth and
+malformed responses remain errors. The helper does not fabricate Predictions or
+silently call another endpoint. The active legacy reader also now rejects duplicate
+Items/ranks, wrong-domain responses and over-limit results, and copies Item tags.
+
+Twenty-four new boundary tests cover normal/empty results, captured scope mismatches,
+malformed/ambiguous rows, counts/capabilities, immutable requests after caller mutation,
+exact retry and errors. Two legacy regressions cover duplicate origins/ranks and
+wrong scope/size. `EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **376 tests**
+(296 mobile, 14 catalog, 66 database), lint/TypeScript and both exports.
+
+No server migration bytes or hosted data changed. The new reader is not activated
+in `usePredictionRanking`; bare-empty legacy responses still error. No live runtime,
+phone/emulator, hosted rollout, APK dispatch/poll or merge occurred. This is client
+response parsing, not delivered pagination or empty-state UI. Next: clear native
+upgrade/race gates, implement bounded immutable server continuation windows and
+per-page runs, then activate captured-scope append/empty rendering and validate
+per-Item origins on device. STATUS owns exact continuation; #229 remains draft.

@@ -1137,6 +1137,16 @@ duplicate-free paging, per-Item append attribution and bounded source scalabilit
 remain open. Deploy after the three preceding pending forwards; Phase 14.1
 device/recovery gates remain separate.
 
+The prepared mobile boundary `predictionPageOperations.ts` creates a frozen request
+(including copied context attributes) for reuse after transport failure, then checks
+response identity against the captured request. It accepts identified empty results
+only with consistent availability and source counts; rejects unsupported continuation,
+wrong Profile/session/mode/type/run, duplicate Items/ranks and non-ordered rows; and
+keeps transport/auth/malformed replies as errors. The existing legacy mapper now also
+rejects duplicate Items/ranks and the legacy loader checks domain and requested size.
+`usePredictionRanking` still uses the legacy RPC. This is not delivered empty-state
+UI, paging, in-flight append invalidation or per-page exposure acceptance.
+
 ### Candidate generation and delivery
 
 Use bounded candidate sources for durable fit, recent/session fit, prior, novelty and Shared agreement, then deduplicate and apply hard eligibility with bounded refill. Trace source membership and considered alternatives. Do not restrict every policy to a fixed baseline top-50 before eligibility or Shared scoring.
