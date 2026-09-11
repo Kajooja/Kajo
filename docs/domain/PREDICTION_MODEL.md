@@ -1054,7 +1054,7 @@ Scenario sources and indexed retrieval still need cost and quality evidence.
 The current client treats an empty RPC array as failure; a versioned empty/continuation
 response and duplicate-free navigation remain required before `MVP-ALG-003` closes.
 
-### Versioned result/continuation contract — specified 2026-09-11, not implemented
+### Versioned result/continuation contract — first-page source prepared 2026-09-11
 
 Phase 14.2 next implementation must deliver these boundaries together, rather
 than treating the old RPC's bare empty array as a successful identifiable run.
@@ -1100,10 +1100,38 @@ versus empty catalog; page/window bounds and reminder limits; final-page retry;
 late response after refresh; per-Item grid→detail→exposure attribution. Existing
 frozen replay and candidate admission controls must remain passing.
 
-This is a concrete design handoff, not a delivered RPC/client feature. Endpoint
-signature, storage representation, numerical limits and invalidation mechanism
-must be reviewed with the implementation. The three already pending hosted
-forwards and Phase 14.1 device/recovery gates remain separate and unchanged.
+The undeployed `20260911070959_identified_prediction_page.sql` implements only
+the identified first-page server boundary. `public.rank_items_page_v1(request
+jsonb)` requires numeric `version: 1`, UUID `requestId`, `profileId`, `sessionId`,
+`discoveryMode`, BOOK/MOVIE `itemType`, integer `limit` 1–50 and object `context`.
+The request is at most 16 KiB; unknown keys and nested context session identity
+are rejected. Optional `cursor` must be null. Session identity is captured as in
+the existing ranker; this endpoint does not create or prove an Event session.
+
+The response includes the specified identity/scope fields and ordered legacy
+rank-row objects in `items`. `source` records admission version, retained candidate
+count, result count and the empty-catalog decision. `CATALOG_EMPTY` requires no
+discoverable Items in the requested domain; suppression alone yields
+`WINDOW_EXHAUSTED`. `nextCursor: null` plus **`continuationSupported: false`**
+explicitly means paging is unavailable, including when the first page has Items.
+It must not be interpreted as proof that all eligible Items were delivered.
+
+The original scoring body moves unchanged, except for supplied server run identity,
+into an owner-only private core. The legacy internal wrapper generates a run ID;
+the new boundary generates one before calling the same core. The public row RPC
+is unchanged. Private RLS-protected receipts persist the exact JSON request and
+response with their run. A transaction advisory lock serializes request-ID reuse;
+current membership is locked/checked before serving even a cached response.
+Changed payload or actor rejects ID reuse. Trace and receipt commit atomically;
+later catalog changes do not rewrite retries. Receipts cascade with their actor,
+Profile or PredictionRun; a time-based receipt retention policy is not yet added.
+
+This source packet does not switch mobile readers or implement continuation
+windows/cursors. Real multi-connection concurrency, native migration acceptance,
+populated hosted upgrade and rollout remain gates. Client empty-state rendering,
+duplicate-free paging, per-Item append attribution and bounded source scalability
+remain open. Deploy after the three preceding pending forwards; Phase 14.1
+device/recovery gates remain separate.
 
 ### Candidate generation and delivery
 

@@ -15,6 +15,7 @@ import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upg
 import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
 import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
 import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
+import { predictionPageSmokeSql } from './prediction-page.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -101,6 +102,8 @@ try {
     assert.match(frozenReplay?.frozenReplay, /^PASS: 18 Personal\/Shared/);
     const [candidatePool] = await exec(await candidatePoolSmokeSql());
     assert.match(candidatePool?.candidatePool, /^PASS: 36 mode\/domain\/Profile\/limit/);
+    const [predictionPage] = await exec(await predictionPageSmokeSql());
+    assert.match(predictionPage?.predictionPage, /^PASS: identified/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -123,7 +126,7 @@ try {
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
-      candidatePool, candidatePoolUpgrade,
+      candidatePool, candidatePoolUpgrade, predictionPage,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

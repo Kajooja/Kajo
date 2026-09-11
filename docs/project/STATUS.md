@@ -56,10 +56,12 @@ uses a no-output `DO` block, and local probe adapters reject stray output instea
 of silently ignoring it. The preceding precision fix remains intact; the combined
 packet's native acceptance is now verified in the CI run above.
 
-**Next action:** implement the versioned continuation/empty-result contract
-through the server and client. The concrete contract and acceptance matrix are
-now specified in PREDICTION_MODEL under “Versioned result/continuation contract”. The
-client still treats an empty array as failure. Independent bounded candidate
+**Next action:** continue the versioned contract from the server first-page source
+checkpoint below: verify native/populated upgrade and simultaneous request retries,
+then implement bounded duplicate-free windows and the captured-scope mobile reader.
+The contract and acceptance matrix are in PREDICTION_MODEL under “Versioned
+result/continuation contract”. The client still treats an empty array as failure.
+Independent bounded candidate
 sources, admission cost at catalog scale and duplicate-free continuation remain
 open under `MVP-ALG-002..003`; the existing full-catalog feature scan now also
 evaluates admission before retaining candidates. This packet does not accept
@@ -76,6 +78,28 @@ Hosted remains on `20260910190243_shared_list_destinations`. Reviewed rollout or
 is late Outcome attribution → precise replay → candidate admission. Keep the
 separate Phase 14.1 recovery gates and deferred Personal two-List APK cases open.
 No reset, APK action, hosted mutation or merge was performed; keep PR draft.
+
+### Identified first-page source checkpoint — 2026-09-11
+
+Undeployed CLI-created `20260911070959_identified_prediction_page.sql` adds
+`rank_items_page_v1(request jsonb)` with a real run ID even for zero Items.
+The original scoring body is shared with the unchanged public legacy row RPC.
+Private receipts return the immutable response on exact retry; changed payloads
+reject reused IDs. Membership is checked/locked on every call, including retry;
+the request-ID transaction lock serializes competing requests. Receipt failure
+rolls back the new trace. Responses distinguish Items, exhausted source and a
+proven domain-empty catalog. `continuationSupported: false` explicitly marks
+this as first-page-only; mobile is not switched and no cursor is accepted.
+
+Full-schema SQL checks exact scorer preservation, Item origins/ranks, malformed
+requests, all six domain/mode suppressed results, catalog-empty identity, immutable
+retries after catalog changes, outsider/revoked access, ACLs and failure atomicity.
+The same behavioral SQL is wired into native CLI CI.
+`EXPO_OFFLINE=1 CI=1 npm run check` passes **350 tests** (270 mobile, 14 catalog,
+66 database), lint/TypeScript and both platform exports. Native multi-connection concurrency and
+populated upgrade remain unverified; do not call this hosted/device acceptance.
+This is the fourth pending forward, after late Outcome → frozen replay → candidate
+admission. No current test data or APK was changed.
 
 ## Frozen replay checkpoint — 2026-09-10
 

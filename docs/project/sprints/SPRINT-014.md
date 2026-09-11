@@ -1720,3 +1720,38 @@ versioned server/client continuation and empty-result slice on the same draft PR
   matrix is explicit; server/client implementation remains the next source task.
 - Documentation-only checkpoint; no new runtime tests, hosted rollout, reset, APK
   polling or merge. Prior source 9fb48c2 passed 349 tests and all five CI gates.
+
+
+### Identified first-page source boundary — 2026-09-11
+
+Continued #228 / draft #229 on `feat/228-delivered-origin` after the owner’s
+positive report for exercised device cases. Fresh-account/empty-state device
+acceptance remains untested; current data is preserved.
+
+CLI-created, undeployed `20260911070959_identified_prediction_page.sql`, SHA-256
+`caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08`,
+adds a versioned first-page RPC. The prior scoring body is reused unchanged except
+for its server-supplied run identity; legacy public row responses remain unchanged.
+Private request receipts make exact retries immutable and reject changed payloads;
+current membership is checked and locked even for cached responses. Request-ID
+advisory locking serializes retries, and trace/receipt writes share a transaction.
+Empty results retain actual PredictionRun identity and distinguish suppression
+from a domain-empty catalog. Explicit `continuationSupported: false` advertises
+that this slice does not implement cursors or switch the mobile reader.
+
+Full-schema checks cover exact old scoring/public-wrapper preservation, guarded
+source rejection, ordered unique origins, retry after catalog mutation, malformed
+requests and changed payloads, six mode/domain suppressed empty runs, empty catalog,
+revoked/outsider authorization, private ACLs and rollback after an injected receipt
+write failure. `prediction-page.mjs` supplies the same rollback-only SQL probe to
+PGlite and required native CLI CI. `EXPO_OFFLINE=1 CI=1 npm run check` exits 0:
+**350 tests** (270 mobile, 14 catalog, 66 database), lint/TypeScript and iOS/Android
+exports. Native CI for this new source, a populated upgrade preservation probe
+and real multi-connection race validation remain open. No hosted deployment,
+reset, APK dispatch/poll, device test or merge occurred.
+
+Next: validate those native/populated gates, then implement the bounded immutable
+continuation window and captured-scope client contract in PREDICTION_MODEL. Deploy
+this fourth pending forward only after late Outcome attribution → frozen replay
+→ candidate admission. Keep Phase 14.1 recovery/device gates and scalable retrieval
+open. STATUS owns current branch/next action; CODEMAP includes the new paths.
