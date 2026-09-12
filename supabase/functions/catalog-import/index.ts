@@ -1,4 +1,5 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { timingSafeEqual } from 'node:crypto';
+import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 import { normalizeTmdbMovie } from '../_shared/catalog-normalizers.mjs';
 
@@ -30,38 +31,42 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const secretKey =
-    readNamedKey('SUPABASE_SECRET_KEYS') ??
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const serverKeys = readServerKeys();
 
-  if (!supabaseUrl || !secretKey) {
+  if (!supabaseUrl || !serverKeys) {
     return json({ status: 'error', code: 'server-not-configured' }, 500);
   }
 
-  // Modern sb_secret_ keys are API keys rather than JWTs. The Edge gateway is
-  // therefore bypassed for this internal function and authorization is enforced
-  // here against the server-only key. Legacy service_role Bearer calls remain
-  // accepted during the 2026 key migration window.
+  // verify_jwt=false is declared in config.toml. Neither a user JWT nor an
+  // arbitrary sb_secret_ prefix grants access: match a configured server key.
+  // Modern keys must use apikey; exact legacy service_role Bearer calls remain
+  // supported independently while that legacy key is configured.
   const suppliedApiKey = request.headers.get('apikey');
   const suppliedBearer = readBearerToken(request.headers.get('authorization'));
-  if (suppliedApiKey !== secretKey && suppliedBearer !== secretKey) {
+  const secretKey = serverKeys.modern.find((key) => keysEqual(suppliedApiKey, key)) ??
+    (serverKeys.legacy && (
+        keysEqual(suppliedApiKey, serverKeys.legacy) ||
+        keysEqual(suppliedBearer, serverKeys.legacy)
+      )
+      ? serverKeys.legacy
+      : null);
+  if (!secretKey) {
     return json({ status: 'error', code: 'forbidden' }, 403);
   }
 
-  let body: ImportRequest;
+  let input: unknown;
   try {
-    body = await request.json();
+    input = await request.json();
   } catch {
     return json({ status: 'error', code: 'invalid-json' }, 400);
   }
 
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return json({ status: 'error', code: 'invalid-request' }, 400);
+  }
+  const body = input as ImportRequest;
   if (body.action !== 'tmdb-movies') {
     return json({ status: 'error', code: 'unsupported-action' }, 400);
-  }
-
-  const tmdbToken = Deno.env.get('TMDB_READ_ACCESS_TOKEN');
-  if (!tmdbToken) {
-    return json({ status: 'error', code: 'tmdb-not-configured' }, 503);
   }
 
   const startPage = boundedInteger(body.startPage, 1, 500, 1);
@@ -74,11 +79,22 @@ Deno.serve(async (request) => {
   );
   const language = normalizeLocale(body.language, DEFAULT_LANGUAGE);
   const region = normalizeRegion(body.region, DEFAULT_REGION);
-  const adminClient = createClient(supabaseUrl, secretKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  if (
+    startPage === null || pages === null || minimumVoteCount === null ||
+    language === null || region === null || startPage + pages - 1 > 500
+  ) {
+    return json({ status: 'error', code: 'invalid-request' }, 400);
+  }
+
+  const tmdbToken = Deno.env.get('TMDB_READ_ACCESS_TOKEN');
+  if (!tmdbToken) {
+    return json({ status: 'error', code: 'tmdb-not-configured' }, 503);
+  }
 
   try {
+    const adminClient = createClient(supabaseUrl, secretKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
     let importedCount = 0;
     let skippedCount = 0;
     const completedPages: number[] = [];
@@ -135,8 +151,9 @@ Deno.serve(async (request) => {
       region,
       minimumVoteCount,
     });
-  } catch (error) {
-    console.error('catalog-import failed', safeErrorMessage(error));
+  } catch {
+    // Upstream errors can contain reflected credentials or provider payloads.
+    console.error('catalog-import failed: provider-import-failed');
     return json({ status: 'error', code: 'provider-import-failed' }, 502);
   }
 });
@@ -252,50 +269,68 @@ function boundedInteger(
   minimum: number,
   maximum: number,
   fallback: number,
-): number {
-  const number = Number(value);
-  return Number.isInteger(number) && number >= minimum && number <= maximum
-    ? number
-    : fallback;
+): number | null {
+  if (value === undefined) return fallback;
+  return typeof value === 'number' && Number.isInteger(value) &&
+      value >= minimum && value <= maximum
+    ? value
+    : null;
 }
 
-function normalizeLocale(value: unknown, fallback: string): string {
-  if (typeof value !== 'string') return fallback;
+function normalizeLocale(value: unknown, fallback: string): string | null {
+  if (value === undefined) return fallback;
+  if (typeof value !== 'string') return null;
   const normalized = value.trim();
-  return /^[a-z]{2}-[A-Z]{2}$/.test(normalized) ? normalized : fallback;
+  return /^[a-z]{2}-[A-Z]{2}$/.test(normalized) ? normalized : null;
 }
 
-function normalizeRegion(value: unknown, fallback: string): string {
-  if (typeof value !== 'string') return fallback;
+function normalizeRegion(value: unknown, fallback: string): string | null {
+  if (value === undefined) return fallback;
+  if (typeof value !== 'string') return null;
   const normalized = value.trim().toUpperCase();
-  return /^[A-Z]{2}$/.test(normalized) ? normalized : fallback;
+  return /^[A-Z]{2}$/.test(normalized) ? normalized : null;
 }
 
 function readBearerToken(value: string | null): string | null {
-  if (!value?.startsWith('Bearer ')) return null;
-  const token = value.slice('Bearer '.length).trim();
-  return token.length > 0 ? token : null;
+  return value?.match(/^Bearer\s+(\S+)$/i)?.[1] ?? null;
 }
 
-function readNamedKey(variableName: string): string | null {
-  const raw = Deno.env.get(variableName);
-  if (!raw) return null;
-
+function readServerKeys(): { modern: string[]; legacy: string | null } | null {
+  const raw = Deno.env.get('SUPABASE_SECRET_KEYS');
+  const modern: string[] = [];
   try {
-    const keys = JSON.parse(raw) as Record<string, unknown>;
-    const defaultKey = keys.default;
-    if (typeof defaultKey === 'string' && defaultKey.length > 0) return defaultKey;
-    const firstKey = Object.values(keys).find(
-      (value): value is string => typeof value === 'string' && value.length > 0,
-    );
-    return firstKey ?? null;
+    if (raw) {
+      const keys: unknown = JSON.parse(raw);
+      if (!keys || typeof keys !== 'object' || Array.isArray(keys)) return null;
+      for (const key of Object.values(keys)) {
+        if (!isSecretKey(key)) return null;
+        modern.push(key);
+      }
+    }
+    // The CLI provisions a singular key in local development.
+    const localKey = Deno.env.get('SUPABASE_SECRET_KEY');
+    if (localKey) {
+      if (!isSecretKey(localKey)) return null;
+      modern.push(localKey);
+    }
+    const legacy = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || null;
+    if (legacy && !/^[\w-]+\.[\w-]+\.[\w-]+$/.test(legacy)) return null;
+    return modern.length || legacy ? { modern, legacy } : null;
   } catch {
     return null;
   }
 }
 
-function safeErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'unknown error';
+function isSecretKey(value: unknown): value is string {
+  return typeof value === 'string' && /^sb_secret_[A-Za-z0-9_-]+$/.test(value);
+}
+
+function keysEqual(supplied: string | null, expected: string): boolean {
+  if (!supplied) return false;
+  const encoder = new TextEncoder();
+  const left = encoder.encode(supplied);
+  const right = encoder.encode(expected);
+  return left.length === right.length && timingSafeEqual(left, right);
 }
 
 function json(body: unknown, status = 200): Response {

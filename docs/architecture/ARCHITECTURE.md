@@ -247,6 +247,20 @@ provider snapshots/API
 
 Normal discovery/search serves persisted Kajo catalog data rather than requiring live external calls per card.
 
+`catalog-import` is a server-only administrative boundary. Its source configuration
+explicitly sets `verify_jwt=false`; the handler independently matches the `apikey`
+header against configured modern secret keys (named platform keys or the singular
+local key). An exact configured legacy `service_role` key may also arrive as Bearer
+during migration. A key prefix or JWT role claim alone never authorizes import.
+Malformed key configuration fails closed, and the matched server credential scopes
+the admin RPC without forwarding any caller user JWT. Explicit invalid parameters
+are rejected before provider access; at most three pages within 1–500 are imported.
+
+The checked-in SDK versions and Deno lock define the Edge source dependency graph.
+Local HTTP fixtures run the registered deployment handlers and real SDK, while
+provider/Data API responses are simulated. Hosted configuration, key provisioning,
+provider imports and device catalog quality require separately recorded acceptance.
+
 Requirements before release:
 
 - useful BOOK/MOVIE breadth,

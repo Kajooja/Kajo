@@ -2,11 +2,32 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  invokeCatalogImport,
   parseTmdbImportArguments,
   planTmdbImportBatches,
   runTmdbBetaImport,
   validateTmdbImportResponse,
 } from './import-tmdb-beta.mjs';
+
+test('admin transport sends server credentials only as apikey to the canonical Edge route', async () => {
+  const realFetch = globalThis.fetch;
+  const batch = { startPage: 1, pages: 3, language: 'fi-FI', region: 'FI', minimumVoteCount: 40 };
+  try {
+    for (const apiKey of ['sb_secret_transport_fixture', 'legacy.service.fixture']) {
+      globalThis.fetch = async (url, init) => {
+        assert.equal(url, 'https://fixture.invalid/functions/v1/catalog-import');
+        assert.equal(init.method, 'POST');
+        assert.equal(init.headers.apikey, apiKey);
+        assert.equal(init.headers.authorization, undefined);
+        assert.deepEqual(JSON.parse(init.body), { action: 'tmdb-movies', ...batch });
+        return Response.json({ status: 'imported' });
+      };
+      assert.deepEqual(await invokeCatalogImport('https://fixture.invalid', apiKey, batch), { status: 'imported' });
+    }
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
 
 test('plans bounded sequential TMDB Edge Function requests', () => {
   const options = parseTmdbImportArguments([

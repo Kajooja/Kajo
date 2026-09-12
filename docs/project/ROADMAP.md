@@ -35,15 +35,15 @@ The active #229 evidence/pagination packet keeps its own acceptance and rollout 
 
 Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
 reconnect retry-UI defect retained as #240. The owner places application UI work
-in a later pre-MVP packet. **E1 #235 and D1 #236 are accepted**; D2 #237 now
-has a measured, independently reproduced development report and rejection decision.
+in a later pre-MVP packet. **E1 #235, D1 #236 and D2 #237 are accepted**; D2 retains its measured,
+independently reproduced development report and rejection decision.
 The owner subsequently authorized an available alternative to 32M; the first
 real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development dataset.
 This bounded development comparison can precede a larger stable benchmark with
 its own manifest. STATUS names the branch and actual acceptance. #229 retains
-its native/fresh-account gates; external research does not close them. After D2
-source acceptance, continue #182’s Phase14.3 Edge entrypoint/configuration audit
-before expanding provider data. Optional further research and a winning external
+its native/fresh-account gates; external research does not close them. #182’s
+Phase14.3 Edge source audit is implemented; after its required CI/source acceptance,
+verify hosted configuration and prepare the bounded provider expansion. Optional further research and a winning external
 model are not prerequisites for that release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
@@ -133,10 +133,11 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-Before catalog expansion, close #182's source-audit deployment gaps: explicitly
-declare the catalog Edge JWT/service-key boundary, pin reproducible Edge imports
-and validate entrypoints plus unauthorized/authorized requests. Existing mobile
-and Node normalizer tests alone do not verify Edge deployment.
+#182 implements the source-audit prerequisite: explicit catalog Edge JWT/server-key
+boundary, pinned imports/lock and local HTTP entrypoint checks. After required
+source CI/merge, verify actual hosted configuration and prepare the bounded TMDB
+rollout/import before provider expansion. Fixture success does not verify deployment
+or close catalog breadth, provider rights or native quality gates.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
