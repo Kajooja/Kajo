@@ -49,10 +49,11 @@ export function createSupabaseItemInteractionPersistenceApi(
 ): ItemInteractionPersistenceApi {
   return {
     async load(profileId) {
-      const { data, error } = await client
-        .from('item_interactions')
-        .select('item_id, interest, saved, consumed, rating, not_interested')
-        .eq('profile_id', profileId);
+      // One authorized snapshot includes native state and source-tagged history.
+      // The server never copies bootstrap ratings into native interactions/Events.
+      const { data, error } = await client.rpc('get_profile_item_states_v1', {
+        target_profile_id: profileId,
+      });
 
       return {
         data,

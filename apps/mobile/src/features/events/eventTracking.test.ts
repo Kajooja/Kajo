@@ -1,11 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import type { Event, EventSession } from '../../domain/contracts';
-import type { EventPersistenceApi } from './eventPersistence';
 import {
+  canUseEventOrigin,
   createEventSession,
   createCorrelationId,
-  createEventWriteCoordinator,
   createTrackedEvent,
   createUuidV7,
   getDwellEventProperties,
@@ -32,13 +31,6 @@ const event: Event = createTrackedEvent(
   '2026-08-29T21:45:01.000Z',
   { locale: 'fi-FI' },
 );
-
-function createApi(): EventPersistenceApi {
-  return {
-    appendSession: vi.fn(async () => ({ error: null })),
-    appendEvent: vi.fn(async () => ({ error: null })),
-  };
-}
 
 describe('Event tracking contracts', () => {
   it('creates time-ordered UUIDv7-compatible identifiers', () => {
@@ -110,65 +102,48 @@ describe('Event tracking contracts', () => {
   });
 });
 
-describe('Event write coordinator', () => {
-  it('persists the session before flushing queued Events', async () => {
-    let finishSession: (() => void) | undefined;
-    const order: string[] = [];
-    const api = createApi();
-    vi.mocked(api.appendSession).mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          order.push('session:start');
-          finishSession = () => {
-            order.push('session:finish');
-            resolve({ error: null });
-          };
-        }),
-    );
-    vi.mocked(api.appendEvent).mockImplementation(async () => {
-      order.push('event');
-      return { error: null };
-    });
-    const coordinator = createEventWriteCoordinator(api, session, vi.fn());
 
-    coordinator.enqueue(event);
-    await Promise.resolve();
-    expect(order).toEqual(['session:start']);
+describe('deferred Event/action origin admission', () => {
+  const origin = { eventType: 'ITEM_LIKED' as const, itemId: 'item-a',
+    predictionId: 'run-a', originSessionId: 'session-a' };
 
-    finishSession?.();
-    await coordinator.waitForIdle();
-
-    expect(order).toEqual(['session:start', 'session:finish', 'event']);
+  it('accepts a retained destination only for its original session and Item', () => {
+    expect(canUseEventOrigin(origin, 'session-a', 'item-a')).toBe(true);
+    expect(canUseEventOrigin(origin, 'session-b', 'item-a')).toBe(false);
+    expect(canUseEventOrigin(origin, 'session-a', 'item-b')).toBe(false);
+    expect(canUseEventOrigin(origin, 'session-a', null)).toBe(false);
   });
 
-  it('retries the same stable Event after a transient failure', async () => {
-    const api = createApi();
-    vi.mocked(api.appendEvent)
-      .mockResolvedValueOnce({ error: { message: 'offline' } })
-      .mockResolvedValueOnce({ error: null });
-    const snapshots: unknown[] = [];
-    const coordinator = createEventWriteCoordinator(
-      api,
-      session,
-      (snapshot) => snapshots.push(snapshot),
-    );
-
-    coordinator.enqueue(event);
-    await coordinator.waitForIdle();
-    coordinator.retry();
-    await coordinator.waitForIdle();
-
-    expect(api.appendEvent).toHaveBeenCalledTimes(2);
-    expect(api.appendEvent).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      id: event.eventId,
-    }));
-    expect(api.appendEvent).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      id: event.eventId,
-    }));
-    expect(snapshots).toContainEqual({
-      sessionPersisted: true,
-      pendingEventCount: 0,
-      message: null,
+  it('rejects a delayed origin even when submitted through a new-session callback', async () => {
+    let currentSession = 'session-a';
+    const accepted: string[] = [];
+    let finish!: () => void;
+    const delayedDestination = new Promise<void>(resolve => { finish = resolve; });
+    const complete = delayedDestination.then(() => {
+      if (canUseEventOrigin(origin, currentSession, 'item-a')) accepted.push(currentSession);
     });
+    currentSession = 'session-b';
+    finish();
+    await complete;
+    expect(accepted).toEqual([]);
+  });
+
+  it('does not attach a local origin to a later authenticated session', () => {
+    const local = { ...origin, originSessionId: null };
+    expect(canUseEventOrigin(local, null, 'item-a')).toBe(true);
+    expect(canUseEventOrigin(local, 'session-a', 'item-a')).toBe(false);
+  });
+
+  it('leaves fresh non-delivered actions available without claiming a frozen session', () => {
+    expect(canUseEventOrigin(undefined, 'session-b', 'item-b')).toBe(true);
+    expect(canUseEventOrigin({ eventType: 'ITEM_LIKED', itemId: 'item-b' }, 'session-b', 'item-b')).toBe(true);
+  });
+
+  it('keeps the admission token out of persisted Event properties and identity', () => {
+    const tracked = createTrackedEvent(session, { ...origin, originSessionId: session.sessionId, properties: { source: 'ITEM_DETAIL' } },
+      'event-id', '2026-09-10T08:00:00.000Z', {});
+    expect(tracked.sessionId).toBe(session.sessionId);
+    expect(tracked).not.toHaveProperty('originSessionId');
+    expect(tracked.properties).not.toHaveProperty('originSessionId');
   });
 });

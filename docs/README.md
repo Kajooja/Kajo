@@ -21,6 +21,7 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 | Which sprint is active? | [STATUS](project/STATUS.md), then its named sprint |
 | Which longer-term ideas remain preserved? | [FUTURE_PLAN](product/FUTURE_PLAN.md) |
 | How do branches, tests and review work? | [WORKFLOW](project/WORKFLOW.md) |
+| Which recorded device checks remain open on the active implementation? | [DEVICE_TEST](project/DEVICE_TEST.md) |
 | How do agents leave a resumable checkpoint? | [HANDOFF_PROTOCOL](project/HANDOFF_PROTOCOL.md) |
 | What did the repository retrospective establish? | [2026-09-09 retrospective](project/retros/2026-09-09.md) |
 | What did the engine-direction, branch and hygiene audit change? | [2026-09-12 audit](project/retros/2026-09-12.md) |

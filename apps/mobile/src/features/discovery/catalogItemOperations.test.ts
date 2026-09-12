@@ -60,6 +60,12 @@ describe('catalog Item mapping', () => {
     ]);
   });
 
+  it('keeps the delivered domain when catalog metadata changes after prediction', () => {
+    const delivered: Item = { id: 'item-1', itemType: 'BOOK', title: 'Delivered book' };
+    const corrected: Item = { id: 'item-1', itemType: 'MOVIE', title: 'Later movie' };
+    expect(enrichItemsFromCatalog([delivered], [corrected])).toEqual([delivered]);
+  });
+
   it('keeps the Prediction row when metadata enrichment misses an Item', () => {
     const ranked: Item[] = [
       { id: 'item-1', itemType: 'MOVIE', title: 'Prediction title', tags: ['drama'] },

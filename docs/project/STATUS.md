@@ -10,39 +10,57 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Primary next packet — #228 / draft PR #229
+## Current source packet — E1 #235
 
-**When the owner says “jatketaan reposta”, continue atomic next-page delivery in
-[PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
-`feat/228-delivered-origin`, after syncing/reconciling accepted main documentation.**
-Inspect refreshed refs before writing. Do not merge the unfinished implementation
-or switch silently to a different research task.
+The owner reported the protocol-2 device tests working on 2026-09-12, with one
+remaining UI defect: **Yritä uudelleen** stays visible after connectivity returns.
+They requested that recovery correction and the other application UI ideas in a
+later pre-MVP UI packet, and asked development to continue.
 
-Latest implementation source inspected: `44b11b437286653eae427bad10493a9380b92668`.
-All five required jobs passed in [CI #458](https://github.com/Kajooja/Kajo/actions/runs/34582041579).
-The earlier request to wait for the corrected first-page retry-lock check is
-resolved; do not rerun/poll it merely because an older checkpoint says pending.
+**The explicitly selected independent source packet is now [E1 #235](https://github.com/Kajooja/Kajo/issues/235),
+branch `feat/235-portable-engine-contracts`.** Follow that branch's current STATUS
+for executable generic contracts and Kajo/media plus synthetic non-media fixtures.
+It starts from accepted main and does not absorb or accept #229 runtime changes.
+The ordered continuation is E1 contract acceptance → D1 #236 → D2 #237. No public
+dataset download or runtime scorer replacement is part of E1.
 
-Next bounded unit:
+## Native packet checkpoint — #228 / draft PR #229
 
-1. Commit a next page from the private frozen source window: exact actor/Profile/
-   session/domain/mode/request/cursor scope, current eligibility, no repeated seen
-   Items, an independent immutable page PredictionRun/ranks and exact retry receipt.
-2. Preserve historical first-page evidence; advance seen state once and implement
-   page-aware frozen/shadow replay. Raw cached candidates are not a deliverable page.
-3. Add native concurrent 16-window-cap and populated pre-window-receipt upgrade
-   cases, alongside page retry/concurrency/expiry/authorization controls. Passing
-   first-page races does not prove these newer cases.
-4. Only then activate the prepared captured-scope reader. Bind visible ranking,
-   readiness and cache to environment, actor, Profile, session, domain, mode and
-   request/revision. Test rapid A → B → A Profile return, session changes,
-   delayed/error replies and per-Item grid/detail/exposure origin.
-5. Record required source/CI acceptance, separately review the exact forward
-   rollout, then complete configured-device/restart/reconnect/account-switch gates.
+`feat/228-delivered-origin` remains the native source/rollout record. CI #468 and
+manual [CI #469](https://github.com/Kajooja/Kajo/actions/runs/34701247895) passed
+at `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31`. The manual run produced
+`kajo-android-standalone-900dc2653e428bb1cbd27e4bdaa7ea0141e47b31`
+(artifact `10300513895`). The owner report follows this requested build;
+the installed binary checksum was not independently supplied.
 
-Keep `continuationSupported: false` until real continuation passes its complete
-boundary. Identified empty results, bounded-window exhaustion and errors remain
-different; exhausted source windows do not prove an empty catalog.
+Owner feedback accepts the exercised normal flows, Profile switching, expired
+cursor → fresh search and the reported persistence/restart checks. Record this
+as device feedback, not proof of every server attribution/native callback race.
+The remaining reconnect defect is [#240](https://github.com/Kajooja/Kajo/issues/240)
+/ MVP-UX-003: recover the same failed request on usable reconnection and remove
+stale retry UI after successful recovery. Do not merely hide a failed backend
+response because the device says online. The owner explicitly defers this to the
+next application UI packet; do not silently start it instead of E1.
+
+The six approved server forwards remain installed through
+`20260912134224_atomic_prediction_pages`. Do not deploy them again or repeat the
+approval. The 15-second client deadline, exact retry/cancel semantics and all
+439 local tests remain recorded in [the recovery checkpoint](sprints/SPRINT-014.md#bounded-client-recovery--2026-09-12).
+No fresh-account test/reset, new DDL, automatic promotion or full DATA/ALG closure
+is implied. Keep #229 draft while its named acceptance gaps remain; E1 is an
+independent source packet, not a way to mark those gaps complete.
+
+## Owner UI decisions — required before MVP
+
+ROADMAP Phase 17.0 now requires private category statistics/progress and weekly
+tracking (#230 / MVP-UX-004), grid multi-selection and List/history operations
+(#231 / MVP-UX-005), plus the new card controls (#239 / MVP-UX-006). The star saves
+to the existing default List shown as **Tykätyt**; the header's three-dot menu opens
+other destinations. Slider and **Ei kiinnosta / Seuraava** sit at the bottom of the
+card above the dock, leaving space for a description. Saving stays on the card;
+**Seuraava** explicitly advances. UX_PRINCIPLES owns this planned successor to
+current auto-advance, with unchanged evidence and Shared consent semantics.
+Community comparisons remain conditional. Implementation is planned, not shipped.
 
 ## Accepted source, active branch and recorded hosted state
 
@@ -54,24 +72,36 @@ accept #229 runtime, implement a portable engine or train a model.
 
 #229 contains later source work: delivered-slate identity, durable exposure,
 multi-List/collection UX, history projection, late outcomes, frozen replay,
-eligibility-first admission, identified first pages and private source windows.
+eligibility-first admission, identified first pages, private source windows and
+protocol-2 atomic continuation and the captured-scope mobile reader.
 The branch has source/test/rollout evidence that must remain intact. Its detailed
 device and implementation records stay on that branch/PR until accepted; compact
 canonical successor contracts in main are explicitly labeled.
 
-Recorded hosted checkpoint from #229: `20260910190243_shared_list_destinations`.
-This audit did not query or change hosted state. Five later source forwards remain
-recorded as **undeployed**, in this exact dependency order:
+Approved hosted rollout on 2026-09-12 completed on Kajo `mwrnvfosrzwygrunrltm`,
+PostgreSQL 17.6. Tracking now has **56** version/name rows, **150** public/private
+functions and **37** application tables. All prior 50 history rows, 138 function
+identities/owners/ACLs and 25 application/Auth-user triggers are preserved. The
+new immutable-page-context trigger brings the trigger count to 26. Seven event
+triggers and 24 creator-default entries are unchanged. All old table fingerprints
+match after accounting for the one reviewed shadow-count constraint; the four
+new private tables have RLS and deny direct reads to API roles. Anonymous and
+missing-actor page calls reject with `42501` in a read-only rolled-back probe.
+No application/Auth rows or row-derived counts/hashes were exported. Populated
+data preservation is independently tested in isolation, not inferred from a live
+row comparison. No reset, historical repair or global-default migration ran.
+The installed files are now aligned with the actual provider versions:
 
-1. `20260910192630_late_outcome_attribution.sql`
-2. `20260910202244_frozen_prediction_replay.sql`
-3. `20260910210520_eligibility_first_candidate_pool.sql`
-4. `20260911070959_identified_prediction_page.sql`
-5. `20260911074543_prediction_continuation_windows.sql`
+1. `20260912133402_late_outcome_attribution.sql`
+2. `20260912133832_frozen_prediction_replay.sql`
+3. `20260912133941_eligibility_first_candidate_pool.sql`
+4. `20260912134056_identified_prediction_page.sql`
+5. `20260912134141_prediction_continuation_windows.sql`
+6. `20260912134224_atomic_prediction_pages.sql`
 
-Use exact branch source, hashes and ADR-0006's existing-database forward procedure
-before rollout. Never run whole historical `db push` or reset to reconcile main
-and hosted. The separately deferred privilege-default forward
+These SQL bytes are immutable. Use a new reviewed forward for any later change;
+never run whole historical `db push` or reset to reconcile main and hosted.
+The separately deferred privilege-default forward
 `20260909131913_close_postgres_function_defaults.sql` remains a separate gate.
 
 The private window bounds remain 50 candidates/seen IDs, 2 MiB, fifteen minutes
@@ -109,7 +139,7 @@ normalization, model training, evaluation and artifact admission are distinct
 recorded operations. A losing challenger is a valid report; it cannot waive
 native usefulness gates or deploy itself.
 
-No engine package, dataset ingestion, trained representation, world model,
+E1 is the selected executable-contract source work; no dataset ingestion, trained representation, world model,
 multistep dreamer or automatic promotion is delivered by this audit.
 
 ## Preserved owner requirements and release order
@@ -120,8 +150,9 @@ multistep dreamer or automatic promotion is delivered by this audit.
 - Multi-destination List selection, final Add without a second Done action,
   always-available unknown Taste response, approximately ten movies then ten books,
   link reveal/copy and device details remain in their canonical product docs.
-- #230 statistics, #231 multi-select/history trash and joint-list choice are later
-  scoped candidates in FUTURE_PLAN, not automatic new MVP blockers.
+- #230 private statistics/weekly tracking and #231 multi-select/history trash are
+  now required pre-MVP Phase 17.0 work. #239 card controls and #240 reconnect
+  recovery join them; FUT-UX-003 joint-list choice remains a separate candidate.
 - Then follow ROADMAP: algorithm/catalog/engine foundation → Taste/holdout →
   anonymous web/app + Google/Apple continuity → preview → Friend/safety → explicit
   Shared creation and joint rounds → core UX/telemetry/privacy → complete beta →
@@ -145,7 +176,7 @@ advisories; #238 prioritizes the runtime routing decoder before public links and
 coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
 Open source findings are assigned to their existing work owners:
-#228 captured-session reader/window acceptance; #182 Edge catalog configuration
+#228 configured protocol-2 device/recovery acceptance; #182 Edge catalog configuration
 and dependency/entrypoint verification; #160 / MVP-OPS-005 production configuration,
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.

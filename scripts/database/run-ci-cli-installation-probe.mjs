@@ -10,6 +10,16 @@ import { functionDigestSql } from './platform-default-probe.mjs';
 import { buildFreshInstallation, installFreshDatabase, installationHistorySql } from './fresh-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
+import { historyProjectionUpgradeSql } from './history-projection-upgrade.mjs';
+import { sharedListDestinationsUpgradeSql } from './shared-list-destinations-upgrade.mjs';
+import { lateOutcomeUpgradeSql } from './late-outcome-upgrade.mjs';
+import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
+import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
+import { predictionPageSmokeSql, predictionPageUpgradeSql, predictionWindowSmokeSql } from './prediction-page.mjs';
+import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
+import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
+import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
+import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -24,7 +34,7 @@ try {
   const historySql = installationHistorySql;
   const nativeSql = `begin read only; set local search_path=pg_catalog;
     ${functionDigestSql({ includeApplication: false })} rollback;`;
-  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations }) => {
+  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrent }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
@@ -37,6 +47,47 @@ try {
     await resetFromMigrations(files.slice(0, collectionIndex));
     const [collectionActionUpgrade] = await exec(collectionActionUpgradeSql(files[collectionIndex], candidate.tables));
     assert.match(collectionActionUpgrade?.collectionActionUpgrade, /^PASS: unchanged populated/);
+    const projectionIndex = files.findIndex(file => file.name.endsWith('_bootstrap_history_projection.sql'));
+    assert.ok(projectionIndex > collectionIndex);
+    await resetFromMigrations(files.slice(0, projectionIndex));
+    const projectionFixture = await readFile(new URL('existing-application-fixture.sql', import.meta.url), 'utf8');
+    const [historyProjectionUpgrade] = await exec(historyProjectionUpgradeSql(files[projectionIndex], projectionFixture, candidate.tables));
+    assert.match(historyProjectionUpgrade?.historyProjectionUpgrade, /^PASS: unchanged populated/);
+    const destinationsIndex = files.findIndex(file => file.name.endsWith('_shared_list_destinations.sql'));
+    assert.ok(destinationsIndex > projectionIndex);
+    await resetFromMigrations(files.slice(0, destinationsIndex));
+    const [sharedListDestinationsUpgrade] = await exec(sharedListDestinationsUpgradeSql(files[destinationsIndex], projectionFixture, candidate.tables));
+    assert.match(sharedListDestinationsUpgrade?.sharedListDestinationsUpgrade, /^PASS: unchanged populated/);
+    const lateIndex = files.findIndex(file => file.name.endsWith('_late_outcome_attribution.sql'));
+    assert.ok(lateIndex > destinationsIndex);
+    await resetFromMigrations(files.slice(0, lateIndex));
+    const [hostedPredictionUpgrade, hostedPredictionRuntime] = await exec(await predictionHostedUpgradeSql(files.slice(lateIndex, lateIndex + 6)));
+    assert.match(hostedPredictionUpgrade?.hostedPredictionUpgrade, /^PASS: reviewed compact/);
+    assert.match(hostedPredictionRuntime?.atomicPages, /^PASS: 12 Personal/);
+    const [lateOutcomeUpgrade] = await exec(lateOutcomeUpgradeSql(files[lateIndex], projectionFixture, candidate.tables));
+    assert.match(lateOutcomeUpgrade?.lateOutcomeUpgrade, /^PASS: unchanged populated/);
+    const replayIndex = files.findIndex(file => file.name.endsWith('_frozen_prediction_replay.sql'));
+    assert.ok(replayIndex > lateIndex);
+    await resetFromMigrations(files.slice(0, replayIndex));
+    const [frozenReplayUpgrade] = await exec('set extra_float_digits=0;\n'
+      + frozenReplayUpgradeSql(files[replayIndex], projectionFixture, candidate.tables));
+    assert.match(frozenReplayUpgrade?.frozenReplayUpgrade, /^PASS: unchanged populated/);
+    const poolIndex = files.findIndex(file => file.name.endsWith('_eligibility_first_candidate_pool.sql'));
+    assert.ok(poolIndex > replayIndex);
+    await resetFromMigrations(files.slice(0, poolIndex));
+    const [candidatePoolUpgrade] = await exec(candidatePoolUpgradeSql(files[poolIndex], projectionFixture, candidate.tables));
+    assert.match(candidatePoolUpgrade?.candidatePoolUpgrade, /^PASS: unchanged populated/);
+    const pageIndex = files.findIndex(file => file.name.endsWith('_identified_prediction_page.sql'));
+    assert.ok(pageIndex > poolIndex);
+    await resetFromMigrations(files.slice(0, pageIndex));
+    const [predictionPageUpgrade] = await exec(predictionPageUpgradeSql(files[pageIndex], projectionFixture));
+    assert.match(predictionPageUpgrade?.predictionPageUpgrade, /^PASS: unchanged populated/);
+    const windowIndex = files.findIndex(file => file.name.endsWith('_prediction_continuation_windows.sql'));
+    const atomicPageIndex = files.findIndex(file => file.name.endsWith('_atomic_prediction_pages.sql'));
+    assert.equal(atomicPageIndex, windowIndex + 1);
+    await resetFromMigrations(files.slice(0, windowIndex));
+    const [continuationUpgrade] = await exec(predictionContinuationUpgradeSql(files[windowIndex], files[atomicPageIndex], projectionFixture));
+    assert.match(continuationUpgrade?.continuationUpgrade, /^PASS: populated pre-window/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -51,6 +102,8 @@ try {
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Failed CLI migration left partial application changes');
     assert.deepEqual((await exec(historySql))[0], expectedHistory, 'Failed CLI migration was recorded as applied');
 
+    const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrent);
+    const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrent);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -60,6 +113,31 @@ try {
     assert.match(itemActions?.itemActions, /^PASS: atomic/);
     const [collectionActions] = await exec(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
+    const [deliveryOrder] = await exec(await readFile(new URL('delivery-order-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(deliveryOrder?.deliveryOrder, /^PASS: 14 Item/);
+    const [lateOutcomes] = await exec(await readFile(new URL('late-outcome-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(lateOutcomes?.lateOutcomes, /^PASS: exact late Shared/);
+    const [frozenReplay] = await exec('set extra_float_digits=0;\n'
+      + await readFile(new URL('frozen-replay-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(frozenReplay?.frozenReplay, /^PASS: 18 Personal\/Shared/);
+    const [candidatePool] = await exec(await candidatePoolSmokeSql());
+    assert.match(candidatePool?.candidatePool, /^PASS: 36 mode\/domain\/Profile\/limit/);
+    const [predictionPage] = await exec(await predictionPageSmokeSql());
+    assert.match(predictionPage?.predictionPage, /^PASS: identified/);
+    const [predictionWindow] = await exec(await predictionWindowSmokeSql());
+    assert.match(predictionWindow?.predictionWindow, /^PASS: bounded frozen/);
+    const [atomicPages] = await exec(await atomicPredictionPagesSmokeSql());
+    assert.match(atomicPages?.atomicPages, /^PASS: 12 Personal/);
+    const [atomicPageBoundaries] = await exec(await atomicPredictionPagesSmokeSql('atomic-prediction-pages-boundaries.sql'));
+    assert.match(atomicPageBoundaries?.atomicPages, /^PASS: current eligibility/);
+    const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
+    const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(bootstrapHistory?.bootstrapHistory, /^PASS: calibration/);
+    const [sharedListDestinations] = await exec(await readFile(new URL('shared-list-destinations-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(sharedListDestinations?.sharedListDestinations, /^PASS: exact target consent/);
+    const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
+    assert.match(listMembership?.listMembership, /^PASS: public delivery/);
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);
@@ -72,6 +150,10 @@ try {
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
+      bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
+      lateOutcomes, lateOutcomeUpgrade, hostedPredictionUpgrade, hostedPredictionRuntime, frozenReplay, frozenReplayUpgrade,
+      candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
+      atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

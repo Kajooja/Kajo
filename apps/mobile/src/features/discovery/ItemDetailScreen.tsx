@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { buildCollectionSequence, buildDeliveredItemOrigins, getDeliveredItemOrigin, type DeliveredItemOrigin, canUseDeliveredSlate, getDeliveredSlate, type DeliveredSlate } from './deliveredSlate';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -41,6 +42,7 @@ import {
 import {
   ListDestinationSheet,
   type ListDestinationCommit,
+  type ListDestinationCommitResult,
 } from '../lists/ListDestinationSheet';
 import { ITEM_LIST_LABELS } from '../lists/itemListLabels';
 import { useItemLists } from '../lists/ItemListsContext';
@@ -62,57 +64,54 @@ import {
   getConsumedItemLabels,
   ITEM_INTERACTION_LABELS,
 } from './itemInteractionLabels';
-import { getMockItem, getRankedMockItems } from './mockDiscovery';
+import { getMockItem } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
 import {
-  applySharedDiscoveryOverlay,
   formatMemberHistoryProvenance,
   formatPendingListApproval,
   getMemberHistoryNicknames,
   getPendingListApproval,
-  type SharedDiscoveryStateMap,
 } from './sharedEndorsement';
 
 const RATING_COMMIT_FEEDBACK_DURATION_MS = 500;
 const COLLAPSED_TAG_COUNT = 2;
 
-function buildEligibleSwipeSequence(
-  selectedItem: Item | undefined,
-  mode: ReturnType<typeof useDiscoveryMode>['mode'],
-  interactions: Parameters<typeof buildSwipeSequence>[2],
-  isSharedProfile: boolean,
-  sharedOverlayReady: boolean,
-  sharedStateByItemId: SharedDiscoveryStateMap,
-): readonly Item[] {
-  if (!selectedItem || !sharedOverlayReady) return [];
-
-  const rankedItems = getRankedMockItems(selectedItem.itemType, mode);
-  const eligibleItems = isSharedProfile
-    ? applySharedDiscoveryOverlay(
-        rankedItems,
-        selectedItem.itemType,
-        sharedStateByItemId,
-      )
-    : rankedItems;
-
-  return buildSwipeSequence(selectedItem, eligibleItems, interactions);
-}
-
 interface ItemDetailScreenProps {
   itemId: ItemId;
+  deliveryId?: string;
   predictionId?: PredictionId;
   predictionSource?: 'hosted' | 'fallback';
 }
 
 export function ItemDetailScreen({
   itemId,
-  predictionId,
+  deliveryId,
   predictionSource,
 }: ItemDetailScreenProps) {
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const sharedEndorsements = useSharedEndorsements();
   const { scopeKey } = useItemLists();
+  const eventTracking = useEventTracking();
+  const [slate] = useState(() => getDeliveredSlate(deliveryId));
+  const invalidOrigin = deliveryId
+    ? !slate || !canUseDeliveredSlate(slate, scopeKey, eventTracking.sessionId, itemId)
+    : predictionSource === 'hosted';
+  if (invalidOrigin) {
+    const styles = createStyles(getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile));
+    return (
+      <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+        <View style={styles.missing}>
+          <Text accessibilityLiveRegion="polite" style={styles.title}>
+            Tämä näkymä ei ole enää käytettävissä. Avaa teos uudelleen.
+          </Text>
+          <Pressable accessibilityRole="button" style={styles.primaryButton} onPress={() => router.back()}>
+            <Text style={styles.primaryButtonText}>Takaisin</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
   const isSharedProfile = activeProfile.activeProfile?.type === 'SHARED';
 
   if (isSharedProfile && sharedEndorsements.status !== 'ready') {
@@ -148,9 +147,9 @@ export function ItemDetailScreen({
 
   return (
     <ItemDetailContent
-      key={`${scopeKey}:${itemId}`}
+      key={`${scopeKey}:${eventTracking.sessionId}:${itemId}:${deliveryId ?? "direct"}`}
       itemId={itemId}
-      {...(predictionId ? { predictionId } : {})}
+      {...(slate ? { slate } : {})}
       {...(predictionSource ? { predictionSource } : {})}
     />
   );
@@ -158,15 +157,20 @@ export function ItemDetailScreen({
 
 function ItemDetailContent({
   itemId,
-  predictionId,
-  predictionSource = 'fallback',
-}: ItemDetailScreenProps) {
+  slate,
+}: ItemDetailScreenProps & { slate?: DeliveredSlate }) {
   const { width } = useWindowDimensions();
-  const { mode } = useDiscoveryMode();
+  const { mode: currentMode } = useDiscoveryMode();
+  const [mode] = useState(() => slate?.mode ?? currentMode);
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
   const sharedEndorsements = useSharedEndorsements();
   const profileMessages = useProfileMessages();
+  const currentView = useRef(true);
+  useLayoutEffect(() => {
+    currentView.current = true;
+    return () => { currentView.current = false; };
+  }, []);
   const {
     interactions,
     setRating,
@@ -176,9 +180,9 @@ function ItemDetailContent({
     undo,
     atomicPendingCount,
   } = useItemInteractions();
-  const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
+  const theme = getRoomTheme(getAmbientPhase(currentMode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const selectedItem = getMockItem(itemId);
+  const selectedItem = slate?.items.find(item => item.id === itemId) ?? getMockItem(itemId);
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
       ? activeProfile.sharedProfiles.find(
@@ -187,20 +191,18 @@ function ItemDetailContent({
         ) ?? null
       : null;
   const [recommendationTraceId] = useState<PredictionId>(
-    () => predictionId ?? createUuidV7(),
+    () => slate?.predictionId ?? createUuidV7(),
   );
-  const sharedOverlayReady =
-    !activeSharedMembership || sharedEndorsements.status === 'ready';
-  const [items] = useState<readonly Item[]>(() =>
-    buildEligibleSwipeSequence(
-      selectedItem,
-      mode,
-      interactions,
-      Boolean(activeSharedMembership),
-      sharedOverlayReady,
-      sharedEndorsements.stateByItemId,
-    ),
-  );
+  const [items] = useState<readonly Item[]>(() => selectedItem
+    ? slate?.source === 'collection' ? buildCollectionSequence(selectedItem, slate.items)
+      : buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
+    : []);
+  const [origins] = useState(() => slate?.origins ?? buildDeliveredItemOrigins(
+    items, items, recommendationTraceId, 'fallback', {},
+  ));
+  const [originSessionId] = useState(() => slate?.sessionId ?? eventTracking.sessionId);
+  const originFor = useCallback((item: Item) => ({ ...getDeliveredItemOrigin(origins, item.id),
+    originSessionId }), [origins, originSessionId]);
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
@@ -221,20 +223,15 @@ function ItemDetailContent({
   const dwellState = useRef<{
     item: Item;
     startedAtMs: number;
+    origin: DeliveredItemOrigin;
+    recordEvent: typeof eventTracking.recordEvent;
+    discoveryMode: typeof mode;
   } | null>(null);
   const visibleDwellItem = useRef<Item | null>(null);
-  const dwellEventContext = useRef({
-    recordEvent: eventTracking.recordEvent,
-    predictionId: recommendationTraceId,
-    discoveryMode: mode,
-    predictionSource,
-  });
-  dwellEventContext.current = {
-    recordEvent: eventTracking.recordEvent,
-    predictionId: recommendationTraceId,
-    discoveryMode: mode,
-    predictionSource,
-  };
+  const startDwell = useCallback((item: Item) => {
+    dwellState.current = { item, startedAtMs: Date.now(), origin: originFor(item),
+      recordEvent: eventTracking.recordEvent, discoveryMode: mode };
+  }, [eventTracking.recordEvent, mode, originFor]);
 
   const finishDwell = useCallback(
     (endReason: 'ITEM_CHANGED' | 'SCREEN_EXIT' | 'APP_BACKGROUND') => {
@@ -251,16 +248,15 @@ function ItemDetailContent({
 
       if (!properties) return;
 
-      const current = dwellEventContext.current;
-      current.recordEvent({
+      activeDwell.recordEvent({
         eventType: 'ITEM_DWELL',
         itemId: activeDwell.item.id,
         itemType: activeDwell.item.itemType,
-        predictionId: current.predictionId,
-        discoveryMode: current.discoveryMode,
+        ...activeDwell.origin,
+        discoveryMode: activeDwell.discoveryMode,
         properties: {
           ...properties,
-          predictionSource: current.predictionSource,
+          ...activeDwell.origin.properties,
         },
       });
     },
@@ -273,19 +269,19 @@ function ItemDetailContent({
 
       if (dwellState.current?.item.id !== item.id) {
         finishDwell('ITEM_CHANGED');
-        dwellState.current = { item, startedAtMs: Date.now() };
+        startDwell(item);
       }
 
       eventTracking.recordEvent({
         eventType: 'ITEM_IMPRESSION',
         itemId: item.id,
         itemType: item.itemType,
-        predictionId: recommendationTraceId,
+        ...originFor(item),
         discoveryMode: mode,
-        properties: { source: 'ITEM_SEQUENCE', predictionSource },
+        properties: { source: 'ITEM_SEQUENCE', ...originFor(item).properties },
       });
     },
-    [eventTracking, finishDwell, mode, predictionSource, recommendationTraceId],
+    [eventTracking, finishDwell, mode, originFor, startDwell],
   );
 
   useEffect(() => {
@@ -299,17 +295,14 @@ function ItemDetailContent({
         visibleDwellItem.current &&
         !dwellState.current
       ) {
-        dwellState.current = {
-          item: visibleDwellItem.current,
-          startedAtMs: Date.now(),
-        };
+        startDwell(visibleDwellItem.current);
       }
 
       previousState = nextState;
     });
 
     return () => subscription.remove();
-  }, [finishDwell]);
+  }, [finishDwell, startDwell]);
 
   useEffect(
     () => () => {
@@ -411,29 +404,41 @@ function ItemDetailContent({
     );
   }
 
-  function handleListDestinationCommit(commit: ListDestinationCommit) {
+  async function handleListDestinationCommit(commit: ListDestinationCommit): Promise<ListDestinationCommitResult> {
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
     const target = listPickerTarget;
-    setListPickerTarget(null);
 
-    if (!target) return;
+    if (!target || !commit.lists.length) return { status: 'error', message: 'Avaa listavalinta uudelleen.' };
 
     if (activeSharedMembership) {
-      void handleEndorsement(
+      const result = await handleEndorsement(
         target.item,
         target.index,
-        commit.list,
+        commit.lists,
         commit.message,
         target.origin,
       );
-      return;
+      if (result.status === 'success') setListPickerTarget(null);
+      return result;
     }
 
     const { item, index } = target;
+    let notice: string | undefined;
     if (commit.message) {
-      void profileMessages.send({ profileId: commit.list.profileId, body: commit.message,
-        listId: commit.list.id, itemId: item.id });
+      for (const list of commit.lists) {
+        if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista tallentuneet lisäykset.' };
+        const messageResult = await profileMessages.send({ profileId: list.profileId, body: commit.message,
+          listId: list.id, itemId: item.id });
+        if (messageResult.status === 'error') notice = 'Lisäys tallentui, mutta viesti ei lähtenyt. Voit lähettää sen postilaatikosta.';
+      }
     }
-    advanceAfterAction(item, index, `${commit.added ? 'Lisätty' : 'Jo'} listalla ${commit.list.name}.`);
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista tallentuneet lisäykset.' };
+    if (!commit.stayOpen) {
+      setListPickerTarget(null);
+      advanceAfterAction(item, index, notice ?? (commit.stayOpen === false
+        ? 'Listalisäykset tallennettu.' : `Lisätty listoille ${commit.lists.map(list => list.name).join(', ')}.`));
+    }
+    return { status: 'success', ...(notice ? { notice } : {}) };
   }
 
   function openListPicker(
@@ -447,52 +452,61 @@ function ItemDetailContent({
       return;
     }
     setListPickerTarget({ item, index, interaction, origin: { eventType: 'ITEM_LIKED',
-      itemId: item.id, itemType: item.itemType, predictionId: recommendationTraceId, discoveryMode: mode } });
+      itemId: item.id, itemType: item.itemType, ...originFor(item), discoveryMode: mode } });
   }
 
   async function handleEndorsement(
     item: Item,
     index: number,
-    proposedList?: ItemList,
+    proposedLists?: readonly ItemList[],
     message?: string | null,
     origin?: EventRecordInput,
-  ) {
-    if (exitingItemId || endorsingItemId) return;
+    confirmedListIds?: readonly string[],
+  ): Promise<ListDestinationCommitResult> {
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
+    if (exitingItemId || endorsingItemId) return { status: 'error', message: 'Odota nykyisen valinnan tallentumista.' };
 
     setEndorsingItemId(item.id);
     const result = await sharedEndorsements.endorse(
       item.id,
-      proposedList?.id,
+      proposedLists?.[0]?.id,
       origin ?? { eventType: 'ITEM_ENDORSED', itemId: item.id, itemType: item.itemType,
-        predictionId: recommendationTraceId, discoveryMode: mode },
+        ...originFor(item), discoveryMode: mode },
+      proposedLists?.map(list => list.id) ?? confirmedListIds,
     );
-    setEndorsingItemId(null);
-
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
     if (result.status === 'error') {
+      setEndorsingItemId(null);
       setFeedback(result.message);
-      return;
+      return result;
     }
 
-    if (proposedList) {
-      rememberRecentList(proposedList.profileId, proposedList.id);
+    for (const list of proposedLists ?? []) {
+      rememberRecentList(list.profileId, list.id);
     }
 
+    let notice: string | undefined;
+    const destinations = result.commit.proposalLists ?? [{ id: result.commit.proposalListId, name: result.commit.proposalListName }];
     if (message) {
-      void profileMessages.send({
-        profileId: result.commit.profileId,
-        body: message,
-        listId: result.commit.proposalListId,
-        itemId: item.id,
-      });
+      for (const list of destinations) {
+        if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
+        const messageResult = await profileMessages.send({
+          profileId: result.commit.profileId, body: message, listId: list.id, itemId: item.id,
+        });
+        if (messageResult.status === 'error') notice = 'Lisäykset tallentuivat, mutta kaikkia viestejä ei lähetetty. Voit lähettää puuttuvat viestit postilaatikosta.';
+      }
     }
 
+    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
+    setEndorsingItemId(null);
     advanceAfterAction(
       item,
       index,
-      result.commit.consensusSaved
-        ? `Pari! Tallennettu listaan ${result.commit.proposalListName}.`
-        : `Odottaa muiden hyväksyntää listalle ${result.commit.proposalListName}.`,
+      notice ?? (result.commit.consensusSaved
+        ? `Pari! Tallennettu listoille ${destinations.map(list => list.name).join(', ')}.`
+        : `Odottaa muiden hyväksyntää listoille ${destinations.map(list => list.name).join(', ')}.`),
     );
+    return { status: 'success', ...(notice ? { notice } : {}) };
   }
 
   function handleCommittedAction(
@@ -518,9 +532,9 @@ function ItemDetailContent({
       eventType: getInteractionEventType(action, nextInteraction),
       itemId: item.id,
       itemType: item.itemType,
-      predictionId: recommendationTraceId,
+      ...originFor(item),
       discoveryMode: mode,
-      properties: { source: 'ITEM_DETAIL', predictionSource, ...eventProperties },
+      properties: { source: 'ITEM_DETAIL', ...originFor(item).properties, ...eventProperties },
     };
     if (!commit(eventId, eventInput)) {
       return false;
@@ -621,6 +635,7 @@ function ItemDetailContent({
     const result = undo();
 
     if (!result) {
+      setFeedback('Kumoamista ei voitu aloittaa. Odota tallennusta ja yritä uudelleen.');
       return;
     }
 
@@ -631,14 +646,14 @@ function ItemDetailContent({
         eventType: 'ITEM_INTERACTION_UNDONE',
         itemId: targetItem.id,
         itemType: targetItem.itemType,
-        predictionId: recommendationTraceId,
+        ...originFor(targetItem),
         discoveryMode: mode,
         properties: {
           ...getUndoEventProperties(
             result.reversedEventId,
             result.restoredInteraction,
           ),
-          predictionSource,
+          ...originFor(targetItem).properties,
         },
       });
     }
@@ -657,8 +672,6 @@ function ItemDetailContent({
       pathname: '/discovery/[itemId]',
       params: {
         itemId: undoTargetItemId,
-        predictionId: recommendationTraceId,
-        predictionSource,
       },
     });
   }
@@ -723,7 +736,7 @@ function ItemDetailContent({
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back to discovery"
+          accessibilityLabel={slate?.collectionTitle ? `Takaisin: ${slate.collectionTitle}` : 'Back to discovery'}
           onPress={() => router.back()}
           hitSlop={10}
           style={({ pressed }) => [
@@ -731,7 +744,7 @@ function ItemDetailContent({
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.backText}>← Discovery</Text>
+          <Text style={styles.backText}>← {slate?.collectionTitle ?? 'Discovery'}</Text>
         </Pressable>
         <View style={styles.topBarActions}>
           <Pressable
@@ -823,6 +836,7 @@ function ItemDetailContent({
               sharedState,
               activeSharedMembership?.members ?? [],
             ),
+            item.itemType,
           );
 
           return (
@@ -875,7 +889,8 @@ function ItemDetailContent({
                 {...(pendingListApproval
                   ? {
                       onApprove: () =>
-                        void handleEndorsement(item, index),
+                        void handleEndorsement(item, index, undefined, undefined, undefined,
+                          sharedState?.proposedLists?.map(list => list.id)),
                     }
                   : {})}
                 onRating={(rating) =>
@@ -945,7 +960,7 @@ function SwipeItemPage({
   const visibleTags = tagsExpanded
     ? tags
     : tags.slice(0, COLLAPSED_TAG_COUNT);
-  const contentExpanded = descriptionExpanded || tagsExpanded;
+  const contentExpanded = descriptionExpanded || tagsExpanded || pendingApprovalLabel !== null;
 
   return (
     <ScrollView
@@ -956,7 +971,7 @@ function SwipeItemPage({
     >
       {pendingApprovalLabel && onApprove ? (
         <View style={styles.approvalBanner}>
-          <Text numberOfLines={2} style={styles.approvalBannerText}>
+          <Text style={styles.approvalBannerText}>
             {pendingApprovalLabel}
           </Text>
           <Pressable

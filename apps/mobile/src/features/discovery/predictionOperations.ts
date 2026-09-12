@@ -1,5 +1,4 @@
 import type {
-  Context,
   DiscoveryMode,
   Item,
   ItemType,
@@ -8,17 +7,10 @@ import type {
   ProfileId,
 } from '../../domain/contracts';
 
-export const PREDICTION_V1_RPC = 'rank_items_v1';
-
 export interface PredictionRpcResponse {
   data: unknown;
-  error: { message: string } | null;
+  error: { message: string; code?: string } | null;
 }
-
-export type PredictionRpc = (
-  functionName: typeof PREDICTION_V1_RPC,
-  arguments_: Readonly<Record<string, unknown>>,
-) => Promise<PredictionRpcResponse>;
 
 export interface PredictionRanking {
   predictionId: PredictionId;
@@ -42,35 +34,6 @@ interface PredictionRow {
   rank: number;
 }
 
-export async function loadPredictionRanking(
-  rpc: PredictionRpc,
-  input: {
-    profileId: ProfileId;
-    mode: DiscoveryMode;
-    itemType: ItemType;
-    limit?: number;
-    context?: Context;
-  },
-): Promise<PredictionRankingResult> {
-  try {
-    const response = await rpc(PREDICTION_V1_RPC, {
-      target_profile_id: input.profileId,
-      requested_mode: input.mode,
-      requested_item_type: input.itemType,
-      result_limit: input.limit ?? 20,
-      request_context: serializeContext(input.context ?? {}),
-    });
-
-    if (response.error) {
-      return predictionError();
-    }
-
-    return mapPredictionRows(response.data, input.profileId, input.mode);
-  } catch {
-    return predictionError();
-  }
-}
-
 export function mapPredictionRows(
   data: unknown,
   profileId: ProfileId,
@@ -86,7 +49,9 @@ export function mapPredictionRows(
   if (
     rows.length !== data.length ||
     !predictionId ||
-    rows.some((row) => row.prediction_id !== predictionId)
+    rows.some((row) => row.prediction_id !== predictionId) ||
+    new Set(rows.map((row) => row.item_id)).size !== rows.length ||
+    new Set(rows.map((row) => row.rank)).size !== rows.length
   ) {
     return predictionError();
   }
@@ -100,7 +65,7 @@ export function mapPredictionRows(
         itemType: row.item_type,
         title: row.title,
         ...(row.description ? { description: row.description } : {}),
-        tags: row.tags,
+        tags: [...row.tags],
       })),
       predictions: rows.map((row) => ({
         predictionId,
@@ -121,7 +86,7 @@ function isPredictionRow(value: unknown): value is PredictionRow {
 
   return (
     typeof row.prediction_id === 'string' &&
-    typeof row.item_id === 'string' &&
+    typeof row.item_id === 'string' && row.item_id.length > 0 &&
     (row.item_type === 'BOOK' || row.item_type === 'MOVIE') &&
     typeof row.title === 'string' &&
     (row.description === null || typeof row.description === 'string') &&
@@ -135,16 +100,6 @@ function isPredictionRow(value: unknown): value is PredictionRow {
     Number.isInteger(row.rank) &&
     row.rank > 0
   );
-}
-
-function serializeContext(context: Context): Readonly<Record<string, unknown>> {
-  return {
-    ...(context.sessionId ? { sessionId: context.sessionId } : {}),
-    ...(context.locale ? { locale: context.locale } : {}),
-    ...(context.timezone ? { timezone: context.timezone } : {}),
-    ...(context.occurredAt ? { occurredAt: context.occurredAt } : {}),
-    ...(context.attributes ? { attributes: context.attributes } : {}),
-  };
 }
 
 function predictionError(): PredictionRankingResult {

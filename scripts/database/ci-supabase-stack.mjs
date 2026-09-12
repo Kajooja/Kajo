@@ -1,7 +1,7 @@
 // Each invocation owns a new unlinked project on an ephemeral GitHub Ubuntu
 // runner. Shared by the platform and application installation checks.
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -130,6 +130,27 @@ async function withNewSupabaseStack(projectId, work, destination) {
         '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
       return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
     };
+    // Separate native sessions for race probes. Unlike the synchronous adapter,
+    // this keeps Node's event loop available while PostgreSQL waits on locks.
+    // Bound to the newly owned, image-verified container above; no database URL.
+    const execConcurrent = sql => new Promise((resolve, reject) => {
+      const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
+        ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1',
+          '--username=postgres', '--dbname=postgres'])], { cwd: directory, env: environment });
+      let output = ''; let errors = '';
+      const timer = setTimeout(() => child.kill('SIGKILL'), 30_000);
+      child.stdout.on('data', data => { output += data; if (output.length>16*1024*1024) child.kill('SIGKILL'); });
+      child.stderr.on('data', data => { errors = (errors+data).slice(-3000); });
+      child.on('error', error => { clearTimeout(timer); reject(error); });
+      child.on('close', code => {
+        clearTimeout(timer);
+        if (code!==0) return reject(new Error(`Concurrent local SQL failed (${code}): ${errors.trim()}`));
+        try { resolve(output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : []); }
+        catch (error) { reject(error); }
+      });
+      child.stdin.on('error', () => {}); // Process close reports failure without an uncaught EPIPE.
+      child.stdin.end(`set statement_timeout='10s';\n${sql}`);
+    });
     let applied = false;
     const applyMigrations = async files => {
       assert.equal(applied, false, 'Fresh installation can execute only once');
@@ -161,7 +182,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       verifyCiPostgresImage(resetImage);
       return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
     };
-    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations });
+    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrent });
     if (destination) {
       const report = { result, cliVersion, image, architecture: process.arch, projectId, containerId,
         workspace: directory, installedAt: new Date().toISOString(), cleanup: 'RETAINED_LOCAL',

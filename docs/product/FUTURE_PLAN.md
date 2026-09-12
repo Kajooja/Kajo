@@ -496,8 +496,9 @@ Keep the Room and primary navigation restrained.
 Execution slot: a separately scoped Phase 17.0 increment after reliable history,
 atomic actions and delivered-origin gates. Weekly aggregation and comparisons
 also depend on Phase 17.1/17.2 telemetry/operations/privacy. This records a
-candidate for that phase, not a new Phase 14 task or an automatic MVP release
-blocker. [Issue #230](https://github.com/Kajooja/Kajo/issues/230) tracks delivery.
+required pre-MVP Phase 17.0 scope by the owner’s 2026-09-12 decision
+(MVP-UX-004), while keeping community comparisons conditional. It is not the
+current E1 implementation task. [Issue #230](https://github.com/Kajooja/Kajo/issues/230) tracks delivery.
 
 ### Personal summary and unlock
 
@@ -590,7 +591,8 @@ Owner idea recorded **2026-09-10**. Reduce repeated work directly in Discovery a
 List grids. Delivery belongs to a separately scoped Phase 17.0 browse/List
 increment after MVP-DATA-003/004 and current List/history correctness.
 [Issue #231](https://github.com/Kajooja/Kajo/issues/231) tracks implementation;
-this is not an automatic additional MVP gate.
+the owner explicitly promoted this to required pre-MVP scope on 2026-09-12
+(MVP-UX-005). The engine work remains the current packet.
 
 ### Selection and actions
 
@@ -659,5 +661,15 @@ The owner’s A-rates → B-responds → joint-history flow, separate Personal h
 and controlled rewatch behavior are promoted to required first-release scope:
 `MVP-SOCIAL-007..009`, ROADMAP Phase 16.3, Issue #232. DOMAIN_MODEL,
 DATA_EVENTS and PREDICTION_MODEL own their contracts. They are not deferred
-behind optional statistics, bulk selection or later social research. Personal
+behind the later Phase 17 statistics/selection packet or later social research. Personal
 statistics must not silently count Shared round responses as Personal reactions.
+
+## Pre-MVP card controls and reconnect recovery — 2026-09-12
+
+The owner added required application work to Phase 17.0: #239 / MVP-UX-006 moves
+List selection into a header overflow, adds a quick-save star for Tykätyt and
+places slider/Ei kiinnosta/Seuraava above the dock with description space.
+#240 / MVP-UX-003 fixes stale retry UI after network recovery. The complete
+interaction/evidence semantics are owned by UX_PRINCIPLES and DATA_EVENTS;
+STATUS owns the device result and E1 continuation. These are required before MVP,
+not shipped controls or a request to mix UI development into E1.

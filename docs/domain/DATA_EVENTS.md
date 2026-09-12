@@ -420,17 +420,29 @@ These compact contracts reconcile active source with accepted-main behavior abov
 
 `eventOutbox.ts` persists immutable Event/session envelopes in its own actor/Profile/environment namespace before acceptance. Original sessions survive restart. Stale scope stops dispatch/callbacks while unresolved evidence remains available to an authorized retry. Correlated commands wait only for their matching already-enqueued pre-action impression; acknowledgement wakes exposure-waiting work while retaining normal network backoff. Missing impressions are never invented. Layout/session admission rejects stale UI actions while already accepted commands retain their original envelope.
 
-### Late Outcome attribution — prepared, not hosted
+`EventRecordInput.originSessionId` is a client-only admission guard: null denotes an explicitly local origin, while omission preserves fresh non-delivered action compatibility. Delivered Detail/picker actions reject a mismatched session or Item. This guard is not persisted as an Event property and does not rewrite the real command/session envelope. `deliveryTier` is client origin/exposure metadata, not a new atomic-command RPC field. Layout-time session invalidation prevents old hydration/receipt/dispatch callbacks from surviving until passive queue cleanup; accepted persisted commands still replay their original session.
 
-`20260910192630_late_outcome_attribution.sql` defines a private read projection shared by ScenarioMemory and evaluation. A previously unattributed command Outcome may be read with `LATE_EXPOSURE_V1` only when its original receipt owns that exact Event and actor/Profile/Item/session/mode/occurrence agree with the selected prior run and a real pre-action impression. A guessed action ID, another member/run or post-action occurrence does not qualify. Multiple impressions cannot duplicate the Outcome.
+Event session persistence precedes its Event, and a stopped coordinator cannot continue a delayed session acknowledgement into an Event write. Acknowledged-session reuse is coordinator-local; restart confirms original sessions again. Exposure-acknowledgement wake-up covers the race where acknowledgement arrives before the command is classified as waiting; a bounded fallback remains. Missing/unreadable exposure queues block correlated dispatch rather than fabricating evidence. `waitingForExposure` suppresses a premature error display while callers continue waiting for the actual receipt; genuine persistence errors remain visible.
+
+### Late Outcome attribution — hosted 2026-09-12
+
+`20260912133402_late_outcome_attribution.sql` defines a private read projection shared by ScenarioMemory and evaluation. A previously unattributed command Outcome may be read with `LATE_EXPOSURE_V1` only when its original receipt owns that exact Event and actor/Profile/Item/session/mode/occurrence agree with the selected prior run and a real pre-action impression. A guessed action ID, another member/run or post-action occurrence does not qualify. Multiple impressions cannot duplicate the Outcome.
 
 The reader separates Outcome occurrence cutoff from evidence-read cutoff; qualifying receipt/impression rows must be visible by that read cutoff. Old evaluations, raw Events and immutable command receipts are never rewritten. Undo still removes the outcome effect; rating 0 remains negative. This is evidence reconciliation, not a new exposure or reward.
 
-### Frozen replay, candidate admission and continuation — prepared
+For late attribution, the receipt must own the primary Event ID or include the exact secondary ID in its recorded `eventIds`. Receipt/Event actor, Profile, Item, occurrence time, session and mode must agree; the run belongs to that actor/Profile/session/mode, selects the Item and precedes the action. The actual impression occurred between that run and action. A client `actionId` property alone, another member/session/run or an impression occurring after the action cannot qualify. Only supported preference/List/Endorsement outcomes participate; metadata, history-clear and Undo do not acquire a new Prediction. Existing `RECORDED` attribution remains compatible; the projection labels reconciled proof `LATE_EXPOSURE_V1`.
+
+### Frozen replay, candidate admission and continuation — hosted 2026-09-12
 
 The active frozen-replay forward records full-precision as-of scoring inputs and original genome/version identity. Replay emits no Events, excludes incompatible legacy inputs and evaluates only the declared frozen source pool. The candidate-admission forward records eligibility/retention counts and ranks before bounded top-50 retention; this metadata is not exposure evidence.
 
-Identified first-page responses distinguish valid empty runs from errors and source exhaustion. Private continuation windows freeze bounded original candidates/seen IDs. They do not yet deliver later pages. The next packet must create an independent immutable page PredictionRun, final ranks, exact scoped retry receipt, current eligibility and seen advancement atomically. It must not revise the earlier run or fabricate an impression; source-cap exhaustion is not proof of catalog exhaustion. Hosted and client activation remain separately gated.
+Protocol 1 retains its identified first-page responses and false continuation capability. The deployed `20260912134224_atomic_prediction_pages.sql` adds opt-in protocol 2: each later page atomically commits its own PredictionRun, page-local candidate ranks/selection, exact scoped receipt, cursor consumption and seen advancement. Current eligibility is checked against a frozen original source; old runs are never revised and no impression is fabricated. Every delivered Item carries its page's own run ID, and the current client source carries that per-Item origin through grid/Shared reordering, captured detail/swipe and durable actions.
+
+Private page context retains the original/parent run, observed seen prefix, reminder history and separate feature/eligibility times after derived-window cleanup. Exact authorized receipt retries survive cache expiry; another request cannot consume the same cursor. Shadow/evaluation conditions on the observed preceding production pages and declares `FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`; unobserved challenger paths acquire no labels. Bounded-window exhaustion is not catalog exhaustion. The client reader binds readiness/cache/append to environment, actor, Profile, session, domain, mode and revision. Old native list callbacks retain their request/view and session instead of borrowing the new view's origins; page fetch/prefetch itself creates no impression. Source CI, exact hosted rollout and configured-device acceptance remain separate gates.
+
+The owner-approved six-forward rollout was verified on 2026-09-12. STATUS and
+Sprint014 record exact source/deployment identities and metadata preservation.
+Configured-device evidence and full DATA acceptance remain open.
 
 ### Collection/history corrections and exact destination sets
 
@@ -443,6 +455,10 @@ The active branch records hosted rollout of membership resurfacing, history clea
 - Shared `ENDORSE_SHARED_ITEM` uses an exact 1–32-List set in the same Profile. Every member must review the same set; incompatible legacy clients cannot approve it. Unanimity atomically commits all memberships, one Shared save transition and each new membership Event. Deleting any pending target cancels the whole proposal with truthful corrections; completed other memberships/Saved survive.
 - UI Undo waits for a ready empty current-session queue. List removal is not offered as Undo; changed removal invalidates affected same-Item entries, and List deletion clears the relevant session history because the receipt omits affected Item IDs. Server predecessor/correction contracts remain authoritative.
 
+The native/bootstrap history projection chooses one active bootstrap row per Item with the existing RATED > CONSUMED, source-time/import-time/ID order. Native rating wins display, including zero; consumed-only input receives no invented rating. Native Saved/interest/rejection retain ownership, and inactive/future-imported evidence is excluded. Clearing history deactivates matching initial RATED/CONSUMED evidence and corrects all still-active native rating/consumption Events, without borrowing a current Prediction. A changed clear advances the Item action head and is not undoable; exact retries return the original receipt even after a later rating. Undoing a native edit can reveal a surviving bootstrap rating. Authorized member aggregates reuse the projection without copying it to Shared consumed history.
+
+Shared exact-set source retains primary `listId` for compatible old single-List commands, while `listIds` and `proposal_lists` identify the complete reviewed set. A receipt must confirm every requested destination. Both legacy approval paths reject sets they cannot display. Unanimity retains original proposer/time and rolls back all memberships/Events on any failure. Personal retries retain confirmed destinations and send optional messages only for newly acknowledged saves; closing the picker invalidates callbacks without cancelling accepted queued commands. There is no additional Done confirmation.
+
 ## 15. Portable observations and external research
 
 E1 defines a source-typed Observation/Outcome boundary; [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) owns dataset normalization and manifests. Research input is never sent through native Event ingestion by manufacturing Kajo accounts.
@@ -450,3 +466,15 @@ E1 defines a source-typed Observation/Outcome boundary; [DATA_ENRICHMENT](../arc
 Preserve dataset/release namespaces, raw values/scales, occurrence time, availability time (or explicit uncertainty), correction/version identity and missingness. Rating-record time does not establish viewing time, recommendation exposure or action propensity. Imported user-authorized history, external research, native Kajo observations and generated hypotheses remain distinguishable even when an adapter maps their fields to a shared contract.
 
 Only information available at prediction time may form input state, retrieval keys, transforms and memory. Later observed labels can evaluate eligible targets at their declared maturity/cutoff. An unchosen alternative has no observed counterfactual outcome; missing or not-yet-mature feedback is not rejection. Synthetic branches never become native Events, observed evaluation labels or independent support for their generator. External artifacts retain lineage and admission/withdrawal rules instead of appearing as copied Scenario history.
+
+### Planned star, overflow and Next controls — owner decision 2026-09-12
+
+#239 maps the star to the existing default SYSTEM_SAVED/SAVED action; Tykätyt is
+presentation wording and does not imply a rating or consumption. Shared saves
+retain Endorsement/unanimity. Overflow uses the existing destination commands.
+Saving will stay on the card, and Next only changes the viewed card: it creates
+no implicit negative/positive Outcome. Actual visibility/opening of the new card
+still uses its original per-Item delivery origin. These planned controls preserve
+atomic receipts, source/actor/Profile/session identity, partial success and
+correction/Undo. #240 reconnects read attempts without discarding or fabricating
+queued exposure/action evidence. Neither UI decision introduces new Event types.

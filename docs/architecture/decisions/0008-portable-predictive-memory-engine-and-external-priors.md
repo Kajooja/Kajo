@@ -1,6 +1,6 @@
 # ADR-0008 — Portable Predictive Memory Engine and external research priors
 
-Date: 2026-09-12  
+Date: 2026-09-12
 Status: **owner-approved design, publication through Issue #233 / PR #234; runtime implementation pending**
 
 ## Context

@@ -45,6 +45,17 @@ const COMMIT_ROW = {
 };
 
 describe('Shared discovery overlay mapping', () => {
+  it('carries every reviewed destination and rejects malformed, duplicate or missing-primary sets', () => {
+    const destinations = [{ id: 'list-1', name: 'Meidän illat' }, { id: 'list-2', name: 'Viikonloppu' }];
+    const overlay = mapSharedDiscoveryOverlay([{ ...OVERLAY_ROW, proposal_lists: destinations }]);
+    expect(overlay.status === 'success' && overlay.stateByItemId['item-1']?.proposedLists).toEqual(destinations);
+    const commit = mapSharedEndorsementCommit([{ ...COMMIT_ROW, proposal_lists: destinations }]);
+    expect(commit.status === 'success' && commit.commit.proposalLists).toEqual(destinations);
+    for (const invalid of [null, [], [destinations[1]], [destinations[0], destinations[0]], [{ id: 'list-1', name: '' }]]) {
+      expect(mapSharedDiscoveryOverlay([{ ...OVERLAY_ROW, proposal_lists: invalid }]).status).toBe('error');
+      expect(mapSharedEndorsementCommit([{ ...COMMIT_ROW, proposal_lists: invalid }]).status).toBe('error');
+    }
+  });
   it('maps generic Item metadata and actor-specific collaboration state', () => {
     expect(mapSharedDiscoveryOverlay([OVERLAY_ROW])).toEqual({
       status: 'success',

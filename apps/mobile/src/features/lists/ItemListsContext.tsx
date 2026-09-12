@@ -1,3 +1,4 @@
+import { useEventTracking } from '../events/EventTrackingContext';
 import {
   createContext,
   useCallback,
@@ -93,9 +94,13 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
 
   const namespace = connection.status === 'configured' ? connection.config.url : '';
   const scopeKey = profileId && profiles.actorUserId ? `${namespace}:${profiles.actorUserId}:${profileId}` : null;
-  const scopeToken = useMemo(() => ({ scopeKey }), [scopeKey]);
-  const currentScope = useRef(scopeToken);
-  useLayoutEffect(() => { currentScope.current = scopeToken; }, [scopeToken]);
+  const { sessionId } = useEventTracking();
+  const scopeToken = useMemo(() => ({ scopeKey, sessionId }), [scopeKey, sessionId]);
+  const currentScope = useRef<typeof scopeToken | null>(scopeToken);
+  useLayoutEffect(() => {
+    currentScope.current = scopeToken;
+    return () => { currentScope.current = null; };
+  }, [scopeToken]);
 
   const rpc = useMemo<ItemListRpc | null>(
     () => connection.status === 'configured'

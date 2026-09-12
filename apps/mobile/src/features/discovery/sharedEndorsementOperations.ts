@@ -3,10 +3,11 @@ import {
   EMPTY_SHARED_DISCOVERY_STATE,
   type SharedDiscoveryItemState,
   type SharedDiscoveryStateMap,
+  type SharedListDestination,
 } from './sharedEndorsement';
 
 export const SHARED_ENDORSEMENT_RPC = {
-  overlay: 'get_shared_discovery_overlay',
+  overlay: 'get_shared_discovery_overlay_v2',
   endorse: 'endorse_shared_list_item',
 } as const;
 
@@ -42,6 +43,7 @@ export interface SharedEndorsementCommit {
   proposalListName: string;
   proposedByUserId: string;
   listEntryCreated: boolean;
+  proposalLists?: readonly SharedListDestination[];
 }
 
 export type SharedEndorsementCommitResult =
@@ -133,6 +135,8 @@ export function mapSharedEndorsementCommit(
     !isNonEmptyString(row.proposal_list_name) ||
     !isNonEmptyString(row.proposed_by_user_id) ||
     typeof row.list_entry_created !== 'boolean'
+    || (row.proposal_lists !== undefined && (!isSharedListDestinations(row.proposal_lists)
+      || row.proposal_lists.length === 0 || row.proposal_lists[0]?.id !== row.proposal_list_id))
   ) {
     return endorsementError();
   }
@@ -165,12 +169,16 @@ export function mapSharedEndorsementCommit(
       proposalListName: row.proposal_list_name,
       proposedByUserId: row.proposed_by_user_id,
       listEntryCreated: row.list_entry_created,
+      ...(row.proposal_lists !== undefined ? { proposalLists: row.proposal_lists as SharedListDestination[] } : {}),
     },
   };
 }
 
 function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
   if (!isRecord(value)) return null;
+  if (value.proposal_lists !== undefined && (!isSharedListDestinations(value.proposal_lists)
+    || (value.proposed_list_id === null ? value.proposal_lists.length !== 0
+      : value.proposal_lists[0]?.id !== value.proposed_list_id))) return null;
 
   if (
     !isNonEmptyString(value.item_id) ||
@@ -234,6 +242,7 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
     proposedListId: value.proposed_list_id as string | null,
     proposedListName: value.proposed_list_name as string | null,
     proposedByUserId: value.proposed_by_user_id as string | null,
+    ...(value.proposal_lists !== undefined ? { proposedLists: value.proposal_lists as SharedListDestination[] } : {}),
   };
 }
 
@@ -257,6 +266,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isSharedListDestinations(value: unknown): value is SharedListDestination[] {
+  return Array.isArray(value) && value.length <= 32
+    && value.every(list => isRecord(list) && isNonEmptyString(list.id) && isNonEmptyString(list.name))
+    && new Set(value.map(list => list.id)).size === value.length;
 }
 
 function isPositiveInteger(value: unknown): value is number {

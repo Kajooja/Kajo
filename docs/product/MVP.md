@@ -187,7 +187,7 @@ Existing SharedProfile learning semantics remain canonical.
 - [-] `MVP-DATA-001` Meaningful discovery behavior is captured through canonical generic event interface.
 - [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [-] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely. #224 delivers rating/not-interest/undo; #226 extends the same atomic/durable path to Lists/Endorsements with mixed undo and outcome corrections. Real-device termination/reconnect acceptance remains open; see the active PR/Sprint 014 for rollout status.
-- [ ] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
+- [-] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
 - [x] `MVP-PRED-001` Prediction ranks generic Items for a Profile.
 - [x] `MVP-PRED-002` Prediction includes long-term, recent and Item-similarity signals.
 - [x] `MVP-PRED-003` DiscoveryMode changes ranking/exploration semantics.
@@ -200,7 +200,7 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [x] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence. Technical acceptance: #207/#210 and adopted fresh-install gate #208/#223; device/bootstrap usability and measured quality remain separate BOOT/CAT/TASTE gates.
 - [ ] `MVP-ALG-002` Serving/shadow share versioned feature/score/eligibility/delivery semantics and baseline replay parity.
-- [ ] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
+- [-] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
 - [ ] `MVP-ALG-004` Working/Short/Long state use ordered, source-aware, evidence-aware decay/support; contradictions can change taste without one session erasing durable state.
 - [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with bounded cross-domain transfer and safe neutral fallback.
 - [ ] `MVP-ALG-006` FOR_YOU/SURPRISE/RISK have evaluated context-dependent policy differences; unsupported confidence/probability claims are forbidden.
@@ -229,6 +229,11 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 
 - [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast/reduced motion plus usable loading/empty/offline/permission/recovery states on representative devices.
 - [ ] `MVP-UX-002` Taste-first link flow is usable on representative mobile browsers and inside the installed app, with clear continuation when an external browser/app-store/auth round-trip occurs.
+
+- [ ] `MVP-UX-003` A failed active discovery reader recovers its exact request on usable reconnection and clears stale retry UI on success, with bounded/coalesced attempts, scope cancellation and unchanged expiry/receipt semantics. Owner device defect #240, 2026-09-12; next application UI packet.
+- [ ] `MVP-UX-004` Personal BOOK/MOVIE statistics include source-aware counts, independent unlock/progress and retry-safe weekly summaries/countdowns before MVP. #230, Phase 17.0; community comparisons remain conditional on cohort/privacy evidence.
+- [ ] `MVP-UX-005` Accessible grid multi-selection supports Discovery List add/not-interest, same-Profile List move/removal and selected history clearing with exact origins, durable partial results and Shared consent. #231, Phase 17.0.
+- [ ] `MVP-UX-006` Cards have a default-save star (Tykätyt), header overflow for other Lists, and a bottom rating slider plus Ei kiinnosta/Seuraava above the dock with description space. Saving stays on the card; Next is explicit navigation. Reuse existing Saved/Shared/evidence semantics. #239, Phase 17.0; UX_PRINCIPLES owns the full contract.
 
 ## Production services and data lifecycle
 

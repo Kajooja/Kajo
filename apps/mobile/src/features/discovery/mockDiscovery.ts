@@ -1,8 +1,4 @@
 import type { DiscoveryMode, Item, ItemId, ItemType } from '../../domain/contracts';
-import {
-  getMostRecentRememberedItems,
-  getRememberedItem,
-} from './predictionRankingCache';
 
 interface MockDiscoveryEntry {
   item: Item;
@@ -291,17 +287,6 @@ export function getStaticMockItems(
     .map(({ item }) => item);
 }
 
-export function getRankedMockItems(
-  itemType: ItemType,
-  mode: DiscoveryMode,
-): readonly Item[] {
-  const remembered = getMostRecentRememberedItems(itemType);
-  return remembered.length > 0 ? remembered : getStaticMockItems(itemType, mode);
-}
-
 export function getMockItem(itemId: ItemId): Item | undefined {
-  return (
-    getRememberedItem(itemId) ??
-    MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item
-  );
+  return MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item;
 }

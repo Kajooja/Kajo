@@ -1,6 +1,7 @@
 import { useRef, useState, type PropsWithChildren } from 'react';
 import { usePathname, useRouter } from 'expo-router';
 import { BlurTargetView, BlurView } from 'expo-blur';
+import { BOTTOM_DOCK_HEIGHT } from './shellLayout';
 import {
   ActivityIndicator,
   Alert,
@@ -239,6 +240,13 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               baseTheme={theme.base}
               ambientTheme={theme.ambient}
             />
+            {activeProfile?.type === 'SHARED' ? (
+              <View accessibilityLiveRegion="polite" style={{ alignSelf: 'flex-start', borderRadius: 5,
+                paddingHorizontal: 7, paddingVertical: 2, marginTop: 3, backgroundColor: '#215638' }}>
+                <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
+                  style={{ color: '#c5f6d5', fontSize: 10, fontWeight: '800' }}>RYHMÄTILA</Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </SafeAreaView>
@@ -1300,7 +1308,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   bottomDock: {
-    minHeight: 46,
+    minHeight: BOTTOM_DOCK_HEIGHT,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',

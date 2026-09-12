@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEventTracking } from '../events/EventTrackingContext';
+import { CollectionGrid } from './CollectionGrid';
+import { formatListEntryDate } from './listPresentation';
+import { EMPTY_ITEM_INTERACTION } from '../discovery/itemInteraction';
+import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -17,14 +20,23 @@ import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
+import { useCollectionNavigation } from './useCollectionNavigation';
+import { useItemInteractions } from '../discovery/ItemInteractionContext';
 import type { ConsumedItem } from './itemListOperations';
-import { formatListEntryDate } from './listPresentation';
 
 export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
+  const { scopeKey } = useItemLists();
+  const { sessionId } = useEventTracking();
+  return <ConsumedHistoryContent key={`${scopeKey}:${sessionId}:${itemType}`} itemType={itemType} />;
+}
+
+function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadConsumed } = itemLists;
+  const openCollectionItem = useCollectionNavigation();
+  const { interactions, submitCollectionAction } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const [snapshot, setSnapshot] = useState<{
@@ -33,7 +45,31 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
     error: string | null;
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const requestKey = `${itemType}:${attempt}`;
+  const [clearing, setClearing] = useState<string | null>(null);
+  const [clearError, setClearError] = useState<string | null>(null);
+  const clearingRef = useRef(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  const clearHistory = async (itemId: string) => {
+    if (clearingRef.current) return;
+    clearingRef.current = true;
+    setClearing(itemId);
+    setClearError(null);
+    try {
+      const result = await submitCollectionAction({ kind: 'CLEAR_HISTORY', itemId }, 'LIST_DETAIL');
+      if (!active.current) return;
+      if (result.status === 'error') setClearError(result.message);
+      else setAttempt(current => current + 1);
+    } catch {
+      if (active.current) setClearError('Poiston tilaa ei voitu varmistaa. Päivitä näkymä vetämällä alaspäin.');
+    } finally {
+      if (active.current) { clearingRef.current = false; setClearing(null); }
+    }
+  };
+  const requestKey = `${itemLists.scopeKey}:${itemType}:${itemLists.revision}:${attempt}`;
   const loading = snapshot?.key !== requestKey;
   const error = snapshot?.key === requestKey ? snapshot.error : null;
   const items = snapshot?.key === requestKey ? snapshot.items : [];
@@ -47,14 +83,24 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
         : { key: requestKey, items: [], error: result.message });
     });
     return () => { active = false; };
-  }, [itemType, loadConsumed, requestKey]);
+  }, [itemType, loadConsumed, requestKey, interactions]);
 
   const title = itemType === 'BOOK' ? 'Luetut' : 'Katsotut';
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <CollectionGrid theme={theme} refreshing={loading} onRefresh={() => setAttempt(current => current + 1)}
+        entries={items.map(entry => ({ item: entry.item, caption: formatListEntryDate(entry.updatedAt),
+          interaction: { ...EMPTY_ITEM_INTERACTION, saved: entry.saved, consumed: entry.consumed, rating: entry.rating } }))}
+        onOpen={item => openCollectionItem(item, items.map(entry => entry.item), title)}
+        renderActions={item => <Pressable accessibilityRole="button"
+          accessibilityLabel={`Poista historiasta: ${item.title}`}
+          accessibilityState={{ disabled: clearing !== null }} disabled={clearing !== null}
+          onPress={() => { void clearHistory(item.id); }} style={{ paddingVertical: 12 }}>
+          <Text style={styles.link}>{clearing === item.id ? 'Poistetaan…' : 'Poista historiasta'}</Text>
+        </Pressable>}
+        header={<View style={styles.content}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -65,38 +111,21 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
           </View>
         </View>
 
+        <Text style={styles.help}>Historiasta poistaminen poistaa arvosanan ja luettu-/katsottu-merkinnän. Tallennukset listoille säilyvät.</Text>
+        {clearError ? <Text accessibilityRole="alert" style={styles.error}>{clearError}</Text> : null}
         {loading ? <ActivityIndicator color={theme.base.textMuted} /> : null}
         {error ? (
           <View style={styles.notice}>
             <Text style={styles.error}>{error}</Text>
-            <Pressable onPress={() => setAttempt((current) => current + 1)}><Text style={styles.link}>Yritä uudelleen</Text></Pressable>
+            <Text style={styles.link}>Päivitä vetämällä alaspäin.</Text>
           </View>
         ) : null}
         {!loading && !error && items.length === 0 ? (
           <Text style={styles.empty}>Ei vielä {title.toLowerCase()} kohteita.</Text>
         ) : null}
 
-        <View style={styles.list}>
-          {items.map((item) => (
-            <Pressable
-              key={item.item.id}
-              accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/discovery/[itemId]', params: { itemId: item.item.id } })}
-              style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-            >
-              <View style={styles.rowText}>
-                <Text style={styles.type}>{itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
-                <Text style={styles.rowTitle}>{item.item.title}</Text>
-                <Text style={styles.meta}>
-                  {item.rating !== null ? `Arvosana ${item.rating}/10 · ` : ''}
-                  {formatListEntryDate(item.updatedAt)}
-                </Text>
-              </View>
-              <Text style={styles.arrow}>›</Text>
-            </Pressable>
-          ))}
-        </View>
-      </ScrollView>
+        </View>}
+      />
     </SafeAreaView>
   );
 }
@@ -104,7 +133,7 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: 'transparent' },
-    content: { padding: 20, paddingBottom: 44, gap: 18 },
+    content: { padding: 18, paddingBottom: 12, gap: 14 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
     backText: { color: theme.base.textPrimary, fontSize: 34 },
@@ -114,14 +143,7 @@ function createStyles(theme: RoomTheme) {
     notice: { gap: 6 },
     error: { color: '#f2a6a6', fontSize: 13 },
     link: { color: theme.ambient.curtainHighlight, fontWeight: '700' },
+    help: { color: theme.base.textMuted, fontSize: 12 },
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
-    list: { gap: 10 },
-    row: { minHeight: 94, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.surface.panel },
-    rowText: { flex: 1, gap: 4 },
-    type: { color: theme.base.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-    rowTitle: { color: theme.base.textPrimary, fontSize: 16, fontWeight: '800' },
-    meta: { color: theme.base.textMuted, fontSize: 12 },
-    arrow: { color: theme.base.textMuted, fontSize: 28 },
-    pressed: { opacity: 0.72 },
   });
 }

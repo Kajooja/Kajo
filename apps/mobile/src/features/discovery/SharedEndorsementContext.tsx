@@ -1,3 +1,4 @@
+import { useEventTracking } from '../events/EventTrackingContext';
 import {
   createContext,
   useCallback,
@@ -42,6 +43,7 @@ interface SharedEndorsementContextValue {
     itemId: ItemId,
     listId?: ItemListId,
     origin?: EventRecordInput,
+    listIds?: readonly ItemListId[],
   ) => Promise<SharedEndorsementCommitResult>;
   retry: () => void;
 }
@@ -74,9 +76,13 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
   const actorUserId = activeProfile.actorUserId;
   const namespace = connection.status === 'configured' ? connection.config.url : '';
   const profileId = activeSharedProfile?.id;
-  const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId }), [namespace, actorUserId, profileId]);
-  const currentScope = useRef(scopeToken);
-  useLayoutEffect(() => { currentScope.current = scopeToken; }, [scopeToken]);
+  const { sessionId } = useEventTracking();
+  const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId, sessionId }), [namespace, actorUserId, profileId, sessionId]);
+  const currentScope = useRef<typeof scopeToken | null>(scopeToken);
+  useLayoutEffect(() => {
+    currentScope.current = scopeToken;
+    return () => { currentScope.current = null; };
+  }, [scopeToken]);
   const rpc = useMemo<SharedEndorsementRpc | null>(
     () =>
       connection.status === 'configured'
@@ -177,6 +183,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
       itemId: ItemId,
       listId?: ItemListId,
       origin?: EventRecordInput,
+      listIds?: readonly ItemListId[],
     ): Promise<SharedEndorsementCommitResult> => {
       if (!rpc || !activeSharedProfile || !actorUserId || status !== 'ready' || currentScope.current !== scopeToken) {
         return { status: 'error', message: UNAVAILABLE_MESSAGE };
@@ -184,7 +191,8 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
 
       const result = await endorseSharedItem(
         async () => {
-          const response = await submitCollectionAction({ kind: 'ENDORSE_SHARED_ITEM', itemId, listId: listId ?? null },
+          const response = await submitCollectionAction({ kind: 'ENDORSE_SHARED_ITEM', itemId, listId: listId ?? null,
+            ...(listIds ? { listIds } : {}) },
             listId ? 'ITEM_DESTINATION_PICKER' : 'SHARED_DISCOVERY', origin);
           return response.status === 'success' ? { data: response.receipt.result, error: null }
             : { data: null, error: { code: 'KAJO_ACTION', message: response.message } };
@@ -235,6 +243,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
               proposedByUserId: result.commit.consensusSaved
                 ? null
                 : result.commit.proposedByUserId,
+              ...(result.commit.proposalLists ? { proposedLists: result.commit.consensusSaved ? [] : result.commit.proposalLists } : {}),
             },
           },
         };
