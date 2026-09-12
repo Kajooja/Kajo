@@ -14,6 +14,143 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog rollout preparation — 2026-09-12 / #182
+
+PR #244 was owner-approved and merged to `969c1195700dfc67b3787eb4a51eb70fda8c6ee9`
+after all five required CI #480 jobs passed. The successor branch
+`fix/182-catalog-rollout-packet` starts there. This checkpoint records read-only
+hosted evidence and a source deployment candidate; it does not record a deployment.
+
+### Hosted comparison
+
+Project `mwrnvfosrzwygrunrltm` (Kajo, eu-west-1) is ACTIVE_HEALTHY. The deployed
+`catalog-import` is ACTIVE v2, `verify_jwt=false`, `import_map=false`, with ESZIP
+SHA-256 `8a85347f51f02dec066495263919f2d575d1b6b60e31d7faaf830c589c7cd2d1`.
+Its entrypoint still imports floating `npm:@supabase/supabase-js@2` and uses the old
+single-selected-key boundary. It does not contain the PR #244 source fixes.
+Downloaded entrypoint SHA-256:
+`230c5e5a90a58392a7a7081599f986c2c4009cc93617f744e8526373bee46b83`.
+The shared normalizer matches accepted source exactly:
+`c45821528593b64763d83860975d979d6466cd9cd01d3e440462402afeaa4283`.
+
+Real unauthenticated HTTPS probes returned GET 405 `method-not-allowed` and POST
+403 `forbidden`. The POST deliberately used an unsupported action as an additional
+guard against provider work. These verify the deployed rejection path only.
+
+The available Supabase connector has no secret-name listing tool. The local admin
+environment has no Supabase access token, URL/server invocation key or TMDB token;
+there is no authenticated CLI setup verified here. Consequently the hosted names
+`TMDB_READ_ACCESS_TOKEN`, `SUPABASE_SECRET_KEYS` and any configured legacy key remain
+**unverified**, rather than asserted absent. Do not infer TMDB availability from a
+403, zero inventory or the existence of an Edge function. A supported authenticated
+`supabase secrets list` can supply names/digests only; discover its flags with CLI
+help first, avoid debug output and retain no values in Git/chat. Provider-token
+setup and an authorized server invocation environment are still required for import.
+
+The committed `scripts/catalog/catalog-coverage.sql` ran successfully as a read-only
+hosted transaction. Counts below exclude hidden Items in the presentation columns:
+
+| Item type | Stored | Discoverable | Image | Description | Creators | Year |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BOOK | 427 | 415 | 385 | 0 | 415 | 413 |
+| MOVIE | 42 | 30 | 0 | 0 | 30 | 30 |
+
+Providers remain 385 Open Library BOOK, 30 curated BOOK and 30 curated MOVIE;
+24 historical mock Items are stored but hidden. TMDB source rows/distinct Items
+and discoverable mocks are all zero. The canonical batch RPC's EXECUTE is false
+for anon/authenticated and true for service_role. This refreshes catalog evidence
+only; it is not a native/account/migration acceptance check.
+
+### Reproducible deployment candidate
+
+The catalog function's sole SDK operation is now a native HTTPS POST to the same
+`upsert_catalog_batch_v1` RPC. Modern matched keys use apikey; only a matched legacy
+key adds Bearer. Incoming user Authorization is never forwarded, redirects fail,
+and incomplete/malformed RPC success fails instead of assuming the batch succeeded.
+The database still owns atomic validation/upsert/dedup. FI/EN behavior and request
+bounds remain. Password auth and its pinned SDK/lock are outside this rollout.
+
+There are exactly three deployment files: `catalog-import/index.ts`, its local
+`deno.json`, and `_shared/catalog-normalizers.mjs`. Runtime imports are those local
+sources plus `node:crypto`; there are no registry packages to resolve during deploy.
+The local configuration therefore has `lock:false` and empty imports. The existing
+root frozen Deno graph remains the source/type/other-entrypoint gate.
+
+`npm run catalog:prepare-deployment` stages exactly those files, checks their Deno
+module graph, and replays all 13 catalog HTTP cases against the staged entrypoint
+with Deno 2.1.4, a fresh cache, and `--no-npm --no-remote --cached-only`. Output is
+created only after verification. A regression test proves that adding a registry
+import prevents payload publication. Preparation never reads credentials or sends
+real provider/database requests. Output is regenerated from Git, not committed.
+
+```sh
+npm run catalog:prepare-deployment -- --project-ref mwrnvfosrzwygrunrltm --output dist/catalog-deployment-182
+npm run catalog:tmdb-beta -- --pages 1 --pages-per-request 1 --dry-run
+```
+
+Use a new output directory on a repeat run. The tested candidate manifest is:
+
+| Content | SHA-256 |
+| --- | --- |
+| Entry point | `db9beae8159f4527ab70af04506669072d81f532ad857832ab0877e07e32cd49` |
+| Function-local configuration | `fdacae7775337096157bc6921a7e19eec4e59fbf865549dff8d9f9f4199062a7` |
+| Shared normalizer | `c45821528593b64763d83860975d979d6466cd9cd01d3e440462402afeaa4283` |
+| Exact serialized deployment payload | `3533d2bf02ebe02be9f8bb30c8ea7ccbd8b8090f455aaa5fcd8f357efd74f010` |
+
+`deploy-payload.json` is the complete `deploy_edge_function` argument, including
+project, function name, relative entrypoint/import-map paths, `verify_jwt:false`
+and file contents. `manifest.json` records byte hashes; `verification.txt` records
+the packet tests. This verifies the source closure, not hosted ESZIP/runtime parity.
+
+### Authorized rollout and canary sequence
+
+1. Finish the successor PR's five required current-head CI gates and source merge.
+   Record separate authorization for this exact Edge update and initial provider
+   canary. PR #244's completed merge approval is not a hosted change approval.
+2. Resolve provider-token availability and an authorized server invocation key
+   through supported secret administration. Do not print/copy values into chat.
+   Refresh hosted v2/config and baseline coverage before any authorized change;
+   unexpected drift requires comparing the changed source/config first.
+3. Regenerate/verify the payload hash and pass that exact JSON to the Supabase
+   deployment tool. Deploy only `catalog-import`; no auth-function or database
+   migration deployment, account reset or APK build belongs to this packet.
+4. Read back the new function version/config and downloaded source hashes. Repeat
+   rejection probes and an authorized unsupported-action request (400, no import).
+   Local fixture success does not replace this real gateway/key verification.
+5. In the authorized admin environment, run the single-page canary:
+   `npm run catalog:tmdb-beta -- --pages 1 --pages-per-request 1`.
+   Defaults are start page 1, fi-FI, FI and minimum vote count 40. The preparatory
+   dry-run above was executed; it made no TMDB call. Do not run the default 15-page
+   import before inspecting the canary.
+6. Re-run `catalog-coverage.sql`. Require positive TMDB source/distinct counts,
+   matching external aliases, useful posters/descriptions, and zero discoverable
+   mocks. Report actual metadata gaps and unique inventory separately from upsert
+   counts. Inspect a small real metadata sample before authorizing broader pages.
+
+Stop immediately on failed preflight, deployment/readback mismatch, import error
+or unacceptable coverage. This importer is an admin operation, not a mobile serving
+path, so stopping invocations contains a failed rollout. Completed batches may
+already be committed even if a later request fails: do not delete Items or restore
+database history. Reconcile source identities and retry the bounded idempotent
+upsert after repair. Do not automatically restore floating v2 code; any code
+recovery must use reviewed captured source with explicit dependency verification.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **375 tests** and the additional
+13-case packaged replay, lint/typecheck and both Hermes exports. Only the previously
+recorded mobile Hook warning remains. CI/merge status belongs to the PR/Issue handoff.
+No hosted write, secret change, real TMDB call or native/device operation occurred.
+#182 remains open for useful catalog breadth, presentation/attribution and quality.
+
+Current primary sources checked after the Supabase changelog scan:
+[function dependencies](https://supabase.com/docs/guides/functions/dependencies),
+[CLI v2.117.0 deployment implementation](https://github.com/supabase/cli/blob/v2.117.0/apps/cli/src/shared/functions/deploy.ts),
+[API key behavior](https://supabase.com/docs/guides/getting-started/api-keys),
+[PostgREST RPC](https://docs.postgrest.org/en/v13/references/api/functions.html) and
+[secret-name listing](https://supabase.com/docs/reference/cli/supabase-secrets-list).
+Function-local config is the supported deployment boundary; the inspected bundler
+does not expose a frozen-lock guarantee. Removing the single catalog SDK operation
+avoids relying on that unverified guarantee or adding a separate bundling toolchain.
+
 ## Catalog Edge source checkpoint — 2026-09-12 / #182
 
 Branch `fix/182-catalog-edge-boundary` starts from accepted D2 main

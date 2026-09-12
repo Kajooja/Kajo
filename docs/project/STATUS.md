@@ -10,44 +10,44 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current source packet — #182 catalog Edge boundary
+## Current source packet — #182 catalog rollout preparation
 
-**[#182](https://github.com/Kajooja/Kajo/issues/182) source verification is implemented
-on `fix/182-catalog-edge-boundary`, based on accepted main
-`3658d1c78b19c6f9c391c14e8e2d66bf814cdcd9`.** D2 #237 / PR #243 was accepted
-there after all five required CI #478 jobs passed at
-`ba080664addeca747d26baaf3df1666bfa593249`. E1/D1/D2 are complete bounded
-source/research foundations; the rejected external challenger remains research-only.
+**PR [#244](https://github.com/Kajooja/Kajo/pull/244) is accepted on main
+`969c1195700dfc67b3787eb4a51eb70fda8c6ee9`.** The owner approved its merge;
+all five required CI #480 jobs passed at
+`b7b35395feb6c29d722fb1254166be0ab7a8b55c`.
+Its source audit is complete. E1/D1/D2 remain accepted bounded foundations and
+the rejected external challenger remains research-only.
 
-The catalog importer now explicitly declares `verify_jwt=false` and checks exact
-configured server keys before body/provider/database work. Modern named/local
-keys use `apikey`; configured legacy service-role keys retain apikey/Bearer support.
-User JWTs, publishable/foreign keys and malformed key configuration fail closed.
-The admin script sends apikey only, and explicit invalid inputs or page ranges
-beyond TMDB page 500 return 400. Upstream errors cannot reflect key-bearing messages
-into responses/logs. Existing FI/EN normalization and canonical batch upsert remain.
+**Active successor: `fix/182-catalog-rollout-packet`, based on that accepted main.**
+The read-only hosted comparison found `catalog-import` v2 still running the older
+floating SDK source, with `verify_jwt=false`. Real HTTP probes returned the expected
+405/403; the database batch RPC remains service-role-only. Fresh coverage confirms
+415 discoverable BOOK / 30 MOVIE, 385 book images, no movie images and no descriptions
+on discoverable Items. There are zero TMDB sources and zero discoverable mocks.
 
-Supabase JS 2.112.4, Deno 2.1.4 and the transitive Edge dependency graph are pinned.
-`npm run test:edge` joins root check and the existing CI `validate` job. It checks
-all three deployment entrypoints and exercises local HTTP with fixture keys,
-provider/Data API responses and the real SDK. Password auth receives dependency
-pinning and an existing-path smoke test only; #160 retains its public input/abuse gate.
-The [catalog checkpoint](sprints/SPRINT-014.md#catalog-edge-source-checkpoint--2026-09-12--182)
-records verification and current upstream documentation caveats. This branch remains
-a source candidate until its PR's five current-head CI jobs pass and it merges.
-Local root check passed 372 tests, lint/typecheck and both Hermes exports; only
-the previously recorded mobile Hook warning remains.
-Once this packet is on accepted main, its source audit is complete.
+The successor removes the catalog function's sole SDK call in favor of native
+Data API RPC. Exact configured-key authorization, FI/EN normalization and canonical
+atomic batch upsert remain; incomplete RPC success now fails explicitly. Its exact
+three-file deployment payload passes the 13 catalog HTTP cases with a fresh cache
+and npm/remote imports disabled. This avoids assuming the source-only frozen lock
+is honored by hosted bundling. Password auth retains the pinned SDK/source lock.
+Local root check passed **375 tests**, plus the packaged replay of those 13 catalog
+cases, lint/typecheck and both Hermes exports; the existing Hook warning remains.
 
-**Next bounded task after this PR's required CI/merge: #182 hosted catalog
-configuration and TMDB import preparation.** First read the actual project's
-catalog-import deployed version/configuration and server-secret names without
-exposing values, then compare with this accepted source. Prepare the exact Edge
-rollout and bounded importer invocation/coverage queries for review; record any
-missing provider credential explicitly. Hosted changes and actual provider import
-need their own recorded authorization and verification; local fixture success is
-not deployed gateway/key or catalog-inventory evidence. Historical 2026-09-06 counts
-remain historical until rechecked. Keep #182 open for catalog breadth/quality.
+**Next bounded task: finish this successor's five current-head CI gates and source
+merge, then obtain recorded authorization for the exact catalog Edge rollout.**
+The [rollout checkpoint](sprints/SPRINT-014.md#catalog-rollout-preparation--2026-09-12--182)
+owns the payload hash, reproduction command, single-page TMDB canary and before/after
+coverage query. The current connector cannot list secret names and the local admin
+environment has no configured credentials: `TMDB_READ_ACCESS_TOKEN` and a usable
+server invocation key are **unverified**, not proven missing on the server. Resolve
+those via a supported authenticated secret-name listing/setup before actual import;
+never ask for secret values in chat. No hosted write/import was performed.
+
+PR #244's merge approval is resolved and must not be requested again. It does not
+authorize this new hosted deployment or provider import. Keep #182 open for catalog
+breadth/quality; source/packet tests are not hosted successor or real-TMDB evidence.
 
 #229 retains its separate native/device/fresh-account gates and six installed
 immutable forwards; do not redeploy them or reset accounts for this catalog unit.

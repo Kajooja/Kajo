@@ -1,5 +1,4 @@
 import { timingSafeEqual } from 'node:crypto';
-import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 import { normalizeTmdbMovie } from '../_shared/catalog-normalizers.mjs';
 
@@ -92,9 +91,6 @@ Deno.serve(async (request) => {
   }
 
   try {
-    const adminClient = createClient(supabaseUrl, secretKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
     let importedCount = 0;
     let skippedCount = 0;
     const completedPages: number[] = [];
@@ -127,15 +123,7 @@ Deno.serve(async (request) => {
 
       for (let offset = 0; offset < entries.length; offset += UPSERT_BATCH_SIZE) {
         const batch = entries.slice(offset, offset + UPSERT_BATCH_SIZE);
-        const { data, error } = await adminClient.rpc('upsert_catalog_batch_v1', {
-          entries: batch,
-        });
-
-        if (error) {
-          throw new Error(`Catalog batch upsert failed: ${error.message}`);
-        }
-
-        importedCount += Array.isArray(data) ? data.length : batch.length;
+        importedCount += await upsertCatalogBatch(supabaseUrl, secretKey, batch);
       }
 
       completedPages.push(page);
@@ -157,6 +145,49 @@ Deno.serve(async (request) => {
     return json({ status: 'error', code: 'provider-import-failed' }, 502);
   }
 });
+
+// A single native Data API call keeps this deployment free of registry
+// dependencies. The canonical database function still owns the atomic write.
+async function upsertCatalogBatch(
+  supabaseUrl: string,
+  secretKey: string,
+  entries: unknown[],
+): Promise<number> {
+  const headers: Record<string, string> = {
+    ...JSON_HEADERS,
+    accept: 'application/json',
+    apikey: secretKey,
+  };
+  // Modern keys are not JWTs. Only the matched legacy service-role key needs
+  // Bearer authorization; never forward the incoming caller's Authorization.
+  if (!secretKey.startsWith('sb_secret_')) {
+    headers.authorization = `Bearer ${secretKey}`;
+  }
+  const response = await fetch(
+    `${supabaseUrl.replace(/\/+$/, '')}/rest/v1/rpc/upsert_catalog_batch_v1`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ entries }),
+      redirect: 'error',
+    },
+  );
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error('Catalog batch upsert failed');
+  }
+  const data: unknown = await response.json();
+  if (
+    !Array.isArray(data) || data.length !== entries.length ||
+    data.some((row, index) =>
+      !row || row.input_index !== index + 1 ||
+      typeof row.item_id !== 'string' || row.item_id.length === 0
+    )
+  ) {
+    throw new Error('Catalog batch upsert returned incomplete results');
+  }
+  return data.length;
+}
 
 function buildDiscoverUrl(input: {
   page: number;

@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 
 // Exercise the handlers registered by the real deployment entrypoints, over
-// local HTTP, with the real pinned SDK. Only provider/Data API responses and
-// environment configuration are fixtures; no hosted keys or data are read.
+// local HTTP. Provider/Data API responses and environment configuration are
+// fixtures; no hosted keys or data are read. The optional packet URL exercises
+// only the packaged catalog handler with npm/remote imports disabled.
+const catalogPacket = Deno.args[0];
 type Handler = (request: Request) => Response | Promise<Response>;
 const handlers = new Map<string, Handler>();
 const realServe = Deno.serve;
@@ -18,11 +20,15 @@ Deno.serve = ((handler: Handler) => {
 }) as typeof Deno.serve;
 try {
   registering = 'catalog-import';
-  await import('./catalog-import/index.ts');
-  registering = 'password-auth';
-  await import('./password-auth/index.ts');
-  registering = 'auth-callback';
-  await import('./auth-callback/index.ts');
+  if (catalogPacket) {
+    await import(new URL('catalog-import/index.ts', catalogPacket).href);
+  } else {
+    await import('./catalog-import/index.ts');
+    registering = 'password-auth';
+    await import('./password-auth/index.ts');
+    registering = 'auth-callback';
+    await import('./auth-callback/index.ts');
+  }
 } finally {
   Deno.serve = realServe;
   Deno.env.get = realGetEnv;
@@ -94,7 +100,7 @@ async function withEdge(
       }
       assert.equal(url.hostname, 'catalog.test');
       assert.equal(url.pathname, '/rest/v1/rpc/upsert_catalog_batch_v1');
-      return Response.json([{ id: 'fixture-item' }]);
+      return Response.json([{ input_index: 1, item_id: 'fixture-item' }]);
     },
     request: (body, headers = { apikey: modern }, method = 'POST') =>
       realFetch(baseUrl, {
@@ -148,7 +154,7 @@ Deno.test('catalog rejects anonymous, user, publishable, foreign and misplaced m
   });
 });
 
-Deno.test('modern apikey imports normalized FI/EN data through the privileged SDK RPC', async () => {
+Deno.test('modern apikey imports normalized FI/EN data through the privileged Data API RPC', async () => {
   await withEdge(async (f) => {
     const response = await f.request({ action: 'tmdb-movies' }, {
       apikey: modern,
@@ -173,7 +179,9 @@ Deno.test('modern apikey imports normalized FI/EN data through the privileged SD
     const rpc = f.outgoing[3];
     assert.equal(rpc.method, 'POST');
     assert.equal(rpc.headers.get('apikey'), modern);
-    assert.equal(rpc.headers.get('authorization'), `Bearer ${modern}`);
+    assert.equal(rpc.headers.get('authorization'), null);
+    assert.equal(rpc.redirect, 'error');
+    assert.match(rpc.headers.get('content-type') ?? '', /^application\/json/);
     const { entries } = await rpc.json();
     assert.equal(entries.length, 1);
     assert.equal(entries[0].providerKey, 'tmdb');
@@ -213,6 +221,7 @@ Deno.test('exact legacy apikey or Bearer remains valid while modern keys are con
       assert.equal(response.status, 200);
       await response.json();
       assert.equal(f.outgoing.at(-1)?.headers.get('apikey'), legacy);
+      assert.equal(f.outgoing.at(-1)?.headers.get('authorization'), `Bearer ${legacy}`);
     }
   });
 });
@@ -340,34 +349,54 @@ Deno.test('upstream failures stop import and cannot reflect credentials into log
   }
 });
 
-Deno.test('password-auth entrypoint uses the pinned SDK for existing server-side resolution', async () => {
-  await withEdge(
-    async (f) => {
-      f.upstream = (request) => {
-        assert.equal(request.url, 'https://catalog.test/rest/v1/rpc/resolve_login_email');
-        assert.equal(request.headers.get('apikey'), modern);
-        return Response.json('fixture@example.invalid');
-      };
-      const response = await f.request({ action: 'account-exists', identifier: 'Fixture' }, {});
-      assert.equal(response.status, 200);
-      assert.deepEqual(await response.json(), { status: 'exists' });
-      assert.deepEqual(await f.outgoing[0].json(), { input_identifier: 'fixture' });
-    },
-    {},
-    'password-auth',
-  );
+Deno.test('incomplete or malformed Data API success never reports a completed import', async () => {
+  for (const payload of [null, {}, [], [{ input_index: 2, item_id: 'fixture-item' }],
+    [{ input_index: 1, item_id: null }]]) {
+    await withEdge(async (f) => {
+      const normal = f.upstream;
+      f.upstream = (request) => new URL(request.url).hostname === 'catalog.test'
+        ? Response.json(payload)
+        : normal(request);
+      await expectError(
+        await f.request({ action: 'tmdb-movies', pages: 3 }),
+        502,
+        'provider-import-failed',
+      );
+      assert.equal(f.outgoing.length, 4);
+    });
+  }
 });
 
-Deno.test('auth-callback entrypoint rejects an invalid link without outbound work', async () => {
-  await withEdge(
-    async (f) => {
-      const response = await f.request(null, {}, 'GET');
-      assert.equal(response.status, 400);
-      assert.equal(await response.text(), 'Invalid Kajo authentication link');
-      assert.equal(response.headers.get('cache-control'), 'no-store');
-      assert.equal(f.outgoing.length, 0);
-    },
-    {},
-    'auth-callback',
-  );
-});
+if (!catalogPacket) {
+  Deno.test('password-auth entrypoint uses the pinned SDK for existing server-side resolution', async () => {
+    await withEdge(
+      async (f) => {
+        f.upstream = (request) => {
+          assert.equal(request.url, 'https://catalog.test/rest/v1/rpc/resolve_login_email');
+          assert.equal(request.headers.get('apikey'), modern);
+          return Response.json('fixture@example.invalid');
+        };
+        const response = await f.request({ action: 'account-exists', identifier: 'Fixture' }, {});
+        assert.equal(response.status, 200);
+        assert.deepEqual(await response.json(), { status: 'exists' });
+        assert.deepEqual(await f.outgoing[0].json(), { input_identifier: 'fixture' });
+      },
+      {},
+      'password-auth',
+    );
+  });
+
+  Deno.test('auth-callback entrypoint rejects an invalid link without outbound work', async () => {
+    await withEdge(
+      async (f) => {
+        const response = await f.request(null, {}, 'GET');
+        assert.equal(response.status, 400);
+        assert.equal(await response.text(), 'Invalid Kajo authentication link');
+        assert.equal(response.headers.get('cache-control'), 'no-store');
+        assert.equal(f.outgoing.length, 0);
+      },
+      {},
+      'auth-callback',
+    );
+  });
+}

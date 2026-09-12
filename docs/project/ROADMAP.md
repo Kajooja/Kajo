@@ -133,11 +133,12 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-#182 implements the source-audit prerequisite: explicit catalog Edge JWT/server-key
-boundary, pinned imports/lock and local HTTP entrypoint checks. After required
-source CI/merge, verify actual hosted configuration and prepare the bounded TMDB
-rollout/import before provider expansion. Fixture success does not verify deployment
-or close catalog breadth, provider rights or native quality gates.
+#182's source-audit prerequisite is accepted in PR #244. Hosted inspection confirms
+old v2 source and no TMDB inventory. The successor prepares a dependency-free catalog
+deployment payload, offline packet verification and one-page import/coverage checks.
+After its source CI/merge, verify server credential availability and obtain the
+recorded hosted rollout/import authorization. Fixture success does not verify
+deployment or close catalog breadth, provider rights or native quality gates.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
