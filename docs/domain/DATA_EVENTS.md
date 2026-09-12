@@ -1,6 +1,8 @@
 # Kajo Event Model
 
-Status: canonical behavioral + growth telemetry contract.
+Status: canonical behavioral + growth telemetry contract, with accepted-main commands and explicitly marked #229/#232 successors.
+
+STATUS owns source, hosted and device acceptance. The #229 source sections below describe the inspected active branch, not code delivered by this documentation change. #232 SharedRatingRound remains planned required first-release work.
 
 Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
@@ -66,10 +68,11 @@ Shared discovery custom-List membership is committed only when the Endorsement c
 
 - `ITEM_CONSUMED`
 - `ITEM_CONSUMPTION_REVERSED`
+- `ITEM_HISTORY_CLEARED` — active #229 administrative correction; not a taste reward
 - `ITEM_INTERACTION_UNDONE`
 - `ITEM_RATED`
 
-Rating 0–10 always implies consumed/read/watched.
+Personal rating 0–10 implies consumed/read/watched. Current Shared SET_RATING is a single-actor transition; the required #232 SharedRatingRound successor records each actor’s experience and completes joint consumption only after all required responses (section 10).
 
 ### Session/search
 
@@ -258,6 +261,10 @@ Pending Endorsement is actor-specific. Unanimous consensus produces one canonica
 
 Friendship does not grant authorization to read another User's Personal Event stream.
 
+Required #232 SharedRatingRound semantics are planned, not existing Event names/API fields. Each response retains round ID, actor, SharedProfile, Item, participant-set version and truthful delivered origin. Pending responses do not emit completed joint consumption/reward. Final completion, joint state and Outcome Events commit atomically once. Rating 0 is valid; preserve responses/disagreement without attributing one actor’s score to the group or copying Personal Events.
+
+Edits/Undo, cancellation and changed membership correct/reconcile prior outcomes. A rewatch uses a new round ID; earlier experiences and action receipts remain immutable. Completion is not automatically positive preference or predictor success. Version reward interpretation and test delayed attribution, participant loss, legacy single-actor history and Personal isolation before Phase 16.3 acceptance.
+
 ## 11. Reliability contract
 
 A meaningful explicit recommendation action must atomically/idempotently update its canonical current-state projection and append corresponding evidence through one authorized boundary.
@@ -317,7 +324,7 @@ mode. This is a validation guard, **not** proof of complete frozen delivered-sla
 provenance: grid/detail/swipe cache/overlay origin and durable exposure delivery
 remain `MVP-DATA-004` work.
 
-### Collection commands — #226 / Phase 14.1
+### Accepted-main collection commands — #226 / Phase 14.1
 
 `public.commit_collection_action_v1(request)` extends the same versioned envelope
 and the same private receipt/head lineage with List create/rename/delete,
@@ -344,7 +351,7 @@ List+Like action. Item and List commands share ordered undo predecessors. Legacy
 membership/projection changes invalidate that head, including delete/reinsert ABA.
 The Item RPC cannot undo a List receipt because it cannot restore membership.
 
-The first Shared actor proposes a custom List; another member accepts the existing
+This paragraph describes the accepted-main single-List command; the active exact-set successor is specified in section 14. The first Shared actor proposes a custom List; another member accepts the existing
 proposal without supplying a replacement List. Only the last required endorsement
 emits consensus Saved and committed custom membership. Completed consensus remains
 durable after List deletion/member changes. Pending withdrawal clears an empty
@@ -401,3 +408,45 @@ Taste/acquisition paths require equivalent discipline:
 - Friends cannot read each other's private Personal event/taste history.
 - Anonymous/Taste/acquisition data has bounded retention and deletion.
 - Growth telemetry must support product analysis without becoming a covert personalization feature.
+
+
+## 14. Active #229 source contracts and remaining boundaries
+
+These compact contracts reconcile active source with accepted-main behavior above. The complete development/device record remains on `feat/228-delivered-origin` in Sprint 014 and DEVICE_TEST; STATUS identifies which head and gates apply. SharedRatingRound (#232) is not delivered by any of these changes.
+
+### Frozen delivery, durable exposure and ordering
+
+`deliveredSlate.ts` captures the exact visible sequence and per-Item origin for one environment/actor/Profile/session/mode. Detail and its actions retain that origin instead of borrowing a later ranking. Injected Shared Items have truthful overlay provenance and no invented Prediction ID. Collection navigation is identified as COLLECTION, with no borrowed rank. Direct entries do not acquire an unverified route Prediction.
+
+`eventOutbox.ts` persists immutable Event/session envelopes in its own actor/Profile/environment namespace before acceptance. Original sessions survive restart. Stale scope stops dispatch/callbacks while unresolved evidence remains available to an authorized retry. Correlated commands wait only for their matching already-enqueued pre-action impression; acknowledgement wakes exposure-waiting work while retaining normal network backoff. Missing impressions are never invented. Layout/session admission rejects stale UI actions while already accepted commands retain their original envelope.
+
+### Late Outcome attribution — prepared, not hosted
+
+`20260910192630_late_outcome_attribution.sql` defines a private read projection shared by ScenarioMemory and evaluation. A previously unattributed command Outcome may be read with `LATE_EXPOSURE_V1` only when its original receipt owns that exact Event and actor/Profile/Item/session/mode/occurrence agree with the selected prior run and a real pre-action impression. A guessed action ID, another member/run or post-action occurrence does not qualify. Multiple impressions cannot duplicate the Outcome.
+
+The reader separates Outcome occurrence cutoff from evidence-read cutoff; qualifying receipt/impression rows must be visible by that read cutoff. Old evaluations, raw Events and immutable command receipts are never rewritten. Undo still removes the outcome effect; rating 0 remains negative. This is evidence reconciliation, not a new exposure or reward.
+
+### Frozen replay, candidate admission and continuation — prepared
+
+The active frozen-replay forward records full-precision as-of scoring inputs and original genome/version identity. Replay emits no Events, excludes incompatible legacy inputs and evaluates only the declared frozen source pool. The candidate-admission forward records eligibility/retention counts and ranks before bounded top-50 retention; this metadata is not exposure evidence.
+
+Identified first-page responses distinguish valid empty runs from errors and source exhaustion. Private continuation windows freeze bounded original candidates/seen IDs. They do not yet deliver later pages. The next packet must create an independent immutable page PredictionRun, final ranks, exact scoped retry receipt, current eligibility and seen advancement atomically. It must not revise the earlier run or fabricate an impression; source-cap exhaustion is not proof of catalog exhaustion. Hosted and client activation remain separately gated.
+
+### Collection/history corrections and exact destination sets
+
+The active branch records hosted rollout of membership resurfacing, history clear, bootstrap-history projection and Shared multi-destination forwards; recheck STATUS before deployment work. These source contracts are not proof of device acceptance.
+
+- Current authorized List entries govern membership suppression; old addition Events are not permanent membership. Receipt revisions invalidate stale ranking identities without changing historical taste evidence.
+- `CLEAR_HISTORY` clears same-Profile rated/consumed state, deactivates relevant bootstrap evidence, emits the administrative marker plus exact corrections for active rating/consumption Events, and preserves Saved/interest/other memberships. State, corrections and receipt commit together; no-op/retry adds no fake evidence. This is not deletion of the Event log or an undoable history action.
+- `get_profile_item_states_v1` provides one authorized native/bootstrap read projection for hydration/history/badges, including rating 0. Reads create no Events. Personal history remains separate when authorized aggregates inform Shared delivery.
+- Personal users freeze the checked destination set on one explicit Add. Existing durable per-List commands run in order; all acknowledgements close the picker and advance once, without a separate Done. Partial success retains confirmed additions and unresolved choices; it is not whole-batch atomicity.
+- Shared `ENDORSE_SHARED_ITEM` uses an exact 1–32-List set in the same Profile. Every member must review the same set; incompatible legacy clients cannot approve it. Unanimity atomically commits all memberships, one Shared save transition and each new membership Event. Deleting any pending target cancels the whole proposal with truthful corrections; completed other memberships/Saved survive.
+- UI Undo waits for a ready empty current-session queue. List removal is not offered as Undo; changed removal invalidates affected same-Item entries, and List deletion clears the relevant session history because the receipt omits affected Item IDs. Server predecessor/correction contracts remain authoritative.
+
+## 15. Portable observations and external research
+
+E1 defines a source-typed Observation/Outcome boundary; [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) owns dataset normalization and manifests. Research input is never sent through native Event ingestion by manufacturing Kajo accounts.
+
+Preserve dataset/release namespaces, raw values/scales, occurrence time, availability time (or explicit uncertainty), correction/version identity and missingness. Rating-record time does not establish viewing time, recommendation exposure or action propensity. Imported user-authorized history, external research, native Kajo observations and generated hypotheses remain distinguishable even when an adapter maps their fields to a shared contract.
+
+Only information available at prediction time may form input state, retrieval keys, transforms and memory. Later observed labels can evaluate eligible targets at their declared maturity/cutoff. An unchosen alternative has no observed counterfactual outcome; missing or not-yet-mature feedback is not rejection. Synthetic branches never become native Events, observed evaluation labels or independent support for their generator. External artifacts retain lineage and admission/withdrawal rules instead of appearing as copied Scenario history.

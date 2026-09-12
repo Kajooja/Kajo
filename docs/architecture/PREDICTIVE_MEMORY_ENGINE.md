@@ -20,6 +20,10 @@ These are explicit review additions, not claims that the supplied proposal or ex
 | Add ExternalTastePrior rather than fabricate complete scenarios | Public rating data supplies limited preference evidence, not Kajo exposures, context, joint history or counterfactual outcomes. Sections 16, 19, 44–45. |
 | Gate artifacts, uncertainty and synthetic influence explicitly | Confidence must be supported; license restrictions and deletion dependencies follow derived artifacts; dreams cannot validate themselves. Sections 7, 28–29, 34–39. |
 | Extract by tested contracts, not a big-bang rewrite | Preserve accepted SQL, identity, privacy, slate and migration behavior while proving portability. Sections 41–44. |
+| Retrieve development paths and allow no useful match | Compare static state, recent change and ordered prefixes by subsequent prediction benefit, not nearest-neighbor distance alone. Sections 12, 23–25. |
+| Distinguish hidden-state hypotheses, possible outcomes, alternative actions and model challengers | One observed action does not reveal what an unchosen action would have caused, or select a unique latent interpretation. Sections 7, 14–15, 30, 36. |
+| Make memory scope and evidence origin separate dimensions | Local/global governs access; observed/synthetic governs evidence. A shared dream is still synthetic. Section 16. |
+| Measure the four sleep functions independently | Replay, simulation, consolidation and evolution have separate controls, budgets and evaluation; research references are hypotheses for this engine. Sections 28–29, 34–38 and research appendix. |
 
 ## 1. Goal
 
@@ -101,6 +105,8 @@ Epistemic uncertainty concerns limited model knowledge; aleatoric uncertainty co
 
 BeliefState informs bounded exploration, Taste question selection, RISK policy and dream prioritization. Out-of-distribution or sparse states may trigger a safer baseline or abstention, not fabricated certainty.
 
+Later versions may maintain weighted **state hypotheses**, such as temporary intent versus a durable preference change. Each hypothesis carries its information cutoff, update method and support. Several hypotheses may explain the same observation; do not pick one as factual hidden psychology. A calibrated probabilistic model can update hypothesis weights by observation likelihood, while a transparent first version records unresolved alternatives without invented probabilities.
+
 ## 8. GroupState
 
 A group is a first-class Subject with its own observations and learned state. In Kajo it is a SharedProfile, not an average of PersonalProfiles.
@@ -148,6 +154,8 @@ A Trajectory is an ordered series of decisions, observations and states. Two sub
 
 Order uses documented event/availability semantics and deterministic tie handling. Unknown time gaps remain unknown. A batch of retrospectively entered ratings is not automatically a watched-in-order trajectory. Trajectory encoders may only consume the prefix available at the evaluated decision.
 
+The intended scenario library stores **prefix plus observed continuation**, with continuation labels and maturity separate from the searchable prefix. Compare near-term order, longer-term history and direction of change against static-state retrieval. A neighbor's continuation may support a forecast only when that continuation was already available at the query cutoff. The queried subject's future remains hidden. Retrospective rating order can test a limited sequence hypothesis; it cannot establish true viewing order.
+
 ## 13. Reality Path
 
 A Reality Path contains observed events and observed portions of transitions. Its observations have `source = OBSERVED`, with source-system provenance and corrections.
@@ -165,6 +173,17 @@ The supplied save/watch/ignore/dislike example needs disambiguation because savi
 
 A missing observation is not a predicted category called dislike. The system can report no observed action within an observable window, but must distinguish that from an unknown or censored outcome.
 
+Keep four concepts independently identified:
+
+| Concept | What varies | What an observation can update |
+|---|---|---|
+| BeliefState hypothesis | Interpretation of the present partially observed state | Support for compatible interpretations; several may remain plausible |
+| Stochastic Branch / Trajectory | Future outcome under a declared action and model | Eligible probability/loss for observed targets and horizons |
+| Alternative-action branch | Proposed action/slate and its conditional future | Direct evidence only for the action actually taken; other actions remain counterfactual |
+| Challenger genome | Encoder, retrieval, weights or model family | Relative predictive performance on the same eligible observed targets |
+
+All four can coexist. Branch IDs must identify their action, hypothesis/model reference and horizon; they are not interchangeable with Challenger IDs. An ensemble's model disagreement is also distinct from randomness sampled repeatedly from a single fitted model.
+
 ## 15. Outcome Model
 
 OutcomeModel estimates target-specific quantities: action/consumption probability, rating distribution conditional on an appropriate outcome, delayed satisfaction and possibly next-state components.
@@ -172,6 +191,8 @@ OutcomeModel estimates target-specific quantities: action/consumption probabilit
 Each output carries `targetDefinition`, `horizon`, `conditioning`, `estimateKind`, `support`, `calibrationVersion` and `observability`. Joint or multi-stage predictions must be coherent; conditional and marginal probabilities are not interchangeable.
 
 Generation 1 may return a scalar ranking score with probabilities unavailable. It must not relabel that score as a distribution. Additional heads enter only with real labels and evaluation. Satisfaction, intention, exposure and retention remain different targets; the adapter supplies their meaning.
+
+For Kajo, preserve separate estimates for interest/selection, eventual consumption and post-experience rating where labels support them. A high save rate is not automatically high satisfaction. Two rating distributions with the same mean can imply very different risks, so a later distributional model should retain its spread or quantiles rather than expose only the average. Missing follow-up stays censored/unknown. Every head defines its own observation opportunity, maturity deadline and conditional population; an outcome becoming observable for one head does not mature every other head.
 
 ## 16. ScenarioMemory
 
@@ -184,6 +205,17 @@ The source's three memory classes are retained:
 A fourth, related but distinct input is **ExternalTastePrior**: licensed research-derived preference parameters or object representations. A rating-only dataset cannot populate complete GlobalScenarioMemory because the missing decision context, alternatives and exposure are not known.
 
 Kajo's native PopulationMemory remains gated by consent, minimum cohort, deletion lineage and evidence. Public dataset identities must not become Kajo Users/Profiles. Synthetic memory is excluded from the default observed-evidence retriever; any later synthetic channel is independently typed, capped, ablated and disabled by default.
+
+The three class names are retrieval channels, not one mutually exclusive provenance enum. The target contract records independent dimensions:
+
+| Dimension | Examples | Rule |
+|---|---|---|
+| Access scope | Subject/local; explicitly admitted cohort/global | Determines who may retrieve/use it |
+| Evidence origin | Observed; synthetic | Determines whether it can count as real outcome evidence |
+| Source system | Native Kajo; named external release; named generator | Preserves original semantics and permissions |
+| Representation | Raw observation reference; episode; derived prototype | Preserves derivation and effective independent support |
+
+A prototype derived from observed episodes remains a derived representation with observed ancestors. A synthetic episode can be local or admitted for wider research without becoming observed. Repeated generation and consolidation never increase the number of independent real observations. This target schema does not rename existing V1 tables or migrate them in this documentation change.
 
 ## 17. Associative Memory / Scenario Search Engine
 
@@ -249,6 +281,8 @@ A transparent first metric combines normalized subject, state, context, environm
 
 MetricEngine returns similarity plus support/coverage, not a claim of causal similarity. Repeated events, multiple tags from one event and many near-duplicate episodes do not independently multiply evidence. Evolution may change weights, K and later the metric family, subject to fixed evaluation controls.
 
+Learned similarity should be selected for **usefulness in predicting later observations**, using mature training labels and separate validation. Geometric proximity alone is not success. Compare static-profile, recent-state and ordered-trajectory alternatives with equal evaluation targets and declared compute budgets. Keep action/domain/horizon compatibility explicit; an apparently similar trajectory under incompatible observation semantics is not a valid neighbor.
+
 ## 25. Retrieval Engine — associative recall
 
 Retrieval returns typed local, permitted global and separately controlled synthetic analogies. Candidate retrieval, authorization and reranking are independently inspectable.
@@ -256,6 +290,8 @@ Retrieval returns typed local, permitted global and separately controlled synthe
 The source's illustrative 1,000 → 100 → 10–30 funnel is a sizing example, not a required full-table scan or latency guarantee. Configure maximum retrieval count, memory, query time and per-source contribution. Preserve a deterministic fallback when no compatible memories exist.
 
 Record retrieved IDs/prototypes, similarity components, source/encoder/index versions, time scope, support and exclusion reasons. Prototype support is not an individual identity and cannot leak private member history through an explanation.
+
+Return an explicit **no useful match** result when similarity, support, feature coverage or compatibility fails its versioned threshold. An index always returning a nearest vector does not establish a useful analogy. Choose thresholds on training/validation only; report abstention coverage and prediction error together. Compare retrieved-continuation forecasts against no-retrieval and static-state controls before increasing K or adding ANN infrastructure.
 
 ## 26. Scenario Graph
 
@@ -281,17 +317,32 @@ Every SyntheticScenario has `source = SYNTHETIC`, generator/world-model versions
 
 Synthetic examples may support debugging, robustness experiments and later model-based training under an explicit experiment. They cannot certify the generator's quality. A matching later observation creates a separate observed record linked to the hypothesis; it does not convert the dream into historical fact.
 
+Begin any learned simulation experiment with one-step or short rollouts anchored in eligible real training states. Declare maximum depth, branch width, compute, synthetic training fraction and unsupported-state stop rule. Model uncertainty and error can compound at every step; generating a long plausible story is not evidence that its transitions are accurate. Compare real-only and dream-assisted training on independent real outcomes before extending the horizon.
+
 ## 29. Error-driven dreaming
 
 Large actual prediction errors can prioritize bounded replay and alternative hypotheses. Where a calibrated probability model exists, surprise may be `-log P(observed)` with a documented numerical floor; scalar models instead use their declared residual/loss.
 
 First check data quality, attribution, maturity and calibration. High error can be noise or a logging defect rather than an important new human pattern. Keep a representative/uniform sampling share alongside surprising cases so the engine does not overfit only outliers. Record sampling weights and compare on untouched real evaluation data.
 
+The SleepLayer has four independently switchable experiment functions:
+
+| Function | Input and purpose | Required control when introduced |
+|---|---|---|
+| Replay | Reuse mature real episodes, mixing representative, recent, rare and informative errors | Uniform/representative replay at a comparable training budget; sampling-bias treatment recorded |
+| Simulation | Generate bounded hypothetical continuations | Real-only training and short-horizon controls; generated labels excluded from evaluation |
+| Consolidation | Compress repeated evidence into supported prototypes | Unconsolidated memory with coverage/error/resource comparison |
+| Evolution | Propose and select alternate immutable configurations | Fixed champion and declared search budget; selection data distinct from final test |
+
+Use the same source/split/label definitions across relevant ablations. A winning combined configuration does not prove every component helped. Introduce one function at a time; a full factorial search and every research function are not first-release requirements.
+
 ## 30. Prediction Error
 
 Compare an observed eligible outcome with the prediction frozen **before** it became available. Regression may use `y - y_hat`; probabilities require appropriate proper losses and calibration analysis. Rating, choice and long-term satisfaction use different labels/denominators.
 
 Outcome corrections append new evidence/reconciliation versions; they do not improve the original prediction retrospectively. Unknown, unexposed, unobservable or immature outcomes are not automatic errors. Report excluded/censored coverage and horizon-specific sample counts.
+
+Observing a reaction to action A can score a Challenger's frozen prediction for that same eligible target, but cannot score imagined success for unchosen B. Nor does a realized stochastic branch make all non-realized branches model errors: a distribution is evaluated by its probabilities over repeated eligible observations. Update state-hypothesis support, outcome-model loss and action-policy evidence through their separate contracts.
 
 ## 31. Error attribution
 
@@ -344,6 +395,8 @@ Champion → bounded challenger generation → offline validation
 ```
 
 Training, validation and final test windows are distinct. Repeated selection against the same holdout is overfitting; lock the final test and record experiment/search budget. User/subject dependence and multiple comparisons matter to uncertainty reporting.
+
+The final test must not influence replay priority, encoder fitting, prototype construction, dream seeds selected for their test errors or challenger mutations. Once final results guide a new design, that window is development evidence; use a newly declared untouched evaluation window for a new final claim. Hyperparameter schedules may evolve within a bounded population, but lineage, mutation choices and compute remain reproducible.
 
 Offline ratings validate specified prediction tasks, not causal policy uplift. Unexposed alternatives cannot be credited with imagined success. Propensity-based estimators require known logging probabilities and support/overlap; deterministic historical ranking does not provide that automatically. Automatic/global promotion remains disabled in Kajo MVP.
 
@@ -452,6 +505,8 @@ Logical modules remain those proposed by the owner:
 
 These are responsibility boundaries, not a mandate for eleven services or empty directories. Remain in one repository and simple deployments initially. Create a reusable package only with executable contracts/tests or a real implementation; preserve server ownership.
 
+Organize execution into four boundaries: generic computation/core, DomainAdapter, training/evaluation runner, and runtime/storage ports. The portability acceptance is an offline command that runs deterministic media/non-media fixtures and, after the dataset packets, the declared public-data experiment without Kajo UI, auth or hosted database access. A shared core does not imply that learned weights transfer unchanged into another domain.
+
 ## 44. Generation 1 — Transparent Engine
 
 Generation 1 uses inspectable state, explicit evidence, deterministic features/retrieval, transparent scoring, frozen traces, outcome reconciliation and bounded evaluation. Existing PostgreSQL/SQL/TypeScript foundations are useful, not discarded.
@@ -551,3 +606,18 @@ Frozen Prediction + Observed Reality
 ```
 
 Kajo is the first environment in which this reusable engine is taught. The architecture's ambitions are preserved in full; implementation claims are limited to the evidence recorded in STATUS, MVP and accepted code.
+
+## Research references and falsifiable proposals
+
+Reviewed 2026-09-12. These primary studies motivate experiments; their results do not establish benefits for Kajo or automatically add release dependencies. [ROADMAP](../project/ROADMAP.md) owns scheduling and [DATA_ENRICHMENT](DATA_ENRICHMENT.md) owns concrete external-data protocols.
+
+| Research | Relevant mechanism | Proposed engine comparison and limit |
+|---|---|---|
+| [RAFT: Retrieval Augmented Time Series Forecasting, 2025](https://arxiv.org/abs/2505.04163) | Retrieves similar historical patterns and their known continuations for numeric forecasts | Prefix/continuation retrieval versus static/no memory; transferring this to preference trajectories is a hypothesis |
+| [PETS, 2018](https://arxiv.org/abs/1805.12114) | Probabilistic ensembles and uncertainty propagation in dynamics learning | Supported uncertainty estimates versus scalar/rank controls; control-task results do not validate human-state inference |
+| [Prioritized Experience Replay, 2016](https://arxiv.org/abs/1511.05952) | Gives selected real transitions more replay weight | Error-aware versus representative replay with sampling-bias and outlier controls; Kajo gains remain unmeasured |
+| [MBPO: When to Trust Your Model, 2019](https://arxiv.org/abs/1906.08253) | Short model-generated rollouts branching from real observations | Real-only versus bounded synthetic training; reinforcement-learning results do not justify long dream chains here |
+| [Population Based Training, 2017](https://arxiv.org/abs/1711.09846) | Jointly optimizes a population of models and hyperparameter schedules | Fixed configuration versus bounded evolution on selection data; no automatic serving promotion |
+| [Causal Representation Learning for Generalisable Recommendation, May 2026 preprint](https://arxiv.org/abs/2605.27043) | Targets generalization under distribution shift rather than full latent causal identification | Later capacity-matched representation comparison on declared shifted data; reported Spotify/KuaiRand results are not Kajo evidence |
+
+Before implementing a paper-derived method, record the exact paper/version and experimental changes. Keep a negative result: rejecting a technique that does not improve useful, supported predictions is progress rather than a reason to keep expanding the model search.

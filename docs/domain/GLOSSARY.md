@@ -61,11 +61,12 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Night | `NIGHT` | Visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Experience actually consumed/read/watched/attended in its domain. |
 | Saved | `SAVED` | Profile-level intentionally stored state; pending Shared Endorsement is not Shared Saved. |
-| Rating | `rating` | Kajo integer 0–10 outcome implying consumed; research raw scales remain separately preserved. |
+| Rating | `rating` | Kajo integer 0–10 experience outcome; Personal rating implies consumed, while a planned SharedRatingRound response alone does not complete joint history. Research raw scales remain separately preserved. |
 | Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an unconsumed Item. |
 | Endorsement / yhteinen tykkäys | `Endorsement` | Actor-specific positive Shared decision to do an Item together. |
 | Pending endorsement | `PendingEndorsement` | At least one active Endorsement without unanimous accepted-member consensus. |
-| Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` target-List proposal bound to Endorsement/consensus semantics; source changes remain governed by current accepted contracts. |
+| Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` proposal. The #229 successor binds an explicit destination set, confirmed by every member before unanimous commit; accepted-main single-List and active exact-set source acceptance remain distinct. |
+| Shared rating round / yhteinen arviointikierros | `SharedRatingRound` | Required first-release target (#232): one identified Shared experience, explicit participant set and each actor’s own response. All required responses precede joint completion; a rewatch creates a new round. Not yet implemented. |
 | Shared consensus | `SharedConsensus` | Unanimous currently accepted-member endorsement; promotes once to Shared Saved/system List and remains durable. |
 | List / lista | `ItemList` | Profile-owned collection of generic, potentially mixed-type Items. |
 | System saved list / Tallennetut | `SYSTEM_SAVED` | Exactly one system Saved List per Profile. |
@@ -83,16 +84,17 @@ The following terms are proposed contract names, **not a claim that matching cod
 | `Subject` | Entity whose outcomes are predicted; maps to Kajo Profile. The supplied architecture's target Actor role is not confused with the acting User. |
 | `Object` / `Action` | Domain-neutral object and eligible decision/slate; Kajo Item/recommendation are adapter mappings. |
 | `CurrentState` | Composition of supported subject, working/recent/durable, uncertainty, group, world and context representations with time/version scope. |
-| `BeliefState` | Estimate/support/uncertainty/calibration metadata distinguishing poor fit from insufficient knowledge. |
+| `BeliefState` | Optional weighted present-state hypotheses plus support/uncertainty/calibration; distinguishes uncertainty about state/model from response variability and poor fit. |
 | `GroupState` | A group's own learned state plus permitted aggregate inputs; Kajo SharedProfile is its subject. |
 | `WorldState` | Time-valid environment, availability and trend signals, separate from personal durable memory. |
 | `Observation` | Source-typed evidence with occurrence/availability semantics and observability mask. |
 | `Trajectory` | Ordered decision/observation/state path; only available prefix enters current prediction. |
 | `RealityPath` | Actually observed portions of a trajectory, never model-invented history. |
-| `Branch` | Predicted horizon-defined event/path; exclusive path categories and overlapping outcome heads are different contracts. |
+| `Branch` | Horizon-defined stochastic outcome/path or explicitly conditioned action alternative; distinct from a present-state hypothesis or model Challenger. Exclusive paths and overlapping outcome heads use different probability contracts. |
 | `LocalScenarioMemory` | Subject-scoped authorized real episodes. |
 | `GlobalScenarioMemory` | Separately admitted privacy-protected cross-subject episodes/prototypes; not rating-only ExternalTastePrior. |
 | `SyntheticScenarioMemory` | Isolated generated hypotheses, excluded from default real-evidence retrieval/evaluation. |
+| Memory scope / origin | Independent metadata: subject/group/domain/global governs permitted use; observed/synthetic and source provenance govern evidential meaning. A globally shared generated path remains synthetic. |
 | `ScenarioEncoder` | Versioned decision-prefix representation for memory retrieval; future labels are excluded from the query. |
 | `MetricEngine` | Context/task-aware compatible-space similarity with support/missingness handling. |
 | `ScenarioPrototype` | Consolidated evidence-grounded pattern retaining support, source/time and deletion lineage. |

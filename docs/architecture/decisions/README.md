@@ -14,7 +14,7 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
-- [0008](0008-portable-predictive-memory-engine-and-external-priors.md) — independent reusable Predictive Memory Engine, Kajo adapter, isolated public taste-data research and artifact admission. Proposed through #233's documentation PR; design acceptance is separate from implementation, training or serving admission. Advances early research, not private Kajo-wide PopulationMemory or automatic evolution.
+- [0008](0008-portable-predictive-memory-engine-and-external-priors.md) — owner-approved independent Predictive Memory Engine, Kajo adapter, isolated public taste-data research and artifact admission, published through #233 / PR #234. Design acceptance is separate from implementation, training or serving admission. Advances early research, not private Kajo-wide PopulationMemory or automatic evolution.
 
 ## Format
 

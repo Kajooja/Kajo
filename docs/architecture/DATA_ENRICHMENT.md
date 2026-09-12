@@ -6,7 +6,7 @@ Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo sema
 
 ## 1. What changes
 
-Use public, appropriately licensed preference data to develop and evaluate the independent engine before Kajo has substantial native history. Start with an isolated MovieLens experiment. Add richer object features and an expectation/outcome study only after the baseline pipeline is reproducible.
+Use public, appropriately licensed preference data to develop and evaluate the independent engine before Kajo has substantial native history. Start with an isolated MovieLens experiment. Add richer object features, an expectation/outcome study or a sequence/exposure study only after the baseline pipeline is reproducible. These optional studies answer different questions; they are not a mandatory data-collection chain.
 
 This introduces **ExternalTastePrior**, not a shortcut around privacy-gated Kajo PopulationMemory. Keep four boundaries separate:
 
@@ -21,7 +21,7 @@ Do not create live Kajo Users/Profiles for external dataset people. Do not injec
 
 ## 2. Source registry — verified documentation
 
-The following facts were checked against the publishers' README files on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Specifications below this section are Kajo design decisions, not publisher guarantees.
+The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
 
 ### MovieLens 32M — first research baseline
 
@@ -37,11 +37,25 @@ Use the 2025-02-08 updated release. It includes elicitation, recommendation and 
 
 Do not assume every expected rating has a later actual rating. The release's self-reported `userCertainty` is not the engine's calibrated BeliefState.
 
+### KuaiRand-1K — optional sequence/exposure study
+
+KuaiRand-1K samples 1,000 users, retaining standard and randomly intervened video logs with timestamps and multiple feedback fields. The publisher recommends 1K/27K for sequential work; Pure removes interactions outside a restricted item pool and therefore has incomplete sequences. IDs are re-indexed by release. The publisher lists approximately 4.3 GB for 1K; it is not a tiny fixture. [KuaiRand documentation][KUAIRAND]
+
+Use this later study to test sequence-aware recall and explicitly defined logged-feedback targets. Keep its own manifest/rights decision and domain adapter; short-video engagement is not movie satisfaction or native Kajo exposure.
+
+### Goodreads and Amazon Reviews — optional candidates, rights unresolved
+
+[UCSD Goodreads][GOODREADS] offers shelves, ratings and book metadata, but specifies academic use only and no redistribution. The current independent non-commercial project has not established that it qualifies. [Amazon Reviews 2023][AMAZON] could support object/category experiments; its [maintainer states][AMAZON-RIGHTS] that the lab is not in a position to assign the dataset a license or dictate its usage terms.
+
+Preserve both as optional research candidates. Neither is an approved download/training dependency or a release blocker. Resolve the exact intended use and source/derivative rights before admitting either; a working MovieLens path and synthetic non-media fixtures do not depend on them.
+
 ## 3. What the sources can and cannot establish
 
 MovieLens supports specified preference-prediction, collaborative representation, item-neighbor and cold-start experiments. Tag relevance can enrich object features. Beliefs can support selected pre-choice expectation analyses where timing and observed follow-up permit.
 
 They do **not** establish Kajo-specific context, exposure, propensity, joint-group satisfaction, whole-world dynamics or book/movie transfer. Rating-only rows cannot be transformed into complete Scenarios by inventing a slate, mood, watch time or action chosen by Kajo.
+
+KuaiRand adds source-specific exposure/intervention evidence, but that evidence applies to its documented logging design and support. A random-intervention flag alone is not a propensity for every possible action/slate, and it does not identify whole-policy or long-term causal effects in Kajo. An experiment must state which conditional prediction or intervention comparison its records actually support.
 
 Maintain an observability mask. Unknown exposure, unavailable context, missing outcome and observed negative response are different states. Dataset selection and platform differences limit generalization; label all external results as external offline evidence, not production uplift.
 
@@ -98,10 +112,12 @@ Proposed fields:
 observationId = stable source-row identity / content hash
 subjectRef + objectRef + dataset/release provenance
 observationKind = EXPLICIT_RATING / TAG / ELICITED_BELIEF / SOURCE_RECOMMENDATION
+                / SOURCE_EXPOSURE / SOURCE_FEEDBACK (only when the source supports it)
 rawValue + rawScale + normalizedValue? + normalizationVersion
 sourceOccurredAt? + ingestedAt + timestampSemantics
 sourceRecordRef + correction/deduplication status
 observability: exposure / context / consumptionTime / followUp
+sourcePolicyRef? + interventionStatus? + propensity? + propensityDefinition?
 ```
 
 Preserve the original rating scale. A convenient Kajo-scale transform is `rating10 = 2 * rating5`, which produces 1–10 here, **not observed zeros**. That numeric transform does not prove equivalence between platforms' rating behavior; calibrate and compare source-specific baselines. Do not create a native Kajo consumed Event merely because an external explicit rating exists.
@@ -136,6 +152,20 @@ A prospective expectation/error pair requires the same release-scoped person and
 
 Publisher-system predicted ratings may be evaluated as a separately named comparator, not silently fed into an independent engine predictor. Elicitation/recommendation sampling fields do not automatically provide the propensities needed for arbitrary policy evaluation. User identity overlap with ML32 is unproven unless explicitly documented; do not join users across releases by integer equality.
 
+### KuaiRand adapter — only in D5
+
+The publisher distinguishes standard and random-intervention logs through `is_rand`; `tab` identifies source scenarios, and `is_click` has different meanings across the two source interfaces. Its `video_features_statistic` fields average statistics across the collection month. [Source field definitions][KUAIRAND]
+
+Adapter requirements:
+
+- Preserve release identity, policy/interface, intervention flag and raw feedback semantics; never merge binary click, explicit like/hate and dwell time into one unversioned satisfaction label.
+- Merge the relevant standard/random files into deterministic timestamp order while retaining log origin; validate duplicates and time units. Do not replace 1K with Pure while claiming complete retained-user trajectories.
+- Keep random-policy evaluation targets out of training/selection under the frozen protocol. Train a comparator on the declared standard-history prefix and report the random evaluation scope, available actions and overlap; do not infer unknown slate probabilities from a dataset-wide replacement rate.
+- Exclude whole-period statistics from strict historical features. Recompute only from permitted earlier records where feasible, with declared sampled-log coverage, or omit them. Treat undated user/basic metadata and later supplements as unavailable unless their cutoff validity is established.
+- Freeze which feedback is observable at each prediction point. Current-row response fields are labels, not inputs. Use independent head maturity/missingness rather than treating every missing or zero feedback field as explicit dislike.
+
+Start with a bounded declared slice/cohort and a small feature allowlist. Record resource limits before download; any larger run is a separate measured step. D5 tests the reusable method in another media setting and cannot close Kajo's native product-value gates.
+
 ## 8. Reproducible evaluation before model complexity
 
 Every EvaluationManifest freezes source hashes, hypothesis, task/label, eligibility, split boundaries, code/dependency versions, random seeds, resource budget, metrics and admission rule before final testing.
@@ -145,6 +175,10 @@ Every EvaluationManifest freezes source hashes, hypothesis, task/label, eligibil
 Start with a train-only global/item mean with support shrinkage, a supported item-neighbor model, and a compact explicit-rating factorization challenger. An implicit-feedback model requires an explicitly justified transformation; absent ratings are not dislikes. Compare current transparent content/state concepts through the research adapter rather than pretending the existing hosted SQL is already trained on MovieLens.
 
 Evaluate both the learned component and the complete candidate/ranking pipeline where the dataset supports the latter. A good reranker cannot recover candidates never retrieved. No baseline may read a test rating through an embedding, normalization statistic, tag aggregate, prototype or nearest-neighbor index.
+
+The first meaningful D2 cohort also declares a small **static-state versus ordered-prefix memory** comparison: durable summary alone; recent state/order added; and retrieved historical prefix plus known continuation where supported. Fix target/candidate sets, horizons, features and compute limits before comparing. Use deterministic features/exact bounded retrieval first. Report the number of eligible neighbors, explicit no-match coverage and whether retrieval improves the same later rating task. The claim is about rating-entry sequences; the experiment must not rename them viewing trajectories. A negative or under-supported finding is a valid bounded result.
+
+Later learned metrics optimize downstream prediction on training/validation data, not merely embedding closeness. Replay, simulation, consolidation and evolution enter through independent controls in [the engine sleep contract](PREDICTIVE_MEMORY_ENGINE.md#29-error-driven-dreaming); D2 does not require all of them or a neural WorldModel.
 
 ### Splits and cold start
 
@@ -176,9 +210,10 @@ A learned external prior is not required to win to complete the research packet.
 |---|---|---|
 | E1 | Generic subject/actor, state/action/object/observation/outcome contracts; Kajo mapping; deterministic media and non-media fixtures | No provider/UI/auth dependency in core; missingness, version/time scope and observed/synthetic separation tests; no runtime scorer swap |
 | D1 | Dataset manifest + MovieLens adapter + isolated small deterministic cohort | No production credentials/writes; repeatable hashes/counts; parsing, bounds, IDs, duplicates, missing mappings, time order, quarantine and idempotent retry tests |
-| D2 | Reproducible baselines, cold-start splits and fixed evaluation report | Same-seed reproducibility; leakage tests for embeddings/features/prototypes; frozen final test; explicit unsupported claims and uncertainty |
+| D2 | Reproducible baselines, cold-start splits, bounded static-state/ordered-prefix comparison and fixed report | Same-seed reproducibility; leakage tests for embeddings/features/prototypes/continuations; frozen final test; no-match coverage; explicit unsupported claims and uncertainty |
 | D3 | Optional named Tag Genome variant and coverage/rights ablation | Variant ranges, mapping conflicts, missing features and temporal availability tested; enriched vs no-enrichment comparison |
 | D4 | Optional Beliefs release-2 expectation study | Conditional nullability, no-response, temporal pair validation, repeated belief policy and follow-up coverage tests |
+| D5 | Optional KuaiRand-1K sequence/exposure study after D2; D3/D4 are not prerequisites | Release/rights/resource manifest; complete retained-user ordering; standard/random and interface semantics; no future aggregate or current-response leakage; declared supported targets and overlap |
 | E2 | One admitted component behind existing Kajo prediction boundary | Accepted SQL compatibility/fallback; immutable trace and current authorization; separately reviewed rollout and real-device evidence |
 
 Dataset download, the full training run and hosted artifact admission are separate recorded operations. No completed checkbox or source CI pass can substitute for them.
@@ -188,5 +223,9 @@ Dataset download, the full training run and hosted artifact admission are separa
 [ML32]: https://files.grouplens.org/datasets/movielens/ml-32m-README.html
 [TG21]: https://files.grouplens.org/datasets/tag-genome-2021/genome_2021_readme.txt
 [BELIEFS]: https://files.grouplens.org/datasets/movielens/ml_belief_2024_data_release_2_README.txt
+[KUAIRAND]: https://kuairand.com/
+[GOODREADS]: https://sites.google.com/eng.ucsd.edu/ucsdbookgraph/home
+[AMAZON]: https://amazon-reviews-2023.github.io/
+[AMAZON-RIGHTS]: https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023/discussions/1
 
-Publication attribution must follow the exact selected release: Harper and Konstan (2015) for MovieLens; Kotkov, Maslov and Neovius (2021) and Vig, Sen and Riedl (2012) for Tag Genome; the Aridor et al. (2024) Beliefs reference specified by its publisher. Store the publisher's complete citation in the dataset manifest rather than relying on this abbreviated design note.
+Publication attribution must follow the exact selected release: Harper and Konstan (2015) for MovieLens; Kotkov, Maslov and Neovius (2021) and Vig, Sen and Riedl (2012) for Tag Genome; the Aridor et al. (2024) Beliefs reference specified by its publisher; Gao et al. (2022) for KuaiRand. Store the publisher's complete citation in the dataset manifest rather than relying on this abbreviated design note. Method proposals and their primary papers are in the [engine research appendix](PREDICTIVE_MEMORY_ENGINE.md#research-references-and-falsifiable-proposals); they are not claims that public-data training already improves Kajo.

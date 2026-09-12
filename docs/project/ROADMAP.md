@@ -33,6 +33,14 @@ Advance portable contracts and an honest MovieLens baseline experiment into Phas
 
 The active #229 evidence/pagination packet keeps its own acceptance and rollout gates. E1/D1/D2 can proceed independently as explicitly named source/research work; E2 runtime integration cannot bypass Phase 14.1/14.2. STATUS identifies the exact active branch and next bounded unit.
 
+Default continuation is **finish the next #228/#229 page-delivery unit**, then
+complete its native/client/recovery/rollout acceptance before closing that packet.
+The next engine packet is [E1 #235](https://github.com/Kajooja/Kajo/issues/235),
+followed by [D1 #236](https://github.com/Kajooja/Kajo/issues/236) and
+[D2 #237](https://github.com/Kajooja/Kajo/issues/237). An explicit switch to isolated
+E1 research is possible while native gates wait, but must be recorded in STATUS.
+Do not interleave two implicit tasks or wait for a large Kajo population to start D1.
+
 ## Milestone: MVP 0.1 — first public Kajo
 
 MVP 0.1 means the first complete, externally usable BOOK/MOVIE Kajo that can acquire a new person from a link, learn them before registration, preserve that learning through account creation and turn the activated user into the next potential inviter.
@@ -91,6 +99,12 @@ Requirements: `MVP-DATA-001..004`, `MVP-PRED-006`.
 
 Exit: canonical action/current state is idempotent and atomic; persistent outbox survives termination/retry/account switch; exact delivered Profile/prediction/slate origin; delayed outcomes never guessed onto a run; Shared/search/List overlays retain truthful provenance.
 
+The first-release [#232](https://github.com/Kajooja/Kajo/issues/232) SharedRatingRound
+contract also needs participant/round provenance, pending versus completed
+outcomes and correction semantics here. Specify member-seen/rewatch eligibility
+under 14.2; deliver the coordinated user flow in 16.3. An already known evidence
+defect must not be hidden behind that later UI milestone.
+
 ### 14.2 — Serving/shadow equivalence and candidate availability
 
 Requirements: `MVP-ALG-002..003`.
@@ -98,6 +112,13 @@ Requirements: `MVP-ALG-002..003`.
 Exit: one versioned scoring/eligibility/policy contract for Personal/Shared; baseline shadow parity within declared tolerance; bounded refill after suppression; identified empty responses; duplicate-free, scope-safe pagination without falsely claiming catalog exhaustion.
 
 Finish the active source packet through its native concurrency/populated-upgrade gates before reader activation or hosted acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page.
+
+The captured reader must also bind visible cache/readiness to environment, actor,
+Profile, session, domain, mode and request/revision. Test rapid A → B → A Profile
+return, session changes, delayed responses and errors; an effect refetch alone
+does not prove that a cached run belongs to the current session. Continuation
+acceptance includes concurrent window-cap creation and populated window upgrades,
+not only first-page retry races.
 
 ### 14.3 — Real catalog and normalized shared features
 
@@ -107,23 +128,36 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
+Before catalog expansion, close #182's source-audit deployment gaps: explicitly
+declare the catalog Edge JWT/service-key boundary, pin reproducible Edge imports
+and validate entrypoints plus unauthorized/authorized requests. Existing mobile
+and Node normalizer tests alone do not verify Edge deployment.
+
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
 ### 14.3A — Portable contracts and external-data research
 
 Requirements: `MVP-ENG-001..003`. Canonical design: ADR-0008 and [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md). This is a bounded foundation, not an indefinite model-search project.
 
-**E1 — contracts and fixtures, first engine-specific packet.** Create an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
+**E1 — contracts and fixtures, first engine-specific packet ([#235](https://github.com/Kajooja/Kajo/issues/235)).** Create an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters through a standalone command. Add the actual workspace/exports and engine lint/typecheck/tests to root `npm run check`; currently only `apps/*` workspaces exist. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
 
-**D1 — isolated MovieLens manifest and adapter.** After E1's record boundary, implement streaming/idempotent normalization and deterministic small-cohort processing. Validate checksums, CSV/ratings/IDs, namespaces, mappings, duplicates, chronological ordering, quarantine and resource bounds. No production credentials or native User/Profile/Event writes. Exclude raw/derived datasets from Git/ordinary CI artifacts before download.
+**D1 — isolated MovieLens manifest and adapter ([#236](https://github.com/Kajooja/Kajo/issues/236)).** After E1's record boundary, implement streaming/idempotent normalization and deterministic small-cohort processing. Validate checksums, CSV/ratings/IDs, namespaces, mappings, duplicates, chronological ordering, quarantine and resource bounds. Then record the actual permitted download and normalized real cohort. No production credentials or native User/Profile/Event writes. Use ignored `research-data/` and `research-artifacts/` locations or explicitly equivalent isolated storage; exclude raw/derived data from ordinary CI artifacts before download.
 
-**D2 — reproducible baseline evaluation.** Compare train-only transparent means/neighbors and an explicit-rating factorization challenger through the same research contract. Freeze global chronological splits, held-out-subject cold-start prefixes, transforms/artifact cutoffs, baselines, metrics and final test before selection. Report coverage, uncertainty, task limitations, cost and prior/enrichment ablations where available. Scale to the full dataset only after the small run is correct and resource-bounded.
+**D2 — reproducible baseline evaluation ([#237](https://github.com/Kajooja/Kajo/issues/237)).** Compare train-only transparent means/neighbors and an explicit-rating factorization challenger through the same research contract. Include one bounded declared static-state versus ordered-prefix/trajectory-retrieval experiment; a negative or insufficient-evidence result is valid. Freeze global chronological splits, held-out-subject cold-start prefixes, transforms/artifact cutoffs, baselines, metrics and final test before selection. Report coverage, uncertainty, task limitations, cost and prior/enrichment ablations where available. Scale to the full dataset only after the small run is correct and resource-bounded.
 
 Exit: reproducible contracts/adapter/report and a documented admit/reject/defer decision. A challenger need not win. No probabilities, counterfactual uplift, group behavior or cross-domain competence may be fabricated from rating-only data. A losing or rights-blocked prior stays out of serving; the transparent baseline remains usable.
 
 **D3 — optional Tag Genome enrichment** follows the baseline: one named variant, mapping/coverage/range/rights checks, temporal-feature availability and no-enrichment comparison.
 
 **D4 — optional Beliefs release-2 study** follows verified schema and pairing rules: distinguish no-response, expected and actual rating; require valid temporal follow-up and report missing outcomes. Neither optional packet is a hidden MVP blocker.
+
+**D5 — optional KuaiRand-1K sequence/exposure study** follows D2 and its own
+release/rights/adapter manifest; D3/D4 are not prerequisites. Test temporal state
+and exposure selection with the source's random-intervention support. Pure is not
+a complete sequence substitute; exclude whole-period aggregates from historical
+features. Random exposure still does not reveal every individual's counterfactual.
+Goodreads/Amazon and real non-recommendation tasks remain conditional later
+research, not downloads hidden inside D1 or automatic release blockers.
 
 **E2 — optional admitted component integration** occurs only after relevant 14.1/14.2 gates and artifact rights/compatibility/quality checks. Reuse the existing Kajo serving boundary, freeze artifact versions in traces and test absence/withdrawal/fallback, Personal/Shared isolation and rollback. Hosted and device acceptance are separate. Offline training is never an automatic production switch.
 
@@ -153,6 +187,10 @@ Requirements: `MVP-TASTE-001..005` plus preview/usefulness gates.
 
 Exit: bounded 12–24-opportunity anonymous test; unknown Items do not poison taste; recognition/information/diversity balance; held-out predictions frozen before answers; documented metric/support; preview from canonical production ranking; useful first-session behavior against a fixed baseline.
 
+LAUNCH_LOOP retains the owner's roughly ten movies → transition → ten books
+proposal inside adaptive bounds, always-available unknown response even after
+rating-wheel movement, and preservation of already accepted Personal taste.
+
 External benchmark results cannot substitute for this real Kajo first-session acceptance.
 
 ### 15.1 — Anonymous identity and web/app continuation
@@ -160,6 +198,11 @@ External benchmark results cannot substitute for this real Kajo first-session ac
 Requirements: `MVP-ACQ-001..004`, `MVP-AUTH-004` and identity continuity requirements.
 
 Exit: browser-capable public Taste link; equivalent installed-app route; server-backed resumable anonymous state; Google/Apple link/upgrade without duplicate User/PersonalProfile; failed/abandoned auth preserves accepted taste inside retention; safe account collisions.
+
+Resolve the runtime routing decoder advisory in #238 before public-link acceptance.
+Use a compatible parent update/interop fix with malformed-link regressions; a bare
+decoder override breaks the installed CommonJS consumer. Coordinated build/test
+dependency maintenance remains under MVP-OPS-005; no forced framework downgrade.
 
 ### 15.2 — Recommendation preview and conversion funnel
 
@@ -175,6 +218,9 @@ Requirements: `MVP-FRIEND-001..004`.
 
 Exit: activated User creates opaque expiring/revocable/rate-limited invite; receiver uses the same Taste flow; explicit acceptance after/through permanent identity; one reciprocal idempotent Friendship; no private Personal evidence exposed.
 
+Include LAUNCH_LOOP's explicit link reveal/one-tap-copy UX; keep Friend and Shared
+invites distinct.
+
 ### 16.1 — Friend list and safety lifecycle
 
 Requirements: `MVP-FRIEND-005..007`.
@@ -187,6 +233,19 @@ Requirements: `MVP-GROUP-001..003` and existing SharedProfile requirements.
 
 Exit: short explicit two-Friend creation; 3+ members still accept membership; invites never create a group automatically; canonical joint/common-fit predictor, not a second recommender; Friend removal does not rewrite Shared history/membership.
 
+### 16.3 — Shared experience rating and controlled rewatch
+
+Requirements: `MVP-SOCIAL-007..009`, [#232](https://github.com/Kajooja/Kajo/issues/232).
+Required before the complete beta, after Personal Taste/setup and Phase 14's
+evidence/eligibility contracts.
+
+Exit: A's attributed Shared rating prompts the other required participants; all
+required individual responses precede completed joint history. Keep disagreement,
+Personal/joint separation, atomic completion, corrections/retries/membership
+changes and truthful legacy provenance. A new joint rewatch is a new experience
+with retained history and a bounded versioned eligibility policy. Two-account and
+N-member server/CI/device cases must pass; completion alone is not satisfaction.
+
 ## Phase 17 — Complete core product and operational quality
 
 ### 17.0 — Browse/core UX completion
@@ -194,6 +253,11 @@ Exit: short explicit two-Friend creation; 3+ members still accept membership; in
 Requirements: `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, Lists/messages/Room/device acceptance.
 
 Exit: contextual Lists, search/filters and authorized Profile surfaces; accessibility/reduced motion/error/offline states; deferred device gates; graphics may evolve without changing domain contracts. Preserve planned #231 multi-select/trash work in its product scope rather than mixing it into engine extraction.
+
+Size #230 private category statistics, #231 multi-select/List moves/history trash
+and FUT-UX-003 joint-list choice as separate candidates here. Their full contracts
+belong to FUTURE_PLAN; they are not automatically added release blockers. Weekly
+statistics/community comparisons additionally depend on 17.1/17.2.
 
 ### 17.1 — Launch telemetry and experimentation
 
@@ -205,7 +269,14 @@ Exit: complete link/Taste/auth/Friend/Shared funnel observable; model/Taste/camp
 
 Requirements: `MVP-OPS-001..006`, Taste/Friend privacy requirements.
 
-Exit: staging/production isolation; anonymous/Taste/invite retention/deletion; backups/restore; crash/queue/prediction/funnel diagnostics; invite limits/anti-enumeration/block handling; cost alerts; fail-closed production configuration.
+Exit: staging/production isolation; anonymous/Taste/invite retention/deletion; backups/restore; crash/queue/prediction/funnel diagnostics; invite limits/anti-enumeration/block and abuse-report handling; cost alerts; fail-closed production configuration.
+
+The repository audit found production build configuration still optional and
+unconfigured clients still able to enter mock mode. `MVP-OPS-005` must reject
+missing production settings and privileged key shapes before bundling, while
+retaining explicit local demo/test behavior. Under #160/#184 validate password
+endpoint JSON shapes, intended enumeration responses and rate limits before
+anonymous/public entry. These are open source findings, not verified hosted defects.
 
 Research artifacts and derived model/index dependencies participate in their own rights, withdrawal and lifecycle controls. Do not ship research data or service credentials to clients.
 

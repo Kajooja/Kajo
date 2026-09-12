@@ -123,6 +123,36 @@ The user reacts to recognizable real Items one at a time. Current rating semanti
 
 The test should normally remain within roughly **12–24 informative known-item opportunities**, adapting to recognition and information gain. Exact thresholds are versioned and must be measured rather than hard-coded forever.
 
+Owner device preference (2026-09-10): make initial profiling visibly longer,
+using approximately **10 movies followed by 10 books**, with a distinct transition
+card announcing book profiling. Treat this as the proposed default progression
+for Phase 15.0, compatible with the 12–24-opportunity adaptive range above, not a
+requirement to force 20 known ratings. Keep unknown-item skips, recognition-aware
+selection and honest progress. The current logged-in calibration flow also needs
+this proposal evaluated after its evidence/history defects are corrected.
+
+Current-calibration evaluation (2026-09-10, #228/#229): the server already accepts
+6–24 known ratings and can select 20 balanced candidates, but currently returns
+an interleaved MOVIE/BOOK sequence and offers completion after six ratings. The
+proposed 10 MOVIE → transition → 10 BOOK progression therefore needs a versioned
+presentation/stop rule, not just a higher numeric minimum. Retain unknown skips,
+bounded extension to 24 opportunities, and fail-open behavior when recognition or
+catalog coverage is insufficient. Freeze the presented order when extending so
+already answered Items do not move or repeat. Existing completed profiles must
+not be forced through calibration again. Implement this progression in Phase 15.0
+with the adaptive Taste interaction; the current history correction does not
+change the six-rating completion rule or claim the longer flow is delivered.
+
+Owner follow-up (2026-09-10): keep an independent **“En tunne” / skip** action
+visible and usable after the rating wheel has moved, including accidental touches.
+“Next” with a draft rating and “unknown” must be separate, unambiguous actions.
+Choosing unknown discards that Item's unsubmitted draft rating and advances or
+extends the opportunity sequence without creating rating/not-interest evidence.
+Cover accidental drag, deliberate zero rating, previous/next and the last-card
+extension/fail-open case. Deliver this with the longer Phase 15.0 Taste flow;
+the current six-rating calibration still switches its combined label after a
+draft rating and has not yet received this interaction correction.
+
 The question-selection policy should optimize information gained about the Profile while retaining:
 
 - high recognition probability,
@@ -205,6 +235,12 @@ Friendship invariants:
 - blocked/removed relationships cannot be recreated through replayed invite tokens,
 - user enumeration and invitation spam are rate-limited.
 
+Future invite presentation (owner idea, 2026-09-10): place a small “lähetä linkki”
+action below Send invitation. Tapping reveals the invitation URL and a one-tap
+copy button. Deliver with Phase 16 link flows, not the current collection fixes.
+Apply the presentation to the appropriate invitation type only once its URL,
+consent and lifecycle exist; a Friend link must not silently join a SharedProfile.
+
 ## 9. SharedProfile creation from Friends
 
 Friends are a lightweight social graph. SharedProfile remains the learned recommendation target for joint use.
@@ -222,6 +258,13 @@ SharedProfile
 For 3+ people, the creator selects Friends and sends/collects explicit membership acceptance under the existing SharedProfile rules.
 
 Do not make every friendship a SharedProfile. This keeps the friend graph lightweight and makes joint learning intentional.
+
+Personal Taste setup precedes joint rating. Preserve an existing completed setup
+and the bounded recognition-aware cold-start exit; do not force a repeat test or
+20 recognized Items to unlock a group. The required next step is SharedRatingRound
+(#232, ROADMAP 16.3): one member’s Shared score invites the others’ own responses,
+then the completed joint experience enters Shared history. Personal history stays
+separate. DOMAIN_MODEL and PREDICTION_MODEL own the round and rewatch contracts.
 
 ## 10. Funnel and event measurement
 

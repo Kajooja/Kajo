@@ -145,13 +145,16 @@ Existing SharedProfile learning semantics remain canonical.
 - [x] `MVP-SOCIAL-003` Member can create actor-specific pending Endorsement.
 - [x] `MVP-SOCIAL-004` Pending Endorsement is hidden for endorser and prioritized for non-endorsing accepted members with provenance.
 - [x] `MVP-SOCIAL-005` Unanimous endorsement promotes once to Shared Saved/system `Tallennetut` and remains durable after later membership changes.
-- [x] `MVP-SOCIAL-006` Accepted-member Personal consumed/rated history may appear only as an attributed lower Shared discovery tier; Shared consumed/consensus-saved Items remain suppressed.
+- [x] `MVP-SOCIAL-006` Delivered V1: accepted-member Personal history appears as an attributed lower Shared tier; Shared consumed/consensus-saved Items are suppressed. Required successor eligibility is tracked separately in `MVP-SOCIAL-009`.
+- [ ] `MVP-SOCIAL-007` After Personal Taste setup, SharedRatingRound retains each participant's own 0–10 response: A's rating prompts B; all required responses precede completed joint Katsotut/Luetut. #232, Phase 16.3.
+- [ ] `MVP-SOCIAL-008` Joint learning keeps actor/round provenance and disagreement, with atomic completion, correction/Undo, retry and membership-change semantics; Personal history remains separate and legacy single-actor history is not fabricated into confirmed rounds. #232.
+- [ ] `MVP-SOCIAL-009` A member-seen Item may rank strongly for joint use; a bounded/versioned rewatch policy permits a new joint experience of the same Item while retaining all prior history. Serving/shadow eligibility and delayed outcomes agree. #232.
 
 ## Swipe and state
 
 - [x] `MVP-SWIPE-001` Optional swipe mode exists for books/movies.
 - [x] `MVP-SWIPE-002` Consumed rating 0–10 and unconsumed not-interest are distinct.
-- [x] `MVP-SWIPE-003` Rating implies consumed/read/watched.
+- [x] `MVP-SWIPE-003` Personal rating implies consumed/read/watched; joint completion additionally requires `MVP-SOCIAL-007`.
 - [x] `MVP-SWIPE-004` Consumed/reacted Items are suppressed appropriately; impressions have bounded cooldown.
 - [x] `MVP-SWIPE-005` Rating, not-interest and List addition use one restrained action drawer; List add is positive action.
 - [x] `MVP-SWIPE-006` Recent interactions can be undone with exact Item/state restoration.
@@ -160,15 +163,15 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [x] `MVP-MEM-001` User can save/unsave Item.
 - [x] `MVP-MEM-002` User can view consumed books/movies.
-- [x] `MVP-MEM-003` Rating 0–10 records consumed.
+- [x] `MVP-MEM-003` Personal rating 0–10 records consumed; the Shared round requirement is tracked in `MVP-SOCIAL-007`.
 - [ ] `MVP-MEM-004` Data model retains an extension point for future note/photo/people/location/date memories.
 - [-] `MVP-MEM-005` Profile-scoped Saved and consumed collections are reachable without duplicating canonical interaction state.
 
 ## Named Lists
 
 - [-] `MVP-LIST-001` Personal/Shared Profiles can own multiple named generic Lists plus one system Saved List.
-- [-] `MVP-LIST-002` Compact one-destination List picker supports recent Lists and create/name/rename.
-- [-] `MVP-LIST-003` Personal add is positive action; Shared custom List proposal/approval follows Endorsement unanimity and then system Saved promotion.
+- [-] `MVP-LIST-002` Compact multi-destination List picker supports recent Lists and create/name/rename in Personal and Shared Profiles; Shared members review the exact full set before atomic unanimous addition. The final Add submits the selection without a second Done action; create alone never adds Items.
+- [-] `MVP-LIST-003` Personal add is positive action; Shared custom List proposal/approval follows Endorsement unanimity for the exact selected set and then system Saved promotion.
 - [-] `MVP-LIST-004` List detail supports list/card presentation, deterministic sort and generic ItemType filters.
 - [-] `MVP-LIST-005` Membership stores truthful added-by/time while canonical consumed/rating state stays elsewhere.
 - [-] `MVP-LIST-006` Shared List access follows accepted membership authorization.
@@ -209,11 +212,11 @@ Existing SharedProfile learning semantics remain canonical.
 
 [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [ROADMAP Phase 14.3A](../project/ROADMAP.md#143a--portable-contracts-and-external-data-research) define the owner-requested new direction. These are planned, not delivered by the architecture documentation.
 
-- [ ] `MVP-ENG-001` Executable generic engine contracts preserve Subject/acting-identity separation, Object/Action/State/Observation/Outcome semantics, missingness, time/version scope and hard constraints. Deterministic Kajo/media and small synthetic non-media adapter fixtures prove portability without importing provider/UI/auth dependencies into the core. Current SQL serving is unchanged until a parity-tested component replacement is admitted.
-- [ ] `MVP-ENG-002` An isolated MovieLens manifest/adapter and baseline report are reproducible on a declared deterministic real-data cohort, with validation/quarantine, train-only artifacts, chronological and cold-start splits, a fixed final test, coverage/uncertainty/resource reporting and explicit task limitations. No external identities or invented context/exposures become native Kajo evidence. Dataset scale and experiment limits are reported honestly; a challenger is not required to win.
+- [ ] `MVP-ENG-001` Executable generic engine contracts preserve Subject/acting-identity separation, Object/Action/State/Observation/Outcome semantics, missingness, time/version scope and hard constraints. Deterministic Kajo/media and small synthetic non-media adapter fixtures run without UI/hosted DB and without importing provider/UI/auth dependencies into core. The real package joins workspace/exports and root lint/typecheck/tests. Current SQL serving is unchanged until a parity-tested component replacement is admitted. E1 #235.
+- [ ] `MVP-ENG-002` An isolated MovieLens manifest/adapter and baseline report are reproducible on a declared deterministic real-data cohort, with validation/quarantine, train-only artifacts, chronological and cold-start splits, a fixed final test, coverage/uncertainty/resource reporting and explicit task limitations. Include a bounded declared static-state versus ordered-prefix/trajectory-retrieval comparison. No external identities or invented context/exposures become native Kajo evidence. Dataset scale and experiment limits are reported honestly; a challenger is not required to win. D1 #236 → D2 #237.
 - [ ] `MVP-ENG-003` Source/derived-artifact permissions and lineage are explicit and fail closed for unsupported uses. A tested absent/invalid/withdrawn-prior fallback and recorded admission/rejection decision preserve native serving. Synthetic records cannot enter observed-outcome evaluation or validate their own generator. Jointly learned source influence requires a documented replacement/retraining path rather than assuming raw-file deletion removes it.
 
-D3 Tag Genome and D4 Beliefs are optional enrichment/research packets after the baseline. E2 serving integration is conditional on rights, useful evidence, compatibility and the existing native reliability/rollback gates. External hidden-rating accuracy does not close Kajo first-session, exposure, Shared, cross-domain or device acceptance. A useful transparent baseline remains acceptable; indefinite model search is not a release requirement.
+D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/research packets after D2. E2 serving integration is conditional on rights, useful evidence, compatibility and the existing native reliability/rollback gates. External hidden-rating accuracy does not close Kajo first-session, exposure, Shared, cross-domain or device acceptance. A useful transparent baseline remains acceptable; indefinite model search is not a release requirement.
 
 ## Growth/funnel measurement — release blockers
 

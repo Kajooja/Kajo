@@ -4,6 +4,8 @@ Kajo is a mobile-first personal and shared discovery platform. It learns a perso
 
 Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
+Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). Its reusable core and [public-data research pipeline](docs/architecture/DATA_ENRICHMENT.md) are planned work with explicit acceptance gates, not already delivered packages or trained models. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
+
 The repository—not a ChatGPT conversation—is the permanent project memory.
 
 ## Start here

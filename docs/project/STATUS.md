@@ -1,94 +1,159 @@
 # Kajo Current Status
 
-Last updated: **2026-09-12**  
-Current milestone: **MVP 0.1 — first public Kajo**  
-Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable-engine foundation**  
+Last updated: **2026-09-12**
+Current milestone: **MVP 0.1 — first public Kajo**
+Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
 
-This file owns the exact resumable handoff. [ROADMAP](ROADMAP.md) owns dependency order; [MVP](../product/MVP.md) owns release blockers; [LAUNCH_LOOP](../product/LAUNCH_LOOP.md) owns the Taste-first acquisition flow. Historical sprint/CI details remain in the relevant PRs and [Sprint 014](sprints/SPRINT-014.md).
+This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
+[MVP](../product/MVP.md) owns release blockers and [LAUNCH_LOOP](../product/LAUNCH_LOOP.md)
+owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
+an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Documentation direction — 2026-09-12 / #233
+## Primary next packet — #228 / draft PR #229
 
-The owner supplied the 51-part Predictive Memory Engine and requested review, independent-engine architecture, public movie-taste enrichment and aligned repository documentation **before implementation**.
+**When the owner says “jatketaan reposta”, continue atomic next-page delivery in
+[PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
+`feat/228-delivered-origin`, after syncing/reconciling accepted main documentation.**
+Inspect refreshed refs before writing. Do not merge the unfinished implementation
+or switch silently to a different research task.
 
-The documentation branch is `docs/233-predictive-memory-engine`, based on accepted main `6dd1fecaca6a081d633bf640aab12b35dcf2cb8f`. Its architecture and integration changes require acceptance through its own PR; they do not merge or accept the active code PR below.
+Latest implementation source inspected: `44b11b437286653eae427bad10493a9380b92668`.
+All five required jobs passed in [CI #458](https://github.com/Kajooja/Kajo/actions/runs/34582041579).
+The earlier request to wait for the corrected first-page retry-lock check is
+resolved; do not rerun/poll it merely because an older checkpoint says pending.
 
-Canonical new documents:
+Next bounded unit:
 
-- [Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md): all 51 conceptual sections, with explicit review amendments and staged implementation.
-- [Data enrichment](../architecture/DATA_ENRICHMENT.md): isolated MovieLens baseline, optional Tag Genome/Beliefs packets, data limits, permissions, manifests and reproducible evaluation.
-- [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md): independent generic core + Kajo adapter; external research prior is not native PopulationMemory.
+1. Commit a next page from the private frozen source window: exact actor/Profile/
+   session/domain/mode/request/cursor scope, current eligibility, no repeated seen
+   Items, an independent immutable page PredictionRun/ranks and exact retry receipt.
+2. Preserve historical first-page evidence; advance seen state once and implement
+   page-aware frozen/shadow replay. Raw cached candidates are not a deliverable page.
+3. Add native concurrent 16-window-cap and populated pre-window-receipt upgrade
+   cases, alongside page retry/concurrency/expiry/authorization controls. Passing
+   first-page races does not prove these newer cases.
+4. Only then activate the prepared captured-scope reader. Bind visible ranking,
+   readiness and cache to environment, actor, Profile, session, domain, mode and
+   request/revision. Test rapid A → B → A Profile return, session changes,
+   delayed/error replies and per-Item grid/detail/exposure origin.
+5. Record required source/CI acceptance, separately review the exact forward
+   rollout, then complete configured-device/restart/reconnect/account-switch gates.
 
-Only documentation is delivered by #233. **No engine package, dataset download/import, trained embedding/model, new runtime endpoint or deployment is delivered.** No new feature is marked accepted merely because its design exists. The source architecture's WorldModel, DreamEngine and self-evolving geometry remain intact as staged targets.
+Keep `continuationSupported: false` until real continuation passes its complete
+boundary. Identified empty results, bounded-window exhaustion and errors remain
+different; exhausted source windows do not prove an empty catalog.
 
-## Accepted main and active source are different
+## Accepted source, active branch and recorded hosted state
 
-Accepted implementation main at inspection: `6dd1fec` — PR #227 / Issue #226, atomic/durable Lists and Shared actions. Its merge records all five final CI #409 gates passed. The earlier main handoff to finish #227 is therefore historical, not the next task.
+Accepted runtime source at audit start: `6dd1fec` / PR #227 — atomic/durable Item,
+List and Shared action foundations. #227 is merged; do not repeat its deployment.
+The #233/#234 delivery publishes independent-engine direction and reconciled
+product/handoff documentation, plus bounded repository hygiene. It does not
+accept #229 runtime, implement a portable engine or train a model.
 
-Active implementation: **Issue #228 / draft PR #229**, branch **`feat/228-delivered-origin`**, inspected head **`44b11b437286653eae427bad10493a9380b92668`**. Preserve this branch and its source/test evidence. Do not copy its unfinished implementation into accepted-main descriptions or reset its data.
+#229 contains later source work: delivered-slate identity, durable exposure,
+multi-List/collection UX, history projection, late outcomes, frozen replay,
+eligibility-first admission, identified first pages and private source windows.
+The branch has source/test/rollout evidence that must remain intact. Its detailed
+device and implementation records stay on that branch/PR until accepted; compact
+canonical successor contracts in main are explicitly labeled.
 
-This handoff incorporates the active branch's recorded 2026-09-11 checkpoint; it is not a fresh verification of hosted state or native CI. Reinspect current refs/checks before continuing. Keep source changes, CI acceptance, hosted rollout and device acceptance separate.
+Recorded hosted checkpoint from #229: `20260910190243_shared_list_destinations`.
+This audit did not query or change hosted state. Five later source forwards remain
+recorded as **undeployed**, in this exact dependency order:
 
-## Next bounded implementation unit — retain #229 checkpoint
+1. `20260910192630_late_outcome_attribution.sql`
+2. `20260910202244_frozen_prediction_replay.sql`
+3. `20260910210520_eligibility_first_candidate_pool.sql`
+4. `20260911070959_identified_prediction_page.sql`
+5. `20260911074543_prediction_continuation_windows.sql`
 
-1. Inspect required CI for the corrected #229 head. The recorded preceding run `34575684407` on `91d07ee` had four passed required jobs; the native CLI/race job failed while parsing a bare PostgreSQL boolean as JSON. The latest source wraps the lock-observation EXISTS result in `to_jsonb`. Corrected-head native acceptance remains **unverified in this documentation task**.
-2. Then implement atomic next-page delivery from the private frozen continuation source: exact actor/Profile/session/domain/mode/request/cursor scope, current eligibility, no repeated seen Items, an independent immutable page PredictionRun/ranks, retry receipt and page-aware frozen/shadow replay.
-3. Keep the continuation capability disabled and the prepared client inactive until the complete boundary passes. Hosted rollout and captured-scope client/device validation remain separately reviewed steps.
+Use exact branch source, hashes and ADR-0006's existing-database forward procedure
+before rollout. Never run whole historical `db push` or reset to reconcile main
+and hosted. The separately deferred privilege-default forward
+`20260909131913_close_postgres_function_defaults.sql` remains a separate gate.
 
-The active branch records a full local `EXPO_OFFLINE=1 CI=1 npm run check` pass with **377 tests**, lint/TypeScript and both exports for its checkpoint. This is recorded source evidence, not a new test run performed for #233 and not proof of pending native/deployment/device gates.
+The private window bounds remain 50 candidates/seen IDs, 2 MiB, fifteen minutes
+from source ranking and sixteen windows per actor/Profile. Preserve receipts,
+runs and Events when reclaiming expired derived cache.
 
-Do not reopen already accepted foundation work or start an unrelated broad scorer rewrite to reconstruct chat context. The engine work packets below have explicit boundaries and can be prepared independently without erasing this handoff.
+## Independent engine and when public data enters
 
-## Pending source and hosted boundaries
+Canonical design: [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md),
+[DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) and
+[ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md).
+All 51 supplied conceptual sections are preserved. The core is independent; Kajo
+is its first DomainAdapter.
 
-As recorded by the active #229 checkpoint, hosted remains on **`20260910190243_shared_list_destinations`**. Five following forwards remain **undeployed**, in dependency order:
+The ordered engine work is:
 
-```text
-late Outcome attribution
-→ frozen prediction replay
-→ eligibility-first candidate admission
-→ identified first-page response
-→ private prediction continuation windows
-```
+| Packet | Exact deliverable | Starts after |
+|---|---|---|
+| [E1 #235](https://github.com/Kajooja/Kajo/issues/235) | Runnable generic contracts + Kajo/media and synthetic non-media fixtures; workspace/exports/root CI integration | Accepted design; default follows current #229 packet |
+| [D1 #236](https://github.com/Kajooja/Kajo/issues/236) | Isolated manifest, MovieLens adapter and actual reproducible small real-data cohort | E1 contract acceptance |
+| [D2 #237](https://github.com/Kajooja/Kajo/issues/237) | Train-only temporal/cold-start baselines and bounded static-state vs trajectory experiment/report | D1 normalized data |
+| D3 / D4 / D5 | Optional Tag Genome / Beliefs / KuaiRand studies | D2 plus each source's own manifest/rights/task; independent of each other |
+| E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
-The last four named sources are `20260910202244_frozen_prediction_replay.sql`, `20260910210520_eligibility_first_candidate_pool.sql`, `20260911070959_identified_prediction_page.sql` and `20260911074543_prediction_continuation_windows.sql`. Use the branch's exact migration history for the first source; do not invent filenames or apply anything from this summary.
+E1/D1/D2 can run as a separately selected isolated source/research packet while
+native rollout/device gates wait. Record the switch here first; their availability
+does not make the default #229 continuation ambiguous. No large native user
+population, production schema or separate network service is needed for D1.
 
-The private window cache is source preparation only: up to 50 candidates/seen IDs, 2 MiB, fifteen minutes from source ranking and sixteen windows per actor/Profile. It does not deliver another page. Scope, historical-source, native race/cap and populated-upgrade acceptance must be checked against current code/CI. Derived-cache cleanup must preserve request/run/Event history.
+Use ignored `research-data/` and `research-artifacts/` or equivalent controlled
+storage. External ratings are source-typed observations, not fake native Events
+or fully observed behavioral Scenarios. Public catalog enrichment and a real
+user's authorized history import remain separate pipelines. Data download,
+normalization, model training, evaluation and artifact admission are distinct
+recorded operations. A losing challenger is a valid report; it cannot waive
+native usefulness gates or deploy itself.
 
-A valid identified empty prediction, genuine source exhaustion and transport/authorization errors are different states. Existing candidate-source fixes do not prove independently generated pools or catalog-scale retrieval. `MVP-ALG-002..003` and Phase 14.1 recovery/provenance gates stay open.
+No engine package, dataset ingestion, trained representation, world model,
+multistep dreamer or automatic promotion is delivered by this audit.
 
-The separately deferred `20260909131913_close_postgres_function_defaults.sql` privilege-default forward is not made deployed or accepted by this documentation update. Follow its existing review/rollout evidence before any hosted change.
+## Preserved owner requirements and release order
 
-## Owner device feedback and data preservation
+- #232 is mandatory first-release Shared rating/rewatch behavior: Phase14 supplies
+  participant/round evidence and policy; Phase15 supplies Personal Taste/setup;
+  Phase16.3 completes joint responses/history and controlled rewatch before beta.
+- Multi-destination List selection, final Add without a second Done action,
+  always-available unknown Taste response, approximately ten movies then ten books,
+  link reveal/copy and device details remain in their canonical product docs.
+- #230 statistics, #231 multi-select/history trash and joint-list choice are later
+  scoped candidates in FUTURE_PLAN, not automatic new MVP blockers.
+- Then follow ROADMAP: algorithm/catalog/engine foundation → Taste/holdout →
+  anonymous web/app + Google/Apple continuity → preview → Friend/safety → explicit
+  Shared creation and joint rounds → core UX/telemetry/privacy → complete beta →
+  production/stores → owner-accepted Share Link Gate.
 
-The owner reports exercised tests appear to work, but did not provide an installed APK SHA/run or measured timings. A completely empty/fresh-account flow was **not tested** because more accounts could not be created; do not diagnose why without evidence. A future small-group reset/test is deferred, not authorized now.
+The owner reports exercised device flows working, but no exact installed APK
+identity/timings were provided for the latest feedback. Empty/fresh-account
+acceptance remains untested. Preserve current test history; a future small-group
+reset is not an instruction to reset now. Do not dispatch or poll APKs as a
+substitute for the next source unit.
 
-Keep the deferred Personal two-List/add-latency and process-death/reconnect cases in [Sprint 014](sprints/SPRINT-014.md) and its linked device handoff. Planned List/consumed-history long-press selection/trash remains Phase 17 / #231, not part of this engine documentation packet.
+## Hygiene and remaining findings
 
-**No account/data reset, hosted mutation, APK dispatch/poll or implementation-PR merge is authorized or performed by #233.**
+The [2026-09-12 audit](retros/2026-09-12.md) records scope, checks and limits.
+Proven-unused catalog hook/wrapper removed; accepted-main migration protection
+extends from 47 to 50 exact hashes without changing SQL or the baseline cutoff.
+Raw/fitted research paths are ignored before the first dataset operation.
+The compatible js-yaml 4.3.2 lockfile patch removes the high advisory. Fresh audit
+has no high/critical findings and fifteen moderate package entries across three
+advisories; #238 prioritizes the runtime routing decoder before public links and
+coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
-## New engine/data work packets
+Open source findings are assigned to their existing work owners:
+#228 captured-session reader/window acceptance; #182 Edge catalog configuration
+and dependency/entrypoint verification; #160 / MVP-OPS-005 production configuration,
+password endpoint input/abuse policy and release dependency checks. See the audit
+for dependency findings and exact verification; no hosted security conclusion is inferred.
 
-After the documentation is accepted, [ROADMAP Phase 14.3A](ROADMAP.md#143a--portable-contracts-and-external-data-research) introduces:
+Merged `feat/226-atomic-collection-actions` is byte-equivalent to accepted #227
+and safe to retire. Remote branch deletion is unavailable through this session's
+supported GitHub capability; do not repeat the completed 145-branch historical
+cleanup or remove the active #229 branch. After #234 merge, its documentation
+branch can likewise be retired through a supported operation.
 
-```text
-E1: generic contracts + Kajo mapping + deterministic media/non-media fixtures
-→ D1: isolated dataset manifest + MovieLens adapter + small repeatable cohort
-→ D2: train-only baselines + chronological/cold-start evaluation + honest report
-```
-
-E1/D1/D2 are independent research/source work and may proceed on an explicitly named separate packet/branch without deploying or overwriting #229. Record which packet is active before writing; do not silently mix the two branches. Native serving integration E2 depends on the relevant Phase 14.1/14.2 gates, artifact admission and rollback evidence.
-
-D3 (named Tag Genome enrichment) and D4 (Beliefs release-2 study) follow only when justified; they are not required to complete the first baseline. No learned prior is required to win. A losing or rights-blocked artifact stays out of serving, with a recorded decision and a working transparent baseline.
-
-The next engine-specific unit is **E1**, not a full neural recommender, production-data import or general service migration. It must make subject/acting identity, observation provenance, missingness, time cutoff and synthetic separation executable, while leaving the current hosted scorer unchanged.
-
-## Existing accepted foundation and remaining release sequence
-
-Profile/actor separation, Personal/Shared boundaries, generic Items, append-only Events, server-owned traces, current ScenarioMemory, explicit shared common-fit, source-provenanced bootstrap and controlled scalar SleepLayer foundations remain valid.
-
-Phase 14.0 technical bootstrap/fresh-install acceptance is retained through #207/#210 and #208/#223. The adopted installation strategy does not mean the unchanged historical migration chronology passes; preserve protected historical migration files and follow ADR-0006. Statistical usefulness, source-aware memory, full parity/refill, catalog features, operational evaluation and device gates remain separate.
-
-Then follow the existing sequence: trustworthy algorithm/catalog → adaptive Taste with honest holdout → anonymous web/app and Google/Apple continuity → recommendation preview → Friend invite/safety → explicit SharedProfile creation → core UX/telemetry/privacy → closed beta → production/store acceptance → **Share Link Gate**.
-
-Commercial monetization, Kajo-wide population retrieval, large multistep dreams, autonomous promotion and distant social/domain expansions are not silently pulled into the first release. The new direction is independent engine contracts plus early, well-bounded research, not abandonment of the working Kajo product.
+Sprint014, full DATA/ALG/ENG acceptance, device gates and public release remain open.

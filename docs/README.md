@@ -23,6 +23,7 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 | How do branches, tests and review work? | [WORKFLOW](project/WORKFLOW.md) |
 | How do agents leave a resumable checkpoint? | [HANDOFF_PROTOCOL](project/HANDOFF_PROTOCOL.md) |
 | What did the repository retrospective establish? | [2026-09-09 retrospective](project/retros/2026-09-09.md) |
+| What did the engine-direction, branch and hygiene audit change? | [2026-09-12 audit](project/retros/2026-09-12.md) |
 | What do canonical terms mean? | [GLOSSARY](domain/GLOSSARY.md) |
 | What are Kajo's entity relationships and privacy boundaries? | [DOMAIN_MODEL](domain/DOMAIN_MODEL.md) |
 | What counts as native event/exposure/outcome evidence? | [DATA_EVENTS](domain/DATA_EVENTS.md) |

@@ -462,6 +462,34 @@ Pending collaboration priority is not actor-specific taste modeling. Personal Ev
 
 One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and the chosen custom List membership. Later membership changes do not revoke reached historical consensus.
 
+That paragraph describes the accepted-main single-destination baseline. The
+#229 successor records/reviews an exact destination set and atomically commits
+all approved memberships; DATA_EVENTS owns its evidence contract. Source merge,
+recorded hosted rollout and device acceptance are separately tracked in STATUS.
+
+### Required Shared rating-round and rewatch successor — #232
+
+`MVP-SOCIAL-007..009` is required first-release behavior. Personal Taste/setup
+precedes the joint flow. A SharedRatingRound freezes intended accepted
+participants, retains each person's 0–10 response and disagreement, and completes
+joint history only after all required responses. Pending, unknown and
+not-yet-watched responses are not completed joint rewards; round completion alone
+is not success. Legacy one-actor joint history cannot gain invented confirmation.
+
+Personal consumption is not Shared consumption. Strong authorized member/joint
+fit may admit member-seen Items under a new tested policy; a later explicit joint
+rewatch creates a new round with earlier history intact. Define cooldown,
+frequency/candidate bounds and reasons before activation rather than borrowing
+saved-reminder constants or deleting terminal history. Preserve not-interest,
+access and availability constraints. No private Personal Prediction is copied.
+
+Phase 14 establishes participant/round evidence, pending/completed/corrected
+outcomes and shared serving/shadow eligibility. Phase 16.3 delivers the complete
+UI/server flow. Test pairs/N members, zero/disagreement, cancellation/edits,
+concurrent completion, membership changes, legacy history and separate rewatch
+rounds with Personal/Shared isolation. DOMAIN_MODEL and DATA_EVENTS own entities
+and command semantics; ROADMAP owns dependency order.
+
 ## 11. Cold start and external history
 
 A sparse Profile must not start from random Items or from fabricated demographic certainty. MVP bootstrap has two explicit PersonalProfile paths:
@@ -977,6 +1005,40 @@ Use bounded candidate sources for durable fit, recent/session fit, prior, novelt
 
 Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
+### Active #229 successor source and remaining acceptance
+
+These contracts are present in the unmerged `feat/228-delivered-origin` source,
+inspected at `44b11b4`. They are not claims that accepted main or hosted serving
+already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
+
+| Source contract | Meaning / remaining boundary |
+|---|---|
+| Late-outcome attribution | Only the immutable command receipt plus actual pre-action exposure can prove the originally requested run; effective outcome reads share an evidence cutoff. Existing Events/evaluations stay frozen. |
+| Frozen replay v2 | Same raw scoring features, genome, Scenario/common-fit inputs and resurfacing/delivery policy for serving/shadow. Equality is conditional on the frozen source pool, not an independently retrieved challenger universe. |
+| Eligibility-first admission | Canonical eligibility precedes raw top-50 retention. This fixes suppression starvation; full-catalog scanning and lack of independent candidate sources remain scale/quality work. |
+| Identified first page | Immutable request/response receipt, exact actor/Profile/session/mode/domain identity and genuine empty-run identity. Retry payload mismatch fails; old row RPC remains for old clients. |
+| Private frozen window | At most 50 candidates/seen IDs, 2 MiB, 15 minutes and 16 windows per actor/Profile. Raw cached candidates include suppressed/already delivered entries and are not another page. |
+
+The next page transaction must recheck current authorization/eligibility, bind an
+opaque cursor and retry receipt to exact scope, advance seen IDs once and commit
+an independent immutable page PredictionRun/ranks. Old runs are never rewritten.
+Page-aware frozen/shadow replay, concurrent window-cap creation and populated
+pre-window-receipt upgrades remain acceptance requirements. Keep
+`continuationSupported: false` until real continuation passes its full boundary.
+
+An empty identified result, exhausted bounded window and transport/authorization
+failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
+Client readiness and visible cached ranking must match environment, actor,
+Profile, session, mode, domain and request/revision. Refetching after a session
+change does not make an older cached run current. Test rapid A → B → A return,
+delayed/error replies and scope changes before switching the prepared page reader.
+
+Active-list membership participates in #229's bounded resurfacing successor;
+removing one membership cannot restore ordinary eligibility while another
+membership or terminal reaction still suppresses the Item. The same versioned
+policy must govern serving and replay. Recorded branch rollout is not inferred
+from the existence of this specification.
+
 ### Adaptive memory without unstable taste
 
 - WorkingState: ordered active-session actions and allowlisted current intent; reset/expire explicitly across session/Profile changes.
@@ -999,7 +1061,7 @@ Outcome reconciliation handles delayed ratings, unsave/removal and undo without 
 
 Shadow compares alternatives only where observed exposure supports evaluation; it cannot establish how users would have reacted to unseen Items. No global/automatic promotion in MVP. Manual canary needs mature supported evidence, explicit authorization and a rehearsed rollback. Insufficient data keeps the baseline active while evaluation operates.
 
-ADR-0008 advances E1 portable contracts and D1/D2 isolated preference research, not production population retrieval or a neural-model requirement. Learned serving embeddings/pgvector, sequential/LLM models, native population learning and autonomous evolution retain later gates. None is a prerequisite for fixing current evidence/scoring defects. Optional D3/D4 enrichment studies do not become hidden first-release blockers.
+ADR-0008 advances E1 portable contracts and D1/D2 isolated preference research, not production population retrieval or a neural-model requirement. Learned serving embeddings/pgvector, sequential/LLM models, native population learning and autonomous evolution retain later gates. None is a prerequisite for fixing current evidence/scoring defects. Optional D3/D4/D5 studies do not become hidden first-release blockers.
 
 ## 19. Research basis
 
@@ -1043,10 +1105,20 @@ The generic engine contracts and all 51 conceptual parts are defined once in [PR
 
 E1 creates executable contracts and media/non-media fixtures without moving credentials, provider schemas, React Native or Kajo BOOK/MOVIE enums into the core. Current SQL remains the serving baseline. A component is extracted/replaced only with parity, absence/failure fallback, scope and rollback tests; no second independently drifting full ranker is introduced.
 
-D1/D2 operate in isolated research storage. Keep source-local people and ratings distinct from Kajo accounts/Events, preserve original scales/timestamp semantics and never fabricate missing exposures, alternatives, mood, consumption time or group state. D3 Tag Genome and D4 Beliefs remain optional after the baseline. Detailed manifests/schema rules/metrics live in DATA_ENRICHMENT, not a duplicate specification here.
+D1/D2 operate in isolated research storage. Keep source-local people and ratings distinct from Kajo accounts/Events, preserve original scales/timestamp semantics and never fabricate missing exposures, alternatives, mood, consumption time or group state. D3 Tag Genome, D4 Beliefs and D5 KuaiRand remain optional after D2; they are independent follow-up studies. Detailed manifests/schema rules/metrics live in DATA_ENRICHMENT, not a duplicate specification here.
 
 A future admitted ExternalTastePrior uses canonical Item mapping and compatible immutable artifacts. It is separately source-weighted/ablated, shrinks with relevant native support and transfers across domains only with evidence. Data/rights withdrawal propagates through jointly trained or distilled dependencies; raw-file removal alone is not proof of influence removal.
 
 Memory retrieval enforces authorization and time/source eligibility before nearest-neighbor selection and again at use. Encode only the decision-time prefix for a query; do not retrieve by its own hidden future Outcome/After/Error. Index/encoder versions must match. The output may be an uncalibrated score; probability heads enter only with explicit target/horizon/conditioning, real labels and calibration.
+
+The core distinguishes present-state hypotheses, stochastic future paths,
+alternative actions and model Challengers. Compare only targets actually
+observed under a valid horizon/action; a never-chosen action is not a negative
+label. Memory scope and observed/synthetic origin are separate dimensions.
+Snapshot versus ordered-trajectory retrieval is a declared D2 experiment, with
+no-match fallback and independent support. Interest, choice, consumption and
+later satisfaction may become separate heads; current V1 reward constants are
+not silently relabeled as those probabilities. Replay, simulation, consolidation
+and evolution require separate ablations before increased complexity is admitted.
 
 Documentation acceptance does not deploy any of these new components. [STATUS](../project/STATUS.md) retains #229's unmerged source and undeployed forwards, and [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.

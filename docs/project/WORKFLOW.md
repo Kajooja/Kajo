@@ -92,6 +92,14 @@ Then exercise the changed user flow on a real phone, emulator or simulator when 
 
 The product goal is an end-to-end **phone-runnable MVP**. Tests should increasingly validate complete user flows as the MVP becomes integrated.
 
+## Independent engine and research work
+
+The generic engine and Kajo adapter are separate responsibilities within the repository. Follow ADR-0008 and ROADMAP: E1 executable contracts → D1 isolated data manifest/adapter → D2 reproducible baseline report. The primary continuation in STATUS takes precedence; an independent research branch must state its packet and dependencies explicitly. Research work does not absorb an unrelated open serving PR.
+
+Keep code, small artificial fixtures, experiment configuration and source/rights manifests in Git. Raw data, derived cohorts, checkpoints and indexes stay outside Git and ordinary CI artifacts under the declared data lifecycle. Validate exclusion before downloading; record reproducible commands, release/checksum identities, transforms, splits, seeds and report/artifact lineage. Artificial fixtures test contracts and must not be presented as real learned-data results.
+
+Code changes still use `npm run check` and focused meaningful contract/adapter/evaluation checks. Ordinary CI must not depend on a private database, production credentials or a network dataset download. Research reports state what was actually run and distinguish correctness, predictive usefulness, artifact admission and native runtime acceptance. Datasets enter only after E1/D1 boundaries; an offline score does not switch production serving.
+
 ## Definition of Done for an Issue
 
 - Acceptance criteria are met.
