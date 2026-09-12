@@ -10,62 +10,63 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current source packet — D2 #237, measured development comparison
+## Current source packet — #182 catalog Edge boundary
 
-**D2 [#237](https://github.com/Kajooja/Kajo/issues/237) is implemented on
-`feat/237-movielens-baselines` / [PR #243](https://github.com/Kajooja/Kajo/pull/243),
-based on accepted main `7602b3418354687855f6b3384085684f4b37a373`.**
-D1 #236 / PR #242 was merged after all five required CI #475 jobs passed at
-`816bf2e6c1437e29f664faef9669729507968209`. E1 #235 / PR #241 is also accepted.
-PR #243 records the exact D2 head, five required CI results and merge. Before
-merge this branch is a source candidate; once present on accepted main, this D2
-packet is complete and the default continuation is #182 below.
+**[#182](https://github.com/Kajooja/Kajo/issues/182) source verification is implemented
+on `fix/182-catalog-edge-boundary`, based on accepted main
+`3658d1c78b19c6f9c391c14e8e2d66bf814cdcd9`.** D2 #237 / PR #243 was accepted
+there after all five required CI #478 jobs passed at
+`ba080664addeca747d26baaf3df1666bfa593249`. E1/D1/D2 are complete bounded
+source/research foundations; the rejected external challenger remains research-only.
+
+The catalog importer now explicitly declares `verify_jwt=false` and checks exact
+configured server keys before body/provider/database work. Modern named/local
+keys use `apikey`; configured legacy service-role keys retain apikey/Bearer support.
+User JWTs, publishable/foreign keys and malformed key configuration fail closed.
+The admin script sends apikey only, and explicit invalid inputs or page ranges
+beyond TMDB page 500 return 400. Upstream errors cannot reflect key-bearing messages
+into responses/logs. Existing FI/EN normalization and canonical batch upsert remain.
+
+Supabase JS 2.112.4, Deno 2.1.4 and the transitive Edge dependency graph are pinned.
+`npm run test:edge` joins root check and the existing CI `validate` job. It checks
+all three deployment entrypoints and exercises local HTTP with fixture keys,
+provider/Data API responses and the real SDK. Password auth receives dependency
+pinning and an existing-path smoke test only; #160 retains its public input/abuse gate.
+The [catalog checkpoint](sprints/SPRINT-014.md#catalog-edge-source-checkpoint--2026-09-12--182)
+records verification and current upstream documentation caveats. This branch remains
+a source candidate until its PR's five current-head CI jobs pass and it merges.
+Local root check passed 372 tests, lint/typecheck and both Hermes exports; only
+the previously recorded mobile Hook warning remains.
+Once this packet is on accepted main, its source audit is complete.
+
+**Next bounded task after this PR's required CI/merge: #182 hosted catalog
+configuration and TMDB import preparation.** First read the actual project's
+catalog-import deployed version/configuration and server-secret names without
+exposing values, then compare with this accepted source. Prepare the exact Edge
+rollout and bounded importer invocation/coverage queries for review; record any
+missing provider credential explicitly. Hosted changes and actual provider import
+need their own recorded authorization and verification; local fixture success is
+not deployed gateway/key or catalog-inventory evidence. Historical 2026-09-06 counts
+remain historical until rechecked. Keep #182 open for catalog breadth/quality.
+
+#229 retains its separate native/device/fresh-account gates and six installed
+immutable forwards; do not redeploy them or reset accounts for this catalog unit.
+Do not substitute optional dataset research, a new APK or #240/UI work for the
+named continuation. The owner UI ideas remain required in their pre-MVP packet.
+
+## Accepted D2 development comparison
 
 The owner-authorized GroupLens Latest Small September 2018 / Kaggle v2 source
-supplies 500 subjects and 84,849 complete-history ratings. D2 froze source/code/
-runtime identity and exact temporal/held-out-subject partitions before fitting:
-46,410 train, 9,945 validation, 9,945 regular final ratings, plus 100 fully reserved
-subjects. The final held-out-subject slice has 2,149 ratings from thirteen subjects.
-Equal-time groups remain intact; metadata with unknown historical availability
-is excluded. This is bounded noncommercial development data, not a shared benchmark.
-
-Eight real model/state variants were trained and evaluated through the independent
-package's research export. Two independent executions matched fitted parameters,
-all predictions, metrics, grouped intervals and decisions. **Challenger admission
-is rejected for this configuration**: validation chose recent state, but its RMSE
-improvement of 0.001959 missed the predeclared 0.01 gate. Native admission is deferred.
-The separately named prequential test improved RMSE from 0.876094 for durable state
-to 0.811834 for recent state; these continuously updated-prefix results cannot be
-reported as fixed-holdout or native usefulness. Cold-start gains are inconsistent.
-
-[Readable report](../../research/reports/movielens-small-d2.md),
+supplies 500 subjects and 84,849 complete-history ratings. D2 compared eight
+variants with frozen chronological/held-out-subject partitions and independent
+reproduction. Validation's 0.001959 RMSE gain missed the predeclared 0.01 admission
+gate: challenger admission is rejected and native use deferred. Separate prequential
+results do not prove fixed-holdout or native usefulness; cold-start support is limited.
+[The readable report](../../research/reports/movielens-small-d2.md),
 [aggregate evidence](../../research/reports/movielens-small-d2.json) and
-[commands](../../research/README.md#d2--reproducible-development-evaluation) own exact
-model definitions, source/code/split hashes, support, uncertainty, costs and scope.
-The final-code executions took 6.98/7.02 s; raw histories, subject partitions, predictions
-and 8 MB fitted artifacts stay ignored. Absent/invalid/withdrawn real-data probes
-returned unavailable with zero native support, without retaining external influence.
-Native-only fixture fallback, invalid timestamp rejection and disallowed/out-of-domain
-checks also pass. A final validation-only hardening replay preserved every original
-numerical parameter, prediction and metric; the report retains that review history.
-
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **357 tests**, lint/typecheck and
-both Hermes exports, with the existing mobile Hook warning. No native UI, hosted
-SQL, catalog import, APK dispatch or serving model changed. See
-[the D2 checkpoint](sprints/SPRINT-014-D2.md). Source acceptance remains distinct
-from actual training/evaluation and any future serving admission.
-
-**Next bounded source task after D2's current-head CI/merge: #182 catalog Edge
-entrypoint/configuration verification, from the then-current accepted main.**
-Phase14.3 permits this independent source work while #229 retains native acceptance:
-verify the catalog import gateway JWT/server-key boundary, pin reproducible Edge
-imports and test anonymous/ordinary-user rejection plus authorized requests.
-Close that source-audit gap before provider catalog expansion. Hosted configuration,
-provider credentials and actual imports remain separately recorded operations.
-Keep #229's source/rollout ledger and remaining device/fresh-account gates intact.
-Do not replace this continuation with unchanged 32M retries, optional D3/D4/D5
-studies or automatic deployment of the rejected model. #240 and the other owner UI
-ideas remain in their ordered pre-MVP application packet.
+[D2 checkpoint](sprints/SPRINT-014-D2.md) retain exact hashes, partitions, all metrics,
+uncertainty, costs, reproduction/review history and the 357-test source acceptance.
+Raw histories, fitted models and predictions remain ignored and research-only.
 
 ## Native packet checkpoint — #228 / draft PR #229
 
@@ -151,9 +152,8 @@ The ordered engine work is:
 | D3 / D4 / D5 | Optional Tag Genome / Beliefs / KuaiRand studies | D2 plus each source's own manifest/rights/task; independent of each other |
 | E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
-E1 and D1 are accepted through #241/#242. D2 now has its reproducible measured
-development report and rejection/fallback decision; finish its current-head source
-acceptance, then continue the named #182 source-audit unit. #229 retains native
+E1, D1 and D2 are accepted through #241/#242/#243. The reproducible D2 report
+and rejection/fallback decision are complete; continue the named #182 catalog unit. #229 retains native
 acceptance and application UI work remains in its separately ordered packet. No large native user
 population, production schema or separate network service is needed for D1.
 
@@ -204,8 +204,8 @@ advisories; #238 prioritizes the runtime routing decoder before public links and
 coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
 Open source findings are assigned to their existing work owners:
-#228 configured protocol-2 device/recovery acceptance; #182 Edge catalog configuration
-and dependency/entrypoint verification; #160 / MVP-OPS-005 production configuration,
+#228 configured protocol-2 device/recovery acceptance; #182 hosted catalog configuration
+and provider expansion after this source verification; #160 / MVP-OPS-005 production configuration,
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.
 

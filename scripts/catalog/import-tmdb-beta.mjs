@@ -265,12 +265,11 @@ async function runCli() {
   }
 }
 
-async function invokeCatalogImport(baseUrl, apiKey, batch) {
+export async function invokeCatalogImport(baseUrl, apiKey, batch) {
   const response = await fetch(`${baseUrl}/functions/v1/catalog-import`, {
     method: 'POST',
     headers: {
       apikey: apiKey,
-      authorization: `Bearer ${apiKey}`,
       accept: 'application/json',
       'content-type': 'application/json',
       'user-agent': 'KajoCatalogImporter/1.0 (+https://github.com/Kajooja/Kajo)',

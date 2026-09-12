@@ -14,6 +14,53 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog Edge source checkpoint — 2026-09-12 / #182
+
+Branch `fix/182-catalog-edge-boundary` starts from accepted D2 main
+`3658d1c78b19c6f9c391c14e8e2d66bf814cdcd9`. It closes the bounded source-audit
+gap from #182 once the PR's five required current-head CI jobs pass and it merges.
+The broader catalog issue and Phase14.3/MVP-CAT requirements remain open.
+
+- `catalog-import` explicitly disables gateway JWT verification and independently
+  matches modern named/local apikeys or the exact configured legacy service-role
+  apikey/Bearer. Malformed configuration, foreign/publishable/user credentials and
+  a modern key supplied only as Bearer fail closed before provider/database work.
+  The matched key scopes the admin client; a supplied user JWT is never forwarded.
+- The admin CLI sends apikey only. Non-object JSON, invalid explicit parameters
+  and requested pages beyond 500 return bounded errors. Provider/RPC failures stop
+  the import without exposing upstream messages in logs or responses.
+- Both SDK imports are exactly 2.112.4. `deno.json`/`deno.lock` pin their transitive
+  graph and Node types; npm locks the Deno 2.1.4 validation tool. Deno's implicit
+  `npm:@types/node@*` compiler alias is locked to the same explicit 22.5.4 types.
+- `npm run test:edge`, included in root check and CI `validate`, checks all three
+  deployment entrypoints and runs 14 local HTTP tests using real handlers/SDK and
+  fixture keys/TMDB/Data API responses. Password auth has dependency pinning and
+  resolution smoke coverage only; its input/enumeration/abuse work stays with #160.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **372 tests**, lint/typecheck and
+both Hermes exports. The existing `DiscoveryScreen.tsx:83` Hook warning remains.
+This workspace's HTTP/2 proxy stalled Deno registry reads; local verification used
+a temporary loopback registry cache fetching unchanged official npm tarballs over
+certificate-verified HTTPS/HTTP1.1. Deno checked upstream integrity hashes. That
+temporary transport is not committed; CI uses the normal registry and frozen lock.
+
+Current official documentation checked 2026-09-12:
+[auth patterns](https://supabase.com/docs/guides/functions/auth),
+[authorization headers](https://supabase.com/docs/guides/functions/auth-headers),
+[API keys](https://supabase.com/docs/guides/getting-started/api-keys),
+[Edge dependency locking](https://supabase.com/docs/guides/security/npm-security#edge-functions-specifics)
+and the [Deno 2.1 platform announcement](https://supabase.com/changelog/37941-all-regions-now-run-deno-2-1-compatible-release),
+after scanning the changelog. The live authorization page describes transitional
+API-key passthrough by the gateway; its indexed search copy still says such keys
+are rejected. Both prescribe apikey plus independent service authentication. This
+implementation declares its boundary explicitly and does not rely on either
+transitional gateway behavior or a key prefix/JWT claim as authorization.
+
+No hosted configuration, secret value, provider inventory or deployed Edge version
+was inspected/changed here. No SQL, native model, APK, device or account-reset
+operation was performed. STATUS owns the next hosted comparison/import preparation;
+the six installed #229 forwards remain immutable and need no repeat deployment.
+
 ## D2 development checkpoint — 2026-09-12
 
 E1 #235 / PR #241 and D1 #236 / PR #242 are accepted. D2 #237 now has a measured,

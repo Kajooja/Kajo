@@ -3,3 +3,8 @@ verify_jwt = false
 
 [functions.auth-callback]
 verify_jwt = false
+
+# Server-to-server API keys are not JWTs. The handler validates the exact
+# configured secret before reading the body or contacting TMDB / the database.
+[functions.catalog-import]
+verify_jwt = false

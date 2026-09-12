@@ -40,12 +40,20 @@ Useful commands:
 npm run ios       # Expo iOS development launch
 npm run android   # Expo Android development launch
 npm run check     # lint + typecheck + tests + iOS/Android bundle smoke checks
+npm run test:edge # pinned Deno entrypoint checks + local HTTP fixtures
 npm run engine:demo  # standalone synthetic media/non-media contract cycles
 ```
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.
 Research intake/tests also require Python 3.12 (standard library only); see
 [`research/README.md`](research/README.md) for the source verification and repeat commands.
+
+`npm ci` also installs the pinned Deno 2.1.4 validation runtime. `test:edge` is part
+of the root check and CI's existing `validate` job: it checks every Edge entrypoint
+against `supabase/functions/deno.lock` and runs local HTTP tests with fixture
+provider/Data API responses. The first check fetches integrity-locked dependencies;
+test execution allows only loopback networking and needs no Supabase/TMDB secrets.
+These checks do not deploy functions or verify the hosted gateway/configuration.
 
 For a new local database, use `npm run database:install -- /absolute/new/workspace`.
 The [installation procedure](docs/architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)

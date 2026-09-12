@@ -80,6 +80,22 @@ npm run test
 npm run smoke
 ```
 
+`npm run test:edge` checks all Supabase Edge entrypoints with the npm-pinned Deno
+runtime and frozen `supabase/functions/deno.lock`, then exercises their registered
+handlers over loopback HTTP using fixture keys and provider/Data API responses.
+It runs inside `npm test` and CI `validate`; no project secrets are required.
+When intentionally updating Edge dependencies, change exact import versions and
+regenerate the lock using the installed npm binary:
+
+```bash
+./node_modules/.bin/deno check --config supabase/functions/deno.json \
+  --frozen=false supabase/functions/*/index.ts supabase/functions/entrypoints.test.ts
+```
+
+Review the lock diff, retain Deno 2.1's implicit Node-types alias at the explicitly
+pinned type version, then run the frozen gate.
+Keep hosted deployment/configuration and actual provider import evidence separate.
+
 For user-facing mobile work, automated validation is necessary but not sufficient when a runnable environment is available. Use one of the following as appropriate:
 
 ```bash
