@@ -66,7 +66,7 @@ supabase/functions/password-auth/
 | Prediction V1 nervous system | `public.rank_items_v1`, private V1 helpers in `20260902223000_prediction_nervous_system_v1.sql`, forward fix `20260904120420_fix_prediction_v1_candidate_returning.sql`, resurfacing policy `20260904183000_reacted_item_resurfacing_policy_v1.sql`, bootstrap NULL fix `20260905003500_fix_resurfacing_null_bootstrap.sql`, Shared common-fit migrations `20260905113000_*`, `20260905114500_*`, `20260905115500_*`, mobile `predictionOperations.ts` | Hosted + configured-device accepted core with #174/#182/#185 extensions and hosted/main #177 Shared common-fit v1.1. Real-data acceptance exposed and fixed bootstrap NULL propagation that had marked untouched Items as saved-suppressed; ordinary Items remain eligible. Shared common-fit is one additional aggregate scoring component in V1, not a second ranker; Personal path remains unchanged |
 | Reacted-Item resurfacing V1 | `supabase/migrations/20260904183000_reacted_item_resurfacing_policy_v1.sql`, `20260905003500_fix_resurfacing_null_bootstrap.sql` | #174 policy remains: consumed/rated/not-interested terminal suppression; saved-only reminder after 30d; 30d cooldown; max 2 reminders/90d; max one reminder/candidate pool. Missing bootstrap evidence is explicitly boolean-false rather than SQL NULL |
 | SleepLayer / EvolutionEngine V1 | `supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql`, `20260904172000_sleep_layer_v1_fk_indexes.sql`, `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` | Accepted 13C: immutable scalar genomes, baseline Champion + three SHADOW Challengers, PolicyAssignment tagging, frozen shadow worker, mature exposed-outcome evaluation with Profile shrinkage, genome-aware V1 policy layer, evidence-gated service-only Profile canary and reversible rollback. Automatic/global Challenger promotion remains unavailable |
-| Prediction design | `docs/domain/PREDICTION_MODEL.md`, `docs/architecture/PREDICTIVE_MEMORY_ENGINE.md`, `docs/architecture/DATA_ENRICHMENT.md`, ADR-0005 and ADR-0008 | Kajo serving/evidence semantics bind to the independent engine target. E1 contracts and D1/D2 isolated public-data research are early work packets; admitted serving integration is separately gated. Native PopulationMemory, large multistep dreams and automatic promotion remain later gates. No portable engine package or dataset pipeline exists yet |
+| Prediction design | `docs/domain/PREDICTION_MODEL.md`, `docs/architecture/PREDICTIVE_MEMORY_ENGINE.md`, `docs/architecture/DATA_ENRICHMENT.md`, ADR-0005 and ADR-0008 | Kajo serving/evidence semantics bind to the independent engine target. E1 contracts and D1/D2 isolated public-data research are early work packets; admitted serving integration is separately gated. Native PopulationMemory, large multistep dreams and automatic promotion remain later gates. E1 now supplies executable contracts and fixtures in `packages/prediction-engine`; no dataset pipeline or serving replacement exists |
 | Shared membership | `20260831171000_shared_profile_membership_foundation.sql`, `20260831172000_fix_shared_profile_member_conflict.sql` | Existing `profiles` + accepted `profile_members`, membership-scoped visibility and readiness |
 | Shared invitations | `20260831200429_shared_profile_invitations.sql` | Pending consent separate from accepted membership |
 | Profile lifecycle | `20260901082902_profile_lifecycle_limits_and_leave.sql` | Identity limits, safe Shared leave and Personal fallback |
@@ -103,23 +103,29 @@ supabase/functions/password-auth/
 Do not create empty feature folders merely to match future architecture. Shared collaboration, Lists, SleepLayer, resurfacing, quick access, provider-backed catalogs, Personal bootstrap imports and Shared common-fit extend generic Profile/Item/Event/Prediction/Memory boundaries rather than creating media/provider-specific queues, duplicate group state or a second recommender. Deployed migrations are never rewritten after hosting.
 
 
-## Active #229 source map — unmerged implementation
+## Native #229 source — separate unmerged implementation
 
-Use the exact active branch/head named in STATUS. These paths are present on `feat/228-delivered-origin` and should not be recreated from scratch on the documentation branch. Its inspected head passed all five required jobs in CI #458; future source changes require their own verification. This source result does not deploy pending forwards or close device acceptance.
+`feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
+contains the newer delivered-origin, atomic continuation, captured-scope client,
+List/history and recovery code. It is not included in this independent E1 branch.
+Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
+and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
+own exact paths, deployed forward identities and remaining device gates. Owner
+feedback on the CI #469 build is positive except reconnect retry UI (#240).
+Do not recreate or roll out those changes from this older runtime checkout.
 
-| Area | Active branch paths | Scope and remaining gates |
-|---|---|---|
-| Frozen delivered origins | `apps/mobile/src/features/discovery/deliveredSlate.ts`; grid/detail routes; `predictionPageOperations.ts` | Immutable scoped per-Item origins, Shared/collection tiers and first-page reader validation. Identified reader remains inactive pending complete paging/rollout/device acceptance. |
-| Durable exposure and ordering | `apps/mobile/src/features/events/eventOutbox.ts`, `EventTrackingContext.tsx`, `itemActionOutbox.ts`; `scripts/database/delivery-order-smoke.sql` | Persisted original sessions/Events, exposure-before-command dependency and acknowledgement wake-up. Physical process-death/reconnect remains open. |
-| Active List membership | `supabase/migrations/20260910110344_list_membership_resurfacing.sql`; `scripts/database/list-membership-smoke.sql` | Current memberships drive suppression without erasing historic taste; recorded hosted rollout, device acceptance open. |
-| History projection and clearing | `*_bootstrap_history_projection.sql`, `20260910134428_clear_consumed_history.sql`; `bootstrap-history-smoke.sql`, `history-clear-smoke.sql`; `get_profile_item_states_v1` | Authorized native/imported read projection and atomic CLEAR_HISTORY corrections. Recorded hosted rollout; source acceptance and device evidence remain distinct. |
-| Shared exact destination set | `supabase/migrations/20260910190243_shared_list_destinations.sql`; `listDestinationSelection.ts`, `sharedEndorsementOperations.ts`; `shared-list-destinations-smoke.sql` | Exact-set unanimous multi-List commit, legacy guards and pending cancellation. Recorded hosted rollout; no SharedRatingRound implementation. |
-| Collection presentation and Add | `apps/mobile/src/features/lists/useCollectionNavigation.ts`, `CollectionGrid.tsx`, `ListDestinationSheet.tsx`; `discovery/DiscoveryItemCard.tsx`, `shellLayout.ts` | Shared cover/rating presentation, collection-scoped navigation, safe picker positioning and Personal final Add without Done. Device checklist stays on this branch. |
-| Late Outcome attribution | `supabase/migrations/20260910192630_late_outcome_attribution.sql`; `scripts/database/late-outcome-smoke.sql`, `late-outcome-upgrade.mjs` | Prepared private effective-Outcome reader; exact original receipt/run/exposure proof and separate occurrence/read cutoffs. Hosted pending. |
-| Frozen replay and admission | `20260910202244_frozen_prediction_replay.sql`, `20260910210520_eligibility_first_candidate_pool.sql`; `frozen-replay-smoke.sql`, `candidate-pool-smoke.sql` | Prepared full-precision frozen scoring/eligibility and admission-before-retention. Pool-conditional evaluation; hosted pending. |
-| Identified page and private continuation | `20260911070959_identified_prediction_page.sql`, `20260911074543_prediction_continuation_windows.sql`; `prediction-page.mjs`, `prediction-page-concurrency.mjs`, `prediction-window-smoke.sql` | First-page receipts and bounded private windows. All inspected native gates passed; atomic later-page delivery, seen advancement and independent page runs are still the next implementation unit. Hosted pending. |
-| Active recovery evidence | `docs/project/DEVICE_TEST.md`, active `docs/project/sprints/SPRINT-014.md` | Dated device reports and runtime/rollout evidence; consult the active branch, with current continuation authority in main STATUS. |
+## Portable engine — E1 #235
 
-## Next portable engine boundary — planned
+| Area | Source | Scope |
+| --- | --- | --- |
+| Generic typed contracts | `packages/prediction-engine/src/contracts.ts`, `src/index.ts` | Subject/actor, observations/raw scale/missingness, source versus access, versioned artifacts, state hypotheses and separate action/outcome/challenger identities |
+| Reference computation | `packages/prediction-engine/src/engine.ts` | Available-prefix state, bounded exact retrieval, numeric reference prediction, immutable forecast, constrained choice, original-outcome comparison and derived memory; no SQL parity claim |
+| Kajo adapter | `packages/prediction-engine/src/adapters/kajo.ts` | Structural Profile/User/Item/rating snapshots; Shared subject isolation; no app/provider imports |
+| Portable fixtures | `packages/prediction-engine/src/fixtures/maintenance.ts`, `cycles.ts`; `npm run engine:demo` | Same executable media and synthetic machine-energy cycle; no real data or cross-domain quality claim |
+| Verification and packaging | `packages/prediction-engine/test/`, package/TS/lint configs; root workspace/scripts | Contract tests, actual built ESM exports and independent core import graph; lint/typecheck/tests/build run in root check and existing CI |
 
-E1 creates a tested generic package only when its bounded work begins; D1 then adds isolated manifest/adapter tools and D2 reproducible train-only baselines/evaluation. Their canonical design is PREDICTIVE_MEMORY_ENGINE/DATA_ENRICHMENT and execution order is ROADMAP. Add real paths here when they exist. Do not create placeholder folders, duplicate SQL scorers or claim current test fixtures demonstrate learned non-media competence.
+[Package README](../../packages/prediction-engine/README.md) documents the exact
+reference algorithm, time semantics, bounds and storage/retraction responsibilities.
+E1 source/CI acceptance precedes D1's real source manifest/adapter/cohort, then D2's
+honest baseline report. There is no public-data pipeline, model training, native
+runtime dependency or empty future-module tree in this packet.
