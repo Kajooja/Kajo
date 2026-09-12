@@ -111,7 +111,7 @@ Requirements: `MVP-ALG-002..003`.
 
 Exit: one versioned scoring/eligibility/policy contract for Personal/Shared; baseline shadow parity within declared tolerance; bounded refill after suppression; identified empty responses; duplicate-free, scope-safe pagination without falsely claiming catalog exhaustion.
 
-Finish the active source packet through its native concurrency/populated-upgrade gates before reader activation or hosted acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page.
+The active source packet now prepares protocol-2 atomic pages and dedicated native concurrency/populated-upgrade checks. Verify the published head, then complete the captured-scope protocol-2 reader before hosted/client acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page. Protocol 1 stays compatible and has no continuation.
 
 The captured reader must also bind visible cache/readiness to environment, actor,
 Profile, session, domain, mode and request/revision. Test rapid A → B → A Profile

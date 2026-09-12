@@ -1908,3 +1908,46 @@ All 53 Markdown files passed local-target/heading-anchor checks. An independent
 loss; differences are only the approved unused hook/wrapper removal, js-yaml patch
 and migration-history manifest extension. The entire feature sprint appendix and
 DEVICE_TEST are retained. Current published-head CI remains a separate gate.
+
+
+## Atomic next-page source — 2026-09-12
+
+Resume base: `e0eacb5` / PR #229; all five CI #462 jobs passed. Added CLI-created
+forward `20260912105528_atomic_prediction_pages.sql`, SHA-256
+`594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1`. This is the sixth undeployed forward, after the
+private continuation window. Existing SQL history is unchanged.
+
+Numeric request protocol 2 opts into bounded pages through the existing public
+endpoint; protocol 1 is preserved by an exact private first-page implementation.
+Each next page owns its immutable run, ranks, frozen feature/state/genome inputs,
+current eligibility snapshot and exact receipt. Request/scope locks serialize
+cursor consumption and cache capacity. Later pages exclude the observed seen
+prefix and enforce one reminder per window; the original source is unchanged.
+Expiry/reclamation removes cache/cursors but retains authorized retry receipts
+and historical page context. No arbitrary live candidate refill is introduced.
+
+Page shadow uses `shadow-page-replay-v1`; evaluation declares
+`FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`. Comparisons remain conditional on
+actual preceding production pages, not hypothetical whole-session outcomes.
+The matching version reaches mature evaluation, including a native 0 rating
+attributed to the page that delivered the Item.
+
+Local full check: **378 tests** (296 mobile, 14 catalog, 68 database), lint,
+TypeScript and iOS/Android exports. The focused page test additionally verifies
+12 Personal/Shared/domain/mode windows with 48 page runs, exact baseline replay,
+zero-rating evaluation, current state/catalog eligibility, actor/scope rejection,
+rollback, expiry/reclamation and protocol-1 retries. A populated pre-window
+upgrade preserves old data, first-page receipts, window snapshots and ACLs;
+source-anchor mismatch rolls the forward back without partial DDL.
+
+The required CLI CI runner now observes genuine native lock contention for
+same-request retries, competing cursor consumers and concurrent 16-window
+capacity, and runs the populated upgrade plus both page probes. Published-head
+CI is the native acceptance record; inspect it before advancing the client.
+No hosted database change, user-data reset, manual APK dispatch or device
+acceptance is part of this source packet. PR #229 remains draft.
+
+Next: captured-scope protocol-2 validation/reader/cache/append, per-page grid and
+detail origins, then exact reviewed forward rollout and configured-device
+acceptance. STATUS owns this next unit; E1 → D1 → D2 remains the subsequent
+independent-engine research sequence.

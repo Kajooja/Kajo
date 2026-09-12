@@ -200,7 +200,7 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [x] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence. Technical acceptance: #207/#210 and adopted fresh-install gate #208/#223; device/bootstrap usability and measured quality remain separate BOOT/CAT/TASTE gates.
 - [ ] `MVP-ALG-002` Serving/shadow share versioned feature/score/eligibility/delivery semantics and baseline replay parity.
-- [ ] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
+- [-] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
 - [ ] `MVP-ALG-004` Working/Short/Long state use ordered, source-aware, evidence-aware decay/support; contradictions can change taste without one session erasing durable state.
 - [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with bounded cross-domain transfer and safe neutral fallback.
 - [ ] `MVP-ALG-006` FOR_YOU/SURPRISE/RISK have evaluated context-dependent policy differences; unsupported confidence/probability claims are forbidden.

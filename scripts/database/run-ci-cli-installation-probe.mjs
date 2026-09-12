@@ -17,6 +17,8 @@ import { frozenReplayUpgradeSql } from './frozen-replay-upgrade.mjs';
 import { candidatePoolSmokeSql, candidatePoolUpgradeSql } from './candidate-pool-upgrade.mjs';
 import { predictionPageSmokeSql, predictionPageUpgradeSql, predictionWindowSmokeSql } from './prediction-page.mjs';
 import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
+import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
+import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -76,6 +78,12 @@ try {
     await resetFromMigrations(files.slice(0, pageIndex));
     const [predictionPageUpgrade] = await exec(predictionPageUpgradeSql(files[pageIndex], projectionFixture));
     assert.match(predictionPageUpgrade?.predictionPageUpgrade, /^PASS: unchanged populated/);
+    const windowIndex = files.findIndex(file => file.name.endsWith('_prediction_continuation_windows.sql'));
+    const atomicPageIndex = files.findIndex(file => file.name.endsWith('_atomic_prediction_pages.sql'));
+    assert.equal(atomicPageIndex, windowIndex + 1);
+    await resetFromMigrations(files.slice(0, windowIndex));
+    const [continuationUpgrade] = await exec(predictionContinuationUpgradeSql(files[windowIndex], files[atomicPageIndex], projectionFixture));
+    assert.match(continuationUpgrade?.continuationUpgrade, /^PASS: populated pre-window/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -91,6 +99,7 @@ try {
     assert.deepEqual((await exec(historySql))[0], expectedHistory, 'Failed CLI migration was recorded as applied');
 
     const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrent);
+    const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrent);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -113,6 +122,10 @@ try {
     assert.match(predictionPage?.predictionPage, /^PASS: identified/);
     const [predictionWindow] = await exec(await predictionWindowSmokeSql());
     assert.match(predictionWindow?.predictionWindow, /^PASS: bounded frozen/);
+    const [atomicPages] = await exec(await atomicPredictionPagesSmokeSql());
+    assert.match(atomicPages?.atomicPages, /^PASS: 12 Personal/);
+    const [atomicPageBoundaries] = await exec(await atomicPredictionPagesSmokeSql('atomic-prediction-pages-boundaries.sql'));
+    assert.match(atomicPageBoundaries?.atomicPages, /^PASS: current eligibility/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -136,6 +149,7 @@ try {
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
       candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
+      atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

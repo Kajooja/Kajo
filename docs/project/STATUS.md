@@ -12,43 +12,52 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Primary next packet — #228 / draft PR #229
 
-**When the owner says “jatketaan reposta”, continue atomic next-page delivery in
-[PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
-`feat/228-delivered-origin`. The #233/#234 engine/audit documentation is
-reconciled into this branch; refresh refs to include any newer accepted changes.**
-Inspect refreshed refs before writing. Do not merge the unfinished implementation
-or switch silently to a different research task.
+**When the owner says “jatketaan reposta”, continue the captured-scope protocol-2
+mobile reader in [PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
+`feat/228-delivered-origin`, after checking the current head's five required CI
+jobs.** Refresh refs first. The accepted #233/#234 engine direction is reconciled;
+do not replace it with an older whole branch document or silently switch to E1.
 
-Latest implementation source inspected: `44b11b437286653eae427bad10493a9380b92668`.
-All five required jobs passed in [CI #458](https://github.com/Kajooja/Kajo/actions/runs/34582041579).
-The earlier request to wait for the corrected first-page retry-lock check is
-resolved; do not rerun/poll it merely because an older checkpoint says pending.
+Resume baseline `e0eacb52ddee3a45cefad20568db4c7f97c1e700` passed all five jobs in
+[CI #462](https://github.com/Kajooja/Kajo/actions/runs/34688660328). The subsequent
+`20260912105528_atomic_prediction_pages.sql` source adds opt-in protocol 2 to
+`rank_items_page_v1`: atomic independent pages, exact cursor/request receipts,
+current eligibility, once-only seen state and frozen observed-prefix replay.
+Protocol 1 and historical first-page receipts remain unchanged. The mobile
+validator is still protocol 1 and the live reader still uses the legacy row RPC.
 
-The reconciliation preserves that implementation and its entire dated sprint/device
-record. Local `npm run check` passed 377 tests (296 mobile, 14 catalog, 67 database),
-lint/TypeScript and both platform exports. New branch-head CI is a separate check;
-inspect the current PR result before any rollout or eventual feature merge.
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **378 tests** (296 mobile,
+14 catalog, 68 database), lint/TypeScript and both platform exports. The focused
+page regression also verifies rating-zero attribution and mature page evaluation.
+The CLI CI runner adds populated pre-window receipt upgrades and real observed-lock
+races for exact retry, competing cursor use and the concurrent 16-window cap.
+Inspect those jobs on the published head; test definitions/local PGlite alone are
+not native concurrency acceptance. Current source and detailed evidence are in
+[the sprint checkpoint](sprints/SPRINT-014.md#atomic-next-page-source--2026-09-12).
 
 Next bounded unit:
 
-1. Commit a next page from the private frozen source window: exact actor/Profile/
-   session/domain/mode/request/cursor scope, current eligibility, no repeated seen
-   Items, an independent immutable page PredictionRun/ranks and exact retry receipt.
-2. Preserve historical first-page evidence; advance seen state once and implement
-   page-aware frozen/shadow replay. Raw cached candidates are not a deliverable page.
-3. Add native concurrent 16-window-cap and populated pre-window-receipt upgrade
-   cases, alongside page retry/concurrency/expiry/authorization controls. Passing
-   first-page races does not prove these newer cases.
-4. Only then activate the prepared captured-scope reader. Bind visible ranking,
-   readiness and cache to environment, actor, Profile, session, domain, mode and
-   request/revision. Test rapid A → B → A Profile return, session changes,
-   delayed/error replies and per-Item grid/detail/exposure origin.
-5. Record required source/CI acceptance, separately review the exact forward
-   rollout, then complete configured-device/restart/reconnect/account-switch gates.
+1. Read the protocol-2 contract in PREDICTION_MODEL and actual RPC source. Update
+   `predictionPageOperations.ts` with immutable first/next requests and validation
+   of version 2, opaque cursor, page/source identity, availability and unique ranks.
+   Preserve protocol-1/legacy compatibility where still required.
+2. Bind visible cache, readiness and append to environment, actor, Profile,
+   session, domain, mode and request/revision. A failed or stale response cannot
+   expose another session's cached run. Test rapid A → B → A, changed sessions,
+   delayed/error replies and retry without changing a request/cursor payload.
+3. Carry each Item's actual page PredictionRun through grid/detail/swipe/exposure
+   and durable actions. Detail keeps its captured slate; appending a new page
+   cannot relabel old Items with the newest page's run.
+4. Distinguish initial loading/error, true empty domain and exhausted bounded
+   window. A next cursor represents remaining source candidates, not a promise
+   that every candidate is currently eligible; a terminal empty page is valid.
+5. Verify source/CI first, then separately review the exact six-forward rollout
+   and complete configured-device/restart/reconnect/account-switch acceptance.
 
-Keep `continuationSupported: false` until real continuation passes its complete
-boundary. Identified empty results, bounded-window exhaustion and errors remain
-different; exhausted source windows do not prove an empty catalog.
+Protocol 1 retains `continuationSupported: false`. Verified protocol 2 reports
+true and serves bounded cursors; client activation must use that complete
+contract. The raw private cache is never a deliverable page. Sprint014, full
+DATA/ALG acceptance, hosted deployment and device gates remain open.
 
 ## Accepted source, active branch and recorded hosted state
 
@@ -60,13 +69,14 @@ accept #229 runtime, implement a portable engine or train a model.
 
 #229 contains later source work: delivered-slate identity, durable exposure,
 multi-List/collection UX, history projection, late outcomes, frozen replay,
-eligibility-first admission, identified first pages and private source windows.
+eligibility-first admission, identified first pages, private source windows and
+protocol-2 atomic continuation.
 The branch has source/test/rollout evidence that must remain intact. Its detailed
 device and implementation records stay on that branch/PR until accepted; compact
 canonical successor contracts in main are explicitly labeled.
 
 Recorded hosted checkpoint from #229: `20260910190243_shared_list_destinations`.
-This audit did not query or change hosted state. Five later source forwards remain
+This audit did not query or change hosted state. Six later source forwards remain
 recorded as **undeployed**, in this exact dependency order:
 
 1. `20260910192630_late_outcome_attribution.sql`
@@ -74,6 +84,7 @@ recorded as **undeployed**, in this exact dependency order:
 3. `20260910210520_eligibility_first_candidate_pool.sql`
 4. `20260911070959_identified_prediction_page.sql`
 5. `20260911074543_prediction_continuation_windows.sql`
+6. `20260912105528_atomic_prediction_pages.sql`
 
 Use exact branch source, hashes and ADR-0006's existing-database forward procedure
 before rollout. Never run whole historical `db push` or reset to reconcile main
@@ -151,7 +162,7 @@ advisories; #238 prioritizes the runtime routing decoder before public links and
 coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
 Open source findings are assigned to their existing work owners:
-#228 captured-session reader/window acceptance; #182 Edge catalog configuration
+#228 captured-session protocol-2 reader and current native acceptance; #182 Edge catalog configuration
 and dependency/entrypoint verification; #160 / MVP-OPS-005 production configuration,
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.

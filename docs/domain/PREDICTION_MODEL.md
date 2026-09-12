@@ -1001,7 +1001,7 @@ A baseline shadow must match Personal and Shared production eligibility, final o
 
 ### Active #229 frozen replay, admission and page contracts
 
-The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The inspected `44b11b4` head passed all five required CI #458 jobs, including first-page observed-lock races. That result does not establish the next-page, concurrent window-cap, populated window-upgrade or device gates. STATUS owns the exact next task and current verification.
+The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The reconciliation head `e0eacb5` passed all five required CI #462 jobs. The newer atomic-page source and its additional native gates are described below; STATUS owns the current head verification and next reader task. Source acceptance does not establish hosted/device acceptance.
 
 #### Frozen replay parity — prepared, not hosted
 
@@ -1025,11 +1025,11 @@ The raw-feature/admission scan still covers the full catalog; only downstream ex
 
 #### Versioned result/continuation contract — first-page source prepared 2026-09-11
 
-`20260911070959_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. Optional cursor must currently be null. Capturing session identity does not create or prove an Event session.
+`20260911070959_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. In protocol 1 the optional cursor must be null; protocol 2 is defined below. Capturing session identity does not create or prove an Event session.
 
 The server generates the PredictionRun ID before ranking. Exact request/response JSON is retained in private RLS-protected receipts; request-ID reuse is serialized with an advisory lock. Current actor/Profile membership is checked and locked even on receipt replay. Changed payload or actor rejects reuse; original trace and receipt commit atomically. Later mutable state cannot rewrite a retry. Receipts cascade with actor/Profile/run; no time-based receipt-retention policy is implemented yet.
 
-Every response, including an empty one, retains version, request/run/Profile/session/mode/type identity and ordered rank rows. `source` records admission version, retained candidate/result counts and empty-catalog decision. Availability distinguishes `ITEMS`, `WINDOW_EXHAUSTED` and `CATALOG_EMPTY`; the last requires no discoverable Items in the requested domain. Suppression or exhaustion of bounded retained candidates cannot establish catalog emptiness. Current `nextCursor: null` and `continuationSupported: false` mean paging is unavailable, even if the first page returned Items; they do not prove all eligible Items were delivered.
+Every response, including an empty one, retains version, request/run/Profile/session/mode/type identity and ordered rank rows. `source` records admission version, retained candidate/result counts and empty-catalog decision. Availability distinguishes `ITEMS`, `WINDOW_EXHAUSTED` and `CATALOG_EMPTY`; the last requires no discoverable Items in the requested domain. Suppression or exhaustion of bounded retained candidates cannot establish catalog emptiness. Protocol 1 `nextCursor: null` and `continuationSupported: false` mean paging is unavailable to that protocol, even if the first page returned Items; they do not prove all eligible Items were delivered.
 
 `predictionPageOperations.ts` prepares a frozen copied request for retry and validates response scope, identity, source counts and availability. It rejects unsupported continuation, duplicate Items/ranks, unordered rows and malformed responses. Legacy mapping also rejects duplicate/rank/domain/size defects. `usePredictionRanking` still uses the legacy RPC: the prepared reader does not constitute delivered empty-state UI, page append or device acceptance.
 
@@ -1037,15 +1037,69 @@ Every response, including an empty one, retains version, request/run/Profile/ses
 
 Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from original ranking and 16 retained windows per actor/Profile. Scope locking serializes creation. New opens reclaim expired derived rows only; source age prevents expired-run reopening as a fresh window. Actor/Profile/run/receipt deletion cascades. Dormant scopes may retain at most 16 expired rows until another open or parent deletion; no background cleanup worker is implemented. Helpers have no API-role execution grants.
 
-The next page unit must add these boundaries together:
+#### Atomic next pages — protocol 2 source, not hosted
 
-- Opaque server-validated cursor bound to actor/Profile/session/mode/type/source/version and the bounded window. Client ranks/excluded IDs are not admission authority.
-- Frozen source plus rechecked current authorization/eligibility. Fail invalidated scopes explicitly; do not substitute newly ranked candidates into the same versioned window.
-- Independent immutable page PredictionRun, parent/window linkage, final ranks and per-Item origins; exact request/cursor retry receipt and atomic seen advancement. Retries must not duplicate Items or change prior ranks. Explicit refresh may start a new window and legitimately repeat still-eligible Items.
-- Captured-scope/revision append. Mode/Profile/session changes invalidate pending replies; an A → B → A return cannot revive an old response. Detail retains its captured slate while new grid pages carry their own run origins.
-- Page-aware frozen/shadow replay, final-page retry, reminder/window bounds, malformed/unauthorized cases, concurrent pages and the separate concurrent 16-window-cap/populated-window-upgrade cases. First-page native races alone do not establish these properties.
+`20260912105528_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
+`public.rank_items_page_v1` endpoint. Protocol 1 keeps its exact first-page body,
+false continuation capability and immutable old receipts; the legacy row RPC is
+unchanged. The inactive mobile validator still speaks protocol 1 and must be
+updated deliberately before activation.
 
-Raw cached candidates include suppressed and already selected alternatives; they are not a next page. No public cursor delivery, seen advancement or next-page run exists yet. Keep capability false until the complete boundary passes; hosted rollout and client/device activation remain distinct steps.
+Protocol 2 retains the 16 KiB envelope, UUID request/Profile/session identities,
+mode/domain, limit 1–50 and object context. A null/omitted cursor starts a new
+window; later requests supply an opaque random UUID cursor. Only request ID and
+cursor change within that window: actor/Profile/session/mode/domain/limit/context
+must match. Server-owned cursor rows bind the original window, predecessor run
+and page index. Request and actor/Profile scope locks serialize exact retries,
+competing consumers and the 16-window cap. Another request cannot reuse a consumed
+cursor, even when its payload would otherwise agree.
+
+Each later page copies the original model/genome, feature/Scenario/common-fit
+scores and state. It rechecks current catalog availability/type and the canonical
+native/bootstrap/List resurfacing policy, excludes already delivered IDs and
+permits at most one reminder across the whole observed window. These hard
+constraints are frozen into candidate `resurfacingInput` before the shared
+reminder/tier helper runs. Newly added catalog Items are outside the frozen pool;
+explicit refresh creates a new window and can legitimately repeat eligible Items.
+
+A single transaction commits the new PredictionRun, all frozen candidates with
+page-local ranks/selection, exact receipt, cursor consumption and once-only seen
+advancement. The original run/candidates never change. Each response Item has
+that page's own prediction ID. `prediction_page_contexts` retains original and
+parent run IDs, logical window ID, index, feature/eligibility times, seen prefix
+and reminder history. It survives derived-window/cursor expiry; actor/Profile/run
+lifecycle still owns evidence and receipt deletion. No time-based evidence
+retention policy is introduced by this forward.
+
+Protocol 2 returns `continuationSupported: true`; a next cursor indicates remaining
+unseen *source candidates*, which can still be suppressed. A terminal zero-result
+page is a real immutable run with `WINDOW_EXHAUSTED`. Only an initial zero-candidate
+request with a proven empty current domain may return `CATALOG_EMPTY`. Window
+exhaustion is not whole-catalog exhaustion. Exact authorized receipt retries work
+after cache expiry/reclamation, while an unused expired cursor fails. Empty first
+pages need no persisted window. The existing 50-candidate/seen, 2 MiB and 15-minute
+bounds remain; no background cleanup or unbounded candidate search is added.
+
+The existing frozen scorer also replays these page inputs. Page shadows use
+`shadow-page-replay-v1` and comparison scope
+`FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`. This comparison conditions on the
+*actual production prefix*, not hypothetical earlier challenger pages or unseen
+user responses. Missing page context fails closed; future catalog/taste changes
+cannot alter frozen replay. New evaluations accept the matching page replay
+version and record its prefix limitation; existing evaluations remain unchanged.
+
+Full-schema checks cover 12 Personal/Shared × domain × mode windows, 48 page runs,
+exact baseline score/rank/selection replay, zero-rating attribution/evaluation,
+current eligibility, scope/actor isolation, rollback, expiry and legacy retries.
+The native CI runner additionally observes real lock contention for same-request
+retry, competing cursor consumers and simultaneous sixteenth/seventeenth windows,
+and rehearses both new forwards over populated pre-window receipts. Read STATUS
+and current PR CI for acceptance; test definitions alone are not native results.
+
+Next, prepare the protocol-2 mobile reader and bind cache/readiness/append to
+captured environment/actor/Profile/session/domain/mode/request/revision. Test
+rapid A → B → A, changed sessions, stale/error replies and mixed page origins.
+Hosted rollout and configured-device acceptance remain separate gates.
 
 #### Late Outcome attribution — prepared, not hosted
 
@@ -1066,8 +1120,8 @@ Bound request/slate size, memory and queries; support continuation through a fro
 ### Active #229 successor source and remaining acceptance
 
 These contracts are present in the unmerged `feat/228-delivered-origin` source,
-inspected at `44b11b4`. They are not claims that accepted main or hosted serving
-already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
+including the protocol-2 page forward. They are not claims that accepted main or
+hosted serving already uses the six pending forwards. STATUS owns exact refs/CI/rollout dates.
 
 | Source contract | Meaning / remaining boundary |
 |---|---|
@@ -1077,12 +1131,11 @@ already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
 | Identified first page | Immutable request/response receipt, exact actor/Profile/session/mode/domain identity and genuine empty-run identity. Retry payload mismatch fails; old row RPC remains for old clients. |
 | Private frozen window | At most 50 candidates/seen IDs, 2 MiB, 15 minutes and 16 windows per actor/Profile. Raw cached candidates include suppressed/already delivered entries and are not another page. |
 
-The next page transaction must recheck current authorization/eligibility, bind an
-opaque cursor and retry receipt to exact scope, advance seen IDs once and commit
-an independent immutable page PredictionRun/ranks. Old runs are never rewritten.
-Page-aware frozen/shadow replay, concurrent window-cap creation and populated
-pre-window-receipt upgrades remain acceptance requirements. Keep
-`continuationSupported: false` until real continuation passes its full boundary.
+The protocol-2 source now commits independent pages, hard eligibility and seen
+advancement atomically, with page-aware frozen replay and dedicated native
+concurrency/upgrade checks. Protocol 1 still reports false capability. The prepared
+mobile reader remains inactive; it must adopt protocol 2 and captured scope before
+client acceptance. Current CI/rollout evidence remains in STATUS.
 
 An empty identified result, exhausted bounded window and transport/authorization
 failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
