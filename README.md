@@ -4,7 +4,7 @@ Kajo is a mobile-first personal and shared discovery platform. It learns a perso
 
 Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
-Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). Its reusable core and [public-data research pipeline](docs/architecture/DATA_ENRICHMENT.md) are planned work with explicit acceptance gates, not already delivered packages or trained models. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
+Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). The executable [E1 package](packages/prediction-engine/README.md) now supplies generic contracts and deterministic media/non-media fixtures. The [public-data research pipeline](docs/architecture/DATA_ENRICHMENT.md), trained models and runtime admission remain separately gated work. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
 
 The repository—not a ChatGPT conversation—is the permanent project memory.
 
@@ -40,6 +40,7 @@ Useful commands:
 npm run ios       # Expo iOS development launch
 npm run android   # Expo Android development launch
 npm run check     # lint + typecheck + tests + iOS/Android bundle smoke checks
+npm run engine:demo  # standalone synthetic media/non-media contract cycles
 ```
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.

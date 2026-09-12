@@ -60,7 +60,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Evening | `EVENING` | Visual phase mapped to SURPRISE. |
 | Night | `NIGHT` | Visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Experience actually consumed/read/watched/attended in its domain. |
-| Saved | `SAVED` | Profile-level intentionally stored state; pending Shared Endorsement is not Shared Saved. |
+| Saved | `SAVED` | Profile-level intentionally stored state; planned star/Tykätyt UI reuses it, without implying a rating or consumption. Pending Shared Endorsement is not Shared Saved. |
 | Rating | `rating` | Kajo integer 0–10 experience outcome; Personal rating implies consumed, while a planned SharedRatingRound response alone does not complete joint history. Research raw scales remain separately preserved. |
 | Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an unconsumed Item. |
 | Endorsement / yhteinen tykkäys | `Endorsement` | Actor-specific positive Shared decision to do an Item together. |

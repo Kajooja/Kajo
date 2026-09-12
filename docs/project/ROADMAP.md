@@ -33,13 +33,11 @@ Advance portable contracts and an honest MovieLens baseline experiment into Phas
 
 The active #229 evidence/pagination packet keeps its own acceptance and rollout gates. E1/D1/D2 can proceed independently as explicitly named source/research work; E2 runtime integration cannot bypass Phase 14.1/14.2. STATUS identifies the exact active branch and next bounded unit.
 
-Default continuation is **finish the next #228/#229 page-delivery unit**, then
-complete its native/client/recovery/rollout acceptance before closing that packet.
-The next engine packet is [E1 #235](https://github.com/Kajooja/Kajo/issues/235),
-followed by [D1 #236](https://github.com/Kajooja/Kajo/issues/236) and
-[D2 #237](https://github.com/Kajooja/Kajo/issues/237). An explicit switch to isolated
-E1 research is possible while native gates wait, but must be recorded in STATUS.
-Do not interleave two implicit tasks or wait for a large Kajo population to start D1.
+Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
+reconnect retry-UI defect retained as #240. The owner places application UI work
+in a later pre-MVP packet. The explicitly selected current source work is now
+**E1 #235**, followed by **D1 #236 → D2 #237**. STATUS names the branch and actual
+acceptance. #229 retains its native/fresh-account gates; E1 does not close them.
 
 ## Milestone: MVP 0.1 — first public Kajo
 
@@ -139,7 +137,7 @@ Public research features are a separate path from provider presentation metadata
 
 Requirements: `MVP-ENG-001..003`. Canonical design: ADR-0008 and [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md). This is a bounded foundation, not an indefinite model-search project.
 
-**E1 — contracts and fixtures, first engine-specific packet ([#235](https://github.com/Kajooja/Kajo/issues/235)).** Create an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters through a standalone command. Add the actual workspace/exports and engine lint/typecheck/tests to root `npm run check`; currently only `apps/*` workspaces exist. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
+**E1 — contracts and fixtures, first engine-specific packet ([#235](https://github.com/Kajooja/Kajo/issues/235)).** E1 source now supplies `packages/prediction-engine` as an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters through a standalone command. The package joins `packages/*` workspaces and root `npm run check` through its lint/typecheck/tests, build and real ESM export check. STATUS records actual source/CI acceptance. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
 
 **D1 — isolated MovieLens manifest and adapter ([#236](https://github.com/Kajooja/Kajo/issues/236)).** After E1's record boundary, implement streaming/idempotent normalization and deterministic small-cohort processing. Validate checksums, CSV/ratings/IDs, namespaces, mappings, duplicates, chronological ordering, quarantine and resource bounds. Then record the actual permitted download and normalized real cohort. No production credentials or native User/Profile/Event writes. Use ignored `research-data/` and `research-artifacts/` locations or explicitly equivalent isolated storage; exclude raw/derived data from ordinary CI artifacts before download.
 
@@ -250,14 +248,17 @@ N-member server/CI/device cases must pass; completion alone is not satisfaction.
 
 ### 17.0 — Browse/core UX completion
 
-Requirements: `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, Lists/messages/Room/device acceptance.
+Requirements: `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, `MVP-UX-003..006`, Lists/messages/Room/device acceptance.
 
 Exit: contextual Lists, search/filters and authorized Profile surfaces; accessibility/reduced motion/error/offline states; deferred device gates; graphics may evolve without changing domain contracts. Preserve planned #231 multi-select/trash work in its product scope rather than mixing it into engine extraction.
 
-Size #230 private category statistics, #231 multi-select/List moves/history trash
-and FUT-UX-003 joint-list choice as separate candidates here. Their full contracts
-belong to FUTURE_PLAN; they are not automatically added release blockers. Weekly
-statistics/community comparisons additionally depend on 17.1/17.2.
+Owner decision 2026-09-12 promotes #230 private category statistics/weekly tracking
+and #231 multi-select/List moves/history trash to required pre-MVP work, with
+#239 star/overflow/explicit-Next card controls and #240 reconnect recovery. These
+map to MVP-UX-003..006. FUT-UX-003 joint-list choice remains a separate candidate.
+UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requirements
+are release gates. Weekly tracking requires the relevant 17.1/17.2 telemetry and
+privacy work before beta; community comparisons remain conditional.
 
 ### 17.1 — Launch telemetry and experimentation
 

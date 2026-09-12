@@ -463,7 +463,9 @@ The core cannot import React Native, Kajo BOOK/MOVIE enums, provider clients, Su
 
 The adapter contract includes the source's encodeActor/encodeObject/buildContext/enumerateActions/interpretOutcome/calculateReward/defineHardConstraints responsibilities, with subject and actor roles made explicit.
 
-Proposed logical interfaces, not yet source code:
+Logical responsibility map (E1 implements the bounded subset documented in
+[`packages/prediction-engine`](../../packages/prediction-engine/README.md); this is
+not a claim that every future engine module is implemented):
 
 ```text
 DomainAdapter:

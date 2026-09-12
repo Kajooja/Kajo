@@ -150,7 +150,8 @@ Use independent checkboxes and a selected count for one or more destinations in
 both Personal and Shared. Creating another List preserves earlier checks. An
 intentional empty selection stays empty. Explicit confirmation commits the set;
 Shared approvers must be able to read every target name before confirming.
-Personal Add is the final confirmation: after every selected destination is
+Current delivered layout (superseded only when #239 is implemented): Personal
+Add is the final confirmation. After every selected destination is
 acknowledged, close the picker and advance once without a separate Done button.
 Do not make the interface appear frozen: show an activity indicator and confirmed
 destination count while saving. A partial failure retains the unresolved choices
@@ -201,3 +202,47 @@ then “Pari!” and joint Katsotut/Luetut. Display whose ratings belong to that
 A new joint viewing uses a new round and retains the earlier experience. Existing
 Personal setup/history survives. This is a release requirement, not functionality
 delivered by the multi-destination picker.
+
+## Required pre-MVP card controls — #239 / MVP-UX-006
+
+Owner decision 2026-09-12: replace the header’s current swipe label area with a
+three-dot overflow for **Lisää listaan**. Keep a separate star as the quick save
+to the default **Tykätyt** destination (liked movies/books). This uses the existing
+generic SYSTEM_SAVED/SAVED store; the label is not a new numeric rating, consumed
+state or parallel per-media collection model.
+
+A filled confirmed star means the active Profile’s default save was acknowledged;
+pending and failed commands have distinct presentation. Supported toggle-off
+removes only that default membership, preserving other Lists and rating/history.
+In Shared context a star still uses Endorsement/unanimous completion: one member’s
+pending choice is not a confirmed joint save, and unsupported consensus removal
+remains protected. The overflow reuses the exact multi-destination picker; create
+alone does not save. Final Add commits once without a separate Done confirmation.
+
+After a save/proposal, retain the card and show **Seuraava** as explicit navigation.
+This deliberately replaces current Personal save-and-auto-advance when #239 is
+implemented; it does not require another save confirmation. Keep **Ei kiinnosta**
+as the explicit negative action. Next alone is navigation, never an implied
+rating, dislike, save or consumed outcome. Preserve zero versus unknown and the
+rule that opening a slider never submits its starting value.
+
+Place the rating slider and Ei kiinnosta/Seuraava controls together at the bottom
+of the card, above the persistent dock and system safe areas. Keep room for the
+introduction/description; long text can scroll without hiding controls. Verify
+small screens, large text, keyboard/panels, screen-reader star/menu/state labels,
+Back and reduced motion, alongside offline/restart, multiple destinations,
+Shared pending/confirmed states and rapid Profile/session changes. No current
+card implementation changes merely by recording this decision.
+
+## Required reconnect recovery — #240 / MVP-UX-003
+
+The 2026-09-12 device report found that Yritä uudelleen remains visible when the
+network returns. On usable reconnection, a focused failed reader should perform
+one bounded/coalesced recovery of its exact request and clear error/retry UI when
+that recovery succeeds. An online indication alone cannot hide a backend failure.
+Preserve loading/error distinction, 15-second deadline, existing page origins,
+source expiry/cap, scope cancellation and durable action queues. Reconnection
+must not create fresh windows or work for a hidden/changed scope. A proven expired
+cursor still needs explicit **Aloita uusi haku**. This is the next application
+recovery packet, deferred by the owner while E1 proceeds; device repeat remains
+required before this release requirement closes.

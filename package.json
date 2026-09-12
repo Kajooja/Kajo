@@ -3,23 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "start": "npm run start --workspace @kajo/mobile",
     "android": "npm run android --workspace @kajo/mobile",
     "ios": "npm run ios --workspace @kajo/mobile",
-    "lint": "npm run lint --workspace @kajo/mobile",
-    "typecheck": "npm run typecheck --workspace @kajo/mobile",
+    "lint": "npm run lint --workspace @kajo/mobile && npm run lint --workspace @kajo/prediction-engine",
+    "typecheck": "npm run typecheck --workspace @kajo/mobile && npm run typecheck --workspace @kajo/prediction-engine",
     "test:mobile": "npm run test --workspace @kajo/mobile",
     "test:catalog": "node --test scripts/catalog/*.test.mjs",
     "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
-    "test": "npm run test:mobile && npm run test:catalog && npm run test:database",
+    "test": "npm run test:mobile && npm run test:catalog && npm run test:database && npm run test:engine",
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke",
     "test:database": "node --test scripts/database/*.test.mjs",
     "database:install": "node scripts/database/install-local-database.mjs",
-    "diagnose:database-replay": "node scripts/database/migration-replay.mjs"
+    "diagnose:database-replay": "node scripts/database/migration-replay.mjs",
+    "test:engine": "npm run test --workspace @kajo/prediction-engine",
+    "engine:demo": "npm run demo --workspace @kajo/prediction-engine"
   },
   "engines": {
     "node": ">=22"
