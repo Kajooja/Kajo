@@ -1,7 +1,7 @@
 # Kajo Complete Product and Research Backlog
 
 Status: **permanent long-term product memory**  
-Product direction consolidated: **2026-09-07**
+Product direction consolidated: **2026-09-07**, refined **2026-09-12**
 
 This file preserves Kajo's complete ambition without allowing distant ideas to displace the first public release.
 
@@ -12,7 +12,7 @@ Execution authority:
 - `ROADMAP.md` — exact build order and Share Link Gate,
 - `STATUS.md` — exact current task.
 
-Everything in this file is **after or conditional on the first-release gates** unless a requirement is explicitly promoted into MVP.
+Most entries follow the first-release gates. Explicit Phase 17 candidates (#230/#231 and List choice) may be scoped during core UX completion; they are optional unless promoted into MVP. Required Shared rating rounds (#232) and the bounded portable-engine/public-data foundation are already owned by MVP/ROADMAP. Their presence here preserves context and must not defer them.
 
 ## 1. Long-term product thesis
 
@@ -56,9 +56,11 @@ The following are **no longer future-only ideas**:
 - Friends surface and basic remove/block/abuse lifecycle,
 - explicit Friends → SharedProfile creation,
 - complete acquisition/funnel telemetry,
-- one-million-user-compatible identity/taste/social contracts.
+- one-million-user-compatible identity/taste/social contracts,
+- independent engine contracts and an isolated reproducible MovieLens baseline (E1 → D1 → D2),
+- SharedRatingRound, separate Personal/joint history and controlled rewatch (#232).
 
-Do not duplicate these here. Their canonical specs are `MVP.md` and `LAUNCH_LOOP.md`.
+Their canonical product requirements are `MVP.md` and `LAUNCH_LOOP.md`. [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md), [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) and ADR-0008 own the independent engine and research boundary. Kajo is its first adapter; five-generation engine ambitions remain preserved without making every advanced module a first-release requirement.
 
 ## 3. FUT-REL-001 — Both public mobile stores — PLANNED
 
@@ -248,7 +250,7 @@ Protect against brigading, fake reviews, popularity dominance and location/priva
 
 ## 13. FUT-ALG-001 — PopulationMemory — CONDITIONAL
 
-Current first release learns from the Profile itself plus permitted provider/catalog priors. Cross-user PopulationMemory becomes possible only when consent, data volume, deletion lineage, minimum-cohort privacy and exposure-bias correction are mature.
+The first release learns from the Profile itself plus permitted provider/catalog priors. ADR-0008 adds early isolated public-data research and permits a separately admitted ExternalTastePrior if rights, evaluation and fallback gates pass. This is distinct from native Kajo cross-Profile PopulationMemory, which requires consent, data volume, deletion lineage, minimum-cohort privacy and exposure-bias correction.
 
 Potential components:
 
@@ -264,7 +266,7 @@ Acceptance requires fixed controls, cohort/privacy thresholds, deletion propagat
 
 ## 14. FUT-ALG-002 — Evidence-gated EvolutionEngine expansion — PLANNED / CONDITIONAL
 
-The first release already requires trustworthy SleepLayer evaluation and controlled Challenger architecture. Later evolution may become more powerful.
+The first release requires trustworthy SleepLayer evaluation and controlled Challenger architecture. Public-data baselines and bounded representation/retrieval experiments can run earlier through E1/D1/D2; this section governs more advanced native production evolution. The full independent engine progression and module dependencies live in PREDICTIVE_MEMORY_ENGINE, rather than in a second algorithm specification here.
 
 Possible Challenger families:
 
@@ -463,7 +465,7 @@ And only after years of product/evidence maturity, Kajo may investigate:
 The first step remains much narrower and measurable: make the Taste-first BOOK/MOVIE Kajo good enough that a real person sends the next person a link voluntarily.
 
 
-## List choice for today — “Mitä tänään” (owner idea, 2026-09-10)
+## FUT-UX-003 — List choice for today — “Mitä tänään” — PLANNED
 
 Offer an explicit action on a List: recommend the best Item from that List for
 today, followed by a browsable ordered card sequence from the same List. This is

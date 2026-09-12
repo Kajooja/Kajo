@@ -1,5 +1,7 @@
 # Kajo UX Principles
 
+These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 remain on its active source branch until merged. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
+
 ## Core feeling
 
 Kajo should feel calm, personal, atmospheric and intelligent. It should not feel like a dashboard, analytics tool, casino UI, futuristic control panel, 3D game or registration funnel disguised as a product.
@@ -119,6 +121,8 @@ open link
 A polished Room cannot compensate for a broken acquisition path. Conversely, acquisition polish must not compensate for weak or dishonest recommendation quality.
 
 
+## Collection and discovery interaction requirements
+
 Discovery, the List index, individual Lists and consumed history use native
 pull-to-refresh for ordinary loading/reloading. Load errors explain the downward
 pull rather than presenting a normal retry button. Short and empty collections
@@ -132,7 +136,7 @@ Destination-picker panels must keep all action buttons above Android system
 navigation and Kajo's bottom navigation, consistent with the other panels.
 Respect safe-area and keyboard insets with gesture and three-button navigation.
 The first #228/#229 Modal-inset correction failed the owner's OnePlus follow-up.
-The picker now lives inside the same shell content bounds above the dock as
+The active #229 picker source lives inside the same shell content bounds above the dock as
 Inbox, with the same bottom gap, rather than calculating a second Android window's
 position. Its body scrolls, the keyboard is avoided, and Back closes the picker.
 The third owner APK report lists only multi-destination selection as remaining; its exact installed SHA was not supplied. Retain a short navigation/keyboard regression for the new picker.
@@ -168,7 +172,7 @@ rating badge. Consumed-only/unrated Items have no invented saved rating.
 Opening the control must never submit the starting value as a new rating.
 Shared member-history attribution must not prefill another member's rating as a
 SharedProfile rating. The owner’s third report says only multi-List selection remains; no specific slider reproduction/fix is claimed. Keep the regression recorded in
-[DEVICE_TEST.md](../project/DEVICE_TEST.md#additional-owner-report--saved-rating-start-position).
+the active #229 `docs/project/DEVICE_TEST.md` handoff named in STATUS.
 
 ## Planned personal statistics and selection
 

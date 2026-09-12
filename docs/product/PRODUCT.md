@@ -22,6 +22,13 @@ A recommendable object is a generic `Item`. Future domains may include series, m
 
 The core prediction architecture must not require redesign when a new ItemType is introduced.
 
+The independent [Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md)
+is a reusable technical system, with Kajo as its first DomainAdapter. Public
+preference data supports isolated non-commercial research before native user
+volume grows. E1/D1/D2 are required bounded foundations; a trained prior is admitted
+only with appropriate evidence, rights and fallback. The architecture is a target,
+not a claim that the portable package or trained model already exists.
+
 ## 3. Prediction targets Profile
 
 Prediction targets a `Profile`, never a User directly.
@@ -30,6 +37,12 @@ Prediction targets a `Profile`, never a User directly.
 - `SharedProfile` = persistent 2-N person Kajo with its own evidence, memory and joint taste.
 
 A SharedProfile is not a simple average of member profiles.
+
+First-release joint experiences also retain each participant's own response:
+after Personal Taste/setup, one Shared rating prompts the others and all required
+responses precede completed joint history. Controlled rewatches create new
+experiences while retaining Personal and earlier joint history. These #232
+requirements are planned successors, with exact acceptance in MVP and Phase 16.3.
 
 ## 4. First public product: prove value before registration
 

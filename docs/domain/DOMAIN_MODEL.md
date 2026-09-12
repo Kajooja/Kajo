@@ -1,6 +1,6 @@
 # Kajo Domain Model
 
-This file defines canonical domain relationships and invariants. Detailed launch UX is in `product/LAUNCH_LOOP.md`; prediction math/evaluation remains in `PREDICTION_MODEL.md`.
+This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition and SharedRatingRound entities are not claims of implemented tables. The exact-set multi-List successor is on active #229 source with separately recorded hosted rollout; accepted-main code retains its earlier single-List boundary until that branch is accepted.
 
 ## Core model
 
@@ -31,6 +31,20 @@ PredictionCandidate
 Event records actor + Profile + Item/context where recommendation semantics apply.
 Acquisition/funnel telemetry is separately classified and cannot silently become taste evidence.
 ```
+
+## Independent engine boundary
+
+The engine is a reusable computation domain; [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md) own its contracts.
+
+| Kajo concept | Engine role | Invariant |
+|---|---|---|
+| Profile | Subject | Personal and Shared remain distinct prediction targets. |
+| acting User | acting identity | Authorization and the actor are never inferred from Subject identity. |
+| Item | Object | Provider/media schemas stay in adapters. |
+| Event, eligible outcome | Observation, Outcome | Native, imported, external and synthetic provenance remain explicit. |
+| authorized current state/context | State and trusted constraints | Only time-valid, authorized inputs cross the adapter. |
+
+An external research subject has a dataset/release namespace and is never instantiated as a Kajo User, AnonymousIdentity or Profile. ExternalTastePrior is a versioned artifact, not native PopulationMemory or an Event history. The core receives already-authorized inputs; public APIs and access checks remain the Kajo adapter/runtime responsibility. No package or serving replacement is delivered by these target relationships.
 
 ## Identity
 

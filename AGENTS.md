@@ -19,6 +19,12 @@ Resolve continuation source:
 - continue one explicit active handoff; never combine unrelated active branches,
 - never treat an unmerged branch as accepted `main` truth.
 
+Read the current main STATUS before the named implementation branch. Where a
+newer accepted design and an older active implementation coexist, preserve both
+their scopes and merge/reconcile documentation deliberately; do not restore an
+older whole STATUS/ROADMAP to make conflicts disappear. STATUS names one default
+next packet; optional independent research is not a second implicit handoff.
+
 Before implementation read, in order:
 
 1. `/AGENTS.md`
@@ -39,6 +45,14 @@ If work touches onboarding, public links, anonymous identity, auth conversion, F
 - `/docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
 
 Do not start implementation until current phase, dependencies and acceptance gates are understood.
+
+For engine/public-data work also read `PREDICTIVE_MEMORY_ENGINE.md`,
+`DATA_ENRICHMENT.md` and ADR-0008. The core is independent; Kajo maps its Profile
+to prediction Subject and User to actor through a DomainAdapter. New engine
+packages must join the workspace and root check, with executable media/non-media
+fixtures. Public datasets enter isolated research through E1 → D1 → D2; external
+people/ratings never become native accounts/Events, and model admission remains
+separate from a successful benchmark.
 
 ## 3. Current release march is mandatory
 
@@ -111,6 +125,11 @@ Algorithm quality is the critical first-release dependency.
 - Taste challenge predictions are frozen before held-out answers enter learning.
 - Never fabricate an accuracy/confidence percentage.
 - Synthetic/counterfactual SleepLayer outcomes never become historical Events.
+- State hypotheses, alternative-action/stochastic future branches and model
+  Challengers are different objects. Unobserved alternatives are not failed
+  outcomes. Retrieval uses only authorized, available-at-time prefixes.
+- Public-data download, normalization, training, evaluation and serving admission
+  are separate recorded steps; fitted artifacts and raw histories stay out of Git.
 - Automatic/global Challenger promotion remains gated by explicit evidence and rollback rules.
 
 ## 6. UI/UX rules

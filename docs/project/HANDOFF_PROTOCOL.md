@@ -17,9 +17,9 @@ The agent then follows the mandatory read order in `/AGENTS.md`.
 `main` is the accepted baseline, but an unfinished sprint may live in an open pull request. Therefore a fresh agent must first fetch remote metadata and resolve the active continuation source:
 
 1. Use an explicitly named PR/branch when the user provides one.
-2. Otherwise inspect the current tracking branch and open PR/Issue handoff linked to the current `STATUS.md` work.
-3. If exactly one branch contains the newer explicit handoff, check it out and then follow its mandatory read order.
-4. If two concurrent branches both appear active, ask which one owns the requested work; never merge their scopes by assumption.
+2. Otherwise read current accepted-main STATUS and its explicitly named primary continuation PR/Issue. Inspect that active branch before selecting work.
+3. Follow the one primary packet chosen there. A separately available research packet does not make the default ambiguous; secondary branches remain separate unless the user or current handoff selects them. Bring accepted canonical decisions into the active branch through the normal Git workflow before extending it; do not let older branch-local planning overwrite newer accepted scope.
+4. Ask only if refreshed repository evidence leaves genuinely conflicting primary handoffs unresolved. Never combine unrelated code branches merely because both are open.
 
 This makes “jatketaan reposta” sufficient without pretending an unmerged draft is already part of `main`.
 
@@ -32,6 +32,7 @@ Before handoff, if meaningful context would otherwise be lost:
 1. Update `STATUS.md` with:
    - what is complete,
    - what is currently in progress,
+   - one primary next packet and its branch/PR/head,
    - exact next action,
    - blockers/known issues,
    - important files.
@@ -70,7 +71,7 @@ Move those into the appropriate repository documents.
 1. Follow AGENTS read order; read `MVP.md`, the active sprint and remaining sequence in `ROADMAP.md`.
 2. Inspect linked Issue/PR state, actual implementation and required hosted configuration. Distinguish planned, implemented, deployed, device-tested and accepted.
 3. Select the earliest unmet dependency in the roadmap. Continue an existing scoped task or create one Issue/branch/PR for the next bounded change; do not rebuild delivered features from a stale handoff.
-4. For algorithm changes, read `PREDICTION_MODEL.md` completion contract and require deterministic DB evidence alongside `npm run check`. For services/data changes, read `ARCHITECTURE.md` inventory/lifecycle gates.
+4. For native algorithm changes, read `PREDICTION_MODEL.md` and require the relevant deterministic database evidence alongside `npm run check`. For independent engine/public-data packets, also read PREDICTIVE_MEMORY_ENGINE, DATA_ENRICHMENT and ADR-0008; require contract/data/evaluation verification appropriate to that packet. No hosted database is needed merely to run isolated research. For services/data lifecycle changes, read ARCHITECTURE.
 5. Complete the available work autonomously. If a credential, device result, paid account or owner decision is unavailable, record the exact dependency and continue an independent already-authorized task. Never request secrets in chat.
 6. Before ending, record branch/PR/head, migration/deploy state, verification, remaining gate and exact next action in STATUS. Do not mark requirements complete merely because the PR exists.
 

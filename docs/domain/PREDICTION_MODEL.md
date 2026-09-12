@@ -1,6 +1,8 @@
 # Kajo Prediction Nervous System
 
-Status: canonical product, memory, learning and evolution architecture.
+Status: canonical **Kajo-domain** serving, memory, learning and evolution contract. Implemented behavior and required targets are distinguished below; exact acceptance is in [STATUS](../project/STATUS.md).
+
+The independent reusable 51-part target architecture is [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) refines the boundary on 2026-09-12: Kajo is the first DomainAdapter, not the definition of the core. External research data/artifacts are governed by [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md). Existing SQL semantics below are retained rather than silently replaced by the target design.
 
 ## 1. Thesis
 
@@ -34,6 +36,8 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 - Memory is evidence with age and confidence, not permanent identity.
 - Evolution never mutates the production champion without evaluation, rollout gates and rollback.
 - Restricted provider metadata is not used for ML/AI training without the necessary licence.
+- External observed research records and synthetic hypotheses never masquerade as native Kajo Events or complete observed Scenarios.
+- Original predictions are frozen historical records; rebuilding derived intelligence cannot rewrite what was predicted before an outcome.
 
 ## 3. The complete loop
 
@@ -51,7 +55,7 @@ flowchart TD
   J --> B
 ```
 
-The online loop updates state and serves rankings. The offline loop evaluates and evolves predictors. They share versioned evidence but remain operationally separate.
+The online loop updates state and serves rankings. The offline loop evaluates and evolves predictors. They share versioned evidence but remain operationally separate. The complete generic architecture additionally separates outcome/world modeling, policy choice, synthetic dreaming and artifact admission; their presence in the design does not imply all are implemented.
 
 ## 4. Memory hierarchy
 
@@ -168,6 +172,8 @@ One episode may produce several Events. V1 selects the strongest available outco
 
 A later rating therefore replaces a weaker early save as the episode's main outcome. Undo Events exclude the reversed evidence. Dwell and open remain supporting observations, not terminal reward.
 
+This is a V1 derived reward projection, not a claim that the underlying events are mutually exclusive. Future OutcomeModel heads must define their own horizons/conditioning and observability. Saving and later consuming may both occur.
+
 #### Scenario score
 
 For candidate (i):
@@ -184,7 +190,7 @@ where (r_e \in [-1,1]), (K=30), and (c(n)) shrinks low-support evidence. Discove
 
 Purpose: learn patterns that no single Profile has enough evidence to learn alone.
 
-It is post-MVP and blocked until consent, data volume, deletion lineage and minimum-cohort privacy gates exist.
+**Native Kajo PopulationMemory** is post-MVP and blocked until consent, data volume, deletion lineage and minimum-cohort privacy gates exist. The external research prior in 4.6 is a separate input, not a waiver of this gate.
 
 Future components:
 
@@ -197,7 +203,23 @@ Future components:
 
 PopulationMemory never permits the mobile client to inspect other Profiles. Retrieval returns aggregated features/signals only. Sensitive/special-category inference is prohibited. Provider-owned aggregate popularity/trend metadata used by `ColdStartPrior` is not PopulationMemory because it is not derived from other Kajo Profiles.
 
+### 4.6 ExternalTastePrior — independent research-derived input
+
+ADR-0008 advances isolated public-data research into Phase 14.3A. An `ExternalTastePrior` is a separately versioned/licensed preference or object-representation artifact, not a Kajo user history, raw population lookup or complete observed Scenario.
+
+[DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) defines MovieLens-first normalization and evaluation, optional Tag Genome features and Beliefs analysis, namespace/time/label limits, rights lineage and artifact admission. External people never become native User/Profile/Event records. User-authorized own-history import in section 11 remains a different product path.
+
+Before serving: demonstrate useful supported behavior, canonical Item mapping, compatible feature/encoder/model versions, bounded source/domain influence, no double-counted bootstrap, correct Shared boundaries and absence/withdrawal fallback. Model size or offline rating accuracy does not close native release gates. Native PopulationMemory and later latent/world/dream generations retain their independent acceptance.
+
+### 4.7 Full CurrentState and uncertainty — target refinement
+
+The generic target composes existing memory with explicit `BeliefState`, `WorldState` and, for Shared subjects, `GroupState`. These are responsibility/contract refinements, not newly implemented tables. World trends/availability are not durable personal taste; missing context is not invented mood.
+
+BeliefState reports estimate, support, uncertainty method and calibration status. Unsupported estimates remain unavailable. Existing V1 rank/confidence components must not be relabeled as calibrated probabilities. Section 20 maps these target concepts onto Kajo without changing the accepted scorer in this documentation delivery.
+
 ## 5. Prediction trace: the system's causal spine
+
+Here “causal spine” means traceable decision/observation provenance, **not** proof of causal intervention effects. Full alternatives and exposure improve evaluation, but do not reveal reactions to unseen actions or remove selection bias by themselves.
 
 ### PredictionRun
 
@@ -244,7 +266,7 @@ For `shared-common-fit-v1.1`, a Shared candidate explanation also records only s
 
 ### Why full slates matter
 
-Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can learn that B won against A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice.
+Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can study B relative to A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice. An unexposed alternative is not an observed rejection.
 
 ## 6. Context contract
 
@@ -328,7 +350,7 @@ The long-term online pipeline has separate responsibilities:
 6. **Trace write:** persist candidate pool, versions and final selection.
 7. **Delivery overlay:** apply pending Endorsement/member-history collaboration semantics without creating another taste model.
 
-MVP V1 combines steps 2–5 inside PostgreSQL because the catalog and event volume are small. A later Python/FastAPI service may replace the transport without changing the conceptual contract.
+MVP V1 combines steps 2–5 inside PostgreSQL because the catalog and event volume are small. A later service may replace a component/transport without changing the conceptual contract. ADR-0008 does not mandate Python/FastAPI or a network service: start with executable generic contracts and parity-tested extraction.
 
 ### 8.1 Reacted-Item resurfacing policy — `resurfacing-v1`
 
@@ -372,7 +394,7 @@ The thresholds are versioned hypotheses, not permanent truth. A future policy ve
 - use ScenarioMemory as a weak guardrail rather than an exploitation rule,
 - retain safety/availability/consumed constraints.
 
-`AmbientPhase` remains presentation only.
+`AmbientPhase` remains presentation only. Policy objectives above are not evidence that V1 has calibrated uncertainty or stochastic propensities; later changes require measured targets and versioned controls.
 
 ## 10. SharedProfile model
 
@@ -438,36 +460,35 @@ Pending collaboration priority is not actor-specific taste modeling. Personal Ev
 
 ### Shared consensus
 
-One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and all explicitly approved custom List memberships atomically. Later membership changes do not revoke reached historical consensus.
+One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and the chosen custom List membership. Later membership changes do not revoke reached historical consensus.
 
-### Required Shared round and rewatch successor — planned #232
+That paragraph describes the accepted-main single-destination baseline. The
+#229 successor records/reviews an exact destination set and atomically commits
+all approved memberships; DATA_EVENTS owns its evidence contract. Source merge,
+recorded hosted rollout and device acceptance are separately tracked in STATUS.
 
-The existing lower member-history tier and terminal joint-consumed suppression
-above describe delivered V1. The owner’s first-release requirement supersedes
-those restrictions only through a tested policy/feature version, not a client
-shuffle or history deletion (`MVP-SOCIAL-007..009`).
+### Required Shared rating-round and rewatch successor — #232
 
-A member’s Personal consumption is not Shared consumption. With strong authorized
-joint fit, that Item may compete for a joint recommendation with truthful
-member-seen attribution; Personal evidence remains private and separately owned.
-A completed joint experience can later become a rewatch candidate with its earlier
-history intact. Define and test an explicit cooldown, frequency cap, candidate
-budget and context/reason before enabling that route. Do not reuse saved-only
-reminder constants as unreviewed rewatch defaults. Not-interest, access, availability
-and safety exclusions remain respected; expose no borrowed Personal Prediction.
+`MVP-SOCIAL-007..009` is required first-release behavior. Personal Taste/setup
+precedes the joint flow. A SharedRatingRound freezes intended accepted
+participants, retains each person's 0–10 response and disagreement, and completes
+joint history only after all required responses. Pending, unknown and
+not-yet-watched responses are not completed joint rewards; round completion alone
+is not success. Legacy one-actor joint history cannot gain invented confirmation.
 
-Personal Taste setup supplies the initial member-fit inputs. Actual joint learning
-uses the participant responses and disagreement from completed SharedRatingRounds,
-not whichever member rated first and not a simple average masquerading as joint
-identity. Pending responses are not completed joint rewards. Completion itself
-is not success: low/zero ratings remain negative evidence. Correction and later
-rounds reconcile independently without erasing earlier experiences.
+Personal consumption is not Shared consumption. Strong authorized member/joint
+fit may admit member-seen Items under a new tested policy; a later explicit joint
+rewatch creates a new round with earlier history intact. Define cooldown,
+frequency/candidate bounds and reasons before activation rather than borrowing
+saved-reminder constants or deleting terminal history. Preserve not-interest,
+access and availability constraints. No private Personal Prediction is copied.
 
-Phase 14 must establish truthful evidence and the eligibility/reward contract;
-Phase 16.3 delivers the end-to-end round/rewatch flow after Personal Taste and
-Friends/Shared creation. Serving and shadow must share the same versioned policy,
-with member-seen, joint-seen, pending, low-fit, cooldown, repeat-cap, correction,
-legacy-history and Personal-isolation regressions before beta acceptance.
+Phase 14 establishes participant/round evidence, pending/completed/corrected
+outcomes and shared serving/shadow eligibility. Phase 16.3 delivers the complete
+UI/server flow. Test pairs/N members, zero/disagreement, cancellation/edits,
+concurrent completion, membership changes, legacy history and separate rewatch
+rounds with Personal/Shared isolation. DOMAIN_MODEL and DATA_EVENTS own entities
+and command semantics; ROADMAP owns dependency order.
 
 ## 11. Cold start and external history
 
@@ -515,13 +536,13 @@ Preferred import paths:
 
 Imports are user-initiated; Kajo does not scrape accounts or depend on unofficial login automation. Imported ratings map to canonical rating/consumed evidence with source/import provenance and mapping confidence. Uncertain Item matches require review or exclusion. Imported Personal evidence is never copied into SharedProfile history.
 
-### Bootstrap serving implementation — #207 pending acceptance
+### Bootstrap serving implementation — #207 / PR #210
 
 The forward correction versions the extended base as `prediction-v0.4-bootstrap`; V1 persists that base version and retains its existing policy/scenario/common-fit behavior. Candidate explanations add `bootstrapServingVersion=bootstrap-serving-v1` and `bootstrapLongTerm`; the latter is already included in `longTerm`, not an extra amount to add again. Memory snapshots retain the bootstrap serving version as well.
 
 Memory and serving reuse the same strongest-active-per-Item bootstrap selection, canonical evidence weights and bootstrap age decay. Bootstrap contributes only to LongTerm, never native ShortTerm or native confidence. Authorized Shared common-fit still reads Personal memory summaries; Shared base does not consume copied Personal bootstrap rows. Removing/replacing a source recomputes current influence; the mobile success boundary invalidates mounted ranking requests.
 
-This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. PR #210 merged the correction and recorded bounded hosted public V1 smoke evidence; PR #219 added public V1 runtime checks on independent isolated Supabase installations. Unmodified chronological replay still fails, and configured-device/first-session recommendation-quality acceptance remains open. See [STATUS.md](../project/STATUS.md) for the exact remaining #207/#208 gates.
+This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. PR #210 merged the correction and recorded bounded hosted public V1 smoke evidence; PR #219 added public V1 runtime checks on independent isolated Supabase installations. The later #223 checkpoint accepts the adopted fresh-install technical gate; unchanged historical chronological replay and the configured-device/first-session quality gates remain separate. See [STATUS.md](../project/STATUS.md) rather than treating the old “#207 pending” heading as current work.
 
 ## 12. Representation roadmap: what Kajo borrows from modern systems
 
@@ -538,7 +559,7 @@ Kajo does not copy one competitor wholesale. It combines proven patterns while k
 | Letterboxd / IMDb | user-initiated history/rating imports that collapse cold start | scraping, credential handling or dependence on an unavailable consumer OAuth path |
 | Spotify / Netflix | multi-timescale sequence representations, contextual ranking and controlled experimentation | engagement-only optimization or an unmeasured large model in the serving path |
 
-Kajon's market-level distinction is therefore not “AI recommends media”. It is the reconstructable tuple:
+Kajo's market-level distinction is therefore not “AI recommends media”. It is the reconstructable tuple:
 
 ```text
 Profile × current Context × alternatives × exposure × behavior × delayed Outcome × time
@@ -570,6 +591,8 @@ MemGPT and later episodic-memory research separate bounded working context from 
 
 Spotify's contextual-bandit work demonstrates context-dependent content mix and separates personalization from experimentation. Kajo follows that separation. A bandit may later choose policy/slate parameters, but A/B infrastructure evaluates the complete personalization system.
 
+These earlier research directions are preserved, not newly admitted components. The bounded external-preference experiment can begin before native sequential/world-model data is sufficient; its claims remain limited to its actual task and evidence.
+
 ## 13. SleepLayer and EvolutionEngine
 
 ### 13.1 Exact meaning of the SleepLayer
@@ -597,6 +620,8 @@ Decision:
   globally, for a cohort, or for this Profile?”
 ```
 
+The percentages above are illustrative, not measured Kajo results.
+
 ### 13.2 Two valid shadow mechanisms
 
 #### Prospective ShadowPrediction — preferred evidence
@@ -610,11 +635,13 @@ At production Prediction time:
 5. wait until the outcome window matures,
 6. score Champion and Challengers against the same observable Outcomes.
 
-Prospective shadowing is the cleanest mechanism because no future data can enter the Challenger's input.
+Prospective shadowing prevents later observations from entering the frozen input, provided model/preprocessing/artifact versions also obey the evaluation cutoff.
 
 #### Historical as-of replay — useful but stricter
 
 A scheduled job can replay old PredictionRuns only when it reconstructs every feature with an `asOf <= prediction.requestedAt` boundary. Current-state tables cannot be read during replay because they may contain future information. Unknown historical availability, missing candidate pools or unversioned feature logic make an episode ineligible rather than guessed.
+
+Occurrence time alone is insufficient when a record became available later. Preserve recorded/available timestamps, artifact training cutoffs and correction history. Distinguish actual deployed-model replay from a retrospectively simulated challenger experiment.
 
 ### 13.3 The counterfactual limit
 
@@ -623,11 +650,11 @@ A ShadowPrediction does not reveal how the user would have reacted to an Item th
 Early valid comparisons are:
 
 - pairwise/order quality among candidates that were meaningfully exposed,
-- predicted probability/calibration for exposed candidates,
+- predicted probability/calibration for exposed candidates where supported labels exist,
 - agreement with the selected/consumed/rated Item when it existed in both comparable slates,
 - coverage: how much of the evaluation set could be judged without invention.
 
-Later unbiased comparison requires controlled randomized exploration and logged `selectionProbability`/propensity. Then IPS, SNIPS or doubly robust estimators can correct policy/exposure bias. Online A/B evidence remains the promotion authority.
+Later bias-corrected comparison requires controlled exploration, truthful logging probabilities appropriate to the actual action/slate and support/overlap assumptions. IPS, SNIPS or doubly robust estimators are not automatically valid merely because a field named propensity exists. Online A/B evidence remains the promotion authority.
 
 ### 13.4 PredictorGenome
 
@@ -651,7 +678,7 @@ random seed
 validity constraints
 ```
 
-Weights are normalized and constrained. A genome cannot disable authorization, eligibility, privacy, trace writing or hard suppression rules. Neural model weights are referenced as immutable artifacts rather than copied into relational rows.
+Weights are normalized and constrained. A genome cannot disable authorization, eligibility, privacy, trace writing or hard suppression rules. Neural model weights are referenced as immutable artifacts rather than copied into relational rows. External training, encoder/index compatibility, permission and split lineage extend this manifest when such artifacts exist; they are not inferred from a model name.
 
 ### 13.5 How Challengers are created
 
@@ -664,7 +691,7 @@ The SleepLayer maintains diversity without brute-forcing an unlimited parameter 
 5. **new family:** explicit challengers such as gradient ranker, sequential Transformer or LLM-backed ranker,
 6. **pruning:** remove dominated, duplicate, unstable or too-expensive genomes.
 
-Initial MVP/post-MVP SleepLayer should mutate only transparent scalar weights/decays over a fixed candidate pool. Learned models enter only after the evidence/evaluation framework is trustworthy.
+Initial MVP/post-MVP serving-oriented SleepLayer should mutate only transparent scalar weights/decays over a fixed candidate pool. Learned serving models enter after the evidence/evaluation framework is trustworthy. Isolated external-preference research under ADR-0008 may begin in Phase 14.3A; it is not an automatic serving-model switch.
 
 ### 13.6 Global, cohort and Profile-specific evolution
 
@@ -711,7 +738,7 @@ Suggested windows to validate with real data:
 - mature book outcome: 30–60 days,
 - long-term trust/return: rolling 30–90 days.
 
-The same episode can be provisional first and mature later. Promotion never mixes incomplete Challenger windows with mature Champion windows.
+The same episode can be provisional first and mature later. Promotion never mixes incomplete Challenger windows with mature Champion windows. Censored/unobservable outcomes remain separate from observed negatives.
 
 ### 13.8 What “70% accuracy” means
 
@@ -737,7 +764,7 @@ Initial research thresholds, to be calibrated rather than treated as universal t
 | Cohort | 500 Outcomes across 100 Profiles | ≥3% | ≥95% | shadow + scoped A/B |
 | Profile | 30 mature Outcomes over ≥14 days | ≥5% | ≥90% with global shrinkage | reversible personal canary |
 
-These are starting safety gates. For rare but high-value outcomes, sequential Bayesian evidence and effect size are more useful than blindly waiting for one fixed count.
+These are starting research safety hypotheses, not measured power guarantees or automatically sufficient evidence. For rare but high-value outcomes, an explicit statistical design, effect size and uncertainty matter more than blindly waiting for one fixed count.
 
 ### 13.10 Promotion state machine
 
@@ -755,7 +782,7 @@ Any active state -> REJECTED
 CANARY / EXPERIMENT / CHAMPION -> ROLLED_BACK
 ```
 
-Promotion records the approving mechanism/person, evidence window, metrics, guardrails, effective scope/time and rollback assignment. Assignment changes are append-only/versioned; the current assignment is a projection.
+Promotion records the approving mechanism/person, evidence window, metrics, guardrails, effective scope/time and rollback assignment. Assignment changes are append-only/versioned; the current assignment is a projection. External-artifact rights admission and model-quality promotion are both required when applicable; neither substitutes for the other.
 
 ### 13.11 Multi-objective comparison
 
@@ -780,7 +807,7 @@ Hard guardrails:
 
 ### 13.12 Memory consolidation during sleep
 
-The owner's dream/subconscious/DNA metaphor is retained as the future direction in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#14-fut-alg-002--evidence-gated-evolutionengine-expansion--planned--conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
+The owner's dream/subconscious/DNA metaphor and complete later generations are retained in [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md) and [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#14-fut-alg-002--evidence-gated-evolutionengine-expansion--planned--conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
 
 The SleepLayer also consolidates memory without rewriting evidence:
 
@@ -792,7 +819,7 @@ The SleepLayer also consolidates memory without rewriting evidence:
 - detects drift and schedules re-evaluation,
 - rebuilds projections after feature/reward changes.
 
-Original Events, PredictionRuns, ShadowPredictions and Outcomes remain immutable. Consolidated memories are versioned derivatives.
+Original Events, PredictionRuns, ShadowPredictions and Outcomes remain distinct historical evidence under their retention/deletion lifecycle. Consolidated memories are versioned derivatives. Error-driven synthetic experiments retain representative real controls and may not validate themselves.
 
 ### 13.13 SleepLayer data model
 
@@ -807,7 +834,7 @@ PromotionDecision
 ModelArtifact
 ```
 
-The MVP foundation now implements all listed relational artifacts except `ModelArtifact`. Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty.
+The MVP foundation implements the listed relational artifacts except `ModelArtifact`. Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty. ModelArtifact is a planned contract until implementation/acceptance is recorded.
 
 ### 13.14 Evolution cycle
 
@@ -825,15 +852,16 @@ The MVP foundation now implements all listed relational artifacts except `ModelA
 
 ### 13.15 Avoiding feedback-loop collapse
 
-- preserve randomized exploration traffic,
-- log actual exposure and selection probability,
+- preserve appropriately controlled exploration traffic,
+- log actual exposure and selection probability when stochastic,
 - evaluate on time splits and holdout cohorts,
-- correct popularity/position bias,
+- address popularity/position bias with supported methods,
 - cap per-Item/provider repetition,
 - distinguish unavailable from rejected,
 - reject hindsight-contaminated replay episodes,
 - do not train on model-generated explanations as user truth,
 - limit simultaneous genome comparisons/multiple-testing risk,
+- keep a final test outside repeated evolutionary selection,
 - monitor representation, outcome and assignment drift.
 
 ## 14. Evaluation framework
@@ -849,7 +877,7 @@ The MVP foundation now implements all listed relational artifacts except `ModelA
 - latency/cost/storage estimates,
 - ablations for each memory layer.
 
-Random train/test splits are forbidden for sequential behavior. Use chronological splits and prevent future state/outcome leakage.
+Random train/test splits are forbidden for sequential behavior. Use chronological splits and prevent future state/outcome leakage throughout preprocessing, embeddings, prototypes and indexes. External evaluation additionally freezes global time boundaries and held-out subject prefixes; a per-user last-N split alone does not prevent cross-user future leakage. Declare candidate/relevance rules and distinguish unlabeled from known-negative examples.
 
 ### Online
 
@@ -868,7 +896,8 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - improvement over base scorer by evidence-count bucket,
 - harmful nearest-neighbor rate,
 - exact replay test from stored traces,
-- no-evidence equivalence to base behavior.
+- no-evidence equivalence to base behavior,
+- query-prefix leakage, authorization-before-retrieval and artifact-version compatibility tests.
 
 ### Resurfacing-specific
 
@@ -876,7 +905,7 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - reminder cooldown/frequency-cap suppression counts,
 - repeated-reacted Item rate in normal discovery,
 - share of slates containing a saved reminder,
-- later consumption/rating after a reminder versus comparable saved Items without a reminder,
+- later consumption/rating after a reminder versus comparable saved Items without a reminder, with causal claims only under an appropriate design,
 - Profile-isolation and trace-completeness checks.
 
 ### Shared common-fit-specific
@@ -893,19 +922,20 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 
 Required monitoring:
 
-- PredictionRun without candidates,
+- unexpected missing candidate trace, distinguished from a valid identified empty run,
 - hosted impression with unknown prediction/candidate,
 - action/outcome with mismatched Profile/actor/Item,
 - impossible timestamps or negative dwell,
 - duplicate Events after retry,
-- outcome latency distribution,
+- outcome latency/maturity and unobservable coverage,
 - fraction of fallback predictions,
 - scenario support and influence distribution,
 - resurfacing classification/reason distribution,
 - Shared common-fit coverage/contribution/disagreement distribution,
-- model/policy version traffic,
+- model/policy/artifact version traffic,
 - feature/state drift,
-- trace storage growth.
+- trace storage growth,
+- external artifact absence/rights/coverage/compatibility failures when integrated.
 
 Every material score/policy component remains available in internal explanation JSON during MVP development. User-facing explanations later use a safe, concise subset and never expose other members' private evidence.
 
@@ -921,13 +951,14 @@ Kajo uses privacy by design:
 - user access/export/delete paths planned before external release,
 - derived memories and prediction traces participate in account/Profile deletion,
 - retention is purpose-specific, documented and reviewable,
-- population datasets need deletion lineage and minimum cohort thresholds.
+- population datasets need deletion lineage and minimum cohort thresholds,
+- external data/model/index dependencies retain rights and withdrawal/retraining lineage.
 
-Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#17-retentiondeletion). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission.
+Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#17-retentiondeletion). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission. Decay, storage deletion and removal of learned source influence are different operations.
 
 ## 17. MVP V1 implementation
 
-`public.rank_items_v1` is the accepted nervous-system serving boundary:
+At the inspected accepted-main baseline, `public.rank_items_v1` is the nervous-system serving boundary:
 
 ```text
 private prediction-v0.4-bootstrap baseline candidate generator
@@ -939,7 +970,7 @@ private prediction-v0.4-bootstrap baseline candidate generator
   -> immutable PredictionRun + complete PredictionCandidate trace
 ```
 
-The baseline genome preserves its scalar policy controls; the current base includes the forward bootstrap correction from #207/PR #210. Earlier V0.3 descriptions are historical checkpoints. This version update does not establish serving/shadow equivalence. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
+The baseline genome preserves its scalar policy controls; the current base includes the forward bootstrap correction from #207/PR #210. Earlier V0.3 descriptions are historical checkpoints. This version update does not establish serving/shadow equivalence. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only. Active #229 source/read-boundary evolution is separately tracked in STATUS and must not be silently described as merged/deployed.
 
 The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Personal policy version is `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`.
 
@@ -953,222 +984,78 @@ Known V1 limits:
 - no stochastic propensity because V1 policy is deterministic,
 - common-fit v1.1 coefficients are conservative hypotheses and require configured-device plus real Shared outcome calibration,
 - Context includes time/surface but not explicit mood/available-time input,
-- saved-reminder thresholds are first versioned heuristics and require real outcome calibration.
+- saved-reminder thresholds are first versioned heuristics and require real outcome calibration,
+- the new portable contracts/external-data plan is not an implemented engine package or trained prior.
 
 ## 18. Required MVP algorithm completion contract
 
-Status: **required target; partial implementation, acceptance open as of 2026-09-10**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy).
+Status: **required target; partial implementation**. Historical V1 delivery does not prove newer acceptance gates. `MVP-ALG-001..009`, `MVP-DATA-003..004` and bounded `MVP-ENG-001..003` govern their respective scope. Technical bootstrap acceptance and all remaining gates are recorded in STATUS; sequencing is maintained only in [ROADMAP](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy-and-the-engine-portable).
 
 ### One feature and policy definition
 
-Serving, memory snapshots and SleepLayer must agree on source-tagged evidence and as-of time. Refactor through forward migrations, preserving one `public.rank_items_v1` boundary. Imported/calibration LongTerm evidence must contribute directly to unseen Personal ranking, even when no native Events or Scenarios exist. Removing a source rebuilds its derived contribution.
+Serving, memory snapshots and SleepLayer must agree on source-tagged evidence and as-of time. Refactor through forward migrations, preserving the accepted public V1 serving boundary. Imported/calibration LongTerm evidence must contribute directly to unseen Personal ranking, even when no native Events or Scenarios exist. Removing a source rebuilds its derived contribution.
 
 Reuse canonical feature calculation and pure scoring/policy helpers rather than independently reproducing formulas in baseline, snapshots, Shared fit and shadow. Eligibility and Shared collaboration delivery remain explicit policy, distinct from taste score, but both must be faithfully replayable. Freeze feature/schema/policy versions and candidate features at prediction time; current mutable catalog tags cannot silently replace historical features.
 
 A baseline shadow must match Personal and Shared production eligibility, final order and selected Items exactly; declare score tolerance for rounding. Tests cover common-fit, reminder tiers, suppression, ties and empty/refilled pools. A score-only match is insufficient.
 
-### Frozen replay parity checkpoint — #228, prepared / not hosted
+### Active #229 frozen replay, admission and page contracts
 
-The forward `20260910202244_frozen_prediction_replay.sql` unifies candidate and
-final scoring in the pure private `prediction_candidate_score_v2` helper. New V0
-candidate explanations carry `scoringFeatures.version = prediction-features-v2`
-with unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty,
-exploration and both penalty inputs. Rounded top-level display fields remain
-compatible. The feature serializer pins `extra_float_digits=3` within V0's function
-scope: a caller's rounded JSON float setting must not erase binary precision, and
-the caller setting is restored on return. The accepted raw baseline weights/scores
-are preserved. Scalar and
-Scenario weights use the same immutable genome recorded on the PredictionRun.
-Final scoring adds the stored raw Scenario score with its genome weight and the
-frozen aggregate Shared common-fit contribution. Personal common-fit stays zero.
+The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The inspected `44b11b4` head passed all five required CI #458 jobs, including first-page observed-lock races. That result does not establish the next-page, concurrent window-cap, populated window-upgrade or device gates. STATUS owns the exact next task and current verification.
 
-New candidate traces also retain `resurfacingInput` before the reminder cap.
-Serving and shadow reuse `finalize_resurfacing_policy_v1` and
-`prediction_delivery_tier_v1`: ordinary eligible Items precede the one eligible
-saved reminder, then suppressed Items; score descends within each tier and exact
-ties use Item id. Each genome chooses its reminder by scalar score before
-Scenario/common-fit, so replay can select a different reminder. Suppressed Items
-can remain in the trace but never satisfy the selected predicate.
+#### Frozen replay parity — prepared, not hosted
 
-The worker uses frozen inputs only. New shadows record code `shadow-replay-v2`,
-feature `prediction-features-v2` and `comparisonScope = FROZEN_SOURCE_POOL`; serving
-policy appends `+frozen-replay-v2`. The preceding attribution forward retains
-`+outcome-attribution-v1`. Immutable genome configuration versions remain their
-original registry values; worker metadata identifies the actual replay code and
-input schema separately. Old traces and evaluations are never rewritten. Queued
-pre-v2 sources fail with an unsupported-input diagnostic rather than reconstructing
-features from mutable data. New evaluations accept only compatible v2 shadows
-and record the replay version/scope, including the no-comparable-outcomes result.
+`20260910202244_frozen_prediction_replay.sql` shares pure private `prediction_candidate_score_v2` between serving and shadow. Candidate `scoringFeatures.version = prediction-features-v2` retains unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty, exploration and both penalty inputs. V0 scopes `extra_float_digits=3` to its function so caller settings cannot erase binary precision; the caller setting is restored afterward. Rounded display fields and the accepted raw baseline formula remain compatible.
 
-Full-schema controls require **exact double-precision score equality**, exact
-rank/selection and policy equality for 18 Personal/Shared × mode × page-size
-cases. An independent accepted-formula check allows `1e-12` arithmetic tolerance.
-Coverage includes real Scenario and common-fit signals, rounding boundaries,
-ties, suppression, reminder re-selection and later catalog/taste/member changes.
-Populated upgrade checks preserve old raw baseline scores and all historical
-data/function boundaries. Native CI and hosted rollout remain separate gates.
+Scalar and Scenario weights use the same immutable genome recorded on the run. Final scoring adds the frozen raw Scenario score with that weight and the frozen aggregate Shared common-fit contribution; Personal common-fit remains zero. `resurfacingInput` is retained before the reminder cap. Serving and replay share `finalize_resurfacing_policy_v1` and `prediction_delivery_tier_v1`: ordinary eligible Items, then the one eligible reminder, then suppressed Items; scores descend within tiers and Item ID breaks exact ties. Each genome chooses its reminder by scalar score before Scenario/common-fit, so a challenger may select a different reminder. Suppressed traced Items are never selected.
 
-This comparison is conditional on the frozen source pool and actual source result
-count. It does not establish parity with a challenger's independently generated
-live pool. The following admission correction handles suppression before the
-cutoff and zero-result replay. Independent candidate sources, bounded retrieval,
-continuation and rollout remain open under `MVP-ALG-002..003`; no promotion or
-measured quality claim follows from these corrections.
+New shadow metadata records `shadow-replay-v2`, `prediction-features-v2` and `comparisonScope = FROZEN_SOURCE_POOL`; serving appends `+frozen-replay-v2` after the preceding `+outcome-attribution-v1`. Registry genome versions remain unchanged; worker code/input schema versions identify actual replay separately. Old traces/evaluations are not rewritten. Pre-v2 queued sources fail diagnostically; new evaluations accept compatible shadows and retain version/scope even when no outcomes are comparable.
 
-### Candidate admission checkpoint — #228, prepared / not hosted
+Existing full-schema controls require exact double-precision score equality and exact rank/selection/policy across 18 Personal/Shared × mode × page-size cases. The independent accepted-formula check uses `1e-12` arithmetic tolerance. Reminder re-selection, precision boundaries, ties and later catalog/taste/member changes are covered. These are comparisons conditional on a frozen source pool, not evidence about independently generated live challenger pools or predictive usefulness.
 
-The forward `20260910210520_eligibility_first_candidate_pool.sql` corrects a
-reproduced case where 70 consumed high-fit Items displaced all 24 ordinary
-alternatives from the raw baseline top-50. V0 now evaluates the canonical
-`resurfacing_policy_decision_v1` at one recorded time before retaining candidates.
-Ordinary Items precede eligible aged reminders, then suppressed Items, with the
-same baseline score and Item-id ordering within tiers. Scalar scoring reuses this
-frozen input; each genome still applies the one-reminder cap over its retained pool.
-Final Scenario/common-fit scoring and shadow share the preceding replay contract.
+#### Candidate admission — prepared, not hosted
 
-New serving policies append `+eligibility-first-v1`. Candidate explanations record
-`candidatePool.version`, `eligibilityAt`, considered/ordinary/reminder/suppressed
-counts, retained limit/count, original `baselineScoreRank` and `admissionRank`.
-These are baseline-admission counters: V0 retains at most 50, after which scalar
-and final scoring retain at most `min(50, 3 × requested limit)` for expensive
-Scenario/common-fit and trace persistence. A suppressed candidate in that trace
-is still not selected or exposed. No genome weight or public RPC signature changes.
+`20260910210520_eligibility_first_candidate_pool.sql` fixes admission starvation: 70 consumed high-fit Items previously occupied top-50 despite 24 ordinary alternatives. V0 evaluates `resurfacing_policy_decision_v1` at one recorded time before retention; ordinary → aged reminder → suppressed ordering precedes the same baseline-score/Item-ID order. Scalar scoring reuses that frozen input, with each genome applying its reminder cap within the retained pool.
 
-Zero-result runs with a complete versioned source are valid frozen comparisons.
-The worker accepts all-suppressed pools and explicit empty-pool controls with zero
-hypothetical selections; automatic challenger queueing still omits an empty pool.
-Pre-admission `frozen-replay-v2` sources remain comparable, while pre-v2 inputs
-still fail diagnostically. Stored history is never backfilled or rewritten.
+The serving suffix is `+eligibility-first-v1`. Candidate `candidatePool` metadata records version, `eligibilityAt`, considered/ordinary/reminder/suppressed counts, retained limit/count, `baselineScoreRank` and `admissionRank`. V0 retains at most 50; expensive Scenario/common-fit work and persisted traces retain at most `min(50, 3 × requested limit)`. Admission counts are not impressions or additional evidence.
 
-Full-schema controls reproduce the original zero-result defect across both
-Profile types, BOOK/MOVIE and three modes, then verify 36 nonempty limit controls,
-two mixed-domain controls, exhausted/empty pools, reminder caps, exact baseline
-score/rank/selection replay and authorization. Populated forward rehearsal retains
-data, old frozen comparisons, all function identities/ACLs/configuration and
-unrelated constraints; unexpected source rolls back the entire forward.
+Complete versioned zero-result sources are valid frozen comparisons. All-suppressed and explicit empty controls can have zero hypothetical selections; automatic challenger queueing still omits empty pools. Pre-admission frozen-v2 sources stay comparable; pre-v2 inputs fail diagnostically. Tests cover 36 Profile/domain/mode/limit combinations, mixed domains, empty/exhausted sources, reminder caps, exact baseline replay and populated preservation.
 
-This fixes admission starvation, not retrieval scale or source diversity. The
-existing full-catalog raw-feature scan remains and now evaluates admission before
-the cutoff; expensive downstream work alone is bounded. Independent Shared/novelty/
-Scenario sources and indexed retrieval still need cost and quality evidence.
-The current client treats an empty RPC array as failure; a versioned empty/continuation
-response and duplicate-free navigation remain required before `MVP-ALG-003` closes.
+The raw-feature/admission scan still covers the full catalog; only downstream expensive work is bounded. This corrects eligibility starvation without claiming indexed retrieval scale, independent source diversity or complete ALG-002/003 acceptance. The active legacy client still treats an empty RPC array as failure until the identified reader is activated.
 
-### Versioned result/continuation contract — first-page source prepared 2026-09-11
+#### Versioned result/continuation contract — first-page source prepared 2026-09-11
 
-Phase 14.2 next implementation must deliver these boundaries together, rather
-than treating the old RPC's bare empty array as a successful identifiable run.
+`20260911070959_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. Optional cursor must currently be null. Capturing session identity does not create or prove an Event session.
 
-- Introduce a versioned object response with `version`, `requestId`,
-  `predictionId`, captured `profileId`, `discoveryMode`, `itemType`, `sessionId`,
-  ordered `items`, `nextCursor` (nullable) and an explicit availability result.
-  An empty page still owns a committed PredictionRun. Transport/auth/malformed
-  replies remain errors; they must not become empty successes or mock fallback.
-- A client-generated request ID identifies an immutable request envelope. Exact
-  retries return the same committed response; reused IDs with changed scope,
-  parameters or cursor are rejected. Obtain the run ID directly from the core
-  operation, never by selecting the latest run or fabricating a client Prediction.
-- Preserve the old row RPC for old clients. Introduce a versioned endpoint/wrapper
-  backed by the same ranking implementation, not a forked scorer. The server
-  contract and its migration precede switching the mobile reader.
-- Cursor is opaque/server-validated and bound to actor, Profile, Event session,
-  mode, Item type, source version and a bounded continuation window. Never trust
-  client-provided selected ranks or arbitrary excluded IDs as admission authority.
-- Each accepted continuation page owns a new immutable PredictionRun with its
-  exact selected ranks and per-Item origins. Record parent/window linkage. A
-  replayed page changes neither seen Items nor historical ranks. No duplicate
-  canonical Item may reappear within a window; a new explicit refresh starts a
-  new window and may legitimately repeat still-eligible Items.
-- Freeze the source pool/version for a continuation window; do not silently mix
-  newly scored candidates into it. Recheck current membership/eligibility before
-  delivery; fail an invalidated window explicitly instead of rewriting earlier
-  evidence. Later independent candidate-source work may extend the window under
-  a new version. Limit retained/seen state and cursor lifetime; never grow an
-  unbounded exclusion list or materialize the whole catalog for paging.
-- A bounded source window being exhausted is not proof of an empty catalog.
-  Distinguish `ITEMS`, `WINDOW_EXHAUSTED` and proven `CATALOG_EMPTY`; record the
-  source/admission counts supporting the decision. Use neutral client empty copy
-  for window exhaustion. Do not claim there are no suitable Items globally.
-- Append only after matching the captured request scope/revision. Mode/Profile/
-  session changes invalidate in-flight append. Detail retains its captured slate;
-  newly appended grid pages must carry each Item's own Prediction origin.
+The server generates the PredictionRun ID before ranking. Exact request/response JSON is retained in private RLS-protected receipts; request-ID reuse is serialized with an advisory lock. Current actor/Profile membership is checked and locked even on receipt replay. Changed payload or actor rejects reuse; original trace and receipt commit atomically. Later mutable state cannot rewrite a retry. Receipts cascade with actor/Profile/run; no time-based receipt-retention policy is implemented yet.
 
-Required deterministic acceptance: identified empty run; malformed/unauthorized
-reply; same request retry and payload mismatch; concurrent pages/retry; duplicate
-Item and rank rejection; changed Profile/session/mode; suppressed-only source
-versus empty catalog; page/window bounds and reminder limits; final-page retry;
-late response after refresh; per-Item grid→detail→exposure attribution. Existing
-frozen replay and candidate admission controls must remain passing.
+Every response, including an empty one, retains version, request/run/Profile/session/mode/type identity and ordered rank rows. `source` records admission version, retained candidate/result counts and empty-catalog decision. Availability distinguishes `ITEMS`, `WINDOW_EXHAUSTED` and `CATALOG_EMPTY`; the last requires no discoverable Items in the requested domain. Suppression or exhaustion of bounded retained candidates cannot establish catalog emptiness. Current `nextCursor: null` and `continuationSupported: false` mean paging is unavailable, even if the first page returned Items; they do not prove all eligible Items were delivered.
 
-The undeployed `20260911070959_identified_prediction_page.sql` implements only
-the identified first-page server boundary. `public.rank_items_page_v1(request
-jsonb)` requires numeric `version: 1`, UUID `requestId`, `profileId`, `sessionId`,
-`discoveryMode`, BOOK/MOVIE `itemType`, integer `limit` 1–50 and object `context`.
-The request is at most 16 KiB; unknown keys and nested context session identity
-are rejected. Optional `cursor` must be null. Session identity is captured as in
-the existing ranker; this endpoint does not create or prove an Event session.
+`predictionPageOperations.ts` prepares a frozen copied request for retry and validates response scope, identity, source counts and availability. It rejects unsupported continuation, duplicate Items/ranks, unordered rows and malformed responses. Legacy mapping also rejects duplicate/rank/domain/size defects. `usePredictionRanking` still uses the legacy RPC: the prepared reader does not constitute delivered empty-state UI, page append or device acceptance.
 
-The response includes the specified identity/scope fields and ordered legacy
-rank-row objects in `items`. `source` records admission version, retained candidate
-count, result count and the empty-catalog decision. `CATALOG_EMPTY` requires no
-discoverable Items in the requested domain; suppression alone yields
-`WINDOW_EXHAUSTED`. `nextCursor: null` plus **`continuationSupported: false`**
-explicitly means paging is unavailable, including when the first page has Items.
-It must not be interpreted as proof that all eligible Items were delivered.
+`20260911074543_prediction_continuation_windows.sql` adds owner-only `frozen-window-v1` open/read helpers. They preserve the first receipt's exact immutable run, ordered candidates, scope and initially selected IDs without reranking, making Events, changing receipts or creating another run. Repeat open returns the same window; reads require the current actor/membership, valid source lifetime and unchanged original run/candidate rows. Later catalog/taste state cannot replace that source.
 
-The original scoring body moves unchanged, except for supplied server run identity,
-into an owner-only private core. The legacy internal wrapper generates a run ID;
-the new boundary generates one before calling the same core. The public row RPC
-is unchanged. Private RLS-protected receipts persist the exact JSON request and
-response with their run. A transaction advisory lock serializes request-ID reuse;
-current membership is locked/checked before serving even a cached response.
-Changed payload or actor rejects ID reuse. Trace and receipt commit atomically;
-later catalog changes do not rewrite retries. Receipts cascade with their actor,
-Profile or PredictionRun; a time-based receipt retention policy is not yet added.
+Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from original ranking and 16 retained windows per actor/Profile. Scope locking serializes creation. New opens reclaim expired derived rows only; source age prevents expired-run reopening as a fresh window. Actor/Profile/run/receipt deletion cascades. Dormant scopes may retain at most 16 expired rows until another open or parent deletion; no background cleanup worker is implemented. Helpers have no API-role execution grants.
 
-This source packet does not switch mobile readers or implement continuation
-windows/cursors. First-page source `c7a4ddd` passed native migration/behavior CI. A populated
-upgrade preservation probe also passes locally and is wired into CI. New native
-race probes require observed lock contention between independent PostgreSQL
-connections for identical retries and changed-payload rejection; their CI results
-and populated native upgrade acceptance remain pending. Hosted upgrade and rollout
-remain gates. Client empty-state rendering,
-duplicate-free paging, per-Item append attribution and bounded source scalability
-remain open. Deploy after the three preceding pending forwards; Phase 14.1
-device/recovery gates remain separate.
+The next page unit must add these boundaries together:
 
-The prepared mobile boundary `predictionPageOperations.ts` creates a frozen request
-(including copied context attributes) for reuse after transport failure, then checks
-response identity against the captured request. It accepts identified empty results
-only with consistent availability and source counts; rejects unsupported continuation,
-wrong Profile/session/mode/type/run, duplicate Items/ranks and non-ordered rows; and
-keeps transport/auth/malformed replies as errors. The existing legacy mapper now also
-rejects duplicate Items/ranks and the legacy loader checks domain and requested size.
-`usePredictionRanking` still uses the legacy RPC. This is not delivered empty-state
-UI, paging, in-flight append invalidation or per-page exposure acceptance.
+- Opaque server-validated cursor bound to actor/Profile/session/mode/type/source/version and the bounded window. Client ranks/excluded IDs are not admission authority.
+- Frozen source plus rechecked current authorization/eligibility. Fail invalidated scopes explicitly; do not substitute newly ranked candidates into the same versioned window.
+- Independent immutable page PredictionRun, parent/window linkage, final ranks and per-Item origins; exact request/cursor retry receipt and atomic seen advancement. Retries must not duplicate Items or change prior ranks. Explicit refresh may start a new window and legitimately repeat still-eligible Items.
+- Captured-scope/revision append. Mode/Profile/session changes invalidate pending replies; an A → B → A return cannot revive an old response. Detail retains its captured slate while new grid pages carry their own run origins.
+- Page-aware frozen/shadow replay, final-page retry, reminder/window bounds, malformed/unauthorized cases, concurrent pages and the separate concurrent 16-window-cap/populated-window-upgrade cases. First-page native races alone do not establish these properties.
 
-The undeployed `20260911074543_prediction_continuation_windows.sql` prepares the
-private `frozen-window-v1` source cache. Owner-only helpers open an actor-owned
-first-page receipt and preserve its full immutable run/candidate snapshot, scope
-and exact initially selected Item IDs. They do not rerank, generate Events, create
-another PredictionRun or rewrite a receipt. Repeated opening uses the same window;
-reads require current actor/membership, an unexpired lifetime and unchanged original
-run/candidate rows. Later catalog/taste state does not replace the snapshot.
+Raw cached candidates include suppressed and already selected alternatives; they are not a next page. No public cursor delivery, seen advancement or next-page run exists yet. Keep capability false until the complete boundary passes; hosted rollout and client/device activation remain distinct steps.
 
-Limits are 50 candidates/seen IDs, 2 MiB per source snapshot, 15 minutes from the
-original run and 16 retained windows per actor/Profile. New-window creation is
-serialized per scope. New requests reclaim expired derived cache rows only, while
-source age prevents reopening an expired run as a fresh window. Actor/Profile/run/
-receipt deletion cascades to this cache. Inactive scopes retain at most 16 expired
-rows until another open or parent deletion; no background cleanup job is claimed.
+#### Late Outcome attribution — prepared, not hosted
 
-These helpers intentionally have no API-role execution grants. Their raw frozen
-candidate ledger includes suppressed and already selected alternatives and is not
-a deliverable next page. The next page commit must verify current eligibility and
-exact requested scope, exclude previously delivered Items, bind cursor/retry state,
-create immutable per-page run/rank origins and preserve page-aware replay semantics.
-No cursor/public pagination, new eligibility decision or seen-set advancement is
-implemented by this source-cache slice. Existing first-page capability stays false.
+`20260910192630_late_outcome_attribution.sql` supplies the same private effective-Outcome reader to ScenarioMemory and mature evaluation. Exact immutable receipt membership and a real pre-action impression can make an earlier unattributed Outcome usable for its originally requested run; missing/mismatched proof contributes nothing. Raw Events/receipts, old evaluations and prediction-time inputs remain unchanged. Duplicate impressions do not multiply support; existing priority/Undo and zero-rating semantics remain authoritative.
+
+Serving appends `+outcome-attribution-v1`; evaluation records `outcomeAttributionVersion` and server-captured `evidenceCutoff`. Outcome occurrence must fit the mature window, while the recorded receipt/impression must be visible by the evidence-read cutoff. A new evaluation may include newly available proof without changing an older evaluation. This bounded reader test establishes neither authenticated arrival timestamps nor large-history performance. DATA_EVENTS owns exact proof membership and event-cutoff semantics.
+
+#### Active List membership — recorded hosted successor
+
+The active #229 `active-list-v1` successor uses current authorized memberships and their latest active added time for ordinary suppression/reminder age. Removing the final membership restores eligibility only when no independent Saved/bootstrap/terminal state suppresses the Item. Existing 30-day reminder minimum age/cooldown, frequency cap and ordinary-before-reminder order remain intact. Its recorded hosted forward is `20260910110344_list_membership_resurfacing.sql`; device acceptance remains separate. List removal need not offer Undo. The optional List-only “Mitä tänään” mode does not replace ordinary Discovery eligibility.
 
 ### Candidate generation and delivery
 
@@ -1176,29 +1063,39 @@ Use bounded candidate sources for durable fit, recent/session fit, prior, novelt
 
 Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
-### Late exposure attribution checkpoint — #228, prepared / not hosted
+### Active #229 successor source and remaining acceptance
 
-The forward `20260910192630_late_outcome_attribution.sql` makes ScenarioMemory and
-mature SleepLayer labels read the same effective Outcome projection. A committed
-unattributed action becomes learnable only when its private immutable receipt and
-an actual pre-action impression prove the exact originally requested run. The
-receipt, stored Event, old evaluations and frozen production/shadow inputs remain
-unchanged. Missing or mismatched proof contributes no Scenario label; duplicate
-impressions do not multiply support, and existing priority/undo rules still apply.
-Ordinary Personal/Shared preference memory is not duplicated by this projection.
+These contracts are present in the unmerged `feat/228-delivered-origin` source,
+inspected at `44b11b4`. They are not claims that accepted main or hosted serving
+already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
 
-Serving policy versions gain `+outcome-attribution-v1`; evaluation metrics declare
-`outcomeAttributionVersion` and the server-captured `evidenceCutoff`. Outcome
-occurrence must fit the existing mature window, while the stored receipt/impression
-must be visible and have recorded creation times within the evidence-read cutoff.
-A newly created evaluation may include later-arriving proof; an already frozen
-evaluation never changes. This records read semantics without changing reward
-values, scalar weights or shadow choices. The full-schema regression compares
-missing-proof, exact late-proof and undo on the same frozen shadow, including a
-zero rating and same-Profile serving support. Native/hosted/device acceptance is
-tracked in STATUS; authenticated arrival timestamps and large-history read costs
-are not established by this bounded correctness test. See DATA_EVENTS for proof
-membership and cutoff details.
+| Source contract | Meaning / remaining boundary |
+|---|---|
+| Late-outcome attribution | Only the immutable command receipt plus actual pre-action exposure can prove the originally requested run; effective outcome reads share an evidence cutoff. Existing Events/evaluations stay frozen. |
+| Frozen replay v2 | Same raw scoring features, genome, Scenario/common-fit inputs and resurfacing/delivery policy for serving/shadow. Equality is conditional on the frozen source pool, not an independently retrieved challenger universe. |
+| Eligibility-first admission | Canonical eligibility precedes raw top-50 retention. This fixes suppression starvation; full-catalog scanning and lack of independent candidate sources remain scale/quality work. |
+| Identified first page | Immutable request/response receipt, exact actor/Profile/session/mode/domain identity and genuine empty-run identity. Retry payload mismatch fails; old row RPC remains for old clients. |
+| Private frozen window | At most 50 candidates/seen IDs, 2 MiB, 15 minutes and 16 windows per actor/Profile. Raw cached candidates include suppressed/already delivered entries and are not another page. |
+
+The next page transaction must recheck current authorization/eligibility, bind an
+opaque cursor and retry receipt to exact scope, advance seen IDs once and commit
+an independent immutable page PredictionRun/ranks. Old runs are never rewritten.
+Page-aware frozen/shadow replay, concurrent window-cap creation and populated
+pre-window-receipt upgrades remain acceptance requirements. Keep
+`continuationSupported: false` until real continuation passes its full boundary.
+
+An empty identified result, exhausted bounded window and transport/authorization
+failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
+Client readiness and visible cached ranking must match environment, actor,
+Profile, session, mode, domain and request/revision. Refetching after a session
+change does not make an older cached run current. Test rapid A → B → A return,
+delayed/error replies and scope changes before switching the prepared page reader.
+
+Active-list membership participates in #229's bounded resurfacing successor;
+removing one membership cannot restore ordinary eligibility while another
+membership or terminal reaction still suppresses the Item. The same versioned
+policy must govern serving and replay. Recorded branch rollout is not inferred
+from the existence of this specification.
 
 ### Adaptive memory without unstable taste
 
@@ -1222,11 +1119,11 @@ Outcome reconciliation handles delayed ratings, unsave/removal and undo without 
 
 Shadow compares alternatives only where observed exposure supports evaluation; it cannot establish how users would have reacted to unseen Items. No global/automatic promotion in MVP. Manual canary needs mature supported evidence, explicit authorization and a rehearsed rollback. Insufficient data keeps the baseline active while evaluation operates.
 
-Learned embeddings/pgvector, sequential/LLM challengers, population learning and full autonomous evolution retain their existing later gates. None is a prerequisite for fixing the current evidence and scoring defects.
+ADR-0008 advances E1 portable contracts and D1/D2 isolated preference research, not production population retrieval or a neural-model requirement. Learned serving embeddings/pgvector, sequential/LLM models, native population learning and autonomous evolution retain later gates. None is a prerequisite for fixing current evidence/scoring defects. Optional D3/D4/D5 studies do not become hidden first-release blockers.
 
 ## 19. Research basis
 
-Primary references reviewed for this design:
+Primary references preserved from the earlier design; newly verified dataset specifications and source limits are maintained in DATA_ENRICHMENT rather than inferred from these general research directions:
 
 - Spotify Research, *Generalized user representations for large-scale recommendations* (2025): multi-signal representations over approximately week/month/six-month scales, near-real-time refresh and synchronized embedding versions. <https://research.atspotify.com/2025/9/generalized-user-representations-for-large-scale-recommendations>
 - Spotify Research, *Calibrated Recommendations with Contextual Bandits* (2025): context-dependent content mix, exploration and multi-objective extension. <https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage>
@@ -1249,20 +1146,37 @@ Primary references reviewed for this design:
 
 References inform direction; Kajo's decisions remain governed by its own evidence, licensing, privacy and product constraints.
 
+## 20. Kajo adapter and external-data boundary — ADR-0008
 
-### Named-list delivery correction required by device feedback (2026-09-10)
+The generic engine contracts and all 51 conceptual parts are defined once in [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). This document supplies Kajo semantics:
 
-Owner-confirmed behavior: adding an Item to a named List is a positive reaction
-and excludes it from ordinary Discovery. The existing Saved-only resurfacing
-check does not satisfy this for CUSTOM Lists. Active authorized List membership
-must participate in eligibility and the existing bounded reminder policy.
-Removing the last membership restores ordinary eligibility only if no other
-reaction suppresses the Item; remaining membership in another List still counts.
-The #228/#229 candidate forward now includes active List membership and its latest
-active added_at in the existing resurfacing decision. It preserves the 30-day
-minimum age/cooldown, frequency cap and ordinary-before-reminder ordering, and
-adds listMembershipPolicyVersion=active-list-v1 to policy metadata. Native Saved,
-bootstrap Saved and terminal reactions remain independent suppression reasons.
-This is implemented in the branch but not yet deployed or device-accepted. List
-removal need not have an undo UX. A separate “Mitä tänään” List-only ranking idea
-is tracked in FUTURE_PLAN and does not replace ordinary Discovery suppression.
+| Generic role | Kajo mapping / owner |
+|---|---|
+| Subject | `Profile`; SharedProfile is its own learned subject |
+| Acting identity | authorized `User`, separately retained as `actorUserId` |
+| Object | canonical `Item`, not provider-specific records |
+| Action | authorized recommendation/slate; policy and hard constraints remain explicit |
+| Observation | source-typed evidence from the native event/command/exposure boundary |
+| Outcome / reward | versioned Kajo meanings, maturity/observability and existing V1 reward projection |
+| State | supported Working/Short/Long/Scenario inputs and later explicit Belief/World/Group composition |
+| DomainAdapter | mapping/feature normalization, target definitions and trusted constraints outside core computation |
+
+E1 creates executable contracts and media/non-media fixtures without moving credentials, provider schemas, React Native or Kajo BOOK/MOVIE enums into the core. Current SQL remains the serving baseline. A component is extracted/replaced only with parity, absence/failure fallback, scope and rollback tests; no second independently drifting full ranker is introduced.
+
+D1/D2 operate in isolated research storage. Keep source-local people and ratings distinct from Kajo accounts/Events, preserve original scales/timestamp semantics and never fabricate missing exposures, alternatives, mood, consumption time or group state. D3 Tag Genome, D4 Beliefs and D5 KuaiRand remain optional after D2; they are independent follow-up studies. Detailed manifests/schema rules/metrics live in DATA_ENRICHMENT, not a duplicate specification here.
+
+A future admitted ExternalTastePrior uses canonical Item mapping and compatible immutable artifacts. It is separately source-weighted/ablated, shrinks with relevant native support and transfers across domains only with evidence. Data/rights withdrawal propagates through jointly trained or distilled dependencies; raw-file removal alone is not proof of influence removal.
+
+Memory retrieval enforces authorization and time/source eligibility before nearest-neighbor selection and again at use. Encode only the decision-time prefix for a query; do not retrieve by its own hidden future Outcome/After/Error. Index/encoder versions must match. The output may be an uncalibrated score; probability heads enter only with explicit target/horizon/conditioning, real labels and calibration.
+
+The core distinguishes present-state hypotheses, stochastic future paths,
+alternative actions and model Challengers. Compare only targets actually
+observed under a valid horizon/action; a never-chosen action is not a negative
+label. Memory scope and observed/synthetic origin are separate dimensions.
+Snapshot versus ordered-trajectory retrieval is a declared D2 experiment, with
+no-match fallback and independent support. Interest, choice, consumption and
+later satisfaction may become separate heads; current V1 reward constants are
+not silently relabeled as those probabilities. Replay, simulation, consolidation
+and evolution require separate ablations before increased complexity is admitted.
+
+Documentation acceptance does not deploy any of these new components. [STATUS](../project/STATUS.md) retains #229's unmerged source and undeployed forwards, and [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.

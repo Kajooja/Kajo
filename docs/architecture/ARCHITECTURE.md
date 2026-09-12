@@ -4,9 +4,13 @@ Status: **canonical implemented boundaries + first-release target architecture**
 Architecture decisions: `docs/architecture/decisions/`  
 Taste-first decision: ADR-0007
 
+Independent-engine refinement: [ADR-0008](decisions/0008-portable-predictive-memory-engine-and-external-priors.md)
+
+This file owns Kajo product/runtime boundaries. The complete reusable 51-part engine target is [PREDICTIVE_MEMORY_ENGINE](PREDICTIVE_MEMORY_ENGINE.md); Kajo-specific prediction/evidence semantics remain in [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). [DATA_ENRICHMENT](DATA_ENRICHMENT.md) owns isolated public-data research and artifact admission. Planned contracts are not claims of implemented packages or deployed models.
+
 ## 1. Architecture principles
 
-Kajo is one product with generic cross-domain recommendation, Profile-scoped memory and deliberately separated identity/social/acquisition concerns.
+Kajo is one product with generic cross-domain recommendation, Profile-scoped memory and deliberately separated identity/social/acquisition concerns. It is the first application of an independent Predictive Memory Engine.
 
 Non-negotiable boundaries:
 
@@ -17,13 +21,15 @@ Friendship             != SharedProfile membership
 Acquisition telemetry  != recommendation evidence
 Mobile presentation    != recommendation logic
 Provider schemas       != Kajo domain model
+Kajo domain adapter    != reusable prediction computation
+External/Synthetic     != native observed Kajo evidence
 ```
 
 Scale principle:
 
 > **Design stable contracts for one million users; provision infrastructure for measured demand.**
 
-Do not introduce Kafka, Kubernetes, a graph database, many microservices or regional complexity merely because Kajo may later need them. Split components only when measured latency, throughput, recovery, cost or isolation requires it.
+Do not introduce Kafka, Kubernetes, a graph database, many microservices or regional complexity merely because Kajo may later need them. Split deployments only when measured latency, throughput, recovery, cost or isolation requires it. Logical engine separation is established through contracts without requiring a separate network service.
 
 ## 2. Repository shape
 
@@ -37,17 +43,17 @@ kajo/
 │   ├── mobile/                  # React Native + Expo
 │   └── web/                     # create only when Taste web implementation begins
 ├── services/
-│   └── prediction/              # create only when Postgres serving no longer suffices
+│   └── prediction/              # only when a separate serving deployment is justified
 ├── supabase/
 │   ├── migrations/
 │   └── functions/
-├── packages/                    # shared contracts/UI only after actual reuse exists
-├── scripts/
+├── packages/                    # executable reusable contracts/core when E1 begins
+├── scripts/                     # bounded research/operational tools when implemented
 ├── docs/
 └── .github/
 ```
 
-Do not create empty folders to match this diagram.
+Do not create empty folders to match this diagram. E1 may create an actual tested engine-contract package; it does not force an immediate SQL-to-service rewrite. CODEMAP lists real code paths, not every conceptual module in the target design.
 
 ## 3. Clients
 
@@ -120,6 +126,8 @@ Requirements:
 - raw auth/invite tokens never enter analytics/log payloads.
 
 Existing email confirmation/recovery flows remain valid for email/password identity. Social auth becomes the primary low-friction launch continuation.
+
+External dataset people are release-scoped research Subjects, not anonymous identities or Kajo Users. Do not manufacture accounts to reuse native event ingestion.
 
 ## 5. Acquisition architecture
 
@@ -195,7 +203,9 @@ MVP backend direction remains:
 
 Presentation components do not scatter direct database access. Use typed service/data boundaries.
 
-Production clients contain only publishable/public configuration. Service-role credentials, database passwords and provider secrets remain server-only.
+Production clients contain only publishable/public configuration. Service-role credentials, database passwords and provider secrets remain server-only. The reusable computation core receives authorized/versioned inputs and injected storage/time/randomness ports, not auth tokens or provider clients.
+
+The external-data workspace is separate from the production transactional database and has no production write credentials. Its batch jobs and learned artifacts have their own manifests, lifecycle and admission checks.
 
 ## 8. Event and command reliability
 
@@ -221,9 +231,11 @@ The #228 List correction extends the existing private resurfacing decision with 
 
 Recommendation delivery origin is frozen truthfully. A cached Item from another Profile/mode/run cannot inherit a hosted `predictionId`.
 
-The #228 draft replaces detail latest-pool guessing with a bounded, scope/session-checked delivered snapshot. Per-Item Shared tiers are frozen; injected pending/member-history Items cannot borrow the ranking Prediction. Detail actions and dwell use the captured descriptor, while live consensus controls remain current. Dwell retains its start-time recording callback. A client-only origin session/Item guard rejects stale Event/action admission; action dispatch and result projection invalidate at layout-time session changes. Lists/Shared async completion tokens expire on session changes and unmount, and destination loading/saving is specific to the current open request. Full `MVP-DATA-004` acceptance still requires late-outcome and representative async/session runtime verification; this client snapshot does not replace server trace validation.
+The inspected accepted-main runtime baseline (`6dd1fec`) has fallback lookups across remembered runs in `predictionRankingCache.ts` without a Profile filter. Exact Profile/run/slate retrieval and overlay provenance remain release requirements under `MVP-DATA-004`; active #228/#229 source corrections are not accepted main by implication. Follow STATUS for the actual code/deployment/device gates.
 
-Growth/acquisition telemetry has separate semantics and retention. Analytics failure must not roll back auth, Friendship, Taste or SharedProfile state.
+The active #228/#229 source replaces detail latest-pool guessing with a bounded, scope/session-checked delivered snapshot. Per-Item Shared tiers are frozen; injected pending/member-history Items cannot borrow the ranking Prediction. Detail actions and dwell use the captured descriptor, while live consensus controls remain current. Dwell retains its start-time recording callback. A client-only origin session/Item guard rejects stale Event/action admission; action dispatch and result projection invalidate at layout-time session changes. Lists/Shared async completion tokens expire on session changes and unmount, and destination loading/saving is specific to the current open request. Full `MVP-DATA-004` acceptance still requires late-outcome rollout and representative async/session runtime verification; this client snapshot does not replace server trace validation. Visible ranking/cache readiness also needs the separately recorded captured-session acceptance before the prepared identified reader is activated.
+
+Growth/acquisition telemetry has separate semantics and retention. Analytics failure must not roll back auth, Friendship, Taste or SharedProfile state. External research and synthetic observations use separate typed records, not new native Event variants introduced by this documentation change.
 
 ## 9. Catalog architecture
 
@@ -250,40 +262,53 @@ Requirements before release:
 - normalized shared feature mapping,
 - provider outage tolerance.
 
+Research object-feature enrichment is a distinct input path. Admission requires validated canonical ID mapping, explicit score/encoder version, coverage, source rights and temporal availability. A public rating dataset does not grant image/metadata rights from every linked provider. Unmapped research objects remain unmapped rather than forcing fuzzy catalog merges.
+
 ## 10. Prediction architecture
 
-Stable conceptual request:
+Stable Kajo request:
 
 ```text
-Profile + Context + DiscoveryMode
-→ bounded candidate retrieval
-→ feature/state assembly
-→ ranker
-→ policy/slate builder
-→ PredictionRun + complete PredictionCandidates
+Profile + authorized actor + Context + DiscoveryMode
+→ Kajo DomainAdapter
+→ bounded eligible candidate and memory retrieval
+→ versioned feature/state assembly
+→ outcome/ranking estimates
+→ policy/slate builder + hard constraints
+→ atomic frozen PredictionRun + complete PredictionCandidates
 → delivered slate
 ```
 
-Current V0/V1 SQL boundaries remain valid while appropriate. Prediction transport may later move to Python/FastAPI without changing the Profile/Item/Event/Prediction contract.
+The independent engine's full cycle and modules are in [PREDICTIVE_MEMORY_ENGINE](PREDICTIVE_MEMORY_ENGINE.md). The Kajo adapter maps Profile to prediction Subject, User to acting identity and Item to Object. It owns domain targets/rewards, provider feature normalization and trusted constraints; the reusable core does not know BOOK/MOVIE, UI components or authentication implementation.
+
+Current V0/V1 SQL boundaries remain valid while appropriate. Only the accepted public serving boundary is exposed to clients; private baselines/workers remain private. A future service or package may replace a component only after behavior/parity and admission tests, not by duplicating the whole scorer independently. No transport/language choice is made mandatory by portability.
 
 ### Online state
+
+Existing Kajo layers remain:
 
 - `WorkingState`: ordered session intent; reconstructed/cached.
 - `ShortTermState`: recent versioned projection.
 - `LongTermState`: durable versioned projection.
 - `ScenarioMemory`: similar same-Profile historical episodes.
-- future `PopulationMemory`: privacy-gated aggregate/collaborative layer.
+- future native `PopulationMemory`: privacy-gated aggregate/collaborative layer.
 
-Taste/import evidence initializes PersonalProfile state with explicit provenance and fades/supersedes behind native evidence according to versioned rules.
+The target adds explicit `BeliefState`, `WorldState` and `GroupState` composition without falsely declaring separate implemented tables. World trends are not durable personal taste. Unsupported probability/uncertainty outputs remain unavailable rather than fabricated.
+
+Taste/import evidence initializes PersonalProfile state with explicit provenance and fades/supersedes behind native evidence according to versioned rules. A later admitted `ExternalTastePrior` is separately licensed, bounded and ablated; it is neither the existing catalog ColdStartPrior nor native PopulationMemory.
 
 ### Candidate/serving requirements
 
-- bounded eligibility/filtering,
+- bounded authorized eligibility/filtering and retrieval,
 - candidate union/refill after suppression,
-- stable pagination/cursor semantics,
-- shared normalized features across domains,
-- one scoring/policy implementation for serving/shadow parity,
-- complete versioned trace before correlated learning.
+- stable pagination/cursor semantics and separate immutable page records,
+- shared normalized features across domains with transfer reliability,
+- one scoring/policy contract for serving/shadow parity,
+- decision-time feature/encoder/index/model versions and information cutoff,
+- complete frozen trace before correlated learning,
+- horizon/observability semantics before introducing probability heads.
+
+Authorization/source/time scope constrains memory search before nearest-neighbor selection and again at materialization. The query cannot contain its own future Outcome/After/Error. Frozen predictions remain historical records even though their estimates were computed by a model.
 
 ## 11. Taste Test architecture
 
@@ -299,7 +324,7 @@ TasteSession state
 → repeat until stop/confidence/fail-open
 ```
 
-Initial question selection may be deterministic/heuristic and inspectable. Learned active selection is introduced only when measured evidence shows improvement.
+Initial question selection may be deterministic/heuristic and inspectable. Learned active selection is introduced only when measured evidence shows improvement. An external offline cold-start benchmark does not substitute for Kajo first-session usefulness.
 
 ### Holdout challenge
 
@@ -314,7 +339,7 @@ freeze taste/state snapshot
 → only then add response to future taste state
 ```
 
-User-facing accuracy cannot be generated from answers already seen by the model.
+User-facing accuracy cannot be generated from answers already seen by the model, including through a fitted prior, prototype or preprocessing statistic.
 
 ### Recommendation preview
 
@@ -333,7 +358,7 @@ Current common-fit architecture combines:
 - disagreement penalty,
 - neutral sparse prior.
 
-Personal raw evidence is not copied into Shared history/explanations. Friend status alone never enters this private evidence path.
+Personal raw evidence is not copied into Shared history/explanations. Friend status alone never enters this private evidence path. Membership changes invalidate dependent aggregates/caches while retaining truthful historical consensus. External movie ratings cannot establish joint-group outcomes.
 
 ## 13. SleepLayer / evolution architecture
 
@@ -351,7 +376,7 @@ PredictionRun + frozen state + candidates
 
 MVP requires an operating bounded/retry-safe evaluator and manual canary/rollback. Automatic/global promotion remains disabled until a later explicit evidence decision.
 
-Synthetic/counterfactual scenarios are model assumptions, never rewritten as historical Events/Outcomes.
+WorldModel estimates and PolicyEngine decisions are separate. The future DreamEngine generates bounded hypotheses; it does not prove causal effects or give observed rewards to unseen alternatives. Synthetic/counterfactual scenarios are model assumptions, never rewritten as historical Events/Outcomes. Keep representative real validation and a final untouched test outside evolutionary selection.
 
 ## 14. One-million-user scale path
 
@@ -383,10 +408,11 @@ Capacity planning distinguishes:
 - invite/friend graph volume,
 - SharedProfiles/User,
 - trace retention,
-- shadow multiplier,
-- image egress.
+- shadow/dream multiplier,
+- image egress,
+- external training/index build resources when actually used.
 
-Do not budget from User count alone.
+Do not budget from User count alone. Isolated offline research does not imply a new production microservice.
 
 ### Data structures
 
@@ -401,7 +427,7 @@ A scale migration must preserve:
 - actor/Profile evidence separation,
 - Taste lineage,
 - Friend vs Shared separation,
-- model/version traceability,
+- model/version/permission traceability,
 - deletion lineage,
 - authorization semantics.
 
@@ -411,9 +437,9 @@ Infrastructure may change; domain truth must not.
 
 Clients cache only bounded authorized presentation data, delivered slates, preferences and pending commands.
 
-Server may maintain invalidatable Profile/model/slate caches. Cache keys include every privacy/behavior dimension needed to prevent cross-Profile or cross-policy leakage.
+Server may maintain invalidatable Profile/model/slate caches. Cache keys include every privacy/behavior dimension needed to prevent cross-Profile or cross-policy leakage. Derived continuation caches expire without deleting historical evidence.
 
-Provider refresh, image enrichment, compaction and SleepLayer work remain outside interaction latency paths.
+Provider refresh, image enrichment, research training, compaction and SleepLayer work remain outside interaction latency paths. Model/index bundles are compatible and versioned; absent/invalid/withdrawn external artifacts fall back safely.
 
 Backpressure pauses/degrades background learning before harming core serving.
 
@@ -442,9 +468,10 @@ At minimum inventory covers:
 - image delivery/storage/cache,
 - background workers/SleepLayer,
 - crash/diagnostic/analytics stack,
-- build/signing/store infrastructure.
+- build/signing/store infrastructure,
+- model/artifact delivery only if admitted into runtime.
 
-Do not release with “some server later” placeholders.
+Research workspaces and dataset/artifact manifests have separate ownership/access/storage/cost rules. No production credentials or raw external histories belong in their public reports. Do not release with “some server later” placeholders.
 
 ## 17. Retention/deletion
 
@@ -461,9 +488,10 @@ Versioned lifecycle rules cover:
 - Prediction traces/shadows/evaluations,
 - logs/analytics,
 - caches/device outbox,
-- backups.
+- backups,
+- learned/prototype/index dependencies and research source/permission withdrawal where relevant.
 
-Deletion propagates into derived state according to lineage and must not be resurrected by restore/worker replay.
+Deletion propagates into derived state according to lineage and must not be resurrected by restore/worker replay. Evidential decay is not storage deletion. Removing a raw source or setting its runtime weight to zero does not establish removal from a jointly trained/distilled artifact; maintain replacement/retraining lineage.
 
 ## 18. Security / abuse
 
@@ -479,7 +507,7 @@ Public Taste/Friend links require:
 - redacted logs,
 - bounded anonymous-account creation.
 
-Personal data is private by default. Friendship alone is not an authorization grant to PersonalProfile evidence.
+Personal data is private by default. Friendship alone is not an authorization grant to PersonalProfile evidence. Neither embeddings nor anonymized-looking IDs automatically make private history safe to publish. Research imports validate archives/rows and never execute dataset content.
 
 ## 19. Release architecture gates
 
@@ -489,14 +517,15 @@ Architecture is ready for broad Taste-link distribution only after:
 2. recommendation evidence is reliable,
 3. serving/shadow parity and candidate refill pass,
 4. real catalog/features support useful cold start,
-5. adaptive state/policy and Taste Test are validated,
-6. anonymous → permanent identity continuity passes,
-7. Friend invite/Friendship/Shared creation authorization passes,
-8. outbox/telemetry/retention/abuse controls pass,
-9. load/failure/restore/rollback drills pass,
-10. owner accepts the store/public release.
+5. portable contracts and the bounded external-data report/permission decision are reproducible,
+6. adaptive state/policy and Taste Test are validated,
+7. anonymous → permanent identity continuity passes,
+8. Friend invite/Friendship/Shared creation authorization passes,
+9. outbox/telemetry/retention/abuse controls pass,
+10. load/failure/restore/rollback drills pass,
+11. owner accepts the store/public release.
 
-`ROADMAP.md` names the final decision **Share Link Gate**.
+A losing or unadmitted learned prior stays out of serving and does not require indefinite research. `ROADMAP.md` names the final decision **Share Link Gate**.
 
 ## 20. Current implementation-specific boundaries to preserve
 
@@ -514,3 +543,9 @@ Historical implementation details remain discoverable through sprint files, migr
 - historical deployed migrations are immutable; fresh-install repair uses explicit accepted migration/baseline strategy rather than rewriting history.
 
 See `CODEMAP.md`, active sprint handoff and ADRs for implementation paths/details.
+
+## 21. Incremental portability and research boundary
+
+E1 makes the engine contract executable with Kajo/media and small synthetic non-media fixtures. It does not move production scoring into the mobile app or bypass the trusted server. D1/D2 introduce an isolated external-data adapter and reproducible baselines. E2 may later replace one admitted component behind existing Kajo contracts with parity, fallback and rollback tests.
+
+The complete source proposal is retained separately: transparent state/memory → latent representations → explicit outcome/next-state model → bounded multistep dreams → self-evolving geometry. Each generation needs its own suitable data and acceptance. Movie-only rating accuracy cannot close all of those gates.

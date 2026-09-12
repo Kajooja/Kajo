@@ -7,6 +7,13 @@ Started: **2026-08-25**
 
 Deliver the complete non-commercial first public BOOK/MOVIE Kajo: anonymous Taste/link entry, an honest held-out prediction challenge, taste-preserving Google/Apple conversion, useful and measurably adaptive Personal/Shared recommendations, personal Friend invitations and explicit consent-based Shared creation. Core browsing/collaboration, reliable evidence, real-device flows and operated production services with tested data lifecycle and recovery must pass the Share Link Gate. Graphics may evolve without changing these behavioral contracts.
 
+The 2026-09-12 refinement adds executable independent-engine contracts and an
+isolated reproducible MovieLens baseline report (E1 #235 → D1 #236 → D2 #237).
+It does not require a winning learned prior, full neural world model or automatic
+promotion. Required Shared rating rounds and controlled rewatch (#232, Phase16.3)
+preserve each participant's response before completed joint history. MVP owns
+the corresponding ENG and SOCIAL requirement IDs; none is delivered by planning.
+
 ## Acceptance source
 
 `docs/product/MVP.md` is the executable requirement list for this milestone.
@@ -24,7 +31,8 @@ Sprint 011 Lists and Sprint 012 messaging foundations are delivered with refresh
 ## Known milestone risks
 
 - Over-expanding item domains before the book/movie core works.
-- Building the evolution engine before enough outcome data exists.
+- Admitting native evolution before enough valid outcome data exists, or delaying
+  isolated public-data research merely because native volume is still small.
 - Letting the Room become a game/3D project instead of a minimal interface.
 - Domain-specific code drift that breaks cross-domain learning.
 - Losing project decisions in AI conversations instead of repository memory.
@@ -44,6 +52,8 @@ MVP 0.1 may be marked **COMPLETE** only when every gate below is satisfied. A dr
 | Hosted backend | Required migrations/functions/configuration are permanently applied, authorization/RLS and rollback/recovery checks pass, and client roles have least privilege |
 | End-to-end behavior | Anonymous link → adaptive Taste → frozen holdout challenge → unseen preview → Google/Apple conversion preserves taste; personal invite → accepted Friendship → explicit Shared creation is exercised, alongside login/recovery, all DiscoveryModes, rating/consumption, Lists, Endorsement, messaging, restart and failure/retry paths |
 | Prediction evidence | Hosted PredictionRun/candidate/session/Event/Outcome correlation is verified without Personal/Shared leakage; fallback remains distinguishable and rollback is documented |
+| Portable engine/research | E1/D1/D2 run reproducibly on declared fixtures/real-data cohort with train-only temporal evaluation, an honest report and artifact admission/rejection/fallback; external/synthetic records never become native evidence |
+| Joint experience | #232 participant responses, completion/correction/rewatch and Personal isolation pass before beta; no first actor is treated as every member |
 | Real devices | Representative supported real-device flows pass; compilation or emulator-only evidence is insufficient for final acceptance |
 | Release | A signed production build with stable identifiers, versioning, production email, privacy/support/store metadata and no embedded privileged secret is downloadable through an official app store; the corresponding browser-to-app link/identity flow is accepted |
 | Operations | Crash/error/latency and critical backend health are observable; support, account deletion/data handling and release rollback paths are documented and tested at the agreed MVP level |
