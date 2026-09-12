@@ -14,6 +14,73 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog v3 hosted checkpoint — 2026-09-12 / #182
+
+The owner requested completion of the reviewed PR #245/Edge/one-page canary packet
+and a resumable repository handoff. PR #245 was merged after rechecking all five
+required CI #482 jobs at `9214a268d84281663a728ea055dd4b4dd073a262` and unchanged
+base `969c1195700dfc67b3787eb4a51eb70fda8c6ee9`. Accepted source is now
+`ad75fc00b100099af4986abfc9955afe308eb6e6`. No repeat approval is needed for these
+completed actions or the same bounded canary once its credential prerequisites hold.
+
+The three-file deployment was regenerated from accepted main and replayed all
+13 catalog HTTP cases with a fresh cache and npm/remote imports disabled. Its
+payload SHA-256 remains
+`3533d2bf02ebe02be9f8bb30c8ea7ccbd8b8090f455aaa5fcd8f357efd74f010`.
+It was deployed only to `catalog-import` on `mwrnvfosrzwygrunrltm`:
+
+| Deployed property | Verified value |
+| --- | --- |
+| Function ID | `852f5604-48d0-4fad-8868-1f276feb4621` |
+| Version / status | 3 / ACTIVE |
+| JWT gateway check / import map | `false` / `true` |
+| ESZIP SHA-256 | `a0ec5d55a2cf61737b11f6a2191d2778f3121e438827e2d141dd9c493a8690b7` |
+| Source readback | All three file contents exactly match the approved payload |
+
+**The hosted configuration acceptance gate failed.** Real HTTPS probes after
+deployment used the deliberately unsupported action `invalid-preflight-only`,
+so no successful authorization could accidentally start a provider import:
+
+| Probe | Observed response | Evidence limit |
+| --- | --- | --- |
+| GET, no credentials | 405 `method-not-allowed` | Handler boots and method guard runs |
+| POST, no credentials | 500 `server-not-configured` | Environment validation stops before caller/provider work |
+| POST, foreign modern fixture apikey | 401 `Invalid API key` | Gateway rejection; not the handler's exact-key test |
+| POST, forged legacy fixture Bearer | 500 `server-not-configured` | Same configuration gate; hosted key acceptance unverified |
+
+A later bounded anonymous POST recheck returned the same 500 response; the gate
+did not clear during this session.
+
+The exact missing or rejected environment input has not been identified.
+`SUPABASE_URL` and `readServerKeys()` are checked before request authentication;
+the latter rejects malformed named/local keys or legacy configuration. This error
+does not establish that TMDB_READ_ACCESS_TOKEN is absent, nor justify changing
+key validation speculatively. The source/test success cannot be reported as
+successful hosted authorization or import.
+
+The read-only coverage query passed again after deployment and matches the baseline:
+415 visible BOOK / 30 MOVIE, 385 book images, no movie images or visible descriptions,
+zero TMDB source rows and zero visible mocks. Batch EXECUTE remains false for
+anon/authenticated and true for service_role. No provider data, secret value,
+account state or installed migration was changed by the deployment/probes.
+
+The Supabase connector is connected but has no secret-listing or function-invocation
+capability. No privileged invocation credentials are configured in the local admin
+environment. Browser inspection of the Secrets page led to sign-in; the secure
+GitHub choice/manual continuation did not produce a verified signed-in Supabase
+page. No secret values were requested or printed. The owner offered to retrieve
+settings instead and was asked for the five relevant secret names' presence plus
+active secret/legacy-key status, with values concealed. Wait for/use that report
+instead of repeating the uncompleted browser flow or requesting values in chat.
+
+Recovery remains within #182: resolve the configuration cause through a supported
+authorized administration path, keep the exact-key boundary, verify anonymous/user
+denial and an authorized unsupported-action request, then run the already-authorized
+one-page canary and before/after coverage. Stop before broader pages. Do not restore
+unlocked v2 or delete Items to hide this failure. Any needed source correction uses
+its own bounded branch/PR and root/current-head gates; the six #229 forwards,
+password/auth callback deployments, APKs and native/device work remain separate.
+
 ## Catalog rollout preparation — 2026-09-12 / #182
 
 PR #244 was owner-approved and merged to `969c1195700dfc67b3787eb4a51eb70fda8c6ee9`

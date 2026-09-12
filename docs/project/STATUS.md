@@ -10,44 +10,51 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current source packet — #182 catalog rollout preparation
+## Current hosted packet — #182 configuration recovery
 
-**PR [#244](https://github.com/Kajooja/Kajo/pull/244) is accepted on main
-`969c1195700dfc67b3787eb4a51eb70fda8c6ee9`.** The owner approved its merge;
-all five required CI #480 jobs passed at
-`b7b35395feb6c29d722fb1254166be0ab7a8b55c`.
-Its source audit is complete. E1/D1/D2 remain accepted bounded foundations and
-the rejected external challenger remains research-only.
+**PR [#245](https://github.com/Kajooja/Kajo/pull/245) is accepted on main
+`ad75fc00b100099af4986abfc9955afe308eb6e6`.** The owner authorized completing its
+merge, the prepared catalog-only Edge update and the one-page TMDB canary once
+credentials are verified. All five required CI #482 jobs passed at unchanged head
+`9214a268d84281663a728ea055dd4b4dd073a262`; head/base/CI were rechecked before merge.
+These approvals are recorded and must not be requested again for the same scope.
+PR #244 and E1/D1/D2 remain accepted; the rejected challenger remains research-only.
 
-**Active successor: `fix/182-catalog-rollout-packet`, based on that accepted main.**
-The read-only hosted comparison found `catalog-import` v2 still running the older
-floating SDK source, with `verify_jwt=false`. Real HTTP probes returned the expected
-405/403; the database batch RPC remains service-role-only. Fresh coverage confirms
-415 discoverable BOOK / 30 MOVIE, 385 book images, no movie images and no descriptions
-on discoverable Items. There are zero TMDB sources and zero discoverable mocks.
+**`catalog-import` v3 is ACTIVE on project `mwrnvfosrzwygrunrltm`.** The exact
+approved dependency-free three-file payload was regenerated from accepted main,
+passed the 13-case packaged replay and was deployed with `verify_jwt=false` and
+the function-local import map. Downloaded source matches all three files exactly.
+Password auth, auth callback and database migrations were not deployed.
 
-The successor removes the catalog function's sole SDK call in favor of native
-Data API RPC. Exact configured-key authorization, FI/EN normalization and canonical
-atomic batch upsert remain; incomplete RPC success now fails explicitly. Its exact
-three-file deployment payload passes the 13 catalog HTTP cases with a fresh cache
-and npm/remote imports disabled. This avoids assuming the source-only frozen lock
-is honored by hosted bundling. Password auth retains the pinned SDK/source lock.
-Local root check passed **375 tests**, plus the packaged replay of those 13 catalog
-cases, lint/typecheck and both Hermes exports; the existing Hook warning remains.
+**Hosted acceptance is blocked: POST currently returns 500
+`server-not-configured`.** GET returns 405; a foreign modern apikey is rejected
+by the gateway with 401. The anonymous and forged-legacy POST responses reach the
+handler's configuration gate, so neither hosted key acceptance nor the provider
+path is verified. The exact missing/rejected environment variable is unknown.
+Do not infer TMDB-token absence from this earlier configuration error, weaken
+authentication, export secret values or restore floating v2 code to get past it.
 
-**Next bounded task: finish this successor's five current-head CI gates and source
-merge, then obtain recorded authorization for the exact catalog Edge rollout.**
-The [rollout checkpoint](sprints/SPRINT-014.md#catalog-rollout-preparation--2026-09-12--182)
-owns the payload hash, reproduction command, single-page TMDB canary and before/after
-coverage query. The current connector cannot list secret names and the local admin
-environment has no configured credentials: `TMDB_READ_ACCESS_TOKEN` and a usable
-server invocation key are **unverified**, not proven missing on the server. Resolve
-those via a supported authenticated secret-name listing/setup before actual import;
-never ask for secret values in chat. No hosted write/import was performed.
+Before/after read-only coverage is unchanged: 415 discoverable BOOK / 30 MOVIE,
+385 book images, no movie images or discoverable descriptions, zero TMDB sources
+and zero discoverable mocks. No provider import or secret change occurred. The
+batch RPC remains service-role-only. Source check/CI passed **375 tests**, plus
+the 13-case staged replay; this is not proof of a working hosted import.
 
-PR #244's merge approval is resolved and must not be requested again. It does not
-authorize this new hosted deployment or provider import. Keep #182 open for catalog
-breadth/quality; source/packet tests are not hosted successor or real-TMDB evidence.
+**Next bounded task: resolve the hosted configuration gate, then complete the
+already-authorized one-page canary.** The owner offered to retrieve settings because
+browser sign-in was not completed. First consume their report of names present in
+Edge Functions > Secrets (`SUPABASE_URL`, `SUPABASE_SECRET_KEYS`,
+`SUPABASE_SERVICE_ROLE_KEY`, optional `SUPABASE_SECRET_KEY`, `TMDB_READ_ACCESS_TOKEN`)
+and active secret/legacy-key status in Settings > API Keys. Request names/status
+only, never values in chat. The connected tool cannot list secrets; the local admin
+environment has no configured credentials. Do not restart an unfinished browser
+login unless the owner wants that route.
+
+The [hosted checkpoint](sprints/SPRINT-014.md#catalog-v3-hosted-checkpoint--2026-09-12--182)
+owns exact hashes/probes and recovery constraints. Once configuration is corrected
+through an authorized supported path, verify rejection behavior and a privileged
+unsupported-action request before running the prepared single-page canary. Re-run
+coverage and inspect real metadata before any broader import. Keep #182 open.
 
 #229 retains its separate native/device/fresh-account gates and six installed
 immutable forwards; do not redeploy them or reset accounts for this catalog unit.

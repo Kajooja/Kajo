@@ -133,12 +133,12 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-#182's source-audit prerequisite is accepted in PR #244. Hosted inspection confirms
-old v2 source and no TMDB inventory. The successor prepares a dependency-free catalog
-deployment payload, offline packet verification and one-page import/coverage checks.
-After its source CI/merge, verify server credential availability and obtain the
-recorded hosted rollout/import authorization. Fixture success does not verify
-deployment or close catalog breadth, provider rights or native quality gates.
+#182's source-audit and reproducible deployment prerequisites are accepted through
+PR #245. The owner-authorized v3 catalog deployment matches source exactly, but its
+hosted POST configuration gate returns `server-not-configured`; no TMDB import has
+run. Resolve the actual server configuration, then verify the already-authorized
+one-page canary and coverage before expansion. Fixture/source success does not
+close hosted import, catalog breadth, provider rights or native quality gates.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
