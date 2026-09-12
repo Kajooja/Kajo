@@ -20,41 +20,55 @@ credentials are verified. All five required CI #482 jobs passed at unchanged hea
 These approvals are recorded and must not be requested again for the same scope.
 PR #244 and E1/D1/D2 remain accepted; the rejected challenger remains research-only.
 
-**`catalog-import` v3 is ACTIVE on project `mwrnvfosrzwygrunrltm`.** The exact
-approved dependency-free three-file payload was regenerated from accepted main,
-passed the 13-case packaged replay and was deployed with `verify_jwt=false` and
-the function-local import map. Downloaded source matches all three files exactly.
-Password auth, auth callback and database migrations were not deployed.
+PR #246 accepted the deployment handoff on main
+`65317c03fde0ee85ce560f61489d3434a79a843f` after all five CI #484 jobs passed.
+The original approved catalog deployment was v3. The latest pre-diagnostic
+readback reports ACTIVE v5 with `verify_jwt=false` and the function-local import
+map; all three files still match the accepted PR #245 source exactly.
 
 **Hosted acceptance is blocked: POST currently returns 500
 `server-not-configured`.** GET returns 405; a foreign modern apikey is rejected
 by the gateway with 401. The anonymous and forged-legacy POST responses reach the
 handler's configuration gate, so neither hosted key acceptance nor the provider
-path is verified. The exact missing/rejected environment variable is unknown.
-Do not infer TMDB-token absence from this earlier configuration error, weaken
-authentication, export secret values or restore floating v2 code to get past it.
+path is verified. A bounded POST after the owner's TMDB-token setup still returned
+the same 500. The exact rejected configuration input is unknown; names visible in
+the Dashboard do not establish runtime values or parser acceptance.
 
 Before/after read-only coverage is unchanged: 415 discoverable BOOK / 30 MOVIE,
 385 book images, no movie images or discoverable descriptions, zero TMDB sources
-and zero discoverable mocks. No provider import or secret change occurred. The
-batch RPC remains service-role-only. Source check/CI passed **375 tests**, plus
-the 13-case staged replay; this is not proof of a working hosted import.
+and zero discoverable mocks. These are the original deployment's before/after
+aggregates; no provider import has run. The batch RPC remains service-role-only.
 
-**Next bounded task: resolve the hosted configuration gate, then complete the
-already-authorized one-page canary.** The owner offered to retrieve settings because
-browser sign-in was not completed. First consume their report of names present in
-Edge Functions > Secrets (`SUPABASE_URL`, `SUPABASE_SECRET_KEYS`,
-`SUPABASE_SERVICE_ROLE_KEY`, optional `SUPABASE_SECRET_KEY`, `TMDB_READ_ACCESS_TOKEN`)
-and active secret/legacy-key status in Settings > API Keys. Request names/status
-only, never values in chat. The connected tool cannot list secrets; the local admin
-environment has no configured credentials. Do not restart an unfinished browser
-login unless the owner wants that route.
+**The owner has added `TMDB_READ_ACCESS_TOKEN` and confirmed both `SUPABASE_URL`
+and plural `SUPABASE_SECRET_KEYS` are present.** A Default secret key is visible
+under API Keys; the legacy anon/service-role variables show Deprecated. Optional
+singular `SUPABASE_SECRET_KEY` is absent. Do not repeat these presence/setup requests.
+TMDB token validity and privileged invocation remain unverified.
 
-The [hosted checkpoint](sprints/SPRINT-014.md#catalog-v3-hosted-checkpoint--2026-09-12--182)
-owns exact hashes/probes and recovery constraints. Once configuration is corrected
+**Recovery source: `fix/182-catalog-config-diagnostics`.** This bounded packet
+adds fixed configuration reason codes only to the private function log. The public
+500 response and exact configured-key authorization remain unchanged. Malformed
+JSON, environment errors, configured key names/values and request data never enter
+the diagnostic message. Source/CI and deployed-version evidence are tracked in
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+
+**Next bounded task: finish the verified catalog-only diagnostic rollout and read
+its actual failure reason, then recover configuration and complete the authorized
+one-page canary.** Inspect the latest Issue #182 checkpoint before deploying so a
+completed rollout is not repeated. After source/current-head gates and exact
+three-file readback, use one unsupported-action probe and the function's **Logs**
+view to find `catalog-import configuration failed:`. The owner can supply only that
+fixed reason line. The connected tool cannot read function logs or secret names;
+the local admin environment has no invocation credentials. Use the owner's supported
+settings/log path; do not restart browser sign-in unless the owner wants that route.
+
+The [diagnostic checkpoint](sprints/SPRINT-014.md#catalog-configuration-diagnostics--2026-09-12--182)
+owns reason meanings and the owner log workflow; the older v3 checkpoint retains
+its dated hashes/probes. Once configuration is corrected
 through an authorized supported path, verify rejection behavior and a privileged
 unsupported-action request before running the prepared single-page canary. Re-run
 coverage and inspect real metadata before any broader import. Keep #182 open.
+Do not weaken authentication, expose secret values or restore floating v2 code.
 
 #229 retains its separate native/device/fresh-account gates and six installed
 immutable forwards; do not redeploy them or reset accounts for this catalog unit.

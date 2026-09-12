@@ -243,21 +243,46 @@ Deno.test('legacy-only configuration works; removing a configured key immediatel
 });
 
 Deno.test('missing or malformed server configuration fails closed before provider access', async () => {
-  for (
-    const overrides of [
-      { SUPABASE_URL: undefined },
-      { SUPABASE_SECRET_KEYS: undefined, SUPABASE_SERVICE_ROLE_KEY: undefined },
-      ...['{', 'null', '[]', '"string"', '{"default":42}', `{"default":"${publishable}"}`]
-        .map((SUPABASE_SECRET_KEYS) => ({ SUPABASE_SECRET_KEYS })),
-      { SUPABASE_SECRET_KEY: publishable },
-      { SUPABASE_SERVICE_ROLE_KEY: 'not-a-service-jwt' },
-    ]
-  ) {
+  const cases: [Record<string, string | undefined>, string][] = [
+    [{ SUPABASE_URL: undefined }, 'missing-supabase-url'],
+    [{ SUPABASE_SECRET_KEYS: undefined, SUPABASE_SERVICE_ROLE_KEY: undefined }, 'missing-server-key'],
+    [{ SUPABASE_SECRET_KEYS: '{}', SUPABASE_SERVICE_ROLE_KEY: undefined }, 'missing-server-key'],
+    [{ SUPABASE_SECRET_KEYS: `{${modern}` }, 'invalid-secret-keys-json'],
+    ...['null', '[]', '"string"'].map((SUPABASE_SECRET_KEYS): [Record<string, string>, string] => [
+      { SUPABASE_SECRET_KEYS }, 'invalid-secret-keys-object',
+    ]),
+    ...['{"default":42}', `{"default":"${publishable}"}`,
+      JSON.stringify({ default: modern, sensitive_fixture_name: `${modern}!${providerToken}` })]
+      .map((SUPABASE_SECRET_KEYS): [Record<string, string>, string] => [
+        { SUPABASE_SECRET_KEYS }, 'invalid-secret-keys-value',
+      ]),
+    [{ SUPABASE_SECRET_KEY: publishable }, 'invalid-local-secret-key'],
+    [{ SUPABASE_SERVICE_ROLE_KEY: `not-a-service-jwt:${legacy}` }, 'invalid-legacy-service-role-key'],
+  ];
+  for (const [overrides, reason] of cases) {
     await withEdge(async (f) => {
       await expectError(await f.request(null), 500, 'server-not-configured');
       assert.equal(f.outgoing.length, 0);
+      // Exact output excludes environment values, arbitrary key names and the
+      // JSON parser's potentially sensitive error text. HTTP stays generic.
+      assert.deepEqual(f.logs, [`catalog-import configuration failed: ${reason}`]);
     }, overrides);
   }
+});
+
+Deno.test('server key read failures never reflect environment error details', async () => {
+  await withEdge(async (f) => {
+    const read = Deno.env.get;
+    Deno.env.get = (name) => {
+      if (name === 'SUPABASE_SECRET_KEY') throw new Error(`${modern} ${providerToken}`);
+      return read(name);
+    };
+    await expectError(await f.request(null), 500, 'server-not-configured');
+    assert.equal(f.outgoing.length, 0);
+    assert.deepEqual(f.logs, [
+      'catalog-import configuration failed: unreadable-server-key-configuration',
+    ]);
+  });
 });
 
 Deno.test('catalog validates method, JSON object and action', async () => {

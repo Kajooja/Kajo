@@ -14,6 +14,74 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog configuration diagnostics — 2026-09-12 / #182
+
+PR #246 accepted the v3 rollout handoff on main
+`65317c03fde0ee85ce560f61489d3434a79a843f` after all five required CI #484 jobs
+passed at `27bd5999da67fc16622a86251f93532528ec6af4`. The owner subsequently added
+`TMDB_READ_ACCESS_TOKEN` and confirmed `SUPABASE_URL` and plural
+`SUPABASE_SECRET_KEYS` are visible under Edge Functions > Secrets. API Keys shows
+a Default secret key. Legacy anon/service-role variables show Deprecated; the
+optional singular local-development key is absent. Those setup/presence questions
+are resolved. Token validity and runtime key parsing are still unverified.
+
+A bounded anonymous unsupported-action POST after token setup returned the same
+500 `server-not-configured`. Fresh pre-diagnostic metadata reports ACTIVE v5,
+`verify_jwt=false`, import map enabled, bundle digest
+`574dd2d7e2f45f5affddc0a88eec0ce3bf98e036b636fe0880ef3cf57bc26a18`.
+All three downloaded source files still exactly match PR #245. No provider call
+or new source deployment was performed during that recheck. The earlier v3 hashes
+below remain historical deployment evidence, not the latest version number.
+
+`fix/182-catalog-config-diagnostics` makes the existing failure diagnosable through
+fixed private-log reason codes. It does not accept previously rejected keys, add
+a public diagnostic endpoint or return configuration details in HTTP responses.
+Malformed JSON exceptions, key values/names and request data must never be logged.
+The real HTTP fixtures verify the unchanged generic 500, no provider/Data API I/O,
+and exact redacted log output, including environment-read exceptions containing
+synthetic secrets. The catalog still has no external runtime packages.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed 376 tests, lint/typecheck and both
+Hermes exports; the existing mobile Hook warning remains. Preparation replayed
+all 14 catalog HTTP cases against the actual staged files with a fresh cache and
+npm/remote imports disabled. The diagnostic payload SHA-256 is
+`0176a96a151103235ef71066556ed32ed7168b5a60c6d1792d4004ebe714787a`;
+its entrypoint SHA-256 is
+`9e4a6dcdcd332a69124b69c01d095d7b8812930452b1cd00e90091429d6d1b9e`.
+The function-local config and normalizer hashes match the earlier packet. These
+source checks do not identify or resolve the hosted configuration failure.
+
+The log prefix is `catalog-import configuration failed:`:
+
+| Reason | Failed check |
+| --- | --- |
+| `missing-supabase-url` | `SUPABASE_URL` is absent or empty in the function runtime |
+| `invalid-secret-keys-json` | `SUPABASE_SECRET_KEYS` cannot be parsed as JSON |
+| `invalid-secret-keys-object` | Parsed named keys are null, an array or a scalar |
+| `invalid-secret-keys-value` | A named key is not a supported secret-key string |
+| `invalid-local-secret-key` | Optional singular `SUPABASE_SECRET_KEY` has an invalid format |
+| `invalid-legacy-service-role-key` | Configured legacy value is not in the accepted JWT format |
+| `missing-server-key` | No modern or legacy server key is available |
+| `unreadable-server-key-configuration` | Another environment/key-read operation threw; its exception is suppressed |
+
+After root/current-head checks, publish the verified three-file catalog payload
+and verify source readback. Inspect Issue #182 first for a completed deployment.
+Trigger only an unsupported-action probe, then open **Edge Functions >
+catalog-import > Logs** and filter for the prefix above. **Logs**, not the request
+headers/body under Invocations, contains this diagnostic. The connected tool has
+no log-read capability, so the owner may send the fixed reason line alone. Do not
+ask for environment dumps, screenshots showing key values or credentials in chat.
+[Supabase's logging guide](https://supabase.com/docs/guides/functions/logging)
+documents the private custom-log view.
+
+Use the observed reason to select the next configuration/source correction. A
+Dashboard presence report is not a reason to relax validation speculatively.
+Verify anonymous/ordinary-user denial and a privileged unsupported-action request
+before the already-authorized `--pages 1 --pages-per-request 1` canary. The owner
+has completed token setup; do not repeat it or confuse the preceding Supabase
+configuration error with the later `tmdb-not-configured` check. Keep #182 open;
+#229, installed forwards, APK/device work and other deployments remain separate.
+
 ## Catalog v3 hosted checkpoint — 2026-09-12 / #182
 
 The owner requested completion of the reviewed PR #245/Edge/one-page canary packet
