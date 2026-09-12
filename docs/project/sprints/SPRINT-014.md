@@ -14,6 +14,16 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## D2 development checkpoint — 2026-09-12
+
+E1 #235 / PR #241 and D1 #236 / PR #242 are accepted. D2 #237 now has a measured,
+independently reproduced eight-variant temporal/cold-start report, with rejected
+challenger admission and tested native-only/unavailable artifact fallback.
+[SPRINT-014-D2](SPRINT-014-D2.md) owns this source/evaluation checkpoint;
+STATUS owns its required CI/merge and subsequent #182 catalog source-audit task.
+Native #229 and full Phase14/MVP/device acceptance remain separate and open.
+The audit and 14A–14D records below retain their dated historical meaning.
+
 ## Current audit/handoff — 2026-09-12 / #233 / PR #234
 
 The [repository audit](../retros/2026-09-12.md) reconciles the independent

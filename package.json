@@ -26,7 +26,8 @@
     "test:research": "python3 -m unittest discover -s scripts/research -p \"test_*.py\" && node --test scripts/research/*.test.mjs",
     "research:movielens:prepare": "python3 scripts/research/movielens.py prepare",
     "research:movielens:download": "python3 scripts/research/movielens.py download",
-    "research:movielens:normalize": "npm run build --workspace @kajo/prediction-engine && node scripts/research/normalize-movielens.mjs"
+    "research:movielens:normalize": "npm run build --workspace @kajo/prediction-engine && node scripts/research/normalize-movielens.mjs",
+    "research:movielens:evaluate": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-ratings.mjs"
   },
   "engines": {
     "node": ">=22"

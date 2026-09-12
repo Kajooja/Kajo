@@ -94,14 +94,24 @@ retraction, correction or permission withdrawal; the in-memory core does not own
 a persistent store or infer missing tombstones. Raw source revisions and original
 frozen forecasts remain immutable when projections are rebuilt.
 
-## Next packet
+## D1/D2 research boundary
 
-E1 is accepted through #241. [D1 #236](https://github.com/Kajooja/Kajo/issues/236)
-now supplies the [isolated intake source](../../research/README.md), manifest,
-parser/adapter, quarantine and reproducible stage hashes. The owner-authorized
-2018 GroupLens Kaggle v2 source supplied a verified, independently reproduced
-500-subject / 84,849-rating development cohort. Release namespaces keep it separate
-from the pending 32M source. After D1's current-head source acceptance, D2
-freezes train-only temporal/cold-start baselines and the bounded static-state vs
-ordered-prefix experiment. No dataset, trained representation, production model
-admission or SQL replacement is delivered by E1.
+E1 and D1 are accepted through #241/#242. The verified GroupLens development
+cohort contains 500 subjects and 84,849 ratings, isolated from native accounts.
+The separate `./research` export now provides D2's eight bounded numeric-rating
+variants, prefix queries and optional-artifact fallback using the same core
+Observation, PredictionScope, TargetDefinition and ArtifactVersion contracts.
+It is not imported by the root reference functions or native serving.
+
+The actual run and independent replay fit means/neighbors/factors/prefix memories,
+then score frozen/prequential and held-out-subject windows. [The report](../../research/reports/movielens-small-d2.md)
+rejects challenger admission under the predeclared rule; native use is deferred.
+[Exact definitions and commands](../../research/README.md#d2--reproducible-development-evaluation)
+include source/partition/code identity, state/memory formulas, bounds and fallback.
+Current D2 source acceptance and the next release task are in STATUS.
+
+No raw histories or fitted weights are published. Absent/invalid/withdrawn or
+disallowed artifacts return authorized native-only evidence or unavailable;
+withdrawal removes every dependent fitted parameter/index from use and requires
+a separately authorized rebuild. This tested research boundary is not a serving
+integration, a complete behavioral Scenario model or a world model.
