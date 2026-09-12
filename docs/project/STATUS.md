@@ -12,10 +12,14 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Primary next packet — #228 / draft PR #229
 
-**When the owner says “jatketaan reposta”, continue the exact six-forward rollout
-preflight in [PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
+**When the owner says “jatketaan reposta”, continue the reviewed six-forward
+deployment in [PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
 `feat/228-delivered-origin`, after checking the current head's five required CI
-jobs.** Refresh refs first. The accepted #233/#234 engine direction is reconciled.
+jobs and the owner's applicable hosted-deployment approval.** The exact target,
+hashes, preservation checks and partial-failure procedure are in
+[the rollout checkpoint](sprints/SPRINT-014.md#hosted-prediction-preflight-and-compatibility--2026-09-12).
+Preparation is complete; hosted writes have not been performed. Refresh refs first.
+The accepted #233/#234 engine direction is reconciled.
 Do not merge the unfinished packet or silently switch to E1.
 
 The server-page baseline `0a184a71320621c5bd31c72f70ff18acf786acc8` passed all five
@@ -32,9 +36,19 @@ callbacks cannot populate a different view. Detail keeps its clicked immutable
 slate. The obsolete unscoped Item cache and unused row-RPC client were removed;
 protocol-1 envelope compatibility and the shared row mapper remain tested.
 
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **420 tests** (338 mobile,
-14 catalog, 68 database), lint/TypeScript and both platform exports. The current
-published head must also pass the five required CI jobs.
+The client head `8a1936c69e8f2dd2f0bd5b770177dcfb50aee9de` passed all five jobs in
+[CI #465](https://github.com/Kajooja/Kajo/actions/runs/34693634630).
+The following hosted preflight reproduced a real deployment blocker: the late
+Outcome/replay patches did not accept the installed compact evaluation/worker
+bodies. The two still-undeployed files now accept only those exact reviewed
+SHA-256 identities and use the corresponding canonical body before their guarded
+feature patches. Unknown variants still fail and roll back. The other four SQL
+files and all deployed history remain unchanged.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile,
+14 catalog, 69 database), lint/TypeScript and both platform exports. The new
+compact-source populated-upgrade/page-runtime probe also joins required native
+CLI CI. The current published head must pass all five jobs before deployment.
 
 This configured client requires all six forwards below. Against the recorded
 older hosted checkpoint it reports a request error; it cannot silently fall back
@@ -45,11 +59,12 @@ is in [the client checkpoint](sprints/SPRINT-014.md#captured-scope-mobile-pages-
 
 Next bounded unit:
 
-1. Identify the exact existing target, actual migration version/name tracking and
-   affected function definitions/ACLs with read-only inspection. The hosted
-   checkpoint below is a record, not a fresh deployment query.
-2. Review the unchanged six files in their exact dependency order and hashes;
-   use ADR-0006's isolated populated-forward rehearsal and the current CI evidence.
+1. Confirm the owner has authorized these six reviewed forwards on existing Kajo
+   `mwrnvfosrzwygrunrltm`. The latest continuation authorized preparation; the
+   requested hosted deployment approval must name this target and SQL packet.
+2. Refresh the read-only target/version/name, five affected function fingerprints,
+   table/trigger/default metadata and current-head CI. Use the revised six hashes
+   in the rollout checkpoint and the exact isolated populated-forward rehearsal.
    Do not apply a fresh baseline, whole historical `db push`, reset or name-only
    tracking repair to an existing database.
 3. Perform only the reviewed forwards under the owner's applicable authorization,
@@ -88,9 +103,13 @@ The branch has source/test/rollout evidence that must remain intact. Its detaile
 device and implementation records stay on that branch/PR until accepted; compact
 canonical successor contracts in main are explicitly labeled.
 
-Recorded hosted checkpoint from #229: `20260910190243_shared_list_destinations`.
-This audit did not query or change hosted state. Six later source forwards remain
-recorded as **undeployed**, in this exact dependency order:
+Read-only hosted preflight on 2026-09-12 confirmed Kajo `mwrnvfosrzwygrunrltm`,
+PostgreSQL 17.6, 50 migration version/name rows ending at
+`20260910190243_shared_list_destinations`, 138 public/private functions, 33 table
+definition fingerprints, 25 application/Auth-user triggers, seven event triggers
+and 24 creator-default entries. No application/Auth rows or row-derived hashes
+were exported. No hosted schema/data/history mutation was performed.
+Six later source forwards remain **undeployed**, in this exact dependency order:
 
 1. `20260910192630_late_outcome_attribution.sql`
 2. `20260910202244_frozen_prediction_replay.sql`

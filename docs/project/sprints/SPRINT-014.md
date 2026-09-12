@@ -2011,3 +2011,124 @@ contains the next configured flow checks. PR #229 and Sprint014 remain open.
 Next: exact existing-database six-forward preflight/rehearsal/rollout, then the
 identified configured client/device checks. STATUS is the authoritative next task;
 E1 → D1 → D2 retains its separate engine/public-data order.
+
+
+## Hosted Prediction preflight and compatibility — 2026-09-12
+
+Resume source: `8a1936c69e8f2dd2f0bd5b770177dcfb50aee9de` / PR #229,
+all five required jobs passed in [CI #465](https://github.com/Kajooja/Kajo/actions/runs/34693634630).
+The next packet was existing-target rollout preparation. No hosted DDL, data,
+migration-history repair, reset, APK dispatch or device acceptance was performed.
+The reviewed deployment below is the concrete next hosted action for owner approval.
+
+Read-only target: **Kajo `mwrnvfosrzwygrunrltm`**, PostgreSQL 17.6,
+ACTIVE_HEALTHY, eu-west-1. Actual tracking has 50 version/name rows, ending at
+`20260910190243_shared_list_destinations`. Metadata capture covers 138
+public/private functions, 33 table definition fingerprints, 25 application/Auth-user
+triggers, seven event triggers and 24 creator-default entries. It exports neither
+application/Auth rows nor row-derived counts/hashes. Raw metadata stays outside Git.
+
+Against the independently reconstructed source at that checkpoint, 112 of 137
+application functions match definition/owner/ACL exactly; all 137 owners/ACLs
+match. The 25 known definition differences fall within ADR-0006's previously
+reviewed formatting/alias/staging ledger. Hosted-only `private.rls_auto_enable()`
+is the existing platform trigger helper and must be preserved. This is not full
+hosted-to-source equivalence or migration-history equivalence.
+
+Three of the five functions touched by this packet match source exactly. The two
+SleepLayer functions retain their known compact bodies. Full source-body lexical
+review (strings/operators preserved, whitespace/comments ignored only as a review
+aid) found identical 1,329 evaluator and 669 worker tokens. Exact stored hashes
+remain distinct and are not normalized in metadata comparisons.
+
+Preflight fingerprints (`function-schema-snapshot.sql`, `search_path=pg_catalog`):
+
+| Function (existing exact signature in source) | Full definition SHA-256 |
+| --- | --- |
+| `private.rank_items_v0` | `a67bef2ff700c51831161bc16fb64b844e5480ec457b88e3c5a7276d19630aba` |
+| `private.rank_items_scalar_v1` | `50dca3c127be1fccf1abc611cfdc8f42997b4c5ea7abf97f2df631b02813e6d7` |
+| `private.rank_items_v1_internal` | `21b01bc3b8df88331e337bd127192d2a2d3ad9ff735553844bcfbf7e9326ab98` |
+| `private.process_shadow_prediction_jobs_v1` | `d8545db8c44201b67eb479d7a2595c194ee9baaa2acf87940a901fbaa01cce1c` |
+| `private.evaluate_shadow_genome_v1` | `50a6ba3ce029e6a1a4f2451f4f97c43455ed879136441e74e2d91b4a82426532` |
+
+**Reproduced blocker:** installing the unchanged first forward into an isolated
+populated source checkpoint containing those exact captured function bodies failed
+with `Late outcome forward: unexpected source anchor ... evaluate_shadow_genome_v1
+(expected 1, found 0)`. Fresh-lineage CI alone had not covered this hosted variant.
+
+Only the two still-undeployed late Outcome/replay files were corrected. Each
+recognizes its one exact compact full-definition SHA-256, places the already
+reviewed canonical function into the migration's local text variable, then applies
+the existing guarded feature patches. CREATE OR REPLACE preserves function
+identity/owner/ACL. No global text normalization, broad source replacement,
+additional migration or deployed-history edit is involved. The prior recorded
+hashes `36cffca7490bc46ba94882de52def69c1d0618cea0e4a33175d70bccb5256d9b`
+and `22d42dce06240092faec75550adcf70de75846079ac48ade0a80231671511f4a`
+are historical and must not be used for this deployment.
+
+Exact reviewed files, in dependency order:
+
+| Migration | Current SQL SHA-256 |
+| --- | --- |
+| `20260910192630_late_outcome_attribution.sql` | `6c724f941bd475f409a151841464f3e56d7a69023aaf72d521279f8c64586337` |
+| `20260910202244_frozen_prediction_replay.sql` | `1b471f7c894035a6154fbc98499ca7ee3dd499c9f4e6902cb72c35fdb7801d1c` |
+| `20260910210520_eligibility_first_candidate_pool.sql` | `92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46` |
+| `20260911070959_identified_prediction_page.sql` | `caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08` |
+| `20260911074543_prediction_continuation_windows.sql` | `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415` |
+| `20260912105528_atomic_prediction_pages.sql` | `594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1` |
+
+Validation: `EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile,
+14 catalog, 69 database), lint/TypeScript and iOS/Android exports.
+`prediction-hosted-source-fixture.sql` contains only the two checksum-pinned schema
+bodies. `prediction-hosted-upgrade.mjs` rehearses all six forwards with synthetic
+existing data, preserving every prior row, function identity/ACL, unrelated
+function body and unrelated constraint; private storage/helper checks also run
+under the open factory function default. A second rolled-back transaction runs
+the full 12-window/48-page Personal/Shared/domain/mode and frozen replay probe.
+The regression mutates a compact semantic token in either function and confirms
+rejection with no leftover DDL or fixture users. The same preservation/runtime SQL
+is now part of required native CLI CI and its metadata report. Inspect the
+published head's five jobs before any hosted mutation.
+
+Security advisor baseline: 19 `rls_enabled_no_policy` INFO findings for intentionally
+private, denied-direct-access tables, plus the existing Auth leaked-password
+protection WARN. See the [RLS advisory](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)
+and [password protection guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+No broad policy grants or Auth configuration changes are part of this packet.
+
+Deployment and partial-failure procedure:
+
+1. Confirm applicable owner authorization for this exact existing target and six
+   SQL files, refresh refs/current CI, actual version/name tracking and metadata.
+   Re-read the five fingerprints above; fail on unreviewed drift. Preserve the
+   full before function/table/trigger/default snapshots without exporting user data.
+2. Apply each reviewed file through `apply_migration` in the listed order, using
+   its exact SQL bytes. Verify provider success and the resulting function/ACL/
+   storage boundary before proceeding. Record actual provider version/name and
+   unchanged SQL hash. Never replay a migration whose commit already succeeded.
+3. Expected total change: twelve new private/public functions, four private RLS
+   tables and one immutable-context trigger; only the five old function bodies
+   above change. Existing identities/owners/ACLs, unrelated definitions/triggers,
+   defaults and the previous 50 tracking rows must remain. The one existing
+   `shadow_prediction_runs_counts_check` is deliberately relaxed to allow zero.
+   Metadata parity and isolated preservation proof are separate from live data checks.
+4. If an individual call fails or its result is ambiguous, stop the sequence and
+   re-read provider history/definitions. The migration transaction must either
+   commit completely or leave no partial DDL. Record the actual successful prefix
+   and prepare a narrow reviewed correction; never reset, drop historical evidence,
+   overwrite receipts or run whole-history `db push`/name-only repair. Preserve
+   source/provider identity mapping if execution pauses; once the chain is complete,
+   synchronize filenames/references in provider dependency order without changing SQL.
+5. Once protocol 2 is deployed, reverting the schema wholesale is not a safe
+   rollback: page receipts/runs/context may already exist. If service restoration
+   is needed, prepare a narrow forward that disables the affected public page
+   endpoint while retaining evidence and the existing row endpoint. No such
+   emergency write is implicitly executed by this preparation packet.
+6. Recheck final definitions/ACLs, private RLS/storage boundaries, unauthenticated
+   denial and advisors. Then perform the configured-client checklist in DEVICE_TEST
+   with the exact identified build. Existing data and fresh-account limitations
+   remain; no account reset or automatic APK dispatch is authorized here.
+
+Next: approval and refreshed preflight for this six-forward hosted rollout,
+then configured-device acceptance. PR #229 remains draft, full DATA/ALG and
+Sprint014 remain open, and E1 → D1 → D2 retains its independent engine order.

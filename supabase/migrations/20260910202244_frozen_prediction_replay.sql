@@ -88,6 +88,208 @@ begin
     'private.rank_items_v1_internal(uuid,text,text,integer,jsonb)'::regprocedure
   ] loop
     definition := pg_get_functiondef(target);
+    -- ADR-0006 reviewed this installed compact body as formatting-only.
+    -- Accept precisely its captured SHA-256; never normalize arbitrary SQL.
+    -- The unchanged feature patches below still validate every source anchor.
+    if target='private.process_shadow_prediction_jobs_v1(integer)'::regprocedure
+      and encode(sha256(convert_to(definition,'UTF8')),'hex')='d8545db8c44201b67eb479d7a2595c194ee9baaa2acf87940a901fbaa01cce1c' then
+      definition := $reviewed_shadow_source$create or replace function private.process_shadow_prediction_jobs_v1(
+  batch_limit integer default 25
+)
+returns jsonb
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+declare
+  selected_job record;
+  source_run record;
+  genome record;
+  shadow_run_id uuid;
+  processed_count integer := 0;
+  failed_count integer := 0;
+begin
+  if batch_limit < 1 or batch_limit > 250 then
+    raise exception 'Batch limit must be between 1 and 250' using errcode = '22023';
+  end if;
+
+  for selected_job in
+    select job.id, job.source_prediction_id, job.genome_id
+    from private.shadow_prediction_jobs as job
+    where job.status = 'QUEUED'
+    order by job.enqueued_at, job.id
+    limit batch_limit
+    for update skip locked
+  loop
+    update private.shadow_prediction_jobs
+    set
+      status = 'PROCESSING',
+      attempts = attempts + 1,
+      started_at = clock_timestamp(),
+      last_error = null
+    where id = selected_job.id;
+
+    begin
+      select * into source_run
+      from private.prediction_runs as production_run
+      where production_run.id = selected_job.source_prediction_id;
+
+      if source_run.id is null
+         or source_run.candidate_count <= 0
+         or source_run.result_count <= 0 then
+        raise exception 'Source PredictionRun is missing or incomplete';
+      end if;
+
+      select * into genome
+      from private.predictor_genomes as stored_genome
+      where stored_genome.id = selected_job.genome_id;
+
+      if genome.id is null then
+        raise exception 'PredictorGenome is missing';
+      end if;
+
+      shadow_run_id := gen_random_uuid();
+
+      insert into private.shadow_prediction_runs (
+        id,
+        source_prediction_id,
+        genome_id,
+        profile_id,
+        actor_user_id,
+        session_id,
+        as_of,
+        requested_item_type,
+        discovery_mode,
+        context,
+        state_snapshot,
+        source_model_version,
+        source_policy_version,
+        code_version,
+        feature_version,
+        memory_version,
+        outcome_version,
+        reward_version,
+        candidate_count,
+        hypothetical_result_count
+      ) values (
+        shadow_run_id,
+        source_run.id,
+        genome.id,
+        source_run.profile_id,
+        source_run.actor_user_id,
+        source_run.session_id,
+        source_run.requested_at,
+        source_run.requested_item_type,
+        source_run.discovery_mode,
+        source_run.context,
+        source_run.state_snapshot,
+        source_run.model_version,
+        source_run.policy_version,
+        genome.code_version,
+        genome.feature_version,
+        genome.memory_version,
+        genome.outcome_version,
+        genome.reward_version,
+        source_run.candidate_count,
+        source_run.result_count
+      );
+
+      insert into private.shadow_prediction_candidates (
+        shadow_prediction_id,
+        item_id,
+        source_rank,
+        production_final_rank,
+        shadow_rank,
+        source_score,
+        production_final_score,
+        shadow_score,
+        scenario_score,
+        hypothetical_selected,
+        explanation
+      )
+      with rescored as (
+        select
+          production_candidate.*,
+          private.shadow_candidate_score_v1(
+            source_run.discovery_mode,
+            production_candidate.explanation,
+            production_candidate.scenario_score,
+            genome.config
+          ) as challenger_score
+        from private.prediction_candidates as production_candidate
+        where production_candidate.prediction_id = source_run.id
+      ),
+      reranked as (
+        select
+          rescored.*,
+          row_number() over (
+            order by rescored.challenger_score desc, rescored.item_id
+          )::integer as challenger_rank
+        from rescored
+      )
+      select
+        shadow_run_id,
+        reranked.item_id,
+        reranked.source_rank,
+        reranked.final_rank,
+        reranked.challenger_rank,
+        reranked.source_score,
+        reranked.final_score,
+        reranked.challenger_score,
+        reranked.scenario_score,
+        reranked.challenger_rank <= source_run.result_count,
+        jsonb_build_object(
+          'version', 'shadow-prediction-v1',
+          'sourcePredictionId', source_run.id,
+          'genomeKey', genome.genome_key,
+          'genomeId', genome.id,
+          'asOf', source_run.requested_at,
+          'input', jsonb_build_object(
+            'productionExplanation', reranked.explanation,
+            'storedScenarioScore', reranked.scenario_score
+          ),
+          'score', reranked.challenger_score,
+          'productionRank', reranked.final_rank,
+          'shadowRank', reranked.challenger_rank,
+          'hypotheticalOnly', true
+        )
+      from reranked;
+
+      if (
+        select count(*)
+        from private.shadow_prediction_candidates as stored_shadow
+        where stored_shadow.shadow_prediction_id = shadow_run_id
+      ) <> source_run.candidate_count then
+        raise exception 'Shadow candidate count does not match frozen source pool';
+      end if;
+
+      update private.shadow_prediction_jobs
+      set
+        status = 'DONE',
+        finished_at = clock_timestamp()
+      where id = selected_job.id;
+
+      processed_count := processed_count + 1;
+    exception when others then
+      update private.shadow_prediction_jobs
+      set
+        status = 'FAILED',
+        finished_at = clock_timestamp(),
+        last_error = left(sqlerrm, 1000)
+      where id = selected_job.id;
+
+      failed_count := failed_count + 1;
+    end;
+  end loop;
+
+  return jsonb_build_object(
+    'processed', processed_count,
+    'failed', failed_count
+  );
+end;
+$$;$reviewed_shadow_source$;
+    end if;
     for patch in select * from (values
       -- JSON float output otherwise inherits the caller's rounding setting.
       -- Pin only this serializer's function scope; restore the caller on return.

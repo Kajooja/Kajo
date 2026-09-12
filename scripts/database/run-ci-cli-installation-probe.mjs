@@ -19,6 +19,7 @@ import { predictionPageSmokeSql, predictionPageUpgradeSql, predictionWindowSmoke
 import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
 import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
 import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
+import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -60,6 +61,9 @@ try {
     const lateIndex = files.findIndex(file => file.name.endsWith('_late_outcome_attribution.sql'));
     assert.ok(lateIndex > destinationsIndex);
     await resetFromMigrations(files.slice(0, lateIndex));
+    const [hostedPredictionUpgrade, hostedPredictionRuntime] = await exec(await predictionHostedUpgradeSql(files.slice(lateIndex, lateIndex + 6)));
+    assert.match(hostedPredictionUpgrade?.hostedPredictionUpgrade, /^PASS: reviewed compact/);
+    assert.match(hostedPredictionRuntime?.atomicPages, /^PASS: 12 Personal/);
     const [lateOutcomeUpgrade] = await exec(lateOutcomeUpgradeSql(files[lateIndex], projectionFixture, candidate.tables));
     assert.match(lateOutcomeUpgrade?.lateOutcomeUpgrade, /^PASS: unchanged populated/);
     const replayIndex = files.findIndex(file => file.name.endsWith('_frozen_prediction_replay.sql'));
@@ -147,7 +151,7 @@ try {
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
-      lateOutcomes, lateOutcomeUpgrade, frozenReplay, frozenReplayUpgrade,
+      lateOutcomes, lateOutcomeUpgrade, hostedPredictionUpgrade, hostedPredictionRuntime, frozenReplay, frozenReplayUpgrade,
       candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
       atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

@@ -60,6 +60,20 @@ unchanged file against an isolated representative existing database. Apply only
 the reviewed new forward file and record its actual deployment identity. Verify
 its intended behavior, unchanged unrelated state and access boundaries afterward.
 
+The 2026-09-12 Prediction preflight reproduced a deployment-only source mismatch:
+the installed evaluation/worker bodies retain the compact form from the reviewed
+SleepLayer differences below. The two still-undeployed late Outcome/replay files
+now recognize only those exact full-definition SHA-256 identities and substitute
+their already-reviewed canonical source in the migration's local text variable
+before applying the existing anchor-checked feature patches. The resulting
+CREATE OR REPLACE retains identity, owner and ACL. This is bounded compatibility
+for two known bodies, not general whitespace normalization or permission to adopt
+arbitrary hosted drift. Unknown variants still abort and roll back.
+The schema-only fixture and populated six-forward/page-runtime rehearsal are
+`prediction-hosted-source-fixture.sql` and `prediction-hosted-upgrade.mjs`; both
+PGlite and required native CLI CI exercise this path. Current hashes, exact target,
+deployment authorization and outcome belong to STATUS/Sprint014.
+
 Known hosted/repository tracking differences are **not repaired by name matching**.
 They remain a separate reviewed operational task under `MVP-OPS-005`; do not run
 an ordinary whole-history `db push` against that mismatched project. New local
