@@ -1,10 +1,10 @@
-# Sprint 014 — Algorithm Reliability, Real Catalog & Profile Bootstrap
+# Sprint 014 — Algorithm Reliability, Real Catalog & Portable Engine
 
 Status: **ACTIVE — PHASE 14 ACCEPTANCE OPEN; DELIVERED FOUNDATIONS ON MAIN**
 
 ## Outcome and current scope
 
-Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy action/delivery evidence, serving/shadow parity and candidate availability, real catalog/features, adaptive memory/policy and operating bounded SleepLayer evaluation. Current requirements and acceptance belong to [MVP.md](../../product/MVP.md) and [ROADMAP.md](../ROADMAP.md).
+Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy action/delivery evidence, serving/shadow parity and candidate availability, real catalog/features, portable engine contracts and isolated public-data evaluation, adaptive memory/policy and operating bounded SleepLayer evaluation. Current requirements and acceptance belong to [MVP.md](../../product/MVP.md) and [ROADMAP.md](../ROADMAP.md).
 
 The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
@@ -13,6 +13,32 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 ## How to read this record
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
+
+## Current audit/handoff — 2026-09-12 / #233 / PR #234
+
+The [repository audit](../retros/2026-09-12.md) reconciles the independent
+51-part engine, public data and previously staged owner decisions. Preserve the
+historical evidence below; the large #229 implementation/device ledger remains
+on its named branch and PR until accepted, rather than copied here as main delivery.
+
+- Accepted runtime source remains `6dd1fec` / PR #227. Audit cleanup removes only
+  a proven-unused catalog hook/wrapper; no runtime endpoint or SQL changes.
+- #229 head `44b11b4` now has all five required jobs passed in CI #458
+  (`34582041579`). Its old request to wait for the corrected first-page race CI is
+  resolved. Complete atomic next-page delivery plus window concurrency/populated
+  upgrade, page replay and captured-session client tests next. Keep continuation
+  disabled until accepted; hosted/device gates remain separate.
+- E1 #235 → D1 #236 → D2 #237 is the next engine sequence. D1 supplies real
+  isolated research data after executable contracts; it does not wait for native
+  population volume. D3/D4/D5 are optional experiments after D2, and E2 serving
+  integration has separate native/rights/quality/fallback gates.
+- #232 joint rating/rewatch is mandatory first release: Phase14 evidence/policy,
+  Phase15 Personal setup, Phase16.3 complete joint flow. #230/#231 and joint-list
+  choice remain scoped later candidates in FUTURE_PLAN, not invented acceptance.
+- Migration protection expands from the original 47 files to 50 by appending
+  three accepted-main hashes; no original SQL/hash or source-baseline cutoff changes.
+- This scoped audit does not close Sprint014, DATA/ALG/ENG requirements, device
+  tests or the Share Link Gate. STATUS is the sole current next-task authority.
 
 ## 14A — Real provider-backed catalog — #182 / device follow-up #199
 

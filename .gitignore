@@ -10,3 +10,6 @@ supabase/.temp/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Public research inputs and fitted artifacts are not source code.
+/research-data/
+/research-artifacts/

@@ -64,14 +64,6 @@ export async function loadCatalogItems(
   }
 }
 
-export async function loadCatalogItem(
-  client: SupabaseClient,
-  itemId: ItemId,
-): Promise<Item | null> {
-  const result = await loadCatalogItems(client, [itemId]);
-  return result.status === 'success' ? result.items[0] ?? null : null;
-}
-
 export function enrichItemsFromCatalog(
   rankedItems: readonly Item[],
   catalogItems: readonly Item[],

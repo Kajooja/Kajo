@@ -1,7 +1,8 @@
 {
   "formatVersion": 1,
   "sourceCommit": "97cd3a18d8d9a57654fa8081c08f9127d2a233fe",
-  "description": "Repository SQL bytes at the accepted #211 checkpoint; not a claim of hosted statement or version parity. Append future accepted migrations; never regenerate existing hashes to bless edits.",
+  "appendedThroughCommit": "6dd1fecaca6a081d633bf640aab12b35dcf2cb8f",
+  "description": "Original 47 repository SQL hashes at the accepted #211 checkpoint, with three accepted-main forwards appended through appendedThroughCommit. This protects 50 source files without changing the fresh-install baseline cutoff or claiming hosted statement, deployment or version parity. Append future accepted migrations; never regenerate existing hashes to bless edits.",
   "files": {
     "20260826203000_backend_foundation.sql": "8dc59bab477add6eb7f9b75b3d43802c8dcf53bff0fd9bb399cf5ec1f677247f",
     "20260827071000_personal_profile_onboarding.sql": "7a300d93065543ef149aee305e9ad50a46d27126e9b8facb7a586442f3209d6d",
@@ -49,6 +50,9 @@
     "20260905113000_shared_common_fit_v1.sql": "3bad27754a0a00b408930c440440e8107c18ceae75a0b762a00a78d2d630e6b7",
     "20260905114500_harden_shared_common_fit_v1_1.sql": "cd963903c27c87d7da7fcc89c05e62688614fbf4f9157ef6d7a2eb926f9ba802",
     "20260905115500_fix_shared_common_fit_personal_policy.sql": "9ac93c168e019fd652d753e498b285369c7c0e8d61d24c9243f10e7d3fee7d91",
-    "20260907155201_bootstrap_personal_ranking.sql": "0cc851cc7f265bef537fba08ac53793cd18a31fe0101f4be95e12304371a6827"
+    "20260907155201_bootstrap_personal_ranking.sql": "0cc851cc7f265bef537fba08ac53793cd18a31fe0101f4be95e12304371a6827",
+    "20260909131913_close_postgres_function_defaults.sql": "167420864b8cf673788ee740691679581b8247ba15ea8410d660032990e5628e",
+    "20260909204512_atomic_item_actions.sql": "81bc4304d24dc063b04fdd567b1b1c3cc8c2a0bda4ecaff286395701b84f1cdb",
+    "20260910071110_atomic_collection_actions.sql": "fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce"
   }
 }

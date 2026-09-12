@@ -1,210 +1,159 @@
 # Kajo Current Status
 
-Last updated: **2026-09-10**
-Current milestone: **MVP 0.1 — first public Kajo**  
-Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
+Last updated: **2026-09-12**
+Current milestone: **MVP 0.1 — first public Kajo**
+Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
 
-This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
+This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
+[MVP](../product/MVP.md) owns release blockers and [LAUNCH_LOOP](../product/LAUNCH_LOOP.md)
+owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
+an older branch-local handoff cannot replace newer accepted product decisions.
 
-## New product truth — 2026-09-07 / #215 / #216
+## Primary next packet — #228 / draft PR #229
 
-The first public Kajo must ship as a complete acquisition + recommendation system, not only as an installable recommender.
+**When the owner says “jatketaan reposta”, continue atomic next-page delivery in
+[PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
+`feat/228-delivered-origin`, after syncing/reconciling accepted main documentation.**
+Inspect refreshed refs before writing. Do not merge the unfinished implementation
+or switch silently to a different research task.
 
-Canonical public loop:
+Latest implementation source inspected: `44b11b437286653eae427bad10493a9380b92668`.
+All five required jobs passed in [CI #458](https://github.com/Kajooja/Kajo/actions/runs/34582041579).
+The earlier request to wait for the corrected first-page retry-lock check is
+resolved; do not rerun/poll it merely because an older checkpoint says pending.
 
-```text
-Taste/Friend link
-→ anonymous Taste Test
-→ first useful PersonalProfile
-→ honest held-out prediction challenge
-→ small unseen recommendation preview
-→ Google/Apple conversion with taste preserved
-→ full Kajo
-→ personal Friend invite
-→ accepted Friendship
-→ explicit Friends → SharedProfile creation
-→ joint recommendation
-→ next invite
-```
+Next bounded unit:
 
-Important social decision:
+1. Commit a next page from the private frozen source window: exact actor/Profile/
+   session/domain/mode/request/cursor scope, current eligibility, no repeated seen
+   Items, an independent immutable page PredictionRun/ranks and exact retry receipt.
+2. Preserve historical first-page evidence; advance seen state once and implement
+   page-aware frozen/shadow replay. Raw cached candidates are not a deliverable page.
+3. Add native concurrent 16-window-cap and populated pre-window-receipt upgrade
+   cases, alongside page retry/concurrency/expiry/authorization controls. Passing
+   first-page races does not prove these newer cases.
+4. Only then activate the prepared captured-scope reader. Bind visible ranking,
+   readiness and cache to environment, actor, Profile, session, domain, mode and
+   request/revision. Test rapid A → B → A Profile return, session changes,
+   delayed/error replies and per-Item grid/detail/exposure origin.
+5. Record required source/CI acceptance, separately review the exact forward
+   rollout, then complete configured-device/restart/reconnect/account-switch gates.
 
-- a personal invite does **not** create a SharedProfile automatically,
-- successful invite acceptance creates a reciprocal `Friendship`,
-- the Friend appears in Friends,
-- SharedProfile is created explicitly from one or more Friends through normal consent/membership rules,
-- Friendship grants no access to private PersonalProfile evidence.
+Keep `continuationSupported: false` until real continuation passes its complete
+boundary. Identified empty results, bounded-window exhaustion and errors remain
+different; exhausted source windows do not prove an empty catalog.
 
-Scale principle: **design contracts for one million users; provision infrastructure for measured demand.** No speculative Kafka/Kubernetes/graph-database/microservice requirement is introduced.
+## Accepted source, active branch and recorded hosted state
 
-Canonical documents for this decision:
+Accepted runtime source at audit start: `6dd1fec` / PR #227 — atomic/durable Item,
+List and Shared action foundations. #227 is merged; do not repeat its deployment.
+The #233/#234 delivery publishes independent-engine direction and reconciled
+product/handoff documentation, plus bounded repository hygiene. It does not
+accept #229 runtime, implement a portable engine or train a model.
 
-- `docs/product/LAUNCH_LOOP.md`
-- `docs/product/MVP.md`
-- `docs/project/ROADMAP.md`
-- `docs/product/PRODUCT.md`
-- `docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
+#229 contains later source work: delivered-slate identity, durable exposure,
+multi-List/collection UX, history projection, late outcomes, frozen replay,
+eligibility-first admission, identified first pages and private source windows.
+The branch has source/test/rollout evidence that must remain intact. Its detailed
+device and implementation records stay on that branch/PR until accepted; compact
+canonical successor contracts in main are explicitly labeled.
 
-The planning delivery from Issue #215 / PR #216 is merged on `main`. Taste/Friend runtime implementation remains planned; accepted documentation is not runtime acceptance.
+Recorded hosted checkpoint from #229: `20260910190243_shared_list_destinations`.
+This audit did not query or change hosted state. Five later source forwards remain
+recorded as **undeployed**, in this exact dependency order:
 
-## Current implementation truth
+1. `20260910192630_late_outcome_attribution.sql`
+2. `20260910202244_frozen_prediction_replay.sql`
+3. `20260910210520_eligibility_first_candidate_pool.sql`
+4. `20260911070959_identified_prediction_page.sql`
+5. `20260911074543_prediction_continuation_windows.sql`
 
-Already accepted/materially delivered foundations include:
+Use exact branch source, hashes and ADR-0006's existing-database forward procedure
+before rollout. Never run whole historical `db push` or reset to reconcile main
+and hosted. The separately deferred privilege-default forward
+`20260909131913_close_postgres_function_defaults.sql` remains a separate gate.
 
-- illustrated 2D Room and global `DiscoveryMode`,
-- BOOK/MOVIE discovery/detail/swipe/rating/not-interest/save/undo foundations,
-- PersonalProfile + consent-based SharedProfiles,
-- Endorsement consensus, named Lists and Profile messaging foundations,
-- generic server-owned Prediction V0/V1 path,
-- WorkingState/ShortTermState/LongTermState/ScenarioMemory architecture,
-- versioned PredictionRun/candidate traces,
-- PredictorGenome/SleepLayer controlled-evolution foundations,
-- provider-backed Item catalog architecture,
-- PersonalProfile history import foundations,
-- bounded no-import real-catalog calibration foundation,
-- SharedProfile common-fit v1.1.
+The private window bounds remain 50 candidates/seen IDs, 2 MiB, fifteen minutes
+from source ranking and sixteen windows per actor/Profile. Preserve receipts,
+runs and Events when reclaiming expired derived cache.
 
-Current catalog truth from the latest verified checkpoint remains:
+## Independent engine and when public data enters
 
-- BOOK: 415 discoverable, 385 with image, descriptions incomplete,
-- MOVIE: 30 discoverable at that checkpoint, poster/description expansion still required.
+Canonical design: [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md),
+[DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) and
+[ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md).
+All 51 supplied conceptual sections are preserved. The core is independent; Kajo
+is its first DomainAdapter.
 
-Do not treat these numbers as permanent; re-query hosted truth when catalog work resumes.
+The ordered engine work is:
 
-## Exact continuation order
+| Packet | Exact deliverable | Starts after |
+|---|---|---|
+| [E1 #235](https://github.com/Kajooja/Kajo/issues/235) | Runnable generic contracts + Kajo/media and synthetic non-media fixtures; workspace/exports/root CI integration | Accepted design; default follows current #229 packet |
+| [D1 #236](https://github.com/Kajooja/Kajo/issues/236) | Isolated manifest, MovieLens adapter and actual reproducible small real-data cohort | E1 contract acceptance |
+| [D2 #237](https://github.com/Kajooja/Kajo/issues/237) | Train-only temporal/cold-start baselines and bounded static-state vs trajectory experiment/report | D1 normalized data |
+| D3 / D4 / D5 | Optional Tag Genome / Beliefs / KuaiRand studies | D2 plus each source's own manifest/rights/task; independent of each other |
+| E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
-The new launch work **does not jump ahead of current algorithm correctness**.
+E1/D1/D2 can run as a separately selected isolated source/research packet while
+native rollout/device gates wait. Record the switch here first; their availability
+does not make the default #229 continuation ambiguous. No large native user
+population, production schema or separate network service is needed for D1.
 
-### Current delivery and next task
+Use ignored `research-data/` and `research-artifacts/` or equivalent controlled
+storage. External ratings are source-typed observations, not fake native Events
+or fully observed behavioral Scenarios. Public catalog enrichment and a real
+user's authorized history import remain separate pipelines. Data download,
+normalization, model training, evaluation and artifact admission are distinct
+recorded operations. A losing challenger is a valid report; it cannot waive
+native usefulness gates or deploy itself.
 
-Phase 14.0 is accepted: #219 supplied source/schema/platform verification and
-#223 (`fd7b82d`) delivered the operational fresh local/CI installation. #207 and
-#208 are closed with their precise technical evidence. `MVP-ALG-001` is complete;
-BOOT/device/catalog/usefulness and full `MVP-ALG-009` remain separate open gates.
-The 47 protected historical files and their failing chronological diagnostic are
-unchanged. [ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)
-owns the adopted fresh lineage and existing-database forward procedure.
+No engine package, dataset ingestion, trained representation, world model,
+multistep dreamer or automatic promotion is delivered by this audit.
 
-The latest **14.1 delivery is #224 / PR #225**:
-rating, not-interest and their undo now have an idempotent/atomic server command
-and a SQLite-backed actor/Profile/environment outbox. The command persists state,
-Event and receipt together, preserves unrelated Saved state, rejects stale undo
-and validates any supplied trace before correlation. The queue persists before
-optimistic acceptance, survives restart/lost replies, preserves FIFO and stops
-stale-scope dispatch/callbacks. A definitively rejected undo can be explicitly
-discarded before reloading current server state. `DATA_EVENTS.md` owns the contract.
-The reviewed server forward `20260909204512_atomic_item_actions.sql` is deployed
-and its rollback-only command acceptance passed. All five gates in CI #403 passed
-for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
-records exact rollout/source verification and the remaining device limitations.
+## Preserved owner requirements and release order
 
-The latest collection delivery is **Issue #226 / PR #227**, branch
-`feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
-Implementation `0d299d5` passed all five required jobs in CI #407; the prior
-handoff head `876f1b6` passed CI #408. Local implementation check passed 287 tests
-plus lint/typecheck and both bundles. PR #227 owns final-head CI and merge evidence.
+- #232 is mandatory first-release Shared rating/rewatch behavior: Phase14 supplies
+  participant/round evidence and policy; Phase15 supplies Personal Taste/setup;
+  Phase16.3 completes joint responses/history and controlled rewatch before beta.
+- Multi-destination List selection, final Add without a second Done action,
+  always-available unknown Taste response, approximately ten movies then ten books,
+  link reveal/copy and device details remain in their canonical product docs.
+- #230 statistics, #231 multi-select/history trash and joint-list choice are later
+  scoped candidates in FUTURE_PLAN, not automatic new MVP blockers.
+- Then follow ROADMAP: algorithm/catalog/engine foundation → Taste/holdout →
+  anonymous web/app + Google/Apple continuity → preview → Friend/safety → explicit
+  Shared creation and joint rounds → core UX/telemetry/privacy → complete beta →
+  production/stores → owner-accepted Share Link Gate.
 
-The owner explicitly approved hosted deployment on **2026-09-10**. Kajo
-`mwrnvfosrzwygrunrltm` accepted `20260910071110_atomic_collection_actions.sql`,
-SHA-256 `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`.
-Only the filename changed to match the actual provider version. The prior hosted
-approval blocker is resolved. Rollback-only hosted List/Shared command acceptance
-and access-boundary checks passed; Sprint 014 records exact scope and limitations.
+The owner reports exercised device flows working, but no exact installed APK
+identity/timings were provided for the latest feedback. Empty/fresh-account
+acceptance remains untested. Preserve current test history; a future small-group
+reset is not an instruction to reset now. Do not dispatch or poll APKs as a
+substitute for the next source unit.
 
-Publication: finish final-head CI, merge #227, then retire its task branch. If #227
-is already merged, continue from main with the next 14.1 task below; do not repeat
-the deployment. No separate global-default forward or old tracking repair is included.
+## Hygiene and remaining findings
 
-Continue **14.1** after this delivery:
+The [2026-09-12 audit](retros/2026-09-12.md) records scope, checks and limits.
+Proven-unused catalog hook/wrapper removed; accepted-main migration protection
+extends from 47 to 50 exact hashes without changing SQL or the baseline cutoff.
+Raw/fitted research paths are ignored before the first dataset operation.
+The compatible js-yaml 4.3.2 lockfile patch removes the high advisory. Fresh audit
+has no high/critical findings and fifteen moderate package entries across three
+advisories; #238 prioritizes the runtime routing decoder before public links and
+coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
-1. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
-   swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
-   exposure delivery durable; the old exposure-only Event queue remains in memory.
-2. Verify late outcomes, real device process-death/reconnect/account switches and
-   complete atomic List/Shared rollback/duplicate/undo authorization cases.
-3. Then proceed to **14.2 serving/shadow/candidate availability**.
+Open source findings are assigned to their existing work owners:
+#228 captured-session reader/window acceptance; #182 Edge catalog configuration
+and dependency/entrypoint verification; #160 / MVP-OPS-005 production configuration,
+password endpoint input/abuse policy and release dependency checks. See the audit
+for dependency findings and exact verification; no hosted security conclusion is inferred.
 
-`MVP-DATA-003/004`, full `MVP-ALG-009`, Sprint 014 and Phase 14 quality/evaluation
-acceptance remain open. No Taste/Friend implementation starts ahead of those
-algorithm requirements. Do not restart completed source export/platform experiments.
+Merged `feat/226-atomic-collection-actions` is byte-equivalent to accepted #227
+and safe to retire. Remote branch deletion is unavailable through this session's
+supported GitHub capability; do not repeat the completed 145-branch historical
+cleanup or remove the active #229 branch. After #234 merge, its documentation
+branch can likewise be retired through a supported operation.
 
-### Existing hosted database and repository hygiene
-
-The existing hosted database stays on the separately reviewed forward-only
-procedure in ADR-0006. Its known tracking mismatch is not repaired by local-lineage
-adoption. Forward file `20260909131913_close_postgres_function_defaults.sql` has
-not been applied hosted; deployment must capture its own prior defaults/rollback.
-The #223 local installer did not change hosted state. #224 applied only its new
-atomic-action forward: all 31 old application/Auth table hashes, 123 existing
-function fingerprints, 21 triggers, defaults and 44 old tracking rows remained
-unchanged. The new tracking row uses the provider's actual version above.
-
-The [2026-09-09 retrospective](retros/2026-09-09.md) and recovery manifest preserve
-the completed #220 audit and removal of all 145 approved old remote branches.
-The cleanup is finished; its old approval block and temporary branches are not
-continuation work. Main CI #395 originally failed at isolated startup and passed
-on one requested rerun; the original cause remains unproven. APK/device acceptance
-is separate, and a main APK build is not a task to poll.
-
-### After Phase 14
-
-Implement the new release path in this exact sequence:
-
-1. **Phase 15.0** adaptive Taste Test + honest holdout prediction challenge.
-2. **Phase 15.1** anonymous identity + web/app link continuation + Google/Apple conversion.
-3. **Phase 15.2** recommendation preview + measurable conversion funnel.
-4. **Phase 16.0** personal Friend invite.
-5. **Phase 16.1** Friends surface + remove/block/abuse lifecycle.
-6. **Phase 16.2** explicit Friends → SharedProfile creation.
-7. **Phase 17** core UX, funnel telemetry, privacy/operations.
-8. **Phase 18** closed external beta of the complete link-to-app loop.
-9. **Phase 19** production/store release candidate.
-10. **Phase 20 Share Link Gate**.
-
-Only when Phase 20 passes may an agent answer:
-
-> **Nyt on aika jakaa käyttäjille linkki.**
-
-## Algorithm bar
-
-The owner explicitly wants the algorithm driven toward the strongest reasonable first-release version rather than leaving known critical quality gaps for “later”. Therefore:
-
-- do not defer known correctness/evidence/cold-start defects merely because the UI works,
-- transparent baseline + tests come before opaque complexity,
-- learned/complex additions are welcome only when they measurably improve the defined outcomes,
-- honest insufficiency of evidence is acceptable; fabricated confidence is not,
-- Taste Test must use the same trustworthy production feature/ranking concepts rather than a disconnected marketing quiz,
-- SleepLayer/evolution remains evidence-gated and reversible.
-
-## Distant vision remains preserved
-
-`FUTURE_PLAN.md` remains the permanent backlog for:
-
-- series,
-- music albums,
-- Helsinki-first events/things to do,
-- broader activities/restaurants/travel,
-- richer experience memory,
-- stronger post-MVP friend/group learning,
-- optional friend-review feed,
-- local/global discovery,
-- PopulationMemory / more advanced evolutionary learning,
-- later consented people discovery,
-- possible friendship/dating compatibility research,
-- distributed/on-device research ideas.
-
-These are not deleted. They are deliberately behind the first-release march order.
-
-## Handoff for a new conversation
-
-When the owner says **“jatketaan reposta”**:
-
-1. sync/inspect current branch/PR/Issue handoff according to `AGENTS.md`,
-2. read `STATUS.md`, `MVP.md`, active Sprint 014 file and `ROADMAP.md`,
-3. continue the exact current Phase 14 task,
-4. do not skip ahead to Taste/Friend implementation until Phase 14 dependencies are accepted,
-5. once launch-loop implementation begins, read `LAUNCH_LOOP.md` + ADR-0007 before coding,
-6. update STATUS at meaningful handoff points so no chat-only context is required.
-
-APK/device tests may be performed at sensible user-facing checkpoints. Do not sit polling build completion unless the owner explicitly asks.
+Sprint014, full DATA/ALG/ENG acceptance, device gates and public release remain open.
