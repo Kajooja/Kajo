@@ -16,6 +16,7 @@
     "test:catalog": "node --test scripts/catalog/*.test.mjs",
     "test:edge": "deno check --config supabase/functions/deno.json --frozen supabase/functions/*/index.ts supabase/functions/entrypoints.test.ts && deno test --config supabase/functions/deno.json --frozen --cached-only --no-prompt --allow-net=127.0.0.1 supabase/functions/entrypoints.test.ts",
     "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
+    "catalog:prepare-deployment": "node scripts/catalog/prepare-catalog-deployment.mjs",
     "test": "npm run test:mobile && npm run test:catalog && npm run test:edge && npm run test:database && npm run test:engine && npm run test:research",
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke",
