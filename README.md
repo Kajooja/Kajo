@@ -4,7 +4,7 @@ Kajo is a mobile-first personal and shared discovery platform. It learns a perso
 
 Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
-Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). The executable [E1 package](packages/prediction-engine/README.md) now supplies generic contracts and deterministic media/non-media fixtures. The [public-data research pipeline](docs/architecture/DATA_ENRICHMENT.md), trained models and runtime admission remain separately gated work. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
+Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). The executable [E1 package](packages/prediction-engine/README.md) supplies generic contracts and deterministic media/non-media fixtures. The [D1 research intake](research/README.md) now has an independently reproduced 500-subject / 84,849-rating development cohort from a pinned GroupLens release. Source acceptance, model evaluation and runtime admission remain separate gates. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
 
 The repository—not a ChatGPT conversation—is the permanent project memory.
 
@@ -44,6 +44,8 @@ npm run engine:demo  # standalone synthetic media/non-media contract cycles
 ```
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.
+Research intake/tests also require Python 3.12 (standard library only); see
+[`research/README.md`](research/README.md) for the source verification and repeat commands.
 
 For a new local database, use `npm run database:install -- /absolute/new/workspace`.
 The [installation procedure](docs/architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)

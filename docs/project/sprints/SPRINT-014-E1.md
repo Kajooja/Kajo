@@ -63,3 +63,10 @@ A losing challenger is valid. Existing SQL serving and #229's native acceptance
 remain independent; do not start UI #239/#240 or download data as an implicit E1
 side task. No requirement to repeat the owner's device tests or build an APK is
 introduced by this standalone source packet.
+
+## Accepted source — 2026-09-12
+
+All five required jobs passed in CI #471 at `17a8466fecb510d9e1049ff9feaa6ab72686400a`.
+PR #241 merged as `3747ecb58d69ba78440ca1b72b7cc554b1a9720a`; Issue #235
+and MVP-ENG-001 are accepted. D1 #236 on `feat/236-movielens-research` is the
+next source packet. This does not accept #229 runtime or any trained artifact.

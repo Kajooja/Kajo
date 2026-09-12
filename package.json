@@ -15,14 +15,18 @@
     "test:mobile": "npm run test --workspace @kajo/mobile",
     "test:catalog": "node --test scripts/catalog/*.test.mjs",
     "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
-    "test": "npm run test:mobile && npm run test:catalog && npm run test:database && npm run test:engine",
+    "test": "npm run test:mobile && npm run test:catalog && npm run test:database && npm run test:engine && npm run test:research",
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke",
     "test:database": "node --test scripts/database/*.test.mjs",
     "database:install": "node scripts/database/install-local-database.mjs",
     "diagnose:database-replay": "node scripts/database/migration-replay.mjs",
     "test:engine": "npm run test --workspace @kajo/prediction-engine",
-    "engine:demo": "npm run demo --workspace @kajo/prediction-engine"
+    "engine:demo": "npm run demo --workspace @kajo/prediction-engine",
+    "test:research": "python3 -m unittest discover -s scripts/research -p \"test_*.py\" && node --test scripts/research/*.test.mjs",
+    "research:movielens:prepare": "python3 scripts/research/movielens.py prepare",
+    "research:movielens:download": "python3 scripts/research/movielens.py download",
+    "research:movielens:normalize": "npm run build --workspace @kajo/prediction-engine && node scripts/research/normalize-movielens.mjs"
   },
   "engines": {
     "node": ">=22"

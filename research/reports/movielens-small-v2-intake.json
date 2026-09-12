@@ -1,0 +1,196 @@
+{
+  "reportVersion": "movielens-intake-evidence-v1",
+  "recordedAt": "2026-09-12",
+  "issue": 236,
+  "scope": "Actual noncommercial offline development intake; no fitted model, shared benchmark or native usefulness claim",
+  "ownerDecision": "Use a suitable available alternative instead of waiting for MovieLens 32M",
+  "source": {
+    "archiveSha256": "12b11d77fdb2c221daa631e5724104f51ecab1298c0e5f535d56e9ceff02ef8b",
+    "datasetId": "movielens",
+    "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+    "releaseId": "ml-latest-small-2018-kaggle-v2"
+  },
+  "manifestPath": "research/manifests/movielens-small-v2.json",
+  "publisherRef": "grouplens/movielens-latest-small",
+  "publisherVersion": 2,
+  "archive": {
+    "bytes": 993937,
+    "md5": "671943f3bd8eb931f426538655aebd76",
+    "sha256": "12b11d77fdb2c221daa631e5724104f51ecab1298c0e5f535d56e9ceff02ef8b"
+  },
+  "sourceFiles": {
+    "README.md": {
+      "bytes": 8342,
+      "sha256": "63d22ac138e80fae37021797ed8e1b9424b5239dc576a137422adf783ae3f404"
+    },
+    "links.csv": {
+      "bytes": 197979,
+      "sha256": "97ad18e4e56a09363c65676b6cb3482ce3e2cea2372a24620c1599c843325f31"
+    },
+    "movies.csv": {
+      "bytes": 494431,
+      "sha256": "5a5f32dd9bb3797b8e728a1b98958789d2b13f294a69fdfbc5727f8a9611aa07"
+    },
+    "ratings.csv": {
+      "bytes": 2483723,
+      "sha256": "aa289ca83157595d0df6aea1be6a4ded676ddc4385472e8313a8ed9805352646"
+    },
+    "tags.csv": {
+      "bytes": 118660,
+      "sha256": "92a9f8bb7916dceef6151209845788c3643f794dfa79d1feaec7121b5960399d"
+    }
+  },
+  "sourceCounts": {
+    "movies": 9742,
+    "ratings": 100836,
+    "subjects": 610,
+    "tags": 3683
+  },
+  "validUniqueRatings": 100836,
+  "eligibleSubjects": 610,
+  "cohort": {
+    "maximumHistory": 2698,
+    "minimumHistory": 20,
+    "ratings": 84849,
+    "seed": "kajo-d1-mlsmall-v2-500-v1",
+    "subjects": 500,
+    "subjectsSha256": "a705d5f9c7193ad58aaf3fc52ce861c1b75da7ce046c3d0479a8ca54c8d24475"
+  },
+  "sourceTimestampRange": {
+    "max": 1537799250,
+    "min": 828124615
+  },
+  "mapping": {
+    "conflictingAliases": 1,
+    "kajoIntersection": "not-queried",
+    "missingImdb": 0,
+    "missingTmdb": 10,
+    "objects": 9742
+  },
+  "quarantine": {
+    "conflicting-alias": 2
+  },
+  "normalizedRunId": "7536085110cb439e349af074ba81e878af871342aa6d31b4a8ab82d431b28452",
+  "planSha256": "ce4aa1ec429c5212f373482ea033805af7c99926a60d128de00ffd4432b5a470",
+  "normalizerCodeSha256": "8d2b2a16645b3e2be0569791acaed38098ef153da5653d3bb87666004952c65a",
+  "normalizedOutputFiles": {
+    "objects.jsonl": {
+      "bytes": 2080594,
+      "sha256": "d7d779ec18859dfed123c6e3f3d9db15f960ad2a8ddf91ef81c835fcd2aab001"
+    },
+    "quarantine.jsonl": {
+      "bytes": 234,
+      "sha256": "eac30a6d2e9f3a1b01c86d15713bd297b2e1f7f96b958338a119f380c4186fef"
+    },
+    "ratings.jsonl": {
+      "bytes": 5909371,
+      "sha256": "c0995b14a8ed789e04c5e808edb4c0786968e35342465b7b1edcc7b7b0913680"
+    },
+    "subjects.jsonl": {
+      "bytes": 51037,
+      "sha256": "b2858d4e1c8e9c3c547487c59f86d398ab3805f5c2bd3f39dfab9b8f4efdc50d"
+    }
+  },
+  "engine": {
+    "conversionId": "df04be1aa5dc5c579ca070f04911f1d5464231e44dfc1360fe35cfd6af620169",
+    "codeSha256": "d44dae5e95eea7f91b56345d67cbcd1969738b7389b2492c6287e2a273a4e4a5",
+    "adapterSha256": "d4cb0abd973cedfae722515b716b46812f5c7701e4fa508cc0e30141b7865921",
+    "inputSha256": "c0995b14a8ed789e04c5e808edb4c0786968e35342465b7b1edcc7b7b0913680",
+    "outputSha256": "2bf4213edc2e63b7fd208900342fab98d4b971a2ce9e1760c9339531cb0e9463",
+    "count": 84849,
+    "evidence": {
+      "native": 0,
+      "external": 84849,
+      "synthetic": 0
+    },
+    "contractProbe": {
+      "status": "passed",
+      "externalPrefixRecords": 20,
+      "unknownActingIdentity": true,
+      "equalTimestampLabelsExcluded": true
+    },
+    "nodeVersion": "24.19.0"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "node": "24.19.0",
+    "platform": "Linux x86_64"
+  },
+  "acquisition": {
+    "initialInspectionSeconds": 22.31328683699394,
+    "independentDownloadSeconds": 19.76383489199361,
+    "independentArchiveHashMatched": true,
+    "downloadCommand": [
+      "npm",
+      "run",
+      "research:movielens:download"
+    ],
+    "metadataCommand": [
+      "npm",
+      "run",
+      "research:movielens:prepare"
+    ]
+  },
+  "verification": {
+    "independentNormalizedManifestsMatch": true,
+    "independentEngineHashesMatch": true,
+    "cachedStagesVerified": true,
+    "runs": [
+      {
+        "label": "first",
+        "command": [
+          "node",
+          "scripts/research/normalize-movielens.mjs",
+          "--source",
+          "small",
+          "--output-dir",
+          "research-artifacts/movielens-small-verified"
+        ],
+        "seconds": 1.940173,
+        "maxChildRssKiB": 132268,
+        "normalizedReused": false,
+        "engineReused": false
+      },
+      {
+        "label": "independent-replay",
+        "command": [
+          "node",
+          "scripts/research/normalize-movielens.mjs",
+          "--source",
+          "small",
+          "--output-dir",
+          "research-artifacts/movielens-small-verified-replay"
+        ],
+        "seconds": 1.728689,
+        "maxChildRssKiB": 132268,
+        "normalizedReused": false,
+        "engineReused": false
+      },
+      {
+        "label": "verified-cache",
+        "command": [
+          "node",
+          "scripts/research/normalize-movielens.mjs",
+          "--source",
+          "small",
+          "--output-dir",
+          "research-artifacts/movielens-small-verified"
+        ],
+        "seconds": 0.206498,
+        "maxChildRssKiB": 132268,
+        "normalizedReused": true,
+        "engineReused": true
+      }
+    ],
+    "memoryMeasure": "Linux resource.RUSAGE_CHILDREN.ru_maxrss: largest child RSS so far in the measuring process, not simultaneous process-tree peak"
+  },
+  "limitations": [
+    "Publisher labels Latest Small a development dataset; the fixed 2018 Kaggle version supports this bounded development exercise, not shared benchmark claims.",
+    "Observed ratings retain complete selected-user histories within this source release; they do not establish viewing time, exposure, context or action propensity.",
+    "The source has 610 users; a deterministic 500-user cohort is not the full MovieLens population or proof of Kajo product uplift.",
+    "One alias collision removes both affected mappings; no movie identities or histories are merged.",
+    "Object metadata is an undated release snapshot; no live Kajo catalog intersection was queried.",
+    "No training, baseline comparison, held-out quality metric or production serving is included in D1."
+  ],
+  "next": "D1 source review/CI acceptance, then D2 #237 freezes the temporal/cold-start development protocol before training."
+}

@@ -35,9 +35,12 @@ The active #229 evidence/pagination packet keeps its own acceptance and rollout 
 
 Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
 reconnect retry-UI defect retained as #240. The owner places application UI work
-in a later pre-MVP packet. The explicitly selected current source work is now
-**E1 #235**, followed by **D1 #236 → D2 #237**. STATUS names the branch and actual
-acceptance. #229 retains its native/fresh-account gates; E1 does not close them.
+in a later pre-MVP packet. **E1 #235 is accepted**, followed by **D1 #236 → D2 #237**.
+The owner subsequently authorized an available alternative to 32M; the first
+real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development dataset.
+This bounded development comparison can precede a larger stable benchmark with
+its own manifest. STATUS names the branch and actual acceptance. #229 retains
+its native/fresh-account gates; external research does not close them.
 
 ## Milestone: MVP 0.1 — first public Kajo
 

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "movielens-intake-v1",
+  "datasetId": "movielens",
+  "releaseId": "ml-32m",
+  "publisher": "GroupLens Research, University of Minnesota",
+  "landingUrl": "https://grouplens.org/datasets/movielens/32m/",
+  "readmeUrl": "https://files.grouplens.org/datasets/movielens/ml-32m-README.html",
+  "checksumUrl": "https://files.grouplens.org/datasets/movielens/ml-32m.zip.md5",
+  "archiveUrl": "https://files.grouplens.org/datasets/movielens/ml-32m.zip",
+  "sourceVerification": {
+    "readmeSha256": null,
+    "publisherMd5": null,
+    "status": "pending-publisher-availability",
+    "lastAttempt": "2026-09-12",
+    "lastResult": "HTTP 502 on retry; HTTPS proxy reports: Certificate verify failed: certificate has expired"
+  },
+  "rights": {
+    "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+    "research": "pending-exact-source-review",
+    "reviewedBy": null,
+    "reviewedAt": null,
+    "rawRedistribution": "not-approved",
+    "fittedArtifactRedistribution": "not-approved",
+    "commercialUse": "not-approved",
+    "productionServing": "not-approved",
+    "publication": ["authored-code", "schemas", "non-identifying-manifests", "aggregate-reports", "attribution"]
+  },
+  "attribution": "F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems 5, 4, Article 19. https://doi.org/10.1145/2827872",
+  "expectedCounts": { "ratings": 32000204, "subjects": 200948, "movies": 87585, "tags": 2000072 },
+  "cohort": { "size": 1000, "seed": "kajo-d1-ml32-v1", "selection": "lowest-sha256-of-release-seed-subject", "minimumSourceRatings": 20 },
+  "semantics": {
+    "target": "external-explicit-rating",
+    "rawScale": { "min": 0.5, "max": 5, "step": 0.5 },
+    "timestamp": "rating-record-seconds-since-unix-epoch-utc",
+    "availability": "assumed-at-occurrence-for-offline-simulation",
+    "equalTimestampPolicy": "exclude-entire-equal-time-group-from-query-prefix",
+    "exposure": "unknown",
+    "watchTime": "unknown",
+    "context": "unknown",
+    "propensity": "unknown",
+    "metadataUse": "static-release-metadata-only-not-historical-features",
+    "catalogIntersection": "not-queried",
+    "duplicatePolicy": "deduplicate-identical-pairs-quarantine-all-conflicting-pairs"
+  },
+  "budgets": {
+    "maxArchiveBytes": 314572800,
+    "maxExpandedBytes": 2147483648,
+    "maxDownloadSeconds": 600,
+    "maxRows": 33000000,
+    "maxSubjects": 250000,
+    "maxMovies": 100000,
+    "maxRatingsPerSubject": 50000,
+    "maxCohortRatings": 500000,
+    "maxQuarantineRows": 100000,
+    "maxCsvFieldBytes": 65536
+  }
+}
