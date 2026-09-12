@@ -33,6 +33,7 @@ Deno.serve(async (request) => {
   const serverKeys = readServerKeys();
 
   if (!supabaseUrl || !serverKeys) {
+    if (!supabaseUrl) invalidServerConfiguration('missing-supabase-url');
     return json({ status: 'error', code: 'server-not-configured' }, 500);
   }
 
@@ -331,25 +332,57 @@ function readServerKeys(): { modern: string[]; legacy: string | null } | null {
   const modern: string[] = [];
   try {
     if (raw) {
-      const keys: unknown = JSON.parse(raw);
-      if (!keys || typeof keys !== 'object' || Array.isArray(keys)) return null;
+      let keys: unknown;
+      try {
+        keys = JSON.parse(raw);
+      } catch {
+        return invalidServerConfiguration('invalid-secret-keys-json');
+      }
+      if (!keys || typeof keys !== 'object' || Array.isArray(keys)) {
+        return invalidServerConfiguration('invalid-secret-keys-object');
+      }
       for (const key of Object.values(keys)) {
-        if (!isSecretKey(key)) return null;
+        if (!isSecretKey(key)) {
+          return invalidServerConfiguration('invalid-secret-keys-value');
+        }
         modern.push(key);
       }
     }
     // The CLI provisions a singular key in local development.
     const localKey = Deno.env.get('SUPABASE_SECRET_KEY');
     if (localKey) {
-      if (!isSecretKey(localKey)) return null;
+      if (!isSecretKey(localKey)) {
+        return invalidServerConfiguration('invalid-local-secret-key');
+      }
       modern.push(localKey);
     }
     const legacy = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || null;
-    if (legacy && !/^[\w-]+\.[\w-]+\.[\w-]+$/.test(legacy)) return null;
-    return modern.length || legacy ? { modern, legacy } : null;
+    if (legacy && !/^[\w-]+\.[\w-]+\.[\w-]+$/.test(legacy)) {
+      return invalidServerConfiguration('invalid-legacy-service-role-key');
+    }
+    return modern.length || legacy
+      ? { modern, legacy }
+      : invalidServerConfiguration('missing-server-key');
   } catch {
-    return null;
+    return invalidServerConfiguration('unreadable-server-key-configuration');
   }
+}
+
+function invalidServerConfiguration(
+  reason:
+    | 'missing-supabase-url'
+    | 'invalid-secret-keys-json'
+    | 'invalid-secret-keys-object'
+    | 'invalid-secret-keys-value'
+    | 'invalid-local-secret-key'
+    | 'invalid-legacy-service-role-key'
+    | 'missing-server-key'
+    | 'unreadable-server-key-configuration',
+): null {
+  // Only fixed reason codes enter the private function log. JSON parse errors,
+  // key values/names and request data must never reach logs or the HTTP response.
+  console.error(`catalog-import configuration failed: ${reason}`);
+  return null;
 }
 
 function isSecretKey(value: unknown): value is string {
