@@ -14,6 +14,96 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog modern-key recovery — 2026-09-12 / #182
+
+PR #247 accepted the diagnostic source on main
+`4fbf5bd8eb0346b18395d633569efc23549c1dc4`, tree
+`d4cd56ec1efa4cd92b1a4dabc19d098f1845f306`, after all five CI #486 jobs passed
+at `e8125f3381b2fff7947ddb78cd87eef1ac481e35`. The deployment response reported
+ACTIVE v6; subsequent readback reported ACTIVE v7 with bundle digest
+`c5ce84272cb674e1c0705e03dc27a308e6c4b328be12a8014a547d128e1130ed`.
+Only one diagnostic deployment call was made; the metadata difference is recorded
+without inferring its cause. All three readback contents match the verified
+PR #247 payload, with `verify_jwt=false` and the function-local import map.
+
+The owner supplied a v7 private log at **2026-09-12T23:40:08.656Z**:
+`catalog-import configuration failed: invalid-legacy-service-role-key`.
+The failed check is now identified: the optional legacy value is not in the
+accepted JWT format and blocks the entire configured-key set. Its actual value
+and the platform's reason for supplying it remain unknown and are not needed for
+this bounded repair. Default modern secret keys are independent of legacy JWT
+compatibility, as described in the
+[current API-key migration guide](https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys).
+The owner's existing Default secret key is suitable; creating or rotating keys is
+not a prerequisite. Token setup, built-in variable presence and the private-log
+request are complete and must not be requested again.
+
+`fix/182-modern-key-legacy-recovery` excludes malformed optional legacy values
+only when validated usable modern keys exist. Excluded legacy strings are never
+accepted through apikey/Bearer or forwarded to the Data API. Without a usable
+modern key, the same malformed legacy input still produces the generic 500 and
+fixed private reason. Malformed modern maps and local keys still fail closed;
+valid legacy exact matching, modern apikey-only matching, named rotation and
+immediate revocation remain unchanged. No role claim authorizes a request.
+
+The HTTP regression exercises named Default/rotation keys and the optional local
+key against two malformed legacy values, including a modern-looking string that
+is deliberately absent from the configured modern set. It checks anonymous/user,
+publishable, foreign, invalid-legacy and modern-Bearer rejection before I/O, then
+normalized import with only the matched modern apikey forwarded. Existing generic
+configuration/redaction tests retain invalid-legacy-only and empty-modern-map
+failure coverage. The catalog still has no external runtime packages.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed 377 tests, lint/typecheck and both
+Hermes exports; the existing mobile Hook warning remains. Deployment preparation
+passed all 15 catalog HTTP cases against the actual staged files with a fresh
+cache and npm/remote imports disabled. Payload SHA-256 is
+`e5e3f85dfe0e76103d7b3c66591395c30cca6ec03796b237da162050f632d4e3`;
+entrypoint SHA-256 is
+`774b3d3f90d240dd4db49000b00004adc212e732dd1cb7b3d80e27e5601b7157`.
+The local config/normalizer hashes remain unchanged. Current-head CI must also
+pass before merge and rollout. Issue #182 owns the actual post-merge commit, CI,
+deployment/readback and probe checkpoint; inspect it before repeating a rollout.
+The earlier diagnostic/v3 sections retain dated evidence rather than current
+next-action instructions. No provider import has been performed at this source
+checkpoint, and no catalog breadth/MVP gate is closed by this repair.
+
+After configuration recovery and negative request checks, use the supported
+owner Dashboard **Edge Functions > catalog-import > Test** path:
+
+1. Choose POST, then **Headers > Add secret key**. The tester defaults to a
+   publishable key; the secret-key action adds the privileged `apikey` through
+   the Dashboard server proxy. Do not paste any key into chat.
+2. First body: `{"action":"invalid-preflight-only"}`. Require 400
+   `unsupported-action`; this proves configured-key acceptance without provider
+   or database I/O. Share only status and response, not request headers.
+3. After that success and fresh read-only baseline coverage, run the already
+   authorized canary exactly once with the following body:
+
+```json
+{
+  "action": "tmdb-movies",
+  "startPage": 1,
+  "pages": 1,
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+4. Record returned counts/pages, re-run `scripts/catalog/catalog-coverage.sql`
+   and inspect actual movie metadata. One page is the initial canary; the CLI's
+   default 15-page expansion is not implied. Keep #182 open for breadth/quality.
+
+The Dashboard path was verified from current official Studio
+[tester source](https://github.com/supabase/supabase/blob/26585dd4a4d6db8910a595214c9f6e8fdd206768/apps/studio/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet.tsx)
+and [header actions](https://github.com/supabase/supabase/blob/26585dd4a4d6db8910a595214c9f6e8fdd206768/apps/studio/components/interfaces/Functions/httpHeaderAddActions.ts).
+It has not yet been exercised with this project's privileged key. The connector
+cannot invoke functions or read secrets; no local privileged credentials exist.
+Use the supported owner path instead of repeating the unfinished browser sign-in.
+Other functions, six installed forwards, accounts and the #229 device ledger are
+outside this catalog-only packet.
+
 ## Catalog configuration diagnostics — 2026-09-12 / #182
 
 PR #246 accepted the v3 rollout handoff on main

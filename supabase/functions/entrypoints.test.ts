@@ -242,6 +242,45 @@ Deno.test('legacy-only configuration works; removing a configured key immediatel
   }, { SUPABASE_SECRET_KEYS: undefined });
 });
 
+Deno.test('valid modern keys work independently of malformed optional legacy credentials', async () => {
+  for (const invalidLegacy of ['not-a-service-jwt', 'sb_secret_legacy_only_fixture']) {
+    for (const modernKeys of [
+      { SUPABASE_SECRET_KEYS: JSON.stringify({ default: modern, rotation: rotated }) },
+      { SUPABASE_SECRET_KEYS: undefined, SUPABASE_SECRET_KEY: modern },
+    ]) {
+      await withEdge(async (f) => {
+        const rejected: HeadersInit[] = [
+          {},
+          { apikey: invalidLegacy },
+          { authorization: `Bearer ${invalidLegacy}` },
+          { apikey: publishable, authorization: `Bearer ${ordinaryUser}` },
+          { apikey: legacy },
+          { authorization: `Bearer ${modern}` },
+          { apikey: 'sb_secret_foreign_fixture' },
+        ];
+        for (const headers of rejected) {
+          await expectError(await f.request(null, headers), 403, 'forbidden');
+        }
+        assert.equal(f.outgoing.length, 0);
+        const accepted = modernKeys.SUPABASE_SECRET_KEYS ? [modern, rotated] : [modern];
+        for (const key of accepted) {
+          const response = await f.request({ action: 'tmdb-movies' }, {
+            apikey: key,
+            authorization: `Bearer ${invalidLegacy}`,
+          });
+          assert.equal(response.status, 200);
+          assert.equal((await response.json()).importedCount, 1);
+          const rpc = f.outgoing.at(-1);
+          assert.equal(rpc?.headers.get('apikey'), key);
+          assert.equal(rpc?.headers.get('authorization'), null);
+        }
+        assert.equal(f.outgoing.length, accepted.length * 4);
+        assert.deepEqual(f.logs, []);
+      }, { ...modernKeys, SUPABASE_SERVICE_ROLE_KEY: invalidLegacy });
+    }
+  }
+});
+
 Deno.test('missing or malformed server configuration fails closed before provider access', async () => {
   const cases: [Record<string, string | undefined>, string][] = [
     [{ SUPABASE_URL: undefined }, 'missing-supabase-url'],
@@ -257,7 +296,10 @@ Deno.test('missing or malformed server configuration fails closed before provide
         { SUPABASE_SECRET_KEYS }, 'invalid-secret-keys-value',
       ]),
     [{ SUPABASE_SECRET_KEY: publishable }, 'invalid-local-secret-key'],
-    [{ SUPABASE_SERVICE_ROLE_KEY: `not-a-service-jwt:${legacy}` }, 'invalid-legacy-service-role-key'],
+    ...[undefined, '{}'].map((SUPABASE_SECRET_KEYS): [Record<string, string | undefined>, string] => [
+      { SUPABASE_SECRET_KEYS, SUPABASE_SERVICE_ROLE_KEY: `not-a-service-jwt:${legacy}` },
+      'invalid-legacy-service-role-key',
+    ]),
   ];
   for (const [overrides, reason] of cases) {
     await withEdge(async (f) => {
