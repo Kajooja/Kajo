@@ -128,19 +128,22 @@ Do not recreate or roll out those changes from this older runtime checkout.
 reference algorithm, time semantics, bounds and storage/retraction responsibilities.
 E1 source/CI acceptance precedes D1's real source manifest/adapter/cohort, then D2's
 honest baseline report. E1 is accepted through #241. D1 intake source is described
-below; actual source/data acceptance remains open. No trained model or native
+below; the selected real development cohort is verified and current-head source
+acceptance remains open. No trained model or native
 runtime dependency is added.
 
 ## Isolated research intake — D1 #236
 
 | Area | Source | Scope |
 | --- | --- | --- |
-| Exact source and rights | `research/manifests/movielens-32m.json` | MovieLens 32M URLs, intended research use, unresolved source-hash/terms review, selection and resource policy; no invented hashes |
+| Exact source and rights | `research/manifests/movielens-small-v2.json`; `movielens-32m.json` | Selected GroupLens Kaggle v2 development source with reviewed scope and actual archive/member hashes; separately pending 32M source, release-specific selection and resource bounds |
 | Bounded archive/CSV normalization | `scripts/research/movielens.py` | Publisher metadata gate, verified atomic download, allowlisted ZIP streams, complete deterministic subject histories, quarantine and hash-verified stage reuse |
 | Engine research adapter | `packages/prediction-engine/src/adapters/movielens.ts`; `scripts/research/normalize-movielens.mjs` | Actual E1 Observation export from original ratings, release namespaces and explicit unknown exposure/action context; separate atomic output stage |
 | Research verification | `scripts/research/test_movielens.py`, `movielens.test.mjs`; engine `test/movielens.test.ts`; root `test:research` | Artificial ZIP → Python → built TypeScript tests plus parser, bounds, integrity, provenance and time-group cases; Python 3.12 configured in ordinary CI, no dataset download |
+| Actual intake evidence | `research/reports/movielens-small-v2-intake.json` | Aggregate-only source/cohort/quarantine/mapping counts, source/output/code hashes, resource measurements and independent replay; no histories or fitted artifacts |
 
 [Research README](../../research/README.md) owns commands and concrete format/policy.
-STATUS owns the current real-data blocker and D1 continuation. This source does
-not implement D2 training, source-rights approval, dataset redistribution or native
+STATUS owns D1 source acceptance and D2 continuation. The small source is real and
+verified; the earlier 32M transport failure is not its prerequisite. This source does
+not implement D2 training, automatic rights approval, dataset redistribution or native
 serving; the generic computation root does not import this external adapter.

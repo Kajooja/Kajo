@@ -98,9 +98,10 @@ frozen forecasts remain immutable when projections are rebuilt.
 
 E1 is accepted through #241. [D1 #236](https://github.com/Kajooja/Kajo/issues/236)
 now supplies the [isolated intake source](../../research/README.md), manifest,
-parser/adapter, quarantine and reproducible stage hashes. Actual publisher
-verification and the small real cohort remain open. D1 must resolve source rights,
-resource limits and actual availability assumptions before downloading. D2 then
+parser/adapter, quarantine and reproducible stage hashes. The owner-authorized
+2018 GroupLens Kaggle v2 source supplied a verified, independently reproduced
+500-subject / 84,849-rating development cohort. Release namespaces keep it separate
+from the pending 32M source. After D1's current-head source acceptance, D2
 freezes train-only temporal/cold-start baselines and the bounded static-state vs
 ordered-prefix experiment. No dataset, trained representation, production model
 admission or SQL replacement is delivered by E1.

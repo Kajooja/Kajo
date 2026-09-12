@@ -1,11 +1,16 @@
-# Sprint 014 — D1 source checkpoint
+# Sprint 014 — D1 source and real-data checkpoint
 
 Date: **2026-09-12**. Issue [#236](https://github.com/Kajooja/Kajo/issues/236).
 Source branch: `feat/236-movielens-research`, based on accepted main
 `3747ecb58d69ba78440ca1b72b7cc554b1a9720a` / merged E1 PR #241. E1's five
 required jobs passed in CI #471. STATUS owns the exact current continuation.
 
-## Source delivered for review
+Current result: the owner-authorized GroupLens 2018 Kaggle v2 alternative supplied
+84,849 real ratings from 500 subjects, independently reproduced. The initial 32M
+source attempts below are historical; see the selected-alternative result and
+exact continuation at the end.
+
+## Initial 32M source delivered for review
 
 A pinned-release manifest and Python 3.12 standard-library intake implement
 metadata review before download, verified atomic ZIP download, safe bounded
@@ -25,7 +30,7 @@ The core computation import graph remains independent. No native UI, SQL,
 provider catalog or authentication code changed. No dependencies were added;
 ordinary CI now sets up Python 3.12 for artificial source tests.
 
-## Validation and actual source attempt
+## Initial validation and 32M source attempt
 
 Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **338 tests**: 212 mobile,
 14 catalog, 61 isolated database, 34 engine, 15 Python intake and two actual
@@ -68,16 +73,52 @@ only; the implementation and the 338-test local result are unchanged. Manifest
 JSON, pending source/rights gates and `git diff --check` were verified; the unchanged
 full check was not repeated for this metadata-only follow-up.
 
+## Selected alternative and actual intake — owner follow-up
+
+The owner explicitly requested a suitable available seed instead of waiting for
+32M. GroupLens's own Kaggle Latest Small version 2 was selected after reviewing
+its archived README Usage License and publisher metadata. Research use has
+attribution/no-endorsement conditions and commercial use requires permission.
+The publisher labels this a development dataset, unsuitable for shared benchmark
+claims. D2's first scope is therefore a pinned, bounded development comparison.
+The source manifest records the exact reviewed purpose and five member hashes;
+SHA-256 values were computed from actual retrieved bytes, not represented as
+publisher-issued checksums. Both initial and authored archive downloads matched.
+
+Actual source counts are 100,836 ratings, 610 subjects, 9,742 movies and 3,683 tags.
+The fixed 500-subject hash cohort contains 84,849 ratings, retaining complete
+20–2,698-rating histories. All ratings remained valid. One TMDb alias collision
+quarantined both affected mapping records; ten objects lack usable TMDb aliases
+in total, with no missing IMDb mappings. No source people or movie IDs were merged.
+Raw data and per-subject histories remain ignored, separate from native Kajo.
+
+Two fresh executions agree on all normalized hashes/manifests and the engine
+Observation hash `2bf4213edc2e63b7fd208900342fab98d4b971a2ce9e1760c9339531cb0e9463`.
+A third execution reused only verified stages. The final first/replay runs took
+1.94/1.73 seconds; largest child RSS was 132,268 KiB, which is not total concurrent
+process-tree memory. [Aggregate evidence](../../../research/reports/movielens-small-v2-intake.json)
+records commands, exact source/code/output hashes and measured limits.
+
+The real run exposed that first-N probe records can all share one timestamp.
+The probe now retains at most twenty earlier records and waits for a strictly
+later observed group; absence of such a group is explicitly unsupported. The
+actual probe passed with twenty prior records. Regression tests cover both a
+large equal-time batch and an all-tied history. This proves the bounded prefix
+contract, not predictive quality, fitted parameters or serving readiness.
+
+The final `EXPO_OFFLINE=1 CI=1 npm run check` passed **345 tests**: 212 mobile,
+14 catalog, 61 database, 35 engine, 19 Python intake and four pipeline cases.
+Lint/TypeScript and both Hermes exports passed, with the unchanged mobile Hook
+warning. Tests are artificial and separate from the real-data evidence above.
+No dependencies, hosted changes, UI edits or manual APK dispatch were added.
+
 ## Exact continuation
 
-Verify any later PR-head CI before merging. Once normal HTTPS verification succeeds or
-an independently verifiable publisher-authorized exact copy is available, resume
-the same D1 issue/branch with
-`research:movielens:prepare`; inspect the exact retrieved source terms/checksum
-and record verified identities/reviewer/scope. Run download, inspect archived
-README and file hashes, then normalize the real full-history cohort. Record actual
-source/cohort/quarantine/mapping counts, resource evidence and repeat hashes in
-an aggregate checkpoint without committing histories. Only after that does
-D2 #237 start its frozen temporal/cold-start baseline comparison. D1 remains open
-while publisher access blocks the real run; do not close it because fixtures pass.
-No manual APK dispatch, hosted write, account reset or UI correction ran here.
+Finish the new source head's required CI and review, then accept D1 #236 / PR #242.
+D2 #237 starts with this exact development cohort: freeze global temporal cutoffs,
+held-out-subject prefixes, final test, source/code identity, seeds, candidate/task
+semantics, metrics and resource limits before fitting. Compare train-only baselines
+and bounded static-state/ordered-prefix memory under the declared data limits.
+Do not wait for the unavailable 32M endpoint as an implicit prerequisite; it can
+supply a separate larger stable benchmark later. Keep source-model admission and
+native #229 acceptance independent. MVP-ENG-002 stays open through the D2 report.

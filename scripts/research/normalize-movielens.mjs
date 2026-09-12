@@ -48,6 +48,7 @@ export async function convertToEngineObservations(directory) {
   let writeError;
   writer.on('error', error => { writeError = error; });
   const sample = [];
+  let probeTarget;
   let count = 0;
   let previous;
   try {
@@ -64,7 +65,11 @@ export async function convertToEngineObservations(directory) {
       previous = order;
       count++;
       if (count > manifest.cohort.ratings) throw new Error('Cohort row count exceeded');
-      if ((!sample.length || sample[0].subjectId === observation.subjectId) && sample.length < 20) sample.push(observation);
+      if (!sample.length) sample.push(observation);
+      else if (!probeTarget && sample[0].subjectId === observation.subjectId) {
+        if (observation.occurredAt > sample[0].occurredAt) probeTarget = observation;
+        else if (sample.length < 20) sample.push(observation);
+      }
       if (writeError) throw writeError;
       if (!writer.write(JSON.stringify(observation) + '\n')) await once(writer, 'drain');
     }
@@ -76,16 +81,17 @@ export async function convertToEngineObservations(directory) {
     if (count !== manifest.cohort.ratings || count === 0 || await sha256(sourcePath) !== inputSha256) {
       throw new Error('Cohort count or input bytes changed');
     }
-    const cutoff = Math.max(0, sample.at(-1).occurredAt - 1);
+    const cutoff = Math.max(0, (probeTarget ?? sample[0]).occurredAt - 1);
     const scope = { subject: { id: sample[0].subjectId, kind: 'individual' }, actingIdentityRef: null,
-      sessionRef: 'offline-contract-probe', evidence: { sourceIds: ['movielens:ml-32m'], cohortIds: [], synthetic: 'exclude' } };
-    const state = represent({ scope, observations: sample.filter(o => o.occurredAt <= cutoff), target: movieLensTarget,
+      sessionRef: 'offline-contract-probe', evidence: { sourceIds: [`${manifest.source.datasetId}:${manifest.source.releaseId}`], cohortIds: [], synthetic: 'exclude' } };
+    const state = represent({ scope, observations: probeTarget ? sample.filter(o => o.occurredAt <= cutoff) : [], target: movieLensTarget,
       asOf: cutoff, artifact: { id: 'untrained-raw-rating-prefix', version: '1', representationVersion: 'raw-rating-v1',
         availableAt: 0, trainedThrough: null, sourceRefs: [], use: 'research-only' } });
     const checkpoint = { conversionId, ...identity, outputSha256: await sha256(targetPath), count,
       evidence: { native: 0, external: count, synthetic: 0 },
-      contractProbe: { externalPrefixRecords: state.prefix.length, unknownActingIdentity: state.scope.actingIdentityRef === null,
-        equalTimestampLabelsExcluded: state.prefix.every(o => o.occurredAt < sample.at(-1).occurredAt) },
+      contractProbe: { status: probeTarget ? 'passed' : 'insufficient-distinct-time-groups',
+        externalPrefixRecords: state.prefix.length, unknownActingIdentity: state.scope.actingIdentityRef === null,
+        equalTimestampLabelsExcluded: probeTarget ? state.prefix.every(o => o.occurredAt < probeTarget.occurredAt) : null },
       nodeVersion: process.versions.node };
     const { writeFile } = await import('node:fs/promises');
     await writeFile(join(work, 'manifest.json'), JSON.stringify(checkpoint, null, 2) + '\n', { flag: 'wx' });

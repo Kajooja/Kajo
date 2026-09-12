@@ -6,6 +6,15 @@ import { fixtureArtifact } from '../src/fixtures/cycles.js';
 const source = { datasetId: 'movielens', releaseId: 'ml-32m', archiveSha256: 'a'.repeat(64), purpose: 'NONCOMMERCIAL_RESEARCH_ONLY' } as const;
 const row = { userId: '1', movieId: '2', rating: 0.5, timestamp: 100 };
 
+it('keeps the pinned development release separate from 32M identities and provenance', () => {
+  const small = interpretMovieLensRating(row, { ...source, releaseId: 'ml-latest-small-2018-kaggle-v2' });
+  const large = interpretMovieLensRating(row, source);
+  expect(small.subjectId).not.toBe(large.subjectId);
+  expect(small.objectId).not.toBe(large.objectId);
+  expect(small.provenance.source).toMatchObject({ id: 'movielens:ml-latest-small-2018-kaggle-v2', release: 'ml-latest-small-2018-kaggle-v2' });
+  expect(small.raw).toEqual(large.raw);
+});
+
 it('preserves raw scale, source identity and unknown native action/exposure semantics', () => {
   const observation = interpretMovieLensRating({ ...row, actorUserId: 'not-a-native-actor', exposure: 'verified' }, source);
   expect(observation).toMatchObject({ subjectId: 'movielens:ml-32m:subject:1', objectId: 'movielens:ml-32m:movie:2',

@@ -1,129 +1,130 @@
 # Isolated MovieLens research — D1
 
-E1 contracts are accepted through PR #241. D1 source supplies bounded intake and
-a real engine adapter. **The actual MovieLens 32M download/cohort is not accepted**:
-the 2026-09-12 publisher README/checksum/archive requests returned HTTP 502 from
-this environment. A repeat attempt confirmed that the HTTPS proxy reports an
-expired certificate during upstream verification. The tracked manifest has no
-verified source hashes or research-rights approval.
-[STATUS](../docs/project/STATUS.md) owns current progress.
+The owner authorized an available alternative to MovieLens 32M on 2026-09-12.
+D1 now uses **GroupLens MovieLens Latest Small, September 2018, Kaggle version 2**
+for a bounded noncommercial development experiment. The actual source contains
+100,836 ratings, 610 users, 9,742 movies and 3,683 tags. A deterministic 500-user
+cohort preserves **84,849 complete-history ratings**, all converted into external
+engine Observations. Independent fresh normalization/conversion and verified cache
+replay produced matching hashes. [Aggregate evidence](reports/movielens-small-v2-intake.json)
+records exact counts, hashes, commands, resource measurements and limitations.
 
-The source is the [GroupLens MovieLens 32M release](https://grouplens.org/datasets/movielens/32m/).
-Its [README](https://files.grouplens.org/datasets/movielens/ml-32m-README.html)
-and [checksum](https://files.grouplens.org/datasets/movielens/ml-32m.zip.md5)
-must be available and reviewed for the declared noncommercial research purpose.
-The complete project rights/admission rules belong to
-[DATA_ENRICHMENT](../docs/architecture/DATA_ENRICHMENT.md).
+The [publisher's Kaggle release](https://www.kaggle.com/datasets/grouplens/movielens-latest-small)
+is the alternative location linked by [GroupLens](https://grouplens.org/datasets/movielens/).
+Its archived README permits research with attribution and no implied endorsement;
+commercial/revenue-bearing use requires prior permission. The publisher labels
+Latest Small a **development dataset**, unsuitable for shared benchmark claims.
+Freezing version 2 and hashes makes this internal development run reproducible;
+it does not change that scope or prove Kajo product usefulness.
 
-## Commands and source gate
+## Selected source and alternatives
 
-Use Node 22+ and Python 3.12 (standard library only). From the repository root:
+| Source | Decision |
+| --- | --- |
+| GroupLens Latest Small, Kaggle v2 | Selected and actually processed. Publisher identity, version, README, archive and every member are pinned; original half-star ratings and timestamps remain intact. |
+| MovieLens 32M | Larger stable benchmark remains available as an explicit later intake. Its original file service fails upstream TLS verification in this environment; it no longer blocks the selected development experiment. |
+| GroupLens MovieLens 20M on Kaggle | Publisher metadata/file listing is available. Its transformed package has different filenames/timestamp representation and an Unknown license label; exact terms and package verification are separate work before use. |
+| Amazon Reviews 2023 | Useful candidate for broader categories, but the maintainer cannot assign its usage rights; unresolved for this project. |
+| UCSD Goodreads | Book ratings/shelves are relevant, but its academic-only scope is not established for this independent project. |
+
+[DATA_ENRICHMENT](../docs/architecture/DATA_ENRICHMENT.md) owns source comparisons,
+rights and research/model-admission semantics. [STATUS](../docs/project/STATUS.md)
+owns the current PR and next bounded step. A source change always has an explicit
+release identity; equal integer IDs never join users across releases.
+
+## Repeat the real intake
+
+Use Node 22+ and Python 3.12 (standard library). From the repository root:
 
 ```sh
 npm ci
 npm run research:movielens:prepare
+npm run research:movielens:download
+npm run research:movielens:normalize -- --output-dir research-artifacts/movielens-small-verified
+npm run research:movielens:normalize -- --output-dir research-artifacts/movielens-small-verified-replay
 ```
 
-`prepare` retrieves only the small publisher README and checksum into ignored
-`research-data/movielens-32m/`. Read the actual snapshot, verify the exact release
-and intended-use terms, then record its SHA-256 and publisher MD5 in
-`research/manifests/movielens-32m.json`. Set `sourceVerification.status` to
-`verified` and the research decision to `approved-for-noncommercial-research`
-only with the named reviewer/date and source evidence. Changing flags alone is
-not a rights review. No commercial/serving/redistribution permission follows.
+The default source is `small`. `prepare` retrieves only the README and publisher
+metadata into ignored `research-data/movielens-small/`. It checks the GroupLens
+owner, dataset identity, version 2, exact README hash and five-file inventory.
+The tracked `manifests/movielens-small-v2.json` records the reviewed research scope,
+original source URLs and actual archive/member SHA-256 values. These are hashes
+computed from retrieved publisher bytes, **not a claimed publisher-issued checksum**.
+No flags are automatically promoted by retrieval.
 
-After source review:
+`download` requires that reviewed source snapshot and uses a bounded temporary
+file. It verifies the pinned version's SHA-256/byte count before atomic publication.
+The first inspected archive and a second independent authored download matched.
+Existing archives are rechecked; failed/changed downloads cannot replace accepted
+bytes. A publisher update requires a new review and identity, not a silent repin.
+
+`normalize` checks every ZIP member's allowlisted path, type, size, CRC and pinned
+hash, streams strict UTF-8 CSV, then creates an atomic normalized stage. The built
+TypeScript adapter creates a separate atomic engine stage. Repeat commands reuse
+only completed stages whose input/output hashes and code lineage still match.
+Different output roots permit independent execution without deleting prior work.
+The run ID binds the source archive, manifest and Python code; the conversion ID
+also binds the built adapter and runner. Source retrieval time stays separate from
+simulated observation time. No real download runs in ordinary CI.
+
+The original 32M source remains explicit and gated by its own unresolved review:
 
 ```sh
-npm run research:movielens:download
-npm run research:movielens:normalize
+npm run research:movielens:prepare -- --source 32m
 ```
 
-`download` requires the pinned, unchanged reviewed snapshot before fetching an
-archive. It uses a bounded temporary file, verifies the publisher MD5, records
-SHA-256 and atomically makes the verified archive available. Existing archives
-are rechecked, not silently replaced. A failed download leaves no accepted ZIP;
-retry restarts that bounded stage. HTTPS publisher URLs are fixed by source.
+Do not retry that failing endpoint repeatedly as a prerequisite for the small run.
 
-`normalize` checks the archive again, validates its allowlisted members and CRCs,
-streams them directly without extracting supplied paths, and creates a complete
-normalized stage under ignored `research-artifacts/movielens-32m/<run-id>/`.
-The built TypeScript adapter then atomically writes an `engine-<conversion-id>`
-stage. Repeat commands reuse only completed outputs whose recorded hashes and
-lineage still match. Interrupted stages are restarted; unknown/corrupt completed
-outputs fail for inspection rather than being overwritten. The script removes
-only temporary paths it created itself.
-
-The run identity binds archive bytes, manifest/normalization policy and source
-code. The adapter stage also binds its built implementation and input hash.
-Source snapshot retrieval time stays distinct from simulated observation time.
-
-## Data and deterministic selection
+## Normalized files and selection
 
 | File | Meaning |
 | --- | --- |
-| `ratings.jsonl` | Valid cohort ratings on the original 0.5–5 scale, ordered by rating timestamp, numeric source user ID and movie ID |
-| `subjects.jsonl` | Release-scoped external subject IDs and complete valid history counts; no native account mapping |
-| `objects.jsonl` | Source movie metadata and explicit IMDb/TMDb aliases; unknown metadata availability; static-release use only |
-| `quarantine.jsonl` | Counted malformed/conflicting records and mapping entries, with source file/line references |
-| `manifest.json` | Archive/file/output hashes, source counts, cohort/selection policy, scope, code/runtime identity and aggregate quarantine/mapping coverage |
-| `engine-*/observations.jsonl` | Source-typed E1 Observations with external provenance and original raw scale; unknown exposure and null native actor/action/prediction |
-| `engine-*/manifest.json` | Exact converted input/output hashes, counts and a bounded available-prefix contract probe |
+| `ratings.jsonl` | Original 0.5–5 ratings, ordered by timestamp, numeric source user ID and movie ID |
+| `subjects.jsonl` | Release-scoped research subjects and their complete valid history counts |
+| `objects.jsonl` | Source movie metadata and explicit IMDb/TMDb aliases; metadata availability remains unknown |
+| `quarantine.jsonl` | Counted invalid/conflicting records and source references |
+| `manifest.json` | Source/output/code hashes, counts, cohort policy, mapping coverage and unknown semantics |
+| `engine-*/observations.jsonl` | External observed E1 records; unknown exposure and null native actor/action/prediction |
+| `engine-*/manifest.json` | Conversion hashes, counts and bounded available-prefix contract probe |
 
-The default cohort takes the 1,000 lowest SHA-256 ranks of
-`movielens:ml-32m:<seed>:<source-user-id>`, among subjects with at least 20 valid
-unique ratings. It retains their complete valid histories. It never takes the
-first N user-sorted rows. User grouping is validated while scanning; within-user
-movie order is irrelevant, and output is chronologically sorted. Equal-time
-targets must use a cutoff strictly before their entire timestamp group in D2.
+Select the 500 lowest SHA-256 ranks of
+`movielens:ml-latest-small-2018-kaggle-v2:<seed>:<source-user-id>` among subjects
+with at least 20 valid unique ratings. The fixed seed is
+`kajo-d1-mlsmall-v2-500-v1`. Keep complete valid histories; never take the first N
+sorted rows. The actual selected history lengths range from 20 to 2,698 ratings.
 
-Exact duplicate user/movie ratings count once. Conflicting rows for a pair are
-all quarantined; this release does not establish which is a legitimate historical
-correction, so the importer does not silently choose the latest or invent revision
-history. Conflicting movie/link IDs are also quarantined. Alias collisions remove
-the conflicting mappings from every affected movie without merging research
-objects. Missing aliases remain missing and are reported. No title-based match or
-live Kajo catalog query is performed. Tags are hashed/validated/counted but are
-not model inputs or converted rating Observations in D1.
+Exact duplicate pairs count once. All conflicting pair versions enter quarantine;
+the importer does not invent historical corrections. Conflicting aliases are
+removed from every affected mapping without merging movies. The real run found
+one TMDb alias shared by two source movies: both mapping records were quarantined,
+ratings remained valid, and ten objects lacked a usable TMDb mapping in total.
+No IMDb mapping was missing. Live Kajo catalog intersection was not queried.
+Tags are validated/counted/hashed and are not model inputs in this packet.
 
-The manifest bounds compressed/expanded bytes, download duration, row/subject/
-object counts, field/line sizes, per-subject history, retained cohort ratings and
-quarantine entries. Defaults cap the archive at 300 MiB, expanded data at 2 GiB
-and the retained cohort at 500,000 ratings. Exceeding a bound fails; it does not
-truncate a selected history. No fitted model or raw data enters ordinary CI.
+The small-source manifest caps archive bytes at 2 MiB, expanded bytes at 8 MiB,
+source rows at 110,000, subjects at 1,000, objects at 12,000, one subject's history
+at 5,000 and cohort ratings at 110,000. Limits fail rather than truncate histories.
+The original 32M source keeps its own larger resource bounds.
 
-## Time and observation limits
+## Time, testing and next experiment
 
-Timestamps record rating activity in epoch seconds. The adapter preserves them
-as milliseconds and explicitly declares availability-at-occurrence as an **offline
-simulation assumption**. It does not invent viewing time, a shown recommendation,
-an action propensity, mood or native Kajo consumption. Metadata is an undated
-release snapshot and cannot silently supply historical features. A research
-rating target uses object-observation conditioning, not a causal action claim.
+Timestamps are rating activity in epoch seconds, not viewing time. Availability
+at occurrence is an explicit offline simulation assumption. Whole equal-time
+label groups stay outside a query's historical prefix. The bounded probe retains
+at most 20 earlier records and waits for a strictly later group; an all-tied history
+is reported as unsupported instead of passing vacuously. The real probe passed
+with 20 earlier records. Object metadata is an undated release snapshot and cannot
+silently become historical features, native exposure, context or consumption.
 
-Raw archives, histories, cohort records, checkpoints and future fitted artifacts
-stay out of Git and ordinary CI uploads. Publish only authored code, schemas,
-non-identifying manifests, aggregate reports and attribution under project policy.
-Source/derivative rights and serving admission remain separate gates.
+`EXPO_OFFLINE=1 CI=1 npm run check` passed **345 tests**: 212 mobile, 14 catalog,
+61 database, 35 engine, 19 Python intake and four cross-language/pipeline tests.
+Lint/TypeScript and both Hermes exports passed; one pre-existing mobile Hook
+warning remains. Tests use explicitly artificial archives. The real-data report
+above is separate evidence and contains no histories or fitted artifacts.
 
-## Verification and next step
-
-`npm run check` includes the existing app/database checks, engine adapter tests,
-15 standard-library intake tests and two actual Python → built TypeScript
-pipeline tests using explicitly artificial archives. Existing CI sets up Python
-3.12 and performs no real dataset download. These tests passed locally (338 total),
-along with lint/typecheck and both Hermes exports. They prove source behavior;
-they are not evidence of a real MovieLens cohort or predictive usefulness.
-All five required jobs also passed in [CI #473](https://github.com/Kajooja/Kajo/actions/runs/34709751376)
-at implementation head `aab39a51761b2047ff8de5fe522fc773a8c78221`.
-
-Resume D1 by obtaining and reviewing the exact publisher metadata, running the
-three commands above, inspecting archived README/terms and recording real
-archive/file/cohort hashes, counts, quarantine and resource evidence. Verify one
-independent rerun produces the same normalized/adapter hashes. Only then does D2
-begin its frozen temporal/cold-start baseline and ordered-prefix experiment.
-Do not substitute another release or an unverified third-party mirror for 32M.
-The current retry condition is a publisher endpoint that passes normal HTTPS
-verification, or an independently verifiable publisher-authorized copy of this
-exact release. Repeated unchanged requests cannot resolve the reported certificate
-failure; do not disable verification or approve source identity from search snippets.
+After this source/data packet's review and CI acceptance, D2 #237 freezes the
+chronological/held-out-subject development protocol, train-only baselines and a
+bounded static-state/ordered-prefix comparison before training. Report supported
+results and uncertainty honestly; the challenger need not win. Raw data, histories
+and future fitted artifacts stay in ignored research storage. Native serving,
+commercial use and artifact admission remain separate decisions.

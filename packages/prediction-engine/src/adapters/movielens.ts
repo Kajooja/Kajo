@@ -7,7 +7,7 @@ export const movieLensTarget: TargetDefinition = {
 
 export interface MovieLensSource {
   readonly datasetId: 'movielens';
-  readonly releaseId: 'ml-32m';
+  readonly releaseId: 'ml-32m' | 'ml-latest-small-2018-kaggle-v2';
   readonly archiveSha256: string;
   readonly purpose: 'NONCOMMERCIAL_RESEARCH_ONLY';
 }
@@ -26,7 +26,7 @@ function positiveId(value: unknown): value is string {
 
 /** Pure research adapter; no source person becomes a native account or Event. */
 export function interpretMovieLensRating(input: unknown, source: MovieLensSource): Observation {
-  if (source.datasetId !== 'movielens' || source.releaseId !== 'ml-32m'
+  if (source.datasetId !== 'movielens' || !['ml-32m', 'ml-latest-small-2018-kaggle-v2'].includes(source.releaseId)
     || source.purpose !== 'NONCOMMERCIAL_RESEARCH_ONLY' || !/^[a-f0-9]{64}$/.test(source.archiveSha256)) {
     throw new Error('A verified research source identity is required');
   }

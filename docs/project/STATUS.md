@@ -10,54 +10,58 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current source packet — D1 #236
+## Current source packet — D1 #236, real development seed
 
 **Continue [D1 #236](https://github.com/Kajooja/Kajo/issues/236) on
-`feat/236-movielens-research` / [draft PR #242](https://github.com/Kajooja/Kajo/pull/242).** It starts from accepted E1 main
-`3747ecb58d69ba78440ca1b72b7cc554b1a9720a` / merged PR #241. All five required
-jobs passed in [CI #471](https://github.com/Kajooja/Kajo/actions/runs/34707456295)
-at E1 head `17a8466fecb510d9e1049ff9feaa6ab72686400a`; its 310 local tests,
-ESM exports and both Hermes bundles are recorded in the E1 checkpoint.
-MVP-ENG-001's bounded contract/source acceptance is complete.
+`feat/236-movielens-research` / [PR #242](https://github.com/Kajooja/Kajo/pull/242).**
+It starts from accepted E1 main `3747ecb58d69ba78440ca1b72b7cc554b1a9720a` / #241.
+MVP-ENG-001 is accepted; #229's later native runtime remains separate.
 
-D1 implements the pinned MovieLens 32M source/rights manifest, safe bounded
-archive/CSV intake, deterministic subject-cohort selection retaining full valid
-histories, quarantine, repeatable hashes and a source-typed engine adapter.
-Raw and derived data remain in ignored research storage; no native accounts,
-Events, production imports or model training. The initial publisher metadata
-and archive requests returned HTTP 502 on 2026-09-12. Actual README/license,
-checksum, download and real-data normalization must be verified separately;
-fixture tests cannot stand in for them.
+The owner explicitly authorized an available alternative to MovieLens 32M on
+2026-09-12. The selected source is **GroupLens MovieLens Latest Small, September
+2018, Kaggle version 2**. Its official publisher identity, archived README terms,
+version, ZIP and all five member hashes have been checked. The allowed current
+scope is noncommercial offline development with attribution. This is the publisher's
+development dataset, not a shared benchmark or evidence of Kajo product uplift.
+The original 32M TLS failure is recorded historically and no longer blocks D1.
 
-A repeat `prepare` attempt also exited 1. The checksum request's HTTP 502 body
-identifies the transport failure as `Certificate verify failed: certificate has
-expired`, reported by the HTTPS proxy. Normal TLS verification remains enabled.
-The publisher landing page is available; its linked Kaggle alternative did not
-yield a verifiable 32M release. Resume retrieval when the official endpoint passes
-HTTPS verification or an independently verifiable publisher-authorized exact
-copy is available. Do not loop unchanged requests or replace the release silently.
+Actual source: **100,836 ratings, 610 subjects, 9,742 movies, 3,683 tags**. The fixed
+hash-selected **500-subject cohort retains 84,849 complete-history ratings**,
+with 20–2,698 ratings per selected subject. All cohort ratings were converted
+through the built TypeScript adapter into source-typed engine Observations.
+One TMDb alias collision quarantines both mappings; no ratings were discarded
+and no movie/user identities were merged. Ten objects lack usable TMDb aliases;
+no IMDb alias is missing. Live Kajo catalog intersection remains unqueried.
 
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **338 tests** (212 mobile,
-14 catalog, 61 database, 34 engine, 15 Python intake and two cross-language
-pipeline cases), TypeScript/lint and both Hermes exports. One pre-existing mobile
-Hook dependency warning remains unchanged. The authored `npm run
-research:movielens:prepare` command was actually run and returned HTTP 502 before
-saving source metadata or downloading an archive. Source/fixture CI, rights
-review and real-data acceptance remain separate; D1 stays open. All five required
-jobs passed in [CI #473](https://github.com/Kajooja/Kajo/actions/runs/34709751376)
-at implementation head `aab39a51761b2047ff8de5fe522fc773a8c78221`. The current
-follow-up changes documentation and source-attempt metadata only. See
-[the D1 checkpoint](sprints/SPRINT-014-D1.md) and [runner](../../research/README.md).
+Two independent fresh normalization/conversion runs produced identical manifests
+and output hashes; a third run verified both cached stages. The engine output
+SHA-256 is `2bf4213edc2e63b7fd208900342fab98d4b971a2ce9e1760c9339531cb0e9463`.
+The final first/replay commands took 1.94/1.73 seconds; largest measured child RSS
+was 132,268 KiB (not a simultaneous process-tree peak). Source download is separate:
+an initial inspection and a second authored download returned the same 993,937-byte
+archive. [Aggregate evidence](../../research/reports/movielens-small-v2-intake.json)
+contains exact commands, every hash, scope and resource-measure limitations.
 
-**Next bounded task: restore verifiable access to the exact MovieLens 32M source,
-retrieve/review the publisher README and checksum, record the real source
-identities, then download/normalize and verify a repeatable complete cohort.**
-Check any later PR-head CI before merge. Do not jump to D2 while the data gate is open.
+Real data exposed a vacuous prefix probe when the first twenty ratings shared a
+timestamp. The corrected bounded probe waits for a strictly later group; all-tied
+histories are reported unsupported. The real probe now used twenty earlier records
+and excluded the complete target timestamp group. This is contract evidence,
+not a quality metric or model training.
 
-After complete D1 acceptance, **D2 #237** freezes train-only temporal/cold-start
-baselines and a bounded static-state/ordered-prefix experiment/report. A losing
-challenger is valid. Keep D2 training and native runtime/model admission outside
-D1. #229's application UI/device gates remain independent.
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **345 tests** (212 mobile,
+14 catalog, 61 database, 35 engine, 19 Python intake and four pipeline cases),
+lint/TypeScript and both Hermes exports. The existing mobile Hook warning remains.
+All five required jobs passed in CI #473/#474 for the preceding source/metadata
+heads; this new source head needs its own required CI before merge. See
+[the D1 checkpoint](sprints/SPRINT-014-D1.md) and [commands](../../research/README.md).
+
+**Next bounded task: accept this real-data/source packet after current-head CI,
+then continue D2 #237 with the pinned small-development cohort.** Freeze global
+chronological and held-out-subject splits, source/code hashes, seeds, metrics,
+resource budgets and baseline/ordered-prefix comparisons before any fitting.
+Do not resume unchanged 32M download loops as a prerequisite. Larger stable data
+can be verified separately when useful; source, research and native admission
+remain distinct. No fitted model, hosted write or UI change is delivered here.
 
 ## Native packet checkpoint — #228 / draft PR #229
 
@@ -144,8 +148,8 @@ The ordered engine work is:
 | E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
 E1 is accepted through #241, and D1 is the current isolated source packet while
-#229 retains its remaining native acceptance. Do not silently resume application
-UI work or begin D2 training before D1 data acceptance. No large native user
+#229 retains its remaining native acceptance. Complete D1 source acceptance and then run the declared D2 development experiment;
+keep application UI work in its separately ordered packet. No large native user
 population, production schema or separate network service is needed for D1.
 
 Use ignored `research-data/` and `research-artifacts/` or equivalent controlled

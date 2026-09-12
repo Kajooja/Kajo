@@ -15,7 +15,8 @@ import zipfile
 import movielens as ml
 
 
-def fixture(directory, *, users=8, movies=None, links=None, ratings=None, tags=None, overrides=None):
+def fixture(directory, *, source="32m", users=8, movies=None, links=None, ratings=None, tags=None, overrides=None):
+    plan = ml.load_plan(source)
     movies = movies if movies is not None else [["1", 'Example, "quoted"\nfilm', "Drama|Comedy"], ["2", "Second", "(no genres listed)"]]
     links = links if links is not None else [["1", "0000012", "15"], ["2", "0000013", ""]]
     ratings = ratings if ratings is not None else [[str(user), str(movie), str(0.5 * (user % 10 + 1)), str(100 + user + (3 - movie) * 10)]
@@ -27,16 +28,19 @@ def fixture(directory, *, users=8, movies=None, links=None, ratings=None, tags=N
         writer = csv.writer(stream)
         writer.writerow(ml.HEADERS[name])
         writer.writerows(entries)
-        content["ml-32m/" + name] = stream.getvalue()
-    content["ml-32m/README.txt"] = "Artificial test archive; not MovieLens source evidence."
+        content[ml.source_member(plan, name)] = stream.getvalue()
+    content[ml.source_member(plan, "README.txt")] = "Artificial test archive; not MovieLens source evidence."
     if overrides:
         content.update(overrides)
     path = Path(directory) / "fixture.zip"
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
         for name, text in content.items():
             archive.writestr(name, text)
-    plan = ml.load_plan()
     plan["sourceVerification"]["publisherMd5"] = hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()
+    if source == "small":
+        files = {name: {"sha256": hashlib.sha256(value.encode()).hexdigest(), "bytes": len(value.encode())} for name, value in content.items()}
+        plan["sourceVerification"].update(archiveSha256=ml.digest(path), archiveBytes=path.stat().st_size,
+                                         files=files, readmeSha256=files["README.md"]["sha256"], publisherMd5=None)
     plan["expectedCounts"] = {"ratings": len(ratings), "subjects": len({row[0] for row in ratings}), "movies": len(movies), "tags": len(tags)}
     plan["cohort"].update(size=min(3, users), minimumSourceRatings=1)
     return path, plan
@@ -52,6 +56,86 @@ class MovieLensIntakeTests(unittest.TestCase):
         archive, plan = fixture(self.root, **kwargs)
         path, report, reused = ml.normalize_archive(archive, self.root / "output", plan)
         return path, report, archive, plan, reused
+
+    def small_metadata(self, plan):
+        return {"ownerRef": "grouplens", "ref": ml.KAGGLE_REF, "id": 63741, "versions": [{"versionNumber": 2}]}, {
+            "datasetFiles": [{"name": name, "totalBytes": info["bytes"]} for name, info in plan["sourceVerification"]["files"].items()]}
+
+    def test_small_version_uses_its_own_namespace_complete_histories_and_byte_identical_replay(self):
+        path, report, archive, plan, _ = self.run_fixture(source="small")
+        self.assertEqual(report["source"]["releaseId"], ml.SMALL_RELEASE)
+        subjects = [json.loads(line) for line in (path / "subjects.jsonl").read_text().splitlines()]
+        self.assertTrue(all(row["subjectRef"].startswith("movielens:" + ml.SMALL_RELEASE + ":subject:") for row in subjects))
+        expected = sorted(range(1, 9), key=lambda user: hashlib.sha256(f"movielens:{ml.SMALL_RELEASE}:{plan['cohort']['seed']}:{user}".encode()).hexdigest())[:3]
+        self.assertEqual({row["userId"] for row in subjects}, {str(user) for user in expected})
+        self.assertTrue(all(row["ratingCount"] == 2 for row in subjects))
+        _, repeated, reused = ml.normalize_archive(archive, self.root / "independent", plan)
+        self.assertFalse(reused)
+        self.assertEqual(report, repeated)
+
+    def test_small_prepare_checks_publisher_version_inventory_and_terms_before_writing(self):
+        archive, plan = fixture(self.root, source="small")
+        with zipfile.ZipFile(archive) as zipped: readme = zipped.read("README.md")
+        for kind in ("owner", "version", "inventory", "duplicate", "terms", "pagination", "valid"):
+            publisher, inventory = self.small_metadata(plan)
+            terms = readme
+            if kind == "owner": publisher["ownerRef"] = "another-uploader"
+            if kind == "version": publisher["versions"] = [{"versionNumber": 3}]
+            if kind == "inventory": inventory["datasetFiles"][0]["totalBytes"] += 1
+            if kind == "duplicate": inventory["datasetFiles"].append(inventory["datasetFiles"][0])
+            if kind == "terms": terms += b"changed"
+            if kind == "pagination": inventory["nextPageToken"] = "more"
+            replies = {plan["readmeUrl"]: terms, plan["metadataUrl"]: json.dumps(publisher).encode(), plan["filesUrl"]: json.dumps(inventory).encode()}
+            opener = lambda url, timeout: io.BytesIO(replies[url])
+            data = self.root / kind
+            if kind == "valid":
+                snapshot = ml.prepare(plan, data, opener)
+                self.assertEqual(ml.approved_source(plan, data), snapshot)
+                self.assertIsNone(snapshot["publisherMd5"])
+            else:
+                with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, "Publisher"):
+                    ml.prepare(plan, data, opener)
+                self.assertFalse(data.exists())
+
+    def test_small_download_and_normalization_verify_archive_and_member_hashes(self):
+        archive, plan = fixture(self.root, source="small")
+        publisher, inventory = self.small_metadata(plan)
+        with zipfile.ZipFile(archive) as zipped: readme = zipped.read("README.md")
+        replies = {plan["readmeUrl"]: readme, plan["metadataUrl"]: json.dumps(publisher).encode(),
+                   plan["filesUrl"]: json.dumps(inventory).encode(), plan["archiveUrl"]: archive.read_bytes()}
+        opener = lambda url, timeout: io.BytesIO(replies[url])
+        data = self.root / "source"
+        ml.prepare(plan, data, opener)
+        downloaded = ml.download(plan, data, opener)
+        self.assertFalse(downloaded["reused"])
+        self.assertTrue(ml.download(plan, data, opener)["reused"])
+        bad_member = copy.deepcopy(plan)
+        bad_member["sourceVerification"]["files"]["ratings.csv"]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "Source member bytes"):
+            ml.normalize_archive(archive, self.root / "bad-member", bad_member)
+        with archive.open("ab") as stream: stream.write(b"changed")
+        with self.assertRaisesRegex(ValueError, "pinned publisher-version bytes"):
+            ml.archive_identity(archive, plan)
+        pending = copy.deepcopy(plan)
+        pending["rights"]["research"] = "pending-exact-source-review"
+        with self.assertRaisesRegex(ValueError, "review is pending"):
+            ml.download(pending, data, opener)
+
+    def test_source_snapshot_release_and_metadata_integrity_are_checked(self):
+        archive, plan = fixture(self.root, source="small")
+        publisher, inventory = self.small_metadata(plan)
+        with zipfile.ZipFile(archive) as zipped: readme = zipped.read("README.md")
+        replies = {plan["readmeUrl"]: readme, plan["metadataUrl"]: json.dumps(publisher).encode(), plan["filesUrl"]: json.dumps(inventory).encode()}
+        data = self.root / "source"
+        snapshot = ml.prepare(plan, data, lambda url, timeout: io.BytesIO(replies[url]))
+        other = {**snapshot, "releaseId": "ml-32m"}
+        ml.atomic_json(data / "publisher.json", other)
+        with self.assertRaisesRegex(ValueError, "another release"):
+            ml.approved_source(plan, data)
+        ml.atomic_json(data / "publisher.json", snapshot)
+        (data / "publisher-metadata.json").write_text("changed")
+        with self.assertRaisesRegex(ValueError, "reviewed identity"):
+            ml.approved_source(plan, data)
 
     def test_streams_quoted_metadata_and_keeps_complete_seeded_histories(self):
         path, report, *_ = self.run_fixture()
@@ -179,7 +263,7 @@ class MovieLensIntakeTests(unittest.TestCase):
         plan["sourceVerification"].update(status="verified", readmeSha256=hashlib.sha256(b"fixture terms").hexdigest())
         plan["rights"].update(research="approved-for-noncommercial-research", reviewedBy="test-fixture", reviewedAt="fixture-time")
         (self.root / "publisher-readme.html").write_bytes(b"fixture terms")
-        ml.atomic_json(self.root / "publisher.json", {"readmeSha256": plan["sourceVerification"]["readmeSha256"], "publisherMd5": plan["sourceVerification"]["publisherMd5"]})
+        ml.atomic_json(self.root / "publisher.json", {"datasetId": "movielens", "releaseId": "ml-32m", "readmeSha256": plan["sourceVerification"]["readmeSha256"], "publisherMd5": plan["sourceVerification"]["publisherMd5"]})
         with self.assertRaisesRegex(ValueError, "checksum"):
             ml.download(plan, self.root, lambda *a, **kw: io.BytesIO(b"corrupt"))
         self.assertFalse((self.root / "ml-32m.zip").exists())
@@ -227,7 +311,7 @@ class MovieLensIntakeTests(unittest.TestCase):
         plan["sourceVerification"].update(status="verified", readmeSha256="a" * 64)
         plan["rights"].update(research="approved-for-noncommercial-research", reviewedBy="fixture", reviewedAt="fixture")
         (self.root / "publisher-readme.html").write_bytes(b"changed terms")
-        ml.atomic_json(self.root / "publisher.json", {"readmeSha256": "a" * 64, "publisherMd5": plan["sourceVerification"]["publisherMd5"]})
+        ml.atomic_json(self.root / "publisher.json", {"datasetId": "movielens", "releaseId": "ml-32m", "readmeSha256": "a" * 64, "publisherMd5": plan["sourceVerification"]["publisherMd5"]})
         with self.assertRaisesRegex(ValueError, "snapshot differs"):
             ml.approved_source(plan, self.root)
 

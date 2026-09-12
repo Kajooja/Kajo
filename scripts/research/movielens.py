@@ -24,7 +24,9 @@ from collections import Counter
 REPO = Path(__file__).resolve().parents[2]
 PLAN_PATH = REPO / "research/manifests/movielens-32m.json"
 SCHEMA = "movielens-intake-v1"
-MEMBERS = {f"ml-32m/{name}" for name in ("ratings.csv", "movies.csv", "links.csv", "tags.csv", "README.txt")}
+SMALL_RELEASE = "ml-latest-small-2018-kaggle-v2"
+KAGGLE_REF = "grouplens/movielens-latest-small"
+KAGGLE_API = "https://www.kaggle.com/api/v1/datasets/"
 HEADERS = {"movies.csv": ["movieId", "title", "genres"], "links.csv": ["movieId", "imdbId", "tmdbId"],
            "ratings.csv": ["userId", "movieId", "rating", "timestamp"], "tags.csv": ["userId", "movieId", "tag", "timestamp"]}
 
@@ -62,14 +64,36 @@ def location(root, value):
     return path
 
 
-def load_plan():
-    plan = json.loads(PLAN_PATH.read_text())
-    if plan["schemaVersion"] != SCHEMA or plan["datasetId"] != "movielens" or plan["releaseId"] != "ml-32m":
+def load_plan(source="32m"):
+    path = {"32m": PLAN_PATH, "small": REPO / "research/manifests/movielens-small-v2.json"}[source]
+    plan = json.loads(path.read_text())
+    release = "ml-32m" if source == "32m" else SMALL_RELEASE
+    if plan["schemaVersion"] != SCHEMA or plan["datasetId"] != "movielens" or plan["releaseId"] != release:
         raise ValueError("Unsupported source/schema")
+    if source == "small":
+        expected = {"readmeUrl": KAGGLE_API + "download/" + KAGGLE_REF + "/README.md?datasetVersionNumber=2",
+                    "archiveUrl": KAGGLE_API + "download/" + KAGGLE_REF + "?datasetVersionNumber=2",
+                    "metadataUrl": KAGGLE_API + "view/" + KAGGLE_REF,
+                    "filesUrl": KAGGLE_API + "list/" + KAGGLE_REF + "?datasetVersionNumber=2"}
+        if any(plan[key] != value for key, value in expected.items()) or plan["publisherRef"] != KAGGLE_REF or plan["publisherVersion"] != 2:
+            raise ValueError("Unexpected publisher/version URL")
+        return plan
     for field, suffix in (("readmeUrl", "ml-32m-README.html"), ("checksumUrl", "ml-32m.zip.md5"), ("archiveUrl", "ml-32m.zip")):
         if plan[field] != "https://files.grouplens.org/datasets/movielens/" + suffix:
             raise ValueError("Unexpected publisher URL")
     return plan
+
+
+def source_member(plan, name):
+    if plan["releaseId"] == "ml-32m":
+        return "ml-32m/" + name
+    if plan["releaseId"] == SMALL_RELEASE:
+        return "README.md" if name == "README.txt" else name
+    raise ValueError("Unsupported source release")
+
+
+def archive_name(plan):
+    return "ml-32m.zip" if plan["releaseId"] == "ml-32m" else "movielens-small-v2.zip"
 
 
 def fetch_small(url, limit, opener=urllib.request.urlopen):
@@ -83,6 +107,28 @@ def fetch_small(url, limit, opener=urllib.request.urlopen):
 def prepare(plan, data_dir, opener=urllib.request.urlopen):
     """Fetch metadata only. Exact terms/checksum must be reviewed before download."""
     readme = fetch_small(plan["readmeUrl"], 64 * 1024, opener)
+    if plan["releaseId"] == SMALL_RELEASE:
+        metadata = fetch_small(plan["metadataUrl"], 128 * 1024, opener)
+        inventory = fetch_small(plan["filesUrl"], 64 * 1024, opener)
+        publisher, files = json.loads(metadata), json.loads(inventory)
+        listed = files["datasetFiles"]
+        if (publisher["ownerRef"] != "grouplens" or publisher["ref"] != KAGGLE_REF or publisher["id"] != 63741
+                or not any(version["versionNumber"] == 2 for version in publisher["versions"])
+                or files.get("nextPageToken") or len(listed) != 5
+                or {file["name"]: file["totalBytes"] for file in listed}
+                   != {name: value["bytes"] for name, value in plan["sourceVerification"]["files"].items()}
+                or hashlib.sha256(readme).hexdigest() != plan["sourceVerification"]["readmeSha256"]):
+            raise ValueError("Publisher identity, version, README or file inventory changed")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        (data_dir / "publisher-readme.md").write_bytes(readme)
+        (data_dir / "publisher-metadata.json").write_bytes(metadata)
+        (data_dir / "publisher-files.json").write_bytes(inventory)
+        result = {"datasetId": plan["datasetId"], "releaseId": plan["releaseId"],
+                  "retrievedAt": datetime.now(timezone.utc).isoformat(), "publisherRef": KAGGLE_REF, "version": 2,
+                  "readmeSha256": hashlib.sha256(readme).hexdigest(), "publisherMd5": None,
+                  "metadataSha256": hashlib.sha256(metadata).hexdigest(), "inventorySha256": hashlib.sha256(inventory).hexdigest()}
+        atomic_json(data_dir / "publisher.json", result)
+        return result
     checksum = fetch_small(plan["checksumUrl"], 256, opener)
     match = re.fullmatch(rb"([a-fA-F0-9]{32})\s+\*?ml-32m\.zip\s*", checksum)
     if not match:
@@ -105,6 +151,17 @@ def approved_source(plan, data_dir):
             or rights["purpose"] != "NONCOMMERCIAL_RESEARCH_ONLY"):
         raise ValueError("Exact publisher terms/checksum review is pending; run prepare and record the verified source first")
     snapshot = json.loads((data_dir / "publisher.json").read_text())
+    if snapshot.get("datasetId") != plan["datasetId"] or snapshot.get("releaseId") != plan["releaseId"]:
+        raise ValueError("Publisher source snapshot belongs to another release")
+    if plan["releaseId"] == SMALL_RELEASE:
+        if (snapshot["publisherRef"] != KAGGLE_REF or snapshot["version"] != 2
+                or not re.fullmatch(r"[a-f0-9]{64}", verification["archiveSha256"])
+                or snapshot["readmeSha256"] != verification["readmeSha256"]
+                or digest(data_dir / "publisher-readme.md") != verification["readmeSha256"]
+                or digest(data_dir / "publisher-metadata.json") != snapshot["metadataSha256"]
+                or digest(data_dir / "publisher-files.json") != snapshot["inventorySha256"]):
+            raise ValueError("Publisher source snapshot differs from reviewed identity")
+        return snapshot
     if (not re.fullmatch(r"[a-f0-9]{64}", verification["readmeSha256"] or "")
             or not re.fullmatch(r"[a-f0-9]{32}", verification["publisherMd5"] or "")
             or snapshot["readmeSha256"] != verification["readmeSha256"]
@@ -122,14 +179,18 @@ def archive_identity(path, plan):
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             sha.update(chunk)
             md5.update(chunk)
-    if md5.hexdigest() != plan["sourceVerification"]["publisherMd5"]:
+    verification = plan["sourceVerification"]
+    if plan["releaseId"] == SMALL_RELEASE:
+        if sha.hexdigest() != verification["archiveSha256"] or path.stat().st_size != verification["archiveBytes"]:
+            raise ValueError("Archive does not match the pinned publisher-version bytes")
+    elif md5.hexdigest() != verification["publisherMd5"]:
         raise ValueError("Archive does not match the reviewed publisher checksum")
     return {"sha256": sha.hexdigest(), "md5": md5.hexdigest(), "bytes": path.stat().st_size}
 
 
 def download(plan, data_dir, opener=urllib.request.urlopen):
     approved_source(plan, data_dir)
-    target = data_dir / "ml-32m.zip"
+    target = data_dir / archive_name(plan)
     if target.exists():
         return {"reused": True, **archive_identity(target, plan)}
     start = time.monotonic()
@@ -153,20 +214,22 @@ def download(plan, data_dir, opener=urllib.request.urlopen):
 def inspect_archive(archive, plan):
     """Read allowlisted members directly; never extract supplied paths to disk."""
     total, found, hashes = 0, set(), {}
+    members = {source_member(plan, name) for name in (*HEADERS, "README.txt")}
+    readme_name = source_member(plan, "README.txt")
     for info in archive.infolist():
-        if info.is_dir() and info.filename == "ml-32m/":
+        if info.is_dir() and plan["releaseId"] == "ml-32m" and info.filename == "ml-32m/":
             continue
         mode = stat.S_IFMT(info.external_attr >> 16)
-        if (info.filename not in MEMBERS or info.filename in found or mode not in (0, stat.S_IFREG)
+        if (info.filename not in members or info.filename in found or mode not in (0, stat.S_IFREG)
                 or info.flag_bits & 1 or info.compress_type not in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED)):
             raise ValueError("Unexpected, duplicate or unsafe archive member")
         found.add(info.filename)
         total += info.file_size
         if total > plan["budgets"]["maxExpandedBytes"] or info.file_size > max(1, info.compress_size) * 300:
             raise ValueError("Expanded archive budget exceeded")
-        if info.filename.endswith("README.txt") and info.file_size > 64 * 1024:
+        if info.filename == readme_name and info.file_size > 64 * 1024:
             raise ValueError("Archive README exceeds budget")
-    if found != MEMBERS:
+    if found != members:
         raise ValueError("Required archive members are missing")
     for name in sorted(found):
         sha, size = hashlib.sha256(), 0
@@ -177,11 +240,13 @@ def inspect_archive(archive, plan):
                     raise ValueError("Expanded member differs from declared size")
                 sha.update(chunk)
         hashes[name] = {"sha256": sha.hexdigest(), "bytes": size}
+    if plan["releaseId"] == SMALL_RELEASE and hashes != plan["sourceVerification"]["files"]:
+        raise ValueError("Source member bytes differ from the pinned publisher version")
     return hashes
 
 
-def rows(archive, name, counts, limit):
-    with archive.open("ml-32m/" + name) as binary, io.TextIOWrapper(binary, encoding="utf-8-sig", newline="") as text:
+def rows(archive, name, counts, limit, plan):
+    with archive.open(source_member(plan, name)) as binary, io.TextIOWrapper(binary, encoding="utf-8-sig", newline="") as text:
         def bounded_lines():
             while True:
                 line = text.readline(csv.field_size_limit() * 8 + 1)
@@ -258,7 +323,7 @@ def normalize_archive(path, output_root, plan):
                 quarantine.write(canonical({"file": file, "line": line, "reason": reason, "record": row}) + "\n")
 
             movies, movie_lines, blocked_movies = {}, {}, set()
-            for line, row in rows(archive, "movies.csv", counts, budgets["maxMovies"]):
+            for line, row in rows(archive, "movies.csv", counts, budgets["maxMovies"], plan):
                 try:
                     if len(row) != 3:
                         raise ValueError("column-count")
@@ -282,7 +347,7 @@ def normalize_archive(path, output_root, plan):
                     reject("movies.csv", line, str(error), row)
 
             links, link_lines, blocked_links, aliases, conflicting_aliases = {}, {}, set(), {}, set()
-            for line, row in rows(archive, "links.csv", counts, budgets["maxMovies"]):
+            for line, row in rows(archive, "links.csv", counts, budgets["maxMovies"], plan):
                 try:
                     if len(row) != 3:
                         raise ValueError("column-count")
@@ -345,7 +410,7 @@ def normalize_archive(path, output_root, plan):
                 if len(history) < plan["cohort"]["minimumSourceRatings"]:
                     return
                 eligible_subjects += 1
-                rank = int(hashlib.sha256(f"movielens:ml-32m:{plan['cohort']['seed']}:{user_id}".encode()).hexdigest(), 16)
+                rank = int(hashlib.sha256(f"movielens:{plan['releaseId']}:{plan['cohort']['seed']}:{user_id}".encode()).hexdigest(), 16)
                 candidate = (-rank, -int(user_id), history)
                 if len(heap) < plan["cohort"]["size"]:
                     heapq.heappush(heap, candidate)
@@ -356,7 +421,7 @@ def normalize_archive(path, output_root, plan):
                 if retained_count > budgets["maxCohortRatings"]:
                     raise ValueError("Complete cohort histories exceed budget; do not truncate them")
 
-            for line, row in rows(archive, "ratings.csv", counts, budgets["maxRows"]):
+            for line, row in rows(archive, "ratings.csv", counts, budgets["maxRows"], plan):
                 try:
                     if len(row) != 4:
                         raise ValueError("column-count")
@@ -389,7 +454,7 @@ def normalize_archive(path, output_root, plan):
                 maximum = at if maximum is None else max(maximum, at)
             finish_subject(current_user, current_rows)
 
-            for line, row in rows(archive, "tags.csv", counts, budgets["maxRows"]):
+            for line, row in rows(archive, "tags.csv", counts, budgets["maxRows"], plan):
                 try:
                     if len(row) != 4:
                         raise ValueError("column-count")
@@ -410,14 +475,14 @@ def normalize_archive(path, output_root, plan):
         write_sets = {
             "ratings.jsonl": ratings,
             "objects.jsonl": (movies[key] for key in sorted(movies, key=int)),
-            "subjects.jsonl": ({"userId": user, "subjectRef": f"movielens:ml-32m:subject:{user}", "ratingCount": len(history)} for user, history in histories),
+            "subjects.jsonl": ({"userId": user, "subjectRef": f"movielens:{plan['releaseId']}:subject:{user}", "ratingCount": len(history)} for user, history in histories),
         }
         for name, entries in write_sets.items():
             with (work / name).open("w", encoding="utf-8") as stream:
                 for entry in entries:
                     stream.write(canonical(entry) + "\n")
         result = {"schemaVersion": SCHEMA, "runId": run_id,
-                  "source": {"datasetId": "movielens", "releaseId": "ml-32m", "archiveSha256": identity["sha256"],
+                  "source": {"datasetId": "movielens", "releaseId": plan["releaseId"], "archiveSha256": identity["sha256"],
                              "purpose": "NONCOMMERCIAL_RESEARCH_ONLY"},
                   "archive": identity, "sourceFiles": hashes, "planSha256": hashlib.sha256(canonical(plan).encode()).hexdigest(),
                   "normalizerCodeSha256": code_hash, "pythonVersion": sys.version.split()[0], "sourceCounts": observed,
@@ -446,19 +511,21 @@ def normalize_archive(path, output_root, plan):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stage", choices=("prepare", "download", "normalize"))
-    parser.add_argument("--data-dir", default=str(REPO / "research-data/movielens-32m"))
-    parser.add_argument("--output-dir", default=str(REPO / "research-artifacts/movielens-32m"))
+    parser.add_argument("--source", choices=("small", "32m"), default="small")
+    parser.add_argument("--data-dir")
+    parser.add_argument("--output-dir")
     args = parser.parse_args()
-    plan = load_plan()
-    data_dir = location("research-data", args.data_dir)
+    plan = load_plan(args.source)
+    folder = "movielens-small" if args.source == "small" else "movielens-32m"
+    data_dir = location("research-data", args.data_dir or REPO / "research-data" / folder)
     if args.stage == "prepare":
         result = prepare(plan, data_dir)
     elif args.stage == "download":
         result = download(plan, data_dir)
     else:
         approved_source(plan, data_dir)
-        output_dir = location("research-artifacts", args.output_dir)
-        path, result, reused = normalize_archive(data_dir / "ml-32m.zip", output_dir, plan)
+        output_dir = location("research-artifacts", args.output_dir or REPO / "research-artifacts" / folder)
+        path, result, reused = normalize_archive(data_dir / archive_name(plan), output_dir, plan)
         result = {"path": str(path), "reused": reused, "manifest": result}
     print(canonical(result))
 

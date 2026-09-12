@@ -1,6 +1,6 @@
 # External taste data and enrichment
 
-Status: **D1 intake/adapter source implemented; actual source/data acceptance pending**, 2026-09-12 / Issue #236. E1 contracts are accepted through #241. No actual MovieLens cohort, trained model or serving change is claimed by fixture checks; STATUS owns the current source-access blocker.
+Status: **D1 selected real development cohort processed and independently reproduced; current-head source review/CI pending**, 2026-09-12 / Issue #236, PR #242. E1 is accepted through #241. The owner authorized an available alternative to 32M; the pinned GroupLens Kaggle v2 seed now supplies 84,849 external ratings from 500 subjects. No fitted model or serving change is claimed. STATUS owns exact acceptance and continuation.
 
 Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo semantics: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Order and acceptance: [ROADMAP](../project/ROADMAP.md), [MVP](../product/MVP.md).
 
@@ -23,9 +23,40 @@ Do not create live Kajo Users/Profiles for external dataset people. Do not injec
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
 
-### MovieLens 32M — first research baseline
+### MovieLens Latest Small, September 2018 / Kaggle version 2 — selected development seed
+
+The owner explicitly authorized a suitable available alternative on 2026-09-12,
+so D1 no longer waits for one unavailable endpoint. GroupLens's own Kaggle dataset
+`grouplens/movielens-latest-small`, version 2, was retrieved over normally verified
+HTTPS. The archived README and exact member hashes were checked. It contains
+100,836 ratings from 610 users, 9,742 movies and 3,683 tags, generated 2018-09-26;
+rating activity spans 1996-03-29 to 2018-09-24. Half-star ratings, CSV structure,
+source-local IDs, chronological limitations and mapping semantics match the
+implemented MovieLens record contract. [Publisher version and README][MLSMALL]
+
+Its Usage License permits research with attribution, no implied endorsement and
+prior permission for commercial/revenue-bearing use. The reviewed scope is local
+noncommercial development only. The publisher calls Latest Small a development
+dataset, unsuitable for shared research benchmarks; freezing its 2018 version
+and content identity does not turn it into a population benchmark. D2's first
+run is therefore a declared bounded development comparison. A larger stable
+benchmark can follow with its own manifest, rather than blocking all progress.
+
+The actual 500 hash-selected subjects retain 84,849 complete-history ratings.
+Two fresh runs and verified stage reuse agree. One TMDb alias collision quarantines
+both mappings without discarding ratings or merging movies. Exact source/output
+hashes, scope and costs are in the [aggregate intake evidence](../../research/reports/movielens-small-v2-intake.json).
+No external subject or rating is inserted into native Kajo storage.
+
+### MovieLens 32M — larger stable benchmark candidate
 
 The release contains 32,000,204 ratings from 200,948 users, 87,585 movies and 2,000,072 tag applications. Rating records span 1995-01-09 to 2023-10-12. Selected users have at least twenty ratings. Files are `ratings.csv`, `movies.csv`, `links.csv` and `tags.csv`; ratings use half-star steps from 0.5 to 5. File order is user then movie, not chronological. Timestamps identify rating/tag activity, not viewing time. `links.csv` provides IMDb/TMDb mappings. No demographics are supplied. Research use has conditions; commercial/revenue-bearing use requires permission. [ML32]
+
+The original 32M file service currently fails upstream TLS verification in this
+environment; its source approval remains unresolved. The explicit `--source 32m`
+path is retained but is no longer D1's sole route. GroupLens's [Kaggle 20M][ML20K]
+metadata/listing is also available; its differently packaged files and unresolved
+license label require their own source/terms check before any later substitution.
 
 ### Tag Genome 2021 — optional object-feature enrichment
 
@@ -92,13 +123,15 @@ Use streaming/chunked parsing, bounded memory, atomic stage checkpoints and resu
 
 D1 now uses `scripts/research/movielens.py` (Python 3.12 standard library), the
 `normalize-movielens.mjs` runner and the separately exported engine MovieLens
-adapter. The source manifest lives in `research/manifests/movielens-32m.json`.
+adapter. The active source manifest is `research/manifests/movielens-small-v2.json`;
+`movielens-32m.json` preserves the separate pending larger source.
 Raw/archive-normalized/engine-observation stages are distinct, hashed and
 atomically completed. [The research runner](../../research/README.md) owns the
 exact commands, fixed limits, seeded full-history cohort and conflict policy.
 Metadata without historical availability stays out of historical features.
-Source terms and checksum identity remain unverified while the publisher fetch
-fails; no manifest approval or actual download result is fabricated.
+The selected small source has reviewed terms and actual pinned archive/member
+hashes. The original 32M source remains unverified. Both releases keep distinct
+identities and limits; fixture and real-data evidence remain separate.
 
 ## 6. Normalized research contracts
 
@@ -231,6 +264,8 @@ Dataset download, the full training run and hosted artifact admission are separa
 ## Sources and attribution
 
 [ML32]: https://files.grouplens.org/datasets/movielens/ml-32m-README.html
+[MLSMALL]: https://www.kaggle.com/datasets/grouplens/movielens-latest-small
+[ML20K]: https://www.kaggle.com/datasets/grouplens/movielens-20m-dataset
 [TG21]: https://files.grouplens.org/datasets/tag-genome-2021/genome_2021_readme.txt
 [BELIEFS]: https://files.grouplens.org/datasets/movielens/ml_belief_2024_data_release_2_README.txt
 [KUAIRAND]: https://kuairand.com/
