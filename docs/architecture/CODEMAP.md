@@ -127,5 +127,20 @@ Do not recreate or roll out those changes from this older runtime checkout.
 [Package README](../../packages/prediction-engine/README.md) documents the exact
 reference algorithm, time semantics, bounds and storage/retraction responsibilities.
 E1 source/CI acceptance precedes D1's real source manifest/adapter/cohort, then D2's
-honest baseline report. There is no public-data pipeline, model training, native
-runtime dependency or empty future-module tree in this packet.
+honest baseline report. E1 is accepted through #241. D1 intake source is described
+below; actual source/data acceptance remains open. No trained model or native
+runtime dependency is added.
+
+## Isolated research intake — D1 #236
+
+| Area | Source | Scope |
+| --- | --- | --- |
+| Exact source and rights | `research/manifests/movielens-32m.json` | MovieLens 32M URLs, intended research use, unresolved source-hash/terms review, selection and resource policy; no invented hashes |
+| Bounded archive/CSV normalization | `scripts/research/movielens.py` | Publisher metadata gate, verified atomic download, allowlisted ZIP streams, complete deterministic subject histories, quarantine and hash-verified stage reuse |
+| Engine research adapter | `packages/prediction-engine/src/adapters/movielens.ts`; `scripts/research/normalize-movielens.mjs` | Actual E1 Observation export from original ratings, release namespaces and explicit unknown exposure/action context; separate atomic output stage |
+| Research verification | `scripts/research/test_movielens.py`, `movielens.test.mjs`; engine `test/movielens.test.ts`; root `test:research` | Artificial ZIP → Python → built TypeScript tests plus parser, bounds, integrity, provenance and time-group cases; Python 3.12 configured in ordinary CI, no dataset download |
+
+[Research README](../../research/README.md) owns commands and concrete format/policy.
+STATUS owns the current real-data blocker and D1 continuation. This source does
+not implement D2 training, source-rights approval, dataset redistribution or native
+serving; the generic computation root does not import this external adapter.

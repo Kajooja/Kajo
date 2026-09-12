@@ -34,6 +34,7 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | Root `compare` | Error against the original forecast for the matching subject/object/target and actual action where required, within the declared horizon and observation cutoff |
 | Root `learn` | A new local derived Scenario from eligible evidence, or null; no source mutation, model training or write side effect |
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
+| `./adapters/movielens` | D1 pure external-rating adapter, original 0.5–5 scale, release namespaces and explicit unknown context; the core root does not import it |
 | `./fixtures` | Deterministic media and synthetic maintenance cycles using the same computation functions |
 
 The separate Kajo adapter accepts already-authorized snapshots. Its membership
@@ -95,9 +96,10 @@ frozen forecasts remain immutable when projections are rebuilt.
 
 ## Next packet
 
-After E1 source/CI acceptance, [D1 #236](https://github.com/Kajooja/Kajo/issues/236)
-adds the isolated MovieLens manifest, source parser/adapter, deterministic small
-real cohort, quarantine and reproducible hashes. D1 must resolve source rights,
+E1 is accepted through #241. [D1 #236](https://github.com/Kajooja/Kajo/issues/236)
+now supplies the [isolated intake source](../../research/README.md), manifest,
+parser/adapter, quarantine and reproducible stage hashes. Actual publisher
+verification and the small real cohort remain open. D1 must resolve source rights,
 resource limits and actual availability assumptions before downloading. D2 then
 freezes train-only temporal/cold-start baselines and the bounded static-state vs
 ordered-prefix experiment. No dataset, trained representation, production model

@@ -10,35 +10,42 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current source packet — E1 #235
+## Current source packet — D1 #236
 
-The owner reported the protocol-2 device tests working on 2026-09-12, with one
-remaining UI defect: **Yritä uudelleen** stays visible after connectivity returns.
-They requested that recovery correction and the other application UI ideas in a
-later pre-MVP UI packet, and asked development to continue.
+**Continue [D1 #236](https://github.com/Kajooja/Kajo/issues/236) on
+`feat/236-movielens-research`.** It starts from accepted E1 main
+`3747ecb58d69ba78440ca1b72b7cc554b1a9720a` / merged PR #241. All five required
+jobs passed in [CI #471](https://github.com/Kajooja/Kajo/actions/runs/34707456295)
+at E1 head `17a8466fecb510d9e1049ff9feaa6ab72686400a`; its 310 local tests,
+ESM exports and both Hermes bundles are recorded in the E1 checkpoint.
+MVP-ENG-001's bounded contract/source acceptance is complete.
 
-**The explicitly selected independent source packet is now [E1 #235](https://github.com/Kajooja/Kajo/issues/235),
-branch `feat/235-portable-engine-contracts`.** This branch implements `packages/prediction-engine`: generic contracts,
-available-prefix state/retrieval, immutable numeric reference forecasts and
-Kajo/media plus synthetic non-media fixtures. `npm run engine:demo` runs the built
-ESM package without UI, hosted DB or credentials. Local `EXPO_OFFLINE=1 CI=1
-npm run check` passed **310 tests** (212 mobile, 14 catalog, 61 database,
-23 engine), lint/TypeScript, built ESM exports and both Hermes bundles.
-Published-head CI/source acceptance remain open. This is accepted-main runtime
-plus E1, so its test total is intentionally different from the newer #229 client.
-See [the E1 checkpoint](sprints/SPRINT-014-E1.md).
-It starts from accepted main and does not absorb or accept #229 runtime changes.
-The ordered continuation is E1 contract acceptance → D1 #236 → D2 #237. No public
-dataset download or runtime scorer replacement is part of E1.
+D1 implements the pinned MovieLens 32M source/rights manifest, safe bounded
+archive/CSV intake, deterministic subject-cohort selection retaining full valid
+histories, quarantine, repeatable hashes and a source-typed engine adapter.
+Raw and derived data remain in ignored research storage; no native accounts,
+Events, production imports or model training. The initial publisher metadata
+and archive requests returned HTTP 502 on 2026-09-12. Actual README/license,
+checksum, download and real-data normalization must be verified separately;
+fixture tests cannot stand in for them.
 
-Next bounded task after E1 source/CI acceptance is **D1 #236**: freeze the exact
-MovieLens release/rights/checksum/resource manifest, build a source-typed adapter
-with quarantine and deterministic idempotent normalization, then record a small
-real cohort in ignored research storage. Keep raw ratings/scales and release-scoped
-identities; unknown exposure/context/action/availability remain explicit. No native
-account/Event writes. D2 #237 follows with train-only temporal/cold-start baselines
-and a fixed static-state/ordered-prefix experiment/report. A losing challenger is
-valid; native scorer admission remains a separate later gate.
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **338 tests** (212 mobile,
+14 catalog, 61 database, 34 engine, 15 Python intake and two cross-language
+pipeline cases), TypeScript/lint and both Hermes exports. One pre-existing mobile
+Hook dependency warning remains unchanged. The authored `npm run
+research:movielens:prepare` command was actually run and returned HTTP 502 before
+saving source metadata or downloading an archive. Source/fixture CI, rights
+review and real-data acceptance remain separate; D1 stays open. See
+[the D1 checkpoint](sprints/SPRINT-014-D1.md) and [runner](../../research/README.md).
+
+**Next bounded task: finish D1 source CI, retrieve/review the publisher README and
+checksum, record the real source identities, then download/normalize and verify
+a repeatable complete cohort.** Do not jump to D2 while this gate is open.
+
+After complete D1 acceptance, **D2 #237** freezes train-only temporal/cold-start
+baselines and a bounded static-state/ordered-prefix experiment/report. A losing
+challenger is valid. Keep D2 training and native runtime/model admission outside
+D1. #229's application UI/device gates remain independent.
 
 ## Native packet checkpoint — #228 / draft PR #229
 
@@ -124,10 +131,10 @@ The ordered engine work is:
 | D3 / D4 / D5 | Optional Tag Genome / Beliefs / KuaiRand studies | D2 plus each source's own manifest/rights/task; independent of each other |
 | E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
-E1 is the selected isolated source packet while #229 retains its remaining native
-acceptance. Finish E1 source/CI acceptance, then continue D1; do not silently resume
-application UI work or interleave dataset processing before the contracts pass. No large native
-user population, production schema or separate network service is needed for D1.
+E1 is accepted through #241, and D1 is the current isolated source packet while
+#229 retains its remaining native acceptance. Do not silently resume application
+UI work or begin D2 training before D1 data acceptance. No large native user
+population, production schema or separate network service is needed for D1.
 
 Use ignored `research-data/` and `research-artifacts/` or equivalent controlled
 storage. External ratings are source-typed observations, not fake native Events
@@ -137,9 +144,9 @@ normalization, model training, evaluation and artifact admission are distinct
 recorded operations. A losing challenger is a valid report; it cannot waive
 native usefulness gates or deploy itself.
 
-E1 delivers executable contracts and transparent fixture computation only. No
-dataset ingestion, trained representation, world model, multistep dreamer or
-automatic promotion is delivered by this packet.
+E1 delivered executable contracts and transparent fixture computation. D1 adds
+research intake; actual data acceptance is recorded above. No trained model,
+world model, multistep dreamer or automatic promotion is delivered.
 
 ## Preserved owner requirements and release order
 

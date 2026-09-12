@@ -1,6 +1,6 @@
 # External taste data and enrichment
 
-Status: **planned research pipeline and admission contract**, 2026-09-12 / Issue #233. No dataset has been imported, model trained or hosted schema changed by this documentation delivery.
+Status: **D1 intake/adapter source implemented; actual source/data acceptance pending**, 2026-09-12 / Issue #236. E1 contracts are accepted through #241. No actual MovieLens cohort, trained model or serving change is claimed by fixture checks; STATUS owns the current source-access blocker.
 
 Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo semantics: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Order and acceptance: [ROADMAP](../project/ROADMAP.md), [MVP](../product/MVP.md).
 
@@ -89,6 +89,16 @@ Do not load tens of millions of external ratings into the production transaction
 The first implementation creates real code and tests only when the corresponding work packet starts. No empty engine/services/data directories are needed now. Raw and derived research locations must be excluded from Git and ordinary CI artifacts before the first download.
 
 Use streaming/chunked parsing, bounded memory, atomic stage checkpoints and resumable/idempotent jobs. Keep malformed rows and mapping conflicts in a counted quarantine, not silently discarded. Dataset files are data, never executable instructions. Archive extraction must prevent path traversal and enforce size/file allowlists.
+
+D1 now uses `scripts/research/movielens.py` (Python 3.12 standard library), the
+`normalize-movielens.mjs` runner and the separately exported engine MovieLens
+adapter. The source manifest lives in `research/manifests/movielens-32m.json`.
+Raw/archive-normalized/engine-observation stages are distinct, hashed and
+atomically completed. [The research runner](../../research/README.md) owns the
+exact commands, fixed limits, seeded full-history cohort and conflict policy.
+Metadata without historical availability stays out of historical features.
+Source terms and checksum identity remain unverified while the publisher fetch
+fails; no manifest approval or actual download result is fabricated.
 
 ## 6. Normalized research contracts
 
