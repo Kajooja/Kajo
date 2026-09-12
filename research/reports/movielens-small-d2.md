@@ -59,17 +59,19 @@ More earliest history does not consistently help this small, temporally distant 
 
 ## Cost, integrity and fallback
 
-Each full local fit/evaluation took **6.69 / 6.72 seconds**. First-run fitting took 0.091 s for means, 0.228 s for neighbors, 0.409 s for factorization and 0.055 s for memories. Peak Node RSS was **372,784 / 368,548 KiB**, below the 1 GiB budget. The ignored serialized model is **8,014,330 bytes**, below 16 MB. These measurements exclude the npm/TypeScript build parent and are machine-specific.
+Each final-code local fit/evaluation took **6.98 / 7.02 seconds**. First-run fitting took 0.080 s for means, 0.239 s for neighbors, 0.406 s for factorization and 0.053 s for memories. Peak Node RSS was **387,240 / 369,320 KiB**, below the 1 GiB budget. The ignored serialized model is **8,014,330 bytes**, below 16 MB. These measurements exclude the npm/TypeScript build parent and are machine-specific.
 
-All eight models together had query-batch p95 **0.0264 ms** frozen and **1.3586 ms** prequential; amortized cost per target was **0.0411 / 0.3129 ms**. Prefix validation/encoding and fold-in are included; IO, aggregation and bootstrap are excluded from model latency. Query groups can contain multiple targets.
+All eight models together had query-batch p95 **0.0302 ms** frozen and **1.3034 ms** prequential; amortized cost per target was **0.0446 / 0.3164 ms**. Prefix validation/encoding and fold-in are included; IO, aggregation and bootstrap are excluded from model latency. Query groups can contain multiple targets.
 
-Before fitting, the runner sealed protocol/code/runtime identity, exact cutoffs and partition/membership hashes. It saved validation selection and the model hash before its first read of final partition files. Two independent fits then produced model SHA256 `c3a1a337f3291477c29920d039de6e396626373e8e30f1e4eced23eb1f16b479` and deterministic result SHA256 `46e68b5310e6a3ff08793a85145b897992a43337b741ba93f360acb302ba49a8`.
+Before fitting, the runner sealed protocol/code/runtime identity, exact cutoffs and partition/membership hashes. It saved validation selection and the model hash before its first read of final partition files. Two independent fits then produced model SHA256 `be74fda4e587d3c21f2b54369742662ffebac7bee9c6512018db4ec911fb1fd4` and deterministic result SHA256 `78963083a33532453f0963790ee4cfd88e0dde4a39672909922bbf76c9d25bd4`.
+
+Final source review added rejection of invalid native-fallback query/evidence timestamps. The original protocol was frozen before fitting at source `53d1a035ab5ebe00948e67132e90522e69a37731`; the final code was then resealed and replayed twice. All partition hashes, numerical fitted parameters, predictions, metrics and decisions match the original run exactly. This is an unchanged-experiment reproducibility check after validation hardening, not a fresh untouched test or a second model search. The aggregate report retains the original freeze receipt and this review history.
 
 Actual real-data probes for absent, invalid and withdrawn models each returned **unavailable with zero native support**, never an external mean or learned vector. Separate invented unit fixtures also verify that an authorized native observation remains usable and disallowed/out-of-domain/nonfinite/future artifacts fail closed. This research boundary is not wired into native serving.
 
 Withdrawal means stopping every dependent model/index/cache and rebuilding from separately authorized inputs, then reevaluating; deleting raw files or zeroing one coefficient cannot remove jointly learned influence. Native admission is **deferred** pending rights, mapping, usefulness, compatibility, isolation, provenance and rollback/device gates. No hosted operation or UI change occurred.
 
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **357 tests**, lint/TypeScript and both Hermes exports. The existing mobile Hook dependency warning remains. Required current-head CI and merge are recorded on the source PR. [Repeat commands and exact model definitions](../README.md#d2--reproducible-development-evaluation).
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **357 tests**, lint/TypeScript and both Hermes exports. The existing mobile Hook dependency warning remains. Required current-head CI and merge are recorded on [PR #243](https://github.com/Kajooja/Kajo/pull/243). [Repeat commands and exact model definitions](../README.md#d2--reproducible-development-evaluation).
 
 ## Attribution
 

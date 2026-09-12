@@ -87,6 +87,14 @@ it('fails absent, invalid, withdrawn, disallowed and out-of-domain artifacts clo
   expect(useOptionalRatingArtifact(a, { ...q, scope: { ...q.scope, evidence: { ...q.scope.evidence, sourceIds: ['native-fixture'] } } }, movieLensTarget))
     .toMatchObject({ mode: 'native-only-fallback', value: 4 });
   expect(useOptionalRatingArtifact(a, query, movieLensTarget).mode).toBe('research');
+  for (const badTime of [NaN, Infinity, -1, 1.5]) {
+    expect(useOptionalRatingArtifact(null, { ...q, asOf: badTime }, movieLensTarget))
+      .toMatchObject({ mode: 'native-only-fallback', value: null, nativeSupport: 0 });
+    for (const field of ['occurredAt', 'availableAt']) {
+      expect(useOptionalRatingArtifact(null, { ...query, prefix: [{ ...native, [field]: badTime }] }, movieLensTarget))
+        .toMatchObject({ mode: 'native-only-fallback', value: null, nativeSupport: 0 });
+    }
+  }
 });
 it('rejects incompatible factors, invalid support, future memories and oversized configurations', () => {
   const a = artifact(), id = Object.keys(a.items)[0]!;

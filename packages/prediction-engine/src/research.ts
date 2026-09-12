@@ -326,6 +326,9 @@ export function forecastRatingBatch(a: RatingArtifact, query: RatingQuery): Reco
 export function useOptionalRatingArtifact(input: unknown, query: RatingQuery, target: TargetDefinition):
   { mode: 'research'; forecasts: Record<RatingVariant, RatingForecast>[] } |
   { mode: 'native-only-fallback'; reason: 'absent' | 'withdrawn' | 'invalid-or-disallowed'; value: number | null; nativeSupport: number } {
+  if (!Number.isSafeInteger(query.asOf) || query.asOf < 0) {
+    return { mode: 'native-only-fallback', reason: 'invalid-or-disallowed', value: null, nativeSupport: 0 };
+  }
   const reason = input == null ? 'absent' : (input as { status?: unknown }).status === 'withdrawn' ? 'withdrawn' : 'invalid-or-disallowed';
   if (validateRatingArtifact(input) && input.target.id === target.id && input.target.version === target.version
     && input.target.scale.min === target.scale.min && input.target.scale.max === target.scale.max
@@ -337,6 +340,7 @@ export function useOptionalRatingArtifact(input: unknown, query: RatingQuery, ta
   for (const row of query.prefix) {
     if (row.subjectId !== query.scope.subject.id || row.access.kind !== 'subject' || row.access.subjectId !== row.subjectId
       || row.provenance.origin !== 'observed' || row.provenance.source.kind !== 'native'
+      || !Number.isSafeInteger(row.occurredAt) || row.occurredAt < 0 || !Number.isSafeInteger(row.availableAt)
       || !query.scope.evidence.sourceIds.includes(row.provenance.source.id) || row.availableAt >= query.asOf
       || row.occurredAt >= query.asOf || row.availableAt < row.occurredAt || row.measurement.status !== 'observed'
       || row.targetId !== target.id || row.targetVersion !== target.version || row.provenance.revision !== 1) continue;

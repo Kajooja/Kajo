@@ -4,7 +4,9 @@ Date: **2026-09-12**. Issue [#237](https://github.com/Kajooja/Kajo/issues/237).
 Branch: `feat/237-movielens-baselines`, based on accepted D1 main
 `7602b3418354687855f6b3384085684f4b37a373` / merged PR #242. All five required
 D1 CI #475 jobs passed at `816bf2e6c1437e29f664faef9669729507968209`.
-This D2 branch needs its own current-head five-job CI and merge before acceptance.
+[PR #243](https://github.com/Kajooja/Kajo/pull/243) records D2 current-head five-job
+CI and merge. This branch is a candidate until that gate; on accepted main the
+bounded packet is complete and #182 is the next source unit.
 
 ## Delivered bounded experiment
 
@@ -26,10 +28,10 @@ This D2 branch needs its own current-head five-job CI and merge before acceptanc
 [The readable report](../../../research/reports/movielens-small-d2.md) and
 [aggregate JSON](../../../research/reports/movielens-small-d2.json) own full
 measured evidence. The pre-fit manifest hash is
-`1d5e642c9a5e83414fec404f725aa6b4cb53d941ad4263a8081b6dcebd3289f4`.
-Two independent runs matched model parameters, every prediction journal, all
+`affc7f596503224ce3d49fafc53e0d55eaddfabbdbd7a71b7c46b0f5b5022e62`.
+Two independent final-code runs matched model parameters, every prediction journal, all
 metrics/intervals and the decision/fallback, with deterministic result hash
-`46e68b5310e6a3ff08793a85145b897992a43337b741ba93f360acb302ba49a8`.
+`78963083a33532453f0963790ee4cfd88e0dde4a39672909922bbf76c9d25bd4`.
 
 Validation selected recent state but its 0.001959 RMSE improvement missed the
 predeclared 0.01 gate: **reject challenger admission in this configuration**.
@@ -37,6 +39,10 @@ The separate prequential comparison supports recent rating-entry state within
 this development task. It does not establish native product benefit; cold-start
 gains are inconsistent and only thirteen reserved subjects have final targets.
 Native serving admission is **deferred**, with no automatic promotion or rollout.
+A final native-fallback invalid-timestamp guard changed no model parameters or
+protocol. The report records the original pre-fit freeze and confirms every
+original numerical parameter/prediction/metric survives the two hardening replays;
+these are reproduction checks, not a newly untouched final window.
 
 ## Validation and scope
 

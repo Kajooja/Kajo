@@ -13,10 +13,13 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 ## Current source packet — D2 #237, measured development comparison
 
 **D2 [#237](https://github.com/Kajooja/Kajo/issues/237) is implemented on
-`feat/237-movielens-baselines`, based on accepted main `7602b3418354687855f6b3384085684f4b37a373`.**
+`feat/237-movielens-baselines` / [PR #243](https://github.com/Kajooja/Kajo/pull/243),
+based on accepted main `7602b3418354687855f6b3384085684f4b37a373`.**
 D1 #236 / PR #242 was merged after all five required CI #475 jobs passed at
 `816bf2e6c1437e29f664faef9669729507968209`. E1 #235 / PR #241 is also accepted.
-The current D2 source still requires its own five-job CI and merge acceptance.
+PR #243 records the exact D2 head, five required CI results and merge. Before
+merge this branch is a source candidate; once present on accepted main, this D2
+packet is complete and the default continuation is #182 below.
 
 The owner-authorized GroupLens Latest Small September 2018 / Kaggle v2 source
 supplies 500 subjects and 84,849 complete-history ratings. D2 froze source/code/
@@ -39,10 +42,12 @@ reported as fixed-holdout or native usefulness. Cold-start gains are inconsisten
 [aggregate evidence](../../research/reports/movielens-small-d2.json) and
 [commands](../../research/README.md#d2--reproducible-development-evaluation) own exact
 model definitions, source/code/split hashes, support, uncertainty, costs and scope.
-The full executions took 6.69/6.72 s; raw histories, subject partitions, predictions
+The final-code executions took 6.98/7.02 s; raw histories, subject partitions, predictions
 and 8 MB fitted artifacts stay ignored. Absent/invalid/withdrawn real-data probes
 returned unavailable with zero native support, without retaining external influence.
-Native-only fixture fallback and disallowed/out-of-domain checks also pass.
+Native-only fixture fallback, invalid timestamp rejection and disallowed/out-of-domain
+checks also pass. A final validation-only hardening replay preserved every original
+numerical parameter, prediction and metric; the report retains that review history.
 
 Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **357 tests**, lint/typecheck and
 both Hermes exports, with the existing mobile Hook warning. No native UI, hosted
