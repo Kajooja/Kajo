@@ -35,12 +35,16 @@ The active #229 evidence/pagination packet keeps its own acceptance and rollout 
 
 Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
 reconnect retry-UI defect retained as #240. The owner places application UI work
-in a later pre-MVP packet. **E1 #235 is accepted**, followed by **D1 #236 → D2 #237**.
+in a later pre-MVP packet. **E1 #235 and D1 #236 are accepted**; D2 #237 now
+has a measured, independently reproduced development report and rejection decision.
 The owner subsequently authorized an available alternative to 32M; the first
 real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development dataset.
 This bounded development comparison can precede a larger stable benchmark with
 its own manifest. STATUS names the branch and actual acceptance. #229 retains
-its native/fresh-account gates; external research does not close them.
+its native/fresh-account gates; external research does not close them. After D2
+source acceptance, continue #182’s Phase14.3 Edge entrypoint/configuration audit
+before expanding provider data. Optional further research and a winning external
+model are not prerequisites for that release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
 
@@ -145,6 +149,11 @@ Requirements: `MVP-ENG-001..003`. Canonical design: ADR-0008 and [DATA_ENRICHMEN
 **D1 — isolated MovieLens manifest and adapter ([#236](https://github.com/Kajooja/Kajo/issues/236)).** After E1's record boundary, implement streaming/idempotent normalization and deterministic small-cohort processing. Validate checksums, CSV/ratings/IDs, namespaces, mappings, duplicates, chronological ordering, quarantine and resource bounds. Then record the actual permitted download and normalized real cohort. No production credentials or native User/Profile/Event writes. Use ignored `research-data/` and `research-artifacts/` locations or explicitly equivalent isolated storage; exclude raw/derived data from ordinary CI artifacts before download.
 
 **D2 — reproducible baseline evaluation ([#237](https://github.com/Kajooja/Kajo/issues/237)).** Compare train-only transparent means/neighbors and an explicit-rating factorization challenger through the same research contract. Include one bounded declared static-state versus ordered-prefix/trajectory-retrieval experiment; a negative or insufficient-evidence result is valid. Freeze global chronological splits, held-out-subject cold-start prefixes, transforms/artifact cutoffs, baselines, metrics and final test before selection. Report coverage, uncertainty, task limitations, cost and prior/enrichment ablations where available. Scale to the full dataset only after the small run is correct and resource-bounded.
+
+D2’s [actual development report](../../research/reports/movielens-small-d2.md) records
+46,410 training rows, fixed temporal/held-out-subject tests, two matching executions
+and rejection of the validation-selected challenger under the frozen rule. This
+completes the bounded experiment; current-head source acceptance is in STATUS.
 
 Exit: reproducible contracts/adapter/report and a documented admit/reject/defer decision. A challenger need not win. No probabilities, counterfactual uplift, group behavior or cross-domain competence may be fabricated from rating-only data. A losing or rights-blocked prior stays out of serving; the transparent baseline remains usable.
 

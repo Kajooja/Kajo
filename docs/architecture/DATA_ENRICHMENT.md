@@ -1,6 +1,10 @@
 # External taste data and enrichment
 
-Status: **D1 selected real development cohort processed and independently reproduced; current-head source review/CI pending**, 2026-09-12 / Issue #236, PR #242. E1 is accepted through #241. The owner authorized an available alternative to 32M; the pinned GroupLens Kaggle v2 seed now supplies 84,849 external ratings from 500 subjects. No fitted model or serving change is claimed. STATUS owns exact acceptance and continuation.
+Status: **D1 accepted; D2 real training/evaluation and independent replay complete,
+source CI/merge tracked in STATUS**, 2026-09-12 / #236/#237. E1 and D1 are accepted
+through #241/#242. D2's [development report](../../research/reports/movielens-small-d2.md)
+rejects challenger admission under the frozen selection rule and defers native
+use; no serving model or native evidence changes.
 
 Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo semantics: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Order and acceptance: [ROADMAP](../project/ROADMAP.md), [MVP](../product/MVP.md).
 
@@ -129,6 +133,14 @@ Raw/archive-normalized/engine-observation stages are distinct, hashed and
 atomically completed. [The research runner](../../research/README.md) owns the
 exact commands, fixed limits, seeded full-history cohort and conflict policy.
 Metadata without historical availability stays out of historical features.
+D2 adds the built engine’s separate `./research` export and
+`scripts/research/evaluate-ratings.mjs`, with a sealed temporal/cold-subject protocol,
+train-only means/neighbors/factors/prefix memories, score-before-update evaluation,
+subject-bootstrap uncertainty and native-only/unavailable withdrawal fallback.
+[The aggregate report](../../research/reports/movielens-small-d2.json) contains the
+actual first/replay hashes and metrics. Raw partitions and all fitted parameters
+remain ignored. Further source policy changes require withdrawing dependent
+artifacts and a separately authorized rebuild; this runner has no serving path.
 The selected small source has reviewed terms and actual pinned archive/member
 hashes. The original 32M source remains unverified. Both releases keep distinct
 identities and limits; fixture and real-data evidence remain separate.

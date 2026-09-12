@@ -128,9 +128,9 @@ Do not recreate or roll out those changes from this older runtime checkout.
 reference algorithm, time semantics, bounds and storage/retraction responsibilities.
 E1 source/CI acceptance precedes D1's real source manifest/adapter/cohort, then D2's
 honest baseline report. E1 is accepted through #241. D1 intake source is described
-below; the selected real development cohort is verified and current-head source
-acceptance remains open. No trained model or native
-runtime dependency is added.
+below; E1/D1 are accepted through #241/#242. D2 now fits isolated research models
+and publishes their reproducible comparison below. No native runtime dependency
+is added; exact source acceptance remains in STATUS.
 
 ## Isolated research intake — D1 #236
 
@@ -143,7 +143,22 @@ runtime dependency is added.
 | Actual intake evidence | `research/reports/movielens-small-v2-intake.json` | Aggregate-only source/cohort/quarantine/mapping counts, source/output/code hashes, resource measurements and independent replay; no histories or fitted artifacts |
 
 [Research README](../../research/README.md) owns commands and concrete format/policy.
-STATUS owns D1 source acceptance and D2 continuation. The small source is real and
+STATUS owns source acceptance and the next release task. The small source is real and
 verified; the earlier 32M transport failure is not its prerequisite. This source does
 not implement D2 training, automatic rights approval, dataset redistribution or native
 serving; the generic computation root does not import this external adapter.
+
+## Offline model/state comparison — D2 #237
+
+| Area | Source | Scope |
+| --- | --- | --- |
+| Built research estimators | `packages/prediction-engine/src/research.ts`; package `./research` export | Same E1 Observation/Scope/target/artifact contracts; train-only shrunken means, bounded positive item-neighbor graph, seeded explicit factors, durable/recent state and prefix-continuation retrieval; root computation/serving imports unchanged |
+| Frozen experiment and runner | `research/manifests/movielens-small-d2.json`; `scripts/research/evaluate-ratings.mjs` | Source/code/runtime/partition hashes sealed before fitting; validation selection saved before final reads; separate frozen/prequential/cold-subject tests, grouped bootstrap, bounded costs and ignored prediction/model journals |
+| Leakage and fallback regression | `packages/prediction-engine/test/research.test.ts`; `scripts/research/evaluate-ratings.test.mjs` | Synthetic/foreign/future/tied evidence rejection, label-blind splits, future-free memory encoder, deterministic built-model replay, prequential score-before-update and native-only/unavailable absent/invalid/withdrawn/disallowed fallback |
+| Actual measured report | `research/reports/movielens-small-d2.md` and `.json` | Eight variants, 46,410 training ratings, fixed final/cold-start targets, coverage/tail/support/uncertainty/resources, two matching fits and explicit reject/defer decision; no histories or fitted weights |
+
+`npm run research:movielens:evaluate` runs the actual built package without UI,
+credentials or a database. Root checks exercise artificial fixtures only. The
+[research README](../../research/README.md#d2--reproducible-development-evaluation)
+owns exact formulas, commands and storage/withdrawal semantics. No native scorer,
+automatic promotion, model service or model registry deployment is added.

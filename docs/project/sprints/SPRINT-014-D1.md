@@ -122,3 +122,12 @@ and bounded static-state/ordered-prefix memory under the declared data limits.
 Do not wait for the unavailable 32M endpoint as an implicit prerequisite; it can
 supply a separate larger stable benchmark later. Keep source-model admission and
 native #229 acceptance independent. MVP-ENG-002 stays open through the D2 report.
+
+## Source acceptance — 2026-09-12
+
+All five required jobs passed in [CI #475](https://github.com/Kajooja/Kajo/actions/runs/34712191386)
+at `816bf2e6c1437e29f664faef9669729507968209`. PR #242 was squash-merged to main
+`7602b3418354687855f6b3384085684f4b37a373`; #236 is closed. The earlier current-head
+acceptance/32M retry instructions above are historical. D1 is complete. D2's real
+training/evaluation and the next release handoff are recorded in
+[the D2 checkpoint](SPRINT-014-D2.md) and current STATUS.

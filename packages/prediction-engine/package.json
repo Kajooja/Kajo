@@ -3,12 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./adapters/kajo": { "types": "./dist/adapters/kajo.d.ts", "import": "./dist/adapters/kajo.js" },
-    "./adapters/movielens": { "types": "./dist/adapters/movielens.d.ts", "import": "./dist/adapters/movielens.js" },
-    "./fixtures": { "types": "./dist/fixtures/cycles.d.ts", "import": "./dist/fixtures/cycles.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapters/kajo": {
+      "types": "./dist/adapters/kajo.d.ts",
+      "import": "./dist/adapters/kajo.js"
+    },
+    "./adapters/movielens": {
+      "types": "./dist/adapters/movielens.d.ts",
+      "import": "./dist/adapters/movielens.js"
+    },
+    "./fixtures": {
+      "types": "./dist/fixtures/cycles.d.ts",
+      "import": "./dist/fixtures/cycles.js"
+    },
+    "./research": {
+      "types": "./dist/research.d.ts",
+      "import": "./dist/research.js"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -17,7 +35,9 @@
     "test": "npm run build && vitest run && node test/exports.mjs",
     "demo": "npm run build && node scripts/demo.mjs"
   },
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.68.0",
     "@typescript-eslint/parser": "^8.68.0",

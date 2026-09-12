@@ -1,4 +1,4 @@
-# Isolated MovieLens research — D1
+# Isolated MovieLens research — D1 and D2
 
 The owner authorized an available alternative to MovieLens 32M on 2026-09-12.
 D1 now uses **GroupLens MovieLens Latest Small, September 2018, Kaggle version 2**
@@ -122,9 +122,86 @@ Lint/TypeScript and both Hermes exports passed; one pre-existing mobile Hook
 warning remains. Tests use explicitly artificial archives. The real-data report
 above is separate evidence and contains no histories or fitted artifacts.
 
-After this source/data packet's review and CI acceptance, D2 #237 freezes the
-chronological/held-out-subject development protocol, train-only baselines and a
-bounded static-state/ordered-prefix comparison before training. Report supported
-results and uncertainty honestly; the challenger need not win. Raw data, histories
-and future fitted artifacts stay in ignored research storage. Native serving,
-commercial use and artifact admission remain separate decisions.
+D1 is accepted through merged PR #242 / CI #475 at main `7602b34`.
+The 345-test count above is its historical gate. D2's measured result follows.
+
+## D2 — reproducible development evaluation
+
+[Readable result](reports/movielens-small-d2.md) · [Full aggregate evidence](reports/movielens-small-d2.json)
+· [Frozen protocol](manifests/movielens-small-d2.json) · Issue #237.
+
+The real run and independent replay agree on fitted parameters, predictions,
+metrics, grouped intervals and the rejection/fallback decision. Recent state won
+the validation comparison but missed its predeclared minimum improvement; no
+challenger is admitted. The separately named prequential comparison supports
+using recent rating-entry state within this development task. Native usefulness,
+Shared behavior, cross-domain transfer and model serving remain separate gates.
+
+After the D1 prepare/download steps above, a new workspace uses:
+
+```sh
+npm run research:movielens:normalize -- --output-dir research-artifacts/movielens-small-verified
+npm run research:movielens:evaluate
+```
+
+The single evaluation command builds the actual TypeScript package, freezes the
+protocol/code/runtime and data split, fits eight declared variants and evaluates
+the selected configuration without changing parameters after the final test.
+It uses Node standard library only; raw/fitted files never enter ordinary CI.
+The public run used Node 24.19.0 / V8 13.6.233.17 on Linux x64. A different runtime
+requires its own freeze; it cannot silently reuse a frozen code/runtime identity.
+
+For an auditable pause before any fitting and a fresh independent replay:
+
+```sh
+npm run research:movielens:evaluate -- freeze
+npm run research:movielens:evaluate -- run
+npm run research:movielens:evaluate -- run --output-dir research-artifacts/movielens-d2-replay
+```
+
+Use either the single command or the staged commands in a fresh workspace.
+Defaults are `research-artifacts/movielens-d2-frozen` and `movielens-d2-run`.
+`--frozen-dir`, `--output-dir` and optional verified D1 `--input` allow explicit
+new paths. A completed or partial directory is not overwritten; inspect it and
+choose a new path for another run. Existing frozen partitions are hash-verified
+when reused. Their subject memberships and all prediction journals remain ignored.
+The public report publishes only aggregate slices and integrity hashes.
+
+### Implemented models and boundaries
+
+All variants consume the same E1 `Observation`, `PredictionScope`, target scale
+and artifact lineage through the package's separate `./research` export. Queries
+contain visible prefixes and target object IDs; current target labels are passed
+to error calculation only after the full timestamp group's forecasts exist.
+This is an offline object-rating boundary, not E1's fixture reference estimator,
+a SQL replacement or a fabricated action-outcome Scenario.
+
+| Variant | Exact implemented role |
+| --- | --- |
+| Global / item mean | Training mean μ; item estimate `(sum + 10μ)/(count + 10)`; unknown item uses μ |
+| Durable state | Item baseline plus sum of permitted subject residuals divided by `(prefix count + 10)` |
+| Recent state | Item baseline plus 0.65 durable residual and 0.35 recent residual; recent residual averages the last three complete time-group residual means, shrunk by `groups/(groups+1)` |
+| Item neighbors | Positive cosine of training item-centered vectors, overlap shrinkage `n/(n+10)`, overlap ≥3; train-support ≥5, top 1,000 items, top 20 edges; no match uses durable state |
+| Factorization | Eight factors, twelve seeded shuffled SGD epochs, learning rate 0.01 and regularization 0.05; fixed item offsets and learned user bias/vectors during fit; inference ridge-folds the permitted prefix into an intercept plus factors with penalty 10 against frozen item vectors |
+| Static retrieval | Same-item, different-subject train memories matched by normalized raw durable prefix mean; at least three earlier time groups; fallback durable state |
+| Ordered retrieval | Same bank plus three ordered complete-group raw means in distance; fallback recent state. Both retrieve at most ten within RMS distance 0.35 and blend 0.35 continuation mean into the fallback |
+
+Memory encoding never reads the continuation or later training labels. Fixed raw
+scale normalization does not use fitted future statistics. The bank is selected
+by a stable seeded record hash, independent of response values; 10,000 total,
+64 per item. Undated metadata is excluded from all variants. Final global model
+parameters and bank stay frozen even in prequential evaluation. Numbers remain
+uncalibrated estimates on 0.5–5, with component support and explicit fallback.
+
+The optional artifact boundary rejects absent/invalid/withdrawn/disallowed or
+out-of-domain inputs and uses only authorized observed native-prefix evidence,
+otherwise unavailable. It retains no learned external parameter in that fallback.
+File/manifest hashes are checked by the runner; this boundary is not wired into
+native serving. Withdrawal requires replacing every dependent model/index/cache,
+a separately authorized rebuild and fresh evaluation, not just raw-file deletion.
+
+The code gate passed **357 tests**, lint/typecheck and both Hermes exports.
+New cases exercise cutoff/held-out/synthetic leakage, unavailable/equal-time
+prefixes, label-blind splits, continuation-free encoders, tied-group order,
+prequential score-before-update, deterministic fits/metrics and fallback. No
+network download or real-data training is performed by ordinary CI.
