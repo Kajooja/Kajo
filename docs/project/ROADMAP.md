@@ -111,7 +111,7 @@ Requirements: `MVP-ALG-002..003`.
 
 Exit: one versioned scoring/eligibility/policy contract for Personal/Shared; baseline shadow parity within declared tolerance; bounded refill after suppression; identified empty responses; duplicate-free, scope-safe pagination without falsely claiming catalog exhaustion.
 
-The active source packet implements protocol-2 atomic pages and the captured-scope mobile reader with per-page origins, alongside native concurrency/populated-upgrade checks. Verify the current published head, then perform the exact existing-database forward preflight/rollout before configured-client and device acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page. Protocol 1 stays compatible and has no continuation.
+The active source packet implements protocol-2 atomic pages and the captured-scope mobile reader with per-page origins, alongside native concurrency/populated-upgrade checks. The approved six-forward hosted rollout completed on 2026-09-12; STATUS records its exact versions and evidence. Verify the current published head, then complete configured-client recovery and device acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page. Protocol 1 stays compatible and has no continuation.
 
 The captured reader must also bind visible cache/readiness to environment, actor,
 Profile, session, domain, mode and request/revision. Test rapid A → B → A Profile

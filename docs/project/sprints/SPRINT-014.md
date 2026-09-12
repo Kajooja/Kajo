@@ -2132,3 +2132,91 @@ Deployment and partial-failure procedure:
 Next: approval and refreshed preflight for this six-forward hosted rollout,
 then configured-device acceptance. PR #229 remains draft, full DATA/ALG and
 Sprint014 remain open, and E1 → D1 → D2 retains its independent engine order.
+
+
+## Approved hosted Prediction rollout — 2026-09-12
+
+The owner explicitly approved the exact six-forward packet on existing **Kajo
+`mwrnvfosrzwygrunrltm`**, preserving current data. This completes the preceding
+preflight's requested action; its old pending/approval instructions are historical.
+Do not repeat these migrations or request that same authorization again.
+
+Deployment source: `78217135897cbfe10c85a0b6610989272bdc87c8` / draft PR #229.
+All five required jobs passed in [CI #466](https://github.com/Kajooja/Kajo/actions/runs/34695947055):
+pinned platform, source validation, clean installations, native CLI lineage and
+populated upgrade. The native CLI log includes the compact-source six-forward
+preservation/runtime probe and ends with its install/rollback/runtime PASS.
+The initial read-only refresh matched the reviewed target, 50 migration rows and
+all captured function/table/trigger/default metadata exactly.
+
+Each approved SQL file was applied separately, in dependency order, with provider
+success and function/owner/ACL/history/private-storage checks before the next.
+All six committed successfully. The provider assigned these actual versions:
+
+| Reviewed source filename | Installed filename | Unchanged SQL SHA-256 |
+| --- | --- | --- |
+| `20260910192630_late_outcome_attribution.sql` | `20260912133402_late_outcome_attribution.sql` | `6c724f941bd475f409a151841464f3e56d7a69023aaf72d521279f8c64586337` |
+| `20260910202244_frozen_prediction_replay.sql` | `20260912133832_frozen_prediction_replay.sql` | `1b471f7c894035a6154fbc98499ca7ee3dd499c9f4e6902cb72c35fdb7801d1c` |
+| `20260910210520_eligibility_first_candidate_pool.sql` | `20260912133941_eligibility_first_candidate_pool.sql` | `92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46` |
+| `20260911070959_identified_prediction_page.sql` | `20260912134056_identified_prediction_page.sql` | `caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08` |
+| `20260911074543_prediction_continuation_windows.sql` | `20260912134141_prediction_continuation_windows.sql` | `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415` |
+| `20260912105528_atomic_prediction_pages.sql` | `20260912134224_atomic_prediction_pages.sql` | `594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1` |
+
+The repository filenames and current canonical references now match those
+provider identities. Only the names changed; every SQL byte still matches the
+approved hash. Earlier dated sprint entries retain their original source names,
+with this mapping as the continuation authority. Previously protected source
+hashes and the accepted fresh-install baseline cutoff remain unchanged. These
+six deployed bodies are immutable; any subsequent correction requires a new
+reviewed forward.
+
+Final metadata verification:
+
+- Migration tracking: **50 → 56** rows, all original version/name pairs unchanged;
+  the exact six names appear in the approved sequence.
+- Public/private functions: **138 → 150**. Every stage's changed/new definition
+  matches the independently reconstructed source fingerprint. All 138 original
+  OIDs/signatures, owners and ACLs are preserved; only the five reviewed existing
+  ranking/evaluator/worker bodies changed. All unrelated definitions are unchanged.
+- Application tables: **33 → 37**. Four new private page receipt/window/context/
+  cursor tables have RLS and deny direct SELECT to anon, authenticated and
+  service_role. All 33 prior complete definition/structure fingerprints match
+  when the one changed `shadow_prediction_runs_counts_check` is virtually
+  substituted with its prior expression inside a read-only metadata query.
+  This isolates the intended zero-count relaxation without changing the database.
+- All **25** prior application/Auth-user triggers are identical; the one new
+  immutable page-context trigger brings the count to **26**. All **7** event
+  triggers, **24** creator-default entries, schemas, roles and memberships are
+  unchanged.
+- In an explicitly read-only transaction with empty JWT claims, both anon and
+  authenticated-without-actor calls to `public.rank_items_page_v1` reject with
+  `42501`. The probe rolls back and creates no users, fixtures or page data.
+- Security advisors: **23 RLS/no-policy INFO** findings, the prior 19 plus the four
+  intentionally private page tables; no new warnings. The existing Auth
+  leaked-password-protection WARN remains outside this packet. See the
+  [RLS advisory](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)
+  and [Auth protection guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+No application/Auth rows or row-derived counts/hashes were exported. Hosted
+metadata checks and the isolated populated-data preservation/runtime proof are
+separate evidence; this is not a live full-row equality claim. No reset,
+whole-history push, historical tracking repair, global-default migration,
+automatic promotion or Auth configuration change ran.
+`20260909131913_close_postgres_function_defaults.sql` remains undeployed.
+
+Before deployment and after filename alignment, local
+`EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile, 14 catalog,
+69 database), lint/TypeScript and iOS/Android Hermes exports. All 53 Markdown files
+and 134 relative file/heading links were checked; none were broken. The PR owns
+verification of the published head. Neither filenames nor documentation change
+mobile behavior.
+
+Next bounded unit: record the exact configured client build/environment against
+server checkpoint `20260912134224_atomic_prediction_pages`, then execute the
+[protocol-2 device/recovery checklist](../DEVICE_TEST.md#protocol-2-configured-client-check--prepared-2026-09-12).
+No emulator/adb or React Native web renderer is available here; no exact newly
+installed build, device result or fresh-account acceptance is claimed. No APK was
+dispatched or polled, and existing account/test history was retained. Keep PR #229
+draft and DATA/ALG/Sprint014 gates open until their actual evidence is accepted.
+STATUS retains this single continuation; E1 → D1 → D2 remains the separately
+selected independent-engine/research sequence.

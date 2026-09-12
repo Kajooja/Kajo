@@ -424,21 +424,25 @@ These compact contracts reconcile active source with accepted-main behavior abov
 
 Event session persistence precedes its Event, and a stopped coordinator cannot continue a delayed session acknowledgement into an Event write. Acknowledged-session reuse is coordinator-local; restart confirms original sessions again. Exposure-acknowledgement wake-up covers the race where acknowledgement arrives before the command is classified as waiting; a bounded fallback remains. Missing/unreadable exposure queues block correlated dispatch rather than fabricating evidence. `waitingForExposure` suppresses a premature error display while callers continue waiting for the actual receipt; genuine persistence errors remain visible.
 
-### Late Outcome attribution — prepared, not hosted
+### Late Outcome attribution — hosted 2026-09-12
 
-`20260910192630_late_outcome_attribution.sql` defines a private read projection shared by ScenarioMemory and evaluation. A previously unattributed command Outcome may be read with `LATE_EXPOSURE_V1` only when its original receipt owns that exact Event and actor/Profile/Item/session/mode/occurrence agree with the selected prior run and a real pre-action impression. A guessed action ID, another member/run or post-action occurrence does not qualify. Multiple impressions cannot duplicate the Outcome.
+`20260912133402_late_outcome_attribution.sql` defines a private read projection shared by ScenarioMemory and evaluation. A previously unattributed command Outcome may be read with `LATE_EXPOSURE_V1` only when its original receipt owns that exact Event and actor/Profile/Item/session/mode/occurrence agree with the selected prior run and a real pre-action impression. A guessed action ID, another member/run or post-action occurrence does not qualify. Multiple impressions cannot duplicate the Outcome.
 
 The reader separates Outcome occurrence cutoff from evidence-read cutoff; qualifying receipt/impression rows must be visible by that read cutoff. Old evaluations, raw Events and immutable command receipts are never rewritten. Undo still removes the outcome effect; rating 0 remains negative. This is evidence reconciliation, not a new exposure or reward.
 
 For late attribution, the receipt must own the primary Event ID or include the exact secondary ID in its recorded `eventIds`. Receipt/Event actor, Profile, Item, occurrence time, session and mode must agree; the run belongs to that actor/Profile/session/mode, selects the Item and precedes the action. The actual impression occurred between that run and action. A client `actionId` property alone, another member/session/run or an impression occurring after the action cannot qualify. Only supported preference/List/Endorsement outcomes participate; metadata, history-clear and Undo do not acquire a new Prediction. Existing `RECORDED` attribution remains compatible; the projection labels reconciled proof `LATE_EXPOSURE_V1`.
 
-### Frozen replay, candidate admission and continuation — prepared
+### Frozen replay, candidate admission and continuation — hosted 2026-09-12
 
 The active frozen-replay forward records full-precision as-of scoring inputs and original genome/version identity. Replay emits no Events, excludes incompatible legacy inputs and evaluates only the declared frozen source pool. The candidate-admission forward records eligibility/retention counts and ranks before bounded top-50 retention; this metadata is not exposure evidence.
 
-Protocol 1 retains its identified first-page responses and false continuation capability. The prepared `20260912105528_atomic_prediction_pages.sql` adds opt-in protocol 2: each later page atomically commits its own PredictionRun, page-local candidate ranks/selection, exact scoped receipt, cursor consumption and seen advancement. Current eligibility is checked against a frozen original source; old runs are never revised and no impression is fabricated. Every delivered Item carries its page's own run ID, and the current client source carries that per-Item origin through grid/Shared reordering, captured detail/swipe and durable actions.
+Protocol 1 retains its identified first-page responses and false continuation capability. The deployed `20260912134224_atomic_prediction_pages.sql` adds opt-in protocol 2: each later page atomically commits its own PredictionRun, page-local candidate ranks/selection, exact scoped receipt, cursor consumption and seen advancement. Current eligibility is checked against a frozen original source; old runs are never revised and no impression is fabricated. Every delivered Item carries its page's own run ID, and the current client source carries that per-Item origin through grid/Shared reordering, captured detail/swipe and durable actions.
 
 Private page context retains the original/parent run, observed seen prefix, reminder history and separate feature/eligibility times after derived-window cleanup. Exact authorized receipt retries survive cache expiry; another request cannot consume the same cursor. Shadow/evaluation conditions on the observed preceding production pages and declares `FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`; unobserved challenger paths acquire no labels. Bounded-window exhaustion is not catalog exhaustion. The client reader binds readiness/cache/append to environment, actor, Profile, session, domain, mode and revision. Old native list callbacks retain their request/view and session instead of borrowing the new view's origins; page fetch/prefetch itself creates no impression. Source CI, exact hosted rollout and configured-device acceptance remain separate gates.
+
+The owner-approved six-forward rollout was verified on 2026-09-12. STATUS and
+Sprint014 record exact source/deployment identities and metadata preservation.
+Configured-device evidence and full DATA acceptance remain open.
 
 ### Collection/history corrections and exact destination sets
 

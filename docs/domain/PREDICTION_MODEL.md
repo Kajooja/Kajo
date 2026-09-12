@@ -1001,11 +1001,11 @@ A baseline shadow must match Personal and Shared production eligibility, final o
 
 ### Active #229 frozen replay, admission and page contracts
 
-The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The server-page baseline `0a184a7` passed all five required CI #464 jobs. The subsequent captured-scope client source is described below; STATUS owns current head verification and the exact rollout preflight. Source acceptance does not establish hosted/device acceptance.
+The following code exists on unmerged `feat/228-delivered-origin`. The owner-approved six-forward server packet was installed and verified on 2026-09-12 from `7821713`, which passed all five CI #466 jobs. STATUS owns the exact deployed versions, current source verification and the remaining configured-device gate; this rollout does not merge the branch or establish device acceptance.
 
-#### Frozen replay parity — prepared, not hosted
+#### Frozen replay parity — hosted 2026-09-12
 
-`20260910202244_frozen_prediction_replay.sql` shares pure private `prediction_candidate_score_v2` between serving and shadow. Candidate `scoringFeatures.version = prediction-features-v2` retains unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty, exploration and both penalty inputs. V0 scopes `extra_float_digits=3` to its function so caller settings cannot erase binary precision; the caller setting is restored afterward. Rounded display fields and the accepted raw baseline formula remain compatible.
+`20260912133832_frozen_prediction_replay.sql` shares pure private `prediction_candidate_score_v2` between serving and shadow. Candidate `scoringFeatures.version = prediction-features-v2` retains unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty, exploration and both penalty inputs. V0 scopes `extra_float_digits=3` to its function so caller settings cannot erase binary precision; the caller setting is restored afterward. Rounded display fields and the accepted raw baseline formula remain compatible.
 
 Scalar and Scenario weights use the same immutable genome recorded on the run. Final scoring adds the frozen raw Scenario score with that weight and the frozen aggregate Shared common-fit contribution; Personal common-fit remains zero. `resurfacingInput` is retained before the reminder cap. Serving and replay share `finalize_resurfacing_policy_v1` and `prediction_delivery_tier_v1`: ordinary eligible Items, then the one eligible reminder, then suppressed Items; scores descend within tiers and Item ID breaks exact ties. Each genome chooses its reminder by scalar score before Scenario/common-fit, so a challenger may select a different reminder. Suppressed traced Items are never selected.
 
@@ -1013,19 +1013,19 @@ New shadow metadata records `shadow-replay-v2`, `prediction-features-v2` and `co
 
 Existing full-schema controls require exact double-precision score equality and exact rank/selection/policy across 18 Personal/Shared × mode × page-size cases. The independent accepted-formula check uses `1e-12` arithmetic tolerance. Reminder re-selection, precision boundaries, ties and later catalog/taste/member changes are covered. These are comparisons conditional on a frozen source pool, not evidence about independently generated live challenger pools or predictive usefulness.
 
-#### Candidate admission — prepared, not hosted
+#### Candidate admission — hosted 2026-09-12
 
-`20260910210520_eligibility_first_candidate_pool.sql` fixes admission starvation: 70 consumed high-fit Items previously occupied top-50 despite 24 ordinary alternatives. V0 evaluates `resurfacing_policy_decision_v1` at one recorded time before retention; ordinary → aged reminder → suppressed ordering precedes the same baseline-score/Item-ID order. Scalar scoring reuses that frozen input, with each genome applying its reminder cap within the retained pool.
+`20260912133941_eligibility_first_candidate_pool.sql` fixes admission starvation: 70 consumed high-fit Items previously occupied top-50 despite 24 ordinary alternatives. V0 evaluates `resurfacing_policy_decision_v1` at one recorded time before retention; ordinary → aged reminder → suppressed ordering precedes the same baseline-score/Item-ID order. Scalar scoring reuses that frozen input, with each genome applying its reminder cap within the retained pool.
 
 The serving suffix is `+eligibility-first-v1`. Candidate `candidatePool` metadata records version, `eligibilityAt`, considered/ordinary/reminder/suppressed counts, retained limit/count, `baselineScoreRank` and `admissionRank`. V0 retains at most 50; expensive Scenario/common-fit work and persisted traces retain at most `min(50, 3 × requested limit)`. Admission counts are not impressions or additional evidence.
 
 Complete versioned zero-result sources are valid frozen comparisons. All-suppressed and explicit empty controls can have zero hypothetical selections; automatic challenger queueing still omits empty pools. Pre-admission frozen-v2 sources stay comparable; pre-v2 inputs fail diagnostically. Tests cover 36 Profile/domain/mode/limit combinations, mixed domains, empty/exhausted sources, reminder caps, exact baseline replay and populated preservation.
 
-The raw-feature/admission scan still covers the full catalog; only downstream expensive work is bounded. This corrects eligibility starvation without claiming indexed retrieval scale, independent source diversity or complete ALG-002/003 acceptance. The active legacy client still treats an empty RPC array as failure until the identified reader is activated.
+The raw-feature/admission scan still covers the full catalog; only downstream expensive work is bounded. This corrects eligibility starvation without claiming indexed retrieval scale, independent source diversity or complete ALG-002/003 acceptance. The active client source uses the identified reader below; configured-device empty-result acceptance remains open.
 
-#### Versioned result/continuation contract — first-page source prepared 2026-09-11
+#### Versioned result/continuation contract — hosted 2026-09-12
 
-`20260911070959_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. In protocol 1 the optional cursor must be null; protocol 2 is defined below. Capturing session identity does not create or prove an Event session.
+`20260912134056_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. In protocol 1 the optional cursor must be null; protocol 2 is defined below. Capturing session identity does not create or prove an Event session.
 
 The server generates the PredictionRun ID before ranking. Exact request/response JSON is retained in private RLS-protected receipts; request-ID reuse is serialized with an advisory lock. Current actor/Profile membership is checked and locked even on receipt replay. Changed payload or actor rejects reuse; original trace and receipt commit atomically. Later mutable state cannot rewrite a retry. Receipts cascade with actor/Profile/run; no time-based receipt-retention policy is implemented yet.
 
@@ -1033,17 +1033,18 @@ Every response, including an empty one, retains version, request/run/Profile/ses
 
 `predictionPageOperations.ts` retains explicit protocol-1 envelope validation and now defaults new requests to protocol 2. Both protocols validate scope, run identity, source counts, availability and contiguous unique ranks. The shared row mapper remains; the unused row-RPC client and its unscoped presentation cache were removed when the live client source adopted protocol 2. Hosted and device acceptance remain separate.
 
-`20260911074543_prediction_continuation_windows.sql` adds owner-only `frozen-window-v1` open/read helpers. They preserve the first receipt's exact immutable run, ordered candidates, scope and initially selected IDs without reranking, making Events, changing receipts or creating another run. Repeat open returns the same window; reads require the current actor/membership, valid source lifetime and unchanged original run/candidate rows. Later catalog/taste state cannot replace that source.
+`20260912134141_prediction_continuation_windows.sql` adds owner-only `frozen-window-v1` open/read helpers. They preserve the first receipt's exact immutable run, ordered candidates, scope and initially selected IDs without reranking, making Events, changing receipts or creating another run. Repeat open returns the same window; reads require the current actor/membership, valid source lifetime and unchanged original run/candidate rows. Later catalog/taste state cannot replace that source.
 
 Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from original ranking and 16 retained windows per actor/Profile. Scope locking serializes creation. New opens reclaim expired derived rows only; source age prevents expired-run reopening as a fresh window. Actor/Profile/run/receipt deletion cascades. Dormant scopes may retain at most 16 expired rows until another open or parent deletion; no background cleanup worker is implemented. Helpers have no API-role execution grants.
 
-#### Atomic next pages — protocol 2 source, not hosted
+#### Atomic next pages — protocol 2 hosted 2026-09-12
 
-`20260912105528_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
+`20260912134224_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
 `public.rank_items_page_v1` endpoint. Protocol 1 keeps its exact first-page body,
 false continuation capability and immutable old receipts; the legacy row RPC is
 unchanged. The current client source opts into protocol 2; protocol-1 envelope compatibility
-remains explicitly tested. Hosted rollout must precede using this client build.
+remains explicitly tested. The recorded hosted rollout supplies this client contract;
+the exact configured build still needs device acceptance.
 
 Protocol 2 retains the 16 KiB envelope, UUID request/Profile/session identities,
 mode/domain, limit 1–50 and object context. A null/omitted cursor starts a new
@@ -1096,7 +1097,7 @@ retry, competing cursor consumers and simultaneous sixteenth/seventeenth windows
 and rehearses both new forwards over populated pre-window receipts. Read STATUS
 and current PR CI for acceptance; test definitions alone are not native results.
 
-#### Captured-scope mobile pages — source, rollout pending
+#### Captured-scope mobile pages — source, device acceptance pending
 
 `usePredictionRanking.ts` now reads protocol 2 through `predictionPageOperations.ts`
 and the tested `predictionPageReader.ts` controller. First requests capture an
@@ -1137,9 +1138,9 @@ Current CI, exact hosted rollout and configured-device acceptance are separate
 facts owned by STATUS and DEVICE_TEST. No new SQL forward is part of this client
 change.
 
-#### Late Outcome attribution — prepared, not hosted
+#### Late Outcome attribution — hosted 2026-09-12
 
-`20260910192630_late_outcome_attribution.sql` supplies the same private effective-Outcome reader to ScenarioMemory and mature evaluation. Exact immutable receipt membership and a real pre-action impression can make an earlier unattributed Outcome usable for its originally requested run; missing/mismatched proof contributes nothing. Raw Events/receipts, old evaluations and prediction-time inputs remain unchanged. Duplicate impressions do not multiply support; existing priority/Undo and zero-rating semantics remain authoritative.
+`20260912133402_late_outcome_attribution.sql` supplies the same private effective-Outcome reader to ScenarioMemory and mature evaluation. Exact immutable receipt membership and a real pre-action impression can make an earlier unattributed Outcome usable for its originally requested run; missing/mismatched proof contributes nothing. Raw Events/receipts, old evaluations and prediction-time inputs remain unchanged. Duplicate impressions do not multiply support; existing priority/Undo and zero-rating semantics remain authoritative.
 
 Serving appends `+outcome-attribution-v1`; evaluation records `outcomeAttributionVersion` and server-captured `evidenceCutoff`. Outcome occurrence must fit the mature window, while the recorded receipt/impression must be visible by the evidence-read cutoff. A new evaluation may include newly available proof without changing an older evaluation. This bounded reader test establishes neither authenticated arrival timestamps nor large-history performance. DATA_EVENTS owns exact proof membership and event-cutoff semantics.
 
@@ -1156,8 +1157,9 @@ Bound request/slate size, memory and queries; support continuation through a fro
 ### Active #229 successor source and remaining acceptance
 
 These contracts are present in the unmerged `feat/228-delivered-origin` source,
-including the protocol-2 page forward. They are not claims that accepted main or
-hosted serving already uses the six pending forwards. STATUS owns exact refs/CI/rollout dates.
+including the protocol-2 page forward. The six server forwards were installed and
+verified on 2026-09-12. STATUS owns exact refs/CI/deployment versions; accepted-main
+source and configured-device acceptance remain separate.
 
 | Source contract | Meaning / remaining boundary |
 |---|---|
@@ -1170,15 +1172,15 @@ hosted serving already uses the six pending forwards. STATUS owns exact refs/CI/
 The protocol-2 source now commits independent pages, hard eligibility and seen
 advancement atomically, with page-aware frozen replay and dedicated native
 concurrency/upgrade checks. Protocol 1 still reports false capability. The client
-source now uses protocol 2 with captured scope and per-Item page origins. Exact
-hosted rollout and configured-device acceptance remain open; STATUS owns their evidence.
+source now uses protocol 2 with captured scope and per-Item page origins. Hosted
+rollout is complete; configured-device acceptance remains open. STATUS owns the evidence.
 
 An empty identified result, exhausted bounded window and transport/authorization
 failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
 Client readiness and visible cached ranking must match environment, actor,
 Profile, session, mode, domain and request/revision. Refetching after a session
 change does not make an older cached run current. Test rapid A → B → A return,
-delayed/error replies and scope changes before switching the prepared page reader.
+delayed/error replies and scope changes before accepting the configured page reader.
 
 Active-list membership participates in #229's bounded resurfacing successor;
 removing one membership cannot restore ordinary eligibility while another
@@ -1268,4 +1270,4 @@ later satisfaction may become separate heads; current V1 reward constants are
 not silently relabeled as those probabilities. Replay, simulation, consolidation
 and evolution require separate ablations before increased complexity is admitted.
 
-Documentation acceptance does not deploy any of these new components. [STATUS](../project/STATUS.md) retains #229's unmerged source and undeployed forwards, and [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.
+Documentation acceptance does not deploy any of these new engine components. [STATUS](../project/STATUS.md) retains #229's unmerged source, completed server rollout and open device gates; [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.

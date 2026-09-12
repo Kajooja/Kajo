@@ -314,9 +314,14 @@ defects merely because earlier reports remain in this historical document.
 
 ## Protocol-2 configured client check — prepared 2026-09-12
 
-Run only after STATUS's exact six-forward target review/rollout and current client
-CI acceptance. Record APK/build/source identity, environment and server checkpoint.
-This source packet has no new installed-device acceptance and starts no APK build.
+The server prerequisite is complete: all six owner-approved forwards were
+installed and verified on Kajo `mwrnvfosrzwygrunrltm` on 2026-09-12, ending at
+`20260912134224_atomic_prediction_pages`. Deployment source `7821713` passed all
+five CI #466 jobs. See the [rollout record](sprints/SPRINT-014.md#approved-hosted-prediction-rollout--2026-09-12).
+Check current client CI, then record the exact APK/build/source identity,
+environment and server checkpoint before these tests. The filename alignment
+changes neither mobile source nor SQL bytes. No exact installed build or new
+device results have been recorded; this checkpoint starts no APK build or reset.
 
 1. Enter BOOK and MOVIE in Personal and Shared Profiles, in all three modes. The
    first fetch starts immediately; loading, request failure and genuine empty
