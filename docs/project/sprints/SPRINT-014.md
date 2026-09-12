@@ -2220,3 +2220,43 @@ dispatched or polled, and existing account/test history was retained. Keep PR #2
 draft and DATA/ALG/Sprint014 gates open until their actual evidence is accepted.
 STATUS retains this single continuation; E1 → D1 → D2 remains the separately
 selected independent-engine/research sequence.
+
+## Bounded client recovery — 2026-09-12
+
+Resumed draft PR #229 at `7d47e44bb55ee7c5e5544fa92b0bcdc6f44a2401`; all five
+required jobs passed in [CI #467](https://github.com/Kajooja/Kajo/actions/runs/34697784410).
+A read-only migration-history query reconfirmed the six installed versions ending
+at `20260912134224_atomic_prediction_pages`. No deployment or data mutation ran.
+
+A new regression reproduced an unresolved first-page load remaining `loading`
+after 15 seconds. The reader now bounds each first/next attempt to 15 seconds
+across the ranking RPC and catalog enrichment. It sends one AbortSignal through
+both SDK requests and races cancellation even if the transport never settles.
+Scope/focus changes and explicit refresh cancel old attempts; timers/listeners
+are released on settlement. A failed append preserves the immutable prefix and
+its page origins; timeout/transport retry retains the original request/context/
+cursor, since client cancellation does not prove a server rollback.
+
+The configured loader preserves server error codes. Exact unusable-cursor errors
+select a fresh search, while capacity errors ask the user to wait and retry.
+Unknown/permission/transport errors use generic copy without exposing server
+details. Buttons and pull recovery follow the same action; no automatic refresh,
+mock downgrade, Event creation or SQL change is introduced. The injected SDK
+transport checks follow the documented
+[AbortSignal boundary](https://supabase.com/docs/reference/javascript/using-modifiers-abortsignal).
+
+Validation: the formerly failing regression passes; **91** focused page/reader/
+catalog tests pass. `EXPO_OFFLINE=1 CI=1 npm run check` passed **439 tests**
+(356 mobile, 14 catalog, 69 database), lint/TypeScript and iOS/Android Hermes
+exports. New cases cover hanging first/next loads, exact retry, late completion,
+blur/reactivation, replaced-attempt deadlines, immutable prefixes, expired cursor
+recovery, capacity and actual SDK signal/error-code propagation with injected HTTP
+fixtures. The published head still requires its own five CI jobs; CI #467 proves
+the resume baseline only.
+
+No native emulator/adb or web renderer is available here, and no new configured
+APK was installed, built or polled. DEVICE_TEST includes the new stalled-request
+and expiry checks; exact build identity, native callbacks, process-death/reconnect
+and fresh-account acceptance remain open. Preserve current test data and keep
+#229 draft. STATUS retains configured-device recovery as the default continuation;
+E1 → D1 → D2 can be explicitly selected while those device gates wait.

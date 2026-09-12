@@ -33,6 +33,7 @@ export type CatalogItemLoadResult =
 export async function loadCatalogItems(
   client: SupabaseClient,
   itemIds: readonly ItemId[],
+  signal?: AbortSignal,
 ): Promise<CatalogItemLoadResult> {
   const uniqueIds = [...new Set(itemIds.filter(Boolean))];
   if (uniqueIds.length === 0) {
@@ -40,10 +41,11 @@ export async function loadCatalogItems(
   }
 
   try {
-    const { data, error } = await client
+    const query = client
       .from('items')
       .select(CATALOG_ITEM_SELECT)
       .in('id', uniqueIds);
+    const { data, error } = await (signal ? query.abortSignal(signal) : query);
     const rawData: unknown = data;
 
     if (error || !Array.isArray(rawData)) {

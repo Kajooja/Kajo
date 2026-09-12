@@ -330,11 +330,17 @@ device results have been recorded; this checkpoint starts no APK build or reset.
    once, retain order and old Item origins; an empty terminal page stops further
    paging without claiming the whole catalog is exhausted.
 3. Interrupt first/next fetches, then use **Yritä uudelleen** or pull-to-retry. The
-   request ID/context/cursor remains exact. An append failure keeps only the valid
-   current-scope prefix. **Aloita uusi haku** explicitly starts a new window,
-   including after cursor expiry; the server's 16-window/15-minute bounds remain.
+   request ID/context/cursor remains exact. Keep the app active with an unanswered
+   request: after 15 seconds it must expose recovery instead of spinning forever,
+   including when only catalog enrichment stalls. An append failure keeps the
+   valid current-scope prefix. With a server-expired/unusable cursor, the primary
+   action is **Aloita uusi haku** and pull-to-refresh starts a new window; it must
+   not offer an endless retry of that cursor. The 16-window/15-minute server bounds
+   remain; a capacity failure asks the user to wait rather than claiming emptiness.
 4. Switch A → B → A quickly, then change actor/account, mode and Event session
-   during delayed RPC/catalog replies. No previous view or error may become the
+   during delayed RPC/catalog replies, and leave/return during a pending load.
+   Scope/focus cleanup cancels the old transport; its late reply or deadline must
+   not change the new view. No previous view or error may become the
    current slate. Background detail feedback must not start repeated grid fetches.
 5. Open Items from different pages and swipe through the captured sequence. Change
    Shared ordering or refresh the grid in parallel; each exposure/action must keep
@@ -352,3 +358,10 @@ device results have been recorded; this checkpoint starts no APK build or reset.
 
 Record each result separately. Source tests/exports and existing positive owner
 reports do not establish these new runtime flows or complete MVP-DATA-004/ALG-003.
+
+The 2026-09-12 recovery follow-up passed 439 local tests and both platform exports;
+its regression first reproduced the never-settling load. The real Supabase SDK
+was exercised with injected HTTP fixtures, including cancellation during catalog
+enrichment and error-code preservation. These are automated source checks, not
+an installed APK, configured user session or native device acceptance. Record the
+new exact build before testing; do not reuse CI #467 as this changed client's SHA.

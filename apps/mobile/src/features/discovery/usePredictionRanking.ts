@@ -6,17 +6,16 @@ import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import type { DiscoveryMode, Item, ItemType, PredictionId } from '../../domain/contracts';
 import { createCorrelationId, createUuidV7 } from '../events/eventTracking';
 import { useEventTracking } from '../events/EventTrackingContext';
-import { enrichItemsFromCatalog, loadCatalogItems } from './catalogItemOperations';
 import { useItemInteractions } from './ItemInteractionContext';
 import type { ItemInteractionMap } from './itemInteraction';
 import { getStaticMockItems } from './mockDiscovery';
-import { createPredictionPageRequest, loadPredictionPage, type PredictionAvailability, type PredictionPageRpc } from './predictionPageOperations';
+import { createPredictionPageRequest, loadCatalogPredictionPage, type PredictionAvailability, type PredictionPageRecovery } from './predictionPageOperations';
 import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope, type PredictionReaderSnapshot } from './predictionPageReader';
 import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay } from './predictionRefresh';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
 const EMPTY: PredictionReaderSnapshot = Object.freeze({ viewId: 'inactive', status: 'idle',
-  pages: Object.freeze([]), items: Object.freeze([]), predictionIds: Object.freeze({}), message: null });
+  pages: Object.freeze([]), items: Object.freeze([]), predictionIds: Object.freeze({}), message: null, recovery: null });
 const subscribeInactive = () => () => {};
 const inactiveSnapshot = () => EMPTY;
 
@@ -32,6 +31,7 @@ export interface VisiblePredictionRanking {
   hasNextPage: boolean;
   loadingNextPage: boolean;
   nextPageError: string | null;
+  recovery: PredictionPageRecovery | null;
   retry: () => void;
   refresh: () => void;
   loadMore: () => void;
@@ -58,24 +58,14 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   const scope = useMemo<PredictionReaderScope | null>(() => environment && actorUserId && profileId && sessionId
     ? { environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision } : null,
   [environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision]);
-  const rpc = useMemo<PredictionPageRpc | null>(() => client ? async (name, arguments_) => {
-    const { data, error } = await client.rpc(name, arguments_);
-    return { data, error: error ? { message: error.message } : null };
-  } : null, [client]);
-  const reader = useMemo(() => scope && rpc && client ? createPredictionPageReader({
+  const reader = useMemo(() => scope && client ? createPredictionPageReader({
     scope,
     createRequest: () => createPredictionPageRequest({ requestId: createUuidV7(),
       profileId: scope.profileId, sessionId: scope.sessionId, mode: scope.mode,
       itemType: scope.itemType, limit: scope.limit, context: getRuntimeContext() }),
     createRequestId: createUuidV7,
-    load: async request => {
-      const result = await loadPredictionPage(rpc, request);
-      if (result.status !== 'success' || result.ranking.items.length === 0) return result;
-      const catalog = await loadCatalogItems(client, result.ranking.items.map(item => item.id));
-      return catalog.status === 'success' ? { ...result, ranking: { ...result.ranking,
-        items: enrichItemsFromCatalog(result.ranking.items, catalog.items) } } : result;
-    },
-  }) : null, [scope, rpc, client]);
+    load: (request, signal) => loadCatalogPredictionPage(client, request, signal),
+  }) : null, [scope, client]);
   const snapshot = useSyncExternalStore(reader?.subscribe ?? subscribeInactive,
     reader?.getSnapshot ?? inactiveSnapshot, reader?.getSnapshot ?? inactiveSnapshot);
   const lastActivation = useRef<{ identity: string; loaded: boolean } | null>(null);
@@ -104,7 +94,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
 
   if (!client) return { ...fallback, viewId: fallback.predictionId, source: 'fallback', status: 'ready',
     message: null, availability: 'ITEMS', hasNextPage: false, loadingNextPage: false, nextPageError: null,
-    retry, refresh, loadMore };
+    recovery: null, retry, refresh, loadMore };
 
   const first = snapshot.pages[0];
   const last = snapshot.pages.at(-1);
@@ -113,7 +103,8 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
     status: first ? 'ready' : snapshot.status === 'error' ? 'error' : 'loading',
     message: first ? null : snapshot.message, availability: last?.availability ?? null,
     hasNextPage: Boolean(last?.nextCursor), loadingNextPage: Boolean(first && snapshot.status === 'loading'),
-    nextPageError: first && snapshot.status === 'error' ? snapshot.message : null, retry, refresh, loadMore };
+    nextPageError: first && snapshot.status === 'error' ? snapshot.message : null,
+    recovery: snapshot.recovery, retry, refresh, loadMore };
 }
 
 function getRuntimeContext() {

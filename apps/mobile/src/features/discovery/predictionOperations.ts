@@ -9,7 +9,7 @@ import type {
 
 export interface PredictionRpcResponse {
   data: unknown;
-  error: { message: string } | null;
+  error: { message: string; code?: string } | null;
 }
 
 export interface PredictionRanking {

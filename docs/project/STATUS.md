@@ -23,6 +23,20 @@ unchanged SQL hashes and preservation evidence are in
 The accepted #233/#234 engine direction is reconciled.
 Do not merge the unfinished packet or silently switch to E1.
 
+Resume baseline `7d47e44bb55ee7c5e5544fa92b0bcdc6f44a2401` passed all five required
+jobs in [CI #467](https://github.com/Kajooja/Kajo/actions/runs/34697784410).
+The client recovery follow-up reproduces and fixes a never-settling page load:
+each active first/next attempt now has a 15-second deadline across RPC and catalog
+enrichment, and scope/focus changes abort it. Transport retry keeps the exact
+request; proven unusable cursors require explicit fresh search, while the window
+cap asks the user to wait and retry. Late replies cannot change accepted pages.
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **439 tests** (356 mobile,
+14 catalog, 69 database), lint/TypeScript and both Hermes exports. Published-head
+CI remains a separate gate; see the current PR and
+[the recovery checkpoint](sprints/SPRINT-014.md#bounded-client-recovery--2026-09-12).
+A read-only history query reconfirmed all six installed versions through
+`20260912134224_atomic_prediction_pages`; no hosted write ran in this follow-up.
+
 The server-page baseline `0a184a71320621c5bd31c72f70ff18acf786acc8` passed all five
 jobs in [CI #464](https://github.com/Kajooja/Kajo/actions/runs/34691537142), including
 native concurrent retries/cursor consumption/window capacity and populated
@@ -66,7 +80,8 @@ Next bounded unit:
    `20260912134224_atomic_prediction_pages`. No further hosted migration is queued
    in this packet. The global privilege-default forward remains a separate gate.
 2. Record the exact configured client build and exercise
-   first-page/append/empty/error/expired-cursor recovery, fast Profile/account/
+   first-page/append/empty/error/expired-cursor recovery, including the new
+   15-second stalled-request and cancel/retry cases, fast Profile/account/
    session changes, mixed-page grid/detail/actions, restart/reconnect and durable
    exposure ordering. Follow the appended DEVICE_TEST checklist. No APK dispatch
    or polling substitutes for device evidence; retain the owner's fresh-account

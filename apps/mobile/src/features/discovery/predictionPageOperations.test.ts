@@ -1,5 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
-import { createNextPredictionPageRequest, createPredictionPageRequest, loadPredictionPage, mapPredictionPage, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
+import { createNextPredictionPageRequest, createPredictionPageRequest, loadCatalogPredictionPage, loadPredictionPage, mapPredictionPage, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
 
 const id = (n: number) => `a2290000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const request = createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
@@ -77,8 +78,108 @@ describe('Identified prediction page boundary', () => {
       vi.fn().mockResolvedValue({ data: page(), error: { message: 'denied' } }),
       vi.fn().mockResolvedValue({ data: null, error: null })]) {
       expect(await loadPredictionPage(rpc, request)).toEqual({ status: 'error',
-        message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.' });
+        message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.', recovery: 'retry' });
     }
+  });
+
+  it.each(['Continuation window expired', 'Continuation source expired', 'Continuation cursor unavailable',
+    'Continuation cursor already consumed', 'Continuation source changed'])(
+    'offers fresh search for the exact server failure %s', async message => {
+      const rpc = vi.fn().mockResolvedValue({ data: null, error: { code: '22023', message } });
+      expect(await loadPredictionPage(rpc, request)).toEqual({ status: 'error', recovery: 'refresh',
+        message: 'Tätä hakua ei voi enää jatkaa. Aloita uusi haku.' });
+      expect(rpc).toHaveBeenCalledTimes(1);
+    });
+
+  it('does not mistake a transport, permission or unknown protocol error for proven expiry', async () => {
+    for (const error of [{ code: '42501', message: 'Profile access denied' },
+      { code: '22023', message: 'Continuation request scope mismatch' },
+      { code: '22023', message: 'private unexpected detail' },
+      { message: 'Continuation window expired' }, { code: '08006', message: 'Continuation window expired' }]) {
+      expect(await loadPredictionPage(async () => ({ data: null, error }), request))
+        .toEqual({ status: 'error', recovery: 'retry',
+          message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.' });
+    }
+  });
+
+  it('keeps the failed request retryable when the active-window capacity is full', async () => {
+    expect(await loadPredictionPage(async () => ({ data: null,
+      error: { code: '54000', message: 'Too many active continuation windows' } }), request))
+      .toEqual({ status: 'error', recovery: 'retry',
+        message: 'Hakuja on tehty paljon lyhyessä ajassa. Odota hetki ja yritä uudelleen.' });
+  });
+});
+
+describe('configured page transport and catalog cancellation', () => {
+  const response = (data: unknown, status = 200) => new Response(JSON.stringify(data), {
+    status, headers: { 'Content-Type': 'application/json' },
+  });
+  function clientWith(fetcher: typeof fetch) {
+    return createClient('https://fixture.invalid', 'public-fixture-key', {
+      global: { fetch: fetcher }, auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+  }
+
+  it('passes the same signal through the actual SDK RPC and metadata fetch, preserving ranks and identity', async () => {
+    const controller = new AbortController();
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+      .mockResolvedValueOnce(response([{
+        id: id(12), item_type: 'BOOK', title: 'Enriched second book', description: null,
+        tags: ['quiet'], creators: ['Author'], release_year: 2020, image_url: 'https://fixture.invalid/cover', original_language: 'fi',
+      }]));
+    const result = await loadCatalogPredictionPage(clientWith(fetcher), request, controller.signal);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(String(fetcher.mock.calls[0]![0])).toContain('/rest/v1/rpc/rank_items_page_v1');
+    expect(JSON.parse(fetcher.mock.calls[0]![1]!.body as string)).toEqual({ request });
+    expect(String(fetcher.mock.calls[1]![0])).toContain('/rest/v1/items?');
+    expect(fetcher.mock.calls.every(([, init]) => init?.signal === controller.signal)).toBe(true);
+    expect(result).toMatchObject({ status: 'success', request, ranking: { predictionId: id(4) } });
+    if (result.status !== 'success') throw new Error('Expected page');
+    expect(result.ranking.items.map(item => item.id)).toEqual([id(11), id(12)]);
+    expect(result.ranking.items.map(item => item.title)).toEqual(['Book 1', 'Enriched second book']);
+  });
+
+  it.each(['before', 'after-rpc'] as const)('skips subsequent work when cancelled %s', async stage => {
+    const controller = new AbortController();
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => {
+      controller.abort();
+      return response(page());
+    });
+    if (stage === 'before') controller.abort();
+    expect((await loadCatalogPredictionPage(clientWith(fetcher), request, controller.signal)).status).toBe('error');
+    expect(fetcher).toHaveBeenCalledTimes(stage === 'before' ? 0 : 1);
+  });
+
+  it('cancels a pending metadata fetch without publishing the delivered response as a completed load', async () => {
+    const controller = new AbortController();
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+      .mockImplementationOnce((_input, init) => new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(new DOMException('Cancelled', 'AbortError')), { once: true });
+      }));
+    const pending = loadCatalogPredictionPage(clientWith(fetcher), request, controller.signal);
+    await vi.waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
+    controller.abort();
+    expect(await pending).toMatchObject({ status: 'error', recovery: 'retry' });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves the identified ranking if only metadata fails', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+      .mockResolvedValueOnce(response({ message: 'Metadata unavailable', code: '42501' }, 403));
+    const result = await loadCatalogPredictionPage(clientWith(fetcher), request, new AbortController().signal);
+    expect(result).toMatchObject({ status: 'success', ranking: { predictionId: id(4) } });
+    if (result.status !== 'success') throw new Error('Expected page');
+    expect(result.ranking.items.map(item => item.title)).toEqual(['Book 1', 'Book 2']);
+  });
+
+  it('retains SQL error codes through the configured SDK boundary without requesting metadata', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response({
+      code: '22023', message: 'Continuation window expired', details: 'private', hint: 'private',
+    }, 400));
+    const result = await loadCatalogPredictionPage(clientWith(fetcher), request, new AbortController().signal);
+    expect(result).toEqual({ status: 'error', recovery: 'refresh',
+      message: 'Tätä hakua ei voi enää jatkaa. Aloita uusi haku.' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -1,4 +1,6 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Context, DiscoveryMode, ItemType, ProfileId, SessionId } from '../../domain/contracts';
+import { enrichItemsFromCatalog, loadCatalogItems } from './catalogItemOperations';
 import { mapPredictionRows, type PredictionRanking, type PredictionRpcResponse } from './predictionOperations';
 
 export const PREDICTION_PAGE_V1_RPC = 'rank_items_page_v1';
@@ -73,17 +75,52 @@ export interface PredictionPage {
 }
 export type PredictionPageResult =
   | PredictionPage
-  | { status: 'error'; message: string };
+  | { status: 'error'; message: string; recovery: PredictionPageRecovery };
+
+export type PredictionPageRecovery = 'retry' | 'refresh';
 
 const pageError = (): PredictionPageResult => ({ status: 'error',
-  message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.' });
+  message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.', recovery: 'retry' });
+
+function rpcError(error: NonNullable<PredictionRpcResponse['error']>): PredictionPageResult {
+  // Only these exact server-owned errors prove the cursor cannot continue.
+  // Do not expose raw server details or turn a lost reply into a new request.
+  if (error.code === '22023' && ['Continuation window expired', 'Continuation source expired',
+    'Continuation cursor unavailable', 'Continuation cursor already consumed',
+    'Continuation source changed'].includes(error.message)) {
+    return { status: 'error', recovery: 'refresh',
+      message: 'Tätä hakua ei voi enää jatkaa. Aloita uusi haku.' };
+  }
+  if (error.code === '54000' && error.message === 'Too many active continuation windows') {
+    return { status: 'error', recovery: 'retry',
+      message: 'Hakuja on tehty paljon lyhyessä ajassa. Odota hetki ja yritä uudelleen.' };
+  }
+  return pageError();
+}
 
 export async function loadPredictionPage(rpc: PredictionPageRpc, request: PredictionPageRequest): Promise<PredictionPageResult> {
   try {
     const response = await rpc(PREDICTION_PAGE_V1_RPC, { request });
-    if (response.error) return pageError();
+    if (response.error) return rpcError(response.error);
     return mapPredictionPage(response.data, request);
   } catch { return pageError(); }
+}
+
+// The reader supplies one cancellation/deadline signal for both parts of the
+// delivery. Aborting the client does not imply the server rolled back its receipt.
+export async function loadCatalogPredictionPage(client: SupabaseClient, request: PredictionPageRequest,
+  signal: AbortSignal): Promise<PredictionPageResult> {
+  if (signal.aborted) return pageError();
+  const result = await loadPredictionPage(async (name, arguments_) => {
+    const { data, error } = await client.rpc(name, arguments_).abortSignal(signal);
+    return { data, error };
+  }, request);
+  if (signal.aborted) return pageError();
+  if (result.status !== 'success' || result.ranking.items.length === 0) return result;
+  const catalog = await loadCatalogItems(client, result.ranking.items.map(item => item.id), signal);
+  if (signal.aborted) return pageError();
+  return catalog.status === 'success' ? { ...result, ranking: { ...result.ranking,
+    items: enrichItemsFromCatalog(result.ranking.items, catalog.items) } } : result;
 }
 
 export function mapPredictionPage(data: unknown, request: PredictionPageRequest): PredictionPageResult {

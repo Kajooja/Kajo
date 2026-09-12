@@ -4,6 +4,7 @@ import {
   type PredictionPage,
   type PredictionPageRequest,
   type PredictionPageResult,
+  type PredictionPageRecovery,
 } from './predictionPageOperations';
 
 export interface PredictionReaderScope {
@@ -29,9 +30,11 @@ export interface PredictionReaderSnapshot {
   readonly items: readonly Item[];
   readonly predictionIds: Readonly<Record<string, string>>;
   readonly message: string | null;
+  readonly recovery: PredictionPageRecovery | null;
 }
 
 const MESSAGE = 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.';
+const REQUEST_TIMEOUT_MS = 15_000;
 
 // One controller per captured scope/revision. Leaving it invalidates all work,
 // including catalog enrichment. Returning to the same scope creates a new
@@ -40,7 +43,7 @@ export function createPredictionPageReader(options: {
   scope: PredictionReaderScope;
   createRequest: () => PredictionPageRequest;
   createRequestId: () => string;
-  load: (request: PredictionPageRequest) => Promise<PredictionPageResult>;
+  load: (request: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>;
 }) {
   const scope = Object.freeze({ ...options.scope });
   let pending: PredictionPageRequest | null = null;
@@ -49,6 +52,7 @@ export function createPredictionPageReader(options: {
   let generation = 0;
   let running = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let cancelFlight: (() => void) | null = null;
   const listeners = new Set<() => void>();
 
   function firstRequest() {
@@ -61,7 +65,7 @@ export function createPredictionPageReader(options: {
 
   function initial(viewId: string): PredictionReaderSnapshot {
     return Object.freeze({ viewId, status: 'idle', pages: Object.freeze([]), items: Object.freeze([]),
-      predictionIds: Object.freeze({}), message: null });
+      predictionIds: Object.freeze({}), message: null, recovery: null });
   }
 
   function publish(next: PredictionReaderSnapshot) {
@@ -73,6 +77,7 @@ export function createPredictionPageReader(options: {
     if (!active || running) return;
     running = true;
     const token = ++generation;
+    let release = () => {};
     try {
       // Capture current context when the focused reader actually starts work,
       // not when a hidden screen observes an interaction revision.
@@ -81,22 +86,42 @@ export function createPredictionPageReader(options: {
         publish(initial(pending.requestId));
       }
       const request = pending;
-      publish({ ...snapshot, status: 'loading', message: null });
-      const result = await options.load(request);
+      publish({ ...snapshot, status: 'loading', message: null, recovery: null });
+      const controller = new AbortController();
+      const cancel = () => controller.abort();
+      cancelFlight = cancel;
+      // Race as well as abort: native transports can ignore cancellation. The
+      // UI must still recover and reject any eventual reply from this attempt.
+      const cancelled = new Promise<never>((_, reject) => {
+        const onAbort = () => reject(new Error('Prediction request cancelled'));
+        controller.signal.addEventListener('abort', onAbort, { once: true });
+        const deadline = setTimeout(cancel, REQUEST_TIMEOUT_MS);
+        release = () => {
+          clearTimeout(deadline);
+          controller.signal.removeEventListener('abort', onAbort);
+          if (cancelFlight === cancel) cancelFlight = null;
+        };
+      });
+      const result = await Promise.race([cancelled, options.load(request, controller.signal)]);
       if (!active || token !== generation) return;
-      if (result.status !== 'success' || result.request !== request || !validSuccessor(result)) {
-        publish({ ...snapshot, status: 'error', message: MESSAGE });
+      if (result.status === 'error') {
+        publish({ ...snapshot, status: 'error', message: result.message, recovery: result.recovery });
+        return;
+      }
+      if (result.request !== request || !validSuccessor(result)) {
+        publish({ ...snapshot, status: 'error', message: MESSAGE, recovery: 'retry' });
         return;
       }
       const page = freezePage(result);
       const pages = Object.freeze([...snapshot.pages, page]);
       const items = Object.freeze(pages.flatMap(entry => entry.ranking.items));
-      publish({ ...snapshot, status: 'ready', pages, items, message: null,
+      publish({ ...snapshot, status: 'ready', pages, items, message: null, recovery: null,
         predictionIds: Object.freeze(Object.fromEntries(pages.flatMap(entry =>
           entry.ranking.items.map(item => [item.id, entry.ranking.predictionId])))) });
     } catch {
-      if (active && token === generation) publish({ ...snapshot, status: 'error', message: MESSAGE });
+      if (active && token === generation) publish({ ...snapshot, status: 'error', message: MESSAGE, recovery: 'retry' });
     } finally {
+      release();
       if (token === generation) running = false;
     }
   }
@@ -123,6 +148,7 @@ export function createPredictionPageReader(options: {
     running = false;
     clearTimeout(timer);
     timer = undefined;
+    cancelFlight?.();
   }
 
   return {
@@ -145,17 +171,18 @@ export function createPredictionPageReader(options: {
       const last = snapshot.pages.at(-1);
       if (!last?.nextCursor) return;
       try { pending = createNextPredictionPageRequest(last, options.createRequestId()); }
-      catch { publish({ ...snapshot, status: 'error', message: MESSAGE }); return; }
+      catch { publish({ ...snapshot, status: 'error', message: MESSAGE, recovery: 'retry' }); return; }
       void dispatch();
     },
     retry() {
-      if (snapshot.status === 'error') void dispatch();
+      if (snapshot.status === 'error' && snapshot.recovery === 'retry') void dispatch();
     },
     refresh() {
       if (!active) return;
       generation += 1;
       running = false;
       clearTimeout(timer);
+      cancelFlight?.();
       pending = null;
       publish(initial(options.createRequestId()));
       void dispatch();

@@ -1121,7 +1121,21 @@ accepted prefix remains immutable and bounded by the original pool; a failed
 append retains it only in its original scope/revision. A terminal empty page
 retains its own PredictionRun. Initial loading/error, proven empty catalog,
 loading the next page and bounded-window exhaustion have distinct UI states.
-Retry and explicit new search are separate actions, including after cursor expiry.
+Each active page attempt has a 15-second deadline covering both RPC and catalog
+enrichment. Scope/focus cleanup and explicit refresh abort the in-flight
+transport; a cancellation race also bounds waiting when a transport ignores its
+signal. Timers are released on settlement. Aborting a client does not prove the
+server rolled back: a retry retains the original request/context/cursor and can
+recover its immutable receipt. Late completion cannot publish or append.
+
+Exact server `22023` errors for an expired, unavailable, already consumed or
+changed continuation source select **Aloita uusi haku**; retrying that unusable
+cursor is disabled. Pull-to-refresh follows the same recovery action. Transport,
+authorization and unknown errors retain safe generic copy and exact-request
+retry; raw server details are not displayed. The explicit window-cap error asks
+the user to wait and retry, without automatically opening more windows. Metadata
+failure alone retains the identified ranking; cancellation cannot publish a
+partially loaded page. These are client changes, not new server limits or Events.
 
 Each Item's page run reaches grid/Shared-overlay origins and the clicked delivered
 slate. Detail/swipe/actions retain that captured sequence and per-Item map while

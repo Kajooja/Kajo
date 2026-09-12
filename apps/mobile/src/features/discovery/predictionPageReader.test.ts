@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope } from './predictionPageReader';
-import { createPredictionPageRequest, mapPredictionPage, type PredictionPageRequest, type PredictionPageResult } from './predictionPageOperations';
+import { createPredictionPageRequest, loadPredictionPage, mapPredictionPage, type PredictionPageRequest, type PredictionPageResult } from './predictionPageOperations';
 
 const id = (n: number) => `a2291000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const scope: PredictionReaderScope = { environment: 'https://first.invalid', actorUserId: id(1), profileId: id(2),
@@ -25,7 +25,7 @@ function deferred<T>() {
   const promise = new Promise<T>(done => { resolve = done; });
   return { promise, resolve };
 }
-function makeReader(load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>(async r => success(r)), capturedScope = scope) {
+function makeReader(load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>(async r => success(r)), capturedScope = scope) {
   const createRequest = vi.fn(() => createPredictionPageRequest({ requestId: newId(), profileId: capturedScope.profileId,
     sessionId: capturedScope.sessionId, mode: capturedScope.mode, itemType: capturedScope.itemType,
     limit: capturedScope.limit, context: { occurredAt: new Date().toISOString(), attributes: { localHour: 12 } } }));
@@ -79,7 +79,7 @@ describe('captured prediction scope', () => {
     late.resolve(success(oldRequest)); await settle();
     expect(a.reader.getSnapshot().items).toEqual([]);
     expect(newA.reader.getSnapshot().items).toEqual([]);
-    returned.resolve({ status: 'error', message: 'offline' }); await settle();
+    returned.resolve({ status: 'error', message: 'offline', recovery: 'retry' }); await settle();
     expect(newA.reader.getSnapshot()).toMatchObject({ status: 'error', items: [], pages: [] });
   });
 
@@ -99,9 +99,119 @@ describe('captured prediction scope', () => {
 });
 
 describe('exact request retry and bounded append', () => {
+  it('bounds an unanswered first page and retries the original request instead of leaving loading stuck', async () => {
+    const late = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(() => late.promise).mockImplementation(async r => success(r));
+    const { reader, createRequest } = makeReader(load);
+    await activate(reader);
+    await vi.advanceTimersByTimeAsync(14_999);
+    expect(reader.getSnapshot().status).toBe('loading');
+    await vi.advanceTimersByTimeAsync(1);
+    expect(reader.getSnapshot()).toMatchObject({ status: 'error', recovery: 'retry', items: [], pages: [] });
+    expect(load.mock.calls[0]![1].aborted).toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+    reader.retry(); await settle();
+    expect(load.mock.calls[1]![0]).toBe(load.mock.calls[0]![0]);
+    expect(createRequest).toHaveBeenCalledTimes(1);
+    expect(load.mock.calls[1]![1].aborted).toBe(false);
+    const accepted = reader.getSnapshot();
+    late.resolve(success(load.mock.calls[0]![0])); await settle();
+    expect(reader.getSnapshot()).toBe(accepted);
+    reader.deactivate();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('times out an append while retaining its prefix and rejects a late response before retry', async () => {
+    const late = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(async r => success(r)).mockImplementationOnce(() => late.promise)
+      .mockImplementation(async r => success(r, 2));
+    const { reader } = makeReader(load);
+    await activate(reader);
+    const prefix = reader.getSnapshot();
+    expect(vi.getTimerCount()).toBe(0);
+    reader.loadMore();
+    await vi.advanceTimersByTimeAsync(15_000);
+    const failed = reader.getSnapshot();
+    expect(failed).toMatchObject({ status: 'error', recovery: 'retry' });
+    expect(failed.pages).toBe(prefix.pages);
+    expect(failed.predictionIds).toBe(prefix.predictionIds);
+    late.resolve(success(load.mock.calls[1]![0], 2)); await settle();
+    expect(reader.getSnapshot()).toBe(failed);
+    reader.retry(); reader.retry(); await settle();
+    expect(load).toHaveBeenCalledTimes(3);
+    expect(load.mock.calls[2]![0]).toBe(load.mock.calls[1]![0]);
+    expect(reader.getSnapshot().pages).toHaveLength(2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('aborts on blur and leaves no deadline or error that can affect another activation', async () => {
+    const abandoned = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(() => abandoned.promise).mockImplementation(async r => success(r));
+    const { reader } = makeReader(load);
+    await activate(reader);
+    const before = reader.getSnapshot();
+    reader.deactivate(); await settle();
+    expect(load.mock.calls[0]![1].aborted).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(reader.getSnapshot()).toBe(before);
+    await activate(reader);
+    expect(load.mock.calls[1]![0]).toBe(load.mock.calls[0]![0]);
+    expect(reader.getSnapshot().status).toBe('ready');
+    expect(load.mock.calls[1]![1].aborted).toBe(false);
+  });
+
+  it('cancels a replaced attempt without letting its deadline cancel the new window', async () => {
+    const old = deferred<PredictionPageResult>();
+    const fresh = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(() => old.promise).mockImplementationOnce(() => fresh.promise);
+    const { reader } = makeReader(load);
+    await activate(reader);
+    await vi.advanceTimersByTimeAsync(10_000);
+    reader.refresh(); await settle();
+    expect(load.mock.calls[0]![1].aborted).toBe(true);
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(load.mock.calls[1]![1].aborted).toBe(false);
+    expect(reader.getSnapshot().status).toBe('loading');
+    fresh.resolve(success(load.mock.calls[1]![0], 1, id(90))); await settle();
+    await vi.advanceTimersByTimeAsync(15_000);
+    expect(reader.getSnapshot().pages[0]!.sourcePredictionId).toBe(id(90));
+    expect(load.mock.calls[1]![1].aborted).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('requires explicit fresh search after server-proven expiry and preserves old delivery evidence', async () => {
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(async r => success(r))
+      .mockImplementationOnce(r => loadPredictionPage(async () => ({ data: null,
+        error: { code: '22023', message: 'Continuation window expired' } }), r))
+      .mockImplementation(async r => success(r, 1, id(90)));
+    const { reader } = makeReader(load);
+    await activate(reader);
+    const original = reader.getSnapshot();
+    await vi.advanceTimersByTimeAsync(16 * 60_000);
+    reader.loadMore(); await settle();
+    expect(reader.getSnapshot()).toMatchObject({ status: 'error', recovery: 'refresh' });
+    expect(reader.getSnapshot().items).toBe(original.items);
+    reader.retry(); reader.loadMore(); await settle();
+    expect(load).toHaveBeenCalledTimes(2);
+    reader.refresh(); await settle();
+    const fresh = load.mock.calls[2]![0];
+    expect(fresh.requestId).not.toBe(original.pages[0]!.request.requestId);
+    expect(fresh.cursor).toBeNull();
+    expect(fresh.context.occurredAt).toBe('2026-09-12T12:16:00.000Z');
+    expect(original.predictionIds[id(52)]).toBe(id(10));
+    expect(reader.getSnapshot().predictionIds[id(52)]).toBe(id(90));
+    expect(reader.getSnapshot().recovery).toBeNull();
+  });
+
   it('retries first-page failure with the same immutable request and context', async () => {
-    const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
-      .mockResolvedValueOnce({ status: 'error', message: 'offline' }).mockImplementation(async r => success(r));
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockResolvedValueOnce({ status: 'error', message: 'offline', recovery: 'retry' }).mockImplementation(async r => success(r));
     const { reader, createRequest } = makeReader(load);
     await activate(reader);
     vi.setSystemTime(new Date('2026-09-12T12:10:00Z'));
@@ -113,7 +223,7 @@ describe('exact request retry and bounded append', () => {
 
   it('preserves page origins, duplicate-tap safety and the exact failed next request', async () => {
     const pending = deferred<PredictionPageResult>();
-    const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
       .mockImplementationOnce(async r => success(r)).mockImplementationOnce(() => pending.promise)
       .mockImplementation(async r => success(r, 2));
     const { reader } = makeReader(load);
@@ -122,7 +232,7 @@ describe('exact request retry and bounded append', () => {
     reader.loadMore(); reader.loadMore(); reader.loadMore();
     expect(load).toHaveBeenCalledTimes(2);
     expect(reader.getSnapshot().items).toBe(first.items);
-    pending.resolve({ status: 'error', message: 'network' }); await settle();
+    pending.resolve({ status: 'error', message: 'network', recovery: 'retry' }); await settle();
     reader.loadMore(); expect(load).toHaveBeenCalledTimes(2);
     reader.retry(); await settle();
     expect(load.mock.calls[2]![0]).toBe(load.mock.calls[1]![0]);
@@ -133,7 +243,7 @@ describe('exact request retry and bounded append', () => {
   });
 
   it('keeps an empty terminal run without erasing previous pages or fetching again', async () => {
-    const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
       .mockImplementationOnce(async r => success(r)).mockImplementation(async r => success(r, 2, id(10), []));
     const { reader } = makeReader(load);
     await activate(reader);
@@ -147,7 +257,7 @@ describe('exact request retry and bounded append', () => {
 
   it('resumes an interrupted delivery with the same request and ignores the earlier reply', async () => {
     const old = deferred<PredictionPageResult>(); const resumed = deferred<PredictionPageResult>();
-    const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
       .mockImplementationOnce(() => old.promise).mockImplementationOnce(() => resumed.promise);
     const { reader } = makeReader(load);
     await activate(reader); reader.deactivate(); await activate(reader);
@@ -160,7 +270,7 @@ describe('exact request retry and bounded append', () => {
 
   it('explicit refresh replaces the window; an older next-page completion cannot append', async () => {
     const late = deferred<PredictionPageResult>();
-    const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
       .mockImplementationOnce(async r => success(r)).mockImplementationOnce(() => late.promise)
       .mockImplementation(async r => success(r, 1, id(90)));
     const { reader, createRequest } = makeReader(load);
@@ -175,7 +285,7 @@ describe('exact request retry and bounded append', () => {
 
   it.each(['source', 'index', 'features', 'count', 'run', 'duplicate', 'cursor'] as const)(
     'rejects a mismatched %s while retaining the accepted prefix', async defect => {
-      const load = vi.fn<(r: PredictionPageRequest) => Promise<PredictionPageResult>>()
+      const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
         .mockImplementationOnce(async r => success(r)).mockImplementation(async r => {
           const result = success(r, 2);
           if (result.status !== 'success') throw new Error('Expected page');
