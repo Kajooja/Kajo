@@ -4,7 +4,7 @@ declare
   request jsonb; root jsonb; response jsonb; next_request jsonb; change jsonb; retry jsonb;
   window_id uuid; source_snapshot jsonb; rejected_item uuid; unavailable_item uuid;
   runs_before integer; receipts_before integer; seen_before uuid[]; old_request jsonb; old_response jsonb;
-  shared_request jsonb; shared_response jsonb;
+  shared_request jsonb; shared_response jsonb; caller_float_digits text := current_setting('extra_float_digits');
 begin
   select profile_id into strict profile from pg_temp.pool_profiles where profile_type='PERSONAL';
   select profile_id into strict other_profile from pg_temp.pool_profiles where profile_type='SHARED';
@@ -73,7 +73,12 @@ begin
   if public.rank_items_page_v1(next_request)<>response or public.rank_items_page_v1(old_request)<>old_response
     or old_response->'continuationSupported'<>'false'::jsonb then raise exception 'Retry or v1 contract changed'; end if;
   perform set_config('role','postgres',true);
+  -- The v2 boundary serializes its cached snapshot at full precision. Compare
+  -- owner-side evidence with the same precision, then restore the caller's GUC.
+  -- Native Supabase defaults to 0; that formatting difference is not row drift.
+  perform set_config('extra_float_digits','3',true);
   if private.prediction_window_source_v1((root->>'predictionId')::uuid)<>source_snapshot then raise exception 'First-page trace changed'; end if;
+  perform set_config('extra_float_digits',caller_float_digits,true);
   -- A committed response survives cache expiry and reclamation; unused cursors do not.
   update private.prediction_continuation_windows w set created_at=now()-interval '16 minutes',expires_at=now()-interval '1 minute'
     where w.id=window_id;

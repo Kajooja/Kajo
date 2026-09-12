@@ -29,11 +29,15 @@ test('atomic continuation preserves distinct page evidence and frozen prefix rep
     finally { await db.exec('rollback'); }
     assert.equal((await db.query("select to_regclass('private.prediction_page_contexts') r")).rows[0].r, null);
     for (const file of files.slice(pageIndex)) await db.exec(`begin; ${file.sql} commit;`);
-    for (const name of ['atomic-prediction-pages-smoke.sql', 'atomic-prediction-pages-boundaries.sql']) {
-      const snapshots = (await db.exec(await atomicPredictionPagesSmokeSql(name)))
-        .flatMap(r => r.rows.map(row => row.snapshot));
-      assert.match(snapshots[0]?.atomicPages, /^PASS:/);
-      assert.equal((await db.query('select count(*)::integer n from private.prediction_page_receipts')).rows[0].n, 0);
+    for (const digits of [0, 3]) {
+      await db.exec(`set extra_float_digits=${digits}`);
+      for (const name of ['atomic-prediction-pages-smoke.sql', 'atomic-prediction-pages-boundaries.sql']) {
+        const snapshots = (await db.exec(await atomicPredictionPagesSmokeSql(name)))
+          .flatMap(r => r.rows.map(row => row.snapshot));
+        assert.match(snapshots[0]?.atomicPages, /^PASS:/);
+        assert.equal((await db.query('select count(*)::integer n from private.prediction_page_receipts')).rows[0].n, 0);
+        assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits));
+      }
     }
   } finally { await db.close(); }
 });

@@ -1944,6 +1944,17 @@ The required CLI CI runner now observes genuine native lock contention for
 same-request retries, competing cursor consumers and concurrent 16-window
 capacity, and runs the populated upgrade plus both page probes. Published-head
 CI is the native acceptance record; inspect it before advancing the client.
+
+First published head `19247e0` passed four jobs in
+[CI](https://github.com/Kajooja/Kajo/actions/runs/34690842376); the CLI job reached
+the final page-boundary probe and rejected its owner-side snapshot comparison.
+The probe used native `extra_float_digits=0` to compare with a snapshot produced
+inside protocol 2 at precision 3. The same failure was reproduced locally at 0.
+The corrected probe compares at the snapshot's full precision and restores the
+caller setting. Both page probes now run locally at 0 and 3, including caller-GUC
+restoration; no migration or stored-row behavior changed. The follow-up head's
+five CI jobs remain the acceptance gate.
+
 No hosted database change, user-data reset, manual APK dispatch or device
 acceptance is part of this source packet. PR #229 remains draft.
 
