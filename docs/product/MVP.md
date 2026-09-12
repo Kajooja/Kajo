@@ -187,7 +187,7 @@ Existing SharedProfile learning semantics remain canonical.
 - [-] `MVP-DATA-001` Meaningful discovery behavior is captured through canonical generic event interface.
 - [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [-] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely. #224 delivers rating/not-interest/undo; #226 extends the same atomic/durable path to Lists/Endorsements with mixed undo and outcome corrections. Real-device termination/reconnect acceptance remains open; see the active PR/Sprint 014 for rollout status.
-- [ ] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
+- [-] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
 - [x] `MVP-PRED-001` Prediction ranks generic Items for a Profile.
 - [x] `MVP-PRED-002` Prediction includes long-term, recent and Item-similarity signals.
 - [x] `MVP-PRED-003` DiscoveryMode changes ranking/exploration semantics.

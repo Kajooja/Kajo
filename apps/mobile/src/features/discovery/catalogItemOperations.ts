@@ -70,7 +70,11 @@ export function enrichItemsFromCatalog(
 ): readonly Item[] {
   const byId = new Map(catalogItems.map((item) => [item.id, item]));
 
-  return rankedItems.map((item) => byId.get(item.id) ?? item);
+  return rankedItems.map((item) => {
+    const metadata = byId.get(item.id);
+    // A later catalog correction cannot turn a delivered BOOK into a MOVIE.
+    return metadata?.itemType === item.itemType ? metadata : item;
+  });
 }
 
 export function mapCatalogItemRow(row: CatalogItemRow): Item {

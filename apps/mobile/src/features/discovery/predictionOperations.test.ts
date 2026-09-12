@@ -1,11 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import {
-  loadPredictionRanking,
-  mapPredictionRows,
-  PREDICTION_V1_RPC,
-  type PredictionRpc,
-} from './predictionOperations';
+import { mapPredictionRows } from './predictionOperations';
 
 const ROWS = [
   {
@@ -33,7 +28,7 @@ const ROWS = [
 ];
 
 describe('Prediction V1 mapping', () => {
-  it('rejects duplicate Items and ambiguous ranks in the active legacy reader', () => {
+  it('rejects duplicate Items and ambiguous ranks in the shared row mapper', () => {
     for (const rows of [[ROWS[0], ROWS[0]], [ROWS[0], { ...ROWS[1], item_id: ROWS[0]!.item_id }],
       [ROWS[0], { ...ROWS[1], rank: ROWS[0]!.rank }]]) {
       expect(mapPredictionRows(rows, 'profile-1', 'FOR_YOU').status).toBe('error');
@@ -95,82 +90,5 @@ describe('Prediction V1 mapping', () => {
         'FOR_YOU',
       ),
     ).toMatchObject({ status: 'error' });
-  });
-});
-
-describe('Prediction V1 RPC boundary', () => {
-  it('rejects a response outside its requested domain or size', async () => {
-    const rpc: PredictionRpc = vi.fn(async () => ({ data: ROWS, error: null }));
-    expect((await loadPredictionRanking(rpc, { profileId: 'profile-1', mode: 'FOR_YOU', itemType: 'BOOK' })).status).toBe('error');
-    expect((await loadPredictionRanking(rpc, { profileId: 'profile-1', mode: 'FOR_YOU', itemType: 'MOVIE', limit: 1 })).status).toBe('error');
-  });
-  it('sends the Profile, mode, generic candidate scope and bounded Context', async () => {
-    const rpc: PredictionRpc = vi.fn(async () => ({ data: ROWS, error: null }));
-
-    await expect(
-      loadPredictionRanking(rpc, {
-        profileId: 'profile-1',
-        mode: 'RISK',
-        itemType: 'MOVIE',
-        limit: 12,
-        context: {
-          sessionId: 'session-1',
-          locale: 'fi-FI',
-          timezone: 'Europe/Helsinki',
-          occurredAt: '2026-09-02T19:30:00.000Z',
-          attributes: {
-            localHour: 22,
-            dayOfWeek: 3,
-            surface: 'DISCOVERY_GRID',
-          },
-        },
-      }),
-    ).resolves.toMatchObject({ status: 'success' });
-
-    expect(rpc).toHaveBeenCalledWith(PREDICTION_V1_RPC, {
-      target_profile_id: 'profile-1',
-      requested_mode: 'RISK',
-      requested_item_type: 'MOVIE',
-      result_limit: 12,
-      request_context: {
-        sessionId: 'session-1',
-        locale: 'fi-FI',
-        timezone: 'Europe/Helsinki',
-        occurredAt: '2026-09-02T19:30:00.000Z',
-        attributes: {
-          localHour: 22,
-          dayOfWeek: 3,
-          surface: 'DISCOVERY_GRID',
-        },
-      },
-    });
-  });
-
-  it('returns one safe retryable error for backend and connection failures', async () => {
-    const backendFailure: PredictionRpc = vi.fn(async () => ({
-      data: null,
-      error: { message: 'private detail' },
-    }));
-    const connectionFailure: PredictionRpc = vi.fn(async () => {
-      throw new Error('offline');
-    });
-
-    await expect(
-      loadPredictionRanking(backendFailure, {
-        profileId: 'profile-1',
-        mode: 'FOR_YOU',
-        itemType: 'BOOK',
-      }),
-    ).resolves.toEqual({
-      status: 'error',
-      message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.',
-    });
-    await expect(
-      loadPredictionRanking(connectionFailure, {
-        profileId: 'profile-1',
-        mode: 'FOR_YOU',
-        itemType: 'BOOK',
-      }),
-    ).resolves.toMatchObject({ status: 'error' });
   });
 });

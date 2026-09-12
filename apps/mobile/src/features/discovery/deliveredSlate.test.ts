@@ -132,3 +132,29 @@ describe('loaded collection navigation', () => {
     expect(items.map(item => item.id)).toEqual(['a', 'b']);
   });
 });
+
+describe('mixed-page delivery evidence', () => {
+  it('keeps each page origin through Shared reordering and a captured detail slate', () => {
+    const a = { id: 'page-a', title: 'A', itemType: 'BOOK' as const };
+    const b = { id: 'page-b', title: 'B', itemType: 'BOOK' as const };
+    const c = { id: 'page-c', title: 'C', itemType: 'BOOK' as const };
+    const runs = { [a.id]: 'run-one', [b.id]: 'run-two' };
+    const origins = buildDeliveredItemOrigins([b, a, c], [a, b], runs, 'hosted', {});
+    rememberDeliveredSlate({ ...slate('mixed-pages'), items: [b, a, c], origins });
+    const opened = getDeliveredSlate('mixed-pages')!;
+    runs[a.id] = 'reranked';
+    buildDeliveredItemOrigins([a, b, c], [a, b, c], 'newest-run', 'hosted', {});
+    expect(opened.items.map(item => item.id)).toEqual([b.id, a.id, c.id]);
+    expect(getDeliveredItemOrigin(opened.origins, a.id).predictionId).toBe('run-one');
+    expect(getDeliveredItemOrigin(opened.origins, b.id).predictionId).toBe('run-two');
+    expect(getDeliveredItemOrigin(opened.origins, c.id).predictionId).toBeUndefined();
+    expect(canUseDeliveredSlate(opened, opened.scopeKey, 'new-session', a.id)).toBe(false);
+  });
+
+  it('does not borrow another page ID when an Item has no accepted page origin', () => {
+    const item = { id: 'unproven', title: 'Unproven', itemType: 'BOOK' as const };
+    expect(buildDeliveredItemOrigins([item], [item], {}, 'hosted', {}).unproven).toEqual({
+      properties: { predictionSource: 'unattributed', deliveryTier: 'UNATTRIBUTED' },
+    });
+  });
+});

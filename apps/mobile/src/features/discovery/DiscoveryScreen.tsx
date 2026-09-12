@@ -1,8 +1,8 @@
 import { DiscoveryItemCard } from './DiscoveryItemCard';
 import { useItemLists } from '../lists/ItemListsContext';
 import { buildDeliveredItemOrigins, getDeliveredItemOrigin, rememberDeliveredSlate, type DeliveredItemOrigin } from './deliveredSlate';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { router } from 'expo-router';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { router, useIsFocused } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   FlatList,
@@ -53,15 +53,17 @@ interface DiscoveryScreenProps {
 
 export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const { mode } = useDiscoveryMode();
+  const focused = useIsFocused();
   const activeProfile = useActiveProfile();
   const { interactions } = useItemInteractions();
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const { scopeKey } = useItemLists();
-  const [imageWindow, setImageWindow] = useState({ first: 0, last: 7 });
+  const [imageWindow, setImageWindow] = useState({ viewId: '', first: 0, last: 7 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
   const ranking = usePredictionRanking(itemType, mode, interactions);
+  const visibleImageWindow = imageWindow.viewId === ranking.viewId ? imageWindow : { first: 0, last: 7 };
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
       ? activeProfile.sharedProfiles.find(
@@ -72,42 +74,41 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const isSharedDiscovery = Boolean(activeSharedMembership);
   const sharedOverlayReady =
     !isSharedDiscovery || sharedEndorsements.status === 'ready';
-  const rankedItems = useMemo(() =>
+  const rankedItems = useMemo(() => ranking.status !== 'ready' ? [] :
     isSharedDiscovery && sharedEndorsements.status === 'ready'
       ? applySharedDiscoveryOverlay(
           ranking.items,
           itemType,
           sharedEndorsements.stateByItemId,
         )
-      : ranking.items, [isSharedDiscovery, sharedEndorsements.status, sharedEndorsements.stateByItemId, ranking.items, itemType]);
+      : ranking.items, [isSharedDiscovery, sharedEndorsements.status, sharedEndorsements.stateByItemId, ranking.status, ranking.items, itemType]);
   const origins = useMemo(() => buildDeliveredItemOrigins(
-    rankedItems, ranking.items, ranking.predictionId, ranking.source,
+    rankedItems, ranking.items, ranking.predictionIds, ranking.source,
     isSharedDiscovery ? sharedEndorsements.stateByItemId : {},
-  ), [rankedItems, ranking.items, ranking.predictionId, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
+  ), [rankedItems, ranking.items, ranking.predictionIds, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
   const items = useMemo(() => sharedOverlayReady
     ? getDiscoverableItems(rankedItems, interactions) : [], [sharedOverlayReady, rankedItems, interactions]);
   const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
-  const visibleItems = useRef<readonly Item[]>([]);
-  const itemsRef = useRef<readonly Item[]>(items);
-  const impressionContext = useRef<ImpressionContext>({
-    mode,
-    origins,
-    recordEvent: eventTracking.recordEvent,
-  });
-
-  useEffect(() => {
-    impressionContext.current = {
-      mode,
-      origins,
-      recordEvent: eventTracking.recordEvent,
-    };
-  }, [eventTracking.recordEvent, mode, origins]);
-
-  useEffect(() => {
-    itemsRef.current = items;
-    prefetchDiscoveryImages(items.slice(0, INITIAL_IMAGE_PREFETCH_COUNT));
-  }, [items]);
+  // Each request/revision owns its visible tokens. A callback retained by the
+  // previous native list cannot relabel those tokens with a new page or scope.
+  const view = useMemo(() => ({ id: ranking.viewId }), [ranking.viewId]);
+  const currentView = useRef<{ token: typeof view; visible: readonly Item[];
+    items: readonly Item[]; context: ImpressionContext | null } | null>(null);
+  useLayoutEffect(() => () => {
+    if (currentView.current?.token === view) currentView.current = null;
+  }, [view]);
+  useLayoutEffect(() => {
+    const previous = currentView.current;
+    const visible = previous?.token === view
+      ? previous.visible.filter(item => items.some(current => current.id === item.id)) : [];
+    const context = focused && ranking.status === 'ready' && sharedOverlayReady
+      ? { mode, origins, originSessionId: eventTracking.sessionId, recordEvent: eventTracking.recordEvent } : null;
+    currentView.current = { token: view, visible, items, context };
+    if (context) recordVisibleImpressions(visible, context);
+  }, [view, items, focused, ranking.status, sharedOverlayReady, mode, origins,
+    eventTracking.sessionId, eventTracking.recordEvent]);
+  useEffect(() => { prefetchDiscoveryImages(items.slice(0, INITIAL_IMAGE_PREFETCH_COUNT)); }, [items]);
 
   const viewabilityConfig = useMemo(
     () => ({
@@ -118,10 +119,13 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   );
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<Item>[] }) => {
+      const committed = currentView.current;
+      if (committed?.token !== view || !committed.context) return;
       const visibleTokens = viewableItems.filter(
-        (token) => token.isViewable && token.index !== null,
+        (token) => token.isViewable && token.index !== null && committed.items.some(item => item.id === token.item.id),
       );
-      visibleItems.current = visibleTokens.map((token) => token.item);
+      const visible = visibleTokens.map((token) => token.item);
+      currentView.current = { ...committed, visible };
 
       if (visibleTokens.length > 0) {
         const indexes = visibleTokens
@@ -129,18 +133,18 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           .filter((index): index is number => index !== null);
         const imagePlan = getDiscoveryImagePlan(
           indexes,
-          itemsRef.current.length,
+          committed.items.length,
         );
 
         if (imagePlan) {
           setImageWindow((current) =>
-            current.first === imagePlan.mount.first &&
+            current.viewId === view.id && current.first === imagePlan.mount.first &&
             current.last === imagePlan.mount.last
               ? current
-              : imagePlan.mount,
+              : { viewId: view.id, ...imagePlan.mount },
           );
           prefetchDiscoveryImages(
-            itemsRef.current.slice(
+            committed.items.slice(
               imagePlan.prefetch.first,
               imagePlan.prefetch.lastExclusive,
             ),
@@ -148,42 +152,22 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         }
       }
 
-      recordVisibleImpressions(
-        visibleItems.current,
-        impressionContext.current,
-      );
+      recordVisibleImpressions(visible, committed.context);
     },
-    [],
+    [view],
   );
 
-  useEffect(() => {
-    if (eventTracking.status === 'ready') {
-      recordVisibleImpressions(
-        visibleItems.current,
-        {
-          mode,
-          origins,
-          recordEvent: eventTracking.recordEvent,
-        },
-      );
-    }
-  }, [
-    eventTracking.status,
-    eventTracking.recordEvent,
-    mode,
-    predictionId,
-    ranking.source,
-    origins,
-  ]);
-
   function openItem(item: Item) {
-    const origin = getDeliveredItemOrigin(origins, item.id);
+    const committed = currentView.current;
+    if (committed?.token !== view || !committed.context || !committed.items.some(current => current.id === item.id)) return;
+    const origin = getDeliveredItemOrigin(committed.context.origins, item.id);
 
-    eventTracking.recordEvent({
+    committed.context.recordEvent({
       eventType: 'ITEM_OPENED',
       itemId: item.id,
       itemType: item.itemType,
       ...origin,
+      originSessionId: committed.context.originSessionId,
       discoveryMode: mode,
       properties: {
         source: 'DISCOVERY_GRID',
@@ -199,7 +183,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
       params: {
         itemId: item.id,
         deliveryId,
-        predictionId,
+        ...(origin.predictionId ? { predictionId: origin.predictionId } : {}),
         predictionSource: ranking.source,
       },
     });
@@ -231,7 +215,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               accessibilityRole="button"
               accessibilityLabel="Show discovery items"
               accessibilityState={{ selected: true }}
-              onPress={() => ranking.retry()}
+              onPress={ranking.refresh}
               style={({ pressed }) => [
                 styles.collectionButton,
                 styles.collectionButtonSelected,
@@ -277,7 +261,10 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               >
                 {ranking.message}
               </Text>
-              <Text style={styles.predictionNoticeText}>Päivitä vetämällä alaspäin.</Text>
+              <Pressable accessibilityRole="button" onPress={ranking.retry}
+                style={({ pressed }) => [styles.collectionButton, pressed && styles.pressed]}>
+                <Text style={styles.collectionText}>Yritä uudelleen</Text>
+              </Pressable>
             </View>
           ) : null}
 
@@ -300,10 +287,16 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         </View>
 
         <FlatList
+          key={ranking.viewId}
           alwaysBounceVertical
           overScrollMode="always"
           refreshing={ranking.status === 'loading' || (isSharedDiscovery && sharedEndorsements.status === 'loading')}
-          onRefresh={() => { ranking.retry(); if (isSharedDiscovery) sharedEndorsements.retry(); }}
+          onRefresh={() => {
+            if (ranking.status === 'error' || ranking.nextPageError) ranking.retry(); else ranking.refresh();
+            if (isSharedDiscovery) sharedEndorsements.retry();
+          }}
+          onEndReached={ranking.loadMore}
+          onEndReachedThreshold={0.4}
           data={items}
           keyExtractor={(item) => item.id}
           numColumns={2}
@@ -324,12 +317,35 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             <Text style={styles.emptyText}>
               {ranking.status === 'loading'
                 ? 'Haetaan suosituksia…'
+                : ranking.status === 'error'
+                  ? 'Suosituksia ei saatu ladattua. Yritä uudelleen.'
                 : !sharedOverlayReady
                   ? 'Yhteisiä valintoja päivitetään…'
+                  : ranking.availability === 'CATALOG_EMPTY'
+                    ? itemType === 'BOOK' ? 'Kirjavalikoima on vielä tyhjä.' : 'Elokuvavalikoima on vielä tyhjä.'
                   : itemType === 'BOOK'
                     ? 'Ei uusia kirjasuosituksia juuri nyt.'
                     : 'Ei uusia elokuvasuosituksia juuri nyt.'}
             </Text>
+          }
+          ListFooterComponent={
+            <View style={styles.pageFooter}>
+              {ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
+                : ranking.nextPageError ? <>
+                  <Text accessibilityLiveRegion="polite" style={styles.pageText}>{ranking.nextPageError}</Text>
+                  <Pressable accessibilityRole="button" onPress={ranking.retry} style={styles.collectionButton}>
+                    <Text style={styles.collectionText}>Yritä uudelleen</Text>
+                  </Pressable>
+                  <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
+                    <Text style={styles.collectionText}>Aloita uusi haku</Text>
+                  </Pressable>
+                </> : ranking.hasNextPage ?
+                  <Pressable accessibilityRole="button" onPress={ranking.loadMore} style={styles.collectionButton}>
+                    <Text style={styles.collectionText}>Näytä lisää</Text>
+                  </Pressable>
+                : ranking.status === 'ready' && ranking.source === 'hosted' && items.length > 0 ?
+                  <Text style={styles.pageText}>Tämän haun suositukset on näytetty. Voit päivittää haun vetämällä alaspäin.</Text> : null}
+            </View>
           }
           renderItem={({ item, index }) => {
             const sharedState = sharedEndorsements.stateByItemId[item.id];
@@ -362,7 +378,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 discoveryImageUrl={discoveryImageUrl}
                 loadImage={
                   imageIsWarm ||
-                  (index >= imageWindow.first && index <= imageWindow.last)
+                  (index >= visibleImageWindow.first && index <= visibleImageWindow.last)
                 }
                 interaction={getItemInteraction(interactions, item.id)}
                 pendingApprovalLabel={pendingApprovalLabel}
@@ -384,6 +400,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 }
 
 interface ImpressionContext {
+  originSessionId: string | null;
   mode: ReturnType<typeof useDiscoveryMode>['mode'];
   origins: Readonly<Record<string, DeliveredItemOrigin>>;
   recordEvent: ReturnType<typeof useEventTracking>['recordEvent'];
@@ -403,6 +420,7 @@ function recordVisibleImpressions(
       itemId: item.id,
       itemType: item.itemType,
       ...origin,
+      originSessionId: context.originSessionId,
       discoveryMode: context.mode,
       properties: {
         source: 'DISCOVERY_GRID',
@@ -452,6 +470,8 @@ function createStyles(theme: RoomTheme) {
       flex: 1,
       paddingTop: 7,
     },
+    pageText: { color: theme.base.textMuted, fontSize: 13, lineHeight: 19, textAlign: 'center' },
+    pageFooter: { paddingVertical: 16, paddingHorizontal: 8, gap: 10, alignItems: 'center' },
     headerContent: {
       paddingHorizontal: 18,
     },

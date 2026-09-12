@@ -1962,3 +1962,52 @@ Next: captured-scope protocol-2 validation/reader/cache/append, per-page grid an
 detail origins, then exact reviewed forward rollout and configured-device
 acceptance. STATUS owns this next unit; E1 → D1 → D2 remains the subsequent
 independent-engine research sequence.
+
+
+## Captured-scope mobile pages — 2026-09-12
+
+Resume source: `0a184a7` / PR #229, all five jobs accepted in
+[CI #464](https://github.com/Kajooja/Kajo/actions/runs/34691537142). This resolves
+the preceding atomic-page/native precision checkpoint. No SQL, migration history,
+package version or lockfile changed in this client packet.
+
+The active client now requests protocol 2. `predictionPageOperations.ts` validates
+first/next lineage, exact scoped envelopes, genuine empty identity and contiguous
+unique ranks; explicit protocol-1 compatibility remains. Requests and primitive
+Context attributes are frozen, with a conservative 8,000-byte client bound.
+
+`predictionPageReader.ts` owns one captured environment/actor/Profile/session/
+domain/mode/limit/evidence-revision controller. Retry keeps its exact request;
+refresh replaces the window. Later pages require the original source/time/count,
+next index/cursor and unseen Item/run/request identities. Accepted prefixes are
+immutable, including their per-Item page IDs and terminal empty-run identity.
+Scope/focus cleanup invalidates pending requests and catalog enrichment. Context
+is captured when the focused fetch begins; hidden feedback does not repeatedly
+open unused windows. First scope entry is immediate; subsequent evidence updates
+retain the 600 ms delay only after an earlier page was actually loaded.
+
+Discovery exposes initial/next loading, scoped failures/retry, explicit fresh
+search, empty catalog and bounded exhaustion. A request/view token keys the native
+list and guards its retained visibility/open callbacks with the captured session.
+Shared reordering, clicked detail/swipe and durable actions keep each Item's actual
+page origin. Appending/prefetching creates no impression. The eight-slate navigation
+handoff remains; the old global Item cache and unused row-RPC client were removed.
+Catalog enrichment cannot change a delivered Item's domain.
+
+Validation: `EXPO_OFFLINE=1 CI=1 npm run check` passed **420 tests** (338 mobile,
+14 catalog, 68 database), lint/TypeScript and iOS/Android Hermes exports. Focused
+regressions cover A → B → A, actor/environment/session/revision changes, delayed
+enrichment/error replies, hidden/cancelled activation, exact first/next retries,
+duplicate taps, interrupted/resumed delivery, refresh versus late append,
+lineage/cursor/duplicate rejection, terminal empty runs and mixed-page captured
+origins. Published-head CI remains the required independent gate.
+
+No native emulator/`adb` or React Native web renderer is available in this workspace;
+no configured-device/visual acceptance is claimed. Hosted state was not queried or
+changed, and no APK was dispatched or polled. This client requires all six pending
+forwards; it intentionally fails closed against an older endpoint. DEVICE_TEST
+contains the next configured flow checks. PR #229 and Sprint014 remain open.
+
+Next: exact existing-database six-forward preflight/rehearsal/rollout, then the
+identified configured client/device checks. STATUS is the authoritative next task;
+E1 → D1 → D2 retains its separate engine/public-data order.

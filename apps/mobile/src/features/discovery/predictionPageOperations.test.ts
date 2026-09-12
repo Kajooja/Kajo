@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createPredictionPageRequest, loadPredictionPage, mapPredictionPage, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
+import { createNextPredictionPageRequest, createPredictionPageRequest, loadPredictionPage, mapPredictionPage, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
 
 const id = (n: number) => `a2290000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const request = createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
-  mode: 'FOR_YOU', itemType: 'BOOK', limit: 6 });
+  mode: 'FOR_YOU', itemType: 'BOOK', limit: 6, version: 1 });
 const row = (n: number) => ({ prediction_id: id(4), item_id: id(n + 10), item_type: 'BOOK',
   title: `Book ${n}`, description: null, tags: ['quiet'], score: 0.8, confidence: 0.7, rank: n });
 const page = () => ({ version: 1, requestId: request.requestId, profileId: request.profileId,
@@ -58,7 +58,7 @@ describe('Identified prediction page boundary', () => {
 
   it('freezes captured request/context for exact retries and later caller mutations', async () => {
     const context = { locale: 'fi-FI', attributes: { localHour: 12 } };
-    const input = { requestId: id(1), profileId: id(2), sessionId: id(3), mode: 'FOR_YOU' as const, itemType: 'BOOK' as const, context };
+    const input = { requestId: id(1), profileId: id(2), sessionId: id(3), mode: 'FOR_YOU' as const, itemType: 'BOOK' as const, version: 1 as const, context };
     const captured = createPredictionPageRequest(input);
     input.profileId = id(99); context.attributes.localHour = 22;
     const rpc = vi.fn().mockResolvedValueOnce({ error: { message: 'offline' }, data: null })
@@ -78,6 +78,77 @@ describe('Identified prediction page boundary', () => {
       vi.fn().mockResolvedValue({ data: null, error: null })]) {
       expect(await loadPredictionPage(rpc, request)).toEqual({ status: 'error',
         message: 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.' });
+    }
+  });
+});
+
+describe('Protocol 2 continuation boundary', () => {
+  const rootRequest = createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
+    mode: 'FOR_YOU', itemType: 'BOOK', limit: 6, context: { occurredAt: '2026-09-12T12:00:00.000Z' } });
+  const root = () => ({ ...page(), version: 2, nextCursor: id(5), continuationSupported: true,
+    source: { version: 'frozen-page-v1', candidateCount: 18, resultCount: 2, catalogEmpty: false,
+      sourcePredictionId: id(4), pageIndex: 1, featureAt: '2026-09-12T12:00:00+00:00' } });
+  const nextRequest = () => {
+    const first = mapPredictionPage(root(), rootRequest);
+    if (first.status !== 'success') throw new Error('Expected first page');
+    return createNextPredictionPageRequest(first, id(6));
+  };
+  const later = () => ({ ...root(), requestId: id(6), predictionId: id(7), nextCursor: id(8),
+    items: [1, 2].map(n => ({ ...row(n), item_id: id(n + 20), prediction_id: id(7) })),
+    source: { ...root().source, pageIndex: 2 } });
+
+  it('opts in explicitly and carries the exact frozen scope/context into the next request', () => {
+    expect(rootRequest.version).toBe(2);
+    const next = nextRequest();
+    expect(next).toEqual({ ...rootRequest, requestId: id(6), cursor: id(5) });
+    expect(next.context).toBe(rootRequest.context);
+    expect(Object.isFrozen(next)).toBe(true);
+    expect(mapPredictionPage(later(), next)).toMatchObject({ status: 'success', pageIndex: 2,
+      sourcePredictionId: id(4), nextCursor: id(8), ranking: { predictionId: id(7) } });
+  });
+
+  it.each([
+    { version: 1 }, { continuationSupported: false }, { nextCursor: 'invalid' }, { nextCursor: undefined },
+    { items: [] }, { items: [{ ...row(1), rank: 2 }] },
+  ])('rejects a malformed v2 envelope %#', change => {
+    expect(mapPredictionPage({ ...root(), ...change }, rootRequest).status).toBe('error');
+  });
+
+  it.each([
+    { version: 'eligibility-first-v1' }, { sourcePredictionId: id(99) }, { sourcePredictionId: null },
+    { pageIndex: 0 }, { pageIndex: 2 }, { pageIndex: 1.5 }, { featureAt: null }, { featureAt: '2026-99-99Tbad' },
+  ])('rejects incorrect first-page lineage %#', change => {
+    expect(mapPredictionPage({ ...root(), source: { ...root().source, ...change } }, rootRequest).status).toBe('error');
+  });
+
+  it('rejects a cursor loop, reused source run and false later catalog emptiness', () => {
+    const next = nextRequest();
+    expect(mapPredictionPage({ ...later(), nextCursor: next.cursor }, next).status).toBe('error');
+    expect(mapPredictionPage({ ...later(), source: { ...later().source, sourcePredictionId: id(7) } }, next).status).toBe('error');
+    expect(mapPredictionPage({ ...later(), items: [], nextCursor: null, availability: 'CATALOG_EMPTY',
+      source: { ...later().source, candidateCount: 0, resultCount: 0, catalogEmpty: true } }, next).status).toBe('error');
+  });
+
+  it('retains an empty terminal page as its own run', () => {
+    const result = mapPredictionPage({ ...later(), items: [], nextCursor: null, availability: 'WINDOW_EXHAUSTED',
+      source: { ...later().source, resultCount: 0 } }, nextRequest());
+    expect(result).toMatchObject({ status: 'success', pageIndex: 2, availability: 'WINDOW_EXHAUSTED',
+      ranking: { predictionId: id(7), items: [], predictions: [] } });
+    if (result.status !== 'success') throw new Error('Expected empty page');
+    expect(() => createNextPredictionPageRequest(result, id(9))).toThrow();
+  });
+
+  it('accepts a genuine empty initial catalog without manufacturing a cursor', () => {
+    expect(mapPredictionPage({ ...root(), items: [], nextCursor: null, availability: 'CATALOG_EMPTY',
+      source: { ...root().source, candidateCount: 0, resultCount: 0, catalogEmpty: true } }, rootRequest))
+      .toMatchObject({ status: 'success', availability: 'CATALOG_EMPTY', nextCursor: null });
+  });
+
+  it('rejects invalid/nested and oversized contexts before transport', () => {
+    for (const context of [{ sessionId: id(3) }, { attributes: { nested: {} } }, { attributes: { invalid: Infinity } },
+      { locale: 'ä'.repeat(8000) }]) {
+      expect(() => createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
+        mode: 'FOR_YOU', itemType: 'BOOK', context: context as never })).toThrow();
     }
   });
 });

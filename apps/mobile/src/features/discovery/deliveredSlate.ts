@@ -20,7 +20,7 @@ export function getDeliveredItemOrigin(
 }
 
 export function buildDeliveredItemOrigins(
-  items: readonly Item[], rankedItems: readonly Item[], predictionId: string,
+  items: readonly Item[], rankedItems: readonly Item[], prediction: string | Readonly<Record<string, string>>,
   source: 'hosted' | 'fallback', shared: SharedDiscoveryStateMap,
 ): Readonly<Record<string, DeliveredItemOrigin>> {
   const rankedIds = new Set(rankedItems.map(item => item.id));
@@ -28,9 +28,11 @@ export function buildDeliveredItemOrigins(
     const state = shared[item.id];
     const deliveryTier = state?.pendingEndorsement ? 'SHARED_PENDING'
       : state?.memberConsumedUserIds.length ? 'SHARED_MEMBER_HISTORY' : 'RANKED';
-    const ranked = rankedIds.has(item.id);
+    const predictionId = typeof prediction === 'string' ? prediction
+      : Object.hasOwn(prediction, item.id) ? prediction[item.id] : undefined;
+    const ranked = rankedIds.has(item.id) && Boolean(predictionId);
     return [item.id, Object.freeze({
-      ...(ranked ? { predictionId } : {}),
+      ...(ranked && predictionId ? { predictionId } : {}),
       properties: Object.freeze({
         predictionSource: ranked ? source : deliveryTier === 'RANKED' ? 'unattributed' : 'shared_overlay',
         deliveryTier: !ranked && deliveryTier === 'RANKED' ? 'UNATTRIBUTED' : deliveryTier,

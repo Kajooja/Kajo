@@ -1001,7 +1001,7 @@ A baseline shadow must match Personal and Shared production eligibility, final o
 
 ### Active #229 frozen replay, admission and page contracts
 
-The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The reconciliation head `e0eacb5` passed all five required CI #462 jobs. The newer atomic-page source and its additional native gates are described below; STATUS owns the current head verification and next reader task. Source acceptance does not establish hosted/device acceptance.
+The following code exists on `feat/228-delivered-origin`; it remains separate from accepted-main runtime and hosted rollout. The server-page baseline `0a184a7` passed all five required CI #464 jobs. The subsequent captured-scope client source is described below; STATUS owns current head verification and the exact rollout preflight. Source acceptance does not establish hosted/device acceptance.
 
 #### Frozen replay parity — prepared, not hosted
 
@@ -1031,7 +1031,7 @@ The server generates the PredictionRun ID before ranking. Exact request/response
 
 Every response, including an empty one, retains version, request/run/Profile/session/mode/type identity and ordered rank rows. `source` records admission version, retained candidate/result counts and empty-catalog decision. Availability distinguishes `ITEMS`, `WINDOW_EXHAUSTED` and `CATALOG_EMPTY`; the last requires no discoverable Items in the requested domain. Suppression or exhaustion of bounded retained candidates cannot establish catalog emptiness. Protocol 1 `nextCursor: null` and `continuationSupported: false` mean paging is unavailable to that protocol, even if the first page returned Items; they do not prove all eligible Items were delivered.
 
-`predictionPageOperations.ts` prepares a frozen copied request for retry and validates response scope, identity, source counts and availability. It rejects unsupported continuation, duplicate Items/ranks, unordered rows and malformed responses. Legacy mapping also rejects duplicate/rank/domain/size defects. `usePredictionRanking` still uses the legacy RPC: the prepared reader does not constitute delivered empty-state UI, page append or device acceptance.
+`predictionPageOperations.ts` retains explicit protocol-1 envelope validation and now defaults new requests to protocol 2. Both protocols validate scope, run identity, source counts, availability and contiguous unique ranks. The shared row mapper remains; the unused row-RPC client and its unscoped presentation cache were removed when the live client source adopted protocol 2. Hosted and device acceptance remain separate.
 
 `20260911074543_prediction_continuation_windows.sql` adds owner-only `frozen-window-v1` open/read helpers. They preserve the first receipt's exact immutable run, ordered candidates, scope and initially selected IDs without reranking, making Events, changing receipts or creating another run. Repeat open returns the same window; reads require the current actor/membership, valid source lifetime and unchanged original run/candidate rows. Later catalog/taste state cannot replace that source.
 
@@ -1042,8 +1042,8 @@ Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from origin
 `20260912105528_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
 `public.rank_items_page_v1` endpoint. Protocol 1 keeps its exact first-page body,
 false continuation capability and immutable old receipts; the legacy row RPC is
-unchanged. The inactive mobile validator still speaks protocol 1 and must be
-updated deliberately before activation.
+unchanged. The current client source opts into protocol 2; protocol-1 envelope compatibility
+remains explicitly tested. Hosted rollout must precede using this client build.
 
 Protocol 2 retains the 16 KiB envelope, UUID request/Profile/session identities,
 mode/domain, limit 1–50 and object context. A null/omitted cursor starts a new
@@ -1096,10 +1096,46 @@ retry, competing cursor consumers and simultaneous sixteenth/seventeenth windows
 and rehearses both new forwards over populated pre-window receipts. Read STATUS
 and current PR CI for acceptance; test definitions alone are not native results.
 
-Next, prepare the protocol-2 mobile reader and bind cache/readiness/append to
-captured environment/actor/Profile/session/domain/mode/request/revision. Test
-rapid A → B → A, changed sessions, stale/error replies and mixed page origins.
-Hosted rollout and configured-device acceptance remain separate gates.
+#### Captured-scope mobile pages — source, rollout pending
+
+`usePredictionRanking.ts` now reads protocol 2 through `predictionPageOperations.ts`
+and the tested `predictionPageReader.ts` controller. First requests capture an
+immutable allowlisted context when a focused fetch starts; the builder caps its
+serialized request at 8,000 UTF-8 bytes to remain inside the server's 16 KiB
+jsonb envelope after whitespace/cursor overhead. A next request changes only its
+request ID and opaque cursor. Transport retry reuses the exact request object;
+explicit refresh starts a new window and does not relabel its predecessor.
+
+The visible cache/readiness/controller identity includes environment, actor,
+Profile, Event session, domain, DiscoveryMode, limit and evidence revision.
+A → B → A creates a new reader on return. Scope cleanup invalidates old fetches
+and catalog enrichment during commit; focus cleanup prevents hidden detail
+feedback from repeatedly opening unused windows. First scope entry is immediate;
+subsequent evidence updates retain the 600 ms delay. Catalog enrichment preserves
+Item ID/order/domain and cannot replace a BOOK with later MOVIE metadata.
+
+Append requires the expected cursor, next index, original source ID, feature time
+and candidate count, unique page/run/request identities and unseen Items. The
+accepted prefix remains immutable and bounded by the original pool; a failed
+append retains it only in its original scope/revision. A terminal empty page
+retains its own PredictionRun. Initial loading/error, proven empty catalog,
+loading the next page and bounded-window exhaustion have distinct UI states.
+Retry and explicit new search are separate actions, including after cursor expiry.
+
+Each Item's page run reaches grid/Shared-overlay origins and the clicked delivered
+slate. Detail/swipe/actions retain that captured sequence and per-Item map while
+new pages or rankings arrive. A new native list instance is keyed by the current
+request/view; callbacks retain that view token and session, so earlier visible
+Items cannot become impressions for a different request or scope. Fetching or
+prefetching a page creates no impression. Eight immutable navigation slates remain
+the bounded handoff; there is no global unscoped lookup of hosted Items.
+
+The configured source requires the complete six-forward server contract and
+fails closed if it is absent. Protocol 1 and the server's legacy row RPC remain
+compatible for existing clients; this client does not downgrade after errors.
+Current CI, exact hosted rollout and configured-device acceptance are separate
+facts owned by STATUS and DEVICE_TEST. No new SQL forward is part of this client
+change.
 
 #### Late Outcome attribution — prepared, not hosted
 
@@ -1133,9 +1169,9 @@ hosted serving already uses the six pending forwards. STATUS owns exact refs/CI/
 
 The protocol-2 source now commits independent pages, hard eligibility and seen
 advancement atomically, with page-aware frozen replay and dedicated native
-concurrency/upgrade checks. Protocol 1 still reports false capability. The prepared
-mobile reader remains inactive; it must adopt protocol 2 and captured scope before
-client acceptance. Current CI/rollout evidence remains in STATUS.
+concurrency/upgrade checks. Protocol 1 still reports false capability. The client
+source now uses protocol 2 with captured scope and per-Item page origins. Exact
+hosted rollout and configured-device acceptance remain open; STATUS owns their evidence.
 
 An empty identified result, exhausted bounded window and transport/authorization
 failure are distinct. Window exhaustion cannot claim global catalog exhaustion.

@@ -1,253 +1,128 @@
-import { useItemInteractions } from './ItemInteractionContext';
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useFocusEffect } from 'expo-router';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
-
-import type {
-  DiscoveryMode,
-  Item,
-  ItemType,
-  PredictionId,
-} from '../../domain/contracts';
+import type { DiscoveryMode, Item, ItemType, PredictionId } from '../../domain/contracts';
 import { createCorrelationId, createUuidV7 } from '../events/eventTracking';
 import { useEventTracking } from '../events/EventTrackingContext';
-import {
-  enrichItemsFromCatalog,
-  loadCatalogItems,
-} from './catalogItemOperations';
+import { enrichItemsFromCatalog, loadCatalogItems } from './catalogItemOperations';
+import { useItemInteractions } from './ItemInteractionContext';
 import type { ItemInteractionMap } from './itemInteraction';
 import { getStaticMockItems } from './mockDiscovery';
-import {
-  loadPredictionRanking,
-  type PredictionRanking,
-  type PredictionRpc,
-} from './predictionOperations';
-import {
-  createLatestRequestGate,
-  getBootstrapEvidenceRevision,
-  subscribeToBootstrapEvidence,
-  getInteractionEvidenceKey,
-  getPredictionRefreshDelay,
-} from './predictionRefresh';
-import { rememberPredictionItems } from './predictionRankingCache';
+import { createPredictionPageRequest, loadPredictionPage, type PredictionAvailability, type PredictionPageRpc } from './predictionPageOperations';
+import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope, type PredictionReaderSnapshot } from './predictionPageReader';
+import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay } from './predictionRefresh';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
-
-type HostedRankingState =
-  | { status: 'idle' }
-  | { status: 'loading'; key: string; previous: PredictionRanking | null }
-  | { status: 'ready'; key: string; ranking: PredictionRanking }
-  | {
-      status: 'error';
-      key: string;
-      previous: PredictionRanking | null;
-      message: string;
-    };
+const EMPTY: PredictionReaderSnapshot = Object.freeze({ viewId: 'inactive', status: 'idle',
+  pages: Object.freeze([]), items: Object.freeze([]), predictionIds: Object.freeze({}), message: null });
+const subscribeInactive = () => () => {};
+const inactiveSnapshot = () => EMPTY;
 
 export interface VisiblePredictionRanking {
   items: readonly Item[];
-  predictionId: PredictionId;
+  predictionId: PredictionId | null;
+  predictionIds: Readonly<Record<string, PredictionId>>;
+  viewId: string;
   source: 'hosted' | 'fallback';
   status: 'loading' | 'ready' | 'error';
   message: string | null;
+  availability: PredictionAvailability | null;
+  hasNextPage: boolean;
+  loadingNextPage: boolean;
+  nextPageError: string | null;
   retry: () => void;
+  refresh: () => void;
+  loadMore: () => void;
 }
 
-export function usePredictionRanking(
-  itemType: ItemType,
-  mode: DiscoveryMode,
-  interactions: ItemInteractionMap,
-): VisiblePredictionRanking {
+export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
+  interactions: ItemInteractionMap): VisiblePredictionRanking {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
-  const [fallbackSeed] = useState(() => createUuidV7());
-  const [attempt, setAttempt] = useState(0);
-  const [hostedState, setHostedState] = useState<HostedRankingState>({
-    status: 'idle',
-  });
-  const requestGate = useRef(createLatestRequestGate());
-  const loadedRequestKeys = useRef(new Set<string>());
-  const bootstrapRevision = useSyncExternalStore(
-    subscribeToBootstrapEvidence,
-    getBootstrapEvidenceRevision,
-    getBootstrapEvidenceRevision,
-  );
   const { collectionRevision } = useItemInteractions();
+  const [fallbackSeed] = useState(() => createUuidV7());
+  const bootstrapRevision = useSyncExternalStore(subscribeToBootstrapEvidence,
+    getBootstrapEvidenceRevision, getBootstrapEvidenceRevision);
   const evidenceKey = getInteractionEvidenceKey(interactions);
-  const profileId =
-    activeProfile.status === 'ready'
-      ? activeProfile.activeProfile?.id ?? null
-      : null;
-  const rankingScopeKey = profileId ? `${profileId}:${itemType}:${mode}` : null;
-  const requestKey = rankingScopeKey ? `${rankingScopeKey}:collections:${collectionRevision}` : null;
-  const fallback = useMemo<PredictionRanking>(
-    () => ({
-      predictionId: createCorrelationId(fallbackSeed, `${itemType}:${mode}`),
-      items: getStaticMockItems(itemType, mode),
-      predictions: [],
-    }),
-    [fallbackSeed, itemType, mode],
-  );
+  const profileId = activeProfile.status === 'ready' ? activeProfile.activeProfile?.id ?? null : null;
+  const actorUserId = activeProfile.status === 'ready' ? activeProfile.actorUserId : null;
+  const sessionId = eventTracking.status === 'ready' && eventTracking.session?.profileId === profileId &&
+    eventTracking.session.actorUserId === actorUserId ? eventTracking.sessionId : null;
   const client = connection.status === 'configured' ? connection.client : null;
-  const rpc = useMemo<PredictionRpc | null>(
-    () =>
-      client
-        ? async (functionName, arguments_) => {
-            const { data, error } = await client.rpc(functionName, arguments_);
-            return {
-              data,
-              error: error ? { message: error.message } : null,
-            };
-          }
-        : null,
-    [client],
-  );
-
-  useEffect(() => {
-    if (!rpc || !client || !profileId || !requestKey || !rankingScopeKey) {
-      return;
-    }
-
-    const token = requestGate.current.start();
-    let active = true;
-    const delayMs = getPredictionRefreshDelay(
-      loadedRequestKeys.current.has(rankingScopeKey),
-      INTERACTION_REFRESH_DELAY_MS,
-    );
-
-    const timeout = setTimeout(() => {
-      setHostedState((current) => ({
-        status: 'loading',
-        key: requestKey,
-        previous: getMatchingRanking(current, requestKey),
-      }));
-
-      void loadPredictionRanking(rpc, {
-        profileId,
-        mode,
-        itemType,
-        limit: activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20,
-        context: getRuntimeContext(eventTracking.sessionId),
-      }).then(async (result) => {
-        if (!active || !requestGate.current.isLatest(token)) return;
-
-        if (result.status === 'success') {
-          const catalog = await loadCatalogItems(
-            client,
-            result.ranking.items.map((item) => item.id),
-          );
-          if (!active || !requestGate.current.isLatest(token)) return;
-
-          const ranking =
-            catalog.status === 'success'
-              ? {
-                  ...result.ranking,
-                  items: enrichItemsFromCatalog(
-                    result.ranking.items,
-                    catalog.items,
-                  ),
-                }
-              : result.ranking;
-
-          loadedRequestKeys.current.add(rankingScopeKey);
-          rememberPredictionItems(ranking.predictionId, ranking.items);
-          setHostedState({ status: 'ready', key: requestKey, ranking });
-          return;
-        }
-
-        setHostedState((current) => ({
-          status: 'error',
-          key: requestKey,
-          previous: getMatchingRanking(current, requestKey),
-          message: result.message,
-        }));
-      });
-    }, delayMs);
-
+  const environment = connection.status === 'configured' ? connection.config.url : null;
+  const limit = activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20;
+  const revision = JSON.stringify([collectionRevision, bootstrapRevision, evidenceKey]);
+  const scope = useMemo<PredictionReaderScope | null>(() => environment && actorUserId && profileId && sessionId
+    ? { environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision } : null,
+  [environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision]);
+  const rpc = useMemo<PredictionPageRpc | null>(() => client ? async (name, arguments_) => {
+    const { data, error } = await client.rpc(name, arguments_);
+    return { data, error: error ? { message: error.message } : null };
+  } : null, [client]);
+  const reader = useMemo(() => scope && rpc && client ? createPredictionPageReader({
+    scope,
+    createRequest: () => createPredictionPageRequest({ requestId: createUuidV7(),
+      profileId: scope.profileId, sessionId: scope.sessionId, mode: scope.mode,
+      itemType: scope.itemType, limit: scope.limit, context: getRuntimeContext() }),
+    createRequestId: createUuidV7,
+    load: async request => {
+      const result = await loadPredictionPage(rpc, request);
+      if (result.status !== 'success' || result.ranking.items.length === 0) return result;
+      const catalog = await loadCatalogItems(client, result.ranking.items.map(item => item.id));
+      return catalog.status === 'success' ? { ...result, ranking: { ...result.ranking,
+        items: enrichItemsFromCatalog(result.ranking.items, catalog.items) } } : result;
+    },
+  }) : null, [scope, rpc, client]);
+  const snapshot = useSyncExternalStore(reader?.subscribe ?? subscribeInactive,
+    reader?.getSnapshot ?? inactiveSnapshot, reader?.getSnapshot ?? inactiveSnapshot);
+  const lastActivation = useRef<{ identity: string; loaded: boolean } | null>(null);
+  // Scope invalidation happens during commit, before an old focus callback or
+  // delayed enrichment can publish into another actor/Profile/session's view.
+  useLayoutEffect(() => () => { reader?.deactivate(); }, [reader]);
+  useFocusEffect(useCallback(() => {
+    if (!reader) return;
+    const identity = predictionReaderScopeKey({ ...reader.scope, revision: '' });
+    reader.activate(getPredictionRefreshDelay(
+      lastActivation.current?.identity === identity && lastActivation.current.loaded, INTERACTION_REFRESH_DELAY_MS));
     return () => {
-      active = false;
-      clearTimeout(timeout);
+      lastActivation.current = { identity, loaded: reader.getSnapshot().pages.length > 0 };
+      reader.deactivate();
     };
-  }, [
-    activeProfile.activeProfile?.type,
-    attempt,
-    bootstrapRevision,
-    client,
-    evidenceKey,
-    eventTracking.sessionId,
-    itemType,
-    mode,
-    profileId,
-    requestKey,
-    rankingScopeKey,
-    rpc,
-  ]);
+  }, [reader]));
 
-  const retry = useCallback(() => setAttempt((current) => current + 1), []);
-  const matchingRanking = requestKey
-    ? getMatchingRanking(hostedState, requestKey)
-    : null;
+  const retry = useCallback(() => { reader?.retry(); }, [reader]);
+  const refresh = useCallback(() => { reader?.refresh(); }, [reader]);
+  const loadMore = useCallback(() => { reader?.loadMore(); }, [reader]);
+  const fallback = useMemo(() => {
+    const predictionId = createCorrelationId(fallbackSeed, `${itemType}:${mode}`);
+    const items = getStaticMockItems(itemType, mode);
+    return { predictionId, items, predictionIds: Object.fromEntries(items.map(item => [item.id, predictionId])) };
+  }, [fallbackSeed, itemType, mode]);
 
-  if (matchingRanking) {
-    return {
-      items: matchingRanking.items,
-      predictionId: matchingRanking.predictionId,
-      source: 'hosted',
-      status:
-        hostedState.status === 'error'
-          ? 'error'
-          : hostedState.status === 'ready'
-            ? 'ready'
-            : 'loading',
-      message: hostedState.status === 'error' ? hostedState.message : null,
-      retry,
-    };
-  }
+  if (!client) return { ...fallback, viewId: fallback.predictionId, source: 'fallback', status: 'ready',
+    message: null, availability: 'ITEMS', hasNextPage: false, loadingNextPage: false, nextPageError: null,
+    retry, refresh, loadMore };
 
-  if (rpc && profileId) {
-    return {
-      items: [],
-      predictionId: fallback.predictionId,
-      source: 'hosted',
-      status: hostedState.status === 'error' ? 'error' : 'loading',
-      message: hostedState.status === 'error' ? hostedState.message : null,
-      retry,
-    };
-  }
-
-  return {
-    items: fallback.items,
-    predictionId: fallback.predictionId,
-    source: 'fallback',
-    status: 'ready',
-    message: null,
-    retry,
-  };
+  const first = snapshot.pages[0];
+  const last = snapshot.pages.at(-1);
+  return { items: snapshot.items, predictionIds: snapshot.predictionIds,
+    predictionId: first?.ranking.predictionId ?? null, viewId: snapshot.viewId, source: 'hosted',
+    status: first ? 'ready' : snapshot.status === 'error' ? 'error' : 'loading',
+    message: first ? null : snapshot.message, availability: last?.availability ?? null,
+    hasNextPage: Boolean(last?.nextCursor), loadingNextPage: Boolean(first && snapshot.status === 'loading'),
+    nextPageError: first && snapshot.status === 'error' ? snapshot.message : null, retry, refresh, loadMore };
 }
 
-function getMatchingRanking(
-  state: HostedRankingState,
-  key: string,
-): PredictionRanking | null {
-  if (state.status === 'idle' || state.key !== key) return null;
-  return state.status === 'ready' ? state.ranking : state.previous;
-}
-
-function getRuntimeContext(sessionId: string | null) {
+function getRuntimeContext() {
   const resolved = Intl.DateTimeFormat().resolvedOptions();
   const now = new Date();
-
   return {
-    ...(sessionId ? { sessionId } : {}),
     ...(resolved.locale ? { locale: resolved.locale } : {}),
     ...(resolved.timeZone ? { timezone: resolved.timeZone } : {}),
     occurredAt: now.toISOString(),
-    attributes: {
-      localHour: now.getHours(),
-      dayOfWeek: now.getDay(),
-      surface: 'DISCOVERY_GRID',
-    },
+    attributes: { localHour: now.getHours(), dayOfWeek: now.getDay(), surface: 'DISCOVERY_GRID' },
   };
 }

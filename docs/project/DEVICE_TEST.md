@@ -310,3 +310,40 @@ implementation or acceptance is inferred for long-press selection.
 
 Continue algorithm source work from STATUS; do not reopen already addressed UI
 defects merely because earlier reports remain in this historical document.
+
+
+## Protocol-2 configured client check — prepared 2026-09-12
+
+Run only after STATUS's exact six-forward target review/rollout and current client
+CI acceptance. Record APK/build/source identity, environment and server checkpoint.
+This source packet has no new installed-device acceptance and starts no APK build.
+
+1. Enter BOOK and MOVIE in Personal and Shared Profiles, in all three modes. The
+   first fetch starts immediately; loading, request failure and genuine empty
+   catalog are distinct. Never show mock Items after a configured RPC failure.
+2. Scroll/press **Näytä lisää** and tap repeatedly during a delayed response. Append
+   once, retain order and old Item origins; an empty terminal page stops further
+   paging without claiming the whole catalog is exhausted.
+3. Interrupt first/next fetches, then use **Yritä uudelleen** or pull-to-retry. The
+   request ID/context/cursor remains exact. An append failure keeps only the valid
+   current-scope prefix. **Aloita uusi haku** explicitly starts a new window,
+   including after cursor expiry; the server's 16-window/15-minute bounds remain.
+4. Switch A → B → A quickly, then change actor/account, mode and Event session
+   during delayed RPC/catalog replies. No previous view or error may become the
+   current slate. Background detail feedback must not start repeated grid fetches.
+5. Open Items from different pages and swipe through the captured sequence. Change
+   Shared ordering or refresh the grid in parallel; each exposure/action must keep
+   its actual page PredictionRun, original Profile/session and captured tier.
+   A missing/expired navigation token asks the user to reopen the Item.
+6. Verify actual grid visibility/open callbacks after a request switch, paging and
+   back navigation. Old native list tokens cannot create impressions for the new
+   request; prefetch alone records none. Check scroll restoration, covers, large
+   text, footer/retry controls and reduced motion on device.
+7. Exercise restart/reconnect, late exposure acknowledgements and queued Item/List
+   actions with their original scope. Preserve the prior outbox/collection checks.
+8. Use an isolated configured fixture for empty-domain/fresh-Profile checks where
+   needed. The owner's current account-creation constraint remains unresolved;
+   no current-account reset or destructive catalog change is authorized by this list.
+
+Record each result separately. Source tests/exports and existing positive owner
+reports do not establish these new runtime flows or complete MVP-DATA-004/ALG-003.

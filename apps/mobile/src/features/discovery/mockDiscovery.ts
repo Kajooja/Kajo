@@ -1,7 +1,4 @@
 import type { DiscoveryMode, Item, ItemId, ItemType } from '../../domain/contracts';
-import {
-  getRememberedItem,
-} from './predictionRankingCache';
 
 interface MockDiscoveryEntry {
   item: Item;
@@ -291,8 +288,5 @@ export function getStaticMockItems(
 }
 
 export function getMockItem(itemId: ItemId): Item | undefined {
-  return (
-    getRememberedItem(itemId) ??
-    MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item
-  );
+  return MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item;
 }
