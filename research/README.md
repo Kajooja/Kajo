@@ -3,8 +3,10 @@
 E1 contracts are accepted through PR #241. D1 source supplies bounded intake and
 a real engine adapter. **The actual MovieLens 32M download/cohort is not accepted**:
 the 2026-09-12 publisher README/checksum/archive requests returned HTTP 502 from
-this environment. The tracked manifest intentionally has no invented hashes or
-research-rights approval. [STATUS](../docs/project/STATUS.md) owns current progress.
+this environment. A repeat attempt confirmed that the HTTPS proxy reports an
+expired certificate during upstream verification. The tracked manifest has no
+verified source hashes or research-rights approval.
+[STATUS](../docs/project/STATUS.md) owns current progress.
 
 The source is the [GroupLens MovieLens 32M release](https://grouplens.org/datasets/movielens/32m/).
 Its [README](https://files.grouplens.org/datasets/movielens/ml-32m-README.html)
@@ -112,6 +114,8 @@ pipeline tests using explicitly artificial archives. Existing CI sets up Python
 3.12 and performs no real dataset download. These tests passed locally (338 total),
 along with lint/typecheck and both Hermes exports. They prove source behavior;
 they are not evidence of a real MovieLens cohort or predictive usefulness.
+All five required jobs also passed in [CI #473](https://github.com/Kajooja/Kajo/actions/runs/34709751376)
+at implementation head `aab39a51761b2047ff8de5fe522fc773a8c78221`.
 
 Resume D1 by obtaining and reviewing the exact publisher metadata, running the
 three commands above, inspecting archived README/terms and recording real
@@ -119,3 +123,7 @@ archive/file/cohort hashes, counts, quarantine and resource evidence. Verify one
 independent rerun produces the same normalized/adapter hashes. Only then does D2
 begin its frozen temporal/cold-start baseline and ordered-prefix experiment.
 Do not substitute another release or an unverified third-party mirror for 32M.
+The current retry condition is a publisher endpoint that passes normal HTTPS
+verification, or an independently verifiable publisher-authorized copy of this
+exact release. Repeated unchanged requests cannot resolve the reported certificate
+failure; do not disable verification or approve source identity from search snippets.

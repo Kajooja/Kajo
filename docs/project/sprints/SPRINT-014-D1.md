@@ -46,11 +46,33 @@ snapshot or download a dataset. Publisher hashes/research approval remain null
 and pending in the tracked manifest. No real cohort counts/hashes, model training,
 quality gain or serving permission are claimed. Raw/derived research paths were
 confirmed ignored; temporary artificial test archives were removed by tests.
-Published-head source CI and full D1 acceptance remain separate open gates.
+The follow-up below records published source CI. Full D1 acceptance remains open.
+
+### Follow-up source diagnosis
+
+The next continuation repeated the actual `prepare` command; it again exited 1
+without source snapshots or a dataset. Reading the bounded checksum error response
+identified HTTP 502 from the HTTPS proxy with the message `Certificate verify
+failed: certificate has expired`. This is the proxy's reported upstream TLS failure,
+not evidence that the release bytes or intended-use terms have changed. Normal
+certificate verification remains enabled. The official landing page still works;
+its linked Kaggle alternative and a focused search did not establish a verifiable
+publisher-authorized 32M copy. Source identity and research approval stay pending.
+
+Draft PR #242 is the source handoff. All five required jobs passed in
+[CI #473](https://github.com/Kajooja/Kajo/actions/runs/34709751376) at implementation
+head `aab39a51761b2047ff8de5fe522fc773a8c78221`: validation, platform defaults,
+two clean application installations, the existing-application forward upgrade and
+Supabase CLI/history. This follow-up changes documentation and attempt metadata
+only; the implementation and the 338-test local result are unchanged. Manifest
+JSON, pending source/rights gates and `git diff --check` were verified; the unchanged
+full check was not repeated for this metadata-only follow-up.
 
 ## Exact continuation
 
-Finish this source PR's required CI. Resume the same D1 issue/branch with
+Verify any later PR-head CI before merging. Once normal HTTPS verification succeeds or
+an independently verifiable publisher-authorized exact copy is available, resume
+the same D1 issue/branch with
 `research:movielens:prepare`; inspect the exact retrieved source terms/checksum
 and record verified identities/reviewer/scope. Run download, inspect archived
 README and file hashes, then normalize the real full-history cohort. Record actual

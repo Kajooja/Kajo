@@ -13,7 +13,7 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 ## Current source packet — D1 #236
 
 **Continue [D1 #236](https://github.com/Kajooja/Kajo/issues/236) on
-`feat/236-movielens-research`.** It starts from accepted E1 main
+`feat/236-movielens-research` / [draft PR #242](https://github.com/Kajooja/Kajo/pull/242).** It starts from accepted E1 main
 `3747ecb58d69ba78440ca1b72b7cc554b1a9720a` / merged PR #241. All five required
 jobs passed in [CI #471](https://github.com/Kajooja/Kajo/actions/runs/34707456295)
 at E1 head `17a8466fecb510d9e1049ff9feaa6ab72686400a`; its 310 local tests,
@@ -29,18 +29,30 @@ and archive requests returned HTTP 502 on 2026-09-12. Actual README/license,
 checksum, download and real-data normalization must be verified separately;
 fixture tests cannot stand in for them.
 
+A repeat `prepare` attempt also exited 1. The checksum request's HTTP 502 body
+identifies the transport failure as `Certificate verify failed: certificate has
+expired`, reported by the HTTPS proxy. Normal TLS verification remains enabled.
+The publisher landing page is available; its linked Kaggle alternative did not
+yield a verifiable 32M release. Resume retrieval when the official endpoint passes
+HTTPS verification or an independently verifiable publisher-authorized exact
+copy is available. Do not loop unchanged requests or replace the release silently.
+
 Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **338 tests** (212 mobile,
 14 catalog, 61 database, 34 engine, 15 Python intake and two cross-language
 pipeline cases), TypeScript/lint and both Hermes exports. One pre-existing mobile
 Hook dependency warning remains unchanged. The authored `npm run
 research:movielens:prepare` command was actually run and returned HTTP 502 before
 saving source metadata or downloading an archive. Source/fixture CI, rights
-review and real-data acceptance remain separate; D1 stays open. See
+review and real-data acceptance remain separate; D1 stays open. All five required
+jobs passed in [CI #473](https://github.com/Kajooja/Kajo/actions/runs/34709751376)
+at implementation head `aab39a51761b2047ff8de5fe522fc773a8c78221`. The current
+follow-up changes documentation and source-attempt metadata only. See
 [the D1 checkpoint](sprints/SPRINT-014-D1.md) and [runner](../../research/README.md).
 
-**Next bounded task: finish D1 source CI, retrieve/review the publisher README and
-checksum, record the real source identities, then download/normalize and verify
-a repeatable complete cohort.** Do not jump to D2 while this gate is open.
+**Next bounded task: restore verifiable access to the exact MovieLens 32M source,
+retrieve/review the publisher README and checksum, record the real source
+identities, then download/normalize and verify a repeatable complete cohort.**
+Check any later PR-head CI before merge. Do not jump to D2 while the data gate is open.
 
 After complete D1 acceptance, **D2 #237** freezes train-only temporal/cold-start
 baselines and a bounded static-state/ordered-prefix experiment/report. A losing

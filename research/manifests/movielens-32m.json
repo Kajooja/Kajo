@@ -12,7 +12,7 @@
     "publisherMd5": null,
     "status": "pending-publisher-availability",
     "lastAttempt": "2026-09-12",
-    "lastResult": "HTTP 502 for publisher README, checksum and archive"
+    "lastResult": "HTTP 502 on retry; HTTPS proxy reports: Certificate verify failed: certificate has expired"
   },
   "rights": {
     "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
