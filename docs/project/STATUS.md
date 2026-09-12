@@ -10,95 +10,57 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Primary next packet — #228 / draft PR #229
+## Current source packet — E1 #235
 
-**When the owner says “jatketaan reposta”, continue configured-client recovery
-and device acceptance in [PR #229](https://github.com/Kajooja/Kajo/pull/229), branch
-`feat/228-delivered-origin`.** Refresh refs and check the current head's five
-required CI jobs first. The owner approved the exact six-forward packet and all
-six were installed and verified on Kajo `mwrnvfosrzwygrunrltm` on 2026-09-12.
-Do not repeat this deployment or ask for the same approval again. Actual versions,
-unchanged SQL hashes and preservation evidence are in
-[the completed rollout](sprints/SPRINT-014.md#approved-hosted-prediction-rollout--2026-09-12).
-The accepted #233/#234 engine direction is reconciled.
-Do not merge the unfinished packet or silently switch to E1.
+The owner reported the protocol-2 device tests working on 2026-09-12, with one
+remaining UI defect: **Yritä uudelleen** stays visible after connectivity returns.
+They requested that recovery correction and the other application UI ideas in a
+later pre-MVP UI packet, and asked development to continue.
 
-Resume baseline `7d47e44bb55ee7c5e5544fa92b0bcdc6f44a2401` passed all five required
-jobs in [CI #467](https://github.com/Kajooja/Kajo/actions/runs/34697784410).
-The client recovery follow-up reproduces and fixes a never-settling page load:
-each active first/next attempt now has a 15-second deadline across RPC and catalog
-enrichment, and scope/focus changes abort it. Transport retry keeps the exact
-request; proven unusable cursors require explicit fresh search, while the window
-cap asks the user to wait and retry. Late replies cannot change accepted pages.
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **439 tests** (356 mobile,
-14 catalog, 69 database), lint/TypeScript and both Hermes exports. Published-head
-CI remains a separate gate; see the current PR and
-[the recovery checkpoint](sprints/SPRINT-014.md#bounded-client-recovery--2026-09-12).
-A read-only history query reconfirmed all six installed versions through
-`20260912134224_atomic_prediction_pages`; no hosted write ran in this follow-up.
+**The explicitly selected independent source packet is now [E1 #235](https://github.com/Kajooja/Kajo/issues/235),
+branch `feat/235-portable-engine-contracts`.** Follow that branch's current STATUS
+for executable generic contracts and Kajo/media plus synthetic non-media fixtures.
+It starts from accepted main and does not absorb or accept #229 runtime changes.
+The ordered continuation is E1 contract acceptance → D1 #236 → D2 #237. No public
+dataset download or runtime scorer replacement is part of E1.
 
-The server-page baseline `0a184a71320621c5bd31c72f70ff18acf786acc8` passed all five
-jobs in [CI #464](https://github.com/Kajooja/Kajo/actions/runs/34691537142), including
-native concurrent retries/cursor consumption/window capacity and populated
-pre-window upgrades. Its earlier float-format probe failure is resolved.
+## Native packet checkpoint — #228 / draft PR #229
 
-The subsequent client source now uses numeric protocol 2 through
-`rank_items_page_v1`. Its focus-aware reader captures environment, actor, Profile,
-session, domain, mode, limit and evidence revision; refresh replaces the view,
-transport retry retains the original request, and each appended Item retains its
-actual page PredictionRun. Stale replies/catalog enrichment and prior native list
-callbacks cannot populate a different view. Detail keeps its clicked immutable
-slate. The obsolete unscoped Item cache and unused row-RPC client were removed;
-protocol-1 envelope compatibility and the shared row mapper remain tested.
+`feat/228-delivered-origin` remains the native source/rollout record. CI #468 and
+manual [CI #469](https://github.com/Kajooja/Kajo/actions/runs/34701247895) passed
+at `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31`. The manual run produced
+`kajo-android-standalone-900dc2653e428bb1cbd27e4bdaa7ea0141e47b31`
+(artifact `10300513895`). The owner report follows this requested build;
+the installed binary checksum was not independently supplied.
 
-The client head `8a1936c69e8f2dd2f0bd5b770177dcfb50aee9de` passed all five jobs in
-[CI #465](https://github.com/Kajooja/Kajo/actions/runs/34693634630).
-The following hosted preflight reproduced a real deployment blocker: the late
-Outcome/replay patches did not accept the installed compact evaluation/worker
-bodies. The two forwards accept only those exact reviewed
-SHA-256 identities and use the corresponding canonical body before their guarded
-feature patches. Unknown variants still fail and roll back. The other four SQL
-files were unchanged; all six SQL bodies are now deployed and immutable.
+Owner feedback accepts the exercised normal flows, Profile switching, expired
+cursor → fresh search and the reported persistence/restart checks. Record this
+as device feedback, not proof of every server attribution/native callback race.
+The remaining reconnect defect is [#240](https://github.com/Kajooja/Kajo/issues/240)
+/ MVP-UX-003: recover the same failed request on usable reconnection and remove
+stale retry UI after successful recovery. Do not merely hide a failed backend
+response because the device says online. The owner explicitly defers this to the
+next application UI packet; do not silently start it instead of E1.
 
-Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile,
-14 catalog, 69 database), lint/TypeScript and both platform exports. The new
-compact-source populated-upgrade/page-runtime probe also joins required native
-CLI CI. Approved deployment source `78217135897cbfe10c85a0b6610989272bdc87c8`
-passed all five jobs in [CI #466](https://github.com/Kajooja/Kajo/actions/runs/34695947055),
-including the native compact-source populated-upgrade/page-runtime probe.
+The six approved server forwards remain installed through
+`20260912134224_atomic_prediction_pages`. Do not deploy them again or repeat the
+approval. The 15-second client deadline, exact retry/cancel semantics and all
+439 local tests remain recorded in [the recovery checkpoint](sprints/SPRINT-014.md#bounded-client-recovery--2026-09-12).
+No fresh-account test/reset, new DDL, automatic promotion or full DATA/ALG closure
+is implied. Keep #229 draft while its named acceptance gaps remain; E1 is an
+independent source packet, not a way to mark those gaps complete.
 
-The target now supplies the complete six-forward protocol-2 server contract.
-The configured client still requires its exact build and device checks; it cannot
-silently fall back to mocks or an unidentified row response. Source/CI and verified
-hosted DDL do not close device, empty-account or full DATA/ALG acceptance. Detailed
-source/test evidence
-is in [the client checkpoint](sprints/SPRINT-014.md#captured-scope-mobile-pages--2026-09-12).
+## Owner UI decisions — required before MVP
 
-Next bounded unit:
-
-1. Confirm current branch/head, required CI and the completed server checkpoint
-   `20260912134224_atomic_prediction_pages`. No further hosted migration is queued
-   in this packet. The global privilege-default forward remains a separate gate.
-2. Record the exact configured client build and exercise
-   first-page/append/empty/error/expired-cursor recovery, including the new
-   15-second stalled-request and cancel/retry cases, fast Profile/account/
-   session changes, mixed-page grid/detail/actions, restart/reconnect and durable
-   exposure ordering. Follow the appended DEVICE_TEST checklist. No APK dispatch
-   or polling substitutes for device evidence; retain the owner's fresh-account
-   testing constraint without resetting current data.
-3. Record the actual device/runtime results and any concrete recovery defect in
-   DEVICE_TEST and Sprint014. This workspace has no native emulator/adb or React
-   Native web renderer, so it has no new device acceptance. Do not repeat source
-   tests or poll builds as a substitute for missing runtime evidence.
-4. Record acceptance and the next ROADMAP task. E1 → D1 → D2 remains the independent
-   engine sequence; if selected while runtime/device work waits, record the switch
-   here so there is one explicit current source task.
-
-The reader starts a fresh request's context only when its focused fetch begins.
-Background detail feedback therefore does not open repeated unused windows. The
-600 ms delay applies to subsequent evidence-driven fetches; first scope entry and
-explicit refresh remain immediate. Window expiry/cap are server bounds, not
-client permission to discard evidence or claim whole-catalog exhaustion.
+ROADMAP Phase 17.0 now requires private category statistics/progress and weekly
+tracking (#230 / MVP-UX-004), grid multi-selection and List/history operations
+(#231 / MVP-UX-005), plus the new card controls (#239 / MVP-UX-006). The star saves
+to the existing default List shown as **Tykätyt**; the header's three-dot menu opens
+other destinations. Slider and **Ei kiinnosta / Seuraava** sit at the bottom of the
+card above the dock, leaving space for a description. Saving stays on the card;
+**Seuraava** explicitly advances. UX_PRINCIPLES owns this planned successor to
+current auto-advance, with unchanged evidence and Shared consent semantics.
+Community comparisons remain conditional. Implementation is planned, not shipped.
 
 ## Accepted source, active branch and recorded hosted state
 
@@ -177,7 +139,7 @@ normalization, model training, evaluation and artifact admission are distinct
 recorded operations. A losing challenger is a valid report; it cannot waive
 native usefulness gates or deploy itself.
 
-No engine package, dataset ingestion, trained representation, world model,
+E1 is the selected executable-contract source work; no dataset ingestion, trained representation, world model,
 multistep dreamer or automatic promotion is delivered by this audit.
 
 ## Preserved owner requirements and release order
@@ -188,8 +150,9 @@ multistep dreamer or automatic promotion is delivered by this audit.
 - Multi-destination List selection, final Add without a second Done action,
   always-available unknown Taste response, approximately ten movies then ten books,
   link reveal/copy and device details remain in their canonical product docs.
-- #230 statistics, #231 multi-select/history trash and joint-list choice are later
-  scoped candidates in FUTURE_PLAN, not automatic new MVP blockers.
+- #230 private statistics/weekly tracking and #231 multi-select/history trash are
+  now required pre-MVP Phase 17.0 work. #239 card controls and #240 reconnect
+  recovery join them; FUT-UX-003 joint-list choice remains a separate candidate.
 - Then follow ROADMAP: algorithm/catalog/engine foundation → Taste/holdout →
   anonymous web/app + Google/Apple continuity → preview → Friend/safety → explicit
   Shared creation and joint rounds → core UX/telemetry/privacy → complete beta →

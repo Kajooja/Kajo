@@ -2260,3 +2260,26 @@ and expiry checks; exact build identity, native callbacks, process-death/reconne
 and fresh-account acceptance remain open. Preserve current test data and keep
 #229 draft. STATUS retains configured-device recovery as the default continuation;
 E1 → D1 → D2 can be explicitly selected while those device gates wait.
+
+## Owner device feedback and E1 selection — 2026-09-12
+
+The owner reports the protocol-2 test flows working, including Profile changes,
+expired cursor → new search and the reported persistence/restart checks. Manual
+CI #469 passed at `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31` and produced its
+matching APK artifact; DEVICE_TEST records the verified artifact identity and
+limits of the self-reported device evidence. The remaining network-recovery
+button defect is #240 / MVP-UX-003 and stays open for a device-verified correction.
+
+Owner direction explicitly places application UI changes in a later required
+pre-MVP packet. #230 private statistics/progress/weekly tracking and #231 grid
+selection/List/history actions now map to MVP-UX-004/005. New #239 / MVP-UX-006
+covers star → default Tykätyt, header overflow → other Lists, bottom slider/actions
+and explicit Next after saving. UX_PRINCIPLES distinguishes this planned successor
+from today’s accepted automatic advancement; DATA_EVENTS retains existing Saved,
+Shared consent and no-implied-rating/Next semantics. No UI source was changed.
+
+The selected independent source packet is E1 #235 on
+`feat/235-portable-engine-contracts`, starting from accepted main. It supplies
+executable generic contracts and media/non-media fixtures before D1/D2. #229
+retains its native/remaining acceptance record, and no missing test or requirement
+is marked complete just to begin E1. No new DDL, APK dispatch/polling or reset ran.

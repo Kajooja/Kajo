@@ -365,3 +365,25 @@ was exercised with injected HTTP fixtures, including cancellation during catalog
 enrichment and error-code preservation. These are automated source checks, not
 an installed APK, configured user session or native device acceptance. Record the
 new exact build before testing; do not reuse CI #467 as this changed client's SHA.
+
+## Owner protocol-2 results — 2026-09-12
+
+Manual [CI #469](https://github.com/Kajooja/Kajo/actions/runs/34701247895) passed
+at `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31` and produced APK artifact
+`kajo-android-standalone-900dc2653e428bb1cbd27e4bdaa7ea0141e47b31`
+(`10300513895`). This is the requested-build context of the following owner
+report; the phone’s installed checksum/device timing was not supplied.
+
+| Exercised check | Owner result |
+| --- | --- |
+| Normal requested flows | OK; overall report says everything worked well |
+| Network recovery | Remaining defect: Yritä uudelleen stays visible after connection returns; #240 |
+| Profile switching | Works |
+| Expired continuation | Works; Aloita uusi haku appeared |
+| Reported persistence/restart check | Works |
+
+Keep #240 as a named pre-MVP UI defect. The owner explicitly schedules that and
+new card controls (#239) for later application work while development moves on.
+No fresh-account acceptance, measured 15-second latency or exhaustive native
+callback/exposure concurrency proof is invented from the general positive report.
+No reset is requested. E1 #235 is now the independent source continuation.

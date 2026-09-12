@@ -466,3 +466,15 @@ E1 defines a source-typed Observation/Outcome boundary; [DATA_ENRICHMENT](../arc
 Preserve dataset/release namespaces, raw values/scales, occurrence time, availability time (or explicit uncertainty), correction/version identity and missingness. Rating-record time does not establish viewing time, recommendation exposure or action propensity. Imported user-authorized history, external research, native Kajo observations and generated hypotheses remain distinguishable even when an adapter maps their fields to a shared contract.
 
 Only information available at prediction time may form input state, retrieval keys, transforms and memory. Later observed labels can evaluate eligible targets at their declared maturity/cutoff. An unchosen alternative has no observed counterfactual outcome; missing or not-yet-mature feedback is not rejection. Synthetic branches never become native Events, observed evaluation labels or independent support for their generator. External artifacts retain lineage and admission/withdrawal rules instead of appearing as copied Scenario history.
+
+### Planned star, overflow and Next controls — owner decision 2026-09-12
+
+#239 maps the star to the existing default SYSTEM_SAVED/SAVED action; Tykätyt is
+presentation wording and does not imply a rating or consumption. Shared saves
+retain Endorsement/unanimity. Overflow uses the existing destination commands.
+Saving will stay on the card, and Next only changes the viewed card: it creates
+no implicit negative/positive Outcome. Actual visibility/opening of the new card
+still uses its original per-Item delivery origin. These planned controls preserve
+atomic receipts, source/actor/Profile/session identity, partial success and
+correction/Undo. #240 reconnects read attempts without discarding or fabricating
+queued exposure/action evidence. Neither UI decision introduces new Event types.
