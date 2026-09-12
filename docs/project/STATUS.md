@@ -1,210 +1,94 @@
 # Kajo Current Status
 
-Last updated: **2026-09-10**
+Last updated: **2026-09-12**  
 Current milestone: **MVP 0.1 — first public Kajo**  
-Current sprint: **Sprint 014 — algorithm reliability / real catalog foundation**  
+Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable-engine foundation**  
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
 
-This file is the authoritative current-state handoff. `ROADMAP.md` owns dependency order; `MVP.md` owns release blockers; `LAUNCH_LOOP.md` owns the Taste-first acquisition flow.
+This file owns the exact resumable handoff. [ROADMAP](ROADMAP.md) owns dependency order; [MVP](../product/MVP.md) owns release blockers; [LAUNCH_LOOP](../product/LAUNCH_LOOP.md) owns the Taste-first acquisition flow. Historical sprint/CI details remain in the relevant PRs and [Sprint 014](sprints/SPRINT-014.md).
 
-## New product truth — 2026-09-07 / #215 / #216
+## Documentation direction — 2026-09-12 / #233
 
-The first public Kajo must ship as a complete acquisition + recommendation system, not only as an installable recommender.
+The owner supplied the 51-part Predictive Memory Engine and requested review, independent-engine architecture, public movie-taste enrichment and aligned repository documentation **before implementation**.
 
-Canonical public loop:
+The documentation branch is `docs/233-predictive-memory-engine`, based on accepted main `6dd1fecaca6a081d633bf640aab12b35dcf2cb8f`. Its architecture and integration changes require acceptance through its own PR; they do not merge or accept the active code PR below.
+
+Canonical new documents:
+
+- [Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md): all 51 conceptual sections, with explicit review amendments and staged implementation.
+- [Data enrichment](../architecture/DATA_ENRICHMENT.md): isolated MovieLens baseline, optional Tag Genome/Beliefs packets, data limits, permissions, manifests and reproducible evaluation.
+- [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md): independent generic core + Kajo adapter; external research prior is not native PopulationMemory.
+
+Only documentation is delivered by #233. **No engine package, dataset download/import, trained embedding/model, new runtime endpoint or deployment is delivered.** No new feature is marked accepted merely because its design exists. The source architecture's WorldModel, DreamEngine and self-evolving geometry remain intact as staged targets.
+
+## Accepted main and active source are different
+
+Accepted implementation main at inspection: `6dd1fec` — PR #227 / Issue #226, atomic/durable Lists and Shared actions. Its merge records all five final CI #409 gates passed. The earlier main handoff to finish #227 is therefore historical, not the next task.
+
+Active implementation: **Issue #228 / draft PR #229**, branch **`feat/228-delivered-origin`**, inspected head **`44b11b437286653eae427bad10493a9380b92668`**. Preserve this branch and its source/test evidence. Do not copy its unfinished implementation into accepted-main descriptions or reset its data.
+
+This handoff incorporates the active branch's recorded 2026-09-11 checkpoint; it is not a fresh verification of hosted state or native CI. Reinspect current refs/checks before continuing. Keep source changes, CI acceptance, hosted rollout and device acceptance separate.
+
+## Next bounded implementation unit — retain #229 checkpoint
+
+1. Inspect required CI for the corrected #229 head. The recorded preceding run `34575684407` on `91d07ee` had four passed required jobs; the native CLI/race job failed while parsing a bare PostgreSQL boolean as JSON. The latest source wraps the lock-observation EXISTS result in `to_jsonb`. Corrected-head native acceptance remains **unverified in this documentation task**.
+2. Then implement atomic next-page delivery from the private frozen continuation source: exact actor/Profile/session/domain/mode/request/cursor scope, current eligibility, no repeated seen Items, an independent immutable page PredictionRun/ranks, retry receipt and page-aware frozen/shadow replay.
+3. Keep the continuation capability disabled and the prepared client inactive until the complete boundary passes. Hosted rollout and captured-scope client/device validation remain separately reviewed steps.
+
+The active branch records a full local `EXPO_OFFLINE=1 CI=1 npm run check` pass with **377 tests**, lint/TypeScript and both exports for its checkpoint. This is recorded source evidence, not a new test run performed for #233 and not proof of pending native/deployment/device gates.
+
+Do not reopen already accepted foundation work or start an unrelated broad scorer rewrite to reconstruct chat context. The engine work packets below have explicit boundaries and can be prepared independently without erasing this handoff.
+
+## Pending source and hosted boundaries
+
+As recorded by the active #229 checkpoint, hosted remains on **`20260910190243_shared_list_destinations`**. Five following forwards remain **undeployed**, in dependency order:
 
 ```text
-Taste/Friend link
-→ anonymous Taste Test
-→ first useful PersonalProfile
-→ honest held-out prediction challenge
-→ small unseen recommendation preview
-→ Google/Apple conversion with taste preserved
-→ full Kajo
-→ personal Friend invite
-→ accepted Friendship
-→ explicit Friends → SharedProfile creation
-→ joint recommendation
-→ next invite
+late Outcome attribution
+→ frozen prediction replay
+→ eligibility-first candidate admission
+→ identified first-page response
+→ private prediction continuation windows
 ```
 
-Important social decision:
+The last four named sources are `20260910202244_frozen_prediction_replay.sql`, `20260910210520_eligibility_first_candidate_pool.sql`, `20260911070959_identified_prediction_page.sql` and `20260911074543_prediction_continuation_windows.sql`. Use the branch's exact migration history for the first source; do not invent filenames or apply anything from this summary.
 
-- a personal invite does **not** create a SharedProfile automatically,
-- successful invite acceptance creates a reciprocal `Friendship`,
-- the Friend appears in Friends,
-- SharedProfile is created explicitly from one or more Friends through normal consent/membership rules,
-- Friendship grants no access to private PersonalProfile evidence.
+The private window cache is source preparation only: up to 50 candidates/seen IDs, 2 MiB, fifteen minutes from source ranking and sixteen windows per actor/Profile. It does not deliver another page. Scope, historical-source, native race/cap and populated-upgrade acceptance must be checked against current code/CI. Derived-cache cleanup must preserve request/run/Event history.
 
-Scale principle: **design contracts for one million users; provision infrastructure for measured demand.** No speculative Kafka/Kubernetes/graph-database/microservice requirement is introduced.
+A valid identified empty prediction, genuine source exhaustion and transport/authorization errors are different states. Existing candidate-source fixes do not prove independently generated pools or catalog-scale retrieval. `MVP-ALG-002..003` and Phase 14.1 recovery/provenance gates stay open.
 
-Canonical documents for this decision:
+The separately deferred `20260909131913_close_postgres_function_defaults.sql` privilege-default forward is not made deployed or accepted by this documentation update. Follow its existing review/rollout evidence before any hosted change.
 
-- `docs/product/LAUNCH_LOOP.md`
-- `docs/product/MVP.md`
-- `docs/project/ROADMAP.md`
-- `docs/product/PRODUCT.md`
-- `docs/architecture/decisions/0007-taste-first-acquisition-identity-social-boundaries.md`
+## Owner device feedback and data preservation
 
-The planning delivery from Issue #215 / PR #216 is merged on `main`. Taste/Friend runtime implementation remains planned; accepted documentation is not runtime acceptance.
+The owner reports exercised tests appear to work, but did not provide an installed APK SHA/run or measured timings. A completely empty/fresh-account flow was **not tested** because more accounts could not be created; do not diagnose why without evidence. A future small-group reset/test is deferred, not authorized now.
 
-## Current implementation truth
+Keep the deferred Personal two-List/add-latency and process-death/reconnect cases in [Sprint 014](sprints/SPRINT-014.md) and its linked device handoff. Planned List/consumed-history long-press selection/trash remains Phase 17 / #231, not part of this engine documentation packet.
 
-Already accepted/materially delivered foundations include:
+**No account/data reset, hosted mutation, APK dispatch/poll or implementation-PR merge is authorized or performed by #233.**
 
-- illustrated 2D Room and global `DiscoveryMode`,
-- BOOK/MOVIE discovery/detail/swipe/rating/not-interest/save/undo foundations,
-- PersonalProfile + consent-based SharedProfiles,
-- Endorsement consensus, named Lists and Profile messaging foundations,
-- generic server-owned Prediction V0/V1 path,
-- WorkingState/ShortTermState/LongTermState/ScenarioMemory architecture,
-- versioned PredictionRun/candidate traces,
-- PredictorGenome/SleepLayer controlled-evolution foundations,
-- provider-backed Item catalog architecture,
-- PersonalProfile history import foundations,
-- bounded no-import real-catalog calibration foundation,
-- SharedProfile common-fit v1.1.
+## New engine/data work packets
 
-Current catalog truth from the latest verified checkpoint remains:
+After the documentation is accepted, [ROADMAP Phase 14.3A](ROADMAP.md#143a--portable-contracts-and-external-data-research) introduces:
 
-- BOOK: 415 discoverable, 385 with image, descriptions incomplete,
-- MOVIE: 30 discoverable at that checkpoint, poster/description expansion still required.
+```text
+E1: generic contracts + Kajo mapping + deterministic media/non-media fixtures
+→ D1: isolated dataset manifest + MovieLens adapter + small repeatable cohort
+→ D2: train-only baselines + chronological/cold-start evaluation + honest report
+```
 
-Do not treat these numbers as permanent; re-query hosted truth when catalog work resumes.
+E1/D1/D2 are independent research/source work and may proceed on an explicitly named separate packet/branch without deploying or overwriting #229. Record which packet is active before writing; do not silently mix the two branches. Native serving integration E2 depends on the relevant Phase 14.1/14.2 gates, artifact admission and rollback evidence.
 
-## Exact continuation order
+D3 (named Tag Genome enrichment) and D4 (Beliefs release-2 study) follow only when justified; they are not required to complete the first baseline. No learned prior is required to win. A losing or rights-blocked artifact stays out of serving, with a recorded decision and a working transparent baseline.
 
-The new launch work **does not jump ahead of current algorithm correctness**.
+The next engine-specific unit is **E1**, not a full neural recommender, production-data import or general service migration. It must make subject/acting identity, observation provenance, missingness, time cutoff and synthetic separation executable, while leaving the current hosted scorer unchanged.
 
-### Current delivery and next task
+## Existing accepted foundation and remaining release sequence
 
-Phase 14.0 is accepted: #219 supplied source/schema/platform verification and
-#223 (`fd7b82d`) delivered the operational fresh local/CI installation. #207 and
-#208 are closed with their precise technical evidence. `MVP-ALG-001` is complete;
-BOOT/device/catalog/usefulness and full `MVP-ALG-009` remain separate open gates.
-The 47 protected historical files and their failing chronological diagnostic are
-unchanged. [ADR-0006](../architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)
-owns the adopted fresh lineage and existing-database forward procedure.
+Profile/actor separation, Personal/Shared boundaries, generic Items, append-only Events, server-owned traces, current ScenarioMemory, explicit shared common-fit, source-provenanced bootstrap and controlled scalar SleepLayer foundations remain valid.
 
-The latest **14.1 delivery is #224 / PR #225**:
-rating, not-interest and their undo now have an idempotent/atomic server command
-and a SQLite-backed actor/Profile/environment outbox. The command persists state,
-Event and receipt together, preserves unrelated Saved state, rejects stale undo
-and validates any supplied trace before correlation. The queue persists before
-optimistic acceptance, survives restart/lost replies, preserves FIFO and stops
-stale-scope dispatch/callbacks. A definitively rejected undo can be explicitly
-discarded before reloading current server state. `DATA_EVENTS.md` owns the contract.
-The reviewed server forward `20260909204512_atomic_item_actions.sql` is deployed
-and its rollback-only command acceptance passed. All five gates in CI #403 passed
-for the implementation; PR #225 owns final-head CI and merge evidence. Sprint 014
-records exact rollout/source verification and the remaining device limitations.
+Phase 14.0 technical bootstrap/fresh-install acceptance is retained through #207/#210 and #208/#223. The adopted installation strategy does not mean the unchanged historical migration chronology passes; preserve protected historical migration files and follow ADR-0006. Statistical usefulness, source-aware memory, full parity/refill, catalog features, operational evaluation and device gates remain separate.
 
-The latest collection delivery is **Issue #226 / PR #227**, branch
-`feat/226-atomic-collection-actions`, based on accepted main `e0d7610` / PR #225.
-Implementation `0d299d5` passed all five required jobs in CI #407; the prior
-handoff head `876f1b6` passed CI #408. Local implementation check passed 287 tests
-plus lint/typecheck and both bundles. PR #227 owns final-head CI and merge evidence.
+Then follow the existing sequence: trustworthy algorithm/catalog → adaptive Taste with honest holdout → anonymous web/app and Google/Apple continuity → recommendation preview → Friend invite/safety → explicit SharedProfile creation → core UX/telemetry/privacy → closed beta → production/store acceptance → **Share Link Gate**.
 
-The owner explicitly approved hosted deployment on **2026-09-10**. Kajo
-`mwrnvfosrzwygrunrltm` accepted `20260910071110_atomic_collection_actions.sql`,
-SHA-256 `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`.
-Only the filename changed to match the actual provider version. The prior hosted
-approval blocker is resolved. Rollback-only hosted List/Shared command acceptance
-and access-boundary checks passed; Sprint 014 records exact scope and limitations.
-
-Publication: finish final-head CI, merge #227, then retire its task branch. If #227
-is already merged, continue from main with the next 14.1 task below; do not repeat
-the deployment. No separate global-default forward or old tracking repair is included.
-
-Continue **14.1** after this delivery:
-
-1. Freeze exact delivered Profile, prediction and slate origin through grid/detail/
-   swipe/Lists/Shared overlays. Remove cross-Profile/run cache guessing, and make
-   exposure delivery durable; the old exposure-only Event queue remains in memory.
-2. Verify late outcomes, real device process-death/reconnect/account switches and
-   complete atomic List/Shared rollback/duplicate/undo authorization cases.
-3. Then proceed to **14.2 serving/shadow/candidate availability**.
-
-`MVP-DATA-003/004`, full `MVP-ALG-009`, Sprint 014 and Phase 14 quality/evaluation
-acceptance remain open. No Taste/Friend implementation starts ahead of those
-algorithm requirements. Do not restart completed source export/platform experiments.
-
-### Existing hosted database and repository hygiene
-
-The existing hosted database stays on the separately reviewed forward-only
-procedure in ADR-0006. Its known tracking mismatch is not repaired by local-lineage
-adoption. Forward file `20260909131913_close_postgres_function_defaults.sql` has
-not been applied hosted; deployment must capture its own prior defaults/rollback.
-The #223 local installer did not change hosted state. #224 applied only its new
-atomic-action forward: all 31 old application/Auth table hashes, 123 existing
-function fingerprints, 21 triggers, defaults and 44 old tracking rows remained
-unchanged. The new tracking row uses the provider's actual version above.
-
-The [2026-09-09 retrospective](retros/2026-09-09.md) and recovery manifest preserve
-the completed #220 audit and removal of all 145 approved old remote branches.
-The cleanup is finished; its old approval block and temporary branches are not
-continuation work. Main CI #395 originally failed at isolated startup and passed
-on one requested rerun; the original cause remains unproven. APK/device acceptance
-is separate, and a main APK build is not a task to poll.
-
-### After Phase 14
-
-Implement the new release path in this exact sequence:
-
-1. **Phase 15.0** adaptive Taste Test + honest holdout prediction challenge.
-2. **Phase 15.1** anonymous identity + web/app link continuation + Google/Apple conversion.
-3. **Phase 15.2** recommendation preview + measurable conversion funnel.
-4. **Phase 16.0** personal Friend invite.
-5. **Phase 16.1** Friends surface + remove/block/abuse lifecycle.
-6. **Phase 16.2** explicit Friends → SharedProfile creation.
-7. **Phase 17** core UX, funnel telemetry, privacy/operations.
-8. **Phase 18** closed external beta of the complete link-to-app loop.
-9. **Phase 19** production/store release candidate.
-10. **Phase 20 Share Link Gate**.
-
-Only when Phase 20 passes may an agent answer:
-
-> **Nyt on aika jakaa käyttäjille linkki.**
-
-## Algorithm bar
-
-The owner explicitly wants the algorithm driven toward the strongest reasonable first-release version rather than leaving known critical quality gaps for “later”. Therefore:
-
-- do not defer known correctness/evidence/cold-start defects merely because the UI works,
-- transparent baseline + tests come before opaque complexity,
-- learned/complex additions are welcome only when they measurably improve the defined outcomes,
-- honest insufficiency of evidence is acceptable; fabricated confidence is not,
-- Taste Test must use the same trustworthy production feature/ranking concepts rather than a disconnected marketing quiz,
-- SleepLayer/evolution remains evidence-gated and reversible.
-
-## Distant vision remains preserved
-
-`FUTURE_PLAN.md` remains the permanent backlog for:
-
-- series,
-- music albums,
-- Helsinki-first events/things to do,
-- broader activities/restaurants/travel,
-- richer experience memory,
-- stronger post-MVP friend/group learning,
-- optional friend-review feed,
-- local/global discovery,
-- PopulationMemory / more advanced evolutionary learning,
-- later consented people discovery,
-- possible friendship/dating compatibility research,
-- distributed/on-device research ideas.
-
-These are not deleted. They are deliberately behind the first-release march order.
-
-## Handoff for a new conversation
-
-When the owner says **“jatketaan reposta”**:
-
-1. sync/inspect current branch/PR/Issue handoff according to `AGENTS.md`,
-2. read `STATUS.md`, `MVP.md`, active Sprint 014 file and `ROADMAP.md`,
-3. continue the exact current Phase 14 task,
-4. do not skip ahead to Taste/Friend implementation until Phase 14 dependencies are accepted,
-5. once launch-loop implementation begins, read `LAUNCH_LOOP.md` + ADR-0007 before coding,
-6. update STATUS at meaningful handoff points so no chat-only context is required.
-
-APK/device tests may be performed at sensible user-facing checkpoints. Do not sit polling build completion unless the owner explicitly asks.
+Commercial monetization, Kajo-wide population retrieval, large multistep dreams, autonomous promotion and distant social/domain expansions are not silently pulled into the first release. The new direction is independent engine contracts plus early, well-bounded research, not abandonment of the working Kajo product.

@@ -4,9 +4,11 @@ Milestone: **MVP 0.1 — first public Kajo**
 
 Product decision **2026-09-07**: algorithm correctness remains the critical path, but the first public release must also include Kajo's complete Taste-first acquisition loop. This file defines release blockers; it does not claim newly planned behavior is implemented. Graphics and detailed copy may evolve through existing theme/UX boundaries without changing the release contract.
 
+Engine refinement **2026-09-12 / ADR-0008**: the Predictive Memory Engine remains an independent reusable system, with Kajo as its first adapter. Portable contracts and an isolated reproducible public-data baseline are added as bounded foundations below. No trained external prior is required to win, and no new runtime/model is accepted by documenting it.
+
 Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
-Canonical launch flow: [LAUNCH_LOOP.md](LAUNCH_LOOP.md). Execution order: [ROADMAP.md](../project/ROADMAP.md). Long-term vision: [FUTURE_PLAN.md](FUTURE_PLAN.md).
+Canonical launch flow: [LAUNCH_LOOP.md](LAUNCH_LOOP.md). Execution order: [ROADMAP.md](../project/ROADMAP.md). Long-term vision: [FUTURE_PLAN.md](FUTURE_PLAN.md). Generic engine: [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). External data: [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md).
 
 ## MVP completion meaning
 
@@ -16,6 +18,7 @@ Before the milestone may be marked complete:
 
 - normal discovery uses a useful real BOOK/MOVIE catalog,
 - the recommendation/evidence system passes algorithm correctness, memory, trace, SleepLayer and replay gates,
+- the engine's independent contracts and external-data baseline report are reproducible, with explicit source/artifact admission or rejection rather than assumed model benefit,
 - a previously unknown visitor can begin a real Taste Test from a public link without registration,
 - Taste Test creates useful first-session PersonalProfile taste and an honest holdout prediction challenge,
 - a small personalized recommendation preview is shown before registration,
@@ -202,6 +205,16 @@ Existing SharedProfile learning semantics remain canonical.
 - [ ] `MVP-ALG-008` SleepLayer has scheduled bounded retry-safe worker, mature-outcome evaluation, monitoring and tested manual canary/rollback; no tiny-sample promotion.
 - [-] `MVP-ALG-009` Clean database/replay and deterministic SQL regression tests cover bootstrap, parity, suppression/refill, time/undo/outcome reconciliation and authorization.
 
+## Portable engine and external-data foundation — bounded completion contracts
+
+[ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [ROADMAP Phase 14.3A](../project/ROADMAP.md#143a--portable-contracts-and-external-data-research) define the owner-requested new direction. These are planned, not delivered by the architecture documentation.
+
+- [ ] `MVP-ENG-001` Executable generic engine contracts preserve Subject/acting-identity separation, Object/Action/State/Observation/Outcome semantics, missingness, time/version scope and hard constraints. Deterministic Kajo/media and small synthetic non-media adapter fixtures prove portability without importing provider/UI/auth dependencies into the core. Current SQL serving is unchanged until a parity-tested component replacement is admitted.
+- [ ] `MVP-ENG-002` An isolated MovieLens manifest/adapter and baseline report are reproducible on a declared deterministic real-data cohort, with validation/quarantine, train-only artifacts, chronological and cold-start splits, a fixed final test, coverage/uncertainty/resource reporting and explicit task limitations. No external identities or invented context/exposures become native Kajo evidence. Dataset scale and experiment limits are reported honestly; a challenger is not required to win.
+- [ ] `MVP-ENG-003` Source/derived-artifact permissions and lineage are explicit and fail closed for unsupported uses. A tested absent/invalid/withdrawn-prior fallback and recorded admission/rejection decision preserve native serving. Synthetic records cannot enter observed-outcome evaluation or validate their own generator. Jointly learned source influence requires a documented replacement/retraining path rather than assuming raw-file deletion removes it.
+
+D3 Tag Genome and D4 Beliefs are optional enrichment/research packets after the baseline. E2 serving integration is conditional on rights, useful evidence, compatibility and the existing native reliability/rollback gates. External hidden-rating accuracy does not close Kajo first-session, exposure, Shared, cross-domain or device acceptance. A useful transparent baseline remains acceptable; indefinite model search is not a release requirement.
+
 ## Growth/funnel measurement — release blockers
 
 - [ ] `MVP-GROWTH-001` Funnel telemetry can reconstruct public link/open → Taste start/response/completion → challenge → preview → auth conversion → Friend invite/open/accept → Friendship → SharedProfile creation.
@@ -241,6 +254,8 @@ Existing SharedProfile learning semantics remain canonical.
 - Monetization/subscriptions/ads.
 - Full autonomous genetic/evolutionary production promotion.
 - Privacy-gated cross-Profile PopulationMemory before consent/cohort/deletion/exposure-bias gates.
+- Mandatory deployment of a learned external prior, Tag Genome or Beliefs pipeline; these are conditional/optional beyond the bounded E1/D1/D2 foundation.
+- Learned multistep WorldModel/DreamEngine, unrestricted synthetic training and self-evolving geometry as release prerequisites.
 - Music, series, games, restaurants, travel and live-event production domains.
 - Public follower/influencer/global feed mechanics.
 - Local stranger discovery or matching.
@@ -254,4 +269,4 @@ Existing SharedProfile learning semantics remain canonical.
 - Continuous precise-location tracking.
 - Speculative Kafka/Kubernetes/graph-database/microservice infrastructure solely for hypothetical scale.
 
-The complete long-term vision—including series, music, hyperlocal activities/events, richer memories, friend-review feeds, local/global discovery, possible people matching/dating research, compact learning infrastructure and distributed research ideas—remains preserved in `FUTURE_PLAN.md` and must not displace the release sequence above.
+The complete long-term vision—including series, music, hyperlocal activities/events, richer memories, friend-review feeds, local/global discovery, possible people matching/dating research, compact learning infrastructure and distributed research ideas—remains preserved in `FUTURE_PLAN.md`. The complete five-generation engine direction is in `PREDICTIVE_MEMORY_ENGINE.md`; neither displaces the release sequence above.

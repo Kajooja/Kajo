@@ -1,6 +1,8 @@
 # Kajo Prediction Nervous System
 
-Status: canonical product, memory, learning and evolution architecture.
+Status: canonical **Kajo-domain** serving, memory, learning and evolution contract. Implemented behavior and required targets are distinguished below; exact acceptance is in [STATUS](../project/STATUS.md).
+
+The independent reusable 51-part target architecture is [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) refines the boundary on 2026-09-12: Kajo is the first DomainAdapter, not the definition of the core. External research data/artifacts are governed by [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md). Existing SQL semantics below are retained rather than silently replaced by the target design.
 
 ## 1. Thesis
 
@@ -34,6 +36,8 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 - Memory is evidence with age and confidence, not permanent identity.
 - Evolution never mutates the production champion without evaluation, rollout gates and rollback.
 - Restricted provider metadata is not used for ML/AI training without the necessary licence.
+- External observed research records and synthetic hypotheses never masquerade as native Kajo Events or complete observed Scenarios.
+- Original predictions are frozen historical records; rebuilding derived intelligence cannot rewrite what was predicted before an outcome.
 
 ## 3. The complete loop
 
@@ -51,7 +55,7 @@ flowchart TD
   J --> B
 ```
 
-The online loop updates state and serves rankings. The offline loop evaluates and evolves predictors. They share versioned evidence but remain operationally separate.
+The online loop updates state and serves rankings. The offline loop evaluates and evolves predictors. They share versioned evidence but remain operationally separate. The complete generic architecture additionally separates outcome/world modeling, policy choice, synthetic dreaming and artifact admission; their presence in the design does not imply all are implemented.
 
 ## 4. Memory hierarchy
 
@@ -168,6 +172,8 @@ One episode may produce several Events. V1 selects the strongest available outco
 
 A later rating therefore replaces a weaker early save as the episode's main outcome. Undo Events exclude the reversed evidence. Dwell and open remain supporting observations, not terminal reward.
 
+This is a V1 derived reward projection, not a claim that the underlying events are mutually exclusive. Future OutcomeModel heads must define their own horizons/conditioning and observability. Saving and later consuming may both occur.
+
 #### Scenario score
 
 For candidate (i):
@@ -184,7 +190,7 @@ where (r_e \in [-1,1]), (K=30), and (c(n)) shrinks low-support evidence. Discove
 
 Purpose: learn patterns that no single Profile has enough evidence to learn alone.
 
-It is post-MVP and blocked until consent, data volume, deletion lineage and minimum-cohort privacy gates exist.
+**Native Kajo PopulationMemory** is post-MVP and blocked until consent, data volume, deletion lineage and minimum-cohort privacy gates exist. The external research prior in 4.6 is a separate input, not a waiver of this gate.
 
 Future components:
 
@@ -197,7 +203,23 @@ Future components:
 
 PopulationMemory never permits the mobile client to inspect other Profiles. Retrieval returns aggregated features/signals only. Sensitive/special-category inference is prohibited. Provider-owned aggregate popularity/trend metadata used by `ColdStartPrior` is not PopulationMemory because it is not derived from other Kajo Profiles.
 
+### 4.6 ExternalTastePrior — independent research-derived input
+
+ADR-0008 advances isolated public-data research into Phase 14.3A. An `ExternalTastePrior` is a separately versioned/licensed preference or object-representation artifact, not a Kajo user history, raw population lookup or complete observed Scenario.
+
+[DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) defines MovieLens-first normalization and evaluation, optional Tag Genome features and Beliefs analysis, namespace/time/label limits, rights lineage and artifact admission. External people never become native User/Profile/Event records. User-authorized own-history import in section 11 remains a different product path.
+
+Before serving: demonstrate useful supported behavior, canonical Item mapping, compatible feature/encoder/model versions, bounded source/domain influence, no double-counted bootstrap, correct Shared boundaries and absence/withdrawal fallback. Model size or offline rating accuracy does not close native release gates. Native PopulationMemory and later latent/world/dream generations retain their independent acceptance.
+
+### 4.7 Full CurrentState and uncertainty — target refinement
+
+The generic target composes existing memory with explicit `BeliefState`, `WorldState` and, for Shared subjects, `GroupState`. These are responsibility/contract refinements, not newly implemented tables. World trends/availability are not durable personal taste; missing context is not invented mood.
+
+BeliefState reports estimate, support, uncertainty method and calibration status. Unsupported estimates remain unavailable. Existing V1 rank/confidence components must not be relabeled as calibrated probabilities. Section 20 maps these target concepts onto Kajo without changing the accepted scorer in this documentation delivery.
+
 ## 5. Prediction trace: the system's causal spine
+
+Here “causal spine” means traceable decision/observation provenance, **not** proof of causal intervention effects. Full alternatives and exposure improve evaluation, but do not reveal reactions to unseen actions or remove selection bias by themselves.
 
 ### PredictionRun
 
@@ -244,7 +266,7 @@ For `shared-common-fit-v1.1`, a Shared candidate explanation also records only s
 
 ### Why full slates matter
 
-Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can learn that B won against A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice.
+Without alternatives, “B was selected” is only a positive pair. With the trace, Kajo can study B relative to A/C/D, which model placed it second, which cards were actually visible and whether the later rating supported the choice. An unexposed alternative is not an observed rejection.
 
 ## 6. Context contract
 
@@ -328,7 +350,7 @@ The long-term online pipeline has separate responsibilities:
 6. **Trace write:** persist candidate pool, versions and final selection.
 7. **Delivery overlay:** apply pending Endorsement/member-history collaboration semantics without creating another taste model.
 
-MVP V1 combines steps 2–5 inside PostgreSQL because the catalog and event volume are small. A later Python/FastAPI service may replace the transport without changing the conceptual contract.
+MVP V1 combines steps 2–5 inside PostgreSQL because the catalog and event volume are small. A later service may replace a component/transport without changing the conceptual contract. ADR-0008 does not mandate Python/FastAPI or a network service: start with executable generic contracts and parity-tested extraction.
 
 ### 8.1 Reacted-Item resurfacing policy — `resurfacing-v1`
 
@@ -372,7 +394,7 @@ The thresholds are versioned hypotheses, not permanent truth. A future policy ve
 - use ScenarioMemory as a weak guardrail rather than an exploitation rule,
 - retain safety/availability/consumed constraints.
 
-`AmbientPhase` remains presentation only.
+`AmbientPhase` remains presentation only. Policy objectives above are not evidence that V1 has calibrated uncertainty or stochastic propensities; later changes require measured targets and versioned controls.
 
 ## 10. SharedProfile model
 
@@ -486,13 +508,13 @@ Preferred import paths:
 
 Imports are user-initiated; Kajo does not scrape accounts or depend on unofficial login automation. Imported ratings map to canonical rating/consumed evidence with source/import provenance and mapping confidence. Uncertain Item matches require review or exclusion. Imported Personal evidence is never copied into SharedProfile history.
 
-### Bootstrap serving implementation — #207 pending acceptance
+### Bootstrap serving implementation — #207 / PR #210
 
 The forward correction versions the extended base as `prediction-v0.4-bootstrap`; V1 persists that base version and retains its existing policy/scenario/common-fit behavior. Candidate explanations add `bootstrapServingVersion=bootstrap-serving-v1` and `bootstrapLongTerm`; the latter is already included in `longTerm`, not an extra amount to add again. Memory snapshots retain the bootstrap serving version as well.
 
 Memory and serving reuse the same strongest-active-per-Item bootstrap selection, canonical evidence weights and bootstrap age decay. Bootstrap contributes only to LongTerm, never native ShortTerm or native confidence. Authorized Shared common-fit still reads Personal memory summaries; Shared base does not consume copied Personal bootstrap rows. Removing/replacing a source recomputes current influence; the mobile success boundary invalidates mounted ranking requests.
 
-This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. PR #210 merged the correction and recorded bounded hosted public V1 smoke evidence; PR #219 added public V1 runtime checks on independent isolated Supabase installations. Unmodified chronological replay still fails, and configured-device/first-session recommendation-quality acceptance remains open. See [STATUS.md](../project/STATUS.md) for the exact remaining #207/#208 gates.
+This scoped correction preserves the existing bootstrap decay floor and native baseline controls. It does not complete source-aware forgetting/support (ALG-004), full serving/shadow equivalence (ALG-002), immutable historical source replay, provider feature normalization or statistical recommendation-quality acceptance. PR #210 merged the correction and recorded bounded hosted public V1 smoke evidence; PR #219 added public V1 runtime checks on independent isolated Supabase installations. The later #223 checkpoint accepts the adopted fresh-install technical gate; unchanged historical chronological replay and the configured-device/first-session quality gates remain separate. See [STATUS.md](../project/STATUS.md) rather than treating the old “#207 pending” heading as current work.
 
 ## 12. Representation roadmap: what Kajo borrows from modern systems
 
@@ -509,7 +531,7 @@ Kajo does not copy one competitor wholesale. It combines proven patterns while k
 | Letterboxd / IMDb | user-initiated history/rating imports that collapse cold start | scraping, credential handling or dependence on an unavailable consumer OAuth path |
 | Spotify / Netflix | multi-timescale sequence representations, contextual ranking and controlled experimentation | engagement-only optimization or an unmeasured large model in the serving path |
 
-Kajon's market-level distinction is therefore not “AI recommends media”. It is the reconstructable tuple:
+Kajo's market-level distinction is therefore not “AI recommends media”. It is the reconstructable tuple:
 
 ```text
 Profile × current Context × alternatives × exposure × behavior × delayed Outcome × time
@@ -541,6 +563,8 @@ MemGPT and later episodic-memory research separate bounded working context from 
 
 Spotify's contextual-bandit work demonstrates context-dependent content mix and separates personalization from experimentation. Kajo follows that separation. A bandit may later choose policy/slate parameters, but A/B infrastructure evaluates the complete personalization system.
 
+These earlier research directions are preserved, not newly admitted components. The bounded external-preference experiment can begin before native sequential/world-model data is sufficient; its claims remain limited to its actual task and evidence.
+
 ## 13. SleepLayer and EvolutionEngine
 
 ### 13.1 Exact meaning of the SleepLayer
@@ -568,6 +592,8 @@ Decision:
   globally, for a cohort, or for this Profile?”
 ```
 
+The percentages above are illustrative, not measured Kajo results.
+
 ### 13.2 Two valid shadow mechanisms
 
 #### Prospective ShadowPrediction — preferred evidence
@@ -581,11 +607,13 @@ At production Prediction time:
 5. wait until the outcome window matures,
 6. score Champion and Challengers against the same observable Outcomes.
 
-Prospective shadowing is the cleanest mechanism because no future data can enter the Challenger's input.
+Prospective shadowing prevents later observations from entering the frozen input, provided model/preprocessing/artifact versions also obey the evaluation cutoff.
 
 #### Historical as-of replay — useful but stricter
 
 A scheduled job can replay old PredictionRuns only when it reconstructs every feature with an `asOf <= prediction.requestedAt` boundary. Current-state tables cannot be read during replay because they may contain future information. Unknown historical availability, missing candidate pools or unversioned feature logic make an episode ineligible rather than guessed.
+
+Occurrence time alone is insufficient when a record became available later. Preserve recorded/available timestamps, artifact training cutoffs and correction history. Distinguish actual deployed-model replay from a retrospectively simulated challenger experiment.
 
 ### 13.3 The counterfactual limit
 
@@ -594,11 +622,11 @@ A ShadowPrediction does not reveal how the user would have reacted to an Item th
 Early valid comparisons are:
 
 - pairwise/order quality among candidates that were meaningfully exposed,
-- predicted probability/calibration for exposed candidates,
+- predicted probability/calibration for exposed candidates where supported labels exist,
 - agreement with the selected/consumed/rated Item when it existed in both comparable slates,
 - coverage: how much of the evaluation set could be judged without invention.
 
-Later unbiased comparison requires controlled randomized exploration and logged `selectionProbability`/propensity. Then IPS, SNIPS or doubly robust estimators can correct policy/exposure bias. Online A/B evidence remains the promotion authority.
+Later bias-corrected comparison requires controlled exploration, truthful logging probabilities appropriate to the actual action/slate and support/overlap assumptions. IPS, SNIPS or doubly robust estimators are not automatically valid merely because a field named propensity exists. Online A/B evidence remains the promotion authority.
 
 ### 13.4 PredictorGenome
 
@@ -622,7 +650,7 @@ random seed
 validity constraints
 ```
 
-Weights are normalized and constrained. A genome cannot disable authorization, eligibility, privacy, trace writing or hard suppression rules. Neural model weights are referenced as immutable artifacts rather than copied into relational rows.
+Weights are normalized and constrained. A genome cannot disable authorization, eligibility, privacy, trace writing or hard suppression rules. Neural model weights are referenced as immutable artifacts rather than copied into relational rows. External training, encoder/index compatibility, permission and split lineage extend this manifest when such artifacts exist; they are not inferred from a model name.
 
 ### 13.5 How Challengers are created
 
@@ -635,7 +663,7 @@ The SleepLayer maintains diversity without brute-forcing an unlimited parameter 
 5. **new family:** explicit challengers such as gradient ranker, sequential Transformer or LLM-backed ranker,
 6. **pruning:** remove dominated, duplicate, unstable or too-expensive genomes.
 
-Initial MVP/post-MVP SleepLayer should mutate only transparent scalar weights/decays over a fixed candidate pool. Learned models enter only after the evidence/evaluation framework is trustworthy.
+Initial MVP/post-MVP serving-oriented SleepLayer should mutate only transparent scalar weights/decays over a fixed candidate pool. Learned serving models enter after the evidence/evaluation framework is trustworthy. Isolated external-preference research under ADR-0008 may begin in Phase 14.3A; it is not an automatic serving-model switch.
 
 ### 13.6 Global, cohort and Profile-specific evolution
 
@@ -682,7 +710,7 @@ Suggested windows to validate with real data:
 - mature book outcome: 30–60 days,
 - long-term trust/return: rolling 30–90 days.
 
-The same episode can be provisional first and mature later. Promotion never mixes incomplete Challenger windows with mature Champion windows.
+The same episode can be provisional first and mature later. Promotion never mixes incomplete Challenger windows with mature Champion windows. Censored/unobservable outcomes remain separate from observed negatives.
 
 ### 13.8 What “70% accuracy” means
 
@@ -708,7 +736,7 @@ Initial research thresholds, to be calibrated rather than treated as universal t
 | Cohort | 500 Outcomes across 100 Profiles | ≥3% | ≥95% | shadow + scoped A/B |
 | Profile | 30 mature Outcomes over ≥14 days | ≥5% | ≥90% with global shrinkage | reversible personal canary |
 
-These are starting safety gates. For rare but high-value outcomes, sequential Bayesian evidence and effect size are more useful than blindly waiting for one fixed count.
+These are starting research safety hypotheses, not measured power guarantees or automatically sufficient evidence. For rare but high-value outcomes, an explicit statistical design, effect size and uncertainty matter more than blindly waiting for one fixed count.
 
 ### 13.10 Promotion state machine
 
@@ -726,7 +754,7 @@ Any active state -> REJECTED
 CANARY / EXPERIMENT / CHAMPION -> ROLLED_BACK
 ```
 
-Promotion records the approving mechanism/person, evidence window, metrics, guardrails, effective scope/time and rollback assignment. Assignment changes are append-only/versioned; the current assignment is a projection.
+Promotion records the approving mechanism/person, evidence window, metrics, guardrails, effective scope/time and rollback assignment. Assignment changes are append-only/versioned; the current assignment is a projection. External-artifact rights admission and model-quality promotion are both required when applicable; neither substitutes for the other.
 
 ### 13.11 Multi-objective comparison
 
@@ -751,7 +779,7 @@ Hard guardrails:
 
 ### 13.12 Memory consolidation during sleep
 
-The owner's dream/subconscious/DNA metaphor is retained as the future direction in [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#14-fut-alg-002--evidence-gated-evolutionengine-expansion--planned--conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
+The owner's dream/subconscious/DNA metaphor and complete later generations are retained in [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md) and [FUTURE_PLAN.md](../product/FUTURE_PLAN.md#14-fut-alg-002--evidence-gated-evolutionengine-expansion--planned--conditional). A winning dream changes a validated PredictorGenome/PolicyAssignment; imagined Outcomes never become real Events or historical Scenarios. Consolidation updates derived memory only with traceable real evidence. Compact genome/artifact references may reduce storage, but they do not replace the retained exposure/candidate evidence needed for valid evaluation. On-device scoring remains a research proposal requiring a later ADR, not an extension silently enabled by this metaphor.
 
 The SleepLayer also consolidates memory without rewriting evidence:
 
@@ -763,7 +791,7 @@ The SleepLayer also consolidates memory without rewriting evidence:
 - detects drift and schedules re-evaluation,
 - rebuilds projections after feature/reward changes.
 
-Original Events, PredictionRuns, ShadowPredictions and Outcomes remain immutable. Consolidated memories are versioned derivatives.
+Original Events, PredictionRuns, ShadowPredictions and Outcomes remain distinct historical evidence under their retention/deletion lifecycle. Consolidated memories are versioned derivatives. Error-driven synthetic experiments retain representative real controls and may not validate themselves.
 
 ### 13.13 SleepLayer data model
 
@@ -778,7 +806,7 @@ PromotionDecision
 ModelArtifact
 ```
 
-The MVP foundation now implements all listed relational artifacts except `ModelArtifact`. Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty.
+The MVP foundation implements the listed relational artifacts except `ModelArtifact`. Required keys include source `predictionId`, `genomeId`, exact as-of timestamp, scope, code/feature/reward versions, eligibility reason, metric numerator/denominator, coverage and uncertainty. ModelArtifact is a planned contract until implementation/acceptance is recorded.
 
 ### 13.14 Evolution cycle
 
@@ -796,15 +824,16 @@ The MVP foundation now implements all listed relational artifacts except `ModelA
 
 ### 13.15 Avoiding feedback-loop collapse
 
-- preserve randomized exploration traffic,
-- log actual exposure and selection probability,
+- preserve appropriately controlled exploration traffic,
+- log actual exposure and selection probability when stochastic,
 - evaluate on time splits and holdout cohorts,
-- correct popularity/position bias,
+- address popularity/position bias with supported methods,
 - cap per-Item/provider repetition,
 - distinguish unavailable from rejected,
 - reject hindsight-contaminated replay episodes,
 - do not train on model-generated explanations as user truth,
 - limit simultaneous genome comparisons/multiple-testing risk,
+- keep a final test outside repeated evolutionary selection,
 - monitor representation, outcome and assignment drift.
 
 ## 14. Evaluation framework
@@ -820,7 +849,7 @@ The MVP foundation now implements all listed relational artifacts except `ModelA
 - latency/cost/storage estimates,
 - ablations for each memory layer.
 
-Random train/test splits are forbidden for sequential behavior. Use chronological splits and prevent future state/outcome leakage.
+Random train/test splits are forbidden for sequential behavior. Use chronological splits and prevent future state/outcome leakage throughout preprocessing, embeddings, prototypes and indexes. External evaluation additionally freezes global time boundaries and held-out subject prefixes; a per-user last-N split alone does not prevent cross-user future leakage. Declare candidate/relevance rules and distinguish unlabeled from known-negative examples.
 
 ### Online
 
@@ -839,7 +868,8 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - improvement over base scorer by evidence-count bucket,
 - harmful nearest-neighbor rate,
 - exact replay test from stored traces,
-- no-evidence equivalence to base behavior.
+- no-evidence equivalence to base behavior,
+- query-prefix leakage, authorization-before-retrieval and artifact-version compatibility tests.
 
 ### Resurfacing-specific
 
@@ -847,7 +877,7 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - reminder cooldown/frequency-cap suppression counts,
 - repeated-reacted Item rate in normal discovery,
 - share of slates containing a saved reminder,
-- later consumption/rating after a reminder versus comparable saved Items without a reminder,
+- later consumption/rating after a reminder versus comparable saved Items without a reminder, with causal claims only under an appropriate design,
 - Profile-isolation and trace-completeness checks.
 
 ### Shared common-fit-specific
@@ -864,19 +894,20 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 
 Required monitoring:
 
-- PredictionRun without candidates,
+- unexpected missing candidate trace, distinguished from a valid identified empty run,
 - hosted impression with unknown prediction/candidate,
 - action/outcome with mismatched Profile/actor/Item,
 - impossible timestamps or negative dwell,
 - duplicate Events after retry,
-- outcome latency distribution,
+- outcome latency/maturity and unobservable coverage,
 - fraction of fallback predictions,
 - scenario support and influence distribution,
 - resurfacing classification/reason distribution,
 - Shared common-fit coverage/contribution/disagreement distribution,
-- model/policy version traffic,
+- model/policy/artifact version traffic,
 - feature/state drift,
-- trace storage growth.
+- trace storage growth,
+- external artifact absence/rights/coverage/compatibility failures when integrated.
 
 Every material score/policy component remains available in internal explanation JSON during MVP development. User-facing explanations later use a safe, concise subset and never expose other members' private evidence.
 
@@ -892,13 +923,14 @@ Kajo uses privacy by design:
 - user access/export/delete paths planned before external release,
 - derived memories and prediction traces participate in account/Profile deletion,
 - retention is purpose-specific, documented and reviewable,
-- population datasets need deletion lineage and minimum cohort thresholds.
+- population datasets need deletion lineage and minimum cohort thresholds,
+- external data/model/index dependencies retain rights and withdrawal/retraining lineage.
 
-Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#17-retentiondeletion). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission.
+Data location, retention decisions, deletion propagation and recovery gates are canonical in [ARCHITECTURE.md](../architecture/ARCHITECTURE.md#17-retentiondeletion). The earlier 13-month trace proposal is not an implemented retention guarantee. No raw evidence may be retained indefinitely by omission. Decay, storage deletion and removal of learned source influence are different operations.
 
 ## 17. MVP V1 implementation
 
-`public.rank_items_v1` is the accepted nervous-system serving boundary:
+At the inspected accepted-main baseline, `public.rank_items_v1` is the nervous-system serving boundary:
 
 ```text
 private prediction-v0.4-bootstrap baseline candidate generator
@@ -910,7 +942,7 @@ private prediction-v0.4-bootstrap baseline candidate generator
   -> immutable PredictionRun + complete PredictionCandidate trace
 ```
 
-The baseline genome preserves its scalar policy controls; the current base includes the forward bootstrap correction from #207/PR #210. Earlier V0.3 descriptions are historical checkpoints. This version update does not establish serving/shadow equivalence. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only.
+The baseline genome preserves its scalar policy controls; the current base includes the forward bootstrap correction from #207/PR #210. Earlier V0.3 descriptions are historical checkpoints. This version update does not establish serving/shadow equivalence. Challenger scalar weights and Scenario weight resolve from the versioned `PolicyAssignment`/`PredictorGenome`. Authenticated clients cannot execute V0, the private scalar scorer, SleepLayer worker/evaluator, common-fit private helpers or canary/rollback operations; mobile traffic enters through `public.rank_items_v1` only. Active #229 source/read-boundary evolution is separately tracked in STATUS and must not be silently described as merged/deployed.
 
 The mobile request carries its Event `sessionId` and bounded time/surface Context. Item detail records meaningful, capped `ITEM_DWELL` evidence. Dwell is not included in V1 reward. Personal policy version is `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`.
 
@@ -924,15 +956,16 @@ Known V1 limits:
 - no stochastic propensity because V1 policy is deterministic,
 - common-fit v1.1 coefficients are conservative hypotheses and require configured-device plus real Shared outcome calibration,
 - Context includes time/surface but not explicit mood/available-time input,
-- saved-reminder thresholds are first versioned heuristics and require real outcome calibration.
+- saved-reminder thresholds are first versioned heuristics and require real outcome calibration,
+- the new portable contracts/external-data plan is not an implemented engine package or trained prior.
 
 ## 18. Required MVP algorithm completion contract
 
-Status: **required target; partial implementation, acceptance open as of 2026-09-09**. Historical V1 delivery does not prove these newer acceptance gates. `MVP-ALG-001..009` and `MVP-DATA-003..004` are mandatory; sequencing is maintained only in [ROADMAP.md](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy).
+Status: **required target; partial implementation**. Historical V1 delivery does not prove newer acceptance gates. `MVP-ALG-001..009`, `MVP-DATA-003..004` and bounded `MVP-ENG-001..003` govern their respective scope. Technical bootstrap acceptance and all remaining gates are recorded in STATUS; sequencing is maintained only in [ROADMAP](../project/ROADMAP.md#phase-14--make-the-algorithm-trustworthy-and-the-engine-portable).
 
 ### One feature and policy definition
 
-Serving, memory snapshots and SleepLayer must agree on source-tagged evidence and as-of time. Refactor through forward migrations, preserving one `public.rank_items_v1` boundary. Imported/calibration LongTerm evidence must contribute directly to unseen Personal ranking, even when no native Events or Scenarios exist. Removing a source rebuilds its derived contribution.
+Serving, memory snapshots and SleepLayer must agree on source-tagged evidence and as-of time. Refactor through forward migrations, preserving the accepted public V1 serving boundary. Imported/calibration LongTerm evidence must contribute directly to unseen Personal ranking, even when no native Events or Scenarios exist. Removing a source rebuilds its derived contribution.
 
 Reuse canonical feature calculation and pure scoring/policy helpers rather than independently reproducing formulas in baseline, snapshots, Shared fit and shadow. Eligibility and Shared collaboration delivery remain explicit policy, distinct from taste score, but both must be faithfully replayable. Freeze feature/schema/policy versions and candidate features at prediction time; current mutable catalog tags cannot silently replace historical features.
 
@@ -966,11 +999,11 @@ Outcome reconciliation handles delayed ratings, unsave/removal and undo without 
 
 Shadow compares alternatives only where observed exposure supports evaluation; it cannot establish how users would have reacted to unseen Items. No global/automatic promotion in MVP. Manual canary needs mature supported evidence, explicit authorization and a rehearsed rollback. Insufficient data keeps the baseline active while evaluation operates.
 
-Learned embeddings/pgvector, sequential/LLM challengers, population learning and full autonomous evolution retain their existing later gates. None is a prerequisite for fixing the current evidence and scoring defects.
+ADR-0008 advances E1 portable contracts and D1/D2 isolated preference research, not production population retrieval or a neural-model requirement. Learned serving embeddings/pgvector, sequential/LLM models, native population learning and autonomous evolution retain later gates. None is a prerequisite for fixing current evidence/scoring defects. Optional D3/D4 enrichment studies do not become hidden first-release blockers.
 
 ## 19. Research basis
 
-Primary references reviewed for this design:
+Primary references preserved from the earlier design; newly verified dataset specifications and source limits are maintained in DATA_ENRICHMENT rather than inferred from these general research directions:
 
 - Spotify Research, *Generalized user representations for large-scale recommendations* (2025): multi-signal representations over approximately week/month/six-month scales, near-real-time refresh and synchronized embedding versions. <https://research.atspotify.com/2025/9/generalized-user-representations-for-large-scale-recommendations>
 - Spotify Research, *Calibrated Recommendations with Contextual Bandits* (2025): context-dependent content mix, exploration and multi-objective extension. <https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage>
@@ -992,3 +1025,28 @@ Primary references reviewed for this design:
 - EDPB, data protection by design/default: minimization and continuous privacy controls from system design onward. <https://www.edpb.europa.eu/topics/ai-and-technology/privacy-by-design-and-by-default_en>
 
 References inform direction; Kajo's decisions remain governed by its own evidence, licensing, privacy and product constraints.
+
+## 20. Kajo adapter and external-data boundary — ADR-0008
+
+The generic engine contracts and all 51 conceptual parts are defined once in [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). This document supplies Kajo semantics:
+
+| Generic role | Kajo mapping / owner |
+|---|---|
+| Subject | `Profile`; SharedProfile is its own learned subject |
+| Acting identity | authorized `User`, separately retained as `actorUserId` |
+| Object | canonical `Item`, not provider-specific records |
+| Action | authorized recommendation/slate; policy and hard constraints remain explicit |
+| Observation | source-typed evidence from the native event/command/exposure boundary |
+| Outcome / reward | versioned Kajo meanings, maturity/observability and existing V1 reward projection |
+| State | supported Working/Short/Long/Scenario inputs and later explicit Belief/World/Group composition |
+| DomainAdapter | mapping/feature normalization, target definitions and trusted constraints outside core computation |
+
+E1 creates executable contracts and media/non-media fixtures without moving credentials, provider schemas, React Native or Kajo BOOK/MOVIE enums into the core. Current SQL remains the serving baseline. A component is extracted/replaced only with parity, absence/failure fallback, scope and rollback tests; no second independently drifting full ranker is introduced.
+
+D1/D2 operate in isolated research storage. Keep source-local people and ratings distinct from Kajo accounts/Events, preserve original scales/timestamp semantics and never fabricate missing exposures, alternatives, mood, consumption time or group state. D3 Tag Genome and D4 Beliefs remain optional after the baseline. Detailed manifests/schema rules/metrics live in DATA_ENRICHMENT, not a duplicate specification here.
+
+A future admitted ExternalTastePrior uses canonical Item mapping and compatible immutable artifacts. It is separately source-weighted/ablated, shrinks with relevant native support and transfers across domains only with evidence. Data/rights withdrawal propagates through jointly trained or distilled dependencies; raw-file removal alone is not proof of influence removal.
+
+Memory retrieval enforces authorization and time/source eligibility before nearest-neighbor selection and again at use. Encode only the decision-time prefix for a query; do not retrieve by its own hidden future Outcome/After/Error. Index/encoder versions must match. The output may be an uncalibrated score; probability heads enter only with explicit target/horizon/conditioning, real labels and calibration.
+
+Documentation acceptance does not deploy any of these new components. [STATUS](../project/STATUS.md) retains #229's unmerged source and undeployed forwards, and [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.

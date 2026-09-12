@@ -1,50 +1,43 @@
 # Kajo Documentation Map
 
-This directory is Kajo's permanent project memory. Chat conversations are temporary; important product/architecture/project decisions must live here.
+Git is the project's durable memory. This map names the owner of each kind of truth; do not duplicate entire specifications across documents.
 
-## If you need to...
+## Start here
 
-| Need | Read |
+Read `AGENTS.md`, this map, [STATUS](project/STATUS.md), [MVP](product/MVP.md), the active sprint/handoff named by STATUS, then [ROADMAP](project/ROADMAP.md). Inspect main and the explicitly named active PR before continuing code. An unmerged PR is not accepted main.
+
+For engine or external-data work, also read the **Predictive Memory Engine**, **Data enrichment**, **Kajo Prediction model** and **ADR-0008** entries below. The portable engine is independent; Kajo is its first adapter. The 51-part design is a target architecture, not a list of already implemented modules.
+
+## Canonical owners
+
+| Question | Document |
 |---|---|
-| Understand what Kajo ultimately is | `product/PRODUCT.md` |
-| Know exactly what the first public release contains | `product/MVP.md` |
-| Understand the Taste Test / link / Friend / Shared acquisition loop | `product/LAUNCH_LOOP.md` |
-| Understand visual/interaction principles | `product/UX_PRINCIPLES.md` |
-| Know where the project is right now | `project/STATUS.md` |
-| Know the exact build order and Share Link Gate | `project/ROADMAP.md` |
-| Know what is being built now | Current sprint/Issue linked from `project/STATUS.md` |
-| Find the complete product target and preserved distant ideas | `product/FUTURE_PLAN.md` |
-| Understand sprint/milestone rules | `project/WORKFLOW.md` |
-| Continue in a new AI conversation | `project/HANDOFF_PROTOCOL.md` |
-| See the latest history/release-truth audit and recovered ideas | [2026-09-09 retrospective](project/retros/2026-09-09.md) |
-| Use the correct terms | `domain/GLOSSARY.md` |
-| Understand User/Profile/Item/Event/Friend relationships | `domain/DOMAIN_MODEL.md` |
-| Understand behavioral/growth event semantics | `domain/DATA_EVENTS.md` |
-| Understand prediction, memory, evaluation and evolution | `domain/PREDICTION_MODEL.md` |
-| Understand technical boundaries, scaling, services and recovery | `architecture/ARCHITECTURE.md` |
-| Find important code | `architecture/CODEMAP.md` |
-| Understand durable architecture choices | `architecture/decisions/` |
+| What is Kajo? | [PRODUCT](product/PRODUCT.md) |
+| What blocks first release? | [MVP](product/MVP.md) |
+| How does the Taste → auth → Friend → Shared launch loop work? | [LAUNCH_LOOP](product/LAUNCH_LOOP.md) |
+| What UX principles constrain it? | [UX_PRINCIPLES](product/UX_PRINCIPLES.md) |
+| What exactly is the current state and next bounded task? | [STATUS](project/STATUS.md) |
+| In what dependency order do we build? | [ROADMAP](project/ROADMAP.md) |
+| Which sprint is active? | [STATUS](project/STATUS.md), then its named sprint |
+| Which longer-term ideas remain preserved? | [FUTURE_PLAN](product/FUTURE_PLAN.md) |
+| How do branches, tests and review work? | [WORKFLOW](project/WORKFLOW.md) |
+| How do agents leave a resumable checkpoint? | [HANDOFF_PROTOCOL](project/HANDOFF_PROTOCOL.md) |
+| What did the repository retrospective establish? | [2026-09-09 retrospective](project/retros/2026-09-09.md) |
+| What do canonical terms mean? | [GLOSSARY](domain/GLOSSARY.md) |
+| What are Kajo's entity relationships and privacy boundaries? | [DOMAIN_MODEL](domain/DOMAIN_MODEL.md) |
+| What counts as native event/exposure/outcome evidence? | [DATA_EVENTS](domain/DATA_EVENTS.md) |
+| What is the complete reusable engine architecture? | [PREDICTIVE_MEMORY_ENGINE](architecture/PREDICTIVE_MEMORY_ENGINE.md) |
+| How does Kajo bind that engine to Profile/Item, serving and evaluation? | [PREDICTION_MODEL](domain/PREDICTION_MODEL.md) |
+| How are public taste data, enrichment and learned artifacts handled? | [DATA_ENRICHMENT](architecture/DATA_ENRICHMENT.md) |
+| What are product/runtime/service boundaries? | [ARCHITECTURE](architecture/ARCHITECTURE.md) |
+| Where does implemented code actually live? | [CODEMAP](architecture/CODEMAP.md) |
+| Why were durable decisions made? | [ADRs](architecture/decisions/README.md) |
+| Why is portability/public-data research now part of Phase 14? | [ADR-0008](architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) |
 
-## Mandatory continuation order
+## Documentation boundaries
 
-When the owner says **"jatketaan reposta"** / **"Continue Kajo from the repository"**:
+Slow-changing truth belongs to product/domain/architecture documents. Execution order belongs to ROADMAP; fast-changing source, CI, deployment and device acceptance belong to STATUS and the active sprint/PR. Historical sprints and retrospectives retain dated evidence rather than acting as the current to-do list.
 
-1. Read `AGENTS.md`.
-2. Read this map.
-3. Read `project/STATUS.md`.
-4. Read `product/MVP.md`.
-5. Read the active sprint/Issue handoff named by STATUS.
-6. Read `project/ROADMAP.md` for dependency order.
-7. If work touches onboarding/acquisition/friends, read `product/LAUNCH_LOOP.md` and ADR-0007.
-8. Read relevant domain/architecture files before code.
+The 2026-09-12 refinement advances **portable contracts and isolated external-preference research**. It does not turn external ratings into native Kajo Scenarios, approve model deployment or waive the later gates for Kajo PopulationMemory, multistep dreaming or autonomous evolution. Read older broad deferral language together with ADR-0008.
 
-The agent must continue the explicit next work package; it must not jump to distant FUTURE_PLAN ideas while release blockers remain.
-
-## Documentation ownership model
-
-- **Slow:** `PRODUCT.md`, UX principles, durable ADRs.
-- **Medium:** `MVP.md`, domain/prediction models, `LAUNCH_LOOP.md`, roadmap.
-- **Fast:** `STATUS.md`, active sprint documents, code map during implementation.
-- **Historical:** completed sprint/milestone files; preserve accepted history.
-
-Avoid duplicating full specifications. Link to the canonical owner document. `STATUS.md` is current-state authority; `ROADMAP.md` owns execution order; `MVP.md` owns the release boundary; `LAUNCH_LOOP.md` owns Taste-first acquisition semantics; `FUTURE_PLAN.md` preserves later ambitions.
+Planned paths in diagrams are not implemented folders. Create code packages only with a real work packet and tests. Documentation acceptance, code CI, dataset ingestion/training, hosted rollout and device acceptance are separate facts.
