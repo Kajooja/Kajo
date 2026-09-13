@@ -10,64 +10,67 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 catalog import diagnostics
+## Current packet — #182 BOOK description enrichment plan
 
-Continue `fix/182-catalog-import-diagnostics` from accepted main
-`f462aaa20e3a65899452be847ee9ff3af22f167d` / PR #251.
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns the subsequent
-PR/CI/merge and hosted readback. The new source supplies the bounded
-`catalog-import-diagnostics-v1` failure contract and shared CLI validation.
-The top-level error code and HTTP 502 remain compatible; stages separate
-Discover/Find/detail/fallback/normalization from canonical upsert failures.
+The diagnostic packet is accepted through [PR #252](https://github.com/Kajooja/Kajo/pull/252),
+main `f8ed71db6186ee9f810d985462119cf7085e1f08`. Catalog-import is ACTIVE **v12**;
+exact five-file readback and unchanged 425-movie coverage are recorded in
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182). Do not recreate its branch,
+repeat its CI/deploy, or reproduce the older science-fiction failure.
 
-Completed pages and confirmed import/skip counts describe acknowledged work
-within the failed request. A failed database acknowledgement has
-`writeOutcome=unknown`, even if it timed out after the database committed.
-CLI starting/completed/failed checkpoints stop immediately; no automatic retry
-or next batch occurs. Raw upstream messages, bodies, headers, IDs and credentials
-are excluded from diagnostics. Source preparation now packages five local files,
-including the shared diagnostic module, without external runtime dependencies.
-Local root validation passed **396 tests**, lint/typecheck and both Hermes
-exports. The final five-file packet separately passed **26 catalog HTTP cases**
-with a fresh cache and no npm/remote imports. The sprint records payload hashes
-and the unchanged-lock registry-cache workaround. Hosted rollout remains separate.
+Branch `docs/182-book-description-plan` defines
+[the guarded description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182)
+and [fixed ten-Item pilot](sprints/SPRINT-014.md#book-description-plan--2026-09-13--182).
+Issue #182 owns this packet's subsequent PR/CI/merge outcome. The implementation
+and pilot execution remain pending; planning acceptance is not description coverage.
 
-**Next bounded action:** finish the required source/PR/CI gate, prepare and review
-the exact catalog-only payload, then record any approved rollout in #182.
-Validate error behavior with deterministic fixtures, including a second-page
-failure after a first-page commit. Do not consume another provider import to test
-diagnostics. The observed science-fiction error's cause remains unresolved.
+**Next bounded source work after this planning gate:** implement the strict
+BOOK description normalizer/no-write preview and the guarded opt-in overload of
+the existing catalog batch boundary. Preserve existing presentation fields and
+managed descriptions across legacy BOOK refreshes; reject stale identities/versions
+and old-server mode mismatch. Validate atomicity, no-op, concurrency and unknown
+write receipts before a reviewed catalog-only rollout and pilot. Do not send a
+description-only record to the current full-replacement upsert.
 
-### Accepted hosted catalog checkpoint — 2026-09-13
+### Verified BOOK checkpoint — 2026-09-13
 
-The owner completed exact curated enrichment and the bounded discovery pass on
-ACTIVE catalog-import v10. At **20:51:19 UTC**, coverage is **425 discoverable
-MOVIE Items**, all with complete TMDB core metadata, posters and descriptions.
-All eight declared expansion coverage checks pass. Original languages are
-**en 259 / fi 60** (75.1% together); Finnish production is 60, non-English 166,
-seven languages have ten movies, era counts are 66/55/74/79/151, and documentary
-coverage is 22. The final identity check at **20:54:38 UTC** preserves all 30
-curated UUIDs/IMDb aliases and original creation times.
+Read-only audit at **22:03:54 UTC** and the committed
+`scripts/catalog/book-description-coverage.sql` at **22:16:34 UTC** confirm
+**415 discoverable / 427 stored BOOK Items**, 385 covers and zero descriptions.
+All 385 provider Items have exactly one matching Work alias/mirror and a selected
+Edition. Their saved Search payloads contain no descriptions; the adapter
+explicitly sets null. The 30 curated books have only Kajo aliases and require a
+separate exact identity review. Selected Edition languages include eng 336 and
+fin 39; these are not description/original languages, and all 385 provider
+original-language values remain unknown.
 
-The pass used **18 request attempts / 28 verified page fetches**, plus two
-reserved failed-science-fiction page slots, within 30 pages / 600 raw candidates.
-One Korean page was repeated; Spanish was deferred and science-fiction's failed
-request had no observed writes. Its exact upstream page progress is unknown.
-No requests remain in this pass. The detailed ledger/identities remain in #182;
-[the sprint checkpoint](sprints/SPRINT-014.md#catalog-expansion-verified-and-failure-diagnostics--2026-09-13--182)
-records the source and operational limits.
+The frozen pilot contains five fin and five eng selected Editions, at most twenty
+sequential provider GET attempts and two reviewed atomic batches of five. All ten
+canonical identities pass the SQL check. No candidate provider calls or writes
+were made during planning. The query retains fixed identities for before/after
+comparison and fingerprints unchanged book fields, movies, aliases and sources.
+Rights/fitness/language review precedes display writes. Subsequent broad
+enrichment uses pinned Work/Edition dumps rather than hundreds of API requests.
 
-The owner wants English-language and Finnish films to dominate the offering;
-other languages complement them. Keep language and Finnish-production measures
-separate, and preserve Personal/Shared personalization. BOOK remains 415
-discoverable / 385 images / zero descriptions. Keep #182 / `MVP-CAT-001..003`
-open for refresh, BOOK metadata, rights/attribution and native quality. Passing
-coverage is not native catalog/Taste or release acceptance.
+### Completed MOVIE pass and preserved gates
 
-Do not repeat the canary, keys/setup/preflight, completed enrichment/expansion or
-the six installed immutable forwards. Preserve #229's independent
-native/device/fresh-account gates and accepted E1/D1/D2 with rejected challenger
-admission. Optional research, APK and later pre-MVP UI work stay separately ordered.
+MOVIE remains **425 discoverable / 437 stored**, all with complete TMDB core
+metadata, images and descriptions; all eight expansion targets and all 30
+original curated identities passed. English **259** and Finnish **60** are the
+main offering, **75.1%** together; other languages complement them. Keep original
+language `fi` separate from Finnish production `FI`, and preserve personalization.
+
+The finished pass used 18 request attempts / 28 verified page fetches plus two
+reserved failed-science-fiction slots, consuming its 30-page cap. The Korean
+repeat, deferred Spanish and unresolved science-fiction cause remain in #182.
+Do not perform more MOVIE imports under that plan or repeat configured-key setup.
+
+#182 / MVP-CAT-001..003 / Phase14.3 remain open for BOOK metadata, repeatable
+refresh, rights/attribution, normalized feature quality and native usefulness.
+Preserve #229's native/device/fresh-account gates, the six installed immutable
+forwards, and accepted E1/D1/D2 with rejected challenger admission. No migration,
+deployment, new provider run, APK dispatch or unrelated UI work is part of this
+planning packet.
 
 ## Accepted D2 development comparison
 

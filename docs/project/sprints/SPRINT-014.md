@@ -14,6 +14,174 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## BOOK description plan — 2026-09-13 / #182
+
+Planning branch: `docs/182-book-description-plan`, based on accepted
+`f8ed71db6186ee9f810d985462119cf7085e1f08` / PR #252. The completed diagnostic
+rollout is catalog-import ACTIVE v12, with exact five-file readback and unchanged
+425-movie coverage recorded in [#182](https://github.com/Kajooja/Kajo/issues/182).
+Do not repeat its CI/deploy/import sequence. This packet adds a reviewed BOOK
+contract and read-only coverage query; it does not implement/apply that contract.
+
+### Observed data and source gaps
+
+Hosted read-only audit at **2026-09-13T22:03:54.804507+00:00**, followed by the committed
+final query at **2026-09-13T22:16:34.12922+00:00**, found:
+
+- **415 discoverable / 427 stored BOOK Items**, 385 covers and zero descriptions.
+- All 385 Open Library Items have one matching Work alias, a matching metadata
+  mirror/source key and a selected Edition key. No saved Search payload contains
+  `description` or `notes`; the Search normalizer explicitly returns null.
+- Display-Edition languages are eng 336, fin 39, swe 3, spa 2, and fre/ita/por/tur/yid
+  one each. These are not original-language or description-language counts.
+  All 385 provider Items have unknown original language. The historical 57 Finnish
+  edition-availability count is a different measure from 39 selected Finnish editions.
+- All 30 original curated BOOK Items have only `kajo_curated_slug` aliases.
+  They retain their original UUIDs and 2026-09-04 creation times. The query lists
+  them for a later exact identity review; exclude them from this pilot.
+- MOVIE remains 425 discoverable / 437 stored, all 425 with images/descriptions.
+  Discoverable mocks remain zero.
+
+The bulk importer currently consumes ratings and Editions, not Work descriptions;
+its normalizer can substitute `notes` and treats Edition language as original
+language. Neither behavior belongs in the new description contract. Its raw
+error-body echo and unverified successful-count fallback, also present in Search
+orchestration, must not be copied into new orchestration.
+
+The deployed single-item upsert confirms full replacement of description and
+metadata (definition MD5 `26418016af759bce2e580fdd7d3236a2`);
+the batch wrapper is `abd9f4d40e35096d1cc1a9fa2a39e497`. A description-only entry
+would clear unrelated fields. Implement the guarded overload described in
+[Catalog architecture](../../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182)
+before any write. Current RPCs and six installed native forwards were not changed.
+
+### Frozen first pilot — open-library-description-pilot-v1
+
+Select five fin and five eng display Editions from existing alias-verified Items,
+ordered by stored popularity descending then Work ID inside each group. This
+selection was frozen from the audit; later checkpoints retain the exact identities
+even after their descriptions change. It is a technical/quality pilot, not a
+representative catalogue sample or evidence about original language.
+
+| Order | Current title | Canonical Item UUID | Work ID | Selected Edition ID | Edition language |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Pieni elämä | `a7f6d2cd-e290-4bc4-97b7-cf1180ea86b9` | `OL17370186W` | `OL26433779M` | fin |
+| 2 | Ei enää ihminen | `43c6e886-0858-4f3e-b188-72cc62b6dfbc` | `OL3923952W` | `OL44944392M` | fin |
+| 3 | Rikos ja rangaistus | `25fa7fee-2a4d-4b8e-9c63-f9f6f367aff9` | `OL166894W` | `OL16835710M` | fin |
+| 4 | Romeo ja Julia | `6aa4020d-fdfa-4010-ad8d-2217c71f06f8` | `OL362427W` | `OL26501345M` | fin |
+| 5 | Ajan lyhyt historia | `9d8a5234-5565-4f42-aa77-30422e780419` | `OL1892617W` | `OL39218444M` | fin |
+| 6 | Atomic Habits | `ccbdb717-0a27-4099-8b56-64b3c5f9aaed` | `OL17930368W` | `OL27918581M` | eng |
+| 7 | It Ends With Us | `b54ebb75-2e4c-48e1-8349-5f73bf0d789b` | `OL18020194W` | `OL27213498M` | eng |
+| 8 | The Subtle Art of Not Giving a Fuck | `c3548ac2-ae85-4ee6-aeeb-8101fa909fb1` | `OL17590212W` | `OL27351482M` | eng |
+| 9 | Control Your Mind and Master Your Feelings | `4af3c2b6-7a8a-4107-b198-ac0ed0afa2c9` | `OL25312237W` | `OL33899062M` | eng |
+| 10 | Harry Potter and the Philosopher's Stone | `fad9046f-f67a-42f2-9fb8-57657035593e` | `OL82563W` | `OL59004869M` | eng |
+
+No substitutions, title search, new Items, new aliases or Edition enumeration.
+If a selected Edition now links to another/multiple Works, stop and review the
+identity conflict; do not repair it inside this pilot.
+
+| Pilot resource | Hard cap |
+| --- | ---: |
+| Existing canonical candidates | 10, exactly as above |
+| Provider GET attempts | 20 total: at most one selected Edition + one exact Work per candidate |
+| Concurrent provider requests | 1 |
+| Minimum spacing | 1,100 ms between request starts; respect Retry-After before any later explicit resume |
+| Per-response timeout / decoded JSON size | 15 seconds / 1 MiB |
+| Automatic retries / redirect follows / replacement candidates | 0 / 0 / 0 |
+| Reviewed database batches | At most 2, positions 1–5 then 6–10, each atomic |
+| Entries written / new Items / alias additions | At most 10 / 0 / 0 |
+
+These are proposed pilot limits, **not operations performed in this planning
+packet**. Documentation lookups and read-only SQL are separate from the future
+candidate GET ledger. Inspect the exact Edition first; fetch its Work only when
+the selected description cannot be used, within the same cap. Every started
+attempt consumes its slot even on failure. A resumed failure needs an explicit
+revised remaining-attempt ledger; never silently reset counters. A successful
+ten-candidate pass does not authorize another 375 single-book API sweep.
+
+Use the application's honest User-Agent/contact identification and the default
+one-request/second tier; do not assume a repository URL grants the provider's
+higher identified tier. Collect and cache provider records before review and
+before opening database transactions. Dry-run planning performs no I/O;
+preview performs only the bounded provider reads and reports no writes.
+
+### Review, apply and continuation
+
+1. Implement/test the strict text normalizer, no-write planner/preview and
+   guarded generic batch mode from the architecture contract. Keep current
+   Search/dump writes from clearing managed descriptions. Old deployments must
+   reject the top-level refresh mode. Accept source/CI and review the exact
+   catalog-only migration/rollout before using it; no new credential setup or
+   unrelated function/native rollout is part of this work.
+2. Run `scripts/catalog/book-description-coverage.sql` and existing
+   `catalog-coverage.sql`. Require all ten `identity_matches=true`; preserve the
+   complete per-Item/source preimage in controlled admin staging for guarded
+   rollback. Keep only IDs, hashes, counts and decisions in Git/#182.
+3. Prepare a frozen preview with source record URLs/revisions/hashes, candidate
+   text hashes, source/fallback, text-language review and actual attempted-call
+   ledger. Review fitness and contribution/use rights before any display write.
+   Unknown permission/language, notes, markup, absent or rejected text stays
+   staged/skipped with fixed reasons. A 404 is a sparse result; transport/rate
+   limit/JSON/identity errors stop. Do not fabricate Finnish copy or claim
+   Edition language proves the text's language.
+4. Apply only approved candidates from positions 1–5 through the guarded mode.
+   Require exact returned input-index/UUID mapping for every acknowledged row.
+   Compare the SQL report before proceeding to positions 6–10. A malformed/lost
+   acknowledgement is an unknown write: stop and reconcile actual hashes/versions.
+   Never automatically replay the batch or continue after uncertainty.
+5. After each batch, require unchanged stored/discoverable counts, all ten
+   identities, all `preservation` fingerprints, each pilot `core_md5` and
+   `source_base_md5`. The query allows only pilot description/provenance/envelope
+   plus automatic timestamps to change. Record added, unchanged, skipped and
+   uncertain counts separately. Use `catalog-coverage.sql` to recheck service
+   privileges. Hashes detect drift; they are not authorization tokens.
+6. The pilot's working usefulness target is **at least six reviewed, usable
+   Finnish/English descriptions out of ten**, with every candidate accounted for,
+   exact identity preservation and no data loss. Record actual Finnish/English
+   text counts and every fallback. Missing the target is a valid failed-coverage
+   result; no automatic extra requests. Native rendering/attribution acceptance
+   remains separate from normalized text/SQL success.
+7. After pilot review, plan the remaining exact Work/Edition join from one
+   pinned monthly dump release, streamed against the existing target IDs.
+   Description enrichment needs no rating-history input or new popularity ranking.
+   Pin source checksums/revisions and use the same guarded mode/checkpoints.
+   Default to filling missing text; changed owned text is an explicit reviewed
+   refresh. Missing upstream text never erases current text. No recurring
+   scheduler is enabled by this plan.
+8. Review the 30 curated identities separately using authoritative Work/Edition
+   linkage and creator/edition evidence. Their current title/author is a search
+   aid, not permission to attach an alias. No fuzzy duplicate creation.
+
+Rollback restores only the prior description/provenance/source envelope on the
+same Items, and only while current hashes/versions still equal this pilot's
+writes. Retain canonical sources/aliases and all user history. A concurrent edit
+or uncertain write requires reconciliation; do not restore entire old Item rows.
+
+### Required implementation verification and remaining gates
+
+Next source packet needs meaningful fixtures for typed/missing/markup/oversize
+descriptions, Edition-vs-text language, Work fallback, notes exclusion, preserved
+presentation/popularity fields, conflicting/redirected IDs, old-server rejection,
+stale/concurrent source/Item versions, identical rerun/no-op, legacy BOOK refresh
+preservation, atomic rollback, lost acknowledgement, call-budget exhaustion,
+404/429/5xx/timeouts, strict UUID receipts and secret/error-body redaction.
+
+Local `npm run check` passed **396 tests**, lint/typecheck and both Hermes exports.
+It used the existing loopback package-archive cache after verifying all eleven
+archives against the unchanged frozen Edge lock SHA-512 values; normal CI remains
+required. The existing unrelated mobile Hook lint warning remains. Changed
+Markdown file/anchor links and all ten SQL/Sprint identity mappings passed.
+The final read-only SQL executed successfully; all ten identities match, and
+inventory/provider/language/preservation values equal the first query's report.
+Only the source-base fingerprint was strengthened to cover all preserved source
+fields as well as its original payload; no stored value changed. Exact source
+CI/merge and the full SQL checkpoint belong to #182. No Work/Edition
+candidate API calls, provider imports, description writes, schema changes,
+deployment, native tests or APK dispatch occurred in this packet. Broader
+rights/attribution, BOOK completeness, bounded refresh and native usefulness keep
+#182 / MVP-CAT-001..003 / Phase 14.3 open. #229 and rejected D2 challenger admission
+are independent and unchanged.
+
 ## Catalog expansion verified and failure diagnostics — 2026-09-13 / #182
 
 The PR #251 source is accepted on main

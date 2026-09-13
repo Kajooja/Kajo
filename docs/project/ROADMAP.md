@@ -47,8 +47,10 @@ discoverable MOVIE Items with complete TMDB core metadata and all eight declared
 coverage checks passing. English (259) and Finnish (60) remain the main offering;
 other languages complement them. The pass is finished within its explicit cap,
 including a Korean repeat, deferred Spanish and a failed science-fiction attempt
-with unknown upstream progress. Continue the narrow failure-diagnostics packet,
-then the remaining catalog refresh, metadata/rights and native quality gates.
+with unknown upstream progress. Failure diagnostics are accepted through PR #252
+and deployed on catalog-import v12. Continue the reviewed BOOK description plan:
+guarded preservation/preview source, then a separately verified ten-Item pilot,
+before broader dump-based enrichment and remaining rights/native quality gates.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -145,12 +147,16 @@ discoverable MOVIE Items, all with complete TMDB core metadata/posters, and all
 30 original curated identities enriched. All declared language/era/genre and
 documentary coverage checks pass; English/Finnish are the principal offering.
 The 18-attempt pass is complete with its conservative 30-page accounting.
-The next source unit makes provider/database failures and partial completion
-actionable without automatic retries. STATUS/Issue #182 own exact source,
-CI/rollout and the full import ledger. Do not repeat accepted canary/setup or
-extend the completed import budget. Repeatable refresh, BOOK descriptions,
-provider rights/attribution, normalized feature quality and native acceptance
-still keep Phase 14.3 open.
+PR #252's additive failure/progress diagnostics are accepted and deployed on v12.
+The next BOOK unit follows the
+[description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182):
+implement preserving/guarded refresh and no-write preview first, then review
+actual text/rights and execute the fixed ten-Item pilot with before/after checks.
+Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
+review before enrichment. STATUS/Issue #182 own source/rollout and execution.
+Do not repeat accepted canary/setup or extend the completed MOVIE budget.
+Repeatable refresh, BOOK descriptions, provider rights/attribution, normalized
+feature quality and native acceptance still keep Phase 14.3 open.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
