@@ -279,6 +279,103 @@ Requirements before release:
 
 Research object-feature enrichment is a distinct input path. Admission requires validated canonical ID mapping, explicit score/encoder version, coverage, source rights and temporal availability. A public rating dataset does not grant image/metadata rights from every linked provider. Unmapped research objects remain unmapped rather than forcing fuzzy catalog merges.
 
+### BOOK description enrichment — planned contract, #182
+
+The reviewed contract is `open-library-description-v1`; its implementation and
+hosted acceptance remain pending. The [Sprint 014 pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182)
+owns the fixed ten candidates, call budget and operational checkpoints.
+
+Identity comes from the existing `open_library` source and matching
+`open_library_work` alias on the same Item. `metadata.openLibraryWorkId` is a
+checked mirror. The selected `displayEditionKey` is a lookup hint until an exact
+Edition response links back to that Work. Reject a different response key,
+redirect, multiple/different Work linkage or alias collision; never follow an
+identity redirect silently or match by display title. A curated Item without a
+provider alias requires a separately reviewed exact mapping before enrichment.
+
+Only the provider's `description` field is eligible. Accept a string or a
+`{type: '/type/text', value: string}` block; null/absent/blank means missing.
+Reject other types instead of stringifying them. Normalize Unicode to NFC,
+line endings, control characters and whitespace; retain paragraph boundaries.
+Bound incoming text to 32 KiB UTF-8 and normalized display text to 80–2,000
+Unicode code points. Oversize, short, markup-bearing or URL-only text is staged
+for review, not silently truncated/rendered. Never substitute bibliographic
+`notes`, excerpts, first sentences, reviews or generated/translated summaries.
+These bounds are Kajo's versioned selection policy, not provider guarantees.
+
+Fetch the exact selected Edition first. Prefer its usable description when the
+text is verified as Finnish or English; otherwise inspect the exact Work's
+description as fallback. Preserve the selected title/cover/Edition regardless
+of fallback. Edition language, available translation languages, description
+language and original language are separate facts. A Finnish Edition does not
+prove its description is Finnish. Initial text-language/fitness review is
+explicit; unknown language stays unknown and is excluded from this pilot's
+display writes. Do not infer or overwrite `original_language`.
+
+`metadata.descriptionProvenance` records contract version, provider, Work and
+chosen record keys, field path, source URL/revision/modified time when supplied,
+fetch time, raw-record SHA-256, normalized-text SHA-256, verified text language
+and review/fallback reason. A missing provider revision/time remains null.
+Keep the existing private source payload intact and append only a versioned
+`descriptionEnrichment` envelope containing both record references/hashes and
+review outcome. Public provenance excludes raw records, personal reviewer
+identifiers and credentials. Raw records/description text stay out of Git.
+
+The current full-replacement upsert is insufficient for a description patch.
+Implement an opt-in overload of the existing generic batch boundary,
+`upsert_catalog_batch_v1(entries jsonb, refresh_mode text)`, **without a default
+for the second argument**. A top-level mode makes the request fail on an older
+server; an extra JSON entry property alone would currently be silently ignored.
+The existing one-argument contract remains. Accept only the declared description
+mode, max ten entries, exact expected Item/source identities and expected current
+Item/source versions. Lock Items then sources in deterministic identity order,
+recheck aliases/lifecycle/versions under the locks, and merge only description,
+its provenance and its source envelope into the current records before using the
+canonical Item upsert. Perform provider calls before this short transaction.
+
+Preserve UUIDs, creation times, all aliases, title, cover, creators, tags, years,
+language, popularity and unrelated metadata/source fields. Missing/invalid text
+never clears an existing description. Equal text, source revision and review/
+policy identity is a no-op; a new fetch timestamp alone does not force a rewrite.
+Version mismatch rejects mutations; already-applied identical content can return
+a read-only no-op after identity verification. Changed text is an explicit
+guarded refresh. Existing full BOOK writers must preserve
+managed descriptions/provenance or reject their refresh; test Search/dump replay
+before accepting the new mode. No new catalog, account, Event, model or general
+admin endpoint is introduced. Use an incremental catalog migration, not edits
+to deployed history or the separate six native forwards. Keep both signatures
+service-role-only and SECURITY INVOKER with an empty search path.
+
+Persist starting/prepared/reviewed/completed/failed checkpoints. Count actual
+provider attempts separately from accepted/skipped candidates and acknowledged
+writes. A 404 or missing description is an explicit sparse result; malformed
+identity/JSON, 429, 5xx, timeout or connection failure stops collection. No
+automatic retry or replacement candidate. An ambiguous database acknowledgement
+is an unknown write outcome: read back exact IDs/text hashes/versions before
+resuming, never assume rollback or refund the consumed budget. Provider-only
+preview needs no database credential. The review artifact's hashes and current
+database versions must still match at the eventual apply step.
+
+The official [API usage guidance](https://openlibrary.org/developers/api) was
+checked on 2026-09-13: cache and identify requests; the default limit is one
+request/second, while identified requests with contact details receive a higher
+limit. Do not fan out hundreds of single-book requests. The small pilot uses
+sequential requests at least 1,100 ms apart; broader enrichment uses the
+[monthly Work/Edition dumps](https://openlibrary.org/developers/dumps), pinned by
+release and hashes. Dump records include revision and modified time, so the same
+normalization/provenance contract can be reused without rerunning popularity
+selection or ingesting external people's ratings.
+
+The provider's [Work schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/work.schema.json)
+and [text-block definition](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/shared_definitions.json)
+describe description/text records. The [licensing page](https://openlibrary.org/developers/licensing)
+does not assert new rights over the database and flags possible pre-existing
+rights. This is not blanket permission for every blurb or cover. Preserve source
+links and review the actual contribution/origin and intended use before display
+writes; unknown permission remains staged. Public beta/store rights, attribution
+UI and withdrawal remain open `MVP-CAT-003` gates. No source documentation check
+alone constitutes rights clearance for a record.
+
 ## 10. Prediction architecture
 
 Stable Kajo request:
