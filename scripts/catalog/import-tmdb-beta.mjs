@@ -2,6 +2,10 @@
 
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import {
+  getTmdbBucket, MAX_IMDB_IDS_PER_REQUEST, TMDB_BETA_BUCKETS,
+  TMDB_BUCKET_ACTION, TMDB_IMDB_ACTION, validImdbIds, validTmdbAsOf,
+} from '../../supabase/functions/_shared/tmdb-import-plan.mjs';
 
 const DEFAULT_OPTIONS = Object.freeze({
   startPage: 1,
@@ -78,6 +82,24 @@ export function parseTmdbImportArguments(args) {
       case '--dry-run':
         options.dryRun = true;
         break;
+      case '--balanced-plan':
+        options.balancedPlan = true;
+        break;
+      case '--bucket':
+        if (!getTmdbBucket(next)) throw new Error('--bucket requires a known bucket ID.');
+        options.bucket = next;
+        index += 1;
+        break;
+      case '--imdb-ids':
+        options.imdbIds = next?.split(',');
+        if (!validImdbIds(options.imdbIds, 50)) throw new Error('--imdb-ids requires 1–50 unique tt identifiers.');
+        index += 1;
+        break;
+      case '--as-of':
+        if (!validTmdbAsOf(next)) throw new Error('--as-of requires a valid past/current YYYY-MM-DD date since 2020.');
+        options.asOf = next;
+        index += 1;
+        break;
       case '--help':
       case '-h':
         options.help = true;
@@ -85,6 +107,23 @@ export function parseTmdbImportArguments(args) {
       default:
         throw new Error(`Unknown argument: ${argument}`);
     }
+  }
+
+  const selectionCount = [options.balancedPlan, options.bucket, options.imdbIds].filter(Boolean).length;
+  if (selectionCount > 1) throw new Error('Select exactly one of --balanced-plan, --bucket or --imdb-ids.');
+  if (selectionCount) {
+    if (!options.asOf) throw new Error('A reviewed --as-of date is required for a bounded selection.');
+    const disallowed = ['--minimum-vote-count', ...(options.bucket ? [] : ['--start-page', '--pages']),
+      ...(options.imdbIds ? ['--region', '--pages-per-request'] : [])];
+    if (args.some((argument) => disallowed.includes(argument))) throw new Error('Selection cannot override fixed controls.');
+    if (options.bucket) {
+      if (!args.includes('--pages')) options.totalPages = getTmdbBucket(options.bucket).pages - options.startPage + 1;
+      if (options.totalPages < 1 || options.startPage + options.totalPages - 1 > getTmdbBucket(options.bucket).pages) {
+        throw new Error('Requested pages exceed the reviewed bucket budget.');
+      }
+    }
+  } else if (options.asOf) {
+    throw new Error('--as-of requires a bounded selection.');
   }
 
   const finalPage = options.startPage + options.totalPages - 1;
@@ -98,6 +137,25 @@ export function parseTmdbImportArguments(args) {
 }
 
 export function planTmdbImportBatches(options) {
+  if (options.imdbIds) {
+    return Array.from({ length: Math.ceil(options.imdbIds.length / MAX_IMDB_IDS_PER_REQUEST) }, (_, index) => ({
+      action: TMDB_IMDB_ACTION,
+      imdbIds: options.imdbIds.slice(index * MAX_IMDB_IDS_PER_REQUEST, (index + 1) * MAX_IMDB_IDS_PER_REQUEST),
+      language: options.language, asOf: options.asOf,
+    }));
+  }
+  if (options.balancedPlan || options.bucket) {
+    const buckets = options.bucket ? [getTmdbBucket(options.bucket)] : TMDB_BETA_BUCKETS;
+    return buckets.flatMap((bucket) => {
+      const startPage = options.bucket ? options.startPage : 1;
+      const totalPages = options.bucket ? options.totalPages : bucket.pages;
+      return planTmdbImportBatches({ startPage, totalPages, pagesPerRequest: options.pagesPerRequest })
+        .map((batch) => ({
+          action: TMDB_BUCKET_ACTION, bucket: bucket.id, ...batch,
+          language: options.language, region: options.region, asOf: options.asOf,
+        }));
+    });
+  }
   const batches = [];
   let page = options.startPage;
   let remaining = options.totalPages;
@@ -127,6 +185,22 @@ export function validateTmdbImportResponse(payload, expected) {
     throw new Error(`catalog-import failed with code: ${code}`);
   }
 
+  if (expected.action === TMDB_BUCKET_ACTION || expected.action === TMDB_IMDB_ACTION) {
+    if (payload.action !== expected.action || payload.asOf !== expected.asOf) {
+      throw new Error('catalog-import selection contract mismatch.');
+    }
+  }
+  if (expected.action === TMDB_IMDB_ACTION) {
+    if (!Array.isArray(payload.imdbIds) || JSON.stringify(payload.imdbIds) !== JSON.stringify(expected.imdbIds) ||
+      payload.language !== expected.language || payload.importedCount !== expected.imdbIds.length || payload.skippedCount !== 0) {
+      throw new Error('catalog-import IMDb enrichment is incomplete or mismatched.');
+    }
+    return { importedCount: payload.importedCount, skippedCount: 0, imdbIds: payload.imdbIds };
+  }
+  if (expected.action === TMDB_BUCKET_ACTION && payload.bucket !== expected.bucket) {
+    throw new Error('catalog-import bucket mismatch.');
+  }
+
   const expectedPages = Array.from(
     { length: expected.pages },
     (_, offset) => expected.startPage + offset,
@@ -151,14 +225,20 @@ export function validateTmdbImportResponse(payload, expected) {
   if (payload.language !== expected.language || payload.region !== expected.region) {
     throw new Error('catalog-import returned unexpected locale/region values.');
   }
-  if (payload.minimumVoteCount !== expected.minimumVoteCount) {
+  const minimumVoteCount = expected.action === TMDB_BUCKET_ACTION
+    ? getTmdbBucket(expected.bucket).minimumVoteCount : expected.minimumVoteCount;
+  if (payload.minimumVoteCount !== minimumVoteCount) {
     throw new Error('catalog-import returned an unexpected minimumVoteCount.');
+  }
+  if (payload.importedCount + payload.skippedCount > expected.pages * 20) {
+    throw new Error('catalog-import counts exceed the requested page budget.');
   }
 
   return {
     importedCount: payload.importedCount,
     skippedCount: payload.skippedCount,
     pages: expectedPages,
+    ...(expected.action === TMDB_BUCKET_ACTION ? { bucket: expected.bucket } : {}),
   };
 }
 
@@ -167,21 +247,30 @@ export async function runTmdbBetaImport(options, dependencies) {
   const results = [];
 
   for (const [index, batch] of batches.entries()) {
-    const expected = {
+    const expected = batch.action ? batch : {
       ...batch,
       language: options.language,
       region: options.region,
       minimumVoteCount: options.minimumVoteCount,
     };
+    dependencies.progress?.({ status: 'starting', request: index + 1, body: expected });
     const response = await dependencies.invoke(expected);
-    results.push(validateTmdbImportResponse(response, expected));
+    const result = validateTmdbImportResponse(response, expected);
+    results.push(result);
+    dependencies.progress?.({ status: 'completed', request: index + 1, body: expected, result });
 
     if (index < batches.length - 1 && options.delayMs > 0) {
       await dependencies.sleep(options.delayMs);
     }
   }
 
-  return summarizeTmdbImport(results);
+  return batches[0]?.action
+    ? {
+      requestCount: results.length, results,
+      importedCount: results.reduce((sum, result) => sum + result.importedCount, 0),
+      skippedCount: results.reduce((sum, result) => sum + result.skippedCount, 0),
+    }
+    : summarizeTmdbImport(results);
 }
 
 export function summarizeTmdbImport(results) {
@@ -215,7 +304,12 @@ async function runCli() {
       JSON.stringify(
         {
           status: 'dry-run',
-          options,
+          ...(batches[0]?.action ? {
+            asOf: options.asOf,
+            requestCount: batches.length,
+            pageBudget: batches.reduce((sum, batch) => sum + (batch.pages ?? 0), 0),
+            identifierBudget: batches.reduce((sum, batch) => sum + (batch.imdbIds?.length ?? 0), 0),
+          } : { options }),
           batches,
         },
         null,
@@ -243,6 +337,7 @@ async function runCli() {
     const summary = await runTmdbBetaImport(options, {
       invoke: (batch) => invokeCatalogImport(supabaseUrl, secretKey, batch),
       sleep,
+      progress: batches[0]?.action ? (checkpoint) => console.log(JSON.stringify(checkpoint)) : undefined,
     });
 
     console.log(
@@ -251,8 +346,9 @@ async function runCli() {
           status: 'complete',
           ...summary,
           language: options.language,
-          region: options.region,
-          minimumVoteCount: options.minimumVoteCount,
+          ...(batches[0]?.action ? { asOf: options.asOf } : {
+            region: options.region, minimumVoteCount: options.minimumVoteCount,
+          }),
         },
         null,
         2,
@@ -275,6 +371,8 @@ export async function invokeCatalogImport(baseUrl, apiKey, batch) {
       'user-agent': 'KajoCatalogImporter/1.0 (+https://github.com/Kajooja/Kajo)',
     },
     body: JSON.stringify({ action: 'tmdb-movies', ...batch }),
+    redirect: 'error',
+    signal: AbortSignal.timeout(180_000),
   });
 
   let payload = null;
@@ -337,6 +435,17 @@ function printVerificationSql() {
 }
 
 function printHelp() {
+  console.log(`Bounded catalog selections (use one):
+  --balanced-plan --as-of YYYY-MM-DD   30 pages across 18 fixed buckets
+  --bucket ID --as-of YYYY-MM-DD       one bucket; --start-page/--pages for recovery
+  --imdb-ids tt0000001,tt0000002 --as-of YYYY-MM-DD   exact enrichment, batches of 10
+
+Use --dry-run to print all request bodies without credentials or network I/O.
+Buckets: ${TMDB_BETA_BUCKETS.map((bucket) => bucket.id).join(', ')}
+The as-of date bounds release dates, not changing provider popularity snapshots.
+Real runs emit a before/after checkpoint for each bounded request and never retry
+an ambiguous result automatically. Recheck coverage before a manual recovery.
+`);
   console.log(`Usage:\n  npm run catalog:tmdb-beta -- [options]\n\nOptions:\n  --start-page 1\n  --pages 15\n  --pages-per-request 3\n  --minimum-vote-count 40\n  --language fi-FI\n  --region FI\n  --delay-ms 350\n  --dry-run\n\nThe script orchestrates the existing hosted catalog-import Edge Function. Each\nrequest remains bounded to at most three TMDB discover pages; this script simply\nexecutes multiple bounded requests in order and fails closed on page gaps or\nprovider/configuration errors. It never sends TMDB credentials to the client.\n\nEnvironment for a real import:\n  SUPABASE_URL\n  SUPABASE_SECRET_KEY   (preferred)\n  or SUPABASE_SERVICE_ROLE_KEY (legacy fallback)\n\nThe hosted Edge Function separately requires TMDB_READ_ACCESS_TOKEN in Supabase\nEdge Function secrets. Do not store any of these secrets in Git.\n`);
 }
 
