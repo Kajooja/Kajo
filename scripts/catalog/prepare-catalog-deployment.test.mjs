@@ -19,7 +19,7 @@ test('deployment payload passes actual catalog HTTP tests without npm or remote 
     const payload = JSON.parse(serialized);
     assert.equal(payload.project_id, projectRef);
     assert.equal(payload.verify_jwt, false);
-    assert.equal(payload.files.length, 3);
+    assert.equal(payload.files.length, 4);
     assert.ok(payload.files.some((file) => file.name === payload.entrypoint_path));
     assert.ok(payload.files.some((file) => file.name === payload.import_map_path));
     const verification = await readFile(join(outputDirectory, 'verification.txt'), 'utf8');

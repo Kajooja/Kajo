@@ -1,8 +1,17 @@
 import { timingSafeEqual } from 'node:crypto';
 
 import { normalizeTmdbMovie } from '../_shared/catalog-normalizers.mjs';
+import {
+  bucketDiscoverFilters,
+  eligibleTmdbMovie,
+  getTmdbBucket,
+  TMDB_BUCKET_ACTION,
+  TMDB_IMDB_ACTION,
+  validImdbIds,
+  validTmdbAsOf,
+} from '../_shared/tmdb-import-plan.mjs';
 
-type ImportAction = 'tmdb-movies';
+type ImportAction = 'tmdb-movies' | typeof TMDB_BUCKET_ACTION | typeof TMDB_IMDB_ACTION;
 
 interface ImportRequest {
   action?: ImportAction;
@@ -11,6 +20,9 @@ interface ImportRequest {
   language?: string;
   region?: string;
   minimumVoteCount?: number;
+  bucket?: string;
+  asOf?: string;
+  imdbIds?: string[];
 }
 
 const JSON_HEADERS = {
@@ -65,14 +77,30 @@ Deno.serve(async (request) => {
     return json({ status: 'error', code: 'invalid-request' }, 400);
   }
   const body = input as ImportRequest;
-  if (body.action !== 'tmdb-movies') {
+  if (!['tmdb-movies', TMDB_BUCKET_ACTION, TMDB_IMDB_ACTION].includes(body.action ?? '')) {
     return json({ status: 'error', code: 'unsupported-action' }, 400);
+  }
+
+  const byImdb = body.action === TMDB_IMDB_ACTION;
+  const selectedBucket = body.action === TMDB_BUCKET_ACTION;
+  const bucket = selectedBucket ? getTmdbBucket(body.bucket) : null;
+  const asOf = body.asOf ?? new Date().toISOString().slice(0, 10);
+  // Reject mixed/unknown controls; never silently ignore a requested selection.
+  const fields = byImdb
+    ? ['action', 'imdbIds', 'language', 'asOf']
+    : selectedBucket
+    ? ['action', 'bucket', 'startPage', 'pages', 'language', 'region', 'asOf']
+    : ['action', 'startPage', 'pages', 'language', 'region', 'minimumVoteCount'];
+  if (Object.keys(body).some((key) => !fields.includes(key)) ||
+    ((byImdb || selectedBucket) && !validTmdbAsOf(body.asOf)) ||
+    (byImdb && !validImdbIds(body.imdbIds)) || (selectedBucket && !bucket)) {
+    return json({ status: 'error', code: 'invalid-request' }, 400);
   }
 
   const startPage = boundedInteger(body.startPage, 1, 500, 1);
   const pages = boundedInteger(body.pages, 1, MAX_PAGES_PER_REQUEST, 1);
   const minimumVoteCount = boundedInteger(
-    body.minimumVoteCount,
+    bucket?.minimumVoteCount ?? body.minimumVoteCount,
     0,
     1000000,
     DEFAULT_MINIMUM_VOTE_COUNT,
@@ -81,7 +109,8 @@ Deno.serve(async (request) => {
   const region = normalizeRegion(body.region, DEFAULT_REGION);
   if (
     startPage === null || pages === null || minimumVoteCount === null ||
-    language === null || region === null || startPage + pages - 1 > 500
+    language === null || region === null || startPage + pages - 1 > 500 ||
+    (bucket && startPage + pages - 1 > bucket.pages)
   ) {
     return json({ status: 'error', code: 'invalid-request' }, 400);
   }
@@ -92,6 +121,37 @@ Deno.serve(async (request) => {
   }
 
   try {
+    if (byImdb) {
+      // Resolve only exact movie identifiers, then verify detail aliases before
+      // one atomic upsert. A missing/ambiguous/mismatched result stops this batch.
+      const imdbIds = body.imdbIds!;
+      const entries = await mapWithConcurrency(imdbIds, TMDB_DETAIL_CONCURRENCY, async (imdbId) => {
+        const url = new URL(`${TMDB_API_BASE_URL}/find/${imdbId}`);
+        url.searchParams.set('external_source', 'imdb_id');
+        url.searchParams.set('language', language);
+        const found = await fetchTmdbJson(url.toString(), tmdbToken);
+        if (!Array.isArray(found.movie_results) || found.movie_results.length !== 1) {
+          throw new Error('IMDb movie mapping is unavailable or ambiguous');
+        }
+        const movieId = found.movie_results[0]?.id;
+        if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new Error('Invalid TMDB ID');
+        const movie = await fetchLocalizedMovie(movieId, language, tmdbToken);
+        const entry = normalizeTmdbMovie(movie);
+        if (!entry || !eligibleTmdbMovie(movie, entry, asOf) || entry.externalIds.imdb_title !== imdbId) {
+          throw new Error('IMDb detail identity or metadata mismatch');
+        }
+        return entry;
+      });
+      if (new Set(entries.map((entry) => entry.providerItemId)).size !== entries.length) {
+        throw new Error('Conflicting IMDb mappings');
+      }
+      const importedCount = await upsertCatalogBatch(supabaseUrl, secretKey, entries);
+      return json({
+        status: 'imported', provider: 'tmdb', action: TMDB_IMDB_ACTION,
+        importedCount, skippedCount: 0, imdbIds, language, asOf,
+      });
+    }
+
     let importedCount = 0;
     let skippedCount = 0;
     const completedPages: number[] = [];
@@ -103,21 +163,28 @@ Deno.serve(async (request) => {
           language,
           region,
           minimumVoteCount,
+          asOf,
+          bucket,
         }),
         tmdbToken,
       );
-      const results = Array.isArray(discovery?.results) ? discovery.results : [];
+      if (!Array.isArray(discovery.results) || discovery.results.length > 20 ||
+        (bucket && discovery.page !== page)) throw new Error('Invalid discovery page');
+      const results = discovery.results;
       const details = await mapWithConcurrency(
         results,
         TMDB_DETAIL_CONCURRENCY,
         async (movie) => {
-          const movieId = Number(movie?.id);
-          if (!Number.isInteger(movieId) || movieId <= 0) return null;
+          const movieId = movie?.id;
+          if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new Error('Invalid TMDB ID');
           return fetchLocalizedMovie(movieId, language, tmdbToken);
         },
       );
       const entries = details
-        .map((movie) => normalizeTmdbMovie(movie))
+        .map((movie) => {
+          const entry = normalizeTmdbMovie(movie);
+          return bucket && !eligibleTmdbMovie(movie, entry, asOf, bucket) ? null : entry;
+        })
         .filter((entry) => entry !== null);
 
       skippedCount += results.length - entries.length;
@@ -139,6 +206,7 @@ Deno.serve(async (request) => {
       language,
       region,
       minimumVoteCount,
+      ...(bucket ? { action: TMDB_BUCKET_ACTION, bucket: bucket.id, asOf } : {}),
     });
   } catch {
     // Upstream errors can contain reflected credentials or provider payloads.
@@ -171,6 +239,7 @@ async function upsertCatalogBatch(
       headers,
       body: JSON.stringify({ entries }),
       redirect: 'error',
+      signal: AbortSignal.timeout(20_000),
     },
   );
   if (!response.ok) {
@@ -195,6 +264,8 @@ function buildDiscoverUrl(input: {
   language: string;
   region: string;
   minimumVoteCount: number;
+  asOf: string;
+  bucket: ReturnType<typeof getTmdbBucket>;
 }): string {
   const url = new URL(`${TMDB_API_BASE_URL}/discover/movie`);
   url.searchParams.set('include_adult', 'false');
@@ -204,7 +275,12 @@ function buildDiscoverUrl(input: {
   url.searchParams.set('page', String(input.page));
   url.searchParams.set('sort_by', 'popularity.desc');
   url.searchParams.set('vote_count.gte', String(input.minimumVoteCount));
-  url.searchParams.set('release_date.lte', new Date().toISOString().slice(0, 10));
+  url.searchParams.set('release_date.lte', input.asOf);
+  if (input.bucket) {
+    for (const [key, value] of Object.entries(bucketDiscoverFilters(input.bucket, input.asOf))) {
+      url.searchParams.set(key, String(value));
+    }
+  }
   return url.toString();
 }
 
@@ -237,7 +313,9 @@ async function fetchMovieDetails(
   const url = new URL(`${TMDB_API_BASE_URL}/movie/${movieId}`);
   url.searchParams.set('language', language);
   url.searchParams.set('append_to_response', 'credits,external_ids');
-  return fetchTmdbJson(url.toString(), token);
+  const movie = await fetchTmdbJson(url.toString(), token);
+  if (movie.id !== movieId) throw new Error('TMDB detail identity mismatch');
+  return movie;
 }
 
 async function fetchTmdbJson(
@@ -249,6 +327,8 @@ async function fetchTmdbJson(
       accept: 'application/json',
       authorization: `Bearer ${token}`,
     },
+    redirect: 'error',
+    signal: AbortSignal.timeout(20_000),
   });
 
   if (!response.ok) {
@@ -256,7 +336,7 @@ async function fetchTmdbJson(
   }
 
   const data = await response.json();
-  if (!data || typeof data !== 'object') {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     throw new Error('TMDB returned a non-object response');
   }
 
@@ -270,24 +350,32 @@ async function mapWithConcurrency<TInput, TOutput>(
 ): Promise<TOutput[]> {
   const output = new Array<TOutput>(values.length);
   let nextIndex = 0;
+  let failed = false;
+  let failure: unknown;
 
   async function worker() {
-    while (true) {
+    while (!failed) {
       const index = nextIndex;
       nextIndex += 1;
       if (index >= values.length) return;
-      output[index] = await mapper(values[index]);
+      try {
+        output[index] = await mapper(values[index]);
+      } catch (error) {
+        failed = true;
+        failure = error;
+      }
     }
   }
 
   await Promise.all(
     Array.from({ length: Math.min(concurrency, values.length) }, () => worker()),
   );
+  if (failed) throw failure;
   return output;
 }
 
 function hasUsefulLocalizedCopy(movie: Record<string, unknown>): boolean {
-  return Boolean(usefulString(movie.title) && usefulString(movie.overview));
+  return Boolean(usefulString(movie.title) && usefulString(movie.overview) && usefulString(movie.poster_path));
 }
 
 function usefulString(value: unknown): string | null {

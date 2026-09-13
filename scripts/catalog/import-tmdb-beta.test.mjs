@@ -8,6 +8,7 @@ import {
   runTmdbBetaImport,
   validateTmdbImportResponse,
 } from './import-tmdb-beta.mjs';
+import { TMDB_BETA_BUCKETS } from '../../supabase/functions/_shared/tmdb-import-plan.mjs';
 
 test('admin transport sends server credentials only as apikey to the canonical Edge route', async () => {
   const realFetch = globalThis.fetch;
@@ -196,4 +197,77 @@ test('runs batches in order and summarizes results', async () => {
     importedCount: 100,
     skippedCount: 0,
   });
+});
+
+test('balanced plan fixes 30 pages across original-language, era and genre buckets without repeating the canary', () => {
+  const options = parseTmdbImportArguments(['--balanced-plan', '--as-of', '2026-09-13', '--dry-run']);
+  const batches = planTmdbImportBatches(options);
+  assert.equal(batches.length, 18);
+  assert.equal(batches.reduce((sum, batch) => sum + batch.pages, 0), 30);
+  assert.ok(batches.every((batch) => batch.action === 'tmdb-movie-bucket-v1' && batch.pages <= 3));
+  assert.equal(batches[0].bucket, 'finnish');
+  assert.deepEqual(TMDB_BETA_BUCKETS.filter((bucket) => bucket.filters.with_original_language)
+    .map((bucket) => bucket.filters.with_original_language), ['fi', 'sv', 'fr', 'de', 'ja', 'ko', 'es']);
+  assert.equal(TMDB_BETA_BUCKETS[0].minimumVoteCount, 10);
+  assert.ok(batches.every((batch) => batch.asOf === '2026-09-13' && batch.language === 'fi-FI'));
+  assert.equal(planTmdbImportBatches(parseTmdbImportArguments([
+    '--bucket', 'finnish', '--as-of', '2026-09-13', '--start-page', '2',
+  ]))[0].pages, 2);
+});
+
+test('selection refuses ambiguous controls, future dates and budget overruns', () => {
+  for (const args of [
+    ['--balanced-plan'], ['--as-of', '2026-09-13'],
+    ['--balanced-plan', '--bucket', 'finnish', '--as-of', '2026-09-13'],
+    ['--balanced-plan', '--pages', '30', '--as-of', '2026-09-13'],
+    ['--bucket', 'finnish', '--minimum-vote-count', '1', '--as-of', '2026-09-13'],
+    ['--bucket', 'finnish', '--start-page', '3', '--pages', '2', '--as-of', '2026-09-13'],
+    ['--balanced-plan', '--as-of', '9999-01-01'],
+    ['--balanced-plan', '--as-of', '2026-02-30'],
+    ['--imdb-ids', 'tt0000001,tt0000001', '--as-of', '2026-09-13'],
+  ]) assert.throws(() => parseTmdbImportArguments(args));
+});
+
+test('IMDb plan chunks exact identifiers and validates complete enrichment including leading zeros', () => {
+  const ids = Array.from({ length: 29 }, (_, index) => `tt${String(index + 1).padStart(7, '0')}`);
+  const batches = planTmdbImportBatches(parseTmdbImportArguments([
+    '--imdb-ids', ids.join(','), '--as-of', '2026-09-13', '--dry-run',
+  ]));
+  assert.deepEqual(batches.map((batch) => batch.imdbIds.length), [10, 10, 9]);
+  assert.deepEqual(batches.flatMap((batch) => batch.imdbIds), ids);
+  const expected = batches[0];
+  const payload = { ...expected, status: 'imported', provider: 'tmdb', importedCount: 10, skippedCount: 0 };
+  assert.equal(validateTmdbImportResponse(payload, expected).importedCount, 10);
+  for (const changes of [{ importedCount: 9 }, { skippedCount: 1 }, { imdbIds: [...expected.imdbIds].reverse() },
+    { action: 'tmdb-movies' }, { asOf: '2026-09-12' }]) {
+    assert.throws(() => validateTmdbImportResponse({ ...payload, ...changes }, expected));
+  }
+});
+
+test('bucket run records completed work and stops on the first failure without automatic retry', async () => {
+  const options = parseTmdbImportArguments(['--balanced-plan', '--as-of', '2026-09-13']);
+  const calls = [];
+  const checkpoints = [];
+  await assert.rejects(runTmdbBetaImport(options, {
+    invoke: async (expected) => {
+      calls.push(expected);
+      if (calls.length === 2) throw new Error('fixture provider failure');
+      return { status: 'imported', provider: 'tmdb', action: expected.action,
+        bucket: expected.bucket, asOf: expected.asOf, importedCount: 55, skippedCount: 5,
+        pages: [1, 2, 3], language: 'fi-FI', region: 'FI', minimumVoteCount: 10 };
+    },
+    sleep: async () => {}, progress: (checkpoint) => checkpoints.push(checkpoint),
+  }), /fixture provider failure/);
+  assert.deepEqual(calls.map((call) => call.bucket), ['finnish', 'classics']);
+  assert.deepEqual(checkpoints.map((checkpoint) => checkpoint.status), ['starting', 'completed', 'starting']);
+  const first = checkpoints[1].result;
+  assert.equal(first.importedCount, 55);
+  const expected = calls[0];
+  const response = { status: 'imported', provider: 'tmdb', action: expected.action,
+    bucket: 'finnish', asOf: expected.asOf, importedCount: 60, skippedCount: 0,
+    pages: [1, 2, 3], language: 'fi-FI', region: 'FI', minimumVoteCount: 10 };
+  for (const changes of [{ action: undefined }, { bucket: 'classics' }, { minimumVoteCount: 40 },
+    { importedCount: 61 }]) {
+    assert.throws(() => validateTmdbImportResponse({ ...response, ...changes }, expected));
+  }
 });

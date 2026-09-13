@@ -10,68 +10,64 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current hosted packet — #182 canary accepted; catalog expansion next
+## Current packet — #182 balanced catalog expansion and exact enrichment
 
-**The authorized one-page TMDB canary is complete and independently verified.**
-At **2026-09-13 11:03:06 UTC**, the owner's successful Test response reported
-`importedCount: 20`, `skippedCount: 0`, `pages: [1]`, `language: fi-FI`,
-`region: FI` and `minimumVoteCount: 40`. The existing CLI response validator
-accepts the exact supplied body. Read-only database checks confirm all 20 TMDB
-sources synced at `2026-09-13T11:03:06.083766Z` and map to 20 distinct Items with
-matching TMDB and IMDb aliases. **Do not repeat the canary or request its result.**
+The next catalog source packet is `feat/182-tmdb-balanced-expansion`, based on
+accepted main `95d2a32ecebb704bc4b7d8105dd2d7552e81accd` / PR #250.
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns its later PR/CI/merge
+and hosted checkpoint. The [expansion plan](sprints/SPRINT-014.md#balanced-tmdb-expansion-and-curated-enrichment--2026-09-13--182)
+owns the exact budgets, working coverage targets and executable commands.
 
-Discoverable MOVIE inventory increased **30 → 49**, and stored MOVIE rows
-**42 → 61**. Nineteen Items are new; TMDB `278` / IMDb `tt0111161` enriched the
-existing curated *Rita Hayworth - avain pakoon* Item while retaining its earlier
-creation time and curated source. All 20 TMDB Items have title, description,
-poster, creators, year, original language, normalized tags, runtime, vote count
-and popularity. All 20 poster URLs returned HTTP 200 / `image/jpeg`. There are
-zero missing matching TMDB/IMDb aliases and zero discoverable mocks. BOOK stays
-at 415 discoverable / 427 stored, with 385 images and no descriptions. Batch RPC
-EXECUTE remains false for anon/authenticated and true for service_role.
+Source now supports **18 fixed selection buckets / 30 pages**, with Finnish-language,
+five era, six other original-language and six genre buckets. The new versioned
+request actions cannot become unfiltered imports on the older deployment.
+A separate exact-IMDb action resolves at most ten movies, verifies detail aliases
+and metadata, then writes one atomic canonical batch. Invalid/ambiguous mappings
+stop the batch; sparse/off-filter discovery candidates are counted and excluded.
+The existing CLI prints no-I/O plans, checks returned selection identity and
+records each starting/completed request; it never automatically retries ambiguity.
+The reproducible deployment packet now includes four local files, without external
+runtime dependencies. Source validation and hosted execution remain separate facts.
+Local root validation passed 387 tests, lint/typecheck and both Hermes exports;
+the exact deployment packet independently passed 21 catalog HTTP cases. The sprint
+checkpoint records the unchanged-lock cache workaround, payload hashes and limits.
 
+The read-only expansion report at **2026-09-13 11:37:42 UTC** confirms **49**
+discoverable movies, **20** with TMDB/core metadata, **0** non-English provider
+movies and **29** curated gaps. Each gap has exactly one existing IMDb alias.
+The three planned enrichment requests contain 10 + 10 + 9 identifiers and should
+retain the 29 existing Item identities. The coverage report counts canonical Items,
+original languages, Finnish production, five eras, genres and all curated gaps;
+its proposed coverage targets currently all remain unmet.
+
+**Next bounded action:** finish source CI/acceptance, then review and roll out this
+exact catalog-only four-file packet and execute the three curated enrichment
+requests before expansion. Re-read #182 for any later result first. Verify each
+batch's aliases/Item identity and before/after coverage, then start the bounded
+Finnish/era/language/genre requests. Full expansion is at most 600 Discover
+candidates, not a promise of 600 new Items. The proposed working target is at
+least 300 complete provider movies with the diversity thresholds in the plan;
+unmet targets require a separately bounded follow-up, never an automatic wider run.
+Further hosted invocation uses an authorized admin environment or the working
+owner **catalog-import > Test** view. The connector cannot invoke functions or
+read secrets; do not request key values, repeat setup/sign-in or invent a
+configuration blocker. No broader import or new deployment ran in source preparation.
+
+The earlier owner-authorized one-page canary is complete: **20 upserts, 19 new
+Items and one curated overlap**, `fi-FI` / `FI` / minimum votes 40 at
+2026-09-13 11:03:06 UTC. All 20 matching TMDB/IMDb aliases and JPEG URLs were
+verified; all original languages were `en`, 17 release years were 2026.
+BOOK remains 415 discoverable / 385 images / no descriptions. Last accepted
+hosted importer is ACTIVE v9, matching PR #248's three source files, with
+`verify_jwt=false`. **Do not repeat the canary, privileged preflight or key setup.**
 The [accepted canary checkpoint](sprints/SPRINT-014.md#tmdb-one-page-canary-accepted--2026-09-13--182)
-records the response, before/after inventory, deduplication, metadata/CDN checks,
-evidence limits and proposed continuation. The first page contains 20 original
-English-language films, 17 from 2026. Finnish and English fallback descriptions
-are both present; `language: fi-FI` localizes metadata and does not establish a
-Finnish-content mix. Twenty MOVIE Items have images/descriptions; 29 remaining
-curated movies do not. This proves the provider path, not beta breadth or native
-image-rendering/quality acceptance. `MVP-CAT-001..003` and #182 remain open.
+retains the exact response, deployment hashes and verification limits.
 
-**Next bounded task: prepare and review #182 catalog expansion with explicit
-breadth, diversity and remaining-metadata targets.** Read the latest
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) checkpoint before executing
-another import. An actual CLI dry-run starting at page 2, covering 14 pages in
-max-three-page requests, produces batches 2–4, 5–7, 8–10, 11–13 and 14–15.
-It is a reviewed transport proposal, not a completed expansion or a diversity
-plan. Specify genre/year/original-language coverage and enrichment of the remaining
-29 curated MOVIE Items, then run the selected bounded batches with before/after
-coverage and stop-on-error behavior. Do not assume a popularity-sorted page range
-alone meets the Finnish/international diversity requirement or promises a fixed
-unique Item count. Source/control improvements needed for that plan can proceed
-without secret access; a further hosted import uses an authorized admin environment
-or the working owner Test view.
-
-The existing configuration, Default-key preflight and provider token have now
-worked through the actual provider and privileged Data API path. No new key,
-rotation, settings/presence check, private log or browser sign-in is needed.
-PR #248 is the accepted runtime repair on `bd7a23f776e99b452404fef0393155b62d96ade0`;
-all five CI #488 jobs, 377 local tests and 15 staged catalog cases passed.
-PR #249 accepted the earlier preflight handoff on
-`395b0bf222000377cd04322436e6f398e5f8c1e2` after all five CI #490 jobs passed.
-Fresh ACTIVE v9 readback still matches all three accepted source files exactly,
-with `verify_jwt=false` and the local import map; no new deployment was needed.
-Issue #182 owns this documentation packet's later merge/CI checkpoint.
-
-The owner authorized completing the catalog repair/rollout and one-page canary,
-then requested a resumable repository handoff. This bounded unit is complete;
-retain the demonstrated exact-key boundary and do not restore floating v2 code.
-E1/D1/D2 stay accepted, with the rejected challenger research-only. #229 retains
-its native/device/fresh-account gates and six installed immutable forwards.
-Do not redeploy those forwards or reset accounts. Optional research, APK work
-and #240/UI work do not replace the named catalog continuation; the owner UI
-ideas remain required before MVP. No phase or public-release gate is closed here.
+Keep #182 / `MVP-CAT-001..003` open for actual breadth/diversity, refresh,
+rights/attribution, BOOK descriptions and native quality. E1/D1/D2 stay accepted
+with rejected challenger admission. #229 retains native/device/fresh-account gates
+and six installed immutable forwards; do not redeploy them or reset accounts.
+Optional research, APK or later pre-MVP UI work does not replace this catalog task.
 
 ## Accepted D2 development comparison
 

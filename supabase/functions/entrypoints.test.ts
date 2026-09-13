@@ -82,7 +82,7 @@ async function withEdge(
         assert.equal(request.headers.get('authorization'), `Bearer ${providerToken}`);
         assert.equal(request.headers.get('apikey'), null);
         if (url.pathname === '/3/discover/movie') {
-          return Response.json({ results: [{ id: 1 }] });
+          return Response.json({ page: Number(url.searchParams.get('page')), results: [{ id: 1 }] });
         }
         assert.equal(url.pathname, '/3/movie/1');
         const english = url.searchParams.get('language') === 'en-US';
@@ -94,6 +94,11 @@ async function withEdge(
           release_date: '2001-01-01',
           genres: [{ id: 18, name: 'Drama' }],
           original_language: 'en',
+          adult: false,
+          video: false,
+          runtime: 120,
+          popularity: 50,
+          vote_count: 100,
           credits: { crew: [{ job: 'Director', name: 'Fixture Director' }] },
           external_ids: { imdb_id: 'tt0000001' },
         });
@@ -430,6 +435,151 @@ Deno.test('incomplete or malformed Data API success never reports a completed im
         'provider-import-failed',
       );
       assert.equal(f.outgoing.length, 4);
+    });
+  }
+});
+
+Deno.test('versioned catalog selections reject unknown, mixed and unbounded controls before I/O', async () => {
+  await withEdge(async (f) => {
+    const base = { action: 'tmdb-movie-bucket-v1', bucket: 'finnish', asOf: '2026-09-13' };
+    for (const body of [
+      { ...base, bucket: 'unknown' }, { ...base, asOf: undefined },
+      { ...base, asOf: '9999-01-01' }, { ...base, asOf: '2026-02-30' },
+      { ...base, startPage: 3, pages: 2 }, { ...base, minimumVoteCount: 0 },
+      { action: 'tmdb-movies', bucket: 'finnish' },
+      ...[[], ['tt0000001', 'tt0000001'], ['1'], [1], Array(11).fill('tt0000001')].map((imdbIds) => ({
+        action: 'tmdb-movies-by-imdb-v1', imdbIds, asOf: '2026-09-13',
+      })),
+      { action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'], asOf: '2026-09-13', pages: 1 },
+    ]) await expectError(await f.request(body), 400, 'invalid-request');
+    assert.equal(f.outgoing.length, 0);
+  });
+});
+
+Deno.test('catalog buckets bind primary dates, original language and genre independently of FI localization', async () => {
+  const cases = [
+    { bucket: 'finnish', filter: 'with_original_language', value: 'fi', changes: { original_language: 'fi' }, votes: '10' },
+    { bucket: 'classics', filter: 'primary_release_date.lte', value: '1989-12-31', changes: { release_date: '1984-01-01' }, votes: '40' },
+    { bucket: 'animation', filter: 'with_genres', value: '16', changes: { genres: [{ id: 16, name: 'Animation' }] }, votes: '40' },
+  ];
+  for (const { bucket, filter, value, changes, votes } of cases) {
+    await withEdge(async (f) => {
+      const normal = f.upstream;
+      f.upstream = async (request) => {
+        const response = await normal(request);
+        return new URL(request.url).pathname === '/3/movie/1'
+          ? Response.json({ ...await response.json(), ...changes }) : response;
+      };
+      const response = await f.request({ action: 'tmdb-movie-bucket-v1', bucket, asOf: '2026-09-13' });
+      assert.equal(response.status, 200);
+      const result = await response.json();
+      assert.equal(result.importedCount, 1);
+      assert.equal(result.action, 'tmdb-movie-bucket-v1');
+      assert.equal(result.bucket, bucket);
+      assert.equal(result.asOf, '2026-09-13');
+      const url = new URL(f.outgoing[0].url);
+      assert.equal(url.searchParams.get(filter), value);
+      assert.equal(url.searchParams.get('language'), 'fi-FI');
+      assert.equal(url.searchParams.get('region'), 'FI');
+      assert.equal(url.searchParams.get('vote_count.gte'), votes);
+      assert.equal(url.searchParams.get('release_date.lte'), '2026-09-13');
+      assert.equal(f.outgoing[0].redirect, 'error');
+    });
+  }
+});
+
+Deno.test('bucket admission counts sparse, unreleased and off-filter details without overwriting Items', async () => {
+  for (const changes of [
+    { poster_path: null }, { overview: '' }, { runtime: 0 }, { vote_count: 1 },
+    { release_date: '2027-01-01' }, { release_date: '2001-02-30' },
+    { original_language: 'fi' }, { adult: true }, { credits: {} },
+  ]) {
+    await withEdge(async (f) => {
+      const normal = f.upstream;
+      f.upstream = async (request) => {
+        const response = await normal(request);
+        return new URL(request.url).pathname === '/3/movie/1'
+          ? Response.json({ ...await response.json(), original_language: 'fr', ...changes }) : response;
+      };
+      const response = await f.request({ action: 'tmdb-movie-bucket-v1', bucket: 'language-fr', asOf: '2026-09-13' });
+      assert.equal(response.status, 200);
+      const result = await response.json();
+      assert.equal(result.importedCount, 0);
+      assert.equal(result.skippedCount, 1);
+      assert.ok(f.outgoing.every((request) => new URL(request.url).hostname === 'api.themoviedb.org'));
+    });
+  }
+});
+
+Deno.test('malformed or mismatched provider pages and detail identities stop before writes', async () => {
+  for (const payload of [{}, { results: {} }, { page: 2, results: [] },
+    { page: 1, results: Array(21).fill({ id: 1 }) }, { page: 1, results: [{ id: '1' }] }]) {
+    await withEdge(async (f) => {
+      f.upstream = () => Response.json(payload);
+      await expectError(await f.request({ action: 'tmdb-movie-bucket-v1', bucket: '2000s', asOf: '2026-09-13' }), 502, 'provider-import-failed');
+      assert.equal(f.outgoing.length, 1);
+    });
+  }
+  await withEdge(async (f) => {
+    const normal = f.upstream;
+    f.upstream = (request) => new URL(request.url).pathname === '/3/movie/1'
+      ? Response.json({ id: 2 }) : normal(request);
+    await expectError(await f.request({ action: 'tmdb-movies' }), 502, 'provider-import-failed');
+    assert.equal(f.outgoing.length, 2);
+  });
+});
+
+Deno.test('IMDb enrichment verifies each exact movie alias then uses one atomic canonical batch', async () => {
+  await withEdge(async (f) => {
+    const normal = f.upstream;
+    f.upstream = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname.startsWith('/3/find/')) {
+        assert.equal(url.searchParams.get('external_source'), 'imdb_id');
+        return Response.json({ movie_results: [{ id: Number(url.pathname.slice(-1)) }] });
+      }
+      if (url.pathname.startsWith('/3/movie/')) {
+        const id = Number(url.pathname.slice(-1));
+        const fixtureUrl = new URL(request.url);
+        fixtureUrl.pathname = '/3/movie/1';
+        const fixture = await (await normal(new Request(fixtureUrl, request))).json();
+        return Response.json({ ...fixture, id, external_ids: { imdb_id: `tt000000${id}` } });
+      }
+      const { entries } = await request.json();
+      assert.deepEqual(entries.map((entry: { externalIds: unknown }) => entry.externalIds), [
+        { tmdb_movie: '1', imdb_title: 'tt0000001' }, { tmdb_movie: '2', imdb_title: 'tt0000002' },
+      ]);
+      return Response.json(entries.map((_: unknown, index: number) => ({ input_index: index + 1, item_id: `existing-${index}` })));
+    };
+    const response = await f.request({
+      action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001', 'tt0000002'], asOf: '2026-09-13',
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      status: 'imported', provider: 'tmdb', action: 'tmdb-movies-by-imdb-v1',
+      importedCount: 2, skippedCount: 0, imdbIds: ['tt0000001', 'tt0000002'],
+      language: 'fi-FI', asOf: '2026-09-13',
+    });
+    assert.equal(f.outgoing.filter((request) => new URL(request.url).hostname === 'catalog.test').length, 1);
+    assert.ok(f.outgoing.every((request) => !request.url.includes('/discover/') && !request.url.includes('/search/')));
+  });
+});
+
+Deno.test('missing, ambiguous, conflicting or sparse IMDb results cannot write catalog entries', async () => {
+  for (const failure of ['missing', 'ambiguous', 'alias', 'metadata']) {
+    await withEdge(async (f) => {
+      const normal = f.upstream;
+      f.upstream = async (request) => {
+        const url = new URL(request.url);
+        if (url.pathname.startsWith('/3/find/')) return Response.json({ movie_results:
+          failure === 'missing' ? [] : failure === 'ambiguous' ? [{ id: 1 }, { id: 2 }] : [{ id: 1 }],
+        });
+        const response = await normal(request);
+        return Response.json({ ...await response.json(), ...(failure === 'alias'
+          ? { external_ids: { imdb_id: 'tt9999999' } } : { poster_path: null }) });
+      };
+      await expectError(await f.request({ action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'], asOf: '2026-09-13' }), 502, 'provider-import-failed');
+      assert.ok(f.outgoing.every((request) => new URL(request.url).hostname === 'api.themoviedb.org'));
     });
   }
 });

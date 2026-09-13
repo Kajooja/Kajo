@@ -139,7 +139,10 @@ Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient descr
 The 2026-09-13 one-page TMDB canary is verified: 20 provider Items, 19 new canonical
 Items plus one curated overlap, 49 discoverable MOVIE Items total, complete checked
 metadata/aliases for all 20 and 20 reachable JPEG posters. This closes the initial
-hosted provider-path gate. Prepare bounded expansion and enrichment next: all 20
+hosted provider-path gate. The prepared next source packet adds 18 fixed buckets /
+30 pages and exact-IMDb enrichment for the 29 remaining curated Items, with measured
+language/era/genre and core-metadata targets. Execute enrichment before expansion;
+source acceptance is not an import result. At the accepted canary checkpoint: all 20
 canary films have original language `en`, 17 are from 2026, and 29 curated movies
 still lack images/descriptions. STATUS and Issue #182 own the exact plan and later
 results; do not repeat the canary. Catalog breadth/diversity, provider rights,

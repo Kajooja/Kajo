@@ -254,7 +254,13 @@ local key). An exact configured legacy `service_role` key may also arrive as Bea
 during migration. A key prefix or JWT role claim alone never authorizes import.
 Malformed key configuration fails closed, and the matched server credential scopes
 the admin RPC without forwarding any caller user JWT. Explicit invalid parameters
-are rejected before provider access; at most three pages within 1–500 are imported.
+are rejected before provider access; legacy discovery imports at most three pages
+within 1–500. Versioned bucket requests use fixed language/primary-era/genre budgets
+and a reviewed release-date cutoff. Exact-IMDb requests resolve at most ten movie
+IDs, verify the returned aliases and full metadata, then call one atomic canonical
+batch upsert. No title-based identity guess is introduced. Unknown/mixed selection
+controls fail before provider access, and older deployments reject the new actions.
+Source acceptance and actual hosted rollout are tracked separately in STATUS.
 
 The checked-in SDK versions and Deno lock define the Edge source dependency graph.
 Local HTTP fixtures run the registered deployment handlers and real SDK, while

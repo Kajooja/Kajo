@@ -14,6 +14,137 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Balanced TMDB expansion and curated enrichment — 2026-09-13 / #182
+
+Source packet: `feat/182-tmdb-balanced-expansion`, from accepted PR #250 main
+`95d2a32ecebb704bc4b7d8105dd2d7552e81accd`. This prepares the exact next catalog
+unit. The old canary is complete; no new hosted import/deployment, DDL, account
+reset, model admission or APK operation is implied by source acceptance.
+Issue #182 records actual source CI/merge and subsequent hosted execution.
+
+### Bounded selection and working targets
+
+`supabase/functions/_shared/tmdb-import-plan.mjs` owns the executable versioned
+selection contract. Changing bucket meaning/budget requires a new reviewed
+contract version. All requests use Finnish metadata with English fallback and
+FI regional release eligibility. A separate fixed `asOf` bounds release dates;
+provider popularity/content may change between requests, so this is not a frozen
+provider snapshot. The `finnish` bucket means original language `fi`, not an
+inferred production country. Coverage reports Finnish production separately.
+
+| Selection | Pages | Minimum votes | Provider filters |
+| --- | ---: | ---: | --- |
+| Finnish-language | 3 | 10 | original language fi |
+| Before 1990; 1990s; 2000s; 2010s; 2020–asOf | 2 each | 40 | primary release-date ranges |
+| Swedish, French, German, Japanese, Korean, Spanish | 1 each | 40 | original language sv/fr/de/ja/ko/es |
+| Animation, comedy, thriller, horror, science-fiction | 2 each | 40 | fixed TMDB genre IDs |
+| Documentary | 1 | 40 | fixed TMDB genre ID |
+| **Total** | **30** | per bucket | **18 sequential requests; at most 600 raw candidates** |
+
+This lower Finnish-language vote floor avoids applying the international-volume
+threshold to a smaller language catalog. It is a coverage choice, not a quality
+score or a recommendation-weight change. Popularity orders within each bucket;
+primary-year, original-language, genre and vote filters are rechecked against
+details before admission. New paths require title, description, valid poster path,
+director, tags, original language, primary date, runtime, vote count, popularity
+and IMDb alias. Missing/off-filter records are counted as skipped. Ambiguous IDs,
+malformed pages and provider/DB errors stop the request; no fuzzy title merge.
+
+These are **working targets for reviewing this expansion**, not preclaimed results:
+
+- at least 300 discoverable TMDB Items with core metadata;
+- at least 25 Finnish-language and 90 non-English movies;
+- at least six original languages with ten complete movies each;
+- at least 25 complete movies in each of the five era bins;
+- at least eight normalized genres with fifteen complete movies each, plus ten documentaries;
+- all 30 existing curated movies enriched with their existing canonical identity.
+
+`tmdb-expansion-coverage.sql` reports every target and the underlying counts.
+Genres overlap, while canonical Items/eras/languages are not duplicated by source
+rows. The existing `catalog-coverage.sql` separately checks provider aliases,
+BOOK inventory, mock suppression and privileged RPC access. Missing a target
+keeps acceptance open: inspect gaps and choose a new bounded follow-up. Never
+silently expand page budgets, lower thresholds or claim provider ranking is
+representative of user taste. Rights/attribution and native image/quality gates
+remain separate even when every inventory target passes.
+
+### Exact execution order
+
+1. Accept source after required CI, generate the four-file deployment packet with
+   `npm run catalog:prepare-deployment`, review/read back the exact catalog-only
+   rollout. Keep `verify_jwt=false` and the existing proven server-key boundary.
+2. Run both read-only coverage queries. Compare with the last checkpoint before
+   sending anything. The 2026-09-13 11:37:42 UTC report is 49 discoverable movies,
+   20 complete TMDB movies, only English, era counts 1/1/0/0/18 and 29 curated gaps.
+   Every gap has exactly one IMDb alias; zero matching ambiguity was observed.
+3. Enrich the remaining curated movies first. The exact IDs below produce three
+   sequential requests of 10 + 10 + 9, each fully resolved/validated before one
+   atomic canonical batch upsert. Expected result: 29 enriched existing Items,
+   49 discoverable movies retained, all 30 curated movies provider-backed.
+   Counts and IDs must be verified; this is an expectation, not a hosted result.
+4. Execute the 18 bounded discovery buckets, with before/after checkpoints.
+   Start with Finnish-language, then era, other-language and genre coverage.
+   A successful first bucket is an inspection checkpoint before the rest.
+5. Record actual unique inventory, overlap/skips, full metadata/aliases, all
+   remaining gaps, locale fallback and bounded poster checks. Require a later
+   real-device catalog/Taste check; do not equate CDN success with native UX.
+
+The CLI dry-runs below read no credentials and perform no network/DB I/O:
+
+```bash
+npm run catalog:tmdb-beta -- --imdb-ids tt2543164,tt1856101,tt1160419,tt15239678,tt0338013,tt6710474,tt0137523,tt0109830,tt0172495,tt2267998,tt1798709,tt1375666,tt0816692,tt3783958,tt1392190,tt0209144,tt15398776,tt6751668,tt1392214,tt0110912,tt0114369,tt0468569,tt0120737,tt0167260,tt0167261,tt0133093,tt0482571,tt0102926,tt2582802 --as-of 2026-09-13 --dry-run
+npm run catalog:tmdb-beta -- --balanced-plan --as-of 2026-09-13 --dry-run
+npm run catalog:tmdb-beta -- --bucket finnish --as-of 2026-09-13 --dry-run
+```
+
+After reviewed rollout, use the printed `batches` bodies in the already working
+owner Test view, or remove `--dry-run` in an authorized admin environment.
+For the first Finnish inspection, use `--bucket finnish`; then execute remaining
+named buckets once rather than rerunning the whole balanced plan. `--bucket ID`
+accepts `--start-page`/`--pages` within that bucket's fixed budget for recovery.
+Never repeat the completed old unfiltered page-1 canary. New actions are
+`tmdb-movie-bucket-v1` and `tmdb-movies-by-imdb-v1`; older hosted code returns
+unsupported-action before I/O instead of silently dropping new filters.
+
+The runner prints a safe starting/completed checkpoint with exact request and
+validated response selection identity. An error/timeout stops further requests.
+Earlier page/batch writes may already be committed; recheck coverage/source sync
+before a manual retry. Do not claim all-or-nothing for the entire multi-request
+plan. Exact source/alias upserts are repeat-safe but provider pages may move.
+Invocation redirects are rejected and calls have explicit transport deadlines.
+No secret values enter request logs or Git. Configuration, sign-in, initial
+preflight and provider token already work and are not prerequisites to repeat.
+
+Provider semantics were checked against the official
+[TMDB Discover reference](https://developer.themoviedb.org/reference/discover-movie)
+and [Find by ID reference](https://developer.themoviedb.org/reference/find-by-id).
+FI localization/region is distinct from original-language selection; era buckets
+use primary dates so regional rereleases cannot redefine a film's original era.
+Local fixture/SQL validation and later CI are recorded in Issue #182.
+
+### Source verification
+
+`npm run check` passed **387 tests** (212 mobile, 21 catalog, 23 Edge,
+61 database, 43 engine, 19 Python research and 8 Node research), lint/typecheck
+and both Hermes exports. The existing mobile Hook lint warning remains.
+The workspace's Deno registry connection failed; the successful full run used
+already downloaded npm archives through a loopback registry cache, verifying all
+eleven archives against the unchanged frozen Edge lock SHA-512 values first.
+No dependency, lock or repository check was weakened. Ordinary hosted CI must
+also pass. Actual final deployment files separately passed **21 catalog HTTP
+cases** with a fresh Deno cache and npm/remote imports disabled.
+
+Final four-file payload SHA-256:
+`b6f440baf81ea326ac5c4144179a9655406cd1817ef911b18a14a8304d8e93f5`.
+Entrypoint SHA-256:
+`84671a86435c385f9476890a7d9f3b3d792cc4241c95517eec8926a89ac39be7`.
+Plan module SHA-256:
+`25447fc9e4ba9a811db552e185c3f2e78a0dff81fdade13a3e343dd58b846025`.
+The existing normalizer and local deployment config are unchanged. The actual
+no-I/O balanced plan is 18 requests / 30 pages; the curated plan is 3 requests /
+29 identifiers. Read-only hosted coverage executed successfully. No new native
+runtime acceptance or broader catalog result is claimed.
+
 ## TMDB one-page canary accepted — 2026-09-13 / #182
 
 **The owner-authorized configuration/rollout/preflight/one-page canary unit is
