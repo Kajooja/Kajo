@@ -15,6 +15,7 @@ const FILES = [
   'catalog-import/deno.json',
   '_shared/catalog-normalizers.mjs',
   '_shared/tmdb-import-plan.mjs',
+  '_shared/catalog-import-diagnostics.mjs',
 ];
 const sha256 = (content) => createHash('sha256').update(content).digest('hex');
 
@@ -58,6 +59,7 @@ export async function prepareCatalogDeployment({
       pathToFileURL(join(staging, FILES[0])).href,
       pathToFileURL(join(staging, FILES[2])).href,
       pathToFileURL(join(staging, FILES[3])).href,
+      pathToFileURL(join(staging, FILES[4])).href,
       'node:crypto',
     ];
     assert.deepEqual(graph.modules.map((module) => {

@@ -137,6 +137,25 @@ async function expectError(response: Response, status: number, code: string) {
   assert.deepEqual(await response.json(), { status: 'error', code });
 }
 
+async function expectImportFailure(response: Response, expected: {
+  stage: string; reason: string; httpStatus?: number | null;
+  completedPages?: number[]; failedPage?: number | null;
+  confirmedImportedCount?: number; confirmedSkippedCount?: number;
+}) {
+  assert.equal(response.status, 502);
+  const diagnostics = {
+    version: 'catalog-import-diagnostics-v1',
+    stage: expected.stage, reason: expected.reason, httpStatus: expected.httpStatus ?? null,
+    completedPages: expected.completedPages ?? [],
+    failedPage: expected.failedPage === undefined ? 1 : expected.failedPage,
+    confirmedImportedCount: expected.confirmedImportedCount ?? 0,
+    confirmedSkippedCount: expected.confirmedSkippedCount ?? 0,
+    writeOutcome: expected.stage === 'catalog-upsert' ? 'unknown' : 'not-started',
+  };
+  assert.deepEqual(await response.json(), { status: 'error', code: 'provider-import-failed', diagnostics });
+  return diagnostics;
+}
+
 Deno.test('catalog rejects anonymous, user, publishable, foreign and misplaced modern keys before I/O', async () => {
   await withEdge(async (f) => {
     const rejected: HeadersInit[] = [
@@ -410,13 +429,12 @@ Deno.test('upstream failures stop import and cannot reflect credentials into log
         }
         return normal(request);
       };
-      await expectError(
+      const diagnostics = await expectImportFailure(
         await f.request({ action: 'tmdb-movies', pages: 3 }),
-        502,
-        'provider-import-failed',
+        { stage: failure === 'provider' ? 'tmdb-discover' : 'catalog-upsert', reason: 'http-error', httpStatus: 500 },
       );
       assert.equal(f.outgoing.length, failure === 'provider' ? 1 : 4);
-      assert.deepEqual(f.logs, ['catalog-import failed: provider-import-failed']);
+      assert.deepEqual(f.logs, [`catalog-import failed: ${JSON.stringify(diagnostics)}`]);
     });
   }
 });
@@ -429,10 +447,9 @@ Deno.test('incomplete or malformed Data API success never reports a completed im
       f.upstream = (request) => new URL(request.url).hostname === 'catalog.test'
         ? Response.json(payload)
         : normal(request);
-      await expectError(
+      await expectImportFailure(
         await f.request({ action: 'tmdb-movies', pages: 3 }),
-        502,
-        'provider-import-failed',
+        { stage: 'catalog-upsert', reason: 'invalid-response', httpStatus: 200 },
       );
       assert.equal(f.outgoing.length, 4);
     });
@@ -516,7 +533,10 @@ Deno.test('malformed or mismatched provider pages and detail identities stop bef
     { page: 1, results: Array(21).fill({ id: 1 }) }, { page: 1, results: [{ id: '1' }] }]) {
     await withEdge(async (f) => {
       f.upstream = () => Response.json(payload);
-      await expectError(await f.request({ action: 'tmdb-movie-bucket-v1', bucket: '2000s', asOf: '2026-09-13' }), 502, 'provider-import-failed');
+      await expectImportFailure(await f.request({ action: 'tmdb-movie-bucket-v1', bucket: '2000s', asOf: '2026-09-13' }), {
+        stage: 'tmdb-discover', reason: Array.isArray(payload.results) && payload.results[0]?.id === '1'
+          ? 'identity-mismatch' : 'invalid-response',
+      });
       assert.equal(f.outgoing.length, 1);
     });
   }
@@ -524,7 +544,7 @@ Deno.test('malformed or mismatched provider pages and detail identities stop bef
     const normal = f.upstream;
     f.upstream = (request) => new URL(request.url).pathname === '/3/movie/1'
       ? Response.json({ id: 2 }) : normal(request);
-    await expectError(await f.request({ action: 'tmdb-movies' }), 502, 'provider-import-failed');
+    await expectImportFailure(await f.request({ action: 'tmdb-movies' }), { stage: 'tmdb-detail', reason: 'identity-mismatch' });
     assert.equal(f.outgoing.length, 2);
   });
 });
@@ -578,10 +598,127 @@ Deno.test('missing, ambiguous, conflicting or sparse IMDb results cannot write c
         return Response.json({ ...await response.json(), ...(failure === 'alias'
           ? { external_ids: { imdb_id: 'tt9999999' } } : { poster_path: null }) });
       };
-      await expectError(await f.request({ action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'], asOf: '2026-09-13' }), 502, 'provider-import-failed');
+      await expectImportFailure(await f.request({ action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'], asOf: '2026-09-13' }), {
+        stage: failure === 'alias' ? 'tmdb-detail' : failure === 'metadata' ? 'normalize' : 'tmdb-find',
+        reason: failure === 'metadata' ? 'ineligible-metadata' : 'identity-mismatch', failedPage: null,
+      });
       assert.ok(f.outgoing.every((request) => new URL(request.url).hostname === 'api.themoviedb.org'));
     });
   }
+});
+
+Deno.test('diagnostics distinguish discovery, IMDb lookup, localized detail, fallback and upsert HTTP failures', async () => {
+  for (const stage of ['tmdb-discover', 'tmdb-find', 'tmdb-detail', 'tmdb-fallback', 'catalog-upsert']) {
+    await withEdge(async (f) => {
+      const normal = f.upstream;
+      f.upstream = (request) => {
+        const url = new URL(request.url);
+        const actualStage = url.hostname === 'catalog.test' ? 'catalog-upsert'
+          : url.pathname.includes('/discover/') ? 'tmdb-discover'
+          : url.pathname.includes('/find/') ? 'tmdb-find'
+          : url.searchParams.get('language') === 'en-US' ? 'tmdb-fallback' : 'tmdb-detail';
+        return actualStage === stage
+          ? new Response(`${modern} ${providerToken}`, { status: 429 }) : normal(request);
+      };
+      const byImdb = stage === 'tmdb-find';
+      const diagnostics = await expectImportFailure(await f.request(byImdb
+        ? { action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'], asOf: '2026-09-13' }
+        : { action: 'tmdb-movies' }), { stage, reason: 'http-error', httpStatus: 429, failedPage: byImdb ? null : 1 });
+      assert.deepEqual(f.logs, [`catalog-import failed: ${JSON.stringify(diagnostics)}`]);
+    });
+  }
+});
+
+Deno.test('transport, timeout, invalid JSON and response-shape diagnostics never reflect upstream error details', async () => {
+  for (const database of [false, true]) {
+    for (const reason of ['timeout', 'network-error', 'invalid-json', 'invalid-response']) {
+      await withEdge(async (f) => {
+        const normal = f.upstream;
+        f.upstream = (request) => {
+          if (!database || new URL(request.url).hostname === 'catalog.test') {
+            if (reason === 'timeout') throw new DOMException(`${modern} ${providerToken}`, 'TimeoutError');
+            if (reason === 'network-error') throw new TypeError(`${modern} ${providerToken}`);
+            if (reason === 'invalid-json') return new Response(`${modern} ${providerToken}`);
+            return Response.json(null);
+          }
+          return normal(request);
+        };
+        const diagnostics = await expectImportFailure(await f.request({ action: 'tmdb-movies' }), {
+          stage: database ? 'catalog-upsert' : 'tmdb-discover', reason,
+          httpStatus: reason.startsWith('invalid-') ? 200 : null,
+        });
+        assert.deepEqual(f.logs, [`catalog-import failed: ${JSON.stringify(diagnostics)}`]);
+      });
+    }
+  }
+});
+
+Deno.test('a second-page failure retains the acknowledged first page and distinguishes an unknown database write', async () => {
+  for (const failure of ['provider', 'database-timeout', 'database-ack']) {
+    await withEdge(async (f) => {
+      let page = 0;
+      const committed: number[] = [];
+      const normal = f.upstream;
+      f.upstream = (request) => {
+        const url = new URL(request.url);
+        if (url.pathname === '/3/discover/movie') {
+          page = Number(url.searchParams.get('page'));
+          if (page === 8 && failure === 'provider') return new Response('upstream unavailable', { status: 503 });
+        }
+        if (url.hostname === 'catalog.test') {
+          committed.push(page); // Fixture models a commit even if its acknowledgement is lost.
+          if (page === 8 && failure === 'database-timeout') throw new DOMException('response lost', 'TimeoutError');
+          if (page === 8 && failure === 'database-ack') return Response.json([]);
+        }
+        return normal(request);
+      };
+      await expectImportFailure(await f.request({ action: 'tmdb-movies', startPage: 7, pages: 3 }), {
+        stage: failure === 'provider' ? 'tmdb-discover' : 'catalog-upsert',
+        reason: failure === 'provider' ? 'http-error' : failure === 'database-timeout' ? 'timeout' : 'invalid-response',
+        httpStatus: failure === 'provider' ? 503 : failure === 'database-ack' ? 200 : null,
+        completedPages: [7], failedPage: 8, confirmedImportedCount: 1,
+      });
+      assert.deepEqual(committed, failure === 'provider' ? [7] : [7, 8]);
+      assert.deepEqual(f.outgoing.filter((r) => r.url.includes('/discover/')).map((r) => new URL(r.url).searchParams.get('page')), ['7', '8']);
+    });
+  }
+});
+
+Deno.test('a completed all-skipped page is reported without inventing an upsert', async () => {
+  await withEdge(async (f) => {
+    const normal = f.upstream;
+    f.upstream = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === '/3/discover/movie' && url.searchParams.get('page') === '2') return new Response('', { status: 503 });
+      const response = await normal(request);
+      return url.pathname === '/3/movie/1' ? Response.json({ ...await response.json(), poster_path: null }) : response;
+    };
+    await expectImportFailure(await f.request({ action: 'tmdb-movie-bucket-v1', bucket: '2000s', pages: 2, asOf: '2026-09-13' }), {
+      stage: 'tmdb-discover', reason: 'http-error', httpStatus: 503,
+      completedPages: [1], failedPage: 2, confirmedSkippedCount: 1,
+    });
+    assert.ok(f.outgoing.every((r) => new URL(r.url).hostname === 'api.themoviedb.org'));
+  });
+});
+
+Deno.test('concurrent detail failures preserve the first cause and stop before catalog writes', async () => {
+  await withEdge(async (f) => {
+    let secondStarted!: () => void;
+    const started = new Promise<void>((resolve) => { secondStarted = resolve; });
+    f.upstream = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === '/3/discover/movie') return Response.json({ page: 1, results: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }] });
+      if (url.pathname === '/3/movie/1') {
+        await started;
+        throw new DOMException('first private detail', 'TimeoutError');
+      }
+      secondStarted();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      return new Response('later private detail', { status: 503 });
+    };
+    await expectImportFailure(await f.request({ action: 'tmdb-movies' }), { stage: 'tmdb-detail', reason: 'timeout' });
+    assert.equal(f.outgoing.length, 5); // Discovery + four in-flight details, never the fifth detail or RPC.
+  });
 });
 
 if (!catalogPacket) {

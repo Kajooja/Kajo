@@ -259,7 +259,8 @@ test('bucket run records completed work and stops on the first failure without a
     sleep: async () => {}, progress: (checkpoint) => checkpoints.push(checkpoint),
   }), /fixture provider failure/);
   assert.deepEqual(calls.map((call) => call.bucket), ['finnish', 'classics']);
-  assert.deepEqual(checkpoints.map((checkpoint) => checkpoint.status), ['starting', 'completed', 'starting']);
+  assert.deepEqual(checkpoints.map((checkpoint) => checkpoint.status), ['starting', 'completed', 'starting', 'failed']);
+  assert.equal(checkpoints[3].diagnostics, null);
   const first = checkpoints[1].result;
   assert.equal(first.importedCount, 55);
   const expected = calls[0];
@@ -270,4 +271,88 @@ test('bucket run records completed work and stops on the first failure without a
     { importedCount: 61 }]) {
     assert.throws(() => validateTmdbImportResponse({ ...response, ...changes }, expected));
   }
+});
+
+const failureDiagnostics = {
+  version: 'catalog-import-diagnostics-v1', stage: 'catalog-upsert', reason: 'timeout', httpStatus: null,
+  completedPages: [1], failedPage: 2, confirmedImportedCount: 20, confirmedSkippedCount: 0, writeOutcome: 'unknown',
+};
+
+test('HTTP failure diagnostics reach the stopped CLI checkpoint without retry or raw upstream fields', async () => {
+  const realFetch = globalThis.fetch;
+  const checkpoints = [];
+  const calls = [];
+  const sleeps = [];
+  try {
+    globalThis.fetch = async (_url, init) => {
+      const batch = JSON.parse(init.body);
+      calls.push(batch);
+      return batch.bucket === 'finnish'
+        ? Response.json({ ...batch, status: 'imported', provider: 'tmdb', importedCount: 60, skippedCount: 0,
+          pages: [1, 2, 3], minimumVoteCount: 10 })
+        : Response.json({ status: 'error', code: 'provider-import-failed', message: 'reflected-secret',
+          diagnostics: { ...failureDiagnostics, details: 'reflected-secret' } }, { status: 502 });
+    };
+    await assert.rejects(runTmdbBetaImport(parseTmdbImportArguments(['--balanced-plan', '--as-of', '2026-09-13']), {
+      invoke: (batch) => invokeCatalogImport('https://fixture.invalid', 'sb_secret_fixture', batch),
+      sleep: async (delay) => { sleeps.push(delay); }, progress: (checkpoint) => checkpoints.push(checkpoint),
+    }), (error) => {
+      assert.match(error.message, /HTTP 502: provider-import-failed/);
+      assert.match(error.message, /unacknowledged writes may have committed/);
+      assert.doesNotMatch(error.message, /reflected-secret/);
+      assert.deepEqual(error.diagnostics, failureDiagnostics);
+      return true;
+    });
+    assert.deepEqual(calls.map((x) => x.bucket), ['finnish', 'classics']);
+    assert.equal(sleeps.length, 1);
+    assert.deepEqual(checkpoints.map((x) => x.status), ['starting', 'completed', 'starting', 'failed']);
+    assert.deepEqual(checkpoints.at(-1).diagnostics, failureDiagnostics);
+    assert.doesNotMatch(JSON.stringify(checkpoints), /reflected-secret/);
+  } finally { globalThis.fetch = realFetch; }
+});
+
+test('only bounded diagnostics matching the failed request are presented; legacy errors remain supported', () => {
+  const expected = { action: 'tmdb-movie-bucket-v1', bucket: '2000s', startPage: 1, pages: 2 };
+  for (const diagnostics of [undefined, { ...failureDiagnostics, version: 'future' },
+    { ...failureDiagnostics, stage: 'reflected-secret' }, { ...failureDiagnostics, reason: 'reflected-secret' },
+    { ...failureDiagnostics, completedPages: [2] }, { ...failureDiagnostics, completedPages: [1, 2] },
+    { ...failureDiagnostics, failedPage: 3 }, { ...failureDiagnostics, httpStatus: 600 },
+    { ...failureDiagnostics, confirmedImportedCount: 21 }, { ...failureDiagnostics, confirmedSkippedCount: -1 },
+    { ...failureDiagnostics, writeOutcome: 'rolled-back' }, { ...failureDiagnostics, writeOutcome: 'not-started' }]) {
+    assert.throws(() => validateTmdbImportResponse({ status: 'error', code: 'provider-import-failed', diagnostics }, expected), (error) => {
+      assert.equal(error.message, 'catalog-import failed with code: provider-import-failed');
+      assert.equal(error.diagnostics, null);
+      return true;
+    });
+  }
+  assert.throws(() => validateTmdbImportResponse({ status: 'error', code: 'reflected-secret' }, expected), /unexpected-response/);
+  const imdb = { ...failureDiagnostics, completedPages: [], failedPage: null, confirmedImportedCount: 0 };
+  assert.throws(() => validateTmdbImportResponse({ status: 'error', code: 'provider-import-failed', diagnostics: imdb }, {
+    action: 'tmdb-movies-by-imdb-v1', imdbIds: ['tt0000001'],
+  }), (error) => { assert.deepEqual(error.diagnostics, imdb); return true; });
+});
+
+test('transport failures and unknown server codes do not echo credentials or invent progress', async () => {
+  const realFetch = globalThis.fetch;
+  try {
+    for (const mode of ['throw', 'code']) {
+      globalThis.fetch = async () => {
+        if (mode === 'throw') throw new Error('reflected-secret');
+        return Response.json({ code: 'reflected-secret', diagnostics: failureDiagnostics }, { status: 502 });
+      };
+      await assert.rejects(invokeCatalogImport('https://fixture.invalid', 'sb_secret_fixture', { startPage: 1, pages: 2 }), (error) => {
+        assert.doesNotMatch(error.message, /reflected-secret/);
+        assert.equal(error.diagnostics, null);
+        return true;
+      });
+    }
+  } finally { globalThis.fetch = realFetch; }
+});
+
+test('a non-success HTTP status cannot become a successful receipt even when its body claims imported', async () => {
+  const realFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => Response.json({ status: 'imported', provider: 'tmdb', code: 'tmdb-not-configured' }, { status: 503 });
+    await assert.rejects(invokeCatalogImport('https://fixture.invalid', 'sb_secret_fixture', { startPage: 1, pages: 1 }), /TMDB_READ_ACCESS_TOKEN/);
+  } finally { globalThis.fetch = realFetch; }
 });

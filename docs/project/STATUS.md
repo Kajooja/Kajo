@@ -10,64 +10,64 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 balanced catalog expansion and exact enrichment
+## Current packet — #182 catalog import diagnostics
 
-The next catalog source packet is `feat/182-tmdb-balanced-expansion`, based on
-accepted main `95d2a32ecebb704bc4b7d8105dd2d7552e81accd` / PR #250.
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns its later PR/CI/merge
-and hosted checkpoint. The [expansion plan](sprints/SPRINT-014.md#balanced-tmdb-expansion-and-curated-enrichment--2026-09-13--182)
-owns the exact budgets, working coverage targets and executable commands.
+Continue `fix/182-catalog-import-diagnostics` from accepted main
+`f462aaa20e3a65899452be847ee9ff3af22f167d` / PR #251.
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns the subsequent
+PR/CI/merge and hosted readback. The new source supplies the bounded
+`catalog-import-diagnostics-v1` failure contract and shared CLI validation.
+The top-level error code and HTTP 502 remain compatible; stages separate
+Discover/Find/detail/fallback/normalization from canonical upsert failures.
 
-Source now supports **18 fixed selection buckets / 30 pages**, with Finnish-language,
-five era, six other original-language and six genre buckets. The new versioned
-request actions cannot become unfiltered imports on the older deployment.
-A separate exact-IMDb action resolves at most ten movies, verifies detail aliases
-and metadata, then writes one atomic canonical batch. Invalid/ambiguous mappings
-stop the batch; sparse/off-filter discovery candidates are counted and excluded.
-The existing CLI prints no-I/O plans, checks returned selection identity and
-records each starting/completed request; it never automatically retries ambiguity.
-The reproducible deployment packet now includes four local files, without external
-runtime dependencies. Source validation and hosted execution remain separate facts.
-Local root validation passed 387 tests, lint/typecheck and both Hermes exports;
-the exact deployment packet independently passed 21 catalog HTTP cases. The sprint
-checkpoint records the unchanged-lock cache workaround, payload hashes and limits.
+Completed pages and confirmed import/skip counts describe acknowledged work
+within the failed request. A failed database acknowledgement has
+`writeOutcome=unknown`, even if it timed out after the database committed.
+CLI starting/completed/failed checkpoints stop immediately; no automatic retry
+or next batch occurs. Raw upstream messages, bodies, headers, IDs and credentials
+are excluded from diagnostics. Source preparation now packages five local files,
+including the shared diagnostic module, without external runtime dependencies.
+Local root validation passed **396 tests**, lint/typecheck and both Hermes
+exports. The final five-file packet separately passed **26 catalog HTTP cases**
+with a fresh cache and no npm/remote imports. The sprint records payload hashes
+and the unchanged-lock registry-cache workaround. Hosted rollout remains separate.
 
-The read-only expansion report at **2026-09-13 11:37:42 UTC** confirms **49**
-discoverable movies, **20** with TMDB/core metadata, **0** non-English provider
-movies and **29** curated gaps. Each gap has exactly one existing IMDb alias.
-The three planned enrichment requests contain 10 + 10 + 9 identifiers and should
-retain the 29 existing Item identities. The coverage report counts canonical Items,
-original languages, Finnish production, five eras, genres and all curated gaps;
-its proposed coverage targets currently all remain unmet.
+**Next bounded action:** finish the required source/PR/CI gate, prepare and review
+the exact catalog-only payload, then record any approved rollout in #182.
+Validate error behavior with deterministic fixtures, including a second-page
+failure after a first-page commit. Do not consume another provider import to test
+diagnostics. The observed science-fiction error's cause remains unresolved.
 
-**Next bounded action:** finish source CI/acceptance, then review and roll out this
-exact catalog-only four-file packet and execute the three curated enrichment
-requests before expansion. Re-read #182 for any later result first. Verify each
-batch's aliases/Item identity and before/after coverage, then start the bounded
-Finnish/era/language/genre requests. Full expansion is at most 600 Discover
-candidates, not a promise of 600 new Items. The proposed working target is at
-least 300 complete provider movies with the diversity thresholds in the plan;
-unmet targets require a separately bounded follow-up, never an automatic wider run.
-Further hosted invocation uses an authorized admin environment or the working
-owner **catalog-import > Test** view. The connector cannot invoke functions or
-read secrets; do not request key values, repeat setup/sign-in or invent a
-configuration blocker. No broader import or new deployment ran in source preparation.
+### Accepted hosted catalog checkpoint — 2026-09-13
 
-The earlier owner-authorized one-page canary is complete: **20 upserts, 19 new
-Items and one curated overlap**, `fi-FI` / `FI` / minimum votes 40 at
-2026-09-13 11:03:06 UTC. All 20 matching TMDB/IMDb aliases and JPEG URLs were
-verified; all original languages were `en`, 17 release years were 2026.
-BOOK remains 415 discoverable / 385 images / no descriptions. Last accepted
-hosted importer is ACTIVE v9, matching PR #248's three source files, with
-`verify_jwt=false`. **Do not repeat the canary, privileged preflight or key setup.**
-The [accepted canary checkpoint](sprints/SPRINT-014.md#tmdb-one-page-canary-accepted--2026-09-13--182)
-retains the exact response, deployment hashes and verification limits.
+The owner completed exact curated enrichment and the bounded discovery pass on
+ACTIVE catalog-import v10. At **20:51:19 UTC**, coverage is **425 discoverable
+MOVIE Items**, all with complete TMDB core metadata, posters and descriptions.
+All eight declared expansion coverage checks pass. Original languages are
+**en 259 / fi 60** (75.1% together); Finnish production is 60, non-English 166,
+seven languages have ten movies, era counts are 66/55/74/79/151, and documentary
+coverage is 22. The final identity check at **20:54:38 UTC** preserves all 30
+curated UUIDs/IMDb aliases and original creation times.
 
-Keep #182 / `MVP-CAT-001..003` open for actual breadth/diversity, refresh,
-rights/attribution, BOOK descriptions and native quality. E1/D1/D2 stay accepted
-with rejected challenger admission. #229 retains native/device/fresh-account gates
-and six installed immutable forwards; do not redeploy them or reset accounts.
-Optional research, APK or later pre-MVP UI work does not replace this catalog task.
+The pass used **18 request attempts / 28 verified page fetches**, plus two
+reserved failed-science-fiction page slots, within 30 pages / 600 raw candidates.
+One Korean page was repeated; Spanish was deferred and science-fiction's failed
+request had no observed writes. Its exact upstream page progress is unknown.
+No requests remain in this pass. The detailed ledger/identities remain in #182;
+[the sprint checkpoint](sprints/SPRINT-014.md#catalog-expansion-verified-and-failure-diagnostics--2026-09-13--182)
+records the source and operational limits.
+
+The owner wants English-language and Finnish films to dominate the offering;
+other languages complement them. Keep language and Finnish-production measures
+separate, and preserve Personal/Shared personalization. BOOK remains 415
+discoverable / 385 images / zero descriptions. Keep #182 / `MVP-CAT-001..003`
+open for refresh, BOOK metadata, rights/attribution and native quality. Passing
+coverage is not native catalog/Taste or release acceptance.
+
+Do not repeat the canary, keys/setup/preflight, completed enrichment/expansion or
+the six installed immutable forwards. Preserve #229's independent
+native/device/fresh-account gates and accepted E1/D1/D2 with rejected challenger
+admission. Optional research, APK and later pre-MVP UI work stay separately ordered.
 
 ## Accepted D2 development comparison
 
