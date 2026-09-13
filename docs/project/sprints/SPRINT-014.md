@@ -14,6 +14,95 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog privileged preflight — 2026-09-13 / #182
+
+**The configuration repair and privileged preflight are accepted.** PR #248
+merged to main `bd7a23f776e99b452404fef0393155b62d96ade0` after all five
+[CI #488 jobs](https://github.com/Kajooja/Kajo/actions/runs/34726762173) passed at
+`9884088099635bd60cd0b6bb929b0b5480b97c3f`; the accepted tree
+`c2ec468e1359cb7fbbf637ed9eb85119411df07c` matches verified source. APK was
+skipped. Root validation passed 377 tests, lint/typecheck and both Hermes exports;
+the actual deployment packet replay passed 15 catalog HTTP cases. The older
+source-preparation and diagnostic sections below retain their dated pending state,
+not the current next task.
+
+The agent deployed the exact three-file repair once as ACTIVE v8. Its verified
+bundle digest was
+`c5c781a5cbe182b7646c1cf7530afa3a9bc0b84e27d81e30e89adb56728ca3d4`.
+The latest pre-canary readback now reports ACTIVE v9, digest
+`9e04d650a398c79c9e0a0ed8e7adefb97c4b45aebfb9b7ee3f2f2f944a01ab88`.
+All three contents still match accepted PR #248 source exactly, with
+`verify_jwt=false` and the function-local import map. The agent did not redeploy
+in this continuation; the metadata change's cause is not inferred. Payload and
+per-file hashes remain the ones in the recovery checkpoint below.
+
+Real negative HTTPS probes at 2026-09-13 00:07 UTC returned GET 405,
+anonymous/synthetic-user/forged-legacy POST 403 and foreign-modern-fixture gateway
+401. All POSTs used `invalid-preflight-only`, so no probe could start a provider
+import. These synthetic JWT checks are not a real signed-in session test.
+
+The owner subsequently used the supported Dashboard **Test > Headers > Add secret
+key** route with the existing Default key. At **2026-09-13 00:23:14 UTC**, the
+reported status/body for `{"action":"invalid-preflight-only"}` was exactly:
+
+```json
+{"status":"error","code":"unsupported-action"}
+```
+
+HTTP 400 here proves configured-key acceptance and reaching body validation;
+provider and Data API work have not started. The owner supplied status, body and
+response metadata, not the secret request header. Only this minimal result is
+recorded; response cookies and unrelated headers are not part of the handoff.
+No new key/rotation, repeated presence check or repeated privileged preflight is
+needed. The old `invalid-legacy-service-role-key` blocker is resolved by PR #248.
+
+The agent re-ran the committed read-only coverage query after this preflight:
+
+| Inventory | Stored | Discoverable | Images | Descriptions |
+| --- | ---: | ---: | ---: | ---: |
+| BOOK | 427 | 415 | 385 | 0 |
+| MOVIE | 42 | 30 | 0 | 0 |
+
+TMDB source rows and distinct TMDB Items remain zero, and no mock is discoverable.
+All 415 discoverable books and 30 movies have creators; release-year coverage is
+413 BOOK / 30 MOVIE. Batch EXECUTE remains false for anon/authenticated and true
+for service_role. These are dated pre-canary aggregates, not an import result.
+
+**Exact continuation:** use the same owner Test view, keep POST and the successful
+secret-key header, and send this already-authorized one-page body once:
+
+```json
+{
+  "action": "tmdb-movies",
+  "startPage": 1,
+  "pages": 1,
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+The owner has been given this request while the agent prepares the resumable
+handoff. Check Issue #182 for a later result before sending or retrying it. The
+connector cannot invoke functions or read secret values, and the local admin
+environment has no privileged invocation credential; the working Dashboard route
+keeps the key within Supabase. Do not restart the incomplete browser sign-in.
+
+Require HTTP 200 with `status: imported`, `provider: tmdb`, `pages: [1]`, exact
+FI locale/region and vote threshold, and inspect returned import/skip counts.
+Those counts alone are not unique catalog coverage. Re-run
+`scripts/catalog/catalog-coverage.sql`, inspect actual title/description/poster/
+creator/year/language/tags and matching TMDB aliases, and record before/after
+changes and any gaps. On an error, preserve the observed response and inspect
+coverage before retrying; do not claim provider-token validity from the preflight.
+The default 15-page expansion remains outside this initial canary. Keep #182 open
+for catalog breadth/quality; no Phase 14/MVP closure is implied by this packet.
+
+The owner requested completion and a handoff resumable with “jatka reposta”.
+STATUS names this one active task and Issue #182 owns later owner/runtime results.
+Other Edge functions, six installed forwards, accounts, #229 native/device gates,
+rejected research challenger admission and the pre-MVP UI queue retain their scope.
+
 ## Catalog modern-key recovery — 2026-09-12 / #182
 
 PR #247 accepted the diagnostic source on main

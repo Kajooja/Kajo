@@ -42,9 +42,10 @@ real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development data
 This bounded development comparison can precede a larger stable benchmark with
 its own manifest. STATUS names the branch and actual acceptance. #229 retains
 its native/fresh-account gates; external research does not close them. #182’s
-Phase14.3 Edge source audit is implemented; after its required CI/source acceptance,
-verify hosted configuration and prepare the bounded provider expansion. Optional further research and a winning external
-model are not prerequisites for that release work.
+Phase14.3 Edge source/deployment and configured-key preflight are accepted;
+verify the already-authorized one-page provider canary and coverage before
+expansion. Optional further research and a winning external model are not
+prerequisites for that release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
 
@@ -133,12 +134,13 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-#182's source-audit and reproducible deployment prerequisites are accepted through
-PR #245. The owner-authorized v3 catalog deployment matches source exactly, but its
-hosted POST configuration gate returns `server-not-configured`; no TMDB import has
-run. Resolve the actual server configuration, then verify the already-authorized
-one-page canary and coverage before expansion. Fixture/source success does not
-close hosted import, catalog breadth, provider rights or native quality gates.
+#182's source/deployment prerequisites and configuration recovery are accepted
+through PR #248. Exact hosted source readback and rejection probes pass; the owner
+confirmed the privileged Default-key preflight on 2026-09-13. Verify the
+already-authorized one-page TMDB canary and actual metadata/coverage before broader
+expansion. STATUS and Issue #182 own the latest request result so a completed
+preflight/import is not repeated. Configuration/auth acceptance does not close
+hosted provider import, catalog breadth, provider rights or native quality gates.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
