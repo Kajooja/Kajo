@@ -10,62 +10,68 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current hosted packet — #182 one-page TMDB canary
+## Current hosted packet — #182 canary accepted; catalog expansion next
 
-**Configuration recovery and the privileged preflight are complete.**
-PR [#248](https://github.com/Kajooja/Kajo/pull/248) is accepted on main
-`bd7a23f776e99b452404fef0393155b62d96ade0`, tree
-`c2ec468e1359cb7fbbf637ed9eb85119411df07c`. All five required CI #488 jobs
-passed at unchanged head `9884088099635bd60cd0b6bb929b0b5480b97c3f` before merge;
-local root validation passed 377 tests and actual staged replay passed 15 catalog
-HTTP cases. The exact three-file repair was deployed as ACTIVE v8. The latest
-readback reports ACTIVE v9 with all three contents still matching accepted
-source, `verify_jwt=false` and the function-local import map. No additional agent
-deployment was performed for this continuation.
+**The authorized one-page TMDB canary is complete and independently verified.**
+At **2026-09-13 11:03:06 UTC**, the owner's successful Test response reported
+`importedCount: 20`, `skippedCount: 0`, `pages: [1]`, `language: fi-FI`,
+`region: FI` and `minimumVoteCount: 40`. The existing CLI response validator
+accepts the exact supplied body. Read-only database checks confirm all 20 TMDB
+sources synced at `2026-09-13T11:03:06.083766Z` and map to 20 distinct Items with
+matching TMDB and IMDb aliases. **Do not repeat the canary or request its result.**
 
-The owner completed **Test > Headers > Add secret key** with the existing Default
-key. The response at **2026-09-13 00:23:14 UTC** was exactly HTTP 400
-`{"status":"error","code":"unsupported-action"}` for
-`{"action":"invalid-preflight-only"}`. This is successful configured-key
-acceptance before provider/Data API work. Earlier hosted negative probes returned
-405 for GET, 403 for anonymous/synthetic-user/forged-legacy POST and gateway 401
-for a foreign modern fixture. The former 500 configuration failure is resolved.
+Discoverable MOVIE inventory increased **30 → 49**, and stored MOVIE rows
+**42 → 61**. Nineteen Items are new; TMDB `278` / IMDb `tt0111161` enriched the
+existing curated *Rita Hayworth - avain pakoon* Item while retaining its earlier
+creation time and curated source. All 20 TMDB Items have title, description,
+poster, creators, year, original language, normalized tags, runtime, vote count
+and popularity. All 20 poster URLs returned HTTP 200 / `image/jpeg`. There are
+zero missing matching TMDB/IMDb aliases and zero discoverable mocks. BOOK stays
+at 415 discoverable / 427 stored, with 385 images and no descriptions. Batch RPC
+EXECUTE remains false for anon/authenticated and true for service_role.
 
-**Do not repeat deployment, key-presence questions, TMDB-token setup, the private
-log request or the successful privileged preflight.** The owner added
-`TMDB_READ_ACCESS_TOKEN`, confirmed built-in URL/plural server keys, and supplied
-the diagnosed invalid optional legacy check. The existing Default secret key is
-sufficient; no new key, rotation or JWT-signing-key change is required.
-PR #248 excludes malformed optional legacy credentials only when validated modern
-keys exist; exact configured-key authorization and fail-closed unusable
-configuration remain intact. Do not expose keys or restore floating v2 code.
+The [accepted canary checkpoint](sprints/SPRINT-014.md#tmdb-one-page-canary-accepted--2026-09-13--182)
+records the response, before/after inventory, deduplication, metadata/CDN checks,
+evidence limits and proposed continuation. The first page contains 20 original
+English-language films, 17 from 2026. Finnish and English fallback descriptions
+are both present; `language: fi-FI` localizes metadata and does not establish a
+Finnish-content mix. Twenty MOVIE Items have images/descriptions; 29 remaining
+curated movies do not. This proves the provider path, not beta breadth or native
+image-rendering/quality acceptance. `MVP-CAT-001..003` and #182 remain open.
 
-**Next bounded task: verify the already-authorized one-page TMDB canary and record
-actual metadata/coverage.** First read the latest
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) checkpoint in case the
-owner has already run it. The owner has been given the exact one-page body in the
-same Dashboard Test view, preserving POST and the accepted secret-key header.
-The [canary checkpoint](sprints/SPRINT-014.md#catalog-privileged-preflight--2026-09-13--182)
-contains the body and response/coverage acceptance. The connector cannot invoke
-functions or read secret values, and no local admin invocation credentials exist.
-Continue through the working owner Test view; do not restart browser sign-in.
+**Next bounded task: prepare and review #182 catalog expansion with explicit
+breadth, diversity and remaining-metadata targets.** Read the latest
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) checkpoint before executing
+another import. An actual CLI dry-run starting at page 2, covering 14 pages in
+max-three-page requests, produces batches 2–4, 5–7, 8–10, 11–13 and 14–15.
+It is a reviewed transport proposal, not a completed expansion or a diversity
+plan. Specify genre/year/original-language coverage and enrichment of the remaining
+29 curated MOVIE Items, then run the selected bounded batches with before/after
+coverage and stop-on-error behavior. Do not assume a popularity-sorted page range
+alone meets the Finnish/international diversity requirement or promises a fixed
+unique Item count. Source/control improvements needed for that plan can proceed
+without secret access; a further hosted import uses an authorized admin environment
+or the working owner Test view.
 
-Fresh pre-canary read-only coverage remains **415 discoverable BOOK / 30 MOVIE**,
-385 book images, no movie images or discoverable descriptions, zero TMDB sources
-and zero visible mocks. Stored counts are 427 BOOK / 42 MOVIE. Batch RPC EXECUTE
-remains false for anon/authenticated and true for service_role. No actual TMDB
-import is verified at this checkpoint; provider-token validity remains open until
-the real request succeeds. If the owner has already sent it, inspect response and
-coverage before any retry. Do not run the CLI's default 15-page expansion before
-single-page review. Keep #182 open for catalog breadth/quality after the canary.
+The existing configuration, Default-key preflight and provider token have now
+worked through the actual provider and privileged Data API path. No new key,
+rotation, settings/presence check, private log or browser sign-in is needed.
+PR #248 is the accepted runtime repair on `bd7a23f776e99b452404fef0393155b62d96ade0`;
+all five CI #488 jobs, 377 local tests and 15 staged catalog cases passed.
+PR #249 accepted the earlier preflight handoff on
+`395b0bf222000377cd04322436e6f398e5f8c1e2` after all five CI #490 jobs passed.
+Fresh ACTIVE v9 readback still matches all three accepted source files exactly,
+with `verify_jwt=false` and the local import map; no new deployment was needed.
+Issue #182 owns this documentation packet's later merge/CI checkpoint.
 
-The owner authorized completing the catalog source merge, exact catalog-only
-rollout and credential-verified one-page canary, and requested this resumable
-handoff. These approvals persist. E1/D1/D2 remain accepted; the rejected challenger
-remains research-only. #229 retains its separate native/device/fresh-account gates
-and six installed immutable forwards. Do not redeploy those forwards or reset
-accounts. Optional research, APK work and #240/UI work do not replace this named
-continuation; the owner UI ideas remain required before MVP.
+The owner authorized completing the catalog repair/rollout and one-page canary,
+then requested a resumable repository handoff. This bounded unit is complete;
+retain the demonstrated exact-key boundary and do not restore floating v2 code.
+E1/D1/D2 stay accepted, with the rejected challenger research-only. #229 retains
+its native/device/fresh-account gates and six installed immutable forwards.
+Do not redeploy those forwards or reset accounts. Optional research, APK work
+and #240/UI work do not replace the named catalog continuation; the owner UI
+ideas remain required before MVP. No phase or public-release gate is closed here.
 
 ## Accepted D2 development comparison
 
@@ -217,8 +223,8 @@ advisories; #238 prioritizes the runtime routing decoder before public links and
 coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
 Open source findings are assigned to their existing work owners:
-#228 configured protocol-2 device/recovery acceptance; #182 hosted catalog configuration
-and provider expansion after this source verification; #160 / MVP-OPS-005 production configuration,
+#228 configured protocol-2 device/recovery acceptance; #182 catalog breadth/diversity
+and metadata expansion after the accepted provider canary; #160 / MVP-OPS-005 production configuration,
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.
 

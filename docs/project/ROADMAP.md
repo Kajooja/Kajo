@@ -42,9 +42,10 @@ real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development data
 This bounded development comparison can precede a larger stable benchmark with
 its own manifest. STATUS names the branch and actual acceptance. #229 retains
 its native/fresh-account gates; external research does not close them. #182’s
-Phase14.3 Edge source/deployment and configured-key preflight are accepted;
-verify the already-authorized one-page provider canary and coverage before
-expansion. Optional further research and a winning external model are not
+Phase14.3 Edge source/deployment, configured-key preflight and the one-page
+provider canary are accepted; the 49 discoverable movies include 20 TMDB-backed
+Items. Continue bounded catalog expansion with explicit diversity and metadata
+targets. Optional further research and a winning external model are not
 prerequisites for that release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
@@ -134,13 +135,15 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-#182's source/deployment prerequisites and configuration recovery are accepted
-through PR #248. Exact hosted source readback and rejection probes pass; the owner
-confirmed the privileged Default-key preflight on 2026-09-13. Verify the
-already-authorized one-page TMDB canary and actual metadata/coverage before broader
-expansion. STATUS and Issue #182 own the latest request result so a completed
-preflight/import is not repeated. Configuration/auth acceptance does not close
-hosted provider import, catalog breadth, provider rights or native quality gates.
+#182's source/deployment and configuration recovery are accepted through PR #248.
+The 2026-09-13 one-page TMDB canary is verified: 20 provider Items, 19 new canonical
+Items plus one curated overlap, 49 discoverable MOVIE Items total, complete checked
+metadata/aliases for all 20 and 20 reachable JPEG posters. This closes the initial
+hosted provider-path gate. Prepare bounded expansion and enrichment next: all 20
+canary films have original language `en`, 17 are from 2026, and 29 curated movies
+still lack images/descriptions. STATUS and Issue #182 own the exact plan and later
+results; do not repeat the canary. Catalog breadth/diversity, provider rights,
+repeatable refresh and native quality gates remain open.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 

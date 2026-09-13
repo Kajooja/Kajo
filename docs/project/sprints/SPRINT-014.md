@@ -14,6 +14,107 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## TMDB one-page canary accepted — 2026-09-13 / #182
+
+**The owner-authorized configuration/rollout/preflight/one-page canary unit is
+complete.** The owner supplied this successful import body with a response date
+of **2026-09-13 11:03:06 UTC**:
+
+```json
+{
+  "status": "imported",
+  "provider": "tmdb",
+  "importedCount": 20,
+  "skippedCount": 0,
+  "pages": [1],
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+`validateTmdbImportResponse` from the existing CLI accepts the supplied body with
+the exact requested page/locale/threshold. The agent did not invoke another
+provider import. The committed read-only coverage query and a bounded inspection
+of all 20 provider Items independently confirm the stored result; all sources
+have `synced_at = 2026-09-13T11:03:06.083766Z`. Provider-token authentication and
+the matched modern-key Data API upsert have now worked in the hosted path.
+Only the response/result and minimal timing evidence are recorded, not cookies,
+request headers, secret values or full provider payloads.
+
+| Measure | Before | After |
+| --- | ---: | ---: |
+| Discoverable MOVIE Items | 30 | 49 |
+| Stored MOVIE Items | 42 | 61 |
+| MOVIE Items with images | 0 | 20 |
+| MOVIE Items with descriptions | 0 | 20 |
+| TMDB source rows / distinct Items | 0 / 0 | 20 / 20 |
+| Discoverable BOOK Items | 415 | 415 |
+| Stored BOOK Items | 427 | 427 |
+| BOOK Items with images / descriptions | 385 / 0 | 385 / 0 |
+| Discoverable mocks | 0 | 0 |
+
+The net increase is **19**, not 20: TMDB `278` / IMDb `tt0111161`
+(*Rita Hayworth - avain pakoon*) maps to one existing curated Item. Its original
+creation time remains `2026-09-04T21:30:52.825771Z`, while the new TMDB source was
+created at the import time. The curated source remains attached. Each of the
+other 19 Items was created at the canary time. This is observed cross-provider
+identity reuse, not an inferred count discrepancy or a new duplicate.
+
+All 20 have nonblank title/description, TMDB poster URL, directors, release year,
+original language and normalized genre tags. Runtime, popularity and vote count
+are present on all 20. Each provider row has exactly one matching `tmdb_movie`
+alias and one matching `imdb_title` alias on the same Item; all 20 provider IDs
+and Item IDs are distinct. No matching alias is missing. The source and alias
+constraints remain unchanged. Batch RPC EXECUTE remains false for anon and
+authenticated and true for service_role.
+
+The agent checked **all 20 stored poster URLs** with bounded parallel HTTP HEAD
+requests: every response was **200 / image/jpeg**. This verifies CDN availability,
+not rendering/cache behavior on a native device. Stored description previews show
+both Finnish text and the existing English fallback; no all-Finnish claim is made.
+All 20 original languages are `en`; year counts are 1984: 1, 1994: 1, 2021: 1,
+2026: 17. One popularity-sorted page is not a representative cold-start catalog.
+Twenty of 49 discoverable movies now have images/descriptions; the other 29
+curated movies still need provider metadata. BOOK description coverage is still
+zero. Broad catalog, rights/attribution, native quality and MVP acceptance stay open.
+
+Fresh hosted readback remains ACTIVE v9, bundle digest
+`9e04d650a398c79c9e0a0ed8e7adefb97c4b45aebfb9b7ee3f2f2f944a01ab88`.
+All three contents exactly match accepted PR #248, with `verify_jwt=false` and the
+function-local import map. No source/deployment, schema, account or other-function
+change was needed for this verification. PR #249's earlier preflight handoff is
+accepted on `395b0bf222000377cd04322436e6f398e5f8c1e2` after all five CI #490
+jobs passed at `e3aa37ad940412e30ae5f8792f14706b722fafe6`. Older dated sections
+below retain what was pending then; they are not current instructions to repeat
+configuration, preflight or the completed canary.
+
+**Next bounded continuation — #182 catalog expansion:** prepare a concrete plan
+for hundreds of discoverable movies with measured genre/year/original-language
+diversity, Finnish/international coverage and the remaining curated metadata.
+The existing orchestration can resume after the accepted page 1. This actual
+dry-run performed no provider or database I/O:
+
+```bash
+npm run catalog:tmdb-beta -- --start-page 2 --pages 14 --pages-per-request 3 --dry-run
+```
+
+It yields five requests: pages 2–4, 5–7, 8–10, 11–13 and 14–15, retaining
+`fi-FI` / `FI` / minimum votes 40. This is a transport proposal only; it neither
+promises 280 unique new Items nor supplies diversity controls. Review the proposed
+content mix and source filters before broader import. Any chosen execution stays
+bounded, sequential and stop-on-error, with fresh before/after coverage and actual
+metadata review. Inspect the latest Issue #182 checkpoint before sending requests
+so completed work is not repeated. Source/control improvements needed by the
+expansion plan do not depend on an admin key; actual calls use an authorized admin
+environment or the now-proven owner Test view. No repeated key setup/sign-in is
+needed, and the one-page canary must not be requested again.
+
+Keep #182 and `MVP-CAT-001..003` open for those remaining gates. Do not substitute
+native #229/device work, optional dataset research or the later pre-MVP UI packet,
+and do not promote the rejected D2 challenger. STATUS names the next bounded
+catalog task; Issue #182 records this documentation packet's merge/CI completion.
+
 ## Catalog privileged preflight — 2026-09-13 / #182
 
 **The configuration repair and privileged preflight are accepted.** PR #248
