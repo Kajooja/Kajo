@@ -10,65 +10,67 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current hosted packet — #182 configuration recovery
+## Current hosted packet — #182 modern-key recovery
 
-**PR [#245](https://github.com/Kajooja/Kajo/pull/245) is accepted on main
-`ad75fc00b100099af4986abfc9955afe308eb6e6`.** The owner authorized completing its
-merge, the prepared catalog-only Edge update and the one-page TMDB canary once
-credentials are verified. All five required CI #482 jobs passed at unchanged head
-`9214a268d84281663a728ea055dd4b4dd073a262`; head/base/CI were rechecked before merge.
-These approvals are recorded and must not be requested again for the same scope.
-PR #244 and E1/D1/D2 remain accepted; the rejected challenger remains research-only.
+**PR [#247](https://github.com/Kajooja/Kajo/pull/247) is accepted on main
+`4fbf5bd8eb0346b18395d633569efc23549c1dc4`.** All five required CI #486 jobs
+passed at unchanged head `e8125f3381b2fff7947ddb78cd87eef1ac481e35`. Its exact
+three-file diagnostic source was deployed to `catalog-import`; the latest
+readback is ACTIVE v7, `verify_jwt=false`, with the function-local import map.
+All three contents match the verified payload. Read
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) for subsequent source,
+CI, deployment and probe checkpoints before repeating any completed action.
 
-PR #246 accepted the deployment handoff on main
-`65317c03fde0ee85ce560f61489d3434a79a843f` after all five CI #484 jobs passed.
-The original approved catalog deployment was v3. The latest pre-diagnostic
-readback reports ACTIVE v5 with `verify_jwt=false` and the function-local import
-map; all three files still match the accepted PR #245 source exactly.
+**The owner supplied the actual v7 failure at 2026-09-12T23:40:08.656Z:**
+`catalog-import configuration failed: invalid-legacy-service-role-key`.
+The optional legacy value fails the JWT-format check, which currently blocks
+valid modern keys too. This identifies the failed check without establishing why
+the platform supplied that value. The owner has added `TMDB_READ_ACCESS_TOKEN`,
+confirmed built-in `SUPABASE_URL` and plural `SUPABASE_SECRET_KEYS`, and sees a
+Default secret key under API Keys. Do not repeat those setup/presence requests or
+ask for the same log. The Default secret key is suitable; no new key, legacy
+rotation or JWT-signing-key change is needed for this source correction.
 
-**Hosted acceptance is blocked: POST currently returns 500
-`server-not-configured`.** GET returns 405; a foreign modern apikey is rejected
-by the gateway with 401. The anonymous and forged-legacy POST responses reach the
-handler's configuration gate, so neither hosted key acceptance nor the provider
-path is verified. A bounded POST after the owner's TMDB-token setup still returned
-the same 500. The exact rejected configuration input is unknown; names visible in
-the Dashboard do not establish runtime values or parser acceptance.
+**Recovery source: `fix/182-modern-key-legacy-recovery`.** The handler excludes a
+malformed optional legacy value when usable modern keys have passed validation.
+That excluded value is never accepted or forwarded. With no usable modern key,
+the same malformed legacy configuration still fails closed. Malformed modern
+maps/local keys still fail closed; exact valid legacy compatibility, modern
+apikey-only authorization and rotation/revocation remain. Public errors and
+private reason-code redaction are preserved.
 
-Before/after read-only coverage is unchanged: 415 discoverable BOOK / 30 MOVIE,
-385 book images, no movie images or discoverable descriptions, zero TMDB sources
-and zero discoverable mocks. These are the original deployment's before/after
-aggregates; no provider import has run. The batch RPC remains service-role-only.
+**Next bounded task: finish the verified catalog-only recovery rollout, then the
+privileged preflight and authorized one-page TMDB canary.** Check the latest Issue
+#182 checkpoint first; it owns actual post-merge/deployment results. Complete root
+and all five current-head CI gates, merge and deploy only the verified three-file
+payload if not already completed. Verify exact hosted source readback and bounded
+unsupported-action rejection. The [recovery checkpoint](sprints/SPRINT-014.md#catalog-modern-key-recovery--2026-09-12--182)
+records the authentication boundary and supported owner Test workflow.
 
-**The owner has added `TMDB_READ_ACCESS_TOKEN` and confirmed both `SUPABASE_URL`
-and plural `SUPABASE_SECRET_KEYS` are present.** A Default secret key is visible
-under API Keys; the legacy anon/service-role variables show Deprecated. Optional
-singular `SUPABASE_SECRET_KEY` is absent. Do not repeat these presence/setup requests.
-TMDB token validity and privileged invocation remain unverified.
+After configuration recovery, the owner can use **Edge Functions > catalog-import
+> Test > Headers > Add secret key** with POST `{"action":"invalid-preflight-only"}`.
+Expected privileged response is 400 `unsupported-action`, without provider or
+Data API work. The tester's default publishable key is insufficient. This
+Dashboard action supplies the server key securely; do not ask for its value in
+chat. The connector cannot invoke the function or read secrets; local admin
+credentials are absent and browser sign-in was not completed. Use this supported
+owner path without restarting sign-in or requesting repeated setup.
 
-**Recovery source: `fix/182-catalog-config-diagnostics`.** This bounded packet
-adds fixed configuration reason codes only to the private function log. The public
-500 response and exact configured-key authorization remain unchanged. Malformed
-JSON, environment errors, configured key names/values and request data never enter
-the diagnostic message. Source/CI and deployed-version evidence are tracked in
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+Once privileged acceptance is verified, run only the prepared single-page canary
+(`--pages 1 --pages-per-request 1`, or the equivalent bounded Dashboard body in
+the sprint checkpoint). Refresh read-only coverage before and after, and inspect
+actual movie metadata before any broader import. TMDB-token validity and actual
+provider acceptance remain unverified until those requests succeed. The last
+read-only aggregates contain 415 discoverable BOOK / 30 MOVIE, 385 book images,
+no movie images or discoverable descriptions, zero TMDB sources and zero visible
+mocks; the service-role-only batch RPC is unchanged. These are dated pre-canary
+counts, not a current inventory claim.
 
-**Next bounded task: finish the verified catalog-only diagnostic rollout and read
-its actual failure reason, then recover configuration and complete the authorized
-one-page canary.** Inspect the latest Issue #182 checkpoint before deploying so a
-completed rollout is not repeated. After source/current-head gates and exact
-three-file readback, use one unsupported-action probe and the function's **Logs**
-view to find `catalog-import configuration failed:`. The owner can supply only that
-fixed reason line. The connected tool cannot read function logs or secret names;
-the local admin environment has no invocation credentials. Use the owner's supported
-settings/log path; do not restart browser sign-in unless the owner wants that route.
-
-The [diagnostic checkpoint](sprints/SPRINT-014.md#catalog-configuration-diagnostics--2026-09-12--182)
-owns reason meanings and the owner log workflow; the older v3 checkpoint retains
-its dated hashes/probes. Once configuration is corrected
-through an authorized supported path, verify rejection behavior and a privileged
-unsupported-action request before running the prepared single-page canary. Re-run
-coverage and inspect real metadata before any broader import. Keep #182 open.
-Do not weaken authentication, expose secret values or restore floating v2 code.
+The owner already authorized completing PR #245, the exact catalog-only Edge
+update and the one-page canary once credentials are verified. These approvals
+persist; do not request them again for the same scope. Keep #182 open for catalog
+breadth/quality. Do not expose keys, weaken authorization or restore floating v2
+code. E1/D1/D2 remain accepted; the rejected challenger remains research-only.
 
 #229 retains its separate native/device/fresh-account gates and six installed
 immutable forwards; do not redeploy them or reset accounts for this catalog unit.

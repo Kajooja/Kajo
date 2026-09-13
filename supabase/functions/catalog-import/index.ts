@@ -356,9 +356,14 @@ function readServerKeys(): { modern: string[]; legacy: string | null } | null {
       }
       modern.push(localKey);
     }
-    const legacy = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || null;
+    let legacy = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || null;
     if (legacy && !/^[\w-]+\.[\w-]+\.[\w-]+$/.test(legacy)) {
-      return invalidServerConfiguration('invalid-legacy-service-role-key');
+      if (!modern.length) {
+        return invalidServerConfiguration('invalid-legacy-service-role-key');
+      }
+      // Modern keys work independently of optional legacy JWT compatibility.
+      // A malformed legacy value must never become an accepted credential.
+      legacy = null;
     }
     return modern.length || legacy
       ? { modern, legacy }
