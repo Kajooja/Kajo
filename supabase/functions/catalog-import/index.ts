@@ -1,6 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 
 import { normalizeTmdbMovie } from '../_shared/catalog-normalizers.mjs';
+import { CatalogImportFailure, createImportFailureDiagnostics } from '../_shared/catalog-import-diagnostics.mjs';
 import {
   bucketDiscoverFilters,
   eligibleTmdbMovie,
@@ -120,6 +121,13 @@ Deno.serve(async (request) => {
     return json({ status: 'error', code: 'tmdb-not-configured' }, 503);
   }
 
+  const progress = {
+    completedPages: [] as number[],
+    failedPage: byImdb ? null : startPage,
+    confirmedImportedCount: 0,
+    confirmedSkippedCount: 0,
+    writeOutcome: 'not-started' as 'not-started' | 'unknown',
+  };
   try {
     if (byImdb) {
       // Resolve only exact movie identifiers, then verify detail aliases before
@@ -129,22 +137,24 @@ Deno.serve(async (request) => {
         const url = new URL(`${TMDB_API_BASE_URL}/find/${imdbId}`);
         url.searchParams.set('external_source', 'imdb_id');
         url.searchParams.set('language', language);
-        const found = await fetchTmdbJson(url.toString(), tmdbToken);
+        const found = await fetchTmdbJson(url.toString(), tmdbToken, 'tmdb-find');
         if (!Array.isArray(found.movie_results) || found.movie_results.length !== 1) {
-          throw new Error('IMDb movie mapping is unavailable or ambiguous');
+          throw new CatalogImportFailure('tmdb-find', 'identity-mismatch');
         }
         const movieId = found.movie_results[0]?.id;
-        if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new Error('Invalid TMDB ID');
+        if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new CatalogImportFailure('tmdb-find', 'identity-mismatch');
         const movie = await fetchLocalizedMovie(movieId, language, tmdbToken);
-        const entry = normalizeTmdbMovie(movie);
-        if (!entry || !eligibleTmdbMovie(movie, entry, asOf) || entry.externalIds.imdb_title !== imdbId) {
-          throw new Error('IMDb detail identity or metadata mismatch');
+        const entry = normalizeMovie(movie);
+        if (!entry || !eligibleTmdbMovie(movie, entry, asOf)) {
+          throw new CatalogImportFailure('normalize', 'ineligible-metadata');
         }
+        if (entry.externalIds.imdb_title !== imdbId) throw new CatalogImportFailure('tmdb-detail', 'identity-mismatch');
         return entry;
       });
       if (new Set(entries.map((entry) => entry.providerItemId)).size !== entries.length) {
-        throw new Error('Conflicting IMDb mappings');
+        throw new CatalogImportFailure('tmdb-find', 'identity-mismatch');
       }
+      progress.writeOutcome = 'unknown';
       const importedCount = await upsertCatalogBatch(supabaseUrl, secretKey, entries);
       return json({
         status: 'imported', provider: 'tmdb', action: TMDB_IMDB_ACTION,
@@ -152,11 +162,9 @@ Deno.serve(async (request) => {
       });
     }
 
-    let importedCount = 0;
-    let skippedCount = 0;
-    const completedPages: number[] = [];
-
     for (let page = startPage; page < startPage + pages; page += 1) {
+      progress.failedPage = page;
+      progress.writeOutcome = 'not-started';
       const discovery = await fetchTmdbJson(
         buildDiscoverUrl({
           page,
@@ -167,53 +175,63 @@ Deno.serve(async (request) => {
           bucket,
         }),
         tmdbToken,
+        'tmdb-discover',
       );
       if (!Array.isArray(discovery.results) || discovery.results.length > 20 ||
-        (bucket && discovery.page !== page)) throw new Error('Invalid discovery page');
+        (bucket && discovery.page !== page)) throw new CatalogImportFailure('tmdb-discover', 'invalid-response');
       const results = discovery.results;
       const details = await mapWithConcurrency(
         results,
         TMDB_DETAIL_CONCURRENCY,
         async (movie) => {
           const movieId = movie?.id;
-          if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new Error('Invalid TMDB ID');
+          if (!Number.isSafeInteger(movieId) || movieId <= 0) throw new CatalogImportFailure('tmdb-discover', 'identity-mismatch');
           return fetchLocalizedMovie(movieId, language, tmdbToken);
         },
       );
       const entries = details
         .map((movie) => {
-          const entry = normalizeTmdbMovie(movie);
+          const entry = normalizeMovie(movie);
           return bucket && !eligibleTmdbMovie(movie, entry, asOf, bucket) ? null : entry;
         })
         .filter((entry) => entry !== null);
 
-      skippedCount += results.length - entries.length;
-
       for (let offset = 0; offset < entries.length; offset += UPSERT_BATCH_SIZE) {
         const batch = entries.slice(offset, offset + UPSERT_BATCH_SIZE);
-        importedCount += await upsertCatalogBatch(supabaseUrl, secretKey, batch);
+        // A missing/invalid acknowledgement cannot establish database rollback.
+        progress.writeOutcome = 'unknown';
+        progress.confirmedImportedCount += await upsertCatalogBatch(supabaseUrl, secretKey, batch);
       }
 
-      completedPages.push(page);
+      progress.confirmedSkippedCount += results.length - entries.length;
+      progress.completedPages.push(page);
     }
 
     return json({
       status: 'imported',
       provider: 'tmdb',
-      importedCount,
-      skippedCount,
-      pages: completedPages,
+      importedCount: progress.confirmedImportedCount,
+      skippedCount: progress.confirmedSkippedCount,
+      pages: progress.completedPages,
       language,
       region,
       minimumVoteCount,
       ...(bucket ? { action: TMDB_BUCKET_ACTION, bucket: bucket.id, asOf } : {}),
     });
-  } catch {
-    // Upstream errors can contain reflected credentials or provider payloads.
-    console.error('catalog-import failed: provider-import-failed');
-    return json({ status: 'error', code: 'provider-import-failed' }, 502);
+  } catch (error) {
+    const diagnostics = createImportFailureDiagnostics(error, progress);
+    console.error(`catalog-import failed: ${JSON.stringify(diagnostics)}`);
+    return json({ status: 'error', code: 'provider-import-failed', diagnostics }, 502);
   }
 });
+
+function normalizeMovie(movie: Record<string, unknown>) {
+  try {
+    return normalizeTmdbMovie(movie);
+  } catch {
+    throw new CatalogImportFailure('normalize', 'invalid-response');
+  }
+}
 
 // A single native Data API call keeps this deployment free of registry
 // dependencies. The canonical database function still owns the atomic write.
@@ -232,7 +250,7 @@ async function upsertCatalogBatch(
   if (!secretKey.startsWith('sb_secret_')) {
     headers.authorization = `Bearer ${secretKey}`;
   }
-  const response = await fetch(
+  const response = await fetchImportResponse(
     `${supabaseUrl.replace(/\/+$/, '')}/rest/v1/rpc/upsert_catalog_batch_v1`,
     {
       method: 'POST',
@@ -241,12 +259,9 @@ async function upsertCatalogBatch(
       redirect: 'error',
       signal: AbortSignal.timeout(20_000),
     },
+    'catalog-upsert',
   );
-  if (!response.ok) {
-    await response.body?.cancel();
-    throw new Error('Catalog batch upsert failed');
-  }
-  const data: unknown = await response.json();
+  const data: unknown = await readImportJson(response, 'catalog-upsert');
   if (
     !Array.isArray(data) || data.length !== entries.length ||
     data.some((row, index) =>
@@ -254,7 +269,7 @@ async function upsertCatalogBatch(
       typeof row.item_id !== 'string' || row.item_id.length === 0
     )
   ) {
-    throw new Error('Catalog batch upsert returned incomplete results');
+    throw new CatalogImportFailure('catalog-upsert', 'invalid-response', response.status);
   }
   return data.length;
 }
@@ -289,13 +304,13 @@ async function fetchLocalizedMovie(
   language: string,
   token: string,
 ): Promise<Record<string, unknown>> {
-  const localized = await fetchMovieDetails(movieId, language, token);
+  const localized = await fetchMovieDetails(movieId, language, token, 'tmdb-detail');
 
   if (language === 'en-US' || hasUsefulLocalizedCopy(localized)) {
     return localized;
   }
 
-  const fallback = await fetchMovieDetails(movieId, 'en-US', token);
+  const fallback = await fetchMovieDetails(movieId, 'en-US', token, 'tmdb-fallback');
   return {
     ...fallback,
     ...localized,
@@ -309,38 +324,72 @@ async function fetchMovieDetails(
   movieId: number,
   language: string,
   token: string,
+  stage: 'tmdb-detail' | 'tmdb-fallback',
 ): Promise<Record<string, unknown>> {
   const url = new URL(`${TMDB_API_BASE_URL}/movie/${movieId}`);
   url.searchParams.set('language', language);
   url.searchParams.set('append_to_response', 'credits,external_ids');
-  const movie = await fetchTmdbJson(url.toString(), token);
-  if (movie.id !== movieId) throw new Error('TMDB detail identity mismatch');
+  const movie = await fetchTmdbJson(url.toString(), token, stage);
+  if (movie.id !== movieId) throw new CatalogImportFailure(stage, 'identity-mismatch');
   return movie;
 }
 
 async function fetchTmdbJson(
   url: string,
   token: string,
+  stage: ConstructorParameters<typeof CatalogImportFailure>[0],
 ): Promise<Record<string, any>> {
-  const response = await fetch(url, {
+  const response = await fetchImportResponse(url, {
     headers: {
       accept: 'application/json',
       authorization: `Bearer ${token}`,
     },
     redirect: 'error',
     signal: AbortSignal.timeout(20_000),
-  });
+  }, stage);
 
-  if (!response.ok) {
-    throw new Error(`TMDB request failed with ${response.status}`);
-  }
-
-  const data = await response.json();
+  const data = await readImportJson(response, stage);
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new Error('TMDB returned a non-object response');
+    throw new CatalogImportFailure(stage, 'invalid-response', response.status);
   }
 
   return data as Record<string, any>;
+}
+
+async function fetchImportResponse(
+  url: string,
+  init: RequestInit,
+  stage: ConstructorParameters<typeof CatalogImportFailure>[0],
+): Promise<Response> {
+  let response: Response;
+  try {
+    response = await fetch(url, init);
+  } catch (error) {
+    throw transportFailure(error, stage);
+  }
+  if (!response.ok) {
+    try { await response.body?.cancel(); } catch { /* Keep the known HTTP failure. */ }
+    throw new CatalogImportFailure(stage, 'http-error', response.status);
+  }
+  return response;
+}
+
+async function readImportJson(response: Response, stage: ConstructorParameters<typeof CatalogImportFailure>[0]) {
+  try {
+    return await response.json();
+  } catch (error) {
+    if (error instanceof SyntaxError) throw new CatalogImportFailure(stage, 'invalid-json', response.status);
+    throw transportFailure(error, stage, response.status);
+  }
+}
+
+function transportFailure(
+  error: unknown,
+  stage: ConstructorParameters<typeof CatalogImportFailure>[0],
+  httpStatus: number | null = null,
+) {
+  const timeout = error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name);
+  return new CatalogImportFailure(stage, timeout ? 'timeout' : 'network-error', httpStatus);
 }
 
 async function mapWithConcurrency<TInput, TOutput>(
@@ -361,8 +410,11 @@ async function mapWithConcurrency<TInput, TOutput>(
       try {
         output[index] = await mapper(values[index]);
       } catch (error) {
-        failed = true;
-        failure = error;
+        // Other in-flight workers may fail later; retain the first failure.
+        if (!failed) {
+          failed = true;
+          failure = error;
+        }
       }
     }
   }

@@ -14,6 +14,93 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog expansion verified and failure diagnostics — 2026-09-13 / #182
+
+The PR #251 source is accepted on main
+`f462aaa20e3a65899452be847ee9ff3af22f167d`; catalog-import v10 is ACTIVE.
+The completed hosted pass has **425 discoverable MOVIE Items with complete
+TMDB core metadata/images/descriptions**, all 30 original curated identities
+preserved, and all eight declared expansion coverage checks passing. Coverage
+was read at 20:51:19 UTC; original UUID/IMDb/creation-time identity was independently
+rechecked at 20:54:38 UTC. The final documentary page added 18 Items/refreshed two;
+all 20 of its posters returned HTTP 200 / image/jpeg.
+
+English (259) and Finnish (60) are the two largest original-language groups
+(75.1% together), matching the owner's catalogue emphasis. Non-English coverage
+is 166; Finnish production is 60; seven languages have at least ten movies.
+The five era counts are 66/55/74/79/151; sixteen genres have at least fifteen
+movies; documentaries total 22. BOOK remains 415 discoverable, 385 images and
+zero descriptions. Native image/Taste quality and rights/refresh remain open.
+
+The actual bounded pass used 18 request attempts with 28 verified page fetches,
+including a Korean repeat. Spanish page 1 was deferred to preserve the cap.
+A subsequent science-fiction request failed without observed committed writes;
+its exact fetched-page progress is unknown, so its entire two-page allowance is
+reserved. The final documentary request consumed the last slot. No more imports
+are authorized by this completed 18-request / 30-page plan. The exact response
+ledger, original 29-gap identity table and final 30-identity check belong to
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+
+### Narrow diagnostic source packet
+
+Branch `fix/182-catalog-import-diagnostics` addresses the generic failure
+receipt, not a proven cause of the observed science-fiction error. The existing
+HTTP 502 / `provider-import-failed` remains, with additive
+`diagnostics.version=catalog-import-diagnostics-v1`. Success and authorization
+contracts, fixed selection budgets, FI/EN normalization and canonical atomic
+per-page upsert semantics remain unchanged.
+
+| Diagnostic field | Meaning |
+| --- | --- |
+| `stage` | Fixed Discover, Find, detail, English fallback, normalization, catalog-upsert or unexpected import stage |
+| `reason` | Fixed HTTP, timeout, network, JSON, response-shape, identity, metadata or unexpected-error category |
+| `httpStatus` | Upstream numeric response status when observed; otherwise null |
+| `completedPages` | Fully processed pages whose writes were acknowledged; an all-skipped/empty page may complete without a write |
+| `failedPage` | Current page, or null for exact-IMDb enrichment |
+| `confirmedImportedCount` / `confirmedSkippedCount` | Counts from the confirmed completed-page prefix; upserts are not unique growth |
+| `writeOutcome` | `not-started` for the current failed unit before a write; `unknown` when its write acknowledgement failed |
+
+A request that fails on page 2 after page 1 committed reports page 1 and its
+confirmed counts. A database timeout/malformed acknowledgement on page 2 cannot
+prove rollback and never reports that page complete. The CLI validates the
+version, fixed fields and progress against the requested page prefix before
+emitting a failed checkpoint; old generic errors remain supported. Extra/raw
+server fields and unknown codes are not reflected. It stops before any later
+request or retry. Progress is scoped to this request; earlier request checkpoints
+remain separate. If no valid receipt arrives, progress remains unknown.
+
+The shared module is `_shared/catalog-import-diagnostics.mjs`; both Edge and
+CLI consume it. Deployment preparation now verifies all five shipped files with
+a fresh Deno cache and npm/remote imports disabled. Fixtures cover stage/status
+classification, secret reflection, malformed/timeout responses, all-skipped
+pages, retained first failure under concurrency, and an acknowledged first page
+followed by a potentially committed but unacknowledged second write.
+
+Local `npm run check` passed **396 tests**: 212 mobile, 25 catalog, 28 Edge,
+61 database, 43 engine, 19 Python research and eight Node research, plus
+lint/typecheck and both Hermes exports. The existing mobile Hook lint warning
+remains. Direct Deno registry access failed with connection refused; the successful
+root run used the existing loopback archive cache after verifying every one of
+the eleven packages against the unchanged frozen Edge lock SHA-512 values.
+No dependency, lock or repository gate was weakened; normal CI must also pass.
+The exact final five-file payload independently passed **26 catalog HTTP cases**
+with a fresh cache and npm/remote imports disabled.
+
+Prepared payload SHA-256:
+`c5e5a4adceeebd2b87d30f1b74dc972a64d52e93ebdaddf13ee6e3aaa7ff09e5`.
+Entrypoint SHA-256:
+`6469138981a0a7463ad884c017519de875cd5603473894458b1503433727faa3`.
+Diagnostic module SHA-256:
+`48c80ec66eef1bd186ecb0b4f631eed8a5577639e2c0eb599b2f252c9d110858`.
+Normalizer, selection plan and function-local configuration contents are unchanged.
+
+The official [Supabase error-handling guide](https://supabase.com/docs/guides/functions/error-handling)
+and [logging guide](https://supabase.com/docs/guides/functions/logging) were checked
+on 2026-09-13. Current source fixtures and required root/CI results belong to the
+PR/#182 checkpoint. Source changes do not retroactively diagnose the old failure;
+hosted rollout is a separate verified step. No provider call, secret request,
+account reset, schema change or unrelated native rollout is needed for this packet.
+
 ## Balanced TMDB expansion and curated enrichment — 2026-09-13 / #182
 
 Source packet: `feat/182-tmdb-balanced-expansion`, from accepted PR #250 main

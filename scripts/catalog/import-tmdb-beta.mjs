@@ -2,6 +2,7 @@
 
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { readImportFailureDiagnostics } from '../../supabase/functions/_shared/catalog-import-diagnostics.mjs';
 import {
   getTmdbBucket, MAX_IMDB_IDS_PER_REQUEST, TMDB_BETA_BUCKETS,
   TMDB_BUCKET_ACTION, TMDB_IMDB_ACTION, validImdbIds, validTmdbAsOf,
@@ -22,6 +23,29 @@ const DEFAULT_OPTIONS = Object.freeze({
 const MAX_TOTAL_PAGES = 30;
 const MAX_PAGES_PER_REQUEST = 3;
 const MAX_TMDB_PAGE = 500;
+
+const FAILURE_CODES = new Set(['method-not-allowed', 'server-not-configured', 'forbidden',
+  'invalid-json', 'invalid-request', 'unsupported-action', 'tmdb-not-configured', 'provider-import-failed']);
+
+class CatalogImportResponseError extends Error {
+  constructor(message, diagnostics = null) {
+    super(message);
+    this.diagnostics = diagnostics;
+  }
+}
+
+function importResponseError(payload, expected, httpStatus = null) {
+  const code = FAILURE_CODES.has(payload?.code) ? payload.code : 'unexpected-response';
+  if (code === 'tmdb-not-configured') {
+    return new CatalogImportResponseError('TMDB_READ_ACCESS_TOKEN is not configured in Supabase Edge Function secrets.');
+  }
+  const diagnostics = code === 'provider-import-failed'
+    ? readImportFailureDiagnostics(payload?.diagnostics, expected) : null;
+  const prefix = httpStatus === null ? 'catalog-import failed with code' : `catalog-import HTTP ${httpStatus}`;
+  return new CatalogImportResponseError(`${prefix}: ${code}` + (diagnostics
+    ? `; diagnostics=${JSON.stringify(diagnostics)}. Recheck database coverage before any manual retry; unacknowledged writes may have committed.`
+    : ''), diagnostics);
+}
 
 export function parseTmdbImportArguments(args) {
   const options = { ...DEFAULT_OPTIONS };
@@ -176,13 +200,7 @@ export function validateTmdbImportResponse(payload, expected) {
   }
 
   if (payload.status !== 'imported' || payload.provider !== 'tmdb') {
-    const code = typeof payload.code === 'string' ? payload.code : 'unexpected-response';
-    if (code === 'tmdb-not-configured') {
-      throw new Error(
-        'TMDB_READ_ACCESS_TOKEN is not configured in Supabase Edge Function secrets.',
-      );
-    }
-    throw new Error(`catalog-import failed with code: ${code}`);
+    throw importResponseError(payload, expected);
   }
 
   if (expected.action === TMDB_BUCKET_ACTION || expected.action === TMDB_IMDB_ACTION) {
@@ -254,8 +272,17 @@ export async function runTmdbBetaImport(options, dependencies) {
       minimumVoteCount: options.minimumVoteCount,
     };
     dependencies.progress?.({ status: 'starting', request: index + 1, body: expected });
-    const response = await dependencies.invoke(expected);
-    const result = validateTmdbImportResponse(response, expected);
+    let result;
+    try {
+      const response = await dependencies.invoke(expected);
+      result = validateTmdbImportResponse(response, expected);
+    } catch (error) {
+      dependencies.progress?.({
+        status: 'failed', request: index + 1, body: expected,
+        diagnostics: error instanceof CatalogImportResponseError ? error.diagnostics : null,
+      });
+      throw error;
+    }
     results.push(result);
     dependencies.progress?.({ status: 'completed', request: index + 1, body: expected, result });
 
@@ -362,18 +389,25 @@ async function runCli() {
 }
 
 export async function invokeCatalogImport(baseUrl, apiKey, batch) {
-  const response = await fetch(`${baseUrl}/functions/v1/catalog-import`, {
-    method: 'POST',
-    headers: {
-      apikey: apiKey,
-      accept: 'application/json',
-      'content-type': 'application/json',
-      'user-agent': 'KajoCatalogImporter/1.0 (+https://github.com/Kajooja/Kajo)',
-    },
-    body: JSON.stringify({ action: 'tmdb-movies', ...batch }),
-    redirect: 'error',
-    signal: AbortSignal.timeout(180_000),
-  });
+  let response;
+  try {
+    response = await fetch(`${baseUrl}/functions/v1/catalog-import`, {
+      method: 'POST',
+      headers: {
+        apikey: apiKey,
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'user-agent': 'KajoCatalogImporter/1.0 (+https://github.com/Kajooja/Kajo)',
+      },
+      body: JSON.stringify({ action: 'tmdb-movies', ...batch }),
+      redirect: 'error',
+      signal: AbortSignal.timeout(180_000),
+    });
+  } catch {
+    // Transport errors may include reflected request data. No response means
+    // progress is unknown, including whether a database write committed.
+    throw new CatalogImportResponseError('catalog-import transport failed; progress unknown. Recheck database coverage before any manual retry.');
+  }
 
   let payload = null;
   try {
@@ -383,9 +417,7 @@ export async function invokeCatalogImport(baseUrl, apiKey, batch) {
   }
 
   if (!response.ok) {
-    if (payload?.code === 'tmdb-not-configured') return payload;
-    const code = typeof payload?.code === 'string' ? `: ${payload.code}` : '';
-    throw new Error(`catalog-import HTTP ${response.status}${code}`);
+    throw importResponseError(payload, batch, response.status);
   }
 
   return payload;
@@ -419,7 +451,8 @@ function isNonNegativeInteger(value) {
 }
 
 function formatPages(value) {
-  return Array.isArray(value) ? value.join(',') : 'none';
+  return Array.isArray(value) && value.length <= 3 && value.every((page) => Number.isInteger(page) && page >= 1 && page <= 500)
+    ? value.join(',') : 'invalid';
 }
 
 function sleep(milliseconds) {

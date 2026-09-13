@@ -41,12 +41,16 @@ The owner subsequently authorized an available alternative to 32M; the first
 real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development dataset.
 This bounded development comparison can precede a larger stable benchmark with
 its own manifest. STATUS names the branch and actual acceptance. #229 retains
-its native/fresh-account gates; external research does not close them. #182’s
-Phase14.3 Edge source/deployment, configured-key preflight and the one-page
-provider canary are accepted; the 49 discoverable movies include 20 TMDB-backed
-Items. Continue bounded catalog expansion with explicit diversity and metadata
-targets. Optional further research and a winning external model are not
-prerequisites for that release work.
+its native/fresh-account gates; external research does not close them. #182's
+bounded enrichment/expansion is verified on catalog-import v10: 425
+discoverable MOVIE Items with complete TMDB core metadata and all eight declared
+coverage checks passing. English (259) and Finnish (60) remain the main offering;
+other languages complement them. The pass is finished within its explicit cap,
+including a Korean repeat, deferred Spanish and a failed science-fiction attempt
+with unknown upstream progress. Continue the narrow failure-diagnostics packet,
+then the remaining catalog refresh, metadata/rights and native quality gates.
+STATUS and #182 own exact source/hosted acceptance. Optional further research
+and a winning external model are not prerequisites for this release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
 
@@ -135,18 +139,18 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-#182's source/deployment and configuration recovery are accepted through PR #248.
-The 2026-09-13 one-page TMDB canary is verified: 20 provider Items, 19 new canonical
-Items plus one curated overlap, 49 discoverable MOVIE Items total, complete checked
-metadata/aliases for all 20 and 20 reachable JPEG posters. This closes the initial
-hosted provider-path gate. The prepared next source packet adds 18 fixed buckets /
-30 pages and exact-IMDb enrichment for the 29 remaining curated Items, with measured
-language/era/genre and core-metadata targets. Execute enrichment before expansion;
-source acceptance is not an import result. At the accepted canary checkpoint: all 20
-canary films have original language `en`, 17 are from 2026, and 29 curated movies
-still lack images/descriptions. STATUS and Issue #182 own the exact plan and later
-results; do not repeat the canary. Catalog breadth/diversity, provider rights,
-repeatable refresh and native quality gates remain open.
+#182's provider-path recovery and bounded expansion are accepted through
+PR #251 / catalog-import v10. The 2026-09-13 final hosted checkpoint has 425
+discoverable MOVIE Items, all with complete TMDB core metadata/posters, and all
+30 original curated identities enriched. All declared language/era/genre and
+documentary coverage checks pass; English/Finnish are the principal offering.
+The 18-attempt pass is complete with its conservative 30-page accounting.
+The next source unit makes provider/database failures and partial completion
+actionable without automatic retries. STATUS/Issue #182 own exact source,
+CI/rollout and the full import ledger. Do not repeat accepted canary/setup or
+extend the completed import budget. Repeatable refresh, BOOK descriptions,
+provider rights/attribution, normalized feature quality and native acceptance
+still keep Phase 14.3 open.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
