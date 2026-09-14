@@ -80,6 +80,17 @@ export function catalogDescriptionUpgradeSql(migration) {
     rollback;`;
 }
 
+export function catalogDescriptionCleanupSql() {
+  const ids = descriptionFixtureItemIds.map(literal).join(',');
+  // Catalog identity uses restrictive foreign keys, not cascading deletion.
+  // These fixed synthetic rows exist only in the newly owned test database.
+  return `begin;
+    delete from private.item_external_ids where item_id in (${ids});
+    delete from private.item_sources where item_id in (${ids});
+    delete from public.items where id in (${ids});
+    commit;`;
+}
+
 export async function catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc) {
   const [fixture] = await exec(`begin; ${catalogDescriptionFixtureSql()}
     select jsonb_build_object('entries',(select jsonb_agg(entry order by position) from description_entries)) as snapshot; commit;`);
@@ -100,6 +111,7 @@ export async function catalogDescriptionConcurrency(exec, execConcurrentSql, cat
     throw new Error(`No expected native wait observed for ${name}`);
   };
   const pending = [];
+  let failure;
   try {
     const first = settled(execConcurrentSql(session('kajo_description_first', entries, true)));
     pending.push(first);
@@ -118,6 +130,7 @@ export async function catalogDescriptionConcurrency(exec, execConcurrentSql, cat
     assert.deepEqual(a.value[0].map(row => row.outcome), ['updated','updated']);
     assert.deepEqual(b.value[0].map(row => row.outcome), ['unchanged','unchanged']);
     assert.match(c.error?.message ?? '', /Full refresh of a managed BOOK description is blocked/);
+    console.log('Description native locks PASS: reversed batch waited/no-op; waiting legacy refresh rejected');
     // Real PostgREST must resolve the named two-argument overload and preserve
     // response cardinality/IDs. This is an identical read-only replay.
     const replay = await catalogRpc({ entries, refresh_mode: 'open-library-description-v1' });
@@ -126,10 +139,18 @@ export async function catalogDescriptionConcurrency(exec, execConcurrentSql, cat
       item_id: entry.expectedItemId, outcome: 'unchanged' })));
     const denied = await catalogRpc({ entries, refresh_mode: 'open-library-description-v1' }, 'anon');
     assert.ok([401, 403, 404].includes(denied.status), 'Anonymous caller reached the catalog mutation');
+    console.log('Description PostgREST PASS: exact guarded replay and anonymous denial');
     return { status: 'PASS', reverseBatchLockWait: true, legacyLockWait: true,
       acknowledgedUpdates: 2, concurrentNoops: 2, postgrestReplay: 2, anonymousDenied: true };
+  } catch (error) {
+    failure = error;
+    throw error;
   } finally {
     await Promise.all(pending);
-    await exec(`begin; delete from public.items where id in (${descriptionFixtureItemIds.map(literal).join(',')}); commit;`);
+    try { await exec(catalogDescriptionCleanupSql()); }
+    catch (error) {
+      if (failure) throw new Error(`${failure.message}; fixture cleanup also failed: ${error.message}`);
+      throw error;
+    }
   }
 }

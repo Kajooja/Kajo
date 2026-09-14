@@ -3,7 +3,7 @@ import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { assertEmptyApplication, snapshotApplication } from './baseline-installation.mjs';
-import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql } from './catalog-descriptions.mjs';
+import { catalogDescriptionCleanupSql, catalogDescriptionFixtureSql, catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql } from './catalog-descriptions.mjs';
 
 test('BOOK description forward preserves populated catalog; guarded writes on the full schema (also native CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -24,5 +24,9 @@ test('BOOK description forward preserves populated catalog; guarded writes on th
     assert.match((await snapshots(await catalogDescriptionSmokeSql()))[0]?.catalogDescriptions, /^PASS: guarded/);
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Description acceptance must roll back all fixture catalog data and helpers');
+    await db.exec(`begin; ${catalogDescriptionFixtureSql()} commit;`);
+    await db.exec(catalogDescriptionCleanupSql());
+    assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
+      'Committed native-concurrency fixtures must clean up under the real restrictive foreign keys');
   } finally { await db.close(); }
 });

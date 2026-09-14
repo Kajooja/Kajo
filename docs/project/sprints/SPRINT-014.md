@@ -140,6 +140,13 @@ proof. Local dependencies use the existing archive cache after all eleven frozen
 Edge SHA-512 checks; CI uses its normal dependency path. The existing unrelated
 mobile Hook lint warning remains.
 
+Initial source CI #500 passed validate/platform/fresh-install/populated-upgrade
+but failed in native concurrency fixture cleanup: catalog source foreign keys
+restrict Item deletion. The fixture now deletes its synthetic aliases/sources
+before Items, also checks committed cleanup in PGlite, and preserves any earlier
+probe error if cleanup fails. The application migration is unchanged. Corrected
+head/CI acceptance is recorded in #182; the failed run is not native acceptance.
+
 The updated read-only coverage query executed at
 **2026-09-14T06:34:32.501146+00:00**: BOOK 415 visible / 427 stored, 385 images,
 zero descriptions; MOVIE 425 visible / 437 stored, all 425 images/descriptions.
