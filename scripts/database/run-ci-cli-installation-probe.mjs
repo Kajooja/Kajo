@@ -10,6 +10,7 @@ import { functionDigestSql } from './platform-default-probe.mjs';
 import { buildFreshInstallation, installFreshDatabase, installationHistorySql } from './fresh-installation.mjs';
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
+import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -24,7 +25,7 @@ try {
   const historySql = installationHistorySql;
   const nativeSql = `begin read only; set local search_path=pg_catalog;
     ${functionDigestSql({ includeApplication: false })} rollback;`;
-  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations }) => {
+  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
@@ -37,6 +38,14 @@ try {
     await resetFromMigrations(files.slice(0, collectionIndex));
     const [collectionActionUpgrade] = await exec(collectionActionUpgradeSql(files[collectionIndex], candidate.tables));
     assert.match(collectionActionUpgrade?.collectionActionUpgrade, /^PASS: unchanged populated/);
+    const descriptionIndex = files.findIndex(file => file.name.endsWith('_book_description_refresh.sql'));
+    assert.ok(descriptionIndex > collectionIndex);
+    await resetFromMigrations(files.slice(0, descriptionIndex));
+    const oldDescriptionMode = await catalogRpc({ entries: [], refresh_mode: 'open-library-description-v1' });
+    assert.equal(oldDescriptionMode.status, 404, 'Older PostgREST must reject the top-level refresh mode');
+    assert.equal(oldDescriptionMode.body.code, 'PGRST202');
+    const [catalogDescriptionUpgrade] = await exec(catalogDescriptionUpgradeSql(files[descriptionIndex]));
+    assert.match(catalogDescriptionUpgrade?.catalogDescriptionUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -60,6 +69,9 @@ try {
     assert.match(itemActions?.itemActions, /^PASS: atomic/);
     const [collectionActions] = await exec(await readFile(new URL('collection-action-smoke.sql', import.meta.url), 'utf8'));
     assert.match(collectionActions?.collectionActions, /^PASS: atomic/);
+    const [catalogDescriptions] = await exec(await catalogDescriptionSmokeSql());
+    assert.match(catalogDescriptions?.catalogDescriptions, /^PASS: guarded/);
+    const catalogDescriptionLocks = await catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc);
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);
@@ -72,6 +84,7 @@ try {
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
+      catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

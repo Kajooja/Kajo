@@ -20,6 +20,7 @@ books as (
 ),
 provider as (
   select b.*, s.provider_item_id, s.source_payload, s.synced_at,
+    s.id as source_id, s.updated_at as source_updated_at,
     md5(((to_jsonb(s) - 'source_payload' - 'synced_at' - 'updated_at')
       || jsonb_build_object('source_payload', s.source_payload - 'descriptionEnrichment'))::text)
       as source_base_md5,
@@ -91,6 +92,9 @@ select jsonb_build_object(
       'position', p.position, 'item_id', p.item_id, 'work_id', p.work_id,
       'edition_id', p.edition_id, 'display_language', p.display_language,
       'title', b.title, 'created_at', b.created_at, 'updated_at', b.updated_at,
+      'source_id', b.source_id, 'source_updated_at', b.source_updated_at,
+      'previous_description', b.description,
+      'previous_enrichment', b.source_payload -> 'descriptionEnrichment',
       'identity_matches', coalesce(b.discoverable and b.provider_item_id = p.work_id
         and b.matching_alias and b.work_alias_count = 1
         and b.metadata ->> 'openLibraryWorkId' = p.work_id
@@ -98,6 +102,7 @@ select jsonb_build_object(
         and b.metadata ->> 'displayLanguage' = p.display_language, false),
       'has_description', nullif(btrim(b.description), '') is not null,
       'description_md5', md5(b.description),
+      'description_sha256', encode(sha256(convert_to(b.description, 'UTF8')), 'hex'),
       'description_provenance', b.metadata -> 'descriptionProvenance',
       'source_synced_at', b.synced_at, 'core_md5', c.core_md5,
       'source_base_md5', b.source_base_md5
