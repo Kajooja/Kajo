@@ -23,8 +23,8 @@ simulated trajectories   → isolated synthetic experiments
 
 Do not create live Kajo Users/Profiles for external dataset people. Do not inject their rows into native Events, imports owned by a real Kajo user, Shared history or reward denominators. A user's own authorized history import remains the existing separate product flow.
 
-BOOK presentation enrichment follows the planned
-[catalog description contract](ARCHITECTURE.md#book-description-enrichment--planned-contract-182)
+BOOK presentation enrichment follows the guarded
+[catalog description contract](ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
 and [bounded pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182).
 It reads exact provider Work/Edition metadata for existing Items, independently
 of preference datasets. Larger coverage uses pinned monthly catalog dumps;

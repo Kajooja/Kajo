@@ -1,7 +1,7 @@
 // Each invocation owns a new unlinked project on an ephemeral GitHub Ubuntu
 // runner. Shared by the platform and application installation checks.
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -130,6 +130,45 @@ async function withNewSupabaseStack(projectId, work, destination) {
         '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
       return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
     };
+    // Independent sessions only on the newly owned CLI CI stack. This makes
+    // actual row-lock waits observable without connecting to a hosted database.
+    const execConcurrentSql = sql => {
+      assert.equal(projectId, 'kajo_ci_cli_install');
+      return new Promise((resolveSql, rejectSql) => {
+        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
+          ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])],
+        { cwd: directory, env: environment, stdio: ['pipe', 'pipe', 'pipe'] });
+        let stdout = '', stderr = '';
+        const timer = setTimeout(() => child.kill('SIGKILL'), 30000);
+        child.stdout.on('data', data => { stdout += data; if (stdout.length > 16 * 1024 * 1024) child.kill('SIGKILL'); });
+        child.stderr.on('data', data => { stderr = (stderr + data).slice(-3000); });
+        child.on('error', error => { clearTimeout(timer); rejectSql(error); });
+        child.on('close', code => {
+          clearTimeout(timer);
+          if (code !== 0) return rejectSql(new Error('Isolated SQL session failed: '
+            + stderr.split('\n').filter(line => /ERROR:/.test(line)).join('\n')));
+          try { resolveSql(stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : []); }
+          catch { rejectSql(new Error('Invalid isolated SQL acknowledgement')); }
+        });
+        child.stdin.on('error', error => { child.kill('SIGKILL'); rejectSql(error); });
+        child.stdin.end(sql);
+      });
+    };
+    const catalogRpc = async (body, role = 'service_role') => {
+      assert.equal(projectId, 'kajo_ci_cli_install');
+      assert.ok(['service_role', 'anon'].includes(role));
+      // Credentials belong only to this new local test stack; never log status.
+      const status = JSON.parse(cli(['status', '--output', 'json']));
+      const url = new URL(status.API_URL);
+      assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname));
+      const key = role === 'service_role' ? status.SERVICE_ROLE_KEY : status.ANON_KEY;
+      assert.ok(typeof key === 'string' && key.length > 20, 'Missing isolated Data API credential');
+      const response = await fetch(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
+        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
+        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+      return { status: response.status, body: await response.json() };
+    };
     let applied = false;
     const applyMigrations = async files => {
       assert.equal(applied, false, 'Fresh installation can execute only once');
@@ -161,7 +200,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       verifyCiPostgresImage(resetImage);
       return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
     };
-    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations });
+    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc });
     if (destination) {
       const report = { result, cliVersion, image, architecture: process.arch, projectId, containerId,
         workspace: directory, installedAt: new Date().toISOString(), cleanup: 'RETAINED_LOCAL',

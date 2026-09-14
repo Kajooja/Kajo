@@ -14,6 +14,154 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## BOOK description implementation — 2026-09-14 / #182
+
+Branch `feat/182-book-description-refresh` starts from accepted planning PR #253,
+main `1ea3a8c64beff8571bde4dc39cf73c30fc68b944`. This packet implements the
+[guarded contract](../../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
+and the frozen pilot below. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+owns the exact PR/head/CI/merge result. This is source acceptance; the migration,
+candidate provider reads and description writes have not run against the hosted
+project. Read-only SQL on 2026-09-14 confirms the earlier BOOK/MOVIE baseline.
+
+### Delivered behavior and deliberate implementation choices
+
+- `open-library-descriptions.mjs` accepts only typed/plain `description`, applies
+  NFC/plain-text/size bounds, verifies exact Edition/Work linkage and hashes raw
+  records/text. Missing notes-only records stay missing. Verified description
+  language is separate from the selected Edition and original language.
+- `import-open-library-descriptions.mjs` supplies `plan`, `preview`, `fallback`,
+  `review`, `apply` and `verify`. The fixed manifest is tested against the SQL's
+  ten UUID/Work/Edition/language tuples. `plan` has no I/O or credential need.
+  Preview uses provider reads only; it collects ten Editions, then pauses for
+  actual review before fetching any fallback Works. This implements the planned
+  Edition-first preference without assuming description language from Edition
+  metadata or spending fallback requests on already acceptable text.
+- One exclusive pilot claim under ignored `dist/catalog-enrichment/`, plus an
+  exclusive per-run lock and atomically replaced checkpoints, prevents parallel
+  starts/reset budgets in different run directories. Every request is recorded
+  before transport. There are at most twenty sequential starts spaced 1,100 ms,
+  a 15-second response deadline and 1 MiB decoded limit. A 404 is sparse; a
+  redirect, identity/JSON/encoding failure, 429, 5xx, timeout or network error
+  fails the run. No automatic retries, replacements or counter reset.
+- Review binds the actual record/text hashes, explicit fi/en text language,
+  contribution/use permission basis and fresh SQL Item/source identities and
+  versions. The public provenance contains the basis hash; the private source
+  envelope contains its bounded explanation. Unknown language/permission stays
+  skipped/staged. Raw records, real descriptions and reviewer files stay ignored.
+- CLI-created forward `20260914060616_book_description_refresh.sql` adds named
+  two-argument overloads at the existing canonical Item/batch boundary, with no
+  default mode. The batch accepts 1–10 distinct Item/source identities and locks
+  Items, sources, then aliases in deterministic order. The narrow Item overload
+  also validates/locks when called directly. It changes only description, its
+  provenance and the private envelope plus automatic update timestamps. Calling
+  the old full writer would normalize existing arrays/title again, so the narrow
+  Item overload is the canonical implementation of the preserving mode.
+- Equal text/source revision/review identity returns a read-only `unchanged`,
+  including an older expected row version. New fetch time/raw-record hash alone
+  does not rewrite existing evidence. A changed text needs exact current Item
+  and source versions. Identity/lifecycle checks still precede no-op. Legacy
+  Search Work and dump Edition imports reject managed refreshes under the same
+  Item lock; unmanaged imports remain supported. All signatures are invoker,
+  empty-search-path and service-role-only; PostgREST receives schema reload.
+- Apply rebuilds and checks the reviewed packet before transport. Positions 1–5
+  and 6–10 are separate atomic requests, each with exact index/UUID/outcome ACKs.
+  `verify` requires a fresh SQL report: catalog/nonpilot fingerprints, all ten
+  identities/core/source fields and actual description SHA-256/provenance must
+  match. Batch 2 is blocked until batch 1 readback passes. The run completes only
+  after the second readback. A lost/malformed response or checkpoint after a
+  possible commit consumes the batch as `unknown-write-outcome`; no auto replay.
+
+### Operator continuation after source/rollout acceptance
+
+Review/apply only the new catalog migration after checking the current hosted
+catalog definitions/ACLs. Do not replay the six native forwards or deploy the
+unchanged v12 Edge function. The Supabase connector does not expose a privileged
+catalog import invocation or secret retrieval; do not work around that boundary
+through SQL HTTP/vault/new endpoints. Use the already configured admin runtime
+for `apply`, with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`; provider-only
+commands need neither. No new key setup is required by this packet.
+
+The commands below are the operational sequence, **not completed provider work**.
+Run from the repository root. Run paths must be under the ignored staging root.
+
+```bash
+npm run catalog:book-descriptions -- plan
+npm run catalog:book-descriptions -- preview --run dist/catalog-enrichment/book-pilot-v1
+npm run catalog:book-descriptions -- fallback --run dist/catalog-enrichment/book-pilot-v1 --review dist/catalog-enrichment/book-pilot-v1/fallback-review.json
+npm run catalog:book-descriptions -- review --run dist/catalog-enrichment/book-pilot-v1 --review dist/catalog-enrichment/book-pilot-v1/text-review.json --baseline dist/catalog-enrichment/book-pilot-v1/before.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 1
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-1.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 2
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-2.json
+```
+
+Inspect the saved `preview.json` and source records before writing review inputs.
+Skip `fallback` entirely if no Work lookup is needed; each selected Work can be
+fetched once. `fallback-review.json` is an array of positions, Edition
+`recordSha256`/`textSha256` (null for missing text) and a reason from
+`edition-missing`, `edition-language`, `edition-rights`, `edition-unsuitable`.
+`text-review.json` contains exactly one decision for each of the ten positions:
+
+| Decision | Required fields in addition to `position` |
+| --- | --- |
+| Accept reviewed text | `choice: "edition"` or `"work"`, exact chosen `recordSha256`, `textSha256`, `textLanguage: "fi"` or `"en"`, `rights: "approved-for-pilot"`, actual 20–1,000-character permission/use `basis` |
+| Leave staged | `choice: "skip"`, nonblank `reason` (max 200 characters) |
+
+Run `scripts/catalog/book-description-coverage.sql` at each named checkpoint and
+save its **`book_description_coverage` object**, not the SQL client's row wrapper,
+as the corresponding private JSON file. The query now exports source UUID/current
+version, description SHA-256 and prior description/provenance/envelope in addition
+to the unchanged preservation fingerprint definitions. Retain complete controlled
+preimages for the reviewed guarded rollback procedure below. No rollback switch
+clears managed fields automatically. Do not delete a failed run's pilot claim,
+edit an ambiguous batch to completed, or invent a new run to reset the budget.
+Read back exact identities/text hashes/versions and record reconciliation plus
+the remaining-attempt decision in #182 before any further operation.
+
+### Verification and remaining gates
+
+Local root `npm run check` passed 411 tests, lint/typecheck and both Hermes
+exports. Catalog fixtures cover bounds, notes exclusion, text/Edition languages,
+hash-bound review, Work fallback, rate/timeout/budget stops, packet tampering,
+exact/unknown ACKs and enforced readbacks. Full-schema PGlite fixtures cover a
+populated catalog upgrade, exact preservation (including unsorted arrays/title),
+stale Item/source versions, conflicting aliases/lifecycle, atomic rollback,
+no-op/changed refresh, ACLs and both legacy replay paths.
+
+Required CLI CI adds the same populated upgrade/smoke on the pinned native
+Supabase stack. Independent service-role sessions must visibly wait for actual
+row locks: reversed input batches update once/no-op once, while a waiting legacy
+refresh is rejected. Real PostgREST must reject the mode on the older schema,
+resolve the new overload with exact read-only replay ACKs and deny anonymous
+access. Source/CLI migration-history/native-platform gates remain required;
+Issue #182 records their actual result rather than treating PGlite as concurrency
+proof. Local dependencies use the existing archive cache after all eleven frozen
+Edge SHA-512 checks; CI uses its normal dependency path. The existing unrelated
+mobile Hook lint warning remains.
+
+Initial source CI #500 passed validate/platform/fresh-install/populated-upgrade
+but failed in native concurrency fixture cleanup: catalog source foreign keys
+restrict Item deletion. The fixture now deletes its synthetic aliases/sources
+before Items, also checks committed cleanup in PGlite, and preserves any earlier
+probe error if cleanup fails. The application migration is unchanged. Corrected
+head/CI acceptance is recorded in #182; the failed run is not native acceptance.
+
+The updated read-only coverage query executed at
+**2026-09-14T06:34:32.501146+00:00**: BOOK 415 visible / 427 stored, 385 images,
+zero descriptions; MOVIE 425 visible / 437 stored, all 425 images/descriptions.
+All ten identities and source UUID/version fields match; all existing preservation
+fingerprints are unchanged. Query SHA-256:
+`e4803671f63815416202a733d6ca9f97ddc429880e571bdab61cc1ebc6919278`.
+Catalog forward SHA-256:
+`c592fd19949eb6a5484711bc9c73a35b596c163175896c60d7bcc6a654652188`.
+
+No hosted DDL/deploy, candidate GET, description write, device test or APK
+dispatch occurred. Source success does not supply a per-record rights decision,
+pilot coverage, native rendering/attribution, broader dump coverage or curated
+identity mapping. #182 / MVP-CAT-001..003 / Phase 14.3 stay open. The completed
+MOVIE cap, #229 native gates and rejected D2 challenger admission are unchanged.
+
 ## BOOK description plan — 2026-09-13 / #182
 
 Planning branch: `docs/182-book-description-plan`, based on accepted
@@ -52,7 +200,7 @@ The deployed single-item upsert confirms full replacement of description and
 metadata (definition MD5 `26418016af759bce2e580fdd7d3236a2`);
 the batch wrapper is `abd9f4d40e35096d1cc1a9fa2a39e497`. A description-only entry
 would clear unrelated fields. Implement the guarded overload described in
-[Catalog architecture](../../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182)
+[Catalog architecture](../../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
 before any write. Current RPCs and six installed native forwards were not changed.
 
 ### Frozen first pilot — open-library-description-pilot-v1

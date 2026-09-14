@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-13**
+Last updated: **2026-09-14**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 BOOK description enrichment plan
+## Current packet — #182 BOOK description refresh implementation
 
 The diagnostic packet is accepted through [PR #252](https://github.com/Kajooja/Kajo/pull/252),
 main `f8ed71db6186ee9f810d985462119cf7085e1f08`. Catalog-import is ACTIVE **v12**;
@@ -18,24 +18,33 @@ exact five-file readback and unchanged 425-movie coverage are recorded in
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182). Do not recreate its branch,
 repeat its CI/deploy, or reproduce the older science-fiction failure.
 
-Branch `docs/182-book-description-plan` defines
-[the guarded description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182)
+Planning [PR #253](https://github.com/Kajooja/Kajo/pull/253) is accepted at
+`1ea3a8c64beff8571bde4dc39cf73c30fc68b944`. It defines
+[the guarded description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
 and [fixed ten-Item pilot](sprints/SPRINT-014.md#book-description-plan--2026-09-13--182).
-Issue #182 owns this packet's subsequent PR/CI/merge outcome. The implementation
-and pilot execution remain pending; planning acceptance is not description coverage.
+Branch `feat/182-book-description-refresh` implements strict normalization,
+provider-only Edition preview and reviewed Work fallback, explicit text/rights
+review, two guarded atomic batches and mandatory SQL readback between them.
+The forward `20260914060616_book_description_refresh.sql` adds narrow Item/batch
+overloads and blocks destructive legacy refresh of managed descriptions. It does
+not change deployed history or run a backfill. [The implementation checkpoint](sprints/SPRINT-014.md#book-description-implementation--2026-09-14--182)
+records commands, test boundaries and recovery. Issue #182 owns the exact
+subsequent PR/CI/merge outcome; consult it before resuming an older branch.
 
-**Next bounded source work after this planning gate:** implement the strict
-BOOK description normalizer/no-write preview and the guarded opt-in overload of
-the existing catalog batch boundary. Preserve existing presentation fields and
-managed descriptions across legacy BOOK refreshes; reject stale identities/versions
-and old-server mode mismatch. Validate atomicity, no-op, concurrency and unknown
-write receipts before a reviewed catalog-only rollout and pilot. Do not send a
-description-only record to the current full-replacement upsert.
+**Next bounded work after source acceptance:** review and roll out only this
+catalog forward, compare its function signatures/ACLs and the fixed SQL baseline,
+then collect the frozen no-write Edition preview. Review actual text language,
+fitness and permission; fetch only explicitly selected Work fallbacks within the
+same twenty-attempt cap. Prepare guarded rollback preimages before any display
+write. Apply reviewed positions 1–5, verify their SQL readback, then separately
+apply/verify positions 6–10. The actual preview, hosted migration and pilot remain
+unperformed in this source packet. Do not reimplement the accepted source or
+send a description patch through the legacy one-argument batch.
 
-### Verified BOOK checkpoint — 2026-09-13
+### Verified BOOK checkpoint — 2026-09-14
 
-Read-only audit at **22:03:54 UTC** and the committed
-`scripts/catalog/book-description-coverage.sql` at **22:16:34 UTC** confirm
+The updated read-only `scripts/catalog/book-description-coverage.sql` at
+**2026-09-14T06:34:32.501146+00:00** confirms the 2026-09-13 baseline:
 **415 discoverable / 427 stored BOOK Items**, 385 covers and zero descriptions.
 All 385 provider Items have exactly one matching Work alias/mirror and a selected
 Edition. Their saved Search payloads contain no descriptions; the adapter
@@ -47,7 +56,7 @@ original-language values remain unknown.
 The frozen pilot contains five fin and five eng selected Editions, at most twenty
 sequential provider GET attempts and two reviewed atomic batches of five. All ten
 canonical identities pass the SQL check. No candidate provider calls or writes
-were made during planning. The query retains fixed identities for before/after
+were made during planning or implementation. The query retains fixed identities for before/after
 comparison and fingerprints unchanged book fields, movies, aliases and sources.
 Rights/fitness/language review precedes display writes. Subsequent broad
 enrichment uses pinned Work/Edition dumps rather than hundreds of API requests.
@@ -68,9 +77,9 @@ Do not perform more MOVIE imports under that plan or repeat configured-key setup
 #182 / MVP-CAT-001..003 / Phase14.3 remain open for BOOK metadata, repeatable
 refresh, rights/attribution, normalized feature quality and native usefulness.
 Preserve #229's native/device/fresh-account gates, the six installed immutable
-forwards, and accepted E1/D1/D2 with rejected challenger admission. No migration,
-deployment, new provider run, APK dispatch or unrelated UI work is part of this
-planning packet.
+forwards, and accepted E1/D1/D2 with rejected challenger admission. This source
+packet creates a catalog migration but performs no hosted deployment, provider
+run, description write, APK dispatch or unrelated UI work.
 
 ## Accepted D2 development comparison
 

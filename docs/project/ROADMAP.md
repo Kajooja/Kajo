@@ -48,8 +48,8 @@ coverage checks passing. English (259) and Finnish (60) remain the main offering
 other languages complement them. The pass is finished within its explicit cap,
 including a Korean repeat, deferred Spanish and a failed science-fiction attempt
 with unknown upstream progress. Failure diagnostics are accepted through PR #252
-and deployed on catalog-import v12. Continue the reviewed BOOK description plan:
-guarded preservation/preview source, then a separately verified ten-Item pilot,
+and deployed on catalog-import v12. BOOK guarded preservation/preview source is
+implemented; accept its CI, review the catalog-only forward and run the ten-Item pilot,
 before broader dump-based enrichment and remaining rights/native quality gates.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
@@ -149,9 +149,10 @@ documentary coverage checks pass; English/Finnish are the principal offering.
 The 18-attempt pass is complete with its conservative 30-page accounting.
 PR #252's additive failure/progress diagnostics are accepted and deployed on v12.
 The next BOOK unit follows the
-[description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--planned-contract-182):
-implement preserving/guarded refresh and no-write preview first, then review
-actual text/rights and execute the fixed ten-Item pilot with before/after checks.
+[description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182):
+guarded refresh and no-write preview are implemented in the #182 source packet;
+after source acceptance, roll out the catalog-only forward, review actual
+text/rights and execute the fixed ten-Item pilot with enforced before/after checks.
 Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
 review before enrichment. STATUS/Issue #182 own source/rollout and execution.
 Do not repeat accepted canary/setup or extend the completed MOVIE budget.

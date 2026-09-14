@@ -279,11 +279,13 @@ Requirements before release:
 
 Research object-feature enrichment is a distinct input path. Admission requires validated canonical ID mapping, explicit score/encoder version, coverage, source rights and temporal availability. A public rating dataset does not grant image/metadata rights from every linked provider. Unmapped research objects remain unmapped rather than forcing fuzzy catalog merges.
 
-### BOOK description enrichment — planned contract, #182
+### BOOK description enrichment — guarded contract, #182
 
-The reviewed contract is `open-library-description-v1`; its implementation and
-hosted acceptance remain pending. The [Sprint 014 pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182)
-owns the fixed ten candidates, call budget and operational checkpoints.
+The source implements `open-library-description-v1`; hosted rollout and pilot
+acceptance remain pending. The [Sprint 014 pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182)
+owns the fixed ten candidates and call budget; the
+[implementation checkpoint](../project/sprints/SPRINT-014.md#book-description-implementation--2026-09-14--182)
+owns executable review/apply/verification steps.
 
 Identity comes from the existing `open_library` source and matching
 `open_library_work` alias on the same Item. `metadata.openLibraryWorkId` is a
@@ -303,7 +305,9 @@ for review, not silently truncated/rendered. Never substitute bibliographic
 `notes`, excerpts, first sentences, reviews or generated/translated summaries.
 These bounds are Kajo's versioned selection policy, not provider guarantees.
 
-Fetch the exact selected Edition first. Prefer its usable description when the
+Fetch the exact selected Edition first. The preview stops for review after ten
+Edition lookups; the separate fallback step fetches only Works whose Edition
+description was rejected with a hash-bound reason. Prefer its usable description when the
 text is verified as Finnish or English; otherwise inspect the exact Work's
 description as fallback. Preserve the selected title/cover/Edition regardless
 of fallback. Edition language, available translation languages, description
@@ -321,17 +325,22 @@ Keep the existing private source payload intact and append only a versioned
 review outcome. Public provenance excludes raw records, personal reviewer
 identifiers and credentials. Raw records/description text stay out of Git.
 
-The current full-replacement upsert is insufficient for a description patch.
-Implement an opt-in overload of the existing generic batch boundary,
+The legacy full-replacement upsert is insufficient for a description patch.
+An opt-in overload of the existing generic batch boundary,
 `upsert_catalog_batch_v1(entries jsonb, refresh_mode text)`, **without a default
-for the second argument**. A top-level mode makes the request fail on an older
+for the second argument**, accepts this mode. A top-level mode makes the request fail on an older
 server; an extra JSON entry property alone would currently be silently ignored.
 The existing one-argument contract remains. Accept only the declared description
 mode, max ten entries, exact expected Item/source identities and expected current
 Item/source versions. Lock Items then sources in deterministic identity order,
 recheck aliases/lifecycle/versions under the locks, and merge only description,
-its provenance and its source envelope into the current records before using the
-canonical Item upsert. Perform provider calls before this short transaction.
+its provenance and its source envelope through the canonical Item writer's narrow
+`upsert_catalog_item_v1(entry jsonb, refresh_mode text)` overload. It also validates
+and locks when called directly. The legacy 17-argument Item signature would sort
+existing arrays and trim display fields; the narrow overload updates only the
+three managed fields plus automatic row timestamps. Source URL/hash/upstream
+time/sync time still describe the preserved original import. Perform provider
+calls before this short transaction.
 
 Preserve UUIDs, creation times, all aliases, title, cover, creators, tags, years,
 language, popularity and unrelated metadata/source fields. Missing/invalid text
@@ -339,12 +348,15 @@ never clears an existing description. Equal text, source revision and review/
 policy identity is a no-op; a new fetch timestamp alone does not force a rewrite.
 Version mismatch rejects mutations; already-applied identical content can return
 a read-only no-op after identity verification. Changed text is an explicit
-guarded refresh. Existing full BOOK writers must preserve
-managed descriptions/provenance or reject their refresh; test Search/dump replay
-before accepting the new mode. No new catalog, account, Event, model or general
+guarded refresh. Existing full BOOK writers reject refreshes of Items with managed
+provenance/envelopes under the Item lock; Search Work and dump Edition alias
+replays are tested. Unmanaged legacy imports keep their existing behavior.
+No new catalog, account, Event, model or general
 admin endpoint is introduced. Use an incremental catalog migration, not edits
-to deployed history or the separate six native forwards. Keep both signatures
-service-role-only and SECURITY INVOKER with an empty search path.
+to deployed history or the separate six native forwards. All catalog writer
+signatures remain service-role-only and SECURITY INVOKER with an empty search
+path. The catalog migration requests a PostgREST schema-cache reload; real named
+argument resolution, old-server rejection and anonymous denial join native CI.
 
 Persist starting/prepared/reviewed/completed/failed checkpoints. Count actual
 provider attempts separately from accepted/skipped candidates and acknowledged
