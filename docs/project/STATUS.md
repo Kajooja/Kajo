@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-14**
+Last updated: **2026-09-17**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,76 +10,76 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 BOOK description refresh implementation
+## Current packet — #182 BOOK rollout and reviewed provider preview
 
-The diagnostic packet is accepted through [PR #252](https://github.com/Kajooja/Kajo/pull/252),
-main `f8ed71db6186ee9f810d985462119cf7085e1f08`. Catalog-import is ACTIVE **v12**;
-exact five-file readback and unchanged 425-movie coverage are recorded in
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182). Do not recreate its branch,
-repeat its CI/deploy, or reproduce the older science-fiction failure.
+Source [PR #254](https://github.com/Kajooja/Kajo/pull/254) is accepted on main
+`dce94df96e965f26810c979cf8af550d551c8597` after all five required CI #501 gates.
+The exact catalog-only description migration is now installed and verified.
+**Do not deploy it again**, recreate its implementation branch, redeploy
+catalog-import v12 or replay the six installed native forwards. Source/hosted
+version mapping and exact checks remain in the owner's controlled checkpoint;
+the accepted source filename/bytes are unchanged.
 
-Planning [PR #253](https://github.com/Kajooja/Kajo/pull/253) is accepted at
-`1ea3a8c64beff8571bde4dc39cf73c30fc68b944`. It defines
-[the guarded description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
-and [fixed ten-Item pilot](sprints/SPRINT-014.md#book-description-plan--2026-09-13--182).
-Branch `feat/182-book-description-refresh` implements strict normalization,
-provider-only Edition preview and reviewed Work fallback, explicit text/rights
-review, two guarded atomic batches and mandatory SQL readback between them.
-The forward `20260914060616_book_description_refresh.sql` adds narrow Item/batch
-overloads and blocks destructive legacy refresh of managed descriptions. It does
-not change deployed history or run a backfill. [The implementation checkpoint](sprints/SPRINT-014.md#book-description-implementation--2026-09-14--182)
-records commands, test boundaries and recovery. Issue #182 owns the exact
-subsequent PR/CI/merge outcome; consult it before resuming an older branch.
+Branch `docs/182-book-description-rollout` records the
+[rollout and actual text review](sprints/SPRINT-014.md#book-rollout-and-description-review--2026-09-17--182).
+The owner explicitly authorized this public documentation and issue update on
+2026-09-17, resolving the earlier publication approval block.
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the exact
+publication PR/head/CI/merge outcome. Private source records and detailed hosted
+evidence remain in the controlled checkpoint.
 
-**Next bounded work after source acceptance:** review and roll out only this
-catalog forward, compare its function signatures/ACLs and the fixed SQL baseline,
-then collect the frozen no-write Edition preview. Review actual text language,
-fitness and permission; fetch only explicitly selected Work fallbacks within the
-same twenty-attempt cap. Prepare guarded rollback preimages before any display
-write. Apply reviewed positions 1–5, verify their SQL readback, then separately
-apply/verify positions 6–10. The actual preview, hosted migration and pilot remain
-unperformed in this source packet. Do not reimplement the accepted source or
-send a description patch through the legacy one-argument batch.
+### Verified result — 2026-09-17
 
-### Verified BOOK checkpoint — 2026-09-14
+Exact function/ACL/history readback and an anonymous HTTP permission-denial probe
+passed. All unrelated function/trigger/default metadata and the entire catalog
+comparison stayed unchanged: BOOK **415 visible / 427 stored / 385 images / zero
+descriptions**; MOVIE **425 / 437 / 425 images and descriptions**. All ten fixed
+pilot identities and row versions match; zero discoverable mocks.
 
-The updated read-only `scripts/catalog/book-description-coverage.sql` at
-**2026-09-14T06:34:32.501146+00:00** confirms the 2026-09-13 baseline:
-**415 discoverable / 427 stored BOOK Items**, 385 covers and zero descriptions.
-All 385 provider Items have exactly one matching Work alias/mirror and a selected
-Edition. Their saved Search payloads contain no descriptions; the adapter
-explicitly sets null. The 30 curated books have only Kajo aliases and require a
-separate exact identity review. Selected Edition languages include eng 336 and
-fin 39; these are not description/original languages, and all 385 provider
-original-language values remain unknown.
+The frozen preview used **all twenty allowed provider attempts**: ten Editions,
+then ten reviewed exact Work fallbacks. All twenty records matched identity;
+there were no retries, redirects, substitutions or database batches. Nine
+Editions have no description; one Finnish description contains a source URL.
+Eight Work descriptions pass the unchanged text rules, all in English; two
+contain disallowed markup/link characters. Edition language remains distinct
+from description/original language.
 
-The frozen pilot contains five fin and five eng selected Editions, at most twenty
-sequential provider GET attempts and two reviewed atomic batches of five. All ten
-canonical identities pass the SQL check. No candidate provider calls or writes
-were made during planning or implementation. The query retains fixed identities for before/after
-comparison and fingerprints unchanged book fields, movies, aliases and sources.
-Rights/fitness/language review precedes display writes. Subsequent broad
-enrichment uses pinned Work/Edition dumps rather than hundreds of API requests.
+Actual review approved **zero display writes**: eight permission/attribution
+holds and two text-policy exclusions. The accepted CLI saved a reviewed packet
+with zero entries and ten skips. **The six-description usefulness target was
+not met.** No empty apply batches were sent. Do not label text eligibility as
+rights clearance or claim a completed description import.
+
+### Exact next bounded packet
+
+Resolve **cached-source permission and required attribution** for the existing
+candidates. Establish actual origin/revision and
+license evidence, required credit/license links and the display contract before
+approving text. Unknown permission stays staged; a larger dump is not a remedy
+for this unresolved gate.
+
+Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
+local staging is `dist/catalog-enrichment/book-pilot-v1`. Never reset the spent
+budget or repeat the provider preview. A restored operation lock requires the
+explicit reconciliation recorded in the Sprint checkpoint. The run is already
+`reviewed`; later changed decisions need a tested review-amendment workflow
+that retains prior decisions and budgets, not a hand-edited status reset.
+Refresh SQL versions and prepare guarded rollback preimages before any approved
+write. Actual apply uses the configured admin runtime; this workspace has no
+privileged runtime credential. Do not restart key setup or bypass the boundary.
 
 ### Completed MOVIE pass and preserved gates
 
-MOVIE remains **425 discoverable / 437 stored**, all with complete TMDB core
-metadata, images and descriptions; all eight expansion targets and all 30
-original curated identities passed. English **259** and Finnish **60** are the
-main offering, **75.1%** together; other languages complement them. Keep original
-language `fi` separate from Finnish production `FI`, and preserve personalization.
+MOVIE remains complete for its bounded pass. English **259** and Finnish **60**
+remain its main offering, **75.1%** together. Keep original language `fi` separate
+from Finnish production `FI`, and preserve personalization. Its 18 attempts and
+30 charged page slots are exhausted; do not perform another import under it.
 
-The finished pass used 18 request attempts / 28 verified page fetches plus two
-reserved failed-science-fiction slots, consuming its 30-page cap. The Korean
-repeat, deferred Spanish and unresolved science-fiction cause remain in #182.
-Do not perform more MOVIE imports under that plan or repeat configured-key setup.
-
-#182 / MVP-CAT-001..003 / Phase14.3 remain open for BOOK metadata, repeatable
-refresh, rights/attribution, normalized feature quality and native usefulness.
-Preserve #229's native/device/fresh-account gates, the six installed immutable
-forwards, and accepted E1/D1/D2 with rejected challenger admission. This source
-packet creates a catalog migration but performs no hosted deployment, provider
-run, description write, APK dispatch or unrelated UI work.
+#182 / MVP-CAT-001..003 / Phase14.3 remain open for rights/attribution, broader
+BOOK descriptions, curated exact mapping, repeatable refresh, normalized feature
+quality and native usefulness. Preserve independent #229/device/fresh-account
+gates, six immutable native forwards and rejected D2 challenger admission.
+No device test, APK dispatch, model admission or unrelated UI work occurred.
 
 ## Accepted D2 development comparison
 

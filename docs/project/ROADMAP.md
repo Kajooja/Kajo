@@ -150,9 +150,12 @@ The 18-attempt pass is complete with its conservative 30-page accounting.
 PR #252's additive failure/progress diagnostics are accepted and deployed on v12.
 The next BOOK unit follows the
 [description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182):
-guarded refresh and no-write preview are implemented in the #182 source packet;
-after source acceptance, roll out the catalog-only forward, review actual
-text/rights and execute the fixed ten-Item pilot with enforced before/after checks.
+guarded refresh is accepted through PR #254 and its catalog-only rollout is
+verified. The fixed ten-Item preview exhausted its twenty provider attempts;
+eight English Work descriptions pass the text rules, but none has an accepted
+permission/attribution decision. Next resolve the cached records' rights and
+required attribution before any display write. Do not redeploy the forward,
+reset the pilot or expand the API pass to compensate for unapproved text.
 Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
 review before enrichment. STATUS/Issue #182 own source/rollout and execution.
 Do not repeat accepted canary/setup or extend the completed MOVIE budget.
