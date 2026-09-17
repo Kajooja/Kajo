@@ -14,6 +14,123 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## BOOK rollout and description review — 2026-09-17 / #182
+
+Branch `docs/182-book-description-rollout` starts from accepted PR #254,
+main `dce94df96e965f26810c979cf8af550d551c8597`. Publication initially stopped
+at automatic approval review. The owner explicitly authorized the public
+documentation and #182 update on 2026-09-17. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+records this documentation packet's exact PR/head/CI/merge outcome.
+
+### Completed rollout and preserved data
+
+The exact accepted `20260914060616_book_description_refresh.sql` was applied
+once. Its source bytes and filename remain unchanged. The owner-controlled
+checkpoint retains the source/hosted version mapping and exact verification;
+do not apply the forward again or repair previous history.
+
+Readback verified both new function bodies, the exact intended legacy guard,
+unchanged legacy batch, service-only invoker permissions and no default mode.
+All previous migration rows, unrelated function definitions/ACLs, triggers and
+global defaults were preserved. An anonymous empty-entry HTTP probe reached the
+named overload and received permission denial, establishing hosted schema-cache
+resolution without a privileged write. It is not an actual import ACK.
+
+Before/after and final catalog comparisons are equal: BOOK **415 discoverable /
+427 stored / 385 images / zero descriptions**; MOVIE **425 / 437 / 425 images and
+descriptions**. All ten pilot identities, row versions and preservation hashes
+match. Detailed database identifiers/fingerprints stay in controlled evidence.
+Security review found no new function/search-path/permission finding; existing
+private-table RLS-without-policy notices and the previously tracked
+[Auth password-protection warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+remain separate operations work.
+
+### Actual frozen preview and review outcome
+
+The unchanged CLI collected all ten selected Editions and, after hash-bound
+fallback review, their ten exact Works. All twenty responses passed exact
+record/Work identity checks. **20 attempted GETs / 20 found records / zero
+retries / zero redirects / zero database batches.** The original request spacing,
+timeouts, size cap, candidate identities and exclusive pilot claim were retained.
+This provider budget is exhausted; no further candidate fetch is part of it.
+
+| Frozen position | Edition description | Work description | Review decision |
+| --- | --- | --- | --- |
+| 1 — Pieni elämä | Finnish; source URL | Eligible English, 199 code points | Stage: permission/attribution unconfirmed |
+| 2 — Ei enää ihminen | Missing | Eligible English, 863 | Stage: permission unconfirmed; embedded critic quotation |
+| 3 — Rikos ja rangaistus | Missing | Markdown/URLs | Stage: text policy rejects it |
+| 4 — Romeo ja Julia | Missing | Eligible English, 388 | Stage: origin/license and attribution need confirmation |
+| 5 — Ajan lyhyt historia | Missing | Contains an asterisk | Stage: unchanged text policy rejects it |
+| 6 — Atomic Habits | Missing | Eligible English, 315 | Stage: permission unconfirmed |
+| 7 — It Ends With Us | Missing | Eligible English, 1,212 | Stage: permission unconfirmed |
+| 8 — The Subtle Art of Not Giving a Fuck | Missing | Eligible English, 470 | Stage: contribution/permission unconfirmed |
+| 9 — Control Your Mind and Master Your Feelings | Missing | Eligible English, 1,182 | Stage: permission unconfirmed |
+| 10 — Harry Potter and the Philosopher's Stone | Missing | Eligible English, 683 | Stage: permission unconfirmed; narrative excerpt present |
+
+The eight structurally eligible descriptions are all English. A Finnish Edition
+did not supply an eligible Finnish description. No markup was stripped, text
+rewritten/translated, notes substituted or original language changed.
+
+The official [Open Library licensing page](https://openlibrary.org/developers/licensing)
+still flags possible pre-existing rights. Actual saved records do not establish
+a permission basis for these display writes. Linked encyclopedia/author pages
+are origin leads, not an exact licensed revision or completed attribution plan.
+The matching current encyclopedia prose is not identical to the cached text;
+do not assert an exact source match without evidence. None is marked approved.
+
+The accepted `review` command generated a **reviewed packet with zero entries
+and ten skips** (eight permission holds, two text-policy exclusions). No `apply`
+or `verify` batch command was run, and no empty batches were sent. The target of
+six approved usable descriptions was **not met**. Preview/review completion is
+not description-import or native-usefulness acceptance.
+
+### Controlled checkpoint and continuation
+
+`Kajo-book-description-pilot-v1.zip` is the owner-controlled checkpoint. It holds
+the original claim, all twenty raw responses/record and text hashes, attempt
+ledger, fallback/content/text decisions, before/final coverage and rollout
+evidence. Real descriptions, raw records, database identifiers and review inputs
+remain outside Git. The local run is `dist/catalog-enrichment/book-pilot-v1`.
+Recover the saved run before any future action; never create another pilot to
+reset its counters or fetch the same candidates again.
+
+One local fallback invocation stopped on a stale operation lock before any
+request. The completed preview's records, hashes, prepared status, zero Work
+attempts/batches and process exit were reconciled before archiving that lock;
+the same claim/state then completed its ten Work calls. The fallback command
+reported no lock after successful exit, but a subsequent tool snapshot again
+contained that lock. Its completed state was reconciled before the no-I/O review.
+This observed persistence limitation is recorded without claiming a source-code
+defect. Restored locks require the same explicit reconciliation; never delete
+the global claim or turn a failed/uncertain operation into success.
+
+Next complete a bounded **cached-source permission and attribution packet**.
+Prioritize exact origin/revision and license evidence for the existing candidate
+texts, determine required public credit/license links, and review the actual
+display contract/UI before approving any text. Resolve unknown permissions with
+documented evidence or keep them staged. Do not change the normalizer simply to
+meet the target or begin a broad dump/API pass first.
+
+The run is already `reviewed` with zero entries. The current CLI intentionally
+does not reopen reviews. If a later decision approves cached text, use a reviewed
+and tested amendment workflow retaining the original decisions, hashes, spent
+attempts and zero batch history; do not edit its status back to `prepared`.
+Refresh the exact SQL baseline and prepare a guarded description-only rollback
+before any write. Actual apply still belongs to the configured admin runtime;
+no privileged credential was available in this workspace and none was retrieved.
+Do not bypass that boundary through SQL HTTP/vault or new admin endpoints.
+
+Validation: accepted PR #254/CI #501 remains the runtime source/native proof.
+This documentation PR runs the normal required CI gates; #182 owns their outcome.
+Hosted readback, anonymous HTTP denial, all twenty
+provider receipts, actual normalization/review and unchanged catalog comparison
+are new evidence. No device test, APK dispatch, new model admission, native
+forward or catalog-import v12 redeployment occurred. Documentation links and
+whitespace passed separately before publication (36 local links across four
+changed Markdown files). #182 / MVP-CAT-001..003 /
+Phase14.3, broader dump coverage, curated mapping, rights and native usefulness
+stay open; the completed MOVIE budget and #229/D2 decisions are unchanged.
+
 ## BOOK description implementation — 2026-09-14 / #182
 
 Branch `feat/182-book-description-refresh` starts from accepted planning PR #253,
