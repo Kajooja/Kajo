@@ -49,8 +49,10 @@ other languages complement them. The pass is finished within its explicit cap,
 including a Korean repeat, deferred Spanish and a failed science-fiction attempt
 with unknown upstream progress. Failure diagnostics are accepted through PR #252
 and deployed on catalog-import v12. BOOK guarded preservation/preview source is
-implemented; accept its CI, review the catalog-only forward and run the ten-Item pilot,
-before broader dump-based enrichment and remaining rights/native quality gates.
+implemented and its catalog-only rollout and ten-Item pilot are complete. The
+cached rights audit retains zero approved descriptions and identifies missing
+attribution support; implement the structured attribution path before admitting
+attribution-dependent text or beginning broader dump-based enrichment.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -153,8 +155,12 @@ The next BOOK unit follows the
 guarded refresh is accepted through PR #254 and its catalog-only rollout is
 verified. The fixed ten-Item preview exhausted its twenty provider attempts;
 eight English Work descriptions pass the text rules, but none has an accepted
-permission/attribution decision. Next resolve the cached records' rights and
-required attribution before any display write. Do not redeploy the forward,
+permission/attribution decision. The completed cached audit and offline review
+amendment preserve those holds. Next implement the
+[structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--next-contract-182),
+then establish exact contribution/revision and license evidence before any
+display write. The general licensing search is recorded; do not repeat it as
+the default continuation. Do not redeploy the forward,
 reset the pilot or expand the API pass to compensate for unapproved text.
 Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
 review before enrichment. STATUS/Issue #182 own source/rollout and execution.

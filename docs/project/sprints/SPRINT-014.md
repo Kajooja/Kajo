@@ -14,6 +14,97 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Cached BOOK rights audit and review amendment — 2026-09-19 / #182
+
+Branch `feat/182-book-review-amendment` starts from accepted PR #255, main
+`6257561b3f2e5a566925abe0e1b82537ebecb4d3`. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+owns this packet's exact PR/head/CI/merge result. The prior deployment and all
+twenty raw provider records were reused; no fresh provider record, hosted
+query/write, APK dispatch or device test belongs to this packet.
+
+### Source findings and display gate
+
+The saved Work records contain no explicit rights/license field. The
+[Open Library licensing page](https://openlibrary.org/developers/licensing),
+rechecked on September 19, still flags possible existing contribution rights.
+Record availability and text eligibility do not establish display permission.
+The controlled `rights-audit.json` binds these findings to each cached record
+revision/hash and text hash; it contains references and conclusions, not new
+replacement descriptions.
+
+| Frozen position | New source finding | Decision |
+| --- | --- | --- |
+| 1 — Pieni elämä | [Wikipedia revision 686759357](https://en.wikipedia.org/w/index.php?title=A_Little_Life&oldid=686759357), October 21, 2015, matches the first two sentences; the third differs. Current prose also differs. | Hold: exact contribution/revision and attribution unresolved |
+| 2 — Ei enää ihminen | [Publisher's current page](https://www.ndbooks.com/book/no-longer-human/) uses different copy; the cached text includes a critic quotation. The publisher provides a separate [permissions process](https://www.ndbooks.com/permissions/). | Hold: exact source and permission unresolved |
+| 3 — Rikos ja rangaistus | Existing Markdown/URLs remain excluded. | Unchanged text-policy exclusion |
+| 4 — Romeo ja Julia | [Linked Wikipedia lead](https://en.wikipedia.org/wiki/Romeo_and_Juliet) overlaps but differs; no exact matching revision was established. | Hold: origin/revision and attribution unresolved |
+| 5 — Ajan lyhyt historia | The cached asterisk remains excluded. | Unchanged text-policy exclusion |
+| 6 — Atomic Habits | [Publisher opening](https://www.penguinrandomhouse.com/books/543993/atomic-habits-by-james-clear/) closely matches, with punctuation differences; [site terms](https://www.penguinrandomhouse.com/terms-of-use/) do not supply a Kajo display grant. | Hold: use permission unresolved |
+| 7 — It Ends With Us | [Publisher page](https://www.simonandschuster.com/books/It-Ends-with-Us/Colleen-Hoover/It-Ends-with-Us/9781501110368) matches three paragraphs, with a different closing paragraph; [site terms](https://www.simonandschuster.com/p/terms-of-use) do not establish permission for this cached copy. | Hold: use permission unresolved |
+| 8 — The Subtle Art of Not Giving a Fuck | [Author page](https://markmanson.net/books/subtle-art) does not contain the cached description. | Hold: primary contribution/permission unconfirmed |
+| 9 — Control Your Mind and Master Your Feelings | No primary origin or license was established. | Hold: origin/permission unconfirmed |
+| 10 — Harry Potter and the Philosopher's Stone | [Author page](https://www.jkrowling.com/book/harry-potter-philosophers-stone/) differs; cached text includes a narrative excerpt. | Hold: exact contribution/permission unresolved |
+
+These are documented matches/leads, not assertions of an exact copyright-owner
+chain. Date-filtered Wikipedia history retrieval was unavailable; that limitation
+does not turn a partial match into a licensed revision. No publisher/contributor
+was contacted and no permission grant was obtained. **Zero display approvals;
+eight rights holds and two unchanged text-policy exclusions.**
+
+The implementation audit found `Item.description` alone in the domain contract,
+no description provenance selection in `catalogItemOperations.ts`, and plain
+description rendering in `ItemDetailScreen.tsx` without source/license credit.
+[Wikimedia reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
+and [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) therefore cannot
+be satisfied by merely storing an attribution note in the private import review.
+The [next attribution contract](../../architecture/ARCHITECTURE.md#description-attribution--next-contract-182)
+owns the minimum structured data and display behavior. No UI/schema extension is
+claimed delivered here, and no existing publisher text is relabeled as CC-licensed.
+
+### Delivered offline review amendment
+
+`amend-review --run <existing-run> --amendment <proposal.json> --baseline <baseline.json>`
+accepts a proposal with exactly `contract`, `expectedReviewSha256`, `reason` and
+all ten `decisions`. The contract is
+`open-library-description-review-amendment-v1`; the expected hash is
+`digest(state.review)` using the existing canonical JSON digest. A non-older
+baseline may refresh expected row versions; the original baseline stays in
+the retained review. Actual apply still requires a current SQL readback and
+guarded rollback preimages in the configured admin runtime.
+
+The command requires a reviewed, non-failed run with **no database batch attempt**.
+It verifies every saved record/hash and the exact consumed attempt accounting,
+including skipped Work records. It validates the old and new packets, preserves
+complete decisions/baselines in `reviewHistory`, links the new review to its
+parent, and saves atomically under the existing lock. Replayed/stale proposals,
+unchanged inputs, invalid history, failed runs and any previous attempted write
+are rejected without resetting state. Apply and verify also validate review
+history. The rights/text/identity rules and SQL v1 payload remain unchanged.
+
+The actual CLI recorded the ten source-specific skip reasons in the original
+run: **20 unchanged attempts / 1 prior review / 0 approved entries / 10 skips /
+0 database batches**. The old raw state, applied proposal and rights audit are
+retained in `Kajo-book-description-pilot-v1.zip`; the applied proposal must not
+be replayed. No operation-lock recovery or global-claim replacement was needed.
+Catalog totals remain the September 17 verified baseline, not a fresh readback.
+
+Validation covers legacy behavior plus exact parent/history retention, successive
+amendments, skipped-record tampering, spent budgets, stale/locked/replayed
+proposals, unchanged permission/language gates and amended synthetic apply/
+readback through the existing RPC contract. The actual CLI test disables fetch
+and supplies no credentials. All 19 description tests and the complete root
+`npm run check` passed, including both platform bundle smokes. The first root
+attempt stopped at a refused npm registry connection; the successful run reused
+cached package archives whose integrity matched every frozen Edge lock entry.
+No dependency or lockfile was changed. All 46 local Markdown link targets and
+the whitespace check passed. Exact remote CI/merge outcomes remain in #182.
+
+Next implement the structured attribution path with synthetic fixtures and
+preserve #229's independent reader/native gates. Matching source revisions and
+appropriate permission evidence remain necessary before real approval; complete
+general licensing research is not the next default task. The pilot and MOVIE
+budgets stay closed; do not redeploy installed SQL or broaden the provider pass.
+
 ## BOOK rollout and description review — 2026-09-17 / #182
 
 Branch `docs/182-book-description-rollout` starts from accepted PR #254,

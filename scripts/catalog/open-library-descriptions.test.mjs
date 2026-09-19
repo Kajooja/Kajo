@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { CONTRACT, PILOT, PILOT_ITEMS, buildDescriptionPacket, digest, inspectRecord,
-  normalizeDescription, readBoundedResponse, sha256, validateAcknowledgement, verifyDescriptionReadback } from './open-library-descriptions.mjs';
+import { CONTRACT, PILOT, PILOT_ITEMS, REVIEW_AMENDMENT, amendDescriptionReview, buildDescriptionPacket, digest, inspectRecord,
+  normalizeDescription, readBoundedResponse, sha256, validateAcknowledgement, validateReviewHistory, verifyDescriptionReadback } from './open-library-descriptions.mjs';
 import { applyDescriptionBatch, collectDescriptions } from './import-open-library-descriptions.mjs';
 
 const text = 'A fictional traveller follows a quiet river and discovers how the choices of an earlier generation still shape the town.';
@@ -257,4 +257,152 @@ test('plan needs no credentials, does no fetch, and fixed identities agree with 
   assert.deepEqual(JSON.parse(result.stdout).candidates, PILOT_ITEMS);
   const sql = await readFile(new URL('book-description-coverage.sql', import.meta.url), 'utf8');
   for (const row of PILOT_ITEMS) assert.ok(sql.includes(`(${row.position}, '${row.itemId}'::uuid, '${row.workId}', '${row.editionId}', '${row.displayLanguage}')`));
+});
+
+function amendmentFixture() {
+  const state = reviewedState();
+  Object.assign(state, { pilot: PILOT, manifestSha256: digest(PILOT_ITEMS) });
+  for (const kind of ['edition', 'work']) for (const candidate of PILOT_ITEMS) {
+    const time = new Date(Date.parse(fetchedAt) + state.attempts.length * 1100).toISOString();
+    const raw = rawRecord(candidate, kind);
+    const inspection = inspectRecord(raw, candidate, kind, time);
+    state.records[candidate.position][kind] = { raw, fetchedAt: time, inspectionSha256: digest(inspection) };
+    state.attempts.push({ position: candidate.position, kind, startedAt: time, status: 'found' });
+    if (kind === 'work') state.records[candidate.position].fallback = {
+      recordSha256: sha256(state.records[candidate.position].edition.raw),
+      textSha256: sha256(text), reason: 'edition-rights' };
+  }
+  state.review.decisions = PILOT_ITEMS.map(({ position }) => ({ position, choice: 'skip', reason: 'Original permission hold.' }));
+  state.review.packet = buildDescriptionPacket(state.records, state.review.decisions, state.review.baseline);
+  state.review.packetSha256 = digest(state.review.packet);
+  state.review.reviewedAt = '2026-09-14T02:00:00.000Z';
+  const amendment = { contract: REVIEW_AMENDMENT, expectedReviewSha256: digest(state.review),
+    reason: 'Record the source investigation without granting display permission.',
+    decisions: structuredClone(state.review.decisions) };
+  amendment.decisions[0].reason = 'Source located; required attribution is not yet supported.';
+  return { state, amendment, baseline: structuredClone(state.review.baseline) };
+}
+
+test('review amendment retains all twenty cached attempts and exact prior review without mutating its input', () => {
+  const { state, amendment, baseline } = amendmentFixture();
+  const before = structuredClone(state);
+  const next = amendDescriptionReview(state, amendment, baseline, '2026-09-19T01:00:00.000Z');
+  assert.deepEqual(state, before);
+  for (const key of ['records', 'attempts', 'batches', 'pilot', 'manifestSha256', 'status']) assert.deepEqual(next[key], state[key]);
+  assert.equal(next.attempts.length, 20);
+  assert.deepEqual(next.reviewHistory, [state.review]);
+  assert.equal(next.review.amendment.previousReviewSha256, digest(state.review));
+  assert.equal(next.review.packet.entries.length, 0);
+  assert.equal(next.review.packet.skipped.length, 10);
+  validateReviewHistory(next);
+  assert.throws(() => amendDescriptionReview(next, amendment, baseline), /review-parent-mismatch/);
+  amendment.decisions[0].reason = 'Later caller mutation must not rewrite accepted history.';
+  assert.notEqual(next.review.decisions[0].reason, amendment.decisions[0].reason);
+  const second = { ...amendment, expectedReviewSha256: digest(next.review) };
+  const latest = amendDescriptionReview(next, second, baseline, '2026-09-19T02:00:00.000Z');
+  assert.deepEqual(latest.reviewHistory, [state.review, next.review]);
+  validateReviewHistory(latest);
+});
+
+test('amendment rejects failed runs, attempted writes, stale parents and unchanged reviews before mutation', () => {
+  for (const mutate of [
+    data => { data.state.status = 'failed'; },
+    data => { data.state.failure = 'unknown-write-outcome'; },
+    data => { data.state.batches.push({ batch: 1, status: 'unknown-write-outcome' }); },
+    data => { data.state.batches.push({ batch: 1, status: 'completed' }); },
+    data => { data.amendment.expectedReviewSha256 = '0'.repeat(64); },
+    data => { data.amendment.decisions = structuredClone(data.state.review.decisions); },
+    data => { data.baseline.checked_at = '2020-01-01T00:00:00.000Z'; },
+    data => { data.amendment.contract = 'unknown'; },
+    data => { data.amendment.reason = 'short'; },
+  ]) {
+    const data = amendmentFixture(); mutate(data);
+    const before = structuredClone(data.state);
+    assert.throws(() => amendDescriptionReview(data.state, data.amendment, data.baseline));
+    assert.deepEqual(data.state, before);
+  }
+  const data = amendmentFixture();
+  assert.throws(() => amendDescriptionReview(data.state, data.amendment, data.baseline, fetchedAt), /invalid-review-time/);
+});
+
+test('amendment checks skipped Work hashes, complete attempt accounting and unchanged approval rules', () => {
+  for (const mutate of [
+    data => { data.state.records[1].work.raw = rawRecord(PILOT_ITEMS[0], 'work', text + ' Changed.'); },
+    data => { data.state.attempts.pop(); },
+    data => { data.state.attempts[19] = { ...data.state.attempts[18] }; },
+    data => { data.state.attempts[0].status = 'started'; },
+    data => { delete data.state.records[1].fallback; },
+    data => { data.state.review.packet.skipped[0].reason = 'Tampered packet.'; },
+    data => { data.amendment.decisions[0] = { ...fixture().decisions[0], rights: 'unknown' }; },
+    data => { data.baseline.pilot[0].work_id = 'OL1W'; },
+  ]) {
+    const data = amendmentFixture(); mutate(data);
+    assert.throws(() => amendDescriptionReview(data.state, data.amendment, data.baseline));
+  }
+});
+
+test('amended synthetic approvals use existing guarded apply and readback; history tampering stops transport', async () => {
+  const { state, amendment, baseline } = amendmentFixture();
+  amendment.decisions[0] = fixture().decisions[0];
+  baseline.checked_at = baseline.pilot[0].updated_at = '2026-09-19T00:00:00.000Z';
+  const next = amendDescriptionReview(state, amendment, baseline);
+  assert.equal(next.review.packet.entries.length, 1);
+  assert.equal(next.review.packet.entries[0].expectedItemUpdatedAt, baseline.checked_at);
+  assert.equal(next.reviewHistory[0].baseline.pilot[0].updated_at, fetchedAt);
+  const options = { checkpoint: async () => {},
+    environment: { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'artificial-service-key-for-fixtures' },
+    fetchImpl: async (_url, request) => {
+      const payload = JSON.parse(request.body);
+      assert.equal(payload.refresh_mode, CONTRACT);
+      assert.equal(payload.entries.length, 1);
+      return Response.json([{ input_index: 1, item_id: PILOT_ITEMS[0].itemId, outcome: 'updated' }]);
+    } };
+  await applyDescriptionBatch(next, 1, options);
+  verifyDescriptionReadback(next, readbackFixture(next));
+  assert.ok(next.batches[0].verification);
+  assert.throws(() => amendDescriptionReview(next, { ...amendment, expectedReviewSha256: digest(next.review) }, baseline), /review-after-write/);
+  for (const mutate of [value => { value.reviewHistory[0].decisions[0].reason += ' Changed.'; },
+    value => { value.reviewHistory = []; }, value => { value.review.amendment.previousReviewSha256 = '0'.repeat(64); }]) {
+    const damaged = amendDescriptionReview(state, amendment, baseline); mutate(damaged);
+    let calls = 0;
+    await assert.rejects(applyDescriptionBatch(damaged, 1, { ...options, fetchImpl: async () => { calls++; } }));
+    assert.equal(calls, 0); assert.equal(damaged.batches.length, 0);
+  }
+});
+
+test('amend-review CLI is offline, keeps the global claim and rejects locked or replayed proposals without rewriting state', async () => {
+  const root = fileURLToPath(new URL('../../dist/catalog-enrichment/', import.meta.url));
+  await mkdir(root, { recursive: true });
+  const directory = await mkdtemp(root + 'amend-test-');
+  const claimPath = root + PILOT + '.json';
+  const claim = await readFile(claimPath).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
+  try {
+    const { state, amendment, baseline } = amendmentFixture();
+    const statePath = directory + '/state.json';
+    await writeFile(statePath, JSON.stringify(state));
+    await writeFile(directory + '/amendment.json', JSON.stringify(amendment));
+    await writeFile(directory + '/baseline.json', JSON.stringify(baseline));
+    await writeFile(directory + '/no-network.mjs', "globalThis.fetch = () => { throw new Error('Network must not be called'); };\n");
+    const args = ['--import', directory + '/no-network.mjs', 'scripts/catalog/import-open-library-descriptions.mjs',
+      'amend-review', '--run', directory, '--amendment', directory + '/amendment.json', '--baseline', directory + '/baseline.json'];
+    const run = () => spawnSync(process.execPath, args, { cwd: fileURLToPath(new URL('../../', import.meta.url)),
+      encoding: 'utf8', env: { PATH: process.env.PATH }, timeout: 5000 });
+    await writeFile(directory + '/operation.lock', 'Artificial lock');
+    assert.equal(run().status, 1);
+    assert.equal(await readFile(statePath, 'utf8'), JSON.stringify(state));
+    await rm(directory + '/operation.lock');
+    const result = run();
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(JSON.parse(result.stdout).providerAttempts, 20);
+    assert.equal(JSON.parse(result.stdout).accepted, 0);
+    assert.ok(!result.stdout.includes('Source located'));
+    const accepted = await readFile(statePath, 'utf8');
+    assert.equal(JSON.parse(accepted).reviewHistory.length, 1);
+    const replay = run();
+    assert.equal(replay.status, 1);
+    assert.match(replay.stderr, /review-parent-mismatch/);
+    assert.equal(await readFile(statePath, 'utf8'), accepted);
+    const afterClaim = await readFile(claimPath).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
+    assert.deepEqual(afterClaim, claim);
+  } finally { await rm(directory, { recursive: true, force: true }); }
 });

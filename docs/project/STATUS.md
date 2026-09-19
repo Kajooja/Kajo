@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-17**
+Last updated: **2026-09-19**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 BOOK rollout and reviewed provider preview
+## Current packet — #182 cached rights audit and review amendment
 
 Source [PR #254](https://github.com/Kajooja/Kajo/pull/254) is accepted on main
 `dce94df96e965f26810c979cf8af550d551c8597` after all five required CI #501 gates.
@@ -20,13 +20,17 @@ catalog-import v12 or replay the six installed native forwards. Source/hosted
 version mapping and exact checks remain in the owner's controlled checkpoint;
 the accepted source filename/bytes are unchanged.
 
-Branch `docs/182-book-description-rollout` records the
+Accepted [PR #255](https://github.com/Kajooja/Kajo/pull/255) records the
 [rollout and actual text review](sprints/SPRINT-014.md#book-rollout-and-description-review--2026-09-17--182).
 The owner explicitly authorized this public documentation and issue update on
 2026-09-17, resolving the earlier publication approval block.
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the exact
-publication PR/head/CI/merge outcome. Private source records and detailed hosted
-evidence remain in the controlled checkpoint.
+publication PR/head/CI/merge outcome. Branch `feat/182-book-review-amendment`
+continues from its accepted main `6257561b3f2e5a566925abe0e1b82537ebecb4d3`.
+It adds an offline review-amendment command and records the
+[cached rights audit](sprints/SPRINT-014.md#cached-book-rights-audit-and-review-amendment--2026-09-19--182).
+Issue #182 owns this packet's exact source/CI/merge outcome. Private source
+records and detailed hosted evidence remain in the controlled checkpoint.
 
 ### Verified result — 2026-09-17
 
@@ -50,20 +54,44 @@ with zero entries and ten skips. **The six-description usefulness target was
 not met.** No empty apply batches were sent. Do not label text eligibility as
 rights clearance or claim a completed description import.
 
+### Cached audit result — 2026-09-19
+
+All twenty saved records and the original zero-entry review were retained.
+The source-specific audit distinguishes publisher overlap, partial historical
+Wikipedia matches and unconfirmed origins; no exact usable permission chain
+was established. Eight rights holds and two text-policy exclusions remain.
+The current Item/catalog mapper/detail view cannot carry or display description
+credit/license/modification information, so attribution-dependent text cannot
+be admitted merely by adding a source link to private metadata.
+
+The tested `amend-review` command recorded the new skip reasons in the same run:
+one retained prior review, twenty unchanged attempts, zero approved entries and
+zero database batches. It rejects stale parent hashes, invalid records/history,
+failed runs and any prior write attempt. No new provider records or hosted
+queries/writes occurred; the catalog figures above remain the September 17
+verified baseline, not a fresh September 19 inventory.
+
 ### Exact next bounded packet
 
-Resolve **cached-source permission and required attribution** for the existing
-candidates. Establish actual origin/revision and
-license evidence, required credit/license links and the display contract before
-approving text. Unknown permission stays staged; a larger dump is not a remedy
-for this unresolved gate.
+Implement **structured description attribution from guarded review/persistence
+through Item mapping to the detail view**, using the minimum contract in
+[ARCHITECTURE](../architecture/ARCHITECTURE.md#description-attribution--next-contract-182).
+Use synthetic fixtures first; cover missing/invalid credit and unsafe URLs,
+preserve legacy unannotated content and the independent #229 reader scope.
+An attribution-requiring description must not become visible through a path
+that drops its required credit. Exact source/revision, applicable license and
+changes still require evidence before any real text is approved; the two
+Wikipedia leads are candidates, not cleared records. Do not repeat the completed
+general licensing search, reset the pilot or enlarge its provider budget.
 
 Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
-local staging is `dist/catalog-enrichment/book-pilot-v1`. Never reset the spent
-budget or repeat the provider preview. A restored operation lock requires the
-explicit reconciliation recorded in the Sprint checkpoint. The run is already
-`reviewed`; later changed decisions need a tested review-amendment workflow
-that retains prior decisions and budgets, not a hand-edited status reset.
+local staging is `dist/catalog-enrichment/book-pilot-v1`. It now also contains
+`rights-audit.json`, the applied `rights-amendment.json` and the original state.
+Never reset the spent budget or repeat the provider preview. A restored operation
+lock requires the explicit reconciliation recorded in the Sprint checkpoint.
+The run is already `reviewed`; future amendments require a new proposal bound
+to the current review hash. The saved applied proposal is historical evidence
+and deliberately fails if replayed. Never hand-edit the status back to `prepared`.
 Refresh SQL versions and prepare guarded rollback preimages before any approved
 write. Actual apply uses the configured admin runtime; this workspace has no
 privileged runtime credential. Do not restart key setup or bypass the boundary.

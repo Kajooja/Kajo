@@ -371,6 +371,17 @@ resuming, never assume rollback or refund the consumed budget. Provider-only
 preview needs no database credential. The review artifact's hashes and current
 database versions must still match at the eventual apply step.
 
+`amend-review` changes a reviewed local packet only before any database batch
+attempt. A versioned proposal binds `digest(state.review)`, gives an explicit
+reason and supplies all ten decisions plus a non-older SQL baseline. The command
+re-inspects every cached Edition/Work, including skipped Works, and reconciles
+each record with the existing attempt ledger. It retains complete prior reviews
+and baselines in `reviewHistory`, links each successor to its parent's hash and
+atomically saves the new review under the existing operation lock. Apply and
+readback also validate the amendment chain. No provider call, budget refund,
+claim replacement, failed-run recovery or write retry is implicit. Structural
+validation does not establish copyright permission or waive attribution.
+
 The official [API usage guidance](https://openlibrary.org/developers/api) was
 checked on 2026-09-13: cache and identify requests; the default limit is one
 request/second, while identified requests with contact details receive a higher
@@ -390,6 +401,42 @@ links and review the actual contribution/origin and intended use before display
 writes; unknown permission remains staged. Public beta/store rights, attribution
 UI and withdrawal remain open `MVP-CAT-003` gates. No source documentation check
 alone constitutes rights clearance for a record.
+
+### Description attribution — next contract, #182
+
+The 2026-09-19 source audit found a concrete presentation gap: `Item` carries
+description text only; `catalogItemOperations.ts` does not select description
+provenance, and `ItemDetailScreen.tsx` renders no description credit/license.
+Private review basis text or its public hash does not provide visible attribution.
+This paragraph defines the next implementation packet, not delivered fields/UI.
+
+Keep a generic description attribution value with the displayed text: source
+title/URL, exact revision reference where applicable, creator/contributor credit,
+license name/URL and an explicit indication of changes. Bind private permission
+evidence, intended use, source/text hashes and required attribution to the same
+reviewed revision. Publish only the safe attribution projection, not reviewer
+identifiers, permission correspondence or raw records. Validate bounded plain
+text and HTTPS URLs before display; reject credentials, executable schemes and
+arbitrary HTML. A missing/malformed required attribution must hide the affected
+managed description while retaining the Item's other data. Existing unannotated
+legacy content needs an explicit compatibility path, not a fabricated license.
+
+Carry this value through the guarded writer, canonical Item mapping, ranking/
+Shared/catalog paths and cached detail view without losing the description's
+binding. Show accessible source and license links with the description, including
+when it is collapsed. Exercise absent/invalid/unsafe data and changed text/credit
+with synthetic fixtures before admitting a real record. The installed v1 SQL is
+immutable; a persistence contract extension requires a new reviewed migration
+and separate rollout. Do not fold unrelated #229/UI work into this packet.
+
+[Wikimedia's reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
+require the applicable license and attribution; page history and third-party
+imports can matter. [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+also requires a license link and change indication, and ShareAlike for adaptations.
+These requirements were checked on 2026-09-19. They do not establish that a
+particular cached Open Library paragraph has a verified Wikimedia origin or
+that its exact source revision uses that license version. Match and review the
+actual contribution first. Publisher overlap likewise does not confer permission.
 
 ## 10. Prediction architecture
 
