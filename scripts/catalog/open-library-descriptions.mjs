@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 
 export const CONTRACT = 'open-library-description-v1';
 export const PILOT = 'open-library-description-pilot-v1';
+export const REVIEW_AMENDMENT = 'open-library-description-review-amendment-v1';
 export const PILOT_ITEMS = Object.freeze([
   ['a7f6d2cd-e290-4bc4-97b7-cf1180ea86b9', 'OL17370186W', 'OL26433779M', 'fin'],
   ['43c6e886-0858-4f3e-b188-72cc62b6dfbc', 'OL3923952W', 'OL44944392M', 'fin'],
@@ -159,9 +160,83 @@ export function buildDescriptionPacket(records, decisions, baseline) {
   return { contract: CONTRACT, pilot: PILOT, baselineSha256: digest(baseline), entries, skipped };
 }
 
+// Amend only a completed local review, never a provider run or an attempted write.
+// Old decisions/baselines remain intact and each successor binds its exact parent.
+export function validateReviewHistory(state) {
+  const history = state.reviewHistory === undefined ? [] : state.reviewHistory;
+  requireValue(Array.isArray(history) && object(state.review), 'invalid-review-history');
+  let previous;
+  for (const review of [...history, state.review]) {
+    requireValue(object(review), 'invalid-review-history');
+    const packet = buildDescriptionPacket(state.records, review.decisions, review.baseline);
+    requireValue(digest(packet) === review.packetSha256
+      && digest(review.packet) === review.packetSha256, 'packet-hash-mismatch');
+    if (previous) {
+      requireValue(review.amendment?.contract === REVIEW_AMENDMENT
+        && review.amendment.previousReviewSha256 === digest(previous)
+        && typeof review.amendment.reason === 'string'
+        && review.amendment.reason.trim().length >= 20 && review.amendment.reason.length <= 1000
+        && timestamp(previous.reviewedAt) && timestamp(review.reviewedAt)
+        && Date.parse(review.reviewedAt) >= Date.parse(previous.reviewedAt), 'invalid-review-history');
+    } else requireValue(!Object.hasOwn(review, 'amendment'), 'invalid-review-history');
+    previous = review;
+  }
+}
+
+export function amendDescriptionReview(state, amendment, baseline, reviewedAt = new Date().toISOString()) {
+  requireValue(state?.pilot === PILOT && state.manifestSha256 === digest(PILOT_ITEMS), 'invalid-run-manifest');
+  requireValue(state.status === 'reviewed' && !Object.hasOwn(state, 'failure'), 'run-not-reviewed');
+  requireValue(Array.isArray(state.batches) && state.batches.length === 0, 'review-after-write-attempt');
+  requireValue(object(amendment) && Object.keys(amendment).sort().join(',')
+    === 'contract,decisions,expectedReviewSha256,reason'
+    && amendment.contract === REVIEW_AMENDMENT && HASH.test(amendment.expectedReviewSha256)
+    && typeof amendment.reason === 'string' && amendment.reason.trim().length >= 20
+    && amendment.reason.length <= 1000, 'invalid-review-amendment');
+  validateReviewHistory(state);
+  requireValue(digest(state.review) === amendment.expectedReviewSha256, 'review-parent-mismatch');
+  requireValue(timestamp(reviewedAt) && timestamp(state.review.reviewedAt)
+    && Date.parse(reviewedAt) >= Date.parse(state.review.reviewedAt), 'invalid-review-time');
+  requireValue(timestamp(baseline?.checked_at)
+    && Date.parse(baseline.checked_at) >= Date.parse(state.review.baseline.checked_at), 'invalid-baseline-time');
+
+  // Inspect every saved record, including Work records excluded by a skip.
+  // The attempt ledger must still account for every record without refunds.
+  requireValue(object(state.records) && Object.keys(state.records).length === PILOT_ITEMS.length
+    && Array.isArray(state.attempts) && state.attempts.length <= 20, 'invalid-preview-ledger');
+  let recordCount = 0;
+  for (const candidate of PILOT_ITEMS) {
+    const saved = state.records[candidate.position];
+    requireValue(object(saved) && saved.edition
+      && Object.keys(saved).every(key => ['edition', 'work', 'fallback'].includes(key)), 'invalid-preview-ledger');
+    for (const kind of ['edition', 'work']) if (saved[kind]) {
+      const record = saved[kind];
+      const inspected = inspectRecord(record.raw, candidate, kind, record.fetchedAt);
+      requireValue(digest(inspected) === record.inspectionSha256, 'preview-hash-mismatch');
+      const attempts = state.attempts.filter(row => row.position === candidate.position && row.kind === kind);
+      requireValue(attempts.length === 1 && attempts[0].status === inspected.status
+        && timestamp(attempts[0].startedAt)
+        && Date.parse(attempts[0].startedAt) <= Date.parse(record.fetchedAt), 'invalid-preview-ledger');
+      recordCount++;
+    }
+    if (saved.work || saved.fallback) {
+      requireValue(saved.work && saved.fallback, 'unreviewed-work-fallback');
+      validateReview(saved.fallback, inspectRecord(saved.edition.raw, candidate, 'edition', saved.edition.fetchedAt), { fallback: true });
+    }
+  }
+  requireValue(recordCount === state.attempts.length, 'invalid-preview-ledger');
+  const packet = buildDescriptionPacket(state.records, amendment.decisions, baseline);
+  requireValue(digest(amendment.decisions) !== digest(state.review.decisions)
+    || digest(baseline) !== digest(state.review.baseline), 'review-unchanged');
+  return { ...structuredClone(state), reviewHistory: [...structuredClone(state.reviewHistory ?? []), structuredClone(state.review)],
+    review: { decisions: structuredClone(amendment.decisions), baseline: structuredClone(baseline), packet,
+      packetSha256: digest(packet), reviewedAt, amendment: { contract: REVIEW_AMENDMENT,
+        previousReviewSha256: amendment.expectedReviewSha256, reason: amendment.reason.trim() } } };
+}
+
 export function verifyDescriptionReadback(state, readback) {
   const batch = state.batches.at(-1);
   requireValue(state.status === 'reviewed' && batch?.status === 'completed', 'run-not-verifiable');
+  if (state.reviewHistory !== undefined || state.review?.amendment) validateReviewHistory(state);
   const before = state.review.baseline;
   const packet = buildDescriptionPacket(state.records, state.review.decisions, before);
   requireValue(digest(packet) === state.review.packetSha256, 'packet-hash-mismatch');

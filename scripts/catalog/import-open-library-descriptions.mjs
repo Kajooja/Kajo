@@ -2,8 +2,8 @@ import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promis
 import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { CONTRACT, PILOT, PILOT_ITEMS, buildDescriptionPacket, digest, inspectRecord,
-  readBoundedResponse, requireValue, validateAcknowledgement, validateReview, verifyDescriptionReadback } from './open-library-descriptions.mjs';
+import { CONTRACT, PILOT, PILOT_ITEMS, amendDescriptionReview, buildDescriptionPacket, digest, inspectRecord,
+  readBoundedResponse, requireValue, validateAcknowledgement, validateReview, validateReviewHistory, verifyDescriptionReadback } from './open-library-descriptions.mjs';
 
 const pause = ms => new Promise(resolvePause => setTimeout(resolvePause, ms));
 const SAFE_ERROR = /^(?:provider-http-\d{3}|provider-(?:network|timeout|identity-mismatch|work-link-mismatch)|(?:invalid|missing|malformed|unreviewed|duplicate|unknown|preview|review|baseline|description|record|response|pilot|batch|run|fallback|packet|unsupported|unsafe|unexpected|write|no)-[a-z-]+)$/;
@@ -75,6 +75,7 @@ export async function collectDescriptions(state, positions, kind, { fetchImpl = 
 
 export async function applyDescriptionBatch(state, batch, { fetchImpl = fetch, checkpoint, environment = process.env } = {}) {
   requireValue(state.status === 'reviewed' && [1, 2].includes(batch), 'run-not-reviewed');
+  if (state.reviewHistory !== undefined || state.review?.amendment) validateReviewHistory(state);
   requireValue(!state.batches.some(row => row.batch === batch)
     && (batch === 1 || state.batches.some(row => row.batch === 1 && row.status === 'completed' && row.verification)), 'invalid-batch-order');
   const packet = buildDescriptionPacket(state.records, state.review.decisions, state.review.baseline);
@@ -134,11 +135,12 @@ function summaries(state) {
 async function main() {
   const { positionals, values } = parseArgs({ allowPositionals: true, options: {
     run: { type: 'string' }, review: { type: 'string' }, baseline: { type: 'string' }, batch: { type: 'string' },
+    amendment: { type: 'string' },
   } });
   requireValue(positionals.length === 1, 'invalid-command');
   const command = positionals[0];
   const allowed = { plan: [], preview: ['run'], fallback: ['run', 'review'], review: ['run', 'review', 'baseline'],
-    apply: ['run', 'batch'], verify: ['run', 'baseline'] };
+    'amend-review': ['run', 'amendment', 'baseline'], apply: ['run', 'batch'], verify: ['run', 'baseline'] };
   requireValue(Object.hasOwn(allowed, command) && Object.keys(values).every(key => allowed[command].includes(key))
     && allowed[command].every(key => values[key]), 'invalid-command-options');
   if (command === 'plan') {
@@ -197,6 +199,12 @@ async function main() {
       const packet = buildDescriptionPacket(state.records, decisions, baseline);
       state.review = { decisions, baseline, packet, packetSha256: digest(packet), reviewedAt: new Date().toISOString() };
       state.status = 'reviewed';
+      await checkpoint(state);
+    }
+    if (command === 'amend-review') {
+      const amendment = JSON.parse(await readFile(values.amendment, 'utf8'));
+      const baseline = JSON.parse(await readFile(values.baseline, 'utf8'));
+      Object.assign(state, amendDescriptionReview(state, amendment, baseline));
       await checkpoint(state);
     }
     if (command === 'apply') await applyDescriptionBatch(state, Number(values.batch), { checkpoint });
