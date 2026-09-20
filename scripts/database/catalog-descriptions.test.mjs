@@ -44,7 +44,12 @@ test('attribution forward preserves populated v1 descriptions and exercises v2 b
     const index = installation.files.findIndex(file => file.name.endsWith('_description_attribution.sql'));
     assert.ok(index > 0);
     for (const file of installation.files.slice(0, index)) await db.exec(`begin; ${file.sql} commit;`);
-    assert.match((await snapshots(catalogAttributionUpgradeSql(installation.files[index])))[0]?.catalogAttributionUpgrade, /^PASS: unchanged populated/);
+    const upgradeRows = (await db.exec(catalogAttributionUpgradeSql(installation.files[index]))).flatMap(result => result.rows);
+    // Native psql emits every result row. Its JSON-line reader must receive only
+    // the final snapshot, never an intermediate Item UUID/outcome row.
+    assert.equal(upgradeRows.length, 1, 'Attribution upgrade emitted an unexpected native result row');
+    assert.deepEqual(Object.keys(upgradeRows[0]), ['snapshot']);
+    assert.match(upgradeRows[0].snapshot.catalogAttributionUpgrade, /^PASS: unchanged populated/);
     for (const file of installation.files.slice(index)) await db.exec(`begin; ${file.sql} commit;`);
     const before = await snapshotApplication(snapshots, installation.candidate, { forward: true });
     assert.match((await snapshots(await catalogAttributionSmokeSql()))[0]?.catalogAttribution, /^PASS: v1 upgrade/);

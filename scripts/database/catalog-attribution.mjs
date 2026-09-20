@@ -25,7 +25,9 @@ export async function catalogAttributionSmokeSql() {
 export function catalogAttributionUpgradeSql(migration) {
   assert.ok(migration.name.endsWith('_description_attribution.sql'));
   return `begin; ${catalogDescriptionFixtureSql()}
-    select * from public.upsert_catalog_item_v1((select entry from description_entries where position=1),'open-library-description-v1');
+    do $seed$ begin
+      perform public.upsert_catalog_item_v1((select entry from description_entries where position=1),'open-library-description-v1');
+    end $seed$;
     create temporary table attribution_upgrade_before as select pg_temp.description_snapshot() as value;
     ${migration.sql}
     do $check$ begin

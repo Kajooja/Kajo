@@ -92,6 +92,17 @@ public `Kajooja/Kajo`, PR creation and merge after all five required checks, and
 requested immediate continuation afterward. The publication block is resolved;
 Issue #182 records the resulting exact source/CI/merge evidence.
 
+PR #257 was actually opened at `f6e2ab325edb8bae1e99f7ac9756d8804667105b`, with
+tree `1e5c74c4133f2e0220fec47341db53051d330b30` matching the local checked tree.
+Initial CI #507 passed validation, platform, clean-install and existing-upgrade
+gates. The native CLI job failed because the attribution upgrade fixture emitted
+an intermediate UUID/outcome row into the strict JSON-line reader. Replacing
+the setup `select` with `perform` preserves the seeded v1 row without emitting
+it. The local full-schema regression now asserts exactly one final snapshot;
+it failed with two rows before the fix and passes afterward. No parser relaxation,
+gate removal or production migration change was used. Final-head CI remains
+required before source acceptance or hosted rollout.
+
 - A fresh complete `npm run check` passed all **430 tests**, lint/typechecks and
   both iOS/Android exports. Runtime source and migration bytes are unchanged.
   The existing verified frozen Edge archive cache was reused. The existing

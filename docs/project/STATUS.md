@@ -45,9 +45,13 @@ current continuation request as insufficient authorization to publish this
 source packet to public `Kajooja/Kajo`. No alternate publication route was tried.
 The owner explicitly approved publication to public `Kajooja/Kajo`, PR creation
 and merge after passing CI on 2026-09-20, and requested immediate continuation
-afterward. The publication block is resolved. Publish this branch and verify all
-five required CI gates before merge, then continue the bounded rollout below.
-Issue #182 owns the resulting exact PR/head/CI/merge evidence.
+afterward. The publication block is resolved and [PR #257](https://github.com/Kajooja/Kajo/pull/257)
+is open. Initial CI #507 passed four gates but found a non-JSON setup row in the
+native attribution upgrade fixture. Setup now performs its write silently, and
+the local database regression asserts that only the final snapshot is emitted.
+The regression failed before the fix and passes afterward; migration/runtime
+bytes are unchanged. Verify all five required gates on the final PR head before
+merge, then continue the bounded rollout below. Issue #182 owns exact acceptance.
 
 ### Verified result — 2026-09-17
 
