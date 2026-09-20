@@ -14,6 +14,123 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Structured description attribution — 2026-09-20 / #182
+
+Branch `feat/182-description-attribution` starts from accepted PR #256/main
+`1d8ed155bc39a0d543df27ca4d68006910f7f755` (all five required CI #505 gates).
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns this source packet's
+exact PR/head/CI/merge outcome when published. The recovery checkpoint below
+records the publication interruption and its subsequent owner approval.
+This packet uses synthetic records only.
+
+- The shared `@kajo/catalog-contracts` package defines the public credit schema,
+  safe bounded text/HTTPS links and browser/native UTF-8 SHA-256 using pinned
+  `@noble/hashes` 1.8.0. Root check includes its tests; no engine/domain fork.
+- Offline review opts attributed approvals into v2, binds source/text hashes and
+  private permission evidence to the public credit and preserves legacy review
+  reconstruction/history. Mixed approved v1/v2 entries cannot silently omit
+  required credit. Apply selects the packet mode and readback verifies both
+  public attribution and private permission bindings.
+- CLI-generated forward `20260920000607_description_attribution.sql` extends
+  only the narrow catalog writers and adds a private validator. Invoker/service
+  ACLs, empty search paths, deterministic locks, exact identities/versions,
+  preserved core metadata and batch atomicity remain. Populated v1→v2 upgrade
+  preserves all existing rows; v2→v1 and legacy overwrite attempts are rejected.
+  Credit/evidence changes require current versions; identical replay is a no-op.
+- Canonical Item reads select metadata and preserve explicit legacy content.
+  Text-only RPC fallbacks and invalid/missing required attribution hide only the
+  description. Ranking, Shared and List enrichment carry whole canonical Items
+  without changing order, authorization or actor/Profile state. Detail cache
+  revalidation rejects altered text or dropped/unsafe credit. The view shows
+  source, revision, credit, license and changes even when the text is collapsed,
+  with independently accessible links and recoverable link-opening errors.
+- Tests cover shared hash/URL/plain-text behavior; v1 review-history preservation
+  and v2 synthetic apply/readback; complete-schema forward/data preservation,
+  ACLs, downgrade/stale-version denial and atomic batch failure; canonical
+  enrichment/error fallback/cache binding; and source/license link activation.
+  A Unicode-trim mismatch found by the SQL fixture was corrected to match the
+  JavaScript contract. Native CI additionally exercises old-server rejection,
+  PostgREST v2 resolution, anonymous denial and overlapping writers.
+
+The complete local `npm run check` passed: **220 mobile, 3 shared-contract,
+46 catalog, 28 Edge, 63 database, 43 engine and 27 research tests (430 total)**,
+lint/typechecks and iOS/Android exports. Frozen Edge dependencies used existing
+archives verified against their lock integrities. Only the new workspace and
+pinned hashing dependency changed the npm lock. Final mobile lint retains only
+the pre-existing Discovery Hook warning. Required final-head native CI/merge
+identities are recorded in #182, not inferred from local PGlite tests.
+
+No native emulator/device was available; actual layout, screen-reader navigation
+and native external-link behavior are not accepted by component/bundle success.
+No hosted query/write, provider request, source permission decision, pilot
+amendment or APK dispatch occurred. The saved checkpoint SHA-256 remains
+`09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`:
+**20 consumed attempts / 1 prior review / 0 approvals / 8 rights holds /
+2 text exclusions / 0 database batches**. September 17 catalog counts remain
+the last verified inventory. #229 and MVP/Phase 14 acceptance stay open.
+
+After source publication and required CI/merge acceptance, continue the new
+catalog-only forward rollout (source SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`) and native
+description-credit acceptance. Do not redeploy installed v1/history, broaden
+budgets or repeat the general licensing search. Exact matching contribution/
+revision and applicable permission are still required before approving real
+text; rendering support alone grants no rights. [ARCHITECTURE](../../architecture/ARCHITECTURE.md#description-attribution--contract-182)
+owns the durable schema/display rules; STATUS owns the single next packet.
+
+### Interrupted-publication recovery and rollout preparation — 2026-09-20
+
+Fresh repository synchronization confirms accepted main is still
+`1d8ed155bc39a0d543df27ca4d68006910f7f755`. Runtime commit
+`89371e094c8259c9bce73719c35e73b583dbfd0b` and its 39-file implementation were
+recovered intact. No remote attribution branch or PR exists. The interrupted
+chat's claim of a published PR waiting for CI was incorrect. Automatic approval
+review rejected the push to public `Kajooja/Kajo`, citing insufficient explicit
+publication authorization for this source packet. No alternate publication
+method was attempted. The owner subsequently explicitly approved publication to
+public `Kajooja/Kajo`, PR creation and merge after all five required checks, and
+requested immediate continuation afterward. The publication block is resolved;
+Issue #182 records the resulting exact source/CI/merge evidence.
+
+- A fresh complete `npm run check` passed all **430 tests**, lint/typechecks and
+  both iOS/Android exports. Runtime source and migration bytes are unchanged.
+  The existing verified frozen Edge archive cache was reused. The existing
+  Discovery Hook warning and Metro's `@noble/hashes/crypto.js` export-resolution
+  fallback warning remain; successful bundles do not prove native execution.
+- A repeatable-read, read-only hosted snapshot at **2026-09-20 19:32 UTC** verified
+  the configured target, migration history, all four catalog writers, their
+  function definitions/owners/ACLs/settings, catalog fingerprints, unrelated
+  functions, triggers and default privileges. The four definitions still match
+  the verified September 17 readback and the locally installed accepted source.
+  All remain invoker functions with empty search paths and service-role-only
+  client execution. The new private attribution validator is absent.
+- The fresh inventory is unchanged in count: BOOK **415 visible / 427 stored /
+  385 images / 0 descriptions**; MOVIE **425 / 437 / 425 / 425**. There are zero
+  managed descriptions and zero discoverable mocks. Exact full catalog hashes
+  and function preimages are retained in the separate local preparation evidence;
+  no raw source paragraphs or private evidence are added to Git.
+- An isolated PGlite rehearsal matched all four target function definitions,
+  owners, ACLs and settings before applying the unchanged new forward. V2
+  binding/upgrade/downgrade/atomicity fixtures passed. A recovery candidate,
+  generated from the two exact prior writer definitions, restores those writers
+  and removes only the new validator. It requires quiesced catalog writers,
+  bounded locks and unchanged v2 function/ACL hashes, and refuses existing v2
+  data. The rehearsal restored the original function and application snapshots;
+  repeating the rollback was rejected. It deliberately does not alter migration
+  history; any real recovery still needs its own reviewed history reconciliation.
+- The pilot archive remains SHA-256
+  `09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`, and the local
+  pilot state matches the archived state byte for byte. No provider call, pilot
+  amendment, hosted write, migration installation, APK dispatch or device test
+  occurred. The new forward remains uninstalled.
+
+After source acceptance, refresh the read-only snapshots immediately before the
+bounded admin rollout and compare all catalog/unrelated metadata afterward.
+Native acceptance must cover Personal, Shared and List detail entry, collapsed
+and expanded credit, source/license link activation and failure, screen-reader
+labels, and missing/invalid-credit fallback. Keep the device and #229 gates open.
+Preparation evidence does not approve any real text or extend the spent budget.
+
 ## Cached BOOK rights audit and review amendment — 2026-09-19 / #182
 
 Branch `feat/182-book-review-amendment` starts from accepted PR #255, main
@@ -57,7 +174,7 @@ description rendering in `ItemDetailScreen.tsx` without source/license credit.
 [Wikimedia reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
 and [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) therefore cannot
 be satisfied by merely storing an attribution note in the private import review.
-The [next attribution contract](../../architecture/ARCHITECTURE.md#description-attribution--next-contract-182)
+The [attribution contract](../../architecture/ARCHITECTURE.md#description-attribution--contract-182)
 owns the minimum structured data and display behavior. No UI/schema extension is
 claimed delivered here, and no existing publisher text is relabeled as CC-licensed.
 

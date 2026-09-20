@@ -101,7 +101,7 @@ export async function applyDescriptionBatch(state, batch, { fetchImpl = fetch, c
           method: 'POST', redirect: 'manual', signal: controller.signal,
           headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
           // The top-level second argument is mandatory. Older servers reject it.
-          body: JSON.stringify({ entries, refresh_mode: CONTRACT }),
+          body: JSON.stringify({ entries, refresh_mode: packet.contract }),
         });
         if (response.status !== 200) { await response.body?.cancel(); throw new Error('unknown-write-outcome'); }
         const raw = await readBoundedResponse(response, 16384);

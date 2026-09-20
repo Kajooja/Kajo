@@ -203,6 +203,14 @@ Friend removal does not silently remove or rewrite existing SharedProfile histor
 
 Current generic fields include stable Kajo ID, ItemType, title/description, normalized tags/creators, optional year/image/language, provider metadata and discoverability.
 
+An attributed description carries a `DescriptionAttribution` value bound to its
+exact text and source-record hashes. Missing or invalid required credit hides
+only the description. Explicit canonical legacy status preserves unannotated
+content; a text-only RPC or cache with missing status cannot establish that
+compatibility. Permission evidence remains private ItemSource data, not a client
+Item field or taste evidence. [ARCHITECTURE](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
+owns the review, persistence and display contract.
+
 `discoverable=false` excludes an Item from ordinary candidate generation while preserving historical Event/List/Prediction references.
 
 Domain metadata may extend Item but prediction consumes normalized generic features rather than provider schemas.

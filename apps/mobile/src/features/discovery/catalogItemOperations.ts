@@ -1,12 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Item, ItemId, ItemType } from '../../domain/contracts';
+import { readCatalogDescription } from '../../domain/itemDescription';
 
 const CATALOG_ITEM_SELECT = [
   'id',
   'item_type',
   'title',
   'description',
+  'metadata',
   'tags',
   'creators',
   'release_year',
@@ -19,6 +21,7 @@ interface CatalogItemRow {
   item_type: ItemType;
   title: string;
   description: string | null;
+  metadata?: unknown;
   tags: string[];
   creators: string[];
   release_year: number | null;
@@ -73,12 +76,22 @@ export function enrichItemsFromCatalog(
   return rankedItems.map((item) => byId.get(item.id) ?? item);
 }
 
+export async function enrichCatalogReferences<T extends { item: Item }>(
+  client: SupabaseClient,
+  references: readonly T[],
+): Promise<readonly T[]> {
+  const catalog = await loadCatalogItems(client, references.map(row => row.item.id));
+  if (catalog.status !== 'success') return references;
+  const byId = new Map(catalog.items.map(item => [item.id, item]));
+  return references.map(row => ({ ...row, item: byId.get(row.item.id) ?? row.item }));
+}
+
 export function mapCatalogItemRow(row: CatalogItemRow): Item {
   return {
     id: row.id,
     itemType: row.item_type,
     title: row.title,
-    ...(row.description ? { description: row.description } : {}),
+    ...readCatalogDescription(row.description, row.metadata),
     tags: row.tags,
     creators: row.creators,
     ...(row.release_year !== null ? { releaseYear: row.release_year } : {}),

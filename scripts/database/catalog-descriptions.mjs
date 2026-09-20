@@ -91,14 +91,16 @@ export function catalogDescriptionCleanupSql() {
     commit;`;
 }
 
-export async function catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc) {
-  const [fixture] = await exec(`begin; ${catalogDescriptionFixtureSql()}
+export async function catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc,
+  { mode = 'open-library-description-v1', fixtureSql = catalogDescriptionFixtureSql() } = {}) {
+  assert.ok(['open-library-description-v1', 'open-library-description-v2'].includes(mode));
+  const [fixture] = await exec(`begin; ${fixtureSql}
     select jsonb_build_object('entries',(select jsonb_agg(entry order by position) from description_entries)) as snapshot; commit;`);
   const entries = fixture.entries;
   const settled = promise => promise.then(value => ({ value }), error => ({ error }));
   const session = (name, values, hold = false) => `begin; set local application_name='${name}';
     set local lock_timeout='8s'; set local role service_role;
-    select jsonb_agg(to_jsonb(r)) from public.upsert_catalog_batch_v1(${literal(JSON.stringify(values))}::jsonb,'open-library-description-v1') r;
+    select jsonb_agg(to_jsonb(r)) from public.upsert_catalog_batch_v1(${literal(JSON.stringify(values))}::jsonb,'${mode}') r;
     ${hold ? "select jsonb_build_object('held',true) from pg_sleep(4);" : ''} commit;`;
   const waitFor = async (name, condition) => {
     const deadline = Date.now() + 7000;
@@ -133,14 +135,14 @@ export async function catalogDescriptionConcurrency(exec, execConcurrentSql, cat
     console.log('Description native locks PASS: reversed batch waited/no-op; waiting legacy refresh rejected');
     // Real PostgREST must resolve the named two-argument overload and preserve
     // response cardinality/IDs. This is an identical read-only replay.
-    const replay = await catalogRpc({ entries, refresh_mode: 'open-library-description-v1' });
+    const replay = await catalogRpc({ entries, refresh_mode: mode });
     assert.equal(replay.status, 200);
     assert.deepEqual(replay.body, entries.map((entry, index) => ({ input_index: index + 1,
       item_id: entry.expectedItemId, outcome: 'unchanged' })));
-    const denied = await catalogRpc({ entries, refresh_mode: 'open-library-description-v1' }, 'anon');
+    const denied = await catalogRpc({ entries, refresh_mode: mode }, 'anon');
     assert.ok([401, 403, 404].includes(denied.status), 'Anonymous caller reached the catalog mutation');
     console.log('Description PostgREST PASS: exact guarded replay and anonymous denial');
-    return { status: 'PASS', reverseBatchLockWait: true, legacyLockWait: true,
+    return { status: 'PASS', mode, reverseBatchLockWait: true, legacyLockWait: true,
       acknowledgedUpdates: 2, concurrentNoops: 2, postgrestReplay: 2, anonymousDenied: true };
   } catch (error) {
     failure = error;

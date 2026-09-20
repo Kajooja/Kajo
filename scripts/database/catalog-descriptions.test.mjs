@@ -4,6 +4,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { assertEmptyApplication, snapshotApplication } from './baseline-installation.mjs';
 import { catalogDescriptionCleanupSql, catalogDescriptionFixtureSql, catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql } from './catalog-descriptions.mjs';
+import { catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
 
 test('BOOK description forward preserves populated catalog; guarded writes on the full schema (also native CI)', async () => {
   const installation = await buildFreshInstallation();
@@ -28,5 +29,25 @@ test('BOOK description forward preserves populated catalog; guarded writes on th
     await db.exec(catalogDescriptionCleanupSql());
     assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before,
       'Committed native-concurrency fixtures must clean up under the real restrictive foreign keys');
+  } finally { await db.close(); }
+});
+
+test('attribution forward preserves populated v1 descriptions and exercises v2 binding/downgrade/atomicity on the full schema', async () => {
+  const installation = await buildFreshInstallation();
+  const db = new PGlite();
+  const snapshots = async sql => (await db.exec(sql)).flatMap(r => r.rows.filter(row => Object.hasOwn(row, 'snapshot')).map(row => row.snapshot));
+  try {
+    await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+      create schema auth; create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
+      create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+      grant usage on schema public,auth to anon,authenticated,service_role;`);
+    const index = installation.files.findIndex(file => file.name.endsWith('_description_attribution.sql'));
+    assert.ok(index > 0);
+    for (const file of installation.files.slice(0, index)) await db.exec(`begin; ${file.sql} commit;`);
+    assert.match((await snapshots(catalogAttributionUpgradeSql(installation.files[index])))[0]?.catalogAttributionUpgrade, /^PASS: unchanged populated/);
+    for (const file of installation.files.slice(index)) await db.exec(`begin; ${file.sql} commit;`);
+    const before = await snapshotApplication(snapshots, installation.candidate, { forward: true });
+    assert.match((await snapshots(await catalogAttributionSmokeSql()))[0]?.catalogAttribution, /^PASS: v1 upgrade/);
+    assert.deepEqual(await snapshotApplication(snapshots, installation.candidate, { forward: true }), before);
   } finally { await db.close(); }
 });

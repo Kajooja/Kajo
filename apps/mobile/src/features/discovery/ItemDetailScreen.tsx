@@ -27,6 +27,8 @@ import type {
   PredictionId,
 } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
+import { visibleItemDescription } from '../../domain/itemDescription';
+import { DescriptionCredit } from './DescriptionCredit';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import {
@@ -941,11 +943,12 @@ function SwipeItemPage({
   const consumedLabels = getConsumedItemLabels(item.itemType);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [tagsExpanded, setTagsExpanded] = useState(false);
+  const description = visibleItemDescription(item);
   const tags = item.tags ?? [];
   const visibleTags = tagsExpanded
     ? tags
     : tags.slice(0, COLLAPSED_TAG_COUNT);
-  const contentExpanded = descriptionExpanded || tagsExpanded;
+  const contentExpanded = descriptionExpanded || tagsExpanded || Boolean(description.descriptionAttribution);
 
   return (
     <ScrollView
@@ -1121,7 +1124,7 @@ function SwipeItemPage({
         </View>
       </View>
 
-      {item.description ? (
+      {description.description ? (
         <View style={styles.descriptionBlock}>
           <Pressable
             accessibilityRole="button"
@@ -1137,9 +1140,12 @@ function SwipeItemPage({
               numberOfLines={descriptionExpanded ? undefined : 2}
               style={styles.description}
             >
-              {item.description}
+              {description.description}
             </Text>
           </Pressable>
+          {description.descriptionAttribution ? (
+            <DescriptionCredit attribution={description.descriptionAttribution} color={theme.base.textMuted} />
+          ) : null}
           {descriptionExpanded ? (
             <Pressable
               accessibilityRole="button"

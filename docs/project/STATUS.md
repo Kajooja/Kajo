@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-19**
+Last updated: **2026-09-20**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 cached rights audit and review amendment
+## Current packet — #182 structured description attribution
 
 Source [PR #254](https://github.com/Kajooja/Kajo/pull/254) is accepted on main
 `dce94df96e965f26810c979cf8af550d551c8597` after all five required CI #501 gates.
@@ -25,12 +25,29 @@ Accepted [PR #255](https://github.com/Kajooja/Kajo/pull/255) records the
 The owner explicitly authorized this public documentation and issue update on
 2026-09-17, resolving the earlier publication approval block.
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the exact
-publication PR/head/CI/merge outcome. Branch `feat/182-book-review-amendment`
-continues from its accepted main `6257561b3f2e5a566925abe0e1b82537ebecb4d3`.
-It adds an offline review-amendment command and records the
+publication PR/head/CI/merge outcome. [PR #256](https://github.com/Kajooja/Kajo/pull/256)
+is accepted on main `1d8ed155bc39a0d543df27ca4d68006910f7f755` after all five
+required CI #505 gates. It adds an offline review-amendment command and records the
 [cached rights audit](sprints/SPRINT-014.md#cached-book-rights-audit-and-review-amendment--2026-09-19--182).
-Issue #182 owns this packet's exact source/CI/merge outcome. Private source
-records and detailed hosted evidence remain in the controlled checkpoint.
+Branch `feat/182-description-attribution` starts from that accepted main and
+implements the review → guarded writer → Item/catalog/Shared/List → detail
+attribution contract with synthetic fixtures. Issue #182 owns its exact PR/head/
+required CI/merge outcome; [Sprint 014](sprints/SPRINT-014.md#structured-description-attribution--2026-09-20--182)
+records delivered source and validation limits. Private source records remain
+in the unchanged controlled checkpoint; rollout preparation is separate.
+
+**Recovery checkpoint, 2026-09-20:** the runtime implementation is preserved in
+local commit `89371e094c8259c9bce73719c35e73b583dbfd0b`. Fresh GitHub/ref checks
+found **no remote attribution branch or PR**, contrary to the interrupted chat's
+publication claim. Accepted main remains `1d8ed155bc39a0d543df27ca4d68006910f7f755`.
+Automatic approval review rejected the branch push because it classified the
+current continuation request as insufficient authorization to publish this
+source packet to public `Kajooja/Kajo`. No alternate publication route was tried.
+The owner explicitly approved publication to public `Kajooja/Kajo`, PR creation
+and merge after passing CI on 2026-09-20, and requested immediate continuation
+afterward. The publication block is resolved. Publish this branch and verify all
+five required CI gates before merge, then continue the bounded rollout below.
+Issue #182 owns the resulting exact PR/head/CI/merge evidence.
 
 ### Verified result — 2026-09-17
 
@@ -60,9 +77,9 @@ All twenty saved records and the original zero-entry review were retained.
 The source-specific audit distinguishes publisher overlap, partial historical
 Wikipedia matches and unconfirmed origins; no exact usable permission chain
 was established. Eight rights holds and two text-policy exclusions remain.
-The current Item/catalog mapper/detail view cannot carry or display description
-credit/license/modification information, so attribution-dependent text cannot
-be admitted merely by adding a source link to private metadata.
+The audit found missing Item/catalog/detail support for visible source/license/
+modification information. The September 20 source packet closes that structural
+gap; it does not establish an exact permission chain for any real paragraph.
 
 The tested `amend-review` command recorded the new skip reasons in the same run:
 one retained prior review, twenty unchanged attempts, zero approved entries and
@@ -71,18 +88,44 @@ failed runs and any prior write attempt. No new provider records or hosted
 queries/writes occurred; the catalog figures above remain the September 17
 verified baseline, not a fresh September 19 inventory.
 
-### Exact next bounded packet
+### Delivered source and exact next bounded packet
 
-Implement **structured description attribution from guarded review/persistence
-through Item mapping to the detail view**, using the minimum contract in
-[ARCHITECTURE](../architecture/ARCHITECTURE.md#description-attribution--next-contract-182).
-Use synthetic fixtures first; cover missing/invalid credit and unsafe URLs,
-preserve legacy unannotated content and the independent #229 reader scope.
-An attribution-requiring description must not become visible through a path
-that drops its required credit. Exact source/revision, applicable license and
-changes still require evidence before any real text is approved; the two
-Wikipedia leads are candidates, not cleared records. Do not repeat the completed
-general licensing search, reset the pilot or enlarge its provider budget.
+`@kajo/catalog-contracts` supplies hash-bound, bounded public credit. V2 review/
+persistence bind private permission evidence to the same text/record/credit;
+legacy checkpoints remain reproducible. Canonical Item enrichment and the detail
+boundary hide managed text if required credit is missing, unsafe or mismatched.
+Source/license links and changes stay visible when the description is collapsed.
+Explicit legacy compatibility preserves existing unannotated catalog content.
+The complete local `npm run check` passed **430 tests**, lint/typechecks and both
+iOS/Android bundle smokes. Native visual/link behavior remains untested here.
+
+After source publication and CI/merge acceptance, continue the **new catalog-only
+attribution forward rollout and native display acceptance**, following the
+[contract](../architecture/ARCHITECTURE.md#description-attribution--contract-182).
+Source file `20260920000607_description_attribution.sql`, SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`, is **not
+installed**. Read-only recovery preflight at **2026-09-20 19:32 UTC** matched all
+four hosted catalog function definitions, owners, ACLs and settings to accepted
+source and confirmed the new validator is absent. Catalog counts remain BOOK
+415 visible / 427 stored / 385 images / zero descriptions and MOVIE
+425 visible / 437 stored / 425 images and descriptions; no managed descriptions
+or discoverable mocks exist. An isolated PGlite rehearsal passed the exact new
+forward and a guarded restoration of the two prior writers; catalog/function
+snapshots matched afterward and repeat rollback was rejected. This is preparation,
+not native/hosted rollout acceptance. Refresh the target/history/functions/ACLs
+and preserve all catalog rows before the separate admin rollout; do not replay the installed v1
+forward or six native forwards. Validate collapsed/expanded credit, links and
+fallbacks on a supported native runtime before accepting display behavior.
+The recovery ran read-only hosted checks and repeated the complete local check
+successfully (430 tests and both exports). No hosted write, provider request,
+pilot amendment, APK dispatch or device test occurred; the prior pilot checkpoint
+and its saved state remain byte-identical.
+
+Exact source/revision, applicable license, intended use and changes still require
+evidence before any real text is approved. The two Wikipedia leads remain
+candidates, not cleared records. Do not repeat the completed general licensing
+search, reset the pilot or enlarge its provider budget. Preserve independent
+#229 reader/delivery/native gates; this packet changes no Prediction/Event trace.
 
 Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
 local staging is `dist/catalog-enrichment/book-pilot-v1`. It now also contains

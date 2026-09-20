@@ -43,7 +43,7 @@ describe('Prediction V1 mapping', () => {
             id: 'item-1',
             itemType: 'MOVIE',
             title: 'First',
-            description: 'Description',
+            descriptionStatus: 'unverified',
             tags: ['bold'],
           },
           {

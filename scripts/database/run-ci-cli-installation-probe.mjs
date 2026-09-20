@@ -11,6 +11,7 @@ import { buildFreshInstallation, installFreshDatabase, installationHistorySql } 
 import { itemActionUpgradeSql } from './item-action-upgrade.mjs';
 import { collectionActionUpgradeSql } from './collection-action-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
+import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -46,6 +47,14 @@ try {
     assert.equal(oldDescriptionMode.body.code, 'PGRST202');
     const [catalogDescriptionUpgrade] = await exec(catalogDescriptionUpgradeSql(files[descriptionIndex]));
     assert.match(catalogDescriptionUpgrade?.catalogDescriptionUpgrade, /^PASS: unchanged populated/);
+    const attributionIndex = files.findIndex(file => file.name.endsWith('_description_attribution.sql'));
+    assert.ok(attributionIndex > descriptionIndex);
+    await resetFromMigrations(files.slice(0, attributionIndex));
+    const unsupportedAttribution = await catalogRpc({ entries: [], refresh_mode: ATTRIBUTION_MODE });
+    assert.equal(unsupportedAttribution.status, 400, 'The v1-only writer must reject the v2 mode');
+    assert.equal(unsupportedAttribution.body.code, '22023');
+    const [catalogAttributionUpgrade] = await exec(catalogAttributionUpgradeSql(files[attributionIndex]));
+    assert.match(catalogAttributionUpgrade?.catalogAttributionUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -72,6 +81,10 @@ try {
     const [catalogDescriptions] = await exec(await catalogDescriptionSmokeSql());
     assert.match(catalogDescriptions?.catalogDescriptions, /^PASS: guarded/);
     const catalogDescriptionLocks = await catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc);
+    const [catalogAttribution] = await exec(await catalogAttributionSmokeSql());
+    assert.match(catalogAttribution?.catalogAttribution, /^PASS: v1 upgrade/);
+    const catalogAttributionLocks = await catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc,
+      { mode: ATTRIBUTION_MODE, fixtureSql: catalogAttributionFixtureSql() });
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);
@@ -85,6 +98,7 @@ try {
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
     return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
+      catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };
