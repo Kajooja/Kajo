@@ -51,10 +51,9 @@ with unknown upstream progress. Failure diagnostics are accepted through PR #252
 and deployed on catalog-import v12. BOOK guarded preservation/preview source is
 implemented and its catalog-only rollout and ten-Item pilot are complete. The
 cached rights audit retains zero approved descriptions. Structured attribution
-now has review/writer/mobile source and synthetic tests. The owner explicitly
-approved this source packet's publication on September 20; required PR CI and merge
-precede its new forward rollout. Native display acceptance also precedes any
-attribution-dependent write. Exact
+is accepted through PR #257 with all five required CI #508 gates, and its exact
+catalog-only forward is installed and verified. Native display/link acceptance
+is the next bounded packet and precedes any attribution-dependent write. Exact
 contribution/revision and permission still need evidence before approval or
 broader dump-based enrichment.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
@@ -162,12 +161,12 @@ eight English Work descriptions pass the text rules, but none has an accepted
 permission/attribution decision. The completed cached audit and offline review
 amendment preserve those holds. The
 [structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
-has review, persistence and mobile source plus synthetic coverage. Publication
-is owner-approved; first pass required PR CI/merge, then refresh the
-prepared target checks, roll out its new catalog-only forward and verify native display/links, then
-establish exact contribution/revision and license evidence before any
-display write. The general licensing search is recorded; do not repeat it as
-the default continuation. Do not redeploy the installed v1 forward,
+is accepted through PR #257 / CI #508 and the new catalog-only forward is
+installed with exact function/ACL, history and full-catalog preservation checks.
+Next verify native display/links, then establish exact contribution/revision
+and license evidence before any display write. The general licensing search
+is recorded; do not repeat it as the default continuation. Do not redeploy either
+installed description forward or replay the six independent native forwards,
 reset the pilot or expand the API pass to compensate for unapproved text.
 Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
 review before enrichment. STATUS/Issue #182 own source/rollout and execution.

@@ -10,138 +10,103 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 structured description attribution
+## Current packet — #182 native description-credit acceptance
 
-Source [PR #254](https://github.com/Kajooja/Kajo/pull/254) is accepted on main
-`dce94df96e965f26810c979cf8af550d551c8597` after all five required CI #501 gates.
-The exact catalog-only description migration is now installed and verified.
-**Do not deploy it again**, recreate its implementation branch, redeploy
-catalog-import v12 or replay the six installed native forwards. Source/hosted
-version mapping and exact checks remain in the owner's controlled checkpoint;
-the accepted source filename/bytes are unchanged.
+Structured attribution is accepted through [PR #257](https://github.com/Kajooja/Kajo/pull/257)
+on main `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0`. Final head
+`f300c5adcea3cee9dc0828945add936a4bad13d6` passed all five required
+[CI #508 gates](https://github.com/Kajooja/Kajo/actions/runs/35536998176).
+The complete local check passed **430 tests**, lint/typechecks and both
+iOS/Android bundle smokes. Native CLI CI verified populated upgrades, concurrent
+writer locks, guarded replay and anonymous PostgREST denial for v1 and v2.
+The owner explicitly approved publication and merge on 2026-09-20 and requested
+immediate continuation. The interrupted publication and CI #507 fixture failure
+are resolved; production migration/runtime bytes did not change in the CI fix.
 
-Accepted [PR #255](https://github.com/Kajooja/Kajo/pull/255) records the
-[rollout and actual text review](sprints/SPRINT-014.md#book-rollout-and-description-review--2026-09-17--182).
-The owner explicitly authorized this public documentation and issue update on
-2026-09-17, resolving the earlier publication approval block.
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the exact
-publication PR/head/CI/merge outcome. [PR #256](https://github.com/Kajooja/Kajo/pull/256)
-is accepted on main `1d8ed155bc39a0d543df27ca4d68006910f7f755` after all five
-required CI #505 gates. It adds an offline review-amendment command and records the
-[cached rights audit](sprints/SPRINT-014.md#cached-book-rights-audit-and-review-amendment--2026-09-19--182).
-Branch `feat/182-description-attribution` starts from that accepted main and
-implements the review → guarded writer → Item/catalog/Shared/List → detail
-attribution contract with synthetic fixtures. Issue #182 owns its exact PR/head/
-required CI/merge outcome; [Sprint 014](sprints/SPRINT-014.md#structured-description-attribution--2026-09-20--182)
-records delivered source and validation limits. Private source records remain
-in the unchanged controlled checkpoint; rollout preparation is separate.
+The exact new catalog-only forward is **installed and verified** as of
+**2026-09-20 21:07 UTC**. Source file
+`20260920000607_description_attribution.sql` retains SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`.
+**Do not deploy it again**, replay the installed v1 description migration or the
+six independent native forwards, or alter migration history. The
+[rollout checkpoint](sprints/SPRINT-014.md#description-attribution-source-acceptance-and-rollout--2026-09-20--182)
+records verification and limits; the exact source/hosted version mapping,
+function preimages and full snapshots are retained in the owner's controlled
+`Kajo-description-attribution-rollout-v1.zip`. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+owns exact publication/CI/merge identities.
 
-**Recovery checkpoint, 2026-09-20:** the runtime implementation is preserved in
-local commit `89371e094c8259c9bce73719c35e73b583dbfd0b`. Fresh GitHub/ref checks
-found **no remote attribution branch or PR**, contrary to the interrupted chat's
-publication claim. Accepted main remains `1d8ed155bc39a0d543df27ca4d68006910f7f755`.
-Automatic approval review rejected the branch push because it classified the
-current continuation request as insufficient authorization to publish this
-source packet to public `Kajooja/Kajo`. No alternate publication route was tried.
-The owner explicitly approved publication to public `Kajooja/Kajo`, PR creation
-and merge after passing CI on 2026-09-20, and requested immediate continuation
-afterward. The publication block is resolved and [PR #257](https://github.com/Kajooja/Kajo/pull/257)
-is open. Initial CI #507 passed four gates but found a non-JSON setup row in the
-native attribution upgrade fixture. Setup now performs its write silently, and
-the local database regression asserts that only the final snapshot is emitted.
-The regression failed before the fix and passes afterward; migration/runtime
-bytes are unchanged. Verify all five required gates on the final PR head before
-merge, then continue the bounded rollout below. Issue #182 owns exact acceptance.
+### Verified hosted result — 2026-09-20
 
-### Verified result — 2026-09-17
+Fresh read-only snapshots before and after installation confirmed all five
+catalog/validator function definitions, owners, ACLs and settings match the
+approved source. Service-role execution is allowed; anonymous/authenticated
+execution is denied. All remain invoker functions with empty search paths.
+The read-only validator probe accepted bound synthetic credit and rejected
+missing credit, unsafe links, a wrong text hash and an extra private field.
 
-Exact function/ACL/history readback and an anonymous HTTP permission-denial probe
-passed. All unrelated function/trigger/default metadata and the entire catalog
-comparison stayed unchanged: BOOK **415 visible / 427 stored / 385 images / zero
-descriptions**; MOVIE **425 / 437 / 425 images and descriptions**. All ten fixed
-pilot identities and row versions match; zero discoverable mocks.
+Exactly one migration was added. All prior history entries, unrelated function
+definitions, triggers and default privileges are unchanged. Full Item, source
+and alias fingerprints match before and after. BOOK remains **415 visible /
+427 stored / 385 images / 0 descriptions**; MOVIE remains **425 / 437 / 425
+images and descriptions**. Zero managed descriptions or discoverable mocks.
+Security advisor findings are unchanged. No catalog paragraph was written.
 
-The frozen preview used **all twenty allowed provider attempts**: ten Editions,
-then ten reviewed exact Work fallbacks. All twenty records matched identity;
-there were no retries, redirects, substitutions or database batches. Nine
-Editions have no description; one Finnish description contains a source URL.
-Eight Work descriptions pass the unchanged text rules, all in English; two
-contain disallowed markup/link characters. Edition language remains distinct
-from description/original language.
+### Frozen pilot and rights decision
 
-Actual review approved **zero display writes**: eight permission/attribution
-holds and two text-policy exclusions. The accepted CLI saved a reviewed packet
-with zero entries and ten skips. **The six-description usefulness target was
-not met.** No empty apply batches were sent. Do not label text eligibility as
-rights clearance or claim a completed description import.
+Accepted [PR #254](https://github.com/Kajooja/Kajo/pull/254) and its installed v1
+rollout supplied the guarded workflow. [PR #255](https://github.com/Kajooja/Kajo/pull/255)
+records the actual preview/review; [PR #256](https://github.com/Kajooja/Kajo/pull/256)
+adds offline review amendment and the source-specific cached audit.
 
-### Cached audit result — 2026-09-19
+The ten fixed candidates spent **all twenty allowed provider attempts**: ten
+Editions and ten exact reviewed Work fallbacks. Eight English Work descriptions
+pass the unchanged text policy but remain permission/attribution holds; two are
+excluded for text policy. **Zero descriptions are approved and zero database
+batches have run.** The six-description usefulness target remains unmet.
+The September 20 continuation made no provider request or pilot amendment.
+The archived and staged pilot states remain byte-identical, with one prior
+review retained. Edition language is distinct from description/original language.
 
-All twenty saved records and the original zero-entry review were retained.
-The source-specific audit distinguishes publisher overlap, partial historical
-Wikipedia matches and unconfirmed origins; no exact usable permission chain
-was established. Eight rights holds and two text-policy exclusions remain.
-The audit found missing Item/catalog/detail support for visible source/license/
-modification information. The September 20 source packet closes that structural
-gap; it does not establish an exact permission chain for any real paragraph.
+`@kajo/catalog-contracts` and the installed v2 writers bind public credit and
+private permission evidence to the same text/record. Canonical Item enrichment
+and detail revalidation hide managed text with missing, unsafe or mismatched
+credit. Source/license links and changes remain visible with collapsed text.
+This closes the structural gap; it grants no rights to any real paragraph.
 
-The tested `amend-review` command recorded the new skip reasons in the same run:
-one retained prior review, twenty unchanged attempts, zero approved entries and
-zero database batches. It rejects stale parent hashes, invalid records/history,
-failed runs and any prior write attempt. No new provider records or hosted
-queries/writes occurred; the catalog figures above remain the September 17
-verified baseline, not a fresh September 19 inventory.
+### Exact next bounded packet — native display and link acceptance
 
-### Delivered source and exact next bounded packet
+Exercise the accepted attribution source on a supported device/emulator with a
+configured build whose commit is recorded. A build from main does not by itself
+include or accept the independent #229 branch. The current workspace has no
+native runtime; component tests, exports and server CI are not device evidence.
+Do not dispatch or poll an APK to replace this acceptance step.
 
-`@kajo/catalog-contracts` supplies hash-bound, bounded public credit. V2 review/
-persistence bind private permission evidence to the same text/record/credit;
-legacy checkpoints remain reproducible. Canonical Item enrichment and the detail
-boundary hide managed text if required credit is missing, unsafe or mismatched.
-Source/license links and changes stay visible when the description is collapsed.
-Explicit legacy compatibility preserves existing unannotated catalog content.
-The complete local `npm run check` passed **430 tests**, lint/typechecks and both
-iOS/Android bundle smokes. Native visual/link behavior remains untested here.
+Use isolated synthetic fixtures from `packages/catalog-contracts/fixtures.json`
+and the canonical detail/enrichment boundaries; keep fixtures out of the hosted
+catalog and genuine Profile/Event history. Record build/source identity, OS,
+device, observations and screenshots for the
+[native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix).
+Required observations cover Personal, Shared and List detail entry; collapsed
+and expanded credit; source/license link success and recoverable failure;
+screen-reader labels; and absent, unsafe or mismatched-credit fallback. No
+native case has yet passed in this continuation. If that runtime is unavailable,
+retain this named gate instead of substituting an unrelated UI or provider pass.
 
-After source publication and CI/merge acceptance, continue the **new catalog-only
-attribution forward rollout and native display acceptance**, following the
-[contract](../architecture/ARCHITECTURE.md#description-attribution--contract-182).
-Source file `20260920000607_description_attribution.sql`, SHA-256
-`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`, is **not
-installed**. Read-only recovery preflight at **2026-09-20 19:32 UTC** matched all
-four hosted catalog function definitions, owners, ACLs and settings to accepted
-source and confirmed the new validator is absent. Catalog counts remain BOOK
-415 visible / 427 stored / 385 images / zero descriptions and MOVIE
-425 visible / 437 stored / 425 images and descriptions; no managed descriptions
-or discoverable mocks exist. An isolated PGlite rehearsal passed the exact new
-forward and a guarded restoration of the two prior writers; catalog/function
-snapshots matched afterward and repeat rollback was rejected. This is preparation,
-not native/hosted rollout acceptance. Refresh the target/history/functions/ACLs
-and preserve all catalog rows before the separate admin rollout; do not replay the installed v1
-forward or six native forwards. Validate collapsed/expanded credit, links and
-fallbacks on a supported native runtime before accepting display behavior.
-The recovery ran read-only hosted checks and repeated the complete local check
-successfully (430 tests and both exports). No hosted write, provider request,
-pilot amendment, APK dispatch or device test occurred; the prior pilot checkpoint
-and its saved state remain byte-identical.
-
-Exact source/revision, applicable license, intended use and changes still require
-evidence before any real text is approved. The two Wikipedia leads remain
-candidates, not cleared records. Do not repeat the completed general licensing
-search, reset the pilot or enlarge its provider budget. Preserve independent
-#229 reader/delivery/native gates; this packet changes no Prediction/Event trace.
+After native acceptance, establish exact source/contribution/revision, license,
+intended use and changes for any real text before a new review amendment.
+The two Wikipedia leads remain candidates, not cleared records. Do not repeat
+the completed general licensing search, reset the run or enlarge its budget.
 
 Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
-local staging is `dist/catalog-enrichment/book-pilot-v1`. It now also contains
-`rights-audit.json`, the applied `rights-amendment.json` and the original state.
-Never reset the spent budget or repeat the provider preview. A restored operation
-lock requires the explicit reconciliation recorded in the Sprint checkpoint.
-The run is already `reviewed`; future amendments require a new proposal bound
-to the current review hash. The saved applied proposal is historical evidence
-and deliberately fails if replayed. Never hand-edit the status back to `prepared`.
-Refresh SQL versions and prepare guarded rollback preimages before any approved
-write. Actual apply uses the configured admin runtime; this workspace has no
-privileged runtime credential. Do not restart key setup or bypass the boundary.
+local staging is `dist/catalog-enrichment/book-pilot-v1`. It includes
+`rights-audit.json`, the applied `rights-amendment.json` and original state.
+A restored operation lock requires the explicit reconciliation recorded in the
+Sprint checkpoint. The run is already `reviewed`; a future amendment must bind
+the current review hash. The saved applied proposal is historical and must not
+be replayed. Never hand-edit status back to `prepared`. Before any approved
+description write, refresh row versions and prepare guarded rollback preimages.
+Apply uses the configured admin runtime; this workspace has no privileged
+importer credential. Do not restart key setup or bypass that boundary.
 
 ### Completed MOVIE pass and preserved gates
 
@@ -150,11 +115,11 @@ remain its main offering, **75.1%** together. Keep original language `fi` separa
 from Finnish production `FI`, and preserve personalization. Its 18 attempts and
 30 charged page slots are exhausted; do not perform another import under it.
 
-#182 / MVP-CAT-001..003 / Phase14.3 remain open for rights/attribution, broader
-BOOK descriptions, curated exact mapping, repeatable refresh, normalized feature
-quality and native usefulness. Preserve independent #229/device/fresh-account
-gates, six immutable native forwards and rejected D2 challenger admission.
-No device test, APK dispatch, model admission or unrelated UI work occurred.
+#182 / MVP-CAT-001..003 / Phase 14.3 remain open for rights, broader BOOK
+descriptions, curated exact mapping, repeatable refresh, normalized feature
+quality and native usefulness. Preserve #229/device/fresh-account gates, the
+six immutable native forwards and rejected D2 challenger admission. No new APK
+dispatch, device test, model admission or unrelated UI work occurred.
 
 ## Accepted D2 development comparison
 

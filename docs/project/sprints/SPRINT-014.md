@@ -14,6 +14,93 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Description attribution source acceptance and rollout — 2026-09-20 / #182
+
+The owner approved public publication, PR and merge after required checks, then
+immediate continuation. [PR #257](https://github.com/Kajooja/Kajo/pull/257) merged
+at `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0` from final head
+`f300c5adcea3cee9dc0828945add936a4bad13d6`, tree
+`f528396dfd3a8796c71fc6216fe053c5b37c4c0b`. All five required
+[CI #508 gates](https://github.com/Kajooja/Kajo/actions/runs/35536998176) passed:
+validation, platform/defaults, two clean installs, existing-application upgrade
+and native Supabase CLI/history. Initial CI #507's extra setup result row was
+fixed by silent fixture seeding, with a red-before/green-after regression for a
+single JSON snapshot. The strict reader and production migration were retained.
+The final complete local check passed all **430 tests** and both mobile exports.
+Native CI confirmed v1/v2 lock waits, guarded replay and anonymous PostgREST
+denial. This is source/server evidence, not native mobile acceptance.
+
+The exact accepted file `20260920000607_description_attribution.sql`, SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`, was applied
+as one bounded migration after fresh target/history/function/ACL verification.
+The installed source/hosted version mapping and full private operational evidence
+are retained in `Kajo-description-attribution-rollout-v1.zip`, SHA-256
+`0787e63162ccc83cc9850c4d1dff00c3681f9b0e9496d43ec1c3c95efb31469e`.
+**Do not deploy the new forward again.** The installed v1 description migration
+and six independent native forwards were not replayed or changed.
+
+Repeatable-read read-only snapshots at **21:03:16 UTC** and **21:07:40 UTC**
+verified the following after the successful installation:
+
+- All five resulting function definitions, owners, ACLs and settings exactly
+  match the isolated installation of accepted source. Every function is invoker,
+  has an empty search path and allows service-role execution while denying
+  anonymous/authenticated execution. The two full legacy writer definitions
+  remain unchanged.
+- Exactly one migration was added; all 57 prior history entries retain their
+  statement digests. Unrelated functions, triggers and default privileges match.
+- Full Item, ItemSource and external-ID alias SHA-256 fingerprints are unchanged.
+  BOOK remains **415 visible / 427 stored / 385 images / 0 descriptions**;
+  MOVIE remains **425 / 437 / 425 / 425**. There are zero managed descriptions
+  and zero discoverable mocks. No catalog writes were used as hosted tests.
+- A service-role read-only helper probe accepts valid bound synthetic credit
+  and rejects missing credit, an unsafe URL, a wrong text hash and an extra
+  private field. Security advisors are unchanged: the same 23 informational
+  RLS notices and pre-existing leaked-password-protection warning remain.
+  The warning's [existing remediation](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+  is independent of this migration; no auth settings changed.
+- The pilot archive still hashes to
+  `09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`.
+  Staged state is byte-identical to its archived entry, SHA-256
+  `3945e504a087071839095588cbd1653f82fe775555591235a3531933d9ff118f`:
+  **20 spent attempts / 1 retained prior review / 0 approved entries / 0 batches**.
+  No provider request, pilot amendment, real description write, APK dispatch or
+  device test occurred.
+
+The controlled evidence includes both snapshots, exact expected function
+definitions, validation SQL and a rehearsed guarded rollback candidate. No
+rollback was executed. That candidate refuses v2 data or drift and needs its
+own quiesced-writer/history-reconciliation review before any real recovery.
+This rollout does not clear the eight rights holds or two text exclusions,
+accept #229, close #182/MVP/Phase 14.3, or establish native UI behavior.
+
+### Native description-credit acceptance matrix
+
+This is the single next bounded acceptance packet. Record the exact configured
+build/source commit, device/OS, result and visual evidence for each row. Use the
+synthetic contract fixtures through canonical Item/detail and enrichment
+boundaries in an isolated test runtime; do not seed the hosted catalog or
+generate genuine user evidence merely to make a test description visible.
+No device/emulator was available during this continuation. Every row is pending.
+
+| Case | Required observation |
+| --- | --- |
+| Personal, Shared and List detail entry | The same canonical attributed Item retains source, revision, credit, license and changes; order and actor/Profile scope stay unchanged |
+| Collapsed and expanded text | Credit stays visible in both states, long credit wraps without clipping, and controls remain usable at increased font size |
+| Source and license links | Each independently opens the exact validated HTTPS destination; back navigation retains detail state |
+| External-link failure | Native refusal/failure shows the recoverable message without losing the Item; a later attempt can succeed |
+| Accessibility | Source and license links have distinct labels/roles and reachable focus; expanded text and credit are read in a usable order |
+| Missing, unsafe or mismatched credit | Managed text is hidden while the other Item data remain; a text-only RPC fallback does not expose an uncredited paragraph |
+| Legacy and cached content | Explicit legacy metadata preserves existing content; changing cached managed text or dropping its credit hides that description |
+
+Successful component tests, exports and server CI are insufficient for these
+observations. A main build does not contain the independent #229 branch by
+implication. Do not dispatch or poll an APK as a substitute for the named device
+gate. After native acceptance, exact source/revision/permission evidence is still
+required for any real description approval; keep the spent provider budget closed.
+[STATUS](../STATUS.md) owns continuation. Entries below retain earlier states,
+including their then-pending source publication and rollout preparation.
+
 ## Structured description attribution — 2026-09-20 / #182
 
 Branch `feat/182-description-attribution` starts from accepted PR #256/main
