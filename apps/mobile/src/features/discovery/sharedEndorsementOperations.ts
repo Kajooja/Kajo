@@ -1,4 +1,5 @@
 import type { ItemType, ProfileId } from '../../domain/contracts';
+import { readCatalogDescription } from '../../domain/itemDescription';
 import {
   EMPTY_SHARED_DISCOVERY_STATE,
   type SharedDiscoveryItemState,
@@ -220,7 +221,7 @@ function mapOverlayRow(value: unknown): SharedDiscoveryItemState | null {
       id: value.item_id,
       itemType,
       title: value.title,
-      ...(value.description ? { description: value.description } : {}),
+      ...readCatalogDescription(value.description, undefined),
       tags: value.tags as string[],
     },
     ineligibleForDiscovery: value.ineligible_for_discovery,

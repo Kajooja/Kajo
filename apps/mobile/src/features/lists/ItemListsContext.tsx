@@ -20,6 +20,7 @@ import type {
 } from '@/domain/contracts';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import { useItemInteractions } from '@/features/discovery/ItemInteractionContext';
+import { enrichCatalogReferences } from '../discovery/catalogItemOperations';
 import { createCollectionMutationRpc, type CollectionActionSource } from '@/features/events/collectionActions';
 import type { EventRecordInput } from '@/features/events/eventTracking';
 
@@ -83,6 +84,7 @@ const ItemListsContext = createContext<ItemListsContextValue | null>(null);
 
 export function ItemListsProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
+  const client = connection.status === 'configured' ? connection.client : null;
   const profiles = useActiveProfile();
   const { submitCollectionAction, collectionRevision } = useItemInteractions();
   const [snapshot, setSnapshot] = useState<ListSnapshot | null>(null);
@@ -163,12 +165,17 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
   const loadEntries = useCallback(
     (listId: ItemListId) => runForProfile(async (api, id) => {
       const result = await loadItemListEntries(api, listId);
-      return result.status === 'success' && result.entries.some(entry => entry.profileId !== id)
-        ? { status: 'error', message: UNAVAILABLE_MESSAGE } as const : result;
-    }, { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListEntriesResult), [runForProfile]);
+      if (result.status !== 'success') return result;
+      if (result.entries.some(entry => entry.profileId !== id))
+        return { status: 'error', message: UNAVAILABLE_MESSAGE } as const;
+      return client ? { ...result, entries: await enrichCatalogReferences(client, result.entries) } : result;
+    }, { status: 'error', message: UNAVAILABLE_MESSAGE } as ItemListEntriesResult), [client, runForProfile]);
   const loadConsumed = useCallback(
-    (itemType: ItemType | null) => runForProfile((api, id) => loadConsumedItems(api, id, itemType),
-      { status: 'error', message: UNAVAILABLE_MESSAGE } as ConsumedItemsResult), [runForProfile]);
+    (itemType: ItemType | null) => runForProfile(async (api, id) => {
+      const result = await loadConsumedItems(api, id, itemType);
+      return result.status === 'success' && client
+        ? { ...result, items: await enrichCatalogReferences(client, result.items) } : result;
+    }, { status: 'error', message: UNAVAILABLE_MESSAGE } as ConsumedItemsResult), [client, runForProfile]);
 
   const status: ItemListsStatus = connection.status === 'unconfigured'
     ? 'disabled'

@@ -14,6 +14,7 @@ import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import type { EventRecordInput } from '@/features/events/eventTracking';
 import { useItemInteractions } from './ItemInteractionContext';
+import { enrichCatalogReferences } from './catalogItemOperations';
 
 import type { ItemId, ItemListId, ProfileId, UserId } from '../../domain/contracts';
 import {
@@ -72,6 +73,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
       ? activeProfile.activeProfile
       : null;
   const actorUserId = activeProfile.actorUserId;
+  const client = connection.status === 'configured' ? connection.client : null;
   const namespace = connection.status === 'configured' ? connection.config.url : '';
   const profileId = activeSharedProfile?.id;
   const scopeToken = useMemo(() => ({ namespace, actorUserId, profileId }), [namespace, actorUserId, profileId]);
@@ -103,8 +105,13 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     let active = true;
     const profileId = activeSharedProfile.id;
 
-    void loadSharedDiscoveryOverlay(rpc, profileId).then((result) => {
+    void loadSharedDiscoveryOverlay(rpc, profileId).then(async (result) => {
       if (!active || currentScope.current !== scopeToken) return;
+      if (result.status === 'success' && client) {
+        const states = await enrichCatalogReferences(client, Object.values(result.stateByItemId));
+        if (!active || currentScope.current !== scopeToken) return;
+        result = { status: 'success', stateByItemId: Object.fromEntries(states.map(state => [state.item.id, state])) };
+      }
 
       setSnapshot((current) => {
         if (result.status === 'success') {
@@ -138,7 +145,7 @@ export function SharedEndorsementProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [activeSharedProfile, actorUserId, attempt, collectionRevision, rpc, scopeToken]);
+  }, [activeSharedProfile, actorUserId, attempt, client, collectionRevision, rpc, scopeToken]);
 
   useEffect(() => {
     if (!activeSharedProfile || !actorUserId || !rpc) return;

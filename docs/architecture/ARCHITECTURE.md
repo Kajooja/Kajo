@@ -399,35 +399,56 @@ does not assert new rights over the database and flags possible pre-existing
 rights. This is not blanket permission for every blurb or cover. Preserve source
 links and review the actual contribution/origin and intended use before display
 writes; unknown permission remains staged. Public beta/store rights, attribution
-UI and withdrawal remain open `MVP-CAT-003` gates. No source documentation check
+runtime acceptance and withdrawal remain open `MVP-CAT-003` gates. No source documentation check
 alone constitutes rights clearance for a record.
 
-### Description attribution — next contract, #182
+### Description attribution — contract, #182
 
-The 2026-09-19 source audit found a concrete presentation gap: `Item` carries
-description text only; `catalogItemOperations.ts` does not select description
-provenance, and `ItemDetailScreen.tsx` renders no description credit/license.
-Private review basis text or its public hash does not provide visible attribution.
-This paragraph defines the next implementation packet, not delivered fields/UI.
+`@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.
+`description-attribution-v1` has exactly ten public fields: `contract`,
+`sourceTitle` (200 code points), `sourceUrl`, `sourceRevision` (nullable, otherwise
+200), `credit` (500), `licenseName` (100), `licenseUrl`, `changes` (500),
+`textSha256` and `recordSha256`. Text is trimmed, nonempty and plain; control/
+format characters and markup are rejected. URLs are bounded to 2,048 ASCII
+characters with explicit HTTPS and DNS host labels; credentials, ports, unsafe
+schemes, malformed percent escapes and encoded ASCII controls are rejected.
+No source or license is fabricated from provider identity alone.
 
-Keep a generic description attribution value with the displayed text: source
-title/URL, exact revision reference where applicable, creator/contributor credit,
-license name/URL and an explicit indication of changes. Bind private permission
-evidence, intended use, source/text hashes and required attribution to the same
-reviewed revision. Publish only the safe attribution projection, not reviewer
-identifiers, permission correspondence or raw records. Validate bounded plain
-text and HTTPS URLs before display; reject credentials, executable schemes and
-arbitrary HTML. A missing/malformed required attribution must hide the affected
-managed description while retaining the Item's other data. Existing unannotated
-legacy content needs an explicit compatibility path, not a fabricated license.
+Supplying attribution or permission on an approved offline decision opts the
+whole packet into `open-library-description-v2`. Every approval in that packet
+needs valid credit bound to its exact normalized text and provider-record hashes,
+plus private `permission: { evidenceSha256, intendedUse }`, currently restricted
+to `kajo-internal-pilot`. The evidence digest refers to the separately reviewed
+permission artifact; it is not itself proof of permission. The private stored
+envelope binds that decision to the same attribution and text/record hashes.
+Public `metadata.descriptionProvenance.attribution` contains only display credit;
+the private `descriptionEnrichment.permission` stays in `ItemSource.source_payload`.
+Legacy v1 checkpoints reconstruct unchanged, including retained review history.
+Apply selects the packet's explicit RPC mode; readback checks public and private
+bindings. A future public release requires separately accepted rights/use scope.
 
-Carry this value through the guarded writer, canonical Item mapping, ranking/
-Shared/catalog paths and cached detail view without losing the description's
-binding. Show accessible source and license links with the description, including
-when it is collapsed. Exercise absent/invalid/unsafe data and changed text/credit
-with synthetic fixtures before admitting a real record. The installed v1 SQL is
-immutable; a persistence contract extension requires a new reviewed migration
-and separate rollout. Do not fold unrelated #229/UI work into this packet.
+New forward `20260920000607_description_attribution.sql` extends the existing
+narrow invoker/service-only Item/batch overloads, with no default mode, backfill,
+new endpoint or change to installed migration files. It permits guarded v1→v2
+upgrades and rejects v2→v1 downgrades and legacy full-writer overwrites. A changed
+credit or permission digest is a version-guarded update; identical replay keeps
+timestamps. Existing deterministic locks, atomicity, identities, preserved core
+fields and ACLs remain. Populated-upgrade and full-schema synthetic tests include
+native CLI/PostgREST and concurrent writers. Source acceptance and hosted rollout
+are separate; STATUS/#182 own the installed version and rollout decision.
+
+Canonical catalog reads select metadata and project text with status `legacy`,
+`attributed` or `unverified`. Only an actual metadata object without the managed
+provenance key establishes legacy compatibility. Missing metadata, malformed
+managed credit, unsupported contracts (including managed v1), unsafe links or
+text-hash mismatch hide the description while preserving the other Item data.
+Text-only ranking, Shared and List RPC fallbacks are unverified; successful
+canonical enrichment replaces the complete Item without altering order or actor/
+Profile state. Remembered Items retain credit; the detail boundary revalidates
+cached text and attribution. Source, revision, credit, license link and changes
+remain visible with a collapsed description and accessible independent links.
+Structural/component/bundle tests do not establish native visual/link acceptance.
+The independent #229 reader/delivery-provenance scope remains unchanged.
 
 [Wikimedia's reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
 require the applicable license and attribution; page history and third-party

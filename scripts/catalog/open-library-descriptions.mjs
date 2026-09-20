@@ -1,5 +1,6 @@
 // Description-only policy. Provider records and operator review files stay out of Git.
 import { createHash } from 'node:crypto';
+import { ATTRIBUTED_DESCRIPTION, DESCRIPTION_PILOT_USE, readDescriptionAttribution } from '@kajo/catalog-contracts';
 
 export const CONTRACT = 'open-library-description-v1';
 export const PILOT = 'open-library-description-pilot-v1';
@@ -110,6 +111,11 @@ export function buildDescriptionPacket(records, decisions, baseline) {
     && PRESERVATION_FIELDS.every(key => /^[0-9a-f]{32}$/.test(baseline.preservation[key])), 'invalid-preservation-baseline');
   const entries = [];
   const skipped = [];
+  // Legacy checkpoints reconstruct byte-for-byte. Supplying attribution or
+  // permission evidence opts the entire approved packet into the new RPC mode.
+  const contract = decisions.some(row => row.choice !== 'skip'
+    && (Object.hasOwn(row, 'attribution') || Object.hasOwn(row, 'permission')))
+    ? ATTRIBUTED_DESCRIPTION : CONTRACT;
   for (const candidate of PILOT_ITEMS) {
     const decision = decisions.filter(row => row.position === candidate.position);
     const before = baseline.pilot.filter(row => row.position === candidate.position);
@@ -145,19 +151,32 @@ export function buildDescriptionPacket(records, decisions, baseline) {
     }
     validateReview(review, chosen);
     const policyReview = { policy: PILOT, rights: 'approved-for-pilot', reason, basisSha256: sha256(review.basis.trim()) };
-    const provenance = { contract: CONTRACT, provider: 'open_library', workKey: `/works/${candidate.workId}`,
+    const provenance = { contract, provider: 'open_library', workKey: `/works/${candidate.workId}`,
       recordKey: chosen.key, field: 'description', sourceUrl: `https://openlibrary.org${chosen.key}`,
       sourceRevision: chosen.sourceRevision, sourceModifiedAt: chosen.sourceModifiedAt,
       fetchedAt: chosen.fetchedAt, recordSha256: chosen.recordSha256, textSha256: chosen.description.textSha256,
       textLanguage: review.textLanguage, review: policyReview };
     requireValue(HASH.test(provenance.recordSha256), 'invalid-record-hash');
+    let permission;
+    if (contract === ATTRIBUTED_DESCRIPTION) {
+      const attribution = readDescriptionAttribution(review.attribution, provenance.textSha256, provenance.recordSha256);
+      requireValue(attribution, 'invalid-description-attribution');
+      requireValue(object(review.permission)
+        && Object.keys(review.permission).sort().join(',') === 'evidenceSha256,intendedUse'
+        && typeof review.permission.evidenceSha256 === 'string'
+        && HASH.test(review.permission.evidenceSha256)
+        && review.permission.intendedUse === DESCRIPTION_PILOT_USE, 'unreviewed-description-permission');
+      provenance.attribution = attribution;
+      permission = { ...review.permission, recordSha256: provenance.recordSha256,
+        textSha256: provenance.textSha256, attribution };
+    }
     entries.push({ position: candidate.position, expectedItemId: candidate.itemId, expectedSourceId: row.source_id,
       expectedItemUpdatedAt: row.updated_at, expectedSourceUpdatedAt: row.source_updated_at,
       workId: candidate.workId, editionId: candidate.editionId, description: chosen.description.text, provenance,
-      enrichment: { contract: CONTRACT, records: inspected.map(({ description: _description, ...ref }) => ref),
-        review: { ...policyReview, basis: review.basis.trim() } } });
+      enrichment: { contract, records: inspected.map(({ description: _description, ...ref }) => ref),
+        review: { ...policyReview, basis: review.basis.trim() }, ...(permission ? { permission } : {}) } });
   }
-  return { contract: CONTRACT, pilot: PILOT, baselineSha256: digest(baseline), entries, skipped };
+  return { contract, pilot: PILOT, baselineSha256: digest(baseline), entries, skipped };
 }
 
 // Amend only a completed local review, never a provider run or an attempted write.
@@ -260,8 +279,11 @@ export function verifyDescriptionReadback(state, readback) {
       };
       requireValue(expected && current.description_sha256 === expected.provenance.textSha256
         && digest(identity(current.description_provenance)) === digest(identity(expected.provenance))
-        && current.previous_enrichment?.contract === CONTRACT
-        && digest(current.previous_enrichment.review) === digest(expected.enrichment.review), 'unexpected-description-readback');
+        && current.previous_enrichment?.contract === packet.contract
+        && digest(current.previous_enrichment.review) === digest(expected.enrichment.review)
+        && (packet.contract !== ATTRIBUTED_DESCRIPTION
+          || object(current.previous_enrichment.permission)
+            && digest(current.previous_enrichment.permission) === digest(expected.enrichment.permission)), 'unexpected-description-readback');
     } else requireValue(['description_sha256', 'description_provenance', 'previous_enrichment', 'updated_at', 'source_updated_at']
       .every(key => digest(current[key]) === digest(old[key])), 'unexpected-unapplied-pilot-change');
   }

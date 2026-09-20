@@ -3,6 +3,8 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import attributionFixture from '../../packages/catalog-contracts/fixtures.json' with { type: 'json' };
+import { ATTRIBUTED_DESCRIPTION } from '@kajo/catalog-contracts';
 import { CONTRACT, PILOT, PILOT_ITEMS, REVIEW_AMENDMENT, amendDescriptionReview, buildDescriptionPacket, digest, inspectRecord,
   normalizeDescription, readBoundedResponse, sha256, validateAcknowledgement, validateReviewHistory, verifyDescriptionReadback } from './open-library-descriptions.mjs';
 import { applyDescriptionBatch, collectDescriptions } from './import-open-library-descriptions.mjs';
@@ -50,6 +52,81 @@ function readbackFixture(state) {
   }
   return readback;
 }
+
+function withAttribution(decision) {
+  return { ...decision, attribution: { ...attributionFixture.attribution,
+    textSha256: decision.textSha256, recordSha256: decision.recordSha256 },
+  permission: { ...attributionFixture.permission } };
+}
+
+test('v2 binds public credit to exact text and records while keeping permission evidence private', () => {
+  const data = fixture();
+  data.decisions = data.decisions.map(withAttribution);
+  const packet = buildDescriptionPacket(data.records, data.decisions, data.baseline);
+  assert.equal(packet.contract, ATTRIBUTED_DESCRIPTION);
+  for (const entry of packet.entries) {
+    assert.equal(entry.provenance.contract, ATTRIBUTED_DESCRIPTION);
+    assert.equal(entry.enrichment.contract, ATTRIBUTED_DESCRIPTION);
+    assert.deepEqual(entry.enrichment.permission.attribution, entry.provenance.attribution);
+    assert.equal(entry.enrichment.permission.textSha256, entry.provenance.textSha256);
+    assert.equal(entry.enrichment.permission.recordSha256, entry.provenance.recordSha256);
+    assert.ok(!JSON.stringify(entry.provenance).includes('evidenceSha256'));
+    assert.ok(!JSON.stringify(entry.provenance).includes(basis));
+  }
+  for (const mutate of [
+    row => { delete row.attribution; }, row => { delete row.permission; },
+    row => { row.attribution.textSha256 = '0'.repeat(64); },
+    row => { row.attribution.recordSha256 = '0'.repeat(64); },
+    row => { row.attribution.sourceUrl = 'javascript:alert(1)'; },
+    row => { row.attribution.reviewer = 'Private identity'; },
+    row => { row.permission.evidenceSha256 = 'unknown'; },
+    row => { row.permission.intendedUse = 'public-store-release'; },
+    row => { row.permission.unreviewed = true; },
+  ]) {
+    const decisions = structuredClone(data.decisions); mutate(decisions[0]);
+    assert.throws(() => buildDescriptionPacket(data.records, decisions, data.baseline));
+  }
+  const mixed = structuredClone(data.decisions);
+  mixed[1] = fixture().decisions[1];
+  assert.throws(() => buildDescriptionPacket(data.records, mixed, data.baseline), /invalid-description-attribution/);
+});
+
+test('v2 amendment preserves a legacy reviewed run and uses v2 apply with strict public/private readback', async () => {
+  const { state, amendment, baseline } = amendmentFixture();
+  const before = structuredClone(state);
+  amendment.decisions[0] = withAttribution(fixture().decisions[0]);
+  const next = amendDescriptionReview(state, amendment, baseline);
+  assert.deepEqual(state, before);
+  assert.deepEqual(next.reviewHistory[0], before.review);
+  assert.equal(next.reviewHistory[0].packet.contract, CONTRACT);
+  assert.equal(next.review.packet.contract, ATTRIBUTED_DESCRIPTION);
+  assert.equal(next.attempts.length, 20);
+  validateReviewHistory(next);
+  let calls = 0;
+  await applyDescriptionBatch(next, 1, { checkpoint: async () => {},
+    environment: { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'artificial-service-key-for-fixtures' },
+    fetchImpl: async (_url, request) => {
+      calls++;
+      const payload = JSON.parse(request.body);
+      assert.equal(payload.refresh_mode, ATTRIBUTED_DESCRIPTION);
+      assert.equal(payload.entries.length, 1);
+      return Response.json([{ input_index: 1, item_id: PILOT_ITEMS[0].itemId, outcome: 'updated' }]);
+    } });
+  assert.equal(calls, 1);
+  for (const mutate of [
+    row => { delete row.description_provenance.attribution; },
+    row => { row.description_provenance.attribution.credit = 'Changed'; },
+    row => { delete row.previous_enrichment.permission; },
+    row => { row.previous_enrichment.permission.evidenceSha256 = '0'.repeat(64); },
+    row => { row.previous_enrichment.permission.attribution.credit = 'Changed'; },
+  ]) {
+    const readback = structuredClone(readbackFixture(next)); mutate(readback.pilot[0]);
+    assert.throws(() => verifyDescriptionReadback(next, readback), /unexpected-description-readback/);
+    assert.equal(next.batches[0].verification, undefined);
+  }
+  verifyDescriptionReadback(next, readbackFixture(next));
+  assert.ok(next.batches[0].verification);
+});
 
 test('strict descriptions retain paragraphs/NFC and count Unicode code points', () => {
   const normalized = normalizeDescription({ type: '/type/text', value: '  ' + text + '\r\n\r\n  cafe\u0301\t ja\u0000 tea.  ' });

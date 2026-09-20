@@ -1,3 +1,5 @@
+import type { DescriptionAttribution } from '@kajo/catalog-contracts';
+
 export type UserId = string;
 export type ProfileId = string;
 export type ItemId = string;
@@ -66,6 +68,8 @@ export interface Item {
   itemType: ItemType;
   title: string;
   description?: string;
+  descriptionStatus?: 'legacy' | 'attributed' | 'unverified';
+  descriptionAttribution?: DescriptionAttribution;
   tags?: readonly string[];
   creators?: readonly string[];
   releaseYear?: number;
