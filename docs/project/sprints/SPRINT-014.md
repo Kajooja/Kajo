@@ -14,6 +14,122 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Isolated native description test companion — 2026-09-21 / #182
+
+The accepted September 20 handoff required native description-credit observations,
+but the hosted catalog intentionally has no approved BOOK descriptions and this
+workspace has no device/emulator. `feat/182-native-description-acceptance` adds a
+concrete isolated test runtime without treating synthetic paragraphs as published
+catalog data or using real users/Events. Source/CI/merge identities belong to
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+
+**Publication approval, 2026-09-21:** after reviewing the complete Git patch,
+the owner explicitly approved this packet's public publication, PR and merge
+after all five required CI gates pass. This resolves the earlier automatic
+approval review block; no alternate publication route followed the rejection.
+Implementation commit `4907fbb9f12eb5730028b46b4a6473adfa9e55fa`, checked tree
+`a888354f9a3345a214a28f72dc54bea35b4cf577`, passed all available implementation
+checks; subsequent checkpoint changes are documentation only. Issue #182 owns
+the final published head, CI and merge identities. Native-device observations
+and the actual Personal/Shared/List entry-context gate remain open.
+
+### Delivered source
+
+- `apps/description-acceptance` is a small Expo workspace with a custom
+  `registerRootComponent` entry. Its Android/iOS identifier is
+  `app.kajo.descriptionacceptance`, distinct from `app.kajo.mobile`. It imports
+  no production app/router/auth/data or Event providers and has no login or
+  storage path. The launcher disables dotenv loading; no project credentials
+  are required. App metadata records the Git commit and dirty state and the
+  screen displays them with OS identity for manual evidence.
+- `ItemDescription.tsx` extracts the existing detail paragraph, collapse
+  controls and credit display. Normal detail and the companion render this same
+  component with the same typography/theme and fail-closed cached Item validation.
+  The original functional expand/collapse updates are retained, and the control
+  now exposes its expanded accessibility state. The parent detail retains its
+  existing scrolling, actions, actor/Profile and Event behavior.
+- `DescriptionCredit` retains `Linking.openURL` by default and its safe URL
+  check/recoverable alert. An optional opener lets only the companion inject
+  a labelled one-shot failure. Retrying the same link then uses the actual
+  native opener; injected failure is recorded separately from OS refusal.
+- Seven synthetic cases exercise long bound credit, missing credit, unsafe
+  source URL, changed cached text, text-only fallback, explicit legacy text and
+  empty text. The existing contract fixture supplies the synthetic paragraph;
+  `example.com` source/license test URLs are distinct and make no real licensing
+  claim. Theme controls cover dawn/evening/night. The app never marks a test
+  accepted automatically or simulates Personal/Shared/List identity.
+- Root lint/types/tests/smokes include the workspace. The new smoke exports
+  iOS/Android and checks the actual source maps for exactly one React instance,
+  all shared production description modules, and an explicit first-party allow
+  list. Database/auth/router/Event imports are rejected. Only the new workspace
+  and a copy of the already locked React 19.2.3 entry were added to the lock;
+  existing dependency versions/integrities did not change.
+- `.github/workflows/description-acceptance.yml` supplies a **manual-only**
+  standalone APK build with source checks, a distinct artifact name and no
+  production credentials. It was not dispatched or polled in this continuation.
+  The existing Kajo APK workflow and installed native/database history are unchanged.
+
+### Validation and limits
+
+The complete local `npm run check` passed **442 tests**: 224 mobile, 3 shared
+contract, 46 catalog, 28 Edge, 63 database, 43 engine, 27 research, 6 companion
+fixture and 2 bundle-boundary tests. Normal mobile and companion each passed
+both iOS and Android exports. Companion source maps contain 596 iOS / 594 Android
+modules, including the same description renderer, one React instance and no
+production auth/data/router dependencies. The existing Discovery Hook and
+`@noble/hashes/crypto.js` export-fallback warnings remain.
+
+The first root attempt stalled requesting registry metadata and was stopped;
+the successful run reused the existing local registry mirror and frozen lock
+integrities. No Edge source, lock or test gate was changed. Npm validated the new
+workspace lock offline. A single-process local Metro probe received running
+status, the isolated Android manifest with source/dirty identity, the exact
+`/apps/description-acceptance/index.ts.bundle` entry and its development bundle.
+This proves the launcher and served bundle, not actual native rendering. React
+Native DevTools could not open in the container; no sandbox setting was bypassed.
+
+No device/emulator was available. No native layout/link/accessibility case,
+APK installation or full Personal/Shared/List entry is accepted by this source
+packet. No hosted query/write, migration, provider request, pilot amendment or
+real description approval occurred. The twenty-request BOOK and completed MOVIE
+budgets stay closed; #182, #229 and broader MVP/Phase 14.3 acceptance remain open.
+
+### Run the native acceptance companion
+
+Use a clean accepted Git checkout on a development machine with the repository's
+Node version and a compatible Expo Go app on a phone connected to the same LAN:
+
+```bash
+npm ci
+npm run acceptance:descriptions -- --lan
+```
+
+Scan the terminal QR code in Expo Go. `npm run acceptance:descriptions -- --offline`
+also starts Metro without registry checks; it does not make external test links
+available without a connection. For Android without Expo Go, an explicitly
+requested manual run of **Description native acceptance APK** builds artifact
+`kajo-description-acceptance-<commit>` from the selected ref. Install that distinct
+test app; do not infer that it contains the Kajo application or #229. A workflow
+definition/export is not evidence that an APK was built, installed or exercised.
+
+Record the source commit/dirty state, build artifact if used, phone model, OS,
+font scale, screen reader, exact case and observed result. Check the valid case
+collapsed and expanded; source/license links separately; all invalid/legacy
+cases; each theme; and labelled simulated failure followed by a successful retry.
+Record actual browser destination/back-navigation and actual OS refusal separately.
+The app's “avauspyyntö välitetty” message only means the OS accepted the request.
+
+The [native acceptance matrix](#native-description-credit-acceptance-matrix)
+remains the gate. The companion covers the shared description component;
+Personal/Shared/List entry, full-card placement and configured application state
+still need isolated application-level tests. Neither the fixture companion nor
+an accepted device test grants permission for any real source text.
+
+Expo's [custom root registration](https://docs.expo.dev/versions/latest/sdk/expo/#registerrootcomponentmaincomponent)
+and [monorepo guidance](https://docs.expo.dev/guides/monorepos/) were checked for
+the separate entry/workspace. No custom Metro resolver or dependency override
+was needed. [STATUS](../STATUS.md) remains the exact continuation authority.
+
 ## Description attribution source acceptance and rollout — 2026-09-20 / #182
 
 The owner approved public publication, PR and merge after required checks, then

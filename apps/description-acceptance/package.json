@@ -1,0 +1,28 @@
+{
+  "name": "@kajo/description-acceptance",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "node ../../scripts/mobile/description-acceptance.mjs start",
+    "smoke": "node ../../scripts/mobile/description-acceptance.mjs smoke",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@kajo/catalog-contracts": "*",
+    "expo": "~57.0.9",
+    "expo-constants": "~57.0.8",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "~5.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "eslint": "^9.39.1",
+    "eslint-config-expo": "~57.0.1",
+    "typescript": "~6.0.3",
+    "vitest": "^3.2.4"
+  }
+}

@@ -45,4 +45,16 @@ describe('description credit links', () => {
     await Promise.resolve();
     expect(native.alert).toHaveBeenCalledWith('Linkki ei auennut', 'Yritä uudelleen hetken kuluttua.');
   });
+  it('recovers after one injected failure using the same link without changing production defaults', async () => {
+    const openLink = vi.fn().mockRejectedValueOnce(new Error('Synthetic failure')).mockResolvedValue(undefined);
+    const tree = DescriptionCredit({ attribution, color: '#fff', openLink });
+    const link = elements(tree).find(node => node.props.accessibilityRole === 'link')!;
+    link.props.onPress!();
+    await Promise.resolve();
+    link.props.onPress!();
+    await Promise.resolve();
+    expect(openLink.mock.calls).toEqual([[attribution.sourceUrl], [attribution.sourceUrl]]);
+    expect(native.alert).toHaveBeenCalledTimes(1);
+    expect(native.openURL).not.toHaveBeenCalled();
+  });
 });

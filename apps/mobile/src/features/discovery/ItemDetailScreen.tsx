@@ -28,7 +28,7 @@ import type {
 } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
 import { visibleItemDescription } from '../../domain/itemDescription';
-import { DescriptionCredit } from './DescriptionCredit';
+import { ItemDescription } from './ItemDescription';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import {
@@ -1124,45 +1124,8 @@ function SwipeItemPage({
         </View>
       </View>
 
-      {description.description ? (
-        <View style={styles.descriptionBlock}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={
-              descriptionExpanded ? 'Tiivistä kuvaus' : 'Laajenna kuvaus'
-            }
-            onPress={() =>
-              setDescriptionExpanded((current) => !current)
-            }
-          >
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={descriptionExpanded ? undefined : 2}
-              style={styles.description}
-            >
-              {description.description}
-            </Text>
-          </Pressable>
-          {description.descriptionAttribution ? (
-            <DescriptionCredit attribution={description.descriptionAttribution} color={theme.base.textMuted} />
-          ) : null}
-          {descriptionExpanded ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Tiivistä kuvaus"
-              onPress={() => setDescriptionExpanded(false)}
-              style={({ pressed }) => [
-                styles.collapseDescription,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={styles.collapseDescriptionText}>
-                Näytä vähemmän
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      <ItemDescription item={item} expanded={descriptionExpanded}
+        onExpandedChange={setDescriptionExpanded} theme={theme} />
     </ScrollView>
   );
 }
@@ -1370,25 +1333,6 @@ function createStyles(theme: RoomTheme) {
       fontSize: 24,
       lineHeight: 28,
       fontWeight: '600',
-    },
-    description: {
-      color: theme.base.textMuted,
-      fontSize: 13,
-      lineHeight: 18,
-    },
-    descriptionBlock: {
-      marginTop: 10,
-    },
-    collapseDescription: {
-      alignSelf: 'flex-start',
-      minHeight: 32,
-      justifyContent: 'center',
-      marginTop: 2,
-    },
-    collapseDescriptionText: {
-      color: theme.ambient.curtainHighlight,
-      fontSize: 12,
-      fontWeight: '700',
     },
     tags: {
       flexDirection: 'row',
