@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-20**
+Last updated: **2026-09-21**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,20 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #182 native description-credit acceptance
+
+**Publication approval, 2026-09-21:** the owner explicitly approved publishing
+this complete source/documentation packet to public `Kajooja/Kajo` and merging
+after all five required CI gates pass. This resolves the earlier automatic
+approval review block; no alternate publication route was used. Implementation
+commit `4907fbb9f12eb5730028b46b4a6473adfa9e55fa`, checked source tree
+`a888354f9a3345a214a28f72dc54bea35b4cf577`, passed all 442 local tests and four
+native exports. Subsequent checkpoint edits are documentation only.
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the final PR,
+exact published source, CI and merge identities. The source checkpoint is based
+on accepted main `00077fd725df3adfff7e020cc51ba2f7fd95b911` / PR #258.
+The next acceptance task remains actual native-device observations below;
+source/CI acceptance alone does not complete it. Do not repeat implementation,
+installed migrations, provider calls or APK dispatch.
 
 Structured attribution is accepted through [PR #257](https://github.com/Kajooja/Kajo/pull/257)
 on main `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0`. Final head
@@ -73,6 +87,33 @@ and detail revalidation hide managed text with missing, unsafe or mismatched
 credit. Source/license links and changes remain visible with collapsed text.
 This closes the structural gap; it grants no rights to any real paragraph.
 
+### Isolated native test companion — 2026-09-21
+
+`apps/description-acceptance` now provides a runnable synthetic description
+test without a login, production router, database client or Event providers.
+It has distinct native ID `app.kajo.descriptionacceptance` and displays its
+Git source commit, dirty-worktree flag and OS. Production detail and the test
+app reuse `ItemDescription`/`DescriptionCredit`; collapse styling, fail-closed
+projection and the real native link opener are shared. The main app retains its
+existing entry point and Profile/List/Shared behavior.
+
+The seven cases cover valid long credit, missing credit, an unsafe URL, altered
+cached text, text-only fallback, explicit legacy text and no description. Three
+ambient themes and an explicitly simulated one-shot link error support manual
+checks. Simulation is not an actual OS refusal, and successful `openURL` is not
+proof that the destination loaded. The synthetic source/license URLs lead to
+distinct `example.com` test destinations, not a real source-rights assertion.
+
+The root check now covers the companion: **442 tests**, lint/typechecks, normal
+mobile iOS/Android exports and companion iOS/Android exports. The actual companion
+source maps must contain the shared renderer and exactly one React instance,
+and reject production auth/data/Event modules or unreviewed first-party imports.
+A local Metro readiness/manifest/development-bundle probe passed. There is still
+no device/emulator result, and no APK was dispatched or polled. See the
+[implementation and run commands](sprints/SPRINT-014.md#isolated-native-description-test-companion--2026-09-21--182).
+Issue #182 owns exact source PR/head/CI/merge acceptance for
+`feat/182-native-description-acceptance`.
+
 ### Exact next bounded packet — native display and link acceptance
 
 Exercise the accepted attribution source on a supported device/emulator with a
@@ -81,8 +122,18 @@ include or accept the independent #229 branch. The current workspace has no
 native runtime; component tests, exports and server CI are not device evidence.
 Do not dispatch or poll an APK to replace this acceptance step.
 
-Use isolated synthetic fixtures from `packages/catalog-contracts/fixtures.json`
-and the canonical detail/enrichment boundaries; keep fixtures out of the hosted
+From a clean accepted checkout on a development machine, run `npm ci`, then
+`npm run acceptance:descriptions -- --lan`, and open the companion in a compatible
+Expo Go runtime on the same network. The opt-in **Description native acceptance
+APK** workflow is available for an explicitly requested standalone Android build;
+it is not part of automatic APK dispatch. Its distinct app ID preserves the
+installed Kajo application. Detailed commands and evidence limits are in the
+Sprint checkpoint above.
+
+Use the companion's isolated synthetic fixtures for rendering/link/accessibility
+checks. Personal/Shared/List entry and full-card placement still require a
+separate configured application test with isolated catalog/account state; the
+companion does not impersonate those contexts. Keep fixtures out of the hosted
 catalog and genuine Profile/Event history. Record build/source identity, OS,
 device, observations and screenshots for the
 [native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix).

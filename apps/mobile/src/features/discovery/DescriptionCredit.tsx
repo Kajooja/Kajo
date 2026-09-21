@@ -3,11 +3,17 @@ import { isAttributionUrl } from '@kajo/catalog-contracts';
 import React from 'react';
 import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
-export function DescriptionCredit({ attribution, color }: { attribution: DescriptionAttribution; color: string }) {
+export type DescriptionLinkOpener = (url: string) => Promise<unknown>;
+
+export function DescriptionCredit({ attribution, color, openLink = Linking.openURL }: {
+  attribution: DescriptionAttribution;
+  color: string;
+  openLink?: DescriptionLinkOpener;
+}) {
   const textStyle = [styles.text, { color }];
   const open = async (url: string) => {
     if (!isAttributionUrl(url)) return;
-    try { await Linking.openURL(url); }
+    try { await openLink(url); }
     catch { Alert.alert('Linkki ei auennut', 'Yritä uudelleen hetken kuluttua.'); }
   };
   return (

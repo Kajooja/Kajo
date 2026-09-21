@@ -10,16 +10,16 @@
     "start": "npm run start --workspace @kajo/mobile",
     "android": "npm run android --workspace @kajo/mobile",
     "ios": "npm run ios --workspace @kajo/mobile",
-    "lint": "npm run lint --workspace @kajo/mobile && npm run lint --workspace @kajo/prediction-engine && npm run lint --workspace @kajo/catalog-contracts",
-    "typecheck": "npm run typecheck --workspace @kajo/mobile && npm run typecheck --workspace @kajo/prediction-engine",
+    "lint": "npm run lint --workspace @kajo/mobile && npm run lint --workspace @kajo/prediction-engine && npm run lint --workspace @kajo/catalog-contracts && npm run lint --workspace @kajo/description-acceptance",
+    "typecheck": "npm run typecheck --workspace @kajo/mobile && npm run typecheck --workspace @kajo/prediction-engine && npm run typecheck --workspace @kajo/description-acceptance",
     "test:mobile": "npm run test --workspace @kajo/mobile",
     "test:catalog": "npm run test --workspace @kajo/catalog-contracts && node --test scripts/catalog/*.test.mjs",
     "test:edge": "deno check --config supabase/functions/deno.json --frozen supabase/functions/*/index.ts supabase/functions/entrypoints.test.ts && deno test --config supabase/functions/deno.json --frozen --cached-only --no-prompt --allow-net=127.0.0.1 supabase/functions/entrypoints.test.ts",
     "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
     "catalog:book-descriptions": "node scripts/catalog/import-open-library-descriptions.mjs",
     "catalog:prepare-deployment": "node scripts/catalog/prepare-catalog-deployment.mjs",
-    "test": "npm run test:mobile && npm run test:catalog && npm run test:edge && npm run test:database && npm run test:engine && npm run test:research",
-    "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile",
+    "test": "npm run test:mobile && npm run test:catalog && npm run test:edge && npm run test:database && npm run test:engine && npm run test:research && npm run test:acceptance",
+    "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile && npm run smoke --workspace @kajo/description-acceptance",
     "check": "npm run lint && npm run typecheck && npm run test && npm run smoke",
     "test:database": "node --test scripts/database/*.test.mjs",
     "database:install": "node scripts/database/install-local-database.mjs",
@@ -30,7 +30,9 @@
     "research:movielens:prepare": "python3 scripts/research/movielens.py prepare",
     "research:movielens:download": "python3 scripts/research/movielens.py download",
     "research:movielens:normalize": "npm run build --workspace @kajo/prediction-engine && node scripts/research/normalize-movielens.mjs",
-    "research:movielens:evaluate": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-ratings.mjs"
+    "research:movielens:evaluate": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-ratings.mjs",
+    "test:acceptance": "npm run test --workspace @kajo/description-acceptance && node --test scripts/mobile/*.test.mjs",
+    "acceptance:descriptions": "npm run start --workspace @kajo/description-acceptance --"
   },
   "engines": {
     "node": ">=22"

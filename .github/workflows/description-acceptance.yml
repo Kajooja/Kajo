@@ -1,0 +1,52 @@
+name: Description native acceptance APK
+
+# Owner-triggered only. Ordinary source CI exports both platforms without
+# building an APK or loading the production mobile/auth application.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: 'true'
+      EXPO_NO_DOTENV: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install frozen dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Validate source and isolated native bundles
+        run: npm run check
+      - name: Generate isolated Android application
+        working-directory: apps/description-acceptance
+        run: npx expo prebuild --platform android --non-interactive --clean
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - name: Build isolated standalone APK
+        working-directory: apps/description-acceptance/android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --no-daemon
+      - name: Verify embedded bundle
+        run: |
+          APK="apps/description-acceptance/android/app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK"
+          unzip -l "$APK" | grep -q "assets/index.android.bundle"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kajo-description-acceptance-${{ github.sha }}
+          path: apps/description-acceptance/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 7

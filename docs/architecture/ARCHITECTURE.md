@@ -448,6 +448,15 @@ Profile state. Remembered Items retain credit; the detail boundary revalidates
 cached text and attribution. Source, revision, credit, license link and changes
 remain visible with a collapsed description and accessible independent links.
 Structural/component/bundle tests do not establish native visual/link acceptance.
+`ItemDescription` owns the shared paragraph/collapse/credit rendering boundary.
+The separate `apps/description-acceptance` companion renders it with isolated
+synthetic Items and a distinct native application ID. It has no production
+router/auth/database/Event providers. Actual exported source maps enforce the
+allowed shared modules and a single React instance. Its optional link-opener
+injection is labelled test failure; production continues to use the native
+opener. Source commit/dirty state and observed device results remain separate.
+The companion cannot accept full Profile/List/Shared entry, real-text rights or
+the independently configured Kajo application merely by passing its own tests.
 The independent #229 reader/delivery-provenance scope remains unchanged.
 
 [Wikimedia's reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
