@@ -14,6 +14,66 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Consumed history scope and full-app test — 2026-09-23 / #182
+
+After PR #260/main `a5131650ceb837ea7fc5fe640ff0798bffaa4aa8` passed all
+five CI #514 gates, the owner requested continuation and concrete instructions.
+Preparing those instructions exposed a separate history-screen ownership defect:
+`ConsumedHistoryScreen` identified a snapshot only by Item type and retry count.
+The navigation shell can switch Profile without unmounting it, so an old
+Personal history/rating or error could remain under the newly selected Shared
+heading until the next response. A quick A → B → A could also reuse old A data.
+
+`fix/182-history-profile-scope` binds each request to the provider's existing
+actor/Profile/environment scope, read callback, Item type and retry attempt.
+The render only accepts the exact request object; every transition, including
+A → B → A, creates a new identity. Old rows and errors disappear before effect
+cleanup/refetch. Existing cancellation, retry and canonical Item navigation
+remain in place. No service endpoint, schema, auth policy or dependency changes.
+This corrects history presentation, not the independent #229 serving/session gates.
+
+Eight controlled component regressions exercise the actual render/effect
+functions, including pre-effect visibility, actor/backend/unavailable scope,
+rapid return, late response, error/retry and BOOK/MOVIE Item navigation. They
+do not mount native views or establish phone acceptance. Exact final source,
+validation, PR/CI and merge identities belong to Issue #182.
+
+The old accepted history reader fails six of these regressions while its late
+response cancellation and domain/navigation checks still pass; the correction
+passes all eight. The full local `npm run check` passes **466 tests** (248 mobile,
+3 contract, 46 catalog, 28 Edge, 63 database, 43 engine, 27 research, 6 companion,
+2 bundle-boundary), lint/typechecks, all four iOS/Android exports and both
+companion source-graph guards. Frozen Deno npm dependencies reused the temporary
+local registry with committed SHA-512 verification; no dependency/lock/gate
+changed. Existing DiscoveryScreen hook and Metro dependency warnings remain.
+
+### Concrete full-app phone check
+
+1. Open the repository's **Actions → CI** and the **main** run for the accepted
+   commit recorded at the top of Issue #182. Main pushes already run the full
+   Kajo APK job after the required gates. When it succeeds, its artifact is
+   `kajo-android-standalone-<full commit SHA>`; extract and install `app-release.apk`.
+   This is the full Kajo application, `app.kajo.mobile`.
+2. Use existing Personal/authorized Shared content. Close Kajo completely,
+   reopen, then go from Room directly to a List, Luetut or Katsotut before
+   opening discovery. Open an existing Item and return. Repeat for both domains
+   where content exists. Title/image/available description must belong to that Item.
+3. Repeat in Shared. While history is visible, switch Personal → Shared → Personal.
+   Old rows/ratings/errors must disappear while the selected history loads;
+   no old response may replace the new history. Note whether a delayed-read
+   transition was actually observed; a fast successful switch alone is not that proof.
+4. In Personal, load a List while online, then disable mobile data and Wi-Fi
+   before opening an Item. A stalled detail read must show an error within
+   15 seconds. Restore connectivity and press **Yritä uudelleen**; the same Item
+   must open. **Takaisin** must also work during loading/error.
+5. Report the CI run/commit, tested cases and any failing steps/screenshot.
+   Missing Shared/history content or an unobserved timing case stays untested.
+
+No new device observation, APK dispatch/poll, hosted operation, provider request
+or pilot amendment is performed here. The successful OnePlus companion report
+remains accepted. Real BOOK descriptions still require their separate exact
+rights/revision review; an absent description is not by itself an entry failure.
+
 ## OnePlus feedback and canonical detail entry — 2026-09-23 / #182
 
 The owner reports: “Toimii. Testasin oneplussalla. Kaikki tuntuvat toimivan oikein.”

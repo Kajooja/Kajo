@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 canonical List/history detail entry
+## Current packet — #182 history scope and full-app acceptance
 
 The isolated description companion is accepted source through
 [PR #259](https://github.com/Kajooja/Kajo/pull/259), main
@@ -39,6 +39,21 @@ Local validation passes **458 tests**, lint/typechecks and all four iOS/Android
 exports, including the companion's isolation checks. Three new entry regressions
 fail on the old accepted route and pass with the correction. Required CI and
 the remaining full-application device observations are separate gates.
+
+The canonical entry correction is accepted as [PR #260](https://github.com/Kajooja/Kajo/pull/260),
+main `a5131650ceb837ea7fc5fe640ff0798bffaa4aa8`, after all five
+[CI #514 gates](https://github.com/Kajooja/Kajo/actions/runs/35855628858).
+While preparing the owner's requested full-app test instructions, inspection
+found a remaining history-screen defect: Luetut/Katsotut reused a snapshot keyed
+only by Item type and retry count, so a new Profile heading could retain the old
+Profile's rows or error until its read completed. `fix/182-history-profile-scope`
+binds visible history to the current actor/Profile scope, read callback, Item type
+and attempt. Each transition gets a new request identity, including A → B → A;
+old rows/errors are hidden before effects and cancelled responses stay ignored.
+The full local `npm run check` passes **466 tests**, lint/typechecks, all four
+iOS/Android exports and the companion isolation guards. Six new regressions
+fail on the old history reader; all eight pass with this correction.
+Issue #182 owns this follow-up's exact final validation/PR/CI/merge identities.
 
 Structured attribution is accepted through [PR #257](https://github.com/Kajooja/Kajo/pull/257)
 on main `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0`. Final head
@@ -142,12 +157,18 @@ including shared `ItemDescription` credit, without adding unrelated mock or
 remembered recommendations to a List/history visit. Existing delivered-Prediction
 routing and Shared readiness remain their separate source paths.
 
-Finish the required source/CI gate, then exercise the accepted main application's
+Finish the history-scope follow-up's required source/CI gate, then exercise the accepted main application's
 cold List/history entry: restart, go straight to a List or Luetut/Katsotut without
 opening discovery, open an Item, return, and repeat in Personal and an authorized
 SharedProfile. Verify canonical metadata/description behavior, error/retry and
 Profile change while a read is delayed. Use isolated application test state for
 synthetic attributed text; real hosted BOOK descriptions remain unapproved.
+While Luetut/Katsotut is open, switch Personal → Shared → Personal and verify
+that the old rows disappear immediately while the selected history loads.
+Use the full Kajo CI main build for the accepted commit recorded in Issue #182;
+the existing workflow produces its APK automatically after all required gates.
+The [test instructions](sprints/SPRINT-014.md#consumed-history-scope-and-full-app-test--2026-09-23--182)
+name the artifact and concrete native steps. Do not repeat the separate companion.
 The owner already tested the companion; this is the remaining application-level
 [native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix),
 not another companion build. Record configured source/build and device identity
