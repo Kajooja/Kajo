@@ -50,13 +50,16 @@ including a Korean repeat, deferred Spanish and a failed science-fiction attempt
 with unknown upstream progress. Failure diagnostics are accepted through PR #252
 and deployed on catalog-import v12. BOOK guarded preservation/preview source is
 implemented and its catalog-only rollout and ten-Item pilot are complete. The
-cached rights audit retains zero approved descriptions. Structured attribution
+initial cached audit retained zero approvals; the September 23 pinned-source
+review now approves two English descriptions for the internal pilot, with six
+rights holds and two text exclusions remaining. No database batch has run. Structured attribution
 is accepted through PR #257 with all five required CI #508 gates, and its exact
 catalog-only forward is installed and verified. The September 23 owner reports
 successful companion and full-application exercises; STATUS records their scope
-and the separately queued Discovery/UI observations. Exact contribution/revision
-and permission evidence is now the next bounded packet before any approval or
-broader dump-based enrichment.
+and the separately queued Discovery/UI observations. The two approved entries
+now have pinned revisions, permission evidence and fresh baseline/preimages;
+controlled apply in the configured admin runtime is next, before broader
+dump-based enrichment. The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -158,16 +161,18 @@ The next BOOK unit follows the
 [description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182):
 guarded refresh is accepted through PR #254 and its catalog-only rollout is
 verified. The fixed ten-Item preview exhausted its twenty provider attempts;
-eight English Work descriptions pass the text rules, but none has an accepted
-permission/attribution decision. The completed cached audit and offline review
-amendment preserve those holds. The
+eight English Work descriptions pass the text rules. The September 23 exact
+Wikipedia-source review and offline amendment approve two for the internal pilot
+with structured credit, preserving six rights holds and two text exclusions. The
 [structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
 is accepted through PR #257 / CI #508 and the new catalog-only forward is
 installed with exact function/ACL, history and full-catalog preservation checks.
-The September 23 companion/full-app owner feedback advances the default task to
-exact contribution/revision and license evidence before any display write.
-Individual unobserved native cases retain their limits. The general licensing search
-is recorded; do not repeat it as the default continuation. Do not redeploy either
+The successful owner companion/full-app feedback and completed source review
+advance the default task to the prepared two-entry guarded apply in the existing
+admin runtime, with fresh versions, preimages and readback. Actual real-text
+phone observations follow a successful apply; no write/native result is claimed
+by review preparation. Do not repeat the completed general licensing search or
+the two source matches as the default continuation. Do not redeploy either
 installed description forward or replay the six independent native forwards,
 reset the pilot or expand the API pass to compensate for unapproved text.
 Broader coverage uses pinned Work/Edition dumps; curated books need exact alias

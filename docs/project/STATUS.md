@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 exact BOOK source and rights evidence
+## Current packet — #182 two reviewed BOOK descriptions; guarded apply pending
 
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
@@ -94,13 +94,29 @@ records the actual preview/review; [PR #256](https://github.com/Kajooja/Kajo/pul
 adds offline review amendment and the source-specific cached audit.
 
 The ten fixed candidates spent **all twenty allowed provider attempts**: ten
-Editions and ten exact reviewed Work fallbacks. Eight English Work descriptions
-pass the unchanged text policy but remain permission/attribution holds; two are
-excluded for text policy. **Zero descriptions are approved and zero database
-batches have run.** The six-description usefulness target remains unmet.
-The September 20 continuation made no provider request or pilot amendment.
-The archived and staged pilot states remain byte-identical, with one prior
-review retained. Edition language is distinct from description/original language.
+Editions and ten exact reviewed Work fallbacks. The September 23 pinned-source
+review now approves **Pieni elämä (position 1)** and **Romeo ja Julia (position 4)**
+for `kajo-internal-pilot` with CC BY-SA 4.0 credit. Both complete paragraphs match
+specific Wikipedia revisions in independent HTML and wikitext comparisons.
+The source-specific decision is retained with its exact hashes/use/changes;
+it is not a blanket permission assertion about Open Library. **Six rights holds,
+two text exclusions and zero database batches remain.** The six-description
+usefulness target is still unmet, and no real paragraph has reached the app.
+
+The existing offline `amend-review` CLI preserved all cached records, spent
+attempts, the original claim and both prior reviews. It ran with network disabled
+and no database credentials; replay was rejected without changing state. Current
+review hash: `28e81b46b3ff11cfadf8e0d5708a776c2cdd69beb6cad0a9ddac523970ce2265`.
+The [pinned-source checkpoint](sprints/SPRINT-014.md#pinned-book-source-review-and-apply-preparation--2026-09-23--182)
+retains revisions, evidence/packet/state hashes, review limits and validation.
+Edition language remains distinct from description/original language.
+
+Fresh read-only coverage on **September 23 at 20:18:12 UTC** confirmed all ten
+identities, row versions and preservation fingerprints unchanged. BOOK remains
+**415 visible / 427 stored / 385 images / 0 descriptions**; MOVIE **425 / 437 /
+425 images and descriptions**. At 20:25:23 UTC the installed validator accepted
+both real credit objects, and complete Item/source/alias preimages were retained.
+This is preparation, not a catalog write or new native result.
 
 `@kajo/catalog-contracts` and the installed v2 writers bind public credit and
 private permission evidence to the same text/record. Canonical Item enrichment
@@ -136,33 +152,36 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — two cached Wikipedia source leads
+### Exact next bounded packet — guarded two-description apply
 
-Establish exact source/contribution/revision, license, intended use and changes
-for the existing **Pieni elämä** and **Romeo ja Julia** cached Work texts before
-any new review amendment. The two Wikipedia leads remain candidates, not cleared
-records. Compare the original text/record hashes with pinned source evidence;
-record both confirmed matches and unresolved contributions. A partial match or a
-general license page cannot clear the whole cached paragraph. No publisher or
-contributor contact is authorized by this review alone.
+Recover the updated `Kajo-book-description-pilot-v1.zip`; local staging is
+`dist/catalog-enrichment/book-pilot-v1`. It contains the original claim, raw
+records/history, `permission-review.json`, `source-comparison.json`, applied
+`pinned-rights-amendment.json`, fresh baseline/preimages, the two-entry batch-1
+request and `apply-readiness.json`. The run is already `reviewed`, with two
+approved entries and no attempted database batch. Both saved amendment proposals
+are historical and must not be replayed. No active operation lock was present
+on this restore; any future restored lock needs explicit state/process
+reconciliation. Never reset status, budget or claim.
 
-The successful owner companion/full-app reports allow this evidence work to
-continue now. Unobserved individual native cases remain recorded limits, not a
-reason to ask for the whole successful test again. Do not repeat the completed
-general licensing search, reset the run, enlarge its budget or start unrelated
-UI implementation. If either source cannot be cleared, record that exact blocker
-and the next bounded alternative rather than relabeling unknown text as licensed.
+Use the already configured admin importer runtime for the accepted guarded
+CLI/RPC sequence. **This workspace has no privileged importer credential**;
+do not restart key setup or replace the importer with ad hoc SQL. All preparation
+possible here is complete. Refresh read-only coverage immediately before apply;
+if versions changed, make a new amendment bound to the current review hash and
+retain refreshed preimages. Apply only positions 1 and 4 in batch 1, then verify
+exact acknowledgements, text/credit/permission bindings and preservation before
+the empty batch-2 checkpoint. Unknown acknowledgement means stop/reconcile,
+not automatic replay. Guarded rollback requires actual post-write versions/hashes
+and restores only description/provenance/envelope, never whole old rows.
 
-Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
-local staging is `dist/catalog-enrichment/book-pilot-v1`. It includes
-`rights-audit.json`, the applied `rights-amendment.json` and original state.
-A restored operation lock requires the explicit reconciliation recorded in the
-Sprint checkpoint. The run is already `reviewed`; a future amendment must bind
-the current review hash. The saved applied proposal is historical and must not
-be replayed. Never hand-edit status back to `prepared`. Before any approved
-description write, refresh row versions and prepare guarded rollback preimages.
-Apply uses the configured admin runtime; this workspace has no privileged
-importer credential. Do not restart key setup or bypass that boundary.
+After a successful controlled apply, observe those two real paragraphs and their
+source/license links on the phone. Do not repeat the whole accepted companion
+or full-app test solely for missing metadata. General licensing search and the
+two exact source matches are complete; the other six permission holds require
+their own evidence. The target of six usable descriptions is not waived by two
+approvals. Broader dump-based enrichment and curated alias review remain later
+bounded units, with no new provider sweep, model admission or UI work implied.
 
 ### Completed MOVIE pass and preserved gates
 
@@ -176,8 +195,8 @@ descriptions, curated exact mapping, repeatable refresh, normalized feature
 quality and native usefulness. Preserve #229/device/fresh-account gates, the
 six immutable native forwards and rejected D2 challenger admission. The owner
 companion and full-app reports are recorded above. The source-evidence packet
-does not dispatch/poll APKs, operate on hosted data, admit a model or implement
-the separately queued UI changes.
+performed only the two recorded hosted read-only checks; it did not dispatch/poll
+APKs, write catalog data, admit a model or implement the separately queued UI changes.
 
 ## Accepted D2 development comparison
 
