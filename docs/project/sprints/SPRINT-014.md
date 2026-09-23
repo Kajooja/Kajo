@@ -14,6 +14,98 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Pinned BOOK source review and apply preparation — 2026-09-23 / #182
+
+The owner-requested continuation after PR #262 advances the existing pilot,
+without a new provider pass. The original archive's 25 manifest entries verified;
+the original claim and run files were restored byte-identically. No active
+operation lock existed; historical completed-lock evidence remains untouched.
+The initial reviewed state had SHA-256
+`3945e504a087071839095588cbd1653f82fe775555591235a3531933d9ff118f`.
+
+### Exact correspondence and limited permission decision
+
+Direct primary-source retrieval resolved the two previously partial leads:
+
+| Position / selected Item | Independently matching Wikipedia revision | Match |
+| --- | --- | --- |
+| 1 / Pieni elämä | [A Little Life, 995224795](https://en.wikipedia.org/w/index.php?title=A_Little_Life&oldid=995224795), 2020-12-19 22:08:22 UTC | All 199 characters; text SHA-256 `3b6b1838b911c90bab7cdefdc17eaf3f61f847df7cc1f2c1243915dd8800d0c6` |
+| 4 / Romeo ja Julia | [Romeo and Juliet, 1060312455](https://en.wikipedia.org/w/index.php?title=Romeo_and_Juliet&oldid=1060312455), 2021-12-14 19:01:23 UTC | All 388 characters; text SHA-256 `0a750307e44db15765970ebd0daa5cc00b3adef8800a9ae9341b63094738113a` |
+
+The offline comparison independently checks saved rendered HTML and revision
+wikitext against the unchanged cached Work descriptions. Only formatting,
+inline links and citation markers are omitted; wording and punctuation match.
+This identifies an independently licensed source for identical prose, not a
+proven chain through the unknown Open Library uploader. Both texts remain
+English; Finnish Edition identity/title/cover and original-language data stay
+unchanged. No generated replacement, translation, excerpt from the book or
+publisher blurb is substituted.
+
+The explicit operator review approves **only these two descriptions for
+`kajo-internal-pilot`** with CC BY-SA 4.0, contributor credit through the exact
+article/history link, a visible license link and a changes notice. The review
+uses [Wikimedia reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content),
+[Wikipedia's copyright policy](https://en.wikipedia.org/wiki/Wikipedia:Copyrights),
+the documented [2023 license update](https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Legal/2023_ToU_updates/About)
+and the [CC BY-SA legal code](https://creativecommons.org/licenses/by-sa/4.0/legalcode.en).
+Pinned article text, current talk pages and twenty preceding history summaries
+per revision showed no additional imported-text credit or specific copyright
+notice for these leads. This is a bounded inspection, not an exhaustive audit of
+every edit; generic historic-page warnings are retained. Credit names Wikipedia
+contributors collectively, never the last editor as sole author. No image,
+other paragraph or publisher text is covered, and no contact was made.
+Public beta/store rights/use and withdrawal review remain separate gates.
+
+`permission-review.json` retains the exact primary-response hashes, decision,
+intended use, public credit and limits; its SHA-256 is
+`4f6d40c93ce0bd44a8eadbf90f1c4aa5cd29441defc15a900d04573197de6681`.
+The evidence and real text remain in the controlled pilot archive, outside Git.
+
+### Actual amendment and read-only preparation
+
+The existing `amend-review` CLI ran with fetch disabled and no database
+credentials. It bound the prior review
+`974f1fd812f51bde6ac1c1125e90319fafd17f830040f9600d2220dc98165056`
+and preserved the entire earlier chain, all raw records, all twenty consumed
+provider attempts and the other eight current decisions. The run now contains
+**2 approved descriptions / 6 rights holds / 2 text exclusions / 2 prior reviews /
+0 database batches**. Packet mode is `open-library-description-v2`; the private
+permission digest and public credit bind the same text/record hashes.
+
+- Current review hash: `28e81b46b3ff11cfadf8e0d5708a776c2cdd69beb6cad0a9ddac523970ce2265`.
+- Current packet hash: `dd31f5b33771e59a5885d618821dbd5e0a4fda5ff4b1d59ebe15c9730ca11262`.
+- Current state file hash: `78afe993517c36bfa1eeeda543aa2b99e0ebae3b90f1a0c043d1d42fb2a6b209`.
+
+An intentional replay of the applied proposal was rejected as
+`review-parent-mismatch`, leaving state bytes unchanged and releasing the lock.
+Neither the old `rights-amendment.json` nor the new
+`pinned-rights-amendment.json` may be replayed as a continuation.
+
+Read-only coverage at **2026-09-23 20:18:12 UTC** confirmed all ten exact
+identities, all Item/source row versions and every preservation fingerprint
+unchanged from the prior review. BOOK remains **415 visible / 427 stored /
+385 images / 0 descriptions**; MOVIE **425 / 437 / 425 images and descriptions**.
+At **20:25:23 UTC**, the installed attribution validator accepted both real credit
+objects. Full Item/source/alias preimages for the two targets were retained and
+their versions matched the baseline. No catalog write or migration occurred.
+
+The private archive now includes comparison/reproduction evidence, the applied
+amendment, updated state/history, public-credit preview, two-entry batch-1
+request and `apply-readiness.json`. Batch 2 has zero approved entries and must
+remain an explicitly verified no-write checkpoint. The six-description usefulness
+target remains unmet. The accepted importer needs the already configured admin
+runtime; this workspace has no privileged importer credential. Do not obtain a
+key here, bypass the importer with ad hoc SQL, or mark a batch as applied.
+
+Next refresh coverage immediately before controlled apply, retain any newly
+required preimages and use the existing guarded CLI/RPC batch/readback sequence.
+If baseline versions changed, prepare a new review amendment bound to the
+current hash above. Any rollback requires the actual post-write versions/hashes
+and restores only the managed description/provenance/envelope. The two real
+paragraphs and links require observation after a successful apply; no new native
+result is claimed here. UI refinements remain queued under PR #262 / Phase 17.0.
+Issue #182 owns this documentation packet's final PR/CI/merge identities.
+
 ## Full-app feedback and deferred UI notes — 2026-09-23 / #182
 
 After the concrete full-app instructions below, the owner reports “Kaikki
