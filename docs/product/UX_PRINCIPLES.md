@@ -50,7 +50,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 28. **Shared recommendations are already shared.** Do not create a parallel `Ehdota yhteiseen` recommender surface.
 29. **Shared positive action is collaborative.** Choosing a custom List in Shared discovery creates actor-specific Endorsement/pending proposal, not immediate membership or Saved state.
 30. **Pending and consensus are visually distinct.** Pending proposer/List provenance and explicit approval remain readable without relying on color alone. Only unanimity produces durable consensus and Shared Saved/list commit.
-31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item. Collections reuse Discovery covers, show given ratings, and provide Ruudukko / Kortit browsing while keeping their own collection context.
+31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item. Collections reuse Discovery covers, show given ratings, and offer list/poster-grid browsing while keeping their own collection context. The planned view controls below extend the existing partial List/grid support to consumed history.
 32. **Shared provenance is truthful.** List membership retains original proposer/added time where defined; UI does not invent actor provenance.
 33. **List choice stays lightweight.** Personal users check all destinations and press Lisää valituille listoille once; all acknowledged additions advance to the next card without a separate Valmis action. Show save progress, retain confirmed additions and unresolved choices on partial failure. Recent choices stay bounded with expansion/new-list creation on demand. Shared members approve the same explicit destination set before unanimous commit.
 34. **Messaging stays Profile-scoped and quiet.** Inbox combines relevant invitation/message activity. Message failure must not roll back successful List action.
@@ -98,6 +98,60 @@ Friends, SharedProfiles, Inbox, Lists and account actions belong to persistent n
 ## Browse completion
 
 Discovery may show a bounded contextual row of active Profile Lists. Catalog search/normalized filters are explicit browse constraints and are not durable taste merely because the user searched. Authorized Profile/Group/Friend filtering must never expose unrelated private identities.
+
+### Owner browse refinements — planned, 2026-09-23
+
+The owner likes the current Discovery appearance and explicitly defers these
+refinements to the appropriate application UI packet. They are recorded work,
+not changes delivered by the catalog/native-acceptance packet. ROADMAP Phase
+17.0 owns scheduling; the existing issues below own implementation.
+
+- **One consumed history (#200):** Discovery's Katsotut/Luetut opens the same
+  canonical, active-Profile and ItemType-scoped history as the Lists entry. A
+  filtered subset of the current recommendation slate is not that history.
+  Membership, saved ratings, empty/loading/error behavior and authorization must
+  agree regardless of entry. BOOK and MOVIE use the same generic route contract.
+- **Compact header (#199/#200):** align the active ItemType title (Elokuvat),
+  Löydä and Katsotut on one row at ordinary phone text sizes. The title is an
+  accessible dropdown for Kirjat and other supported ItemTypes; future domains
+  can join that same selector when available. Keep bounded contextual Lists and
+  their canonical overflow without adding another permanent header tier.
+  Small screens and large text may adapt without clipping labels or targets.
+- **More poster space (#199):** remove the reported empty brown strip beneath
+  the grid and redundant content/footer insets. Posters use the available shell
+  content area down to the dock; retain the actual dock/system safe areas and
+  readable final rows. Preserve the accepted visual direction and bounded image
+  caching/virtualization.
+- **Continuous browsing (#199, dependent on #228/#229):** approaching the end
+  loads the next server page, preserving order, existing rows and scroll. Reuse
+  the accepted cursor/delivery contract when that source packet is merged;
+  coalesce requests, retain exact per-Item origins, avoid duplicate IDs and
+  cancel obsolete Profile/domain/session reads. Errors allow the same request
+  to recover. Exhaustion or expiry remains truthful; do not fabricate an endless
+  feed by recycling Items, reranking on the client or silently resetting a run.
+- **Collection view control (#231):** beside a List or Katsotut/Luetut heading,
+  offer list (horizontal lines) and poster-grid (2 × 2 squares) icons with
+  accessible names and selected state. Both render the same canonical collection,
+  filters, order, ratings and membership. Reuse existing List/grid components;
+  keep collection/scroll context when opening and returning from an Item.
+  Switching presentation creates no taste Event, rating or membership write.
+
+### Owner detail refinements — planned, #239, 2026-09-23
+
+Use an arrow-only Back control with accessible name **Takaisin**, including
+Items opened from Lists or consumed history. Remove the visible **Discovery**
+label from an open card. Back returns to the actual entry collection and its
+state/scroll position; it never routes to Discovery merely because detail uses
+the shared discovery route.
+
+Show the full description immediately when it fits the available card area.
+Only overflowing text needs an explicit expansion affordance, after which the
+card content scrolls. Measure available space with title, metadata, controls,
+safe areas and scaled text; a fixed two-line cutoff is not the fit rule. Reuse
+the shared `ItemDescription` renderer and preserve source/credit/license/changes
+visibility and link behavior in both states. Verify small and large screens,
+long text, large fonts and return from both Discovery and collections alongside
+the existing #239 controls. These changes do not alter text permission rules.
 
 ## Launch-loop UX acceptance
 
