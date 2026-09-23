@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -24,30 +24,35 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
-  const { loadConsumed } = itemLists;
+  const { scopeKey, loadConsumed } = itemLists;
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
+  const [attempt, setAttempt] = useState(0);
+  // Identity changes even for A → B → A; never show a previous read under a
+  // new Profile heading while effect cleanup/refetch is still pending.
+  const request = useMemo(
+    () => ({ scopeKey, itemType, attempt, loadConsumed }),
+    [scopeKey, itemType, attempt, loadConsumed],
+  );
   const [snapshot, setSnapshot] = useState<{
-    key: string;
+    request: typeof request;
     items: readonly ConsumedItem[];
     error: string | null;
   } | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  const requestKey = `${itemType}:${attempt}`;
-  const loading = snapshot?.key !== requestKey;
-  const error = snapshot?.key === requestKey ? snapshot.error : null;
-  const items = snapshot?.key === requestKey ? snapshot.items : [];
+  const loading = snapshot?.request !== request;
+  const error = snapshot?.request === request ? snapshot.error : null;
+  const items = snapshot?.request === request ? snapshot.items : [];
 
   useEffect(() => {
     let active = true;
-    void loadConsumed(itemType).then((result) => {
+    void request.loadConsumed(request.itemType).then((result) => {
       if (!active) return;
       setSnapshot(result.status === 'success'
-        ? { key: requestKey, items: result.items, error: null }
-        : { key: requestKey, items: [], error: result.message });
+        ? { request, items: result.items, error: null }
+        : { request, items: [], error: result.message });
     });
     return () => { active = false; };
-  }, [itemType, loadConsumed, requestKey]);
+  }, [request]);
 
   const title = itemType === 'BOOK' ? 'Luetut' : 'Katsotut';
 
