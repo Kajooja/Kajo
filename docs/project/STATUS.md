@@ -10,50 +10,42 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 history scope and full-app acceptance
+## Current packet — #182 exact BOOK source and rights evidence
 
-The isolated description companion is accepted source through
+The owner reports successful full-application use on **2026-09-23** after the
+cold List/history entry, Profile switching and error/retry test instructions:
+“Kaikki toimii.” This accepts the behavior they exercised. The report also
+identifies Discovery's Katsotut navigation defect and queues browse/detail
+refinements for a suitable later UI packet; it does not close those issues.
+The owner explicitly requests substantial continuation on the existing roadmap.
+
+The accepted source for that requested full-app check is
+[PR #261](https://github.com/Kajooja/Kajo/pull/261), main
+`6d8e75df4d66ce2aa209f806c09bfb5e379c560c`, after all five
+[CI #516 gates](https://github.com/Kajooja/Kajo/actions/runs/35861047609).
+Its exact request identity prevents Luetut/Katsotut from retaining another
+actor/Profile's rows or errors, including rapid A → B → A. Local validation
+passed **466 tests**, lint/typechecks, four iOS/Android exports and companion
+isolation guards. Six new regressions fail on old source; all eight pass fixed.
+This follows [PR #260](https://github.com/Kajooja/Kajo/pull/260), main
+`a5131650ceb837ea7fc5fe640ff0798bffaa4aa8`, accepted after all five
+[CI #514 gates](https://github.com/Kajooja/Kajo/actions/runs/35855628858),
+which loads exact canonical Item/credit for cold List/history detail entry.
+
+The earlier OnePlus companion report remains accepted separately. Its source is
 [PR #259](https://github.com/Kajooja/Kajo/pull/259), main
-`8e7625e8f3867fa34ca709aa10ce76e83588fe82`, after all five
-[CI #512 gates](https://github.com/Kajooja/Kajo/actions/runs/35635820105).
-Its 442 local tests and four exports passed. The earlier publication approval
-block is resolved; do not repeat that source packet.
+`8e7625e8f3867fa34ca709aa10ce76e83588fe82`, with all five
+[CI #512 gates](https://github.com/Kajooja/Kajo/actions/runs/35635820105),
+442 local tests and four exports. Do not repeat either successful exercise only
+to fill missing metadata. Exact installed binary/source, model/OS and individual
+accessibility, OS-refusal or delayed-response observations were not supplied;
+none are inferred. The latest full-app report is not native acceptance of the
+independent #229 branch or permission to display real BOOK descriptions.
 
-**Owner device feedback, 2026-09-23:** the owner tested the companion on a
-OnePlus phone and reports that everything exercised works correctly, then
-explicitly requested continuation. Record this as the owner's successful
-companion test, not merely another bundle check. Exact model, OS, installed
-source/binary identity, screenshots and individual accessibility/OS-refusal
-observations were not supplied. Do not invent them or repeat the companion
-exercise solely to fill those fields. Full Kajo Personal/Shared/List entry and
-independent #229 acceptance remain separate.
-
-The next source inspection found a real entry defect: List/history routes pass
-an Item ID but detail previously resolved it only from remembered predictions
-or static mocks. A canonical listed Item absent from that cache could therefore
-show as missing after restart, or reuse stale description metadata from another
-slate. `fix/182-catalog-detail-entry` fixes this bounded path. Exact source,
-validation, PR and merge identities are recorded in
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
-Local validation passes **458 tests**, lint/typechecks and all four iOS/Android
-exports, including the companion's isolation checks. Three new entry regressions
-fail on the old accepted route and pass with the correction. Required CI and
-the remaining full-application device observations are separate gates.
-
-The canonical entry correction is accepted as [PR #260](https://github.com/Kajooja/Kajo/pull/260),
-main `a5131650ceb837ea7fc5fe640ff0798bffaa4aa8`, after all five
-[CI #514 gates](https://github.com/Kajooja/Kajo/actions/runs/35855628858).
-While preparing the owner's requested full-app test instructions, inspection
-found a remaining history-screen defect: Luetut/Katsotut reused a snapshot keyed
-only by Item type and retry count, so a new Profile heading could retain the old
-Profile's rows or error until its read completed. `fix/182-history-profile-scope`
-binds visible history to the current actor/Profile scope, read callback, Item type
-and attempt. Each transition gets a new request identity, including A → B → A;
-old rows/errors are hidden before effects and cancelled responses stay ignored.
-The full local `npm run check` passes **466 tests**, lint/typechecks, all four
-iOS/Android exports and the companion isolation guards. Six new regressions
-fail on the old history reader; all eight pass with this correction.
-Issue #182 owns this follow-up's exact final validation/PR/CI/merge identities.
+The [owner-feedback checkpoint](sprints/SPRINT-014.md#full-app-feedback-and-deferred-ui-notes--2026-09-23--182)
+maps all new notes to #199, #200, #231, #239 and FUT-CAT-001. Product requirements
+live in [UX_PRINCIPLES](../product/UX_PRINCIPLES.md#owner-browse-refinements--planned-2026-09-23),
+with Phase 17.0 scheduling in ROADMAP. They are recorded, not implemented here.
 
 Structured attribution is accepted through [PR #257](https://github.com/Kajooja/Kajo/pull/257)
 on main `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0`. Final head
@@ -144,42 +136,22 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — canonical detail entry and full-app acceptance
+### Exact next bounded packet — two cached Wikipedia source leads
 
-`ItemDetailScreen` now sends routes without a delivered `predictionId` through
-`CatalogDetailEntry` and the existing canonical `loadCatalogItems` projection.
-The loader reads the requested Item's metadata even if another cached slate
-contains that ID. It shows a loading state, an explicit missing/error result,
-a 15-second deadline and retry/back controls. Client, actor/Profile scope,
-Item and attempt changes hide the prior result; cleanup discards late responses.
-A successful load opens that one complete Item in the existing detail card,
-including shared `ItemDescription` credit, without adding unrelated mock or
-remembered recommendations to a List/history visit. Existing delivered-Prediction
-routing and Shared readiness remain their separate source paths.
+Establish exact source/contribution/revision, license, intended use and changes
+for the existing **Pieni elämä** and **Romeo ja Julia** cached Work texts before
+any new review amendment. The two Wikipedia leads remain candidates, not cleared
+records. Compare the original text/record hashes with pinned source evidence;
+record both confirmed matches and unresolved contributions. A partial match or a
+general license page cannot clear the whole cached paragraph. No publisher or
+contributor contact is authorized by this review alone.
 
-Finish the history-scope follow-up's required source/CI gate, then exercise the accepted main application's
-cold List/history entry: restart, go straight to a List or Luetut/Katsotut without
-opening discovery, open an Item, return, and repeat in Personal and an authorized
-SharedProfile. Verify canonical metadata/description behavior, error/retry and
-Profile change while a read is delayed. Use isolated application test state for
-synthetic attributed text; real hosted BOOK descriptions remain unapproved.
-While Luetut/Katsotut is open, switch Personal → Shared → Personal and verify
-that the old rows disappear immediately while the selected history loads.
-Use the full Kajo CI main build for the accepted commit recorded in Issue #182;
-the existing workflow produces its APK automatically after all required gates.
-The [test instructions](sprints/SPRINT-014.md#consumed-history-scope-and-full-app-test--2026-09-23--182)
-name the artifact and concrete native steps. Do not repeat the separate companion.
-The owner already tested the companion; this is the remaining application-level
-[native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix),
-not another companion build. Record configured source/build and device identity
-when available, without inventing identities for the earlier owner report.
-Do not dispatch or poll an APK or seed real user/catalog evidence to stand in for
-this gate. This workspace still has no native device/emulator.
-
-After native acceptance, establish exact source/contribution/revision, license,
-intended use and changes for any real text before a new review amendment.
-The two Wikipedia leads remain candidates, not cleared records. Do not repeat
-the completed general licensing search, reset the run or enlarge its budget.
+The successful owner companion/full-app reports allow this evidence work to
+continue now. Unobserved individual native cases remain recorded limits, not a
+reason to ask for the whole successful test again. Do not repeat the completed
+general licensing search, reset the run, enlarge its budget or start unrelated
+UI implementation. If either source cannot be cleared, record that exact blocker
+and the next bounded alternative rather than relabeling unknown text as licensed.
 
 Recover `Kajo-book-description-pilot-v1.zip` and its original claim/state/reviews;
 local staging is `dist/catalog-enrichment/book-pilot-v1`. It includes
@@ -203,8 +175,9 @@ from Finnish production `FI`, and preserve personalization. Its 18 attempts and
 descriptions, curated exact mapping, repeatable refresh, normalized feature
 quality and native usefulness. Preserve #229/device/fresh-account gates, the
 six immutable native forwards and rejected D2 challenger admission. The owner
-companion report is recorded above; no new APK dispatch, hosted operation, model
-admission or unrelated UI work occurs in the canonical detail-entry correction.
+companion and full-app reports are recorded above. The source-evidence packet
+does not dispatch/poll APKs, operate on hosted data, admit a model or implement
+the separately queued UI changes.
 
 ## Accepted D2 development comparison
 

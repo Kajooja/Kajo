@@ -52,9 +52,10 @@ and deployed on catalog-import v12. BOOK guarded preservation/preview source is
 implemented and its catalog-only rollout and ten-Item pilot are complete. The
 cached rights audit retains zero approved descriptions. Structured attribution
 is accepted through PR #257 with all five required CI #508 gates, and its exact
-catalog-only forward is installed and verified. Native display/link acceptance
-is the next bounded packet and precedes any attribution-dependent write. Exact
-contribution/revision and permission still need evidence before approval or
+catalog-only forward is installed and verified. The September 23 owner reports
+successful companion and full-application exercises; STATUS records their scope
+and the separately queued Discovery/UI observations. Exact contribution/revision
+and permission evidence is now the next bounded packet before any approval or
 broader dump-based enrichment.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
@@ -163,8 +164,9 @@ amendment preserve those holds. The
 [structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
 is accepted through PR #257 / CI #508 and the new catalog-only forward is
 installed with exact function/ACL, history and full-catalog preservation checks.
-Next verify native display/links, then establish exact contribution/revision
-and license evidence before any display write. The general licensing search
+The September 23 companion/full-app owner feedback advances the default task to
+exact contribution/revision and license evidence before any display write.
+Individual unobserved native cases retain their limits. The general licensing search
 is recorded; do not repeat it as the default continuation. Do not redeploy either
 installed description forward or replay the six independent native forwards,
 reset the pilot or expand the API pass to compensate for unapproved text.
@@ -307,6 +309,17 @@ map to MVP-UX-003..006. FUT-UX-003 joint-list choice remains a separate candidat
 UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requirements
 are release gates. Weekly tracking requires the relevant 17.1/17.2 telemetry and
 privacy work before beta; community comparisons remain conditional.
+
+The owner explicitly queues the September 23 browse/detail refinements here:
+#200 canonical Katsotut/Luetut entry; #199/#200 one-row ItemType dropdown and
+collection navigation; #199 removal of unused grid space and continued loading;
+#231 list/poster-grid controls also for history; #239 fit-aware descriptions and
+arrow-only Back to the real origin. UX_PRINCIPLES owns the full contract. Address
+canonical navigation correctness before visual refinements; continuous loading
+depends on #228/#229's accepted server cursor/delivery path. These are deferred
+refinements of existing browse work, not a request to interrupt the current BOOK
+source review or an automatic expansion of MVP gates. Later cast/director
+presentation stays under FUT-CAT-001, outside this immediate UI packet.
 
 ### 17.1 — Launch telemetry and experimentation
 

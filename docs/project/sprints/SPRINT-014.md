@@ -14,6 +14,49 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Full-app feedback and deferred UI notes — 2026-09-23 / #182
+
+After the concrete full-app instructions below, the owner reports “Kaikki
+toimii” and asks to record additional observations, implement them when suitable
+and continue substantially along the existing roadmap. This is successful
+owner-reported acceptance of the exercised application behavior. The requested
+source was PR #261/main `6d8e75df4d66ce2aa209f806c09bfb5e379c560c`,
+accepted after all five [CI #516 gates](https://github.com/Kajooja/Kajo/actions/runs/35861047609)
+and the 466-test local check. Installed binary identity and individual timed,
+accessibility or OS-refusal cases were not separately reported. The earlier
+OnePlus companion result remains accepted; do not repeat either full exercise
+solely to fill those metadata. This does not accept independent draft PR #229.
+
+The report explicitly retains a Discovery entry defect and these deferred notes:
+
+| Owner observation | Canonical destination |
+| --- | --- |
+| Discovery Katsotut must open the same watched history | #200; UX_PRINCIPLES browse refinements |
+| Elokuvat, Löydä and Katsotut share a row; title dropdown selects Kirjat/future types | #199/#200; UX_PRINCIPLES |
+| Remove unused brown space below the poster grid | #199; UX_PRINCIPLES |
+| Load another batch near the bottom | #199, dependent on #228/#229 cursor/delivery acceptance |
+| Show fitting descriptions in full; expand/scroll only when needed | #239; UX_PRINCIPLES detail refinements |
+| Open card has arrow-only Back, including List/history entry | #239; UX_PRINCIPLES detail refinements |
+| List/history heading offers list and poster-grid icons | #231; UX_PRINCIPLES collection views |
+| Eventually show actors/directors and other movie credits | FUT-CAT-001, coordinated with #182 |
+
+Source inspection confirms that Discovery currently computes consumed Items from
+`ranking.items`, unlike canonical `ConsumedHistoryScreen`. `ItemListScreen`
+already has LIST/GRID controls, so extend the existing presentation instead of
+claiming there is no grid at all. Detail currently labels Back “Discovery” and
+`ItemDescription` collapses every description to two lines. The TMDB normalizer
+already stores cast names and directors; richer display does not automatically
+require another provider import. These findings scope later implementation,
+not a fix delivered by this documentation packet.
+
+ROADMAP Phase 17.0 keeps the browse/detail refinements after current foundations;
+future cast presentation does not create a new release blocker. The default next
+packet is the two cached Wikipedia source leads for BOOK permission/attribution.
+The original ten-Item pilot remains reviewed with 20 spent provider attempts,
+eight rights holds, two text exclusions, zero approved descriptions and zero
+database batches. General licensing research, installed forwards and completed
+MOVIE expansion are not repeated.
+
 ## Consumed history scope and full-app test — 2026-09-23 / #182
 
 After PR #260/main `a5131650ceb837ea7fc5fe640ff0798bffaa4aa8` passed all
