@@ -14,6 +14,71 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## OnePlus feedback and canonical detail entry — 2026-09-23 / #182
+
+The owner reports: “Toimii. Testasin oneplussalla. Kaikki tuntuvat toimivan oikein.”
+This follows the companion test instructions and accepts its exercised behavior
+on the owner's OnePlus phone. Model, OS, installed commit/binary identity,
+screenshots and individual TalkBack/OS-refusal results were not provided; none
+are inferred from chat client metadata or a possible build run. The owner then
+explicitly requested continuation. Do not repeat the accepted companion test.
+
+The companion source was merged as PR #259/main
+`8e7625e8f3867fa34ca709aa10ce76e83588fe82`; all five CI #512 gates passed, with
+one CLI-startup retry on unchanged source. Its native feedback does not accept
+Personal/Shared/List navigation, #229 or real description permissions.
+
+### Bounded correction
+
+Inspection of actual List/history navigation found that `ItemListScreen` and
+`ConsumedHistoryScreen` pass only `itemId` to detail. The old detail constructor
+looked it up with `getMockItem`, which could only see remembered recommendation
+Items and static mocks. Thus an already loaded canonical List Item could still
+be missing when opened after restart; a stale recommendation could also supply
+its description instead of current canonical metadata.
+
+`fix/182-catalog-detail-entry` adds `CatalogDetailEntry` and
+`catalogDetailLoad.ts`, using existing `loadCatalogItems` and the same public
+attribution projection. A route without a delivered Prediction ID loads its
+exact canonical Item with loading/missing/error, retry and Back states. Every
+attempt has a 15-second deadline; cancellation and timeout discard late results.
+The component identifies state by client, actor/Profile scope, Item and attempt
+and unmounts the previous card across scope changes. A successful read opens
+one Item in the existing card and never creates a remembered Prediction slate.
+The original delivered-Prediction path and Shared-overlay readiness gate remain.
+No production fixture, auth bypass, dependency, migration or new API is added.
+
+Regression coverage includes the actual route selection, Personal/Shared scope
+keys, canonical credit in the shared renderer with collapsed/expanded text,
+missing/wrong/malformed rows, invalid attribution, stale cached descriptions,
+backend failure/retry, cancellation and bounded late responses. The old accepted
+route fails three new entry regressions; its delivered-Prediction/Shared gate
+check still passes. Exact final validation and PR/head/merge identities belong
+to Issue #182; source success is not new device evidence.
+
+Local root-check stages pass **458 tests**: 240 mobile, 3 contract, 46 catalog,
+28 Edge, 63 database, 43 engine, 27 research, 6 companion and 2 bundle-boundary
+tests, plus lint/typechecks. All four iOS/Android exports and both companion
+source-graph guards also pass; the complete smoke command was confirmed
+separately after the initial combined log stopped at Metro startup. Deno's
+registry transport stalled in this environment, so the unchanged locked npm
+tarballs were served through a temporary local HTTP registry after verifying
+their SHA-512 integrity against the committed lock. No dependency, lockfile or
+gate changed. The existing DiscoveryScreen hook and Metro dependency-export
+warnings remain. No native device/emulator is available in this workspace.
+
+### Remaining acceptance
+
+After source acceptance, test the configured full application by restarting and
+opening a List or Luetut/Katsotut before discovery, then opening an Item and
+returning. Repeat for Personal and an authorized SharedProfile and exercise
+read failure/retry and a Profile change during a delayed read. Attributed
+synthetic paragraphs still require isolated application test state; do not put
+them in the hosted catalog or real Profile/Event history. No new device test,
+APK dispatch/poll, hosted query/write, provider request, pilot amendment or model
+admission is performed by this correction. BOOK/MOVIE budgets, rights holds,
+#229/fresh-account gates and broader MVP/Phase 14.3 acceptance remain open.
+
 ## Isolated native description test companion — 2026-09-21 / #182
 
 The accepted September 20 handoff required native description-credit observations,
@@ -192,12 +257,16 @@ accept #229, close #182/MVP/Phase 14.3, or establish native UI behavior.
 
 ### Native description-credit acceptance matrix
 
-This is the single next bounded acceptance packet. Record the exact configured
+This matrix defines application-level native acceptance. The September 23
+checkpoint above records the owner's successful isolated companion test and
+the separate canonical entry correction. Record the exact configured
 build/source commit, device/OS, result and visual evidence for each row. Use the
 synthetic contract fixtures through canonical Item/detail and enrichment
 boundaries in an isolated test runtime; do not seed the hosted catalog or
 generate genuine user evidence merely to make a test description visible.
-No device/emulator was available during this continuation. Every row is pending.
+No device/emulator was available for the September 20 implementation. That
+checkpoint left every row pending; the later owner report is scoped to the
+companion and does not supply separate full-application observations per row.
 
 | Case | Required observation |
 | --- | --- |
