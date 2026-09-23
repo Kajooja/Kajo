@@ -18,6 +18,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSupabaseConnection } from '../../data/SupabaseProvider';
 
 import type {
   EventId,
@@ -29,6 +30,7 @@ import type {
 import { getAmbientPhase } from '../../domain/discovery';
 import { visibleItemDescription } from '../../domain/itemDescription';
 import { ItemDescription } from './ItemDescription';
+import { CatalogDetailEntry } from './CatalogDetailEntry';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import {
@@ -111,6 +113,7 @@ export function ItemDetailScreen({
   predictionId,
   predictionSource,
 }: ItemDetailScreenProps) {
+  const connection = useSupabaseConnection();
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const sharedEndorsements = useSharedEndorsements();
@@ -148,6 +151,16 @@ export function ItemDetailScreen({
     );
   }
 
+  if (!predictionId) {
+    return (
+      <CatalogDetailEntry key={`${scopeKey}:${itemId}`} itemId={itemId} scopeKey={scopeKey}
+        client={connection.status === 'configured' ? connection.client : null}
+        theme={getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile)} onBack={() => router.back()}>
+        {item => <ItemDetailContent itemId={itemId} catalogItem={item} />}
+      </CatalogDetailEntry>
+    );
+  }
+
   return (
     <ItemDetailContent
       key={`${scopeKey}:${itemId}`}
@@ -162,7 +175,8 @@ function ItemDetailContent({
   itemId,
   predictionId,
   predictionSource = 'fallback',
-}: ItemDetailScreenProps) {
+  catalogItem,
+}: ItemDetailScreenProps & { catalogItem?: Item }) {
   const { width } = useWindowDimensions();
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
@@ -180,7 +194,7 @@ function ItemDetailContent({
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const selectedItem = getMockItem(itemId);
+  const selectedItem = catalogItem ?? getMockItem(itemId);
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
       ? activeProfile.sharedProfiles.find(
@@ -194,7 +208,7 @@ function ItemDetailContent({
   const sharedOverlayReady =
     !activeSharedMembership || sharedEndorsements.status === 'ready';
   const [items] = useState<readonly Item[]>(() =>
-    buildEligibleSwipeSequence(
+    catalogItem ? [catalogItem] : buildEligibleSwipeSequence(
       selectedItem,
       mode,
       interactions,

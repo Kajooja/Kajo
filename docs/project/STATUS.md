@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-21**
+Last updated: **2026-09-23**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,21 +10,35 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 native description-credit acceptance
+## Current packet — #182 canonical List/history detail entry
 
-**Publication approval, 2026-09-21:** the owner explicitly approved publishing
-this complete source/documentation packet to public `Kajooja/Kajo` and merging
-after all five required CI gates pass. This resolves the earlier automatic
-approval review block; no alternate publication route was used. Implementation
-commit `4907fbb9f12eb5730028b46b4a6473adfa9e55fa`, checked source tree
-`a888354f9a3345a214a28f72dc54bea35b4cf577`, passed all 442 local tests and four
-native exports. Subsequent checkpoint edits are documentation only.
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182) records the final PR,
-exact published source, CI and merge identities. The source checkpoint is based
-on accepted main `00077fd725df3adfff7e020cc51ba2f7fd95b911` / PR #258.
-The next acceptance task remains actual native-device observations below;
-source/CI acceptance alone does not complete it. Do not repeat implementation,
-installed migrations, provider calls or APK dispatch.
+The isolated description companion is accepted source through
+[PR #259](https://github.com/Kajooja/Kajo/pull/259), main
+`8e7625e8f3867fa34ca709aa10ce76e83588fe82`, after all five
+[CI #512 gates](https://github.com/Kajooja/Kajo/actions/runs/35635820105).
+Its 442 local tests and four exports passed. The earlier publication approval
+block is resolved; do not repeat that source packet.
+
+**Owner device feedback, 2026-09-23:** the owner tested the companion on a
+OnePlus phone and reports that everything exercised works correctly, then
+explicitly requested continuation. Record this as the owner's successful
+companion test, not merely another bundle check. Exact model, OS, installed
+source/binary identity, screenshots and individual accessibility/OS-refusal
+observations were not supplied. Do not invent them or repeat the companion
+exercise solely to fill those fields. Full Kajo Personal/Shared/List entry and
+independent #229 acceptance remain separate.
+
+The next source inspection found a real entry defect: List/history routes pass
+an Item ID but detail previously resolved it only from remembered predictions
+or static mocks. A canonical listed Item absent from that cache could therefore
+show as missing after restart, or reuse stale description metadata from another
+slate. `fix/182-catalog-detail-entry` fixes this bounded path. Exact source,
+validation, PR and merge identities are recorded in
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+Local validation passes **458 tests**, lint/typechecks and all four iOS/Android
+exports, including the companion's isolation checks. Three new entry regressions
+fail on the old accepted route and pass with the correction. Required CI and
+the remaining full-application device observations are separate gates.
 
 Structured attribution is accepted through [PR #257](https://github.com/Kajooja/Kajo/pull/257)
 on main `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0`. Final head
@@ -108,40 +122,38 @@ The root check now covers the companion: **442 tests**, lint/typechecks, normal
 mobile iOS/Android exports and companion iOS/Android exports. The actual companion
 source maps must contain the shared renderer and exactly one React instance,
 and reject production auth/data/Event modules or unreviewed first-party imports.
-A local Metro readiness/manifest/development-bundle probe passed. There is still
-no device/emulator result, and no APK was dispatched or polled. See the
+A local Metro readiness/manifest/development-bundle probe passed on September 21.
+The September 23 owner report above now supplies successful OnePlus companion
+feedback. No new APK is dispatched or polled in this continuation. See the
 [implementation and run commands](sprints/SPRINT-014.md#isolated-native-description-test-companion--2026-09-21--182).
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — native display and link acceptance
+### Exact next bounded packet — canonical detail entry and full-app acceptance
 
-Exercise the accepted attribution source on a supported device/emulator with a
-configured build whose commit is recorded. A build from main does not by itself
-include or accept the independent #229 branch. The current workspace has no
-native runtime; component tests, exports and server CI are not device evidence.
-Do not dispatch or poll an APK to replace this acceptance step.
+`ItemDetailScreen` now sends routes without a delivered `predictionId` through
+`CatalogDetailEntry` and the existing canonical `loadCatalogItems` projection.
+The loader reads the requested Item's metadata even if another cached slate
+contains that ID. It shows a loading state, an explicit missing/error result,
+a 15-second deadline and retry/back controls. Client, actor/Profile scope,
+Item and attempt changes hide the prior result; cleanup discards late responses.
+A successful load opens that one complete Item in the existing detail card,
+including shared `ItemDescription` credit, without adding unrelated mock or
+remembered recommendations to a List/history visit. Existing delivered-Prediction
+routing and Shared readiness remain their separate source paths.
 
-From a clean accepted checkout on a development machine, run `npm ci`, then
-`npm run acceptance:descriptions -- --lan`, and open the companion in a compatible
-Expo Go runtime on the same network. The opt-in **Description native acceptance
-APK** workflow is available for an explicitly requested standalone Android build;
-it is not part of automatic APK dispatch. Its distinct app ID preserves the
-installed Kajo application. Detailed commands and evidence limits are in the
-Sprint checkpoint above.
-
-Use the companion's isolated synthetic fixtures for rendering/link/accessibility
-checks. Personal/Shared/List entry and full-card placement still require a
-separate configured application test with isolated catalog/account state; the
-companion does not impersonate those contexts. Keep fixtures out of the hosted
-catalog and genuine Profile/Event history. Record build/source identity, OS,
-device, observations and screenshots for the
-[native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix).
-Required observations cover Personal, Shared and List detail entry; collapsed
-and expanded credit; source/license link success and recoverable failure;
-screen-reader labels; and absent, unsafe or mismatched-credit fallback. No
-native case has yet passed in this continuation. If that runtime is unavailable,
-retain this named gate instead of substituting an unrelated UI or provider pass.
+Finish the required source/CI gate, then exercise the accepted main application's
+cold List/history entry: restart, go straight to a List or Luetut/Katsotut without
+opening discovery, open an Item, return, and repeat in Personal and an authorized
+SharedProfile. Verify canonical metadata/description behavior, error/retry and
+Profile change while a read is delayed. Use isolated application test state for
+synthetic attributed text; real hosted BOOK descriptions remain unapproved.
+The owner already tested the companion; this is the remaining application-level
+[native acceptance matrix](sprints/SPRINT-014.md#native-description-credit-acceptance-matrix),
+not another companion build. Record configured source/build and device identity
+when available, without inventing identities for the earlier owner report.
+Do not dispatch or poll an APK or seed real user/catalog evidence to stand in for
+this gate. This workspace still has no native device/emulator.
 
 After native acceptance, establish exact source/contribution/revision, license,
 intended use and changes for any real text before a new review amendment.
@@ -169,8 +181,9 @@ from Finnish production `FI`, and preserve personalization. Its 18 attempts and
 #182 / MVP-CAT-001..003 / Phase 14.3 remain open for rights, broader BOOK
 descriptions, curated exact mapping, repeatable refresh, normalized feature
 quality and native usefulness. Preserve #229/device/fresh-account gates, the
-six immutable native forwards and rejected D2 challenger admission. No new APK
-dispatch, device test, model admission or unrelated UI work occurred.
+six immutable native forwards and rejected D2 challenger admission. The owner
+companion report is recorded above; no new APK dispatch, hosted operation, model
+admission or unrelated UI work occurs in the canonical detail-entry correction.
 
 ## Accepted D2 development comparison
 

@@ -447,6 +447,13 @@ canonical enrichment replaces the complete Item without altering order or actor/
 Profile state. Remembered Items retain credit; the detail boundary revalidates
 cached text and attribution. Source, revision, credit, license link and changes
 remain visible with a collapsed description and accessible independent links.
+List/history detail routes without a delivered Prediction ID load their exact
+canonical Item through `CatalogDetailEntry` / `catalogDetailLoad` and
+`loadCatalogItems`, instead of depending on a remembered recommendation. Reads
+have a 15-second deadline, retry/back states and discarded late responses after
+scope/client/Item/attempt changes. A successful entry renders only that Item;
+it neither inserts a synthetic Prediction slate nor borrows another slate's
+metadata. Delivered-Prediction routing retains its separate evidence gates.
 Structural/component/bundle tests do not establish native visual/link acceptance.
 `ItemDescription` owns the shared paragraph/collapse/credit rendering boundary.
 The separate `apps/description-acceptance` companion renders it with isolated
