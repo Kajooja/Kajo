@@ -482,6 +482,68 @@ File acquisition is separate; the intake does not download multi-gigabyte dumps
 or infer hashes from publisher names. Preserve its completed private run together
 with the pinned source manifest before later review.
 
+The separate `catalog-book-dump-acquisition.yml` workflow can acquire the fixed
+**2026-08-31** release in GitHub's runtime when the local publisher connection is
+unavailable. This is one explicitly activated catalog request, not a scheduled
+import. It uses only public Work/Edition pairs, downloads no rating histories and
+has no database credentials or writes. The source collector validates publisher
+metadata and complete file checksums while streaming both compressed files;
+only selected raw records are retained in memory. The public request declares
+all byte/row/time caps. In addition to those limits, the job is bounded to
+120 minutes and the requested collector to 110 minutes.
+
+Merge the workflow and collector to main before activation. The sole trigger is
+the exact branch `catalog-acquisition/ol-20260831` adding
+`scripts/catalog/requests/ol-20260831.json`. The runner checks out current main,
+disables persistent Git credentials and accepts only one child commit of that
+exact source, with that request as its sole added file. It validates the request's
+canonical digest, roster, limits and recipient fingerprint before source access.
+Pinned third-party Actions use read-only contents/actions permissions. No
+production credentials, request-branch code or package lifecycle scripts run.
+`run_attempt` must be 1, and any earlier workflow run on that request branch
+consumes the request, including a preflight failure. The workflow has no dispatch,
+automatic retry or reset path. A failure requires reconciling the retained
+accounting and separately reviewing any future request and cumulative budget.
+
+Prepare custody locally, before publishing the request:
+
+```bash
+node scripts/catalog/prepare-dump-acquisition-request.mjs keys --out NEW_PRIVATE_KEY_DIRECTORY
+node scripts/catalog/prepare-dump-acquisition-request.mjs request \
+  --snapshot PRIVATE_TARGET_SNAPSHOT.json --source-head ACCEPTED_CURRENT_MAIN_SHA \
+  --key-dir PRIVATE_KEY_DIRECTORY --out PUBLIC_REQUEST.json
+```
+
+Durably retain the private key and private catalog snapshot before activation.
+The public request contains no Item/source UUIDs, versions, raw text or private
+key. The runner encrypts its result with a random AES-256-GCM key wrapped using
+the recipient's RSA-3072 key and RSA-OAEP-SHA256. Authenticated envelope fields
+bind the exact request, recipient, source, roster and plaintext hash. Only this
+ciphertext is uploaded; no raw selected records reach artifacts or logs. On a
+source failure, the step remains failed and may upload an encrypted failure
+receipt containing actual partial byte/request counts. Preflight failures that
+cannot validate the recipient produce no artifact. Public error messages are
+fixed codes. Ordinary CI uses synthetic streams and never downloads the dumps.
+
+After downloading the single sealed JSON from its artifact, recover locally:
+
+```bash
+node scripts/catalog/prepare-dump-acquisition-request.mjs unseal \
+  --request PUBLIC_REQUEST.json --key-dir PRIVATE_KEY_DIRECTORY \
+  --input open-library-20260831.sealed.json --out NEW_PRIVATE_RESULT_DIRECTORY
+```
+
+Recovery verifies authenticated identities, hashes and complete source/roster
+bindings; tampering or the wrong key fails closed. A failed receipt remains a
+failed result. Encryption authenticates envelope integrity, not the sender:
+retain the verified GitHub run/head/request and downloaded artifact ID/SHA-256
+receipt, and recover only that run's artifact. Anyone holding the public key
+could otherwise produce a different valid encrypted envelope.
+A successful collected result still has zero approvals: bind it
+to a fresh private catalog snapshot and complete source-specific language/rights
+review before designing a separately bounded guarded application. Do not pass
+either result into the completed ten-Item pilot or replay that pilot's batches.
+
 The provider's [Work schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/work.schema.json)
 and [text-block definition](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/shared_definitions.json)
 describe description/text records. The [licensing page](https://openlibrary.org/developers/licensing)
