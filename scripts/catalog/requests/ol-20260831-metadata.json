@@ -1,0 +1,26 @@
+{
+  "contract": "open-library-metadata-diagnostic-request-v1",
+  "purpose": "metadata-only-failure-diagnosis",
+  "release": "2026-08-31",
+  "sourceHead": "d3681fcdfa9a877b0f314159d87208d0ccd0f7f8",
+  "limits": {
+    "metadataBytes": 2097152,
+    "timeoutMs": 30000,
+    "maxRedirects": 0
+  },
+  "recipientPublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA14FHlbX3zrZpdczcZl3N\nG6TRmRDCwoVtw9k00+p+9DRCh+C2YmdZSNENLkT4Q6bnfHFMAItIj2SRhrhXpL23\nEziQbCxF8wIM5WbeDeoczVZULehwW0Hp+1X1vcHAL+opWI6z/pF/BSOtasbHipDY\nay5pm9w+z6vjwnyh7IHXpWniGdkF149Ynad5qXtczgWElV1wY8q6x9lJuws/D7Y7\n8FsTMOWoKxujWGhJ2SyAfvHCg+h1zvW5hJBQ3rDzWatv80xOotUpVF/5lxU7ggMY\nQM9efkvR3JSRH8dJC+ZC1tveMBxVgNQA7alAEltVBr4O+3oMqWgtxQ8zDqHUGSzY\nhSbPJ8R/itnmevv/XCXTyuUnv0KBYa/sZrIGSRnW/2xBIGz562UFEnsnKfOdVeT0\nbvtKvH0OoJhAHxnhFuf4d9/jHaOw8AwVTv6hB8nj3yZIDRaQD3lbmoaOm3V5Drx6\nQKr8y/AQ5nKcRaMNtvPi7y/aOHZJWMLIhQ5vJUuvuw63AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "recipientFingerprint": "8a5fa11d31492a719496d68b0c736426d9fa5fab4ce8e11474943b159997142b",
+  "previousAcquisition": {
+    "runId": "35995362978",
+    "sourceHead": "ec17a0738702074dedecff00e60a2e529939c8fc",
+    "requestHead": "4308943cf0157ec6648017a0bf7a25e5b0876c5a",
+    "requestSha256": "9ac96783138824653f8e23eb9bf47c93ed30b7f7e3db658afd25b348f16b6f50",
+    "artifactId": "10805673376",
+    "artifactZipSha256": "a97aed35be266b0d80c7f29364ee7c693a351e876fa28b418fefb452ba884c2f",
+    "artifactZipBytes": 2429,
+    "sealedArtifactSha256": "38becbaaa21ed5c8746b672bbd68aeb1f56f6e7c7105a3828bead2555a63fa8b",
+    "metadataSha256": "b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b",
+    "metadataBytes": 4248
+  },
+  "requestSha256": "24d82539a439fb156cab3f740beb8d2d23c55e0ca82a7b2d71db259215bed488"
+}
