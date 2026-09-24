@@ -168,8 +168,9 @@ with structured credit, preserving six rights holds and two text exclusions. The
 is accepted through PR #257 / CI #508 and the new catalog-only forward is
 installed with exact function/ACL, history and full-catalog preservation checks.
 The successful owner companion/full-app feedback and completed source review
-advance the default task to the prepared two-entry guarded apply in the existing
-admin runtime, with fresh versions, preimages and readback. Actual real-text
+advance the default task to the prepared two-entry guarded apply in a configured
+admin runtime, with fresh versions, preimages and readback. STATUS records the
+current runtime availability and exact artifact recovery path. Actual real-text
 phone observations follow a successful apply; no write/native result is claimed
 by review preparation. Do not repeat the completed general licensing search or
 the two source matches as the default continuation. Do not redeploy either
@@ -322,8 +323,8 @@ collection navigation; #199 removal of unused grid space and continued loading;
 arrow-only Back to the real origin. UX_PRINCIPLES owns the full contract. Address
 canonical navigation correctness before visual refinements; continuous loading
 depends on #228/#229's accepted server cursor/delivery path. These are deferred
-refinements of existing browse work, not a request to interrupt the current BOOK
-source review or an automatic expansion of MVP gates. Later cast/director
+refinements of existing browse work, not a request to interrupt the current guarded
+BOOK apply or an automatic expansion of MVP gates. Later cast/director
 presentation stays under FUT-CAT-001, outside this immediate UI packet.
 
 ### 17.1 — Launch telemetry and experimentation

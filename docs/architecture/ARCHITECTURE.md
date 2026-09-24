@@ -281,11 +281,11 @@ Research object-feature enrichment is a distinct input path. Admission requires 
 
 ### BOOK description enrichment — guarded contract, #182
 
-The source implements `open-library-description-v1`; hosted rollout is verified.
-The fixed provider preview is reviewed with zero display-approved entries;
-permission/attribution and pilot usefulness remain open. The
-[rollout and review checkpoint](../project/sprints/SPRINT-014.md#book-rollout-and-description-review--2026-09-17--182)
-records that result. The [Sprint 014 pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182)
+The guarded writer supports `open-library-description-v1` and the attributed
+`open-library-description-v2` contract below. Both hosted forwards are installed.
+Source-specific permission review, guarded apply/readback and native usefulness
+are separate gates; [STATUS](../project/STATUS.md) owns the current approvals and
+write state. The [Sprint 014 pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182)
 owns the fixed ten candidates and call budget; the
 [implementation checkpoint](../project/sprints/SPRINT-014.md#book-description-implementation--2026-09-14--182)
 owns executable review/apply/verification steps.
