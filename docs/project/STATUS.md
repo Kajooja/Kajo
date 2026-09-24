@@ -30,6 +30,11 @@ acquisition is blocked before download by Archive.org connection timeouts. The i
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
+The continued September 24 request also selects independent **[#269](https://github.com/Kajooja/Kajo/issues/269)**
+provider-backed BOOK/MOVIE concept mapping and actual catalog coverage. This
+Phase 14.3 audit can proceed while #182 source acquisition is resolved. It does
+not replace the primary dump packet or change serving tags, Memory or scoring.
+
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
 “Kaikki toimii.” This accepts the behavior they exercised. The report also
@@ -222,6 +227,33 @@ six immutable native forwards and rejected D2 challenger admission. The owner
 companion and full-app reports are recorded above. The owner executed the two recorded importer batches. This continuation
 verified their readbacks and completed archive; no APK dispatch, model admission
 or separately queued UI change is included.
+
+## Provider-backed concept audit — #269
+
+The offline `catalog:features` tool projects six shared concept identifiers from
+exact TMDB genre IDs and reviewed Open Library subject labels. It preserves
+provider, source field, evidence kind, registry/projection hashes and row times.
+Missing or unsupported concepts remain `null`; repeated synonyms do not add
+weight. Open Library topics and film genres are different evidence, so a shared
+identifier does not establish transfer reliability or a preference score.
+
+The actual read-only snapshot at **2026-09-24 11:18:16 UTC** covers all **840**
+visible Items: **415 BOOK / 425 MOVIE**, with zero provider identity mismatches.
+At least one of the six supported concepts is present for **244 BOOK / 280 MOVIE**.
+**171 BOOKs** contain a mapped concept in the saved provider subjects that is
+absent from the current matching Item-tag slugs, comprising **231 concept
+assertions**. This observes missing tag representation; it does not by itself
+prove why the omission occurred. All thirty curated-only BOOKs remain without
+supported provider evidence.
+
+The [hash-bound aggregate report](catalog-feature-coverage-2026-09-24.json)
+records coverage and method limits. Complete snapshot and per-Item projections
+stay outside Git. Current `public.items.tags`, bootstrap/native Memory, Shared
+fit and Scenario similarity are unchanged. This supplies inspectable mapping
+and a concrete coverage gap, not a trained or admitted serving model. A later
+explicit rollout must bind versioned features to all consumers and compare
+serving/shadow behavior before changing existing evidence interpretation.
+#182 remains the primary next packet; Phase 14.3 and MVP-ALG-005 stay open.
 
 ## Accepted D2 development comparison
 

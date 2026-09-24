@@ -184,6 +184,15 @@ Do not repeat accepted canary/setup or extend the completed MOVIE budget.
 Repeatable refresh, BOOK descriptions, provider rights/attribution, normalized
 feature quality and native acceptance still keep Phase 14.3 open.
 
+The independently selected #269 offline concept audit now maps exact provider
+fields with versioned lineage and neutral unknowns. On the actual 840-Item
+snapshot, six supported concepts cover 244 BOOKs and 280 MOVIEs; 171 BOOKs have
+mapped provider concepts absent from current matching tag slugs. The aggregate
+report in STATUS records the limited taxonomy and distinct topic/genre evidence.
+Serving tags and scorers remain unchanged. A coordinated versioned rollout and
+parity/evaluation are still required before these projections become prediction
+inputs; this audit alone closes no algorithm or catalog release requirement.
+
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
 ### 14.3A — Portable contracts and external-data research

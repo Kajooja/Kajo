@@ -279,6 +279,57 @@ Requirements before release:
 
 Research object-feature enrichment is a distinct input path. Admission requires validated canonical ID mapping, explicit score/encoder version, coverage, source rights and temporal availability. A public rating dataset does not grant image/metadata rights from every linked provider. Unmapped research objects remain unmapped rather than forcing fuzzy catalog merges.
 
+### Offline shared-concept audit — #269
+
+`scripts/catalog/item-features.mjs` defines `catalog-concepts-v1`: six shared
+concepts (fantasy, horror, mystery, romance, science fiction and thriller), with
+six exact TMDB genre IDs and 28 reviewed Open Library subject labels. Labels
+receive only case/whitespace normalization; the registry never infers from
+descriptions, acquisition buckets, people, places, popularity or current tags.
+The registry cites the provider documentation and subject pages consulted on
+September 24. [TMDB](https://developer.themoviedb.org/reference/genre-movie-list)
+declares genres; [Open Library subjects](https://openlibrary.org/dev/docs/api/subjects)
+are topics and can include books *about* a genre. These assertions retain
+`provider-genre` or `provider-subject` evidence and unknown transfer reliability.
+A positive concept is `1` once per Item, regardless of duplicate/synonymous
+labels; every unasserted or unavailable concept is `null`, never a dislike or
+known absence. Drama/plays, history/documentary and comics/animation are not
+assumed equivalent.
+
+Run `scripts/catalog/catalog-feature-snapshot.sql` read-only, save its result
+outside Git, then run:
+
+```bash
+npm run catalog:features -- --snapshot /private/catalog-snapshot.json --out dist/catalog-features/NEW_RUN
+```
+
+The SQL allowlists only Item identity/tags/times and provider genre/subject
+fields, with exact source-ID/alias checks. The credential-free, network-free
+inspector writes private `features.json` and aggregate `coverage.json` to a new
+directory. The private artifact retains source positions, rules, row times,
+source hashes (including unknown/null), unmatched labels and calculated
+`projectionSha256`; that digest is not a full provider-record hash. The report
+binds input bytes, canonical snapshot/artifact, mapping version/hash and the
+producer source files. `checkedAt` is the observation boundary; neither an old
+provider timestamp nor a current source row proves historical availability.
+Only the aggregate report may be committed.
+
+The [September 24 aggregate](../project/catalog-feature-coverage-2026-09-24.json)
+was reproduced byte-for-byte from the actual 840-Item snapshot. At least one
+supported concept is available for 244/415 BOOKs and 280/425 MOVIEs, with zero
+identity mismatches. Thirty curated-only BOOKs have no supported provider
+projection. On 171 BOOKs, at least one asserted concept has no matching
+source-label slug in the current Item tags (231 concepts across those Items).
+This measures tag omission, without establishing its cause or claiming broad
+feature quality. The remaining 171 BOOKs and 145 MOVIEs lack these six supported
+concepts; they are not classified as negative examples.
+
+This packet supplies inspectable feature candidates and coverage only. It does
+not change `public.items.tags`, native memory/ranking, #229 frozen replay,
+DomainAdapter inputs or trained models. Serving admission still needs bounded
+transfer/reliability, historical feature freezing and comparative quality
+evidence; `MVP-ALG-005` remains open.
+
 ### BOOK description enrichment — guarded contract, #182
 
 The guarded writer supports `open-library-description-v1` and the attributed
