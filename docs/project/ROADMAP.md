@@ -52,14 +52,15 @@ and deployed on catalog-import v12. BOOK guarded preservation/preview source is
 implemented and its catalog-only rollout and ten-Item pilot are complete. The
 initial cached audit retained zero approvals; the September 23 pinned-source
 review now approves two English descriptions for the internal pilot, with six
-rights holds and two text exclusions remaining. No database batch has run. Structured attribution
-is accepted through PR #257 with all five required CI #508 gates, and its exact
-catalog-only forward is installed and verified. The September 23 owner reports
-successful companion and full-application exercises; STATUS records their scope
-and the separately queued Discovery/UI observations. The two approved entries
-now have pinned revisions, permission evidence and fresh baseline/preimages;
-controlled apply in the configured admin runtime is next, before broader
-dump-based enrichment. The six-description usefulness target remains unmet.
+rights holds and two text exclusions remaining. The owner completed the guarded
+apply on September 24: two updates and the verified empty second batch. Structured
+attribution is accepted through PR #257 with all five required CI #508 gates,
+and its exact catalog-only forward is installed and verified. The September 23
+owner reports successful companion and full-application exercises; STATUS records
+their scope and separately queued Discovery/UI observations. A focused observation
+of the two real paragraphs/links remains. The next primary packet is pinned
+exact-ID Work/Edition dump intake; no real dump scan or additional approved text
+is claimed yet. The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -167,17 +168,16 @@ with structured credit, preserving six rights holds and two text exclusions. The
 [structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
 is accepted through PR #257 / CI #508 and the new catalog-only forward is
 installed with exact function/ACL, history and full-catalog preservation checks.
-The successful owner companion/full-app feedback and completed source review
-advance the default task to the prepared two-entry guarded apply in a configured
-admin runtime, with fresh versions, preimages and readback. STATUS records the
-current runtime availability and exact artifact recovery path. Actual real-text
-phone observations follow a successful apply; no write/native result is claimed
-by review preparation. Do not repeat the completed general licensing search or
-the two source matches as the default continuation. Do not redeploy either
-installed description forward or replay the six independent native forwards,
-reset the pilot or expand the API pass to compensate for unapproved text.
-Broader coverage uses pinned Work/Edition dumps; curated books need exact alias
-review before enrichment. STATUS/Issue #182 own source/rollout and execution.
+The owner completed both importer batches on September 24, with two updates,
+full preservation checks and a verified empty second batch. STATUS records the
+completed archive and the remaining focused real-text phone observation. Next,
+implement bounded local pinned Work/Edition dump intake for the existing exact
+BOOK identities, excluding managed descriptions; staging and rights review precede
+a guarded writer bridge. Actual source files are an execution dependency. Curated
+books need exact alias review before enrichment. Do not repeat the completed
+source matches, redeploy either installed description forward or the six native
+forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own
+source/rollout and execution.
 Do not repeat accepted canary/setup or extend the completed MOVIE budget.
 Repeatable refresh, BOOK descriptions, provider rights/attribution, normalized
 feature quality and native acceptance still keep Phase 14.3 open.
@@ -198,6 +198,13 @@ D2’s [actual development report](../../research/reports/movielens-small-d2.md)
 46,410 training rows, fixed temporal/held-out-subject tests, two matching executions
 and rejection of the validation-selected challenger under the frozen rule. This
 completes the bounded experiment; current-head source acceptance is in STATUS.
+
+On September 24 the owner explicitly selected independent **#265** alongside the
+primary catalog packet: correct unsupported latent fallback and run one frozen
+exploratory earliest/recent prefix study on the same authorized D1 cohort. Keep
+original D2 training cutoffs/parameters and historical report immutable; report
+coverage, paired uncertainty and replay. Reused development data does not become
+an untouched final test. No model admission or new-source download is implied.
 
 Exit: reproducible contracts/adapter/report and a documented admit/reject/defer decision. A challenger need not win. No probabilities, counterfactual uplift, group behavior or cross-domain competence may be fabricated from rating-only data. A losing or rights-blocked prior stays out of serving; the transparent baseline remains usable.
 
@@ -323,8 +330,8 @@ collection navigation; #199 removal of unused grid space and continued loading;
 arrow-only Back to the real origin. UX_PRINCIPLES owns the full contract. Address
 canonical navigation correctness before visual refinements; continuous loading
 depends on #228/#229's accepted server cursor/delivery path. These are deferred
-refinements of existing browse work, not a request to interrupt the current guarded
-BOOK apply or an automatic expansion of MVP gates. Later cast/director
+refinements of existing browse work, not a request to interrupt the current bounded
+BOOK enrichment or an automatic expansion of MVP gates. Later cast/director
 presentation stays under FUT-CAT-001, outside this immediate UI packet.
 
 ### 17.1 — Launch telemetry and experimentation
