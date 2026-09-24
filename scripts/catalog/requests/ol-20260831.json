@@ -1,0 +1,1553 @@
+{
+  "contract": "open-library-dump-acquisition-request-v1",
+  "release": "2026-08-31",
+  "sourceHead": "ec17a0738702074dedecff00e60a2e529939c8fc",
+  "roster": [
+    {
+      "workId": "OL100672W",
+      "editionId": "OL39806707M"
+    },
+    {
+      "workId": "OL10263W",
+      "editionId": "OL22007893M"
+    },
+    {
+      "workId": "OL102749W",
+      "editionId": "OL37044701M"
+    },
+    {
+      "workId": "OL103134W",
+      "editionId": "OL57076114M"
+    },
+    {
+      "workId": "OL103194W",
+      "editionId": "OL53722322M"
+    },
+    {
+      "workId": "OL10432709W",
+      "editionId": "OL21257816M"
+    },
+    {
+      "workId": "OL1052133W",
+      "editionId": "OL31390125M"
+    },
+    {
+      "workId": "OL1063267W",
+      "editionId": "OL58718718M"
+    },
+    {
+      "workId": "OL1063588W",
+      "editionId": "OL17151006M"
+    },
+    {
+      "workId": "OL1067314W",
+      "editionId": "OL26433013M"
+    },
+    {
+      "workId": "OL10834W",
+      "editionId": "OL24833372M"
+    },
+    {
+      "workId": "OL1089297W",
+      "editionId": "OL7035430M"
+    },
+    {
+      "workId": "OL1099280W",
+      "editionId": "OL6682530M"
+    },
+    {
+      "workId": "OL1099513W",
+      "editionId": "OL37044653M"
+    },
+    {
+      "workId": "OL1100007W",
+      "editionId": "OL37044494M"
+    },
+    {
+      "workId": "OL114967W",
+      "editionId": "OL39804701M"
+    },
+    {
+      "workId": "OL1161171W",
+      "editionId": "OL24946191M"
+    },
+    {
+      "workId": "OL116250W",
+      "editionId": "OL29261000M"
+    },
+    {
+      "workId": "OL118388W",
+      "editionId": "OL58837491M"
+    },
+    {
+      "workId": "OL1184991W",
+      "editionId": "OL43218940M"
+    },
+    {
+      "workId": "OL11999891W",
+      "editionId": "OL28252045M"
+    },
+    {
+      "workId": "OL1230601W",
+      "editionId": "OL38211806M"
+    },
+    {
+      "workId": "OL1230613W",
+      "editionId": "OL50985609M"
+    },
+    {
+      "workId": "OL1230631W",
+      "editionId": "OL49668278M"
+    },
+    {
+      "workId": "OL1230715W",
+      "editionId": "OL16834953M"
+    },
+    {
+      "workId": "OL1268413W",
+      "editionId": "OL58936271M"
+    },
+    {
+      "workId": "OL1317211W",
+      "editionId": "OL37044614M"
+    },
+    {
+      "workId": "OL137872W",
+      "editionId": "OL7265204M"
+    },
+    {
+      "workId": "OL138052W",
+      "editionId": "OL45637056M"
+    },
+    {
+      "workId": "OL1418187W",
+      "editionId": "OL37044782M"
+    },
+    {
+      "workId": "OL145191W",
+      "editionId": "OL10930731M"
+    },
+    {
+      "workId": "OL14856842W",
+      "editionId": "OL24701367M"
+    },
+    {
+      "workId": "OL14873315W",
+      "editionId": "OL35698542M"
+    },
+    {
+      "workId": "OL14908941W",
+      "editionId": "OL24383587M"
+    },
+    {
+      "workId": "OL149210W",
+      "editionId": "OL43203811M"
+    },
+    {
+      "workId": "OL14942956W",
+      "editionId": "OL32096760M"
+    },
+    {
+      "workId": "OL15104144W",
+      "editionId": "OL32975663M"
+    },
+    {
+      "workId": "OL151406W",
+      "editionId": "OL38582653M"
+    },
+    {
+      "workId": "OL151411W",
+      "editionId": "OL50375394M"
+    },
+    {
+      "workId": "OL15168588W",
+      "editionId": "OL29132156M"
+    },
+    {
+      "workId": "OL152161W",
+      "editionId": "OL51733622M"
+    },
+    {
+      "workId": "OL15374110W",
+      "editionId": "OL24524516M"
+    },
+    {
+      "workId": "OL15401200W",
+      "editionId": "OL26832077M"
+    },
+    {
+      "workId": "OL1548597W",
+      "editionId": "OL19862767M"
+    },
+    {
+      "workId": "OL15692719W",
+      "editionId": "OL6533349M"
+    },
+    {
+      "workId": "OL15719630W",
+      "editionId": "OL26223598M"
+    },
+    {
+      "workId": "OL1593567W",
+      "editionId": "OL50520131M"
+    },
+    {
+      "workId": "OL15936512W",
+      "editionId": "OL27257671M"
+    },
+    {
+      "workId": "OL15992072W",
+      "editionId": "OL36689110M"
+    },
+    {
+      "workId": "OL16014245W",
+      "editionId": "OL27350901M"
+    },
+    {
+      "workId": "OL16015154W",
+      "editionId": "OL36692670M"
+    },
+    {
+      "workId": "OL16142094W",
+      "editionId": "OL32814136M"
+    },
+    {
+      "workId": "OL16151508W",
+      "editionId": "OL25686336M"
+    },
+    {
+      "workId": "OL16333W",
+      "editionId": "OL51000106M"
+    },
+    {
+      "workId": "OL16336633W",
+      "editionId": "OL61147291M"
+    },
+    {
+      "workId": "OL16444438W",
+      "editionId": "OL25607762M"
+    },
+    {
+      "workId": "OL16509148W",
+      "editionId": "OL30528808M"
+    },
+    {
+      "workId": "OL16550681W",
+      "editionId": "OL32281715M"
+    },
+    {
+      "workId": "OL16607146W",
+      "editionId": "OL35606216M"
+    },
+    {
+      "workId": "OL166894W",
+      "editionId": "OL16835710M"
+    },
+    {
+      "workId": "OL166925W",
+      "editionId": "OL21257815M"
+    },
+    {
+      "workId": "OL167178W",
+      "editionId": "OL46761508M"
+    },
+    {
+      "workId": "OL1673205W",
+      "editionId": "OL48593945M"
+    },
+    {
+      "workId": "OL16820059W",
+      "editionId": "OL34008811M"
+    },
+    {
+      "workId": "OL16821606W",
+      "editionId": "OL50521984M"
+    },
+    {
+      "workId": "OL17075811W",
+      "editionId": "OL27700871M"
+    },
+    {
+      "workId": "OL17091839W",
+      "editionId": "OL32815550M"
+    },
+    {
+      "workId": "OL17203233W",
+      "editionId": "OL25775024M"
+    },
+    {
+      "workId": "OL17267881W",
+      "editionId": "OL25840917M"
+    },
+    {
+      "workId": "OL17268007W",
+      "editionId": "OL28237427M"
+    },
+    {
+      "workId": "OL17332479W",
+      "editionId": "OL32178549M"
+    },
+    {
+      "workId": "OL17352669W",
+      "editionId": "OL29858947M"
+    },
+    {
+      "workId": "OL17356252W",
+      "editionId": "OL32830998M"
+    },
+    {
+      "workId": "OL17356883W",
+      "editionId": "OL49207728M"
+    },
+    {
+      "workId": "OL17358795W",
+      "editionId": "OL27222609M"
+    },
+    {
+      "workId": "OL17590212W",
+      "editionId": "OL27351482M"
+    },
+    {
+      "workId": "OL176092W",
+      "editionId": "OL47779234M"
+    },
+    {
+      "workId": "OL17714701W",
+      "editionId": "OL46865767M"
+    },
+    {
+      "workId": "OL17732W",
+      "editionId": "OL6312713M"
+    },
+    {
+      "workId": "OL17793648W",
+      "editionId": "OL26382974M"
+    },
+    {
+      "workId": "OL17797857W",
+      "editionId": "OL35407796M"
+    },
+    {
+      "workId": "OL17837119W",
+      "editionId": "OL27371038M"
+    },
+    {
+      "workId": "OL17850410W",
+      "editionId": "OL48258839M"
+    },
+    {
+      "workId": "OL17860744W",
+      "editionId": "OL32856480M"
+    },
+    {
+      "workId": "OL17864836W",
+      "editionId": "OL29762592M"
+    },
+    {
+      "workId": "OL17930368W",
+      "editionId": "OL27918581M"
+    },
+    {
+      "workId": "OL1793164W",
+      "editionId": "OL55686771M"
+    },
+    {
+      "workId": "OL18020194W",
+      "editionId": "OL27213498M"
+    },
+    {
+      "workId": "OL18108064W",
+      "editionId": "OL28024418M"
+    },
+    {
+      "workId": "OL18147687W",
+      "editionId": "OL27158788M"
+    },
+    {
+      "workId": "OL18203673W",
+      "editionId": "OL26680836M"
+    },
+    {
+      "workId": "OL1822313W",
+      "editionId": "OL45966982M"
+    },
+    {
+      "workId": "OL18417W",
+      "editionId": "OL6477875M"
+    },
+    {
+      "workId": "OL1846074W",
+      "editionId": "OL2058072M"
+    },
+    {
+      "workId": "OL1846076W",
+      "editionId": "OL57945037M"
+    },
+    {
+      "workId": "OL1864135W",
+      "editionId": "OL25628639M"
+    },
+    {
+      "workId": "OL1865528W",
+      "editionId": "OL37937797M"
+    },
+    {
+      "workId": "OL1879162W",
+      "editionId": "OL2409159M"
+    },
+    {
+      "workId": "OL18819818W",
+      "editionId": "OL26706016M"
+    },
+    {
+      "workId": "OL1892617W",
+      "editionId": "OL39218444M"
+    },
+    {
+      "workId": "OL1898309W",
+      "editionId": "OL7464598M"
+    },
+    {
+      "workId": "OL1906484W",
+      "editionId": "OL26211555M"
+    },
+    {
+      "workId": "OL19096402W",
+      "editionId": "OL59645497M"
+    },
+    {
+      "workId": "OL1914022W",
+      "editionId": "OL35879278M"
+    },
+    {
+      "workId": "OL1966485W",
+      "editionId": "OL32102238M"
+    },
+    {
+      "workId": "OL19667762W",
+      "editionId": "OL26886358M"
+    },
+    {
+      "workId": "OL1968364W",
+      "editionId": "OL8631770M"
+    },
+    {
+      "workId": "OL19744000W",
+      "editionId": "OL26957069M"
+    },
+    {
+      "workId": "OL19761410W",
+      "editionId": "OL26974419M"
+    },
+    {
+      "workId": "OL1992198W",
+      "editionId": "OL58878743M"
+    },
+    {
+      "workId": "OL20019347W",
+      "editionId": "OL61427352M"
+    },
+    {
+      "workId": "OL2003465W",
+      "editionId": "OL30135388M"
+    },
+    {
+      "workId": "OL20068530W",
+      "editionId": "OL39128605M"
+    },
+    {
+      "workId": "OL20090688W",
+      "editionId": "OL27632309M"
+    },
+    {
+      "workId": "OL20150260W",
+      "editionId": "OL43133062M"
+    },
+    {
+      "workId": "OL20234863W",
+      "editionId": "OL27459480M"
+    },
+    {
+      "workId": "OL20577143W",
+      "editionId": "OL29191495M"
+    },
+    {
+      "workId": "OL20600W",
+      "editionId": "OL26264931M"
+    },
+    {
+      "workId": "OL20646061W",
+      "editionId": "OL60608485M"
+    },
+    {
+      "workId": "OL20808172W",
+      "editionId": "OL28169596M"
+    },
+    {
+      "workId": "OL21025633W",
+      "editionId": "OL46541738M"
+    },
+    {
+      "workId": "OL21084352W",
+      "editionId": "OL29471184M"
+    },
+    {
+      "workId": "OL21237606W",
+      "editionId": "OL30193052M"
+    },
+    {
+      "workId": "OL2163649W",
+      "editionId": "OL32838419M"
+    },
+    {
+      "workId": "OL21640039W",
+      "editionId": "OL51726888M"
+    },
+    {
+      "workId": "OL2172356W",
+      "editionId": "OL18919966M"
+    },
+    {
+      "workId": "OL2234917W",
+      "editionId": "OL37044499M"
+    },
+    {
+      "workId": "OL228702W",
+      "editionId": "OL24737293M"
+    },
+    {
+      "workId": "OL23166W",
+      "editionId": "OL49203562M"
+    },
+    {
+      "workId": "OL23204W",
+      "editionId": "OL60991559M"
+    },
+    {
+      "workId": "OL23205W",
+      "editionId": "OL45620413M"
+    },
+    {
+      "workId": "OL23481W",
+      "editionId": "OL33891575M"
+    },
+    {
+      "workId": "OL23535656W",
+      "editionId": "OL46772463M"
+    },
+    {
+      "workId": "OL23746568W",
+      "editionId": "OL31489498M"
+    },
+    {
+      "workId": "OL239940W",
+      "editionId": "OL40217931M"
+    },
+    {
+      "workId": "OL24034W",
+      "editionId": "OL38627923M"
+    },
+    {
+      "workId": "OL24156W",
+      "editionId": "OL37044555M"
+    },
+    {
+      "workId": "OL24178205W",
+      "editionId": "OL36010073M"
+    },
+    {
+      "workId": "OL24390422W",
+      "editionId": "OL37985553M"
+    },
+    {
+      "workId": "OL244537W",
+      "editionId": "OL7101974M"
+    },
+    {
+      "workId": "OL24477958W",
+      "editionId": "OL7657915M"
+    },
+    {
+      "workId": "OL24542623W",
+      "editionId": "OL36102626M"
+    },
+    {
+      "workId": "OL24656586W",
+      "editionId": "OL26204741M"
+    },
+    {
+      "workId": "OL25312237W",
+      "editionId": "OL33899062M"
+    },
+    {
+      "workId": "OL25515697W",
+      "editionId": "OL35082870M"
+    },
+    {
+      "workId": "OL257943W",
+      "editionId": "OL58636603M"
+    },
+    {
+      "workId": "OL258758W",
+      "editionId": "OL32244199M"
+    },
+    {
+      "workId": "OL258850W",
+      "editionId": "OL32183670M"
+    },
+    {
+      "workId": "OL258902W",
+      "editionId": "OL32183720M"
+    },
+    {
+      "workId": "OL259010W",
+      "editionId": "OL33223754M"
+    },
+    {
+      "workId": "OL259026W",
+      "editionId": "OL32183706M"
+    },
+    {
+      "workId": "OL261794W",
+      "editionId": "OL27284158M"
+    },
+    {
+      "workId": "OL262421W",
+      "editionId": "OL47078012M"
+    },
+    {
+      "workId": "OL262438W",
+      "editionId": "OL46850025M"
+    },
+    {
+      "workId": "OL262452W",
+      "editionId": "OL47077035M"
+    },
+    {
+      "workId": "OL262454W",
+      "editionId": "OL46849620M"
+    },
+    {
+      "workId": "OL262460W",
+      "editionId": "OL47306378M"
+    },
+    {
+      "workId": "OL262496W",
+      "editionId": "OL46850026M"
+    },
+    {
+      "workId": "OL262554W",
+      "editionId": "OL43306242M"
+    },
+    {
+      "workId": "OL2629977W",
+      "editionId": "OL24362766M"
+    },
+    {
+      "workId": "OL263458W",
+      "editionId": "OL378529M"
+    },
+    {
+      "workId": "OL26492W",
+      "editionId": "OL6565760M"
+    },
+    {
+      "workId": "OL265426W",
+      "editionId": "OL32768394M"
+    },
+    {
+      "workId": "OL266178W",
+      "editionId": "OL21258296M"
+    },
+    {
+      "workId": "OL267096W",
+      "editionId": "OL55069982M"
+    },
+    {
+      "workId": "OL267171W",
+      "editionId": "OL37863121M"
+    },
+    {
+      "workId": "OL267933W",
+      "editionId": "OL16840368M"
+    },
+    {
+      "workId": "OL2718328W",
+      "editionId": "OL31834793M"
+    },
+    {
+      "workId": "OL27203W",
+      "editionId": "OL12112215M"
+    },
+    {
+      "workId": "OL27245843W",
+      "editionId": "OL38429115M"
+    },
+    {
+      "workId": "OL27310398W",
+      "editionId": "OL46776502M"
+    },
+    {
+      "workId": "OL273184W",
+      "editionId": "OL58881816M"
+    },
+    {
+      "workId": "OL273644W",
+      "editionId": "OL54209038M"
+    },
+    {
+      "workId": "OL27448W",
+      "editionId": "OL24335283M"
+    },
+    {
+      "workId": "OL274505W",
+      "editionId": "OL33021517M"
+    },
+    {
+      "workId": "OL274518W",
+      "editionId": "OL25954563M"
+    },
+    {
+      "workId": "OL27495W",
+      "editionId": "OL58627158M"
+    },
+    {
+      "workId": "OL276386W",
+      "editionId": "OL25261892M"
+    },
+    {
+      "workId": "OL276798W",
+      "editionId": "OL20021159M"
+    },
+    {
+      "workId": "OL2772007W",
+      "editionId": "OL37937735M"
+    },
+    {
+      "workId": "OL27729743W",
+      "editionId": "OL57519600M"
+    },
+    {
+      "workId": "OL27733867W",
+      "editionId": "OL49140417M"
+    },
+    {
+      "workId": "OL27778127W",
+      "editionId": "OL8580015M"
+    },
+    {
+      "workId": "OL278022W",
+      "editionId": "OL33127633M"
+    },
+    {
+      "workId": "OL27818823W",
+      "editionId": "OL38446297M"
+    },
+    {
+      "workId": "OL28319W",
+      "editionId": "OL32760677M"
+    },
+    {
+      "workId": "OL28353073W",
+      "editionId": "OL25444042M"
+    },
+    {
+      "workId": "OL28570037W",
+      "editionId": "OL7001197M"
+    },
+    {
+      "workId": "OL28952677W",
+      "editionId": "OL46070146M"
+    },
+    {
+      "workId": "OL2895536W",
+      "editionId": "OL37819235M"
+    },
+    {
+      "workId": "OL28988W",
+      "editionId": "OL52329495M"
+    },
+    {
+      "workId": "OL29226517W",
+      "editionId": "OL53388405M"
+    },
+    {
+      "workId": "OL2950942W",
+      "editionId": "OL21569627M"
+    },
+    {
+      "workId": "OL2965102W",
+      "editionId": "OL27609627M"
+    },
+    {
+      "workId": "OL29983W",
+      "editionId": "OL47803988M"
+    },
+    {
+      "workId": "OL3171087W",
+      "editionId": "OL21142070M"
+    },
+    {
+      "workId": "OL32466W",
+      "editionId": "OL42890793M"
+    },
+    {
+      "workId": "OL3261155W",
+      "editionId": "OL32090513M"
+    },
+    {
+      "workId": "OL3295030W",
+      "editionId": "OL17969527M"
+    },
+    {
+      "workId": "OL3388961W",
+      "editionId": "OL57631274M"
+    },
+    {
+      "workId": "OL35351151W",
+      "editionId": "OL47766650M"
+    },
+    {
+      "workId": "OL362699W",
+      "editionId": "OL32244208M"
+    },
+    {
+      "workId": "OL362702W",
+      "editionId": "OL32183351M"
+    },
+    {
+      "workId": "OL36287W",
+      "editionId": "OL50534173M"
+    },
+    {
+      "workId": "OL36861W",
+      "editionId": "OL50534154M"
+    },
+    {
+      "workId": "OL381550W",
+      "editionId": "OL7038266M"
+    },
+    {
+      "workId": "OL38663W",
+      "editionId": "OL62086492M"
+    },
+    {
+      "workId": "OL3902892W",
+      "editionId": "OL3179378M"
+    },
+    {
+      "workId": "OL3923952W",
+      "editionId": "OL44944392M"
+    },
+    {
+      "workId": "OL39349W",
+      "editionId": "OL39156452M"
+    },
+    {
+      "workId": "OL39360W",
+      "editionId": "OL57296714M"
+    },
+    {
+      "workId": "OL39379W",
+      "editionId": "OL58393454M"
+    },
+    {
+      "workId": "OL3946622W",
+      "editionId": "OL28804104M"
+    },
+    {
+      "workId": "OL41059W",
+      "editionId": "OL33016994M"
+    },
+    {
+      "workId": "OL41078W",
+      "editionId": "OL33133952M"
+    },
+    {
+      "workId": "OL41495W",
+      "editionId": "OL37797986M"
+    },
+    {
+      "workId": "OL43024W",
+      "editionId": "OL6614479M"
+    },
+    {
+      "workId": "OL450063W",
+      "editionId": "OL37044608M"
+    },
+    {
+      "workId": "OL45089W",
+      "editionId": "OL61216082M"
+    },
+    {
+      "workId": "OL45499W",
+      "editionId": "OL37044633M"
+    },
+    {
+      "workId": "OL455305W",
+      "editionId": "OL49222446M"
+    },
+    {
+      "workId": "OL45790W",
+      "editionId": "OL28338839M"
+    },
+    {
+      "workId": "OL45809W",
+      "editionId": "OL39486924M"
+    },
+    {
+      "workId": "OL45885W",
+      "editionId": "OL58678256M"
+    },
+    {
+      "workId": "OL45886W",
+      "editionId": "OL23270375M"
+    },
+    {
+      "workId": "OL462007W",
+      "editionId": "OL37044694M"
+    },
+    {
+      "workId": "OL46241W",
+      "editionId": "OL49819475M"
+    },
+    {
+      "workId": "OL465360W",
+      "editionId": "OL7824010M"
+    },
+    {
+      "workId": "OL46881W",
+      "editionId": "OL18336594M"
+    },
+    {
+      "workId": "OL471500W",
+      "editionId": "OL26336963M"
+    },
+    {
+      "workId": "OL471509W",
+      "editionId": "OL58537989M"
+    },
+    {
+      "workId": "OL471565W",
+      "editionId": "OL16835133M"
+    },
+    {
+      "workId": "OL471576W",
+      "editionId": "OL50528186M"
+    },
+    {
+      "workId": "OL471603W",
+      "editionId": "OL51733472M"
+    },
+    {
+      "workId": "OL471610W",
+      "editionId": "OL39223296M"
+    },
+    {
+      "workId": "OL471724W",
+      "editionId": "OL14873719M"
+    },
+    {
+      "workId": "OL471789W",
+      "editionId": "OL37044871M"
+    },
+    {
+      "workId": "OL471841W",
+      "editionId": "OL49376720M"
+    },
+    {
+      "workId": "OL471895W",
+      "editionId": "OL51167583M"
+    },
+    {
+      "workId": "OL471932W",
+      "editionId": "OL58633852M"
+    },
+    {
+      "workId": "OL471940W",
+      "editionId": "OL58989621M"
+    },
+    {
+      "workId": "OL471947W",
+      "editionId": "OL58597951M"
+    },
+    {
+      "workId": "OL472049W",
+      "editionId": "OL58621648M"
+    },
+    {
+      "workId": "OL472073W",
+      "editionId": "OL40281030M"
+    },
+    {
+      "workId": "OL472165W",
+      "editionId": "OL26379432M"
+    },
+    {
+      "workId": "OL472549W",
+      "editionId": "OL50517844M"
+    },
+    {
+      "workId": "OL472715W",
+      "editionId": "OL47232302M"
+    },
+    {
+      "workId": "OL483391W",
+      "editionId": "OL42874973M"
+    },
+    {
+      "workId": "OL492640W",
+      "editionId": "OL37026241M"
+    },
+    {
+      "workId": "OL492642W",
+      "editionId": "OL28321439M"
+    },
+    {
+      "workId": "OL492646W",
+      "editionId": "OL27312894M"
+    },
+    {
+      "workId": "OL492647W",
+      "editionId": "OL27280673M"
+    },
+    {
+      "workId": "OL492658W",
+      "editionId": "OL27284483M"
+    },
+    {
+      "workId": "OL49488W",
+      "editionId": "OL43190630M"
+    },
+    {
+      "workId": "OL498463W",
+      "editionId": "OL14873788M"
+    },
+    {
+      "workId": "OL503666W",
+      "editionId": "OL7015993M"
+    },
+    {
+      "workId": "OL50548W",
+      "editionId": "OL58886319M"
+    },
+    {
+      "workId": "OL515754W",
+      "editionId": "OL22596614M"
+    },
+    {
+      "workId": "OL51815W",
+      "editionId": "OL7231838M"
+    },
+    {
+      "workId": "OL51831W",
+      "editionId": "OL7004561M"
+    },
+    {
+      "workId": "OL51948W",
+      "editionId": "OL25098059M"
+    },
+    {
+      "workId": "OL52114W",
+      "editionId": "OL33225306M"
+    },
+    {
+      "workId": "OL52266W",
+      "editionId": "OL37044712M"
+    },
+    {
+      "workId": "OL52267W",
+      "editionId": "OL37044446M"
+    },
+    {
+      "workId": "OL528094W",
+      "editionId": "OL26034797M"
+    },
+    {
+      "workId": "OL531767W",
+      "editionId": "OL24183407M"
+    },
+    {
+      "workId": "OL53908W",
+      "editionId": "OL26483419M"
+    },
+    {
+      "workId": "OL53919W",
+      "editionId": "OL31959376M"
+    },
+    {
+      "workId": "OL53994W",
+      "editionId": "OL31959489M"
+    },
+    {
+      "workId": "OL55649W",
+      "editionId": "OL26429580M"
+    },
+    {
+      "workId": "OL55806W",
+      "editionId": "OL27948099M"
+    },
+    {
+      "workId": "OL5682519W",
+      "editionId": "OL46896776M"
+    },
+    {
+      "workId": "OL5720022W",
+      "editionId": "OL50551445M"
+    },
+    {
+      "workId": "OL5720023W",
+      "editionId": "OL24644542M"
+    },
+    {
+      "workId": "OL5720025W",
+      "editionId": "OL61346164M"
+    },
+    {
+      "workId": "OL5720027W",
+      "editionId": "OL47007177M"
+    },
+    {
+      "workId": "OL5735363W",
+      "editionId": "OL46874697M"
+    },
+    {
+      "workId": "OL5749847W",
+      "editionId": "OL44158485M"
+    },
+    {
+      "workId": "OL5749849W",
+      "editionId": "OL58601251M"
+    },
+    {
+      "workId": "OL5781992W",
+      "editionId": "OL57895812M"
+    },
+    {
+      "workId": "OL5782000W",
+      "editionId": "OL35490297M"
+    },
+    {
+      "workId": "OL5784622W",
+      "editionId": "OL58852921M"
+    },
+    {
+      "workId": "OL5819456W",
+      "editionId": "OL32840838M"
+    },
+    {
+      "workId": "OL5819895W",
+      "editionId": "OL27058111M"
+    },
+    {
+      "workId": "OL5819962W",
+      "editionId": "OL25303268M"
+    },
+    {
+      "workId": "OL5840870W",
+      "editionId": "OL29608949M"
+    },
+    {
+      "workId": "OL59448W",
+      "editionId": "OL1865466M"
+    },
+    {
+      "workId": "OL5969057W",
+      "editionId": "OL24953189M"
+    },
+    {
+      "workId": "OL59798W",
+      "editionId": "OL5613890M"
+    },
+    {
+      "workId": "OL6027236W",
+      "editionId": "OL26130544M"
+    },
+    {
+      "workId": "OL617847W",
+      "editionId": "OL46947677M"
+    },
+    {
+      "workId": "OL61982W",
+      "editionId": "OL38579896M"
+    },
+    {
+      "workId": "OL62073W",
+      "editionId": "OL58725900M"
+    },
+    {
+      "workId": "OL62979W",
+      "editionId": "OL42894499M"
+    },
+    {
+      "workId": "OL63009W",
+      "editionId": "OL45608458M"
+    },
+    {
+      "workId": "OL63073W",
+      "editionId": "OL25477622M"
+    },
+    {
+      "workId": "OL65430W",
+      "editionId": "OL39491447M"
+    },
+    {
+      "workId": "OL66513W",
+      "editionId": "OL50293425M"
+    },
+    {
+      "workId": "OL66534W",
+      "editionId": "OL51733520M"
+    },
+    {
+      "workId": "OL66544W",
+      "editionId": "OL51681372M"
+    },
+    {
+      "workId": "OL66562W",
+      "editionId": "OL47010286M"
+    },
+    {
+      "workId": "OL676009W",
+      "editionId": "OL49640659M"
+    },
+    {
+      "workId": "OL679348W",
+      "editionId": "OL24367587M"
+    },
+    {
+      "workId": "OL679358W",
+      "editionId": "OL32805601M"
+    },
+    {
+      "workId": "OL69612W",
+      "editionId": "OL57630364M"
+    },
+    {
+      "workId": "OL69630W",
+      "editionId": "OL51733815M"
+    },
+    {
+      "workId": "OL71037W",
+      "editionId": "OL48594700M"
+    },
+    {
+      "workId": "OL716850W",
+      "editionId": "OL4097086M"
+    },
+    {
+      "workId": "OL72352W",
+      "editionId": "OL42944504M"
+    },
+    {
+      "workId": "OL731663W",
+      "editionId": "OL32100180M"
+    },
+    {
+      "workId": "OL731737W",
+      "editionId": "OL58560626M"
+    },
+    {
+      "workId": "OL74128W",
+      "editionId": "OL49829494M"
+    },
+    {
+      "workId": "OL74504W",
+      "editionId": "OL32941311M"
+    },
+    {
+      "workId": "OL76487W",
+      "editionId": "OL37044730M"
+    },
+    {
+      "workId": "OL767941W",
+      "editionId": "OL28434444M"
+    },
+    {
+      "workId": "OL76833W",
+      "editionId": "OL40260593M"
+    },
+    {
+      "workId": "OL76837W",
+      "editionId": "OL35696920M"
+    },
+    {
+      "workId": "OL76972W",
+      "editionId": "OL15574143M"
+    },
+    {
+      "workId": "OL77746W",
+      "editionId": "OL52191215M"
+    },
+    {
+      "workId": "OL7924103W",
+      "editionId": "OL24934473M"
+    },
+    {
+      "workId": "OL80763W",
+      "editionId": "OL35667337M"
+    },
+    {
+      "workId": "OL81584W",
+      "editionId": "OL8457402M"
+    },
+    {
+      "workId": "OL81589W",
+      "editionId": "OL43436728M"
+    },
+    {
+      "workId": "OL81591W",
+      "editionId": "OL7572129M"
+    },
+    {
+      "workId": "OL81597W",
+      "editionId": "OL8457077M"
+    },
+    {
+      "workId": "OL81602W",
+      "editionId": "OL7777829M"
+    },
+    {
+      "workId": "OL81603W",
+      "editionId": "OL35666822M"
+    },
+    {
+      "workId": "OL81605W",
+      "editionId": "OL7777738M"
+    },
+    {
+      "workId": "OL81606W",
+      "editionId": "OL7573136M"
+    },
+    {
+      "workId": "OL81607W",
+      "editionId": "OL17444573M"
+    },
+    {
+      "workId": "OL81608W",
+      "editionId": "OL7572724M"
+    },
+    {
+      "workId": "OL81610W",
+      "editionId": "OL8136423M"
+    },
+    {
+      "workId": "OL81613W",
+      "editionId": "OL7572658M"
+    },
+    {
+      "workId": "OL81614W",
+      "editionId": "OL43478637M"
+    },
+    {
+      "workId": "OL81617W",
+      "editionId": "OL7573371M"
+    },
+    {
+      "workId": "OL81618W",
+      "editionId": "OL58142869M"
+    },
+    {
+      "workId": "OL81619W",
+      "editionId": "OL22316379M"
+    },
+    {
+      "workId": "OL81621W",
+      "editionId": "OL7573654M"
+    },
+    {
+      "workId": "OL81623W",
+      "editionId": "OL7572267M"
+    },
+    {
+      "workId": "OL81624W",
+      "editionId": "OL53271630M"
+    },
+    {
+      "workId": "OL81626W",
+      "editionId": "OL35297182M"
+    },
+    {
+      "workId": "OL81627W",
+      "editionId": "OL7571967M"
+    },
+    {
+      "workId": "OL81628W",
+      "editionId": "OL7572728M"
+    },
+    {
+      "workId": "OL81629W",
+      "editionId": "OL53223768M"
+    },
+    {
+      "workId": "OL81630W",
+      "editionId": "OL27281791M"
+    },
+    {
+      "workId": "OL81631W",
+      "editionId": "OL7572262M"
+    },
+    {
+      "workId": "OL81633W",
+      "editionId": "OL10631997M"
+    },
+    {
+      "workId": "OL81634W",
+      "editionId": "OL45621643M"
+    },
+    {
+      "workId": "OL8193387W",
+      "editionId": "OL37044810M"
+    },
+    {
+      "workId": "OL8193416W",
+      "editionId": "OL56088272M"
+    },
+    {
+      "workId": "OL8193465W",
+      "editionId": "OL44517712M"
+    },
+    {
+      "workId": "OL8193478W",
+      "editionId": "OL53728237M"
+    },
+    {
+      "workId": "OL82536W",
+      "editionId": "OL59004673M"
+    },
+    {
+      "workId": "OL82537W",
+      "editionId": "OL59041259M"
+    },
+    {
+      "workId": "OL82548W",
+      "editionId": "OL23247162M"
+    },
+    {
+      "workId": "OL82560W",
+      "editionId": "OL61057758M"
+    },
+    {
+      "workId": "OL82563W",
+      "editionId": "OL59004869M"
+    },
+    {
+      "workId": "OL82565W",
+      "editionId": "OL59004684M"
+    },
+    {
+      "workId": "OL82586W",
+      "editionId": "OL61068190M"
+    },
+    {
+      "workId": "OL827357W",
+      "editionId": "OL22961483M"
+    },
+    {
+      "workId": "OL8273964W",
+      "editionId": "OL37937749M"
+    },
+    {
+      "workId": "OL8479867W",
+      "editionId": "OL35447857M"
+    },
+    {
+      "workId": "OL8483260W",
+      "editionId": "OL36660032M"
+    },
+    {
+      "workId": "OL85892W",
+      "editionId": "OL37044817M"
+    },
+    {
+      "workId": "OL86318W",
+      "editionId": "OL51746364M"
+    },
+    {
+      "workId": "OL8662242W",
+      "editionId": "OL24349255M"
+    },
+    {
+      "workId": "OL8721462W",
+      "editionId": "OL13535641M"
+    },
+    {
+      "workId": "OL872932W",
+      "editionId": "OL39469409M"
+    },
+    {
+      "workId": "OL875437W",
+      "editionId": "OL60959007M"
+    },
+    {
+      "workId": "OL891786W",
+      "editionId": "OL50378632M"
+    },
+    {
+      "workId": "OL893461W",
+      "editionId": "OL24669863M"
+    },
+    {
+      "workId": "OL893707W",
+      "editionId": "OL40236288M"
+    },
+    {
+      "workId": "OL9170454W",
+      "editionId": "OL26586394M"
+    },
+    {
+      "workId": "OL922430W",
+      "editionId": "OL59047926M"
+    },
+    {
+      "workId": "OL9264548W",
+      "editionId": "OL61126554M"
+    },
+    {
+      "workId": "OL927199W",
+      "editionId": "OL7817572M"
+    },
+    {
+      "workId": "OL93082W",
+      "editionId": "OL25578325M"
+    },
+    {
+      "workId": "OL98130W",
+      "editionId": "OL7033415M"
+    },
+    {
+      "workId": "OL98174W",
+      "editionId": "OL27923566M"
+    },
+    {
+      "workId": "OL98459W",
+      "editionId": "OL9817111M"
+    },
+    {
+      "workId": "OL98491W",
+      "editionId": "OL32060276M"
+    },
+    {
+      "workId": "OL98501W",
+      "editionId": "OL37044780M"
+    },
+    {
+      "workId": "OL9973101W",
+      "editionId": "OL53036763M"
+    }
+  ],
+  "limits": {
+    "metadataBytes": 2097152,
+    "totalCompressedBytes": 15000000000,
+    "retainedBytes": 67108864,
+    "lineBytes": 1049600,
+    "maxDecodedBytes": 137438953472,
+    "maxRows": 100000000,
+    "timeoutMs": 6600000,
+    "metadataTimeoutMs": 30000,
+    "maxRedirects": 4
+  },
+  "recipientPublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA14FHlbX3zrZpdczcZl3N\nG6TRmRDCwoVtw9k00+p+9DRCh+C2YmdZSNENLkT4Q6bnfHFMAItIj2SRhrhXpL23\nEziQbCxF8wIM5WbeDeoczVZULehwW0Hp+1X1vcHAL+opWI6z/pF/BSOtasbHipDY\nay5pm9w+z6vjwnyh7IHXpWniGdkF149Ynad5qXtczgWElV1wY8q6x9lJuws/D7Y7\n8FsTMOWoKxujWGhJ2SyAfvHCg+h1zvW5hJBQ3rDzWatv80xOotUpVF/5lxU7ggMY\nQM9efkvR3JSRH8dJC+ZC1tveMBxVgNQA7alAEltVBr4O+3oMqWgtxQ8zDqHUGSzY\nhSbPJ8R/itnmevv/XCXTyuUnv0KBYa/sZrIGSRnW/2xBIGz562UFEnsnKfOdVeT0\nbvtKvH0OoJhAHxnhFuf4d9/jHaOw8AwVTv6hB8nj3yZIDRaQD3lbmoaOm3V5Drx6\nQKr8y/AQ5nKcRaMNtvPi7y/aOHZJWMLIhQ5vJUuvuw63AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "recipientFingerprint": "8a5fa11d31492a719496d68b0c736426d9fa5fab4ce8e11474943b159997142b",
+  "requestSha256": "9ac96783138824653f8e23eb9bf47c93ed30b7f7e3db658afd25b348f16b6f50"
+}
