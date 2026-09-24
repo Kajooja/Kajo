@@ -35,7 +35,8 @@
     "research:movielens:evaluate": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-ratings.mjs",
     "research:movielens:prefixes": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-prefixes.mjs",
     "test:acceptance": "npm run test --workspace @kajo/description-acceptance && node --test scripts/mobile/*.test.mjs",
-    "acceptance:descriptions": "npm run start --workspace @kajo/description-acceptance --"
+    "acceptance:descriptions": "npm run start --workspace @kajo/description-acceptance --",
+    "catalog:features:baseline": "node scripts/catalog/evaluate-feature-baseline.mjs"
   },
   "engines": {
     "node": ">=22"

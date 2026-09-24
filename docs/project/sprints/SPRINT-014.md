@@ -14,6 +14,84 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Canonical catalog feature sensitivity — 2026-09-24 / #273
+
+The continued MVP request selects this independent offline packet alongside
+primary #182. It uses the accepted #269 snapshot/registry and byte-identical
+canonical Personal bootstrap SQL in disposable PGlite, with a hash-bound fixed
+clock. The three predeclared arms isolate added provider-concept coverage (C−B)
+from broader tag representation changes (B−A). The local preregistration commit
+`aca84fa21c02040d0ceaaa513d9a6b5e818c597a` precedes scoring; a private source
+archive/receipt preserves it separately from later public publication.
+
+Two independent processes reproduce identical result/report bytes from 840
+Items, 12 distinct whole-Item anchors, 24 synthetic profiles and 144 domain-specific
+top-50 queries. C−B changes all 24 BOOK memberships (600 entries and 600 exits as
+Item-query occurrences), and none of the 24 MOVIE lists. The existing SQL's 0.1
+FOR_YOU novelty contribution for unmatched nonempty tags explains MOVIE→BOOK
+changes despite zero bootstrap transfer. A dedicated fixture regression confirms
+that mechanism. B−A changes all 48 memberships: no neutral serving replacement,
+real-user quality improvement or cross-domain taste transfer is established.
+
+Protocol SHA-256 `90bfb9d250b4dfa2bb41dcd8f94d8c01fdbf401b5ca235022366f3116ab015db`;
+freeze `f938a0f191b79e1016297a09223f4505d8fb54454b266bbab405c46431defbba`;
+private result bytes `2039354833777359e8598d2c56b4f4ddbde3a36225350492f80e2638083c86ed`;
+public aggregate bytes `ff5deac98815ecef739172dced2b78d146ec001d7d2390b2a3a040cc2139b571`.
+The [full report](../../../research/reports/catalog-feature-baseline-273.md)
+records selection bias, conditional top-50 metrics, exact source/runtime hashes,
+clock boundary and the approximately 925 MiB observed fixture memory cost.
+
+Independent protocol/results review passed, including direct private-result
+checks of novelty and all table counts. Local lint/typechecks, 248 mobile,
+128 catalog, 63 database, 44 engine, 32 research and 8 acceptance tests passed;
+four exports and companion guards passed separately. The combined 180-second
+check stops on frozen Deno npm-registry access in this environment. All five
+remote CI jobs remain required for merge. No production state, SQL migration,
+trained artifact, native Event, admission or #182 source budget changes here.
+
+## Completed metadata diagnosis — 2026-09-24 / #182
+
+PR #272 is accepted on main `d3681fcdfa9a877b0f314159d87208d0ccd0f7f8`,
+exact tree `c7267e44c0c1b93ffcfa2c4c92f392e5724b6914`, after all five
+[CI #536 jobs](https://github.com/Kajooja/Kajo/actions/runs/35997619768),
+541 tests and four exports. The root local gate passed lint/typechecks and
+248 mobile / 118 catalog tests, then hit the 150-second frozen Deno registry
+network limit. Independent review and 55 targeted tests passed.
+
+The separately prepared request `bbc351eb9fa7eee0fb25f2183be3c1a729b59191`,
+canonical SHA-256 `24d82539a439fb156cab3f740beb8d2d23c55e0ca82a7b2d71db259215bed488`,
+was retained before activation. [Run 35998771483](https://github.com/Kajooja/Kajo/actions/runs/35998771483)
+succeeded on attempt one, 12:23:41–12:23:54 UTC. Artifact **10807770129**,
+**18,243 bytes**, passed ZIP digest/CRC and authenticated recovery. ZIP SHA-256:
+`b7f4da1d6e13a25e10de4864980db664df871b6dd0be281d0ded1e2fdd958f45`;
+sealed JSON: `b03d6ed815c4f5d0b44dedea7cbe740b4061acad7e7679d3be8cac300a8f0a77`;
+plaintext: `9190228268817d70bd113568d6eef36391d5fcec3f17d51f703454e47a0b689e`.
+
+The recovered **4,248-byte** body exactly matches the original
+`b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+The original metadata validator is byte-identical and reproduces
+`acquisition-compressed-byte-limit`. Exact publisher source pins:
+
+| File | Compressed bytes | MD5 | SHA1 |
+| --- | ---: | --- | --- |
+| Works | 4,058,336,593 | `eda3a83f9dbc85a4d8f7cde838f070b5` | `c9362f345368cdc8bf64efcc05d6e4b590974cb6` |
+| Editions | 12,586,485,055 | `da4de1cca148aa85bea0707a63ffa212` | `e09e00630797598aab877ec542596b1b58f6b87c` |
+
+Their total **16,644,821,648** exceeds the original **15,000,000,000** cap.
+Thus the historical cause is established; the prior entry's uncertainty is
+superseded by this exact-byte reproduction. One metadata GET, zero dump/per-Item/
+ratings requests, approvals or database writes. The diagnostic is consumed.
+Recovery version **4** retains 27 verified members, **137,782 bytes**, SHA-256
+`d7fc6ae44047aee30720fd9cc519aa60556e3fce54dcf3f3caabaaf1da486087`;
+original run/request/source receipts remain unchanged.
+
+The continued owner instruction now selects a distinct reviewed acquisition in
+`fix/182-reviewed-dump-budget`, bound to these exact two pins and total size,
+the prior diagnostic provenance, original roster/recipient and accepted source.
+Old protocol ceilings and consumed requests remain unchanged. It requires no
+fresh metadata GET; source CI/merge and durable custody precede activation.
+No full scan, extra text, rights decision or database change is claimed here.
+
 ## First cloud acquisition and metadata diagnosis — 2026-09-24 / #182
 
 PR #270's concept audit is accepted on main

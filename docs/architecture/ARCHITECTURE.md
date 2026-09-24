@@ -330,6 +330,25 @@ DomainAdapter inputs or trained models. Serving admission still needs bounded
 transfer/reliability, historical feature freezing and comparative quality
 evidence; `MVP-ALG-005` remains open.
 
+### Offline canonical bootstrap sensitivity — #273
+
+`catalog:features:baseline` connects the #269 projection to an isolated fixture
+of the actual Personal bootstrap SQL. A frozen protocol compares legacy tags,
+source-kind concepts already represented in tags, and the full audited concept
+projection on the same catalog and at most 24 synthetic anchor profiles. It
+records top-50 entry/exit and conditional score/rank/contribution changes; this
+is computational sensitivity, not accuracy or user-benefit evidence. Anchors
+deliberately prefer missing BOOK concepts and can repeat whole Items.
+
+Application SQL bodies remain unmodified; only the disposable PGlite fixture's
+clock is replaced at a pinned instant at/after source observation. Source,
+mapping, plan, code/runtime and output hashes make the private run reproducible.
+Missing concepts remain absent, while topic/genre keys remain separate. No
+native Events, actual people, training, production tags or model admission are
+introduced. V1 Scenario/Shared behavior and serving-shadow parity are outside
+this base-scorer diagnostic. The [protocol and report](../../research/reports/catalog-feature-baseline-273.md)
+own exact experimental limits; Phase 14.3 and MVP-ALG-005 remain open.
+
 ### BOOK description enrichment — guarded contract, #182
 
 The guarded writer supports `open-library-description-v1` and the attributed

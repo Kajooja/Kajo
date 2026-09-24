@@ -59,11 +59,11 @@ and its exact catalog-only forward is installed and verified. The September 23
 owner reports successful companion and full-application exercises; STATUS records
 their scope and separately queued Discovery/UI observations. A focused observation
 of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake is implemented; the next primary step
-is a separately bounded metadata-only diagnosis after the accepted cloud run
-read 4,248 bytes and failed before any dump request. Its old receipt lost the
-precise validation cause; no full retry is selected. Preserve the consumed run,
-recover exact diagnostic bytes and inspect publisher fields before any future
-acquisition. No real dump scan or additional approved text is claimed. The six-description usefulness target remains unmet.
+is a distinct exact-pinned acquisition after a separate metadata-only diagnostic
+proved the original size-budget failure: both files total 16,644,821,648 bytes,
+above the old 15 GB cap. Preserve both consumed requests and their limits; the
+new request has its own reviewed exact-source budget. No real dump scan or
+additional approved text is claimed. The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -174,14 +174,14 @@ installed with exact function/ACL, history and full-catalog preservation checks.
 The owner completed both importer batches on September 24, with two updates,
 full preservation checks and a verified empty second batch. STATUS records the
 completed archive and the remaining focused real-text phone observation. Next,
-diagnose the metadata rejection in the first accepted cloud acquisition before
-selecting any new full request. The consumed run fetched 4,248 metadata bytes and
-zero dump bytes; all 383 requested catalog identities/versions remain unchanged.
-The next explicit metadata-only diagnostic captures the exact private response
-and validation code within 2 MiB/30 seconds, with no dump GET even on success.
-Its hash determines whether it can reproduce the original failure or only a new
-observation. Later full-source acquisition, private recovery, fresh reconciliation
-and source-specific rights review still precede a guarded writer bridge. Curated
+execute the separately selected exact-pinned acquisition after its source CI
+and durable request custody. The metadata-only diagnostic recovered the exact
+original body and proved the old 15 GB cap was below the two files’ observed
+16,644,821,648 bytes. Both earlier requests remain consumed, with zero dump GETs.
+The new request binds the original 383-target roster and recipient, exact publisher
+sizes/checksums and a separate one-shot budget. Full-source completion, private
+recovery, fresh reconciliation and source-specific rights review still precede
+a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own
