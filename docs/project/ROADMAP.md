@@ -58,9 +58,9 @@ attribution is accepted through PR #257 with all five required CI #508 gates,
 and its exact catalog-only forward is installed and verified. The September 23
 owner reports successful companion and full-application exercises; STATUS records
 their scope and separately queued Discovery/UI observations. A focused observation
-of the two real paragraphs/links remains. The next primary packet is pinned
-exact-ID Work/Edition dump intake; no real dump scan or additional approved text
-is claimed yet. The six-description usefulness target remains unmet.
+of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake is implemented; the next primary step
+is an actual bounded scan once official source files are reachable. No real
+dump scan or additional approved text is claimed yet. The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -171,9 +171,11 @@ installed with exact function/ACL, history and full-catalog preservation checks.
 The owner completed both importer batches on September 24, with two updates,
 full preservation checks and a verified empty second batch. STATUS records the
 completed archive and the remaining focused real-text phone observation. Next,
-implement bounded local pinned Work/Edition dump intake for the existing exact
-BOOK identities, excluding managed descriptions; staging and rights review precede
-a guarded writer bridge. Actual source files are an execution dependency. Curated
+execute the implemented bounded local pinned Work/Edition dump intake for the
+existing exact BOOK identities, excluding managed descriptions. The actual plan
+selects 383 targets; Archive.org timeouts blocked acquisition before download.
+Verified source files remain the next dependency; staging and rights review
+precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own

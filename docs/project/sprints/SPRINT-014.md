@@ -14,6 +14,64 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Offline BOOK dump intake — 2026-09-24 / #182
+
+Source work implements a distinct local monthly-dump intake after the completed
+pilot. `scripts/catalog/book-description-dump-targets.sql` freezes existing
+provider BOOK identity/version bindings; `open-library-dump-descriptions.mjs`
+and `prepare-open-library-dump-descriptions.mjs` supply the no-I/O plan and
+streaming stage. Architecture/CODEMAP own the stable contract and commands.
+The old pilot, importer, normalizer, consumed provider budgets and installed
+migrations are unchanged. No admin/network client is introduced.
+
+The intake requires exact same-release official source paths, full compressed
+bytes/SHA-256, gzip integrity/EOF and explicit decoded-byte/row limits. It retains
+only exact Work/Edition targets, rejects identity/envelope/linkage mismatches
+and duplicates, caps each line and total retained records, and excludes existing
+managed descriptions. New private output claims cannot be overwritten; failure
+keeps evidence without exposing a completed review. Source records, source/target
+hashes and per-target candidate status are private. Missing text, unknown
+language and rights remain explicit; no text is autoapproved or applicable through
+the old ten-Item pilot. A later guarded writer bridge is still required.
+
+### Actual plan and acquisition boundary
+
+The real read-only snapshot at `2026-09-24T09:56:48.39856+00:00` produced
+**385 provider BOOKs / 383 selected / two excluded / 766 expected records**.
+Canonical target-snapshot digest:
+`4ae7a429ef64faeb82386282c594a8a5d13cf49f17adc5f54a3a07d9fd136517`.
+Saved plan file SHA-256:
+`804c3801735f747a5bdd39b69acaf46f1b825a1512ee92a4b357fa81b70d88f4`.
+No source files were opened, provider requests made, text approved or database
+rows written by that plan.
+
+Official [Open Library dump links](https://openlibrary.org/developers/dumps)
+resolved both source types to `2026-08-31` under
+`https://archive.org/download/ol_dump_2026-08-31/`. Bounded metadata GET and the
+redirected Work HEAD failed with proxy CONNECT timeouts. Approximate publisher
+sizes (2.9G Work / 9.2G Edition) are not verified sizes for that release. Exact
+bytes/external checksums/local hashes remain unknown; zero dump bytes or partials
+exist and no real staging run occurred. The next task is reachable official
+source acquisition, verified manifest construction and one bounded real scan.
+
+### Validation and source acceptance
+
+Fourteen new regressions pass, including malformed/exact identity, truncated or
+concatenated gzip, complete-file hash/byte/row bounds, duplicate target, atomic
+failure/no-overwrite and canonical publisher-path checks. Independent adversarial
+review also verified invalid UTF-8, a late duplicate in a second gzip member and
+the 64 MiB retained-record bound. It requested canonical publisher paths; the
+fix and rejection test are included.
+
+Local lint/typechecks, **452 non-edge tests**, four iOS/Android exports and both
+companion isolation checks passed. `npm run check` reached frozen Deno resolution
+and failed because registry.npmjs.org refused the connection. No dependency,
+lockfile or TLS exception was used. Required PR CI supplies the full edge and
+five-job acceptance before merge; Issue #182 records exact head/run/merge IDs.
+This is source/fixture plus real-plan evidence, not additional live descriptions
+or native acceptance. Completed pilot/phone/rights and independent #265 gates
+remain as recorded in STATUS.
+
 ## BOOK pilot completed and next packets — 2026-09-24 / #182
 
 The owner ran the accepted importer from PR #264/main

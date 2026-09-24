@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 exact-ID BOOK dump intake; pilot completed
+## Current packet — #182 actual pinned BOOK dump scan; intake implemented
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -25,10 +25,10 @@ preservation checks. Do not restore the old reviewed state or repeat apply.
 The owner's subsequent request explicitly selects **#182 pinned Work/Edition
 dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
 unsupported latent fallback correction and bounded MovieLens prefix research**
-alongside it. These are source work in progress, not delivered runtime behavior.
-The catalog packet must preserve exact existing identities, keep description
-rights/language decisions explicit and stage locally before any guarded write.
-The research packet uses the already authorized dataset and does not admit a model.
+alongside it. The catalog intake is now implemented and independently reviewed; real source
+acquisition is blocked before download by Archive.org connection timeouts. The
+research packet remains independent, uses the already authorized dataset and
+cannot admit a model. Source/CI acceptance is recorded in the respective issues.
 
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
@@ -172,9 +172,11 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — pinned BOOK dump intake
+### Exact next bounded packet — actual pinned BOOK dump scan
 
-Implement `feat/182-book-dump-intake` from accepted main under #182. Read-only
+`feat/182-book-dump-intake` supplies the local intake under #182. The
+[source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
+records implementation, actual plan, tests and acquisition limits. Read-only
 exact-ID snapshot at **2026-09-24 09:56:48 UTC** contains **385 provider BOOKs**,
 zero identity mismatches and two already described/managed exclusions: **383**
 possible targets. This is a target inventory, not a count of usable descriptions.
@@ -185,9 +187,20 @@ dumps, verifies complete-file hashes and resource limits, and extracts only thos
 exact identities. It does not repeat popularity/ratings selection, infer text
 rights/language or call providers/RPCs. Stage review candidates with complete
 source/target/version bindings; require a later explicit review and guarded
-writer bridge before any catalog update. Actual dump execution needs the pinned
-local source files; no such files are present at this checkpoint. Fixture tests
-must not be described as a completed real-data scan or catalog expansion.
+writer bridge before any catalog update. Actual plan execution succeeded with these 383 targets and 766 expected exact
+Work/Edition records. It made zero provider calls, writes or approvals.
+
+Next obtain official same-release files in a reachable local environment. The
+official Work/Edition links resolved to **2026-08-31**, but metadata GET and the
+redirected Work HEAD both failed connecting to Archive.org. No exact byte count,
+external checksum or local SHA-256 is verified; **zero dump bytes were downloaded**.
+Do not manufacture a source manifest from the approximate documentation sizes.
+Verify release metadata, exact compressed bytes/checksums and local SHA-256, then
+run the documented `plan`/`stage` commands with explicit bounds. Preserve the
+saved target snapshot/plan or refresh read-only and explicitly record the new
+selection. Inspect actual staged coverage/missing/rights/language candidates
+before designing the guarded review/apply bridge. Fixture acceptance is not a
+completed scan, usable-description count or additional catalog expansion.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed

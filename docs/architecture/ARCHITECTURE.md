@@ -392,6 +392,45 @@ release and hashes. Dump records include revision and modified time, so the same
 normalization/provenance contract can be reused without rerunning popularity
 selection or ingesting external people's ratings.
 
+The offline `catalog:book-descriptions:dump` intake stages exact existing Work and
+selected Edition records from two local files of the same dated release. Its
+read-only target snapshot checks source/alias/mirror identity and freezes row
+versions; existing or managed descriptions are excluded. `plan` validates this
+snapshot without opening dumps. `stage` requires explicit publisher URLs, full
+file SHA-256 values, byte lengths, compression and decoded-byte/row limits. It
+streams both files to EOF, checks gzip integrity and hashes, rejects duplicate or
+conflicting target records and reconciles dump envelopes with their JSON. Missing
+records and rejected text remain counted results. The existing strict description
+policy is reused; legacy ratings-based selection and `notes` normalization are not.
+
+Intake is bounded to 385 snapshot Items, 1,049,600 bytes per line and 64 MiB of
+retained raw records. Each run exclusively claims a new direct child of ignored
+`dist/catalog-enrichment/`, with private files and a failed/staged checkpoint.
+Only after complete input verification does it publish candidates for review.
+Their language, fallback choice, rights and attribution start unreviewed; Edition
+language proves none of those facts. The output is not an apply packet and cannot
+be passed into the fixed ten-Item pilot. Intake has no network/database client,
+does not reset old attempt budgets and never imports ratings or creates aliases.
+Source-specific review and a separately bounded guarded application remain
+necessary after staging; implementation/fixture success is not real dump execution.
+
+Example local commands (the source manifest pins actual files, never `latest`):
+
+```bash
+npm run catalog:book-descriptions:dump -- plan --targets SNAPSHOT.json
+npm run catalog:book-descriptions:dump -- stage --targets SNAPSHOT.json --manifest SOURCE.json \
+  --works LOCAL_WORKS.txt.gz --editions LOCAL_EDITIONS.txt.gz --out dist/catalog-enrichment/NEW_RUN
+```
+
+`scripts/catalog/book-description-dump-targets.sql` produces `SNAPSHOT.json` via
+read-only SQL. `SOURCE.json` has contract
+`open-library-description-dump-source-v1`, `release` (`YYYY-MM-DD`), `retrievedAt`
+and `sources.works` / `sources.editions`; each source supplies `url`, `sha256`,
+`bytes`, `compression` (`gzip` or `none`), `maxDecodedBytes` and `maxRows`.
+File acquisition is separate; the intake does not download multi-gigabyte dumps
+or infer hashes from publisher names. Preserve its completed private run together
+with the pinned source manifest before later review.
+
 The provider's [Work schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/work.schema.json)
 and [text-block definition](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/shared_definitions.json)
 describe description/text records. The [licensing page](https://openlibrary.org/developers/licensing)
