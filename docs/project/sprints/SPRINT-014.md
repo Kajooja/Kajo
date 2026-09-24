@@ -14,6 +14,101 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Pilot recovery and conversation handoff — 2026-09-24 / #182
+
+The owner requested continuation, repository hygiene and a handoff usable from a
+new conversation. The accepted starting point is PR #263, main
+`4df8b519e2f4526bf458f5b64c36904b266a15a2`, tree
+`3486735267c83c37d7b42a1ccfce146a97279ba8`, after all five CI #521 gates
+(run `35916619070`). PR #262 already records all deferred UI notes. Only draft
+PR #229 was open at the start; it remains an independent native acceptance packet.
+This closes the local preparation/handoff unit, not Sprint 014 or Phase 14.3.
+
+### Recover the exact reviewed pilot
+
+The owner's saved artifact was verified on September 24:
+
+| Property | Expected value |
+| --- | --- |
+| Saved path | `/FRST/Kajo-book-description-pilot-v1.zip` |
+| Version | **7**, saved 2026-09-23 20:34:32 UTC |
+| Size | **902,604 bytes** |
+| Archive SHA-256 | `fe1c70bfe2f31567f048973a0184591a46d064d70cbffcfa9236da59dcdf3637` |
+| Manifest | Root `manifest.json`, **87 entries** with exact paths, sizes and SHA-256 |
+| State SHA-256 | `78afe993517c36bfa1eeeda543aa2b99e0ebae3b90f1a0c043d1d42fb2a6b209` |
+
+Resolve that saved filename/path through the owner's file access and verify the
+version/hash before use. If a newer version exists, reconcile its later batch
+ledger and repository checkpoint; never overwrite it with this pre-apply state.
+Extract into a private empty directory, validate every manifest entry, then map
+archive `catalog-enrichment/` to this checkout's ignored `dist/catalog-enrichment/`.
+Retain `evidence/` outside Git. Do not overwrite a newer local run. Preserve the
+original `open-library-description-pilot-v1.json` claim byte-for-byte, including
+its historical absolute directory; that value is not an instruction to recreate
+the old scratch workspace. Keep completed-lock evidence; do not invent an active
+`operation.lock`. Reconcile any actual active lock with state/process evidence.
+
+The restored run must be `reviewed`, with **20 provider attempts, 2 prior reviews,
+2 approved entries at positions 1 and 4, 6 rights holds, 2 text exclusions and
+0 database batches**. Current review and packet hashes are in the
+[source-review checkpoint](#pinned-book-source-review-and-apply-preparation--2026-09-23--182).
+Both amendment proposals are already applied historical inputs. Do not run
+`preview`, `fallback`, `review`, or either saved `amend-review` proposal again.
+
+September 24 checks verified ZIP CRC, all 87 member hashes and byte identity of
+every staged catalog file. `validateReviewHistory` and `buildDescriptionPacket`
+from the accepted module reconstructed the full review chain and exact saved
+two-entry RPC request with fetch disabled. All twenty record inspections and
+the original record/attempt ledgers matched; state bytes did not change.
+
+### Remaining operator sequence
+
+The current workspace has neither `SUPABASE_URL` nor
+`SUPABASE_SERVICE_ROLE_KEY` (presence-only check; no secret values read).
+The two repository workflows provide CI and the synthetic description companion,
+not BOOK import. No reachable configured admin runtime/location is recorded.
+Continue in an operator environment that already has the project's server-side
+import configuration; do not obtain a key in chat, extract a secret, substitute
+SQL for the importer or create a new privileged endpoint to bypass this boundary.
+
+1. In that environment, recover the run as above and use accepted main source.
+   Immediately before apply, run `scripts/catalog/book-description-coverage.sql`
+   read-only and save its **`book_description_coverage` object**, without the SQL
+   row wrapper. Compare all identities, versions and preservation fingerprints
+   to the reviewed baseline. Retain fresh full target preimages using the saved
+   `apply-preflight.sql`. September 23 snapshots are recovery evidence, not a
+   substitute for this fresh check. Drift requires review and a new amendment
+   bound to the current review hash before any batch attempt; never edit state.
+2. Apply batch 1 with the accepted CLI. Inspect exact acknowledgements. Obtain a
+   new read-only coverage object as `after-batch-1.json`, then run `verify`.
+3. Only after that verification succeeds, apply the empty batch 2. It records
+   zero writes but still requires its own later coverage object and `verify`.
+   Run becomes `completed` only after the second verification.
+
+Run the following commands individually from the repository root, pausing for
+the read-only snapshot and inspection described above between each command:
+
+```bash
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 1
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-1.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 2
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-2.json
+```
+
+Unknown acknowledgements or failed verification stop this sequence for exact
+ID/hash/version reconciliation; do not retry automatically, reset the claim or
+mark a batch complete manually. Retain post-write identities/versions for guarded
+restoration of managed fields only. Persist the updated run, acknowledgements,
+readbacks and manifest in the same saved artifact with version-conflict checking
+before leaving the operator environment, then update STATUS/#182.
+
+Observe only these two real paragraphs and their source/license links on the
+phone after successful apply. Accepted companion/full-app reports remain valid;
+the six-description target, other rights holds and broader catalog/native/MVP
+gates remain open. This handoff performed no hosted query/write, provider GET,
+migration, APK dispatch or new device exercise. Runtime/SQL/dependencies remain
+unchanged. Required PR CI and final merge identity are recorded in Issue #182.
+
 ## Pinned BOOK source review and apply preparation — 2026-09-23 / #182
 
 The owner-requested continuation after PR #262 advances the existing pilot,

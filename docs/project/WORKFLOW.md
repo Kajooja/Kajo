@@ -68,8 +68,9 @@ It currently runs:
 1. lint,
 2. TypeScript typecheck,
 3. automated tests,
-4. iOS Expo bundle smoke test,
-5. Android Expo bundle smoke test.
+4. main mobile iOS and Android Expo bundle smoke tests,
+5. isolated description companion iOS and Android exports, including source-map
+   guards for shared rendering, a single React instance and production-module isolation.
 
 Individual commands may be used while iterating:
 

@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-23**
+Last updated: **2026-09-24**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,17 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #182 two reviewed BOOK descriptions; guarded apply pending
+
+**Source review and local preparation are complete; hosted apply is blocked by
+the unavailable admin importer runtime in this workspace.** Accepted review
+source is [PR #263](https://github.com/Kajooja/Kajo/pull/263), main
+`4df8b519e2f4526bf458f5b64c36904b266a15a2`, after all five
+[CI #521 gates](https://github.com/Kajooja/Kajo/actions/runs/35916619070).
+The September 24 handoff verified the saved v7 archive and unchanged reviewed
+state, corrected stale documentation and retained the same next task. Its
+[recovery and execution checkpoint](sprints/SPRINT-014.md#pilot-recovery-and-conversation-handoff--2026-09-24--182)
+contains the exact archive identity, restore mapping and remaining commands.
+Issue #182 records this handoff PR's final source/CI/merge identity.
 
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
@@ -154,18 +165,24 @@ Issue #182 owns exact source PR/head/CI/merge acceptance for
 
 ### Exact next bounded packet — guarded two-description apply
 
-Recover the updated `Kajo-book-description-pilot-v1.zip`; local staging is
-`dist/catalog-enrichment/book-pilot-v1`. It contains the original claim, raw
+Recover `Kajo-book-description-pilot-v1.zip` **version 7** using the
+[verified recovery checkpoint](sprints/SPRINT-014.md#pilot-recovery-and-conversation-handoff--2026-09-24--182);
+local staging is `dist/catalog-enrichment/book-pilot-v1`. It contains the original
+claim, raw
 records/history, `permission-review.json`, `source-comparison.json`, applied
-`pinned-rights-amendment.json`, fresh baseline/preimages, the two-entry batch-1
+`pinned-rights-amendment.json`, September 23 baseline/preimages, the two-entry batch-1
 request and `apply-readiness.json`. The run is already `reviewed`, with two
 approved entries and no attempted database batch. Both saved amendment proposals
 are historical and must not be replayed. No active operation lock was present
 on this restore; any future restored lock needs explicit state/process
 reconciliation. Never reset status, budget or claim.
 
-Use the already configured admin importer runtime for the accepted guarded
-CLI/RPC sequence. **This workspace has no privileged importer credential**;
+Use an operator environment already configured for this project's accepted
+admin CLI/RPC sequence. On September 24, presence-only checks found neither
+`SUPABASE_URL` nor `SUPABASE_SERVICE_ROLE_KEY` in this workspace; the repository
+has no BOOK-import dispatch workflow. A reachable configured runtime/location
+has not been recorded. This is the remaining execution dependency, not another
+source review. **This workspace has no privileged importer credential**;
 do not restart key setup or replace the importer with ad hoc SQL. All preparation
 possible here is complete. Refresh read-only coverage immediately before apply;
 if versions changed, make a new amendment bound to the current review hash and
@@ -272,7 +289,8 @@ The owner-approved #229 hosted rollout completed on 2026-09-12 through
 All six installed forwards are immutable; do not redeploy, reset, repair historical
 migrations or mistake this older accepted-main SQL tree for a new rollout packet.
 The separately deferred `20260909131913_close_postgres_function_defaults.sql`
-remains its own gate. This independent E1 packet ran no hosted query or mutation.
+remains its own gate. The earlier independent E1 packet ran no hosted query or
+mutation; later catalog rollout/read-only checkpoints are recorded separately above.
 
 The private window bounds remain 50 candidates/seen IDs, 2 MiB, fifteen minutes
 from source ranking and sixteen windows per actor/Profile. Preserve receipts,
@@ -342,9 +360,9 @@ The [2026-09-12 audit](retros/2026-09-12.md) records scope, checks and limits.
 Proven-unused catalog hook/wrapper removed; accepted-main migration protection
 extends from 47 to 50 exact hashes without changing SQL or the baseline cutoff.
 Raw/fitted research paths are ignored before the first dataset operation.
-The compatible js-yaml 4.3.2 lockfile patch removes the high advisory. Fresh audit
-has no high/critical findings and fifteen moderate package entries across three
-advisories; #238 prioritizes the runtime routing decoder before public links and
+The compatible js-yaml 4.3.2 lockfile patch removed the high advisory in the
+September 12 audit, which reported no high/critical findings and fifteen moderate
+package entries across three advisories; #238 prioritizes the runtime routing decoder before public links and
 coordinates build/test-tool updates. Do not apply an incompatible bare override.
 
 Open source findings are assigned to their existing work owners:
@@ -352,6 +370,15 @@ Open source findings are assigned to their existing work owners:
 and metadata expansion after the accepted provider canary; #160 / MVP-OPS-005 production configuration,
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.
+
+The September 24 check found a clean accepted-main checkout before this docs
+packet, no tracked empty/placeholder/temporary archive files, and no tracked
+files matching ignore rules. Current canonical Markdown paths/anchors resolved.
+All 87 pilot archive entries and the staged run matched their hashes; the
+accepted offline validator reconstructed the review history and two-entry request
+without changing state. This is scoped repository/artifact hygiene, not a fresh
+dependency advisory or hosted security audit. Runtime source, SQL, dependencies,
+provider budgets and catalog data are unchanged.
 
 Merged `feat/226-atomic-collection-actions` is byte-equivalent to accepted #227
 and safe to retire. Remote branch deletion is unavailable through this session's
