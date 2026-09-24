@@ -14,6 +14,98 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## BOOK pilot completed and next packets — 2026-09-24 / #182
+
+The owner ran the accepted importer from PR #264/main
+`51919db1ee8d5384cd724047dcf8293a27b51261` on their MacBook (Node 22.20.0,
+npm 11.6.1, Apple Git 2.50.1). Server credentials stayed in the local operator
+environment; none were included in the uploaded run. Both guarded batches and
+their accepted CLI readbacks completed. The original twenty provider attempts,
+claim, cached records, current review and two prior reviews are unchanged.
+
+| Batch | Actual acknowledgement | Later readback |
+| --- | --- | --- |
+| 1 | Started `2026-09-24T09:31:59.861Z`, completed `09:32:00.439Z`; exactly the two approved UUIDs, `updated: 2`, `unchanged: 0` | Checked `2026-09-24T09:33:31.23372+00:00`; SHA-256 `61d980d1cce90b09733d31a225f27330379ba7ae7477bd3371a3af0559ef1780` |
+| 2 | Started `2026-09-24T09:37:53.222Z`, completed `09:37:53.223Z`; no Item IDs, zero updates | Checked `2026-09-24T09:39:21.375188+00:00`; SHA-256 `91b21929496e2686948dc478b5b5c9d889e9c208a36015aba24381af2d2a2568` |
+
+Both acknowledgements bind the unchanged packet SHA-256
+`dd31f5b33771e59a5885d618821dbd5e0a4fda5ff4b1d59ebe15c9730ca11262`.
+The two approved Items are Pieni elämä
+`a7f6d2cd-e290-4bc4-97b7-cf1180ea86b9` and Romeo ja Julia
+`6aa4020d-fdfa-4010-ad8d-2217c71f06f8`; their Item post-write version is
+`2026-09-24T09:32:00.069894+00:00`. Exact source versions remain in private
+evidence. Scope is still `kajo-internal-pilot`, with the pinned CC BY-SA 4.0
+source/credit decision below; broader public-use acceptance is separate.
+
+### Independent hosted and operator-run verification
+
+Read-only coverage at 09:23:09 UTC and full preimages/ACL validation at 09:25:15
+matched the reviewed baseline immediately before apply. After batch 1, fresh
+coverage and complete Item/source/alias preimages independently confirmed exact
+text, full public provenance and private permission/enrichment bindings. Full
+Item/source fields outside description/provenance/enrichment and update times
+are unchanged, including source `synced_at`; aliases including `last_seen_at`
+are unchanged. Batch 2's coverage differs only in its check time.
+
+BOOK is **415 visible / 427 stored / 385 images / 2 descriptions**. MOVIE is
+**425 visible / 437 stored / 425 images and descriptions**. The installed
+writer/validator remain postgres-owned invoker functions, with empty search
+paths, service-role execution allowed and anonymous/authenticated execution
+denied. No provider request, migration or model admission was performed here.
+
+The uploaded actual operator ZIP has SHA-256
+`914c602dc8d9d2b49523a210b263b112f23a9020979560732669a0be5cc93e57`.
+Its thirty files include the actual completed state and both verification
+objects. Independent archive review and the accepted offline validators
+reconstructed the review chain and both readbacks without mutating state. All
+pre-write fields other than run status and the new batch ledger match the prior
+reviewed state; no active lock, symlink or environment file is present.
+
+### Completed recovery identity
+
+| Property | Completed value |
+| --- | --- |
+| Controlled archive | `/FRST/Kajo-book-description-pilot-v1.zip`, **version 11** |
+| Archive size / manifest | **1,013,922 bytes / 103 entries**, all CRC/member hashes verified |
+| Archive SHA-256 | `06f090f4ccf7ebc78af0a9d1ef3fee465c26511e05ec8adb33b2c2c8745db5c3` |
+| Actual completed state SHA-256 | `499eb9b33159db8fb3030fd8242b94c8278a08920e1cf55bed4de81c6a51588f` |
+| Current review SHA-256 | `28e81b46b3ff11cfadf8e0d5708a776c2cdd69beb6cad0a9ddac523970ce2265` |
+
+Canonical archive `catalog-enrichment/book-pilot-v1/state.json` is now the actual
+**completed** run. Restore that tree to ignored `dist/catalog-enrichment/` only
+after verifying the current archive/version/hash and checking for a newer run.
+Pre-write state/preview copies are explicitly historical evidence and must not
+replace it. `operator-checkpoint.json` identifies the completed state and actual
+upload; all earlier source evidence, fresh preimages/readbacks, acknowledgement
+and independent verification evidence remain retained. Preserve the original
+claim bytes/historical path, completed locks and review history. Do not replay
+preview, fallback, amendment or apply. Unknown later changes require exact
+state/hash/version reconciliation, never a manually reset status or budget.
+
+### Selected continuation and remaining acceptance
+
+The owner's new request advances the primary #182 packet to bounded exact-ID
+Work/Edition dump intake (`feat/182-book-dump-intake`). Fresh read-only target
+snapshot at `2026-09-24T09:56:48.39856+00:00` has **385** exact provider BOOKs,
+zero identity mismatches and **383** targets after excluding the two existing
+managed descriptions. This is a target inventory; real pinned monthly files,
+streaming intake, rights/language review and a guarded writer bridge remain
+distinct steps. The thirty curated alias gaps are not fuzzy-matched.
+
+Independent #265 / `feat/research-prefix-evaluation` is explicitly selected for
+the reproduced unsupported-latent-prefix fallback defect and one preregistered
+exploratory study using the already authorized D1 MovieLens cohort. Fixed D2
+training boundaries and inspected development data stay explicit. D2's rejected
+challenger remains rejected; external observations never become native accounts
+or Events. STATUS owns the live implementation/acceptance handoff.
+
+Only a focused phone observation of these two real paragraphs and source/license
+links remains for this apply; the accepted full-app/companion exercises need not
+be repeated. Six rights holds, two exclusions, the six-description target,
+curated mapping/feature quality, #229/native/fresh-account gates and broader MVP
+acceptance remain open. No APK was dispatched or UI refinement implemented by
+this completion packet. The older handoff below is historical and superseded.
+
 ## Pilot recovery and conversation handoff — 2026-09-24 / #182
 
 The owner requested continuation, repository hygiene and a handoff usable from a

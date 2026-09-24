@@ -10,18 +10,25 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 two reviewed BOOK descriptions; guarded apply pending
+## Current packet — #182 exact-ID BOOK dump intake; pilot completed
 
-**Source review and local preparation are complete; hosted apply is blocked by
-the unavailable admin importer runtime in this workspace.** Accepted review
-source is [PR #263](https://github.com/Kajooja/Kajo/pull/263), main
-`4df8b519e2f4526bf458f5b64c36904b266a15a2`, after all five
-[CI #521 gates](https://github.com/Kajooja/Kajo/actions/runs/35916619070).
-The September 24 handoff verified the saved v7 archive and unchanged reviewed
-state, corrected stale documentation and retained the same next task. Its
-[recovery and execution checkpoint](sprints/SPRINT-014.md#pilot-recovery-and-conversation-handoff--2026-09-24--182)
-contains the exact archive identity, restore mapping and remaining commands.
-Issue #182 records this handoff PR's final source/CI/merge identity.
+**The two approved BOOK descriptions are applied and independently verified.**
+The owner ran the accepted CLI from PR #264/main
+`51919db1ee8d5384cd724047dcf8293a27b51261` on September 24. Batch 1 updated
+exactly two Items; batch 2 was the required verified empty checkpoint. The actual
+uploaded run is `completed`, with both readbacks, the original claim, twenty
+consumed provider attempts and unchanged review history. The
+[completion checkpoint](sprints/SPRINT-014.md#book-pilot-completed-and-next-packets--2026-09-24--182)
+records the complete archive **version 11**, exact hashes, acknowledgements and
+preservation checks. Do not restore the old reviewed state or repeat apply.
+
+The owner's subsequent request explicitly selects **#182 pinned Work/Edition
+dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
+unsupported latent fallback correction and bounded MovieLens prefix research**
+alongside it. These are source work in progress, not delivered runtime behavior.
+The catalog packet must preserve exact existing identities, keep description
+rights/language decisions explicit and stage locally before any guarded write.
+The research packet uses the already authorized dataset and does not admit a model.
 
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
@@ -51,7 +58,8 @@ The earlier OnePlus companion report remains accepted separately. Its source is
 to fill missing metadata. Exact installed binary/source, model/OS and individual
 accessibility, OS-refusal or delayed-response observations were not supplied;
 none are inferred. The latest full-app report is not native acceptance of the
-independent #229 branch or permission to display real BOOK descriptions.
+independent #229 branch. The two subsequently applied real paragraphs and their
+source/license links still need a focused phone observation.
 
 The [owner-feedback checkpoint](sprints/SPRINT-014.md#full-app-feedback-and-deferred-ui-notes--2026-09-23--182)
 maps all new notes to #199, #200, #231, #239 and FUT-CAT-001. Product requirements
@@ -111,8 +119,9 @@ for `kajo-internal-pilot` with CC BY-SA 4.0 credit. Both complete paragraphs mat
 specific Wikipedia revisions in independent HTML and wikitext comparisons.
 The source-specific decision is retained with its exact hashes/use/changes;
 it is not a blanket permission assertion about Open Library. **Six rights holds,
-two text exclusions and zero database batches remain.** The six-description
-usefulness target is still unmet, and no real paragraph has reached the app.
+two text exclusions remain.** Both database batches are now completed and
+verified: two descriptions were written, followed by the empty checkpoint. The
+six-description usefulness target is still unmet; actual phone observation remains open.
 
 The existing offline `amend-review` CLI preserved all cached records, spent
 attempts, the original claim and both prior reviews. It ran with network disabled
@@ -122,12 +131,12 @@ The [pinned-source checkpoint](sprints/SPRINT-014.md#pinned-book-source-review-a
 retains revisions, evidence/packet/state hashes, review limits and validation.
 Edition language remains distinct from description/original language.
 
-Fresh read-only coverage on **September 23 at 20:18:12 UTC** confirmed all ten
-identities, row versions and preservation fingerprints unchanged. BOOK remains
-**415 visible / 427 stored / 385 images / 0 descriptions**; MOVIE **425 / 437 /
-425 images and descriptions**. At 20:25:23 UTC the installed validator accepted
-both real credit objects, and complete Item/source/alias preimages were retained.
-This is preparation, not a catalog write or new native result.
+Fresh read-only coverage on **September 24 at 09:39:21 UTC** confirms BOOK
+**415 visible / 427 stored / 385 images / 2 descriptions**; MOVIE **425 / 437 /
+425 images and descriptions**. Exact text, public credit and private permission
+bindings match the reviewed packet. Complete Item/source preimages and aliases
+confirm preservation outside the intended managed fields and update timestamps.
+No new provider request, migration or model admission accompanied the apply.
 
 `@kajo/catalog-contracts` and the installed v2 writers bind public credit and
 private permission evidence to the same text/record. Canonical Item enrichment
@@ -163,42 +172,28 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — guarded two-description apply
+### Exact next bounded packet — pinned BOOK dump intake
 
-Recover `Kajo-book-description-pilot-v1.zip` **version 7** using the
-[verified recovery checkpoint](sprints/SPRINT-014.md#pilot-recovery-and-conversation-handoff--2026-09-24--182);
-local staging is `dist/catalog-enrichment/book-pilot-v1`. It contains the original
-claim, raw
-records/history, `permission-review.json`, `source-comparison.json`, applied
-`pinned-rights-amendment.json`, September 23 baseline/preimages, the two-entry batch-1
-request and `apply-readiness.json`. The run is already `reviewed`, with two
-approved entries and no attempted database batch. Both saved amendment proposals
-are historical and must not be replayed. No active operation lock was present
-on this restore; any future restored lock needs explicit state/process
-reconciliation. Never reset status, budget or claim.
+Implement `feat/182-book-dump-intake` from accepted main under #182. Read-only
+exact-ID snapshot at **2026-09-24 09:56:48 UTC** contains **385 provider BOOKs**,
+zero identity mismatches and two already described/managed exclusions: **383**
+possible targets. This is a target inventory, not a count of usable descriptions.
+The thirty curated BOOK alias gaps remain a separate exact mapping task.
 
-Use an operator environment already configured for this project's accepted
-admin CLI/RPC sequence. On September 24, presence-only checks found neither
-`SUPABASE_URL` nor `SUPABASE_SERVICE_ROLE_KEY` in this workspace; the repository
-has no BOOK-import dispatch workflow. A reachable configured runtime/location
-has not been recorded. This is the remaining execution dependency, not another
-source review. **This workspace has no privileged importer credential**;
-do not restart key setup or replace the importer with ad hoc SQL. All preparation
-possible here is complete. Refresh read-only coverage immediately before apply;
-if versions changed, make a new amendment bound to the current review hash and
-retain refreshed preimages. Apply only positions 1 and 4 in batch 1, then verify
-exact acknowledgements, text/credit/permission bindings and preservation before
-the empty batch-2 checkpoint. Unknown acknowledgement means stop/reconcile,
-not automatic replay. Guarded rollback requires actual post-write versions/hashes
-and restores only description/provenance/envelope, never whole old rows.
+The bounded intake reads explicitly pinned same-date local Work and Edition
+dumps, verifies complete-file hashes and resource limits, and extracts only those
+exact identities. It does not repeat popularity/ratings selection, infer text
+rights/language or call providers/RPCs. Stage review candidates with complete
+source/target/version bindings; require a later explicit review and guarded
+writer bridge before any catalog update. Actual dump execution needs the pinned
+local source files; no such files are present at this checkpoint. Fixture tests
+must not be described as a completed real-data scan or catalog expansion.
 
-After a successful controlled apply, observe those two real paragraphs and their
-source/license links on the phone. Do not repeat the whole accepted companion
-or full-app test solely for missing metadata. General licensing search and the
-two exact source matches are complete; the other six permission holds require
-their own evidence. The target of six usable descriptions is not waived by two
-approvals. Broader dump-based enrichment and curated alias review remain later
-bounded units, with no new provider sweep, model admission or UI work implied.
+The completed pilot is recovery evidence, not an input to a new preview or apply.
+Its six rights holds require their own evidence. Preserve both installed
+forwards, all twenty spent BOOK attempts and the finished MOVIE budget. Observe
+only the two new real paragraphs and their links on the phone when convenient;
+do not repeat the accepted full-app/companion exercise.
 
 ### Completed MOVIE pass and preserved gates
 
@@ -211,9 +206,9 @@ from Finnish production `FI`, and preserve personalization. Its 18 attempts and
 descriptions, curated exact mapping, repeatable refresh, normalized feature
 quality and native usefulness. Preserve #229/device/fresh-account gates, the
 six immutable native forwards and rejected D2 challenger admission. The owner
-companion and full-app reports are recorded above. The source-evidence packet
-performed only the two recorded hosted read-only checks; it did not dispatch/poll
-APKs, write catalog data, admit a model or implement the separately queued UI changes.
+companion and full-app reports are recorded above. The owner executed the two recorded importer batches. This continuation
+verified their readbacks and completed archive; no APK dispatch, model admission
+or separately queued UI change is included.
 
 ## Accepted D2 development comparison
 
@@ -228,6 +223,18 @@ results do not prove fixed-holdout or native usefulness; cold-start support is l
 [D2 checkpoint](sprints/SPRINT-014-D2.md) retain exact hashes, partitions, all metrics,
 uncertainty, costs, reproduction/review history and the 357-test source acceptance.
 Raw histories, fitted models and predictions remain ignored and research-only.
+
+### Explicitly selected independent follow-up — #265
+
+`feat/research-prefix-evaluation` corrects a reproduced research-only fallback
+bug: a prefix containing no trained Items must use the durable baseline instead
+of an unsupported latent item mean. Freeze the exploratory prefix-study manifest
+before running the existing D1 cohort: original D2 training cutoff and fitted
+parameters, held-out subjects, earliest/recent complete prior time groups with
+0/5/10/20 budgets and identical target denominators. Report coverage, actual
+prefix sizes/age, paired subject uncertainty, resources and independent replay.
+D2's already examined data is development evidence, not a fresh final test.
+Historical D2 results and rejection stay intact; native serving is unchanged.
 
 ## Native packet checkpoint — #228 / draft PR #229
 
@@ -315,7 +322,8 @@ The ordered engine work is:
 | E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
 E1, D1 and D2 are accepted through #241/#242/#243. The reproducible D2 report
-and rejection/fallback decision are complete; continue the named #182 catalog unit. #229 retains native
+and rejection/fallback decision are complete. #182 remains the primary catalog
+unit; the owner explicitly selected independent #265 as described above. #229 retains native
 acceptance and application UI work remains in its separately ordered packet. No large native user
 population, production schema or separate network service is needed for D1.
 
@@ -371,14 +379,12 @@ and metadata expansion after the accepted provider canary; #160 / MVP-OPS-005 pr
 password endpoint input/abuse policy and release dependency checks. See the audit
 for dependency findings and exact verification; no hosted security conclusion is inferred.
 
-The September 24 check found a clean accepted-main checkout before this docs
-packet, no tracked empty/placeholder/temporary archive files, and no tracked
-files matching ignore rules. Current canonical Markdown paths/anchors resolved.
-All 87 pilot archive entries and the staged run matched their hashes; the
-accepted offline validator reconstructed the review history and two-entry request
-without changing state. This is scoped repository/artifact hygiene, not a fresh
-dependency advisory or hosted security audit. Runtime source, SQL, dependencies,
-provider budgets and catalog data are unchanged.
+The September 24 completion audit verified the actual uploaded run and all
+**103 completed archive entries**, preserved cached records/attempts/review
+history and independently reproduced both saved verification results. The
+canonical completed state and full before/after evidence are retained outside
+Git. No secret, raw provider record, fitted model or operator state enters this
+documentation packet. Historical preparation/hygiene checks remain in Sprint 014.
 
 Merged `feat/226-atomic-collection-actions` is byte-equivalent to accepted #227
 and safe to retire. Remote branch deletion is unavailable through this session's
