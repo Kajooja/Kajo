@@ -12,6 +12,24 @@ export const ACQUISITION_LIMITS = Object.freeze({ metadataBytes: 2 * 1024 * 1024
   totalCompressedBytes: 15000000000, retainedBytes: 64 * 1024 * 1024,
   lineBytes: LIMITS.lineBytes, maxDecodedBytes: 128 * 1024 ** 3, maxRows: 100000000,
   timeoutMs: 120 * 60 * 1000, metadataTimeoutMs: 30000, maxRedirects: 4 });
+// A separate reviewed protocol, pinned to the authenticated metadata diagnosis.
+// The original protocol and its consumed 15 GB request keep their old ceiling.
+export const REVIEWED_ACQUISITION_LIMITS = Object.freeze({ ...ACQUISITION_LIMITS,
+  totalCompressedBytes: 16644821648, timeoutMs: 110 * 60 * 1000 });
+export const REVIEWED_SOURCE_PINS = Object.freeze({
+  works: Object.freeze({ url: 'https://archive.org/download/ol_dump_2026-08-31/ol_dump_works_2026-08-31.txt.gz',
+    bytes: 4058336593, md5: 'eda3a83f9dbc85a4d8f7cde838f070b5', sha1: 'c9362f345368cdc8bf64efcc05d6e4b590974cb6', compression: 'gzip' }),
+  editions: Object.freeze({ url: 'https://archive.org/download/ol_dump_2026-08-31/ol_dump_editions_2026-08-31.txt.gz',
+    bytes: 12586485055, md5: 'da4de1cca148aa85bea0707a63ffa212', sha1: 'e09e00630797598aab877ec542596b1b58f6b87c', compression: 'gzip' }),
+});
+export const REVIEWED_SOURCE_EVIDENCE = Object.freeze({ contract: 'open-library-reviewed-source-evidence-v1',
+  metadataUrl: 'https://archive.org/metadata/ol_dump_2026-08-31',
+  metadataSha256: 'b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b', metadataBytes: 4248,
+  diagnosticSourceHead: 'd3681fcdfa9a877b0f314159d87208d0ccd0f7f8',
+  diagnosticRequestHead: 'bbc351eb9fa7eee0fb25f2183be3c1a729b59191',
+  diagnosticRequestSha256: '24d82539a439fb156cab3f740beb8d2d23c55e0ca82a7b2d71db259215bed488',
+  diagnosticRetrievedAt: '2026-09-24T12:23:50.433Z', diagnosticValidationCode: 'acquisition-compressed-byte-limit',
+  previousTotalCompressedBytes: 15000000000, reviewedTotalCompressedBytes: 16644821648 });
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const exactKeys = (value, keys) => object(value) && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
 const fail = code => new Error(code);
@@ -30,6 +48,7 @@ export const ACQUISITION_ERROR_CODES = Object.freeze([
   'dump-staging-limit', 'dump-file-size-mismatch', 'dump-decoded-byte-limit', 'dump-checksum-mismatch',
   'invalid-record-context', 'record-too-large', 'malformed-provider-json', 'provider-identity-mismatch',
   'provider-work-link-mismatch', 'invalid-provider-revision', 'invalid-provider-modified-time',
+  'invalid-reviewed-acquisition-input',
 ]);
 const knownErrorCodes = new Set(ACQUISITION_ERROR_CODES);
 
@@ -281,6 +300,92 @@ export async function inspectOpenLibraryDumpMetadata({ release, signal, transpor
   } finally { controller.abort(); }
 }
 
+// Both protocols use the identical transport, full EOF/hash verification,
+// retained-record budget, parsing and coverage calculation below.
+async function collectPinnedSources({ pinned, selected, retrievedAt, started, signal, transport, limits, accounting, budget }) {
+  requireValue(pinned.works.bytes + pinned.editions.bytes <= limits.totalCompressedBytes,
+    'acquisition-compressed-byte-limit');
+  const sources = {}, collected = {};
+  for (const kind of ['works', 'editions']) {
+    const source = pinned[kind];
+    accounting.activeSource = kind;
+    accounting.sources[kind] = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0,
+      unrelatedRows: 0, malformedUnrelatedRows: 0, complete: false, expectedBytes: source.bytes };
+    const response = await openOfficial(source.url, { signal, maxBytes: source.bytes,
+      timeoutMs: Math.max(1, limits.timeoutMs - (Date.now() - started)) }, transport, limits,
+    () => accounting.requests[kind]++);
+    const length = response.headers?.['content-length'];
+    if (length !== undefined && (!/^\d+$/.test(length) || Number(length) !== source.bytes)) {
+      response.body.destroy(); throw fail('dump-file-size-mismatch');
+    }
+    const scan = await scanDumpStream(response.body, source, kind, selected, retrievedAt, budget,
+      { signal, keyOf: row => row.workId, lineBytes: limits.lineBytes, retainedBytes: limits.retainedBytes,
+        observeProgress: stats => { accounting.sources[kind] = Object.assign(stats, { complete: false, expectedBytes: source.bytes }); } });
+    collected[kind] = scan.records;
+    sources[kind] = { ...source, ...scan.stats, finalUrl: response.url, redirects: response.redirects,
+      publisherChecksumsVerified: true };
+    accounting.sources[kind] = { ...scan.stats, expectedBytes: source.bytes, publisherChecksumsVerified: true };
+  }
+  const records = selected.map(row => ({ ...row, work: collected.works.get(row.workId) ?? null,
+    edition: collected.editions.get(row.workId) ?? null }));
+  const coverage = { targets: records.length, found: 0, missing: 0, eligibleTexts: 0, targetsWithEligibleText: 0 };
+  for (const row of records) {
+    let eligible = false;
+    for (const kind of ['work', 'edition']) {
+      if (row[kind]) coverage.found++; else coverage.missing++;
+      if (row[kind]?.inspection.description.status === 'eligible') { coverage.eligibleTexts++; eligible = true; }
+    }
+    if (eligible) coverage.targetsWithEligibleText++;
+  }
+  return { sources, records, coverage };
+}
+
+function sourceManifest(release, retrievedAt, sources) {
+  return { contract: SOURCE_CONTRACT, release, retrievedAt,
+    sources: Object.fromEntries(Object.entries(sources).map(([kind, source]) => [kind,
+      Object.fromEntries(['url', 'sha256', 'bytes', 'compression', 'maxDecodedBytes', 'maxRows'].map(key => [key, source[key]]))])) };
+}
+
+export async function acquireReviewedOpenLibraryDumps({ release, roster, sourcePins, sourceEvidence, limits,
+  signal, transport = curlAcquisitionTransport } = {}) {
+  requireValue(release === ACQUISITION_RELEASE && object(sourcePins) && object(sourceEvidence) && object(limits)
+    && digest(sourcePins) === digest(REVIEWED_SOURCE_PINS)
+    && digest(sourceEvidence) === digest(REVIEWED_SOURCE_EVIDENCE)
+    && digest(limits) === digest(REVIEWED_ACQUISITION_LIMITS), 'invalid-reviewed-acquisition-input');
+  const selected = validateAcquisitionRoster(roster);
+  const controller = new AbortController();
+  const combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+  const timer = setTimeout(() => controller.abort(), REVIEWED_ACQUISITION_LIMITS.timeoutMs);
+  timer.unref?.();
+  const started = Date.now(), retrievedAt = new Date().toISOString(), accounting = initialAccounting(retrievedAt);
+  accounting.activeSource = null;
+  accounting.metadata = { bytes: 0, complete: false, skipped: true, reason: 'reviewed-pinned-source-evidence' };
+  const budget = { bytes: 0 };
+  // Use immutable accepted constants after validation, not mutable caller data.
+  const pinned = Object.fromEntries(Object.entries(REVIEWED_SOURCE_PINS).map(([kind, source]) => [kind,
+    { ...source, maxDecodedBytes: REVIEWED_ACQUISITION_LIMITS.maxDecodedBytes, maxRows: REVIEWED_ACQUISITION_LIMITS.maxRows }]));
+  try {
+    const result = await collectPinnedSources({ pinned, selected, retrievedAt, started, signal: combined,
+      transport, limits: REVIEWED_ACQUISITION_LIMITS, accounting, budget });
+    accounting.activeSource = null;
+    accounting.retainedRecordBytes = budget.bytes;
+    accounting.completedAt = new Date().toISOString();
+    return { contract: ACQUISITION_CONTRACT, status: 'collected', release, retrievedAt, completedAt: accounting.completedAt,
+      rosterSha256: digest(selected), limits: { ...REVIEWED_ACQUISITION_LIMITS },
+      sourceEvidence: { ...REVIEWED_SOURCE_EVIDENCE }, ...result,
+      sourceManifest: sourceManifest(release, retrievedAt, result.sources), accounting,
+      retainedRecordBytes: budget.bytes, approved: 0, databaseWrites: 0, individualProviderRequests: 0,
+      rights: 'unreviewed', note: 'Exact reviewed source pins; no new metadata request. Source-specific review and fresh private catalog binding are still required.' };
+  } catch (error) {
+    accounting.retainedRecordBytes = budget.bytes;
+    accounting.failedAt = new Date().toISOString();
+    const failure = fail(combined.aborted ? 'acquisition-aborted' : safeAcquisitionError(error));
+    failure.accounting = structuredClone(accounting);
+    failure.sourceEvidence = { ...REVIEWED_SOURCE_EVIDENCE };
+    throw failure;
+  } finally { clearTimeout(timer); controller.abort(); }
+}
+
 export async function acquireOpenLibraryDumps({ release, roster, signal, transport = curlAcquisitionTransport,
   limits: overrides } = {}) {
   requireValue(release === ACQUISITION_RELEASE, 'invalid-acquisition-release');
@@ -299,45 +404,13 @@ export async function acquireOpenLibraryDumps({ release, roster, signal, transpo
     // Freeze both exact file identities, publisher hashes and byte bounds before
     // the first large GET. MD5/SHA-1 are compared, never replaced by our own hash.
     const pinned = validation.pinnedSources;
-    const sources = {}, collected = {};
-    for (const kind of ['works', 'editions']) {
-      const source = pinned[kind];
-      accounting.activeSource = kind;
-      accounting.sources[kind] = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0,
-        unrelatedRows: 0, malformedUnrelatedRows: 0, complete: false, expectedBytes: source.bytes };
-      const response = await openOfficial(source.url, { signal: combined, maxBytes: source.bytes,
-        timeoutMs: Math.max(1, limits.timeoutMs - (Date.now() - started)) }, transport, limits,
-      () => accounting.requests[kind]++);
-      const length = response.headers?.['content-length'];
-      if (length !== undefined && (!/^\d+$/.test(length) || Number(length) !== source.bytes)) {
-        response.body.destroy(); throw fail('dump-file-size-mismatch');
-      }
-      const scan = await scanDumpStream(response.body, source, kind, selected, retrievedAt, budget,
-        { signal: combined, keyOf: row => row.workId, lineBytes: limits.lineBytes, retainedBytes: limits.retainedBytes,
-          observeProgress: stats => { accounting.sources[kind] = Object.assign(stats, { complete: false, expectedBytes: source.bytes }); } });
-      collected[kind] = scan.records;
-      sources[kind] = { ...source, ...scan.stats, finalUrl: response.url, redirects: response.redirects,
-        publisherChecksumsVerified: true };
-      accounting.sources[kind] = { ...scan.stats, expectedBytes: source.bytes, publisherChecksumsVerified: true };
-    }
-    const records = selected.map(row => ({ ...row, work: collected.works.get(row.workId) ?? null,
-      edition: collected.editions.get(row.workId) ?? null }));
-    const coverage = { targets: records.length, found: 0, missing: 0, eligibleTexts: 0, targetsWithEligibleText: 0 };
-    for (const row of records) {
-      let eligible = false;
-      for (const kind of ['work', 'edition']) {
-        if (row[kind]) coverage.found++; else coverage.missing++;
-        if (row[kind]?.inspection.description.status === 'eligible') { coverage.eligibleTexts++; eligible = true; }
-      }
-      if (eligible) coverage.targetsWithEligibleText++;
-    }
+    const { sources, records, coverage } = await collectPinnedSources({ pinned, selected, retrievedAt, started,
+      signal: combined, transport, limits, accounting, budget });
     return { contract: ACQUISITION_CONTRACT, status: 'collected', release, retrievedAt,
       completedAt: new Date().toISOString(), rosterSha256: digest(selected), limits,
       metadata: { url: metadata.url, finalUrl: metadata.finalUrl, redirects: metadata.redirects,
         bytes: raw.length, sha256: sha256(raw), raw: raw.toString('utf8'), document }, sources,
-      sourceManifest: { contract: SOURCE_CONTRACT, release, retrievedAt,
-        sources: Object.fromEntries(Object.entries(sources).map(([kind, source]) => [kind,
-          Object.fromEntries(['url', 'sha256', 'bytes', 'compression', 'maxDecodedBytes', 'maxRows'].map(key => [key, source[key]]))])) },
+      sourceManifest: sourceManifest(release, retrievedAt, sources),
       retainedRecordBytes: budget.bytes, records, coverage, approved: 0, databaseWrites: 0,
       individualProviderRequests: 0, rights: 'unreviewed',
       note: 'Unreviewed public-identifier collection only. Bind against a fresh private catalog snapshot locally before any review or application.' };
