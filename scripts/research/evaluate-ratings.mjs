@@ -161,6 +161,9 @@ function summary(a, reference, replicates, seed) {
 }
 const mean = values => values.reduce((x, y) => x + y, 0) / values.length;
 
+// Shared arithmetic for separately declared studies; D2's protocol and runner remain unchanged.
+export { accumulator as ratingAccumulator, add as addRatingError, summary as summarizeRatingErrors };
+
 /** Batch predictions are produced before any labels in that complete time group update state. */
 export function evaluateWindow(artifact, initial, targets, { prequential = false, protocol, budgetStarted = performance.now() }) {
   const state = bySubject(initial), metrics = {}, latencies = [], journals = [], prefixSizes = new Map();

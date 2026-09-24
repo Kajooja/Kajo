@@ -32,6 +32,7 @@
     "research:movielens:download": "python3 scripts/research/movielens.py download",
     "research:movielens:normalize": "npm run build --workspace @kajo/prediction-engine && node scripts/research/normalize-movielens.mjs",
     "research:movielens:evaluate": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-ratings.mjs",
+    "research:movielens:prefixes": "npm run build --workspace @kajo/prediction-engine && node --max-old-space-size=768 scripts/research/evaluate-prefixes.mjs",
     "test:acceptance": "npm run test --workspace @kajo/description-acceptance && node --test scripts/mobile/*.test.mjs",
     "acceptance:descriptions": "npm run start --workspace @kajo/description-acceptance --"
   },

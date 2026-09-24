@@ -45,6 +45,20 @@ it('rejects held-out subjects, cutoff-time labels and synthetic evidence before 
     kind: 'generator', id: 'invented', version: '1', parentRefs: [] }, recordId: 'x', revision: 1 } };
   expect(() => fitRatingArtifact([synthetic, ...rows.slice(1)], spec)).toThrow('synthetic');
 });
+it('retains durable state when no prefix item has fitted factors, with explicit zero component support', () => {
+  const a = artifact(), unknown = row(100, 999, 100, 0.5);
+  for (const visible of [[], [unknown]]) {
+    const predictions = forecastRatingBatch(a, { ...query, prefix: visible });
+    for (const prediction of predictions) {
+      expect(prediction.factorization.value).toBe(prediction['state-static'].value);
+      expect(prediction.factorization).toMatchObject({ fallback: true, componentSupport: 0 });
+    }
+  }
+  const supported = forecastRatingBatch(a, { ...query, prefix: [...prefix, unknown] });
+  expect(supported[0]!.factorization).toMatchObject({ fallback: false, componentSupport: prefix.length });
+  expect(supported[1]!.factorization.value).toBe(supported[1]!['state-static'].value);
+  expect(supported[1]!.factorization).toMatchObject({ fallback: true, componentSupport: 0 });
+});
 it('rejects equal-time/future targets, foreign subjects, duplicate and missing prefix evidence', () => {
   const a = artifact();
   for (const extra of [row(100, 20, 130), row(100, 20, 131), row(1, 20, 110), prefix[0]!]) {

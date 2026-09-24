@@ -250,6 +250,23 @@ Use global chronological train/validation/test cutoffs with all learned artifact
 
 Specify whether a result is frozen-batch or prequential. In a prequential test, score first, then allow that newly observed answer to update later state; never report that as a fixed holdout test. Keep a final untouched test window outside evolutionary model selection. Preserve an item-cold-start slice where feasible and report excluded/unmapped entities.
 
+### Reusing development data for a bounded follow-up
+
+A follow-up on already inspected outcomes must identify itself as exploratory;
+a changed prefix policy or wider time window does not create a fresh final test.
+The #265 protocol fixes original D2 source/configuration/membership/training
+boundaries and changes only the declared held-out prefix question. Every policy
+scores identical targets before any current timestamp group's answers enter
+history. Contiguous complete-group selection must report actual size, age and
+oversized-group blocking; equal maximum budgets need not mean equal information.
+Paired uncertainty resamples the same subjects jointly across conditions.
+
+A latent component with zero supported prefix Items must retain its declared
+state fallback; the presence of unsupported ratings alone is not latent support.
+This is research estimator correctness, not a serving integration. The
+[recorded follow-up](../../research/reports/movielens-small-prefix-study.md)
+retains its evidence and limitations separately from the original D2 report.
+
 ### Metrics and interpretation
 
 Use rating MAE/RMSE for observed explicit ratings. Use probability losses/calibration only when a probability target and supported labels exist. Ranking NDCG/Recall needs a published relevance rule and candidate universe; sampled unlabeled negatives are not known dislikes and must be labeled as an assumption/protocol.

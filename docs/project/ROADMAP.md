@@ -201,12 +201,15 @@ D2’s [actual development report](../../research/reports/movielens-small-d2.md)
 and rejection of the validation-selected challenger under the frozen rule. This
 completes the bounded experiment; current-head source acceptance is in STATUS.
 
-On September 24 the owner explicitly selected independent **#265** alongside the
-primary catalog packet: correct unsupported latent fallback and run one frozen
-exploratory earliest/recent prefix study on the same authorized D1 cohort. Keep
-original D2 training cutoffs/parameters and historical report immutable; report
-coverage, paired uncertainty and replay. Reused development data does not become
-an untouched final test. No model admission or new-source download is implied.
+The explicitly selected independent **#265** follow-up now corrects unsupported
+latent fallback and reports one reproduced exploratory earliest/recent prefix
+study on the same authorized D1 cohort. Original training boundaries/parameters
+and historical D2 rejection are preserved. On 5,707 ratings from 23 held-out
+subjects, the fixed recent-prefix durable-state comparison improves RMSE from
+0.850843 to 0.807788, with paired subject interval wholly below zero. This is reused
+development data and compares policies with potentially different actual prefix
+counts; no new final, native, BOOK or model-admission claim follows. The bounded
+packet is complete; it does not make further model search an MVP prerequisite.
 
 Exit: reproducible contracts/adapter/report and a documented admit/reject/defer decision. A challenger need not win. No probabilities, counterfactual uplift, group behavior or cross-domain competence may be fabricated from rating-only data. A losing or rights-blocked prior stays out of serving; the transparent baseline remains usable.
 
