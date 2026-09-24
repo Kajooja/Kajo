@@ -14,6 +14,39 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Reviewed acquisition failure and offline handoff — 2026-09-24 / #182
+
+After accepted PR #275/main `349c8b5e27b9a0eb88e178f19361e2bea0d7a026`,
+the owner authorized the separately reviewed request
+`4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb`.
+[Run 36003953876](https://github.com/Kajooja/Kajo/actions/runs/36003953876)
+failed on its only attempt at **13:11:37 UTC**, with
+`provider-identity-mismatch` at Work dump row **804,172**, whose key was in the
+selected roster. Collector accounting reports **78,731,116 compressed / 456,982,528 decoded bytes**, eleven preceding
+matches and 40,567 transient selected-record bytes. Those counters are not row
+byte offsets or full-source integrity evidence. The failed artifact contains
+**zero raw records**; selected target and failing predicate remain unknown.
+No Edition stream, complete EOF/checksum, review candidate, approval or database
+write occurred. Authenticated private recovery bound source/request/run/artifact;
+read-only comparison at **13:14:31 UTC** confirms all **383** targets unchanged.
+
+Recovery **version 2**, `Kajo-book-reviewed-acquisition-20260924.zip`, retains
+28 verified members / **152,823 bytes**, SHA-256
+`345bc96a22c927d58e5492c4e7ad1490ed8488233e01e82587628a126ac4166d`.
+It includes the ciphertext, run/source receipts, fresh snapshot, inspection and
+offline failure proposal. The request is consumed; no retry is selected.
+
+The next packet is source-only and offline: retain exactly one failing selected
+TSV row within the existing 1,049,600-byte line bound, with raw-byte hash,
+source/row/expected-roster identities and fixed private object/key/type/location
+predicate codes. Forward a versioned bounded failure object only through encrypted
+output; distinguish its bytes from matched-record accounting. Recovery must verify
+hashes/bindings and reproduce the predicate, while accepting historical receipts.
+Tests cover all predicates, `location: null`, bounds, tampering, encryption and
+public-log silence. Keep the original guard fail-closed and public code fixed;
+a failed stream supplies no success candidates or full-source verification.
+This packet authorizes no provider calls, new acquisition, review or database write.
+
 ## Reviewed exact-source acquisition implementation — 2026-09-24 / #182
 
 The exact-byte metadata diagnosis selects a separately reviewed request with
@@ -39,9 +72,12 @@ Actual local preparation smoke used the retained original roster, diagnostic
 ciphertext and key; altered ciphertext and wrong keys failed. It emitted no
 request file and made no network calls. The integrated local check passed
 lint/typechecks, 248 mobile and 143 catalog tests before the frozen Deno registry
-network boundary. Full source CI/merge and durable request/key recovery remain
-prerequisites for actual activation. Source and runtime acceptance are recorded
-in #182; no completed full scan is claimed at this implementation checkpoint.
+network boundary. [PR #275](https://github.com/Kajooja/Kajo/pull/275) then merged
+as `349c8b5e27b9a0eb88e178f19361e2bea0d7a026`, exact tree
+`c201ff7e351e0bfaf7d02e8e4abb36e80b2f0408`, after all five
+[CI #539 gates](https://github.com/Kajooja/Kajo/actions/runs/36000730750),
+**566 tests / four exports**. Durable request/key recovery preceded the actual
+activation recorded above; source acceptance does not imply a completed scan.
 
 A separate publisher-documentation check also records that Open Library ratings
 and reading-log dumps have no subject key, so they cannot supply individual taste
@@ -79,8 +115,10 @@ Independent protocol/results review passed, including direct private-result
 checks of novelty and all table counts. Local lint/typechecks, 248 mobile,
 128 catalog, 63 database, 44 engine, 32 research and 8 acceptance tests passed;
 four exports and companion guards passed separately. The combined 180-second
-check stops on frozen Deno npm-registry access in this environment. All five
-remote CI jobs remain required for merge. No production state, SQL migration,
+check stops on frozen Deno npm-registry access in this environment.
+[PR #274](https://github.com/Kajooja/Kajo/pull/274) then merged as
+`15bff8ddfb4b698b367b265123de3a83488ed70a`, after all five remote CI gates,
+**551 tests / four exports**; #273 is closed. No production state, SQL migration,
 trained artifact, native Event, admission or #182 source budget changes here.
 
 ## Completed metadata diagnosis — 2026-09-24 / #182

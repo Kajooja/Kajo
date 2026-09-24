@@ -58,12 +58,14 @@ attribution is accepted through PR #257 with all five required CI #508 gates,
 and its exact catalog-only forward is installed and verified. The September 23
 owner reports successful companion and full-application exercises; STATUS records
 their scope and separately queued Discovery/UI observations. A focused observation
-of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake is implemented; the next primary step
-is a distinct exact-pinned acquisition after a separate metadata-only diagnostic
-proved the original size-budget failure: both files total 16,644,821,648 bytes,
-above the old 15 GB cap. Preserve both consumed requests and their limits; the
-new request has its own reviewed exact-source budget. No real dump scan or
-additional approved text is claimed. The six-description usefulness target remains unmet.
+of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake
+and reviewed acquisition are accepted. After the metadata diagnostic proved the
+original 15 GB size-budget failure, the separate exact-pinned acquisition ran
+once and failed at a selected Work identity guard. All three requests are
+consumed; preserve their budgets and evidence. The next primary step is offline
+bounded selected-row failure evidence, with no new acquisition or retry. No
+complete dump scan or additional approved text exists. The six-description
+usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -173,15 +175,19 @@ is accepted through PR #257 / CI #508 and the new catalog-only forward is
 installed with exact function/ACL, history and full-catalog preservation checks.
 The owner completed both importer batches on September 24, with two updates,
 full preservation checks and a verified empty second batch. STATUS records the
-completed archive and the remaining focused real-text phone observation. Next,
-execute the separately selected exact-pinned acquisition after its source CI
-and durable request custody. The metadata-only diagnostic recovered the exact
-original body and proved the old 15 GB cap was below the two files’ observed
-16,644,821,648 bytes. Both earlier requests remain consumed, with zero dump GETs.
-The new request binds the original 383-target roster and recipient, exact publisher
-sizes/checksums and a separate one-shot budget. Full-source completion, private
-recovery, fresh reconciliation and source-specific rights review still precede
-a guarded writer bridge. Curated
+completed archive and the remaining focused real-text phone observation.
+The metadata-only diagnostic proved the old 15 GB cap was below the two files’
+observed 16,644,821,648 bytes. PR #275's separately accepted exact-pinned
+acquisition then ran once and failed at a selected Work identity guard, before
+EOF or full-source verification. Its recovered artifact contains no raw records;
+the selected identity and failing predicate remain unknown. All three requests
+are consumed, and fresh read-only reconciliation confirms 383 unchanged targets.
+Next, implement and test bounded selected-row failure evidence offline, preserving
+the fail-closed guard and fixed public code while retaining diagnostic evidence
+only in encrypted output. No acquisition, retry or new provider budget is selected.
+A future source run still requires its own explicit selection; complete-source
+verification, private recovery, fresh reconciliation and source-specific rights
+review precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own

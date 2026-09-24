@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 exact-pinned acquisition after proven size-budget failure
+## Current packet — #182 offline selected-row failure evidence
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -30,9 +30,12 @@ accepted. Actual [run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/
 read one complete **4,248-byte** metadata response, then failed before any dump
 request. A separate accepted metadata-only diagnostic recovered identical bytes and
 proved the cause: the two files total **16,644,821,648 bytes**, above the original
-15,000,000,000-byte cap. Both requests are consumed. The next selected packet is
-a distinct exact-pinned acquisition with that observed size, preserving the old
-limits and all source-integrity checks. The independent research packet has a corrected fallback and a completed,
+15,000,000,000-byte cap. Both requests are consumed. The separately accepted
+reviewed acquisition also ran once and failed at a selected Work identity guard;
+its encrypted artifact retained no raw records. The exact next packet is an
+**offline, bounded selected-row failure-evidence forward**, preserving the guard
+and public fixed error code. No acquisition or retry is selected. The independent
+research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -183,7 +186,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — reviewed exact-source acquisition
+### Exact next bounded packet — offline selected-row failure evidence
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -232,25 +235,34 @@ Authenticated recovery and the byte-identical original validator reproduce
 This is now a proven historical cause. The diagnostic fetched no dumps, per-Item
 sources or ratings, approved no text and wrote no database rows. It is consumed.
 
-The owner's continued MVP instruction selects `fix/182-reviewed-dump-budget`:
-a **new, distinct one-shot request** using exactly these observed publisher
-sizes/MD5/SHA1 pins and this exact total ceiling. It must preserve the original
-383-target roster/recipient, prior-run provenance, old immutable protocol limits,
-full EOF/gzip/checksum verification and all remaining memory/time/row bounds.
-The implemented workflow uses `catalog-acquisition/ol-20260831-reviewed` and
-only `scripts/catalog/requests/ol-20260831-reviewed.json`. Local preparation
-reauthenticates the archived diagnostic ciphertext with the saved key before
-emitting that public request. The runner verifies the original acquisition and
-diagnostic Git objects, roster/key equality, exact accepted source and sole-file
-change. It needs no new metadata GET and permits no automatic retries or unrelated
-source acquisition. Source CI/merge and durable exact request/key custody precede
-activation; a completed scan, private recovery and fresh catalog reconciliation
-precede source-specific rights/language review and any guarded writer bridge.
-No successful dump scan or added approved text exists at this checkpoint.
-The [runtime checkpoint](sprints/SPRINT-014.md#completed-metadata-diagnosis--2026-09-24--182)
-records the exact evidence and selected next action. Independent #273 measures
-feature coverage in an isolated synthetic bootstrap fixture; it does not replace
-this primary handoff or admit any model/serving change.
+[PR #275](https://github.com/Kajooja/Kajo/pull/275) is accepted as
+`349c8b5e27b9a0eb88e178f19361e2bea0d7a026`, after all five
+[CI #539 gates](https://github.com/Kajooja/Kajo/actions/runs/36000730750),
+**566 tests / four exports**. Its separate 16,644,821,648-byte contract preserves
+the original roster/recipient, exact publisher pins, prior-run provenance, old
+immutable limits and full-source integrity checks. The owner authorized merge
+and activation after source acceptance and durable request/key custody.
+
+Request `4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb` was consumed by
+[run 36003953876](https://github.com/Kajooja/Kajo/actions/runs/36003953876).
+The Work stream failed with `provider-identity-mismatch` at a selected row at
+dump position **804,172**, after **78,731,116 compressed / 456,982,528 decoded bytes**.
+Its 11 preceding matches / 40,567 bytes were transient: authenticated recovery
+contains **zero raw records or candidates**. The selected target and failing
+predicate are unknown. No Edition request, database write, complete EOF or
+full-source checksum verification occurred. Fresh read-only reconciliation at
+**2026-09-24 13:14:31 UTC** confirms all **383** selected targets unchanged.
+
+Next, implement and test only bounded private failure evidence: retain the one
+failing selected TSV row under the existing line bound, exact raw bytes/hash,
+source/row/roster bindings and fixed private predicate codes in encrypted failure
+output. Recovery must reproduce the guard failure and reject tampering. Preserve
+historical receipts, public-log silence, separate diagnostic-byte accounting and
+all fail-closed identity checks. No successful source, review candidate, approval or
+write may result from a failed stream. **Do not rerun this request or start a new
+acquisition.** The [runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
+records authenticated recovery and the bounded next packet. Independent #273 is
+accepted synthetic sensitivity evidence, with no model or serving admission.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed
@@ -290,7 +302,9 @@ so the six-concept representation is not a neutral replacement for native tags.
 Do not call these effects learned taste or accuracy gains. Any later integration
 must separate metadata-driven novelty, coordinate Memory/Shared/Scenario and
 serving-shadow semantics, and measure real held-out usefulness. #182 stays primary.
-Source/CI acceptance is recorded in #273; D2 model rejection remains unchanged.
+[PR #274](https://github.com/Kajooja/Kajo/pull/274) is merged as
+`15bff8ddfb4b698b367b265123de3a83488ed70a`, after all five CI gates,
+**551 tests / four exports**; #273 is closed. D2 model rejection remains unchanged.
 
 ## Provider-backed concept audit — #269
 
