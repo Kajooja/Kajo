@@ -8,11 +8,12 @@ import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { createGunzip } from 'node:zlib';
 import { digest, inspectRecord, requireValue, sha256, UUID } from './open-library-descriptions.mjs';
+import { createDumpFailureEvidence, FAILURE_EVIDENCE_LIMITS } from './dump-failure-evidence.mjs';
 
 export const TARGET_CONTRACT = 'open-library-description-dump-targets-v1';
 export const SOURCE_CONTRACT = 'open-library-description-dump-source-v1';
 export const INTAKE_CONTRACT = 'open-library-description-dump-intake-v1';
-export const LIMITS = Object.freeze({ targets: 385, lineBytes: 1049600, stagedRecordBytes: 64 * 1024 * 1024,
+export const LIMITS = Object.freeze({ targets: 385, lineBytes: FAILURE_EVIDENCE_LIMITS.lineBytes, stagedRecordBytes: 64 * 1024 * 1024,
   fileBytes: 64 * 1024 ** 3, decodedBytes: 512 * 1024 ** 3, rows: 200000000 });
 export const DEFAULT_STAGING_ROOT = fileURLToPath(new URL('../../dist/catalog-enrichment/', import.meta.url));
 const HASH = /^[0-9a-f]{64}$/;
@@ -23,6 +24,10 @@ const boundedInteger = (value, maximum) => Number.isSafeInteger(value) && value 
 const timestamp = value => typeof value === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?(?:Z|[+-]\d\d:\d\d)?$/.test(value)
   && Number.isFinite(Date.parse(/[Zz]|[+-]\d\d:\d\d$/.test(value) ? value : value + 'Z'));
 const timeValue = value => Date.parse(/Z$|[+-]\d\d:\d\d$/.test(value) ? value : value + 'Z');
+// Only the selected-row inspection below can brand an exception. A transport's
+// arbitrary error properties cannot become private diagnostic evidence.
+const selectedRowFailures = new WeakMap();
+export const readDumpFailureEvidence = error => selectedRowFailures.get(error);
 
 export function validateDumpTargets(snapshot) {
   requireValue(exactKeys(snapshot, ['contract', 'checkedAt', 'targets']) && snapshot.contract === TARGET_CONTRACT
@@ -132,7 +137,8 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
     .map(name => [name, createHash(name)]));
   const decoder = new TextDecoder('utf-8', { fatal: true });
   let pending = Buffer.alloc(0);
-  function line(bytes) {
+  function line(bytes, terminated) {
+    const rowBytes = bytes;
     stats.rows += 1;
     requireValue(stats.rows <= source.maxRows, 'dump-row-limit');
     if (bytes.at(-1) === 13) bytes = bytes.subarray(0, -1);
@@ -163,7 +169,16 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
     const raw = decoded.slice(boundaries[3] + 1);
     requireValue(recordType === `/type/${type}` && /^[1-9]\d*$/.test(revision)
       && Number.isSafeInteger(Number(revision)) && timestamp(modifiedAt), 'invalid-dump-target-envelope');
-    const inspection = inspectRecord(raw, target, type, fetchedAt);
+    let inspection;
+    try { inspection = inspectRecord(raw, target, type, fetchedAt); }
+    catch (error) {
+      if (error.message === 'provider-identity-mismatch' && error.identityPredicate) {
+        selectedRowFailures.set(error, createDumpFailureEvidence({ rowBytes, terminated, sourceKind: kind, source,
+          roster: selected, expected: target, row: stats.rows, fetchedAt, predicate: error.identityPredicate,
+          limits: { lineBytes, maxRows: source.maxRows } }));
+      }
+      throw error;
+    }
     requireValue((inspection.sourceRevision === null || inspection.sourceRevision === Number(revision))
       && (inspection.sourceModifiedAt === null || timeValue(inspection.sourceModifiedAt) === timeValue(modifiedAt)),
     'invalid-dump-target-envelope');
@@ -189,7 +204,7 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
       for (let end = chunk.indexOf(10); end !== -1; end = chunk.indexOf(10, start)) {
         const part = chunk.subarray(start, end);
         requireValue(pending.length + part.length <= lineBytes, 'dump-line-limit');
-        line(pending.length ? Buffer.concat([pending, part]) : part);
+        line(pending.length ? Buffer.concat([pending, part]) : part, true);
         pending = Buffer.alloc(0);
         start = end + 1;
       }
@@ -205,7 +220,7 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
   // Always consume to EOF, including after every target was found: digest and
   // gzip footer integrity cover the whole file, and a later duplicate must fail.
   await pipeline(...streams, ...(signal ? [{ signal }] : []));
-  if (pending.length) line(pending);
+  if (pending.length) line(pending, false);
   requireValue(stats.bytes === source.bytes, 'dump-file-size-mismatch');
   const checksums = Object.fromEntries(Object.entries(hashes).map(([name, hash]) => [name, hash.digest('hex')]));
   for (const [name, value] of Object.entries(checksums))

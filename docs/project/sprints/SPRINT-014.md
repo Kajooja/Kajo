@@ -14,6 +14,40 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Offline selected-row failure evidence — 2026-09-24 / #182
+
+`fix/182-dump-failure-evidence` implements the bounded failure-evidence forward.
+The shared parser retains at most
+one selected row when the unchanged identity guard fails. The versioned private
+object binds the exact source, roster, expected Work/Edition pair, dump row,
+fetched time, raw Base64 bytes/hash and object/key/type/location predicate.
+Raw bytes exclude LF, retain any CR, and record whether LF terminated the row.
+Recovery validates all bounds/bindings and replays the predicate before exposing
+the private diagnosis. Historical receipts without this field remain valid.
+
+Diagnostic bytes are separate from matched-record accounting. The public failure
+code remains fixed; raw input and precise predicates stay in encrypted output.
+Failed streams remain incomplete and produce no source checksum verification,
+review candidates, approvals or database writes. This implementation cannot
+restore the real row discarded by run 36003953876; its exact cause remains unknown.
+
+Independent review and **86 targeted tests** pass, including all four predicates,
+actual maximum-size CRLF rows, UTF-8 chunk boundaries, Work/Edition cases,
+untrusted transport errors, both collector/encryption paths and a correctly
+encrypted but internally forged payload. The local integrated check passed
+lint/typechecks, **248 mobile and 159 catalog tests**, then reached frozen Deno
+npm dependency downloads. All five remote CI gates remain required; exact
+source/CI/merge acceptance is recorded in Issue #182.
+The new unsealer also opened the actual prior reviewed failure and metadata
+diagnostic; historical payloads and missing-evidence meaning stayed unchanged.
+No source request, database change or new artifact recovery was fabricated.
+
+After source acceptance, evaluate one separate bounded Work-source diagnosis
+plan against the same release/roster/recipient. Declare byte/row/time limits and
+stop at the first selected identity failure to recover one encrypted row and
+replay its actual predicate offline. The patch adds no request or trigger and
+activates no provider budget; all consumed requests remain consumed.
+
 ## Reviewed acquisition failure and offline handoff — 2026-09-24 / #182
 
 After accepted PR #275/main `349c8b5e27b9a0eb88e178f19361e2bea0d7a026`,

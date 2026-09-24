@@ -6,6 +6,7 @@ import { ACQUISITION_CONTRACT, ACQUISITION_LIMITS, ACQUISITION_RELEASE,
   METADATA_INSPECTION_CONTRACT, inspectAcquisitionMetadataBytes, safeAcquisitionError,
   validateAcquisitionRoster } from './acquire-open-library-dumps.mjs';
 import { canonicalJson, digest, requireValue, sha256 } from './open-library-descriptions.mjs';
+import { validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
 
 export const REQUEST_CONTRACT = 'open-library-dump-acquisition-request-v1';
 export const SEALED_CONTRACT = 'open-library-dump-acquisition-sealed-v1';
@@ -143,12 +144,67 @@ const rosterHash = request => request.contract === DIAGNOSTIC_REQUEST_CONTRACT ?
 const payloadKind = result => result.status === 'failed' ? 'failure'
   : result.contract === METADATA_INSPECTION_CONTRACT ? 'metadata-inspection' : 'collected';
 
+// New evidence is checked on both sides of encryption. Old receipts without it
+// retain their historical meaning; no missing row can be reconstructed from
+// partial stream counters alone.
+function validateCollectedFailureEvidence(result, request) {
+  const accounting = result.accounting;
+  if (!object(accounting) || !Object.hasOwn(accounting, 'failureEvidence')) {
+    requireValue(accounting?.diagnosticRetainedBytes === undefined || accounting.diagnosticRetainedBytes === 0,
+      'invalid-dump-failure-evidence');
+    return;
+  }
+  const evidence = accounting.failureEvidence;
+  requireValue(result.contract === FAILURE_CONTRACT && result.status === 'failed'
+    && result.code === 'provider-identity-mismatch' && object(evidence)
+    && ['works', 'editions'].includes(evidence.sourceKind), 'invalid-dump-failure-evidence');
+  let source;
+  if (request.contract === REVIEWED_REQUEST_CONTRACT) source = request.sourcePins[evidence.sourceKind];
+  else {
+    const metadata = accounting.metadata;
+    requireValue(object(metadata) && metadata.complete === true && Number.isSafeInteger(metadata.bytes)
+      && metadata.bytes > 0 && metadata.bytes <= request.limits.metadataBytes
+      && typeof metadata.rawBase64 === 'string'
+      && metadata.rawBase64.length <= 4 * Math.ceil(metadata.bytes / 3), 'invalid-dump-failure-evidence');
+    const raw = base64(metadata.rawBase64, metadata.bytes);
+    requireValue(sha256(raw) === metadata.sha256, 'invalid-dump-failure-evidence');
+    const inspected = inspectAcquisitionMetadataBytes(raw, request.release, request.limits);
+    requireValue(inspected.validation.valid, 'invalid-dump-failure-evidence');
+    source = inspected.validation.pinnedSources[evidence.sourceKind];
+  }
+  validateDumpFailureEvidence(evidence, { roster: request.roster, source, limits: request.limits });
+  const stats = accounting.sources?.[evidence.sourceKind];
+  requireValue(object(stats) && accounting.activeSource === evidence.sourceKind
+    && evidence.fetchedAt === accounting.startedAt
+    && stats.complete === false && stats.publisherChecksumsVerified === undefined
+    && ['sha256', 'md5', 'sha1'].every(name => stats[name] === undefined)
+    && stats.expectedBytes === source.bytes && stats.rows === evidence.row
+    && ['bytes', 'decodedBytes', 'rows', 'matchedRecords', 'unrelatedRows', 'malformedUnrelatedRows']
+      .every(name => Number.isSafeInteger(stats[name]) && stats[name] >= 0)
+    && stats.bytes > 0 && stats.bytes <= source.bytes
+    && stats.decodedBytes >= evidence.rawBytes && stats.decodedBytes <= request.limits.maxDecodedBytes
+    && stats.matchedRecords <= request.roster.length
+    && stats.matchedRecords + stats.unrelatedRows + 1 === stats.rows
+    && stats.malformedUnrelatedRows <= stats.unrelatedRows
+    && accounting.diagnosticRetainedBytes === evidence.rawBytes
+    && Number.isSafeInteger(accounting.retainedRecordBytes) && accounting.retainedRecordBytes >= 0
+    && accounting.retainedRecordBytes <= request.limits.retainedBytes
+    && Number.isSafeInteger(accounting.requests?.[evidence.sourceKind])
+    && accounting.requests[evidence.sourceKind] >= 1
+    && accounting.requests[evidence.sourceKind] <= 1 + request.limits.maxRedirects
+    && (evidence.sourceKind !== 'works' || accounting.requests.editions === 0
+      && accounting.sources.editions === undefined)
+    && accounting.individualProviderRequests === 0 && accounting.databaseWrites === 0,
+  'invalid-dump-failure-evidence');
+}
+
 function validateCollected(collected, request) {
   if (collected?.contract === FAILURE_CONTRACT) {
     requireValue(exactKeys(collected, ['contract', 'status', 'release', 'rosterSha256', 'limits', 'code', 'accounting'])
       && collected.status === 'failed' && collected.release === request.release
       && collected.rosterSha256 === digest(request.roster) && digest(collected.limits) === digest(request.limits)
       && /^[a-z-]{1,100}$/.test(collected.code) && object(collected.accounting), 'invalid-acquisition-failure');
+    validateCollectedFailureEvidence(collected, request);
     return;
   }
   requireValue(object(collected) && collected.contract === ACQUISITION_CONTRACT
@@ -162,6 +218,7 @@ function validateCollected(collected, request) {
       && row.editionId === request.roster[index].editionId)
     && ['works', 'editions'].every(kind => collected.sources?.[kind]?.complete === true
       && collected.sources[kind].publisherChecksumsVerified === true), 'invalid-acquisition-collected');
+  validateCollectedFailureEvidence(collected, request);
 }
 
 export function sealAcquisition(collected, request) {
