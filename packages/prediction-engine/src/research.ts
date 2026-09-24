@@ -288,6 +288,7 @@ export function forecastRatingBatch(a: RatingArtifact, query: RatingQuery): Reco
   const recentCorrection = lastGroups.length / (lastGroups.length + 1) * recentResidual;
   const rawMean = prefix.length ? mean(prefix.map(observed)) : null;
   const rawRecent = lastGroups.map(g => mean(g.map(observed))), factors = foldIn(a, prefix);
+  const factorSupport = prefix.filter(row => Object.hasOwn(a.items, row.objectId)).length;
   const width = a.target.scale.max - a.target.scale.min;
   const clip = (x: number) => Math.max(a.target.scale.min, Math.min(a.target.scale.max, x));
   return query.objectIds.map(objectId => {
@@ -301,7 +302,7 @@ export function forecastRatingBatch(a: RatingArtifact, query: RatingQuery): Reco
     const neighbors = (item?.neighbors ?? []).filter(([id]) => residuals.has(id));
     const weight = neighbors.reduce((sum, [, sim]) => sum + sim, 0);
     const neighbor = weight ? base + neighbors.reduce((sum, [id, sim]) => sum + sim * residuals.get(id)!, 0) / weight : state;
-    const latent = item && prefix.length ? base + factors[0]! + item.vector.reduce((sum, v, i) => sum + v * factors[i + 1]!, 0) : state;
+    const latent = item && factorSupport ? base + factors[0]! + item.vector.reduce((sum, v, i) => sum + v * factors[i + 1]!, 0) : state;
     const retrieve = (ordered: boolean): RatingForecast => {
       const fallback = ordered ? recent : state;
       if (rawMean === null || groups.length < c.retrieval.minPrefixGroups) return make(fallback, 0);
@@ -317,7 +318,7 @@ export function forecastRatingBatch(a: RatingArtifact, query: RatingQuery): Reco
     };
     return { 'global-mean': make(a.globalMean, a.trainCount), 'item-mean': make(base, item?.count ?? 0),
       'state-static': make(state, prefix.length), 'state-recent': make(recent, prefix.length),
-      'item-neighbor': make(neighbor, neighbors.length), 'factorization': make(latent, item && prefix.length ? prefix.filter(r => Object.hasOwn(a.items, r.objectId)).length : 0),
+      'item-neighbor': make(neighbor, neighbors.length), 'factorization': make(latent, item ? factorSupport : 0),
       'retrieval-static': retrieve(false), trajectory: retrieve(true) };
   });
 }

@@ -14,6 +14,66 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Exploratory prefix study and recovery — 2026-09-24 / #265
+
+The owner explicitly requested continued public-preference research alongside
+#182. A reproduced factorization inference defect discarded durable subject
+state when all visible Items lacked fitted factors. The repair uses actual
+supported-prefix count, preserving the declared durable fallback with zero
+component support. Empty, mixed and unknown-target regressions are included.
+Native serving, fitting and historical D2 reports are unchanged.
+
+The fixed protocol/code were locally committed as `e37f63d` before the real fit.
+Source download reproduced the original 993,937-byte GroupLens Latest Small /
+Kaggle v2 archive, and normalization reproduced all **84,849 observations / 500
+subjects**. Freeze receipt
+`e21f14b673a33161f95643d4e0eeeee4f4e1c4fffa8c61d5c41ccbf481c59aa8`
+binds exact source/code/runtime, original D2 configuration and all partition hashes.
+
+Two independent fits used the original **46,410 ratings / 299 training subjects**.
+The declared exploratory target window contains **5,707 ratings / 23 held-out
+subjects**. Every policy/budget scores the same complete target groups before
+updating only that subject's available history. Primary recent-vs-earliest
+maximum-ten durable-state RMSE is **0.807788 vs 0.850843**, difference **−0.043054**,
+paired subject-bootstrap 95% **[−0.060646, −0.024471]**. The actual report records
+prefix size/age, 1,218 cold-item targets, zero history, all fixed diagnostics,
+coverage, resource bounds and limits. Equal maximum budgets do not ensure equal
+actual information. Already inspected development data supports no fresh final,
+BOOK-transfer, Shared, native or admission claim. D2 rejection stays intact.
+
+Model SHA-256: `808283339e023db236a4dd20412cf9b873072457a5c717aa2ed969763684e3ef`.
+Deterministic result SHA-256:
+`1f40db237a52cff34a1ed8b7a91b048939632beaa32456dd831cb1713dd2034b`.
+Both runs matched parameters, journals, metrics and prefix summaries. Each took
+under four seconds, peaked below 381 MiB RSS and produced an 8,014,330-byte model.
+Exact costs/runtime and scope are in the [report](../../../research/reports/movielens-small-prefix-study.md).
+
+The controlled `/FRST/Kajo-MovieLens-prefix-study-265.zip` is **12,988,040 bytes**,
+SHA-256 `ad6e93025ae88099ced717c57bc7d932cced1007f6fc3bd46818625aa223f6c1`.
+Its forty member hashes/sizes and ZIP CRC verified before saving. It retains
+source/rights evidence, normalization, exact source snapshot, frozen partitions,
+two actual models/journals and aggregate reports outside Git. Recover it only
+into private ignored paths after verifying all hashes. The old freeze binds
+its original source/runtime; later package/script changes require a new freeze,
+not editing that receipt. Research-only rights/withdrawal conditions remain.
+
+Independent method/code review found one parent-configuration binding gap;
+it was fixed and regression-tested before commit/freeze. Final report review
+verified result hashes, support, metrics and limitations. Engine lint/typecheck
+and **44 engine / 32 research / 63 database tests** passed, plus four exports and
+companion isolation. Local root check was stopped at Deno registry connection
+retries; no full-local-pass claim or TLS/lock change. Required PR CI supplies the
+complete gate; Issue #265 records head/run/merge acceptance. Root integration
+adds only the already reviewed catalog command and canonical documentation;
+it does not recalculate or overwrite the historical study.
+
+The completed pilot recovery and next primary #182 acquisition/scan remain below.
+The separate `/FRST/Kajo-book-dump-targets-20260924.zip` retains real snapshot,
+plan and failed acquisition evidence: **27,012 bytes**, SHA-256
+`035d4a919f5033bf4561f5f6b00fe014ffe55df2c97d37fef3b44e865446a669`.
+It contains no source dump or approved text and does not replace the completed
+pilot archive. Broader catalog/native/MVP acceptance stays open.
+
 ## Offline BOOK dump intake — 2026-09-24 / #182
 
 Source work implements a distinct local monthly-dump intake after the completed

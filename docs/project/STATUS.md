@@ -26,9 +26,9 @@ The owner's subsequent request explicitly selects **#182 pinned Work/Edition
 dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
 unsupported latent fallback correction and bounded MovieLens prefix research**
 alongside it. The catalog intake is now implemented and independently reviewed; real source
-acquisition is blocked before download by Archive.org connection timeouts. The
-research packet remains independent, uses the already authorized dataset and
-cannot admit a model. Source/CI acceptance is recorded in the respective issues.
+acquisition is blocked before download by Archive.org connection timeouts. The independent research packet now has a corrected fallback and a completed,
+reproduced exploratory study on the same authorized dataset. It admits no model.
+Source/CI acceptance is recorded in the respective issues.
 
 The owner reports successful full-application use on **2026-09-23** after the
 cold List/history entry, Profile switching and error/retry test instructions:
@@ -237,17 +237,33 @@ results do not prove fixed-holdout or native usefulness; cold-start support is l
 uncertainty, costs, reproduction/review history and the 357-test source acceptance.
 Raw histories, fitted models and predictions remain ignored and research-only.
 
-### Explicitly selected independent follow-up — #265
+### Completed independent prefix study — #265
 
-`feat/research-prefix-evaluation` corrects a reproduced research-only fallback
-bug: a prefix containing no trained Items must use the durable baseline instead
-of an unsupported latent item mean. Freeze the exploratory prefix-study manifest
-before running the existing D1 cohort: original D2 training cutoff and fitted
-parameters, held-out subjects, earliest/recent complete prior time groups with
-0/5/10/20 budgets and identical target denominators. Report coverage, actual
-prefix sizes/age, paired subject uncertainty, resources and independent replay.
-D2's already examined data is development evidence, not a fresh final test.
-Historical D2 results and rejection stay intact; native serving is unchanged.
+`feat/research-prefix-evaluation` fixes the research-only fallback bug: a prefix
+containing no trained Items now retains the durable-state baseline instead of
+returning an unsupported latent item mean. Empty, mixed and unknown-target cases
+are covered. Training and the historical D2 report remain unchanged.
+
+The [actual study and limits](../../research/reports/movielens-small-prefix-study.md)
+and [aggregate evidence](../../research/reports/movielens-small-prefix-study.json)
+record the preregistered earliest/recent complete-prior-group comparison with
+0/5/10/20 budgets. Two independent fits use the original **46,410 training rows /
+299 observed training subjects** and score identical **5,707 ratings / 23 held-out
+subjects**. Primary recent versus earliest ten-rating durable-state RMSE is
+**0.807788 versus 0.850843**, paired difference **−0.043054**, subject-bootstrap
+95% interval **[−0.060646, −0.024471]**. The fixed comparison exceeds its descriptive
+threshold; no diagnostic model was selected or promoted.
+
+This reuses already examined D2 development data, not a fresh final test. Equal
+maximum budgets have different actual prefix counts; the result compares practical
+selection policies, not pure recency at equal information. It demonstrates no
+BOOK transfer, Shared or native usefulness. Parameters/predictions/metrics match
+between both runs; complete source, normalized data, freeze, models and journals
+are retained privately in `Kajo-MovieLens-prefix-study-265.zip`. The
+[checkpoint](sprints/SPRINT-014.md#exploratory-prefix-study-and-recovery--2026-09-24--265)
+records archive integrity and validation limits. Further research needs a named
+question and untouched evaluation evidence where a final claim is intended;
+do not run an open-ended model search. The primary #182 task above remains next.
 
 ## Native packet checkpoint — #228 / draft PR #229
 
@@ -336,7 +352,7 @@ The ordered engine work is:
 
 E1, D1 and D2 are accepted through #241/#242/#243. The reproducible D2 report
 and rejection/fallback decision are complete. #182 remains the primary catalog
-unit; the owner explicitly selected independent #265 as described above. #229 retains native
+unit; explicitly selected independent #265 is now completed as described above. #229 retains native
 acceptance and application UI work remains in its separately ordered packet. No large native user
 population, production schema or separate network service is needed for D1.
 
@@ -349,8 +365,9 @@ recorded operations. A losing challenger is a valid report; it cannot waive
 native usefulness gates or deploy itself.
 
 E1 delivered executable contracts; D1 delivered real research intake; D2 now
-fits and evaluates bounded offline models. Fitted artifacts remain research-only
-and are rejected for admission in this configuration. No native model integration,
+fits and evaluates bounded offline models. #265 adds a reproducible exploratory
+prefix-policy result and unsupported-latent fallback repair. Fitted artifacts remain
+research-only; D2 rejection and native admission deferral are unchanged. No native model integration,
 world model, multistep dreamer or automatic promotion is delivered.
 
 ## Preserved owner requirements and release order

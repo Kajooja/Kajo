@@ -182,7 +182,7 @@ a SQL replacement or a fabricated action-outcome Scenario.
 | Durable state | Item baseline plus sum of permitted subject residuals divided by `(prefix count + 10)` |
 | Recent state | Item baseline plus 0.65 durable residual and 0.35 recent residual; recent residual averages the last three complete time-group residual means, shrunk by `groups/(groups+1)` |
 | Item neighbors | Positive cosine of training item-centered vectors, overlap shrinkage `n/(n+10)`, overlap ≥3; train-support ≥5, top 1,000 items, top 20 edges; no match uses durable state |
-| Factorization | Eight factors, twelve seeded shuffled SGD epochs, learning rate 0.01 and regularization 0.05; fixed item offsets and learned user bias/vectors during fit; inference ridge-folds the permitted prefix into an intercept plus factors with penalty 10 against frozen item vectors |
+| Factorization | Eight factors, twelve seeded shuffled SGD epochs, learning rate 0.01 and regularization 0.05; fixed item offsets and learned user bias/vectors during fit; inference ridge-folds the permitted prefix into an intercept plus factors with penalty 10 against frozen item vectors. Current source uses durable state when the target or every prefix item lacks fitted factors; the dated D2 report retains its original code/results |
 | Static retrieval | Same-item, different-subject train memories matched by normalized raw durable prefix mean; at least three earlier time groups; fallback durable state |
 | Ordered retrieval | Same bank plus three ordered complete-group raw means in distance; fallback recent state. Both retrieve at most ten within RMS distance 0.35 and blend 0.35 continuation mean into the fallback |
 
@@ -205,3 +205,64 @@ New cases exercise cutoff/held-out/synthetic leakage, unavailable/equal-time
 prefixes, label-blind splits, continuation-free encoders, tied-group order,
 prequential score-before-update, deterministic fits/metrics and fallback. No
 network download or real-data training is performed by ordinary CI.
+
+## Exploratory prefix adaptation — #265
+
+[Actual result and limits](reports/movielens-small-prefix-study.md) ·
+[Aggregate evidence](reports/movielens-small-prefix-study.json).
+
+The owner requested further research on the already authorized public preference
+source on September 24. The [fixed study protocol](manifests/movielens-small-prefix-study.json)
+compares the earliest and most recent complete rating-entry groups under maximum
+prefix budgets 0/5/10/20. Its single primary contrast is recent minus earliest RMSE
+at budget 10 using durable state. The other existing variants and budgets are
+diagnostics, with no tuning, winner selection or automatic model admission.
+
+This reuses **previously inspected D2 development outcomes**. It cannot produce
+a new untouched-final claim. Original D2 membership, all partition hashes and both
+cutoffs must match before freezing the study. Global models train on the same
+regular-subject pre-cutoff rows. Every held-out subject's post-training-cutoff
+rating is scored under every condition; pre-cutoff history and previously scored
+groups may enter only that subject's visible prefix. All current tied labels
+stay hidden until every condition has scored the complete group.
+
+Recent selection retains a contiguous suffix of whole groups. Earliest selection
+retains a contiguous prefix. Both stop when the next group cannot fit; they never
+skip a large group to fill a budget. A maximum budget does not promise that many
+visible ratings. Actual size, rating-entry age and oversized-group exclusions
+are reported, together with cold-item and zero-history fallback. This compares
+two practical policies at a maximum budget, **not pure recency at equal actual
+information**. Paired policy uncertainty jointly resamples the same subjects and
+is descriptive exploratory evidence.
+
+After the existing pinned prepare/download/normalize commands above:
+
+```sh
+npm run research:movielens:prefixes -- freeze
+npm run research:movielens:prefixes -- run
+npm run research:movielens:prefixes -- run --output-dir research-artifacts/movielens-prefix-replay
+```
+
+The freeze records exact source, original split, current code/protocol and runtime
+before fitting. The two run commands independently fit and evaluate those same
+fixed conditions. For a fresh replay in an already used workspace, supply new
+`--frozen-dir` / `--output-dir` paths; existing or partial directories are never
+overwritten. `--input` accepts only the exact hashed D1 observation file. All
+outputs remain under ignored `research-artifacts/`; source records, model
+parameters and prediction journals are not repository/ordinary CI artifacts.
+Publish only the aggregate report and integrity hashes.
+
+The recorded September 24 freeze was made from the exact pre-run source snapshot
+at local commit `e37f63d`, before later catalog script/package integration. Its
+private recovery archive retains that source snapshot and runtime identity.
+Unrelated later changes to a hashed package/script intentionally invalidate reuse
+of the old freeze. For exact recovery, use the recorded source/runtime; for a new
+current-source run, create a new freeze in a new directory and report its new
+identity. Do not edit or relabel the old receipt to make a later checkout match.
+
+The factorization support repair in this packet restores durable state when a
+known target has no supported prefix item. It does not change training or the
+historical D2 report. Source, training, evidence of benefit and serving admission
+remain separate facts. MovieLens cannot establish BOOK transfer, Shared behavior
+or native product usefulness; the source's research-only rights and the existing
+withdrawal/admission gates remain in force.
