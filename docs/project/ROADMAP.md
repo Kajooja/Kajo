@@ -59,8 +59,10 @@ and its exact catalog-only forward is installed and verified. The September 23
 owner reports successful companion and full-application exercises; STATUS records
 their scope and separately queued Discovery/UI observations. A focused observation
 of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake is implemented; the next primary step
-is an actual bounded scan once official source files are reachable. No real
-dump scan or additional approved text is claimed yet. The six-description usefulness target remains unmet.
+is actual execution of the separate one-shot cloud acquisition workflow after
+source CI/merge, with private key custody and ciphertext-only artifact recovery.
+Local Archive.org access remains blocked. No real dump scan or additional
+approved text is claimed at the source checkpoint. The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -171,11 +173,13 @@ installed with exact function/ACL, history and full-catalog preservation checks.
 The owner completed both importer batches on September 24, with two updates,
 full preservation checks and a verified empty second batch. STATUS records the
 completed archive and the remaining focused real-text phone observation. Next,
-execute the implemented bounded local pinned Work/Edition dump intake for the
-existing exact BOOK identities, excluding managed descriptions. The actual plan
-selects 383 targets; Archive.org timeouts blocked acquisition before download.
-Verified source files remain the next dependency; staging and rights review
-precede a guarded writer bridge. Curated
+execute the separately reviewed bounded cloud Work/Edition acquisition after
+source CI/merge for the existing exact BOOK identities, excluding managed
+descriptions. The actual plan selects 383 targets; local Archive.org access
+remains blocked. The one-shot request streams complete publisher files and
+returns only encrypted selected records/accounting. Exact runtime provenance,
+private recovery and fresh catalog reconciliation precede source-specific rights
+review and a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own

@@ -14,6 +14,57 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded cloud BOOK acquisition — 2026-09-24 / #182
+
+The continued owner request selects a concrete acquisition path after the local
+Archive.org connection failed again with HTTP 502 before any dump bytes. The
+separate accepted-source workflow streams the fixed **2026-08-31** Work/Edition
+dumps on GitHub, retaining only the public exact-ID roster's selected records.
+It is activated explicitly by one narrow request-branch push after source CI and
+merge; ordinary CI uses fixture streams and cannot launch the real download.
+
+The request binds exact current main, canonical public roster, all caps and
+recipient public-key fingerprint. Its sole parent must be that main commit and
+its only tree change the allowlisted request JSON. Read-only GitHub permissions,
+pinned Actions, disabled persisted checkout credentials and no lifecycle scripts
+prevent request-branch code or database credentials from entering the operation.
+Run attempt must be one and the current run the only run on that request branch;
+preflight/source failures consume the request and never retry automatically.
+
+Publisher metadata (at most 2 MiB) pins both exact names, byte counts and MD5/SHA-1
+before source GETs. The shared stream parser verifies full EOF/gzip integrity,
+bytes, publisher checksums and final SHA-256, bounded by 15,000,000,000 compressed
+bytes total, 128 GiB decoded/100 million rows per file, 1,049,600-byte lines,
+64 MiB retained records and a 110-minute collector deadline in a 120-minute job.
+Redirects remain HTTPS official hosts and exact release-file routes. Missing
+records stay explicit; no per-book API call, catalog write or rights approval.
+
+Only RSA-OAEP-SHA256/AES-256-GCM ciphertext reaches public artifacts. Failures can
+retain an encrypted safe partial-accounting receipt while the step remains
+failed. Private key generation and recovery are local. Envelope integrity does
+not identify the sender: exact trusted run/head/request and downloaded artifact
+provenance must be retained separately. Recovery does not turn partial receipts
+into completed source scans or replace later target/version/rights review.
+
+An actual existing GitHub artifact was downloaded successfully: artifact
+`10802996039`, **4,659 bytes**, SHA-256
+`054d3d562971ae3c841eb717a243b207709da5bd9263c9ffe545bbea4ff3fef1`;
+its ZIP CRC verified. Before activation, the recipient key pair and original
+private target snapshot were durably retained in the initial
+`Kajo-book-dump-acquisition-recovery-20260924.zip`: **28,163 bytes**, SHA-256
+`d2ed5b5c5df349473cbe5e3491e2cbcce80516b49b008f8207943e6b90ef297d`.
+All six member sizes/hashes and ZIP CRC verified. This initial custody checkpoint
+contains no activated request or dump records; later run recovery updates it.
+
+Independent review and **42 core/parser/envelope/guard/CLI tests** pass, including
+full-stream late corruption/duplicates, transport limits/redirects, failed partial
+accounting, wrong source/tree/rerun, ciphertext tampering and exact unseal bytes.
+All fourteen previous local-intake regressions remain. Full composed root/CI
+acceptance and actual run/head/artifact outcome are recorded in #182. At source
+publication no source dump has been downloaded, no review approved and no catalog
+or native state changed. #269 is stacked source context, not an alternate next
+packet or serving rollout.
+
 ## Provider-backed catalog concept audit — 2026-09-24 / #269
 
 The continued owner request explicitly selects this independent Phase 14.3

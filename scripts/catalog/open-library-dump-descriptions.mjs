@@ -115,22 +115,28 @@ async function jsonFile(path, value) {
   return sha256(bytes);
 }
 
-async function scanDump(path, source, kind, selected, fetchedAt, budget) {
+// Shared byte-stream parser; callers own source acquisition and trust checks.
+// The local intake still supplies a pre-pinned SHA-256. The acquisition runner
+// supplies both publisher MD5/SHA-1 and records SHA-256 only after complete EOF.
+export async function scanDumpStream(input, source, kind, selected, fetchedAt, budget,
+  { signal, keyOf = row => row.itemId, lineBytes = LIMITS.lineBytes,
+    retainedBytes = LIMITS.stagedRecordBytes, observeProgress } = {}) {
   const type = kind === 'works' ? 'work' : 'edition';
   const targets = new Map(selected.map(row => [type === 'work' ? `/works/${row.workId}` : `/books/${row.editionId}`, row]));
   const records = new Map();
   const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
-  const hash = createHash('sha256');
+  observeProgress?.(stats);
+  requireValue(source.sha256 !== undefined || source.md5 !== undefined && source.sha1 !== undefined,
+    'missing-dump-checksum');
+  const hashes = Object.fromEntries(['sha256', ...['md5', 'sha1'].filter(name => source[name] !== undefined)]
+    .map(name => [name, createHash(name)]));
   const decoder = new TextDecoder('utf-8', { fatal: true });
-  const sourceInfo = await lstat(path);
-  requireValue(sourceInfo.isFile() && !sourceInfo.isSymbolicLink(), 'unsafe-dump-input');
-  requireValue(sourceInfo.size === source.bytes, 'dump-file-size-mismatch');
   let pending = Buffer.alloc(0);
   function line(bytes) {
     stats.rows += 1;
     requireValue(stats.rows <= source.maxRows, 'dump-row-limit');
     if (bytes.at(-1) === 13) bytes = bytes.subarray(0, -1);
-    requireValue(bytes.length <= LIMITS.lineBytes, 'dump-line-limit');
+    requireValue(bytes.length <= lineBytes, 'dump-line-limit');
     let decoded;
     try { decoded = decoder.decode(bytes); }
     catch { throw new Error('invalid-dump-encoding'); }
@@ -150,7 +156,7 @@ async function scanDump(path, source, kind, selected, fetchedAt, budget) {
       return;
     }
     requireValue(boundaries.length === 4, 'malformed-dump-target-row');
-    requireValue(!records.has(target.itemId), 'duplicate-dump-target-record');
+    requireValue(!records.has(keyOf(target)), 'duplicate-dump-target-record');
     const recordType = decoded.slice(0, boundaries[0]);
     const revision = decoded.slice(boundaries[1] + 1, boundaries[2]);
     const modifiedAt = decoded.slice(boundaries[2] + 1, boundaries[3]);
@@ -162,8 +168,8 @@ async function scanDump(path, source, kind, selected, fetchedAt, budget) {
       && (inspection.sourceModifiedAt === null || timeValue(inspection.sourceModifiedAt) === timeValue(modifiedAt)),
     'invalid-dump-target-envelope');
     budget.bytes += Buffer.byteLength(raw);
-    requireValue(budget.bytes <= LIMITS.stagedRecordBytes, 'dump-staging-limit');
-    records.set(target.itemId, { raw, inspection, inspectionSha256: digest(inspection),
+    requireValue(budget.bytes <= retainedBytes, 'dump-staging-limit');
+    records.set(keyOf(target), { raw, inspection, inspectionSha256: digest(inspection),
       dump: { row: stats.rows, revision: Number(revision), modifiedAt } });
     stats.matchedRecords += 1;
   }
@@ -171,7 +177,7 @@ async function scanDump(path, source, kind, selected, fetchedAt, budget) {
     try {
       stats.bytes += chunk.length;
       requireValue(stats.bytes <= source.bytes, 'dump-file-size-mismatch');
-      hash.update(chunk);
+      for (const hash of Object.values(hashes)) hash.update(chunk);
       callback(null, chunk);
     } catch (error) { callback(error); }
   } });
@@ -182,28 +188,36 @@ async function scanDump(path, source, kind, selected, fetchedAt, budget) {
       let start = 0;
       for (let end = chunk.indexOf(10); end !== -1; end = chunk.indexOf(10, start)) {
         const part = chunk.subarray(start, end);
-        requireValue(pending.length + part.length <= LIMITS.lineBytes, 'dump-line-limit');
+        requireValue(pending.length + part.length <= lineBytes, 'dump-line-limit');
         line(pending.length ? Buffer.concat([pending, part]) : part);
         pending = Buffer.alloc(0);
         start = end + 1;
       }
       const tail = chunk.subarray(start);
-      requireValue(pending.length + tail.length <= LIMITS.lineBytes, 'dump-line-limit');
+      requireValue(pending.length + tail.length <= lineBytes, 'dump-line-limit');
       pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
       callback();
     } catch (error) { callback(error); }
   } });
-  const streams = [createReadStream(path), meter];
+  const streams = [input, meter];
   if (source.compression === 'gzip') streams.push(createGunzip());
   streams.push(sink);
   // Always consume to EOF, including after every target was found: digest and
   // gzip footer integrity cover the whole file, and a later duplicate must fail.
-  await pipeline(...streams);
+  await pipeline(...streams, ...(signal ? [{ signal }] : []));
   if (pending.length) line(pending);
   requireValue(stats.bytes === source.bytes, 'dump-file-size-mismatch');
-  const fileSha256 = hash.digest('hex');
-  requireValue(fileSha256 === source.sha256, 'dump-checksum-mismatch');
-  return { records, stats: { ...stats, sha256: fileSha256, complete: true } };
+  const checksums = Object.fromEntries(Object.entries(hashes).map(([name, hash]) => [name, hash.digest('hex')]));
+  for (const [name, value] of Object.entries(checksums))
+    requireValue(source[name] === undefined || source[name] === value, 'dump-checksum-mismatch');
+  return { records, stats: { ...stats, ...checksums, complete: true } };
+}
+
+async function scanDump(path, source, kind, selected, fetchedAt, budget) {
+  const sourceInfo = await lstat(path);
+  requireValue(sourceInfo.isFile() && !sourceInfo.isSymbolicLink(), 'unsafe-dump-input');
+  requireValue(sourceInfo.size === source.bytes, 'dump-file-size-mismatch');
+  return scanDumpStream(createReadStream(path), source, kind, selected, fetchedAt, budget);
 }
 
 export async function stageDumpDescriptions({ snapshot, manifest, worksPath, editionsPath,

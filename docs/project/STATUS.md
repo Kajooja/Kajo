@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 actual pinned BOOK dump scan; intake implemented
+## Current packet — #182 one-shot pinned BOOK dump acquisition
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -25,8 +25,11 @@ preservation checks. Do not restore the old reviewed state or repeat apply.
 The owner's subsequent request explicitly selects **#182 pinned Work/Edition
 dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
 unsupported latent fallback correction and bounded MovieLens prefix research**
-alongside it. The catalog intake is now implemented and independently reviewed; real source
-acquisition is blocked before download by Archive.org connection timeouts. The independent research packet now has a corrected fallback and a completed,
+alongside it. The local intake and a separate bounded cloud acquisition workflow
+are implemented and independently reviewed. Local Archive.org acquisition is
+still blocked before dump download (connection failure, then HTTP 502). Actual
+cloud execution follows accepted-source CI and one explicit request activation.
+The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -195,17 +198,33 @@ source/target/version bindings; require a later explicit review and guarded
 writer bridge before any catalog update. Actual plan execution succeeded with these 383 targets and 766 expected exact
 Work/Edition records. It made zero provider calls, writes or approvals.
 
-Next obtain official same-release files in a reachable local environment. The
-official Work/Edition links resolved to **2026-08-31**, but metadata GET and the
-redirected Work HEAD both failed connecting to Archive.org. No exact byte count,
-external checksum or local SHA-256 is verified; **zero dump bytes were downloaded**.
-Do not manufacture a source manifest from the approximate documentation sizes.
-Verify release metadata, exact compressed bytes/checksums and local SHA-256, then
-run the documented `plan`/`stage` commands with explicit bounds. Preserve the
-saved target snapshot/plan or refresh read-only and explicitly record the new
-selection. Inspect actual staged coverage/missing/rights/language candidates
-before designing the guarded review/apply bridge. Fixture acceptance is not a
-completed scan, usable-description count or additional catalog expansion.
+Next execute the reviewed `catalog-book-dump-acquisition.yml` workflow after
+all five required source CI jobs pass and the source is merged. Its single
+`catalog-acquisition/ol-20260831` request must be one child of exact current main
+and add only the public request JSON. The locally retained private key and exact
+383-target snapshot are durably saved before activation. Actual Actions artifact
+download was verified with an existing ZIP, including byte digest and CRC.
+
+The secretless collector pins the **2026-08-31** publisher metadata before either
+large GET, streams both files to complete EOF/checksums, caps total compressed
+bytes at **15,000,000,000**, retains at most **64 MiB** and allows no automatic
+retry. The collector deadline is 110 minutes within a 120-minute job. Only an
+authenticated encrypted result leaves the public runner; a failed source run can
+retain encrypted partial accounting. Every earlier request-branch run consumes
+the one-shot request, including preflight failure. No production credentials,
+ratings, ordinary-CI data download or pilot-budget reset is involved.
+
+At this source checkpoint **zero dump bytes have been downloaded**. Exact
+publisher sizes/checksums and actual success or failure are runtime evidence,
+not inferred from approximate documentation. Verify the exact Actions run/head,
+request and artifact digest, recover with the saved key, and preserve its full
+source/accounting receipt. Reconcile the public roster against a fresh private
+catalog snapshot and inspect actual coverage/missing/rights/language candidates
+before a guarded review/apply bridge. Do not treat selected records as complete
+dump files, or a fixture/collected result as approved presentation text. #182
+records source acceptance and the actual run; the
+[acquisition checkpoint](sprints/SPRINT-014.md#bounded-cloud-book-acquisition--2026-09-24--182)
+and ARCHITECTURE retain recovery and failure boundaries.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed
