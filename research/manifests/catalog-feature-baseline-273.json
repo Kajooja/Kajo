@@ -1,0 +1,42 @@
+{
+  "contract": "catalog-feature-baseline-protocol-v1",
+  "issue": 273,
+  "version": "1",
+  "baseSourceCommit": "14b7352afc6dea717cf8b58bc7e6c16975967b36",
+  "inputFileSha256": "9391286e83d3fe4de680b8456cd83990ade46d28d5dc3ec6030849c06465c3bb",
+  "snapshotCheckedAt": "2026-09-24T11:18:16.242881+00:00",
+  "asOf": "2026-09-24T11:18:16.242881+00:00",
+  "items": 840,
+  "mappingSha256": "b4319f2554c8627b35f4d77428ff91a576e66ef7ab58fbb1d35f6f64d66f1642",
+  "arms": {
+    "A": "Exact original Item tags, preserving all legacy strings/order.",
+    "B": "Unique sorted evidenceKind:concept identifiers with at least one assertion inItemTags=true.",
+    "C": "Unique sorted evidenceKind:concept identifiers from all audited assertions. No legacy-tag union."
+  },
+  "anchorSelection": "BOOK then MOVIE; registry concept order; ratings 0 then 10. For each type/concept choose lexical smallest supported Item UUID; BOOK first prefers Items with no represented assertion for that concept, falling back to all supported Items. MOVIE chooses lexical supported Item. Missing buckets skipped and counted. Freeze all anchors before any scoring.",
+  "maximumSyntheticProfiles": 24,
+  "profileIdentity": "Deterministic synthetic UUIDs start 00000000-0000-4000-8000-000000927301 in selection order; same identities and single whole-Item rating in every arm.",
+  "anchorLimit": "Diagnostic sample deliberately favors missing BOOK concepts, can repeat Item anchors, and carries all each Item’s features. Not independent people or isolated concept tastes.",
+  "mode": "FOR_YOU",
+  "candidateRoster": "All snapshot Items except current profile’s rated anchor marked non-discoverable. Same roster across arms, queried separately by BOOK/MOVIE. No native Events or current interactions.",
+  "resultLimit": 50,
+  "rankOrder": "Canonical SQL final_score descending, UUID ascending; preserve returned rank. Never impute excluded or unreturned scores.",
+  "time": "Disposable in-memory PGlite pg_catalog.now() is a stable injected clock at asOf. Canonical application definitions remain exact source bytes. This is synthetic fixed-time sensitivity, not historical replay.",
+  "comparisons": [
+    "C-B: additional source-concept representation under fixed vocabulary and source-kind policy",
+    "B-A: separate representation sensitivity, including removal of other legacy tags and separation of source kinds"
+  ],
+  "metrics": "Returned/eligible/unreturned/excluded counts; returned-union/common/entry/exit counts; rank, score and bootstrap contribution changes among common Items; report by anchor type, rating sign and target type. No quality/admission threshold, selection or population uncertainty estimate. Aggregated Item counts are Item-query occurrences, not distinct Items; membership changes exclude order-only changes.",
+  "volatileOmissions": "SQL-generated prediction UUIDs are not captured; they do not enter scoring. No outcome or execution-time filter/selection. Frozen asOf retained.",
+  "isolation": "Only private.rank_items_v0 and private.build_profile_memory_state_v1 with five canonical dependencies; no V1/Scenario/Shared/serving-shadow or native deployment.",
+  "functionSha256": {
+    "private.is_profile_member": "0fde252531866f861816c7fe710eff8652ad2111d0b079072731022b88165409",
+    "private.bootstrap_evidence_weight_v1": "5b72cc87a25e3e936e3c2548f0ccad6b8201057945e685da3f706a3f152b6432",
+    "private.event_evidence_weight_v1": "5982c8379131d3d72f68898168cb3e48a71f639019fd6f0c9098b4f99f190dfa",
+    "private.bootstrap_decay_v1": "85dd1631cc2a4fbd8578ea4990232967561d8edf6d464fe4cf17925dbfce617b",
+    "private.bootstrap_weighted_evidence_v1": "eeda8d3deae147f57883f4411f4ba2cda82a51242fc65926e06ebee5d4f7fcd4",
+    "private.build_profile_memory_state_v1": "a1795fac8f23858f717e55c4606a1695d0044790daef0abc9c464d3e490cb7b9",
+    "private.rank_items_v0": "94bdf6d933547d32653cf874f4cd4690d6ebb8ad7930bad9c489ee18ce8bf03c"
+  },
+  "clockSha256": "3d154fa52953f553e66a5a0f2e35ba22e858b6d550e66cbe3d475cefb0e461fd"
+}

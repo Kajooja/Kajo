@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 metadata-only diagnosis after a zero-dump failure
+## Current packet — #182 exact-pinned acquisition after proven size-budget failure
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -28,10 +28,11 @@ unsupported latent fallback correction and bounded MovieLens prefix research**
 alongside it. The local intake and bounded cloud acquisition workflow are now
 accepted. Actual [run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978)
 read one complete **4,248-byte** metadata response, then failed before any dump
-request. The exact validation cause was lost by the old error receipt. That
-request is consumed; the next packet fixes private failure evidence and performs
-one separately bounded **metadata-only** diagnostic. It does not retry the full
-acquisition. The independent research packet has a corrected fallback and a completed,
+request. A separate accepted metadata-only diagnostic recovered identical bytes and
+proved the cause: the two files total **16,644,821,648 bytes**, above the original
+15,000,000,000-byte cap. Both requests are consumed. The next selected packet is
+a distinct exact-pinned acquisition with that observed size, preserving the old
+limits and all source-integrity checks. The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -182,7 +183,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — metadata-only diagnosis
+### Exact next bounded packet — reviewed exact-source acquisition
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -209,29 +210,42 @@ from that accepted source, with private key custody already retained.
 The actual run failed at metadata validation: **one GET / 4,248 bytes / zero
 Work or Edition GETs / zero dump bytes / zero selected records**. The encrypted
 artifact was downloaded and its digest, ZIP CRC and authenticated unseal verified.
-The receipt retained only a generic code plus metadata size/hash, so its specific
-cause remains **unproven**; do not call this another connection failure. Fresh
+The original receipt retained only a generic code plus metadata size/hash; the
+subsequent diagnostic below establishes the precise cause. Fresh
 read-only comparison at **2026-09-24 11:56:28 UTC** confirms all **383** requested
 identities, source/Item versions and description states unchanged. No text was
 approved or written. The original request/run is consumed and must not be rerun.
 
-`fix/182-acquisition-evidence` supplies precise allowlisted private failure codes
-and bounded metadata bytes before decoding or validation. Public logs remain
-sanitized, and old encrypted failure receipts remain readable. Its distinct
-`catalog-diagnostic/ol-20260831` request is limited to **one metadata GET / 2 MiB /
-30 seconds / zero redirects** and cannot fetch either dump even when metadata is
-valid. It binds the original request/run/artifact evidence and accepted current
-source, uses a separate one-shot run guard and returns only encrypted evidence.
+PR #272 is accepted as `d3681fcdfa9a877b0f314159d87208d0ccd0f7f8`, tree
+`c7267e44c0c1b93ffcfa2c4c92f392e5724b6914`, after all five
+[CI #536 gates](https://github.com/Kajooja/Kajo/actions/runs/35997619768),
+**541 tests / four exports**. Its old-receipt-compatible forward retains precise
+private codes and exact bounded metadata while sanitizing public logs.
 
-Next accept this forward source through CI/merge, preserve its exact request and
-activate that small diagnostic once. Compare the recovered metadata hash with the
-original `b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
-Only identical bytes can reproduce the exact original validation failure; a
-changed body supplies a new observation. Inspect exact current publisher fields
-before selecting any adapter repair or separately bounded future acquisition.
-This packet authorizes no full-dump retry, source-budget refund or rights decision.
-The [runtime checkpoint](sprints/SPRINT-014.md#first-cloud-acquisition-and-metadata-diagnosis--2026-09-24--182)
-records source/run/artifact hashes, recovery and the narrow next action.
+The distinct [diagnostic run 35998771483](https://github.com/Kajooja/Kajo/actions/runs/35998771483)
+succeeded at **2026-09-24 12:23:41–12:23:54 UTC**. Its single metadata GET returned
+**4,248 bytes**, exactly the original SHA-256
+`b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+Authenticated recovery and the byte-identical original validator reproduce
+`acquisition-compressed-byte-limit`: Works **4,058,336,593** plus Editions
+**12,586,485,055** totals **16,644,821,648 bytes**, above the old 15 GB cap.
+This is now a proven historical cause. The diagnostic fetched no dumps, per-Item
+sources or ratings, approved no text and wrote no database rows. It is consumed.
+
+The owner's continued MVP instruction selects `fix/182-reviewed-dump-budget`:
+a **new, distinct one-shot request** using exactly these observed publisher
+sizes/MD5/SHA1 pins and this exact total ceiling. It must preserve the original
+383-target roster/recipient, prior-run provenance, old immutable protocol limits,
+full EOF/gzip/checksum verification and all remaining memory/time/row bounds.
+It needs no new metadata GET and permits no automatic retries or unrelated
+source acquisition. Source CI/merge and durable exact request/key custody precede
+activation; a completed scan, private recovery and fresh catalog reconciliation
+precede source-specific rights/language review and any guarded writer bridge.
+No successful dump scan or added approved text exists at this checkpoint.
+The [runtime checkpoint](sprints/SPRINT-014.md#completed-metadata-diagnosis--2026-09-24--182)
+records the exact evidence and selected next action. Independent #273 measures
+feature coverage in an isolated synthetic bootstrap fixture; it does not replace
+this primary handoff or admit any model/serving change.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed
@@ -253,6 +267,25 @@ six immutable native forwards and rejected D2 challenger admission. The owner
 companion and full-app reports are recorded above. The owner executed the two recorded importer batches. This continuation
 verified their readbacks and completed archive; no APK dispatch, model admission
 or separately queued UI change is included.
+
+## Canonical bootstrap feature sensitivity — #273
+
+The independent [offline protocol and report](../../research/reports/catalog-feature-baseline-273.md)
+now reproduce two byte-identical executions of the frozen 840-Item snapshot.
+They compare current tags (A), already represented six-concept assertions (B)
+and all reviewed assertions (C) with **24 synthetic profiles / 144 top-50 queries**.
+Canonical SQL is unchanged; only the disposable PGlite clock is fixed. No real
+outcomes, personal histories, training, database writes or serving changes enter.
+
+C−B changes all **24 BOOK** top-50 memberships (600 entries/exits counted as
+Item-query occurrences), with no change in **24 MOVIE** lists. Crucially, the
+existing novelty formula rewards nonempty unmatched tags: MOVIE→BOOK list changes
+occur even when bootstrap transfer is exactly zero. B−A changes all 48 lists,
+so the six-concept representation is not a neutral replacement for native tags.
+Do not call these effects learned taste or accuracy gains. Any later integration
+must separate metadata-driven novelty, coordinate Memory/Shared/Scenario and
+serving-shadow semantics, and measure real held-out usefulness. #182 stays primary.
+Source/CI acceptance is recorded in #273; D2 model rejection remains unchanged.
 
 ## Provider-backed concept audit — #269
 
