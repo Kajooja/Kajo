@@ -524,6 +524,10 @@ source failure, the step remains failed and may upload an encrypted failure
 receipt containing actual partial byte/request counts. Preflight failures that
 cannot validate the recipient produce no artifact. Public error messages are
 fixed codes. Ordinary CI uses synthetic streams and never downloads the dumps.
+Complete metadata response bytes, URLs, SHA-256 and known validation failures
+are retained inside the encrypted receipt before decoding or source validation;
+partial/oversized responses retain accounting only. Neither diagnostic detail
+nor publisher text is printed in public failure logs.
 
 After downloading the single sealed JSON from its artifact, recover locally:
 
@@ -543,6 +547,46 @@ A successful collected result still has zero approvals: bind it
 to a fresh private catalog snapshot and complete source-specific language/rights
 review before designing a separately bounded guarded application. Do not pass
 either result into the completed ten-Item pilot or replay that pilot's batches.
+
+The separate `catalog-book-metadata-diagnostic.yml` workflow diagnoses the
+consumed acquisition run **35995362978**, whose original receipt retained a
+complete metadata hash/count but lost its bytes and precise validation code.
+Its distinct `open-library-metadata-diagnostic-request-v1` request is the sole
+added file `scripts/catalog/requests/ol-20260831-metadata.json` on one child of
+accepted main, on the exact branch `catalog-diagnostic/ol-20260831`. The request
+binds the consumed run, source/request commits and canonical request digest,
+original Actions artifact ID/ZIP size/SHA-256, enclosed sealed JSON SHA-256, and
+metadata size/SHA-256. Preparation validates the original public request; the
+runner fetches that fixed Git object and requires its same recipient public key.
+
+This is a distinct one-shot metadata budget: at most one official metadata GET,
+at most 2 MiB and 30 seconds, with redirects disabled. The core inspection entry
+point never opens Work or Edition streams, even when metadata is valid. It
+returns complete byte evidence plus the independently revalidated source verdict
+or an encrypted partial-transport failure. No roster, catalog snapshot, database
+access or approval enters the diagnostic. The runner uses the same accepted-main,
+sole-added-request and first-run gates, with a separate workflow-run ledger;
+any previous diagnostic run consumes this budget. The earlier full acquisition
+remains consumed, and this workflow cannot reset or resume it.
+
+Prepare and recover only on the local private-key custodian:
+
+```bash
+node scripts/catalog/prepare-dump-metadata-diagnostic.mjs request \
+  --previous-request ORIGINAL_PUBLIC_REQUEST.json --source-head ACCEPTED_CURRENT_MAIN_SHA \
+  --out PUBLIC_METADATA_REQUEST.json
+node scripts/catalog/prepare-dump-metadata-diagnostic.mjs unseal \
+  --request PUBLIC_METADATA_REQUEST.json --key-dir ORIGINAL_PRIVATE_KEY_DIRECTORY \
+  --input open-library-metadata-20260831.sealed.json --out NEW_PRIVATE_DIAGNOSTIC_DIRECTORY
+```
+
+Only authenticated ciphertext leaves the runner. Recovery writes exact private
+evidence and reports `bodyMatchesPrevious`; only an identical complete metadata
+SHA-256 can reproduce the original input. A different body diagnoses the current
+response and cannot establish the historical failure cause. Verified diagnostic
+run/head/request/artifact provenance remains required alongside decryption.
+The result has zero approvals, zero dump requests and zero database writes;
+neither a valid source verdict nor successful recovery authorizes a full retry.
 
 The provider's [Work schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/work.schema.json)
 and [text-block definition](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/shared_definitions.json)

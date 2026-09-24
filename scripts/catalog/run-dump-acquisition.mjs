@@ -5,7 +5,7 @@ import { appendFile, mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { acquireOpenLibraryDumps } from './acquire-open-library-dumps.mjs';
+import { acquireOpenLibraryDumps, safeAcquisitionError } from './acquire-open-library-dumps.mjs';
 import { digest, requireValue, sha256 } from './open-library-descriptions.mjs';
 import { FAILURE_CONTRACT, REQUEST_BRANCH, REQUEST_PATH, sealAcquisition, validateAcquisitionRequest } from './seal-dump-acquisition.mjs';
 
@@ -72,7 +72,7 @@ export async function guardedAcquisition({ env = process.env, git, fetcher = fet
   catch (error) {
     failure = safePublicAcquisitionError(error);
     collected = { contract: FAILURE_CONTRACT, status: 'failed', release: request.release,
-      rosterSha256: digest(request.roster), limits: request.limits, code: failure,
+      rosterSha256: digest(request.roster), limits: request.limits, code: safeAcquisitionError(error),
       accounting: error?.accounting ?? { unavailable: true } };
   }
   const sealed = sealAcquisition(collected, request);

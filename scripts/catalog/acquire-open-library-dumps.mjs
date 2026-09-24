@@ -6,6 +6,7 @@ import { digest, requireValue, sha256 } from './open-library-descriptions.mjs';
 import { LIMITS, SOURCE_CONTRACT, scanDumpStream } from './open-library-dump-descriptions.mjs';
 
 export const ACQUISITION_CONTRACT = 'open-library-dump-acquisition-v1';
+export const METADATA_INSPECTION_CONTRACT = 'open-library-dump-metadata-inspection-v1';
 export const ACQUISITION_RELEASE = '2026-08-31';
 export const ACQUISITION_LIMITS = Object.freeze({ metadataBytes: 2 * 1024 * 1024,
   totalCompressedBytes: 15000000000, retainedBytes: 64 * 1024 * 1024,
@@ -14,6 +15,23 @@ export const ACQUISITION_LIMITS = Object.freeze({ metadataBytes: 2 * 1024 * 1024
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const exactKeys = (value, keys) => object(value) && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
 const fail = code => new Error(code);
+// Only implementation-owned codes survive into private diagnostic receipts.
+// A provider or transport string resembling a code is not an allowed code.
+export const ACQUISITION_ERROR_CODES = Object.freeze([
+  'acquisition-failed', 'invalid-acquisition-roster', 'duplicate-acquisition-identity',
+  'invalid-acquisition-limits', 'invalid-acquisition-release', 'unsafe-acquisition-url',
+  'unsafe-acquisition-source-route', 'acquisition-aborted', 'acquisition-transport-failed',
+  'acquisition-header-limit', 'acquisition-invalid-response', 'acquisition-redirect-loop',
+  'acquisition-redirect-limit', 'acquisition-http-failed', 'acquisition-content-encoding',
+  'acquisition-metadata-limit', 'acquisition-metadata-timeout', 'invalid-acquisition-metadata',
+  'invalid-acquisition-source-count', 'invalid-acquisition-source-integrity', 'acquisition-compressed-byte-limit',
+  'missing-dump-checksum', 'dump-row-limit', 'dump-line-limit', 'invalid-dump-encoding',
+  'malformed-dump-target-row', 'duplicate-dump-target-record', 'invalid-dump-target-envelope',
+  'dump-staging-limit', 'dump-file-size-mismatch', 'dump-decoded-byte-limit', 'dump-checksum-mismatch',
+  'invalid-record-context', 'record-too-large', 'malformed-provider-json', 'provider-identity-mismatch',
+  'provider-work-link-mismatch', 'invalid-provider-revision', 'invalid-provider-modified-time',
+]);
+const knownErrorCodes = new Set(ACQUISITION_ERROR_CODES);
 
 export function validateAcquisitionRoster(roster) {
   requireValue(Array.isArray(roster) && roster.length > 0 && roster.length <= LIMITS.targets,
@@ -198,8 +216,69 @@ export function validateAcquisitionMetadata(document, release, limits = ACQUISIT
 }
 
 export function safeAcquisitionError(error) {
-  return /^(?:invalid|duplicate|unsafe|missing|acquisition|dump|record|provider|malformed)-[a-z-]+$/.test(error?.message)
-    ? error.message : 'acquisition-failed';
+  return knownErrorCodes.has(error?.message) ? error.message : 'acquisition-failed';
+}
+
+function initialAccounting(retrievedAt) {
+  return { startedAt: retrievedAt, activeSource: 'metadata', metadata: { bytes: 0, complete: false },
+    sources: {}, retainedRecordBytes: 0, requests: { metadata: 0, works: 0, editions: 0 },
+    individualProviderRequests: 0, databaseWrites: 0 };
+}
+
+// Shared by full collection and metadata-only inspection. Evidence is captured
+// before decoding/validation; it is private input for encryption, never a log.
+async function inspectMetadata({ release, signal, transport, limits, accounting }) {
+  const metadataUrl = `https://archive.org/metadata/ol_dump_${release}`;
+  const controller = new AbortController();
+  const combined = AbortSignal.any([signal, controller.signal]);
+  const timer = setTimeout(() => controller.abort(), Math.min(limits.metadataTimeoutMs, limits.timeoutMs));
+  timer.unref?.();
+  let meta, raw;
+  try {
+    meta = await openOfficial(metadataUrl, { signal: combined,
+      timeoutMs: Math.min(limits.metadataTimeoutMs, limits.timeoutMs), maxBytes: limits.metadataBytes }, transport, limits,
+    () => accounting.requests.metadata++);
+    raw = await readBounded(meta.body, limits.metadataBytes, combined, bytes => { accounting.metadata.bytes = bytes; });
+    Object.assign(accounting.metadata, { complete: true, sha256: sha256(raw), rawBase64: raw.toString('base64'),
+      url: metadataUrl, finalUrl: meta.url, redirects: meta.redirects });
+  } catch (error) {
+    if (controller.signal.aborted) throw fail('acquisition-metadata-timeout');
+    throw error;
+  } finally { clearTimeout(timer); controller.abort(); }
+  return { raw, metadata: accounting.metadata, ...inspectAcquisitionMetadataBytes(raw, release, limits) };
+}
+
+export function inspectAcquisitionMetadataBytes(raw, release, limits = ACQUISITION_LIMITS) {
+  let document;
+  try { document = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(raw)); }
+  catch { return { validation: { valid: false, code: 'invalid-acquisition-metadata', pinnedSources: null } }; }
+  try {
+    const pinnedSources = validateAcquisitionMetadata(document, release, limits);
+    return { document, validation: { valid: true, code: null, pinnedSources } };
+  } catch (error) {
+    return { document, validation: { valid: false, code: safeAcquisitionError(error), pinnedSources: null } };
+  }
+}
+
+export async function inspectOpenLibraryDumpMetadata({ release, signal, transport = curlAcquisitionTransport,
+  limits: overrides } = {}) {
+  requireValue(release === ACQUISITION_RELEASE, 'invalid-acquisition-release');
+  const limits = boundedLimits(overrides), controller = new AbortController();
+  const combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+  const retrievedAt = new Date().toISOString(), accounting = initialAccounting(retrievedAt);
+  try {
+    const inspected = await inspectMetadata({ release, signal: combined, transport, limits, accounting });
+    accounting.activeSource = null;
+    accounting.completedAt = new Date().toISOString();
+    return { contract: METADATA_INSPECTION_CONTRACT, status: 'inspected', release, retrievedAt,
+      completedAt: accounting.completedAt, limits, metadata: inspected.metadata, validation: inspected.validation,
+      accounting, dumpRequests: 0, approved: 0, databaseWrites: 0, individualProviderRequests: 0 };
+  } catch (error) {
+    accounting.failedAt = new Date().toISOString();
+    const failure = fail(combined.aborted ? 'acquisition-aborted' : safeAcquisitionError(error));
+    failure.accounting = structuredClone(accounting);
+    throw failure;
+  } finally { controller.abort(); }
 }
 
 export async function acquireOpenLibraryDumps({ release, roster, signal, transport = curlAcquisitionTransport,
@@ -211,33 +290,15 @@ export async function acquireOpenLibraryDumps({ release, roster, signal, transpo
   const timer = setTimeout(() => controller.abort(), limits.timeoutMs);
   timer.unref?.();
   const started = Date.now(), retrievedAt = new Date().toISOString();
-  const accounting = { startedAt: retrievedAt, activeSource: 'metadata',
-    metadata: { bytes: 0, complete: false }, sources: {}, retainedRecordBytes: 0,
-    requests: { metadata: 0, works: 0, editions: 0 }, individualProviderRequests: 0, databaseWrites: 0 };
+  const accounting = initialAccounting(retrievedAt);
   const budget = { bytes: 0 };
   try {
-    const metadataUrl = `https://archive.org/metadata/ol_dump_${release}`;
-    const metadataController = new AbortController();
-    const metadataSignal = AbortSignal.any([combined, metadataController.signal]);
-    const metadataTimer = setTimeout(() => metadataController.abort(), limits.metadataTimeoutMs);
-    metadataTimer.unref?.();
-    let meta, raw;
-    try {
-      meta = await openOfficial(metadataUrl, { signal: metadataSignal,
-        timeoutMs: Math.min(limits.metadataTimeoutMs, limits.timeoutMs), maxBytes: limits.metadataBytes }, transport, limits,
-      () => accounting.requests.metadata++);
-      raw = await readBounded(meta.body, limits.metadataBytes, metadataSignal, bytes => { accounting.metadata.bytes = bytes; });
-      Object.assign(accounting.metadata, { complete: true, sha256: sha256(raw) });
-    } catch (error) {
-      if (metadataController.signal.aborted) throw fail('acquisition-metadata-timeout');
-      throw error;
-    } finally { clearTimeout(metadataTimer); }
-    let document;
-    try { document = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(raw)); }
-    catch { throw fail('invalid-acquisition-metadata'); }
+    const { raw, document, metadata, validation } = await inspectMetadata({ release,
+      signal: combined, transport, limits, accounting });
+    requireValue(validation.valid, validation.code);
     // Freeze both exact file identities, publisher hashes and byte bounds before
     // the first large GET. MD5/SHA-1 are compared, never replaced by our own hash.
-    const pinned = validateAcquisitionMetadata(document, release, limits);
+    const pinned = validation.pinnedSources;
     const sources = {}, collected = {};
     for (const kind of ['works', 'editions']) {
       const source = pinned[kind];
@@ -272,7 +333,7 @@ export async function acquireOpenLibraryDumps({ release, roster, signal, transpo
     }
     return { contract: ACQUISITION_CONTRACT, status: 'collected', release, retrievedAt,
       completedAt: new Date().toISOString(), rosterSha256: digest(selected), limits,
-      metadata: { url: metadataUrl, finalUrl: meta.url, redirects: meta.redirects,
+      metadata: { url: metadata.url, finalUrl: metadata.finalUrl, redirects: metadata.redirects,
         bytes: raw.length, sha256: sha256(raw), raw: raw.toString('utf8'), document }, sources,
       sourceManifest: { contract: SOURCE_CONTRACT, release, retrievedAt,
         sources: Object.fromEntries(Object.entries(sources).map(([kind, source]) => [kind,

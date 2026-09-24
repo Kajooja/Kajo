@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 one-shot pinned BOOK dump acquisition
+## Current packet — #182 metadata-only diagnosis after a zero-dump failure
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -25,11 +25,13 @@ preservation checks. Do not restore the old reviewed state or repeat apply.
 The owner's subsequent request explicitly selects **#182 pinned Work/Edition
 dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
 unsupported latent fallback correction and bounded MovieLens prefix research**
-alongside it. The local intake and a separate bounded cloud acquisition workflow
-are implemented and independently reviewed. Local Archive.org acquisition is
-still blocked before dump download (connection failure, then HTTP 502). Actual
-cloud execution follows accepted-source CI and one explicit request activation.
-The independent research packet has a corrected fallback and a completed,
+alongside it. The local intake and bounded cloud acquisition workflow are now
+accepted. Actual [run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978)
+read one complete **4,248-byte** metadata response, then failed before any dump
+request. The exact validation cause was lost by the old error receipt. That
+request is consumed; the next packet fixes private failure evidence and performs
+one separately bounded **metadata-only** diagnostic. It does not retry the full
+acquisition. The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -180,7 +182,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — actual pinned BOOK dump scan
+### Exact next bounded packet — metadata-only diagnosis
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -198,33 +200,38 @@ source/target/version bindings; require a later explicit review and guarded
 writer bridge before any catalog update. Actual plan execution succeeded with these 383 targets and 766 expected exact
 Work/Edition records. It made zero provider calls, writes or approvals.
 
-Next execute the reviewed `catalog-book-dump-acquisition.yml` workflow after
-all five required source CI jobs pass and the source is merged. Its single
-`catalog-acquisition/ol-20260831` request must be one child of exact current main
-and add only the public request JSON. The locally retained private key and exact
-383-target snapshot are durably saved before activation. Actual Actions artifact
-download was verified with an existing ZIP, including byte digest and CRC.
+PR #271 is merged as `ec17a0738702074dedecff00e60a2e529939c8fc`, exact tree
+`138067fc92a48f210a0713554b2f8aa37b20e085`, after all five
+[CI #533 gates](https://github.com/Kajooja/Kajo/actions/runs/35993942738),
+**528 tests** and four exports. The exact reviewed request was activated once
+from that accepted source, with private key custody already retained.
 
-The secretless collector pins the **2026-08-31** publisher metadata before either
-large GET, streams both files to complete EOF/checksums, caps total compressed
-bytes at **15,000,000,000**, retains at most **64 MiB** and allows no automatic
-retry. The collector deadline is 110 minutes within a 120-minute job. Only an
-authenticated encrypted result leaves the public runner; a failed source run can
-retain encrypted partial accounting. Every earlier request-branch run consumes
-the one-shot request, including preflight failure. No production credentials,
-ratings, ordinary-CI data download or pilot-budget reset is involved.
+The actual run failed at metadata validation: **one GET / 4,248 bytes / zero
+Work or Edition GETs / zero dump bytes / zero selected records**. The encrypted
+artifact was downloaded and its digest, ZIP CRC and authenticated unseal verified.
+The receipt retained only a generic code plus metadata size/hash, so its specific
+cause remains **unproven**; do not call this another connection failure. Fresh
+read-only comparison at **2026-09-24 11:56:28 UTC** confirms all **383** requested
+identities, source/Item versions and description states unchanged. No text was
+approved or written. The original request/run is consumed and must not be rerun.
 
-At this source checkpoint **zero dump bytes have been downloaded**. Exact
-publisher sizes/checksums and actual success or failure are runtime evidence,
-not inferred from approximate documentation. Verify the exact Actions run/head,
-request and artifact digest, recover with the saved key, and preserve its full
-source/accounting receipt. Reconcile the public roster against a fresh private
-catalog snapshot and inspect actual coverage/missing/rights/language candidates
-before a guarded review/apply bridge. Do not treat selected records as complete
-dump files, or a fixture/collected result as approved presentation text. #182
-records source acceptance and the actual run; the
-[acquisition checkpoint](sprints/SPRINT-014.md#bounded-cloud-book-acquisition--2026-09-24--182)
-and ARCHITECTURE retain recovery and failure boundaries.
+`fix/182-acquisition-evidence` supplies precise allowlisted private failure codes
+and bounded metadata bytes before decoding or validation. Public logs remain
+sanitized, and old encrypted failure receipts remain readable. Its distinct
+`catalog-diagnostic/ol-20260831` request is limited to **one metadata GET / 2 MiB /
+30 seconds / zero redirects** and cannot fetch either dump even when metadata is
+valid. It binds the original request/run/artifact evidence and accepted current
+source, uses a separate one-shot run guard and returns only encrypted evidence.
+
+Next accept this forward source through CI/merge, preserve its exact request and
+activate that small diagnostic once. Compare the recovered metadata hash with the
+original `b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+Only identical bytes can reproduce the exact original validation failure; a
+changed body supplies a new observation. Inspect exact current publisher fields
+before selecting any adapter repair or separately bounded future acquisition.
+This packet authorizes no full-dump retry, source-budget refund or rights decision.
+The [runtime checkpoint](sprints/SPRINT-014.md#first-cloud-acquisition-and-metadata-diagnosis--2026-09-24--182)
+records source/run/artifact hashes, recovery and the narrow next action.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed
