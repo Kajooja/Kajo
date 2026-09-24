@@ -5,7 +5,8 @@ import { createServer, get } from 'node:http';
 import { PassThrough, Readable } from 'node:stream';
 import test from 'node:test';
 import { gzipSync } from 'node:zlib';
-import { ACQUISITION_LIMITS, ACQUISITION_RELEASE, acquireOpenLibraryDumps, curlAcquisitionTransport, safeAcquisitionError,
+import { ACQUISITION_LIMITS, ACQUISITION_RELEASE, acquireOpenLibraryDumps, curlAcquisitionTransport,
+  inspectOpenLibraryDumpMetadata, safeAcquisitionError,
   validateAcquisitionMetadata, validateAcquisitionRoster, validateAcquisitionUrl } from './acquire-open-library-dumps.mjs';
 import { digest, sha256 } from './open-library-descriptions.mjs';
 import { validateDumpSources } from './open-library-dump-descriptions.mjs';
@@ -129,6 +130,75 @@ test('both metadata identities/checksums/byte bounds are frozen before any sourc
     await assert.rejects(f.run(), /(?:invalid-acquisition|acquisition-compressed-byte-limit)/);
     assert.equal(f.calls.length, 1);
   }
+});
+
+test('metadata inspection retains exact complete bytes before every validation failure without starting dumps', async () => {
+  const cases = [
+    [Buffer.from([0xff, 0xfe]), 'invalid-acquisition-metadata'],
+    [Buffer.from('{private malformed JSON'), 'invalid-acquisition-metadata'],
+    [Buffer.from('{}'), 'invalid-acquisition-metadata'],
+    [dataFixture({ mutateMetadata: data => { data.files.pop(); } }).metadata, 'invalid-acquisition-source-count'],
+    [dataFixture({ mutateMetadata: data => { delete data.files[0].md5; } }).metadata, 'invalid-acquisition-source-integrity'],
+    [dataFixture({ mutateMetadata: data => { data.files[0].size = String(ACQUISITION_LIMITS.totalCompressedBytes); } }).metadata,
+      'acquisition-compressed-byte-limit'],
+  ];
+  for (const [raw, code] of cases) {
+    const calls = [];
+    const transport = async url => {
+      calls.push(url);
+      assert.equal(url, `https://archive.org/metadata/ol_dump_${release}`);
+      return { status: 200, headers: {}, body: Readable.from([raw]) };
+    };
+    const inspected = await inspectOpenLibraryDumpMetadata({ release, transport });
+    assert.equal(inspected.status, 'inspected');
+    assert.deepEqual(inspected.validation, { valid: false, code, pinnedSources: null });
+    assert.equal(inspected.metadata.complete, true);
+    assert.equal(inspected.metadata.bytes, raw.length);
+    assert.equal(inspected.metadata.sha256, sha256(raw));
+    assert.deepEqual(Buffer.from(inspected.metadata.rawBase64, 'base64'), raw);
+    assert.deepEqual(inspected.accounting.requests, { metadata: 1, works: 0, editions: 0 });
+    assert.equal(inspected.dumpRequests, 0);
+    assert.equal(calls.length, 1);
+    await assert.rejects(acquireOpenLibraryDumps({ release, roster, transport }), error => {
+      assert.equal(error.message, code);
+      assert.equal(error.accounting.metadata.sha256, sha256(raw));
+      assert.deepEqual(Buffer.from(error.accounting.metadata.rawBase64, 'base64'), raw);
+      assert.deepEqual(error.accounting.requests, { metadata: 1, works: 0, editions: 0 });
+      return true;
+    });
+    assert.equal(calls.length, 2);
+  }
+});
+
+test('valid metadata-only inspection returns pinned source fields but never opens either dump', async () => {
+  const data = dataFixture(), calls = [];
+  const result = await inspectOpenLibraryDumpMetadata({ release, limits: { maxRedirects: 0, timeoutMs: 30000 },
+    transport: async url => {
+      calls.push(url);
+      assert.ok(url.includes('/metadata/'));
+      return { status: 200, headers: {}, body: Readable.from([data.metadata]) };
+    } });
+  assert.equal(result.validation.valid, true);
+  assert.equal(result.validation.code, null);
+  assert.deepEqual(result.validation.pinnedSources, validateAcquisitionMetadata(data.document, release));
+  assert.equal(calls.length, 1);
+  assert.deepEqual(result.accounting.sources, {});
+  assert.equal(result.accounting.requests.works + result.accounting.requests.editions, 0);
+});
+
+test('metadata-only limit and connection failures preserve partial accounting but never pretend complete evidence', async () => {
+  const raw = Buffer.from('too many metadata bytes');
+  await assert.rejects(inspectOpenLibraryDumpMetadata({ release, limits: { metadataBytes: 2 },
+    transport: async () => ({ status: 200, headers: {}, body: Readable.from([raw]) }) }), error => {
+    assert.equal(error.message, 'acquisition-metadata-limit');
+    assert.equal(error.accounting.metadata.complete, false);
+    assert.equal(error.accounting.metadata.bytes, raw.length);
+    assert.equal(error.accounting.metadata.rawBase64, undefined);
+    assert.deepEqual(error.accounting.requests, { metadata: 1, works: 0, editions: 0 });
+    return true;
+  });
+  assert.equal(safeAcquisitionError(new Error('invalid-acquisition-secret-provider-text')), 'acquisition-failed');
+  assert.equal(safeAcquisitionError(new Error('invalid-acquisition-source-count')), 'invalid-acquisition-source-count');
 });
 
 test('publisher MD5 and SHA1 independently reject incorrect bytes even when the other matches', async t => {

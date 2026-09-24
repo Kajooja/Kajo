@@ -5,8 +5,9 @@ import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
-import { ACQUISITION_CONTRACT } from './acquire-open-library-dumps.mjs';
+import { ACQUISITION_CONTRACT, acquireOpenLibraryDumps } from './acquire-open-library-dumps.mjs';
 import { digest, sha256 } from './open-library-descriptions.mjs';
 import { TARGET_CONTRACT } from './open-library-dump-descriptions.mjs';
 import { prepareAcquisitionRequest, prepareRecipient } from './prepare-dump-acquisition-request.mjs';
@@ -164,6 +165,44 @@ test('failed transfer returns a failed step and an encrypted partial-accounting 
   assert.deepEqual(recovered.accounting, accounting);
   assert.equal(recovered.code, 'acquisition-failed');
   assert.equal(safePublicAcquisitionError(new Error('acquisition-private-secret-in-error')), 'acquisition-failed');
+});
+
+test('private receipt preserves exact metadata validation code and bytes while public errors remain generic', async t => {
+  const root = await directory(t);
+  const document = { privateCanary: secretText, metadata: { identifier: `ol_dump_${request.release}` },
+    files: ['works', 'editions'].map(kind => ({ name: `ol_dump_${kind}_${request.release}.txt.gz`,
+      size: '10', md5: 'a'.repeat(32), sha1: 'b'.repeat(40) })) };
+  const missing = structuredClone(document); missing.files = [];
+  const integrity = structuredClone(document); delete integrity.files[0].md5;
+  const cap = structuredClone(document); cap.files[0].size = String(request.limits.totalCompressedBytes);
+  const cases = [[Buffer.from([0xff]), 'invalid-acquisition-metadata'],
+    [Buffer.from('{malformed JSON ' + secretText), 'invalid-acquisition-metadata'],
+    [Buffer.from(JSON.stringify({ privateCanary: secretText })), 'invalid-acquisition-metadata'],
+    [Buffer.from(JSON.stringify(missing)), 'invalid-acquisition-source-count'],
+    [Buffer.from(JSON.stringify(integrity)), 'invalid-acquisition-source-integrity'],
+    [Buffer.from(JSON.stringify(cap)), 'acquisition-compressed-byte-limit']];
+  for (const [index, [raw, code]] of cases.entries()) {
+    const outputDirectory = join(root, `diagnostic-failure-${index}`);
+    let calls = 0;
+    await assert.rejects(guardedAcquisition({ env: env(), git, fetcher, outputDirectory,
+      acquire: options => acquireOpenLibraryDumps({ ...options, transport: async url => {
+        calls++;
+        assert.equal(url, `https://archive.org/metadata/ol_dump_${request.release}`);
+        return { status: 200, headers: {}, body: Readable.from([raw]) };
+      } }) }), error => {
+      assert.equal(error.message, 'acquisition-failed');
+      return true;
+    });
+    assert.equal(calls, 1);
+    const bytes = await readFile(join(outputDirectory, 'open-library-20260831.sealed.json'), 'utf8');
+    assert.ok(!bytes.includes(secretText));
+    if (raw.length > 20) assert.ok(!bytes.includes(raw.toString('base64')));
+    const recovered = unsealAcquisition(JSON.parse(bytes), request, keys.privateKey);
+    assert.equal(recovered.code, code);
+    assert.equal(recovered.accounting.metadata.sha256, sha256(raw));
+    assert.deepEqual(Buffer.from(recovered.accounting.metadata.rawBase64, 'base64'), raw);
+    assert.deepEqual(recovered.accounting.requests, { metadata: 1, works: 0, editions: 0 });
+  }
 });
 
 test('local recipient custody refuses replacement and creates restrictive private files', async t => {

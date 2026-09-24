@@ -14,6 +14,76 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## First cloud acquisition and metadata diagnosis — 2026-09-24 / #182
+
+PR #270's concept audit is accepted on main
+`690268b9d7f982e1dd10e9dcf059bb8906529504` after all five CI #532 gates,
+500 tests and four exports. Collector PR #271 follows as
+`ec17a0738702074dedecff00e60a2e529939c8fc`, exact tree
+`138067fc92a48f210a0713554b2f8aa37b20e085`; head
+`d892c2d29dca3284c2fb47ad276424bb7c095369` passed all five
+[CI #533 jobs](https://github.com/Kajooja/Kajo/actions/runs/35993942738),
+**528 tests / four exports / companion isolation**. Its post-#270 merge tree is
+identical, preserving the tested source without a squash/ancestry conflict.
+The composed local check passed lint/typechecks, 248 mobile and 105 catalog tests
+before its 150-second Deno registry timeout; CI supplied the complete gate.
+
+The exact public request commit
+`4308943cf0157ec6648017a0bf7a25e5b0876c5a` is one child of accepted source and
+adds only the allowlisted request file. Canonical request hash:
+`9ac96783138824653f8e23eb9bf47c93ed30b7f7e3db658afd25b348f16b6f50`.
+It was durably retained with the key before the one activation. Actual
+[run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978),
+attempt one, ran **2026-09-24 11:50:15–11:50:28 UTC** and failed after metadata
+validation. The publisher returned **4,248 complete bytes**, SHA-256
+`b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+Accounting records **one metadata GET / zero Works or Editions GETs / zero dump
+bytes / zero retained records / zero approvals / zero database writes**.
+
+The failure step still uploaded only ciphertext. Artifact **10805673376** is
+**2,429 bytes**, ZIP SHA-256
+`a97aed35be266b0d80c7f29364ee7c693a351e876fa28b418fefb452ba884c2f`.
+Its sole encrypted JSON SHA-256 is
+`38becbaaa21ed5c8746b672bbd68aeb1f56f6e7c7105a3828bead2555a63fa8b`;
+authenticated recovery reproduces plaintext SHA-256
+`3e5754aa87644603694ed10ee58bd50df5ba3a39f9a5a9033fb0c058983e1e47`.
+ZIP digest/CRC, source/request/run identity and encrypted bindings were verified.
+The old wrapper reused its public error sanitizer for the private receipt, and
+the core discarded raw metadata on validation failure. Only the generic
+`acquisition-failed` survives; the original precise cause is **unproven**.
+Do not relabel it as a connection failure, guess malformed publisher fields or
+infer source sizes/checksums from approximate documentation.
+
+A fresh read-only target snapshot at `2026-09-24T11:56:28.995884+00:00` and the
+private six-test inspection helper confirm all **383** selected identities,
+Item/source versions, descriptions and managed flags unchanged; the full target
+inventory remains 385. The helper rechecks the accepted source and receipts and
+keeps failure explicit. Recovery **version 2**,
+`Kajo-book-dump-acquisition-recovery-20260924.zip`, retains eighteen verified
+members: **94,201 bytes**, SHA-256
+`34af941724199ca201ae75896e495337837fc70c989fc017a2b2a7594e0c51de`.
+It includes the original key, request/source/run receipts, ciphertext ZIP/JSON,
+recovered failure, fresh snapshot and private reconciliation. No source text or
+completed dump scan exists in this archive.
+
+The next forward source retains exact fixed private error codes and bounded
+metadata bytes before parsing/validation while keeping public logs sanitized.
+A distinct, purpose-bound diagnostic request on
+`catalog-diagnostic/ol-20260831` can perform only **one GET / 2 MiB / 30 seconds /
+zero redirects**. It binds the original run/request/artifact hashes, checks exact
+accepted source and its sole request-file change, and has its own prior-run guard.
+Even valid metadata cannot trigger a Work/Edition download. The old acquisition
+request stays consumed; no full retry, migration, pilot reset or rights approval
+is included. The recovered body hash must match the original before claiming
+reproduction of that old failure; otherwise it is a separate current observation.
+Actual diagnostic source acceptance/request/outcome are recorded in #182.
+
+Independent core/workflow review passed with **55 targeted tests**. The integrated
+local gate passed lint/typechecks, **248 mobile / 118 catalog tests**; the frozen
+Deno registry step remained blocked by this environment. All five remote CI jobs
+remain required before merge and any diagnostic activation. Actual old ciphertext
+also unseals with the forward reader to its unchanged `3e5754aa…` plaintext hash.
+
 ## Bounded cloud BOOK acquisition — 2026-09-24 / #182
 
 The continued owner request selects a concrete acquisition path after the local
