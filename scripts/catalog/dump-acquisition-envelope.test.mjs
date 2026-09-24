@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { generateKeyPairSync } from 'node:crypto';
+import { createHash, generateKeyPairSync } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 import { ACQUISITION_CONTRACT, acquireOpenLibraryDumps } from './acquire-open-library-dumps.mjs';
 import { digest, sha256 } from './open-library-descriptions.mjs';
 import { TARGET_CONTRACT } from './open-library-dump-descriptions.mjs';
@@ -165,6 +166,42 @@ test('failed transfer returns a failed step and an encrypted partial-accounting 
   assert.deepEqual(recovered.accounting, accounting);
   assert.equal(recovered.code, 'acquisition-failed');
   assert.equal(safePublicAcquisitionError(new Error('acquisition-private-secret-in-error')), 'acquisition-failed');
+});
+
+test('original collector seals selected-row evidence bound to its retained publisher metadata', async t => {
+  const root = await directory(t), outputDirectory = join(root, 'identity-failure');
+  const row = Buffer.from('/type/work\t/works/OL123W\t1\t2026-08-31T00:00:00Z\t'
+    + JSON.stringify({ key: '/works/OL999W', type: { key: '/type/work' }, description: secretText }));
+  const streams = { works: gzipSync(Buffer.concat([row, Buffer.from('\n')])), editions: gzipSync('') };
+  const metadata = { metadata: { identifier: `ol_dump_${request.release}` },
+    files: Object.entries(streams).map(([kind, bytes]) => ({ name: `ol_dump_${kind}_${request.release}.txt.gz`,
+      size: String(bytes.length), md5: createHash('md5').update(bytes).digest('hex'),
+      sha1: createHash('sha1').update(bytes).digest('hex') })) };
+  const metadataBytes = Buffer.from(JSON.stringify(metadata)), calls = [];
+  await assert.rejects(guardedAcquisition({ env: env(), git, fetcher, outputDirectory,
+    acquire: options => acquireOpenLibraryDumps({ ...options, transport: async url => {
+      calls.push(url);
+      assert.ok(url === `https://archive.org/metadata/ol_dump_${request.release}`
+        || url.endsWith(`/ol_dump_works_${request.release}.txt.gz`));
+      return { status: 200, headers: {}, body: Readable.from([calls.length === 1 ? metadataBytes : streams.works]) };
+    } }) }), error => { assert.equal(error.message, 'acquisition-failed'); return true; });
+  assert.equal(calls.length, 2);
+  const encrypted = await readFile(join(outputDirectory, 'open-library-20260831.sealed.json'), 'utf8');
+  assert.ok(!encrypted.includes(secretText));
+  assert.ok(!encrypted.includes(row.toString('base64')));
+  const recovered = unsealAcquisition(JSON.parse(encrypted), request, keys.privateKey);
+  assert.equal(recovered.status, 'failed');
+  assert.equal(recovered.accounting.failureEvidence.predicate, 'record-key-mismatch');
+  assert.deepEqual(Buffer.from(recovered.accounting.failureEvidence.rawBase64, 'base64'), row);
+  assert.equal(recovered.accounting.failureEvidence.source.md5, metadata.files[0].md5);
+  assert.deepEqual(recovered.accounting.requests, { metadata: 1, works: 1, editions: 0 });
+  // A self-consistent changed metadata body still cannot rebind the row's source.
+  const changed = structuredClone(recovered), differentMetadata = structuredClone(metadata);
+  differentMetadata.files[0].md5 = '0'.repeat(32);
+  const differentBytes = Buffer.from(JSON.stringify(differentMetadata));
+  Object.assign(changed.accounting.metadata, { rawBase64: differentBytes.toString('base64'),
+    bytes: differentBytes.length, sha256: sha256(differentBytes) });
+  assert.throws(() => sealAcquisition(changed, request), /invalid-dump-failure-evidence/);
 });
 
 test('private receipt preserves exact metadata validation code and bytes while public errors remain generic', async t => {

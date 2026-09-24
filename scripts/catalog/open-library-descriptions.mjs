@@ -64,6 +64,17 @@ export function normalizeDescription(field) {
   return { status: 'eligible', text, textSha256: sha256(text), length };
 }
 
+// Ordered implementation-owned reasons stay private; the existing rejection
+// code and exact identity policy remain unchanged for every caller.
+export function providerIdentityFailure(record, candidate, kind) {
+  if (!object(record)) return 'record-not-object';
+  const key = kind === 'edition' ? `/books/${candidate.editionId}` : `/works/${candidate.workId}`;
+  if (record.key !== key) return 'record-key-mismatch';
+  if (record.type?.key !== `/type/${kind}`) return 'record-type-mismatch';
+  if (Object.hasOwn(record, 'location')) return 'record-location-present';
+  return null;
+}
+
 export function inspectRecord(raw, candidate, kind, fetchedAt) {
   requireValue(['edition', 'work'].includes(kind) && timestamp(fetchedAt), 'invalid-record-context');
   const key = kind === 'edition' ? `/books/${candidate.editionId}` : `/works/${candidate.workId}`;
@@ -73,8 +84,12 @@ export function inspectRecord(raw, candidate, kind, fetchedAt) {
   requireValue(typeof raw === 'string' && Buffer.byteLength(raw) <= 1048576, 'record-too-large');
   let record;
   try { record = JSON.parse(raw); } catch { throw new Error('malformed-provider-json'); }
-  requireValue(object(record) && record.key === key && record.type?.key === `/type/${kind}`
-    && !Object.hasOwn(record, 'location'), 'provider-identity-mismatch');
+  const predicate = providerIdentityFailure(record, candidate, kind);
+  if (predicate) {
+    const error = new Error('provider-identity-mismatch');
+    Object.defineProperty(error, 'identityPredicate', { value: predicate });
+    throw error;
+  }
   if (kind === 'edition') requireValue(Array.isArray(record.works) && record.works.length === 1
     && record.works[0]?.key === `/works/${candidate.workId}`, 'provider-work-link-mismatch');
   const revision = record.revision ?? null;

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { generateKeyPairSync } from 'node:crypto';
+import { constants, createCipheriv, generateKeyPairSync, publicEncrypt, randomBytes } from 'node:crypto';
 import { mkdtemp, readFile, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -8,7 +8,7 @@ import test from 'node:test';
 import { gzipSync } from 'node:zlib';
 import { ACQUISITION_CONTRACT, ACQUISITION_LIMITS, REVIEWED_ACQUISITION_LIMITS,
   REVIEWED_SOURCE_EVIDENCE, REVIEWED_SOURCE_PINS, acquireReviewedOpenLibraryDumps } from './acquire-open-library-dumps.mjs';
-import { digest } from './open-library-descriptions.mjs';
+import { canonicalJson, digest, sha256 } from './open-library-descriptions.mjs';
 import { prepareReviewedAcquisitionRequest } from './prepare-reviewed-dump-acquisition.mjs';
 import { guardedReviewedAcquisition, validateReviewedCommit, validateReviewedRunBudget } from './run-reviewed-dump-acquisition.mjs';
 import { DIAGNOSTIC_LIMITS, DIAGNOSTIC_PREVIOUS_ACQUISITION, DIAGNOSTIC_REQUEST_CONTRACT, DIAGNOSTIC_REQUEST_PATH, FAILURE_CONTRACT, REQUEST_CONTRACT,
@@ -174,6 +174,128 @@ test('real reviewed core truncation records partial dump bytes with no metadata 
   assert.equal(result.accounting.sources.works.bytes, bytes.length);
   assert.deepEqual(result.accounting.requests, { metadata: 0, works: 1, editions: 0 });
   assert.equal(result.accounting.metadata.skipped, true);
+});
+
+const rejectedRow = Buffer.from('/type/work\t/works/OL123W\t1\t2026-08-31T00:00:00Z\t'
+  + JSON.stringify({ key: '/works/OL123W', type: { key: '/type/work' }, location: null,
+    description: canary }) + '\r');
+const unrelatedRow = '/type/work\t/works/OL999W\t1\t2026-08-31T00:00:00Z\t'
+  + JSON.stringify({ key: '/works/OL999W', type: { key: '/type/work' }, description: 'UNRELATED PRIVATE CANARY' }) + '\n';
+
+async function identityFailureFixture() {
+  const stream = gzipSync(Buffer.concat([Buffer.from(unrelatedRow), rejectedRow, Buffer.from('\n')]));
+  let requests = 0;
+  try {
+    await acquireReviewedOpenLibraryDumps({ release: request.release, roster,
+      sourcePins: request.sourcePins, sourceEvidence: request.sourceEvidence, limits: request.limits,
+      transport: async url => {
+        requests++; assert.equal(url, REVIEWED_SOURCE_PINS.works.url);
+        return { status: 200, headers: {}, body: Readable.from([stream]) };
+      } });
+    assert.fail('Fixture must stop at the selected identity failure');
+  } catch (error) {
+    assert.equal(error.message, 'provider-identity-mismatch');
+    assert.equal(requests, 1);
+    return error;
+  }
+}
+
+function failureResult(error) {
+  return { contract: FAILURE_CONTRACT, status: 'failed', release: request.release,
+    rosterSha256: digest(roster), limits: request.limits, code: error.message, accounting: error.accounting };
+}
+
+test('selected-row failure crosses the real collector and runner only inside encrypted evidence', async t => {
+  const root = await directory(t), outputDirectory = join(root, 'selected-failure'), output = join(root, 'outputs');
+  const originalError = await identityFailureFixture();
+  await assert.rejects(guardedReviewedAcquisition({ env: { ...env(), GITHUB_OUTPUT: output },
+    git: fixtureGit(), fetcher, outputDirectory, acquire: async () => { throw originalError; } }), error => {
+    assert.equal(error.message, 'reviewed-acquisition-failed');
+    assert.deepEqual(Object.getOwnPropertyNames(error).sort(), ['message', 'stack']);
+    assert.ok(!error.stack.includes(canary));
+    return true;
+  });
+  assert.equal(await readFile(output, 'utf8'), 'sealed=true\n');
+  assert.deepEqual(await readdir(outputDirectory), ['open-library-reviewed-20260831.sealed.json']);
+  const encrypted = await readFile(join(outputDirectory, 'open-library-reviewed-20260831.sealed.json'), 'utf8');
+  for (const privateValue of [canary, rejectedRow.toString('base64'), 'record-location-present', 'UNRELATED PRIVATE CANARY'])
+    assert.ok(!encrypted.includes(privateValue));
+  const result = unsealReviewedAcquisition(JSON.parse(encrypted), request, keys.privateKey);
+  assert.equal(result.status, 'failed');
+  assert.equal(result.code, 'provider-identity-mismatch');
+  const evidence = result.accounting.failureEvidence;
+  assert.equal(evidence.predicate, 'record-location-present');
+  assert.equal(evidence.row, 2);
+  assert.equal(evidence.terminated, true);
+  assert.deepEqual(Buffer.from(evidence.rawBase64, 'base64'), rejectedRow);
+  assert.equal(evidence.rawSha256, sha256(rejectedRow));
+  assert.equal(evidence.rawBytes, rejectedRow.length);
+  assert.equal(result.accounting.diagnosticRetainedBytes, rejectedRow.length);
+  assert.equal(result.accounting.retainedRecordBytes, 0);
+  assert.equal(result.accounting.sources.works.matchedRecords, 0);
+  assert.equal(result.accounting.sources.works.complete, false);
+  assert.equal(result.accounting.sources.works.publisherChecksumsVerified, undefined);
+  assert.deepEqual(result.accounting.requests, { metadata: 0, works: 1, editions: 0 });
+  assert.equal(result.records, undefined);
+  assert.equal(result.coverage, undefined);
+  assert.ok(!JSON.stringify(result).includes('UNRELATED PRIVATE CANARY'));
+});
+
+test('failure sealing rejects altered selected-row, source, predicate and accounting bindings', async () => {
+  const failure = failureResult(await identityFailureFixture());
+  assert.deepEqual(unsealReviewedAcquisition(sealReviewedAcquisition(failure, request), request, keys.privateKey), failure);
+  const changes = [
+    value => { value.code = 'dump-checksum-mismatch'; },
+    value => { value.accounting.activeSource = 'editions'; },
+    value => { value.accounting.startedAt = '2026-08-31T00:00:00Z'; },
+    value => { value.accounting.diagnosticRetainedBytes++; },
+    value => { value.accounting.sources.works.rows++; },
+    value => { value.accounting.sources.works.matchedRecords++; },
+    value => { value.accounting.sources.works.expectedBytes--; },
+    value => { value.accounting.sources.works.complete = true; },
+    value => { value.accounting.sources.works.publisherChecksumsVerified = true; },
+    value => { value.accounting.sources.works.sha256 = '0'.repeat(64); },
+    value => { value.accounting.requests.editions = 1; },
+    value => { value.accounting.databaseWrites = 1; },
+    value => { value.accounting.failureEvidence.predicate = 'record-key-mismatch'; },
+    value => { value.accounting.failureEvidence.rawSha256 = '0'.repeat(64); },
+    value => { value.accounting.failureEvidence.expected.workId = 'OL999W'; },
+    value => { value.accounting.failureEvidence.source.bytes--; },
+    value => { value.accounting.failureEvidence.rawBase64 += '\n'; },
+    value => { value.accounting.failureEvidence.rawBytes = request.limits.lineBytes + 1; },
+    value => { delete value.accounting.failureEvidence; },
+  ];
+  for (const change of changes) {
+    const mutated = structuredClone(failure); change(mutated);
+    assert.throws(() => sealReviewedAcquisition(mutated, request), /invalid-(?:dump|reviewed-acquisition)-/);
+  }
+  const success = collected();
+  success.accounting.failureEvidence = failure.accounting.failureEvidence;
+  success.accounting.diagnosticRetainedBytes = failure.accounting.diagnosticRetainedBytes;
+  assert.throws(() => sealReviewedAcquisition(success, request), /invalid-dump-failure-evidence/);
+  const historical = structuredClone(failure);
+  delete historical.accounting.failureEvidence;
+  delete historical.accounting.diagnosticRetainedBytes;
+  assert.deepEqual(unsealReviewedAcquisition(sealReviewedAcquisition(historical, request), request, keys.privateKey), historical);
+});
+
+test('authenticated decryption still rejects internally forged failure evidence', async () => {
+  const failure = failureResult(await identityFailureFixture());
+  const good = sealReviewedAcquisition(failure, request);
+  // The public key is public: an authenticated envelope alone cannot establish
+  // who produced its data. Re-encrypt a malformed payload with valid crypto.
+  failure.accounting.failureEvidence.expected.workId = 'OL999W';
+  const plaintext = Buffer.from(JSON.stringify(failure));
+  const header = { ...good.header, plaintextSha256: sha256(plaintext), plaintextBytes: plaintext.length };
+  const key = randomBytes(32), iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  cipher.setAAD(Buffer.from(canonicalJson(header)));
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  const forged = { header, wrappedKey: publicEncrypt({ key: keys.publicKey,
+    padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256' }, key).toString('base64'),
+  iv: iv.toString('base64'), tag: cipher.getAuthTag().toString('base64'), ciphertext: ciphertext.toString('base64') };
+  key.fill(0); plaintext.fill(0);
+  assert.throws(() => unsealReviewedAcquisition(forged, request, keys.privateKey), /acquisition-unseal-failed/);
 });
 
 test('new envelopes reject changed source proofs, metadata fetches, ciphertext and request identities', () => {

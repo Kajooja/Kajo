@@ -3,7 +3,7 @@
 import { spawn } from 'node:child_process';
 import { PassThrough } from 'node:stream';
 import { digest, requireValue, sha256 } from './open-library-descriptions.mjs';
-import { LIMITS, SOURCE_CONTRACT, scanDumpStream } from './open-library-dump-descriptions.mjs';
+import { LIMITS, SOURCE_CONTRACT, readDumpFailureEvidence, scanDumpStream } from './open-library-dump-descriptions.mjs';
 
 export const ACQUISITION_CONTRACT = 'open-library-dump-acquisition-v1';
 export const METADATA_INSPECTION_CONTRACT = 'open-library-dump-metadata-inspection-v1';
@@ -318,9 +318,19 @@ async function collectPinnedSources({ pinned, selected, retrievedAt, started, si
     if (length !== undefined && (!/^\d+$/.test(length) || Number(length) !== source.bytes)) {
       response.body.destroy(); throw fail('dump-file-size-mismatch');
     }
-    const scan = await scanDumpStream(response.body, source, kind, selected, retrievedAt, budget,
-      { signal, keyOf: row => row.workId, lineBytes: limits.lineBytes, retainedBytes: limits.retainedBytes,
-        observeProgress: stats => { accounting.sources[kind] = Object.assign(stats, { complete: false, expectedBytes: source.bytes }); } });
+    let scan;
+    try {
+      scan = await scanDumpStream(response.body, source, kind, selected, retrievedAt, budget,
+        { signal, keyOf: row => row.workId, lineBytes: limits.lineBytes, retainedBytes: limits.retainedBytes,
+          observeProgress: stats => { accounting.sources[kind] = Object.assign(stats, { complete: false, expectedBytes: source.bytes }); } });
+    } catch (error) {
+      const evidence = readDumpFailureEvidence(error);
+      if (evidence) {
+        accounting.failureEvidence = evidence;
+        accounting.diagnosticRetainedBytes = evidence.rawBytes;
+      }
+      throw error;
+    }
     collected[kind] = scan.records;
     sources[kind] = { ...source, ...scan.stats, finalUrl: response.url, redirects: response.redirects,
       publisherChecksumsVerified: true };

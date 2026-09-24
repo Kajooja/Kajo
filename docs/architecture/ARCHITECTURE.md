@@ -660,6 +660,31 @@ writes; unknown permission remains staged. Public beta/store rights, attribution
 runtime acceptance and withdrawal remain open `MVP-CAT-003` gates. No source documentation check
 alone constitutes rights clearance for a record.
 
+### Selected-row failure evidence — #182
+
+The bounded failure-evidence forward preserves the existing
+`provider-identity-mismatch` guard. `scripts/catalog/dump-failure-evidence.mjs`
+validates the private `open-library-selected-row-failure-evidence-v1` object in
+`accounting.failureEvidence` against the request's roster, exact canonical source
+and limits. It records a fixed private
+object/key/type/location predicate, source kind, roster hash, expected Work and
+Edition identities, dump row and fetch time, plus exact Base64 row bytes, byte
+length and SHA-256. Row bytes exclude the LF delimiter but retain CR; `terminated`
+distinguishes a row ended by LF from a final EOF row. The diagnostic row is bounded
+to 1,049,600 bytes.
+
+The scanner forwards only the offending selected row through the collector to
+encrypted output. `diagnosticRetainedBytes` counts these bytes separately from
+prior matched/retained records. Local authenticated recovery checks the bounds, hash,
+source/roster binding and reproduced predicate; older receipts without evidence
+remain valid. Public logs retain fixed codes and never emit row data or the
+private predicate. A failed stream remains incomplete: this evidence cannot
+verify full-source EOF/checksums or become a review candidate. It neither
+recovers a discarded historical row nor activates a new request/source budget.
+A private source-bound inspection helper must include the new failure-evidence
+dependency in its accepted-source manifest; archived helpers remain unchanged.
+Source/fixture acceptance and any later bounded source diagnosis are separate.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

@@ -33,8 +33,12 @@ proved the cause: the two files total **16,644,821,648 bytes**, above the origin
 15,000,000,000-byte cap. Both requests are consumed. The separately accepted
 reviewed acquisition also ran once and failed at a selected Work identity guard;
 its encrypted artifact retained no raw records. The exact next packet is an
-**offline, bounded selected-row failure-evidence forward**, preserving the guard
-and public fixed error code. No acquisition or retry is selected. The independent
+**offline, bounded selected-row failure-evidence forward** in
+`fix/182-dump-failure-evidence`, preserving the guard and public fixed error code.
+Implementation and independent fixture review are complete; exact CI/merge
+acceptance is recorded in Issue #182. After acceptance, evaluate
+a separate bounded Work-source diagnosis plan to recover and replay the first
+failing selected row. This patch activates no acquisition or retry. The independent
 research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
@@ -253,15 +257,26 @@ predicate are unknown. No Edition request, database write, complete EOF or
 full-source checksum verification occurred. Fresh read-only reconciliation at
 **2026-09-24 13:14:31 UTC** confirms all **383** selected targets unchanged.
 
-Next, implement and test only bounded private failure evidence: retain the one
-failing selected TSV row under the existing line bound, exact raw bytes/hash,
-source/row/roster bindings and fixed private predicate codes in encrypted failure
-output. Recovery must reproduce the guard failure and reject tampering. Preserve
-historical receipts, public-log silence, separate diagnostic-byte accounting and
-all fail-closed identity checks. No successful source, review candidate, approval or
-write may result from a failed stream. **Do not rerun this request or start a new
-acquisition.** The [runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
-records authenticated recovery and the bounded next packet. Independent #273 is
+`fix/182-dump-failure-evidence` implements the bounded offline forward. Its
+[contract](../architecture/ARCHITECTURE.md#selected-row-failure-evidence--182)
+retains one failing selected TSV row, source/row/roster bindings and a fixed private
+identity predicate in encrypted failure output; recovery replays that predicate.
+Independent review and all 86 targeted tests pass; exact CI/merge acceptance
+is recorded in Issue #182. It cannot recover the row discarded by
+the consumed run or establish its unknown cause. Historical receipts, public-log
+silence, separate diagnostic-byte accounting and all identity guards remain.
+
+After source acceptance, the exact next task is to evaluate a **separate bounded
+Work-source diagnosis plan** against the same pinned release, 383-target roster
+and recipient. Specify compressed/decoded byte, row and time bounds; stop at the
+first selected identity failure, recover its one encrypted row and replay the
+actual predicate offline. Version any private inspection helper against the
+accepted source, including its new failure-evidence dependency; preserve archived
+helpers byte-identically. This is a concrete path to diagnose the obstruction,
+not another full catalog acquisition. No Edition request, consumed-request retry
+or new source budget is activated by this patch. The
+[runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
+preserves the failed run and authenticated recovery. Independent #273 remains
 accepted synthetic sensitivity evidence, with no model or serving admission.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
