@@ -2,6 +2,7 @@
 import { constants, createCipheriv, createDecipheriv, createPrivateKey, createPublicKey,
   privateDecrypt, publicEncrypt, randomBytes } from 'node:crypto';
 import { ACQUISITION_CONTRACT, ACQUISITION_LIMITS, ACQUISITION_RELEASE,
+  REVIEWED_ACQUISITION_LIMITS, REVIEWED_SOURCE_EVIDENCE, REVIEWED_SOURCE_PINS,
   METADATA_INSPECTION_CONTRACT, inspectAcquisitionMetadataBytes, safeAcquisitionError,
   validateAcquisitionRoster } from './acquire-open-library-dumps.mjs';
 import { canonicalJson, digest, requireValue, sha256 } from './open-library-descriptions.mjs';
@@ -24,6 +25,19 @@ export const DIAGNOSTIC_PREVIOUS_ACQUISITION = Object.freeze({ runId: '359953629
   artifactZipSha256: 'a97aed35be266b0d80c7f29364ee7c693a351e876fa28b418fefb452ba884c2f', artifactZipBytes: 2429,
   sealedArtifactSha256: '38becbaaa21ed5c8746b672bbd68aeb1f56f6e7c7105a3828bead2555a63fa8b',
   metadataSha256: 'b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b', metadataBytes: 4248 });
+export const REVIEWED_REQUEST_CONTRACT = 'open-library-reviewed-dump-acquisition-request-v1';
+export const REVIEWED_REQUEST_BRANCH = 'catalog-acquisition/ol-20260831-reviewed';
+export const REVIEWED_REQUEST_PATH = 'scripts/catalog/requests/ol-20260831-reviewed.json';
+export const REVIEWED_REQUEST_PURPOSE = 'diagnosed-exact-size-dump-acquisition';
+export const REVIEWED_PREVIOUS_DIAGNOSTIC = Object.freeze({ runId: '35998771483',
+  sourceHead: 'd3681fcdfa9a877b0f314159d87208d0ccd0f7f8', requestHead: 'bbc351eb9fa7eee0fb25f2183be3c1a729b59191',
+  requestSha256: '24d82539a439fb156cab3f740beb8d2d23c55e0ca82a7b2d71db259215bed488',
+  artifactId: '10807770129', artifactZipBytes: 18243,
+  artifactZipSha256: 'b7f4da1d6e13a25e10de4864980db664df871b6dd0be281d0ded1e2fdd958f45',
+  sealedArtifactSha256: 'b03d6ed815c4f5d0b44dedea7cbe740b4061acad7e7679d3be8cac300a8f0a77',
+  metadataSha256: DIAGNOSTIC_PREVIOUS_ACQUISITION.metadataSha256,
+  metadataBytes: DIAGNOSTIC_PREVIOUS_ACQUISITION.metadataBytes,
+  validationCode: 'acquisition-compressed-byte-limit' });
 const hash = /^[0-9a-f]{64}$/;
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const exactKeys = (value, keys) => object(value) && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
@@ -63,6 +77,26 @@ export function validateMetadataDiagnosticRequest(request) {
     && request.release === ACQUISITION_RELEASE && /^[0-9a-f]{40}$/.test(request.sourceHead)
     && digest(request.limits) === digest(DIAGNOSTIC_LIMITS)
     && digest(request.previousAcquisition) === digest(DIAGNOSTIC_PREVIOUS_ACQUISITION), 'invalid-metadata-diagnostic-request');
+  requireValue(recipientFingerprint(request.recipientPublicKey) === request.recipientFingerprint,
+    'invalid-acquisition-recipient-fingerprint');
+  const { requestSha256, ...body } = request;
+  requireValue(hash.test(requestSha256) && digest(body) === requestSha256, 'invalid-acquisition-request-hash');
+  return request;
+}
+
+export function validateReviewedAcquisitionRequest(request) {
+  requireValue(exactKeys(request, ['contract', 'purpose', 'release', 'sourceHead', 'roster', 'limits',
+    'sourcePins', 'sourceEvidence', 'previousAcquisition', 'previousDiagnostic',
+    'recipientPublicKey', 'recipientFingerprint', 'requestSha256'])
+    && request.contract === REVIEWED_REQUEST_CONTRACT && request.purpose === REVIEWED_REQUEST_PURPOSE
+    && request.release === ACQUISITION_RELEASE && /^[0-9a-f]{40}$/.test(request.sourceHead)
+    && digest(request.limits) === digest(REVIEWED_ACQUISITION_LIMITS)
+    && digest(request.sourcePins) === digest(REVIEWED_SOURCE_PINS)
+    && digest(request.sourceEvidence) === digest(REVIEWED_SOURCE_EVIDENCE)
+    && digest(request.previousAcquisition) === digest(DIAGNOSTIC_PREVIOUS_ACQUISITION)
+    && digest(request.previousDiagnostic) === digest(REVIEWED_PREVIOUS_DIAGNOSTIC), 'invalid-reviewed-acquisition-request');
+  requireValue(canonicalJson(validateAcquisitionRoster(request.roster)) === canonicalJson(request.roster),
+    'invalid-acquisition-roster-order');
   requireValue(recipientFingerprint(request.recipientPublicKey) === request.recipientFingerprint,
     'invalid-acquisition-recipient-fingerprint');
   const { requestSha256, ...body } = request;
@@ -140,6 +174,32 @@ export function sealMetadataDiagnostic(result, request) {
   return sealPayload(result, request, validateMetadataDiagnostic, MAX_DIAGNOSTIC_PLAINTEXT_BYTES);
 }
 
+function validateReviewedCollected(result, request) {
+  validateCollected(result, request);
+  const accounting = result.accounting;
+  requireValue(object(accounting) && accounting.requests?.metadata === 0
+    && accounting.metadata?.bytes === 0 && accounting.metadata.complete === false && accounting.metadata.skipped === true
+    && accounting.individualProviderRequests === 0 && accounting.databaseWrites === 0
+    && Number.isSafeInteger(accounting.retainedRecordBytes) && accounting.retainedRecordBytes >= 0
+    && (result.status === 'failed' || accounting.retainedRecordBytes <= request.limits.retainedBytes)
+    && ['works', 'editions'].every(kind => Number.isSafeInteger(accounting.requests[kind])
+      && accounting.requests[kind] >= 0 && accounting.requests[kind] <= 1 + request.limits.maxRedirects),
+  'invalid-reviewed-acquisition-accounting');
+  if (result.status === 'failed') return;
+  requireValue(digest(result.sourceEvidence) === digest(request.sourceEvidence)
+    && result.metadata === undefined
+    && ['works', 'editions'].every(kind => {
+      const source = result.sources[kind], pin = request.sourcePins[kind];
+      return source.url === pin.url && source.bytes === pin.bytes && source.md5 === pin.md5 && source.sha1 === pin.sha1
+        && hash.test(source.sha256) && accounting.requests[kind] >= 1;
+    }), 'invalid-reviewed-acquisition-source-evidence');
+}
+
+export function sealReviewedAcquisition(result, request) {
+  validateReviewedAcquisitionRequest(request);
+  return sealPayload(result, request, validateReviewedCollected, MAX_PLAINTEXT_BYTES);
+}
+
 function sealPayload(collected, request, validate, maximum) {
   validate(collected, request);
   const plaintext = Buffer.from(JSON.stringify(collected));
@@ -177,6 +237,11 @@ export function unsealMetadataDiagnostic(envelope, request, privatePem) {
   validateMetadataDiagnosticRequest(request);
   return unsealPayload(envelope, request, privatePem, validateMetadataDiagnostic,
     MAX_DIAGNOSTIC_PLAINTEXT_BYTES, ['failure', 'metadata-inspection']);
+}
+
+export function unsealReviewedAcquisition(envelope, request, privatePem) {
+  validateReviewedAcquisitionRequest(request);
+  return unsealPayload(envelope, request, privatePem, validateReviewedCollected, MAX_PLAINTEXT_BYTES, ['failure', 'collected']);
 }
 
 function unsealPayload(envelope, request, privatePem, validate, maximum, kinds) {

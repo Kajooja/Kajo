@@ -14,6 +14,40 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Reviewed exact-source acquisition implementation — 2026-09-24 / #182
+
+The exact-byte metadata diagnosis selects a separately reviewed request with
+**16,644,821,648** compressed bytes and immutable Work/Edition size/MD5/SHA1 pins.
+The old 15 GB acquisition and metadata diagnostic retain their original limits,
+request bytes and consumed-run status. The new fixed request branch is
+`catalog-acquisition/ol-20260831-reviewed`; its sole added path is
+`scripts/catalog/requests/ol-20260831-reviewed.json`.
+
+Local preparation first checks the known diagnostic ciphertext hash and performs
+authenticated decryption with the original recipient key. It re-derives both
+source pins from those exact observed bytes and preserves the original 383-pair
+roster. The runner verifies both predecessor Git objects, exact source ancestry,
+sole request change and separate first-run ledger. No new metadata, per-Item,
+ratings or database request is possible. The shared streaming verifier still
+requires complete EOF/gzip integrity, exact sizes/MD5/SHA1 and computed SHA-256;
+all decoded/row/line/retained-memory bounds remain unchanged. Only ciphertext
+success/failure recovery leaves the public runner. The collector deadline remains
+110 minutes within a 120-minute job; no automated retry or dispatch exists.
+
+Independent core/workflow/envelope/docs review passed with **70 targeted tests**.
+Actual local preparation smoke used the retained original roster, diagnostic
+ciphertext and key; altered ciphertext and wrong keys failed. It emitted no
+request file and made no network calls. The integrated local check passed
+lint/typechecks, 248 mobile and 143 catalog tests before the frozen Deno registry
+network boundary. Full source CI/merge and durable request/key recovery remain
+prerequisites for actual activation. Source and runtime acceptance are recorded
+in #182; no completed full scan is claimed at this implementation checkpoint.
+
+A separate publisher-documentation check also records that Open Library ratings
+and reading-log dumps have no subject key, so they cannot supply individual taste
+profiles. Their download/training is not part of this acquisition. The source
+registry retains this limitation and the unresolved aggregate-use rights gate.
+
 ## Canonical catalog feature sensitivity — 2026-09-24 / #273
 
 The continued MVP request selects this independent offline packet alongside

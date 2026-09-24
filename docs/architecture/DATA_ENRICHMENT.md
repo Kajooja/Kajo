@@ -93,6 +93,23 @@ Use this later study to test sequence-aware recall and explicitly defined logged
 
 Preserve both as optional research candidates. Neither is an approved download/training dependency or a release blocker. Resolve the exact intended use and source/derivative rights before admitting either; a working MovieLens path and synthetic non-media fixtures do not depend on them.
 
+### Open Library ratings/reading-log dumps — no individual histories
+
+Documentation checked September 24, 2026. The [publisher's dump schema][OL-DUMPS]
+identifies a Work, optional Edition, rating or shelf, and date on each row. It
+provides no subject key, including a stable pseudonymous one. Therefore these
+files cannot form individual taste histories, user holdouts, chronological
+profile prefixes or book/movie subject links. Item-level distributions may be
+research candidates; the precise date semantics remain unverified. No download
+or training is admitted by this review.
+
+The [publisher's rights statement][OL-RIGHTS] disclaims newly asserted database
+rights while acknowledging possible existing rights. It does not establish a
+blanket license for every contribution or separately settle research, derivatives,
+redistribution and serving. Keep any aggregate-prior proposal behind its own
+manifest and rights decision. The #182 Work/Edition acquisition excludes ratings
+and reading-log files and does not reconstruct source identities.
+
 ## 3. What the sources can and cannot establish
 
 MovieLens supports specified preference-prediction, collaborative representation, item-neighbor and cold-start experiments. Tag relevance can enrich object features. Beliefs can support selected pre-choice expectation analyses where timing and observed follow-up permit.
@@ -312,3 +329,6 @@ Dataset download, the full training run and hosted artifact admission are separa
 [AMAZON-RIGHTS]: https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023/discussions/1
 
 Publication attribution must follow the exact selected release: Harper and Konstan (2015) for MovieLens; Kotkov, Maslov and Neovius (2021) and Vig, Sen and Riedl (2012) for Tag Genome; the Aridor et al. (2024) Beliefs reference specified by its publisher; Gao et al. (2022) for KuaiRand. Store the publisher's complete citation in the dataset manifest rather than relying on this abbreviated design note. Method proposals and their primary papers are in the [engine research appendix](PREDICTIVE_MEMORY_ENGINE.md#research-references-and-falsifiable-proposals); they are not claims that public-data training already improves Kajo.
+
+[OL-DUMPS]: https://openlibrary.org/developers/dumps
+[OL-RIGHTS]: https://openlibrary.org/developers/licensing

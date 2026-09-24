@@ -607,6 +607,49 @@ run/head/request/artifact provenance remains required alongside decryption.
 The result has zero approvals, zero dump requests and zero database writes;
 neither a valid source verdict nor successful recovery authorizes a full retry.
 
+The separately reviewed `catalog-book-reviewed-acquisition.yml` forward uses
+the authenticated diagnosis from run **35998771483**. Its complete metadata body
+matches the original response and establishes the size-limit failure: Work is
+**4,058,336,593 bytes**, Edition is **12,586,485,055 bytes**, totaling
+**16,644,821,648 bytes**. The old 15,000,000,000-byte acquisition limit remains
+unchanged. `open-library-reviewed-dump-acquisition-request-v1` freezes this exact
+new sum, both publisher MD5/SHA-1/size/URL pins and the prior run/request/artifact
+evidence. It permits no wider source budget and performs **zero metadata GETs**.
+
+The new trigger is only `catalog-acquisition/ol-20260831-reviewed`, adding only
+`scripts/catalog/requests/ol-20260831-reviewed.json` as one child of accepted
+main. Before streaming, the runner fetches both fixed predecessor request Git
+objects, checks the original roster and recipient, then verifies the new
+workflow's unused one-shot ledger. The original acquisition and diagnostic
+branches remain consumed. Full compressed EOF, gzip validity, exact bytes and
+both publisher checksums are still mandatory; SHA-256 is calculated from the
+actual complete streams. All other parser, retention, official-redirect and
+time bounds remain unchanged, including 110 collector minutes and 120 job
+minutes. Full dumps never reach disk or artifacts.
+
+Local preparation requires the exact archived diagnostic sealed JSON hash,
+decrypts/authenticates it with the original private key, validates its complete
+metadata evidence and re-derives the fixed pins before writing a public request:
+
+```bash
+node scripts/catalog/prepare-reviewed-dump-acquisition.mjs request \
+  --previous-request ORIGINAL_PUBLIC_REQUEST.json --diagnostic-request PUBLIC_METADATA_REQUEST.json \
+  --diagnostic-input open-library-metadata-20260831.sealed.json \
+  --key-dir ORIGINAL_PRIVATE_KEY_DIRECTORY --source-head ACCEPTED_CURRENT_MAIN_SHA \
+  --out PUBLIC_REVIEWED_REQUEST.json
+node scripts/catalog/prepare-reviewed-dump-acquisition.mjs unseal \
+  --request PUBLIC_REVIEWED_REQUEST.json --key-dir ORIGINAL_PRIVATE_KEY_DIRECTORY \
+  --input open-library-reviewed-20260831.sealed.json --out NEW_PRIVATE_RESULT_DIRECTORY
+```
+
+Reviewed results bind `sourceEvidence` to the archived diagnosis instead of
+claiming a new metadata response; their accounting records zero metadata
+requests. Selected records or actual partial failure accounting remain encrypted.
+Recovery still requires verified Actions artifact provenance, complete source
+and record validation, and reconciliation against the original plus fresh private
+catalog snapshot. Source acquisition grants zero approvals and performs no
+per-item provider requests, ratings intake or database writes.
+
 The provider's [Work schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/work.schema.json)
 and [text-block definition](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/shared_definitions.json)
 describe description/text records. The [licensing page](https://openlibrary.org/developers/licensing)

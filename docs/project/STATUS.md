@@ -237,7 +237,12 @@ a **new, distinct one-shot request** using exactly these observed publisher
 sizes/MD5/SHA1 pins and this exact total ceiling. It must preserve the original
 383-target roster/recipient, prior-run provenance, old immutable protocol limits,
 full EOF/gzip/checksum verification and all remaining memory/time/row bounds.
-It needs no new metadata GET and permits no automatic retries or unrelated
+The implemented workflow uses `catalog-acquisition/ol-20260831-reviewed` and
+only `scripts/catalog/requests/ol-20260831-reviewed.json`. Local preparation
+reauthenticates the archived diagnostic ciphertext with the saved key before
+emitting that public request. The runner verifies the original acquisition and
+diagnostic Git objects, roster/key equality, exact accepted source and sole-file
+change. It needs no new metadata GET and permits no automatic retries or unrelated
 source acquisition. Source CI/merge and durable exact request/key custody precede
 activation; a completed scan, private recovery and fresh catalog reconciliation
 precede source-specific rights/language review and any guarded writer bridge.
