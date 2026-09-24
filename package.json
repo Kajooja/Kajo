@@ -18,6 +18,7 @@
     "catalog:tmdb-beta": "node scripts/catalog/import-tmdb-beta.mjs",
     "catalog:book-descriptions": "node scripts/catalog/import-open-library-descriptions.mjs",
     "catalog:book-descriptions:dump": "node scripts/catalog/prepare-open-library-dump-descriptions.mjs",
+    "catalog:features": "node scripts/catalog/inspect-item-features.mjs",
     "catalog:prepare-deployment": "node scripts/catalog/prepare-catalog-deployment.mjs",
     "test": "npm run test:mobile && npm run test:catalog && npm run test:edge && npm run test:database && npm run test:engine && npm run test:research && npm run test:acceptance",
     "smoke": "npm run smoke:ios --workspace @kajo/mobile && npm run smoke:android --workspace @kajo/mobile && npm run smoke --workspace @kajo/description-acceptance",

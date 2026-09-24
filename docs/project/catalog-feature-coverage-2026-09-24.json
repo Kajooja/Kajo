@@ -1,0 +1,79 @@
+{
+  "contract": "catalog-feature-coverage-v1",
+  "featureVersion": "catalog-concepts-v1",
+  "mappingSha256": "b4319f2554c8627b35f4d77428ff91a576e66ef7ab58fbb1d35f6f64d66f1642",
+  "snapshotSha256": "9c5e228af2003eb2dc3c394f91fff6e4a9cb3dd90afb2c2bd825aff584bc8705",
+  "checkedAt": "2026-09-24T11:18:16.242881+00:00",
+  "artifactSha256": "b3f9ce4da5e4f60ef8ee878311554cd7d947bd0229081891bb2fbfef98fecf70",
+  "items": 840,
+  "coverage": {
+    "BOOK": {
+      "items": 415,
+      "itemsWithAssertions": 244,
+      "itemsWithoutAssertions": 171,
+      "itemsWithoutSupportedSource": 30,
+      "itemsWithIdentityMismatch": 0,
+      "sourceRows": 415,
+      "unsupportedSourceRows": 30,
+      "identityMismatchSourceRows": 0,
+      "missingLabelSourceRows": 0,
+      "emptyLabelSourceRows": 0,
+      "observedLabelOccurrences": 19946,
+      "matchedLabelOccurrences": 780,
+      "unmatchedLabelOccurrences": 19166,
+      "matchedLabelsAbsentFromItemTags": 575,
+      "itemsWithAssertionsAbsentFromItemTags": 171,
+      "assertionsAbsentFromItemTags": 231,
+      "conceptItems": {
+        "fantasy": 92,
+        "horror": 60,
+        "mystery": 75,
+        "romance": 65,
+        "science-fiction": 61,
+        "thriller": 52
+      }
+    },
+    "MOVIE": {
+      "items": 425,
+      "itemsWithAssertions": 280,
+      "itemsWithoutAssertions": 145,
+      "itemsWithoutSupportedSource": 0,
+      "itemsWithIdentityMismatch": 0,
+      "sourceRows": 455,
+      "unsupportedSourceRows": 30,
+      "identityMismatchSourceRows": 0,
+      "missingLabelSourceRows": 0,
+      "emptyLabelSourceRows": 0,
+      "observedLabelOccurrences": 1135,
+      "matchedLabelOccurrences": 388,
+      "unmatchedLabelOccurrences": 747,
+      "matchedLabelsAbsentFromItemTags": 0,
+      "itemsWithAssertionsAbsentFromItemTags": 0,
+      "assertionsAbsentFromItemTags": 0,
+      "conceptItems": {
+        "fantasy": 70,
+        "horror": 59,
+        "mystery": 35,
+        "romance": 44,
+        "science-fiction": 77,
+        "thriller": 103
+      }
+    }
+  },
+  "semantics": {
+    "positive": "1 means an exact supported provider label asserts the concept; duplicates do not increase it",
+    "missing": "null means unavailable, unsupported or unasserted; never negative evidence",
+    "sourceKinds": "provider-subject and provider-genre are retained separately; transfer reliability is unknown",
+    "availability": "checkedAt is the observation boundary; source timestamps do not prove historical feature availability",
+    "tagComparison": "compares matched source labels with current Item tags; absence is not proof of truncation",
+    "scope": "offline catalog audit only; no serving, ranking, memory, training or rights admission"
+  },
+  "inputFileSha256": "9391286e83d3fe4de680b8456cd83990ade46d28d5dc3ec6030849c06465c3bb",
+  "artifactFileSha256": "5c4ee3ec9c8b7588dd9bb9212e4cf9d98057527fe5b55c4604e9ba8e5a34b487",
+  "implementation": {
+    "scripts/catalog/item-features.mjs": "7e24d4b1ad65dba0714774a2800d03cf312db1336b3bc58b630370e8fb96563b",
+    "scripts/catalog/inspect-item-features.mjs": "87e8ec2a238f41c193830567f6e3cdfaf7619a6cb92c7eb81390384cbc0bbc1b",
+    "scripts/catalog/catalog-feature-snapshot.sql": "6e36decee9f61e6628eda91fe9586c5f11873050b7b550e211a7ad5e498bc2fa",
+    "supabase/functions/_shared/catalog-normalizers.mjs": "c45821528593b64763d83860975d979d6466cd9cd01d3e440462402afeaa4283"
+  }
+}

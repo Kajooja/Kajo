@@ -14,6 +14,45 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Provider-backed catalog concept audit — 2026-09-24 / #269
+
+The continued owner request explicitly selects this independent Phase 14.3
+packet while #182 remains the primary source-acquisition task. The offline
+mapper and inspector use a strict allowlisted read-only catalog snapshot,
+exact provider identity checks, an immutable six-concept registry, source-field
+lineage and deterministic projection hashes. Exact normalized Open Library
+subject labels and numeric TMDB genre IDs are supported; source topics and film
+genres retain different evidence kinds. Synonyms collapse to one positive
+assertion and unavailable concepts stay `null`, not fabricated negative evidence.
+
+The actual snapshot at `2026-09-24T11:18:16.242881+00:00` contains **840 visible
+Items / 415 BOOK / 425 MOVIE**. Its saved file SHA-256 is
+`9391286e83d3fe4de680b8456cd83990ade46d28d5dc3ec6030849c06465c3bb`.
+All 385 Open Library and 425 TMDB identity bindings match; thirty curated BOOKs
+have no supported provider source. At least one mapped concept covers **244
+BOOK / 280 MOVIE**. **171 BOOKs / 231 concept assertions** have mapped source
+labels absent from the current matching Item-tag slugs. This is a measured
+representation gap, not a causal claim about the old tag cap or evidence that
+any particular new model improves preferences.
+
+The [aggregate report](../catalog-feature-coverage-2026-09-24.json) binds input,
+registry and private feature-projection hashes. Snapshot/per-Item records stay
+out of Git. No catalog write, serving adapter, public tag, Memory, Shared or
+Scenario interpretation changes; model admission and Phase 14 gates remain open.
+Fourteen focused regressions cover identity ambiguity, neutral unknowns,
+synonym collapse, provider/field separation, lineage changes, deterministic
+coverage, private-output handling and CLI failure/overwrite behavior. Local
+catalog validation passes **77 tests**; lint/typechecks and **248 mobile tests**
+also pass. The bounded root check reaches a Deno registry connection block;
+complete acceptance requires all five PR CI jobs, recorded in Issue #269.
+
+The controlled `Kajo-catalog-feature-audit-269.zip` is **751,715 bytes**, SHA-256
+`a2d42c2d1168fdbef501bc9edb8d11fd29cb6db5b6f9043186eab36458bbea7a`.
+It preserves the actual input, private projection, aggregate report and recovery
+instructions. Every member
+size/hash and ZIP CRC was verified before saving. Source validation and exact
+PR/CI/merge acceptance are recorded in Issue #269.
+
 ## Exploratory prefix study and recovery — 2026-09-24 / #265
 
 The owner explicitly requested continued public-preference research alongside
