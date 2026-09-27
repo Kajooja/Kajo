@@ -916,7 +916,7 @@ file containing exactly `contract`, `maxConflictedPairs` and
 `maxDiagnosticBytes`. Both budgets are positive safe integers, bounded by the
 selected roster (at most 385 pairs) and 64 MiB respectively; there are no default
 budgets. This grants no provider access or new acquisition attempt. Existing
-`stage`, strict scanning and all cloud acquisition paths keep fail-fast identity
+`stage`, strict scanning and historical cloud acquisition paths keep fail-fast identity
 semantics. No foreign location is followed or substituted.
 
 Only validated current v2 `record-location-mismatch` evidence can exclude a
@@ -956,12 +956,128 @@ checks and CLI isolation. The source-bound full-continuation inspector includes
 the new imported policy module in its dependency closure; archived recovery
 still executes its original accepted source and unchanged v1/v2 rules.
 
-This local policy is not an acquisition successor. A later source packet must
-separately specify and test request/source/collector/result/recovery bindings,
-explicit operational budgets and one-shot activation before any new provider
-access. All five prior requests stay consumed. Complete-source verification,
+This local policy is not an acquisition successor. The separate core below
+supplies request/collector/result and payload-recovery contracts; guarded
+source/run/custody bindings, explicit operational budgets and one-shot activation
+still precede new provider access. All five prior requests stay consumed. Complete-source verification,
 fresh catalog reconciliation and individual language/origin/rights review still
 precede a separately bounded writer bridge.
+
+### Conflict-aware acquisition core and successor boundary — #182
+
+The successor uses the accepted offline exclusion policy without changing any
+existing acquisition entrypoint. Its source packet supplies a request protocol,
+a shared streaming collector, encrypted result validation and pure private
+payload inspection. It does **not** yet supply an executable request, Actions
+workflow, operator preparation or source/run/custody authentication wrapper.
+Those controls must be completed and accepted before any activation.
+
+#### Public request and private predecessor proof
+
+`open-library-conflict-aware-dump-acquisition-request-v1` has purpose
+`full-acquisition-with-bounded-pair-exclusion`. It preserves the exact original
+383-pair roster, recipient, dated publisher pins, source evidence, acquisition
+limits and public lineage from the consumed full-continuation request. The new
+request adds its implementation `sourceHead`, accepted `policySourceHead`, an
+explicit `conflictPolicy` and the consumed continuation's public run/source/
+request-head/request-digest identity. The complete body is hash-bound; unknown
+fields, changed ordering, substituted keys/targets/pins or historical dispatch
+are rejected. Policy acceptance is PR #283, main
+`1f3bd049a37f182a773a4101791f9962b87cfb99`.
+
+The source contract requires positive explicit policy caps; no operational pair
+or diagnostic budget is chosen by a default. Ceilings remain the selected roster
+and 64 MiB, with diagnostic rows also charged to the cumulative 64 MiB selected
+record budget. An actual request must freeze its reviewed values before the
+future one-shot activation. This source acceptance grants no provider budget.
+
+Do not add new private archive/artifact/plaintext/row hashes, identifiers or disguised
+receipt commitments to the new public request or fixtures. Local preparation
+must authenticate the retained predecessor using its original accepted-source
+inspector and trusted run/artifact/custody receipts, then replay the new policy.
+Preserve that proof privately. The cloud gate can verify public lineage, accepted
+source and caps; it cannot independently authenticate unpublished private custody.
+
+#### Streaming and encrypted result
+
+`acquireConflictAwareOpenLibraryDumps` validates the exact original public
+383-pair roster and freezes the reviewed source pins, source evidence and limits.
+It reuses the same official HTTPS
+transport, bounded redirects, Work-then-Edition sequence and deadline. The
+lower-level `collectConflictDumpStreams` requires an explicit source-opening
+callback and bounded structural inputs; it has no default network transport and
+supports real synthetic gzip fixtures. Neither entrypoint uses private Item IDs
+as scanner keys. Historical acquisition functions always select the strict
+scanner, including when callers pass unknown conflict options.
+
+The fixed source ceiling remains **16,644,821,648 compressed bytes**, with
+128 GiB decoded / 100 million rows per source, 1,049,600-byte lines, 64 MiB
+cumulative selected-record-plus-diagnostic bytes and a 110-minute collector
+limit. There are no metadata, per-Item, ratings or database requests, retries,
+range resumes or source substitutions. A later workflow keeps a 120-minute job
+ceiling. These measure accepted source input, not discarded redirect traffic.
+Both files must reach verified EOF/gzip integrity and match exact byte lengths,
+publisher MD5/SHA-1 and computed SHA-256 before a collected result exists.
+
+`open-library-conflict-aware-dump-acquisition-result-v1` is separate from both
+historical cloud results and local staging. Successful results keep surviving
+pair records and **separately suppressed valid counterpart records**, plus one
+bounded quarantine ledger. Suppressed raw records remain private recovery
+evidence and can never enter candidates. Retaining them permits independent
+raw hash, inspection, envelope and byte-accounting replay without fabricating
+missing counterparts or trusting an unverifiable byte total. Every original
+pair belongs to exactly one group. The only quarantined identity is the original
+selected pair; a foreign location is never followed or substituted.
+
+The result distinguishes physical valid matches, quarantined rows/pairs,
+suppressed counterparts, missing quarantined counterparts, surviving found/
+missing records and eligible text shapes. Per complete source, rows equal valid
+matches plus quarantine plus unrelated rows. Across both sources, physical
+valid matches equal surviving found plus suppressed records; twice the target
+count equals surviving found plus surviving missing plus twice quarantined
+pairs. Cumulative byte charge equals all valid raw bytes, including suppressed
+counterparts, plus diagnostic raw bytes. Exclusion never refunds charge.
+
+Any failure discards both surviving and suppressed record arrays and the
+whole-source result manifest. It retains only bounded earlier quarantine
+evidence, truthful partial counters and a successor-specific fixed error code.
+`terminalFailureEvidence: null` explicitly means the final rejected row was not
+retained; it does not claim an unknown cause was diagnosed or grant a retry.
+Failed counters preserve an attempted row/chunk that crossed a stop threshold;
+recovery checks the corresponding failure reason rather than pretending it was
+accepted input or resetting it to zero. Completed Work assertions may survive an
+Edition failure, but they do not make the acquisition partially successful.
+
+The existing RSA-OAEP/AES-GCM primitives enforce a **160 MiB plaintext ceiling**
+and bind the new request identity. The new seal/unseal wrappers validate the
+strict request and separate result contract; old wrappers reject the successor.
+Encryption and payload consistency alone do not authenticate the sender.
+
+#### Pure recovery and the remaining operator gate
+
+`validateConflictDumpPayload` checks a result against supplied request context.
+`inspectConflictDumpPayload` additionally binds original/fresh private catalog
+snapshots, produces unapproved surviving candidates and reports reconciliation.
+Both are pure offline functions; strict real-request validation belongs to the
+new seal/unseal wrapper. Inspection explicitly reports
+`validationScope: payload-consistency-only` and `provenanceVerified: false`.
+It replays original conflict evidence and every surviving/suppressed valid raw
+record, recomputes inspection and complete counters, and excludes every
+quarantined pair. Collector full-file assertions are checked against pins; the
+full dumps are not downloaded or rehashed during recovery. No result supplies
+language/origin/rights approval, catalog writes or model admission.
+
+Next implement one distinct guarded activation and source-bound recovery path
+around this core. Freeze all five predecessor Git objects at their original
+request paths; require an accepted-main child with the sole new request file,
+first push/run attempt, separate spent ledger, read-only permissions and frozen
+dependencies. Bind the entire source/dependency closure, actual CI/run/artifact
+provenance and exclusive private output. Authenticate predecessor evidence and
+save/read back private recovery custody before publishing a request. No schedule,
+dispatch, rerun or activation is delivered by this core packet. After those
+source/CI/custody gates, any separately bounded execution must stop at recovered
+failure or unreviewed complete collection. Fresh reconciliation and individual
+rights review precede a separately bounded writer bridge.
 
 ### Description attribution — contract, #182
 

@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 conflict-aware acquisition specification
+## Current packet — #182 guarded conflict acquisition and recovery
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -68,26 +68,33 @@ Approvals and database writes remain zero. The
 records the public source/request/run acceptance and continuation boundary.
 
 The [offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182)
-is implemented on `feat/182-offline-conflict-policy`. Exact PR/head, required CI
-and merge acceptance belong to Issue #182. Its separate `stage-with-conflicts`
-command requires explicit budgets, replays eligible v2 evidence, validates
-revision/time/Edition links and excludes the entire original Work–Edition pair.
-Both full local sources must pass integrity checks before unapproved surviving
-candidates exist. Existing strict/cloud paths and historical evidence stay
-unchanged. The private recovered evidence was replayed locally against the narrow
-policy; no new provider access occurred. The
-[implementation checkpoint](sprints/SPRINT-014.md#offline-conflict-policy-and-hygiene--2026-09-28--182)
-records tests, limitations and repository hygiene.
+is accepted through [PR #283](https://github.com/Kajooja/Kajo/pull/283), main
+`1f3bd049a37f182a773a4101791f9962b87cfb99`, after all five
+[CI #557 gates](https://github.com/Kajooja/Kajo/actions/runs/36352866962),
+**678 tests / four exports**. Its explicit local policy excludes entire original
+Work–Edition pairs, preserves strict identity rejection and grants no text approval.
 
-**Next after source acceptance: specify and test the conflict-aware one-shot
-acquisition successor's request, collector, result and recovery contract.** Bind
-this policy and explicit operational caps to exact accepted source, the original
-roster/key/pins and authenticated predecessor evidence before preparing any
-activation. This offline packet grants no new provider budget. All **five** prior
-requests remain consumed; do not rerun, reset or reuse them or the completed
-pilot. Full-source verification, fresh reconciliation, individual rights review
-and separately bounded writes remain later gates. No additional description is
-approved and no catalog/device/release gate is closed. Exact acceptance stays in
+The [conflict-aware acquisition core](../architecture/ARCHITECTURE.md#conflict-aware-acquisition-core-and-successor-boundary--182)
+is implemented on `feat/182-conflict-acquisition-core`: strict successor request
+and encrypted-result contracts, shared complete-source streaming with bounded
+exclusion, retained private suppressed records for exact replay, and pure payload/
+snapshot inspection. Failure discards all candidate records and honestly retains
+only bounded prior diagnostics. Payload consistency is explicitly separate from
+source/run/custody authentication. Exact PR/head, tests and CI/merge acceptance
+belong to Issue #182 and the
+[core checkpoint](sprints/SPRINT-014.md#conflict-aware-acquisition-core--2026-09-28--182).
+
+**Next after core source acceptance: implement the guarded one-shot activation
+and source-bound private recovery path around the new core.** Add the distinct
+runner/workflow, local predecessor-authenticating preparation and trusted
+source/dependency/CI/run/artifact inspector. Preserve original roster/key/pins and
+all five fixed predecessor Git objects. Freeze explicit operational policy caps
+and verify private recovery custody before any request publication/activation.
+The core packet delivers no executable request or provider budget. All **five**
+prior requests remain consumed; do not rerun, reset or reuse them or the completed
+pilot. Fresh reconciliation, individual rights review and separately bounded
+writes remain later gates. No additional description or catalog/device/release
+gate is accepted. Exact acceptance stays in
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
@@ -345,9 +352,9 @@ full-source verification, candidates, approvals and writes remain zero.
 PR #279 accepted the offline exact-self-location correction and versioned
 failure replay. PR #281's separately accepted full continuation has now run once
 and ended in failure; private recovery and authentication verification are
-complete. The offline conflict policy is implemented; follow the single acquisition-contract
-specification task at the top of this file
-and the
+complete. The offline conflict policy is accepted and the separate successor core
+is implemented; follow the single guarded activation/recovery task at the top of
+this file and the
 [result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182).
 All five requests remain consumed. Complete publisher EOF/checksum verification,
 fresh reconciliation and source-specific rights review still precede a writer

@@ -69,15 +69,15 @@ requests remain consumed. The exact-self-location correction and versioned
 historical failure replay are accepted through PR #279. PR #281's separate bounded full-acquisition
 continuation passed all five required CI gates and activated once. Its public
 run ended in failure; private recovery and authentication verification are
-complete. All five requests are now consumed. The separately selected offline
-conflict policy is implemented with an explicit bounded local command, whole-pair
-exclusion, unchanged strict/cloud guards and complete-source verification.
-[STATUS](STATUS.md) and #182 record exact source/CI acceptance. Next specify and
-test the conflict-aware one-shot acquisition request/collector/result/recovery
-contract before any new operational budget or provider access. Foreign locations
-are never remapped. No additional text is approved and no database write was
-performed. The prefix diagnosis still cannot prove the earlier discarded row
-was identical.
+complete. All five requests are now consumed. PR #283 accepted the explicit
+local conflict policy. The separate successor core now supplies shared bounded
+streaming, strict request/result encryption contracts and pure payload replay,
+with complete-source verification and whole-pair exclusion. [STATUS](STATUS.md)
+and #182 record exact core source/CI acceptance. Next implement its guarded
+one-shot activation and trusted source/run/custody recovery wrapper before any
+new operational budget or provider access. Foreign locations are never remapped.
+No additional text is approved and no database write was performed. The prefix
+diagnosis still cannot prove the earlier discarded row was identical.
 The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
@@ -204,13 +204,15 @@ PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
 failure replay. PR #281 accepted the
 [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182).
 Its one-shot public run ended in failure; private recovery and authentication
-verification are complete. The fifth request is consumed. The
-[offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182)
-now implements the separate bounded local exclusion path, preserving foreign
-identity rejection and making no automatic remapping. Next specify and test the
-successor's request, collector, result and recovery bindings with explicit caps
-and accepted-source custody. That source/CI gate precedes a separately authorized
-one-shot acquisition; the local policy does not grant a provider budget or rerun.
+verification are complete. The fifth request is consumed. PR #283 accepted the
+[offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182).
+The [successor core](../architecture/ARCHITECTURE.md#conflict-aware-acquisition-core-and-successor-boundary--182)
+now implements bounded streaming, separate request/result contracts, encrypted
+recovery and pure consistency/snapshot replay. It supplies no executable request,
+workflow or trusted run/custody verification. Next implement those guarded
+activation and source-bound operator controls, freeze operational policy caps
+and verify private custody before any separately bounded provider execution.
+Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
