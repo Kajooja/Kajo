@@ -64,16 +64,17 @@ original 15 GB size-budget failure, the separate exact-pinned acquisition ran
 once and failed at a selected Work identity guard. The separately accepted
 100 MiB Work-prefix diagnosis then recovered a current selected row whose
 `location` exactly equals its canonical Work key. Its object, key and type are
-valid; the old guard rejects every present location field. All four requests are
-consumed. The exact-self-location correction and versioned historical failure
-replay are accepted through PR #279. The separate bounded full-acquisition
-continuation now has a new one-shot protocol with retained pins/roster and
-source-bound private recovery. Pass source CI/merge, then preserve custody before
-activation. STATUS records exact acceptance; no new executable request is
-prepared or activated by this source packet.
-The diagnosis supplies no full-source verification or candidates
-and cannot prove the discarded historical row was identical. No complete dump
-scan or additional approved text exists.
+valid; the old guard rejects every present location field. Those four predecessor
+requests remain consumed. The exact-self-location correction and versioned
+historical failure replay are accepted through PR #279. PR #281's separate bounded full-acquisition
+continuation passed all five required CI gates and activated once. Its public
+run ended in failure; private recovery and authentication verification are
+complete. All five requests are now consumed. The next packet specifies and tests
+an offline selected-record conflict/quarantine policy, preserving foreign-location
+rejection and forbidding automatic remapping. STATUS records public acceptance
+and the result checkpoint. No additional text is approved and no database write
+was performed. The prefix diagnosis still cannot prove the earlier discarded row
+was identical.
 The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
@@ -197,12 +198,16 @@ made no database requests or writes. Its bounded partial stream is not a complet
 source scan, and matching row position does not establish historical byte identity.
 
 PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
-failure replay. Accept the implemented
-[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182),
-then pass source CI/merge and preserve private custody before one activation.
-No executable request is prepared or activated. Consumed requests and their
-budgets remain immutable. Complete-source verification, private recovery, fresh
-reconciliation and source-specific rights review precede a guarded writer bridge. Curated
+failure replay. PR #281 accepted the
+[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182).
+Its one-shot public run ended in failure; private recovery and authentication
+verification are complete. The fifth request is consumed. Next, specify and test
+an offline selected-record conflict/quarantine policy. Preserve foreign-location
+rejection and make no automatic remapping. A scan that excludes conflicted
+records changes failure policy and requires its own source packet plus separately
+specified one-shot acquisition. No rerun or new provider budget is authorized by
+this handoff. Complete-source verification, fresh reconciliation and
+source-specific rights review still precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own
