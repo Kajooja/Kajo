@@ -3,9 +3,14 @@
 import { spawn } from 'node:child_process';
 import { PassThrough } from 'node:stream';
 import { digest, requireValue, sha256 } from './open-library-descriptions.mjs';
-import { LIMITS, SOURCE_CONTRACT, readDumpFailureEvidence, scanDumpStream } from './open-library-dump-descriptions.mjs';
+import { LIMITS, SOURCE_CONTRACT, readDumpFailureEvidence, scanDumpConflictStream, scanDumpStream } from './open-library-dump-descriptions.mjs';
+import { createDumpConflictLedger } from './dump-conflict-policy.mjs';
 
 export const ACQUISITION_CONTRACT = 'open-library-dump-acquisition-v1';
+export const CONFLICT_ACQUISITION_CONTRACT = 'open-library-conflict-aware-dump-acquisition-result-v1';
+// Canonical public roster from the consumed reviewed request. The production
+// successor keeps those same pairs; the stream-only test seam may use subsets.
+export const CONFLICT_ACQUISITION_ROSTER_SHA256 = '195789b92489cc0b92a03748ff567fbf2bb9b4dc9ec8cf845ab5b6464bf6e601';
 export const METADATA_INSPECTION_CONTRACT = 'open-library-dump-metadata-inspection-v1';
 export const ACQUISITION_RELEASE = '2026-08-31';
 export const ACQUISITION_LIMITS = Object.freeze({ metadataBytes: 2 * 1024 * 1024,
@@ -51,6 +56,18 @@ export const ACQUISITION_ERROR_CODES = Object.freeze([
   'invalid-reviewed-acquisition-input',
 ]);
 const knownErrorCodes = new Set(ACQUISITION_ERROR_CODES);
+export const CONFLICT_ACQUISITION_ERROR_CODES = Object.freeze([...ACQUISITION_ERROR_CODES,
+  'invalid-conflict-acquisition-input', 'invalid-dump-conflict-roster', 'invalid-dump-conflict-policy',
+  'invalid-dump-conflict-ledger', 'invalid-dump-conflict-scan', 'invalid-dump-conflict-evidence',
+  'dump-conflict-fatal', 'dump-conflict-pair-limit', 'dump-conflict-diagnostic-limit',
+  'duplicate-selected-dump-record', 'invalid-conflict-acquisition-accounting']);
+const conflictErrorCodes = new Set(CONFLICT_ACQUISITION_ERROR_CODES);
+export const safeConflictAcquisitionError = error => conflictErrorCodes.has(error?.message) ? error.message : 'acquisition-failed';
+// The opener has not parsed a row. Its opaque failures cannot assert scanner,
+// identity, policy, or staging failures through a matching exception message.
+const conflictOpenErrorCodes = new Set(['unsafe-acquisition-url', 'unsafe-acquisition-source-route',
+  'acquisition-aborted', 'acquisition-transport-failed', 'acquisition-header-limit', 'acquisition-invalid-response',
+  'acquisition-redirect-loop', 'acquisition-redirect-limit', 'acquisition-http-failed', 'acquisition-content-encoding']);
 
 export function validateAcquisitionRoster(roster) {
   requireValue(Array.isArray(roster) && roster.length > 0 && roster.length <= LIMITS.targets,
@@ -328,7 +345,8 @@ export async function inspectOpenLibraryDumpMetadata({ release, signal, transpor
 
 // Both protocols use the identical transport, full EOF/hash verification,
 // retained-record budget, parsing and coverage calculation below.
-async function collectPinnedSources({ pinned, selected, retrievedAt, started, signal, transport, limits, accounting, budget }) {
+async function collectPinnedSources({ pinned, selected, retrievedAt, started, signal, transport, limits, accounting, budget,
+  conflictLedger, openSource }) {
   requireValue(pinned.works.bytes + pinned.editions.bytes <= limits.totalCompressedBytes,
     'acquisition-compressed-byte-limit');
   const sources = {}, collected = {};
@@ -336,21 +354,24 @@ async function collectPinnedSources({ pinned, selected, retrievedAt, started, si
     const source = pinned[kind];
     accounting.activeSource = kind;
     accounting.sources[kind] = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0,
-      unrelatedRows: 0, malformedUnrelatedRows: 0, complete: false, expectedBytes: source.bytes };
-    const response = await openOfficial(source.url, { signal, maxBytes: source.bytes,
-      timeoutMs: Math.max(1, limits.timeoutMs - (Date.now() - started)) }, transport, limits,
-    () => accounting.requests[kind]++);
+      unrelatedRows: 0, malformedUnrelatedRows: 0, complete: false, expectedBytes: source.bytes,
+      ...(conflictLedger ? { quarantinedRecords: 0 } : {}) };
+    const options = { signal, maxBytes: source.bytes, timeoutMs: Math.max(1, limits.timeoutMs - (Date.now() - started)) };
+    const countRequest = () => { accounting.requests[kind]++; };
+    const response = openSource ? await openSource(kind, structuredClone(source), options, countRequest)
+      : await openOfficial(source.url, options, transport, limits, countRequest);
     const length = response.headers?.['content-length'];
     if (length !== undefined && (!/^\d+$/.test(length) || Number(length) !== source.bytes)) {
       response.body.destroy(); throw fail('dump-file-size-mismatch');
     }
     let scan;
     try {
-      scan = await scanDumpStream(response.body, source, kind, selected, retrievedAt, budget,
+      scan = await (conflictLedger ? scanDumpConflictStream : scanDumpStream)(response.body, source, kind, selected, retrievedAt, budget,
         { signal, keyOf: row => row.workId, lineBytes: limits.lineBytes, retainedBytes: limits.retainedBytes,
+          ...(conflictLedger ? { conflictLedger } : {}),
           observeProgress: stats => { accounting.sources[kind] = Object.assign(stats, { complete: false, expectedBytes: source.bytes }); } });
     } catch (error) {
-      const evidence = readDumpFailureEvidence(error);
+      const evidence = conflictLedger ? undefined : readDumpFailureEvidence(error);
       if (evidence) {
         accounting.failureEvidence = evidence;
         accounting.diagnosticRetainedBytes = evidence.rawBytes;
@@ -364,6 +385,7 @@ async function collectPinnedSources({ pinned, selected, retrievedAt, started, si
   }
   const records = selected.map(row => ({ ...row, work: collected.works.get(row.workId) ?? null,
     edition: collected.editions.get(row.workId) ?? null }));
+  if (conflictLedger) return conflictProjection({ records, sources, ledger: conflictLedger, accounting, budget });
   const coverage = { targets: records.length, found: 0, missing: 0, eligibleTexts: 0, targetsWithEligibleText: 0 };
   for (const row of records) {
     let eligible = false;
@@ -376,10 +398,151 @@ async function collectPinnedSources({ pinned, selected, retrievedAt, started, si
   return { sources, records, coverage };
 }
 
+function conflictProjection({ records: allRecords, sources, ledger, accounting, budget }) {
+  const quarantine = ledger.snapshot(), excluded = new Set(quarantine.quarantinedWorkIds), records = [], suppressedRecords = [];
+  const coverage = { selectedTargets: allRecords.length, survivingTargets: allRecords.length - excluded.size,
+    validMatchedRecords: 0, quarantinedPairs: excluded.size, quarantinedRows: quarantine.conflicts.length,
+    pairedRecordsSuppressed: 0, quarantinedMissingRecords: 0, recordsFound: 0, recordsMissing: 0,
+    eligibleTexts: 0, targetWithEligibleText: 0, descriptionStatuses: {} };
+  let validRecordBytes = 0, survivingRecordBytes = 0, suppressedRecordBytes = 0;
+  for (const row of allRecords) {
+    const found = ['work', 'edition'].filter(kind => row[kind] !== null);
+    const bytes = found.reduce((sum, kind) => sum + Buffer.byteLength(row[kind].raw), 0);
+    validRecordBytes += bytes; coverage.validMatchedRecords += found.length;
+    if (excluded.has(row.workId)) {
+      suppressedRecords.push(row); suppressedRecordBytes += bytes; coverage.pairedRecordsSuppressed += found.length;
+      continue;
+    }
+    records.push(row); survivingRecordBytes += bytes;
+    let eligible = false;
+    for (const kind of ['work', 'edition']) {
+      const record = row[kind], status = record?.inspection.description.status ?? 'record-missing';
+      if (record) coverage.recordsFound++; else coverage.recordsMissing++;
+      coverage.descriptionStatuses[status] = (coverage.descriptionStatuses[status] ?? 0) + 1;
+      if (status === 'eligible') { coverage.eligibleTexts++; eligible = true; }
+    }
+    if (eligible) coverage.targetWithEligibleText++;
+  }
+  coverage.quarantinedMissingRecords = 2 * coverage.quarantinedPairs - coverage.quarantinedRows - coverage.pairedRecordsSuppressed;
+  requireValue(coverage.quarantinedMissingRecords >= 0 && budget.bytes === validRecordBytes + quarantine.diagnosticBytes
+    && coverage.quarantinedRows === sources.works.quarantinedRecords + sources.editions.quarantinedRecords
+    && coverage.validMatchedRecords === sources.works.matchedRecords + sources.editions.matchedRecords
+    && ['works', 'editions'].every(kind => sources[kind].rows === sources[kind].matchedRecords
+      + sources[kind].quarantinedRecords + sources[kind].unrelatedRows
+      && Array.isArray(sources[kind].redirects) && accounting.requests[kind] === sources[kind].redirects.length + 1),
+  'invalid-conflict-acquisition-accounting');
+  Object.assign(accounting, { validRecordBytes, survivingRecordBytes, suppressedRecordBytes });
+  return { sources, records, suppressedRecords, coverage };
+}
+
 function sourceManifest(release, retrievedAt, sources) {
   return { contract: SOURCE_CONTRACT, release, retrievedAt,
     sources: Object.fromEntries(Object.entries(sources).map(([kind, source]) => [kind,
       Object.fromEntries(['url', 'sha256', 'bytes', 'compression', 'maxDecodedBytes', 'maxRows'].map(key => [key, source[key]]))])) };
+}
+
+// Low-level source-core seam: the caller owns transport provenance and must
+// supply openSource(kind, source, options, onRequest). There is deliberately no
+// network default. Only the production wrapper below binds the real fixed pins.
+export async function collectConflictDumpStreams({ release, roster, sourcePins, limits, conflictPolicy,
+  signal, openSource } = {}) {
+  requireValue(release === ACQUISITION_RELEASE && typeof openSource === 'function'
+    && exactKeys(sourcePins, ['works', 'editions']) && exactKeys(limits, Object.keys(REVIEWED_ACQUISITION_LIMITS))
+    && Object.entries(limits).every(([key, value]) => Number.isSafeInteger(value)
+      && value >= (key === 'maxRedirects' ? 0 : 1) && value <= REVIEWED_ACQUISITION_LIMITS[key]),
+  'invalid-conflict-acquisition-input');
+  for (const kind of ['works', 'editions']) {
+    const pin = sourcePins[kind], ceiling = REVIEWED_SOURCE_PINS[kind];
+    requireValue(exactKeys(pin, Object.keys(ceiling)) && pin.url === ceiling.url && pin.compression === 'gzip'
+      && Number.isSafeInteger(pin.bytes) && pin.bytes > 0 && pin.bytes <= ceiling.bytes
+      && typeof pin.md5 === 'string' && /^[0-9a-f]{32}$/.test(pin.md5)
+      && typeof pin.sha1 === 'string' && /^[0-9a-f]{40}$/.test(pin.sha1), 'invalid-conflict-acquisition-input');
+  }
+  const selected = validateAcquisitionRoster(roster), fixedLimits = structuredClone(limits);
+  requireValue(sourcePins.works.bytes + sourcePins.editions.bytes <= fixedLimits.totalCompressedBytes,
+    'acquisition-compressed-byte-limit');
+  const ledger = createDumpConflictLedger({ policy: conflictPolicy, selected });
+  const pinned = Object.fromEntries(Object.entries(sourcePins).map(([kind, source]) => [kind,
+    { ...structuredClone(source), maxDecodedBytes: fixedLimits.maxDecodedBytes, maxRows: fixedLimits.maxRows }]));
+  const controller = new AbortController(), combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+  const timer = setTimeout(() => controller.abort(), fixedLimits.timeoutMs); timer.unref?.();
+  const started = Date.now(), retrievedAt = new Date().toISOString(), accounting = initialAccounting(retrievedAt), budget = { bytes: 0 };
+  delete accounting.retainedRecordBytes;
+  accounting.activeSource = null;
+  accounting.metadata = { bytes: 0, complete: false, skipped: true, reason: 'reviewed-pinned-source-evidence' };
+  const finish = () => {
+    const quarantine = ledger.snapshot();
+    accounting.cumulativeStagedBytes = budget.bytes;
+    accounting.diagnosticBytes = quarantine.diagnosticBytes;
+    return { release, retrievedAt, rosterSha256: digest(selected), limits: fixedLimits,
+      conflictPolicy: quarantine.policy, policySha256: quarantine.policySha256, quarantine, accounting };
+  };
+  try {
+    const guardedOpen = async (kind, source, options, onRequest) => {
+      combined.throwIfAborted();
+      let response, opening = true;
+      try {
+        response = await openSource(kind, source, options, () => {
+          requireValue(opening, 'acquisition-invalid-response');
+          combined.throwIfAborted();
+          requireValue(accounting.requests[kind] < fixedLimits.maxRedirects + 1, 'acquisition-redirect-limit');
+          onRequest();
+        });
+      } catch (error) {
+        throw fail(conflictOpenErrorCodes.has(error?.message) ? error.message : 'acquisition-transport-failed');
+      } finally { opening = false; }
+      try {
+        requireValue(response && response.body && typeof response.body.destroy === 'function'
+          && response.status === 200 && typeof response.url === 'string' && Array.isArray(response.redirects)
+          && (response.headers === undefined || object(response.headers))
+          && response.redirects.length <= fixedLimits.maxRedirects && accounting.requests[kind] === response.redirects.length + 1,
+        'acquisition-invalid-response');
+        // An opener may keep its own references. Snapshot the audit metadata
+        // before consuming its stream, independently of immutable scan pins.
+        const redirects = structuredClone(response.redirects), headers = structuredClone(response.headers ?? {});
+        let url = pinned[kind].url;
+        const visited = new Set([url]);
+        for (const redirect of redirects) {
+          requireValue(exactKeys(redirect, ['from', 'to', 'status']) && redirect.from === url
+            && [301, 302, 303, 307, 308].includes(redirect.status) && !visited.has(redirect.to),
+          'acquisition-invalid-response');
+          url = validateAcquisitionSourceUrl(redirect.to, pinned[kind].url); visited.add(url);
+        }
+        requireValue(response.url === url, 'acquisition-invalid-response');
+        validateAcquisitionSourceUrl(url, pinned[kind].url);
+        return { status: response.status, body: response.body, headers, url, redirects };
+      } catch (error) {
+        if (typeof response?.body?.destroy === 'function') response.body.destroy();
+        throw error;
+      }
+    };
+    const result = await collectPinnedSources({ pinned, selected, retrievedAt, started, signal: combined,
+      limits: fixedLimits, accounting, budget, conflictLedger: ledger, openSource: guardedOpen });
+    accounting.activeSource = null; accounting.completedAt = new Date().toISOString();
+    return { ...finish(), status: 'collected', completedAt: accounting.completedAt, ...result,
+      sourceManifest: sourceManifest(release, retrievedAt, result.sources) };
+  } catch (error) {
+    accounting.failedAt = new Date().toISOString();
+    // Terminal failures receive no additional raw-row allocation. Only already
+    // accepted ledger entries survive; valid and suppressed candidates do not.
+    return { ...finish(), status: 'failed', completedAt: accounting.failedAt,
+      code: combined.aborted ? 'acquisition-aborted' : safeConflictAcquisitionError(error), terminalFailureEvidence: null };
+  } finally { clearTimeout(timer); controller.abort(); }
+}
+
+export async function acquireConflictAwareOpenLibraryDumps({ release, roster, sourcePins, sourceEvidence, limits,
+  conflictPolicy, signal, transport = curlAcquisitionTransport } = {}) {
+  requireValue(release === ACQUISITION_RELEASE && object(sourcePins) && object(sourceEvidence) && object(limits)
+    && digest(sourcePins) === digest(REVIEWED_SOURCE_PINS) && digest(sourceEvidence) === digest(REVIEWED_SOURCE_EVIDENCE)
+    && digest(limits) === digest(REVIEWED_ACQUISITION_LIMITS), 'invalid-conflict-acquisition-input');
+  const selected = validateAcquisitionRoster(roster);
+  requireValue(selected.length === 383 && digest(selected) === CONFLICT_ACQUISITION_ROSTER_SHA256,
+    'invalid-conflict-acquisition-input');
+  const result = await collectConflictDumpStreams({ release, roster: selected, sourcePins: REVIEWED_SOURCE_PINS,
+    limits: REVIEWED_ACQUISITION_LIMITS, conflictPolicy, signal,
+    openSource: (_kind, source, options, onRequest) => openOfficial(source.url, options, transport, REVIEWED_ACQUISITION_LIMITS, onRequest) });
+  return { contract: CONFLICT_ACQUISITION_CONTRACT, ...result, sourceEvidence: { ...REVIEWED_SOURCE_EVIDENCE },
+    approved: 0, databaseWrites: 0, individualProviderRequests: 0, modelAdmissions: 0, rights: 'unreviewed' };
 }
 
 export async function acquireReviewedOpenLibraryDumps({ release, roster, sourcePins, sourceEvidence, limits,

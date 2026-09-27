@@ -14,6 +14,45 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Conflict-aware acquisition core — 2026-09-28 / #182
+
+`feat/182-conflict-acquisition-core` continues accepted PR #283/main
+`1f3bd049a37f182a773a4101791f9962b87cfb99`, whose five CI #557 gates passed
+678 tests and four exports. Exact core PR/head, validation and merge acceptance
+belong to Issue #182. This checkpoint advances the earlier successor-contract
+handoff; all historical entries below are preserved.
+
+The separate successor request freezes original public roster/key/pins/limits
+and consumed lineage, accepted policy source, implementation source and explicit
+policy caps. It adds no private predecessor artifact or row commitments. The
+collector reuses the official transport and complete Work-then-Edition scanner;
+existing acquisition entrypoints remain strict. Tiny real gzip fixtures exercise
+the same core through a mandatory injected source opener with no network default.
+
+Complete results separate surviving pairs, suppressed valid counterpart records
+and one bounded quarantine ledger. Retained suppressed raw evidence permits exact
+private replay and byte accounting without becoming candidates. All diagnostics
+and valid records share the cumulative cap. Failure discards both record arrays
+and the whole-source manifest, preserves truthful partial counters/prior bounded
+quarantine, and explicitly reports that terminal row evidence is unavailable.
+New fixed error codes never disclose provider text.
+
+Strict new seal/unseal wrappers reuse bounded encryption and reject altered
+requests/results. Pure recovery checks raw records, policy evidence, source
+assertions, counters and original/fresh snapshots. Its explicit payload-only scope
+does not claim authenticated GitHub provenance or rehash the absent full dumps.
+All surviving candidates remain unapproved; no catalog write or model admission
+is delivered. Tests are synthetic and ordinary CI makes no real dump requests.
+
+The packet delivers the reusable core, not an operational acquisition. Next
+implement one distinct guarded runner/workflow, local authenticated predecessor
+preparation and a source/dependency/CI/run/artifact-bound recovery inspector.
+Freeze explicit operational policy caps and preserve/read back private recovery
+custody before request publication. All five predecessor requests remain consumed;
+no new provider budget, executable request or activation occurs here. Fresh
+reconciliation and individual rights review still precede a separately bounded
+writer bridge. STATUS owns the single next task.
+
 ## Offline conflict policy and hygiene — 2026-09-28 / #182
 
 `feat/182-offline-conflict-policy` continues accepted main
