@@ -62,11 +62,13 @@ of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake
 and reviewed acquisition are accepted. After the metadata diagnostic proved the
 original 15 GB size-budget failure, the separate exact-pinned acquisition ran
 once and failed at a selected Work identity guard. All three requests are
-consumed; preserve their budgets and evidence. Complete source acceptance of the
-offline selected-row failure-evidence forward, then evaluate a separate bounded
-Work-only diagnosis plan to recover and replay the actual failing row. This
-patch activates no source budget or retry. No complete dump scan or additional
-approved text exists. The six-description usefulness target remains unmet.
+consumed; preserve their budgets and evidence. The selected continuation is a
+distinct bounded 100 MiB Work-prefix diagnosis. After source acceptance, prepare
+and retain its exact request/key, activate once, recover any rejected selected
+row and replay its predicate offline before choosing a fix. It supplies no full
+source verification or review candidates and cannot prove the discarded historical
+row was identical. No complete dump scan or additional approved text exists.
+The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
 
@@ -183,13 +185,14 @@ acquisition then ran once and failed at a selected Work identity guard, before
 EOF or full-source verification. Its recovered artifact contains no raw records;
 the selected identity and failing predicate remain unknown. All three requests
 are consumed, and fresh read-only reconciliation confirms 383 unchanged targets.
-Complete offline source/fixture/CI acceptance of bounded selected-row failure
-evidence, preserving the identity guard and fixed public code. Then evaluate a
-separate Work-only diagnosis plan with exact source/roster/recipient bindings and
-explicit byte/row/time limits, stopping at the first selected identity failure
-for encrypted row recovery and offline predicate replay. This patch activates
-no acquisition, consumed-request retry or provider budget. Complete-source
-verification, private recovery, fresh reconciliation and source-specific rights
+Complete source/fixture/CI acceptance of the distinct Work-prefix diagnosis, then
+prepare its authenticated predecessor-bound request, retain private custody and
+activate once. The fixed 100 MiB range, 1 GiB decoded, 1,000,000-row and 600-second
+bounds permit one encrypted first selected identity failure; no full-download
+fallback, Edition source or consumed-request retry exists. Recover and replay the
+actual predicate before choosing a correction. An inconclusive or failed result
+does not expand the budget. Complete-source verification, private recovery,
+fresh reconciliation and source-specific rights
 review precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native

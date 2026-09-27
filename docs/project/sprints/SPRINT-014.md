@@ -14,6 +14,41 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded Work-prefix diagnosis — 2026-09-24 / #182
+
+Implementation resumed on September 27 after interruption. The twelve stream/
+transport tests and twelve request/envelope/runner tests pass. A separate private
+recovery inspector passes ten offline receipt, code-binding and artifact tests.
+Source CI and the actual one-shot diagnosis remain pending at this checkpoint.
+
+`fix/182-work-prefix-diagnostic` selects a distinct source diagnosis after the
+consumed reviewed acquisition discarded its failing row. Implementation and
+source/fixture/CI acceptance are in progress. PR #277's prerequisite failure-
+evidence source is accepted; the new prefix request has not been activated.
+
+The request freezes the same Work source (full size **4,058,336,593 bytes** and
+existing publisher pins), 383-pair roster and recipient. Only the first
+**104,857,600 compressed bytes** are requested, as `Range: bytes=0-104857599`.
+HTTP 206 must match exact Content-Range/Length and identity encoding; HTTP 200
+or mismatched headers fail without fallback. Parsing is bounded to **1 GiB
+decoded / 1,000,000 rows / 600 seconds / four official redirects**. A complete
+first rejected selected row yields `diagnosed`; range/decoded/row exhaustion
+without one yields `inconclusive`; header, truncation, corruption, timeout or
+transport failures yield `failed`. Prefix hashes and buffered byte counters do
+not verify the whole source or identify an exact row byte offset.
+
+Preparation authenticates the archived run **36003953876** failure before a new
+request is emitted. The sole branch/path is
+`catalog-diagnostic/ol-20260831-work-prefix` /
+`scripts/catalog/requests/ol-20260831-work-prefix.json`, with its own one-shot
+ledger. After source acceptance, retain exact request/key custody, activate once,
+authenticate and inspect the artifact, then replay the captured predicate offline
+to select the actual fix. The new private inspector must bind all accepted source
+dependencies; previous archives remain byte-identical. Without the original
+row's hash, a new row cannot prove exact historical reproduction. No full-source
+checksum, review candidate, approval, database write or model admission follows.
+An inconclusive result does not silently select a retry or broader source budget.
+
 ## Offline selected-row failure evidence — 2026-09-24 / #182
 
 `fix/182-dump-failure-evidence` implements the bounded failure-evidence forward.
@@ -36,8 +71,9 @@ actual maximum-size CRLF rows, UTF-8 chunk boundaries, Work/Edition cases,
 untrusted transport errors, both collector/encryption paths and a correctly
 encrypted but internally forged payload. The local integrated check passed
 lint/typechecks, **248 mobile and 159 catalog tests**, then reached frozen Deno
-npm dependency downloads. All five remote CI gates remain required; exact
-source/CI/merge acceptance is recorded in Issue #182.
+npm dependency downloads. [PR #277](https://github.com/Kajooja/Kajo/pull/277) is
+accepted as `3e865ac9ecfcda427ab03d50d1592ff72b4d038d` after all five
+[CI #544 gates](https://github.com/Kajooja/Kajo/actions/runs/36008368238).
 The new unsealer also opened the actual prior reviewed failure and metadata
 diagnostic; historical payloads and missing-evidence meaning stayed unchanged.
 No source request, database change or new artifact recovery was fabricated.

@@ -87,8 +87,10 @@ export function validateAcquisitionUrl(value) {
 // curl keeps ordinary TLS verification and environment proxy behavior. The
 // subprocess receives argv directly, never shell text. Redirects and retries are
 // deliberately disabled here; every next URL is checked by openOfficial().
-export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes }, spawnProcess = spawn) {
+export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes, range, acceptHeaders, observeBodyBytes }, spawnProcess = spawn) {
   signal?.throwIfAborted();
+  if (range !== undefined) requireValue(Number.isSafeInteger(range.start) && range.start >= 0
+    && Number.isSafeInteger(range.end) && range.end >= range.start, 'invalid-acquisition-range');
   return new Promise((resolve, reject) => {
     const body = new PassThrough();
     // A header/transport error can arrive before the caller receives the body.
@@ -96,23 +98,30 @@ export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes }, s
     const child = spawnProcess('curl', ['--disable', '--silent', '--show-error', '--proto', '=https',
       '--suppress-connect-headers', '--connect-timeout', '15', '--max-time', String(Math.max(1, Math.ceil(timeoutMs / 1000))),
       '--speed-limit', '1024', '--speed-time', '60', '--max-filesize', String(maxBytes),
+      ...(range === undefined ? [] : ['--range', `${range.start}-${range.end}`, '--header', 'Accept-Encoding: identity']),
       '--user-agent', 'Kajo-Catalog-Dump-Collector/1.0 (+https://github.com/Kajooja/Kajo)',
       '--include', '--output', '-', '--url', url], { stdio: ['ignore', 'pipe', 'ignore'] });
-    let settled = false, exited = false, headers = Buffer.alloc(0), headerBytes = 0;
+    let settled = false, exited = false, stopped = false, allowBody = true, headers = Buffer.alloc(0), headerBytes = 0;
     const stop = error => {
+      stopped = true;
       if (!settled) { settled = true; reject(error); }
       body.destroy(error);
       if (!exited) child.kill('SIGTERM');
     };
     const abort = () => stop(fail('acquisition-aborted'));
     signal?.addEventListener('abort', abort, { once: true });
-    body.on('close', () => { if (!exited) child.kill('SIGTERM'); });
+    body.on('close', () => { stopped = true; if (!exited) child.kill('SIGTERM'); });
     body.on('drain', () => child.stdout.resume());
     child.on('error', () => stop(fail('acquisition-transport-failed')));
     child.stdout.on('error', () => stop(fail('acquisition-transport-failed')));
-    const writeBody = chunk => { if (chunk.length && !body.write(chunk)) child.stdout.pause(); };
+    const observe = chunk => {
+      try { if (chunk.length) observeBodyBytes?.(chunk.length); return true; }
+      catch (error) { stop(error); return false; }
+    };
+    const writeBody = chunk => { if (!stopped && allowBody && chunk.length && !body.write(chunk)) child.stdout.pause(); };
     child.stdout.on('data', chunk => {
-      if (settled) { writeBody(chunk); return; }
+      if (stopped || body.destroyed) return;
+      if (settled) { if (observe(chunk)) writeBody(chunk); return; }
       headers = Buffer.concat([headers, chunk]);
       for (let boundary = headers.indexOf('\r\n\r\n'); boundary !== -1; boundary = headers.indexOf('\r\n\r\n')) {
         headerBytes += boundary + 4;
@@ -130,13 +139,24 @@ export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes }, s
           if (colon <= 0) return stop(fail('acquisition-invalid-response'));
           const key = line.slice(0, colon).trim().toLowerCase(), value = line.slice(colon + 1).trim();
           if (Object.hasOwn(responseHeaders, key)) {
-            if (['location', 'content-length', 'content-encoding'].includes(key)) return stop(fail('acquisition-invalid-response'));
+            if (['location', 'content-length', 'content-encoding', ...(range === undefined ? [] : ['content-range', 'content-type'])]
+              .includes(key)) return stop(fail('acquisition-invalid-response'));
             continue;
           }
           responseHeaders[key] = value;
         }
+        // A range diagnostic must reject status/headers before any bundled
+        // body bytes are forwarded. Discarded bytes are still accounted for.
+        if (!observe(headers)) return;
+        try { allowBody = acceptHeaders ? acceptHeaders({ status, headers: responseHeaders }) !== false : true; }
+        catch (error) { return stop(error); }
         settled = true;
         resolve({ status, headers: responseHeaders, body });
+        if (!allowBody) {
+          stopped = true; headers = Buffer.alloc(0); body.end();
+          if (!exited) child.kill('SIGTERM');
+          return;
+        }
         writeBody(headers);
         headers = Buffer.alloc(0);
         return;
@@ -146,6 +166,7 @@ export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes }, s
     child.on('close', code => {
       exited = true;
       signal?.removeEventListener('abort', abort);
+      if (stopped) return;
       if (code !== 0 || !settled) stop(fail('acquisition-transport-failed'));
       else body.end();
     });
@@ -153,21 +174,26 @@ export function curlAcquisitionTransport(url, { signal, timeoutMs, maxBytes }, s
   });
 }
 
-async function openOfficial(url, options, transport, limits, onRequest = () => {}) {
-  const redirects = [], visited = new Set();
-  const original = new URL(validateAcquisitionUrl(url));
+export function validateAcquisitionSourceUrl(url, originalUrl) {
+  const original = new URL(validateAcquisitionUrl(originalUrl));
   const metadataPath = `/metadata/ol_dump_${ACQUISITION_RELEASE}`;
   const filename = original.pathname.split('/').at(-1);
   const isMetadata = original.pathname === metadataPath;
+  url = validateAcquisitionUrl(url);
+  const current = new URL(url);
+  const archiveHost = current.hostname === 'archive.org' || current.hostname.endsWith('.archive.org');
+  const archiveFile = new RegExp(`^/(?:download|serve|items|[0-9]+/items)/ol_dump_${ACQUISITION_RELEASE}/${filename.replaceAll('.', '\\.')}$`);
+  requireValue(isMetadata ? archiveHost && current.pathname === metadataPath
+    : archiveHost && archiveFile.test(current.pathname)
+      || current.hostname === 'openlibrary.org' && current.pathname === `/data/${filename}`,
+  'unsafe-acquisition-source-route');
+  return url;
+}
+
+async function openOfficial(url, options, transport, limits, onRequest = () => {}) {
+  const redirects = [], visited = new Set(), originalUrl = url;
   for (;;) {
-    url = validateAcquisitionUrl(url);
-    const current = new URL(url);
-    const archiveHost = current.hostname === 'archive.org' || current.hostname.endsWith('.archive.org');
-    const archiveFile = new RegExp(`^/(?:download|serve|items|[0-9]+/items)/ol_dump_${ACQUISITION_RELEASE}/${filename.replaceAll('.', '\\.')}$`);
-    requireValue(isMetadata ? archiveHost && current.pathname === metadataPath
-      : archiveHost && archiveFile.test(current.pathname)
-        || current.hostname === 'openlibrary.org' && current.pathname === `/data/${filename}`,
-    'unsafe-acquisition-source-route');
+    url = validateAcquisitionSourceUrl(url, originalUrl);
     requireValue(!visited.has(url), 'acquisition-redirect-loop');
     visited.add(url);
     options.signal.throwIfAborted();

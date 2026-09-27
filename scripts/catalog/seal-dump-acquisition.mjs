@@ -257,12 +257,12 @@ export function sealReviewedAcquisition(result, request) {
   return sealPayload(result, request, validateReviewedCollected, MAX_PLAINTEXT_BYTES);
 }
 
-function sealPayload(collected, request, validate, maximum) {
+export function sealPayload(collected, request, validate, maximum, kindOf = payloadKind) {
   validate(collected, request);
   const plaintext = Buffer.from(JSON.stringify(collected));
   requireValue(plaintext.length <= maximum, 'acquisition-plaintext-limit');
   const header = { contract: SEALED_CONTRACT, algorithm: 'RSA-OAEP-SHA256+AES-256-GCM',
-    payloadKind: payloadKind(collected),
+    payloadKind: kindOf(collected),
     requestSha256: request.requestSha256, recipientFingerprint: request.recipientFingerprint,
     release: request.release, sourceHead: request.sourceHead, rosterSha256: rosterHash(request),
     plaintextSha256: sha256(plaintext), plaintextBytes: plaintext.length };
@@ -301,7 +301,7 @@ export function unsealReviewedAcquisition(envelope, request, privatePem) {
   return unsealPayload(envelope, request, privatePem, validateReviewedCollected, MAX_PLAINTEXT_BYTES, ['failure', 'collected']);
 }
 
-function unsealPayload(envelope, request, privatePem, validate, maximum, kinds) {
+export function unsealPayload(envelope, request, privatePem, validate, maximum, kinds, kindOf = payloadKind) {
   requireValue(exactKeys(envelope, ['header', 'wrappedKey', 'iv', 'tag', 'ciphertext'])
     && exactKeys(envelope.header, ['contract', 'algorithm', 'payloadKind', 'requestSha256', 'recipientFingerprint',
       'release', 'sourceHead', 'rosterSha256', 'plaintextSha256', 'plaintextBytes']), 'invalid-acquisition-envelope');
@@ -329,7 +329,7 @@ function unsealPayload(envelope, request, privatePem, validate, maximum, kinds) 
     requireValue(sha256(plaintext) === header.plaintextSha256, 'invalid-acquisition-plaintext-hash');
     const collected = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(plaintext));
     validate(collected, request);
-    requireValue(payloadKind(collected) === header.payloadKind,
+    requireValue(kindOf(collected) === header.payloadKind,
       'invalid-acquisition-envelope-binding');
     return collected;
   } catch { throw new Error('acquisition-unseal-failed'); }
