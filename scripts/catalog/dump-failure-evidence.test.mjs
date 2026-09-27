@@ -5,7 +5,8 @@ import test from 'node:test';
 import { gzipSync } from 'node:zlib';
 import { ACQUISITION_LIMITS, ACQUISITION_RELEASE, REVIEWED_ACQUISITION_LIMITS, REVIEWED_SOURCE_EVIDENCE,
   REVIEWED_SOURCE_PINS, acquireOpenLibraryDumps, acquireReviewedOpenLibraryDumps } from './acquire-open-library-dumps.mjs';
-import { FAILURE_EVIDENCE_LIMITS, canonicalDumpSource, validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
+import { FAILURE_EVIDENCE_CONTRACT, FAILURE_EVIDENCE_LIMITS, LEGACY_FAILURE_EVIDENCE_CONTRACT,
+  canonicalDumpSource, validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
 import { digest, inspectRecord, providerIdentityFailure, sha256 } from './open-library-descriptions.mjs';
 import { LIMITS, readDumpFailureEvidence, scanDumpStream } from './open-library-dump-descriptions.mjs';
 
@@ -39,12 +40,12 @@ async function scan(bytes, { kind = 'works', selected = roster, lineBytes = LIMI
     validate: evidence => validateDumpFailureEvidence(evidence, { roster: selected, source: pin, limits: { lineBytes, maxRows: pin.maxRows } }) };
 }
 
-test('ordered private predicates preserve the exact preexisting identity rejection, including location:null', () => {
+test('ordered private predicates reject wrong identities and noncanonical locations, including location:null', () => {
   const good = record();
   for (const [value, predicate] of [[null, 'record-not-object'], [[], 'record-not-object'], [1, 'record-not-object'],
     [{ ...good, key: '/works/OL999W', type: null, location: null }, 'record-key-mismatch'],
     [{ ...good, type: { key: '/type/redirect' }, location: null }, 'record-type-mismatch'],
-    [{ ...good, location: null }, 'record-location-present']]) {
+    [{ ...good, location: null }, 'record-location-mismatch']]) {
     assert.equal(providerIdentityFailure(value, roster[0], 'work'), predicate);
     assert.throws(() => inspectRecord(JSON.stringify(value), roster[0], 'work', at), error => {
       assert.equal(error.message, 'provider-identity-mismatch');
@@ -57,10 +58,51 @@ test('ordered private predicates preserve the exact preexisting identity rejecti
   assert.equal(inspectRecord(JSON.stringify(good), roster[0], 'work', at).status, 'found');
 });
 
+test('Work and Edition accept only exact self-location after key and type checks, without weakening later validation', () => {
+  for (const [sourceKind, kind] of [['works', 'work'], ['editions', 'edition']]) {
+    const good = record(sourceKind), self = { ...good, location: good.key };
+    const raw = JSON.stringify(self), inspected = inspectRecord(raw, roster[0], kind, at);
+    assert.equal(providerIdentityFailure(self, roster[0], kind), null);
+    assert.equal(inspected.status, 'found');
+    assert.equal(inspected.key, good.key);
+    assert.equal(inspected.recordSha256, sha256(raw));
+    assert.equal(inspected.description.text, description);
+    for (const location of [null, false, 0, {}, [], { key: good.key }, '/works/OL999W', '/books/OL999M',
+      `https://openlibrary.org${good.key}`, `//openlibrary.org${good.key}`, good.key + '/', good.key + '?x=1',
+      good.key + '#self', ' ' + good.key, good.key.toLowerCase(), good.key.replace('OL', '%4FL')]) {
+      assert.throws(() => inspectRecord(JSON.stringify({ ...good, location }), roster[0], kind, at), error => {
+        assert.equal(error.message, 'provider-identity-mismatch');
+        assert.equal(error.identityPredicate, 'record-location-mismatch'); return true;
+      });
+    }
+    for (const type of [{ key: '/type/redirect' }, { key: kind === 'work' ? '/type/edition' : '/type/work' }, null]) {
+      assert.throws(() => inspectRecord(JSON.stringify({ ...self, type }), roster[0], kind, at),
+        error => error.identityPredicate === 'record-type-mismatch');
+    }
+    assert.throws(() => inspectRecord(JSON.stringify({ ...self, key: '/works/OL999W', type: null }), roster[0], kind, at),
+      error => error.identityPredicate === 'record-key-mismatch');
+    assert.throws(() => inspectRecord(JSON.stringify({ ...self, revision: 0 }), roster[0], kind, at), /invalid-provider-revision/);
+    if (kind === 'edition') assert.throws(() => inspectRecord(JSON.stringify({ ...self, works: [] }), roster[0], kind, at),
+      /provider-work-link-mismatch/);
+  }
+});
+
+test('full Work and Edition scanners accept a self-location and retain exact raw identity without failure evidence', async () => {
+  for (const kind of ['works', 'editions']) {
+    const self = { ...record(kind), location: key(kind, roster[0]) };
+    const f = await scan(row(self, { kind }), { kind });
+    assert.equal(f.error, undefined); assert.equal(f.evidence, undefined);
+    assert.equal(f.result.stats.complete, true); assert.equal(f.result.stats.matchedRecords, 1);
+    assert.equal(f.result.records.get(roster[0].workId).raw, JSON.stringify(self));
+    assert.equal(f.result.records.get(roster[0].workId).inspection.recordSha256, sha256(JSON.stringify(self)));
+  }
+});
+
 test('each rejected selected identity is reproducible with exact source and roster binding', async () => {
   for (const value of [null, { ...record(), key: '/works/OL999W' }, { ...record(), type: null }, { ...record(), location: null }]) {
     const f = await scan(row(value));
     assert.equal(f.error.message, 'provider-identity-mismatch');
+    assert.equal(f.evidence.contract, FAILURE_EVIDENCE_CONTRACT);
     assert.equal(f.evidence.predicate, providerIdentityFailure(value, roster[0], 'work'));
     assert.equal(f.validate(f.evidence), f.evidence);
     assert.deepEqual(f.evidence.source, canonicalDumpSource(f.pin));
@@ -70,6 +112,44 @@ test('each rejected selected identity is reproducible with exact source and rost
     assert.equal(f.budget.bytes, 0);
     assert.equal(f.result, undefined);
   }
+});
+
+test('v1 receipts retain all four ordered legacy reasons including self-location without changing v2 semantics', async () => {
+  for (const kind of ['works', 'editions']) {
+    const good = record(kind), seed = await scan(row({ ...good, location: null }, { kind }), { kind });
+    for (const [value, predicate] of [[null, 'record-not-object'],
+      [{ ...good, key: '/works/OL999W', type: null, location: good.key }, 'record-key-mismatch'],
+      [{ ...good, type: { key: '/type/redirect' }, location: good.key }, 'record-type-mismatch'],
+      [{ ...good, location: good.key }, 'record-location-present'], [{ ...good, location: null }, 'record-location-present']]) {
+      const raw = row(value, { kind, ending: '' });
+      const legacy = { ...seed.evidence, contract: LEGACY_FAILURE_EVIDENCE_CONTRACT, predicate,
+        rawBase64: raw.toString('base64'), rawBytes: raw.length, rawSha256: sha256(raw) };
+      const before = JSON.stringify(legacy);
+      assert.equal(seed.validate(legacy), legacy);
+      assert.equal(JSON.stringify(legacy), before);
+      if (predicate === 'record-location-present') {
+        assert.throws(() => seed.validate({ ...legacy, contract: FAILURE_EVIDENCE_CONTRACT }), /invalid-dump-failure-evidence/);
+        if (value.location === good.key) assert.throws(() => seed.validate({ ...legacy,
+          contract: FAILURE_EVIDENCE_CONTRACT, predicate: 'record-location-mismatch' }), /invalid-dump-failure-evidence/);
+      }
+    }
+  }
+});
+
+test('v1 replay preserves JSON parse and raw-byte bounds before its frozen identity guard', async () => {
+  const f = await scan(row({ ...record(), location: null }));
+  const legacy = { ...f.evidence, contract: LEGACY_FAILURE_EVIDENCE_CONTRACT, predicate: 'record-location-present' };
+  const withRaw = raw => {
+    const bytes = Buffer.from(['/type/work', '/works/OL123W', '1', modifiedAt, raw].join('\t'));
+    return { ...legacy, rawBase64: bytes.toString('base64'), rawBytes: bytes.length, rawSha256: sha256(bytes) };
+  };
+  assert.throws(() => f.validate(withRaw('{"location":')), /invalid-dump-failure-evidence/);
+  const self = { ...record(), location: '/works/OL123W', description: '' };
+  self.description = 'x'.repeat(1048576 - Buffer.byteLength(JSON.stringify(self)));
+  assert.equal(Buffer.byteLength(JSON.stringify(self)), 1048576);
+  assert.equal(f.validate(withRaw(JSON.stringify(self))).contract, LEGACY_FAILURE_EVIDENCE_CONTRACT);
+  self.description += 'x';
+  assert.throws(() => f.validate(withRaw(JSON.stringify(self))), /invalid-dump-failure-evidence/);
 });
 
 test('LF, CRLF and final EOF framing roundtrip exact original selected-row bytes across stream chunks', async () => {

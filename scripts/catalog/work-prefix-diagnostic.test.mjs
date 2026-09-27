@@ -8,10 +8,10 @@ import { Readable } from 'node:stream';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
-import { createDumpFailureEvidence } from './dump-failure-evidence.mjs';
+import { FAILURE_EVIDENCE_CONTRACT, LEGACY_FAILURE_EVIDENCE_CONTRACT, createDumpFailureEvidence } from './dump-failure-evidence.mjs';
 import { WORK_PREFIX_DIAGNOSTIC_CONTRACT, WORK_PREFIX_LIMITS, WORK_PREFIX_RANGE, WORK_PREFIX_SOURCE_PIN,
   inspectWorkDumpPrefix } from './inspect-work-dump-prefix.mjs';
-import { canonicalJson, digest, sha256 } from './open-library-descriptions.mjs';
+import { canonicalJson, digest, inspectRecord, sha256 } from './open-library-descriptions.mjs';
 import { prepareWorkPrefixRequest } from './prepare-work-prefix-diagnostic.mjs';
 import { WORK_PREFIX_ARTIFACT_FILE, WORK_PREFIX_WORKFLOW_FILE, guardedWorkPrefixDiagnostic,
   validateWorkPrefixCommit, validateWorkPrefixRunBudget } from './run-work-prefix-diagnostic.mjs';
@@ -46,7 +46,7 @@ function resultFor(status = 'diagnosed', request = syntheticRequest) {
   const raw = failedRow(request), l = request.limits;
   const failureEvidence = status === 'diagnosed' ? createDumpFailureEvidence({ rowBytes: raw, terminated: true,
     sourceKind: 'works', source: request.sourcePin, roster: request.roster, expected: request.roster[0], row: 1,
-    fetchedAt: at, predicate: 'record-location-present', limits: l }) : null;
+    fetchedAt: at, predicate: 'record-location-mismatch', limits: l }) : null;
   return { contract: WORK_PREFIX_DIAGNOSTIC_CONTRACT, status,
     code: status === 'diagnosed' ? 'provider-identity-mismatch' : status === 'inconclusive' ? 'work-prefix-row-limit' : 'work-prefix-range-not-honored',
     release: request.release, retrievedAt: at, completedAt: at, rosterSha256: digest(request.roster),
@@ -142,13 +142,38 @@ test('all diagnostic statuses roundtrip authenticated encryption with one neutra
   for (const status of ['diagnosed', 'inconclusive', 'failed']) {
     const result = resultFor(status), sealed = sealWorkPrefixDiagnostic(result, syntheticRequest);
     assert.equal(sealed.header.payloadKind, 'work-prefix-diagnostic');
+    if (result.failureEvidence) assert.equal(result.failureEvidence.contract, FAILURE_EVIDENCE_CONTRACT);
     assert.deepEqual(unsealWorkPrefixDiagnostic(sealed, syntheticRequest, keys.privateKey), result);
     assert.ok(!JSON.stringify(sealed).includes(canary));
-    assert.ok(!JSON.stringify(sealed).includes('record-location-present'));
+    assert.ok(!JSON.stringify(sealed).includes('record-location-mismatch'));
     if (result.failureEvidence) assert.ok(!JSON.stringify(sealed).includes(result.failureEvidence.rawBase64));
     const damaged = structuredClone(sealed); damaged.header.sourceHead = 'd'.repeat(40);
     assert.throws(() => unsealWorkPrefixDiagnostic(damaged, syntheticRequest, keys.privateKey), /invalid-acquisition-envelope-binding/);
   }
+});
+
+test('encrypted v1 self-location diagnosis remains recoverable byte-for-byte after the live guard correction', () => {
+  const historical = resultFor(), expected = syntheticRequest.roster[0];
+  const self = { key: `/works/${expected.workId}`, type: { key: '/type/work' }, location: `/works/${expected.workId}` };
+  const raw = Buffer.from(['/type/work', self.key, '1', '2026-08-15T10:00:00', JSON.stringify(self)].join('\t'));
+  Object.assign(historical.failureEvidence, { contract: LEGACY_FAILURE_EVIDENCE_CONTRACT, predicate: 'record-location-present',
+    rawBase64: raw.toString('base64'), rawBytes: raw.length, rawSha256: sha256(raw) });
+  Object.assign(historical.accounting, { decodedBytes: raw.length + 1, failureEvidenceBytes: raw.length });
+  assert.equal(inspectRecord(JSON.stringify(self), expected, 'work', at).status, 'found');
+  const bytes = JSON.stringify(historical), envelope = sealWorkPrefixDiagnostic(historical, syntheticRequest);
+  const sealedBytes = JSON.stringify(envelope);
+  assert.equal(envelope.header.plaintextSha256, sha256(bytes));
+  const recovered = unsealWorkPrefixDiagnostic(envelope, syntheticRequest, keys.privateKey);
+  assert.equal(JSON.stringify(recovered), bytes);
+  assert.equal(JSON.stringify(envelope), sealedBytes);
+  assert.equal(recovered.failureEvidence.predicate, 'record-location-present');
+  assert.equal(recovered.failureEvidence.contract, LEGACY_FAILURE_EVIDENCE_CONTRACT);
+  assert.equal(recovered.status, 'diagnosed');
+  assert.equal(recovered.candidates, 0); assert.equal(recovered.databaseWrites, 0);
+  const relabeled = structuredClone(historical);
+  relabeled.failureEvidence.contract = FAILURE_EVIDENCE_CONTRACT;
+  relabeled.failureEvidence.predicate = 'record-location-mismatch';
+  assert.throws(() => sealWorkPrefixDiagnostic(relabeled, syntheticRequest), /invalid-dump-failure-evidence/);
 });
 
 test('recovery rejects forged diagnostics, source completion, candidates, tail rows and accounting or predicate drift', () => {
@@ -219,7 +244,7 @@ test('guarded real-roster core fixture writes only ciphertext and preserves no-c
   assert.deepEqual(calls, [WORK_PREFIX_SOURCE_PIN.url]);
   const sealed = await readFile(join(root, 'output', WORK_PREFIX_ARTIFACT_FILE), 'utf8');
   assert.ok(!sealed.includes(canary));
-  assert.ok(!sealed.includes('record-location-present'));
+  assert.ok(!sealed.includes('record-location-mismatch'));
   assert.equal(JSON.parse(sealed).header.recipientFingerprint, previousRequest.recipientFingerprint);
   assert.equal(actual.candidates, 0);
   assert.equal((await stat(join(root, 'output', WORK_PREFIX_ARTIFACT_FILE))).mode & 0o077, 0);
@@ -256,14 +281,14 @@ test('local recovery refuses overwrite and prints no private predicate or row', 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).diagnosticStatus, 'diagnosed');
   const recovered = await readFile(join(root, 'recovered', 'work-prefix-diagnostic.json'), 'utf8');
-  assert.equal(JSON.parse(recovered).failureEvidence.predicate, 'record-location-present');
+  assert.equal(JSON.parse(recovered).failureEvidence.predicate, 'record-location-mismatch');
   const repeat = spawnSync(process.execPath, args, { encoding: 'utf8', env: childEnv });
   assert.equal(repeat.status, 1);
   assert.deepEqual(JSON.parse(repeat.stderr), { status: 'failed', code: 'work-prefix-local-operation-failed' });
   assert.equal(await readFile(join(root, 'recovered', 'work-prefix-diagnostic.json'), 'utf8'), recovered);
   const logs = [blocked.stdout, blocked.stderr, result.stdout, result.stderr, repeat.stdout, repeat.stderr].join('');
   assert.ok(!logs.includes(canary));
-  assert.ok(!logs.includes('record-location-present'));
+  assert.ok(!logs.includes('record-location-mismatch'));
 });
 
 test('dedicated workflow pins Actions, checks out main without credentials and uploads only encrypted artifact', async () => {

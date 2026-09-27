@@ -218,13 +218,13 @@ test('selected-row failure crosses the real collector and runner only inside enc
   assert.equal(await readFile(output, 'utf8'), 'sealed=true\n');
   assert.deepEqual(await readdir(outputDirectory), ['open-library-reviewed-20260831.sealed.json']);
   const encrypted = await readFile(join(outputDirectory, 'open-library-reviewed-20260831.sealed.json'), 'utf8');
-  for (const privateValue of [canary, rejectedRow.toString('base64'), 'record-location-present', 'UNRELATED PRIVATE CANARY'])
+  for (const privateValue of [canary, rejectedRow.toString('base64'), 'record-location-mismatch', 'UNRELATED PRIVATE CANARY'])
     assert.ok(!encrypted.includes(privateValue));
   const result = unsealReviewedAcquisition(JSON.parse(encrypted), request, keys.privateKey);
   assert.equal(result.status, 'failed');
   assert.equal(result.code, 'provider-identity-mismatch');
   const evidence = result.accounting.failureEvidence;
-  assert.equal(evidence.predicate, 'record-location-present');
+  assert.equal(evidence.predicate, 'record-location-mismatch');
   assert.equal(evidence.row, 2);
   assert.equal(evidence.terminated, true);
   assert.deepEqual(Buffer.from(evidence.rawBase64, 'base64'), rejectedRow);
