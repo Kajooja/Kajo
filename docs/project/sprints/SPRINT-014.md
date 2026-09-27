@@ -14,6 +14,37 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Full-acquisition continuation result and handoff — 2026-09-27 / #182
+
+[PR #281](https://github.com/Kajooja/Kajo/pull/281) is accepted as main
+`8a9aefbf87870abd932dac53c6d4abae7fd0683d`, tree
+`3f4cff0502950fe708881595b6053e97d8d46a79`. All five
+[CI #553 gates](https://github.com/Kajooja/Kajo/actions/runs/36347927166) passed,
+**645 tests / four exports**. This supplies source acceptance for the implementation
+checkpoint below; its earlier publication/activation instructions are historical.
+
+The public request branch `catalog-acquisition/ol-20260831-continuation` advanced
+to `f2558795be45be17bd2632071cf25746e4ec82a2`, tree
+`7e7e10f14a9e7342eab2bff140014bcfdcaf30f9`.
+[Run 36349027698](https://github.com/Kajooja/Kajo/actions/runs/36349027698)
+executed on push, attempt 1, and completed with failure on September 27.
+Private recovery and authentication verification are complete. The owner retains
+the private evidence separately. This packet produced zero approvals and zero
+database writes.
+
+All **five requests are consumed**. Do not rerun the continuation, alter its
+request/caps or reset a ledger. The single next task is to **specify and test an
+offline selected-record conflict/quarantine policy**. Preserve foreign-location
+rejection and make no automatic remapping. Continuing a scan while explicitly
+excluding conflicted records changes failure policy and needs its own source
+packet plus a separately specified one-shot acquisition. This handoff grants no
+new provider permission/budget, catalog write or model admission.
+
+The packet stops at recovered failure and this handoff. Full-source verification,
+fresh catalog reconciliation and source-specific language, origin and rights
+review remain before a separately bounded writer bridge. The two existing
+approved paragraphs, completed pilot and catalog/device/release gates stay intact.
+
 ## Full-acquisition continuation implementation — 2026-09-27 / #182
 
 `feat/182-full-dump-continuation` implements the accepted PR #280 specification

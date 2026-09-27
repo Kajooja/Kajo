@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 full-acquisition continuation implementation
+## Current packet — #182 offline selected-record conflict policy
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -53,31 +53,29 @@ rule. The captured row now passes identity validation, but its description still
 fails `markup-or-url`; no additional text is approved.
 
 The [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182)
-is implemented on `feat/182-full-dump-continuation` from accepted main
-`d05419f140ac42c99318b4788d1cf9606edb0e9a`. The new request freezes the original
-383 pairs, recipient, source pins, 16,644,821,648-byte accepted-source budget and
-110-minute collector deadline. Preparation authenticates the captured prefix
-and corrected identity; the runner validates the four fixed predecessor Git
-objects, correction ancestry, accepted source, sole-file child and first-run
-ledger. Private recovery replays source/dependency, Git/CI/run/artifact, raw-record
-and manifest bindings. Historical request dispatch and v1 receipts stay unchanged.
+is accepted through [PR #281](https://github.com/Kajooja/Kajo/pull/281), main
+`8a9aefbf87870abd932dac53c6d4abae7fd0683d`, after all five
+[CI #553 gates](https://github.com/Kajooja/Kajo/actions/runs/36347927166),
+**645 tests / four exports**.
 
-**Publication authorization:** the owner explicitly approved publishing these
-changes to public `Kajooja/Kajo` and merging after successful CI on September 27.
-Independent review and 34 new focused tests pass; the actual local source-binding
-smoke verified 17 source files and eight dependency files. The prior automatic
-publication block is resolved by that authorization. Local validation has the
-frozen Deno registry limitation recorded in Sprint 014; remote CI remains required.
+The public request branch `catalog-acquisition/ol-20260831-continuation`, head
+`f2558795be45be17bd2632071cf25746e4ec82a2`, activated once.
+[Run 36349027698](https://github.com/Kajooja/Kajo/actions/runs/36349027698)
+completed with failure on September 27. Private recovery and authentication
+verification are complete; the owner retains the private evidence separately.
+Approvals and database writes remain zero. The
+[result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182)
+records the public source/request/run acceptance and continuation boundary.
 
-**Next: publish `feat/182-full-dump-continuation`, pass all five required CI gates
-and merge. Then preserve the separate private request/recovery archive before
-activating `catalog-acquisition/ol-20260831-continuation` once.** No executable
-request has been prepared or activated by the source packet. Follow the
-[implementation checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-implementation--2026-09-27--182).
-Exact source/CI acceptance stays in [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
-All four predecessor requests remain consumed. Stop this packet after a privately
-recovered failed or collected result and updated handoff. Fresh catalog
-reconciliation, rights review and separately bounded writes remain later steps.
+**Next: specify and test an offline selected-record conflict/quarantine policy.**
+Preserve foreign-location rejection and make no automatic remapping. Continuing
+a scan while explicitly excluding conflicted records changes failure policy: it
+needs its own source packet and separately specified one-shot acquisition.
+All **five** requests are consumed. Do not rerun the continuation, reset a ledger,
+grant a new provider budget or reuse the completed pilot. This packet ends at
+recovered failure and this handoff. Fresh catalog reconciliation, rights review
+and separately bounded writes remain later gates. Exact acceptance stays in
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
@@ -332,12 +330,14 @@ including one redirect and no Edition, metadata, per-Item or database requests;
 full-source verification, candidates, approvals and writes remain zero.
 
 PR #279 accepted the offline exact-self-location correction and versioned
-failure replay as recorded above. The selected full-acquisition specification
-now defines the new request, immutable pins/roster, budget, custody and recovery.
-Follow the single implementation task at the top of this file. No executable
-request has been prepared or activated; no consumed budget is reset. Complete
-publisher EOF/checksum verification, private recovery, fresh reconciliation and
-source-specific rights review still precede a writer bridge.
+failure replay. PR #281's separately accepted full continuation has now run once
+and ended in failure; private recovery and authentication verification are
+complete. Follow the single offline conflict-policy task at the top of this file
+and the
+[result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182).
+All five requests remain consumed. Complete publisher EOF/checksum verification,
+fresh reconciliation and source-specific rights review still precede a writer
+bridge; this packet supplies no additional approvals or database writes.
 Independent #273 remains accepted synthetic sensitivity evidence.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
