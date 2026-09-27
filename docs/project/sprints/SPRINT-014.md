@@ -14,6 +14,55 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Full-acquisition continuation plan and handoff — 2026-09-27 / #182
+
+The owner requested one further completed packet and a clean new-conversation
+handoff. The [selected continuation specification](../../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182)
+defines one new full Work/Edition acquisition after the accepted identity fix.
+This packet changes documentation only. It creates no workflow, provider request,
+raw-data copy, database change, APK dispatch or model admission. #182 and all
+remaining catalog/MVP/device gates stay open.
+
+PR #279 is accepted as `8c4d8ecf65187f12bb30ed4207d03848fd87d292`, tree
+`50e848ed291309c549790ebdabe91e2857abc01e`, reviewed head
+`1a7f15ab0626f6c3d4ad823be72a1085578b94f1`. CI #549/run 36343239488 passed all
+five gates, **611 tests / four exports**. Its 87 focused tests and independent
+review include exact self-location and frozen v1 replay. The final private
+`Kajo-book-work-prefix-diagnostic-20260927.zip` recovery package contains
+**25 members / 101,412 bytes**, SHA-256
+`a3abd65a7cf6355fd6cd0349b03ca16610526611aba8df7e80c907c50e1d5775`.
+It retains the prefix source/request/run/artifact, key, captured row, replay and
+accepted correction receipt. Its original inspector remains bound to PR #278
+main `99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1`, not current main.
+
+Resume from refreshed accepted main and Issue #182, then create
+`feat/182-full-dump-continuation`. Reuse `acquireReviewedOpenLibraryDumps` and the
+existing scanner/encryption/record validators; add the separately named request,
+local preparation/recovery, one-shot runner/workflow and meaningful regression
+tests defined in ARCHITECTURE. Do not add an actual request file to the source PR.
+The design is selected; implementation, full CI, source merge, durable custody,
+activation and real two-file result remain pending in that order.
+
+For local preparation recover the saved prefix package above and
+`Kajo-book-reviewed-acquisition-20260924.zip` (version 2, **28 members /
+152,823 bytes**, SHA-256
+`345bc96a22c927d58e5492c4e7ad1490ed8488233e01e82587628a126ac4166d`).
+Use retained original roster/key/source pins and receipt lineage. No new key,
+provider metadata lookup or re-created historical result is needed. Do not expose
+private rows/UUIDs/keys in Git. A separate continuation archive must be durably
+saved before the new request branch is advanced; existing archives stay intact.
+
+Stop the implementation packet after one recovered failed or collected result
+and an updated handoff. A failure keeps its spent ledger and bounded evidence;
+a collection is unreviewed private input for fresh catalog reconciliation and
+source-specific text/rights review. It is not an apply packet. The two existing
+approved paragraphs and all earlier consumed attempts remain unchanged.
+Independent contract review checked the actual collector, request/envelope
+validators and current-task instructions. All **67 local Markdown targets** and
+whitespace checks pass. No code changed or new local root suite was needed;
+this planning PR's required CI and exact merge acceptance belong to Issue #182.
+STATUS owns the next action.
+
 ## Exact self-location correction — 2026-09-27 / #182
 
 `fix/182-self-location` supplies the offline source correction. Issue #182 owns

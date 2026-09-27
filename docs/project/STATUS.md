@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 exact self-location correction
+## Current packet — #182 full-acquisition continuation implementation
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -44,15 +44,30 @@ one rejected selected row. Authenticated private replay proves that the current
 row has matching Work key/type and a `location` equal to its own canonical path;
 the guard rejected the mere presence of that field.
 
-**`fix/182-self-location`** supplies the narrow offline correction: allow only
-an exact self-location after the object/key/type checks, keep foreign locations,
-null and real redirect records rejected, and preserve historical v1 failure
-replay while new captures use v2. Independent review and **87 focused tests**
-pass; exact source/required-CI acceptance belongs to
-[Issue #182](https://github.com/Kajooja/Kajo/issues/182). Confirm that acceptance,
-then specify a separate bounded full-acquisition continuation using the retained
-pins and roster. All four source requests are consumed; no new full request is
-selected or activated yet.
+[PR #279](https://github.com/Kajooja/Kajo/pull/279) accepted the exact-self-location
+correction on main `8c4d8ecf65187f12bb30ed4207d03848fd87d292`, after all five
+[CI #549 gates](https://github.com/Kajooja/Kajo/actions/runs/36343239488),
+**611 tests / four exports**. Foreign/null locations and real redirects remain
+rejected. New failure evidence is v2; historical v1 recovery retains its original
+rule. The captured row now passes identity validation, but its description still
+fails `markup-or-url`; no additional text is approved.
+
+**Next: implement the [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182)**
+on `feat/182-full-dump-continuation` from accepted main. The specification is
+complete; this implementation branch and its new entry points/workflow do not yet
+exist. Add only the new fixed request protocol, predecessor/correction checks,
+private preparation/recovery and focused tests, reusing the full collector.
+Keep the original 383 pairs, recipient and dated publisher pins, with the same
+16,644,821,648-byte full-source budget and 110-minute collector deadline.
+Do not redesign the plan or rerun a consumed workflow.
+
+Follow the [implementation and recovery handoff](sprints/SPRINT-014.md#full-acquisition-continuation-plan-and-handoff--2026-09-27--182).
+After required CI/merge and verified durable key/request custody, the new
+operation can be activated once and privately recovered. No executable request
+has been prepared or activated by this planning packet. All four predecessor
+requests remain consumed. Acquisition, fresh catalog reconciliation, rights
+review and separately bounded writes remain distinct steps. Exact source/CI
+acceptance stays in [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
@@ -204,7 +219,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — accept the self-location correction
+### Dump intake and consumed acquisition evidence
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -306,20 +321,13 @@ The prefix request is consumed and must not be replayed. It made two Work GETs
 including one redirect and no Edition, metadata, per-Item or database requests;
 full-source verification, candidates, approvals and writes remain zero.
 
-Confirm the **offline exact self-location correction's source acceptance** in
-Issue #182 against its exact head and required CI. The supplied patch has passed
-independent review, 87 focused tests and actual private v1 replay. New failure captures use
-`open-library-selected-row-failure-evidence-v2` and
-`record-location-mismatch`; v1 receipts retain their original
-`record-location-present` replay without changing historical bytes. The exact
-key/type and Edition-to-Work checks remain mandatory. The actual captured record
-now passes identity validation but its description remains excluded as
-`markup-or-url`; no candidate or approval follows from this fix. After source
-acceptance, specify one separate full-acquisition continuation with exact retained pins/roster,
-limits, recovery and a new request identity. This does not select or activate a
-new request automatically and does not reset any consumed source budget.
-Complete publisher EOF/checksum verification, private recovery, fresh target
-reconciliation and source-specific rights review still precede a writer bridge.
+PR #279 accepted the offline exact-self-location correction and versioned
+failure replay as recorded above. The selected full-acquisition specification
+now defines the new request, immutable pins/roster, budget, custody and recovery.
+Follow the single implementation task at the top of this file. No executable
+request has been prepared or activated; no consumed budget is reset. Complete
+publisher EOF/checksum verification, private recovery, fresh reconciliation and
+source-specific rights review still precede a writer bridge.
 Independent #273 remains accepted synthetic sensitivity evidence.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.

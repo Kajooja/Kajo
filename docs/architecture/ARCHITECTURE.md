@@ -760,6 +760,154 @@ for exact self-location. Neither a diagnosis nor an inconclusive result grants t
 rights, a full-source verification or a retry. STATUS owns the consumed request
 and any later separately specified acquisition continuation.
 
+### Full acquisition after the self-location correction — planned, #182
+
+This is the selected successor specification, **not an implemented or activated
+request**. Reuse `acquireReviewedOpenLibraryDumps` and the existing streaming,
+source-pin and encrypted-result validation. The four earlier one-shot ledgers
+remain consumed. Do not change their contracts, branches, request files or caps
+or make the old reviewed workflow rerunnable.
+
+| New protocol identity | Selected value |
+| --- | --- |
+| Request contract | `open-library-full-dump-continuation-request-v1` |
+| Purpose | `full-acquisition-after-self-location-correction` |
+| Request branch | `catalog-acquisition/ol-20260831-continuation` |
+| Sole added request path | `scripts/catalog/requests/ol-20260831-continuation.json` |
+| Workflow | `.github/workflows/catalog-book-full-continuation.yml` |
+| Sealed filename | `open-library-continuation-20260831.sealed.json` |
+
+These names reserve one bounded operation, not a generic retry service. Add
+small `prepare-full-dump-continuation.mjs`, `seal-full-dump-continuation.mjs` and
+`run-full-dump-continuation.mjs` entry points under `scripts/catalog/` with focused
+protocol tests. These paths are planned; create them only in the implementation
+packet. Reuse the existing full collector rather than the partial prefix reader.
+
+#### Immutable inputs and proof of the correction
+
+The new request retains the reviewed request's exact release, canonical sorted
+383 Work/Edition pairs, recipient PEM/fingerprint, `sourcePins`, `sourceEvidence`
+and limits. Its canonical digest covers all fields except the digest itself;
+reject extra fields, altered order, pins, limits or predecessor identities. Its
+`sourceHead` names the exact accepted main containing the new implementation.
+
+Bind both consumed predecessor Git objects: reviewed request
+`4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb` and prefix request
+`6a6dc390940db1b15d68a8d850dd08bfbb88bd4a`, at their original fixed paths. Validate
+their canonical request hashes and unchanged roster/key, including the reviewed
+request's original acquisition/metadata lineage. Freeze the prefix run, artifact
+ID, ZIP byte length/hash, sealed-file hash and exact decrypted plaintext SHA-256 from the
+[Sprint diagnosis](../project/sprints/SPRINT-014.md#bounded-work-prefix-diagnosis--2026-09-27--182)
+and its private recovery receipt. The public request contains these identities,
+never raw rows, private keys or catalog UUID/version snapshots.
+
+Before emitting a request, local preparation must authenticate the exact archived
+prefix ciphertext with the original key, validate its `diagnosed` result and
+frozen v1 evidence, and replay the captured row through the corrected live
+identity guard. Require the recorded exact self-location case, unchanged row
+hash and matching outer revision/time; do not reinterpret the old receipt as
+success. Description text remains independently eligible or rejected. Reuse the
+existing reviewed request validation for the retained pins; do not fetch fresh
+metadata or infer publisher hashes from the prefix.
+
+The accepted source must descend from correction main
+`8c4d8ecf65187f12bb30ed4207d03848fd87d292`. Its exact source receipt binds the
+workflow, lockfiles and all imported parser/collector/crypto/validator files,
+including `dump-failure-evidence.mjs`; ancestry alone is not a file-integrity
+check. Required source CI and tests must confirm that the exact self-location
+rule and versioned evidence replay still hold at this source head.
+
+#### Fixed resource budget and honest accounting
+
+Use the unchanged `REVIEWED_SOURCE_PINS` and `REVIEWED_ACQUISITION_LIMITS`:
+
+| Bound | Value |
+| --- | --- |
+| Work compressed file | 4,058,336,593 bytes |
+| Edition compressed file | 12,586,485,055 bytes |
+| Combined compressed source input | 16,644,821,648 bytes |
+| Decoded input / rows | 128 GiB / 100,000,000 per source |
+| Line / retained selected records | 1,049,600 bytes / 64 MiB across both sources |
+| Failure evidence / sealed plaintext | One bounded line / 160 MiB maximum plaintext |
+| Collector / Actions job deadline | 110 / 120 minutes |
+| Provider attempts | Work then Edition; at most five GETs each, including four official redirects |
+| Metadata / per-Item / ratings / database requests | Zero |
+
+This starts each compressed stream from byte zero. No range resume, source
+substitution, retry, extra release, title matching or additional target is allowed.
+Fail on the first error; never begin Edition after a Work failure. Require full
+EOF/gzip integrity, exact byte lengths, publisher MD5 and SHA-1, and actual
+computed SHA-256 for **both** sources before exposing a collected result. Missing
+selected records and rejected description text remain counted outcomes. A Work
+success followed by Edition failure is an overall failure, not partial success.
+
+The compressed-source cap describes accepted parser input, not all network
+traffic. Current full-collector accounting does not measure discarded redirect
+bodies; do not relabel it as a cumulative transport cap or exact row offset.
+The prior reviewed and prefix runs recorded 78,731,116 and 78,690,134 compressed
+bytes respectively: **157,421,250** already consumed. This distinct full attempt
+adds at most 16,644,821,648 accepted source bytes, giving **16,802,242,898** for
+those recorded dump inputs plus this ceiling. The two historical 4,248-byte
+metadata responses are separate; the prefix's 78,821,206 observed body bytes use
+a different counter. Failed/unknown transfer accounting never becomes zero or
+an unused budget. Preserve each original ledger and counter definition.
+
+#### Activation, recovery and next acceptance
+
+Implementation and its five required CI gates precede activation. The workflow
+accepts only a push to the exact new branch, one child of current accepted main
+with the request as the sole added file, `run_attempt=1`, and its own first-run
+ledger. It checks out accepted main, validates fixed predecessor Git objects,
+uses read-only GitHub permissions and installs frozen dependencies without
+lifecycle scripts. Exclusively claim a new empty private output directory before
+opening any provider stream; existing output fails before consuming network I/O. No schedule, dispatch or rerun path is added. Any prior run on
+this branch consumes the request, including preflight failure.
+
+Before publishing that request, preserve a separate private recovery archive:
+original key, original target snapshot, predecessor requests/artifacts/receipts,
+new request bytes/hash, accepted source/CI/dependency receipt and a tested local
+inspector. Verify archive hashes and durable custody first. Do not overwrite the
+completed pilot or earlier acquisition/diagnostic archives. Before recovery,
+verify run/head/request, exact artifact ID and downloaded ZIP/hash/sole member;
+encryption alone cannot establish the sender. The inspector uses the new
+request's accepted source, not whatever main later contains.
+
+Reuse the existing success/failure payload validation through an explicit adapter
+for the new request, without weakening historical request dispatch.
+`validateCollectedFailureEvidence` currently selects pinned-source validation
+only for `REVIEWED_REQUEST_CONTRACT`; extract/reuse that explicit validated-pin
+path so a zero-metadata continuation failure does not enter the historical
+metadata-body path. Bind the new request digest/source/roster/recipient in the
+authenticated envelope; never pass
+a successor through an old request validator by silently changing its contract.
+New identity failures retain v2 evidence; v1 receipts still replay their original
+rule. On any stream failure discard candidate records and retain only bounded
+encrypted accounting/evidence. Interrupted jobs or missing artifacts stay
+consumed with unknown details; never replay to recreate evidence.
+
+Successful acquisition has zero approvals/writes. Recover all records privately,
+recompute raw-record hashes and `inspectRecord` results, and verify source
+manifest/pin bindings; encrypted payload shape alone is insufficient. Then
+reconcile exact original and fresh read-only catalog snapshots before
+selecting review candidates. Changed identities, existing descriptions or row
+versions are explicit reconciliation results, not permission to overwrite them.
+Per-record language, exact origin, intended-use rights and attribution review
+precede a separately bounded guarded apply/readback design. The completed
+ten-Item pilot cannot accept these results. Neither acquisition nor this plan
+adds Items, trains a model or completes catalog/device/release acceptance.
+
+Implementation acceptance includes synthetic successful two-source collection;
+self-location accepted while foreign/null/redirect identity fails; Work failure
+preventing Edition access; Edition failure discarding prior Work candidates;
+EOF/hash/budget errors; exact predecessor/ciphertext/roster/key/source binding;
+first-run/sole-file/accepted-source gates; tampered envelopes and forged recovery
+provenance; bounded v2 failure replay and unchanged v1 recovery; sanitized public
+logs and output overwrite refusal. Validate local-only CLI behavior in an isolated
+child environment so GitHub CI cannot accidentally disable its production guard.
+Ordinary CI never downloads the real dumps. After merge and verified custody,
+activate once, record the result, and pause at recovered failure or collected
+unreviewed records rather than silently extending the budget.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.
