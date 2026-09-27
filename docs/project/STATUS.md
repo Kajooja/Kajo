@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-27**
+Last updated: **2026-09-28**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 offline selected-record conflict policy
+## Current packet — #182 conflict-aware acquisition specification
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -67,14 +67,27 @@ Approvals and database writes remain zero. The
 [result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182)
 records the public source/request/run acceptance and continuation boundary.
 
-**Next: specify and test an offline selected-record conflict/quarantine policy.**
-Preserve foreign-location rejection and make no automatic remapping. Continuing
-a scan while explicitly excluding conflicted records changes failure policy: it
-needs its own source packet and separately specified one-shot acquisition.
-All **five** requests are consumed. Do not rerun the continuation, reset a ledger,
-grant a new provider budget or reuse the completed pilot. This packet ends at
-recovered failure and this handoff. Fresh catalog reconciliation, rights review
-and separately bounded writes remain later gates. Exact acceptance stays in
+The [offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182)
+is implemented on `feat/182-offline-conflict-policy`. Exact PR/head, required CI
+and merge acceptance belong to Issue #182. Its separate `stage-with-conflicts`
+command requires explicit budgets, replays eligible v2 evidence, validates
+revision/time/Edition links and excludes the entire original Work–Edition pair.
+Both full local sources must pass integrity checks before unapproved surviving
+candidates exist. Existing strict/cloud paths and historical evidence stay
+unchanged. The private recovered evidence was replayed locally against the narrow
+policy; no new provider access occurred. The
+[implementation checkpoint](sprints/SPRINT-014.md#offline-conflict-policy-and-hygiene--2026-09-28--182)
+records tests, limitations and repository hygiene.
+
+**Next after source acceptance: specify and test the conflict-aware one-shot
+acquisition successor's request, collector, result and recovery contract.** Bind
+this policy and explicit operational caps to exact accepted source, the original
+roster/key/pins and authenticated predecessor evidence before preparing any
+activation. This offline packet grants no new provider budget. All **five** prior
+requests remain consumed; do not rerun, reset or reuse them or the completed
+pilot. Full-source verification, fresh reconciliation, individual rights review
+and separately bounded writes remain later gates. No additional description is
+approved and no catalog/device/release gate is closed. Exact acceptance stays in
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
@@ -332,7 +345,8 @@ full-source verification, candidates, approvals and writes remain zero.
 PR #279 accepted the offline exact-self-location correction and versioned
 failure replay. PR #281's separately accepted full continuation has now run once
 and ended in failure; private recovery and authentication verification are
-complete. Follow the single offline conflict-policy task at the top of this file
+complete. The offline conflict policy is implemented; follow the single acquisition-contract
+specification task at the top of this file
 and the
 [result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182).
 All five requests remain consumed. Complete publisher EOF/checksum verification,

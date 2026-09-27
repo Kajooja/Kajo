@@ -14,6 +14,46 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Offline conflict policy and hygiene — 2026-09-28 / #182
+
+`feat/182-offline-conflict-policy` continues accepted main
+`e0c26144de6270589a0e2bf8e1a4958c698f17e8`. Exact PR/head, required CI and merge
+acceptance belong to Issue #182. This checkpoint supersedes the preceding
+result's next-task instruction while preserving every historical entry below.
+
+The explicit local `stage-with-conflicts` command requires a versioned policy
+and positive pair/diagnostic budgets. It replays original v2 failure evidence,
+checks same-kind foreign canonical location outside the roster, and independently
+validates matching revision/time and Edition Work links. The immutable ledger
+excludes the whole original pair; it never remaps identity or approves text.
+Both sources still require full EOF/gzip/checksum verification. Duplicates,
+malformed rows, unsupported conflicts and exhausted budgets abort. Quarantined
+rows and suppressed counterparts remain charged to the cumulative staging cap.
+Private result artifacts bind source/targets/policy/roster and distinguish
+physical matches, exclusions, missing survivors and retained/consumed bytes.
+The strict parser, existing cloud paths and historical recovery rules remain.
+The source-bound inspector's closure now includes the imported policy module.
+
+Synthetic policy and gzip intake tests cover both source directions, subsequent
+failures, exact accounting, CLI isolation and immutable evidence. The retained
+private evidence also replays against the narrow policy locally. No raw evidence,
+private identifiers or diagnostic hashes are added to fixtures or public output.
+Source validation results and any environment limitation are recorded in #182.
+No new acquisition, description approval, catalog write or model admission occurs.
+
+The read-only hygiene audit found no broken local Markdown links/anchors,
+detected secrets, tracked raw/generated/temp outputs, empty files or exact
+file duplicates. Workspace declarations, lock metadata and CI script references
+agree. All five consumed request branches retain their frozen identities.
+No unrelated cleanup was warranted; no release requirement was marked complete.
+
+Next after source acceptance: specify and test the conflict-aware one-shot
+acquisition request/collector/result/recovery contract and explicit operational
+caps, preserving original roster/key/pins and authenticated predecessor custody.
+All five prior requests remain consumed. This local policy grants no new provider
+permission/budget; fresh reconciliation and individual rights review still
+precede a separately bounded writer bridge. STATUS owns that single next task.
+
 ## Full-acquisition continuation result and handoff — 2026-09-27 / #182
 
 [PR #281](https://github.com/Kajooja/Kajo/pull/281) is accepted as main

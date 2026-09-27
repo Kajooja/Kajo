@@ -908,6 +908,61 @@ Ordinary CI never downloads the real dumps. After merge and verified custody,
 activate once, record the result, and pause at recovered failure or collected
 unreviewed records rather than silently extending the budget.
 
+### Offline selected-record conflict policy — #182
+
+`open-library-selected-record-conflict-policy-v1` is an explicit local-only
+exclusion policy. The separate `stage-with-conflicts` command requires a policy
+file containing exactly `contract`, `maxConflictedPairs` and
+`maxDiagnosticBytes`. Both budgets are positive safe integers, bounded by the
+selected roster (at most 385 pairs) and 64 MiB respectively; there are no default
+budgets. This grants no provider access or new acquisition attempt. Existing
+`stage`, strict scanning and all cloud acquisition paths keep fail-fast identity
+semantics. No foreign location is followed or substituted.
+
+Only validated current v2 `record-location-mismatch` evidence can exclude a
+pair. Replay the original bytes and original identity failure first. The record
+must have the exact selected object/key/type and a different canonical path of
+the same source kind, outside the entire selected roster. Require nonnull valid
+revision and modification metadata matching the original TSV fields exactly;
+an Edition must still link to its single selected Work. V1 evidence, true
+redirects, null/arbitrary/cross-kind locations, another selected identity and
+invalid/mismatched metadata or Work links remain fatal. A minimal metadata
+projection checks fields after the failed identity guard; it never accepts or
+rewrites the original record. No text or rights approval follows from exclusion.
+
+The branded, roster-bound ledger retains immutable copies of original evidence
+and assessments. Both members of each conflicted Work–Edition pair are excluded,
+including an already collected counterpart. Selected outer-key duplicates remain
+fatal, even after quarantine. Diagnostic raw rows consume both the explicit
+policy budget and the same cumulative 64 MiB staging budget as valid records;
+suppressing a counterpart never refunds consumed bytes. Pair caps, row/decoded
+bounds, malformed data and all existing parser/integrity checks remain active.
+
+Both complete local sources must pass EOF, gzip and pinned checksum verification
+before candidate artifacts are written. The separate
+`open-library-description-dump-conflict-intake-v1` result binds target snapshot,
+source manifest, policy and canonical roster hashes. Private `records.json`,
+`review.json`, `quarantine.json` and `report.json` distinguish physical valid
+matches, quarantined rows/pairs, suppressed counterparts, surviving records,
+missing records and consumed/retained bytes. A failed intake retains only a
+private diagnostic checkpoint; it cannot supply successful candidates. Output
+paths remain exclusive and private; CLI output contains aggregate counts or
+fixed error codes. All surviving reviews start unreviewed, with zero approvals,
+provider requests, database writes and model admissions.
+
+Synthetic tests cover eligibility/mutations, budgets, immutable ledgers, whole
+pair exclusion, duplicates and failures after a conflict, including EOF/gzip/hash
+checks and CLI isolation. The source-bound full-continuation inspector includes
+the new imported policy module in its dependency closure; archived recovery
+still executes its original accepted source and unchanged v1/v2 rules.
+
+This local policy is not an acquisition successor. A later source packet must
+separately specify and test request/source/collector/result/recovery bindings,
+explicit operational budgets and one-shot activation before any new provider
+access. All five prior requests stay consumed. Complete-source verification,
+fresh catalog reconciliation and individual language/origin/rights review still
+precede a separately bounded writer bridge.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

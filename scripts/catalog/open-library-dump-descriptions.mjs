@@ -1,7 +1,7 @@
 // Offline intake only. No provider/database client, rights approval or pilot replay.
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { lstat, mkdir, rename, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { Transform, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
@@ -9,10 +9,12 @@ import { fileURLToPath } from 'node:url';
 import { createGunzip } from 'node:zlib';
 import { digest, inspectRecord, requireValue, sha256, UUID } from './open-library-descriptions.mjs';
 import { createDumpFailureEvidence, FAILURE_EVIDENCE_LIMITS } from './dump-failure-evidence.mjs';
+import { createDumpConflictLedger, validateDumpConflictLedger } from './dump-conflict-policy.mjs';
 
 export const TARGET_CONTRACT = 'open-library-description-dump-targets-v1';
 export const SOURCE_CONTRACT = 'open-library-description-dump-source-v1';
 export const INTAKE_CONTRACT = 'open-library-description-dump-intake-v1';
+export const CONFLICT_INTAKE_CONTRACT = 'open-library-description-dump-conflict-intake-v1';
 export const LIMITS = Object.freeze({ targets: 385, lineBytes: FAILURE_EVIDENCE_LIMITS.lineBytes, stagedRecordBytes: 64 * 1024 * 1024,
   fileBytes: 64 * 1024 ** 3, decodedBytes: 512 * 1024 ** 3, rows: 200000000 });
 export const DEFAULT_STAGING_ROOT = fileURLToPath(new URL('../../dist/catalog-enrichment/', import.meta.url));
@@ -126,7 +128,7 @@ async function jsonFile(path, value) {
 // One row/envelope/identity parser is used by complete intake and diagnostic
 // prefixes. Prefix mode retains only seen public IDs and one rejected row.
 function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
-  retainedBytes, stats, prefix }) {
+  retainedBytes, stats, prefix, conflictLedger }) {
   const type = kind === 'works' ? 'work' : 'edition';
   const targets = new Map(selected.map(row => [type === 'work' ? `/works/${row.workId}` : `/books/${row.editionId}`, row]));
   const records = new Map(), seen = new Set();
@@ -170,9 +172,20 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
     try { inspection = inspectRecord(raw, target, type, fetchedAt); }
     catch (error) {
       if (error.message === 'provider-identity-mismatch' && error.identityPredicate) {
-        selectedRowFailures.set(error, createDumpFailureEvidence({ rowBytes, terminated, sourceKind: kind, source,
+        const evidence = createDumpFailureEvidence({ rowBytes, terminated, sourceKind: kind, source,
           roster: selected, expected: target, row: stats.rows, fetchedAt, predicate: error.identityPredicate,
-          limits: { lineBytes, maxRows: source.maxRows } }));
+          limits: { lineBytes, maxRows: source.maxRows } });
+        selectedRowFailures.set(error, evidence);
+        if (conflictLedger) {
+          // Diagnostics share the cumulative raw-record budget. Neither a
+          // quarantined row nor a later suppressed partner refunds that charge.
+          requireValue(budget.bytes + evidence.rawBytes <= retainedBytes, 'dump-staging-limit');
+          conflictLedger.record(evidence, { source, limits: { lineBytes, maxRows: source.maxRows } });
+          budget.bytes += evidence.rawBytes;
+          seen.add(keyOf(target));
+          stats.quarantinedRecords += 1;
+          return;
+        }
       }
       selectedError = error;
       throw error;
@@ -215,13 +228,35 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
 export async function scanDumpStream(input, source, kind, selected, fetchedAt, budget,
   { signal, keyOf = row => row.itemId, lineBytes = LIMITS.lineBytes,
     retainedBytes = LIMITS.stagedRecordBytes, observeProgress } = {}) {
-  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
+  // Historical callers cannot opt in by adding a policy/ledger option. This
+  // entry point always preserves the original abort-on-conflict behavior.
+  return scanDumpStreamInternal(input, source, kind, selected, fetchedAt, budget,
+    { signal, keyOf, lineBytes, retainedBytes, observeProgress });
+}
+
+export async function scanDumpConflictStream(input, source, kind, selected, fetchedAt, budget,
+  { conflictLedger, signal, keyOf = row => row.itemId, lineBytes = LIMITS.lineBytes,
+    retainedBytes = LIMITS.stagedRecordBytes, observeProgress } = {}) {
+  validateDumpConflictLedger(conflictLedger, selected);
+  requireValue(['works', 'editions'].includes(kind) && boundedInteger(lineBytes, LIMITS.lineBytes)
+    && boundedInteger(retainedBytes, LIMITS.stagedRecordBytes)
+    && Number.isSafeInteger(budget?.bytes) && budget.bytes >= 0 && budget.bytes <= retainedBytes,
+  'invalid-dump-conflict-scan');
+  return scanDumpStreamInternal(input, structuredClone(source), kind, structuredClone(selected), fetchedAt, budget,
+    { conflictLedger, signal, keyOf, lineBytes, retainedBytes, observeProgress });
+}
+
+async function scanDumpStreamInternal(input, source, kind, selected, fetchedAt, budget,
+  { signal, keyOf, lineBytes, retainedBytes, observeProgress, conflictLedger }) {
+  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0,
+    ...(conflictLedger ? { quarantinedRecords: 0, complete: false } : {}) };
   observeProgress?.(stats);
   requireValue(source.sha256 !== undefined || source.md5 !== undefined && source.sha1 !== undefined,
     'missing-dump-checksum');
   const hashes = Object.fromEntries(['sha256', ...['md5', 'sha1'].filter(name => source[name] !== undefined)]
     .map(name => [name, createHash(name)]));
-  const parser = createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes, retainedBytes, stats });
+  const parser = createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
+    retainedBytes, stats, conflictLedger });
   const meter = new Transform({ transform(chunk, _encoding, callback) {
     try {
       stats.bytes += chunk.length;
@@ -360,6 +395,147 @@ export async function stageDumpDescriptions({ snapshot, manifest, worksPath, edi
   } catch (error) {
     state.status = 'failed';
     state.failure = safeDumpError(error);
+    await checkpoint();
+    throw new Error(state.failure);
+  }
+}
+
+// Explicit local-only successor. No existing request, acquisition collector or
+// default stage call supplies a conflict ledger or changes its result contract.
+export async function stageDumpDescriptionsWithConflicts({ snapshot, manifest, policy, worksPath, editionsPath,
+  outputDirectory, stagingRoot = DEFAULT_STAGING_ROOT }) {
+  // Bind and scan the same immutable local values even if a caller changes its
+  // objects while filesystem operations yield. No historical API is changed.
+  snapshot = structuredClone(snapshot);
+  manifest = structuredClone(manifest);
+  policy = structuredClone(policy);
+  const originalPlan = planDumpDescriptions(snapshot, manifest);
+  requireValue(manifest !== undefined && typeof worksPath === 'string' && typeof editionsPath === 'string'
+    && resolve(worksPath) !== resolve(editionsPath), 'invalid-dump-input-paths');
+  const selected = validateDumpTargets(snapshot);
+  requireValue(selected.length > 0, 'missing-dump-targets');
+  const ledger = createDumpConflictLedger({ policy, selected });
+  const initialLedger = ledger.snapshot();
+  const plan = { ...originalPlan, contract: CONFLICT_INTAKE_CONTRACT,
+    policySha256: initialLedger.policySha256, rosterSha256: initialLedger.rosterSha256 };
+  const bindings = { contract: CONFLICT_INTAKE_CONTRACT, targetSnapshotSha256: plan.targetSnapshotSha256,
+    sourceManifestSha256: plan.sourceManifestSha256, policySha256: plan.policySha256, rosterSha256: plan.rosterSha256 };
+  const directory = await claimOutput(stagingRoot, outputDirectory);
+  const budget = { bytes: 0 };
+  const state = { ...plan, status: 'collecting-with-conflict-policy', sources: {}, activeSource: null,
+    startedAt: new Date().toISOString(), cumulativeStagedBytes: 0, diagnosticBytes: 0,
+    approved: 0, databaseWrites: 0, providerRequests: 0, modelAdmissions: 0 };
+  const checkpoint = async () => {
+    state.cumulativeStagedBytes = budget.bytes;
+    state.diagnosticBytes = ledger.snapshot().diagnosticBytes;
+    await jsonFile(join(directory, 'state.next.json'), state);
+    await rename(join(directory, 'state.next.json'), join(directory, 'state.json'));
+  };
+  const scan = async (path, kind) => {
+    state.activeSource = kind;
+    const source = manifest.sources[kind], sourceInfo = await lstat(path);
+    requireValue(sourceInfo.isFile() && !sourceInfo.isSymbolicLink(), 'unsafe-dump-input');
+    requireValue(sourceInfo.size === source.bytes, 'dump-file-size-mismatch');
+    const result = await scanDumpConflictStream(createReadStream(path), source, kind, selected,
+      manifest.retrievedAt, budget, { conflictLedger: ledger, observeProgress: stats => { state.sources[kind] = stats; } });
+    state.sources[kind] = result.stats;
+    state.activeSource = null;
+    await checkpoint();
+    return result;
+  };
+  try {
+    await checkpoint();
+    await jsonFile(join(directory, 'targets.json'), snapshot);
+    await jsonFile(join(directory, 'sources.json'), manifest);
+    await jsonFile(join(directory, 'policy.json'), initialLedger.policy);
+    const works = await scan(worksPath, 'works');
+    const editions = await scan(editionsPath, 'editions');
+    state.activeSource = null;
+    // Full EOF/gzip/hash checks for both files precede all candidate artifacts.
+    const quarantine = ledger.snapshot(), excluded = new Set(quarantine.quarantinedWorkIds);
+    const coverage = { selectedTargets: selected.length, survivingTargets: selected.length - excluded.size,
+      validMatchedRecords: works.stats.matchedRecords + editions.stats.matchedRecords,
+      quarantinedPairs: excluded.size, quarantinedRows: works.stats.quarantinedRecords + editions.stats.quarantinedRecords,
+      pairedRecordsSuppressed: 0, quarantinedMissingRecords: 0, recordsFound: 0, recordsMissing: 0,
+      eligibleTexts: 0, targetWithEligibleText: 0, descriptionStatuses: {} };
+    const records = [], review = [];
+    let validRecordBytes = 0, survivingRecordBytes = 0;
+    for (const target of selected) {
+      const row = { itemId: target.itemId, workId: target.workId, editionId: target.editionId,
+        work: works.records.get(target.itemId) ?? null, edition: editions.records.get(target.itemId) ?? null };
+      const found = ['work', 'edition'].filter(kind => row[kind] !== null);
+      const bytes = found.reduce((total, kind) => total + Buffer.byteLength(row[kind].raw), 0);
+      validRecordBytes += bytes;
+      if (excluded.has(target.workId)) {
+        coverage.pairedRecordsSuppressed += found.length;
+        continue;
+      }
+      records.push(row);
+      survivingRecordBytes += bytes;
+      const options = {};
+      let eligible = false;
+      for (const kind of ['edition', 'work']) {
+        const record = row[kind];
+        if (record) coverage.recordsFound += 1; else coverage.recordsMissing += 1;
+        const status = record?.inspection.description.status ?? 'record-missing';
+        coverage.descriptionStatuses[status] = (coverage.descriptionStatuses[status] ?? 0) + 1;
+        if (status === 'eligible') { coverage.eligibleTexts += 1; eligible = true; }
+        options[kind] = record ? { ...record.inspection, dump: record.dump,
+          inspectionSha256: record.inspectionSha256 } : null;
+      }
+      if (eligible) coverage.targetWithEligibleText += 1;
+      review.push({ itemId: row.itemId, options, decision: { status: 'unreviewed', choice: null,
+        textLanguage: null, rights: 'unreviewed', basis: null, attribution: null, permission: null } });
+    }
+    coverage.quarantinedMissingRecords = 2 * coverage.quarantinedPairs - coverage.quarantinedRows - coverage.pairedRecordsSuppressed;
+    requireValue(coverage.quarantinedRows === quarantine.conflicts.length && coverage.quarantinedMissingRecords >= 0
+      && coverage.validMatchedRecords === coverage.recordsFound + coverage.pairedRecordsSuppressed
+      && selected.length * 2 === coverage.recordsFound + coverage.recordsMissing + 2 * coverage.quarantinedPairs
+      && budget.bytes === validRecordBytes + quarantine.diagnosticBytes
+      && ['works', 'editions'].every(kind => state.sources[kind].complete === true
+        && state.sources[kind].rows === state.sources[kind].matchedRecords + state.sources[kind].quarantinedRecords
+          + state.sources[kind].unrelatedRows), 'invalid-dump-conflict-accounting');
+    const accounting = { cumulativeStagedBytes: budget.bytes, diagnosticBytes: quarantine.diagnosticBytes,
+      validRecordBytes, survivingRecordBytes, suppressedRecordBytes: validRecordBytes - survivingRecordBytes };
+    state.recordsFileSha256 = await jsonFile(join(directory, 'records.json'), { ...bindings, records });
+    state.quarantineFileSha256 = await jsonFile(join(directory, 'quarantine.json'), { ...bindings,
+      status: 'excluded-pairs-after-complete-source-verification', ledger: quarantine });
+    state.reviewFileSha256 = await jsonFile(join(directory, 'review.json'), { ...bindings,
+      note: 'Surviving technical options only. Quarantined pairs cannot be reviewed here. This is not an apply packet.', candidates: review });
+    Object.assign(state, { status: 'staged-with-conflict-policy', coverage, accounting, completedAt: new Date().toISOString() });
+    state.reportFileSha256 = await jsonFile(join(directory, 'report.json'), { ...bindings, status: state.status,
+      sources: state.sources, coverage, accounting, recordsFileSha256: state.recordsFileSha256,
+      quarantineFileSha256: state.quarantineFileSha256, reviewFileSha256: state.reviewFileSha256,
+      rights: 'unreviewed', approved: 0, databaseWrites: 0, providerRequests: 0, modelAdmissions: 0 });
+    await checkpoint();
+    // Public CLI output is aggregate-only; exact evidence/bindings remain in the
+    // private directory, including when every selected pair is excluded.
+    return { contract: CONFLICT_INTAKE_CONTRACT, status: state.status,
+      selectedTargets: selected.length, survivingTargets: coverage.survivingTargets,
+      quarantinedPairs: coverage.quarantinedPairs, quarantinedRows: coverage.quarantinedRows,
+      pairedRecordsSuppressed: coverage.pairedRecordsSuppressed, recordsFound: coverage.recordsFound,
+      recordsMissing: coverage.recordsMissing, eligibleTexts: coverage.eligibleTexts,
+      targetWithEligibleText: coverage.targetWithEligibleText, fullSourcesVerified: 2,
+      approved: 0, databaseWrites: 0, providerRequests: 0, modelAdmissions: 0 };
+  } catch (error) {
+    state.status = 'failed-with-conflict-policy';
+    state.failure = safeDumpError(error);
+    await rm(join(directory, 'state.next.json'), { force: true });
+    // A later write/checkpoint failure cannot leave candidate-bearing artifacts
+    // looking like a completed intake. Keep only bounded diagnostic evidence.
+    for (const name of ['records', 'review', 'report']) {
+      await rm(join(directory, `${name}.json`), { force: true });
+      delete state[`${name}FileSha256`];
+    }
+    const quarantine = ledger.snapshot();
+    if (quarantine.conflicts.length > 0) {
+      state.quarantineFileSha256 = await jsonFile(join(directory, 'quarantine.next.json'), { ...bindings,
+        status: 'diagnostic-only-incomplete-intake', ledger: quarantine });
+      await rename(join(directory, 'quarantine.next.json'), join(directory, 'quarantine.json'));
+    } else {
+      await rm(join(directory, 'quarantine.json'), { force: true });
+      delete state.quarantineFileSha256;
+    }
     await checkpoint();
     throw new Error(state.failure);
   }

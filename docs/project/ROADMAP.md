@@ -69,11 +69,14 @@ requests remain consumed. The exact-self-location correction and versioned
 historical failure replay are accepted through PR #279. PR #281's separate bounded full-acquisition
 continuation passed all five required CI gates and activated once. Its public
 run ended in failure; private recovery and authentication verification are
-complete. All five requests are now consumed. The next packet specifies and tests
-an offline selected-record conflict/quarantine policy, preserving foreign-location
-rejection and forbidding automatic remapping. STATUS records public acceptance
-and the result checkpoint. No additional text is approved and no database write
-was performed. The prefix diagnosis still cannot prove the earlier discarded row
+complete. All five requests are now consumed. The separately selected offline
+conflict policy is implemented with an explicit bounded local command, whole-pair
+exclusion, unchanged strict/cloud guards and complete-source verification.
+[STATUS](STATUS.md) and #182 record exact source/CI acceptance. Next specify and
+test the conflict-aware one-shot acquisition request/collector/result/recovery
+contract before any new operational budget or provider access. Foreign locations
+are never remapped. No additional text is approved and no database write was
+performed. The prefix diagnosis still cannot prove the earlier discarded row
 was identical.
 The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
@@ -201,12 +204,14 @@ PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
 failure replay. PR #281 accepted the
 [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182).
 Its one-shot public run ended in failure; private recovery and authentication
-verification are complete. The fifth request is consumed. Next, specify and test
-an offline selected-record conflict/quarantine policy. Preserve foreign-location
-rejection and make no automatic remapping. A scan that excludes conflicted
-records changes failure policy and requires its own source packet plus separately
-specified one-shot acquisition. No rerun or new provider budget is authorized by
-this handoff. Complete-source verification, fresh reconciliation and
+verification are complete. The fifth request is consumed. The
+[offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182)
+now implements the separate bounded local exclusion path, preserving foreign
+identity rejection and making no automatic remapping. Next specify and test the
+successor's request, collector, result and recovery bindings with explicit caps
+and accepted-source custody. That source/CI gate precedes a separately authorized
+one-shot acquisition; the local policy does not grant a provider budget or rerun.
+Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
