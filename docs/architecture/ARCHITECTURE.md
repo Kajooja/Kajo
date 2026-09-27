@@ -760,11 +760,12 @@ for exact self-location. Neither a diagnosis nor an inconclusive result grants t
 rights, a full-source verification or a retry. STATUS owns the consumed request
 and any later separately specified acquisition continuation.
 
-### Full acquisition after the self-location correction — planned, #182
+### Full acquisition after the self-location correction — #182
 
-This is the selected successor specification, **not an implemented or activated
-request**. Reuse `acquireReviewedOpenLibraryDumps` and the existing streaming,
-source-pin and encrypted-result validation. The four earlier one-shot ledgers
+The continuation implementation reuses `acquireReviewedOpenLibraryDumps` and
+the existing streaming, source-pin and encrypted-result validation. Source
+acceptance and actual activation are separate; STATUS records their current state.
+The four earlier one-shot ledgers
 remain consumed. Do not change their contracts, branches, request files or caps
 or make the old reviewed workflow rerunnable.
 
@@ -777,11 +778,11 @@ or make the old reviewed workflow rerunnable.
 | Workflow | `.github/workflows/catalog-book-full-continuation.yml` |
 | Sealed filename | `open-library-continuation-20260831.sealed.json` |
 
-These names reserve one bounded operation, not a generic retry service. Add
-small `prepare-full-dump-continuation.mjs`, `seal-full-dump-continuation.mjs` and
-`run-full-dump-continuation.mjs` entry points under `scripts/catalog/` with focused
-protocol tests. These paths are planned; create them only in the implementation
-packet. Reuse the existing full collector rather than the partial prefix reader.
+These names reserve one bounded operation, not a generic retry service. The
+`prepare-full-dump-continuation.mjs`, `seal-full-dump-continuation.mjs` and
+`run-full-dump-continuation.mjs` entry points live under `scripts/catalog/` with
+focused protocol tests. `inspect-full-dump-continuation.mjs` verifies accepted source and
+private recovery. The runtime uses the existing full collector.
 
 #### Immutable inputs and proof of the correction
 
@@ -874,10 +875,9 @@ request's accepted source, not whatever main later contains.
 
 Reuse the existing success/failure payload validation through an explicit adapter
 for the new request, without weakening historical request dispatch.
-`validateCollectedFailureEvidence` currently selects pinned-source validation
-only for `REVIEWED_REQUEST_CONTRACT`; extract/reuse that explicit validated-pin
-path so a zero-metadata continuation failure does not enter the historical
-metadata-body path. Bind the new request digest/source/roster/recipient in the
+The shared `validatePinnedAcquisitionPayload` adapter passes explicitly validated
+source pins to failure-evidence validation, so a zero-metadata continuation
+failure does not enter the historical metadata-body path. Bind the new request digest/source/roster/recipient in the
 authenticated envelope; never pass
 a successor through an old request validator by silently changing its contract.
 New identity failures retain v2 evidence; v1 receipts still replay their original

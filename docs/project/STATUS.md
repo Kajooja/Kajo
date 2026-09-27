@@ -52,22 +52,32 @@ rejected. New failure evidence is v2; historical v1 recovery retains its origina
 rule. The captured row now passes identity validation, but its description still
 fails `markup-or-url`; no additional text is approved.
 
-**Next: implement the [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182)**
-on `feat/182-full-dump-continuation` from accepted main. The specification is
-complete; this implementation branch and its new entry points/workflow do not yet
-exist. Add only the new fixed request protocol, predecessor/correction checks,
-private preparation/recovery and focused tests, reusing the full collector.
-Keep the original 383 pairs, recipient and dated publisher pins, with the same
-16,644,821,648-byte full-source budget and 110-minute collector deadline.
-Do not redesign the plan or rerun a consumed workflow.
+The [full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182)
+is implemented on `feat/182-full-dump-continuation` from accepted main
+`d05419f140ac42c99318b4788d1cf9606edb0e9a`. The new request freezes the original
+383 pairs, recipient, source pins, 16,644,821,648-byte accepted-source budget and
+110-minute collector deadline. Preparation authenticates the captured prefix
+and corrected identity; the runner validates the four fixed predecessor Git
+objects, correction ancestry, accepted source, sole-file child and first-run
+ledger. Private recovery replays source/dependency, Git/CI/run/artifact, raw-record
+and manifest bindings. Historical request dispatch and v1 receipts stay unchanged.
 
-Follow the [implementation and recovery handoff](sprints/SPRINT-014.md#full-acquisition-continuation-plan-and-handoff--2026-09-27--182).
-After required CI/merge and verified durable key/request custody, the new
-operation can be activated once and privately recovered. No executable request
-has been prepared or activated by this planning packet. All four predecessor
-requests remain consumed. Acquisition, fresh catalog reconciliation, rights
-review and separately bounded writes remain distinct steps. Exact source/CI
-acceptance stays in [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+**Publication authorization:** the owner explicitly approved publishing these
+changes to public `Kajooja/Kajo` and merging after successful CI on September 27.
+Independent review and 34 new focused tests pass; the actual local source-binding
+smoke verified 17 source files and eight dependency files. The prior automatic
+publication block is resolved by that authorization. Local validation has the
+frozen Deno registry limitation recorded in Sprint 014; remote CI remains required.
+
+**Next: publish `feat/182-full-dump-continuation`, pass all five required CI gates
+and merge. Then preserve the separate private request/recovery archive before
+activating `catalog-acquisition/ol-20260831-continuation` once.** No executable
+request has been prepared or activated by the source packet. Follow the
+[implementation checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-implementation--2026-09-27--182).
+Exact source/CI acceptance stays in [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+All four predecessor requests remain consumed. Stop this packet after a privately
+recovered failed or collected result and updated handoff. Fresh catalog
+reconciliation, rights review and separately bounded writes remain later steps.
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.

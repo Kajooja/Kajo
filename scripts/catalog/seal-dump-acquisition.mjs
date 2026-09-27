@@ -147,7 +147,7 @@ const payloadKind = result => result.status === 'failed' ? 'failure'
 // New evidence is checked on both sides of encryption. Old receipts without it
 // retain their historical meaning; no missing row can be reconstructed from
 // partial stream counters alone.
-function validateCollectedFailureEvidence(result, request) {
+function validateCollectedFailureEvidence(result, request, validatedPins) {
   const accounting = result.accounting;
   if (!object(accounting) || !Object.hasOwn(accounting, 'failureEvidence')) {
     requireValue(accounting?.diagnosticRetainedBytes === undefined || accounting.diagnosticRetainedBytes === 0,
@@ -159,7 +159,8 @@ function validateCollectedFailureEvidence(result, request) {
     && result.code === 'provider-identity-mismatch' && object(evidence)
     && ['works', 'editions'].includes(evidence.sourceKind), 'invalid-dump-failure-evidence');
   let source;
-  if (request.contract === REVIEWED_REQUEST_CONTRACT) source = request.sourcePins[evidence.sourceKind];
+  if (validatedPins !== undefined) source = validatedPins[evidence.sourceKind];
+  else if (request.contract === REVIEWED_REQUEST_CONTRACT) source = request.sourcePins[evidence.sourceKind];
   else {
     const metadata = accounting.metadata;
     requireValue(object(metadata) && metadata.complete === true && Number.isSafeInteger(metadata.bytes)
@@ -198,13 +199,13 @@ function validateCollectedFailureEvidence(result, request) {
   'invalid-dump-failure-evidence');
 }
 
-function validateCollected(collected, request) {
+function validateCollected(collected, request, validatedPins) {
   if (collected?.contract === FAILURE_CONTRACT) {
     requireValue(exactKeys(collected, ['contract', 'status', 'release', 'rosterSha256', 'limits', 'code', 'accounting'])
       && collected.status === 'failed' && collected.release === request.release
       && collected.rosterSha256 === digest(request.roster) && digest(collected.limits) === digest(request.limits)
       && /^[a-z-]{1,100}$/.test(collected.code) && object(collected.accounting), 'invalid-acquisition-failure');
-    validateCollectedFailureEvidence(collected, request);
+    validateCollectedFailureEvidence(collected, request, validatedPins);
     return;
   }
   requireValue(object(collected) && collected.contract === ACQUISITION_CONTRACT
@@ -218,7 +219,7 @@ function validateCollected(collected, request) {
       && row.editionId === request.roster[index].editionId)
     && ['works', 'editions'].every(kind => collected.sources?.[kind]?.complete === true
       && collected.sources[kind].publisherChecksumsVerified === true), 'invalid-acquisition-collected');
-  validateCollectedFailureEvidence(collected, request);
+  validateCollectedFailureEvidence(collected, request, validatedPins);
 }
 
 export function sealAcquisition(collected, request) {
@@ -231,8 +232,10 @@ export function sealMetadataDiagnostic(result, request) {
   return sealPayload(result, request, validateMetadataDiagnostic, MAX_DIAGNOSTIC_PLAINTEXT_BYTES);
 }
 
-function validateReviewedCollected(result, request) {
-  validateCollected(result, request);
+// Explicit payload adapter: callers validate their own request contract first.
+// A successor never masquerades as a historical reviewed request.
+export function validatePinnedAcquisitionPayload(result, request) {
+  validateCollected(result, request, request.sourcePins);
   const accounting = result.accounting;
   requireValue(object(accounting) && accounting.requests?.metadata === 0
     && accounting.metadata?.bytes === 0 && accounting.metadata.complete === false && accounting.metadata.skipped === true
@@ -254,7 +257,7 @@ function validateReviewedCollected(result, request) {
 
 export function sealReviewedAcquisition(result, request) {
   validateReviewedAcquisitionRequest(request);
-  return sealPayload(result, request, validateReviewedCollected, MAX_PLAINTEXT_BYTES);
+  return sealPayload(result, request, validatePinnedAcquisitionPayload, MAX_PLAINTEXT_BYTES);
 }
 
 export function sealPayload(collected, request, validate, maximum, kindOf = payloadKind) {
@@ -298,7 +301,7 @@ export function unsealMetadataDiagnostic(envelope, request, privatePem) {
 
 export function unsealReviewedAcquisition(envelope, request, privatePem) {
   validateReviewedAcquisitionRequest(request);
-  return unsealPayload(envelope, request, privatePem, validateReviewedCollected, MAX_PLAINTEXT_BYTES, ['failure', 'collected']);
+  return unsealPayload(envelope, request, privatePem, validatePinnedAcquisitionPayload, MAX_PLAINTEXT_BYTES, ['failure', 'collected']);
 }
 
 export function unsealPayload(envelope, request, privatePem, validate, maximum, kinds, kindOf = payloadKind) {

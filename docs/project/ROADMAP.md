@@ -67,9 +67,10 @@ once and failed at a selected Work identity guard. The separately accepted
 valid; the old guard rejects every present location field. All four requests are
 consumed. The exact-self-location correction and versioned historical failure
 replay are accepted through PR #279. The separate bounded full-acquisition
-continuation is now specified: implement its new one-shot protocol with retained
-pins/roster and verified private recovery, pass source CI/merge, then preserve
-custody before activation. No new executable request is prepared or activated.
+continuation now has a new one-shot protocol with retained pins/roster and
+source-bound private recovery. Pass source CI/merge, then preserve custody before
+activation. STATUS records exact acceptance; no new executable request is
+prepared or activated by this source packet.
 The diagnosis supplies no full-source verification or candidates
 and cannot prove the discarded historical row was identical. No complete dump
 scan or additional approved text exists.
@@ -196,8 +197,8 @@ made no database requests or writes. Its bounded partial stream is not a complet
 source scan, and matching row position does not establish historical byte identity.
 
 PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
-failure replay. Implement the selected
-[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182),
+failure replay. Accept the implemented
+[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182),
 then pass source CI/merge and preserve private custody before one activation.
 No executable request is prepared or activated. Consumed requests and their
 budgets remain immutable. Complete-source verification, private recovery, fresh

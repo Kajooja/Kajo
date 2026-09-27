@@ -14,10 +14,79 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Full-acquisition continuation implementation — 2026-09-27 / #182
+
+`feat/182-full-dump-continuation` implements the accepted PR #280 specification
+from main `d05419f140ac42c99318b4788d1cf9606edb0e9a`. Exact source PR/head,
+required CI and merge acceptance belong to Issue #182. No executable request,
+provider access, catalog mutation or model admission is part of the source PR.
+
+The separately named request retains the exact canonical reviewed body: original
+383 pairs, recipient, both publisher pins, source evidence and limits. Local
+preparation authenticates the frozen prefix ciphertext and v1 diagnosis, replays
+the captured row through the corrected live identity guard, and checks its outer
+revision/time. The row's rejected description remains independent from identity.
+The source receipt binds the accepted Git tree, five successful CI jobs, workflow,
+lockfiles, complete first-party import closure and loaded hashing dependency.
+
+The new runner checks current accepted main, clean source, correction ancestry,
+all four fixed predecessor Git objects, exact sole-request child, push/run/head
+identity and its own first-run ledger. It rejects existing output before any
+network use and exclusively claims a private output directory before provider
+streams. Work failure prevents Edition access; Edition failure remains an
+overall failure with all candidates discarded. Source bytes retain the accepted
+counter meaning, not a claim to measure every redirected network byte.
+
+A small shared pinned-result adapter fixes continuation failure validation
+without broadening historical request dispatch. New continuation identity
+failures require v2 evidence; archived v1 receipts preserve their original rule.
+Only authenticated ciphertext leaves Actions, with sanitized public errors.
+The offline inspector checks exact Git/source/dependency/CI/request/run/artifact
+bindings, ZIP CRC/sole member/hash, envelope authentication, raw record and
+inspection hashes, source manifests, accounting and coverage. It never turns
+collected descriptions into approvals. Operator-captured GitHub evidence is
+checked against Git and downloaded bytes; public-key encryption alone is not
+sender authentication.
+
+Focused tests cover strict request mutations, actual corrected-row semantics,
+zero-metadata v2 failure sealing, environment/tree/ledger/output gates, failed
+Work/Edition behavior and private recovery provenance. Existing collector tests
+retain synthetic complete two-source EOF/checksum coverage and sparse/malformed
+outcomes. A private memory-only preparation smoke authenticated the actual saved
+prefix with the original key; no executable request file was emitted. All **34 new focused tests** pass after independent review. The existing
+54-test envelope/reviewed/failure/prefix subset also passes. Local root validation
+passed lint/typechecks, 248 mobile and 3 contract tests plus the catalog suite;
+its frozen Deno dependency check timed out at restricted registry access after
+240 seconds. Separate remaining database, engine, research and companion tests,
+all four exports and companion isolation guards passed. All five required remote
+CI gates remain mandatory. Exact source/CI acceptance belongs to Issue #182. At this checkpoint the code
+is local commit `dc9588a06ba1000d02babc483fb7aca1cf1674bd`, tree
+`205a51d7ff99c42a646f3f65431971a1ef9d04fa`. A real local source-binding smoke
+verified 17 source and eight dependency files. The initial automatic source-upload rejection required explicit publication
+consent; the owner supplied it on September 27 for public `Kajooja/Kajo` and merge
+after CI. The source is ready for publication; STATUS owns current acceptance.
+
+
+After source CI/merge, recover the two unchanged archives named in the planning
+checkpoint below. Verify their recorded hashes, then create a **separate** private
+continuation archive containing the original key/snapshot, predecessor artifacts
+and receipts, accepted source/CI/dependency receipt, prepared request bytes and
+inspector. Use `prepare-full-dump-continuation.mjs request` with
+`--reviewed-request`, `--prefix-request`, `--prefix-input`, `--source-head`,
+`--source-receipt`, `--repo`, `--key-dir` and a new `--out` file. Preparation and
+recovery are local-only; retain the exact accepted checkout for inspection.
+
+Durably verify custody before advancing the sole request branch. After one run,
+record GitHub provenance, download the exact artifact and run the accepted-source
+inspector. Stop at recovered failure or unreviewed collected records and update
+STATUS. Fresh read-only catalog reconciliation, source-specific language/rights
+review and a separately bounded writer bridge remain later gates. The completed
+pilot, four predecessor ledgers and all release/device requirements stay intact.
+
 ## Full-acquisition continuation plan and handoff — 2026-09-27 / #182
 
 The owner requested one further completed packet and a clean new-conversation
-handoff. The [selected continuation specification](../../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182)
+handoff. The [selected continuation specification](../../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182)
 defines one new full Work/Edition acquisition after the accepted identity fix.
 This packet changes documentation only. It creates no workflow, provider request,
 raw-data copy, database change, APK dispatch or model admission. #182 and all
