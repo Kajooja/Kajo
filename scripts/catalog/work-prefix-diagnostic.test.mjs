@@ -1,16 +1,18 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { constants, createCipheriv, generateKeyPairSync, publicEncrypt, randomBytes } from 'node:crypto';
 import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createDumpFailureEvidence } from './dump-failure-evidence.mjs';
 import { WORK_PREFIX_DIAGNOSTIC_CONTRACT, WORK_PREFIX_LIMITS, WORK_PREFIX_RANGE, WORK_PREFIX_SOURCE_PIN,
   inspectWorkDumpPrefix } from './inspect-work-dump-prefix.mjs';
 import { canonicalJson, digest, sha256 } from './open-library-descriptions.mjs';
-import { prepareWorkPrefixRequest, runWorkPrefixPrepare } from './prepare-work-prefix-diagnostic.mjs';
+import { prepareWorkPrefixRequest } from './prepare-work-prefix-diagnostic.mjs';
 import { WORK_PREFIX_ARTIFACT_FILE, WORK_PREFIX_WORKFLOW_FILE, guardedWorkPrefixDiagnostic,
   validateWorkPrefixCommit, validateWorkPrefixRunBudget } from './run-work-prefix-diagnostic.mjs';
 import { REVIEWED_REQUEST_PATH, recipientFingerprint, validateReviewedAcquisitionRequest } from './seal-dump-acquisition.mjs';
@@ -244,16 +246,24 @@ test('local recovery refuses overwrite and prints no private predicate or row', 
   await writeFile(requestPath, JSON.stringify(syntheticRequest));
   await writeFile(inputPath, JSON.stringify(sealWorkPrefixDiagnostic(resultFor(), syntheticRequest)));
   await writeFile(join(root, 'recipient-private.pem'), keys.privateKey, { mode: 0o600 });
-  const logs = [], original = console.log; console.log = value => logs.push(value);
-  try {
-    const args = ['unseal', '--request', requestPath, '--input', inputPath, '--key-dir', root, '--out', join(root, 'recovered')];
-    const result = await runWorkPrefixPrepare(args);
-    assert.equal(result.diagnosticStatus, 'diagnosed');
-    assert.equal(JSON.parse(await readFile(join(root, 'recovered', 'work-prefix-diagnostic.json'), 'utf8')).failureEvidence.predicate, 'record-location-present');
-    await assert.rejects(runWorkPrefixPrepare(args), { code: 'EEXIST' });
-  } finally { console.log = original; }
-  assert.ok(!logs.join('').includes(canary));
-  assert.ok(!logs.join('').includes('record-location-present'));
+  const args = [fileURLToPath(new URL('./prepare-work-prefix-diagnostic.mjs', import.meta.url)),
+    'unseal', '--request', requestPath, '--input', inputPath, '--key-dir', root, '--out', join(root, 'recovered')];
+  const childEnv = { ...process.env }; delete childEnv.GITHUB_ACTIONS;
+  const blocked = spawnSync(process.execPath, args, { encoding: 'utf8', env: { ...childEnv, GITHUB_ACTIONS: 'true' } });
+  assert.equal(blocked.status, 1);
+  assert.deepEqual(JSON.parse(blocked.stderr), { status: 'failed', code: 'work-prefix-local-operation-failed' });
+  const result = spawnSync(process.execPath, args, { encoding: 'utf8', env: childEnv });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).diagnosticStatus, 'diagnosed');
+  const recovered = await readFile(join(root, 'recovered', 'work-prefix-diagnostic.json'), 'utf8');
+  assert.equal(JSON.parse(recovered).failureEvidence.predicate, 'record-location-present');
+  const repeat = spawnSync(process.execPath, args, { encoding: 'utf8', env: childEnv });
+  assert.equal(repeat.status, 1);
+  assert.deepEqual(JSON.parse(repeat.stderr), { status: 'failed', code: 'work-prefix-local-operation-failed' });
+  assert.equal(await readFile(join(root, 'recovered', 'work-prefix-diagnostic.json'), 'utf8'), recovered);
+  const logs = [blocked.stdout, blocked.stderr, result.stdout, result.stderr, repeat.stdout, repeat.stderr].join('');
+  assert.ok(!logs.includes(canary));
+  assert.ok(!logs.includes('record-location-present'));
 });
 
 test('dedicated workflow pins Actions, checks out main without credentials and uploads only encrypted artifact', async () => {
