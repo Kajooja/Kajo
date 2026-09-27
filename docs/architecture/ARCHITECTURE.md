@@ -685,6 +685,60 @@ A private source-bound inspection helper must include the new failure-evidence
 dependency in its accepted-source manifest; archived helpers remain unchanged.
 Source/fixture acceptance and any later bounded source diagnosis are separate.
 
+### Bounded Work-prefix diagnosis — #182
+
+`open-library-work-prefix-diagnostic-v1` is a separate partial-source diagnosis.
+It binds the consumed reviewed acquisition, unchanged 383-pair public roster and
+recipient, and the same dated Work URL/full-size/publisher pins. Local preparation
+authenticates the exact archived failure before emitting a request. The fixed
+branch `catalog-diagnostic/ol-20260831-work-prefix` may add only
+`scripts/catalog/requests/ol-20260831-work-prefix.json` to accepted main; a separate
+one-shot ledger prevents replay. Previous request ledgers and limits stay intact.
+
+The reader sends `Range: bytes=0-104857599` and accepts only HTTP 206 with
+`Content-Range: bytes 0-104857599/4058336593`, Content-Length **104,857,600** and
+identity encoding; multipart or transfer-encoded bodies are rejected. It never
+falls back to HTTP 200/full-body acquisition. Limits
+are **100 MiB compressed / 1 GiB decoded / 1,000,000 rows / 600 seconds**, with
+four official redirects (at most five Work GET attempts) and the existing
+1,049,600-byte line bound. The 100 MiB limit bounds the requested range and
+accepted compressed parser input. `receivedBodyBytes` also records discarded
+redirect-body or already-buffered bytes without clamping; an observed cumulative
+crossing fails immediately with `work-prefix-body-limit`. It is not a zero-
+overshoot guarantee for socket traffic. There are no metadata, Edition or per-Item
+requests.
+
+The first complete selected identity rejection yields `diagnosed` and exactly
+one validated encrypted failure-evidence row. Range/decoded/row exhaustion without
+a diagnosis yields `inconclusive`; early truncation, corruption, timeout or
+header/transport failure yields `failed`. There is no record collection or source
+manifest. `fullSourceComplete` and `publisherChecksumsVerified` remain false;
+candidates, approvals and database writes remain zero. A prefix hash covers only
+accepted compressed bytes; buffered counters are not the offending row's offset.
+
+Prepare and recover on the original private-key custodian:
+
+```bash
+node scripts/catalog/prepare-work-prefix-diagnostic.mjs request \
+  --previous-request PUBLIC_REVIEWED_REQUEST.json --previous-input open-library-reviewed-20260831.sealed.json \
+  --key-dir ORIGINAL_PRIVATE_KEY_DIRECTORY --source-head ACCEPTED_CURRENT_MAIN_SHA \
+  --out PUBLIC_WORK_PREFIX_REQUEST.json
+node scripts/catalog/prepare-work-prefix-diagnostic.mjs unseal \
+  --request PUBLIC_WORK_PREFIX_REQUEST.json --key-dir ORIGINAL_PRIVATE_KEY_DIRECTORY \
+  --input WORK_PREFIX_SEALED.json --out NEW_PRIVATE_RESULT_DIRECTORY
+```
+
+Preparation first requires the known predecessor ciphertext hash, then decrypts
+and validates its exact failed receipt. Recovery writes private
+`work-prefix-diagnostic.json`. After accepted source and durable request/key
+custody, the request is activated once and its artifact is recovered with
+verified run/head/artifact provenance.
+A new private inspector binds all source dependencies and replays the exact
+predicate offline; existing archives remain unchanged. This establishes only the
+current diagnostic row. No original row hash survived, so byte-identical
+historical reproduction cannot be established. Neither a diagnosis nor an
+inconclusive result grants text rights, a full-source verification or a retry.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

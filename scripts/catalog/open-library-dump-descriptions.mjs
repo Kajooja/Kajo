@@ -123,22 +123,19 @@ async function jsonFile(path, value) {
 // Shared byte-stream parser; callers own source acquisition and trust checks.
 // The local intake still supplies a pre-pinned SHA-256. The acquisition runner
 // supplies both publisher MD5/SHA-1 and records SHA-256 only after complete EOF.
-export async function scanDumpStream(input, source, kind, selected, fetchedAt, budget,
-  { signal, keyOf = row => row.itemId, lineBytes = LIMITS.lineBytes,
-    retainedBytes = LIMITS.stagedRecordBytes, observeProgress } = {}) {
+// One row/envelope/identity parser is used by complete intake and diagnostic
+// prefixes. Prefix mode retains only seen public IDs and one rejected row.
+function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
+  retainedBytes, stats, prefix }) {
   const type = kind === 'works' ? 'work' : 'edition';
   const targets = new Map(selected.map(row => [type === 'work' ? `/works/${row.workId}` : `/books/${row.editionId}`, row]));
-  const records = new Map();
-  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
-  observeProgress?.(stats);
-  requireValue(source.sha256 !== undefined || source.md5 !== undefined && source.sha1 !== undefined,
-    'missing-dump-checksum');
-  const hashes = Object.fromEntries(['sha256', ...['md5', 'sha1'].filter(name => source[name] !== undefined)]
-    .map(name => [name, createHash(name)]));
+  const records = new Map(), seen = new Set();
+  let selectedError;
   const decoder = new TextDecoder('utf-8', { fatal: true });
   let pending = Buffer.alloc(0);
   function line(bytes, terminated) {
     const rowBytes = bytes;
+    if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
     stats.rows += 1;
     requireValue(stats.rows <= source.maxRows, 'dump-row-limit');
     if (bytes.at(-1) === 13) bytes = bytes.subarray(0, -1);
@@ -162,7 +159,7 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
       return;
     }
     requireValue(boundaries.length === 4, 'malformed-dump-target-row');
-    requireValue(!records.has(keyOf(target)), 'duplicate-dump-target-record');
+    requireValue(!seen.has(keyOf(target)), 'duplicate-dump-target-record');
     const recordType = decoded.slice(0, boundaries[0]);
     const revision = decoded.slice(boundaries[1] + 1, boundaries[2]);
     const modifiedAt = decoded.slice(boundaries[2] + 1, boundaries[3]);
@@ -177,17 +174,54 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
           roster: selected, expected: target, row: stats.rows, fetchedAt, predicate: error.identityPredicate,
           limits: { lineBytes, maxRows: source.maxRows } }));
       }
+      selectedError = error;
       throw error;
     }
     requireValue((inspection.sourceRevision === null || inspection.sourceRevision === Number(revision))
       && (inspection.sourceModifiedAt === null || timeValue(inspection.sourceModifiedAt) === timeValue(modifiedAt)),
     'invalid-dump-target-envelope');
-    budget.bytes += Buffer.byteLength(raw);
-    requireValue(budget.bytes <= retainedBytes, 'dump-staging-limit');
-    records.set(keyOf(target), { raw, inspection, inspectionSha256: digest(inspection),
-      dump: { row: stats.rows, revision: Number(revision), modifiedAt } });
+    seen.add(keyOf(target));
+    if (!prefix) {
+      budget.bytes += Buffer.byteLength(raw);
+      requireValue(budget.bytes <= retainedBytes, 'dump-staging-limit');
+      records.set(keyOf(target), { raw, inspection, inspectionSha256: digest(inspection),
+        dump: { row: stats.rows, revision: Number(revision), modifiedAt } });
+    }
     stats.matchedRecords += 1;
   }
+  function write(chunk) {
+    const remaining = source.maxDecodedBytes - stats.decodedBytes;
+    const accepted = prefix && chunk.length > remaining ? chunk.subarray(0, remaining) : chunk;
+    stats.decodedBytes += accepted.length;
+    requireValue(stats.decodedBytes <= source.maxDecodedBytes, 'dump-decoded-byte-limit');
+    let start = 0;
+    for (let end = accepted.indexOf(10); end !== -1; end = accepted.indexOf(10, start)) {
+      const part = accepted.subarray(start, end);
+      requireValue(pending.length + part.length <= lineBytes, 'dump-line-limit');
+      line(pending.length ? Buffer.concat([pending, part]) : part, true);
+      pending = Buffer.alloc(0);
+      start = end + 1;
+      if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
+    }
+    const tail = accepted.subarray(start);
+    requireValue(pending.length + tail.length <= lineBytes, 'dump-line-limit');
+    pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
+    if (prefix && stats.decodedBytes === source.maxDecodedBytes) throw prefix.decodedLimit;
+  }
+  return { records, write, finish: () => { if (pending.length) line(pending, false); },
+    failureEvidence: error => error === selectedError ? readDumpFailureEvidence(error) : undefined };
+}
+
+export async function scanDumpStream(input, source, kind, selected, fetchedAt, budget,
+  { signal, keyOf = row => row.itemId, lineBytes = LIMITS.lineBytes,
+    retainedBytes = LIMITS.stagedRecordBytes, observeProgress } = {}) {
+  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
+  observeProgress?.(stats);
+  requireValue(source.sha256 !== undefined || source.md5 !== undefined && source.sha1 !== undefined,
+    'missing-dump-checksum');
+  const hashes = Object.fromEntries(['sha256', ...['md5', 'sha1'].filter(name => source[name] !== undefined)]
+    .map(name => [name, createHash(name)]));
+  const parser = createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes, retainedBytes, stats });
   const meter = new Transform({ transform(chunk, _encoding, callback) {
     try {
       stats.bytes += chunk.length;
@@ -197,22 +231,7 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
     } catch (error) { callback(error); }
   } });
   const sink = new Writable({ write(chunk, _encoding, callback) {
-    try {
-      stats.decodedBytes += chunk.length;
-      requireValue(stats.decodedBytes <= source.maxDecodedBytes, 'dump-decoded-byte-limit');
-      let start = 0;
-      for (let end = chunk.indexOf(10); end !== -1; end = chunk.indexOf(10, start)) {
-        const part = chunk.subarray(start, end);
-        requireValue(pending.length + part.length <= lineBytes, 'dump-line-limit');
-        line(pending.length ? Buffer.concat([pending, part]) : part, true);
-        pending = Buffer.alloc(0);
-        start = end + 1;
-      }
-      const tail = chunk.subarray(start);
-      requireValue(pending.length + tail.length <= lineBytes, 'dump-line-limit');
-      pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
-      callback();
-    } catch (error) { callback(error); }
+    try { parser.write(chunk); callback(); } catch (error) { callback(error); }
   } });
   const streams = [input, meter];
   if (source.compression === 'gzip') streams.push(createGunzip());
@@ -220,12 +239,61 @@ export async function scanDumpStream(input, source, kind, selected, fetchedAt, b
   // Always consume to EOF, including after every target was found: digest and
   // gzip footer integrity cover the whole file, and a later duplicate must fail.
   await pipeline(...streams, ...(signal ? [{ signal }] : []));
-  if (pending.length) line(pending, false);
+  parser.finish();
   requireValue(stats.bytes === source.bytes, 'dump-file-size-mismatch');
   const checksums = Object.fromEntries(Object.entries(hashes).map(([name, hash]) => [name, hash.digest('hex')]));
   for (const [name, value] of Object.entries(checksums))
     requireValue(source[name] === undefined || source[name] === value, 'dump-checksum-mismatch');
-  return { records, stats: { ...stats, ...checksums, complete: true } };
+  return { records: parser.records, stats: { ...stats, ...checksums, complete: true } };
+}
+
+// This separate entry point never returns collected records or complete-file
+// integrity. Only its own parser exceptions can diagnose a rejected selected row.
+export async function scanDumpFailurePrefix(input, source, selected, fetchedAt,
+  { compressedBytes, maxDecodedBytes, maxRows, lineBytes, signal, observeProgress }) {
+  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
+  observeProgress?.(stats);
+  const prefix = { rowLimit: new Error('work-prefix-row-limit'), decodedLimit: new Error('work-prefix-decoded-limit') };
+  const rangeOverflow = new Error('work-prefix-range-overflow');
+  const parser = createDumpRowParser({ source: { ...source, maxDecodedBytes, maxRows }, kind: 'works', selected,
+    fetchedAt, keyOf: row => row.workId, lineBytes, stats, prefix });
+  const hash = createHash('sha256');
+  let inputEnded = false, inputError, gzipError, parserError;
+  const onEnd = () => { inputEnded = true; };
+  const onInputError = error => { if (!gzipError && !parserError) inputError = error; };
+  input.on('end', onEnd); input.on('error', onInputError);
+  const meter = new Transform({ transform(chunk, _encoding, callback) {
+    if (stats.bytes + chunk.length > compressedBytes) return callback(rangeOverflow);
+    stats.bytes += chunk.length; hash.update(chunk); callback(null, chunk);
+  } });
+  const gunzip = createGunzip();
+  gunzip.on('error', error => { if (!inputError && !parserError) gzipError = error; });
+  const sink = new Writable({ write(chunk, _encoding, callback) {
+    try { parser.write(chunk); callback(); }
+    catch (error) { parserError = error; callback(error); }
+  } });
+  let status = 'inconclusive', code = 'work-prefix-range-exhausted', failureEvidence = null;
+  try {
+    await pipeline(input, meter, gunzip, sink, ...(signal ? [{ signal }] : []));
+    // Deliberately do not inspect an unterminated tail from a partial source.
+    if (!inputEnded || stats.bytes !== compressedBytes) { status = 'failed'; code = 'work-prefix-truncated'; }
+  } catch (error) {
+    const evidence = parser.failureEvidence(error);
+    if (evidence) { status = 'diagnosed'; code = 'provider-identity-mismatch'; failureEvidence = evidence; }
+    else if (error === prefix.rowLimit || error === prefix.decodedLimit) { code = error.message; }
+    else if (error === gzipError && !inputError && gzipError.code === 'Z_BUF_ERROR'
+      && inputEnded && stats.bytes === compressedBytes) { /* Expected incomplete gzip at the exact range end. */ }
+    else {
+      status = 'failed';
+      if (error === rangeOverflow) code = rangeOverflow.message;
+      else if (error === parserError) code = parserError.message;
+      else if (error === gzipError && !inputError) code = gzipError.code === 'Z_BUF_ERROR'
+        ? 'work-prefix-truncated' : 'work-prefix-gzip-invalid';
+      else code = 'work-prefix-stream-failed';
+    }
+  } finally { input.removeListener('end', onEnd); input.removeListener('error', onInputError); }
+  return { status, code, stats, prefixComplete: inputEnded && stats.bytes === compressedBytes,
+    prefixSha256: hash.digest('hex'), failureEvidence };
 }
 
 async function scanDump(path, source, kind, selected, fetchedAt, budget) {

@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-24**
+Last updated: **2026-09-27**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 offline selected-row failure evidence
+## Current packet — #182 bounded Work-prefix diagnosis
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -32,14 +32,16 @@ request. A separate accepted metadata-only diagnostic recovered identical bytes 
 proved the cause: the two files total **16,644,821,648 bytes**, above the original
 15,000,000,000-byte cap. Both requests are consumed. The separately accepted
 reviewed acquisition also ran once and failed at a selected Work identity guard;
-its encrypted artifact retained no raw records. The exact next packet is an
-**offline, bounded selected-row failure-evidence forward** in
-`fix/182-dump-failure-evidence`, preserving the guard and public fixed error code.
-Implementation and independent fixture review are complete; exact CI/merge
-acceptance is recorded in Issue #182. After acceptance, evaluate
-a separate bounded Work-source diagnosis plan to recover and replay the first
-failing selected row. This patch activates no acquisition or retry. The independent
-research packet has a corrected fallback and a completed,
+its encrypted artifact retained no raw records. [PR #277](https://github.com/Kajooja/Kajo/pull/277)
+supplies bounded encrypted failure evidence and is accepted on main
+`3e865ac9ecfcda427ab03d50d1592ff72b4d038d` after all five
+[CI #544 gates](https://github.com/Kajooja/Kajo/actions/runs/36008368238).
+The selected continuation is a **distinct 100 MiB Work-prefix diagnosis** in
+`fix/182-work-prefix-diagnostic`, using the same pinned Work source, roster and
+recipient. After source acceptance, prepare and retain the exact request/key,
+activate it once, recover the encrypted result and replay any captured predicate
+offline to choose the actual fix. The previous requests remain consumed. The
+independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -190,7 +192,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — offline selected-row failure evidence
+### Exact next bounded packet — Work-prefix diagnosis and actual predicate replay
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -261,23 +263,35 @@ full-source checksum verification occurred. Fresh read-only reconciliation at
 [contract](../architecture/ARCHITECTURE.md#selected-row-failure-evidence--182)
 retains one failing selected TSV row, source/row/roster bindings and a fixed private
 identity predicate in encrypted failure output; recovery replays that predicate.
-Independent review and all 86 targeted tests pass; exact CI/merge acceptance
-is recorded in Issue #182. It cannot recover the row discarded by
+Independent review and all 86 targeted tests pass; PR #277 is accepted as recorded
+above. It cannot recover the row discarded by
 the consumed run or establish its unknown cause. Historical receipts, public-log
 silence, separate diagnostic-byte accounting and all identity guards remain.
 
-After source acceptance, the exact next task is to evaluate a **separate bounded
-Work-source diagnosis plan** against the same pinned release, 383-target roster
-and recipient. Specify compressed/decoded byte, row and time bounds; stop at the
-first selected identity failure, recover its one encrypted row and replay the
-actual predicate offline. Version any private inspection helper against the
-accepted source, including its new failure-evidence dependency; preserve archived
-helpers byte-identically. This is a concrete path to diagnose the obstruction,
-not another full catalog acquisition. No Edition request, consumed-request retry
-or new source budget is activated by this patch. The
-[runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
-preserves the failed run and authenticated recovery. Independent #273 remains
-accepted synthetic sensitivity evidence, with no model or serving admission.
+The selected [Work-prefix diagnostic contract](../architecture/ARCHITECTURE.md#bounded-work-prefix-diagnosis--182)
+requests only bytes **0–104,857,599** of the same pinned Work file. It accepts an
+exact HTTP 206 range/length with identity encoding; HTTP 200 or mismatched headers
+fail without a full-download fallback. Bounds are **100 MiB compressed / 1 GiB
+decoded / 1,000,000 rows / 600 seconds / four official redirects**. The first
+selected identity failure supplies one encrypted diagnostic row; exhausted range,
+decoded or row bounds without that evidence are inconclusive. This verifies no
+full-source checksum and supplies no review candidates, approvals or writes.
+
+Complete source/fixture/CI acceptance of this distinct packet, then prepare its
+request by authenticating the archived failure from run **36003953876** with the
+original key. Retain exact request, key and source/run/artifact provenance before
+one activation on `catalog-diagnostic/ol-20260831-work-prefix`; its only request
+path is `scripts/catalog/requests/ol-20260831-work-prefix.json`. Recover the result
+with a new private inspector bound to every accepted source dependency; keep old
+archives byte-identical. Replay any captured predicate offline and decide the
+smallest actual correction from the evidence. A newly captured row diagnoses the
+current response; absent an original row hash it cannot prove byte-identical
+historical reproduction. An inconclusive or failed diagnosis grants no automatic
+retry or wider budget. This continues the authorized #182 task, with no Edition,
+metadata, per-Item or database requests and no new model admission.
+The [prior runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
+remains the authenticated record of the consumed acquisition. Independent #273
+remains accepted synthetic sensitivity evidence.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed
