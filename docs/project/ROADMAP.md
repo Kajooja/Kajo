@@ -65,10 +65,12 @@ once and failed at a selected Work identity guard. The separately accepted
 100 MiB Work-prefix diagnosis then recovered a current selected row whose
 `location` exactly equals its canonical Work key. Its object, key and type are
 valid; the old guard rejects every present location field. All four requests are
-consumed. Complete the narrow exact-self-location correction and versioned
-historical failure replay, then specify a separate bounded full-acquisition
-continuation with the retained pins and roster. No new full request is selected
-or activated. The diagnosis supplies no full-source verification or candidates
+consumed. The exact-self-location correction and versioned historical failure
+replay are accepted through PR #279. The separate bounded full-acquisition
+continuation is now specified: implement its new one-shot protocol with retained
+pins/roster and verified private recovery, pass source CI/merge, then preserve
+custody before activation. No new executable request is prepared or activated.
+The diagnosis supplies no full-source verification or candidates
 and cannot prove the discarded historical row was identical. No complete dump
 scan or additional approved text exists.
 The six-description usefulness target remains unmet.
@@ -193,15 +195,13 @@ The prior read-only reconciliation confirmed 383 unchanged targets; the diagnosi
 made no database requests or writes. Its bounded partial stream is not a complete
 source scan, and matching row position does not establish historical byte identity.
 
-Accept the narrow offline correction after review/tests/CI: exact self-location
-is allowed only after object/key/type validation, while foreign/null locations
-and actual redirects remain rejected. Preserve v1 historical failure semantics
-and version new captures as v2. Next specify a separate full-acquisition
-continuation with exact retained source pins/roster and explicit bounds and
-recovery; do not replay the consumed requests or silently expand their budgets.
-No new full request is selected or activated at this checkpoint. Complete-source
-verification, private recovery, fresh reconciliation and source-specific rights
-review precede a guarded writer bridge. Curated
+PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
+failure replay. Implement the selected
+[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--planned-182),
+then pass source CI/merge and preserve private custody before one activation.
+No executable request is prepared or activated. Consumed requests and their
+budgets remain immutable. Complete-source verification, private recovery, fresh
+reconciliation and source-specific rights review precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native
 forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own
