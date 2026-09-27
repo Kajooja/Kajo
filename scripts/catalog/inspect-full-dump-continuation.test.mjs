@@ -240,7 +240,7 @@ test('ZIP checks cannot be disabled with Python optimization environment flags',
   assert.match(result.stderr, /artifact-zip-mismatch/);
 });
 
-test('source closure rejects modified failure validator, workflow, lock, executing inspector and loaded dependency', async t => {
+test('source closure rejects modified evidence and conflict modules, workflow, lock, inspector and dependency', async t => {
   const root = await mkdtemp(join(tmpdir(), 'kajo-continuation-source-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   for (const path of FULL_CONTINUATION_SOURCE_FILES) {
@@ -257,8 +257,10 @@ test('source closure rejects modified failure validator, workflow, lock, executi
   let head = git(['rev-parse', 'HEAD']);
   const binding = await collectFullContinuationCodeBinding(root, head);
   assert.ok(binding.files['scripts/catalog/dump-failure-evidence.mjs']);
+  assert.ok(binding.files['scripts/catalog/dump-conflict-policy.mjs']);
   assert.ok(binding.dependencies['@noble/hashes'].files['esm/sha2.js']);
-  for (const path of ['scripts/catalog/dump-failure-evidence.mjs', FULL_CONTINUATION_WORKFLOW_PATH, 'package-lock.json']) {
+  for (const path of ['scripts/catalog/dump-failure-evidence.mjs', 'scripts/catalog/dump-conflict-policy.mjs',
+    FULL_CONTINUATION_WORKFLOW_PATH, 'package-lock.json']) {
     const original = await readFile(join(root, path));
     await writeFile(join(root, path), Buffer.concat([original, Buffer.from('\n// modified\n')]));
     await assert.rejects(collectFullContinuationCodeBinding(root, head), /inspection-source-modified/);
