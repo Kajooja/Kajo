@@ -365,8 +365,16 @@ Identity comes from the existing `open_library` source and matching
 checked mirror. The selected `displayEditionKey` is a lookup hint until an exact
 Edition response links back to that Work. Reject a different response key,
 redirect, multiple/different Work linkage or alias collision; never follow an
-identity redirect silently or match by display title. A curated Item without a
-provider alias requires a separately reviewed exact mapping before enrichment.
+identity redirect silently or match by display title. After object/key/type
+validation, an own `location` field is allowed only when it is the exact expected
+canonical path string; absent location is also allowed. Foreign, null and
+non-string locations remain identity failures. A `/type/redirect` record fails
+the type check even when its location points to itself. The upstream
+[Work redirect-chain implementation](https://github.com/internetarchive/openlibrary/blob/master/openlibrary/core/models.py)
+follows `location` only for `/type/redirect`; this supports keeping redirect type
+separate from a normal record's self-location, without inferring why the field
+was supplied. A curated Item without a provider alias requires a separately
+reviewed exact mapping before enrichment.
 
 Only the provider's `description` field is eligible. Accept a string or a
 `{type: '/type/text', value: string}` block; null/absent/blank means missing.
@@ -662,16 +670,26 @@ alone constitutes rights clearance for a record.
 
 ### Selected-row failure evidence — #182
 
-The bounded failure-evidence forward preserves the existing
-`provider-identity-mismatch` guard. `scripts/catalog/dump-failure-evidence.mjs`
-validates the private `open-library-selected-row-failure-evidence-v1` object in
-`accounting.failureEvidence` against the request's roster, exact canonical source
-and limits. It records a fixed private
+The bounded failure-evidence forward keeps the public
+`provider-identity-mismatch` code. `scripts/catalog/dump-failure-evidence.mjs`
+validates the private object in `accounting.failureEvidence` against the request's
+roster, exact canonical source and limits. It records a fixed private
 object/key/type/location predicate, source kind, roster hash, expected Work and
 Edition identities, dump row and fetch time, plus exact Base64 row bytes, byte
 length and SHA-256. Row bytes exclude the LF delimiter but retain CR; `terminated`
 distinguishes a row ended by LF from a final EOF row. The diagnostic row is bounded
 to 1,049,600 bytes.
+
+New captures use `open-library-selected-row-failure-evidence-v2`. Predicate replay
+uses the current ordered object/key/type checks and then
+`record-location-mismatch`: only absence or the exact expected canonical path
+is accepted. Existing `open-library-selected-row-failure-evidence-v1` receipts
+retain frozen legacy replay, including `record-location-present` for every own
+location field, the original 1 MiB raw JSON bound and parse-before-guard order.
+A v1 self-location failure remains valid historical evidence even though live
+inspection now accepts that same identity. Contract versions are never rewritten
+and a v1 receipt cannot be interpreted through the relaxed live guard. Source
+acceptance of this correction is recorded separately in STATUS.
 
 The scanner forwards only the offending selected row through the collector to
 encrypted output. `diagnosticRetainedBytes` counts these bytes separately from
@@ -734,10 +752,13 @@ and validates its exact failed receipt. Recovery writes private
 custody, the request is activated once and its artifact is recovered with
 verified run/head/artifact provenance.
 A new private inspector binds all source dependencies and replays the exact
-predicate offline; existing archives remain unchanged. This establishes only the
-current diagnostic row. No original row hash survived, so byte-identical
-historical reproduction cannot be established. Neither a diagnosis nor an
-inconclusive result grants text rights, a full-source verification or a retry.
+predicate offline under its recorded evidence version; existing archives remain
+unchanged. This establishes only the current diagnostic row. No original row
+hash survived, so byte-identical historical reproduction cannot be established.
+The actual v1 diagnostic remains replayable after the live guard's correction
+for exact self-location. Neither a diagnosis nor an inconclusive result grants text
+rights, a full-source verification or a retry. STATUS owns the consumed request
+and any later separately specified acquisition continuation.
 
 ### Description attribution — contract, #182
 

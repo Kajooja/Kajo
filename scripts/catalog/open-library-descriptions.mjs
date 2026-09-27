@@ -64,14 +64,14 @@ export function normalizeDescription(field) {
   return { status: 'eligible', text, textSha256: sha256(text), length };
 }
 
-// Ordered implementation-owned reasons stay private; the existing rejection
-// code and exact identity policy remain unchanged for every caller.
+// Ordered implementation-owned reasons stay private. A redundant canonical
+// self-location does not redirect identity; other locations remain rejected.
 export function providerIdentityFailure(record, candidate, kind) {
   if (!object(record)) return 'record-not-object';
   const key = kind === 'edition' ? `/books/${candidate.editionId}` : `/works/${candidate.workId}`;
   if (record.key !== key) return 'record-key-mismatch';
   if (record.type?.key !== `/type/${kind}`) return 'record-type-mismatch';
-  if (Object.hasOwn(record, 'location')) return 'record-location-present';
+  if (Object.hasOwn(record, 'location') && record.location !== key) return 'record-location-mismatch';
   return null;
 }
 

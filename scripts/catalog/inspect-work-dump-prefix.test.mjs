@@ -4,7 +4,7 @@ import { PassThrough, Readable } from 'node:stream';
 import test from 'node:test';
 import { gzipSync } from 'node:zlib';
 import { curlAcquisitionTransport } from './acquire-open-library-dumps.mjs';
-import { validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
+import { FAILURE_EVIDENCE_CONTRACT, validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
 import { sha256 } from './open-library-descriptions.mjs';
 import { scanDumpFailurePrefix } from './open-library-dump-descriptions.mjs';
 import { WORK_PREFIX_LIMITS, WORK_PREFIX_RANGE, WORK_PREFIX_SOURCE_PIN,
@@ -64,12 +64,13 @@ test('fixed source, range, limits and public roster reject widening before trans
   assert.equal(calls, 0);
 });
 
-test('same parser diagnoses only the first rejected selected identity and discards prior valid records', async () => {
+test('prefix scanner passes a self-location then diagnoses the first rejected identity as v2, discarding prior records', async () => {
   const rejected = row('OL789W', { location: null });
-  const bytes = gzipSync(row() + rejected + row('OL789W', { key: '/works/OL999W' }));
+  const bytes = gzipSync(row('OL123W', { location: '/works/OL123W' }) + rejected + row('OL789W', { key: '/works/OL999W' }));
   const calls = [], result = await inspectWorkDumpPrefix({ ...args(), transport: injected(bytes, calls) });
   assert.equal(result.status, 'diagnosed'); assert.equal(result.code, 'provider-identity-mismatch');
-  assert.equal(result.failureEvidence.predicate, 'record-location-present');
+  assert.equal(result.failureEvidence.predicate, 'record-location-mismatch');
+  assert.equal(result.failureEvidence.contract, FAILURE_EVIDENCE_CONTRACT);
   assert.equal(result.failureEvidence.row, 2);
   assert.equal(result.failureEvidence.terminated, true);
   assert.equal(Buffer.from(result.failureEvidence.rawBase64, 'base64').toString(), rejected.slice(0, -1));

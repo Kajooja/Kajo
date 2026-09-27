@@ -61,13 +61,16 @@ their scope and separately queued Discovery/UI observations. A focused observati
 of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake
 and reviewed acquisition are accepted. After the metadata diagnostic proved the
 original 15 GB size-budget failure, the separate exact-pinned acquisition ran
-once and failed at a selected Work identity guard. All three requests are
-consumed; preserve their budgets and evidence. The selected continuation is a
-distinct bounded 100 MiB Work-prefix diagnosis. After source acceptance, prepare
-and retain its exact request/key, activate once, recover any rejected selected
-row and replay its predicate offline before choosing a fix. It supplies no full
-source verification or review candidates and cannot prove the discarded historical
-row was identical. No complete dump scan or additional approved text exists.
+once and failed at a selected Work identity guard. The separately accepted
+100 MiB Work-prefix diagnosis then recovered a current selected row whose
+`location` exactly equals its canonical Work key. Its object, key and type are
+valid; the old guard rejects every present location field. All four requests are
+consumed. Complete the narrow exact-self-location correction and versioned
+historical failure replay, then specify a separate bounded full-acquisition
+continuation with the retained pins and roster. No new full request is selected
+or activated. The diagnosis supplies no full-source verification or candidates
+and cannot prove the discarded historical row was identical. No complete dump
+scan or additional approved text exists.
 The six-description usefulness target remains unmet.
 STATUS and #182 own exact source/hosted acceptance. Optional further research
 and a winning external model are not prerequisites for this release work.
@@ -183,16 +186,21 @@ The metadata-only diagnostic proved the old 15 GB cap was below the two files’
 observed 16,644,821,648 bytes. PR #275's separately accepted exact-pinned
 acquisition then ran once and failed at a selected Work identity guard, before
 EOF or full-source verification. Its recovered artifact contains no raw records;
-the selected identity and failing predicate remain unknown. All three requests
-are consumed, and fresh read-only reconciliation confirms 383 unchanged targets.
-Complete source/fixture/CI acceptance of the distinct Work-prefix diagnosis, then
-prepare its authenticated predecessor-bound request, retain private custody and
-activate once. The fixed 100 MiB range, 1 GiB decoded, 1,000,000-row and 600-second
-bounds permit one encrypted first selected identity failure; no full-download
-fallback, Edition source or consumed-request retry exists. Recover and replay the
-actual predicate before choosing a correction. An inconclusive or failed result
-does not expand the budget. Complete-source verification, private recovery,
-fresh reconciliation and source-specific rights
+its historical selected identity and predicate cannot be recovered. The later
+one-shot Work-prefix diagnosis is accepted and consumed: it retained an exact
+self-location row and reproduced the old presence-only rejection privately.
+The prior read-only reconciliation confirmed 383 unchanged targets; the diagnosis
+made no database requests or writes. Its bounded partial stream is not a complete
+source scan, and matching row position does not establish historical byte identity.
+
+Accept the narrow offline correction after review/tests/CI: exact self-location
+is allowed only after object/key/type validation, while foreign/null locations
+and actual redirects remain rejected. Preserve v1 historical failure semantics
+and version new captures as v2. Next specify a separate full-acquisition
+continuation with exact retained source pins/roster and explicit bounds and
+recovery; do not replay the consumed requests or silently expand their budgets.
+No new full request is selected or activated at this checkpoint. Complete-source
+verification, private recovery, fresh reconciliation and source-specific rights
 review precede a guarded writer bridge. Curated
 books need exact alias review before enrichment. Do not repeat the completed
 source matches, redeploy either installed description forward or the six native

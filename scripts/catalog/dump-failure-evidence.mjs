@@ -2,9 +2,13 @@
 // or proof of complete source integrity. No source or filesystem access.
 import { digest, inspectRecord, sha256 } from './open-library-descriptions.mjs';
 
-export const FAILURE_EVIDENCE_CONTRACT = 'open-library-selected-row-failure-evidence-v1';
+export const LEGACY_FAILURE_EVIDENCE_CONTRACT = 'open-library-selected-row-failure-evidence-v1';
+export const FAILURE_EVIDENCE_CONTRACT = 'open-library-selected-row-failure-evidence-v2';
 export const FAILURE_EVIDENCE_LIMITS = Object.freeze({ lineBytes: 1049600, records: 1 });
 export const IDENTITY_FAILURE_PREDICATES = Object.freeze([
+  'record-not-object', 'record-key-mismatch', 'record-type-mismatch', 'record-location-mismatch',
+]);
+const legacyPredicates = Object.freeze([
   'record-not-object', 'record-key-mismatch', 'record-type-mismatch', 'record-location-present',
 ]);
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -31,6 +35,20 @@ function publicRoster(roster) {
   }).sort((a, b) => a.workId.localeCompare(b.workId));
 }
 
+// Frozen v1 receipt semantics: raw size and JSON parsing preceded the original
+// ordered identity guard, which rejected every own location, including self.
+// Do not call the live guard here or reinterpret historical failure evidence.
+function legacyIdentityFailure(raw, expected, kind) {
+  check(Buffer.byteLength(raw) <= 1048576);
+  const record = JSON.parse(raw);
+  if (!object(record)) return 'record-not-object';
+  const key = kind === 'edition' ? `/books/${expected.editionId}` : `/works/${expected.workId}`;
+  if (record.key !== key) return 'record-key-mismatch';
+  if (record.type?.key !== `/type/${kind}`) return 'record-type-mismatch';
+  if (Object.hasOwn(record, 'location')) return 'record-location-present';
+  return null;
+}
+
 export function createDumpFailureEvidence({ rowBytes, terminated, sourceKind, source, roster, expected,
   row, fetchedAt, predicate, limits }) {
   check(Buffer.isBuffer(rowBytes) && integer(rowBytes.length, Math.min(limits.lineBytes, FAILURE_EVIDENCE_LIMITS.lineBytes)));
@@ -44,10 +62,11 @@ export function createDumpFailureEvidence({ rowBytes, terminated, sourceKind, so
 export function validateDumpFailureEvidence(evidence, { roster, source, limits } = {}) {
   if (evidence === undefined) return null; // Historical receipts remain readable.
   try {
+    const legacy = evidence?.contract === LEGACY_FAILURE_EVIDENCE_CONTRACT;
     check(exactKeys(evidence, ['contract', 'code', 'predicate', 'sourceKind', 'source', 'rosterSha256',
       'expected', 'row', 'fetchedAt', 'rawBase64', 'rawBytes', 'rawSha256', 'terminated'])
-      && evidence.contract === FAILURE_EVIDENCE_CONTRACT && evidence.code === 'provider-identity-mismatch'
-      && IDENTITY_FAILURE_PREDICATES.includes(evidence.predicate)
+      && (legacy || evidence.contract === FAILURE_EVIDENCE_CONTRACT) && evidence.code === 'provider-identity-mismatch'
+      && (legacy ? legacyPredicates : IDENTITY_FAILURE_PREDICATES).includes(evidence.predicate)
       && ['works', 'editions'].includes(evidence.sourceKind)
       && object(limits) && integer(limits.lineBytes, FAILURE_EVIDENCE_LIMITS.lineBytes)
       && integer(limits.maxRows, 200000000) && integer(evidence.row, limits.maxRows)
@@ -89,10 +108,14 @@ export function validateDumpFailureEvidence(evidence, { roster, source, limits }
       && decoded.slice(boundaries[0] + 1, boundaries[1]) === key
       && /^[1-9]\d*$/.test(revision) && Number.isSafeInteger(Number(revision))
       && timestamp(decoded.slice(boundaries[2] + 1, boundaries[3])));
-    let rejection;
-    try { inspectRecord(decoded.slice(boundaries[3] + 1), evidence.expected, kind, evidence.fetchedAt); }
-    catch (error) { rejection = error; }
-    check(rejection?.message === evidence.code && rejection.identityPredicate === evidence.predicate);
+    const raw = decoded.slice(boundaries[3] + 1);
+    if (legacy) check(legacyIdentityFailure(raw, evidence.expected, kind) === evidence.predicate);
+    else {
+      let rejection;
+      try { inspectRecord(raw, evidence.expected, kind, evidence.fetchedAt); }
+      catch (error) { rejection = error; }
+      check(rejection?.message === evidence.code && rejection.identityPredicate === evidence.predicate);
+    }
     return evidence;
   } catch { throw new Error('invalid-dump-failure-evidence'); }
 }

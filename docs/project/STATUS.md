@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 bounded Work-prefix diagnosis
+## Current packet — #182 exact self-location correction
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -36,12 +36,24 @@ its encrypted artifact retained no raw records. [PR #277](https://github.com/Kaj
 supplies bounded encrypted failure evidence and is accepted on main
 `3e865ac9ecfcda427ab03d50d1592ff72b4d038d` after all five
 [CI #544 gates](https://github.com/Kajooja/Kajo/actions/runs/36008368238).
-The selected continuation is a **distinct 100 MiB Work-prefix diagnosis** in
-`fix/182-work-prefix-diagnostic`, using the same pinned Work source, roster and
-recipient. After source acceptance, prepare and retain the exact request/key,
-activate it once, recover the encrypted result and replay any captured predicate
-offline to choose the actual fix. The previous requests remain consumed. The
-independent research packet has a corrected fallback and a completed,
+[PR #278](https://github.com/Kajooja/Kajo/pull/278) accepted the separate bounded
+Work-prefix diagnosis on main `99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1`
+after all five [CI #547 gates](https://github.com/Kajooja/Kajo/actions/runs/36341667520),
+**606 tests / four exports**. Its one-shot September 27 run succeeded and retained
+one rejected selected row. Authenticated private replay proves that the current
+row has matching Work key/type and a `location` equal to its own canonical path;
+the guard rejected the mere presence of that field.
+
+**`fix/182-self-location`** supplies the narrow offline correction: allow only
+an exact self-location after the object/key/type checks, keep foreign locations,
+null and real redirect records rejected, and preserve historical v1 failure
+replay while new captures use v2. Independent review and **87 focused tests**
+pass; exact source/required-CI acceptance belongs to
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182). Confirm that acceptance,
+then specify a separate bounded full-acquisition continuation using the retained
+pins and roster. All four source requests are consumed; no new full request is
+selected or activated yet.
+The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
 
@@ -192,7 +204,7 @@ feedback. No new APK is dispatched or polled in this continuation. See the
 Issue #182 owns exact source PR/head/CI/merge acceptance for
 `feat/182-native-description-acceptance`.
 
-### Exact next bounded packet — Work-prefix diagnosis and actual predicate replay
+### Exact next bounded packet — accept the self-location correction
 
 `feat/182-book-dump-intake` supplies the local intake under #182. The
 [source delivery checkpoint](sprints/SPRINT-014.md#offline-book-dump-intake--2026-09-24--182)
@@ -277,21 +289,38 @@ selected identity failure supplies one encrypted diagnostic row; exhausted range
 decoded or row bounds without that evidence are inconclusive. This verifies no
 full-source checksum and supplies no review candidates, approvals or writes.
 
-Complete source/fixture/CI acceptance of this distinct packet, then prepare its
-request by authenticating the archived failure from run **36003953876** with the
-original key. Retain exact request, key and source/run/artifact provenance before
-one activation on `catalog-diagnostic/ol-20260831-work-prefix`; its only request
-path is `scripts/catalog/requests/ol-20260831-work-prefix.json`. Recover the result
-with a new private inspector bound to every accepted source dependency; keep old
-archives byte-identical. Replay any captured predicate offline and decide the
-smallest actual correction from the evidence. A newly captured row diagnoses the
-current response; absent an original row hash it cannot prove byte-identical
-historical reproduction. An inconclusive or failed diagnosis grants no automatic
-retry or wider budget. This continues the authorized #182 task, with no Edition,
-metadata, per-Item or database requests and no new model admission.
-The [prior runtime checkpoint](sprints/SPRINT-014.md#reviewed-acquisition-failure-and-offline-handoff--2026-09-24--182)
-remains the authenticated record of the consumed acquisition. Independent #273
-remains accepted synthetic sensitivity evidence.
+The distinct request was prepared from the authenticated prior failure and
+retained with the original key before activation. [Run 36342443617](https://github.com/Kajooja/Kajo/actions/runs/36342443617)
+completed its only attempt on **September 27 at 18:55:52 UTC** with `diagnosed`.
+At row **804,172**, Work **OL82565W** / selected Edition **OL59004684M** has outer
+and JSON key `/works/OL82565W`, type `/type/work`, and the exact same value in
+`location`. The preserved **5,234-byte** row replays `record-location-present`
+under the original guard. Recovery verified all fifteen accepted source files,
+request/run binding, artifact ZIP CRC/hash and authenticated unseal. No raw row
+is committed to Git. The [actual checkpoint](sprints/SPRINT-014.md#bounded-work-prefix-diagnosis--2026-09-27--182)
+retains the source, request, counters and evidence hashes.
+
+This establishes the current diagnostic cause. The older acquisition discarded
+its row/hash, so the matching position does not prove identical historical input.
+The prefix request is consumed and must not be replayed. It made two Work GETs
+including one redirect and no Edition, metadata, per-Item or database requests;
+full-source verification, candidates, approvals and writes remain zero.
+
+Confirm the **offline exact self-location correction's source acceptance** in
+Issue #182 against its exact head and required CI. The supplied patch has passed
+independent review, 87 focused tests and actual private v1 replay. New failure captures use
+`open-library-selected-row-failure-evidence-v2` and
+`record-location-mismatch`; v1 receipts retain their original
+`record-location-present` replay without changing historical bytes. The exact
+key/type and Edition-to-Work checks remain mandatory. The actual captured record
+now passes identity validation but its description remains excluded as
+`markup-or-url`; no candidate or approval follows from this fix. After source
+acceptance, specify one separate full-acquisition continuation with exact retained pins/roster,
+limits, recovery and a new request identity. This does not select or activate a
+new request automatically and does not reset any consumed source budget.
+Complete publisher EOF/checksum verification, private recovery, fresh target
+reconciliation and source-specific rights review still precede a writer bridge.
+Independent #273 remains accepted synthetic sensitivity evidence.
 
 The completed pilot is recovery evidence, not an input to a new preview or apply.
 Its six rights holds require their own evidence. Preserve both installed

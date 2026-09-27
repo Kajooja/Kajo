@@ -14,40 +14,91 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
-## Bounded Work-prefix diagnosis — 2026-09-24 / #182
+## Exact self-location correction — 2026-09-27 / #182
 
-Implementation resumed on September 27 after interruption. The twelve stream/
-transport tests and twelve request/envelope/runner tests pass. A separate private
-recovery inspector passes ten offline receipt, code-binding and artifact tests.
-Source CI and the actual one-shot diagnosis remain pending at this checkpoint.
+`fix/182-self-location` supplies the offline source correction. Issue #182 owns
+its exact source head and required-CI acceptance. The authenticated Work-prefix
+row below establishes that the presence-only `location` guard rejects a record
+whose location is its own exact canonical Work path. It does not establish why
+the provider retained that field or prove that the discarded earlier row had
+identical bytes.
 
-`fix/182-work-prefix-diagnostic` selects a distinct source diagnosis after the
-consumed reviewed acquisition discarded its failing row. Implementation and
-source/fixture/CI acceptance are in progress. PR #277's prerequisite failure-
-evidence source is accepted; the new prefix request has not been activated.
+The narrow correction accepts absent or exact self-location only after the
+existing object, exact key and exact type checks. Foreign paths, null/non-string
+locations and real `/type/redirect` records remain rejected; Edition Work linkage
+and all text/source bounds remain mandatory. New captures use
+`open-library-selected-row-failure-evidence-v2` with
+`record-location-mismatch`. Historical v1 evidence retains the frozen
+`record-location-present` rule, original parsing order and bounds, without
+rewriting a receipt or reclassifying the prior result as success.
+
+Independent review and **87 focused tests** pass. Actual private replay with the
+new source authenticates the original v1 ciphertext and preserves its canonical
+plaintext and captured-row SHA-256 values unchanged. Current `inspectRecord`
+accepts the exact self identity, and revision/modified fields match the outer TSV
+envelope. Its description still fails the text rule as `markup-or-url`: this
+produces zero candidates, approvals or writes. This is offline fixture and actual
+receipt evidence; required full CI acceptance remains separately recorded in
+Issue #182.
+
+Confirm source acceptance in Issue #182, then specify a separate bounded
+full-acquisition continuation using retained source pins/roster and explicit
+recovery. No new full request has been selected or activated. Consumed requests
+remain consumed; full publisher EOF/checksums, fresh reconciliation and rights
+review still precede any catalog write. The source correction itself performs
+no provider, database, migration, APK or model-admission action.
+
+## Bounded Work-prefix diagnosis — 2026-09-27 / #182
+
+Implementation resumed on September 27 after interruption. [PR #278](https://github.com/Kajooja/Kajo/pull/278)
+is accepted as main `99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1`, tree
+`00cd5b4ff7a91ec21bafa7e6a76bd4a82267b356`. Reviewed head
+`906243aadb3b7f229a6c8392f85620dfc1325a39` passed all five
+[CI #547 gates](https://github.com/Kajooja/Kajo/actions/runs/36341667520),
+**606 tests / four exports**. The preceding CI #546 test-environment failure was
+corrected without changing production behavior. Twelve stream/transport tests,
+twelve request/envelope/runner tests and ten private recovery tests cover the
+new protocol and offline receipt/code/artifact bindings.
 
 The request freezes the same Work source (full size **4,058,336,593 bytes** and
-existing publisher pins), 383-pair roster and recipient. Only the first
-**104,857,600 compressed bytes** are requested, as `Range: bytes=0-104857599`.
-HTTP 206 must match exact Content-Range/Length and identity encoding; HTTP 200
-or mismatched headers fail without fallback. Parsing is bounded to **1 GiB
-decoded / 1,000,000 rows / 600 seconds / four official redirects**. A complete
-first rejected selected row yields `diagnosed`; range/decoded/row exhaustion
-without one yields `inconclusive`; header, truncation, corruption, timeout or
-transport failures yield `failed`. Prefix hashes and buffered byte counters do
-not verify the whole source or identify an exact row byte offset.
+existing publisher pins), original 383-pair roster and recipient. Only bytes
+**0–104,857,599** are requested. Strict HTTP 206 range/length and identity encoding,
+**1 GiB decoded / 1,000,000 rows / 600 seconds / four official redirects** and
+no full-download fallback remain the accepted contract. The complete request,
+original private key and source receipt were retained before activation.
 
-Preparation authenticates the archived run **36003953876** failure before a new
-request is emitted. The sole branch/path is
-`catalog-diagnostic/ol-20260831-work-prefix` /
-`scripts/catalog/requests/ol-20260831-work-prefix.json`, with its own one-shot
-ledger. After source acceptance, retain exact request/key custody, activate once,
-authenticate and inspect the artifact, then replay the captured predicate offline
-to select the actual fix. The new private inspector must bind all accepted source
-dependencies; previous archives remain byte-identical. Without the original
-row's hash, a new row cannot prove exact historical reproduction. No full-source
-checksum, review candidate, approval, database write or model admission follows.
-An inconclusive result does not silently select a retry or broader source budget.
+| Actual one-shot identity | Value |
+| --- | --- |
+| Request commit / tree | `6a6dc390940db1b15d68a8d850dd08bfbb88bd4a` / `f605c4f44cbcfff3d297fcfdc6cab371b60a1e90` |
+| Canonical request SHA-256 | `03c4e1abf4ce3d67452239b76c5d1a0fd18d0bef0c41767c99075f88c1c26bc8` |
+| Actions run | [36342443617](https://github.com/Kajooja/Kajo/actions/runs/36342443617), successful attempt 1 |
+| Diagnostic interval | `2026-09-27T18:55:42.844Z`–`2026-09-27T18:55:52.033Z` |
+| Artifact | `10939256706`, ZIP **14,021 bytes**, SHA-256 `d3b8c99729ea8f10f7458becff6be8f0b061aaaeaf8cdfdd0b127dde76b7e0ae` |
+
+Authenticated recovery yields `diagnosed` / `record-location-present` at row
+**804,172**, selected Work **OL82565W** / Edition **OL59004684M**. The outer key and
+JSON key are both `/works/OL82565W`; the outer and JSON types are both `/type/work`.
+The JSON `location` is exactly `/works/OL82565W`. Its **5,234-byte** captured row
+has SHA-256 `36052131a5d776e82658e741280683eaf38b18930fcf89717af2a68b9c161752`.
+Raw row bytes remain private, outside Git. The historical guard's rejection was
+replayed offline against the verified accepted source.
+
+Accounting records **78,821,206 observed body bytes / 78,690,134 accepted
+compressed bytes / 456,982,528 decoded bytes**, eleven preceding matches and
+804,160 unrelated rows. The two Work GETs include one HTTP 302 redirect. Buffered
+counters are not exact row byte offsets. There were **zero metadata, Edition,
+per-Item or database requests**, zero full-source EOF/publisher-checksum
+verifications, review candidates, approvals or writes. The partial-source result
+does not establish rights to the captured description.
+
+The private inspector verified the complete fifteen-file accepted source binding,
+request/run provenance, artifact ZIP CRC/hash and authenticated unseal. The
+request on `catalog-diagnostic/ol-20260831-work-prefix` is now consumed. Do not
+rerun it or change its request/caps. Existing recovery archives remain unchanged.
+The diagnosed current row has the same position as the earlier acquisition
+failure, but that failure discarded its row/hash: byte-identical historical
+reproduction cannot be established. The narrow correction above follows this
+new observed evidence; it does not retroactively change the old receipt.
 
 ## Offline selected-row failure evidence — 2026-09-24 / #182
 
