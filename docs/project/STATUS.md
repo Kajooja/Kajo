@@ -49,11 +49,13 @@ focused foreground reader's exact request/context/cursor, retained prefix and
 cursor still requires explicit new search. This source is still in draft #229,
 not accepted main or a new hosted migration/device observation.
 
-**Next bounded action:** reconcile accepted #296 into `feat/228-delivered-origin`,
-verify the resulting exact head through all five CI gates, and update #229's
-source/acceptance record. Keep configured-device and fresh-account observations
-explicit; do not repeat installed forwards or reset accounts to manufacture them.
-After this reconciliation, continue Sprint 014's remaining evidence/catalog and
+**Next bounded action:** continue draft #229 on `feat/228-delivered-origin` from
+its latest exact source/CI checkpoint. Confirm that it contains accepted #296 and
+all five required checks are green for that head; resolve any actual integration
+failure before device acceptance. The PR records the current combined head so an
+older successful checkpoint is never substituted. Complete the named configured-device
+and fresh-account observations; do not repeat installed forwards or reset accounts
+to manufacture them. Then continue Sprint 014's remaining evidence/catalog and
 algorithm gates in ROADMAP order. Later UI work has named slots rather than
 competing active branches; E1/D1/D2 need no repeat and optional model research is
 not a release prerequisite.
