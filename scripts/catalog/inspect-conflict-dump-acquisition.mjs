@@ -3,7 +3,8 @@
 import { digest, inspectRecord, sha256 } from './open-library-descriptions.mjs';
 import { validateDumpSources, validateDumpTargets } from './open-library-dump-descriptions.mjs';
 import { createDumpConflictLedger, validateDumpConflictPolicy } from './dump-conflict-policy.mjs';
-import { CONFLICT_ACQUISITION_CONTRACT, REVIEWED_ACQUISITION_LIMITS, safeConflictAcquisitionError, validateAcquisitionRoster, validateAcquisitionSourceUrl } from './acquire-open-library-dumps.mjs';
+import { CONFLICT_ACQUISITION_CONTRACT, FRAMED_ACQUISITION_CONTRACT, REVIEWED_ACQUISITION_LIMITS,
+  safeConflictAcquisitionError, safeFramedAcquisitionError, validateAcquisitionRoster, validateAcquisitionSourceUrl } from './acquire-open-library-dumps.mjs';
 
 export const CONFLICT_ACQUISITION_RESULT_CONTRACT = CONFLICT_ACQUISITION_CONTRACT;
 const kinds = ['works', 'editions'];
@@ -19,6 +20,8 @@ const timestamp = value => typeof value === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\
   && Number.isFinite(timeValue(value));
 const check = (condition, code = 'invalid-conflict-acquisition-payload') => { if (!condition) throw new Error(code); };
 const counters = ['bytes', 'decodedBytes', 'rows', 'matchedRecords', 'unrelatedRows', 'malformedUnrelatedRows', 'quarantinedRecords'];
+const framingCounters = ['oversizedUnrelatedRows', 'oversizedUnrelatedBytes', 'maxBufferedLineBytes'];
+const sourceCounters = (kind, framed) => framed && kind === 'editions' ? [...counters, ...framingCounters] : counters;
 const checksums = ['sha256', 'md5', 'sha1'];
 const zeroFields = ['approved', 'databaseWrites', 'individualProviderRequests', 'modelAdmissions'];
 
@@ -54,6 +57,7 @@ function replayQuarantine(result, request, roster) {
   const ledger = createDumpConflictLedger({ policy: request.conflictPolicy, selected: roster });
   const rows = { works: new Set(), editions: new Set() }, selectedKeys = { works: new Set(), editions: new Set() };
   const minimumDecodedBytes = { works: 0, editions: 0 };
+  const minimumBufferedLineBytes = { works: 0, editions: 0 };
   let previousKind = 0, previousRow = 0;
   for (const entry of saved.conflicts) {
     check(exact(entry, ['assessment', 'evidence']) && kinds.includes(entry.evidence?.sourceKind), 'invalid-conflict-quarantine');
@@ -62,6 +66,7 @@ function replayQuarantine(result, request, roster) {
       'conflict-ledger-order-mismatch');
     previousKind = kindIndex; previousRow = evidence.row;
     minimumDecodedBytes[kind] += evidence.rawBytes + (evidence.terminated ? 1 : 0);
+    minimumBufferedLineBytes[kind] = Math.max(minimumBufferedLineBytes[kind], evidence.rawBytes);
     check(evidence.fetchedAt === result.retrievedAt && !rows[kind].has(evidence.row), 'conflict-evidence-time-or-row-mismatch');
     const assessment = ledger.record(evidence, { source: request.sourcePins[kind], limits: request.limits });
     check(same(assessment, entry.assessment), 'conflict-assessment-mismatch');
@@ -69,10 +74,10 @@ function replayQuarantine(result, request, roster) {
   }
   const replay = ledger.snapshot();
   check(same(replay, saved), 'conflict-ledger-replay-mismatch');
-  return { ledger: replay, rows, selectedKeys, minimumDecodedBytes };
+  return { ledger: replay, rows, selectedKeys, minimumDecodedBytes, minimumBufferedLineBytes };
 }
 
-function validateAccounting(result, request, replay, success) {
+function validateAccounting(result, request, replay, success, framed) {
   const a = result.accounting, limits = request.limits;
   const keys = ['startedAt', 'activeSource', 'metadata', 'sources', 'requests', 'individualProviderRequests', 'databaseWrites',
     'cumulativeStagedBytes', 'diagnosticBytes', success ? 'completedAt' : 'failedAt',
@@ -92,21 +97,36 @@ function validateAccounting(result, request, replay, success) {
     || a.sources.works?.complete === true, 'conflict-edition-before-complete-work');
   let completeBytes = 0;
   for (const kind of kinds) {
+    const fields = sourceCounters(kind, framed);
     const source = a.sources[kind], pin = request.sourcePins[kind];
     if (source === undefined) {
       check(!success && a.requests[kind] === 0 && replay.rows[kind].size === 0, 'conflict-source-accounting-missing');
       continue;
     }
     const complete = source.complete === true;
-    check(exact(source, [...counters, 'complete', 'expectedBytes', ...(complete ? [...checksums, 'publisherChecksumsVerified'] : [])])
-      && typeof source.complete === 'boolean' && counters.every(key => count(source[key]))
+    check(exact(source, [...fields, 'complete', 'expectedBytes', ...(complete ? [...checksums, 'publisherChecksumsVerified'] : [])])
+      && typeof source.complete === 'boolean' && fields.every(key => count(source[key]))
       && source.expectedBytes === pin.bytes && source.matchedRecords + source.quarantinedRecords <= request.roster.length
       && source.quarantinedRecords === replay.rows[kind].size && source.malformedUnrelatedRows <= source.unrelatedRows
       && [...replay.rows[kind]].every(row => row <= source.rows)
       && source.decodedBytes >= replay.minimumDecodedBytes[kind]
       && replay.ledger.conflicts.filter(entry => entry.evidence.sourceKind === kind)
         .every(entry => entry.evidence.terminated || entry.evidence.row === source.rows)
-      && (a.requests[kind] > 0 || !complete && counters.every(key => source[key] === 0)), 'invalid-conflict-source-accounting');
+      && (a.requests[kind] > 0 || !complete && fields.every(key => source[key] === 0)), 'invalid-conflict-source-accounting');
+    if (framed && kind === 'editions') {
+      const skipped = source.oversizedUnrelatedRows, bytes = source.oversizedUnrelatedBytes;
+      check(skipped <= source.unrelatedRows - source.malformedUnrelatedRows
+        && bytes >= skipped * (limits.lineBytes + 1)
+        && (bytes === 0 || bytes > limits.lineBytes)
+        && (skipped > 0 || !complete || bytes === 0)
+        && source.maxBufferedLineBytes >= replay.minimumBufferedLineBytes.editions
+        && source.maxBufferedLineBytes <= Math.min(limits.lineBytes, source.decodedBytes),
+      'invalid-framed-source-accounting');
+      // No discarded row is retained. These are necessary bounds on collector
+      // assertions, not a replay of its private outer-header classification.
+      replay.minimumDecodedBytes.editions += bytes + skipped;
+      check(source.decodedBytes >= replay.minimumDecodedBytes.editions, 'framed-decoded-accounting-mismatch');
+    }
     const accountedRows = source.matchedRecords + source.quarantinedRecords + source.unrelatedRows;
     if (complete) {
       check(source.publisherChecksumsVerified === true && source.bytes === pin.bytes && source.md5 === pin.md5
@@ -127,7 +147,12 @@ function validateAccounting(result, request, replay, success) {
   'invalid-conflict-active-source');
   if (!success) {
     const active = a.sources[a.activeSource];
-    check(result.code !== 'dump-row-limit' || active.rows === limits.maxRows + 1, 'conflict-row-limit-reason-mismatch');
+    check(result.code !== 'dump-row-limit' || active.rows === limits.maxRows + 1
+      || framed && a.activeSource === 'editions' && active.rows === limits.maxRows, 'conflict-row-limit-reason-mismatch');
+    check(result.code !== 'dump-unterminated-oversized-row' || framed && a.activeSource === 'editions'
+      && active.oversizedUnrelatedBytes >= (active.oversizedUnrelatedRows + 1) * (limits.lineBytes + 1)
+      && active.rows === active.matchedRecords + active.quarantinedRecords + active.unrelatedRows,
+    'framed-unterminated-row-reason-mismatch');
     check(result.code !== 'dump-decoded-byte-limit' || active.decodedBytes > limits.maxDecodedBytes,
       'conflict-decoded-limit-reason-mismatch');
     const matched = kinds.reduce((sum, kind) => sum + (a.sources[kind]?.matchedRecords ?? 0), 0);
@@ -158,24 +183,26 @@ function replayRecord(record, pair, kind, result, request, replay) {
   check(!record.raw.includes('\n') && Buffer.byteLength(framed) <= request.limits.lineBytes,
     'conflict-record-frame-mismatch');
   replay.minimumDecodedBytes[sourceKind] += Buffer.byteLength(framed);
+  replay.minimumBufferedLineBytes[sourceKind] = Math.max(replay.minimumBufferedLineBytes[sourceKind], Buffer.byteLength(framed));
   replay.rows[sourceKind].add(envelope.row); replay.selectedKeys[sourceKind].add(pair.workId);
   return inspection;
 }
 
-function validateCompletePayload(result, request, roster, replay) {
+function validateCompletePayload(result, request, roster, replay, framed) {
   check(exact(result.sources, kinds) && Array.isArray(result.records) && Array.isArray(result.suppressedRecords),
     'invalid-conflict-success-shape');
   validateDumpSources(result.sourceManifest);
   check(result.sourceManifest.release === request.release && result.sourceManifest.retrievedAt === result.retrievedAt,
     'conflict-manifest-binding-mismatch');
   for (const kind of kinds) {
+    const fields = sourceCounters(kind, framed);
     const source = result.sources[kind], pin = request.sourcePins[kind], observed = result.accounting.sources[kind];
-    check(exact(source, ['url', 'compression', 'maxDecodedBytes', 'maxRows', ...counters, ...checksums,
+    check(exact(source, ['url', 'compression', 'maxDecodedBytes', 'maxRows', ...fields, ...checksums,
       'complete', 'finalUrl', 'redirects', 'publisherChecksumsVerified', 'expectedBytes'])
       && source.expectedBytes === pin.bytes && source.url === pin.url && source.compression === pin.compression && source.maxDecodedBytes === request.limits.maxDecodedBytes
       && source.maxRows === request.limits.maxRows && Array.isArray(source.redirects) && source.redirects.length <= request.limits.maxRedirects
       && result.accounting.requests[kind] === source.redirects.length + 1
-      && [...counters, ...checksums, 'complete', 'publisherChecksumsVerified'].every(key => source[key] === observed[key])
+      && [...fields, ...checksums, 'complete', 'publisherChecksumsVerified'].every(key => source[key] === observed[key])
       && Object.entries(result.sourceManifest.sources[kind]).every(([key, value]) => source[key] === value),
     'conflict-source-binding-mismatch');
     let currentUrl = source.url;
@@ -226,6 +253,7 @@ function validateCompletePayload(result, request, roster, replay) {
   check(coverage.quarantinedMissingRecords >= 0 && same(coverage, result.coverage)
     && kinds.every(kind => found[kind] === result.sources[kind].matchedRecords
       && result.sources[kind].decodedBytes >= replay.minimumDecodedBytes[kind])
+    && (!framed || result.sources.editions.maxBufferedLineBytes >= replay.minimumBufferedLineBytes.editions)
     && a.validRecordBytes === validRecordBytes && a.survivingRecordBytes === survivingRecordBytes
     && a.suppressedRecordBytes === suppressedRecordBytes && a.cumulativeStagedBytes === validRecordBytes + a.diagnosticBytes,
   'conflict-coverage-or-byte-mismatch');
@@ -235,22 +263,32 @@ function validateCompletePayload(result, request, roster, replay) {
 // The caller separately validates the frozen operational request. This helper
 // deliberately supports smaller synthetic contexts and never authorizes a run.
 export function validateConflictDumpPayload(result, request) {
+  return validatePairDumpPayload(result, request, false);
+}
+
+export function validateFramedDumpPayload(result, request) {
+  return validatePairDumpPayload(result, request, true);
+}
+
+function validatePairDumpPayload(result, request, framed) {
   const roster = validateContext(request), success = result?.status === 'collected';
   const common = ['contract', 'status', 'release', 'retrievedAt', 'completedAt', 'rosterSha256', 'limits', 'sourceEvidence',
     'conflictPolicy', 'policySha256', 'quarantine', 'accounting', ...zeroFields, 'rights'];
   check(exact(result, [...common, ...(success ? ['sources', 'sourceManifest', 'records', 'suppressedRecords', 'coverage']
-    : ['code', 'terminalFailureEvidence'])]) && result.contract === CONFLICT_ACQUISITION_RESULT_CONTRACT
+    : ['code', 'terminalFailureEvidence'])])
+    && result.contract === (framed ? FRAMED_ACQUISITION_CONTRACT : CONFLICT_ACQUISITION_RESULT_CONTRACT)
     && ['collected', 'failed'].includes(result.status) && result.release === request.release
     && timestamp(result.retrievedAt) && timestamp(result.completedAt) && timeValue(result.retrievedAt) >= Date.parse(request.release)
     && timeValue(result.completedAt) >= timeValue(result.retrievedAt) && result.rosterSha256 === digest(roster)
     && same(result.limits, request.limits) && same(result.sourceEvidence, request.sourceEvidence)
     && same(result.conflictPolicy, request.conflictPolicy) && result.policySha256 === digest(request.conflictPolicy)
     && zeroFields.every(key => result[key] === 0) && result.rights === 'unreviewed', 'invalid-conflict-result-binding');
-  check(success || typeof result.code === 'string' && safeConflictAcquisitionError(new Error(result.code)) === result.code
+  check(success || typeof result.code === 'string'
+    && (framed ? safeFramedAcquisitionError : safeConflictAcquisitionError)(new Error(result.code)) === result.code
     && result.terminalFailureEvidence === null, 'invalid-conflict-failure-shape');
   const replay = replayQuarantine(result, request, roster);
-  validateAccounting(result, request, replay, success);
-  if (success) validateCompletePayload(result, request, roster, replay);
+  validateAccounting(result, request, replay, success, framed);
+  if (success) validateCompletePayload(result, request, roster, replay, framed);
   return result;
 }
 
@@ -278,13 +316,22 @@ function reconcile(originalSnapshot, freshSnapshot, selected, completedAt) {
 }
 
 export function inspectConflictDumpPayload({ request, result, originalSnapshot, freshSnapshot }) {
-  validateConflictDumpPayload(result, request);
+  return inspectPairDumpPayload({ request, result, originalSnapshot, freshSnapshot }, false);
+}
+
+export function inspectFramedDumpPayload({ request, result, originalSnapshot, freshSnapshot }) {
+  return inspectPairDumpPayload({ request, result, originalSnapshot, freshSnapshot }, true);
+}
+
+function inspectPairDumpPayload({ request, result, originalSnapshot, freshSnapshot }, framed) {
+  validatePairDumpPayload(result, request, framed);
   const selected = validateDumpTargets(originalSnapshot);
   check(same(validateAcquisitionRoster(selected.map(({ workId, editionId }) => ({ workId, editionId }))), request.roster),
     'conflict-original-snapshot-roster-mismatch');
   const success = result.status === 'collected';
   const reconciliation = reconcile(originalSnapshot, freshSnapshot, selected, result.completedAt);
-  const summary = { contract: 'kajo-private-conflict-acquisition-inspection-v1', validationScope: 'payload-consistency-only',
+  const summary = { contract: framed ? 'kajo-private-framed-acquisition-inspection-v1' : 'kajo-private-conflict-acquisition-inspection-v1',
+    validationScope: 'payload-consistency-only',
     provenanceVerified: false, status: success ? 'consistent-unreviewed-collection' : 'consistent-failed-acquisition',
     requestSha256: request.requestSha256 ?? null, sourceHead: request.sourceHead ?? null,
     rosterSha256: result.rosterSha256, policySha256: result.policySha256,
@@ -292,6 +339,7 @@ export function inspectConflictDumpPayload({ request, result, originalSnapshot, 
     rights: 'unreviewed', approved: 0, databaseWrites: 0, modelAdmissions: 0, inspectionSourceRequests: 0,
     fullDumpChecksumsRecomputedLocally: false,
     fullSourceChecksumsScope: 'Collector assertions checked against supplied pins; full dump bytes are absent from recovery.',
+    ...(framed ? { framingScope: 'Discard counters are bounded collector assertions. Discarded outer headers and inner JSON are absent from recovery.' } : {}),
     accounting: structuredClone(result.accounting), candidates: 0,
     accountingScope: success ? 'Record, exclusion and retained-byte totals replayed; full-source counters are collector assertions.'
       : 'Partial source and staging counters are bounded collector assertions; discarded records are unavailable for replay.',

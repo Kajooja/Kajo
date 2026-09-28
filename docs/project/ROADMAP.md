@@ -83,9 +83,10 @@ an oversized Edition row whose complete outer header is outside the original
 roster. All seven requests are consumed. The explicit local framing core now
 discards only oversized rows with a complete canonical unrelated header, retaining
 selected/unknown failures, original limits, checksum accounting and historical
-replay. Next integrate it into a separately versioned full-collection successor
-with new accounting/replay and original-source predecessor, one-shot and custody
-gates. Source acceptance grants no provider allowance. The discarded historical
+replay. The separately versioned full-collection core now integrates the scanner,
+frozen predecessor request and new encrypted accounting/replay. Next deliver its
+guarded operator with original-source predecessor, one-shot and custody gates.
+Source acceptance grants no provider allowance. The discarded historical
 terminal row's identity and selection status remain unknown; the new prefix does
 not validate the oversized JSON or full source.
 Foreign locations are never remapped.
@@ -235,10 +236,14 @@ the original roster. All seven requests are consumed. The
 [local framing core](../architecture/ARCHITECTURE.md#bounded-edition-framing-core--182)
 now supplies bounded discard through LF only after complete canonical outer-header
 proof. Selected/unknown rows, global limits, selected identity guards, checksum
-accounting and historical replay remain strict. Next integrate this explicit
-entrypoint into a separately versioned full-collection successor, with request/
-result accounting, encrypted replay, all seven fixed predecessors, original-source
-diagnosis recovery, distinct first-run controls and source/CI/custody checks.
+accounting and historical replay remain strict. The
+[framed full-collection core](../architecture/ARCHITECTURE.md#framed-full-collection-successor-core--182)
+now integrates this explicit entrypoint with the full two-source collector,
+separate request/result accounting and encrypted payload replay. Its request
+retains all seven fixed predecessor identities and the exact previous roster,
+recipient, source pins, full budgets and conflict policy. Next supply its guarded
+operator: original-source diagnosis recovery, all seven Git objects, distinct
+first-push/first-run controls and source/dependency/CI/custody checks.
 Accept that source before preparing a new request and saving/reading back separate
 private recovery custody. No provider request or limit expansion is included.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
