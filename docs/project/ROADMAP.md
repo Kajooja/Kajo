@@ -452,12 +452,13 @@ Requirements: `MVP-OPS-001..006`, Taste/Friend privacy requirements.
 
 Exit: staging/production isolation; anonymous/Taste/invite retention/deletion; backups/restore; crash/queue/prediction/funnel diagnostics; invite limits/anti-enumeration/block and abuse-report handling; cost alerts; fail-closed production configuration.
 
-The repository audit found production build configuration still optional and
-unconfigured clients still able to enter mock mode. `MVP-OPS-005` must reject
-missing production settings and privileged key shapes before bundling, while
-retaining explicit local demo/test behavior. Under #160/#184 validate password
-endpoint JSON shapes, intended enumeration responses and rate limits before
-anonymous/public entry. These are open source findings, not verified hosted defects.
+The #160 source correction supplies fail-closed build/runtime production config,
+explicit demo identity, public-key shape validation and bounded password JSON
+validation before lookup. STATUS/#160 own exact source/CI/hosted acceptance.
+Distributed abuse limits and deliberate enumeration policy remain required before
+public entry, alongside hosted password protection, current platform security
+updates and release dependency checks. Source fixtures alone do not certify the
+complete production service.
 
 Research artifacts and derived model/index dependencies participate in their own rights, withdrawal and lifecycle controls. Do not ship research data or service credentials to clients.
 

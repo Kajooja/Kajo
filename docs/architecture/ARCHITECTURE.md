@@ -204,6 +204,25 @@ Presentation components do not scatter direct database access. Use typed service
 
 Production clients contain only publishable/public configuration. Service-role credentials, database passwords and provider secrets remain server-only. The reusable computation core receives authorized/versioned inputs and injected storage/time/randomness ports, not auth tokens or provider clients.
 
+`apps/mobile/app.config.js` validates before Expo build/export/prebuild, using the
+same pure `supabaseConfigPolicy.js` as the runtime connection. Production is the
+default; both public settings and a non-loopback HTTPS origin are required.
+Publishable keys and legacy JWTs with explicit `anon` role are allowed; secret,
+service-role, session, malformed and unknown key shapes are rejected. This is
+configuration validation, not verification that an API key is authentic or live.
+Explicit `KAJO_BUILD_MODE=demo` is embedded in Expo config; only that identity
+permits an unconfigured client. Missing runtime identity fails closed. CI's
+standalone release job pins production mode. No key enters error messages.
+
+The password-auth boundary validates a closed action/identifier/password object
+before privileged lookup. JSON null/arrays/scalars, unknown fields/actions,
+invalid field types and oversized values are rejected. Request reading is bounded
+to 8 KiB, 8,192 chunks and five seconds, including absent Content-Length and
+invalid UTF-8. Responses are no-store; parser failures expose no submitted text.
+Named server-key configuration rejects non-object JSON. Existing account-exists
+and not-found semantics remain; distributed abuse limits and their deliberate
+enumeration policy still require the separate #160 public-entry acceptance.
+
 The external-data workspace is separate from the production transactional database and has no production write credentials. Its batch jobs and learned artifacts have their own manifests, lifecycle and admission checks.
 
 ## 8. Event and command reliability

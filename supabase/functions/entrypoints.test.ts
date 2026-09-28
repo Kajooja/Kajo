@@ -722,6 +722,52 @@ Deno.test('concurrent detail failures preserve the first cause and stop before c
 });
 
 if (!catalogPacket) {
+  Deno.test('password-auth rejects invalid JSON shapes and fields before any privileged lookup', async () => {
+    await withEdge(async f => {
+      for (const body of [null, [], 1, 'sign-in', {}, { action: 'unknown', identifier: 'Fixture' },
+        { action: 'account-exists', identifier: null }, { action: 'account-exists', identifier: ['Fixture'] },
+        { action: 'account-exists', identifier: 'Fixture', extra: true },
+        { action: 'account-exists', identifier: 'Fixture\n' },
+        { action: 'sign-in', identifier: 'Fixture' },
+        { action: 'sign-in', identifier: 'Fixture', password: { length: 10 } },
+        { action: 'sign-in', identifier: 'Fixture', password: 'short' },
+        { action: 'sign-in', identifier: 'Fixture', password: 'x'.repeat(1025) },
+        { action: 'account-exists', identifier: 'x'.repeat(9000) }]) {
+        const response = await f.request(body, {});
+        assert.equal(response.status, 400);
+        assert.deepEqual(await response.json(), { status: 'error' });
+        assert.equal(response.headers.get('cache-control'), 'no-store');
+      }
+      assert.equal(f.outgoing.length, 0); assert.deepEqual(f.logs, []);
+    }, {}, 'password-auth');
+  });
+
+  Deno.test('password-auth bounds streamed bytes and malformed UTF-8/JSON without trusting Content-Length', async () => {
+    await withEdge(async f => {
+      const handler = handlers.get('password-auth')!;
+      for (const chunks of [[new Uint8Array([255])], [new TextEncoder().encode('{broken')],
+        Array.from({ length: 10 }, () => new Uint8Array(1024).fill(32))]) {
+        let index = 0;
+        const body = new ReadableStream<Uint8Array>({ pull(controller) {
+          if (index < chunks.length) controller.enqueue(chunks[index++]!); else controller.close();
+        } });
+        const response = await handler(new Request('https://fixture.invalid', { method: 'POST', body }));
+        assert.equal(response.status, 400); assert.deepEqual(await response.json(), { status: 'error' });
+      }
+      assert.equal(f.outgoing.length, 0);
+    }, {}, 'password-auth');
+  });
+
+  Deno.test('password-auth ends a stalled body without making an auth request', async () => {
+    await withEdge(async f => {
+      let cancelled = false;
+      const body = new ReadableStream<Uint8Array>({ cancel() { cancelled = true; } });
+      const response = await handlers.get('password-auth')!(new Request('https://fixture.invalid', { method: 'POST', body }));
+      assert.equal(response.status, 400); assert.deepEqual(await response.json(), { status: 'error' });
+      assert.equal(cancelled, true); assert.equal(f.outgoing.length, 0);
+    }, {}, 'password-auth');
+  });
+
   Deno.test('password-auth entrypoint uses the pinned SDK for existing server-side resolution', async () => {
     await withEdge(
       async (f) => {
@@ -738,6 +784,26 @@ if (!catalogPacket) {
       {},
       'password-auth',
     );
+  });
+
+  Deno.test('password-auth preserves a valid password and session response after input validation', async () => {
+    await withEdge(async f => {
+      f.upstream = async request => {
+        const url = new URL(request.url);
+        if (url.pathname === '/rest/v1/rpc/resolve_login_email') return Response.json('fixture@example.invalid');
+        assert.equal(url.pathname, '/auth/v1/token');
+        assert.equal(url.searchParams.get('grant_type'), 'password');
+        const body = await request.json();
+        assert.equal(body.email, 'fixture@example.invalid'); assert.equal(body.password, '  fixture-password  ');
+        return Response.json({ access_token: ordinaryUser, refresh_token: 'synthetic-refresh', token_type: 'bearer', expires_in: 3600,
+          user: { id: '11111111-1111-4111-8111-111111111111', email: 'fixture@example.invalid' } });
+      };
+      const response = await f.request({ action: 'sign-in', identifier: 'Fixture', password: '  fixture-password  ' }, {});
+      assert.equal(response.status, 200); assert.equal(response.headers.get('cache-control'), 'no-store');
+      assert.deepEqual(await response.json(), { status: 'authenticated', accessToken: ordinaryUser,
+        refreshToken: 'synthetic-refresh', userId: '11111111-1111-4111-8111-111111111111' });
+      assert.equal(f.outgoing.length, 2);
+    }, {}, 'password-auth');
   });
 
   Deno.test('auth-callback entrypoint rejects an invalid link without outbound work', async () => {

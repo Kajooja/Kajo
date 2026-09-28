@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — repository closure audit and #182 diagnostic correction
+## Current packet — repository closure audit and #160 production guards
 
 On September 28 the owner broadened continuation to resolve unfinished repository
 work. The [closure audit](retros/2026-09-28.md) accounts for all **18 open issues
@@ -18,12 +18,21 @@ and draft PR #229**, concrete implementation paths and external acceptance needs
 It supersedes old deferrals of source defects while preserving dependency order
 and truthful acceptance gates.
 
-The first correction supplies a bounded terminal-conflict collector/replay and
-all-copy key cleanup with process termination and independent verification. The
+The first correction is accepted through [PR #294](https://github.com/Kajooja/Kajo/pull/294),
+main `3500f9b709e5315cb864f9bcbf9f004c76596bce`, reviewed
+`dc12785c4057151d3d3bd2faf160c69b99839550`, exact tree
+`068f975577edbbc99eaeb5e4eba80b183ffd1f16`, all five
+[CI #580 gates](https://github.com/Kajooja/Kajo/actions/runs/36476170169),
+867 tests/four exports. It supplies bounded terminal replay and independently
+verified all-copy key cleanup. The
 [source checkpoint](sprints/SPRINT-014.md#terminal-diagnostic-and-cleanup-correction--2026-09-28--182)
 records tests and limitations. No consumed request, historical row or catalog
-write is replayed. Next complete source/CI acceptance, then fix #160's production
-configuration/password-input defects. Reconcile #229's nine merge conflicts and
+write is replayed. The #160 correction now adds shared Expo/runtime production
+configuration guards, explicit demo identity, public-key shape checks and bounded
+password-auth JSON validation before lookup. Local checks/exports pass; exact
+source/CI and hosted acceptance are tracked in #160. Enumeration, distributed
+abuse limits and provider settings remain distinct gates. Next reconcile #229's
+nine merge conflicts and
 #240 against current main; preserve catalog/credit/cold-history fixes and its
 remaining native/device gates rather than restoring a stale whole STATUS.
 

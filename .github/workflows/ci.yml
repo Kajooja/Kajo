@@ -162,6 +162,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: [validate, database-platform, database-installation, database-upgrade, database-cli-installation]
     runs-on: ubuntu-latest
+    env:
+      KAJO_BUILD_MODE: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -3,13 +3,27 @@ import { describe, expect, it } from 'vitest';
 import { resolveSupabaseConfiguration } from './supabaseConfig';
 
 describe('resolveSupabaseConfiguration', () => {
-  it('keeps the app unconfigured when both public values are absent', () => {
+  it('allows an unconfigured app only in explicit demo mode', () => {
     expect(
       resolveSupabaseConfiguration({
         url: undefined,
         publishableKey: undefined,
+        allowDemo: true,
       }),
     ).toEqual({ status: 'unconfigured' });
+  });
+
+  it('fails closed when build identity and backend configuration are absent', () => {
+    expect(resolveSupabaseConfiguration({ url: undefined, publishableKey: undefined })).toMatchObject({
+      status: 'invalid', code: 'MISSING_URL',
+    });
+  });
+
+  it.each(['sb_secret_private', 'unknown-key', 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.signature',
+    'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.signature'])('refuses non-public key shapes without echoing them', publishableKey => {
+    const result = resolveSupabaseConfiguration({ url: 'https://example.supabase.co', publishableKey });
+    expect(result).toMatchObject({ status: 'invalid', code: 'INVALID_PUBLISHABLE_KEY' });
+    expect(JSON.stringify(result)).not.toContain(publishableKey);
   });
 
   it.each([

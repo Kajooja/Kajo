@@ -34,6 +34,17 @@ npm ci
 npm run start
 ```
 
+Set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for the
+configured app. Expo configuration defaults to production and rejects absent,
+partial, privileged or malformed configuration before building. Production needs
+a non-loopback HTTPS origin and a publishable key (legacy `anon` JWTs remain
+supported); credentials are never echoed in failures.
+
+For a deliberate local demo without a backend, use `KAJO_BUILD_MODE=demo npm run
+start` or `KAJO_BUILD_MODE=demo npm run check`. The mode is embedded in the build;
+an unconfigured production client cannot silently enter demo. The Android release
+job explicitly requires production mode. Demo exports are not release acceptance.
+
 Useful commands:
 
 ```bash

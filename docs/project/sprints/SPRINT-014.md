@@ -14,6 +14,32 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Production configuration and auth input guards — 2026-09-28 / #160
+
+Expo and mobile now share public configuration validation. Production requires
+both public settings and non-loopback HTTPS; only explicit embedded demo mode
+permits an unconfigured client. Secret/service-role/session/malformed key shapes
+fail closed without echoing input, with legacy anon compatibility. The standalone
+Android job explicitly pins production mode; actual Expo config tests cover it.
+
+Password-auth now validates closed action/identifier/password shapes before
+privileged lookup, bounds reading to 8 KiB/8,192 chunks/five seconds and returns
+no-store responses. HTTP tests cover null/arrays/types, streaming/UTF-8/JSON limits,
+stalled bodies and valid password/session behavior. Enumeration and distributed
+abuse policy are preserved as separate unresolved release requirements.
+
+Local lint/typechecks, 254 mobile tests, three production-config tests and four
+Hermes exports pass. Root check is attempted; unavailable npm access prevents
+local Deno dependency fetch. Required remote CI/Edge and exact source acceptance
+are tracked in #160. No hosted function/configuration/data change is claimed here.
+
+The preceding #182 correction is accepted through PR #294, main
+`3500f9b709e5315cb864f9bcbf9f004c76596bce`, reviewed
+`dc12785c4057151d3d3bd2faf160c69b99839550`, tree
+`068f975577edbbc99eaeb5e4eba80b183ffd1f16`. All five CI #580/run 36476170169
+gates passed, 867 tests/four exports, including 28 Deno tests. A separate command
+verified all three synthetic keys absent on the final namespace-aware source.
+
 ## Terminal diagnostic and cleanup correction — 2026-09-28 / #182
 
 The owner broadens continuation to unfinished repository work. The
