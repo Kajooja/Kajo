@@ -4,6 +4,15 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Repository closure continuation — 2026-09-28
+
+PRs #294/#295 passed all five source gates. #238 now has concrete compatible
+remediation for all three advisory families and a zero-advisory lockfile receipt;
+exact CI and actual link/device acceptance remain distinct. Draft #229 has been
+reconciled with accepted main and implements #240 reconnect recovery. Keep its
+native/fresh-account gates and the full Taste-first release order. The
+[closure audit](retros/2026-09-28.md) records every open issue's resolution path.
+
 ## Product decision — 2026-09-07
 
 The first public Kajo is not only a store-downloadable BOOK/MOVIE recommender. It must contain the complete **Taste-first launch loop**:

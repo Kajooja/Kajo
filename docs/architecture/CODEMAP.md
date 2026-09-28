@@ -26,6 +26,17 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Dependency compatibility verification
+
+`package.json` pins the reviewed Vitest family, previous Vite line, and explicit
+query-string/xcode parents. `scripts/dependencies/patch-routing-decoder.mjs`
+checks the exact query-string 7.1.3 hash and safe decoder version, then unwraps
+its ESM default export without replacing the parent API. Installation refuses
+unexpected source. `routing-dependencies.test.mjs` exercises the actual installed
+Router path functions, hostile input in a bounded child and xcode's UUID call.
+The root check and CI include these regressions; CI also runs the fresh advisory
+audit. `dependency-audit-2026-09-28.json` retains the exact lockfile checkpoint.
+
 ## Implementation locations
 
 | Area | Canonical path | Current state |
