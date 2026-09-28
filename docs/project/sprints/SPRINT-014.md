@@ -14,6 +14,74 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Framed full-collection operation — 2026-09-28 / #182
+
+The owner continued the named operational packet after accepted
+[PR #292](https://github.com/Kajooja/Kajo/pull/292), main
+`bc5546eb8f8851ebd8594725b5b25141c72e3aa1`, reviewed head
+`81dbf1be9c4980690361ba76a68c336ff6e86572`, tree
+`c73ef76213c97e8f4c13c857eaa92318ae755268`. All five
+[CI #576 gates](https://github.com/Kajooja/Kajo/actions/runs/36457191366)
+passed, 852 tests/four exports. The source packet below remains historical truth.
+
+Fresh predecessor readback verified the original private archive and all 22 inputs.
+A separate private archive established custody before the accepted preparer ran
+all three original inspectors at their fixed source heads. The complete source,
+installed dependencies, reviewed trees and supplied receipts passed verification;
+request creation followed original-source diagnosis recovery. The final private
+preparation check confirmed no staged raw key copies. The original recipient,
+383-pair roster, source pins, 16,644,821,648-byte compressed total, other full
+limits and 8-pair/8 MiB policy stayed unchanged. All 18 retained request fields
+were compared with the already public predecessor request.
+
+The sole-file request commit `67b4a7480af41c1e664c6b80bbe7754530ec59b2`,
+tree `d90ac7ccc8366fa05bc2cc838c1f881fded94600`, has accepted main as its only
+parent. Actual Git validation checked all seven predecessors. The prepared
+request, exact source/Git receipts and recovery chain were saved and read back
+before the first push to `catalog-acquisition/ol-20260831-framed`.
+[Run 36464232252](https://github.com/Kajooja/Kajo/actions/runs/36464232252)
+completed its sole attempt with failure. Private original-source recovery verified
+`failed` / `dump-conflict-fatal`, with Edition active. The payload asserts complete
+Work/publisher-checksum verification and successful bounded unrelated Edition
+discard before failure. Complete dump bytes and discarded headers/JSON were not
+retained, so local recovery does not independently reproduce those assertions.
+The terminal rejected row, identity predicate and policy reason are absent. Older
+quarantine entries cannot establish that missing terminal cause. No candidates
+survive this failed acquisition.
+
+The actual run/artifact metadata, first-attempt ledger, chronology, exact artifact
+ZIP digest/CRC/member and authenticated unseal all passed. The accepted recovery
+CLI also repeated original Edition/conflict/continuation inspection. A fresh
+post-run read-only catalog snapshot reconciled the original selected targets
+without changes. Private inspection remains payload-consistency-only with
+provenanceVerified false and separate verified-against-supplied-receipts operator
+binding. The completed private archive's version 5 was saved and read back;
+all 133 members and their manifest hashes matched exactly. No private runtime
+counters, raw records, keys or custody commitments enter public Git.
+
+Command-local key cleanup checks reported absence, but a later filesystem read
+observed staged raw key copies after preparation/recovery. Explicit cleanup and
+an independent subsequent read confirmed their absence. Two same-source local
+preparation reproductions passed; the cross-command discrepancy's cause is not
+established. It must be reproduced with synthetic nested processes before another
+activation; command-local success alone is insufficient operational evidence.
+The original canonical key and intentional private custody archives are preserved.
+
+All eight requests are consumed permanently. No retries, reset, reuse, roster
+expansion, limit widening, approvals, database writes or model admissions occurred.
+This was an actual bounded acquisition/recovery, not successful full collection,
+rights approval or additional catalog/MVP/device/release acceptance. The source
+implementation and historical Sprint tail are unchanged.
+
+**Next:** implement a separate bounded local terminal-conflict diagnostic/evidence
+contract with synthetic fixtures. Retain the exact selected-row rejection and
+original identity/policy reason under explicit limits, preserving existing rules
+and historical inspectors. Include synthetic cross-command key-cleanup regression
+and independent absence verification. A new provider operation needs accepted
+source and its own concrete reviewed request/custody checkpoint. Complete source
+collection, fresh reconciliation and individual rights review still precede a
+separately bounded writer.
+
 ## Framed full-collection operator — 2026-09-28 / #182
 
 `feat/182-framed-acquisition-operator` continues accepted full-collection core

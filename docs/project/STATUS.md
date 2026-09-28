@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 framed operator; private operation preparation next
+## Current packet — #182 framed result recovered; terminal-conflict diagnosis next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -174,20 +174,48 @@ copies are removed on success, failure and timeout. The
 records validation and limitations. No request branch or provider operation is
 included in this source packet.
 
-**Next: prepare the private framed full-collection operation from accepted source.**
-Capture its exact merged head/tree and all five CI gates; preserve the Edition
-diagnostic at original source `3d12a7f69534fef305b7ca37767626ae584b688e`, including
-the original conflict/continuation chain. Reconstruct and verify all 22 private
-inputs, record the unchanged full limits and 8-pair/8 MiB policy, then save and
-read back a new recovery archive. Use the new preparer to authenticate predecessors
-and write the sole-file request last. Activation follows that concrete operational
-checkpoint, on the distinct branch with one first push/run. Keep collector,
-request/result and historical rules unchanged. All **seven** earlier requests remain consumed; never rerun,
-reset or reuse them or the completed pilot. No candidates survived the failed
-collection or were retained by the diagnosis. Approvals, database writes and model
-admissions remain zero. Complete collection, fresh reconciliation and individual
-rights review still precede separately bounded writes. No additional catalog,
-device or release gate is accepted. Exact acceptance stays in
+The private framed operation was prepared from accepted [PR #292](https://github.com/Kajooja/Kajo/pull/292),
+main `bc5546eb8f8851ebd8594725b5b25141c72e3aa1`, reviewed tree
+`c73ef76213c97e8f4c13c857eaa92318ae755268`, after all five
+[CI #576 gates](https://github.com/Kajooja/Kajo/actions/runs/36457191366),
+852 tests/four exports. Fresh durable readback bound all 22 predecessor inputs;
+the accepted preparer authenticated the original Edition/conflict/continuation
+chain before writing the request. All 18 retained public fields match the prior
+public request. The exact sole-file request commit is
+`67b4a7480af41c1e664c6b80bbe7754530ec59b2`; it has accepted main as its only
+parent. The prepared request and exact Git/source receipts were saved and read
+back before activation.
+
+One distinct [run 36464232252](https://github.com/Kajooja/Kajo/actions/runs/36464232252)
+completed its only attempt with failure. Accepted-source private recovery verified
+`failed` / `dump-conflict-fatal` while Edition was active. The payload records
+complete Work/publisher-checksum verification and prior bounded unrelated Edition
+discards; full dump bytes and discarded headers/JSON are absent, so these remain
+collector assertions. The terminal rejected row, identity predicate and policy
+reason were not retained. No exact terminal cause can be recovered from older
+quarantine entries. Candidate output is empty.
+
+Runtime/ZIP/ciphertext/unseal/chronology and original-source recovery receipts all
+passed; fresh post-run read-only reconciliation found no changes to the original
+targets. The completed private archive was saved and read back byte-for-byte,
+including all manifested members. Its result stays `payload-consistency-only` /
+`provenanceVerified: false`, with separate checked operator receipts. The
+[operation checkpoint](sprints/SPRINT-014.md#framed-full-collection-operation--2026-09-28--182)
+records the result and a post-command key-cleanup discrepancy: staged copies were
+removed explicitly and a separate read verified absence; the cause is unresolved.
+All **eight** requests are consumed; never rerun, reset or reuse any of them.
+
+**Next: implement a separate bounded terminal-conflict diagnostic source packet.**
+Use synthetic fixtures to preserve the exact rejected selected-row evidence and
+original predicate/policy reason without relaxing identity, framing, roster or
+whole-pair exclusion rules. Reproduce the cross-command key-cleanup discrepancy
+with synthetic nested processes and retain independent key-absence verification
+as an activation gate. Keep this consumed result and all historical inspectors
+unchanged. Only accepted source plus a separately reviewed concrete operational
+request can authorize a new diagnostic; this result grants no new provider run.
+Complete collection, fresh reconciliation and individual language/rights review
+still precede any writer. Approvals, database writes and model admissions remain
+zero; no catalog/MVP/device/release gate closes. Exact acceptance stays in
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
@@ -446,8 +474,8 @@ PR #279 accepted the offline exact-self-location correction and versioned
 failure replay. PR #281's separately accepted full continuation has now run once
 and ended in failure; private recovery and authentication verification are
 complete. The offline policy and successor core are accepted; the guarded operator
-path is implemented. Follow the single request/custody/activation task at the top of
-this file and the
+path is implemented. Follow the single current handoff at the top of this file
+and the
 [result checkpoint](sprints/SPRINT-014.md#full-acquisition-continuation-result-and-handoff--2026-09-27--182).
 All five requests remain consumed. Complete publisher EOF/checksum verification,
 fresh reconciliation and source-specific rights review still precede a writer
