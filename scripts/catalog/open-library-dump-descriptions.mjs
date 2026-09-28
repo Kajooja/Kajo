@@ -3,12 +3,14 @@ import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { lstat, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { Transform, Writable } from 'node:stream';
+import { Readable, Transform, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { createGunzip } from 'node:zlib';
 import { digest, inspectRecord, requireValue, sha256, UUID } from './open-library-descriptions.mjs';
-import { createDumpFailureEvidence, FAILURE_EVIDENCE_LIMITS } from './dump-failure-evidence.mjs';
+import { createDumpFailureEvidence, FAILURE_EVIDENCE_LIMITS, createEditionLineEvidence,
+  EDITION_LINE_DIAGNOSTIC_CONTRACT, safeEditionLineParserError, validateEditionLineContext,
+  validateEditionLineDiagnostic } from './dump-failure-evidence.mjs';
 import { createDumpConflictLedger, validateDumpConflictLedger } from './dump-conflict-policy.mjs';
 
 export const TARGET_CONTRACT = 'open-library-description-dump-targets-v1';
@@ -116,6 +118,8 @@ async function claimOutput(root, output) {
   return directory;
 }
 
+export { claimOutput as claimDumpDiagnosticOutput };
+
 async function jsonFile(path, value) {
   const bytes = JSON.stringify(value, null, 2) + '\n';
   await writeFile(path, bytes, { flag: 'wx', mode: 0o600 });
@@ -128,13 +132,23 @@ async function jsonFile(path, value) {
 // One row/envelope/identity parser is used by complete intake and diagnostic
 // prefixes. Prefix mode retains only seen public IDs and one rejected row.
 function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
-  retainedBytes, stats, prefix, conflictLedger }) {
+  retainedBytes, stats, prefix, conflictLedger, lineDiagnostic }) {
   const type = kind === 'works' ? 'work' : 'edition';
   const targets = new Map(selected.map(row => [type === 'work' ? `/works/${row.workId}` : `/books/${row.editionId}`, row]));
   const records = new Map(), seen = new Set();
   let selectedError;
   const decoder = new TextDecoder('utf-8', { fatal: true });
   let pending = Buffer.alloc(0);
+  let lineStartByte = 0, lineError, lineEvidence;
+  function boundLine(part) {
+    if (pending.length + part.length <= lineBytes) return;
+    const error = new Error('dump-line-limit');
+    if (lineDiagnostic) {
+      lineEvidence = createEditionLineEvidence({ pending, part, row: stats.rows + 1, lineStartByte, context: lineDiagnostic });
+      lineError = error;
+    }
+    throw error;
+  }
   function line(bytes, terminated) {
     const rowBytes = bytes;
     if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
@@ -210,19 +224,21 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
     let start = 0;
     for (let end = accepted.indexOf(10); end !== -1; end = accepted.indexOf(10, start)) {
       const part = accepted.subarray(start, end);
-      requireValue(pending.length + part.length <= lineBytes, 'dump-line-limit');
+      boundLine(part);
       line(pending.length ? Buffer.concat([pending, part]) : part, true);
+      lineStartByte += pending.length + part.length + 1;
       pending = Buffer.alloc(0);
       start = end + 1;
       if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
     }
     const tail = accepted.subarray(start);
-    requireValue(pending.length + tail.length <= lineBytes, 'dump-line-limit');
+    boundLine(tail);
     pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
     if (prefix && stats.decodedBytes === source.maxDecodedBytes) throw prefix.decodedLimit;
   }
   return { records, write, finish: () => { if (pending.length) line(pending, false); },
-    failureEvidence: error => error === selectedError ? readDumpFailureEvidence(error) : undefined };
+    failureEvidence: error => error === selectedError ? readDumpFailureEvidence(error) : undefined,
+    lineFailureEvidence: error => error === lineError ? lineEvidence : undefined };
 }
 
 export async function scanDumpStream(input, source, kind, selected, fetchedAt, budget,
@@ -329,6 +345,68 @@ export async function scanDumpFailurePrefix(input, source, selected, fetchedAt,
   } finally { input.removeListener('end', onEnd); input.removeListener('error', onInputError); }
   return { status, code, stats, prefixComplete: inputEnded && stats.bytes === compressedBytes,
     prefixSha256: hash.digest('hex'), failureEvidence };
+}
+
+// Separate diagnostic entrypoint. It uses the same framer/identity guards but
+// retains only one bounded outer envelope, never candidates or a full row.
+// The supplied stream is caller-owned acquisition; this function opens nothing.
+export async function scanEditionLinePrefix(input, { source, roster, limits, fetchedAt, signal } = {}) {
+  const context = validateEditionLineContext({ source, roster, limits, fetchedAt });
+  requireValue(input instanceof Readable, 'invalid-edition-line-input');
+  ({ source, roster, limits, fetchedAt } = context);
+  const controller = new AbortController(), combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+  const timer = setTimeout(() => controller.abort(), limits.timeoutMs); timer.unref?.();
+  const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0 };
+  const prefix = { rowLimit: new Error('edition-line-row-limit'), decodedLimit: new Error('edition-line-decoded-limit') };
+  const overflow = new Error('edition-line-prefix-overflow');
+  const parser = createDumpRowParser({ source: { ...source, maxRows: limits.maxRows, maxDecodedBytes: limits.maxDecodedBytes },
+    kind: 'editions', selected: roster, fetchedAt, keyOf: row => row.workId, lineBytes: limits.lineBytes,
+    stats, prefix, lineDiagnostic: context });
+  const hash = createHash('sha256');
+  let inputEnded = false, inputError, gzipError, parserError;
+  const onEnd = () => { inputEnded = true; };
+  const onInputError = error => { if (!gzipError && !parserError) inputError = error; };
+  input.on('end', onEnd); input.on('error', onInputError);
+  const meter = new Transform({ transform(chunk, _encoding, callback) {
+    if (stats.bytes + chunk.length > limits.compressedBytes) return callback(overflow);
+    stats.bytes += chunk.length; hash.update(chunk); callback(null, chunk);
+  } });
+  const gunzip = createGunzip();
+  gunzip.on('error', error => { if (!inputError && !parserError) gzipError = error; });
+  const sink = new Writable({ write(chunk, _encoding, callback) {
+    try { parser.write(chunk); callback(); }
+    catch (error) { parserError = error; callback(error); }
+  } });
+  let status = 'inconclusive', code = 'edition-line-prefix-exhausted', failureEvidence = null;
+  try {
+    await pipeline(input, meter, gunzip, sink, { signal: combined });
+    // Prefix exhaustion cannot validate an unterminated tail or a full source.
+    if (!inputEnded || stats.bytes !== limits.compressedBytes) { status = 'failed'; code = 'edition-line-prefix-truncated'; }
+  } catch (error) {
+    const evidence = parser.lineFailureEvidence(error);
+    if (combined.aborted) { status = 'failed'; code = 'edition-line-aborted'; }
+    else if (error === parserError && !inputError && !gzipError && evidence) {
+      status = 'diagnosed'; code = 'dump-line-limit'; failureEvidence = evidence;
+    } else if (error === prefix.rowLimit || error === prefix.decodedLimit) { code = error.message; }
+    else if (error === gzipError && !inputError && !parserError && gzipError.code === 'Z_BUF_ERROR'
+      && inputEnded && stats.bytes === limits.compressedBytes && limits.compressedBytes < source.bytes) {
+      // Expected incomplete gzip only at the exact declared partial-prefix end.
+    } else {
+      status = 'failed';
+      if (error === overflow) code = 'edition-line-prefix-overflow';
+      else if (error === parserError && !inputError && !gzipError) code = safeEditionLineParserError(error);
+      else if (error === gzipError && !inputError && !parserError) code = gzipError.code === 'Z_BUF_ERROR'
+        ? 'edition-line-prefix-truncated' : 'edition-line-gzip-invalid';
+      else code = 'edition-line-stream-failed';
+    }
+  } finally {
+    clearTimeout(timer); input.removeListener('end', onEnd); input.removeListener('error', onInputError);
+  }
+  return validateEditionLineDiagnostic({ contract: EDITION_LINE_DIAGNOSTIC_CONTRACT, sourceKind: 'editions', source,
+    rosterSha256: digest(roster), limits, fetchedAt, completedAt: new Date().toISOString(), status, code, stats,
+    prefixComplete: inputEnded && !inputError && stats.bytes === limits.compressedBytes, prefixSha256: hash.digest('hex'),
+    failureEvidence, fullSourceComplete: false, publisherChecksumsVerified: false, validationScope: 'payload-consistency-only',
+    provenanceVerified: false, candidates: 0, approved: 0, databaseWrites: 0, modelAdmissions: 0, inspectionSourceRequests: 0 }, context);
 }
 
 async function scanDump(path, source, kind, selected, fetchedAt, budget) {

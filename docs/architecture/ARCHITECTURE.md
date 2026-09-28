@@ -1150,6 +1150,97 @@ bounded execution at recovered failure or unreviewed complete collection. Fresh
 reconciliation and individual rights review precede a separately bounded writer
 bridge; all five historical requests remain consumed.
 
+### Local Edition line-framing diagnosis — #182
+
+`scanEditionLinePrefix` is a separate local diagnostic entrypoint over a supplied
+gzip stream. It reuses `createDumpRowParser` from complete dump acquisition, with
+the same byte ceiling before target classification, fatal UTF-8 handling and
+completed-row identity/envelope/duplicate guards. Historical strict, conflict
+and Work-prefix entrypoints cannot activate it through an extra option. It
+retains no candidates and never skips an oversized row to continue collection.
+
+The caller explicitly supplies the dated canonical Edition source pin, original
+unique Work/Edition roster, observation time and all six limits:
+`compressedBytes`, `maxDecodedBytes`, `maxRows`, `lineBytes`, `prefixBytes` and
+`timeoutMs`. No operational defaults are selected. The prefix cap is at most
+4,096 bytes and cannot exceed the line cap; other schema ceilings do not grant
+an acquisition allowance. Context is validated and copied before stream access.
+
+`open-library-edition-line-limit-evidence-v1` captures only the first overflow
+observed by that framer. It binds the canonical source, roster/limits digests,
+observation time, one-based row, zero-based decoded `lineStartByte` and an exact
+retained-prefix byte count/hash. Evidence ends immediately after the fourth tab
+when present, retaining no following JSON; otherwise it fills the explicit
+prefix cap. UTF-8 bytes and any CR count toward the line ceiling; LF does not.
+`observedLineBytesAtLeast` is exactly `lineBytes + 1`, a scanner-observed lower
+bound. `rowComplete` is false and `rowBytes`/`rowSha256` are null. The small
+retained header cannot independently prove the whole line exceeded its cap.
+
+A complete valid outer Edition envelope yields `envelopeSelection.status` of
+`selected` or `unrelated` by its outer key against the supplied roster. Invalid,
+future-dated, incomplete or invalid-UTF-8 headers yield `unknown` with a fixed
+reason and no extracted identity. Even `selected` is strictly an outer-envelope
+classification: inner JSON, key/type/location, Work linkage, language, content
+and rights remain unchecked for that oversized row. A new observed header never
+proves the identity of the earlier discarded terminal row, even at the same
+position. No raw header, private identifier or digest belongs in public logs.
+
+`open-library-edition-line-prefix-diagnostic-v1` has a closed result schema,
+source/roster/limit bindings, bounded counters, observed compressed-prefix hash
+and one of these outcomes:
+
+| Outcome | Meaning |
+| --- | --- |
+| `diagnosed` / `dump-line-limit` | The scanner's own first overflow, with validated bounded header evidence |
+| `inconclusive` | Exact prefix exhaustion, row cap or decoded-byte cap before an overflow witness |
+| `failed` | Early EOF, compressed overrun, gzip corruption, abort/timeout, transport error or existing parser guard |
+
+Only expected incomplete gzip at the exact declared **partial** prefix end is
+ordinary exhaustion; a truncated full-size input fails. The unterminated tail
+is not parsed as a complete record, though an observed tail exceeding the line
+ceiling can be diagnosed. The stream pipeline closes on completion, failure or
+abort. Whole compressed chunks crossing their cap are rejected; decoded chunks
+are clipped to the remaining budget. Counters can include buffered lookahead
+within the caps and do not identify compressed row offsets. Input errors cannot
+forge a diagnosis by supplying the scanner's error text or evidence properties.
+
+Validation replays the minimal prefix, classification, hashes and consistent
+accounting; `validationScope` remains `payload-consistency-only` and
+`provenanceVerified` is false. `fullSourceComplete` and
+`publisherChecksumsVerified` remain false even if a supplied gzip reaches EOF.
+Source pins are context, not authenticated local bytes. `candidates`, `approved`,
+`databaseWrites`, `modelAdmissions` and `inspectionSourceRequests` are all zero.
+
+The local-only `inspect-edition-line-prefix.mjs` CLI requires the consumed conflict
+request and explicit limits as bounded JSON regular files. It validates that
+public request schema, preserves its exact line ceiling and does not exceed its
+decoded/row/time caps. It blocks GitHub Actions, accepts a regular local gzip
+input, reads from byte zero to the compressed cap, and exclusively claims a new
+private direct child of ignored `dist/catalog-enrichment`. Request, limits and
+diagnostic are mode 0600 under a mode 0700 directory; symlink output parents and
+overwriting are rejected. `diagnostic.json` is written last with request/context
+hashes and `sourceAuthentication: not-performed`. Output contains only a fixed
+status/code and zero action counts. This is neither private predecessor recovery
+nor a provider operation.
+
+```sh
+npm run catalog:book-descriptions:lines -- \
+  --request /private/consumed-conflict-request.json \
+  --limits /private/explicit-line-limits.json \
+  --editions /private/local-edition-prefix.gz \
+  --out dist/catalog-enrichment/new-line-diagnosis
+```
+
+Actual provider diagnosis requires a **separate accepted guarded operator path**:
+original-source recovery of the consumed conflict result, all six fixed public
+predecessor requests, accepted source/dependency/CI identity, strict bounded range
+transport, a distinct first-run ledger, encrypted results and private recovery
+custody saved/read back before activation. That next source packet must precede
+explicit operational caps and a new sole-file request; this local core supplies
+none. Keep the original roster, pins, line ceiling and identity rules. All six
+historical requests remain consumed; no rerun, limit increase, source completion,
+description approval or serving/model admission follows from this diagnostic.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

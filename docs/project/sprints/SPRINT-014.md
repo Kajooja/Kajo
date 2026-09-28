@@ -14,6 +14,66 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Local Edition line-framing diagnostic — 2026-09-28 / #182
+
+`feat/182-edition-line-diagnostic` continues the accepted result checkpoint from
+[PR #286](https://github.com/Kajooja/Kajo/pull/286), main
+`2b533a29e53f9e2145e54720b6834f91a27b89be`. That documentation source passed all
+five CI #563 gates with 738 tests and four exports. Issue #182 owns the exact new
+PR/head/tree, required CI results and merge acceptance. Historical checkpoints
+below remain unchanged.
+
+The local diagnostic reuses the existing byte framer. Its separate evidence
+contract retains an explicit prefix of at most 4 KiB, shortened at the fourth
+tab, with source/roster/limit bindings, row and decoded byte position. A valid
+complete outer envelope permits selected/unrelated classification; incomplete,
+invalid or invalid-UTF-8 headers remain unknown. The reported line size is a
+scanner-observed lower bound, never an exact size or full-row hash. The prefix
+does not validate JSON, inner identity, Work linkage, description or rights.
+
+Compressed/decoded/row/time bounds are explicit; gzip corruption, early EOF,
+overflow, timeout and parser errors fail closed. Exact partial-prefix or row/byte
+budget exhaustion is inconclusive. Buffered counters do not locate a row inside
+compressed bytes. Result validation checks payload consistency only: publisher
+checksums, full-source completion and provenance remain unverified. Existing
+strict/conflict/Work-prefix scanner entrypoints cannot enable this behavior by
+supplying an extra option and retain their original rejection rules.
+
+`npm run catalog:book-descriptions:lines` accepts only local regular-file inputs,
+an explicit limits document and the consumed conflict request as public context.
+It blocks Actions, preserves that request's line ceiling and resource caps,
+claims a new private directory under ignored catalog staging, and writes its
+diagnostic last. Standard output contains only fixed outcome codes and zero
+action counts. It authenticates neither the consumed private result nor the
+supplied local gzip bytes. No workflow, executable request or provider default
+is introduced.
+
+Nineteen synthetic tests cover selected/unrelated/unknown oversized headers,
+compressed and decoded chunk boundaries, UTF-8/CRLF byte accounting, bounded
+tails, resource limits, corruption, aborts, forged errors/evidence, context
+mutation, prior scanner behavior and actual local CLI permissions/non-overwrite.
+The focused scanner/conflict/recovery/evidence suite passes 89 tests. Local root
+check passed lint, typecheck, mobile and catalog tests, then stopped because the
+Deno npm registry connection was refused in this environment. The remaining
+database/engine/research/acceptance tests and all four platform exports passed
+separately: 729 local tests in total, excluding the blocked 28 edge tests. The
+complete root check and all five required CI jobs remain the merge gate.
+
+Files: `dump-failure-evidence.mjs`, `open-library-dump-descriptions.mjs`, new
+`inspect-edition-line-prefix.mjs` and `edition-line-diagnostic.test.mjs`, root
+package script and the changed canonical STATUS/ROADMAP/ARCHITECTURE/CODEMAP.
+No real provider diagnosis, private row publication, catalog reconciliation,
+approval, database write, model admission or device/release acceptance occurred.
+The actual failed row remains unknown and all six requests stay consumed.
+
+**Next:** implement the separate guarded one-shot Edition-prefix operator path.
+Require original-source recovery of the consumed conflict result, all six fixed
+predecessor requests, accepted source/dependency/CI, strict bounded range transport,
+first-run accounting, encrypted result/recovery and private custody readback.
+Source acceptance comes before separately reviewed explicit caps and activation;
+never reuse a consumed branch, relax the original line/identity guards or infer
+historical byte identity from matching positions. STATUS owns this one packet.
+
 ## Conflict acquisition result and line-framing handoff — 2026-09-28 / #182
 
 The guarded operator source is accepted through

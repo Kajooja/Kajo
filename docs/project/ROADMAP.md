@@ -77,9 +77,12 @@ and #182 record source/CI acceptance. The guarded operator path now supplies
 one-shot activation controls and receipt-based source/run/custody recovery.
 PR #285 accepted that path; a separately bounded request then activated once.
 Its failed result was recovered and preserved. All six requests are consumed.
-STATUS now selects a local-only bounded Edition line-framing diagnostic contract
-before any separately accepted provider diagnosis. Existing limits and source
-pins remain; the terminal row's identity and selection status are unknown.
+The local bounded Edition line diagnostic now supplies minimal outer-envelope
+evidence and synthetic boundary tests. STATUS selects a separate guarded one-shot
+Edition-prefix operator path before any actual provider diagnosis: accepted
+source/CI, fixed predecessor lineage, bounded transport and encrypted private
+recovery/custody are required. Existing limits and source pins remain; the
+discarded terminal row's identity and selection status are still unknown.
 Foreign locations are never remapped.
 No additional text is approved and no database write was performed. The prefix
 diagnosis still cannot prove the earlier discarded row was identical.
@@ -218,9 +221,13 @@ provider execution. The guarded operator path now supplies the distinct workflow
 original-source predecessor preparation, private custody checks and source-bound
 recovery. PR #285 accepted that path, and actual preparation/custody verification
 preceded one distinct request. Its failed result is privately recovered and
-preserved; all six requests are consumed. The next local-only packet specifies
-and tests bounded Edition line-framing diagnostics, retaining existing limits
-and pins. No new provider execution follows from this result checkpoint.
+preserved; all six requests are consumed. The local bounded Edition line-framing
+diagnostic is implemented with explicit limits, minimal header evidence and
+synthetic regression tests. The next packet is its separate guarded one-shot
+operator path, binding accepted source/CI and all six fixed predecessors to
+bounded transport and encrypted private recovery/custody. Existing limits and
+pins remain. Source acceptance precedes separately reviewed operational caps
+and activation; no provider execution follows from the local diagnostic.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated
