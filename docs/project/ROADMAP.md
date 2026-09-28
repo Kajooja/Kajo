@@ -86,8 +86,12 @@ selected/unknown failures, original limits, checksum accounting and historical
 replay. The separately versioned full-collection core now integrates the scanner,
 frozen predecessor request and new encrypted accounting/replay. Its guarded
 operator now supplies original-source predecessor checks, one-shot controls and
-source/dependency/CI/custody gates. Next prepare the private operation from accepted
-source and save/read back its recovery archive before distinct activation.
+source/dependency/CI/custody gates. Original-source preparation and exact durable
+readback now precede one activated framed full-collection run, attempt one. All
+eight requests are consumed. Its failed Edition result is privately recovered,
+freshly reconciled and preserved. Next build bounded terminal-conflict evidence
+with synthetic fixtures and resolve the post-command key-cleanup observation;
+STATUS owns that exact source packet and its later operational gates.
 Source acceptance grants no provider allowance. The discarded historical
 terminal row's identity and selection status remain unknown; the new prefix does
 not validate the oversized JSON or full source.
@@ -248,9 +252,15 @@ recipient, source pins, full budgets and conflict policy. The
 now checks all seven Git objects, distinct first-push/first-run controls and
 source/dependency/CI/custody receipts. Original-source diagnosis recovery preflights
 all three historical closures before key staging, then bounds the nested process
-chain and cleans temporary keys. Next prepare a new request from accepted source,
-verify all 22 private predecessor inputs and save/read back separate private
-recovery custody before activation. No provider request or limit expansion is included.
+chain and cleans temporary keys. Actual preparation verified all 22 inputs and
+the three original inspectors, then saved and read back the new private request
+and exact source/Git receipt before one distinct first-attempt activation. The
+eighth request is consumed; no retry, reset, reuse or limit expansion is allowed.
+Its failed Edition result is privately recovered as dump-conflict-fatal; the
+terminal row/predicate/policy reason were not retained. Fresh reconciliation
+found no original-target changes and exact private archive readback passed.
+Next implement a separate bounded terminal-conflict diagnostic with synthetic
+fixtures and cross-command key-cleanup verification. This grants no provider run.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated
