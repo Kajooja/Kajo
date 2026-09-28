@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "movielens-intake-v1",
+  "datasetId": "movielens",
+  "releaseId": "ml-latest-small-2018-kaggle-v2",
+  "publisher": "GroupLens Research, University of Minnesota",
+  "landingUrl": "https://www.kaggle.com/datasets/grouplens/movielens-latest-small",
+  "readmeUrl": "https://www.kaggle.com/api/v1/datasets/download/grouplens/movielens-latest-small/README.md?datasetVersionNumber=2",
+  "archiveUrl": "https://www.kaggle.com/api/v1/datasets/download/grouplens/movielens-latest-small?datasetVersionNumber=2",
+  "sourceVerification": {
+    "readmeSha256": "63d22ac138e80fae37021797ed8e1b9424b5239dc576a137422adf783ae3f404",
+    "publisherMd5": null,
+    "archiveSha256": "12b11d77fdb2c221daa631e5724104f51ecab1298c0e5f535d56e9ceff02ef8b",
+    "archiveBytes": 993937,
+    "files": {
+      "README.md": {
+        "sha256": "63d22ac138e80fae37021797ed8e1b9424b5239dc576a137422adf783ae3f404",
+        "bytes": 8342
+      },
+      "links.csv": {
+        "sha256": "97ad18e4e56a09363c65676b6cb3482ce3e2cea2372a24620c1599c843325f31",
+        "bytes": 197979
+      },
+      "movies.csv": {
+        "sha256": "5a5f32dd9bb3797b8e728a1b98958789d2b13f294a69fdfbc5727f8a9611aa07",
+        "bytes": 494431
+      },
+      "ratings.csv": {
+        "sha256": "aa289ca83157595d0df6aea1be6a4ded676ddc4385472e8313a8ed9805352646",
+        "bytes": 2483723
+      },
+      "tags.csv": {
+        "sha256": "92a9f8bb7916dceef6151209845788c3643f794dfa79d1feaec7121b5960399d",
+        "bytes": 118660
+      }
+    },
+    "status": "verified",
+    "lastAttempt": "2026-09-12",
+    "lastResult": "Official GroupLens Kaggle version 2 retrieved over verified HTTPS; README and all archive members inspected",
+    "hashOrigin": "SHA-256 computed from retrieved version-pinned publisher bytes; not a publisher-issued checksum"
+  },
+  "rights": {
+    "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+    "research": "approved-for-noncommercial-research",
+    "reviewedBy": "Codex: source-document review for owner-authorized noncommercial offline development",
+    "reviewedAt": "2026-09-12",
+    "rawRedistribution": "not-approved",
+    "fittedArtifactRedistribution": "not-approved",
+    "commercialUse": "not-approved",
+    "productionServing": "not-approved",
+    "publication": [
+      "authored-code",
+      "schemas",
+      "non-identifying-manifests",
+      "aggregate-reports",
+      "attribution"
+    ],
+    "evidence": "Archived README.md Usage License permits research with attribution, no implied endorsement and prior permission for commercial/revenue-bearing use.",
+    "approvedScope": "Local noncommercial research/development only; aggregate development report with attribution; no raw histories, fitted artifacts or native serving publication"
+  },
+  "attribution": "F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems 5, 4, Article 19. https://doi.org/10.1145/2827872",
+  "expectedCounts": {
+    "ratings": 100836,
+    "subjects": 610,
+    "movies": 9742,
+    "tags": 3683
+  },
+  "cohort": {
+    "size": 500,
+    "seed": "kajo-d1-mlsmall-v2-500-v1",
+    "selection": "lowest-sha256-of-release-seed-subject",
+    "minimumSourceRatings": 20
+  },
+  "semantics": {
+    "target": "external-explicit-rating",
+    "rawScale": {
+      "min": 0.5,
+      "max": 5,
+      "step": 0.5
+    },
+    "timestamp": "rating-record-seconds-since-unix-epoch-utc",
+    "availability": "assumed-at-occurrence-for-offline-simulation",
+    "equalTimestampPolicy": "exclude-entire-equal-time-group-from-query-prefix",
+    "exposure": "unknown",
+    "watchTime": "unknown",
+    "context": "unknown",
+    "propensity": "unknown",
+    "metadataUse": "static-release-metadata-only-not-historical-features",
+    "catalogIntersection": "not-queried",
+    "duplicatePolicy": "deduplicate-identical-pairs-quarantine-all-conflicting-pairs",
+    "evaluationScope": "Frozen 2018 development snapshot; internal development evidence, not a shared benchmark or Kajo uplift claim"
+  },
+  "budgets": {
+    "maxArchiveBytes": 2097152,
+    "maxExpandedBytes": 8388608,
+    "maxDownloadSeconds": 60,
+    "maxRows": 110000,
+    "maxSubjects": 1000,
+    "maxMovies": 12000,
+    "maxRatingsPerSubject": 5000,
+    "maxCohortRatings": 110000,
+    "maxQuarantineRows": 10000,
+    "maxCsvFieldBytes": 65536
+  },
+  "publisherRef": "grouplens/movielens-latest-small",
+  "publisherVersion": 2,
+  "metadataUrl": "https://www.kaggle.com/api/v1/datasets/view/grouplens/movielens-latest-small",
+  "filesUrl": "https://www.kaggle.com/api/v1/datasets/list/grouplens/movielens-latest-small?datasetVersionNumber=2"
+}

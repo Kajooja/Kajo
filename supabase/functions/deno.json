@@ -1,0 +1,10 @@
+{
+  "nodeModulesDir": "none",
+  "compilerOptions": {
+    "types": ["npm:@types/node@22.5.4"]
+  },
+  "lock": {
+    "path": "deno.lock",
+    "frozen": true
+  }
+}

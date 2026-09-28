@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 type AuthAction =
   | 'account-exists'
@@ -7,8 +7,8 @@ type AuthAction =
   | 'sign-in';
 
 interface RequestBody {
-  action?: AuthAction;
-  identifier?: string;
+  action: AuthAction;
+  identifier: string;
   password?: string;
 }
 
@@ -16,20 +16,26 @@ const RECOVERY_REDIRECT = 'kajo://auth/recovery';
 const CONFIRM_REDIRECT = 'kajo://auth/confirm';
 const headers = {
   'content-type': 'application/json; charset=utf-8',
+  'cache-control': 'no-store',
+  'x-content-type-options': 'nosniff',
 };
+const MAX_BODY_BYTES = 8192;
 
 Deno.serve(async (request) => {
   if (request.method !== 'POST') {
     return json({ status: 'error' }, 405);
   }
 
-  let body: RequestBody;
+  let input: unknown;
 
   try {
-    body = await request.json();
+    input = await readBoundedBody(request);
   } catch {
     return json({ status: 'error' }, 400);
   }
+
+  if (!isRequestBody(input)) return json({ status: 'error' }, 400);
+  const body = input;
 
   const identifier = normalizeIdentifier(body.identifier);
 
@@ -156,6 +162,49 @@ function normalizeIdentifier(value: unknown): string | null {
   return normalized.length >= 2 && normalized.length <= 320 ? normalized : null;
 }
 
+function isRequestBody(value: unknown): value is RequestBody {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const body = value as Record<string, unknown>;
+  const actions = ['account-exists', 'resend-confirmation', 'request-password-reset', 'sign-in'];
+  if (typeof body.action !== 'string' || !actions.includes(body.action)
+    || typeof body.identifier !== 'string' || body.identifier.length > 320
+    || /[\u0000-\u001f\u007f]/.test(body.identifier)) return false;
+  const allowed = body.action === 'sign-in' ? ['action', 'identifier', 'password'] : ['action', 'identifier'];
+  if (Object.keys(body).some(key => !allowed.includes(key))) return false;
+  return body.action !== 'sign-in' || typeof body.password === 'string' && body.password.length >= 6 && body.password.length <= 1024;
+}
+
+async function readBoundedBody(request: Request): Promise<unknown> {
+  const length = request.headers.get('content-length');
+  if (length !== null && (!/^\d+$/.test(length) || Number(length) > MAX_BODY_BYTES)) throw new Error('invalid-body');
+  const reader = request.body?.getReader();
+  if (!reader) throw new Error('invalid-body');
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  let complete = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('invalid-body')), 5000);
+  });
+  try {
+    while (true) {
+      const { done, value } = await Promise.race([reader.read(), deadline]);
+      if (done) { complete = true; break; }
+      bytes += value.byteLength;
+      if (bytes > MAX_BODY_BYTES || chunks.length >= MAX_BODY_BYTES) throw new Error('invalid-body');
+      chunks.push(value);
+    }
+    const raw = new Uint8Array(bytes);
+    let offset = 0;
+    for (const chunk of chunks) { raw.set(chunk, offset); offset += chunk.byteLength; }
+    return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(raw));
+  } finally {
+    clearTimeout(timer);
+    if (!complete) void reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
+}
+
 function readNamedKey(variableName: string): string | null {
   const raw = Deno.env.get(variableName);
 
@@ -164,14 +213,16 @@ function readNamedKey(variableName: string): string | null {
   }
 
   try {
-    const keys = JSON.parse(raw) as Record<string, unknown>;
-    const defaultKey = keys.default;
+    const keys: unknown = JSON.parse(raw);
+    if (keys === null || typeof keys !== 'object' || Array.isArray(keys)) return null;
+    const values = keys as Record<string, unknown>;
+    const defaultKey = values.default;
 
     if (typeof defaultKey === 'string' && defaultKey.length > 0) {
       return defaultKey;
     }
 
-    const firstKey = Object.values(keys).find(
+    const firstKey = Object.values(values).find(
       (value): value is string => typeof value === 'string' && value.length > 0,
     );
     return firstKey ?? null;

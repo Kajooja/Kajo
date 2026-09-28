@@ -1,0 +1,63 @@
+{
+  "version": "explicit-rating-development-v1",
+  "issue": 237,
+  "scope": "Noncommercial offline development, not a shared benchmark or native serving admission",
+  "sourceReport": "research/reports/movielens-small-v2-intake.json",
+  "hypothesis": "Train-only collaborative features and ordered rating-entry prefixes may improve the same hidden observed-rating task over a shrunken item mean and durable subject state.",
+  "target": "Original observed explicit rating on 0.5–5; no implicit negatives, probabilities or causal outcomes",
+  "candidateProtocol": "Exactly the actually rated object in each held-out row; all models score identical targets. No ranking, recommendation exposure or candidate-recall claim.",
+  "split": {
+    "seed": "kajo-d2-small-v1",
+    "heldOutSubjectFraction": 0.2,
+    "subjectSelection": "Lowest SHA256(seed + ':' + namespaced subject ID), no rating-value selection",
+    "trainQuantile": 0.7,
+    "testQuantile": 0.85,
+    "cutoffs": "Timestamp at floor(q * non-held-out rows); train < trainBefore, validation [trainBefore, testFrom), final >= testFrom. Equal-time groups never split.",
+    "frozenBatch": "Global artifacts and subject prefixes use training rows only; validation labels never join final frozen-batch state.",
+    "prequential": "Same frozen global artifacts; final state starts with permitted training and validation history, then only that subject's strictly earlier scored test groups. Score the entire equal-time group before updating.",
+    "coldPrefixes": [0, 5, 10, 20],
+    "coldStart": "Held-out subjects are excluded from all global fits and validation selection. Reveal earliest complete timestamp groups strictly before testFrom without exceeding the prefix budget. Score identical final-window targets at every budget; report actual prefix sizes, including zero when a group exceeds the budget."
+  },
+  "models": {
+    "seed": 2372026,
+    "itemShrinkage": 10,
+    "subjectShrinkage": 10,
+    "recentGroups": 3,
+    "recentWeight": 0.35,
+    "neighbors": { "maxItems": 1000, "minSupport": 5, "minOverlap": 3, "shrinkage": 10, "topK": 20 },
+    "factorization": { "dimensions": 8, "epochs": 12, "learningRate": 0.01, "regularization": 0.05, "foldInRidge": 10 },
+    "retrieval": { "maxMemories": 10000, "perItem": 64, "topK": 10, "maxDistance": 0.35, "weight": 0.35, "minPrefixGroups": 3 },
+    "variants": ["global-mean", "item-mean", "state-static", "state-recent", "item-neighbor", "factorization", "retrieval-static", "trajectory"]
+  },
+  "features": {
+    "metadata": "Off: undated release metadata and tags are not historical inputs",
+    "state": "Raw long-term mean and three most recent complete rating-time-group means, normalized by the fixed target scale; residual state uses train-only item means",
+    "neighbors": "Positive cosine of item-centered training vectors, overlap shrinkage, train-popularity top 1000 items, at most 20 neighbors",
+    "factorization": "Seeded SGD squared explicit-rating error, fixed shrunken item offsets, learned user bias and user/item vectors; score subjects by ridge fold-in of their permitted prefixes against frozen item vectors",
+    "memory": "Train-only prefix plus known continuation; exact target object, different subject, no future labels in distance. Stable seeded record selection with no response-value sampling; static versus ordered distance on the same bank. No fabricated actions or viewing trajectories."
+  },
+  "selection": {
+    "reference": "state-static",
+    "candidates": ["state-recent", "item-neighbor", "factorization", "retrieval-static", "trajectory"],
+    "rule": "One fixed configuration per variant. Select lowest validation frozen-batch RMSE, tie by declared candidate order. Save selection and model hashes before opening final evaluation. No refit, parameter sweep or final-test reselection.",
+    "minimumValidationRmseGain": 0.01,
+    "finalRule": "Development validation only if selected variant improves validation RMSE by >=0.01, paired subject-bootstrap final RMSE difference upper95 < 0, and cold-item RMSE degradation <=0.1 when at least 20 subjects support that slice. Otherwise reject or defer for inadequate support. Native serving always deferred."
+  },
+  "metrics": {
+    "primary": ["MAE", "RMSE"],
+    "uncertainty": "500 seeded subject-cluster percentile bootstrap replicates; resample subjects with all their rows, preserving paired model/reference errors. Descriptive development uncertainty, not population guarantees.",
+    "bootstrapReplicates": 500,
+    "slices": "All; train item support 0 (cold), 1–9 (tail), >=10 (supported); train subject support 0 versus >0; controlled held-out subject prefixes",
+    "coverage": "Finite predictions, supported component versus fallback, eligible memory counts, neighbor use and explicit no-match; one common denominator including cold items",
+    "errorDistribution": "Absolute-error p50, p90, p95; row-weighted and subject-macro errors",
+    "resources": "Training component times, query-batch p50/p95 and total evaluation times, Node process peak RSS, artifact bytes; exclude IO/bootstrap from model latency"
+  },
+  "resources": { "maxRows": 100000, "maxSubjects": 500, "maxItems": 10000, "maxInputBytes": 150000000, "maxRssMiB": 1024, "maxSeconds": 300, "maxArtifactBytes": 16000000 },
+  "artifactPolicy": {
+    "use": "research-only",
+    "absenceInvalidWithdrawal": "Fail closed to a native-only observed-prefix mean or unavailable; never reuse any externally fitted means, vectors or memories as the withdrawal fallback",
+    "publication": "Aggregate report, hashes and protocol only; histories, subject memberships, partitions, predictions and fitted parameters remain ignored",
+    "withdrawal": "Stop all uses of the dependent artifact, remove derived model/index/caches from use, rebuild from separately authorized inputs and rerun evaluation; deleting raw rows or setting one coefficient to zero is insufficient",
+    "nativeAdmission": "Deferred: separate rights, canonical mapping, native usefulness, isolation, compatibility, trace, fallback/rollback and device gates"
+  }
+}

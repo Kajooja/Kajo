@@ -20,6 +20,8 @@ import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.m
 import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
 import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
+import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
+import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 try {
@@ -34,7 +36,7 @@ try {
   const historySql = installationHistorySql;
   const nativeSql = `begin read only; set local search_path=pg_catalog;
     ${functionDigestSql({ includeApplication: false })} rollback;`;
-  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrent }) => {
+  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
@@ -88,6 +90,22 @@ try {
     await resetFromMigrations(files.slice(0, windowIndex));
     const [continuationUpgrade] = await exec(predictionContinuationUpgradeSql(files[windowIndex], files[atomicPageIndex], projectionFixture));
     assert.match(continuationUpgrade?.continuationUpgrade, /^PASS: populated pre-window/);
+    const descriptionIndex = files.findIndex(file => file.name.endsWith('_book_description_refresh.sql'));
+    assert.ok(descriptionIndex > collectionIndex);
+    await resetFromMigrations(files.slice(0, descriptionIndex));
+    const oldDescriptionMode = await catalogRpc({ entries: [], refresh_mode: 'open-library-description-v1' });
+    assert.equal(oldDescriptionMode.status, 404, 'Older PostgREST must reject the top-level refresh mode');
+    assert.equal(oldDescriptionMode.body.code, 'PGRST202');
+    const [catalogDescriptionUpgrade] = await exec(catalogDescriptionUpgradeSql(files[descriptionIndex]));
+    assert.match(catalogDescriptionUpgrade?.catalogDescriptionUpgrade, /^PASS: unchanged populated/);
+    const attributionIndex = files.findIndex(file => file.name.endsWith('_description_attribution.sql'));
+    assert.ok(attributionIndex > descriptionIndex);
+    await resetFromMigrations(files.slice(0, attributionIndex));
+    const unsupportedAttribution = await catalogRpc({ entries: [], refresh_mode: ATTRIBUTION_MODE });
+    assert.equal(unsupportedAttribution.status, 400, 'The v1-only writer must reject the v2 mode');
+    assert.equal(unsupportedAttribution.body.code, '22023');
+    const [catalogAttributionUpgrade] = await exec(catalogAttributionUpgradeSql(files[attributionIndex]));
+    assert.match(catalogAttributionUpgrade?.catalogAttributionUpgrade, /^PASS: unchanged populated/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -102,8 +120,8 @@ try {
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Failed CLI migration left partial application changes');
     assert.deepEqual((await exec(historySql))[0], expectedHistory, 'Failed CLI migration was recorded as applied');
 
-    const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrent);
-    const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrent);
+    const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrentSql);
+    const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -138,6 +156,13 @@ try {
     assert.match(sharedListDestinations?.sharedListDestinations, /^PASS: exact target consent/);
     const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listMembership?.listMembership, /^PASS: public delivery/);
+    const [catalogDescriptions] = await exec(await catalogDescriptionSmokeSql());
+    assert.match(catalogDescriptions?.catalogDescriptions, /^PASS: guarded/);
+    const catalogDescriptionLocks = await catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc);
+    const [catalogAttribution] = await exec(await catalogAttributionSmokeSql());
+    assert.match(catalogAttribution?.catalogAttribution, /^PASS: v1 upgrade/);
+    const catalogAttributionLocks = await catalogDescriptionConcurrency(exec, execConcurrentSql, catalogRpc,
+      { mode: ATTRIBUTION_MODE, fixtureSql: catalogAttributionFixtureSql() });
     await exec(`begin; ${defaults} rollback;`);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'CLI installation runtime smoke left changes');
     const [platformAfter, functionsAfter] = await exec(platformSql + '\n' + nativeSql);
@@ -154,6 +179,8 @@ try {
       lateOutcomes, lateOutcomeUpgrade, hostedPredictionUpgrade, hostedPredictionRuntime, frozenReplay, frozenReplayUpgrade,
       candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
       atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
+      catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
+      catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
       failedMigrationAtomicity: 'PASS', applicationSnapshotSha256: hash(JSON.stringify(first)),
       nativeFunctions: functionsAfter, platform: platformAfter };

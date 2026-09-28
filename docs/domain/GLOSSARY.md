@@ -21,6 +21,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Acquisition attribution | `AcquisitionAttribution` | Bounded campaign/referral metadata for the funnel; not Item preference evidence. |
 | Item | `Item` | Any recommendable object/experience regardless of domain; maps to generic engine Object. |
 | Item type | `ItemType` | Domain classification such as BOOK/MOVIE; never a separate core Item model. |
+| Description attribution | `DescriptionAttribution` | Public source/revision, credit, license and change information bound to an Item description's exact text and source-record hashes; distinct from private permission evidence and AcquisitionAttribution. |
 | Item source | `ItemSource` | Server-owned provenance linking a canonical Item to a provider record. |
 | External item ID | `ItemExternalId` | Namespaced stable provider/domain identifier for safe matching/import. |
 | Discoverable | `discoverable` | Normal candidate eligibility lifecycle flag preserving historical references. |

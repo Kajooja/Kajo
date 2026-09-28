@@ -284,9 +284,10 @@ export function getStaticMockItems(
       const scoreDifference = right.scores[mode] - left.scores[mode];
       return scoreDifference !== 0 ? scoreDifference : left.item.id.localeCompare(right.item.id);
     })
-    .map(({ item }) => item);
+    .map(({ item }) => ({ ...item, descriptionStatus: 'legacy' as const }));
 }
 
 export function getMockItem(itemId: ItemId): Item | undefined {
-  return MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item;
+  const mock = MOCK_DISCOVERY_ENTRIES.find(({ item }) => item.id === itemId)?.item;
+  return mock ? { ...mock, descriptionStatus: 'legacy' } : undefined;
 }

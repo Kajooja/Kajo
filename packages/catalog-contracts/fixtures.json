@@ -1,0 +1,19 @@
+{
+  "description": "A fictional traveller follows a quiet river and discovers how the choices of an earlier generation still shape the town.",
+  "attribution": {
+    "contract": "description-attribution-v1",
+    "sourceTitle": "Synteettinen testilähde",
+    "sourceUrl": "https://example.invalid/source?revision=7",
+    "sourceRevision": "7",
+    "credit": "Synteettisen testiaineiston tekijät",
+    "licenseName": "Testilisenssi",
+    "licenseUrl": "https://example.invalid/license",
+    "changes": "Vain välilyönnit on normalisoitu.",
+    "textSha256": "58933dfb21d4f9f4cf7c8492837917d563877c0b8be106a7d011dc6d219241bf",
+    "recordSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "permission": {
+    "evidenceSha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "intendedUse": "kajo-internal-pilot"
+  }
+}

@@ -14,6 +14,3532 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native reconciliation and reconnect correction — 2026-09-28 / #228 / #240
+
+Reconciled the older draft #229 against accepted main through PR #295, retaining
+current catalog attribution and cold canonical detail/history tests. The nine
+conflicts covered four app files, three canonical documents and two database
+probe runners. Both sets of independent concurrency/upgrade probes remain;
+already deployed SQL is byte-identical. Tests that previously addressed the
+removed global Item cache now exercise immutable delivered slates and canonical
+cold reads. Collection history keeps render-time ownership checks through rapid
+A → B → A, collection revisions and ItemType changes.
+
+#240 uses SDK-57 `expo-network` with focus and AppState lifecycle ownership.
+Recovery retains exact failed request/context/cursor, accepted prefix and timeout;
+coalescing and a three-attempt budget prevent a notification storm. The previous
+error stays through the pending retry and clears only on success. Expiry is still
+explicit new search. Focused tests cover first/next pages, backend failure, network
+flapping, deadlines/late responses, scope changes, stale initial reachability and
+background/unmount cancellation. No action/exposure queue is reset or synthesized.
+
+Local lint/typecheck, 410 mobile tests, 71 database tests and four Hermes exports
+pass. Root `npm run check` reaches Deno dependency fetching but local registry
+access there stalls; remote CI must prove the complete gate.
+
+Exact remote CI and remaining configured-device/fresh-account observations belong
+to #229/#240; prior #469 APK acceptance is not attributed to the new source.
+
+PR #295 was accepted on main `cd224d277f33b105e63cd83126d111b12b64ba10`,
+reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, exact tree
+`0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
+880 tests and four exports. Hosted configuration/function rollout remains
+separate from that source acceptance.
+
+## Production configuration and auth input guards — 2026-09-28 / #160
+
+Expo and mobile now share public configuration validation. Production requires
+both public settings and non-loopback HTTPS; only explicit embedded demo mode
+permits an unconfigured client. Secret/service-role/session/malformed key shapes
+fail closed without echoing input, with legacy anon compatibility. The standalone
+Android job explicitly pins production mode; actual Expo config tests cover it.
+
+Password-auth now validates closed action/identifier/password shapes before
+privileged lookup, bounds reading to 8 KiB/8,192 chunks/five seconds and returns
+no-store responses. HTTP tests cover null/arrays/types, streaming/UTF-8/JSON limits,
+stalled bodies and valid password/session behavior. Enumeration and distributed
+abuse policy are preserved as separate unresolved release requirements.
+
+Local lint/typechecks, 254 mobile tests, three production-config tests and four
+Hermes exports pass. Root check is attempted; unavailable npm access prevents
+local Deno dependency fetch. Required remote CI/Edge and exact source acceptance
+are tracked in #160. No hosted function/configuration/data change is claimed here.
+
+The preceding #182 correction is accepted through PR #294, main
+`3500f9b709e5315cb864f9bcbf9f004c76596bce`, reviewed
+`dc12785c4057151d3d3bd2faf160c69b99839550`, tree
+`068f975577edbbc99eaeb5e4eba80b183ffd1f16`. All five CI #580/run 36476170169
+gates passed, 867 tests/four exports, including 28 Deno tests. A separate command
+verified all three synthetic keys absent on the final namespace-aware source.
+
+## Terminal diagnostic and cleanup correction — 2026-09-28 / #182
+
+The owner broadens continuation to unfinished repository work. The
+[closure audit](../retros/2026-09-28.md) enumerates 18 open issues and draft #229,
+concrete fixes and external acceptance dependencies. Main is the starting truth;
+the older native branch has nine source/document/runner merge conflicts.
+
+This packet fixes terminal evidence loss with a separate collector/result schema:
+one bounded selected row, original identity predicate and fatal policy reason,
+cumulative retention charging and pure replay. Failed results keep no candidates;
+old entrypoints/schemas remain unchanged. No provider I/O or real diagnosis occurs.
+
+Cleanup attempts all three copies despite individual errors, flushes directory
+metadata, checks absence in a fresh process and waits for live descendants after
+SIGKILL. A reproduced PID-namespace mismatch makes direct /proc group comparison
+unsafe; the new check translates namespaces and tests a live group. Recovery
+success/failure/timeout run in a separate process before inspection. A distinct
+command also verified all three synthetic key paths absent. Actual earlier key
+reappearance was not reproduced; its cause is not claimed proved. Independent
+post-command absence remains mandatory before any operational continuation.
+
+Focused 26 cleanup/operator and 28 collector/replay tests passed. Root check passed
+lint/typechecks/mobile/catalog, then waited on unavailable npm registry access
+for Deno dependencies; it was stopped rather than misreported as success. Remaining
+local suites/exports and all five remote CI gates must pass before merge. All
+historical private evidence and eight consumed request branches remain unchanged.
+
+## Framed full-collection operation — 2026-09-28 / #182
+
+The owner continued the named operational packet after accepted
+[PR #292](https://github.com/Kajooja/Kajo/pull/292), main
+`bc5546eb8f8851ebd8594725b5b25141c72e3aa1`, reviewed head
+`81dbf1be9c4980690361ba76a68c336ff6e86572`, tree
+`c73ef76213c97e8f4c13c857eaa92318ae755268`. All five
+[CI #576 gates](https://github.com/Kajooja/Kajo/actions/runs/36457191366)
+passed, 852 tests/four exports. The source packet below remains historical truth.
+
+Fresh predecessor readback verified the original private archive and all 22 inputs.
+A separate private archive established custody before the accepted preparer ran
+all three original inspectors at their fixed source heads. The complete source,
+installed dependencies, reviewed trees and supplied receipts passed verification;
+request creation followed original-source diagnosis recovery. The final private
+preparation check confirmed no staged raw key copies. The original recipient,
+383-pair roster, source pins, 16,644,821,648-byte compressed total, other full
+limits and 8-pair/8 MiB policy stayed unchanged. All 18 retained request fields
+were compared with the already public predecessor request.
+
+The sole-file request commit `67b4a7480af41c1e664c6b80bbe7754530ec59b2`,
+tree `d90ac7ccc8366fa05bc2cc838c1f881fded94600`, has accepted main as its only
+parent. Actual Git validation checked all seven predecessors. The prepared
+request, exact source/Git receipts and recovery chain were saved and read back
+before the first push to `catalog-acquisition/ol-20260831-framed`.
+[Run 36464232252](https://github.com/Kajooja/Kajo/actions/runs/36464232252)
+completed its sole attempt with failure. Private original-source recovery verified
+`failed` / `dump-conflict-fatal`, with Edition active. The payload asserts complete
+Work/publisher-checksum verification and successful bounded unrelated Edition
+discard before failure. Complete dump bytes and discarded headers/JSON were not
+retained, so local recovery does not independently reproduce those assertions.
+The terminal rejected row, identity predicate and policy reason are absent. Older
+quarantine entries cannot establish that missing terminal cause. No candidates
+survive this failed acquisition.
+
+The actual run/artifact metadata, first-attempt ledger, chronology, exact artifact
+ZIP digest/CRC/member and authenticated unseal all passed. The accepted recovery
+CLI also repeated original Edition/conflict/continuation inspection. A fresh
+post-run read-only catalog snapshot reconciled the original selected targets
+without changes. Private inspection remains payload-consistency-only with
+provenanceVerified false and separate verified-against-supplied-receipts operator
+binding. The completed private archive's version 5 was saved and read back;
+all 133 members and their manifest hashes matched exactly. No private runtime
+counters, raw records, keys or custody commitments enter public Git.
+
+Command-local key cleanup checks reported absence, but a later filesystem read
+observed staged raw key copies after preparation/recovery. Explicit cleanup and
+an independent subsequent read confirmed their absence. Two same-source local
+preparation reproductions passed; the cross-command discrepancy's cause is not
+established. It must be reproduced with synthetic nested processes before another
+activation; command-local success alone is insufficient operational evidence.
+The original canonical key and intentional private custody archives are preserved.
+
+All eight requests are consumed permanently. No retries, reset, reuse, roster
+expansion, limit widening, approvals, database writes or model admissions occurred.
+This was an actual bounded acquisition/recovery, not successful full collection,
+rights approval or additional catalog/MVP/device/release acceptance. The source
+implementation and historical Sprint tail are unchanged.
+
+**Next:** implement a separate bounded local terminal-conflict diagnostic/evidence
+contract with synthetic fixtures. Retain the exact selected-row rejection and
+original identity/policy reason under explicit limits, preserving existing rules
+and historical inspectors. Include synthetic cross-command key-cleanup regression
+and independent absence verification. A new provider operation needs accepted
+source and its own concrete reviewed request/custody checkpoint. Complete source
+collection, fresh reconciliation and individual rights review still precede a
+separately bounded writer.
+
+## Framed full-collection operator — 2026-09-28 / #182
+
+`feat/182-framed-acquisition-operator` continues accepted full-collection core
+[PR #291](https://github.com/Kajooja/Kajo/pull/291), main
+`cfa36d5810c1f5e6f91c4112e4376415f2f4ced1`, tree
+`71cc0279496913dc2d355daa16e6bc8e477e171c`, after all five
+[CI #574 gates](https://github.com/Kajooja/Kajo/actions/runs/36450439387),
+830 tests/four exports. This source packet uses synthetic inputs; the real private
+Edition archive and all seven consumed requests remain untouched.
+
+The new local preparer, first-push runner, private recovery CLI and pinned
+workflow enforce the separate framed contract. The runner requires clean accepted
+main with the accepted core ancestor, a sole-file main-child request, all seven
+exact predecessor Git values and exactly one first-attempt workflow run. A private
+output is claimed before provider I/O. Successful or failed payloads produce only
+neutral authenticated ciphertext; a failed collection reports a fixed public
+error after the upload marker. Frozen full-source and conflict budgets remain.
+
+Preparation/recovery binds source files, actual ESM dependency bytes, the reviewed
+tree, all five CI gates, full limits/framing source, runtime chronology and ZIP,
+ciphertext and plaintext receipts. Exactly 22 predecessor inputs, including the
+recipient key and both older custody archives, require durable readback. All three
+original inspectors are preflighted before staging the key or launching children;
+the continuation's 17-file original manifest is preserved, without its later
+conflict-policy addition. Original heads stay fixed at `3d12a7f` / `2463168` /
+`8a9aefb`. A 60-second POSIX process-group deadline also stops descendants after
+parent failure or early exit. Three known temporary key copies are removed on all
+paths; caller buffers are cleared in `finally`.
+
+Only original-source recovery of the unrelated bounded outer-header diagnosis
+permits predecessor proof and final request creation. Recovery preserves the
+core's payload-consistency-only label, separately records checked operator
+receipts and emits private collection, candidate, quarantine and optional fresh
+reconciliation outputs. No candidate gains rights approval or write eligibility.
+
+Twenty-two new synthetic regressions cover seven-request lineage, source/tree/run
+and output races, failed-result sealing, full receipt/custody tampering, complete
+source/dependency closures, historical manifest drift and private CLI failures.
+Real isolated child processes exercise success, failure and timeout, verifying
+all three key deletions and stopped grandchildren. Read-only preflight also
+succeeded against all three actual frozen historical checkouts without reading
+private custody or executing their inspectors. Local lint/typechecks, all 824
+non-Edge tests and four iOS/Android exports pass, including companion isolation
+guards; the focused current/historical operator suite passes 48 tests. The root
+check reaches Edge validation but this environment refuses its npm registry
+connection. Full root validation and all five required CI gates must pass before
+merge; exact source/CI acceptance is recorded in Issue #182. Historical Sprint
+entries below are preserved.
+
+**Next:** capture accepted operator source/CI evidence and prepare the private
+full-collection operation. Reconstruct all 22 inputs under their original source,
+record unchanged limits, save/read back a new recovery archive and let the new
+preparer write the request last. Activation uses its distinct branch and one
+first push/run only after that operational checkpoint. Complete source collection,
+fresh catalog reconciliation and individual rights review still precede any
+bounded writer. This packet creates no request branch, provider operation,
+database write, model admission or additional catalog/MVP/device acceptance.
+
+## Framed full-collection core — 2026-09-28 / #182
+
+`feat/182-framed-dump-acquisition` continues accepted framing source
+[PR #290](https://github.com/Kajooja/Kajo/pull/290), main
+`b34aca7451199e3cf78578318d8f5f151ad80c32`, after all five
+[CI #572 gates](https://github.com/Kajooja/Kajo/actions/runs/36443402209),
+806 tests/four exports. Original Edition diagnostic source remains fixed at
+`3d12a7f69534fef305b7ca37767626ae584b688e`; its private archive was not used or
+modified by this synthetic source packet.
+
+The explicit `collectFramedDumpStreams` / `acquireFramedOpenLibraryDumps` path
+now integrates full Work/Edition scanning. Only Edition enables bounded discard;
+Work parsing, selected identity guards, whole-pair exclusion, full EOF/publisher
+hashes and cumulative retention limits remain. One referenced deadline covers
+both sources, including an uncooperative opener. Late bodies are destroyed and
+late request accounting is rejected. Historical entrypoints retain their rules.
+
+The new request reconstructs the exact consumed Edition request and retains all
+seven public predecessors, original roster/pins/recipient, full-source budgets
+and 8-pair/8 MiB conflict policy. Historical diagnostic limits cannot become the
+new collection budget. Distinct result/encryption contracts replay retained
+records, suppressed partners, quarantine, coverage and new Edition counters.
+Counter validation includes decoded/LF minimums and retained-record buffer bounds.
+Failed acquisitions expose no candidates or terminal raw row. Private inspection
+states that absent discarded headers/JSON and full source bytes remain collector
+assertions, not independently replayed source authentication or rights approval.
+
+Twenty-four new synthetic tests cover both-source success, Work/Edition conflicts,
+selected/quarantined/unknown oversized failures, EOF, all retained resource caps,
+complete checksums, strict historical dispatch, tampered accounting, frozen
+predecessor/request fields and authenticated ciphertext replay. Separate-process
+checks verify timeout liveness for a stalled Work opener/stream; a cumulative
+deadline test verifies late Edition body cleanup. The focused old/new suite
+passes 62 tests. Local lint/typechecks pass with the unchanged Discovery hook
+warning. All 802 non-Edge tests and four iOS/Android exports pass; the local root
+check cannot finish Edge dependency retrieval in this environment. Full root
+validation and all five required CI gates must pass before merge; exact current
+source/CI acceptance belongs to Issue #182. Existing Sprint history is preserved.
+
+**Next:** implement the guarded operator for this new contract. Revalidate all
+seven fixed Git requests and authenticate the consumed Edition diagnosis at its
+original accepted source, including original conflict/continuation recovery.
+Add distinct first-push/first-run controls, complete source/dependency/CI binding
+and private custody preparation/readback/recovery. No actual request belongs in
+that source packet. After source acceptance, a separately bounded operation needs
+a new recovery archive saved/read back before activation. All seven old requests
+remain consumed. Complete collection, fresh reconciliation and individual rights
+review precede any writer. This packet performs no provider, database, model or
+device operation and accepts no additional catalog/MVP/release gate.
+
+## Bounded Edition framing core — 2026-09-28 / #182
+
+`feat/182-bounded-edition-framing` continues accepted result
+[PR #289](https://github.com/Kajooja/Kajo/pull/289), main
+`3c21886e142a415292f857a30e6aeeab14a67918`, after
+[CI #569](https://github.com/Kajooja/Kajo/actions/runs/36436832176) passed all five
+required gates with 786 tests/four exports. The prior diagnosis and its original
+source/custody remain unchanged; no private result was copied into this packet.
+
+The shared byte framer now supports the explicit local `scanEditionFramedStream`.
+Only an oversized row's complete canonical outer Edition header, within 4 KiB
+and outside the entire original roster, permits streaming discard until LF.
+Selected and unknown headers still fail, including pairs already quarantined
+during Work collection. Unknown headers include incomplete/invalid encoding,
+BOM/control characters, impossible dates and future timestamps. The original
+line ceiling, selected identity/metadata/Work-linkage/duplicate guards, cumulative
+retention budget and complete size/checksum/gzip verification remain.
+
+The scanner releases its pending buffer after proof and never parses or retains
+the discarded body. New counters record skipped rows/non-LF bytes and the logical
+buffer peak; all discarded bytes remain in compressed/decoded/checksum accounting.
+An unterminated oversized tail fails. Explicit source/roster/limits are checked
+and copied before stream access; a supplied conflict ledger must bind the entire
+roster. Abort/timeout/errors destroy the pipeline without returning records.
+Historical strict/conflict scans and both prefix diagnoses cannot opt in through
+extra options; their schemas and replay rules are unchanged.
+
+Twenty new synthetic tests passed locally, covering split headers, overflow,
+CRLF, consecutive skips, the 4 KiB proof boundary, selected/quarantined/unknown
+failures, preserved identity guards, full checksums/resource caps and failure
+cleanup. A streamed 32 MiB row checks allocation bounds independently of the
+reported logical buffer peak. The focused old/new scanner suite passed 73 tests.
+Local root validation passed lint/typechecks (one unchanged Discovery hook warning)
+and the first 630 tests, then remained blocked at Edge npm dependency retrieval.
+The remaining groups passed 147 tests separately: **777 local tests total**.
+Both main-app iOS/Android exports completed; companion export completion is not
+claimed from the local logs. Full root validation/four exports and all five
+required CI gates must pass before merge; exact acceptance is recorded in #182.
+Initial CI #571 exposed a liveness defect: an unreferenced deadline allowed Node
+to exit with the scan promise pending when a supplied stream had no active I/O
+handle. The new scanner now retains its timer until completion/failure and clears
+it in `finally`. A separate-process stalled-stream test verifies actual timeout,
+destruction and normal process exit. The corrected catalog suite passed 380
+tests locally, taking the non-Edge total to **778**. Historical timers are unchanged.
+All 100 local Markdown targets resolve, whitespace checks pass and the historical
+sprint tail is unchanged. No provider, database, model or device operation was
+performed. All seven previous requests remain consumed permanently.
+
+**Next:** integrate the local core into a separately versioned full-collection
+successor. Preserve original roster/pins/recipient/conflict policy/full-source
+budgets and the line ceiling. Add new request/result accounting and encrypted
+replay; bind all seven predecessors and the accepted Edition diagnosis through
+original-source recovery. Distinct one-shot controls and accepted source/CI/private
+custody must precede a separately prepared request and activation. Save/read back
+a new recovery archive first. Complete source verification, fresh reconciliation
+and individual rights review still precede any writer. No prior request is
+rerun/reset/reused and no historical discarded row is retrospectively identified.
+
+## Edition-prefix result and framing handoff — 2026-09-28 / #182
+
+`docs/182-edition-prefix-result` records the actual diagnosis after
+[PR #288](https://github.com/Kajooja/Kajo/pull/288) accepted the guarded operator
+on main `3d12a7f69534fef305b7ca37767626ae584b688e`, reviewed head
+`707205d66885f110340eaa7eaebb52868b314060`, tree
+`ac280ab67f56a3aaf55c55c51dba4c005d7aebb8`. All five
+[CI #567 gates](https://github.com/Kajooja/Kajo/actions/runs/36401690949)
+passed, with 786 tests and four exports. The owner explicitly approved source
+merge, then the prepared public request and one bounded diagnosis. The historical
+source and failure checkpoints below remain unchanged.
+
+Actual preparation verified the accepted code/workflow/package/lock closure and
+installed dependency bytes, all six fixed public predecessor requests, fifteen
+private custody inputs and the consumed conflict result through its original
+accepted recovery process. Its original continuation checkout remained fixed.
+Temporary staged key copies were removed. The separate recovery package retained
+the unchanged canonical key, original inputs, source/CI receipts and request;
+its exact archive/member readback preceded activation. When public publication
+changed the local request commit identity, the source/Git receipts and recovery
+package were updated and read back again before creating the request branch.
+
+The sole-file request is
+`scripts/catalog/requests/ol-20260831-edition-prefix.json` on
+`catalog-diagnostic/ol-20260831-edition-prefix`, head
+`be0ec18cdc968b5643e45c57c5ab9919f885e195`, tree
+`04aa72b5134bf1fa7db9a155ecabe123c7d1e5ee`, request SHA-256
+`d70b1ca97038a55718dfa9bd238a694237bff12400345fbcfc0b00f92e1a09c6`.
+Its sole parent is the accepted operator main. The retained fields were checked
+against the already-public consumed conflict request. No private key or new
+row/archive commitment was published.
+
+Explicit caps were **512 MiB compressed / 3 GiB decoded / 2,000,000 rows /
+10 minutes**, preserving the **1,049,600-byte line ceiling** and a **4 KiB maximum
+outer-header prefix**. At most four redirects/five Edition HTTP requests share
+the cumulative byte budget; Work, metadata and individual-record calls are zero.
+The distinct branch was absent and its ledger empty before activation.
+[Run 36435310394](https://github.com/Kajooja/Kajo/actions/runs/36435310394)
+completed successfully, attempt 1, including the single ciphertext upload.
+
+Private recovery checked ZIP member/CRC/digest, authenticated unseal, Git/source/
+dependency/CI and runtime chronology, and original-source predecessor recovery.
+The outcome is **`diagnosed` / `dump-line-limit`**. Its complete canonical outer
+Edition envelope classifies the newly observed oversized row as **outside the
+original roster**. This is a bounded header classification: inner JSON,
+key/type/location consistency, Work linkage, full row bytes and exact size remain
+unchecked. The scanner observes a line-size lower bound; the small header alone
+cannot establish full-row size. The partial prefix verifies neither a complete
+dump nor publisher checksums. It cannot identify the earlier discarded terminal
+row, even if positions agree. Receipt provenance is operator-captured; encryption
+alone does not authenticate the sender.
+
+The complete private ciphertext, receipts, original recovery inputs and recovered
+result are preserved, with an independent exact archive/member readback. No raw
+header, private row identifier, private artifact/archive commitment or runtime
+counter is recorded here. Candidates, approvals, database writes and model
+admissions remain zero. No fresh catalog reconciliation or device/release
+acceptance was performed. **All seven requests are consumed permanently.**
+No retry, rerun, reset, new allowance or automatic limit expansion followed.
+
+**Next:** implement and test a bounded local Edition framing correction that can
+stream-discard an oversized unrelated row only after a complete canonical outer
+header proves its key is outside the entire original roster. Keep selected and
+unknown headers as failures, preserve selected-record identity guards and all
+global compressed/decoded/row/time limits, include discarded bytes in checksum
+accounting and preserve historical replay. Synthetic tests must prove recovery
+at the next row boundary, bounded memory and correct truncation/error/abort
+behavior. This is an offline source packet; any later full-collection request
+requires separate source/CI, predecessor/custody and operational acceptance.
+Complete-source verification, fresh reconciliation and individual rights review
+still precede a writer. STATUS owns this single next packet.
+
+Files changed by this result checkpoint: STATUS, ROADMAP and this sprint record.
+No application, acquisition, parser, dependency or workflow code changes here.
+Source tests remain those of the accepted operator; this documentation PR must
+pass all five required CI gates before merge. Exact checkpoint acceptance is in
+Issue #182.
+
+## Guarded Edition-prefix operator — 2026-09-28 / #182
+
+`feat/182-edition-operator` continues the local diagnostic accepted through
+[PR #287](https://github.com/Kajooja/Kajo/pull/287), main
+`12c1dc203a4d4e5a326c6f2a64db4c5fe49b0cb4`, reviewed head
+`4278341b043671e39945b99dcb02da3a5ae5681a`, after all five
+[CI #565 gates](https://github.com/Kajooja/Kajo/actions/runs/36396734170),
+757 tests and four exports. Exact new PR/head/tree, CI and merge acceptance
+belong to Issue #182; historical source and result checkpoints below are unchanged.
+
+The separate Edition request preserves the exact consumed conflict request's
+public roster, key, pins, policy, limits and lineage. It adds an accepted local-core
+binding and six explicit diagnostic caps. Schema ceilings are 1 GiB compressed,
+8 GiB decoded, 10 million rows and 20 minutes, with the original line ceiling and
+at most 4 KiB retained prefix. No operational values are selected by this source
+packet. The original conflict exclusions do not become a prefix-scanner skip rule.
+
+The new collector requests only one bounded Edition byte range, with at most
+four redirects and no Work, metadata or individual-record calls. Exact 206 range/
+length/encoding checks precede decoding; redirect bodies share the cumulative
+budget, and invalid routes, overflow, timeout or transport errors stop. The
+result embeds the existing local diagnosis with truthful counters and no
+complete-source, candidate, approval, write or model-admission claim. All outcomes
+share one neutral encrypted payload kind; unexpected errors cannot invent a
+receipt. No raw header or classification enters public runner output.
+
+The distinct push workflow checks out clean accepted main, verifies the sole-file
+request child and all six fixed historical Git objects, then enforces its own
+first-run ledger. Read-only permissions, immutable actions, frozen dependencies
+without lifecycle scripts, a 30-minute job and ciphertext-only upload are fixed.
+The workflow/request branch is separate; every earlier ledger remains consumed.
+
+Local preparation and recovery bind their entire code/workflow/package/lock
+closure and actual ESM dependency bytes to accepted source/CI. Private custody
+checks cover fifteen required inputs, including the consumed conflict result,
+its original continuation and nested archive/key. The conflict result is recovered
+in a fresh process with its original accepted script and original continuation
+checkout. Only the authenticated Edition line-limit failure after complete Work
+can support preparation. Temporary key copies are cleaned, existing outputs are
+never overwritten, and request/summary files are written last. Encryption still
+does not authenticate the sender independently of the operator-captured receipts.
+Shared file/source/ZIP/receipt helpers retain the original conflict entrypoints'
+fixed defaults and contracts.
+
+Twenty-nine new synthetic tests cover request lineage/caps, actual curl header
+framing, bounded gzip scanning, redirects/accounting, aborts, encrypted tampering,
+first-run/source/tree guards, private output/custody, source/dependency drift,
+receipt chronology, predecessor rejection and local CLI behavior. All 51 focused
+Edition/conflict runner/recovery tests pass. A local `npm run check` attempt stopped
+at Deno dependency checking in the restricted executor. Separate database, engine,
+research and acceptance suites passed, as did all four platform exports. Complete
+root validation and all five required CI jobs remain the merge gate. Synthetic
+tests do not replace actual original-source predecessor/custody verification.
+
+Files: five new `*-edition-prefix-diagnostic.mjs` operator modules, its dedicated
+workflow, two test files and public/synthetic fixture helper; shared primitives in
+`recover-conflict-dump-acquisition.mjs`; canonical ARCHITECTURE/CODEMAP/STATUS/ROADMAP.
+No new request file, real provider request, actual predecessor rerun, database
+write, model admission or device/release acceptance is included. The historical
+terminal row remains unknown; six requests are consumed.
+
+**Next:** use accepted source/CI to prepare the actual bounded Edition diagnosis.
+Authenticate the retained conflict result through original recovery, review all
+explicit caps, freeze the new sole-file request identity and save/read back a
+separate private recovery archive before activation. Execute once and privately
+recover its diagnosed, inconclusive or failed result. Stop there; do not retry,
+expand limits or infer historical row identity from position. STATUS owns this
+single next packet; further collection, reconciliation and rights gates remain.
+
+## Local Edition line-framing diagnostic — 2026-09-28 / #182
+
+`feat/182-edition-line-diagnostic` continues the accepted result checkpoint from
+[PR #286](https://github.com/Kajooja/Kajo/pull/286), main
+`2b533a29e53f9e2145e54720b6834f91a27b89be`. That documentation source passed all
+five CI #563 gates with 738 tests and four exports. Issue #182 owns the exact new
+PR/head/tree, required CI results and merge acceptance. Historical checkpoints
+below remain unchanged.
+
+The local diagnostic reuses the existing byte framer. Its separate evidence
+contract retains an explicit prefix of at most 4 KiB, shortened at the fourth
+tab, with source/roster/limit bindings, row and decoded byte position. A valid
+complete outer envelope permits selected/unrelated classification; incomplete,
+invalid or invalid-UTF-8 headers remain unknown. The reported line size is a
+scanner-observed lower bound, never an exact size or full-row hash. The prefix
+does not validate JSON, inner identity, Work linkage, description or rights.
+
+Compressed/decoded/row/time bounds are explicit; gzip corruption, early EOF,
+overflow, timeout and parser errors fail closed. Exact partial-prefix or row/byte
+budget exhaustion is inconclusive. Buffered counters do not locate a row inside
+compressed bytes. Result validation checks payload consistency only: publisher
+checksums, full-source completion and provenance remain unverified. Existing
+strict/conflict/Work-prefix scanner entrypoints cannot enable this behavior by
+supplying an extra option and retain their original rejection rules.
+
+`npm run catalog:book-descriptions:lines` accepts only local regular-file inputs,
+an explicit limits document and the consumed conflict request as public context.
+It blocks Actions, preserves that request's line ceiling and resource caps,
+claims a new private directory under ignored catalog staging, and writes its
+diagnostic last. Standard output contains only fixed outcome codes and zero
+action counts. It authenticates neither the consumed private result nor the
+supplied local gzip bytes. No workflow, executable request or provider default
+is introduced.
+
+Nineteen synthetic tests cover selected/unrelated/unknown oversized headers,
+compressed and decoded chunk boundaries, UTF-8/CRLF byte accounting, bounded
+tails, resource limits, corruption, aborts, forged errors/evidence, context
+mutation, prior scanner behavior and actual local CLI permissions/non-overwrite.
+The focused scanner/conflict/recovery/evidence suite passes 89 tests. Local root
+check passed lint, typecheck, mobile and catalog tests, then stopped because the
+Deno npm registry connection was refused in this environment. The remaining
+database/engine/research/acceptance tests and all four platform exports passed
+separately: 729 local tests in total, excluding the blocked 28 edge tests. The
+complete root check and all five required CI jobs remain the merge gate.
+
+Files: `dump-failure-evidence.mjs`, `open-library-dump-descriptions.mjs`, new
+`inspect-edition-line-prefix.mjs` and `edition-line-diagnostic.test.mjs`, root
+package script and the changed canonical STATUS/ROADMAP/ARCHITECTURE/CODEMAP.
+No real provider diagnosis, private row publication, catalog reconciliation,
+approval, database write, model admission or device/release acceptance occurred.
+The actual failed row remains unknown and all six requests stay consumed.
+
+**Next:** implement the separate guarded one-shot Edition-prefix operator path.
+Require original-source recovery of the consumed conflict result, all six fixed
+predecessor requests, accepted source/dependency/CI, strict bounded range transport,
+first-run accounting, encrypted result/recovery and private custody readback.
+Source acceptance comes before separately reviewed explicit caps and activation;
+never reuse a consumed branch, relax the original line/identity guards or infer
+historical byte identity from matching positions. STATUS owns this one packet.
+
+## Conflict acquisition result and line-framing handoff — 2026-09-28 / #182
+
+The guarded operator source is accepted through
+[PR #285](https://github.com/Kajooja/Kajo/pull/285), main
+`24631688fbbbf73b2197768d5df686e26ff361dd`, reviewed head
+`6ef1ba8bf158dc80c3d1b1cf05942a1931bb198e`, tree
+`b0002f6381f0dce0ff05256846d04607b3cd96dd`. All five
+[CI #561 gates](https://github.com/Kajooja/Kajo/actions/runs/36388094791) passed:
+738 tests and four exports. Historical source checkpoints below remain unchanged.
+
+Actual local preparation verified the source/dependency closure, accepted CI,
+original public request Git objects and retained predecessor archive readback.
+The original accepted inspector authenticated the real predecessor in a fresh
+process; policy replay then produced the successor request. A separate private
+recovery archive was saved and read back before the request branch was created.
+
+Operational caps were explicitly frozen at **8 conflicted original pairs and
+8 MiB diagnostics**: about 2.1% of the unchanged 383-pair roster and one eighth
+of the unchanged combined retention cap. Both are independent stop conditions,
+not text approval. The two pinned source streams retain their original byte,
+row, time and redirect limits. The sole-file request branch
+`catalog-acquisition/ol-20260831-conflicts`, head
+`11bada2563374616cc8d014d787039c9235ea071`, is a child of accepted main.
+[Run 36391833763](https://github.com/Kajooja/Kajo/actions/runs/36391833763)
+activated once on its first attempt and completed with failure on September 28.
+The ciphertext upload succeeded.
+
+Private recovery checked the actual ZIP, authenticated ciphertext, accepted
+source/dependencies/CI, request Git identity, runtime receipts and predecessor
+custody. It verified a consistent failed result with `dump-line-limit` in the
+Edition source. Work completed with publisher checksum verification; Edition
+did not complete. Full dump checksums are collector assertions checked against
+the pins, not hashes recomputed from full local dumps. The failed contract
+discards candidate records and retains no terminal row evidence. Its identity,
+contents, exact size and selected/unrelated status cannot be inferred. All
+private evidence and recovery outputs are preserved separately; no new private
+row, artifact or archive commitments are published here.
+
+Offline code review confirms that `createDumpRowParser` checks the pending byte
+length before `line()` classifies the target. The fixed error code therefore
+does not identify a selected row. Existing historical/core behavior is unchanged.
+No fresh catalog reconciliation, rights review, description approval, database
+write, model admission or device/release acceptance occurred.
+
+**Next:** implement and test a local-only bounded Edition line-framing diagnostic
+contract. Bind minimal prefix evidence to the source and truthful counters;
+distinguish unknown selection from classification established by a valid bounded
+envelope. Cover oversized selected/unrelated rows, chunk boundaries and existing
+resource guards with synthetic inputs. Keep current parser limits, source pins
+and identity rules. Any actual diagnosis requires a separate accepted request
+and private recovery custody. All six requests are consumed; never rerun or
+update the request branch, raise a limit or start another provider operation
+from this result checkpoint. STATUS owns this single next packet.
+
+## Guarded conflict operator path — 2026-09-28 / #182
+
+`feat/182-guarded-conflict-acquisition` continues PR #284/main
+`686ac92fe5900287c0699ba69434b743e3e2515d`, accepted with all five CI #559 gates,
+716 tests and four exports. Exact operator PR/head, validation and merge acceptance
+belong to Issue #182. Historical checkpoints below remain unchanged.
+
+The distinct workflow/runner binds accepted main, policy/core ancestry, one sole
+added request, all five fixed predecessor Git objects, first push/run and an
+independent spent ledger. It retains frozen dependencies, read-only permissions,
+exclusive private output and ciphertext-only upload. The collector's validated
+failure result is sealed; unexpected exceptions cannot fabricate accounting.
+
+Local preparation authenticates retained predecessor evidence using its original
+accepted inspector in a separate process, with exact bootstrap/source/dependency
+verification. Private custody checks compare actual archive bytes and every
+required input member, including the key, to the operator-captured durable readback
+receipt. Policy replay precedes request output. No new private archive/artifact/
+row commitment enters a public request. Recovery verifies source/CI/dependencies,
+request Git lineage, run/artifact/ZIP provenance, encryption and payload consistency.
+Its provenance label accurately describes supplied operator receipts, not a
+cryptographic sender attestation. Suppressed records never become candidates.
+
+Synthetic tests exercise successful sealing, real tiny-gzip failure, exhausted
+ledgers, edited sources/dependencies, altered receipts/ZIP/custody, CLI isolation,
+private output refusal and unchanged historical/core contracts. Ordinary CI does
+not fetch publisher dumps. No actual request, provider execution, language/rights
+approval, catalog write, model admission or device acceptance occurs here.
+
+Next after operator source acceptance: freeze explicit operational caps, capture
+the accepted source receipt, authenticate the actual retained predecessor, prepare
+one request and save/read back a separate private recovery archive. Only then
+publish the sole-file child and execute once. Recover the result and stop at
+failure or unreviewed collection. All five prior requests remain consumed;
+STATUS owns the current next task.
+
+## Conflict-aware acquisition core — 2026-09-28 / #182
+
+`feat/182-conflict-acquisition-core` continues accepted PR #283/main
+`1f3bd049a37f182a773a4101791f9962b87cfb99`, whose five CI #557 gates passed
+678 tests and four exports. Exact core PR/head, validation and merge acceptance
+belong to Issue #182. This checkpoint advances the earlier successor-contract
+handoff; all historical entries below are preserved.
+
+The separate successor request freezes original public roster/key/pins/limits
+and consumed lineage, accepted policy source, implementation source and explicit
+policy caps. It adds no private predecessor artifact or row commitments. The
+collector reuses the official transport and complete Work-then-Edition scanner;
+existing acquisition entrypoints remain strict. Tiny real gzip fixtures exercise
+the same core through a mandatory injected source opener with no network default.
+
+Complete results separate surviving pairs, suppressed valid counterpart records
+and one bounded quarantine ledger. Retained suppressed raw evidence permits exact
+private replay and byte accounting without becoming candidates. All diagnostics
+and valid records share the cumulative cap. Failure discards both record arrays
+and the whole-source manifest, preserves truthful partial counters/prior bounded
+quarantine, and explicitly reports that terminal row evidence is unavailable.
+New fixed error codes never disclose provider text.
+
+Strict new seal/unseal wrappers reuse bounded encryption and reject altered
+requests/results. Pure recovery checks raw records, policy evidence, source
+assertions, counters and original/fresh snapshots. Its explicit payload-only scope
+does not claim authenticated GitHub provenance or rehash the absent full dumps.
+All surviving candidates remain unapproved; no catalog write or model admission
+is delivered. Tests are synthetic and ordinary CI makes no real dump requests.
+
+The packet delivers the reusable core, not an operational acquisition. Next
+implement one distinct guarded runner/workflow, local authenticated predecessor
+preparation and a source/dependency/CI/run/artifact-bound recovery inspector.
+Freeze explicit operational policy caps and preserve/read back private recovery
+custody before request publication. All five predecessor requests remain consumed;
+no new provider budget, executable request or activation occurs here. Fresh
+reconciliation and individual rights review still precede a separately bounded
+writer bridge. STATUS owns the single next task.
+
+## Offline conflict policy and hygiene — 2026-09-28 / #182
+
+`feat/182-offline-conflict-policy` continues accepted main
+`e0c26144de6270589a0e2bf8e1a4958c698f17e8`. Exact PR/head, required CI and merge
+acceptance belong to Issue #182. This checkpoint supersedes the preceding
+result's next-task instruction while preserving every historical entry below.
+
+The explicit local `stage-with-conflicts` command requires a versioned policy
+and positive pair/diagnostic budgets. It replays original v2 failure evidence,
+checks same-kind foreign canonical location outside the roster, and independently
+validates matching revision/time and Edition Work links. The immutable ledger
+excludes the whole original pair; it never remaps identity or approves text.
+Both sources still require full EOF/gzip/checksum verification. Duplicates,
+malformed rows, unsupported conflicts and exhausted budgets abort. Quarantined
+rows and suppressed counterparts remain charged to the cumulative staging cap.
+Private result artifacts bind source/targets/policy/roster and distinguish
+physical matches, exclusions, missing survivors and retained/consumed bytes.
+The strict parser, existing cloud paths and historical recovery rules remain.
+The source-bound inspector's closure now includes the imported policy module.
+
+Synthetic policy and gzip intake tests cover both source directions, subsequent
+failures, exact accounting, CLI isolation and immutable evidence. The retained
+private evidence also replays against the narrow policy locally. No raw evidence,
+private identifiers or diagnostic hashes are added to fixtures or public output.
+Source validation results and any environment limitation are recorded in #182.
+No new acquisition, description approval, catalog write or model admission occurs.
+
+The read-only hygiene audit found no broken local Markdown links/anchors,
+detected secrets, tracked raw/generated/temp outputs, empty files or exact
+file duplicates. Workspace declarations, lock metadata and CI script references
+agree. All five consumed request branches retain their frozen identities.
+No unrelated cleanup was warranted; no release requirement was marked complete.
+
+Next after source acceptance: specify and test the conflict-aware one-shot
+acquisition request/collector/result/recovery contract and explicit operational
+caps, preserving original roster/key/pins and authenticated predecessor custody.
+All five prior requests remain consumed. This local policy grants no new provider
+permission/budget; fresh reconciliation and individual rights review still
+precede a separately bounded writer bridge. STATUS owns that single next task.
+
+## Full-acquisition continuation result and handoff — 2026-09-27 / #182
+
+[PR #281](https://github.com/Kajooja/Kajo/pull/281) is accepted as main
+`8a9aefbf87870abd932dac53c6d4abae7fd0683d`, tree
+`3f4cff0502950fe708881595b6053e97d8d46a79`. All five
+[CI #553 gates](https://github.com/Kajooja/Kajo/actions/runs/36347927166) passed,
+**645 tests / four exports**. This supplies source acceptance for the implementation
+checkpoint below; its earlier publication/activation instructions are historical.
+
+The public request branch `catalog-acquisition/ol-20260831-continuation` advanced
+to `f2558795be45be17bd2632071cf25746e4ec82a2`, tree
+`7e7e10f14a9e7342eab2bff140014bcfdcaf30f9`.
+[Run 36349027698](https://github.com/Kajooja/Kajo/actions/runs/36349027698)
+executed on push, attempt 1, and completed with failure on September 27.
+Private recovery and authentication verification are complete. The owner retains
+the private evidence separately. This packet produced zero approvals and zero
+database writes.
+
+All **five requests are consumed**. Do not rerun the continuation, alter its
+request/caps or reset a ledger. The single next task is to **specify and test an
+offline selected-record conflict/quarantine policy**. Preserve foreign-location
+rejection and make no automatic remapping. Continuing a scan while explicitly
+excluding conflicted records changes failure policy and needs its own source
+packet plus a separately specified one-shot acquisition. This handoff grants no
+new provider permission/budget, catalog write or model admission.
+
+The packet stops at recovered failure and this handoff. Full-source verification,
+fresh catalog reconciliation and source-specific language, origin and rights
+review remain before a separately bounded writer bridge. The two existing
+approved paragraphs, completed pilot and catalog/device/release gates stay intact.
+
+## Full-acquisition continuation implementation — 2026-09-27 / #182
+
+`feat/182-full-dump-continuation` implements the accepted PR #280 specification
+from main `d05419f140ac42c99318b4788d1cf9606edb0e9a`. Exact source PR/head,
+required CI and merge acceptance belong to Issue #182. No executable request,
+provider access, catalog mutation or model admission is part of the source PR.
+
+The separately named request retains the exact canonical reviewed body: original
+383 pairs, recipient, both publisher pins, source evidence and limits. Local
+preparation authenticates the frozen prefix ciphertext and v1 diagnosis, replays
+the captured row through the corrected live identity guard, and checks its outer
+revision/time. The row's rejected description remains independent from identity.
+The source receipt binds the accepted Git tree, five successful CI jobs, workflow,
+lockfiles, complete first-party import closure and loaded hashing dependency.
+
+The new runner checks current accepted main, clean source, correction ancestry,
+all four fixed predecessor Git objects, exact sole-request child, push/run/head
+identity and its own first-run ledger. It rejects existing output before any
+network use and exclusively claims a private output directory before provider
+streams. Work failure prevents Edition access; Edition failure remains an
+overall failure with all candidates discarded. Source bytes retain the accepted
+counter meaning, not a claim to measure every redirected network byte.
+
+A small shared pinned-result adapter fixes continuation failure validation
+without broadening historical request dispatch. New continuation identity
+failures require v2 evidence; archived v1 receipts preserve their original rule.
+Only authenticated ciphertext leaves Actions, with sanitized public errors.
+The offline inspector checks exact Git/source/dependency/CI/request/run/artifact
+bindings, ZIP CRC/sole member/hash, envelope authentication, raw record and
+inspection hashes, source manifests, accounting and coverage. It never turns
+collected descriptions into approvals. Operator-captured GitHub evidence is
+checked against Git and downloaded bytes; public-key encryption alone is not
+sender authentication.
+
+Focused tests cover strict request mutations, actual corrected-row semantics,
+zero-metadata v2 failure sealing, environment/tree/ledger/output gates, failed
+Work/Edition behavior and private recovery provenance. Existing collector tests
+retain synthetic complete two-source EOF/checksum coverage and sparse/malformed
+outcomes. A private memory-only preparation smoke authenticated the actual saved
+prefix with the original key; no executable request file was emitted. All **34 new focused tests** pass after independent review. The existing
+54-test envelope/reviewed/failure/prefix subset also passes. Local root validation
+passed lint/typechecks, 248 mobile and 3 contract tests plus the catalog suite;
+its frozen Deno dependency check timed out at restricted registry access after
+240 seconds. Separate remaining database, engine, research and companion tests,
+all four exports and companion isolation guards passed. All five required remote
+CI gates remain mandatory. Exact source/CI acceptance belongs to Issue #182. At this checkpoint the code
+is local commit `dc9588a06ba1000d02babc483fb7aca1cf1674bd`, tree
+`205a51d7ff99c42a646f3f65431971a1ef9d04fa`. A real local source-binding smoke
+verified 17 source and eight dependency files. The initial automatic source-upload rejection required explicit publication
+consent; the owner supplied it on September 27 for public `Kajooja/Kajo` and merge
+after CI. The source is ready for publication; STATUS owns current acceptance.
+
+
+After source CI/merge, recover the two unchanged archives named in the planning
+checkpoint below. Verify their recorded hashes, then create a **separate** private
+continuation archive containing the original key/snapshot, predecessor artifacts
+and receipts, accepted source/CI/dependency receipt, prepared request bytes and
+inspector. Use `prepare-full-dump-continuation.mjs request` with
+`--reviewed-request`, `--prefix-request`, `--prefix-input`, `--source-head`,
+`--source-receipt`, `--repo`, `--key-dir` and a new `--out` file. Preparation and
+recovery are local-only; retain the exact accepted checkout for inspection.
+
+Durably verify custody before advancing the sole request branch. After one run,
+record GitHub provenance, download the exact artifact and run the accepted-source
+inspector. Stop at recovered failure or unreviewed collected records and update
+STATUS. Fresh read-only catalog reconciliation, source-specific language/rights
+review and a separately bounded writer bridge remain later gates. The completed
+pilot, four predecessor ledgers and all release/device requirements stay intact.
+
+## Full-acquisition continuation plan and handoff — 2026-09-27 / #182
+
+The owner requested one further completed packet and a clean new-conversation
+handoff. The [selected continuation specification](../../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182)
+defines one new full Work/Edition acquisition after the accepted identity fix.
+This packet changes documentation only. It creates no workflow, provider request,
+raw-data copy, database change, APK dispatch or model admission. #182 and all
+remaining catalog/MVP/device gates stay open.
+
+PR #279 is accepted as `8c4d8ecf65187f12bb30ed4207d03848fd87d292`, tree
+`50e848ed291309c549790ebdabe91e2857abc01e`, reviewed head
+`1a7f15ab0626f6c3d4ad823be72a1085578b94f1`. CI #549/run 36343239488 passed all
+five gates, **611 tests / four exports**. Its 87 focused tests and independent
+review include exact self-location and frozen v1 replay. The final private
+`Kajo-book-work-prefix-diagnostic-20260927.zip` recovery package contains
+**25 members / 101,412 bytes**, SHA-256
+`a3abd65a7cf6355fd6cd0349b03ca16610526611aba8df7e80c907c50e1d5775`.
+It retains the prefix source/request/run/artifact, key, captured row, replay and
+accepted correction receipt. Its original inspector remains bound to PR #278
+main `99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1`, not current main.
+
+Resume from refreshed accepted main and Issue #182, then create
+`feat/182-full-dump-continuation`. Reuse `acquireReviewedOpenLibraryDumps` and the
+existing scanner/encryption/record validators; add the separately named request,
+local preparation/recovery, one-shot runner/workflow and meaningful regression
+tests defined in ARCHITECTURE. Do not add an actual request file to the source PR.
+The design is selected; implementation, full CI, source merge, durable custody,
+activation and real two-file result remain pending in that order.
+
+For local preparation recover the saved prefix package above and
+`Kajo-book-reviewed-acquisition-20260924.zip` (version 2, **28 members /
+152,823 bytes**, SHA-256
+`345bc96a22c927d58e5492c4e7ad1490ed8488233e01e82587628a126ac4166d`).
+Use retained original roster/key/source pins and receipt lineage. No new key,
+provider metadata lookup or re-created historical result is needed. Do not expose
+private rows/UUIDs/keys in Git. A separate continuation archive must be durably
+saved before the new request branch is advanced; existing archives stay intact.
+
+Stop the implementation packet after one recovered failed or collected result
+and an updated handoff. A failure keeps its spent ledger and bounded evidence;
+a collection is unreviewed private input for fresh catalog reconciliation and
+source-specific text/rights review. It is not an apply packet. The two existing
+approved paragraphs and all earlier consumed attempts remain unchanged.
+Independent contract review checked the actual collector, request/envelope
+validators and current-task instructions. All **67 local Markdown targets** and
+whitespace checks pass. No code changed or new local root suite was needed;
+this planning PR's required CI and exact merge acceptance belong to Issue #182.
+STATUS owns the next action.
+
+## Exact self-location correction — 2026-09-27 / #182
+
+`fix/182-self-location` supplies the offline source correction. Issue #182 owns
+its exact source head and required-CI acceptance. The authenticated Work-prefix
+row below establishes that the presence-only `location` guard rejects a record
+whose location is its own exact canonical Work path. It does not establish why
+the provider retained that field or prove that the discarded earlier row had
+identical bytes.
+
+The narrow correction accepts absent or exact self-location only after the
+existing object, exact key and exact type checks. Foreign paths, null/non-string
+locations and real `/type/redirect` records remain rejected; Edition Work linkage
+and all text/source bounds remain mandatory. New captures use
+`open-library-selected-row-failure-evidence-v2` with
+`record-location-mismatch`. Historical v1 evidence retains the frozen
+`record-location-present` rule, original parsing order and bounds, without
+rewriting a receipt or reclassifying the prior result as success.
+
+Independent review and **87 focused tests** pass. Actual private replay with the
+new source authenticates the original v1 ciphertext and preserves its canonical
+plaintext and captured-row SHA-256 values unchanged. Current `inspectRecord`
+accepts the exact self identity, and revision/modified fields match the outer TSV
+envelope. Its description still fails the text rule as `markup-or-url`: this
+produces zero candidates, approvals or writes. This is offline fixture and actual
+receipt evidence; required full CI acceptance remains separately recorded in
+Issue #182.
+
+Confirm source acceptance in Issue #182, then specify a separate bounded
+full-acquisition continuation using retained source pins/roster and explicit
+recovery. No new full request has been selected or activated. Consumed requests
+remain consumed; full publisher EOF/checksums, fresh reconciliation and rights
+review still precede any catalog write. The source correction itself performs
+no provider, database, migration, APK or model-admission action.
+
+## Bounded Work-prefix diagnosis — 2026-09-27 / #182
+
+Implementation resumed on September 27 after interruption. [PR #278](https://github.com/Kajooja/Kajo/pull/278)
+is accepted as main `99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1`, tree
+`00cd5b4ff7a91ec21bafa7e6a76bd4a82267b356`. Reviewed head
+`906243aadb3b7f229a6c8392f85620dfc1325a39` passed all five
+[CI #547 gates](https://github.com/Kajooja/Kajo/actions/runs/36341667520),
+**606 tests / four exports**. The preceding CI #546 test-environment failure was
+corrected without changing production behavior. Twelve stream/transport tests,
+twelve request/envelope/runner tests and ten private recovery tests cover the
+new protocol and offline receipt/code/artifact bindings.
+
+The request freezes the same Work source (full size **4,058,336,593 bytes** and
+existing publisher pins), original 383-pair roster and recipient. Only bytes
+**0–104,857,599** are requested. Strict HTTP 206 range/length and identity encoding,
+**1 GiB decoded / 1,000,000 rows / 600 seconds / four official redirects** and
+no full-download fallback remain the accepted contract. The complete request,
+original private key and source receipt were retained before activation.
+
+| Actual one-shot identity | Value |
+| --- | --- |
+| Request commit / tree | `6a6dc390940db1b15d68a8d850dd08bfbb88bd4a` / `f605c4f44cbcfff3d297fcfdc6cab371b60a1e90` |
+| Canonical request SHA-256 | `03c4e1abf4ce3d67452239b76c5d1a0fd18d0bef0c41767c99075f88c1c26bc8` |
+| Actions run | [36342443617](https://github.com/Kajooja/Kajo/actions/runs/36342443617), successful attempt 1 |
+| Diagnostic interval | `2026-09-27T18:55:42.844Z`–`2026-09-27T18:55:52.033Z` |
+| Artifact | `10939256706`, ZIP **14,021 bytes**, SHA-256 `d3b8c99729ea8f10f7458becff6be8f0b061aaaeaf8cdfdd0b127dde76b7e0ae` |
+
+Authenticated recovery yields `diagnosed` / `record-location-present` at row
+**804,172**, selected Work **OL82565W** / Edition **OL59004684M**. The outer key and
+JSON key are both `/works/OL82565W`; the outer and JSON types are both `/type/work`.
+The JSON `location` is exactly `/works/OL82565W`. Its **5,234-byte** captured row
+has SHA-256 `36052131a5d776e82658e741280683eaf38b18930fcf89717af2a68b9c161752`.
+Raw row bytes remain private, outside Git. The historical guard's rejection was
+replayed offline against the verified accepted source.
+
+Accounting records **78,821,206 observed body bytes / 78,690,134 accepted
+compressed bytes / 456,982,528 decoded bytes**, eleven preceding matches and
+804,160 unrelated rows. The two Work GETs include one HTTP 302 redirect. Buffered
+counters are not exact row byte offsets. There were **zero metadata, Edition,
+per-Item or database requests**, zero full-source EOF/publisher-checksum
+verifications, review candidates, approvals or writes. The partial-source result
+does not establish rights to the captured description.
+
+The private inspector verified the complete fifteen-file accepted source binding,
+request/run provenance, artifact ZIP CRC/hash and authenticated unseal. The
+request on `catalog-diagnostic/ol-20260831-work-prefix` is now consumed. Do not
+rerun it or change its request/caps. Existing recovery archives remain unchanged.
+The diagnosed current row has the same position as the earlier acquisition
+failure, but that failure discarded its row/hash: byte-identical historical
+reproduction cannot be established. The narrow correction above follows this
+new observed evidence; it does not retroactively change the old receipt.
+
+## Offline selected-row failure evidence — 2026-09-24 / #182
+
+`fix/182-dump-failure-evidence` implements the bounded failure-evidence forward.
+The shared parser retains at most
+one selected row when the unchanged identity guard fails. The versioned private
+object binds the exact source, roster, expected Work/Edition pair, dump row,
+fetched time, raw Base64 bytes/hash and object/key/type/location predicate.
+Raw bytes exclude LF, retain any CR, and record whether LF terminated the row.
+Recovery validates all bounds/bindings and replays the predicate before exposing
+the private diagnosis. Historical receipts without this field remain valid.
+
+Diagnostic bytes are separate from matched-record accounting. The public failure
+code remains fixed; raw input and precise predicates stay in encrypted output.
+Failed streams remain incomplete and produce no source checksum verification,
+review candidates, approvals or database writes. This implementation cannot
+restore the real row discarded by run 36003953876; its exact cause remains unknown.
+
+Independent review and **86 targeted tests** pass, including all four predicates,
+actual maximum-size CRLF rows, UTF-8 chunk boundaries, Work/Edition cases,
+untrusted transport errors, both collector/encryption paths and a correctly
+encrypted but internally forged payload. The local integrated check passed
+lint/typechecks, **248 mobile and 159 catalog tests**, then reached frozen Deno
+npm dependency downloads. [PR #277](https://github.com/Kajooja/Kajo/pull/277) is
+accepted as `3e865ac9ecfcda427ab03d50d1592ff72b4d038d` after all five
+[CI #544 gates](https://github.com/Kajooja/Kajo/actions/runs/36008368238).
+The new unsealer also opened the actual prior reviewed failure and metadata
+diagnostic; historical payloads and missing-evidence meaning stayed unchanged.
+No source request, database change or new artifact recovery was fabricated.
+
+After source acceptance, evaluate one separate bounded Work-source diagnosis
+plan against the same release/roster/recipient. Declare byte/row/time limits and
+stop at the first selected identity failure to recover one encrypted row and
+replay its actual predicate offline. The patch adds no request or trigger and
+activates no provider budget; all consumed requests remain consumed.
+
+## Reviewed acquisition failure and offline handoff — 2026-09-24 / #182
+
+After accepted PR #275/main `349c8b5e27b9a0eb88e178f19361e2bea0d7a026`,
+the owner authorized the separately reviewed request
+`4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb`.
+[Run 36003953876](https://github.com/Kajooja/Kajo/actions/runs/36003953876)
+failed on its only attempt at **13:11:37 UTC**, with
+`provider-identity-mismatch` at Work dump row **804,172**, whose key was in the
+selected roster. Collector accounting reports **78,731,116 compressed / 456,982,528 decoded bytes**, eleven preceding
+matches and 40,567 transient selected-record bytes. Those counters are not row
+byte offsets or full-source integrity evidence. The failed artifact contains
+**zero raw records**; selected target and failing predicate remain unknown.
+No Edition stream, complete EOF/checksum, review candidate, approval or database
+write occurred. Authenticated private recovery bound source/request/run/artifact;
+read-only comparison at **13:14:31 UTC** confirms all **383** targets unchanged.
+
+Recovery **version 2**, `Kajo-book-reviewed-acquisition-20260924.zip`, retains
+28 verified members / **152,823 bytes**, SHA-256
+`345bc96a22c927d58e5492c4e7ad1490ed8488233e01e82587628a126ac4166d`.
+It includes the ciphertext, run/source receipts, fresh snapshot, inspection and
+offline failure proposal. The request is consumed; no retry is selected.
+
+The next packet is source-only and offline: retain exactly one failing selected
+TSV row within the existing 1,049,600-byte line bound, with raw-byte hash,
+source/row/expected-roster identities and fixed private object/key/type/location
+predicate codes. Forward a versioned bounded failure object only through encrypted
+output; distinguish its bytes from matched-record accounting. Recovery must verify
+hashes/bindings and reproduce the predicate, while accepting historical receipts.
+Tests cover all predicates, `location: null`, bounds, tampering, encryption and
+public-log silence. Keep the original guard fail-closed and public code fixed;
+a failed stream supplies no success candidates or full-source verification.
+This packet authorizes no provider calls, new acquisition, review or database write.
+
+## Reviewed exact-source acquisition implementation — 2026-09-24 / #182
+
+The exact-byte metadata diagnosis selects a separately reviewed request with
+**16,644,821,648** compressed bytes and immutable Work/Edition size/MD5/SHA1 pins.
+The old 15 GB acquisition and metadata diagnostic retain their original limits,
+request bytes and consumed-run status. The new fixed request branch is
+`catalog-acquisition/ol-20260831-reviewed`; its sole added path is
+`scripts/catalog/requests/ol-20260831-reviewed.json`.
+
+Local preparation first checks the known diagnostic ciphertext hash and performs
+authenticated decryption with the original recipient key. It re-derives both
+source pins from those exact observed bytes and preserves the original 383-pair
+roster. The runner verifies both predecessor Git objects, exact source ancestry,
+sole request change and separate first-run ledger. No new metadata, per-Item,
+ratings or database request is possible. The shared streaming verifier still
+requires complete EOF/gzip integrity, exact sizes/MD5/SHA1 and computed SHA-256;
+all decoded/row/line/retained-memory bounds remain unchanged. Only ciphertext
+success/failure recovery leaves the public runner. The collector deadline remains
+110 minutes within a 120-minute job; no automated retry or dispatch exists.
+
+Independent core/workflow/envelope/docs review passed with **70 targeted tests**.
+Actual local preparation smoke used the retained original roster, diagnostic
+ciphertext and key; altered ciphertext and wrong keys failed. It emitted no
+request file and made no network calls. The integrated local check passed
+lint/typechecks, 248 mobile and 143 catalog tests before the frozen Deno registry
+network boundary. [PR #275](https://github.com/Kajooja/Kajo/pull/275) then merged
+as `349c8b5e27b9a0eb88e178f19361e2bea0d7a026`, exact tree
+`c201ff7e351e0bfaf7d02e8e4abb36e80b2f0408`, after all five
+[CI #539 gates](https://github.com/Kajooja/Kajo/actions/runs/36000730750),
+**566 tests / four exports**. Durable request/key recovery preceded the actual
+activation recorded above; source acceptance does not imply a completed scan.
+
+A separate publisher-documentation check also records that Open Library ratings
+and reading-log dumps have no subject key, so they cannot supply individual taste
+profiles. Their download/training is not part of this acquisition. The source
+registry retains this limitation and the unresolved aggregate-use rights gate.
+
+## Canonical catalog feature sensitivity — 2026-09-24 / #273
+
+The continued MVP request selects this independent offline packet alongside
+primary #182. It uses the accepted #269 snapshot/registry and byte-identical
+canonical Personal bootstrap SQL in disposable PGlite, with a hash-bound fixed
+clock. The three predeclared arms isolate added provider-concept coverage (C−B)
+from broader tag representation changes (B−A). The local preregistration commit
+`aca84fa21c02040d0ceaaa513d9a6b5e818c597a` precedes scoring; a private source
+archive/receipt preserves it separately from later public publication.
+
+Two independent processes reproduce identical result/report bytes from 840
+Items, 12 distinct whole-Item anchors, 24 synthetic profiles and 144 domain-specific
+top-50 queries. C−B changes all 24 BOOK memberships (600 entries and 600 exits as
+Item-query occurrences), and none of the 24 MOVIE lists. The existing SQL's 0.1
+FOR_YOU novelty contribution for unmatched nonempty tags explains MOVIE→BOOK
+changes despite zero bootstrap transfer. A dedicated fixture regression confirms
+that mechanism. B−A changes all 48 memberships: no neutral serving replacement,
+real-user quality improvement or cross-domain taste transfer is established.
+
+Protocol SHA-256 `90bfb9d250b4dfa2bb41dcd8f94d8c01fdbf401b5ca235022366f3116ab015db`;
+freeze `f938a0f191b79e1016297a09223f4505d8fb54454b266bbab405c46431defbba`;
+private result bytes `2039354833777359e8598d2c56b4f4ddbde3a36225350492f80e2638083c86ed`;
+public aggregate bytes `ff5deac98815ecef739172dced2b78d146ec001d7d2390b2a3a040cc2139b571`.
+The [full report](../../../research/reports/catalog-feature-baseline-273.md)
+records selection bias, conditional top-50 metrics, exact source/runtime hashes,
+clock boundary and the approximately 925 MiB observed fixture memory cost.
+
+Independent protocol/results review passed, including direct private-result
+checks of novelty and all table counts. Local lint/typechecks, 248 mobile,
+128 catalog, 63 database, 44 engine, 32 research and 8 acceptance tests passed;
+four exports and companion guards passed separately. The combined 180-second
+check stops on frozen Deno npm-registry access in this environment.
+[PR #274](https://github.com/Kajooja/Kajo/pull/274) then merged as
+`15bff8ddfb4b698b367b265123de3a83488ed70a`, after all five remote CI gates,
+**551 tests / four exports**; #273 is closed. No production state, SQL migration,
+trained artifact, native Event, admission or #182 source budget changes here.
+
+## Completed metadata diagnosis — 2026-09-24 / #182
+
+PR #272 is accepted on main `d3681fcdfa9a877b0f314159d87208d0ccd0f7f8`,
+exact tree `c7267e44c0c1b93ffcfa2c4c92f392e5724b6914`, after all five
+[CI #536 jobs](https://github.com/Kajooja/Kajo/actions/runs/35997619768),
+541 tests and four exports. The root local gate passed lint/typechecks and
+248 mobile / 118 catalog tests, then hit the 150-second frozen Deno registry
+network limit. Independent review and 55 targeted tests passed.
+
+The separately prepared request `bbc351eb9fa7eee0fb25f2183be3c1a729b59191`,
+canonical SHA-256 `24d82539a439fb156cab3f740beb8d2d23c55e0ca82a7b2d71db259215bed488`,
+was retained before activation. [Run 35998771483](https://github.com/Kajooja/Kajo/actions/runs/35998771483)
+succeeded on attempt one, 12:23:41–12:23:54 UTC. Artifact **10807770129**,
+**18,243 bytes**, passed ZIP digest/CRC and authenticated recovery. ZIP SHA-256:
+`b7f4da1d6e13a25e10de4864980db664df871b6dd0be281d0ded1e2fdd958f45`;
+sealed JSON: `b03d6ed815c4f5d0b44dedea7cbe740b4061acad7e7679d3be8cac300a8f0a77`;
+plaintext: `9190228268817d70bd113568d6eef36391d5fcec3f17d51f703454e47a0b689e`.
+
+The recovered **4,248-byte** body exactly matches the original
+`b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+The original metadata validator is byte-identical and reproduces
+`acquisition-compressed-byte-limit`. Exact publisher source pins:
+
+| File | Compressed bytes | MD5 | SHA1 |
+| --- | ---: | --- | --- |
+| Works | 4,058,336,593 | `eda3a83f9dbc85a4d8f7cde838f070b5` | `c9362f345368cdc8bf64efcc05d6e4b590974cb6` |
+| Editions | 12,586,485,055 | `da4de1cca148aa85bea0707a63ffa212` | `e09e00630797598aab877ec542596b1b58f6b87c` |
+
+Their total **16,644,821,648** exceeds the original **15,000,000,000** cap.
+Thus the historical cause is established; the prior entry's uncertainty is
+superseded by this exact-byte reproduction. One metadata GET, zero dump/per-Item/
+ratings requests, approvals or database writes. The diagnostic is consumed.
+Recovery version **4** retains 27 verified members, **137,782 bytes**, SHA-256
+`d7fc6ae44047aee30720fd9cc519aa60556e3fce54dcf3f3caabaaf1da486087`;
+original run/request/source receipts remain unchanged.
+
+The continued owner instruction now selects a distinct reviewed acquisition in
+`fix/182-reviewed-dump-budget`, bound to these exact two pins and total size,
+the prior diagnostic provenance, original roster/recipient and accepted source.
+Old protocol ceilings and consumed requests remain unchanged. It requires no
+fresh metadata GET; source CI/merge and durable custody precede activation.
+No full scan, extra text, rights decision or database change is claimed here.
+
+## First cloud acquisition and metadata diagnosis — 2026-09-24 / #182
+
+PR #270's concept audit is accepted on main
+`690268b9d7f982e1dd10e9dcf059bb8906529504` after all five CI #532 gates,
+500 tests and four exports. Collector PR #271 follows as
+`ec17a0738702074dedecff00e60a2e529939c8fc`, exact tree
+`138067fc92a48f210a0713554b2f8aa37b20e085`; head
+`d892c2d29dca3284c2fb47ad276424bb7c095369` passed all five
+[CI #533 jobs](https://github.com/Kajooja/Kajo/actions/runs/35993942738),
+**528 tests / four exports / companion isolation**. Its post-#270 merge tree is
+identical, preserving the tested source without a squash/ancestry conflict.
+The composed local check passed lint/typechecks, 248 mobile and 105 catalog tests
+before its 150-second Deno registry timeout; CI supplied the complete gate.
+
+The exact public request commit
+`4308943cf0157ec6648017a0bf7a25e5b0876c5a` is one child of accepted source and
+adds only the allowlisted request file. Canonical request hash:
+`9ac96783138824653f8e23eb9bf47c93ed30b7f7e3db658afd25b348f16b6f50`.
+It was durably retained with the key before the one activation. Actual
+[run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978),
+attempt one, ran **2026-09-24 11:50:15–11:50:28 UTC** and failed after metadata
+validation. The publisher returned **4,248 complete bytes**, SHA-256
+`b5613fc9b54dbd4592cfd71a71571d0e17028be76c9592eb1c7152ae7df3742b`.
+Accounting records **one metadata GET / zero Works or Editions GETs / zero dump
+bytes / zero retained records / zero approvals / zero database writes**.
+
+The failure step still uploaded only ciphertext. Artifact **10805673376** is
+**2,429 bytes**, ZIP SHA-256
+`a97aed35be266b0d80c7f29364ee7c693a351e876fa28b418fefb452ba884c2f`.
+Its sole encrypted JSON SHA-256 is
+`38becbaaa21ed5c8746b672bbd68aeb1f56f6e7c7105a3828bead2555a63fa8b`;
+authenticated recovery reproduces plaintext SHA-256
+`3e5754aa87644603694ed10ee58bd50df5ba3a39f9a5a9033fb0c058983e1e47`.
+ZIP digest/CRC, source/request/run identity and encrypted bindings were verified.
+The old wrapper reused its public error sanitizer for the private receipt, and
+the core discarded raw metadata on validation failure. Only the generic
+`acquisition-failed` survives; the original precise cause is **unproven**.
+Do not relabel it as a connection failure, guess malformed publisher fields or
+infer source sizes/checksums from approximate documentation.
+
+A fresh read-only target snapshot at `2026-09-24T11:56:28.995884+00:00` and the
+private six-test inspection helper confirm all **383** selected identities,
+Item/source versions, descriptions and managed flags unchanged; the full target
+inventory remains 385. The helper rechecks the accepted source and receipts and
+keeps failure explicit. Recovery **version 2**,
+`Kajo-book-dump-acquisition-recovery-20260924.zip`, retains eighteen verified
+members: **94,201 bytes**, SHA-256
+`34af941724199ca201ae75896e495337837fc70c989fc017a2b2a7594e0c51de`.
+It includes the original key, request/source/run receipts, ciphertext ZIP/JSON,
+recovered failure, fresh snapshot and private reconciliation. No source text or
+completed dump scan exists in this archive.
+
+The next forward source retains exact fixed private error codes and bounded
+metadata bytes before parsing/validation while keeping public logs sanitized.
+A distinct, purpose-bound diagnostic request on
+`catalog-diagnostic/ol-20260831` can perform only **one GET / 2 MiB / 30 seconds /
+zero redirects**. It binds the original run/request/artifact hashes, checks exact
+accepted source and its sole request-file change, and has its own prior-run guard.
+Even valid metadata cannot trigger a Work/Edition download. The old acquisition
+request stays consumed; no full retry, migration, pilot reset or rights approval
+is included. The recovered body hash must match the original before claiming
+reproduction of that old failure; otherwise it is a separate current observation.
+Actual diagnostic source acceptance/request/outcome are recorded in #182.
+
+Independent core/workflow review passed with **55 targeted tests**. The integrated
+local gate passed lint/typechecks, **248 mobile / 118 catalog tests**; the frozen
+Deno registry step remained blocked by this environment. All five remote CI jobs
+remain required before merge and any diagnostic activation. Actual old ciphertext
+also unseals with the forward reader to its unchanged `3e5754aa…` plaintext hash.
+
+## Bounded cloud BOOK acquisition — 2026-09-24 / #182
+
+The continued owner request selects a concrete acquisition path after the local
+Archive.org connection failed again with HTTP 502 before any dump bytes. The
+separate accepted-source workflow streams the fixed **2026-08-31** Work/Edition
+dumps on GitHub, retaining only the public exact-ID roster's selected records.
+It is activated explicitly by one narrow request-branch push after source CI and
+merge; ordinary CI uses fixture streams and cannot launch the real download.
+
+The request binds exact current main, canonical public roster, all caps and
+recipient public-key fingerprint. Its sole parent must be that main commit and
+its only tree change the allowlisted request JSON. Read-only GitHub permissions,
+pinned Actions, disabled persisted checkout credentials and no lifecycle scripts
+prevent request-branch code or database credentials from entering the operation.
+Run attempt must be one and the current run the only run on that request branch;
+preflight/source failures consume the request and never retry automatically.
+
+Publisher metadata (at most 2 MiB) pins both exact names, byte counts and MD5/SHA-1
+before source GETs. The shared stream parser verifies full EOF/gzip integrity,
+bytes, publisher checksums and final SHA-256, bounded by 15,000,000,000 compressed
+bytes total, 128 GiB decoded/100 million rows per file, 1,049,600-byte lines,
+64 MiB retained records and a 110-minute collector deadline in a 120-minute job.
+Redirects remain HTTPS official hosts and exact release-file routes. Missing
+records stay explicit; no per-book API call, catalog write or rights approval.
+
+Only RSA-OAEP-SHA256/AES-256-GCM ciphertext reaches public artifacts. Failures can
+retain an encrypted safe partial-accounting receipt while the step remains
+failed. Private key generation and recovery are local. Envelope integrity does
+not identify the sender: exact trusted run/head/request and downloaded artifact
+provenance must be retained separately. Recovery does not turn partial receipts
+into completed source scans or replace later target/version/rights review.
+
+An actual existing GitHub artifact was downloaded successfully: artifact
+`10802996039`, **4,659 bytes**, SHA-256
+`054d3d562971ae3c841eb717a243b207709da5bd9263c9ffe545bbea4ff3fef1`;
+its ZIP CRC verified. Before activation, the recipient key pair and original
+private target snapshot were durably retained in the initial
+`Kajo-book-dump-acquisition-recovery-20260924.zip`: **28,163 bytes**, SHA-256
+`d2ed5b5c5df349473cbe5e3491e2cbcce80516b49b008f8207943e6b90ef297d`.
+All six member sizes/hashes and ZIP CRC verified. This initial custody checkpoint
+contains no activated request or dump records; later run recovery updates it.
+
+Independent review and **42 core/parser/envelope/guard/CLI tests** pass, including
+full-stream late corruption/duplicates, transport limits/redirects, failed partial
+accounting, wrong source/tree/rerun, ciphertext tampering and exact unseal bytes.
+All fourteen previous local-intake regressions remain. Full composed root/CI
+acceptance and actual run/head/artifact outcome are recorded in #182. At source
+publication no source dump has been downloaded, no review approved and no catalog
+or native state changed. #269 is stacked source context, not an alternate next
+packet or serving rollout.
+
+## Provider-backed catalog concept audit — 2026-09-24 / #269
+
+The continued owner request explicitly selects this independent Phase 14.3
+packet while #182 remains the primary source-acquisition task. The offline
+mapper and inspector use a strict allowlisted read-only catalog snapshot,
+exact provider identity checks, an immutable six-concept registry, source-field
+lineage and deterministic projection hashes. Exact normalized Open Library
+subject labels and numeric TMDB genre IDs are supported; source topics and film
+genres retain different evidence kinds. Synonyms collapse to one positive
+assertion and unavailable concepts stay `null`, not fabricated negative evidence.
+
+The actual snapshot at `2026-09-24T11:18:16.242881+00:00` contains **840 visible
+Items / 415 BOOK / 425 MOVIE**. Its saved file SHA-256 is
+`9391286e83d3fe4de680b8456cd83990ade46d28d5dc3ec6030849c06465c3bb`.
+All 385 Open Library and 425 TMDB identity bindings match; thirty curated BOOKs
+have no supported provider source. At least one mapped concept covers **244
+BOOK / 280 MOVIE**. **171 BOOKs / 231 concept assertions** have mapped source
+labels absent from the current matching Item-tag slugs. This is a measured
+representation gap, not a causal claim about the old tag cap or evidence that
+any particular new model improves preferences.
+
+The [aggregate report](../catalog-feature-coverage-2026-09-24.json) binds input,
+registry and private feature-projection hashes. Snapshot/per-Item records stay
+out of Git. No catalog write, serving adapter, public tag, Memory, Shared or
+Scenario interpretation changes; model admission and Phase 14 gates remain open.
+Fourteen focused regressions cover identity ambiguity, neutral unknowns,
+synonym collapse, provider/field separation, lineage changes, deterministic
+coverage, private-output handling and CLI failure/overwrite behavior. Local
+catalog validation passes **77 tests**; lint/typechecks and **248 mobile tests**
+also pass. The bounded root check reaches a Deno registry connection block;
+complete acceptance requires all five PR CI jobs, recorded in Issue #269.
+
+The controlled `Kajo-catalog-feature-audit-269.zip` is **751,715 bytes**, SHA-256
+`a2d42c2d1168fdbef501bc9edb8d11fd29cb6db5b6f9043186eab36458bbea7a`.
+It preserves the actual input, private projection, aggregate report and recovery
+instructions. Every member
+size/hash and ZIP CRC was verified before saving. Source validation and exact
+PR/CI/merge acceptance are recorded in Issue #269.
+
+## Exploratory prefix study and recovery — 2026-09-24 / #265
+
+The owner explicitly requested continued public-preference research alongside
+#182. A reproduced factorization inference defect discarded durable subject
+state when all visible Items lacked fitted factors. The repair uses actual
+supported-prefix count, preserving the declared durable fallback with zero
+component support. Empty, mixed and unknown-target regressions are included.
+Native serving, fitting and historical D2 reports are unchanged.
+
+The fixed protocol/code were locally committed as `e37f63d` before the real fit.
+Source download reproduced the original 993,937-byte GroupLens Latest Small /
+Kaggle v2 archive, and normalization reproduced all **84,849 observations / 500
+subjects**. Freeze receipt
+`e21f14b673a33161f95643d4e0eeeee4f4e1c4fffa8c61d5c41ccbf481c59aa8`
+binds exact source/code/runtime, original D2 configuration and all partition hashes.
+
+Two independent fits used the original **46,410 ratings / 299 training subjects**.
+The declared exploratory target window contains **5,707 ratings / 23 held-out
+subjects**. Every policy/budget scores the same complete target groups before
+updating only that subject's available history. Primary recent-vs-earliest
+maximum-ten durable-state RMSE is **0.807788 vs 0.850843**, difference **−0.043054**,
+paired subject-bootstrap 95% **[−0.060646, −0.024471]**. The actual report records
+prefix size/age, 1,218 cold-item targets, zero history, all fixed diagnostics,
+coverage, resource bounds and limits. Equal maximum budgets do not ensure equal
+actual information. Already inspected development data supports no fresh final,
+BOOK-transfer, Shared, native or admission claim. D2 rejection stays intact.
+
+Model SHA-256: `808283339e023db236a4dd20412cf9b873072457a5c717aa2ed969763684e3ef`.
+Deterministic result SHA-256:
+`1f40db237a52cff34a1ed8b7a91b048939632beaa32456dd831cb1713dd2034b`.
+Both runs matched parameters, journals, metrics and prefix summaries. Each took
+under four seconds, peaked below 381 MiB RSS and produced an 8,014,330-byte model.
+Exact costs/runtime and scope are in the [report](../../../research/reports/movielens-small-prefix-study.md).
+
+The controlled `/FRST/Kajo-MovieLens-prefix-study-265.zip` is **12,988,040 bytes**,
+SHA-256 `ad6e93025ae88099ced717c57bc7d932cced1007f6fc3bd46818625aa223f6c1`.
+Its forty member hashes/sizes and ZIP CRC verified before saving. It retains
+source/rights evidence, normalization, exact source snapshot, frozen partitions,
+two actual models/journals and aggregate reports outside Git. Recover it only
+into private ignored paths after verifying all hashes. The old freeze binds
+its original source/runtime; later package/script changes require a new freeze,
+not editing that receipt. Research-only rights/withdrawal conditions remain.
+
+Independent method/code review found one parent-configuration binding gap;
+it was fixed and regression-tested before commit/freeze. Final report review
+verified result hashes, support, metrics and limitations. Engine lint/typecheck
+and **44 engine / 32 research / 63 database tests** passed, plus four exports and
+companion isolation. Local root check was stopped at Deno registry connection
+retries; no full-local-pass claim or TLS/lock change. Required PR CI supplies the
+complete gate; Issue #265 records head/run/merge acceptance. Root integration
+adds only the already reviewed catalog command and canonical documentation;
+it does not recalculate or overwrite the historical study.
+
+The completed pilot recovery and next primary #182 acquisition/scan remain below.
+The separate `/FRST/Kajo-book-dump-targets-20260924.zip` retains real snapshot,
+plan and failed acquisition evidence: **27,012 bytes**, SHA-256
+`035d4a919f5033bf4561f5f6b00fe014ffe55df2c97d37fef3b44e865446a669`.
+It contains no source dump or approved text and does not replace the completed
+pilot archive. Broader catalog/native/MVP acceptance stays open.
+
+## Offline BOOK dump intake — 2026-09-24 / #182
+
+Source work implements a distinct local monthly-dump intake after the completed
+pilot. `scripts/catalog/book-description-dump-targets.sql` freezes existing
+provider BOOK identity/version bindings; `open-library-dump-descriptions.mjs`
+and `prepare-open-library-dump-descriptions.mjs` supply the no-I/O plan and
+streaming stage. Architecture/CODEMAP own the stable contract and commands.
+The old pilot, importer, normalizer, consumed provider budgets and installed
+migrations are unchanged. No admin/network client is introduced.
+
+The intake requires exact same-release official source paths, full compressed
+bytes/SHA-256, gzip integrity/EOF and explicit decoded-byte/row limits. It retains
+only exact Work/Edition targets, rejects identity/envelope/linkage mismatches
+and duplicates, caps each line and total retained records, and excludes existing
+managed descriptions. New private output claims cannot be overwritten; failure
+keeps evidence without exposing a completed review. Source records, source/target
+hashes and per-target candidate status are private. Missing text, unknown
+language and rights remain explicit; no text is autoapproved or applicable through
+the old ten-Item pilot. A later guarded writer bridge is still required.
+
+### Actual plan and acquisition boundary
+
+The real read-only snapshot at `2026-09-24T09:56:48.39856+00:00` produced
+**385 provider BOOKs / 383 selected / two excluded / 766 expected records**.
+Canonical target-snapshot digest:
+`4ae7a429ef64faeb82386282c594a8a5d13cf49f17adc5f54a3a07d9fd136517`.
+Saved plan file SHA-256:
+`804c3801735f747a5bdd39b69acaf46f1b825a1512ee92a4b357fa81b70d88f4`.
+No source files were opened, provider requests made, text approved or database
+rows written by that plan.
+
+Official [Open Library dump links](https://openlibrary.org/developers/dumps)
+resolved both source types to `2026-08-31` under
+`https://archive.org/download/ol_dump_2026-08-31/`. Bounded metadata GET and the
+redirected Work HEAD failed with proxy CONNECT timeouts. Approximate publisher
+sizes (2.9G Work / 9.2G Edition) are not verified sizes for that release. Exact
+bytes/external checksums/local hashes remain unknown; zero dump bytes or partials
+exist and no real staging run occurred. The next task is reachable official
+source acquisition, verified manifest construction and one bounded real scan.
+
+### Validation and source acceptance
+
+Fourteen new regressions pass, including malformed/exact identity, truncated or
+concatenated gzip, complete-file hash/byte/row bounds, duplicate target, atomic
+failure/no-overwrite and canonical publisher-path checks. Independent adversarial
+review also verified invalid UTF-8, a late duplicate in a second gzip member and
+the 64 MiB retained-record bound. It requested canonical publisher paths; the
+fix and rejection test are included.
+
+Local lint/typechecks, **452 non-edge tests**, four iOS/Android exports and both
+companion isolation checks passed. `npm run check` reached frozen Deno resolution
+and failed because registry.npmjs.org refused the connection. No dependency,
+lockfile or TLS exception was used. Required PR CI supplies the full edge and
+five-job acceptance before merge; Issue #182 records exact head/run/merge IDs.
+This is source/fixture plus real-plan evidence, not additional live descriptions
+or native acceptance. Completed pilot/phone/rights and independent #265 gates
+remain as recorded in STATUS.
+
+## BOOK pilot completed and next packets — 2026-09-24 / #182
+
+The owner ran the accepted importer from PR #264/main
+`51919db1ee8d5384cd724047dcf8293a27b51261` on their MacBook (Node 22.20.0,
+npm 11.6.1, Apple Git 2.50.1). Server credentials stayed in the local operator
+environment; none were included in the uploaded run. Both guarded batches and
+their accepted CLI readbacks completed. The original twenty provider attempts,
+claim, cached records, current review and two prior reviews are unchanged.
+
+| Batch | Actual acknowledgement | Later readback |
+| --- | --- | --- |
+| 1 | Started `2026-09-24T09:31:59.861Z`, completed `09:32:00.439Z`; exactly the two approved UUIDs, `updated: 2`, `unchanged: 0` | Checked `2026-09-24T09:33:31.23372+00:00`; SHA-256 `61d980d1cce90b09733d31a225f27330379ba7ae7477bd3371a3af0559ef1780` |
+| 2 | Started `2026-09-24T09:37:53.222Z`, completed `09:37:53.223Z`; no Item IDs, zero updates | Checked `2026-09-24T09:39:21.375188+00:00`; SHA-256 `91b21929496e2686948dc478b5b5c9d889e9c208a36015aba24381af2d2a2568` |
+
+Both acknowledgements bind the unchanged packet SHA-256
+`dd31f5b33771e59a5885d618821dbd5e0a4fda5ff4b1d59ebe15c9730ca11262`.
+The two approved Items are Pieni elämä
+`a7f6d2cd-e290-4bc4-97b7-cf1180ea86b9` and Romeo ja Julia
+`6aa4020d-fdfa-4010-ad8d-2217c71f06f8`; their Item post-write version is
+`2026-09-24T09:32:00.069894+00:00`. Exact source versions remain in private
+evidence. Scope is still `kajo-internal-pilot`, with the pinned CC BY-SA 4.0
+source/credit decision below; broader public-use acceptance is separate.
+
+### Independent hosted and operator-run verification
+
+Read-only coverage at 09:23:09 UTC and full preimages/ACL validation at 09:25:15
+matched the reviewed baseline immediately before apply. After batch 1, fresh
+coverage and complete Item/source/alias preimages independently confirmed exact
+text, full public provenance and private permission/enrichment bindings. Full
+Item/source fields outside description/provenance/enrichment and update times
+are unchanged, including source `synced_at`; aliases including `last_seen_at`
+are unchanged. Batch 2's coverage differs only in its check time.
+
+BOOK is **415 visible / 427 stored / 385 images / 2 descriptions**. MOVIE is
+**425 visible / 437 stored / 425 images and descriptions**. The installed
+writer/validator remain postgres-owned invoker functions, with empty search
+paths, service-role execution allowed and anonymous/authenticated execution
+denied. No provider request, migration or model admission was performed here.
+
+The uploaded actual operator ZIP has SHA-256
+`914c602dc8d9d2b49523a210b263b112f23a9020979560732669a0be5cc93e57`.
+Its thirty files include the actual completed state and both verification
+objects. Independent archive review and the accepted offline validators
+reconstructed the review chain and both readbacks without mutating state. All
+pre-write fields other than run status and the new batch ledger match the prior
+reviewed state; no active lock, symlink or environment file is present.
+
+### Completed recovery identity
+
+| Property | Completed value |
+| --- | --- |
+| Controlled archive | `/FRST/Kajo-book-description-pilot-v1.zip`, **version 11** |
+| Archive size / manifest | **1,013,922 bytes / 103 entries**, all CRC/member hashes verified |
+| Archive SHA-256 | `06f090f4ccf7ebc78af0a9d1ef3fee465c26511e05ec8adb33b2c2c8745db5c3` |
+| Actual completed state SHA-256 | `499eb9b33159db8fb3030fd8242b94c8278a08920e1cf55bed4de81c6a51588f` |
+| Current review SHA-256 | `28e81b46b3ff11cfadf8e0d5708a776c2cdd69beb6cad0a9ddac523970ce2265` |
+
+Canonical archive `catalog-enrichment/book-pilot-v1/state.json` is now the actual
+**completed** run. Restore that tree to ignored `dist/catalog-enrichment/` only
+after verifying the current archive/version/hash and checking for a newer run.
+Pre-write state/preview copies are explicitly historical evidence and must not
+replace it. `operator-checkpoint.json` identifies the completed state and actual
+upload; all earlier source evidence, fresh preimages/readbacks, acknowledgement
+and independent verification evidence remain retained. Preserve the original
+claim bytes/historical path, completed locks and review history. Do not replay
+preview, fallback, amendment or apply. Unknown later changes require exact
+state/hash/version reconciliation, never a manually reset status or budget.
+
+### Selected continuation and remaining acceptance
+
+The owner's new request advances the primary #182 packet to bounded exact-ID
+Work/Edition dump intake (`feat/182-book-dump-intake`). Fresh read-only target
+snapshot at `2026-09-24T09:56:48.39856+00:00` has **385** exact provider BOOKs,
+zero identity mismatches and **383** targets after excluding the two existing
+managed descriptions. This is a target inventory; real pinned monthly files,
+streaming intake, rights/language review and a guarded writer bridge remain
+distinct steps. The thirty curated alias gaps are not fuzzy-matched.
+
+Independent #265 / `feat/research-prefix-evaluation` is explicitly selected for
+the reproduced unsupported-latent-prefix fallback defect and one preregistered
+exploratory study using the already authorized D1 MovieLens cohort. Fixed D2
+training boundaries and inspected development data stay explicit. D2's rejected
+challenger remains rejected; external observations never become native accounts
+or Events. STATUS owns the live implementation/acceptance handoff.
+
+Only a focused phone observation of these two real paragraphs and source/license
+links remains for this apply; the accepted full-app/companion exercises need not
+be repeated. Six rights holds, two exclusions, the six-description target,
+curated mapping/feature quality, #229/native/fresh-account gates and broader MVP
+acceptance remain open. No APK was dispatched or UI refinement implemented by
+this completion packet. The older handoff below is historical and superseded.
+
+## Pilot recovery and conversation handoff — 2026-09-24 / #182
+
+The owner requested continuation, repository hygiene and a handoff usable from a
+new conversation. The accepted starting point is PR #263, main
+`4df8b519e2f4526bf458f5b64c36904b266a15a2`, tree
+`3486735267c83c37d7b42a1ccfce146a97279ba8`, after all five CI #521 gates
+(run `35916619070`). PR #262 already records all deferred UI notes. Only draft
+PR #229 was open at the start; it remains an independent native acceptance packet.
+This closes the local preparation/handoff unit, not Sprint 014 or Phase 14.3.
+
+### Recover the exact reviewed pilot
+
+The owner's saved artifact was verified on September 24:
+
+| Property | Expected value |
+| --- | --- |
+| Saved path | `/FRST/Kajo-book-description-pilot-v1.zip` |
+| Version | **7**, saved 2026-09-23 20:34:32 UTC |
+| Size | **902,604 bytes** |
+| Archive SHA-256 | `fe1c70bfe2f31567f048973a0184591a46d064d70cbffcfa9236da59dcdf3637` |
+| Manifest | Root `manifest.json`, **87 entries** with exact paths, sizes and SHA-256 |
+| State SHA-256 | `78afe993517c36bfa1eeeda543aa2b99e0ebae3b90f1a0c043d1d42fb2a6b209` |
+
+Resolve that saved filename/path through the owner's file access and verify the
+version/hash before use. If a newer version exists, reconcile its later batch
+ledger and repository checkpoint; never overwrite it with this pre-apply state.
+Extract into a private empty directory, validate every manifest entry, then map
+archive `catalog-enrichment/` to this checkout's ignored `dist/catalog-enrichment/`.
+Retain `evidence/` outside Git. Do not overwrite a newer local run. Preserve the
+original `open-library-description-pilot-v1.json` claim byte-for-byte, including
+its historical absolute directory; that value is not an instruction to recreate
+the old scratch workspace. Keep completed-lock evidence; do not invent an active
+`operation.lock`. Reconcile any actual active lock with state/process evidence.
+
+The restored run must be `reviewed`, with **20 provider attempts, 2 prior reviews,
+2 approved entries at positions 1 and 4, 6 rights holds, 2 text exclusions and
+0 database batches**. Current review and packet hashes are in the
+[source-review checkpoint](#pinned-book-source-review-and-apply-preparation--2026-09-23--182).
+Both amendment proposals are already applied historical inputs. Do not run
+`preview`, `fallback`, `review`, or either saved `amend-review` proposal again.
+
+September 24 checks verified ZIP CRC, all 87 member hashes and byte identity of
+every staged catalog file. `validateReviewHistory` and `buildDescriptionPacket`
+from the accepted module reconstructed the full review chain and exact saved
+two-entry RPC request with fetch disabled. All twenty record inspections and
+the original record/attempt ledgers matched; state bytes did not change.
+
+### Remaining operator sequence
+
+The current workspace has neither `SUPABASE_URL` nor
+`SUPABASE_SERVICE_ROLE_KEY` (presence-only check; no secret values read).
+The two repository workflows provide CI and the synthetic description companion,
+not BOOK import. No reachable configured admin runtime/location is recorded.
+Continue in an operator environment that already has the project's server-side
+import configuration; do not obtain a key in chat, extract a secret, substitute
+SQL for the importer or create a new privileged endpoint to bypass this boundary.
+
+1. In that environment, recover the run as above and use accepted main source.
+   Immediately before apply, run `scripts/catalog/book-description-coverage.sql`
+   read-only and save its **`book_description_coverage` object**, without the SQL
+   row wrapper. Compare all identities, versions and preservation fingerprints
+   to the reviewed baseline. Retain fresh full target preimages using the saved
+   `apply-preflight.sql`. September 23 snapshots are recovery evidence, not a
+   substitute for this fresh check. Drift requires review and a new amendment
+   bound to the current review hash before any batch attempt; never edit state.
+2. Apply batch 1 with the accepted CLI. Inspect exact acknowledgements. Obtain a
+   new read-only coverage object as `after-batch-1.json`, then run `verify`.
+3. Only after that verification succeeds, apply the empty batch 2. It records
+   zero writes but still requires its own later coverage object and `verify`.
+   Run becomes `completed` only after the second verification.
+
+Run the following commands individually from the repository root, pausing for
+the read-only snapshot and inspection described above between each command:
+
+```bash
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 1
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-1.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 2
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-2.json
+```
+
+Unknown acknowledgements or failed verification stop this sequence for exact
+ID/hash/version reconciliation; do not retry automatically, reset the claim or
+mark a batch complete manually. Retain post-write identities/versions for guarded
+restoration of managed fields only. Persist the updated run, acknowledgements,
+readbacks and manifest in the same saved artifact with version-conflict checking
+before leaving the operator environment, then update STATUS/#182.
+
+Observe only these two real paragraphs and their source/license links on the
+phone after successful apply. Accepted companion/full-app reports remain valid;
+the six-description target, other rights holds and broader catalog/native/MVP
+gates remain open. This handoff performed no hosted query/write, provider GET,
+migration, APK dispatch or new device exercise. Runtime/SQL/dependencies remain
+unchanged. Required PR CI and final merge identity are recorded in Issue #182.
+
+## Pinned BOOK source review and apply preparation — 2026-09-23 / #182
+
+The owner-requested continuation after PR #262 advances the existing pilot,
+without a new provider pass. The original archive's 25 manifest entries verified;
+the original claim and run files were restored byte-identically. No active
+operation lock existed; historical completed-lock evidence remains untouched.
+The initial reviewed state had SHA-256
+`3945e504a087071839095588cbd1653f82fe775555591235a3531933d9ff118f`.
+
+### Exact correspondence and limited permission decision
+
+Direct primary-source retrieval resolved the two previously partial leads:
+
+| Position / selected Item | Independently matching Wikipedia revision | Match |
+| --- | --- | --- |
+| 1 / Pieni elämä | [A Little Life, 995224795](https://en.wikipedia.org/w/index.php?title=A_Little_Life&oldid=995224795), 2020-12-19 22:08:22 UTC | All 199 characters; text SHA-256 `3b6b1838b911c90bab7cdefdc17eaf3f61f847df7cc1f2c1243915dd8800d0c6` |
+| 4 / Romeo ja Julia | [Romeo and Juliet, 1060312455](https://en.wikipedia.org/w/index.php?title=Romeo_and_Juliet&oldid=1060312455), 2021-12-14 19:01:23 UTC | All 388 characters; text SHA-256 `0a750307e44db15765970ebd0daa5cc00b3adef8800a9ae9341b63094738113a` |
+
+The offline comparison independently checks saved rendered HTML and revision
+wikitext against the unchanged cached Work descriptions. Only formatting,
+inline links and citation markers are omitted; wording and punctuation match.
+This identifies an independently licensed source for identical prose, not a
+proven chain through the unknown Open Library uploader. Both texts remain
+English; Finnish Edition identity/title/cover and original-language data stay
+unchanged. No generated replacement, translation, excerpt from the book or
+publisher blurb is substituted.
+
+The explicit operator review approves **only these two descriptions for
+`kajo-internal-pilot`** with CC BY-SA 4.0, contributor credit through the exact
+article/history link, a visible license link and a changes notice. The review
+uses [Wikimedia reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content),
+[Wikipedia's copyright policy](https://en.wikipedia.org/wiki/Wikipedia:Copyrights),
+the documented [2023 license update](https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Legal/2023_ToU_updates/About)
+and the [CC BY-SA legal code](https://creativecommons.org/licenses/by-sa/4.0/legalcode.en).
+Pinned article text, current talk pages and twenty preceding history summaries
+per revision showed no additional imported-text credit or specific copyright
+notice for these leads. This is a bounded inspection, not an exhaustive audit of
+every edit; generic historic-page warnings are retained. Credit names Wikipedia
+contributors collectively, never the last editor as sole author. No image,
+other paragraph or publisher text is covered, and no contact was made.
+Public beta/store rights/use and withdrawal review remain separate gates.
+
+`permission-review.json` retains the exact primary-response hashes, decision,
+intended use, public credit and limits; its SHA-256 is
+`4f6d40c93ce0bd44a8eadbf90f1c4aa5cd29441defc15a900d04573197de6681`.
+The evidence and real text remain in the controlled pilot archive, outside Git.
+
+### Actual amendment and read-only preparation
+
+The existing `amend-review` CLI ran with fetch disabled and no database
+credentials. It bound the prior review
+`974f1fd812f51bde6ac1c1125e90319fafd17f830040f9600d2220dc98165056`
+and preserved the entire earlier chain, all raw records, all twenty consumed
+provider attempts and the other eight current decisions. The run now contains
+**2 approved descriptions / 6 rights holds / 2 text exclusions / 2 prior reviews /
+0 database batches**. Packet mode is `open-library-description-v2`; the private
+permission digest and public credit bind the same text/record hashes.
+
+- Current review hash: `28e81b46b3ff11cfadf8e0d5708a776c2cdd69beb6cad0a9ddac523970ce2265`.
+- Current packet hash: `dd31f5b33771e59a5885d618821dbd5e0a4fda5ff4b1d59ebe15c9730ca11262`.
+- Current state file hash: `78afe993517c36bfa1eeeda543aa2b99e0ebae3b90f1a0c043d1d42fb2a6b209`.
+
+An intentional replay of the applied proposal was rejected as
+`review-parent-mismatch`, leaving state bytes unchanged and releasing the lock.
+Neither the old `rights-amendment.json` nor the new
+`pinned-rights-amendment.json` may be replayed as a continuation.
+
+Read-only coverage at **2026-09-23 20:18:12 UTC** confirmed all ten exact
+identities, all Item/source row versions and every preservation fingerprint
+unchanged from the prior review. BOOK remains **415 visible / 427 stored /
+385 images / 0 descriptions**; MOVIE **425 / 437 / 425 images and descriptions**.
+At **20:25:23 UTC**, the installed attribution validator accepted both real credit
+objects. Full Item/source/alias preimages for the two targets were retained and
+their versions matched the baseline. No catalog write or migration occurred.
+
+The private archive now includes comparison/reproduction evidence, the applied
+amendment, updated state/history, public-credit preview, two-entry batch-1
+request and `apply-readiness.json`. Batch 2 has zero approved entries and must
+remain an explicitly verified no-write checkpoint. The six-description usefulness
+target remains unmet. The accepted importer needs the already configured admin
+runtime; this workspace has no privileged importer credential. Do not obtain a
+key here, bypass the importer with ad hoc SQL, or mark a batch as applied.
+
+Next refresh coverage immediately before controlled apply, retain any newly
+required preimages and use the existing guarded CLI/RPC batch/readback sequence.
+If baseline versions changed, prepare a new review amendment bound to the
+current hash above. Any rollback requires the actual post-write versions/hashes
+and restores only the managed description/provenance/envelope. The two real
+paragraphs and links require observation after a successful apply; no new native
+result is claimed here. UI refinements remain queued under PR #262 / Phase 17.0.
+Issue #182 owns this documentation packet's final PR/CI/merge identities.
+
+## Full-app feedback and deferred UI notes — 2026-09-23 / #182
+
+After the concrete full-app instructions below, the owner reports “Kaikki
+toimii” and asks to record additional observations, implement them when suitable
+and continue substantially along the existing roadmap. This is successful
+owner-reported acceptance of the exercised application behavior. The requested
+source was PR #261/main `6d8e75df4d66ce2aa209f806c09bfb5e379c560c`,
+accepted after all five [CI #516 gates](https://github.com/Kajooja/Kajo/actions/runs/35861047609)
+and the 466-test local check. Installed binary identity and individual timed,
+accessibility or OS-refusal cases were not separately reported. The earlier
+OnePlus companion result remains accepted; do not repeat either full exercise
+solely to fill those metadata. This does not accept independent draft PR #229.
+
+The report explicitly retains a Discovery entry defect and these deferred notes:
+
+| Owner observation | Canonical destination |
+| --- | --- |
+| Discovery Katsotut must open the same watched history | #200; UX_PRINCIPLES browse refinements |
+| Elokuvat, Löydä and Katsotut share a row; title dropdown selects Kirjat/future types | #199/#200; UX_PRINCIPLES |
+| Remove unused brown space below the poster grid | #199; UX_PRINCIPLES |
+| Load another batch near the bottom | #199, dependent on #228/#229 cursor/delivery acceptance |
+| Show fitting descriptions in full; expand/scroll only when needed | #239; UX_PRINCIPLES detail refinements |
+| Open card has arrow-only Back, including List/history entry | #239; UX_PRINCIPLES detail refinements |
+| List/history heading offers list and poster-grid icons | #231; UX_PRINCIPLES collection views |
+| Eventually show actors/directors and other movie credits | FUT-CAT-001, coordinated with #182 |
+
+Source inspection confirms that Discovery currently computes consumed Items from
+`ranking.items`, unlike canonical `ConsumedHistoryScreen`. `ItemListScreen`
+already has LIST/GRID controls, so extend the existing presentation instead of
+claiming there is no grid at all. Detail currently labels Back “Discovery” and
+`ItemDescription` collapses every description to two lines. The TMDB normalizer
+already stores cast names and directors; richer display does not automatically
+require another provider import. These findings scope later implementation,
+not a fix delivered by this documentation packet.
+
+ROADMAP Phase 17.0 keeps the browse/detail refinements after current foundations;
+future cast presentation does not create a new release blocker. The default next
+packet is the two cached Wikipedia source leads for BOOK permission/attribution.
+The original ten-Item pilot remains reviewed with 20 spent provider attempts,
+eight rights holds, two text exclusions, zero approved descriptions and zero
+database batches. General licensing research, installed forwards and completed
+MOVIE expansion are not repeated.
+
+## Consumed history scope and full-app test — 2026-09-23 / #182
+
+After PR #260/main `a5131650ceb837ea7fc5fe640ff0798bffaa4aa8` passed all
+five CI #514 gates, the owner requested continuation and concrete instructions.
+Preparing those instructions exposed a separate history-screen ownership defect:
+`ConsumedHistoryScreen` identified a snapshot only by Item type and retry count.
+The navigation shell can switch Profile without unmounting it, so an old
+Personal history/rating or error could remain under the newly selected Shared
+heading until the next response. A quick A → B → A could also reuse old A data.
+
+`fix/182-history-profile-scope` binds each request to the provider's existing
+actor/Profile/environment scope, read callback, Item type and retry attempt.
+The render only accepts the exact request object; every transition, including
+A → B → A, creates a new identity. Old rows and errors disappear before effect
+cleanup/refetch. Existing cancellation, retry and canonical Item navigation
+remain in place. No service endpoint, schema, auth policy or dependency changes.
+This corrects history presentation, not the independent #229 serving/session gates.
+
+Eight controlled component regressions exercise the actual render/effect
+functions, including pre-effect visibility, actor/backend/unavailable scope,
+rapid return, late response, error/retry and BOOK/MOVIE Item navigation. They
+do not mount native views or establish phone acceptance. Exact final source,
+validation, PR/CI and merge identities belong to Issue #182.
+
+The old accepted history reader fails six of these regressions while its late
+response cancellation and domain/navigation checks still pass; the correction
+passes all eight. The full local `npm run check` passes **466 tests** (248 mobile,
+3 contract, 46 catalog, 28 Edge, 63 database, 43 engine, 27 research, 6 companion,
+2 bundle-boundary), lint/typechecks, all four iOS/Android exports and both
+companion source-graph guards. Frozen Deno npm dependencies reused the temporary
+local registry with committed SHA-512 verification; no dependency/lock/gate
+changed. Existing DiscoveryScreen hook and Metro dependency warnings remain.
+
+### Concrete full-app phone check
+
+1. Open the repository's **Actions → CI** and the **main** run for the accepted
+   commit recorded at the top of Issue #182. Main pushes already run the full
+   Kajo APK job after the required gates. When it succeeds, its artifact is
+   `kajo-android-standalone-<full commit SHA>`; extract and install `app-release.apk`.
+   This is the full Kajo application, `app.kajo.mobile`.
+2. Use existing Personal/authorized Shared content. Close Kajo completely,
+   reopen, then go from Room directly to a List, Luetut or Katsotut before
+   opening discovery. Open an existing Item and return. Repeat for both domains
+   where content exists. Title/image/available description must belong to that Item.
+3. Repeat in Shared. While history is visible, switch Personal → Shared → Personal.
+   Old rows/ratings/errors must disappear while the selected history loads;
+   no old response may replace the new history. Note whether a delayed-read
+   transition was actually observed; a fast successful switch alone is not that proof.
+4. In Personal, load a List while online, then disable mobile data and Wi-Fi
+   before opening an Item. A stalled detail read must show an error within
+   15 seconds. Restore connectivity and press **Yritä uudelleen**; the same Item
+   must open. **Takaisin** must also work during loading/error.
+5. Report the CI run/commit, tested cases and any failing steps/screenshot.
+   Missing Shared/history content or an unobserved timing case stays untested.
+
+No new device observation, APK dispatch/poll, hosted operation, provider request
+or pilot amendment is performed here. The successful OnePlus companion report
+remains accepted. Real BOOK descriptions still require their separate exact
+rights/revision review; an absent description is not by itself an entry failure.
+
+## OnePlus feedback and canonical detail entry — 2026-09-23 / #182
+
+The owner reports: “Toimii. Testasin oneplussalla. Kaikki tuntuvat toimivan oikein.”
+This follows the companion test instructions and accepts its exercised behavior
+on the owner's OnePlus phone. Model, OS, installed commit/binary identity,
+screenshots and individual TalkBack/OS-refusal results were not provided; none
+are inferred from chat client metadata or a possible build run. The owner then
+explicitly requested continuation. Do not repeat the accepted companion test.
+
+The companion source was merged as PR #259/main
+`8e7625e8f3867fa34ca709aa10ce76e83588fe82`; all five CI #512 gates passed, with
+one CLI-startup retry on unchanged source. Its native feedback does not accept
+Personal/Shared/List navigation, #229 or real description permissions.
+
+### Bounded correction
+
+Inspection of actual List/history navigation found that `ItemListScreen` and
+`ConsumedHistoryScreen` pass only `itemId` to detail. The old detail constructor
+looked it up with `getMockItem`, which could only see remembered recommendation
+Items and static mocks. Thus an already loaded canonical List Item could still
+be missing when opened after restart; a stale recommendation could also supply
+its description instead of current canonical metadata.
+
+`fix/182-catalog-detail-entry` adds `CatalogDetailEntry` and
+`catalogDetailLoad.ts`, using existing `loadCatalogItems` and the same public
+attribution projection. A route without a delivered Prediction ID loads its
+exact canonical Item with loading/missing/error, retry and Back states. Every
+attempt has a 15-second deadline; cancellation and timeout discard late results.
+The component identifies state by client, actor/Profile scope, Item and attempt
+and unmounts the previous card across scope changes. A successful read opens
+one Item in the existing card and never creates a remembered Prediction slate.
+The original delivered-Prediction path and Shared-overlay readiness gate remain.
+No production fixture, auth bypass, dependency, migration or new API is added.
+
+Regression coverage includes the actual route selection, Personal/Shared scope
+keys, canonical credit in the shared renderer with collapsed/expanded text,
+missing/wrong/malformed rows, invalid attribution, stale cached descriptions,
+backend failure/retry, cancellation and bounded late responses. The old accepted
+route fails three new entry regressions; its delivered-Prediction/Shared gate
+check still passes. Exact final validation and PR/head/merge identities belong
+to Issue #182; source success is not new device evidence.
+
+Local root-check stages pass **458 tests**: 240 mobile, 3 contract, 46 catalog,
+28 Edge, 63 database, 43 engine, 27 research, 6 companion and 2 bundle-boundary
+tests, plus lint/typechecks. All four iOS/Android exports and both companion
+source-graph guards also pass; the complete smoke command was confirmed
+separately after the initial combined log stopped at Metro startup. Deno's
+registry transport stalled in this environment, so the unchanged locked npm
+tarballs were served through a temporary local HTTP registry after verifying
+their SHA-512 integrity against the committed lock. No dependency, lockfile or
+gate changed. The existing DiscoveryScreen hook and Metro dependency-export
+warnings remain. No native device/emulator is available in this workspace.
+
+### Remaining acceptance
+
+After source acceptance, test the configured full application by restarting and
+opening a List or Luetut/Katsotut before discovery, then opening an Item and
+returning. Repeat for Personal and an authorized SharedProfile and exercise
+read failure/retry and a Profile change during a delayed read. Attributed
+synthetic paragraphs still require isolated application test state; do not put
+them in the hosted catalog or real Profile/Event history. No new device test,
+APK dispatch/poll, hosted query/write, provider request, pilot amendment or model
+admission is performed by this correction. BOOK/MOVIE budgets, rights holds,
+#229/fresh-account gates and broader MVP/Phase 14.3 acceptance remain open.
+
+## Isolated native description test companion — 2026-09-21 / #182
+
+The accepted September 20 handoff required native description-credit observations,
+but the hosted catalog intentionally has no approved BOOK descriptions and this
+workspace has no device/emulator. `feat/182-native-description-acceptance` adds a
+concrete isolated test runtime without treating synthetic paragraphs as published
+catalog data or using real users/Events. Source/CI/merge identities belong to
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+
+**Publication approval, 2026-09-21:** after reviewing the complete Git patch,
+the owner explicitly approved this packet's public publication, PR and merge
+after all five required CI gates pass. This resolves the earlier automatic
+approval review block; no alternate publication route followed the rejection.
+Implementation commit `4907fbb9f12eb5730028b46b4a6473adfa9e55fa`, checked tree
+`a888354f9a3345a214a28f72dc54bea35b4cf577`, passed all available implementation
+checks; subsequent checkpoint changes are documentation only. Issue #182 owns
+the final published head, CI and merge identities. Native-device observations
+and the actual Personal/Shared/List entry-context gate remain open.
+
+### Delivered source
+
+- `apps/description-acceptance` is a small Expo workspace with a custom
+  `registerRootComponent` entry. Its Android/iOS identifier is
+  `app.kajo.descriptionacceptance`, distinct from `app.kajo.mobile`. It imports
+  no production app/router/auth/data or Event providers and has no login or
+  storage path. The launcher disables dotenv loading; no project credentials
+  are required. App metadata records the Git commit and dirty state and the
+  screen displays them with OS identity for manual evidence.
+- `ItemDescription.tsx` extracts the existing detail paragraph, collapse
+  controls and credit display. Normal detail and the companion render this same
+  component with the same typography/theme and fail-closed cached Item validation.
+  The original functional expand/collapse updates are retained, and the control
+  now exposes its expanded accessibility state. The parent detail retains its
+  existing scrolling, actions, actor/Profile and Event behavior.
+- `DescriptionCredit` retains `Linking.openURL` by default and its safe URL
+  check/recoverable alert. An optional opener lets only the companion inject
+  a labelled one-shot failure. Retrying the same link then uses the actual
+  native opener; injected failure is recorded separately from OS refusal.
+- Seven synthetic cases exercise long bound credit, missing credit, unsafe
+  source URL, changed cached text, text-only fallback, explicit legacy text and
+  empty text. The existing contract fixture supplies the synthetic paragraph;
+  `example.com` source/license test URLs are distinct and make no real licensing
+  claim. Theme controls cover dawn/evening/night. The app never marks a test
+  accepted automatically or simulates Personal/Shared/List identity.
+- Root lint/types/tests/smokes include the workspace. The new smoke exports
+  iOS/Android and checks the actual source maps for exactly one React instance,
+  all shared production description modules, and an explicit first-party allow
+  list. Database/auth/router/Event imports are rejected. Only the new workspace
+  and a copy of the already locked React 19.2.3 entry were added to the lock;
+  existing dependency versions/integrities did not change.
+- `.github/workflows/description-acceptance.yml` supplies a **manual-only**
+  standalone APK build with source checks, a distinct artifact name and no
+  production credentials. It was not dispatched or polled in this continuation.
+  The existing Kajo APK workflow and installed native/database history are unchanged.
+
+### Validation and limits
+
+The complete local `npm run check` passed **442 tests**: 224 mobile, 3 shared
+contract, 46 catalog, 28 Edge, 63 database, 43 engine, 27 research, 6 companion
+fixture and 2 bundle-boundary tests. Normal mobile and companion each passed
+both iOS and Android exports. Companion source maps contain 596 iOS / 594 Android
+modules, including the same description renderer, one React instance and no
+production auth/data/router dependencies. The existing Discovery Hook and
+`@noble/hashes/crypto.js` export-fallback warnings remain.
+
+The first root attempt stalled requesting registry metadata and was stopped;
+the successful run reused the existing local registry mirror and frozen lock
+integrities. No Edge source, lock or test gate was changed. Npm validated the new
+workspace lock offline. A single-process local Metro probe received running
+status, the isolated Android manifest with source/dirty identity, the exact
+`/apps/description-acceptance/index.ts.bundle` entry and its development bundle.
+This proves the launcher and served bundle, not actual native rendering. React
+Native DevTools could not open in the container; no sandbox setting was bypassed.
+
+No device/emulator was available. No native layout/link/accessibility case,
+APK installation or full Personal/Shared/List entry is accepted by this source
+packet. No hosted query/write, migration, provider request, pilot amendment or
+real description approval occurred. The twenty-request BOOK and completed MOVIE
+budgets stay closed; #182, #229 and broader MVP/Phase 14.3 acceptance remain open.
+
+### Run the native acceptance companion
+
+Use a clean accepted Git checkout on a development machine with the repository's
+Node version and a compatible Expo Go app on a phone connected to the same LAN:
+
+```bash
+npm ci
+npm run acceptance:descriptions -- --lan
+```
+
+Scan the terminal QR code in Expo Go. `npm run acceptance:descriptions -- --offline`
+also starts Metro without registry checks; it does not make external test links
+available without a connection. For Android without Expo Go, an explicitly
+requested manual run of **Description native acceptance APK** builds artifact
+`kajo-description-acceptance-<commit>` from the selected ref. Install that distinct
+test app; do not infer that it contains the Kajo application or #229. A workflow
+definition/export is not evidence that an APK was built, installed or exercised.
+
+Record the source commit/dirty state, build artifact if used, phone model, OS,
+font scale, screen reader, exact case and observed result. Check the valid case
+collapsed and expanded; source/license links separately; all invalid/legacy
+cases; each theme; and labelled simulated failure followed by a successful retry.
+Record actual browser destination/back-navigation and actual OS refusal separately.
+The app's “avauspyyntö välitetty” message only means the OS accepted the request.
+
+The [native acceptance matrix](#native-description-credit-acceptance-matrix)
+remains the gate. The companion covers the shared description component;
+Personal/Shared/List entry, full-card placement and configured application state
+still need isolated application-level tests. Neither the fixture companion nor
+an accepted device test grants permission for any real source text.
+
+Expo's [custom root registration](https://docs.expo.dev/versions/latest/sdk/expo/#registerrootcomponentmaincomponent)
+and [monorepo guidance](https://docs.expo.dev/guides/monorepos/) were checked for
+the separate entry/workspace. No custom Metro resolver or dependency override
+was needed. [STATUS](../STATUS.md) remains the exact continuation authority.
+
+## Description attribution source acceptance and rollout — 2026-09-20 / #182
+
+The owner approved public publication, PR and merge after required checks, then
+immediate continuation. [PR #257](https://github.com/Kajooja/Kajo/pull/257) merged
+at `a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0` from final head
+`f300c5adcea3cee9dc0828945add936a4bad13d6`, tree
+`f528396dfd3a8796c71fc6216fe053c5b37c4c0b`. All five required
+[CI #508 gates](https://github.com/Kajooja/Kajo/actions/runs/35536998176) passed:
+validation, platform/defaults, two clean installs, existing-application upgrade
+and native Supabase CLI/history. Initial CI #507's extra setup result row was
+fixed by silent fixture seeding, with a red-before/green-after regression for a
+single JSON snapshot. The strict reader and production migration were retained.
+The final complete local check passed all **430 tests** and both mobile exports.
+Native CI confirmed v1/v2 lock waits, guarded replay and anonymous PostgREST
+denial. This is source/server evidence, not native mobile acceptance.
+
+The exact accepted file `20260920000607_description_attribution.sql`, SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`, was applied
+as one bounded migration after fresh target/history/function/ACL verification.
+The installed source/hosted version mapping and full private operational evidence
+are retained in `Kajo-description-attribution-rollout-v1.zip`, SHA-256
+`0787e63162ccc83cc9850c4d1dff00c3681f9b0e9496d43ec1c3c95efb31469e`.
+**Do not deploy the new forward again.** The installed v1 description migration
+and six independent native forwards were not replayed or changed.
+
+Repeatable-read read-only snapshots at **21:03:16 UTC** and **21:07:40 UTC**
+verified the following after the successful installation:
+
+- All five resulting function definitions, owners, ACLs and settings exactly
+  match the isolated installation of accepted source. Every function is invoker,
+  has an empty search path and allows service-role execution while denying
+  anonymous/authenticated execution. The two full legacy writer definitions
+  remain unchanged.
+- Exactly one migration was added; all 57 prior history entries retain their
+  statement digests. Unrelated functions, triggers and default privileges match.
+- Full Item, ItemSource and external-ID alias SHA-256 fingerprints are unchanged.
+  BOOK remains **415 visible / 427 stored / 385 images / 0 descriptions**;
+  MOVIE remains **425 / 437 / 425 / 425**. There are zero managed descriptions
+  and zero discoverable mocks. No catalog writes were used as hosted tests.
+- A service-role read-only helper probe accepts valid bound synthetic credit
+  and rejects missing credit, an unsafe URL, a wrong text hash and an extra
+  private field. Security advisors are unchanged: the same 23 informational
+  RLS notices and pre-existing leaked-password-protection warning remain.
+  The warning's [existing remediation](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+  is independent of this migration; no auth settings changed.
+- The pilot archive still hashes to
+  `09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`.
+  Staged state is byte-identical to its archived entry, SHA-256
+  `3945e504a087071839095588cbd1653f82fe775555591235a3531933d9ff118f`:
+  **20 spent attempts / 1 retained prior review / 0 approved entries / 0 batches**.
+  No provider request, pilot amendment, real description write, APK dispatch or
+  device test occurred.
+
+The controlled evidence includes both snapshots, exact expected function
+definitions, validation SQL and a rehearsed guarded rollback candidate. No
+rollback was executed. That candidate refuses v2 data or drift and needs its
+own quiesced-writer/history-reconciliation review before any real recovery.
+This rollout does not clear the eight rights holds or two text exclusions,
+accept #229, close #182/MVP/Phase 14.3, or establish native UI behavior.
+
+### Native description-credit acceptance matrix
+
+This matrix defines application-level native acceptance. The September 23
+checkpoint above records the owner's successful isolated companion test and
+the separate canonical entry correction. Record the exact configured
+build/source commit, device/OS, result and visual evidence for each row. Use the
+synthetic contract fixtures through canonical Item/detail and enrichment
+boundaries in an isolated test runtime; do not seed the hosted catalog or
+generate genuine user evidence merely to make a test description visible.
+No device/emulator was available for the September 20 implementation. That
+checkpoint left every row pending; the later owner report is scoped to the
+companion and does not supply separate full-application observations per row.
+
+| Case | Required observation |
+| --- | --- |
+| Personal, Shared and List detail entry | The same canonical attributed Item retains source, revision, credit, license and changes; order and actor/Profile scope stay unchanged |
+| Collapsed and expanded text | Credit stays visible in both states, long credit wraps without clipping, and controls remain usable at increased font size |
+| Source and license links | Each independently opens the exact validated HTTPS destination; back navigation retains detail state |
+| External-link failure | Native refusal/failure shows the recoverable message without losing the Item; a later attempt can succeed |
+| Accessibility | Source and license links have distinct labels/roles and reachable focus; expanded text and credit are read in a usable order |
+| Missing, unsafe or mismatched credit | Managed text is hidden while the other Item data remain; a text-only RPC fallback does not expose an uncredited paragraph |
+| Legacy and cached content | Explicit legacy metadata preserves existing content; changing cached managed text or dropping its credit hides that description |
+
+Successful component tests, exports and server CI are insufficient for these
+observations. A main build does not contain the independent #229 branch by
+implication. Do not dispatch or poll an APK as a substitute for the named device
+gate. After native acceptance, exact source/revision/permission evidence is still
+required for any real description approval; keep the spent provider budget closed.
+[STATUS](../STATUS.md) owns continuation. Entries below retain earlier states,
+including their then-pending source publication and rollout preparation.
+
+## Structured description attribution — 2026-09-20 / #182
+
+Branch `feat/182-description-attribution` starts from accepted PR #256/main
+`1d8ed155bc39a0d543df27ca4d68006910f7f755` (all five required CI #505 gates).
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182) owns this source packet's
+exact PR/head/CI/merge outcome when published. The recovery checkpoint below
+records the publication interruption and its subsequent owner approval.
+This packet uses synthetic records only.
+
+- The shared `@kajo/catalog-contracts` package defines the public credit schema,
+  safe bounded text/HTTPS links and browser/native UTF-8 SHA-256 using pinned
+  `@noble/hashes` 1.8.0. Root check includes its tests; no engine/domain fork.
+- Offline review opts attributed approvals into v2, binds source/text hashes and
+  private permission evidence to the public credit and preserves legacy review
+  reconstruction/history. Mixed approved v1/v2 entries cannot silently omit
+  required credit. Apply selects the packet mode and readback verifies both
+  public attribution and private permission bindings.
+- CLI-generated forward `20260920000607_description_attribution.sql` extends
+  only the narrow catalog writers and adds a private validator. Invoker/service
+  ACLs, empty search paths, deterministic locks, exact identities/versions,
+  preserved core metadata and batch atomicity remain. Populated v1→v2 upgrade
+  preserves all existing rows; v2→v1 and legacy overwrite attempts are rejected.
+  Credit/evidence changes require current versions; identical replay is a no-op.
+- Canonical Item reads select metadata and preserve explicit legacy content.
+  Text-only RPC fallbacks and invalid/missing required attribution hide only the
+  description. Ranking, Shared and List enrichment carry whole canonical Items
+  without changing order, authorization or actor/Profile state. Detail cache
+  revalidation rejects altered text or dropped/unsafe credit. The view shows
+  source, revision, credit, license and changes even when the text is collapsed,
+  with independently accessible links and recoverable link-opening errors.
+- Tests cover shared hash/URL/plain-text behavior; v1 review-history preservation
+  and v2 synthetic apply/readback; complete-schema forward/data preservation,
+  ACLs, downgrade/stale-version denial and atomic batch failure; canonical
+  enrichment/error fallback/cache binding; and source/license link activation.
+  A Unicode-trim mismatch found by the SQL fixture was corrected to match the
+  JavaScript contract. Native CI additionally exercises old-server rejection,
+  PostgREST v2 resolution, anonymous denial and overlapping writers.
+
+The complete local `npm run check` passed: **220 mobile, 3 shared-contract,
+46 catalog, 28 Edge, 63 database, 43 engine and 27 research tests (430 total)**,
+lint/typechecks and iOS/Android exports. Frozen Edge dependencies used existing
+archives verified against their lock integrities. Only the new workspace and
+pinned hashing dependency changed the npm lock. Final mobile lint retains only
+the pre-existing Discovery Hook warning. Required final-head native CI/merge
+identities are recorded in #182, not inferred from local PGlite tests.
+
+No native emulator/device was available; actual layout, screen-reader navigation
+and native external-link behavior are not accepted by component/bundle success.
+No hosted query/write, provider request, source permission decision, pilot
+amendment or APK dispatch occurred. The saved checkpoint SHA-256 remains
+`09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`:
+**20 consumed attempts / 1 prior review / 0 approvals / 8 rights holds /
+2 text exclusions / 0 database batches**. September 17 catalog counts remain
+the last verified inventory. #229 and MVP/Phase 14 acceptance stay open.
+
+After source publication and required CI/merge acceptance, continue the new
+catalog-only forward rollout (source SHA-256
+`57af455775f7f43d7cfe81fc8af887128358c3c3e056f785b4cbb3545bfab043`) and native
+description-credit acceptance. Do not redeploy installed v1/history, broaden
+budgets or repeat the general licensing search. Exact matching contribution/
+revision and applicable permission are still required before approving real
+text; rendering support alone grants no rights. [ARCHITECTURE](../../architecture/ARCHITECTURE.md#description-attribution--contract-182)
+owns the durable schema/display rules; STATUS owns the single next packet.
+
+### Interrupted-publication recovery and rollout preparation — 2026-09-20
+
+Fresh repository synchronization confirms accepted main is still
+`1d8ed155bc39a0d543df27ca4d68006910f7f755`. Runtime commit
+`89371e094c8259c9bce73719c35e73b583dbfd0b` and its 39-file implementation were
+recovered intact. No remote attribution branch or PR exists. The interrupted
+chat's claim of a published PR waiting for CI was incorrect. Automatic approval
+review rejected the push to public `Kajooja/Kajo`, citing insufficient explicit
+publication authorization for this source packet. No alternate publication
+method was attempted. The owner subsequently explicitly approved publication to
+public `Kajooja/Kajo`, PR creation and merge after all five required checks, and
+requested immediate continuation afterward. The publication block is resolved;
+Issue #182 records the resulting exact source/CI/merge evidence.
+
+PR #257 was actually opened at `f6e2ab325edb8bae1e99f7ac9756d8804667105b`, with
+tree `1e5c74c4133f2e0220fec47341db53051d330b30` matching the local checked tree.
+Initial CI #507 passed validation, platform, clean-install and existing-upgrade
+gates. The native CLI job failed because the attribution upgrade fixture emitted
+an intermediate UUID/outcome row into the strict JSON-line reader. Replacing
+the setup `select` with `perform` preserves the seeded v1 row without emitting
+it. The local full-schema regression now asserts exactly one final snapshot;
+it failed with two rows before the fix and passes afterward. No parser relaxation,
+gate removal or production migration change was used. Final-head CI remains
+required before source acceptance or hosted rollout.
+
+- A fresh complete `npm run check` passed all **430 tests**, lint/typechecks and
+  both iOS/Android exports. Runtime source and migration bytes are unchanged.
+  The existing verified frozen Edge archive cache was reused. The existing
+  Discovery Hook warning and Metro's `@noble/hashes/crypto.js` export-resolution
+  fallback warning remain; successful bundles do not prove native execution.
+- A repeatable-read, read-only hosted snapshot at **2026-09-20 19:32 UTC** verified
+  the configured target, migration history, all four catalog writers, their
+  function definitions/owners/ACLs/settings, catalog fingerprints, unrelated
+  functions, triggers and default privileges. The four definitions still match
+  the verified September 17 readback and the locally installed accepted source.
+  All remain invoker functions with empty search paths and service-role-only
+  client execution. The new private attribution validator is absent.
+- The fresh inventory is unchanged in count: BOOK **415 visible / 427 stored /
+  385 images / 0 descriptions**; MOVIE **425 / 437 / 425 / 425**. There are zero
+  managed descriptions and zero discoverable mocks. Exact full catalog hashes
+  and function preimages are retained in the separate local preparation evidence;
+  no raw source paragraphs or private evidence are added to Git.
+- An isolated PGlite rehearsal matched all four target function definitions,
+  owners, ACLs and settings before applying the unchanged new forward. V2
+  binding/upgrade/downgrade/atomicity fixtures passed. A recovery candidate,
+  generated from the two exact prior writer definitions, restores those writers
+  and removes only the new validator. It requires quiesced catalog writers,
+  bounded locks and unchanged v2 function/ACL hashes, and refuses existing v2
+  data. The rehearsal restored the original function and application snapshots;
+  repeating the rollback was rejected. It deliberately does not alter migration
+  history; any real recovery still needs its own reviewed history reconciliation.
+- The pilot archive remains SHA-256
+  `09e6de176eca698a7db582a4f9d4e892ce2f3fe841771b251b0581dee23b91a8`, and the local
+  pilot state matches the archived state byte for byte. No provider call, pilot
+  amendment, hosted write, migration installation, APK dispatch or device test
+  occurred. The new forward remains uninstalled.
+
+After source acceptance, refresh the read-only snapshots immediately before the
+bounded admin rollout and compare all catalog/unrelated metadata afterward.
+Native acceptance must cover Personal, Shared and List detail entry, collapsed
+and expanded credit, source/license link activation and failure, screen-reader
+labels, and missing/invalid-credit fallback. Keep the device and #229 gates open.
+Preparation evidence does not approve any real text or extend the spent budget.
+
+## Cached BOOK rights audit and review amendment — 2026-09-19 / #182
+
+Branch `feat/182-book-review-amendment` starts from accepted PR #255, main
+`6257561b3f2e5a566925abe0e1b82537ebecb4d3`. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+owns this packet's exact PR/head/CI/merge result. The prior deployment and all
+twenty raw provider records were reused; no fresh provider record, hosted
+query/write, APK dispatch or device test belongs to this packet.
+
+### Source findings and display gate
+
+The saved Work records contain no explicit rights/license field. The
+[Open Library licensing page](https://openlibrary.org/developers/licensing),
+rechecked on September 19, still flags possible existing contribution rights.
+Record availability and text eligibility do not establish display permission.
+The controlled `rights-audit.json` binds these findings to each cached record
+revision/hash and text hash; it contains references and conclusions, not new
+replacement descriptions.
+
+| Frozen position | New source finding | Decision |
+| --- | --- | --- |
+| 1 — Pieni elämä | [Wikipedia revision 686759357](https://en.wikipedia.org/w/index.php?title=A_Little_Life&oldid=686759357), October 21, 2015, matches the first two sentences; the third differs. Current prose also differs. | Hold: exact contribution/revision and attribution unresolved |
+| 2 — Ei enää ihminen | [Publisher's current page](https://www.ndbooks.com/book/no-longer-human/) uses different copy; the cached text includes a critic quotation. The publisher provides a separate [permissions process](https://www.ndbooks.com/permissions/). | Hold: exact source and permission unresolved |
+| 3 — Rikos ja rangaistus | Existing Markdown/URLs remain excluded. | Unchanged text-policy exclusion |
+| 4 — Romeo ja Julia | [Linked Wikipedia lead](https://en.wikipedia.org/wiki/Romeo_and_Juliet) overlaps but differs; no exact matching revision was established. | Hold: origin/revision and attribution unresolved |
+| 5 — Ajan lyhyt historia | The cached asterisk remains excluded. | Unchanged text-policy exclusion |
+| 6 — Atomic Habits | [Publisher opening](https://www.penguinrandomhouse.com/books/543993/atomic-habits-by-james-clear/) closely matches, with punctuation differences; [site terms](https://www.penguinrandomhouse.com/terms-of-use/) do not supply a Kajo display grant. | Hold: use permission unresolved |
+| 7 — It Ends With Us | [Publisher page](https://www.simonandschuster.com/books/It-Ends-with-Us/Colleen-Hoover/It-Ends-with-Us/9781501110368) matches three paragraphs, with a different closing paragraph; [site terms](https://www.simonandschuster.com/p/terms-of-use) do not establish permission for this cached copy. | Hold: use permission unresolved |
+| 8 — The Subtle Art of Not Giving a Fuck | [Author page](https://markmanson.net/books/subtle-art) does not contain the cached description. | Hold: primary contribution/permission unconfirmed |
+| 9 — Control Your Mind and Master Your Feelings | No primary origin or license was established. | Hold: origin/permission unconfirmed |
+| 10 — Harry Potter and the Philosopher's Stone | [Author page](https://www.jkrowling.com/book/harry-potter-philosophers-stone/) differs; cached text includes a narrative excerpt. | Hold: exact contribution/permission unresolved |
+
+These are documented matches/leads, not assertions of an exact copyright-owner
+chain. Date-filtered Wikipedia history retrieval was unavailable; that limitation
+does not turn a partial match into a licensed revision. No publisher/contributor
+was contacted and no permission grant was obtained. **Zero display approvals;
+eight rights holds and two unchanged text-policy exclusions.**
+
+The implementation audit found `Item.description` alone in the domain contract,
+no description provenance selection in `catalogItemOperations.ts`, and plain
+description rendering in `ItemDetailScreen.tsx` without source/license credit.
+[Wikimedia reuse terms](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use#7._Licensing_of_Content)
+and [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) therefore cannot
+be satisfied by merely storing an attribution note in the private import review.
+The [attribution contract](../../architecture/ARCHITECTURE.md#description-attribution--contract-182)
+owns the minimum structured data and display behavior. No UI/schema extension is
+claimed delivered here, and no existing publisher text is relabeled as CC-licensed.
+
+### Delivered offline review amendment
+
+`amend-review --run <existing-run> --amendment <proposal.json> --baseline <baseline.json>`
+accepts a proposal with exactly `contract`, `expectedReviewSha256`, `reason` and
+all ten `decisions`. The contract is
+`open-library-description-review-amendment-v1`; the expected hash is
+`digest(state.review)` using the existing canonical JSON digest. A non-older
+baseline may refresh expected row versions; the original baseline stays in
+the retained review. Actual apply still requires a current SQL readback and
+guarded rollback preimages in the configured admin runtime.
+
+The command requires a reviewed, non-failed run with **no database batch attempt**.
+It verifies every saved record/hash and the exact consumed attempt accounting,
+including skipped Work records. It validates the old and new packets, preserves
+complete decisions/baselines in `reviewHistory`, links the new review to its
+parent, and saves atomically under the existing lock. Replayed/stale proposals,
+unchanged inputs, invalid history, failed runs and any previous attempted write
+are rejected without resetting state. Apply and verify also validate review
+history. The rights/text/identity rules and SQL v1 payload remain unchanged.
+
+The actual CLI recorded the ten source-specific skip reasons in the original
+run: **20 unchanged attempts / 1 prior review / 0 approved entries / 10 skips /
+0 database batches**. The old raw state, applied proposal and rights audit are
+retained in `Kajo-book-description-pilot-v1.zip`; the applied proposal must not
+be replayed. No operation-lock recovery or global-claim replacement was needed.
+Catalog totals remain the September 17 verified baseline, not a fresh readback.
+
+Validation covers legacy behavior plus exact parent/history retention, successive
+amendments, skipped-record tampering, spent budgets, stale/locked/replayed
+proposals, unchanged permission/language gates and amended synthetic apply/
+readback through the existing RPC contract. The actual CLI test disables fetch
+and supplies no credentials. All 19 description tests and the complete root
+`npm run check` passed, including both platform bundle smokes. The first root
+attempt stopped at a refused npm registry connection; the successful run reused
+cached package archives whose integrity matched every frozen Edge lock entry.
+No dependency or lockfile was changed. All 46 local Markdown link targets and
+the whitespace check passed. Exact remote CI/merge outcomes remain in #182.
+
+Next implement the structured attribution path with synthetic fixtures and
+preserve #229's independent reader/native gates. Matching source revisions and
+appropriate permission evidence remain necessary before real approval; complete
+general licensing research is not the next default task. The pilot and MOVIE
+budgets stay closed; do not redeploy installed SQL or broaden the provider pass.
+
+## BOOK rollout and description review — 2026-09-17 / #182
+
+Branch `docs/182-book-description-rollout` starts from accepted PR #254,
+main `dce94df96e965f26810c979cf8af550d551c8597`. Publication initially stopped
+at automatic approval review. The owner explicitly authorized the public
+documentation and #182 update on 2026-09-17. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+records this documentation packet's exact PR/head/CI/merge outcome.
+
+### Completed rollout and preserved data
+
+The exact accepted `20260914060616_book_description_refresh.sql` was applied
+once. Its source bytes and filename remain unchanged. The owner-controlled
+checkpoint retains the source/hosted version mapping and exact verification;
+do not apply the forward again or repair previous history.
+
+Readback verified both new function bodies, the exact intended legacy guard,
+unchanged legacy batch, service-only invoker permissions and no default mode.
+All previous migration rows, unrelated function definitions/ACLs, triggers and
+global defaults were preserved. An anonymous empty-entry HTTP probe reached the
+named overload and received permission denial, establishing hosted schema-cache
+resolution without a privileged write. It is not an actual import ACK.
+
+Before/after and final catalog comparisons are equal: BOOK **415 discoverable /
+427 stored / 385 images / zero descriptions**; MOVIE **425 / 437 / 425 images and
+descriptions**. All ten pilot identities, row versions and preservation hashes
+match. Detailed database identifiers/fingerprints stay in controlled evidence.
+Security review found no new function/search-path/permission finding; existing
+private-table RLS-without-policy notices and the previously tracked
+[Auth password-protection warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+remain separate operations work.
+
+### Actual frozen preview and review outcome
+
+The unchanged CLI collected all ten selected Editions and, after hash-bound
+fallback review, their ten exact Works. All twenty responses passed exact
+record/Work identity checks. **20 attempted GETs / 20 found records / zero
+retries / zero redirects / zero database batches.** The original request spacing,
+timeouts, size cap, candidate identities and exclusive pilot claim were retained.
+This provider budget is exhausted; no further candidate fetch is part of it.
+
+| Frozen position | Edition description | Work description | Review decision |
+| --- | --- | --- | --- |
+| 1 — Pieni elämä | Finnish; source URL | Eligible English, 199 code points | Stage: permission/attribution unconfirmed |
+| 2 — Ei enää ihminen | Missing | Eligible English, 863 | Stage: permission unconfirmed; embedded critic quotation |
+| 3 — Rikos ja rangaistus | Missing | Markdown/URLs | Stage: text policy rejects it |
+| 4 — Romeo ja Julia | Missing | Eligible English, 388 | Stage: origin/license and attribution need confirmation |
+| 5 — Ajan lyhyt historia | Missing | Contains an asterisk | Stage: unchanged text policy rejects it |
+| 6 — Atomic Habits | Missing | Eligible English, 315 | Stage: permission unconfirmed |
+| 7 — It Ends With Us | Missing | Eligible English, 1,212 | Stage: permission unconfirmed |
+| 8 — The Subtle Art of Not Giving a Fuck | Missing | Eligible English, 470 | Stage: contribution/permission unconfirmed |
+| 9 — Control Your Mind and Master Your Feelings | Missing | Eligible English, 1,182 | Stage: permission unconfirmed |
+| 10 — Harry Potter and the Philosopher's Stone | Missing | Eligible English, 683 | Stage: permission unconfirmed; narrative excerpt present |
+
+The eight structurally eligible descriptions are all English. A Finnish Edition
+did not supply an eligible Finnish description. No markup was stripped, text
+rewritten/translated, notes substituted or original language changed.
+
+The official [Open Library licensing page](https://openlibrary.org/developers/licensing)
+still flags possible pre-existing rights. Actual saved records do not establish
+a permission basis for these display writes. Linked encyclopedia/author pages
+are origin leads, not an exact licensed revision or completed attribution plan.
+The matching current encyclopedia prose is not identical to the cached text;
+do not assert an exact source match without evidence. None is marked approved.
+
+The accepted `review` command generated a **reviewed packet with zero entries
+and ten skips** (eight permission holds, two text-policy exclusions). No `apply`
+or `verify` batch command was run, and no empty batches were sent. The target of
+six approved usable descriptions was **not met**. Preview/review completion is
+not description-import or native-usefulness acceptance.
+
+### Controlled checkpoint and continuation
+
+`Kajo-book-description-pilot-v1.zip` is the owner-controlled checkpoint. It holds
+the original claim, all twenty raw responses/record and text hashes, attempt
+ledger, fallback/content/text decisions, before/final coverage and rollout
+evidence. Real descriptions, raw records, database identifiers and review inputs
+remain outside Git. The local run is `dist/catalog-enrichment/book-pilot-v1`.
+Recover the saved run before any future action; never create another pilot to
+reset its counters or fetch the same candidates again.
+
+One local fallback invocation stopped on a stale operation lock before any
+request. The completed preview's records, hashes, prepared status, zero Work
+attempts/batches and process exit were reconciled before archiving that lock;
+the same claim/state then completed its ten Work calls. The fallback command
+reported no lock after successful exit, but a subsequent tool snapshot again
+contained that lock. Its completed state was reconciled before the no-I/O review.
+This observed persistence limitation is recorded without claiming a source-code
+defect. Restored locks require the same explicit reconciliation; never delete
+the global claim or turn a failed/uncertain operation into success.
+
+Next complete a bounded **cached-source permission and attribution packet**.
+Prioritize exact origin/revision and license evidence for the existing candidate
+texts, determine required public credit/license links, and review the actual
+display contract/UI before approving any text. Resolve unknown permissions with
+documented evidence or keep them staged. Do not change the normalizer simply to
+meet the target or begin a broad dump/API pass first.
+
+The run is already `reviewed` with zero entries. The current CLI intentionally
+does not reopen reviews. If a later decision approves cached text, use a reviewed
+and tested amendment workflow retaining the original decisions, hashes, spent
+attempts and zero batch history; do not edit its status back to `prepared`.
+Refresh the exact SQL baseline and prepare a guarded description-only rollback
+before any write. Actual apply still belongs to the configured admin runtime;
+no privileged credential was available in this workspace and none was retrieved.
+Do not bypass that boundary through SQL HTTP/vault or new admin endpoints.
+
+Validation: accepted PR #254/CI #501 remains the runtime source/native proof.
+This documentation PR runs the normal required CI gates; #182 owns their outcome.
+Hosted readback, anonymous HTTP denial, all twenty
+provider receipts, actual normalization/review and unchanged catalog comparison
+are new evidence. No device test, APK dispatch, new model admission, native
+forward or catalog-import v12 redeployment occurred. Documentation links and
+whitespace passed separately before publication (36 local links across four
+changed Markdown files). #182 / MVP-CAT-001..003 /
+Phase14.3, broader dump coverage, curated mapping, rights and native usefulness
+stay open; the completed MOVIE budget and #229/D2 decisions are unchanged.
+
+## BOOK description implementation — 2026-09-14 / #182
+
+Branch `feat/182-book-description-refresh` starts from accepted planning PR #253,
+main `1ea3a8c64beff8571bde4dc39cf73c30fc68b944`. This packet implements the
+[guarded contract](../../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
+and the frozen pilot below. [Issue #182](https://github.com/Kajooja/Kajo/issues/182)
+owns the exact PR/head/CI/merge result. This is source acceptance; the migration,
+candidate provider reads and description writes have not run against the hosted
+project. Read-only SQL on 2026-09-14 confirms the earlier BOOK/MOVIE baseline.
+
+### Delivered behavior and deliberate implementation choices
+
+- `open-library-descriptions.mjs` accepts only typed/plain `description`, applies
+  NFC/plain-text/size bounds, verifies exact Edition/Work linkage and hashes raw
+  records/text. Missing notes-only records stay missing. Verified description
+  language is separate from the selected Edition and original language.
+- `import-open-library-descriptions.mjs` supplies `plan`, `preview`, `fallback`,
+  `review`, `apply` and `verify`. The fixed manifest is tested against the SQL's
+  ten UUID/Work/Edition/language tuples. `plan` has no I/O or credential need.
+  Preview uses provider reads only; it collects ten Editions, then pauses for
+  actual review before fetching any fallback Works. This implements the planned
+  Edition-first preference without assuming description language from Edition
+  metadata or spending fallback requests on already acceptable text.
+- One exclusive pilot claim under ignored `dist/catalog-enrichment/`, plus an
+  exclusive per-run lock and atomically replaced checkpoints, prevents parallel
+  starts/reset budgets in different run directories. Every request is recorded
+  before transport. There are at most twenty sequential starts spaced 1,100 ms,
+  a 15-second response deadline and 1 MiB decoded limit. A 404 is sparse; a
+  redirect, identity/JSON/encoding failure, 429, 5xx, timeout or network error
+  fails the run. No automatic retries, replacements or counter reset.
+- Review binds the actual record/text hashes, explicit fi/en text language,
+  contribution/use permission basis and fresh SQL Item/source identities and
+  versions. The public provenance contains the basis hash; the private source
+  envelope contains its bounded explanation. Unknown language/permission stays
+  skipped/staged. Raw records, real descriptions and reviewer files stay ignored.
+- CLI-created forward `20260914060616_book_description_refresh.sql` adds named
+  two-argument overloads at the existing canonical Item/batch boundary, with no
+  default mode. The batch accepts 1–10 distinct Item/source identities and locks
+  Items, sources, then aliases in deterministic order. The narrow Item overload
+  also validates/locks when called directly. It changes only description, its
+  provenance and the private envelope plus automatic update timestamps. Calling
+  the old full writer would normalize existing arrays/title again, so the narrow
+  Item overload is the canonical implementation of the preserving mode.
+- Equal text/source revision/review identity returns a read-only `unchanged`,
+  including an older expected row version. New fetch time/raw-record hash alone
+  does not rewrite existing evidence. A changed text needs exact current Item
+  and source versions. Identity/lifecycle checks still precede no-op. Legacy
+  Search Work and dump Edition imports reject managed refreshes under the same
+  Item lock; unmanaged imports remain supported. All signatures are invoker,
+  empty-search-path and service-role-only; PostgREST receives schema reload.
+- Apply rebuilds and checks the reviewed packet before transport. Positions 1–5
+  and 6–10 are separate atomic requests, each with exact index/UUID/outcome ACKs.
+  `verify` requires a fresh SQL report: catalog/nonpilot fingerprints, all ten
+  identities/core/source fields and actual description SHA-256/provenance must
+  match. Batch 2 is blocked until batch 1 readback passes. The run completes only
+  after the second readback. A lost/malformed response or checkpoint after a
+  possible commit consumes the batch as `unknown-write-outcome`; no auto replay.
+
+### Operator continuation after source/rollout acceptance
+
+Review/apply only the new catalog migration after checking the current hosted
+catalog definitions/ACLs. Do not replay the six native forwards or deploy the
+unchanged v12 Edge function. The Supabase connector does not expose a privileged
+catalog import invocation or secret retrieval; do not work around that boundary
+through SQL HTTP/vault/new endpoints. Use the already configured admin runtime
+for `apply`, with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`; provider-only
+commands need neither. No new key setup is required by this packet.
+
+The commands below are the operational sequence, **not completed provider work**.
+Run from the repository root. Run paths must be under the ignored staging root.
+
+```bash
+npm run catalog:book-descriptions -- plan
+npm run catalog:book-descriptions -- preview --run dist/catalog-enrichment/book-pilot-v1
+npm run catalog:book-descriptions -- fallback --run dist/catalog-enrichment/book-pilot-v1 --review dist/catalog-enrichment/book-pilot-v1/fallback-review.json
+npm run catalog:book-descriptions -- review --run dist/catalog-enrichment/book-pilot-v1 --review dist/catalog-enrichment/book-pilot-v1/text-review.json --baseline dist/catalog-enrichment/book-pilot-v1/before.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 1
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-1.json
+npm run catalog:book-descriptions -- apply --run dist/catalog-enrichment/book-pilot-v1 --batch 2
+npm run catalog:book-descriptions -- verify --run dist/catalog-enrichment/book-pilot-v1 --baseline dist/catalog-enrichment/book-pilot-v1/after-batch-2.json
+```
+
+Inspect the saved `preview.json` and source records before writing review inputs.
+Skip `fallback` entirely if no Work lookup is needed; each selected Work can be
+fetched once. `fallback-review.json` is an array of positions, Edition
+`recordSha256`/`textSha256` (null for missing text) and a reason from
+`edition-missing`, `edition-language`, `edition-rights`, `edition-unsuitable`.
+`text-review.json` contains exactly one decision for each of the ten positions:
+
+| Decision | Required fields in addition to `position` |
+| --- | --- |
+| Accept reviewed text | `choice: "edition"` or `"work"`, exact chosen `recordSha256`, `textSha256`, `textLanguage: "fi"` or `"en"`, `rights: "approved-for-pilot"`, actual 20–1,000-character permission/use `basis` |
+| Leave staged | `choice: "skip"`, nonblank `reason` (max 200 characters) |
+
+Run `scripts/catalog/book-description-coverage.sql` at each named checkpoint and
+save its **`book_description_coverage` object**, not the SQL client's row wrapper,
+as the corresponding private JSON file. The query now exports source UUID/current
+version, description SHA-256 and prior description/provenance/envelope in addition
+to the unchanged preservation fingerprint definitions. Retain complete controlled
+preimages for the reviewed guarded rollback procedure below. No rollback switch
+clears managed fields automatically. Do not delete a failed run's pilot claim,
+edit an ambiguous batch to completed, or invent a new run to reset the budget.
+Read back exact identities/text hashes/versions and record reconciliation plus
+the remaining-attempt decision in #182 before any further operation.
+
+### Verification and remaining gates
+
+Local root `npm run check` passed 411 tests, lint/typecheck and both Hermes
+exports. Catalog fixtures cover bounds, notes exclusion, text/Edition languages,
+hash-bound review, Work fallback, rate/timeout/budget stops, packet tampering,
+exact/unknown ACKs and enforced readbacks. Full-schema PGlite fixtures cover a
+populated catalog upgrade, exact preservation (including unsorted arrays/title),
+stale Item/source versions, conflicting aliases/lifecycle, atomic rollback,
+no-op/changed refresh, ACLs and both legacy replay paths.
+
+Required CLI CI adds the same populated upgrade/smoke on the pinned native
+Supabase stack. Independent service-role sessions must visibly wait for actual
+row locks: reversed input batches update once/no-op once, while a waiting legacy
+refresh is rejected. Real PostgREST must reject the mode on the older schema,
+resolve the new overload with exact read-only replay ACKs and deny anonymous
+access. Source/CLI migration-history/native-platform gates remain required;
+Issue #182 records their actual result rather than treating PGlite as concurrency
+proof. Local dependencies use the existing archive cache after all eleven frozen
+Edge SHA-512 checks; CI uses its normal dependency path. The existing unrelated
+mobile Hook lint warning remains.
+
+Initial source CI #500 passed validate/platform/fresh-install/populated-upgrade
+but failed in native concurrency fixture cleanup: catalog source foreign keys
+restrict Item deletion. The fixture now deletes its synthetic aliases/sources
+before Items, also checks committed cleanup in PGlite, and preserves any earlier
+probe error if cleanup fails. The application migration is unchanged. Corrected
+head/CI acceptance is recorded in #182; the failed run is not native acceptance.
+
+The updated read-only coverage query executed at
+**2026-09-14T06:34:32.501146+00:00**: BOOK 415 visible / 427 stored, 385 images,
+zero descriptions; MOVIE 425 visible / 437 stored, all 425 images/descriptions.
+All ten identities and source UUID/version fields match; all existing preservation
+fingerprints are unchanged. Query SHA-256:
+`e4803671f63815416202a733d6ca9f97ddc429880e571bdab61cc1ebc6919278`.
+Catalog forward SHA-256:
+`c592fd19949eb6a5484711bc9c73a35b596c163175896c60d7bcc6a654652188`.
+
+No hosted DDL/deploy, candidate GET, description write, device test or APK
+dispatch occurred. Source success does not supply a per-record rights decision,
+pilot coverage, native rendering/attribution, broader dump coverage or curated
+identity mapping. #182 / MVP-CAT-001..003 / Phase 14.3 stay open. The completed
+MOVIE cap, #229 native gates and rejected D2 challenger admission are unchanged.
+
+## BOOK description plan — 2026-09-13 / #182
+
+Planning branch: `docs/182-book-description-plan`, based on accepted
+`f8ed71db6186ee9f810d985462119cf7085e1f08` / PR #252. The completed diagnostic
+rollout is catalog-import ACTIVE v12, with exact five-file readback and unchanged
+425-movie coverage recorded in [#182](https://github.com/Kajooja/Kajo/issues/182).
+Do not repeat its CI/deploy/import sequence. This packet adds a reviewed BOOK
+contract and read-only coverage query; it does not implement/apply that contract.
+
+### Observed data and source gaps
+
+Hosted read-only audit at **2026-09-13T22:03:54.804507+00:00**, followed by the committed
+final query at **2026-09-13T22:16:34.12922+00:00**, found:
+
+- **415 discoverable / 427 stored BOOK Items**, 385 covers and zero descriptions.
+- All 385 Open Library Items have one matching Work alias, a matching metadata
+  mirror/source key and a selected Edition key. No saved Search payload contains
+  `description` or `notes`; the Search normalizer explicitly returns null.
+- Display-Edition languages are eng 336, fin 39, swe 3, spa 2, and fre/ita/por/tur/yid
+  one each. These are not original-language or description-language counts.
+  All 385 provider Items have unknown original language. The historical 57 Finnish
+  edition-availability count is a different measure from 39 selected Finnish editions.
+- All 30 original curated BOOK Items have only `kajo_curated_slug` aliases.
+  They retain their original UUIDs and 2026-09-04 creation times. The query lists
+  them for a later exact identity review; exclude them from this pilot.
+- MOVIE remains 425 discoverable / 437 stored, all 425 with images/descriptions.
+  Discoverable mocks remain zero.
+
+The bulk importer currently consumes ratings and Editions, not Work descriptions;
+its normalizer can substitute `notes` and treats Edition language as original
+language. Neither behavior belongs in the new description contract. Its raw
+error-body echo and unverified successful-count fallback, also present in Search
+orchestration, must not be copied into new orchestration.
+
+The deployed single-item upsert confirms full replacement of description and
+metadata (definition MD5 `26418016af759bce2e580fdd7d3236a2`);
+the batch wrapper is `abd9f4d40e35096d1cc1a9fa2a39e497`. A description-only entry
+would clear unrelated fields. Implement the guarded overload described in
+[Catalog architecture](../../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
+before any write. Current RPCs and six installed native forwards were not changed.
+
+### Frozen first pilot — open-library-description-pilot-v1
+
+Select five fin and five eng display Editions from existing alias-verified Items,
+ordered by stored popularity descending then Work ID inside each group. This
+selection was frozen from the audit; later checkpoints retain the exact identities
+even after their descriptions change. It is a technical/quality pilot, not a
+representative catalogue sample or evidence about original language.
+
+| Order | Current title | Canonical Item UUID | Work ID | Selected Edition ID | Edition language |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Pieni elämä | `a7f6d2cd-e290-4bc4-97b7-cf1180ea86b9` | `OL17370186W` | `OL26433779M` | fin |
+| 2 | Ei enää ihminen | `43c6e886-0858-4f3e-b188-72cc62b6dfbc` | `OL3923952W` | `OL44944392M` | fin |
+| 3 | Rikos ja rangaistus | `25fa7fee-2a4d-4b8e-9c63-f9f6f367aff9` | `OL166894W` | `OL16835710M` | fin |
+| 4 | Romeo ja Julia | `6aa4020d-fdfa-4010-ad8d-2217c71f06f8` | `OL362427W` | `OL26501345M` | fin |
+| 5 | Ajan lyhyt historia | `9d8a5234-5565-4f42-aa77-30422e780419` | `OL1892617W` | `OL39218444M` | fin |
+| 6 | Atomic Habits | `ccbdb717-0a27-4099-8b56-64b3c5f9aaed` | `OL17930368W` | `OL27918581M` | eng |
+| 7 | It Ends With Us | `b54ebb75-2e4c-48e1-8349-5f73bf0d789b` | `OL18020194W` | `OL27213498M` | eng |
+| 8 | The Subtle Art of Not Giving a Fuck | `c3548ac2-ae85-4ee6-aeeb-8101fa909fb1` | `OL17590212W` | `OL27351482M` | eng |
+| 9 | Control Your Mind and Master Your Feelings | `4af3c2b6-7a8a-4107-b198-ac0ed0afa2c9` | `OL25312237W` | `OL33899062M` | eng |
+| 10 | Harry Potter and the Philosopher's Stone | `fad9046f-f67a-42f2-9fb8-57657035593e` | `OL82563W` | `OL59004869M` | eng |
+
+No substitutions, title search, new Items, new aliases or Edition enumeration.
+If a selected Edition now links to another/multiple Works, stop and review the
+identity conflict; do not repair it inside this pilot.
+
+| Pilot resource | Hard cap |
+| --- | ---: |
+| Existing canonical candidates | 10, exactly as above |
+| Provider GET attempts | 20 total: at most one selected Edition + one exact Work per candidate |
+| Concurrent provider requests | 1 |
+| Minimum spacing | 1,100 ms between request starts; respect Retry-After before any later explicit resume |
+| Per-response timeout / decoded JSON size | 15 seconds / 1 MiB |
+| Automatic retries / redirect follows / replacement candidates | 0 / 0 / 0 |
+| Reviewed database batches | At most 2, positions 1–5 then 6–10, each atomic |
+| Entries written / new Items / alias additions | At most 10 / 0 / 0 |
+
+These are proposed pilot limits, **not operations performed in this planning
+packet**. Documentation lookups and read-only SQL are separate from the future
+candidate GET ledger. Inspect the exact Edition first; fetch its Work only when
+the selected description cannot be used, within the same cap. Every started
+attempt consumes its slot even on failure. A resumed failure needs an explicit
+revised remaining-attempt ledger; never silently reset counters. A successful
+ten-candidate pass does not authorize another 375 single-book API sweep.
+
+Use the application's honest User-Agent/contact identification and the default
+one-request/second tier; do not assume a repository URL grants the provider's
+higher identified tier. Collect and cache provider records before review and
+before opening database transactions. Dry-run planning performs no I/O;
+preview performs only the bounded provider reads and reports no writes.
+
+### Review, apply and continuation
+
+1. Implement/test the strict text normalizer, no-write planner/preview and
+   guarded generic batch mode from the architecture contract. Keep current
+   Search/dump writes from clearing managed descriptions. Old deployments must
+   reject the top-level refresh mode. Accept source/CI and review the exact
+   catalog-only migration/rollout before using it; no new credential setup or
+   unrelated function/native rollout is part of this work.
+2. Run `scripts/catalog/book-description-coverage.sql` and existing
+   `catalog-coverage.sql`. Require all ten `identity_matches=true`; preserve the
+   complete per-Item/source preimage in controlled admin staging for guarded
+   rollback. Keep only IDs, hashes, counts and decisions in Git/#182.
+3. Prepare a frozen preview with source record URLs/revisions/hashes, candidate
+   text hashes, source/fallback, text-language review and actual attempted-call
+   ledger. Review fitness and contribution/use rights before any display write.
+   Unknown permission/language, notes, markup, absent or rejected text stays
+   staged/skipped with fixed reasons. A 404 is a sparse result; transport/rate
+   limit/JSON/identity errors stop. Do not fabricate Finnish copy or claim
+   Edition language proves the text's language.
+4. Apply only approved candidates from positions 1–5 through the guarded mode.
+   Require exact returned input-index/UUID mapping for every acknowledged row.
+   Compare the SQL report before proceeding to positions 6–10. A malformed/lost
+   acknowledgement is an unknown write: stop and reconcile actual hashes/versions.
+   Never automatically replay the batch or continue after uncertainty.
+5. After each batch, require unchanged stored/discoverable counts, all ten
+   identities, all `preservation` fingerprints, each pilot `core_md5` and
+   `source_base_md5`. The query allows only pilot description/provenance/envelope
+   plus automatic timestamps to change. Record added, unchanged, skipped and
+   uncertain counts separately. Use `catalog-coverage.sql` to recheck service
+   privileges. Hashes detect drift; they are not authorization tokens.
+6. The pilot's working usefulness target is **at least six reviewed, usable
+   Finnish/English descriptions out of ten**, with every candidate accounted for,
+   exact identity preservation and no data loss. Record actual Finnish/English
+   text counts and every fallback. Missing the target is a valid failed-coverage
+   result; no automatic extra requests. Native rendering/attribution acceptance
+   remains separate from normalized text/SQL success.
+7. After pilot review, plan the remaining exact Work/Edition join from one
+   pinned monthly dump release, streamed against the existing target IDs.
+   Description enrichment needs no rating-history input or new popularity ranking.
+   Pin source checksums/revisions and use the same guarded mode/checkpoints.
+   Default to filling missing text; changed owned text is an explicit reviewed
+   refresh. Missing upstream text never erases current text. No recurring
+   scheduler is enabled by this plan.
+8. Review the 30 curated identities separately using authoritative Work/Edition
+   linkage and creator/edition evidence. Their current title/author is a search
+   aid, not permission to attach an alias. No fuzzy duplicate creation.
+
+Rollback restores only the prior description/provenance/source envelope on the
+same Items, and only while current hashes/versions still equal this pilot's
+writes. Retain canonical sources/aliases and all user history. A concurrent edit
+or uncertain write requires reconciliation; do not restore entire old Item rows.
+
+### Required implementation verification and remaining gates
+
+Next source packet needs meaningful fixtures for typed/missing/markup/oversize
+descriptions, Edition-vs-text language, Work fallback, notes exclusion, preserved
+presentation/popularity fields, conflicting/redirected IDs, old-server rejection,
+stale/concurrent source/Item versions, identical rerun/no-op, legacy BOOK refresh
+preservation, atomic rollback, lost acknowledgement, call-budget exhaustion,
+404/429/5xx/timeouts, strict UUID receipts and secret/error-body redaction.
+
+Local `npm run check` passed **396 tests**, lint/typecheck and both Hermes exports.
+It used the existing loopback package-archive cache after verifying all eleven
+archives against the unchanged frozen Edge lock SHA-512 values; normal CI remains
+required. The existing unrelated mobile Hook lint warning remains. Changed
+Markdown file/anchor links and all ten SQL/Sprint identity mappings passed.
+The final read-only SQL executed successfully; all ten identities match, and
+inventory/provider/language/preservation values equal the first query's report.
+Only the source-base fingerprint was strengthened to cover all preserved source
+fields as well as its original payload; no stored value changed. Exact source
+CI/merge and the full SQL checkpoint belong to #182. No Work/Edition
+candidate API calls, provider imports, description writes, schema changes,
+deployment, native tests or APK dispatch occurred in this packet. Broader
+rights/attribution, BOOK completeness, bounded refresh and native usefulness keep
+#182 / MVP-CAT-001..003 / Phase 14.3 open. #229 and rejected D2 challenger admission
+are independent and unchanged.
+
+## Catalog expansion verified and failure diagnostics — 2026-09-13 / #182
+
+The PR #251 source is accepted on main
+`f462aaa20e3a65899452be847ee9ff3af22f167d`; catalog-import v10 is ACTIVE.
+The completed hosted pass has **425 discoverable MOVIE Items with complete
+TMDB core metadata/images/descriptions**, all 30 original curated identities
+preserved, and all eight declared expansion coverage checks passing. Coverage
+was read at 20:51:19 UTC; original UUID/IMDb/creation-time identity was independently
+rechecked at 20:54:38 UTC. The final documentary page added 18 Items/refreshed two;
+all 20 of its posters returned HTTP 200 / image/jpeg.
+
+English (259) and Finnish (60) are the two largest original-language groups
+(75.1% together), matching the owner's catalogue emphasis. Non-English coverage
+is 166; Finnish production is 60; seven languages have at least ten movies.
+The five era counts are 66/55/74/79/151; sixteen genres have at least fifteen
+movies; documentaries total 22. BOOK remains 415 discoverable, 385 images and
+zero descriptions. Native image/Taste quality and rights/refresh remain open.
+
+The actual bounded pass used 18 request attempts with 28 verified page fetches,
+including a Korean repeat. Spanish page 1 was deferred to preserve the cap.
+A subsequent science-fiction request failed without observed committed writes;
+its exact fetched-page progress is unknown, so its entire two-page allowance is
+reserved. The final documentary request consumed the last slot. No more imports
+are authorized by this completed 18-request / 30-page plan. The exact response
+ledger, original 29-gap identity table and final 30-identity check belong to
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+
+### Narrow diagnostic source packet
+
+Branch `fix/182-catalog-import-diagnostics` addresses the generic failure
+receipt, not a proven cause of the observed science-fiction error. The existing
+HTTP 502 / `provider-import-failed` remains, with additive
+`diagnostics.version=catalog-import-diagnostics-v1`. Success and authorization
+contracts, fixed selection budgets, FI/EN normalization and canonical atomic
+per-page upsert semantics remain unchanged.
+
+| Diagnostic field | Meaning |
+| --- | --- |
+| `stage` | Fixed Discover, Find, detail, English fallback, normalization, catalog-upsert or unexpected import stage |
+| `reason` | Fixed HTTP, timeout, network, JSON, response-shape, identity, metadata or unexpected-error category |
+| `httpStatus` | Upstream numeric response status when observed; otherwise null |
+| `completedPages` | Fully processed pages whose writes were acknowledged; an all-skipped/empty page may complete without a write |
+| `failedPage` | Current page, or null for exact-IMDb enrichment |
+| `confirmedImportedCount` / `confirmedSkippedCount` | Counts from the confirmed completed-page prefix; upserts are not unique growth |
+| `writeOutcome` | `not-started` for the current failed unit before a write; `unknown` when its write acknowledgement failed |
+
+A request that fails on page 2 after page 1 committed reports page 1 and its
+confirmed counts. A database timeout/malformed acknowledgement on page 2 cannot
+prove rollback and never reports that page complete. The CLI validates the
+version, fixed fields and progress against the requested page prefix before
+emitting a failed checkpoint; old generic errors remain supported. Extra/raw
+server fields and unknown codes are not reflected. It stops before any later
+request or retry. Progress is scoped to this request; earlier request checkpoints
+remain separate. If no valid receipt arrives, progress remains unknown.
+
+The shared module is `_shared/catalog-import-diagnostics.mjs`; both Edge and
+CLI consume it. Deployment preparation now verifies all five shipped files with
+a fresh Deno cache and npm/remote imports disabled. Fixtures cover stage/status
+classification, secret reflection, malformed/timeout responses, all-skipped
+pages, retained first failure under concurrency, and an acknowledged first page
+followed by a potentially committed but unacknowledged second write.
+
+Local `npm run check` passed **396 tests**: 212 mobile, 25 catalog, 28 Edge,
+61 database, 43 engine, 19 Python research and eight Node research, plus
+lint/typecheck and both Hermes exports. The existing mobile Hook lint warning
+remains. Direct Deno registry access failed with connection refused; the successful
+root run used the existing loopback archive cache after verifying every one of
+the eleven packages against the unchanged frozen Edge lock SHA-512 values.
+No dependency, lock or repository gate was weakened; normal CI must also pass.
+The exact final five-file payload independently passed **26 catalog HTTP cases**
+with a fresh cache and npm/remote imports disabled.
+
+Prepared payload SHA-256:
+`c5e5a4adceeebd2b87d30f1b74dc972a64d52e93ebdaddf13ee6e3aaa7ff09e5`.
+Entrypoint SHA-256:
+`6469138981a0a7463ad884c017519de875cd5603473894458b1503433727faa3`.
+Diagnostic module SHA-256:
+`48c80ec66eef1bd186ecb0b4f631eed8a5577639e2c0eb599b2f252c9d110858`.
+Normalizer, selection plan and function-local configuration contents are unchanged.
+
+The official [Supabase error-handling guide](https://supabase.com/docs/guides/functions/error-handling)
+and [logging guide](https://supabase.com/docs/guides/functions/logging) were checked
+on 2026-09-13. Current source fixtures and required root/CI results belong to the
+PR/#182 checkpoint. Source changes do not retroactively diagnose the old failure;
+hosted rollout is a separate verified step. No provider call, secret request,
+account reset, schema change or unrelated native rollout is needed for this packet.
+
+## Balanced TMDB expansion and curated enrichment — 2026-09-13 / #182
+
+Source packet: `feat/182-tmdb-balanced-expansion`, from accepted PR #250 main
+`95d2a32ecebb704bc4b7d8105dd2d7552e81accd`. This prepares the exact next catalog
+unit. The old canary is complete; no new hosted import/deployment, DDL, account
+reset, model admission or APK operation is implied by source acceptance.
+Issue #182 records actual source CI/merge and subsequent hosted execution.
+
+### Bounded selection and working targets
+
+`supabase/functions/_shared/tmdb-import-plan.mjs` owns the executable versioned
+selection contract. Changing bucket meaning/budget requires a new reviewed
+contract version. All requests use Finnish metadata with English fallback and
+FI regional release eligibility. A separate fixed `asOf` bounds release dates;
+provider popularity/content may change between requests, so this is not a frozen
+provider snapshot. The `finnish` bucket means original language `fi`, not an
+inferred production country. Coverage reports Finnish production separately.
+
+| Selection | Pages | Minimum votes | Provider filters |
+| --- | ---: | ---: | --- |
+| Finnish-language | 3 | 10 | original language fi |
+| Before 1990; 1990s; 2000s; 2010s; 2020–asOf | 2 each | 40 | primary release-date ranges |
+| Swedish, French, German, Japanese, Korean, Spanish | 1 each | 40 | original language sv/fr/de/ja/ko/es |
+| Animation, comedy, thriller, horror, science-fiction | 2 each | 40 | fixed TMDB genre IDs |
+| Documentary | 1 | 40 | fixed TMDB genre ID |
+| **Total** | **30** | per bucket | **18 sequential requests; at most 600 raw candidates** |
+
+This lower Finnish-language vote floor avoids applying the international-volume
+threshold to a smaller language catalog. It is a coverage choice, not a quality
+score or a recommendation-weight change. Popularity orders within each bucket;
+primary-year, original-language, genre and vote filters are rechecked against
+details before admission. New paths require title, description, valid poster path,
+director, tags, original language, primary date, runtime, vote count, popularity
+and IMDb alias. Missing/off-filter records are counted as skipped. Ambiguous IDs,
+malformed pages and provider/DB errors stop the request; no fuzzy title merge.
+
+These are **working targets for reviewing this expansion**, not preclaimed results:
+
+- at least 300 discoverable TMDB Items with core metadata;
+- at least 25 Finnish-language and 90 non-English movies;
+- at least six original languages with ten complete movies each;
+- at least 25 complete movies in each of the five era bins;
+- at least eight normalized genres with fifteen complete movies each, plus ten documentaries;
+- all 30 existing curated movies enriched with their existing canonical identity.
+
+`tmdb-expansion-coverage.sql` reports every target and the underlying counts.
+Genres overlap, while canonical Items/eras/languages are not duplicated by source
+rows. The existing `catalog-coverage.sql` separately checks provider aliases,
+BOOK inventory, mock suppression and privileged RPC access. Missing a target
+keeps acceptance open: inspect gaps and choose a new bounded follow-up. Never
+silently expand page budgets, lower thresholds or claim provider ranking is
+representative of user taste. Rights/attribution and native image/quality gates
+remain separate even when every inventory target passes.
+
+### Exact execution order
+
+1. Accept source after required CI, generate the four-file deployment packet with
+   `npm run catalog:prepare-deployment`, review/read back the exact catalog-only
+   rollout. Keep `verify_jwt=false` and the existing proven server-key boundary.
+2. Run both read-only coverage queries. Compare with the last checkpoint before
+   sending anything. The 2026-09-13 11:37:42 UTC report is 49 discoverable movies,
+   20 complete TMDB movies, only English, era counts 1/1/0/0/18 and 29 curated gaps.
+   Every gap has exactly one IMDb alias; zero matching ambiguity was observed.
+3. Enrich the remaining curated movies first. The exact IDs below produce three
+   sequential requests of 10 + 10 + 9, each fully resolved/validated before one
+   atomic canonical batch upsert. Expected result: 29 enriched existing Items,
+   49 discoverable movies retained, all 30 curated movies provider-backed.
+   Counts and IDs must be verified; this is an expectation, not a hosted result.
+4. Execute the 18 bounded discovery buckets, with before/after checkpoints.
+   Start with Finnish-language, then era, other-language and genre coverage.
+   A successful first bucket is an inspection checkpoint before the rest.
+5. Record actual unique inventory, overlap/skips, full metadata/aliases, all
+   remaining gaps, locale fallback and bounded poster checks. Require a later
+   real-device catalog/Taste check; do not equate CDN success with native UX.
+
+The CLI dry-runs below read no credentials and perform no network/DB I/O:
+
+```bash
+npm run catalog:tmdb-beta -- --imdb-ids tt2543164,tt1856101,tt1160419,tt15239678,tt0338013,tt6710474,tt0137523,tt0109830,tt0172495,tt2267998,tt1798709,tt1375666,tt0816692,tt3783958,tt1392190,tt0209144,tt15398776,tt6751668,tt1392214,tt0110912,tt0114369,tt0468569,tt0120737,tt0167260,tt0167261,tt0133093,tt0482571,tt0102926,tt2582802 --as-of 2026-09-13 --dry-run
+npm run catalog:tmdb-beta -- --balanced-plan --as-of 2026-09-13 --dry-run
+npm run catalog:tmdb-beta -- --bucket finnish --as-of 2026-09-13 --dry-run
+```
+
+After reviewed rollout, use the printed `batches` bodies in the already working
+owner Test view, or remove `--dry-run` in an authorized admin environment.
+For the first Finnish inspection, use `--bucket finnish`; then execute remaining
+named buckets once rather than rerunning the whole balanced plan. `--bucket ID`
+accepts `--start-page`/`--pages` within that bucket's fixed budget for recovery.
+Never repeat the completed old unfiltered page-1 canary. New actions are
+`tmdb-movie-bucket-v1` and `tmdb-movies-by-imdb-v1`; older hosted code returns
+unsupported-action before I/O instead of silently dropping new filters.
+
+The runner prints a safe starting/completed checkpoint with exact request and
+validated response selection identity. An error/timeout stops further requests.
+Earlier page/batch writes may already be committed; recheck coverage/source sync
+before a manual retry. Do not claim all-or-nothing for the entire multi-request
+plan. Exact source/alias upserts are repeat-safe but provider pages may move.
+Invocation redirects are rejected and calls have explicit transport deadlines.
+No secret values enter request logs or Git. Configuration, sign-in, initial
+preflight and provider token already work and are not prerequisites to repeat.
+
+Provider semantics were checked against the official
+[TMDB Discover reference](https://developer.themoviedb.org/reference/discover-movie)
+and [Find by ID reference](https://developer.themoviedb.org/reference/find-by-id).
+FI localization/region is distinct from original-language selection; era buckets
+use primary dates so regional rereleases cannot redefine a film's original era.
+Local fixture/SQL validation and later CI are recorded in Issue #182.
+
+### Source verification
+
+`npm run check` passed **387 tests** (212 mobile, 21 catalog, 23 Edge,
+61 database, 43 engine, 19 Python research and 8 Node research), lint/typecheck
+and both Hermes exports. The existing mobile Hook lint warning remains.
+The workspace's Deno registry connection failed; the successful full run used
+already downloaded npm archives through a loopback registry cache, verifying all
+eleven archives against the unchanged frozen Edge lock SHA-512 values first.
+No dependency, lock or repository check was weakened. Ordinary hosted CI must
+also pass. Actual final deployment files separately passed **21 catalog HTTP
+cases** with a fresh Deno cache and npm/remote imports disabled.
+
+Final four-file payload SHA-256:
+`b6f440baf81ea326ac5c4144179a9655406cd1817ef911b18a14a8304d8e93f5`.
+Entrypoint SHA-256:
+`84671a86435c385f9476890a7d9f3b3d792cc4241c95517eec8926a89ac39be7`.
+Plan module SHA-256:
+`25447fc9e4ba9a811db552e185c3f2e78a0dff81fdade13a3e343dd58b846025`.
+The existing normalizer and local deployment config are unchanged. The actual
+no-I/O balanced plan is 18 requests / 30 pages; the curated plan is 3 requests /
+29 identifiers. Read-only hosted coverage executed successfully. No new native
+runtime acceptance or broader catalog result is claimed.
+
+## TMDB one-page canary accepted — 2026-09-13 / #182
+
+**The owner-authorized configuration/rollout/preflight/one-page canary unit is
+complete.** The owner supplied this successful import body with a response date
+of **2026-09-13 11:03:06 UTC**:
+
+```json
+{
+  "status": "imported",
+  "provider": "tmdb",
+  "importedCount": 20,
+  "skippedCount": 0,
+  "pages": [1],
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+`validateTmdbImportResponse` from the existing CLI accepts the supplied body with
+the exact requested page/locale/threshold. The agent did not invoke another
+provider import. The committed read-only coverage query and a bounded inspection
+of all 20 provider Items independently confirm the stored result; all sources
+have `synced_at = 2026-09-13T11:03:06.083766Z`. Provider-token authentication and
+the matched modern-key Data API upsert have now worked in the hosted path.
+Only the response/result and minimal timing evidence are recorded, not cookies,
+request headers, secret values or full provider payloads.
+
+| Measure | Before | After |
+| --- | ---: | ---: |
+| Discoverable MOVIE Items | 30 | 49 |
+| Stored MOVIE Items | 42 | 61 |
+| MOVIE Items with images | 0 | 20 |
+| MOVIE Items with descriptions | 0 | 20 |
+| TMDB source rows / distinct Items | 0 / 0 | 20 / 20 |
+| Discoverable BOOK Items | 415 | 415 |
+| Stored BOOK Items | 427 | 427 |
+| BOOK Items with images / descriptions | 385 / 0 | 385 / 0 |
+| Discoverable mocks | 0 | 0 |
+
+The net increase is **19**, not 20: TMDB `278` / IMDb `tt0111161`
+(*Rita Hayworth - avain pakoon*) maps to one existing curated Item. Its original
+creation time remains `2026-09-04T21:30:52.825771Z`, while the new TMDB source was
+created at the import time. The curated source remains attached. Each of the
+other 19 Items was created at the canary time. This is observed cross-provider
+identity reuse, not an inferred count discrepancy or a new duplicate.
+
+All 20 have nonblank title/description, TMDB poster URL, directors, release year,
+original language and normalized genre tags. Runtime, popularity and vote count
+are present on all 20. Each provider row has exactly one matching `tmdb_movie`
+alias and one matching `imdb_title` alias on the same Item; all 20 provider IDs
+and Item IDs are distinct. No matching alias is missing. The source and alias
+constraints remain unchanged. Batch RPC EXECUTE remains false for anon and
+authenticated and true for service_role.
+
+The agent checked **all 20 stored poster URLs** with bounded parallel HTTP HEAD
+requests: every response was **200 / image/jpeg**. This verifies CDN availability,
+not rendering/cache behavior on a native device. Stored description previews show
+both Finnish text and the existing English fallback; no all-Finnish claim is made.
+All 20 original languages are `en`; year counts are 1984: 1, 1994: 1, 2021: 1,
+2026: 17. One popularity-sorted page is not a representative cold-start catalog.
+Twenty of 49 discoverable movies now have images/descriptions; the other 29
+curated movies still need provider metadata. BOOK description coverage is still
+zero. Broad catalog, rights/attribution, native quality and MVP acceptance stay open.
+
+Fresh hosted readback remains ACTIVE v9, bundle digest
+`9e04d650a398c79c9e0a0ed8e7adefb97c4b45aebfb9b7ee3f2f2f944a01ab88`.
+All three contents exactly match accepted PR #248, with `verify_jwt=false` and the
+function-local import map. No source/deployment, schema, account or other-function
+change was needed for this verification. PR #249's earlier preflight handoff is
+accepted on `395b0bf222000377cd04322436e6f398e5f8c1e2` after all five CI #490
+jobs passed at `e3aa37ad940412e30ae5f8792f14706b722fafe6`. Older dated sections
+below retain what was pending then; they are not current instructions to repeat
+configuration, preflight or the completed canary.
+
+**Next bounded continuation — #182 catalog expansion:** prepare a concrete plan
+for hundreds of discoverable movies with measured genre/year/original-language
+diversity, Finnish/international coverage and the remaining curated metadata.
+The existing orchestration can resume after the accepted page 1. This actual
+dry-run performed no provider or database I/O:
+
+```bash
+npm run catalog:tmdb-beta -- --start-page 2 --pages 14 --pages-per-request 3 --dry-run
+```
+
+It yields five requests: pages 2–4, 5–7, 8–10, 11–13 and 14–15, retaining
+`fi-FI` / `FI` / minimum votes 40. This is a transport proposal only; it neither
+promises 280 unique new Items nor supplies diversity controls. Review the proposed
+content mix and source filters before broader import. Any chosen execution stays
+bounded, sequential and stop-on-error, with fresh before/after coverage and actual
+metadata review. Inspect the latest Issue #182 checkpoint before sending requests
+so completed work is not repeated. Source/control improvements needed by the
+expansion plan do not depend on an admin key; actual calls use an authorized admin
+environment or the now-proven owner Test view. No repeated key setup/sign-in is
+needed, and the one-page canary must not be requested again.
+
+Keep #182 and `MVP-CAT-001..003` open for those remaining gates. Do not substitute
+native #229/device work, optional dataset research or the later pre-MVP UI packet,
+and do not promote the rejected D2 challenger. STATUS names the next bounded
+catalog task; Issue #182 records this documentation packet's merge/CI completion.
+
+## Catalog privileged preflight — 2026-09-13 / #182
+
+**The configuration repair and privileged preflight are accepted.** PR #248
+merged to main `bd7a23f776e99b452404fef0393155b62d96ade0` after all five
+[CI #488 jobs](https://github.com/Kajooja/Kajo/actions/runs/34726762173) passed at
+`9884088099635bd60cd0b6bb929b0b5480b97c3f`; the accepted tree
+`c2ec468e1359cb7fbbf637ed9eb85119411df07c` matches verified source. APK was
+skipped. Root validation passed 377 tests, lint/typecheck and both Hermes exports;
+the actual deployment packet replay passed 15 catalog HTTP cases. The older
+source-preparation and diagnostic sections below retain their dated pending state,
+not the current next task.
+
+The agent deployed the exact three-file repair once as ACTIVE v8. Its verified
+bundle digest was
+`c5c781a5cbe182b7646c1cf7530afa3a9bc0b84e27d81e30e89adb56728ca3d4`.
+The latest pre-canary readback now reports ACTIVE v9, digest
+`9e04d650a398c79c9e0a0ed8e7adefb97c4b45aebfb9b7ee3f2f2f944a01ab88`.
+All three contents still match accepted PR #248 source exactly, with
+`verify_jwt=false` and the function-local import map. The agent did not redeploy
+in this continuation; the metadata change's cause is not inferred. Payload and
+per-file hashes remain the ones in the recovery checkpoint below.
+
+Real negative HTTPS probes at 2026-09-13 00:07 UTC returned GET 405,
+anonymous/synthetic-user/forged-legacy POST 403 and foreign-modern-fixture gateway
+401. All POSTs used `invalid-preflight-only`, so no probe could start a provider
+import. These synthetic JWT checks are not a real signed-in session test.
+
+The owner subsequently used the supported Dashboard **Test > Headers > Add secret
+key** route with the existing Default key. At **2026-09-13 00:23:14 UTC**, the
+reported status/body for `{"action":"invalid-preflight-only"}` was exactly:
+
+```json
+{"status":"error","code":"unsupported-action"}
+```
+
+HTTP 400 here proves configured-key acceptance and reaching body validation;
+provider and Data API work have not started. The owner supplied status, body and
+response metadata, not the secret request header. Only this minimal result is
+recorded; response cookies and unrelated headers are not part of the handoff.
+No new key/rotation, repeated presence check or repeated privileged preflight is
+needed. The old `invalid-legacy-service-role-key` blocker is resolved by PR #248.
+
+The agent re-ran the committed read-only coverage query after this preflight:
+
+| Inventory | Stored | Discoverable | Images | Descriptions |
+| --- | ---: | ---: | ---: | ---: |
+| BOOK | 427 | 415 | 385 | 0 |
+| MOVIE | 42 | 30 | 0 | 0 |
+
+TMDB source rows and distinct TMDB Items remain zero, and no mock is discoverable.
+All 415 discoverable books and 30 movies have creators; release-year coverage is
+413 BOOK / 30 MOVIE. Batch EXECUTE remains false for anon/authenticated and true
+for service_role. These are dated pre-canary aggregates, not an import result.
+
+**Exact continuation:** use the same owner Test view, keep POST and the successful
+secret-key header, and send this already-authorized one-page body once:
+
+```json
+{
+  "action": "tmdb-movies",
+  "startPage": 1,
+  "pages": 1,
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+The owner has been given this request while the agent prepares the resumable
+handoff. Check Issue #182 for a later result before sending or retrying it. The
+connector cannot invoke functions or read secret values, and the local admin
+environment has no privileged invocation credential; the working Dashboard route
+keeps the key within Supabase. Do not restart the incomplete browser sign-in.
+
+Require HTTP 200 with `status: imported`, `provider: tmdb`, `pages: [1]`, exact
+FI locale/region and vote threshold, and inspect returned import/skip counts.
+Those counts alone are not unique catalog coverage. Re-run
+`scripts/catalog/catalog-coverage.sql`, inspect actual title/description/poster/
+creator/year/language/tags and matching TMDB aliases, and record before/after
+changes and any gaps. On an error, preserve the observed response and inspect
+coverage before retrying; do not claim provider-token validity from the preflight.
+The default 15-page expansion remains outside this initial canary. Keep #182 open
+for catalog breadth/quality; no Phase 14/MVP closure is implied by this packet.
+
+The owner requested completion and a handoff resumable with “jatka reposta”.
+STATUS names this one active task and Issue #182 owns later owner/runtime results.
+Other Edge functions, six installed forwards, accounts, #229 native/device gates,
+rejected research challenger admission and the pre-MVP UI queue retain their scope.
+
+## Catalog modern-key recovery — 2026-09-12 / #182
+
+PR #247 accepted the diagnostic source on main
+`4fbf5bd8eb0346b18395d633569efc23549c1dc4`, tree
+`d4cd56ec1efa4cd92b1a4dabc19d098f1845f306`, after all five CI #486 jobs passed
+at `e8125f3381b2fff7947ddb78cd87eef1ac481e35`. The deployment response reported
+ACTIVE v6; subsequent readback reported ACTIVE v7 with bundle digest
+`c5ce84272cb674e1c0705e03dc27a308e6c4b328be12a8014a547d128e1130ed`.
+Only one diagnostic deployment call was made; the metadata difference is recorded
+without inferring its cause. All three readback contents match the verified
+PR #247 payload, with `verify_jwt=false` and the function-local import map.
+
+The owner supplied a v7 private log at **2026-09-12T23:40:08.656Z**:
+`catalog-import configuration failed: invalid-legacy-service-role-key`.
+The failed check is now identified: the optional legacy value is not in the
+accepted JWT format and blocks the entire configured-key set. Its actual value
+and the platform's reason for supplying it remain unknown and are not needed for
+this bounded repair. Default modern secret keys are independent of legacy JWT
+compatibility, as described in the
+[current API-key migration guide](https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys).
+The owner's existing Default secret key is suitable; creating or rotating keys is
+not a prerequisite. Token setup, built-in variable presence and the private-log
+request are complete and must not be requested again.
+
+`fix/182-modern-key-legacy-recovery` excludes malformed optional legacy values
+only when validated usable modern keys exist. Excluded legacy strings are never
+accepted through apikey/Bearer or forwarded to the Data API. Without a usable
+modern key, the same malformed legacy input still produces the generic 500 and
+fixed private reason. Malformed modern maps and local keys still fail closed;
+valid legacy exact matching, modern apikey-only matching, named rotation and
+immediate revocation remain unchanged. No role claim authorizes a request.
+
+The HTTP regression exercises named Default/rotation keys and the optional local
+key against two malformed legacy values, including a modern-looking string that
+is deliberately absent from the configured modern set. It checks anonymous/user,
+publishable, foreign, invalid-legacy and modern-Bearer rejection before I/O, then
+normalized import with only the matched modern apikey forwarded. Existing generic
+configuration/redaction tests retain invalid-legacy-only and empty-modern-map
+failure coverage. The catalog still has no external runtime packages.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed 377 tests, lint/typecheck and both
+Hermes exports; the existing mobile Hook warning remains. Deployment preparation
+passed all 15 catalog HTTP cases against the actual staged files with a fresh
+cache and npm/remote imports disabled. Payload SHA-256 is
+`e5e3f85dfe0e76103d7b3c66591395c30cca6ec03796b237da162050f632d4e3`;
+entrypoint SHA-256 is
+`774b3d3f90d240dd4db49000b00004adc212e732dd1cb7b3d80e27e5601b7157`.
+The local config/normalizer hashes remain unchanged. Current-head CI must also
+pass before merge and rollout. Issue #182 owns the actual post-merge commit, CI,
+deployment/readback and probe checkpoint; inspect it before repeating a rollout.
+The earlier diagnostic/v3 sections retain dated evidence rather than current
+next-action instructions. No provider import has been performed at this source
+checkpoint, and no catalog breadth/MVP gate is closed by this repair.
+
+After configuration recovery and negative request checks, use the supported
+owner Dashboard **Edge Functions > catalog-import > Test** path:
+
+1. Choose POST, then **Headers > Add secret key**. The tester defaults to a
+   publishable key; the secret-key action adds the privileged `apikey` through
+   the Dashboard server proxy. Do not paste any key into chat.
+2. First body: `{"action":"invalid-preflight-only"}`. Require 400
+   `unsupported-action`; this proves configured-key acceptance without provider
+   or database I/O. Share only status and response, not request headers.
+3. After that success and fresh read-only baseline coverage, run the already
+   authorized canary exactly once with the following body:
+
+```json
+{
+  "action": "tmdb-movies",
+  "startPage": 1,
+  "pages": 1,
+  "language": "fi-FI",
+  "region": "FI",
+  "minimumVoteCount": 40
+}
+```
+
+4. Record returned counts/pages, re-run `scripts/catalog/catalog-coverage.sql`
+   and inspect actual movie metadata. One page is the initial canary; the CLI's
+   default 15-page expansion is not implied. Keep #182 open for breadth/quality.
+
+The Dashboard path was verified from current official Studio
+[tester source](https://github.com/supabase/supabase/blob/26585dd4a4d6db8910a595214c9f6e8fdd206768/apps/studio/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet.tsx)
+and [header actions](https://github.com/supabase/supabase/blob/26585dd4a4d6db8910a595214c9f6e8fdd206768/apps/studio/components/interfaces/Functions/httpHeaderAddActions.ts).
+It has not yet been exercised with this project's privileged key. The connector
+cannot invoke functions or read secrets; no local privileged credentials exist.
+Use the supported owner path instead of repeating the unfinished browser sign-in.
+Other functions, six installed forwards, accounts and the #229 device ledger are
+outside this catalog-only packet.
+
+## Catalog configuration diagnostics — 2026-09-12 / #182
+
+PR #246 accepted the v3 rollout handoff on main
+`65317c03fde0ee85ce560f61489d3434a79a843f` after all five required CI #484 jobs
+passed at `27bd5999da67fc16622a86251f93532528ec6af4`. The owner subsequently added
+`TMDB_READ_ACCESS_TOKEN` and confirmed `SUPABASE_URL` and plural
+`SUPABASE_SECRET_KEYS` are visible under Edge Functions > Secrets. API Keys shows
+a Default secret key. Legacy anon/service-role variables show Deprecated; the
+optional singular local-development key is absent. Those setup/presence questions
+are resolved. Token validity and runtime key parsing are still unverified.
+
+A bounded anonymous unsupported-action POST after token setup returned the same
+500 `server-not-configured`. Fresh pre-diagnostic metadata reports ACTIVE v5,
+`verify_jwt=false`, import map enabled, bundle digest
+`574dd2d7e2f45f5affddc0a88eec0ce3bf98e036b636fe0880ef3cf57bc26a18`.
+All three downloaded source files still exactly match PR #245. No provider call
+or new source deployment was performed during that recheck. The earlier v3 hashes
+below remain historical deployment evidence, not the latest version number.
+
+`fix/182-catalog-config-diagnostics` makes the existing failure diagnosable through
+fixed private-log reason codes. It does not accept previously rejected keys, add
+a public diagnostic endpoint or return configuration details in HTTP responses.
+Malformed JSON exceptions, key values/names and request data must never be logged.
+The real HTTP fixtures verify the unchanged generic 500, no provider/Data API I/O,
+and exact redacted log output, including environment-read exceptions containing
+synthetic secrets. The catalog still has no external runtime packages.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed 376 tests, lint/typecheck and both
+Hermes exports; the existing mobile Hook warning remains. Preparation replayed
+all 14 catalog HTTP cases against the actual staged files with a fresh cache and
+npm/remote imports disabled. The diagnostic payload SHA-256 is
+`0176a96a151103235ef71066556ed32ed7168b5a60c6d1792d4004ebe714787a`;
+its entrypoint SHA-256 is
+`9e4a6dcdcd332a69124b69c01d095d7b8812930452b1cd00e90091429d6d1b9e`.
+The function-local config and normalizer hashes match the earlier packet. These
+source checks do not identify or resolve the hosted configuration failure.
+
+The log prefix is `catalog-import configuration failed:`:
+
+| Reason | Failed check |
+| --- | --- |
+| `missing-supabase-url` | `SUPABASE_URL` is absent or empty in the function runtime |
+| `invalid-secret-keys-json` | `SUPABASE_SECRET_KEYS` cannot be parsed as JSON |
+| `invalid-secret-keys-object` | Parsed named keys are null, an array or a scalar |
+| `invalid-secret-keys-value` | A named key is not a supported secret-key string |
+| `invalid-local-secret-key` | Optional singular `SUPABASE_SECRET_KEY` has an invalid format |
+| `invalid-legacy-service-role-key` | Configured legacy value is not in the accepted JWT format |
+| `missing-server-key` | No modern or legacy server key is available |
+| `unreadable-server-key-configuration` | Another environment/key-read operation threw; its exception is suppressed |
+
+After root/current-head checks, publish the verified three-file catalog payload
+and verify source readback. Inspect Issue #182 first for a completed deployment.
+Trigger only an unsupported-action probe, then open **Edge Functions >
+catalog-import > Logs** and filter for the prefix above. **Logs**, not the request
+headers/body under Invocations, contains this diagnostic. The connected tool has
+no log-read capability, so the owner may send the fixed reason line alone. Do not
+ask for environment dumps, screenshots showing key values or credentials in chat.
+[Supabase's logging guide](https://supabase.com/docs/guides/functions/logging)
+documents the private custom-log view.
+
+Use the observed reason to select the next configuration/source correction. A
+Dashboard presence report is not a reason to relax validation speculatively.
+Verify anonymous/ordinary-user denial and a privileged unsupported-action request
+before the already-authorized `--pages 1 --pages-per-request 1` canary. The owner
+has completed token setup; do not repeat it or confuse the preceding Supabase
+configuration error with the later `tmdb-not-configured` check. Keep #182 open;
+#229, installed forwards, APK/device work and other deployments remain separate.
+
+## Catalog v3 hosted checkpoint — 2026-09-12 / #182
+
+The owner requested completion of the reviewed PR #245/Edge/one-page canary packet
+and a resumable repository handoff. PR #245 was merged after rechecking all five
+required CI #482 jobs at `9214a268d84281663a728ea055dd4b4dd073a262` and unchanged
+base `969c1195700dfc67b3787eb4a51eb70fda8c6ee9`. Accepted source is now
+`ad75fc00b100099af4986abfc9955afe308eb6e6`. No repeat approval is needed for these
+completed actions or the same bounded canary once its credential prerequisites hold.
+
+The three-file deployment was regenerated from accepted main and replayed all
+13 catalog HTTP cases with a fresh cache and npm/remote imports disabled. Its
+payload SHA-256 remains
+`3533d2bf02ebe02be9f8bb30c8ea7ccbd8b8090f455aaa5fcd8f357efd74f010`.
+It was deployed only to `catalog-import` on `mwrnvfosrzwygrunrltm`:
+
+| Deployed property | Verified value |
+| --- | --- |
+| Function ID | `852f5604-48d0-4fad-8868-1f276feb4621` |
+| Version / status | 3 / ACTIVE |
+| JWT gateway check / import map | `false` / `true` |
+| ESZIP SHA-256 | `a0ec5d55a2cf61737b11f6a2191d2778f3121e438827e2d141dd9c493a8690b7` |
+| Source readback | All three file contents exactly match the approved payload |
+
+**The hosted configuration acceptance gate failed.** Real HTTPS probes after
+deployment used the deliberately unsupported action `invalid-preflight-only`,
+so no successful authorization could accidentally start a provider import:
+
+| Probe | Observed response | Evidence limit |
+| --- | --- | --- |
+| GET, no credentials | 405 `method-not-allowed` | Handler boots and method guard runs |
+| POST, no credentials | 500 `server-not-configured` | Environment validation stops before caller/provider work |
+| POST, foreign modern fixture apikey | 401 `Invalid API key` | Gateway rejection; not the handler's exact-key test |
+| POST, forged legacy fixture Bearer | 500 `server-not-configured` | Same configuration gate; hosted key acceptance unverified |
+
+A later bounded anonymous POST recheck returned the same 500 response; the gate
+did not clear during this session.
+
+The exact missing or rejected environment input has not been identified.
+`SUPABASE_URL` and `readServerKeys()` are checked before request authentication;
+the latter rejects malformed named/local keys or legacy configuration. This error
+does not establish that TMDB_READ_ACCESS_TOKEN is absent, nor justify changing
+key validation speculatively. The source/test success cannot be reported as
+successful hosted authorization or import.
+
+The read-only coverage query passed again after deployment and matches the baseline:
+415 visible BOOK / 30 MOVIE, 385 book images, no movie images or visible descriptions,
+zero TMDB source rows and zero visible mocks. Batch EXECUTE remains false for
+anon/authenticated and true for service_role. No provider data, secret value,
+account state or installed migration was changed by the deployment/probes.
+
+The Supabase connector is connected but has no secret-listing or function-invocation
+capability. No privileged invocation credentials are configured in the local admin
+environment. Browser inspection of the Secrets page led to sign-in; the secure
+GitHub choice/manual continuation did not produce a verified signed-in Supabase
+page. No secret values were requested or printed. The owner offered to retrieve
+settings instead and was asked for the five relevant secret names' presence plus
+active secret/legacy-key status, with values concealed. Wait for/use that report
+instead of repeating the uncompleted browser flow or requesting values in chat.
+
+Recovery remains within #182: resolve the configuration cause through a supported
+authorized administration path, keep the exact-key boundary, verify anonymous/user
+denial and an authorized unsupported-action request, then run the already-authorized
+one-page canary and before/after coverage. Stop before broader pages. Do not restore
+unlocked v2 or delete Items to hide this failure. Any needed source correction uses
+its own bounded branch/PR and root/current-head gates; the six #229 forwards,
+password/auth callback deployments, APKs and native/device work remain separate.
+
+## Catalog rollout preparation — 2026-09-12 / #182
+
+PR #244 was owner-approved and merged to `969c1195700dfc67b3787eb4a51eb70fda8c6ee9`
+after all five required CI #480 jobs passed. The successor branch
+`fix/182-catalog-rollout-packet` starts there. This checkpoint records read-only
+hosted evidence and a source deployment candidate; it does not record a deployment.
+
+### Hosted comparison
+
+Project `mwrnvfosrzwygrunrltm` (Kajo, eu-west-1) is ACTIVE_HEALTHY. The deployed
+`catalog-import` is ACTIVE v2, `verify_jwt=false`, `import_map=false`, with ESZIP
+SHA-256 `8a85347f51f02dec066495263919f2d575d1b6b60e31d7faaf830c589c7cd2d1`.
+Its entrypoint still imports floating `npm:@supabase/supabase-js@2` and uses the old
+single-selected-key boundary. It does not contain the PR #244 source fixes.
+Downloaded entrypoint SHA-256:
+`230c5e5a90a58392a7a7081599f986c2c4009cc93617f744e8526373bee46b83`.
+The shared normalizer matches accepted source exactly:
+`c45821528593b64763d83860975d979d6466cd9cd01d3e440462402afeaa4283`.
+
+Real unauthenticated HTTPS probes returned GET 405 `method-not-allowed` and POST
+403 `forbidden`. The POST deliberately used an unsupported action as an additional
+guard against provider work. These verify the deployed rejection path only.
+
+The available Supabase connector has no secret-name listing tool. The local admin
+environment has no Supabase access token, URL/server invocation key or TMDB token;
+there is no authenticated CLI setup verified here. Consequently the hosted names
+`TMDB_READ_ACCESS_TOKEN`, `SUPABASE_SECRET_KEYS` and any configured legacy key remain
+**unverified**, rather than asserted absent. Do not infer TMDB availability from a
+403, zero inventory or the existence of an Edge function. A supported authenticated
+`supabase secrets list` can supply names/digests only; discover its flags with CLI
+help first, avoid debug output and retain no values in Git/chat. Provider-token
+setup and an authorized server invocation environment are still required for import.
+
+The committed `scripts/catalog/catalog-coverage.sql` ran successfully as a read-only
+hosted transaction. Counts below exclude hidden Items in the presentation columns:
+
+| Item type | Stored | Discoverable | Image | Description | Creators | Year |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BOOK | 427 | 415 | 385 | 0 | 415 | 413 |
+| MOVIE | 42 | 30 | 0 | 0 | 30 | 30 |
+
+Providers remain 385 Open Library BOOK, 30 curated BOOK and 30 curated MOVIE;
+24 historical mock Items are stored but hidden. TMDB source rows/distinct Items
+and discoverable mocks are all zero. The canonical batch RPC's EXECUTE is false
+for anon/authenticated and true for service_role. This refreshes catalog evidence
+only; it is not a native/account/migration acceptance check.
+
+### Reproducible deployment candidate
+
+The catalog function's sole SDK operation is now a native HTTPS POST to the same
+`upsert_catalog_batch_v1` RPC. Modern matched keys use apikey; only a matched legacy
+key adds Bearer. Incoming user Authorization is never forwarded, redirects fail,
+and incomplete/malformed RPC success fails instead of assuming the batch succeeded.
+The database still owns atomic validation/upsert/dedup. FI/EN behavior and request
+bounds remain. Password auth and its pinned SDK/lock are outside this rollout.
+
+There are exactly three deployment files: `catalog-import/index.ts`, its local
+`deno.json`, and `_shared/catalog-normalizers.mjs`. Runtime imports are those local
+sources plus `node:crypto`; there are no registry packages to resolve during deploy.
+The local configuration therefore has `lock:false` and empty imports. The existing
+root frozen Deno graph remains the source/type/other-entrypoint gate.
+
+`npm run catalog:prepare-deployment` stages exactly those files, checks their Deno
+module graph, and replays all 13 catalog HTTP cases against the staged entrypoint
+with Deno 2.1.4, a fresh cache, and `--no-npm --no-remote --cached-only`. Output is
+created only after verification. A regression test proves that adding a registry
+import prevents payload publication. Preparation never reads credentials or sends
+real provider/database requests. Output is regenerated from Git, not committed.
+
+```sh
+npm run catalog:prepare-deployment -- --project-ref mwrnvfosrzwygrunrltm --output dist/catalog-deployment-182
+npm run catalog:tmdb-beta -- --pages 1 --pages-per-request 1 --dry-run
+```
+
+Use a new output directory on a repeat run. The tested candidate manifest is:
+
+| Content | SHA-256 |
+| --- | --- |
+| Entry point | `db9beae8159f4527ab70af04506669072d81f532ad857832ab0877e07e32cd49` |
+| Function-local configuration | `fdacae7775337096157bc6921a7e19eec4e59fbf865549dff8d9f9f4199062a7` |
+| Shared normalizer | `c45821528593b64763d83860975d979d6466cd9cd01d3e440462402afeaa4283` |
+| Exact serialized deployment payload | `3533d2bf02ebe02be9f8bb30c8ea7ccbd8b8090f455aaa5fcd8f357efd74f010` |
+
+`deploy-payload.json` is the complete `deploy_edge_function` argument, including
+project, function name, relative entrypoint/import-map paths, `verify_jwt:false`
+and file contents. `manifest.json` records byte hashes; `verification.txt` records
+the packet tests. This verifies the source closure, not hosted ESZIP/runtime parity.
+
+### Authorized rollout and canary sequence
+
+1. Finish the successor PR's five required current-head CI gates and source merge.
+   Record separate authorization for this exact Edge update and initial provider
+   canary. PR #244's completed merge approval is not a hosted change approval.
+2. Resolve provider-token availability and an authorized server invocation key
+   through supported secret administration. Do not print/copy values into chat.
+   Refresh hosted v2/config and baseline coverage before any authorized change;
+   unexpected drift requires comparing the changed source/config first.
+3. Regenerate/verify the payload hash and pass that exact JSON to the Supabase
+   deployment tool. Deploy only `catalog-import`; no auth-function or database
+   migration deployment, account reset or APK build belongs to this packet.
+4. Read back the new function version/config and downloaded source hashes. Repeat
+   rejection probes and an authorized unsupported-action request (400, no import).
+   Local fixture success does not replace this real gateway/key verification.
+5. In the authorized admin environment, run the single-page canary:
+   `npm run catalog:tmdb-beta -- --pages 1 --pages-per-request 1`.
+   Defaults are start page 1, fi-FI, FI and minimum vote count 40. The preparatory
+   dry-run above was executed; it made no TMDB call. Do not run the default 15-page
+   import before inspecting the canary.
+6. Re-run `catalog-coverage.sql`. Require positive TMDB source/distinct counts,
+   matching external aliases, useful posters/descriptions, and zero discoverable
+   mocks. Report actual metadata gaps and unique inventory separately from upsert
+   counts. Inspect a small real metadata sample before authorizing broader pages.
+
+Stop immediately on failed preflight, deployment/readback mismatch, import error
+or unacceptable coverage. This importer is an admin operation, not a mobile serving
+path, so stopping invocations contains a failed rollout. Completed batches may
+already be committed even if a later request fails: do not delete Items or restore
+database history. Reconcile source identities and retry the bounded idempotent
+upsert after repair. Do not automatically restore floating v2 code; any code
+recovery must use reviewed captured source with explicit dependency verification.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **375 tests** and the additional
+13-case packaged replay, lint/typecheck and both Hermes exports. Only the previously
+recorded mobile Hook warning remains. CI/merge status belongs to the PR/Issue handoff.
+No hosted write, secret change, real TMDB call or native/device operation occurred.
+#182 remains open for useful catalog breadth, presentation/attribution and quality.
+
+Current primary sources checked after the Supabase changelog scan:
+[function dependencies](https://supabase.com/docs/guides/functions/dependencies),
+[CLI v2.117.0 deployment implementation](https://github.com/supabase/cli/blob/v2.117.0/apps/cli/src/shared/functions/deploy.ts),
+[API key behavior](https://supabase.com/docs/guides/getting-started/api-keys),
+[PostgREST RPC](https://docs.postgrest.org/en/v13/references/api/functions.html) and
+[secret-name listing](https://supabase.com/docs/reference/cli/supabase-secrets-list).
+Function-local config is the supported deployment boundary; the inspected bundler
+does not expose a frozen-lock guarantee. Removing the single catalog SDK operation
+avoids relying on that unverified guarantee or adding a separate bundling toolchain.
+
+## Catalog Edge source checkpoint — 2026-09-12 / #182
+
+Branch `fix/182-catalog-edge-boundary` starts from accepted D2 main
+`3658d1c78b19c6f9c391c14e8e2d66bf814cdcd9`. It closes the bounded source-audit
+gap from #182 once the PR's five required current-head CI jobs pass and it merges.
+The broader catalog issue and Phase14.3/MVP-CAT requirements remain open.
+
+- `catalog-import` explicitly disables gateway JWT verification and independently
+  matches modern named/local apikeys or the exact configured legacy service-role
+  apikey/Bearer. Malformed configuration, foreign/publishable/user credentials and
+  a modern key supplied only as Bearer fail closed before provider/database work.
+  The matched key scopes the admin client; a supplied user JWT is never forwarded.
+- The admin CLI sends apikey only. Non-object JSON, invalid explicit parameters
+  and requested pages beyond 500 return bounded errors. Provider/RPC failures stop
+  the import without exposing upstream messages in logs or responses.
+- Both SDK imports are exactly 2.112.4. `deno.json`/`deno.lock` pin their transitive
+  graph and Node types; npm locks the Deno 2.1.4 validation tool. Deno's implicit
+  `npm:@types/node@*` compiler alias is locked to the same explicit 22.5.4 types.
+- `npm run test:edge`, included in root check and CI `validate`, checks all three
+  deployment entrypoints and runs 14 local HTTP tests using real handlers/SDK and
+  fixture keys/TMDB/Data API responses. Password auth has dependency pinning and
+  resolution smoke coverage only; its input/enumeration/abuse work stays with #160.
+
+Local `EXPO_OFFLINE=1 CI=1 npm run check` passed **372 tests**, lint/typecheck and
+both Hermes exports. The existing `DiscoveryScreen.tsx:83` Hook warning remains.
+This workspace's HTTP/2 proxy stalled Deno registry reads; local verification used
+a temporary loopback registry cache fetching unchanged official npm tarballs over
+certificate-verified HTTPS/HTTP1.1. Deno checked upstream integrity hashes. That
+temporary transport is not committed; CI uses the normal registry and frozen lock.
+
+Current official documentation checked 2026-09-12:
+[auth patterns](https://supabase.com/docs/guides/functions/auth),
+[authorization headers](https://supabase.com/docs/guides/functions/auth-headers),
+[API keys](https://supabase.com/docs/guides/getting-started/api-keys),
+[Edge dependency locking](https://supabase.com/docs/guides/security/npm-security#edge-functions-specifics)
+and the [Deno 2.1 platform announcement](https://supabase.com/changelog/37941-all-regions-now-run-deno-2-1-compatible-release),
+after scanning the changelog. The live authorization page describes transitional
+API-key passthrough by the gateway; its indexed search copy still says such keys
+are rejected. Both prescribe apikey plus independent service authentication. This
+implementation declares its boundary explicitly and does not rely on either
+transitional gateway behavior or a key prefix/JWT claim as authorization.
+
+No hosted configuration, secret value, provider inventory or deployed Edge version
+was inspected/changed here. No SQL, native model, APK, device or account-reset
+operation was performed. STATUS owns the next hosted comparison/import preparation;
+the six installed #229 forwards remain immutable and need no repeat deployment.
+
+## D2 development checkpoint — 2026-09-12
+
+E1 #235 / PR #241 and D1 #236 / PR #242 are accepted. D2 #237 now has a measured,
+independently reproduced eight-variant temporal/cold-start report, with rejected
+challenger admission and tested native-only/unavailable artifact fallback.
+[SPRINT-014-D2](SPRINT-014-D2.md) owns this source/evaluation checkpoint;
+STATUS owns its required CI/merge and subsequent #182 catalog source-audit task.
+Native #229 and full Phase14/MVP/device acceptance remain separate and open.
+The audit and 14A–14D records below retain their dated historical meaning.
+
 ## Current audit/handoff — 2026-09-12 / #233 / PR #234
 
 The [repository audit](../retros/2026-09-12.md) reconciles the independent

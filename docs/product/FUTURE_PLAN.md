@@ -103,6 +103,16 @@ Do not make external provider availability part of every user interaction.
 
 Acceptance includes coverage/duplicate/image/description/language reports, provider outage behavior, safe alias/work/edition matching and legally usable imagery/attribution.
 
+Owner addition, 2026-09-23: expose movie cast/lead actors, directors and useful
+credits in a later bounded metadata/detail increment coordinated with #182.
+The existing TMDB normalizer already preserves up to eight cast names in
+`metadata.cast` and up to four directors in generic `creators`; inspect stored
+coverage and presentation projection before adding ingestion. Reuse canonical
+Item metadata and provenance rather than introducing a Movie-specific store or
+runtime provider fetch. Here “stars” means performers, distinct from #239's
+quick-save star and the Profile's numeric rating. This is a deferred enrichment
+idea, not a new release blocker or permission to reopen the spent MOVIE pass.
+
 ## 5. FUT-DOM-001 — Series — PLANNED
 
 Add series through the same generic Profile/Item/Event/Prediction/List architecture.

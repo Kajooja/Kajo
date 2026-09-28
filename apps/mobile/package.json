@@ -15,12 +15,14 @@
     "smoke:android": "expo export --platform android --output-dir dist/android"
   },
   "dependencies": {
+    "@kajo/catalog-contracts": "*",
     "@supabase/supabase-js": "^2.112.4",
     "expo": "~57.0.9",
     "expo-blur": "~57.0.2",
     "expo-constants": "~57.0.8",
     "expo-file-system": "57.0.5",
     "expo-linking": "~57.0.4",
+    "expo-network": "~57.0.2",
     "expo-router": "~57.0.9",
     "expo-sqlite": "~57.0.1",
     "expo-status-bar": "~57.0.1",

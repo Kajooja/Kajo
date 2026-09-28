@@ -1,8 +1,8 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { CollectionGrid } from './CollectionGrid';
 import { formatListEntryDate } from './listPresentation';
 import { EMPTY_ITEM_INTERACTION } from '../discovery/itemInteraction';
-import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -30,21 +30,27 @@ export function ConsumedHistoryScreen({ itemType }: { itemType: ItemType }) {
   return <ConsumedHistoryContent key={`${scopeKey}:${sessionId}:${itemType}`} itemType={itemType} />;
 }
 
-function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
+export function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
   const { mode } = useDiscoveryMode();
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
-  const { loadConsumed } = itemLists;
+  const { scopeKey, loadConsumed, revision } = itemLists;
   const openCollectionItem = useCollectionNavigation();
-  const { interactions, submitCollectionAction } = useItemInteractions();
+  const { submitCollectionAction } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
+  const [attempt, setAttempt] = useState(0);
+  // Identity changes even for A → B → A; never show a previous read under a
+  // new Profile heading while effect cleanup/refetch is still pending.
+  const request = useMemo(
+    () => ({ scopeKey, itemType, attempt, loadConsumed, revision }),
+    [scopeKey, itemType, attempt, loadConsumed, revision],
+  );
   const [snapshot, setSnapshot] = useState<{
-    key: string;
+    request: typeof request;
     items: readonly ConsumedItem[];
     error: string | null;
   } | null>(null);
-  const [attempt, setAttempt] = useState(0);
   const [clearing, setClearing] = useState<string | null>(null);
   const [clearError, setClearError] = useState<string | null>(null);
   const clearingRef = useRef(false);
@@ -69,21 +75,22 @@ function ConsumedHistoryContent({ itemType }: { itemType: ItemType }) {
       if (active.current) { clearingRef.current = false; setClearing(null); }
     }
   };
-  const requestKey = `${itemLists.scopeKey}:${itemType}:${itemLists.revision}:${attempt}`;
-  const loading = snapshot?.key !== requestKey;
-  const error = snapshot?.key === requestKey ? snapshot.error : null;
-  const items = snapshot?.key === requestKey ? snapshot.items : [];
+  const loading = snapshot?.request !== request;
+  const error = snapshot?.request === request ? snapshot.error : null;
+  const items = snapshot?.request === request ? snapshot.items : [];
 
   useEffect(() => {
     let active = true;
-    void loadConsumed(itemType).then((result) => {
+    void request.loadConsumed(request.itemType).then((result) => {
       if (!active) return;
       setSnapshot(result.status === 'success'
-        ? { key: requestKey, items: result.items, error: null }
-        : { key: requestKey, items: [], error: result.message });
+        ? { request, items: result.items, error: null }
+        : { request, items: [], error: result.message });
+    }).catch(() => {
+      if (active) setSnapshot({ request, items: [], error: 'Historiaa ei saatu ladattua. Yritä uudelleen.' });
     });
     return () => { active = false; };
-  }, [itemType, loadConsumed, requestKey, interactions]);
+  }, [request]);
 
   const title = itemType === 'BOOK' ? 'Luetut' : 'Katsotut';
 

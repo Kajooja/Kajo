@@ -1,5 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useFocusEffect } from 'expo-router';
+import * as Network from 'expo-network';
+import { AppState } from 'react-native';
 
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
@@ -11,6 +13,7 @@ import type { ItemInteractionMap } from './itemInteraction';
 import { getStaticMockItems } from './mockDiscovery';
 import { createPredictionPageRequest, loadCatalogPredictionPage, type PredictionAvailability, type PredictionPageRecovery } from './predictionPageOperations';
 import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope, type PredictionReaderSnapshot } from './predictionPageReader';
+import { watchFocusedPredictionReader } from './predictionConnectivity';
 import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay } from './predictionRefresh';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
@@ -32,6 +35,7 @@ export interface VisiblePredictionRanking {
   loadingNextPage: boolean;
   nextPageError: string | null;
   recovery: PredictionPageRecovery | null;
+  retrying: boolean;
   retry: () => void;
   refresh: () => void;
   loadMore: () => void;
@@ -75,9 +79,13 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   useFocusEffect(useCallback(() => {
     if (!reader) return;
     const identity = predictionReaderScopeKey({ ...reader.scope, revision: '' });
-    reader.activate(getPredictionRefreshDelay(
+    const stopFocusedReader = watchFocusedPredictionReader(reader, {
+      getState: Network.getNetworkStateAsync,
+      subscribe: Network.addNetworkStateListener,
+    }, AppState, getPredictionRefreshDelay(
       lastActivation.current?.identity === identity && lastActivation.current.loaded, INTERACTION_REFRESH_DELAY_MS));
     return () => {
+      stopFocusedReader();
       lastActivation.current = { identity, loaded: reader.getSnapshot().pages.length > 0 };
       reader.deactivate();
     };
@@ -94,17 +102,18 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
 
   if (!client) return { ...fallback, viewId: fallback.predictionId, source: 'fallback', status: 'ready',
     message: null, availability: 'ITEMS', hasNextPage: false, loadingNextPage: false, nextPageError: null,
-    recovery: null, retry, refresh, loadMore };
+    recovery: null, retrying: false, retry, refresh, loadMore };
 
   const first = snapshot.pages[0];
   const last = snapshot.pages.at(-1);
   return { items: snapshot.items, predictionIds: snapshot.predictionIds,
     predictionId: first?.ranking.predictionId ?? null, viewId: snapshot.viewId, source: 'hosted',
-    status: first ? 'ready' : snapshot.status === 'error' ? 'error' : 'loading',
+    status: first ? 'ready' : snapshot.message ? 'error' : 'loading',
     message: first ? null : snapshot.message, availability: last?.availability ?? null,
     hasNextPage: Boolean(last?.nextCursor), loadingNextPage: Boolean(first && snapshot.status === 'loading'),
-    nextPageError: first && snapshot.status === 'error' ? snapshot.message : null,
-    recovery: snapshot.recovery, retry, refresh, loadMore };
+    nextPageError: first ? snapshot.message : null,
+    recovery: snapshot.recovery, retrying: snapshot.status === 'loading' && snapshot.message !== null,
+    retry, refresh, loadMore };
 }
 
 function getRuntimeContext() {

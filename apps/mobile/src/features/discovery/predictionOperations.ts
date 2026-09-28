@@ -6,6 +6,7 @@ import type {
   PredictionId,
   ProfileId,
 } from '../../domain/contracts';
+import { readCatalogDescription } from '../../domain/itemDescription';
 
 export interface PredictionRpcResponse {
   data: unknown;
@@ -64,7 +65,7 @@ export function mapPredictionRows(
         id: row.item_id,
         itemType: row.item_type,
         title: row.title,
-        ...(row.description ? { description: row.description } : {}),
+        ...readCatalogDescription(row.description, undefined),
         tags: [...row.tags],
       })),
       predictions: rows.map((row) => ({

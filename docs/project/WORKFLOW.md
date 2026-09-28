@@ -68,8 +68,9 @@ It currently runs:
 1. lint,
 2. TypeScript typecheck,
 3. automated tests,
-4. iOS Expo bundle smoke test,
-5. Android Expo bundle smoke test.
+4. main mobile iOS and Android Expo bundle smoke tests,
+5. isolated description companion iOS and Android exports, including source-map
+   guards for shared rendering, a single React instance and production-module isolation.
 
 Individual commands may be used while iterating:
 
@@ -79,6 +80,22 @@ npm run typecheck
 npm run test
 npm run smoke
 ```
+
+`npm run test:edge` checks all Supabase Edge entrypoints with the npm-pinned Deno
+runtime and frozen `supabase/functions/deno.lock`, then exercises their registered
+handlers over loopback HTTP using fixture keys and provider/Data API responses.
+It runs inside `npm test` and CI `validate`; no project secrets are required.
+When intentionally updating Edge dependencies, change exact import versions and
+regenerate the lock using the installed npm binary:
+
+```bash
+./node_modules/.bin/deno check --config supabase/functions/deno.json \
+  --frozen=false supabase/functions/*/index.ts supabase/functions/entrypoints.test.ts
+```
+
+Review the lock diff, retain Deno 2.1's implicit Node-types alias at the explicitly
+pinned type version, then run the frozen gate.
+Keep hosted deployment/configuration and actual provider import evidence separate.
 
 For user-facing mobile work, automated validation is necessary but not sufficient when a runnable environment is available. Use one of the following as appropriate:
 

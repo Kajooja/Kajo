@@ -35,6 +35,7 @@ export interface PredictionReaderSnapshot {
 
 const MESSAGE = 'Suositusten päivittäminen epäonnistui. Yritä uudelleen.';
 const REQUEST_TIMEOUT_MS = 15_000;
+const MAX_RECONNECT_ATTEMPTS = 3;
 
 // One controller per captured scope/revision. Leaving it invalidates all work,
 // including catalog enrichment. Returning to the same scope creates a new
@@ -53,6 +54,9 @@ export function createPredictionPageReader(options: {
   let running = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let cancelFlight: (() => void) | null = null;
+  let reachable: boolean | null = null;
+  let reconnectPending = false;
+  let reconnectAttempts = 0;
   const listeners = new Set<() => void>();
 
   function firstRequest() {
@@ -83,10 +87,13 @@ export function createPredictionPageReader(options: {
       // not when a hidden screen observes an interaction revision.
       if (!pending) {
         pending = firstRequest();
+        reconnectAttempts = 0;
         publish(initial(pending.requestId));
       }
       const request = pending;
-      publish({ ...snapshot, status: 'loading', message: null, recovery: null });
+      // Connectivity is only a reason to try. Retain the failure until this
+      // exact request succeeds; the UI can show a disabled pending retry.
+      publish({ ...snapshot, status: 'loading' });
       const controller = new AbortController();
       const cancel = () => controller.abort();
       cancelFlight = cancel;
@@ -113,6 +120,7 @@ export function createPredictionPageReader(options: {
         return;
       }
       const page = freezePage(result);
+      reconnectPending = false;
       const pages = Object.freeze([...snapshot.pages, page]);
       const items = Object.freeze(pages.flatMap(entry => entry.ranking.items));
       publish({ ...snapshot, status: 'ready', pages, items, message: null, recovery: null,
@@ -122,8 +130,25 @@ export function createPredictionPageReader(options: {
       if (active && token === generation) publish({ ...snapshot, status: 'error', message: MESSAGE, recovery: 'retry' });
     } finally {
       release();
-      if (token === generation) running = false;
+      if (token === generation) {
+        running = false;
+        recoverAfterReconnect();
+      }
     }
+  }
+
+  function recoverAfterReconnect() {
+    if (!active || running || !reconnectPending || reachable !== true) return;
+    if (snapshot.status !== 'error' || snapshot.recovery !== 'retry') {
+      reconnectPending = false;
+      return;
+    }
+    reconnectPending = false;
+    // A flapping connection cannot create an unbounded request loop. A manual
+    // retry is still available after the per-request automatic budget is spent.
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) return;
+    reconnectAttempts += 1;
+    void dispatch();
   }
 
   function validSuccessor(page: PredictionPage): boolean {
@@ -146,6 +171,8 @@ export function createPredictionPageReader(options: {
     active = false;
     generation += 1;
     running = false;
+    reachable = null;
+    reconnectPending = false;
     clearTimeout(timer);
     timer = undefined;
     cancelFlight?.();
@@ -166,16 +193,35 @@ export function createPredictionPageReader(options: {
       timer = setTimeout(() => { timer = undefined; void dispatch(); }, delayMs);
     },
     deactivate,
+    setConnectivity(next: boolean | null) {
+      if (!active) return;
+      const previous = reachable;
+      reachable = next;
+      if (next !== true) { reconnectPending = false; return; }
+      if (previous === true || !pending) return;
+      // Coalesce an online edge that arrives while a failed transport is still
+      // awaiting its deadline. Success discards it; failure retries once.
+      if (running || snapshot.status === 'error') reconnectPending = true;
+      recoverAfterReconnect();
+    },
     loadMore() {
       if (!active || snapshot.status !== 'ready' || running) return;
       const last = snapshot.pages.at(-1);
       if (!last?.nextCursor) return;
-      try { pending = createNextPredictionPageRequest(last, options.createRequestId()); }
+      try {
+        pending = createNextPredictionPageRequest(last, options.createRequestId());
+        reconnectAttempts = 0;
+        reconnectPending = false;
+      }
       catch { publish({ ...snapshot, status: 'error', message: MESSAGE, recovery: 'retry' }); return; }
       void dispatch();
     },
     retry() {
-      if (snapshot.status === 'error' && snapshot.recovery === 'retry') void dispatch();
+      if (active && snapshot.status === 'error' && snapshot.recovery === 'retry') {
+        reconnectPending = false;
+        reconnectAttempts = 0;
+        void dispatch();
+      }
     },
     refresh() {
       if (!active) return;
@@ -184,6 +230,7 @@ export function createPredictionPageReader(options: {
       clearTimeout(timer);
       cancelFlight?.();
       pending = null;
+      reconnectPending = false;
       publish(initial(options.createRequestId()));
       void dispatch();
     },

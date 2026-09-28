@@ -262,8 +262,10 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                 {ranking.message}
               </Text>
               <Pressable accessibilityRole="button" onPress={ranking.recovery === 'refresh' ? ranking.refresh : ranking.retry}
+                disabled={ranking.retrying} accessibilityState={{ disabled: ranking.retrying, busy: ranking.retrying }}
                 style={({ pressed }) => [styles.collectionButton, pressed && styles.pressed]}>
-                <Text style={styles.collectionText}>{ranking.recovery === 'refresh' ? 'Aloita uusi haku' : 'Yritä uudelleen'}</Text>
+                <Text accessibilityLiveRegion="polite" style={styles.collectionText}>{ranking.retrying ? 'Yritetään uudelleen…'
+                  : ranking.recovery === 'refresh' ? 'Aloita uusi haku' : 'Yritä uudelleen'}</Text>
               </Pressable>
             </View>
           ) : null}
@@ -290,7 +292,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           key={ranking.viewId}
           alwaysBounceVertical
           overScrollMode="always"
-          refreshing={ranking.status === 'loading' || (isSharedDiscovery && sharedEndorsements.status === 'loading')}
+          refreshing={ranking.status === 'loading' || ranking.retrying || (isSharedDiscovery && sharedEndorsements.status === 'loading')}
           onRefresh={() => {
             if ((ranking.status === 'error' || ranking.nextPageError) && ranking.recovery === 'retry') ranking.retry(); else ranking.refresh();
             if (isSharedDiscovery) sharedEndorsements.retry();
@@ -330,16 +332,17 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           }
           ListFooterComponent={
             <View style={styles.pageFooter}>
-              {ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
-                : ranking.nextPageError ? <>
+              {ranking.nextPageError ? <>
                   <Text accessibilityLiveRegion="polite" style={styles.pageText}>{ranking.nextPageError}</Text>
-                  {ranking.recovery === 'retry' ? <Pressable accessibilityRole="button" onPress={ranking.retry} style={styles.collectionButton}>
-                    <Text style={styles.collectionText}>Yritä uudelleen</Text>
+                  {ranking.recovery === 'retry' ? <Pressable accessibilityRole="button" onPress={ranking.retry} style={styles.collectionButton}
+                    disabled={ranking.retrying} accessibilityState={{ disabled: ranking.retrying, busy: ranking.retrying }}>
+                    <Text accessibilityLiveRegion="polite" style={styles.collectionText}>{ranking.retrying ? 'Yritetään uudelleen…' : 'Yritä uudelleen'}</Text>
                   </Pressable> : null}
                   <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Aloita uusi haku</Text>
                   </Pressable>
-                </> : ranking.hasNextPage ?
+                </> : ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
+                : ranking.hasNextPage ?
                   <Pressable accessibilityRole="button" onPress={ranking.loadMore} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Näytä lisää</Text>
                   </Pressable>

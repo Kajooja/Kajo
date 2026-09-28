@@ -4,7 +4,7 @@ Kajo is a mobile-first personal and shared discovery platform. It learns a perso
 
 Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
-Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). Its reusable core and [public-data research pipeline](docs/architecture/DATA_ENRICHMENT.md) are planned work with explicit acceptance gates, not already delivered packages or trained models. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
+Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). The executable [E1 package](packages/prediction-engine/README.md) supplies generic contracts and deterministic media/non-media fixtures. The [D1 research intake](research/README.md) now has an independently reproduced 500-subject / 84,849-rating development cohort from a pinned GroupLens release. The [D2 report](research/reports/movielens-small-d2.md) now records actual train-only model/state comparisons, an independent replay and a rejected challenger. Source acceptance, model evaluation and runtime admission remain separate gates. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
 
 The repository—not a ChatGPT conversation—is the permanent project memory.
 
@@ -34,15 +34,37 @@ npm ci
 npm run start
 ```
 
+Set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for the
+configured app. Expo configuration defaults to production and rejects absent,
+partial, privileged or malformed configuration before building. Production needs
+a non-loopback HTTPS origin and a publishable key (legacy `anon` JWTs remain
+supported); credentials are never echoed in failures.
+
+For a deliberate local demo without a backend, use `KAJO_BUILD_MODE=demo npm run
+start` or `KAJO_BUILD_MODE=demo npm run check`. The mode is embedded in the build;
+an unconfigured production client cannot silently enter demo. The Android release
+job explicitly requires production mode. Demo exports are not release acceptance.
+
 Useful commands:
 
 ```bash
 npm run ios       # Expo iOS development launch
 npm run android   # Expo Android development launch
 npm run check     # lint + typecheck + tests + iOS/Android bundle smoke checks
+npm run test:edge # pinned Deno entrypoint checks + local HTTP fixtures
+npm run engine:demo  # standalone synthetic media/non-media contract cycles
 ```
 
 The mobile application lives under `apps/mobile/` and uses React Native, Expo and TypeScript.
+Research intake/tests also require Python 3.12 (standard library only); see
+[`research/README.md`](research/README.md) for the source verification and repeat commands.
+
+`npm ci` also installs the pinned Deno 2.1.4 validation runtime. `test:edge` is part
+of the root check and CI's existing `validate` job: it checks every Edge entrypoint
+against `supabase/functions/deno.lock` and runs local HTTP tests with fixture
+provider/Data API responses. The first check fetches integrity-locked dependencies;
+test execution allows only loopback networking and needs no Supabase/TMDB secrets.
+These checks do not deploy functions or verify the hosted gateway/configuration.
 
 For a new local database, use `npm run database:install -- /absolute/new/workspace`.
 The [installation procedure](docs/architecture/decisions/0006-clean-install-database-baseline.md#adopted-installation-procedure)

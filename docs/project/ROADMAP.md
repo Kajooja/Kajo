@@ -4,6 +4,15 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Repository closure continuation — 2026-09-28
+
+PRs #294/#295 are accepted with all five CI gates. The reconciled #229 source
+preserves later catalog/credit/cold-history fixes and adds bounded #240 native
+reachability recovery; exact source CI and configured-device acceptance remain
+separate. #238 has a fresh 15-moderate audit and a concrete compatible-upgrade
+path. The [closure audit](retros/2026-09-28.md) tracks every open issue without
+removing MVP requirements or carrying an unexplained source defect forward.
+
 ## Product decision — 2026-09-07
 
 The first public Kajo is not only a store-downloadable BOOK/MOVIE recommender. It must contain the complete **Taste-first launch loop**:
@@ -35,9 +44,75 @@ The active #229 evidence/pagination packet keeps its own acceptance and rollout 
 
 Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
 reconnect retry-UI defect retained as #240. The owner places application UI work
-in a later pre-MVP packet. The explicitly selected current source work is now
-**E1 #235**, followed by **D1 #236 → D2 #237**. STATUS names the branch and actual
-acceptance. #229 retains its native/fresh-account gates; E1 does not close them.
+in a later pre-MVP packet. **E1 #235, D1 #236 and D2 #237 are accepted**; D2 retains its measured,
+independently reproduced development report and rejection decision.
+The owner subsequently authorized an available alternative to 32M; the first
+real seed is the pinned 2018 GroupLens Latest Small / Kaggle v2 development dataset.
+This bounded development comparison can precede a larger stable benchmark with
+its own manifest. STATUS names the branch and actual acceptance. #229 retains
+its native/fresh-account gates; external research does not close them. #182's
+bounded enrichment/expansion is verified on catalog-import v10: 425
+discoverable MOVIE Items with complete TMDB core metadata and all eight declared
+coverage checks passing. English (259) and Finnish (60) remain the main offering;
+other languages complement them. The pass is finished within its explicit cap,
+including a Korean repeat, deferred Spanish and a failed science-fiction attempt
+with unknown upstream progress. Failure diagnostics are accepted through PR #252
+and deployed on catalog-import v12. BOOK guarded preservation/preview source is
+implemented and its catalog-only rollout and ten-Item pilot are complete. The
+initial cached audit retained zero approvals; the September 23 pinned-source
+review now approves two English descriptions for the internal pilot, with six
+rights holds and two text exclusions remaining. The owner completed the guarded
+apply on September 24: two updates and the verified empty second batch. Structured
+attribution is accepted through PR #257 with all five required CI #508 gates,
+and its exact catalog-only forward is installed and verified. The September 23
+owner reports successful companion and full-application exercises; STATUS records
+their scope and separately queued Discovery/UI observations. A focused observation
+of the two real paragraphs/links remains. The exact-ID Work/Edition dump intake
+and reviewed acquisition are accepted. After the metadata diagnostic proved the
+original 15 GB size-budget failure, the separate exact-pinned acquisition ran
+once and failed at a selected Work identity guard. The separately accepted
+100 MiB Work-prefix diagnosis then recovered a current selected row whose
+`location` exactly equals its canonical Work key. Its object, key and type are
+valid; the old guard rejects every present location field. Those four predecessor
+requests remain consumed. The exact-self-location correction and versioned
+historical failure replay are accepted through PR #279. PR #281's separate bounded full-acquisition
+continuation passed all five required CI gates and activated once. Its public
+run ended in failure; private recovery and authentication verification are
+complete. All five requests are now consumed. PR #283 accepted the explicit
+local conflict policy. The separate successor core now supplies shared bounded
+streaming, strict request/result encryption contracts and pure payload replay,
+with complete-source verification and whole-pair exclusion. [STATUS](STATUS.md)
+and #182 record source/CI acceptance. The guarded operator path now supplies
+one-shot activation controls and receipt-based source/run/custody recovery.
+PR #285 accepted that path; a separately bounded request then activated once.
+Its failed result was recovered and preserved. PR #288 accepted the separate
+guarded Edition-prefix operator; actual preparation, explicit caps and separate
+custody readback preceded its one successful diagnosis. Private recovery verified
+an oversized Edition row whose complete outer header is outside the original
+roster. All seven requests are consumed. The explicit local framing core now
+discards only oversized rows with a complete canonical unrelated header, retaining
+selected/unknown failures, original limits, checksum accounting and historical
+replay. The separately versioned full-collection core now integrates the scanner,
+frozen predecessor request and new encrypted accounting/replay. Its guarded
+operator now supplies original-source predecessor checks, one-shot controls and
+source/dependency/CI/custody gates. Original-source preparation and exact durable
+readback now precede one activated framed full-collection run, attempt one. All
+eight requests are consumed. Its failed Edition result is privately recovered,
+freshly reconciled and preserved. A separate diagnostic core now preserves bounded
+terminal evidence and replays the original predicate/policy on synthetic fixtures.
+Recovery checks process termination/PID namespaces and all key copies in a fresh
+process; independent post-command absence remains mandatory. The owner's closure
+audit also selects existing source defects for correction. STATUS owns exact
+source acceptance, continuation and later operational gates.
+Source acceptance grants no provider allowance. The discarded historical
+terminal row's identity and selection status remain unknown; the new prefix does
+not validate the oversized JSON or full source.
+Foreign locations are never remapped.
+No additional text is approved and no database write was performed. The prefix
+diagnosis still cannot prove the earlier discarded row was identical.
+The six-description usefulness target remains unmet.
+STATUS and #182 own exact source/hosted acceptance. Optional further research
+and a winning external model are not prerequisites for this release work.
 
 ## Milestone: MVP 0.1 — first public Kajo
 
@@ -109,7 +184,7 @@ Requirements: `MVP-ALG-002..003`.
 
 Exit: one versioned scoring/eligibility/policy contract for Personal/Shared; baseline shadow parity within declared tolerance; bounded refill after suppression; identified empty responses; duplicate-free, scope-safe pagination without falsely claiming catalog exhaustion.
 
-The active source packet implements protocol-2 atomic pages and the captured-scope mobile reader with per-page origins, alongside native concurrency/populated-upgrade checks. The approved six-forward hosted rollout completed on 2026-09-12; STATUS records its exact versions and evidence. Verify the current published head, then complete configured-client recovery and device acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page. Protocol 1 stays compatible and has no continuation.
+Finish the active source packet through its native concurrency/populated-upgrade gates before reader activation or hosted acceptance. Every new page has its own immutable delivery trace; an old run cannot be rewritten to explain a new page.
 
 The captured reader must also bind visible cache/readiness to environment, actor,
 Profile, session, domain, mode and request/revision. Test rapid A → B → A Profile
@@ -126,10 +201,98 @@ May proceed alongside independent 14.0–14.2 work.
 
 Exit: useful BOOK/MOVIE beta breadth; legal images/attribution; sufficient description/creator/year/language/tags; repeatable bounded refresh; versioned normalized cross-domain feature mapping with provenance and neutral missing-feature behavior.
 
-Before catalog expansion, close #182's source-audit deployment gaps: explicitly
-declare the catalog Edge JWT/service-key boundary, pin reproducible Edge imports
-and validate entrypoints plus unauthorized/authorized requests. Existing mobile
-and Node normalizer tests alone do not verify Edge deployment.
+#182's provider-path recovery and bounded expansion are accepted through
+PR #251 / catalog-import v10. The 2026-09-13 final hosted checkpoint has 425
+discoverable MOVIE Items, all with complete TMDB core metadata/posters, and all
+30 original curated identities enriched. All declared language/era/genre and
+documentary coverage checks pass; English/Finnish are the principal offering.
+The 18-attempt pass is complete with its conservative 30-page accounting.
+PR #252's additive failure/progress diagnostics are accepted and deployed on v12.
+The next BOOK unit follows the
+[description contract](../architecture/ARCHITECTURE.md#book-description-enrichment--guarded-contract-182):
+guarded refresh is accepted through PR #254 and its catalog-only rollout is
+verified. The fixed ten-Item preview exhausted its twenty provider attempts;
+eight English Work descriptions pass the text rules. The September 23 exact
+Wikipedia-source review and offline amendment approve two for the internal pilot
+with structured credit, preserving six rights holds and two text exclusions. The
+[structured attribution path](../architecture/ARCHITECTURE.md#description-attribution--contract-182)
+is accepted through PR #257 / CI #508 and the new catalog-only forward is
+installed with exact function/ACL, history and full-catalog preservation checks.
+The owner completed both importer batches on September 24, with two updates,
+full preservation checks and a verified empty second batch. STATUS records the
+completed archive and the remaining focused real-text phone observation.
+The metadata-only diagnostic proved the old 15 GB cap was below the two files’
+observed 16,644,821,648 bytes. PR #275's separately accepted exact-pinned
+acquisition then ran once and failed at a selected Work identity guard, before
+EOF or full-source verification. Its recovered artifact contains no raw records;
+its historical selected identity and predicate cannot be recovered. The later
+one-shot Work-prefix diagnosis is accepted and consumed: it retained an exact
+self-location row and reproduced the old presence-only rejection privately.
+The prior read-only reconciliation confirmed 383 unchanged targets; the diagnosis
+made no database requests or writes. Its bounded partial stream is not a complete
+source scan, and matching row position does not establish historical byte identity.
+
+PR #279 accepted the narrow exact-self-location correction and versioned v1/v2
+failure replay. PR #281 accepted the
+[full-acquisition continuation contract](../architecture/ARCHITECTURE.md#full-acquisition-after-the-self-location-correction--182).
+Its one-shot public run ended in failure; private recovery and authentication
+verification are complete. The fifth request is consumed. PR #283 accepted the
+[offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182).
+The [successor core](../architecture/ARCHITECTURE.md#conflict-aware-acquisition-core-and-successor-boundary--182)
+now implements bounded streaming, separate request/result contracts, encrypted
+recovery and pure consistency/snapshot replay. It supplies no executable request or
+provider execution. The guarded operator path now supplies the distinct workflow,
+original-source predecessor preparation, private custody checks and source-bound
+recovery. PR #285 accepted that path, and actual preparation/custody verification
+preceded one distinct request. Its failed result is privately recovered and
+preserved. The local Edition diagnostic and its guarded operator were accepted
+through PR #288. Original-source predecessor verification, explicit caps and
+separate custody readback preceded one owner-approved Edition-prefix request.
+Its successful run was privately recovered as `diagnosed` / `dump-line-limit`;
+the retained complete outer header classifies the new oversized row as outside
+the original roster. All seven requests are consumed. The
+[local framing core](../architecture/ARCHITECTURE.md#bounded-edition-framing-core--182)
+now supplies bounded discard through LF only after complete canonical outer-header
+proof. Selected/unknown rows, global limits, selected identity guards, checksum
+accounting and historical replay remain strict. The
+[framed full-collection core](../architecture/ARCHITECTURE.md#framed-full-collection-successor-core--182)
+now integrates this explicit entrypoint with the full two-source collector,
+separate request/result accounting and encrypted payload replay. Its request
+retains all seven fixed predecessor identities and the exact previous roster,
+recipient, source pins, full budgets and conflict policy. The
+[guarded operator](../architecture/ARCHITECTURE.md#framed-full-collection-operator--182)
+now checks all seven Git objects, distinct first-push/first-run controls and
+source/dependency/CI/custody receipts. Original-source diagnosis recovery preflights
+all three historical closures before key staging, then bounds the nested process
+chain and cleans temporary keys. Actual preparation verified all 22 inputs and
+the three original inspectors, then saved and read back the new private request
+and exact source/Git receipt before one distinct first-attempt activation. The
+eighth request is consumed; no retry, reset, reuse or limit expansion is allowed.
+Its failed Edition result is privately recovered as dump-conflict-fatal; the
+terminal row/predicate/policy reason were not retained. Fresh reconciliation
+found no original-target changes and exact private archive readback passed.
+A separate bounded terminal-conflict diagnostic core and strengthened key cleanup
+now have synthetic source tests. This grants no provider run; STATUS owns the
+closure audit's next correction and the later encrypted operational boundary.
+Neither core acceptance nor the local policy grants a rerun or provider budget.
+Complete-source verification, fresh reconciliation and
+source-specific rights review still precede a guarded writer bridge. Curated
+books need exact alias review before enrichment. Do not repeat the completed
+source matches, redeploy either installed description forward or the six native
+forwards, reset the pilot or expand the exhausted API pass. STATUS/Issue #182 own
+source/rollout and execution.
+Do not repeat accepted canary/setup or extend the completed MOVIE budget.
+Repeatable refresh, BOOK descriptions, provider rights/attribution, normalized
+feature quality and native acceptance still keep Phase 14.3 open.
+
+The independently selected #269 offline concept audit now maps exact provider
+fields with versioned lineage and neutral unknowns. On the actual 840-Item
+snapshot, six supported concepts cover 244 BOOKs and 280 MOVIEs; 171 BOOKs have
+mapped provider concepts absent from current matching tag slugs. The aggregate
+report in STATUS records the limited taxonomy and distinct topic/genre evidence.
+Serving tags and scorers remain unchanged. A coordinated versioned rollout and
+parity/evaluation are still required before these projections become prediction
+inputs; this audit alone closes no algorithm or catalog release requirement.
 
 Public research features are a separate path from provider presentation metadata. Do not contaminate production catalog or user evidence while building the research workspace.
 
@@ -137,11 +300,26 @@ Public research features are a separate path from provider presentation metadata
 
 Requirements: `MVP-ENG-001..003`. Canonical design: ADR-0008 and [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md). This is a bounded foundation, not an indefinite model-search project.
 
-**E1 — contracts and fixtures, first engine-specific packet ([#235](https://github.com/Kajooja/Kajo/issues/235)).** Create an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters through a standalone command. Add the actual workspace/exports and engine lint/typecheck/tests to root `npm run check`; currently only `apps/*` workspaces exist. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
+**E1 — contracts and fixtures, first engine-specific packet ([#235](https://github.com/Kajooja/Kajo/issues/235)).** E1 source now supplies `packages/prediction-engine` as an executable generic contract boundary for Subject/acting identity, State, Object, Action, Observation, Outcome, Scenario and version/provenance information. Map Kajo Profile/Item without renaming app identities. Exercise deterministic media and small synthetic non-media adapters through a standalone command. The package joins `packages/*` workspaces and root `npm run check` through its lint/typecheck/tests, build and real ESM export check. STATUS records actual source/CI acceptance. Test missingness, observed/external/synthetic separation, horizons, as-of inputs and hard constraints. Keep runtime SQL unchanged; source extraction requires parity, not a duplicate drifting scorer.
 
 **D1 — isolated MovieLens manifest and adapter ([#236](https://github.com/Kajooja/Kajo/issues/236)).** After E1's record boundary, implement streaming/idempotent normalization and deterministic small-cohort processing. Validate checksums, CSV/ratings/IDs, namespaces, mappings, duplicates, chronological ordering, quarantine and resource bounds. Then record the actual permitted download and normalized real cohort. No production credentials or native User/Profile/Event writes. Use ignored `research-data/` and `research-artifacts/` locations or explicitly equivalent isolated storage; exclude raw/derived data from ordinary CI artifacts before download.
 
 **D2 — reproducible baseline evaluation ([#237](https://github.com/Kajooja/Kajo/issues/237)).** Compare train-only transparent means/neighbors and an explicit-rating factorization challenger through the same research contract. Include one bounded declared static-state versus ordered-prefix/trajectory-retrieval experiment; a negative or insufficient-evidence result is valid. Freeze global chronological splits, held-out-subject cold-start prefixes, transforms/artifact cutoffs, baselines, metrics and final test before selection. Report coverage, uncertainty, task limitations, cost and prior/enrichment ablations where available. Scale to the full dataset only after the small run is correct and resource-bounded.
+
+D2’s [actual development report](../../research/reports/movielens-small-d2.md) records
+46,410 training rows, fixed temporal/held-out-subject tests, two matching executions
+and rejection of the validation-selected challenger under the frozen rule. This
+completes the bounded experiment; current-head source acceptance is in STATUS.
+
+The explicitly selected independent **#265** follow-up now corrects unsupported
+latent fallback and reports one reproduced exploratory earliest/recent prefix
+study on the same authorized D1 cohort. Original training boundaries/parameters
+and historical D2 rejection are preserved. On 5,707 ratings from 23 held-out
+subjects, the fixed recent-prefix durable-state comparison improves RMSE from
+0.850843 to 0.807788, with paired subject interval wholly below zero. This is reused
+development data and compares policies with potentially different actual prefix
+counts; no new final, native, BOOK or model-admission claim follows. The bounded
+packet is complete; it does not make further model search an MVP prerequisite.
 
 Exit: reproducible contracts/adapter/report and a documented admit/reject/defer decision. A challenger need not win. No probabilities, counterfactual uplift, group behavior or cross-domain competence may be fabricated from rating-only data. A losing or rights-blocked prior stays out of serving; the transparent baseline remains usable.
 
@@ -260,6 +438,17 @@ UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requireme
 are release gates. Weekly tracking requires the relevant 17.1/17.2 telemetry and
 privacy work before beta; community comparisons remain conditional.
 
+The owner explicitly queues the September 23 browse/detail refinements here:
+#200 canonical Katsotut/Luetut entry; #199/#200 one-row ItemType dropdown and
+collection navigation; #199 removal of unused grid space and continued loading;
+#231 list/poster-grid controls also for history; #239 fit-aware descriptions and
+arrow-only Back to the real origin. UX_PRINCIPLES owns the full contract. Address
+canonical navigation correctness before visual refinements; continuous loading
+depends on #228/#229's accepted server cursor/delivery path. These are deferred
+refinements of existing browse work, not a request to interrupt the current bounded
+BOOK enrichment or an automatic expansion of MVP gates. Later cast/director
+presentation stays under FUT-CAT-001, outside this immediate UI packet.
+
 ### 17.1 — Launch telemetry and experimentation
 
 Requirements: `MVP-GROWTH-001..004`.
@@ -272,12 +461,13 @@ Requirements: `MVP-OPS-001..006`, Taste/Friend privacy requirements.
 
 Exit: staging/production isolation; anonymous/Taste/invite retention/deletion; backups/restore; crash/queue/prediction/funnel diagnostics; invite limits/anti-enumeration/block and abuse-report handling; cost alerts; fail-closed production configuration.
 
-The repository audit found production build configuration still optional and
-unconfigured clients still able to enter mock mode. `MVP-OPS-005` must reject
-missing production settings and privileged key shapes before bundling, while
-retaining explicit local demo/test behavior. Under #160/#184 validate password
-endpoint JSON shapes, intended enumeration responses and rate limits before
-anonymous/public entry. These are open source findings, not verified hosted defects.
+The #160 source correction supplies fail-closed build/runtime production config,
+explicit demo identity, public-key shape validation and bounded password JSON
+validation before lookup. STATUS/#160 own exact source/CI/hosted acceptance.
+Distributed abuse limits and deliberate enumeration policy remain required before
+public entry, alongside hosted password protection, current platform security
+updates and release dependency checks. Source fixtures alone do not certify the
+complete production service.
 
 Research artifacts and derived model/index dependencies participate in their own rights, withdrawal and lifecycle controls. Do not ship research data or service credentials to clients.
 

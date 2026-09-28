@@ -19,6 +19,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSupabaseConnection } from '../../data/SupabaseProvider';
 
 import type {
   EventId,
@@ -28,6 +29,9 @@ import type {
   PredictionId,
 } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
+import { visibleItemDescription } from '../../domain/itemDescription';
+import { ItemDescription } from './ItemDescription';
+import { CatalogDetailEntry } from './CatalogDetailEntry';
 import { getRoomTheme, type RoomTheme } from '../../theme/roomTheme';
 import { useEventTracking } from '../events/EventTrackingContext';
 import {
@@ -88,6 +92,7 @@ export function ItemDetailScreen({
   deliveryId,
   predictionSource,
 }: ItemDetailScreenProps) {
+  const connection = useSupabaseConnection();
   const { mode } = useDiscoveryMode();
   const activeProfile = useActiveProfile();
   const sharedEndorsements = useSharedEndorsements();
@@ -145,6 +150,16 @@ export function ItemDetailScreen({
     );
   }
 
+  if (!deliveryId) {
+    return (
+      <CatalogDetailEntry key={`${scopeKey}:${eventTracking.sessionId}:${itemId}`} itemId={itemId} scopeKey={scopeKey}
+        client={connection.status === 'configured' ? connection.client : null}
+        theme={getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile)} onBack={() => router.back()}>
+        {item => <ItemDetailContent itemId={itemId} catalogItem={item} />}
+      </CatalogDetailEntry>
+    );
+  }
+
   return (
     <ItemDetailContent
       key={`${scopeKey}:${eventTracking.sessionId}:${itemId}:${deliveryId ?? "direct"}`}
@@ -158,7 +173,8 @@ export function ItemDetailScreen({
 function ItemDetailContent({
   itemId,
   slate,
-}: ItemDetailScreenProps & { slate?: DeliveredSlate }) {
+  catalogItem,
+}: ItemDetailScreenProps & { slate?: DeliveredSlate; catalogItem?: Item }) {
   const { width } = useWindowDimensions();
   const { mode: currentMode } = useDiscoveryMode();
   const [mode] = useState(() => slate?.mode ?? currentMode);
@@ -182,7 +198,7 @@ function ItemDetailContent({
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(currentMode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const selectedItem = slate?.items.find(item => item.id === itemId) ?? getMockItem(itemId);
+  const selectedItem = catalogItem ?? slate?.items.find(item => item.id === itemId) ?? getMockItem(itemId);
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
       ? activeProfile.sharedProfiles.find(
@@ -197,9 +213,11 @@ function ItemDetailContent({
     ? slate?.source === 'collection' ? buildCollectionSequence(selectedItem, slate.items)
       : buildSwipeSequence(selectedItem, slate?.items ?? [selectedItem], interactions)
     : []);
-  const [origins] = useState(() => slate?.origins ?? buildDeliveredItemOrigins(
-    items, items, recommendationTraceId, 'fallback', {},
-  ));
+  const [origins] = useState(() => slate?.origins ?? (catalogItem
+    ? Object.fromEntries(items.map(item => [item.id, {
+      properties: { predictionSource: 'collection' as const, deliveryTier: 'COLLECTION' as const },
+    }]))
+    : buildDeliveredItemOrigins(items, items, recommendationTraceId, 'fallback', {})));
   const [originSessionId] = useState(() => slate?.sessionId ?? eventTracking.sessionId);
   const originFor = useCallback((item: Item) => ({ ...getDeliveredItemOrigin(origins, item.id),
     originSessionId }), [origins, originSessionId]);
@@ -956,11 +974,12 @@ function SwipeItemPage({
   const consumedLabels = getConsumedItemLabels(item.itemType);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [tagsExpanded, setTagsExpanded] = useState(false);
+  const description = visibleItemDescription(item);
   const tags = item.tags ?? [];
   const visibleTags = tagsExpanded
     ? tags
     : tags.slice(0, COLLAPSED_TAG_COUNT);
-  const contentExpanded = descriptionExpanded || tagsExpanded || pendingApprovalLabel !== null;
+  const contentExpanded = descriptionExpanded || tagsExpanded || pendingApprovalLabel !== null || Boolean(description.descriptionAttribution);
 
   return (
     <ScrollView
@@ -1136,42 +1155,8 @@ function SwipeItemPage({
         </View>
       </View>
 
-      {item.description ? (
-        <View style={styles.descriptionBlock}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={
-              descriptionExpanded ? 'Tiivistä kuvaus' : 'Laajenna kuvaus'
-            }
-            onPress={() =>
-              setDescriptionExpanded((current) => !current)
-            }
-          >
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={descriptionExpanded ? undefined : 2}
-              style={styles.description}
-            >
-              {item.description}
-            </Text>
-          </Pressable>
-          {descriptionExpanded ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Tiivistä kuvaus"
-              onPress={() => setDescriptionExpanded(false)}
-              style={({ pressed }) => [
-                styles.collapseDescription,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={styles.collapseDescriptionText}>
-                Näytä vähemmän
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      <ItemDescription item={item} expanded={descriptionExpanded}
+        onExpandedChange={setDescriptionExpanded} theme={theme} />
     </ScrollView>
   );
 }
@@ -1379,25 +1364,6 @@ function createStyles(theme: RoomTheme) {
       fontSize: 24,
       lineHeight: 28,
       fontWeight: '600',
-    },
-    description: {
-      color: theme.base.textMuted,
-      fontSize: 13,
-      lineHeight: 18,
-    },
-    descriptionBlock: {
-      marginTop: 10,
-    },
-    collapseDescription: {
-      alignSelf: 'flex-start',
-      minHeight: 32,
-      justifyContent: 'center',
-      marginTop: 2,
-    },
-    collapseDescriptionText: {
-      color: theme.ambient.curtainHighlight,
-      fontSize: 12,
-      fontWeight: '700',
     },
     tags: {
       flexDirection: 'row',

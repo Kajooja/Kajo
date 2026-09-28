@@ -1,6 +1,10 @@
 # External taste data and enrichment
 
-Status: **planned research pipeline and admission contract**, 2026-09-12 / Issue #233. No dataset has been imported, model trained or hosted schema changed by this documentation delivery.
+Status: **D1 accepted; D2 real training/evaluation and independent replay complete,
+source CI/merge tracked in STATUS**, 2026-09-12 / #236/#237. E1 and D1 are accepted
+through #241/#242. D2's [development report](../../research/reports/movielens-small-d2.md)
+rejects challenger admission under the frozen selection rule and defers native
+use; no serving model or native evidence changes.
 
 Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo semantics: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Order and acceptance: [ROADMAP](../project/ROADMAP.md), [MVP](../product/MVP.md).
 
@@ -19,13 +23,53 @@ simulated trajectories   → isolated synthetic experiments
 
 Do not create live Kajo Users/Profiles for external dataset people. Do not inject their rows into native Events, imports owned by a real Kajo user, Shared history or reward denominators. A user's own authorized history import remains the existing separate product flow.
 
+BOOK presentation enrichment follows the guarded
+[catalog description contract](ARCHITECTURE.md#book-description-enrichment--guarded-contract-182)
+and [bounded pilot](../project/sprints/SPRINT-014.md#book-description-plan--2026-09-13--182).
+It reads exact provider Work/Edition metadata for existing Items, independently
+of preference datasets. Larger coverage uses pinned monthly catalog dumps;
+descriptions need no external people's ratings or new learned prior. Provider
+text/cover rights are reviewed for the intended use, separately from research
+artifact admission.
+
 ## 2. Source registry — verified documentation
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
 
-### MovieLens 32M — first research baseline
+### MovieLens Latest Small, September 2018 / Kaggle version 2 — selected development seed
+
+The owner explicitly authorized a suitable available alternative on 2026-09-12,
+so D1 no longer waits for one unavailable endpoint. GroupLens's own Kaggle dataset
+`grouplens/movielens-latest-small`, version 2, was retrieved over normally verified
+HTTPS. The archived README and exact member hashes were checked. It contains
+100,836 ratings from 610 users, 9,742 movies and 3,683 tags, generated 2018-09-26;
+rating activity spans 1996-03-29 to 2018-09-24. Half-star ratings, CSV structure,
+source-local IDs, chronological limitations and mapping semantics match the
+implemented MovieLens record contract. [Publisher version and README][MLSMALL]
+
+Its Usage License permits research with attribution, no implied endorsement and
+prior permission for commercial/revenue-bearing use. The reviewed scope is local
+noncommercial development only. The publisher calls Latest Small a development
+dataset, unsuitable for shared research benchmarks; freezing its 2018 version
+and content identity does not turn it into a population benchmark. D2's first
+run is therefore a declared bounded development comparison. A larger stable
+benchmark can follow with its own manifest, rather than blocking all progress.
+
+The actual 500 hash-selected subjects retain 84,849 complete-history ratings.
+Two fresh runs and verified stage reuse agree. One TMDb alias collision quarantines
+both mappings without discarding ratings or merging movies. Exact source/output
+hashes, scope and costs are in the [aggregate intake evidence](../../research/reports/movielens-small-v2-intake.json).
+No external subject or rating is inserted into native Kajo storage.
+
+### MovieLens 32M — larger stable benchmark candidate
 
 The release contains 32,000,204 ratings from 200,948 users, 87,585 movies and 2,000,072 tag applications. Rating records span 1995-01-09 to 2023-10-12. Selected users have at least twenty ratings. Files are `ratings.csv`, `movies.csv`, `links.csv` and `tags.csv`; ratings use half-star steps from 0.5 to 5. File order is user then movie, not chronological. Timestamps identify rating/tag activity, not viewing time. `links.csv` provides IMDb/TMDb mappings. No demographics are supplied. Research use has conditions; commercial/revenue-bearing use requires permission. [ML32]
+
+The original 32M file service currently fails upstream TLS verification in this
+environment; its source approval remains unresolved. The explicit `--source 32m`
+path is retained but is no longer D1's sole route. GroupLens's [Kaggle 20M][ML20K]
+metadata/listing is also available; its differently packaged files and unresolved
+license label require their own source/terms check before any later substitution.
 
 ### Tag Genome 2021 — optional object-feature enrichment
 
@@ -48,6 +92,23 @@ Use this later study to test sequence-aware recall and explicitly defined logged
 [UCSD Goodreads][GOODREADS] offers shelves, ratings and book metadata, but specifies academic use only and no redistribution. The current independent non-commercial project has not established that it qualifies. [Amazon Reviews 2023][AMAZON] could support object/category experiments; its [maintainer states][AMAZON-RIGHTS] that the lab is not in a position to assign the dataset a license or dictate its usage terms.
 
 Preserve both as optional research candidates. Neither is an approved download/training dependency or a release blocker. Resolve the exact intended use and source/derivative rights before admitting either; a working MovieLens path and synthetic non-media fixtures do not depend on them.
+
+### Open Library ratings/reading-log dumps — no individual histories
+
+Documentation checked September 24, 2026. The [publisher's dump schema][OL-DUMPS]
+identifies a Work, optional Edition, rating or shelf, and date on each row. It
+provides no subject key, including a stable pseudonymous one. Therefore these
+files cannot form individual taste histories, user holdouts, chronological
+profile prefixes or book/movie subject links. Item-level distributions may be
+research candidates; the precise date semantics remain unverified. No download
+or training is admitted by this review.
+
+The [publisher's rights statement][OL-RIGHTS] disclaims newly asserted database
+rights while acknowledging possible existing rights. It does not establish a
+blanket license for every contribution or separately settle research, derivatives,
+redistribution and serving. Keep any aggregate-prior proposal behind its own
+manifest and rights decision. The #182 Work/Edition acquisition excludes ratings
+and reading-log files and does not reconstruct source identities.
 
 ## 3. What the sources can and cannot establish
 
@@ -89,6 +150,26 @@ Do not load tens of millions of external ratings into the production transaction
 The first implementation creates real code and tests only when the corresponding work packet starts. No empty engine/services/data directories are needed now. Raw and derived research locations must be excluded from Git and ordinary CI artifacts before the first download.
 
 Use streaming/chunked parsing, bounded memory, atomic stage checkpoints and resumable/idempotent jobs. Keep malformed rows and mapping conflicts in a counted quarantine, not silently discarded. Dataset files are data, never executable instructions. Archive extraction must prevent path traversal and enforce size/file allowlists.
+
+D1 now uses `scripts/research/movielens.py` (Python 3.12 standard library), the
+`normalize-movielens.mjs` runner and the separately exported engine MovieLens
+adapter. The active source manifest is `research/manifests/movielens-small-v2.json`;
+`movielens-32m.json` preserves the separate pending larger source.
+Raw/archive-normalized/engine-observation stages are distinct, hashed and
+atomically completed. [The research runner](../../research/README.md) owns the
+exact commands, fixed limits, seeded full-history cohort and conflict policy.
+Metadata without historical availability stays out of historical features.
+D2 adds the built engine’s separate `./research` export and
+`scripts/research/evaluate-ratings.mjs`, with a sealed temporal/cold-subject protocol,
+train-only means/neighbors/factors/prefix memories, score-before-update evaluation,
+subject-bootstrap uncertainty and native-only/unavailable withdrawal fallback.
+[The aggregate report](../../research/reports/movielens-small-d2.json) contains the
+actual first/replay hashes and metrics. Raw partitions and all fitted parameters
+remain ignored. Further source policy changes require withdrawing dependent
+artifacts and a separately authorized rebuild; this runner has no serving path.
+The selected small source has reviewed terms and actual pinned archive/member
+hashes. The original 32M source remains unverified. Both releases keep distinct
+identities and limits; fixture and real-data evidence remain separate.
 
 ## 6. Normalized research contracts
 
@@ -186,6 +267,23 @@ Use global chronological train/validation/test cutoffs with all learned artifact
 
 Specify whether a result is frozen-batch or prequential. In a prequential test, score first, then allow that newly observed answer to update later state; never report that as a fixed holdout test. Keep a final untouched test window outside evolutionary model selection. Preserve an item-cold-start slice where feasible and report excluded/unmapped entities.
 
+### Reusing development data for a bounded follow-up
+
+A follow-up on already inspected outcomes must identify itself as exploratory;
+a changed prefix policy or wider time window does not create a fresh final test.
+The #265 protocol fixes original D2 source/configuration/membership/training
+boundaries and changes only the declared held-out prefix question. Every policy
+scores identical targets before any current timestamp group's answers enter
+history. Contiguous complete-group selection must report actual size, age and
+oversized-group blocking; equal maximum budgets need not mean equal information.
+Paired uncertainty resamples the same subjects jointly across conditions.
+
+A latent component with zero supported prefix Items must retain its declared
+state fallback; the presence of unsupported ratings alone is not latent support.
+This is research estimator correctness, not a serving integration. The
+[recorded follow-up](../../research/reports/movielens-small-prefix-study.md)
+retains its evidence and limitations separately from the original D2 report.
+
 ### Metrics and interpretation
 
 Use rating MAE/RMSE for observed explicit ratings. Use probability losses/calibration only when a probability target and supported labels exist. Ranking NDCG/Recall needs a published relevance rule and candidate universe; sampled unlabeled negatives are not known dislikes and must be labeled as an assumption/protocol.
@@ -221,6 +319,8 @@ Dataset download, the full training run and hosted artifact admission are separa
 ## Sources and attribution
 
 [ML32]: https://files.grouplens.org/datasets/movielens/ml-32m-README.html
+[MLSMALL]: https://www.kaggle.com/datasets/grouplens/movielens-latest-small
+[ML20K]: https://www.kaggle.com/datasets/grouplens/movielens-20m-dataset
 [TG21]: https://files.grouplens.org/datasets/tag-genome-2021/genome_2021_readme.txt
 [BELIEFS]: https://files.grouplens.org/datasets/movielens/ml_belief_2024_data_release_2_README.txt
 [KUAIRAND]: https://kuairand.com/
@@ -229,3 +329,6 @@ Dataset download, the full training run and hosted artifact admission are separa
 [AMAZON-RIGHTS]: https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023/discussions/1
 
 Publication attribution must follow the exact selected release: Harper and Konstan (2015) for MovieLens; Kotkov, Maslov and Neovius (2021) and Vig, Sen and Riedl (2012) for Tag Genome; the Aridor et al. (2024) Beliefs reference specified by its publisher; Gao et al. (2022) for KuaiRand. Store the publisher's complete citation in the dataset manifest rather than relying on this abbreviated design note. Method proposals and their primary papers are in the [engine research appendix](PREDICTIVE_MEMORY_ENGINE.md#research-references-and-falsifiable-proposals); they are not claims that public-data training already improves Kajo.
+
+[OL-DUMPS]: https://openlibrary.org/developers/dumps
+[OL-RIGHTS]: https://openlibrary.org/developers/licensing

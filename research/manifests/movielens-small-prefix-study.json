@@ -1,0 +1,46 @@
+{
+  "version": "movielens-prefix-development-v1",
+  "issue": 265,
+  "scope": "Owner-authorized noncommercial exploratory development on previously inspected D2 data; not a fresh holdout, native usefulness result or model admission",
+  "sourceReport": "research/reports/movielens-small-v2-intake.json",
+  "sourceManifest": "research/manifests/movielens-small-v2.json",
+  "parentProtocol": "research/manifests/movielens-small-d2.json",
+  "parentReport": "research/reports/movielens-small-d2.json",
+  "hypothesis": "Under the same small visible-rating budget, recent complete rating-entry groups may adapt a durable residual estimate better than the earliest groups.",
+  "training": "Exactly D2 regular-subject training rows and configuration; verify original membership, partition hashes and cutoffs. Fit once per independent run. Held-out-subject rows never enter any global fit. No hyperparameter search or selection.",
+  "targets": "Every D2 held-out-subject rating at or after the original training cutoff. The full target set is identical across every policy/budget/variant. These reused development outcomes are not untouched final evidence.",
+  "prefix": {
+    "policies": ["earliest", "recent"],
+    "budgets": [0, 5, 10, 20],
+    "availability": "Subject's complete strictly earlier rating-time groups, including pre-training-cutoff history; score each whole current group before appending any current labels. Global artifact never updates.",
+    "earliest": "Take the longest contiguous prefix of complete groups whose cumulative row count fits the budget; stop at the first group that does not fit.",
+    "recent": "Walk backward from the latest prior group, retaining whole groups until the next group cannot fit; stop without skipping it. Return the contiguous suffix in chronological order.",
+    "ties": "No partial timestamp group, arbitrary within-group ordering or current-group evidence. Oversized boundary groups may leave zero usable prefix.",
+    "missing": "Unknown training items remain in subject state; factorization uses the declared durable-state fallback when no prefix item has fitted factors. Zero support and cold items remain in every denominator."
+  },
+  "primary": {
+    "budget": 10,
+    "variant": "state-static",
+    "contrast": "recent minus earliest RMSE, paired on exact subject/object/time identities",
+    "uncertainty": "500 seeded paired subject-cluster bootstrap replicates, jointly resampling all rows per subject; descriptive exploratory intervals only",
+    "minimumSubjects": 20,
+    "minimumMaterialGain": 0.01,
+    "decision": "Report direction, interval, support and material-gain threshold. Regardless of outcome, no selection, promotion, native integration or new final claim."
+  },
+  "diagnostics": {
+    "variants": ["global-mean", "item-mean", "state-static", "state-recent", "item-neighbor", "factorization", "retrieval-static", "trajectory"],
+    "metrics": "MAE/RMSE, subject-macro errors, absolute error quantiles, fixed cold/tail/supported item slices, finite/component coverage and paired policy intervals for the same variant/budget",
+    "prefixSupport": "Query-weighted and target-row-weighted actual size and oldest/newest age in days; empty eligible history, oversized-group blocking and zero selected prefix counts separately",
+    "cost": "Fit and total run times, selector and forecast times separately, peak process RSS and artifact bytes"
+  },
+  "replay": "Two independent fits/evaluations must match numeric parameters, predictions, all metrics/prefix summaries and deterministic result hash; timings and runtime resource peaks are excluded from equality.",
+  "resources": {
+    "maxRows": 100000,
+    "maxInputBytes": 150000000,
+    "maxRssMiB": 1024,
+    "maxSeconds": 300,
+    "maxArtifactBytes": 16000000
+  },
+  "publication": "Only authored code, this protocol, aggregate reports and hashes; subject membership, histories, prediction journals and fitted parameters remain private/ignored. Existing source rights/withdrawal rules remain in force.",
+  "nativeAdmission": "deferred; research-only source rights, quality, mapping, compatibility, isolation, trace, fallback and device gates remain separate"
+}

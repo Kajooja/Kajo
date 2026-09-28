@@ -130,27 +130,45 @@ async function withNewSupabaseStack(projectId, work, destination) {
         '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
       return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
     };
-    // Separate native sessions for race probes. Unlike the synchronous adapter,
-    // this keeps Node's event loop available while PostgreSQL waits on locks.
-    // Bound to the newly owned, image-verified container above; no database URL.
-    const execConcurrent = sql => new Promise((resolve, reject) => {
-      const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
-        ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1',
-          '--username=postgres', '--dbname=postgres'])], { cwd: directory, env: environment });
-      let output = ''; let errors = '';
-      const timer = setTimeout(() => child.kill('SIGKILL'), 30_000);
-      child.stdout.on('data', data => { output += data; if (output.length>16*1024*1024) child.kill('SIGKILL'); });
-      child.stderr.on('data', data => { errors = (errors+data).slice(-3000); });
-      child.on('error', error => { clearTimeout(timer); reject(error); });
-      child.on('close', code => {
-        clearTimeout(timer);
-        if (code!==0) return reject(new Error(`Concurrent local SQL failed (${code}): ${errors.trim()}`));
-        try { resolve(output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : []); }
-        catch (error) { reject(error); }
+    // Independent sessions only on the newly owned CLI CI stack. This makes
+    // actual row-lock waits observable without connecting to a hosted database.
+    const execConcurrentSql = sql => {
+      assert.equal(projectId, 'kajo_ci_cli_install');
+      return new Promise((resolveSql, rejectSql) => {
+        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
+          ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])],
+        { cwd: directory, env: environment, stdio: ['pipe', 'pipe', 'pipe'] });
+        let stdout = '', stderr = '';
+        const timer = setTimeout(() => child.kill('SIGKILL'), 30000);
+        child.stdout.on('data', data => { stdout += data; if (stdout.length > 16 * 1024 * 1024) child.kill('SIGKILL'); });
+        child.stderr.on('data', data => { stderr = (stderr + data).slice(-3000); });
+        child.on('error', error => { clearTimeout(timer); rejectSql(error); });
+        child.on('close', code => {
+          clearTimeout(timer);
+          if (code !== 0) return rejectSql(new Error('Isolated SQL session failed: '
+            + stderr.split('\n').filter(line => /ERROR:/.test(line)).join('\n')));
+          try { resolveSql(stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : []); }
+          catch { rejectSql(new Error('Invalid isolated SQL acknowledgement')); }
+        });
+        child.stdin.on('error', error => { child.kill('SIGKILL'); rejectSql(error); });
+        child.stdin.end(sql);
       });
-      child.stdin.on('error', () => {}); // Process close reports failure without an uncaught EPIPE.
-      child.stdin.end(`set statement_timeout='10s';\n${sql}`);
-    });
+    };
+    const catalogRpc = async (body, role = 'service_role') => {
+      assert.equal(projectId, 'kajo_ci_cli_install');
+      assert.ok(['service_role', 'anon'].includes(role));
+      // Credentials belong only to this new local test stack; never log status.
+      const status = JSON.parse(cli(['status', '--output', 'json']));
+      const url = new URL(status.API_URL);
+      assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname));
+      const key = role === 'service_role' ? status.SERVICE_ROLE_KEY : status.ANON_KEY;
+      assert.ok(typeof key === 'string' && key.length > 20, 'Missing isolated Data API credential');
+      const response = await fetch(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
+        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
+        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+      return { status: response.status, body: await response.json() };
+    };
     let applied = false;
     const applyMigrations = async files => {
       assert.equal(applied, false, 'Fresh installation can execute only once');
@@ -182,7 +200,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       verifyCiPostgresImage(resetImage);
       return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
     };
-    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrent });
+    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc });
     if (destination) {
       const report = { result, cliVersion, image, architecture: process.arch, projectId, containerId,
         workspace: directory, installedAt: new Date().toISOString(), cleanup: 'RETAINED_LOCAL',

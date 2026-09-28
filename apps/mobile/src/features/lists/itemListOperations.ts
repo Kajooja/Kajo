@@ -1,3 +1,4 @@
+import { readCatalogDescription } from '../../domain/itemDescription';
 import type {
   Item,
   ItemId,
@@ -377,7 +378,7 @@ function mapItem(value: Record<string, unknown>): Item | null {
     id: value.item_id,
     itemType: value.item_type,
     title: value.title,
-    ...(value.description ? { description: value.description } : {}),
+    ...readCatalogDescription(value.description, undefined),
     tags: value.tags as string[],
   };
 }

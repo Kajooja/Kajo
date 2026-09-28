@@ -37,6 +37,104 @@ async function activate(reader: ReturnType<typeof makeReader>['reader']) {
 }
 async function settle() { await vi.advanceTimersByTimeAsync(0); }
 
+describe('focused connectivity recovery', () => {
+  const offline: PredictionPageResult = { status: 'error', message: 'offline', recovery: 'retry' };
+
+  it.each([false, true])('retries the exact failed page and keeps its error until success; append=%s', async append => {
+    const retry = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>();
+    if (append) load.mockImplementationOnce(async request => success(request));
+    load.mockResolvedValueOnce(offline).mockImplementationOnce(() => retry.promise);
+    const { reader, createRequest } = makeReader(load);
+    await activate(reader);
+    const prefix = reader.getSnapshot().items;
+    if (append) { reader.loadMore(); await settle(); }
+    const request = load.mock.calls.at(-1)![0];
+    reader.setConnectivity(false); reader.setConnectivity(null);
+    expect(reader.getSnapshot()).toMatchObject({ status: 'error', message: 'offline' });
+    reader.setConnectivity(true);
+    for (let i = 0; i < 20; i++) reader.setConnectivity(true);
+    expect(load.mock.calls.at(-1)![0]).toBe(request);
+    expect(load).toHaveBeenCalledTimes(append ? 3 : 2);
+    expect(createRequest).toHaveBeenCalledTimes(1);
+    expect(reader.getSnapshot()).toMatchObject({ status: 'loading', message: 'offline', recovery: 'retry' });
+    expect(reader.getSnapshot().items).toBe(prefix);
+    retry.resolve(success(request, append ? 2 : 1)); await settle();
+    expect(reader.getSnapshot()).toMatchObject({ status: 'ready', message: null, recovery: null });
+    expect(reader.getSnapshot().pages).toHaveLength(append ? 2 : 1);
+    expect(new Set(reader.getSnapshot().items.map(item => item.id)).size).toBe(append ? 4 : 2);
+  });
+
+  it('caps flapping-network attempts while preserving backend failures and a manual retry', async () => {
+    const { reader, load } = makeReader(vi.fn(async () => offline));
+    await activate(reader);
+    for (let i = 0; i < 20; i++) {
+      reader.setConnectivity(false); reader.setConnectivity(true); await settle();
+    }
+    expect(load).toHaveBeenCalledTimes(4); // Initial dispatch + three automatic attempts.
+    expect(new Set(load.mock.calls.map(([request]) => request)).size).toBe(1);
+    expect(reader.getSnapshot()).toMatchObject({ status: 'error', message: 'offline' });
+    reader.retry(); await settle();
+    expect(load).toHaveBeenCalledTimes(5);
+  });
+
+  it('coalesces reconnect during a hung request and retains the 15-second bound', async () => {
+    const late = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(() => late.promise).mockResolvedValue(offline);
+    const { reader } = makeReader(load);
+    await activate(reader);
+    reader.setConnectivity(false); reader.setConnectivity(true); reader.setConnectivity(true);
+    await vi.advanceTimersByTimeAsync(15_000);
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(load.mock.calls[0]![1].aborted).toBe(true);
+    const failed = reader.getSnapshot();
+    late.resolve(success(load.mock.calls[0]![0])); await settle();
+    expect(reader.getSnapshot()).toBe(failed);
+    expect(failed.message).toBe('offline');
+  });
+
+  it('does not retry a successful in-flight request or a server-proven expired cursor', async () => {
+    const late = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(() => late.promise)
+      .mockResolvedValue({ status: 'error', message: 'expired', recovery: 'refresh' });
+    const { reader } = makeReader(load);
+    await activate(reader);
+    reader.setConnectivity(false); reader.setConnectivity(true);
+    late.resolve(success(load.mock.calls[0]![0])); await settle();
+    expect(load).toHaveBeenCalledTimes(1);
+    reader.loadMore(); await settle();
+    const expired = reader.getSnapshot();
+    reader.setConnectivity(false); reader.setConnectivity(true); reader.retry(); await settle();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(reader.getSnapshot()).toBe(expired);
+    expect(expired).toMatchObject({ recovery: 'refresh', message: 'expired' });
+  });
+
+  it('cancels recovery on blur and cannot publish its late reply into a replacement scope', async () => {
+    const late = deferred<PredictionPageResult>();
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockResolvedValueOnce(offline).mockImplementationOnce(() => late.promise);
+    const old = makeReader(load);
+    await activate(old.reader);
+    old.reader.setConnectivity(true);
+    const oldRequest = load.mock.calls[1]![0];
+    old.reader.deactivate();
+    expect(load.mock.calls[1]![1].aborted).toBe(true);
+    old.reader.setConnectivity(false); old.reader.setConnectivity(true);
+    const next = makeReader(undefined, { ...scope, actorUserId: id(8), revision: 'changed' });
+    await activate(next.reader);
+    const accepted = next.reader.getSnapshot();
+    late.resolve(success(oldRequest)); await settle();
+    expect(next.reader.getSnapshot()).toBe(accepted);
+    expect(old.reader.getSnapshot().items).toEqual([]);
+    expect(load).toHaveBeenCalledTimes(2);
+    next.reader.deactivate();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
 beforeEach(() => { sequence = 100; vi.useFakeTimers(); vi.setSystemTime(new Date('2026-09-12T12:00:00Z')); });
 afterEach(() => { vi.useRealTimers(); });
 

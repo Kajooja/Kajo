@@ -26,6 +26,11 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Setup Python for isolated research tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
@@ -157,6 +162,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: [validate, database-platform, database-installation, database-upgrade, database-cli-installation]
     runs-on: ubuntu-latest
+    env:
+      KAJO_BUILD_MODE: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4

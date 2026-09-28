@@ -13,3 +13,7 @@ yarn-error.log*
 # Public research inputs and fitted artifacts are not source code.
 /research-data/
 /research-artifacts/
+
+# Standard-library research tools do not commit interpreter caches.
+__pycache__/
+*.pyc
