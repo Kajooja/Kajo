@@ -1231,15 +1231,127 @@ npm run catalog:book-descriptions:lines -- \
   --out dist/catalog-enrichment/new-line-diagnosis
 ```
 
-Actual provider diagnosis requires a **separate accepted guarded operator path**:
-original-source recovery of the consumed conflict result, all six fixed public
-predecessor requests, accepted source/dependency/CI identity, strict bounded range
-transport, a distinct first-run ledger, encrypted results and private recovery
-custody saved/read back before activation. That next source packet must precede
-explicit operational caps and a new sole-file request; this local core supplies
-none. Keep the original roster, pins, line ceiling and identity rules. All six
-historical requests remain consumed; no rerun, limit increase, source completion,
-description approval or serving/model admission follows from this diagnostic.
+Actual provider diagnosis uses the separate guarded path below. Keep the original
+roster, pins, line ceiling and identity rules. All six historical requests remain
+consumed; no rerun, limit increase, source completion, description approval or
+serving/model admission follows from the local diagnostic.
+
+#### Guarded Edition-prefix operator path
+
+`open-library-edition-prefix-request-v1` has purpose
+`bounded-edition-line-framing-diagnosis`. It retains the consumed conflict
+request's original roster, key, pins, full acquisition limits, conflict policy
+and public lineage. Validation reconstructs that exact prior request digest;
+changed pairs, ordering, recipients or policy cannot be substituted. New fields
+bind the accepted local diagnostic core and the consumed conflict's public
+source/request/run identity, plus all six explicit `diagnosticLimits` fields.
+No new private row, artifact or archive commitment enters the public request.
+
+The prefix begins at compressed byte zero of the same pinned Edition file.
+Schema ceilings are **1 GiB compressed, 8 GiB decoded, 10 million rows and
+20 minutes**, with the unchanged line ceiling and at most 4 KiB retained prefix.
+They are not defaults or a selected operational allowance. Preparation must
+explicitly select and review all caps. There are at most four redirects/five
+Edition HTTP requests; Work, metadata and individual-record requests remain zero.
+The original conflict policy is retained as historical identity, not enabled as
+a skip policy in this strict prefix scanner.
+
+The collector reuses the bounded curl transport, checking status and headers
+before forwarding body bytes. Only a single exact 206 `Content-Range` and
+`Content-Length`, identity encoding and non-multipart body are accepted. Reject
+200, changed ranges, transfer encoding, query parameters, changed filenames or
+unapproved hosts/routes. Redirects preserve the range, are loop-checked and count
+toward the same request/body budget; observed discarded redirect bodies also
+consume bytes. A redirect cannot reset a cap. Timeout, abort, invalid headers,
+overflow or transport failure terminate without a retry. Unknown exceptions
+become fixed public categories and never supply a fabricated scanner diagnosis.
+
+`open-library-edition-prefix-result-v1` binds the exact request/source, observation
+times, request/body counters, redirect chain, accepted response and optional
+local diagnostic. A scanner result replays the existing closed local contract;
+transport failures retain no header diagnosis. The local diagnostic may be
+diagnosed, inconclusive or failed. No outcome verifies a complete dump, grants
+provenance, retains candidates or approves text. `seal-edition-prefix-diagnostic`
+uses the existing RSA-OAEP/AES-GCM protocol with a 128 KiB plaintext ceiling and
+one neutral `edition-prefix-diagnostic` payload kind for every outcome. Pure
+payload replay supports synthetic cryptographic fixtures; production seal/unseal
+always enforces the frozen operational request first.
+
+The distinct workflow accepts only
+`catalog-diagnostic/ol-20260831-edition-prefix` with the sole added
+`scripts/catalog/requests/ol-20260831-edition-prefix.json`. It checks out accepted
+main without stored credentials, installs frozen catalog dependencies without
+lifecycle scripts and uses read-only contents/actions permissions. The runner
+checks clean source, current main, accepted-core ancestry, exact single-parent
+request diff and all six fixed predecessor Git objects at their original paths.
+Its workflow/branch ledger must contain exactly the current first push and
+attempt. Any prior run consumes this branch, including preflight failure. No
+dispatch, schedule or retry exists. The 30-minute job exclusively claims private
+output and uploads only its single ciphertext file, including a validated failed
+result. An unexpected exception cannot invent accounting; missing ciphertext is
+a consumed failure with unknown detail.
+
+Local preparation and recovery authenticate the current complete code/workflow/
+package/lock closure and actual ESM dependency routes/bytes before loading
+parsers or using private keys. A `kajo-edition-prefix-source-acceptance-v1` receipt
+binds accepted source/tree, reviewed PR head, all five required CI jobs and the
+test/export counts. Recovery also binds the new request Git child, explicit
+diagnostic-limit digest, run chronology, ZIP member/bytes and authenticated
+plaintext through `kajo-edition-prefix-runtime-receipt-v1`. These are
+operator-captured receipts checked against supplied Git/bytes, not independent
+online attestation. The result's `provenanceVerified: false` remains intact;
+the private summary separately records receipt-verification scope.
+
+`kajo-edition-prefix-predecessor-custody-v1` uses the same bounded archive/member
+readback checks as conflict preparation. Its exact input manifest maps the fifteen
+names below to absolute local paths:
+
+| Inputs | Meaning |
+| --- | --- |
+| `request`, `sealed`, `artifact-zip`, `source-receipt`, `run-receipt` | Consumed conflict acquisition |
+| `continuation-request`, `continuation-sealed`, `continuation-artifact-zip`, `continuation-source-receipt`, `continuation-run-receipt` | Its original full-continuation predecessor |
+| `prefix-sealed`, `recipient-key`, `snapshot` | Original prefix, unchanged recovery key and original snapshot |
+| `continuation-custody-receipt`, `continuation-custody-archive` | Earlier durable readback needed by the original conflict recovery |
+
+Verify the supplied archive and every named member, including the owner-only key
+and nested custody archive, before executing a historical inspector. The consumed
+conflict is recovered with **its original accepted recovery script at its fixed
+source head**, in a new process; its continuation likewise uses the original
+accepted continuation checkout. Check historical heads and inspector bytes against
+the fixed Git object first. The old recovery verifies its own closure, receipts,
+encryption, original snapshot and predecessor. Today's scanner does not reinterpret
+the discarded row. Only its verified failed `dump-line-limit` in Edition after
+publisher-verified complete Work can support preparation. The terminal row remains
+unknown. Temporary staged key copies are removed on success/failure, including
+the known child copy after timeout; the original key/archive are preserved.
+
+Both CLIs block Actions and claim a new private output directory with no linked
+parents or overwrite. Preparation writes the private predecessor proof and then
+`request.json` last. Recovery authenticates the predecessor again, writes private
+`diagnostic.json` and its receipt-bound `summary.json` last, printing no header or
+classification. Existing conflict wrappers retain their fixed v1 contracts and
+bounds while sharing file, source, ZIP and receipt primitives with this path.
+
+```sh
+node scripts/catalog/prepare-edition-prefix-diagnostic.mjs \
+  --repo /private/accepted-edition-source --source-head ACCEPTED_MAIN_SHA \
+  --source-receipt /private/edition-source-receipt.json --limits /private/reviewed-limits.json \
+  --conflict-repo /private/original-conflict-source \
+  --continuation-repo /private/original-continuation-source \
+  --predecessor-inputs /private/edition-predecessor-inputs.json \
+  --custody-receipt /private/conflict-result-custody.json --custody-archive /private/readback.zip \
+  --out /private/new-edition-preparation
+```
+
+Recovery uses the same historical checkout, input/custody and new-output arguments
+with `--repo`, `--request`, `--sealed`, `--artifact-zip`, `--source-receipt` and
+`--run-receipt`. After accepted source and successful actual preparation, freeze
+the public request Git identity and save/read back a **separate new recovery
+archive** containing the request/proof, source/CI/dependency receipts and original
+recovery inputs before activation. The source implementation supplies no request
+file or selected caps. Stop actual execution at one privately recovered outcome;
+inconclusive/failure does not authorize expansion. Any later correction or full
+collection needs its own accepted packet, fresh reconciliation and rights review.
 
 ### Description attribution — contract, #182
 

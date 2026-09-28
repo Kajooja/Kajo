@@ -14,6 +14,75 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Guarded Edition-prefix operator — 2026-09-28 / #182
+
+`feat/182-edition-operator` continues the local diagnostic accepted through
+[PR #287](https://github.com/Kajooja/Kajo/pull/287), main
+`12c1dc203a4d4e5a326c6f2a64db4c5fe49b0cb4`, reviewed head
+`4278341b043671e39945b99dcb02da3a5ae5681a`, after all five
+[CI #565 gates](https://github.com/Kajooja/Kajo/actions/runs/36396734170),
+757 tests and four exports. Exact new PR/head/tree, CI and merge acceptance
+belong to Issue #182; historical source and result checkpoints below are unchanged.
+
+The separate Edition request preserves the exact consumed conflict request's
+public roster, key, pins, policy, limits and lineage. It adds an accepted local-core
+binding and six explicit diagnostic caps. Schema ceilings are 1 GiB compressed,
+8 GiB decoded, 10 million rows and 20 minutes, with the original line ceiling and
+at most 4 KiB retained prefix. No operational values are selected by this source
+packet. The original conflict exclusions do not become a prefix-scanner skip rule.
+
+The new collector requests only one bounded Edition byte range, with at most
+four redirects and no Work, metadata or individual-record calls. Exact 206 range/
+length/encoding checks precede decoding; redirect bodies share the cumulative
+budget, and invalid routes, overflow, timeout or transport errors stop. The
+result embeds the existing local diagnosis with truthful counters and no
+complete-source, candidate, approval, write or model-admission claim. All outcomes
+share one neutral encrypted payload kind; unexpected errors cannot invent a
+receipt. No raw header or classification enters public runner output.
+
+The distinct push workflow checks out clean accepted main, verifies the sole-file
+request child and all six fixed historical Git objects, then enforces its own
+first-run ledger. Read-only permissions, immutable actions, frozen dependencies
+without lifecycle scripts, a 30-minute job and ciphertext-only upload are fixed.
+The workflow/request branch is separate; every earlier ledger remains consumed.
+
+Local preparation and recovery bind their entire code/workflow/package/lock
+closure and actual ESM dependency bytes to accepted source/CI. Private custody
+checks cover fifteen required inputs, including the consumed conflict result,
+its original continuation and nested archive/key. The conflict result is recovered
+in a fresh process with its original accepted script and original continuation
+checkout. Only the authenticated Edition line-limit failure after complete Work
+can support preparation. Temporary key copies are cleaned, existing outputs are
+never overwritten, and request/summary files are written last. Encryption still
+does not authenticate the sender independently of the operator-captured receipts.
+Shared file/source/ZIP/receipt helpers retain the original conflict entrypoints'
+fixed defaults and contracts.
+
+Twenty-nine new synthetic tests cover request lineage/caps, actual curl header
+framing, bounded gzip scanning, redirects/accounting, aborts, encrypted tampering,
+first-run/source/tree guards, private output/custody, source/dependency drift,
+receipt chronology, predecessor rejection and local CLI behavior. All 51 focused
+Edition/conflict runner/recovery tests pass. A local `npm run check` attempt stopped
+at Deno dependency checking in the restricted executor. Separate database, engine,
+research and acceptance suites passed, as did all four platform exports. Complete
+root validation and all five required CI jobs remain the merge gate. Synthetic
+tests do not replace actual original-source predecessor/custody verification.
+
+Files: five new `*-edition-prefix-diagnostic.mjs` operator modules, its dedicated
+workflow, two test files and public/synthetic fixture helper; shared primitives in
+`recover-conflict-dump-acquisition.mjs`; canonical ARCHITECTURE/CODEMAP/STATUS/ROADMAP.
+No new request file, real provider request, actual predecessor rerun, database
+write, model admission or device/release acceptance is included. The historical
+terminal row remains unknown; six requests are consumed.
+
+**Next:** use accepted source/CI to prepare the actual bounded Edition diagnosis.
+Authenticate the retained conflict result through original recovery, review all
+explicit caps, freeze the new sole-file request identity and save/read back a
+separate private recovery archive before activation. Execute once and privately
+recover its diagnosed, inconclusive or failed result. Stop there; do not retry,
+expand limits or infer historical row identity from position. STATUS owns this
+single next packet; further collection, reconciliation and rights gates remain.
+
 ## Local Edition line-framing diagnostic — 2026-09-28 / #182
 
 `feat/182-edition-line-diagnostic` continues the accepted result checkpoint from

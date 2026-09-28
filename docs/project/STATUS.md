@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 local Edition line diagnosis; guarded operator path next
+## Current packet — #182 guarded Edition-prefix path; bounded actual diagnosis next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -112,14 +112,24 @@ synthetic regression tests cover chunk/UTF-8/CRLF boundaries, resource exhaustio
 stream errors, schema tampering and the private local CLI. This source packet
 does not identify the discarded terminal row or authenticate a publisher source.
 
-**Next: implement and test a separate guarded one-shot Edition-prefix diagnostic
-operator path.** Bind the new request to the consumed conflict result through its
-original accepted recovery, all six fixed predecessor requests and an accepted
-source/dependency/CI receipt. Specify strict bounded range transport, a first-run
-ledger, encrypted result/recovery and private custody readback before activation.
-Keep the original roster, pins, line ceiling and identity rules; select explicit
-operational caps only during separately reviewed preparation. The current local
-CLI and this handoff grant no provider execution or limit increase.
+The [guarded Edition-prefix operator path](../architecture/ARCHITECTURE.md#guarded-edition-prefix-operator-path)
+now implements its distinct request, workflow, bounded HTTP range transport and
+encrypted result. Local preparation/recovery checks the complete source/dependency
+closure and accepted CI, all six fixed public predecessors, private archive
+readback and the consumed conflict result through its original accepted recovery
+in a separate process. The first-run ledger rejects retries, source drift and
+anything except a sole-file request child of accepted main. No operational caps,
+new request file or actual provider execution are included in this source packet.
+
+**Next: prepare, execute once and privately recover the bounded Edition-prefix
+diagnosis.** Start from accepted source/CI in Issue #182; authenticate the actual
+consumed conflict result and custody through the new local preparer. Select and
+review explicit caps within the schema ceilings, retaining the original roster,
+pins, line ceiling and identity rules. Save and read back a separate recovery
+archive before activating the distinct sole-file request. Stop at the recovered
+diagnosed, inconclusive or failed outcome; never automatically expand a limit or
+retry. A new header observation still cannot identify the discarded historical
+row. This handoff does not itself activate a request or select an allowance.
 All **six** requests remain consumed; never rerun, reset or reuse them or the
 completed pilot. No candidates survived the failed collection. Approvals, database
 writes and model admissions remain zero. Complete collection, fresh reconciliation
