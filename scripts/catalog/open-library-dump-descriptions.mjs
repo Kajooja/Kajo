@@ -10,7 +10,7 @@ import { createGunzip } from 'node:zlib';
 import { digest, inspectRecord, requireValue, sha256, UUID } from './open-library-descriptions.mjs';
 import { createDumpFailureEvidence, FAILURE_EVIDENCE_LIMITS, createEditionLineEvidence,
   EDITION_LINE_DIAGNOSTIC_CONTRACT, safeEditionLineParserError, validateEditionLineContext,
-  validateEditionLineDiagnostic } from './dump-failure-evidence.mjs';
+  validateEditionLineDiagnostic, canonicalDumpSource, isUnrelatedEditionLine } from './dump-failure-evidence.mjs';
 import { createDumpConflictLedger, validateDumpConflictLedger } from './dump-conflict-policy.mjs';
 
 export const TARGET_CONTRACT = 'open-library-description-dump-targets-v1';
@@ -132,7 +132,7 @@ async function jsonFile(path, value) {
 // One row/envelope/identity parser is used by complete intake and diagnostic
 // prefixes. Prefix mode retains only seen public IDs and one rejected row.
 function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
-  retainedBytes, stats, prefix, conflictLedger, lineDiagnostic }) {
+  retainedBytes, stats, prefix, conflictLedger, lineDiagnostic, editionFraming }) {
   const type = kind === 'works' ? 'work' : 'edition';
   const targets = new Map(selected.map(row => [type === 'work' ? `/works/${row.workId}` : `/books/${row.editionId}`, row]));
   const records = new Map(), seen = new Set();
@@ -140,8 +140,18 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
   const decoder = new TextDecoder('utf-8', { fatal: true });
   let pending = Buffer.alloc(0);
   let lineStartByte = 0, lineError, lineEvidence;
+  let discarding = false, discardedLineBytes = 0;
   function boundLine(part) {
+    if (editionFraming && part.length) requireValue(stats.rows < source.maxRows, 'dump-row-limit');
+    if (discarding) return;
     if (pending.length + part.length <= lineBytes) return;
+    if (editionFraming && isUnrelatedEditionLine(pending, part, editionFraming)) {
+      discarding = true;
+      discardedLineBytes = pending.length;
+      stats.oversizedUnrelatedBytes += pending.length;
+      pending = Buffer.alloc(0);
+      return;
+    }
     const error = new Error('dump-line-limit');
     if (lineDiagnostic) {
       lineEvidence = createEditionLineEvidence({ pending, part, row: stats.rows + 1, lineStartByte, context: lineDiagnostic });
@@ -149,11 +159,19 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
     }
     throw error;
   }
-  function line(bytes, terminated) {
-    const rowBytes = bytes;
+  function countRow() {
     if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
     stats.rows += 1;
     requireValue(stats.rows <= source.maxRows, 'dump-row-limit');
+  }
+  function discard(part) {
+    discardedLineBytes += part.length;
+    stats.oversizedUnrelatedBytes += part.length;
+  }
+  function line(bytes, terminated) {
+    const rowBytes = bytes;
+    countRow();
+    if (editionFraming) stats.maxBufferedLineBytes = Math.max(stats.maxBufferedLineBytes, bytes.length);
     if (bytes.at(-1) === 13) bytes = bytes.subarray(0, -1);
     requireValue(bytes.length <= lineBytes, 'dump-line-limit');
     let decoded;
@@ -225,18 +243,34 @@ function createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf,
     for (let end = accepted.indexOf(10); end !== -1; end = accepted.indexOf(10, start)) {
       const part = accepted.subarray(start, end);
       boundLine(part);
-      line(pending.length ? Buffer.concat([pending, part]) : part, true);
-      lineStartByte += pending.length + part.length + 1;
+      if (discarding) {
+        discard(part);
+        countRow();
+        stats.unrelatedRows += 1;
+        stats.oversizedUnrelatedRows += 1;
+        lineStartByte += discardedLineBytes + 1;
+        discarding = false; discardedLineBytes = 0;
+      } else {
+        line(pending.length ? Buffer.concat([pending, part]) : part, true);
+        lineStartByte += pending.length + part.length + 1;
+      }
       pending = Buffer.alloc(0);
       start = end + 1;
       if (prefix && stats.rows === source.maxRows) throw prefix.rowLimit;
     }
     const tail = accepted.subarray(start);
     boundLine(tail);
-    pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
+    if (discarding) discard(tail);
+    else {
+      pending = pending.length ? Buffer.concat([pending, tail]) : Buffer.from(tail);
+      if (editionFraming) stats.maxBufferedLineBytes = Math.max(stats.maxBufferedLineBytes, pending.length);
+    }
     if (prefix && stats.decodedBytes === source.maxDecodedBytes) throw prefix.decodedLimit;
   }
-  return { records, write, finish: () => { if (pending.length) line(pending, false); },
+  return { records, write, finish: () => {
+    requireValue(!discarding, 'dump-unterminated-oversized-row');
+    if (pending.length) line(pending, false);
+  },
     failureEvidence: error => error === selectedError ? readDumpFailureEvidence(error) : undefined,
     lineFailureEvidence: error => error === lineError ? lineEvidence : undefined };
 }
@@ -262,17 +296,40 @@ export async function scanDumpConflictStream(input, source, kind, selected, fetc
     { conflictLedger, signal, keyOf, lineBytes, retainedBytes, observeProgress });
 }
 
+// Explicit local core only: no historical entrypoint, request or recovery opts
+// into this rule. Supply the entire original roster, including quarantined pairs.
+export async function scanEditionFramedStream(input, source, selected, fetchedAt, budget,
+  { signal, lineBytes, retainedBytes, timeoutMs, conflictLedger, keyOf = row => row.workId, observeProgress } = {}) {
+  const canonical = canonicalDumpSource(source);
+  requireValue(input instanceof Readable && exactKeys(source, [...Object.keys(canonical), 'maxRows', 'maxDecodedBytes'])
+    && boundedInteger(retainedBytes, LIMITS.stagedRecordBytes)
+    && Number.isSafeInteger(budget?.bytes) && budget.bytes >= 0 && budget.bytes <= retainedBytes,
+  'invalid-edition-framing-scan');
+  const editionFraming = validateEditionLineContext({ source: canonical, roster: selected, fetchedAt,
+    limits: { compressedBytes: source.bytes, maxDecodedBytes: source.maxDecodedBytes, maxRows: source.maxRows,
+      lineBytes, prefixBytes: Math.min(4096, lineBytes), timeoutMs } });
+  if (conflictLedger !== undefined) validateDumpConflictLedger(conflictLedger, selected);
+  const fixedSource = structuredClone(source), fixedRoster = structuredClone(selected);
+  const controller = new AbortController(), combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+  const timer = setTimeout(() => controller.abort(), timeoutMs); timer.unref?.();
+  try {
+    return await scanDumpStreamInternal(input, fixedSource, 'editions', fixedRoster, fetchedAt, budget,
+      { signal: combined, lineBytes, retainedBytes, conflictLedger, keyOf, observeProgress, editionFraming });
+  } finally { clearTimeout(timer); }
+}
+
 async function scanDumpStreamInternal(input, source, kind, selected, fetchedAt, budget,
-  { signal, keyOf, lineBytes, retainedBytes, observeProgress, conflictLedger }) {
+  { signal, keyOf, lineBytes, retainedBytes, observeProgress, conflictLedger, editionFraming }) {
   const stats = { bytes: 0, decodedBytes: 0, rows: 0, matchedRecords: 0, unrelatedRows: 0, malformedUnrelatedRows: 0,
-    ...(conflictLedger ? { quarantinedRecords: 0, complete: false } : {}) };
+    ...(conflictLedger ? { quarantinedRecords: 0, complete: false } : {}),
+    ...(editionFraming ? { oversizedUnrelatedRows: 0, oversizedUnrelatedBytes: 0, maxBufferedLineBytes: 0, complete: false } : {}) };
   observeProgress?.(stats);
   requireValue(source.sha256 !== undefined || source.md5 !== undefined && source.sha1 !== undefined,
     'missing-dump-checksum');
   const hashes = Object.fromEntries(['sha256', ...['md5', 'sha1'].filter(name => source[name] !== undefined)]
     .map(name => [name, createHash(name)]));
   const parser = createDumpRowParser({ source, kind, selected, fetchedAt, budget, keyOf, lineBytes,
-    retainedBytes, stats, conflictLedger });
+    retainedBytes, stats, conflictLedger, editionFraming });
   const meter = new Transform({ transform(chunk, _encoding, callback) {
     try {
       stats.bytes += chunk.length;

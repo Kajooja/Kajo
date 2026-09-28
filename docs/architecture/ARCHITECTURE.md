@@ -1353,6 +1353,63 @@ file or selected caps. Stop actual execution at one privately recovered outcome;
 inconclusive/failure does not authorize expansion. Any later correction or full
 collection needs its own accepted packet, fresh reconciliation and rights review.
 
+### Bounded Edition framing core — #182
+
+`scanEditionFramedStream` is an explicit local complete-gzip scanner in
+`open-library-dump-descriptions.mjs`. It reuses the shared byte framer, record
+inspection, conflict ledger and complete-source checksum pipeline. No existing
+strict/conflict acquisition, prefix diagnostic, CLI, request, result schema or
+historical recovery enables this rule through an extra option. A separately
+accepted successor must integrate it before any provider execution.
+
+The caller supplies the canonical dated Edition source with exact compressed
+size, SHA-256 or publisher MD5/SHA-1, decoded/row bounds, the **entire original
+unique Work/Edition roster**, observation time, cumulative staging budget and
+explicit `lineBytes`, `retainedBytes`, `timeoutMs`. There are no operational cap
+defaults. Existing schema ceilings apply, including the unchanged maximum
+1,049,600-byte line limit. Validate/copy source and roster before reading. An
+optional branded conflict ledger must bind that same roster; quarantined pairs
+are never removed from header selection. Caller cancellation and the bounded
+scanner timer share the stream's abort boundary; a future collector must also
+preserve its global two-source deadline and cumulative budgets.
+
+At overflow only, inspect at most `min(4096, lineBytes)` bytes from the line start,
+ending at the fourth tab. Discard requires an ASCII canonical `/type/edition`
+header, `/books/OL…M` key outside the roster, positive safe integer revision and
+valid nonfuture timestamp. Incomplete headers, invalid encoding, BOM/control
+characters, normalized impossible dates and 24:00 timestamps cannot authorize
+discard. Selected and unknown headers still fail `dump-line-limit`. These new
+strict discard predicates do not reinterpret historical diagnostic evidence.
+
+Once proven unrelated, release the pending row buffer and count/skip subsequent
+bytes through LF without decoding JSON, following inner IDs or retaining the
+body. CR counts toward line bytes; LF does not. Resume normal framing at exactly
+the next byte. Ordinary rows preserve existing encoding/envelope/identity/Work
+linkage/duplicate/retention rules. An oversized discarded tail without LF fails
+`dump-unterminated-oversized-row`; ordinary under-limit EOF retains its original
+semantics. Truncated/corrupt gzip, source errors, premature close, abort, timeout
+or any resource overrun reject the scan without returning records.
+
+New-entrypoint statistics add `oversizedUnrelatedRows` (LF-completed discarded
+rows), `oversizedUnrelatedBytes` (all their observed non-LF bytes, including a
+partial discarded tail on failure) and `maxBufferedLineBytes` (largest logical
+buffered/parsed ordinary row, bounded by `lineBytes`, not process RSS). Discarded
+rows are also `unrelatedRows`; discarded bytes remain in total decoded/compressed
+accounting and **every full-file checksum**. They do not consume retained-record
+bytes or become candidates, verified JSON records or conflict evidence. Only
+complete EOF, exact source size, gzip integrity and all supplied checksum matches
+return `complete: true`. These counters do not authenticate the publisher or
+grant rights, approval, database writes or model admission.
+
+Synthetic tests cover split headers/overflow/CRLF, consecutive skips, 4 KiB header
+boundaries, selected/quarantined and malformed headers, preserved identity
+guards, exact global accounting/checksums, EOF/truncation/error/abort/timeout and
+historical-entrypoint isolation. A streamed 32 MiB row checks bounded allocations
+independently of the reported logical buffer peak. No real dump was requested or
+historical row reconstructed by this source packet. New request/result/encryption
+contracts, original-source predecessor recovery and separate operational custody
+remain prerequisites for a full-collection successor.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

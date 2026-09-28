@@ -106,16 +106,34 @@ function envelopeSelection(bytes, context) {
     workId: target?.workId ?? null };
 }
 
+function editionHeaderPrefix(pending, part, maximum) {
+  const head = pending.subarray(0, maximum);
+  let bytes = Buffer.concat([head, part.subarray(0, maximum - head.length)]);
+  const boundary = fourthTab(bytes);
+  if (boundary >= 0) bytes = bytes.subarray(0, boundary + 1);
+  return bytes;
+}
+
+// The new complete-source framer uses only this bounded outer-header proof.
+// Historical diagnostic classification/replay keeps its original semantics.
+export function isUnrelatedEditionLine(pending, part, context) {
+  const bytes = editionHeaderPrefix(pending, part, Math.min(EDITION_LINE_PREFIX_MAX_BYTES, context.limits.lineBytes));
+  if (bytes.some(byte => byte !== 9 && (byte < 32 || byte > 126))
+    || envelopeSelection(bytes, context).status !== 'unrelated') return false;
+  const modifiedAt = bytes.toString('ascii').split('\t')[3];
+  // Date.parse normalizes impossible calendar days and 24:00 into another day.
+  // Such headers cannot authorize discard, even though older replay accepts them.
+  return new Date(modifiedAt.slice(0, 10)).toISOString().slice(0, 10) === modifiedAt.slice(0, 10)
+    && modifiedAt.slice(11, 19) < '24:00:00';
+}
+
 export function createEditionLineEvidence({ pending, part, row, lineStartByte, context }) {
   const fixed = validateEditionLineContext(context), maximum = fixed.limits.prefixBytes;
   lineCheck(Buffer.isBuffer(pending) && Buffer.isBuffer(part)
     && pending.length <= fixed.limits.lineBytes && pending.length + part.length > fixed.limits.lineBytes
     && !pending.includes(10) && !part.subarray(0, fixed.limits.lineBytes + 1 - pending.length).includes(10));
   // Never concatenate an oversized row; retain no bytes after the fourth tab.
-  const head = pending.subarray(0, maximum);
-  let bytes = Buffer.concat([head, part.subarray(0, maximum - head.length)]);
-  const boundary = fourthTab(bytes);
-  if (boundary >= 0) bytes = bytes.subarray(0, boundary + 1);
+  const bytes = editionHeaderPrefix(pending, part, maximum);
   const evidence = { contract: EDITION_LINE_EVIDENCE_CONTRACT, code: 'dump-line-limit', sourceKind: 'editions',
     source: fixed.source, rosterSha256: digest(fixed.roster), limitsSha256: digest(fixed.limits), fetchedAt: fixed.fetchedAt,
     row, lineStartByte, observedLineBytesAtLeast: fixed.limits.lineBytes + 1,

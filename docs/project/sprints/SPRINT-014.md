@@ -14,6 +14,58 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded Edition framing core — 2026-09-28 / #182
+
+`feat/182-bounded-edition-framing` continues accepted result
+[PR #289](https://github.com/Kajooja/Kajo/pull/289), main
+`3c21886e142a415292f857a30e6aeeab14a67918`, after
+[CI #569](https://github.com/Kajooja/Kajo/actions/runs/36436832176) passed all five
+required gates with 786 tests/four exports. The prior diagnosis and its original
+source/custody remain unchanged; no private result was copied into this packet.
+
+The shared byte framer now supports the explicit local `scanEditionFramedStream`.
+Only an oversized row's complete canonical outer Edition header, within 4 KiB
+and outside the entire original roster, permits streaming discard until LF.
+Selected and unknown headers still fail, including pairs already quarantined
+during Work collection. Unknown headers include incomplete/invalid encoding,
+BOM/control characters, impossible dates and future timestamps. The original
+line ceiling, selected identity/metadata/Work-linkage/duplicate guards, cumulative
+retention budget and complete size/checksum/gzip verification remain.
+
+The scanner releases its pending buffer after proof and never parses or retains
+the discarded body. New counters record skipped rows/non-LF bytes and the logical
+buffer peak; all discarded bytes remain in compressed/decoded/checksum accounting.
+An unterminated oversized tail fails. Explicit source/roster/limits are checked
+and copied before stream access; a supplied conflict ledger must bind the entire
+roster. Abort/timeout/errors destroy the pipeline without returning records.
+Historical strict/conflict scans and both prefix diagnoses cannot opt in through
+extra options; their schemas and replay rules are unchanged.
+
+Nineteen new synthetic tests passed locally, covering split headers, overflow,
+CRLF, consecutive skips, the 4 KiB proof boundary, selected/quarantined/unknown
+failures, preserved identity guards, full checksums/resource caps and failure
+cleanup. A streamed 32 MiB row checks allocation bounds independently of the
+reported logical buffer peak. The focused old/new scanner suite passed 72 tests.
+Local root validation passed lint/typechecks (one unchanged Discovery hook warning)
+and the first 630 tests, then remained blocked at Edge npm dependency retrieval.
+The remaining groups passed 147 tests separately: **777 local tests total**.
+Both main-app iOS/Android exports completed; companion export completion is not
+claimed from the local logs. Full root validation/four exports and all five
+required CI gates must pass before merge; exact acceptance is recorded in #182.
+All 100 local Markdown targets resolve, whitespace checks pass and the historical
+sprint tail is unchanged. No provider, database, model or device operation was
+performed. All seven previous requests remain consumed permanently.
+
+**Next:** integrate the local core into a separately versioned full-collection
+successor. Preserve original roster/pins/recipient/conflict policy/full-source
+budgets and the line ceiling. Add new request/result accounting and encrypted
+replay; bind all seven predecessors and the accepted Edition diagnosis through
+original-source recovery. Distinct one-shot controls and accepted source/CI/private
+custody must precede a separately prepared request and activation. Save/read back
+a new recovery archive first. Complete source verification, fresh reconciliation
+and individual rights review still precede any writer. No prior request is
+rerun/reset/reused and no historical discarded row is retrospectively identified.
+
 ## Edition-prefix result and framing handoff — 2026-09-28 / #182
 
 `docs/182-edition-prefix-result` records the actual diagnosis after

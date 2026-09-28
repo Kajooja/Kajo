@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 Edition diagnosis recovered; bounded framing correction next
+## Current packet — #182 bounded Edition framing core; full-collection integration next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -137,14 +137,27 @@ The reviewed caps were **512 MiB compressed / 3 GiB decoded / 2,000,000 rows /
 10 minutes**, with the unchanged **1,049,600-byte line ceiling** and at most
 **4 KiB header prefix**. No retry or automatic limit increase followed.
 
-**Next: implement and test a bounded local Edition framing correction.** Permit
-streaming discard of an oversized row only when its complete canonical outer
-header proves its key is outside the entire original roster. Selected or unknown
-headers still fail; preserve selected-record identity guards, the line ceiling,
-global compressed/decoded/row/time limits, checksum accounting and historical
-replay. Prove row-boundary recovery and bounded memory with synthetic tests before
-any separately accepted full-collection successor. This is a local source packet,
-not a new provider allowance. All **seven** requests remain consumed; never rerun,
+The [bounded Edition framing core](../architecture/ARCHITECTURE.md#bounded-edition-framing-core--182)
+now supplies the explicit local `scanEditionFramedStream` entrypoint. Only a
+complete canonical outer header within 4 KiB proving a key outside the entire
+original roster permits an oversized row to be discarded through its terminating
+LF. Selected/unknown rows still fail, including quarantined pairs. The line
+ceiling, selected identity guards, full compressed-byte checksums and all resource
+limits remain. Nineteen synthetic regressions cover chunk boundaries, a streamed
+32 MiB row, exact accounting, integrity failures, abort/timeout and old-entrypoint
+isolation. Historical scanners and recovery contracts retain their original rules.
+The [source checkpoint](sprints/SPRINT-014.md#bounded-edition-framing-core--2026-09-28--182)
+records validation; exact source/CI acceptance stays in Issue #182.
+
+**Next: integrate this core into a separately versioned full-collection successor.**
+Preserve the original roster, pins, recipient, line ceiling, conflict policy and
+full-source budgets. Define/test new request/result accounting and encrypted
+payload replay without changing historical contracts. Bind all seven consumed
+predecessors and the accepted Edition diagnosis through original-source recovery;
+then supply distinct one-shot activation and source/CI/custody checks. No actual
+request is included in that source packet. Activation requires separately accepted
+source, explicit operational limits and a new private recovery archive saved and
+read back first. All **seven** requests remain consumed; never rerun,
 reset or reuse them or the completed pilot. No candidates survived the failed
 collection or were retained by the diagnosis. Approvals, database writes and model
 admissions remain zero. Complete collection, fresh reconciliation and individual
