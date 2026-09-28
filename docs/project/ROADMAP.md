@@ -73,9 +73,10 @@ complete. All five requests are now consumed. PR #283 accepted the explicit
 local conflict policy. The separate successor core now supplies shared bounded
 streaming, strict request/result encryption contracts and pure payload replay,
 with complete-source verification and whole-pair exclusion. [STATUS](STATUS.md)
-and #182 record exact core source/CI acceptance. Next implement its guarded
-one-shot activation and trusted source/run/custody recovery wrapper before any
-new operational budget or provider access. Foreign locations are never remapped.
+and #182 record source/CI acceptance. The guarded operator path now supplies
+one-shot activation controls and receipt-based source/run/custody recovery. Next
+freeze operational caps, prepare and preserve private recovery custody, then
+activate once after source acceptance. Foreign locations are never remapped.
 No additional text is approved and no database write was performed. The prefix
 diagnosis still cannot prove the earlier discarded row was identical.
 The six-description usefulness target remains unmet.
@@ -208,10 +209,12 @@ verification are complete. The fifth request is consumed. PR #283 accepted the
 [offline conflict policy](../architecture/ARCHITECTURE.md#offline-selected-record-conflict-policy--182).
 The [successor core](../architecture/ARCHITECTURE.md#conflict-aware-acquisition-core-and-successor-boundary--182)
 now implements bounded streaming, separate request/result contracts, encrypted
-recovery and pure consistency/snapshot replay. It supplies no executable request,
-workflow or trusted run/custody verification. Next implement those guarded
-activation and source-bound operator controls, freeze operational policy caps
-and verify private custody before any separately bounded provider execution.
+recovery and pure consistency/snapshot replay. It supplies no executable request or
+provider execution. The guarded operator path now supplies the distinct workflow,
+original-source predecessor preparation, private custody checks and source-bound
+recovery. Next accept source/CI, freeze operational caps, prepare/save/read back
+private recovery custody, then activate one distinct bounded request and recover
+its result.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated

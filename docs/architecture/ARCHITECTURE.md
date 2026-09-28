@@ -968,9 +968,9 @@ precede a separately bounded writer bridge.
 The successor uses the accepted offline exclusion policy without changing any
 existing acquisition entrypoint. Its source packet supplies a request protocol,
 a shared streaming collector, encrypted result validation and pure private
-payload inspection. It does **not** yet supply an executable request, Actions
-workflow, operator preparation or source/run/custody authentication wrapper.
-Those controls must be completed and accepted before any activation.
+payload inspection. The guarded operator path below adds local preparation, a
+distinct Actions workflow and receipt-based recovery. Source/CI acceptance and
+private custody still precede publication of an actual executable request.
 
 #### Public request and private predecessor proof
 
@@ -1014,7 +1014,7 @@ The fixed source ceiling remains **16,644,821,648 compressed bytes**, with
 128 GiB decoded / 100 million rows per source, 1,049,600-byte lines, 64 MiB
 cumulative selected-record-plus-diagnostic bytes and a 110-minute collector
 limit. There are no metadata, per-Item, ratings or database requests, retries,
-range resumes or source substitutions. A later workflow keeps a 120-minute job
+range resumes or source substitutions. The guarded workflow keeps a 120-minute job
 ceiling. These measure accepted source input, not discarded redirect traffic.
 Both files must reach verified EOF/gzip integrity and match exact byte lengths,
 publisher MD5/SHA-1 and computed SHA-256 before a collected result exists.
@@ -1067,17 +1067,88 @@ quarantined pair. Collector full-file assertions are checked against pins; the
 full dumps are not downloaded or rehashed during recovery. No result supplies
 language/origin/rights approval, catalog writes or model admission.
 
-Next implement one distinct guarded activation and source-bound recovery path
-around this core. Freeze all five predecessor Git objects at their original
-request paths; require an accepted-main child with the sole new request file,
-first push/run attempt, separate spent ledger, read-only permissions and frozen
-dependencies. Bind the entire source/dependency closure, actual CI/run/artifact
-provenance and exclusive private output. Authenticate predecessor evidence and
-save/read back private recovery custody before publishing a request. No schedule,
-dispatch, rerun or activation is delivered by this core packet. After those
-source/CI/custody gates, any separately bounded execution must stop at recovered
-failure or unreviewed complete collection. Fresh reconciliation and individual
-rights review precede a separately bounded writer bridge.
+#### Guarded operator path
+
+The separate `catalog-book-conflict-acquisition.yml` workflow accepts only the
+fixed `catalog-acquisition/ol-20260831-conflicts` push with the sole new file
+`scripts/catalog/requests/ol-20260831-conflicts.json`. Its parent must be current
+accepted main, descending from the accepted core and policy. It checks out main,
+requires clean source, reads all five predecessor requests from fixed Git objects
+at their original paths, and checks its own workflow/branch first-run ledger.
+Any earlier attempt consumes this branch, including preflight failure. Git
+replacement objects cannot substitute provenance. Read-only GitHub permissions,
+frozen dependencies without lifecycle scripts, 110/120-minute collector/job
+limits, one exclusive output directory and ciphertext-only upload are mandatory.
+No schedule, dispatch or retry exists. Unknown exceptions cannot mint fabricated
+accounting; missing ciphertext remains a consumed failure with unknown detail.
+
+Local `prepare-conflict-dump-acquisition.mjs` and
+`recover-conflict-dump-acquisition.mjs` run from the accepted source checkout.
+They verify its entire imported code/workflow/package/lock closure and actual ESM
+package routes and dependency bytes before importing parsers or using the key.
+The operator-captured source receipt binds the accepted tree, reviewed PR head,
+five successful CI jobs, test/export counts and acceptance chronology. Recovery
+also checks the sole-file request Git child, the explicit policy digest, first
+push/run, artifact metadata, ZIP bytes and exact single ciphertext member, then
+authenticated unseal and complete payload replay. API receipts are trusted
+operator observations checked against Git and supplied bytes, not signatures or
+an independent online attestation. Core `provenanceVerified: false` stays intact;
+`operatorProvenance` separately records this narrower receipt-verification scope.
+
+Preparation and recovery both authenticate the consumed full continuation using
+its **original accepted inspector in a separate process at the fixed historical
+head**. Before executing it, verify that checkout head and inspector bytes against
+the original Git object. The historical inspector then verifies its own complete
+source/dependency closure, source/run/artifact receipts, old prefix, original
+snapshot and ciphertext under the original key. Today's parser cannot reinterpret
+that evidence. Only a verified failed result with replayable narrow conflict
+evidence may feed the new explicit policy ledger. No terminal evidence is invented.
+
+The private predecessor input manifest maps these exact keys to absolute local
+file paths: `request`, `prefix-sealed`, `sealed`, `artifact-zip`, `recipient-key`,
+`snapshot`, `source-receipt`, `run-receipt`. Every input is bounded and a regular
+file; the key and custody archive must have private permissions. The custody
+receipt has contract
+`kajo-conflict-predecessor-custody-v1`, `storage` (`fileId`, positive `version`,
+`readBackAt`), `archive` (`bytes`, `sha256`) and `files` (each manifest key maps to
+`member`, `bytes`, `sha256`). Verify actual read-back archive bytes and every
+required member, including the key; reject duplicate/unsafe member paths and
+oversized archives. This checks an operator-captured durable readback claim, not
+the remote storage service independently. Those identifiers and hashes remain
+private. New public requests add only the already public Git/run lineage.
+
+Both CLIs exclusively claim a private output directory, reject linked parents
+and never overwrite old evidence. Historical inputs are staged from the exact
+custody-checked bytes; the staged key is removed after the child exits and its
+in-memory buffer is cleared. Preparation writes private predecessor proof before
+writing `request.json` last. Recovery writes unapproved candidates, quarantines,
+reconciliation and collected evidence privately, then its summary last. Neither
+CLI accesses the provider or database.
+
+Example preparation (all paths are private local inputs; caps are explicit in
+`policy.json`, with no selected default):
+
+```sh
+node scripts/catalog/prepare-conflict-dump-acquisition.mjs \
+  --repo /private/accepted-source --source-head ACCEPTED_MAIN_SHA \
+  --source-receipt /private/source-receipt.json --policy /private/policy.json \
+  --predecessor-repo /private/original-continuation-source \
+  --predecessor-inputs /private/predecessor-inputs.json \
+  --custody-receipt /private/custody-receipt.json --custody-archive /private/readback.zip \
+  --out /private/new-preparation
+```
+
+Recovery uses the same predecessor/custody arguments with `--repo`, `--request`,
+`--sealed`, `--artifact-zip`, `--source-receipt`, `--run-receipt`, optional
+`--current-snapshot` and a new `--out` directory. Before activation, save and read
+back a **separate new recovery archive** containing the prepared request/proof,
+accepted source/CI/dependency receipt and original recovery inputs. That later
+archive must not overwrite any predecessor archive. Confirm these gates and
+freeze the operational policy caps before publishing the one-shot request. This
+source packet adds no request file or actual provider budget. Stop the distinct
+bounded execution at recovered failure or unreviewed complete collection. Fresh
+reconciliation and individual rights review precede a separately bounded writer
+bridge; all five historical requests remain consumed.
 
 ### Description attribution — contract, #182
 

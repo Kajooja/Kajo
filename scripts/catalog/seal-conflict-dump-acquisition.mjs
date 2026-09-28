@@ -1,4 +1,4 @@
-// Protocol core only: no request preparation, activation or provider budget.
+// Strict successor protocol; the guarded operator path owns activation and custody.
 // Existing request dispatch and historical recovery remain unchanged.
 import { validateDumpConflictPolicy } from './dump-conflict-policy.mjs';
 import { validateConflictDumpPayload } from './inspect-conflict-dump-acquisition.mjs';
@@ -8,6 +8,9 @@ import { FULL_CONTINUATION_REQUEST_CONTRACT, FULL_CONTINUATION_REQUEST_PURPOSE,
   validateFullDumpContinuationRequest } from './seal-full-dump-continuation.mjs';
 
 export const CONFLICT_REQUEST_CONTRACT = 'open-library-conflict-aware-dump-acquisition-request-v1';
+export const CONFLICT_REQUEST_PATH = 'scripts/catalog/requests/ol-20260831-conflicts.json';
+export const CONFLICT_REQUEST_BRANCH = 'catalog-acquisition/ol-20260831-conflicts';
+export const CONFLICT_CORE_SOURCE_HEAD = '686ac92fe5900287c0699ba69434b743e3e2515d';
 export const CONFLICT_REQUEST_PURPOSE = 'full-acquisition-with-bounded-pair-exclusion';
 export const CONFLICT_POLICY_SOURCE_HEAD = '1f3bd049a37f182a773a4101791f9962b87cfb99';
 // Public Git/run lineage only. No new private artifact, archive, plaintext or

@@ -14,6 +14,42 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Guarded conflict operator path — 2026-09-28 / #182
+
+`feat/182-guarded-conflict-acquisition` continues PR #284/main
+`686ac92fe5900287c0699ba69434b743e3e2515d`, accepted with all five CI #559 gates,
+716 tests and four exports. Exact operator PR/head, validation and merge acceptance
+belong to Issue #182. Historical checkpoints below remain unchanged.
+
+The distinct workflow/runner binds accepted main, policy/core ancestry, one sole
+added request, all five fixed predecessor Git objects, first push/run and an
+independent spent ledger. It retains frozen dependencies, read-only permissions,
+exclusive private output and ciphertext-only upload. The collector's validated
+failure result is sealed; unexpected exceptions cannot fabricate accounting.
+
+Local preparation authenticates retained predecessor evidence using its original
+accepted inspector in a separate process, with exact bootstrap/source/dependency
+verification. Private custody checks compare actual archive bytes and every
+required input member, including the key, to the operator-captured durable readback
+receipt. Policy replay precedes request output. No new private archive/artifact/
+row commitment enters a public request. Recovery verifies source/CI/dependencies,
+request Git lineage, run/artifact/ZIP provenance, encryption and payload consistency.
+Its provenance label accurately describes supplied operator receipts, not a
+cryptographic sender attestation. Suppressed records never become candidates.
+
+Synthetic tests exercise successful sealing, real tiny-gzip failure, exhausted
+ledgers, edited sources/dependencies, altered receipts/ZIP/custody, CLI isolation,
+private output refusal and unchanged historical/core contracts. Ordinary CI does
+not fetch publisher dumps. No actual request, provider execution, language/rights
+approval, catalog write, model admission or device acceptance occurs here.
+
+Next after operator source acceptance: freeze explicit operational caps, capture
+the accepted source receipt, authenticate the actual retained predecessor, prepare
+one request and save/read back a separate private recovery archive. Only then
+publish the sole-file child and execute once. Recover the result and stop at
+failure or unreviewed collection. All five prior requests remain consumed;
+STATUS owns the current next task.
+
 ## Conflict-aware acquisition core — 2026-09-28 / #182
 
 `feat/182-conflict-acquisition-core` continues accepted PR #283/main
