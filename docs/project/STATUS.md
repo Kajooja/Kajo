@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 guarded Edition-prefix path; bounded actual diagnosis next
+## Current packet — #182 Edition diagnosis recovered; bounded framing correction next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -113,28 +113,43 @@ stream errors, schema tampering and the private local CLI. This source packet
 does not identify the discarded terminal row or authenticate a publisher source.
 
 The [guarded Edition-prefix operator path](../architecture/ARCHITECTURE.md#guarded-edition-prefix-operator-path)
-now implements its distinct request, workflow, bounded HTTP range transport and
-encrypted result. Local preparation/recovery checks the complete source/dependency
-closure and accepted CI, all six fixed public predecessors, private archive
-readback and the consumed conflict result through its original accepted recovery
-in a separate process. The first-run ledger rejects retries, source drift and
-anything except a sole-file request child of accepted main. No operational caps,
-new request file or actual provider execution are included in this source packet.
+is accepted through [PR #288](https://github.com/Kajooja/Kajo/pull/288), main
+`3d12a7f69534fef305b7ca37767626ae584b688e`, after all five
+[CI #567 gates](https://github.com/Kajooja/Kajo/actions/runs/36401690949),
+**786 tests / four exports**. Actual local preparation authenticated the consumed
+conflict result through its original accepted recovery, all six fixed predecessor
+requests and the complete source/dependency/CI closure. A separate private recovery
+package was saved and read back before the owner-approved activation.
 
-**Next: prepare, execute once and privately recover the bounded Edition-prefix
-diagnosis.** Start from accepted source/CI in Issue #182; authenticate the actual
-consumed conflict result and custody through the new local preparer. Select and
-review explicit caps within the schema ceilings, retaining the original roster,
-pins, line ceiling and identity rules. Save and read back a separate recovery
-archive before activating the distinct sole-file request. Stop at the recovered
-diagnosed, inconclusive or failed outcome; never automatically expand a limit or
-retry. A new header observation still cannot identify the discarded historical
-row. This handoff does not itself activate a request or select an allowance.
-All **six** requests remain consumed; never rerun, reset or reuse them or the
-completed pilot. No candidates survived the failed collection. Approvals, database
-writes and model admissions remain zero. Complete collection, fresh reconciliation
-and individual rights review still precede separately bounded writes. No additional
-catalog/device/release gate is accepted. Exact acceptance stays in
+The distinct request on `catalog-diagnostic/ol-20260831-edition-prefix`, head
+`be0ec18cdc968b5643e45c57c5ab9919f885e195`, activated exactly once.
+[Run 36435310394](https://github.com/Kajooja/Kajo/actions/runs/36435310394)
+completed successfully on September 28. Private receipt-bound recovery verified
+`diagnosed` / `dump-line-limit`: a complete canonical outer Edition header
+classifies the newly observed oversized row as outside the original roster.
+Its inner JSON, complete row and exact size remain unvalidated. This observation
+does not identify the earlier discarded terminal row or verify a complete source.
+The complete private result is preserved and independently read back; the
+[result checkpoint](sprints/SPRINT-014.md#edition-prefix-result-and-framing-handoff--2026-09-28--182)
+records the operational boundary. No raw header or private row identity is public.
+
+The reviewed caps were **512 MiB compressed / 3 GiB decoded / 2,000,000 rows /
+10 minutes**, with the unchanged **1,049,600-byte line ceiling** and at most
+**4 KiB header prefix**. No retry or automatic limit increase followed.
+
+**Next: implement and test a bounded local Edition framing correction.** Permit
+streaming discard of an oversized row only when its complete canonical outer
+header proves its key is outside the entire original roster. Selected or unknown
+headers still fail; preserve selected-record identity guards, the line ceiling,
+global compressed/decoded/row/time limits, checksum accounting and historical
+replay. Prove row-boundary recovery and bounded memory with synthetic tests before
+any separately accepted full-collection successor. This is a local source packet,
+not a new provider allowance. All **seven** requests remain consumed; never rerun,
+reset or reuse them or the completed pilot. No candidates survived the failed
+collection or were retained by the diagnosis. Approvals, database writes and model
+admissions remain zero. Complete collection, fresh reconciliation and individual
+rights review still precede separately bounded writes. No additional catalog,
+device or release gate is accepted. Exact acceptance stays in
 [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
