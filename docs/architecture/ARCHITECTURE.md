@@ -1359,8 +1359,9 @@ collection needs its own accepted packet, fresh reconciliation and rights review
 `open-library-dump-descriptions.mjs`. It reuses the shared byte framer, record
 inspection, conflict ledger and complete-source checksum pipeline. No existing
 strict/conflict acquisition, prefix diagnostic, CLI, request, result schema or
-historical recovery enables this rule through an extra option. A separately
-accepted successor must integrate it before any provider execution.
+historical recovery enables this rule through an extra option. The separate
+full-collection core below integrates it; guarded activation is still required
+before any provider execution.
 
 The caller supplies the canonical dated Edition source with exact compressed
 size, SHA-256 or publisher MD5/SHA-1, decoded/row bounds, the **entire original
@@ -1372,8 +1373,8 @@ optional branded conflict ledger must bind that same roster; quarantined pairs
 are never removed from header selection. Caller cancellation and the bounded
 scanner timer share the stream's abort boundary. The timer keeps a stalled scan
 alive even without another I/O handle and is cleared when the scan settles. A
-separate-process regression verifies this liveness boundary. A future collector must also
-preserve its global two-source deadline and cumulative budgets.
+separate-process regression verifies this liveness boundary. The successor below
+also preserves its global two-source deadline and cumulative budgets.
 
 At overflow only, inspect at most `min(4096, lineBytes)` bytes from the line start,
 ending at the fourth tab. Discard requires an ASCII canonical `/type/edition`
@@ -1409,8 +1410,65 @@ guards, exact global accounting/checksums, EOF/truncation/error/abort/timeout an
 historical-entrypoint isolation. A streamed 32 MiB row checks bounded allocations
 independently of the reported logical buffer peak. No real dump was requested or
 historical row reconstructed by this source packet. New request/result/encryption
-contracts, original-source predecessor recovery and separate operational custody
-remain prerequisites for a full-collection successor.
+contracts are supplied below; original-source predecessor recovery and separate
+operational custody remain prerequisites for execution.
+
+### Framed full-collection successor core — #182
+
+`collectFramedDumpStreams` is an explicit transport-injected full-collection seam;
+`acquireFramedOpenLibraryDumps` supplies the exact reviewed production pins and
+383-pair roster. Work retains strict conflict-aware parsing; only Edition uses
+`scanEditionFramedStream`. Both must reach EOF with exact compressed sizes,
+publisher MD5/SHA-1 verification and recorded SHA-256. Work must complete before
+Edition opens. Exclusion covers whole original pairs; the original roster stays
+in the Edition header guard even when a Work conflict excludes a pair. Retained
+valid/suppressed records and diagnostics share the unchanged cumulative budget.
+
+The global deadline covers both openers and both streams. This successor keeps
+its timer referenced until settlement, bounds an opener even if it ignores
+AbortSignal, destroys late response bodies and blocks late request accounting.
+Remaining time is supplied to transport and Edition scanning. Historical public
+collector entrypoints ignore framing flags; their scanners, timers, result
+schemas and error vocabulary remain unchanged. Shared implementation is private,
+not a public option to silently upgrade a consumed contract.
+
+`open-library-framed-dump-acquisition-request-v1` has purpose
+`full-acquisition-with-bounded-edition-framing` and binds accepted framing source
+`b34aca7451199e3cf78578318d8f5f151ad80c32`. It reconstructs the exact consumed
+Edition-prefix request under its own historical schema/digest, preserving all
+seven public predecessor identities, original recipient, roster, pins, source
+evidence, full-source limits and conflict policy. The latter remains **8 pairs /
+8 MiB diagnostics**. The old diagnostic limits remain historical data and cannot
+be substituted for the full-collection limits. Unknown/private fields, recipient
+replacement or any retained-budget change are rejected even after rehashing.
+Construction and schema validation neither authenticate the previous private
+diagnosis nor authorize a run. No executable request is included here.
+
+`open-library-framed-dump-acquisition-result-v1` and neutral encrypted kind
+`framed-acquisition-result` are distinct from previous results. Only Edition
+source/accounting objects add the three framing counters. Pure
+`validateFramedDumpPayload` / `inspectFramedDumpPayload` reuse record, whole-pair,
+quarantine, coverage, source-manifest and fresh-snapshot replay with a closed new
+schema. They check completed-discard row/byte bounds, LF accounting, buffer limits,
+agreement between source and accounting objects and retained-record decoded-byte
+minimums. Partial failures preserve observed skip bytes but no terminal row or
+candidates. `dump-unterminated-oversized-row` requires a partial Edition discard;
+row-budget failures distinguish a pre-row bound from the old counted extra row.
+
+These checks do not recompute full-file hashes or replay absent discarded headers
+and JSON. Their summary explicitly remains **payload-consistency-only**, with
+`provenanceVerified: false`. A fresh catalog mismatch blocks review eligibility;
+even unchanged candidates remain unapproved until source-specific language/rights
+review. Production seal/unseal validates the frozen request first; synthetic test
+contexts use the generic envelope seam and cannot replace its fixed recipient.
+
+The next source packet supplies a distinct guarded operator/workflow: all seven
+fixed Git predecessors, original accepted Edition recovery (with original
+conflict/continuation children), accepted source/dependency/CI checks, sole-file
+main-child first-push/first-run guards and private custody readback. Only after
+that acceptance can a separately bounded request be prepared. A new recovery
+archive must be saved/read back before activation. Every old request remains
+consumed; no historical row is reclassified, budget widened or text approved.
 
 ### Description attribution — contract, #182
 

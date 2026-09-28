@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 bounded Edition framing core; full-collection integration next
+## Current packet — #182 framed full-collection core; guarded operator next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -149,13 +149,26 @@ isolation. Historical scanners and recovery contracts retain their original rule
 The [source checkpoint](sprints/SPRINT-014.md#bounded-edition-framing-core--2026-09-28--182)
 records validation; exact source/CI acceptance stays in Issue #182.
 
-**Next: integrate this core into a separately versioned full-collection successor.**
-Preserve the original roster, pins, recipient, line ceiling, conflict policy and
-full-source budgets. Define/test new request/result accounting and encrypted
-payload replay without changing historical contracts. Bind all seven consumed
-predecessors and the accepted Edition diagnosis through original-source recovery;
-then supply distinct one-shot activation and source/CI/custody checks. No actual
-request is included in that source packet. Activation requires separately accepted
+The [framed full-collection successor](../architecture/ARCHITECTURE.md#framed-full-collection-successor-core--182)
+now integrates that scanner with the complete Work/Edition collector, unchanged
+pair exclusion, source integrity checks and cumulative retention/deadline bounds.
+Its separate request reconstructs the exact consumed Edition diagnostic and
+preserves all seven public predecessor identities, original roster/pins/recipient,
+full-source limits and the **8-pair / 8 MiB** conflict policy. Distinct result and
+encryption contracts replay retained records, quarantine, source accounting and
+new discard counters. A stalled opener is bounded and a late body is destroyed.
+Private inspection remains payload consistency only; discarded headers/JSON and
+full dump bytes cannot be independently replayed from that payload. The
+[source checkpoint](sprints/SPRINT-014.md#framed-full-collection-core--2026-09-28--182)
+records tests and scope. No actual request or provider operation is included.
+
+**Next: implement the guarded operator for this new full-collection contract.**
+Revalidate all seven fixed predecessor Git objects and authenticate the accepted
+Edition diagnosis through its original source, including the original conflict
+and continuation recovery chain. Supply distinct first-push/first-run activation,
+complete source/dependency/CI binding and private custody preparation/recovery.
+Keep the current collector/request/result rules and historical contracts intact.
+No actual request belongs in that source packet. Activation requires separately accepted
 source, explicit operational limits and a new private recovery archive saved and
 read back first. All **seven** requests remain consumed; never rerun,
 reset or reuse them or the completed pilot. No candidates survived the failed

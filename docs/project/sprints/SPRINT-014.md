@@ -14,6 +14,56 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Framed full-collection core — 2026-09-28 / #182
+
+`feat/182-framed-dump-acquisition` continues accepted framing source
+[PR #290](https://github.com/Kajooja/Kajo/pull/290), main
+`b34aca7451199e3cf78578318d8f5f151ad80c32`, after all five
+[CI #572 gates](https://github.com/Kajooja/Kajo/actions/runs/36443402209),
+806 tests/four exports. Original Edition diagnostic source remains fixed at
+`3d12a7f69534fef305b7ca37767626ae584b688e`; its private archive was not used or
+modified by this synthetic source packet.
+
+The explicit `collectFramedDumpStreams` / `acquireFramedOpenLibraryDumps` path
+now integrates full Work/Edition scanning. Only Edition enables bounded discard;
+Work parsing, selected identity guards, whole-pair exclusion, full EOF/publisher
+hashes and cumulative retention limits remain. One referenced deadline covers
+both sources, including an uncooperative opener. Late bodies are destroyed and
+late request accounting is rejected. Historical entrypoints retain their rules.
+
+The new request reconstructs the exact consumed Edition request and retains all
+seven public predecessors, original roster/pins/recipient, full-source budgets
+and 8-pair/8 MiB conflict policy. Historical diagnostic limits cannot become the
+new collection budget. Distinct result/encryption contracts replay retained
+records, suppressed partners, quarantine, coverage and new Edition counters.
+Counter validation includes decoded/LF minimums and retained-record buffer bounds.
+Failed acquisitions expose no candidates or terminal raw row. Private inspection
+states that absent discarded headers/JSON and full source bytes remain collector
+assertions, not independently replayed source authentication or rights approval.
+
+Twenty-four new synthetic tests cover both-source success, Work/Edition conflicts,
+selected/quarantined/unknown oversized failures, EOF, all retained resource caps,
+complete checksums, strict historical dispatch, tampered accounting, frozen
+predecessor/request fields and authenticated ciphertext replay. Separate-process
+checks verify timeout liveness for a stalled Work opener/stream; a cumulative
+deadline test verifies late Edition body cleanup. The focused old/new suite
+passes 62 tests. Local lint/typechecks pass with the unchanged Discovery hook
+warning. All 802 non-Edge tests and four iOS/Android exports pass; the local root
+check cannot finish Edge dependency retrieval in this environment. Full root
+validation and all five required CI gates must pass before merge; exact current
+source/CI acceptance belongs to Issue #182. Existing Sprint history is preserved.
+
+**Next:** implement the guarded operator for this new contract. Revalidate all
+seven fixed Git requests and authenticate the consumed Edition diagnosis at its
+original accepted source, including original conflict/continuation recovery.
+Add distinct first-push/first-run controls, complete source/dependency/CI binding
+and private custody preparation/readback/recovery. No actual request belongs in
+that source packet. After source acceptance, a separately bounded operation needs
+a new recovery archive saved/read back before activation. All seven old requests
+remain consumed. Complete collection, fresh reconciliation and individual rights
+review precede any writer. This packet performs no provider, database, model or
+device operation and accepts no additional catalog/MVP/release gate.
+
 ## Bounded Edition framing core — 2026-09-28 / #182
 
 `feat/182-bounded-edition-framing` continues accepted result
