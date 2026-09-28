@@ -25,6 +25,10 @@ jobs:
       - name: Install frozen dependencies
         run: npm ci --no-audit --no-fund
       - name: Validate source and isolated native bundles
+        # Root check also exports the separate mobile app; this isolated
+        # acceptance workflow deliberately has no production backend settings.
+        env:
+          KAJO_BUILD_MODE: demo
         run: npm run check
       - name: Generate isolated Android application
         working-directory: apps/description-acceptance

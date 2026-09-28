@@ -14,6 +14,49 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Repository hygiene and dependency placement — 2026-09-29
+
+The owner permits fixing current defects, scheduling incomplete work at its proper
+future phase, and retiring superseded work after dependency checks. The single
+[ROADMAP disposition table](../ROADMAP.md#unfinished-work-disposition--2026-09-29)
+covers all 18 audited issues and draft #229. Later UX, Shared, identity, email and
+beta work retain explicit prerequisites and acceptance; no release requirement
+is removed or marked complete by this cleanup.
+
+**Delivered source:** #294 diagnostic/all-copy cleanup and #295 production/input
+guards are accepted as recorded below. #296 is now accepted at main
+`8525ecf32a39757a1f660d41ffa788c7276f7bcc`, reviewed
+`7b0062e668bda1fb5e2b247e1225dd42175256eb`, after all five CI #585 gates.
+The exact-lock audit has zero known advisories and five added routing/tooling
+regressions. This supersedes the earlier pending-CI instruction for that packet.
+
+The isolated description-acceptance workflow now explicitly selects demo mode
+for its root-check step, which has no backend configuration. The production
+configuration correction otherwise rejects that step by default. The focused
+config reproduction fails without the mode and passes with it; production and
+APK settings are unchanged. Exact hygiene-PR CI acceptance remains separate.
+
+**Native source:** draft #229 at
+`e41f84475704223bb8994e0e49f3101be2d1122b` passes all five CI #584 gates,
+1,044 tests/four exports. Its nine conflicts and #240 reconnect source are
+resolved, preserving accepted catalog attribution/cold history and ten deployed
+forward files byte-for-byte. Accepted #296 still needs reconciliation into the
+native draft and exact-head CI. Configured-device and fresh-account observations
+remain explicit; no new deployment, account reset or device run is claimed.
+
+**Scheduled / remaining:** Phase 14 evidence/catalog/adaptive policy/SleepLayer
+acceptance still precedes Taste and the later launch loop. E1/D1/D2 are complete
+bounded foundations, and optional model research is not a new release gate.
+ROADMAP owns the detailed future queue. #230/#231 remain required pre-MVP work;
+#240 now needs acceptance of its implemented reader correction rather than a
+second implementation. Source fixes do not close #160 hosted operations or #182
+rights/catalog usefulness. No branch-deletion result is claimed in this record.
+
+**Files reconciled:** STATUS, ROADMAP, MVP, FUTURE_PLAN, UX_PRINCIPLES and the
+September 28 retrospective now agree on source versus runtime acceptance and
+execution ownership. Historical entries below remain dated evidence; their old
+next-task directives are superseded by current STATUS.
+
 ## Routing and tooling advisory remediation — 2026-09-28 / #238
 
 The fresh audit reproduced 15 moderate affected package paths from three

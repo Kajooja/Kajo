@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-28**
+Last updated: **2026-09-29**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,11 +10,14 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — dependency advisory closure / #238
+## Current packet — repository hygiene and native dependency reconciliation
 
-The September 28 [repository audit](retros/2026-09-28.md) accounts for the 18
-open issues and draft PR #229. All requirements and real acceptance gates remain;
-this packet resolves source defects rather than deleting unfinished MVP work.
+The owner clarified on September 29 that unfinished work must be fixed or assigned
+its correct dependency slot, and superseded work removed only after checking its
+references. The [repository audit](retros/2026-09-28.md) preserves the findings;
+[ROADMAP's disposition table](ROADMAP.md#unfinished-work-disposition--2026-09-29)
+owns the placement of all 18 audited issues and draft PR #229. No MVP requirement
+or real acceptance gate is removed by this cleanup.
 
 PR #294 is accepted at main `3500f9b709e5315cb864f9bcbf9f004c76596bce`,
 all five CI #580 gates, 867 tests/four exports: bounded terminal catalog evidence
@@ -25,28 +28,35 @@ and independent all-copy recovery-key cleanup. PR #295 is accepted at main
 input before lookup. Hosted auth deployment, distributed abuse/anti-enumeration,
 provider settings and the platform upgrade remain distinct #160 gates.
 
-#238 source now resolves all three recorded advisory families: decoder 0.5.0
-with a hash-checked query-string 7.1.3 CommonJS adapter, UUID 11.1.1 for xcode's
-existing v4 call, and coordinated Vitest 4.1.11. Expo/RN/router remain unchanged;
-Vite remains at the previous 7.3.6. Root parent pins avoid npm workspace-link
-override loss. A fresh dependency audit returns zero advisories. Real routing,
-malformed-input deadline, parent-source integrity, auth callback parameters and
-xcode identifier tests join root check; CI also checks current advisories.
-The [audit receipt](dependency-audit-2026-09-28.json) ties this to its exact lock.
-Next complete exact five-gate CI, accept this source and reconcile it into #229.
-Native/link round-trip gates stay explicit; a Node parser test is not a phone.
+PR #296 is accepted at main `8525ecf32a39757a1f660d41ffa788c7276f7bcc`,
+reviewed `7b0062e668bda1fb5e2b247e1225dd42175256eb`, after all five CI #585
+gates. It resolves #238's three recorded advisory families with decoder 0.5.0
+and a hash-checked query-string 7.1.3 CommonJS adapter, UUID 11.1.1 for xcode's
+existing v4 call, and coordinated Vitest 4.1.11. Expo/RN/router and Vite 7.3.6
+stay unchanged. Five regressions cover routing, bounded malformed input, parent
+integrity, auth callback parameters and xcode identifiers. The
+[audit receipt](dependency-audit-2026-09-28.json) records zero known advisories
+for the exact lock. Actual native/link round-trip acceptance remains separate.
 
-The older native draft is reconciled separately at
+The older native draft is reconciled at
 `e41f84475704223bb8994e0e49f3101be2d1122b`, tree
 `2c9d36532c8067e681b4577297f5d7ac84a3f889`, with all nine conflicts resolved.
-It retains current catalog attribution/cold history plus immutable delivery and
-protocol-2 pagination. Ten deployed forwards are byte-identical. #240 supplies
-bounded native reconnect recovery owned by the focused foreground reader, exact
-request/context/cursor, retained prefix and 15-second deadline. Only backend
-success clears errors; expired cursors still require explicit new search. CI
-#584 validation proves 1,044 tests/four exports; its remaining database gates and
-configured-device/fresh-account acceptance are tracked in draft #229. It is not
-accepted main or a new hosted migration/device observation.
+All five CI #584 gates passed, with 1,044 tests/four exports. It retains accepted
+catalog attribution/cold history, immutable delivery and protocol-2 pagination;
+ten deployed forwards remain byte-identical. #240 now has bounded recovery of the
+focused foreground reader's exact request/context/cursor, retained prefix and
+15-second deadline. Only successful backend recovery clears the error; an expired
+cursor still requires explicit new search. This source is still in draft #229,
+not accepted main or a new hosted migration/device observation.
+
+**Next bounded action:** reconcile accepted #296 into `feat/228-delivered-origin`,
+verify the resulting exact head through all five CI gates, and update #229's
+source/acceptance record. Keep configured-device and fresh-account observations
+explicit; do not repeat installed forwards or reset accounts to manufacture them.
+After this reconciliation, continue Sprint 014's remaining evidence/catalog and
+algorithm gates in ROADMAP order. Later UI work has named slots rather than
+competing active branches; E1/D1/D2 need no repeat and optional model research is
+not a release prerequisite.
 
 ### Preserved #182 catalog and operation ledger
 
@@ -60,11 +70,11 @@ consumed provider attempts and unchanged review history. The
 records the complete archive **version 11**, exact hashes, acknowledgements and
 preservation checks. Do not restore the old reviewed state or repeat apply.
 
-The owner's subsequent request explicitly selects **#182 pinned Work/Edition
-dump intake** as the next primary packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
+The owner's earlier post-pilot request selected **#182 pinned Work/Edition
+dump intake** as that packet and independent **[#265](https://github.com/Kajooja/Kajo/issues/265)
 unsupported latent fallback correction and bounded MovieLens prefix research**
-alongside it. The local intake and bounded cloud acquisition workflow are now
-accepted. Actual [run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978)
+alongside it. This is the dated operational ledger, not a second current handoff.
+The local intake and bounded cloud acquisition workflow are now accepted. Actual [run 35995362978](https://github.com/Kajooja/Kajo/actions/runs/35995362978)
 read one complete **4,248-byte** metadata response, then failed before any dump
 request. A separate accepted metadata-only diagnostic recovered identical bytes and
 proved the cause: the two files total **16,644,821,648 bytes**, above the original
@@ -642,19 +652,20 @@ the installed binary checksum was not independently supplied.
 Owner feedback accepts the exercised normal flows, Profile switching, expired
 cursor → fresh search and the reported persistence/restart checks. Record this
 as device feedback, not proof of every server attribution/native callback race.
-The remaining reconnect defect is [#240](https://github.com/Kajooja/Kajo/issues/240)
-/ MVP-UX-003: recover the same failed request on usable reconnection and remove
-stale retry UI after successful recovery. Do not merely hide a failed backend
-response because the device says online. The owner explicitly defers this to the
-next application UI packet; do not silently substitute it for the named source packet.
+The September 12 reconnect defect is [#240](https://github.com/Kajooja/Kajo/issues/240)
+/ MVP-UX-003. The reconciled draft now implements bounded recovery of that same
+request and clears stale retry UI only after successful backend recovery. The
+current source/CI checkpoint is above; repeating the actual device observation
+remains required. The older decision to defer implementation is superseded by this
+source correction, not by an online indicator that conceals a backend error.
 
 The six approved server forwards remain installed through
 `20260912134224_atomic_prediction_pages`. Do not deploy them again or repeat the
 approval. The 15-second client deadline, exact retry/cancel semantics and all
 439 local tests remain recorded in [the native recovery checkpoint](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/sprints/SPRINT-014.md#bounded-client-recovery--2026-09-12).
 No fresh-account test/reset, new DDL, automatic promotion or full DATA/ALG closure
-is implied. Keep #229 draft while its named acceptance gaps remain; E1 is an
-independent source packet, not a way to mark those gaps complete.
+is implied. Keep #229 draft while its named acceptance gaps remain. Accepted
+E1/D1/D2 research does not close native acceptance.
 
 ## Owner UI decisions — required before MVP
 
@@ -670,7 +681,7 @@ Community comparisons remain conditional. Implementation is planned, not shipped
 
 ## Accepted source, active branch and recorded hosted state
 
-Accepted runtime source at audit start: `6dd1fec` / PR #227 — atomic/durable Item,
+Historical September 12 audit baseline: `6dd1fec` / PR #227 — atomic/durable Item,
 List and Shared action foundations. #227 is merged; do not repeat its deployment.
 The #233/#234 delivery publishes independent-engine direction and reconciled
 product/handoff documentation, plus bounded repository hygiene. It does not
@@ -680,9 +691,10 @@ accept #229 runtime, implement a portable engine or train a model.
 multi-List/collection UX, history projection, late outcomes, frozen replay,
 eligibility-first admission, identified first pages, private source windows and
 protocol-2 atomic continuation and the captured-scope mobile reader.
-The branch has source/test/rollout evidence that must remain intact. Its detailed
-device and implementation records stay on that branch/PR until accepted; compact
-canonical successor contracts in main are explicitly labeled.
+The branch has source/test/rollout evidence that must remain intact. The current
+reconciliation checkpoint is at the top of this file; its detailed device and
+implementation records stay on that branch/PR until accepted. Compact canonical
+successor contracts in main are explicitly labeled.
 
 The owner-approved #229 hosted rollout completed on 2026-09-12 through
 `20260912134224_atomic_prediction_pages`, as recorded in that branch's
@@ -716,10 +728,11 @@ The ordered engine work is:
 | E2 | One admitted component behind existing serving boundary | Relevant native 14.1/14.2 gates + rights/quality/compatibility/fallback/rollback |
 
 E1, D1 and D2 are accepted through #241/#242/#243. The reproducible D2 report
-and rejection/fallback decision are complete. #182 remains the primary catalog
-unit; explicitly selected independent #265 is now completed as described above. #229 retains native
-acceptance and application UI work remains in its separately ordered packet. No large native user
-population, production schema or separate network service is needed for D1.
+and rejection/fallback decision are complete. The independent #265 follow-up is
+also complete. #182 owns remaining catalog work; #229 retains native acceptance,
+and later application UI work has its ROADMAP slot. Current STATUS names the
+one active handoff. No large native population, production schema or separate
+network service was required for D1.
 
 Use ignored `research-data/` and `research-artifacts/` or equivalent controlled
 storage. External ratings are source-typed observations, not fake native Events
@@ -744,8 +757,9 @@ world model, multistep dreamer or automatic promotion is delivered.
   always-available unknown Taste response, approximately ten movies then ten books,
   link reveal/copy and device details remain in their canonical product docs.
 - #230 private statistics/weekly tracking and #231 multi-select/history trash are
-  now required pre-MVP Phase 17.0 work. #239 card controls and #240 reconnect
-  recovery join them; FUT-UX-003 joint-list choice remains a separate candidate.
+  now required pre-MVP Phase 17.0 work, alongside #239 card controls. #240 is
+  implemented in the active native reader packet with device acceptance still
+  open; FUT-UX-003 joint-list choice remains a separate candidate.
 - Then follow ROADMAP: algorithm/catalog/engine foundation → Taste/holdout →
   anonymous web/app + Google/Apple continuity → preview → Friend/safety → explicit
   Shared creation and joint rounds → core UX/telemetry/privacy → complete beta →
@@ -754,8 +768,8 @@ world model, multistep dreamer or automatic promotion is delivered.
 The owner reports exercised device flows working, but no exact installed APK
 identity/timings were provided for the latest feedback. Empty/fresh-account
 acceptance remains untested. Preserve current test history; a future small-group
-reset is not an instruction to reset now. Do not dispatch or poll APKs as a
-substitute for the next source unit.
+reset is not an instruction to reset now. A newly built APK alone cannot replace
+the named device observations.
 
 ## Hygiene and remaining findings
 
@@ -763,16 +777,16 @@ The [2026-09-12 audit](retros/2026-09-12.md) records scope, checks and limits.
 Proven-unused catalog hook/wrapper removed; accepted-main migration protection
 extends from 47 to 50 exact hashes without changing SQL or the baseline cutoff.
 Raw/fitted research paths are ignored before the first dataset operation.
-The compatible js-yaml 4.3.2 lockfile patch removed the high advisory in the
-September 12 audit, which reported no high/critical findings and fifteen moderate
-package entries across three advisories; #238 prioritizes the runtime routing decoder before public links and
-coordinates build/test-tool updates. Do not apply an incompatible bare override.
+The September 12 js-yaml 4.3.2 patch removed the then-reported high advisory. Its
+remaining fifteen moderate package paths across three advisory families were the
+baseline for #238; PR #296 now supplies the accepted compatible fixes and a fresh
+zero-advisory receipt. This dated audit does not promise future advisory absence.
 
 Open source findings are assigned to their existing work owners:
-#228 configured protocol-2 device/recovery acceptance; #182 catalog breadth/diversity
-and metadata expansion after the accepted provider canary; #160 / MVP-OPS-005 production configuration,
-password endpoint input/abuse policy and release dependency checks. See the audit
-for dependency findings and exact verification; no hosted security conclusion is inferred.
+#228 configured protocol-2 device/recovery acceptance; #182 catalog breadth/diversity,
+rights and useful metadata; #160 hosted acceptance/platform hardening and abuse
+policy after the accepted production/input source correction. ROADMAP owns their
+dependency placement; no hosted security conclusion follows from source tests.
 
 The September 24 completion audit verified the actual uploaded run and all
 **103 completed archive entries**, preserved cached records/attempts/review
@@ -781,10 +795,12 @@ canonical completed state and full before/after evidence are retained outside
 Git. No secret, raw provider record, fitted model or operator state enters this
 documentation packet. Historical preparation/hygiene checks remain in Sprint 014.
 
-Merged `feat/226-atomic-collection-actions` is byte-equivalent to accepted #227
-and safe to retire. Remote branch deletion is unavailable through this session's
-supported GitHub capability; do not repeat the completed 145-branch historical
-cleanup or remove the active #229 branch. After #234 merge, its documentation
-branch can likewise be retired through a supported operation.
+The [current branch inventory](retros/branch-cleanup-2026-09-28.json) supersedes
+older branch-cleanup instructions. It distinguishes merged candidates, a native
+integration hold and retained request/default/native refs. Deletion remains a
+pending supported operation; do not repeat the historical 145-branch cleanup or
+remove the active #229 branch and consumed request identities.
 
-Sprint014, full DATA/ALG/ENG acceptance, device gates and public release remain open.
+Sprint 014, full DATA/ALG/catalog acceptance, device gates and public release
+remain open. The bounded E1/D1/D2 foundation is complete; native model admission
+is a separate conditional decision.
