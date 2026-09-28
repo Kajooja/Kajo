@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 framed full-collection core; guarded operator next
+## Current packet — #182 framed operator; private operation preparation next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -162,15 +162,27 @@ full dump bytes cannot be independently replayed from that payload. The
 [source checkpoint](sprints/SPRINT-014.md#framed-full-collection-core--2026-09-28--182)
 records tests and scope. No actual request or provider operation is included.
 
-**Next: implement the guarded operator for this new full-collection contract.**
-Revalidate all seven fixed predecessor Git objects and authenticate the accepted
-Edition diagnosis through its original source, including the original conflict
-and continuation recovery chain. Supply distinct first-push/first-run activation,
-complete source/dependency/CI binding and private custody preparation/recovery.
-Keep the current collector/request/result rules and historical contracts intact.
-No actual request belongs in that source packet. Activation requires separately accepted
-source, explicit operational limits and a new private recovery archive saved and
-read back first. All **seven** requests remain consumed; never rerun,
+The [guarded framed operator](../architecture/ARCHITECTURE.md#framed-full-collection-operator--182)
+now supplies local preparation/recovery and a distinct first-push/first-run
+workflow. All seven Git predecessors, accepted source/dependency/CI receipts and
+22 private predecessor inputs are bound before collection. Complete original
+Edition/conflict/continuation closures are checked before staging the key or
+executing their original inspectors. The oldest closure retains its original
+17 files. A process-group deadline stops nested children; all three temporary key
+copies are removed on success, failure and timeout. The
+[operator checkpoint](sprints/SPRINT-014.md#framed-full-collection-operator--2026-09-28--182)
+records validation and limitations. No request branch or provider operation is
+included in this source packet.
+
+**Next: prepare the private framed full-collection operation from accepted source.**
+Capture its exact merged head/tree and all five CI gates; preserve the Edition
+diagnostic at original source `3d12a7f69534fef305b7ca37767626ae584b688e`, including
+the original conflict/continuation chain. Reconstruct and verify all 22 private
+inputs, record the unchanged full limits and 8-pair/8 MiB policy, then save and
+read back a new recovery archive. Use the new preparer to authenticate predecessors
+and write the sole-file request last. Activation follows that concrete operational
+checkpoint, on the distinct branch with one first push/run. Keep collector,
+request/result and historical rules unchanged. All **seven** earlier requests remain consumed; never rerun,
 reset or reuse them or the completed pilot. No candidates survived the failed
 collection or were retained by the diagnosis. Approvals, database writes and model
 admissions remain zero. Complete collection, fresh reconciliation and individual

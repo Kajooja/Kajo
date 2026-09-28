@@ -9,6 +9,12 @@ import { EDITION_PREFIX_REQUEST_CONTRACT, EDITION_PREFIX_PURPOSE,
 export const FRAMED_REQUEST_CONTRACT = 'open-library-framed-dump-acquisition-request-v1';
 export const FRAMED_REQUEST_PURPOSE = 'full-acquisition-with-bounded-edition-framing';
 export const FRAMED_CORE_SOURCE_HEAD = 'b34aca7451199e3cf78578318d8f5f151ad80c32';
+export const FRAMED_COLLECTION_SOURCE_HEAD = 'cfa36d5810c1f5e6f91c4112e4376415f2f4ced1';
+export const FRAMED_REQUEST_BRANCH = 'catalog-acquisition/ol-20260831-framed';
+export const FRAMED_REQUEST_PATH = 'scripts/catalog/requests/ol-20260831-framed.json';
+export const FRAMED_WORKFLOW = 'catalog-book-framed-acquisition.yml';
+export const FRAMED_ARTIFACT = 'open-library-framed-20260831.sealed.json';
+export const FRAMED_ARTIFACT_NAME = 'kajo-book-framed-sealed';
 // Public Git/run lineage only. Private headers, raw identities and artifact or
 // custody commitments must not become fields of the public successor request.
 export const FRAMED_PREVIOUS_EDITION_DIAGNOSTIC = Object.freeze({ runId: '36435310394',
