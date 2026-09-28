@@ -64,19 +64,27 @@ export async function readConflictPrivateBytes(path, maximum, privateKey = false
 // This check executes no repository or installed package code. All imports are
 // verified before loadConflictAcquisitionModules can execute a parser or validator.
 export async function collectConflictAcquisitionCodeBinding(repo, sourceHead) {
+  return collectCatalogCodeBinding(repo, sourceHead, { sourceFiles: CONFLICT_ACQUISITION_SOURCE_FILES,
+    executingFile: SELF, executingUrl: import.meta.url, dynamicImports: [SELF] });
+}
+
+// Shared by the distinct Edition operator. Each entrypoint supplies its fixed
+// closure; historical conflict callers retain the exact default manifest.
+export async function collectCatalogCodeBinding(repo, sourceHead, { sourceFiles, executingFile, executingUrl, dynamicImports }) {
   repo = resolve(repo);
   check(gitHash(sourceHead) && git(repo, ['rev-parse', 'HEAD']).trim() === sourceHead,
     'inspection-repo-head-mismatch');
   const files = {}, rawFiles = {};
-  for (const path of CONFLICT_ACQUISITION_SOURCE_FILES) {
+  for (const path of sourceFiles) {
     const raw = await readConflictPrivateBytes(join(repo, path), 8 * 1024 * 1024);
     check(sha(raw) === sha(git(repo, ['show', `${sourceHead}:${path}`], true)), 'inspection-source-modified');
     files[path] = sha(raw); rawFiles[path] = decode(raw);
   }
-  check(sha(await readConflictPrivateBytes(fileURLToPath(import.meta.url), 1024 * 1024)) === files[SELF],
+  check(sha(await readConflictPrivateBytes(fileURLToPath(import.meta.url), 1024 * 1024)) === files[SELF]
+    && sha(await readConflictPrivateBytes(fileURLToPath(executingUrl), 1024 * 1024)) === files[executingFile],
     'executing-inspector-source-mismatch');
   for (const [path, source] of Object.entries(rawFiles).filter(([path]) => /\.(?:mjs|js)$/.test(path))) {
-    check(path === SELF || !/\bimport\s*\(/.test(source), 'unreviewed-dynamic-import');
+    check(dynamicImports.includes(path) || !/\bimport\s*\(/.test(source), 'unreviewed-dynamic-import');
     for (const match of source.matchAll(/(?:^|\n)\s*(?:import\s+(?:[\s\S]*?\sfrom\s+)?|export\s+[^;]*?\sfrom\s+)['"]([^'"]+)['"]\s*;/g)) {
       const name = match[1];
       if (name.startsWith('node:')) continue;
@@ -130,8 +138,12 @@ console.log(JSON.stringify({contracts,sha256,utils,crypto}));`;
 }
 
 export function validateConflictAcquisitionSourceReceipt(s, codeBinding) {
+  return validateCatalogSourceReceipt(s, codeBinding, 'kajo-conflict-acquisition-source-acceptance-v1');
+}
+
+export function validateCatalogSourceReceipt(s, codeBinding, expectedContract) {
   const ci = s?.ci;
-  check(s?.contract === 'kajo-conflict-acquisition-source-acceptance-v1'
+  check(s?.contract === expectedContract
     && s.sourceHead === codeBinding.sourceHead && s.sourceTree === codeBinding.sourceTree
     && gitHash(s.reviewedHead) && positive(s.sourcePr) && positive(s.tests) && s.exports === 4
     && same(s.files, codeBinding.files) && same(s.dependencies, codeBinding.dependencies)
@@ -169,34 +181,46 @@ export async function loadConflictAcquisitionModules(repo, sourceHead, sourceRec
 }
 
 export function verifyConflictAcquisitionArtifactZip(zip, sealed) {
+  return verifyCatalogArtifactZip(zip, sealed, CONFLICT_ACQUISITION_ARTIFACT_FILE);
+}
+
+export function verifyCatalogArtifactZip(zip, sealed, artifactFile) {
   check(Buffer.isBuffer(zip) && zip.length <= MAX_INPUT && Buffer.isBuffer(sealed) && sealed.length <= MAX_INPUT,
     'invalid-artifact-size');
   // Read hash-bound bytes, not a second pathname. Only ciphertext enters Python.
   const script = `import zipfile,hashlib,io,sys,stat\nwith zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())) as z:\n assert z.namelist()==[sys.argv[1]]\n i=z.infolist()[0]\n assert i.file_size==int(sys.argv[3]) and not i.is_dir() and not(i.flag_bits&1)\n assert stat.S_IFMT(i.external_attr>>16) in (0,stat.S_IFREG)\n assert i.compress_type in (zipfile.ZIP_STORED,zipfile.ZIP_DEFLATED)\n assert z.testzip() is None\n assert hashlib.sha256(z.read(i)).hexdigest()==sys.argv[2]\n`;
-  try { execFileSync('python3', ['-I', '-c', script, CONFLICT_ACQUISITION_ARTIFACT_FILE, sha(sealed), String(sealed.length)],
+  try { execFileSync('python3', ['-I', '-c', script, artifactFile, sha(sealed), String(sealed.length)],
     { input: zip, maxBuffer: 1024, timeout: 60000, stdio: ['pipe', 'pipe', 'ignore'] }); }
   catch { throw new Error('artifact-zip-mismatch'); }
 }
 
 export function validateConflictAcquisitionReceipts({ request, collected, sourceReceipt: s, runReceipt: r,
   envelope, zip, sealed, modules }) {
-  validateConflictAcquisitionSourceReceipt(s, modules.codeBinding);
+  return validateCatalogAcquisitionReceipts({ request, collected, sourceReceipt: s, runReceipt: r, envelope, zip, sealed, modules },
+    { sourceContract: 'kajo-conflict-acquisition-source-acceptance-v1', runtimeContract: 'kajo-conflict-acquisition-runtime-receipt-v1',
+      workflowPath: CONFLICT_ACQUISITION_WORKFLOW_PATH, artifactFile: CONFLICT_ACQUISITION_ARTIFACT_FILE,
+      artifactPrefix: 'kajo-book-conflicts-sealed', branch: modules.CONFLICT_REQUEST_BRANCH });
+}
+
+export function validateCatalogAcquisitionReceipts({ request, collected, sourceReceipt: s, runReceipt: r,
+  envelope, zip, sealed, modules }, { sourceContract, runtimeContract, workflowPath, artifactFile, artifactPrefix, branch }) {
+  validateCatalogSourceReceipt(s, modules.codeBinding, sourceContract);
   const run = r?.run, artifact = r?.artifact;
   check(s.requestSha256 === request.requestSha256 && gitHash(s.requestHead) && gitHash(s.requestTree)
     && s.recipientFingerprint === request.recipientFingerprint && s.targets === request.roster.length
     && s.policySha256 === modules.digest(request.conflictPolicy),
   'source-request-receipt-mismatch');
-  check(r?.contract === 'kajo-conflict-acquisition-runtime-receipt-v1' && r.sourceHead === request.sourceHead
+  check(r?.contract === runtimeContract && r.sourceHead === request.sourceHead
     && r.requestSha256 === request.requestSha256 && positive(run?.id) && run.runAttempt === 1
     && run.repository === 'Kajooja/Kajo' && run.event === 'push'
-    && run.headBranch === modules.CONFLICT_REQUEST_BRANCH && run.headSha === s.requestHead
-    && run.path === CONFLICT_ACQUISITION_WORKFLOW_PATH && run.url === `https://github.com/Kajooja/Kajo/actions/runs/${run.id}`
+    && run.headBranch === branch && run.headSha === s.requestHead
+    && run.path === workflowPath && run.url === `https://github.com/Kajooja/Kajo/actions/runs/${run.id}`
     && run.status === 'completed' && run.conclusion === (collected.status === 'failed' ? 'failure' : 'success')
     && instant(run.createdAt) && instant(run.updatedAt) && before(run.createdAt, run.updatedAt)
     && before(s.acceptedAt, run.createdAt), 'run-receipt-mismatch');
-  check(positive(artifact?.id) && artifact.name === `kajo-book-conflicts-sealed-${run.id}`
+  check(positive(artifact?.id) && artifact.name === `${artifactPrefix}-${run.id}`
     && artifact.workflowRunId === run.id && artifact.headSha === s.requestHead && artifact.headBranch === run.headBranch
-    && artifact.expired === false && artifact.singleMember === CONFLICT_ACQUISITION_ARTIFACT_FILE
+    && artifact.expired === false && artifact.singleMember === artifactFile
     && artifact.zipCrcVerified === true && artifact.authenticatedUnsealVerified === true
     && artifact.zipBytes === zip.length && artifact.zipSha256 === sha(zip)
     && artifact.sealedFileSha256 === sha(sealed) && artifact.recoveredPlaintextSha256 === envelope.header.plaintextSha256
@@ -256,14 +280,19 @@ export const CONFLICT_PREDECESSOR_INPUTS = Object.freeze(['request', 'prefix-sea
 const exact = (value, keys) => object(value) && same(Object.keys(value).sort(), [...keys].sort());
 
 export async function readConflictPredecessorInputs(manifestPath) {
+  return readCatalogPrivateInputs(manifestPath, CONFLICT_PREDECESSOR_INPUTS);
+}
+
+export async function readCatalogPrivateInputs(manifestPath, keys,
+  { largeNames = ['sealed', 'artifact-zip'], privateNames = ['recipient-key'] } = {}) {
   const manifest = json(await readConflictPrivateBytes(manifestPath, 1024 * 1024));
-  check(exact(manifest, CONFLICT_PREDECESSOR_INPUTS), 'invalid-predecessor-input-manifest');
+  check(exact(manifest, keys), 'invalid-predecessor-input-manifest');
   const input = {};
   try {
-    for (const name of CONFLICT_PREDECESSOR_INPUTS) {
+    for (const name of keys) {
       check(typeof manifest[name] === 'string' && resolve(manifest[name]) === manifest[name], 'invalid-predecessor-input-path');
       input[name] = await readConflictPrivateBytes(manifest[name], name === 'recipient-key' ? 8192
-        : ['sealed', 'artifact-zip'].includes(name) ? MAX_INPUT : 8 * 1024 * 1024, name === 'recipient-key');
+        : largeNames.includes(name) ? MAX_INPUT : 8 * 1024 * 1024, privateNames.includes(name));
     }
     return input;
   } catch (error) { input['recipient-key']?.fill(0); throw error; }
@@ -272,16 +301,21 @@ export async function readConflictPredecessorInputs(manifestPath) {
 // The receipt is a private operator-captured durable readback assertion. Verify
 // its actual archive and every required member; never publish these commitments.
 export function verifyConflictPredecessorCustody(receipt, archive, input) {
+  return verifyCatalogPredecessorCustody(receipt, archive, input,
+    { contract: 'kajo-conflict-predecessor-custody-v1', keys: CONFLICT_PREDECESSOR_INPUTS });
+}
+
+export function verifyCatalogPredecessorCustody(receipt, archive, input, { contract, keys }) {
   check(exact(receipt, ['contract', 'storage', 'archive', 'files'])
-    && receipt.contract === 'kajo-conflict-predecessor-custody-v1'
+    && receipt.contract === contract
     && exact(receipt.storage, ['fileId', 'version', 'readBackAt'])
     && typeof receipt.storage.fileId === 'string' && /^libfile_[A-Za-z0-9]+$/.test(receipt.storage.fileId)
     && positive(receipt.storage.version) && instant(receipt.storage.readBackAt)
     && exact(receipt.archive, ['bytes', 'sha256']) && Buffer.isBuffer(archive) && archive.length <= MAX_INPUT
     && receipt.archive.bytes === archive.length && receipt.archive.sha256 === sha(archive)
-    && exact(receipt.files, CONFLICT_PREDECESSOR_INPUTS), 'predecessor-custody-mismatch');
+    && exact(receipt.files, keys), 'predecessor-custody-mismatch');
   const members = {};
-  for (const name of CONFLICT_PREDECESSOR_INPUTS) {
+  for (const name of keys) {
     const entry = receipt.files[name], raw = input[name];
     check(exact(entry, ['member', 'bytes', 'sha256']) && typeof entry.member === 'string'
       && entry.member.length < 512 && !entry.member.includes('\\') && !entry.member.startsWith('/')
