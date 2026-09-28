@@ -14,6 +14,33 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Routing and tooling advisory remediation — 2026-09-28 / #238
+
+The fresh audit reproduced 15 moderate affected package paths from three
+advisories. The malformed-percent routing regression timed out before the fix.
+The safe decoder's ESM default is now unwrapped by one hash-checked import change
+in its unchanged CommonJS query-string 7.1.3 parent. Bare overrides and a major
+parent swap are not used as compatibility evidence. Unexpected source/version
+fails installation. Vitest is coordinated at 4.1.11, Vite stays 7.3.6, and xcode's
+actual v4 UUID call works with 11.1.1. Expo/RN/router versions are unchanged.
+
+The local npm 11.9 workspace-link override defect was reproduced: root overrides
+alone silently preserved vulnerable leaves. Explicit root query-string/xcode
+parents (also used by the regression tests) make the override graph effective;
+clean `npm ci`, `npm ls`, real parser tests and a fresh zero-advisory audit verify
+it. The pinned lockfile is recorded in the dependency audit receipt. Five
+regressions join root check and CI runs the current-advisory check. Lint/typecheck,
+mobile/engine/companion tests and four platform exports pass. Root check's local
+Deno registry transport limitation remains, so exact remote CI is required.
+Node-only URL checks do not assert installed/not-installed native link acceptance.
+
+PR #295 is accepted at `cd224d277f33b105e63cd83126d111b12b64ba10`,
+reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, tree
+`0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
+880 tests/four exports including 32 Deno tests. Draft #229 was independently
+reconciled at `e41f84475704223bb8994e0e49f3101be2d1122b`; CI #584 validation
+passes 1,044 tests/four exports, with other source/device gates separately tracked.
+
 ## Production configuration and auth input guards — 2026-09-28 / #160
 
 Expo and mobile now share public configuration validation. Production requires

@@ -24,7 +24,7 @@ The first public release includes the Taste-first link â†’ anonymous learning â†
 
 Prerequisites:
 
-- Node.js 22 or newer.
+- Node.js 22.12+ (22 LTS) or Node.js 24+.
 - npm 10 or newer.
 
 From the repository root:
@@ -71,3 +71,21 @@ The [installation procedure](docs/architecture/decisions/0006-clean-install-data
 uses the verified source baseline plus unchanged forward migrations on pinned
 local Supabase. Existing hosted databases follow the separate forward-deployment
 procedure. The original historical replay remains a failing diagnostic.
+
+
+### Reviewed dependency compatibility
+
+`npm ci` applies the reviewed CommonJS/ESM decoder interop needed by Expo Router
+57 / query-string 7.1.3. It verifies the exact parent source hash and decoder
+version before changing one import; an unexpected dependency change fails the
+installation. Do not skip install scripts for a runnable app. `npm run
+test:dependencies` checks real Expo routing, malformed URL handling and the xcode
+UUID call; `npm run audit:dependencies` checks current published advisories.
+
+Root query-string/xcode dev pins make the parents used by these tests explicit
+and keep security overrides effective across npm workspace-link resolution.
+Vitest is coordinated at 4.1.11; Vite stays at the previously accepted 7.3.6.
+[The audit record](docs/project/dependency-audit-2026-09-28.json) records the exact
+lockfile and results. Review/remove the decoder interop when the routing parent
+adopts a compatible patched decoder; its source hash intentionally rejects blind
+upgrades. Do not use `npm audit fix --force` to downgrade Expo.

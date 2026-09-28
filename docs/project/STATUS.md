@@ -10,31 +10,43 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — repository closure audit and #160 production guards
+## Current packet — dependency advisory closure / #238
 
-On September 28 the owner broadened continuation to resolve unfinished repository
-work. The [closure audit](retros/2026-09-28.md) accounts for all **18 open issues
-and draft PR #229**, concrete implementation paths and external acceptance needs.
-It supersedes old deferrals of source defects while preserving dependency order
-and truthful acceptance gates.
+The September 28 [repository audit](retros/2026-09-28.md) accounts for the 18
+open issues and draft PR #229. All requirements and real acceptance gates remain;
+this packet resolves source defects rather than deleting unfinished MVP work.
 
-The first correction is accepted through [PR #294](https://github.com/Kajooja/Kajo/pull/294),
-main `3500f9b709e5315cb864f9bcbf9f004c76596bce`, reviewed
-`dc12785c4057151d3d3bd2faf160c69b99839550`, exact tree
-`068f975577edbbc99eaeb5e4eba80b183ffd1f16`, all five
-[CI #580 gates](https://github.com/Kajooja/Kajo/actions/runs/36476170169),
-867 tests/four exports. It supplies bounded terminal replay and independently
-verified all-copy key cleanup. The
-[source checkpoint](sprints/SPRINT-014.md#terminal-diagnostic-and-cleanup-correction--2026-09-28--182)
-records tests and limitations. No consumed request, historical row or catalog
-write is replayed. The #160 correction now adds shared Expo/runtime production
-configuration guards, explicit demo identity, public-key shape checks and bounded
-password-auth JSON validation before lookup. Local checks/exports pass; exact
-source/CI and hosted acceptance are tracked in #160. Enumeration, distributed
-abuse limits and provider settings remain distinct gates. Next reconcile #229's
-nine merge conflicts and
-#240 against current main; preserve catalog/credit/cold-history fixes and its
-remaining native/device gates rather than restoring a stale whole STATUS.
+PR #294 is accepted at main `3500f9b709e5315cb864f9bcbf9f004c76596bce`,
+all five CI #580 gates, 867 tests/four exports: bounded terminal catalog evidence
+and independent all-copy recovery-key cleanup. PR #295 is accepted at main
+`cd224d277f33b105e63cd83126d111b12b64ba10`, reviewed
+`aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, all five CI #582 gates,
+880 tests/four exports: fail-closed production configuration and bounded auth
+input before lookup. Hosted auth deployment, distributed abuse/anti-enumeration,
+provider settings and the platform upgrade remain distinct #160 gates.
+
+#238 source now resolves all three recorded advisory families: decoder 0.5.0
+with a hash-checked query-string 7.1.3 CommonJS adapter, UUID 11.1.1 for xcode's
+existing v4 call, and coordinated Vitest 4.1.11. Expo/RN/router remain unchanged;
+Vite remains at the previous 7.3.6. Root parent pins avoid npm workspace-link
+override loss. A fresh dependency audit returns zero advisories. Real routing,
+malformed-input deadline, parent-source integrity, auth callback parameters and
+xcode identifier tests join root check; CI also checks current advisories.
+The [audit receipt](dependency-audit-2026-09-28.json) ties this to its exact lock.
+Next complete exact five-gate CI, accept this source and reconcile it into #229.
+Native/link round-trip gates stay explicit; a Node parser test is not a phone.
+
+The older native draft is reconciled separately at
+`e41f84475704223bb8994e0e49f3101be2d1122b`, tree
+`2c9d36532c8067e681b4577297f5d7ac84a3f889`, with all nine conflicts resolved.
+It retains current catalog attribution/cold history plus immutable delivery and
+protocol-2 pagination. Ten deployed forwards are byte-identical. #240 supplies
+bounded native reconnect recovery owned by the focused foreground reader, exact
+request/context/cursor, retained prefix and 15-second deadline. Only backend
+success clears errors; expired cursors still require explicit new search. CI
+#584 validation proves 1,044 tests/four exports; its remaining database gates and
+configured-device/fresh-account acceptance are tracked in draft #229. It is not
+accepted main or a new hosted migration/device observation.
 
 ### Preserved #182 catalog and operation ledger
 
