@@ -80,11 +80,14 @@ Its failed result was recovered and preserved. PR #288 accepted the separate
 guarded Edition-prefix operator; actual preparation, explicit caps and separate
 custody readback preceded its one successful diagnosis. Private recovery verified
 an oversized Edition row whose complete outer header is outside the original
-roster. All seven requests are consumed. STATUS selects a bounded local framing
-correction for such unrelated rows, preserving selected/unknown failures, original
-limits, checksum accounting and historical replay. No new provider allowance
-follows. The discarded historical terminal row's identity and selection status
-remain unknown; the new prefix does not validate the oversized JSON or full source.
+roster. All seven requests are consumed. The explicit local framing core now
+discards only oversized rows with a complete canonical unrelated header, retaining
+selected/unknown failures, original limits, checksum accounting and historical
+replay. Next integrate it into a separately versioned full-collection successor
+with new accounting/replay and original-source predecessor, one-shot and custody
+gates. Source acceptance grants no provider allowance. The discarded historical
+terminal row's identity and selection status remain unknown; the new prefix does
+not validate the oversized JSON or full source.
 Foreign locations are never remapped.
 No additional text is approved and no database write was performed. The prefix
 diagnosis still cannot prove the earlier discarded row was identical.
@@ -228,12 +231,16 @@ through PR #288. Original-source predecessor verification, explicit caps and
 separate custody readback preceded one owner-approved Edition-prefix request.
 Its successful run was privately recovered as `diagnosed` / `dump-line-limit`;
 the retained complete outer header classifies the new oversized row as outside
-the original roster. All seven requests are consumed. The next packet implements
-and tests bounded local framing for oversized unrelated Edition rows. Complete
-canonical outer-header proof must precede any discard; selected/unknown rows,
-global resource limits, selected identity guards, checksum accounting and
-historical replay remain strict. No new provider request or limit expansion is
-included. Any later full collection needs its own accepted successor.
+the original roster. All seven requests are consumed. The
+[local framing core](../architecture/ARCHITECTURE.md#bounded-edition-framing-core--182)
+now supplies bounded discard through LF only after complete canonical outer-header
+proof. Selected/unknown rows, global limits, selected identity guards, checksum
+accounting and historical replay remain strict. Next integrate this explicit
+entrypoint into a separately versioned full-collection successor, with request/
+result accounting, encrypted replay, all seven fixed predecessors, original-source
+diagnosis recovery, distinct first-run controls and source/CI/custody checks.
+Accept that source before preparing a new request and saving/reading back separate
+private recovery custody. No provider request or limit expansion is included.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated
