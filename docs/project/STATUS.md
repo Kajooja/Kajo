@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 recovered conflict acquisition; line-framing diagnosis next
+## Current packet — #182 local Edition line diagnosis; guarded operator path next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -103,13 +103,23 @@ private recovery result is preserved. The
 records the acceptance boundary. Receipt provenance is operator-captured;
 encryption alone is not source authentication.
 
-**Next: implement and test a local-only bounded line-framing diagnostic contract
-for the Edition size-limit failure.** The current framer applies the byte ceiling
-before target classification. Specify minimal source-bound prefix evidence and
-synthetic oversized-row/chunk-boundary cases without assuming that the terminal
-row was unrelated. Preserve existing parser limits, pins and identity rules.
-Any actual diagnosis needs a separately accepted, bounded request and private
-custody; this checkpoint grants no new provider execution or limit increase.
+The [local Edition line diagnostic](../architecture/ARCHITECTURE.md#local-edition-line-framing-diagnosis--182)
+now uses that same byte framer and retains at most an explicitly bounded header
+prefix. It reports a scanner-observed size lower bound and selected/unrelated
+status only when the complete outer envelope is valid; otherwise selection is
+unknown. It neither retains nor validates the oversized JSON record. Nineteen
+synthetic regression tests cover chunk/UTF-8/CRLF boundaries, resource exhaustion,
+stream errors, schema tampering and the private local CLI. This source packet
+does not identify the discarded terminal row or authenticate a publisher source.
+
+**Next: implement and test a separate guarded one-shot Edition-prefix diagnostic
+operator path.** Bind the new request to the consumed conflict result through its
+original accepted recovery, all six fixed predecessor requests and an accepted
+source/dependency/CI receipt. Specify strict bounded range transport, a first-run
+ledger, encrypted result/recovery and private custody readback before activation.
+Keep the original roster, pins, line ceiling and identity rules; select explicit
+operational caps only during separately reviewed preparation. The current local
+CLI and this handoff grant no provider execution or limit increase.
 All **six** requests remain consumed; never rerun, reset or reuse them or the
 completed pilot. No candidates survived the failed collection. Approvals, database
 writes and model admissions remain zero. Complete collection, fresh reconciliation

@@ -1,5 +1,5 @@
-// Private diagnostic evidence only: one rejected selected row, never a candidate
-// or proof of complete source integrity. No source or filesystem access.
+// Private diagnostic evidence only: a rejected selected row or bounded line
+// prefix, never a candidate or full-source proof. No source/filesystem access.
 import { digest, inspectRecord, sha256 } from './open-library-descriptions.mjs';
 
 export const LEGACY_FAILURE_EVIDENCE_CONTRACT = 'open-library-selected-row-failure-evidence-v1';
@@ -33,6 +33,159 @@ function publicRoster(roster) {
     works.add(row.workId); editions.add(row.editionId);
     return { workId: row.workId, editionId: row.editionId };
   }).sort((a, b) => a.workId.localeCompare(b.workId));
+}
+
+export const EDITION_LINE_EVIDENCE_CONTRACT = 'open-library-edition-line-limit-evidence-v1';
+export const EDITION_LINE_DIAGNOSTIC_CONTRACT = 'open-library-edition-line-prefix-diagnostic-v1';
+export const EDITION_LINE_PREFIX_MAX_BYTES = 4096;
+const lineCheck = condition => { if (!condition) throw new Error('invalid-edition-line-diagnostic'); };
+const count = value => Number.isSafeInteger(value) && value >= 0;
+const diagnosticCodes = Object.freeze({
+  diagnosed: ['dump-line-limit'],
+  inconclusive: ['edition-line-prefix-exhausted', 'edition-line-row-limit', 'edition-line-decoded-limit'],
+  failed: ['edition-line-prefix-overflow', 'edition-line-prefix-truncated', 'edition-line-gzip-invalid',
+    'edition-line-stream-failed', 'edition-line-parser-failed', 'edition-line-aborted', 'invalid-dump-encoding',
+    'malformed-dump-target-row', 'duplicate-dump-target-record', 'invalid-dump-target-envelope',
+    'provider-identity-mismatch', 'malformed-provider-json', 'provider-work-link-mismatch'],
+});
+const timeValue = value => Date.parse(/Z$|[+-]\d\d:\d\d$/.test(value) ? value : value + 'Z');
+const same = (a, b) => digest(a) === digest(b);
+export const safeEditionLineParserError = error => diagnosticCodes.failed.includes(error?.message)
+  ? error.message : 'edition-line-parser-failed';
+
+// Schema ceilings are not an operational allowance. Every caller supplies all
+// limits, and the local CLI additionally preserves the consumed request's caps.
+export function validateEditionLineContext({ source, roster, limits, fetchedAt } = {}) {
+  try {
+    const selected = publicRoster(roster), canonical = canonicalDumpSource(source);
+    lineCheck(exactKeys(source, Object.keys(canonical)) && source.compression === 'gzip'
+      && integer(source.bytes, 64 * 1024 ** 3)
+      && (typeof source.sha256 === 'string' && /^[0-9a-f]{64}$/.test(source.sha256)
+        || typeof source.md5 === 'string' && /^[0-9a-f]{32}$/.test(source.md5)
+          && typeof source.sha1 === 'string' && /^[0-9a-f]{40}$/.test(source.sha1))
+      && ['sha256', 'md5', 'sha1'].every(name => source[name] === undefined
+        || typeof source[name] === 'string' && new RegExp(`^[0-9a-f]{${name === 'md5' ? 32 : name === 'sha1' ? 40 : 64}}$`).test(source[name]))
+      && timestamp(fetchedAt));
+    const url = new URL(source.url), match = /\/ol_dump_editions_(\d{4}-\d\d-\d\d)\.txt\.gz$/.exec(url.pathname);
+    lineCheck(match && url.protocol === 'https:' && !url.username && !url.password && !url.port && !url.search && !url.hash
+      && ['archive.org', 'openlibrary.org'].includes(url.hostname));
+    const release = match[1], date = new Date(release);
+    lineCheck(Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === release
+      && timeValue(fetchedAt) >= date.getTime()
+      && url.pathname === (url.hostname === 'archive.org' ? `/download/ol_dump_${release}/` : '/data/')
+        + `ol_dump_editions_${release}.txt.gz`);
+    lineCheck(exactKeys(limits, ['compressedBytes', 'maxDecodedBytes', 'maxRows', 'lineBytes', 'prefixBytes', 'timeoutMs'])
+      && integer(limits.compressedBytes, source.bytes) && integer(limits.maxDecodedBytes, 512 * 1024 ** 3)
+      && integer(limits.maxRows, 200000000) && integer(limits.lineBytes, FAILURE_EVIDENCE_LIMITS.lineBytes)
+      && integer(limits.prefixBytes, Math.min(EDITION_LINE_PREFIX_MAX_BYTES, limits.lineBytes))
+      && integer(limits.timeoutMs, 6600000));
+    return { source: structuredClone(canonical), roster: selected, limits: structuredClone(limits), fetchedAt };
+  } catch { throw new Error('invalid-edition-line-diagnostic'); }
+}
+
+function fourthTab(bytes) {
+  let boundary = -1;
+  for (let index = 0; index < 4; index++) { boundary = bytes.indexOf(9, boundary + 1); if (boundary < 0) return -1; }
+  return boundary;
+}
+
+// Classify only a complete, bounded outer envelope. No JSON, inner key/type,
+// Work linkage, language, rights or record identity is validated by this label.
+function envelopeSelection(bytes, context) {
+  const unknown = reason => ({ status: 'unknown', reason, editionId: null, workId: null });
+  if (fourthTab(bytes) < 0) return unknown('header-prefix-incomplete');
+  let fields;
+  try { fields = new TextDecoder('utf-8', { fatal: true }).decode(bytes).split('\t'); }
+  catch { return unknown('invalid-header-encoding'); }
+  const [type, key, revision, modifiedAt] = fields;
+  if (type !== '/type/edition' || !/^\/books\/OL\d+M$/.test(key) || !/^[1-9]\d*$/.test(revision)
+    || !Number.isSafeInteger(Number(revision)) || !timestamp(modifiedAt) || timeValue(modifiedAt) > timeValue(context.fetchedAt))
+    return unknown('invalid-edition-envelope');
+  const editionId = key.slice('/books/'.length), target = context.roster.find(row => row.editionId === editionId);
+  return { status: target ? 'selected' : 'unrelated', reason: 'canonical-edition-envelope', editionId,
+    workId: target?.workId ?? null };
+}
+
+export function createEditionLineEvidence({ pending, part, row, lineStartByte, context }) {
+  const fixed = validateEditionLineContext(context), maximum = fixed.limits.prefixBytes;
+  lineCheck(Buffer.isBuffer(pending) && Buffer.isBuffer(part)
+    && pending.length <= fixed.limits.lineBytes && pending.length + part.length > fixed.limits.lineBytes
+    && !pending.includes(10) && !part.subarray(0, fixed.limits.lineBytes + 1 - pending.length).includes(10));
+  // Never concatenate an oversized row; retain no bytes after the fourth tab.
+  const head = pending.subarray(0, maximum);
+  let bytes = Buffer.concat([head, part.subarray(0, maximum - head.length)]);
+  const boundary = fourthTab(bytes);
+  if (boundary >= 0) bytes = bytes.subarray(0, boundary + 1);
+  const evidence = { contract: EDITION_LINE_EVIDENCE_CONTRACT, code: 'dump-line-limit', sourceKind: 'editions',
+    source: fixed.source, rosterSha256: digest(fixed.roster), limitsSha256: digest(fixed.limits), fetchedAt: fixed.fetchedAt,
+    row, lineStartByte, observedLineBytesAtLeast: fixed.limits.lineBytes + 1,
+    prefixBase64: bytes.toString('base64'), prefixBytes: bytes.length, prefixSha256: sha256(bytes),
+    envelopeSelection: envelopeSelection(bytes, fixed), validationScope: 'bounded-outer-envelope-only',
+    sizeEvidence: 'scanner-observed-lower-bound', rowComplete: false, rowBytes: null, rowSha256: null };
+  return validateEditionLineEvidence(evidence, fixed);
+}
+
+export function validateEditionLineEvidence(evidence, context) {
+  try {
+    const fixed = validateEditionLineContext(context), limits = fixed.limits;
+    lineCheck(exactKeys(evidence, ['contract', 'code', 'sourceKind', 'source', 'rosterSha256', 'limitsSha256',
+      'fetchedAt', 'row', 'lineStartByte', 'observedLineBytesAtLeast', 'prefixBase64', 'prefixBytes', 'prefixSha256',
+      'envelopeSelection', 'validationScope', 'sizeEvidence', 'rowComplete', 'rowBytes', 'rowSha256'])
+      && evidence.contract === EDITION_LINE_EVIDENCE_CONTRACT && evidence.code === 'dump-line-limit'
+      && evidence.sourceKind === 'editions' && same(evidence.source, fixed.source)
+      && evidence.rosterSha256 === digest(fixed.roster) && evidence.limitsSha256 === digest(limits)
+      && evidence.fetchedAt === fixed.fetchedAt && integer(evidence.row, limits.maxRows)
+      && count(evidence.lineStartByte) && evidence.lineStartByte >= evidence.row - 1
+      && (evidence.row !== 1 || evidence.lineStartByte === 0)
+      && evidence.observedLineBytesAtLeast === limits.lineBytes + 1
+      && evidence.lineStartByte + evidence.observedLineBytesAtLeast <= limits.maxDecodedBytes
+      && evidence.validationScope === 'bounded-outer-envelope-only' && evidence.sizeEvidence === 'scanner-observed-lower-bound'
+      && evidence.rowComplete === false && evidence.rowBytes === null && evidence.rowSha256 === null
+      && integer(evidence.prefixBytes, limits.prefixBytes) && typeof evidence.prefixBase64 === 'string'
+      && evidence.prefixBase64.length === 4 * Math.ceil(evidence.prefixBytes / 3)
+      && /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(evidence.prefixBase64));
+    const bytes = Buffer.from(evidence.prefixBase64, 'base64'), boundary = fourthTab(bytes);
+    lineCheck(bytes.length === evidence.prefixBytes && bytes.toString('base64') === evidence.prefixBase64
+      && sha256(bytes) === evidence.prefixSha256 && !bytes.includes(10)
+      && (boundary < 0 ? bytes.length === limits.prefixBytes : bytes.length === boundary + 1)
+      && same(evidence.envelopeSelection, envelopeSelection(bytes, fixed)));
+    return evidence;
+  } catch { throw new Error('invalid-edition-line-diagnostic'); }
+}
+
+export function validateEditionLineDiagnostic(result, context) {
+  try {
+    const fixed = validateEditionLineContext(context), limits = fixed.limits, stats = result?.stats;
+    lineCheck(exactKeys(result, ['contract', 'sourceKind', 'source', 'rosterSha256', 'limits', 'fetchedAt', 'completedAt',
+      'status', 'code', 'stats', 'prefixComplete', 'prefixSha256', 'failureEvidence', 'fullSourceComplete',
+      'publisherChecksumsVerified', 'validationScope', 'provenanceVerified', 'candidates', 'approved', 'databaseWrites',
+      'modelAdmissions', 'inspectionSourceRequests']) && result.contract === EDITION_LINE_DIAGNOSTIC_CONTRACT
+      && result.sourceKind === 'editions' && same(result.source, fixed.source) && result.rosterSha256 === digest(fixed.roster)
+      && same(result.limits, limits) && result.fetchedAt === fixed.fetchedAt && timestamp(result.completedAt)
+      && timeValue(result.completedAt) >= timeValue(result.fetchedAt)
+      && Object.hasOwn(diagnosticCodes, result.status) && diagnosticCodes[result.status].includes(result.code)
+      && result.fullSourceComplete === false && result.publisherChecksumsVerified === false
+      && result.validationScope === 'payload-consistency-only' && result.provenanceVerified === false
+      && ['candidates', 'approved', 'databaseWrites', 'modelAdmissions', 'inspectionSourceRequests'].every(key => result[key] === 0)
+      && exactKeys(stats, ['bytes', 'decodedBytes', 'rows', 'matchedRecords', 'unrelatedRows', 'malformedUnrelatedRows'])
+      && Object.values(stats).every(count) && stats.bytes <= limits.compressedBytes && stats.decodedBytes <= limits.maxDecodedBytes
+      && stats.rows <= limits.maxRows && stats.rows <= stats.decodedBytes && stats.matchedRecords <= fixed.roster.length
+      && (stats.bytes > 0 || stats.decodedBytes === 0)
+      && stats.malformedUnrelatedRows <= stats.unrelatedRows && stats.rows >= stats.matchedRecords + stats.unrelatedRows
+      && stats.rows <= stats.matchedRecords + stats.unrelatedRows + (result.status === 'failed' ? 1 : 0)
+      && typeof result.prefixComplete === 'boolean' && (!result.prefixComplete || stats.bytes === limits.compressedBytes)
+      && typeof result.prefixSha256 === 'string' && /^[0-9a-f]{64}$/.test(result.prefixSha256)
+      && (stats.bytes !== 0 || result.prefixSha256 === sha256(Buffer.alloc(0))));
+    if (result.status === 'diagnosed') {
+      const evidence = validateEditionLineEvidence(result.failureEvidence, fixed);
+      lineCheck(stats.bytes > 0 && evidence.row === stats.rows + 1
+        && evidence.lineStartByte + evidence.observedLineBytesAtLeast <= stats.decodedBytes);
+    } else lineCheck(result.failureEvidence === null);
+    if (result.code === 'edition-line-row-limit') lineCheck(stats.rows === limits.maxRows);
+    if (result.code === 'edition-line-decoded-limit') lineCheck(stats.decodedBytes === limits.maxDecodedBytes);
+    if (result.code === 'edition-line-prefix-exhausted') lineCheck(result.prefixComplete);
+    return result;
+  } catch { throw new Error('invalid-edition-line-diagnostic'); }
 }
 
 // Frozen v1 receipt semantics: raw size and JSON parsing preceded the original
