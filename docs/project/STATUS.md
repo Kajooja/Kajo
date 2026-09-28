@@ -10,7 +10,24 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 framed result recovered; terminal-conflict diagnosis next
+## Current packet — repository closure audit and #182 diagnostic correction
+
+On September 28 the owner broadened continuation to resolve unfinished repository
+work. The [closure audit](retros/2026-09-28.md) accounts for all **18 open issues
+and draft PR #229**, concrete implementation paths and external acceptance needs.
+It supersedes old deferrals of source defects while preserving dependency order
+and truthful acceptance gates.
+
+The first correction supplies a bounded terminal-conflict collector/replay and
+all-copy key cleanup with process termination and independent verification. The
+[source checkpoint](sprints/SPRINT-014.md#terminal-diagnostic-and-cleanup-correction--2026-09-28--182)
+records tests and limitations. No consumed request, historical row or catalog
+write is replayed. Next complete source/CI acceptance, then fix #160's production
+configuration/password-input defects. Reconcile #229's nine merge conflicts and
+#240 against current main; preserve catalog/credit/cold-history fixes and its
+remaining native/device gates rather than restoring a stale whole STATUS.
+
+### Preserved #182 catalog and operation ledger
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -205,14 +222,13 @@ records the result and a post-command key-cleanup discrepancy: staged copies wer
 removed explicitly and a separate read verified absence; the cause is unresolved.
 All **eight** requests are consumed; never rerun, reset or reuse any of them.
 
-**Next: implement a separate bounded terminal-conflict diagnostic source packet.**
-Use synthetic fixtures to preserve the exact rejected selected-row evidence and
-original predicate/policy reason without relaxing identity, framing, roster or
-whole-pair exclusion rules. Reproduce the cross-command key-cleanup discrepancy
-with synthetic nested processes and retain independent key-absence verification
-as an activation gate. Keep this consumed result and all historical inspectors
-unchanged. Only accepted source plus a separately reviewed concrete operational
-request can authorize a new diagnostic; this result grants no new provider run.
+The separate diagnostic source above preserves the exact selected row and original
+predicate/policy reason without relaxing identity, framing, roster or exclusion.
+Synthetic nested-process and independent-command checks verify key absence; the
+original anomaly's cause remains unproved. All consumed results and original
+inspectors stay fixed. A new actual diagnosis requires an accepted encrypted
+operator, explicit operational request and independent key-absence gate; this
+result grants no new provider run.
 Complete collection, fresh reconciliation and individual language/rights review
 still precede any writer. Approvals, database writes and model admissions remain
 zero; no catalog/MVP/device/release gate closes. Exact acceptance stays in

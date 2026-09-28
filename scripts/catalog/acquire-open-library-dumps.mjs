@@ -4,11 +4,13 @@ import { spawn } from 'node:child_process';
 import { PassThrough } from 'node:stream';
 import { digest, requireValue, sha256 } from './open-library-descriptions.mjs';
 import { LIMITS, SOURCE_CONTRACT, readDumpFailureEvidence, scanDumpConflictStream, scanDumpStream, scanEditionFramedStream } from './open-library-dump-descriptions.mjs';
-import { createDumpConflictLedger } from './dump-conflict-policy.mjs';
+import { createDumpConflictLedger, readDumpConflictFailure } from './dump-conflict-policy.mjs';
+import { createTerminalConflictEvidence, validateTerminalConflictPolicy } from './dump-conflict-policy.mjs';
 
 export const ACQUISITION_CONTRACT = 'open-library-dump-acquisition-v1';
 export const CONFLICT_ACQUISITION_CONTRACT = 'open-library-conflict-aware-dump-acquisition-result-v1';
 export const FRAMED_ACQUISITION_CONTRACT = 'open-library-framed-dump-acquisition-result-v1';
+export const TERMINAL_ACQUISITION_CONTRACT = 'open-library-terminal-conflict-dump-acquisition-result-v1';
 // Canonical public roster from the consumed reviewed request. The production
 // successor keeps those same pairs; the stream-only test seam may use subsets.
 export const CONFLICT_ACQUISITION_ROSTER_SHA256 = '195789b92489cc0b92a03748ff567fbf2bb9b4dc9ec8cf845ab5b6464bf6e601';
@@ -464,6 +466,16 @@ export async function collectFramedDumpStreams({ release, roster, sourcePins, li
   return collectPairDumpStreams({ release, roster, sourcePins, limits, conflictPolicy, signal, openSource }, true);
 }
 
+// Explicit successor seam; no network default, executable request or old-result
+// upgrade. The terminal row shares cumulative retention and has its own cap.
+export async function collectTerminalConflictDumpStreams({ release, roster, sourcePins, limits, conflictPolicy,
+  terminalDiagnosticPolicy, signal, openSource } = {}) {
+  validateTerminalConflictPolicy(terminalDiagnosticPolicy, limits);
+  const result = await collectPairDumpStreams({ release, roster, sourcePins, limits, conflictPolicy, signal, openSource }, true,
+    structuredClone(terminalDiagnosticPolicy));
+  return { contract: TERMINAL_ACQUISITION_CONTRACT, ...result };
+}
+
 // An injected opener may ignore AbortSignal. Bound that await as well as the
 // streams, close a late body, and never retain its late response in accounting.
 function openUntilAbort(open, signal) {
@@ -482,7 +494,8 @@ function openUntilAbort(open, signal) {
   });
 }
 
-async function collectPairDumpStreams({ release, roster, sourcePins, limits, conflictPolicy, signal, openSource }, editionFraming) {
+async function collectPairDumpStreams({ release, roster, sourcePins, limits, conflictPolicy, signal, openSource }, editionFraming,
+  terminalDiagnosticPolicy) {
   const inputCode = editionFraming ? 'invalid-framed-acquisition-input' : 'invalid-conflict-acquisition-input';
   requireValue(release === ACQUISITION_RELEASE && typeof openSource === 'function'
     && exactKeys(sourcePins, ['works', 'editions']) && exactKeys(limits, Object.keys(REVIEWED_ACQUISITION_LIMITS))
@@ -514,7 +527,8 @@ async function collectPairDumpStreams({ release, roster, sourcePins, limits, con
     accounting.cumulativeStagedBytes = budget.bytes;
     accounting.diagnosticBytes = quarantine.diagnosticBytes;
     return { release, retrievedAt, rosterSha256: digest(selected), limits: fixedLimits,
-      conflictPolicy: quarantine.policy, policySha256: quarantine.policySha256, quarantine, accounting };
+      conflictPolicy: quarantine.policy, policySha256: quarantine.policySha256, quarantine, accounting,
+      ...(terminalDiagnosticPolicy ? { terminalDiagnosticPolicy } : {}) };
   };
   try {
     const guardedOpen = async (kind, source, options, onRequest) => {
@@ -564,11 +578,23 @@ async function collectPairDumpStreams({ release, roster, sourcePins, limits, con
       sourceManifest: sourceManifest(release, retrievedAt, result.sources) };
   } catch (error) {
     accounting.failedAt = new Date().toISOString();
-    // Terminal failures receive no additional raw-row allocation. Only already
-    // accepted ledger entries survive; valid and suppressed candidates do not.
+    let terminalFailureEvidence = null;
+    let code = combined.aborted ? 'acquisition-aborted'
+      : (editionFraming ? safeFramedAcquisitionError : safeConflictAcquisitionError)(error);
+    const failure = terminalDiagnosticPolicy && code === 'dump-conflict-fatal' ? readDumpConflictFailure(error) : undefined;
+    if (failure) {
+      if (failure.evidence.rawBytes > terminalDiagnosticPolicy.maxBytes) code = 'dump-terminal-diagnostic-limit';
+      else {
+        requireValue(budget.bytes + failure.evidence.rawBytes <= fixedLimits.retainedBytes, 'dump-staging-limit');
+        terminalFailureEvidence = createTerminalConflictEvidence(failure, { roster: selected,
+          source: pinned[accounting.activeSource], limits: fixedLimits, conflictPolicy: ledger.snapshot().policy, terminalDiagnosticPolicy });
+        budget.bytes += failure.evidence.rawBytes;
+      }
+    }
+    // Historical result contracts still retain no terminal row. Failed results
+    // never return valid/suppressed candidates, even if Work completed earlier.
     return { ...finish(), status: 'failed', completedAt: accounting.failedAt,
-      code: combined.aborted ? 'acquisition-aborted'
-        : (editionFraming ? safeFramedAcquisitionError : safeConflictAcquisitionError)(error), terminalFailureEvidence: null };
+      code, terminalFailureEvidence };
   } finally { clearTimeout(timer); controller.abort(); }
 }
 

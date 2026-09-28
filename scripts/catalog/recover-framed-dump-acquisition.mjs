@@ -3,7 +3,7 @@
 // inspectors execute only at their original accepted heads and rule versions.
 import { createHash } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
-import { unlink, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -13,6 +13,7 @@ import { CONFLICT_ACQUISITION_SOURCE_FILES, ORIGINAL_SNAPSHOT_SHA256, collectCat
   claimConflictPrivateOutput, readConflictPrivateBytes } from './recover-conflict-dump-acquisition.mjs';
 import { EDITION_SOURCE_FILES, EDITION_SOURCE_CONTRACT, EDITION_PREDECESSOR_INPUTS } from './recover-edition-prefix-diagnostic.mjs';
 import { FULL_CONTINUATION_SOURCE_FILES } from './inspect-full-dump-continuation.mjs';
+import { cleanHistoricalKeys, waitForHistoricalGroupExit } from './historical-recovery-cleanup.mjs';
 
 const SELF = 'scripts/catalog/recover-framed-dump-acquisition.mjs';
 const EDITION_INSPECTOR = 'scripts/catalog/recover-edition-prefix-diagnostic.mjs';
@@ -38,6 +39,7 @@ export const FRAMED_RUNTIME_CONTRACT = 'kajo-framed-acquisition-runtime-receipt-
 export const FRAMED_CUSTODY_CONTRACT = 'kajo-framed-acquisition-predecessor-custody-v1';
 export const FRAMED_SOURCE_FILES = Object.freeze([...new Set([...EDITION_SOURCE_FILES, ...FULL_CONTINUATION_SOURCE_FILES,
   SELF, 'scripts/catalog/prepare-framed-dump-acquisition.mjs', 'scripts/catalog/run-framed-dump-acquisition.mjs',
+  'scripts/catalog/historical-recovery-cleanup.mjs',
   'scripts/catalog/seal-framed-dump-acquisition.mjs', '.github/workflows/catalog-book-framed-acquisition.yml'])]);
 // The Edition result adds five inputs to the original conflict recovery's fifteen
 // and its two custody inputs. The same recipient key is bound through all levels.
@@ -136,7 +138,13 @@ function historicalChild(repo, args, timeoutMs) {
     const fail = () => reject(new Error('framed-predecessor-authentication-failed'));
     child.once('error', () => { clearTimeout(timer); killGroup(); fail(); });
     child.once('exit', killGroup);
-    child.once('close', code => { clearTimeout(timer); if (code !== 0 || timedOut) fail(); else resolveChild(); });
+    child.once('close', async code => {
+      clearTimeout(timer);
+      try {
+        if (child.pid) await waitForHistoricalGroupExit(child.pid);
+        if (code !== 0 || timedOut) fail(); else resolveChild();
+      } catch { fail(); }
+    });
   });
 }
 
@@ -156,9 +164,7 @@ export async function stageFramedHistoricalRecovery({ editionRepo, conflictRepo,
     await historicalChild(editionRepo, args, timeoutMs);
     return childOut;
   } finally {
-    for (const path of [join(staged, 'recipient-key'), join(childOut, 'predecessor-inputs/recipient-key'),
-      join(childOut, 'conflict-recovery/predecessor-inputs/recipient-key')])
-      await unlink(path).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    await cleanHistoricalKeys(out);
   }
 }
 

@@ -16,7 +16,7 @@ import { CONFLICT_ACQUISITION_REQUIRED_JOBS, verifyCatalogArtifactZip, collectCa
 import { FRAMED_SOURCE_FILES, FRAMED_SOURCE_CONTRACT, FRAMED_RUNTIME_CONTRACT, FRAMED_CUSTODY_CONTRACT,
   FRAMED_PREDECESSOR_INPUTS, collectFramedAcquisitionCodeBinding, validateFramedAcquisitionSourceReceipt, validateFramedAcquisitionReceipts,
   verifyFramedPredecessorCustody, readFramedPredecessorInputs, validateFramedPredecessorResult,
-  authenticateFramedPredecessor, verifyFramedHistoricalSource, stageFramedHistoricalRecovery,
+  authenticateFramedPredecessor, verifyFramedHistoricalSource,
   FRAMED_HISTORICAL_SOURCES } from './recover-framed-dump-acquisition.mjs';
 import { EDITION_PREDECESSOR_INPUTS, EDITION_SOURCE_FILES, EDITION_SOURCE_CONTRACT } from './recover-edition-prefix-diagnostic.mjs';
 import { predecessors as olderPredecessors, sourceHead, requestHead } from './fixtures/edition-prefix-fixture.mjs';
@@ -427,10 +427,16 @@ ${mode === 'timeout' ? 'setInterval(()=>{},1000);' : `process.exit(${mode === 's
   await writeFile(join(editionRepo, 'scripts/catalog/recover-edition-prefix-diagnostic.mjs'), fakeInspector);
   const input = Object.fromEntries(FRAMED_PREDECESSOR_INPUTS.map(name => [name, Buffer.from('synthetic-' + name)]));
   assert.equal(FRAMED_PREDECESSOR_INPUTS.length, 22); assert.equal(new Set(FRAMED_PREDECESSOR_INPUTS).size, 22);
-  const operation = stageFramedHistoricalRecovery({ editionRepo, conflictRepo: root, continuationRepo: root, input, out,
-    timeoutMs: mode === 'timeout' ? 2000 : 10000 });
-  if (mode === 'success') assert.equal(await operation, join(out, 'edition-recovery'));
-  else await assert.rejects(operation, error => error.message === 'framed-predecessor-authentication-failed');
+  // The entire recovery exits before this independent parent inspects disk.
+  const operation = spawnSync(process.execPath, ['--input-type=module', '--eval', `
+import { stageFramedHistoricalRecovery } from ${JSON.stringify(new URL('./recover-framed-dump-acquisition.mjs', import.meta.url).href)};
+const input = Object.fromEntries(${JSON.stringify(FRAMED_PREDECESSOR_INPUTS)}.map(name => [name, Buffer.from('synthetic-' + name)]));
+try { await stageFramedHistoricalRecovery({ editionRepo: ${JSON.stringify(editionRepo)}, conflictRepo: ${JSON.stringify(root)},
+  continuationRepo: ${JSON.stringify(root)}, input, out: ${JSON.stringify(out)}, timeoutMs: ${mode === 'timeout' ? 2000 : 10000} }); }
+catch (error) { if (error.message !== 'framed-predecessor-authentication-failed') process.exit(2); process.exit(1); }
+`], { encoding: 'utf8', timeout: 20000 });
+  assert.equal(operation.status, mode === 'success' ? 0 : 1, operation.stderr);
+  assert.equal(operation.stdout, ''); assert.equal(operation.stderr, '');
   assert.equal(await readFile(join(out, 'edition-recovery/ready'), 'utf8'), 'yes');
   for (const name of ['predecessor-inputs/recipient-key', 'edition-recovery/predecessor-inputs/recipient-key',
     'edition-recovery/conflict-recovery/predecessor-inputs/recipient-key', 'request.json', 'predecessor-proof.json'])
