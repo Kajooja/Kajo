@@ -14,6 +14,84 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Edition-prefix result and framing handoff — 2026-09-28 / #182
+
+`docs/182-edition-prefix-result` records the actual diagnosis after
+[PR #288](https://github.com/Kajooja/Kajo/pull/288) accepted the guarded operator
+on main `3d12a7f69534fef305b7ca37767626ae584b688e`, reviewed head
+`707205d66885f110340eaa7eaebb52868b314060`, tree
+`ac280ab67f56a3aaf55c55c51dba4c005d7aebb8`. All five
+[CI #567 gates](https://github.com/Kajooja/Kajo/actions/runs/36401690949)
+passed, with 786 tests and four exports. The owner explicitly approved source
+merge, then the prepared public request and one bounded diagnosis. The historical
+source and failure checkpoints below remain unchanged.
+
+Actual preparation verified the accepted code/workflow/package/lock closure and
+installed dependency bytes, all six fixed public predecessor requests, fifteen
+private custody inputs and the consumed conflict result through its original
+accepted recovery process. Its original continuation checkout remained fixed.
+Temporary staged key copies were removed. The separate recovery package retained
+the unchanged canonical key, original inputs, source/CI receipts and request;
+its exact archive/member readback preceded activation. When public publication
+changed the local request commit identity, the source/Git receipts and recovery
+package were updated and read back again before creating the request branch.
+
+The sole-file request is
+`scripts/catalog/requests/ol-20260831-edition-prefix.json` on
+`catalog-diagnostic/ol-20260831-edition-prefix`, head
+`be0ec18cdc968b5643e45c57c5ab9919f885e195`, tree
+`04aa72b5134bf1fa7db9a155ecabe123c7d1e5ee`, request SHA-256
+`d70b1ca97038a55718dfa9bd238a694237bff12400345fbcfc0b00f92e1a09c6`.
+Its sole parent is the accepted operator main. The retained fields were checked
+against the already-public consumed conflict request. No private key or new
+row/archive commitment was published.
+
+Explicit caps were **512 MiB compressed / 3 GiB decoded / 2,000,000 rows /
+10 minutes**, preserving the **1,049,600-byte line ceiling** and a **4 KiB maximum
+outer-header prefix**. At most four redirects/five Edition HTTP requests share
+the cumulative byte budget; Work, metadata and individual-record calls are zero.
+The distinct branch was absent and its ledger empty before activation.
+[Run 36435310394](https://github.com/Kajooja/Kajo/actions/runs/36435310394)
+completed successfully, attempt 1, including the single ciphertext upload.
+
+Private recovery checked ZIP member/CRC/digest, authenticated unseal, Git/source/
+dependency/CI and runtime chronology, and original-source predecessor recovery.
+The outcome is **`diagnosed` / `dump-line-limit`**. Its complete canonical outer
+Edition envelope classifies the newly observed oversized row as **outside the
+original roster**. This is a bounded header classification: inner JSON,
+key/type/location consistency, Work linkage, full row bytes and exact size remain
+unchecked. The scanner observes a line-size lower bound; the small header alone
+cannot establish full-row size. The partial prefix verifies neither a complete
+dump nor publisher checksums. It cannot identify the earlier discarded terminal
+row, even if positions agree. Receipt provenance is operator-captured; encryption
+alone does not authenticate the sender.
+
+The complete private ciphertext, receipts, original recovery inputs and recovered
+result are preserved, with an independent exact archive/member readback. No raw
+header, private row identifier, private artifact/archive commitment or runtime
+counter is recorded here. Candidates, approvals, database writes and model
+admissions remain zero. No fresh catalog reconciliation or device/release
+acceptance was performed. **All seven requests are consumed permanently.**
+No retry, rerun, reset, new allowance or automatic limit expansion followed.
+
+**Next:** implement and test a bounded local Edition framing correction that can
+stream-discard an oversized unrelated row only after a complete canonical outer
+header proves its key is outside the entire original roster. Keep selected and
+unknown headers as failures, preserve selected-record identity guards and all
+global compressed/decoded/row/time limits, include discarded bytes in checksum
+accounting and preserve historical replay. Synthetic tests must prove recovery
+at the next row boundary, bounded memory and correct truncation/error/abort
+behavior. This is an offline source packet; any later full-collection request
+requires separate source/CI, predecessor/custody and operational acceptance.
+Complete-source verification, fresh reconciliation and individual rights review
+still precede a writer. STATUS owns this single next packet.
+
+Files changed by this result checkpoint: STATUS, ROADMAP and this sprint record.
+No application, acquisition, parser, dependency or workflow code changes here.
+Source tests remain those of the accepted operator; this documentation PR must
+pass all five required CI gates before merge. Exact checkpoint acceptance is in
+Issue #182.
+
 ## Guarded Edition-prefix operator — 2026-09-28 / #182
 
 `feat/182-edition-operator` continues the local diagnostic accepted through
