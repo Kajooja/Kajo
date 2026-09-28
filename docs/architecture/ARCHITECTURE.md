@@ -1550,6 +1550,44 @@ record the unchanged operational limits, and save/read back a new recovery archi
 before activation. A completed collection still needs fresh catalog reconciliation
 and individual rights review before a separately bounded writer operation.
 
+### Terminal-conflict diagnostic core and recovery cleanup — #182
+
+`collectTerminalConflictDumpStreams` is an explicit transport-injected successor.
+`open-library-terminal-conflict-diagnostic-policy-v1` permits one record with a
+positive `maxBytes` no larger than existing line/cumulative retention ceilings.
+It supplies no default network transport, executable request, workflow or new
+encryption contract. Historical entrypoints ignore the extra policy and retain
+their old schemas/null terminal evidence. All eight consumed operations stay fixed.
+
+The ledger brands its fatal exception with the validated selected row and exact
+assessment. Only the new collector retains it under
+`open-library-terminal-conflict-dump-acquisition-result-v1`, charging raw bytes once
+to cumulative retention. Accepted quarantine keeps its separate 8-pair/8-MiB bound.
+Exceeding the terminal cap returns `dump-terminal-diagnostic-limit` without a row.
+Original predicate, source, roster, row, LF/CR bytes, hash and policy reason are
+replayed under a closed evidence schema. A transport error cannot impersonate
+parser evidence. Exclusion rules stay unchanged; failure returns no candidates.
+
+`inspect-terminal-conflict-dump.mjs` validates the allocation, original policy,
+source/row/time order, decoded minimum and Edition buffer accounting, then reuses
+unchanged framed source/record/quarantine checks. It cannot authenticate a publisher
+or prove absent full-source bytes. Results remain payload-consistency-only and
+unapproved. Tests cover fatal reasons, prior quarantine, source order, caps,
+tampering, malformed/transport/timeout/checksum failures and historical isolation.
+
+`historical-recovery-cleanup.mjs` attempts all three temporary keys even if one
+removal fails, flushes directory metadata, checks leaf absence including dangling
+symlinks and verifies it in a fresh process. After SIGKILL, recovery waits for all
+live group members before cleanup. Linux checks translate PID namespaces when
+`/proc` belongs to an outer namespace; direct host-PGID comparison can falsely
+report absence. Zombies cannot execute. Unverified termination/cleanup prevents
+successful preparation/recovery. Original historical sources are not modified.
+
+The actual September 28 key reappearance was not reproduced synthetically. These
+are demonstrated cleanup/verification fixes, not a proved explanation of that
+observation. Independent post-command absence remains mandatory before archiving
+or activation. Tests require no historical private key or provider stream.
+
 ### Description attribution — contract, #182
 
 `@kajo/catalog-contracts` defines the generic `DescriptionAttribution` value.

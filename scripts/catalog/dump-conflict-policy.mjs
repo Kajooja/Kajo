@@ -1,6 +1,6 @@
 // Explicit offline exclusion only. A rejected record never becomes a candidate,
 // and its foreign location is never followed or substituted into the roster.
-import { FAILURE_EVIDENCE_CONTRACT, validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
+import { FAILURE_EVIDENCE_CONTRACT, FAILURE_EVIDENCE_LIMITS, validateDumpFailureEvidence } from './dump-failure-evidence.mjs';
 import { digest, inspectRecord, requireValue } from './open-library-descriptions.mjs';
 
 export const CONFLICT_POLICY_CONTRACT = 'open-library-selected-record-conflict-policy-v1';
@@ -10,6 +10,13 @@ const exactKeys = (value, keys) => object(value) && Object.keys(value).sort().jo
 const positiveInteger = (value, maximum) => Number.isSafeInteger(value) && value > 0 && value <= maximum;
 const brandedLedgers = new WeakSet();
 const ledgerRosters = new WeakMap();
+const terminalFailures = new WeakMap();
+// Error identity, not a provider-supplied message/property, establishes origin.
+// Historical collectors still discard this ephemeral evidence in their v1 result.
+export const readDumpConflictFailure = error => {
+  const failure = terminalFailures.get(error);
+  return failure ? structuredClone(failure) : undefined;
+};
 
 function canonicalRoster(selected) {
   requireValue(Array.isArray(selected) && positiveInteger(selected.length, 385), 'invalid-dump-conflict-roster');
@@ -89,7 +96,11 @@ export function createDumpConflictLedger({ policy, selected }) {
   const ledger = Object.freeze({
     record(evidence, { source, limits } = {}) {
       const assessment = assessDumpConflict(evidence, { roster, source, limits });
-      requireValue(assessment.decision === 'quarantine-pair', 'dump-conflict-fatal');
+      if (assessment.decision !== 'quarantine-pair') {
+        const error = new Error('dump-conflict-fatal');
+        terminalFailures.set(error, { assessment, evidence });
+        throw error;
+      }
       const identity = assessment.sourceKind + ':' + (assessment.sourceKind === 'works' ? assessment.workId : assessment.editionId);
       requireValue(!seen.has(identity), 'duplicate-selected-dump-record');
       requireValue(quarantined.has(assessment.workId) || quarantined.size < fixedPolicy.maxConflictedPairs,
@@ -114,4 +125,45 @@ export function validateDumpConflictLedger(ledger, selected) {
   requireValue(brandedLedgers.has(ledger) && ledgerRosters.get(ledger) === digest(canonicalRoster(selected)),
     'invalid-dump-conflict-ledger');
   return ledger;
+}
+
+// Separately bounded terminal diagnostics; no change to historical result schemas.
+export const TERMINAL_CONFLICT_POLICY = 'open-library-terminal-conflict-diagnostic-policy-v1';
+export const TERMINAL_CONFLICT_EVIDENCE = 'open-library-terminal-conflict-diagnostic-evidence-v1';
+const exact = (value, keys) => value !== null && typeof value === 'object' && !Array.isArray(value)
+  && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
+const check = value => { if (!value) throw new Error('invalid-terminal-conflict-diagnostic'); };
+
+export function validateTerminalConflictPolicy(policy, limits) {
+  check(exact(policy, ['contract', 'records', 'maxBytes']) && policy.contract === TERMINAL_CONFLICT_POLICY
+    && policy.records === 1 && Number.isSafeInteger(policy.maxBytes) && policy.maxBytes > 0
+    && policy.maxBytes <= Math.min(FAILURE_EVIDENCE_LIMITS.lineBytes, limits.lineBytes, limits.retainedBytes));
+  return policy;
+}
+
+export function createTerminalConflictEvidence(failure, context) {
+  const value = { contract: TERMINAL_CONFLICT_EVIDENCE, code: 'dump-conflict-fatal',
+    policySha256: digest(context.conflictPolicy), diagnosticPolicySha256: digest(context.terminalDiagnosticPolicy),
+    assessment: structuredClone(failure.assessment), evidence: structuredClone(failure.evidence),
+    validationScope: 'selected-row-policy-replay-only', provenanceVerified: false,
+    fullSourceComplete: false, candidates: 0, approved: 0, databaseWrites: 0, modelAdmissions: 0 };
+  return validateTerminalConflictEvidence(value, context);
+}
+
+export function validateTerminalConflictEvidence(value, context) {
+  try {
+    const { roster, source, limits, conflictPolicy, terminalDiagnosticPolicy } = context;
+    validateTerminalConflictPolicy(terminalDiagnosticPolicy, limits);
+    validateDumpConflictPolicy(conflictPolicy, roster);
+    check(exact(value, ['contract', 'code', 'policySha256', 'diagnosticPolicySha256', 'assessment', 'evidence',
+      'validationScope', 'provenanceVerified', 'fullSourceComplete', 'candidates', 'approved', 'databaseWrites', 'modelAdmissions'])
+      && value.contract === TERMINAL_CONFLICT_EVIDENCE && value.code === 'dump-conflict-fatal'
+      && value.policySha256 === digest(conflictPolicy) && value.diagnosticPolicySha256 === digest(terminalDiagnosticPolicy)
+      && value.validationScope === 'selected-row-policy-replay-only' && value.provenanceVerified === false
+      && value.fullSourceComplete === false && ['candidates', 'approved', 'databaseWrites', 'modelAdmissions'].every(key => value[key] === 0)
+      && value.evidence.rawBytes <= terminalDiagnosticPolicy.maxBytes);
+    const replay = assessDumpConflict(value.evidence, { roster, source, limits: { lineBytes: limits.lineBytes, maxRows: limits.maxRows } });
+    check(replay.decision === 'fatal' && digest(replay) === digest(value.assessment));
+    return value;
+  } catch { throw new Error('invalid-terminal-conflict-diagnostic'); }
 }

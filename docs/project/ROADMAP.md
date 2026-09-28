@@ -89,9 +89,12 @@ operator now supplies original-source predecessor checks, one-shot controls and
 source/dependency/CI/custody gates. Original-source preparation and exact durable
 readback now precede one activated framed full-collection run, attempt one. All
 eight requests are consumed. Its failed Edition result is privately recovered,
-freshly reconciled and preserved. Next build bounded terminal-conflict evidence
-with synthetic fixtures and resolve the post-command key-cleanup observation;
-STATUS owns that exact source packet and its later operational gates.
+freshly reconciled and preserved. A separate diagnostic core now preserves bounded
+terminal evidence and replays the original predicate/policy on synthetic fixtures.
+Recovery checks process termination/PID namespaces and all key copies in a fresh
+process; independent post-command absence remains mandatory. The owner's closure
+audit also selects existing source defects for correction. STATUS owns exact
+source acceptance, continuation and later operational gates.
 Source acceptance grants no provider allowance. The discarded historical
 terminal row's identity and selection status remain unknown; the new prefix does
 not validate the oversized JSON or full source.
@@ -259,8 +262,9 @@ eighth request is consumed; no retry, reset, reuse or limit expansion is allowed
 Its failed Edition result is privately recovered as dump-conflict-fatal; the
 terminal row/predicate/policy reason were not retained. Fresh reconciliation
 found no original-target changes and exact private archive readback passed.
-Next implement a separate bounded terminal-conflict diagnostic with synthetic
-fixtures and cross-command key-cleanup verification. This grants no provider run.
+A separate bounded terminal-conflict diagnostic core and strengthened key cleanup
+now have synthetic source tests. This grants no provider run; STATUS owns the
+closure audit's next correction and the later encrypted operational boundary.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated

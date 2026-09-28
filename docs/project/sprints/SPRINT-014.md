@@ -14,6 +14,33 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Terminal diagnostic and cleanup correction — 2026-09-28 / #182
+
+The owner broadens continuation to unfinished repository work. The
+[closure audit](../retros/2026-09-28.md) enumerates 18 open issues and draft #229,
+concrete fixes and external acceptance dependencies. Main is the starting truth;
+the older native branch has nine source/document/runner merge conflicts.
+
+This packet fixes terminal evidence loss with a separate collector/result schema:
+one bounded selected row, original identity predicate and fatal policy reason,
+cumulative retention charging and pure replay. Failed results keep no candidates;
+old entrypoints/schemas remain unchanged. No provider I/O or real diagnosis occurs.
+
+Cleanup attempts all three copies despite individual errors, flushes directory
+metadata, checks absence in a fresh process and waits for live descendants after
+SIGKILL. A reproduced PID-namespace mismatch makes direct /proc group comparison
+unsafe; the new check translates namespaces and tests a live group. Recovery
+success/failure/timeout run in a separate process before inspection. A distinct
+command also verified all three synthetic key paths absent. Actual earlier key
+reappearance was not reproduced; its cause is not claimed proved. Independent
+post-command absence remains mandatory before any operational continuation.
+
+Focused 26 cleanup/operator and 28 collector/replay tests passed. Root check passed
+lint/typechecks/mobile/catalog, then waited on unavailable npm registry access
+for Deno dependencies; it was stopped rather than misreported as success. Remaining
+local suites/exports and all five remote CI gates must pass before merge. All
+historical private evidence and eight consumed request branches remain unchanged.
+
 ## Framed full-collection operation — 2026-09-28 / #182
 
 The owner continued the named operational packet after accepted
