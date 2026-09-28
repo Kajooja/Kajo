@@ -2,6 +2,7 @@ import 'react-native-url-polyfill/auto';
 import 'expo-sqlite/localStorage/install';
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 
 import { readSupabaseEnvironment } from './supabaseConfig';
 import {
@@ -10,7 +11,7 @@ import {
 } from './supabaseConnection';
 
 export const supabaseConnection: SupabaseConnection<SupabaseClient> =
-  createSupabaseConnection(readSupabaseEnvironment(), ({ url, publishableKey }) =>
+  createSupabaseConnection(readSupabaseEnvironment(Constants.expoConfig?.extra?.kajoBuildMode), ({ url, publishableKey }) =>
     createClient(url, publishableKey, {
       auth: {
         storage: localStorage,

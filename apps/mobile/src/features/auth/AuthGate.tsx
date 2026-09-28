@@ -102,7 +102,7 @@ export function AuthGate({ children }: PropsWithChildren) {
     return (
       <AuthStatusScreen
         title="Yhteysasetukset ovat virheelliset"
-        message="Tarkista EXPO_PUBLIC_SUPABASE_URL ja EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
+        message="Tämän sovellusversion palveluasetukset ovat virheelliset. Päivitä sovellus tai ota yhteyttä tukeen."
       />
     );
   }

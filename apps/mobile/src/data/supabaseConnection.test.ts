@@ -11,7 +11,14 @@ describe('createSupabaseConnection', () => {
         { url: undefined, publishableKey: undefined },
         createClient,
       ),
-    ).toEqual({ status: 'unconfigured' });
+    ).toMatchObject({ status: 'invalid', code: 'MISSING_URL' });
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it('keeps the deliberately selected demo offline without creating a client', () => {
+    const createClient = vi.fn();
+    expect(createSupabaseConnection({ url: undefined, publishableKey: undefined, allowDemo: true }, createClient))
+      .toEqual({ status: 'unconfigured' });
     expect(createClient).not.toHaveBeenCalled();
   });
 
