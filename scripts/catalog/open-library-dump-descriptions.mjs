@@ -311,7 +311,9 @@ export async function scanEditionFramedStream(input, source, selected, fetchedAt
   if (conflictLedger !== undefined) validateDumpConflictLedger(conflictLedger, selected);
   const fixedSource = structuredClone(source), fixedRoster = structuredClone(selected);
   const controller = new AbortController(), combined = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
-  const timer = setTimeout(() => controller.abort(), timeoutMs); timer.unref?.();
+  // A supplied Readable need not own a socket/file handle. Keep its deadline
+  // alive until the pending scan settles, including a completely stalled input.
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await scanDumpStreamInternal(input, fixedSource, 'editions', fixedRoster, fetchedAt, budget,
       { signal: combined, lineBytes, retainedBytes, conflictLedger, keyOf, observeProgress, editionFraming });

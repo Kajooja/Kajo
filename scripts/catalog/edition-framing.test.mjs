@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { Readable } from 'node:stream';
@@ -209,6 +210,22 @@ test('transport error, premature close, caller abort and timeout destroy the str
     assert.equal(input.destroyed, true); assert.equal(progress.complete, false);
     if (failure !== 'timeout') assert.ok(progress.oversizedUnrelatedBytes > 0);
   }
+});
+
+test('standalone stalled stream stays alive until its deadline and releases the timer after rejection', () => {
+  const moduleUrl = new URL('./open-library-dump-descriptions.mjs', import.meta.url).href;
+  const script = `import assert from 'node:assert/strict';
+    import { Readable } from 'node:stream';
+    import { scanEditionFramedStream } from ${JSON.stringify(moduleUrl)};
+    const input = new Readable({ read() {} });
+    await assert.rejects(scanEditionFramedStream(input, ${JSON.stringify(fixture('').source)},
+      ${JSON.stringify(roster)}, ${JSON.stringify(fetchedAt)}, { bytes: 0 },
+      ${JSON.stringify({ ...options, timeoutMs: 25 })}), { name: 'AbortError' });
+    assert.equal(input.destroyed, true);
+    process.stdout.write('deadline-observed');`;
+  const result = spawnSync(process.execPath, ['--input-type=module', '--eval', script], { encoding: 'utf8', timeout: 5000 });
+  assert.equal(result.error, undefined); assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, 'deadline-observed');
 });
 
 test('explicit validated limits and unique roster are required before any stream read', async () => {

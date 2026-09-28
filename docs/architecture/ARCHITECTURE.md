@@ -1370,7 +1370,9 @@ defaults. Existing schema ceilings apply, including the unchanged maximum
 1,049,600-byte line limit. Validate/copy source and roster before reading. An
 optional branded conflict ledger must bind that same roster; quarantined pairs
 are never removed from header selection. Caller cancellation and the bounded
-scanner timer share the stream's abort boundary; a future collector must also
+scanner timer share the stream's abort boundary. The timer keeps a stalled scan
+alive even without another I/O handle and is cleared when the scan settles. A
+separate-process regression verifies this liveness boundary. A future collector must also
 preserve its global two-source deadline and cumulative budgets.
 
 At overflow only, inspect at most `min(4096, lineBytes)` bytes from the line start,

@@ -143,7 +143,7 @@ complete canonical outer header within 4 KiB proving a key outside the entire
 original roster permits an oversized row to be discarded through its terminating
 LF. Selected/unknown rows still fail, including quarantined pairs. The line
 ceiling, selected identity guards, full compressed-byte checksums and all resource
-limits remain. Nineteen synthetic regressions cover chunk boundaries, a streamed
+limits remain. Twenty synthetic regressions cover chunk boundaries, a streamed
 32 MiB row, exact accounting, integrity failures, abort/timeout and old-entrypoint
 isolation. Historical scanners and recovery contracts retain their original rules.
 The [source checkpoint](sprints/SPRINT-014.md#bounded-edition-framing-core--2026-09-28--182)

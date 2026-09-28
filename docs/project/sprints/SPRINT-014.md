@@ -41,17 +41,23 @@ roster. Abort/timeout/errors destroy the pipeline without returning records.
 Historical strict/conflict scans and both prefix diagnoses cannot opt in through
 extra options; their schemas and replay rules are unchanged.
 
-Nineteen new synthetic tests passed locally, covering split headers, overflow,
+Twenty new synthetic tests passed locally, covering split headers, overflow,
 CRLF, consecutive skips, the 4 KiB proof boundary, selected/quarantined/unknown
 failures, preserved identity guards, full checksums/resource caps and failure
 cleanup. A streamed 32 MiB row checks allocation bounds independently of the
-reported logical buffer peak. The focused old/new scanner suite passed 72 tests.
+reported logical buffer peak. The focused old/new scanner suite passed 73 tests.
 Local root validation passed lint/typechecks (one unchanged Discovery hook warning)
 and the first 630 tests, then remained blocked at Edge npm dependency retrieval.
 The remaining groups passed 147 tests separately: **777 local tests total**.
 Both main-app iOS/Android exports completed; companion export completion is not
 claimed from the local logs. Full root validation/four exports and all five
 required CI gates must pass before merge; exact acceptance is recorded in #182.
+Initial CI #571 exposed a liveness defect: an unreferenced deadline allowed Node
+to exit with the scan promise pending when a supplied stream had no active I/O
+handle. The new scanner now retains its timer until completion/failure and clears
+it in `finally`. A separate-process stalled-stream test verifies actual timeout,
+destruction and normal process exit. The corrected catalog suite passed 380
+tests locally, taking the non-Edge total to **778**. Historical timers are unchanged.
 All 100 local Markdown targets resolve, whitespace checks pass and the historical
 sprint tail is unchanged. No provider, database, model or device operation was
 performed. All seven previous requests remain consumed permanently.
