@@ -71,6 +71,17 @@ export async function collectConflictAcquisitionCodeBinding(repo, sourceHead) {
 // Shared by the distinct Edition operator. Each entrypoint supplies its fixed
 // closure; historical conflict callers retain the exact default manifest.
 export async function collectCatalogCodeBinding(repo, sourceHead, { sourceFiles, executingFile, executingUrl, dynamicImports }) {
+  check(typeof executingFile === 'string' && executingFile.length > 0 && executingUrl, 'executing-inspector-source-mismatch');
+  return collectCatalogBinding(repo, sourceHead, { sourceFiles, dynamicImports, executingFile, executingUrl });
+}
+
+// Read-only historical preflight. It executes no inspector/parser; the caller
+// must bind this manifest/head to an accepted source receipt before child launch.
+export async function collectHistoricalCatalogCodeBinding(repo, sourceHead, { sourceFiles, dynamicImports }) {
+  return collectCatalogBinding(repo, sourceHead, { sourceFiles, dynamicImports });
+}
+
+async function collectCatalogBinding(repo, sourceHead, { sourceFiles, dynamicImports, executingFile, executingUrl }) {
   repo = resolve(repo);
   check(gitHash(sourceHead) && git(repo, ['rev-parse', 'HEAD']).trim() === sourceHead,
     'inspection-repo-head-mismatch');
@@ -80,7 +91,7 @@ export async function collectCatalogCodeBinding(repo, sourceHead, { sourceFiles,
     check(sha(raw) === sha(git(repo, ['show', `${sourceHead}:${path}`], true)), 'inspection-source-modified');
     files[path] = sha(raw); rawFiles[path] = decode(raw);
   }
-  check(sha(await readConflictPrivateBytes(fileURLToPath(import.meta.url), 1024 * 1024)) === files[SELF]
+  if (executingFile) check(sha(await readConflictPrivateBytes(fileURLToPath(import.meta.url), 1024 * 1024)) === files[SELF]
     && sha(await readConflictPrivateBytes(fileURLToPath(executingUrl), 1024 * 1024)) === files[executingFile],
     'executing-inspector-source-mismatch');
   for (const [path, source] of Object.entries(rawFiles).filter(([path]) => /\.(?:mjs|js)$/.test(path))) {

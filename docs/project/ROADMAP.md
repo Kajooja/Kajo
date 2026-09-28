@@ -84,8 +84,10 @@ roster. All seven requests are consumed. The explicit local framing core now
 discards only oversized rows with a complete canonical unrelated header, retaining
 selected/unknown failures, original limits, checksum accounting and historical
 replay. The separately versioned full-collection core now integrates the scanner,
-frozen predecessor request and new encrypted accounting/replay. Next deliver its
-guarded operator with original-source predecessor, one-shot and custody gates.
+frozen predecessor request and new encrypted accounting/replay. Its guarded
+operator now supplies original-source predecessor checks, one-shot controls and
+source/dependency/CI/custody gates. Next prepare the private operation from accepted
+source and save/read back its recovery archive before distinct activation.
 Source acceptance grants no provider allowance. The discarded historical
 terminal row's identity and selection status remain unknown; the new prefix does
 not validate the oversized JSON or full source.
@@ -241,11 +243,14 @@ accounting and historical replay remain strict. The
 now integrates this explicit entrypoint with the full two-source collector,
 separate request/result accounting and encrypted payload replay. Its request
 retains all seven fixed predecessor identities and the exact previous roster,
-recipient, source pins, full budgets and conflict policy. Next supply its guarded
-operator: original-source diagnosis recovery, all seven Git objects, distinct
-first-push/first-run controls and source/dependency/CI/custody checks.
-Accept that source before preparing a new request and saving/reading back separate
-private recovery custody. No provider request or limit expansion is included.
+recipient, source pins, full budgets and conflict policy. The
+[guarded operator](../architecture/ARCHITECTURE.md#framed-full-collection-operator--182)
+now checks all seven Git objects, distinct first-push/first-run controls and
+source/dependency/CI/custody receipts. Original-source diagnosis recovery preflights
+all three historical closures before key staging, then bounds the nested process
+chain and cleans temporary keys. Next prepare a new request from accepted source,
+verify all 22 private predecessor inputs and save/read back separate private
+recovery custody before activation. No provider request or limit expansion is included.
 Neither core acceptance nor the local policy grants a rerun or provider budget.
 Complete-source verification, fresh reconciliation and
 source-specific rights review still precede a guarded writer bridge. Curated

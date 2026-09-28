@@ -14,6 +14,64 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Framed full-collection operator — 2026-09-28 / #182
+
+`feat/182-framed-acquisition-operator` continues accepted full-collection core
+[PR #291](https://github.com/Kajooja/Kajo/pull/291), main
+`cfa36d5810c1f5e6f91c4112e4376415f2f4ced1`, tree
+`71cc0279496913dc2d355daa16e6bc8e477e171c`, after all five
+[CI #574 gates](https://github.com/Kajooja/Kajo/actions/runs/36450439387),
+830 tests/four exports. This source packet uses synthetic inputs; the real private
+Edition archive and all seven consumed requests remain untouched.
+
+The new local preparer, first-push runner, private recovery CLI and pinned
+workflow enforce the separate framed contract. The runner requires clean accepted
+main with the accepted core ancestor, a sole-file main-child request, all seven
+exact predecessor Git values and exactly one first-attempt workflow run. A private
+output is claimed before provider I/O. Successful or failed payloads produce only
+neutral authenticated ciphertext; a failed collection reports a fixed public
+error after the upload marker. Frozen full-source and conflict budgets remain.
+
+Preparation/recovery binds source files, actual ESM dependency bytes, the reviewed
+tree, all five CI gates, full limits/framing source, runtime chronology and ZIP,
+ciphertext and plaintext receipts. Exactly 22 predecessor inputs, including the
+recipient key and both older custody archives, require durable readback. All three
+original inspectors are preflighted before staging the key or launching children;
+the continuation's 17-file original manifest is preserved, without its later
+conflict-policy addition. Original heads stay fixed at `3d12a7f` / `2463168` /
+`8a9aefb`. A 60-second POSIX process-group deadline also stops descendants after
+parent failure or early exit. Three known temporary key copies are removed on all
+paths; caller buffers are cleared in `finally`.
+
+Only original-source recovery of the unrelated bounded outer-header diagnosis
+permits predecessor proof and final request creation. Recovery preserves the
+core's payload-consistency-only label, separately records checked operator
+receipts and emits private collection, candidate, quarantine and optional fresh
+reconciliation outputs. No candidate gains rights approval or write eligibility.
+
+Twenty-two new synthetic regressions cover seven-request lineage, source/tree/run
+and output races, failed-result sealing, full receipt/custody tampering, complete
+source/dependency closures, historical manifest drift and private CLI failures.
+Real isolated child processes exercise success, failure and timeout, verifying
+all three key deletions and stopped grandchildren. Read-only preflight also
+succeeded against all three actual frozen historical checkouts without reading
+private custody or executing their inspectors. Local lint/typechecks, all 824
+non-Edge tests and four iOS/Android exports pass, including companion isolation
+guards; the focused current/historical operator suite passes 48 tests. The root
+check reaches Edge validation but this environment refuses its npm registry
+connection. Full root validation and all five required CI gates must pass before
+merge; exact source/CI acceptance is recorded in Issue #182. Historical Sprint
+entries below are preserved.
+
+**Next:** capture accepted operator source/CI evidence and prepare the private
+full-collection operation. Reconstruct all 22 inputs under their original source,
+record unchanged limits, save/read back a new recovery archive and let the new
+preparer write the request last. Activation uses its distinct branch and one
+first push/run only after that operational checkpoint. Complete source collection,
+fresh catalog reconciliation and individual rights review still precede any
+bounded writer. This packet creates no request branch, provider operation,
+database write, model admission or additional catalog/MVP/device acceptance.
+
 ## Framed full-collection core — 2026-09-28 / #182
 
 `feat/182-framed-dump-acquisition` continues accepted framing source

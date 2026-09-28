@@ -1462,13 +1462,93 @@ even unchanged candidates remain unapproved until source-specific language/right
 review. Production seal/unseal validates the frozen request first; synthetic test
 contexts use the generic envelope seam and cannot replace its fixed recipient.
 
-The next source packet supplies a distinct guarded operator/workflow: all seven
-fixed Git predecessors, original accepted Edition recovery (with original
-conflict/continuation children), accepted source/dependency/CI checks, sole-file
-main-child first-push/first-run guards and private custody readback. Only after
-that acceptance can a separately bounded request be prepared. A new recovery
-archive must be saved/read back before activation. Every old request remains
-consumed; no historical row is reclassified, budget widened or text approved.
+The guarded operator below supplies preparation, one-shot activation controls and
+original-source recovery. Every old request remains consumed; no historical row
+is reclassified, budget widened or text approved.
+
+### Framed full-collection operator — #182
+
+`prepare-framed-dump-acquisition.mjs`, `run-framed-dump-acquisition.mjs` and
+`recover-framed-dump-acquisition.mjs` implement a distinct operator boundary.
+The push-only `catalog-book-framed-acquisition.yml` workflow checks out accepted
+main, requires the full-collection core `cfa36d5810c1f5e6f91c4112e4376415f2f4ced1`
+as an ancestor, and refuses a dirty checkout. The sole request addition must be
+`scripts/catalog/requests/ol-20260831-framed.json` on
+`catalog-acquisition/ol-20260831-framed`, with accepted main as its only parent.
+All seven fixed predecessor Git objects are fetched and revalidated. The exact
+push/head and a separate ledger containing only the current first-attempt run
+must pass before a new private output directory is claimed or provider I/O starts.
+There is no dispatch, schedule, retry, write permission or limit override.
+
+The workflow retains the frozen 16,644,821,648-byte compressed total, 128 GiB
+decoded and 100 million rows per source, 64 MiB cumulative retention, 1,049,600-byte
+line ceiling, 8-pair/8 MiB conflict policy and 110-minute collector deadline. Its
+120-minute job budget leaves time for ciphertext upload. The runner validates
+and encrypts both complete and failed results; only the neutral sealed artifact
+is uploaded for seven days. Failed collection sets the upload marker before
+returning a fixed generic failure. CI stdout contains no raw result, discarded
+header, candidate count or recipient key. Actions are pinned to immutable commits;
+dependency installation disables lifecycle scripts.
+
+Preparation and recovery are local-only and require a new private output.
+Before dynamic parser import, the new inspector binds its complete source closure,
+workflow/lock files and actual ESM dependency bytes to an accepted source receipt,
+the identical reviewed tree and all five successful CI jobs. New receipt contracts
+are `kajo-framed-acquisition-source-acceptance-v1`,
+`kajo-framed-acquisition-runtime-receipt-v1` and
+`kajo-framed-acquisition-predecessor-custody-v1`. Source/run receipts bind request,
+recipient, full limits digest, framing source, conflict policy, first push/run,
+chronology and exact artifact/ZIP/plaintext hashes. ZIP membership and CRC are
+checked against supplied ciphertext. These are verified operator assertions,
+not independent sender or storage-service authentication.
+
+The predecessor manifest has exactly **22 absolute paths**: the Edition
+`request`, `sealed`, `artifact-zip`, `source-receipt`, `run-receipt`; the same five
+conflict inputs prefixed `conflict-`; `continuation-request`, `prefix-sealed`,
+`continuation-sealed`, `continuation-artifact-zip`, `recipient-key`, `snapshot`,
+`continuation-source-receipt`, `continuation-run-receipt`,
+`continuation-custody-receipt`, `continuation-custody-archive`,
+`conflict-custody-receipt` and `conflict-custody-archive`. Fresh durable custody
+readback must bind every member, including the key and both nested archives.
+Key/archive inputs require private modes; manifests reject symlinks, missing or
+extra names, and oversized inputs. No private custody digest enters the public
+request.
+
+Before staging a key or starting a historical process, read-only preflight checks
+all three original source closures, installed ESM dependencies and reviewed trees:
+
+| Inspector | Original accepted head | Original source files |
+| --- | --- | --- |
+| Edition diagnosis | `3d12a7f69534fef305b7ca37767626ae584b688e` | 26 |
+| Conflict acquisition | `24631688fbbbf73b2197768d5df686e26ff361dd` | 20 |
+| Full continuation | `8a9aefbf87870abd932dac53c6d4abae7fd0683d` | 17 |
+
+The continuation's original manifest predates `dump-conflict-policy.mjs`; today's
+expanded manifest cannot replace it. Only the original Edition inspector then
+executes, recursively calling the original conflict and continuation inspectors.
+A POSIX process group bounds the complete child chain to 60 seconds, discards
+child stdout/stderr and stops descendants even if the parent exits early. All
+three known temporary key copies are removed on success, failure and timeout;
+the caller clears its in-memory key in `finally`. Nested custody archives remain
+private recovery evidence.
+
+The original child must recover `diagnosed` / `dump-line-limit` with an unrelated
+canonical outer header, bounded-header-only scope, no complete row/hash or full
+source proof, and zero candidates/approvals/writes/admissions. New preparation
+does not rerun today's framing predicate over that private header. Only after
+these checks is `predecessor-proof.json` saved; `request.json` is written last.
+Recovery additionally checks all seven Git requests, the original snapshot and
+the new encrypted result, then writes collected/candidate/quarantine/reconciliation
+outputs and a final summary. An optional fresh snapshot records changes. The core
+summary stays `payload-consistency-only` / `provenanceVerified: false`; an
+additional field records the narrower receipt verification. Candidates remain
+unreviewed and ineligible for writes.
+
+Source delivery includes no executable request. Next capture accepted source/CI
+evidence, reconstruct the private predecessor inputs using their original code,
+record the unchanged operational limits, and save/read back a new recovery archive
+before activation. A completed collection still needs fresh catalog reconciliation
+and individual rights review before a separately bounded writer operation.
 
 ### Description attribution — contract, #182
 
