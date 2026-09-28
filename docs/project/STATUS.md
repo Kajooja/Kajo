@@ -10,7 +10,7 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #182 guarded conflict acquisition and recovery
+## Current packet — #182 recovered conflict acquisition; line-framing diagnosis next
 
 **The two approved BOOK descriptions are applied and independently verified.**
 The owner ran the accepted CLI from PR #264/main
@@ -82,25 +82,40 @@ is accepted through [PR #284](https://github.com/Kajooja/Kajo/pull/284), main
 complete-source streaming with bounded exclusion and pure payload replay.
 
 The [guarded operator path](../architecture/ARCHITECTURE.md#guarded-operator-path)
-is implemented on `feat/182-guarded-conflict-acquisition`: distinct first-push
-runner/workflow, fixed five-predecessor Git verification, local preparation with
-original-source predecessor authentication and durable-readback checks, and
-source/dependency/CI/run/artifact-bound private recovery. Receipt provenance is
-explicitly operator-captured; encryption alone is not source authentication.
-Exact PR/head, validation and merge acceptance belong to Issue #182 and the
-[operator checkpoint](sprints/SPRINT-014.md#guarded-conflict-operator-path--2026-09-28--182).
+is accepted through [PR #285](https://github.com/Kajooja/Kajo/pull/285), main
+`24631688fbbbf73b2197768d5df686e26ff361dd`, after all five
+[CI #561 gates](https://github.com/Kajooja/Kajo/actions/runs/36388094791),
+**738 tests / four exports**. The actual predecessor passed its original accepted
+inspector. Source/dependency/CI and Git checks passed, and separate private recovery
+custody was saved and read back before activation.
 
-**Next after operator source acceptance: prepare one explicit bounded request
-and private recovery custody, then activate once and recover the result.** Freeze
-reviewed policy caps, capture the accepted source/CI/dependency receipt, authenticate
-the retained predecessor with its original inspector, and save/read back the new
-private recovery archive before publishing the sole-file request. No request,
-provider run or selected operational allowance is delivered by this source packet.
-All **five** previous requests remain consumed; never rerun, reset or reuse them
-or the completed pilot. Stop at recovered failure or unreviewed collection; fresh
-reconciliation, individual rights review and separately bounded writes follow.
-No additional description or catalog/device/release gate is accepted. Exact
-acceptance stays in [Issue #182](https://github.com/Kajooja/Kajo/issues/182).
+The explicit policy permits at most **8 conflicted original pairs / 8 MiB
+diagnostics** under the unchanged source and retention limits. Sole-file request
+head `11bada2563374616cc8d014d787039c9235ea071` on
+`catalog-acquisition/ol-20260831-conflicts` activated once.
+[Run 36391833763](https://github.com/Kajooja/Kajo/actions/runs/36391833763)
+ended with failure on September 28. Private receipt-bound recovery verified
+`dump-line-limit` in the Edition source after the Work source completed with
+publisher checksum verification. No terminal row evidence was retained; its
+identity, contents and selected/unrelated status remain unknown. The complete
+private recovery result is preserved. The
+[result checkpoint](sprints/SPRINT-014.md#conflict-acquisition-result-and-line-framing-handoff--2026-09-28--182)
+records the acceptance boundary. Receipt provenance is operator-captured;
+encryption alone is not source authentication.
+
+**Next: implement and test a local-only bounded line-framing diagnostic contract
+for the Edition size-limit failure.** The current framer applies the byte ceiling
+before target classification. Specify minimal source-bound prefix evidence and
+synthetic oversized-row/chunk-boundary cases without assuming that the terminal
+row was unrelated. Preserve existing parser limits, pins and identity rules.
+Any actual diagnosis needs a separately accepted, bounded request and private
+custody; this checkpoint grants no new provider execution or limit increase.
+All **six** requests remain consumed; never rerun, reset or reuse them or the
+completed pilot. No candidates survived the failed collection. Approvals, database
+writes and model admissions remain zero. Complete collection, fresh reconciliation
+and individual rights review still precede separately bounded writes. No additional
+catalog/device/release gate is accepted. Exact acceptance stays in
+[Issue #182](https://github.com/Kajooja/Kajo/issues/182).
 The independent research packet has a corrected fallback and a completed,
 reproduced exploratory study on the same authorized dataset. It admits no model.
 Source/CI acceptance is recorded in the respective issues.
