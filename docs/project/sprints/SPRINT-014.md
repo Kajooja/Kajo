@@ -14,6 +14,60 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Conflict acquisition result and line-framing handoff — 2026-09-28 / #182
+
+The guarded operator source is accepted through
+[PR #285](https://github.com/Kajooja/Kajo/pull/285), main
+`24631688fbbbf73b2197768d5df686e26ff361dd`, reviewed head
+`6ef1ba8bf158dc80c3d1b1cf05942a1931bb198e`, tree
+`b0002f6381f0dce0ff05256846d04607b3cd96dd`. All five
+[CI #561 gates](https://github.com/Kajooja/Kajo/actions/runs/36388094791) passed:
+738 tests and four exports. Historical source checkpoints below remain unchanged.
+
+Actual local preparation verified the source/dependency closure, accepted CI,
+original public request Git objects and retained predecessor archive readback.
+The original accepted inspector authenticated the real predecessor in a fresh
+process; policy replay then produced the successor request. A separate private
+recovery archive was saved and read back before the request branch was created.
+
+Operational caps were explicitly frozen at **8 conflicted original pairs and
+8 MiB diagnostics**: about 2.1% of the unchanged 383-pair roster and one eighth
+of the unchanged combined retention cap. Both are independent stop conditions,
+not text approval. The two pinned source streams retain their original byte,
+row, time and redirect limits. The sole-file request branch
+`catalog-acquisition/ol-20260831-conflicts`, head
+`11bada2563374616cc8d014d787039c9235ea071`, is a child of accepted main.
+[Run 36391833763](https://github.com/Kajooja/Kajo/actions/runs/36391833763)
+activated once on its first attempt and completed with failure on September 28.
+The ciphertext upload succeeded.
+
+Private recovery checked the actual ZIP, authenticated ciphertext, accepted
+source/dependencies/CI, request Git identity, runtime receipts and predecessor
+custody. It verified a consistent failed result with `dump-line-limit` in the
+Edition source. Work completed with publisher checksum verification; Edition
+did not complete. Full dump checksums are collector assertions checked against
+the pins, not hashes recomputed from full local dumps. The failed contract
+discards candidate records and retains no terminal row evidence. Its identity,
+contents, exact size and selected/unrelated status cannot be inferred. All
+private evidence and recovery outputs are preserved separately; no new private
+row, artifact or archive commitments are published here.
+
+Offline code review confirms that `createDumpRowParser` checks the pending byte
+length before `line()` classifies the target. The fixed error code therefore
+does not identify a selected row. Existing historical/core behavior is unchanged.
+No fresh catalog reconciliation, rights review, description approval, database
+write, model admission or device/release acceptance occurred.
+
+**Next:** implement and test a local-only bounded Edition line-framing diagnostic
+contract. Bind minimal prefix evidence to the source and truthful counters;
+distinguish unknown selection from classification established by a valid bounded
+envelope. Cover oversized selected/unrelated rows, chunk boundaries and existing
+resource guards with synthetic inputs. Keep current parser limits, source pins
+and identity rules. Any actual diagnosis requires a separate accepted request
+and private recovery custody. All six requests are consumed; never rerun or
+update the request branch, raise a limit or start another provider operation
+from this result checkpoint. STATUS owns this single next packet.
+
 ## Guarded conflict operator path — 2026-09-28 / #182
 
 `feat/182-guarded-conflict-acquisition` continues PR #284/main
