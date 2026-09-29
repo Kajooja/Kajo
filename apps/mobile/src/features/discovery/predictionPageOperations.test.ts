@@ -111,6 +111,9 @@ describe('Identified prediction page boundary', () => {
 });
 
 describe('configured page transport and catalog cancellation', () => {
+  // A single signature preserves URL inputs when Vitest wraps the DOM/native
+  // fetch overloads; the mock still has to satisfy the actual SDK transport.
+  type FetchTransport = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   const response = (data: unknown, status = 200) => new Response(JSON.stringify(data), {
     status, headers: { 'Content-Type': 'application/json' },
   });
@@ -122,7 +125,7 @@ describe('configured page transport and catalog cancellation', () => {
 
   it('passes the same signal through the actual SDK RPC and metadata fetch, preserving ranks and identity', async () => {
     const controller = new AbortController();
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+    const fetcher = vi.fn<FetchTransport>().mockResolvedValueOnce(response(page()))
       .mockResolvedValueOnce(response([{
         id: id(12), item_type: 'BOOK', title: 'Enriched second book', description: null,
         tags: ['quiet'], creators: ['Author'], release_year: 2020, image_url: 'https://fixture.invalid/cover', original_language: 'fi',
@@ -141,7 +144,7 @@ describe('configured page transport and catalog cancellation', () => {
 
   it.each(['before', 'after-rpc'] as const)('skips subsequent work when cancelled %s', async stage => {
     const controller = new AbortController();
-    const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => {
+    const fetcher = vi.fn<FetchTransport>().mockImplementation(async () => {
       controller.abort();
       return response(page());
     });
@@ -152,7 +155,7 @@ describe('configured page transport and catalog cancellation', () => {
 
   it('cancels a pending metadata fetch without publishing the delivered response as a completed load', async () => {
     const controller = new AbortController();
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+    const fetcher = vi.fn<FetchTransport>().mockResolvedValueOnce(response(page()))
       .mockImplementationOnce((_input, init) => new Promise((_resolve, reject) => {
         init?.signal?.addEventListener('abort', () => reject(new DOMException('Cancelled', 'AbortError')), { once: true });
       }));
@@ -164,7 +167,7 @@ describe('configured page transport and catalog cancellation', () => {
   });
 
   it('preserves the identified ranking if only metadata fails', async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(page()))
+    const fetcher = vi.fn<FetchTransport>().mockResolvedValueOnce(response(page()))
       .mockResolvedValueOnce(response({ message: 'Metadata unavailable', code: '42501' }, 403));
     const result = await loadCatalogPredictionPage(clientWith(fetcher), request, new AbortController().signal);
     expect(result).toMatchObject({ status: 'success', ranking: { predictionId: id(4) } });
@@ -173,7 +176,7 @@ describe('configured page transport and catalog cancellation', () => {
   });
 
   it('retains SQL error codes through the configured SDK boundary without requesting metadata', async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response({
+    const fetcher = vi.fn<FetchTransport>().mockResolvedValueOnce(response({
       code: '22023', message: 'Continuation window expired', details: 'private', hint: 'private',
     }, 400));
     const result = await loadCatalogPredictionPage(clientWith(fetcher), request, new AbortController().signal);

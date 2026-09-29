@@ -40,6 +40,17 @@ supabase/functions/password-auth/
 - `run-ci-cli-installation-probe.mjs`: both immutable prediction forwards and later
   catalog forwards, populated upgrades, runtime and concurrent-session assertions.
 
+## Dependency compatibility verification
+
+`package.json` pins the reviewed Vitest family, previous Vite line, and explicit
+query-string/xcode parents. `scripts/dependencies/patch-routing-decoder.mjs`
+checks the exact query-string 7.1.3 hash and safe decoder version, then unwraps
+its ESM default export without replacing the parent API. Installation refuses
+unexpected source. `routing-dependencies.test.mjs` exercises the actual installed
+Router path functions, hostile input in a bounded child and xcode's UUID call.
+The root check and CI include these regressions; CI also runs the fresh advisory
+audit. `dependency-audit-2026-09-28.json` retains the exact lockfile checkpoint.
+
 ## Implementation locations
 
 | Area | Canonical path | Current state |
@@ -149,12 +160,13 @@ Do not create empty feature folders merely to match future architecture. Shared 
 
 `feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
 contains the newer delivered-origin, atomic continuation, captured-scope client,
-List/history and recovery code. It is not included in this independent E1 branch.
-Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
-and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
-own exact paths, deployed forward identities and remaining device gates. Owner
-feedback on the CI #469 build is positive except reconnect retry UI (#240).
-Do not recreate or roll out those changes from this older runtime checkout.
+List/history and recovery code present in this reconciled native checkout.
+It remains separate from accepted main until #229's required gates pass.
+[STATUS](../project/STATUS.md) owns the exact source/CI checkpoint, deployed
+forward identities and remaining device gates. Owner feedback on the historical
+CI #469 build is positive except reconnect retry UI (#240); the current source
+corrects that defect, with its new configured-device observation still open.
+Do not recreate the existing implementation or repeat its installed migrations.
 
 ## Portable engine — E1 #235
 

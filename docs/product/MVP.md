@@ -230,7 +230,7 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 - [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast/reduced motion plus usable loading/empty/offline/permission/recovery states on representative devices.
 - [ ] `MVP-UX-002` Taste-first link flow is usable on representative mobile browsers and inside the installed app, with clear continuation when an external browser/app-store/auth round-trip occurs.
 
-- [ ] `MVP-UX-003` A failed active discovery reader recovers its exact request on usable reconnection and clears stale retry UI on success, with bounded/coalesced attempts, scope cancellation and unchanged expiry/receipt semantics. Owner device defect #240, 2026-09-12; next application UI packet.
+- [-] `MVP-UX-003` A failed active discovery reader recovers its exact request on usable reconnection and clears stale retry UI on success, with bounded/coalesced attempts, scope cancellation and unchanged expiry/receipt semantics. Owner device defect #240, 2026-09-12; source implemented in draft #229 under Phase 14.2, with exact source acceptance and the real-device repeat still required. STATUS owns the current checkpoint.
 - [ ] `MVP-UX-004` Personal BOOK/MOVIE statistics include source-aware counts, independent unlock/progress and retry-safe weekly summaries/countdowns before MVP. #230, Phase 17.0; community comparisons remain conditional on cohort/privacy evidence.
 - [ ] `MVP-UX-005` Accessible grid multi-selection supports Discovery List add/not-interest, same-Profile List move/removal and selected history clearing with exact origins, durable partial results and Shared consent. #231, Phase 17.0.
 - [ ] `MVP-UX-006` Cards have a default-save star (Tykätyt), header overflow for other Lists, and a bottom rating slider plus Ei kiinnosta/Seuraava above the dock with description space. Saving stays on the card; Next is explicit navigation. Reuse existing Saved/Shared/evidence semantics. #239, Phase 17.0; UX_PRINCIPLES owns the full contract.
@@ -241,7 +241,7 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 - [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, anonymous identities/Taste sessions, attribution/invites/Friendship, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups.
 - [ ] `MVP-OPS-003` Backup and isolated restore drills meet recorded objectives for database/objects/config/signing recovery.
 - [ ] `MVP-OPS-004` Alerts/runbooks cover API/auth/Taste/link/import/worker failures, crash rate, queue age, Prediction quality/latency, database/storage growth and spend.
-- [ ] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete; production builds fail closed on missing production config/mock discovery.
+- [-] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete; production builds fail closed on missing production config/mock discovery. #295 accepts production configuration/input guards and #296 resolves the recorded dependency advisories; hosted/security/lifecycle/release verification remains open.
 - [ ] `MVP-OPS-006` Anonymous Taste and Friend-invite creation/open/accept have abuse/rate limits, anti-enumeration, revoke/expiry, block handling and redacted diagnostics suitable for public links.
 
 ## External beta readiness

@@ -297,6 +297,7 @@ that recovery succeeds. An online indication alone cannot hide a backend failure
 Preserve loading/error distinction, 15-second deadline, existing page origins,
 source expiry/cap, scope cancellation and durable action queues. Reconnection
 must not create fresh windows or work for a hidden/changed scope. A proven expired
-cursor still needs explicit **Aloita uusi haku**. This is the next application
-recovery packet, deferred by the owner while E1 proceeds; device repeat remains
-required before this release requirement closes.
+cursor still needs explicit **Aloita uusi haku**. The native #229 reader packet
+now implements this correction under Phase 14.2; STATUS owns exact source/CI
+acceptance. A repeat of the actual device failure/recovery flow remains required
+before this release requirement closes.

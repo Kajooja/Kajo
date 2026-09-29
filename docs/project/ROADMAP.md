@@ -4,14 +4,50 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
-## Repository closure continuation — 2026-09-28
+## Unfinished work disposition — 2026-09-29
 
-PRs #294/#295 are accepted with all five CI gates. The reconciled #229 source
-preserves later catalog/credit/cold-history fixes and adds bounded #240 native
-reachability recovery; exact source CI and configured-device acceptance remain
-separate. #238 has a fresh 15-moderate audit and a concrete compatible-upgrade
-path. The [closure audit](retros/2026-09-28.md) tracks every open issue without
-removing MVP requirements or carrying an unexplained source defect forward.
+The owner explicitly permits scheduling unfinished work at its correct dependency
+slot and retiring work superseded by accepted solutions. This table is the single
+current disposition of the 18 issues inventoried by the
+[September 28 audit](retros/2026-09-28.md). STATUS owns the one active handoff and
+exact source/CI/hosted/device acceptance. Sprint 014 remains active; later rows
+are queued work for the existing phases, not parallel active sprints or waived
+release requirements. Historical sprint plans do not override this order.
+
+| Work | Disposition and execution slot | Dependency and remaining acceptance |
+| --- | --- | --- |
+| #228 / draft #229 delivery | Critical current Sprint 014, 14.1–14.2. Reconciled source; native acceptance open. | Preserve immutable origins, trace, captured reader and deployed forwards. Integrate accepted dependency fixes and verify the resulting exact head; complete configured-device/fresh-account observations. No repeated DDL or account reset. |
+| #240 reconnect | Source implemented in #229 under 14.2; MVP-UX-003 remains open for acceptance. | Exact failed request/cursor/context, focused foreground scope, bounded/coalesced retry and backend success before error removal. Keep expiry and real-device regression; do not create a duplicate future implementation. |
+| #177 common fit | 14.1–14.2 acceptance only; scorer and hosted rollout already accepted. | Observe authorized Shared sparse/disagreement/trace behavior on the configured Android build. No replacement scorer or repeated deployment. |
+| #182 catalog | Critical catalog work, 14.3. Diagnostic/cleanup source accepted through #294. | Separate bounded operator/budget before new acquisition; then rights, fresh reconciliation and guarded writes. Eight old requests stay consumed. Six useful descriptions and actual text/link device observations remain. Completed MOVIE expansion is not repeated. |
+| #238 dependencies | Recorded source advisories resolved through #296; ongoing MVP-OPS-005 maintenance. | Accepted compatible decoder/UUID/Vitest fixes, audit receipt and required CI. Actual web/native link round-trips remain under 15.1 / MVP-ACQ-007; Node parser tests do not close them. |
+| #160 security | Immediate accepted-source deployment/platform follow-up; complete abuse/privacy gate in 17.2, production recheck in 19.0. | #295 fixes source configuration/input validation. Hosted verification, password protection, supported security upgrade and distributed abuse/anti-enumeration remain. Public-entry controls must pass before external users, even when built ahead of their numbered operations phase. |
+| #184 identity conversion | Scheduled 15.1 after 14 and adaptive Taste 15.0. | Same logical User/PersonalProfile, ownership-proved collisions, interruption/retry and real Google/Apple browser/app configuration. No email-only merge or duplicate taste state. |
+| #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred merely because UI is later. |
+| #200 history navigation | Scheduled 17.0, before visual browse refinements. | Discovery Katsotut/Luetut must use canonical active-Profile/ItemType history and contextual Lists, with cold entry, permission/error handling and real-origin return. Reuse #229 and accepted cold-history work. |
+| #199 grid | Scheduled 17.0 after accepted #229 pagination. | Density, coalesced continuous loading, stable order/deduplication, safe final rows and small-screen/large-text checks. Old poster/token/import defect is superseded by accepted catalog work, not grounds for another MOVIE acquisition. |
+| #239 cards | Scheduled 17.0, required MVP-UX-006. | Reuse Saved/Shared Endorsement, multi-destination commands and exact origins. Star/overflow/explicit Next, fit-aware description/credit and accessible Back; saving stays on card and Next adds no taste evidence. |
+| #231 selection | Scheduled 17.0, required MVP-UX-005, after DATA-003/004 and List/history correctness. | Canonical selected IDs/origins, durable partial results, atomic moves, Shared consent, retry/restart and membership changes. History list/poster views use the same collection; trash does not erase unrelated state. |
+| #230 statistics | Scheduled 17.0 private summaries; weekly work depends on 17.1/17.2 telemetry/privacy. | Source-aware distinct counts including rating zero, independent unlock, retry-safe weekly snapshots and Helsinki/DST boundaries, correction/deletion/isolation. Community comparisons remain conditional on cohort/privacy evidence. |
+| #201 catalog search | Scheduled 17.0, MVP-DISC-009. | Canonical persisted Items, title/creator and normalized filters, bounded server pagination and honest provenance. Browse is not a second recommender; filters are not preference events. |
+| #203 Profile filtering | Scheduled 17.0, MVP-NAV-005. | Filter already-authorized Personal/accepted Shared names; preserve account scope and revocation. No public directory or membership bypass. |
+| #78 startup | Scheduled 17.0, MVP-UX-001. | Canonical logo sizing and target Android margins/auth/startup observation; hydration-driven loading without a fabricated delay. |
+| #127 SMTP | Scheduled 17.2 before external beta; final production recheck 19.0. | Owner's verified sender/domain and supported SMTP configuration, then authorized confirmation/recovery delivery to external providers. Disabling confirmation is not acceptance. |
+| #186 beta | Scheduled Phase 18 after the complete launch loop and operations gates. | Controlled 10–50-person actual link → Taste → challenge → preview → Google/Apple → Friend → Shared flow, diagnostics and owner Android/iOS acceptance. Fixtures cannot replace participants or distribution. |
+
+Requirements without one of these issue numbers remain in their phase: adaptive
+memory/cross-domain/mode behavior in 14.4; bounded SleepLayer/evaluation in 14.5;
+Taste/holdout/usefulness and continuation in 15; Friend safety and explicit Shared
+creation in 16; Lists/messages/accessibility, telemetry, retention/restore and
+operations in 17; complete beta in 18; production/stores in 19; Share Link Gate
+in 20. The bounded E1/D1/D2 foundation is complete; optional further research and
+model admission are not new release blockers.
+
+Retire a superseded source branch only after checking accepted commit/tree
+coverage, unique changes and live PR/document/workflow references. Consumed
+catalog request identities, original recovery sources and immutable deployed
+migration history are retained dependencies. The old Sprint 015 store-close plan
+is superseded; it is not revived by scheduling future work here.
 
 ## Product decision — 2026-09-07
 
@@ -375,10 +411,10 @@ Requirements: `MVP-ACQ-001..004`, `MVP-AUTH-004` and identity continuity require
 
 Exit: browser-capable public Taste link; equivalent installed-app route; server-backed resumable anonymous state; Google/Apple link/upgrade without duplicate User/PersonalProfile; failed/abandoned auth preserves accepted taste inside retention; safe account collisions.
 
-Resolve the runtime routing decoder advisory in #238 before public-link acceptance.
-Use a compatible parent update/interop fix with malformed-link regressions; a bare
-decoder override breaks the installed CommonJS consumer. Coordinated build/test
-dependency maintenance remains under MVP-OPS-005; no forced framework downgrade.
+The runtime routing decoder advisory is resolved through #238 / PR #296 with
+compatible parent interop and malformed-link regressions. Preserve that fix during
+web/app integration and still exercise real link round-trips before acceptance.
+Ongoing dependency maintenance remains under MVP-OPS-005; no forced framework downgrade.
 
 ### 15.2 — Recommendation preview and conversion funnel
 
@@ -432,8 +468,9 @@ Exit: contextual Lists, search/filters and authorized Profile surfaces; accessib
 
 Owner decision 2026-09-12 promotes #230 private category statistics/weekly tracking
 and #231 multi-select/List moves/history trash to required pre-MVP work, with
-#239 star/overflow/explicit-Next card controls and #240 reconnect recovery. These
-map to MVP-UX-003..006. FUT-UX-003 joint-list choice remains a separate candidate.
+#239 star/overflow/explicit-Next card controls. #240 reconnect source is now part
+of the Phase 14.2 native reader packet; its device acceptance remains required.
+Together these map to MVP-UX-003..006. FUT-UX-003 joint-list choice remains a separate candidate.
 UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requirements
 are release gates. Weekly tracking requires the relevant 17.1/17.2 telemetry and
 privacy work before beta; community comparisons remain conditional.

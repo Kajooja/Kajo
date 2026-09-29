@@ -14,6 +14,68 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Repository hygiene and dependency placement — 2026-09-29
+
+The owner permits fixing current defects, scheduling incomplete work at its proper
+future phase, and retiring superseded work after dependency checks. The single
+[ROADMAP disposition table](../ROADMAP.md#unfinished-work-disposition--2026-09-29)
+covers all 18 audited issues and draft #229. Later UX, Shared, identity, email and
+beta work retain explicit prerequisites and acceptance; no release requirement
+is removed or marked complete by this cleanup.
+
+**Delivered source:** #294 diagnostic/all-copy cleanup and #295 production/input
+guards are accepted as recorded below. #296 is now accepted at main
+`8525ecf32a39757a1f660d41ffa788c7276f7bcc`, reviewed
+`7b0062e668bda1fb5e2b247e1225dd42175256eb`, after all five CI #585 gates.
+The exact-lock audit has zero known advisories and five added routing/tooling
+regressions. This supersedes the earlier pending-CI instruction for that packet.
+
+The isolated description-acceptance workflow now explicitly selects demo mode
+for its root-check step, which has no backend configuration. The production
+configuration correction otherwise rejects that step by default. The focused
+config reproduction fails without the mode and passes with it; production and
+APK settings are unchanged. Hygiene PR #297 is now accepted at main
+`eef40fe`; that accepted main is integrated into the native continuation. The
+combined native head still requires its own complete five-gate CI record and
+configured-device acceptance; predecessor results do not supply either.
+
+**Native source:** draft #229 at
+`e41f84475704223bb8994e0e49f3101be2d1122b` passes all five CI #584 gates,
+1,044 tests/four exports. Its nine conflicts and #240 reconnect source are
+resolved, preserving accepted catalog attribution/cold history and ten deployed
+forward files byte-for-byte. Accepted #296 is integrated into the
+current native draft; all five checks must verify the resulting exact head.
+Configured-device and fresh-account observations
+remain explicit; no new deployment, account reset or device run is claimed.
+
+**Scheduled / remaining:** Phase 14 evidence/catalog/adaptive policy/SleepLayer
+acceptance still precedes Taste and the later launch loop. E1/D1/D2 are complete
+bounded foundations, and optional model research is not a new release gate.
+ROADMAP owns the detailed future queue. #230/#231 remain required pre-MVP work;
+#240 now needs acceptance of its implemented reader correction rather than a
+second implementation. Source fixes do not close #160 hosted operations or #182
+rights/catalog usefulness. No branch-deletion result is claimed in this record.
+
+**Files reconciled:** STATUS, ROADMAP, MVP, FUTURE_PLAN, UX_PRINCIPLES and the
+September 28 retrospective now agree on source versus runtime acceptance and
+execution ownership. Historical entries below remain dated evidence; their old
+next-task directives are superseded by current STATUS.
+
+## Accepted dependency/native integration checkpoint — 2026-09-29 / #229
+
+PRs #294, #295 and #296 are accepted source on main. Native draft #229 separately
+passed all five CI #584 gates after reconciliation through #295 and bounded #240
+recovery. This continuation integrates accepted #296 into that native source.
+The combined lock has a fresh zero-advisory audit (571 production / 936 total
+dependencies), recorded under SHA256
+`cb30bd8bb84fb2d3dac65e751092bd10e877ea0c06cdc83c58f20f1cdc71f7b9`.
+Five fetch test mocks now declare one explicit transport signature for Vitest 4
+and retain SDK compatibility checks; 410 mobile and five dependency regressions
+pass. Exact-head five-gate CI remains required before source acceptance. Preserve native/fresh-account/device observations and historical SQL
+bytes. STATUS owns the current bounded next action; the dated deliveries below
+retain their original scopes. No new device observation or hosted rollout is
+inferred from the two predecessor CI runs.
+
 ## Native reconciliation and reconnect correction — 2026-09-28 / #228 / #240
 
 Reconciled the older draft #229 against accepted main through PR #295, retaining
@@ -34,17 +96,54 @@ flapping, deadlines/late responses, scope changes, stale initial reachability an
 background/unmount cancellation. No action/exposure queue is reset or synthesized.
 
 Local lint/typecheck, 410 mobile tests, 71 database tests and four Hermes exports
-pass. Root `npm run check` reaches Deno dependency fetching but local registry
-access there stalls; remote CI must prove the complete gate.
+pass. Root `npm run check` reached Deno dependency fetching but local registry
+access there stalled. Exact native head
+`e41f84475704223bb8994e0e49f3101be2d1122b`, tree
+`2c9d36532c8067e681b4577297f5d7ac84a3f889`, subsequently passed all five
+[CI #584 gates](https://github.com/Kajooja/Kajo/actions/runs/36481134174),
+1,044 tests/four exports.
 
-Exact remote CI and remaining configured-device/fresh-account observations belong
-to #229/#240; prior #469 APK acceptance is not attributed to the new source.
+Remaining configured-device/fresh-account observations belong to #229/#240;
+prior #469 APK acceptance is not attributed to the new source.
 
 PR #295 was accepted on main `cd224d277f33b105e63cd83126d111b12b64ba10`,
 reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, exact tree
 `0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
 880 tests and four exports. Hosted configuration/function rollout remains
 separate from that source acceptance.
+
+## Routing and tooling advisory remediation — 2026-09-28 / #238
+
+The fresh audit reproduced 15 moderate affected package paths from three
+advisories. The malformed-percent routing regression timed out before the fix.
+The safe decoder's ESM default is now unwrapped by one hash-checked import change
+in its unchanged CommonJS query-string 7.1.3 parent. Bare overrides and a major
+parent swap are not used as compatibility evidence. Unexpected source/version
+fails installation. Vitest is coordinated at 4.1.11, Vite stays 7.3.6, and xcode's
+actual v4 UUID call works with 11.1.1. Expo/RN/router versions are unchanged.
+
+The local npm 11.9 workspace-link override defect was reproduced: root overrides
+alone silently preserved vulnerable leaves. Explicit root query-string/xcode
+parents (also used by the regression tests) make the override graph effective;
+clean `npm ci`, `npm ls`, real parser tests and a fresh zero-advisory audit verify
+it. The pinned lockfile is recorded in the dependency audit receipt. Five
+regressions join root check and CI runs the current-advisory check. Lint/typecheck,
+mobile/engine/companion tests and four platform exports pass. Root check's local
+Deno registry transport limitation remained; all five exact-head
+[CI #585 gates](https://github.com/Kajooja/Kajo/actions/runs/36483069338)
+subsequently passed. PR #296 is accepted at main
+`8525ecf32a39757a1f660d41ffa788c7276f7bcc`, reviewed
+`7b0062e668bda1fb5e2b247e1225dd42175256eb`, tree
+`cadf4fe10cfe7d8296b761e69c39b7c3497b8c97`.
+Node-only URL checks do not assert installed/not-installed native link acceptance.
+
+PR #295 is accepted at `cd224d277f33b105e63cd83126d111b12b64ba10`,
+reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, tree
+`0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
+880 tests/four exports including 32 Deno tests. Draft #229 was independently
+reconciled at `e41f84475704223bb8994e0e49f3101be2d1122b`; CI #584 validation
+and all four database gates passed, with 1,044 tests/four exports. Device gates
+remain separately tracked.
 
 ## Production configuration and auth input guards — 2026-09-28 / #160
 

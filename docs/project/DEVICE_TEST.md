@@ -1,5 +1,45 @@
 # Collection device checkpoint — #228 / #229
 
+## Current configured-device packet — 2026-09-29 / #240
+
+The reconciled native source now implements bounded reconnect recovery and
+includes the accepted dependency correction. [STATUS](STATUS.md) owns its current
+source and CI checkpoint. The dated records below preserve earlier observations;
+their positive results do not establish acceptance of this new binary.
+
+After all five checks pass for the current branch head, record the configured
+APK's run/commit/artifact identity, device/OS, backend environment and installed
+server checkpoint before testing. Do not repeat the ten deployed native forwards
+or reset accounts. Use the existing authorized accounts and retain their data.
+
+1. Cause a first-page network failure, keep Discovery focused and the app active,
+   then reconnect. Recovery starts automatically; the failure remains visible
+   while the retry is pending and clears only when the backend succeeds. A working
+   network with a failing backend must retain the error and manual retry.
+2. Repeat after a later page fails. Already loaded Items retain their order and
+   appear once; recovery appends once. Where approved diagnostics expose request
+   identities, confirm the same request/context/cursor and original page origins.
+   UI observation alone does not prove those server identities.
+3. Flap connectivity during failure and during a pending request. Repeated online
+   notifications must not produce duplicate requests/pages; the automatic budget
+   is three attempts per failed request. A manual retry remains available after
+   exhaustion. Record measured counts only when diagnostics support them.
+4. Background the app, leave Discovery or switch Profile during recovery, then
+   return. Old replies must not replace the current Profile's cards or error;
+   foreground recovery remains scoped to the active reader. Also repeat while
+   an Item/List action is queued: reconnect must not duplicate or erase it.
+5. With a controlled stalled request, observe recovery after the 15-second bound,
+   including a stalled metadata fetch if the configured test setup supports it.
+   An expired cursor must still offer **Aloita uusi haku** and require explicit
+   new search; reconnect must not loop on that cursor.
+
+Record each result or test-environment limitation separately, with the exact
+binary identity. Protocol-2 native visibility/exposure, Shared sparse/disagreement
+and fresh-account observations below remain separate acceptance gaps. Current
+account-creation limits are not resolved by this source change.
+
+## Historical collection checkpoint — 2026-09-10
+
 Status: **owner reports multi-List flow otherwise good; Personal confirmation/latency APK regression explicitly deferred on 2026-09-10 while development continues**.
 `STATUS.md` owns the live reset/publication state. Do not infer acceptance from this plan.
 The client correction at `1102d92` passed all required CI checks. The cases below
