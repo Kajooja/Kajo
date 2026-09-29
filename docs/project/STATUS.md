@@ -19,6 +19,15 @@ references. The [repository audit](retros/2026-09-28.md) preserves the findings;
 owns the placement of all 18 audited issues and draft PR #229. No MVP requirement
 or real acceptance gate is removed by this cleanup.
 
+Hygiene PR #297 is accepted at main
+`eef40fe3606ac8105032fc3af64fec67602287fa`. On September 29, seven issue bodies
+(#160/#182/#228/#230/#231/#232/#240) were reconciled with the disposition table;
+all 18 open scopes remain. All 55 audited merged branch refs still match the
+inventory, and the published native head below satisfies the #296 integration
+hold. Eight consumed request refs remain retained dependencies. No remote branch
+deletions ran because the connector provides no supported deletion operation;
+the original audit JSON remains dated evidence.
+
 PR #294 is accepted at main `3500f9b709e5315cb864f9bcbf9f004c76596bce`,
 all five CI #580 gates, 867 tests/four exports: bounded terminal catalog evidence
 and independent all-copy recovery-key cleanup. PR #295 is accepted at main
@@ -38,23 +47,28 @@ integrity, auth callback parameters and xcode identifiers. The
 [audit receipt](dependency-audit-2026-09-28.json) records zero known advisories
 for the exact lock. Actual native/link round-trip acceptance remains separate.
 
-The older native draft is reconciled at
-`e41f84475704223bb8994e0e49f3101be2d1122b`, tree
-`2c9d36532c8067e681b4577297f5d7ac84a3f889`, with all nine conflicts resolved.
-All five CI #584 gates passed, with 1,044 tests/four exports. It retains accepted
-catalog attribution/cold history, immutable delivery and protocol-2 pagination;
-ten deployed forwards remain byte-identical. #240 now has bounded recovery of the
+Draft #229 now publishes combined head
+`6ed685d5e96c10062f73df26e103a43733030297`, tree
+`1cb418464278156d1c1bd084e172362478050cf6`, containing accepted #296 and #297.
+[CI #590](https://github.com/Kajooja/Kajo/actions/runs/36536181092) owns that
+head's five-job conclusion; PR #229 records its verification result. Local
+validation passed 1,017 non-Edge tests and four Hermes exports. Local Edge
+validation could not fetch a dependency because the connection was refused;
+no local Edge pass is claimed. The prior native checkpoint `e41f844` passed
+CI #584, but that result does not replace this combined head's checks.
+The source retains accepted catalog attribution/cold history, immutable delivery
+and protocol-2 pagination; ten deployed forwards remain byte-identical.
+#240 now has bounded recovery of the
 focused foreground reader's exact request/context/cursor, retained prefix and
 15-second deadline. Only successful backend recovery clears the error; an expired
 cursor still requires explicit new search. This source is still in draft #229,
 not accepted main or a new hosted migration/device observation.
 
-**Next bounded action:** continue draft #229 on `feat/228-delivered-origin` from
-its latest exact source/CI checkpoint. Confirm that it contains accepted #296 and
-all five required checks are green for that head; resolve any actual integration
-failure before device acceptance. The PR records the current combined head so an
-older successful checkpoint is never substituted. Complete the named configured-device
-and fresh-account observations; do not repeat installed forwards or reset accounts
+**Next bounded action:** inspect all five CI #590 conclusions for the published #229 head
+on `feat/228-delivered-origin`; resolve any actual integration failure before
+device acceptance. Do not substitute an older successful checkpoint. Complete
+the named configured-device and fresh-account observations; do not repeat
+installed forwards or reset accounts
 to manufacture them. Then continue Sprint 014's remaining evidence/catalog and
 algorithm gates in ROADMAP order. Later UI work has named slots rather than
 competing active branches; E1/D1/D2 need no repeat and optional model research is

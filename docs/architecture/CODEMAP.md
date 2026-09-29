@@ -146,12 +146,15 @@ Do not create empty feature folders merely to match future architecture. Shared 
 
 `feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
 contains the newer delivered-origin, atomic continuation, captured-scope client,
-List/history and recovery code. It is not included in this independent E1 branch.
+List/history and recovery code. That implementation remains separate from
+accepted main until #229's required gates pass.
 Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
 and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
 own exact paths, deployed forward identities and remaining device gates. Owner
-feedback on the CI #469 build is positive except reconnect retry UI (#240).
-Do not recreate or roll out those changes from this older runtime checkout.
+feedback on the historical CI #469 build is positive except reconnect retry UI
+(#240); its current source correction still requires configured-device acceptance.
+Continue the named native branch rather than recreating its implementation or
+repeating installed migrations from main.
 
 ## Portable engine — E1 #235
 
