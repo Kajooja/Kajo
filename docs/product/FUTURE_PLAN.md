@@ -12,7 +12,7 @@ Execution authority:
 - `ROADMAP.md` — exact build order and Share Link Gate,
 - `STATUS.md` — exact current task.
 
-Most entries follow the first-release gates. Explicit Phase 17 candidates (#230/#231 and List choice) may be scoped during core UX completion; they are optional unless promoted into MVP. Required Shared rating rounds (#232) and the bounded portable-engine/public-data foundation are already owned by MVP/ROADMAP. Their presence here preserves context and must not defer them.
+Most entries follow the first-release gates. The owner promoted #230 private statistics/weekly tracking and #231 multi-select/history operations to required Phase 17.0 scope (MVP-UX-004/005). FUT-UX-003 List choice remains an optional separately scoped candidate. Required Shared rating rounds (#232) and the bounded portable-engine/public-data foundation are owned by MVP/ROADMAP. Their presence here preserves context and must not defer them.
 
 ## 1. Long-term product thesis
 
@@ -507,8 +507,7 @@ Execution slot: a separately scoped Phase 17.0 increment after reliable history,
 atomic actions and delivered-origin gates. Weekly aggregation and comparisons
 also depend on Phase 17.1/17.2 telemetry/operations/privacy. This records a
 required pre-MVP Phase 17.0 scope by the owner’s 2026-09-12 decision
-(MVP-UX-004), while keeping community comparisons conditional. It is not the
-current E1 implementation task. [Issue #230](https://github.com/Kajooja/Kajo/issues/230) tracks delivery.
+(MVP-UX-004), while keeping community comparisons conditional. [Issue #230](https://github.com/Kajooja/Kajo/issues/230) tracks delivery.
 
 ### Personal summary and unlock
 
@@ -602,7 +601,7 @@ List grids. Delivery belongs to a separately scoped Phase 17.0 browse/List
 increment after MVP-DATA-003/004 and current List/history correctness.
 [Issue #231](https://github.com/Kajooja/Kajo/issues/231) tracks implementation;
 the owner explicitly promoted this to required pre-MVP scope on 2026-09-12
-(MVP-UX-005). The engine work remains the current packet.
+(MVP-UX-005). STATUS owns the active work packet; this section defines the planned product contract.
 
 ### Selection and actions
 
@@ -679,7 +678,8 @@ statistics must not silently count Shared round responses as Personal reactions.
 The owner added required application work to Phase 17.0: #239 / MVP-UX-006 moves
 List selection into a header overflow, adds a quick-save star for Tykätyt and
 places slider/Ei kiinnosta/Seuraava above the dock with description space.
-#240 / MVP-UX-003 fixes stale retry UI after network recovery. The complete
-interaction/evidence semantics are owned by UX_PRINCIPLES and DATA_EVENTS;
-STATUS owns the device result and E1 continuation. These are required before MVP,
-not shipped controls or a request to mix UI development into E1.
+#240 / MVP-UX-003 fixes stale retry UI after network recovery; its source now
+belongs to the Phase 14.2 native reader packet, with device acceptance still
+required. UX_PRINCIPLES and DATA_EVENTS own the interaction/evidence semantics;
+STATUS owns exact source and device acceptance. #239 controls remain planned.
+Both requirements must pass before MVP.
