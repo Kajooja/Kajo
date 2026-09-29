@@ -22,6 +22,9 @@ future phase, and retiring superseded work after dependency checks. The single
 covers all 18 audited issues and draft #229. Later UX, Shared, identity, email and
 beta work retain explicit prerequisites and acceptance; no release requirement
 is removed or marked complete by this cleanup.
+Seven issue descriptions were reconciled on September 29; all 18 open scopes
+remain, with their current disposition in ROADMAP and publication checkpoint in
+STATUS.
 
 **Delivered source:** #294 diagnostic/all-copy cleanup and #295 production/input
 guards are accepted as recorded below. #296 is now accepted at main
@@ -34,15 +37,17 @@ The isolated description-acceptance workflow now explicitly selects demo mode
 for its root-check step, which has no backend configuration. The production
 configuration correction otherwise rejects that step by default. The focused
 config reproduction fails without the mode and passes with it; production and
-APK settings are unchanged. Exact hygiene-PR CI acceptance remains separate.
+APK settings are unchanged. Hygiene PR #297 is accepted at main `eef40fe`.
 
 **Native source:** draft #229 at
 `e41f84475704223bb8994e0e49f3101be2d1122b` passes all five CI #584 gates,
 1,044 tests/four exports. Its nine conflicts and #240 reconnect source are
 resolved, preserving accepted catalog attribution/cold history and ten deployed
-forward files byte-for-byte. Accepted #296 still needs reconciliation into the
-native draft and exact-head CI. Configured-device and fresh-account observations
-remain explicit; no new deployment, account reset or device run is claimed.
+forward files byte-for-byte. Accepted #296 and #297 are now included in the
+published native head recorded in STATUS; PR #229 records its exact CI #590
+verification result, independently of the predecessor checks.
+Configured-device and fresh-account observations remain explicit; no new
+deployment, account reset or device run is claimed.
 
 **Scheduled / remaining:** Phase 14 evidence/catalog/adaptive policy/SleepLayer
 acceptance still precedes Taste and the later launch loop. E1/D1/D2 are complete
