@@ -22,6 +22,9 @@ future phase, and retiring superseded work after dependency checks. The single
 covers all 18 audited issues and draft #229. Later UX, Shared, identity, email and
 beta work retain explicit prerequisites and acceptance; no release requirement
 is removed or marked complete by this cleanup.
+Seven issue descriptions were reconciled on September 29; all 18 open scopes
+remain, with their current disposition in ROADMAP and publication checkpoint in
+STATUS.
 
 **Delivered source:** #294 diagnostic/all-copy cleanup and #295 production/input
 guards are accepted as recorded below. #296 is now accepted at main
@@ -34,19 +37,17 @@ The isolated description-acceptance workflow now explicitly selects demo mode
 for its root-check step, which has no backend configuration. The production
 configuration correction otherwise rejects that step by default. The focused
 config reproduction fails without the mode and passes with it; production and
-APK settings are unchanged. Hygiene PR #297 is now accepted at main
-`eef40fe`; that accepted main is integrated into the native continuation. The
-combined native head still requires its own complete five-gate CI record and
-configured-device acceptance; predecessor results do not supply either.
+APK settings are unchanged. Hygiene PR #297 is accepted at main `eef40fe`.
 
 **Native source:** draft #229 at
 `e41f84475704223bb8994e0e49f3101be2d1122b` passes all five CI #584 gates,
 1,044 tests/four exports. Its nine conflicts and #240 reconnect source are
 resolved, preserving accepted catalog attribution/cold history and ten deployed
-forward files byte-for-byte. Accepted #296 is integrated into the
-current native draft; all five checks must verify the resulting exact head.
-Configured-device and fresh-account observations
-remain explicit; no new deployment, account reset or device run is claimed.
+forward files byte-for-byte. Accepted #296 and #297 are now included in the
+published native head recorded in STATUS; PR #229 records its exact CI #590
+verification result, independently of the predecessor checks.
+Configured-device and fresh-account observations remain explicit; no new
+deployment, account reset or device run is claimed.
 
 **Scheduled / remaining:** Phase 14 evidence/catalog/adaptive policy/SleepLayer
 acceptance still precedes Taste and the later launch loop. E1/D1/D2 are complete
@@ -60,6 +61,14 @@ rights/catalog usefulness. No branch-deletion result is claimed in this record.
 September 28 retrospective now agree on source versus runtime acceptance and
 execution ownership. Historical entries below remain dated evidence; their old
 next-task directives are superseded by current STATUS.
+
+Accepted handoff PR #298 is on main
+`70d78daa8d5e587f84a5802b986aefd1f9fa55ad` after all five CI #591 gates.
+This documentation-only integration preserves native source and its complete
+historical record. Native checkpoint `6ed685d` passed all five CI #590 gates,
+1,049 tests/four exports; the latest combined PR head requires its own checks.
+STATUS owns the current source/device continuation. No runtime, SQL or dependency
+change and no device acceptance follows from this merge.
 
 ## Accepted dependency/native integration checkpoint — 2026-09-29 / #229
 

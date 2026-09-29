@@ -19,6 +19,15 @@ references. The [repository audit](retros/2026-09-28.md) preserves the findings;
 owns the placement of all 18 audited issues and draft PR #229. No MVP requirement
 or real acceptance gate is removed by this cleanup.
 
+Hygiene PR #297 is accepted at main
+`eef40fe3606ac8105032fc3af64fec67602287fa`. On September 29, seven issue bodies
+(#160/#182/#228/#230/#231/#232/#240) were reconciled with the disposition table;
+all 18 open scopes remain. All 55 audited merged branch refs still match the
+inventory, and the published native head below satisfies the #296 integration
+hold. Eight consumed request refs remain retained dependencies. No remote branch
+deletions ran because the connector provides no supported deletion operation;
+the original audit JSON remains dated evidence.
+
 The catalog/cleanup correction is accepted through [PR #294](https://github.com/Kajooja/Kajo/pull/294),
 main `3500f9b709e5315cb864f9bcbf9f004c76596bce`, reviewed
 `dc12785c4057151d3d3bd2faf160c69b99839550`, tree
@@ -54,36 +63,41 @@ zero-advisory result (571 production / 936 total dependencies); the
 integrity, auth callback parameters and xcode tests join root check; CI checks
 current advisories. Parser tests do not assert native link round-trip acceptance.
 
-The native source `e41f84475704223bb8994e0e49f3101be2d1122b`, tree
-`2c9d36532c8067e681b4577297f5d7ac84a3f889`, resolved #229's original nine conflicts
-against main through #295 and passed all five
-[CI #584 gates](https://github.com/Kajooja/Kajo/actions/runs/36481134174),
-**1,044 tests/four exports**. It preserves immutable delivered origins/protocol-2
-pages alongside current catalog description/credit and cold-history scope
-protection. All ten deployed September 10/12 forwards retain their exact bytes;
-both catalog and prediction concurrency/upgrade suites run in the combined CLI
+The preceding native source checkpoint is
+`6ed685d5e96c10062f73df26e103a43733030297`, tree
+`1cb418464278156d1c1bd084e172362478050cf6`, containing accepted #296 and #297.
+All five [CI #590 gates](https://github.com/Kajooja/Kajo/actions/runs/36536181092)
+passed, with **1,049 tests/four exports**. The original nine conflicts through
+#295 and the dependency integration are resolved. Immutable delivered origins,
+protocol-2 pages, catalog description/credit and cold-history scope protection
+remain; all ten deployed September 10/12 forwards retain their exact bytes.
+Both catalog and prediction concurrency/upgrade suites run in the combined CLI
 probe. #240 subscribes to native reachability only while focused and foregrounded,
 coalesces at most three automatic attempts per failed request, retains exact
 context/cursor/15-second deadlines and accepted prefix, and only clears an error
 after backend success. Expired cursors still require an explicit new search.
 
-The combined source incorporates accepted #296 and preserves its exact routing
-adapter and reviewed overrides with native `expo-network` 57.0.2. Five fetch mock
-types were made explicit for Vitest 4's DOM/native overload checking; all 410
-mobile tests and five dependency regressions pass. Complete exact-head CI remains
-separate from these local checks and the two green predecessor heads.
+Handoff PR #298 is accepted on main
+`70d78daa8d5e587f84a5802b986aefd1f9fa55ad` after all five CI #591 gates.
+Its current hygiene facts are now integrated here without runtime, SQL or package
+changes. CI #590 remains evidence for the preceding runtime checkpoint; the
+latest #229 head and its own five-job CI conclusion are independently authoritative
+in the PR. This documentation merge does not accept #229 into main or provide a
+new configured-device observation.
 
-**Next bounded action:** continue the current `feat/228-delivered-origin` / #229
-head, confirm accepted #296 is included and all five exact-head CI gates pass,
-and update #229's source/acceptance record. Then complete the named configured-device
-and fresh-account observations, including #240 network-loss/reconnect recovery.
-Do not repeat installed forwards or reset accounts to manufacture acceptance.
-Historical CI #469/APK source `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31` and the
-owner's exercised September 12 flows remain evidence only for their original binary.
-After this packet, continue Sprint 014's remaining evidence/catalog and algorithm
-gates in ROADMAP order. Later UI work has named slots rather than competing active
-branches; E1/D1/D2 need no repeat and optional model research is not a release
-prerequisite. No new hosted migration, account reset or device observation is claimed.
+**Next bounded action:** inspect the latest `feat/228-delivered-origin` / #229
+head and confirm its own five CI gates pass, resolving any integration failure
+before device acceptance. Then complete the current configured-device packet in
+[DEVICE_TEST](DEVICE_TEST.md#current-configured-device-packet--2026-09-29--240)
+and remaining fresh-account observations, including #240 network-loss/reconnect
+recovery. Do not repeat installed forwards or reset accounts to manufacture
+acceptance. Historical CI #469/APK source
+`900dc2653e428bb1cbd27e4bdaa7ea0141e47b31` and the owner's exercised September 12
+flows remain evidence only for their original binary. After this packet, continue
+Sprint 014's remaining evidence/catalog and algorithm gates in ROADMAP order.
+Later UI work has named slots; E1/D1/D2 need no repeat and optional model research
+is not a release prerequisite. No new hosted migration, account reset or device
+observation is claimed.
 
 ### Preserved #182 catalog and operation ledger
 

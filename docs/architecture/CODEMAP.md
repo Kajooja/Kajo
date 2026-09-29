@@ -160,13 +160,15 @@ Do not create empty feature folders merely to match future architecture. Shared 
 
 `feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
 contains the newer delivered-origin, atomic continuation, captured-scope client,
-List/history and recovery code present in this reconciled native checkout.
-It remains separate from accepted main until #229's required gates pass.
-[STATUS](../project/STATUS.md) owns the exact source/CI checkpoint, deployed
-forward identities and remaining device gates. Owner feedback on the historical
-CI #469 build is positive except reconnect retry UI (#240); the current source
-corrects that defect, with its new configured-device observation still open.
-Do not recreate the existing implementation or repeat its installed migrations.
+List/history and recovery code. That implementation remains separate from
+accepted main until #229's required gates pass.
+Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
+and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
+own exact paths, deployed forward identities and remaining device gates. Owner
+feedback on the historical CI #469 build is positive except reconnect retry UI
+(#240); its current source correction still requires configured-device acceptance.
+Continue the named native branch rather than recreating its implementation or
+repeating installed migrations from main.
 
 ## Portable engine — E1 #235
 
