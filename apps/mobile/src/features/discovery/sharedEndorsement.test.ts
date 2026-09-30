@@ -113,7 +113,7 @@ describe('Shared discovery collaboration overlay', () => {
       proposedByNickname: 'Mirri',
     });
     expect(formatPendingListApproval(approval)).toBe(
-      'Mirri lisäsi listaan Meidän illat',
+      'Mirri ehdottaa listoille: Meidän illat',
     );
     expect(
       getPendingListApproval(STATE['endorsed-by-me'], [
@@ -139,9 +139,13 @@ describe('Shared discovery collaboration overlay', () => {
     );
 
     expect(nicknames).toEqual(['Mirri']);
-    expect(formatMemberHistoryProvenance(nicknames)).toBe('Mirri nähnyt');
-    expect(formatMemberHistoryProvenance(['A', 'B'])).toBe(
+    expect(formatMemberHistoryProvenance(nicknames, 'MOVIE')).toBe('Mirri nähnyt');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'MOVIE')).toBe(
       'A ja B nähneet',
     );
+    expect(formatMemberHistoryProvenance(['A'], 'BOOK')).toBe('A lukenut');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'BOOK')).toBe('A ja B lukeneet');
+    expect(formatMemberHistoryProvenance(['A', 'B', 'C'], 'BOOK')).toBe('A ja 2 muuta lukeneet');
+    expect(formatMemberHistoryProvenance([], 'BOOK')).toBeNull();
   });
 });

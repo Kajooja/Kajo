@@ -5,7 +5,7 @@ import { ATTRIBUTED_DESCRIPTION } from '@kajo/catalog-contracts';
 import fixture from '../../../../../packages/catalog-contracts/fixtures.json';
 import { getRoomTheme } from '../../theme/roomTheme';
 import { CATALOG_DETAIL_TIMEOUT_MS, startCatalogDetailLoad, type CatalogDetailResult } from './catalogDetailLoad';
-import { clearPredictionItemCacheForTests, rememberPredictionItems } from './predictionRankingCache';
+import { rememberCollectionSlate } from './deliveredSlate';
 import { getMockItem } from './mockDiscovery';
 import { DescriptionCredit } from './DescriptionCredit';
 import { ItemDescription } from './ItemDescription';
@@ -45,8 +45,8 @@ function nodes(value: ReactNode): ReactElement<NodeProps>[] {
     ? [child, ...nodes(child.props.children)] : []);
 }
 
-beforeEach(() => { vi.useFakeTimers(); clearPredictionItemCacheForTests(); });
-afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); clearPredictionItemCacheForTests(); });
+beforeEach(() => { vi.useFakeTimers(); });
+afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); });
 
 describe('canonical List/history detail entry', () => {
   it('opens a cold Item absent from every recommendation and carries credit into the actual renderer', async () => {
@@ -68,8 +68,9 @@ describe('canonical List/history detail entry', () => {
   });
 
   it('does not reuse stale description text from a different cached recommendation', async () => {
-    rememberPredictionItems('unrelated-prediction', [{ id: itemId, itemType: 'BOOK', title: 'Old title',
-      description: 'Stale text', descriptionStatus: 'legacy' }]);
+    rememberCollectionSlate({ id: 'unrelated-detail-slate', scopeKey: 'other:actor:personal', sessionId: 'old-session',
+      mode: 'FOR_YOU', items: [{ id: itemId, itemType: 'BOOK', title: 'Old title',
+        description: 'Stale text', descriptionStatus: 'legacy' }] });
     const result = await load(fakeClient({ data: [row], error: null }).client);
     expect(result).toMatchObject({ status: 'ready', item: { title: row.title,
       description: fixture.description, descriptionAttribution: fixture.attribution } });

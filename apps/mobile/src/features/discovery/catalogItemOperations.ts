@@ -36,6 +36,7 @@ export type CatalogItemLoadResult =
 export async function loadCatalogItems(
   client: SupabaseClient,
   itemIds: readonly ItemId[],
+  signal?: AbortSignal,
 ): Promise<CatalogItemLoadResult> {
   const uniqueIds = [...new Set(itemIds.filter(Boolean))];
   if (uniqueIds.length === 0) {
@@ -43,10 +44,11 @@ export async function loadCatalogItems(
   }
 
   try {
-    const { data, error } = await client
+    const query = client
       .from('items')
       .select(CATALOG_ITEM_SELECT)
       .in('id', uniqueIds);
+    const { data, error } = await (signal ? query.abortSignal(signal) : query);
     const rawData: unknown = data;
 
     if (error || !Array.isArray(rawData)) {
@@ -73,7 +75,11 @@ export function enrichItemsFromCatalog(
 ): readonly Item[] {
   const byId = new Map(catalogItems.map((item) => [item.id, item]));
 
-  return rankedItems.map((item) => byId.get(item.id) ?? item);
+  return rankedItems.map((item) => {
+    const metadata = byId.get(item.id);
+    // A later catalog correction cannot turn a delivered BOOK into a MOVIE.
+    return metadata?.itemType === item.itemType ? metadata : item;
+  });
 }
 
 export async function enrichCatalogReferences<T extends { item: Item }>(

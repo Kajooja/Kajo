@@ -26,6 +26,20 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Reconciled delivery and recovery source — #229 / #240
+
+- `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts`:
+  protocol-2 captured scope, immutable pages and exact transport retry; one native
+  reachability listener per focused foreground reader, bounded reconnect attempts.
+- `predictionConnectivity.ts`: listener-first initial read, stale callback/blur/
+  background cancellation; `expo-network` is a declared SDK-57 native dependency.
+- `deliveredSlate.ts`, `useCollectionNavigation.ts`: immutable clicked Item origins
+  and separate collection provenance; the old unscoped Item cache is removed.
+- `ConsumedHistoryScreen.tsx`: canonical history ownership by request identity,
+  Profile/session/ItemType/revision plus collection navigation and atomic clear.
+- `run-ci-cli-installation-probe.mjs`: both immutable prediction forwards and later
+  catalog forwards, populated upgrades, runtime and concurrent-session assertions.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit

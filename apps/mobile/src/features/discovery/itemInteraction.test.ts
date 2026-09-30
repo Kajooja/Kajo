@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Item } from '../../domain/contracts';
+import type { CollectionActionReceipt } from '../events/collectionActions';
 import {
   buildSwipeSequence,
+  applyCollectionUndoReceipt,
+  canUndoItemInteraction,
   commitItemInteractionAction,
   EMPTY_ITEM_INTERACTION_STORE,
   getConsumedItems,
@@ -276,5 +279,48 @@ describe('item interaction state', () => {
     });
 
     expect(store).toBe(EMPTY_ITEM_INTERACTION_STORE);
+  });
+});
+
+describe('acknowledged collection undo history', () => {
+  const receipt: CollectionActionReceipt = {
+    version: 1, actionId: 'add-a', profileId: 'profile', kind: 'SET_LIST_ENTRY',
+    itemId: BOOK_A.id, listId: 'list', result: true, eventIds: ['add-a'],
+    changed: true, undoable: true, beforeInteraction: getItemInteraction({}, BOOK_A.id),
+    interaction: { ...getItemInteraction({}, BOOK_A.id), interest: 'LIKED' },
+    predictionId: null, discoveryMode: null,
+  };
+  const prior = commitItemInteractionAction(EMPTY_ITEM_INTERACTION_STORE,
+    { type: 'SET_RATING', itemId: BOOK_A.id, rating: 7, atomicActionId: 'rate-a' });
+  const added = applyCollectionUndoReceipt(prior, receipt);
+
+  it('waits for persistence readiness and acknowledgement before offering undo', () => {
+    expect(canUndoItemInteraction(added, false, 0)).toBe(false);
+    expect(canUndoItemInteraction(added, true, 1)).toBe(false);
+    expect(canUndoItemInteraction(added, true, 0)).toBe(true);
+    expect(canUndoItemInteraction(EMPTY_ITEM_INTERACTION_STORE, true, 0)).toBe(false);
+  });
+
+  it('keeps mixed Item/List undo order and does not repush an undo receipt', () => {
+    expect(getLatestUndoEntry(added)?.collectionActionId).toBe('add-a');
+    const undone = undoLastItemInteractionAction(added);
+    expect(applyCollectionUndoReceipt(undone, { ...receipt, kind: 'UNDO_LIST_ENTRY', undoable: false })).toBe(undone);
+    expect(getLatestUndoEntry(undone)?.atomicActionId).toBe('rate-a');
+  });
+
+  it('removal clears older undo for that Item while preserving another Item', () => {
+    const other = commitItemInteractionAction(added,
+      { type: 'SET_RATING', itemId: BOOK_B.id, rating: 8, atomicActionId: 'rate-b' });
+    const removed = applyCollectionUndoReceipt(other, { ...receipt, actionId: 'remove-a', result: false });
+    expect(removed.undoStack.map(entry => entry.itemId)).toEqual([BOOK_B.id]);
+  });
+
+  it('a no-op removal leaves a valid prior head unchanged', () => {
+    expect(applyCollectionUndoReceipt(added, { ...receipt, result: false, changed: false, undoable: false })).toBe(added);
+  });
+
+  it('List deletion clears history and a changed Shared action blocks older same-Item undo', () => {
+    expect(applyCollectionUndoReceipt(added, { ...receipt, kind: 'DELETE_LIST', itemId: null }).undoStack).toEqual([]);
+    expect(applyCollectionUndoReceipt(prior, { ...receipt, kind: 'ENDORSE_SHARED_ITEM', undoable: false }).undoStack).toEqual([]);
   });
 });

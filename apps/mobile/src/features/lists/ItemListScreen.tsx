@@ -1,3 +1,6 @@
+import { CollectionGrid } from './CollectionGrid';
+import { formatListEntryDate } from './listPresentation';
+import { EMPTY_ITEM_INTERACTION } from '../discovery/itemInteraction';
 import { useEffect, useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -5,7 +8,6 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -20,16 +22,15 @@ import { useDiscoveryMode } from '../discovery/DiscoveryModeContext';
 import { InteractionPersistenceNotice } from '../discovery/InteractionPersistenceNotice';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useItemLists } from './ItemListsContext';
+import { useCollectionNavigation } from './useCollectionNavigation';
 import {
   MAXIMUM_ITEM_LIST_NAME_LENGTH,
   type ItemListEntry,
 } from './itemListOperations';
 import {
-  formatListEntryDate,
   selectPresentedListEntries,
   type ItemListSort,
   type ItemListTypeFilter,
-  type ItemListView,
 } from './listPresentation';
 
 interface ItemListScreenProps {
@@ -46,9 +47,11 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   const profiles = useActiveProfile();
   const itemLists = useItemLists();
   const { loadEntries } = itemLists;
+  const openCollectionItem = useCollectionNavigation();
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
   const styles = createStyles(theme);
   const summary = itemLists.lists.find((list) => list.id === listId) ?? null;
+  const sharedSaved = profiles.activeProfile?.type === 'SHARED' && summary?.kind === 'SYSTEM_SAVED';
   const [entrySnapshot, setEntrySnapshot] = useState<{
     key: string;
     entries: readonly ItemListEntry[];
@@ -57,7 +60,6 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   const [attempt, setAttempt] = useState(0);
   const [filter, setFilter] = useState<ItemListTypeFilter>('ALL');
   const [sort, setSort] = useState<ItemListSort>('NEWEST');
-  const [view, setView] = useState<ItemListView>('LIST');
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -93,7 +95,7 @@ function ItemListContent({ listId }: ItemListScreenProps) {
   );
 
   async function removeEntry(entry: ItemListEntry) {
-    if (saving) return;
+    if (saving || !summary || sharedSaved) return;
     setSaving(true);
     setActionError(null);
     const result = await itemLists.setEntry(listId, entry.item.id, false);
@@ -156,7 +158,18 @@ function ItemListContent({ listId }: ItemListScreenProps) {
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
       <InteractionPersistenceNotice theme={theme} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <CollectionGrid theme={theme} refreshing={loading} onRefresh={() => setAttempt(current => current + 1)}
+        entries={presentedEntries.map(entry => ({ item: entry.item, caption: formatListEntryDate(entry.addedAt),
+          interaction: { ...EMPTY_ITEM_INTERACTION, saved: entry.saved, consumed: entry.consumed, rating: entry.rating },
+          provenance: profiles.activeProfile?.type === 'SHARED'
+            ? entry.addedByNickname ? `${entry.addedByNickname} lisäsi` : 'Aiempi jäsen lisäsi' : null }))}
+        onOpen={item => openCollectionItem(item, presentedEntries.map(entry => entry.item), summary?.name ?? 'Lista')}
+        renderActions={item => !summary || sharedSaved ? null : (
+          <Pressable accessibilityRole="button" accessibilityLabel={`Poista ${item.title} listalta`} disabled={saving}
+            onPress={() => { const entry = entries.find(candidate => candidate.item.id === item.id); if (entry) void removeEntry(entry); }}
+            style={{ paddingHorizontal: 10, paddingVertical: 10 }}><Text style={styles.removeText}>Poista listalta</Text></Pressable>
+        )}
+        header={<View style={styles.content}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -209,8 +222,6 @@ function ItemListContent({ listId }: ItemListScreenProps) {
           <View style={styles.controlRow}>
             <ControlButton active={sort === 'NEWEST'} label="Uusimmat" styles={styles} onPress={() => setSort('NEWEST')} />
             <ControlButton active={sort === 'OLDEST'} label="Vanhimmat" styles={styles} onPress={() => setSort('OLDEST')} />
-            <ControlButton active={view === 'LIST'} label="Lista" styles={styles} onPress={() => setView('LIST')} />
-            <ControlButton active={view === 'GRID'} label="Kortit" styles={styles} onPress={() => setView('GRID')} />
           </View>
         </View>
 
@@ -218,29 +229,20 @@ function ItemListContent({ listId }: ItemListScreenProps) {
         {loadError ? (
           <View style={styles.notice}>
             <Text style={styles.error}>{loadError}</Text>
-            <Pressable onPress={() => setAttempt((current) => current + 1)}><Text style={styles.link}>Yritä uudelleen</Text></Pressable>
+            <Text style={styles.link}>Päivitä vetämällä alaspäin.</Text>
           </View>
         ) : null}
         {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
+        {sharedSaved ? (
+          <Text style={styles.empty}>Tallennetut ovat ryhmän yhdessä hyväksymiä. Yhteisen tallennuksen poistaminen ei ole vielä käytettävissä.</Text>
+        ) : null}
 
         {!loading && !loadError && presentedEntries.length === 0 ? (
           <Text style={styles.empty}>Tällä listalla ei ole vielä kohteita.</Text>
         ) : null}
 
-        <View style={view === 'GRID' ? styles.grid : styles.list}>
-          {presentedEntries.map((entry) => (
-            <EntryCard
-              key={entry.item.id}
-              entry={entry}
-              isShared={profiles.activeProfile?.type === 'SHARED'}
-              grid={view === 'GRID'}
-              styles={styles}
-              onOpen={() => router.push({ pathname: '/discovery/[itemId]', params: { itemId: entry.item.id } })}
-              onRemove={() => void removeEntry(entry)}
-            />
-          ))}
-        </View>
-      </ScrollView>
+        </View>}
+      />
     </SafeAreaView>
   );
 }
@@ -253,31 +255,10 @@ function ControlButton({ label, active, styles, onPress }: { label: string; acti
   );
 }
 
-function EntryCard({ entry, isShared, grid, styles, onOpen, onRemove }: { entry: ItemListEntry; isShared: boolean; grid: boolean; styles: ReturnType<typeof createStyles>; onOpen: () => void; onRemove: () => void }) {
-  return (
-    <View style={[styles.entry, grid && styles.gridEntry]}>
-      <Pressable accessibilityRole="button" onPress={onOpen} style={styles.entryBody}>
-        <Text style={styles.entryType}>{entry.item.itemType === 'BOOK' ? 'KIRJA' : 'ELOKUVA'}</Text>
-        <Text numberOfLines={grid ? 3 : 2} style={styles.entryTitle}>{entry.item.title}</Text>
-        <Text style={styles.entryMeta}>
-          {entry.rating !== null ? `Arvosana ${entry.rating}/10 · ` : entry.consumed ? 'Kulutettu · ' : ''}
-          {formatListEntryDate(entry.addedAt)}
-        </Text>
-        {isShared ? (
-          <Text style={styles.provenance}>{entry.addedByNickname ? `${entry.addedByNickname} lisäsi` : 'Aiempi jäsen lisäsi'}</Text>
-        ) : null}
-      </Pressable>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Poista ${entry.item.title} listalta`} onPress={onRemove} style={styles.removeButton}>
-        <Text style={styles.removeText}>Poista</Text>
-      </Pressable>
-    </View>
-  );
-}
-
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: 'transparent' },
-    content: { padding: 20, paddingBottom: 44, gap: 18 },
+    content: { padding: 18, paddingBottom: 12, gap: 14 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     backButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
     backText: { color: theme.base.textPrimary, fontSize: 34 },
@@ -301,16 +282,6 @@ function createStyles(theme: RoomTheme) {
     notice: { gap: 6 },
     error: { color: '#f2a6a6', fontSize: 13 },
     empty: { color: theme.base.textMuted, paddingVertical: 28, textAlign: 'center' },
-    list: { gap: 10 },
-    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    entry: { minHeight: 124, padding: 14, gap: 10, borderRadius: 15, borderWidth: 1, borderColor: theme.base.border, backgroundColor: theme.surface.panel },
-    gridEntry: { width: '48%', minHeight: 180 },
-    entryBody: { flex: 1, gap: 4 },
-    entryType: { color: theme.base.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-    entryTitle: { color: theme.base.textPrimary, fontSize: 16, fontWeight: '800' },
-    entryMeta: { color: theme.base.textMuted, fontSize: 12, lineHeight: 17 },
-    provenance: { color: theme.ambient.curtainHighlight, fontSize: 12, fontWeight: '700' },
-    removeButton: { alignSelf: 'flex-start', paddingVertical: 4 },
     removeText: { color: '#f2a6a6', fontSize: 12, fontWeight: '700' },
   });
 }

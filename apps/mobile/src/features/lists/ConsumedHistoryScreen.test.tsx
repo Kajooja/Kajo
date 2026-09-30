@@ -3,7 +3,9 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { router } from 'expo-router';
 import type { ItemType } from '../../domain/contracts';
 import type { ConsumedItemsResult } from './itemListOperations';
-import { ConsumedHistoryScreen } from './ConsumedHistoryScreen';
+import { ConsumedHistoryContent } from './ConsumedHistoryScreen';
+import { CollectionGrid } from './CollectionGrid';
+import { getDeliveredSlate } from '../discovery/deliveredSlate';
 
 const hooks = vi.hoisted(() => ({
   states: [] as unknown[],
@@ -15,6 +17,7 @@ const hooks = vi.hoisted(() => ({
 const context = vi.hoisted(() => ({
   scopeKey: 'test:actor:personal' as string | null,
   profileName: 'Personal',
+  revision: 0,
   loadConsumed: vi.fn<(itemType: ItemType | null) => Promise<ConsumedItemsResult>>(),
 }));
 
@@ -34,6 +37,11 @@ vi.mock('react', async importOriginal => {
         hooks.states[index] = typeof next === 'function' ? next(hooks.states[index]) : next;
       }];
     },
+    useRef: (initial: unknown) => {
+      const index = hooks.stateIndex++;
+      if (!(index in hooks.states)) hooks.states[index] = { current: initial };
+      return hooks.states[index];
+    },
     useMemo: (factory: () => unknown, deps: readonly unknown[]) => {
       const index = hooks.memoIndex++;
       if (!same(hooks.memos[index]?.deps, deps)) hooks.memos[index] = { deps, value: factory() };
@@ -52,6 +60,13 @@ vi.mock('react', async importOriginal => {
     },
   };
 });
+vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({
+  sessionId: 'test-session', createEventId: () => 'history-navigation-test',
+}) }));
+vi.mock('../discovery/ItemInteractionContext', () => ({ useItemInteractions: () => ({
+  submitCollectionAction: vi.fn(),
+}) }));
+vi.mock('./CollectionGrid', () => ({ CollectionGrid: 'CollectionGrid' }));
 vi.mock('./ItemListsContext', () => ({ useItemLists: () => context }));
 vi.mock('../profiles/ActiveProfileContext', () => ({ useActiveProfile: () => ({
   activeProfile: { id: context.scopeKey, type: 'PERSONAL', name: context.profileName },
@@ -78,7 +93,13 @@ function text(value: ReactNode): string {
 }
 function render(itemType: ItemType = 'BOOK') {
   hooks.stateIndex = hooks.memoIndex = hooks.effectIndex = 0;
-  return ConsumedHistoryScreen({ itemType });
+  const screen = ConsumedHistoryContent({ itemType });
+  // Inspect the real collection props while leaving native virtualization to device tests.
+  const grid = React.Children.toArray(screen.props.children).find(child => React.isValidElement(child) && child.type === CollectionGrid) as ReactElement<React.ComponentProps<typeof CollectionGrid>>;
+  return React.createElement('View', {}, grid.props.header,
+    React.createElement('Pressable', { onPress: grid.props.onRefresh }, 'Yritä uudelleen'),
+    ...grid.props.entries.map(entry => React.createElement('Pressable', { key: entry.item.id,
+      onPress: () => grid.props.onOpen(entry.item) }, entry.item.title)));
 }
 function flushEffects() {
   const effects = [...hooks.pending.values()];
@@ -198,7 +219,12 @@ describe('consumed history read ownership', () => {
     const tree = render('MOVIE');
     expect(text(tree)).toContain('Katsotut');
     nodes(tree).find(node => node.type === 'Pressable' && text(node).includes('Watched movie'))!.props.onPress!();
-    expect(router.push).toHaveBeenCalledWith({ pathname: '/discovery/[itemId]', params: { itemId: 'fixture-item' } });
+    expect(router.push).toHaveBeenCalledWith({ pathname: '/discovery/[itemId]',
+      params: { itemId: 'fixture-item', deliveryId: 'history-navigation-test' } });
+    const slate = getDeliveredSlate('history-navigation-test')!;
+    expect(slate).toMatchObject({ scopeKey: context.scopeKey, sessionId: 'test-session',
+      source: 'collection', predictionId: null, collectionTitle: 'Katsotut' });
+    expect(slate.items.map(item => item.title)).toEqual(['Watched movie']);
     expect(context.loadConsumed.mock.calls).toEqual([['BOOK'], ['MOVIE']]);
   });
 });

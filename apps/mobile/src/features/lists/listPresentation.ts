@@ -3,7 +3,6 @@ import type { ItemListEntry } from './itemListOperations';
 
 export type ItemListTypeFilter = 'ALL' | ItemType;
 export type ItemListSort = 'NEWEST' | 'OLDEST';
-export type ItemListView = 'LIST' | 'GRID';
 
 export const COMPACT_LIST_DESTINATION_LIMIT = 5;
 export const DRAWER_MOST_USED_LIST_LIMIT = 3;

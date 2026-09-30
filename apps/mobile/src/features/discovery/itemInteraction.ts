@@ -1,4 +1,5 @@
 import type { EventId, Item, ItemId } from '../../domain/contracts';
+import type { CollectionActionReceipt } from '../events/collectionActions';
 
 export type ItemInterest = 'LIKED' | 'DISLIKED';
 
@@ -188,6 +189,31 @@ export function getLatestUndoEntry(
   store: ItemInteractionStore,
 ): ItemInteractionUndoEntry | null {
   return store.undoStack[store.undoStack.length - 1] ?? null;
+}
+
+export function canUndoItemInteraction(store: ItemInteractionStore, ready: boolean, pendingCount: number): boolean {
+  return ready && pendingCount === 0 && store.undoStack.length > 0;
+}
+
+export function applyCollectionUndoReceipt(
+  store: ItemInteractionStore,
+  receipt: CollectionActionReceipt,
+): ItemInteractionStore {
+  if (!receipt.changed || receipt.kind === 'UNDO_LIST_ENTRY') return store;
+  // A deleted List can invalidate several earlier receipts, whose Items are not
+  // included in this response. Drop the session history instead of offering stale undo.
+  if (receipt.kind === 'DELETE_LIST') return { ...store, undoStack: [] };
+  if (!receipt.itemId) return store;
+  if (receipt.kind === 'SET_LIST_ENTRY' && receipt.result === true
+    && receipt.undoable && receipt.beforeInteraction) {
+    return { ...store, undoStack: [...store.undoStack, {
+      itemId: receipt.itemId, previousInteraction: receipt.beforeInteraction,
+      eventId: receipt.actionId, collectionActionId: receipt.actionId,
+    }].slice(-ITEM_INTERACTION_UNDO_LIMIT) };
+  }
+  // Removal and Shared changes advance this Item's server action head. Neither
+  // the removal nor earlier actions behind that head are offered as undo.
+  return { ...store, undoStack: store.undoStack.filter(entry => entry.itemId !== receipt.itemId) };
 }
 
 export function getNextSwipeIndex(currentIndex: number, itemCount: number): number | null {

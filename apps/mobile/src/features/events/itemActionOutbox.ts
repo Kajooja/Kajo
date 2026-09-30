@@ -28,6 +28,7 @@ export interface ItemActionOutbox<TEntry extends PendingQueuedAction = PendingIt
   stop(): void;
   enqueue(entry: TEntry): boolean;
   retry(): void;
+  resumeAfterExposure(): void;
   discardRejectedUndo(): boolean;
   discardRejectedAction(): boolean;
   pending(): readonly TEntry[];
@@ -59,6 +60,8 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
   let attempt = 0;
   let flight: Promise<void> | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
+  let waitingForExposure = false;
+  let exposureChangedDuringFlight = false;
   const isValid = options.isPendingAction ?? (isPendingItemAction as unknown as
     (value: unknown, scope: ItemActionScope) => value is TEntry);
 
@@ -117,11 +120,16 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
         catch { result = { status: 'error', retryable: true, message: 'Valinta odottaa yhteyttä. Yritämme tallennusta uudelleen.' }; }
         finally { if (deadline) clearTimeout(deadline); }
         if (result.status === 'error') {
-          message = result.message;
+          // Waiting for our own exposure queue is normal pending work. Publishing
+          // it as an error also settles collection waiters before the real receipt.
+          waitingForExposure = result.retryable && result.waitingForExposure === true;
+          message = waitingForExposure ? null : result.message;
           blocked = !result.retryable;
           rejectedEntry = result.rejectedAction === true || (result.rejectedUndo === true && entry.command.kind === 'UNDO') ? entry : null;
           if (active && result.retryable) {
-            const delay = Math.min(30_000, 1_000 * 2 ** Math.min(attempt++, 5));
+            // Exposure acknowledgement normally wakes this immediately. Its
+            // fallback timer must not increase network-failure backoff.
+            const delay = waitingForExposure ? 1_000 : Math.min(30_000, 1_000 * 2 ** Math.min(attempt++, 5));
             timer = setTimeout(() => { timer = null; drain(); }, delay);
           }
           break;
@@ -135,6 +143,7 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
           write(current.filter(row => row.command.actionId !== entry.command.actionId));
         } catch { ready = false; message = STORAGE_ERROR; break; }
         message = null;
+        waitingForExposure = false;
         attempt = 0;
         if (active && options.isCurrent?.() !== false) options.onCommitted(result.receipt);
         publish();
@@ -142,11 +151,25 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
     })().finally(() => {
       flight = null;
       publish();
+      const resume = waitingForExposure && exposureChangedDuringFlight;
+      exposureChangedDuringFlight = false;
+      if (resume) resumeAfterExposure();
       if (pending.length > 0) drain();
     });
   }
 
   reload();
+  function resumeAfterExposure() {
+    if (!active || options.isCurrent?.() === false) return;
+    // The Event can finish while the guarded sender is returning "wait".
+    // Remember that notification until the in-flight result is classified.
+    if (flight) { exposureChangedDuringFlight = true; return; }
+    if (!waitingForExposure) return;
+    if (timer) clearTimeout(timer);
+    timer = null;
+    waitingForExposure = false;
+    drain();
+  }
   function discardRejectedAction() {
     if (!active || options.isCurrent?.() === false || !blocked || !rejectedEntry) return false;
     try {
@@ -189,10 +212,12 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
       blocked = false;
       rejectedEntry = null;
       message = null;
+      waitingForExposure = false;
       reload();
       publish();
       drain();
     },
+    resumeAfterExposure,
     discardRejectedUndo() {
       return rejectedEntry?.command.kind === 'UNDO' && discardRejectedAction();
     },

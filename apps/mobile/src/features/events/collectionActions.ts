@@ -10,12 +10,13 @@ import {
 import { createItemActionSender, type ItemActionResult } from './itemActionPersistence';
 
 export type CollectionActionIntent =
+  | { kind: 'CLEAR_HISTORY'; itemId: string }
   | { kind: 'CREATE_LIST'; itemId: null; name: string }
   | { kind: 'RENAME_LIST'; itemId: null; listId: string; name: string }
   | { kind: 'DELETE_LIST'; itemId: null; listId: string }
   | { kind: 'SET_LIST_ENTRY'; itemId: string; listId: string; present: boolean; positive: boolean }
   | { kind: 'UNDO_LIST_ENTRY'; itemId: string; reversesActionId: string }
-  | { kind: 'ENDORSE_SHARED_ITEM'; itemId: string; listId: string | null }
+  | { kind: 'ENDORSE_SHARED_ITEM'; itemId: string; listId: string | null; listIds?: readonly string[] }
   | { kind: 'REVERSE_ENDORSEMENT'; itemId: string };
 
 export type CollectionActionSource = 'LISTS' | 'LIST_DETAIL' | 'ITEM_DESTINATION_PICKER' | 'SHARED_DISCOVERY';
@@ -78,7 +79,7 @@ export function createCollectionMutationRpc(submit: SubmitCollectionAction, prof
 
 export function isCollectionCommand(command: { kind: string }): command is CollectionActionCommand {
   return ['CREATE_LIST', 'RENAME_LIST', 'DELETE_LIST', 'SET_LIST_ENTRY', 'UNDO_LIST_ENTRY',
-    'ENDORSE_SHARED_ITEM', 'REVERSE_ENDORSEMENT'].includes(command.kind);
+    'ENDORSE_SHARED_ITEM', 'REVERSE_ENDORSEMENT', 'CLEAR_HISTORY'].includes(command.kind);
 }
 
 export function isPendingProfileAction(value: unknown, scope: ItemActionScope): value is PendingProfileAction {
@@ -95,6 +96,8 @@ export function isPendingProfileAction(value: unknown, scope: ItemActionScope): 
     || !['LISTS', 'LIST_DETAIL', 'ITEM_DESTINATION_PICKER', 'SHARED_DISCOVERY'].includes(String(c.source))) return false;
   const validName = typeof c.name === 'string' && validateItemListName(c.name).status === 'valid';
   switch (c.kind) {
+    case 'CLEAR_HISTORY': return isUuid(c.itemId) && c.predictionId === null && c.discoveryMode === null
+      && (c.listId === undefined || c.listId === null);
     case 'CREATE_LIST': return c.itemId === null && validName;
     case 'RENAME_LIST': return c.itemId === null && isUuid(c.listId) && validName;
     case 'DELETE_LIST': return c.itemId === null && isUuid(c.listId);
@@ -102,7 +105,10 @@ export function isPendingProfileAction(value: unknown, scope: ItemActionScope): 
       && typeof c.present === 'boolean' && typeof c.positive === 'boolean'
       && (!c.positive || (c.present && c.source === 'ITEM_DESTINATION_PICKER'));
     case 'UNDO_LIST_ENTRY': return isUuid(c.itemId) && isUuid(c.reversesActionId) && isItemInteraction(value.restoredInteraction);
-    case 'ENDORSE_SHARED_ITEM': return isUuid(c.itemId) && (c.listId === null || isUuid(c.listId));
+    case 'ENDORSE_SHARED_ITEM': return isUuid(c.itemId) && (c.listId === null || isUuid(c.listId))
+      && (c.listIds === undefined || (Array.isArray(c.listIds) && c.listIds.length > 0 && c.listIds.length <= 32
+        && c.listIds.every(isUuid) && new Set(c.listIds).size === c.listIds.length
+        && (c.listId === null || c.listIds.includes(c.listId))));
     case 'REVERSE_ENDORSEMENT': return isUuid(c.itemId);
     default: return false;
   }
@@ -141,7 +147,9 @@ function validReceipt(data: unknown, command: CollectionActionCommand): data is 
       const mapped = mapSharedEndorsementCommit(data.result);
       return mapped.status === 'success' && mapped.commit.profileId === command.profileId
         && mapped.commit.itemId === command.itemId && mapped.commit.actorUserId === command.actorUserId
-        && mapped.commit.proposalListId === data.listId;
+        && mapped.commit.proposalListId === data.listId
+        && (command.listIds === undefined || (mapped.commit.proposalLists?.length === command.listIds.length
+          && mapped.commit.proposalLists.every(list => command.listIds!.includes(list.id))));
     }
     case 'REVERSE_ENDORSEMENT': {
       const row = Array.isArray(data.result) && data.result.length === 1 ? data.result[0] : null;
@@ -149,6 +157,9 @@ function validReceipt(data: unknown, command: CollectionActionCommand): data is 
         && row.actor_user_id === command.actorUserId && typeof row.endorsement_reversed === 'boolean'
         && Number.isInteger(row.endorsement_count) && (row.endorsement_count as number) >= 0;
     }
+    case 'CLEAR_HISTORY': return data.result === true && data.listId === null
+      && data.predictionId === null && data.discoveryMode === null
+      && isItemInteraction(data.interaction) && data.interaction.rating === null && !data.interaction.consumed;
     case 'SET_LIST_ENTRY': return data.result === command.present;
     case 'DELETE_LIST':
     case 'UNDO_LIST_ENTRY': return data.result === true;

@@ -3,6 +3,12 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Item } from '../../domain/contracts';
 import { CatalogDetailEntry } from './CatalogDetailEntry';
 import { ItemDetailScreen } from './ItemDetailScreen';
+import { getDeliveredSlate, rememberDeliveredSlate } from './deliveredSlate';
+
+vi.mock('react', async importOriginal => ({
+  ...await importOriginal<typeof import('react')>(),
+  useState: (initial: unknown) => [typeof initial === 'function' ? initial() : initial, vi.fn()],
+}));
 
 const state = vi.hoisted(() => ({ client: {}, scopeKey: 'test:actor:personal', shared: false, overlayStatus: 'ready' }));
 vi.mock('../../data/SupabaseProvider', () => ({ useSupabaseConnection: () => ({ status: 'configured', client: state.client }) }));
@@ -13,7 +19,7 @@ vi.mock('../profiles/ActiveProfileContext', () => ({ useActiveProfile: () => ({
 vi.mock('./DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
 vi.mock('./SharedEndorsementContext', () => ({ useSharedEndorsements: () => ({ status: state.overlayStatus, retry: vi.fn() }) }));
 vi.mock('../lists/ItemListsContext', () => ({ useItemLists: () => ({ scopeKey: state.scopeKey }) }));
-vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: vi.fn() }));
+vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({ sessionId: 'test-session' }) }));
 vi.mock('../messages/ProfileMessagesContext', () => ({ useProfileMessages: vi.fn() }));
 vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: vi.fn() }));
 vi.mock('../lists/ListDestinationSheet', () => ({ ListDestinationSheet: 'ListDestinationSheet' }));
@@ -57,8 +63,18 @@ describe('the real detail route', () => {
     state.overlayStatus = 'loading';
     expect(ItemDetailScreen({ itemId: 'cold-item' }).type).not.toBe(CatalogDetailEntry);
     state.overlayStatus = 'ready';
-    const prediction = ItemDetailScreen({ itemId: 'ranked-item', predictionId: 'delivered-run', predictionSource: 'hosted' });
+    rememberDeliveredSlate({ id: 'entry-test-delivery', scopeKey: state.scopeKey, sessionId: 'test-session',
+      predictionId: 'delivered-run', source: 'hosted', mode: 'FOR_YOU',
+      items: [{ id: 'ranked-item', itemType: 'BOOK', title: 'Delivered title' }],
+      origins: { 'ranked-item': { predictionId: 'delivered-run',
+        properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } } } });
+    const prediction = ItemDetailScreen({ itemId: 'ranked-item', deliveryId: 'entry-test-delivery', predictionSource: 'hosted' });
     expect(prediction.type).not.toBe(CatalogDetailEntry);
-    expect(prediction.props).toMatchObject({ predictionId: 'delivered-run', predictionSource: 'hosted' });
+    expect(prediction.props.slate).toBe(getDeliveredSlate('entry-test-delivery'));
+    const missing = ItemDetailScreen({ itemId: 'ranked-item', predictionId: 'invented-run', predictionSource: 'hosted' });
+    expect(missing.type).not.toBe(CatalogDetailEntry);
+    expect(missing.props.slate).toBeUndefined();
+    state.scopeKey = 'other:actor:personal';
+    expect(ItemDetailScreen({ itemId: 'ranked-item', deliveryId: 'entry-test-delivery' }).props.slate).toBeUndefined();
   });
 });

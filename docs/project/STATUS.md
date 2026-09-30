@@ -736,7 +736,8 @@ The owner-approved #229 hosted rollout completed on 2026-09-12 through
 `20260912134224_atomic_prediction_pages`, as recorded in that branch's
 [rollout checkpoint](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/sprints/SPRINT-014.md#approved-hosted-prediction-rollout--2026-09-12).
 All six installed forwards are immutable; do not redeploy, reset, repair historical
-migrations or mistake this older accepted-main SQL tree for a new rollout packet.
+migrations or mistake their presence in this reconciled native SQL tree for a new
+rollout packet.
 The separately deferred `20260909131913_close_postgres_function_defaults.sql`
 remains its own gate. The earlier independent E1 packet ran no hosted query or
 mutation; later catalog rollout/read-only checkpoints are recorded separately above.

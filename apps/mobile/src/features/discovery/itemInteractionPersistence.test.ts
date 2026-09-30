@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import {
   createAcknowledgedInteractionRefresh,
+  createSupabaseItemInteractionPersistenceApi,
   loadPersistedItemInteractions,
   type ItemInteractionPersistenceApi,
 } from './itemInteractionPersistence';
@@ -25,6 +27,21 @@ function createApi(): ItemInteractionPersistenceApi {
 }
 
 describe('loadPersistedItemInteractions', () => {
+  it('hydrates initial and native ratings through one Profile-authorized snapshot, including zero', async () => {
+    const rpc = vi.fn(async () => ({ data: [
+      { item_id: 'initial', interest: null, saved: false, consumed: true, rating: 0, not_interested: false },
+      { item_id: 'native', interest: 'LIKED', saved: true, consumed: true, rating: 8, not_interested: false },
+      { item_id: 'read-only', interest: null, saved: false, consumed: true, rating: null, not_interested: false },
+    ], error: null }));
+    const api = createSupabaseItemInteractionPersistenceApi({ rpc } as unknown as SupabaseClient);
+    const result = await loadPersistedItemInteractions(api, 'personal-a');
+    expect(rpc).toHaveBeenCalledExactlyOnceWith('get_profile_item_states_v1', { target_profile_id: 'personal-a' });
+    expect(result).toMatchObject({ status: 'success', interactions: {
+      initial: { consumed: true, rating: 0 }, native: { consumed: true, rating: 8, saved: true },
+      'read-only': { consumed: true, rating: null },
+    } });
+  });
+
   it('hydrates generic interaction state by Item ID', async () => {
     const api = createApi();
 
