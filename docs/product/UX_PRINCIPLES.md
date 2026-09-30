@@ -185,6 +185,13 @@ either recommendations or Shared choices load. Durable mutation recovery remains
 a distinct action; refreshing never discards queued choices. Gesture behavior
 requires the combined real-device acceptance checkpoint.
 
+At the terminal Discovery notice, the owner also requires downward-pull refresh
+without returning to the top (2026-09-30, #199). A pull beginning on that notice
+and its accessible **Päivitä haku** button use the same scoped refresh boundary.
+Normal grid scrolling remains available; repeated gestures coalesce and callbacks
+from a replaced Profile/request cannot refresh the new scope. The notice describes
+the current search, never claims that every catalog Item has been exhausted.
+
 
 Destination-picker panels must keep all action buttons above Android system
 navigation and Kajo's bottom navigation, consistent with the other panels.

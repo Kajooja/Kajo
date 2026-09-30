@@ -174,6 +174,15 @@ feedback on the historical CI #469 build is positive except reconnect retry UI
 Continue the named native branch rather than recreating its implementation or
 repeating installed migrations from main.
 
+The focused #199 terminal-refresh follow-up adds
+`apps/mobile/src/features/discovery/DiscoveryEndRefresh.tsx` and its component
+regressions. `DiscoveryScreen` renders it only at the current hosted search's
+terminal notice and binds it to the same scoped refresh/Shared recovery path.
+PanResponder captures downward pulls starting on that surface; a labelled button
+provides an accessible equivalent. Trigger coalescing and unmount cleanup preserve
+request/Profile boundaries. This source remains separate from the current test
+APK until reviewed, built and physically accepted; STATUS owns that checkpoint.
+
 ## Portable engine — E1 #235
 
 | Area | Source | Scope |
