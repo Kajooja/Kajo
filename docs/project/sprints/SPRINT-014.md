@@ -14,6 +14,26 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native document reconciliation and fixed APK source — 2026-09-30
+
+Security PR #299 is accepted on main `1c26e0d72d30662f70c3cf061790cd2672443f43`
+after all five CI #597 gates at reviewed `0f210b19e07cd06aad236c028ef70703b694105b`.
+Native documentation head `9fac7ec772959465ea4b25bf8ad1b86de4fcef8e`, tree
+`71a9f65489800ac2b450e1f55d104bc92df3bcd8`, incorporates that accepted main.
+One STATUS conflict was deliberately resolved with accepted main's current packet
+and the native historical tail; the complete sprint record is preserved.
+Only those two Markdown files differ from standalone runtime source
+`2cfa2f3b206cba87712f3d531a78f00e24e59791`. All executable files and APK
+build inputs remain byte-identical. [CI #599](https://github.com/Kajooja/Kajo/actions/runs/36689852558)
+owns the new document head's required checks.
+
+The frozen runtime's PR CI #595 and all five standalone CI #596 gates pass,
+**1,057 tests/four exports**, with zero known advisories. CI #596's actual APK
+conclusion/artifact and that frozen SHA own binary identity; the document merge
+does not constitute a different application build or device observation.
+Configured-device #240 recovery and remaining native/fresh-account observations
+remain the single next packet after these source/build checks. #229 stays draft.
+
 ## Branch cleanup and standalone audit correction — 2026-09-30 / #229 / #238
 
 The owner-authorized cleanup deleted **57 merged development refs** and retained

@@ -65,16 +65,32 @@ fresh zero-advisory result. Its source PR still requires all five CI gates befor
 merge. The native graph is measured separately in
 [its receipt on the exact source](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/dependency-audit-native-2026-09-30.json).
 
-Draft [#229](https://github.com/Kajooja/Kajo/pull/229) publishes corrected head
+Draft [#229](https://github.com/Kajooja/Kajo/pull/229) now publishes documentation
+head `9fac7ec772959465ea4b25bf8ad1b86de4fcef8e`, tree
+`71a9f65489800ac2b450e1f55d104bc92df3bcd8`, including accepted security
+[PR #299](https://github.com/Kajooja/Kajo/pull/299) / main
+`1c26e0d72d30662f70c3cf061790cd2672443f43`. All five exact-head
+[CI #597 gates](https://github.com/Kajooja/Kajo/actions/runs/36687401224)
+passed for reviewed `0f210b19e07cd06aad236c028ef70703b694105b`.
+Only STATUS and Sprint 014 changed in the subsequent native reconciliation:
+accepted main's current packet and the complete native historical tail are both
+preserved. Every executable file and APK build input is byte-identical to the
+frozen standalone source below. [CI #599](https://github.com/Kajooja/Kajo/actions/runs/36689852558)
+owns the latest documentation head's five required conclusions; earlier runtime
+checks do not replace those checks.
+
+The standalone runtime source remains
 `2cfa2f3b206cba87712f3d531a78f00e24e59791`, tree
-`ff0b9367aa2dd5227931a839880c5b0814dcaf4f`, incorporating correction
+`ff0b9367aa2dd5227931a839880c5b0814dcaf4f`, including correction
 `9a8b951ffefcbd53671f6046f3560f5a2ee33c5d`.
-[CI #595](https://github.com/Kajooja/Kajo/actions/runs/36686521092) owns its PR
-checks. Replacement standalone dispatch
-[CI #596](https://github.com/Kajooja/Kajo/actions/runs/36686741366) uses that
-same exact head; its conclusion and `kajo-android-standalone-2cfa2f3b206cba87712f3d531a78f00e24e59791`
-artifact are the authoritative build receipt. Native local root check and the
-separate native audit also pass. The source retains immutable delivered origins,
+[PR CI #595](https://github.com/Kajooja/Kajo/actions/runs/36686521092) and all five
+required gates in [standalone CI #596](https://github.com/Kajooja/Kajo/actions/runs/36686741366)
+pass for this runtime source, with **1,057 tests/four exports** and a fresh
+zero-advisory audit. CI #596's APK conclusion and
+`kajo-android-standalone-2cfa2f3b206cba87712f3d531a78f00e24e59791` artifact
+are the binary receipt; the later document commit does not change that source.
+Native local root check and its separate audit also pass.
+The source retains immutable delivered origins,
 protocol-2 pagination, catalog description/credit and cold-history scope protection;
 all ten already deployed native forwards retain their exact bytes. #240's focused
 foreground reader preserves the exact request/context/cursor, accepted prefix and
@@ -83,8 +99,9 @@ backend recovery clears the error; an expired cursor requires explicit new searc
 This remains draft implementation, separately from accepted main and real device
 observations.
 
-**Next bounded action:** verify all five required jobs and the successful APK
-artifact for exact head `2cfa2f3b206cba87712f3d531a78f00e24e59791` in CI #596.
+**Next bounded action:** verify the latest document head's five CI #599 gates
+and the successful standalone APK artifact for exact runtime source
+`2cfa2f3b206cba87712f3d531a78f00e24e59791` in CI #596.
 Resolve any actual failure before installation, then complete
 [the native configured-device packet](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/DEVICE_TEST.md)
 and remaining fresh-account observations, including #240 network-loss/reconnect.
