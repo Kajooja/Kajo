@@ -1,5 +1,29 @@
 # Collection device checkpoint — #228 / #229
 
+## Owner result and end-of-grid refresh — 2026-09-30
+
+The owner reports that disconnection and reconnection worked. Retain that
+positive basic #240 observation; the installed run/SHA, device/OS and page were
+not supplied, so the remaining cases below are not inferred to have passed.
+
+The same exercise found #199: after reaching the end of BOOK recommendations,
+the instruction says to pull down, but refreshing requires returning to the top.
+The focused source follow-up on `fix/199-discovery-end-refresh` supplies a
+downward pull beginning on the end notice and a **Päivitä haku** button. Source
+review/checks and a new installed APK precede acceptance of that correction.
+
+For the corrected APK, scroll to the final BOOK and MOVIE rows. Pull downward
+on the notice, then repeat using the button: both start a fresh search without
+first returning to the top. Ordinary scrolling elsewhere remains usable. Short,
+upward and sideways gestures must not refresh. Repeated pulls/taps must not
+create duplicate refreshes; switching Profile or leaving during a pull must
+not start work in the newly active scope. Test a short list and empty state too;
+their existing top pull-to-refresh remains usable. Record the new APK identity.
+
+Continue the other current configured-device and protocol-2 cases below on the
+existing requested APK; its known terminal-gesture failure remains recorded.
+Use the existing accounts and preserve their data.
+
 ## APK source refresh — 2026-09-30 / #238
 
 The September 30 dispatch [CI #594](https://github.com/Kajooja/Kajo/actions/runs/36681309205)

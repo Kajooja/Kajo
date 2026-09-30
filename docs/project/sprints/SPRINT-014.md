@@ -14,6 +14,25 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Phone recovery result and terminal refresh — 2026-09-30 / #199 / #240
+
+The owner reports successful network loss/reconnection. The actual installed
+run/SHA, device/OS and page were not supplied; retain this basic positive result
+without claiming the remaining native/recovery/fresh-account gates. Issue #240
+records its scope. The existing CI #596 APK remains the requested test source.
+
+The BOOK end notice instructs pull-to-refresh but native refresh is only available
+at the top. #199 records this new defect. The focused source branch
+`fix/199-discovery-end-refresh` adds a terminal-notice downward gesture and
+accessible refresh button, reusing the same reader and Shared refresh boundary.
+Short/upward/sideways gestures are ignored, repeat triggers coalesce and unmounted
+footer callbacks cannot act on a changed Profile/request. Six focused component
+regressions cover these behaviors. Root checks/CI and physical gesture acceptance
+are separate; a corrected APK is needed for the new terminal repeat. No deployed
+migration, data, account or existing operation is changed. STATUS owns continuation
+and DEVICE_TEST records the owner-facing repeat; broader #199 UI work stays in
+its existing ROADMAP slot.
+
 ## Branch cleanup and standalone audit correction — 2026-09-30 / #229 / #238
 
 The owner-authorized cleanup deleted **57 merged development refs** and retained

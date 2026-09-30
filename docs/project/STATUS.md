@@ -12,6 +12,25 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
 
+### Phone result and terminal refresh follow-up — 2026-09-30
+
+The owner reports that network disconnection and reconnection work on the phone.
+This is a positive basic #240 observation; installed APK identity, device/OS,
+page and remaining recovery subcases were not supplied. Keep their individual
+acceptance open rather than repeat or discard the successful observation.
+
+After loading BOOK recommendations to the end, the terminal pull-to-refresh
+instruction cannot be used there: the gesture works only at the top. #199 now
+owns this concrete current-reader defect separately from its later broad grid
+work. `fix/199-discovery-end-refresh`, based on #229's published native head,
+adds a downward pull beginning on the end notice plus an accessible **Päivitä
+haku** button through the existing scoped reader. Repeated triggers coalesce;
+old footer callbacks are inert after unmount. Source review/CI and a corrected
+installed APK remain separate from the owner's current test result. The exact
+follow-up cases are in [DEVICE_TEST](DEVICE_TEST.md). Continue the remaining
+native tests with existing accounts and preserve their data. This packet changes
+no server forward, catalog data, outbox or other release gate.
+
 The owner-selected repository hygiene is completed. The September 30
 [cleanup receipt](retros/branch-cleanup-2026-09-30.json) verifies **57 merged
 development refs deleted, 10 necessary refs retained**: main, draft #229 and all

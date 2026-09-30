@@ -1,4 +1,5 @@
 import { DiscoveryItemCard } from './DiscoveryItemCard';
+import { DiscoveryEndRefresh } from './DiscoveryEndRefresh';
 import { useItemLists } from '../lists/ItemListsContext';
 import { buildDeliveredItemOrigins, getDeliveredItemOrigin, rememberDeliveredSlate, type DeliveredItemOrigin } from './deliveredSlate';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -90,6 +91,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     ? getDiscoverableItems(rankedItems, interactions) : [], [sharedOverlayReady, rankedItems, interactions]);
   const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
+  const refreshing = ranking.status === 'loading' || ranking.retrying ||
+    (isSharedDiscovery && sharedEndorsements.status === 'loading');
   // Each request/revision owns its visible tokens. A callback retained by the
   // previous native list cannot relabel those tokens with a new page or scope.
   const view = useMemo(() => ({ id: ranking.viewId }), [ranking.viewId]);
@@ -187,6 +190,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
         predictionSource: ranking.source,
       },
     });
+  }
+
+  function refreshDiscovery() {
+    if ((ranking.status === 'error' || ranking.nextPageError) && ranking.recovery === 'retry') ranking.retry();
+    else ranking.refresh();
+    if (isSharedDiscovery) sharedEndorsements.retry();
   }
 
   return (
@@ -292,11 +301,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           key={ranking.viewId}
           alwaysBounceVertical
           overScrollMode="always"
-          refreshing={ranking.status === 'loading' || ranking.retrying || (isSharedDiscovery && sharedEndorsements.status === 'loading')}
-          onRefresh={() => {
-            if ((ranking.status === 'error' || ranking.nextPageError) && ranking.recovery === 'retry') ranking.retry(); else ranking.refresh();
-            if (isSharedDiscovery) sharedEndorsements.retry();
-          }}
+          refreshing={refreshing}
+          onRefresh={refreshDiscovery}
           onEndReached={ranking.loadMore}
           onEndReachedThreshold={0.4}
           data={items}
@@ -347,7 +353,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                     <Text style={styles.collectionText}>Näytä lisää</Text>
                   </Pressable>
                 : ranking.status === 'ready' && ranking.source === 'hosted' && items.length > 0 ?
-                  <Text style={styles.pageText}>Tämän haun suositukset on näytetty. Voit päivittää haun vetämällä alaspäin.</Text> : null}
+                  <DiscoveryEndRefresh key={ranking.viewId} theme={theme} disabled={refreshing || !focused}
+                    onRefresh={() => {
+                      const committed = currentView.current;
+                      if (committed?.token === view && committed.context) refreshDiscovery();
+                    }} /> : null}
             </View>
           }
           renderItem={({ item, index }) => {
