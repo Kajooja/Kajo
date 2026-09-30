@@ -1,0 +1,549 @@
+{
+  "format": "kajo-branch-cleanup-result-v1",
+  "date": "2026-09-30",
+  "completedAt": "2026-09-30T07:15:36.908Z",
+  "baselineInventory": "docs/project/retros/branch-cleanup-2026-09-28.json",
+  "acceptedMainAtCleanup": "70d78daa8d5e587f84a5802b986aefd1f9fa55ad",
+  "activeNativeAtCleanup": "c6509c6e17dd02aa77f5c48d56c789be0ff2ef13",
+  "summary": {
+    "refsBefore": 67,
+    "mergedDevelopmentRefsDeleted": 57,
+    "refsAfter": 10,
+    "consumedRequestsRetained": 8,
+    "activeDraftRetained": 1,
+    "defaultBranchRetained": 1
+  },
+  "verification": {
+    "candidateHeadsMatchedFreshMergedPullRequests": true,
+    "mergeCommitsReachableFromAcceptedMain": true,
+    "retainedRefHeadsByteIdentical": true,
+    "dependencyHoldResolved": {
+      "pr": 296,
+      "acceptedMain": "8525ecf32a39757a1f660d41ffa788c7276f7bcc",
+      "ancestorOfCurrentMain": true,
+      "ancestorOfActiveNative": true
+    },
+    "executableBranchNameReferences": 0,
+    "activeNativeChangedExecutableFilesChecked": 103,
+    "changedMainWorkflowChecked": ".github/workflows/description-acceptance.yml",
+    "mainMarkdownFilesChecked": 61,
+    "retiredBranchFileLinksFound": 0,
+    "method": "Authenticated GitHub branch deletion UI (Deleted/Restore result for each ref); fresh connector branch readback verified final set and exact retained SHAs."
+  },
+  "deleted": [
+    {
+      "name": "docs/182-attribution-rollout",
+      "headSha": "dd31588ec393c34853ba131b19908ae9aa341968",
+      "mergedPr": 258,
+      "mergeCommitSha": "00077fd725df3adfff7e020cc51ba2f7fd95b911",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-book-description-plan",
+      "headSha": "23972540b5af5c36ec848b28469b2cc5c861c09c",
+      "mergedPr": 253,
+      "mergeCommitSha": "1ea3a8c64beff8571bde4dc39cf73c30fc68b944",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-book-description-rollout",
+      "headSha": "9a0f177e82c5e588b9ac2de3b895e80ccbebf839",
+      "mergedPr": 255,
+      "mergeCommitSha": "6257561b3f2e5a566925abe0e1b82537ebecb4d3",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-catalog-canary-handoff",
+      "headSha": "e3aa37ad940412e30ae5f8792f14706b722fafe6",
+      "mergedPr": 249,
+      "mergeCommitSha": "395b0bf222000377cd04322436e6f398e5f8c1e2",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-completed-book-pilot",
+      "headSha": "ba997ee3f4e66beced13a060b74be1b3fb7cf123",
+      "mergedPr": 266,
+      "mergeCommitSha": "08981d9d934bc2feb77e7e0c0db0e883f37847f3",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-conflict-acquisition-result",
+      "headSha": "e4ea42729616218e8173f8aae0a9769814a090eb",
+      "mergedPr": 286,
+      "mergeCommitSha": "2b533a29e53f9e2145e54720b6834f91a27b89be",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-continuation-result",
+      "headSha": "5b0133e97c239996ed093294918956eaa36923b3",
+      "mergedPr": 282,
+      "mergeCommitSha": "e0c26144de6270589a0e2bf8e1a4958c698f17e8",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-edition-prefix-result",
+      "headSha": "15162cd4c10cfead472dafc1616406f3ad996db7",
+      "mergedPr": 289,
+      "mergeCommitSha": "3c21886e142a415292f857a30e6aeeab14a67918",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-framed-operation-result",
+      "headSha": "90c416e99b3753927a3f1b9c2a5b9a7ff1bf2745",
+      "mergedPr": 293,
+      "mergeCommitSha": "87b7859df7094136142cb34ca30d76c918781957",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-full-acquisition-continuation",
+      "headSha": "9cfd56284f938015ad7fee16eceea381249d0973",
+      "mergedPr": 280,
+      "mergeCommitSha": "d05419f140ac42c99318b4788d1cf9606edb0e9a",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-hosted-catalog-checkpoint",
+      "headSha": "27bd5999da67fc16622a86251f93532528ec6af4",
+      "mergedPr": 246,
+      "mergeCommitSha": "65317c03fde0ee85ce560f61489d3434a79a843f",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-owner-feedback-and-ui-queue",
+      "headSha": "6c636ac2ccd98b176201c45d228d99de33f1a729",
+      "mergedPr": 262,
+      "mergeCommitSha": "fa208c896910197d6ce1dac8521ddd9fa901066f",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-pinned-wikipedia-review",
+      "headSha": "22f2cf61a37e80bbdd64085f4a7c53fc60e0b00d",
+      "mergedPr": 263,
+      "mergeCommitSha": "4df8b519e2f4526bf458f5b64c36904b266a15a2",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-resumable-pilot-handoff",
+      "headSha": "24befda473466a4dccbdc2b72403aa6adcbf341b",
+      "mergedPr": 264,
+      "mergeCommitSha": "51919db1ee8d5384cd724047dcf8293a27b51261",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-reviewed-acquisition-handoff",
+      "headSha": "7772317953b37cfc1a17a2cf3b5efeb784050674",
+      "mergedPr": 276,
+      "mergeCommitSha": "6e2b6d0b85acba7b9e6bb12c7ac5ae34e92b482a",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/182-tmdb-canary-accepted",
+      "headSha": "27ca4bc44e2700f330180956e513d221c4998c38",
+      "mergedPr": 250,
+      "mergeCommitSha": "95d2a32ecebb704bc4b7d8105dd2d7552e81accd",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/233-predictive-memory-engine",
+      "headSha": "caad96767801c91e73e8ec046d24fd64886d2583",
+      "mergedPr": 234,
+      "mergeCommitSha": "d4d014dc59761df98072fd15395552ab50135247",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-book-description-refresh",
+      "headSha": "f11e73ba2939785847590b936e7bec3e62f60395",
+      "mergedPr": 254,
+      "mergeCommitSha": "dce94df96e965f26810c979cf8af550d551c8597",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-book-dump-intake",
+      "headSha": "dd70bcf0c81a2eaa50e5deb49859956b8af7c48f",
+      "mergedPr": 267,
+      "mergeCommitSha": "40495044ff7c93337ef02a6a8c2ec416e6a27210",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-book-review-amendment",
+      "headSha": "55d09232a86becadf286f6da32c01f5a35456934",
+      "mergedPr": 256,
+      "mergeCommitSha": "1d8ed155bc39a0d543df27ca4d68006910f7f755",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-bounded-edition-framing",
+      "headSha": "3bdee08769b03a388640084e2f50c05b4fd31523",
+      "mergedPr": 290,
+      "mergeCommitSha": "b34aca7451199e3cf78578318d8f5f151ad80c32",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-conflict-acquisition-core",
+      "headSha": "69f09ed91cf2ed106adb8637946e39bd15e1198c",
+      "mergedPr": 284,
+      "mergeCommitSha": "686ac92fe5900287c0699ba69434b743e3e2515d",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-description-attribution",
+      "headSha": "f300c5adcea3cee9dc0828945add936a4bad13d6",
+      "mergedPr": 257,
+      "mergeCommitSha": "a4e5bbf8d587c69a8ea3a90aecbd49c652d89df0",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-dump-acquisition",
+      "headSha": "d892c2d29dca3284c2fb47ad276424bb7c095369",
+      "mergedPr": 271,
+      "mergeCommitSha": "ec17a0738702074dedecff00e60a2e529939c8fc",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-edition-line-diagnostic",
+      "headSha": "4278341b043671e39945b99dcb02da3a5ae5681a",
+      "mergedPr": 287,
+      "mergeCommitSha": "12c1dc203a4d4e5a326c6f2a64db4c5fe49b0cb4",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-edition-operator",
+      "headSha": "707205d66885f110340eaa7eaebb52868b314060",
+      "mergedPr": 288,
+      "mergeCommitSha": "3d12a7f69534fef305b7ca37767626ae584b688e",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-framed-acquisition-operator",
+      "headSha": "81dbf1be9c4980690361ba76a68c336ff6e86572",
+      "mergedPr": 292,
+      "mergeCommitSha": "bc5546eb8f8851ebd8594725b5b25141c72e3aa1",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-framed-dump-acquisition",
+      "headSha": "63323dfbc2aec5da2dc5e5cdeb9f626d41578906",
+      "mergedPr": 291,
+      "mergeCommitSha": "cfa36d5810c1f5e6f91c4112e4376415f2f4ced1",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-full-dump-continuation",
+      "headSha": "9db868c5b4b97205dd1cc2c60cc695e3ef77c294",
+      "mergedPr": 281,
+      "mergeCommitSha": "8a9aefbf87870abd932dac53c6d4abae7fd0683d",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-guarded-conflict-acquisition",
+      "headSha": "6ef1ba8bf158dc80c3d1b1cf05942a1931bb198e",
+      "mergedPr": 285,
+      "mergeCommitSha": "24631688fbbbf73b2197768d5df686e26ff361dd",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-native-description-acceptance",
+      "headSha": "4a0b1ea2610a63a603cf260a460746e976d682f7",
+      "mergedPr": 259,
+      "mergeCommitSha": "8e7625e8f3867fa34ca709aa10ce76e83588fe82",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-offline-conflict-policy",
+      "headSha": "2d98aeb8b4a2db4bbc840053f72fbe69c0986bb8",
+      "mergedPr": 283,
+      "mergeCommitSha": "1f3bd049a37f182a773a4101791f9962b87cfb99",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/182-tmdb-balanced-expansion",
+      "headSha": "17e0542750303a1c65c0838c4e434f4ad797fbb9",
+      "mergedPr": 251,
+      "mergeCommitSha": "f462aaa20e3a65899452be847ee9ff3af22f167d",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/226-atomic-collection-actions",
+      "headSha": "45834327afc94b4087e26073125d4d9626775915",
+      "mergedPr": 227,
+      "mergeCommitSha": "6dd1fecaca6a081d633bf640aab12b35dcf2cb8f",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/235-portable-engine-contracts",
+      "headSha": "17a8466fecb510d9e1049ff9feaa6ab72686400a",
+      "mergedPr": 241,
+      "mergeCommitSha": "3747ecb58d69ba78440ca1b72b7cc554b1a9720a",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/236-movielens-research",
+      "headSha": "816bf2e6c1437e29f664faef9669729507968209",
+      "mergedPr": 242,
+      "mergeCommitSha": "7602b3418354687855f6b3384085684f4b37a373",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/237-movielens-baselines",
+      "headSha": "ba080664addeca747d26baaf3df1666bfa593249",
+      "mergedPr": 243,
+      "mergeCommitSha": "3658d1c78b19c6f9c391c14e8e2d66bf814cdcd9",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/catalog-feature-audit",
+      "headSha": "d4f8cb5ea68b07a0eae5c0f65f3fa5e8eb5fb66e",
+      "mergedPr": 270,
+      "mergeCommitSha": "690268b9d7f982e1dd10e9dcf059bb8906529504",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "feat/research-prefix-evaluation",
+      "headSha": "15a6d1b516c03fe35722063afa814774edd52894",
+      "mergedPr": 268,
+      "mergeCommitSha": "a2ecfee529e87385102352f9a4e18d93f409a1fb",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/160-production-guards",
+      "headSha": "aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979",
+      "mergedPr": 295,
+      "mergeCommitSha": "cd224d277f33b105e63cd83126d111b12b64ba10",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-acquisition-evidence",
+      "headSha": "14b7352afc6dea717cf8b58bc7e6c16975967b36",
+      "mergedPr": 272,
+      "mergeCommitSha": "d3681fcdfa9a877b0f314159d87208d0ccd0f7f8",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-catalog-config-diagnostics",
+      "headSha": "e8125f3381b2fff7947ddb78cd87eef1ac481e35",
+      "mergedPr": 247,
+      "mergeCommitSha": "4fbf5bd8eb0346b18395d633569efc23549c1dc4",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-catalog-detail-entry",
+      "headSha": "ac1ca286d160ddd256178ab029ef50243c7089e3",
+      "mergedPr": 260,
+      "mergeCommitSha": "a5131650ceb837ea7fc5fe640ff0798bffaa4aa8",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-catalog-edge-boundary",
+      "headSha": "b7b35395feb6c29d722fb1254166be0ab7a8b55c",
+      "mergedPr": 244,
+      "mergeCommitSha": "969c1195700dfc67b3787eb4a51eb70fda8c6ee9",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-catalog-import-diagnostics",
+      "headSha": "bf19a444b0a8acd7106cf7f153179d6f6b446992",
+      "mergedPr": 252,
+      "mergeCommitSha": "f8ed71db6186ee9f810d985462119cf7085e1f08",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-catalog-rollout-packet",
+      "headSha": "9214a268d84281663a728ea055dd4b4dd073a262",
+      "mergedPr": 245,
+      "mergeCommitSha": "ad75fc00b100099af4986abfc9955afe308eb6e6",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-dump-failure-evidence",
+      "headSha": "f74a1e4c5838cc82dcde15dd420934190b5b50fd",
+      "mergedPr": 277,
+      "mergeCommitSha": "3e865ac9ecfcda427ab03d50d1592ff72b4d038d",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-history-profile-scope",
+      "headSha": "69080d46798570204d6b1987c8e1325f46ebc1bd",
+      "mergedPr": 261,
+      "mergeCommitSha": "6d8e75df4d66ce2aa209f806c09bfb5e379c560c",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-modern-key-legacy-recovery",
+      "headSha": "9884088099635bd60cd0b6bb929b0b5480b97c3f",
+      "mergedPr": 248,
+      "mergeCommitSha": "bd7a23f776e99b452404fef0393155b62d96ade0",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-reviewed-dump-budget",
+      "headSha": "b8ee251b407b8e0849d840c1aaf4587dcdeefbae",
+      "mergedPr": 275,
+      "mergeCommitSha": "349c8b5e27b9a0eb88e178f19361e2bea0d7a026",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-self-location",
+      "headSha": "1a7f15ab0626f6c3d4ad823be72a1085578b94f1",
+      "mergedPr": 279,
+      "mergeCommitSha": "8c4d8ecf65187f12bb30ed4207d03848fd87d292",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/182-work-prefix-diagnostic",
+      "headSha": "906243aadb3b7f229a6c8392f85620dfc1325a39",
+      "mergedPr": 278,
+      "mergeCommitSha": "99ed067ba7aec9f9bbb63d806cafbafc8a0bb4d1",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/238-dependency-closure",
+      "headSha": "7b0062e668bda1fb5e2b247e1225dd42175256eb",
+      "mergedPr": 296,
+      "mergeCommitSha": "8525ecf32a39757a1f660d41ffa788c7276f7bcc",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "fix/repo-open-items",
+      "headSha": "dc12785c4057151d3d3bd2faf160c69b99839550",
+      "mergedPr": 294,
+      "mergeCommitSha": "3500f9b709e5315cb864f9bcbf9f004c76596bce",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "research/catalog-feature-baseline",
+      "headSha": "9e32cecd6da269f8f40a21998a38be775d8c6bbb",
+      "mergedPr": 274,
+      "mergeCommitSha": "15bff8ddfb4b698b367b265123de3a83488ed70a",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/repository-hygiene",
+      "headSha": "604a7372abd15ef0e8e9caad4dbc836154f1ffed",
+      "mergedPr": 297,
+      "mergeCommitSha": "eef40fe3606ac8105032fc3af64fec67602287fa",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    },
+    {
+      "name": "docs/continuation-20260929",
+      "headSha": "11e662c8e84526403c7065f1e011e75e33072edb",
+      "mergedPr": 298,
+      "mergeCommitSha": "70d78daa8d5e587f84a5802b986aefd1f9fa55ad",
+      "mergeReachableFromMain": true,
+      "status": "deleted"
+    }
+  ],
+  "retained": [
+    {
+      "name": "catalog-acquisition/ol-20260831-conflicts",
+      "headSha": "11bada2563374616cc8d014d787039c9235ea071",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-acquisition/ol-20260831-continuation",
+      "headSha": "f2558795be45be17bd2632071cf25746e4ec82a2",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-acquisition/ol-20260831-framed",
+      "headSha": "67b4a7480af41c1e664c6b80bbe7754530ec59b2",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-acquisition/ol-20260831-reviewed",
+      "headSha": "4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-acquisition/ol-20260831",
+      "headSha": "4308943cf0157ec6648017a0bf7a25e5b0876c5a",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-diagnostic/ol-20260831-edition-prefix",
+      "headSha": "be0ec18cdc968b5643e45c57c5ab9919f885e195",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-diagnostic/ol-20260831-work-prefix",
+      "headSha": "6a6dc390940db1b15d68a8d850dd08bfbb88bd4a",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "catalog-diagnostic/ol-20260831",
+      "headSha": "bbc351eb9fa7eee0fb25f2183be3c1a729b59191",
+      "reason": "consumed #182 operation and original recovery dependency"
+    },
+    {
+      "name": "feat/228-delivered-origin",
+      "headSha": "c6509c6e17dd02aa77f5c48d56c789be0ff2ef13",
+      "reason": "active draft PR #229"
+    },
+    {
+      "name": "main",
+      "headSha": "70d78daa8d5e587f84a5802b986aefd1f9fa55ad",
+      "reason": "default branch"
+    }
+  ],
+  "limitations": [
+    "Snapshot of the cleanup operation; later review branches and intentional head updates are separate work.",
+    "Merged PRs and Git history remain the archive; no code, SQL, hosted configuration or account state was changed by branch cleanup.",
+    "All eight consumed catalog requests remain consumed and cannot be rerun or reset.",
+    "Draft #229 and all 18 audited issue scopes retain their actual acceptance gates."
+  ]
+}

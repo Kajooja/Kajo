@@ -1,0 +1,49 @@
+{
+  "format": "kajo-dependency-audit-v1",
+  "date": "2026-09-30",
+  "scope": "all root npm workspaces, production and development dependencies",
+  "packageLockSha256": "18fb71ddfd8d61d5e4245908b8b46c641f4bbca9faa9701dfbe6c1c92a81782c",
+  "result": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 570,
+        "dev": 338,
+        "optional": 94,
+        "peer": 17,
+        "peerOptional": 0,
+        "total": 935
+      }
+    }
+  },
+  "resolved": {
+    "brace-expansion": "1.1.18 -> 1.1.21 and three 5.0.9 leaves -> 5.0.12; original minimatch semver ranges and CommonJS/ESM parent APIs retained"
+  },
+  "advisories": [
+    "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+    "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+    "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p"
+  ],
+  "validation": {
+    "rootCheck": "DENO_TLS_CA_STORE=system KAJO_BUILD_MODE=demo npm run check passed; normal TLS certificate validation retained with system CAs",
+    "cleanInstall": "npm ci --no-audit --no-fund",
+    "installedGraph": "npm ls brace-expansion --all",
+    "dependencyTests": "13 passed: five existing routing/tooling and eight matching/hostile-input regressions across four actual consumer paths",
+    "sourceDiff": "Only version/resolved/integrity of four brace-expansion leaves changed; package.json, Expo/RN/router, installed decoder adapter and other lock entries unchanged"
+  },
+  "limitations": [
+    "Point-in-time npm advisory data; September 28 zero-advisory receipt remains historical evidence.",
+    "The native lock has its separate NetInfo dependency and must be independently audited after integration.",
+    "Native device and installed/not-installed link acceptance remain separate.",
+    "No hosted service, SQL, account or consumed catalog-request changes."
+  ]
+}

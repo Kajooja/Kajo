@@ -1,5 +1,18 @@
 # Collection device checkpoint — #228 / #229
 
+## APK source refresh — 2026-09-30 / #238
+
+The September 30 dispatch [CI #594](https://github.com/Kajooja/Kajo/actions/runs/36681309205)
+for `c6509c6e17dd02aa77f5c48d56c789be0ff2ef13` failed its fresh dependency audit
+and produced no APK. Its preceding five-job CI #593 remains dated source evidence.
+The compatible correction refreshes brace-expansion 1.1.18 to 1.1.21 and three
+5.0.9 leaves to 5.0.12, preserving every parent API and existing decoder adapter.
+Eight bounded regression cases join the five existing dependency tests.
+The current #229 metadata owns the exact updated head and replacement dispatch;
+use its successful `kajo-android-standalone-<SHA>` artifact after all five gates.
+Keep #229 draft until the configured-device and fresh-account observations pass.
+This refresh changes no deployed forward, backend configuration or account data.
+
 ## Current configured-device packet — 2026-09-29 / #240
 
 The reconciled native source now implements bounded reconnect recovery and
