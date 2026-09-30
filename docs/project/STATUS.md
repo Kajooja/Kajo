@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-29**
+Last updated: **2026-09-30**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,23 +10,22 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — repository hygiene and native dependency reconciliation
+## Current packet — #229 standalone APK and configured-device acceptance
 
-The owner clarified on September 29 that unfinished work must be fixed or assigned
-its correct dependency slot, and superseded work removed only after checking its
-references. The [repository audit](retros/2026-09-28.md) preserves the findings;
+The owner-selected repository hygiene is completed. The September 30
+[cleanup receipt](retros/branch-cleanup-2026-09-30.json) verifies **57 merged
+development refs deleted, 10 necessary refs retained**: main, draft #229 and all
+eight consumed #182 operation/recovery refs. The 55 original candidates plus the
+two later merged #297/#298 handoff refs were checked against fresh heads,
+merged-PR reachability and executable/file-link dependencies before deletion.
+Independent readback verified every retained SHA unchanged. Accepted #296 is an
+ancestor of both accepted main and the native source, resolving its old hold.
+The September 28 inventory remains dated pre-deletion evidence; later review
+branches and intentional head updates are separate operations.
+
 [ROADMAP's disposition table](ROADMAP.md#unfinished-work-disposition--2026-09-29)
-owns the placement of all 18 audited issues and draft PR #229. No MVP requirement
-or real acceptance gate is removed by this cleanup.
-
-Hygiene PR #297 is accepted at main
-`eef40fe3606ac8105032fc3af64fec67602287fa`. On September 29, seven issue bodies
-(#160/#182/#228/#230/#231/#232/#240) were reconciled with the disposition table;
-all 18 open scopes remain. All 55 audited merged branch refs still match the
-inventory, and the published native head below satisfies the #296 integration
-hold. Eight consumed request refs remain retained dependencies. No remote branch
-deletions ran because the connector provides no supported deletion operation;
-the original audit JSON remains dated evidence.
+continues to place all 18 audited issues and draft #229. Later UX, identity,
+Shared and beta work retain their own prerequisites. No MVP gate was removed.
 
 PR #294 is accepted at main `3500f9b709e5315cb864f9bcbf9f004c76596bce`,
 all five CI #580 gates, 867 tests/four exports: bounded terminal catalog evidence
@@ -47,32 +46,53 @@ integrity, auth callback parameters and xcode identifiers. The
 [audit receipt](dependency-audit-2026-09-28.json) records zero known advisories
 for the exact lock. Actual native/link round-trip acceptance remains separate.
 
-Draft #229 now publishes combined head
-`6ed685d5e96c10062f73df26e103a43733030297`, tree
-`1cb418464278156d1c1bd084e172362478050cf6`, containing accepted #296 and #297.
-[CI #590](https://github.com/Kajooja/Kajo/actions/runs/36536181092) owns that
-head's five-job conclusion; PR #229 records its verification result. Local
-validation passed 1,017 non-Edge tests and four Hermes exports. Local Edge
-validation could not fetch a dependency because the connection was refused;
-no local Edge pass is claimed. The prior native checkpoint `e41f844` passed
-CI #584, but that result does not replace this combined head's checks.
-The source retains accepted catalog attribution/cold history, immutable delivery
-and protocol-2 pagination; ten deployed forwards remain byte-identical.
-#240 now has bounded recovery of the
-focused foreground reader's exact request/context/cursor, retained prefix and
-15-second deadline. Only successful backend recovery clears the error; an expired
-cursor still requires explicit new search. This source is still in draft #229,
-not accepted main or a new hosted migration/device observation.
+The preceding native head `c6509c6e17dd02aa77f5c48d56c789be0ff2ef13`
+passed all five [CI #593 gates](https://github.com/Kajooja/Kajo/actions/runs/36538244179),
+1,049 tests/four exports. The September 30 standalone dispatch
+[CI #594](https://github.com/Kajooja/Kajo/actions/runs/36681309205) then failed the
+fresh dependency audit and produced no APK. Three newly reviewed brace-expansion
+DoS advisories affected the formerly clean 1.1.18/5.0.9 leaves. Its two platform
+and clean-install gates passed; the remaining jobs were skipped. The earlier
+zero-advisory receipt is point-in-time evidence rather than a permanent guarantee.
 
-**Next bounded action:** inspect all five CI #590 conclusions for the published #229 head
-on `feat/228-delivered-origin`; resolve any actual integration failure before
-device acceptance. Do not substitute an older successful checkpoint. Complete
-the named configured-device and fresh-account observations; do not repeat
-installed forwards or reset accounts
-to manufacture them. Then continue Sprint 014's remaining evidence/catalog and
-algorithm gates in ROADMAP order. Later UI work has named slots rather than
-competing active branches; E1/D1/D2 need no repeat and optional model research is
-not a release prerequisite.
+The compatible #238 correction in this checkpoint refreshes only those four lock
+leaves to **1.1.21/5.0.12**, preserving every minimatch parent API and the accepted
+routing-decoder adapter, Expo/RN/router, UUID and Vitest versions. Eight ordinary
+matching and bounded hostile-input regressions join the five existing dependency
+tests. Clean installation, all 13 dependency tests and the local root check pass;
+[the main receipt](dependency-audit-2026-09-30.json) records the exact lock and
+fresh zero-advisory result. Its source PR still requires all five CI gates before
+merge. The native graph is measured separately in
+[its receipt on the exact source](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/dependency-audit-native-2026-09-30.json).
+
+Draft [#229](https://github.com/Kajooja/Kajo/pull/229) publishes corrected head
+`2cfa2f3b206cba87712f3d531a78f00e24e59791`, tree
+`ff0b9367aa2dd5227931a839880c5b0814dcaf4f`, incorporating correction
+`9a8b951ffefcbd53671f6046f3560f5a2ee33c5d`.
+[CI #595](https://github.com/Kajooja/Kajo/actions/runs/36686521092) owns its PR
+checks. Replacement standalone dispatch
+[CI #596](https://github.com/Kajooja/Kajo/actions/runs/36686741366) uses that
+same exact head; its conclusion and `kajo-android-standalone-2cfa2f3b206cba87712f3d531a78f00e24e59791`
+artifact are the authoritative build receipt. Native local root check and the
+separate native audit also pass. The source retains immutable delivered origins,
+protocol-2 pagination, catalog description/credit and cold-history scope protection;
+all ten already deployed native forwards retain their exact bytes. #240's focused
+foreground reader preserves the exact request/context/cursor, accepted prefix and
+15-second deadline with at most three coalesced automatic attempts. Only successful
+backend recovery clears the error; an expired cursor requires explicit new search.
+This remains draft implementation, separately from accepted main and real device
+observations.
+
+**Next bounded action:** verify all five required jobs and the successful APK
+artifact for exact head `2cfa2f3b206cba87712f3d531a78f00e24e59791` in CI #596.
+Resolve any actual failure before installation, then complete
+[the native configured-device packet](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/DEVICE_TEST.md)
+and remaining fresh-account observations, including #240 network-loss/reconnect.
+Record the installed run/SHA, device and backend checkpoint; retain #229 as draft
+until its real acceptance gates pass. Preserve existing data and the eight consumed
+requests; installed forwards need no repeat. Then continue Sprint 014's remaining
+evidence/catalog and algorithm gates in ROADMAP order. Later UI work has named
+slots; E1/D1/D2 need no repeat and optional model research is not a release gate.
 
 ### Preserved #182 catalog and operation ledger
 

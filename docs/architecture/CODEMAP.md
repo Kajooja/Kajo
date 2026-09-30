@@ -36,6 +36,10 @@ unexpected source. `routing-dependencies.test.mjs` exercises the actual installe
 Router path functions, hostile input in a bounded child and xcode's UUID call.
 The root check and CI include these regressions; CI also runs the fresh advisory
 audit. `dependency-audit-2026-09-28.json` retains the exact lockfile checkpoint.
+`scripts/dependencies/brace-expansion.test.mjs` verifies ordinary matching and
+bounded hostile-input parsing through all four actual minimatch consumer paths.
+The compatible 1.1.21/5.0.12 lock refresh and current advisory result are recorded
+in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 
 ## Implementation locations
 

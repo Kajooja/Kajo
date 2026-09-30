@@ -14,6 +14,38 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Branch cleanup and standalone audit correction — 2026-09-30 / #229 / #238
+
+The owner-authorized cleanup deleted **57 merged development refs** and retained
+**10 necessary refs**, including main, draft #229 and all eight consumed #182
+requests. Fresh candidate heads, merged-PR ancestry and branch-name/file-link
+references were checked first; independent readback verified retained SHAs
+unchanged. Accepted #296 is already an ancestor of main and native, resolving its
+old hold. The [result receipt](../retros/branch-cleanup-2026-09-30.json) records
+each deleted PR/head and retained dependency. The September 28 inventory and
+historical entries below remain dated evidence. All 18 issue scopes retain their
+ROADMAP slots and actual acceptance gates.
+
+Native `c6509c6e17dd02aa77f5c48d56c789be0ff2ef13` passed all five CI #593
+gates, 1,049 tests/four exports. Its September 30 [standalone run #594](https://github.com/Kajooja/Kajo/actions/runs/36681309205)
+failed the now-current brace-expansion audit and produced no APK. The compatible
+correction refreshes four leaves to 1.1.21/5.0.12 without parent/framework changes.
+Eight consumer matching/hostile-input cases join the five existing dependency
+regressions. Both clean installs, 13 dependency tests and each local root check
+pass; separate exact-lock main/native receipts show zero current advisories.
+Normal TLS validation was retained using system CAs for local Deno.
+
+Draft #229 now publishes `2cfa2f3b206cba87712f3d531a78f00e24e59791`, tree
+`ff0b9367aa2dd5227931a839880c5b0814dcaf4f`, including correction
+`9a8b951ffefcbd53671f6046f3560f5a2ee33c5d`. [PR CI #595](https://github.com/Kajooja/Kajo/actions/runs/36686521092)
+and replacement [standalone run #596](https://github.com/Kajooja/Kajo/actions/runs/36686741366)
+own that head's exact results and artifact. Source PR acceptance for main remains
+separate. After its required checks and successful APK artifact, the current
+bounded action is the configured-device #240 reconnect and remaining native /
+fresh-account observations. Existing deployed forwards/data and consumed
+requests are preserved; #229 remains draft and no new device acceptance is
+claimed. [STATUS](../STATUS.md) owns the exact continuation.
+
 ## Repository hygiene and dependency placement — 2026-09-29
 
 The owner permits fixing current defects, scheduling incomplete work at its proper
