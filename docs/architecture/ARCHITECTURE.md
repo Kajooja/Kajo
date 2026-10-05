@@ -1989,3 +1989,46 @@ recovery the prior failure stays visible with a disabled pending retry control.
 Only the current successful response clears it. Server-proven cursor expiry or
 other refresh-only recovery requires explicit new search. Scope/revision changes,
 blur, backgrounding and unmount invalidate prior work before it can publish.
+
+
+## Verified local dependency security corrections — #238
+
+When a published dependency has no fixed release, a local source correction must
+retain its real npm identity and the raw advisory result. It is not an upstream
+version upgrade or permission to suppress unrelated scanner findings.
+
+`scripts/dependencies/security-patches.mjs` binds the braces 3.0.3 and node-forge
+1.4.0 archives to their exact lockfile identities/integrities and original source
+SHA-256 hashes. Installation is idempotent and refuses unknown or partially
+patched source. Verification is read-only and checks every locked installed copy.
+
+- [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm):
+  bound brace/parenthesis parser nesting and all three recursive output walkers
+  at 128 levels, including direct AST calls. Depth rejection is a controlled
+  SyntaxError, analogous to the existing maximum input length. Escaped, quoted
+  and character-class braces remain literal. The upstream diagnosis is
+  [micromatch/braces#70](https://github.com/micromatch/braces/issues/70).
+- [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv):
+  require exactly the validated OID plus an optional, empty primitive NULL in
+  DigestAlgorithm, retaining the outer DigestInfo count check. Counting children
+  alone is insufficient: an unexpected second element or nonempty NULL must also
+  be rejected. The correction covers `lib/rsa.js` and both distributed browser
+  bundles; the same malformed-signature controls execute against all three.
+  The upstream diagnosis/proposal is
+  [digitalbazaar/forge#1149](https://github.com/digitalbazaar/forge/issues/1149)
+  / [#1152](https://github.com/digitalbazaar/forge/pull/1152).
+
+`audit-dependencies.mjs` first verifies those exact corrections and runs the
+installed security regressions (including pristine-upstream negative controls),
+then obtains fresh `npm audit --json`. It prints the complete raw report,
+verified source hashes, mitigated findings and unmitigated findings separately.
+Only the exact two advisory/package identities on verified copies qualify. Parent
+meta-vulnerabilities qualify only when all reachable advisory leaves qualify;
+cycles without a real leaf fail. New findings, unknown copies/source, missing
+patches, malformed/incomplete reports and scanner transport failure fail closed.
+Moderate/high/critical findings without verified corrections block CI. Published
+upstream findings are never described as zero vulnerabilities.
+
+The corrections are temporary compatibility backports. Review/remove each when
+a fixed upstream release is available; changed source/version fails until reviewed.
+All normal checks, actual APK build and owner device acceptance remain required.

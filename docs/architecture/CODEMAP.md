@@ -55,6 +55,15 @@ bounded hostile-input parsing through all four actual minimatch consumer paths.
 The compatible 1.1.21/5.0.12 lock refresh and current advisory result are recorded
 in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 
+`scripts/dependencies/security-patches.mjs` installs/verifies the exact October
+braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
+reproduces unpatched defects and tests corrected installed consumers.
+`audit-dependencies.mjs` / `audit-dependencies.test.mjs` preserve raw npm findings
+and fail on unmitigated advisories or unverifiable patches. The correction contract
+is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual
+native graph. CI's same-repository `build-android-apk` PR label opts into an APK
+behind the unchanged five mandatory jobs.
+
 ## Implementation locations
 
 | Area | Canonical path | Current state |

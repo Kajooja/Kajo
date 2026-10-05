@@ -38,9 +38,9 @@
     "test:acceptance": "npm run test --workspace @kajo/description-acceptance && node --test scripts/mobile/*.test.mjs",
     "acceptance:descriptions": "npm run start --workspace @kajo/description-acceptance --",
     "catalog:features:baseline": "node scripts/catalog/evaluate-feature-baseline.mjs",
-    "postinstall": "node scripts/dependencies/patch-routing-decoder.mjs",
+    "postinstall": "node scripts/dependencies/patch-routing-decoder.mjs && node scripts/dependencies/security-patches.mjs",
     "test:dependencies": "node --test scripts/dependencies/*.test.mjs",
-    "audit:dependencies": "npm audit --audit-level=moderate"
+    "audit:dependencies": "node scripts/dependencies/audit-dependencies.mjs"
   },
   "engines": {
     "node": "^22.12.0 || >=24.0.0"

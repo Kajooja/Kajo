@@ -14,6 +14,36 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## APK audit recovery — 2026-10-05 / #238
+
+The owner-requested terminal-refresh APK dispatch CI #603 failed in the fresh npm
+audit: two upstream advisories produced 19 high-severity package findings. No APK
+was built. Latest published braces 3.0.3 and node-forge 1.4.0 remain affected.
+The owner requested correction and another APK run, with completion followed by
+the owner. STATUS owns the active source/run identity.
+
+The narrow correction installs hash-checked depth guards in braces parse/compile/
+expand/stringify and strict RSA DigestAlgorithm element count plus empty-NULL
+validation. Real negative controls reproduce both upstream defects; regression
+coverage preserves normal Metro matching, standard RSA signatures and PSS.
+A verified audit keeps raw upstream findings visible, verifies every locked copy
+and executes the security tests before classifying only those two corrected
+advisories. Unknown/new findings and verification/transport failures still block.
+No package alias, framework downgrade or blanket severity exception is introduced.
+
+The CI `build-android-apk` label explicitly requests a same-repository PR build
+behind all five existing gates; its artifact is bound to the PR merge checkout.
+This source leaves #301/#229 unmerged and all phone acceptance open. The six-case
+owner follow-up is recorded in DEVICE_TEST. No hosted/data changes are included.
+
+Local validation: clean installation, fresh verified audit and all 20 added
+security/audit regressions pass, including both distributed forge browser bundles.
+The root check passed lint, types, dependencies, mobile and catalog suites, then
+stopped at Deno's refused registry connection in this environment. Database,
+engine, research and acceptance suites passed separately, as did all four Hermes
+smoke exports. The complete Deno and isolated platform/installation gates remain
+mandatory in the new GitHub run; no completed CI or APK is claimed here.
+
 ## Phone recovery result and terminal refresh — 2026-09-30 / #199 / #240
 
 The owner reports successful network loss/reconnection. The actual installed

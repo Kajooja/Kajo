@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-30**
+Last updated: **2026-10-05**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,36 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### APK audit recovery — 2026-10-05 / #238
+
+The owner-dispatched [CI #603](https://github.com/Kajooja/Kajo/actions/runs/37362675116)
+on terminal-refresh source `825ecc1c809008a0c312e0bfef2b901476b86808` failed the
+fresh dependency audit before an APK was built. The report has **19 high-severity
+package findings from two upstream advisories**: braces GHSA-vfj7-8cjw-p6xm and
+node-forge GHSA-86w9-cpqp-85rv. The platform job was cancelled; downstream jobs,
+including the APK, were skipped. September 30 CI remains historical evidence.
+The owner explicitly requested correcting these findings and starting another
+APK build on October 5, leaving build completion for the owner to follow.
+
+`fix/238-native-audit-october` continues the exact #301 source as a narrow #238
+correction. Published latest versions remain braces 3.0.3 / node-forge 1.4.0, so
+installation applies hash-checked source corrections: bounded parser/walker
+nesting and strict nested DigestAlgorithm elements/empty NULL parameters.
+Package identities, lockfile, frameworks and deployed forwards are preserved.
+The fresh audit retains the full upstream report and accepts these two findings
+only after verifying every installed copy and running the real security
+regressions. New advisories, unknown source, missing patches or audit transport
+errors still fail. This is **not a zero-advisory upstream release**; the exact
+receipt is [dependency-audit-native-2026-10-05.json](dependency-audit-native-2026-10-05.json).
+Replace the temporary corrections with reviewed fixed upstream releases when
+available. See the [dependency correction contract](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
+
+CI supports an explicit `build-android-apk` label on same-repository PRs, retaining
+all five mandatory gates before the APK. Its artifact name identifies the actual
+PR merge checkout SHA; the PR head and run metadata identify the source branch.
+Unlabelled PRs, fork PRs and the existing manual/main paths keep their documented
+build boundaries. Neither #301 nor draft #229 is merged by this recovery.
 
 ### Phone result and terminal refresh follow-up — 2026-09-30
 
@@ -102,16 +132,16 @@ backend recovery clears the error; an expired cursor requires explicit new searc
 This remains draft implementation, separately from accepted main and real device
 observations.
 
-**Next bounded action:** verify all five required jobs and the successful APK
-artifact for exact head `2cfa2f3b206cba87712f3d531a78f00e24e59791` in CI #596.
-Resolve any actual failure before installation, then complete
-[the native configured-device packet](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/DEVICE_TEST.md)
-and remaining fresh-account observations, including #240 network-loss/reconnect.
-Record the installed run/SHA, device and backend checkpoint; retain #229 as draft
-until its real acceptance gates pass. Preserve existing data and the eight consumed
-requests; installed forwards need no repeat. Then continue Sprint 014's remaining
-evidence/catalog and algorithm gates in ROADMAP order. Later UI work has named
-slots; E1/D1/D2 need no repeat and optional model research is not a release gate.
+**Next bounded action:** publish the #238 correction based on #301 and start its
+labelled APK CI once. Verify the run/PR head and leave completion for the owner to
+follow. Only a successful new APK containing the terminal-refresh and security
+corrections is suitable for the six-case phone test supplied on October 5.
+Record its actual run/artifact/checkout SHA, OnePlus model and Android version.
+Preserve the positive September 30 basic reconnect observation; complete the
+remaining configured-device/fresh-account gates with existing accounts and data.
+Keep #229 draft. Current source, CI and device acceptance remain separate; do not
+repeat deployed forwards or consumed catalog requests. After acceptance, continue
+Sprint 014 in ROADMAP order.
 
 ### Preserved #182 catalog and operation ledger
 
