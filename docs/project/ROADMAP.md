@@ -4,6 +4,35 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Engine build-out commitment — 2026-10-05
+
+The complete [51-part Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md) is already the accepted target. The owner now requires explicit implementation traceability so that state, multi-space geometry, scenario/trajectory memory, future branches, dreams and evolution do not remain disconnected future ideas.
+
+[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md) maps every architecture section to twelve bounded capability/acceptance packets; [#302](https://github.com/Kajooja/Kajo/issues/302) tracks their delivery. The ledger owns completion evidence, while **this ROADMAP remains the only execution-order authority**. Existing MVP IDs and release gates are unchanged. E1/D1/D2 remain complete; their reference/research acceptance is not native serving integration or later-generation acceptance.
+
+| Capability packet | Execution placement and dependency |
+|---|---|
+| EB-01 — evidence and portable native integration | Existing evidence/parity work stays in 14.1–14.2. Inventory the E1/native mapping after that acceptance, then extract one parity-tested computation through the current boundary. Full extraction is separately scoped, not silently made an MVP blocker or canceled because an external prior loses. |
+| EB-02 — adaptive state | Existing Working/Short/Long, World/Belief and context foundations stay in 14.4; joint interaction behavior also follows the #232/16.3 contract. Later learned state extensions require supported observations and ablations. |
+| EB-03 — operating evaluation/replay | Existing bounded worker, frozen decisions, delayed outcomes and manual rollout/rollback stay in 14.5. This evaluation foundation precedes new learned-component admission. |
+| EB-04 — local scenario/trajectory recall | Retain the existing ScenarioMemory and 14.4 acceptance; extend to measured ordered-prefix/continuation recall after EB-01/02/03. A no-retrieval control and no-useful-match path are required. |
+| EB-05 — learned multi-space geometry | After useful EB-04 and permitted training evidence. Compare transparent and task-conditioned representations before optional ANN; version/rebuild/switch indexes safely. No new product domain or native global memory is a mandatory prerequisite. |
+| EB-06 — native global scenario memory | After local semantics plus consent/cohort/deletion/exposure and sufficient-evidence gates. ExternalTastePrior is separate. Scale or shared dreams cannot bypass those gates. |
+| EB-07 — world/outcome model and branches | After truthful state, evaluation and observable horizon-defined targets. Begin with a calibrated one-step experiment; no dependency on a global graph, ANN scale or a multistep dream system. |
+| EB-08 — policy and active learning | Existing modes remain in 14.4 and recognition-aware Taste in 15.0. Later distributional policies follow EB-07; stochastic policy evaluation requires truthful action/slate probabilities and support. |
+| EB-09 — consolidation and typed graph | After lineage/lifecycle and local retrieval. Compare one prototype/edge family with uncompressed/unlinked controls; a dedicated graph database is not required. |
+| EB-10 — dreams and synthetic memory | After supported EB-07 transitions and EB-03 evaluation. Begin with short real-anchored rollouts and real-only controls; expand only on independent real evidence with bounded synthetic influence. |
+| EB-11 — evolving geometry/models | Simple configuration challengers follow EB-03. Representation/model/dream families follow the acceptance of the components they vary. Keep bounded search, untouched final evaluation, admission and rollback; no automatic production mutation. |
+| EB-12 — real second-domain portability | E1's synthetic fixture is already complete. A separately selected real-domain study follows adequate core/data contracts; full-engine acceptance requires applicable EB evidence and an end-to-end runtime/rollback demonstration. No new dataset or service is selected by this documentation. |
+
+The default current task remains **#229's configured-device/fresh-account acceptance and its explicitly named native follow-ups**, not twelve new active tasks. At this audit, open #301 targets #229's native branch with terminal-refresh source; inspect its actual source/CI/merge state before using it, and do not claim the older CI #596 APK contains that correction. This dated observation does not merge either PR or waive phone acceptance. STATUS and fresh PR state continue to own the exact next action.
+
+Then complete remaining Phase 14 evidence/catalog, adaptive memory and operating evaluation in their existing dependency order, followed by the established Taste → Friend → Shared → beta → store → Share Link march. At the next engine-specific packet, use the ledger's first unmet applicable capability and create/reuse one narrow implementation issue under #302. Do not repeat accepted contracts or the rejected D2 experiment.
+
+After first release, the **engine has its own dependency-driven build-out path**, rather than waiting behind every later product feature. The normal progression is transparent native integration/state/evaluation → useful local trajectories → measured latent geometry and supported one-step world/outcome modeling → bounded dreams → wider model/geometry evolution and real portability evidence. Global memory and consolidation enter when their own gates pass; they are not invented prerequisites for unrelated one-step work. Music, events, feeds and dating are not mandatory predecessors. An independent pre-release research slice still requires explicit selection and must not displace release-critical work.
+
+Preserve all 51 target capabilities. A method may be rejected or a capability deferred with recorded evidence and a successor/owner decision; do not silently delete the capability, declare it delivered because documentation exists, or require a speculative technique to win before Kajo can release. The later-generation limits in FUTURE_PLAN/ADR-0008 remain valid; read their product ordering together with this explicit engine dependency path.
+
 ## Unfinished work disposition — 2026-09-29
 
 The owner explicitly permits scheduling unfinished work at its correct dependency
