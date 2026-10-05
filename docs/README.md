@@ -6,7 +6,7 @@ Git is the project's durable memory. This map names the owner of each kind of tr
 
 Read `AGENTS.md`, this map, [STATUS](project/STATUS.md), [MVP](product/MVP.md), the active sprint/handoff named by STATUS, then [ROADMAP](project/ROADMAP.md). Inspect main and the explicitly named active PR before continuing code. An unmerged PR is not accepted main.
 
-For engine or external-data work, also read the **Predictive Memory Engine**, **Data enrichment**, **Kajo Prediction model** and **ADR-0008** entries below. The portable engine is independent; Kajo is its first adapter. The 51-part design is a target architecture, not a list of already implemented modules.
+For engine or external-data work, also read the **Predictive Memory Engine**, **Engine build-out**, **Data enrichment**, **Kajo Prediction model** and **ADR-0008** entries below. The portable engine is independent; Kajo is its first adapter. The 51-part design is a target architecture, not a list of already implemented modules. Each engine implementation packet must identify its EB acceptance scope and architecture sections; completed reference/research work must not be restarted as native integration.
 
 ## Canonical owners
 
@@ -28,6 +28,7 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 | What are Kajo's entity relationships and privacy boundaries? | [DOMAIN_MODEL](domain/DOMAIN_MODEL.md) |
 | What counts as native event/exposure/outcome evidence? | [DATA_EVENTS](domain/DATA_EVENTS.md) |
 | What is the complete reusable engine architecture? | [PREDICTIVE_MEMORY_ENGINE](architecture/PREDICTIVE_MEMORY_ENGINE.md) |
+| Which implementation/acceptance packet covers each of its 51 parts? | [ENGINE_BUILDOUT](project/ENGINE_BUILDOUT.md), tracked by [#302](https://github.com/Kajooja/Kajo/issues/302); scheduling remains in ROADMAP |
 | How does Kajo bind that engine to Profile/Item, serving and evaluation? | [PREDICTION_MODEL](domain/PREDICTION_MODEL.md) |
 | How are public taste data, enrichment and learned artifacts handled? | [DATA_ENRICHMENT](architecture/DATA_ENRICHMENT.md) |
 | What are product/runtime/service boundaries? | [ARCHITECTURE](architecture/ARCHITECTURE.md) |
@@ -40,5 +41,7 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 Slow-changing truth belongs to product/domain/architecture documents. Execution order belongs to ROADMAP; fast-changing source, CI, deployment and device acceptance belong to STATUS and the active sprint/PR. Historical sprints and retrospectives retain dated evidence rather than acting as the current to-do list.
 
 The 2026-09-12 refinement advances **portable contracts and isolated external-preference research**. It does not turn external ratings into native Kajo Scenarios, approve model deployment or waive the later gates for Kajo PopulationMemory, multistep dreaming or autonomous evolution. Read older broad deferral language together with ADR-0008.
+
+The 2026-10-05 [build-out refinement](project/ROADMAP.md#engine-build-out-commitment--2026-10-05) connects the entire accepted design to twelve measurable capability packets. It preserves existing first-release scope and the current native handoff. Later engine generations have their own dependency path; unrelated future media/social product additions are not hidden prerequisites. The ledger defines what closes a capability, not another competing schedule or a claim of production readiness.
 
 Planned paths in diagrams are not implemented folders. Create code packages only with a real work packet and tests. Documentation acceptance, code CI, dataset ingestion/training, hosted rollout and device acceptance are separate facts.

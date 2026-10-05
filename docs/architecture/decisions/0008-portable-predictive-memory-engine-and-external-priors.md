@@ -43,3 +43,11 @@ Benefits: independent engine contracts, repeatable early experiments, explicit u
 Costs: adapter and artifact versioning, research/production isolation, license lineage, temporal evaluation and separate model admission must be maintained. Public data does not remove native-data, consent, device or cross-domain validation work.
 
 The documentation PR must update the navigation and canonical scope/continuation owners, retain existing release gates, and distinguish planned modules from delivered code. Implementation requires deterministic contract/leakage/authorization tests, reproducible source manifests and explicit evidence before any serving change.
+
+## Implementation traceability refinement — 2026-10-05
+
+The owner asks that the complete design become an executable build direction, not only a stored proposal. The source audit confirms all 51 sections already exist and E1/D1/D2 are accepted foundations; this does not establish native engine integration or later-generation acceptance. The original dated rollout statements above remain historical context, not instructions to repeat deployed forwards.
+
+Adopt [ENGINE_BUILDOUT](../../project/ENGINE_BUILDOUT.md), tracked in [#302](https://github.com/Kajooja/Kajo/issues/302), as the section-to-capability acceptance ledger. [ROADMAP](../../project/ROADMAP.md#engine-build-out-commitment--2026-10-05) retains sole scheduling authority and the existing release march. The ledger covers native-core integration, state, replay, trajectory recall, multi-space geometry, global memory, distributions, policy, consolidation, dreams, evolution and real second-domain portability.
+
+The engine's later capability path does not have to wait for unrelated music/events/feed/dating product additions. It does require its own data, quality, privacy, resource and operational prerequisites. All 51 sections remain the target; methods may be rejected with evidence, but capabilities cannot silently disappear. No new runtime, service, migration, external-data acquisition, production model or first-release blocker is introduced by this documentation refinement. STATUS and current PRs retain their exact native/device acceptance boundaries.
