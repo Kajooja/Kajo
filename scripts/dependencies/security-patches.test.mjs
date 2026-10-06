@@ -4,14 +4,26 @@ import { generateKeyPairSync, verify as verifyNative } from 'node:crypto';
 import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, posix, resolve, win32 } from 'node:path';
 import test from 'node:test';
 import { runInNewContext } from 'node:vm';
-import { corrections, correctedSource, originalSource, projectRoot, securityPatches } from './security-patches.mjs';
+import { corrections, correctedSource, originalSource, projectRoot, resolveDependencyDirectory, securityPatches } from './security-patches.mjs';
 
 const require = createRequire(import.meta.url);
 const braces = require('braces');
 const forge = require('node-forge');
+
+test('dependency containment accepts Windows/POSIX installs and rejects escapes', () => {
+  for (const [pathApi, root] of [[posix, '/work/Kajo'], [win32, 'C:\\work\\Kajo']]) {
+    for (const node of ['node_modules/braces', 'node_modules/parent/node_modules/braces']) {
+      assert.equal(resolveDependencyDirectory(root, node, pathApi), pathApi.resolve(root, node));
+    }
+    for (const node of ['.', '../outside/node_modules/braces', '../Kajo-other/node_modules/braces']) {
+      assert.throws(() => resolveDependencyDirectory(root, node, pathApi), /Invalid dependency path/);
+    }
+  }
+  assert.throws(() => resolveDependencyDirectory('C:\\work\\Kajo', 'D:\\node_modules\\braces', win32), /Invalid dependency path/);
+});
 
 test('all locked instances contain the exact security corrections', async () => {
   const receipt = await securityPatches();

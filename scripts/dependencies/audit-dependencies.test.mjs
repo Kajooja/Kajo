@@ -1,9 +1,38 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
-import { classifyAudit } from './audit-dependencies.mjs';
+import { classifyAudit, npmAuditInvocation } from './audit-dependencies.mjs';
 import { corrections } from './security-patches.mjs';
 
 const verified = corrections.map(value => ({ ...value, path: `node_modules/${value.name}` }));
+
+test('npm-run CLI execution preserves argument boundaries on Windows and POSIX', async () => {
+  const temporary = await mkdtemp(join(tmpdir(), 'kajo-npm-invocation-'));
+  try {
+    const cli = join(temporary, 'npm cli & fixture.cjs');
+    await writeFile(cli, 'process.stdout.write(JSON.stringify(process.argv.slice(2)));');
+    for (const platform of ['win32', 'linux']) {
+      const invocation = npmAuditInvocation(platform, { npm_execpath: cli });
+      const result = spawnSync(invocation.command, invocation.args, { encoding: 'utf8', timeout: 5000 });
+      assert.ifError(result.error);
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(JSON.parse(result.stdout), ['audit', '--json', '--audit-level=moderate']);
+    }
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('direct Windows audit uses the command interpreter and a fixed audit command', () => {
+  const invocation = npmAuditInvocation('win32', {});
+  assert.equal(invocation.command, 'cmd.exe');
+  assert.deepEqual(invocation.args, ['/d', '/s', '/c', 'npm.cmd audit --json --audit-level=moderate']);
+  assert.equal(npmAuditInvocation('linux', {}).command, 'npm');
+});
+
 function fixture() {
   const vulnerabilities = Object.fromEntries(corrections.map(value => [value.name, {
     name: value.name, severity: 'high', nodes: [`node_modules/${value.name}`],

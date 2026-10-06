@@ -14,6 +14,38 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## APK retry and dependency-script portability — 2026-10-06 / #304
+
+CI #605 attempt 1 failed in hosted-runner allocation before any steps ran.
+Attempt 2 passed platform and two-clean-installation gates, but validate again
+acquired no runner; the remaining dependent jobs, including APK, were skipped.
+GitHub's corresponding global Actions incident is resolved at this checkpoint.
+STATUS owns the exact source and owner handoff.
+
+The retry review corrected Windows postinstall path containment and direct
+`npm.cmd` execution. Native path-relative containment rejects root/sibling/other-
+drive escapes. npm-run audit invokes the CLI through Node without a shell;
+direct Windows invocation uses a fixed command via `cmd.exe`. Portable fixtures
+cover Windows/POSIX path rules and CLI filenames with spaces/metacharacters;
+no native Windows runtime is claimed.
+
+Fresh audit found two additional high advisory leaves, compression and
+source-map-js. Their published fixes 1.8.2 / 1.2.2 fit the existing Expo CLI /
+PostCSS ranges. Only those lock entries and compression's existing destroy edge
+are refreshed. Security regressions exercise aborted compression streams and
+bounded source-map offsets while preserving ordinary map use.
+
+Local validation: clean npm installation and the fresh verified audit passed.
+All 39 dependency tests, mobile/catalog suites, database/engine/research/acceptance
+suites, lint, typechecks and all four Hermes exports passed. `npm run check`
+stopped at the Deno registry connection refused by this local environment.
+The complete CI Deno check and all five native gates remain required; this
+checkpoint claims no completed CI/APK or physical-device acceptance.
+
+The owner requested another APK build without polling after launch. Publishing
+the new head of labelled PR #304 requests that run behind all five normal gates;
+build completion and the six-case configured-device round remain open.
+
 ## APK audit recovery — 2026-10-05 / #238
 
 The owner-requested terminal-refresh APK dispatch CI #603 failed in the fresh npm

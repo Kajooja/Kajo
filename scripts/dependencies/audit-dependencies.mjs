@@ -4,6 +4,19 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { corrections, projectRoot, securityPatches } from './security-patches.mjs';
 
+export function npmAuditInvocation(platform = process.platform, environment = process.env) {
+  const args = ['audit', '--json', '--audit-level=moderate'];
+  if (environment.npm_execpath) {
+    // npm run supplies its CLI path; Node executes it without a shell on every OS.
+    return { command: process.execPath, args: [environment.npm_execpath, ...args] };
+  }
+  if (platform === 'win32') {
+    // Direct node invocation also works: Windows cannot execute npm.cmd directly.
+    return { command: environment.ComSpec || 'cmd.exe', args: ['/d', '/s', '/c', 'npm.cmd audit --json --audit-level=moderate'] };
+  }
+  return { command: 'npm', args };
+}
+
 // npm identifies published archives, not installed source patches. Retain the
 // complete raw report, and classify only these two *verified* source corrections.
 // New advisories, missing patches, malformed reports and audit transport errors fail.
@@ -66,7 +79,8 @@ export async function auditDependencies() {
   });
   assert.ifError(regression.error);
   assert.equal(regression.status, 0, `Security regressions failed:\n${regression.stdout}\n${regression.stderr}`);
-  const audit = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['audit', '--json', '--audit-level=moderate'], {
+  const invocation = npmAuditInvocation();
+  const audit = spawnSync(invocation.command, invocation.args, {
     cwd: projectRoot, encoding: 'utf8', timeout: 120000, maxBuffer: 10 * 1024 * 1024,
   });
   assert.ifError(audit.error);

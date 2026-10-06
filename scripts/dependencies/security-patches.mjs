@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { lstat, readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import path, { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -100,6 +100,15 @@ export function correctedSource(source, file) {
   return corrected;
 }
 
+export function resolveDependencyDirectory(root, node, pathApi = path) {
+  const directory = pathApi.resolve(root, node);
+  const relative = pathApi.relative(pathApi.resolve(root), directory);
+  assert.ok(relative && relative !== '..' &&
+    !relative.startsWith(`..${pathApi.sep}`) && !pathApi.isAbsolute(relative),
+  'Invalid dependency path');
+  return directory;
+}
+
 export async function securityPatches({ root = projectRoot, install = false } = {}) {
   const lock = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'));
   assert.equal(lock.lockfileVersion, 3, 'Review the dependency lock format');
@@ -111,8 +120,7 @@ export async function securityPatches({ root = projectRoot, install = false } = 
       assert.equal(entry.version, correction.version, `Unreviewed ${correction.name} version`);
       assert.equal(entry.integrity, correction.integrity, `Unreviewed ${correction.name} archive`);
       assert.equal(entry.resolved, `https://registry.npmjs.org/${correction.name}/-/${correction.name}-${correction.version}.tgz`);
-      const directory = resolve(root, path);
-      assert.ok(directory.startsWith(resolve(root) + '/'), 'Invalid dependency path');
+      const directory = resolveDependencyDirectory(root, path);
       assert.ok((await lstat(directory)).isDirectory(), 'Dependency must be a real installed directory');
       const pkg = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
       assert.equal(pkg.name, correction.name);

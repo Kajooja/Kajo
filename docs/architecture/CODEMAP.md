@@ -63,6 +63,11 @@ and fail on unmitigated advisories or unverifiable patches. The correction contr
 is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual
 native graph. CI's same-repository `build-android-apk` PR label opts into an APK
 behind the unchanged five mandatory jobs.
+`october-advisories.test.mjs` covers the compatible compression 1.8.2 /
+source-map-js 1.2.2 lock refresh: actual aborted-stream release, ordinary codec/map
+behavior and bounded indexed-map processing. The fresh updated-lock receipt is
+`dependency-audit-native-2026-10-06.json`; Windows installation/audit portability
+is exercised by the existing security-patch/audit test files.
 
 ## Implementation locations
 

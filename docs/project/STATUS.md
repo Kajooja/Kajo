@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-05**
+Last updated: **2026-10-06**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,55 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### APK retry after GitHub Actions incident — 2026-10-06 / #304
+
+[PR #304](https://github.com/Kajooja/Kajo/pull/304) contains the October security
+corrections on `fix/238-native-audit-october`, based on the exact #301 source.
+[CI #605](https://github.com/Kajooja/Kajo/actions/runs/37367448021) attempt 1
+failed before either initial job acquired a hosted runner; GitHub reported runner
+acquisition failure and an internal server error. Attempt 2 passed the isolated
+platform and two-clean-installation jobs, but validate again acquired no runner
+and executed no steps. Its dependent upgrade, CLI and APK jobs were skipped.
+Neither attempt is evidence of a source regression or a completed APK.
+
+[GitHub Status](https://www.githubstatus.com/) reports the October 5 Actions
+incident resolved; Actions is operational at the October 6 retry checkpoint.
+The owner requested any remaining corrections and another APK build, explicitly
+without polling its progress after starting it.
+
+The October 6 fresh audit also found two additional unmitigated advisories:
+compression [GHSA-vc2v-76pw-4v95](https://github.com/advisories/GHSA-vc2v-76pw-4v95)
+and source-map-js [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
+Refreshed only their two lock leaves to published fixes **1.8.2 / 1.2.2**, within
+the existing Expo CLI and PostCSS ranges. The compression `destroy` dependency
+already exists in the lock. Parent/framework versions and the earlier exact
+braces/forge source corrections are retained. The October 5 receipt remains
+dated evidence for its former lock.
+The [October 6 receipt](dependency-audit-native-2026-10-06.json) records the updated
+lock and fresh verified audit, with zero unmitigated findings. Its raw report
+still retains the 19 upstream findings covered by exact installed-source
+corrections; it is not a zero-advisory upstream release.
+
+Review found and corrected two Windows-only dependency-script defects: native
+path containment must use `path.relative` rather than a literal POSIX slash,
+and Windows cannot directly execute `npm.cmd`. The audit now launches npm's CLI
+through Node when invoked with `npm run`, with a fixed `cmd.exe` command for
+direct Windows invocation. Directory escapes remain rejected and the source
+verification/audit severity rules are retained. The Linux runner failures above
+are separate from these portability defects.
+
+Local validation: clean installation, the fresh verified audit, all **39**
+dependency regressions and the mobile/catalog/database/engine/research/acceptance
+suites passed. Lint and typechecks passed, as did all four iOS/Android Hermes
+exports. The complete root check stopped only at Deno dependency resolution:
+this environment refused the npm-registry connection. Deno and the native
+platform/installation gates remain mandatory in the new GitHub run.
+
+Publishing the corrected PR head with its existing `build-android-apk` label
+requests a fresh APK run behind all five gates. Leave completion for the owner
+to follow through the [branch's Actions runs](https://github.com/Kajooja/Kajo/actions?query=branch%3Afix%2F238-native-audit-october).
+No completed CI, APK or native Windows execution is claimed by this checkpoint.
 
 ### APK audit recovery — 2026-10-05 / #238
 
@@ -132,9 +181,9 @@ backend recovery clears the error; an expired cursor requires explicit new searc
 This remains draft implementation, separately from accepted main and real device
 observations.
 
-**Next bounded action:** publish the #238 correction based on #301 and start its
-labelled APK CI once. Verify the run/PR head and leave completion for the owner to
-follow. Only a successful new APK containing the terminal-refresh and security
+**Next bounded action:** follow the latest corrected PR #304 APK run. For the
+October 6 request, start the build and leave completion to the owner without
+polling. Only a successful new APK containing the terminal-refresh and security
 corrections is suitable for the six-case phone test supplied on October 5.
 Record its actual run/artifact/checkout SHA, OnePlus model and Android version.
 Preserve the positive September 30 basic reconnect observation; complete the

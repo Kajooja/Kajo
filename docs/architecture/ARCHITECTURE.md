@@ -2001,6 +2001,10 @@ version upgrade or permission to suppress unrelated scanner findings.
 1.4.0 archives to their exact lockfile identities/integrities and original source
 SHA-256 hashes. Installation is idempotent and refuses unknown or partially
 patched source. Verification is read-only and checks every locked installed copy.
+Installed-directory containment uses native path-relative rules on Windows and
+POSIX. The audit launches npm's CLI through Node under `npm run`, falling back to
+a fixed command through `cmd.exe` for direct Windows execution; `.cmd` files
+cannot be directly spawned as native executables.
 
 - [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm):
   bound brace/parenthesis parser nesting and all three recursive output walkers
@@ -2032,3 +2036,9 @@ upstream findings are never described as zero vulnerabilities.
 The corrections are temporary compatibility backports. Review/remove each when
 a fixed upstream release is available; changed source/version fails until reviewed.
 All normal checks, actual APK build and owner device acceptance remain required.
+
+For October 6, compatible published fixes replace the compression 1.8.1 and
+source-map-js 1.2.1 lock leaves with 1.8.2 and 1.2.2. They fit the existing Expo
+CLI/PostCSS ranges and require no audit exception. The regression boundary covers
+compressed-response abort cleanup and validated/bounded indexed source-map
+offsets, with ordinary source-map and consumer behavior retained.
