@@ -36,6 +36,24 @@ bounded task; no new catalogue acquisition or later-phase identity/social work.
 STATUS owns exact new-forward rollout, publication/check results and next APK.
 Phone acceptance and remaining #229 release gaps stay separate; preserve data.
 
+Validation/rollout: 478 mobile tests, root lint/typechecks, dependency/catalog/
+engine/research/acceptance suites and main/acceptance iOS/Android exports passed.
+The corrected catalogue-chain full-schema case passed after the sweep's actor
+error-classification correction; independent later-page provenance passed at
+both float settings. Deno registry access was refused locally; Docker/native
+Supabase/CLI/concurrency still require CI. All gates remain mandatory.
+
+Reviewed source `5089d0abb65965c669fa540de9a025e34f92f178` supplied the exact SQL
+SHA-256 `8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8`.
+Only the new forward was applied to preflighted project `mwrnvfosrzwygrunrltm` as
+provider `20261006143148/catalog_prediction_chain`; filename now matches tracking
+with unchanged bytes. Full prior function owners/ACLs and 152 unrelated bodies
+survived; only the private dispatcher changed, with five owner-only helpers and
+three RLS/API-denied tables added. Existing application row hashes stayed equal.
+Hosted rollback probe verified 80 distinct Items/four pages for each BOOK/MOVIE;
+57 old authorized receipts replay unchanged. Exact receipt:
+[rollout](../catalog-chain-rollout-2026-10-06.json). Main/#229 acceptance stays open.
+
 ## CLI Data API recovery after CI #606 — 2026-10-06 / #304
 
 CI #606 passed validate (fresh security audit, Deno and four exports), platform,

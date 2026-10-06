@@ -9,7 +9,9 @@ successes; exact installed artifact/model/Android version were not supplied.
 The old terminal **Päivitä haku** behavior is superseded by list continuation.
 
 Use the new `fix/199-discovery-catalog-append` build only after its required gates
-and `20261006140559_catalog_prediction_chain.sql` hosted rollout are verified.
+pass. The `20261006143148_catalog_prediction_chain.sql` hosted rollout is
+verified: BOOK/MOVIE each appended 80 distinct Items; all probe writes rolled
+back and existing data/legacy receipts were preserved.
 Do not replay older forwards or reset accounts. Install as an update preserving
 data, and record the run/artifact, phone model and Android version.
 

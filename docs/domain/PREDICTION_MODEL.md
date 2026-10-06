@@ -1099,7 +1099,7 @@ and current PR CI for acceptance; test definitions alone are not native results.
 
 #### Catalogue-wide append — protocol 3 source, 2026-10-06
 
-`20261006140559_catalog_prediction_chain.sql` extends the same page RPC with
+`20261006143148_catalog_prediction_chain.sql` extends the same page RPC with
 explicit version 3; existing row/protocol 1/2 bodies and historical receipts retain
 their contract. Its exact full-definition source hashes and unique patch anchors
 reject unknown ranker drift. Private clones add server-only delivered-prefix and

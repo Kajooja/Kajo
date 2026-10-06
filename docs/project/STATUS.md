@@ -32,7 +32,7 @@ bounded #199/#200 layout requirements into the current native packet. Remaining
 Phase 17 UX and all #229 release gates keep their prerequisites.
 
 `fix/199-discovery-catalog-append` continues the exact successful #304 source.
-The new forward `20261006140559_catalog_prediction_chain.sql` opts protocol 3
+The new forward `20261006143148_catalog_prediction_chain.sql` opts protocol 3
 into the existing page RPC while retaining old protocol 1/2 callers and receipts.
 Server-owned delivered-prefix exclusion occurs before bounded candidate admission.
 Every appended page keeps its own immutable ranked run and exact receipt; the
@@ -70,10 +70,35 @@ The exact new SQL SHA-256 is
 Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four guarded ranker bodies
 and their owners/ACLs; existing migration tracking remains unrepaired.
 
-Current next action: publish the reviewed source, apply only that exact new
-forward to the preflighted target and verify it with the population-preserving
-rollback probe. Then request its APK behind all five required gates. Retrieve the new run link once; do not poll. Then use the
-new [DEVICE_TEST](DEVICE_TEST.md) append/layout round with existing accounts/data.
+The forward is deployed as provider version **20261006143148**, name
+`catalog_prediction_chain`, on the exact target above. The repository filename
+now matches that provider tracking; authored SQL bytes/hash are unchanged.
+Source `5089d0abb65965c669fa540de9a025e34f92f178` is the reviewed rollout input.
+The [rollout receipt](catalog-chain-rollout-2026-10-06.json) records all 153 prior
+function identities: only the intended private dispatcher body changed, all
+prior owners/ACLs and 152 unrelated definitions stayed equal, and five owner-only
+helpers were added. Three new tables have RLS and no anon/authenticated/service
+role table access. Existing users/Profiles/Items/Events/interactions/runs/
+candidates/receipts retained their exact row digests before deployment and after
+the rollback-only runtime probe. All **57** currently authorized existing
+protocol 1/2 receipts replayed unchanged. No older forward or history repair ran.
+
+The existing owned PersonalProfile's hosted BOOK and MOVIE probes each appended
+**80 distinct Items over four pages**, preserving chain/prefix/per-card run
+identity and exact retries. Both prove continuation beyond 50; both still report
+MORE. Every probe write was rolled back. This is database-role/runtime evidence,
+not real HTTP/JWT or Android gesture/visibility acceptance.
+
+The correction branch requests APK through a same-repository PR with
+`build-android-apk`, retaining all five required gates. GitHub owns its latest
+head/run/artifact identity. No completed new CI or APK is claimed by this source
+checkpoint; #607 is the successful predecessor only. Retrieve the new run link
+once and leave completion to the owner without polling.
+
+Current next action: follow the correction's
+[Actions runs](https://github.com/Kajooja/Kajo/actions?query=branch%3Afix%2F199-discovery-catalog-append).
+After all gates and APK succeed, install as an update and execute the new
+[DEVICE_TEST](DEVICE_TEST.md) append/layout round with existing accounts/data.
 Keep draft #229 and accepted main unchanged until their remaining gates pass.
 
 ### CLI Data API transport recovery — 2026-10-06 / #304
