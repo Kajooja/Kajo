@@ -89,6 +89,15 @@ identity and exact retries. Both prove continuation beyond 50; both still report
 MORE. Every probe write was rolled back. This is database-role/runtime evidence,
 not real HTTP/JWT or Android gesture/visibility acceptance.
 
+[PR #305](https://github.com/Kajooja/Kajo/pull/305) publishes the correction,
+stacked on #304; reviewed application/SQL/rollout source is
+`b076530c9698ac08c4ff8b2ace3322612da920a2`. The `build-android-apk` label is
+verified on the PR before this final handoff commit. Its synchronization requests
+the configured standalone APK behind the unchanged five mandatory gates.
+The initial unlabelled PR discovery run #608 is separate from that APK request.
+Use the latest labelled synchronization run for the new binary; GitHub owns its
+actual head/merge/artifact identity. Publishing this handoff does not accept main.
+
 The correction branch requests APK through a same-repository PR with
 `build-android-apk`, retaining all five required gates. GitHub owns its latest
 head/run/artifact identity. No completed new CI or APK is claimed by this source
