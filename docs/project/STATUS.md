@@ -12,6 +12,41 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
 
+### CLI Data API transport recovery — 2026-10-06 / #304
+
+Published source `86b90e1560ae5912cc3e4c357f446cea420a15b5` reached
+[CI #606](https://github.com/Kajooja/Kajo/actions/runs/37456707996).
+Validation (including the fresh audit, Deno tests and all four exports), platform,
+two clean installations and populated forward upgrade passed. Only CLI
+installation/history failed: after starting its isolated stack and performing
+reset rehearsals, the sole JavaScript fetch path (`catalogRpc`) reported
+`fetch failed`. APK was consequently skipped by its required dependency gate.
+The old log does not identify the RPC, transport cause or daemon state; this is
+not another runner-allocation failure or a failing dependency audit.
+
+The harness now verifies live local Data API/database access with the read-only
+`items?select=id&limit=0` query before each catalog RPC. Readiness requires HTTP
+200 and exactly `[]`. Only recognized temporary transport errors, owned request
+timeouts and gateway 502/503/504 responses receive a bounded retry (20 reads,
+1.5 seconds per read and 500 ms between attempts). Other HTTP/JSON/permission
+failures remain fatal. Requests use IPv4 loopback and close their connections;
+the original POST executes once and is never replayed after a lost reply.
+Existing schema-cache, unchanged-cardinality and anonymous-denial assertions
+remain required. Reset/RPC sequence labels and sanitized failure codes replace
+the uninformative bare error without exposing keys or CLI status.
+
+Local validation: the database suite passed **81 tests**, followed by all **15**
+final targeted stack/transport tests, including real loopback socket interruption
+and a stalled response-body timeout. Root lint/typechecks, 39 dependency, 416
+mobile and 444 catalog tests passed; the root check stopped at Deno lockfile
+resolution because the local npm-registry connection was refused. No Docker executable is available locally,
+so the actual isolated Supabase rehearsal must run in GitHub. The new run still
+requires all five gates before APK; no successful new CLI gate or APK is claimed.
+
+Publish the corrected head of labelled PR #304 to request the replacement APK.
+Retrieve its run link once and leave progress to the owner without polling.
+The existing six-case phone round remains next after a successful artifact.
+
 ### APK retry after GitHub Actions incident — 2026-10-06 / #304
 
 [PR #304](https://github.com/Kajooja/Kajo/pull/304) contains the October security

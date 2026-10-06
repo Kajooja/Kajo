@@ -14,6 +14,30 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## CLI Data API recovery after CI #606 — 2026-10-06 / #304
+
+CI #606 passed validate (fresh security audit, Deno and four exports), platform,
+two clean installations and populated upgrade. CLI installation/history alone
+failed with `fetch failed` in its local catalog RPC transport, so its dependent
+APK was skipped. The old log cannot establish which RPC or transport cause;
+the source and runner-allocation failures from earlier attempts are distinct.
+
+Before each RPC, the isolated harness now requires a successful read-only Items
+query. Twenty bounded readiness attempts cover recognized temporary transport
+errors, owned timeouts and gateway 502/503/504; permission/schema/malformed
+responses fail immediately. IPv4 loopback and closed connections avoid resolver
+and pooled-socket dependencies across resets. The POST is sent exactly once,
+with its original response assertions retained. Fixed reset/RPC sequence labels
+and sanitized cause codes give actionable diagnostics without credentials.
+
+The full local database suite passed 81 tests; the final targeted suite passed
+15, including actual loopback socket failure and stalled-body timeout recovery.
+Root lint/typechecks, dependency/mobile/catalog tests passed, then Deno lockfile
+resolution failed on the local refused npm-registry connection.
+Local Docker is unavailable, so GitHub still owns actual Supabase stack/runtime
+verification. All five original gates remain mandatory before APK. STATUS owns
+the next labelled PR head and the owner's no-polling build handoff.
+
 ## APK retry and dependency-script portability — 2026-10-06 / #304
 
 CI #605 attempt 1 failed in hosted-runner allocation before any steps ran.
