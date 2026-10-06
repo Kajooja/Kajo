@@ -404,3 +404,165 @@ describe('exact request retry and bounded append', () => {
       expect(reader.getSnapshot().items).toBe(before.items);
     });
 });
+
+describe('catalog-chain append and termination', () => {
+  const chainScope = { ...scope, limit: 40 };
+  const chainId = id(9000);
+  const rootPredictionId = id(10000);
+  const sizes = [35, 40, 30, 15];
+  function chainPage(request: PredictionPageRequest, index: number) {
+    const count = sizes[index - 1]!;
+    const offset = sizes.slice(0, index - 1).reduce((sum, size) => sum + size, 0);
+    const predictionId = id(10000 + index - 1);
+    return { version: 3, requestId: request.requestId, profileId: request.profileId,
+      sessionId: request.sessionId, discoveryMode: request.discoveryMode, itemType: request.itemType,
+      predictionId, continuationSupported: true, availability: 'ITEMS',
+      nextCursor: index < sizes.length ? id(30000 + index) : null,
+      source: { version: 'catalog-chain-v1', sourcePredictionId: predictionId, rootPredictionId,
+        parentPredictionId: index === 1 ? null : id(10000 + index - 2), chainId, pageIndex: index,
+        featureAt: `2026-10-06T13:0${index - 1}:00+00:00`, candidateCount: [50, 45, 40, 15][index - 1],
+        resultCount: count, catalogEmpty: false, seenCount: offset + count, chainLimit: 1000,
+        continuationState: index < sizes.length ? 'MORE' : 'CATALOG_EXHAUSTED' },
+      items: Array.from({ length: count }, (_, n) => ({ prediction_id: predictionId,
+        item_id: id(20000 + offset + n), item_type: request.itemType, title: `Item ${offset + n}`,
+        description: null, tags: ['quiet'], score: 0.8, confidence: 0.7, rank: n + 1 })) };
+  }
+  function chainReader(load: (request: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>) {
+    const createRequest = vi.fn(() => createPredictionPageRequest({ requestId: newId(),
+      profileId: chainScope.profileId, sessionId: chainScope.sessionId, mode: chainScope.mode,
+      itemType: chainScope.itemType, limit: chainScope.limit, version: 3,
+      context: { occurredAt: '2026-10-06T13:00:00.000Z', attributes: { localHour: 16 } } }));
+    return { reader: createPredictionPageReader({ scope: chainScope, createRequest, createRequestId: newId, load }),
+      createRequest };
+  }
+
+  it('appends 120 Items beyond a single candidate pool without replacing the view or losing origins', async () => {
+    let pageIndex = 0;
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>(
+      async request => mapPredictionPage(chainPage(request, ++pageIndex), request));
+    const { reader, createRequest } = chainReader(load);
+    await activate(reader);
+    const first = reader.getSnapshot();
+    expect(first.status).toBe('ready');
+    expect(first.items).toHaveLength(35);
+    for (let index = 2; index <= sizes.length; index++) {
+      const prefix = reader.getSnapshot();
+      reader.loadMore(); reader.loadMore(); reader.loadMore();
+      expect(reader.getSnapshot().viewId).toBe(first.viewId);
+      expect(reader.getSnapshot().items).toBe(prefix.items);
+      await settle();
+      const appended = reader.getSnapshot();
+      expect(appended.status).toBe('ready');
+      expect(appended.viewId).toBe(first.viewId);
+      expect(appended.items.slice(0, prefix.items.length)).toEqual(prefix.items);
+      expect(appended.pages.slice(0, prefix.pages.length)).toEqual(prefix.pages);
+      expect(load.mock.calls[index - 1]![0].context).toBe(load.mock.calls[0]![0].context);
+      expect(load.mock.calls[index - 1]![0].cursor).toBe(prefix.pages.at(-1)!.nextCursor);
+    }
+    const complete = reader.getSnapshot();
+    expect(complete.items).toHaveLength(120);
+    expect(new Set(complete.items.map(item => item.id)).size).toBe(120);
+    expect(complete.pages.map(entry => entry.featureAt)).toEqual([0, 1, 2, 3].map(n => `2026-10-06T13:0${n}:00+00:00`));
+    expect(complete.pages.map(entry => entry.candidateCount)).toEqual([50, 45, 40, 15]);
+    expect(complete.pages.map(entry => entry.sourcePredictionId)).toEqual([10000, 10001, 10002, 10003].map(id));
+    let offset = 0;
+    sizes.forEach((size, index) => {
+      for (let n = 0; n < size; n++) expect(complete.predictionIds[id(20000 + offset + n)]).toBe(id(10000 + index));
+      offset += size;
+    });
+    expect(first.items).toHaveLength(35);
+    expect(first.predictionIds[id(20000)]).toBe(rootPredictionId);
+    expect(complete.pages.at(-1)).toMatchObject({ availability: 'ITEMS', continuationState: 'CATALOG_EXHAUSTED',
+      nextCursor: null, seenCount: 120, ranking: { predictionId: id(10003) } });
+    reader.loadMore(); reader.retry(); await settle();
+    expect(load).toHaveBeenCalledTimes(4);
+    expect(createRequest).toHaveBeenCalledTimes(1);
+    expect(reader.getSnapshot()).toBe(complete);
+  });
+
+  it.each(['chain', 'root', 'parent', 'source', 'index', 'seen', 'run', 'item', 'cursor'] as const)(
+    'rejects a broken %s on a later page while retaining the entire accepted prefix', async defect => {
+      let pageIndex = 0;
+      const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>(async request => {
+        const result = mapPredictionPage(chainPage(request, ++pageIndex), request);
+        if (result.status !== 'success') throw new Error('Expected valid catalog-chain fixture');
+        if (pageIndex === 3) {
+          if (defect === 'chain') result.chainId = id(999);
+          if (defect === 'root') result.rootPredictionId = id(999);
+          if (defect === 'parent') result.parentPredictionId = rootPredictionId;
+          if (defect === 'source') result.sourcePredictionId = rootPredictionId;
+          if (defect === 'index') result.pageIndex = 4;
+          if (defect === 'seen') result.seenCount = 104;
+          if (defect === 'run') result.ranking.predictionId = rootPredictionId;
+          if (defect === 'item') result.ranking.items[0]!.id = id(20000);
+          if (defect === 'cursor') result.nextCursor = id(30001);
+        }
+        return result;
+      });
+      const { reader } = chainReader(load);
+      await activate(reader);
+      reader.loadMore(); await settle();
+      const accepted = reader.getSnapshot();
+      expect(accepted.items).toHaveLength(75);
+      reader.loadMore(); await settle();
+      expect(reader.getSnapshot()).toMatchObject({ status: 'error', recovery: 'retry', viewId: accepted.viewId });
+      expect(reader.getSnapshot().items).toBe(accepted.items);
+      expect(reader.getSnapshot().pages).toBe(accepted.pages);
+      expect(reader.getSnapshot().predictionIds).toBe(accepted.predictionIds);
+    });
+
+  it('preserves previous Items and the identified terminal run when current eligibility exhausts the catalog', async () => {
+    const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>()
+      .mockImplementationOnce(async request => mapPredictionPage(chainPage(request, 1), request))
+      .mockImplementation(async request => {
+        const terminal = chainPage(request, 2);
+        return mapPredictionPage({ ...terminal, items: [], nextCursor: null, availability: 'CATALOG_EXHAUSTED',
+          source: { ...terminal.source, resultCount: 0, candidateCount: 0, seenCount: 35,
+            continuationState: 'CATALOG_EXHAUSTED' } }, request);
+      });
+    const { reader } = chainReader(load);
+    await activate(reader);
+    const prefix = reader.getSnapshot();
+    reader.loadMore(); await settle();
+    expect(reader.getSnapshot().status).toBe('ready');
+    expect(reader.getSnapshot().items).toEqual(prefix.items);
+    expect(reader.getSnapshot().predictionIds).toEqual(prefix.predictionIds);
+    expect(reader.getSnapshot().pages.at(-1)).toMatchObject({ availability: 'CATALOG_EXHAUSTED', seenCount: 35,
+      continuationState: 'CATALOG_EXHAUSTED', nextCursor: null, ranking: { predictionId: id(10001), items: [] } });
+    reader.loadMore(); reader.retry(); await settle();
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['READER_LIMIT', 'CATALOG_EXHAUSTED'] as const)(
+    'retains the distinct %s reason when the reader reaches exactly 1000 Items', async terminalState => {
+      let pageIndex = 0;
+      const load = vi.fn<(r: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>>(async request => {
+        const index = ++pageIndex;
+        const predictionId = id(10000 + index - 1);
+        const offset = (index - 1) * 40;
+        const template = chainPage(request, 1);
+        return mapPredictionPage({ ...template, predictionId, nextCursor: index < 25 ? id(30000 + index) : null,
+          items: Array.from({ length: 40 }, (_, n) => ({ ...template.items[0], prediction_id: predictionId,
+            item_id: id(20000 + offset + n), title: `Item ${offset + n}`, rank: n + 1 })),
+          source: { ...template.source, sourcePredictionId: predictionId,
+            parentPredictionId: index === 1 ? null : id(10000 + index - 2), pageIndex: index,
+            featureAt: `2026-10-06T13:${String(index - 1).padStart(2, '0')}:00+00:00`,
+            candidateCount: 40, resultCount: 40, seenCount: index * 40,
+            continuationState: index < 25 ? 'MORE' : terminalState } }, request);
+      });
+      const { reader } = chainReader(load);
+      await activate(reader);
+      const viewId = reader.getSnapshot().viewId;
+      for (let index = 2; index <= 25; index++) { reader.loadMore(); await settle(); }
+      const complete = reader.getSnapshot();
+      expect(complete).toMatchObject({ status: 'ready', viewId });
+      expect(complete.items).toHaveLength(1000);
+      expect(new Set(complete.items.map(item => item.id)).size).toBe(1000);
+      expect(complete.pages.at(-1)).toMatchObject({ pageIndex: 25, seenCount: 1000, chainLimit: 1000,
+        availability: 'ITEMS', nextCursor: null, continuationState: terminalState });
+      expect(complete.predictionIds[id(20999)]).toBe(id(10024));
+      reader.loadMore(); reader.retry(); await settle();
+      expect(load).toHaveBeenCalledTimes(25);
+      expect(reader.getSnapshot()).toBe(complete);
+    });
+});

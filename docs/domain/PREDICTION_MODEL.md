@@ -1042,7 +1042,7 @@ Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from origin
 `20260912134224_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
 `public.rank_items_page_v1` endpoint. Protocol 1 keeps its exact first-page body,
 false continuation capability and immutable old receipts; the legacy row RPC is
-unchanged. The current client source opts into protocol 2; protocol-1 envelope compatibility
+unchanged. The September 12 client source opted into protocol 2; protocol-1 envelope compatibility
 remains explicitly tested. The recorded hosted rollout supplies this client contract;
 the exact configured build still needs device acceptance.
 
@@ -1097,9 +1097,56 @@ retry, competing cursor consumers and simultaneous sixteenth/seventeenth windows
 and rehearses both new forwards over populated pre-window receipts. Read STATUS
 and current PR CI for acceptance; test definitions alone are not native results.
 
+#### Catalogue-wide append — protocol 3 source, 2026-10-06
+
+`20261006140559_catalog_prediction_chain.sql` extends the same page RPC with
+explicit version 3; existing row/protocol 1/2 bodies and historical receipts retain
+their contract. Its exact full-definition source hashes and unique patch anchors
+reject unknown ranker drift. Private clones add server-only delivered-prefix and
+reminder-budget arguments; API clients cannot supply their own exclusions.
+
+Every page ranks a fresh immutable source after excluding this chain's already
+delivered Items **before** top 50 candidate admission. It reuses current canonical
+hard eligibility and allows at most one reminder across the chain. No earlier
+run/order/origin is revised. New catalogue or eligibility changes can affect the
+next source; this is not a single frozen whole-catalogue ranking.
+
+The request retains version, actor/Profile/session/mode/domain/limit/context;
+only its request ID and opaque UUID cursor advance. The response source version
+is `catalog-chain-v1`. `sourcePredictionId` is the current page's run;
+`rootPredictionId`, `parentPredictionId`, `chainId` and contiguous `pageIndex`
+identify global lineage. `featureAt`, `candidateCount` and result count belong
+to the independent current source. `seenCount` counts cumulative delivered Items;
+`chainLimit` is 1000. Current-scope locks serialize retries/competing consumers.
+Exact authorized receipt retry precedes cache lookup and survives cache expiry.
+
+A next cursor and `continuationState: MORE` exist only while current unseen
+eligible Items remain. Final nonempty pages still report availability `ITEMS`;
+`CATALOG_EXHAUSTED` state proves no more currently eligible unseen Items under
+the same hard policy/reminder budget. A zero page reports availability
+`CATALOG_EXHAUSTED`; `CATALOG_EMPTY` is only an initial request with no discoverable
+Items in that domain. `READER_LIMIT` distinguishes reaching 1000 delivered Items
+while more eligible Items remain. Never label a resource limit or candidate
+cutoff as catalogue exhaustion. Expiry requires an explicit new search.
+
+Chains expire 15 minutes from their original source, and protocols 2/3 share a
+16-active-reader budget per actor/Profile. New starts reclaim expired derived
+chains; no background cleanup is introduced. Immutable chain-page evidence
+preserves the server prefix/reminder state after cache cleanup. New private
+tables have RLS and no API/service-role access; helper execution is owner-only.
+Actor/Profile/run lifecycle owns receipts/evidence deletion as before.
+
+Frozen replay/shadow/evaluation uses each page's own immutable admitted source,
+not a hypothetical challenger-wide catalogue sequence. Fetching/appending records
+no impression. Tests exercise 145 eligible Items per domain, Personal/Shared and
+all modes, suppression/reminders, legacy retries, prefix races/expiry/limits and
+populated upgrade. A later-page rating 0/delayed exposure test verifies the exact
+page outcome and mature matching-genome evaluation. Local synthetic proof,
+actual native CI, hosted rollout and phone acceptance remain separate facts.
+
 #### Captured-scope mobile pages — source, device acceptance pending
 
-`usePredictionRanking.ts` now reads protocol 2 through `predictionPageOperations.ts`
+`usePredictionRanking.ts` now explicitly reads protocol 3 through `predictionPageOperations.ts`
 and the tested `predictionPageReader.ts` controller. First requests capture an
 immutable allowlisted context when a focused fetch starts; the builder caps its
 serialized request at 8,000 UTF-8 bytes to remain inside the server's 16 KiB
@@ -1115,9 +1162,11 @@ feedback from repeatedly opening unused windows. First scope entry is immediate;
 subsequent evidence updates retain the 600 ms delay. Catalog enrichment preserves
 Item ID/order/domain and cannot replace a BOOK with later MOVIE metadata.
 
-Append requires the expected cursor, next index, original source ID, feature time
-and candidate count, unique page/run/request identities and unseen Items. The
-accepted prefix remains immutable and bounded by the original pool; a failed
+Append requires the expected cursor, next index, unique page/run/request
+identities and unseen Items. Protocol2 additionally fixes its original source,
+feature time/count and total pool bound. Protocol 3 instead fixes chain/root and
+previous-page identity plus cumulative seen count, allowing independently ranked
+page sources/times/counts. The accepted prefix remains immutable; a failed
 append retains it only in its original scope/revision. A terminal empty page
 retains its own PredictionRun. Initial loading/error, proven empty catalog,
 loading the next page and bounded-window exhaustion have distinct UI states.
@@ -1130,7 +1179,8 @@ recover its immutable receipt. Late completion cannot publish or append.
 
 Exact server `22023` errors for an expired, unavailable, already consumed or
 changed continuation source select **Aloita uusi haku**; retrying that unusable
-cursor is disabled. Pull-to-refresh follows the same recovery action. Transport,
+cursor is disabled. Discovery pull appends or retries the exact request; starting
+a new search after expiry is an explicit action. Transport,
 authorization and unknown errors retain safe generic copy and exact-request
 retry; raw server details are not displayed. The explicit window-cap error asks
 the user to wait and retry, without automatically opening more windows. Metadata
@@ -1145,7 +1195,8 @@ Items cannot become impressions for a different request or scope. Fetching or
 prefetching a page creates no impression. Eight immutable navigation slates remain
 the bounded handoff; there is no global unscoped lookup of hosted Items.
 
-The configured source requires the complete six-forward server contract and
+The configured protocol 3 source requires the deployed six-forward predecessor
+contract plus the new catalogue-chain forward and
 fails closed if it is absent. Protocol 1 and the server's legacy row RPC remain
 compatible for existing clients; this client does not downgrade after errors.
 Current CI, exact hosted rollout and configured-device acceptance are separate

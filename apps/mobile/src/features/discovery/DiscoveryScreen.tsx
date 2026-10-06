@@ -1,5 +1,6 @@
 import { DiscoveryItemCard } from './DiscoveryItemCard';
-import { DiscoveryEndRefresh } from './DiscoveryEndRefresh';
+import { DiscoveryCollectionHeader } from './DiscoveryCollectionHeader';
+import { useDiscoveryAppendGesture } from './useDiscoveryAppendGesture';
 import { useItemLists } from '../lists/ItemListsContext';
 import { buildDeliveredItemOrigins, getDeliveredItemOrigin, rememberDeliveredSlate, type DeliveredItemOrigin } from './deliveredSlate';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -14,7 +15,6 @@ import {
   View,
   type ViewToken,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Item, ItemType } from '../../domain/contracts';
 import { getAmbientPhase } from '../../domain/discovery';
@@ -33,7 +33,6 @@ import {
   getDiscoverableItems,
   getItemInteraction,
 } from './itemInteraction';
-import { getConsumedItemLabels } from './itemInteractionLabels';
 import {
   applySharedDiscoveryOverlay,
   formatMemberHistoryProvenance,
@@ -89,9 +88,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   ), [rankedItems, ranking.items, ranking.predictionIds, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
   const items = useMemo(() => sharedOverlayReady
     ? getDiscoverableItems(rankedItems, interactions) : [], [sharedOverlayReady, rankedItems, interactions]);
-  const consumedLabel = getConsumedItemLabels(itemType).history;
   const predictionId = ranking.predictionId;
-  const refreshing = ranking.status === 'loading' || ranking.retrying ||
+  const refreshing = ranking.status === 'loading' || ranking.loadingNextPage || ranking.retrying ||
     (isSharedDiscovery && sharedEndorsements.status === 'loading');
   // Each request/revision owns its visible tokens. A callback retained by the
   // previous native list cannot relabel those tokens with a new page or scope.
@@ -192,14 +190,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     });
   }
 
-  function refreshDiscovery() {
+  function appendDiscovery() {
+    const committed = currentView.current;
+    if (!focused || committed?.token !== view) return;
     if ((ranking.status === 'error' || ranking.nextPageError) && ranking.recovery === 'retry') ranking.retry();
-    else ranking.refresh();
-    if (isSharedDiscovery) sharedEndorsements.retry();
+    else if (ranking.hasNextPage && committed.context) ranking.loadMore();
+    if (isSharedDiscovery && sharedEndorsements.status !== 'ready') sharedEndorsements.retry();
   }
+  const appendGesture = useDiscoveryAppendGesture(ranking.viewId,
+    `${ranking.viewId}:${ranking.items.length}`, focused && sharedOverlayReady && ranking.hasNextPage &&
+      !refreshing && !ranking.loadingNextPage && !ranking.nextPageError, appendDiscovery);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+    <View style={styles.safeArea}>
       <StatusBar style="light" />
       <View
         pointerEvents="none"
@@ -214,51 +217,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 
       <View style={styles.screen}>
         <View style={styles.headerContent}>
-          <Text style={styles.title}>{title}</Text>
-
-          <View
-            style={styles.collectionRow}
-            accessibilityLabel="Discovery collection"
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Show discovery items"
-              accessibilityState={{ selected: true }}
-              onPress={ranking.refresh}
-              style={({ pressed }) => [
-                styles.collectionButton,
-                styles.collectionButtonSelected,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.collectionText,
-                  styles.collectionTextSelected,
-                ]}
-              >
-                Löydä
-              </Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Show ${consumedLabel.toLowerCase()}`}
-              accessibilityState={{ selected: false }}
-              onPress={() => router.push({ pathname: '/lists/history', params: { itemType } })}
-              style={({ pressed }) => [
-                styles.collectionButton,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.collectionText,
-                ]}
-              >
-                {consumedLabel}
-              </Text>
-            </Pressable>
-          </View>
+          <DiscoveryCollectionHeader itemType={itemType} title={title} theme={theme} />
 
           <InteractionPersistenceNotice theme={theme} />
 
@@ -297,13 +256,19 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           ) : null}
         </View>
 
+        <View style={styles.gridViewport} {...appendGesture.panHandlers} onLayout={appendGesture.onLayout}>
         <FlatList
           key={ranking.viewId}
           alwaysBounceVertical
           overScrollMode="always"
           refreshing={refreshing}
-          onRefresh={refreshDiscovery}
-          onEndReached={ranking.loadMore}
+          onRefresh={appendDiscovery}
+          onScroll={appendGesture.onScroll}
+          scrollEventThrottle={16}
+          onContentSizeChange={appendGesture.onContentSizeChange}
+          onEndReached={() => {
+            if (ranking.status === 'ready' && !ranking.nextPageError && !ranking.loadingNextPage) appendDiscovery();
+          }}
           onEndReachedThreshold={0.4}
           data={items}
           keyExtractor={(item) => item.id}
@@ -344,20 +309,32 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                     disabled={ranking.retrying} accessibilityState={{ disabled: ranking.retrying, busy: ranking.retrying }}>
                     <Text accessibilityLiveRegion="polite" style={styles.collectionText}>{ranking.retrying ? 'Yritetään uudelleen…' : 'Yritä uudelleen'}</Text>
                   </Pressable> : null}
-                  <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
+                  {ranking.recovery === 'refresh' ? <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Aloita uusi haku</Text>
-                  </Pressable>
+                  </Pressable> : null}
                 </> : ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
-                : ranking.hasNextPage ?
-                  <Pressable accessibilityRole="button" onPress={ranking.loadMore} style={styles.collectionButton}>
+                : ranking.hasNextPage ? <>
+                  <Text style={styles.pageText}>Vedä alaspäin listan lopussa nähdäksesi lisää.</Text>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Näytä lisää"
+                    accessibilityHint="Lisää teoksia nykyisen listan loppuun"
+                    onPress={appendGesture.append} disabled={!focused || refreshing}
+                    accessibilityState={{ disabled: !focused || refreshing }} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Näytä lisää</Text>
                   </Pressable>
-                : ranking.status === 'ready' && ranking.source === 'hosted' && items.length > 0 ?
-                  <DiscoveryEndRefresh key={ranking.viewId} theme={theme} disabled={refreshing || !focused}
-                    onRefresh={() => {
-                      const committed = currentView.current;
-                      if (committed?.token === view && committed.context) refreshDiscovery();
-                    }} /> : null}
+                </> : ranking.status === 'ready' && ranking.source === 'hosted' && items.length > 0 ? <>
+                  <Text accessibilityLiveRegion="polite" style={styles.pageText}>
+                    {ranking.continuationState === 'READER_LIMIT'
+                      ? 'Tämän haun selausraja saavutettiin. Voit aloittaa uuden haun.'
+                      : ranking.continuationState === 'CATALOG_EXHAUSTED'
+                        ? itemType === 'BOOK' ? 'Kaikki tähän hakuun sopivat kirjat on näytetty.'
+                          : 'Kaikki tähän hakuun sopivat elokuvat on näytetty.'
+                        : 'Tämän haun suositukset on näytetty.'}
+                  </Text>
+                  {ranking.continuationState === 'READER_LIMIT' ?
+                    <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
+                      <Text style={styles.collectionText}>Aloita uusi haku</Text>
+                    </Pressable> : null}
+                </> : null}
             </View>
           }
           renderItem={({ item, index }) => {
@@ -407,8 +384,9 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             );
           }}
         />
+        </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -481,24 +459,13 @@ function createStyles(theme: RoomTheme) {
     },
     screen: {
       flex: 1,
-      paddingTop: 7,
+      paddingTop: 2,
     },
     pageText: { color: theme.base.textMuted, fontSize: 13, lineHeight: 19, textAlign: 'center' },
-    pageFooter: { paddingVertical: 16, paddingHorizontal: 8, gap: 10, alignItems: 'center' },
+    gridViewport: { flex: 1 },
+    pageFooter: { paddingVertical: 8, paddingHorizontal: 8, gap: 10, alignItems: 'center' },
     headerContent: {
-      paddingHorizontal: 18,
-    },
-    title: {
-      color: theme.base.textPrimary,
-      fontSize: 21,
-      lineHeight: 25,
-      fontWeight: '700',
-      marginBottom: 10,
-    },
-    collectionRow: {
-      flexDirection: 'row',
-      gap: 8,
-      marginBottom: 10,
+      paddingHorizontal: 12,
     },
     predictionNotice: {
       flexDirection: 'row',
@@ -513,26 +480,20 @@ function createStyles(theme: RoomTheme) {
       fontSize: 12,
     },
     collectionButton: {
-      minHeight: 36,
+      minHeight: 44,
       borderBottomWidth: 1,
       borderBottomColor: 'transparent',
       paddingHorizontal: 4,
       justifyContent: 'center',
-    },
-    collectionButtonSelected: {
-      borderBottomColor: theme.ambient.curtainHighlight,
     },
     collectionText: {
       color: theme.base.textMuted,
       fontSize: 13,
       fontWeight: '600',
     },
-    collectionTextSelected: {
-      color: theme.base.textPrimary,
-    },
     gridContent: {
       paddingHorizontal: 3,
-      paddingBottom: 24,
+      paddingBottom: 0,
     },
     emptyGrid: {
       flexGrow: 1,

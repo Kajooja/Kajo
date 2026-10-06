@@ -189,14 +189,21 @@ feedback on the historical CI #469 build is positive except reconnect retry UI
 Continue the named native branch rather than recreating its implementation or
 repeating installed migrations from main.
 
-The focused #199 terminal-refresh follow-up adds
-`apps/mobile/src/features/discovery/DiscoveryEndRefresh.tsx` and its component
-regressions. `DiscoveryScreen` renders it only at the current hosted search's
-terminal notice and binds it to the same scoped refresh/Shared recovery path.
-PanResponder captures downward pulls starting on that surface; a labelled button
-provides an accessible equivalent. Trigger coalescing and unmount cleanup preserve
-request/Profile boundaries. This source remains separate from the current test
-APK until reviewed, built and physically accepted; STATUS owns that checkpoint.
+The owner-promoted October 6 #199 correction adds catalogue-wide protocol 3 and
+compact navigation on `fix/199-discovery-catalog-append`:
+
+| Area | Source | Contract |
+| --- | --- | --- |
+| Compact header | `DiscoveryCollectionHeader.tsx`, `DiscoveryModeShell.tsx` and component tests | ItemType/Löydä/history row, supported type dropdown/canonical history, restrained shell chrome, preserved global dock/system safeareas. |
+| Grid append gesture | `discoveryAppendGesture.ts`, `useDiscoveryAppendGesture.ts`, `DiscoveryScreen.tsx` | Bottom-viewport downward pull and accessible append, coalesced page identity, inert obsolete callbacks, no nested bottom/grid inset. Automatic end loading never retries an error loop. |
+| Versioned client | `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts` and tests | Explicit protocol 3 chain/root/parent/prefix validation, stable list view and per-card origins, exact retry/deadline/cancellation; protocols 1/2 retained. |
+| Catalogue chain | `20261006140559_catalog_prediction_chain.sql`; private `prediction_catalog_chains`, `prediction_catalog_chain_pages`, `prediction_catalog_chain_cursors` | Delivered exclusion before bounded admission, independent immutable ranked page sources, scoped exact receipts, current eligibility, 1000-Item/15-minute/shared 16-reader bounds, truthful exhaustion/limit. |
+| Runtime/upgrade acceptance | `catalog-prediction-chain.mjs`, `.test.mjs`, fixture/smoke/boundaries SQL | 145 eligible Items per domain across Personal/Shared/modes, populated forward preservation, legacy retries and access boundaries; native CLI integration is a separate gate. |
+| Later-page evidence | `prediction-chain-provenance.mjs`, `.sql`, `.test.mjs` | Page after 80 prior Items retains rating 0/delayed exposure, effective outcome, frozen replay/mature evaluation and post-cache exact retries. |
+| Hosted rollback probe | `catalog-chain-hosted-smoke.sql` | Existing owned Profile and catalogue, aggregate-only BOOK/MOVIE append verification, full rollback, no reset/import. |
+
+This source remains separate from accepted main and requires the new forward,
+CI/build and physical-device acceptance. STATUS owns exact rollout/checkpoint.
 
 ## Portable engine — E1 #235
 

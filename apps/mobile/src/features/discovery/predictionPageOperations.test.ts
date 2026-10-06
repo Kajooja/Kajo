@@ -256,3 +256,110 @@ describe('Protocol 2 continuation boundary', () => {
     }
   });
 });
+
+describe('Protocol 3 catalog-chain boundary', () => {
+  const chainId = id(200);
+  const rootPredictionId = id(201);
+  const rootRequest = createPredictionPageRequest({ requestId: id(202), profileId: id(2), sessionId: id(3),
+    mode: 'FOR_YOU', itemType: 'BOOK', limit: 40, version: 3,
+    context: { occurredAt: '2026-10-06T13:00:00.000Z', attributes: { localHour: 16 } } });
+  const root = () => ({ ...page(), version: 3, requestId: rootRequest.requestId, predictionId: rootPredictionId,
+    nextCursor: id(203), continuationSupported: true,
+    items: Array.from({ length: 40 }, (_, index) => ({ ...row(index + 1), prediction_id: rootPredictionId })),
+    source: { version: 'catalog-chain-v1', candidateCount: 50, resultCount: 40, catalogEmpty: false,
+      sourcePredictionId: rootPredictionId, rootPredictionId, parentPredictionId: null, chainId,
+      pageIndex: 1, featureAt: '2026-10-06T13:00:00+00:00', seenCount: 40, chainLimit: 1000,
+      continuationState: 'MORE' } });
+  const nextRequest = () => {
+    const first = mapPredictionPage(root(), rootRequest);
+    if (first.status !== 'success') throw new Error('Expected catalog-chain root');
+    return createNextPredictionPageRequest(first, id(204));
+  };
+  const later = () => ({ ...root(), requestId: id(204), predictionId: id(205), nextCursor: id(206),
+    items: Array.from({ length: 40 }, (_, index) => ({ ...row(index + 1),
+      prediction_id: id(205), item_id: id(index + 1000) })),
+    source: { ...root().source, sourcePredictionId: id(205), parentPredictionId: rootPredictionId,
+      pageIndex: 2, featureAt: '2026-10-06T13:01:00+00:00', candidateCount: 45, seenCount: 80 } });
+
+  it('explicitly opts in and carries the original captured scope through the opaque cursor', async () => {
+    expect(createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
+      mode: 'FOR_YOU', itemType: 'BOOK' }).version).toBe(2);
+    const first = mapPredictionPage(root(), rootRequest);
+    expect(first).toMatchObject({ status: 'success', sourcePredictionId: rootPredictionId, rootPredictionId,
+      parentPredictionId: null, chainId, seenCount: 40, chainLimit: 1000, continuationState: 'MORE' });
+    const next = nextRequest();
+    expect(next).toEqual({ ...rootRequest, requestId: id(204), cursor: id(203) });
+    expect(next.context).toBe(rootRequest.context);
+    expect(Object.isFrozen(next)).toBe(true);
+    const rpc = vi.fn().mockResolvedValue({ data: later(), error: null });
+    expect(await loadPredictionPage(rpc, next)).toMatchObject({ status: 'success',
+      sourcePredictionId: id(205), rootPredictionId, parentPredictionId: rootPredictionId,
+      pageIndex: 2, featureAt: '2026-10-06T13:01:00+00:00', candidateCount: 45, seenCount: 80,
+      ranking: { predictionId: id(205) } });
+    expect(rpc).toHaveBeenCalledWith(PREDICTION_PAGE_V1_RPC, { request: next });
+  });
+
+  it.each([
+    { version: 'frozen-page-v1' }, { chainId: null }, { chainId: 'invalid' },
+    { sourcePredictionId: id(999) }, { rootPredictionId: id(999) }, { parentPredictionId: id(999) },
+    { pageIndex: 0 }, { pageIndex: 2 }, { pageIndex: 1.5 }, { seenCount: 39 }, { seenCount: 41 },
+    { seenCount: NaN }, { chainLimit: 999 }, { chainLimit: 1001 },
+    { continuationState: 'unknown' }, { featureAt: null }, { featureAt: '2026-99-99Tbad' },
+    { candidateCount: 51 }, { candidateCount: 39 }, { resultCount: 39 },
+  ])('rejects malformed root lineage or counts %#', change => {
+    expect(mapPredictionPage({ ...root(), source: { ...root().source, ...change } }, rootRequest).status).toBe('error');
+  });
+
+  it.each([
+    { sourcePredictionId: rootPredictionId }, { rootPredictionId: id(205) }, { parentPredictionId: null },
+    { parentPredictionId: id(205) }, { pageIndex: 1 }, { pageIndex: 1002 }, { seenCount: 39 },
+  ])('rejects malformed later-page lineage %#', change => {
+    expect(mapPredictionPage({ ...later(), source: { ...later().source, ...change } }, nextRequest()).status).toBe('error');
+  });
+
+  it('allows the final nonempty page to report catalog exhaustion without an extra empty fetch', () => {
+    const terminal = { ...later(), nextCursor: null,
+      source: { ...later().source, candidateCount: 40, continuationState: 'CATALOG_EXHAUSTED' } };
+    const result = mapPredictionPage(terminal, nextRequest());
+    expect(result).toMatchObject({ status: 'success', availability: 'ITEMS', nextCursor: null,
+      continuationState: 'CATALOG_EXHAUSTED', seenCount: 80, ranking: { predictionId: id(205) } });
+    if (result.status !== 'success') throw new Error('Expected final nonempty page');
+    expect(result.ranking.items).toHaveLength(40);
+    expect(() => createNextPredictionPageRequest(result, id(207))).toThrow();
+  });
+
+  it('distinguishes an empty domain from an exhausted nonempty catalog and the reader safety limit', () => {
+    const empty = { ...root(), items: [], nextCursor: null, availability: 'CATALOG_EMPTY',
+      source: { ...root().source, candidateCount: 0, resultCount: 0, catalogEmpty: true,
+        seenCount: 0, continuationState: 'CATALOG_EXHAUSTED' } };
+    expect(mapPredictionPage(empty, rootRequest)).toMatchObject({ status: 'success', availability: 'CATALOG_EMPTY',
+      continuationState: 'CATALOG_EXHAUSTED', ranking: { predictionId: rootPredictionId, items: [] } });
+    expect(mapPredictionPage({ ...empty, availability: 'CATALOG_EXHAUSTED',
+      source: { ...empty.source, catalogEmpty: false } }, rootRequest))
+      .toMatchObject({ status: 'success', availability: 'CATALOG_EXHAUSTED', seenCount: 0 });
+    const exhausted = { ...later(), items: [], nextCursor: null, availability: 'CATALOG_EXHAUSTED',
+      source: { ...later().source, candidateCount: 0, resultCount: 0, seenCount: 40,
+        continuationState: 'CATALOG_EXHAUSTED' } };
+    expect(mapPredictionPage(exhausted, nextRequest())).toMatchObject({ status: 'success',
+      availability: 'CATALOG_EXHAUSTED', ranking: { predictionId: id(205), items: [] } });
+    expect(mapPredictionPage({ ...later(), nextCursor: null, source: { ...later().source,
+      candidateCount: 40, pageIndex: 25, seenCount: 1000, continuationState: 'READER_LIMIT' } }, nextRequest()))
+      .toMatchObject({ status: 'success', availability: 'ITEMS', continuationState: 'READER_LIMIT',
+        pageIndex: 25, seenCount: 1000 });
+  });
+
+  it('rejects false termination, cursor loops, duplicate Items and a later empty-domain claim', () => {
+    const next = nextRequest();
+    for (const changed of [
+      { ...later(), nextCursor: next.cursor },
+      { ...later(), nextCursor: null },
+      { ...later(), source: { ...later().source, continuationState: 'CATALOG_EXHAUSTED' } },
+      { ...later(), availability: 'WINDOW_EXHAUSTED' },
+      { ...later(), items: [later().items[0], { ...later().items[1], item_id: later().items[0]!.item_id }],
+        source: { ...later().source, resultCount: 2 } },
+      { ...later(), items: [], nextCursor: null, availability: 'CATALOG_EMPTY',
+        source: { ...later().source, candidateCount: 0, resultCount: 0, catalogEmpty: true,
+          continuationState: 'CATALOG_EXHAUSTED' } },
+    ]) expect(mapPredictionPage(changed, next).status).toBe('error');
+  });
+});

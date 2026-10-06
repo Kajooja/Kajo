@@ -11,7 +11,7 @@ import { useEventTracking } from '../events/EventTrackingContext';
 import { useItemInteractions } from './ItemInteractionContext';
 import type { ItemInteractionMap } from './itemInteraction';
 import { getStaticMockItems } from './mockDiscovery';
-import { createPredictionPageRequest, loadCatalogPredictionPage, type PredictionAvailability, type PredictionPageRecovery } from './predictionPageOperations';
+import { createPredictionPageRequest, loadCatalogPredictionPage, type PredictionAvailability, type PredictionContinuationState, type PredictionPageRecovery } from './predictionPageOperations';
 import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope, type PredictionReaderSnapshot } from './predictionPageReader';
 import { watchFocusedPredictionReader } from './predictionConnectivity';
 import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay } from './predictionRefresh';
@@ -31,6 +31,7 @@ export interface VisiblePredictionRanking {
   status: 'loading' | 'ready' | 'error';
   message: string | null;
   availability: PredictionAvailability | null;
+  continuationState: PredictionContinuationState | null;
   hasNextPage: boolean;
   loadingNextPage: boolean;
   nextPageError: string | null;
@@ -64,7 +65,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   [environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision]);
   const reader = useMemo(() => scope && client ? createPredictionPageReader({
     scope,
-    createRequest: () => createPredictionPageRequest({ requestId: createUuidV7(),
+    createRequest: () => createPredictionPageRequest({ version: 3, requestId: createUuidV7(),
       profileId: scope.profileId, sessionId: scope.sessionId, mode: scope.mode,
       itemType: scope.itemType, limit: scope.limit, context: getRuntimeContext() }),
     createRequestId: createUuidV7,
@@ -101,7 +102,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   }, [fallbackSeed, itemType, mode]);
 
   if (!client) return { ...fallback, viewId: fallback.predictionId, source: 'fallback', status: 'ready',
-    message: null, availability: 'ITEMS', hasNextPage: false, loadingNextPage: false, nextPageError: null,
+    message: null, availability: 'ITEMS', continuationState: null, hasNextPage: false, loadingNextPage: false, nextPageError: null,
     recovery: null, retrying: false, retry, refresh, loadMore };
 
   const first = snapshot.pages[0];
@@ -110,6 +111,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
     predictionId: first?.ranking.predictionId ?? null, viewId: snapshot.viewId, source: 'hosted',
     status: first ? 'ready' : snapshot.message ? 'error' : 'loading',
     message: first ? null : snapshot.message, availability: last?.availability ?? null,
+    continuationState: last?.continuationState ?? null,
     hasNextPage: Boolean(last?.nextCursor), loadingNextPage: Boolean(first && snapshot.status === 'loading'),
     nextPageError: first ? snapshot.message : null,
     recovery: snapshot.recovery, retrying: snapshot.status === 'loading' && snapshot.message !== null,

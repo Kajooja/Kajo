@@ -1,5 +1,46 @@
 # Collection device checkpoint — #228 / #229
 
+## Append/layout correction and owner results — 2026-10-06
+
+CI #607 / run 37464008658 succeeded through all five mandatory gates and APK.
+The owner's latest phone round reports cases 1–3 fail, cases 4–6 pass. Retain
+network append/reconnect, scope/background and interrupted two-List recovery
+successes; exact installed artifact/model/Android version were not supplied.
+The old terminal **Päivitä haku** behavior is superseded by list continuation.
+
+Use the new `fix/199-discovery-catalog-append` build only after its required gates
+and `20261006140559_catalog_prediction_chain.sql` hosted rollout are verified.
+Do not replay older forwards or reset accounts. Install as an update preserving
+data, and record the run/artifact, phone model and Android version.
+
+1. **BOOK append.** Scroll through more than 50 distinct books. At the end of the
+   loaded cards, pull downward from the bottom viewport and use **Näytä lisää**.
+   Existing cards keep their order and position; new cards extend the same list.
+   Repeat quickly: no duplicate cards or jump to the first row. Upward/sideways
+   and short drags retain ordinary scrolling. A top downward pull also appends.
+2. **Truthful end.** Continue until no unseen eligible books remain. The notice
+   says all books fitting this search have been shown. A server reader limit
+   reports a browsing limit instead; an expired cursor offers explicit new
+   search. A network/backend error retains loaded cards and exact retry.
+3. **MOVIE append.** Repeat 1–2 for movies, including more than 50 unique cards,
+   preserving the same behavior and movie-specific end notice.
+4. **Compact layout.** Elokuvat/Kirjat, Löydä and Katsotut/Luetut share a row at
+   normal text size. Switching type/history retains the canonical destination;
+   pressing selected Löydä keeps the current feed. The cards extend to the real
+   mail/Profile/menu dock with no unused band. Check small screen/large text,
+   final rows and both gesture/three-button Android navigation without clipping.
+5. **Brief regression.** Recheck the previously passing 4–6 on this new build:
+   disconnect during append/reconnect; change scope or background while loading;
+   interrupt a two-List save and reopen. Preserve each prior success separately
+   if the new round cannot repeat it.
+
+Fetching a page is not exposure evidence. The server/client synthetic origin,
+shadow and evaluation regressions do not prove native visibility or useful
+recommendation quality. Fresh-account/Shared and other gates below stay open.
+
+The following dated instructions describe earlier sources. Their fresh-search
+terminal semantics do not apply to this correction.
+
 ## Corrected test build after failed audit — 2026-10-05
 
 CI #603 failed before APK creation due to two newly reviewed dependency advisories.

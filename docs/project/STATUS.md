@@ -12,6 +12,70 @@ an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
 
+### Catalog-wide append and compact Discovery — 2026-10-06 / #199
+
+[CI #607](https://github.com/Kajooja/Kajo/actions/runs/37464008658) on
+`00f0bad9ed35c8647b72f8dd584df039ae8d0f9e` passed all five required gates
+and built the standalone APK. This closes #304's recorded CLI transport/build
+failure for that source. The owner subsequently reports phone cases **4–6 pass**:
+later-page network recovery, scope/background changes during loading and
+interrupted two-List saving/reopen. Exact installed artifact/device/OS were not
+supplied; keep those observations without inventing their identities or accepting
+fresh-account, Shared or visibility cases.
+
+Cases **1–3 fail**: downward pull/button at the end starts the same bounded
+search again and moves to its beginning for BOOK and MOVIE. The owner now
+explicitly requires append beyond the retained 50-candidate pool, truthful end
+copy, a one-row ItemType/Löydä/history header and removal of unused bottom space.
+This supersedes the September 30 fresh-search footer behavior and promotes these
+bounded #199/#200 layout requirements into the current native packet. Remaining
+Phase 17 UX and all #229 release gates keep their prerequisites.
+
+`fix/199-discovery-catalog-append` continues the exact successful #304 source.
+The new forward `20261006140559_catalog_prediction_chain.sql` opts protocol 3
+into the existing page RPC while retaining old protocol 1/2 callers and receipts.
+Server-owned delivered-prefix exclusion occurs before bounded candidate admission.
+Every appended page keeps its own immutable ranked run and exact receipt; the
+chain preserves scope, ordering, unique Items and per-card origins. Catalogue
+exhaustion and the bounded reader limit are distinct. Existing deployed files
+are unchanged; only the new reviewed forward may be deployed.
+
+The mobile reader retains its view and loaded prefix across append/retry.
+Downward pulls at the bottom or top and **Näytä lisää** append/retry; an expired
+cursor offers an explicit new search. Header controls share one responsive row;
+Löydä does not reset the existing list. The global 46-pixel dock and its system
+safe area remain; the nested bottom safe area and 24-pixel grid padding are gone.
+Physical small-screen/large-text and Android gesture checks remain owner work.
+
+The next bounded repository step extends Phase 14.1/14.2 evidence: more than 120
+eligible Items per domain, later-page origin, delayed exposure/zero-rating,
+frozen shadow replay and mature evaluation. This is not catalogue acquisition,
+a Phase 15 jump or acceptance of recommendation quality.
+
+Validation: root lint/typechecks, **478 mobile**, 39 dependency, 444 catalogue,
+44 engine, 32 research and 11 acceptance tests passed. The database sweep passed
+83 cases; the new chain case initially found an actor-denial classification,
+then its corrected full-schema rerun passed. Independent later-page provenance
+and legacy atomic paging also passed. New chain acceptance covers 12 scopes,
+145 eligible Items each and 36 distinct sources, including populated upgrade,
+source-guard rollback, actual 1000-reader cap and frozen replay. Main and
+acceptance-app iOS/Android exports passed, as did explicit demo exports. The
+fresh verified dependency audit has zero unmitigated findings. `npm run check`
+stopped at refused Deno registry access; native Supabase/lock/CLI tests require
+GitHub because local Docker is unavailable. Neither is waived.
+
+Independent forward/client/hosted-probe reviews found no remaining blocker.
+The exact new SQL SHA-256 is
+`8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8`.
+Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four guarded ranker bodies
+and their owners/ACLs; existing migration tracking remains unrepaired.
+
+Current next action: publish the reviewed source, apply only that exact new
+forward to the preflighted target and verify it with the population-preserving
+rollback probe. Then request its APK behind all five required gates. Retrieve the new run link once; do not poll. Then use the
+new [DEVICE_TEST](DEVICE_TEST.md) append/layout round with existing accounts/data.
+Keep draft #229 and accepted main unchanged until their remaining gates pass.
+
 ### CLI Data API transport recovery — 2026-10-06 / #304
 
 Published source `86b90e1560ae5912cc3e4c357f446cea420a15b5` reached

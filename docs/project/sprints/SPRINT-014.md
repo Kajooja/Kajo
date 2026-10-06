@@ -14,6 +14,28 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Catalog append, compact layout and later-page evidence — 2026-10-06 / #199
+
+CI #607 on `00f0bad` passed all five mandatory jobs and produced APK, resolving the
+recorded #304 transport/build failure. The owner reports phone 4–6 passed;
+BOOK/MOVIE end pull/button 1–3 still fail by resetting the same bounded search.
+No exact installed artifact/device identity was supplied.
+
+The owner requested all corrections now and a bounded next repository step.
+Protocol 3 adds server-owned prefix exclusion before bounded ranking admission,
+fresh immutable per-page runs, scoped cursor/receipt retries and distinct
+eligible-catalogue exhaustion versus reader-limit states. Legacy 1/2 and deployed
+SQL bytes stay unchanged. The mobile list appends without replacing its view,
+uses bottom-viewport downward gestures and keeps per-Item prediction origins.
+Header controls share one row and redundant nested bottom/grid space is removed;
+the actual dock/system safearea remains.
+
+Phase 14.1/14.2 acceptance extends to 120+ eligible Items per domain and later-page
+zero-rating/late exposure/frozen replay/evaluation. This is the next independent
+bounded task; no new catalogue acquisition or later-phase identity/social work.
+STATUS owns exact new-forward rollout, publication/check results and next APK.
+Phone acceptance and remaining #229 release gaps stay separate; preserve data.
+
 ## CLI Data API recovery after CI #606 — 2026-10-06 / #304
 
 CI #606 passed validate (fresh security audit, Deno and four exports), platform,

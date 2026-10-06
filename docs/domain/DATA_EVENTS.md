@@ -478,3 +478,20 @@ still uses its original per-Item delivery origin. These planned controls preserv
 atomic receipts, source/actor/Profile/session identity, partial success and
 correction/Undo. #240 reconnects read attempts without discarding or fabricating
 queued exposure/action evidence. Neither UI decision introduces new Event types.
+
+### Catalogue-chain delivery — protocol 3 source, 2026-10-06
+
+The owner-promoted append correction uses `catalog-chain-v1` over the same page
+RPC. Server-owned delivered-prefix exclusion precedes bounded source admission.
+Each new page is a fresh immutable PredictionRun with its own per-Item origin;
+chain/root/parent/index metadata preserves global delivery order without claiming
+a frozen catalogue-wide ranking. Prior cards and trace identities remain unchanged.
+Private immutable chain-page evidence survives derived cache expiry.
+
+No new Event type or fabricated exposure is introduced. A page fetch/prefetch is
+not an impression. The existing captured visible origins/detail/actions and late
+exposure resolver retain the particular page run, including rating 0 received
+before its delayed impression. Shadow and mature evaluation compare the actual
+page's frozen candidate source; they do not simulate unseen whole-chain actions.
+Exact receipt retries after cache cleanup add no duplicate run/action/outcome.
+Source/PGlite, native CI, hosted rollout and real visibility remain separate gates.

@@ -19,6 +19,9 @@ import { predictionPageSmokeSql, predictionPageUpgradeSql, predictionWindowSmoke
 import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.mjs';
 import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
 import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
+import { catalogPredictionChainSmokeSql, catalogPredictionChainUpgradeSql,
+  verifyCatalogPredictionChainConcurrency } from './catalog-prediction-chain.mjs';
+import { predictionChainProvenanceSmokeSql } from './prediction-chain-provenance.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -106,6 +109,12 @@ try {
     assert.equal(unsupportedAttribution.body.code, '22023');
     const [catalogAttributionUpgrade] = await exec(catalogAttributionUpgradeSql(files[attributionIndex]));
     assert.match(catalogAttributionUpgrade?.catalogAttributionUpgrade, /^PASS: unchanged populated/);
+    const chainIndex = files.findIndex(file => file.name.endsWith('_catalog_prediction_chain.sql'));
+    assert.ok(chainIndex > atomicPageIndex);
+    await resetFromMigrations(files.slice(0, chainIndex));
+    const chainFixture = await readFile(new URL('catalog-prediction-chain-fixture.sql', import.meta.url), 'utf8');
+    const [catalogChainUpgrade] = await exec(catalogPredictionChainUpgradeSql(files[chainIndex], chainFixture));
+    assert.match(catalogChainUpgrade?.catalogChainUpgrade, /^PASS: populated v1\/v2/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -122,6 +131,7 @@ try {
 
     const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrentSql);
     const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrentSql);
+    const catalogChainConcurrency = await verifyCatalogPredictionChainConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -148,6 +158,12 @@ try {
     assert.match(atomicPages?.atomicPages, /^PASS: 12 Personal/);
     const [atomicPageBoundaries] = await exec(await atomicPredictionPagesSmokeSql('atomic-prediction-pages-boundaries.sql'));
     assert.match(atomicPageBoundaries?.atomicPages, /^PASS: current eligibility/);
+    const [catalogChain] = await exec(await catalogPredictionChainSmokeSql());
+    assert.match(catalogChain?.catalogChain, /^PASS: 12 Personal\/Shared/);
+    const [catalogChainBoundaries] = await exec(await catalogPredictionChainSmokeSql('catalog-prediction-chain-boundaries.sql'));
+    assert.match(catalogChainBoundaries?.catalogChain, /^PASS: current suppression/);
+    const [catalogChainProvenance] = await exec(await predictionChainProvenanceSmokeSql());
+    assert.match(catalogChainProvenance?.catalogChainProvenance, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -179,6 +195,8 @@ try {
       lateOutcomes, lateOutcomeUpgrade, hostedPredictionUpgrade, hostedPredictionRuntime, frozenReplay, frozenReplayUpgrade,
       candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,
       atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
+      catalogChain, catalogChainBoundaries, catalogChainUpgrade, catalogChainConcurrency,
+      catalogChainProvenance,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
