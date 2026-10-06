@@ -6,11 +6,83 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
+import { setTimeout as wait } from 'node:timers/promises';
 import { bufferedSqlCommand } from './buffered-sql-command.mjs';
 
 const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
 const imageId = 'sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f';
+
+const transientTransportCodes = new Set(['ECONNREFUSED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT',
+  'UND_ERR_SOCKET', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT']);
+function transportSignal(error, signal) {
+  // Undici may surface a timed-out response body as AbortError rather than
+  // TimeoutError. Only our own timeout signal makes that failure retryable.
+  if (signal?.aborted && signal.reason?.name === 'TimeoutError') return 'request-timeout';
+  const code = error?.cause?.code ?? error?.code;
+  if (transientTransportCodes.has(code)) return code;
+  return error?.name === 'TimeoutError' ? 'request-timeout' : 'unknown';
+}
+
+// db reset recreates Postgres; the local Data API can still be reconnecting.
+// Retry only a read-only query. A lost RPC acknowledgement never replays a POST.
+export async function requestIsolatedCatalogRpc({ apiUrl, readKey, rpcKey, body, stage,
+  fetchImpl = fetch, waitImpl = wait }) {
+  let url;
+  try { url = new URL(apiUrl); } catch { throw new Error('Invalid isolated Data API URL'); }
+  assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname)
+    && !url.username && !url.password && !url.search && !url.hash && url.pathname === '/',
+  'Data API must belong to the isolated localhost stack');
+  assert.match(stage, /^reset-\d+-rpc-\d+$/);
+  assert.ok([readKey, rpcKey].every(key => typeof key === 'string' && key.length > 20),
+    'Missing isolated Data API credential');
+  // Docker's local gateway is IPv4. Avoid localhost resolving to an IPv6 listener.
+  url.hostname = '127.0.0.1';
+  const headers = key => ({ apikey: key, Authorization: `Bearer ${key}`, Connection: 'close' });
+  const fail = (phase, detail) => new Error(`Isolated catalog RPC ${stage}: ${phase} failed (${detail}); POST not retried`);
+  let lastSignal;
+  for (let attempt = 1; attempt <= 20; attempt++) {
+    let response, rows;
+    const signal = AbortSignal.timeout(1500);
+    try {
+      response = await fetchImpl(new URL('/rest/v1/items?select=id&limit=0', url), {
+        method: 'GET', redirect: 'error', signal, headers: headers(readKey),
+      });
+      if (response.status === 200) rows = await response.json();
+    } catch (error) {
+      // Never echo arbitrary exceptions, response bodies, credentials or status.
+      if (error instanceof SyntaxError) throw fail('readiness', 'invalid JSON');
+      lastSignal = transportSignal(error, signal);
+      if (lastSignal === 'unknown') throw fail('readiness', 'unknown transport error');
+      response = undefined;
+    }
+    if (response?.status === 200) {
+      if (!Array.isArray(rows) || rows.length !== 0) throw fail('readiness', 'expected empty read-only result');
+      break;
+    }
+    if (response) {
+      const status = response.status;
+      try { await response.body?.cancel(); }
+      catch (error) { throw fail('readiness response', transportSignal(error, signal)); }
+      if (![502, 503, 504].includes(status)) throw fail('readiness', `HTTP ${status}`);
+      lastSignal = `HTTP ${status}`;
+    }
+    if (attempt === 20) throw fail('readiness', `20 attempts exhausted; ${lastSignal}`);
+    await waitImpl(500);
+  }
+  // Connection: close prevents reuse of a socket from an earlier reset. Preserve
+  // expected HTTP errors (404/400/permission denial) for the existing assertions.
+  const signal = AbortSignal.timeout(10000);
+  try {
+    const response = await fetchImpl(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
+      method: 'POST', redirect: 'error', signal,
+      headers: { ...headers(rpcKey), 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    return { status: response.status, body: await response.json() };
+  } catch (error) {
+    throw fail('POST', error instanceof SyntaxError ? 'invalid JSON' : transportSignal(error, signal));
+  }
+}
 
 // Return fixed diagnostic labels only: CLI output can include local credentials.
 // These are observed symptoms, not a claimed root cause or an automatic retry rule.
@@ -154,20 +226,18 @@ async function withNewSupabaseStack(projectId, work, destination) {
         child.stdin.end(sql);
       });
     };
+    let resetCount = 0, rpcCount = 0;
     const catalogRpc = async (body, role = 'service_role') => {
       assert.equal(projectId, 'kajo_ci_cli_install');
       assert.ok(['service_role', 'anon'].includes(role));
       // Credentials belong only to this new local test stack; never log status.
       const status = JSON.parse(cli(['status', '--output', 'json']));
-      const url = new URL(status.API_URL);
-      assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname));
       const key = role === 'service_role' ? status.SERVICE_ROLE_KEY : status.ANON_KEY;
-      assert.ok(typeof key === 'string' && key.length > 20, 'Missing isolated Data API credential');
-      const response = await fetch(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
-        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
-        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      const stage = `reset-${resetCount}-rpc-${++rpcCount}`;
+      console.log(`Checking isolated Data API ${stage}`);
+      return requestIsolatedCatalogRpc({ apiUrl: status.API_URL, readKey: status.SERVICE_ROLE_KEY,
+        rpcKey: key, body, stage,
       });
-      return { status: response.status, body: await response.json() };
     };
     let applied = false;
     const applyMigrations = async files => {
@@ -195,6 +265,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       await rm(path, { recursive: true, force: true });
       await mkdir(path);
       for (const file of files) await writeFile(join(path, file.name), file.sql, { flag: 'wx' });
+      console.log(`Resetting isolated CLI database ${++resetCount} with ${files.length} migrations`);
       cli(['db', 'reset', '--local', '--no-seed', '--yes'], { timeout: 360_000 });
       const resetImage = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
       verifyCiPostgresImage(resetImage);

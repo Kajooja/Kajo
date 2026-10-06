@@ -14,6 +14,92 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## CLI Data API recovery after CI #606 — 2026-10-06 / #304
+
+CI #606 passed validate (fresh security audit, Deno and four exports), platform,
+two clean installations and populated upgrade. CLI installation/history alone
+failed with `fetch failed` in its local catalog RPC transport, so its dependent
+APK was skipped. The old log cannot establish which RPC or transport cause;
+the source and runner-allocation failures from earlier attempts are distinct.
+
+Before each RPC, the isolated harness now requires a successful read-only Items
+query. Twenty bounded readiness attempts cover recognized temporary transport
+errors, owned timeouts and gateway 502/503/504; permission/schema/malformed
+responses fail immediately. IPv4 loopback and closed connections avoid resolver
+and pooled-socket dependencies across resets. The POST is sent exactly once,
+with its original response assertions retained. Fixed reset/RPC sequence labels
+and sanitized cause codes give actionable diagnostics without credentials.
+
+The full local database suite passed 81 tests; the final targeted suite passed
+15, including actual loopback socket failure and stalled-body timeout recovery.
+Root lint/typechecks, dependency/mobile/catalog tests passed, then Deno lockfile
+resolution failed on the local refused npm-registry connection.
+Local Docker is unavailable, so GitHub still owns actual Supabase stack/runtime
+verification. All five original gates remain mandatory before APK. STATUS owns
+the next labelled PR head and the owner's no-polling build handoff.
+
+## APK retry and dependency-script portability — 2026-10-06 / #304
+
+CI #605 attempt 1 failed in hosted-runner allocation before any steps ran.
+Attempt 2 passed platform and two-clean-installation gates, but validate again
+acquired no runner; the remaining dependent jobs, including APK, were skipped.
+GitHub's corresponding global Actions incident is resolved at this checkpoint.
+STATUS owns the exact source and owner handoff.
+
+The retry review corrected Windows postinstall path containment and direct
+`npm.cmd` execution. Native path-relative containment rejects root/sibling/other-
+drive escapes. npm-run audit invokes the CLI through Node without a shell;
+direct Windows invocation uses a fixed command via `cmd.exe`. Portable fixtures
+cover Windows/POSIX path rules and CLI filenames with spaces/metacharacters;
+no native Windows runtime is claimed.
+
+Fresh audit found two additional high advisory leaves, compression and
+source-map-js. Their published fixes 1.8.2 / 1.2.2 fit the existing Expo CLI /
+PostCSS ranges. Only those lock entries and compression's existing destroy edge
+are refreshed. Security regressions exercise aborted compression streams and
+bounded source-map offsets while preserving ordinary map use.
+
+Local validation: clean npm installation and the fresh verified audit passed.
+All 39 dependency tests, mobile/catalog suites, database/engine/research/acceptance
+suites, lint, typechecks and all four Hermes exports passed. `npm run check`
+stopped at the Deno registry connection refused by this local environment.
+The complete CI Deno check and all five native gates remain required; this
+checkpoint claims no completed CI/APK or physical-device acceptance.
+
+The owner requested another APK build without polling after launch. Publishing
+the new head of labelled PR #304 requests that run behind all five normal gates;
+build completion and the six-case configured-device round remain open.
+
+## APK audit recovery — 2026-10-05 / #238
+
+The owner-requested terminal-refresh APK dispatch CI #603 failed in the fresh npm
+audit: two upstream advisories produced 19 high-severity package findings. No APK
+was built. Latest published braces 3.0.3 and node-forge 1.4.0 remain affected.
+The owner requested correction and another APK run, with completion followed by
+the owner. STATUS owns the active source/run identity.
+
+The narrow correction installs hash-checked depth guards in braces parse/compile/
+expand/stringify and strict RSA DigestAlgorithm element count plus empty-NULL
+validation. Real negative controls reproduce both upstream defects; regression
+coverage preserves normal Metro matching, standard RSA signatures and PSS.
+A verified audit keeps raw upstream findings visible, verifies every locked copy
+and executes the security tests before classifying only those two corrected
+advisories. Unknown/new findings and verification/transport failures still block.
+No package alias, framework downgrade or blanket severity exception is introduced.
+
+The CI `build-android-apk` label explicitly requests a same-repository PR build
+behind all five existing gates; its artifact is bound to the PR merge checkout.
+This source leaves #301/#229 unmerged and all phone acceptance open. The six-case
+owner follow-up is recorded in DEVICE_TEST. No hosted/data changes are included.
+
+Local validation: clean installation, fresh verified audit and all 20 added
+security/audit regressions pass, including both distributed forge browser bundles.
+The root check passed lint, types, dependencies, mobile and catalog suites, then
+stopped at Deno's refused registry connection in this environment. Database,
+engine, research and acceptance suites passed separately, as did all four Hermes
+smoke exports. The complete Deno and isolated platform/installation gates remain
+mandatory in the new GitHub run; no completed CI or APK is claimed here.
+
 ## Phone recovery result and terminal refresh — 2026-09-30 / #199 / #240
 
 The owner reports successful network loss/reconnection. The actual installed

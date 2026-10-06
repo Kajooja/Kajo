@@ -1,5 +1,23 @@
 # Collection device checkpoint — #228 / #229
 
+## Corrected test build after failed audit — 2026-10-05
+
+CI #603 failed before APK creation due to two newly reviewed dependency advisories.
+Use the new #238 correction based on #301, on `fix/238-native-audit-october`;
+STATUS owns source/check acceptance. An owner-authorized same-repository PR can
+opt into an APK with `build-android-apk`. It still builds only after all five CI
+gates pass. The artifact suffix is the actual PR merge checkout SHA, not a claim
+that its head has been accepted into main. Record the run link and artifact name.
+The previous #596 APK does not include terminal refresh or the October corrections.
+
+Install as an update with existing accounts/data. The focused owner round is:
+BOOK terminal downward pull; terminal button/repeated triggers; normal gestures
+and MOVIE/top refresh; network loss while appending a later page; scope/background
+changes while loading; and interrupted two-List saving with restart/reconnect.
+Report each case separately as pass/fail/not tested, with OnePlus model and Android
+version. These observations do not prove internal request/provenance identities or
+close the separate fresh-account/Shared/visibility gaps below.
+
 ## Owner result and end-of-grid refresh — 2026-09-30
 
 The owner reports that disconnection and reconnection worked. Retain that

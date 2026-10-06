@@ -55,6 +55,20 @@ bounded hostile-input parsing through all four actual minimatch consumer paths.
 The compatible 1.1.21/5.0.12 lock refresh and current advisory result are recorded
 in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 
+`scripts/dependencies/security-patches.mjs` installs/verifies the exact October
+braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
+reproduces unpatched defects and tests corrected installed consumers.
+`audit-dependencies.mjs` / `audit-dependencies.test.mjs` preserve raw npm findings
+and fail on unmitigated advisories or unverifiable patches. The correction contract
+is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual
+native graph. CI's same-repository `build-android-apk` PR label opts into an APK
+behind the unchanged five mandatory jobs.
+`october-advisories.test.mjs` covers the compatible compression 1.8.2 /
+source-map-js 1.2.2 lock refresh: actual aborted-stream release, ordinary codec/map
+behavior and bounded indexed-map processing. The fresh updated-lock receipt is
+`dependency-audit-native-2026-10-06.json`; Windows installation/audit portability
+is exercised by the existing security-patch/audit test files.
+
 ## Implementation locations
 
 | Area | Canonical path | Current state |
@@ -144,6 +158,7 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 | Unchanged-export upgrade proof | `scripts/database/run-export-upgrade-probe.mjs` | Optional checksum-gated PGlite-only CLI using the exact owner export plus Auth trigger/seeds/synthetic state. No function/ACL supplement; all 123 original functions and existing row hashes survive forward migration, rollback and reapplication. Does not introduce an attachment dependency into CI |
 | Canonical local/CI installation lineage | `scripts/database/fresh-installation.mjs`, `install-local-database.mjs`, `ci-supabase-stack.mjs`; `npm run database:install`; `run-ci-cli-installation-probe.mjs` | New local workspace only; same reviewed baseline plus unchanged forward files, exact image/hash/history/source/runtime verification and failure cleanup. Successful development stack remains running with a metadata manifest. Required CLI CI uses the same operational install, populated old-schema Item and collection forward rehearsals, two complete resets and failed-migration atomicity. New tables/functions join source snapshots. The original history diagnostic is unchanged; hosted deployment follows the separate ADR-0006 forward procedure |
 | CI image identity | `scripts/database/ci-supabase-stack.mjs`, `ci-supabase-stack.test.mjs` | Allows only observed Supabase ECR/GHCR references at 17.6.1.167 with the exact reviewed Linux x64 image ID; checks again after reset. Reports the actual registry, rejects changed content/version/registry. Fixes CI #391's same-content registry-label rejection; all five required jobs PASS in CI #392 |
+| Isolated CLI Data API readiness | `scripts/database/ci-supabase-stack.mjs`, `isolated-catalog-rpc.test.mjs` | After database reset, bounds retries of a localhost-only, read-only Items query before each catalog RPC. Uses IPv4/closed connections, keeps the original POST single-attempt and preserves HTTP/schema/permission assertions. Fixed stage labels and sanitized cause codes identify failures. Unit and actual loopback interruption/stalled-body tests do not replace the real CLI CI gate |
 | Buffered SQL transport | `scripts/database/buffered-sql-command.mjs`, `buffered-sql-command.test.mjs`; Mac and CI runners | Consumes the entire SQL stream into a private temporary file before psql starts, retaining early ON_ERROR_STOP errors instead of stdin EPIPE. Removes the file on success/failure; test preserves multi-megabyte Unicode/literal payloads and exact failure status. SQL bytes never execute as shell code |
 | System-seed source | `scripts/database/system-seed-source.mjs` | Rejects source/seed checksum drift. Original-source CLI plus accepted deterministic empty-install supplement used by the local lineage; explicit IDs and logical cutoff epoch. Canonical semantic equivalence and exact row repeatability tested. No hosted reads; source output refuses overwrite |
 | Application trigger parity | `scripts/database/trigger-source.mjs` | Offline export diagnostic rebuilds protected source triggers in a rolled-back PGlite transaction and compares PostgreSQL definitions/enabled states for all 21 application triggers. Auth supplement separate; platform event triggers outside scope. CI tests require no conversation attachment |

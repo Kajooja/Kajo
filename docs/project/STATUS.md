@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-09-30**
+Last updated: **2026-10-06**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,120 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### CLI Data API transport recovery — 2026-10-06 / #304
+
+Published source `86b90e1560ae5912cc3e4c357f446cea420a15b5` reached
+[CI #606](https://github.com/Kajooja/Kajo/actions/runs/37456707996).
+Validation (including the fresh audit, Deno tests and all four exports), platform,
+two clean installations and populated forward upgrade passed. Only CLI
+installation/history failed: after starting its isolated stack and performing
+reset rehearsals, the sole JavaScript fetch path (`catalogRpc`) reported
+`fetch failed`. APK was consequently skipped by its required dependency gate.
+The old log does not identify the RPC, transport cause or daemon state; this is
+not another runner-allocation failure or a failing dependency audit.
+
+The harness now verifies live local Data API/database access with the read-only
+`items?select=id&limit=0` query before each catalog RPC. Readiness requires HTTP
+200 and exactly `[]`. Only recognized temporary transport errors, owned request
+timeouts and gateway 502/503/504 responses receive a bounded retry (20 reads,
+1.5 seconds per read and 500 ms between attempts). Other HTTP/JSON/permission
+failures remain fatal. Requests use IPv4 loopback and close their connections;
+the original POST executes once and is never replayed after a lost reply.
+Existing schema-cache, unchanged-cardinality and anonymous-denial assertions
+remain required. Reset/RPC sequence labels and sanitized failure codes replace
+the uninformative bare error without exposing keys or CLI status.
+
+Local validation: the database suite passed **81 tests**, followed by all **15**
+final targeted stack/transport tests, including real loopback socket interruption
+and a stalled response-body timeout. Root lint/typechecks, 39 dependency, 416
+mobile and 444 catalog tests passed; the root check stopped at Deno lockfile
+resolution because the local npm-registry connection was refused. No Docker executable is available locally,
+so the actual isolated Supabase rehearsal must run in GitHub. The new run still
+requires all five gates before APK; no successful new CLI gate or APK is claimed.
+
+Publish the corrected head of labelled PR #304 to request the replacement APK.
+Retrieve its run link once and leave progress to the owner without polling.
+The existing six-case phone round remains next after a successful artifact.
+
+### APK retry after GitHub Actions incident — 2026-10-06 / #304
+
+[PR #304](https://github.com/Kajooja/Kajo/pull/304) contains the October security
+corrections on `fix/238-native-audit-october`, based on the exact #301 source.
+[CI #605](https://github.com/Kajooja/Kajo/actions/runs/37367448021) attempt 1
+failed before either initial job acquired a hosted runner; GitHub reported runner
+acquisition failure and an internal server error. Attempt 2 passed the isolated
+platform and two-clean-installation jobs, but validate again acquired no runner
+and executed no steps. Its dependent upgrade, CLI and APK jobs were skipped.
+Neither attempt is evidence of a source regression or a completed APK.
+
+[GitHub Status](https://www.githubstatus.com/) reports the October 5 Actions
+incident resolved; Actions is operational at the October 6 retry checkpoint.
+The owner requested any remaining corrections and another APK build, explicitly
+without polling its progress after starting it.
+
+The October 6 fresh audit also found two additional unmitigated advisories:
+compression [GHSA-vc2v-76pw-4v95](https://github.com/advisories/GHSA-vc2v-76pw-4v95)
+and source-map-js [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
+Refreshed only their two lock leaves to published fixes **1.8.2 / 1.2.2**, within
+the existing Expo CLI and PostCSS ranges. The compression `destroy` dependency
+already exists in the lock. Parent/framework versions and the earlier exact
+braces/forge source corrections are retained. The October 5 receipt remains
+dated evidence for its former lock.
+The [October 6 receipt](dependency-audit-native-2026-10-06.json) records the updated
+lock and fresh verified audit, with zero unmitigated findings. Its raw report
+still retains the 19 upstream findings covered by exact installed-source
+corrections; it is not a zero-advisory upstream release.
+
+Review found and corrected two Windows-only dependency-script defects: native
+path containment must use `path.relative` rather than a literal POSIX slash,
+and Windows cannot directly execute `npm.cmd`. The audit now launches npm's CLI
+through Node when invoked with `npm run`, with a fixed `cmd.exe` command for
+direct Windows invocation. Directory escapes remain rejected and the source
+verification/audit severity rules are retained. The Linux runner failures above
+are separate from these portability defects.
+
+Local validation: clean installation, the fresh verified audit, all **39**
+dependency regressions and the mobile/catalog/database/engine/research/acceptance
+suites passed. Lint and typechecks passed, as did all four iOS/Android Hermes
+exports. The complete root check stopped only at Deno dependency resolution:
+this environment refused the npm-registry connection. Deno and the native
+platform/installation gates remain mandatory in the new GitHub run.
+
+Publishing the corrected PR head with its existing `build-android-apk` label
+requests a fresh APK run behind all five gates. Leave completion for the owner
+to follow through the [branch's Actions runs](https://github.com/Kajooja/Kajo/actions?query=branch%3Afix%2F238-native-audit-october).
+No completed CI, APK or native Windows execution is claimed by this checkpoint.
+
+### APK audit recovery — 2026-10-05 / #238
+
+The owner-dispatched [CI #603](https://github.com/Kajooja/Kajo/actions/runs/37362675116)
+on terminal-refresh source `825ecc1c809008a0c312e0bfef2b901476b86808` failed the
+fresh dependency audit before an APK was built. The report has **19 high-severity
+package findings from two upstream advisories**: braces GHSA-vfj7-8cjw-p6xm and
+node-forge GHSA-86w9-cpqp-85rv. The platform job was cancelled; downstream jobs,
+including the APK, were skipped. September 30 CI remains historical evidence.
+The owner explicitly requested correcting these findings and starting another
+APK build on October 5, leaving build completion for the owner to follow.
+
+`fix/238-native-audit-october` continues the exact #301 source as a narrow #238
+correction. Published latest versions remain braces 3.0.3 / node-forge 1.4.0, so
+installation applies hash-checked source corrections: bounded parser/walker
+nesting and strict nested DigestAlgorithm elements/empty NULL parameters.
+Package identities, lockfile, frameworks and deployed forwards are preserved.
+The fresh audit retains the full upstream report and accepts these two findings
+only after verifying every installed copy and running the real security
+regressions. New advisories, unknown source, missing patches or audit transport
+errors still fail. This is **not a zero-advisory upstream release**; the exact
+receipt is [dependency-audit-native-2026-10-05.json](dependency-audit-native-2026-10-05.json).
+Replace the temporary corrections with reviewed fixed upstream releases when
+available. See the [dependency correction contract](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
+
+CI supports an explicit `build-android-apk` label on same-repository PRs, retaining
+all five mandatory gates before the APK. Its artifact name identifies the actual
+PR merge checkout SHA; the PR head and run metadata identify the source branch.
+Unlabelled PRs, fork PRs and the existing manual/main paths keep their documented
+build boundaries. Neither #301 nor draft #229 is merged by this recovery.
 
 ### Phone result and terminal refresh follow-up — 2026-09-30
 
@@ -102,16 +216,16 @@ backend recovery clears the error; an expired cursor requires explicit new searc
 This remains draft implementation, separately from accepted main and real device
 observations.
 
-**Next bounded action:** verify all five required jobs and the successful APK
-artifact for exact head `2cfa2f3b206cba87712f3d531a78f00e24e59791` in CI #596.
-Resolve any actual failure before installation, then complete
-[the native configured-device packet](https://github.com/Kajooja/Kajo/blob/2cfa2f3b206cba87712f3d531a78f00e24e59791/docs/project/DEVICE_TEST.md)
-and remaining fresh-account observations, including #240 network-loss/reconnect.
-Record the installed run/SHA, device and backend checkpoint; retain #229 as draft
-until its real acceptance gates pass. Preserve existing data and the eight consumed
-requests; installed forwards need no repeat. Then continue Sprint 014's remaining
-evidence/catalog and algorithm gates in ROADMAP order. Later UI work has named
-slots; E1/D1/D2 need no repeat and optional model research is not a release gate.
+**Next bounded action:** follow the latest corrected PR #304 APK run. For the
+October 6 request, start the build and leave completion to the owner without
+polling. Only a successful new APK containing the terminal-refresh and security
+corrections is suitable for the six-case phone test supplied on October 5.
+Record its actual run/artifact/checkout SHA, OnePlus model and Android version.
+Preserve the positive September 30 basic reconnect observation; complete the
+remaining configured-device/fresh-account gates with existing accounts and data.
+Keep #229 draft. Current source, CI and device acceptance remain separate; do not
+repeat deployed forwards or consumed catalog requests. After acceptance, continue
+Sprint 014 in ROADMAP order.
 
 ### Preserved #182 catalog and operation ledger
 

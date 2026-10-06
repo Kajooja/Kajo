@@ -199,3 +199,19 @@ At milestone close:
 ## Documentation rule
 
 Documentation is not a diary. Record durable truth, decisions, state and handoff—not every thought or implementation step.
+
+
+## Explicit PR test APK builds
+
+An owner-authorized same-repository PR may use the `build-android-apk` label to
+request a standalone Android APK after all five normal CI gates pass. The label
+event and later source updates start CI; unlabelled/fork PRs skip the APK job.
+The configured binary uses the PR merge checkout, whose SHA appears in the artifact
+name. Record that SHA, PR head and run together; a test artifact is not a merge or
+release acceptance. Manual workflow_dispatch and main-push builds remain available.
+After starting the requested run, provide its link and leave completion for the
+owner to follow when requested. Do not claim artifact availability before success.
+
+Fresh dependency audit retains raw npm findings. The two pinned local source
+corrections are accepted by the audit only after exact-source verification and
+real security regressions; see ARCHITECTURE's dependency correction contract.
