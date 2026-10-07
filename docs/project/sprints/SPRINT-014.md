@@ -14,6 +14,24 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## CLI command deadline after CI #610 — 2026-10-07 / #305
+
+The owner reported #610 failed on `b1c7ad`. Four mandatory jobs passed;
+CLI installation/history ended with Docker ETIMEDOUT after reset 15, before the
+new populated-chain upgrade completed, so APK was skipped. Unlabelled operation
+errors cannot distinguish the two following Docker inspections from SQL work;
+no native planner or deployed-forward cause is proven by that log.
+
+Fixed operation/stage labels, elapsed-time reporting, bounded named SQL budgets
+and server statement/lock limits now make the failure actionable. The native
+deadline canary must prove server cancellation and transaction rollback.
+Populated chain upgrade reuses the compact candidate-pool fixture while retaining
+all old receipt/window/page and row/OID/owner/ACL/function parity checks.
+Full 145/domain traversal, actual 1000 cap, provenance and real concurrency remain
+required. CLI's 25-minute outer job and all five APK gates remain unchanged.
+Deployed SQL bytes and existing hosted data are untouched. STATUS owns final
+verification/publication and one-time replacement-run handoff; no CI polling.
+
 ## Catalog append, compact layout and later-page evidence — 2026-10-06 / #199
 
 CI #607 on `00f0bad` passed all five mandatory jobs and produced APK, resolving the

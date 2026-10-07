@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
-import { readFile } from 'node:fs/promises';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { catalogPredictionChainSmokeSql, catalogPredictionChainUpgradeSql } from './catalog-prediction-chain.mjs';
+import { catalogPredictionChainSmokeSql, catalogPredictionChainUpgradeSql,
+  catalogPredictionChainUpgradeFixtureSql } from './catalog-prediction-chain.mjs';
 
-test('catalog continuation admits beyond 50 with fresh immutable sources, exact retries and honest bounds (full schema)', async () => {
+test('catalog continuation admits beyond 50 with fresh immutable sources, exact retries and honest bounds (full schema)', async t => {
   const db = new PGlite();
   try {
     await db.exec(`create role anon; create role authenticated; create role service_role;
@@ -29,17 +29,21 @@ test('catalog continuation admits beyond 50 with fresh immutable sources, exact 
     assert.equal((await db.query("select to_regprocedure('private.rank_items_catalog_with_identity_v1(uuid[],boolean,uuid,uuid,text,text,integer,jsonb)') r")).rows[0].r, null,
       'Rejected source drift left cloned ranking functions');
     assert.equal((await db.query("select pg_get_functiondef('private.rank_items_page_v1(jsonb)'::regprocedure) d")).rows[0].d, original);
-    const fixture = await readFile(new URL('catalog-prediction-chain-fixture.sql', import.meta.url), 'utf8');
+    const fixture = await catalogPredictionChainUpgradeFixtureSql();
+    let stageStarted = performance.now();
     const upgrade = await db.exec(catalogPredictionChainUpgradeSql(files[chainIndex], fixture));
     assert.match(upgrade.flatMap(result => result.rows)[0]?.snapshot.catalogChainUpgrade, /^PASS: populated v1\/v2/);
+    t.diagnostic(`populated-upgrade completed in ${Math.round(performance.now() - stageStarted)} ms`);
     for (const file of files.slice(chainIndex)) await db.exec(`begin; ${file.sql} commit;`);
     for (const [digits, name] of [[0, 'catalog-prediction-chain-smoke.sql'], [3, 'catalog-prediction-chain-boundaries.sql']]) {
       await db.exec(`set extra_float_digits=${digits}`);
+      stageStarted = performance.now();
       const snapshots = (await db.exec(await catalogPredictionChainSmokeSql(name)))
         .flatMap(result => result.rows.map(row => row.snapshot));
       assert.match(snapshots[0]?.catalogChain, /^PASS:/);
       assert.equal((await db.query('select count(*)::integer n from private.prediction_page_receipts')).rows[0].n, 0);
       assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits));
+      t.diagnostic(`${name} completed in ${Math.round(performance.now() - stageStarted)} ms`);
     }
   } finally { await db.close(); }
 });

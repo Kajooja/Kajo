@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-06**
+Last updated: **2026-10-07**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,50 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### CLI command deadline after CI #610 — 2026-10-07 / #305
+
+The owner reports [CI #610](https://github.com/Kajooja/Kajo/actions/runs/37481476151)
+failed on `b1c7ad15df133334e1f2a479565549a989dbcd71`. Validate, platform,
+two clean installations and populated application upgrade passed. CLI
+installation/history alone failed with `spawnSync docker ETIMEDOUT`; its
+dependent standalone APK was skipped. The last logged reset is number 15 with
+17 migrations, immediately before the newly added populated catalog-chain
+upgrade. The old log cannot distinguish the following Docker inspections from
+the SQL invocation; it does not establish a planner, lock or deployed-SQL defect.
+
+The harness now names SQL stages and Docker operations, logs elapsed SQL time
+and supports explicitly bounded proof budgets. The server has a per-statement
+deadline and 30-second lock limit; the Docker invocation separately bounds the
+whole script. A native canary must observe server statement cancellation and
+prove its uncommitted probe table rolled back. No SQL write is automatically
+retried after a timeout. The existing 25-minute CLI job and all five APK dependency
+gates remain required.
+
+The populated-upgrade proof uses the existing compact candidate-pool fixture,
+while preserving v1 receipts, a live v2 window and committed later page, all
+existing row/function/OID/owner/ACL comparisons and v3 continuation. The full
+145-Item/domain, 12-chain traversal, 1000-reader bound and later-page provenance
+proofs remain independent mandatory runtime checks. The deployed forward's
+SQL hash and hosted rollout receipt are unchanged; no hosted migration, history
+repair or data reset is required for this CI correction.
+
+Local validation passed **18** stack/transport tests, including a real process
+deadline and intact buffered SQL. The complete full-schema chain regression
+passed in 138.76 seconds: compact upgrade 2.543 seconds, unchanged 12-chain
+matrix 49.044 seconds and unchanged suppression/expiry/1000-reader boundary
+proof 85.653 seconds. These PGlite timings are not native Supabase measurements.
+The root check again passed lint/typechecks, 39 dependency, 478 mobile and 444
+catalogue tests, then stopped at refused Deno npm-registry access. Docker is
+unavailable locally; actual server cancellation, native concurrency and the CLI
+gate require the next GitHub run. No gate is waived.
+
+The existing PR #305 still has `build-android-apk`. Synchronizing this reviewed
+correction requests the replacement behind all five unchanged dependency gates;
+GitHub owns its exact source/merge/run/artifact identity. The next action is that
+latest labelled synchronization, then the append/layout phone round in
+DEVICE_TEST after a successful APK. Retrieve the run link once without progress
+polling; keep main and draft #229 unaccepted.
 
 ### Catalog-wide append and compact Discovery — 2026-10-06 / #199
 

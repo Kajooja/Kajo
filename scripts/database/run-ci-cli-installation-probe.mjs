@@ -20,7 +20,7 @@ import { verifyPredictionPageConcurrency } from './prediction-page-concurrency.m
 import { atomicPredictionPagesSmokeSql, predictionContinuationUpgradeSql } from './atomic-prediction-pages.mjs';
 import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages-concurrency.mjs';
 import { catalogPredictionChainSmokeSql, catalogPredictionChainUpgradeSql,
-  verifyCatalogPredictionChainConcurrency } from './catalog-prediction-chain.mjs';
+  catalogPredictionChainUpgradeFixtureSql, verifyCatalogPredictionChainConcurrency } from './catalog-prediction-chain.mjs';
 import { predictionChainProvenanceSmokeSql } from './prediction-chain-provenance.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
@@ -42,6 +42,19 @@ try {
   const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
+    // The server must cancel before Docker's deadline, aborting this entire
+    // transaction. A separate acknowledgement proves no partial DDL survived.
+    await assert.rejects(exec(`begin;
+      create table public.kajo_ci_sql_deadline_probe(id integer primary key);
+      insert into public.kajo_ci_sql_deadline_probe values(1);
+      do $$ begin perform pg_sleep(10); end $$;
+      commit;`, { stage: 'sql-deadline-canary', timeoutMs: 10_000 }),
+    /canceling statement due to statement timeout/);
+    const [deadlineRollback] = await exec(`select jsonb_build_object('absent',
+      to_regclass('public.kajo_ci_sql_deadline_probe') is null);`, { stage: 'sql-deadline-rollback' });
+    assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
+    const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
+      rollback: 'owned test table absent after server statement cancellation' };
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
     assert.ok(actionIndex > 0);
     await resetFromMigrations(files.slice(0, actionIndex));
@@ -112,8 +125,9 @@ try {
     const chainIndex = files.findIndex(file => file.name.endsWith('_catalog_prediction_chain.sql'));
     assert.ok(chainIndex > atomicPageIndex);
     await resetFromMigrations(files.slice(0, chainIndex));
-    const chainFixture = await readFile(new URL('catalog-prediction-chain-fixture.sql', import.meta.url), 'utf8');
-    const [catalogChainUpgrade] = await exec(catalogPredictionChainUpgradeSql(files[chainIndex], chainFixture));
+    const chainFixture = await catalogPredictionChainUpgradeFixtureSql();
+    const [catalogChainUpgrade] = await exec(catalogPredictionChainUpgradeSql(files[chainIndex], chainFixture),
+      { stage: 'catalog-chain-populated-upgrade', timeoutMs: 300_000 });
     assert.match(catalogChainUpgrade?.catalogChainUpgrade, /^PASS: populated v1\/v2/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
@@ -158,11 +172,14 @@ try {
     assert.match(atomicPages?.atomicPages, /^PASS: 12 Personal/);
     const [atomicPageBoundaries] = await exec(await atomicPredictionPagesSmokeSql('atomic-prediction-pages-boundaries.sql'));
     assert.match(atomicPageBoundaries?.atomicPages, /^PASS: current eligibility/);
-    const [catalogChain] = await exec(await catalogPredictionChainSmokeSql());
+    const [catalogChain] = await exec(await catalogPredictionChainSmokeSql(),
+      { stage: 'catalog-chain-profile-domain-mode-matrix', timeoutMs: 300_000 });
     assert.match(catalogChain?.catalogChain, /^PASS: 12 Personal\/Shared/);
-    const [catalogChainBoundaries] = await exec(await catalogPredictionChainSmokeSql('catalog-prediction-chain-boundaries.sql'));
+    const [catalogChainBoundaries] = await exec(await catalogPredictionChainSmokeSql('catalog-prediction-chain-boundaries.sql'),
+      { stage: 'catalog-chain-prefix-expiry-reader-limit', timeoutMs: 600_000 });
     assert.match(catalogChainBoundaries?.catalogChain, /^PASS: current suppression/);
-    const [catalogChainProvenance] = await exec(await predictionChainProvenanceSmokeSql());
+    const [catalogChainProvenance] = await exec(await predictionChainProvenanceSmokeSql(),
+      { stage: 'catalog-chain-later-page-outcome-provenance', timeoutMs: 120_000 });
     assert.match(catalogChainProvenance?.catalogChainProvenance, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
@@ -190,7 +207,7 @@ try {
     const nativeDefaults = rows => (rows ?? []).filter(row => !(row.creator === 'postgres'
       && (['public', 'private'].includes(row.schema) || (row.schema === '*' && row.kind === 'f'))));
     assert.deepEqual(nativeDefaults(platformAfter.creatorDefaults), nativeDefaults(platformBefore.creatorDefaults));
-    return { operationalInstall, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
+    return { operationalInstall, sqlStatementDeadline, itemActions, itemActionUpgrade, collectionActions, collectionActionUpgrade,
       bootstrapHistory, historyProjectionUpgrade, sharedListDestinations, sharedListDestinationsUpgrade,
       lateOutcomes, lateOutcomeUpgrade, hostedPredictionUpgrade, hostedPredictionRuntime, frozenReplay, frozenReplayUpgrade,
       candidatePool, candidatePoolUpgrade, predictionPage, predictionPageUpgrade, predictionPageConcurrency, predictionWindow,

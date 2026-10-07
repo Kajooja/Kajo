@@ -11,6 +11,14 @@ export async function catalogPredictionChainSmokeSql(name = 'catalog-prediction-
   return `begin; ${fixture}\n${smoke}\nrollback;`;
 }
 
+// Upgrade preservation needs populated v1/v2 origins and a still-open cursor,
+// independently of catalog breadth. Reuse the canonical smaller fixture here;
+// the mandatory runtime fixtures still traverse 145 eligible Items/domain and
+// exercise the actual 1000-Item reader cap without reducing their corpus.
+export async function catalogPredictionChainUpgradeFixtureSql() {
+  return readFile(new URL('candidate-pool-fixture.sql', import.meta.url), 'utf8');
+}
+
 // The ordinary forward is rehearsed against populated v1/v2 receipts, source
 // candidates, a live window and a committed later page. No old bytes are edited.
 export function catalogPredictionChainUpgradeSql(migration, fixture) {
@@ -18,7 +26,7 @@ export function catalogPredictionChainUpgradeSql(migration, fixture) {
   return `begin; set local extra_float_digits=3;
     ${fixture}
     create temp table chain_upgrade(request jsonb,response jsonb,cached_window jsonb) on commit drop;
-    do $seed$ declare actor uuid := 'a22c0000-0000-4000-8000-000000000001'; profile uuid;
+    do $seed$ declare profile uuid;
       request jsonb; root jsonb; response jsonb; stored_window jsonb;
     begin
       select profile_id into strict profile from pg_temp.pool_profiles where profile_type='PERSONAL';
@@ -96,8 +104,9 @@ export async function verifyCatalogPredictionChainConcurrency(exec) {
     insert into auth.users(id,email,raw_user_meta_data) values('${actor}','catalog-chain@example.invalid','{"kajo_nickname":"Native chain"}');
     insert into public.items(id,item_type,title,tags,discoverable) select md5('native-catalog-chain:'||n)::uuid,
       'BOOK','Native chain '||n,array['native-chain'],true from generate_series(1,144) n;
-    commit;`);
-  const [scope] = await exec(`select jsonb_build_object('profileId',id) from public.profiles where owner_user_id='${actor}' and profile_type='PERSONAL';`);
+    commit;`, { stage: 'catalog-chain-concurrency-fixture' });
+  const [scope] = await exec(`select jsonb_build_object('profileId',id) from public.profiles where owner_user_id='${actor}' and profile_type='PERSONAL';`,
+    { stage: 'catalog-chain-concurrency-scope' });
   const base = { version: 3, profileId: scope.profileId, sessionId: 'a22d0000-0000-4000-8000-000000000002',
     discoveryMode: 'FOR_YOU', itemType: 'BOOK', limit: 2, context: {} };
   let sequence = 10;
@@ -112,11 +121,13 @@ export async function verifyCatalogPredictionChainConcurrency(exec) {
     'receipts',(select count(*) from private.prediction_page_receipts where actor_user_id='${actor}'),
     'windows',(select count(*) from private.prediction_continuation_windows where actor_user_id='${actor}' and expires_at>clock_timestamp()),
     'chains',(select count(*) from private.prediction_catalog_chains where actor_user_id='${actor}' and expires_at>clock_timestamp()),
-    'pages',(select count(*) from private.prediction_catalog_chain_pages p join private.prediction_runs r on r.id=p.prediction_id where r.actor_user_id='${actor}'));`))[0];
+    'pages',(select count(*) from private.prediction_catalog_chain_pages p join private.prediction_runs r on r.id=p.prediction_id where r.actor_user_id='${actor}'));`,
+  { stage: 'catalog-chain-concurrency-evidence' }))[0];
   const waitForLock = async (name, granted) => {
     for (let attempt = 0; attempt < 50; attempt++) {
       const [found] = await exec(`select to_jsonb(exists(select 1 from pg_locks l join pg_stat_activity a on a.pid=l.pid
-        where a.application_name='${name}' and l.locktype='advisory' and l.granted=${granted}));`);
+        where a.application_name='${name}' and l.locktype='advisory' and l.granted=${granted}));`,
+      { stage: 'catalog-chain-concurrency-observed-lock' });
       if (found) return;
       await delay(50);
     }
@@ -124,17 +135,20 @@ export async function verifyCatalogPredictionChainConcurrency(exec) {
   };
   const race = async (a, b) => {
     const settle = promise => promise.then(value => ({ value }), error => ({ error }));
-    const first = settle(exec(call(a, 'kajo_catalog_chain_holder', true)));
+    const first = settle(exec(call(a, 'kajo_catalog_chain_holder', true),
+      { stage: 'catalog-chain-concurrency-holder', timeoutMs: 120_000 }));
     let second;
     try {
       await waitForLock('kajo_catalog_chain_holder', true);
-      second = settle(exec(call(b, 'kajo_catalog_chain_waiter')));
+      second = settle(exec(call(b, 'kajo_catalog_chain_waiter'),
+        { stage: 'catalog-chain-concurrency-waiter', timeoutMs: 120_000 }));
       await waitForLock('kajo_catalog_chain_waiter', false);
       return await Promise.all([first, second]);
     } finally { await Promise.all([first, second]); }
   };
   for (const competing of [false, true]) {
-    const [root] = await exec(call({ ...base, requestId: id() }, 'kajo_catalog_chain_root'));
+    const [root] = await exec(call({ ...base, requestId: id() }, 'kajo_catalog_chain_root'),
+      { stage: 'catalog-chain-concurrency-root', timeoutMs: 120_000 });
     assert.ok(root.nextCursor);
     const command = { ...base, requestId: id(), cursor: root.nextCursor };
     const before = await counts();
@@ -146,14 +160,17 @@ export async function verifyCatalogPredictionChainConcurrency(exec) {
       assert.deepEqual(b.value, a.value, 'Concurrent catalog-chain retry changed immutable page receipt');
     }
     assert.deepEqual(await counts(), { ...before, runs: before.runs + 1, receipts: before.receipts + 1, pages: before.pages + 1 });
-    const [seen] = await exec(`select to_jsonb(cardinality(seen_item_ids)) from private.prediction_catalog_chains where id='${root.source.chainId}';`);
+    const [seen] = await exec(`select to_jsonb(cardinality(seen_item_ids)) from private.prediction_catalog_chains where id='${root.source.chainId}';`,
+      { stage: 'catalog-chain-concurrency-prefix' });
     assert.equal(seen, 4, 'Concurrent catalog-chain request advanced the prefix twice');
   }
-  while ((await counts()).windows < 8) await exec(call({ ...base, version: 2, requestId: id() }, 'kajo_catalog_chain_fill_v2'));
+  while ((await counts()).windows < 8) await exec(call({ ...base, version: 2, requestId: id() }, 'kajo_catalog_chain_fill_v2'),
+    { stage: 'catalog-chain-concurrency-fill-v2', timeoutMs: 120_000 });
   for (;;) {
     const count = await counts();
     if (count.windows + count.chains >= 15) break;
-    await exec(call({ ...base, requestId: id() }, 'kajo_catalog_chain_fill_v3'));
+    await exec(call({ ...base, requestId: id() }, 'kajo_catalog_chain_fill_v3'),
+      { stage: 'catalog-chain-concurrency-fill-v3', timeoutMs: 120_000 });
   }
   const before = await counts();
   const [a, b] = await race({ ...base, requestId: id() }, { ...base, version: 2, requestId: id() });
