@@ -1,6 +1,6 @@
 # Kajo Domain Model
 
-This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition and SharedRatingRound entities are not claims of implemented tables. The exact-set multi-List successor is on active #229 source with separately recorded hosted rollout; accepted-main code retains its earlier single-List boundary until that branch is accepted.
+This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition entities are not claims of implemented tables. #232A's round evidence foundation is active unmerged source, separately from the required coordinated user/learning flow. The exact-set multi-List successor is on active #229 source with separately recorded hosted rollout; accepted-main code retains its earlier single-List boundary until that branch is accepted.
 
 ## Core model
 
@@ -286,7 +286,7 @@ Deleting any destination of a pending proposal cancels the whole proposal and re
 real deleting actor and affected endorsing actor separately. Completed consensus
 and Saved survive List deletion.
 
-## SharedRatingRound — required first release, planned #232
+## SharedRatingRound — required first release, #232
 
 Personal Taste setup comes first; an existing completed setup is retained. Joint
 experience then learns in SharedProfile, without overwriting Personal history.
@@ -313,6 +313,34 @@ Legacy Shared ratings with only one known actor remain identifiable legacy histo
 never fabricate other participants’ responses or silently treat them as completed
 new rounds. List Endorsement/SharedConsensus and a completed SharedRatingRound are
 separate decisions, even if the UI uses “Pari!” for both.
+
+### Phase 14.1 source foundation — #232A
+
+The unmerged `feat/232-shared-round-evidence` foundation supplies an explicit
+server round boundary independently of the legacy Item action path. A round
+binds one SharedProfile, Item and experience ID to a frozen participant set.
+Durable membership generation UUIDs distinguish leaving and rejoining from the
+original enrollment; physical database row placement is not participant identity.
+Membership drift requires explicit reconfirmation with fresh responses or
+cancellation. A current accepted member can recover a stale round even after
+all original participants have left; answering requires current membership in
+the frozen set.
+
+Ordinary membership departure preserves round history. Deleting a User removes
+affected new round roots and their response/receipt lineage, including that
+User's participation in an earlier reconfirmed snapshot. This prevents embedded
+participant identities from surviving deletion inside other actors' receipts.
+It does not alter legacy Shared data or establish a general retention policy.
+
+Round revisions serialize commands; response revisions and command receipts
+preserve each answer, unknown/clear, correction, cancellation and original
+delivery claim. The projection distinguishes PENDING, COMPLETED, CANCELLED and
+RECONFIRMATION_REQUIRED. Completion requires every frozen participant's actual
+integer rating, including valid zero; unknown is not a rating. This foundation
+returns `groupReward=null` and `learnable=false`. It does not update joint
+Katsotut/Luetut, ordinary Item state or Events. The coordinated flow and versioned
+joint outcome admission remain required before release; source/CI/hosted
+acceptance belong to STATUS.
 
 Member-seen Items remain eligible for a strong, truthfully explained joint fit.
 Previously joint-consumed Items may reappear only through a versioned, bounded

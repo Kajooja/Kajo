@@ -490,6 +490,19 @@ concurrent completion, membership changes, legacy history and separate rewatch
 rounds with Personal/Shared isolation. DOMAIN_MODEL and DATA_EVENTS own entities
 and command semantics; ROADMAP owns dependency order.
 
+The #232A source foundation now separates an explicit response vector from
+legacy single-actor Shared Item outcomes. Its current round projection can be
+COMPLETED only when every frozen participant has answered; membership-generation
+drift invalidates that current confirmation until reconfirmation with fresh
+answers. Corrections and cancellation retain immutable response/command history.
+`groupReward=null` and `learnable=false` are deliberate admission results, not
+missing ratings to replace with zero or a member average. The legacy V1
+Memory/Scenario/evaluation readers are unchanged and do not receive these new
+round records. A versioned joint outcome reader must establish as-of participant,
+correction, maturity and per-response delivery semantics before any joint label
+enters learning. No new Shared scorer, rewatch admission or outcome quality gain
+is claimed by this foundation. STATUS owns the unmerged source/CI/rollout state.
+
 ## 11. Cold start and external history
 
 A sparse Profile must not start from random Items or from fabricated demographic certainty. MVP bootstrap has two explicit PersonalProfile paths:
