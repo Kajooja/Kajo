@@ -371,6 +371,13 @@ coordinates. Neither artifact defines a group reward or an independent sample
 per member. Erasing the retained receipt lineage erases these derived artifacts.
 Observation after a prediction does not establish historical feature availability.
 
+The #232D internal owner preparation removes PredictionRun sources, their shadow
+artifacts and copied comparison traces atomically, with whole affected evaluation
+batches invalidated. It preserves ordinary artifact immutability and rejects
+unresolved promoted-policy influence. User/Profile roots are deleted separately
+in the same owner transaction after preparation, rather than by an automatic
+Auth lifecycle hook. DATA_EVENTS owns scope, permission and concurrency semantics.
+
 Member-seen Items remain eligible for a strong, truthfully explained joint fit.
 Previously joint-consumed Items may reappear only through a versioned, bounded
 rewatch policy. Existing history stays intact. Exact eligibility, cooldown and

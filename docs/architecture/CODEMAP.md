@@ -86,6 +86,20 @@ The existing required CLI gate includes these probes. DATA_EVENTS and
 PREDICTION_MODEL retain unavailable scalar metrics and historical feature
 admission; STATUS owns the exact migration name/hash and source/CI/rollout state.
 
+## Closed shadow-source erasure — #232D, active source only
+
+`20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source
+eraser and an API-denied exact-row transaction permission relation. It retains
+ordinary immutable-artifact protection, invalidates entire affected evaluation
+batches and explicitly removes copied #232C comparison traces. A common first-lock
+lifecycle gate serializes worker/evaluator/canary/rollback/comparison writers
+against erasure; unresolved learned-policy lineage rejects preparation atomically.
+`shadow-source-erasure.mjs`, its fixture/matrix/full-schema test and
+`shadow-source-erasure-concurrency.mjs` join the existing CLI gate for populated
+preservation and actual worker/eraser race orders. User/Profile roots remain for
+owner deletion within that same transaction. DATA_EVENTS owns the contract;
+STATUS records source checks, pending native evidence and the next integration.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit
