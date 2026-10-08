@@ -187,6 +187,9 @@ try {
     assert.match(bootstrapHistory?.bootstrapHistory, /^PASS: calibration/);
     const [sharedListDestinations] = await exec(await readFile(new URL('shared-list-destinations-smoke.sql', import.meta.url), 'utf8'));
     assert.match(sharedListDestinations?.sharedListDestinations, /^PASS: exact target consent/);
+    const [sharedOverlayEligibility] = await exec(await readFile(new URL('shared-overlay-eligibility-smoke.sql', import.meta.url), 'utf8'),
+      { stage: 'shared-overlay-eligibility' });
+    assert.match(sharedOverlayEligibility?.sharedOverlayEligibility, /^PASS: withdrawn\/rejected/);
     const [listMembership] = await exec(await readFile(new URL('list-membership-smoke.sql', import.meta.url), 'utf8'));
     assert.match(listMembership?.listMembership, /^PASS: public delivery/);
     const [catalogDescriptions] = await exec(await catalogDescriptionSmokeSql());

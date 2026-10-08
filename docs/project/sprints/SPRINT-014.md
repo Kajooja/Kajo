@@ -14,6 +14,33 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Shared overlay eligibility prerequisite — 2026-10-08 / #177
+
+The #305 predecessor passed all five CI #612 gates and APK; the owner reports the
+exercised append/layout flows work. Broader native/fresh-account gates stay open.
+A source review then reproduced a separate 14.2 defect: pending/member-history
+overlay Items bypassed catalogue withdrawal and Shared not-interest exclusions.
+This narrow packet precedes the separately planned #232 evidence foundation.
+
+The CLI-generated `20261008122852_shared_overlay_eligibility.sql` guards the old
+private overlay body and extends only its exclusion flag. Existing rows, zero
+ratings, proposals and function identity/owner/ACL survive. The final mobile
+filter also suppresses local not-interest without fabricating consumption.
+Two mobile regressions fail before the correction; all 26 focused cases pass
+after it. Full-schema rollback acceptance proves the old SQL defect, populated
+row/function preservation, source guard, legacy/v2 parity, scope and authorization.
+The same SQL smoke is a named mandatory native CLI stage. Lint/typechecks, 43
+dependency, 481 mobile and 444 catalogue tests passed; all four main and isolated
+description-acceptance iOS/Android production-mode exports passed. The root check
+stopped at refused Deno npm-registry access, so no complete pass is claimed.
+Docker/native CI remains required.
+
+Authored SQL SHA-256:
+`49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698`.
+No hosted forward has run; no existing migration/data was changed. STATUS owns
+root-check/publication evidence, approved deployment and the focused Shared
+device observation. No source test closes the broader #229 acceptance gaps.
+
 ## Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
 
 CI #611 on `da376700fc24bae894383533f11e6168da74e36d` stopped at the fresh

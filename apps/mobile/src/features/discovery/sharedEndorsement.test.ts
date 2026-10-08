@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { getDiscoverableItems, setItemNotInterested } from './itemInteraction';
+
 import {
   applySharedDiscoveryOverlay,
   formatMemberHistoryProvenance,
@@ -94,6 +96,23 @@ describe('Shared discovery collaboration overlay', () => {
     expect(
       applySharedDiscoveryOverlay(ITEMS, 'MOVIE', STATE).map((item) => item.id),
     ).toEqual(['pending', 'ordinary', 'seen-high', 'seen-low']);
+  });
+
+  it('cannot reintroduce locally rejected pending or member-history Items outside the ranked page', () => {
+    const interactions = setItemNotInterested(setItemNotInterested({}, 'pending', true), 'seen-high', true);
+    const overlaid = applySharedDiscoveryOverlay([ITEMS[0]!], 'MOVIE', STATE);
+
+    expect(getDiscoverableItems(overlaid, interactions).map(item => item.id)).toEqual(['ordinary', 'seen-low']);
+  });
+
+  it('honors server exclusions in both pending and member-history overlay tiers', () => {
+    const state: SharedDiscoveryStateMap = {
+      ...STATE,
+      pending: { ...STATE.pending!, ineligibleForDiscovery: true },
+      'seen-high': { ...STATE['seen-high']!, ineligibleForDiscovery: true },
+    };
+
+    expect(applySharedDiscoveryOverlay(ITEMS, 'MOVIE', state).map(item => item.id)).toEqual(['ordinary', 'seen-low']);
   });
 
   it('names the proposer and target List in the pending approval banner', () => {
