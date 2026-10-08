@@ -61,7 +61,7 @@ export function createPredictionPageReader(options: {
 
   function firstRequest() {
     const request = options.createRequest();
-    if (request.version !== 2 || request.cursor !== null || request.profileId !== scope.profileId ||
+    if ((request.version !== 2 && request.version !== 3) || request.cursor !== null || request.profileId !== scope.profileId ||
       request.sessionId !== scope.sessionId || request.itemType !== scope.itemType ||
       request.discoveryMode !== scope.mode || request.limit !== scope.limit) throw new Error('Prediction reader scope mismatch');
     return request;
@@ -152,15 +152,24 @@ export function createPredictionPageReader(options: {
   }
 
   function validSuccessor(page: PredictionPage): boolean {
-    if (!page.continuationSupported || page.request.version !== 2) return false;
+    if (!page.continuationSupported || (page.request.version !== 2 && page.request.version !== 3)) return false;
     const root = snapshot.pages[0];
     const last = snapshot.pages.at(-1);
-    if (!root || !last) return page.pageIndex === 1 && page.sourcePredictionId === page.ranking.predictionId;
-    return page.request.cursor === last.nextCursor && last.nextCursor !== null &&
-      page.pageIndex === last.pageIndex + 1 && page.pageIndex <= 51 &&
-      page.sourcePredictionId === root.sourcePredictionId && page.featureAt === root.featureAt &&
-      page.candidateCount === root.candidateCount && page.availability !== 'CATALOG_EMPTY' &&
-      snapshot.items.length + page.ranking.items.length <= root.candidateCount &&
+    const uniqueItems = new Set(page.ranking.items.map(item => item.id)).size === page.ranking.items.length;
+    if (!uniqueItems) return false;
+    if (!root || !last) return page.pageIndex === 1 && page.sourcePredictionId === page.ranking.predictionId &&
+      (page.request.version === 2 || (page.rootPredictionId === page.ranking.predictionId &&
+        page.parentPredictionId === null && page.seenCount === page.ranking.items.length && page.chainLimit === 1000 &&
+        typeof page.chainId === 'string'));
+    const validLineage = page.request.version === 3
+      ? page.chainId === root.chainId && page.rootPredictionId === root.rootPredictionId &&
+        page.parentPredictionId === last.ranking.predictionId && page.sourcePredictionId === page.ranking.predictionId &&
+        page.seenCount === snapshot.items.length + page.ranking.items.length && page.chainLimit === root.chainLimit &&
+        page.pageIndex <= 1001 && page.seenCount <= 1000
+      : page.pageIndex <= 51 && page.sourcePredictionId === root.sourcePredictionId && page.featureAt === root.featureAt &&
+        page.candidateCount === root.candidateCount && snapshot.items.length + page.ranking.items.length <= root.candidateCount;
+    return page.request.version === root.request.version && page.request.cursor === last.nextCursor && last.nextCursor !== null &&
+      page.pageIndex === last.pageIndex + 1 && validLineage && page.availability !== 'CATALOG_EMPTY' &&
       !page.ranking.items.some(item => Object.hasOwn(snapshot.predictionIds, item.id)) &&
       !snapshot.pages.some(entry => entry.ranking.predictionId === page.ranking.predictionId ||
         entry.request.requestId === page.request.requestId ||

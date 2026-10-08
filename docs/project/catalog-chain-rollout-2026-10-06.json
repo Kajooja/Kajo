@@ -1,0 +1,185 @@
+{
+  "target": "mwrnvfosrzwygrunrltm",
+  "migration": {
+    "version": "20261006143148",
+    "name": "catalog_prediction_chain"
+  },
+  "sqlSha256": "8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8",
+  "sourceCommit": "5089d0abb65965c669fa540de9a025e34f92f178",
+  "functionCountBefore": 153,
+  "functionCountAfter": 158,
+  "altered": [
+    {
+      "identity": "private.rank_items_page_v1(request jsonb)",
+      "before": "a856d7259d902bc5f29686d68b43b3a48531faee779930cda1d0153e0bad9842",
+      "after": "c9b0123b576fdf94e2690a658b976f57a67196fc10eeac527f54416bdba91d7f"
+    }
+  ],
+  "added": [
+    {
+      "identity": "private.rank_items_catalog_base_v1(_chain_seen uuid[], _chain_reminder_spent boolean, target_profile_id uuid, requested_mode text, requested_item_type text, result_limit integer, request_context jsonb)",
+      "definitionSha256": "83a31c13947b7694492dba35f06ce40408e022b1b84fdc1a658f8a8ed03100e4",
+      "owner": "postgres",
+      "acl": [
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "grantable": false,
+          "privilege": "EXECUTE"
+        }
+      ]
+    },
+    {
+      "identity": "private.rank_items_catalog_chain_v1(request jsonb)",
+      "definitionSha256": "fe04ad02b611309e3e7a2a8e861b77f5d57496ef55a6e65ea036e7b148357047",
+      "owner": "postgres",
+      "acl": [
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "grantable": false,
+          "privilege": "EXECUTE"
+        }
+      ]
+    },
+    {
+      "identity": "private.rank_items_catalog_scalar_v1(_chain_seen uuid[], _chain_reminder_spent boolean, target_profile_id uuid, requested_mode text, requested_item_type text, result_limit integer, request_context jsonb, forced_genome_id uuid)",
+      "definitionSha256": "f1ba21cb01b240afbf7c372369f0ec95bd0254427ffc74d1c025c9f955f8f090",
+      "owner": "postgres",
+      "acl": [
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "grantable": false,
+          "privilege": "EXECUTE"
+        }
+      ]
+    },
+    {
+      "identity": "private.rank_items_catalog_with_identity_v1(_chain_seen uuid[], _chain_reminder_spent boolean, supplied_prediction_id uuid, target_profile_id uuid, requested_mode text, requested_item_type text, result_limit integer, request_context jsonb)",
+      "definitionSha256": "483450b31562b586dbb7eaaa59e6a7e0dda3d3ee8a1ead5981e211efb4f8bf39",
+      "owner": "postgres",
+      "acl": [
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "grantable": false,
+          "privilege": "EXECUTE"
+        }
+      ]
+    },
+    {
+      "identity": "private.rank_items_frozen_page_v2(request jsonb)",
+      "definitionSha256": "24d28e20245ee81431fc8425f068f2690f6cd2caf65d079216fd352dc2951fa4",
+      "owner": "postgres",
+      "acl": [
+        {
+          "grantee": "postgres",
+          "grantor": "postgres",
+          "grantable": false,
+          "privilege": "EXECUTE"
+        }
+      ]
+    }
+  ],
+  "missing": [],
+  "aclChanged": [],
+  "rowDigestsUnchanged": true,
+  "verifiedRowCounts": [
+    {
+      "object": "users",
+      "rows": 2
+    },
+    {
+      "object": "profiles",
+      "rows": 3
+    },
+    {
+      "object": "items",
+      "rows": 864
+    },
+    {
+      "object": "events",
+      "rows": 1790
+    },
+    {
+      "object": "interactions",
+      "rows": 24
+    },
+    {
+      "object": "prediction_runs",
+      "rows": 203
+    },
+    {
+      "object": "prediction_candidates",
+      "rows": 8010
+    },
+    {
+      "object": "prediction_page_receipts",
+      "rows": 57
+    }
+  ],
+  "rowsChanged": [],
+  "format": "kajo-catalog-chain-rollout-v1",
+  "date": "2026-10-06",
+  "authoringVersion": "20261006140559",
+  "deployedFilename": "20261006143148_catalog_prediction_chain.sql",
+  "rowDigestsUnchangedAfterRollbackProbe": true,
+  "tables": [
+    {
+      "object": "prediction_catalog_chain_cursors",
+      "rls_enabled": true,
+      "owner": "postgres",
+      "api_access": {
+        "anon": false,
+        "service_role": false,
+        "authenticated": false
+      }
+    },
+    {
+      "object": "prediction_catalog_chain_pages",
+      "rls_enabled": true,
+      "owner": "postgres",
+      "api_access": {
+        "anon": false,
+        "service_role": false,
+        "authenticated": false
+      }
+    },
+    {
+      "object": "prediction_catalog_chains",
+      "rls_enabled": true,
+      "owner": "postgres",
+      "api_access": {
+        "anon": false,
+        "service_role": false,
+        "authenticated": false
+      }
+    }
+  ],
+  "runtime": {
+    "domains": [
+      {
+        "pages": 4,
+        "itemType": "BOOK",
+        "pastFormer50": true,
+        "deliveredCount": 80,
+        "continuationState": "MORE"
+      },
+      {
+        "pages": 4,
+        "itemType": "MOVIE",
+        "pastFormer50": true,
+        "deliveredCount": 80,
+        "continuationState": "MORE"
+      }
+    ],
+    "rolledBack": true,
+    "catalogChainHosted": "PASS: authorized BOOK/MOVIE append and immutable exact receipts"
+  },
+  "legacy": {
+    "rolledBack": true,
+    "legacyReceiptReplay": "PASS",
+    "existingReceiptsVerified": 57
+  }
+}

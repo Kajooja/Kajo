@@ -229,6 +229,10 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
           <View style={styles.control}>
             <View style={styles.labelRow} pointerEvents="none">
               <Text style={[styles.label, { color: theme.base.textMuted }]}>LÖYTÖTILA</Text>
+              {activeProfile?.type === 'SHARED' ? (
+                <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
+                  style={styles.sharedModeLabel}>RYHMÄTILA</Text>
+              ) : null}
               <Text style={[styles.value, { color: theme.base.textPrimary }]}>
                 {MODE_LABELS[mode]}
               </Text>
@@ -240,13 +244,6 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
               baseTheme={theme.base}
               ambientTheme={theme.ambient}
             />
-            {activeProfile?.type === 'SHARED' ? (
-              <View accessibilityLiveRegion="polite" style={{ alignSelf: 'flex-start', borderRadius: 5,
-                paddingHorizontal: 7, paddingVertical: 2, marginTop: 3, backgroundColor: '#215638' }}>
-                <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
-                  style={{ color: '#c5f6d5', fontSize: 10, fontWeight: '800' }}>RYHMÄTILA</Text>
-              </View>
-            ) : null}
           </View>
         </View>
       </SafeAreaView>
@@ -989,16 +986,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   bar: {
-    minHeight: 58,
+    minHeight: 48,
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 2,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   brand: {
     width: 76,
-    height: 40,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
@@ -1013,12 +1010,14 @@ const styles = StyleSheet.create({
   control: {
     flex: 1,
     minWidth: 104,
-    gap: 4,
+    gap: 2,
   },
   labelRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    columnGap: 6,
   },
   label: {
     fontSize: 8,
@@ -1029,6 +1028,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 0.8,
+  },
+  sharedModeLabel: {
+    color: '#c5f6d5',
+    fontSize: 8,
+    fontWeight: '800',
   },
   content: {
     flex: 1,

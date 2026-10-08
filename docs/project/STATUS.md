@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-06**
+Last updated: **2026-10-08**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,187 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
+
+The owner reports [CI #611](https://github.com/Kajooja/Kajo/actions/runs/37598842487)
+failed on `da376700fc24bae894383533f11e6168da74e36d`. Dependency audit
+blocked validate with one new unmitigated critical finding:
+[GHSA-pqg4-j6r4-53mv](https://github.com/advisories/GHSA-pqg4-j6r4-53mv)
+in shell-quote 1.10.0. Platform and two clean installations passed;
+CLI, populated upgrade and APK were skipped. The previous CLI deadline correction
+therefore still awaits its native run; #611 did not reproduce a Docker timeout.
+
+The official advisory identifies affected versions >=1.8.4 and <1.11.0;
+upstream 1.11.0 rejects line terminators in string tokens following a comment.
+The sole locked leaf now uses that published fix. Its React DevTools 6.1.5 parent
+accepts ^1.6.1 and is unchanged, as are Expo/RN/router, other dependencies and
+the two verified source corrections. No override, audit exception, source-patch
+identity change or gate bypass is introduced. Existing DevTools editor parsing
+and normal POSIX quoting require regression coverage; Windows shell quoting is
+not inferred from this POSIX API.
+
+Clean `npm ci` passed with the existing postinstall corrections. All **43**
+dependency tests passed; the four new shell-quote regressions reproduced two
+failures on 1.10.0 before passing on the installed 1.11.0. Independent POSIX
+argument/editor parsing checks passed; native Windows execution was unavailable.
+Lint/typechecks, 478 mobile and 444 catalogue tests passed. All four main and
+description-acceptance iOS/Android production-mode Hermes exports passed.
+The root check stopped at Deno npm-registry resolution with Connection refused;
+no full pass is claimed. Docker/native gates still require GitHub and are not waived.
+
+The [fresh receipt](dependency-audit-native-2026-10-08.json) binds lock SHA-256
+`e453c3f30cf10a4de32f4906e124746bfb202c6376af81e397a544856963bb57`.
+Shell-quote is absent from the fresh raw audit; **zero unmitigated** findings
+remain. Its 19 raw high upstream findings are still covered only by the two
+unchanged verified source corrections, not described as zero vulnerabilities.
+
+Publish on existing labelled PR #305 to request the replacement APK behind all
+five mandatory gates. Retrieve the run link once without progress polling.
+After a successful artifact, resume DEVICE_TEST's BOOK/MOVIE append/layout round.
+The deployed SQL, existing hosted data, main and draft #229 acceptance are unchanged.
+
+### CLI command deadline after CI #610 — 2026-10-07 / #305
+
+The owner reports [CI #610](https://github.com/Kajooja/Kajo/actions/runs/37481476151)
+failed on `b1c7ad15df133334e1f2a479565549a989dbcd71`. Validate, platform,
+two clean installations and populated application upgrade passed. CLI
+installation/history alone failed with `spawnSync docker ETIMEDOUT`; its
+dependent standalone APK was skipped. The last logged reset is number 15 with
+17 migrations, immediately before the newly added populated catalog-chain
+upgrade. The old log cannot distinguish the following Docker inspections from
+the SQL invocation; it does not establish a planner, lock or deployed-SQL defect.
+
+The harness now names SQL stages and Docker operations, logs elapsed SQL time
+and supports explicitly bounded proof budgets. The server has a per-statement
+deadline and 30-second lock limit; the Docker invocation separately bounds the
+whole script. A native canary must observe server statement cancellation and
+prove its uncommitted probe table rolled back. No SQL write is automatically
+retried after a timeout. The existing 25-minute CLI job and all five APK dependency
+gates remain required.
+
+The populated-upgrade proof uses the existing compact candidate-pool fixture,
+while preserving v1 receipts, a live v2 window and committed later page, all
+existing row/function/OID/owner/ACL comparisons and v3 continuation. The full
+145-Item/domain, 12-chain traversal, 1000-reader bound and later-page provenance
+proofs remain independent mandatory runtime checks. The deployed forward's
+SQL hash and hosted rollout receipt are unchanged; no hosted migration, history
+repair or data reset is required for this CI correction.
+
+Local validation passed **18** stack/transport tests, including a real process
+deadline and intact buffered SQL. The complete full-schema chain regression
+passed in 138.76 seconds: compact upgrade 2.543 seconds, unchanged 12-chain
+matrix 49.044 seconds and unchanged suppression/expiry/1000-reader boundary
+proof 85.653 seconds. These PGlite timings are not native Supabase measurements.
+The root check again passed lint/typechecks, 39 dependency, 478 mobile and 444
+catalogue tests, then stopped at refused Deno npm-registry access. Docker is
+unavailable locally; actual server cancellation, native concurrency and the CLI
+gate require the next GitHub run. No gate is waived.
+
+The existing PR #305 still has `build-android-apk`. Synchronizing this reviewed
+correction requests the replacement behind all five unchanged dependency gates;
+GitHub owns its exact source/merge/run/artifact identity. The next action is that
+latest labelled synchronization, then the append/layout phone round in
+DEVICE_TEST after a successful APK. Retrieve the run link once without progress
+polling; keep main and draft #229 unaccepted.
+
+### Catalog-wide append and compact Discovery — 2026-10-06 / #199
+
+[CI #607](https://github.com/Kajooja/Kajo/actions/runs/37464008658) on
+`00f0bad9ed35c8647b72f8dd584df039ae8d0f9e` passed all five required gates
+and built the standalone APK. This closes #304's recorded CLI transport/build
+failure for that source. The owner subsequently reports phone cases **4–6 pass**:
+later-page network recovery, scope/background changes during loading and
+interrupted two-List saving/reopen. Exact installed artifact/device/OS were not
+supplied; keep those observations without inventing their identities or accepting
+fresh-account, Shared or visibility cases.
+
+Cases **1–3 fail**: downward pull/button at the end starts the same bounded
+search again and moves to its beginning for BOOK and MOVIE. The owner now
+explicitly requires append beyond the retained 50-candidate pool, truthful end
+copy, a one-row ItemType/Löydä/history header and removal of unused bottom space.
+This supersedes the September 30 fresh-search footer behavior and promotes these
+bounded #199/#200 layout requirements into the current native packet. Remaining
+Phase 17 UX and all #229 release gates keep their prerequisites.
+
+`fix/199-discovery-catalog-append` continues the exact successful #304 source.
+The new forward `20261006143148_catalog_prediction_chain.sql` opts protocol 3
+into the existing page RPC while retaining old protocol 1/2 callers and receipts.
+Server-owned delivered-prefix exclusion occurs before bounded candidate admission.
+Every appended page keeps its own immutable ranked run and exact receipt; the
+chain preserves scope, ordering, unique Items and per-card origins. Catalogue
+exhaustion and the bounded reader limit are distinct. Existing deployed files
+are unchanged; only the new reviewed forward may be deployed.
+
+The mobile reader retains its view and loaded prefix across append/retry.
+Downward pulls at the bottom or top and **Näytä lisää** append/retry; an expired
+cursor offers an explicit new search. Header controls share one responsive row;
+Löydä does not reset the existing list. The global 46-pixel dock and its system
+safe area remain; the nested bottom safe area and 24-pixel grid padding are gone.
+Physical small-screen/large-text and Android gesture checks remain owner work.
+
+The next bounded repository step extends Phase 14.1/14.2 evidence: more than 120
+eligible Items per domain, later-page origin, delayed exposure/zero-rating,
+frozen shadow replay and mature evaluation. This is not catalogue acquisition,
+a Phase 15 jump or acceptance of recommendation quality.
+
+Validation: root lint/typechecks, **478 mobile**, 39 dependency, 444 catalogue,
+44 engine, 32 research and 11 acceptance tests passed. The database sweep passed
+83 cases; the new chain case initially found an actor-denial classification,
+then its corrected full-schema rerun passed. Independent later-page provenance
+and legacy atomic paging also passed. New chain acceptance covers 12 scopes,
+145 eligible Items each and 36 distinct sources, including populated upgrade,
+source-guard rollback, actual 1000-reader cap and frozen replay. Main and
+acceptance-app iOS/Android exports passed, as did explicit demo exports. The
+fresh verified dependency audit has zero unmitigated findings. `npm run check`
+stopped at refused Deno registry access; native Supabase/lock/CLI tests require
+GitHub because local Docker is unavailable. Neither is waived.
+
+Independent forward/client/hosted-probe reviews found no remaining blocker.
+The exact new SQL SHA-256 is
+`8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8`.
+Hosted preflight on `mwrnvfosrzwygrunrltm` matches all four guarded ranker bodies
+and their owners/ACLs; existing migration tracking remains unrepaired.
+
+The forward is deployed as provider version **20261006143148**, name
+`catalog_prediction_chain`, on the exact target above. The repository filename
+now matches that provider tracking; authored SQL bytes/hash are unchanged.
+Source `5089d0abb65965c669fa540de9a025e34f92f178` is the reviewed rollout input.
+The [rollout receipt](catalog-chain-rollout-2026-10-06.json) records all 153 prior
+function identities: only the intended private dispatcher body changed, all
+prior owners/ACLs and 152 unrelated definitions stayed equal, and five owner-only
+helpers were added. Three new tables have RLS and no anon/authenticated/service
+role table access. Existing users/Profiles/Items/Events/interactions/runs/
+candidates/receipts retained their exact row digests before deployment and after
+the rollback-only runtime probe. All **57** currently authorized existing
+protocol 1/2 receipts replayed unchanged. No older forward or history repair ran.
+
+The existing owned PersonalProfile's hosted BOOK and MOVIE probes each appended
+**80 distinct Items over four pages**, preserving chain/prefix/per-card run
+identity and exact retries. Both prove continuation beyond 50; both still report
+MORE. Every probe write was rolled back. This is database-role/runtime evidence,
+not real HTTP/JWT or Android gesture/visibility acceptance.
+
+[PR #305](https://github.com/Kajooja/Kajo/pull/305) publishes the correction,
+stacked on #304; reviewed application/SQL/rollout source is
+`b076530c9698ac08c4ff8b2ace3322612da920a2`. The `build-android-apk` label is
+verified on the PR before this final handoff commit. Its synchronization requests
+the configured standalone APK behind the unchanged five mandatory gates.
+The initial unlabelled PR discovery run #608 is separate from that APK request.
+Use the latest labelled synchronization run for the new binary; GitHub owns its
+actual head/merge/artifact identity. Publishing this handoff does not accept main.
+
+The correction branch requests APK through a same-repository PR with
+`build-android-apk`, retaining all five required gates. GitHub owns its latest
+head/run/artifact identity. No completed new CI or APK is claimed by this source
+checkpoint; #607 is the successful predecessor only. Retrieve the new run link
+once and leave completion to the owner without polling.
+
+Current next action: follow the correction's
+[Actions runs](https://github.com/Kajooja/Kajo/actions?query=branch%3Afix%2F199-discovery-catalog-append).
+After all gates and APK succeed, install as an update and execute the new
+[DEVICE_TEST](DEVICE_TEST.md) append/layout round with existing accounts/data.
+Keep draft #229 and accepted main unchanged until their remaining gates pass.
 
 ### CLI Data API transport recovery — 2026-10-06 / #304
 

@@ -10,7 +10,7 @@ const record = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value);
 
 export interface PredictionPageRequest {
-  readonly version: 1 | 2;
+  readonly version: 1 | 2 | 3;
   readonly requestId: string;
   readonly profileId: ProfileId;
   readonly sessionId: SessionId;
@@ -25,13 +25,13 @@ export interface PredictionPageRequest {
 export function createPredictionPageRequest(input: {
   requestId: string; profileId: ProfileId; sessionId: SessionId;
   mode: DiscoveryMode; itemType: ItemType; limit?: number; context?: Omit<Context, 'sessionId'>;
-  version?: 1 | 2;
+  version?: 1 | 2 | 3;
 }): PredictionPageRequest {
   const limit = input.limit ?? 20;
   if (![input.requestId, input.profileId, input.sessionId].every(isUuid) ||
     !Number.isInteger(limit) || limit < 1 || limit > 50 ||
     !['FOR_YOU', 'SURPRISE', 'RISK'].includes(input.mode) || !['BOOK', 'MOVIE'].includes(input.itemType) ||
-    (input.version !== undefined && input.version !== 1 && input.version !== 2)) {
+    (input.version !== undefined && ![1, 2, 3].includes(input.version))) {
     throw new Error('Invalid prediction page scope');
   }
   const context = input.context ?? {};
@@ -59,7 +59,7 @@ export function createPredictionPageRequest(input: {
 }
 
 export function createNextPredictionPageRequest(page: PredictionPage, requestId: string): PredictionPageRequest {
-  if (page.request.version !== 2 || !isUuid(page.nextCursor) || !isUuid(requestId) ||
+  if ((page.request.version !== 2 && page.request.version !== 3) || !isUuid(page.nextCursor) || !isUuid(requestId) ||
     requestId.toLowerCase() === page.request.requestId) throw new Error('Invalid prediction continuation');
   return Object.freeze({ ...page.request, requestId: requestId.toLowerCase(), cursor: page.nextCursor });
 }
@@ -67,11 +67,14 @@ export function createNextPredictionPageRequest(page: PredictionPage, requestId:
 export type PredictionPageRpc = (name: typeof PREDICTION_PAGE_V1_RPC,
   arguments_: { request: PredictionPageRequest }) => Promise<PredictionRpcResponse>;
 
-export type PredictionAvailability = 'ITEMS' | 'WINDOW_EXHAUSTED' | 'CATALOG_EMPTY';
+export type PredictionAvailability = 'ITEMS' | 'WINDOW_EXHAUSTED' | 'CATALOG_EMPTY' | 'CATALOG_EXHAUSTED';
+export type PredictionContinuationState = 'MORE' | 'CATALOG_EXHAUSTED' | 'READER_LIMIT';
 export interface PredictionPage {
   status: 'success'; request: PredictionPageRequest; ranking: PredictionRanking;
   availability: PredictionAvailability; continuationSupported: boolean; nextCursor: string | null;
   candidateCount: number; sourcePredictionId: string; pageIndex: number; featureAt: string | null;
+  chainId?: string; rootPredictionId?: string; parentPredictionId?: string | null;
+  seenCount?: number; chainLimit?: number; continuationState?: PredictionContinuationState;
 }
 export type PredictionPageResult =
   | PredictionPage
@@ -128,19 +131,20 @@ export function mapPredictionPage(data: unknown, request: PredictionPageRequest)
     data.requestId !== request.requestId || data.profileId !== request.profileId ||
     data.sessionId !== request.sessionId || data.discoveryMode !== request.discoveryMode ||
     data.itemType !== request.itemType || !Array.isArray(data.items) || data.items.length > request.limit ||
-    data.continuationSupported !== (request.version === 2) || !record(data.source)) return pageError();
+    data.continuationSupported !== (request.version >= 2) || !record(data.source)) return pageError();
   const items = data.items;
   const source = data.source;
-  if (source.version !== (request.version === 2 ? 'frozen-page-v1' : 'eligibility-first-v1') || typeof source.candidateCount !== 'number' ||
+  if (source.version !== (request.version === 3 ? 'catalog-chain-v1' : request.version === 2 ? 'frozen-page-v1' : 'eligibility-first-v1') || typeof source.candidateCount !== 'number' ||
     !Number.isInteger(source.candidateCount) || source.candidateCount < data.items.length ||
     source.candidateCount > Math.min(50, request.limit * 3) || source.resultCount !== data.items.length ||
     source.catalogEmpty !== (data.availability === 'CATALOG_EMPTY')) return pageError();
-  if (data.availability !== 'ITEMS' && data.availability !== 'WINDOW_EXHAUSTED' && data.availability !== 'CATALOG_EMPTY') return pageError();
+  if (data.availability !== 'ITEMS' && data.availability !== 'CATALOG_EMPTY' &&
+    data.availability !== (request.version === 3 ? 'CATALOG_EXHAUSTED' : 'WINDOW_EXHAUSTED')) return pageError();
   if ((data.availability === 'ITEMS') !== (data.items.length > 0) ||
     (data.availability === 'CATALOG_EMPTY' && (source.candidateCount !== 0 || request.cursor !== null))) return pageError();
   if (request.version === 1) {
     if (request.cursor !== null || data.nextCursor !== null) return pageError();
-  } else {
+  } else if (request.version === 2) {
     if ((data.nextCursor !== null && (!isUuid(data.nextCursor) || data.nextCursor === request.cursor || items.length === 0)) ||
       !isUuid(source.sourcePredictionId) || typeof source.pageIndex !== 'number' ||
       !Number.isInteger(source.pageIndex) || source.pageIndex < 1 || source.pageIndex > 51 ||
@@ -148,6 +152,23 @@ export function mapPredictionPage(data: unknown, request: PredictionPageRequest)
       (request.cursor === null ? source.pageIndex !== 1 || source.sourcePredictionId !== data.predictionId
         : source.pageIndex < 2 || source.sourcePredictionId === data.predictionId) ||
       (data.nextCursor !== null && source.candidateCount <= items.length)) return pageError();
+  } else {
+    if (!isUuid(source.sourcePredictionId) || source.sourcePredictionId !== data.predictionId ||
+      !isUuid(source.rootPredictionId) || !isUuid(source.chainId) ||
+      typeof source.pageIndex !== 'number' || !Number.isInteger(source.pageIndex) || source.pageIndex < 1 || source.pageIndex > 1001 ||
+      typeof source.featureAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(source.featureAt) || !Number.isFinite(Date.parse(source.featureAt)) ||
+      typeof source.seenCount !== 'number' || !Number.isInteger(source.seenCount) ||
+      source.seenCount < items.length || source.seenCount > 1000 || source.chainLimit !== 1000 ||
+      !['MORE', 'CATALOG_EXHAUSTED', 'READER_LIMIT'].includes(source.continuationState as string) ||
+      (request.cursor === null ? source.pageIndex !== 1 || source.rootPredictionId !== data.predictionId ||
+        source.parentPredictionId !== null || source.seenCount !== items.length
+        : source.pageIndex < 2 || source.rootPredictionId === data.predictionId ||
+        !isUuid(source.parentPredictionId) || source.parentPredictionId === data.predictionId) ||
+      (data.nextCursor !== null && (!isUuid(data.nextCursor) || data.nextCursor === request.cursor || items.length === 0)) ||
+      (source.continuationState === 'MORE') !== (data.nextCursor !== null) ||
+      (source.continuationState === 'MORE' && source.seenCount >= source.chainLimit) ||
+      (source.continuationState === 'READER_LIMIT' && source.seenCount !== source.chainLimit) ||
+      (items.length === 0 && source.continuationState !== 'CATALOG_EXHAUSTED')) return pageError();
   }
 
   let ranking: PredictionRanking;
@@ -162,10 +183,13 @@ export function mapPredictionPage(data: unknown, request: PredictionPageRequest)
     if (mapped.status !== 'success') return pageError();
     ranking = mapped.ranking;
   }
-  return { status: 'success', request, ranking, availability: data.availability,
-    continuationSupported: request.version === 2, nextCursor: data.nextCursor as string | null,
+  return { status: 'success', request, ranking, availability: data.availability as PredictionAvailability,
+    continuationSupported: request.version >= 2, nextCursor: data.nextCursor as string | null,
     candidateCount: source.candidateCount,
-    sourcePredictionId: request.version === 2 ? source.sourcePredictionId as string : data.predictionId,
-    pageIndex: request.version === 2 ? source.pageIndex as number : 1,
-    featureAt: request.version === 2 ? source.featureAt as string : null };
+    sourcePredictionId: request.version >= 2 ? source.sourcePredictionId as string : data.predictionId,
+    pageIndex: request.version >= 2 ? source.pageIndex as number : 1,
+    featureAt: request.version >= 2 ? source.featureAt as string : null,
+    ...(request.version === 3 ? { chainId: source.chainId as string, rootPredictionId: source.rootPredictionId as string,
+      parentPredictionId: source.parentPredictionId as string | null, seenCount: source.seenCount as number,
+      chainLimit: source.chainLimit as number, continuationState: source.continuationState as PredictionContinuationState } : {}) };
 }

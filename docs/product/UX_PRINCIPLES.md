@@ -185,12 +185,16 @@ either recommendations or Shared choices load. Durable mutation recovery remains
 a distinct action; refreshing never discards queued choices. Gesture behavior
 requires the combined real-device acceptance checkpoint.
 
-At the terminal Discovery notice, the owner also requires downward-pull refresh
-without returning to the top (2026-09-30, #199). A pull beginning on that notice
-and its accessible **Päivitä haku** button use the same scoped refresh boundary.
-Normal grid scrolling remains available; repeated gestures coalesce and callbacks
-from a replaced Profile/request cannot refresh the new scope. The notice describes
-the current search, never claims that every catalog Item has been exhausted.
+The 2026-10-06 owner correction supersedes the terminal fresh-search footer:
+Discovery downward pull at the bottom viewport or top and accessible **Näytä
+lisää** extend the current list. Approaching the end also appends through the
+scoped server cursor. Preserve existing order/scroll and per-Item origins;
+coalesce repeated gestures and discard obsolete scope callbacks. Show no more
+eligible books/movies only after server proof; report a reader limit or cursor
+expiry separately. An expired cursor requires explicit **Aloita uusi haku**.
+Selected **Löydä** does not reset the feed. Catalogue-wide append and compact
+header/bottom-space fixes are owner-promoted into the current native packet;
+physical gesture, small-screen and large-text acceptance remains required.
 
 
 Destination-picker panels must keep all action buttons above Android system

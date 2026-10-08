@@ -112,6 +112,38 @@ export function verifyLocalPostgresImage(image, platform = process.platform, arc
   assert.equal(digest, expected, 'Postgres image content changed; review its actual digest before running application SQL');
 }
 
+function sqlProbeSettings({ stage = 'sql', timeoutMs = 120_000 } = {}) {
+  assert.match(stage, /^[a-z][a-z0-9-]{0,79}$/, 'Expected a fixed SQL probe stage label');
+  assert.ok(Number.isSafeInteger(timeoutMs) && timeoutMs >= 1000 && timeoutMs <= 600_000,
+    'SQL probe timeout must be between 1000 and 600000 milliseconds');
+  return { stage, timeoutMs, statementTimeoutMs: timeoutMs - Math.min(5000, Math.floor(timeoutMs / 2)) };
+}
+
+// Each server statement is bounded as well as the whole Docker invocation.
+// These are separate clocks: a late statement can outlive the aggregate client
+// deadline, but cannot run indefinitely if its client disconnects. Explicitly
+// named expensive proofs may opt into a bounded larger budget.
+export async function runIsolatedSqlProbe(docker, container, sql, options) {
+  const { stage, timeoutMs, statementTimeoutMs } = sqlProbeSettings(options);
+  const startedAt = Date.now();
+  console.log(`Checking isolated SQL ${stage} (deadline ${timeoutMs}ms)`);
+  let output;
+  try {
+    output = docker(['exec', '-i', '--env',
+      `PGOPTIONS=-c statement_timeout=${statementTimeoutMs} -c lock_timeout=30000`, container,
+      ...bufferedSqlCommand(['psql', '-X', '-qAt',
+        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql, timeout: timeoutMs });
+  } catch (error) {
+    if (error?.code === 'ETIMEDOUT') {
+      throw new Error(`Isolated SQL ${stage} exceeded Docker deadline ${timeoutMs}ms`, { cause: error });
+    }
+    throw new Error(`Isolated SQL ${stage} failed: ${error.message}`, { cause: error });
+  }
+  const snapshots = output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
+  console.log(`Completed isolated SQL ${stage} (${Date.now() - startedAt}ms)`);
+  return snapshots;
+}
+
 export async function withCiSupabaseStack(projectId, work) {
   assert.equal(process.platform, 'linux', 'This runner requires GitHub Ubuntu');
   assert.equal(process.arch, 'x64', 'This image checkpoint is for Linux x64');
@@ -147,7 +179,15 @@ async function withNewSupabaseStack(projectId, work, destination) {
   function run(command, args, { input, timeout = 120_000 } = {}) {
     const result = spawnSync(command, args, { cwd: directory, env: environment,
       input, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout });
-    if (result.error) throw result.error;
+    if (result.error) {
+      const operation = command === 'docker'
+        ? (args.includes('psql') ? 'sql' : ['inspect', 'ps', 'volume', 'context'].find(name => args.includes(name)) ?? 'operation')
+        : ['start', 'stop', 'reset', 'migration', 'status', 'init'].find(name => args.includes(name)) ?? 'operation';
+      const code = /^[A-Z][A-Z0-9_]{0,39}$/.test(result.error.code ?? '') ? result.error.code : 'PROCESS_ERROR';
+      const error = new Error(`Isolated ${command} ${operation} failed: ${code} (deadline ${timeout}ms)`, { cause: result.error });
+      error.code = code;
+      throw error;
+    }
     if (result.status !== 0) {
       // SQL is repository-owned metadata/probe input. CLI output can contain
       // development keys/connection strings, so is never logged here.
@@ -197,30 +237,34 @@ async function withNewSupabaseStack(projectId, work, destination) {
     console.log(`Image: ${image}`);
     verifyLocalPostgresImage(image);
     const containerId = docker(['inspect', '--format', '{{.Id}}', container]).trim();
-    const execSnapshots = async sql => {
-      const output = docker(['exec', '-i', container, ...bufferedSqlCommand(['psql', '-X', '-qAt',
-        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
-      return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
-    };
+    const execSnapshots = (sql, options) => runIsolatedSqlProbe(docker, container, sql, options);
     // Independent sessions only on the newly owned CLI CI stack. This makes
     // actual row-lock waits observable without connecting to a hosted database.
-    const execConcurrentSql = sql => {
+    const execConcurrentSql = (sql, options) => {
       assert.equal(projectId, 'kajo_ci_cli_install');
+      const { stage, timeoutMs, statementTimeoutMs } = sqlProbeSettings({ stage: 'concurrent-sql', timeoutMs: 30_000, ...options });
       return new Promise((resolveSql, rejectSql) => {
-        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
+        const startedAt = Date.now();
+        console.log(`Checking isolated SQL ${stage} (deadline ${timeoutMs}ms)`);
+        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', '--env',
+          `PGOPTIONS=-c statement_timeout=${statementTimeoutMs} -c lock_timeout=30000`, container,
           ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])],
         { cwd: directory, env: environment, stdio: ['pipe', 'pipe', 'pipe'] });
-        let stdout = '', stderr = '';
-        const timer = setTimeout(() => child.kill('SIGKILL'), 30000);
+        let stdout = '', stderr = '', timedOut = false;
+        const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutMs);
         child.stdout.on('data', data => { stdout += data; if (stdout.length > 16 * 1024 * 1024) child.kill('SIGKILL'); });
         child.stderr.on('data', data => { stderr = (stderr + data).slice(-3000); });
         child.on('error', error => { clearTimeout(timer); rejectSql(error); });
         child.on('close', code => {
           clearTimeout(timer);
-          if (code !== 0) return rejectSql(new Error('Isolated SQL session failed: '
+          if (timedOut) return rejectSql(new Error(`Isolated SQL ${stage} exceeded Docker deadline ${timeoutMs}ms`));
+          if (code !== 0) return rejectSql(new Error(`Isolated SQL ${stage} session failed: `
             + stderr.split('\n').filter(line => /ERROR:/.test(line)).join('\n')));
-          try { resolveSql(stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : []); }
-          catch { rejectSql(new Error('Invalid isolated SQL acknowledgement')); }
+          try {
+            const snapshots = stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : [];
+            console.log(`Completed isolated SQL ${stage} (${Date.now() - startedAt}ms)`);
+            resolveSql(snapshots);
+          } catch { rejectSql(new Error(`Invalid isolated SQL ${stage} acknowledgement`)); }
         });
         child.stdin.on('error', error => { child.kill('SIGKILL'); rejectSql(error); });
         child.stdin.end(sql);
