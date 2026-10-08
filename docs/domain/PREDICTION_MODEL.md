@@ -518,6 +518,30 @@ remain unavailable until that admission is implemented and validated. No new
 Shared scorer, rewatch admission or outcome quality gain is claimed by these
 foundations. STATUS owns the unmerged source/CI/rollout state.
 
+The #232C source implements the frozen outcome-evidence and paired-support
+boundary. An internal capture retains the actual reader result and observation
+time; replay by ID never recomputes a cutoff-only query. A new ID can reconcile
+later evidence or corrections without overwriting an earlier comparison.
+Production and shadow use that identical vector under an explicit existing
+evaluation window, with a single actor-specific support mask and frozen source/
+candidate/version metadata. Missing shadow, mismatched scope/pool/version or
+unsupported own exposure cannot be admitted by borrowing another coordinate.
+Complete support permits paired vector review only; it does not create a scalar
+`GenomEvaluation`, calibrated rating forecast, reward or automatic winner.
+
+Existing rank scores do not supply frozen per-member rating forecasts. A future
+metric must declare its target and exposure/horizon contract before scoring.
+For example, an ordinal target would require distinct Item/experience outcomes,
+each actor's actual exposed ratings from a comparable frozen candidate pool,
+explicit ties and missing support, rather than turning a rank into a rating.
+This packet retains null production/challenger metrics and advantage. Historical
+feature eligibility remains closed until a prospective prediction consumer
+records the capture it actually used; observation time alone cannot repair past
+availability. DATA_EVENTS owns the immutable storage/erasure contract, including
+the inherited old shadow dependency that can block source-account/Profile
+deletion. That deletion boundary must be repaired before outcome admission or
+hosted activation; the new derived cascades alone do not establish full erasure.
+
 One identified round/experience is one observation unit, regardless of member or
 receipt count. Coverage counts are diagnostics, not independent sample sizes.
 The private audit vector retains actor/enrollment identities only inside its

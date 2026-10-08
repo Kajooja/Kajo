@@ -14,6 +14,46 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Frozen observed Shared outcomes — 2026-10-08 / #232C
+
+The owner's continuation starts from exact #308 source
+`70891b757dca5d01d245b9fbaf4f6cd6e0e73288`. All five #616 gates pass, including
+independent-session commit visibility; its backend APK is deliberately skipped.
+Separate #306/#614 also completes its labelled APK. These remain source results,
+not main/hosted/device acceptance. The prior dated entries are preserved below.
+
+The additive capture freezes the outcome JSON actually observed, selected
+receipt/revision, cutoffs/maturity/versions and server observation time. Exact
+ID retries replay stored JSON; new commits/exposure/corrections need new IDs.
+An immutable receipt foreign key supports independent capture before a newer
+response commits and cascades successful source erasure into comparisons.
+The paired-support artifact freezes the same vector and common actor-specific
+support mask for production/shadow under an explicit evaluation window and
+strict matching frozen candidate metadata. Missing support remains diagnostic;
+metrics/advantage/group reward and learning remain unavailable.
+
+Final migration hash is
+`d018d6d5901e690991e7b3bd35b5f000d8ceec79739c51cf17abbb7a1a5a793e`.
+The full database sweep passes **89/89** and the final focused recheck adds
+explicit REPEATABLE READ/SERIALIZABLE allocation rejection with preserved exact
+retry/replay. Independent review finds no source blocker. Lint/types and all
+locally available suites plus four production Hermes exports pass; root check
+stops at Deno registry Connection refused. Native execution remains required CI.
+Native CLI proof must complete an older-prefix capture while the final response
+is still uncommitted, then show unchanged stored replay and an advancing new
+capture. Populated/rollback matrices preserve every old object/row/ACL and prove
+retry, correction, zero/unknown/N-member support, quotas and derived erasure.
+
+Review identifies an inherited blocker: processed SleepLayer shadow artifacts
+can prevent source User/Profile deletion through old foreign keys and immutable
+DELETE triggers. The new packet tests and records the rollback boundary rather
+than claiming full erasure. The next bounded source repairs that old dependency
+with authorized deletion, retained ordinary immutability and populated/native
+scope/rollback proof before any joint metric admission or hosted activation.
+The subsequent target/metric must use real exposed outcomes and these frozen
+vectors. Historical feature availability, #306 integration, Phase 16.3 UI and
+MVP acceptance stay separate and open; no external-data operation is repeated.
+
 ## Receipt-prefix Shared round outcomes — 2026-10-08 / #232B
 
 The owner asks to continue. All five #307 / CI #615 gates pass, including native

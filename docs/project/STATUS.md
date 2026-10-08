@@ -10,7 +10,99 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232 versioned Shared round outcome reader
+## Current packet — #232 frozen observed outcomes and paired support
+
+### Visible capture boundary — 2026-10-08
+
+Continue on `feat/232-shared-vector-captures`, stacked on
+[PR #308](https://github.com/Kajooja/Kajo/pull/308), exact source
+`70891b757dca5d01d245b9fbaf4f6cd6e0e73288`, tree
+`447242c38d959bc0a17b68441c50d0b1d191c24e`. Fresh finite inspection for the
+owner's **“jatka siis eteenpäin”** confirms all five required
+[CI #616](https://github.com/Kajooja/Kajo/actions/runs/37787587079) gates passed,
+including actual independent-session visibility; its unrequested backend APK
+is intentionally skipped. Separate #306 / [CI #614](https://github.com/Kajooja/Kajo/actions/runs/37779579804)
+now passes all five gates and APK. Artifact `11553533078`, source
+`d14c705d33ff633f86d3bc133dd9b701b6f210cd`, archive digest
+`sha256:9054d5b3111b36b9831cccf6f473d43d39dab97ad6b5760dcb48e80aedb24027`,
+is available until October 15; it is not installed-device evidence. No progress
+polling, main merge or hosted deployment follows from these source results.
+
+`20261008175254_shared_round_outcome_captures.sql` adds private immutable observed
+outcome captures and paired vector-support artifacts. An owner-only capture
+generates its payload from the actual visible reader result, freezing its
+selected receipt/revision, cutoffs/maturity/versions and observation time.
+Exact ID retries return the first stored JSON. A later commit, late impression
+or correction needs a new capture; replay never reruns cutoff timestamps.
+Its selected immutable-receipt foreign key allows capture to complete while a
+newer response holds the mutable round/Profile, and inherits successful source
+lineage erasure. Allocation caps do not prevent underlying response corrections.
+
+Comparison freezes an explicit evaluation window and Challenger against the
+same capture and common per-actor support mask. It checks the prediction/input/
+outcome horizon, own exposure and exact frozen production/shadow candidate pool,
+scope and versions. Missing or incompatible support is retained explicitly.
+One round/experience remains one observation unit. Existing scores have no
+calibrated per-member rating head: metrics/advantage/group reward stay null,
+`learnable=false` and `historicalFeatureEligible=false`. These are internal
+outcome-evidence artifacts, not legacy scalar evaluations or an automatic winner.
+DATA_EVENTS/PREDICTION_MODEL own the exact contract and admission limits.
+
+Final migration SHA-256:
+`d018d6d5901e690991e7b3bd35b5f000d8ceec79739c51cf17abbb7a1a5a793e`.
+The complete fresh database sweep passes **89/89**, without failures/skips;
+the final focused recheck passes populated preservation, immutable vector/
+comparison replay, late real shadow arrival, same-count rank mismatch, quotas,
+closed API access, correction/reconfirmation/zero/unknown coverage and whole
+rollback on inherited erasure failure. Independent committed-fixture tests
+prove REPEATABLE READ/SERIALIZABLE allocation fails with `25001`, while exact
+existing-ID retry and stored replay remain unchanged. Independent review finds
+no source blocker. Root lint/types, 43 dependency tests, 478 mobile tests and
+444 catalog tests pass; Deno registry `Connection refused` prevents a complete
+root-check pass. Engine/research/acceptance and all four production Hermes
+exports pass separately. The old #232A/B and deployed catalog-chain hashes and
+root lockfile remain exact. Required CI
+retains every old gate and adds populated preservation, rollback matrices and
+independent-session capture/replay proof. No local native execution, hosted
+advisors, rollout or APK request is claimed for this backend packet.
+
+**Next bounded action:** retrieve the scoped source PR's run link once when
+publishing, without progress polling. On the next continuation verify its
+required gates from the current #229 handoff and resolve actual failures.
+Then repair the inherited SleepLayer source-erasure boundary before
+joint metric admission or hosted activation: processed shadow runs retain
+non-cascading production/Profile/User dependencies and DELETE-denying triggers,
+so an attempted source deletion can fail and roll back the new cascades too.
+Retain normal artifact immutability and provide a closed transaction-scoped
+eraser for exact source/shadow/candidate IDs, using an API-denied permission
+relation rather than a caller-settable bypass or disabled trigger. Remove
+dependent shadow candidates/jobs and affected evaluation lineage; account for
+GLOBAL/shrunk PROFILE metrics in intersecting windows and explicitly invalidate
+affected policy influence through the append-only decision contract or a
+fail-closed prerequisite. Preserve genomes and unrelated windows/source scopes.
+Synchronize worker/evaluator/manual-canary races in a declared lock order so
+they cannot recreate stale evidence after erasure. Independent PredictionRun
+purge also needs explicit cleanup of copied #232C comparison traces: their
+receipt cascade handles round lineage, not a standalone run purge.
+Prove the closed owner entrypoint's source-actor/Profile deletion, unaffected-scope
+preservation, atomic rejection of still-restricted Item deletion and
+rollback in populated/native tests. #232C explicitly tests this inherited
+failure and successful former-non-source-participant/round lineage deletion;
+it does not claim full account erasure is already fixed.
+Automatic Auth deletion and arbitrary Item hard erasure need their own explicit
+integration/dependency closure; a successful internal source eraser alone does
+not establish those paths or complete learned-influence erasure.
+
+After that prerequisite, declare the Shared prediction target and exposed-outcome
+metric against these frozen vectors, including horizon, ties/zero/missing support,
+correction reconciliation and uncertainty at the round/experience level. Do not
+convert diagnostic readiness or raw ranks into a scalar reward/rating forecast.
+Keep historical feature admission closed until a prospective consumer records
+the capture it actually used. #306 integration/guarded rollout, Phase 16.3 mobile
+activation and #229's open device gates remain separate; preserve both CLI probe
+sets and the consumed #182 ledger. Accepted E1/D1/D2 work needs no repeat.
+
+## Preserved #232B versioned Shared round outcome reader
 
 ### Receipt-prefix interpretation — 2026-10-08
 

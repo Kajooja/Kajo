@@ -71,6 +71,21 @@ same acceptance-time cutoffs after commit. The required CLI gate includes these
 probes; they do not assert that acceptance timestamps reconstruct commit history.
 DATA_EVENTS owns the interpretation; STATUS owns publication and rollout state.
 
+## Observed Shared outcome captures — #232C, active source only
+
+The additive `shared_round_outcome_captures` migration stores owner-only immutable
+captures and paired vector-support comparisons. Capture replay uses stored JSON
+and a selected-receipt cascade, including former-participant erasure; it does not
+rerun acceptance timestamps. Comparison freezes the evaluation window and both
+production/shadow sides on a common actor-specific support mask. The new
+`shared-round-outcome-captures.mjs` helper, SQL matrix/full-schema test and
+`shared-round-outcome-captures-concurrency.mjs` native helper verify populated
+preservation, retry/correction/coverage,
+strict frozen-pool compatibility and independent capture before a late commit.
+The existing required CLI gate includes these probes. DATA_EVENTS and
+PREDICTION_MODEL retain unavailable scalar metrics and historical feature
+admission; STATUS owns the exact migration name/hash and source/CI/rollout state.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit
