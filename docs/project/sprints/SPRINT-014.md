@@ -14,6 +14,42 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Receipt-prefix Shared round outcomes — 2026-10-08 / #232B
+
+The owner asks to continue. All five #307 / CI #615 gates pass, including native
+round races and the populated rehearsal; its unrequested backend APK is skipped
+intentionally. Separate #306 / CI #614 also passes all five gates, with its
+labelled APK still in progress at the one-time inspection. Those are source
+checks, not main/hosted/device acceptance.
+
+The next bounded source implements `shared-round-outcome-v1` over immutable
+command prefixes. Participant sets and individual 0–10/unknown/cleared/missing
+responses survive cutoff replay, corrections, cancellation and reconfirmation.
+Maturity is a declared elapsed window; late exposure remains per response and
+cannot borrow another actor's trace. Minimum/spread and coverage are descriptive;
+one round is one observation unit. No scalar reward, group satisfaction or
+learning activation follows from completion.
+
+Historical membership between commands and actual commit visibility are unknown.
+The reader explicitly withholds historical feature eligibility. An independent
+native reader/holder proof must demonstrate that the same acceptance-time cutoff
+can gain a receipt after commit, rather than falsely claim frozen replay from a
+timestamp. Populated upgrades preserve all existing rows/functions/ACLs/receipts;
+new matrices verify temporal and privacy boundaries without altering old readers.
+STATUS owns final source hashes, validation, publication and the exact next
+visible-prefix/evaluation-admission packet. Phase 16.3 UI and MVP gates stay open;
+no hosted deployment, history reset, external-data operation or model promotion
+is part of this packet.
+
+Final source SHA-256 is
+`2fbab2b59e796138d18895b2fe8c1213ff2c7e9cfa8df57bb8af79e85ca3a85f`.
+The complete final database sweep passes **88/88**, and independent review finds
+no blocker. Lint/types and all locally available dependency/mobile/catalog/
+engine/research/acceptance suites plus four production Hermes exports pass.
+Root check stops at Deno registry Connection refused; Docker/native visibility
+execution remains required CI evidence. No complete local root/native pass or
+hosted application is claimed.
+
 ## Working APK and Shared evidence continuation — 2026-10-08 / #232
 
 CI #612 passed all five required gates and APK on #305 source `36a788d`,

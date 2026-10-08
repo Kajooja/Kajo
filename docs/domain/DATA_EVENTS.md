@@ -300,9 +300,66 @@ generation bookkeeping are API-denied and RLS-enabled. This source writes no
 native Event, legacy Item interaction, existing action receipt or joint reward.
 The explicit `groupReward=null`, `learnable=false` output keeps these new records
 out of the legacy scalar learning loop. The old single-actor Shared evidence
-reader remains legacy; a versioned joint outcome reader, as-of reconciliation,
-rewatch eligibility, durable mobile commands and Phase 16.3 activation are still
+reader remains legacy. The source-only receipt-prefix reader below adds temporal
+interpretation without admission into those consumers. Joint learning admission,
+rewatch eligibility, durable mobile commands and Phase 16.3 activation remain
 required. STATUS records source verification and deployment separately.
+
+### Versioned receipt-prefix outcomes — #232B, source only
+
+`private.shared_rating_round_outcome_v1` reads one SharedProfile/round and returns
+`shared-round-outcome-v1`. It is an internal invoker function with an empty search
+path; PUBLIC, anon, authenticated and service_role cannot execute it directly.
+No public RPC, Event, history entry, scalar reward or existing reader is changed.
+
+The caller supplies finite past/present `outcome_cutoff`, `evidence_cutoff` and
+an explicit nonnegative maturity interval of at most 90 days, without calendar
+months/years. Commands must belong to the receipt prefix accepted by both cutoffs.
+Revision orders that prefix, including timestamp ties; a later revision cannot
+skip an earlier cutoff-invisible receipt when the server clock regresses. Before
+the OPEN receipt, or after lineage deletion, there is no round projection.
+
+`outcome_cutoff` is a server-command timeline point. A correction after it remains
+outside that historical prefix even when `evidence_cutoff` is later. Advancing the
+outcome cutoff exposes the correction; an old vector is not a claim about current
+truth. Reconfirmation retains only responses for its newly acknowledged set.
+The maturity anchor is the latest accepted time in the selected prefix, including
+a rating edit that leaves the round completed; clock regression cannot move that
+anchor backwards. Elapsed time is a caller-declared review
+window, not evidence of satisfaction, calibration or immunity to later correction.
+
+Each response retains its immutable recorded origin. A separate derived
+attribution can reconcile a late actual impression only for that response's own
+actor, SharedProfile, Item, selected run, session and mode. The run/impression
+must precede the response in occurrence time and the stored Event creation
+timestamp must be at or before the evidence cutoff. This inherited timestamp
+convention is labelled `proofAvailabilityBasis=STORED_EVENT_CREATED_AT`;
+`proofAvailableAt` does not establish trusted server arrival or commit visibility.
+The existing Event insert boundary permits the recorded column, so a future
+availability/admission ledger must capture its own server observation time.
+A claim or another member's exposure is insufficient.
+Neither response nor receipt is rewritten; advancing the evidence cutoff can
+change only derived attribution.
+
+The output declares `COMMAND_RECEIPT_PREFIX`, `SERVER_COMMAND_ACCEPTED_AT` and
+`historicalFeatureEligible=false`. These records contain no full membership
+timeline or commit-visibility history; timestamps cannot prove a past transaction
+was already visible. Current membership/head/catalog tables do not replace that
+missing evidence. A future prediction-time consumer needs a genuinely captured
+visible prefix or a separately admitted availability ledger.
+In particular, a command accepted before a cutoff can commit after the original
+read: rereading the same cutoffs may then include it. These arguments alone are
+not a frozen replay token. Retain the selected command/revision and actual
+observation boundary when a future consumer freezes a result.
+
+Coverage distinguishes rated, unknown, cleared and unanswered participants and
+attributed responses. Complete vectors preserve zero and disagreement; minimum
+rating and rating spread are descriptive summaries, never a joint reward.
+`READY_FOR_VECTOR_REVIEW` requires all ratings and the declared elapsed interval;
+other results distinguish incomplete, immature and cancelled evidence.
+`groupReward=null` and `learnable=false` remain explicit. The next learning
+consumer must freeze interpretation/cutoffs/window, correction lineage and the
+same observable vectors for production and shadow before admitting a label.
 
 ## 11. Reliability contract
 

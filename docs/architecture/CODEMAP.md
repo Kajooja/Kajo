@@ -55,6 +55,22 @@ corrected/cancelled evidence, access/origin/replay and populated preservation.
 The required CLI installation gate includes these probes. STATUS distinguishes
 source verification, CI and any future hosted rollout.
 
+## Shared round receipt-prefix outcomes — #232B, active source only
+
+`20261008132733_shared_round_outcomes.sql` adds the owner-only invoker
+`private.shared_rating_round_outcome_v1` and a receipt-prefix lookup index.
+It reads bounded immutable round acknowledgements with explicit command/evidence
+cutoffs, response-specific attribution and a caller-declared maturity interval.
+It reports vector readiness/coverage without a scalar reward or historical
+feature eligibility; no V1 ranker, Memory, Scenario or evaluator body is changed.
+`shared-round-outcomes.mjs`, its SQL fixture/matrix and full-schema test cover
+cutoff/correction/reconfirmation, legacy/privacy separation and populated
+preservation. `shared-round-outcomes-visibility.mjs` uses independent native
+sessions to prove an uncommitted receipt is hidden, then may appear under the
+same acceptance-time cutoffs after commit. The required CLI gate includes these
+probes; they do not assert that acceptance timestamps reconstruct commit history.
+DATA_EVENTS owns the interpretation; STATUS owns publication and rollout state.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit

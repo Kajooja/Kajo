@@ -498,10 +498,33 @@ answers. Corrections and cancellation retain immutable response/command history.
 `groupReward=null` and `learnable=false` are deliberate admission results, not
 missing ratings to replace with zero or a member average. The legacy V1
 Memory/Scenario/evaluation readers are unchanged and do not receive these new
-round records. A versioned joint outcome reader must establish as-of participant,
-correction, maturity and per-response delivery semantics before any joint label
-enters learning. No new Shared scorer, rewatch admission or outcome quality gain
-is claimed by this foundation. STATUS owns the unmerged source/CI/rollout state.
+round records. The #232B source reader now supplies a versioned receipt-prefix
+vector, correction/reconfirmation boundaries, caller-declared maturity and
+per-response delivery reconciliation. DATA_EVENTS owns that exact contract.
+It preserves individual ratings, including zero, with descriptive minimum/spread
+and coverage; it defines no average or scalar joint reward.
+
+`READY_FOR_VECTOR_REVIEW` is a diagnostic outcome result, not a learned label.
+The acknowledged participant set is known at its command; intervening historical
+membership and transaction commit visibility remain unknown. Its explicit
+`historicalFeatureEligible=false` prevents accepted-at timestamps from being used
+as proof of a past prediction input. An outcome vector observed later may be used
+only under a separately frozen evaluation/admission contract. That contract must
+declare the horizon and maturity window, reconcile later corrections without
+overwriting frozen evaluations, compare production/shadow on identical supported
+vectors and report missing/unknown/unattributed coverage. Per-actor exposure never
+credits the entire group or an unexposed challenger. Group reward and learning
+remain unavailable until that admission is implemented and validated. No new
+Shared scorer, rewatch admission or outcome quality gain is claimed by these
+foundations. STATUS owns the unmerged source/CI/rollout state.
+
+One identified round/experience is one observation unit, regardless of member or
+receipt count. Coverage counts are diagnostics, not independent sample sizes.
+The private audit vector retains actor/enrollment identities only inside its
+authorized server boundary. A future portable adapter or aggregate report must
+use scoped member references and declared privacy rules; it must not export this
+raw vector or place it in candidate explanations. Unattributed completed ratings
+can describe an experience without establishing credit for a prediction.
 
 ## 11. Cold start and external history
 
