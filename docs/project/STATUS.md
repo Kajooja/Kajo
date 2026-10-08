@@ -10,7 +10,63 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232 closed prediction-source erasure
+## Current packet — #232 isolated CI startup lifecycle
+
+### Repeated startup failure — 2026-10-08
+
+Continue on `fix/232-ci-startup-lifecycle`, stacked on
+[PR #310](https://github.com/Kajooja/Kajo/pull/310), exact parent source
+`02d45088c1e5c26e21bc3f1038fd247861e340bf`, tree
+`89761f1949608a42adeca82f826eefde838797b5`. A finite completed inspection of
+[CI #618](https://github.com/Kajooja/Kajo/actions/runs/37831362324) confirms
+validate, native platform/defaults, populated upgrade and CLI history/runtime
+passed. In particular, the actual independent PostgreSQL worker/eraser proof
+passed in both lock orders. The two-clean-installations gate failed in its first
+Supabase startup before application SQL, again reporting mixed image-download/
+port-binding symptoms. The backend APK is intentionally skipped. #310 has not
+passed all required gates and remains unmerged/unhosted.
+
+The isolated stack helper now separates ambient output symptoms from exact
+fatal templates in pinned CLI 2.117.0. It emits fixed terminal/process labels,
+bounded owned-container status/health/ports and resource counts, withholding raw
+CLI output, credentials, Docker environment and health logs. The pinned CLI
+already retries image pulls and registry fallback; earlier pull warnings can
+remain after recovery. Mixed whole-log symptoms therefore do not establish the
+terminal cause. No outer startup retry, port relocation or image/CLI change is
+introduced; the startup deadline and single application SQL attempts remain.
+
+Preflight and cleanup use the resources selected by the exact project label,
+with canonical-name fallback. A pre-existing project is rejected before startup
+or cleanup. Failed startup/work preserves its primary error together with any
+cleanup errors, attempts bounded owned-stack cleanup and removes its owned
+workspace even when stop fails. Cleanup success requires verified absence of
+owned containers, volumes and networks. Successful retained local development
+stacks keep their previous behavior. The complete database sweep passes **97/97**
+without failures/skips, including the final frozen helper. Startup/readiness
+focused tests pass **24/24**, plus a final **2/2** assertion recheck. Independent
+review matches the final file hashes and finds no blocker. Lint/types, dependency,
+mobile/catalog, engine 44/ESM, research 19 Python + 13 Node, acceptance 6 + 5
+and all four production Hermes exports pass. Root check reaches Deno dependency
+retrieval; complete local root-check acceptance is not claimed. These process
+fixtures verify failure reporting, cleanup and secret withholding; actual native
+runner acceptance remains required CI. The recurrent startup cause is still
+unconfirmed; this fixes lifecycle handling and diagnosis, not a proven port/image
+root cause. All migration and lockfile hashes remain unchanged.
+
+**Next bounded action:** publish this narrow harness repair and retrieve its run
+link once. In the separate stacked metric packet, implement a portable exposed-
+outcome ordinal target and strict Kajo frozen-artifact adapter. Two complete
+Shared experiences with the same enrollment vector must use both Items from
+one explicitly selected frozen production/shadow pool, with the anchor before
+both OPEN receipt boundaries. Preserve zero, ties, disagreement, missing support,
+correction identities and round/experience observation units. Anchor-time
+membership is not frozen by current traces, so the result remains a retrospective
+diagnostic with learning/historical feature admission closed. No calibrated
+member-rating head, invented accuracy, joint average reward or automatic
+promotion follows from this source. Keep native installation acceptance,
+account lifecycle integration, #306, Phase 16.3 and #229 device gates separate.
+
+## Preserved #232D closed prediction-source erasure
 
 ### Owner preparation boundary — 2026-10-08
 
