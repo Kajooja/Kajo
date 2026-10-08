@@ -26,6 +26,8 @@ import { sharedRatingRoundsSmokeSql, sharedRatingRoundsUpgradeSql } from './shar
 import { verifySharedRatingRoundsConcurrency } from './shared-rating-rounds-concurrency.mjs';
 import { sharedRoundOutcomesSmokeSql, sharedRoundOutcomesUpgradeSql } from './shared-round-outcomes.mjs';
 import { verifySharedRoundOutcomesVisibility } from './shared-round-outcomes-visibility.mjs';
+import { sharedRoundOutcomeCapturesSmokeSql, sharedRoundOutcomeCapturesUpgradeSql } from './shared-round-outcome-captures.mjs';
+import { verifySharedRoundOutcomeCapturesConcurrency } from './shared-round-outcome-captures-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -145,6 +147,12 @@ try {
     const [sharedRoundOutcomesUpgrade] = await exec(await sharedRoundOutcomesUpgradeSql(files[outcomesIndex]),
       { stage: 'shared-round-outcomes-populated-upgrade', timeoutMs: 120_000 });
     assert.match(sharedRoundOutcomesUpgrade?.sharedRoundOutcomesUpgrade, /^PASS: every existing row/);
+    const capturesIndex = files.findIndex(file => file.name.endsWith('_shared_round_outcome_captures.sql'));
+    assert.ok(capturesIndex > outcomesIndex);
+    await resetFromMigrations(files.slice(0, capturesIndex));
+    const [sharedRoundOutcomeCapturesUpgrade] = await exec(await sharedRoundOutcomeCapturesUpgradeSql(files[capturesIndex]),
+      { stage: 'shared-round-outcome-captures-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(sharedRoundOutcomeCapturesUpgrade?.sharedRoundOutcomeCapturesUpgrade, /^PASS: every populated row/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -164,6 +172,7 @@ try {
     const catalogChainConcurrency = await verifyCatalogPredictionChainConcurrency(execConcurrentSql);
     const sharedRatingRoundsConcurrency = await verifySharedRatingRoundsConcurrency(execConcurrentSql);
     const sharedRoundOutcomesVisibility = await verifySharedRoundOutcomesVisibility(execConcurrentSql);
+    const sharedRoundOutcomeCapturesConcurrency = await verifySharedRoundOutcomeCapturesConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -205,6 +214,9 @@ try {
     const [sharedRoundOutcomes] = await exec(await sharedRoundOutcomesSmokeSql(),
       { stage: 'shared-round-outcomes-cutoff-maturity-attribution', timeoutMs: 120_000 });
     assert.match(sharedRoundOutcomes?.sharedRoundOutcomes, /^PASS:/);
+    const [sharedRoundOutcomeCaptures] = await exec(await sharedRoundOutcomeCapturesSmokeSql(),
+      { stage: 'shared-round-outcome-captures-replay-support-privacy', timeoutMs: 120_000 });
+    assert.match(sharedRoundOutcomeCaptures?.sharedRoundOutcomeCaptures, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -240,6 +252,7 @@ try {
       catalogChainProvenance,
       sharedRatingRounds, sharedRatingRoundsUpgrade, sharedRatingRoundsConcurrency,
       sharedRoundOutcomes, sharedRoundOutcomesUpgrade, sharedRoundOutcomesVisibility,
+      sharedRoundOutcomeCaptures, sharedRoundOutcomeCapturesUpgrade, sharedRoundOutcomeCapturesConcurrency,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

@@ -361,6 +361,16 @@ response vector can be reviewed as observed outcome evidence; that is separate
 from an admitted joint reward, current membership confirmation or predictor
 success. DATA_EVENTS owns cutoffs and attribution; PREDICTION_MODEL owns admission.
 
+The #232C source adds `SharedRoundOutcomeCapture`: the exact vector an internal
+consumer actually observed, with its receipt identity, interpretation/cutoffs,
+maturity, versions and observation time. Its replay remains fixed after a late
+commit or correction; a new capture represents the new interpretation. A paired
+production/shadow support artifact references the same capture and declared
+evaluation window, retaining each actor's own attribution and unsupported
+coordinates. Neither artifact defines a group reward or an independent sample
+per member. Erasing the retained receipt lineage erases these derived artifacts.
+Observation after a prediction does not establish historical feature availability.
+
 Member-seen Items remain eligible for a strong, truthfully explained joint fit.
 Previously joint-consumed Items may reappear only through a versioned, bounded
 rewatch policy. Existing history stays intact. Exact eligibility, cooldown and

@@ -361,6 +361,72 @@ other results distinguish incomplete, immature and cancelled evidence.
 consumer must freeze interpretation/cutoffs/window, correction lineage and the
 same observable vectors for production and shadow before admitting a label.
 
+### Observed outcome captures and paired support — #232C, source only
+
+`private.capture_shared_rating_round_outcome_v1` creates an internal
+`shared-round-capture-v1` artifact from the reader's actual statement-visible
+result. The caller supplies a capture ID and the reader arguments, never a
+rating vector. The artifact freezes the complete outcome JSON, selected receipt,
+revision/participant-set identity, cutoffs, elapsed maturity and interpreter
+versions, a content checksum and server observation time after the read.
+Retrying the same ID/arguments returns the original artifact; changed arguments
+under that ID fail. Replay reads stored JSON rather than rerunning timestamps.
+Later commits, late exposure, edits, cancellation or reconfirmation require a
+new capture ID and retain the earlier interpretation as a separate version.
+
+The capture references its selected immutable receipt with cascading deletion.
+It does not lock a mutable round/Profile through a direct parent foreign key;
+this permits an independent consumer to finish capturing an older committed
+prefix while a newer response transaction remains open. The existing receipt
+lineage carries round/Profile/Item and former-participant erasure into captures
+and their comparisons. Captures and comparisons are immutable, RLS-enabled and
+API-denied; only the internal owner can execute these invoker functions.
+Allocation is bounded to 16 captures per round and 16 comparisons per capture;
+exact retries remain possible at capacity. These are derived-artifact limits,
+not limits on correcting the underlying response.
+New allocation requires READ COMMITTED isolation so a waiter sees earlier
+committed allocations after its advisory lock. REPEATABLE READ/SERIALIZABLE
+allocation fails closed; stored replay and exact existing-ID retries still work
+under those isolation levels.
+
+This new-lineage cascade is conditional on successful source erasure. The older
+SleepLayer shadow tables retain non-cascading source/Profile/User foreign keys
+and DELETE-denying triggers. A processed shadow can therefore block the source
+actor/Profile deletion; that failed transaction also rolls back derived erasure.
+The #232C tests preserve this inherited failure explicitly and prove new-lineage
+erasure for a former participant without those old shadow dependencies. Repair
+of the older shadow deletion boundary is the next separate source prerequisite,
+not an accepted privacy behavior or evidence of full account erasure.
+Independently purging a PredictionRun is a different boundary: these comparisons
+retain copied trace metadata and have no run foreign key. Stored replay survives
+such a purge; a new comparison reports unavailable source support. The source
+eraser must explicitly include copied comparison lineage when deleting traces
+for privacy, rather than assume its receipt foreign key covers that operation.
+
+`private.compare_shared_round_outcome_capture_v1` freezes one capture, one
+Challenger genome and one existing evaluation window. It checks the declared
+prediction interval, input/outcome cutoffs and maturity. For each response it
+requires that actor's own Shared run, selected/exposed Item and compatible frozen
+shadow run/candidate pool. Both sides retain the same capture/vector and common
+support mask. Partial support is reported rather than filling missing ratings
+or crediting another actor's trace. A fully supported, ready vector is a paired
+review artifact, not a scalar evaluation result. Window and run/candidate/version
+metadata are retained so later mutable state cannot redefine the comparison.
+Candidate snapshots retain frozen IDs, ranks/scores/selection and explanation
+checksums after validation of the bounded full pool; this is a paired support
+artifact, not a new full-feature replay engine. Capture/result sizes and
+candidate enumeration are bounded as well as artifact counts.
+
+The artifact use is `OUTCOME_EVIDENCE_ONLY`. `observedAt` establishes what the
+consumer read, not a receipt's commit time, Event arrival time or availability
+to an earlier PredictionRun. `historicalFeatureEligible=false`, null production/
+challenger metrics, advantage and group reward, and `learnable=false` remain
+explicit. No legacy `genome_evaluations` row, Event, Memory or policy promotion
+is produced. One round/experience remains one observation unit across member
+coordinates and multiple captures. A prospective feature consumer must freeze
+the capture reference it actually used; a separately declared joint target and
+exposed-outcome metric are still required before learning admission.
+
 ## 11. Reliability contract
 
 A meaningful explicit recommendation action must atomically/idempotently update its canonical current-state projection and append corresponding evidence through one authorized boundary.
