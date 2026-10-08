@@ -97,6 +97,115 @@ export function classifySupabaseStartFailure(output) {
   return signals.length ? signals : ['unclassified'];
 }
 
+const stackServices = new Set(['db', 'auth', 'realtime', 'storage', 'storage_api', 'rest', 'kong',
+  'inbucket', 'mailpit', 'studio', 'meta', 'edge_runtime', 'imgproxy', 'analytics', 'vector', 'pooler']);
+const ownedResource = (name, projectId) => name.startsWith('supabase_') && name.endsWith(`_${projectId}`);
+const processCodes = new Set(['ETIMEDOUT', 'ENOENT', 'EACCES', 'EPERM', 'EIO', 'EAGAIN', 'ENOMEM', 'ENOBUFS',
+  'EMFILE', 'ENFILE', 'EPIPE', 'ECONNREFUSED', 'ECONNRESET', 'E2BIG', 'EBADF', 'EINVAL']);
+const processCode = code => processCodes.has(code) ? code : 'PROCESS_ERROR';
+const exitCode = status => Number.isInteger(status) && status >= 0 && status <= 255 ? status : null;
+const processDiagnostic = (result, timeout) => ({
+  processCode: result.error ? processCode(result.error.code) : null,
+  exitCode: exitCode(result.status), deadlineMs: timeout,
+});
+
+// These are output observations, including potentially nonfatal pull warnings.
+// No label authorizes retry, port relocation or an unverified image change.
+function startFailureDiagnostic(result, timeout) {
+  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+  // Exact pinned CLI 2.117.0 fatal templates, distinct from earlier pull attempts:
+  // apps/cli/src/command-internal/legacy-docker-image-resolve.ts and
+  // apps/cli/src/command-internal/db-bootstrap/container-lifecycle.ts.
+  const terminalFailures = [
+    ...output.matchAll(/failed to pull docker image from all registries:[^\r\n]*/g),
+    ...output.matchAll(/failed to start docker container "[^"\r\n]+"(?::[^\r\n]*)?(?=\r?\n|$)/g),
+  ].map(match => ({ stage: match[0].startsWith('failed to pull') ? 'image-pull' : 'container-start',
+    condition: match[0].startsWith('failed to pull') ? 'all-registries-failed'
+      : /Bind for (.*) failed: port is already allocated/.test(match[0]) ? 'port-conflict' : 'unspecified' })).slice(0, 16);
+  return { cliVersion, attemptCount: 1, deadlineMs: timeout,
+    exitCode: Number.isInteger(result.status) ? result.status : null,
+    processCode: result.error ? processCode(result.error.code) : null,
+    signal: /^SIG[A-Z]{1,12}$/.test(result.signal ?? '') ? result.signal : null,
+    outputSignals: classifySupabaseStartFailure(output), terminalFailures,
+    terminalStatus: terminalFailures.length === 1 ? 'SINGLE' : terminalFailures.length ? 'MULTIPLE' : 'UNCLASSIFIED',
+    cause: 'UNCONFIRMED', recovery: 'NOT_RETRIED' };
+}
+
+// Inspect only resources of the newly owned project, before cleanup removes
+// useful state. Never copy Docker Env, raw State.Error, health logs or CLI output.
+export function inspectOwnedSupabaseStack(projectId, docker, { details = true, inventoryTimeoutMs = 5000 } = {}) {
+  assert.match(projectId, /^kajo_(?:ci_[a-z_]+|local_[a-f0-9]{12})$/);
+  assert.ok([5000, 30_000].includes(inventoryTimeoutMs), 'Expected a reviewed Docker inventory deadline');
+  const inspectionFailures = [];
+  const inspectionDiagnostics = [];
+  const failed = (stage, error, deadlineMs) => {
+    const diagnostic = error?.processDiagnostic;
+    inspectionDiagnostics.push({ stage,
+      processCode: diagnostic?.processCode === null ? null : processCode(diagnostic?.processCode ?? error?.code),
+      exitCode: exitCode(diagnostic?.exitCode), deadlineMs });
+  };
+  const list = (kind, args) => {
+    let stage = `${kind}-name-list`;
+    try {
+      const named = docker(args, { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/)
+        .filter(name => ownedResource(name, projectId));
+      // Pinned CLI stop selects by this label, including differently named
+      // resources. Mirror that ownership boundary before startup and after stop.
+      stage = `${kind}-label-list`;
+      const labelled = docker([...args, '--filter', `label=com.supabase.cli.project=${projectId}`],
+        { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/).filter(Boolean);
+      return [...new Set([...named, ...labelled])];
+    } catch (error) { inspectionFailures.push(`${kind}-list`); failed(stage, error, inventoryTimeoutMs); return null; }
+  };
+  const names = list('container', ['ps', '-a', '--format', '{{.Names}}']);
+  const volumes = list('volume', ['volume', 'ls', '--format', '{{.Name}}']);
+  const networks = list('network', ['network', 'ls', '--format', '{{.Name}}']);
+  const containers = [];
+  if (details) for (const name of (names ?? []).slice(0, 24)) {
+    const label = name.slice('supabase_'.length, -`_${projectId}`.length);
+    const service = stackServices.has(label) ? label : 'unknown';
+    try {
+      const state = JSON.parse(docker(['inspect', '--format',
+        '{"status":{{json .State.Status}},"health":{{if .State.Health}}{{json .State.Health.Status}}{{else}}null{{end}},'
+          + '"exitCode":{{json .State.ExitCode}},"oomKilled":{{json .State.OOMKilled}},"error":{{json .State.Error}},'
+          + '"bindings":{{json .NetworkSettings.Ports}},"requestedBindings":{{json .HostConfig.PortBindings}}}',
+      name], { timeout: 1000 }));
+      const bindings = ports => Object.entries(ports ?? {}).flatMap(([key, values]) => {
+        const match = key.match(/^(\d{1,5})\/(tcp|udp)$/);
+        if (!match || !Array.isArray(values)) return [];
+        return values.flatMap(value => {
+          const hostPort = Number(value.HostPort), containerPort = Number(match[1]);
+          if (![hostPort, containerPort].every(port => Number.isInteger(port) && port > 0 && port <= 65535)) return [];
+          return [{ containerPort, protocol: match[2], hostPort,
+            hostAddress: ['127.0.0.1', '::1'].includes(value.HostIp) ? 'loopback'
+              : ['0.0.0.0', '::'].includes(value.HostIp) ? 'wildcard' : 'other' }];
+        });
+      }).slice(0, 24);
+      containers.push({ service,
+        status: ['created', 'running', 'paused', 'restarting', 'removing', 'exited', 'dead'].includes(state.status)
+          ? state.status : 'unknown',
+        health: state.health ? (['starting', 'healthy', 'unhealthy'].includes(state.health)
+          ? state.health : 'unknown') : 'none',
+        exitCode: Number.isInteger(state.exitCode) && state.exitCode >= 0 && state.exitCode <= 255 ? state.exitCode : null,
+        oomKilled: state.oomKilled === true,
+        errorSignals: state.error ? classifySupabaseStartFailure(String(state.error)) : [],
+        bindings: bindings(state.bindings), requestedBindings: bindings(state.requestedBindings) });
+    } catch (error) {
+      inspectionFailures.push('container-inspect'); failed('container-inspect', error, 1000);
+      containers.push({ service, status: 'unavailable' });
+    }
+  }
+  return { containerCount: names?.length ?? null, volumeCount: volumes?.length ?? null,
+    networkCount: networks?.length ?? null, containers, truncated: (names?.length ?? 0) > 24,
+    inspectionFailures, inspectionDiagnostics };
+}
+
+function assertStackAbsent(state, stage) {
+  assert.ok(state.containerCount === 0 && state.volumeCount === 0 && state.networkCount === 0
+    && state.inspectionFailures.length === 0,
+  `Isolated Supabase ${stage} resource check failed: ${JSON.stringify(state)}`);
+}
+
 export function verifyCiPostgresImage(image) {
   verifyLocalPostgresImage(image, 'linux', 'x64');
 }
@@ -167,7 +276,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
     || (process.platform === 'darwin' && process.arch === 'arm64'), 'Requires Linux x64 or macOS arm64 with local Docker');
   const container = `supabase_db_${projectId}`;
   const environment = { ...process.env };
-  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID', 'SUPABASE_WORKDIR',
+  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID', 'SUPABASE_WORKDIR', 'SUPABASE_ENV',
     'PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'PGSERVICE', 'PGSERVICEFILE', 'PGPASSFILE',
     'DOCKER_HOST', 'DOCKER_CONTEXT', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']) delete environment[name];
   Object.assign(environment, { DOCKER_HOST: 'unix:///var/run/docker.sock',
@@ -175,33 +284,36 @@ async function withNewSupabaseStack(projectId, work, destination) {
   let directory;
   let started = false;
   let retained = false;
+  let primaryError;
   let dockerHost = 'unix:///var/run/docker.sock';
   function run(command, args, { input, timeout = 120_000 } = {}) {
     const result = spawnSync(command, args, { cwd: directory, env: environment,
       input, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout });
+    const operation = command === 'docker'
+      ? (args.includes('psql') ? 'sql' : ['inspect', 'ps', 'volume', 'network', 'context'].find(name => args.includes(name)) ?? 'operation')
+      : ['start', 'stop', 'reset', 'migration', 'status', 'init'].find(name => args.includes(name)) ?? 'operation';
     if (result.error) {
-      const operation = command === 'docker'
-        ? (args.includes('psql') ? 'sql' : ['inspect', 'ps', 'volume', 'context'].find(name => args.includes(name)) ?? 'operation')
-        : ['start', 'stop', 'reset', 'migration', 'status', 'init'].find(name => args.includes(name)) ?? 'operation';
-      const code = /^[A-Z][A-Z0-9_]{0,39}$/.test(result.error.code ?? '') ? result.error.code : 'PROCESS_ERROR';
+      const code = processCode(result.error.code);
       const error = new Error(`Isolated ${command} ${operation} failed: ${code} (deadline ${timeout}ms)`, { cause: result.error });
       error.code = code;
+      error.processDiagnostic = processDiagnostic(result, timeout);
+      if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
       throw error;
     }
     if (result.status !== 0) {
       // SQL is repository-owned metadata/probe input. CLI output can contain
       // development keys/connection strings, so is never logged here.
       let detail = command === 'docker' && args.includes('psql') ? `: ${result.stderr.trim().slice(-3000)}` : '';
-      if (command === 'npx' && args.includes('start')) {
-        detail = `: start signals=${classifySupabaseStartFailure(result.stdout + '\n' + result.stderr).join(',')}; raw CLI output withheld`;
-      }
       if (command === 'npx' && (args.includes('reset') || args.includes('migration'))) {
         // Reset diagnostics include only SQL error/flag lines, not CLI status
         // output with development connection strings or keys.
         detail = ': ' + result.stderr.split('\n').filter(line => /ERROR:|SQLSTATE|unknown flag:/.test(line))
           .join('\n').replace(/postgres(?:ql)?:\/\/\S+/gi, '[local connection]').slice(-3000);
       }
-      throw new Error(`${command} ${args[0]} failed with exit ${result.status}${detail}`);
+      const error = new Error(`Isolated ${command} ${operation} failed with exit ${result.status}${detail}`);
+      error.processDiagnostic = processDiagnostic(result, timeout);
+      if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
+      throw error;
     }
     return result.stdout;
   }
@@ -214,10 +326,10 @@ async function withNewSupabaseStack(projectId, work, destination) {
       assert.ok(dockerHost?.startsWith('unix://'), 'Docker Desktop must use a local Unix socket');
       environment.DOCKER_HOST = dockerHost;
     }
-    const names = docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n');
-    assert.ok(!names.includes(container), 'Refusing to reuse an existing Supabase stack');
-    const volumes = docker(['volume', 'ls', '--format', '{{.Name}}']).trim().split('\n');
-    assert.ok(!volumes.some(name => name.endsWith(`_${projectId}`)), 'Refusing to restore an existing Supabase volume');
+    // Operational inventory must tolerate a cold/loaded daemon; failure-state
+    // diagnostics retain the separate 5s inventory and 24 x 1s detail budget.
+    assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+      { details: false, inventoryTimeoutMs: 30_000 }), 'preflight');
     if (destination) {
       await mkdir(destination, { mode: 0o700 }); // Exclusive: existing files/directories are never reused.
       directory = destination;
@@ -232,7 +344,15 @@ async function withNewSupabaseStack(projectId, work, destination) {
     await writeFile(configPath, config);
     console.log(`Starting isolated Supabase CLI ${cliVersion} stack ${projectId}`);
     started = true;
-    cli(['start', '--exclude', 'studio,postgres-meta,edge-runtime,imgproxy,logflare,vector,supavisor'], { timeout: 720_000 });
+    try {
+      cli(['start', '--exclude', 'studio,postgres-meta,edge-runtime,imgproxy,logflare,vector,supavisor'], { timeout: 720_000 });
+    } catch (error) {
+      const diagnostic = { ...error.startDiagnostic, projectId,
+        ownedDocker: inspectOwnedSupabaseStack(projectId, docker) };
+      const failure = new Error(`Isolated Supabase startup failed: ${JSON.stringify(diagnostic)}; raw CLI output withheld`, { cause: error });
+      failure.startDiagnostic = diagnostic;
+      throw failure;
+    }
     const image = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
     console.log(`Image: ${image}`);
     verifyLocalPostgresImage(image);
@@ -324,15 +444,32 @@ async function withNewSupabaseStack(projectId, work, destination) {
       retained = true;
       return report;
     }
-    cli(['stop', '--no-backup'], { timeout: 120_000 });
-    started = false;
-    assert.ok(!docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n').includes(container),
-      'Stopped project container still exists');
     return { result, cliVersion, image, architecture: process.arch, projectId, containerId,
       commit: process.env.GITHUB_SHA, cleanup: 'PASS',
       configSha256: createHash('sha256').update(config).digest('hex') };
+  } catch (error) {
+    primaryError = error;
+    throw error;
   } finally {
-    if (started && !retained) cli(['stop', '--no-backup'], { timeout: 120_000 });
-    if (directory && !retained) await rm(directory, { recursive: true, force: true });
+    const cleanupErrors = [];
+    if (started && !retained) {
+      try { cli(['stop', '--no-backup', '--project-id', projectId], { timeout: 120_000 }); }
+      catch (error) { cleanupErrors.push(error); }
+      // A successful stop exit is insufficient proof of container/volume cleanup.
+      try { assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+        { details: false, inventoryTimeoutMs: 30_000 }), 'cleanup'); }
+      catch (error) { cleanupErrors.push(error); }
+    }
+    // CLI/Docker cleanup failure must never prevent removing our owned workspace.
+    if (directory && !retained) {
+      try { await rm(directory, { recursive: true, force: true }); }
+      catch { cleanupErrors.push(new Error('Isolated Supabase workspace removal failed')); }
+    }
+    if (cleanupErrors.length) {
+      const errors = [...(primaryError ? [primaryError] : []), ...cleanupErrors];
+      throw new AggregateError(errors,
+        `Isolated Supabase lifecycle failed: ${errors.map((error, index) => `${index === 0 && primaryError ? 'primary' : 'cleanup'}=${error.message}`).join('; ')}`,
+        { cause: primaryError ?? cleanupErrors[0] });
+    }
   }
 }

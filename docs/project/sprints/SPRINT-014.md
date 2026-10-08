@@ -14,6 +14,38 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Isolated CI startup lifecycle — 2026-10-08 / #232
+
+Completed #310 / CI #618 passes validate, platform/defaults, populated upgrade
+and CLI history/runtime, including actual independent worker/eraser races in
+both lock orders. Its first two-install stack startup fails before application
+SQL with the same mixed symptoms as #617. #310 remains an unmerged source packet
+with one failed required gate; its backend APK is intentionally skipped.
+
+The narrow helper repair adds sanitized terminal/process diagnostics and bounded
+owned-container/resource state, separates recovered pull warnings from exact
+pinned CLI fatal templates, rejects pre-existing labelled/named project resources
+before startup, verifies cleanup absence and preserves both primary and cleanup
+failures. Owned workspace removal still runs if CLI stop fails. No outer startup
+retry, image/version/port change or application SQL retry is introduced. Local
+process fixtures pass 24/24 plus a final 2/2 assertion recheck; the complete
+database sweep passes 97/97. Independent final review finds no blocker. Lint/
+types, locally available non-edge suites and all four production Hermes exports
+pass. Root check reaches Deno registry dependency retrieval, with no complete
+local pass claimed. The native startup cause remains unconfirmed; these fixtures
+are not native installation acceptance. A finite dependent-packet #619 inspection
+now confirms platform, validate and two clean installs pass, with populated upgrade
+failing before startup on unavailable container-list inventory and CLI still
+running. A follow-up uses a bounded 30-second operational inventory budget plus
+fixed process/phase/exit diagnostics; default diagnostic snapshots keep five-second
+reads. It does not retry or infer a confirmed root cause from missing state. Its
+required new run remains separate. Final startup/readiness tests pass 27/27 and
+the complete final database sweep passes 100/100. Independent review finds no
+blocker. Fresh root check stops at Deno registry Connection refused after
+available gates pass. STATUS owns the single
+active handoff; portable Shared ordinal evaluation follows separately without
+changing serving or admitting historical features/group reward.
+
 ## Closed prediction-source preparation — 2026-10-08 / #232D
 
 The owner's continuation starts from #309 source
