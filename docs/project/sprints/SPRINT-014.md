@@ -14,6 +14,22 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
+
+CI #611 on `da376700fc24bae894383533f11e6168da74e36d` stopped at the fresh
+dependency audit: shell-quote 1.10.0 had one critical unmitigated finding,
+GHSA-pqg4-j6r4-53mv. Platform and two clean installations passed; CLI, populated
+upgrade and APK were skipped. The preceding timeout correction is still native
+acceptance work, not a newly reproduced timeout failure.
+
+The compatible lock leaf now uses upstream 1.11.0; React DevTools 6.1.5 accepts
+it under ^1.6.1 without changing the parent or framework graph. Line-terminator
+rejection after comment tokens and ordinary editor/argument parsing are covered
+against the actual installed consumer. The existing verified braces/forge fixes,
+raw advisory reporting and all five gates remain required. STATUS owns final
+validation, the dated exact-lock audit receipt and the one-time replacement-run
+handoff. No hosted migration/data reset, main merge or #229 acceptance is implied.
+
 ## CLI command deadline after CI #610 — 2026-10-07 / #305
 
 The owner reported #610 failed on `b1c7ad`. Four mandatory jobs passed;

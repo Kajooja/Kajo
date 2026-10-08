@@ -69,6 +69,13 @@ behavior and bounded indexed-map processing. The fresh updated-lock receipt is
 `dependency-audit-native-2026-10-06.json`; Windows installation/audit portability
 is exercised by the existing security-patch/audit test files.
 
+`shell-quote.test.mjs` resolves the actual React DevTools consumer and verifies
+the upstream 1.11.0 fix for line terminators after comment tokens, including
+parse/append/quote composition and ordinary editor/argument round trips.
+The compatible single-leaf lock refresh keeps its parent/framework versions and
+the audit's existing fail-closed correction rules. Exact lock and fresh audit:
+`dependency-audit-native-2026-10-08.json`.
+
 ## Implementation locations
 
 | Area | Canonical path | Current state |

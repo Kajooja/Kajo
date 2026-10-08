@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-07**
+Last updated: **2026-10-08**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -11,6 +11,45 @@ owns the Taste/Friend/Shared flow. Read current main first, then the active bran
 an older branch-local handoff cannot replace newer accepted product decisions.
 
 ## Current packet — #229 standalone APK and configured-device acceptance
+
+### Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
+
+The owner reports [CI #611](https://github.com/Kajooja/Kajo/actions/runs/37598842487)
+failed on `da376700fc24bae894383533f11e6168da74e36d`. Dependency audit
+blocked validate with one new unmitigated critical finding:
+[GHSA-pqg4-j6r4-53mv](https://github.com/advisories/GHSA-pqg4-j6r4-53mv)
+in shell-quote 1.10.0. Platform and two clean installations passed;
+CLI, populated upgrade and APK were skipped. The previous CLI deadline correction
+therefore still awaits its native run; #611 did not reproduce a Docker timeout.
+
+The official advisory identifies affected versions >=1.8.4 and <1.11.0;
+upstream 1.11.0 rejects line terminators in string tokens following a comment.
+The sole locked leaf now uses that published fix. Its React DevTools 6.1.5 parent
+accepts ^1.6.1 and is unchanged, as are Expo/RN/router, other dependencies and
+the two verified source corrections. No override, audit exception, source-patch
+identity change or gate bypass is introduced. Existing DevTools editor parsing
+and normal POSIX quoting require regression coverage; Windows shell quoting is
+not inferred from this POSIX API.
+
+Clean `npm ci` passed with the existing postinstall corrections. All **43**
+dependency tests passed; the four new shell-quote regressions reproduced two
+failures on 1.10.0 before passing on the installed 1.11.0. Independent POSIX
+argument/editor parsing checks passed; native Windows execution was unavailable.
+Lint/typechecks, 478 mobile and 444 catalogue tests passed. All four main and
+description-acceptance iOS/Android production-mode Hermes exports passed.
+The root check stopped at Deno npm-registry resolution with Connection refused;
+no full pass is claimed. Docker/native gates still require GitHub and are not waived.
+
+The [fresh receipt](dependency-audit-native-2026-10-08.json) binds lock SHA-256
+`e453c3f30cf10a4de32f4906e124746bfb202c6376af81e397a544856963bb57`.
+Shell-quote is absent from the fresh raw audit; **zero unmitigated** findings
+remain. Its 19 raw high upstream findings are still covered only by the two
+unchanged verified source corrections, not described as zero vulnerabilities.
+
+Publish on existing labelled PR #305 to request the replacement APK behind all
+five mandatory gates. Retrieve the run link once without progress polling.
+After a successful artifact, resume DEVICE_TEST's BOOK/MOVIE append/layout round.
+The deployed SQL, existing hosted data, main and draft #229 acceptance are unchanged.
 
 ### CLI command deadline after CI #610 — 2026-10-07 / #305
 
