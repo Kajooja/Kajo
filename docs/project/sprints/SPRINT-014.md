@@ -14,6 +14,40 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Closed prediction-source preparation — 2026-10-08 / #232D
+
+The owner's continuation starts from #309 source
+`0d756feb78dfa6e7fab24108a3ec7b215d24c59b`. CI #617 passed four gates,
+including native #232C visibility/replay, while two-clean-installations failed
+in Supabase startup before application SQL. One failed-job rerun was requested
+without changing source; a single completed verification confirms all five
+#617 gates now pass. Mixed diagnostic
+symptoms are not an automatic-retry rule. No progress polling or backend APK
+request is added; main/hosted/device acceptance remains separate.
+
+The bounded forward adds closed owner source preparation and exact transaction/
+backend/row DELETE permissions, preserving ordinary immutability. Real page
+descendants, shadow dependencies, copied comparison traces and whole affected
+GLOBAL/shrunk PROFILE evaluation batches are erased atomically. Unresolved
+promotion/assignment/rollback influence blocks before writes. The first-lock
+lifecycle gate serializes declared source/evidence writers against preparation.
+Actual User/Profile roots remain for owner deletion in the same transaction;
+residual canonical Item-state restrictions are still atomic and explicit.
+Automatic account lifecycle and concurrent import/bootstrap integration are
+not activated. Final migration SHA-256:
+`d0a2de045fccf4fb5f1413ad3c24054f5c3c7a87f6cb186829ff39d1e7aab671`.
+The complete database sweep passes **90/90**, and the final combined focused
+recheck passes **2/2**, including the NULL promotion-allowance escape, copied
+orphan windows, all15 exact body changes, API/permit guards and residual root
+restrictions. Independent final review finds no blocker. Lint/types, locally
+available non-edge suites and all four production Hermes exports pass; local
+root check stops at Deno registry Connection refused. Native worker/eraser proof
+is in required CI, with no local native or all-writer race claim. Historical
+page-forward scorer preservation is asserted before later approved lifecycle
+changes, then current runtime still runs against the full chain. STATUS owns
+publication and the next metric gate; source erasure does not itself improve
+prediction quality or admit a joint reward.
+
 ## Frozen observed Shared outcomes — 2026-10-08 / #232C
 
 The owner's continuation starts from exact #308 source

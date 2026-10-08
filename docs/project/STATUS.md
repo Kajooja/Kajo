@@ -10,7 +10,88 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232 frozen observed outcomes and paired support
+## Current packet — #232 closed prediction-source erasure
+
+### Owner preparation boundary — 2026-10-08
+
+Continue on `feat/232-shadow-source-erasure`, stacked on
+[PR #309](https://github.com/Kajooja/Kajo/pull/309), exact source
+`0d756feb78dfa6e7fab24108a3ec7b215d24c59b`, tree
+`19c78ebf92a6525186f96eb3ba15a15dc91c40bd`. Fresh completed inspection of
+[CI #617](https://github.com/Kajooja/Kajo/actions/runs/37822575187) confirms
+validate, native platform/defaults, populated forward upgrade and CLI history/
+runtime passed, including actual #232C capture before commit and independent
+stored replay. The two-clean-installations job failed during the first Supabase
+CLI stack startup, before application SQL. Fixed diagnostics reported mixed
+image-download/port-binding symptoms, which do not establish a retryable cause.
+One explicit failed-job rerun was requested on the unchanged source. A single
+completed retry verification now confirms all five #617 gates pass; startup did
+not fail again. No source-based automatic retry, image/CLI change, port relocation
+or progress polling is introduced. The backend APK is intentionally skipped.
+The new packet's required CI acceptance remains open.
+
+`20261008185216_shadow_source_erasure.sql` adds owner-only READ COMMITTED
+prediction-source erasure preparation for PREDICTION_RUN, PROFILE and ACTOR.
+Actual protocol-2/3 source/root/parent links close dependent production pages.
+An API-denied RLS permission relation authorizes exact immutable DELETE rows
+for this backend/transaction only. Ordinary immutable UPDATE/DELETE remains
+denied. The operation deletes source/shadow/jobs/candidates, copied vector
+comparisons and whole intersecting scalar evaluation batches, including GLOBAL
+and every shrunk PROFILE scope/genome. Unresolved promotion/assignment/rollback
+influence rejects all writes atomically; decisions/assignments are not rewritten.
+Genomes, unrelated source rows/windows and canonical evidence/state remain.
+
+A common lifecycle gate is acquired before other locks: exclusive erasure,
+shared worker/evaluator/canary/rollback/comparison and declared serving/page/
+window/atomic command entrances. Fresh READ COMMITTED writes follow waiting;
+the evaluator's evidence cutoff is established after waiting. Stored comparison
+replay and exact retries remain read-only. User/Profile roots stay present and
+locked after return so an owner can delete them in that same transaction. The
+owner must start with erasure before producer calls or parent locks; arbitrary
+shared-to-exclusive lock upgrades are not a safe concurrent composition.
+Successful preparation does not imply automatic Auth/account lifecycle support:
+canonical Item-state restrictions can independently reject User deletion, and
+bootstrap/import/calibration concurrency integration remains separate. Item
+hard deletion is still restricted. DATA_EVENTS owns these exact boundaries.
+
+Migration SHA-256:
+`d0a2de045fccf4fb5f1413ad3c24054f5c3c7a87f6cb186829ff39d1e7aab671`.
+
+The final complete database sweep passes **90/90**, without failures/skips;
+the final combined focused recheck passes **2/2**. Populated preservation checks
+old rows, columns/defaults/constraints/indexes/OIDs/ACLs/triggers and proves all
+15 permitted entry-body edits reverse to their exact original bodies. Actual
+source/descendant/shadow cleanup, whole batch invalidation, orphan copied traces,
+malformed provenance, permission/API denial, isolation rejection and full rollback
+pass. The NULL `from_state` seed-allowance regression is closed. Successful
+same-transaction owner User/Profile deletion and the residual canonical Item-state
+restriction are both explicit cases. Independent final review finds no blocker.
+Lint/types, 43 dependency, 478 mobile and 444 catalog tests pass; engine 44/ESM,
+research 19 Python + 13 Node, acceptance 6 + 5 and all four production Hermes
+exports pass separately. Root check stops at Deno registry Connection refused;
+a complete local root-check pass is not claimed. Old deployed/#232A/B/C forwards
+and the root lockfile retain their exact hashes.
+
+Required CI retains every old gate and adds populated preservation, rollback
+matrices and independent native worker/eraser races in both orders. Deterministic
+evaluator/canary behavior is separate, not a claim of native races for every
+entrance. Native execution remains pending for this new source; sequential
+PGlite fixture/syntax verification is not independent PostgreSQL proof. No main
+merge, hosted migration, APK request or new learned predictor is claimed.
+
+**Next bounded action:** retrieve the scoped PR's run link once at publication,
+then inspect its required gates on the next continuation and resolve actual
+failures. Keep account integration and policy-influence refusal explicit; do not
+turn successful source preparation into unconditional account erasure. After
+these source prerequisites are verified, declare the Shared exposed-outcome
+prediction target/metric against the same frozen vectors: horizon, ties/zero/
+missing support, corrections and uncertainty at the round/experience level.
+Raw ranking scores are not calibrated member ratings. Historical feature
+admission stays closed until a prospective consumer records its actual capture.
+#306 integration/guarded rollout, Phase 16.3 UI and #229 device gates remain
+separate; preserve both CLI probe sets and consumed #182/E1/D1/D2 evidence.
+
+## Preserved #232C frozen observed outcomes and paired support
 
 ### Visible capture boundary — 2026-10-08
 

@@ -402,6 +402,8 @@ retain copied trace metadata and have no run foreign key. Stored replay survives
 such a purge; a new comparison reports unavailable source support. The source
 eraser must explicitly include copied comparison lineage when deleting traces
 for privacy, rather than assume its receipt foreign key covers that operation.
+The #232D source implements that separate owner preparation boundary below;
+direct User/Profile deletion still does not call it automatically.
 
 `private.compare_shared_round_outcome_capture_v1` freezes one capture, one
 Challenger genome and one existing evaluation window. It checks the declared
@@ -426,6 +428,62 @@ is produced. One round/experience remains one observation unit across member
 coordinates and multiple captures. A prospective feature consumer must freeze
 the capture reference it actually used; a separately declared joint target and
 exposed-outcome metric are still required before learning admission.
+
+### Closed prediction-source erasure preparation — #232D, source only
+
+`private.erase_prediction_sources_v1(scope, id)` is an internal owner-only,
+READ COMMITTED transaction operation. Its scopes are `PREDICTION_RUN`, `PROFILE`
+and `ACTOR`; it removes the canonical PredictionRun source closure and dependent
+shadow jobs/runs/candidates and copied vector comparisons. ACTOR includes runs
+in that User's owned PersonalProfiles, as well as their actor-owned runs. PROFILE
+includes every actor's runs in that Profile. Actual protocol-2/3 source/root/
+parent page links extend the closure to dependent production runs, without
+including independent requests. A missing PREDICTION_RUN root is rejected;
+ACTOR/PROFILE copied comparison metadata is checked even if its original run
+is no longer present. User/Profile roots remain locked
+and present: an owner may delete the root in the same transaction after this
+preparation succeeds. This is not an automatic Auth deletion or mobile account
+deletion integration.
+
+Evaluation rows do not retain exact source-contribution lineage. Erasure therefore
+invalidates whole existing evaluation batches in windows intersecting the erased
+runs or their copied trace times, and windows retained by matching comparisons
+or directly scoped PROFILE evaluations. This includes GLOBAL and every shrunk
+PROFILE scope and genome. It cannot keep
+a profile metric whose shrinkage still contains the erased global evidence.
+Unrelated source rows, windows and genomes remain. Promotion decisions retain
+copied metrics and policy assignments retain rollback ancestry without a complete
+evaluation foreign key. Unresolved learned policy influence rejects the entire
+operation before any deletion; ordinary rollback is not influence erasure.
+The owner operation rejects a truncated closure rather than deleting a partial
+set; source and total dependent-row caps bound the preparation.
+
+An API-denied, RLS-enabled permission relation authorizes only exact immutable
+DELETE rows for this backend and transaction. Ordinary UPDATE/DELETE stays denied;
+there is no caller-settable bypass or disabled trigger. The eraser obtains an
+exclusive lifecycle advisory lock before parent/source locks. An owner must call
+it as the first lifecycle writer in a dedicated transaction, before acquiring
+parent locks; upgrading an earlier producer's shared lock is not a safe concurrent
+composition. Shadow worker,
+scalar evaluator, manual canary, rollback and new vector comparison operations
+obtain shared access before their own locks and use fresh READ COMMITTED snapshots
+for writes after waiting. Serving rank/page/window and atomic Item/collection/
+Shared command entrances join this gate before their parent/receipt locks.
+Exact stored comparison retries remain read-only.
+The permission rows are removed before successful return; any error rolls back
+the preparation, including permission allocation and all derived invalidation.
+
+Standalone run erasure removes copied production/shadow trace comparisons even
+though they lack a source FK. It retains the canonical round outcome capture;
+that capture records outcome/response origins, not a copied prediction feature
+trace, and a later comparison reports missing source support. Actual round or
+participant-root erasure still follows the receipt cascade. Arbitrary Item hard
+erasure and automatic Auth/Profile lifecycle integration require separate closure.
+Existing canonical Item state can independently restrict User deletion; successful
+prediction preparation does not remove that state or make that root deletion
+unconditionally succeed. Bootstrap/import/calibration and account lifecycle
+writers still need their own integration review before full concurrent account
+erasure can be claimed.
 
 ## 11. Reliability contract
 

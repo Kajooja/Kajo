@@ -33,11 +33,14 @@ test('identified first page preserves the scorer, immutable retries and empty ru
         return row.snapshot;
       }));
     assert.match(upgrade[0]?.predictionPageUpgrade, /^PASS: unchanged populated/);
-    for (const file of files.slice(index)) await db.exec(`begin; ${file.sql} commit;`);
+    // Verify this historical forward's exact scorer preservation before later
+    // lifecycle forwards add their separately guarded entry locks/timestamps.
+    await db.exec(`begin; ${files[index].sql} commit;`);
     assert.equal(await definition('private.rank_items_with_identity_v1(uuid,uuid,text,text,integer,jsonb)'),
       oldCore.replace('FUNCTION private.rank_items_v1_internal(',
         'FUNCTION private.rank_items_with_identity_v1(supplied_prediction_id uuid, ')
         .replace('current_prediction_id uuid := gen_random_uuid();','current_prediction_id uuid := supplied_prediction_id;'));
+    for (const file of files.slice(index + 1)) await db.exec(`begin; ${file.sql} commit;`);
     assert.equal(await definition('public.rank_items_v1(uuid,text,text,integer,jsonb)'),oldPublic);
     const snapshots = (await db.exec(await predictionPageSmokeSql())).flatMap(r => r.rows.map(row => {
       assert.deepEqual(Object.keys(row),['snapshot']);

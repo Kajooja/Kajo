@@ -542,6 +542,16 @@ the inherited old shadow dependency that can block source-account/Profile
 deletion. That deletion boundary must be repaired before outcome admission or
 hosted activation; the new derived cascades alone do not establish full erasure.
 
+The #232D source adds a closed owner preparation for PredictionRun/Profile/actor
+source erasure. It invalidates every GLOBAL and shrunk PROFILE evaluation batch
+in intersecting prediction windows because exact per-source contribution lineage
+is absent. Copied vector comparison traces are removed explicitly. Incomplete
+promotion/assignment/rollback influence lineage is a fail-closed prerequisite,
+not permission to retain learned influence after deleting inputs. Writer/eraser
+serialization prevents stale shadow evidence from being recreated after a waiter
+continues. This changes no serving weights, metric, reward or admission decision;
+automatic account erasure integration and a joint target/metric remain open.
+
 One identified round/experience is one observation unit, regardless of member or
 receipt count. Coverage counts are diagnostics, not independent sample sizes.
 The private audit vector retains actor/enrollment identities only inside its
