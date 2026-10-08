@@ -100,7 +100,14 @@ export function classifySupabaseStartFailure(output) {
 const stackServices = new Set(['db', 'auth', 'realtime', 'storage', 'storage_api', 'rest', 'kong',
   'inbucket', 'mailpit', 'studio', 'meta', 'edge_runtime', 'imgproxy', 'analytics', 'vector', 'pooler']);
 const ownedResource = (name, projectId) => name.startsWith('supabase_') && name.endsWith(`_${projectId}`);
-const processCode = code => /^[A-Z][A-Z0-9_]{0,39}$/.test(code ?? '') ? code : 'PROCESS_ERROR';
+const processCodes = new Set(['ETIMEDOUT', 'ENOENT', 'EACCES', 'EPERM', 'EIO', 'EAGAIN', 'ENOMEM', 'ENOBUFS',
+  'EMFILE', 'ENFILE', 'EPIPE', 'ECONNREFUSED', 'ECONNRESET', 'E2BIG', 'EBADF', 'EINVAL']);
+const processCode = code => processCodes.has(code) ? code : 'PROCESS_ERROR';
+const exitCode = status => Number.isInteger(status) && status >= 0 && status <= 255 ? status : null;
+const processDiagnostic = (result, timeout) => ({
+  processCode: result.error ? processCode(result.error.code) : null,
+  exitCode: exitCode(result.status), deadlineMs: timeout,
+});
 
 // These are output observations, including potentially nonfatal pull warnings.
 // No label authorizes retry, port relocation or an unverified image change.
@@ -126,19 +133,29 @@ function startFailureDiagnostic(result, timeout) {
 
 // Inspect only resources of the newly owned project, before cleanup removes
 // useful state. Never copy Docker Env, raw State.Error, health logs or CLI output.
-export function inspectOwnedSupabaseStack(projectId, docker, { details = true } = {}) {
+export function inspectOwnedSupabaseStack(projectId, docker, { details = true, inventoryTimeoutMs = 5000 } = {}) {
   assert.match(projectId, /^kajo_(?:ci_[a-z_]+|local_[a-f0-9]{12})$/);
+  assert.ok([5000, 30_000].includes(inventoryTimeoutMs), 'Expected a reviewed Docker inventory deadline');
   const inspectionFailures = [];
+  const inspectionDiagnostics = [];
+  const failed = (stage, error, deadlineMs) => {
+    const diagnostic = error?.processDiagnostic;
+    inspectionDiagnostics.push({ stage,
+      processCode: diagnostic?.processCode === null ? null : processCode(diagnostic?.processCode ?? error?.code),
+      exitCode: exitCode(diagnostic?.exitCode), deadlineMs });
+  };
   const list = (kind, args) => {
+    let stage = `${kind}-name-list`;
     try {
-      const named = docker(args, { timeout: 5000 }).trim().split(/\r?\n/)
+      const named = docker(args, { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/)
         .filter(name => ownedResource(name, projectId));
       // Pinned CLI stop selects by this label, including differently named
       // resources. Mirror that ownership boundary before startup and after stop.
+      stage = `${kind}-label-list`;
       const labelled = docker([...args, '--filter', `label=com.supabase.cli.project=${projectId}`],
-        { timeout: 5000 }).trim().split(/\r?\n/).filter(Boolean);
+        { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/).filter(Boolean);
       return [...new Set([...named, ...labelled])];
-    } catch { inspectionFailures.push(`${kind}-list`); return null; }
+    } catch (error) { inspectionFailures.push(`${kind}-list`); failed(stage, error, inventoryTimeoutMs); return null; }
   };
   const names = list('container', ['ps', '-a', '--format', '{{.Names}}']);
   const volumes = list('volume', ['volume', 'ls', '--format', '{{.Name}}']);
@@ -173,10 +190,14 @@ export function inspectOwnedSupabaseStack(projectId, docker, { details = true } 
         oomKilled: state.oomKilled === true,
         errorSignals: state.error ? classifySupabaseStartFailure(String(state.error)) : [],
         bindings: bindings(state.bindings), requestedBindings: bindings(state.requestedBindings) });
-    } catch { inspectionFailures.push('container-inspect'); containers.push({ service, status: 'unavailable' }); }
+    } catch (error) {
+      inspectionFailures.push('container-inspect'); failed('container-inspect', error, 1000);
+      containers.push({ service, status: 'unavailable' });
+    }
   }
   return { containerCount: names?.length ?? null, volumeCount: volumes?.length ?? null,
-    networkCount: networks?.length ?? null, containers, truncated: (names?.length ?? 0) > 24, inspectionFailures };
+    networkCount: networks?.length ?? null, containers, truncated: (names?.length ?? 0) > 24,
+    inspectionFailures, inspectionDiagnostics };
 }
 
 function assertStackAbsent(state, stage) {
@@ -275,6 +296,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       const code = processCode(result.error.code);
       const error = new Error(`Isolated ${command} ${operation} failed: ${code} (deadline ${timeout}ms)`, { cause: result.error });
       error.code = code;
+      error.processDiagnostic = processDiagnostic(result, timeout);
       if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
       throw error;
     }
@@ -289,6 +311,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
           .join('\n').replace(/postgres(?:ql)?:\/\/\S+/gi, '[local connection]').slice(-3000);
       }
       const error = new Error(`Isolated ${command} ${operation} failed with exit ${result.status}${detail}`);
+      error.processDiagnostic = processDiagnostic(result, timeout);
       if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
       throw error;
     }
@@ -303,7 +326,10 @@ async function withNewSupabaseStack(projectId, work, destination) {
       assert.ok(dockerHost?.startsWith('unix://'), 'Docker Desktop must use a local Unix socket');
       environment.DOCKER_HOST = dockerHost;
     }
-    assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker, { details: false }), 'preflight');
+    // Operational inventory must tolerate a cold/loaded daemon; failure-state
+    // diagnostics retain the separate 5s inventory and 24 x 1s detail budget.
+    assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+      { details: false, inventoryTimeoutMs: 30_000 }), 'preflight');
     if (destination) {
       await mkdir(destination, { mode: 0o700 }); // Exclusive: existing files/directories are never reused.
       directory = destination;
@@ -430,7 +456,8 @@ async function withNewSupabaseStack(projectId, work, destination) {
       try { cli(['stop', '--no-backup', '--project-id', projectId], { timeout: 120_000 }); }
       catch (error) { cleanupErrors.push(error); }
       // A successful stop exit is insufficient proof of container/volume cleanup.
-      try { assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker, { details: false }), 'cleanup'); }
+      try { assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+        { details: false, inventoryTimeoutMs: 30_000 }), 'cleanup'); }
       catch (error) { cleanupErrors.push(error); }
     }
     // CLI/Docker cleanup failure must never prevent removing our owned workspace.

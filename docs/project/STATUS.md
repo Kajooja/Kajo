@@ -53,6 +53,22 @@ runner acceptance remains required CI. The recurrent startup cause is still
 unconfirmed; this fixes lifecycle handling and diagnosis, not a proven port/image
 root cause. All migration and lockfile hashes remain unchanged.
 
+A single dependent-packet inspection of #311 / CI #619 confirms platform,
+validate (including Deno) and both clean installations pass. Populated upgrade
+fails before startup at owned-container preflight inventory; the fixed message
+reports container-list unavailable but suppresses its process code. CLI history/
+runtime is still running at that finite lookup, with no subsequent polling.
+The follow-up restores a 30-second operational inventory budget for preflight/
+cleanup while keeping default failure-state diagnostics bounded to five seconds
+per list. It reports fixed resource/phase/process/exit/deadline diagnostics,
+retains failure rather than assuming empty state, and still retries no operation.
+The short five-second inventory bound is a plausible limitation, not a confirmed
+native root cause. The final focused startup/readiness suite passes **27/27** and the final complete
+database sweep passes **100/100**, without failures/skips; independent review
+finds no blocker. Fresh root check passes available lint/types/dependency/mobile/
+catalog gates and again stops at Deno registry Connection refused. New source needs its own required run;
+successful clean installs do not make the whole #619 run green.
+
 **Next bounded action:** publish this narrow harness repair and retrieve its run
 link once. In the separate stacked metric packet, implement a portable exposed-
 outcome ordinal target and strict Kajo frozen-artifact adapter. Two complete

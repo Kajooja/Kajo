@@ -46,6 +46,7 @@ async function mockedStackLifecycle(fixture) {
         const labelled=args.includes('--filter');
         const ownedName=fixture.labelledName??('supabase_db_'+project);
         if(args.includes('ps')){
+          if(fixture.listPreflightExit)process.exit(fixture.listPreflightExit);
           if(fixture.listExit&&state.owned)process.exit(fixture.listExit);
           if(!labelled)console.log('supabase_db_kajo_ci_unrelated');
           if(state.owned)console.log(ownedName);
@@ -121,7 +122,7 @@ test('pinned CLI pull warnings and fatal port conflicts stay distinct; startup i
   assert.equal(result.diagnostic.deadlineMs, 720_000);
   assert.equal(result.diagnostic.exitCode, 1);
   assert.deepEqual(result.diagnostic.ownedDocker, {
-    containerCount: 1, volumeCount: 1, networkCount: 1, truncated: false, inspectionFailures: [],
+    containerCount: 1, volumeCount: 1, networkCount: 1, truncated: false, inspectionFailures: [], inspectionDiagnostics: [],
     containers: [{ service: 'db', status: 'created', health: 'unhealthy', exitCode: 125, oomKilled: false,
       errorSignals: ['port-binding'], bindings: [],
       requestedBindings: [{ containerPort: 5432, protocol: 'tcp', hostPort: 54322, hostAddress: 'loopback' }] }],
@@ -202,8 +203,63 @@ test('failed Docker observation does not replace startup failure or fabricate em
   assert.equal(run.result.ok, false);
   assert.equal(run.result.diagnostic.ownedDocker.containerCount, null);
   assert.deepEqual(run.result.diagnostic.ownedDocker.inspectionFailures, ['container-list']);
+  assert.deepEqual(run.result.diagnostic.ownedDocker.inspectionDiagnostics,
+    [{ stage: 'container-name-list', processCode: null, exitCode: 4, deadlineMs: 5000 }]);
   assert.match(run.result.message, /startup failed/);
   assert.doesNotMatch(run.output, /synthetic-cli-private-secret/);
+});
+
+test('operational preflight reports the 30s deadline and sanitized exit without starting or stopping a stack', async () => {
+  const run = await mockedStackLifecycle({ listPreflightExit: 4 });
+  assert.equal(run.result.ok, false);
+  assert.equal(run.result.workCalled, false);
+  assert.match(run.result.message, /preflight resource check failed/);
+  assert.match(run.result.message,
+    /"inspectionDiagnostics":\[{"stage":"container-name-list","processCode":null,"exitCode":4,"deadlineMs":30000}\]/);
+  assert.match(run.result.message, /"containerCount":null/);
+  assert.ok(run.commands.every(c => c.command !== 'npx'));
+});
+
+test('operational inventory has six bounded 30s reads; diagnostic inventory retains six 5s reads', () => {
+  for (const inventoryTimeoutMs of [5000, 30_000]) {
+    const requests = [];
+    const result = inspectOwnedSupabaseStack('kajo_ci_unit_test', (args, options) => {
+      requests.push({ args, timeout: options.timeout }); return '';
+    }, { details: false, ...(inventoryTimeoutMs === 30_000 ? { inventoryTimeoutMs } : {}) });
+    assert.equal(requests.length, 6);
+    assert.ok(requests.every(request => request.timeout === inventoryTimeoutMs));
+    assert.equal(requests.filter(request => request.args.includes('--filter')).length, 3);
+    assert.equal(result.containerCount, 0);
+    assert.deepEqual(result.inspectionDiagnostics, []);
+  }
+  assert.throws(() => inspectOwnedSupabaseStack('kajo_ci_unit_test', () => assert.fail('Invalid budget'),
+    { inventoryTimeoutMs: Infinity }), /reviewed Docker inventory deadline/);
+});
+
+test('fixed named/label inspection phases preserve safe process codes and never echo unknown exceptions', () => {
+  for (const [code, expected] of [['ETIMEDOUT', 'ETIMEDOUT'], ['SYNTHETIC_PRIVATE_SECRET', 'PROCESS_ERROR']]) {
+    const result = inspectOwnedSupabaseStack('kajo_ci_unit_test', args => {
+      if (args.includes('ps') && args.includes('--filter')) {
+        const error = new Error('synthetic-private-secret'); error.code = code; throw error;
+      }
+      return '';
+    }, { details: false, inventoryTimeoutMs: 30_000 });
+    assert.equal(result.containerCount, null, 'Failed label inventory cannot prove absence');
+    assert.deepEqual(result.inspectionFailures, ['container-list']);
+    assert.deepEqual(result.inspectionDiagnostics,
+      [{ stage: 'container-label-list', processCode: expected, exitCode: null, deadlineMs: 30_000 }]);
+    assert.doesNotMatch(JSON.stringify(result), /synthetic-private-secret|SYNTHETIC_PRIVATE_SECRET/);
+  }
+  const invalidStatus = inspectOwnedSupabaseStack('kajo_ci_unit_test', args => {
+    if (args.includes('volume')) throw Object.assign(new Error('synthetic-private-secret'), {
+      processDiagnostic: { processCode: 'SYNTHETIC_PRIVATE_SECRET', exitCode: 'synthetic-private-secret' },
+    });
+    return '';
+  }, { details: false });
+  assert.equal(invalidStatus.volumeCount, null);
+  assert.deepEqual(invalidStatus.inspectionDiagnostics,
+    [{ stage: 'volume-name-list', processCode: 'PROCESS_ERROR', exitCode: null, deadlineMs: 5000 }]);
+  assert.doesNotMatch(JSON.stringify(invalidStatus), /synthetic-private-secret|SYNTHETIC_PRIVATE_SECRET/);
 });
 
 test('owned Docker diagnostics are bounded, sanitize unknown values and ignore unrelated project resources', () => {

@@ -33,7 +33,16 @@ database sweep passes 97/97. Independent final review finds no blocker. Lint/
 types, locally available non-edge suites and all four production Hermes exports
 pass. Root check reaches Deno registry dependency retrieval, with no complete
 local pass claimed. The native startup cause remains unconfirmed; these fixtures
-are not native installation acceptance. STATUS owns the single
+are not native installation acceptance. A finite dependent-packet #619 inspection
+now confirms platform, validate and two clean installs pass, with populated upgrade
+failing before startup on unavailable container-list inventory and CLI still
+running. A follow-up uses a bounded 30-second operational inventory budget plus
+fixed process/phase/exit diagnostics; default diagnostic snapshots keep five-second
+reads. It does not retry or infer a confirmed root cause from missing state. Its
+required new run remains separate. Final startup/readiness tests pass 27/27 and
+the complete final database sweep passes 100/100. Independent review finds no
+blocker. Fresh root check stops at Deno registry Connection refused after
+available gates pass. STATUS owns the single
 active handoff; portable Shared ordinal evaluation follows separately without
 changing serving or admitting historical features/group reward.
 
