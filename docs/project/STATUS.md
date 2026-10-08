@@ -10,7 +10,79 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #229 standalone APK and configured-device acceptance
+## Current packet — #232 Shared rating-round evidence foundation
+
+### Working APK and roadmap continuation — 2026-10-08
+
+[CI #612](https://github.com/Kajooja/Kajo/actions/runs/37763304219) succeeded
+through all five mandatory gates and the standalone Android APK job for #305
+source `36a788d1c5e97ac862f07cfd6a6470fa6c61b4e4`, with PR merge checkout
+`205035ce0a1ec4e21ffbc65720427d787f9fda5b`. This supplies the previously pending
+native deadline/cancellation, populated-upgrade and concurrency evidence; the
+earlier local Deno/Docker limitations remain dated local observations.
+The owner now reports **“Täydellistä. Toimii.”** and requests continued roadmap
+implementation. Record positive acceptance of the exercised append/layout
+correction in DEVICE_TEST; installed checksum, phone/OS and unreported
+individual cases remain unknown. Broader #229 gates, including fresh-account/
+Shared, native exposure and durable interruption, remain open. Main and draft
+#229 have not been merged by this acceptance.
+
+The next implementation is the earliest distinct Phase 14.1 dependency:
+[#232](https://github.com/Kajooja/Kajo/issues/232) participant/round evidence.
+The protocol-3 later-page zero-rating, delayed exposure, frozen replay and mature
+evaluation slice is already implemented and passed #612; do not repeat it.
+Current legacy Shared SET_RATING still records one actor, not a confirmed joint
+round. Neither that history nor completion alone establishes group satisfaction.
+
+Continue on `feat/232-shared-round-evidence`, based on the exact tested #305
+head. This source-only foundation adds frozen accepted participants, separate
+actor responses and correction/cancellation receipts through an explicit new
+server boundary. Preserve response-specific delivery provenance and keep joint
+reward unavailable until its versioned interpretation is admitted. Existing
+Events, interactions, ranking/evaluation bodies and historical receipts are not
+rewritten. No UI activation, rewatch-policy change, account reset, provider
+request or hosted rollout is part of this packet. Phase 16.3 still owns the
+coordinated user flow; Phase 14 owns its truthful learning prerequisites.
+
+The additive boundary is now implemented in
+`20261008122349_shared_rating_round_evidence.sql`, SHA-256
+`4e80e0daadaa537e85bb14ce11fffb3f4fc263164e4db3ee7182f4be75514796`.
+Four private RLS/API-denied tables and new lifecycle/evidence triggers retain
+existing object identities and data. The full-schema matrix covers pairs/N,
+zero/unknown/disagreement, immutable revisions, current authorization before
+retry, own delivered origins, enrollment changes, deletion through old receipt
+snapshots, 32/33-participant recovery and correction at the allocation limit.
+New allocation is bounded; truthful corrections remain possible at that limit.
+All **87 database tests** pass on the final stable source. A preceding sweep
+exposed the overflow-read defect while the matrix was extended; the corrected
+source passed its focused replay and the complete fresh sweep. Required native
+holder/waiter races and populated rehearsal are wired without weakening old gates.
+
+Lint/typechecks, 43 dependency, 478 mobile, 444 catalog, engine, research and
+acceptance suites pass; all four production-mode Hermes exports pass. The root
+check stopped at locally refused Deno npm-registry resolution, so no complete
+local root/native pass is claimed. CI owns the Deno/native gates. The deployed
+catalog-chain file is byte-identical; neither new forward has been deployed.
+
+A separately discovered Phase 14.2 hard-eligibility defect is corrected in
+[PR #306](https://github.com/Kajooja/Kajo/pull/306), source `d14c705`:
+Shared member-history overlays could reintroduce withdrawn or Shared-rejected
+Items. Its guarded forward and immediate client filter have red-to-green/full-
+schema preservation tests and all four exports; required CI/APK and guarded
+hosted rollout remain separate. Keep that narrow correction distinct from this
+round foundation. When integrating both, retain both CLI imports/probes/report
+fields; each adds its own required smoke rather than replacing the other.
+
+**Next bounded action:** publish/verify this scoped source PR stacked on #305,
+then continue #232's versioned as-of joint outcome/replay reader before admitting
+round labels into Memory/Scenario/evaluation. Establish participant/correction/
+maturity and per-response attribution explicitly; legacy single-actor evidence
+does not acquire joint confirmation. Integrate the #306 eligibility prerequisite
+with its own checks. Hosted rollout and Phase 16.3 UI activation remain distinct,
+as do #229's remaining device gates and the consumed #182 ledger below. Retrieve
+new CI links once without progress polling; do not repeat accepted E1/D1/D2 work.
+
+## Preserved #229 / #305 native delivery checkpoint
 
 ### Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
 

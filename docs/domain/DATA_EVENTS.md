@@ -2,7 +2,7 @@
 
 Status: canonical behavioral + growth telemetry contract, with accepted-main commands and explicitly marked #229/#232 successors.
 
-STATUS owns source, hosted and device acceptance. The #229 source sections below describe the inspected active branch, not code delivered by this documentation change. #232 SharedRatingRound remains planned required first-release work.
+STATUS owns source, hosted and device acceptance. The #229 source sections below describe the inspected active branch, not code delivered by this documentation change. #232's coordinated user/learning flow remains required; its source-only round evidence foundation is described separately below.
 
 Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
@@ -261,9 +261,48 @@ Pending Endorsement is actor-specific. Unanimous consensus produces one canonica
 
 Friendship does not grant authorization to read another User's Personal Event stream.
 
-Required #232 SharedRatingRound semantics are planned, not existing Event names/API fields. Each response retains round ID, actor, SharedProfile, Item, participant-set version and truthful delivered origin. Pending responses do not emit completed joint consumption/reward. Final completion, joint state and Outcome Events commit atomically once. Rating 0 is valid; preserve responses/disagreement without attributing one actor’s score to the group or copying Personal Events.
+Required #232 coordinated SharedRatingRound semantics remain planned beyond the source-only foundation below; no new joint Outcome Event is activated. Each response retains round ID, actor, SharedProfile, Item, participant-set version and truthful delivered origin. Pending responses do not emit completed joint consumption/reward. Final completion, joint state and Outcome Events must eventually commit atomically once. Rating 0 is valid; preserve responses/disagreement without attributing one actor’s score to the group or copying Personal Events.
 
 Edits/Undo, cancellation and changed membership correct/reconcile prior outcomes. A rewatch uses a new round ID; earlier experiences and action receipts remain immutable. Completion is not automatically positive preference or predictor success. Version reward interpretation and test delayed attribution, participant loss, legacy single-actor history and Personal isolation before Phase 16.3 acceptance.
+
+### Executable round evidence foundation — #232A, source only
+
+`public.commit_shared_rating_round_v1` accepts a bounded version-1 command with
+`commandId`, authenticated `actorUserId`, `profileId`, `roundId`, `kind` and
+`expectedRevision`. Its round-command namespace is separate from legacy Item/
+collection `actionId`; it does not promise cross-family UUID deduplication.
+OPEN_ROUND binds the Item/experience and snapshots current accepted participants.
+SET_RESPONSE records the actor's integer 0–10 rating or explicit unknown;
+CLEAR_RESPONSE removes that actor's current answer without erasing its revision.
+CANCEL_ROUND and RECONFIRM_ROUND retain history, and reconfirmation requires fresh
+answers against the new enrollment snapshot. Exact payload retry returns the
+original receipt only after current authorization; a changed payload or stale
+revision fails. Occurrence/receipt times are server-owned.
+
+The v1 boundary caps JSON commands at 4096 bytes, participants at 32 and revisions
+at 4096 per round. OPEN_ROUND refuses allocation when 16 other pending/
+reconfirmation rounds already exist for the Profile. Correcting or reconfirming
+an existing round remains possible at that allocation limit; resource admission
+cannot prevent an answer from becoming unknown or being cleared. The immutable
+receipt is an acknowledgement of that command's historical result; the read API
+supplies current status after intervening answers or membership changes.
+
+Each optional origin claims its own prediction/session/mode. Validated attribution
+requires the actor's same-SharedProfile run, selected Item and actual impression.
+Missing proof remains UNATTRIBUTED with the claim retained separately; a later
+impression cannot rewrite a response or receipt. An unranked response is permitted
+without inventing an exposure. `public.get_shared_rating_round_v1` returns the
+authorized current round projection and per-actor response vector. Completed
+answers do not collapse into an average or imply satisfaction.
+
+Private round/participant/response-revision/receipt storage and membership
+generation bookkeeping are API-denied and RLS-enabled. This source writes no
+native Event, legacy Item interaction, existing action receipt or joint reward.
+The explicit `groupReward=null`, `learnable=false` output keeps these new records
+out of the legacy scalar learning loop. The old single-actor Shared evidence
+reader remains legacy; a versioned joint outcome reader, as-of reconciliation,
+rewatch eligibility, durable mobile commands and Phase 16.3 activation are still
+required. STATUS records source verification and deployment separately.
 
 ## 11. Reliability contract
 

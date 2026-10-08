@@ -22,6 +22,8 @@ import { verifyAtomicPredictionPageConcurrency } from './atomic-prediction-pages
 import { catalogPredictionChainSmokeSql, catalogPredictionChainUpgradeSql,
   catalogPredictionChainUpgradeFixtureSql, verifyCatalogPredictionChainConcurrency } from './catalog-prediction-chain.mjs';
 import { predictionChainProvenanceSmokeSql } from './prediction-chain-provenance.mjs';
+import { sharedRatingRoundsSmokeSql, sharedRatingRoundsUpgradeSql } from './shared-rating-rounds.mjs';
+import { verifySharedRatingRoundsConcurrency } from './shared-rating-rounds-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -129,6 +131,12 @@ try {
     const [catalogChainUpgrade] = await exec(catalogPredictionChainUpgradeSql(files[chainIndex], chainFixture),
       { stage: 'catalog-chain-populated-upgrade', timeoutMs: 300_000 });
     assert.match(catalogChainUpgrade?.catalogChainUpgrade, /^PASS: populated v1\/v2/);
+    const roundsIndex = files.findIndex(file => file.name.endsWith('_shared_rating_round_evidence.sql'));
+    assert.ok(roundsIndex > chainIndex);
+    await resetFromMigrations(files.slice(0, roundsIndex));
+    const [sharedRatingRoundsUpgrade] = await exec(await sharedRatingRoundsUpgradeSql(files[roundsIndex]),
+      { stage: 'shared-rating-rounds-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(sharedRatingRoundsUpgrade?.sharedRatingRoundsUpgrade, /^PASS: every populated old row/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -146,6 +154,7 @@ try {
     const predictionPageConcurrency = await verifyPredictionPageConcurrency(execConcurrentSql);
     const atomicPageConcurrency = await verifyAtomicPredictionPageConcurrency(execConcurrentSql);
     const catalogChainConcurrency = await verifyCatalogPredictionChainConcurrency(execConcurrentSql);
+    const sharedRatingRoundsConcurrency = await verifySharedRatingRoundsConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -181,6 +190,9 @@ try {
     const [catalogChainProvenance] = await exec(await predictionChainProvenanceSmokeSql(),
       { stage: 'catalog-chain-later-page-outcome-provenance', timeoutMs: 120_000 });
     assert.match(catalogChainProvenance?.catalogChainProvenance, /^PASS:/);
+    const [sharedRatingRounds] = await exec(await sharedRatingRoundsSmokeSql(),
+      { stage: 'shared-rating-rounds-command-evidence-matrix', timeoutMs: 120_000 });
+    assert.match(sharedRatingRounds?.sharedRatingRounds, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -214,6 +226,7 @@ try {
       atomicPages, atomicPageBoundaries, atomicPageConcurrency, continuationUpgrade,
       catalogChain, catalogChainBoundaries, catalogChainUpgrade, catalogChainConcurrency,
       catalogChainProvenance,
+      sharedRatingRounds, sharedRatingRoundsUpgrade, sharedRatingRoundsConcurrency,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

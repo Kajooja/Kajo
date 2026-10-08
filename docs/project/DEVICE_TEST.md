@@ -1,5 +1,33 @@
 # Collection device checkpoint — #228 / #229
 
+## Successful replacement APK and owner acceptance — 2026-10-08
+
+[CI #612](https://github.com/Kajooja/Kajo/actions/runs/37763304219) passed all five
+mandatory gates and built the standalone APK for PR #305
+source `36a788d1c5e97ac862f07cfd6a6470fa6c61b4e4`, with APK merge checkout
+`205035ce0a1ec4e21ffbc65720427d787f9fda5b`. This closes the recorded
+build/audit/CLI failures for that source.
+GitHub's [artifact](https://github.com/Kajooja/Kajo/actions/runs/37763304219/artifacts/11545571462)
+is `kajo-android-standalone-205035ce0a1ec4e21ffbc65720427d787f9fda5b`,
+archive digest `sha256:ea418bee4bced8037c3cfd9e605dddb6ff40527b73ffc0a36492100f1f0bdef2`.
+This identifies the available build archive, not the phone's extracted APK.
+The owner reports that the current APK works perfectly, accepting the exercised
+append/layout correction. Preserve the earlier positive recovery and multi-List
+observations as their own evidence.
+
+The source and merge identities describe the successful requested build; the
+installed binary checksum, phone model and Android version were not supplied.
+The general report does not individually verify catalogue exhaustion versus the
+reader limit, every gesture/navigation/large-text combination, controlled
+15-second stalls, callback/provenance races or process-death recovery.
+Fresh-account/empty-domain, Shared sparse/disagreement and native visibility/
+exposure acceptance remain open below. Keep #229 draft and preserve current
+accounts/data; no reset or replay of deployed forwards is needed.
+
+The dated failed cases and build instructions below remain historical records.
+Their request to build/install the replacement is satisfied by this successful
+round; they do not require repeating the accepted append/layout correction.
+
 ## Append/layout correction and owner results — 2026-10-06
 
 CI #607 / run 37464008658 succeeded through all five mandatory gates and APK.

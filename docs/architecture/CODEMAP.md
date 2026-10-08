@@ -40,6 +40,21 @@ supabase/functions/password-auth/
 - `run-ci-cli-installation-probe.mjs`: both immutable prediction forwards and later
   catalog forwards, populated upgrades, runtime and concurrent-session assertions.
 
+## Shared rating-round evidence foundation — #232A, active source only
+
+`20261008122349_shared_rating_round_evidence.sql` adds private round evidence,
+participant enrollment generations, immutable response revisions and exact
+command receipts. The explicit `commit_shared_rating_round_v1` and
+`get_shared_rating_round_v1` APIs authorize the acting member and preserve the
+Shared target; they do not activate a mobile flow or write legacy Item Events/
+interactions. New membership bookkeeping distinguishes enrollment generations
+without changing historical member rows. Existing rankers/evaluators stay intact;
+the projection explicitly withholds a joint reward. `shared-rating-rounds.mjs`,
+its full-schema SQL/tests and native concurrency helper exercise pending/complete/
+corrected/cancelled evidence, access/origin/replay and populated preservation.
+The required CLI installation gate includes these probes. STATUS distinguishes
+source verification, CI and any future hosted rollout.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit

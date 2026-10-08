@@ -14,6 +14,35 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Working APK and Shared evidence continuation — 2026-10-08 / #232
+
+CI #612 passed all five required gates and APK on #305 source `36a788d`,
+including the previously pending native cancellation/rollback, populated upgrade
+and concurrency checks. The owner reports the current APK works and selects
+continued roadmap implementation. DEVICE_TEST records positive acceptance of
+the exercised append/layout correction without inventing an installed checksum,
+device/OS or unreported subcase. Broader #229 and release gates stay open.
+
+The next distinct Phase 14.1 implementation is #232's SharedRatingRound evidence
+foundation: freeze participants, preserve each actor's response and prediction
+origin, and distinguish pending/completed/corrected/cancelled evidence without
+inventing group reward. Legacy one-actor Shared history is retained as legacy;
+no responses are backfilled. Coordinated UI belongs to Phase 16.3, while
+versioned joint outcome/eligibility and learning remain Phase 14 dependencies.
+STATUS owns the exact branch, validation and subsequent bounded action.
+
+Delivered source: `20261008122349_shared_rating_round_evidence.sql`, hash
+`4e80e0daadaa537e85bb14ce11fffb3f4fc263164e4db3ee7182f4be75514796`.
+The final 87-test database sweep passes, including populated preservation and
+the expanded participant/origin/retry/correction/deletion/capacity matrix.
+Independent review found no blocker; native observed-blocker races remain
+mandatory CI evidence. Lint/types and remaining locally available suites/four
+exports pass; Deno registry Connection refused prevents claiming a complete
+local root check. The next bounded algorithm dependency is the versioned as-of
+joint outcome/replay reader, before these response vectors enter learning.
+The independently found Shared overlay exclusion bypass has a separate narrow
+correction in #306; preserve both sets of CLI probes when integrating.
+
 ## Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
 
 CI #611 on `da376700fc24bae894383533f11e6168da74e36d` stopped at the fresh
