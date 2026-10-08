@@ -10,7 +10,71 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232 Shared rating-round evidence foundation
+## Current packet — #232 versioned Shared round outcome reader
+
+### Receipt-prefix interpretation — 2026-10-08
+
+Continue on `feat/232-shared-round-replay`, stacked on
+[PR #307](https://github.com/Kajooja/Kajo/pull/307) source
+`9e3c49a7398320f6473acd0fb36230d30056b7e6`. Fresh inspection for the owner's
+**“Jatka siis eteenpäin”** confirms all five required
+[CI #615](https://github.com/Kajooja/Kajo/actions/runs/37780248224) gates passed.
+Its APK job is intentionally skipped: this backend foundation requested no APK.
+The independent [#306](https://github.com/Kajooja/Kajo/pull/306) eligibility fix
+also passed all five [CI #614](https://github.com/Kajooja/Kajo/actions/runs/37779579804)
+gates; its labelled APK job was still in progress at this one-time inspection.
+Do not turn either observation into main/hosted/device acceptance or poll progress.
+
+`20261008132733_shared_round_outcomes.sql`, SHA-256
+`2fbab2b59e796138d18895b2fe8c1213ff2c7e9cfa8df57bb8af79e85ca3a85f`,
+adds an owner-only versioned STABLE invoker reader and receipt lookup index.
+One statement's consistent visible immutable command prefix supplies the
+frozen participant/response vector under both command and evidence cutoffs.
+Corrections/cancellation affect later prefixes; reconfirmation does not reuse
+old answers. Zero, unknown, cleared and missing remain distinct. Maturity is an
+explicit caller-declared elapsed interval, anchored at the maximum acceptance
+time in that prefix. Per-response late exposure is derived only from an actual
+own-actor run/selected Item/impression; stored origins and receipts remain intact.
+Coverage and descriptive minimum/spread do not define a scalar joint reward.
+
+The contract declares `COMMAND_RECEIPT_PREFIX`, `SERVER_COMMAND_ACCEPTED_AT`,
+`historicalFeatureEligible=false`, historical membership/commit visibility
+unknown, `groupReward=null` and `learnable=false`. The foundation has no ledger
+of intervening memberships or transaction commit times. Same acceptance cutoffs
+can gain a receipt after a late commit; the new native independent-session proof
+tests that limitation explicitly. A timestamp-only read is not a frozen replay
+token. Existing ranker, Memory, Scenario, evaluation, Item state and Event bodies
+are unchanged; legacy single-actor Shared history gains no joint confirmation.
+
+The complete fresh database sweep passes **88/88**, with no failures/skips.
+The focused full-schema rehearsal passes populated row/object/ACL preservation,
+receipt replay and the temporal matrix, including null-safe assertions,
+missing/duplicate prefixes, clock regression/ties, independent cutoffs, per-actor
+late/backdated timestamp conventions and UTC/DST maturity. Independent review
+found no blocker. Root `npm run check` passed lint/typechecks and dependency/
+mobile/catalog suites, then stopped at Deno registry `Connection refused`.
+Engine/research/acceptance suites and all four production-mode Hermes exports
+pass separately. No complete local root/native pass is claimed; Docker is
+unavailable. Required CI retains all old gates and adds the populated upgrade,
+rollback matrix and actual independent-session commit-visibility proof, each
+with its own bounded SQL stage/report. The SQL hash above, #232A hash and deployed
+catalog-chain bytes/lock remain unchanged. Neither this reader nor the #232A/#306
+forwards has been deployed; an API-writable stored Event timestamp is explicitly
+not trusted arrival history.
+
+**Next bounded action:** verify this scoped source PR's required CI gates, resolving
+any actual failure before integration. Retrieve its run link once without progress
+polling. Then implement #232's frozen visible-prefix/evaluation admission
+boundary: capture what the consumer actually observed, freeze vector interpretation,
+cutoffs/maturity/versions, reconcile later corrections and compare production/shadow
+on identical supported outcome vectors. Do not feed diagnostic readiness into the
+legacy scalar reward loop or invent a member average. Keep historical feature
+eligibility closed until actual availability is captured. #306 integration/guarded
+hosted rollout and Phase 16.3 mobile activation remain separate; preserve both
+CLI probe sets, #229's open device gates and the consumed #182 ledger. Accepted
+E1/D1/D2 work needs no repeat. The preceding source remains dated history below.
+
+## Preserved #232A Shared rating-round evidence foundation
 
 ### Working APK and roadmap continuation — 2026-10-08
 

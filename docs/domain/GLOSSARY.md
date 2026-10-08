@@ -67,7 +67,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Endorsement / yhteinen tykkäys | `Endorsement` | Actor-specific positive Shared decision to do an Item together. |
 | Pending endorsement | `PendingEndorsement` | At least one active Endorsement without unanimous accepted-member consensus. |
 | Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` proposal. The #229 successor binds an explicit destination set, confirmed by every member before unanimous commit; accepted-main single-List and active exact-set source acceptance remain distinct. |
-| Shared rating round / yhteinen arviointikierros | `SharedRatingRound` | Required first-release target (#232): one identified Shared experience, explicit participant set and each actor’s own response. All required responses precede joint completion; a rewatch creates a new round. Not yet implemented. |
+| Shared rating round / yhteinen arviointikierros | `SharedRatingRound` | One identified Shared experience, frozen accepted participants and each actor’s own response. Source-only #232A/B implements revisioned evidence and a receipt-prefix outcome reader; the coordinated first-release flow and learning admission remain planned. All required ratings precede joint completion; a rewatch creates a new round. |
 | Shared consensus | `SharedConsensus` | Unanimous currently accepted-member endorsement; promotes once to Shared Saved/system List and remains durable. |
 | List / lista | `ItemList` | Profile-owned collection of generic, potentially mixed-type Items. |
 | System saved list / Tallennetut | `SYSTEM_SAVED` | Exactly one system Saved List per Profile. |

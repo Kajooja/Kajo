@@ -342,6 +342,25 @@ Katsotut/Luetut, ordinary Item state or Events. The coordinated flow and version
 joint outcome admission remain required before release; source/CI/hosted
 acceptance belong to STATUS.
 
+### Receipt-prefix outcome projection — #232B, source only
+
+The private versioned reader reconstructs one round from its immutable command
+receipts, retaining the acknowledged participant set and separate responses.
+Its basis is `COMMAND_RECEIPT_PREFIX`, with `SERVER_COMMAND_ACCEPTED_AT` times.
+Later corrections, cancellation and reconfirmation affect later prefixes; they
+do not change an earlier prefix or merge answers across participant-set versions.
+New experience IDs remain separate even for the same Item. Ordinary departure
+does not erase an already acknowledged experience; User/Profile/Item deletion
+removes the retained lineage rather than resurrecting it through replay.
+
+The projection does not reconstruct historical membership between commands or
+transaction commit visibility. It cannot use today's membership, current round
+head or Item state to fill those gaps. `historicalFeatureEligible=false` excludes
+it as proof of a past prediction-time feature snapshot. A complete, elapsed-window
+response vector can be reviewed as observed outcome evidence; that is separate
+from an admitted joint reward, current membership confirmation or predictor
+success. DATA_EVENTS owns cutoffs and attribution; PREDICTION_MODEL owns admission.
+
 Member-seen Items remain eligible for a strong, truthfully explained joint fit.
 Previously joint-consumed Items may reappear only through a versioned, bounded
 rewatch policy. Existing history stays intact. Exact eligibility, cooldown and
