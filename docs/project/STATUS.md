@@ -10,7 +10,56 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #229 standalone APK and configured-device acceptance
+## Current packet — #177 Shared overlay eligibility prerequisite
+
+### Confirmed overlay bypass — 2026-10-08 / Phase 14.2
+
+CI #612 passed all five mandatory gates and APK for the predecessor #305 source
+`36a788d1c5e97ac862f07cfd6a6470fa6c61b4e4`; the owner accepts the exercised
+append/layout flows. That general report does not establish every #229 native
+evidence, Shared or fresh-account gate. Installed checksum/device/OS are unknown.
+
+The next reliability review found a concrete bypass: the Shared overlay returned
+withdrawn Items and Shared not-interested Items with a false discovery-exclusion
+flag. Pending/member-history tiers could append them outside the server-ranked
+page, and the client's last filter checked only consumed state. This is a known
+14.2 eligibility defect to fix before extending Shared round work.
+
+`fix/177-shared-overlay-eligibility` starts at that exact tested source. The new
+CLI-generated forward `20261008122852_shared_overlay_eligibility.sql` changes only
+the guarded private overlay's exclusion expression. It retains catalogue/history,
+zero ratings, proposal metadata, function identity/owner/ACL and all existing
+application/Auth/evidence rows. Local not-interest state also removes an Item
+from the visible grid/swipe remainder without making it consumed. No scorer,
+legacy migration, Shared round, Event or reward contract is changed.
+
+The authored forward SHA-256 is
+`49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698`.
+It is **not deployed**. Two client regressions first reproduced the defect;
+all 26 focused cases now pass. Full-schema SQL proves the old read defect,
+unknown-source rejection, populated row/OID/owner/ACL preservation, legacy/v2
+agreement, retained metadata, Profile isolation and revoked/outsider denial.
+The rollback-only runtime proof is also required by native CLI CI. Root lint and
+typechecks, 43 dependency, 481 mobile and 444 catalogue tests passed. The root
+check then stopped at Deno's frozen npm-registry resolution with Connection
+refused; no complete root-check pass is claimed. All four main and isolated
+description-acceptance iOS/Android production-mode Hermes exports passed
+separately. Docker is unavailable locally; native CI remains mandatory.
+
+Read-only hosted preflight on `mwrnvfosrzwygrunrltm` matches the guarded source
+MD5 `ffdbb9d3c1291d3cf58f0ad89e82fd95`, owner `postgres` and the existing
+postgres/authenticated execute ACL. Its full definition SHA-256 is
+`3bf115e4fb11887b244df79735848dbde671ffba60d54df37a856719353c6f53`.
+No hosted data, DDL or migration-history mutation was performed.
+
+Next: publish this narrow correction as a PR stacked on #305, retaining all five
+mandatory checks and requesting its APK. After those checks, repeat the guarded
+hosted preflight and apply only this exact new forward in an approved rollout
+packet. A focused Shared BOOK/MOVIE exclusion observation follows a successful
+artifact and rollout; no device test is requested before the artifact exists.
+Preserve existing accounts/data and prior hosted forwards;
+broader #229 and Sprint 014 acceptance remain open. #232's evidence foundation
+continues as its separate packet after this prerequisite is integrated.
 
 ### Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
 

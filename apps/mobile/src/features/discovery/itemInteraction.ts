@@ -228,7 +228,10 @@ export function getDiscoverableItems(
   items: readonly Item[],
   interactions: ItemInteractionMap,
 ): readonly Item[] {
-  return items.filter((item) => !getItemInteraction(interactions, item.id).consumed);
+  return items.filter((item) => {
+    const interaction = getItemInteraction(interactions, item.id);
+    return !interaction.consumed && !interaction.notInterested;
+  });
 }
 
 export function getConsumedItems(
