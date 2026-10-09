@@ -26,6 +26,14 @@
     "./research": {
       "types": "./dist/research.d.ts",
       "import": "./dist/research.js"
+    },
+    "./ordinal": {
+      "types": "./dist/ordinal.d.ts",
+      "import": "./dist/ordinal.js"
+    },
+    "./adapters/kajo-ordinal": {
+      "types": "./dist/adapters/kajo-ordinal.d.ts",
+      "import": "./dist/adapters/kajo-ordinal.js"
     }
   },
   "scripts": {

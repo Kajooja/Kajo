@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-08**
+Last updated: **2026-10-09**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,103 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232 isolated CI startup lifecycle
+## Current packet — #232E portable exposed-outcome ordinal audit
+
+### Diagnostic target and executable owner report — 2026-10-08
+
+Continue on `feat/232-shared-ordinal-evaluation`, stacked on
+[PR #311](https://github.com/Kajooja/Kajo/pull/311), exact parent source
+`c3b98bbaf1f4c7cb26b2a3f7c76ced6c6503e873`, tree
+`1b1698a548dacf4a5e118f06dc5da4df785f4e85`. #311 repairs startup diagnosis/
+cleanup and bounded operational inventory, not a confirmed image/port cause.
+One finite #619 inspection shows platform, validate and both clean installations
+pass, populated upgrade fails before startup at container inventory, and CLI is
+still running at that lookup. The follow-up adds 30-second operational inventory
+and fixed process/phase diagnostics; final database 100/100 and startup/readiness
+27/27 pass. Its [CI #620](https://github.com/Kajooja/Kajo/actions/runs/37840193670)
+was in progress at the one-time new-source lookup. Required native acceptance
+remains open; no ongoing polling is introduced. Completed #310 / CI #618 passes actual worker/eraser
+lock orders and other application gates, with first clean-install startup failed
+before SQL. No main merge, hosted write or backend APK request is introduced.
+
+The separate pure `./ordinal` engine subpath evaluates two distinct group
+experiences using identical actor/enrollment sets and both Items from ONE
+explicit frozen production/shadow candidate pool. Complete own exposure,
+compatible target/scale, outcome availability/maturity and strict pre-OPEN
+stored-clock boundaries are required. Pareto dominance supplies a directional
+comparison; all-member ties and opposing preferences remain unscored coverage.
+Zero remains a rating. Frozen rank order is authoritative for unequal scores;
+exact score ties remain neutral despite ID tie-breaks. No rank-to-rating
+conversion, member average or second Shared recommender is created.
+
+The strict `./adapters/kajo-ordinal` mapper accepts owner-authorized immutable
+#232C snapshots, checks complete common support, window/genome/mode/domain,
+versions/pools, a common evidence cutoff/maturity interval, every actor's own
+actual exposure and declared digest bindings.
+Mandatory scoped subject/member/enrollment handles replace raw audit identities
+in portable inputs/reports. Private source/capture/round/Item/comparison references
+remain sensitive owner audit data; aliases are not anonymization or authorization.
+PostgreSQL JSONB digests/file authenticity are not recomputed by this adapter.
+Representable receipt microseconds are preserved as decimal milliseconds;
+precision-collapsed boundaries are conservatively rejected. Numeric E1 serving/
+reference behavior and every SQL migration/lockfile remain unchanged.
+
+`npm run engine:ordinal -- INPUT_MANIFEST OUTPUT_REPORT` builds the real ESM
+exports and writes a bounded exclusive mode-0600 report outside Git repositories/
+worktrees. The explicit manifest is limited to 16 MiB and 256 non-overlapping
+pairs; repeated round/experience/object pairs cannot inflate support, including
+alias changes. No network/database write or existing-file overwrite occurs.
+Target/version/time, capture/revision, round/experience/object refs, actor
+provenance and the one anchor permit replay; new captures reconcile corrections
+without rewriting earlier reports or adding another observation for that round.
+PREDICTION_MODEL owns exact target/selection/privacy semantics.
+
+This is conditional descriptive evaluation of production-exposed Items, not a
+causal shadow-policy experiment, prospective holdout or calibrated member forecast.
+Historical anchor membership and commit availability remain unknown. Reports
+keep learning/historical feature admission closed, reward/advantage null,
+independence unestablished and uncertainty unavailable. Generated media and
+maintenance fixtures contribute zero observed quality labels. Existing SQL
+functions produce synthetic database-fixture artifacts for the adapter/CLI test;
+that interoperability proof is not a native prediction-quality measurement.
+
+Final source validation passes **101/101 database tests** without failures/skips,
+**77/77 engine tests** and actual built ESM/root/ordinal import-graph checks.
+The focused adapter suite passes 21/21, core 12/12 and combined offline CLI/actual
+SQL bridge 11/11; the complete research suite passes 19 Python + 23 Node tests.
+The bridge uses existing SQL serving/delivery/round/worker/capture/comparison
+functions, verifies producer digests inside PostgreSQL, runs the real CLI, and
+proves new correction captures/revision4 while old report replay stays exact.
+Independent final reviews find no blocker. Final engine lint/typecheck passes;
+fresh root check passes available lint/types/dependency/mobile/catalog stages
+and stops at Deno registry Connection refused. A complete local root-check pass
+is not claimed. The unchanged application scope retains the parent's acceptance
+and four production Hermes export evidence; no device/native quality acceptance
+is inferred. All old migrations and the root lockfile retain their exact hashes.
+
+**Publication authorization — 2026-10-09:** the validated implementation is local commit
+`5235db39aacdca10913a13656a04c99d8199b425`, tree
+`4274e92f76679711bb119dbddf5833728add071a`. The owner explicitly authorized
+publication in the public `Kajooja/Kajo` repository with **"Saat julkaista"**,
+resolving the previous automatic review block. Subsequent authorization/handoff
+edits change documentation only; implementation and validation remain unchanged.
+Publish the branch/PR and retrieve its run link once. The single active
+[PR #229 handoff](https://github.com/Kajooja/Kajo/pull/229) records the resulting
+exact published source, tree, PR and run; its historical September 30 checkpoint
+and original source branch remain preserved.
+
+**Next bounded action:** on the next continuation inspect completed required
+gates for that exact published source and diagnose the new
+sanitized startup receipt if installation still fails. Before native learning/
+serving admission, freeze prospective full enrollment, first-answer/prefix and
+actual consumer capture lineage, then predeclare an authorized delayed-outcome
+sample and selection/uncertainty rules. Do not reinterpret accepted-at clocks or
+complete retrospective captures as historical features. Serving changes require
+measured production/challenger evidence and a separate promotion/rollback gate.
+Preserve #306 integration/guarded rollout, Phase 16.3 UI, #229 device acceptance,
+canonical account-erasure restrictions and consumed #182/E1/D1/D2 evidence.
+
+## Preserved #232 isolated CI startup lifecycle
 
 ### Repeated startup failure — 2026-10-08
 

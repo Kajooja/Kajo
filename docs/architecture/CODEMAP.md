@@ -86,6 +86,25 @@ The existing required CLI gate includes these probes. DATA_EVENTS and
 PREDICTION_MODEL retain unavailable scalar metrics and historical feature
 admission; STATUS owns the exact migration name/hash and source/CI/rollout state.
 
+## Portable Shared ordinal diagnostic — #232E, active source only
+
+`packages/prediction-engine/src/ordinal.ts` exposes bounded pure pair/batch
+Pareto evaluation through `./ordinal`; `src/adapters/kajo-ordinal.ts` validates
+already-authorized frozen #232C snapshots and required scoped member handles.
+Their tests exercise media/non-media, zero/ties/disagreement/missing support,
+clocks/corrections, full enrollment, pool/version/provenance and private alias
+boundaries. Built ESM/import-graph checks keep both separate from the root
+numeric engine and all app/provider dependencies.
+`scripts/database/shared-ordinal-adapter.test.mjs` runs actual existing SQL
+serving, delivery, round, worker, capture and comparison functions in disposable
+PGlite before crossing the adapter, including new-capture correction replay.
+`packages/prediction-engine/scripts/ordinal-report.mjs` and
+`scripts/research/ordinal-report.test.mjs`, via `npm run engine:ordinal`, provide
+bounded offline private reports outside the repository without overwriting.
+PREDICTION_MODEL owns diagnostic/selection/alias semantics; no serving, schema,
+reward, historical feature admission or promotion is introduced. SQL fixtures
+use synthetic actors and do not measure native prediction quality.
+
 ## Closed shadow-source erasure — #232D, active source only
 
 `20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source
@@ -98,7 +117,8 @@ against erasure; unresolved learned-policy lineage rejects preparation atomicall
 `shadow-source-erasure-concurrency.mjs` join the existing CLI gate for populated
 preservation and actual worker/eraser race orders. User/Profile roots remain for
 owner deletion within that same transaction. DATA_EVENTS owns the contract;
-STATUS records source checks, pending native evidence and the next integration.
+STATUS records source checks, actual worker/eraser native proof and remaining
+installation/integration acceptance.
 
 ## Dependency compatibility verification
 
