@@ -10,7 +10,97 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232F prepared pre-first-response prediction input
+## Current packet — native memory/serving decay parity and dependency audit
+
+### Personal prediction critical path — 2026-10-09
+
+Continue on `fix/personal-decay-parity`, stacked on published
+[PR #313](https://github.com/Kajooja/Kajo/pull/313), exact parent source
+`16e8e64a382fa07fd49b78815dc1339d0fa3d72a`, tree
+`91066fb95621ed2957572fafe89a58cf448833b6`. Its
+[CI #622](https://github.com/Kajooja/Kajo/actions/runs/37916596980) remains
+in progress at this continuation's single lookup; no completed gate is inferred
+and no ongoing CI/APK polling is introduced. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. Unmerged source, hosted behavior and
+device acceptance remain distinct. Public source publication is already authorized.
+
+The owner explicitly asks to audit current/future documentation and reconsider
+order. The audit confirms accepted E1/D1/D2 executable/research foundations,
+whose old planned/pending summaries are corrected without admitting an external
+serving model. All 62 tracked Markdown files and 277 local links/anchors resolve
+before edits; no historical source or consumed operation is removed. Current
+publication identity, dated audit evidence, the promoted #199 append/layout
+packet and the non-default Sprint 012 handoff are reconciled in their owners.
+
+ROADMAP now prioritizes a measurable Personal BOOK/MOVIE path: native memory/
+serving parity, then bounded ordered session/state policy, then adaptive Taste
+and a frozen honest challenge. Source work may overlap independent Shared and
+device acceptance. Server-backed anonymous identity and minimum retention,
+abuse and measurement contracts precede actual anonymous Taste acceptance;
+provider conversion and complete operational/public-release gates retain their
+separate dependencies. No MVP requirement or advanced-engine ambition is removed.
+
+The source correction removes a live inconsistency: memory snapshots used
+unclamped native 180-day LongTerm decay, while ordinary and catalogue-chain base
+scorers stopped ageing observations at day 365. The versioned private
+`native_long_term_decay_v2` helper now governs current snapshots and both kernels.
+New live metadata identifies `native-long-term-decay-v2` and base
+`prediction-v0.5-native-decay`; structural memory/features and scalar genomes
+remain compatible. Native Events/UNDOs require finite occurrence times at or
+before their declared cutoff. `nativeEvidenceAsOf` records memory's explicit
+`state_as_of` and the base transaction's `now()` separately; this does not unify
+clocks or certify commit-time availability. Strengths, ShortTerm and the bootstrap
+20% floor are preserved. Shared direct base also changes; common-fit/member
+aggregation and genuine joint forecast consumption remain separate.
+
+Pinned CLI 2.117.0 generated
+`20261009103214_personal_native_decay_parity.sql`, SHA-256
+`fb1bdb933a287b4d2942cc821162a712ccb2669bf80e63fa72d93798bd0f6f98`.
+Five exact drift-guarded body patches preserve old function identities, owner,
+ACL/configuration and lifecycle-first entry guards. All 68 older migration files,
+the root lockfile and immutable historical rows/features/replay retain their bytes.
+
+Validation: full database **103/103** passes. The final affected full-schema test
+also passes after adding exact bidirectional production/shadow Item sets. It
+reproduces the actual old memory-negative/base-positive contradiction; proves
+age-boundary, future/nonfinite Event+UNDO, correction/removal, bootstrap and
+Personal BOOK/MOVIE behavior; preserves populated old rows/objects; and requires
+actual V2/V3 Personal/Shared pages and every baseline shadow with exact frozen
+score/rank/selection parity. Independent source/test/doc review and syntax/diff
+checks pass. The final Markdown audit finds 62 files and 279 local links/anchors
+valid. Engine **77/77** plus built ESM graphs, research **19 Python + 23 Node**,
+and acceptance **6 + 5** pass. Fresh root lint/typecheck, dependency **43**, mobile
+**478** and catalog **444** pass before Deno registry `Connection refused`
+(exit 1). A separate smoke attempt fails closed because local production
+Supabase configuration is absent; no complete root or fresh application-export
+pass is claimed. Existing required CLI gates gain populated-upgrade and runtime
+math/serving/frozen-parity stages; actual Docker/native execution and live local
+advisors remain unavailable here. Source tests do not establish native activation
+or measured recommendation quality.
+
+The single [#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns the
+published exact PR/source/tree and one-time CI result while preserving its
+September 30 checkpoint. Required exact-source CI/native acceptance remains open
+until demonstrated; no ongoing CI/APK polling is introduced.
+
+**Next bounded action:** on continuation resolve this published source from #229
+and inspect completed required gates once, diagnosing a concrete sanitized
+receipt if installation fails. Then implement the next bounded ordered Personal
+session/state policy component with static/WorkingState-off controls and explicit
+support/reset/expiry. Keep the separately retained bootstrap-floor hypothesis,
+independent support, normalized-feature/transfer evaluation and real
+first-session usefulness as explicit remaining gates.
+
+#232F's genuine versioned consumer remains a named queued Shared dependency:
+it must actually use its captured input, retain that identity atomically with
+PredictionRun, and prove correction/withdrawal/dependent-forecast erasure before
+admission. Input capture and ordinal diagnostics do not substitute for it.
+Preserve #306 integration, #229 configured-device/fresh-account evidence,
+Phase 16.3 joint-round/rewatch delivery, #182/E1/D1/D2 consumed records and all
+required native/hosted/privacy/quality/release gates. No main merge, hosted write,
+new APK or account/data reset is introduced.
+
+## Preserved #232F prepared pre-first-response prediction input
 
 ### Full enrollment and actual zero-response prefix — 2026-10-09
 
@@ -73,14 +163,15 @@ to obtain because Docker is unavailable here. The local CLI security-advisor
 attempt cannot connect to `127.0.0.1:54322`; executable full-schema privilege/RLS/
 invoker/search-path checks pass, without claiming a live advisor pass.
 
-Publish this source branch on its exact #312 parent and record the resulting
-PR/source/tree and one-time CI lookup in the single
-[#229 handoff](https://github.com/Kajooja/Kajo/pull/229), preserving its September
-30 checkpoint. Publication is a source review packet; required CI/native
-acceptance stays open until its exact source passes. No main merge, hosted write
-or new APK is introduced.
+Published [PR #313](https://github.com/Kajooja/Kajo/pull/313), source
+`16e8e64a382fa07fd49b78815dc1339d0fa3d72a`, tree
+`91066fb95621ed2957572fafe89a58cf448833b6`, on the exact #312 parent above.
+Its [CI #622](https://github.com/Kajooja/Kajo/actions/runs/37916596980) was
+in progress at the one-time publication lookup. #229 records that exact source
+and preserves its September 30 checkpoint verbatim. Required native acceptance
+remains separate; this dated packet is not the default next-task instruction.
 
-**Next bounded action:** on continuation resolve the published exact source
+**Recorded next action at #232F publication:** on continuation resolve the published exact source
 from #229 and inspect its completed required gates once; diagnose a concrete
 sanitized receipt if installation fails. Then implement a genuine versioned
 forecast consumer that uses this prepared input and atomically retains the

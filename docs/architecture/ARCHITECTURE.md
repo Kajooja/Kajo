@@ -47,13 +47,16 @@ kajo/
 ├── supabase/
 │   ├── migrations/
 │   └── functions/
-├── packages/                    # executable reusable contracts/core when E1 begins
+├── packages/                    # implemented reusable engine contracts/core
 ├── scripts/                     # bounded research/operational tools when implemented
 ├── docs/
 └── .github/
 ```
 
-Do not create empty folders to match this diagram. E1 may create an actual tested engine-contract package; it does not force an immediate SQL-to-service rewrite. CODEMAP lists real code paths, not every conceptual module in the target design.
+Do not create empty folders to match this diagram. E1 delivered the tested
+`packages/prediction-engine` contract package; D1/D2 delivered isolated research
+intake/evaluation. This does not force a SQL-to-service rewrite or admit a serving
+model. CODEMAP lists real code paths, not every conceptual target module.
 
 ## 3. Clients
 
@@ -100,6 +103,12 @@ Provider linking must not create duplicate Kajo Users or PersonalProfiles.
 ### Anonymous Taste identity
 
 Taste Test starts without an account wall. Kajo therefore needs a server-backed anonymous identity/session boundary.
+
+This boundary, minimum retention/deletion and abuse controls, and versioned Taste
+measurement precede real anonymous Taste acceptance under ROADMAP 15.0. Provider
+linking and full browser/app continuity complete under 15.1; full launch operations
+remain later gates. Selection/challenge source work can use authorized fixtures
+before this runtime exists, without claiming an anonymous launch flow.
 
 Conceptual model:
 
@@ -1967,7 +1976,19 @@ See `CODEMAP.md`, active sprint handoff and ADRs for implementation paths/detail
 
 ## 21. Incremental portability and research boundary
 
-E1 makes the engine contract executable with Kajo/media and small synthetic non-media fixtures. It does not move production scoring into the mobile app or bypass the trusted server. D1/D2 introduce an isolated external-data adapter and reproducible baselines. E2 may later replace one admitted component behind existing Kajo contracts with parity, fallback and rollback tests.
+E1 implements the executable engine contract with Kajo/media and small synthetic
+non-media fixtures. D1/D2 implement the isolated external-data adapter and
+reproducible baseline report; their bounded foundation is accepted. Production
+scoring remains server-owned. E2 may later replace one admitted component behind
+existing Kajo contracts with parity, fallback and rollback tests.
+
+The October 9 dependency audit prioritizes the native memory/serving
+decay divergence before bounded ordered Personal session/state policy and adaptive
+Taste/frozen challenge. Preserve the current server boundary and version actual
+features/interpretation; normalized-feature activation must coordinate every
+consumer. Known Shared evidence defects remain mandatory, while its queued
+genuine prepared-input consumer and advanced models are not a blanket prerequisite
+to Personal source work. ROADMAP owns order; STATUS owns exact acceptance.
 
 The complete source proposal is retained separately: transparent state/memory → latent representations → explicit outcome/next-state model → bounded multistep dreams → self-evolving geometry. Each generation needs its own suitable data and acceptance. Movie-only rating accuracy cannot close all of those gates.
 

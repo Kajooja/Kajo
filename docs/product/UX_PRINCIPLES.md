@@ -101,10 +101,11 @@ Discovery may show a bounded contextual row of active Profile Lists. Catalog sea
 
 ### Owner browse refinements — planned, 2026-09-23
 
-The owner likes the current Discovery appearance and explicitly defers these
-refinements to the appropriate application UI packet. They are recorded work,
-not changes delivered by the catalog/native-acceptance packet. ROADMAP Phase
-17.0 owns scheduling; the existing issues below own implementation.
+The September 23 queue remains recorded product work. The owner's October 6
+promotion moves #199 continuous append, compact one-row header and unused
+bottom-space removal into the native correction packet described below;
+gesture/small-screen/large-text acceptance remains required. ROADMAP Phase 17.0
+retains the other broad browse refinements; the issues below own implementation.
 
 - **One consumed history (#200):** Discovery's Katsotut/Luetut opens the same
   canonical, active-Profile and ItemType-scoped history as the Lists entry. A
@@ -124,7 +125,7 @@ not changes delivered by the catalog/native-acceptance packet. ROADMAP Phase
   caching/virtualization.
 - **Continuous browsing (#199, dependent on #228/#229):** approaching the end
   loads the next server page, preserving order, existing rows and scroll. Reuse
-  the accepted cursor/delivery contract when that source packet is merged;
+  the versioned cursor/delivery contract with its separate source/native gates;
   coalesce requests, retain exact per-Item origins, avoid duplicate IDs and
   cancel obsolete Profile/domain/session reads. Errors allow the same request
   to recover. Exhaustion or expiry remains truthful; do not fabricate an endless

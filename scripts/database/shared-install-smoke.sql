@@ -11,6 +11,8 @@ declare
   personal_ids uuid[];
   common_fit jsonb;
   ranked record;
+  expected_base_version text := case when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
+    then 'prediction-v0.4-bootstrap' else 'prediction-v0.5-native-decay' end;
 begin
   insert into auth.users(id,email,raw_user_meta_data)
   select id,id::text || '@example.invalid',jsonb_build_object('kajo_nickname','Probe ' || left(id::text,18))
@@ -57,7 +59,7 @@ begin
   end loop;
   if (select count(*) from private.prediction_runs where profile_id=shared
       and policy_version like '%shared-common-fit-v1.1%'
-      and base_model_version='prediction-v0.4-bootstrap') <> 2 then
+      and base_model_version=expected_base_version) <> 2 then
     raise exception 'Missing Shared versioned traces or denied call persisted a trace';
   end if;
 end;

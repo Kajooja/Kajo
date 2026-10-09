@@ -85,7 +85,8 @@ UUID call; `npm run audit:dependencies` checks current published advisories.
 Root query-string/xcode dev pins make the parents used by these tests explicit
 and keep security overrides effective across npm workspace-link resolution.
 Vitest is coordinated at 4.1.11; Vite stays at the previously accepted 7.3.6.
-[The audit record](docs/project/dependency-audit-2026-09-28.json) records the exact
-lockfile and results. Review/remove the decoder interop when the routing parent
+[The September 28 audit record](docs/project/dependency-audit-2026-09-28.json)
+retains that dated lockfile and its results; current dependency/source acceptance
+is recorded in [STATUS](docs/project/STATUS.md). Review/remove the decoder interop when the routing parent
 adopts a compatible patched decoder; its source hash intentionally rejects blind
 upgrades. Do not use `npm audit fix --force` to downgrade Expo.

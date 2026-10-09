@@ -60,9 +60,9 @@ separate from a successful benchmark.
 
 ```text
 trustworthy algorithm/evidence/catalog
+→ server-backed anonymous entry + minimum retention/abuse/measurement
 → adaptive Taste Test + honest holdout challenge
-→ anonymous web/app entry + Google/Apple conversion
-→ recommendation preview/funnel
+→ recommendation preview + Google/Apple continuity/funnel
 → Friend invite + Friends safety lifecycle
 → explicit Friends → SharedProfile
 → core UX/telemetry/privacy/operations
@@ -70,6 +70,16 @@ trustworthy algorithm/evidence/catalog
 → production/store acceptance
 → Share Link Gate
 ```
+
+These are acceptance dependencies, not a requirement to finish every advanced
+Shared model before Personal source work. The owner-requested October 9 dependency
+review prioritizes the live native LongTerm snapshot/serving decay mismatch, then bounded
+ordered session/state policy and adaptive Personal Taste with a frozen challenge.
+Known Shared evidence defects remain mandatory; the genuine #232F input consumer,
+#306 integration, #229 native/device acceptance and Phase 16.3 remain open gates.
+Real anonymous Taste acceptance requires its server identity, minimum lifecycle/
+abuse controls and measurement first; complete conversion/operations and the
+remaining release requirements retain their ROADMAP slots.
 
 Do not jump to distant FUTURE_PLAN ideas while release blockers remain.
 
