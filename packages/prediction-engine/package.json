@@ -34,6 +34,14 @@
     "./adapters/kajo-ordinal": {
       "types": "./dist/adapters/kajo-ordinal.d.ts",
       "import": "./dist/adapters/kajo-ordinal.js"
+    },
+    "./working-state": {
+      "types": "./dist/working-state.d.ts",
+      "import": "./dist/working-state.js"
+    },
+    "./adapters/kajo-working-state": {
+      "types": "./dist/adapters/kajo-working-state.d.ts",
+      "import": "./dist/adapters/kajo-working-state.js"
     }
   },
   "scripts": {

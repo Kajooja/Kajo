@@ -101,6 +101,8 @@ deletion and abuse controls, and versioned recognition/completion/challenge
 measurement. These are the applicable early parts of `MVP-ACQ-001..004`,
 `MVP-OPS-002/006` and `MVP-GROWTH-001..003`; full provider conversion, operations
 and launch-funnel acceptance remain required in their ROADMAP phases.
+The owner's October 9 clarification reaffirms the initial adaptive Taste before
+release; a group invitation or decision session does not replace these gates.
 
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
 - [ ] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required.
@@ -142,8 +144,9 @@ Existing SharedProfile learning semantics remain canonical.
 - [x] `MVP-PROFILE-004` SharedProfile name length is 2–32 characters.
 - [x] `MVP-PROFILE-005` Member can leave SharedProfile safely with confirmation and correct fallback/access loss.
 - [ ] `MVP-GROUP-001` Two Friends can explicitly create a new SharedProfile through one short consent-based flow; accepting a Friend invite never creates it automatically.
-- [ ] `MVP-GROUP-002` 3+ SharedProfile creation can select Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent.
+- [ ] `MVP-GROUP-002` The planned compact 3–5-person creation flow can select authorized accepted Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent. Existing generic 2-N membership support remains intact.
 - [ ] `MVP-GROUP-003` Newly created SharedProfile immediately uses the existing canonical joint/common-fit prediction boundary; no pair-specific duplicate recommender is introduced.
+- [ ] `MVP-GROUP-004` Planned Phase 16.2 creation uses 2–5 total person slots, including the creator in one slot. Each `+` selects an authorized accepted Friend or creates an opaque expiring/revocable invitation with show/copy/OS-share actions (including WhatsApp where available). The receiver continues through the same app/Taste/link flow and explicitly accepts the correct Friend/group permissions; sending/opening a link creates no membership/Friendship or private history access. Pending and accepted slots remain distinct; Friend safety gates precede this UX.
 
 ## Existing Shared discovery
 
@@ -156,6 +159,15 @@ Existing SharedProfile learning semantics remain canonical.
 - [ ] `MVP-SOCIAL-007` After Personal Taste setup, SharedRatingRound retains each participant's own 0–10 response: A's rating prompts B; all required responses precede completed joint Katsotut/Luetut. #232, Phase 16.3.
 - [ ] `MVP-SOCIAL-008` Joint learning keeps actor/round provenance and disagreement, with atomic completion, correction/Undo, retry and membership-change semantics; Personal history remains separate and legacy single-actor history is not fabricated into confirmed rounds. #232.
 - [ ] `MVP-SOCIAL-009` A member-seen Item may rank strongly for joint use; a bounded/versioned rewatch policy permits a new joint experience of the same Item while retaining all prior history. Serving/shadow eligibility and delayed outcomes agree. #232.
+
+## Planned joint decision session — before complete beta
+
+These October 9 product requirements are queued under ROADMAP 16.4 after 16.3;
+they do not describe delivered Shared discovery or SharedRatingRound behavior.
+
+- [ ] `MVP-SOCIAL-010` SharedProfile offers an optional “watch/read today” session with at most five current canonical BOOK/MOVIE suggestions, ranked by the same predictor using the inherited DiscoveryMode/risk policy. Optional Tinder-like cards have accessible non-gesture alternatives and exact displayed origins; other “do today” domains remain future scope.
+- [ ] `MVP-SOCIAL-011` Session-level rejection can replace/veto the current suggestion, with a proposed any-participant veto rule to confirm when implemented; “already seen/read” replaces the option within this session. Refill is bounded and reports genuine eligibility exhaustion or expiry. These actions do not silently submit ordinary durable not-interest, erase history, permanently prohibit rewatch, complete a SharedRatingRound or create group reward.
+- [ ] `MVP-SOCIAL-012` Joint decision sessions retain a bounded frozen accepted roster and actor/Profile/session/version provenance, with explicit membership-change/expiry/cancel/exact-retry/concurrency behavior, authorized minimal telemetry and lifecycle/deletion rules. Two-person and N-member server/device/accessibility cases pass; choosing alone is not confirmed joint consumption or satisfaction.
 
 ## Swipe and state
 

@@ -58,6 +58,15 @@ Do not create empty folders to match this diagram. E1 delivered the tested
 intake/evaluation. This does not force a SQL-to-service rewrite or admit a serving
 model. CODEMAP lists real code paths, not every conceptual target module.
 
+The bounded `./working-state` export now adds a pure ordered-session intent
+hypothesis beside E1. Its separate `./adapters/kajo-working-state` export accepts
+already-authorized Personal Event/session snapshots; it owns no database reader,
+writer, authorization service or mobile state. Adjustment defaults to OFF and
+does not alter E1 state, native SQL serving, Shared scoring or frozen historical
+forecasts. [The package README](../../packages/prediction-engine/README.md#bounded-session-intent)
+owns its executable limits and controls. Native capture/consumer integration,
+versioned shadow comparison and admission remain explicit subsequent gates.
+
 ## 3. Clients
 
 ### Mobile

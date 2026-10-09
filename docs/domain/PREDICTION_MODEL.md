@@ -76,6 +76,19 @@ Lifetime: session-scoped; a new session starts after an intentional app/session 
 
 Example: three quick comedy skips followed by two long thriller detail views may change this session's candidate mix without rewriting the Profile's enduring identity.
 
+**Implemented source boundary:** `packages/prediction-engine` now provides a
+separate bounded `working-state-v1` / `working-policy-v1` hypothesis and strict
+Personal Kajo Event/session normalizer. It uses explicit native ratings and
+not-interest only; passive attention is retained as context and never invented
+satisfaction. At least two distinct current Items are required. It preserves
+correction/undo, equal-time ambiguity, known occurrence/availability cutoffs and
+caller-declared complete session prefix plus visible correction closure.
+Adjustment defaults to OFF; STATIC and ORDERED are explicit diagnostic controls.
+The [package README](../../packages/prediction-engine/README.md#bounded-session-intent)
+owns the exact formula, bounded support and reset/expiry rules. No native
+PredictionRun consumes it yet, and this does not complete MVP-ALG-004 or prove
+usefulness, calibration or historical feature availability.
+
 ### 4.2 ShortTermState — lähimuisti
 
 Purpose: capture intent, mood-like drift and temporary interests across sessions.
@@ -457,6 +470,18 @@ SharedProfile ranking
 ```
 
 Pending collaboration priority is not actor-specific taste modeling. Personal Events are not copied into Shared Event history.
+
+### Planned today-choice session — separate from Shared outcomes
+
+ROADMAP 16.4 / MVP-SOCIAL-010..012 queues an optional bounded BOOK/MOVIE choice
+session through the canonical Shared predictor and inherited DiscoveryMode.
+At most five current options retain exact delivery origins and a bounded accepted
+roster. Session-only veto or already-seen replacement is not completed joint
+experience, automatic negative group reward or permission to erase prior history.
+It must preserve ordinary discovery/controlled-rewatch semantics, bounded refill
+and honest exhaustion/expiry. Unknown/seen disclosure does not infer a member's
+private rating. The proposed any-member veto needs its final product threshold
+at implementation; no second recommender or current model activation is delivered.
 
 ### Shared consensus
 

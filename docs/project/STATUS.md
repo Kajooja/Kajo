@@ -10,7 +10,103 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — native memory/serving decay parity and dependency audit
+## Current packet — bounded Personal WorkingState and queued social flow
+
+### Source continuation and CI repair — 2026-10-09
+
+Continue on `feat/personal-session-state`, stacked on published
+[PR #314](https://github.com/Kajooja/Kajo/pull/314), exact source
+`b822fcadf9b9c78eeeaf213ac2543dd52467810e`, tree
+`99377bf7135454c8f4c3a6900161d4e291161400`. The single continuation lookup finds
+[CI #623](https://github.com/Kajooja/Kajo/actions/runs/37920718066) completed with
+failure: platform/defaults, full validation/exports, two clean native installations
+and populated native upgrade pass; the CLI migration/concurrency gate fails.
+Its sanitized receipt identifies a test baseline error: three fixture Users and
+two SharedProfiles legitimately create five system Saved Lists (12 → 17), then
+the pre-cleanup comparison incorrectly uses the pre-fixture snapshot. No ongoing
+CI/APK polling is introduced. Accepted main remains `34d21704cafe21091a2369396c9bc61dce99c1e9`.
+Unmerged source, native/hosted activation and device acceptance remain distinct.
+
+The correction retains two full unfiltered snapshots of all 17 canonical tracked
+relations: the original before fixture allocation for after-cleanup verification,
+and initialized state immediately after owned Auth/Profile creation for every
+source/open/race/preparation operation. No fixture-owned or unrelated row is
+filtered out. Exact cleanup, ownership guards, independent-session lock orders,
+cancellation and error retention are preserved. The new full-schema regression
+reproduces the five legitimate Lists and rejects equal-count changes to owned,
+unrelated Personal and unrelated Shared Lists while preserving unrelated roots.
+The required native CLI gate must rerun on the new exact source.
+
+The owner requests upcoming compact social flow after the foundations, before
+release. ROADMAP 16.2 now plans 2–5 total persons including the creator, plus slots
+for accepted Friend selection or opaque show/copy/OS/WhatsApp invitation, with
+explicit canonical consent. ROADMAP 16.4 follows round/rewatch foundations with
+at most five current BOOK/MOVIE options from the same Shared predictor and
+inherited DiscoveryMode. Proposed any-member veto awaits its final product
+threshold; session veto/seen replacement neither erases history nor creates
+ordinary durable not-interest, group completion or reward. Initial adaptive Taste
+is explicitly reaffirmed before release. New requirements stay planned/open;
+other “do today” domains remain future work. No current social UI is implemented.
+
+The completed portable source exports `deriveWorkingState` /
+`scoreWorkingAdjustment` separately through `./working-state` and the strict
+`normalizeKajoWorkingSession` through `./adapters/kajo-working-state`.
+`working-state-v1` / `working-policy-v1` capture authorized subject/actor/session,
+finite occurrence/availability cutoffs, full-prefix/correction-closure declaration,
+frozen schema/artifact/configuration and source references. At most 128 records,
+32 Items, 32 feature dimensions and 256 exact invalidations are accepted; at least
+two distinct latest Items support a component. Equal-time ambiguity abstains and
+IDs add no recency. Default session/idle limits are four hours/30 minutes;
+reset excludes at-or-before evidence. Only selected-session Item-linked activity
+refreshes its clock. Own other-session corrections may remove stale taste without
+importing their preference; exact UNDO and selective history/interest clear retain
+canonical effects. Valid zero is observed, attention/unknown/bootstrap are not
+invented satisfaction, and one session does not become durable independent support.
+
+The component uses a declared normalized feature mean; ORDERED applies a default
+two-time-group half-life, STATIC omits recency and OFF returns exact zero by
+default. Candidate adjustment is bounded to ±0.25, uncalibrated, with unavailable
+uncertainty and zero observed evaluation labels. Caller authorization, complete
+visible correction closure and frozen feature availability remain required;
+STORED_CREATED_TIME is only a proxy and commit availability is UNKNOWN.
+Existing E1 `represent`/Prediction contracts, native SQL/scalar genomes, Shared
+scoring and frozen traces remain unchanged. Native activation, historical feature
+eligibility and learning remain false; MVP-ALG-004 stays open.
+
+Validation: database **105/105**, engine **137/137** plus built separate ESM/import
+graphs, research **19 Python + 23 Node**, and acceptance **6 + 5** pass. The new
+**60** unit tests include independent ordered/static/off numeric oracles,
+correction/expiry/reset/resource and source/privacy controls, and a synthetic
+non-media minimize fixture. Actual full-schema canonical command interoperability
+and the initialized/original full-snapshot regression each pass; the final
+strengthened command test also passes after adding actual cross-session
+replacement/UNDO and exact original Event preservation. Old Events, command
+receipts and native PredictionRun remain frozen, default OFF preserves actual
+baseline scores/order, and rollback leaves no fixture rows. Independent code,
+test and canonical-document reviews plus syntax/diff checks pass. All **62**
+Markdown files, **283** local links and **89** heading references resolve.
+All **69** migration files and the root lockfile are unchanged; no new dependency
+or DDL is introduced. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog
+**444** pass before Deno registry `Connection refused` (exit 1). No complete
+local root or fresh application-export pass is claimed; application source/build
+inputs are unchanged in this packet.
+Actual Docker/native execution and live local advisors remain unavailable;
+PGlite and source fixtures establish interoperability, not native concurrency,
+serving/shadow admission or recommendation quality.
+
+**Next bounded action:** resolve the exact published source and one CI run in
+[#229](https://github.com/Kajooja/Kajo/pull/229), preserving its September 30
+checkpoint. On continuation inspect completed required gates once and diagnose
+any concrete sanitized failure. Then implement a bounded native Personal
+WorkingState capture/consumer bridge under explicit serving/shadow version and
+static/off controls; default OFF remains until exact parity and admission evidence
+exists.
+Keep independent support, bootstrap-floor evaluation, transfer and real
+first-session usefulness, queued genuine #232F Shared consumption, #306,
+#229 device/fresh-account, Phase 16.3–16.4 and all required release/privacy/quality
+gates. No main merge, hosted write, new APK or data reset is introduced.
+
+## Preserved native memory/serving decay parity and dependency audit
 
 ### Personal prediction critical path — 2026-10-09
 
@@ -83,7 +179,7 @@ published exact PR/source/tree and one-time CI result while preserving its
 September 30 checkpoint. Required exact-source CI/native acceptance remains open
 until demonstrated; no ongoing CI/APK polling is introduced.
 
-**Next bounded action:** on continuation resolve this published source from #229
+**Recorded next action at native-decay publication:** on continuation resolve this published source from #229
 and inspect completed required gates once, diagnosing a concrete sanitized
 receipt if installation fails. Then implement the next bounded ordered Personal
 session/state policy component with static/WorkingState-off controls and explicit

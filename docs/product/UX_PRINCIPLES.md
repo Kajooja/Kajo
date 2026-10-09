@@ -25,6 +25,10 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 9. **Friendship is lightweight.** Accepted Friends appear on a simple Friends surface. Friendship does not create a joint Room/Profile automatically and does not expose private taste history.
 10. **Shared Kajo is intentional.** From Friends, creating `yhteinen Kajo` should be one short explicit flow. SharedProfile is a learned place/context, not a hidden side effect of a referral.
 
+The owner's October 9 clarification reaffirms the initial adaptive Taste as a
+pre-release requirement. Group invitation shortcuts preserve accepted Personal
+setup and never replace the planned Taste, frozen challenge or usefulness gates.
+
 ## Authenticated Kajo principles
 
 11. **Navigation stays compact.** Domain discovery begins from Room objects. Account/Profile/Lists/Friends/Groups management belongs in restrained persistent navigation rather than Room clutter.
@@ -268,6 +272,36 @@ then “Pari!” and joint Katsotut/Luetut. Display whose ratings belong to that
 A new joint viewing uses a new round and retains the earlier experience. Existing
 Personal setup/history survives. This is a release requirement, not functionality
 delivered by the multi-destination picker.
+
+## Planned compact group creation and joint decision — 2026-10-09
+
+Deliver compact creation under ROADMAP 16.2 after Friend invite/safety lifecycle
+16.0–16.1. Show **2–5 total person slots including the creator**, already occupying
+one slot. A `+` selects an authorized accepted Friend or generates an opaque
+invitation that can be shown, copied or shared through the OS share sheet,
+including WhatsApp where available. Distinguish pending invitations from accepted
+members. Receiver continuation uses the same app/Taste/link route and explicit
+Friend/group consent; sending or opening a link creates no relationship or
+private Personal history access. This UI does not impose a new bound on existing
+generic 2-N SharedProfile storage.
+
+After 16.3's rating evidence/controlled rewatch, planned 16.4 offers an optional
+“what should we watch/read today?” Shared session with at most five current
+canonical BOOK/MOVIE suggestions. Reuse the same predictor and inherited
+DiscoveryMode/risk; optional Tinder-like cards retain accessible buttons and do
+not replace ordinary grid discovery or duplicate the global curtain control.
+“Do today”/other domains remain future work.
+
+Proposed any-participant session-level “not interested” veto removes the current
+option; confirm the exact veto rule at implementation. “Already seen/read”
+replaces the option within this session. Bound refill and give truthful exhaustion,
+expiry and retry states. Neither action silently submits a permanent dislike,
+erases history, permanently forbids rewatch, completes a SharedRatingRound or
+creates group reward. Freeze the accepted session roster with explicit expiry,
+membership-change, concurrency, lifecycle and minimal telemetry rules; choice
+alone is not confirmed consumption. The separate optional List-only FUT-UX-003
+is not promoted by this plan. MVP-GROUP-004 and MVP-SOCIAL-010..012 remain open;
+no current UI changes merely by recording these ideas.
 
 ## Required pre-MVP card controls — #239 / MVP-UX-006
 

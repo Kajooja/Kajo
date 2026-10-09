@@ -70,10 +70,47 @@ export const sharedRoundPredictionInputsNativeProbeSql = Object.freeze({
   end; $membership$;`,
 });
 
+// The two lifecycle checkpoints deliberately hash every canonical row. The
+// initialized checkpoint includes owned Auth/Profile system-list creation; the
+// original checkpoint remains the full restoration contract after cleanup.
+export function sharedRoundPredictionInputsCanonicalEvidenceSql() {
+  return `select jsonb_object_agg(identity,snapshot) from (
+    ${['public.events', 'public.event_sessions', 'public.item_interactions', 'public.item_lists',
+      'public.item_list_entries', 'public.shared_item_endorsements', 'public.shared_item_consensus',
+      'private.prediction_runs', 'private.prediction_candidates', 'private.shadow_prediction_jobs',
+      'private.shadow_prediction_runs', 'private.shadow_prediction_candidates', 'private.genome_evaluations',
+      'private.evaluation_windows', 'private.predictor_genomes', 'private.promotion_decisions',
+      'private.policy_assignments'].map(relation => `select '${relation}' identity,
+        jsonb_build_object('count',count(*),'sha256',encode(sha256(convert_to(
+          coalesce(jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text),'[]'::jsonb)::text,'UTF8')),'hex')) snapshot
+        from ${relation} r`).join(' union all ')}
+    ) snapshots;`;
+}
+
+export function sharedRoundPredictionInputsNativeCleanupSql() {
+  return `begin;
+          do $cleanup$ declare actor uuid; begin foreach actor in array array[${ids(actors)}] loop
+            if exists(select 1 from public.users where id=actor) then
+              perform private.erase_prediction_sources_v1('ACTOR',actor); end if;
+          end loop; end; $cleanup$;
+          delete from public.profiles where id=any(array[${ids(profiles)}]);
+          delete from auth.users where id=any(array[${ids(actors)}]);
+          delete from public.items where id='${itemId}';
+          select jsonb_build_object('users',(select count(*) from auth.users where id=any(array[${ids(actors)}]))
+              +(select count(*) from public.users where id=any(array[${ids(actors)}])),
+            'profiles',(select count(*) from public.profiles where id=any(array[${ids(profiles)}]) or owner_user_id=any(array[${ids(actors)}])),
+            'items',(select count(*) from public.items where id='${itemId}'),
+            'rounds',(select count(*) from private.shared_rating_rounds where id=any(array[${ids([priorRound, ...rounds])}])),
+            'inputs',(select count(*) from private.shared_round_prediction_inputs where id=any(array[${ids(inputs)}])),
+            'sources',(select count(*) from private.shared_round_outcome_captures where id=any(array[${ids(sources)}])),
+            'edges',(select count(*) from private.shared_round_prediction_input_sources where input_id=any(array[${ids(inputs)}])));
+          commit;`;
+}
+
 export async function verifySharedRoundPredictionInputsConcurrency(execConcurrentSql) {
   const exec = (sql, stage, timeoutMs = 30_000) => execConcurrentSql(sql, { stage, timeoutMs });
   const running = [], proofs = [];
-  let fixtureAttempted = false, original, failure, result;
+  let fixtureAttempted = false, original, initialized, failure, result;
   const sleep = `do $hold$ begin
     begin perform pg_sleep(45); exception when query_canceled then null; end;
   end; $hold$;`;
@@ -133,17 +170,7 @@ export async function verifySharedRoundPredictionInputsConcurrency(execConcurren
     assert.equal(released, true, 'Could not release the observed owned post-call sleep');
   }
   const read = async (index, stage) => (await exec(transaction('kajo_shared_input_read', getCall(index)), stage))[0];
-  const evidence = async stage => (await exec(`select jsonb_object_agg(identity,snapshot) from (
-    ${['public.events', 'public.event_sessions', 'public.item_interactions', 'public.item_lists',
-      'public.item_list_entries', 'public.shared_item_endorsements', 'public.shared_item_consensus',
-      'private.prediction_runs', 'private.prediction_candidates', 'private.shadow_prediction_jobs',
-      'private.shadow_prediction_runs', 'private.shadow_prediction_candidates', 'private.genome_evaluations',
-      'private.evaluation_windows', 'private.predictor_genomes', 'private.promotion_decisions',
-      'private.policy_assignments'].map(relation => `select '${relation}' identity,
-        jsonb_build_object('count',count(*),'sha256',encode(sha256(convert_to(
-          coalesce(jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text),'[]'::jsonb)::text,'UTF8')),'hex')) snapshot
-        from ${relation} r`).join(' union all ')}
-    ) snapshots;`, stage))[0];
+  const evidence = async stage => (await exec(sharedRoundPredictionInputsCanonicalEvidenceSql(), stage))[0];
   const sourceDigest = async stage => (await exec(`select jsonb_build_object(
     'captures',(select coalesce(jsonb_agg(to_jsonb(r) order by id),'[]'::jsonb)
       from private.shared_round_outcome_captures r where id=any(array[${ids(sources)}])),
@@ -215,6 +242,7 @@ export async function verifySharedRoundPredictionInputsConcurrency(execConcurren
     original = await evidence('shared-input-original-canonical-state');
     fixtureAttempted = true;
     await exec(sharedRoundPredictionInputsNativeFixtureSql(), 'shared-input-owned-fixture');
+    initialized = await evidence('shared-input-initialized-canonical-state');
     await exec(sharedRoundPredictionInputsNativeSourcesSql(), 'shared-input-prior-visible-source-captures');
     await exec(sharedRoundPredictionInputsNativeOpenSql(), 'shared-input-unresponded-target-rounds');
 
@@ -383,7 +411,7 @@ export async function verifySharedRoundPredictionInputsConcurrency(execConcurren
     const controlAfter = await read(9, 'shared-input-unrelated-actor-input-preserved');
     assert.deepEqual(controlAfter.value, control.value);
     assert.equal(controlAfter.utf8, control.utf8);
-    assert.deepEqual(await evidence('shared-input-canonical-state-unchanged'), original);
+    assert.deepEqual(await evidence('shared-input-canonical-state-unchanged'), initialized);
     result = { status: 'PASS', proofs,
       cases: ['committed UNKNOWN response excludes capture; capture commits before blocked first response',
         'rolled-back first response leaves an eligible unresponded target',
@@ -408,23 +436,7 @@ export async function verifySharedRoundPredictionInputsConcurrency(execConcurren
     }
     if (fixtureAttempted) {
       try {
-        const [remaining] = await exec(`begin;
-          do $cleanup$ declare actor uuid; begin foreach actor in array array[${ids(actors)}] loop
-            if exists(select 1 from public.users where id=actor) then
-              perform private.erase_prediction_sources_v1('ACTOR',actor); end if;
-          end loop; end; $cleanup$;
-          delete from public.profiles where id=any(array[${ids(profiles)}]);
-          delete from auth.users where id=any(array[${ids(actors)}]);
-          delete from public.items where id='${itemId}';
-          select jsonb_build_object('users',(select count(*) from auth.users where id=any(array[${ids(actors)}]))
-              +(select count(*) from public.users where id=any(array[${ids(actors)}])),
-            'profiles',(select count(*) from public.profiles where id=any(array[${ids(profiles)}]) or owner_user_id=any(array[${ids(actors)}])),
-            'items',(select count(*) from public.items where id='${itemId}'),
-            'rounds',(select count(*) from private.shared_rating_rounds where id=any(array[${ids([priorRound, ...rounds])}])),
-            'inputs',(select count(*) from private.shared_round_prediction_inputs where id=any(array[${ids(inputs)}])),
-            'sources',(select count(*) from private.shared_round_outcome_captures where id=any(array[${ids(sources)}])),
-            'edges',(select count(*) from private.shared_round_prediction_input_sources where input_id=any(array[${ids(inputs)}])));
-          commit;`, 'shared-input-cleanup-only-owned-fixture', 60_000);
+        const [remaining] = await exec(sharedRoundPredictionInputsNativeCleanupSql(), 'shared-input-cleanup-only-owned-fixture', 60_000);
         assert.deepEqual(remaining, { users: 0, profiles: 0, items: 0, rounds: 0, inputs: 0, sources: 0, edges: 0 });
         if (original) assert.deepEqual(await evidence('shared-input-unrelated-state-after-owned-cleanup'), original);
       } catch (error) { cleanupFailures.push(error); }

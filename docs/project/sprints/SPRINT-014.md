@@ -14,6 +14,45 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded Personal session state and next social planning — 2026-10-09
+
+Continue from exact #314 source `b822fcadf9b9c78eeeaf213ac2543dd52467810e`.
+CI #623 completed failure only in the CLI gate; the other four required jobs,
+including full validation/exports and native installation/upgrade, passed. The
+CLI fixture's five legitimate system Lists require an initialized full snapshot
+for active checks and the original full snapshot for owned-cleanup restoration.
+The correction preserves all 17 relation count/hash checks and race/cleanup rules.
+
+The owner queues compact consent-based 2–5-person creation under 16.2 and a bounded
+five-option Shared “watch/read today” session under 16.4 after round/rewatch
+evidence. Initial adaptive Taste remains required before release. Planned session
+veto/seen replacement neither rewrites history nor supplies confirmed group
+outcomes; all requirements remain open. Product/domain documents own semantics.
+
+The completed separate `./working-state` and `./adapters/kajo-working-state`
+source exports represent bounded ordered Personal session intent with independent
+latest Item support, complete correction closure, selective clear/UNDO, equal-time
+ambiguity and explicit reset/expiry. Default bounds are 128 records/32 Items/32
+features/256 invalidations, two distinct Items, four-hour session/30-minute idle
+and a ±0.25 uncalibrated component. Only selected-session Item-linked activity
+refreshes the clock; other-session corrections cannot import taste. OFF is default,
+with explicit STATIC/ORDERED controls. Stored creation is an availability proxy,
+not commit certification. Native serving, Shared algorithms and old E1/scalar/
+frozen traces remain unchanged; native admission and MVP-ALG-004 stay open.
+
+Database **105/105**, engine **137/137** plus built ESM/import graphs, research
+**19 Python + 23 Node** and acceptance **6 + 5** pass. New **60** unit tests,
+actual full-schema command bridge and
+full initialized/original canonical-snapshot regression pass, including final
+strengthened cross-session correction/UNDO and old Event/receipt/run preservation.
+Independent review, syntax/diff and **62 Markdown / 283 local-link / 89 heading**
+audits pass; all **69** migrations and the root lockfile retain bytes. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog
+**444** pass before Deno registry `Connection refused` (exit 1). No complete
+local root or fresh application-export pass is claimed; application source/build
+inputs are unchanged in this packet.
+STATUS/#229 own exact publication and one current handoff to a bounded native
+Personal capture/consumer bridge with versioned shadow/static/off admission.
+
 ## Native memory/scoring parity and execution audit — 2026-10-09
 
 The owner requests continuation, a current-documentation audit and future-aware

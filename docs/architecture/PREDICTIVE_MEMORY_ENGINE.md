@@ -78,6 +78,16 @@ WorkingState describes the ordered active session: recent observations, explicit
 
 It can alter immediate intent without converting one unusual session into permanent taste. Actor/Profile switches cannot reuse another scope's working state. Replay uses the captured sequence prefix, not the current session cache.
 
+The repository's source-only `./working-state` component implements a bounded
+first hypothesis with independent latest Item support, equal-time groups,
+explicit correction closure, reset/expiry and STATIC/ORDERED/OFF controls.
+Its adjustment defaults to OFF, is uncalibrated and supplies no observed quality
+labels or learning admission. A separate Kajo normalizer consumes authorized
+Personal snapshots; an invented machine-domain fixture exercises the same core.
+This component does not yet compose the complete CurrentState or participate in
+native prediction serving. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
+remain distinct from the full target in this section.
+
 ## 5. ShortTermState — recent memory
 
 ShortTermState represents temporary interests over days or weeks and can reverse faster than durable memory. A transparent starting family is `weight(age) = exp(-lambda * age)`; time scale and event strength are versioned hypotheses.

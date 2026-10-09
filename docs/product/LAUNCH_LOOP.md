@@ -89,6 +89,12 @@ Properties:
 ### 3.3 SharedProfile/group invite
 
 Existing SharedProfile membership invitations remain a separate concept. A group invite grants no friendship automatically unless a later explicit product decision changes that rule.
+The planned compact creation flow can show/copy/share this opaque invitation
+through the OS share sheet or WhatsApp where available. A receiver uses the same
+app/Taste/link continuation, reusing accepted Personal setup where present, and
+explicitly accepts group membership. If Friendship is also offered, it requires
+its own clear consent; link delivery/opening grants no private Personal history
+access and creates no automatic Friend or group relationship.
 
 ## 4. Anonymous identity and conversion
 
@@ -261,7 +267,14 @@ Create yhteinen Kajo
 SharedProfile
 ```
 
-For 3+ people, the creator selects Friends and sends/collects explicit membership acceptance under the existing SharedProfile rules.
+Planned Phase 16.2 creation uses **2–5 total people including the creator**.
+Show at most five member slots, with the creator occupying one. Each `+` slot
+selects an authorized accepted Friend or generates an opaque invitation with
+show, copy and OS-share actions, including WhatsApp where available. For 3–5
+people, collect each person's explicit canonical membership acceptance; pending
+slots are not accepted members. Expiry, revocation, rate limits, replay and
+block/remove safety under 16.0–16.1 precede this UI. The compact creation bound
+does not replace existing generic 2-N SharedProfile membership support.
 
 Do not make every friendship a SharedProfile. This keeps the friend graph lightweight and makes joint learning intentional.
 
@@ -271,6 +284,30 @@ and the bounded recognition-aware cold-start exit; do not force a repeat test or
 (#232, ROADMAP 16.3): one member’s Shared score invites the others’ own responses,
 then the completed joint experience enters Shared history. Personal history stays
 separate. DOMAIN_MODEL and PREDICTION_MODEL own the round and rewatch contracts.
+The October 9 clarification reaffirms the initial adaptive Taste before release;
+the group shortcut is not a substitute for the planned Taste/usefulness gates.
+
+### Planned joint decision for today — ROADMAP 16.4
+
+After 16.3's evidence/rewatch delivery, offer an optional Shared session for
+“what should we watch/read today?” before the complete beta. At most five current
+BOOK/MOVIE options come from the same canonical Shared predictor and inherited
+DiscoveryMode/risk policy; an optional Tinder-like card sequence does not create
+a second recommender. “Do today”/other domains remain future scope.
+
+Proposed behavior is an any-participant session-level “not interested” veto;
+confirm its exact threshold when implemented. “Already seen/read” replaces that
+current option for this session. Refill is bounded, retains exact origins and
+explains genuine eligible exhaustion or expiry. Preserve prior history and
+controlled rewatch: these controls are not ordinary durable not-interest,
+history deletion, SharedRatingRound completion or automatic group reward.
+
+Freeze a bounded accepted roster, retain actor/session/scope/version provenance
+and define membership-change, expiry, cancellation, exact-retry, concurrency and
+deletion behavior. Session opening, options exposed and rejection/selection/end
+telemetry remain separate from confirmed outcomes. Ordinary Shared discovery
+and the separately optional List-only FUT-UX-003 remain distinct. All behavior
+here is planned; MVP-SOCIAL-010..012 own acceptance.
 
 ## 10. Funnel and event measurement
 
@@ -397,7 +434,7 @@ Canonical order:
 3. Adaptive cold-start/Taste policy, trustworthy frozen challenge evaluation and canonical recommendation preview.
 4. Google/Apple identity conversion and browser/installed-app continuation preserving that state, plus the full conversion funnel.
 5. Personal Friend invite + friend lifecycle.
-6. Fast SharedProfile creation from Friends.
+6. Compact consent-based SharedProfile creation, individual Shared rounds/controlled rewatch, then the planned bounded joint decision session under ROADMAP 16.2–16.4.
 7. End-to-end funnel telemetry, experiments, privacy/abuse and operational gates.
 8. Closed external beta of the complete link-to-Kajo loop.
 9. Store/public release readiness.

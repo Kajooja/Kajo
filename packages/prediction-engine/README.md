@@ -34,6 +34,8 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | Root `compare` | Error against the original forecast for the matching subject/object/target and actual action where required, within the declared horizon and observation cutoff |
 | Root `learn` | A new local derived Scenario from eligible evidence, or null; no source mutation, model training or write side effect |
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
+| `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
+| `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
 | `./adapters/movielens` | D1 pure external-rating adapter, original 0.5–5 scale, release namespaces and explicit unknown context; the core root does not import it |
 | `./ordinal` | #232E bounded exposed group Pareto pair/batch diagnostic using one frozen production/shadow candidate pool, full enrollment and own exposure; no scalar group reward or learning |
 | `./adapters/kajo-ordinal` | Strict immutable #232C artifact mapping, required scoped subject/member/enrollment handles, declared digest bindings and diagnostic-only clock/membership limits |
@@ -48,7 +50,7 @@ policy uses the target's maximize/minimize direction.
 
 ## Time, evidence and uncertainty
 
-Instants are nonnegative integer milliseconds on a declared clock. All fixture
+The E1 reference functions use nonnegative integer milliseconds on a declared clock. All fixture
 times are synthetic. Observation occurrence and availability must both precede
 the decision to enter its state. Features and model/representation artifacts must
 already be available, with training no later than artifact availability. Frozen
@@ -95,6 +97,65 @@ authorized revision view and invalidate/rebuild affected derived episodes after
 retraction, correction or permission withdrawal; the in-memory core does not own
 a persistent store or infer missing tombstones. Raw source revisions and original
 frozen forecasts remain immutable when projections are rebuilt.
+
+## Bounded session intent
+
+`./working-state` is a separate source-only hypothesis, not a replacement for
+E1's `represent` or native SQL. `deriveWorkingState` captures a declared cutoff,
+subject/actor/session, complete-prefix declaration, feature schema/artifact,
+configuration, eligible records, latest distinct Items and equal-time groups.
+The caller must provide the complete authorized session prefix **and visible
+same-owner correction closure**; `prefixComplete=false` yields inactive state.
+No database lookup or completeness authentication occurs inside the engine.
+
+Default ceilings are 128 supplied records, 32 Items, 32 normalized feature
+dimensions and 256 exact invalidation references. Exceeding a ceiling fails;
+the caller cannot silently truncate a prefix. Session duration expires at four
+hours, inactivity at 30 minutes, and `resetAt` excludes intent at or before that
+instant. Current session activity and taste support are separate. Only Item-linked
+activity is normalized in this first component; non-Item search/mode Events do
+not extend its clock. Corrections from another session
+can remove stale intent without importing that session's preference or extending
+the selected session's activity clock. At least two distinct latest Items are
+required; repeated actions, revisions and multiple tags add no independent Item
+support. Conflicting latest states at equal occurrence time remain ambiguous;
+record/Item IDs never establish semantic recency.
+
+For a valid observed target, direction is
+`d = 2 * ((value - min) / (max - min)) - 1`, negated for a minimize objective.
+Scale width must remain finite; division precedes multiplication to avoid overflow.
+An explicit negative action has direction -1 and remains distinct from a rating.
+Unknown/malformed ratings remove stale preference without inventing a negative;
+attention supplies activity context only. For feature `f`, STATIC uses
+`sum(d_i * x_if) / sum(x_if)`. ORDERED multiplies each weight by
+`2 ** (-older_time_groups / 2)` under the default two-group half-life. Equal-time
+Items share the same recency factor. A candidate's component is the mean of the
+selected feature vector weighted by its known positive feature coordinates,
+scaled and clamped to ±0.25. Missing/zero features supply no weight; unavailable
+features or mismatched artifacts reject rather than becoming current knowledge.
+
+`scoreWorkingAdjustment({ state, object })` defaults to `control: 'OFF'` and
+returns exactly zero. Explicit `STATIC` and `ORDERED` controls are diagnostic
+ablations, not admitted native policy. Results identify `working-state-v1` /
+`working-policy-v1`, `uncalibrated`, unavailable uncertainty, temporary intent,
+zero observed evaluation labels, `historicalFeatureEligible=false`,
+`learnable=false` and `nativeActivated=false`. Synthetic machine fixtures prove
+the same generic core executes outside media; they do not establish quality.
+
+The separate Kajo normalizer accepts actual Personal Event/session row shapes,
+explicit scoped handles and supplied versioned feature objects. It retains exact
+Event IDs, valid rating zero and selective history/interest clear plus UNDO
+semantics. Shared, foreign actor/Profile, external/synthetic and bootstrap inputs
+do not become native working support. Occurrence and stored `created_at` remain
+separate finite decimal-millisecond cutoffs, preserving representable PostgreSQL
+fractions. `STORED_CREATED_TIME` is only a proxy; commit availability is UNKNOWN.
+Malformed owned rows reject the supplied snapshot even when future; valid future
+evidence is excluded before correction reconciliation.
+The caller still owns current authorization, full correction closure and captured
+feature availability. Actual native command fixtures prove interoperability,
+not prospective serving consumption. A native versioned capture/consumer,
+serving/shadow parity, static/off comparisons and quality admission remain next
+gates; old SQL scores, scalar genomes and frozen forecasts are unchanged.
 
 ## Offline Shared ordinal audit
 
