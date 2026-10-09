@@ -12,12 +12,14 @@ declare
   ranked record;
   member uuid;
   new_actor uuid := gen_random_uuid();
+  expected_base_version text := case when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
+    then 'prediction-v0.4-bootstrap' else 'prediction-v0.5-native-decay' end;
 begin
   select id into strict profile from public.profiles where owner_user_id=actor and profile_type='PERSONAL';
   perform set_config('request.jwt.claim.sub',actor::text,true);
   perform set_config('role','authenticated',true);
   select * into strict ranked from public.rank_items_v1(profile,'FOR_YOU','BOOK',20,'{}') where item_id=candidate;
-  if ranked.explanation->>'baseVersion' is distinct from 'prediction-v0.4-bootstrap'
+  if ranked.explanation->>'baseVersion' is distinct from expected_base_version
     or coalesce((ranked.explanation->>'bootstrapLongTerm')::numeric,0) <= 0 then
     raise exception 'Existing Personal bootstrap ranking failed';
   end if;

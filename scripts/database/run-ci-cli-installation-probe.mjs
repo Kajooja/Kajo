@@ -32,6 +32,7 @@ import { shadowSourceErasureSmokeSql, shadowSourceErasureUpgradeSql } from './sh
 import { verifyShadowSourceErasureConcurrency } from './shadow-source-erasure-concurrency.mjs';
 import { sharedRoundPredictionInputsSmokeSql, sharedRoundPredictionInputsUpgradeSql } from './shared-round-prediction-inputs.mjs';
 import { verifySharedRoundPredictionInputsConcurrency } from './shared-round-prediction-inputs-concurrency.mjs';
+import { personalNativeDecaySmokeSql, personalNativeDecayUpgradeSql } from './personal-native-decay.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -169,6 +170,12 @@ try {
     const [sharedRoundPredictionInputsUpgrade] = await exec(await sharedRoundPredictionInputsUpgradeSql(files[predictionInputsIndex]),
       { stage: 'shared-round-prediction-inputs-populated-upgrade', timeoutMs: 120_000 });
     assert.match(sharedRoundPredictionInputsUpgrade?.sharedRoundPredictionInputsUpgrade, /^PASS:/);
+    const nativeDecayIndex = files.findIndex(file => file.name.endsWith('_personal_native_decay_parity.sql'));
+    assert.ok(nativeDecayIndex > predictionInputsIndex);
+    await resetFromMigrations(files.slice(0,nativeDecayIndex));
+    const [personalNativeDecayUpgrade] = await exec(await personalNativeDecayUpgradeSql(files[nativeDecayIndex]),
+      { stage: 'personal-native-decay-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalNativeDecayUpgrade?.personalNativeDecayUpgrade, /^PASS: actual old memory/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -241,6 +248,9 @@ try {
     const [sharedRoundPredictionInputs] = await exec(await sharedRoundPredictionInputsSmokeSql(),
       { stage: 'shared-round-prediction-inputs-enrollment-prefix-sources-erasure', timeoutMs: 120_000 });
     assert.match(sharedRoundPredictionInputs?.sharedRoundPredictionInputs, /^PASS:/);
+    const [personalNativeDecay] = await exec(await personalNativeDecaySmokeSql(),
+      { stage: 'personal-native-decay-state-score-frozen-parity', timeoutMs: 120_000 });
+    assert.match(personalNativeDecay?.personalNativeDecay, /^PASS: shared native LT math/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -279,6 +289,7 @@ try {
       sharedRoundOutcomeCaptures, sharedRoundOutcomeCapturesUpgrade, sharedRoundOutcomeCapturesConcurrency,
       shadowSourceErasure, shadowSourceErasureUpgrade, shadowSourceErasureConcurrency,
       sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
+      personalNativeDecay, personalNativeDecayUpgrade,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

@@ -26,10 +26,26 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native memory/serving decay parity — active source only
+
+`20261009103214_personal_native_decay_parity.sql` introduces the versioned
+private `native_long_term_decay_v2(timestamptz,timestamptz)` contract and guarded
+updates to `build_profile_memory_state_v1`, `rank_items_v0`,
+`rank_items_catalog_base_v1` and their two identity wrappers. Current native
+Events/UNDOs have finite occurrence-time cutoffs; `nativeEvidenceAsOf` records
+the existing distinct memory/base clocks. New live metadata names
+`native-long-term-decay-v2` / `prediction-v0.5-native-decay`. It preserves existing immutable rows,
+frozen scalar feature vectors, permissions, function identities and lifecycle
+entry guards. Full-schema populated-upgrade, age-boundary, source/correction
+and frozen serving-shadow replay checks join the existing database/native CLI
+gates through `scripts/database/personal-native-decay.mjs`, its test/fixture/smoke
+files and the existing `run-ci-cli-installation-probe.mjs`. PREDICTION_MODEL owns interpretation and STATUS owns exact publication,
+tests and activation; the portable core and Shared forecast consumer are separate.
+
 ## Reconciled delivery and recovery source — #229 / #240
 
 - `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts`:
-  protocol-2 captured scope, immutable pages and exact transport retry; one native
+  preserved protocol-2 compatibility/recovery: captured scope, immutable pages and exact transport retry; one native
   reachability listener per focused foreground reader, bounded reconnect attempts.
 - `predictionConnectivity.ts`: listener-first initial read, stale callback/blur/
   background cancellation; `expo-network` is a declared SDK-57 native dependency.
@@ -234,7 +250,7 @@ the audit's existing fail-closed correction rules. Exact lock and fresh audit:
 | Password auth boundary | `supabase/functions/password-auth/`, `supabase/functions/entrypoints.test.ts` | Closed JSON/action/field checks before privileged lookup, 8-KiB/8,192-chunk/five-second body limits and no-store responses. Existing email/nickname resolution retained; public-entry abuse/enumeration acceptance remains separately gated |
 | Auth email callback | `supabase/functions/auth-callback/` | HTTPS callback forwarding verification token hashes to mobile |
 | Bootstrap direct serving (#207, technically accepted) | `20260907155201_bootstrap_personal_ranking.sql`; `scripts/database/bootstrap-ranking.test.mjs`; `predictionRefresh.ts` | Forward `prediction-v0.4-bootstrap` scorer shares bootstrap selection/weight/decay with memory and versions V1 traces. Import/remove/calibration successes refresh mounted rankings. Isolated SQL tests run in npm test; PR #210 records bounded hosted public V1 smoke and PR #219 adds independent Supabase installation/runtime evidence. Adopted fresh local/CI lineage #208/#223 completes this technical gate. Historical chronology still fails unchanged; device/bootstrap usability and measured quality remain separate open gates |
-| Prediction V0 baseline | historical V0 migrations; current private `rank_items_v0` after `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` plus #182 discoverability rewrite and `20260907155201_bootstrap_personal_ranking.sql` | Current `prediction-v0.4-bootstrap` candidate generator retained privately; V0.3 is the earlier baseline. #182 adds `candidate.discoverable` to normal candidate eligibility; no provider-specific scorer. `public.rank_items_v0` remains non-serving and authenticated execution revoked |
+| Prediction V0 baseline | historical V0 migrations; current private `rank_items_v0` after `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` plus #182 discoverability rewrite and `20260907155201_bootstrap_personal_ranking.sql` | Inspected accepted-main `prediction-v0.4-bootstrap` candidate generator retained privately; V0.3 is the earlier baseline. #182 adds `candidate.discoverable` to normal candidate eligibility; no provider-specific scorer. `public.rank_items_v0` remains non-serving and authenticated execution revoked |
 | Prediction V1 nervous system | `public.rank_items_v1`, private V1 helpers in `20260902223000_prediction_nervous_system_v1.sql`, forward fix `20260904120420_fix_prediction_v1_candidate_returning.sql`, resurfacing policy `20260904183000_reacted_item_resurfacing_policy_v1.sql`, bootstrap NULL fix `20260905003500_fix_resurfacing_null_bootstrap.sql`, Shared common-fit migrations `20260905113000_*`, `20260905114500_*`, `20260905115500_*`, mobile `predictionOperations.ts` | Hosted + configured-device accepted core with #174/#182/#185 extensions and hosted/main #177 Shared common-fit v1.1. Real-data acceptance exposed and fixed bootstrap NULL propagation that had marked untouched Items as saved-suppressed; ordinary Items remain eligible. Shared common-fit is one additional aggregate scoring component in V1, not a second ranker; Personal path remains unchanged |
 | Reacted-Item resurfacing V1 | `supabase/migrations/20260904183000_reacted_item_resurfacing_policy_v1.sql`, `20260905003500_fix_resurfacing_null_bootstrap.sql` | #174 policy remains: consumed/rated/not-interested terminal suppression; saved-only reminder after 30d; 30d cooldown; max 2 reminders/90d; max one reminder/candidate pool. Missing bootstrap evidence is explicitly boolean-false rather than SQL NULL |
 | SleepLayer / EvolutionEngine V1 | `supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql`, `20260904172000_sleep_layer_v1_fk_indexes.sql`, `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` | Accepted 13C: immutable scalar genomes, baseline Champion + three SHADOW Challengers, PolicyAssignment tagging, frozen shadow worker, mature exposed-outcome evaluation with Profile shrinkage, genome-aware V1 policy layer, evidence-gated service-only Profile canary and reversible rollback. Automatic/global Challenger promotion remains unavailable |

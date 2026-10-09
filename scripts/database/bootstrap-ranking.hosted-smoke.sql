@@ -11,6 +11,8 @@ declare
   unique_tag text := 'bootstrap_smoke_' || gen_random_uuid()::text;
   ranked record;
   result_count integer;
+  expected_base_version text := case when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
+    then 'prediction-v0.4-bootstrap' else 'prediction-v0.5-native-decay' end;
 begin
   insert into auth.users(id,email,raw_user_meta_data)
   values(actor,actor::text || '@example.invalid',jsonb_build_object('kajo_nickname','Bootstrap smoke'));
@@ -26,7 +28,7 @@ begin
   values(actor,profile,evidence_item,'BOOK','KAJO_CSV','SMOKE_TEST',job,'1','RATED',10);
   perform set_config('role','authenticated',true);
   select * into strict ranked from public.rank_items_v1(profile,'FOR_YOU','BOOK',20,'{}') where item_id=candidate;
-  if ranked.explanation->>'baseVersion' <> 'prediction-v0.4-bootstrap'
+  if ranked.explanation->>'baseVersion' is distinct from expected_base_version
      or coalesce((ranked.explanation->>'bootstrapLongTerm')::numeric,0) <= 0 then
     raise exception 'Missing bootstrap contribution or version: %',ranked.explanation;
   end if;
@@ -41,7 +43,7 @@ begin
   exception when insufficient_privilege then null;
   end;
   perform set_config('role','postgres',true);
-  if not exists(select 1 from private.prediction_runs where profile_id=profile and base_model_version='prediction-v0.4-bootstrap') then
+  if not exists(select 1 from private.prediction_runs where profile_id=profile and base_model_version=expected_base_version) then
     raise exception 'Missing versioned prediction trace';
   end if;
   perform set_config('kajo.bootstrap_smoke_result','PASS: authenticated public V1, bootstrap contribution, import removal, outsider denial, persisted base version; transaction rolled back',true);

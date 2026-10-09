@@ -6,6 +6,19 @@ STATUS owns source, hosted and device acceptance. The #229 source sections below
 
 Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
+The active native memory/serving parity correction changes a versioned current
+decay calculation, not canonical Event identity or evidence strength. A newly
+computed PredictionRun/state/feature trace identifies its live kernel version;
+old runs, scalar feature vectors, receipts and shadow/page replay remain frozen
+with their original numbers and versions. Correcting current calculation must
+not fabricate earlier knowledge or rewrite a historical forecast. Exact native
+decay interpretation belongs to PREDICTION_MODEL; source/native/hosted acceptance
+belongs to STATUS. Current native Events and UNDOs require finite `occurred_at`
+at or before their respective cutoff; future/nonfinite UNDOs cannot remove current
+evidence. `nativeEvidenceAsOf` records memory's explicit `state_as_of` or the base
+transaction's `now()`. This occurrence-time selection neither unifies those clocks
+nor proves commit-time availability.
+
 ## 1. Recommendation Event contract
 
 Conceptual fields:

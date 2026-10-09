@@ -104,6 +104,12 @@ permanent Kajo User
    + same PersonalProfile/taste history
 ```
 
+This server-backed foundation must exist before real anonymous Taste acceptance.
+It includes authorized resume, bounded creation, retention/deletion of abandoned
+state, redacted diagnostics and versioned opportunity/completion/challenge
+measurement. A logged-in policy prototype can test selection separately; it
+cannot stand in for anonymous identity or claim the complete launch flow.
+
 Conversion requirements:
 
 - no second PersonalProfile is created,
@@ -386,16 +392,22 @@ The launch loop begins only after the algorithm/data spine is reliable enough th
 
 Canonical order:
 
-1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics.
-2. Adaptive cold-start/Taste policy and trustworthy challenge evaluation.
-3. Anonymous identity + web Taste entry + identity conversion.
-4. Recommendation preview and conversion funnel.
+1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics; begin with the live native decay-parity correction, then bounded ordered Personal session/state policy.
+2. Server-backed anonymous identity/PersonalProfile-compatible state and TasteSession, minimal retention/deletion/abuse controls and versioned measurement before real Taste acceptance.
+3. Adaptive cold-start/Taste policy, trustworthy frozen challenge evaluation and canonical recommendation preview.
+4. Google/Apple identity conversion and browser/installed-app continuation preserving that state, plus the full conversion funnel.
 5. Personal Friend invite + friend lifecycle.
 6. Fast SharedProfile creation from Friends.
 7. End-to-end funnel telemetry, experiments, privacy/abuse and operational gates.
 8. Closed external beta of the complete link-to-Kajo loop.
 9. Store/public release readiness.
 10. **Only after all release gates pass: share the Taste link with real acquisition traffic.**
+
+Personal source work may proceed alongside independent Shared/native acceptance.
+Known Shared evidence defects, the genuine #232F prepared-input consumer,
+#306 integration, #229 device/fresh-account acceptance and Phase 16.3 remain
+required. Advanced Shared model enhancements do not serialize every Personal
+source task; all relevant quality/privacy and complete-beta gates still apply.
 
 The project should not announce “now is the time to share the link” until the release readiness gate in the roadmap is explicitly satisfied.
 

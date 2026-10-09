@@ -14,6 +14,45 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native memory/scoring parity and execution audit — 2026-10-09
+
+The owner requests continuation, a current-documentation audit and future-aware
+resequencing. Published #313 source `16e8e64a382fa07fd49b78815dc1339d0fa3d72a`
+is the exact parent; CI #622 remains in progress at the single continuation
+lookup. The audit finds no broken active local links, but corrects stale
+portable-foundation, publication, UI-disposition and anonymous-dependency
+summaries while preserving dated evidence and outstanding acceptance.
+
+ROADMAP prioritizes the Personal BOOK/MOVIE vertical slice through native memory/
+serving parity, ordered session/state policy and adaptive Taste/frozen challenge.
+Independent Shared/source/native/device work can proceed alongside it; the
+genuine #232F consumer and all first-release requirements remain queued gates.
+Anonymous identity and minimum retention/abuse/measurement precede real Taste
+acceptance. Advanced group models, optional public-data model admission and
+later engine generations do not serialize every Personal source increment.
+
+The completed source correction removes the serving-only native 365-day clamp
+through the shared private unclamped 180-day helper. New live metadata names
+`native-long-term-decay-v2` / `prediction-v0.5-native-decay`. Finite native
+Event/UNDO occurrence cutoffs exclude future/nonfinite inputs;
+`nativeEvidenceAsOf` discloses the existing distinct memory/base clocks, without
+claiming commit-time availability. Strengths, ShortTerm, bootstrap floor,
+structural features/genomes and old frozen replay remain preserved. The pinned
+CLI-generated forward SHA-256 is
+`fb1bdb933a287b4d2942cc821162a712ccb2669bf80e63fa72d93798bd0f6f98`.
+
+Full database **103/103**, final populated/frozen-parity target, engine **77**,
+research **19 Python + 23 Node**, acceptance **6 + 5**, independent review and
+syntax/diff checks pass. All 62 Markdown files / 279 local links resolve.
+Fresh root lint/types, dependency **43**, mobile **478** and catalog **444** pass
+before Deno registry connection refusal; separate application smoke fails closed
+without local production Supabase configuration. No complete root/export/native
+activation or measured-quality pass is claimed. The existing required CLI gate
+now includes populated upgrade and live math/serving/frozen-parity stages; Docker
+native execution remains CI evidence. All 68 earlier migrations and lockfile
+are unchanged. STATUS and #229 own the one exact publication/continuation;
+Phase 14 remains open.
+
 ## Prepared pre-first-response prediction input — 2026-10-09 / #232F
 
 The continuation starts from published #312 source

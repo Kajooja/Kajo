@@ -1161,7 +1161,9 @@ Known V1 limits:
 - common-fit v1.1 coefficients are conservative hypotheses and require configured-device plus real Shared outcome calibration,
 - Context includes time/surface but not explicit mood/available-time input,
 - saved-reminder thresholds are first versioned heuristics and require real outcome calibration,
-- the new portable contracts/external-data plan is not an implemented engine package or trained prior.
+- accepted E1 supplies an executable independent engine package and D1/D2 supply
+  reproducible research intake/evaluation; they do not replace native SQL serving
+  or admit a trained external prior.
 
 ## 18. Required MVP algorithm completion contract
 
@@ -1395,7 +1397,7 @@ Use bounded candidate sources for durable fit, recent/session fit, prior, novelt
 
 Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
-### Active #229 successor source and remaining acceptance
+### Preserved September 12 #229 successor checkpoint and remaining acceptance
 
 These contracts are present in the unmerged `feat/228-delivered-origin` source,
 including the protocol-2 page forward. The six server forwards were installed and
@@ -1410,11 +1412,13 @@ source and configured-device acceptance remain separate.
 | Identified first page | Immutable request/response receipt, exact actor/Profile/session/mode/domain identity and genuine empty-run identity. Retry payload mismatch fails; old row RPC remains for old clients. |
 | Private frozen window | At most 50 candidates/seen IDs, 2 MiB, 15 minutes and 16 windows per actor/Profile. Raw cached candidates include suppressed/already delivered entries and are not another page. |
 
-The protocol-2 source now commits independent pages, hard eligibility and seen
-advancement atomically, with page-aware frozen replay and dedicated native
-concurrency/upgrade checks. Protocol 1 still reports false capability. The client
-source now uses protocol 2 with captured scope and per-Item page origins. Hosted
-rollout is complete; configured-device acceptance remains open. STATUS owns the evidence.
+At the September 12 checkpoint, the protocol-2 source committed independent
+pages, hard eligibility and seen advancement atomically, with page-aware frozen
+replay and dedicated native concurrency/upgrade checks. Protocol 1 still reports
+false capability. That checkpoint's client used protocol 2 with captured scope
+and per-Item page origins, and its hosted rollout was complete. The later
+catalogue-chain source requests protocol 3 as documented above; its deployment
+and configured-device acceptance are separate. STATUS owns current evidence.
 
 An empty identified result, exhausted bounded window and transport/authorization
 failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
@@ -1435,11 +1439,38 @@ from the existence of this specification.
 - ShortTerm: recent independent evidence across useful time buckets; adapt rapidly but distinguish unknown/attention from negative preference.
 - LongTerm: weighted support by feature/source and repeat experience; adapt slowly to sustained contradiction. Imported history is an initial prior, not a permanent minimum weight.
 - Record effective support and uncertainty. Repeated taps or one Event joining many tags are not independent observations. Undo/removal/revised ratings invalidate or compensate prior evidence consistently.
-- Use one decay definition. The existing 365-day age clamp and bootstrap 20% floor require deliberate replacement or explicit evaluated justification; snapshots and serving cannot disagree.
+- Use one versioned decay definition. The active native-decay parity correction
+  removes the serving-only 365-day age clamp in favour of the existing unclamped
+  180-day native LongTerm rule. The bootstrap 20% floor remains a separately
+  retained hypothesis requiring deliberate evaluation/replacement; this packet
+  does not establish that heuristic's quality or complete adaptive memory.
 - Common normalized features allow BOOK/MOVIE transfer, while domain metadata and transfer reliability prevent false equivalence. Preserve evidence strengths, not only top-tag names. Missing features yield a neutral bounded fallback.
 - Begin with a transparent bounded context-dependent weighting rule over these states; compare it with a static baseline. Learned gating may later replace it behind the same versioned contract.
 - FOR_YOU optimizes supported fit; SURPRISE adds relevant novelty; RISK allocates bounded exploration to relevant uncertain candidates. Deterministic hash jitter alone is not evidence of epistemic uncertainty. Log propensities if stochastic selection is introduced.
 - The implemented logged-in `cold-start-v1` calibration uses six known ratings within a 12-to-24 slate. The planned anonymous adaptive Taste Test has its own versioned stopping/support rules and held-out challenge in [LAUNCH_LOOP.md](../product/LAUNCH_LOOP.md); do not transfer the six-rating gate or claim adaptive selection is already delivered. Measure recognizability, information gain, skips and completion, not just stored ratings.
+
+The 2026-10-09 dependency audit selects a native parity packet that makes current
+snapshots and ordinary/catalogue-chain kernels use the same unclamped decay
+formula, preserving evidence strengths and ShortTerm/bootstrap interpretation.
+`native-long-term-decay-v2` identifies that live extraction; new base runs use
+`prediction-v0.5-native-decay`. Structural `memory-state-v1` and
+`prediction-features-v2` remain compatible with unchanged scalar genomes. Old
+stored scalar feature vectors and frozen shadow/page replay retain their original
+numbers and versions. Native Events and UNDOs require finite occurrence times
+at or before the respective cutoff. `nativeEvidenceAsOf` records the actual
+clock: memory's explicit `state_as_of` and the base's transaction `now()`.
+The packet does not make those clocks equal or certify commit-time availability. Changing current
+calculation is not permission to rewrite a historical prediction. This source
+correction affects native direct evidence in both Personal and Shared bases,
+without changing common-fit/member aggregation or admitting a joint forecast.
+CODEMAP owns exact implementation paths and STATUS owns validation/activation.
+
+ROADMAP now advances bounded Personal state/session policy and adaptive Taste
+source work alongside independent Shared/native/device gates. Its genuine
+#232F consumer remains required for prospective Shared feature/learning
+admission; this Personal-first execution order does not relabel capture-only
+evidence as used by a forecast. Public anonymous Taste still requires stable
+server identity, retention/abuse and minimal measurement before acceptance.
 
 SharedProfile retains its own joint history and same-Profile Scenarios. Authorized member fit is a bounded aggregate input; leaving/deletion removes access and invalidates derived dependencies. Shared learned state is never merely the average of members or a copy of Personal Events.
 
