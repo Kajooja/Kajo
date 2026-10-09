@@ -635,6 +635,37 @@ fixtures verify adapter interoperability, not product quality. Prospective
 membership/prefix capture, measured delayed native quality and serving admission
 remain separate release dependencies. STATUS owns exact source/CI acceptance.
 
+### Prepared prospective input boundary — #232F, active source only
+
+The private `shared-round-prediction-input-v1` producer prepares a future Shared
+prediction input while the target experience has never received any response.
+It locks current membership and the round, records the complete actor/enrollment
+vector and contiguous zero-response command prefix, and reads an explicit
+bounded set of immutable prior #232C captures. Unknown/clear and an answer in an
+older participant set count as earlier responses; reconfirmation cannot reset
+that first-experience boundary. No-answer reconfirmation remains supported.
+The input is identified by its target round/experience, current revision,
+selected receipt, source capture identities/digests and actual observation time.
+
+This establishes current enrollment and available statement-visible evidence
+at preparation. It does not establish membership at a previously ranked anchor,
+a global commit history, prospective outcome-sample selection or actual scorer
+consumption. Its use remains `INPUT_CAPTURE_ONLY`, predictor consumption is
+`NOT_RECORDED`, historical feature/learning admission stays false and reward
+remains null. No old PredictionRun or ordinal report gains new eligibility.
+Source statuses are preserved; input preparation is not quality measurement.
+
+The next consumer must genuinely read this exact immutable input, produce its
+versioned forecast from the declared features and atomically retain that input
+identity with the resulting PredictionRun. That consumer needs its own
+membership/correction/withdrawal/fallback tests and erasure of dependent
+forecasts. A registration beside an unchanged scorer is insufficient. Then
+predeclare authorized delayed outcomes, cohort/selection/overlap and uncertainty
+rules before quality comparison or any promotion/rollback admission. The current
+SQL scorer, root numeric engine and #232E ordinal diagnostics remain unchanged.
+DATA_EVENTS owns producer locks, replay, bounds and whole-artifact erasure;
+STATUS owns exact source/CI/native acceptance.
+
 ## 11. Cold start and external history
 
 A sparse Profile must not start from random Items or from fabricated demographic certainty. MVP bootstrap has two explicit PersonalProfile paths:
