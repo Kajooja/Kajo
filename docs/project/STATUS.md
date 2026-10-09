@@ -10,7 +10,88 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — #232E portable exposed-outcome ordinal audit
+## Current packet — #232F prepared pre-first-response prediction input
+
+### Full enrollment and actual zero-response prefix — 2026-10-09
+
+Continue on `feat/232-pre-response-inputs`, stacked on
+[PR #312](https://github.com/Kajooja/Kajo/pull/312), exact parent source
+`6708f2a56ba61385898d8dd5ed823095a3d2b25b`, tree
+`128434c29d11a15bd150911cc3621667d805209b`. Its
+[CI #621](https://github.com/Kajooja/Kajo/actions/runs/37911060101) was still
+in progress at the single continuation lookup; completed required acceptance
+could not be inferred and no ongoing polling was introduced. Parent #232E's
+database 101/101 and engine 77/77 evidence remains separate from this new source.
+The owner's explicit public `Kajooja/Kajo` publication authorization persists.
+
+This bounded forward prepares an immutable internal input while one Shared
+experience has never received any response. It captures current complete
+actor/enrollment generations and the actual contiguous OPEN/RECONFIRM prefix
+under the same Profile/member/round locks as answers, with the existing lifecycle
+gate first. Unknown, clear and answers in an earlier participant set all close
+this first-response boundary; reconfirmation cannot make an answered experience
+fresh. Explicit prior #232C outcome capture selection is bounded, same-scope and
+stored exactly, with complete generation equality rather than intersection.
+
+`INPUT_CAPTURE_ONLY` and `predictorConsumption=NOT_RECORDED` describe the
+delivered boundary. Current enrollment is known at preparation; membership at
+an older ranking time and global commit history remain unknown. Historical
+feature/learning admission remains false and group reward remains null.
+No ranker, root numeric engine, existing ordinal interpretation, Event or Item
+interaction changes. This is input preparation, not a genuine forecast consumer,
+quality improvement or native learning admission.
+
+Private RLS/API-denied immutable tables retain target-receipt and reverse-source
+dependencies. Deleting a selected source capture removes the whole copied input
+artifact. The guarded owner-erasure extension invalidates frozen current/former
+actor identities after existing policy/influence checks; User/Profile/Item
+roots and automatic account deletion retain their separate restrictions.
+Source-capture invalidation requires READ COMMITTED and acquires no lifecycle
+lock late inside deletion. Exact retries remain frozen after current caller
+reauthorization; new allocations and source deletion fail closed at stronger
+isolation where the declared fresh-prefix guarantees are unavailable.
+
+Final source passes database **102/102**, engine **77/77** plus actual built ESM
+import-graph checks, research **19 Python + 23 Node**, and acceptance **6 + 5**.
+Fresh root check passes lint/types, dependencies **43/43**, mobile **478/478**
+and catalog **444/444**, then stops at Deno registry `Connection refused`.
+No complete local root pass or fresh application export is claimed. Populated
+old-row/object preservation includes independent negative controls for an old
+row, unrelated function and an undeclared eraser-body change. The full-schema
+matrix covers complete enrollment/prefix, all earlier-response forms, exact
+retries, legacy uppercase UUID/integral decimal commands, isolation, source/
+capture/byte bounds and whole-parent actor/source/claim erasure.
+
+The pinned CLI **2.117.0** generated
+`20261009094421_shared_round_prediction_inputs.sql`, SHA-256
+`149a2301f24e3ace13208a7d8c92e4577d8d4d29635e04a9d5a24f979fbbd8d7`.
+All older migration files and the root lockfile retain their bytes. Independent
+source reviews find no remaining blocker. Nine independent-session lock orders
+are implemented in the existing required native CLI gate; local sequential
+full-schema fixture checks pass, but actual native execution remains CI evidence
+to obtain because Docker is unavailable here. The local CLI security-advisor
+attempt cannot connect to `127.0.0.1:54322`; executable full-schema privilege/RLS/
+invoker/search-path checks pass, without claiming a live advisor pass.
+
+Publish this source branch on its exact #312 parent and record the resulting
+PR/source/tree and one-time CI lookup in the single
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229), preserving its September
+30 checkpoint. Publication is a source review packet; required CI/native
+acceptance stays open until its exact source passes. No main merge, hosted write
+or new APK is introduced.
+
+**Next bounded action:** on continuation resolve the published exact source
+from #229 and inspect its completed required gates once; diagnose a concrete
+sanitized receipt if installation fails. Then implement a genuine versioned
+forecast consumer that uses this prepared input and atomically retains the
+input identity with its PredictionRun. Do not register an unused input beside
+an unchanged scorer. Future admission requires corrected/withdrawn evidence,
+dependent-forecast erasure and predeclared authorized delayed-outcome selection,
+overlap/uncertainty and measured promotion/rollback gates. Preserve separate
+#306 rollout/integration, Phase 16.3 UI, #229 device acceptance and consumed
+#182/E1/D1/D2 evidence.
+
+## Preserved #232E portable exposed-outcome ordinal audit
 
 ### Diagnostic target and executable owner report — 2026-10-08
 

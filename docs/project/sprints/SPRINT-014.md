@@ -14,6 +14,32 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Prepared pre-first-response prediction input — 2026-10-09 / #232F
+
+The continuation starts from published #312 source
+`6708f2a56ba61385898d8dd5ed823095a3d2b25b`, with CI #621 still in progress at
+the single continuation lookup. The next bounded input producer freezes the
+whole current enrollment and zero-response OPEN/RECONFIRM prefix before any
+answer in the target experience, plus explicit same-roster prior outcome
+captures. Unknown, clear and old-set answers reject a new first-response capture.
+Private immutable source dependencies remove whole copied inputs during source
+withdrawal, and guarded owner preparation covers current/former copied actors.
+`INPUT_CAPTURE_ONLY` keeps actual forecast consumption unrecorded and historical
+feature/learning/reward admission closed. Existing serving and ordinal behavior
+remain unchanged. Final source passes database **102/102**, engine **77/77**
+plus built ESM graph checks, research **19 Python + 23 Node** and acceptance
+**6 + 5**. Root lint/types, dependency **43**, mobile **478** and catalog **444**
+checks pass before Deno registry `Connection refused`; no complete local check
+or fresh application-export claim is made. Populated preservation negative
+controls and the complete enrollment/prefix/source/erasure matrix pass, including
+legacy UUID/numeric spellings and exact retries at stronger isolation.
+Independent source reviews pass; old migrations and root lockfile remain exact.
+Nine independent-session lock orders join the required native CLI gate, but
+Docker/native execution and live security advisors are unavailable locally.
+STATUS owns exact source publication, #229's preserved handoff and the genuine
+consumer lineage that follows. Source tests/probe implementation do not close
+native, measured-quality, learning, device or Phase 14 acceptance.
+
 ## Portable exposed-outcome ordinal audit — 2026-10-08 / #232E
 
 The owner's long continuation advances from narrow #311 startup lifecycle source

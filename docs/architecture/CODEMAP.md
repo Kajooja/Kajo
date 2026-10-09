@@ -105,6 +105,20 @@ PREDICTION_MODEL owns diagnostic/selection/alias semantics; no serving, schema,
 reward, historical feature admission or promotion is introduced. SQL fixtures
 use synthetic actors and do not measure native prediction quality.
 
+## Prepared Shared prediction inputs — #232F, active source only
+
+`20261009094421_shared_round_prediction_inputs.sql` adds private immutable input
+and reverse-source binding tables, the internal pre-first-response capture/getter,
+whole-parent source-deletion invalidation and a guarded #232D eraser extension.
+`shared-round-prediction-inputs.mjs`, its fixture/matrix/full-schema tests and
+`shared-round-prediction-inputs-concurrency.mjs` cover populated preservation,
+full roster/prefix, prior-response refusal, exact retries, isolation/caps and
+source/actor erasure. The existing native CLI gate exercises actual independent
+response/capture and source-delete/capture lock orders; implementation of that
+probe is separate from a passing native run. No ranking or portable-engine
+consumer is introduced. DATA_EVENTS owns capture-only semantics and
+PREDICTION_MODEL owns the required genuine forecast-consumption lineage.
+
 ## Closed shadow-source erasure — #232D, active source only
 
 `20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source

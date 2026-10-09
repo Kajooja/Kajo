@@ -30,6 +30,8 @@ import { sharedRoundOutcomeCapturesSmokeSql, sharedRoundOutcomeCapturesUpgradeSq
 import { verifySharedRoundOutcomeCapturesConcurrency } from './shared-round-outcome-captures-concurrency.mjs';
 import { shadowSourceErasureSmokeSql, shadowSourceErasureUpgradeSql } from './shadow-source-erasure.mjs';
 import { verifyShadowSourceErasureConcurrency } from './shadow-source-erasure-concurrency.mjs';
+import { sharedRoundPredictionInputsSmokeSql, sharedRoundPredictionInputsUpgradeSql } from './shared-round-prediction-inputs.mjs';
+import { verifySharedRoundPredictionInputsConcurrency } from './shared-round-prediction-inputs-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -161,6 +163,12 @@ try {
     const [shadowSourceErasureUpgrade] = await exec(await shadowSourceErasureUpgradeSql(files[erasureIndex]),
       { stage: 'shadow-source-erasure-populated-upgrade', timeoutMs: 120_000 });
     assert.match(shadowSourceErasureUpgrade?.shadowSourceErasureUpgrade, /^PASS: every populated/);
+    const predictionInputsIndex = files.findIndex(file => file.name.endsWith('_shared_round_prediction_inputs.sql'));
+    assert.ok(predictionInputsIndex > erasureIndex);
+    await resetFromMigrations(files.slice(0, predictionInputsIndex));
+    const [sharedRoundPredictionInputsUpgrade] = await exec(await sharedRoundPredictionInputsUpgradeSql(files[predictionInputsIndex]),
+      { stage: 'shared-round-prediction-inputs-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(sharedRoundPredictionInputsUpgrade?.sharedRoundPredictionInputsUpgrade, /^PASS:/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -182,6 +190,7 @@ try {
     const sharedRoundOutcomesVisibility = await verifySharedRoundOutcomesVisibility(execConcurrentSql);
     const sharedRoundOutcomeCapturesConcurrency = await verifySharedRoundOutcomeCapturesConcurrency(execConcurrentSql);
     const shadowSourceErasureConcurrency = await verifyShadowSourceErasureConcurrency(execConcurrentSql);
+    const sharedRoundPredictionInputsConcurrency = await verifySharedRoundPredictionInputsConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -229,6 +238,9 @@ try {
     const [shadowSourceErasure] = await exec(await shadowSourceErasureSmokeSql(),
       { stage: 'shadow-source-erasure-lineage-permissions-rollback', timeoutMs: 120_000 });
     assert.match(shadowSourceErasure?.shadowSourceErasure, /^PASS:/);
+    const [sharedRoundPredictionInputs] = await exec(await sharedRoundPredictionInputsSmokeSql(),
+      { stage: 'shared-round-prediction-inputs-enrollment-prefix-sources-erasure', timeoutMs: 120_000 });
+    assert.match(sharedRoundPredictionInputs?.sharedRoundPredictionInputs, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -266,6 +278,7 @@ try {
       sharedRoundOutcomes, sharedRoundOutcomesUpgrade, sharedRoundOutcomesVisibility,
       sharedRoundOutcomeCaptures, sharedRoundOutcomeCapturesUpgrade, sharedRoundOutcomeCapturesConcurrency,
       shadowSourceErasure, shadowSourceErasureUpgrade, shadowSourceErasureConcurrency,
+      sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

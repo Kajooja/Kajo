@@ -384,6 +384,24 @@ rewatch policy. Existing history stays intact. Exact eligibility, cooldown and
 frequency gates belong to PREDICTION_MODEL; neither a personal watch nor opening
 a new round is itself a positive joint outcome.
 
+### Prepared pre-first-response input — #232F, source only
+
+`SharedRoundPredictionInputCapture` prepares one identified Shared round for a
+future prediction consumer. It freezes the complete current accepted actor/
+enrollment generation set, the actual command prefix and explicitly selected
+earlier immutable outcome captures. Current roster and the round's acknowledged
+roster must match exactly. Any prior response in this experience, including
+unknown, clear or a response before participant reconfirmation, closes this
+first-response boundary. An unanswered reconfirmation can prepare a new input;
+it cannot relabel an answered experience as fresh.
+
+Membership is known at input capture, not at an earlier PredictionRun's ranking
+time. The use is `INPUT_CAPTURE_ONLY`, with predictor consumption unrecorded;
+this creates no new PredictionRun, response, Event, reward or learned influence.
+Target receipt deletion and selected source-capture deletion invalidate the
+whole copied input artifact. DATA_EVENTS owns storage/replay/erasure and
+PREDICTION_MODEL owns the future actual-consumer and admission gates.
+
 ## Event
 
 An `Event` records meaningful recommendation-related evidence and at minimum may retain actor User, Profile context, Item, type, time, session, Context and predictionId.

@@ -429,6 +429,65 @@ coordinates and multiple captures. A prospective feature consumer must freeze
 the capture reference it actually used; a separately declared joint target and
 exposed-outcome metric are still required before learning admission.
 
+### Prepared pre-first-response inputs — #232F, source only
+
+`private.capture_shared_round_prediction_input_v1(capture_id, profile_id,
+round_id, expected_revision, source_capture_ids)` is an internal owner-invoker
+producer. The owner supplies identities and an explicit set of earlier outcome
+capture IDs, never a fabricated roster, response vector or prediction output.
+An empty source set represents preparation without prior captured outcomes.
+The private input and source-binding tables are RLS-enabled, API-denied and
+immutable; a getter replays stored JSON rather than querying cutoffs again.
+
+New allocation acquires the shared prediction lifecycle gate first and requires
+READ COMMITTED. A capture-ID lock, current Profile/actor/full ordered membership
+locks and the target round lock serialize it with the existing answer and
+membership writers. The current full 2–32-member enrollment must equal the
+acknowledged participant vector; the pending head must match the requested
+revision and the complete contiguous OPEN/RECONFIRM receipt prefix. Any response
+row or SET_RESPONSE/CLEAR_RESPONSE receipt anywhere in this round's history
+rejects allocation, including unknown, clear and earlier participant sets.
+A membership reconfirmation without any prior response remains eligible.
+This is a locked pre-first-response observation, not an accepted-at reconstruction
+of an earlier global commit timeline.
+
+Source selection is caller-declared, with 0–16 unique capture IDs in canonical
+order. The producer reads the exact stored #232C snapshots under source-row
+locks, preserving their outcome/cutoff/maturity/attribution versions and status.
+Sources require the same SharedProfile and complete actor/enrollment vector;
+different source rounds/experiences cannot masquerade as independent revisions
+of one experience. Source observations must be finite and visible within the
+new observation boundary. Current membership at preparation does not prove old
+source prediction-time membership or availability to an earlier consumer.
+
+The artifact records `INPUT_CAPTURE_ONLY`, `predictorConsumption=NOT_RECORDED`,
+`historicalFeatureEligible=false`, `learnable=false` and null group reward.
+It is neither a PredictionRun nor a receipt proving that a scorer used these
+features. Existing ordinal/outcome artifacts keep their original interpretation.
+Exact ID/payload retries return the original artifact after current actor
+reauthorization, including after subsequent answers; a changed payload rejects.
+There are at most 16 inputs per round, a 4 KiB request and an 8 MiB result.
+New allocation under REPEATABLE READ/SERIALIZABLE fails closed; exact stored
+replay does not create a new allocation or restore erased lineage.
+
+The parent references its selected target receipt with cascading deletion.
+Indexed reverse source bindings plus a READ COMMITTED-only source-capture
+BEFORE DELETE trigger
+remove the whole copied input parent when any selected source is deleted;
+removing only an edge would leave erased data in the stored JSON. Existing
+round/receipt/User/Profile/Item cascades carry both target and source erasure.
+The #232D preparation is extended after its existing safety checks to invalidate
+these inputs for an erased Profile or any frozen actor, including a departed
+member whose run belongs to another actor. Typed producer metadata covers every
+copied current/former prefix participant and actor, plus retained validated and
+claimed prediction references. A claim receives no exposure or outcome credit;
+its copied identifier still participates in conservative erasure. The combined
+deletion budget includes input parents and reverse-binding rows before mutation.
+Direct binding removal while a parent exists is denied; whole-parent cascades
+remain valid. Unresolved learned-policy influence
+still rejects the entire preparation before mutation. Automatic Auth/account
+erasure integration and genuine consumer-run lineage remain separate gates.
+
 ### Closed prediction-source erasure preparation — #232D, source only
 
 `private.erase_prediction_sources_v1(scope, id)` is an internal owner-only,
