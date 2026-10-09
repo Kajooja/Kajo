@@ -40,7 +40,8 @@
     "catalog:features:baseline": "node scripts/catalog/evaluate-feature-baseline.mjs",
     "postinstall": "node scripts/dependencies/patch-routing-decoder.mjs && node scripts/dependencies/security-patches.mjs",
     "test:dependencies": "node --test scripts/dependencies/*.test.mjs",
-    "audit:dependencies": "node scripts/dependencies/audit-dependencies.mjs"
+    "audit:dependencies": "node scripts/dependencies/audit-dependencies.mjs",
+    "engine:ordinal": "npm run build --workspace @kajo/prediction-engine && node packages/prediction-engine/scripts/ordinal-report.mjs"
   },
   "engines": {
     "node": "^22.12.0 || >=24.0.0"

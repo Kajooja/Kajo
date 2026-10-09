@@ -35,6 +35,8 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | Root `learn` | A new local derived Scenario from eligible evidence, or null; no source mutation, model training or write side effect |
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
 | `./adapters/movielens` | D1 pure external-rating adapter, original 0.5–5 scale, release namespaces and explicit unknown context; the core root does not import it |
+| `./ordinal` | #232E bounded exposed group Pareto pair/batch diagnostic using one frozen production/shadow candidate pool, full enrollment and own exposure; no scalar group reward or learning |
+| `./adapters/kajo-ordinal` | Strict immutable #232C artifact mapping, required scoped subject/member/enrollment handles, declared digest bindings and diagnostic-only clock/membership limits |
 | `./fixtures` | Deterministic media and synthetic maintenance cycles using the same computation functions |
 
 The separate Kajo adapter accepts already-authorized snapshots. Its membership
@@ -93,6 +95,45 @@ authorized revision view and invalidate/rebuild affected derived episodes after
 retraction, correction or permission withdrawal; the in-memory core does not own
 a persistent store or infer missing tombstones. Raw source revisions and original
 frozen forecasts remain immutable when projections are rebuilt.
+
+## Offline Shared ordinal audit
+
+```sh
+npm run engine:ordinal -- /private/input-manifest.json /private/output-report.json
+```
+
+Use `contractVersion: "kajo-shared-ordinal-manifest-v1"`,
+`selectionBasis: "OWNER_DECLARED_NONOVERLAPPING_PAIRS"`, a finite evaluation clock
+and at most 256 explicit `pairs`. Each pair supplies `pairId`, immutable
+`leftComparison` / `rightComparison`, one `anchor` with `sourcePredictionId` and
+`actorUserId`, and the adapter's required scoped `references`. The built
+`KajoOrdinalSnapshots` declaration owns exact field names. The owner supplies
+already-authorized artifacts and a full bijective alias map; supplied files and
+PostgreSQL JSONB payload digests are not authenticated by the engine.
+
+Both outcomes need complete own exposure and identical enrollment/window/genome/
+mode/domain, evidence cutoff and elapsed maturity interval. The same anchor pool supplies both Items' ordering and must precede
+both original OPEN timestamps. The ordinal module accepts finite decimal
+milliseconds to preserve representable server receipt fractions; the existing
+numeric reference functions retain their integer-clock rule. Every-member ties,
+disagreement and missing/unknown/cleared or immature support remain unscored.
+Scores are never converted into ratings; equal predictor scores are neutral ties.
+
+The private report preserves scoped member handles and sensitive source/capture/
+round/Item/comparison references. Its exclusive output must stay outside the
+repository. No network/database write, raw vector publication or overwrite occurs.
+The owner must remove or regenerate these offline files after source withdrawal/
+erasure; they are not discovered by the database eraser. Private file guarantees
+apply to the supported Linux/macOS owner CLI; the pure engine remains independent.
+Failed writes remove only an inode established as owned; persistent identity
+failure returns `OUTPUT_CLEANUP`, retaining an empty private reservation before
+any report bytes are written.
+Selection is owner-declared, independent units/prospective consumption are not
+established, and the result is conditional on observed production exposure.
+Historical feature eligibility, learning, scalar group reward/advantage and
+uncertainty remain unavailable. The executable media/maintenance fixtures are
+synthetic with zero observed quality labels; SQL-producer fixtures prove only
+interoperability, not serving improvement or causal challenger utility.
 
 ## D1/D2 research boundary
 

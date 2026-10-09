@@ -14,6 +14,42 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Portable exposed-outcome ordinal audit — 2026-10-08 / #232E
+
+The owner's long continuation advances from narrow #311 startup lifecycle source
+`c3b98bbaf1f4c7cb26b2a3f7c76ced6c6503e873`; its new #620 native CI acceptance
+remains open at publication. The separate portable pair/batch evaluator and strict
+Kajo snapshot adapter declare a complete exposed-vector Pareto target against
+both Items from one frozen production/shadow pool. Required scoped member/
+enrollment handles, own per-actor exposure, versions/windows, zero/ties/missing/
+disagreement, maturity and pre-OPEN stored-clock boundaries are executable guards.
+The owner-only offline command writes bounded private non-overlapping audit
+reports outside Git with fixed errors and no overwrite/network/database writes.
+
+Media and non-media generated fixtures supply zero observed quality labels;
+actual existing SQL producers feed a disposable PGlite adapter/CLI test, including
+new-capture correction identity and immutable earlier replay. Source/ESM checks
+preserve the independent root/ordinal graphs. This does not change SQL serving,
+weights, stored metrics, rewards or promotion. Membership/commit/selection remain
+historically unproven, independence unestablished, uncertainty unavailable and
+learning/historical feature admission closed. STATUS owns validation/publication
+and the prospective membership/prefix/consumer lineage gate that follows.
+Final source passes database 101/101, engine 77/77 with real ESM graph checks,
+adapter 21/21, core 12/12, combined CLI/SQL bridge 11/11 and research 19 Python +
+23 Node. Final engine lint/types and independent reviews pass. Root check again
+stops at Deno registry Connection refused after available earlier stages pass;
+no complete local pass, measured native quality, hosted activation or main merge
+is claimed. Parent application/four-export evidence and all migration/lockfile
+hashes remain intact.
+
+The owner explicitly authorized public publication on 2026-10-09 with
+**"Saat julkaista"**, resolving the previous automatic review block. The validated
+implementation remains `5235db39aacdca10913a13656a04c99d8199b425`; authorization/
+handoff follow-ups change documentation only. Publish #232E on the existing
+`Kajooja/Kajo` remote and record its exact resulting PR/source/tree/run in the
+single active #229 handoff. STATUS owns the subsequent required-gate inspection
+and bounded prospective evidence work; all completed validation remains unchanged.
+
 ## Isolated CI startup lifecycle — 2026-10-08 / #232
 
 Completed #310 / CI #618 passes validate, platform/defaults, populated upgrade

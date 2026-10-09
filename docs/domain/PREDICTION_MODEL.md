@@ -529,12 +529,11 @@ unsupported own exposure cannot be admitted by borrowing another coordinate.
 Complete support permits paired vector review only; it does not create a scalar
 `GenomEvaluation`, calibrated rating forecast, reward or automatic winner.
 
-Existing rank scores do not supply frozen per-member rating forecasts. A future
-metric must declare its target and exposure/horizon contract before scoring.
-For example, an ordinal target would require distinct Item/experience outcomes,
-each actor's actual exposed ratings from a comparable frozen candidate pool,
-explicit ties and missing support, rather than turning a rank into a rating.
-This packet retains null production/challenger metrics and advantage. Historical
+Existing rank scores do not supply frozen per-member rating forecasts. The
+#232C storage boundary retains null production/challenger metrics and advantage;
+#232E below adds a separate retrospective ordinal diagnostic against distinct
+Item/experience outcomes from one frozen pool. It does not fill those stored
+scalar fields or turn a rank into a rating. Historical
 feature eligibility remains closed until a prospective prediction consumer
 records the capture it actually used; observation time alone cannot repair past
 availability. DATA_EVENTS owns the immutable storage/erasure contract, including
@@ -550,7 +549,8 @@ promotion/assignment/rollback influence lineage is a fail-closed prerequisite,
 not permission to retain learned influence after deleting inputs. Writer/eraser
 serialization prevents stale shadow evidence from being recreated after a waiter
 continues. This changes no serving weights, metric, reward or admission decision;
-automatic account erasure integration and a joint target/metric remain open.
+automatic account erasure integration and prospective joint learning/serving
+admission remain open.
 
 One identified round/experience is one observation unit, regardless of member or
 receipt count. Coverage counts are diagnostics, not independent sample sizes.
@@ -559,6 +559,81 @@ authorized server boundary. A future portable adapter or aggregate report must
 use scoped member references and declared privacy rules; it must not export this
 raw vector or place it in candidate explanations. Unattributed completed ratings
 can describe an experience without establishing credit for a prediction.
+
+### Portable exposed-outcome ordinal diagnostic — #232E, active source only
+
+`group-ordinal-pair-v1` declares a partial-order target over two distinct Item,
+round and experience identities. The pure `./ordinal` engine subpath receives
+two complete exposed outcome vectors with the exact same actor/enrollment set,
+a target/raw scale and one explicitly selected frozen production/shadow anchor.
+For maximizing ratings, LEFT_DOMINATES means every member rated the left
+experience at least as highly and at least one rated it higher; RIGHT_DOMINATES
+is the reverse. A minimizing non-media target reverses that direction. All-member
+ties and opposing member preferences retain their vectors and coverage reasons
+without inventing a scalar order. Zero is an observed rating. Missing, unknown,
+cleared, unexposed, immature, future, unauthorized or incompatible coordinates
+leave the pair unscored; the evaluator never intersects away a missing member.
+
+Both Items must occur in the same anchor pool for both predictors. Unequal finite
+scores use that predictor's frozen rank order, including policy eligibility
+ordering; exact equal scores remain a neutral predicted tie despite the Item-ID
+rank tie-break. A directional observed pair yields agreement, disagreement or a
+predicted tie separately for production and shadow. Ranks from different requests
+are not compared, scores are not converted into member ratings, and the outcome
+vector is not averaged into group reward. One pair is one diagnostic observation
+unit, not one sample per member. The bounded batch rejects reused pair IDs,
+rounds, experiences and same-subject unordered Item pairs. Even disjoint units do
+not establish independence: uncertainty remains unavailable, with no confidence
+interval, accuracy percentage, scalar advantage or automatic winner/admission.
+
+The strict Kajo adapter accepts already-authorized immutable #232C comparison
+snapshots. Both require COMPLETE_VECTOR_SUPPORTED, identical frozen evaluation
+window/genome, the same DiscoveryMode and non-null Item domain, full actor masks,
+matching production/shadow pools and versions, and each member's own actual
+attributed exposure to each Item. Window prediction/input/outcome bounds,
+evidence cutoffs, maturity and comparison observation times are rechecked; both
+captures use the same evidence cutoff and elapsed maturity interval. The
+anchor must precede BOTH original OPEN `createdAt` timestamps, not merely a later
+corrected response. Current artifacts retain latest responses rather than a full
+first-answer certificate. Decimal milliseconds preserve representable receipt
+microseconds; a precision-collapsed equal boundary is conservatively rejected.
+The existing numeric reference estimator's integer-clock rules remain unchanged.
+
+That pre-OPEN rule is a stored-clock diagnostic, not proof of transaction commit
+availability or actual prospective consumption. Anchor-time membership generations
+are absent from the trace and remain HISTORICAL_MEMBERSHIP_UNKNOWN. Later complete
+captures cannot establish old feature availability. The report is conditional on
+Items production actually exposed and the group actually rated, with no causal
+shadow-policy benefit claim. `historicalFeatureEligible=false`, `learnable=false`,
+`commitVisibility=unknown`, `groupReward=null` and `advantage=null` remain explicit.
+Stored #232C comparison metrics remain null; no SQL schema/scorer/evaluator,
+GenomEvaluation, policy assignment or promotion changes.
+
+The owner supplies a required scope identifier and bijective subject/member/
+enrollment handles. Portable inputs and reports contain those scoped handles,
+not raw User/Profile/enrollment UUID vectors. This is data minimization, not
+anonymization: capture, round, Item, prediction, session and comparison lineage
+references remain sensitive private audit data. Authorization, immutable producer
+integrity and alias lifecycle belong to the owner. The owner must invalidate and
+remove or regenerate local manifests/reports when source consent, membership or
+evidence is withdrawn/erased; the SQL eraser does not discover offline files. The adapter checks declared
+digest formats/equalities and structural bindings; it does not recompute PostgreSQL
+JSONB digests or authenticate a supplied file. Reports retain target/version,
+evaluation time, round/experience/object/capture revisions and the one anchor for
+replay. A new capture/manifest reconciles corrections without changing an older
+report or counting another revision as an extra experience.
+
+`npm run engine:ordinal -- INPUT_MANIFEST OUTPUT_REPORT` is a bounded offline
+owner audit over explicitly selected non-overlapping pairs. Selection is caller-
+declared, not a prospective certificate. It writes a private exclusive report
+outside the repository on Linux/macOS, performs no network/database writes and
+leaves existing reports unchanged. Failed writes remove only an identified owned
+inode; persistent identity failure returns OUTPUT_CLEANUP and retains an empty
+private reservation without writing report bytes. Synthetic media and maintenance fixtures demonstrate execution
+and contribute zero observed evaluation labels; actual SQL-produced synthetic
+fixtures verify adapter interoperability, not product quality. Prospective
+membership/prefix capture, measured delayed native quality and serving admission
+remain separate release dependencies. STATUS owns exact source/CI acceptance.
 
 ## 11. Cold start and external history
 

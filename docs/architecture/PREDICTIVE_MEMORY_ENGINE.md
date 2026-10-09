@@ -488,6 +488,19 @@ Engine:
 
 Time, randomness, storage and model loading are injected/versioned. Pure scoring/replay components do not acquire credentials or mutate production state. Kajo's trusted server boundary remains responsible for authorization, current membership/eligibility, atomic trace/receipt commit and exposure provenance.
 
+The #232E source adds a separate pure `./ordinal` evaluator and
+`./adapters/kajo-ordinal` snapshot normalizer; neither enters the numeric root
+import graph or native serving. It evaluates a complete exposed group vector's
+Pareto direction against both Items from one frozen production/shadow pool.
+Media/maintenance generated fixtures and a real SQL-producer interoperability
+fixture exercise the boundary. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md)
+owns the exact target, bounds, ties, clocks and unavailable learning/uncertainty.
+Caller-provided scoped member/enrollment handles replace raw audit identities;
+private lineage refs remain owner-only. The offline audit command trusts an
+already-authorized immutable snapshot and declared digest bindings, not supplied
+file authenticity or prospective feature availability. It writes no Events,
+memories, rewards, policies or promotion decisions.
+
 ## 43. Internal modularity
 
 Logical modules remain those proposed by the owner:
