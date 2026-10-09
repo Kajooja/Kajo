@@ -195,6 +195,12 @@ Friend A + Friend B
 
 For 3+ users, selected Friends still pass through explicit Shared membership acceptance.
 
+The planned compact creation UX uses 2–5 total people including the creator,
+without replacing generic 2-N SharedProfile membership. Opaque link delivery
+and Friend selection remain distinct from accepted Friendship/ProfileMember;
+opening a link cannot create either relationship or grant private history access.
+LAUNCH_LOOP/UX_PRINCIPLES own the planned slot/share presentation under ROADMAP 16.2.
+
 Friend removal does not silently remove or rewrite existing SharedProfile history/membership. Any desired membership change uses SharedProfile lifecycle rules.
 
 ## Item
@@ -285,6 +291,19 @@ Pending withdrawal removes the actor’s Endorsement and cancels its outcome evi
 Deleting any destination of a pending proposal cancels the whole proposal and records administrative cancellation with the
 real deleting actor and affected endorsing actor separately. Completed consensus
 and Saved survive List deletion.
+
+## Planned bounded joint decision for today
+
+ROADMAP 16.4 / MVP-SOCIAL-010..012 introduces a planned temporary Shared choice
+context, after the existing round/rewatch evidence foundations. It uses canonical
+BOOK/MOVIE Items and the same Shared predictor with at most five current options.
+A frozen accepted roster, actor/scope/version identity and explicit expiry,
+membership-change/retry/deletion rules precede interpretation of session actions.
+Session veto or already-seen replacement does not delete history, prohibit future
+rewatch, submit ordinary durable not-interest, complete a SharedRatingRound or
+create confirmed consumption/reward. The proposed any-member veto threshold is
+a product decision to confirm at implementation. Product documents own the UX;
+this plan creates no delivered entity/table or new production evidence stream.
 
 ## SharedRatingRound — required first release, #232
 

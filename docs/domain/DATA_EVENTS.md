@@ -19,6 +19,28 @@ evidence. `nativeEvidenceAsOf` records memory's explicit `state_as_of` or the ba
 transaction's `now()`. This occurrence-time selection neither unifies those clocks
 nor proves commit-time availability.
 
+The separate source-only Personal WorkingState adapter maps already-authorized
+canonical Events and `event_sessions` into an immutable ordered prefix. Native
+Event IDs remain exact source references; Profile/User/session identities map
+through explicit scoped handles. Ratings retain valid zero, malformed/unknown
+values do not invent dislike, and not-interest is an explicit negative action
+rather than a fabricated rating. History clear and interest clear retain their
+different canonical effects. Visible same-owner corrections and exact UNDO links
+are reconciled before selected-session taste is derived; another session supplies
+no positive taste or activity-clock renewal. Foreign/private/synthetic/bootstrap
+inputs are not native support. The caller explicitly declares complete session
+prefix plus correction closure; stored `created_at` is an availability proxy,
+not commit-time certification. The adapter adds no Event writer or table, native
+PredictionRun consumption or historical learning eligibility. Exact limits and
+OFF/STATIC/ORDERED controls belong to the [engine README](../../packages/prediction-engine/README.md#bounded-session-intent).
+
+The planned ROADMAP 16.4 joint decision session keeps session exposure, veto,
+already-seen replacement and choice telemetry separate from canonical consumed
+ratings/SharedRatingRound outcomes. A choice is not verified consumption or group
+reward; session rejection cannot silently become a permanent group dislike.
+Actor/roster/scope/version/expiry and erasure semantics must be specified before
+runtime admission. No new production Event or table is created by this plan.
+
 ## 1. Recommendation Event contract
 
 Conceptual fields:

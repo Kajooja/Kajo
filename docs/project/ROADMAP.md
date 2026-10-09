@@ -456,6 +456,8 @@ Exit: bounded 12–24-opportunity anonymous test; unknown Items do not poison ta
 LAUNCH_LOOP retains the owner's roughly ten movies → transition → ten books
 proposal inside adaptive bounds, always-available unknown response even after
 rating-wheel movement, and preservation of already accepted Personal taste.
+The October 9 owner clarification reaffirms this initial adaptive Taste as a
+pre-release requirement; the planned social shortcuts do not replace it.
 
 External benchmark results cannot substitute for this real Kajo first-session acceptance.
 
@@ -499,9 +501,23 @@ Exit: both users see the connection; remove/block/reinvite behavior is safe unde
 
 ### 16.2 — SharedProfile creation from Friends
 
-Requirements: `MVP-GROUP-001..003` and existing SharedProfile requirements.
+Requirements: `MVP-GROUP-001..004` and existing SharedProfile requirements.
 
-Exit: short explicit two-Friend creation; 3+ members still accept membership; invites never create a group automatically; canonical joint/common-fit predictor, not a second recommender; Friend removal does not rewrite Shared history/membership.
+Planned compact creation flow: **2–5 total people including the creator**, with
+the creator occupying one of at most five member slots. A `+` slot selects an
+authorized accepted Friend or generates an opaque invitation that can be shown,
+copied or shared through the OS share sheet, including WhatsApp where available.
+Friend invite/safety lifecycle under 16.0–16.1 comes first. The receiver follows
+the same app/Taste/link continuation and explicitly accepts the relevant Friend
+or group permissions; sending/opening a link never creates either relationship.
+Friendship grants no private Personal history access. The compact UI bound does
+not redefine existing generic 2-N SharedProfile storage.
+
+Exit: short explicit two-person creation; each additional participant accepts
+canonical membership; pending slots/invites are distinct from accepted members;
+expiry/revocation/retry and blocked/removed relationships remain safe. Use the
+canonical joint/common-fit predictor; Friend removal does not rewrite Shared
+history/membership. This October 9 plan is not delivered UI or acceptance.
 
 ### 16.3 — Shared experience rating and controlled rewatch
 
@@ -515,6 +531,34 @@ Personal/joint separation, atomic completion, corrections/retries/membership
 changes and truthful legacy provenance. A new joint rewatch is a new experience
 with retained history and a bounded versioned eligibility policy. Two-account and
 N-member server/CI/device cases must pass; completion alone is not satisfaction.
+
+### 16.4 — Bounded joint decision for today — planned before beta
+
+Requirements: `MVP-SOCIAL-010..012`. Implement after 16.3's evidence and controlled
+rewatch contracts and the Friend/membership foundations, before the complete beta.
+
+Offer an optional Shared session for “what should we watch/read today?” with at
+most five current canonical BOOK/MOVIE suggestions from the same Shared
+predictor and inherited `DiscoveryMode` (`FOR_YOU`, `SURPRISE`, `RISK`). An optional
+Tinder-like card sequence has accessible non-gesture controls. Proposed behavior:
+any participating member's session-level “not interested” vetoes the current
+option; confirm the exact veto rule when implementing. “Already seen/read”
+replaces the current suggestion for this session. Bound refill and preserve exact
+delivery origins, current eligibility and genuine exhaustion/expiry messages.
+
+Freeze the accepted participant roster for a bounded session, with explicit
+membership-change, expiry, cancellation, exact-retry and concurrent-action rules.
+Choices/exposure and minimal session telemetry retain actor/scope/version
+provenance. A session veto is not an ordinary durable `NOT_INTERESTED` command;
+replacement neither erases history nor permanently prohibits rewatch. Selection
+does not complete SharedRatingRound, confirm consumption or create group reward.
+Keep ordinary Shared discovery and the separately optional FUT-UX-003 List choice
+distinct. “Do today”/other domains remain future scope.
+
+Exit: two-person and N-member permission/race/refill/empty/expiry/retry/privacy
+cases and accessible device behavior pass without changing confirmed history or
+fabricating joint outcomes. This is queued product work, not the next Personal
+source component or a closed release gate.
 
 ## Phase 17 — Complete core product and operational quality
 

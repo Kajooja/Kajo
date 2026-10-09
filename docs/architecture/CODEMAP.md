@@ -135,6 +135,13 @@ probe is separate from a passing native run. No ranking or portable-engine
 consumer is introduced. DATA_EVENTS owns capture-only semantics and
 PREDICTION_MODEL owns the required genuine forecast-consumption lineage.
 
+The native helper retains a full initialized canonical snapshot for active
+fixture checks and the full original snapshot for after-cleanup restoration.
+`shared-round-prediction-inputs-concurrency.test.mjs` executes the actual fixture,
+capture and cleanup SQL in a fresh full schema, proving the five automatic Saved
+Lists and detecting equal-count mutations to owned and unrelated Lists. No table
+or ownership exclusion relaxes the native race gate.
+
 ## Closed shadow-source erasure — #232D, active source only
 
 `20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source
@@ -331,6 +338,9 @@ CI/build and physical-device acceptance. STATUS owns exact rollout/checkpoint.
 | Generic typed contracts | `packages/prediction-engine/src/contracts.ts`, `src/index.ts` | Subject/actor, observations/raw scale/missingness, source versus access, versioned artifacts, state hypotheses and separate action/outcome/challenger identities |
 | Reference computation | `packages/prediction-engine/src/engine.ts` | Available-prefix state, bounded exact retrieval, numeric reference prediction, immutable forecast, constrained choice, original-outcome comparison and derived memory; no SQL parity claim |
 | Kajo adapter | `packages/prediction-engine/src/adapters/kajo.ts` | Structural Profile/User/Item/rating snapshots; Shared subject isolation; no app/provider imports |
+| Bounded session hypothesis | `packages/prediction-engine/src/working-state.ts`; `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; complete current-session/correction prefix, independent Item support, equal-time groups, finite cutoffs and resource/reset/expiry limits; no native admission |
+| Personal session normalizer | `packages/prediction-engine/src/adapters/kajo-working-state.ts`; `./adapters/kajo-working-state` | Authorized actual Event/session snapshots with strict Profile/actor/source semantics; corrections are resolved before session taste filtering; no database or app imports |
+| Session verification | `packages/prediction-engine/test/working-state.test.ts`, `working-state-kajo.test.ts`; `scripts/database/working-state-kajo.test.mjs`; `test/exports.mjs` | Independent numeric/static/off, correction/expiry/bounds and synthetic non-media controls; actual full-schema Personal command/session interoperability and frozen existing run preservation; built separate ESM/import graphs |
 | Portable fixtures | `packages/prediction-engine/src/fixtures/maintenance.ts`, `cycles.ts`; `npm run engine:demo` | Same executable media and synthetic machine-energy cycle; no real data or cross-domain quality claim |
 | Verification and packaging | `packages/prediction-engine/test/`, package/TS/lint configs; root workspace/scripts | Contract tests, actual built ESM exports and independent core import graph; lint/typecheck/tests/build run in root check and existing CI |
 
