@@ -34,6 +34,8 @@ import { sharedRoundPredictionInputsSmokeSql, sharedRoundPredictionInputsUpgrade
 import { verifySharedRoundPredictionInputsConcurrency } from './shared-round-prediction-inputs-concurrency.mjs';
 import { personalNativeDecaySmokeSql, personalNativeDecayUpgradeSql } from './personal-native-decay.mjs';
 import { personalWorkingBridgeSmokeSql, personalWorkingBridgeUpgradeSql } from './personal-working-bridge.mjs';
+import { personalWorkingResetSmokeSql, personalWorkingResetUpgradeSql } from './personal-working-reset.mjs';
+import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -183,6 +185,12 @@ try {
     const [personalWorkingBridgeUpgrade] = await exec(await personalWorkingBridgeUpgradeSql(files[workingBridgeIndex]),
       { stage: 'personal-working-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalWorkingBridgeUpgrade?.personalWorkingBridgeUpgrade, /^PASS: every populated old/);
+    const workingResetIndex = files.findIndex(file => file.name.endsWith('_personal_working_reset.sql'));
+    assert.ok(workingResetIndex > workingBridgeIndex);
+    await resetFromMigrations(files.slice(0,workingResetIndex));
+    const [personalWorkingResetUpgrade] = await exec(await personalWorkingResetUpgradeSql(files[workingResetIndex]),
+      { stage: 'personal-working-reset-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalWorkingResetUpgrade?.personalWorkingResetUpgrade, /^PASS: every populated old/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -205,6 +213,7 @@ try {
     const sharedRoundOutcomeCapturesConcurrency = await verifySharedRoundOutcomeCapturesConcurrency(execConcurrentSql);
     const shadowSourceErasureConcurrency = await verifyShadowSourceErasureConcurrency(execConcurrentSql);
     const sharedRoundPredictionInputsConcurrency = await verifySharedRoundPredictionInputsConcurrency(execConcurrentSql);
+    const personalWorkingResetConcurrency = await verifyPersonalWorkingResetConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -261,6 +270,9 @@ try {
     const [personalWorkingBridge] = await exec(await personalWorkingBridgeSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
+    const [personalWorkingReset] = await exec(await personalWorkingResetSmokeSql(),
+      { stage: 'personal-working-reset-frozen-lifecycle-consumer', timeoutMs: 120_000 });
+    assert.match(personalWorkingReset?.personalWorkingReset, /^PASS:/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -300,6 +312,7 @@ try {
       shadowSourceErasure, shadowSourceErasureUpgrade, shadowSourceErasureConcurrency,
       sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
+      personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

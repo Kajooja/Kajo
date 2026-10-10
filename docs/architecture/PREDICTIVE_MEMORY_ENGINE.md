@@ -95,8 +95,14 @@ no-session/empty/no-tag/overflow envelopes are inert. Unsupported legacy tags,
 malformed UNDO or timestamp precision collapse yield `INPUT_UNAVAILABLE` with
 an explicit reason and no partial prefix, preserving baseline OFF pages. The
 portable core retains strict input/schema validation; parity is scoped to
-accepted nonempty schemas. Native reset remains open despite the core's
-explicit reset support. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
+accepted nonempty schemas. Reset-aware native capture now includes a bounded
+private canonical lifecycle-control ledger in the same snapshot. Its latest
+server-owned boundary excludes at-or-before taste and Item activity without
+renewing expiry, deleting history or supplying preference/reward. New capture,
+feature, serving and comparison generations preserve old frozen sources.
+Forecast-only erasure retains raw controls; genuine parent deletion cascades
+them. Product reset integration, a public API/UI and quality/activation remain
+separate gates. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
 remain distinct from the full target in this section.
 
 ## 5. ShortTermState — recent memory

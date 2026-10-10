@@ -91,7 +91,8 @@ now freezes its own authorized capture into new PredictionRuns and consumes
 versioned candidate components with serving fixed to OFF. Explicit private
 STATIC/ORDERED comparisons use frozen features; they do not activate session
 ranking or complete MVP-ALG-004, usefulness, calibration or historical feature
-availability. Native reset and quality/admission remain separate requirements.
+availability. The private reset-aware capture now accepts a canonical session
+control; product reset integration and quality/admission remain separate gates.
 
 ### 4.2 ShortTermState — lähimuisti
 
@@ -1464,12 +1465,21 @@ from the existence of this specification.
 
 ### Native Personal WorkingState capture and comparison
 
-The source forward `20261010064104_personal_working_bridge.sql` adds a bounded
-native bridge beside the portable component. New ordinary and catalogue-chain
-Personal rank sources capture `native-working-capture-v1` in
-`PredictionRun.state_snapshot.workingState`, retain candidate
-`workingIntent.version = personal-working-features-v1` and append
-`+personal-working-off-v1` to the serving policy. Shared sources receive no
+The source forward `20261010064104_personal_working_bridge.sql` establishes a
+bounded native bridge beside the portable component. The reset-aware successor
+`20261010082558_personal_working_reset.sql` retains the same private helper
+identities and adds a second captured-source generation. Ordinary and
+catalogue-chain Personal rank sources freeze state in
+`PredictionRun.state_snapshot.workingState`, candidate features in
+`workingIntent` and the explicit serving suffix:
+
+| Captured source | Candidate features | Serving suffix | Private comparison |
+| --- | --- | --- | --- |
+| `native-working-capture-v1` | `personal-working-features-v1` | `+personal-working-off-v1` | `personal-working-shadow-v1` |
+| `native-working-capture-v2` | `personal-working-features-v2` | `+personal-working-off-v2` | `personal-working-shadow-v2` |
+
+Fresh sources use the reset-aware generation; existing v1 sources remain
+supported without rewriting their bytes. Shared sources receive no
 Personal capture or WorkingState component. Existing scalar scorer/genome
 contracts, historical forecasts, receipts and Events retain their semantics.
 Exact source/native/hosted acceptance is recorded only in STATUS.
@@ -1502,7 +1512,9 @@ input; SQL/portable parity is scoped to accepted nonempty feature states rather
 than these native inert envelopes. Independent SQL/portable nonzero vector
 scalars use a finite 1e-12 numerical comparison with exact control/feature keys;
 actual OFF serving scores, ranks, selection and frozen receipts remain exact.
-Native `resetAt` is null; a supported native reset lifecycle/API is not delivered.
+The first capture generation has no reset control. The reset-aware generation
+freezes its visible private controls in the same MVCC capture and applies the
+latest `resetAt` boundary as specified below.
 
 One private `prediction_candidate_score_working_v1` consumes the frozen
 STATIC/ORDERED candidate adjustments bounded to ±0.25. Its serving control is
@@ -1515,7 +1527,7 @@ its old source.
 
 The owner-only `private.record_personal_working_shadow_v1(source, control)`
 actually scores frozen candidate features through the same consumer and retains
-an immutable `personal-working-shadow-v1` result for OFF, STATIC or ORDERED.
+an immutable source-generation-matched result for OFF, STATIC or ORDERED.
 `FROZEN_CANDIDATE_POOL_AND_FINAL_DELIVERY_POLICY` conditions on the source's
 admitted pool and final eligibility, delivery tiers and chosen reminder; it does
 not replay an independently changed admission/reminder policy or hypothetical
@@ -1532,7 +1544,50 @@ comparisons and the existing owner eraser counts them in the same dependency
 budget. Direct comparison UPDATE/DELETE remains denied. There is no hosted
 activation, user API, mobile UI, APK or automatic promotion in this source packet.
 
-MVP-ALG-004 remains open: native reset, supported quality against STATIC/OFF,
+#### Private native session reset controls
+
+`private.personal_working_resets` stores canonical private lifecycle controls,
+with `personal-working-reset-v1` receipts. A reset affects WorkingState only; it
+is not taste, an UNDO, history deletion, a public Event or reward. The ledger and
+`private.commit_personal_working_reset_v1(reset_id, actor, profile, session)` are
+RLS/API-denied; the helper is SECURITY INVOKER and needs an existing own Personal
+session plus current owner/member authorization. It creates no public reset API
+or mobile control.
+
+The lifecycle gate precedes reset-ID, Profile/member and session locks. Every
+retry reauthorizes and returns its original receipt before quota or new-write
+checks. New controls require READ COMMITTED, at most 128 controls per exact
+actor/Profile/session scope, and one full-precision server clock sampled after
+the locks. The stored instant is an availability proxy with UNKNOWN commit
+availability; it neither certifies historical availability nor renews the
+session's start or lifetime. A 129th allocation rejects rather than evicting an
+earlier boundary.
+
+Reset-aware capture reads all visible controls at its cutoff in the same MVCC
+statement as the complete Event prefix/correction closure and current features.
+It retains their exact control/source references, the maximum `resetAt` and all
+source references tied at that maximum. Taste and selected-session Item activity
+at or before that boundary are excluded; later independent Items can rebuild
+temporary intent. Correction/UNDO cannot resurrect pre-reset taste. Reset adds
+no Item support or activity-clock renewal, and leaves LongTerm, ShortTerm,
+canonical Events, interactions and command receipts unchanged.
+
+The raw Event/correction budgets remain unchanged: reset cannot bypass an
+oversized old prefix. A 129-control sentinel produces inactive `BUDGET_EXCEEDED`
+with incomplete control/prefix declarations and no retained partial evidence.
+Unsupported control boundaries or unrepresentable timestamp precision also
+abstain through `INPUT_UNAVAILABLE`. Old v1 sources/comparisons and copied V2
+pages remain supported and frozen; a fresh V3 page sees the new control.
+Serving remains exact OFF for both generations.
+
+Forecast-only `PREDICTION_RUN`, `PROFILE` and `ACTOR` source erasure retains the
+raw control ledger alongside raw Events, so deleting derived forecasts cannot
+resurrect old intent. Actual User/Profile/session parent deletion cascades its
+controls. The immutable guard permits DELETE only after a required parent is
+gone; direct UPDATE/DELETE with live parents stays denied. No runtime quality,
+serving ON policy, user API, UI or hosted activation follows from this source.
+
+MVP-ALG-004 remains open: product reset integration, supported quality against STATIC/OFF,
 independent/effective support, source-aware forgetting/bootstrap-floor evaluation,
 normalized-feature transfer, real first-session usefulness and measured
 activation/rollback still require their own evidence. Shared #232F consumption
