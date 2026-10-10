@@ -23,6 +23,20 @@ Source work continues on `feat/personal-working-evaluation` without admitting
 native/hosted behavior or quality. STATUS/#229 own exact publication and one next
 packet; the September 30 checkpoint stays intact.
 
+The continuation inspection of current-source CI #628 (`ff136d6a5da8f4f2757be74504fdbcc750d1f6e6`,
+tree `dbff11aefb3eff9d838bff79c77f13154d0c8128`) finds four required jobs passed,
+including validation/application exports, while CLI installation/history fails
+the native exact OFF assertion. The caller's native precision setting was not
+logged. A full-schema reproduction proves rounded JSON score serialization can
+change binary values despite exact scorer/rank/policy outputs. New guarded
+forward `20261010153638_personal_working_shadow_precision.sql` sets only the
+comparison writer's function-local `extra_float_digits=3`, restoring the caller
+on return. Both source generations retain exact new scores. Existing rows,
+including previously rounded comparisons, stay immutable and may still fail an
+exact audit; neither tolerance nor historical rewriting is introduced.
+Migration SHA-256:
+`57394e07607be2df9a02197926e8cc19b904b2cea5f012295545cff25c3e7f8c`.
+
 The isolated portable audit freezes one actual OFF/STATIC/ORDERED pool, versions,
 target/horizon and disjoint pairs before labels. Control creation/availability
 and plan selection clocks cannot be substituted by the source cutoff. Typed
@@ -44,18 +58,23 @@ Current native pools retain adjustment scalars but no complete candidate feature
 vectors; native candidate support reports `FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`
 without consulting later catalog tags. Full generic features exercise support
 diagnostics, without certifying native support.
-All 71 old migrations, old Working/scorers and root lockfile preserve bytes.
-
-Validation: full engine **178/178** with built ESM/isolation graphs, full database
-**131/131** including actual v1/v2 SQL producer interop, research **19 + 23** and
-acceptance **6 + 5** pass; two independent reviews are clean. Offline root check
-passes lint/typecheck/dependency **43**/mobile **478**, then exits during parallel
-catalog without a final diagnostic. All **444** catalog cases pass with two
-workers (**441** scripts plus **3** contracts). Edge registry access is unavailable;
-cached-only fails on missing `@supabase/auth-js` metadata. Complete root check,
-application exports and native acceptance remain unclaimed. All **62** Markdown
+Fresh continuation validation: full engine **178/178** with built ESM/isolation
+graphs, full database **135/135** including actual v1/v2 SQL producer interop and
+**4/4** precision regressions, research **19 + 23** and acceptance **6 + 5** pass.
+Populated true v1/v2 artifacts exercise caller -3/0/1, exact OFF float8 bytes and
+delivery fields, cached receipt/row bytes, only approved function config changes,
+error-path restoration and injected score/rank/selection/row/body/ACL rejection.
+Native CLI adds the populated receipt and unchanged strict bridge fixture at
+caller0. Independent precision review is clean. Fresh offline root check passes
+lint/typecheck/dependency **43**/mobile **478**/catalog **444** (**441** scripts plus
+**3** contracts), then Edge registry loading is interrupted (130); cached-only
+fails on missing `@supabase/auth-js` metadata. Complete local root check, fresh
+application exports and native execution remain unclaimed. Docker/local advisors
+remain unavailable. All **62** Markdown
 files, **291** local links and **97** anchors resolve; syntax/diff checks pass.
-Next exact CI once, then versioned native candidate-feature freezing with old
+All **71** previous migrations, old engine/scoring source and root lockfile
+retain bytes; this config repair is migration **72**.
+Next repaired exact CI once, then versioned native candidate-feature freezing with old
 captures and exact OFF preserved, followed by prospective enrollment/own exposed latest-rating
 correction capture, a preregistered untouched evaluation window and observed
 coverage before quality. Preserve V1 reward meaning, bootstrap/independent

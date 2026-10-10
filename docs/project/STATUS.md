@@ -28,6 +28,23 @@ polling is inferred. Accepted main remains
 publication/CI and preserves its September 30 checkpoint. Public source
 publication authorization persists; source work overlaps open admission gates.
 
+The current-source continuation inspection of
+[CI #628](https://github.com/Kajooja/Kajo/actions/runs/38042488182), source
+`ff136d6a5da8f4f2757be74504fdbcc750d1f6e6`, tree
+`dbff11aefb3eff9d838bff79c77f13154d0c8128`, finds validation/all tests/application
+exports, platform/defaults, both clean installations and populated upgrade
+passed. Only CLI installation/history failed, at the native Working OFF
+comparison's exact score/policy assertion. The actual native caller precision
+setting was not logged. Disposable full-schema reproduction identifies a
+precision-sensitive JSON score round-trip defect: rounded caller output changes
+binary score values while the scorer, candidate set, ranks and policy stay exact.
+The guarded CLI-generated forward
+`20261010153638_personal_working_shadow_precision.sql` pins only the comparison
+writer's function-local float precision. New writes preserve binary scores for
+both source generations and restore the caller setting. All old rows, including
+any rounded comparison receipt, remain immutable; mismatched old OFF receipts
+still fail the strict audit. This repair relaxes no comparison or admission gate.
+
 The isolated portable `./working-evaluation` boundary freezes an explicit
 same-source OFF/STATIC/ORDERED candidate pool, target, horizon, versions and
 nonoverlapping pairs before labels. It consumes the actual frozen control
@@ -70,7 +87,8 @@ pool, rank/score/tier/selection and scoped handles; it performs no auth lookup,
 feature refresh, raw Event replay, writes or serving changes. Actual SQL producer
 interoperability uses owned synthetic fixtures and supplies no real native
 quality sample. This packet creates no native enrollment/outcome capture writer,
-public reset API/UI, new database migration or policy assignment.
+public reset API/UI or policy assignment. The pure audit adds no persistence
+schema; the separate precision forward changes only function configuration.
 Stored source references and `complete=true` are caller assertions. The trusted
 owner must check current access and invalidate retained plans/captures/reports
 after source withdrawal; this pure evaluator supplies no native lifecycle guard.
@@ -82,25 +100,34 @@ therefore explicitly `FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`. Current catalog
 features cannot fill that historical gap. The generic complete-feature support
 diagnostic does not establish native effective support.
 
-Validation: full engine **178/178**, built ESM exports/isolation graphs and full
-database **131/131** pass, including actual v1/v2 native SQL-producer interop.
+Fresh continuation validation: full engine **178/178**, built ESM
+exports/isolation graphs and full database **135/135** pass, including actual
+v1/v2 native SQL-producer interop and **4/4** precision regressions. The real
+populated precision upgrade verifies both source generations at caller -3/0/1,
+exact OFF binary scores and delivery policy, old row/receipt preservation and
+all function metadata except the approved config. Caller restoration is checked
+on success, cached retry and errors; deliberate score/rank/selection and
+row/body/ACL mutations are rejected. The native CLI gate adds this reusable
+upgrade receipt and challenges caller0 with the unchanged strict bridge fixture.
 Core **29** and adapter **12** cases cover clocks, exposure, correction/unknown
 abstention, source-record reuse, synthetic separation and prototype/alias guards.
-Two independent reviews are clean. Research **19 Python + 23 Node** and acceptance
-**6 + 5** pass. Fresh offline root check passes lint, typecheck, dependency **43**
-and mobile **478** before the parallel catalog process exits without a final
-diagnostic. All catalog **444** cases subsequently pass with two test workers
-(**441** scripts plus the **3** contract cases). Edge registry loading remains
-unavailable; the exact cached-only test fails on missing `@supabase/auth-js`
-metadata. No complete root check or application-export/native receipt is claimed.
+Independent implementation review is clean. Research **19 Python + 23 Node**
+and acceptance **6 + 5** pass. Fresh offline root check passes lint, typecheck,
+dependency **43**, mobile **478** and all catalog **444** cases (**441** scripts
+plus **3** contracts), then Edge registry loading cannot complete and is
+interrupted (exit 130). The exact cached-only Edge test fails on missing
+`@supabase/auth-js` metadata. No complete local root check or fresh application
+export/native execution receipt is claimed. Local Docker/advisors remain
+unavailable; new exact-source CI is owned by #229's publication snapshot.
 All **62** tracked Markdown files, **291** local links and **97** anchors resolve;
 syntax and whitespace checks pass.
-All **71** existing migrations, old Working/scoring implementation and root
-lockfile retain bytes. Source, native/hosted, device and quality acceptance remain
+All **71** previous migrations, old Working/scoring source and root lockfile
+retain bytes; the precision repair is new migration **72**. Source,
+native/hosted, device and quality acceptance remain
 separate; local PGlite fixtures do not certify real prospective data or quality.
 
-**Next bounded action:** resolve this exact publication in #229 and inspect its
-required CI once; repair a concrete sanitized failure. Then freeze bounded
+**Next bounded action:** resolve the repaired exact publication in #229 and
+inspect its required CI once; repair a concrete sanitized failure. Then freeze bounded
 candidate features in a new native source/feature generation, preserving old
 captures and exact OFF serving. That enables native support accounting before
 the following Personal prospective source/pair enrollment and immutable own-exposure /

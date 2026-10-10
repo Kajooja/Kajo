@@ -1536,6 +1536,16 @@ No new genome, shadow job, propensity, observed outcome or quality/promotion
 input is created. These uncalibrated comparisons report unavailable uncertainty,
 zero observed evaluation labels and `nativeActivated=false`.
 
+The config-only precision forward
+`20261010153638_personal_working_shadow_precision.sql` pins the comparison
+writer's function-local `extra_float_digits=3`. Each new JSON score must
+round-trip to the same binary double as its frozen scorer output even when
+the caller requests rounded float output; the caller setting restores on return.
+This applies to both captured-source generations without changing the scorer,
+function body/identity/ACL or prior rows. Existing rounded comparison receipts
+remain immutable; an exact-OFF audit must still reject a mismatched old receipt
+rather than tolerate or rewrite it.
+
 The private RLS/API-denied comparison table has at most one result per source and
 control, at most 50 candidates and a 256-KiB result ceiling. Retries reauthorize
 and return stored bytes. Lifecycle-first locking and READ COMMITTED for new
@@ -1647,8 +1657,10 @@ inventing weights. Pure complete-feature support fixtures are separate from a
 frozen native feature producer.
 
 The native `normalizeKajoWorkingEvaluationPlan` adapter maps existing frozen
-Personal sources and all three actual comparison rows into a plan input; this
-packet adds no database migration, enrollment ledger or outcome-capture writer.
+Personal sources and all three actual comparison rows into a plan input; the
+pure audit adds no persistence schema, enrollment ledger or outcome-capture
+writer. The separate comparison precision forward above changes only function
+configuration.
 Stored `created_at` boundaries remain availability proxies with UNKNOWN commit
 visibility. An input passing structural cutoff checks is not a certified
 prospective native experiment. In particular, the existing V1 strongest-effective
