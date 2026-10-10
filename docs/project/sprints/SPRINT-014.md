@@ -14,6 +14,20 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native WorkingState numeric comparison repair — 2026-10-10
+
+PR #316 source `7593e7b397134778fb1ac041e2d312cbd321125d` fails CI #625
+validation only at a seeded SQL/JavaScript ordered-vector strict-equality check,
+with roughly 8e-17 last-digit roundoff. Platform/defaults passed; other native
+gates were in progress/skipped at the single inspection, not accepted. Scalar
+vector parity now requires exact keys, finite numbers and 1e-12 tolerance;
+state/provenance and genuine OFF scores/ranks/selection stay exact. The concrete
+CI pair passes and material differences, malformed numbers and missing/extra
+controls/features fail. Final affected **13/13** pass; full database
+**118/118** passes. Independent review and syntax/diff pass. All **70**
+migration files, runtime source and lockfile remain unchanged. STATUS/#229 own
+new exact-source CI and the gated next native reset lifecycle/control task.
+
 ## Native Personal WorkingState capture and frozen controls — 2026-10-10
 
 Exact parent #315 source `523d8eb6eb45045da6f9b9c4327b96b3a5d036ea` passes

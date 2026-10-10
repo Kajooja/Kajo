@@ -26,6 +26,33 @@ The single [#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns the new
 published PR/source/tree and one-time CI result; its September 30 checkpoint
 remains preserved. Public source publication is already authorized.
 
+### CI numerical parity repair — 2026-10-10
+
+The next single inspection of [CI #625](https://github.com/Kajooja/Kajo/actions/runs/38037052666)
+for [PR #316](https://github.com/Kajooja/Kajo/pull/316), source
+`7593e7b397134778fb1ac041e2d312cbd321125d`, tree
+`3805c52a65f6dd3585a22a10d7994175a5b919d3`, finds validation failed and
+platform/defaults passed. Two clean installations were in progress at that
+snapshot; CLI and populated-upgrade jobs were skipped after validation failure.
+No completed native gate is inferred.
+
+The failure is one seeded SQL/portable vector comparison requiring exact binary
+floating-point equality: `-0.17157287525380988` versus
+`-0.17157287525380996`. Independent ordered means may differ in their last digits
+across runtimes. The correction requires exact control/feature keys and finite
+numeric values within **1e-12**; it rejects larger discrepancies, nonnumeric or
+nonfinite values and missing/extra dimensions. Nonnumeric state, source/receipt
+bytes and actual OFF scores, ranks and selection remain exact. The concrete CI
+pair and adversarial numeric/key regressions pass. Only tests/documentation
+change: all **70** installed migration files, runtime source and root lockfile
+retain their bytes. The final affected suite passes **13/13**; full database
+**118/118** passes. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog **444**
+pass before Deno registry `Connection refused` (exit 1). Complete root/exports
+remain unclaimed. New
+exact-source CI must establish required native/admission gates. The next private
+reset source increment may be prepared on its own stack while those gates run;
+this source overlap does not admit activation or measured quality.
+
 Both native Personal rankers now capture their authorized current session,
 complete own same-Item correction closure and current Item-tag feature artifacts
 in one bounded MVCC statement. The frozen `native-working-capture-v1` snapshot
@@ -85,8 +112,9 @@ native concurrency, hosted activation or recommendation quality.
 
 **Next bounded action:** resolve this exact published source in #229 and inspect
 completed required gates once, diagnosing any concrete sanitized failure. Then
-implement bounded native reset lifecycle/control with frozen-source, retry and
-scope tests. Keep prospective OFF/STATIC/ORDERED quality evaluation, bootstrap-floor/
+prepare bounded native reset lifecycle/control with frozen-source, retry and
+scope tests; source work may overlap predecessor CI, while native acceptance and
+activation remain separate gates. Keep prospective OFF/STATIC/ORDERED quality evaluation, bootstrap-floor/
 effective independent support, transfer and real first-session usefulness as
 subsequent gates before adaptive Taste/frozen challenge admission. Server-backed
 anonymous identity and minimum retention/abuse/measurement precede real anonymous

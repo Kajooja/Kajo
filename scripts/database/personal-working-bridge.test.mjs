@@ -9,8 +9,43 @@ import { personalWorkingBridgePatches, personalWorkingBridgeSmokeSql, personalWo
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const uuid = n => `a9146000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-const near = (actual, expected, label) => assert.ok(Math.abs(actual - expected) < 1e-12,
-  `${label}: ${actual} differs from independent oracle ${expected}`);
+const near = (actual, expected, label) => {
+  assert.ok(Number.isFinite(actual) && Number.isFinite(expected), `${label}: both oracle values must be finite numbers`);
+  assert.ok(Math.abs(actual - expected) <= 1e-12,
+    `${label}: ${actual} differs from independent oracle ${expected}`);
+};
+const nearVectors = (actual, expected, label) => {
+  for (const [name, vectors] of [['native', actual], ['portable', expected]]) {
+    assert.ok(vectors !== null && typeof vectors === 'object' && !Array.isArray(vectors), `${label}: ${name} vector envelope`);
+    assert.deepEqual(Object.keys(vectors).sort(), ['ordered', 'static'], `${label}: ${name} control keys`);
+  }
+  for (const control of ['ordered', 'static']) {
+    for (const [name, vector] of [['native', actual[control]], ['portable', expected[control]]]) {
+      assert.ok(vector !== null && typeof vector === 'object' && !Array.isArray(vector), `${label}: ${name} ${control} vector shape`);
+    }
+    assert.deepEqual(Object.keys(actual[control]).sort(), Object.keys(expected[control]).sort(), `${label}: exact ${control} feature keys`);
+    for (const feature of Object.keys(expected[control])) near(actual[control][feature], expected[control][feature],
+      `${label}: ${control}/${feature}`);
+  }
+};
+
+test('Working vector parity allows only finite bounded roundoff while preserving complete control/feature keys', () => {
+  // CI #625 sample 7 exposed independent SQL/JavaScript evaluation of the
+  // same ordered mean differing in the last binary floating-point digits.
+  const native = { ordered: { 'bridge-cold': -0.17157287525380988 }, static: { 'bridge-cold': 0 } };
+  const portable = { ordered: { 'bridge-cold': -0.17157287525380996 }, static: { 'bridge-cold': 0 } };
+  assert.notDeepEqual(native, portable, 'The concrete platform roundoff fixture must expose unequal scalar bytes');
+  nearVectors(native, portable, 'CI sample 7 independent numeric parity');
+  assert.throws(() => nearVectors({ ...native, ordered: { 'bridge-cold': portable.ordered['bridge-cold'] + 2e-12 } }, portable,
+    'material discrepancy'), /differs from independent oracle/);
+  for (const invalid of [NaN, Infinity, -Infinity, '0', null, undefined]) assert.throws(() => nearVectors(
+    { ...native, ordered: { 'bridge-cold': invalid } }, portable, 'invalid numeric component'), /finite numbers/);
+  assert.throws(() => nearVectors(native, { ...portable, ordered: { 'bridge-cold': NaN } }, 'invalid portable oracle'), /finite numbers/);
+  assert.throws(() => nearVectors({ ...native, ordered: {} }, portable, 'missing feature'), /exact ordered feature keys/);
+  assert.throws(() => nearVectors({ ...native, ordered: { ...native.ordered, unexpected: 0 } }, portable, 'extra feature'), /exact ordered feature keys/);
+  assert.throws(() => nearVectors({ ordered: native.ordered }, portable, 'missing control'), /control keys/);
+  assert.throws(() => nearVectors({ ...native, future: {} }, portable, 'extra control'), /control keys/);
+});
 
 test('native Personal Working capture and frozen default-OFF consumer preserve baseline, ownership and lifecycle (full schema)', async t => {
   const build = spawnSync(process.execPath, ['node_modules/typescript/bin/tsc', '-p', 'packages/prediction-engine/tsconfig.build.json'],
@@ -493,8 +528,9 @@ test('native Personal Working capture and frozen default-OFF consumer preserve b
         }
         const state = await capture(selectedSession, iso(-300_000 + [60, 20, 240][sample % 3] * 60_000), otherPersonal, other);
         const portable = await oracle(state);
-        for (const key of ['items', 'groups', 'vectors', 'support', 'exclusions']) assert.deepEqual(state[key], portable[key],
+        for (const key of ['items', 'groups', 'support', 'exclusions']) assert.deepEqual(state[key], portable[key],
           `Seed 7235 sample ${sample} exact ${key} portable parity`);
+        nearVectors(state.vectors, portable.vectors, `Seed 7235 sample ${sample} bounded numeric vector parity`);
       }
       t.diagnostic('24 deterministic native prefixes / 480 mixed Events / 72 explicit control numeric oracles');
     });

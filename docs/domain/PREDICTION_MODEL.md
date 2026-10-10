@@ -1499,7 +1499,9 @@ prefix/features. This inactive component preserves real V2/V3 OFF pages instead
 of making supported baseline serving depend on portable input compatibility.
 The portable core still requires a valid nonempty schema and rejects unsupported
 input; SQL/portable parity is scoped to accepted nonempty feature states rather
-than these native inert envelopes.
+than these native inert envelopes. Independent SQL/portable nonzero vector
+scalars use a finite 1e-12 numerical comparison with exact control/feature keys;
+actual OFF serving scores, ranks, selection and frozen receipts remain exact.
 Native `resetAt` is null; a supported native reset lifecycle/API is not delivered.
 
 One private `prediction_candidate_score_working_v1` consumes the frozen
