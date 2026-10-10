@@ -14,6 +14,54 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Frozen WorkingState order and support evaluation — 2026-10-10
+
+Exact parent #317 source `78a79dd0cfb5e49b400357443bf8d54de01cf6e7`, tree
+`105fb9abf38e88ae218628ad75bfc41f33ea6dd6`, has four required CI #627 jobs
+passed at its single continuation inspection; CLI remains in progress.
+Source work continues on `feat/personal-working-evaluation` without admitting
+native/hosted behavior or quality. STATUS/#229 own exact publication and one next
+packet; the September 30 checkpoint stays intact.
+
+The isolated portable audit freezes one actual OFF/STATIC/ORDERED pool, versions,
+target/horizon and disjoint pairs before labels. Control creation/availability
+and plan selection clocks cannot be substituted by the source cutoff. Typed
+reconciled outcome captures retain scope/actor/source/exposure/maturity and
+correction boundaries. One shared directional pair mask reports ordinal
+agreement/tie/disagreement; absent/unavailable evidence stays unscored and all
+planned pairs retain coverage. Synthetic metrics are separate. Batch lineage
+checks prevent the same raw observation/revision/experience or subject-Item pair
+from multiplying units; subject/session clusters are not statistical independence.
+No rating RMSE, confidence/probability, causal uplift or admission follows.
+
+Candidate-specific Item coefficients collapse all tags before weighted effective
+Item concentration is calculated under actual STATIC/ORDERED weights. This is
+component influence, not independent outcome N. The strict Kajo plan adapter uses
+real frozen source/control rows and exact OFF/policy provenance; owned SQL
+producer fixtures demonstrate interoperability, without native observed quality.
+No native prospective enrollment or outcome capture writer is delivered yet.
+Current native pools retain adjustment scalars but no complete candidate feature
+vectors; native candidate support reports `FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`
+without consulting later catalog tags. Full generic features exercise support
+diagnostics, without certifying native support.
+All 71 old migrations, old Working/scorers and root lockfile preserve bytes.
+
+Validation: full engine **178/178** with built ESM/isolation graphs, full database
+**131/131** including actual v1/v2 SQL producer interop, research **19 + 23** and
+acceptance **6 + 5** pass; two independent reviews are clean. Offline root check
+passes lint/typecheck/dependency **43**/mobile **478**, then exits during parallel
+catalog without a final diagnostic. All **444** catalog cases pass with two
+workers (**441** scripts plus **3** contracts). Edge registry access is unavailable;
+cached-only fails on missing `@supabase/auth-js` metadata. Complete root check,
+application exports and native acceptance remain unclaimed. All **62** Markdown
+files, **291** local links and **97** anchors resolve; syntax/diff checks pass.
+Next exact CI once, then versioned native candidate-feature freezing with old
+captures and exact OFF preserved, followed by prospective enrollment/own exposed latest-rating
+correction capture, a preregistered untouched evaluation window and observed
+coverage before quality. Preserve V1 reward meaning, bootstrap/independent
+support/transfer/first-session, Taste/anonymous, genuine Shared, device and all
+release gates. No main merge, hosted write, APK or account/history reset.
+
 ## Bounded private native WorkingState reset controls — 2026-10-10
 
 Exact parent #316 source `0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a` contains

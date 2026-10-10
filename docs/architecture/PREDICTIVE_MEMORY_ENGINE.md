@@ -100,10 +100,29 @@ private canonical lifecycle-control ledger in the same snapshot. Its latest
 server-owned boundary excludes at-or-before taste and Item activity without
 renewing expiry, deleting history or supplying preference/reward. New capture,
 feature, serving and comparison generations preserve old frozen sources.
+
 Forecast-only erasure retains raw controls; genuine parent deletion cascades
 them. Product reset integration, a public API/UI and quality/activation remain
 separate gates. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
 remain distinct from the full target in this section.
+
+A separate bounded `./working-evaluation` diagnostic compares predeclared
+OFF/STATIC/ORDERED orders on one frozen common pool and explicit nonoverlapping
+pairs. Both actual OFF exposures, matching delivery tiers and immutable scoped,
+mature labels are required. It reports conditional rank agreement/ties/
+disagreement and planned-pair coverage, not rating RMSE or counterfactual uplift.
+Repeated source revisions cannot multiply support; synthetic evidence stays
+separate and Subject/session-cluster independence remains unestablished.
+Candidate-specific STATIC/ORDERED Item weights yield a concentration summary;
+its Kish-style count is not a statistical sample size. Existing native candidate
+explanations freeze adjustments without full candidate features, so native
+candidate-specific support remains explicitly unavailable; current tags cannot
+fill that gap. Freeze versioned candidate features before native prospective
+enrollment and strict label capture. Existing captured-source creation clocks
+are availability proxies, so structural checks do not certify a prospective
+native experiment. No enrollment/outcome writer, serving activation
+or learning admission follows. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)
+owns the evidence and admission limits.
 
 ## 5. ShortTermState — recent memory
 
