@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-09**
+Last updated: **2026-10-10**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,101 +10,118 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — bounded Personal WorkingState and queued social flow
+## Current packet — native Personal WorkingState capture and frozen comparisons
 
-### Source continuation and CI repair — 2026-10-09
+### Source continuation — 2026-10-10
 
-Continue on `feat/personal-session-state`, stacked on published
-[PR #314](https://github.com/Kajooja/Kajo/pull/314), exact source
-`b822fcadf9b9c78eeeaf213ac2543dd52467810e`, tree
-`99377bf7135454c8f4c3a6900161d4e291161400`. The single continuation lookup finds
-[CI #623](https://github.com/Kajooja/Kajo/actions/runs/37920718066) completed with
-failure: platform/defaults, full validation/exports, two clean native installations
-and populated native upgrade pass; the CLI migration/concurrency gate fails.
-Its sanitized receipt identifies a test baseline error: three fixture Users and
-two SharedProfiles legitimately create five system Saved Lists (12 → 17), then
-the pre-cleanup comparison incorrectly uses the pre-fixture snapshot. No ongoing
-CI/APK polling is introduced. Accepted main remains `34d21704cafe21091a2369396c9bc61dce99c1e9`.
-Unmerged source, native/hosted activation and device acceptance remain distinct.
+Continue on `feat/personal-working-bridge`, stacked on published
+[PR #315](https://github.com/Kajooja/Kajo/pull/315), exact parent source
+`523d8eb6eb45045da6f9b9c4327b96b3a5d036ea`, tree
+`a15a3c17d8f786cb69d5ba47a156e053410ec4e3`. The single continuation lookup
+confirms all five required jobs in
+[CI #624](https://github.com/Kajooja/Kajo/actions/runs/37928373382) passed,
+including the corrected full initialized/original List snapshots. APK was
+skipped. Accepted main remains `34d21704cafe21091a2369396c9bc61dce99c1e9`.
+The single [#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns the new
+published PR/source/tree and one-time CI result; its September 30 checkpoint
+remains preserved. Public source publication is already authorized.
 
-The correction retains two full unfiltered snapshots of all 17 canonical tracked
-relations: the original before fixture allocation for after-cleanup verification,
-and initialized state immediately after owned Auth/Profile creation for every
-source/open/race/preparation operation. No fixture-owned or unrelated row is
-filtered out. Exact cleanup, ownership guards, independent-session lock orders,
-cancellation and error retention are preserved. The new full-schema regression
-reproduces the five legitimate Lists and rejects equal-count changes to owned,
-unrelated Personal and unrelated Shared Lists while preserving unrelated roots.
-The required native CLI gate must rerun on the new exact source.
+### CI numerical parity repair — 2026-10-10
 
-The owner requests upcoming compact social flow after the foundations, before
-release. ROADMAP 16.2 now plans 2–5 total persons including the creator, plus slots
-for accepted Friend selection or opaque show/copy/OS/WhatsApp invitation, with
-explicit canonical consent. ROADMAP 16.4 follows round/rewatch foundations with
-at most five current BOOK/MOVIE options from the same Shared predictor and
-inherited DiscoveryMode. Proposed any-member veto awaits its final product
-threshold; session veto/seen replacement neither erases history nor creates
-ordinary durable not-interest, group completion or reward. Initial adaptive Taste
-is explicitly reaffirmed before release. New requirements stay planned/open;
-other “do today” domains remain future work. No current social UI is implemented.
+The next single inspection of [CI #625](https://github.com/Kajooja/Kajo/actions/runs/38037052666)
+for [PR #316](https://github.com/Kajooja/Kajo/pull/316), source
+`7593e7b397134778fb1ac041e2d312cbd321125d`, tree
+`3805c52a65f6dd3585a22a10d7994175a5b919d3`, finds validation failed and
+platform/defaults passed. Two clean installations were in progress at that
+snapshot; CLI and populated-upgrade jobs were skipped after validation failure.
+No completed native gate is inferred.
 
-The completed portable source exports `deriveWorkingState` /
-`scoreWorkingAdjustment` separately through `./working-state` and the strict
-`normalizeKajoWorkingSession` through `./adapters/kajo-working-state`.
-`working-state-v1` / `working-policy-v1` capture authorized subject/actor/session,
-finite occurrence/availability cutoffs, full-prefix/correction-closure declaration,
-frozen schema/artifact/configuration and source references. At most 128 records,
-32 Items, 32 feature dimensions and 256 exact invalidations are accepted; at least
-two distinct latest Items support a component. Equal-time ambiguity abstains and
-IDs add no recency. Default session/idle limits are four hours/30 minutes;
-reset excludes at-or-before evidence. Only selected-session Item-linked activity
-refreshes its clock. Own other-session corrections may remove stale taste without
-importing their preference; exact UNDO and selective history/interest clear retain
-canonical effects. Valid zero is observed, attention/unknown/bootstrap are not
-invented satisfaction, and one session does not become durable independent support.
+The failure is one seeded SQL/portable vector comparison requiring exact binary
+floating-point equality: `-0.17157287525380988` versus
+`-0.17157287525380996`. Independent ordered means may differ in their last digits
+across runtimes. The correction requires exact control/feature keys and finite
+numeric values within **1e-12**; it rejects larger discrepancies, nonnumeric or
+nonfinite values and missing/extra dimensions. Nonnumeric state, source/receipt
+bytes and actual OFF scores, ranks and selection remain exact. The concrete CI
+pair and adversarial numeric/key regressions pass. Only tests/documentation
+change: all **70** installed migration files, runtime source and root lockfile
+retain their bytes. The final affected suite passes **13/13**; full database
+**118/118** passes. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog **444**
+pass before Deno registry `Connection refused` (exit 1). Complete root/exports
+remain unclaimed. New
+exact-source CI must establish required native/admission gates. The next private
+reset source increment may be prepared on its own stack while those gates run;
+this source overlap does not admit activation or measured quality.
 
-The component uses a declared normalized feature mean; ORDERED applies a default
-two-time-group half-life, STATIC omits recency and OFF returns exact zero by
-default. Candidate adjustment is bounded to ±0.25, uncalibrated, with unavailable
-uncertainty and zero observed evaluation labels. Caller authorization, complete
-visible correction closure and frozen feature availability remain required;
-STORED_CREATED_TIME is only a proxy and commit availability is UNKNOWN.
-Existing E1 `represent`/Prediction contracts, native SQL/scalar genomes, Shared
-scoring and frozen traces remain unchanged. Native activation, historical feature
-eligibility and learning remain false; MVP-ALG-004 stays open.
+Both native Personal rankers now capture their authorized current session,
+complete own same-Item correction closure and current Item-tag feature artifacts
+in one bounded MVCC statement. The frozen `native-working-capture-v1` snapshot
+feeds `personal-working-features-v1` under `+personal-working-off-v1` serving.
+The actual final scorer consumes explicit OFF and returns the original baseline
+score directly. Shared returns no capture and retains its scoring/version path.
+V2 first and continuation pages accept the precise new Personal policy suffix;
+V2 copied continuation stays frozen and V3 new requests capture fresh evidence.
 
-Validation: database **105/105**, engine **137/137** plus built separate ESM/import
-graphs, research **19 Python + 23 Node**, and acceptance **6 + 5** pass. The new
-**60** unit tests include independent ordered/static/off numeric oracles,
-correction/expiry/reset/resource and source/privacy controls, and a synthetic
-non-media minimize fixture. Actual full-schema canonical command interoperability
-and the initialized/original full-snapshot regression each pass; the final
-strengthened command test also passes after adding actual cross-session
-replacement/UNDO and exact original Event preservation. Old Events, command
-receipts and native PredictionRun remain frozen, default OFF preserves actual
-baseline scores/order, and rollback leaves no fixture rows. Independent code,
-test and canonical-document reviews plus syntax/diff checks pass. All **62**
-Markdown files, **283** local links and **89** heading references resolve.
-All **69** migration files and the root lockfile are unchanged; no new dependency
-or DDL is introduced. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog
-**444** pass before Deno registry `Connection refused` (exit 1). No complete
-local root or fresh application-export pass is claimed; application source/build
-inputs are unchanged in this packet.
-Actual Docker/native execution and live local advisors remain unavailable;
-PGlite and source fixtures establish interoperability, not native concurrency,
-serving/shadow admission or recommendation quality.
+Default bounds remain 128 records, 32 Items/features, two distinct supporting
+Items, four hours/30 minutes and a ±0.25 uncalibrated adjustment. Other-session
+corrections may invalidate stale preferences but cannot import taste or refresh
+the selected-session clock. Valid zero, exact UNDO, selective clear and equal-time
+ambiguity retain their canonical effects. Native empty/no-session/overflow
+captures are inert envelopes. Unsupported legacy feature/source data or
+millisecond timestamp precision collapse produces `INPUT_UNAVAILABLE`, discards
+partial evidence and preserves real OFF page availability. The portable core
+retains strict input/nonempty-schema validation. Current tags are known at capture;
+stored creation remains an availability proxy, commit availability is UNKNOWN
+and historical feature eligibility is false.
 
-**Next bounded action:** resolve the exact published source and one CI run in
-[#229](https://github.com/Kajooja/Kajo/pull/229), preserving its September 30
-checkpoint. On continuation inspect completed required gates once and diagnose
-any concrete sanitized failure. Then implement a bounded native Personal
-WorkingState capture/consumer bridge under explicit serving/shadow version and
-static/off controls; default OFF remains until exact parity and admission evidence
-exists.
-Keep independent support, bootstrap-floor evaluation, transfer and real
-first-session usefulness, queued genuine #232F Shared consumption, #306,
-#229 device/fresh-account, Phase 16.3–16.4 and all required release/privacy/quality
-gates. No main merge, hosted write, new APK or data reset is introduced.
+A private immutable `personal_working_shadow_comparisons` table records genuine
+OFF/STATIC/ORDERED rescoring, ranks and selection from the same frozen candidates,
+serving genome and final delivery policy. Its explicit scope is
+`FROZEN_CANDIDATE_POOL_AND_FINAL_DELIVERY_POLICY`: this does not independently
+choose a new reminder/eligibility policy. It reauthorizes every retry and follows
+source/actor/Profile erasure through the existing bounded lifecycle lock/budget.
+API roles cannot read/write/execute the new internals. No new evaluation label,
+effective durable support, genome, job, serving ON mode or measured-quality
+admission is introduced; MVP-ALG-004 remains open.
+
+Pinned Supabase CLI **2.117.0** generated the single forward migration
+`20261010064104_personal_working_bridge.sql`, SHA-256
+`319ea5dfb0c591321ba923d57a3408f3230005d7478cdfce6b6bfeeb8d50579d`.
+Four exact old-body drift guards
+preserve existing object identity, owner, ACL/configuration and lifecycle guards.
+All **69** earlier migrations and the root lockfile retain their exact bytes;
+no dependency or application/build-input change is introduced. The existing
+required CLI gate gains populated-upgrade preservation and native runtime
+capture/frozen-consumer probes. Canonical contracts are in
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
+and [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md).
+
+Validation: database **117/117**, engine **137/137** plus built ESM/import graphs, research **19 Python + 23 Node** and acceptance **6 + 5** pass. Targeted regressions cover actual
+V2/V3 BOOK/MOVIE × all DiscoveryModes, exact OFF numeric/rank/selection parity,
+V2 frozen copied continuation, 24 seeded mixed prefixes / 480 Events / 72 control
+oracles, corrections/expiry, unsupported source/precision and all overflow
+sentinels, source/actor/Profile erasure, old populated rows/object metadata,
+API denial and immutability. The final strengthened **12/12** affected tests also pass after adding the native
+populated-upgrade verifier, adversarial row/body mutation rejection and UTF-16
+feature boundaries. Independent source/test/document reviews, syntax/diff and **62 Markdown / 288 local-link / 93 heading** checks pass.
+Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog **444**
+pass before Deno registry `Connection refused` (exit 1). No complete local root
+or fresh application-export pass is claimed. Docker/native execution and live
+local advisors remain unavailable here; source/PGlite parity does not establish
+native concurrency, hosted activation or recommendation quality.
+
+**Next bounded action:** resolve this exact published source in #229 and inspect
+completed required gates once, diagnosing any concrete sanitized failure. Then
+prepare bounded native reset lifecycle/control with frozen-source, retry and
+scope tests; source work may overlap predecessor CI, while native acceptance and
+activation remain separate gates. Keep prospective OFF/STATIC/ORDERED quality evaluation, bootstrap-floor/
+effective independent support, transfer and real first-session usefulness as
+subsequent gates before adaptive Taste/frozen challenge admission. Server-backed
+anonymous identity and minimum retention/abuse/measurement precede real anonymous
+Taste acceptance. Keep queued genuine #232F Shared consumption, #306 integration,
+#229 device/fresh-account, consent-based 2–5-person creation and at-most-five
+Shared today-session planning, Phase 16.3–16.4 and all release/privacy/quality gates.
+No main merge, hosted write, new APK or account/data reset is introduced.
 
 ## Preserved native memory/serving decay parity and dependency audit
 

@@ -14,6 +14,55 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native WorkingState numeric comparison repair — 2026-10-10
+
+PR #316 source `7593e7b397134778fb1ac041e2d312cbd321125d` fails CI #625
+validation only at a seeded SQL/JavaScript ordered-vector strict-equality check,
+with roughly 8e-17 last-digit roundoff. Platform/defaults passed; other native
+gates were in progress/skipped at the single inspection, not accepted. Scalar
+vector parity now requires exact keys, finite numbers and 1e-12 tolerance;
+state/provenance and genuine OFF scores/ranks/selection stay exact. The concrete
+CI pair passes and material differences, malformed numbers and missing/extra
+controls/features fail. Final affected **13/13** pass; full database
+**118/118** passes. Independent review and syntax/diff pass. All **70**
+migration files, runtime source and lockfile remain unchanged. STATUS/#229 own
+new exact-source CI and the gated next native reset lifecycle/control task.
+
+## Native Personal WorkingState capture and frozen controls — 2026-10-10
+
+Exact parent #315 source `523d8eb6eb45045da6f9b9c4327b96b3a5d036ea` passes
+all five required CI #624 jobs at the single continuation lookup. Current source
+is `feat/personal-working-bridge`; STATUS/#229 own publication and the one next
+task while preserving the complete September 30 checkpoint.
+
+The new CLI-generated forward freezes authorized Personal session/correction
+closure and current Item-tag features in one bounded MVCC statement. Both native
+rankers consume versioned capture/features with exact default OFF scores. Shared
+remains without this capture. The precise Personal policy suffix is accepted by
+V2 windows; copied continuation preserves the original source while V3 captures
+new evidence. Native no-session/empty/overflow or unsupported-source/precision
+captures remain inert, with no partial evidence or invented dimensions; portable
+input validation stays strict. Actual owner-only private immutable
+OFF/STATIC/ORDERED comparisons rescore frozen candidates with the original genome
+and final delivery policy, rerank/reselect and follow source/actor/Profile erasure.
+This is not new evaluation support, automatic admission, serving ON, reset or UI.
+
+Four guarded old-body edits preserve metadata and old rows; all 69 older
+migrations and lockfile remain unchanged. Existing CLI gates gain populated-upgrade
+and runtime capture/consumer probes. Validation: database **117/117**, engine **137/137** plus built ESM/import graphs, research **19 Python + 23 Node** and acceptance **6 + 5** pass.
+Tests cover all V2/V3/domain/mode combinations, copied continuation, 24 seeded
+prefixes/480 Events/72 numeric controls, source/precision/resource fallbacks,
+corrections and authorization/immutability/erasure. Independent reviews pass.
+Fresh root lint/types, dependency **43**, mobile **478**, catalog **444** pass before Deno registry
+connection refusal; no complete root/export/native/advisor pass is claimed.
+
+Continue exact-source CI once, then bounded native reset lifecycle/control with
+frozen-source, retry and scope tests. Prospective OFF/STATIC/ORDERED quality,
+effective independent support/bootstrap and real first-session usefulness follow. Anonymous prerequisites precede real adaptive Taste.
+Genuine #232F Shared consumption, #306, #229 configured-device/fresh-account,
+planned consent-based 2–5 group/five-option today flow and all release gates remain.
+No main merge, hosted write, APK or account/data reset.
+
 ## Bounded Personal session state and next social planning — 2026-10-09
 
 Continue from exact #314 source `b822fcadf9b9c78eeeaf213ac2543dd52467810e`.

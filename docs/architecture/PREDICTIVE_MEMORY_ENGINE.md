@@ -78,14 +78,25 @@ WorkingState describes the ordered active session: recent observations, explicit
 
 It can alter immediate intent without converting one unusual session into permanent taste. Actor/Profile switches cannot reuse another scope's working state. Replay uses the captured sequence prefix, not the current session cache.
 
-The repository's source-only `./working-state` component implements a bounded
+The repository's separate `./working-state` component implements a bounded
 first hypothesis with independent latest Item support, equal-time groups,
 explicit correction closure, reset/expiry and STATIC/ORDERED/OFF controls.
 Its adjustment defaults to OFF, is uncalibrated and supplies no observed quality
 labels or learning admission. A separate Kajo normalizer consumes authorized
 Personal snapshots; an invented machine-domain fixture exercises the same core.
-This component does not yet compose the complete CurrentState or participate in
-native prediction serving. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
+The [native Personal bridge](../domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
+now freezes an authorized current Event/session/correction prefix and binary
+current-tag artifact into new Kajo PredictionRuns. A versioned consumer returns
+the exact legacy score with serving fixed to OFF; owner-only STATIC/ORDERED
+comparisons truly consume frozen components under the original pool and final
+delivery policy. No native ON policy, complete CurrentState composition,
+historical-feature eligibility, quality or learning admission follows. Native
+no-session/empty/no-tag/overflow envelopes are inert. Unsupported legacy tags,
+malformed UNDO or timestamp precision collapse yield `INPUT_UNAVAILABLE` with
+an explicit reason and no partial prefix, preserving baseline OFF pages. The
+portable core retains strict input/schema validation; parity is scoped to
+accepted nonempty schemas. Native reset remains open despite the core's
+explicit reset support. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
 remain distinct from the full target in this section.
 
 ## 5. ShortTermState — recent memory

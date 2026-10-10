@@ -151,11 +151,34 @@ separate finite decimal-millisecond cutoffs, preserving representable PostgreSQL
 fractions. `STORED_CREATED_TIME` is only a proxy; commit availability is UNKNOWN.
 Malformed owned rows reject the supplied snapshot even when future; valid future
 evidence is excluded before correction reconciliation.
-The caller still owns current authorization, full correction closure and captured
-feature availability. Actual native command fixtures prove interoperability,
-not prospective serving consumption. A native versioned capture/consumer,
-serving/shadow parity, static/off comparisons and quality admission remain next
-gates; old SQL scores, scalar genomes and frozen forecasts are unchanged.
+The normalizer's caller still owns current authorization, full correction closure
+and captured feature availability; the package adds no database access.
+
+The separate [native Personal bridge](../../docs/domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
+now captures one authorized MVCC Event/session/same-Item correction snapshot
+with binary current Item tags and freezes `native-working-capture-v1` into new
+Kajo PredictionRuns. Candidate `personal-working-features-v1` stores explicit
+STATIC/ORDERED adjustments. A versioned SQL consumer serves fixed OFF, returning
+the exact legacy score; owner-only `personal-working-shadow-v1` comparisons
+actually score those frozen components under the original pool and final delivery
+policy. They do not replay alternative admission/reminder policy, create genomes
+or jobs, supply observed quality or activate session ranking. Protocol 2 pages
+inherit their source; protocol 3 captures each fresh page. Old scalar contracts,
+Shared behavior and frozen forecasts remain unchanged.
+
+Native NO_SESSION, empty/no-tag, `BUDGET_EXCEEDED` and `INPUT_UNAVAILABLE`
+envelopes are inert. Overflow or unsupported legacy input sets
+`prefixComplete=false` and retains no partial evidence. Null/empty/overlength/
+control-character tags, malformed UNDO or source timestamp precision collapse
+produce an explicit unavailable reason while real V2/V3 OFF pages retain the
+baseline. The portable core still rejects unsupported input and requires a valid
+nonempty schema, so SQL/portable parity applies to accepted nonempty states.
+Current tags are known at capture, not certified historical
+features or demonstrated semantic transfer. Stored creation remains a proxy,
+commit availability UNKNOWN, and historical/learning/ON admission remains false.
+The portable `resetAt` control does not deliver a native reset API. Native reset,
+quality against STATIC/OFF, meaningful first-session behavior and measured
+activation/rollback remain open gates; STATUS owns exact validation/deployment.
 
 ## Offline Shared ordinal audit
 
