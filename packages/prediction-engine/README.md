@@ -36,6 +36,8 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
 | `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
+| `./working-evaluation` | Pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`, `evaluateWorkingPlan` and `evaluateWorkingBatch`; conditional OFF-exposed pairwise comparison, planned coverage and Item weight concentration; no capture writer or admission |
+| `./adapters/kajo-working-evaluation` | Strict `normalizeKajoWorkingEvaluationPlan` for supplied frozen Personal sources and all three actual native comparison rows; honest proxy clocks and unavailable candidate-feature support; no native label writer |
 | `./adapters/movielens` | D1 pure external-rating adapter, original 0.5–5 scale, release namespaces and explicit unknown context; the core root does not import it |
 | `./ordinal` | #232E bounded exposed group Pareto pair/batch diagnostic using one frozen production/shadow candidate pool, full enrollment and own exposure; no scalar group reward or learning |
 | `./adapters/kajo-ordinal` | Strict immutable #232C artifact mapping, required scoped subject/member/enrollment handles, declared digest bindings and diagnostic-only clock/membership limits |
@@ -193,6 +195,81 @@ not add a public reset API/UI or change the portable package's database-free
 boundary. Product reset integration, quality against STATIC/OFF,
 meaningful first-session behavior and measured
 activation/rollback remain open gates; STATUS owns exact validation/deployment.
+
+## Bounded Working evaluation
+
+`./working-evaluation` is a separate descriptive boundary. It neither imports
+into the root estimator nor changes `working-state-v1`, existing native SQL or
+serving OFF. Its public functions are:
+
+| Function | Contract |
+| --- | --- |
+| `summarizeWorkingSupport` | Actual candidate-specific STATIC/ORDERED Item coefficients and weight concentration, with zero support for OFF/inactive state; multiple tags collapse onto their contributing Item |
+| `freezeWorkingEvaluationPlan` | Immutable scoped source/target/horizon/version plan, one complete common pool of at most 50 Objects and at most 25 disjoint owner-predeclared pairs |
+| `evaluateWorkingPlan` | One immutable reconciled outcome capture; all planned pairs retained with a common comparable directional mask across OFF/STATIC/ORDERED |
+| `evaluateWorkingBatch` | At most 128 plan inputs and 128 total planned pairs; descriptive coverage and paired agreement/tie/disagreement transitions, with source reuse and Subject/session clusters explicit |
+
+Every control supplies its frozen score/rank for the same pool and its own
+creation and availability clocks. The historical source-input cutoff is separate
+from later comparison creation and plan selection. Controls may be computed
+after that source cutoff, but must exist by the plan boundary; the plan and its
+controls must precede eligible OFF exposures and label occurrences. A declared
+plan is a supplied artifact, not verified native enrollment. The capture binds
+its source, actor, Subject and forecast-session context to the plan; each label
+retains the matching Object and Prediction. Later outcome Events may occur in a
+different session. The evaluator requires original OFF selection and actual
+exposure, same delivery tier, declared target and mature horizon, plus labels
+available at the evaluation cutoff. A capture contains at most 50 labels. Valid zero is retained. Missing, unknown, cleared,
+immature, unavailable and unexposed labels abstain; no-feedback does not become
+rejection. Repeated stable source records cannot count again through a newer
+revision. The caller supplies an already-reconciled immutable capture; this
+package does not read Events or decide which newly arriving correction wins.
+Declared `sourceIds` and `complete=true` are scope/completeness assertions, not
+current authorization. The trusted owner must reauthorize access and invalidate
+or remove retained captures, plans and reports after source withdrawal. No
+native outcome producer or automatic withdrawal/erasure protection is added.
+
+The diagnostic measures ranking agreement, predictor ties and disagreement on
+actual exposed pairs. Working adjustments are not rating predictions, so it
+reports no RMSE, calibrated confidence, counterfactual outcome or uplift. Target
+ties do not invent a winner. Every distinct planned pair remains in the coverage
+denominator, including abstentions. Observed native/external and synthetic
+counts remain separate; excluded or mixed provenance cannot create observed
+quality support. Retained Subject/session clusters have
+`independence: 'not-established'`.
+
+The support summary exposes nonnegative per-Item `coefficients`, contributing
+Items/time groups and feature coverage. Its `effectiveItems` is the Kish-style
+weight concentration `(sum(w) ** 2) / sum(w ** 2)`, or zero with no weight.
+This is not a statistical sample size. It cannot certify independence,
+uncertainty or sufficient evidence for promotion. Evaluation reports remain
+`descriptiveOnly=true`, `historicalFeatureEligible=false`, `learnable=false`,
+`nativeActivated=false` and `qualityAdmitted=false`, with unavailable uncertainty.
+Proxy creation-time declarations cannot establish
+`prospectiveDeclaredEligibility`. The separate Kajo adapter validates supplied
+frozen native artifacts through `normalizeKajoWorkingEvaluationPlan` with
+`KajoWorkingEvaluationSnapshots`. It accepts generation-matched capture,
+features, serving suffix and OFF/STATIC/ORDERED comparison rows for v1 or v2,
+including their actual `created_at` and a trusted supplied observation boundary
+not after planning. The source binding retains scoped capture/model/mode/domain
+lineage, requested/stored creation and the trusted observation boundary, with
+commit visibility UNKNOWN and historical eligibility false. Required explicit
+scoped handles cover the entire candidate
+pool; they are neither authorization certificates nor pseudonymous identities.
+The native plan declares `kajo:personal-exposed-rating-order` on the original
+0–10 scale. It adds no database migration, prospective enrollment or
+immutable strict own-rating capture. Existing native candidate explanations
+freeze adjustments rather than full candidate features; the adapter declares
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE` for candidate-specific support instead of
+using current tags or extrapolating input-closure Item features. A frozen native
+feature producer is the next native support prerequisite; prospective enrollment,
+a strict label writer and honest availability evidence remain subsequent explicit
+gates. The existing strongest-effective V1 reward evaluator and its save/rating
+semantics are unchanged.
+
+The [canonical evaluation contract](../../docs/domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)
+owns interpretation and remaining quality/admission requirements; STATUS owns
+source publication and verification.
 
 ## Offline Shared ordinal audit
 

@@ -1536,6 +1536,16 @@ No new genome, shadow job, propensity, observed outcome or quality/promotion
 input is created. These uncalibrated comparisons report unavailable uncertainty,
 zero observed evaluation labels and `nativeActivated=false`.
 
+The config-only precision forward
+`20261010153638_personal_working_shadow_precision.sql` pins the comparison
+writer's function-local `extra_float_digits=3`. Each new JSON score must
+round-trip to the same binary double as its frozen scorer output even when
+the caller requests rounded float output; the caller setting restores on return.
+This applies to both captured-source generations without changing the scorer,
+function body/identity/ACL or prior rows. Existing rounded comparison receipts
+remain immutable; an exact-OFF audit must still reject a mismatched old receipt
+rather than tolerate or rewrite it.
+
 The private RLS/API-denied comparison table has at most one result per source and
 control, at most 50 candidates and a 256-KiB result ceiling. Retries reauthorize
 and return stored bytes. Lifecycle-first locking and READ COMMITTED for new
@@ -1586,6 +1596,84 @@ resurrect old intent. Actual User/Profile/session parent deletion cascades its
 controls. The immutable guard permits DELETE only after a required parent is
 gone; direct UPDATE/DELETE with live parents stays denied. No runtime quality,
 serving ON policy, user API, UI or hosted activation follows from this source.
+
+#### Bounded offline WorkingState evaluation
+
+The separate portable `./working-evaluation` boundary evaluates immutable
+OFF/STATIC/ORDERED orders on one declared common pool of at most 50 Objects.
+The owner supplies a frozen plan with at most 25 nonoverlapping Item pairs,
+actor/Subject/session scope, source cutoffs, target and maturity horizon. Each control has
+explicit creation and availability boundaries, distinct from the historical
+source-input cutoff. A control may legitimately be computed after that input
+cutoff; the plan and controls must be fixed before the eligible OFF exposures
+and label occurrences. Earlier source timestamps cannot masquerade as earlier
+comparison creation or pair selection.
+
+The engine exposes pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`,
+`evaluateWorkingPlan` and `evaluateWorkingBatch`. It does not enroll sessions,
+select favorable pairs after seeing labels, capture outcomes or modify native
+forecast/comparison rows.
+
+Only both Items' actual OFF exposure can support an observed pair. Their delivery
+tier must match; the diagnostic does not compare an ordinary card with a reminder
+or pretend an alternative admission/delivery policy occurred. Inputs retain
+source/control/capture versions, exposure references, complete common-pool ranks
+and immutable reconciled labels. The capture binds the exact actor, Subject,
+forecast session and source; each label binds its own Object and original
+Prediction. A later rating may occur in another Event session without changing
+that forecast context. Labels must fall inside the declared horizon, be mature
+and available by the evaluation cutoff. Valid rating zero remains observed. Missing,
+unknown, cleared, immature, unexposed or unavailable labels stay unscored rather
+than becoming rejection. The adapter accepts supplied authorized captures; no
+server authorization or capture authenticity is inferred from their JSON shape.
+Declared `sourceIds` and `complete=true` do not grant current access. The trusted
+owner must reauthorize reads and invalidate or remove retained captures/plans/
+reports after source withdrawal; this pure boundary adds no native outcome
+producer or automatic withdrawal/erasure protection.
+
+Working adjustments are ranking components, not predicted ratings. The report
+therefore records conditional pairwise agreement, predictor ties and disagreement
+for each control rather than RMSE, calibrated confidence or counterfactual uplift.
+Observed target ties are reported without fabricating a winner. Every distinct
+planned pair remains in the coverage denominator even when unscored; this guards
+against retaining only favorable supported pairs. Source-record reuse is checked
+by stable source identity across revisions, so correction/replay cannot supply a
+second observation. Synthetic pairs are reported separately and contribute no
+observed quality evidence. Subject/session clusters are retained with independence
+not established; pair counts and repeated session actions are not statistical
+sample sizes.
+
+A separate support summary uses the actual candidate-specific Item coefficients
+for STATIC and ORDERED. Its weight concentration distinguishes many contributing
+Items from one heavily weighted Item. A Kish-style concentration count is a
+property of those weights, not proof of independent observations, calibrated
+uncertainty or a sufficient sample for admission. It does not change the working
+formula or the native capture budgets. Existing native candidate explanations
+freeze only the two working adjustments, not full candidate features; captured
+input-closure Item features cannot substitute for every candidate. The adapter
+therefore declares candidate-specific support unavailable through
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE` instead of reading current Item tags or
+inventing weights. Pure complete-feature support fixtures are separate from a
+frozen native feature producer.
+
+The native `normalizeKajoWorkingEvaluationPlan` adapter maps existing frozen
+Personal sources and all three actual comparison rows into a plan input; the
+pure audit adds no persistence schema, enrollment ledger or outcome-capture
+writer. The separate comparison precision forward above changes only function
+configuration.
+Stored `created_at` boundaries remain availability proxies with UNKNOWN commit
+visibility. An input passing structural cutoff checks is not a certified
+prospective native experiment. In particular, the existing V1 strongest-effective
+reward evaluator is unchanged: an eligible save is not silently relabeled as a
+post-consumption rating. The next native support prerequisite is a versioned
+frozen candidate-feature generation. Truthful prospective enrollment and a strict
+own-rating capture then remain explicit prerequisites for their corresponding
+quality claims. Evaluation reports retain unavailable uncertainty,
+`descriptiveOnly=true`, `historicalFeatureEligible=false`, `learnable=false`,
+`nativeActivated=false` and `qualityAdmitted=false`; they cannot activate
+WorkingState or close MVP-ALG-004.
+The [package README](../../packages/prediction-engine/README.md#bounded-working-evaluation)
+owns the executable API and exact input limits.
 
 MVP-ALG-004 remains open: product reset integration, supported quality against STATIC/OFF,
 independent/effective support, source-aware forgetting/bootstrap-floor evaluation,

@@ -10,108 +10,137 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — bounded private native WorkingState reset lifecycle
+## Current packet — bounded frozen WorkingState order evaluation
 
-### Source continuation and parent CI repair — 2026-10-10
+### Source continuation — 2026-10-10
 
-Continue on `feat/personal-working-reset`, stacked on
-[PR #316](https://github.com/Kajooja/Kajo/pull/316), exact parent source
-`0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a`, tree
-`4eb30c70e3685c5cbc444ce16fc09a80b5cbb626`. Its first source's CI #625 failed
-only a seeded SQL/JavaScript ordered-vector bit-equality assertion, about 8e-17
-roundoff. The published repair keeps exact control/feature keys and finite
-scalars within 1e-12; real OFF scores/ranks/selection, frozen receipts and
-nonnumeric state remain exact. Full database **118/118**, affected **13/13** and
-independent review pass; all 70 migrations/runtime/lockfile retain bytes.
-
-The one inspection of repaired-source
-[CI #626](https://github.com/Kajooja/Kajo/actions/runs/38037826531) finds four
-required jobs passed: validation with all tests/application exports, platform/
-defaults, two clean native installations and populated native upgrade. The CLI
-installation/history gate remains in progress at that snapshot. No complete
-native acceptance is inferred; source work overlaps these gates without
-admitting serving or quality. Accepted main remains
+Continue on `feat/personal-working-evaluation`, stacked on
+[PR #317](https://github.com/Kajooja/Kajo/pull/317), exact parent source
+`78a79dd0cfb5e49b400357443bf8d54de01cf6e7`, tree
+`105fb9abf38e88ae218628ad75bfc41f33ea6dd6`. Its single continuation inspection of
+[CI #627](https://github.com/Kajooja/Kajo/actions/runs/38039179797) finds validation
+with all tests/application exports, platform/defaults, two clean native
+installations and populated upgrade passed. CLI installation/history remains in
+progress at that snapshot. No complete native acceptance or ongoing CI/APK
+polling is inferred. Accepted main remains
 `34d21704cafe21091a2369396c9bc61dce99c1e9`. The single
-[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns the new published
-PR/source/tree and one-time CI receipt, preserving its September 30 checkpoint.
-Public source publication authorization persists.
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns exact current
+publication/CI and preserves its September 30 checkpoint. Public source
+publication authorization persists; source work overlaps open admission gates.
 
-The new private immutable `personal_working_resets` ledger records canonical
-WorkingState lifecycle-control evidence, separate from Item/taste/UNDO/history
-Events. An API-denied security-invoker typed controller accepts reset ID and
-current actor/PersonalProfile/existing session identity. Every retry reauthorizes
-current ownership, membership and exact session scope before returning the
-original frozen receipt. New writes require READ COMMITTED, acquire the shared
-source-lifecycle gate before request/Profile/session locks and store one
-server-clock instant after those locks. At most 128 distinct controls per scope
-are admitted; exact retries remain valid at quota.
+The current-source continuation inspection of
+[CI #628](https://github.com/Kajooja/Kajo/actions/runs/38042488182), source
+`ff136d6a5da8f4f2757be74504fdbcc750d1f6e6`, tree
+`dbff11aefb3eff9d838bff79c77f13154d0c8128`, finds validation/all tests/application
+exports, platform/defaults, both clean installations and populated upgrade
+passed. Only CLI installation/history failed, at the native Working OFF
+comparison's exact score/policy assertion. The actual native caller precision
+setting was not logged. Disposable full-schema reproduction identifies a
+precision-sensitive JSON score round-trip defect: rounded caller output changes
+binary score values while the scorer, candidate set, ranks and policy stay exact.
+The guarded CLI-generated forward
+`20261010153638_personal_working_shadow_precision.sql` pins only the comparison
+writer's function-local float precision. New writes preserve binary scores for
+both source generations and restore the caller setting. All old rows, including
+any rounded comparison receipt, remain immutable; mismatched old OFF receipts
+still fail the strict audit. This repair relaxes no comparison or admission gate.
 
-New `native-working-capture-v2` snapshots include all cutoff-visible scoped
-control references in the same MVCC statement as the complete Item/correction
-prefix and current features. The latest visible `resetAt` excludes taste and
-selected-session activity at-or-before that boundary under portable semantics.
-Reset supplies no preference, refreshes no activity clock and renews no four-hour
-session lifetime; other sessions/Profiles/actors remain separate. Full pre-reset
-Item/correction budgets are retained. A 129-control sentinel abstains honestly
-without a truncated accepted control prefix. Stored creation remains an
-availability proxy, commit availability is UNKNOWN and quality/learning
-admission is false.
+The isolated portable `./working-evaluation` boundary freezes an explicit
+same-source OFF/STATIC/ORDERED candidate pool, target, horizon, versions and
+nonoverlapping pairs before labels. It consumes the actual frozen control
+scores, without assuming that native final scoring adds the adjustment directly
+to a baseline. Comparison creation/availability and pair-selection clocks remain
+separate from the original source cutoff. A created-time proxy or caller's
+clock declaration is not authenticated historical/commit availability or a
+native prospective enrollment receipt.
 
-New serving source/features use `+personal-working-off-v2` /
-`personal-working-features-v2`; genuine scoring stays fixed to exact OFF.
-Old v1 captures, comparisons, old page receipts and copied V2 continuation retain
-their frozen meaning; fresh V3 requests capture current controls. Frozen new
-OFF/STATIC/ORDERED comparisons retain their reset lineage and the original
-candidate pool/genome/final delivery policy. No public reset RPC, mobile UI,
-serving ON or measured-quality support is delivered.
+An already reconciled immutable outcome capture supplies actual eligible
+observations and explicit occurrence/availability/exposure/maturity/correction
+semantics. Evaluation reports ordinal score-order agreement, score ties and
+disagreement on one common pair mask. Both Items must have actual OFF exposure
+and compatible frozen eligibility/delivery tier. Missing, unknown, cleared,
+unexposed, censored, unavailable, immature or unsupported evidence remains
+unscored coverage, not a negative or a replacement pair. Native raw scores are
+uncalibrated: this creates no rating RMSE, probability or causal policy uplift.
+Every originally planned pair stays in the coverage denominator.
 
-Forecast-only source/actor/Profile erasure removes copied reset state with its
-PredictionRun while retaining raw reset controls alongside surviving raw Events;
-removing a control alone could otherwise resurrect earlier intent on recapture.
-Actual User/Profile/session parent removal cascades raw controls. Direct ledger
-UPDATE/DELETE remains denied while parents exist; its cascade guard adds no late
-lifecycle lock.
+Bounded batch accounting rejects reused source-record lineage independently of
+revision, repeated experiences/anchors/pairs and same-subject unordered Item
+pairs. Subjects and sessions are clusters; the number of control outputs, tags,
+taps or source projections is not an independent outcome count. Synthetic
+fixture results remain separate from observed metrics. Statistical independence
+is not established, uncertainty remains unavailable and historical feature,
+learning, serving activation and admission remain closed.
 
-Pinned Supabase CLI **2.117.0** generated
-`20261010082558_personal_working_reset.sql`, SHA-256
-`402250688e24c3862f61c2d2448d35a715c5016bf611da84501224fdd07f774b`.
-Eight exact reviewed body transforms
-preserve existing identities/owner/ACL/configuration and old populated rows.
-All **70** previous migrations and root lockfile remain unchanged. Existing
-required CLI gates gain reset populated-upgrade, native runtime and genuinely
-independent-session retry/quota/lifecycle race probes with exact owned cleanup.
-Old bridge migration tests pin their own forward; current runtime smoke accepts
-matched v1/v2 metadata, and reset-specific tests require v2.
+A separate candidate-specific support diagnostic uses the existing surviving
+Item/feature and STATIC/ORDERED equal-time-group weights. It sums each Item's
+influence across tags before computing weight concentration, so many tags do
+not multiply the Item count. Weighted effective Item count describes the
+component's concentration; it is neither independent observed-outcome sample
+size nor calibrated confidence. OFF/inactive/no-coverage cases are explicit.
+WorkingState v1 and its old native capture/features/policy contracts retain bytes.
 
-Validation: full database **130/130**, affected bridge/reset **22/22**, connected
-probe source/fixture **3/3**, engine **137/137** with built ESM/import graphs,
-research **19 Python + 23 Node** and acceptance **6 + 5** pass. The legacy bridge
-runtime smoke also passes on the complete reset-aware schema. Independent
-source/test/canonical reviews, changed/new JavaScript syntax, diff checks and
-**62 Markdown / 287 local links / 93 heading references** pass.
-Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog **444**
-pass before Deno registry Connection refused (exit 1). Complete local root/fresh
-application-export acceptance is not claimed. Tests cover portable reset/clock/expiry and
-correction parity, scope/availability/control bounds, retry authorization,
-versioned real V2/V3 pages and frozen comparisons, old-object/row preservation,
-API denial/immutability and genuine parent cascades. Native concurrency probes
-are source-tested here; actual lock/race evidence belongs to exact-source CI.
-Local Docker and live local advisors remain unavailable; the local advisors
-attempt fails closed at `127.0.0.1:54322` with connection refusal. No hosted
-write or native/admission result is inferred from PGlite.
+The Kajo adapter accepts an already-authorized immutable Personal source and
+its actual three private comparison rows, retaining source/control clocks and
+exact OFF candidate/policy provenance. It validates matching source generations,
+pool, rank/score/tier/selection and scoped handles; it performs no auth lookup,
+feature refresh, raw Event replay, writes or serving changes. Actual SQL producer
+interoperability uses owned synthetic fixtures and supplies no real native
+quality sample. This packet creates no native enrollment/outcome capture writer,
+public reset API/UI or policy assignment. The pure audit adds no persistence
+schema; the separate precision forward changes only function configuration.
+Stored source references and `complete=true` are caller assertions. The trusted
+owner must check current access and invalidate retained plans/captures/reports
+after source withdrawal; this pure evaluator supplies no native lifecycle guard.
 
-**Next bounded action:** resolve this exact published source in #229, inspect
-completed required CI gates once and repair any concrete sanitized failure. Then
-prepare a versioned prospective OFF/STATIC/ORDERED quality/effective-support
-packet using frozen eligible sources and honest outcome availability, retaining
-bootstrap-floor/independent support, transfer and real first-session usefulness
-as explicit gates before adaptive Taste/frozen challenge admission. Anonymous
-server identity and minimum retention/abuse/measurement precede real anonymous
-Taste. Keep genuine #232F Shared consumption, #306 integration, #229 device/
-fresh-account, consent-based 2–5-person creation and at-most-five Shared today
-planning, Phase 16.3–16.4 and all release/privacy/quality gates. Native user-facing
-reset integration remains separately gated. No main merge, hosted write, APK or
-account/history reset is introduced; MVP-ALG-004 stays open.
+Current native candidate snapshots freeze adjustment scalars rather than the
+complete candidate feature vector; capture Item features belong to the input
+closure, not necessarily the ranked pool. Native candidate-specific support is
+therefore explicitly `FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`. Current catalog
+features cannot fill that historical gap. The generic complete-feature support
+diagnostic does not establish native effective support.
+
+Fresh continuation validation: full engine **178/178**, built ESM
+exports/isolation graphs and full database **135/135** pass, including actual
+v1/v2 native SQL-producer interop and **4/4** precision regressions. The real
+populated precision upgrade verifies both source generations at caller -3/0/1,
+exact OFF binary scores and delivery policy, old row/receipt preservation and
+all function metadata except the approved config. Caller restoration is checked
+on success, cached retry and errors; deliberate score/rank/selection and
+row/body/ACL mutations are rejected. The native CLI gate adds this reusable
+upgrade receipt and challenges caller0 with the unchanged strict bridge fixture.
+Core **29** and adapter **12** cases cover clocks, exposure, correction/unknown
+abstention, source-record reuse, synthetic separation and prototype/alias guards.
+Independent implementation review is clean. Research **19 Python + 23 Node**
+and acceptance **6 + 5** pass. Fresh offline root check passes lint, typecheck,
+dependency **43**, mobile **478** and all catalog **444** cases (**441** scripts
+plus **3** contracts), then Edge registry loading cannot complete and is
+interrupted (exit 130). The exact cached-only Edge test fails on missing
+`@supabase/auth-js` metadata. No complete local root check or fresh application
+export/native execution receipt is claimed. Local Docker/advisors remain
+unavailable; new exact-source CI is owned by #229's publication snapshot.
+All **62** tracked Markdown files, **291** local links and **97** anchors resolve;
+syntax and whitespace checks pass.
+All **71** previous migrations, old Working/scoring source and root lockfile
+retain bytes; the precision repair is new migration **72**. Source,
+native/hosted, device and quality acceptance remain
+separate; local PGlite fixtures do not certify real prospective data or quality.
+
+**Next bounded action:** resolve the repaired exact publication in #229 and
+inspect its required CI once; repair a concrete sanitized failure. Then freeze bounded
+candidate features in a new native source/feature generation, preserving old
+captures and exact OFF serving. That enables native support accounting before
+the following Personal prospective source/pair enrollment and immutable own-exposure /
+latest-rating / correction outcome capture needed to feed this audit honestly.
+Preserve old strongest-episode reward interpretation and its historical
+artifacts; the new ordinal target needs its own explicit resolution contract.
+Declare an untouched evaluation window and observed coverage before any quality
+claim or canary. Bootstrap-floor/source-aware independent support, transfer and
+real first-session usefulness remain gates before adaptive Taste/frozen challenge
+admission. Anonymous identity/retention/abuse/measurement precede real anonymous
+Taste. Keep genuine #232F Shared, #306 integration, #229 device/fresh-account,
+planned consent-based group/today flow and every release/privacy/quality gate.
+MVP-ALG-004 stays open. No main merge, hosted write, APK or account/history reset.
 
 ## Preserved native memory/serving decay parity and dependency audit
 

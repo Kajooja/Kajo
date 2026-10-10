@@ -48,6 +48,21 @@ ledger and controller are API-denied, with no public reset RPC or mobile control
 The version, quota, availability and frozen replay contract belongs to
 [private native session reset controls](PREDICTION_MODEL.md#private-native-session-reset-controls).
 
+The portable WorkingState evaluation boundary consumes already-reconciled
+immutable label captures with exact source/actor/Profile/forecast-session and
+Item/exposure references. Later outcome Events need not share the original
+forecast session; the captured forecast context remains bound to its plan. It creates no canonical Event, enrollment ledger or
+outcome-capture writer. Missing, cleared, unknown, immature and unexposed labels
+remain unscored; corrections/replays of one stable source record cannot add
+independent observations. Stored source/control creation times do not certify
+commit availability or prospective enrollment. Declared sources/completeness do
+not authorize current access; the trusted owner must invalidate or remove
+retained captures/plans/reports after withdrawal. This packet adds no native
+outcome producer or automatic withdrawal protection. The existing strongest-effective
+V1 reward evaluator remains unchanged, and strict own-rating capture is a
+separate admission gate. Conditional ranking/coverage and weight-concentration
+interpretation belongs to [bounded offline WorkingState evaluation](PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation).
+
 The planned ROADMAP 16.4 joint decision session keeps session exposure, veto,
 already-seen replacement and choice telemetry separate from canonical consumed
 ratings/SharedRatingRound outcomes. A choice is not verified consumption or group

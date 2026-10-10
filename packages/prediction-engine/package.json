@@ -42,6 +42,14 @@
     "./adapters/kajo-working-state": {
       "types": "./dist/adapters/kajo-working-state.d.ts",
       "import": "./dist/adapters/kajo-working-state.js"
+    },
+    "./working-evaluation": {
+      "types": "./dist/working-evaluation.d.ts",
+      "import": "./dist/working-evaluation.js"
+    },
+    "./adapters/kajo-working-evaluation": {
+      "types": "./dist/adapters/kajo-working-evaluation.d.ts",
+      "import": "./dist/adapters/kajo-working-evaluation.js"
     }
   },
   "scripts": {

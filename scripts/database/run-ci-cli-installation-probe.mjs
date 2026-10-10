@@ -33,8 +33,9 @@ import { verifyShadowSourceErasureConcurrency } from './shadow-source-erasure-co
 import { sharedRoundPredictionInputsSmokeSql, sharedRoundPredictionInputsUpgradeSql } from './shared-round-prediction-inputs.mjs';
 import { verifySharedRoundPredictionInputsConcurrency } from './shared-round-prediction-inputs-concurrency.mjs';
 import { personalNativeDecaySmokeSql, personalNativeDecayUpgradeSql } from './personal-native-decay.mjs';
-import { personalWorkingBridgeSmokeSql, personalWorkingBridgeUpgradeSql } from './personal-working-bridge.mjs';
+import { personalWorkingBridgeUpgradeSql } from './personal-working-bridge.mjs';
 import { personalWorkingResetSmokeSql, personalWorkingResetUpgradeSql } from './personal-working-reset.mjs';
+import { personalWorkingPrecisionSmokeSql, personalWorkingPrecisionUpgradeSql } from './personal-working-shadow-precision.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
@@ -191,6 +192,15 @@ try {
     const [personalWorkingResetUpgrade] = await exec(await personalWorkingResetUpgradeSql(files[workingResetIndex]),
       { stage: 'personal-working-reset-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalWorkingResetUpgrade?.personalWorkingResetUpgrade, /^PASS: every populated old/);
+    const workingPrecisionIndex = files.findIndex(file => file.name.endsWith('_personal_working_shadow_precision.sql'));
+    assert.equal(workingPrecisionIndex, workingResetIndex + 1);
+    // The reset upgrade rolled back to the actual pre-reset lineage. Freeze v1
+    // sources there, install reset71 and precision72 only inside this verifier,
+    // and challenge fresh controls at caller -3/0/1 without rewriting old rows.
+    const [personalWorkingPrecisionUpgrade] = await exec(await personalWorkingPrecisionUpgradeSql(
+      files[workingResetIndex], files[workingPrecisionIndex]),
+    { stage: 'personal-working-precision-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalWorkingPrecisionUpgrade?.personalWorkingPrecisionUpgrade, /^PASS: genuine v1\/v2/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -267,7 +277,7 @@ try {
     const [personalNativeDecay] = await exec(await personalNativeDecaySmokeSql(),
       { stage: 'personal-native-decay-state-score-frozen-parity', timeoutMs: 120_000 });
     assert.match(personalNativeDecay?.personalNativeDecay, /^PASS: shared native LT math/);
-    const [personalWorkingBridge] = await exec(await personalWorkingBridgeSmokeSql(),
+    const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
     const [personalWorkingReset] = await exec(await personalWorkingResetSmokeSql(),
@@ -313,6 +323,7 @@ try {
       sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
+      personalWorkingPrecisionUpgrade,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,
