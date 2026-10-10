@@ -85,9 +85,13 @@ correction/undo, equal-time ambiguity, known occurrence/availability cutoffs and
 caller-declared complete session prefix plus visible correction closure.
 Adjustment defaults to OFF; STATIC and ORDERED are explicit diagnostic controls.
 The [package README](../../packages/prediction-engine/README.md#bounded-session-intent)
-owns the exact formula, bounded support and reset/expiry rules. No native
-PredictionRun consumes it yet, and this does not complete MVP-ALG-004 or prove
-usefulness, calibration or historical feature availability.
+owns the exact formula, bounded support and portable reset/expiry rules. The
+[native Personal bridge](#native-personal-workingstate-capture-and-comparison)
+now freezes its own authorized capture into new PredictionRuns and consumes
+versioned candidate components with serving fixed to OFF. Explicit private
+STATIC/ORDERED comparisons use frozen features; they do not activate session
+ranking or complete MVP-ALG-004, usefulness, calibration or historical feature
+availability. Native reset and quality/admission remain separate requirements.
 
 ### 4.2 ShortTermState — lähimuisti
 
@@ -1457,6 +1461,80 @@ removing one membership cannot restore ordinary eligibility while another
 membership or terminal reaction still suppresses the Item. The same versioned
 policy must govern serving and replay. Recorded branch rollout is not inferred
 from the existence of this specification.
+
+### Native Personal WorkingState capture and comparison
+
+The source forward `20261010064104_personal_working_bridge.sql` adds a bounded
+native bridge beside the portable component. New ordinary and catalogue-chain
+Personal rank sources capture `native-working-capture-v1` in
+`PredictionRun.state_snapshot.workingState`, retain candidate
+`workingIntent.version = personal-working-features-v1` and append
+`+personal-working-off-v1` to the serving policy. Shared sources receive no
+Personal capture or WorkingState component. Existing scalar scorer/genome
+contracts, historical forecasts, receipts and Events retain their semantics.
+Exact source/native/hosted acceptance is recorded only in STATUS.
+
+`private.capture_personal_working_state_v1` requires the current acting identity
+to own the PersonalProfile. One MVCC statement captures the actual Event session,
+complete own Item-linked prefix and visible same-Item correction closure,
+including other-session replacements, selective clear and exact UNDO. A supplied
+ranking session ID does not create an Event session. Independent latest Items,
+equal-time ambiguity, valid zero, attention-only activity and four-hour/30-minute
+expiry follow the bounded source hypothesis. Another session may remove stale
+intent without supplying its own preference or renewing the activity clock.
+
+The native feature artifact is `native-binary-tags-v1`: binary current Item tags
+known in that capture, with no training or demonstrated semantic transfer. It
+freezes dimensions, Item features, source timestamps, configuration and cutoff.
+Stored Event creation time remains an availability proxy; commit availability
+is UNKNOWN and historical-feature/learning admission stays false. Bounds are
+128 records, 32 Items, 32 dimensions and 256 exact invalidations. Overflow
+sentinels produce an inert `BUDGET_EXCEEDED` envelope with
+`prefixComplete=false` and no retained partial evidence; truncation cannot
+produce active state. NO_SESSION, empty and no-tag captures also remain inert.
+Unsupported legacy tags (null, empty, over 256 UTF-16 code units or control characters),
+malformed UNDO sources or source timestamp precision collapse produce
+`INPUT_UNAVAILABLE` with an explicit reason, `prefixComplete=false` and no partial
+prefix/features. This inactive component preserves real V2/V3 OFF pages instead
+of making supported baseline serving depend on portable input compatibility.
+The portable core still requires a valid nonempty schema and rejects unsupported
+input; SQL/portable parity is scoped to accepted nonempty feature states rather
+than these native inert envelopes.
+Native `resetAt` is null; a supported native reset lifecycle/API is not delivered.
+
+One private `prediction_candidate_score_working_v1` consumes the frozen
+STATIC/ORDERED candidate adjustments bounded to ±0.25. Its serving control is
+fixed to OFF and returns the legacy scorer's exact number directly. This is
+actual versioned input consumption with zero serving adjustment; it adds no
+client control or ON policy. Protocol 2 later pages inherit the original capture
+and candidate features; protocol 3 captures each fresh page's own source. Current
+reauthorization precedes exact receipt replay, which cannot recapture or rewrite
+its old source.
+
+The owner-only `private.record_personal_working_shadow_v1(source, control)`
+actually scores frozen candidate features through the same consumer and retains
+an immutable `personal-working-shadow-v1` result for OFF, STATIC or ORDERED.
+`FROZEN_CANDIDATE_POOL_AND_FINAL_DELIVERY_POLICY` conditions on the source's
+admitted pool and final eligibility, delivery tiers and chosen reminder; it does
+not replay an independently changed admission/reminder policy or hypothetical
+earlier pages. OFF requires exact candidate set, scores, ranks and selections.
+No new genome, shadow job, propensity, observed outcome or quality/promotion
+input is created. These uncalibrated comparisons report unavailable uncertainty,
+zero observed evaluation labels and `nativeActivated=false`.
+
+The private RLS/API-denied comparison table has at most one result per source and
+control, at most 50 candidates and a 256-KiB result ceiling. Retries reauthorize
+and return stored bytes. Lifecycle-first locking and READ COMMITTED for new
+comparisons preserve source-erasure ordering; source FK deletion removes its
+comparisons and the existing owner eraser counts them in the same dependency
+budget. Direct comparison UPDATE/DELETE remains denied. There is no hosted
+activation, user API, mobile UI, APK or automatic promotion in this source packet.
+
+MVP-ALG-004 remains open: native reset, supported quality against STATIC/OFF,
+independent/effective support, source-aware forgetting/bootstrap-floor evaluation,
+normalized-feature transfer, real first-session usefulness and measured
+activation/rollback still require their own evidence. Shared #232F consumption
+and the device/privacy/release gates remain independent.
 
 ### Adaptive memory without unstable taste
 
