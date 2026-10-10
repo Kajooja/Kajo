@@ -36,6 +36,7 @@ import { personalNativeDecaySmokeSql, personalNativeDecayUpgradeSql } from './pe
 import { personalWorkingBridgeUpgradeSql } from './personal-working-bridge.mjs';
 import { personalWorkingResetSmokeSql, personalWorkingResetUpgradeSql } from './personal-working-reset.mjs';
 import { personalWorkingPrecisionSmokeSql, personalWorkingPrecisionUpgradeSql } from './personal-working-shadow-precision.mjs';
+import { personalWorkingCandidateFeaturesSmokeSql, personalWorkingCandidateFeaturesUpgradeSql } from './personal-working-candidate-features.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
@@ -201,6 +202,14 @@ try {
       files[workingResetIndex], files[workingPrecisionIndex]),
     { stage: 'personal-working-precision-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalWorkingPrecisionUpgrade?.personalWorkingPrecisionUpgrade, /^PASS: genuine v1\/v2/);
+    const workingCandidateFeaturesIndex = files.findIndex(file => file.name.endsWith('_personal_working_candidate_features.sql'));
+    assert.equal(workingCandidateFeaturesIndex, workingPrecisionIndex + 1);
+    // The previous disposable verifier leaves the actual pre-reset lineage.
+    // Freeze both genuine old generations before applying the candidate forward.
+    const [personalWorkingCandidateFeaturesUpgrade] = await exec(await personalWorkingCandidateFeaturesUpgradeSql(
+      files[workingResetIndex], files[workingPrecisionIndex], files[workingCandidateFeaturesIndex]),
+    { stage: 'personal-working-candidate-features-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalWorkingCandidateFeaturesUpgrade?.personalWorkingCandidateFeaturesUpgrade, /^PASS: genuine v1\/v2/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -283,6 +292,9 @@ try {
     const [personalWorkingReset] = await exec(await personalWorkingResetSmokeSql(),
       { stage: 'personal-working-reset-frozen-lifecycle-consumer', timeoutMs: 120_000 });
     assert.match(personalWorkingReset?.personalWorkingReset, /^PASS:/);
+    const [personalWorkingCandidateFeatures] = await exec(await personalWorkingCandidateFeaturesSmokeSql(),
+      { stage: 'personal-working-candidate-features-native-freeze-parity', timeoutMs: 120_000 });
+    assert.match(personalWorkingCandidateFeatures?.personalWorkingCandidateFeatures, /^PASS: actual BOOK\/MOVIE/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -324,6 +336,7 @@ try {
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
+      personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

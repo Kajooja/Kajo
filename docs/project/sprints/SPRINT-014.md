@@ -14,6 +14,66 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Frozen native candidate features and support — 2026-10-10
+
+Exact parent #318 source `9352e3e711e41e773d9092167eb58052c71156da`, tree
+`d7bd1f6a92fc037373599d9e378b700f6969345c`, has all five required jobs
+completed successfully at the continuation CI #629 inspection: validation/exports,
+platform/defaults, two clean native installations, populated upgrade and
+CLI/history. Precision, frozen-consumer/reset and native-installation probes
+pass for that exact parent; this new packet retains its own exact-source gate. Source work
+continues on `feat/personal-working-candidate-features`. STATUS/#229 retain one
+exact publication and next packet; no full native admission is inferred.
+
+New guarded CLI forward **73** freezes complete dense binary candidate features
+in capture/features/OFF-policy/shadow v3 over the unchanged bounded input schema.
+Compact six-field schema/artifact references and
+`CAPTURE_DIMENSION_ORDER_BINARY_V1` arrays bind the full immutable schema once
+in the capture; exact original dimension order is decoded before core sorting.
+No candidate-only tag expands dimensions; a complete zero vector has zero
+coverage rather than unavailable features. Actual ranking-statement tags supply
+both the existing adjustment and new vector. Candidate availability stays
+`SOURCE_RANKING_STATEMENT_SNAPSHOT`, `availableAt:null`, commit UNKNOWN, with
+cutoff only an input reference. No common capture/candidate MVCC instant or
+historical availability is claimed. The immutable v1/v2 sources, cached
+comparisons/pages/reset lineage and exact OFF scorer/delivery policy remain;
+function identities/security/ACL/config, including precision72, are preserved.
+No table/API or new control assignment is introduced.
+
+The pure adapter reconstructs active v3 from frozen raw input and features,
+retargets both state and observations to the ordinal audit contract, and aliases
+all input Items/Events/UNDO targets before derivation. It checks support/vector/
+scalar agreement with finite 1e-12 independent numeric tolerance, preserving
+exact OFF. Complete scoped aliases must remain stable across later outcome
+captures/batches. Source binding keeps the candidate availability unknown.
+Candidate-specific STATIC/ORDERED support is Item-weight concentration, not
+outcome sample size/confidence. V1/v2 and inactive v3 remain explicitly
+unavailable. Owned native-producer fixtures add no observed native quality.
+
+Full engine **193/193** with built exports, final adapter **27/27**, database
+**140/140**, final candidate file **5/5**, research **19 + 23** and acceptance
+**6 + 5** pass. Actual mode/domain/V2/V3 sources, 50-candidate × 32-dimension
+bounds, inactive/overflow fallback, exact old rows/function metadata/precision,
+four drift guards and genuine V2 cursor continuation after later catalog/
+correction/reset changes are verified. The paired actual V2 large-name regression
+(two inputs, 32 valid maximum-length dimensions, 50 candidates) is accepted at
+measured **459,590 → 497,590 bytes**, below the unchanged **2 MiB** ceiling;
+this is bounded-case evidence rather than universal near-cap headroom. Root lint/typecheck/dependency **43** /
+mobile **478** / catalog contracts **3** pass; interrupted parallel catalog is
+followed by a successful serial **441** run. Cached Edge fails on missing
+`@supabase/auth-js`; complete local root check/fresh app exports/native receipt
+remain unclaimed. Independent adapter/interop review, syntax/diff and **62**
+Markdown / **291** local links / **97** anchors pass. All 72 old migrations and
+root lock retain bytes; eight reviewed function bodies retain identities and
+all metadata. Migration SHA-256:
+`988e84d61ab2ff39e6b132e7e351dca56c8733b731ec78c6dd58afe3ac42ee8e`.
+Next exact CI once, then bounded prospective enrollment and immutable own-
+exposure/latest-rating/correction capture before untouched evaluation and
+quality admission.
+All bootstrap/independent support/transfer/first-session, Taste/anonymous,
+genuine Shared, device and release gates remain. No main merge, hosted write,
+APK or account/history reset.
+
 ## Frozen WorkingState order and support evaluation — 2026-10-10
 
 Exact parent #317 source `78a79dd0cfb5e49b400357443bf8d54de01cf6e7`, tree

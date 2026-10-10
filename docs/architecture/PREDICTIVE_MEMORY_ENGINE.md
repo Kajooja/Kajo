@@ -114,14 +114,19 @@ disagreement and planned-pair coverage, not rating RMSE or counterfactual uplift
 Repeated source revisions cannot multiply support; synthetic evidence stays
 separate and Subject/session-cluster independence remains unestablished.
 Candidate-specific STATIC/ORDERED Item weights yield a concentration summary;
-its Kish-style count is not a statistical sample size. Existing native candidate
-explanations freeze adjustments without full candidate features, so native
-candidate-specific support remains explicitly unavailable; current tags cannot
-fill that gap. Freeze versioned candidate features before native prospective
-enrollment and strict label capture. Existing captured-source creation clocks
-are availability proxies, so structural checks do not certify a prospective
-native experiment. No enrollment/outcome writer, serving activation
-or learning admission follows. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)
+its Kish-style count is not a statistical sample size. Old native v1/v2
+candidate explanations retain adjustment-only support as explicitly unavailable.
+Fresh v3 sources freeze compact dense binary candidate vectors in the original
+captured dimension order, bound to the full schema/artifact retained once in the
+capture. The adapter reconstructs the complete frozen input
+prefix with scoped Item/Event/UNDO aliases before deriving support. Current tags
+cannot replace either frozen input or candidate features. Candidate projections
+record their ranking-statement snapshot with unknown commit visibility and no
+historical availability certificate; source creation clocks also remain proxies.
+These descriptive support weights do not establish independent outcome N,
+confidence, quality or a prospective native experiment. Native prospective
+enrollment and strict label capture remain separate prerequisites. No enrollment/
+outcome writer, serving activation or learning admission follows. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)
 owns the evidence and admission limits.
 
 ## 5. ShortTermState — recent memory

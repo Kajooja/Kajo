@@ -1468,19 +1468,22 @@ from the existence of this specification.
 The source forward `20261010064104_personal_working_bridge.sql` establishes a
 bounded native bridge beside the portable component. The reset-aware successor
 `20261010082558_personal_working_reset.sql` retains the same private helper
-identities and adds a second captured-source generation. Ordinary and
-catalogue-chain Personal rank sources freeze state in
-`PredictionRun.state_snapshot.workingState`, candidate features in
-`workingIntent` and the explicit serving suffix:
+identities and adds reset-aware capture. The candidate-feature successor
+`20261010160025_personal_working_candidate_features.sql` adds a third generation
+through guarded changes to the existing helpers. Ordinary and catalogue-chain
+Personal rank sources freeze state in `PredictionRun.state_snapshot.workingState`,
+working adjustments and versioned candidate projections in `workingIntent`, and
+the explicit serving suffix:
 
-| Captured source | Candidate features | Serving suffix | Private comparison |
+| Captured source | Candidate intent | Serving suffix | Private comparison |
 | --- | --- | --- | --- |
 | `native-working-capture-v1` | `personal-working-features-v1` | `+personal-working-off-v1` | `personal-working-shadow-v1` |
 | `native-working-capture-v2` | `personal-working-features-v2` | `+personal-working-off-v2` | `personal-working-shadow-v2` |
+| `native-working-capture-v3` | `personal-working-features-v3` | `+personal-working-off-v3` | `personal-working-shadow-v3` |
 
-Fresh sources use the reset-aware generation; existing v1 sources remain
-supported without rewriting their bytes. Shared sources receive no
-Personal capture or WorkingState component. Existing scalar scorer/genome
+Fresh sources use v3; existing v1/v2 sources, candidate explanations, comparisons
+and copied pages remain supported without rewriting their bytes. Shared sources
+receive no Personal capture or WorkingState component. Existing scalar scorer/genome
 contracts, historical forecasts, receipts and Events retain their semantics.
 Exact source/native/hosted acceptance is recorded only in STATUS.
 
@@ -1516,6 +1519,45 @@ The first capture generation has no reset control. The reset-aware generation
 freezes its visible private controls in the same MVCC capture and applies the
 latest `resetAt` boundary as specified below.
 
+For v3, each `workingIntent.candidateFeatures` envelope identifies
+`native-working-candidate-features-v1` and binds the exact capture ID and input
+`asOf`. The complete immutable schema/artifact is retained once in the capture.
+Each candidate uses a compact `featureSchemaRef` containing `id`, `version`,
+`artifactId`, `artifactVersion`, `representationVersion` and `dimensionCount`,
+plus `featureEncoding: 'CAPTURE_DIMENSION_ORDER_BINARY_V1'`. Its `features` is a
+dense numeric 0/1 array in the original `capture.featureSchema.dimensions` order,
+with exactly one entry per dimension. Binding the capture ID, input cutoff,
+compact reference and vector length binds that full frozen schema without copying
+dimension names or the complete artifact into every candidate. Readers must not
+sort or extend the dimension order. This compact representation preserves the
+existing 2-MiB protocol-2 window budget for a bounded 50-candidate pool.
+
+An ACTIVE, complete capture with a valid nonempty schema yields `AVAILABLE` and
+projects the candidate tags actually supplied to the ranking statement onto all
+frozen working dimensions. A candidate with no intersection therefore retains an
+all-zero vector, with genuine zero feature coverage. This projection is complete
+for the working schema, not a substitute for unrelated baseline features.
+Inactive, incomplete, empty or invalid schema captures instead retain
+`UNAVAILABLE`, `features:null` and an explicit reason; baseline OFF still works.
+
+Candidate tags can be read by a later READ COMMITTED statement than the input
+capture. Their availability basis is therefore
+`SOURCE_RANKING_STATEMENT_SNAPSHOT`, with `availableAt:null` and
+`commitAvailability:UNKNOWN`. Candidate `asOf` binds the input reference; it
+does not certify that the projection was historically available at that cutoff.
+The portable v3 plan retains this distinction in
+`sourceBinding.candidateFeatureSnapshot`: the ranking-statement availability
+basis, `availableAt:null` and `inputReferenceAt` equal to the source cutoff. The
+candidate Object's numeric `availableAt` is only that arithmetic input reference
+required by the working scorer; it supplies no availability certificate. Plan
+freezing validates and copies the explicit binding without changing scoring or
+adding this field to legacy plans.
+The artifact remains research-only, with historical-feature, learning and native
+activation flags false. Comparison validation requires matching bindings,
+encoding, vector length and binary entries; comparisons refer to the immutable source candidate
+projection rather than duplicating it into their bounded receipt. No current
+catalog lookup is permitted when later evaluating that source.
+
 One private `prediction_candidate_score_working_v1` consumes the frozen
 STATIC/ORDERED candidate adjustments bounded to ±0.25. Its serving control is
 fixed to OFF and returns the legacy scorer's exact number directly. This is
@@ -1541,8 +1583,8 @@ The config-only precision forward
 writer's function-local `extra_float_digits=3`. Each new JSON score must
 round-trip to the same binary double as its frozen scorer output even when
 the caller requests rounded float output; the caller setting restores on return.
-This applies to both captured-source generations without changing the scorer,
-function body/identity/ACL or prior rows. Existing rounded comparison receipts
+This applies to all supported captured-source generations without changing the
+scorer, function body/identity/ACL or prior rows. Existing rounded comparison receipts
 remain immutable; an exact-OFF audit must still reject a mismatched old receipt
 rather than tolerate or rewrite it.
 
@@ -1588,7 +1630,7 @@ with incomplete control/prefix declarations and no retained partial evidence.
 Unsupported control boundaries or unrepresentable timestamp precision also
 abstain through `INPUT_UNAVAILABLE`. Old v1 sources/comparisons and copied V2
 pages remain supported and frozen; a fresh V3 page sees the new control.
-Serving remains exact OFF for both generations.
+Serving remains exact OFF for all supported generations.
 
 Forecast-only `PREDICTION_RUN`, `PROFILE` and `ACTOR` source erasure retains the
 raw control ledger alongside raw Events, so deleting derived forecasts cannot
@@ -1648,13 +1690,25 @@ for STATIC and ORDERED. Its weight concentration distinguishes many contributing
 Items from one heavily weighted Item. A Kish-style concentration count is a
 property of those weights, not proof of independent observations, calibrated
 uncertainty or a sufficient sample for admission. It does not change the working
-formula or the native capture budgets. Existing native candidate explanations
-freeze only the two working adjustments, not full candidate features; captured
-input-closure Item features cannot substitute for every candidate. The adapter
-therefore declares candidate-specific support unavailable through
-`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE` instead of reading current Item tags or
-inventing weights. Pure complete-feature support fixtures are separate from a
-frozen native feature producer.
+formula or the native capture budgets. Old native v1/v2 candidate explanations
+freeze only the two working adjustments; their candidate-specific support stays
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`. Captured input-closure Item features
+cannot substitute for every candidate. The v3 producer freezes the complete dense
+candidate projection described above, so its adapter can decode the compact
+vector against the exact captured dimension order and derive support from the
+actual frozen input prefix without reading current Item features. Inert v3 captures remain explicitly unavailable. An AVAILABLE all-zero
+projection instead reports zero feature coverage, not missing features.
+
+For active v3 support, caller-supplied `references.inputObjects` covers the exact
+captured input-Item set and `references.inputRecords` covers every raw Event ID
+and exact UNDO target, including targets outside retained raw rows. Input and
+ranked occurrences of the same Item must reuse one scoped Object alias; distinct
+Items and source records cannot share an alias. The adapter reconstructs the
+complete frozen Event/session/correction prefix through the existing Personal
+normalizer, replaces native Object and source-record IDs before deriving the
+portable state, and verifies its frozen schema/capture binding. Neither plans nor
+reports retain native actor/Profile/session/Item/Event/control identifiers.
+These supplied references do not prove authorization or authenticate the source.
 
 The native `normalizeKajoWorkingEvaluationPlan` adapter maps existing frozen
 Personal sources and all three actual comparison rows into a plan input; the
@@ -1665,10 +1719,10 @@ Stored `created_at` boundaries remain availability proxies with UNKNOWN commit
 visibility. An input passing structural cutoff checks is not a certified
 prospective native experiment. In particular, the existing V1 strongest-effective
 reward evaluator is unchanged: an eligible save is not silently relabeled as a
-post-consumption rating. The next native support prerequisite is a versioned
-frozen candidate-feature generation. Truthful prospective enrollment and a strict
-own-rating capture then remain explicit prerequisites for their corresponding
-quality claims. Evaluation reports retain unavailable uncertainty,
+post-consumption rating. Versioned frozen v3 candidate projections supply only
+descriptive support accounting. Truthful prospective enrollment, strict own-rating
+capture and observed exposure/label coverage remain explicit prerequisites for
+corresponding quality claims. Evaluation reports retain unavailable uncertainty,
 `descriptiveOnly=true`, `historicalFeatureEligible=false`, `learnable=false`,
 `nativeActivated=false` and `qualityAdmitted=false`; they cannot activate
 WorkingState or close MVP-ALG-004.

@@ -10,7 +10,7 @@ const controls = ['OFF', 'STATIC', 'ORDERED'];
 
 // Disposable generated actors exercise the real unchanged native producers.
 // Later labels are explicitly synthetic fixtures, never observed native quality.
-test('actual v1/v2 native frozen Working controls cross the pure evaluation adapter without native outcome claims',
+test('actual v1/v2/v3 native frozen Working controls cross the pure evaluation adapter without native outcome claims',
   { timeout: 180_000 }, async () => {
     execFileSync('npm', ['run', 'build', '--workspace', '@kajo/prediction-engine'], {
       cwd: fileURLToPath(new URL('../../', import.meta.url)), timeout: 120_000, stdio: 'pipe',
@@ -26,6 +26,8 @@ test('actual v1/v2 native frozen Working controls cross the pure evaluation adap
         grant usage on schema public,auth to anon,authenticated,service_role;`);
       const { files } = await buildFreshInstallation();
       const resetIndex = files.findIndex(file => file.name.endsWith('_personal_working_reset.sql'));
+      const featureIndex = files.findIndex(file => file.name.endsWith('_personal_working_candidate_features.sql'));
+      assert.ok(featureIndex > resetIndex);
       assert.ok(resetIndex > files.findIndex(file => file.name.endsWith('_personal_working_bridge.sql')));
       for (const file of files.slice(0, resetIndex)) await db.exec(`begin;${file.sql}commit;`);
       const actor = uuid(1), sessionId = uuid(3), evidence = [20, 21].map(uuid), admitted = [40, 41, 42, 43, 44, 45].map(uuid);
@@ -67,7 +69,7 @@ test('actual v1/v2 native frozen Working controls cross the pure evaluation adap
       const sourceV1 = await produce(); const frozenV1 = await read(sourceV1);
       assert.equal(frozenV1.source_run.state_snapshot.workingState.version, 'native-working-capture-v1');
       await db.exec('commit;');
-      for (const file of files.slice(resetIndex)) await db.exec(`begin;${file.sql}commit;`);
+      for (const file of files.slice(resetIndex, featureIndex)) await db.exec(`begin;${file.sql}commit;`);
       await db.exec('begin;');
       await db.query("select set_config('request.jwt.claim.sub',$1,true)", [actor]);
       const receipt = (await db.query('select private.commit_personal_working_reset_v1($1,$2,$3,$4) value',
@@ -87,7 +89,7 @@ test('actual v1/v2 native frozen Working controls cross the pure evaluation adap
         const scope = `actual-sql-v${index + 1}`, observedAt = Number(snapshot.observed_at), plannedAt = observedAt + 1;
         const selected = snapshot.source_candidates.filter(candidate => candidate.selected_for_delivery);
         assert.equal(selected.length, 2);
-        const closureItems = new Set(snapshot.source_run.state_snapshot.workingState.itemFeatures.map(item => item.itemId));
+        const closureItems = new Set(snapshot.source_run.state_snapshot.workingState.itemFeatures.map(item => item.id));
         assert.ok(snapshot.source_candidates.every(candidate => !closureItems.has(candidate.item_id)),
           'native frozen input-closure features are not the admitted candidate features');
         assert.ok(snapshot.source_candidates.every(candidate => !Object.hasOwn(candidate.explanation.workingIntent, 'features')
@@ -159,17 +161,71 @@ test('actual v1/v2 native frozen Working controls cross the pure evaluation adap
           snapshot.source_run.genome_id, snapshot.source_run.state_snapshot.workingState.captureId,
           ...snapshot.source_candidates.map(candidate => candidate.item_id)]) assert.equal(JSON.stringify([plan, report]).toLowerCase().includes(raw), false);
       }
+      // A genuine forward upgrades the producer only after preserving real v1/v2.
+      await db.exec('commit;');
+      for (const file of files.slice(featureIndex)) await db.exec(`begin;${file.sql}commit;`);
+      await db.exec('begin;');
+      await db.query("update public.items set tags=array['working-warm'] where id=any($1::uuid[])", [evidence]);
+      await db.query("update public.items set tags=array['candidate-only'] where id=$1", [admitted[2]]);
+      await rate(evidence[0], 0, Number((await db.query('select extract(epoch from clock_timestamp())*1000 value')).rows[0].value));
+      await rate(evidence[1], 10, Number((await db.query('select extract(epoch from clock_timestamp())*1000 value')).rows[0].value));
+      const sourceV3 = await produce(), frozenV3 = await read(sourceV3);
+      const nativeCapture = frozenV3.source_run.state_snapshot.workingState;
+      assert.equal(nativeCapture.version, 'native-working-capture-v3'); assert.equal(nativeCapture.status, 'ACTIVE');
+      const scope = 'actual-sql-v3', observedAt = Number(frozenV3.observed_at), plannedAt = observedAt + 1;
+      const rankedAliases = frozenV3.source_candidates.map((candidate, i) => ({ itemId: candidate.item_id, objectRef: `${scope}:candidate-${i}` }));
+      const inputObjects = nativeCapture.itemFeatures.map((item, i) => ({ itemId: item.id,
+        objectRef: rankedAliases.find(alias => alias.itemId === item.id)?.objectRef ?? `${scope}:input-${i}` }));
+      const recordIds = [...new Set(nativeCapture.rawEvents.flatMap(event => [event.id,
+        ...(event.event_type === 'ITEM_INTERACTION_UNDONE' ? [event.properties.reversedEventId] : [])]))];
+      const inputV3 = { actorUserId: actor, profile: { id: profileId, type: 'PERSONAL', ownerUserId: actor },
+        sourceRun: frozenV3.source_run, sourceCandidates: frozenV3.source_candidates, comparisons: frozenV3.comparisons,
+        snapshotObservedAt: observedAt, planning: { id: `${scope}:plan`, createdAt: plannedAt,
+          horizon: { startAt: plannedAt, endAt: plannedAt + 100 }, pairs: [] }, references: {
+          scopeId: scope, subjectRef: `${scope}:subject`, actorRef: `${scope}:actor`, sessionRef: `${scope}:session`,
+          sourcePredictionRef: `${scope}:prediction`, captureRef: `${scope}:capture`, objects: rankedAliases,
+          controlRefs: { OFF: `${scope}:off`, STATIC: `${scope}:static`, ORDERED: `${scope}:ordered` }, inputObjects,
+          inputRecords: recordIds.map((recordId, i) => ({ recordId, recordRef: `${scope}:record-${i}` })) } };
+      const normalizedV3 = normalizeKajoWorkingEvaluationPlan(inputV3), planV3 = freezeWorkingEvaluationPlan(normalizedV3);
+      assert.equal(planV3.working.status, 'available'); assert.ok(planV3.support);
+      assert.deepEqual(planV3.sourceBinding.candidateFeatureSnapshot, { availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT',
+        availableAt: null, inputReferenceAt: nativeCapture.asOf });
+      const positiveId = frozenV3.source_candidates.find(candidate => candidate.item_id === admitted[0]).item_id;
+      const positiveAlias = rankedAliases.find(alias => alias.itemId === positiveId).objectRef;
+      const staticSupport = planV3.support.STATIC.find(value => value.objectId === positiveAlias);
+      const orderedSupport = planV3.support.ORDERED.find(value => value.objectId === positiveAlias);
+      assert.equal(staticSupport.contributingItems, 2); assert.equal(staticSupport.effectiveItems, 2);
+      assert.deepEqual(staticSupport.coefficients.map(value => value.weight), [0.5, 0.5]);
+      assert.ok(orderedSupport.effectiveItems < 2 && orderedSupport.effectiveItems > 1);
+      assert.equal(orderedSupport.interpretation, 'ITEM_WEIGHT_CONCENTRATION_NOT_OUTCOME_SAMPLE_SIZE');
+      const zeroAlias = rankedAliases.find(alias => alias.itemId === admitted[2]).objectRef;
+      const zeroSupport = planV3.support.ORDERED.find(value => value.objectId === zeroAlias);
+      assert.equal(zeroSupport.reason, 'NO_FEATURE_COVERAGE'); assert.equal(zeroSupport.effectiveItems, 0);
+      for (const control of controls) for (const candidate of frozenV3.comparisons.find(row => row.control === control).result.candidates) {
+        const alias = rankedAliases.find(ref => ref.itemId === candidate.itemId).objectRef;
+        assert.equal(normalizedV3.controls[control].candidates.find(row => row.objectId === alias).score, candidate.score);
+      }
+      const missingInput = structuredClone(inputV3); missingInput.references.inputRecords.pop();
+      assert.throws(() => normalizeKajoWorkingEvaluationPlan(missingInput), /invalid-aliases/);
+      const corruptVector = structuredClone(inputV3); corruptVector.sourceCandidates[0].explanation.workingIntent.candidateFeatures.features[0] = 2;
+      assert.throws(() => normalizeKajoWorkingEvaluationPlan(corruptVector), /incompatible-snapshots/);
+      const falselyAvailable = structuredClone(inputV3); falselyAvailable.sourceCandidates[0].explanation.workingIntent.candidateFeatures.availableAt = nativeCapture.asOf;
+      assert.throws(() => normalizeKajoWorkingEvaluationPlan(falselyAvailable), /incompatible-snapshots/);
+      for (const raw of [actor, profileId, sessionId, sourceV3, nativeCapture.captureId, frozenV3.source_run.genome_id,
+        receipt.resetId, ...evidence, ...admitted, ...recordIds]) assert.equal(JSON.stringify(planV3).toLowerCase().includes(raw), false);
+      plans.push(planV3);
       // Current catalogue changes and control retries cannot reinterpret frozen
       // scores or fill the explicit candidate-feature gap.
       await db.exec("update public.items set tags=array['later-catalogue'],discoverable=false;");
-      for (const source of [sourceV1, sourceV2]) for (const control of controls) await db.query(
+      for (const source of [sourceV1, sourceV2, sourceV3]) for (const control of controls) await db.query(
         'select private.record_personal_working_shadow_v1($1,$2)', [source, control]);
-      for (const [source, previous] of [[sourceV1, frozenV1], [sourceV2, frozenV2]]) {
+      for (const [source, previous] of [[sourceV1, frozenV1], [sourceV2, frozenV2], [sourceV3, frozenV3]]) {
         const after = await read(source);
         assert.deepEqual(after.source_run, previous.source_run); assert.deepEqual(after.source_candidates, previous.source_candidates);
         assert.deepEqual(after.comparisons, previous.comparisons);
       }
-      assert.equal(plans.length, 2);
+      assert.deepEqual(freezeWorkingEvaluationPlan(normalizeKajoWorkingEvaluationPlan(inputV3)), planV3);
+      assert.equal(plans.length, 3);
       await db.exec('rollback;');
     } finally { await db.close(); }
   });

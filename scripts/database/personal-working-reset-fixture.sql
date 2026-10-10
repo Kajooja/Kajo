@@ -35,8 +35,8 @@ begin
   command := command||jsonb_build_object('actionId',gen_random_uuid(),'itemId',evidence_b,'occurredAt',now()-interval '3 minutes','rating',10);
   perform set_config('role','authenticated',true);perform public.commit_item_action_v1(command);perform set_config('role','postgres',true);
   before_capture := private.capture_personal_working_state_v1(actor,owned_profile,chosen_session,clock_timestamp());
-  perform pg_temp.working_reset_assert(before_capture->>'version'='native-working-capture-v2' and before_capture->>'status'='ACTIVE',
-    'actual native commands produce the current v2 active capture');
+  perform pg_temp.working_reset_assert(before_capture->>'version' in('native-working-capture-v2','native-working-capture-v3') and before_capture->>'status'='ACTIVE',
+    'actual native commands produce the current reset-aware active capture');
   request := jsonb_build_object('version',3,'requestId',gen_random_uuid(),'profileId',owned_profile,'sessionId',chosen_session,
     'discoveryMode','FOR_YOU','itemType','BOOK','limit',2,'context','{}'::jsonb);
   perform set_config('role','authenticated',true);page := public.rank_items_page_v1(request);perform set_config('role','postgres',true);
@@ -53,7 +53,7 @@ begin
   perform pg_temp.working_reset_assert(private.commit_personal_working_reset_v1(reset_id,actor,owned_profile,chosen_session)=receipt,
     'exact reset retry returns the immutable original receipt');
   cleared := private.capture_personal_working_state_v1(actor,owned_profile,chosen_session,clock_timestamp());
-  perform pg_temp.working_reset_assert(cleared->>'version'='native-working-capture-v2' and cleared->>'status'='RESET_EMPTY'
+  perform pg_temp.working_reset_assert(cleared->>'version'=before_capture->>'version' and cleared->>'status'='RESET_EMPTY'
     and cleared#>>'{support,distinctItems}'='0' and cleared->>'resetControlCount'='1'
     and cleared->'resetControlPrefixComplete'='true'::jsonb and jsonb_array_length(cleared->'resetControls')=1
     and private.personal_working_adjustment_v1(cleared,array['native-reset-warm'],'ORDERED')=0,
@@ -77,12 +77,15 @@ begin
   request := request||jsonb_build_object('requestId',gen_random_uuid());
   perform set_config('role','authenticated',true);page := public.rank_items_page_v1(request);perform set_config('role','postgres',true);
   fresh_source := (page->>'predictionId')::uuid;cleared := private.record_personal_working_shadow_v1(fresh_source,'OFF');
-  perform pg_temp.working_reset_assert((select policy_version like '%+personal-working-off-v2' and state_snapshot#>>'{workingState,version}'='native-working-capture-v2'
+  perform pg_temp.working_reset_assert((select policy_version like case before_capture->>'version'
+      when 'native-working-capture-v2' then '%+personal-working-off-v2' else '%+personal-working-off-v3' end
+    and state_snapshot#>>'{workingState,version}'=before_capture->>'version'
     and state_snapshot#>>'{workingState,status}'='ACTIVE' and state_snapshot#>>'{workingState,resetControlCount}'='1'
     and state_snapshot#>>'{workingState,resetControls,0,resetId}'=reset_id::text
     from private.prediction_runs where id=fresh_source) and not exists(select 1 from private.prediction_candidates c where c.prediction_id=fresh_source
-      and c.explanation#>>'{workingIntent,version}' is distinct from 'personal-working-features-v2'),
-    'new native source consumes the actual preceding server reset and post-reset evidence with matching v2 capture/feature/OFF policy');
+      and c.explanation#>>'{workingIntent,version}' is distinct from case before_capture->>'version'
+        when 'native-working-capture-v2' then 'personal-working-features-v2' else 'personal-working-features-v3' end),
+    'new native source consumes the actual preceding server reset and post-reset evidence with matched capture/feature/OFF policy');
   perform pg_temp.working_reset_assert(not exists(select 1 from private.prediction_candidates p
     full join jsonb_array_elements(cleared->'candidates') s(value) on p.prediction_id=fresh_source and p.item_id=(s.value->>'itemId')::uuid
     where (p.prediction_id=fresh_source or s.value is not null) and (p.item_id is null or s.value is null

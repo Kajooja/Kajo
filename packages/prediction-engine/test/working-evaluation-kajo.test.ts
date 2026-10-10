@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeKajoWorkingEvaluationPlan, KajoWorkingEvaluationSnapshotError } from '../src/adapters/kajo-working-evaluation.js';
 import type { KajoWorkingEvaluationSnapshots } from '../src/adapters/kajo-working-evaluation.js';
-import { freezeWorkingEvaluationPlan } from '../src/working-evaluation.js';
+import { normalizeKajoWorkingSession } from '../src/adapters/kajo-working-state.js';
+import type { KajoWorkingEvent, KajoWorkingSessionInput } from '../src/adapters/kajo-working-state.js';
+import type { PredictionObject } from '../src/contracts.js';
+import { deriveWorkingState, scoreWorkingAdjustment } from '../src/working-state.js';
+import type { WorkingFeatureSchema } from '../src/working-state.js';
+import { evaluateWorkingPlan, freezeWorkingEvaluationPlan } from '../src/working-evaluation.js';
+import type { WorkingEvaluationPlan, WorkingOutcomeCapture } from '../src/working-evaluation.js';
 
 // Generated row shapes test the boundary. The full-schema producer test is
 // scripts/database/working-evaluation-kajo.test.mjs; these are not native evidence.
@@ -58,6 +64,82 @@ function result(input: KajoWorkingEvaluationSnapshots, index = 0): Row { return 
 function pool(input: KajoWorkingEvaluationSnapshots, index = 0): Row[] { return result(input, index).candidates as Row[]; }
 const rejected = (input: KajoWorkingEvaluationSnapshots) => expect(() => normalizeKajoWorkingEvaluationPlan(input))
   .toThrow(KajoWorkingEvaluationSnapshotError);
+function intent(input: KajoWorkingEvaluationSnapshots, index = 0): Row {
+  return ((input.sourceCandidates[index] as Row).explanation as Row).workingIntent as Row;
+}
+function candidateFeatures(input: KajoWorkingEvaluationSnapshots, index = 0): Row {
+  return intent(input, index).candidateFeatures as Row;
+}
+function nativeEvent(n: number, item: number, rating: number, at: number): KajoWorkingEvent {
+  return { id: id(n), actor_user_id: actor, profile_id: profile, session_id: session, item_id: id(item),
+    item_type: 'BOOK', event_type: 'ITEM_RATED', occurred_at: at, created_at: at, properties: { rating } };
+}
+function schemaReference(input: KajoWorkingEvaluationSnapshots): Row {
+  const schema = capture(input).featureSchema as Row, artifact = schema.artifact as Row;
+  return { id: schema.id, version: schema.version, artifactId: artifact.id, artifactVersion: artifact.version,
+    representationVersion: artifact.representationVersion, dimensionCount: (schema.dimensions as unknown[]).length };
+}
+/** Rebuild producer-shaped diagnostics from the full canonical frozen prefix. */
+function refreshV3Diagnostics(input: Fixture): void {
+  const frozen = capture(input);
+  const normalized = normalizeKajoWorkingSession({ profile: input.profile, actorUserId: input.actorUserId,
+    session: frozen.session as KajoWorkingSessionInput['session'], events: frozen.rawEvents as KajoWorkingEvent[],
+    objects: frozen.itemFeatures as PredictionObject[], featureSchema: frozen.featureSchema as unknown as WorkingFeatureSchema,
+    asOf: frozen.asOf as number, prefixComplete: frozen.prefixComplete as boolean,
+    resetAt: frozen.resetAt as number | null,
+    refs: { scopeId: input.references.scopeId, subjectRef: input.references.subjectRef,
+      actorRef: input.references.actorRef, sessionRef: input.references.sessionRef } });
+  const state = deriveWorkingState(normalized);
+  Object.assign(frozen, { status: state.status, config: structuredClone(state.config),
+    support: structuredClone(state.support), vectors: structuredClone(state.vectors),
+    records: state.records.map(record => ({ eventId: record.observation.provenance.recordId,
+      itemId: record.observation.objectId, kind: record.kind })),
+    items: structuredClone(state.items), groups: structuredClone(state.groups) });
+  for (let i = 0; i < input.sourceCandidates.length; i++) {
+    const workingIntent = intent(input, i), envelope = candidateFeatures(input, i);
+    const dimensions = (frozen.featureSchema as unknown as WorkingFeatureSchema).dimensions;
+    const object: PredictionObject = { id: (input.sourceCandidates[i] as Row).item_id as string,
+      features: Object.fromEntries(dimensions.map((key, index) => [key, (envelope.features as number[])[index]!])),
+      availableAt: frozen.asOf as number,
+      artifact: (frozen.featureSchema as unknown as WorkingFeatureSchema).artifact };
+    for (const control of ['STATIC', 'ORDERED'] as const) {
+      const adjustment = scoreWorkingAdjustment({ state, object, control }).value;
+      workingIntent[control === 'STATIC' ? 'staticAdjustment' : 'orderedAdjustment'] = adjustment;
+      pool(input, control === 'STATIC' ? 1 : 2)[i]!.adjustment = adjustment;
+    }
+  }
+}
+function v3Fixture(): Fixture {
+  const input = fixture('v3'), frozen = capture(input);
+  const artifact = { id: 'native-working-tags', version: '1', representationVersion: 'native-binary-tags-v1',
+    availableAt: 100, trainedThrough: null, sourceRefs: ['kajo-canonical-events-v1'], use: 'research-only' } as const;
+  const schema = { id: 'native-working-tags', version: '1', dimensions: ['dark', 'warm'], artifact };
+  Object.assign(frozen, { session: { id: session, actor_user_id: actor, profile_id: profile, started_at: 0, created_at: 0 },
+    featureSchema: schema, resetAt: null, resetControls: [], resetSourceRefs: [],
+    rawEvents: [nativeEvent(11, 30, 0, 10), nativeEvent(12, 31, 10, 20)],
+    itemFeatures: [30, 31].map(n => ({ id: id(n), availableAt: 100, artifact,
+      tags: ['dark', 'warm'], sourceCreatedAt: 0, sourceUpdatedAt: 0, features: { dark: 1, warm: 1 } })) });
+  for (let i = 0; i < input.sourceCandidates.length; i++) Object.assign(intent(input, i), {
+    captureVersion: frozen.version, resetAt: null, resetSourceRefs: [], status: 'ACTIVE',
+    candidateFeatures: { version: 'native-working-candidate-features-v1', status: 'AVAILABLE', captureId,
+      asOf: 100, featureSchemaRef: schemaReference(input), featureEncoding: 'CAPTURE_DIMENSION_ORDER_BINARY_V1',
+      availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT', availableAt: null,
+      commitAvailability: 'UNKNOWN', historicalFeatureEligible: false, learnable: false, nativeActivated: false,
+      features: [[1, 1], [0, 0], [0, 1]][i], unavailableReason: null } });
+  for (const comparison of input.comparisons as Row[]) Object.assign(comparison.result as Row,
+    { captureVersion: frozen.version, resetAt: null, resetSourceRefs: [] });
+  input.references = { ...input.references,
+    inputObjects: [30, 31].map((n, i) => ({ itemId: id(n), objectRef: `fixture:input-${i}` })),
+    inputRecords: [11, 12].map((n, i) => ({ recordId: id(n), recordRef: `fixture:event-${i}` })) };
+  refreshV3Diagnostics(input);
+  return input;
+}
+function availablePlan(input: Fixture): WorkingEvaluationPlan & { working: { status: 'available' } } {
+  const plan = freezeWorkingEvaluationPlan(normalizeKajoWorkingEvaluationPlan(input));
+  expect(plan.working.status).toBe('available');
+  if (plan.working.status !== 'available') throw new Error('Expected complete v3 Working fixture');
+  return plan as WorkingEvaluationPlan & { working: { status: 'available' } };
+}
 
 describe('native Personal Working evaluation snapshot adapter', () => {
   it.each(['v1', 'v2'])('retains actual %s source and three control scores, with honest proxy clocks and missing candidate features', generation => {
@@ -154,5 +236,218 @@ describe('native Personal Working evaluation snapshot adapter', () => {
   it('checks stored calendars and rejects unsupported precision instead of conflating clocks', () => {
     const invalid = fixture(); comparison(invalid).created_at = '2024-02-30T00:00:00Z'; rejected(invalid);
     const precision = fixture(); comparison(precision).created_at = '2500-01-01T00:00:00.000001Z'; rejected(precision);
+  });
+});
+
+describe('v3 frozen candidate features and portable native support', () => {
+  it('uses the complete frozen prefix for independent Item concentration and retains actual control scores', () => {
+    const input = v3Fixture(), before = structuredClone(input), plan = availablePlan(input);
+    const candidate = plan.support!.STATIC.find(row => row.objectId === 'fixture:item-2')!;
+    const ordered = plan.support!.ORDERED.find(row => row.objectId === 'fixture:item-2')!;
+    expect(candidate.coefficients).toEqual([{ objectId: 'fixture:input-0', weight: 0.5 },
+      { objectId: 'fixture:input-1', weight: 0.5 }]);
+    expect(candidate.effectiveItems).toBe(2); expect(candidate.contributingTimeGroups).toBe(2);
+    const recency = Math.SQRT1_2;
+    expect(ordered.coefficients[0]!.weight).toBeCloseTo(recency / (recency + 1), 12);
+    expect(ordered.coefficients[1]!.weight).toBeCloseTo(1 / (recency + 1), 12);
+    expect(ordered.effectiveItems).toBeCloseTo((1 + recency) ** 2 / (1 + recency ** 2), 12);
+    expect(ordered.featureCoverage).toBe(1);
+    expect(ordered.interpretation).toBe('ITEM_WEIGHT_CONCENTRATION_NOT_OUTCOME_SAMPLE_SIZE');
+    expect(ordered.uncertainty).toBe('unavailable');
+    expect(plan.controls.STATIC.candidates.find(row => row.objectId === 'fixture:item-2')!.score).toBe(0.82);
+    expect(plan.controls.ORDERED.candidates.find(row => row.objectId === 'fixture:item-2')!.score).toBe(0.5);
+    expect(plan.working.state.support).toMatchObject({ distinctItems: 2, nativeItems: 2, syntheticItems: 0, observedRatings: 2 });
+    expect(plan.working.state.target).toEqual(plan.target);
+    expect(plan.working.state.records.every(row => row.observation.targetId === plan.target.id)).toBe(true);
+    expect(plan.sourceBinding!.candidateFeatureSnapshot).toEqual({ availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT',
+      availableAt: null, inputReferenceAt: 100 });
+    expect(input).toEqual(before); expect(freezeWorkingEvaluationPlan(plan)).toEqual(plan);
+    const tampered = structuredClone(plan); (tampered.sourceBinding!.candidateFeatureSnapshot as unknown as Row).inputReferenceAt = 99;
+    expect(() => freezeWorkingEvaluationPlan(tampered)).toThrow();
+    const missing = structuredClone(plan); (missing.sourceBinding as unknown as Row).candidateFeatureSnapshot = null;
+    expect(() => freezeWorkingEvaluationPlan(missing)).toThrow(/invalid candidate feature snapshot binding/);
+  });
+
+  it('distinguishes a complete all-zero candidate vector from unavailable features and keeps OFF exact', () => {
+    const plan = availablePlan(v3Fixture());
+    for (const control of ['STATIC', 'ORDERED'] as const) {
+      const noCoverage = plan.support![control].find(row => row.objectId === 'fixture:item-1')!;
+      expect(noCoverage.reason).toBe('NO_FEATURE_COVERAGE'); expect(noCoverage.coefficients).toEqual([]);
+      expect(noCoverage.effectiveItems).toBe(0); expect(noCoverage.featureCoverage).toBe(0);
+    }
+    expect(plan.support!.OFF.every(row => row.reason === 'OFF' && row.effectiveItems === 0)).toBe(true);
+    expect(plan.controls.OFF.candidates.map(row => row.score)).toEqual([0.1, 0.7, 0.8]);
+    const changed = v3Fixture(); pool(changed)[0]!.score = 0.8 + Number.EPSILON; rejected(changed);
+  });
+
+  it.each(['NO_SESSION', 'RESET_EMPTY', 'INPUT_UNAVAILABLE', 'BUDGET_EXCEEDED'])
+  ('retains honest inert %s source envelopes without inventing candidate support', status => {
+    const input = v3Fixture(), frozen = capture(input);
+    Object.assign(frozen, { status, prefixComplete: false, rawEvents: [], itemFeatures: [], records: [], items: [],
+      groups: [], vectors: { static: {}, ordered: {} }, featureSchema: { ...(frozen.featureSchema as Row), dimensions: [] },
+      ...(status === 'NO_SESSION' ? { session: null } : {}) });
+    for (let i = 0; i < input.sourceCandidates.length; i++) {
+      Object.assign(candidateFeatures(input, i), { status: 'UNAVAILABLE', features: null,
+        unavailableReason: 'CAPTURE_INACTIVE', featureSchemaRef: schemaReference(input) });
+      Object.assign(intent(input, i), { status, staticAdjustment: 0, orderedAdjustment: 0 });
+      pool(input, 1)[i]!.adjustment = 0; pool(input, 2)[i]!.adjustment = 0;
+    }
+    delete (input.references as unknown as Row).inputObjects; delete (input.references as unknown as Row).inputRecords;
+    const plan = freezeWorkingEvaluationPlan(normalizeKajoWorkingEvaluationPlan(input));
+    expect(plan.working).toEqual({ status: 'unavailable', reason: 'FROZEN_CANDIDATE_FEATURES_CAPTURE_INACTIVE' });
+    expect(plan.support).toBeNull(); expect(plan.controls.OFF.candidates.map(row => row.score)).toEqual([0.1, 0.7, 0.8]);
+  });
+
+  it('binds compact binary projections to the complete schema reference, cutoff and source capture', () => {
+    const mutations: ((input: Fixture) => void)[] = [
+      input => { delete intent(input).candidateFeatures; },
+      input => { candidateFeatures(input).version = 'other'; },
+      input => { candidateFeatures(input).status = 'UNAVAILABLE'; },
+      input => { candidateFeatures(input).captureId = id(99); },
+      input => { candidateFeatures(input).asOf = 99; },
+      input => { candidateFeatures(input).availableAt = 100; },
+      input => { candidateFeatures(input).availabilityBasis = 'CURRENT_MVCC_SNAPSHOT_KNOWN_AT_CAPTURE'; },
+      input => { candidateFeatures(input).commitAvailability = 'KNOWN'; },
+      input => { candidateFeatures(input).historicalFeatureEligible = true; },
+      input => { candidateFeatures(input).learnable = true; },
+      input => { candidateFeatures(input).nativeActivated = true; },
+      input => { candidateFeatures(input).unavailableReason = 'CAPTURE_INACTIVE'; },
+      input => { candidateFeatures(input).featureEncoding = 'SORTED_BINARY'; },
+      input => { delete candidateFeatures(input).featureEncoding; },
+      input => { candidateFeatures(input).features = [1]; },
+      input => { candidateFeatures(input).features = [1, 1, 0]; },
+      input => { candidateFeatures(input).features = [0.5, 1]; },
+      input => { candidateFeatures(input).features = [1, null]; },
+      input => { candidateFeatures(input).features = [1, '1']; },
+      input => { candidateFeatures(input).features = Array<number>(2); },
+      input => { candidateFeatures(input).features = Object.assign([1, 1], { extra: 0 }); },
+      input => { candidateFeatures(input).features = { dark: 1, warm: 1 }; },
+      input => { candidateFeatures(input).features = null; },
+      ...['id', 'version', 'artifactId', 'artifactVersion', 'representationVersion', 'dimensionCount']
+        .map(key => (input: Fixture) => { (candidateFeatures(input).featureSchemaRef as Row)[key] = key === 'dimensionCount' ? 1 : 'other'; }),
+      input => { (candidateFeatures(input).featureSchemaRef as Row).extra = 'other'; },
+      input => { delete candidateFeatures(input).featureSchemaRef; },
+    ];
+    for (const mutate of mutations) { const input = v3Fixture(); mutate(input); rejected(input); }
+  });
+
+  it('decodes binary positions in the original capture dimension order without resorting names', () => {
+    const input = v3Fixture(), frozen = capture(input);
+    (frozen.featureSchema as Row).dimensions = ['warm', 'dark'];
+    (frozen.itemFeatures as Row[])[0]!.features = { warm: 1, dark: 0 };
+    (frozen.itemFeatures as Row[])[1]!.features = { warm: 0, dark: 1 };
+    refreshV3Diagnostics(input);
+    const plan = availablePlan(input), candidate = plan.working.objects.find(object => object.id === 'fixture:item-0')!;
+    expect(candidate.features).toEqual({ warm: 0, dark: 1 });
+    expect(intent(input, 2).staticAdjustment).toBe(0.25);
+    expect(plan.support!.STATIC.find(row => row.objectId === candidate.id)!.coefficients)
+      .toEqual([{ objectId: 'fixture:input-1', weight: 1 }]);
+  });
+
+  it('creates own binary feature keys for prototype-like dimensions from compact vectors', () => {
+    const input = v3Fixture(), frozen = capture(input), dimensions = ['constructor', '__proto__', 'toString'];
+    (frozen.featureSchema as Row).dimensions = dimensions;
+    for (const item of frozen.itemFeatures as Row[]) {
+      item.features = Object.fromEntries(dimensions.map(key => [key, 1])); item.tags = [...dimensions];
+    }
+    for (let i = 0; i < input.sourceCandidates.length; i++) Object.assign(candidateFeatures(input, i), {
+      featureSchemaRef: schemaReference(input), features: [[1, 1, 1], [0, 0, 0], [0, 1, 0]][i] });
+    refreshV3Diagnostics(input);
+    const plan = availablePlan(input), features = plan.working.objects.find(object => object.id === 'fixture:item-0')!.features;
+    expect(features).toEqual(Object.fromEntries([['constructor', 0], ['__proto__', 1], ['toString', 0]]));
+    for (const key of dimensions) expect(Object.hasOwn(features, key)).toBe(true);
+    expect(plan.support!.ORDERED.find(row => row.objectId === 'fixture:item-0')!.effectiveItems).toBeGreaterThan(1);
+    expect(freezeWorkingEvaluationPlan(plan)).toEqual(plan);
+  });
+
+  it('requires the exact complete input Item and source-record alias closures', () => {
+    const mutations: ((input: Fixture) => void)[] = [
+      input => { delete (input.references as unknown as Row).inputObjects; },
+      input => { delete (input.references as unknown as Row).inputRecords; },
+      input => { input.references = { ...input.references, inputObjects: input.references.inputObjects!.slice(0, 1) }; },
+      input => { input.references = { ...input.references, inputRecords: input.references.inputRecords!.slice(0, 1) }; },
+      input => { input.references = { ...input.references, inputObjects: [...input.references.inputObjects!,
+        { itemId: id(99), objectRef: 'fixture:extra-item' }] }; },
+      input => { input.references = { ...input.references, inputRecords: [...input.references.inputRecords!,
+        { recordId: id(99), recordRef: 'fixture:extra-record' }] }; },
+      input => { input.references = { ...input.references, inputRecords: [input.references.inputRecords![0]!,
+        { ...input.references.inputRecords![1]!, recordRef: input.references.inputRecords![0]!.recordRef }] }; },
+    ];
+    for (const mutate of mutations) { const input = v3Fixture(); mutate(input); rejected(input); }
+  });
+
+  it('reuses the ranked alias when an input Item also belongs to the frozen pool', () => {
+    const input = v3Fixture(), frozen = capture(input);
+    (frozen.rawEvents as Row[])[0]!.item_id = id(20); (frozen.itemFeatures as Row[])[0]!.id = id(20);
+    input.references = { ...input.references, inputObjects: [{ itemId: id(20), objectRef: 'fixture:item-2' },
+      input.references.inputObjects![1]!] };
+    refreshV3Diagnostics(input);
+    expect(availablePlan(input).working.state.items.map(row => row.objectId)).toContain('fixture:item-2');
+    input.references = { ...input.references, inputObjects: [{ itemId: id(20), objectRef: 'fixture:other-alias' },
+      input.references.inputObjects![1]!] }; rejected(input);
+  });
+
+  it('preserves exact Undo lineage using aliases, including a target outside the captured prefix', () => {
+    const input = v3Fixture(), frozen = capture(input), outsideTarget = id(99), foreignSession = id(98);
+    const replaced = nativeEvent(13, 30, 10, 30);
+    const undo: KajoWorkingEvent = { ...nativeEvent(14, 30, 0, 40), event_type: 'ITEM_INTERACTION_UNDONE',
+      session_id: foreignSession, properties: { reversedEventId: id(13) } };
+    const outside: KajoWorkingEvent = { ...undo, id: id(15), occurred_at: 45, created_at: 45,
+      properties: { reversedEventId: outsideTarget } };
+    frozen.rawEvents = [...frozen.rawEvents as KajoWorkingEvent[], replaced, undo, outside];
+    input.references = { ...input.references, inputRecords: [11, 12, 13, 14, 15, 99]
+      .map(n => ({ recordId: id(n), recordRef: `fixture:event-${n}` })) };
+    refreshV3Diagnostics(input);
+    const plan = availablePlan(input);
+    expect(plan.working.state.items.find(row => row.objectId === 'fixture:input-0')!.direction).toBe(-1);
+    const invalidates = plan.working.state.records.filter(row => row.kind === 'UNDO').flatMap(row => row.invalidates!);
+    expect(invalidates).toEqual([{ sourceId: 'kajo-canonical-events-v1', recordId: 'fixture:event-13' },
+      { sourceId: 'kajo-canonical-events-v1', recordId: 'fixture:event-99' }]);
+    for (const raw of [actor, profile, session, prediction, captureId, id(6), id(20), id(21), id(22), id(30), id(31),
+      id(11), id(12), id(13), id(14), id(15), outsideTarget, foreignSession]) expect(JSON.stringify(plan)).not.toContain(raw);
+    input.references = { ...input.references, inputRecords: input.references.inputRecords!.slice(0, -1) }; rejected(input);
+  });
+
+  it('does not allow any captured native Item, Event or Undo target to leak through an alias', () => {
+    for (const raw of [id(30), id(31), id(11), id(12)]) {
+      const input = v3Fixture(); input.references = { ...input.references, actorRef: `fixture:${raw.toUpperCase()}` };
+      rejected(input);
+    }
+  });
+
+  it('rejects a tampered input feature snapshot, native vector, support count or candidate adjustment', () => {
+    const mutations: ((input: Fixture) => void)[] = [
+      input => { ((capture(input).itemFeatures as Row[])[0]!.features as Row).warm = 0.5; },
+      input => { (capture(input).itemFeatures as Row[])[0]!.availableAt = 101; },
+      input => { ((capture(input).itemFeatures as Row[])[0]!.artifact as Row).version = 'other'; },
+      input => { (capture(input).support as Row).distinctItems = 3; },
+      input => { (capture(input).support as Row).nativeItems = 0; },
+      input => { ((capture(input).vectors as Row).ordered as Row).warm = 0.2; },
+      input => { (capture(input).config as Row).maxAdjustment = 0.2; },
+      input => { (capture(input).rawEvents as Row[])[0]!.actor_user_id = id(99); },
+      input => { (capture(input).rawEvents as Row[])[0]!.occurred_at = 'not-a-date'; },
+      input => { intent(input).orderedAdjustment = 0.2; pool(input, 2)[0]!.adjustment = 0.2; },
+    ];
+    for (const mutate of mutations) { const input = v3Fixture(); mutate(input); rejected(input); }
+  });
+
+  it('retains source-record aliases so later reuse cannot become a new observed pair', () => {
+    const input = v3Fixture(), plan = availablePlan(input);
+    const labels: WorkingOutcomeCapture['labels'] = plan.pairs.flatMap(pair => [pair.leftObjectId, pair.rightObjectId])
+      .map((objectId, index) => ({ objectId, experienceId: `fixture:experience-${index}`, exposedAt: 230 + index * 10,
+        status: 'observed', observation: { subjectId: plan.scope.subject.id, actingIdentityRef: plan.scope.actingIdentityRef!,
+          objectId, actionId: `fixture:experience-${index}`, predictionId: plan.sourcePredictionId,
+          targetId: plan.target.id, targetVersion: plan.target.version, measurement: { status: 'observed', value: index ? 10 : 0 },
+          raw: { value: index ? 10 : 0, scale: plan.target.scale }, occurredAt: 250 + index * 10, availableAt: 260 + index * 10,
+          exposure: 'verified', access: { kind: 'subject', subjectId: plan.scope.subject.id },
+          provenance: { origin: 'observed', source: { kind: 'native', id: 'kajo-canonical-events-v1' },
+            recordId: index ? 'fixture:new-outcome' : input.references.inputRecords![0]!.recordRef, revision: 2 } } }));
+    const outcome: WorkingOutcomeCapture = { id: 'fixture:outcome', sourcePredictionId: plan.sourcePredictionId,
+      subjectId: plan.scope.subject.id, actingIdentityRef: plan.scope.actingIdentityRef!, sessionRef: plan.scope.sessionRef,
+      revision: 1, createdAt: 320, availableAt: 320, matureAt: 310, availabilityBasis: 'STORED_CREATED_TIME',
+      complete: true, resolutionVersion: 'fixture-terminal-v1', labels };
+    const report = evaluateWorkingPlan(plan, outcome, 330);
+    expect(report.pairs[0]!.reasons).toContain('input-outcome-reuse');
+    expect(report.unscoredPairUnits).toBe(1); expect(report.observed.nativePairUnits).toBe(0);
   });
 });

@@ -10,7 +10,128 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — bounded frozen WorkingState order evaluation
+## Current packet — frozen native Working candidate features and support
+
+### Source continuation — 2026-10-10
+
+Continue on `feat/personal-working-candidate-features`, stacked on
+[PR #318](https://github.com/Kajooja/Kajo/pull/318), exact parent source
+`9352e3e711e41e773d9092167eb58052c71156da`, tree
+`d7bd1f6a92fc037373599d9e378b700f6969345c`. The single continuation inspection
+of [CI #629](https://github.com/Kajooja/Kajo/actions/runs/38065153534) finds
+all five required jobs completed successfully: validation/all tests/application
+exports, platform/defaults, two clean native installations, populated upgrade
+and CLI installation/history. Its precision, frozen-consumer/reset and native
+installation probes pass for that exact parent source. Candidate-feature native
+acceptance belongs to this new packet's exact-source CI; no ongoing CI/APK polling
+is introduced. Fresh accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. The single
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns exact current
+publication/CI and preserves its September 30 checkpoint. Public source
+publication authorization persists; source work overlaps open admission gates.
+
+The CLI-generated guarded forward
+`20261010160025_personal_working_candidate_features.sql` introduces native
+capture/features/OFF-policy/shadow **v3**. It freezes each admitted candidate's
+dense binary projection of the actual ranking tags over the existing captured
+schema (at most 32 dimensions and 50 candidates). Each candidate carries a
+compact six-field `featureSchemaRef` and
+`featureEncoding=CAPTURE_DIMENSION_ORDER_BINARY_V1`, with a complete 0/1 array
+in the **original captured dimension order**. CaptureId/asOf, exact schema/
+artifact identity and vector length bind the immutable full schema retained once
+in the source. The adapter decodes that original order before core derivation
+sorts its copy; no candidate-only tag extends the schema. A complete
+all-zero vector stays available with zero coverage; inactive, incomplete,
+empty-schema or invalid-schema inputs have explicit unavailable features.
+The representation remains `native-binary-tags-v1`; no scorer formula, native
+control assignment, table or public API is added. Default OFF still returns the
+actual baseline directly. Previous v1/v2 sources, comparisons, frozen pages,
+retry receipts and reset lineage retain their original meanings and bytes;
+new comparisons reference the immutable candidate pool without duplicating
+vectors into the bounded receipt.
+
+Input closure is captured in one MVCC statement, but candidate tags belong to
+the later ranking statement. Candidate features therefore retain
+`availabilityBasis=SOURCE_RANKING_STATEMENT_SNAPSHOT`, `availableAt=null` and
+`commitAvailability=UNKNOWN`; `asOf` binds input cutoff rather than proving
+historical candidate availability. A frozen plan retains this distinction in
+`sourceBinding.candidateFeatureSnapshot`, with `inputReferenceAt=cutoff`.
+Portable candidate object clocks are arithmetic references for the unchanged
+scorer, not availability certificates. Historical-feature eligibility,
+learning and native activation remain false.
+
+The pure Personal adapter reconstructs active v3 WorkingState only from the
+frozen raw prefix and full input feature closure. Complete scoped Item aliases
+reuse ranked aliases on overlap; owner-stable source-record aliases cover all
+input Event IDs and exact UNDO targets, including targets outside the raw rows.
+Both input and observations adopt the audit's explicit ordinal target while
+retaining native 0–10 measurement and unverified input exposure. It checks
+reconstructed state status/counts/vectors and candidate scalar adjustments;
+independent numeric agreement uses finite 1e-12 tolerance, while actual OFF
+scores, ranks, tier, eligibility and selection stay exact. Native identity,
+input/correction/reset/session IDs cannot leak into the portable plan. The
+owner must keep record aliases stable across future captures/batches and
+reauthorize retained data after source withdrawal; descriptors do not supply
+authentication or lifecycle guards.
+
+Active v3 candidate-specific support now reports the actual frozen Item/feature
+concentration under STATIC and ORDERED weights. Tags collapse into Item
+coefficients before effective Item concentration is calculated; it is not
+independent outcome N or calibrated confidence. Old v1/v2 sources still report
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`; current catalog lookup cannot fill that
+gap. V3 inactive envelopes remain explicitly unavailable without inventing
+empty-schema features. The audit still requires prospective enrollment and
+reconciled own exposure/latest-rating/correction outcomes; source tests supply
+no observed native quality sample.
+
+Validation: full engine **193/193** with build/ESM exports, final adapter
+**27/27**, full database **140/140**, research **19 Python + 23 Node** and
+acceptance **6 + 5** pass. The candidate-feature file's final **5/5** run adds
+genuine v3 V2 cursor continuation after later catalog/correction/reset changes;
+its original capture/vector/source score, refreshed eligibility, consumed-cursor
+retry and actual continued OFF score/rank/tier/selection remain exact. Native
+fixtures cover all three modes × BOOK/MOVIE × V2/V3, the **50 × 32** candidate/
+dimension boundary, zero coverage, inactive/overflow fallback, all old v1/v2
+rows/retries and four injected body/row/precision/ACL rejection guards. Native
+CLI installs the reusable populated upgrade and current runtime receipts;
+local PGlite results do not certify native execution or real prospective data.
+A paired actual V2 probe with two inputs, 32 valid 256-UTF16-character dimension
+names and 50 candidates is accepted before/after the forward: measured window
+snapshots **459,590 → 497,590 bytes** under the unchanged **2 MiB** ceiling.
+The durable upgrade/runtime regression retains this case; it is not a universal
+headroom certificate for arbitrary sources already near the ceiling.
+Independent SQL/adapter/interop review is clean.
+
+Fresh offline root check passes lint/typecheck, dependency **43**, mobile **478**
+and catalog contracts **3**, then the parallel catalog run is interrupted
+without a completed suite. Its bounded serial retry passes all **441** catalog
+script tests. Cached-only Edge execution fails on missing `@supabase/auth-js`
+metadata. No complete local root check or fresh application export/native
+receipt is claimed; Docker/local advisors remain unavailable. All **62** tracked
+Markdown files, **291** local links and **97** anchors resolve; syntax/diff checks
+pass. All **72** previous migrations, WorkingState/scoring formula and root
+lockfile retain bytes; forward **73** changes eight exactly reviewed old
+function bodies while preserving every function identity/metadata, including
+writer-local precision3. Migration SHA-256:
+`988e84d61ab2ff39e6b132e7e351dca56c8733b731ec78c6dd58afe3ac42ee8e`.
+Source, native/hosted, device and quality acceptance remain separate. No main
+merge, hosted write, APK or account/history reset is performed.
+
+**Next bounded action:** resolve this exact publication in #229 and inspect its
+required CI once; repair a concrete sanitized failure. Then add the bounded
+Personal prospective source/pair enrollment and immutable own-exposure /
+latest-rating / correction outcome capture needed to feed the frozen audit.
+Declare an untouched evaluation window and observed coverage before any quality
+claim or canary. Preserve old strongest-episode reward interpretation and its
+historical artifacts; the ordinal target needs its own explicit resolution
+contract. Bootstrap-floor/source-aware independent support, transfer and real
+first-session usefulness remain gates before adaptive Taste/frozen challenge
+admission. Anonymous identity/retention/abuse/measurement precede real anonymous
+Taste. Keep genuine #232F Shared, #306 integration, #229 device/fresh-account,
+planned consent-based group/today flow and every release/privacy/quality gate.
+MVP-ALG-004 stays open.
+
+## Preserved frozen WorkingState order evaluation and precision repair
 
 ### Source continuation — 2026-10-10
 

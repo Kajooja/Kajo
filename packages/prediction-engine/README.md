@@ -37,7 +37,7 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
 | `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
 | `./working-evaluation` | Pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`, `evaluateWorkingPlan` and `evaluateWorkingBatch`; conditional OFF-exposed pairwise comparison, planned coverage and Item weight concentration; no capture writer or admission |
-| `./adapters/kajo-working-evaluation` | Strict `normalizeKajoWorkingEvaluationPlan` for supplied frozen Personal sources and all three actual native comparison rows; honest proxy clocks and unavailable candidate-feature support; no native label writer |
+| `./adapters/kajo-working-evaluation` | Strict `normalizeKajoWorkingEvaluationPlan` for supplied frozen Personal sources and all three actual native comparison rows; honest proxy clocks, v3 frozen-prefix candidate support and explicit older-generation unavailability; no native label writer |
 | `./adapters/movielens` | D1 pure external-rating adapter, original 0.5–5 scale, release namespaces and explicit unknown context; the core root does not import it |
 | `./ordinal` | #232E bounded exposed group Pareto pair/batch diagnostic using one frozen production/shadow candidate pool, full enrollment and own exposure; no scalar group reward or learning |
 | `./adapters/kajo-ordinal` | Strict immutable #232C artifact mapping, required scoped subject/member/enrollment handles, declared digest bindings and diagnostic-only clock/membership limits |
@@ -159,12 +159,15 @@ and captured feature availability; the package adds no database access.
 The separate [native Personal bridge](../../docs/domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
 now captures one authorized MVCC Event/session/same-Item correction snapshot
 with binary current Item tags and freezes versioned native capture into Kajo
-PredictionRuns. The first `native-working-capture-v1` /
-`personal-working-features-v1` generation remains supported; fresh reset-aware
-sources use `native-working-capture-v2` / `personal-working-features-v2` and
-`+personal-working-off-v2`. A versioned SQL consumer serves fixed OFF, returning
-the exact legacy score; owner-only `personal-working-shadow-v1` / `v2` comparisons
-actually score those frozen components under the original pool and final delivery
+PredictionRuns. The `native-working-capture-v1` / v2 generations and their
+adjustment-only explanations remain supported with frozen bytes. Fresh sources
+use reset-aware `native-working-capture-v3` / `personal-working-features-v3`,
+`+personal-working-off-v3` and `personal-working-shadow-v3`. Each v3 candidate
+freezes a compact dense binary projection of the actual ranking-statement tags
+in the capture's original dimension order, bound to its retained working
+schema/artifact. A versioned SQL consumer serves
+fixed OFF, returning the exact legacy score; owner-only generation-matched
+comparisons actually score those frozen components under the original pool and final delivery
 policy. They do not replay alternative admission/reminder policy, create genomes
 or jobs, supply observed quality or activate session ranking. Protocol 2 pages
 inherit their source; protocol 3 captures each fresh page. Old scalar contracts,
@@ -177,9 +180,13 @@ control-character tags, malformed UNDO or source timestamp precision collapse
 produce an explicit unavailable reason while real V2/V3 OFF pages retain the
 baseline. The portable core still rejects unsupported input and requires a valid
 nonempty schema, so SQL/portable parity applies to accepted nonempty states.
-Current tags are known at capture, not certified historical
-features or demonstrated semantic transfer. Stored creation remains a proxy,
-commit availability UNKNOWN, and historical/learning/ON admission remains false.
+Input tags are known in their capture snapshot. Candidate projections record
+`SOURCE_RANKING_STATEMENT_SNAPSHOT`, `availableAt:null` and UNKNOWN commit
+availability because the ranking statement can observe a later READ COMMITTED
+snapshot than the input capture. Their `asOf` binds only that input reference;
+it is not certified historical availability or demonstrated semantic transfer.
+Stored creation remains a proxy, commit availability UNKNOWN, and historical/
+learning/ON admission remains false.
 The reset-aware native source now has a separate immutable private canonical
 control ledger and API-denied SECURITY INVOKER commit helper. It requires an
 existing own Personal session, reauthorizes each exact retry before quota and
@@ -249,7 +256,7 @@ Proxy creation-time declarations cannot establish
 `prospectiveDeclaredEligibility`. The separate Kajo adapter validates supplied
 frozen native artifacts through `normalizeKajoWorkingEvaluationPlan` with
 `KajoWorkingEvaluationSnapshots`. It accepts generation-matched capture,
-features, serving suffix and OFF/STATIC/ORDERED comparison rows for v1 or v2,
+features, serving suffix and OFF/STATIC/ORDERED comparison rows for v1, v2 or v3,
 including their actual `created_at` and a trusted supplied observation boundary
 not after planning. The source binding retains scoped capture/model/mode/domain
 lineage, requested/stored creation and the trusted observation boundary, with
@@ -257,14 +264,51 @@ commit visibility UNKNOWN and historical eligibility false. Required explicit
 scoped handles cover the entire candidate
 pool; they are neither authorization certificates nor pseudonymous identities.
 The native plan declares `kajo:personal-exposed-rating-order` on the original
-0–10 scale. It adds no database migration, prospective enrollment or
-immutable strict own-rating capture. Existing native candidate explanations
-freeze adjustments rather than full candidate features; the adapter declares
-`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE` for candidate-specific support instead of
-using current tags or extrapolating input-closure Item features. A frozen native
-feature producer is the next native support prerequisite; prospective enrollment,
-a strict label writer and honest availability evidence remain subsequent explicit
-gates. The existing strongest-effective V1 reward evaluator and its save/rating
+0–10 scale. The adapter adds no persistence, prospective enrollment or
+immutable strict own-rating capture. Old native v1/v2 explanations retain
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`; their adjustment scalars and input-closure
+Item features cannot substitute for missing candidate projections.
+
+The native v3 source producer supplies `workingIntent.candidateFeatures` with
+`version: 'native-working-candidate-features-v1'`. Each candidate binds its capture
+ID and input `asOf`, with `featureSchemaRef` containing `id`, `version`,
+`artifactId`, `artifactVersion`, `representationVersion` and `dimensionCount`.
+The full schema/artifact stays once in the immutable capture.
+`featureEncoding: 'CAPTURE_DIMENSION_ORDER_BINARY_V1'` identifies a dense
+numeric 0/1 `features` array whose length exactly equals the captured dimension
+count. The adapter validates every binding and decodes entries to an own-key
+binary feature dictionary using the original `capture.featureSchema.dimensions`
+order; it never sorts, extends or substitutes dimensions. Compact references and
+vectors avoid per-candidate full-schema duplication under the unchanged 2-MiB
+protocol-2 window limit.
+
+ACTIVE complete captures with valid nonempty schemas supply `AVAILABLE`;
+inactive/incomplete/invalid captures retain `UNAVAILABLE` and null features.
+An AVAILABLE all-zero vector has actual zero feature coverage. No current
+catalog features enter reconstruction or support accounting. V3 plans
+also retain `sourceBinding.candidateFeatureSnapshot` with
+`availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT'`, `availableAt:null` and
+`inputReferenceAt` equal to the source cutoff. Candidate Objects use that cutoff
+as the working scorer's arithmetic `availableAt` reference; this is not a claim
+of historical feature availability. Plan freezing validates and copies the
+explicit metadata, preserving legacy plan shape and scoring semantics.
+
+Active v3 support additionally requires `references.inputObjects`, an exact map
+of all captured input Item IDs to scoped `objectRef` handles, and
+`references.inputRecords`, an exact map of raw Event IDs plus UNDO targets to
+scoped `recordRef` handles. A target outside retained raw rows still requires its
+alias. An Item also present in the ranked pool reuses its existing Object handle;
+different Items/source records cannot share aliases. The adapter normalizes the
+complete frozen Event/session/correction prefix, remaps Object/provenance/UNDO
+identifiers before deriving state, and retains no native identifiers in the plan
+or report. The trusted caller must keep source-record aliases stable across later
+outcome captures so correction or input reuse remains detectable. Aliases neither
+authenticate snapshots nor establish current access.
+
+These v3 candidate weights report descriptive concentration, not independent
+outcome N, calibrated confidence or observed quality. Prospective enrollment,
+a strict label writer and honest availability evidence remain explicit gates.
+The existing strongest-effective V1 reward evaluator and its save/rating
 semantics are unchanged.
 
 The [canonical evaluation contract](../../docs/domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)

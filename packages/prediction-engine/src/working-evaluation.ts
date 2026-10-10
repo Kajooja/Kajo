@@ -52,6 +52,12 @@ export interface WorkingSourceBinding {
   readonly snapshotObservedAt: number;
   readonly commitAvailability: 'UNKNOWN';
   readonly historicalFeatureEligible: false;
+  /** Candidate clock is unknown; the cutoff is only the arithmetic input reference. */
+  readonly candidateFeatureSnapshot?: {
+    readonly availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT';
+    readonly availableAt: null;
+    readonly inputReferenceAt: number;
+  };
 }
 export interface WorkingEvaluationPlanInput {
   readonly id: string;
@@ -255,10 +261,16 @@ export function freezeWorkingEvaluationPlan(input: WorkingEvaluationPlanInput): 
       && input.sourceCutoff <= binding.requestedAt && binding.requestedAt <= binding.snapshotObservedAt
       && binding.storedSourceCreatedAt <= binding.snapshotObservedAt && binding.snapshotObservedAt <= input.createdAt
       && binding.commitAvailability === 'UNKNOWN' && binding.historicalFeatureEligible === false, 'invalid source binding');
+    const candidateSnapshot = binding.candidateFeatureSnapshot;
+    valid(candidateSnapshot === undefined || (record(candidateSnapshot) && candidateSnapshot.availabilityBasis === 'SOURCE_RANKING_STATEMENT_SNAPSHOT'
+      && candidateSnapshot.availableAt === null && candidateSnapshot.inputReferenceAt === input.sourceCutoff),
+    'invalid candidate feature snapshot binding');
     sourceBinding = { kind: binding.kind, captureRef: binding.captureRef, modelVersion: binding.modelVersion,
       baseModelVersion: binding.baseModelVersion, mode: binding.mode, objectType: binding.objectType,
       requestedAt: binding.requestedAt, storedSourceCreatedAt: binding.storedSourceCreatedAt, snapshotObservedAt: binding.snapshotObservedAt,
-      commitAvailability: binding.commitAvailability, historicalFeatureEligible: false };
+      commitAvailability: binding.commitAvailability, historicalFeatureEligible: false,
+      ...(candidateSnapshot === undefined ? {} : { candidateFeatureSnapshot: {
+        availabilityBasis: candidateSnapshot.availabilityBasis, availableAt: null, inputReferenceAt: candidateSnapshot.inputReferenceAt } }) };
   }
   valid(record(input.controls) && Object.keys(input.controls).length === 3 && controls.every(control => Object.hasOwn(input.controls, control)), 'all three frozen controls required');
   const identities = new Set<string>();
