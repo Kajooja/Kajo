@@ -33,7 +33,7 @@ begin
   perform set_config('role','authenticated',true);perform public.commit_item_action_v1(command);perform set_config('role','postgres',true);
   capture := private.capture_personal_working_state_v1(actor,profile_id,session_id,clock_timestamp());
   expected := 0.25::double precision*(1-sqrt(0.5::double precision))/(1+sqrt(0.5::double precision));
-  perform pg_temp.working_assert(capture->>'version'='native-working-capture-v1' and capture->>'status'='ACTIVE'
+  perform pg_temp.working_assert(capture->>'version' in('native-working-capture-v1','native-working-capture-v2') and capture->>'status'='ACTIVE'
     and capture#>>'{support,distinctItems}'='2' and capture->'prefixComplete'='true'::jsonb,
     'canonical zero/positive commands supply two independent native session Items');
   perform pg_temp.working_assert(abs(private.personal_working_adjustment_v1(capture,array['native-working-warm'],'ORDERED')-expected)<1e-12
@@ -49,6 +49,11 @@ begin
   select jsonb_agg(to_jsonb(c) order by c.final_rank) into frozen_candidates from private.prediction_candidates c where c.prediction_id=source_id;
   perform pg_temp.working_assert(frozen_source#>>'{state_snapshot,workingState,status}'='ACTIVE',
     'actual new Personal PredictionRun freezes the authorized capture before score consumption');
+  perform pg_temp.working_assert(not exists(select 1 from private.prediction_candidates c where c.prediction_id=source_id
+    and (c.explanation#>>'{workingIntent,captureId}' is distinct from frozen_source#>>'{state_snapshot,workingState,captureId}'
+      or c.explanation#>>'{workingIntent,version}' is distinct from case frozen_source#>>'{state_snapshot,workingState,version}'
+        when 'native-working-capture-v1' then 'personal-working-features-v1' when 'native-working-capture-v2' then 'personal-working-features-v2' end)),
+    'current source uses one matched capture/feature version and exact capture provenance');
   shadow_off := private.record_personal_working_shadow_v1(source_id,'OFF');
   shadow_static := private.record_personal_working_shadow_v1(source_id,'STATIC');
   shadow_ordered := private.record_personal_working_shadow_v1(source_id,'ORDERED');

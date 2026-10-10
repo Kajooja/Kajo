@@ -30,9 +30,23 @@ are reconciled before selected-session taste is derived; another session supplie
 no positive taste or activity-clock renewal. Foreign/private/synthetic/bootstrap
 inputs are not native support. The caller explicitly declares complete session
 prefix plus correction closure; stored `created_at` is an availability proxy,
-not commit-time certification. The adapter adds no Event writer or table, native
-PredictionRun consumption or historical learning eligibility. Exact limits and
+not commit-time certification. The portable adapter adds no Event writer or
+core table. The separate versioned native bridge consumes its frozen current
+capture in Personal PredictionRuns with exact OFF serving; historical learning
+eligibility remains false. Exact limits and
 OFF/STATIC/ORDERED controls belong to the [engine README](../../packages/prediction-engine/README.md#bounded-session-intent).
+
+The private native reset ledger records session lifecycle controls rather than
+Item/taste Events. Each authorized reset freezes one server-clock boundary and
+its exact actor/Profile/session identity; retries preserve that receipt. The
+reset-aware capture copies all cutoff-visible controls alongside its complete
+Event/correction prefix, excludes taste and activity at or before the latest
+boundary, and retains the original session lifetime. Reset neither writes a
+preference nor deletes history. Forecast-only erasure retains raw controls with
+surviving raw Events; actual User/Profile/session removal cascades them. The
+ledger and controller are API-denied, with no public reset RPC or mobile control.
+The version, quota, availability and frozen replay contract belongs to
+[private native session reset controls](PREDICTION_MODEL.md#private-native-session-reset-controls).
 
 The planned ROADMAP 16.4 joint decision session keeps session exposure, veto,
 already-seen replacement and choice telemetry separate from canonical consumed

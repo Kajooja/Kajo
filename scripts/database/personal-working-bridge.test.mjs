@@ -192,7 +192,7 @@ test('native Personal Working capture and frozen default-OFF consumer preserve b
       left join pg_attrdef d on d.adrelid=a.attrelid and d.adnum=a.attnum
       where n.nspname in('public','private','auth') and c.relkind='r' and a.attnum>0 and not a.attisdropped order by a.attrelid,a.attnum`)).rows;
     // Apply the actual new forward over populated, real old forecasts and shadows.
-    for (const file of files.slice(index)) await db.exec(file.sql);
+    await db.exec(files[index].sql);
     assert.deepEqual((await db.query(`select c.oid,to_jsonb(c)-array['relpages','reltuples','relallvisible','relallfrozen','relfrozenxid','relminmxid'] properties
       from pg_class c where c.oid=any($1::oid[]) order by c.oid`, [oldTables.map(row => row.oid)])).rows, oldTables,
     'Every existing table keeps identity, owner, ACL, RLS and structural properties');
@@ -580,7 +580,7 @@ test('native Personal Working capture and frozen default-OFF consumer preserve b
     await db.exec('rollback;');
     // The upgrade itself was rollback-tested with the owned fixture. Install
     // its empty lineage separately before checking the newly introduced table.
-    for (const file of files.slice(index)) await db.exec(`begin;${file.sql}commit;`);
+    await db.exec(`begin;${files[index].sql}commit;`);
     for (const table of ['auth.users', 'public.events', 'public.item_interactions', 'public.event_sessions',
       'private.prediction_runs', 'private.prediction_candidates', 'private.shadow_prediction_runs',
       'private.shadow_prediction_candidates', 'private.prediction_page_receipts', 'private.personal_working_shadow_comparisons']) {

@@ -14,6 +14,49 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded private native WorkingState reset controls — 2026-10-10
+
+Exact parent #316 source `0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a` contains
+the finite 1e-12 vector-oracle repair; OFF/nonnumeric/source bytes stay exact.
+At the single CI #626 inspection validation/exports, platform/defaults, two clean
+native installations and populated upgrade pass; CLI remains in progress.
+Source work on `feat/personal-working-reset` overlaps without claiming native
+admission. STATUS/#229 own exact publication and one resumable task.
+
+The new CLI-generated forward adds a private immutable scoped reset-control
+ledger and API-denied security-invoker controller. Reauthorized exact receipts
+precede quota/time checks; new writes require READ COMMITTED and a post-lock
+server instant. There are at most 128 controls per actor/PersonalProfile/session.
+Capture v2 reads full cutoff-visible controls together with its bounded complete
+Item/correction prefix in one MVCC statement, freezes latest resetAt and excludes
+at-or-before taste/activity. Reset adds no taste, history deletion, clock refresh
+or four-hour session renewal. Control overflow abstains without partial evidence.
+New features/off-policy v2 retain exact default OFF; v1 frozen sources/shadows,
+page retries and copied V2 windows remain supported. Future fresh pages see resets.
+
+Raw controls survive forecast-only erasure to prevent stale-intent resurrection;
+actual User/Profile/session cascade removes them. API denial, parent-only immutable
+guard and old-object/row preservation remain enforced. All 70 previous migration
+files and root lockfile retain bytes. Existing native CLI acceptance gains bounded
+populated/runtime probes and independently connected reset-ID/Profile/quota and
+source-erasure lock races with exact owned cleanup. Migration SHA-256:
+`402250688e24c3862f61c2d2448d35a715c5016bf611da84501224fdd07f774b`;
+eight exact guarded function-body transforms preserve old identities/metadata.
+Full database **130**, affected **22**, concurrency fixture/source **3**, engine
+**137**, research **19 Python + 23 Node** and acceptance **6 + 5** pass.
+The old bridge runtime smoke passes on the latest schema. Independent reviews,
+syntax/diff and **62 Markdown / 287 local links / 93 heading references** pass.
+Fresh root lint/types, dependency **43**, mobile **478** and catalog **444** pass
+before Deno registry Connection refused (exit 1); no full root/fresh export pass.
+Local Docker/live advisors are unavailable (local54322
+connection refused); source/PGlite tests do not certify actual races or quality.
+
+Next resolve exact CI once, then prospective versioned OFF/STATIC/ORDERED quality
+and effective independent support/bootstrap/transfer/first-session evidence.
+Public reset UI/API, adaptive Taste/anonymous prerequisites, genuine #232F Shared,
+#306, #229 device/fresh-account, planned group/today flow and all release gates
+remain open. No main merge, hosted write, APK or account/history reset.
+
 ## Native WorkingState numeric comparison repair — 2026-10-10
 
 PR #316 source `7593e7b397134778fb1ac041e2d312cbd321125d` fails CI #625

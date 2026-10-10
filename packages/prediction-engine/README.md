@@ -156,10 +156,12 @@ and captured feature availability; the package adds no database access.
 
 The separate [native Personal bridge](../../docs/domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
 now captures one authorized MVCC Event/session/same-Item correction snapshot
-with binary current Item tags and freezes `native-working-capture-v1` into new
-Kajo PredictionRuns. Candidate `personal-working-features-v1` stores explicit
-STATIC/ORDERED adjustments. A versioned SQL consumer serves fixed OFF, returning
-the exact legacy score; owner-only `personal-working-shadow-v1` comparisons
+with binary current Item tags and freezes versioned native capture into Kajo
+PredictionRuns. The first `native-working-capture-v1` /
+`personal-working-features-v1` generation remains supported; fresh reset-aware
+sources use `native-working-capture-v2` / `personal-working-features-v2` and
+`+personal-working-off-v2`. A versioned SQL consumer serves fixed OFF, returning
+the exact legacy score; owner-only `personal-working-shadow-v1` / `v2` comparisons
 actually score those frozen components under the original pool and final delivery
 policy. They do not replay alternative admission/reminder policy, create genomes
 or jobs, supply observed quality or activate session ranking. Protocol 2 pages
@@ -176,8 +178,20 @@ nonempty schema, so SQL/portable parity applies to accepted nonempty states.
 Current tags are known at capture, not certified historical
 features or demonstrated semantic transfer. Stored creation remains a proxy,
 commit availability UNKNOWN, and historical/learning/ON admission remains false.
-The portable `resetAt` control does not deliver a native reset API. Native reset,
-quality against STATIC/OFF, meaningful first-session behavior and measured
+The reset-aware native source now has a separate immutable private canonical
+control ledger and API-denied SECURITY INVOKER commit helper. It requires an
+existing own Personal session, reauthorizes each exact retry before quota and
+samples its server boundary after lifecycle/ID/Profile/session locks; new writes
+require READ COMMITTED and at most 128 controls per scope. Capture freezes all
+visible controls and latest-boundary source references in the same MVCC snapshot.
+At-or-before taste/activity is excluded without renewing expiry, erasing history
+or adding reward. Reset leaves the raw prefix/correction budget intact; overflow
+retains no partial active evidence. Forecast-only erasure keeps these raw controls,
+while genuine User/Profile/session removal cascades them. Old sources/comparisons
+and V2 copies remain frozen; fresh V3 sources can observe the control. This does
+not add a public reset API/UI or change the portable package's database-free
+boundary. Product reset integration, quality against STATIC/OFF,
+meaningful first-session behavior and measured
 activation/rollback remain open gates; STATUS owns exact validation/deployment.
 
 ## Offline Shared ordinal audit
