@@ -18,6 +18,8 @@ export interface KajoWorkingEvaluationSnapshots {
   readonly sourceCandidates: readonly unknown[];
   /** Complete table rows, including created_at; result.asOf is the input cutoff. */
   readonly comparisons: readonly unknown[];
+  /** Already-authorized immutable native declaration; a later read stays later. */
+  readonly enrollment?: unknown;
   /** Owner-observed read clock, not a commit-time certificate. */
   readonly snapshotObservedAt: number;
   readonly planning: { readonly id: string; readonly createdAt: number;
@@ -164,7 +166,21 @@ export function normalizeKajoWorkingEvaluationPlan(input: KajoWorkingEvaluationS
   const genomeId = uuid(source.genome_id);
   const requestedAt = instant(source.requested_at), storedSourceAt = instant(source.created_at);
   const observedAt = clock(input.snapshotObservedAt), plannedAt = clock(planning.createdAt);
-  check(observedAt >= requestedAt && observedAt >= storedSourceAt && plannedAt >= observedAt, 'artifact-unavailable');
+  const enrollment = input.enrollment === undefined ? null : row(input.enrollment);
+  const enrolledPairs = enrollment === null ? [] : list(enrollment.pairs, 25, 1).map(row);
+  const enrolledControls = enrollment === null ? [] : list(enrollment.controls, 3, 3).map(row);
+  if (enrollment !== null) {
+    flags(enrollment);
+    check(enrollment.version === 'personal-working-enrollment-v1' && enrollment.commitAvailability === 'UNKNOWN'
+      && uuid(enrollment.actorUserId) === actor && uuid(enrollment.profileId) === profile
+      && uuid(enrollment.sourcePredictionId) === sourceId && session !== null && uuid(enrollment.sessionId) === session
+      && clock(enrollment.declaredAt) === plannedAt && observedAt >= plannedAt, 'incompatible-snapshots');
+    uuid(enrollment.enrollmentId);
+    check(new Set(enrolledPairs.map(pair => uuid(pair.pairId))).size === enrolledPairs.length
+      && new Set(enrolledControls.map(control => uuid(control.comparisonId))).size === 3
+      && new Set(enrolledControls.map(control => control.control)).size === 3, 'incompatible-snapshots');
+  }
+  check(observedAt >= requestedAt && observedAt >= storedSourceAt && (plannedAt >= observedAt || enrollment !== null), 'artifact-unavailable');
   check(['FOR_YOU', 'SURPRISE', 'RISK'].includes(text(source.discovery_mode)));
   check(source.requested_item_type === null || ['BOOK', 'MOVIE'].includes(text(source.requested_item_type)));
   const model = text(source.model_version), sourcePolicy = text(source.policy_version);
@@ -235,6 +251,8 @@ export function normalizeKajoWorkingEvaluationPlan(input: KajoWorkingEvaluationS
   ranks(candidates, 'final_score', 'final_rank', 'item_id', tier);
   const namespace = text(refs.scopeId, 128);
   const rawIds = [actor, profile, sourceId, captureId, genomeId, ...candidateIds, ...(session ? [session] : [])];
+  if (enrollment !== null) rawIds.push(uuid(enrollment.enrollmentId), ...enrolledPairs.map(pair => uuid(pair.pairId)),
+    ...enrolledControls.map(control => uuid(control.comparisonId)));
   const rawEvents = list(capture.rawEvents, 128).map(row), inputItems = list(capture.itemFeatures, 32).map(row);
   const inputIds = generation === 'v3' ? inputItems.map(item => uuid(item.id)) : [];
   const recordIds = generation === 'v3' ? [...new Set(rawEvents.flatMap(event => {
@@ -287,6 +305,10 @@ export function normalizeKajoWorkingEvaluationPlan(input: KajoWorkingEvaluationS
     const comparison = controlRows.find(r => r.control === control); check(comparison, 'incompatible-snapshots');
     check(uuid(comparison.source_prediction_id) === sourceId, 'incompatible-snapshots');
     const createdAt = instant(comparison.created_at); check(createdAt <= observedAt, 'artifact-unavailable');
+    if (enrollment !== null) {
+      const declaredControl = enrolledControls.find(value => value.control === control);
+      check(declaredControl && clock(declaredControl.createdAt) === createdAt && createdAt <= plannedAt, 'incompatible-snapshots');
+    }
     const result = row(comparison.result); flags(result);
     check(result.version === comparisonVersion && uuid(result.sourcePredictionId) === sourceId && result.control === control
       && uuid(result.captureId) === captureId && result.sourceModelVersion === model && result.sourcePolicyVersion === sourcePolicy
@@ -334,6 +356,13 @@ export function normalizeKajoWorkingEvaluationPlan(input: KajoWorkingEvaluationS
   const suppliedHorizon = row(planning.horizon);
   const horizon = { startAt: clock(suppliedHorizon.startAt), endAt: clock(suppliedHorizon.endAt) };
   check(horizon.startAt >= plannedAt && horizon.endAt > horizon.startAt);
+  if (enrollment !== null) {
+    const enrolledHorizon = row(enrollment.horizon), plannedPairs = list(planning.pairs, 25, 1).map(row);
+    check(clock(enrolledHorizon.startAt) === horizon.startAt && clock(enrolledHorizon.endAt) === horizon.endAt
+      && clock(enrollment.matureAt) >= horizon.endAt && enrolledPairs.length === plannedPairs.length
+      && enrolledPairs.every((pair, index) => uuid(pair.leftItemId) === uuid(plannedPairs[index]!.leftItemId)
+        && uuid(pair.rightItemId) === uuid(plannedPairs[index]!.rightItemId)), 'incompatible-snapshots');
+  }
   const normalized: WorkingEvaluationPlanInput = { id: text(planning.id), sourcePredictionId: text(refs.sourcePredictionRef),
     scope: { subject: { id: text(refs.subjectRef), kind: 'individual' }, actingIdentityRef: text(refs.actorRef),
       sessionRef: text(refs.sessionRef), evidence: { sourceIds: ['kajo-canonical-events-v1'], cohortIds: [], synthetic: 'exclude' } },
@@ -346,6 +375,8 @@ export function normalizeKajoWorkingEvaluationPlan(input: KajoWorkingEvaluationS
       objectType: source.requested_item_type === null ? 'ANY' : source.requested_item_type as string,
       requestedAt, storedSourceCreatedAt: storedSourceAt, snapshotObservedAt: observedAt,
       commitAvailability: 'UNKNOWN', historicalFeatureEligible: false,
+      ...(enrollment === null ? {} : { prospectiveDeclaration: {
+        basis: 'STORED_PROSPECTIVE_DECLARATION', declarationRef: text(planning.id), declaredAt: plannedAt, commitAvailability: 'UNKNOWN' } }),
       ...(generation !== 'v3' ? {} : { candidateFeatureSnapshot: {
         availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT', availableAt: null, inputReferenceAt: cutoff } }) },
     versions: { capture: captureVersion, features: featureVersion, scorer: 'prediction-candidate-score-working-v1', policy: sourcePolicy },

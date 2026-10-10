@@ -14,6 +14,29 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Prospective Personal enrollment and outcomes — 2026-10-10
+
+The prior #319 source `0103d941944cbf0b545686ad60d13b08bc068b9d`, tree
+`868e9f15d91e19735c45a15e7a9de676104e43e2`, has all five CI #630 jobs successful.
+The new `feat/personal-working-prospective` packet adds CLI-generated forward74
+for private pre-evidence enrollment, durable sixteen-write reservations, immutable
+latest-terminal captures and whole-source withdrawal. Actual same-tier OFF pair
+receipt, three controls and dedicated declaration transaction precede real
+exposure. Complete correction closure preserves zero and abstains on ties/unknown/
+clear/missing; V1 strongest-episode reward remains separate. Actual later snapshot
+reads retain their clock beside the stored declaration. Source limits, erasure,
+local/native receipts and next bounded report belong to STATUS/#229. All quality,
+historical-feature, learning, activation and release gates remain open.
+
+Final resumed engineering validation: engine **220/220**, full database
+**164/164**, zero failures/skips, and independent actual-producer/commit-guard
+review pass. Native upgrade/mutation/interop/bounds/source withdrawal and
+SAVEPOINT cases are covered; no fixture adds observed quality evidence. Root
+lint/typecheck, dependency43/mobile478/catalogue444, research19Python+23Node,
+acceptance6+5 and Markdown references pass. Complete local root/app-export/native
+receipts remain unclaimed: Edge registry connection and absent local PostgreSQL
+block those gates. Exact-source CI/publication is retained only in #229.
+
 ## Frozen native candidate features and support — 2026-10-10
 
 Exact parent #318 source `9352e3e711e41e773d9092167eb58052c71156da`, tree

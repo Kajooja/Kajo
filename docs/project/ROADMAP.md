@@ -4,6 +4,22 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Prospective Personal source and evaluation order — 2026-10-10
+
+The active source successor now supplies bounded server declaration of actual OFF
+pairs and immutable latest-terminal outcome captures, with whole-source withdrawal
+and durable capture reservations. STATUS and #229 own exact publication and gates.
+Next consume those actual receipts in one bounded owner-run coverage report; freeze
+its untouched cohort/window before observed quality or canary claims. Stored
+clocks remain proxies, repeated source/subject-Item evidence remains dependent,
+and no local fixture admits learning or native activation. Preserve the existing
+bootstrap/transfer/first-session, genuine #232F, #306 and device/release order.
+
+The complete 51-part capability map remains saved separately in open PR #303.
+Its inherited #238 dependency-audit/CI blocker requires reconciliation at the
+integration slot, with successful checks on the resulting exact source. A saved
+mapping is not implemented runtime and cannot bypass those gates.
+
 ## Personal correctness and first-session value — dependency audit, 2026-10-09
 
 The next bounded correctness packet fixes the live native LongTerm decay

@@ -37,7 +37,9 @@ import { personalWorkingBridgeUpgradeSql } from './personal-working-bridge.mjs';
 import { personalWorkingResetSmokeSql, personalWorkingResetUpgradeSql } from './personal-working-reset.mjs';
 import { personalWorkingPrecisionSmokeSql, personalWorkingPrecisionUpgradeSql } from './personal-working-shadow-precision.mjs';
 import { personalWorkingCandidateFeaturesSmokeSql, personalWorkingCandidateFeaturesUpgradeSql } from './personal-working-candidate-features.mjs';
+import { personalWorkingProspectiveSmokeSql, personalWorkingProspectiveUpgradeSql } from './personal-working-prospective.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
+import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
 import { catalogDescriptionSmokeSql, catalogDescriptionUpgradeSql, catalogDescriptionConcurrency } from './catalog-descriptions.mjs';
 import { ATTRIBUTION_MODE, catalogAttributionFixtureSql, catalogAttributionSmokeSql, catalogAttributionUpgradeSql } from './catalog-attribution.mjs';
@@ -210,6 +212,15 @@ try {
       files[workingResetIndex], files[workingPrecisionIndex], files[workingCandidateFeaturesIndex]),
     { stage: 'personal-working-candidate-features-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalWorkingCandidateFeaturesUpgrade?.personalWorkingCandidateFeaturesUpgrade, /^PASS: genuine v1\/v2/);
+    const workingProspectiveIndex = files.findIndex(file => file.name.endsWith('_personal_working_prospective.sql'));
+    assert.equal(workingProspectiveIndex, workingCandidateFeaturesIndex + 1);
+    // Earlier disposable generation matrices leave the real pre-reset schema.
+    // Install the complete candidate-features predecessor before freezing actual
+    // active v3 artifacts; the prospective forward changes only its eraser body.
+    await resetFromMigrations(files.slice(0, workingProspectiveIndex));
+    const [personalWorkingProspectiveUpgrade] = await exec(await personalWorkingProspectiveUpgradeSql(files[workingProspectiveIndex]),
+      { stage: 'personal-working-prospective-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalWorkingProspectiveUpgrade?.personalWorkingProspectiveUpgrade, /^PASS: actual active v3/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -233,6 +244,11 @@ try {
     const shadowSourceErasureConcurrency = await verifyShadowSourceErasureConcurrency(execConcurrentSql);
     const sharedRoundPredictionInputsConcurrency = await verifySharedRoundPredictionInputsConcurrency(execConcurrentSql);
     const personalWorkingResetConcurrency = await verifyPersonalWorkingResetConcurrency(execConcurrentSql);
+    const personalWorkingProspectiveConcurrency = await verifyPersonalWorkingProspectiveConcurrency(execConcurrentSql);
+    assert.equal(personalWorkingProspectiveConcurrency.status, 'PASS');
+    assert.equal(personalWorkingProspectiveConcurrency.servingControl, 'OFF');
+    assert.equal(personalWorkingProspectiveConcurrency.qualityAdmission, false);
+    assert.equal(personalWorkingProspectiveConcurrency.nativeActivated, false);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -295,6 +311,12 @@ try {
     const [personalWorkingCandidateFeatures] = await exec(await personalWorkingCandidateFeaturesSmokeSql(),
       { stage: 'personal-working-candidate-features-native-freeze-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingCandidateFeatures?.personalWorkingCandidateFeatures, /^PASS: actual BOOK\/MOVIE/);
+    // The fixture owns separate committed declaration/observation transactions
+    // and restores its rows itself. Never wrap it in an outer BEGIN/ROLLBACK.
+    const prospectiveResults = await exec(await personalWorkingProspectiveSmokeSql(),
+      { stage: 'personal-working-prospective-native-enrollment-outcomes', timeoutMs: 120_000 });
+    const personalWorkingProspective = prospectiveResults.find(row => row?.personalWorkingProspective);
+    assert.match(personalWorkingProspective?.personalWorkingProspective, /^PASS: actual version3 source/);
     const [historyClear] = await exec(await readFile(new URL('history-clear-smoke.sql', import.meta.url), 'utf8'));
     assert.match(historyClear?.historyClear, /^PASS: atomic correction/);
     const [bootstrapHistory] = await exec(await readFile(new URL('bootstrap-history-smoke.sql', import.meta.url), 'utf8'));
@@ -337,6 +359,7 @@ try {
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
+      personalWorkingProspective, personalWorkingProspectiveUpgrade, personalWorkingProspectiveConcurrency,
       catalogDescriptions, catalogDescriptionUpgrade, catalogDescriptionLocks,
       catalogAttribution, catalogAttributionUpgrade, catalogAttributionLocks,
       resets: [firstRuntime, secondRuntime], history: expectedHistory,

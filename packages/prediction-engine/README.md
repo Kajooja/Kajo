@@ -375,3 +375,29 @@ disallowed artifacts return authorized native-only evidence or unavailable;
 withdrawal removes every dependent fitted parameter/index from use and requires
 a separately authorized rebuild. This tested research boundary is not a serving
 integration, a complete behavioral Scenario model or a world model.
+
+### Prospective native Working outcomes
+
+`./adapters/kajo-working-outcomes` exports `normalizeKajoWorkingOutcomeCapture`.
+A trusted owner supplies already-authorized native enrollment/capture envelopes,
+the exact frozen plan and complete scoped Item/pair/control/Event/exposure aliases.
+The optional `enrollment` input to `normalizeKajoWorkingEvaluationPlan` binds a
+stored server declaration while preserving a later actual `snapshotObservedAt`.
+The retained `sourceBinding.prospectiveDeclaration` is a stored proxy, with commit
+availability UNKNOWN; shape checks do not authenticate or authorize a receipt.
+The trusted private caller preserves the dedicated declaration transaction and
+its deferred commit constraint; forcing it immediate and later inserting paired
+evidence is outside this protocol.
+
+Kajo's private native producer declares eligible same-tier actual OFF pairs and
+all controls in a dedicated committed transaction before own exposure/outcomes.
+Mature immutable captures use latest surviving terminal occurrence and exact own
+UNDO; valid zero remains observed, ties/clear/not-interest/unknown/missing stay
+unscored. This object-observation target retains later own rating origins without
+claiming causal forecast attribution or changing strongest-episode reward.
+Event/origin-source withdrawal removes whole copied native captures; lifetime
+reservations deny reused withdrawn IDs. The pure adapter cannot retract a caller's
+already-retained object, so every read/report still needs current authorization
+and source withdrawal reconciliation. Complete planned-pair coverage and batch
+source/subject-Item reuse checks remain required. Local fixtures establish zero
+observed quality units; historical features, learning and activation stay false.

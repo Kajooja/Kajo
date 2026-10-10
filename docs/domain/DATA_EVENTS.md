@@ -36,6 +36,27 @@ capture in Personal PredictionRuns with exact OFF serving; historical learning
 eligibility remains false. Exact limits and
 OFF/STATIC/ORDERED controls belong to the [engine README](../../packages/prediction-engine/README.md#bounded-session-intent).
 
+The separate private prospective Personal producer declares actual delivered
+same-tier Item pairs and OFF/STATIC/ORDERED comparisons before own exposure or
+terminal evidence. Declaration and evidence use separate committed transactions;
+a private deferred commit guard rejects own paired evidence added before the
+declaration commits, including SAVEPOINT children. Tuple xmin is only additional
+transaction-identity defense, not an availability certificate. Actual
+source/session/mode `ITEM_IMPRESSION` after declaration and controls is required;
+page retrieval does not fabricate it. Canonical Event names remain unchanged.
+
+`personal-latest-terminal-v1` resolves the complete own Item correction prefix
+through a fixed maturity boundary. Latest surviving occurrence wins; valid rating
+zero stays observed. Exact own UNDO restores a prior surviving terminal, while
+history clear, not-interest, interest clear, malformed/missing UNDO and simultaneous
+terminal times remain clear/unknown/undone/missing coverage. A rating after horizon
+end is unscored even if visible before maturity. Raw rating session/Prediction
+origins remain available for audit without a causal attribution claim. This target
+is separate from strongest-episode reward. Immutable captures retain every copied
+raw Event dependency; Event/origin-forecast withdrawal removes the entire capture,
+never just its binding. A reservation prevents withdrawn capture ID/revision reuse.
+Stored clocks remain UNKNOWN commit proxies and grant no historical learning.
+
 The private native reset ledger records session lifecycle controls rather than
 Item/taste Events. Each authorized reset freezes one server-clock boundary and
 its exact actor/Profile/session identity; retries preserve that receipt. The

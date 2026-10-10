@@ -140,8 +140,44 @@ function availablePlan(input: Fixture): WorkingEvaluationPlan & { working: { sta
   if (plan.working.status !== 'available') throw new Error('Expected complete v3 Working fixture');
   return plan as WorkingEvaluationPlan & { working: { status: 'available' } };
 }
+function enrolledFixture(): Fixture {
+  const input = v3Fixture(); input.snapshotObservedAt = 400;
+  input.enrollment = { version: 'personal-working-enrollment-v1', enrollmentId: id(70), sourcePredictionId: prediction,
+    actorUserId: actor, profileId: profile, sessionId: session, declaredAt: input.planning.createdAt,
+    horizon: { ...input.planning.horizon }, matureAt: input.planning.horizon.endAt + 30,
+    pairs: input.planning.pairs.map((pair, index) => ({ pairId: id(71 + index),
+      leftItemId: pair.leftItemId, rightItemId: pair.rightItemId })),
+    controls: controls.map((control, index) => ({ control, comparisonId: id(80 + index), createdAt: comparison(input, index).created_at })),
+    commitAvailability: 'UNKNOWN', historicalFeatureEligible: false, learnable: false, nativeActivated: false };
+  return input;
+}
 
 describe('native Personal Working evaluation snapshot adapter', () => {
+  it('retains the actual later read clock when an immutable native enrollment fixes the earlier plan', () => {
+    const input = enrolledFixture(), before = structuredClone(input), plan = availablePlan(input);
+    expect(input).toEqual(before); expect(plan.createdAt).toBe(210); expect(plan.sourceBinding!.snapshotObservedAt).toBe(400);
+    expect(plan.sourceBinding!.prospectiveDeclaration).toEqual({ basis: 'STORED_PROSPECTIVE_DECLARATION',
+      declarationRef: 'fixture:plan', declaredAt: 210, commitAvailability: 'UNKNOWN' });
+    expect(plan.controls.OFF.createdAt).toBe(95); expect(freezeWorkingEvaluationPlan(plan)).toEqual(plan);
+    expect(plan.availabilityBasis).toBe('STORED_CREATED_TIME');
+    for (const raw of [id(70), id(71), id(80), id(81), id(82)]) expect(JSON.stringify(plan)).not.toContain(raw);
+    const undeclared = enrolledFixture(); delete undeclared.enrollment; rejected(undeclared);
+  });
+
+  it('requires exact native enrollment scope, closed versions/flags, declaration, horizon, pair orientation and actual control clocks', () => {
+    for (const [key, value] of [['version', 'personal-working-enrollment-v2'], ['actorUserId', id(99)], ['profileId', id(99)],
+      ['sessionId', id(99)], ['sourcePredictionId', id(99)], ['declaredAt', 211], ['matureAt', 309],
+      ['commitAvailability', 'CERTIFIED'], ['learnable', true], ['historicalFeatureEligible', true], ['nativeActivated', true]] as const) {
+      const input = enrolledFixture(); (input.enrollment as Row)[key] = value; rejected(input);
+    }
+    const horizon = enrolledFixture(); ((horizon.enrollment as Row).horizon as Row).endAt = 311; rejected(horizon);
+    const pair = enrolledFixture(); ((pair.enrollment as Row).pairs as Row[])[0]!.leftItemId = id(21); rejected(pair);
+    const control = enrolledFixture(); ((control.enrollment as Row).controls as Row[])[0]!.createdAt = 94; rejected(control);
+    const duplicate = enrolledFixture(); ((duplicate.enrollment as Row).controls as Row[])[2]!.control = 'OFF'; rejected(duplicate);
+    const earlierRead = enrolledFixture(); earlierRead.snapshotObservedAt = 200; rejected(earlierRead);
+    const leaked = enrolledFixture(); leaked.planning = { ...leaked.planning, id: `fixture:${id(70)}` }; rejected(leaked);
+  });
+
   it.each(['v1', 'v2'])('retains actual %s source and three control scores, with honest proxy clocks and missing candidate features', generation => {
     const raw = fixture(generation), before = structuredClone(raw), normalized = normalizeKajoWorkingEvaluationPlan(raw);
     const frozen = freezeWorkingEvaluationPlan(normalized);

@@ -11,6 +11,7 @@ import { deriveWorkingState, scoreWorkingAdjustment } from '@kajo/prediction-eng
 import { normalizeKajoWorkingSession } from '@kajo/prediction-engine/adapters/kajo-working-state';
 import { summarizeWorkingSupport, freezeWorkingEvaluationPlan, evaluateWorkingPlan,
   evaluateWorkingBatch } from '@kajo/prediction-engine/working-evaluation';
+import { normalizeKajoWorkingOutcomeCapture } from '@kajo/prediction-engine/adapters/kajo-working-outcomes';
 import { normalizeKajoWorkingEvaluationPlan } from '@kajo/prediction-engine/adapters/kajo-working-evaluation';
 
 assert.equal(typeof core.predict, 'function');
@@ -34,6 +35,8 @@ assert.equal(core.freezeWorkingEvaluationPlan, undefined);
 assert.equal(core.evaluateWorkingPlan, undefined);
 assert.equal(typeof normalizeKajoWorkingEvaluationPlan, 'function');
 assert.equal(core.normalizeKajoWorkingEvaluationPlan, undefined);
+assert.equal(typeof normalizeKajoWorkingOutcomeCapture, 'function');
+assert.equal(core.normalizeKajoWorkingOutcomeCapture, undefined);
 
 // Inspect the actual built core import graph: no app, adapter or provider dependency.
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -52,13 +55,14 @@ assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
 // contain no app or provider runtime dependency.
 for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
-  'working-evaluation.js', 'adapters/kajo-working-evaluation.js']) {
+  'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
     'ordinal.js': ['./contracts.js'],
     'adapters/kajo-ordinal.js': ['../contracts.js', '../ordinal.js'],
     'working-state.js': ['./contracts.js'],
     'adapters/kajo-working-state.js': ['../contracts.js', '../working-state.js', './kajo.js'],
+    'adapters/kajo-working-outcomes.js': ['../contracts.js', '../working-evaluation.js'],
     'working-evaluation.js': ['./contracts.js', './working-state.js'],
     'adapters/kajo-working-evaluation.js': ['../contracts.js', '../working-evaluation.js', '../working-state.js', './kajo-working-state.js'],
   }[file];

@@ -10,7 +10,103 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — frozen native Working candidate features and support
+## Current packet — prospective Personal enrollment and immutable outcomes
+
+Continue on `feat/personal-working-prospective`, stacked on
+[PR #319](https://github.com/Kajooja/Kajo/pull/319), exact parent
+`0103d941944cbf0b545686ad60d13b08bc068b9d`, tree
+`868e9f15d91e19735c45a15e7a9de676104e43e2`. The continuation inspection of
+[CI #630](https://github.com/Kajooja/Kajo/actions/runs/38091350048) confirms all
+five required jobs successful: validation/exports, platform/defaults, two clean
+installations, CLI/history and populated upgrade. APK was skipped without opt-in.
+Accepted main remains `34d21704cafe21091a2369396c9bc61dce99c1e9`.
+The single [#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns this
+packet's exact published head/tree/CI receipt and preserves its original draft
+head and September 30 checkpoint. Source publication authorization persists.
+
+CLI2.117.0 forward `20261010225549_personal_working_prospective.sql` adds four
+private, API-denied relations for immutable enrollments, capture reservations,
+latest-terminal captures and complete Event dependency edges. One fresh actual
+v3 page source may enroll once, with 1–25 disjoint eligible OFF-delivered same-tier
+pairs and all three frozen controls, before any own paired-Item exposure or
+terminal evidence. The server declares a 1-second–90-day horizon and 0–7-day
+settlement period. Limits are 128 enrollments per actor/Profile and 16 lifetime
+capture reservations per enrollment; withdrawal does not free an ID or revision.
+The comparison UUID is a deterministic alias for the existing immutable
+source/control composite key, not a newly added comparison table identity.
+
+Enrollment requires a dedicated READ COMMITTED transaction: lifecycle EXCLUSIVE
+first, then Event SHARE before Profile/source/session locks. This waits for both
+canonical writers and already-started raw Event INSERTs, and briefly blocks new
+ones until COMMIT. It rejects a preheld lifecycle SHARE upgrade. The owner commits
+that declaration before recording exposure. A private deferred commit guard
+rejects any own paired evidence added before that COMMIT, including SAVEPOINT
+child transactions. Capturing in the declaration's top transaction also rejects.
+Tuple xmin exclusion is only additional defense, not an arrival-time certificate.
+This serialization is bounded private diagnostic work, not a user serving path.
+
+A mature capture reads one complete own Item terminal/correction prefix through
+the predetermined maturity boundary, at most 8,192 Events / 8 MiB. Oversized
+prefixes abstain completely. Latest surviving rating wins by occurrence time;
+valid zero is observed, exact own UNDO can restore an earlier surviving terminal,
+clear/not-interest/missing/malformed or tied terminal times remain unscored.
+This separate `personal-latest-terminal-v1` resolution never replaces V1's
+strongest-episode reward. Actual source/session/mode impressions after declaration
+and all three controls are required; a fetched receipt alone is not exposure.
+The object-observation target permits a later own rating from another session or
+without forecast attribution, retaining its raw origin rather than borrowing an
+older attributed rating. Copied raw Event or origin-forecast withdrawal removes
+the whole capture, while its reservation survives until enrollment/source erasure.
+Forecast erasure retains unrelated canonical Events. A later capture with an
+erased or foreign raw forecast-origin pointer abstains completely through
+`ORIGIN_SOURCE_UNAVAILABLE`, preventing copied-source reconstruction. Sorted source row locks and
+the existing guarded erasure budget protect dependency creation/removal.
+
+The pure `./adapters/kajo-working-outcomes` export binds these already-authorized
+receipts to the exact frozen portable plan and scoped aliases, including input
+Items and correction targets. A stored prospective declaration permits an honest
+later snapshot read while retaining the actual read clock. Stored clocks keep
+commit availability UNKNOWN; historical features, learning, native activation
+and quality admission remain false. Different source plans can share Items;
+source-event and subject/Item-pair reuse must be rejected by the existing batch
+consumer, never presented as independent evidence.
+
+Fresh final validation: engine **220/220** and built ESM/import isolation pass;
+full serial database **164/164**, zero failures/skips, including populated
+preservation, four injected mutation rejections, actual SQL-to-plan-to-outcome
+interoperability, row/byte budgets and SAVEPOINT commit regressions. Independent
+final review reproduces the old same-commit bug and confirms its rejection.
+Root lint/typecheck, dependency **43**, mobile **478** and catalogue **444** checks
+pass (catalogue Node **441** rerun serially after the root command stopped without
+a completed catalogue summary). Research **19 Python + 23 Node**, acceptance
+**6 + 5** and **62 Markdown / 291 local links / 97 anchors** pass. Complete local
+`npm run check` and fresh app exports remain unclaimed: isolated Edge loading
+fails on registry.npmjs.org Connection refused, and local Supabase lint cannot
+connect to a running PostgreSQL/Docker stack. Actual independently connected
+native concurrency and installation gates require this packet's exact-source CI.
+
+Exact-source publication/native acceptance is recorded in #229. Local fixture
+results are engineering evidence and contribute zero observed quality units.
+Source work does not close hosted, device, first-session or release gates.
+
+**Single next action:** verify this packet's exact source and inspect its completed
+required CI gates once; repair a concrete failure. Then add a bounded owner-run
+report consuming actual enrollment/capture snapshots and their frozen plans,
+retaining every planned pair in coverage, source reuse checks and actor/session
+clusters. Declare the untouched cohort/report window before collecting observed
+quality evidence or a canary. Keep bootstrap-floor/independent support/transfer/
+first-session usefulness, real anonymous Taste prerequisites, genuine #232F Shared,
+#306 integration and #229 configured-device/fresh-account/MVP gates open.
+
+Separate unfinished documentation [PR #303](https://github.com/Kajooja/Kajo/pull/303)
+retains its 51-part engine capability map and inherited #238 security/CI blocker.
+Its old checkpoint is not this packet's state; reconcile it in the #306 integration
+slot rather than importing stale STATUS or bypassing its required checks.
+
+## Previous packet — frozen native Working candidate features and support
+
+This checkpoint preserves the previous implementation record. CI #630 completion
+and the current next action above supersede its old pending-state instructions.
 
 ### Source continuation — 2026-10-10
 

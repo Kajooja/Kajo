@@ -10,6 +10,14 @@ Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
 Canonical launch flow: [LAUNCH_LOOP.md](LAUNCH_LOOP.md). Execution order: [ROADMAP.md](../project/ROADMAP.md). Long-term vision: [FUTURE_PLAN.md](FUTURE_PLAN.md). Generic engine: [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). External data: [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md).
 
+Prospective Personal enrollments and latest-terminal captures are now a separate
+active source foundation. They require a declared window and genuine own OFF
+exposure, retain zero/clear/UNDO/missing coverage, and withdraw copied captures
+with their sources. This supplies engineering provenance rather than release
+quality: observed usefulness, independent support, bootstrap/transfer, genuine
+Shared and all native/hosted/device/privacy gates remain required. STATUS owns
+exact publication and acceptance.
+
 ## MVP completion meaning
 
 `MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.

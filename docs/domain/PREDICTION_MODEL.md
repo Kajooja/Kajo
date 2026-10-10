@@ -1639,6 +1639,48 @@ controls. The immutable guard permits DELETE only after a required parent is
 gone; direct UPDATE/DELETE with live parents stays denied. No runtime quality,
 serving ON policy, user API, UI or hosted activation follows from this source.
 
+#### Private prospective WorkingState outcome source
+
+The active successor adds private `enroll_personal_working_evaluation_v1` and
+`capture_personal_working_outcomes_v1` producers. A fresh actual v3 receipt binds
+one immutable source to 1–25 disjoint same-tier eligible OFF-selected pairs and
+three actual frozen controls; prior own impressions/terminals reject declaration.
+Server clocks declare a 1-second–90-day horizon and 0–7-day maturity delay.
+Dedicated READ COMMITTED enrollment takes lifecycle EXCLUSIVE then Event SHARE
+before Profile/source/session locks, preventing label arrival during selection.
+Commit before exposure. A private deferred commit guard rejects newly visible
+own paired evidence in that same commit, including SAVEPOINT child transactions;
+capture in the declaration top transaction rejects too. Tuple xmin is additional
+defense and proves only tuple transaction identity. Limits are 128 actor/Profile plans and
+16 lifetime capture reservations, preserved across capture withdrawal.
+
+A mature capture uses one complete own relevant Event/correction snapshot through
+the fixed maturity cutoff (8,192 rows / 8 MiB); excess abstains without a partial
+prefix. `personal-latest-terminal-v1` uses latest surviving occurrence, valid
+0–10 integer ratings and exact own UNDO, with no UUID winner for terminal ties.
+Only an actual immutable-source/session/mode impression strictly after declaration
+and all controls supports an observed horizon label. Later unattributed own rating
+can replace an earlier attributed one: this is object-observation, not a causal
+reward. Clear, not-interest, missing, unresolved correction and out-of-horizon
+terminals remain unscored. Existing strongest-episode reward is untouched.
+
+Capture/Event bindings and sorted source KEY SHARE locks withdraw whole copied
+captures on raw Event or copied origin-forecast deletion. The guarded eraser adds
+all four new relations to its existing complete dependent-row budget; old rows,
+function metadata, source/pages/retries and exact OFF values retain bytes. Missing
+or foreign copied origin pointers make a later capture wholly unavailable; raw
+canonical Events cannot rebuild an already-withdrawn forecast-origin artifact.
+Different sources may reuse Items, but the batch must reject dependent repeated
+source-record/subject-Item pairs. No independence follows from a plan count.
+
+The pure outcome adapter aliases authorized receipts into the exact portable plan.
+An optional stored prospective declaration preserves server declaredAt and an
+honest later snapshotObservedAt, with UNKNOWN commit availability, rather than
+backdating the owner's read. Capture availableAt is the actual observed read
+proxy. Historical-feature eligibility, learning, native activation and quality
+admission remain false. Native CI, hosted/device, untouched observed cohort and
+real usefulness are separate gates owned by STATUS/#229.
+
 #### Bounded offline WorkingState evaluation
 
 The separate portable `./working-evaluation` boundary evaluates immutable

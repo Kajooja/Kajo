@@ -26,6 +26,19 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Prospective Personal evaluation evidence — active source only
+
+| Boundary | Meaningful paths |
+| --- | --- |
+| Private immutable enrollment, lifetime reservation, latest-terminal capture and erasure edges | `supabase/migrations/20261010225549_personal_working_prospective.sql` |
+| Native populated preservation, real SQL acceptance and independently connected lock races | `scripts/database/personal-working-prospective*.mjs`, `personal-working-prospective-fixture.sql`, existing `run-ci-cli-installation-probe.mjs` |
+| Authorized native receipt to scoped portable outcome | `packages/prediction-engine/src/adapters/kajo-working-outcomes.ts` and its optional package export |
+| Stored declaration and actual later read binding | Existing `adapters/kajo-working-evaluation.ts` / `working-evaluation.ts` |
+| Actual SQL producer → plan → outcomes → coverage regression | `scripts/database/working-outcomes-kajo.test.mjs` |
+
+STATUS owns exact source/native acceptance. These private producers retain exact
+OFF and UNKNOWN commit availability; they add no serving API or quality admission.
+
 ## Native memory/serving decay parity — active source only
 
 `20261009103214_personal_native_decay_parity.sql` introduces the versioned

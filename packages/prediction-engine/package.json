@@ -50,6 +50,10 @@
     "./adapters/kajo-working-evaluation": {
       "types": "./dist/adapters/kajo-working-evaluation.d.ts",
       "import": "./dist/adapters/kajo-working-evaluation.js"
+    },
+    "./adapters/kajo-working-outcomes": {
+      "types": "./dist/adapters/kajo-working-outcomes.d.ts",
+      "import": "./dist/adapters/kajo-working-outcomes.js"
     }
   },
   "scripts": {

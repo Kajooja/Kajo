@@ -52,6 +52,13 @@ export interface WorkingSourceBinding {
   readonly snapshotObservedAt: number;
   readonly commitAvailability: 'UNKNOWN';
   readonly historicalFeatureEligible: false;
+  /** Stored declaration is separate from a later authorized snapshot read. */
+  readonly prospectiveDeclaration?: {
+    readonly basis: 'STORED_PROSPECTIVE_DECLARATION';
+    readonly declarationRef: string;
+    readonly declaredAt: number;
+    readonly commitAvailability: 'UNKNOWN';
+  };
   /** Candidate clock is unknown; the cutoff is only the arithmetic input reference. */
   readonly candidateFeatureSnapshot?: {
     readonly availabilityBasis: 'SOURCE_RANKING_STATEMENT_SNAPSHOT';
@@ -256,10 +263,16 @@ export function freezeWorkingEvaluationPlan(input: WorkingEvaluationPlanInput): 
   let sourceBinding: WorkingSourceBinding | undefined;
   if (input.sourceBinding !== undefined) {
     const binding = input.sourceBinding;
+    const declaration = binding?.prospectiveDeclaration;
+    valid(declaration === undefined || (record(declaration) && Object.keys(declaration).length === 4
+      && ['basis', 'declarationRef', 'declaredAt', 'commitAvailability'].every(key => Object.hasOwn(declaration, key))
+      && declaration.basis === 'STORED_PROSPECTIVE_DECLARATION' && declaration.declarationRef === input.id
+      && time(declaration.declaredAt) && declaration.declaredAt === input.createdAt && declaration.commitAvailability === 'UNKNOWN'),
+    'invalid prospective declaration binding');
     valid(binding && [binding.kind, binding.captureRef, binding.modelVersion, binding.baseModelVersion, binding.mode, binding.objectType].every(id)
       && time(binding.requestedAt) && time(binding.storedSourceCreatedAt) && time(binding.snapshotObservedAt)
       && input.sourceCutoff <= binding.requestedAt && binding.requestedAt <= binding.snapshotObservedAt
-      && binding.storedSourceCreatedAt <= binding.snapshotObservedAt && binding.snapshotObservedAt <= input.createdAt
+      && binding.storedSourceCreatedAt <= binding.snapshotObservedAt && (binding.snapshotObservedAt <= input.createdAt || declaration !== undefined)
       && binding.commitAvailability === 'UNKNOWN' && binding.historicalFeatureEligible === false, 'invalid source binding');
     const candidateSnapshot = binding.candidateFeatureSnapshot;
     valid(candidateSnapshot === undefined || (record(candidateSnapshot) && candidateSnapshot.availabilityBasis === 'SOURCE_RANKING_STATEMENT_SNAPSHOT'
@@ -269,6 +282,9 @@ export function freezeWorkingEvaluationPlan(input: WorkingEvaluationPlanInput): 
       baseModelVersion: binding.baseModelVersion, mode: binding.mode, objectType: binding.objectType,
       requestedAt: binding.requestedAt, storedSourceCreatedAt: binding.storedSourceCreatedAt, snapshotObservedAt: binding.snapshotObservedAt,
       commitAvailability: binding.commitAvailability, historicalFeatureEligible: false,
+      ...(declaration === undefined ? {} : { prospectiveDeclaration: {
+        basis: declaration.basis, declarationRef: declaration.declarationRef, declaredAt: declaration.declaredAt,
+        commitAvailability: declaration.commitAvailability } }),
       ...(candidateSnapshot === undefined ? {} : { candidateFeatureSnapshot: {
         availabilityBasis: candidateSnapshot.availabilityBasis, availableAt: null, inputReferenceAt: candidateSnapshot.inputReferenceAt } }) };
   }

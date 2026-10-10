@@ -185,6 +185,21 @@ describe('immutable preregistered frozen control plans', () => {
     expect(plan.sourceBinding).toEqual(binding);expect(freezeWorkingEvaluationPlan(plan)).toEqual(plan);
     expect(() => freezeWorkingEvaluationPlan({ ...x.input, sourceBinding: { ...binding, snapshotObservedAt: 111 } })).toThrow('source binding');
   });
+  it('keeps a later source read separate from a stored prospective declaration without certifying commit availability', () => {
+    const x = fixture(), binding = { kind: 'domain-native', captureRef: 'capture-ref', modelVersion: 'model-1', baseModelVersion: 'base-1',
+      mode: 'standard', objectType: 'object', requestedAt: 105, storedSourceCreatedAt: 90, snapshotObservedAt: 170,
+      commitAvailability: 'UNKNOWN' as const, historicalFeatureEligible: false as const,
+      prospectiveDeclaration: { basis: 'STORED_PROSPECTIVE_DECLARATION' as const, declarationRef: x.input.id,
+        declaredAt: x.input.createdAt, commitAvailability: 'UNKNOWN' as const } };
+    const plan = freezeWorkingEvaluationPlan({ ...x.input, sourceBinding: binding });
+    expect(plan.sourceBinding).toEqual(binding); expect(plan.createdAt).toBe(110); expect(plan.sourceBinding!.snapshotObservedAt).toBe(170);
+    expect(freezeWorkingEvaluationPlan(plan)).toEqual(plan);
+    for (const change of [{ declarationRef: 'other-plan' }, { declaredAt: 111 }, { basis: 'INFERRED' },
+      { commitAvailability: 'CERTIFIED' }, { extra: 'private' }]) {
+      expect(() => freezeWorkingEvaluationPlan({ ...x.input, sourceBinding: { ...binding,
+        prospectiveDeclaration: { ...binding.prospectiveDeclaration, ...change } as typeof binding.prospectiveDeclaration } })).toThrow('prospective declaration binding');
+    }
+  });
 });
 
 describe('shared directional mask from immutable mature terminal captures', () => {
