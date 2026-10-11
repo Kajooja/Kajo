@@ -100,6 +100,74 @@ retraction, correction or permission withdrawal; the in-memory core does not own
 a persistent store or infer missing tombstones. Raw source revisions and original
 frozen forecasts remain immutable when projections are rebuilt.
 
+## Adaptive Taste opportunity selection
+
+`./taste-selection` exports pure `selectTasteOpportunity`; the independent root
+estimator and native ranking remain unchanged. `./adapters/kajo-taste-selection`
+exports `normalizeKajoTasteSelection` and `kajoTasteStages` for a trusted,
+already-authorized own PersonalProfile snapshot. Neither module reads/writes a
+database, creates anonymous identity or admits production policy.
+
+The server caller supplies a **frozen** catalog/feature cutoff, rating scale,
+stable stage/configuration assignment, canonical candidates, append-only ordered
+presentation ledger, complete retained answer revisions and acknowledged stage
+transitions. It must preserve those inputs and persist actual presentations and
+responses. Shape checks and an owned-Profile descriptor do not authenticate that
+caller, prove historical feature availability or replace authorization.
+
+Each invocation returns one immutable QUESTION, TRANSITION or STOP. An unanswered
+current question is replayed without consuming a new opportunity. Previously
+presented Items are never repeated, moved or counted again on extension. Latest
+visible revisions replace earlier answers; duplicate identical revisions count
+once, conflicting revisions/clock regressions reject input and future revisions
+do not contaminate the current prefix. A withdrawn earlier answer loses support
+without repeating its Item; withdrawal of the current answer reopens that same
+question. Later presentation requires a preceding terminal answer in its retained
+history, even if subsequently withdrawn. UNKNOWN contributes no taste support;
+NOT_INTERESTED remains distinct and is not counted as a known rating. A rating of
+zero is a genuine known answer. Draft ratings are not inputs to this policy.
+
+For the same pool/ledger, PRIOR_ONLY orders by the catalog recognition heuristic.
+ADAPTIVE uses the fixed versioned score
+`0.65 * recognitionPrior + 0.20 * diversity + 0.15 * informationProxy`, with
+lexical Item-ID ties. Diversity is one minus the largest weighted feature Jaccard
+overlap with any presented Item. The information proxy is the candidate-feature
+weighted mean of `1 / (1 + featureSupport)`; each latest rating/not-interest
+answer adds its normalized Item features to support. It measures coverage rather
+than information entropy or expected satisfaction. Rating direction does not
+change this coverage proxy. Missing priors/features contribute zero; feature
+mass normalization avoids awarding information merely for extra tags. These are
+inspectable, uncalibrated heuristics, not recognition probabilities, accuracy,
+independent outcome sample sizes or demonstrated quality gains.
+
+Default source configuration requires at least 12 presented opportunities, allows
+at most 24, and uses **eight** known ratings as a provisional completion-support
+threshold. It deliberately does not inherit logged-in cold-start-v1's six-rating
+gate. The Kajo stage assignment proposes ten MOVIE opportunities, an acknowledged
+transition, then ten BOOK opportunities. Unknowns count as opportunities rather
+than required ratings. Each nonfinal stage advances at its quota or genuine
+catalog exhaustion. The final stage can extend to the maximum if known ratings
+remain insufficient. Sparse/exhausted catalog or the opportunity cap ends with
+explicit fail-open support; existing completed setup is reused. Generic callers
+may configure up to four disjoint-domain stages whose target total is within
+12–24; tests also execute a synthetic non-media system task.
+
+Bounds are 256 supplied candidates, 64 normalized 0..1/missing feature dimensions,
+24 unique presentations, eight retained revisions per Item and four stages.
+Features/artifacts after the frozen catalog cutoff are unavailable even when the
+session clock advances. The Kajo adapter collapses duplicate native binary tags;
+undiscoverable or mock-only/missing-provider Items are ineligible. Incompatible
+representations, unsafe scope/shape/bounds and premature transitions reject.
+
+Results retain `nativeActivated=false`, `qualityAdmitted=false` and unavailable
+uncertainty. The provisional threshold/weights need real recognizability,
+completion and first-session usefulness evaluation against PRIOR_ONLY. Server
+TasteSession, anonymous identity, retention/deletion/abuse/measurement, frozen
+holdout prediction challenge and canonical preview are separate required work.
+No ranking score is converted to a 0–10 predicted rating and no challenge score is
+manufactured by this selector. Calibration/import answers must retain their
+canonical source semantics rather than becoming native/Working evidence.
+
 ## Bounded session intent
 
 `./working-state` is a separate source-only hypothesis, not a replacement for

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { getBootstrapEvidenceRevision } from '../discovery/predictionRefresh';
 
 import {
+  appendProfileCalibrationCandidates,
   commitProfileCalibration,
   mapProfileBootstrapStatus,
   mapProfileCalibrationCandidates,
@@ -103,6 +104,28 @@ describe('profileCalibrationOperations', () => {
     expect(
       mapProfileCalibrationCandidates([{ itemId: 'x', itemType: 'GAME' }]),
     ).toBeNull();
+  });
+
+  it('preserves presented identity/order and appends only bounded new candidates', () => {
+    const presented = mapProfileCalibrationCandidates([
+      { itemId: 'a', itemType: 'MOVIE', title: 'Presented A', tags: [], creators: [] },
+      { itemId: 'b', itemType: 'BOOK', title: 'Presented B', tags: [], creators: [] },
+    ])!;
+    const candidates = mapProfileCalibrationCandidates([
+      { itemId: 'b', itemType: 'BOOK', title: 'Changed B', tags: [], creators: [] },
+      { itemId: 'c', itemType: 'MOVIE', title: 'New C', tags: [], creators: [] },
+      { itemId: 'a', itemType: 'MOVIE', title: 'Changed A', tags: [], creators: [] },
+      { itemId: 'c', itemType: 'MOVIE', title: 'Duplicate C', tags: [], creators: [] },
+      { itemId: 'd', itemType: 'BOOK', title: 'New D', tags: [], creators: [] },
+    ])!;
+    const result = appendProfileCalibrationCandidates(presented, candidates, 3);
+    expect(result.map(item => item.id)).toEqual(['a', 'b', 'c']);
+    expect(result[0]).toBe(presented[0]);
+    expect(result[1]).toBe(presented[1]);
+    expect(result[2]?.title).toBe('New C');
+    expect(presented).toHaveLength(2);
+    expect(appendProfileCalibrationCandidates([], candidates, 4).map(item => item.id))
+      .toEqual(['b', 'c', 'a', 'd']);
   });
 });
 

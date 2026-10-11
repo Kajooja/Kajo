@@ -15,9 +15,14 @@ complete supplied enrollment reconciliation, deterministic pairs, first reserved
 capture and exported-file lifecycle. No real authorized cohort is instantiated.
 The exact #322 source has all five CI #633 gates successful. Actual collection
 still requires native/operator access and an independently retained declaration.
-The October 12 continuation first integrates the separate #306 eligibility source,
-then advances bounded Personal Taste selection and the existing calibration's
-independent unknown action. It does not invent a real roster or anonymous session.
+The October 12 continuation integrates the separate #306 eligibility source in
+#323 and implements a bounded portable Personal Taste selector plus the existing
+calibration's independent unknown/prefix/scope correction. The selector has no
+native consumer yet. Next provide a coherent own-Personal server TasteSession
+with frozen policy/catalog and durable authorized presentation/response receipts,
+then the honest frozen challenge. Native distinct-Item confidence support remains
+a correctness gate. This source work does not invent a real roster or anonymous
+session.
 Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing

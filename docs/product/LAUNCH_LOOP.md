@@ -161,9 +161,22 @@ visible and usable after the rating wheel has moved, including accidental touche
 Choosing unknown discards that Item's unsubmitted draft rating and advances or
 extends the opportunity sequence without creating rating/not-interest evidence.
 Cover accidental drag, deliberate zero rating, previous/next and the last-card
-extension/fail-open case. Deliver this with the longer Phase 15.0 Taste flow;
-the current six-rating calibration still switches its combined label after a
-draft rating and has not yet received this interaction correction.
+extension/fail-open case. The October 12 source correction gives the existing
+six-rating calibration independent Next and unknown actions, preserves genuine
+zero and the presented prefix on expansion, and cancels stale profile operations.
+Its longer adaptive progression and configured-device acceptance remain open.
+
+The October 12 portable `taste-selection-v1` source returns bounded immutable
+question/transition/stop decisions from an authorized frozen input and presentation
+ledger. Its provisional rule uses 12–24 opportunities, at least eight known
+ratings, and the proposed ten MOVIE → acknowledged transition → ten BOOK stages.
+Recognition, diversity and feature-coverage proxies are compared with a fixed
+PRIOR_ONLY control; they do not measure expected satisfaction or uncertainty.
+Unknown contributes no taste support, not-interest remains distinct, and a rating
+of zero remains known. Correction/withdrawal, current-question replay and genuine
+exhaustion are explicit. The existing native six-rating calibration does not
+consume this selector. Server-backed TasteSession, anonymous prerequisites,
+challenge, preview and observed first-session usefulness remain required.
 
 The question-selection policy should optimize information gained about the Profile while retaining:
 

@@ -14,6 +14,35 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Personal Taste selector and calibration source — 2026-10-12
+
+A separate portable `taste-selection-v1` export now chooses immutable next
+questions, transitions and stops from trusted frozen caller inputs. Fixed
+ADAPTIVE/PRIOR_ONLY controls use recognition/diversity/feature-coverage heuristics;
+zero/unknown/not-interest, revisions/withdrawal, replay, no-repeat bounds and
+exhaustion are explicit. Source defaults propose 12–24 opportunities, eight known
+ratings and ten MOVIE → transition → ten BOOK. Generic non-media coverage and
+strict Kajo owned-Personal/canonical-real-Item normalization retain the independent
+root estimator graph. New tests **25/25**, full engine **245/245**, built exports,
+lint/typecheck and independent selector review pass.
+
+The existing calibration receives independent unknown after wheel movement,
+genuine zero preservation, append-only presented-prefix expansion and async
+profile-scope cancellation. Its static/interleaved six-known gate remains current;
+it does not consume the adaptive selector. Independent screen/operations
+**17/17**, full mobile **493/493**, lint/typecheck pass. Root dependency **43**,
+catalogue **444**, research **19 Python + 43 Node**, acceptance **6 + 5** and
+configured application/description exports pass. Required root check is blocked
+at unavailable Edge registry/cache; complete local success is not claimed.
+Full database serial recheck and exact source CI remain pending in STATUS/#229.
+
+No native TasteSession consumer, anonymous foundation, frozen challenge, canonical
+preview or observed usefulness is admitted. Native confidence still needs distinct
+Item support rather than summed tag counts. Required anonymous identity/retention/
+abuse/measurement, actual Working cohort/operator prerequisites, genuine #232F,
+#306 hosted rollout and configured-device/MVP gates remain open. No hosted write,
+account/history reset or main merge occurs.
+
 ## Shared overlay source integration — 2026-10-12
 
 Completed #322 CI #633 passes all five required jobs. The separate #306 source

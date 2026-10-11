@@ -41,6 +41,26 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 
 ## 3. The complete loop
 
+### Personal Taste opportunity source
+
+The source-only `taste-selection-v1` selector and Kajo adapter boundary live
+under the independent package's `./taste-selection` and
+`./adapters/kajo-taste-selection` exports. It chooses an immutable next question,
+explicit stage transition or bounded stop from caller-authorized, frozen catalog
+and response/presentation inputs. It performs no database access, clock read,
+random draw, native evidence write or production ranking activation.
+The [package contract](../../packages/prediction-engine/README.md#adaptive-taste-opportunity-selection)
+owns limits, normalization and formulas.
+
+ADAPTIVE uses recognition, diversity and a feature-coverage proxy; PRIOR_ONLY is
+the fixed diagnostic control. Feature coverage is not measured information gain,
+predicted rating, satisfaction probability or calibrated confidence. Unknown
+responses do not supply preference support; canonical negative responses and
+genuine zero remain distinct. Native TasteSession authorization, immutable
+presentation/response persistence, canonical bootstrap admission, frozen challenge
+and usefulness evidence are required before product acceptance. The root estimator,
+current native calibration policy/RPC and scorer remain unchanged.
+
 ```mermaid
 flowchart TD
   A["Observe Events"] --> B["Update memory projections"]

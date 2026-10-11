@@ -13,6 +13,8 @@ import { summarizeWorkingSupport, freezeWorkingEvaluationPlan, evaluateWorkingPl
   evaluateWorkingBatch } from '@kajo/prediction-engine/working-evaluation';
 import { normalizeKajoWorkingOutcomeCapture } from '@kajo/prediction-engine/adapters/kajo-working-outcomes';
 import { normalizeKajoWorkingEvaluationPlan } from '@kajo/prediction-engine/adapters/kajo-working-evaluation';
+import { selectTasteOpportunity } from '@kajo/prediction-engine/taste-selection';
+import { normalizeKajoTasteSelection, kajoTasteStages } from '@kajo/prediction-engine/adapters/kajo-taste-selection';
 
 assert.equal(typeof core.predict, 'function');
 assert.equal(typeof createKajoAdapter, 'function');
@@ -37,6 +39,11 @@ assert.equal(typeof normalizeKajoWorkingEvaluationPlan, 'function');
 assert.equal(core.normalizeKajoWorkingEvaluationPlan, undefined);
 assert.equal(typeof normalizeKajoWorkingOutcomeCapture, 'function');
 assert.equal(core.normalizeKajoWorkingOutcomeCapture, undefined);
+assert.equal(typeof selectTasteOpportunity, 'function');
+assert.equal(typeof normalizeKajoTasteSelection, 'function');
+assert.equal(kajoTasteStages.length, 2);
+assert.equal(core.selectTasteOpportunity, undefined);
+assert.equal(core.normalizeKajoTasteSelection, undefined);
 
 // Inspect the actual built core import graph: no app, adapter or provider dependency.
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -55,7 +62,8 @@ assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
 // contain no app or provider runtime dependency.
 for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
-  'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js']) {
+  'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
+  'taste-selection.js', 'adapters/kajo-taste-selection.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
     'ordinal.js': ['./contracts.js'],
@@ -65,10 +73,12 @@ for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js'
     'adapters/kajo-working-outcomes.js': ['../contracts.js', '../working-evaluation.js'],
     'working-evaluation.js': ['./contracts.js', './working-state.js'],
     'adapters/kajo-working-evaluation.js': ['../contracts.js', '../working-evaluation.js', '../working-state.js', './kajo-working-state.js'],
+    'taste-selection.js': ['./contracts.js'],
+    'adapters/kajo-taste-selection.js': ['../contracts.js', '../taste-selection.js'],
   }[file];
   for (const match of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)) {
     assert.ok(allowed.includes(match[1]), `Unexpected isolated runtime import in ${file}`);
   }
   assert.ok((await readFile(join(root, file.replace(/\.js$/, '.d.ts')), 'utf8')).length > 0);
 }
-console.log('Built ESM exports and independent core/ordinal/working-state/evaluation import graphs passed.');
+console.log('Built ESM exports and independent core/ordinal/working-state/evaluation/Taste import graphs passed.');

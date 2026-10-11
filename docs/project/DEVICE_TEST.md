@@ -294,6 +294,27 @@ explicit repeat-reset request above supersedes that instruction.
 
 ## Focused follow-up after correction rollout
 
+### October 12 calibration source regression — device acceptance pending
+
+Use a build containing the independent unknown/prefix/scope correction. Record
+installed source SHA, device/OS and actual results; automated screen tests and
+bundle exports do not close this observation.
+
+1. Move the rating wheel accidentally, choose **En tunne**, then return to the
+   Item: its unsubmitted rating is absent. Deliberate zero followed by Next must
+   remain a real known rating. The sixth known rating can complete immediately.
+2. Skip through the initial slate to expansion. Already presented Items keep
+   order and do not repeat; no-new-candidate exhaustion fails open. A failed
+   expansion preserves current drafts and allows retry.
+3. Switch profile or sign out while load/expand/save is pending. A delayed old
+   response must not change the new profile screen, close its calibration or
+   replace its current draft. Returning to an already completed profile must
+   not force calibration again.
+
+The native six-rating/static interleaved flow remains current. The portable
+adaptive selector, longer ten MOVIE → transition → ten BOOK progression,
+anonymous Taste and frozen challenge require their own integration/acceptance.
+
 The owner-requested repeat reset is complete. Fully restart the app, sign out/in
 if needed, and complete initial profiling again. Recreate a Shared group with the
 second account for the Shared cases. This reset does not change the current

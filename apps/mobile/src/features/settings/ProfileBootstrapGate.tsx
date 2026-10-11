@@ -1,5 +1,5 @@
 import { useRouter, useSegments } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,6 +21,7 @@ import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import { getRoomTheme } from '@/theme/roomTheme';
 
 import {
+  appendProfileCalibrationCandidates,
   commitProfileCalibration,
   loadProfileBootstrapStatus,
   loadProfileCalibrationCandidates,
@@ -29,6 +30,8 @@ import {
   type ProfileCalibrationResponse,
   type ProfileCalibrationRpc,
 } from './profileCalibrationOperations';
+
+let nextCalibrationScopeKey = 0;
 
 export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
@@ -61,30 +64,44 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
         : null,
     [client],
   );
+  const scope = useMemo(() => ({
+    key: ++nextCalibrationScopeKey,
+    profileId: personalProfile?.id ?? null,
+    activeIsPersonal,
+    rpc,
+    routeKey,
+  }), [personalProfile?.id, activeIsPersonal, rpc, routeKey]);
+  const committedScope = useRef<typeof scope | null>(null);
+  useLayoutEffect(() => {
+    committedScope.current = scope;
+    return () => {
+      if (committedScope.current === scope) committedScope.current = null;
+    };
+  }, [scope]);
 
   const refreshStatus = useCallback(async () => {
-    if (!rpc || !personalProfile || !activeIsPersonal) return;
+    if (!rpc || !personalProfile || !activeIsPersonal || committedScope.current !== scope) return;
     const profileId = personalProfile.id;
     const result = await loadProfileBootstrapStatus(rpc, profileId);
-    if (result.status === 'success') {
+    if (committedScope.current === scope && result.status === 'success') {
       setLoadedStatus({ profileId, value: result.value });
     }
-  }, [activeIsPersonal, personalProfile, rpc]);
+  }, [activeIsPersonal, personalProfile, rpc, scope]);
 
   useEffect(() => {
-    if (!rpc || !personalProfile || !activeIsPersonal) return;
+    if (!rpc || !personalProfile || !activeIsPersonal || committedScope.current !== scope) return;
 
     let active = true;
     const profileId = personalProfile.id;
     void loadProfileBootstrapStatus(rpc, profileId).then((result) => {
-      if (active && result.status === 'success') {
+      if (active && committedScope.current === scope && result.status === 'success') {
         setLoadedStatus({ profileId, value: result.value });
       }
     });
     return () => {
       active = false;
     };
-  }, [activeIsPersonal, personalProfile, routeKey, rpc]);
+  }, [activeIsPersonal, personalProfile, routeKey, rpc, scope]);
 
   const status =
     personalProfile && loadedStatus?.profileId === personalProfile.id
@@ -107,13 +124,17 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
 
   return (
     <ProfileCalibrationScreen
+      key={scope.key}
       profileId={personalProfile.id}
       rpc={rpc}
       theme={theme}
       status={status}
       onOpenImport={() => router.push('/settings')}
-      onFailOpen={() => setFailedOpenProfileId(personalProfile.id)}
+      onFailOpen={() => {
+        if (committedScope.current === scope) setFailedOpenProfileId(personalProfile.id);
+      }}
       onCompleted={() => {
+        if (committedScope.current !== scope) return;
         setFailedOpenProfileId(personalProfile.id);
         void refreshStatus();
       }}
@@ -121,7 +142,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   );
 }
 
-function ProfileCalibrationScreen({
+export function ProfileCalibrationScreen({
   profileId,
   rpc,
   theme,
@@ -139,6 +160,14 @@ function ProfileCalibrationScreen({
   onCompleted: () => void;
 }) {
   const styles = createStyles(theme);
+  const scope = useMemo(() => ({ profileId, rpc }), [profileId, rpc]);
+  const committedScope = useRef<typeof scope | null>(null);
+  useLayoutEffect(() => {
+    committedScope.current = scope;
+    return () => {
+      if (committedScope.current === scope) committedScope.current = null;
+    };
+  }, [scope]);
   const [started, setStarted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,27 +175,35 @@ function ProfileCalibrationScreen({
   const [index, setIndex] = useState(0);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [exhausted, setExhausted] = useState(false);
+  const [expandedToMaximum, setExpandedToMaximum] = useState(false);
   const current = items[index] ?? null;
   const responses: ProfileCalibrationResponse[] = Object.entries(ratings).map(
     ([itemId, rating]) => ({ itemId, rating }),
   );
   const canCommit = responses.length >= status.minimumStrongEvidence;
   const canExpand =
+    !expandedToMaximum &&
     items.length < status.maximumCandidateCount &&
     responses.length < status.minimumStrongEvidence;
 
   async function loadCandidates(limit: number, continueFromCurrent = false) {
-    if (busy) return;
+    if (busy || committedScope.current !== scope) return;
     setBusy(true);
     setError(null);
     const result = await loadProfileCalibrationCandidates(rpc, profileId, limit);
+    if (committedScope.current !== scope) return;
     if (result.status === 'error') {
       setError(result.message);
       setBusy(false);
       return;
     }
 
-    if (result.items.length < status.minimumStrongEvidence) {
+    const expandedItems = appendProfileCalibrationCandidates(
+      items,
+      result.items,
+      status.maximumCandidateCount,
+    );
+    if (expandedItems.length < status.minimumStrongEvidence) {
       setError(
         'Kajo ei pysty vielä tarjoamaan riittävää määrää oikeita profilointikortteja. Voit jatkaa nyt ja profilointi käynnistyy uudelleen, kun katalogi on valmis.',
       );
@@ -176,19 +213,20 @@ function ProfileCalibrationScreen({
     }
 
     const previousLength = items.length;
-    setItems(result.items);
-    if (continueFromCurrent && result.items.length > previousLength) {
+    setItems(expandedItems);
+    if (continueFromCurrent && expandedItems.length > previousLength) {
       setIndex(previousLength);
     } else if (!started) {
       setIndex(0);
     }
     setStarted(true);
-    setExhausted(result.items.length >= status.maximumCandidateCount);
+    if (continueFromCurrent) setExpandedToMaximum(true);
+    setExhausted(continueFromCurrent && expandedItems.length === previousLength);
     setBusy(false);
   }
 
   async function commit() {
-    if (busy || !canCommit) return;
+    if (busy || !canCommit || committedScope.current !== scope) return;
     setBusy(true);
     setError(null);
     const result = await commitProfileCalibration(
@@ -197,6 +235,7 @@ function ProfileCalibrationScreen({
       responses,
       status.minimumStrongEvidence,
     );
+    if (committedScope.current !== scope) return;
     if (result.status === 'error') {
       setError(result.message);
       setBusy(false);
@@ -207,22 +246,32 @@ function ProfileCalibrationScreen({
   }
 
   function move(delta: number) {
-    if (items.length === 0) return;
+    if (items.length === 0 || committedScope.current !== scope) return;
     setIndex((currentIndex) =>
       Math.min(items.length - 1, Math.max(0, currentIndex + delta)),
     );
   }
 
-  function next() {
+  function next(ratingCount = responses.length) {
+    if (busy || committedScope.current !== scope) return;
     if (index < items.length - 1) {
       move(1);
       return;
     }
-    if (canExpand) {
+    if (!expandedToMaximum && items.length < status.maximumCandidateCount &&
+      ratingCount < status.minimumStrongEvidence) {
       void loadCandidates(status.maximumCandidateCount, true);
       return;
     }
     setExhausted(true);
+  }
+
+  function unknown() {
+    if (busy || !current || committedScope.current !== scope) return;
+    const remainingRatings = { ...ratings };
+    delete remainingRatings[current.id];
+    setRatings(remainingRatings);
+    next(Object.keys(remainingRatings).length);
   }
 
   return (
@@ -324,12 +373,13 @@ function ProfileCalibrationScreen({
               disabled={busy}
               rating={ratings[current.id] ?? null}
               theme={theme}
-              onRatingChange={(rating) =>
+              onRatingChange={(rating) => {
+                if (committedScope.current !== scope) return;
                 setRatings((existing) => ({
                   ...existing,
                   [current.id]: rating,
-                }))
-              }
+                }));
+              }}
             />
 
             <View style={styles.navigationRow}>
@@ -348,7 +398,7 @@ function ProfileCalibrationScreen({
               <Pressable
                 accessibilityRole="button"
                 disabled={busy}
-                onPress={next}
+                onPress={() => next()}
                 style={({ pressed }) => [
                   styles.secondaryButton,
                   busy && styles.disabled,
@@ -356,16 +406,27 @@ function ProfileCalibrationScreen({
                 ]}
               >
                 <Text style={styles.secondaryButtonText}>
-                  {ratings[current.id] === undefined
-                    ? index === items.length - 1 && canExpand
-                      ? 'En tunne · näytä lisää'
-                      : 'En tunne · seuraava'
-                    : index === items.length - 1 && canExpand
-                      ? 'Näytä lisää'
-                      : 'Seuraava'}
+                  {index === items.length - 1 && canExpand
+                    ? 'Näytä lisää'
+                    : 'Seuraava'}
                 </Text>
               </Pressable>
             </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="En tunne"
+              accessibilityHint="Ohita teos ja hylkää sille valittu arvio"
+              disabled={busy}
+              onPress={unknown}
+              style={({ pressed }) => [
+                styles.secondaryWideButton,
+                busy && styles.disabled,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.secondaryButtonText}>En tunne</Text>
+            </Pressable>
 
             <Pressable
               accessibilityRole="button"

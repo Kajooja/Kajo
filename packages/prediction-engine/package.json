@@ -54,6 +54,14 @@
     "./adapters/kajo-working-outcomes": {
       "types": "./dist/adapters/kajo-working-outcomes.d.ts",
       "import": "./dist/adapters/kajo-working-outcomes.js"
+    },
+    "./taste-selection": {
+      "types": "./dist/taste-selection.d.ts",
+      "import": "./dist/taste-selection.js"
+    },
+    "./adapters/kajo-taste-selection": {
+      "types": "./dist/adapters/kajo-taste-selection.d.ts",
+      "import": "./dist/adapters/kajo-taste-selection.js"
     }
   },
   "scripts": {

@@ -10,7 +10,60 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — integrate Shared overlay eligibility
+## Current packet — Personal Taste selector and calibration correction
+
+Continue on `feat/kajo-first-session`, based on the published
+[PR #323](https://github.com/Kajooja/Kajo/pull/323) integration head
+`08efb7b8ad60e4dd857d0664bd0bbef6bec03455`, tree
+`352153f81a6970fb7ebfa0109c7deb583d5d4682`. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. The single
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns exact publication,
+CI and build receipts; its September 30 checkpoint remains intact. GitHub source
+publication is authorized. No hosted state, account or history is reset.
+
+The independent engine now supplies a pure immutable Taste opportunity selector
+and strict Kajo Personal adapter. It uses a frozen caller-authorized snapshot,
+ordered presentation/response ledger, fixed ADAPTIVE/PRIOR_ONLY controls, no repeated
+Items, explicit transitions, correction/withdrawal and fail-open exhaustion.
+Provisional source defaults are 12–24 opportunities and eight known ratings; Kajo
+proposes ten MOVIE → acknowledged transition → ten BOOK. Recognition/diversity/
+feature coverage are inspectable heuristics, not calibrated information gain,
+expected satisfaction or demonstrated quality. Root estimator exports and native
+ranking remain unchanged. The [package contract](../../packages/prediction-engine/README.md#adaptive-taste-opportunity-selection)
+owns the exact source API and limits.
+
+The existing logged-in calibration now keeps **En tunne** independently available
+after wheel movement, discards only that unsubmitted draft, preserves genuine zero,
+and appends unique expansion candidates without moving the presented prefix.
+Committed scope tokens and a keyed screen prevent old profile/load/save responses
+from changing a newer calibration. This native six-rating/static interleaved flow
+does not yet consume the adaptive selector. Existing completed profiles are reused.
+
+Independent selector/adapter **25/25**, full engine **245/245** plus built
+ESM/import graphs, independent calibration screen/operations **17/17**, and full
+mobile **493/493**, lint/typecheck pass. Root lint/typecheck, dependency **43** and
+catalogue **444** pass; research **19 Python + 43 Node**, acceptance **6 + 5** and
+configured iOS/Android application plus isolated description exports also pass.
+The required root check is blocked at unavailable Edge registry/cache loading;
+complete local root success is unclaimed. The full database serial recheck and
+exact new-source CI are still pending. Failed overload-run database cases pass
+**17/17** in their focused serial replay without changing code or fixtures.
+Source, native/hosted, device and observed-quality acceptance stay separate.
+
+**Single next action:** finalize independent source review, checks and publication
+of this bounded packet. Then implement the coherent own-Personal server TasteSession
+consumer with frozen catalog/policy, durable presentation/response receipts and
+canonical bootstrap provenance. The old stateless calibration RPC is not a session
+API. Anonymous identity/lifecycle/abuse/measurement must precede real anonymous
+Taste acceptance; holdout challenge predictions must be frozen before answers.
+Native confidence also still needs distinct independent Item support rather than
+summed tag counts. Real Working collection needs an actual authorized existing-owner
+roster and independent pre-window declaration, not editable fixture files. Preserve
+bootstrap/transfer/usefulness, genuine #232F, #306 guarded hosted rollout, #229
+device/fresh-account, and every MVP/Share Link gate. No learning/quality admission
+or first-public completion is claimed.
+
+## Previous packet — integrate Shared overlay eligibility
 
 The October 12 owner continuation requests sustained engine and first-app work.
 Continue on `feat/kajo-first-session`, based on the exact #322 head
