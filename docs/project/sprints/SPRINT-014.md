@@ -14,6 +14,34 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Private owner Working report and native fixture repair — 2026-10-11
+
+The #320 source `f68569b5c0545e5081fbc2b246ea27cacd33c572`, tree
+`88625552287ff26da8398156f255171fcf6e82f6`, has four successful CI #631 gates;
+CLI/history fails its strict JSON read after prospective native lock probes.
+DO/PERFORM suppresses fixture-only setup/sleep result rows, retaining the separate
+committed enrollment boundary. The strengthened regression requires exactly one
+JSON acknowledgement; no migration or production SQL changes.
+
+The private `engine:working` report consumes actual enrollment/source/control and
+immutable outcome snapshots through existing adapters. All planned pairs remain
+in coverage, native identity and alias guards reject reused units, and actor/
+session clusters expose dependence. Outputs are bounded private exclusive files
+outside Git; fixture observed evidence is zero. Files need current owner access
+and withdrawal/retention handling. The report does not establish an untouched
+cohort, statistical independence, measured quality or any admission. STATUS/#229
+own exact validation/publication and the next predeclared native coverage window.
+
+Final full database **165/165**, engine **220/220** with built exports,
+research **19 Python + 34 Node**, acceptance **6 + 5**, dependency **43**,
+mobile **478**, catalogue **444**, native SQL-to-CLI **4/4** and independently
+reviewed Working/ordinal **21/21** pass. An independent guard mutation reproduces
+one false comparable unit from reused inert input, rejected by the final source.
+All 74 migrations/core/scorer/lock bytes are unchanged. Root Edge loading lacks
+registry cache and fresh app smoke lacks production configuration; complete
+local root/exports/native CI acceptance remain unclaimed. STATUS/#229 retain
+exact new-source gates and all release dependencies.
+
 ## Prospective Personal enrollment and outcomes — 2026-10-10
 
 The prior #319 source `0103d941944cbf0b545686ad60d13b08bc068b9d`, tree

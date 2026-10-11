@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
@@ -19,7 +22,7 @@ test('actual committed native enrollment and own latest-rating capture cross bot
     const { normalizeKajoWorkingOutcomeCapture } = await import('../../packages/prediction-engine/dist/adapters/kajo-working-outcomes.js');
     const { freezeWorkingEvaluationPlan, evaluateWorkingPlan } = await import('../../packages/prediction-engine/dist/working-evaluation.js');
     const db = new PGlite();
-    const actor = uuid(1), sessionId = uuid(2), enrollmentId = uuid(3), nativePairId = uuid(4);
+    const actor = uuid(1), sessionId = uuid(2), enrollmentId = uuid(3), nativePairIds = [4, 5].map(uuid);
     const evidence = [20, 21].map(uuid), admitted = [30, 31, 32, 33].map(uuid);
     let sequence = 100;
     const next = () => uuid(sequence++);
@@ -66,12 +69,13 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         session: { sessionId, startedAt, context: {} }, kind: 'SET_RATING', rating: index * 10,
       });
       const page = await actorCall('rank_items_page_v1', { version: 3, requestId: next(), profileId,
-        sessionId, discoveryMode: 'FOR_YOU', itemType: 'BOOK', limit: 2, context: {} });
+        sessionId, discoveryMode: 'FOR_YOU', itemType: 'BOOK', limit: 4, context: {} });
       const sourcePredictionId = page.predictionId;
       const selected = (await db.query(`select item_id from private.prediction_candidates
         where prediction_id=$1 and selected_for_delivery order by final_rank`, [sourcePredictionId])).rows.map(row => row.item_id);
-      assert.equal(selected.length, 2);
-      const nativePairs = [{ pairId: nativePairId, leftItemId: selected[0], rightItemId: selected[1] }];
+      assert.equal(selected.length, 4);
+      const nativePairs = nativePairIds.map((pairId, index) => ({ pairId,
+        leftItemId: selected[index * 2], rightItemId: selected[index * 2 + 1] }));
       const enrollment = await transaction(async () => (await db.query(
         'select private.enroll_personal_working_evaluation_v1($1,$2,$3::jsonb,1,0) value',
         [enrollmentId, sourcePredictionId, JSON.stringify(nativePairs)])).rows[0].value);
@@ -96,14 +100,16 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         sourceRun: snapshot.source_run, sourceCandidates: snapshot.source_candidates, comparisons: snapshot.comparisons,
         enrollment, snapshotObservedAt: observedAt,
         planning: { id: scoped('enrollment'), createdAt: enrollment.declaredAt, horizon: enrollment.horizon,
-          pairs: [{ pairId: scoped('pair-0'), leftItemId: selected[0], rightItemId: selected[1] }] },
+          pairs: nativePairs.map((pair, index) => ({ ...pair, pairId: scoped(`pair-${index}`) })) },
         references: { scopeId: 'actual-native-outcomes', subjectRef: scoped('subject'), actorRef: scoped('actor'),
           sessionRef: scoped('session'), sourcePredictionRef: scoped('source'), captureRef: scoped('working-capture'),
           controlRefs: { OFF: scoped('off'), STATIC: scoped('static'), ORDERED: scoped('ordered') }, objects: rankedAliases,
           inputObjects: nativeWorking.itemFeatures.map((item, index) => ({ itemId: item.id,
             objectRef: rankedAliases.find(reference => reference.itemId === item.id)?.objectRef ?? scoped(`input-${index}`) })),
           inputRecords: rawRecordIds.map(recordId => ({ recordId, recordRef: recordRef(recordId) })) } };
+      const planInputBefore = JSON.stringify(planInput);
       const plan = freezeWorkingEvaluationPlan(normalizeKajoWorkingEvaluationPlan(planInput));
+      assert.equal(JSON.stringify(planInput), planInputBefore, 'Plan adapter leaves native inputs intact');
       assert.equal(plan.createdAt, enrollment.declaredAt);
       assert.equal(plan.sourceBinding.snapshotObservedAt, observedAt);
       assert.deepEqual(plan.sourceBinding.prospectiveDeclaration, { basis: 'STORED_PROSPECTIVE_DECLARATION',
@@ -127,7 +133,9 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         return eventId;
       });
       const exposureIds = [];
-      for (const itemId of selected) exposureIds.push(await event(itemId, 'ITEM_IMPRESSION'));
+      // The second declared pair intentionally has no exposure or terminal
+      // evidence. Every consumer must retain it in planned/unscored coverage.
+      for (const itemId of selected.slice(0, 2)) exposureIds.push(await event(itemId, 'ITEM_IMPRESSION'));
       const superseded = await event(selected[0], 'ITEM_RATED', { rating: 9 });
       const terminalIds = [await event(selected[0], 'ITEM_RATED', { rating: 0 }),
         await event(selected[1], 'ITEM_RATED', { rating: 10 })];
@@ -141,25 +149,113 @@ test('actual committed native enrollment and own latest-rating capture cross bot
           controls: Object.fromEntries(controls.map(control => [control, {
             comparisonId: enrollment.controls.find(value => value.control === control).comparisonId,
             controlRef: plan.controls[control].id,
-          }])), pairs: [{ pairId: nativePairId, pairRef: scoped('pair-0') }],
+          }])), pairs: nativePairIds.map((pairId, index) => ({ pairId, pairRef: scoped(`pair-${index}`) })),
           objects: selected.map(itemId => ({ itemId, objectRef: objectRef(itemId) })),
           events: terminalIds.map(eventId => ({ eventId, recordRef: recordRef(eventId) })),
           exposures: exposureIds.map((exposureId, index) => ({ exposureId, experienceRef: scoped(`experience-${index}`) })) } };
+      const outcomeInputBefore = JSON.stringify(outcomeInput);
       const capture = normalizeKajoWorkingOutcomeCapture(outcomeInput);
+      assert.equal(JSON.stringify(outcomeInput), outcomeInputBefore, 'Outcome adapter leaves native inputs intact');
       const report = evaluateWorkingPlan(plan, capture, nativeCapture.capturedAt + 1);
-      assert.equal(capture.complete, true); assert.equal(report.plannedPairUnits, 1);
-      assert.equal(report.comparablePairUnits, 1); assert.equal(report.unscoredPairUnits, 0);
+      assert.equal(capture.complete, true); assert.equal(report.plannedPairUnits, 2);
+      assert.equal(report.comparablePairUnits, 1); assert.equal(report.unscoredPairUnits, 1);
       assert.equal(report.observed.nativePairUnits, 1); assert.equal(report.pairs[0].observedOrder, 'right');
-      assert.deepEqual(capture.labels.map(label => label.observation.measurement.value),
+      assert.equal(report.pairs[1].status, 'unscored');
+      assert.deepEqual(capture.labels.map(label => label.observation?.measurement.value ?? null),
         nativeCapture.labels.map(label => label.rating));
       assert.equal(capture.labels.find(label => label.objectId === objectRef(selected[0])).observation.raw.value, 0);
       for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) assert.equal(report[key], false);
       assert.equal(report.pairs[0].prospectiveDeclaredEligibility, false);
       assert.equal(JSON.stringify(snapshot), rawBefore, 'Pure adapters do not mutate supplied native rows');
-      const rawIds = [actor, profileId, sessionId, sourcePredictionId, enrollmentId, nativePairId, nativeCapture.captureId,
+      const rawIds = [actor, profileId, sessionId, sourcePredictionId, enrollmentId, ...nativePairIds, nativeCapture.captureId,
         snapshot.source_run.genome_id, nativeWorking.captureId, ...evidence, ...admitted, ...rawRecordIds,
         ...exposureIds, ...terminalIds, superseded, ...enrollment.controls.map(control => control.comparisonId)];
       for (const raw of rawIds) assert.equal(JSON.stringify([plan, capture, report]).toLowerCase().includes(raw), false);
+
+      await t.test('owner CLI consumes actual frozen SQL snapshots and retains missing planned-pair coverage outside Git', async () => {
+        const directory = await mkdtemp(join(tmpdir(), 'kajo-native-working-report-'));
+        try {
+          const root = fileURLToPath(new URL('../../', import.meta.url));
+          const cli = fileURLToPath(new URL('../../packages/prediction-engine/scripts/working-report.mjs', import.meta.url));
+          const inputPath = join(directory, 'manifest.json'), outputPath = join(directory, 'report.json');
+          const manifest = { contractVersion: 'kajo-personal-working-manifest-v1',
+            selectionBasis: 'OWNER_DECLARED_NATIVE_ENROLLMENTS', evidenceBasis: 'ENGINEERING_FIXTURE',
+            scopeId: 'actual-native-outcomes', evaluationAsOf: nativeCapture.capturedAt + 1,
+            entries: [{ expectedScope: { actorUserId: actor, profileId, sessionId, sourcePredictionId, enrollmentId },
+              planSnapshot: planInput, outcomeSnapshot: { capture: nativeCapture, references: outcomeInput.references } }] };
+          const inputBytes = JSON.stringify(manifest), suppliedBytes = JSON.stringify([planInput, outcomeInput]);
+          await writeFile(inputPath, inputBytes, { mode: 0o600 });
+          const command = output => spawnSync(process.execPath, [cli, inputPath, output], {
+            cwd: root, encoding: 'utf8', timeout: 10_000, maxBuffer: 64 * 1024,
+          });
+          const result = command(outputPath);
+          assert.equal(result.status, 0, result.stderr);
+          assert.equal(result.stdout, 'WORKING_REPORT_CREATED\n');
+          assert.equal(result.stderr, '');
+          assert.equal((await stat(directory)).mode & 0o777, 0o700);
+          assert.equal((await stat(outputPath)).mode & 0o777, 0o600);
+          assert.equal(await readFile(inputPath, 'utf8'), inputBytes, 'CLI leaves private native input bytes intact');
+          assert.equal(JSON.stringify([planInput, outcomeInput]), suppliedBytes, 'Supplied native snapshots stay intact');
+          const outputBytes = await readFile(outputPath, 'utf8'), cliReport = JSON.parse(outputBytes);
+          assert.equal(cliReport.evidenceBasis, 'ENGINEERING_FIXTURE');
+          assert.equal(cliReport.observedEvidencePairUnits, 0, 'Actual SQL fixture contributes no observed user-quality units');
+          assert.equal(cliReport.result.plannedPairUnits, 2);
+          assert.equal(cliReport.result.comparablePairUnits, 1);
+          assert.equal(cliReport.result.unscoredPairUnits, 1);
+          assert.equal(cliReport.result.observedNativePairUnits, 1);
+          assert.deepEqual(cliReport.result.reports, [report]);
+          assert.deepEqual(cliReport.actorClusters, { actors: 1, actorSessions: 1,
+            observedActors: 1, observedActorSessions: 1 });
+          assert.deepEqual(cliReport.result.clusters, { subjects: 1, subjectSessions: 1,
+            observedSubjects: 1, observedSubjectSessions: 1 });
+          for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) {
+            assert.equal(cliReport[key], false);
+            assert.equal(cliReport.result[key], false);
+          }
+          for (const raw of rawIds) assert.equal(outputBytes.toLowerCase().includes(raw), false);
+          assert.doesNotMatch(outputBytes, /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu);
+
+          const missing = structuredClone(manifest);
+          missing.entries[0].outcomeSnapshot = null;
+          await writeFile(inputPath, JSON.stringify(missing), { mode: 0o600 });
+          const missingPath = join(directory, 'missing-report.json'), absentResult = command(missingPath);
+          assert.equal(absentResult.status, 0, absentResult.stderr);
+          assert.equal(absentResult.stdout, 'WORKING_REPORT_CREATED\n');
+          assert.equal(absentResult.stderr, '');
+          const absentReport = JSON.parse(await readFile(missingPath, 'utf8'));
+          assert.equal(absentReport.result.plannedPairUnits, 2);
+          assert.equal(absentReport.result.comparablePairUnits, 0);
+          assert.equal(absentReport.result.unscoredPairUnits, 2);
+          assert.equal(absentReport.result.observedNativePairUnits, 0);
+          assert.equal(absentReport.observedEvidencePairUnits, 0);
+          assert.deepEqual(absentReport.actorClusters, { actors: 1, actorSessions: 1,
+            observedActors: 0, observedActorSessions: 0 });
+          assert.deepEqual(absentReport.result.reports[0].pairs.map(pair => pair.pairId), plan.pairs.map(pair => pair.pairId));
+          assert.equal(absentReport.result.reports[0].captureRef, null);
+          assert.ok(absentReport.result.reports[0].pairs.every(pair => pair.status === 'unscored'
+            && pair.reasons.includes('malformed-capture')));
+          assert.equal(await readFile(inputPath, 'utf8'), JSON.stringify(missing));
+          for (const raw of rawIds) assert.equal(JSON.stringify(absentReport).toLowerCase().includes(raw), false);
+
+          const wrongOwner = structuredClone(manifest);
+          wrongOwner.entries[0].expectedScope.actorUserId = uuid(900);
+          const reusedSource = structuredClone(manifest);
+          reusedSource.entries.push(structuredClone(reusedSource.entries[0]));
+          // Relabelling an actual source does not create independent evidence.
+          reusedSource.entries[1].planSnapshot.planning.id = scoped('relabeled-enrollment');
+          reusedSource.entries[1].planSnapshot.references.sourcePredictionRef = scoped('relabeled-source');
+          for (const [value, code] of [[wrongOwner, 'SCOPE_MISMATCH'], [reusedSource, 'SOURCE_REUSE']]) {
+            const bytes = JSON.stringify(value), rejectedPath = join(directory, `rejected-${code}.json`);
+            await writeFile(inputPath, bytes, { mode: 0o600 });
+            const rejected = command(rejectedPath);
+            assert.equal(rejected.status, 1);
+            assert.equal(rejected.stdout, '');
+            assert.equal(rejected.stderr, `WORKING_REPORT_${code}\n`);
+            await assert.rejects(stat(rejectedPath), { code: 'ENOENT' });
+            assert.equal(await readFile(inputPath, 'utf8'), bytes);
+          }
+        } finally { await rm(directory, { recursive: true, force: true }); }
+      });
 
       await t.test('scope, source, pair and declaration mismatches cannot cross the frozen adapters', () => {
         for (const [key, value] of [['actorUserId', uuid(900)], ['sourcePredictionId', uuid(901)], ['declaredAt', enrollment.declaredAt + 1]]) {

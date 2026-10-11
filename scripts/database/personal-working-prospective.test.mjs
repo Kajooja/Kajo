@@ -482,10 +482,13 @@ test('native prospective Personal enrollment and latest terminal captures retain
         }
       });
 
-      await t.test('native explicit-transaction acceptance fixture is executable and cleans every owned row', async () => {
+      await t.test('native explicit-transaction acceptance emits one JSON acknowledgement and cleans every owned row', async () => {
         const fixture = await readFile(new URL('./personal-working-prospective-fixture.sql', import.meta.url), 'utf8');
-        const snapshots = (await db.exec(fixture)).flatMap(row => row.rows.map(item => item.snapshot));
-        assert.match(snapshots.find(row => row?.personalWorkingProspective)?.personalWorkingProspective, /^PASS:/);
+        // Native psql -qAt emits every result value. Setup UUIDs or void sleep
+        // results would break the CLI probe's strict JSON-line decoder.
+        const values = (await db.exec(fixture)).flatMap(result => result.rows.flatMap(row => Object.values(row)));
+        assert.equal(values.length, 1, 'Only the final JSON acknowledgement may reach native stdout');
+        assert.match(values[0]?.personalWorkingProspective, /^PASS:/);
         assert.equal((await db.query("select count(*)::integer value from auth.users where id::text like 'a9172000-%'")).rows[0].value, 0);
       });
     } finally { await db.close(); }

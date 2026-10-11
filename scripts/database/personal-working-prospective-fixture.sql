@@ -48,11 +48,11 @@ end;$prospective_setup$;
 commit;
 
 begin;
-select set_config('request.jwt.claim.sub',(select actor::text from pg_temp.working_prospective_fixture),true);
 do $prospective_enroll$
 declare f record;receipt jsonb;
 begin
   select * into strict f from pg_temp.working_prospective_fixture;
+  perform set_config('request.jwt.claim.sub',f.actor::text,true);
   receipt:=private.enroll_personal_working_evaluation_v1(f.plan,f.source,f.pairs,1,0);
   perform pg_temp.working_prospective_assert(receipt->>'version'='personal-working-enrollment-v1'
     and receipt->>'enrollmentId'=f.plan::text and receipt->>'sourcePredictionId'=f.source::text
@@ -67,11 +67,11 @@ end;$prospective_enroll$;
 commit;
 
 begin;
-select set_config('request.jwt.claim.sub',(select actor::text from pg_temp.working_prospective_fixture),true);
 do $prospective_evidence$
 declare f record;item uuid;
 begin
   select * into strict f from pg_temp.working_prospective_fixture;
+  perform set_config('request.jwt.claim.sub',f.actor::text,true);
   foreach item in array array[f.left_item,f.right_item] loop
     insert into public.events(id,actor_user_id,profile_id,item_id,item_type,event_type,occurred_at,
       session_id,prediction_id,discovery_mode,properties)
@@ -91,14 +91,15 @@ begin
     values(gen_random_uuid(),f.actor,f.profile,f.right_item,'BOOK','ITEM_RATED',clock_timestamp(),f.session,f.source,'FOR_YOU','{"rating":10}');
 end;$prospective_evidence$;
 commit;
-select pg_sleep(1.1);
+-- Keep setup and maturity waits silent for the native JSON-line reader.
+do $prospective_mature$ begin perform pg_sleep(1.1);end;$prospective_mature$;
 
 begin;
-select set_config('request.jwt.claim.sub',(select actor::text from pg_temp.working_prospective_fixture),true);
 do $prospective_capture$
 declare f record;receipt jsonb;owned_capture_id uuid:=gen_random_uuid();role_name text;
 begin
   select * into strict f from pg_temp.working_prospective_fixture;
+  perform set_config('request.jwt.claim.sub',f.actor::text,true);
   receipt:=private.capture_personal_working_outcomes_v1(owned_capture_id,f.plan);
   perform pg_temp.working_prospective_assert(receipt->>'version'='personal-working-outcomes-v1' and receipt->'complete'='true'::jsonb
     and receipt->>'resolutionVersion'='personal-latest-terminal-v1' and jsonb_array_length(receipt->'labels')=2

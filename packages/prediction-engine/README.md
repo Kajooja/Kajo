@@ -203,6 +203,45 @@ boundary. Product reset integration, quality against STATIC/OFF,
 meaningful first-session behavior and measured
 activation/rollback remain open gates; STATUS owns exact validation/deployment.
 
+## Private owner Working report
+
+Run `npm run engine:working -- INPUT_MANIFEST OUTPUT_REPORT` on Linux/macOS.
+The command reads already-authorized native snapshots, reconstructs frozen plans
+through `./adapters/kajo-working-evaluation`, normalizes immutable captures through
+`./adapters/kajo-working-outcomes`, and calls `evaluateWorkingBatch`. It makes no
+network/database writes. Reports are private mode-0600 exclusive files outside
+Git repositories/worktrees; inputs and reports retain sensitive audit lineage
+and require owner-controlled retention and invalidation after source withdrawal.
+
+The strict JSON manifest has these fields:
+
+| Field | Required value |
+| --- | --- |
+| `contractVersion` | `kajo-personal-working-manifest-v1` |
+| `selectionBasis` | `OWNER_DECLARED_NATIVE_ENROLLMENTS` |
+| `evidenceBasis` | `ENGINEERING_FIXTURE` or `OWNER_AUTHORIZED_NATIVE_SNAPSHOTS` |
+| `scopeId` | One stable opaque alias namespace for the batch |
+| `evaluationAsOf` | Finite millisecond cutoff, including representable fractions |
+| `entries` | At most 128 native enrollments and 128 total planned pairs |
+
+Each entry contains `expectedScope` with native `actorUserId`, `profileId`,
+`sessionId`, `sourcePredictionId` and `enrollmentId`; `planSnapshot` is the complete
+`KajoWorkingEvaluationSnapshots` input with the actual stored enrollment.
+`outcomeSnapshot` is either null or `{capture, references}`, using the immutable
+native capture and `KajoWorkingOutcomeSnapshots.references`. The command derives
+its native scope, enrollment and frozen plan rather than accepting a second
+caller-supplied portable plan. Input bytes are bounded to 16 MiB and report bytes to 32 MiB.
+
+Every enrolled pair remains in coverage, including absent/unavailable captures.
+Canonical native identities and stable aliases prevent relabelled source,
+subject/Item pair, terminal Event or exposure reuse from multiplying units.
+Reports include actor/session and Subject/session clusters, unavailable
+uncertainty and independence not established. Engineering fixtures contribute
+zero observed evidence units. A declaration of owner-authorized snapshots does
+not authenticate files, certify current access or establish an untouched cohort.
+Predeclare the cohort/report window separately before observed quality or canary
+claims; this command admits no model, learning or native activation.
+
 ## Bounded Working evaluation
 
 `./working-evaluation` is a separate descriptive boundary. It neither imports

@@ -9,8 +9,9 @@ This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` o
 The active source successor now supplies bounded server declaration of actual OFF
 pairs and immutable latest-terminal outcome captures, with whole-source withdrawal
 and durable capture reservations. STATUS and #229 own exact publication and gates.
-Next consume those actual receipts in one bounded owner-run coverage report; freeze
-its untouched cohort/window before observed quality or canary claims. Stored
+The active successor consumes those actual receipts in a bounded private owner-run
+coverage report. Next freeze its untouched cohort/window and complete enrollment
+selection before observed quality or canary claims. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing
 bootstrap/transfer/first-session, genuine #232F, #306 and device/release order.

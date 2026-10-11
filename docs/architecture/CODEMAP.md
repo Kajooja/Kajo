@@ -35,6 +35,7 @@ supabase/functions/password-auth/
 | Authorized native receipt to scoped portable outcome | `packages/prediction-engine/src/adapters/kajo-working-outcomes.ts` and its optional package export |
 | Stored declaration and actual later read binding | Existing `adapters/kajo-working-evaluation.ts` / `working-evaluation.ts` |
 | Actual SQL producer → plan → outcomes → coverage regression | `scripts/database/working-outcomes-kajo.test.mjs` |
+| Private owner Working report, native identity guards and filesystem contract | `packages/prediction-engine/scripts/working-report.mjs`, shared `private-report-files.mjs`, `scripts/research/working-report.test.mjs`; root `engine:working` |
 
 STATUS owns exact source/native acceptance. These private producers retain exact
 OFF and UNKNOWN commit availability; they add no serving API or quality admission.

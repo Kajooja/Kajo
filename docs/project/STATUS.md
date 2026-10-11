@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-10**
+Last updated: **2026-10-11**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,83 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — prospective Personal enrollment and immutable outcomes
+## Current packet — private owner Working coverage report
+
+Continue on `feat/personal-working-report`, stacked on
+[PR #320](https://github.com/Kajooja/Kajo/pull/320), exact parent
+`f68569b5c0545e5081fbc2b246ea27cacd33c572`, tree
+`88625552287ff26da8398156f255171fcf6e82f6`. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. Public source publication
+authorization persists. The single [#229 handoff](https://github.com/Kajooja/Kajo/pull/229)
+owns this packet's exact published head/tree/CI and preserves its September 30
+checkpoint. Source, native/hosted, device and observed-quality acceptance remain
+separate.
+
+The continuation inspection of [CI #631](https://github.com/Kajooja/Kajo/actions/runs/38094871749)
+finds validation/exports, platform/defaults, two clean installations and populated
+upgrade passed. CLI/history fails after the new native concurrency probes:
+its strict JSON reader receives bare `set_config` UUID and `pg_sleep` output from
+the prospective fixture. The fixture now uses DO/PERFORM for those setup calls,
+keeping declaration COMMIT/exposure/maturity transaction boundaries unchanged.
+A regression requires exactly one final JSON acknowledgement. No migration,
+production function, parser strictness or existing source receipt changes.
+The repair requires its own completed native CI receipt.
+
+`npm run engine:working -- INPUT_MANIFEST OUTPUT_REPORT` reconstructs each actual
+stored enrollment's frozen plan and latest-terminal capture through the existing
+portable adapters, then evaluates one bounded batch. All planned pairs remain
+in coverage even when a capture is absent. The command checks native source,
+Profile/Item pair, Event/exposure identities and stable aliases before counting,
+retains actor/session and Subject/session clusters, and writes one private
+exclusive mode-0600 output outside Git. It performs no network/database writes.
+The [package README](../../packages/prediction-engine/README.md#private-owner-working-report)
+owns the strict manifest and limits. Files remain owner-authorized sensitive
+audit artifacts; this offline command cannot reauthorize or erase them itself.
+
+Engineering fixtures contribute zero observed evidence units. Stored declaration
+and snapshot clocks remain proxies with commit availability UNKNOWN. Input
+shape and an owner-authorized label do not authenticate snapshots or establish
+an untouched cohort. Uncertainty is unavailable and independence unestablished;
+historical-feature eligibility, learning, native activation and quality admission
+remain false. Existing OFF/STATIC/ORDERED scores and V1 strongest-episode reward
+retain their semantics.
+
+Final validation: full serial database **165/165**, zero failures/skips; engine
+**220/220** and built ESM/import graphs; research **19 Python + 34 Node**;
+acceptance **6 + 5**; dependency **43**, mobile **478** and catalogue **444**.
+The prospective fixture's strengthened one-output regression passes **16/16**,
+and actual SQL-to-private-CLI bridge **4/4** includes two enrolled pairs with one
+unexposed pair, null-capture coverage, exact zero/latest rating, immutable inputs,
+private output and no native UUIDs. Independent CLI/ordinal **21/21** and review
+pass; disabling only the inert raw input/outcome overlap guard admits one false
+comparable/native unit, confirming that regression. The final strengthened
+Working tests **11/11** pass. Syntax, whitespace, **290 local file links / 99
+heading anchors** resolve. All 74 migrations, production scorer/core and root
+lockfile retain bytes.
+
+The required local `npm run check` passes lint/typecheck/dependency/mobile/
+catalogue stages, then repeats unavailable Edge registry loads and is interrupted.
+Cached Edge fails on absent `@supabase/auth-js` metadata. Fresh `npm run smoke`
+fails closed on missing local production Supabase configuration. Full local
+root/application exports and independently connected native execution remain
+unclaimed; no Docker/PostgreSQL stack is available here. This new source needs
+its own five native CI gates. Exact publication/native CI belong to #229.
+No fixture establishes recommendation quality or closes release gates.
+
+**Single next action:** inspect this packet's completed exact-source CI once and
+repair a concrete failure. Then predeclare one bounded untouched native cohort,
+report window, complete enrollment selection, authorized snapshot lifecycle and
+support/overlap rules before collecting observed coverage; do not manufacture
+real accounts or reset existing history. Observed quality/canary admission remains
+separate. Preserve bootstrap-floor/independent support/transfer/actual first-session
+usefulness, anonymous Taste prerequisites, genuine #232F Shared, #306 integration,
+#229 configured-device/fresh-account and every MVP release gate. The separate
+#303 capability-map integration retains its inherited #238 security/CI blocker.
+
+## Previous packet — prospective Personal enrollment and immutable outcomes
+
+The following dated source record is preserved. Its old pending CI/next-action
+wording is superseded by the current packet above.
 
 Continue on `feat/personal-working-prospective`, stacked on
 [PR #319](https://github.com/Kajooja/Kajo/pull/319), exact parent

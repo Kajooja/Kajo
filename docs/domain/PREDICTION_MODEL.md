@@ -1681,6 +1681,20 @@ proxy. Historical-feature eligibility, learning, native activation and quality
 admission remain false. Native CI, hosted/device, untouched observed cohort and
 real usefulness are separate gates owned by STATUS/#229.
 
+The private owner `engine:working` command now consumes these native receipts,
+reconstructing frozen plans through the existing adapters before batch evaluation.
+It retains every planned pair with missing-capture coverage, checks native
+identity and stable alias reuse across entries, and records actor/session as well
+as Subject/session clusters. Its explicit engineering-fixture basis contributes
+zero observed evidence units. A supplied owner-authorized snapshot basis is not
+authentication, current authorization or a certificate of untouched selection.
+The bounded exclusive mode-0600 report stays outside Git and requires owner
+retention/withdrawal handling. It performs no network/database writes and does
+not change quality, historical-feature, learning or activation admission.
+The [executable input contract](../../packages/prediction-engine/README.md#private-owner-working-report)
+owns limits and manifest fields. Declare the native cohort/report window and
+complete enrollment selection before observed-quality/canary work.
+
 #### Bounded offline WorkingState evaluation
 
 The separate portable `./working-evaluation` boundary evaluates immutable

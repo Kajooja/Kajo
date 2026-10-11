@@ -1,7 +1,6 @@
 // Ephemeral owner audit only: no providers, database access or model admission.
-import { constants } from 'node:fs';
-import { lstat, open, realpath, unlink } from 'node:fs/promises';
-import { basename, dirname, join, resolve } from 'node:path';
+import { resolve } from 'node:path';
+import { createPrivateReportFiles } from './private-report-files.mjs';
 import { fileURLToPath } from 'node:url';
 
 const MAX_INPUT_BYTES = 16 * 1024 * 1024;
@@ -14,37 +13,10 @@ export class OrdinalReportError extends Error {
 }
 const reject = code => { throw new OrdinalReportError(code); };
 
-// POSIX permissions/no-follow flags are required for private owner audit files.
-// The portable evaluator itself does not depend on this filesystem boundary.
-export function assertOrdinalReportPlatform(platform = process.platform) {
-  if (!['linux', 'darwin'].includes(platform) || !Number.isInteger(constants.O_NOFOLLOW)
-    || constants.O_NOFOLLOW <= 0 || !Number.isInteger(constants.O_NONBLOCK) || constants.O_NONBLOCK <= 0) reject('PLATFORM');
-}
-
-async function readManifest(path) {
-  let handle;
-  try {
-    handle = await open(resolve(path), constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
-    const stat = await handle.stat();
-    if (!stat.isFile()) reject('INPUT_FILE');
-    if (stat.size > MAX_INPUT_BYTES) reject('INPUT_TOO_LARGE');
-    const bytes = Buffer.alloc(MAX_INPUT_BYTES + 1);
-    let length = 0;
-    while (true) {
-      if (length > MAX_INPUT_BYTES) reject('INPUT_TOO_LARGE');
-      const read = await handle.read(bytes, length, Math.min(64 * 1024, bytes.length - length), null);
-      if (read.bytesRead === 0) break;
-      length += read.bytesRead;
-    }
-    let manifest;
-    try { manifest = JSON.parse(bytes.subarray(0, length).toString('utf8')); }
-    catch { reject('MANIFEST_INVALID'); }
-    return manifest;
-  } catch (error) {
-    if (error instanceof OrdinalReportError) throw error;
-    reject('INPUT_FILE');
-  } finally { await handle?.close().catch(() => {}); }
-}
+const { assertPlatform, readManifest, reportPath, writeReport } = createPrivateReportFiles({
+  reject, isReportError: error => error instanceof OrdinalReportError, maximumInputBytes: MAX_INPUT_BYTES,
+});
+export function assertOrdinalReportPlatform(platform = process.platform) { assertPlatform(platform); }
 
 function validateManifest(value) {
   const keys = ['contractVersion', 'selectionBasis', 'evaluationAsOf', 'pairs'];
@@ -62,67 +34,6 @@ function validateManifest(value) {
       || (Object.hasOwn(pair, 'evaluationAsOf') && pair.evaluationAsOf !== value.evaluationAsOf)) reject('MANIFEST_INVALID');
     if (pairIds.has(pair.pairId)) reject('PAIRS_OVERLAP');
     pairIds.add(pair.pairId);
-  }
-}
-
-async function reportPath(path) {
-  // Real parent traversal also catches symlink aliases into a repository and
-  // .git files used by worktrees. Parent directories must already exist.
-  const requested = resolve(path);
-  let parent;
-  try {
-    parent = await realpath(dirname(requested));
-    let ancestor = parent;
-    while (true) {
-      try { await lstat(join(ancestor, '.git')); reject('OUTPUT_LOCATION'); }
-      catch (error) { if (error.code !== 'ENOENT') throw error; }
-      // Bare repositories have HEAD/objects/refs at their root, without .git.
-      // Reject present markers conservatively, including shared/symlink layouts.
-      try {
-        await lstat(join(ancestor, 'HEAD'));
-        await lstat(join(ancestor, 'objects'));
-        await lstat(join(ancestor, 'refs'));
-        reject('OUTPUT_LOCATION');
-      } catch (error) { if (error.code !== 'ENOENT') throw error; }
-      const next = dirname(ancestor);
-      if (next === ancestor) break;
-      ancestor = next;
-    }
-  } catch (error) {
-    if (error instanceof OrdinalReportError) throw error;
-    reject('OUTPUT_LOCATION');
-  }
-  return join(parent, basename(requested));
-}
-
-async function writeReport(path, report) {
-  let handle, identity, created = false;
-  try {
-    handle = await open(path, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
-    created = true;
-    identity = await handle.stat();
-    await handle.writeFile(`${JSON.stringify(report, null, 2)}\n`, 'utf8');
-    await handle.sync();
-    await handle.close();
-    handle = undefined;
-  } catch (error) {
-    // An initial fstat failure may recover. Without an fd identity, never unlink
-    // a possibly replaced pathname; report cleanup uncertainty explicitly. No
-    // report bytes are written before this identity is established.
-    if (created && !identity) {
-      try { identity = await handle.stat(); } catch { /* fail closed below */ }
-    }
-    await handle?.close().catch(() => {});
-    if (created) {
-      if (!identity) reject('OUTPUT_CLEANUP');
-      // Never unlink a preexisting output or a replacement with another inode.
-      try {
-        const current = await lstat(path);
-        if (current.dev !== identity.dev || current.ino !== identity.ino) reject('OUTPUT_CLEANUP');
-        await unlink(path);
-      } catch (cleanupError) { if (cleanupError.code !== 'ENOENT') reject('OUTPUT_CLEANUP'); }
-    }
-    reject(error.code === 'EEXIST' && !created ? 'OUTPUT_EXISTS' : 'OUTPUT_WRITE');
   }
 }
 
