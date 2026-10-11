@@ -255,6 +255,35 @@ The generic target composes existing memory with explicit `BeliefState`, `WorldS
 
 BeliefState reports estimate, support, uncertainty method and calibration status. Unsupported estimates remain unavailable. Existing V1 rank/confidence components must not be relabeled as calibrated probabilities. Section 20 maps these target concepts onto Kajo without changing the accepted scorer in this documentation delivery.
 
+### 4.8 Native base confidence support — distinct-Item correction
+
+The October 12 source forward `20261011213431_native_item_support.sql` corrects
+new base confidence in both `private.rank_items_v0` and its catalogue clone
+`private.rank_items_catalog_base_v1`. Previously, one admitted native Event on an
+Item with eight matching tags yielded `evidenceCount=8` and confidence 1. Repeated
+actions on that same Item also inflated this support. Legacy `evidenceCount`
+remains a tag-incidence diagnostic; it is not an independent sample count.
+
+New `nativeItemSupportCount` counts distinct matching native Items from the
+kernel's already admitted nonzero weighted rows. Existing Profile, as-of, UNDO
+and matching-tag filters remain authoritative. One Item contributes at most one
+unit regardless of tag/action count. When no matching admitted native Item exists,
+support is zero. The existing `min(1, count / 8)` confidence heuristic now uses that count.
+The distinct-Item union runs only after the existing rank/limit admission, over
+at most 50 returned candidates; it does not repeat for the full catalogue pool.
+Explanations record `nativeSupportVersion=native-item-support-v1`, basis
+`DISTINCT_MATCHING_NATIVE_ITEMS` and calibration `uncalibrated`. Item IDs remain
+internal to the private computation; only support metadata is exposed.
+
+The exact two-body guard preserves function identity/owner/ACL/configuration,
+every score/feature/version/ranking component and all old frozen rows/receipts.
+Bootstrap alone still supplies no native confidence. Distinct Items are a
+conservative support proxy, not proof of statistical independence or calibrated
+probability. Bootstrap/native same-Item additive influence, the retained bootstrap
+floor, memory/Scenario/Shared reliability and observed usefulness remain separate
+source-fusion/quality gates. Source tests and native CI do not themselves deploy
+or admit those semantics; STATUS owns exact acceptance.
+
 ## 5. Prediction trace: the system's causal spine
 
 Here “causal spine” means traceable decision/observation provenance, **not** proof of causal intervention effects. Full alternatives and exposure improve evaluation, but do not reveal reactions to unseen actions or remove selection bias by themselves.

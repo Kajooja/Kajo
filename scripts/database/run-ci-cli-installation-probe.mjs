@@ -38,6 +38,7 @@ import { personalWorkingResetSmokeSql, personalWorkingResetUpgradeSql } from './
 import { personalWorkingPrecisionSmokeSql, personalWorkingPrecisionUpgradeSql } from './personal-working-shadow-precision.mjs';
 import { personalWorkingCandidateFeaturesSmokeSql, personalWorkingCandidateFeaturesUpgradeSql } from './personal-working-candidate-features.mjs';
 import { personalWorkingProspectiveSmokeSql, personalWorkingProspectiveUpgradeSql } from './personal-working-prospective.mjs';
+import { nativeItemSupportSmokeSql, nativeItemSupportUpgradeSql } from './native-item-support.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
@@ -221,6 +222,12 @@ try {
     const [personalWorkingProspectiveUpgrade] = await exec(await personalWorkingProspectiveUpgradeSql(files[workingProspectiveIndex]),
       { stage: 'personal-working-prospective-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalWorkingProspectiveUpgrade?.personalWorkingProspectiveUpgrade, /^PASS: actual active v3/);
+    const nativeItemSupportIndex = files.findIndex(file => file.name.endsWith('_native_item_support.sql'));
+    assert.ok(nativeItemSupportIndex > workingProspectiveIndex);
+    await resetFromMigrations(files.slice(0, nativeItemSupportIndex));
+    const [nativeItemSupportUpgrade] = await exec(await nativeItemSupportUpgradeSql(files[nativeItemSupportIndex]),
+      { stage: 'native-item-support-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(nativeItemSupportUpgrade?.nativeItemSupportUpgrade, /^PASS: old one-Item\/eight-tag defect/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -302,6 +309,9 @@ try {
     const [personalNativeDecay] = await exec(await personalNativeDecaySmokeSql(),
       { stage: 'personal-native-decay-state-score-frozen-parity', timeoutMs: 120_000 });
     assert.match(personalNativeDecay?.personalNativeDecay, /^PASS: shared native LT math/);
+    const [nativeItemSupport] = await exec(await nativeItemSupportSmokeSql(),
+      { stage: 'native-item-support-distinct-admitted-native-items', timeoutMs: 120_000 });
+    assert.match(nativeItemSupport?.nativeItemSupport, /^PASS: distinct native Item support/);
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -359,6 +369,7 @@ try {
       shadowSourceErasure, shadowSourceErasureUpgrade, shadowSourceErasureConcurrency,
       sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
+      nativeItemSupport, nativeItemSupportUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

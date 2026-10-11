@@ -14,6 +14,32 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native base confidence distinct-Item support — 2026-10-12
+
+The old ordinary/catalogue kernel defect is reproduced on an actual populated
+schema: one native Item/eight matching tags yields confidence one. The guarded
+source forward replaces only its new base support with distinct admitted matching
+native Items; repeated tags/actions cannot create extra units. Legacy tag incidence
+remains diagnostic; explanation count/basis/version and uncalibrated status make
+the heuristic explicit. Scores/features/ranks/versions and old frozen evidence/
+receipts/functions retain their approved semantics. Bootstrap-only native support
+remains zero; same-Item source fusion and the retained bootstrap floor remain open.
+
+A private denied-API pure helper, independent populated preservation/drift verifier,
+BOOK/MOVIE/mode/zero/repeat/UNDO/temporal/foreign/missing/bootstrap matrix and actual
+CLI upgrade/smoke stages supply engineering coverage. The pinned CLI is unavailable
+locally and offline npm returns ENOTCACHED; the new forward uses a UTC-generated
+name. Focused full-schema **6/6**, syntax/whitespace pass; the actual 120-Item
+instrumented regression proves helper calls **1/7/50** for requested limits,
+without changing complete results or retained helper metadata. Final frozen full
+serial database **173/173**, independent support **6/6**, source/CLI review and
+**141 links / 77 anchors** pass. Root lint/typecheck/dependency **43**/mobile **493**/
+catalogue **444** pass before unavailable Edge registry loading; complete local
+root success is unclaimed. Completed parent #323 CI #634
+passes all five required jobs on the exact integrated tree; #324 CI #635/636
+and opted-in APK remain pending. STATUS/#229 own final publication/CI/build and
+subsequent native rollout/device/quality gates. No production mutation or quality activation occurs.
+
 ## Personal Taste selector and calibration source — 2026-10-12
 
 A separate portable `taste-selection-v1` export now chooses immutable next

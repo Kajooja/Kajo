@@ -18,11 +18,17 @@ still requires native/operator access and an independently retained declaration.
 The October 12 continuation integrates the separate #306 eligibility source in
 #323 and implements a bounded portable Personal Taste selector plus the existing
 calibration's independent unknown/prefix/scope correction. The selector has no
-native consumer yet. Next provide a coherent own-Personal server TasteSession
-with frozen policy/catalog and durable authorized presentation/response receipts,
-then the honest frozen challenge. Native distinct-Item confidence support remains
-a correctness gate. This source work does not invent a real roster or anonymous
-session.
+native consumer yet. The narrow native distinct-Item base confidence correction
+now follows this packet: preserve scores and frozen history while removing tag/
+action multiplicity from its uncalibrated support heuristic. Source/CI, hosted
+rollout and observed acceptance remain separate. Next correct canonical Personal
+rating revision/source fusion and bootstrap forgetting: a surviving explicit
+native rating supersedes earlier edits and the same Item's bootstrap rating;
+zero/neutral, exact Undo, ambiguity and current effective bootstrap-status support
+must agree across memory and both kernels. Then provide a coherent own-Personal
+server TasteSession with frozen policy/catalog and durable authorized presentation/
+response receipts, followed by the honest frozen challenge. This source work does not invent a
+real roster or anonymous session.
 Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing

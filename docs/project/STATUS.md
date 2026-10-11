@@ -10,7 +10,92 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — Personal Taste selector and calibration correction
+## Current packet — native base confidence support correction
+
+Continue on `feat/native-item-support`, based on the published
+[PR #324](https://github.com/Kajooja/Kajo/pull/324) head
+`9710f9cedf51bff12cbda0130d8fa4580b6d5c7a`, tree
+`f4174fd093db06d4a2de1bc74e801d870d00b6fb`. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. The single
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns exact published
+head/tree/CI/build receipts and retains its complete earlier handoff.
+
+A concrete native confidence defect is reproduced: one native Item with eight
+matching tags gives tag-incidence count eight and confidence one. The guarded
+forward now changes only new base confidence support in both ordinary/catalogue
+kernels to distinct already-admitted matching native Items. Existing temporal,
+UNDO and Profile filters remain in the original kernels. Legacy evidenceCount
+remains diagnostic; explanations add versioned distinct-Item count/basis and
+explicit uncalibrated status. The /8 formula is a conservative heuristic, not
+independent sample N or a calibrated probability. Scores, features, ranks,
+versions, old frozen rows/receipts and function metadata remain unchanged.
+Support aggregation is materialized after existing top-limit admission, over at
+most 50 returned candidates; an instrumented large-pool regression checks calls.
+Bootstrap alone still adds no native confidence. Source fusion/memory/Scenario/
+Shared reliability and observed quality remain separate.
+
+The new private helper denies PUBLIC/anon/authenticated/service_role execution.
+Independent populated forward verification checks old tables/rows/columns/
+constraints/indexes/triggers/functions/receipts, approves only the two exact body
+patches and rejects row/extra-score/bootstrap/ACL drift. Focused controls exercise
+BOOK/MOVIE, every mode, matching/duplicate tags/actions, distinct Items, zero,
+UNDO, neutral/future/foreign/missing evidence and bootstrap overlap. CLI install
+now includes populated support upgrade and full runtime smoke stages. Exact
+validation is finalized below; required CI/native rollout remains separate.
+The immutable forward SHA-256 is
+`ece43d9d34ccce1df6e9f01e69ac4498432cc211c58f5bcc8700e8ea3fc480d2`.
+Focused populated/support regression **6/6**, node syntax and whitespace pass.
+The large-pool rollback instrument observes exactly **1/7/50** helper calls for
+those requested limits over 120 eligible Items, retaining complete results.
+Independent frozen regression **6/6**, source review, CLI wiring and
+**141 local links / 77 anchors** pass. The required root check passes
+lint/typecheck/dependency **43**/mobile **493**/catalogue **444**, then fails on
+unavailable Edge registry `@supabase/auth-js` connection refused. Final frozen
+full database serial suite passes **173/173**, zero failures/skips, including the
+new **6/6** support tests. The pre-freeze run was stopped before the bounded
+resource revision and supplies no final acceptance. Complete local root success
+is not claimed; parent configured exports and unchanged engine remain as recorded.
+The CLI executable/cache is unavailable locally (offline ENOTCACHED), so the new
+UTC-named forward preserves the existing migration pattern without a CLI run.
+
+The parent has engine **245**, mobile **493**, catalogue **444**, dependency **43**,
+full serial database **167**, research **19 Python + 43 Node**, acceptance **6 + 5**
+and configured iOS/Android/application-description exports passed. Root check is
+blocked at Edge npm registry access, not a successful complete check. Parent
+CI #635 and APK-opted-in #636 are pending. Completed
+[#323 CI #634](https://github.com/Kajooja/Kajo/actions/runs/38175782298) passes all
+five required gates: validate `114577759890`, platform `114577759959`, two clean
+installations `114578059215`, populated upgrade `114578986882`, CLI/history
+`114578986844`. Its synthetic merge `890381e05484ee0052d64a80307d2cd421358f70`
+has the exact integrated tree `352153f81a6970fb7ebfa0109c7deb583d5d4682`; APK is
+skipped. Parent #324 explicitly opts into a test APK only after all five gates.
+No build/device acceptance is claimed merely from its label or compiled exports.
+
+**Single next action:** verify this exact published source and inspect its completed
+required CI once; repair a concrete failure. Source review/local SQL verification
+is complete, while native CI, guarded hosted rollout and device acceptance remain
+separate.
+Then correct canonical Personal source fusion/forgetting before server
+TasteSession: resolve one surviving explicit native rating per Item through the
+available prefix and exact UNDO, replacing earlier edits and that Item's bootstrap
+rating. Preserve zero/neutral five; weak actions cannot suppress durable bootstrap,
+ambiguous ties cannot invent a winner, and genuine withdrawal may reveal the
+retained bootstrap. Version the removal of the permanent bootstrap decay floor,
+keeping its 1460-day timescale and native 180-day rule. Use the same resolver for
+Personal memory, ordinary/catalogue serving and current bootstrap-status support;
+raw Event counts cannot establish completed setup after Undo/clear/removal.
+Retain frozen history and separate Shared/repeat-experience/observed-quality gates.
+After that implement coherent own-Personal server TasteSession with frozen policy/
+catalog, durable authorized presentations/responses and canonical bootstrap
+provenance. Before
+real anonymous Taste provide identity/lifecycle/abuse/measurement; before challenge
+answers freeze its predictions. Actual Working collection needs authorized
+existing-owner/native/operator scope and an independent pre-window declaration.
+Preserve genuine #232F, #306 guarded hosted rollout, #229 device/fresh-account
+and every MVP/Share Link gate. No hosted write, account/history reset, main merge,
+learning/quality activation or first-public completion is claimed.
+
+## Previous packet — Personal Taste selector and calibration correction
 
 Continue on `feat/kajo-first-session`, based on the published
 [PR #323](https://github.com/Kajooja/Kajo/pull/323) integration head
@@ -45,8 +130,8 @@ mobile **493/493**, lint/typecheck pass. Root lint/typecheck, dependency **43** 
 catalogue **444** pass; research **19 Python + 43 Node**, acceptance **6 + 5** and
 configured iOS/Android application plus isolated description exports also pass.
 The required root check is blocked at unavailable Edge registry/cache loading;
-complete local root success is unclaimed. The full database serial recheck and
-exact new-source CI are still pending. Failed overload-run database cases pass
+complete local root success is unclaimed. The full database serial recheck passes **167/167**; exact new-source CI remains
+pending. Failed overload-run database cases pass
 **17/17** in their focused serial replay without changing code or fixtures.
 Source, native/hosted, device and observed-quality acceptance stay separate.
 
