@@ -242,6 +242,82 @@ not authenticate files, certify current access or establish an untouched cohort.
 Predeclare the cohort/report window separately before observed quality or canary
 claims; this command admits no model, learning or native activation.
 
+## Private Working cohort protocol
+
+The separate cohort command fixes selection rules before a future enrollment
+window and reconciles a supplied complete inventory against those rules:
+
+```bash
+npm run engine:working:cohort -- declare REQUEST DECLARATION
+npm run engine:working:cohort -- report DECLARATION INVENTORY REPORT
+```
+
+Use existing, currently authorized PersonalProfile owners. The repository has no
+real cohort roster or private enrollment inventory; its executable fixtures are
+engineering evidence. Creating a protocol file does not establish that a real
+untouched cohort exists. No account creation, history reset, hosted deployment
+or automatic model admission is part of these commands.
+
+The strict private declaration request contains:
+
+| Field | Contract |
+| --- | --- |
+| `contractVersion` | `kajo-personal-working-cohort-request-v1` |
+| `scopeId`, `cohortRef` | Opaque scoped aliases without embedded native UUIDs |
+| `roster` | 1–128 explicit `{actorUserId, profileId, actorRef, subjectRef}` records; stable, injective aliases in `scopeId` |
+| `enrollmentWindow` | Future `{startAt, endAt}` in milliseconds; selection is half-open `[startAt, endAt)` |
+| `horizonMs` | 1 second–90 days, an integer multiple of 1,000 ms |
+| `settlementMs` | 0–7 days, an integer multiple of 1,000 ms |
+| `evaluationAsOf` | Fixed cutoff at least `endAt + horizonMs + settlementMs` |
+
+Declaration records the process clock and a canonical SHA-256 digest. Inventory
+and report reference that normalized declaration digest; their arbitrary file
+contents are not signed or hashed by it. It is an integrity check on the protocol,
+not a trusted timestamp or signature. Start must follow the declaration clock.
+The report runs after the fixed evaluation cutoff, without backdating actual
+snapshot reads. Existing `snapshotObservedAt <= evaluationAsOf` still applies;
+the operator must export authorized snapshots by that cutoff.
+
+The strict inventory has `contractVersion:
+"kajo-personal-working-cohort-inventory-v1"`, `declarationDigest`, `inventory` and
+`manifest`. `manifest` is the complete existing Working v1 manifest. Every ledger
+row has `{enrollmentId, actorUserId, profileId, declaredAt, pairCount,
+firstCaptureStatus}` and must belong to the declared roster/window. Ledger rows
+and manifest entries must correspond exactly; omitted/extra enrollments and
+excess budgets reject the entire report rather than truncate it. The supplied
+inventory's actual completeness remains unestablished by files.
+
+All native enrollments in the declared roster/window are selected. Sources must
+be requested during that window. Enrollments must use exactly the fixed horizon
+and settlement. Each eligible OFF-selected tier below 2 is sorted by frozen final
+rank and paired adjacently, with the lower rank on the left; an odd remaining
+candidate stays unpaired. Pair choices cannot be replaced by a favorable subset.
+Every selected pair and every support state stays in descriptive coverage.
+Registered owners with zero selected enrollments remain visible in roster counts.
+Existing native identity, alias and input/outcome overlap guards still apply.
+
+Only the first reserved immutable capture, revision 1, is admitted.
+`firstCaptureStatus: "AVAILABLE"` requires that capture; `"NOT_RESERVED"` requires
+a null capture and retains all planned pairs in coverage. `"WITHDRAWN"` invalidates
+the whole cohort, and revision 2 cannot replace it. Missing/unknown/incomplete
+labels do not become failed outcomes. Item support concentration is not an
+independent outcome sample size; no significance, uplift or quality claim follows.
+
+The same POSIX private-file limits and mode-0600 exclusive output outside Git
+apply. The owner must remove requests, declarations, inventories, snapshots and
+reports at withdrawal or seven days after the fixed cutoff, whichever is earlier.
+The command rejects an expired report but does not erase retained files or check
+current native authorization. A withdrawal invalidates the entire cohort; do not
+prune its denominator and reuse the remaining report.
+
+Reports retain explicit unestablished source authenticity, actual preregistration,
+inventory completeness and current authorization. Commit availability is UNKNOWN,
+independence unestablished and uncertainty unavailable. Engineering fixtures
+contribute zero observed evidence units; historical-feature eligibility, learning,
+native activation and quality admission remain false. An independently retained
+operator/native receipt, exact implementation/backend checkpoint and current
+scope/complete inventory are still needed before real observed coverage is claimed.
+
 ## Bounded Working evaluation
 
 `./working-evaluation` is a separate descriptive boundary. It neither imports

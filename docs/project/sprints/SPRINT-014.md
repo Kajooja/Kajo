@@ -14,6 +14,40 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Bounded future Working cohort protocol — 2026-10-11
+
+Parent #321 source `963a3ab0ccf577d22cab02b2a5300f59d7eee9db`, tree
+`851b27af5ba64bdb6ba26fd3e352e1c02368e403`, has all five successful CI #632
+gates in the completed receipt inspection after implementation; the earlier
+unfinished check had four passed jobs. The synthetic merge has that same tree;
+APK was skipped. STATUS/#229 own exact new-source gates.
+
+The new offline declaration/checker fixes a future existing-owner roster,
+half-open enrollment window, fixed horizon/settlement/report cutoff, complete
+supplied ledger reconciliation, all adjacent same-tier OFF pairs and first
+reserved capture revision 1. Missing captures retain all planned pairs;
+omissions, altered windows, substitution, overlap, excess budgets and declared
+withdrawal reject the whole cohort. File digests establish internal integrity
+only. The private artifacts need current owner access and removal at withdrawal
+or the fixed seven-day review deadline; no automatic erasure occurs.
+
+This source-only packet has no actual authorized roster/inventory or independent
+native/operator declaration receipt. It creates no real untouched cohort and
+collects no observed coverage. Fixture observed evidence stays zero, and all
+learning/activation/quality gates remain unchanged. The next actual collection
+requires that native/operator path and existing-owner scope, after required
+source gates. No accounts, histories, SQL, hosted state or APK change.
+
+New cohort **9/9**, independent combined cohort/Working/ordinal **30/30**,
+actual SQL-to-cohort **5/5**, engine **220/220** plus built import graphs,
+research **19 Python + 43 Node**, acceptance **6 + 5** pass. Root lint/typecheck,
+dependency **43**, mobile **478** and catalogue **444** pass before unavailable
+Edge registry/cache; fresh smoke fails closed without production configuration.
+Complete local root/application exports remain unclaimed. Independent source
+and docs review, **145 file links / 78 anchors**, syntax/whitespace pass.
+Root lock, 74 migrations, engine source, production functions and all tracked
+SQL remain byte-identical; this source still requires its own native CI gates.
+
 ## Private owner Working report and native fixture repair — 2026-10-11
 
 The #320 source `f68569b5c0545e5081fbc2b246ea27cacd33c572`, tree

@@ -10,7 +10,82 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — private owner Working coverage report
+## Current packet — bounded future Working cohort protocol
+
+Continue on `feat/personal-working-cohort`, stacked on
+[PR #321](https://github.com/Kajooja/Kajo/pull/321), exact parent
+`963a3ab0ccf577d22cab02b2a5300f59d7eee9db`, tree
+`851b27af5ba64bdb6ba26fd3e352e1c02368e403`. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`. The single
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) owns exact publication
+and native CI; its original September 30 checkpoint remains intact. Public
+source publication authorization persists. Source, native/hosted, device and
+observed-quality acceptance remain distinct.
+
+The completed parent [CI #632](https://github.com/Kajooja/Kajo/actions/runs/38170545876)
+has all five required jobs successful: validation/exports `114562053561`,
+platform/defaults `114562053583`, two clean installations `114562393040`,
+populated upgrade `114562981038` and CLI/history `114562981021`.
+An initial unfinished inspection was followed by one completed receipt inspection
+after implementation. Its synthetic merge `791c8785d72ce48b055f30742ef21592ca14ba59`
+has the exact parent tree above. APK was skipped without opt-in.
+No ongoing CI/APK polling is introduced.
+
+The source-only `engine:working:cohort` command declares a future explicit native
+owner/PersonalProfile roster, half-open enrollment window, fixed horizon,
+settlement and evaluation cutoff. Its report reconciles all supplied ledger
+enrollments bijectively with the existing Working manifest. It fixes adjacent
+same-tier OFF-selected pairs and first reserved capture revision 1. Null captures
+retain planned units; omissions, scope/window changes, excess budgets, overlap,
+later capture substitution or declared withdrawal reject the whole report.
+All support states and registered owners with zero enrollments remain visible.
+
+The normalized declaration digest links inventory/report to those rules; it does
+not hash or sign their arbitrary contents or establish a trusted clock, native
+authenticity, actual preregistration, inventory completeness or current
+authorization. The owner must invalidate/remove every exported artifact on
+withdrawal or seven days after the fixed cutoff; the command rejects expired
+reports but does not reauthorize or erase copies. Private exclusive files remain
+outside Git. The [cohort contract](../../packages/prediction-engine/README.md#private-working-cohort-protocol)
+owns input fields and limits. Existing Working v1 behavior is preserved.
+
+No actual roster, private enrollment inventory or independent operator/native
+declaration receipt is present in the repository. No real untouched cohort is
+instantiated and no observed coverage is collected. Engineering fixtures yield
+zero observed evidence units. Commit availability UNKNOWN, independence
+unestablished, uncertainty unavailable and all learning/activation/quality flags
+remain unchanged. No SQL, hosted state, accounts, history or APK is changed.
+
+Final validation: new cohort **9/9** and independently reviewed combined
+cohort/Working/ordinal **30/30**, zero failures/skips; actual native SQL-to-cohort
+bridge **5/5** verifies first reservation, revision-2 rejection, fixed horizon,
+all adjacent pairs, omission and actual whole-capture withdrawal. Engine
+**220/220** plus built exports/import graphs, research **19 Python + 43 Node**
+and acceptance **6 + 5** pass. The required root check passes lint/typecheck,
+dependency **43**, mobile **478** and catalogue **444**, then is interrupted on
+unavailable Edge registry loading; cached Edge lacks `@supabase/auth-js`.
+Fresh smoke fails closed on missing production Supabase configuration.
+Complete local root/application exports remain unclaimed. Independent source
+and documentation review pass; **145 local links / 78 anchors** resolve.
+Root lock, all 74 migrations, 15 engine source files, 10 production function
+files and 130 tracked SQL files retain bytes. The new source requires its own
+five CI conclusions; publication/native receipts belong to #229.
+
+**Single next action:** verify this exact published source and inspect its completed
+required CI once; repair a
+concrete failure. Then establish the actual authorized native/operator path,
+existing-owner roster and independent pre-window declaration before collecting
+one real bounded cohort. Do not invent a roster, reset accounts, backdate snapshot
+reads or call editable files a prospective certificate. Observed-quality/canary
+admission remains separate. Preserve bootstrap/independent support/transfer/
+first-session usefulness, anonymous Taste prerequisites, genuine #232F Shared,
+#306 integration, #229 configured-device/fresh-account and every MVP gate.
+The separate #303 capability map retains its inherited #238 integration blocker.
+
+## Previous packet — private owner Working coverage report
+
+The following dated source record is preserved. Its old pending CI/next-action
+wording is superseded by the current packet above.
 
 Continue on `feat/personal-working-report`, stacked on
 [PR #320](https://github.com/Kajooja/Kajo/pull/320), exact parent

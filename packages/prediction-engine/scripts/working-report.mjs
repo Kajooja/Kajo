@@ -164,10 +164,8 @@ function validateNativeBatch(manifest) {
   for (const id of outcomeRecords.keys()) if (inputRecords.has(id)) reject('SOURCE_REUSE');
 }
 
-export async function runWorkingReport(inputPath, outputPath) {
-  assertWorkingReportPlatform();
-  if (typeof inputPath !== 'string' || !inputPath || typeof outputPath !== 'string' || !outputPath) reject('ARGUMENTS');
-  const destination = await reportPath(outputPath), manifest = await readManifest(inputPath);
+/** Pure snapshot builder; filesystem authorization remains the owner's duty. */
+export async function buildWorkingReport(manifest) {
   validateManifest(manifest); validateNativeBatch(manifest);
   let normalizePlan, normalizeCapture, freezePlan, evaluateBatch;
   try {
@@ -206,6 +204,14 @@ export async function runWorkingReport(inputPath, outputPath) {
       observedActors: observedActors.size, observedActorSessions: observedSessions.size }, result };
   const serialized = JSON.stringify(report);
   if (embeddedUuidPattern.test(serialized)) reject('SNAPSHOT_REJECTED');
+  return report;
+}
+
+export async function runWorkingReport(inputPath, outputPath) {
+  assertWorkingReportPlatform();
+  if (typeof inputPath !== 'string' || !inputPath || typeof outputPath !== 'string' || !outputPath) reject('ARGUMENTS');
+  const destination = await reportPath(outputPath), manifest = await readManifest(inputPath);
+  const report = await buildWorkingReport(manifest);
   await writeReport(destination, report);
   return report;
 }

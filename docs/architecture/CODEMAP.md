@@ -36,6 +36,7 @@ supabase/functions/password-auth/
 | Stored declaration and actual later read binding | Existing `adapters/kajo-working-evaluation.ts` / `working-evaluation.ts` |
 | Actual SQL producer → plan → outcomes → coverage regression | `scripts/database/working-outcomes-kajo.test.mjs` |
 | Private owner Working report, native identity guards and filesystem contract | `packages/prediction-engine/scripts/working-report.mjs`, shared `private-report-files.mjs`, `scripts/research/working-report.test.mjs`; root `engine:working` |
+| Future Working cohort declaration and complete supplied-inventory reconciliation | `packages/prediction-engine/scripts/working-cohort.mjs`, `scripts/research/working-cohort.test.mjs`; root `engine:working:cohort` |
 
 STATUS owns exact source/native acceptance. These private producers retain exact
 OFF and UNKNOWN commit availability; they add no serving API or quality admission.

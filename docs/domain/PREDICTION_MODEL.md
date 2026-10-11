@@ -1695,6 +1695,19 @@ The [executable input contract](../../packages/prediction-engine/README.md#priva
 owns limits and manifest fields. Declare the native cohort/report window and
 complete enrollment selection before observed-quality/canary work.
 
+The separate private Working cohort protocol now fixes an explicit existing-owner
+roster, future half-open enrollment window, horizon, settlement and report cutoff.
+Its checker reconciles every supplied inventory enrollment with the report, uses
+all adjacent same-tier eligible OFF pairs and the first reserved capture revision,
+and rejects omissions, altered windows, overlap, excess budgets or declared
+withdrawal. All support states and absent captures remain in descriptive coverage.
+Withdrawal invalidates the whole cohort; exported artifacts have a seven-day
+post-cutoff retention bound. The owner handles actual access and removal.
+A canonical digest is only file-integrity evidence: native authenticity, current
+authorization, inventory completeness and actual predeclaration remain
+unestablished. The [cohort input contract](../../packages/prediction-engine/README.md#private-working-cohort-protocol)
+does not instantiate a real cohort or grant quality/canary admission.
+
 #### Bounded offline WorkingState evaluation
 
 The separate portable `./working-evaluation` boundary evaluates immutable

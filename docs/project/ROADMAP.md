@@ -10,8 +10,12 @@ The active source successor now supplies bounded server declaration of actual OF
 pairs and immutable latest-terminal outcome captures, with whole-source withdrawal
 and durable capture reservations. STATUS and #229 own exact publication and gates.
 The active successor consumes those actual receipts in a bounded private owner-run
-coverage report. Next freeze its untouched cohort/window and complete enrollment
-selection before observed quality or canary claims. Stored
+coverage report. Its source-only cohort protocol now fixes a future roster/window,
+complete supplied enrollment reconciliation, deterministic pairs, first reserved
+capture and exported-file lifecycle. No real authorized cohort is instantiated.
+Next verify source CI, then establish the actual native/operator prerequisites
+and independently retained declaration before collecting observed coverage.
+Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing
 bootstrap/transfer/first-session, genuine #232F, #306 and device/release order.
