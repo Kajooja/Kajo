@@ -118,6 +118,14 @@ describe('item interaction state', () => {
     expect(getConsumedItems(ITEMS, interactions).map((item) => item.id)).toEqual(['book-b']);
   });
 
+  it('suppresses not-interested Items without adding them to consumed history', () => {
+    const interactions = setItemNotInterested({}, 'book-b', true);
+
+    expect(getDiscoverableItems(ITEMS, interactions).map((item) => item.id)).toEqual(['book-a', 'book-c']);
+    expect(getConsumedItems(ITEMS, interactions)).toEqual([]);
+    expect(getDiscoverableItems(ITEMS, setItemNotInterested(interactions, 'book-b', false))).toEqual(ITEMS);
+  });
+
   it('starts swipe at the selected Item and suppresses other consumed Items', () => {
     const interactions = setItemConsumed({}, 'book-b', true);
 

@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-11**
+Last updated: **2026-10-12**
 Current milestone: **MVP 0.1 — first public Kajo**
 Current sprint: **Sprint 014 — algorithm reliability / real catalog / portable engine**
 Last accepted sprint: **Sprint 013 — Prediction Nervous System & ScenarioMemory**
@@ -10,7 +10,34 @@ This file owns one exact resumable next task. [ROADMAP](ROADMAP.md) owns order,
 owns the Taste/Friend/Shared flow. Read current main first, then the active branch;
 an older branch-local handoff cannot replace newer accepted product decisions.
 
-## Current packet — bounded future Working cohort protocol
+## Current packet — integrate Shared overlay eligibility
+
+The October 12 owner continuation requests sustained engine and first-app work.
+Continue on `feat/kajo-first-session`, based on the exact #322 head
+`57c43dda3e9db205415dc6353c4ba22b649ca3e9`. Its completed
+[CI #633](https://github.com/Kajooja/Kajo/actions/runs/38172624391) passes all five
+required gates; the synthetic merge receipt must retain the tested source tree.
+Accepted main remains `34d21704cafe21091a2369396c9bc61dce99c1e9`.
+
+The previously separate #306 eligibility fix is now integrated into this native
+source: its six executable/test/SQL files retain exact bytes from
+`d14c705d33ff633f86d3bc133dd9b701b6f210cd`; its CLI probe is merged alongside all
+later Shared/Working probes. Rejected or withdrawn Items cannot re-enter through
+Shared member-history/pending overlays. Focused mobile **26/26** and populated
+full-schema regression **1/1** pass. The guarded migration retains SHA-256
+`49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698`.
+Integrated source CI, hosted guarded rollout and actual device acceptance remain
+separate; no deployed migration/history or account is changed.
+
+**Next action:** validate/publish the integrated source, then implement the bounded
+Personal Taste selection source and the existing calibration's independent unknown
+action. Real Working collection still requires the native/operator prerequisites
+below. Preserve anonymous identity/lifecycle/abuse/measurement, frozen challenge,
+actual first-session usefulness, genuine #232F and #229 device/release gates.
+The old staged #199 footer is superseded by the existing append/compact-layout
+source and must not be transplanted.
+
+## Previous packet — bounded future Working cohort protocol
 
 Continue on `feat/personal-working-cohort`, stacked on
 [PR #321](https://github.com/Kajooja/Kajo/pull/321), exact parent

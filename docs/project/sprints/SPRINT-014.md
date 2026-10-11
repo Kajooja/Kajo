@@ -14,6 +14,21 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Shared overlay source integration — 2026-10-12
+
+Completed #322 CI #633 passes all five required jobs. The separate #306 source
+is integrated without replacing current Shared/Working probes or canonical
+handoff documents. Six code/test/SQL files are byte-identical to reviewed
+`d14c705d33ff633f86d3bc133dd9b701b6f210cd`; the guarded migration SHA-256 remains
+`49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698`.
+The three-line CLI stage runs alongside all subsequent native probes.
+Focused mobile **26/26** and populated full-schema eligibility/negative-control/
+metadata-preservation **1/1** pass. Integrated CI, hosted rollout and device
+observations remain distinct. No account/history reset or hosted mutation occurs.
+The stale staged #199 terminal-refresh footer is superseded by the current
+append/compact-layout source. STATUS owns publication and the next Personal
+first-session source work; every anonymous/quality/Shared/device release gate stays.
+
 ## Bounded future Working cohort protocol — 2026-10-11
 
 Parent #321 source `963a3ab0ccf577d22cab02b2a5300f59d7eee9db`, tree

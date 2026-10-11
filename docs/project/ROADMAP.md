@@ -13,8 +13,11 @@ The active successor consumes those actual receipts in a bounded private owner-r
 coverage report. Its source-only cohort protocol now fixes a future roster/window,
 complete supplied enrollment reconciliation, deterministic pairs, first reserved
 capture and exported-file lifecycle. No real authorized cohort is instantiated.
-Next verify source CI, then establish the actual native/operator prerequisites
-and independently retained declaration before collecting observed coverage.
+The exact #322 source has all five CI #633 gates successful. Actual collection
+still requires native/operator access and an independently retained declaration.
+The October 12 continuation first integrates the separate #306 eligibility source,
+then advances bounded Personal Taste selection and the existing calibration's
+independent unknown action. It does not invent a real roster or anonymous session.
 Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing
@@ -41,7 +44,8 @@ acceptance. Known Shared evidence/eligibility defects must still be resolved.
 The genuine consumer of #232F's prepared input remains queued: it must calculate
 from that exact input and atomically retain the resulting forecast lineage before
 joint learning/serving admission. Input preparation is not delivered consumption.
-Keep #306 integration/guarded rollout, #229 native/device/fresh-account acceptance,
+#306 source integration now joins the active stack; its integrated CI/guarded
+rollout and device acceptance remain open. Keep #229 native/device/fresh-account acceptance,
 Phase 16.3 and every MVP requirement. STATUS owns exact source and acceptance.
 
 Before real anonymous Taste acceptance, provide server-backed anonymous state,
