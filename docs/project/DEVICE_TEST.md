@@ -1,12 +1,39 @@
 # Collection device checkpoint — #228 / #229
 
+## Owned mobile Taste consumer acceptance — #330 / 2026-10-12
+
+Use the #330 source's successful CI/APK receipt and actual backend checkpoint.
+The accepted-main #648 APK predates this mobile consumer; it cannot demonstrate
+these new screens. If the first Taste RPC is unavailable, the app deliberately
+uses legacy static calibration. Do not interpret that as new-flow acceptance or
+apply forwards without their guarded history/ownership procedure.
+
+1. Preserve completed setup; import history before explicitly starting a new test.
+   Resume a retained session after restart, including after six strong bootstrap answers.
+2. Follow actual MOVIE questions to the explicit book transition, then BOOK questions
+   and bounded server stop. Unknown after an accidental wheel drag sends no rating;
+   deliberate 0 and neutral 5 remain ratings.
+3. Lose a reply after a submitted answer, restart and retry. The same pending ID/body
+   returns the accepted state, without another question/answer or duplicate bootstrap.
+   A conflict requires explicit reload; the old answer never shifts to a new Item.
+4. Switch Profile/client, background or restart during a request. Old callbacks do not
+   change the new scope. Corrupt/unwritable local storage confirms no new answer.
+5. Enter the challenge, answer known/unknown/not-interest, and verify forecasts and
+   partial results remain hidden until all first answers lock. Completion reports
+   sample size, ordering, ties and missing support without a claimed percentage.
+6. Confirm removal and source withdrawal. Challenge-only removal preserves training
+   ratings; session removal withdraws its source. Past request IDs do not resurrect it.
+
+Record installed SHA/run, device/OS, backend history and actual observed cases.
+Automated screen/controller/SQL contract tests do not establish gesture or device acceptance.
+
 ## Source integration and current device scope — 2026-10-12
 
 The owner authorized the complete source stack merge through #329 after CI.
 The earlier instructions below to keep #229 draft are historical and superseded
 for source integration. No new phone observation is supplied by that approval.
 Current source/build identity belongs to [STATUS](STATUS.md); the latest verified
-APK is the #324 build recorded there, not the older artifacts below.
+accepted-main APK is #648, recorded there; it predates #330 and the older artifacts below remain dated evidence.
 Keep unobserved reconnect/provenance/process-death, fresh-account and Shared cases
 open with #238. Record installed binary/run, device and backend checkpoint when
 exercising them. Preserve prior positive observations and existing account data.

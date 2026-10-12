@@ -118,7 +118,7 @@ owned PersonalProfile. `public.taste_session_v1(request)` is an invoker wrapper
 over a privately owned authorization/transaction boundary. Private session and
 command tables have RLS, with no direct `anon`/`authenticated`/`service_role` access.
 Every operation rechecks the canonical owner; Shared, foreign and anonymous
-identities are rejected. This is not the anonymous launch entry or mobile rollout.
+identities are rejected. This is not the anonymous launch entry. The #330 mobile consumer uses these RPCs for owned authenticated sessions; hosted/device acceptance is separate.
 
 | Operation | Required JSON fields besides `operation` | Behavior |
 |---|---|---|
@@ -161,9 +161,7 @@ Import-source removal performs the same withdrawal atomically. Session/command
 copies cascade on account/Profile deletion. Existing bootstrap rows follow the
 canonical logical-removal/retention policy; this source does not claim complete
 anonymous retention or physical erasure. Server-issued opportunities are durable
-presentation receipts, not observed exposure. Existing native calibration is
-unchanged. The separate own-Personal challenge source is described below; public
-anonymous entry, app/UI integration and observed usefulness remain required.
+presentation receipts, not observed exposure. The native six-strong setup status remains independent of the longer server Taste policy. The #330 mobile consumer follows retained server state; legacy static calibration is used only when its first session RPC is confirmed unavailable. The separate challenge source is below; anonymous entry, hosted/device acceptance and observed usefulness remain required.
 
 ### TasteResponse
 
@@ -246,6 +244,16 @@ challenge terminal. Taste/import removal does the same. Account/Profile deletion
 cascades the new tables. Existing canonical Prediction history follows its own
 retention/erasure lifecycle; logical challenge removal is not a physical-erasure
 claim for that history.
+
+The #330 mobile consumer retains only session/challenge IDs, dismissal and one
+unacknowledged command in backend/actor/Profile-scoped SQLite. An exact replay is
+followed by RESUME before another decision. A confirmed conflict is reloaded only
+after explicit user action, without rebasing an old answer. New cold-start START
+waits for the start action, preserving the import-first option; completed setup and
+retained sessions are resolved through the server, independently of six-strong status.
+The first missing RPC alone permits legacy fallback. Forecasts and partial metrics
+are rejected by the adapter while the challenge is active; terminal withdrawal
+clears the rendered state. This does not establish observed screen exposure.
 
 `learningAdmission=EVALUATION_ONLY`: answers do not become native Events, bootstrap
 rows, impressions, training outcomes or model-promotion evidence. Explicit future

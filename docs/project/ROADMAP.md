@@ -10,8 +10,10 @@ The owner explicitly authorized merging the complete #229 → #329 source stack
 into main after required CI. This supersedes the earlier device-based source
 merge hold. Configured-device/fresh-account evidence, hosted rollout, measured
 quality and every incomplete MVP gate retain their existing acceptance scope.
-After integration, start from main and connect the owned adaptive TasteSession
-and frozen challenge mobile flow. STATUS owns the exact publication receipt.
+The complete source stack is now accepted through #329 and main CI #648. #330
+supplies the owned adaptive TasteSession/challenge mobile consumer; verify its
+source CI and matching backend/device behavior before release acceptance. STATUS
+owns the exact publication receipt and one current task.
 Older dated sections below preserve their original decisions and evidence.
 
 ## Prospective Personal source and evaluation order — 2026-10-10
@@ -46,7 +48,8 @@ durable authorized presentation/response receipts, independent portable/SQL
 selection parity, rating-only bootstrap projection and removal. The current
 successor freezes canonical holdout forecasts before accepting evaluation-only
 answers, with descriptive same-domain ordinal agreement and explicit ties/missing
-support. Next connect the adaptive app flow to both authorized boundaries.
+support. The #330 owned mobile source now connects both authorized boundaries; guarded
+hosted/device validation and canonical preview follow in their retained order.
 The source does not invent a real roster,
 prove screen exposure or supply an anonymous session.
 Observed quality and canary claims remain separate. Stored

@@ -70,7 +70,10 @@ Unknown/not-interest/withdrawal stay distinguishable; see [Taste evidence](DATA_
 Durable receipt issuance is not observed screen exposure. The own-Personal frozen
 challenge source is below; anonymous lifecycle, preview, app integration and
 usefulness evidence remain open.
-The root estimator, current mobile calibration policy/RPC and scorer are unchanged.
+The root estimator and scorer are unchanged. The #330 owned mobile consumer uses
+the retained server selection policy rather than the legacy six-rating stop rule.
+Only a confirmed missing first session RPC permits legacy static calibration.
+Runtime/deployment/anonymous and measured usefulness acceptance remain separate.
 
 ### Frozen Personal Taste challenge
 
@@ -99,6 +102,12 @@ Pairs are partitioned in this order:
 | Absolute frozen score difference is at most `1e-9` | `forecastTiePairs`; stable ID rank is not a taste prediction. |
 | Both differences are nonzero and their signs agree | `concordantPairs`. |
 | Both differences are nonzero and their signs disagree | `discordantPairs`. |
+
+The #330 mobile result presents these actual counts as same-domain ordering
+agreement, sample size, ties and missing forecasts. Active responses with visible
+forecasts or partial metrics are rejected by the service adapter. No client
+ranking/rating estimator, percentage, uncertainty interval or learning projection
+is introduced. The adapter is checked against actual current SQL RPC results.
 
 `comparablePairs = concordantPairs + discordantPairs`. The result separately reports
 reserved/answered Items, known ratings, unknown and not-interest counts. Unknown

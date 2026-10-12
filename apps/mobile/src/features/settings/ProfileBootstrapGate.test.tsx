@@ -2,7 +2,7 @@ import React, { type ReactElement, type ReactNode } from 'react';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getRoomTheme } from '../../theme/roomTheme';
-import { ProfileBootstrapGate, ProfileCalibrationScreen } from './ProfileBootstrapGate';
+import { ProfileBootstrapGate, ProfileCalibrationScreen, PersonalTasteGate } from './ProfileBootstrapGate';
 import type { ProfileBootstrapStatus, ProfileCalibrationRpc } from './profileCalibrationOperations';
 
 const hooks = vi.hoisted(() => ({
@@ -59,7 +59,9 @@ vi.mock('react-native', () => ({
   StyleSheet: { create: (value: unknown) => value },
 }));
 vi.mock('expo-router', () => ({ useRouter: () => ({ push: vi.fn() }), useSegments: () => context.segments }));
-vi.mock('@/data/SupabaseProvider', () => ({ useSupabaseConnection: () => ({ status: 'configured', client: context.client }) }));
+vi.mock('expo-sqlite/kv-store', () => ({ default: { getItemSync: () => null, setItemSync: vi.fn() } }));
+vi.mock('@/data/SupabaseProvider', () => ({ useSupabaseConnection: () => ({ status: 'configured', client: context.client,
+  config: { url: 'https://fixture.example.invalid' } }) }));
 vi.mock('@/features/branding/KajoBrand', () => ({ KajoMark: 'KajoMark' }));
 vi.mock('@/features/discovery/DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
 vi.mock('@/features/discovery/RatingControl', () => ({ RatingControl: 'RatingControl' }));
@@ -175,7 +177,9 @@ function renderGate() {
   return tree;
 }
 function screenElement(tree = renderGate()): ScreenElement {
-  expect(React.isValidElement(tree) && tree.type).toBe(ProfileCalibrationScreen);
+  // The outer scope now owns both the new server flow and legacy fallback.
+  // Continue exercising the real retained legacy screen with that exact scope.
+  expect(React.isValidElement(tree) && tree.type).toBe(PersonalTasteGate);
   return tree as ScreenElement;
 }
 function renderElement(element: ScreenElement) {

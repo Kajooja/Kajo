@@ -14,6 +14,37 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Owned adaptive mobile Taste consumer — #330 / 2026-10-12
+
+Source parent: accepted main `9237b3814b2b408a43ec8abb664c3a6c0a57baca`, all five
+CI #647/#648 gates. Main #648 also built the verified APK; it predates this consumer.
+The `feat/mobile-personal-taste` packet connects both owned server Taste RPCs to
+mobile through typed receipt validation and a separate one-command SQLite controller.
+New cold-start creation waits for explicit start/import choice; retained sessions
+and completed setup follow server truth, independently of native six-strong status.
+Movie-to-book acknowledgement, genuine zero/neutral, independent unknown/not-interest,
+masked challenge forecasts, honest ordinal counts and confirmed removal are implemented.
+
+One backend/actor/Profile-scoped immutable pending command is persisted before send.
+Lost replies and local acknowledgement failure retain the exact ID/body; current
+server state is resumed before another decision. Confirmed conflict/rejection needs
+explicit reload, without rebasing an answer. Layout/generation cancellation rejects
+old callbacks; corrupt queues are preserved without dispatch/overwrite. Only a
+confirmed missing first session RPC enables legacy static calibration. Full retained
+answers/forecasts remain server-owned; this is not a new native Event/learning writer.
+
+Validation: 34 focused mobile tests, existing legacy regressions and the actual
+full-current-schema mobile-adapter SQL contract pass through stages, canonical
+freeze/completion and both removal boundaries. Local lint/typecheck, dependency,
+mobile and catalogue checks pass. Local root reaches refused Deno npm-registry
+access; full-root success is not claimed. Final full CI/native export receipts
+belong to #330's PR. DEVICE_TEST lists exact matching-source/backend cases;
+no real device, hosted rollout, account reset or measured usefulness is claimed.
+
+Next: finish source CI, then guarded matching-backend/native acceptance. Canonical
+unseen preview follows. Anonymous lifecycle/abuse/measurement, later answer
+projection, genuine #232F, Shared rollout and incomplete MVP gates stay open.
+
 ## Owner-authorized source integration — 2026-10-12
 
 The owner explicitly instructed: “No jatka, yhdistä mainiin, hyväksy kaikki.”

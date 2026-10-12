@@ -1,4 +1,6 @@
 import { useRouter, useSegments } from 'expo-router';
+import Storage from 'expo-sqlite/kv-store';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
 import {
   ActivityIndicator,
@@ -19,6 +21,9 @@ import { useDiscoveryMode } from '@/features/discovery/DiscoveryModeContext';
 import { RatingControl } from '@/features/discovery/RatingControl';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import { getRoomTheme } from '@/theme/roomTheme';
+import { createPersonalTasteFlow, type PersonalTasteSnapshot } from './personalTasteFlow';
+import { createPersonalTasteRpc, type TasteAnswer } from './personalTasteOperations';
+import { PersonalTasteScreen } from './PersonalTasteScreen';
 
 import {
   appendProfileCalibrationCandidates,
@@ -114,8 +119,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
     !personalProfile ||
     !activeIsPersonal ||
     !status ||
-    failedOpenProfileId === personalProfile.id ||
-    !shouldOfferProfileCalibration(status)
+    failedOpenProfileId === personalProfile.id
   ) {
     return children;
   }
@@ -123,9 +127,12 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   const theme = getRoomTheme(getAmbientPhase(mode), profiles.activeProfile);
 
   return (
-    <ProfileCalibrationScreen
+    <PersonalTasteGate
       key={scope.key}
       profileId={personalProfile.id}
+      actorUserId={personalProfile.ownerUserId}
+      namespace={connection.status === 'configured' ? connection.config.url : ''}
+      client={client!}
       rpc={rpc}
       theme={theme}
       status={status}
@@ -138,8 +145,51 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
         setFailedOpenProfileId(personalProfile.id);
         void refreshStatus();
       }}
-    />
+    >{children}</PersonalTasteGate>
   );
+}
+
+export function PersonalTasteGate({ children, profileId, actorUserId, namespace, client, rpc, theme, status,
+  onOpenImport, onFailOpen, onCompleted }: PropsWithChildren<{
+  profileId: string; actorUserId: string; namespace: string;
+  client: SupabaseClient;
+  rpc: ProfileCalibrationRpc; theme: ReturnType<typeof getRoomTheme>; status: ProfileBootstrapStatus;
+  onOpenImport: () => void; onFailOpen: () => void; onCompleted: () => void;
+}>) {
+  const [snapshot, setSnapshot] = useState<PersonalTasteSnapshot | null>(null);
+  const [begun, setBegun] = useState(false);
+  const [draftRating, setDraftRating] = useState<number | null>(null);
+  const [confirmRemoval, setConfirmRemoval] = useState(false);
+  const flow = useMemo(() => createPersonalTasteFlow({ namespace, actorUserId, profileId, storage: Storage,
+    rpc: createPersonalTasteRpc(client), onChange: setSnapshot, autoStart: !status.needsCalibration }), [actorUserId, client, namespace, profileId, status.needsCalibration]);
+  useLayoutEffect(() => { flow.start(); return () => flow.stop(); }, [flow]);
+  const state = snapshot ?? flow.snapshot();
+  const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));
+  const identity = `${state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.challenge?.revision ?? state.session?.revision ?? ''}:${challengeItem?.id ?? state.session?.item?.id ?? ''}`;
+  const committedIdentity = useRef(identity);
+  useLayoutEffect(() => { committedIdentity.current = identity; setDraftRating(null); setConfirmRemoval(false); }, [identity]);
+  const current = () => committedIdentity.current === identity;
+  if (state.dismissed) return children;
+  if (state.legacy) return shouldOfferProfileCalibration(status) ? <ProfileCalibrationScreen profileId={profileId} rpc={rpc}
+    theme={theme} status={status} onOpenImport={onOpenImport} onFailOpen={onFailOpen} onCompleted={onCompleted} /> : children;
+  function answer(answer: TasteAnswer) {
+    if (!current()) return;
+    if (state.challenge && challengeItem && state.challenge.revision !== null) {
+      flow.answerChallenge(challengeItem.id, answer, state.challenge.revision);
+    } else if (state.session?.item && state.session.revision !== null) {
+      flow.answerTraining(answer, state.session.item.id, state.session.revision);
+    }
+  }
+  return <PersonalTasteScreen state={state} theme={theme} begun={begun} draftRating={draftRating}
+    confirmRemoval={confirmRemoval} onBegin={() => { if (current()) { setBegun(true); flow.begin(); } }}
+    onDraftChange={rating => { if (current()) setDraftRating(rating); }} onAnswer={answer}
+    onBooks={() => { if (current() && state.session?.revision !== null && state.session) flow.acknowledgeBooks(state.session.revision); }}
+    onChallenge={() => { if (current()) flow.startChallenge(); }}
+    onRetry={() => flow.retry()} onReload={() => flow.recoverConflict()} onOpenImport={onOpenImport}
+    onContinue={() => { if (!current() || state.busy) return; if (flow.dismiss()) onCompleted(); else onFailOpen(); }}
+    onAskRemoval={() => setConfirmRemoval(true)} onCancelRemoval={() => setConfirmRemoval(false)}
+    onRemove={() => { const revision = state.challenge?.revision ?? state.session?.revision;
+      if (current() && revision !== undefined && revision !== null) flow.remove(revision); }} />;
 }
 
 export function ProfileCalibrationScreen({
