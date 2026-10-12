@@ -49,7 +49,7 @@ configured-device/fresh-account acceptance or imply a hosted rollout.
 | EB-01 / EB-02 | #307–#313 Shared response/capture/erasure/prepared-input lineage; #314 decay parity; #315–#319 WorkingState, native OFF controls, reset and candidate features | Genuine Shared prepared-input consumer, native-core extraction, admitted state benefit and lifecycle/rollout/device gates |
 | EB-02 / EB-09 | #325 distinct native-Item support and #326 Personal rating/bootstrap fusion, exact Undo/clear, effective Saved/List setup support and versioned forgetting | Uncalibrated support is not independent statistical N; cross-domain transfer, quality and hosted acceptance remain open |
 | EB-03 | #320 prospective native enrollment/outcome captures; #321 private report; #322 future cohort declaration/inventory checks | Actual authorized cohort, independently retained pre-window declaration, observed coverage/usefulness and admission |
-| EB-08 | #324 portable bounded Taste selector and native calibration unknown/zero/prefix/scope correction | Server-backed TasteSession consumer, anonymous prerequisites, frozen challenge and measured first-session value |
+| EB-08 | #324 portable bounded Taste selector/calibration correction; current own-Personal durable session and parity-tested SQL selection adapter | App/anonymous prerequisites, frozen challenge and measured first-session value |
 
 The complete-capability checkboxes below remain open. The source handoff and exact
 CI/build/hosted state belong only to STATUS and the referenced PR receipts. This

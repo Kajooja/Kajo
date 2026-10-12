@@ -30,10 +30,12 @@ exact Undo, selective clears, ambiguity and effective strong setup support now
 share the same resolver across memory and both kernels. Source clocks remain
 proxies. This preserves the existing six-strong native status and distinct
 known-rating Taste thresholds.
-Then provide a coherent own-Personal
-server TasteSession with frozen policy/catalog and durable authorized presentation/
-response receipts, followed by the honest frozen challenge. This source work does not invent a
-real roster or anonymous session.
+The current own-Personal server successor supplies frozen policy/catalog and
+durable authorized presentation/response receipts, independent portable/SQL
+selection parity, rating-only bootstrap projection and removal. Next provide the
+honest frozen holdout challenge through canonical serving, then connect the
+adaptive app flow to these boundaries. The source does not invent a real roster,
+prove screen exposure or supply an anonymous session.
 Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
 and no local fixture admits learning or native activation. Preserve the existing

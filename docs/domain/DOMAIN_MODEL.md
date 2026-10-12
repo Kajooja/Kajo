@@ -111,6 +111,58 @@ status
 
 A TasteSession is not a second Profile and not a media-specific taste silo.
 
+### Own-Personal TasteSession source
+
+The `personal-taste-session-v1` source implements one bounded session per existing
+owned PersonalProfile. `public.taste_session_v1(request)` is an invoker wrapper
+over a privately owned authorization/transaction boundary. Private session and
+command tables have RLS, with no direct `anon`/`authenticated`/`service_role` access.
+Every operation rechecks the canonical owner; Shared, foreign and anonymous
+identities are rejected. This is not the anonymous launch entry or mobile rollout.
+
+| Operation | Required JSON fields besides `operation` | Behavior |
+|---|---|---|
+| `START` | `profileId`, `requestId` | Create/freeze once or resume the one existing session; never reset accepted setup. |
+| `RESUME` | `profileId`, `sessionId` | Return current authorized state without advancing. |
+| `ANSWER` | `profileId`, `sessionId`, `requestId`, `expectedRevision`, `questionIndex`, `answer` | Append a bounded response revision to a server-issued question; persist the next opportunity atomically. |
+| `ACK_TRANSITION` | `profileId`, `sessionId`, `requestId`, `expectedRevision` | Acknowledge the currently offered movie → book transition. |
+| `REMOVE` | `profileId`, `sessionId`, `requestId`, `expectedRevision` | Withdraw this session's bootstrap source, tombstone the session and clear retained answer/command copies. |
+
+IDs are UUIDs. Unknown/missing fields and malformed values are rejected; requests
+are bounded to 4 KiB. `answer` is `{kind:"RATING",value:0..10}` with an integer
+value, or `{kind:"UNKNOWN"}`, `{kind:"NOT_INTERESTED"}`, `{kind:"WITHDRAWN"}`.
+Each question accepts at most eight revisions. Server receipt time, not a client
+clock, orders them. The creation START and accepted ANSWER/ACK commands reserve their request IDs
+within the session: an identical ID/body replays the frozen result and a different
+body fails. Further START IDs act as unrecorded resume requests, so retries cannot
+allocate unbounded creation receipts. A stale session revision fails with
+SQLSTATE `40001`. A client must resume before constructing a new command; retries
+retain the original command. Profile/session row locks serialize concurrent work;
+transaction conflicts/deadlocks roll back completely and require bounded retry.
+
+The server freezes at most 128 real Items per domain plus a frequency-ranked,
+lexically tied 64-tag dictionary (`taste-tags-frequency-64-v1`). Catalog title,
+provider identities, recognition proxy and binary features come from canonical
+server records. These are capture-time features, not a claim of historical
+provider availability. The selected snapshot cannot be supplied or replaced by
+a client. The policy is fixed to ADAPTIVE on public creation; private PRIOR_ONLY
+is a diagnostic comparator, not a client override.
+
+`CATALOG_UNAVAILABLE` means a retained catalog Item is no longer discoverable or
+has lost real provenance. No old request result or new answer is returned/applied;
+REMOVE remains available. This conservative version preserves the frozen session
+for explicit recovery rather than silently changing its candidate universe.
+`REMOVED` is terminal even for past request IDs and a new START. One logical
+session bounds creation; a future restart policy requires separate versioning.
+
+Import-source removal performs the same withdrawal atomically. Session/command
+copies cascade on account/Profile deletion. Existing bootstrap rows follow the
+canonical logical-removal/retention policy; this source does not claim complete
+anonymous retention or physical erasure. Server-issued opportunities are durable
+presentation receipts, not observed exposure. Existing native calibration is
+unchanged; public anonymous entry, honest frozen challenge and app/UI integration
+remain required.
+
 ### TasteResponse
 
 A `TasteResponse` records a canonical response to a real Item presented during Taste Test.

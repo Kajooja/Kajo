@@ -14,6 +14,38 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Durable own-Personal TasteSession — 2026-10-12
+
+The interrupted #326/#327 follow-up is complete: CI #639 and #641 pass all five
+required gates; optional APK jobs were skipped. No dependent stack was merged
+past #229's configured-device/fresh-account gate.
+
+The successor `feat/personal-taste-session` adds one bounded own-Personal session
+with frozen real catalog/policy/feature dictionary, durable opportunities and
+answer revisions, server-owned selection, transition acknowledgement, exact
+request replay, optimistic revision conflicts and removal. SQL/portable selector
+parity covers ADAPTIVE and PRIOR_ONLY, replay, zero/unknown/not-interest/correction,
+withdrawal and stage/stop rules. Ratings project incrementally into the existing
+bootstrap boundary with distinct `TASTE_SESSION_V1`/`TASTE_TEST` provenance; no
+native Events or Shared evidence are fabricated. Other withdrawn Items remain
+withdrawn when a different Item is answered.
+
+Private RLS tables and revoked helper/table permissions restrict access to the
+owner RPC. Anonymous/foreign/Shared calls fail. Source removal atomically clears
+session and retry copies, including removal via the existing import endpoint;
+account deletion cascades them. Live catalog withdrawal blocks delivery/writes
+except REMOVE. The v1 source intentionally does not admit not-interest into the
+older rating/consumed/saved bootstrap kinds or claim anonymous/public/UI readiness.
+
+The additive forward is generated with pinned CLI 2.117.0. Populated-forward
+regressions preserve every old table row and function identity/body/ACL. Local
+focused full-schema tests pass; full root/database and exact-source CI receipts
+are finalized in this PR. Native CLI includes authenticated smoke plus separate
+connection duplicate/conflict/removal lock probes. Local advisors cannot connect
+without a local Supabase/Postgres service; this is not a clean-advisor claim.
+No hosted migration, mobile gate activation, account reset or learning admission.
+Next source packet is the genuinely frozen own-Personal holdout challenge.
+
 ## Personal source fusion/forgetting — 2026-10-12
 
 Completed #325 CI #637 passes all five required jobs on exact source tree

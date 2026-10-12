@@ -56,10 +56,20 @@ ADAPTIVE uses recognition, diversity and a feature-coverage proxy; PRIOR_ONLY is
 the fixed diagnostic control. Feature coverage is not measured information gain,
 predicted rating, satisfaction probability or calibrated confidence. Unknown
 responses do not supply preference support; canonical negative responses and
-genuine zero remain distinct. Native TasteSession authorization, immutable
-presentation/response persistence, canonical bootstrap admission, frozen challenge
-and usefulness evidence are required before product acceptance. The root estimator,
-current native calibration policy/RPC and scorer remain unchanged.
+genuine zero remain distinct. The own-Personal `personal-taste-session-v1` source
+now persists the authorized frozen catalog, presentations and response revisions
+and consumes an independent SQL adapter of the same policy. Full-schema tests
+compare actual decisions/components with the portable implementation, including
+PRIOR_ONLY, correction/withdrawal and stage transitions. The bounded feature
+capture uses `taste-tags-frequency-64-v1`; this is an explicit dictionary selection,
+not a claim that omitted catalog dimensions do not exist. Public creation freezes
+ADAPTIVE; diagnostics cannot change the policy through the public request.
+
+Explicit ratings alone project to source-provenanced LongTerm bootstrap evidence.
+Unknown/not-interest/withdrawal stay distinguishable; see [Taste evidence](DATA_EVENTS.md#3-taste-evidence).
+Durable receipt issuance is not observed screen exposure. Frozen holdout challenge,
+anonymous lifecycle, preview, app integration and usefulness evidence remain open.
+The root estimator, current mobile calibration policy/RPC and scorer are unchanged.
 
 ```mermaid
 flowchart TD

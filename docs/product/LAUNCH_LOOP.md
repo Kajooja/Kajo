@@ -175,8 +175,11 @@ PRIOR_ONLY control; they do not measure expected satisfaction or uncertainty.
 Unknown contributes no taste support, not-interest remains distinct, and a rating
 of zero remains known. Correction/withdrawal, current-question replay and genuine
 exhaustion are explicit. The existing native six-rating calibration does not
-consume this selector. Server-backed TasteSession, anonymous prerequisites,
-challenge, preview and observed first-session usefulness remain required.
+consume this selector. The own-Personal server successor now provides durable
+catalog/policy/presentation/response storage and a parity-tested SQL selection
+adapter, with exact retries, corrections, removal and rating-only bootstrap
+provenance. It is not connected to that mobile gate. Anonymous prerequisites,
+frozen challenge, preview and observed first-session usefulness remain required.
 
 The question-selection policy should optimize information gained about the Profile while retaining:
 

@@ -210,6 +210,26 @@ source = TASTE_TEST
 
 When a Taste response is projected into PersonalProfile bootstrap/Memory state, it remains distinguishable from native post-activation Kajo behavior and from imported history.
 
+The own-Personal `personal-taste-session-v1` source records bounded server-time
+response revisions against its frozen session/question ledger. Its SQL policy
+adapter consumes only that retained prefix. A zero rating is known; five is a
+neutral known rating; UNKNOWN supplies no taste support. WITHDRAWN removes the
+current contribution while retaining the revision history until source removal.
+NOT_INTERESTED is stored distinctly and may affect question feature coverage;
+this version deliberately admits **only RATING** to the existing bootstrap
+schema, which has no not-interest source kind. It does not fabricate native
+Events, exposure, consumption commands, ShortTerm evidence or challenge results.
+
+A rating projects into the existing `KAJO_CALIBRATION` storage family under the
+separate `TASTE_SESSION_V1` dataset, with `source=TASTE_TEST`, `tasteSessionId`,
+`questionIndex`, `questionPolicyVersion` and `responseRevision` metadata. It never
+replaces the older `COLD_START_V1` dataset or an imported source. Only the answered
+Item is updated, so another response cannot reactivate an unrelated removed
+rating. Native authority is still resolved by the Personal source-fusion policy.
+Session/import removal withdraws this source and clears session and exact-retry
+copies; old request IDs cannot resurrect it. Broader bootstrap retention remains
+owned by its existing lifecycle.
+
 ## 4. TasteChallenge evaluation
 
 A held-out challenge prediction must be frozen before the actual answer can influence the state being scored.

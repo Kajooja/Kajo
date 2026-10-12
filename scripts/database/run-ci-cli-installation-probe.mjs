@@ -40,6 +40,8 @@ import { personalWorkingCandidateFeaturesSmokeSql, personalWorkingCandidateFeatu
 import { personalWorkingProspectiveSmokeSql, personalWorkingProspectiveUpgradeSql } from './personal-working-prospective.mjs';
 import { nativeItemSupportSmokeSql, nativeItemSupportUpgradeSql } from './native-item-support.mjs';
 import { personalSourceFusionSmokeSql, personalSourceFusionUpgradeSql } from './personal-source-fusion.mjs';
+import { personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
+import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
@@ -271,6 +273,7 @@ try {
     assert.equal(personalWorkingProspectiveConcurrency.servingControl, 'OFF');
     assert.equal(personalWorkingProspectiveConcurrency.qualityAdmission, false);
     assert.equal(personalWorkingProspectiveConcurrency.nativeActivated, false);
+    const personalTasteSessionConcurrency = await verifyPersonalTasteSessionConcurrency(execConcurrentSql);
     const secondRuntime = await resetFromMigrations(files);
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), first, 'Repeated CLI installation differs');
     assert.deepEqual((await exec(historySql))[0], expectedHistory);
@@ -324,6 +327,9 @@ try {
     const [personalSourceFusion] = await exec(await personalSourceFusionSmokeSql(),
       { stage: 'personal-source-fusion-current-state-serving-status', timeoutMs: 120_000 });
     assert.match(personalSourceFusion?.personalSourceFusion, /^PASS: current own rating\/prior fusion/);
+    const [personalTasteSession] = await exec(await personalTasteSessionSmokeSql(),
+      { stage: 'personal-taste-session-public-durable-source', timeoutMs: 120_000 });
+    assert.match(personalTasteSession?.personalTasteSession, /^PASS: own durable Taste/);
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -383,6 +389,7 @@ try {
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
+      personalTasteSession, personalTasteSessionConcurrency,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
