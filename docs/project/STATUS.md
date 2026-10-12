@@ -10,18 +10,22 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — owned adaptive mobile Taste consumer / #330
+## Current packet — guarded owned mobile Taste acceptance / #238
 
-Accepted main is `9237b3814b2b408a43ec8abb664c3a6c0a57baca`, tree
-`80862d9b9a1e1cea5d062be3d1fddb237ff45658`, through [#329](https://github.com/Kajooja/Kajo/pull/329).
-All 27 source PRs are merged. All five final-head CI #647 gates and main CI #648
-pass; main #648 also built the standalone APK. The owner's October 12 instruction
-superseded the previous device-based source merge hold. Actual device, deployment
-and quality observations still retain their own scope.
+The owned mobile source is accepted through [#331](https://github.com/Kajooja/Kajo/pull/331),
+merge `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, tree `25ea91d280d407921cbc8a4678cdef58fa9970a4`.
+Its final source `bebd53613a0bc10917feb36b87e9a221dcf2295b` passed all five
+[CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245).
+[#330](https://github.com/Kajooja/Kajo/issues/330) closes the source packet;
+actual matching-backend/APK/device acceptance stays open in #238 and DEVICE_TEST.
+This documentation successor changes no executable, dependency, migration or build inputs.
+Its PR receipt owns the exact documentation head/CI and later main build status.
 
-The next source packet is [#330](https://github.com/Kajooja/Kajo/issues/330), branch
-**`feat/mobile-personal-taste`**, based directly on that main. Its PR/issue receipt
-owns exact publication and final CI state; an open source branch is not accepted main.
+The earlier #329 main integration accepted all 27 original source PRs. All five
+CI #647/#648 gates and the #648 standalone APK pass. The owner's October 12
+instruction superseded the previous device-based source merge hold. Actual device,
+deployment and quality observations retain their own scope.
+
 The owned mobile consumer now uses both `taste_session_v1` and
 `taste_challenge_v1` through a typed service boundary and a separate persistence/
 retry controller. Presentation does not select questions or score predictions.
@@ -52,21 +56,24 @@ Delivered source behavior:
   calibration. Once a new session exists, an outage never changes evidence writers.
 
 Validation: 35 focused mobile regressions pass, including retained legacy scope
-cases. The shipped mobile adapter also passes a full-current-schema SQL contract
-probe through START, zero/five/unknown, the actual book transition, canonical frozen
-challenge completion and both removal boundaries. Local lint/typecheck, dependency,
-mobile and catalogue checks pass. Local root `npm run check` encounters refused
-Deno npm-registry access at Edge validation; full-root success is not claimed.
-Final full CI and native exports belong to the current PR receipt. No hosted
-migration, account reset, actual device round trip or quality admission is claimed.
+cases. The shipped adapter also passes an actual full-current-schema SQL RPC probe
+through START, zero/five/unknown, the actual book transition, canonical frozen
+challenge completion and both removals. Final CI #650 passes the complete root
+check: 517 mobile tests, 225 database tests, 245 engine tests, the remaining suites
+and all four native exports. Platform/defaults, two clean installations, populated
+upgrade and native CLI installation/history/concurrency also pass. The local root
+run encountered refused Deno npm-registry access; full local-root success is not
+claimed. No hosted migration, account reset, device round trip or quality admission
+is supplied by these automated results.
 
-**Next action:** finish this source's required CI, fixing any failure, then perform
-its guarded native acceptance with the matching backend checkpoint and APK.
-Reconcile actual hosted migration history before proposing any forward application;
-never replay old deployed files or reset accounts. Exercise resume/lost reply/
-restart, movie-to-book transition, unknown after a draft, genuine zero, conflict,
-Profile/client changes, hidden challenge forecasts/results and source withdrawal.
-Record installed SHA/run, device and backend identity in DEVICE_TEST/#330.
+**Next action:** verify the actual backend checkpoint and obtain the matching-source
+APK for guarded native acceptance. Reconcile actual hosted migration history before
+proposing any forward application; never replay deployed files or reset accounts.
+Exercise resume/lost reply/restart, movie-to-book transition, unknown after a draft,
+genuine zero, conflict, Profile/client changes, hidden challenge forecasts/results
+and source withdrawal. Record installed SHA/run, device and backend identity in
+DEVICE_TEST/[#238](https://github.com/Kajooja/Kajo/issues/238). Source #330/#331 is
+complete; do not restart its implementation or use the older #648 binary as new-flow evidence.
 Canonical unseen preview follows this consumer. Anonymous identity/lifecycle/
 abuse/measurement still precede real anonymous entry; later answer projection,
 observed usefulness, genuine #232F, Shared rollout and all incomplete MVP gates remain open.
@@ -79,7 +86,7 @@ observed usefulness, genuine #232F, Shared rollout and all incomplete MVP gates 
 | #307–#313 | Shared round evidence, replay/captures, erasure and prepared prediction inputs. Genuine #232F prediction consumption and Phase 16.3 remain open. |
 | #314–#322 | Native decay, bounded Personal WorkingState, frozen controls/features, prospective enrollment and private report/cohort foundation. Serving stays OFF; no actual cohort or quality admission. |
 | #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its branch and guarded hosted/device gates remain preserved. |
-| #324 / #328 / #329 / #330 | Portable selector and legacy calibration correction, durable session/SQL parity and canonical frozen holdout evaluation are integrated. #330 supplies the owned adaptive mobile consumer with a guarded legacy fallback; hosted/device and anonymous acceptance remain separate. |
+| #324 / #328 / #329 / #330 / #331 | Portable selector and legacy calibration correction, durable session/SQL parity and canonical frozen holdout evaluation are integrated. #330/#331 is accepted owned adaptive mobile source with a guarded legacy fallback; hosted/device and anonymous acceptance remain separate. |
 | #325 | Distinct native-Item base confidence support; all five [CI #637 gates](https://github.com/Kajooja/Kajo/actions/runs/38178201644) pass. The /8 support heuristic remains uncalibrated. |
 | #326 / #327 | Personal source fusion/forgetting and complete engine ledger/handoff; all five required gates pass for both. Full-engine tracker #302 remains open. |
 | #303 / #302 | Full-engine capability map integrated in this documentation successor on the current dependency-corrected stack. Original #303 is closed as superseded; its integrated #327 replacement passes all five CI #641 gates. Full-capability tracker #302 remains open. |
@@ -91,6 +98,11 @@ an authorized existing-owner roster/native/operator scope and an independently
 retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
+
+The #331 main push started [CI #651](https://github.com/Kajooja/Kajo/actions/runs/38287239357),
+including its automatic standalone APK stage after all five jobs. That new build
+is still running at this acceptance receipt; no matching new APK is claimed yet.
+The documentation PR receipt retains subsequent main CI/build status.
 
 The latest verified binary at this checkpoint is accepted main [CI #648](https://github.com/Kajooja/Kajo/actions/runs/38262881349),
 source `9237b3814b2b408a43ec8abb664c3a6c0a57baca`, tree
