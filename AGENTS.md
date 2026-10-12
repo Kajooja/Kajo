@@ -82,7 +82,7 @@ On October 12 the owner explicitly authorized the complete #229 → #329 source
 stack integration into main after successful required CI. This supersedes the
 earlier device-based source merge hold, not the requirement to record actual
 device observations. Continue from fresh main after that integration; STATUS
-owns the current guarded matching-backend/native acceptance and exact source receipt.
+owns the current guarded backend upgrade/native acceptance and exact source receipt.
 The owned mobile Taste/challenge consumer is accepted through #331 after all five
 final-source CI #650 gates; do not repeat that source implementation.
 Real anonymous Taste acceptance requires its server identity, minimum lifecycle/

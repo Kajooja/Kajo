@@ -13,7 +13,10 @@ quality and every incomplete MVP gate retain their existing acceptance scope.
 The complete original source stack is accepted through #329 and main CI #648.
 The owned adaptive TasteSession/challenge mobile consumer is now accepted through
 #330/#331 after all five final-source CI #650 gates. Guarded matching-backend/APK/device
-acceptance is next; canonical unseen preview follows that consumer in its retained
+acceptance is next; #333 prepares the exact 16-forward chain from the reviewed
+catalog-generation source checkpoint. Review that packet before live application; the #653
+matching APK is ready, while actual new-runtime deployment remains open.
+Canonical unseen preview follows that consumer in its retained
 order. STATUS owns the exact source/build receipt and one current task. Automated
 source acceptance does not close the remaining anonymous, device or release gates.
 Older dated sections below preserve their original decisions and evidence.

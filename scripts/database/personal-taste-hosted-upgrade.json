@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "applicationSource": "f5d9ce7b6f504075f2fb2edad5f15231f1cea465",
+  "forwards": [
+    {
+      "filename": "20261008122349_shared_rating_round_evidence.sql",
+      "sha256": "4e80e0daadaa537e85bb14ce11fffb3f4fc263164e4db3ee7182f4be75514796"
+    },
+    {
+      "filename": "20261008122852_shared_overlay_eligibility.sql",
+      "sha256": "49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698"
+    },
+    {
+      "filename": "20261008132733_shared_round_outcomes.sql",
+      "sha256": "2fbab2b59e796138d18895b2fe8c1213ff2c7e9cfa8df57bb8af79e85ca3a85f"
+    },
+    {
+      "filename": "20261008175254_shared_round_outcome_captures.sql",
+      "sha256": "d018d6d5901e690991e7b3bd35b5f000d8ceec79739c51cf17abbb7a1a5a793e"
+    },
+    {
+      "filename": "20261008185216_shadow_source_erasure.sql",
+      "sha256": "d0a2de045fccf4fb5f1413ad3c24054f5c3c7a87f6cb186829ff39d1e7aab671"
+    },
+    {
+      "filename": "20261009094421_shared_round_prediction_inputs.sql",
+      "sha256": "149a2301f24e3ace13208a7d8c92e4577d8d4d29635e04a9d5a24f979fbbd8d7"
+    },
+    {
+      "filename": "20261009103214_personal_native_decay_parity.sql",
+      "sha256": "fb1bdb933a287b4d2942cc821162a712ccb2669bf80e63fa72d93798bd0f6f98"
+    },
+    {
+      "filename": "20261010064104_personal_working_bridge.sql",
+      "sha256": "319ea5dfb0c591321ba923d57a3408f3230005d7478cdfce6b6bfeeb8d50579d"
+    },
+    {
+      "filename": "20261010082558_personal_working_reset.sql",
+      "sha256": "402250688e24c3862f61c2d2448d35a715c5016bf611da84501224fdd07f774b"
+    },
+    {
+      "filename": "20261010153638_personal_working_shadow_precision.sql",
+      "sha256": "57394e07607be2df9a02197926e8cc19b904b2cea5f012295545cff25c3e7f8c"
+    },
+    {
+      "filename": "20261010160025_personal_working_candidate_features.sql",
+      "sha256": "988e84d61ab2ff39e6b132e7e351dca56c8733b731ec78c6dd58afe3ac42ee8e"
+    },
+    {
+      "filename": "20261010225549_personal_working_prospective.sql",
+      "sha256": "9826b5608f38944adae1454cea74826f8c1f3acaa90bb34fe01594d60edfbda6"
+    },
+    {
+      "filename": "20261011213431_native_item_support.sql",
+      "sha256": "ece43d9d34ccce1df6e9f01e69ac4498432cc211c58f5bcc8700e8ea3fc480d2"
+    },
+    {
+      "filename": "20261012060821_personal_source_fusion.sql",
+      "sha256": "adca19e9fbb63ef83160f3c79932b7c8d9abd26a9500787db184e08a0a181551"
+    },
+    {
+      "filename": "20261012100043_personal_taste_session.sql",
+      "sha256": "6294ea492ac64faf26a58d314c286620f5d6f7b2860db293bb29e07eaab07cc8"
+    },
+    {
+      "filename": "20261012111935_personal_taste_challenge.sql",
+      "sha256": "85c6bc56e3b983014c76e37f21caf1899601b1112b96570c94eeded01e383873"
+    }
+  ],
+  "sourceCheckpoint": "20261006143148_catalog_prediction_chain.sql"
+}
