@@ -14,6 +14,26 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Owned mobile source accepted — #331 / 2026-10-12
+
+[#331](https://github.com/Kajooja/Kajo/pull/331) is merged as `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`,
+accepting source `bebd53613a0bc10917feb36b87e9a221dcf2295b` and tree
+`25ea91d280d407921cbc8a4678cdef58fa9970a4`. All five final-source
+[CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245) pass:
+complete root validation (517 mobile, 225 database and 245 engine tests, remaining
+suites and four exports), platform/defaults, two clean installations, populated
+upgrade and native CLI installation/history/concurrency. All 276 local document
+links/anchors passed before this acceptance handoff; recheck links after edits.
+
+The main push started [CI #651](https://github.com/Kajooja/Kajo/actions/runs/38287239357)
+and its automatic APK stage; it is still running at this source-acceptance receipt.
+
+Issue #330's source packet is complete. STATUS now owns guarded matching-backend/APK/
+native acceptance in DEVICE_TEST/#238, then canonical unseen preview. A new APK
+must match this consumer; #648 predates it. No hosted migration, phone observation,
+account reset or measured usefulness is claimed. The entry below preserves what
+was pending before source CI/acceptance; it is not another source implementation request.
+
 ## Owned adaptive mobile Taste consumer — #330 / 2026-10-12
 
 Source parent: accepted main `9237b3814b2b408a43ec8abb664c3a6c0a57baca`, all five

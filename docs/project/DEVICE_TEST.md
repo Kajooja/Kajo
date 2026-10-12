@@ -2,7 +2,11 @@
 
 ## Owned mobile Taste consumer acceptance — #330 / 2026-10-12
 
-Use the #330 source's successful CI/APK receipt and actual backend checkpoint.
+Owned source #330 is accepted in [#331](https://github.com/Kajooja/Kajo/pull/331),
+merge `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, tree `25ea91d280d407921cbc8a4678cdef58fa9970a4`,
+after all five [CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245).
+Obtain its matching-source APK and verify the actual backend checkpoint.
+Record actual acceptance here and in #238; the source issue is complete.
 The accepted-main #648 APK predates this mobile consumer; it cannot demonstrate
 these new screens. If the first Taste RPC is unavailable, the app deliberately
 uses legacy static calibration. Do not interpret that as new-flow acceptance or
@@ -29,7 +33,8 @@ Automated screen/controller/SQL contract tests do not establish gesture or devic
 
 ## Source integration and current device scope — 2026-10-12
 
-The owner authorized the complete source stack merge through #329 after CI.
+The owner authorized source integration after CI. The complete original stack is
+accepted through #329 and the owned mobile consumer through #331.
 The earlier instructions below to keep #229 draft are historical and superseded
 for source integration. No new phone observation is supplied by that approval.
 Current source/build identity belongs to [STATUS](STATUS.md); the latest verified

@@ -10,10 +10,12 @@ The owner explicitly authorized merging the complete #229 → #329 source stack
 into main after required CI. This supersedes the earlier device-based source
 merge hold. Configured-device/fresh-account evidence, hosted rollout, measured
 quality and every incomplete MVP gate retain their existing acceptance scope.
-The complete source stack is now accepted through #329 and main CI #648. #330
-supplies the owned adaptive TasteSession/challenge mobile consumer; verify its
-source CI and matching backend/device behavior before release acceptance. STATUS
-owns the exact publication receipt and one current task.
+The complete original source stack is accepted through #329 and main CI #648.
+The owned adaptive TasteSession/challenge mobile consumer is now accepted through
+#330/#331 after all five final-source CI #650 gates. Guarded matching-backend/APK/device
+acceptance is next; canonical unseen preview follows that consumer in its retained
+order. STATUS owns the exact source/build receipt and one current task. Automated
+source acceptance does not close the remaining anonymous, device or release gates.
 Older dated sections below preserve their original decisions and evidence.
 
 ## Prospective Personal source and evaluation order — 2026-10-10
