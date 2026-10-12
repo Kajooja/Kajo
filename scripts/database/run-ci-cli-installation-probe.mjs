@@ -39,6 +39,7 @@ import { personalWorkingPrecisionSmokeSql, personalWorkingPrecisionUpgradeSql } 
 import { personalWorkingCandidateFeaturesSmokeSql, personalWorkingCandidateFeaturesUpgradeSql } from './personal-working-candidate-features.mjs';
 import { personalWorkingProspectiveSmokeSql, personalWorkingProspectiveUpgradeSql } from './personal-working-prospective.mjs';
 import { nativeItemSupportSmokeSql, nativeItemSupportUpgradeSql } from './native-item-support.mjs';
+import { personalSourceFusionSmokeSql, personalSourceFusionUpgradeSql } from './personal-source-fusion.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
 import { predictionHostedUpgradeSql } from './prediction-hosted-upgrade.mjs';
@@ -228,6 +229,20 @@ try {
     const [nativeItemSupportUpgrade] = await exec(await nativeItemSupportUpgradeSql(files[nativeItemSupportIndex]),
       { stage: 'native-item-support-populated-upgrade', timeoutMs: 120_000 });
     assert.match(nativeItemSupportUpgrade?.nativeItemSupportUpgrade, /^PASS: old one-Item\/eight-tag defect/);
+    const sourceFusionIndex = files.findIndex(file => file.name.endsWith('_personal_source_fusion.sql'));
+    assert.equal(sourceFusionIndex, nativeItemSupportIndex + 1);
+    await resetFromMigrations(files.slice(0, sourceFusionIndex));
+    // These predecessor matrices explicitly assert the old source/floor policy.
+    // Keep them on that generation; the new matrix owns fused live semantics.
+    const [personalNativeDecay] = await exec(await personalNativeDecaySmokeSql(),
+      { stage: 'personal-native-decay-pre-fusion-generation', timeoutMs: 120_000 });
+    assert.match(personalNativeDecay?.personalNativeDecay, /^PASS: shared native LT math/);
+    const [nativeItemSupport] = await exec(await nativeItemSupportSmokeSql(),
+      { stage: 'native-item-support-pre-fusion-generation', timeoutMs: 120_000 });
+    assert.match(nativeItemSupport?.nativeItemSupport, /^PASS: distinct native Item support/);
+    const [personalSourceFusionUpgrade] = await exec(await personalSourceFusionUpgradeSql(files[sourceFusionIndex]),
+      { stage: 'personal-source-fusion-populated-upgrade', timeoutMs: 120_000 });
+    assert.match(personalSourceFusionUpgrade?.personalSourceFusionUpgrade, /^PASS: old duplicate contribution/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -306,12 +321,9 @@ try {
     const [sharedRoundPredictionInputs] = await exec(await sharedRoundPredictionInputsSmokeSql(),
       { stage: 'shared-round-prediction-inputs-enrollment-prefix-sources-erasure', timeoutMs: 120_000 });
     assert.match(sharedRoundPredictionInputs?.sharedRoundPredictionInputs, /^PASS:/);
-    const [personalNativeDecay] = await exec(await personalNativeDecaySmokeSql(),
-      { stage: 'personal-native-decay-state-score-frozen-parity', timeoutMs: 120_000 });
-    assert.match(personalNativeDecay?.personalNativeDecay, /^PASS: shared native LT math/);
-    const [nativeItemSupport] = await exec(await nativeItemSupportSmokeSql(),
-      { stage: 'native-item-support-distinct-admitted-native-items', timeoutMs: 120_000 });
-    assert.match(nativeItemSupport?.nativeItemSupport, /^PASS: distinct native Item support/);
+    const [personalSourceFusion] = await exec(await personalSourceFusionSmokeSql(),
+      { stage: 'personal-source-fusion-current-state-serving-status', timeoutMs: 120_000 });
+    assert.match(personalSourceFusion?.personalSourceFusion, /^PASS: current own rating\/prior fusion/);
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -370,6 +382,7 @@ try {
       sharedRoundPredictionInputs, sharedRoundPredictionInputsUpgrade, sharedRoundPredictionInputsConcurrency,
       personalNativeDecay, personalNativeDecayUpgrade, personalWorkingBridge, personalWorkingBridgeUpgrade,
       nativeItemSupport, nativeItemSupportUpgrade,
+      personalSourceFusion, personalSourceFusionUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

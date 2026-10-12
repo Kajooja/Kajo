@@ -14,6 +14,44 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Personal source fusion/forgetting — 2026-10-12
+
+Completed #325 CI #637 passes all five required jobs on exact source tree
+`84f0279c2868411caba0b031030996766218962d`. Earlier #324 CI #636 passes all five
+and standalone APK; its actual checkout/source tree and archive receipt belong
+to STATUS/DEVICE_TEST. Build completion does not close device or public-release
+acceptance.
+
+The bounded #326 source continuation targets current Personal rating ownership,
+selective clear/Undo/ambiguity, effective six-strong setup support and versioned
+bootstrap floor removal, with common memory/ordinary/catalogue source semantics.
+Structural memory/feature generations and old frozen outputs remain compatible;
+Shared native calculations, real repeat experiences and measured quality remain
+separate. Final implementation/tests/source version details follow STATUS and
+PREDICTION_MODEL; no hosted write, history/account reset or quality activation occurs.
+
+The actual verified CLI2.117.0 bootstrap creates
+`20261012060821_personal_source_fusion.sql`; a temporary read-only runner workflow
+is removed from the final diff. Official archive, artifact, binary and tested
+checkout hashes verify provenance rather than inventing a filename. The local
+CLI is now available for subsequent source migrations.
+
+The continuation now completes the forward and native CLI populated-upgrade/runtime
+wiring. Regressions cover canonical equal/backdated rating edits through List
+receipts, exact Undo, legacy ambiguity/malformed values, invalid/cyclic/competing
+lineage, depth 512 and overflow, future controls, Saved/List removal/deletion,
+public owner authorization and genuine Shared preservation. A backdated Saved/List
+removal defect was reproduced and corrected using validated receipt order.
+Old-generation smoke matrices remain on their actual pre-fusion source; new source
+checks own the intentional version/count/overlap changes. Existing general fresh
+install/history smoke checks now recognize that one current rating can have two
+retained raw Events.
+
+The current STATUS is condensed to one handoff, source/build/hosted/device gates
+and links to this historical log. The 35-ref audit retains all live dependencies
+and eight consumed operation identities; no branches or user data are deleted.
+Final test counts and publication/CI receipts follow the completed source PR.
+
 ## Native base confidence distinct-Item support — 2026-10-12
 
 The old ordinary/catalogue kernel defect is reproduced on an actual populated

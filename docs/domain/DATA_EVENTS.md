@@ -6,6 +6,22 @@ STATUS owns source, hosted and device acceptance. The #229 source sections below
 
 Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
+The Personal source-fusion correction now resolves available same-owner native
+rating authority before assigning weights. Exact scoped canonical command
+receipt lineage governs revisions, including backdated/equal occurrence clocks;
+legacy raw Events retain explicit chronological ambiguity rules. A valid later
+revision replaces earlier same-Item authority and bootstrap contribution; zero
+and neutral five remain real answers. Exact scoped Undo, selective clears and unavailable/ambiguous replacements
+retain their distinct effects. Receipt-bound history erasure cannot resurrect an
+earlier negative merely by reversing a later rating. The resolver reads existing
+Events/receipts/bootstrap sources and writes no synthetic or duplicate Event.
+Retained bootstrap fallback remains explicitly source-labelled prior evidence.
+Newly computed Personal traces version this source/floor correction while old
+frozen forecasts/receipts keep their original values and versions. Exact semantics
+and limits belong to [Personal source fusion](PREDICTION_MODEL.md#49-personal-source-fusion-and-forgetting);
+STATUS owns implementation and acceptance. Setup strong support is not a count
+of known Taste ratings, and mutable future display state cannot certify a prefix.
+
 The active native memory/serving parity correction changes a versioned current
 decay calculation, not canonical Event identity or evidence strength. A newly
 computed PredictionRun/state/feature trace identifies its live kernel version;

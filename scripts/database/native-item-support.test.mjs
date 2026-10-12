@@ -52,7 +52,10 @@ test('native confidence counts matching admitted distinct Items; preserves score
         assert.equal((await db.query("select to_regprocedure('private.native_item_support_count_v1(uuid[])') helper")).rows[0].helper, null);
       }
     });
-    for (const file of files.slice(index)) await db.exec(`begin;${file.sql}commit;`);
+    // Preserve the pre-fusion support contract; fused source ownership has its
+    // own full-schema matrix and cannot satisfy this old overlap assertion.
+    const fusionIndex = files.findIndex(file => file.name.endsWith('_personal_source_fusion.sql'));
+    for (const file of files.slice(index, fusionIndex < 0 ? undefined : fusionIndex)) await db.exec(`begin;${file.sql}commit;`);
     await t.test('native/book/movie/tag/repeat/zero/undo/time/Profile/missing/bootstrap matrix and ordinary/catalogue parity', async () => {
       const result = (await db.exec(await nativeItemSupportSmokeSql())).flatMap(value => value.rows.map(row => row.snapshot));
       assert.match(result[0]?.nativeItemSupport, /^PASS: distinct native Item support/);

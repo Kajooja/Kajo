@@ -296,6 +296,13 @@ explicit repeat-reset request above supersedes that instruction.
 
 ### October 12 calibration source regression — device acceptance pending
 
+The completed #324 [CI #636 APK](https://github.com/Kajooja/Kajo/actions/runs/38177074386/artifacts/11717690069)
+contains this correction, source `9710f9cedf51bff12cbda0130d8fa4580b6d5c7a`,
+tree `f4174fd093db06d4a2de1bc74e801d870d00b6fb`, actual checkout
+`8db45988a9b4d018f46461f087df3543d9a1771d`. All five required jobs and APK build
+pass. Archive availability ends 2026-10-18 22:21:38 UTC. This build receipt does
+not replace owner observations on the OnePlus or other actual devices.
+
 Use a build containing the independent unknown/prefix/scope correction. Record
 installed source SHA, device/OS and actual results; automated screen tests and
 bundle exports do not close this observation.

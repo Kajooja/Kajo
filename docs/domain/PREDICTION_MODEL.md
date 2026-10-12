@@ -284,6 +284,56 @@ floor, memory/Scenario/Shared reliability and observed usefulness remain separat
 source-fusion/quality gates. Source tests and native CI do not themselves deploy
 or admit those semantics; STATUS owns exact acceptance.
 
+### 4.9 Personal source fusion and forgetting
+
+The new source forward `20261012060821_personal_source_fusion.sql` introduces
+`personal-source-fusion-v1` for current Personal memory and both ordinary/catalogue
+serving kernels. It resolves same-owner native Event authority from finite
+occurrence/creation prefixes before selecting weights. Exact owned canonical
+command receipt lineage governs revisions, including backdated/equal occurrence
+clocks; unsupported legacy raw Events retain explicit occurrence-time/ambiguity
+rules. A valid later revision replaces earlier same-Item native authority; zero
+and neutral five remain authoritative and supersede that Item's bootstrap
+contribution. Not-interest is a separate negative, not a
+fabricated rating. Exact scoped UNDO, selective interest/history clear, malformed
+replacement and ambiguous times must not revive superseded native preference.
+Retained authorized bootstrap can supply an explicitly labelled prior fallback
+when a current native value is unavailable or ambiguous; it is not a current
+native answer or a resolved ambiguity.
+
+Canonical receipt lineage must bind actor/Profile/Item, command/result and source
+Event identities within the eligible finite prefix. An absent, competing, cyclic,
+mixed or over-depth chain is explicit unavailable authority, never a guessed
+UUID winner. The bounded receipt depth is 512. Current active bootstrap withdrawal
+remains an authorization/source-lifecycle decision rather than historical replay.
+
+Receipt-bound history erasure remains distinct from an ordinary Undo. Weak
+attention/save/List actions do not themselves replace a durable rating. Strong
+setup status retains its existing six-strong-Item criterion and wire version;
+Saved/consumed/List alternatives are not known Taste ratings. Current effective
+support follows the same available source scope, rather than counting raw
+historical Events or accepting future display state as current evidence. Canonical
+Saved/List revisions use receipt depth instead of client occurrence order. A list
+deletion with an indistinguishable available clock conservatively withholds that
+list's support; an independent surviving List/rating still supports the Item.
+
+Personal bootstrap now uses separately versioned `bootstrap-decay-v2`,
+`exp(-ageDays / 1460)` without the old permanent 0.2 floor; future/nonfinite times
+are unavailable. Current active bootstrap withdrawal remains distinct from a
+historical cutoff replay. Native LongTerm retains its 180-day rule. New Personal base and
+bootstrap semantics identify `prediction-v0.6-personal-source-fusion` and
+`bootstrap-serving-v2-source-fusion`. Structural `memory-state-v1` and
+`prediction-features-v2` remain compatible; aggregate `sourceFusion` metadata
+records version/availability basis, unresolved native/fallback counts and unknown
+commit availability. Raw source IDs stay within private computation.
+
+Shared native calculations and old helper/frozen prediction/page/shadow/Working
+artifacts keep their earlier semantics and versions. Authorized Shared member
+summaries can still consume corrected Personal memory through the existing
+boundary. Stored clocks remain availability proxies; this source does not certify
+historical feature knowledge, statistical independence, calibrated confidence or
+observed usefulness. STATUS owns final implementation/test/CI/hosted acceptance.
+
 ## 5. Prediction trace: the system's causal spine
 
 Here “causal spine” means traceable decision/observation provenance, **not** proof of causal intervention effects. Full alternatives and exposure improve evaluation, but do not reveal reactions to unseen actions or remove selection bias by themselves.

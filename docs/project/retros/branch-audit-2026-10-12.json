@@ -1,0 +1,228 @@
+{
+  "auditDate": "2026-10-12",
+  "acceptedMain": "34d21704cafe21091a2369396c9bc61dce99c1e9",
+  "scope": "Fresh remote refs and open PR dependency inventory before publishing completed #326",
+  "remoteBranchCount": 35,
+  "deleted": [],
+  "findings": [
+    "No merged development ref is reachable from accepted main and safe to delete.",
+    "Eight consumed catalog operation refs retain immutable source/recovery identity.",
+    "The native PR chain starts at draft #229; device acceptance prevents treating CI success as main acceptance.",
+    "#306 implementation is carried by #323; keep its source receipt until integrated release history is accepted.",
+    "#303 documentation is complete but failed inherited dependency audit; reconcile it onto the current tested native stack.",
+    "The temporary #326 CLI bootstrap workflow is removed by the completed source packet.",
+    "No tracked logs, APKs, archives, .keep placeholders, TODO/FIXME or merge-conflict markers were found in implementation paths."
+  ],
+  "branches": [
+    {
+      "branch": "catalog-acquisition/ol-20260831",
+      "sha": "4308943cf0157ec6648017a0bf7a25e5b0876c5a",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-conflicts",
+      "sha": "11bada2563374616cc8d014d787039c9235ea071",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-continuation",
+      "sha": "f2558795be45be17bd2632071cf25746e4ec82a2",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-framed",
+      "sha": "67b4a7480af41c1e664c6b80bbe7754530ec59b2",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-reviewed",
+      "sha": "4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831",
+      "sha": "bbc351eb9fa7eee0fb25f2183be3c1a729b59191",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-edition-prefix",
+      "sha": "be0ec18cdc968b5643e45c57c5ab9919f885e195",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-work-prefix",
+      "sha": "6a6dc390940db1b15d68a8d850dd08bfbb88bd4a",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "docs/302-engine-buildout",
+      "sha": "ac7133fdda35d2b68b9dbc8bcab5f0e9fe8d7287",
+      "disposition": "retain",
+      "reason": "documentation-awaiting-dependency-reconciliation"
+    },
+    {
+      "branch": "feat/228-delivered-origin",
+      "sha": "9fac7ec772959465ea4b25bf8ad1b86de4fcef8e",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-pre-response-inputs",
+      "sha": "16e8e64a382fa07fd49b78815dc1339d0fa3d72a",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-shadow-source-erasure",
+      "sha": "02d45088c1e5c26e21bc3f1038fd247861e340bf",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-shared-ordinal-evaluation",
+      "sha": "6708f2a56ba61385898d8dd5ed823095a3d2b25b",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-shared-round-evidence",
+      "sha": "9e3c49a7398320f6473acd0fb36230d30056b7e6",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-shared-round-replay",
+      "sha": "70891b757dca5d01d245b9fbaf4f6cd6e0e73288",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/232-shared-vector-captures",
+      "sha": "0d756feb78dfa6e7fab24108a3ec7b215d24c59b",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/kajo-first-session",
+      "sha": "9710f9cedf51bff12cbda0130d8fa4580b6d5c7a",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/native-item-support",
+      "sha": "f017c089d8414a87fbb7168761019b471ee3dde6",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-session-state",
+      "sha": "523d8eb6eb45045da6f9b9c4327b96b3a5d036ea",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-source-fusion",
+      "sha": "5b830f2cf97b97ad70df4e01d472979782a759a9",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-bridge",
+      "sha": "0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-candidate-features",
+      "sha": "0103d941944cbf0b545686ad60d13b08bc068b9d",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-cohort",
+      "sha": "57c43dda3e9db205415dc6353c4ba22b649ca3e9",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-evaluation",
+      "sha": "9352e3e711e41e773d9092167eb58052c71156da",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-prospective",
+      "sha": "f68569b5c0545e5081fbc2b246ea27cacd33c572",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-report",
+      "sha": "963a3ab0ccf577d22cab02b2a5300f59d7eee9db",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/personal-working-reset",
+      "sha": "78a79dd0cfb5e49b400357443bf8d54de01cf6e7",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "feat/shared-overlay-integration",
+      "sha": "08efb7b8ad60e4dd857d0664bd0bbef6bec03455",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "fix/177-shared-overlay-eligibility",
+      "sha": "d14c705d33ff633f86d3bc133dd9b701b6f210cd",
+      "disposition": "retain",
+      "reason": "duplicated-source-integrated-by-323"
+    },
+    {
+      "branch": "fix/199-discovery-catalog-append",
+      "sha": "36a788d1c5e97ac862f07cfd6a6470fa6c61b4e4",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "fix/199-discovery-end-refresh",
+      "sha": "825ecc1c809008a0c312e0bfef2b901476b86808",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "fix/232-ci-startup-lifecycle",
+      "sha": "c3b98bbaf1f4c7cb26b2a3f7c76ced6c6503e873",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "fix/238-native-audit-october",
+      "sha": "00f0bad9ed35c8647b72f8dd584df039ae8d0f9e",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "fix/personal-decay-parity",
+      "sha": "b822fcadf9b9c78eeeaf213ac2543dd52467810e",
+      "disposition": "retain",
+      "reason": "active-pr-dependency"
+    },
+    {
+      "branch": "main",
+      "sha": "34d21704cafe21091a2369396c9bc61dce99c1e9",
+      "disposition": "retain",
+      "reason": "accepted-main"
+    }
+  ]
+}

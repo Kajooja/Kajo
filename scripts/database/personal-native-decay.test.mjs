@@ -51,7 +51,10 @@ test('native LongTerm state/scoring use one versioned elapsed kernel while froze
     } finally { await db.exec('rollback;'); }
     assert.equal((await db.query("select to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') helper")).rows[0].helper,null,
       'Rejected drift left the new helper behind');
-    for (const file of files.slice(index)) await db.exec(`begin;${file.sql}commit;`);
+    // This generation's matrix explicitly asserts the old bootstrap floor and
+    // source policy. The fusion suite verifies their versioned replacement.
+    const fusionIndex = files.findIndex(file => file.name.endsWith('_personal_source_fusion.sql'));
+    for (const file of files.slice(index, fusionIndex < 0 ? undefined : fusionIndex)) await db.exec(`begin;${file.sql}commit;`);
     started = performance.now();
     const smoke = (await db.exec(await personalNativeDecaySmokeSql()))
       .flatMap(result => result.rows.map(row => row.snapshot));

@@ -11,7 +11,8 @@ declare
   unique_tag text := 'bootstrap_smoke_' || gen_random_uuid()::text;
   ranked record;
   result_count integer;
-  expected_base_version text := case when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
+  expected_base_version text := case when to_regprocedure('private.personal_source_evidence_v1(uuid,timestamptz)') is not null
+    then 'prediction-v0.6-personal-source-fusion' when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
     then 'prediction-v0.4-bootstrap' else 'prediction-v0.5-native-decay' end;
 begin
   insert into auth.users(id,email,raw_user_meta_data)

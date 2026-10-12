@@ -32,8 +32,11 @@ begin
   rating_cmd:=rating_cmd||jsonb_build_object('actionId',gen_random_uuid(),'rating',9);
   perform public.commit_item_action_v1(rating_cmd);
   perform set_config('role','postgres',true);
-  if private.build_profile_memory_state_v1(profile,now())->>'nativeEvidenceCount'<>'2' then
+  if (select count(*) from public.events where profile_id=profile and event_type='ITEM_RATED')<>2 then
     raise exception 'Fixture did not create two real rating evidence Events'; end if;
+  if (private.build_profile_memory_state_v1(profile,now())->>'nativeEvidenceCount')::integer<>
+    (case when to_regprocedure('private.personal_source_evidence_v1(uuid,timestamptz)') is null then 2 else 1 end) then
+    raise exception 'Memory did not apply the installed rating revision policy'; end if;
   perform set_config('role','authenticated',true);
   clear_cmd:=base||jsonb_build_object('actionId',gen_random_uuid(),'kind','CLEAR_HISTORY');
   perform set_config('kajo.reject_history_action',clear_cmd->>'actionId',true);

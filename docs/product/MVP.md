@@ -18,6 +18,12 @@ quality: observed usefulness, independent support, bootstrap/transfer, genuine
 Shared and all native/hosted/device/privacy gates remain required. STATUS owns
 exact publication and acceptance.
 
+The active Personal source-fusion/forgetting correction reconciles canonical
+rating revisions versus bootstrap, preserves zero/neutral and selective Undo/clear,
+and distinguishes effective native strong setup support from known Taste ratings.
+This is a correctness foundation, not measured first-session usefulness or a
+server-backed anonymous TasteSession. All release acceptance below remains required.
+
 ## MVP completion meaning
 
 `MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.

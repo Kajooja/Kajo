@@ -21,11 +21,15 @@ calibration's independent unknown/prefix/scope correction. The selector has no
 native consumer yet. The narrow native distinct-Item base confidence correction
 now follows this packet: preserve scores and frozen history while removing tag/
 action multiplicity from its uncalibrated support heuristic. Source/CI, hosted
-rollout and observed acceptance remain separate. Next correct canonical Personal
-rating revision/source fusion and bootstrap forgetting: a surviving explicit
-native rating supersedes earlier edits and the same Item's bootstrap rating;
-zero/neutral, exact Undo, ambiguity and current effective bootstrap-status support
-must agree across memory and both kernels. Then provide a coherent own-Personal
+rollout and observed acceptance remain separate. #325 source now passes all five
+CI #637 gates; #324 CI #636 supplies a standalone test APK, with actual device
+acceptance still open. The active #326 packet corrects canonical Personal rating
+revision/source fusion and bootstrap forgetting: surviving native rating authority
+supersedes earlier same-Item ratings and bootstrap contribution; zero/neutral,
+exact Undo, selective clears, ambiguity and effective strong setup support must
+agree across memory and both kernels. Source clocks remain proxies. This preserves
+the existing six-strong native status and distinct known-rating Taste thresholds.
+Then provide a coherent own-Personal
 server TasteSession with frozen policy/catalog and durable authorized presentation/
 response receipts, followed by the honest frozen challenge. This source work does not invent a
 real roster or anonymous session.

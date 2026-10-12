@@ -12,7 +12,8 @@ declare
   ranked record;
   member uuid;
   new_actor uuid := gen_random_uuid();
-  expected_base_version text := case when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
+  expected_base_version text := case when to_regprocedure('private.personal_source_evidence_v1(uuid,timestamptz)') is not null
+    then 'prediction-v0.6-personal-source-fusion' when to_regprocedure('private.native_long_term_decay_v2(timestamptz,timestamptz)') is null
     then 'prediction-v0.4-bootstrap' else 'prediction-v0.5-native-decay' end;
 begin
   select id into strict profile from public.profiles where owner_user_id=actor and profile_type='PERSONAL';
