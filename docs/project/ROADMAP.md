@@ -17,8 +17,9 @@ The exact #322 source has all five CI #633 gates successful. Actual collection
 still requires native/operator access and an independently retained declaration.
 The October 12 continuation integrates the separate #306 eligibility source in
 #323 and implements a bounded portable Personal Taste selector plus the existing
-calibration's independent unknown/prefix/scope correction. The selector has no
-native consumer yet. The completed native distinct-Item base confidence correction
+calibration's independent unknown/prefix/scope correction. The selector now has
+the #328 server SQL adapter; its mobile consumer remains open. The completed
+native distinct-Item base confidence correction
 preserves scores and frozen history while removing tag/action multiplicity from
 its uncalibrated support heuristic. Source/CI, hosted
 rollout and observed acceptance remain separate. #325 source now passes all five
@@ -32,9 +33,11 @@ proxies. This preserves the existing six-strong native status and distinct
 known-rating Taste thresholds.
 The current own-Personal server successor supplies frozen policy/catalog and
 durable authorized presentation/response receipts, independent portable/SQL
-selection parity, rating-only bootstrap projection and removal. Next provide the
-honest frozen holdout challenge through canonical serving, then connect the
-adaptive app flow to these boundaries. The source does not invent a real roster,
+selection parity, rating-only bootstrap projection and removal. The current
+successor freezes canonical holdout forecasts before accepting evaluation-only
+answers, with descriptive same-domain ordinal agreement and explicit ties/missing
+support. Next connect the adaptive app flow to both authorized boundaries.
+The source does not invent a real roster,
 prove screen exposure or supply an anonymous session.
 Observed quality and canary claims remain separate. Stored
 clocks remain proxies, repeated source/subject-Item evidence remains dependent,
@@ -43,9 +46,9 @@ bootstrap/transfer/first-session, genuine #232F, #306 and device/release order.
 
 The complete 51-part [capability map](ENGINE_BUILDOUT.md) from #303 is now
 reconciled into this current dependency-corrected source stack, with October 12
-state/evaluation/Taste foundations recorded below. Its original failed CI does not
-qualify as acceptance; the integrated documentation requires its own successful
-checks. This does not mark a target capability delivered or merge the native stack.
+state/evaluation/Taste foundations recorded below. Original #303 is closed as
+superseded; its integrated #327 replacement passes all five CI #641 gates.
+This does not mark a target capability delivered or merge the native stack.
 
 ## Engine build-out commitment — 2026-10-05
 
@@ -82,8 +85,9 @@ The October 9 sequence first required the live native LongTerm decay divergence
 between memory snapshots and serving to be corrected. #314 supplies that source;
 #315–#326 add bounded state/evaluation, source-aware forgetting/support and the
 portable Taste selector. These source foundations do not establish recommendation
-quality. Continue with the own-Personal server TasteSession and its frozen
-challenge through the existing server prediction boundary. Use versioned
+quality. The own-Personal server TasteSession and frozen evaluation-only
+challenge now have source boundaries; next integrate their adaptive mobile flow.
+Use versioned
 components, fixed baselines and measured first-session usefulness; a new model
 family is not a prerequisite. This source-plan priority does not mark a
 component, main integration, rollout or device gate accepted.

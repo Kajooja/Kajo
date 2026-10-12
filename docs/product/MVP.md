@@ -18,11 +18,13 @@ quality: observed usefulness, independent support, bootstrap/transfer, genuine
 Shared and all native/hosted/device/privacy gates remain required. STATUS owns
 exact publication and acceptance.
 
-The active Personal source-fusion/forgetting correction reconciles canonical
+The completed Personal source-fusion/forgetting source reconciles canonical
 rating revisions versus bootstrap, preserves zero/neutral and selective Undo/clear,
 and distinguishes effective native strong setup support from known Taste ratings.
 This is a correctness foundation, not measured first-session usefulness or a
-server-backed anonymous TasteSession. All release acceptance below remains required.
+server-backed anonymous TasteSession. The current owned server TasteSession and
+frozen ordinal challenge are source foundations; app integration, anonymous entry
+and measured usefulness remain open. All release acceptance below remains required.
 
 ## MVP completion meaning
 
@@ -121,8 +123,8 @@ release; a group invitation or decision session does not replace these gates.
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
 - [-] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required. A bounded portable selector and strict Kajo adapter now exist in source; owned server TasteSession persistence and a parity-tested SQL adapter now exist in source; anonymous entry, app consumption, measured selection value and device acceptance remain open.
 - [ ] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics and initialize the visitor's PersonalProfile-compatible taste state without pretending campaign/auth behavior is recommendation evidence.
-- [ ] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward.
-- [ ] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted.
+- [-] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward. The owned server source now freezes one canonical run and reserved forecasts before first answers; answers remain evaluation-only. Anonymous/app acceptance and explicit later projection remain open.
+- [-] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted. The source now reports same-domain ordinal agreement, ties/missing support and unavailable small-sample uncertainty; user-facing presentation and observed acceptance remain open.
 - [ ] `MVP-TASTE-006` After the challenge, Kajo shows a small unseen recommendation preview generated through the canonical production ranking boundary, including safe explanation and optional FOR_YOU/SURPRISE/RISK contrast.
 - [ ] `MVP-TASTE-007` A completed Taste session produces useful first-session recommendations compared with a fixed transparent baseline/reference set; if evidence does not show usefulness, public launch remains blocked.
 

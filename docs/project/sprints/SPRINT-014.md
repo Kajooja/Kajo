@@ -14,6 +14,44 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Frozen own-Personal Taste challenge — 2026-10-12
+
+The #328 parent is complete for source review: exact `b7dd4f799358ca167ec1d5a178d290608aacd9ed`,
+tree `3e434b54b8b26230265552933739ab1ba92ef954`, all five CI #644 gates pass.
+The current `feat/personal-taste-challenge` continuation advances EB-03/EB-08
+(sections 30/32/33/40) without changing the scorer or promoting a model.
+
+Delivered source: `taste_challenge_v1` reserves up to three real unseen Items per
+domain before one canonical cross-domain FOR_YOU run; freezes full run/pool,
+state/model/genome and holdout commitments; accepts immutable first answers with
+exact retry/CAS and durable resume; and reveals forecasts only at completion.
+Same-domain ordinal agreement reports known/unknown/not-interest, score/rating
+ties and missing forecasts, with unavailable small-dependent-sample uncertainty.
+Scores are not converted to calibrated ratings or percentages. Answers remain
+EVALUATION_ONLY, without native Event/bootstrap/reward writes.
+
+Private ownership/RLS/ACL boundaries, anonymous refusal, live catalog withdrawal,
+Taste/import removal, source Prediction erasure and account cascade are covered.
+Existing rows/functions/ACLs and historical predictions retain their bytes.
+The additive migration was created by pinned Supabase CLI 2.117.0. Native CLI
+probes exercise separate connections for duplicate creation/answer, revision
+conflict and source removal, and compare complete canonical state after cleanup.
+Local and exact-source final CI receipts belong to the active PR/#229 handoff.
+Local native advisors require the unavailable local Postgres stack; configured
+backend/device behavior and real usefulness are not claimed.
+
+Hygiene reconciliation corrects the stale “no native consumer” wording to the
+actual server-versus-mobile boundary and records #327's completed integration CI.
+Canonical protocol/evidence/model, CODEMAP, launch semantics, MVP partial status,
+ROADMAP, capability ledger and STATUS now describe the same source and next task.
+No older sprint result is rewritten, no branch dependency is deleted and no
+hosted write, account reset, provider acquisition or main merge is performed.
+
+Next: verify this source's CI, then integrate the owned adaptive mobile Taste and
+challenge flow through both RPCs. Keep anonymous lifecycle/abuse/measurement,
+explicit later answer projection, canonical preview, observed first-session value,
+#229 configured-device/fresh-account and the complete MVP/Share Link gates open.
+
 ## Durable own-Personal TasteSession — 2026-10-12
 
 The interrupted #326/#327 follow-up is complete: CI #639 and #641 pass all five

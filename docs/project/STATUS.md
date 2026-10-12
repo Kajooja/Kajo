@@ -10,73 +10,74 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — durable own-Personal TasteSession
+## Current packet — frozen own-Personal Taste challenge
 
-Active continuation: **[#328](https://github.com/Kajooja/Kajo/pull/328), `feat/personal-taste-session`**, directly based on
-[#327](https://github.com/Kajooja/Kajo/pull/327) source
-`52d370946d0f60f89f328113849980924a1c4f53`, tree
-`d84629eff13c3fe01a7bad6232a3e7a17e421eb3`. Accepted main remains
-`34d21704cafe21091a2369396c9bc61dce99c1e9`. Parent #326 [CI #639](https://github.com/Kajooja/Kajo/actions/runs/38229883071)
-and #327 [CI #641](https://github.com/Kajooja/Kajo/actions/runs/38231303098) now pass
-**all five required gates**, including actual CLI installation/history. Their
-optional APK jobs were skipped. The prior interrupted CI follow-up is complete.
+Active continuation: **`feat/personal-taste-challenge`**. The current
+[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) identifies its published PR,
+exact source/tree and final CI receipt. It is directly based on
+[#328](https://github.com/Kajooja/Kajo/pull/328), source
+`b7dd4f799358ca167ec1d5a178d290608aacd9ed`, tree
+`3e434b54b8b26230265552933739ab1ba92ef954`. All five required
+[CI #644 gates](https://github.com/Kajooja/Kajo/actions/runs/38239109789) pass for
+that parent, including native CLI concurrency/history. #326 CI #639 and #327
+CI #641 also pass all five. Accepted main remains
+`34d21704cafe21091a2369396c9bc61dce99c1e9`; no stack merge or hosted rollout is implied.
 
-This source adds an authenticated own-Personal `taste_session_v1` boundary:
-server-owned frozen catalog/policy/features, durable question order and response
-revisions, explicit movie → book acknowledgement, resume, exact request replay,
-revision conflicts and removal. The SQL selection adapter is compared with the
-independent portable `taste-selection-v1` implementation. At most 256 real Items,
-64 feature dimensions, 24 opportunities and eight response revisions per Item
-bound the source. Existing completed setup is preserved; no reset is performed.
-Missing catalog recognition is explicitly `null`/`UNAVAILABLE`; a supplied zero
-remains a distinct catalog proxy. Popularity alone cannot manufacture recognition.
+This source adds `taste_challenge_v1` after the completed own-Personal training
+session. It reserves at most three real unseen Items per domain before calling
+canonical cross-domain `FOR_YOU` serving once. Training presentations and all
+same-Item native/bootstrap evidence, including inactive rows, exclude holdouts.
+The full canonical run/pool, model/state/genome lineage and reserved forecasts are
+committed before any answer. A candidate absent from the deliverable pool remains
+explicitly unavailable. New START IDs cannot resample; exact retries cannot
+allocate another run or answer. Scores stay hidden until all first answers lock.
 
-Only current explicit ratings, including zero/five, project incrementally into
-existing LongTerm bootstrap storage under dataset `TASTE_SESSION_V1` with
-`source=TASTE_TEST` and session/question/policy/revision provenance. Unknown is
-not preference evidence. Not-interest remains a distinct durable selection
-response; this version does **not** admit it into the older bootstrap schema or
-pretend it is a native Event. Correcting one Item cannot reactivate another
-withdrawn Item. Native rating authority retains #326's source precedence.
+The current scorer predicts order, not a calibrated 0–10 rating.
+`taste-ordinal-agreement-v1` reports same-domain concordant/discordant pairs,
+actual/forecast ties, missing support and known/unknown/not-interest counts.
+Pairs sharing Items are dependent. Small-sample uncertainty is unavailable;
+accuracy percentage and rating error are null. No usefulness or quality claim is
+made. Answers remain **EVALUATION_ONLY**, with no bootstrap, Event, exposure,
+reward, learning or promotion writes.
 
-Private tables have RLS and no API table grants. Ownership is rechecked before
-replay; anonymous identities and Shared/foreign Profiles are refused. Import
-source removal atomically tombstones the session and clears its catalog, answer
-ledger and retained command results. Account deletion cascades those copies.
-Live catalog withdrawal blocks further data delivery/answers while preserving
-REMOVE. Existing bootstrap removal remains logical withdrawal, not a new
-physical-erasure claim. No hosted write or mobile gate switch occurs.
+Private RLS/ACLs, ownership and anonymous rejection precede replay. The canonical
+Prediction lifecycle gate and Profile/session locks serialize source work.
+Taste/import withdrawal and Prediction source erasure clear copied forecasts,
+answers and receipts; account deletion cascades them. Live holdout withdrawal
+blocks answers/replay while preserving REMOVE. Removal is terminal. Existing
+canonical Prediction history follows its own retention/erasure contract.
 
-Implementation and protocol: [DOMAIN_MODEL](../domain/DOMAIN_MODEL.md#own-personal-tastesession-source),
-[DATA_EVENTS](../domain/DATA_EVENTS.md#3-taste-evidence),
-[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#personal-taste-opportunity-source),
-[CODEMAP](../architecture/CODEMAP.md), migration
-`20261012100043_personal_taste_session.sql` and `scripts/database/personal-taste-session*`.
-The migration name was generated by pinned Supabase CLI **2.117.0**.
+Protocol: [DOMAIN_MODEL](../domain/DOMAIN_MODEL.md#own-personal-frozen-challenge-source).
+Metric: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#frozen-personal-taste-challenge).
+Evidence: [DATA_EVENTS](../domain/DATA_EVENTS.md#4-tastechallenge-evaluation).
+Implementation: [CODEMAP](../architecture/CODEMAP.md), migration
+`20261012111935_personal_taste_challenge.sql` (generated by pinned CLI **2.117.0**),
+and `scripts/database/personal-taste-challenge*`. The packet advances EB-03/EB-08
+and architecture sections 30/32/33/40; it does not close those capabilities.
 
 ### Validation and exact next action
 
-Focused full-schema tests cover populated-forward preservation of old rows and
-function identity/body/permissions, authenticated public commands, malformed and
-stale requests, zero/neutral/unknown/correction, source/account removal, catalog
-freeze/withdrawal/budgets, stage progression, fail-open limits and independent
-portable/SQL policy parity. Native CLI CI additionally exercises separate
-connections for duplicate START/ANSWER, conflicting revisions and source removal.
-The exact final test/CI receipts belong to this PR and the current
-[Sprint 014 entry](sprints/SPRINT-014.md#durable-own-personal-tastesession--2026-10-12).
-Local native advisors cannot connect because no local Supabase/Postgres service
-is running; explicit schema/ACL/ownership regressions are the local evidence.
+Full-schema regressions exercise genuine canonical scoring, complete populated
+forward preservation, source lineage, pre-answer freeze, retries/CAS, zero/five,
+unknown/not-interest, ties/missing support, authorization, withdrawal and erasure.
+Native CLI CI runs separate-connection duplicate START/ANSWER, conflicting-revision
+and source-removal tests, with a complete before/after canonical cleanup comparison.
+Local full/root checks and final exact-source CI receipts belong to the current
+PR and the [Sprint 014 entry](sprints/SPRINT-014.md#frozen-own-personal-taste-challenge--2026-10-12).
+Local Supabase/Postgres is unavailable for native advisors; this is not a hosted
+security/advisor or device acceptance receipt.
 
-**Next action:** finish the current source's required CI, fixing an actual failure
-first. Then implement the own-Personal **frozen holdout challenge** through the
-canonical prediction boundary: reserve held-out Items, freeze supported
-model/state/forecast lineage before accepting answers, and define an honest
-metric and missing-support path. Wire the adaptive mobile flow only through the
-new authorized server boundary after its challenge contract is settled; the
-existing six-rating mobile calibration remains in use meanwhile. Durable
-presentations mean server-issued opportunities, not proof of screen exposure.
-Anonymous identity/retention/abuse/measurement precede real anonymous Taste.
-First-session usefulness, preview, hosted/device acceptance and Share Link remain open.
+**Next action:** verify this published source's required CI, fixing any failure
+first, then connect the owned adaptive mobile Taste flow to `taste_session_v1`
+and `taste_challenge_v1`: durable resume/retry, movie-to-book acknowledgement,
+independent unknown action, genuine zero, honest ordinal result/missing-support
+copy and removal. Keep the existing six-known/static calibration until its
+replacement is explicitly integrated and verified. Any later challenge-answer
+projection needs explicit canonical evidence/lifecycle semantics after the freeze;
+these evaluation rows are not automatic training evidence. Canonical unseen
+preview and observed first-session usefulness follow. Server identity, retention,
+abuse and measurement still precede real anonymous entry. Hosted/device tests,
+#229 acceptance and the Share Link Gate remain open.
 
 ## Source stack and integration gates
 
@@ -86,10 +87,10 @@ First-session usefulness, preview, hosted/device acceptance and Share Link remai
 | #307–#313 | Shared round evidence, replay/captures, erasure and prepared prediction inputs. Genuine #232F prediction consumption and Phase 16.3 remain open. |
 | #314–#322 | Native decay, bounded Personal WorkingState, frozen controls/features, prospective enrollment and private report/cohort foundation. Serving stays OFF; no actual cohort or quality admission. |
 | #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its branch and guarded hosted/device gates remain preserved. |
-| #324 / current Taste successor | Portable selector and native calibration correction; current server persistence/SQL adapter adds owned durable opportunities. Native six-known/static calibration remains unchanged. |
+| #324 / #328 / current challenge | Portable selector and native calibration correction; #328 adds durable session/SQL parity, and the current packet freezes canonical holdout evaluation. Native six-known/static calibration remains unchanged. |
 | #325 | Distinct native-Item base confidence support; all five [CI #637 gates](https://github.com/Kajooja/Kajo/actions/runs/38178201644) pass. The /8 support heuristic remains uncalibrated. |
 | #326 / #327 | Personal source fusion/forgetting and complete engine ledger/handoff; all five required gates pass for both. Full-engine tracker #302 remains open. |
-| #303 / #302 | Full-engine capability map integrated in this documentation successor on the current dependency-corrected stack. Original #303 CI failed its old inherited audit; the new integration requires its own checks. Full-capability tracker #302 remains open. |
+| #303 / #302 | Full-engine capability map integrated in this documentation successor on the current dependency-corrected stack. Original #303 is closed as superseded; its integrated #327 replacement passes all five CI #641 gates. Full-capability tracker #302 remains open. |
 
 Do not merge the dependent stack past #229's remaining acceptance gates or delete
 its ancestor branches as though they were stale. Actual Working collection needs
@@ -135,9 +136,10 @@ the actual hosted checkpoint need their guarded deployment procedure.
 
 ## Repository hygiene and historical evidence
 
-The [October 12 branch audit](retros/branch-audit-2026-10-12.json) covers **35 remote
-branches**: accepted main, eight consumed operation identities and open source/
-documentation dependencies. No branch was deleted: none is a safely disposable
+The [October 12 branch audit](retros/branch-audit-2026-10-12.json) records **35 remote
+branches at its earlier source checkpoint**: accepted main, eight consumed operation
+identities and open source/documentation dependencies. Subsequent #326–current
+continuation refs are preserved dependencies too. No branch was deleted: none is a safely disposable
 merged development ref on current main. No tracked logs, APK/archive outputs,
 `.keep` placeholders, implementation TODO/FIXME or merge-conflict markers were found.
 

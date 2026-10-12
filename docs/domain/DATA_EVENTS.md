@@ -266,6 +266,24 @@ answeredAt
 
 A challenge prediction whose answer was already in training evidence is invalid and excluded from user-facing accuracy/evaluation.
 
+The own-Personal `personal-taste-challenge-v1` implementation stores private first
+answers only after one canonical run and the entire reserved holdout slate have
+been committed. It excludes every training presentation and all existing native/
+bootstrap evidence on those Items, even inactive rows. It retains the actual run
+identity, Taste revision, model/policy/genome lineage, trace/state digests and
+server answer receipt times. Exact request retries cannot allocate another run,
+answer or score. Scores and the metric are withheld until completion.
+
+These answers are explicitly **EVALUATION_ONLY**. They create no native Event,
+bootstrap row, impression, Scenario reward or learnable outcome. RATING zero/five,
+UNKNOWN and NOT_INTERESTED remain distinct; no unknown/negative label is converted
+to a numeric rating. The [ordinal evaluation contract](PREDICTION_MODEL.md#frozen-personal-taste-challenge)
+counts same-domain agreement/ties/missing support without calibrated-rating or
+accuracy claims. Source Prediction erasure and Taste/import removal clear copied
+forecast, answer and command state; account deletion cascades it. Future explicit
+learning projection requires its own source lifecycle while retaining the frozen
+pre-answer lineage. Existing Prediction retention remains a separate boundary.
+
 ## 5. Acquisition/growth telemetry
 
 Growth telemetry is a separate event class/stream/table boundary or an explicitly typed system event contract. It may correlate sessions/attribution but does not require `profileId`/`itemId` when those concepts do not apply.

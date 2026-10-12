@@ -178,8 +178,10 @@ exhaustion are explicit. The existing native six-rating calibration does not
 consume this selector. The own-Personal server successor now provides durable
 catalog/policy/presentation/response storage and a parity-tested SQL selection
 adapter, with exact retries, corrections, removal and rating-only bootstrap
-provenance. It is not connected to that mobile gate. Anonymous prerequisites,
-frozen challenge, preview and observed first-session usefulness remain required.
+provenance. The separate owned challenge now freezes canonical forecasts and
+evaluation-only first answers with an honest ordinal metric. Neither boundary is
+connected to that mobile gate. Anonymous prerequisites, preview, app integration
+and observed first-session usefulness remain required.
 
 The question-selection policy should optimize information gained about the Profile while retaining:
 
@@ -209,6 +211,18 @@ Challenge contract:
 Never display a fabricated “91% accuracy” number. User-facing metrics must correspond to a documented mathematical measure, sample size and uncertainty. With very few holdouts, prefer plain language such as “Kajo osui lähelle 2/3 arviossa” rather than false precision.
 
 Possible internal metrics include MAE/RMSE on 0–10 ratings, tolerance hit rate, rank correlation when enough items exist, calibration error and completion/recognition rate.
+
+The October 12 own-Personal source supports **ranking order**, not a calibrated
+rating estimate. It reserves up to three unseen Items per domain before one
+canonical forecast and hides scores until all first answers are locked. Its
+[taste-ordinal-agreement-v1 metric](../domain/PREDICTION_MODEL.md#frozen-personal-taste-challenge)
+reports same-domain pair agreement, ties, missing forecasts and known/unknown
+counts; dependent pairs are not independent observations. Percentage, rating
+error and statistical certainty are unavailable. UI must describe ordering
+agreement and sample size, never say “within N rating points” from these scores.
+These answers remain evaluation-only; automatic learning projection, mobile
+presentation, anonymous prerequisites and observed usefulness are separate gates.
+
 
 ## 7. Recommendation preview and conversion wall
 

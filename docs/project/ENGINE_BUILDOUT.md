@@ -38,9 +38,9 @@ Do not repeat E1/D1/D2, reset native accounts, repeat deployed migrations or rea
 
 ## October 12 integration checkpoint
 
-The original assessment above remains dated. The current integration sits on
-[Personal source fusion #326](https://github.com/Kajooja/Kajo/pull/326), source
-`70d4e48f8260bc3462fa40cbea221184e63c0bb3`; accepted main is still the September 30
+The original assessment above remains dated. The current challenge continuation builds on
+[owned server TasteSession #328](https://github.com/Kajooja/Kajo/pull/328), source
+`b7dd4f799358ca167ec1d5a178d290608aacd9ed`; accepted main is still the September 30
 checkpoint. The source below reuses the full native stack; it does not waive #229
 configured-device/fresh-account acceptance or imply a hosted rollout.
 
@@ -49,7 +49,7 @@ configured-device/fresh-account acceptance or imply a hosted rollout.
 | EB-01 / EB-02 | #307–#313 Shared response/capture/erasure/prepared-input lineage; #314 decay parity; #315–#319 WorkingState, native OFF controls, reset and candidate features | Genuine Shared prepared-input consumer, native-core extraction, admitted state benefit and lifecycle/rollout/device gates |
 | EB-02 / EB-09 | #325 distinct native-Item support and #326 Personal rating/bootstrap fusion, exact Undo/clear, effective Saved/List setup support and versioned forgetting | Uncalibrated support is not independent statistical N; cross-domain transfer, quality and hosted acceptance remain open |
 | EB-03 | #320 prospective native enrollment/outcome captures; #321 private report; #322 future cohort declaration/inventory checks | Actual authorized cohort, independently retained pre-window declaration, observed coverage/usefulness and admission |
-| EB-08 | #324 portable bounded Taste selector/calibration correction; current own-Personal durable session and parity-tested SQL selection adapter | App/anonymous prerequisites, frozen challenge and measured first-session value |
+| EB-03 / EB-08 | #324 portable Taste selector; #328 durable session/SQL parity; current canonical frozen holdout and descriptive same-domain ordinal evaluation | App/anonymous prerequisites, explicit later answer projection, user-facing metric and measured first-session value |
 
 The complete-capability checkboxes below remain open. The source handoff and exact
 CI/build/hosted state belong only to STATUS and the referenced PR receipts. This

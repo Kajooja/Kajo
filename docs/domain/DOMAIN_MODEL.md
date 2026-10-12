@@ -162,8 +162,8 @@ copies cascade on account/Profile deletion. Existing bootstrap rows follow the
 canonical logical-removal/retention policy; this source does not claim complete
 anonymous retention or physical erasure. Server-issued opportunities are durable
 presentation receipts, not observed exposure. Existing native calibration is
-unchanged; public anonymous entry, honest frozen challenge and app/UI integration
-remain required.
+unchanged. The separate own-Personal challenge source is described below; public
+anonymous entry, app/UI integration and observed usefulness remain required.
 
 ### TasteResponse
 
@@ -193,6 +193,62 @@ freeze Profile/taste snapshot
 ```
 
 A challenge Item cannot improve the prediction that is being scored.
+
+#### Own-Personal frozen challenge source
+
+`public.taste_challenge_v1(request)` implements one evaluation-only challenge per
+completed (`STOPPED`) own authenticated TasteSession. Shared, foreign and anonymous
+access is denied before any retained response can be replayed. Private challenge
+and command tables have RLS and no API table grants. No existing ranking function,
+historical prediction or mobile calibration behavior is replaced.
+The existing `taste_session_v1` response stays unchanged; the new consumer invokes
+this separate RPC after `STOPPED`.
+
+| Operation | Required JSON fields besides `operation` | Behavior |
+|---|---|---|
+| `START` | `profileId`, `sessionId`, `requestId` | Reserve and freeze once; further starts resume without allocating another run or resampling. |
+| `RESUME` | `profileId`, `sessionId`, `challengeId` | Read the current authorized challenge without changing it. |
+| `ANSWER` | `profileId`, `sessionId`, `challengeId`, `requestId`, `expectedRevision`, `itemId`, `answer` | Accept one first answer for a reserved Item; no retrospective correction of the measured answer. |
+| `REMOVE` | `profileId`, `sessionId`, `challengeId`, `requestId`, `expectedRevision` | Clear the retained forecast/answer/command copies and leave a terminal tombstone. |
+
+Requests are bounded to 4 KiB with exact fields and UUID identities. `answer` is an
+integer `{kind:"RATING",value:0..10}`, `{kind:"UNKNOWN"}` or
+`{kind:"NOT_INTERESTED"}`. Zero and neutral five remain actual ratings. A previously
+accepted Item cannot be answered again. An identical command ID/body replays its
+original response; conflicting reuse fails. Stale revisions fail with `40001`;
+resume before constructing a new command, retaining the old command for retries.
+
+The server reserves up to three Items per domain from the frozen training catalog,
+ordered by recognition then stable Item ID, **before** running the scorer. All
+training presentations and every existing same-Profile Item Event/bootstrap row
+(including inactive evidence) exclude that Item. The client cannot choose the
+holdouts. One cross-domain `FOR_YOU` canonical PredictionRun freezes the complete
+bounded pool, state and model; a reserved Item outside its deliverable pool is
+explicitly unavailable. The challenge retains the Taste revision, model/base/
+policy versions, genome ID, state digest and a digest of the complete run, candidate
+pool, genome configuration and reserved forecasts. See the
+[ordinal metric](PREDICTION_MODEL.md#frozen-personal-taste-challenge).
+
+Items are presented in stable ID order. Scores, predicted order and partial metrics
+remain hidden until all reserved answers are locked; an initial commitment alone
+is visible. No new calibration, probability or observed exposure is implied.
+`UNAVAILABLE / NO_UNSEEN_HOLDOUTS` records an empty eligible set without resampling.
+`CATALOG_UNAVAILABLE / HOLDOUT_WITHDRAWN` blocks answers and old receipts if a
+reserved Item loses discoverability or real provenance; REMOVE remains available.
+
+Lock order is the canonical shared Prediction lifecycle gate, Profile, training
+session, then challenge. Native actions use the same Profile serialization; a
+post-scoring check rejects newly visible legacy Item evidence atomically. Source
+Prediction erasure clears every copied forecast/answer/receipt and leaves the
+challenge terminal. Taste/import removal does the same. Account/Profile deletion
+cascades the new tables. Existing canonical Prediction history follows its own
+retention/erasure lifecycle; logical challenge removal is not a physical-erasure
+claim for that history.
+
+`learningAdmission=EVALUATION_ONLY`: answers do not become native Events, bootstrap
+rows, impressions, training outcomes or model-promotion evidence. Explicit future
+projection must preserve this pre-answer freeze and source-removal lineage.
+App presentation, anonymous prerequisites and actual usefulness remain open.
 
 ### AcquisitionAttribution
 

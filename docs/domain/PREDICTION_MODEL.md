@@ -67,9 +67,55 @@ ADAPTIVE; diagnostics cannot change the policy through the public request.
 
 Explicit ratings alone project to source-provenanced LongTerm bootstrap evidence.
 Unknown/not-interest/withdrawal stay distinguishable; see [Taste evidence](DATA_EVENTS.md#3-taste-evidence).
-Durable receipt issuance is not observed screen exposure. Frozen holdout challenge,
-anonymous lifecycle, preview, app integration and usefulness evidence remain open.
+Durable receipt issuance is not observed screen exposure. The own-Personal frozen
+challenge source is below; anonymous lifecycle, preview, app integration and
+usefulness evidence remain open.
 The root estimator, current mobile calibration policy/RPC and scorer are unchanged.
+
+### Frozen Personal Taste challenge
+
+`personal-taste-challenge-v1` reserves unseen holdouts before calling the existing
+`rank_items_with_identity_v1` once in cross-domain `FOR_YOU` mode, with a bounded
+50-Item pool. Selection is fixed to at most three real Items per domain by frozen
+recognition/ID, independently of the forecast score. Training presentations and
+all existing same-Item native/bootstrap records are excluded. The run's canonical
+state, source features, genome and full candidate trace remain the audit source;
+the challenge freezes their commitment and every reserved score or explicit
+missing result before accepting any answer. Later training corrections, metadata
+changes and answers never recompute those forecasts. Lifecycle withdrawal remains
+authoritative over replay. [DOMAIN_MODEL](DOMAIN_MODEL.md#own-personal-frozen-challenge-source)
+owns the bounded protocol, locking and erasure rules.
+
+The existing scalar is an **uncalibrated ranking score**, not a predicted 0–10
+rating or satisfaction probability. Therefore `taste-ordinal-agreement-v1`
+measures only **same-domain rating order**. It forms unordered pairs of reserved
+Items whose first responses are both ratings; BOOK/MOVIE cross-pairs are excluded.
+Pairs are partitioned in this order:
+
+| Pair condition | Count / treatment |
+|---|---|
+| Either forecast is unavailable | `missingForecastPairs`; no imputation. |
+| Actual ratings are equal | `ratingTiePairs`; no claimed ordering target. |
+| Absolute frozen score difference is at most `1e-9` | `forecastTiePairs`; stable ID rank is not a taste prediction. |
+| Both differences are nonzero and their signs agree | `concordantPairs`. |
+| Both differences are nonzero and their signs disagree | `discordantPairs`. |
+
+`comparablePairs = concordantPairs + discordantPairs`. The result separately reports
+reserved/answered Items, known ratings, unknown and not-interest counts. Unknown
+and not-interest are not invented numeric ratings. Pair counts share Items and
+are dependent: at most six known ratings do not become a larger independent sample.
+No comparable pairs yields `INSUFFICIENT_COMPARABLE_PAIRS`; otherwise the result is
+`DESCRIPTIVE_ONLY`. Both expose `UNAVAILABLE_SMALL_DEPENDENT_SAMPLE`, null
+`accuracyPercent` / `ratingError`, and `qualityAdmitted=false`. No confidence
+interval, MAE/RMSE or percentage is manufactured from these ranking scores.
+
+All scores and partial metrics stay hidden until all reserved answers are locked.
+The first answer is the measured answer; it cannot be retrospectively edited to
+improve the result. REMOVE withdraws the retained evaluation. These private
+answers are `EVALUATION_ONLY`, with no automatic bootstrap, Event, reward, learning
+or model promotion. Any later explicit taste projection must preserve the
+commitment and its removal lineage. The source proves protocol correctness, not
+first-session usefulness, representative population quality or screen exposure.
 
 ```mermaid
 flowchart TD

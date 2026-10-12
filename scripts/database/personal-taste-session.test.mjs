@@ -46,9 +46,10 @@ async function database() {
     create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
     grant usage on schema public,auth to anon,authenticated,service_role;`);
   const {files}=await buildFreshInstallation();
-  for(const file of files.slice(0,-1)) await db.exec(`begin;${file.sql}commit;`);
-  assert.match(files.at(-1).name,/_personal_taste_session.sql$/);
-  return {db,migration:files.at(-1)};
+  const index=files.findIndex(file=>file.name.endsWith('_personal_taste_session.sql'));
+  assert.ok(index>0);
+  for(const file of files.slice(0,index)) await db.exec(`begin;${file.sql}commit;`);
+  return {db,migration:files[index],forwards:files.slice(index+1)};
 }
 const snapshotRows=async db=>(await db.query(`select n.nspname||'.'||c.relname name from pg_class c join pg_namespace n on n.oid=c.relnamespace
   where c.relkind='r' and n.nspname in('public','private','auth') order by 1`)).rows;
@@ -56,7 +57,7 @@ const snapshotFunctions=async db=>(await db.query(`select p.oid,to_jsonb(p) body
   where n.nspname in('public','private','auth') order by p.oid`)).rows;
 
 test('own Personal durable Taste session / full current schema',async t=>{
-  const {db,migration}=await database();
+  const {db,migration,forwards}=await database();
   const query=async(sql,args=[])=>(await db.query(sql,args)).rows;
   const rpc=async(request,actor=owner,role='authenticated')=>{
     await db.query("select set_config('request.jwt.claim.sub',$1,true)",[actor??'']);
@@ -100,6 +101,7 @@ test('own Personal durable Taste session / full current schema',async t=>{
       }finally{await db.exec('rollback;');}
     });
     await db.exec(migration.sql);
+    for(const file of forwards)await db.exec(file.sql);
     await t.test('native-CLI smoke executes authenticated public commands and rolls back',async()=>{
       try{const rows=(await db.exec(await personalTasteSessionSmokeSql())).flatMap(r=>r.rows);assert.match(rows[0].snapshot.personalTasteSession,/^PASS:/);}
       finally{await db.exec('rollback;');}
