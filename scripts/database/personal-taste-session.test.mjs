@@ -217,6 +217,16 @@ test('own Personal durable Taste session / full current schema',async t=>{
       s=await rpc(command(s,'ACK_TRANSITION'));assert.equal(s.selection.decision.reason,'CATALOG_EXHAUSTED');
       assert.equal(s.selection.decision.failOpen,true);assert.equal(s.selection.counts.knownRatings,0);
     });
+    await sub('absent recognition is unavailable while a supplied zero remains an explicit catalog proxy',async({start})=>{
+      const [missing,zero]=(await query('select id from public.items order by id limit 2')).map(r=>r.id);
+      await query("update public.items set metadata='{\"popularity\":9000}' where id=$1",[missing]);
+      await query("update public.items set metadata='{\"coldStartRecognition\":0}' where id=$1",[zero]);
+      await start();const catalog=(await query('select catalog from private.taste_sessions'))[0].catalog;
+      assert.equal(catalog.find(c=>c.id===missing).recognitionPrior,null);
+      assert.equal(catalog.find(c=>c.id===missing).priorBasis,'UNAVAILABLE');
+      assert.equal(catalog.find(c=>c.id===zero).recognitionPrior,0);
+      assert.equal(catalog.find(c=>c.id===zero).priorBasis,'PROVIDER_CATALOG');
+    });
     await sub('SQL selection agrees with portable policy across adaptive/control, ratings/skips/corrections and domain transition',async({start,answer,command})=>{
       for(const policy of ['ADAPTIVE','PRIOR_ONLY']){
         await db.exec('savepoint parity;');

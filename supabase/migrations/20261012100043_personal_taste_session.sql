@@ -129,6 +129,8 @@ returns jsonb language sql stable security definer set search_path='' as $$
   with reacted as materialized (select distinct item_id from private.personal_source_evidence_v1(target_profile_id,cutoff)),
   eligible as materialized (
     select i.id,i.item_type,i.title,i.tags,i.created_at,private.catalog_cold_start_prior_v1(i.id,cutoff) prior,
+      (coalesce(i.metadata->>'coldStartRecognition','') ~ '^([0-9]+([.][0-9]+)?|[.][0-9]+)$'
+        or coalesce(i.metadata->>'voteCount','') ~ '^[0-9]+$') has_recognition,
       array(select distinct s.provider_key from private.item_sources s where s.item_id=i.id and s.provider_key<>'kajo_mock'
         and isfinite(s.created_at) and s.created_at<=cutoff order by s.provider_key limit 16) providers
     from public.items i where i.discoverable and isfinite(i.created_at) and i.created_at<=cutoff
@@ -145,8 +147,9 @@ returns jsonb language sql stable security definer set search_path='' as $$
   ) select coalesce(jsonb_agg(jsonb_build_object('id',id,'itemType',item_type,'title',left(title,512),'providerKeys',providers,
     'availableAt',floor(extract(epoch from cutoff)*1000)::bigint,
     'tags',array(select distinct tag from unnest(b.tags) tag where tag in(select tag from dimensions) order by tag),
-    'recognitionPrior',(prior->>'recognition')::double precision,
-    'priorBasis',case when prior->>'source'='KAJO_CURATED_RECOGNITION' then 'CURATED_RECOGNITION' else 'PROVIDER_CATALOG' end
+    'recognitionPrior',case when has_recognition then (prior->>'recognition')::double precision else null end,
+    'priorBasis',case when not has_recognition then 'UNAVAILABLE'
+      when prior->>'source'='KAJO_CURATED_RECOGNITION' then 'CURATED_RECOGNITION' else 'PROVIDER_CATALOG' end
   ) order by id),'[]') from bounded b;
 $$;
 revoke all on function private.taste_catalog_snapshot_v1(uuid,timestamptz) from public,anon,authenticated,service_role;

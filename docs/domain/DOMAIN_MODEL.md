@@ -144,7 +144,9 @@ The server freezes at most 128 real Items per domain plus a frequency-ranked,
 lexically tied 64-tag dictionary (`taste-tags-frequency-64-v1`). Catalog title,
 provider identities, recognition proxy and binary features come from canonical
 server records. These are capture-time features, not a claim of historical
-provider availability. The selected snapshot cannot be supplied or replaced by
+provider availability. Missing recognition remains `null`/`UNAVAILABLE`, distinct
+from an explicitly supplied zero; popularity alone is not recognition evidence.
+The selected snapshot cannot be supplied or replaced by
 a client. The policy is fixed to ADAPTIVE on public creation; private PRIOR_ONLY
 is a diagnostic comparator, not a client override.
 

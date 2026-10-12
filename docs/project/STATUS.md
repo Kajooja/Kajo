@@ -12,7 +12,7 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current packet — durable own-Personal TasteSession
 
-Active continuation: **`feat/personal-taste-session`**, directly based on
+Active continuation: **[#328](https://github.com/Kajooja/Kajo/pull/328), `feat/personal-taste-session`**, directly based on
 [#327](https://github.com/Kajooja/Kajo/pull/327) source
 `52d370946d0f60f89f328113849980924a1c4f53`, tree
 `d84629eff13c3fe01a7bad6232a3e7a17e421eb3`. Accepted main remains
@@ -28,6 +28,8 @@ revision conflicts and removal. The SQL selection adapter is compared with the
 independent portable `taste-selection-v1` implementation. At most 256 real Items,
 64 feature dimensions, 24 opportunities and eight response revisions per Item
 bound the source. Existing completed setup is preserved; no reset is performed.
+Missing catalog recognition is explicitly `null`/`UNAVAILABLE`; a supplied zero
+remains a distinct catalog proxy. Popularity alone cannot manufacture recognition.
 
 Only current explicit ratings, including zero/five, project incrementally into
 existing LongTerm bootstrap storage under dataset `TASTE_SESSION_V1` with
