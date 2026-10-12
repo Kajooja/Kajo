@@ -214,8 +214,10 @@ this separate RPC after `STOPPED`.
 Requests are bounded to 4 KiB with exact fields and UUID identities. `answer` is an
 integer `{kind:"RATING",value:0..10}`, `{kind:"UNKNOWN"}` or
 `{kind:"NOT_INTERESTED"}`. Zero and neutral five remain actual ratings. A previously
-accepted Item cannot be answered again. An identical command ID/body replays its
-original response; conflicting reuse fails. Stale revisions fail with `40001`;
+accepted Item cannot be answered again. The creation START and accepted ANSWER
+reserve their command IDs: identical ID/body replays the original response and
+conflicting reuse fails. Later START IDs are unrecorded resume requests, avoiding
+unbounded creation receipts. Stale revisions fail with `40001`;
 resume before constructing a new command, retaining the old command for retries.
 
 The server reserves up to three Items per domain from the frozen training catalog,
