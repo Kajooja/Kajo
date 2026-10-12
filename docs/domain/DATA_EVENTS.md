@@ -1,6 +1,6 @@
 # Kajo Event Model
 
-Status: canonical behavioral + growth telemetry contract, with accepted-main commands and explicitly marked #229/#232 successors.
+Status: canonical behavioral + growth telemetry contract. #329 integrates the #229/#232 source foundations; dated predecessor semantics remain explicitly identified below. STATUS owns deployment and acceptance.
 
 STATUS owns source, hosted and device acceptance. The #229 source sections below describe the inspected active branch, not code delivered by this documentation change. #232's coordinated user/learning flow remains required; its source-only round evidence foundation is described separately below.
 
@@ -769,7 +769,7 @@ List+Like action. Item and List commands share ordered undo predecessors. Legacy
 membership/projection changes invalidate that head, including delete/reinsert ABA.
 The Item RPC cannot undo a List receipt because it cannot restore membership.
 
-This paragraph describes the accepted-main single-List command; the active exact-set successor is specified in section 14. The first Shared actor proposes a custom List; another member accepts the existing
+This paragraph preserves the earlier #226 single-List baseline; the current exact-set implementation is specified in section 14. The first Shared actor proposes a custom List; another member accepts the existing
 proposal without supplying a replacement List. Only the last required endorsement
 emits consensus Saved and committed custom membership. Completed consensus remains
 durable after List deletion/member changes. Pending withdrawal clears an empty
@@ -830,7 +830,7 @@ Taste/acquisition paths require equivalent discipline:
 
 ## 14. Active #229 source contracts and remaining boundaries
 
-These compact contracts reconcile active source with accepted-main behavior above. The complete development/device record remains on `feat/228-delivered-origin` in Sprint 014 and DEVICE_TEST; STATUS identifies which head and gates apply. SharedRatingRound (#232) is not delivered by any of these changes.
+These #229 contracts supersede the explicitly historical baselines above and are included in #329 integration. Sprint 014 and DEVICE_TEST preserve their development/device record; STATUS identifies the source and remaining gates. These #229 changes do not themselves implement SharedRatingRound; its later #232A/B source foundation and remaining user/learning scope are documented separately.
 
 ### Frozen delivery, durable exposure and ordering
 

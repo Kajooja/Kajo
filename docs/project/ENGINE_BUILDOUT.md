@@ -40,9 +40,10 @@ Do not repeat E1/D1/D2, reset native accounts, repeat deployed migrations or rea
 
 The original assessment above remains dated. The current challenge continuation builds on
 [owned server TasteSession #328](https://github.com/Kajooja/Kajo/pull/328), source
-`b7dd4f799358ca167ec1d5a178d290608aacd9ed`; accepted main is still the September 30
-checkpoint. The source below reuses the full native stack; it does not waive #229
-configured-device/fresh-account acceptance or imply a hosted rollout.
+`b7dd4f799358ca167ec1d5a178d290608aacd9ed`. The later October 12 owner decision
+authorizes the complete source stack integration through #329 after required CI.
+STATUS owns the actual merge receipt and next mobile packet. Configured-device/
+fresh-account evidence and hosted rollout remain separate acceptance work.
 
 | Capability | New source foundation since the original review | Remaining acceptance |
 |---|---|---|

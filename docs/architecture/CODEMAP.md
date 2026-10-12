@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Current implementation and acceptance state is maintained in [STATUS.md](../project/STATUS.md). The first table maps accepted-main source (implementation baseline `6dd1fec`); the second explicitly maps active #229 files that require its checkout. A path in the active table is not a claim that it exists on main. Hosted rollout, code acceptance and device acceptance are separate. Catalog counts and CI identities in baseline descriptions are dated evidence, not a live inventory.
+Current implementation and acceptance state is maintained in [STATUS.md](../project/STATUS.md). The first table retains the earlier implementation baseline (`6dd1fec`); the native #229 and subsequent sections describe its successors included in #329 integration. Read both tables from current main after that merge, rather than checking out an obsolete ancestor branch. Hosted rollout, code acceptance and device acceptance are separate. Catalog counts and CI identities in baseline descriptions are dated evidence, not a live inventory.
 
 Important current paths:
 
@@ -264,7 +264,7 @@ the audit's existing fail-closed correction rules. Exact lock and fresh audit:
 | Discovery feature | `apps/mobile/src/features/discovery/` | Grid/detail/swipe, Prediction V1 wiring, catalog enrichment, impression/dwell evidence, rating/not-interested/save, undo/cooldown and Shared Endorsement overlay; provider integrations normalize to generic Items before reaching this layer |
 | Shared overlay exclusion guard — #306 source integration | `supabase/migrations/20261008122852_shared_overlay_eligibility.sql`; `scripts/database/shared-overlay-eligibility-smoke.sql`, `shared-overlay-eligibility.test.mjs`; `itemInteraction.ts` / `sharedEndorsement.test.ts` | Exact #306 correction prevents pending/member-history tiers from reintroducing withdrawn or Shared-rejected Items. Existing metadata/rows/function permissions survive; local not-interest is also suppressed without consumption. Its mandatory native CLI stage is retained alongside the later Shared/Working stages; STATUS owns exact integrated-source checks and separate hosted/device acceptance |
 | Interaction persistence | `apps/mobile/src/features/discovery/ItemInteractionContext.tsx` | Active-Profile hydration and optimistic rating/not-interest/undo through the durable command boundary; server acknowledgements reconcile state with remaining pending actions. Owns the shared Item/collection queue, confirmed List undo receipts and List/Shared refresh revisions; old whole-state writer removed |
-| Event Engine | `apps/mobile/src/features/events/` | `itemActionCommands.ts`, `itemActionPersistence.ts`, `itemActionOutbox.ts` implement the typed durable rating/not-interest/undo command path. `collectionActions.ts` provides collection intents/receipt validation and mutation adapters over the same queue. Accepted-main exposure tracking remains memory-only; active #229 supplies the separate durable successor below |
+| Event Engine | `apps/mobile/src/features/events/` | `itemActionCommands.ts`, `itemActionPersistence.ts`, `itemActionOutbox.ts` implement the typed durable rating/not-interest/undo command path. `collectionActions.ts` provides collection intents/receipt validation and mutation adapters over the same queue. The earlier baseline used memory-only exposure tracking; the integrated #229 durable successor is described below |
 | Atomic Item command | `*_atomic_item_actions.sql`; `public.commit_item_action_v1`; private `item_action_receipts` / `item_action_heads`; `scripts/database/item-action-smoke.sql`, `item-action-upgrade.mjs` | Actor-authorized atomic state/Event/receipt, exact retry, protected undo and trace guards. Full-schema regressions and populated old-schema rehearsal run in local tests and native CLI CI; rollout evidence is in Sprint 014 / #224 |
 | Atomic collection commands | `*_atomic_collection_actions.sql`; `public.commit_collection_action_v1`; `scripts/database/collection-action-smoke.sql`, `collection-action-upgrade.mjs` | List lifecycle/membership and unanimous Shared commit, exact retries/no-op receipts, mixed undo and correction of every affected Event. Native CI rehearses the forward with populated old Item receipts/Lists and verifies old columns/functions/ACLs |
 | Profiles | `apps/mobile/src/features/profiles/ActiveProfileContext.tsx`, `SharedProfilesScreen.tsx`, `sharedProfileOperations.ts` | One canonical Profile state/membership boundary for Personal identity, Shared create/invite/respond/leave and selection; quick access is local presentation ordering only |
@@ -322,19 +322,15 @@ the audit's existing fail-closed correction rules. Exact lock and fresh audit:
 Do not create empty feature folders merely to match future architecture. Shared collaboration, Lists, SleepLayer, resurfacing, quick access, provider-backed catalogs, Personal bootstrap imports and Shared common-fit extend generic Profile/Item/Event/Prediction/Memory boundaries rather than creating media/provider-specific queues, duplicate group state or a second recommender. Deployed migrations are never rewritten after hosting.
 
 
-## Native #229 source — separate unmerged implementation
+## Native #229 source — integrated delivery foundation
 
-`feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
-contains the newer delivered-origin, atomic continuation, captured-scope client,
-List/history and recovery code. That implementation remains separate from
-accepted main until #229's required gates pass.
-Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
-and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
-own exact paths, deployed forward identities and remaining device gates. Owner
-feedback on the historical CI #469 build is positive except reconnect retry UI
-(#240); its current source correction still requires configured-device acceptance.
-Continue the named native branch rather than recreating its implementation or
-repeating installed migrations from main.
+[PR #229](https://github.com/Kajooja/Kajo/pull/229) supplies delivered-origin,
+atomic continuation, captured-scope client, List/history and recovery code.
+The complete successor stack is integrated through the owner-authorized #329.
+[STATUS](../project/STATUS.md) owns its merge receipt, deployed forward identities
+and remaining device gates. Earlier CI #469 feedback and later observations remain
+dated evidence in DEVICE_TEST. Continue from current main after integration; do
+not recreate this implementation or repeat installed migrations.
 
 The owner-promoted October 6 #199 correction adds catalogue-wide protocol 3 and
 compact navigation on `fix/199-discovery-catalog-append`:
@@ -349,8 +345,8 @@ compact navigation on `fix/199-discovery-catalog-append`:
 | Later-page evidence | `prediction-chain-provenance.mjs`, `.sql`, `.test.mjs` | Page after 80 prior Items retains rating 0/delayed exposure, effective outcome, frozen replay/mature evaluation and post-cache exact retries. |
 | Hosted rollback probe | `catalog-chain-hosted-smoke.sql` | Existing owned Profile and catalogue, aggregate-only BOOK/MOVIE append verification, full rollback, no reset/import. |
 
-This source remains separate from accepted main and requires the new forward,
-CI/build and physical-device acceptance. STATUS owns exact rollout/checkpoint.
+This source is included in #329 integration. Hosted forward, CI/build and
+physical-device evidence remain distinct; STATUS owns the exact checkpoint.
 
 ## Portable engine — E1 #235
 

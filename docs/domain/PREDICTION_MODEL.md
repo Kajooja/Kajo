@@ -647,7 +647,7 @@ at implementation; no second recommender or current model activation is delivere
 
 One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and the chosen custom List membership. Later membership changes do not revoke reached historical consensus.
 
-That paragraph describes the accepted-main single-destination baseline. The
+That paragraph preserves the earlier #226 single-destination baseline. The
 #229 successor records/reviews an exact destination set and atomically commits
 all approved memberships; DATA_EVENTS owns its evidence contract. Source merge,
 recorded hosted rollout and device acceptance are separately tracked in STATUS.
@@ -701,7 +701,7 @@ vectors and report missing/unknown/unattributed coverage. Per-actor exposure nev
 credits the entire group or an unexposed challenger. Group reward and learning
 remain unavailable until that admission is implemented and validated. No new
 Shared scorer, rewatch admission or outcome quality gain is claimed by these
-foundations. STATUS owns the unmerged source/CI/rollout state.
+foundations. STATUS owns the current source/CI/rollout state.
 
 The #232C source implements the frozen outcome-evidence and paired-support
 boundary. An internal capture retains the actual reader result and observation
@@ -1364,7 +1364,7 @@ A baseline shadow must match Personal and Shared production eligibility, final o
 
 ### Active #229 frozen replay, admission and page contracts
 
-The following code exists on unmerged `feat/228-delivered-origin`. The owner-approved six-forward server packet was installed and verified on 2026-09-12 from `7821713`, which passed all five CI #466 jobs. STATUS owns the exact deployed versions, current source verification and the remaining configured-device gate; this rollout does not merge the branch or establish device acceptance.
+The following #229 code is included in the owner-authorized #329 integration. The owner-approved six-forward server packet was installed and verified on 2026-09-12 from `7821713`, which passed all five CI #466 jobs. STATUS owns the exact deployed versions, current source verification and the remaining configured-device gate; this rollout does not merge the branch or establish device acceptance.
 
 #### Frozen replay parity — hosted 2026-09-12
 
@@ -1584,7 +1584,7 @@ Bound request/slate size, memory and queries; support continuation through a fro
 
 ### Preserved September 12 #229 successor checkpoint and remaining acceptance
 
-These contracts are present in the unmerged `feat/228-delivered-origin` source,
+These contracts originated in the then-unmerged `feat/228-delivered-origin` source,
 including the protocol-2 page forward. The six server forwards were installed and
 verified on 2026-09-12. STATUS owns exact refs/CI/deployment versions; accepted-main
 source and configured-device acceptance remain separate.
@@ -2068,4 +2068,4 @@ later satisfaction may become separate heads; current V1 reward constants are
 not silently relabeled as those probabilities. Replay, simulation, consolidation
 and evolution require separate ablations before increased complexity is admitted.
 
-Documentation acceptance does not deploy any of these new engine components. [STATUS](../project/STATUS.md) retains #229's unmerged source, completed server rollout and open device gates; [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.
+Documentation acceptance does not deploy any of these new engine components. [STATUS](../project/STATUS.md) records #329 source integration, dated server rollout and open device gates; [ROADMAP](../project/ROADMAP.md) preserves the completed E1 → D1 → D2 foundation and schedules remaining engine work without restarting it.

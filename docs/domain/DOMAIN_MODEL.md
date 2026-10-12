@@ -1,6 +1,6 @@
 # Kajo Domain Model
 
-This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition entities are not claims of implemented tables. #232A's round evidence foundation is active unmerged source, separately from the required coordinated user/learning flow. The exact-set multi-List successor is on active #229 source with separately recorded hosted rollout; accepted-main code retains its earlier single-List boundary until that branch is accepted.
+This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition entities are not claims of implemented tables. #232A's round evidence and #229's exact-set multi-List implementation are included in the owner-authorized #329 source integration. The coordinated Shared user/learning flow, hosted rollout and device acceptance retain their separate gates in STATUS.
 
 ## Core model
 
@@ -447,7 +447,7 @@ separate decisions, even if the UI uses “Pari!” for both.
 
 ### Phase 14.1 source foundation — #232A
 
-The unmerged `feat/232-shared-round-evidence` foundation supplies an explicit
+The #232A source foundation, included in #329 integration, supplies an explicit
 server round boundary independently of the legacy Item action path. A round
 binds one SharedProfile, Item and experience ID to a frozen participant set.
 Durable membership generation UUIDs distinguish leaving and rejoining from the

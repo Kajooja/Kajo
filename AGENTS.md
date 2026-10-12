@@ -78,6 +78,11 @@ ordered session/state policy and adaptive Personal Taste with a frozen challenge
 Known Shared evidence defects remain mandatory; the genuine #232F input consumer,
 #306's guarded hosted/device acceptance (source integrated through #323),
 #229 native/device acceptance and Phase 16.3 remain open gates.
+On October 12 the owner explicitly authorized the complete #229 → #329 source
+stack integration into main after successful required CI. This supersedes the
+earlier device-based source merge hold, not the requirement to record actual
+device observations. Continue from fresh main after that integration; STATUS
+owns the next mobile packet and exact source receipt.
 Real anonymous Taste acceptance requires its server identity, minimum lifecycle/
 abuse controls and measurement first; complete conversion/operations and the
 remaining release requirements retain their ROADMAP slots.

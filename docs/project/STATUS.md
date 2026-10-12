@@ -10,18 +10,27 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — frozen own-Personal Taste challenge
+## Current packet — integrate the owned adaptive mobile Taste flow
 
-Active continuation: **`feat/personal-taste-challenge`**. The current
-[#229 handoff](https://github.com/Kajooja/Kajo/pull/229) identifies its published PR,
-exact source/tree and final CI receipt. It is directly based on
-[#328](https://github.com/Kajooja/Kajo/pull/328), source
-`b7dd4f799358ca167ec1d5a178d290608aacd9ed`, tree
-`3e434b54b8b26230265552933739ab1ba92ef954`. All five required
-[CI #644 gates](https://github.com/Kajooja/Kajo/actions/runs/38239109789) pass for
-that parent, including native CLI concurrency/history. #326 CI #639 and #327
-CI #641 also pass all five. Accepted main remains
-`34d21704cafe21091a2369396c9bc61dce99c1e9`; no stack merge or hosted rollout is implied.
+On **2026-10-12**, the owner explicitly authorized accepting and merging the
+complete source stack into main: “No jatka, yhdistä mainiin, hyväksy kaikki.”
+This supersedes the earlier instruction to hold source integration behind #229's
+configured-device/fresh-account observations. Those observations and the release
+requirements remain open; source approval is not a fabricated runtime result.
+
+[PR #329](https://github.com/Kajooja/Kajo/pull/329), retargeted to main, owns this
+integration and its exact final source/merge and CI receipt. Its ancestry contains
+all **27** open source PRs: #229, #301, #304, #305 and #307–#329. The reconciled
+merge preserves main #300's September 30 history and the newer source contracts.
+Required CI must pass on the reconciled head before merging. After that merge,
+continue from fresh **main**, not from an ancestor branch or the old #229 packet.
+
+Before documentation reconciliation, complete source `5aaeb9dbcf297cc5b6f211cf2332a53581f337f7`
+(tree `2a9248b9204f209f7baf495486bdcf4158e1abe5`) passed all five required
+[CI #646 gates](https://github.com/Kajooja/Kajo/actions/runs/38248249254), including
+**224 database tests** and native CLI concurrency/history. This integration
+changes documentation only relative to that tested source. #328 CI #644,
+#326 CI #639 and #327 CI #641 also passed all five gates.
 
 This source adds `taste_challenge_v1` after the completed own-Personal training
 session. It reserves at most three real unseen Items per domain before calling
@@ -67,23 +76,25 @@ PR and the [Sprint 014 entry](sprints/SPRINT-014.md#frozen-own-personal-taste-ch
 Local Supabase/Postgres is unavailable for native advisors; this is not a hosted
 security/advisor or device acceptance receipt.
 
-**Next action:** verify this published source's required CI, fixing any failure
-first, then connect the owned adaptive mobile Taste flow to `taste_session_v1`
+**Next action:** connect the owned adaptive mobile Taste flow to `taste_session_v1`
 and `taste_challenge_v1`: durable resume/retry, movie-to-book acknowledgement,
 independent unknown action, genuine zero, honest ordinal result/missing-support
-copy and removal. Keep the existing six-known/static calibration until its
+copy and removal. Start at `ProfileBootstrapGate.tsx` and
+`profileCalibrationOperations.ts`; ongoing training/challenge follows retained
+server session state, independently of the existing six-strong setup status.
+Preserve already-completed setup. Keep the existing six-known/static calibration until its
 replacement is explicitly integrated and verified. Any later challenge-answer
 projection needs explicit canonical evidence/lifecycle semantics after the freeze;
 these evaluation rows are not automatic training evidence. Canonical unseen
 preview and observed first-session usefulness follow. Server identity, retention,
 abuse and measurement still precede real anonymous entry. Hosted/device tests,
-#229 acceptance and the Share Link Gate remain open.
+#229's recorded device cases and the Share Link Gate remain open.
 
 ## Source stack and integration gates
 
 | Work | Current disposition |
 |---|---|
-| #229, #301, #304, #305 | Native delivery, reconnect/end refresh, audit recovery and catalogue append source. #229 stays draft until configured-device/fresh-account acceptance. |
+| #229, #301, #304, #305 | Native delivery, reconnect/end refresh, audit recovery and catalogue append source included in the owner-authorized #329 integration. Configured-device/fresh-account observations remain tracked in DEVICE_TEST and #238. |
 | #307–#313 | Shared round evidence, replay/captures, erasure and prepared prediction inputs. Genuine #232F prediction consumption and Phase 16.3 remain open. |
 | #314–#322 | Native decay, bounded Personal WorkingState, frozen controls/features, prospective enrollment and private report/cohort foundation. Serving stays OFF; no actual cohort or quality admission. |
 | #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its branch and guarded hosted/device gates remain preserved. |
@@ -92,8 +103,9 @@ abuse and measurement still precede real anonymous entry. Hosted/device tests,
 | #326 / #327 | Personal source fusion/forgetting and complete engine ledger/handoff; all five required gates pass for both. Full-engine tracker #302 remains open. |
 | #303 / #302 | Full-engine capability map integrated in this documentation successor on the current dependency-corrected stack. Original #303 is closed as superseded; its integrated #327 replacement passes all five CI #641 gates. Full-capability tracker #302 remains open. |
 
-Do not merge the dependent stack past #229's remaining acceptance gates or delete
-its ancestor branches as though they were stale. Actual Working collection needs
+The owner has authorized source integration after successful CI. Keep branch
+cleanup separate from consumed operation identities and any active worktree.
+Actual Working collection needs
 an authorized existing-owner roster/native/operator scope and an independently
 retained pre-window declaration. Fixtures are not observed evidence.
 
@@ -137,10 +149,12 @@ the actual hosted checkpoint need their guarded deployment procedure.
 ## Repository hygiene and historical evidence
 
 The [October 12 branch audit](retros/branch-audit-2026-10-12.json) records **35 remote
-branches at its earlier source checkpoint**: accepted main, eight consumed operation
-identities and open source/documentation dependencies. Subsequent #326–current
-continuation refs are preserved dependencies too. No branch was deleted: none is a safely disposable
-merged development ref on current main. No tracked logs, APK/archive outputs,
+branches at its earlier source checkpoint**: then-accepted main, eight consumed
+operation identities and open source/documentation dependencies. That earlier
+audit did not delete branches. After #329 integration, check actual ancestry,
+fresh PR state, file references and active worktrees before retiring merged refs;
+the eight consumed catalogue operation identities remain retained.
+No tracked logs, APK/archive outputs,
 `.keep` placeholders, implementation TODO/FIXME or merge-conflict markers were found.
 
 STATUS is now a current handoff rather than a 2,500-line collection of conflicting

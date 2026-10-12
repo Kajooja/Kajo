@@ -4,6 +4,16 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Source integration decision — 2026-10-12
+
+The owner explicitly authorized merging the complete #229 → #329 source stack
+into main after required CI. This supersedes the earlier device-based source
+merge hold. Configured-device/fresh-account evidence, hosted rollout, measured
+quality and every incomplete MVP gate retain their existing acceptance scope.
+After integration, start from main and connect the owned adaptive TasteSession
+and frozen challenge mobile flow. STATUS owns the exact publication receipt.
+Older dated sections below preserve their original decisions and evidence.
+
 ## Prospective Personal source and evaluation order — 2026-10-10
 
 The active source successor now supplies bounded server declaration of actual OFF
@@ -48,7 +58,8 @@ The complete 51-part [capability map](ENGINE_BUILDOUT.md) from #303 is now
 reconciled into this current dependency-corrected source stack, with October 12
 state/evaluation/Taste foundations recorded below. Original #303 is closed as
 superseded; its integrated #327 replacement passes all five CI #641 gates.
-This does not mark a target capability delivered or merge the native stack.
+This does not mark a complete target capability delivered. The later source
+integration decision above separately authorizes the native stack merge.
 
 ## Engine build-out commitment — 2026-10-05
 
@@ -119,7 +130,7 @@ release requirements. Historical sprint plans do not override this order.
 
 | Work | Disposition and execution slot | Dependency and remaining acceptance |
 | --- | --- | --- |
-| #228 / draft #229 delivery | Critical current Sprint 014, 14.1–14.2. Reconciled source; native acceptance open. | Preserve immutable origins, trace, captured reader and deployed forwards. Integrate accepted dependency fixes and verify the resulting exact head; complete configured-device/fresh-account observations. No repeated DDL or account reset. |
+| #228 / #229 delivery | Critical current Sprint 014, 14.1–14.2. Reconciled source; native acceptance open. | Preserve immutable origins, trace, captured reader and deployed forwards. Integrate accepted dependency fixes and verify the resulting exact head; complete configured-device/fresh-account observations. No repeated DDL or account reset. |
 | #240 reconnect | Source implemented in #229 under 14.2; MVP-UX-003 remains open for acceptance. | Exact failed request/cursor/context, focused foreground scope, bounded/coalesced retry and backend success before error removal. Keep expiry and real-device regression; do not create a duplicate future implementation. |
 | #177 common fit | 14.1–14.2 acceptance only; scorer and hosted rollout already accepted. | Observe authorized Shared sparse/disagreement/trace behavior on the configured Android build. No replacement scorer or repeated deployment. |
 | #182 catalog | Critical catalog work, 14.3. Diagnostic/cleanup source accepted through #294. | Separate bounded operator/budget before new acquisition; then rights, fresh reconciliation and guarded writes. Eight old requests stay consumed. Six useful descriptions and actual text/link device observations remain. Completed MOVIE expansion is not repeated. |

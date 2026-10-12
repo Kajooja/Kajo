@@ -14,6 +14,29 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Owner-authorized source integration — 2026-10-12
+
+The owner explicitly instructed: “No jatka, yhdistä mainiin, hyväksy kaikki.”
+This supersedes the prior #229 configured-device/fresh-account source merge hold.
+Source approval does not manufacture phone tests, deploy forwards, enroll a cohort
+or close incomplete release/quality requirements.
+
+PR #329 is retargeted to main as the integration of all 27 open source PRs:
+#229, #301, #304, #305 and #307–#329. Every original head is an ancestor of
+`5aaeb9dbcf297cc5b6f211cf2332a53581f337f7`; its full source passed all five CI #646
+jobs, including 224 database tests and four exports. The reconciliation changes
+only documentation, preserves main #300's complete September 30 entry below and
+requires all five final-head CI gates before the history-preserving merge.
+The final source/tree, CI and resulting main merge SHA belong to PR #329.
+
+Canonical documents now distinguish retained historical baselines from the
+integrated native source. STATUS points to one next packet: owned adaptive mobile
+TasteSession/challenge resume, retry, transition, unknown/zero and honest result
+presentation. The earlier static calibration remains until explicitly replaced.
+Configured-device observations remain in DEVICE_TEST/#238. No new APK, hosted
+write, account reset, provider acquisition or model admission is claimed.
+Consumed catalogue operation refs and active worktrees remain retained.
+
 ## Frozen own-Personal Taste challenge — 2026-10-12
 
 The #328 parent is complete for source review: exact `b7dd4f799358ca167ec1d5a178d290608aacd9ed`,
@@ -1001,6 +1024,27 @@ are separate; a corrected APK is needed for the new terminal repeat. No deployed
 migration, data, account or existing operation is changed. STATUS owns continuation
 and DEVICE_TEST records the owner-facing repeat; broader #199 UI work stays in
 its existing ROADMAP slot.
+
+## Native document reconciliation and fixed APK source — 2026-09-30
+
+Security PR #299 is accepted on main `1c26e0d72d30662f70c3cf061790cd2672443f43`
+after all five CI #597 gates at reviewed `0f210b19e07cd06aad236c028ef70703b694105b`.
+Native documentation head `9fac7ec772959465ea4b25bf8ad1b86de4fcef8e`, tree
+`71a9f65489800ac2b450e1f55d104bc92df3bcd8`, incorporates that accepted main.
+One STATUS conflict was deliberately resolved with accepted main's current packet
+and the native historical tail; the complete sprint record is preserved.
+Only those two Markdown files differ from standalone runtime source
+`2cfa2f3b206cba87712f3d531a78f00e24e59791`. All executable files and APK
+build inputs remain byte-identical. [CI #599](https://github.com/Kajooja/Kajo/actions/runs/36689852558)
+owns the new document head's required checks.
+
+The frozen runtime's PR CI #595 and all five standalone CI #596 gates pass,
+**1,057 tests/four exports**, with zero known advisories. CI #596's actual APK
+conclusion/artifact and that frozen SHA own binary identity; the document merge
+does not constitute a different application build or device observation.
+Configured-device #240 recovery and remaining native/fresh-account observations
+remain the single next packet after these source/build checks. #229 stays draft.
+
 
 ## Branch cleanup and standalone audit correction — 2026-09-30 / #229 / #238
 

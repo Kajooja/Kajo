@@ -1,6 +1,6 @@
 # Kajo UX Principles
 
-These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 remain on its active source branch until merged. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
+These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 are included in the owner-authorized #329 source integration. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
 
 ## Core feeling
 

@@ -1,5 +1,16 @@
 # Collection device checkpoint — #228 / #229
 
+## Source integration and current device scope — 2026-10-12
+
+The owner authorized the complete source stack merge through #329 after CI.
+The earlier instructions below to keep #229 draft are historical and superseded
+for source integration. No new phone observation is supplied by that approval.
+Current source/build identity belongs to [STATUS](STATUS.md); the latest verified
+APK is the #324 build recorded there, not the older artifacts below.
+Keep unobserved reconnect/provenance/process-death, fresh-account and Shared cases
+open with #238. Record installed binary/run, device and backend checkpoint when
+exercising them. Preserve prior positive observations and existing account data.
+
 ## Successful replacement APK and owner acceptance — 2026-10-08
 
 [CI #612](https://github.com/Kajooja/Kajo/actions/runs/37763304219) passed all five
