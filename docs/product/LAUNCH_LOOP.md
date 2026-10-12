@@ -174,14 +174,18 @@ Recognition, diversity and feature-coverage proxies are compared with a fixed
 PRIOR_ONLY control; they do not measure expected satisfaction or uncertainty.
 Unknown contributes no taste support, not-interest remains distinct, and a rating
 of zero remains known. Correction/withdrawal, current-question replay and genuine
-exhaustion are explicit. The existing native six-rating calibration does not
-consume this selector. The own-Personal server successor now provides durable
+exhaustion are explicit. The retained legacy static calibration does not consume this selector; #330 now
+connects the owned adaptive mobile flow to its server adapter. The own-Personal server successor now provides durable
 catalog/policy/presentation/response storage and a parity-tested SQL selection
 adapter, with exact retries, corrections, removal and rating-only bootstrap
 provenance. The separate owned challenge now freezes canonical forecasts and
-evaluation-only first answers with an honest ordinal metric. Neither boundary is
-connected to that mobile gate. Anonymous prerequisites, preview, app integration
-and observed first-session usefulness remain required.
+evaluation-only first answers with an honest ordinal metric. The #330 owned mobile consumer connects both boundaries. It persists exact pending
+commands in backend/actor/Profile-scoped SQLite, resumes retained state after
+acknowledgement, acknowledges the book transition explicitly and renders honest
+ordinal counts only after challenge completion. New START waits for the start
+action so history can be imported first; already-completed setup is preserved.
+Legacy calibration is a guarded first-missing-RPC fallback. Anonymous prerequisites,
+preview, hosted/device acceptance and observed first-session usefulness remain required.
 
 The question-selection policy should optimize information gained about the Profile while retaining:
 
@@ -220,8 +224,9 @@ reports same-domain pair agreement, ties, missing forecasts and known/unknown
 counts; dependent pairs are not independent observations. Percentage, rating
 error and statistical certainty are unavailable. UI must describe ordering
 agreement and sample size, never say “within N rating points” from these scores.
-These answers remain evaluation-only; automatic learning projection, mobile
-presentation, anonymous prerequisites and observed usefulness are separate gates.
+These answers remain evaluation-only; automatic learning projection, anonymous prerequisites and observed usefulness
+remain separate gates. #330 supplies the owned mobile presentation, with actual
+hosted/device acceptance still required.
 
 
 ## 7. Recommendation preview and conversion wall

@@ -230,6 +230,15 @@ Session/import removal withdraws this source and clears session and exact-retry
 copies; old request IDs cannot resurrect it. Broader bootstrap retention remains
 owned by its existing lifecycle.
 
+The #330 mobile consumer persists one immutable pending RPC command before
+sending it. A lost reply or process restart retains its original request ID/body;
+local acknowledgement failure retains the same command too. Accepted receipts
+refresh bootstrap-serving caches, not native taste Events. Unknown discards the
+unsubmitted rating draft and sends UNKNOWN, never a zero or negative rating.
+Server-owned state and the subsequent RESUME decide the next opportunity.
+SQLite keys include backend, actor and Profile; corrupt or stale-scope data is not
+dispatched/overwritten. Source/receipt issuance still does not prove screen exposure.
+
 ## 4. TasteChallenge evaluation
 
 A held-out challenge prediction must be frozen before the actual answer can influence the state being scored.
