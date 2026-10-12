@@ -1,10 +1,18 @@
 # Kajo
 
-Kajo is a mobile-first personal and shared discovery platform. It learns a person as a whole instead of building isolated book, movie or music taste silos.
+Kajo is a mobile-first personal and shared discovery platform. It is designed to learn supported cross-domain preferences and behavior instead of building isolated book, movie or music taste silos.
 
 Kajo starts with **books and movies**. Its domain and prediction architecture are intentionally generic so it can later expand to music, series, hyperlocal events, concerts, travel, restaurants and other experiences.
 
 Kajo is the first adapter for the independent [Predictive Memory Engine](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md). The executable [E1 package](packages/prediction-engine/README.md) supplies generic contracts and deterministic media/non-media fixtures. The [D1 research intake](research/README.md) now has an independently reproduced 500-subject / 84,849-rating development cohort from a pinned GroupLens release. The [D2 report](research/reports/movielens-small-d2.md) now records actual train-only model/state comparisons, an independent replay and a rejected challenger. Source acceptance, model evaluation and runtime admission remain separate gates. [ROADMAP](docs/project/ROADMAP.md) orders native reliability, portable contracts, isolated MovieLens data and evaluation before any admitted serving change.
+
+## Predictive Memory Engine: design and delivery
+
+The [complete 51-part architecture](docs/architecture/PREDICTIVE_MEMORY_ENGINE.md) defines a portable state/scenario system: working, short and long memory; belief, group and world state; local/global/synthetic recall; multi-space geometry; future branches; policy; and evidence-gated dreaming/evolution. Kajo is its first application, not a dependency of the generic core.
+
+The [implementation and acceptance ledger](docs/project/ENGINE_BUILDOUT.md) maps **every architectural section** to a bounded build-out packet with prerequisites, tests, evaluation controls and completion evidence. [Issue #302](https://github.com/Kajooja/Kajo/issues/302) tracks the full engine; [ROADMAP](docs/project/ROADMAP.md#engine-build-out-commitment--2026-10-05) schedules its delivery without replacing the current native/device gates or making every research generation an MVP blocker.
+
+The E1 reference package is **not yet the native serving implementation**. Learned global memory, calibrated world models, multistep dreams and self-evolving geometry remain staged capabilities, not features claimed by this README. Successful interfaces, real predictive usefulness and production admission require separate evidence.
 
 The repository—not a ChatGPT conversation—is the permanent project memory.
 

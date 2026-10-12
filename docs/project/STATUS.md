@@ -10,11 +10,13 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — finish Personal source fusion #326
+## Current packet — source fusion complete; reconcile engine documentation
 
-Active branch: **`feat/personal-source-fusion`**, [PR #326](https://github.com/Kajooja/Kajo/pull/326),
-based on [#325](https://github.com/Kajooja/Kajo/pull/325) at
-`f017c089d8414a87fbb7168761019b471ee3dde6`.
+Active continuation: **`docs/326-engine-handoff`**, a documentation-only successor
+of [Personal source fusion #326](https://github.com/Kajooja/Kajo/pull/326), exact
+source `70d4e48f8260bc3462fa40cbea221184e63c0bb3`, tree
+`612d4997b015f5e673d72aec856db00f07aa827b`. The saved #303 51-section capability
+map is reconciled here with the current source foundations and roadmap order.
 Accepted main is still `34d21704cafe21091a2369396c9bc61dce99c1e9`.
 The PR head and CI receipt identify the published source; a temporary CLI bootstrap
 commit alone does not contain the completed implementation.
@@ -61,15 +63,18 @@ and catalogue **444**, then fails because this environment cannot download the
 locked Edge npm dependencies (`@supabase/auth-js`, connection refused).
 A complete local root pass is **not** claimed. Engine **245**, research
 **19 Python + 43 Node**, and acceptance **6 + 5** pass separately.
-The final serial database result and exact published CI receipt are recorded in
+Final serial database **192/192** and four explicit demo-mode application/description
+iOS/Android exports pass. Demo export is not configured-device acceptance.
+The exact published CI receipt is recorded in
 [PR #326](https://github.com/Kajooja/Kajo/pull/326) and the current
 [Sprint 014 entry](sprints/SPRINT-014.md#personal-source-fusionforgetting--2026-10-12).
 Required CI must pass for the completed implementation, not just its bootstrap commit.
 
-**Next action:** verify all five required CI conclusions on the completed #326
-source and fix any actual failure. Reconcile the saved #303 engine capability map
-onto the current dependency-corrected stack, preserving its 51-section scope and
-current roadmap order. Then implement the own-Personal server TasteSession with
+**Next action:** verify all five required CI conclusions on #326 and this
+documentation successor, fixing any actual failure. The #303 capability map is
+now integrated in [ENGINE_BUILDOUT](ENGINE_BUILDOUT.md); all 51 sections and
+twelve acceptance packets remain open at their full-capability scope. Then
+implement the own-Personal server TasteSession with
 frozen policy/catalog, durable authorized presentations/responses and canonical
 bootstrap provenance. Anonymous identity, retention/deletion, abuse controls and
 measurement precede real anonymous Taste; challenge predictions freeze before answers.
@@ -85,7 +90,7 @@ measurement precede real anonymous Taste; challenge predictions freeze before an
 | #324 | Portable Taste selector and calibration correction. Native six-known/static calibration does not yet consume the adaptive selector. |
 | #325 | Distinct native-Item base confidence support; all five [CI #637 gates](https://github.com/Kajooja/Kajo/actions/runs/38178201644) pass. The /8 support heuristic remains uncalibrated. |
 | #326 | Current Personal source fusion/forgetting packet above. |
-| #303 / #302 | Full-engine capability map saved but original PR failed inherited dependency audit. Reconcile documentation without reverting current source or claiming capabilities delivered. |
+| #303 / #302 | Full-engine capability map integrated in this documentation successor on the current dependency-corrected stack. Original #303 CI failed its old inherited audit; the new integration requires its own checks. Full-capability tracker #302 remains open. |
 
 Do not merge the dependent stack past #229's remaining acceptance gates or delete
 its ancestor branches as though they were stale. Actual Working collection needs

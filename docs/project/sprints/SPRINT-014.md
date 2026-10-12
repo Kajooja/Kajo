@@ -50,7 +50,20 @@ retained raw Events.
 The current STATUS is condensed to one handoff, source/build/hosted/device gates
 and links to this historical log. The 35-ref audit retains all live dependencies
 and eight consumed operation identities; no branches or user data are deleted.
-Final test counts and publication/CI receipts follow the completed source PR.
+Final source is #326 `70d4e48f8260bc3462fa40cbea221184e63c0bb3`, tested tree
+`612d4997b015f5e673d72aec856db00f07aa827b`. Serial database **192/192**, engine
+**245**, mobile **493**, catalogue **444**, dependency **43**, research **19 Python
++ 43 Node**, acceptance **6 + 5**, and four explicit demo-mode exports pass.
+Root check remains blocked at locked Edge registry loading after earlier stages
+pass. All **253 local links / 73 anchors** pass. CI #638
+(run `38229883071`) owns the completed source's pending required gates.
+
+A separate documentation successor reconciles #303's complete 51-section map into
+the current source/dependency stack. README, documentation map, ADR-0008 and
+ROADMAP now link the twelve capability packets; the ledger records October 12
+source foundations without ticking full capabilities or restoring stale handoffs.
+#302 remains the full-engine tracker. New integration CI, native stack merge,
+hosted/device/observed-quality and Share Link acceptance remain separate.
 
 ## Native base confidence distinct-Item support — 2026-10-12
 
