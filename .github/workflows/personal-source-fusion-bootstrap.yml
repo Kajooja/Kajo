@@ -1,0 +1,55 @@
+name: Personal source fusion CLI bootstrap
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths: [.github/workflows/personal-source-fusion-bootstrap.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  migration-cli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify pinned CLI and generate actual migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          TASK_DIR="$RUNNER_TEMP/kajo-fusion-cli"
+          mkdir -p "$TASK_DIR/bin" "$TASK_DIR/project" "$TASK_DIR/output"
+          curl --fail --silent --show-error --location --max-time 90 \
+            https://github.com/supabase/cli/releases/download/v2.117.0/supabase_linux_amd64.tar.gz \
+            --output "$TASK_DIR/cli.tar.gz"
+          echo "69c05f85b9e47ee706d30f1a6ca8a526b4e337bfd12c7ef1ef522d24e7280d24  $TASK_DIR/cli.tar.gz" | sha256sum --check --strict
+          tar -xzf "$TASK_DIR/cli.tar.gz" -C "$TASK_DIR/bin" supabase
+          test "$("$TASK_DIR/bin/supabase" --version)" = "2.117.0"
+          "$TASK_DIR/bin/supabase" --help
+          "$TASK_DIR/bin/supabase" init --help
+          "$TASK_DIR/bin/supabase" migration --help
+          "$TASK_DIR/bin/supabase" migration new --help
+          "$TASK_DIR/bin/supabase" --workdir "$TASK_DIR/project" init
+          "$TASK_DIR/bin/supabase" --workdir "$TASK_DIR/project" migration new personal_source_fusion
+          cp "$TASK_DIR/bin/supabase" "$TASK_DIR/output/supabase"
+          cp "$TASK_DIR/project/supabase/migrations/"*_personal_source_fusion.sql "$TASK_DIR/output/"
+          python3 - <<'PY'
+          import hashlib, json, os, re
+          from pathlib import Path
+          output=Path(os.environ['RUNNER_TEMP'])/'kajo-fusion-cli/output'
+          files=list(output.glob('*_personal_source_fusion.sql'))
+          assert len(files)==1 and re.fullmatch(r'[0-9]{14}_personal_source_fusion.sql',files[0].name)
+          assert files[0].stat().st_size==0
+          manifest={'cliVersion':'2.117.0','archiveSha256':'69c05f85b9e47ee706d30f1a6ca8a526b4e337bfd12c7ef1ef522d24e7280d24',
+            'binarySha256':hashlib.sha256((output/'supabase').read_bytes()).hexdigest(),
+            'migration':files[0].name,'checkoutSha':os.environ['GITHUB_SHA']}
+          (output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest))
+          PY
+      - name: Retain CLI-generated source and verified binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: kajo-personal-source-fusion-cli
+          path: ${{ runner.temp }}/kajo-fusion-cli/output/
+          if-no-files-found: error
+          retention-days: 7
