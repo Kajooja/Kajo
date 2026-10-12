@@ -23,7 +23,7 @@ export async function verifyPersonalTasteSessionConcurrency(execConcurrentSql){
       if code is distinct from '${reject}' then raise exception 'Expected Taste conflict';end if;end;$reject$;
       select jsonb_build_object('sqlstate','${reject}');`:`select ${expression};`;
     s.promise=exec(`begin;set local application_name='${name}';set local request.jwt.claim.sub='${actor}';set local role authenticated;
-      ${call}${hold?`do $hold$ begin begin perform pg_sleep(20);exception when query_canceled then null;end;end;$hold$;`:''}commit;`,name)
+      ${call}${hold?`do $hold$ begin begin perform pg_sleep(20);exception when query_canceled then null;end;end;$hold$;`:''}commit;`,name.replaceAll('_','-'))
       .then(rows=>(s.done={rows}),error=>(s.done={error}));return s;
   };
   const observe=async(s,holder=null)=>{

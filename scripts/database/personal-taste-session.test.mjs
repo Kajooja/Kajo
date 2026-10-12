@@ -7,12 +7,37 @@ import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { personalTasteSessionFixtureSql, personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
 import { personalSourceFusionFixtureSql } from './personal-source-fusion.mjs';
+import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
+import { runIsolatedSqlProbe } from './ci-supabase-stack.mjs';
 
 const owner='ab157000-0000-4000-8000-000000000001', other='ab157000-0000-4000-8000-000000000002';
 const root=new URL('../../',import.meta.url);
 const source=await readFile(new URL('packages/prediction-engine/src/taste-selection.ts',root),'utf8');
 const {selectTasteOpportunity}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,
   {compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
+
+test('Taste concurrency reaches the native executor with accepted stage labels and cleans its fixture on connection failure',async()=>{
+  const stages=[];let nativeAttempt=false;
+  await assert.rejects(verifyPersonalTasteSessionConcurrency((sql,options)=>runIsolatedSqlProbe(()=>{
+    stages.push(options.stage);
+    if(sql.includes("set local application_name='kajo_taste_start_holder'")){
+      nativeAttempt=true;throw new Error('simulated native connection failure');
+    }
+    const values={
+      'taste-reserved-scope':{users:0,items:0,backends:0},
+      'taste-canonical-tables':['public.profiles'],
+      'taste-canonical-before':{'public.profiles':'retained'},
+      'taste-canonical-after':{'public.profiles':'retained'},
+      'taste-profile':'ab157000-0000-4000-8000-000000000010',
+      'taste-observe-owned-lock':null,
+    };
+    if(options.stage in values)return JSON.stringify(values[options.stage]);
+    assert.ok(['taste-fixture','taste-cleanup'].includes(options.stage));return '';
+  },'disposable-test-container',sql,options)),/simulated native connection failure/);
+  assert.equal(nativeAttempt,true,'The shared SQL runner must accept the label before the native attempt');
+  assert.ok(stages.includes('taste-cleanup'));
+  assert.equal(stages.at(-1),'taste-canonical-after');
+});
 
 async function database() {
   const db=new PGlite();
