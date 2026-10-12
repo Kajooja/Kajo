@@ -18,17 +18,18 @@ still requires native/operator access and an independently retained declaration.
 The October 12 continuation integrates the separate #306 eligibility source in
 #323 and implements a bounded portable Personal Taste selector plus the existing
 calibration's independent unknown/prefix/scope correction. The selector has no
-native consumer yet. The narrow native distinct-Item base confidence correction
-now follows this packet: preserve scores and frozen history while removing tag/
-action multiplicity from its uncalibrated support heuristic. Source/CI, hosted
+native consumer yet. The completed native distinct-Item base confidence correction
+preserves scores and frozen history while removing tag/action multiplicity from
+its uncalibrated support heuristic. Source/CI, hosted
 rollout and observed acceptance remain separate. #325 source now passes all five
 CI #637 gates; #324 CI #636 supplies a standalone test APK, with actual device
-acceptance still open. The active #326 packet corrects canonical Personal rating
+acceptance still open. The completed #326 source corrects canonical Personal rating
 revision/source fusion and bootstrap forgetting: surviving native rating authority
 supersedes earlier same-Item ratings and bootstrap contribution; zero/neutral,
-exact Undo, selective clears, ambiguity and effective strong setup support must
-agree across memory and both kernels. Source clocks remain proxies. This preserves
-the existing six-strong native status and distinct known-rating Taste thresholds.
+exact Undo, selective clears, ambiguity and effective strong setup support now
+share the same resolver across memory and both kernels. Source clocks remain
+proxies. This preserves the existing six-strong native status and distinct
+known-rating Taste thresholds.
 Then provide a coherent own-Personal
 server TasteSession with frozen policy/catalog and durable authorized presentation/
 response receipts, followed by the honest frozen challenge. This source work does not invent a
@@ -75,10 +76,11 @@ Preserve all 51 target capabilities. A method may be rejected or a capability de
 
 ## Personal correctness and first-session value — dependency audit, 2026-10-09
 
-The next bounded correctness packet fixes the live native LongTerm decay
-divergence between memory snapshots and serving. It does not by itself complete
-source-aware forgetting/support or establish recommendation quality. Then
-advance ordered session/state policy and adaptive Personal Taste with a frozen
+The October 9 sequence first required the live native LongTerm decay divergence
+between memory snapshots and serving to be corrected. #314 supplies that source;
+#315–#326 add bounded state/evaluation, source-aware forgetting/support and the
+portable Taste selector. These source foundations do not establish recommendation
+quality. Continue with the own-Personal server TasteSession and its frozen
 challenge through the existing server prediction boundary. Use versioned
 components, fixed baselines and measured first-session usefulness; a new model
 family is not a prerequisite. This source-plan priority does not mark a
@@ -89,8 +91,9 @@ acceptance. Known Shared evidence/eligibility defects must still be resolved.
 The genuine consumer of #232F's prepared input remains queued: it must calculate
 from that exact input and atomically retain the resulting forecast lineage before
 joint learning/serving admission. Input preparation is not delivered consumption.
-#306 source integration now joins the active stack; its integrated CI/guarded
-rollout and device acceptance remain open. Keep #229 native/device/fresh-account acceptance,
+#306 source is integrated in #323 with all five CI #634 gates passed; the duplicate
+#306 is closed after exact source comparison. Its guarded hosted rollout and
+device acceptance remain open. Keep #229 native/device/fresh-account acceptance,
 Phase 16.3 and every MVP requirement. STATUS owns exact source and acceptance.
 
 Before real anonymous Taste acceptance, provide server-backed anonymous state,

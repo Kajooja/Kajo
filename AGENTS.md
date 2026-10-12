@@ -76,7 +76,8 @@ Shared model before Personal source work. The owner-requested October 9 dependen
 review prioritizes the live native LongTerm snapshot/serving decay mismatch, then bounded
 ordered session/state policy and adaptive Personal Taste with a frozen challenge.
 Known Shared evidence defects remain mandatory; the genuine #232F input consumer,
-#306 integration, #229 native/device acceptance and Phase 16.3 remain open gates.
+#306's guarded hosted/device acceptance (source integrated through #323),
+#229 native/device acceptance and Phase 16.3 remain open gates.
 Real anonymous Taste acceptance requires its server identity, minimum lifecycle/
 abuse controls and measurement first; complete conversion/operations and the
 remaining release requirements retain their ROADMAP slots.

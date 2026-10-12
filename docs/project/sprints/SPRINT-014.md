@@ -55,14 +55,17 @@ Final source is #326 `70d4e48f8260bc3462fa40cbea221184e63c0bb3`, tested tree
 **245**, mobile **493**, catalogue **444**, dependency **43**, research **19 Python
 + 43 Node**, acceptance **6 + 5**, and four explicit demo-mode exports pass.
 Root check remains blocked at locked Edge registry loading after earlier stages
-pass. All **253 local links / 73 anchors** pass. CI #638
+pass. All **253 local links / 73 anchors** pass. CI #639
 (run `38229883071`) owns the completed source's pending required gates.
 
 A separate documentation successor reconciles #303's complete 51-section map into
 the current source/dependency stack. README, documentation map, ADR-0008 and
 ROADMAP now link the twelve capability packets; the ledger records October 12
 source foundations without ticking full capabilities or restoring stale handoffs.
-#302 remains the full-engine tracker. New integration CI, native stack merge,
+ROADMAP and AGENTS now distinguish completed decay/support/Shared integration
+source from remaining hosted/device acceptance. Duplicate #306 is closed after
+all six implementation/test/migration files match #323 exactly; its branch and
+original guarded rollout evidence remain preserved. #302 remains the full-engine tracker. New integration CI, native stack merge,
 hosted/device/observed-quality and Share Link acceptance remain separate.
 
 ## Native base confidence distinct-Item support — 2026-10-12

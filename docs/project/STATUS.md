@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — source fusion complete; reconcile engine documentation
+## Current packet — source fusion and engine handoff complete
 
 Active continuation: **`docs/326-engine-handoff`**, a documentation-only successor
 of [Personal source fusion #326](https://github.com/Kajooja/Kajo/pull/326), exact
@@ -70,14 +70,15 @@ The exact published CI receipt is recorded in
 [Sprint 014 entry](sprints/SPRINT-014.md#personal-source-fusionforgetting--2026-10-12).
 Required CI must pass for the completed implementation, not just its bootstrap commit.
 
-**Next action:** verify all five required CI conclusions on #326 and this
-documentation successor, fixing any actual failure. The #303 capability map is
-now integrated in [ENGINE_BUILDOUT](ENGINE_BUILDOUT.md); all 51 sections and
-twelve acceptance packets remain open at their full-capability scope. Then
-implement the own-Personal server TasteSession with
+**Next action:** inspect the final CI receipts on [#326](https://github.com/Kajooja/Kajo/pull/326)
+and [#327](https://github.com/Kajooja/Kajo/pull/327). If either exact source still lacks
+a successful required gate, finish that check and fix an actual failure first.
+Once both pass, continue with the own-Personal server TasteSession with
 frozen policy/catalog, durable authorized presentations/responses and canonical
 bootstrap provenance. Anonymous identity, retention/deletion, abuse controls and
 measurement precede real anonymous Taste; challenge predictions freeze before answers.
+The integrated [ENGINE_BUILDOUT](ENGINE_BUILDOUT.md) retains all 51 sections and
+twelve acceptance packets, open at their full-capability scope.
 
 ## Source stack and integration gates
 
@@ -86,7 +87,7 @@ measurement precede real anonymous Taste; challenge predictions freeze before an
 | #229, #301, #304, #305 | Native delivery, reconnect/end refresh, audit recovery and catalogue append source. #229 stays draft until configured-device/fresh-account acceptance. |
 | #307–#313 | Shared round evidence, replay/captures, erasure and prepared prediction inputs. Genuine #232F prediction consumption and Phase 16.3 remain open. |
 | #314–#322 | Native decay, bounded Personal WorkingState, frozen controls/features, prospective enrollment and private report/cohort foundation. Serving stays OFF; no actual cohort or quality admission. |
-| #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack. Guarded hosted rollout and actual Shared device observations remain open. |
+| #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its branch and guarded hosted/device gates remain preserved. |
 | #324 | Portable Taste selector and calibration correction. Native six-known/static calibration does not yet consume the adaptive selector. |
 | #325 | Distinct native-Item base confidence support; all five [CI #637 gates](https://github.com/Kajooja/Kajo/actions/runs/38178201644) pass. The /8 support heuristic remains uncalibrated. |
 | #326 | Current Personal source fusion/forgetting packet above. |
