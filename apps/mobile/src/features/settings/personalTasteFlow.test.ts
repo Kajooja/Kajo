@@ -86,6 +86,17 @@ describe('durable owned mobile Taste flow', () => {
     expect(flow.answerTraining({ kind: 'RATING', value: 0 }, id(106), 7)).toBe(true); await flow.waitForIdle();
     expect(rpc.mock.calls.filter(c => c[1].request.operation === 'ANSWER')).toHaveLength(1);
   });
+  it('recovers a confirmed first START rejection without requiring a nonexistent session ID', async () => {
+    const rpc = vi.fn<TasteRpc>().mockResolvedValueOnce({ data: null, error: { code: '40001', message: 'creation rolled back' } })
+      .mockResolvedValue(ok(sessionResponse()));
+    const { flow } = setup(rpc); flow.start(); await flow.waitForIdle();
+    expect(flow.snapshot()).toMatchObject({ conflict: true, session: null, pending: true });
+    flow.recoverConflict(); await flow.waitForIdle();
+    expect(flow.snapshot()).toMatchObject({ conflict: false, pending: false, session: { sessionId } });
+    const starts = rpc.mock.calls.filter(c => c[1].request.operation === 'START');
+    expect(starts).toHaveLength(2); expect(starts[1]?.[1].request.requestId).not.toBe(starts[0]?.[1].request.requestId);
+    expect(rpc.mock.calls.every(c => c[1].request.operation !== 'ANSWER')).toBe(true);
+  });
   it('preserves completed setup without starting a challenge or old static calibration', async () => {
     const rpc = vi.fn<TasteRpc>().mockResolvedValue(ok(sessionResponse([], 'STOP', 'EXISTING_COMPLETION')));
     const { flow } = setup(rpc); flow.start(); await flow.waitForIdle();

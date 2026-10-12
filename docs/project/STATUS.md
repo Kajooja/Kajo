@@ -51,7 +51,7 @@ Delivered source behavior:
   Only a positively missing first session RPC enables the retained legacy static
   calibration. Once a new session exists, an outage never changes evidence writers.
 
-Validation: 34 focused mobile regressions pass, including retained legacy scope
+Validation: 35 focused mobile regressions pass, including retained legacy scope
 cases. The shipped mobile adapter also passes a full-current-schema SQL contract
 probe through START, zero/five/unknown, the actual book transition, canonical frozen
 challenge completion and both removal boundaries. Local lint/typecheck, dependency,

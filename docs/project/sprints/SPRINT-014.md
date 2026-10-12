@@ -33,7 +33,7 @@ old callbacks; corrupt queues are preserved without dispatch/overwrite. Only a
 confirmed missing first session RPC enables legacy static calibration. Full retained
 answers/forecasts remain server-owned; this is not a new native Event/learning writer.
 
-Validation: 34 focused mobile tests, existing legacy regressions and the actual
+Validation: 35 focused mobile tests, existing legacy regressions and the actual
 full-current-schema mobile-adapter SQL contract pass through stages, canonical
 freeze/completion and both removal boundaries. Local lint/typecheck, dependency,
 mobile and catalogue checks pass. Local root reaches refused Deno npm-registry

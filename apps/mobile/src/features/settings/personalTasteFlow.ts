@@ -183,7 +183,14 @@ export function createPersonalTasteFlow(options: {
       // A domain rejection / SQLSTATE 40001 confirms this attempt rolled back. Re-read before a new
       // user decision; never silently rebase/resubmit the old answer.
       if (!current() || flight || !state.conflict || !save({ ...stored, pending: null })) return;
-      launch(readCurrent);
+      if (stored.sessionId) launch(readCurrent);
+      else {
+        // A rejected first START has no session ID to resume. START also looks
+        // up the one existing server session; this is an explicit lookup, not
+        // a replacement answer or reset of a retained session.
+        state = { ...state, blocked: false };
+        enqueue({ functionName: 'taste_session_v1', request: { operation: 'START', profileId: options.profileId, requestId: id() } });
+      }
     },
     answerTraining(answer: TasteAnswer, itemId: string, revision: number) { return sessionCommand('ANSWER', answer, itemId, revision); },
     acknowledgeBooks(revision: number) { return sessionCommand('ACK_TRANSITION', undefined, undefined, revision); },
