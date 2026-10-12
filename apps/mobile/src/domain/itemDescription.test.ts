@@ -3,7 +3,7 @@ import fixture from '../../../../packages/catalog-contracts/fixtures.json';
 import { ATTRIBUTED_DESCRIPTION } from '@kajo/catalog-contracts';
 import { readCatalogDescription, visibleItemDescription } from './itemDescription';
 import type { Item } from './contracts';
-import { clearPredictionItemCacheForTests, getRememberedItem, rememberPredictionItems } from '../features/discovery/predictionRankingCache';
+import { getDeliveredSlate, rememberCollectionSlate } from '../features/discovery/deliveredSlate';
 
 const metadata = { descriptionProvenance: { contract: ATTRIBUTED_DESCRIPTION,
   textSha256: fixture.attribution.textSha256, recordSha256: fixture.attribution.recordSha256,
@@ -20,13 +20,13 @@ describe('description and required credit travel together', () => {
       expect(readCatalogDescription(fixture.description, value)).toEqual({ descriptionStatus: 'unverified' });
     }
   });
-  it('projects only public credit, retains it in detail cache, and rejects modified text or lost/unsafe credit', () => {
-    clearPredictionItemCacheForTests();
+  it('projects only public credit, retains it in the immutable delivered slate, and rejects modified text or lost/unsafe credit', () => {
     const original = item();
     expect(original.descriptionAttribution).toEqual(fixture.attribution);
     expect(JSON.stringify(original)).not.toContain('basisSha256');
-    rememberPredictionItems('synthetic-slate', [original]);
-    const cached = getRememberedItem(original.id)!;
+    rememberCollectionSlate({ id: 'description-credit-test', scopeKey: 'test:actor:personal', sessionId: 'test-session',
+      mode: 'FOR_YOU', items: [original] });
+    const cached = getDeliveredSlate('description-credit-test')!.items[0]!;
     expect(visibleItemDescription(cached).descriptionAttribution).toEqual(fixture.attribution);
     const { descriptionAttribution: _credit, ...missing } = cached;
     for (const changed of [missing, { ...cached, description: fixture.description+' Changed.' },
@@ -34,7 +34,6 @@ describe('description and required credit travel together', () => {
       expect(visibleItemDescription(changed).description).toBeUndefined();
       expect(changed.id).toBe(original.id);
     }
-    clearPredictionItemCacheForTests();
   });
   it('does not relabel a managed paragraph as legacy merely because its status is missing', () => {
     const { descriptionStatus: _status, ...withoutStatus } = item();

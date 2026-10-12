@@ -1,13 +1,15 @@
 # ADR-0008 — Portable Predictive Memory Engine and external research priors
 
-Date: 2026-09-12  
-Status: **owner-approved design, publication through Issue #233 / PR #234; runtime implementation pending**
+Decision date: 2026-09-12
+Status: **owner-approved design through Issue #233 / PR #234**. Subsequent bounded
+E1/D1/D2 foundations are implemented and accepted; native component admission and
+later generations remain gated. STATUS owns current source/runtime acceptance.
 
 ## Context
 
 The owner supplied a 51-section Predictive Memory Engine proposal and wants the engine to remain a reusable independent system. Kajo is the first application. Public movie-preference data can support non-commercial research before Kajo accumulates enough native evidence.
 
-Existing ADR-0002/0003/0005/0007, Profile privacy, the SQL serving boundary and the Phase 14 → Taste → Friend → Shared release march remain valid. The currently active code is draft PR #229 / Issue #228; it is not accepted main merely because this architecture is documented.
+Existing ADR-0002/0003/0005/0007, Profile privacy, the SQL serving boundary and the Phase 14 → Taste → Friend → Shared release march remain valid. At this decision's September 12 checkpoint the active code was draft PR #229 / Issue #228; architecture documentation did not make that source accepted main.
 
 ## Decision
 
@@ -26,7 +28,19 @@ Earlier wording deferred learned embeddings/population work broadly. This ADR ad
 
 `ROADMAP` owns packet order; `STATUS` owns the exact resumable task; `MVP` owns first-release acceptance. E1 #235 / D1 #236 / D2 #237 establish executable contracts and an honest external-data report, not a requirement that a learned challenger must win. Production quality remains a separate gate. Optional D3/D4/D5 and generations 2–5 are not silently promoted into MVP.
 
-The active #229 evidence/pagination work retains its own CI, five undeployed forwards, rollout and device gates. This documentation change does not apply migrations, reset accounts, launch APK builds, activate a new reader or merge the active code branch.
+The original September 12 text recorded #229's CI, five undeployed forwards,
+rollout and device gates. This historical text does not define the current
+deployment count; later deployment and acceptance belong to STATUS and must not
+be repeated from this paragraph. The bounded E1/D1/D2 foundation is now accepted through
+#241/#242/#243 without admitting an external serving model.
+
+The owner-requested October 9 dependency audit prioritizes the live native memory/serving decay
+correction, ordered Personal session/state policy and adaptive Taste/frozen
+challenge through existing boundaries. Known Shared evidence defects and its
+queued genuine prepared-input consumer remain required; advanced Shared model
+enhancements are not a serial prerequisite to Personal source work. This preserves
+the staged engine ambition and separate quality/privacy/rollout gates. ROADMAP
+owns this execution refinement; the original architectural decisions above stand.
 
 ## Alternatives considered
 
@@ -43,3 +57,11 @@ Benefits: independent engine contracts, repeatable early experiments, explicit u
 Costs: adapter and artifact versioning, research/production isolation, license lineage, temporal evaluation and separate model admission must be maintained. Public data does not remove native-data, consent, device or cross-domain validation work.
 
 The documentation PR must update the navigation and canonical scope/continuation owners, retain existing release gates, and distinguish planned modules from delivered code. Implementation requires deterministic contract/leakage/authorization tests, reproducible source manifests and explicit evidence before any serving change.
+
+## Implementation traceability refinement — 2026-10-05
+
+The owner asks that the complete design become an executable build direction, not only a stored proposal. The source audit confirms all 51 sections already exist and E1/D1/D2 are accepted foundations; this does not establish native engine integration or later-generation acceptance. The original dated rollout statements above remain historical context, not instructions to repeat deployed forwards.
+
+Adopt [ENGINE_BUILDOUT](../../project/ENGINE_BUILDOUT.md), tracked in [#302](https://github.com/Kajooja/Kajo/issues/302), as the section-to-capability acceptance ledger. [ROADMAP](../../project/ROADMAP.md#engine-build-out-commitment--2026-10-05) retains sole scheduling authority and the existing release march. The ledger covers native-core integration, state, replay, trajectory recall, multi-space geometry, global memory, distributions, policy, consolidation, dreams, evolution and real second-domain portability.
+
+The engine's later capability path does not have to wait for unrelated music/events/feed/dating product additions. It does require its own data, quality, privacy, resource and operational prerequisites. All 51 sections remain the target; methods may be rejected with evidence, but capabilities cannot silently disappear. No new runtime, service, migration, external-data acquisition, production model or first-release blocker is introduced by this documentation refinement. STATUS and current PRs retain their exact native/device acceptance boundaries.

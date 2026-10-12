@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 permissions:
@@ -162,7 +163,14 @@ jobs:
 
   android-apk:
     name: Build standalone Android APK
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    # Explicit same-repository test-build opt-in; all five gates still precede
+    # the APK. Fork PRs cannot opt themselves into a configured test binary.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.labels.*.name, 'build-android-apk'))
     needs: [validate, database-platform, database-installation, database-upgrade, database-cli-installation]
     runs-on: ubuntu-latest
     env:

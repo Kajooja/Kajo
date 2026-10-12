@@ -10,6 +10,22 @@ Status legend: `[ ] planned`, `[-] in progress`, `[x] complete`.
 
 Canonical launch flow: [LAUNCH_LOOP.md](LAUNCH_LOOP.md). Execution order: [ROADMAP.md](../project/ROADMAP.md). Long-term vision: [FUTURE_PLAN.md](FUTURE_PLAN.md). Generic engine: [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md). External data: [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md).
 
+Prospective Personal enrollments and latest-terminal captures are now a separate
+active source foundation. They require a declared window and genuine own OFF
+exposure, retain zero/clear/UNDO/missing coverage, and withdraw copied captures
+with their sources. This supplies engineering provenance rather than release
+quality: observed usefulness, independent support, bootstrap/transfer, genuine
+Shared and all native/hosted/device/privacy gates remain required. STATUS owns
+exact publication and acceptance.
+
+The completed Personal source-fusion/forgetting source reconciles canonical
+rating revisions versus bootstrap, preserves zero/neutral and selective Undo/clear,
+and distinguishes effective native strong setup support from known Taste ratings.
+This is a correctness foundation, not measured first-session usefulness or a
+server-backed anonymous TasteSession. The current owned server TasteSession and
+frozen ordinal challenge are source foundations; app integration, anonymous entry
+and measured usefulness remain open. All release acceptance below remains required.
+
 ## MVP completion meaning
 
 `MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.
@@ -95,11 +111,20 @@ Commercial monetization, public stranger discovery, dating, extra production dom
 
 These requirements implement [LAUNCH_LOOP.md](LAUNCH_LOOP.md).
 
+Real anonymous Taste acceptance first requires stable server-backed identity and
+PersonalProfile-compatible state, resumable TasteSession, minimum retention/
+deletion and abuse controls, and versioned recognition/completion/challenge
+measurement. These are the applicable early parts of `MVP-ACQ-001..004`,
+`MVP-OPS-002/006` and `MVP-GROWTH-001..003`; full provider conversion, operations
+and launch-funnel acceptance remain required in their ROADMAP phases.
+The owner's October 9 clarification reaffirms the initial adaptive Taste before
+release; a group invitation or decision session does not replace these gates.
+
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
-- [ ] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required.
+- [-] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required. A bounded portable selector and strict Kajo adapter now exist in source; owned server TasteSession persistence and a parity-tested SQL adapter now exist in source; anonymous entry, app consumption, measured selection value and device acceptance remain open.
 - [ ] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics and initialize the visitor's PersonalProfile-compatible taste state without pretending campaign/auth behavior is recommendation evidence.
-- [ ] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward.
-- [ ] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted.
+- [-] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward. The owned server source now freezes one canonical run and reserved forecasts before first answers; answers remain evaluation-only. Anonymous/app acceptance and explicit later projection remain open.
+- [-] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted. The source now reports same-domain ordinal agreement, ties/missing support and unavailable small-sample uncertainty; user-facing presentation and observed acceptance remain open.
 - [ ] `MVP-TASTE-006` After the challenge, Kajo shows a small unseen recommendation preview generated through the canonical production ranking boundary, including safe explanation and optional FOR_YOU/SURPRISE/RISK contrast.
 - [ ] `MVP-TASTE-007` A completed Taste session produces useful first-session recommendations compared with a fixed transparent baseline/reference set; if evidence does not show usefulness, public launch remains blocked.
 
@@ -135,8 +160,9 @@ Existing SharedProfile learning semantics remain canonical.
 - [x] `MVP-PROFILE-004` SharedProfile name length is 2–32 characters.
 - [x] `MVP-PROFILE-005` Member can leave SharedProfile safely with confirmation and correct fallback/access loss.
 - [ ] `MVP-GROUP-001` Two Friends can explicitly create a new SharedProfile through one short consent-based flow; accepting a Friend invite never creates it automatically.
-- [ ] `MVP-GROUP-002` 3+ SharedProfile creation can select Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent.
+- [ ] `MVP-GROUP-002` The planned compact 3–5-person creation flow can select authorized accepted Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent. Existing generic 2-N membership support remains intact.
 - [ ] `MVP-GROUP-003` Newly created SharedProfile immediately uses the existing canonical joint/common-fit prediction boundary; no pair-specific duplicate recommender is introduced.
+- [ ] `MVP-GROUP-004` Planned Phase 16.2 creation uses 2–5 total person slots, including the creator in one slot. Each `+` selects an authorized accepted Friend or creates an opaque expiring/revocable invitation with show/copy/OS-share actions (including WhatsApp where available). The receiver continues through the same app/Taste/link flow and explicitly accepts the correct Friend/group permissions; sending/opening a link creates no membership/Friendship or private history access. Pending and accepted slots remain distinct; Friend safety gates precede this UX.
 
 ## Existing Shared discovery
 
@@ -149,6 +175,15 @@ Existing SharedProfile learning semantics remain canonical.
 - [ ] `MVP-SOCIAL-007` After Personal Taste setup, SharedRatingRound retains each participant's own 0–10 response: A's rating prompts B; all required responses precede completed joint Katsotut/Luetut. #232, Phase 16.3.
 - [ ] `MVP-SOCIAL-008` Joint learning keeps actor/round provenance and disagreement, with atomic completion, correction/Undo, retry and membership-change semantics; Personal history remains separate and legacy single-actor history is not fabricated into confirmed rounds. #232.
 - [ ] `MVP-SOCIAL-009` A member-seen Item may rank strongly for joint use; a bounded/versioned rewatch policy permits a new joint experience of the same Item while retaining all prior history. Serving/shadow eligibility and delayed outcomes agree. #232.
+
+## Planned joint decision session — before complete beta
+
+These October 9 product requirements are queued under ROADMAP 16.4 after 16.3;
+they do not describe delivered Shared discovery or SharedRatingRound behavior.
+
+- [ ] `MVP-SOCIAL-010` SharedProfile offers an optional “watch/read today” session with at most five current canonical BOOK/MOVIE suggestions, ranked by the same predictor using the inherited DiscoveryMode/risk policy. Optional Tinder-like cards have accessible non-gesture alternatives and exact displayed origins; other “do today” domains remain future scope.
+- [ ] `MVP-SOCIAL-011` Session-level rejection can replace/veto the current suggestion, with a proposed any-participant veto rule to confirm when implemented; “already seen/read” replaces the option within this session. Refill is bounded and reports genuine eligibility exhaustion or expiry. These actions do not silently submit ordinary durable not-interest, erase history, permanently prohibit rewatch, complete a SharedRatingRound or create group reward.
+- [ ] `MVP-SOCIAL-012` Joint decision sessions retain a bounded frozen accepted roster and actor/Profile/session/version provenance, with explicit membership-change/expiry/cancel/exact-retry/concurrency behavior, authorized minimal telemetry and lifecycle/deletion rules. Two-person and N-member server/device/accessibility cases pass; choosing alone is not confirmed joint consumption or satisfaction.
 
 ## Swipe and state
 
@@ -187,7 +222,7 @@ Existing SharedProfile learning semantics remain canonical.
 - [-] `MVP-DATA-001` Meaningful discovery behavior is captured through canonical generic event interface.
 - [-] `MVP-DATA-002` Recommendation impressions are traceable to a `predictionId`.
 - [-] `MVP-DATA-003` Meaningful action commits canonical Event(s) and current-state projection atomically/idempotently; persistent actor/Profile outbox survives termination/retry safely. #224 delivers rating/not-interest/undo; #226 extends the same atomic/durable path to Lists/Endorsements with mixed undo and outcome corrections. Real-device termination/reconnect acceptance remains open; see the active PR/Sprint 014 for rollout status.
-- [ ] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
+- [-] `MVP-DATA-004` Grid/detail/swipe/search/Lists/Shared overlays use exact truthful delivered Profile/prediction/slate origin; delayed outcomes never inherit guessed provenance.
 - [x] `MVP-PRED-001` Prediction ranks generic Items for a Profile.
 - [x] `MVP-PRED-002` Prediction includes long-term, recent and Item-similarity signals.
 - [x] `MVP-PRED-003` DiscoveryMode changes ranking/exploration semantics.
@@ -200,7 +235,7 @@ Existing SharedProfile learning semantics remain canonical.
 
 - [x] `MVP-ALG-001` Imported/calibrated taste changes unseen Personal ranking directly; opposite bootstrap tastes produce explainably different orders and removal/correction recomputes influence. Technical acceptance: #207/#210 and adopted fresh-install gate #208/#223; device/bootstrap usability and measured quality remain separate BOOT/CAT/TASTE gates.
 - [ ] `MVP-ALG-002` Serving/shadow share versioned feature/score/eligibility/delivery semantics and baseline replay parity.
-- [ ] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
+- [-] `MVP-ALG-003` Bounded candidate generation refills after suppression and paginates without duplicates/leakage/false exhaustion.
 - [ ] `MVP-ALG-004` Working/Short/Long state use ordered, source-aware, evidence-aware decay/support; contradictions can change taste without one session erasing durable state.
 - [ ] `MVP-ALG-005` BOOK/MOVIE share versioned normalized features with bounded cross-domain transfer and safe neutral fallback.
 - [ ] `MVP-ALG-006` FOR_YOU/SURPRISE/RISK have evaluated context-dependent policy differences; unsupported confidence/probability claims are forbidden.
@@ -210,10 +245,10 @@ Existing SharedProfile learning semantics remain canonical.
 
 ## Portable engine and external-data foundation — bounded completion contracts
 
-[ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [ROADMAP Phase 14.3A](../project/ROADMAP.md#143a--portable-contracts-and-external-data-research) define the owner-requested new direction. These are planned, not delivered by the architecture documentation.
+[ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [ROADMAP Phase 14.3A](../project/ROADMAP.md#143a--portable-contracts-and-external-data-research) define the bounded foundation. E1/D1/D2 are implemented and accepted; architecture documentation alone did not deliver them. Native integration, model admission and later engine generations remain separate gates.
 
 - [x] `MVP-ENG-001` Executable generic engine contracts preserve Subject/acting-identity separation, Object/Action/State/Observation/Outcome semantics, missingness, time/version scope and hard constraints. Deterministic Kajo/media and small synthetic non-media adapter fixtures run without UI/hosted DB and without importing provider/UI/auth dependencies into core. The real package joins workspace/exports and root lint/typecheck/tests. Current SQL serving is unchanged until a parity-tested component replacement is admitted. E1 #235 accepted through merged PR #241 / CI #471; native runtime/model admission remains separate.
-- [x] `MVP-ENG-002` An isolated MovieLens manifest/adapter and baseline report are reproducible on a declared deterministic real-data cohort, with validation/quarantine, train-only artifacts, chronological and cold-start splits, a fixed final test, coverage/uncertainty/resource reporting and explicit task limitations. Include a bounded declared static-state versus ordered-prefix/trajectory-retrieval comparison. No external identities or invented context/exposures become native Kajo evidence. Dataset scale and experiment limits are reported honestly; a challenger is not required to win. D1 #236 / merged PR #242 supplies the verified 500-subject / 84,849-rating development cohort. D2 #237 now supplies the independently reproduced [temporal/cold-start report](../../research/reports/movielens-small-d2.md), eight model/state variants, grouped uncertainty and a predeclared rejection decision. Current D2 source CI/merge is tracked in STATUS; no shared benchmark or native uplift is claimed.
+- [x] `MVP-ENG-002` An isolated MovieLens manifest/adapter and baseline report are reproducible on a declared deterministic real-data cohort, with validation/quarantine, train-only artifacts, chronological and cold-start splits, a fixed final test, coverage/uncertainty/resource reporting and explicit task limitations. Include a bounded declared static-state versus ordered-prefix/trajectory-retrieval comparison. No external identities or invented context/exposures become native Kajo evidence. Dataset scale and experiment limits are reported honestly; a challenger is not required to win. D1 #236 / merged PR #242 supplies the verified 500-subject / 84,849-rating development cohort. D2 #237 / merged PR #243 supplies the independently reproduced [temporal/cold-start report](../../research/reports/movielens-small-d2.md), eight model/state variants, grouped uncertainty and a predeclared rejection decision. Further research/source acceptance is tracked in STATUS; no shared benchmark or native uplift is claimed.
 - [x] `MVP-ENG-003` Source/derived-artifact permissions and lineage are explicit and fail closed for unsupported uses. A tested absent/invalid/withdrawn-prior fallback and recorded admission/rejection decision preserve native serving. Synthetic records cannot enter observed-outcome evaluation or validate their own generator. Jointly learned source influence requires a documented replacement/retraining path rather than assuming raw-file deletion removes it. D1/D2 record reviewed noncommercial research scope, inherited source/model/partition hashes, rejected development admission and deferred native use. Executable absent/invalid/withdrawn/disallowed fallback retains only authorized native-prefix evidence or unavailable; synthetic training/evaluation is rejected. [D2 evidence](../../research/reports/movielens-small-d2.md) records actual probes and the full dependency replacement/rebuild procedure. This bounded research requirement does not admit or integrate a serving model.
 
 D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/research packets after D2. E2 serving integration is conditional on rights, useful evidence, compatibility and the existing native reliability/rollback gates. External hidden-rating accuracy does not close Kajo first-session, exposure, Shared, cross-domain or device acceptance. A useful transparent baseline remains acceptable; indefinite model search is not a release requirement.
@@ -230,7 +265,7 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 - [ ] `MVP-UX-001` Core flows support screen readers, larger text, accessible gesture alternatives, contrast/reduced motion plus usable loading/empty/offline/permission/recovery states on representative devices.
 - [ ] `MVP-UX-002` Taste-first link flow is usable on representative mobile browsers and inside the installed app, with clear continuation when an external browser/app-store/auth round-trip occurs.
 
-- [-] `MVP-UX-003` A failed active discovery reader recovers its exact request on usable reconnection and clears stale retry UI on success, with bounded/coalesced attempts, scope cancellation and unchanged expiry/receipt semantics. Owner device defect #240, 2026-09-12; source implemented in draft #229 under Phase 14.2, with exact source acceptance and the real-device repeat still required. STATUS owns the current checkpoint.
+- [-] `MVP-UX-003` A failed active discovery reader recovers its exact request on usable reconnection and clears stale retry UI on success, with bounded/coalesced attempts, scope cancellation and unchanged expiry/receipt semantics. Owner device defect #240, 2026-09-12; source implemented in #229 under Phase 14.2 and included in the #329 integration; the real-device repeat remains required. STATUS owns the current checkpoint.
 - [ ] `MVP-UX-004` Personal BOOK/MOVIE statistics include source-aware counts, independent unlock/progress and retry-safe weekly summaries/countdowns before MVP. #230, Phase 17.0; community comparisons remain conditional on cohort/privacy evidence.
 - [ ] `MVP-UX-005` Accessible grid multi-selection supports Discovery List add/not-interest, same-Profile List move/removal and selected history clearing with exact origins, durable partial results and Shared consent. #231, Phase 17.0.
 - [ ] `MVP-UX-006` Cards have a default-save star (Tykätyt), header overflow for other Lists, and a bottom rating slider plus Ei kiinnosta/Seuraava above the dock with description space. Saving stays on the card; Next is explicit navigation. Reuse existing Saved/Shared/evidence semantics. #239, Phase 17.0; UX_PRINCIPLES owns the full contract.

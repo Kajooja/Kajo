@@ -14,6 +14,1017 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Owner-authorized source integration — 2026-10-12
+
+The owner explicitly instructed: “No jatka, yhdistä mainiin, hyväksy kaikki.”
+This supersedes the prior #229 configured-device/fresh-account source merge hold.
+Source approval does not manufacture phone tests, deploy forwards, enroll a cohort
+or close incomplete release/quality requirements.
+
+PR #329 is retargeted to main as the integration of all 27 open source PRs:
+#229, #301, #304, #305 and #307–#329. Every original head is an ancestor of
+`5aaeb9dbcf297cc5b6f211cf2332a53581f337f7`; its full source passed all five CI #646
+jobs, including 224 database tests and four exports. The reconciliation changes
+only documentation, preserves main #300's complete September 30 entry below and
+requires all five final-head CI gates before the history-preserving merge.
+The final source/tree, CI and resulting main merge SHA belong to PR #329.
+
+Canonical documents now distinguish retained historical baselines from the
+integrated native source. STATUS points to one next packet: owned adaptive mobile
+TasteSession/challenge resume, retry, transition, unknown/zero and honest result
+presentation. The earlier static calibration remains until explicitly replaced.
+Configured-device observations remain in DEVICE_TEST/#238. No new APK, hosted
+write, account reset, provider acquisition or model admission is claimed.
+Consumed catalogue operation refs and active worktrees remain retained.
+
+## Frozen own-Personal Taste challenge — 2026-10-12
+
+The #328 parent is complete for source review: exact `b7dd4f799358ca167ec1d5a178d290608aacd9ed`,
+tree `3e434b54b8b26230265552933739ab1ba92ef954`, all five CI #644 gates pass.
+The current `feat/personal-taste-challenge` continuation advances EB-03/EB-08
+(sections 30/32/33/40) without changing the scorer or promoting a model.
+
+Delivered source: `taste_challenge_v1` reserves up to three real unseen Items per
+domain before one canonical cross-domain FOR_YOU run; freezes full run/pool,
+state/model/genome and holdout commitments; accepts immutable first answers with
+exact retry/CAS and durable resume; and reveals forecasts only at completion.
+Same-domain ordinal agreement reports known/unknown/not-interest, score/rating
+ties and missing forecasts, with unavailable small-dependent-sample uncertainty.
+Scores are not converted to calibrated ratings or percentages. Answers remain
+EVALUATION_ONLY, without native Event/bootstrap/reward writes.
+
+Private ownership/RLS/ACL boundaries, anonymous refusal, live catalog withdrawal,
+Taste/import removal, source Prediction erasure and account cascade are covered.
+Existing rows/functions/ACLs and historical predictions retain their bytes.
+The additive migration was created by pinned Supabase CLI 2.117.0. Native CLI
+probes exercise separate connections for duplicate creation/answer, revision
+conflict and source removal, and compare complete canonical state after cleanup.
+Local and exact-source final CI receipts belong to the active PR/#229 handoff.
+Local native advisors require the unavailable local Postgres stack; configured
+backend/device behavior and real usefulness are not claimed.
+
+Hygiene reconciliation corrects the stale “no native consumer” wording to the
+actual server-versus-mobile boundary and records #327's completed integration CI.
+Canonical protocol/evidence/model, CODEMAP, launch semantics, MVP partial status,
+ROADMAP, capability ledger and STATUS now describe the same source and next task.
+No older sprint result is rewritten, no branch dependency is deleted and no
+hosted write, account reset, provider acquisition or main merge is performed.
+
+Next: verify this source's CI, then integrate the owned adaptive mobile Taste and
+challenge flow through both RPCs. Keep anonymous lifecycle/abuse/measurement,
+explicit later answer projection, canonical preview, observed first-session value,
+#229 configured-device/fresh-account and the complete MVP/Share Link gates open.
+
+## Durable own-Personal TasteSession — 2026-10-12
+
+The interrupted #326/#327 follow-up is complete: CI #639 and #641 pass all five
+required gates; optional APK jobs were skipped. No dependent stack was merged
+past #229's configured-device/fresh-account gate.
+
+The successor `feat/personal-taste-session` adds one bounded own-Personal session
+with frozen real catalog/policy/feature dictionary, durable opportunities and
+answer revisions, server-owned selection, transition acknowledgement, exact
+request replay, optimistic revision conflicts and removal. SQL/portable selector
+parity covers ADAPTIVE and PRIOR_ONLY, replay, zero/unknown/not-interest/correction,
+withdrawal and stage/stop rules. Ratings project incrementally into the existing
+bootstrap boundary with distinct `TASTE_SESSION_V1`/`TASTE_TEST` provenance; no
+native Events or Shared evidence are fabricated. Other withdrawn Items remain
+withdrawn when a different Item is answered.
+
+Private RLS tables and revoked helper/table permissions restrict access to the
+owner RPC. Anonymous/foreign/Shared calls fail. Source removal atomically clears
+session and retry copies, including removal via the existing import endpoint;
+account deletion cascades them. Live catalog withdrawal blocks delivery/writes
+except REMOVE. The v1 source intentionally does not admit not-interest into the
+older rating/consumed/saved bootstrap kinds or claim anonymous/public/UI readiness.
+
+The additive forward is generated with pinned CLI 2.117.0. Populated-forward
+regressions preserve every old table row and function identity/body/ACL. Local
+focused full-schema tests pass; full root/database and exact-source CI receipts
+are finalized in this PR. Native CLI includes authenticated smoke plus separate
+connection duplicate/conflict/removal lock probes. Local advisors cannot connect
+without a local Supabase/Postgres service; this is not a clean-advisor claim.
+No hosted migration, mobile gate activation, account reset or learning admission.
+Next source packet is the genuinely frozen own-Personal holdout challenge.
+
+## Personal source fusion/forgetting — 2026-10-12
+
+Completed #325 CI #637 passes all five required jobs on exact source tree
+`84f0279c2868411caba0b031030996766218962d`. Earlier #324 CI #636 passes all five
+and standalone APK; its actual checkout/source tree and archive receipt belong
+to STATUS/DEVICE_TEST. Build completion does not close device or public-release
+acceptance.
+
+The bounded #326 source continuation targets current Personal rating ownership,
+selective clear/Undo/ambiguity, effective six-strong setup support and versioned
+bootstrap floor removal, with common memory/ordinary/catalogue source semantics.
+Structural memory/feature generations and old frozen outputs remain compatible;
+Shared native calculations, real repeat experiences and measured quality remain
+separate. Final implementation/tests/source version details follow STATUS and
+PREDICTION_MODEL; no hosted write, history/account reset or quality activation occurs.
+
+The actual verified CLI2.117.0 bootstrap creates
+`20261012060821_personal_source_fusion.sql`; a temporary read-only runner workflow
+is removed from the final diff. Official archive, artifact, binary and tested
+checkout hashes verify provenance rather than inventing a filename. The local
+CLI is now available for subsequent source migrations.
+
+The continuation now completes the forward and native CLI populated-upgrade/runtime
+wiring. Regressions cover canonical equal/backdated rating edits through List
+receipts, exact Undo, legacy ambiguity/malformed values, invalid/cyclic/competing
+lineage, depth 512 and overflow, future controls, Saved/List removal/deletion,
+public owner authorization and genuine Shared preservation. A backdated Saved/List
+removal defect was reproduced and corrected using validated receipt order.
+Old-generation smoke matrices remain on their actual pre-fusion source; new source
+checks own the intentional version/count/overlap changes. Existing general fresh
+install/history smoke checks now recognize that one current rating can have two
+retained raw Events.
+
+The current STATUS is condensed to one handoff, source/build/hosted/device gates
+and links to this historical log. The 35-ref audit retains all live dependencies
+and eight consumed operation identities; no branches or user data are deleted.
+Final source is #326 `70d4e48f8260bc3462fa40cbea221184e63c0bb3`, tested tree
+`612d4997b015f5e673d72aec856db00f07aa827b`. Serial database **192/192**, engine
+**245**, mobile **493**, catalogue **444**, dependency **43**, research **19 Python
++ 43 Node**, acceptance **6 + 5**, and four explicit demo-mode exports pass.
+Root check remains blocked at locked Edge registry loading after earlier stages
+pass. All **253 local links / 73 anchors** pass. CI #639
+(run `38229883071`) owns the completed source's pending required gates.
+
+A separate documentation successor reconciles #303's complete 51-section map into
+the current source/dependency stack. README, documentation map, ADR-0008 and
+ROADMAP now link the twelve capability packets; the ledger records October 12
+source foundations without ticking full capabilities or restoring stale handoffs.
+ROADMAP and AGENTS now distinguish completed decay/support/Shared integration
+source from remaining hosted/device acceptance. Duplicate #306 is closed after
+all six implementation/test/migration files match #323 exactly; its branch and
+original guarded rollout evidence remain preserved. #302 remains the full-engine tracker. New integration CI, native stack merge,
+hosted/device/observed-quality and Share Link acceptance remain separate.
+
+## Native base confidence distinct-Item support — 2026-10-12
+
+The old ordinary/catalogue kernel defect is reproduced on an actual populated
+schema: one native Item/eight matching tags yields confidence one. The guarded
+source forward replaces only its new base support with distinct admitted matching
+native Items; repeated tags/actions cannot create extra units. Legacy tag incidence
+remains diagnostic; explanation count/basis/version and uncalibrated status make
+the heuristic explicit. Scores/features/ranks/versions and old frozen evidence/
+receipts/functions retain their approved semantics. Bootstrap-only native support
+remains zero; same-Item source fusion and the retained bootstrap floor remain open.
+
+A private denied-API pure helper, independent populated preservation/drift verifier,
+BOOK/MOVIE/mode/zero/repeat/UNDO/temporal/foreign/missing/bootstrap matrix and actual
+CLI upgrade/smoke stages supply engineering coverage. The pinned CLI is unavailable
+locally and offline npm returns ENOTCACHED; the new forward uses a UTC-generated
+name. Focused full-schema **6/6**, syntax/whitespace pass; the actual 120-Item
+instrumented regression proves helper calls **1/7/50** for requested limits,
+without changing complete results or retained helper metadata. Final frozen full
+serial database **173/173**, independent support **6/6**, source/CLI review and
+**141 links / 77 anchors** pass. Root lint/typecheck/dependency **43**/mobile **493**/
+catalogue **444** pass before unavailable Edge registry loading; complete local
+root success is unclaimed. Completed parent #323 CI #634
+passes all five required jobs on the exact integrated tree; #324 CI #635/636
+and opted-in APK remain pending. STATUS/#229 own final publication/CI/build and
+subsequent native rollout/device/quality gates. No production mutation or quality activation occurs.
+
+## Personal Taste selector and calibration source — 2026-10-12
+
+A separate portable `taste-selection-v1` export now chooses immutable next
+questions, transitions and stops from trusted frozen caller inputs. Fixed
+ADAPTIVE/PRIOR_ONLY controls use recognition/diversity/feature-coverage heuristics;
+zero/unknown/not-interest, revisions/withdrawal, replay, no-repeat bounds and
+exhaustion are explicit. Source defaults propose 12–24 opportunities, eight known
+ratings and ten MOVIE → transition → ten BOOK. Generic non-media coverage and
+strict Kajo owned-Personal/canonical-real-Item normalization retain the independent
+root estimator graph. New tests **25/25**, full engine **245/245**, built exports,
+lint/typecheck and independent selector review pass.
+
+The existing calibration receives independent unknown after wheel movement,
+genuine zero preservation, append-only presented-prefix expansion and async
+profile-scope cancellation. Its static/interleaved six-known gate remains current;
+it does not consume the adaptive selector. Independent screen/operations
+**17/17**, full mobile **493/493**, lint/typecheck pass. Root dependency **43**,
+catalogue **444**, research **19 Python + 43 Node**, acceptance **6 + 5** and
+configured application/description exports pass. Required root check is blocked
+at unavailable Edge registry/cache; complete local success is not claimed.
+Full database serial recheck and exact source CI remain pending in STATUS/#229.
+
+No native TasteSession consumer, anonymous foundation, frozen challenge, canonical
+preview or observed usefulness is admitted. Native confidence still needs distinct
+Item support rather than summed tag counts. Required anonymous identity/retention/
+abuse/measurement, actual Working cohort/operator prerequisites, genuine #232F,
+#306 hosted rollout and configured-device/MVP gates remain open. No hosted write,
+account/history reset or main merge occurs.
+
+## Shared overlay source integration — 2026-10-12
+
+Completed #322 CI #633 passes all five required jobs. The separate #306 source
+is integrated without replacing current Shared/Working probes or canonical
+handoff documents. Six code/test/SQL files are byte-identical to reviewed
+`d14c705d33ff633f86d3bc133dd9b701b6f210cd`; the guarded migration SHA-256 remains
+`49aba479d9b5055cd314798ec5e23d09330369887eb37e504d90bdc90f1eb698`.
+The three-line CLI stage runs alongside all subsequent native probes.
+Focused mobile **26/26** and populated full-schema eligibility/negative-control/
+metadata-preservation **1/1** pass. Integrated CI, hosted rollout and device
+observations remain distinct. No account/history reset or hosted mutation occurs.
+The stale staged #199 terminal-refresh footer is superseded by the current
+append/compact-layout source. STATUS owns publication and the next Personal
+first-session source work; every anonymous/quality/Shared/device release gate stays.
+
+## Bounded future Working cohort protocol — 2026-10-11
+
+Parent #321 source `963a3ab0ccf577d22cab02b2a5300f59d7eee9db`, tree
+`851b27af5ba64bdb6ba26fd3e352e1c02368e403`, has all five successful CI #632
+gates in the completed receipt inspection after implementation; the earlier
+unfinished check had four passed jobs. The synthetic merge has that same tree;
+APK was skipped. STATUS/#229 own exact new-source gates.
+
+The new offline declaration/checker fixes a future existing-owner roster,
+half-open enrollment window, fixed horizon/settlement/report cutoff, complete
+supplied ledger reconciliation, all adjacent same-tier OFF pairs and first
+reserved capture revision 1. Missing captures retain all planned pairs;
+omissions, altered windows, substitution, overlap, excess budgets and declared
+withdrawal reject the whole cohort. File digests establish internal integrity
+only. The private artifacts need current owner access and removal at withdrawal
+or the fixed seven-day review deadline; no automatic erasure occurs.
+
+This source-only packet has no actual authorized roster/inventory or independent
+native/operator declaration receipt. It creates no real untouched cohort and
+collects no observed coverage. Fixture observed evidence stays zero, and all
+learning/activation/quality gates remain unchanged. The next actual collection
+requires that native/operator path and existing-owner scope, after required
+source gates. No accounts, histories, SQL, hosted state or APK change.
+
+New cohort **9/9**, independent combined cohort/Working/ordinal **30/30**,
+actual SQL-to-cohort **5/5**, engine **220/220** plus built import graphs,
+research **19 Python + 43 Node**, acceptance **6 + 5** pass. Root lint/typecheck,
+dependency **43**, mobile **478** and catalogue **444** pass before unavailable
+Edge registry/cache; fresh smoke fails closed without production configuration.
+Complete local root/application exports remain unclaimed. Independent source
+and docs review, **145 file links / 78 anchors**, syntax/whitespace pass.
+Root lock, 74 migrations, engine source, production functions and all tracked
+SQL remain byte-identical; this source still requires its own native CI gates.
+
+## Private owner Working report and native fixture repair — 2026-10-11
+
+The #320 source `f68569b5c0545e5081fbc2b246ea27cacd33c572`, tree
+`88625552287ff26da8398156f255171fcf6e82f6`, has four successful CI #631 gates;
+CLI/history fails its strict JSON read after prospective native lock probes.
+DO/PERFORM suppresses fixture-only setup/sleep result rows, retaining the separate
+committed enrollment boundary. The strengthened regression requires exactly one
+JSON acknowledgement; no migration or production SQL changes.
+
+The private `engine:working` report consumes actual enrollment/source/control and
+immutable outcome snapshots through existing adapters. All planned pairs remain
+in coverage, native identity and alias guards reject reused units, and actor/
+session clusters expose dependence. Outputs are bounded private exclusive files
+outside Git; fixture observed evidence is zero. Files need current owner access
+and withdrawal/retention handling. The report does not establish an untouched
+cohort, statistical independence, measured quality or any admission. STATUS/#229
+own exact validation/publication and the next predeclared native coverage window.
+
+Final full database **165/165**, engine **220/220** with built exports,
+research **19 Python + 34 Node**, acceptance **6 + 5**, dependency **43**,
+mobile **478**, catalogue **444**, native SQL-to-CLI **4/4** and independently
+reviewed Working/ordinal **21/21** pass. An independent guard mutation reproduces
+one false comparable unit from reused inert input, rejected by the final source.
+All 74 migrations/core/scorer/lock bytes are unchanged. Root Edge loading lacks
+registry cache and fresh app smoke lacks production configuration; complete
+local root/exports/native CI acceptance remain unclaimed. STATUS/#229 retain
+exact new-source gates and all release dependencies.
+
+## Prospective Personal enrollment and outcomes — 2026-10-10
+
+The prior #319 source `0103d941944cbf0b545686ad60d13b08bc068b9d`, tree
+`868e9f15d91e19735c45a15e7a9de676104e43e2`, has all five CI #630 jobs successful.
+The new `feat/personal-working-prospective` packet adds CLI-generated forward74
+for private pre-evidence enrollment, durable sixteen-write reservations, immutable
+latest-terminal captures and whole-source withdrawal. Actual same-tier OFF pair
+receipt, three controls and dedicated declaration transaction precede real
+exposure. Complete correction closure preserves zero and abstains on ties/unknown/
+clear/missing; V1 strongest-episode reward remains separate. Actual later snapshot
+reads retain their clock beside the stored declaration. Source limits, erasure,
+local/native receipts and next bounded report belong to STATUS/#229. All quality,
+historical-feature, learning, activation and release gates remain open.
+
+Final resumed engineering validation: engine **220/220**, full database
+**164/164**, zero failures/skips, and independent actual-producer/commit-guard
+review pass. Native upgrade/mutation/interop/bounds/source withdrawal and
+SAVEPOINT cases are covered; no fixture adds observed quality evidence. Root
+lint/typecheck, dependency43/mobile478/catalogue444, research19Python+23Node,
+acceptance6+5 and Markdown references pass. Complete local root/app-export/native
+receipts remain unclaimed: Edge registry connection and absent local PostgreSQL
+block those gates. Exact-source CI/publication is retained only in #229.
+
+## Frozen native candidate features and support — 2026-10-10
+
+Exact parent #318 source `9352e3e711e41e773d9092167eb58052c71156da`, tree
+`d7bd1f6a92fc037373599d9e378b700f6969345c`, has all five required jobs
+completed successfully at the continuation CI #629 inspection: validation/exports,
+platform/defaults, two clean native installations, populated upgrade and
+CLI/history. Precision, frozen-consumer/reset and native-installation probes
+pass for that exact parent; this new packet retains its own exact-source gate. Source work
+continues on `feat/personal-working-candidate-features`. STATUS/#229 retain one
+exact publication and next packet; no full native admission is inferred.
+
+New guarded CLI forward **73** freezes complete dense binary candidate features
+in capture/features/OFF-policy/shadow v3 over the unchanged bounded input schema.
+Compact six-field schema/artifact references and
+`CAPTURE_DIMENSION_ORDER_BINARY_V1` arrays bind the full immutable schema once
+in the capture; exact original dimension order is decoded before core sorting.
+No candidate-only tag expands dimensions; a complete zero vector has zero
+coverage rather than unavailable features. Actual ranking-statement tags supply
+both the existing adjustment and new vector. Candidate availability stays
+`SOURCE_RANKING_STATEMENT_SNAPSHOT`, `availableAt:null`, commit UNKNOWN, with
+cutoff only an input reference. No common capture/candidate MVCC instant or
+historical availability is claimed. The immutable v1/v2 sources, cached
+comparisons/pages/reset lineage and exact OFF scorer/delivery policy remain;
+function identities/security/ACL/config, including precision72, are preserved.
+No table/API or new control assignment is introduced.
+
+The pure adapter reconstructs active v3 from frozen raw input and features,
+retargets both state and observations to the ordinal audit contract, and aliases
+all input Items/Events/UNDO targets before derivation. It checks support/vector/
+scalar agreement with finite 1e-12 independent numeric tolerance, preserving
+exact OFF. Complete scoped aliases must remain stable across later outcome
+captures/batches. Source binding keeps the candidate availability unknown.
+Candidate-specific STATIC/ORDERED support is Item-weight concentration, not
+outcome sample size/confidence. V1/v2 and inactive v3 remain explicitly
+unavailable. Owned native-producer fixtures add no observed native quality.
+
+Full engine **193/193** with built exports, final adapter **27/27**, database
+**140/140**, final candidate file **5/5**, research **19 + 23** and acceptance
+**6 + 5** pass. Actual mode/domain/V2/V3 sources, 50-candidate × 32-dimension
+bounds, inactive/overflow fallback, exact old rows/function metadata/precision,
+four drift guards and genuine V2 cursor continuation after later catalog/
+correction/reset changes are verified. The paired actual V2 large-name regression
+(two inputs, 32 valid maximum-length dimensions, 50 candidates) is accepted at
+measured **459,590 → 497,590 bytes**, below the unchanged **2 MiB** ceiling;
+this is bounded-case evidence rather than universal near-cap headroom. Root lint/typecheck/dependency **43** /
+mobile **478** / catalog contracts **3** pass; interrupted parallel catalog is
+followed by a successful serial **441** run. Cached Edge fails on missing
+`@supabase/auth-js`; complete local root check/fresh app exports/native receipt
+remain unclaimed. Independent adapter/interop review, syntax/diff and **62**
+Markdown / **291** local links / **97** anchors pass. All 72 old migrations and
+root lock retain bytes; eight reviewed function bodies retain identities and
+all metadata. Migration SHA-256:
+`988e84d61ab2ff39e6b132e7e351dca56c8733b731ec78c6dd58afe3ac42ee8e`.
+Next exact CI once, then bounded prospective enrollment and immutable own-
+exposure/latest-rating/correction capture before untouched evaluation and
+quality admission.
+All bootstrap/independent support/transfer/first-session, Taste/anonymous,
+genuine Shared, device and release gates remain. No main merge, hosted write,
+APK or account/history reset.
+
+## Frozen WorkingState order and support evaluation — 2026-10-10
+
+Exact parent #317 source `78a79dd0cfb5e49b400357443bf8d54de01cf6e7`, tree
+`105fb9abf38e88ae218628ad75bfc41f33ea6dd6`, has four required CI #627 jobs
+passed at its single continuation inspection; CLI remains in progress.
+Source work continues on `feat/personal-working-evaluation` without admitting
+native/hosted behavior or quality. STATUS/#229 own exact publication and one next
+packet; the September 30 checkpoint stays intact.
+
+The continuation inspection of current-source CI #628 (`ff136d6a5da8f4f2757be74504fdbcc750d1f6e6`,
+tree `dbff11aefb3eff9d838bff79c77f13154d0c8128`) finds four required jobs passed,
+including validation/application exports, while CLI installation/history fails
+the native exact OFF assertion. The caller's native precision setting was not
+logged. A full-schema reproduction proves rounded JSON score serialization can
+change binary values despite exact scorer/rank/policy outputs. New guarded
+forward `20261010153638_personal_working_shadow_precision.sql` sets only the
+comparison writer's function-local `extra_float_digits=3`, restoring the caller
+on return. Both source generations retain exact new scores. Existing rows,
+including previously rounded comparisons, stay immutable and may still fail an
+exact audit; neither tolerance nor historical rewriting is introduced.
+Migration SHA-256:
+`57394e07607be2df9a02197926e8cc19b904b2cea5f012295545cff25c3e7f8c`.
+
+The isolated portable audit freezes one actual OFF/STATIC/ORDERED pool, versions,
+target/horizon and disjoint pairs before labels. Control creation/availability
+and plan selection clocks cannot be substituted by the source cutoff. Typed
+reconciled outcome captures retain scope/actor/source/exposure/maturity and
+correction boundaries. One shared directional pair mask reports ordinal
+agreement/tie/disagreement; absent/unavailable evidence stays unscored and all
+planned pairs retain coverage. Synthetic metrics are separate. Batch lineage
+checks prevent the same raw observation/revision/experience or subject-Item pair
+from multiplying units; subject/session clusters are not statistical independence.
+No rating RMSE, confidence/probability, causal uplift or admission follows.
+
+Candidate-specific Item coefficients collapse all tags before weighted effective
+Item concentration is calculated under actual STATIC/ORDERED weights. This is
+component influence, not independent outcome N. The strict Kajo plan adapter uses
+real frozen source/control rows and exact OFF/policy provenance; owned SQL
+producer fixtures demonstrate interoperability, without native observed quality.
+No native prospective enrollment or outcome capture writer is delivered yet.
+Current native pools retain adjustment scalars but no complete candidate feature
+vectors; native candidate support reports `FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`
+without consulting later catalog tags. Full generic features exercise support
+diagnostics, without certifying native support.
+Fresh continuation validation: full engine **178/178** with built ESM/isolation
+graphs, full database **135/135** including actual v1/v2 SQL producer interop and
+**4/4** precision regressions, research **19 + 23** and acceptance **6 + 5** pass.
+Populated true v1/v2 artifacts exercise caller -3/0/1, exact OFF float8 bytes and
+delivery fields, cached receipt/row bytes, only approved function config changes,
+error-path restoration and injected score/rank/selection/row/body/ACL rejection.
+Native CLI adds the populated receipt and unchanged strict bridge fixture at
+caller0. Independent precision review is clean. Fresh offline root check passes
+lint/typecheck/dependency **43**/mobile **478**/catalog **444** (**441** scripts plus
+**3** contracts), then Edge registry loading is interrupted (130); cached-only
+fails on missing `@supabase/auth-js` metadata. Complete local root check, fresh
+application exports and native execution remain unclaimed. Docker/local advisors
+remain unavailable. All **62** Markdown
+files, **291** local links and **97** anchors resolve; syntax/diff checks pass.
+All **71** previous migrations, old engine/scoring source and root lockfile
+retain bytes; this config repair is migration **72**.
+Next repaired exact CI once, then versioned native candidate-feature freezing with old
+captures and exact OFF preserved, followed by prospective enrollment/own exposed latest-rating
+correction capture, a preregistered untouched evaluation window and observed
+coverage before quality. Preserve V1 reward meaning, bootstrap/independent
+support/transfer/first-session, Taste/anonymous, genuine Shared, device and all
+release gates. No main merge, hosted write, APK or account/history reset.
+
+## Bounded private native WorkingState reset controls — 2026-10-10
+
+Exact parent #316 source `0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a` contains
+the finite 1e-12 vector-oracle repair; OFF/nonnumeric/source bytes stay exact.
+At the single CI #626 inspection validation/exports, platform/defaults, two clean
+native installations and populated upgrade pass; CLI remains in progress.
+Source work on `feat/personal-working-reset` overlaps without claiming native
+admission. STATUS/#229 own exact publication and one resumable task.
+
+The new CLI-generated forward adds a private immutable scoped reset-control
+ledger and API-denied security-invoker controller. Reauthorized exact receipts
+precede quota/time checks; new writes require READ COMMITTED and a post-lock
+server instant. There are at most 128 controls per actor/PersonalProfile/session.
+Capture v2 reads full cutoff-visible controls together with its bounded complete
+Item/correction prefix in one MVCC statement, freezes latest resetAt and excludes
+at-or-before taste/activity. Reset adds no taste, history deletion, clock refresh
+or four-hour session renewal. Control overflow abstains without partial evidence.
+New features/off-policy v2 retain exact default OFF; v1 frozen sources/shadows,
+page retries and copied V2 windows remain supported. Future fresh pages see resets.
+
+Raw controls survive forecast-only erasure to prevent stale-intent resurrection;
+actual User/Profile/session cascade removes them. API denial, parent-only immutable
+guard and old-object/row preservation remain enforced. All 70 previous migration
+files and root lockfile retain bytes. Existing native CLI acceptance gains bounded
+populated/runtime probes and independently connected reset-ID/Profile/quota and
+source-erasure lock races with exact owned cleanup. Migration SHA-256:
+`402250688e24c3862f61c2d2448d35a715c5016bf611da84501224fdd07f774b`;
+eight exact guarded function-body transforms preserve old identities/metadata.
+Full database **130**, affected **22**, concurrency fixture/source **3**, engine
+**137**, research **19 Python + 23 Node** and acceptance **6 + 5** pass.
+The old bridge runtime smoke passes on the latest schema. Independent reviews,
+syntax/diff and **62 Markdown / 287 local links / 93 heading references** pass.
+Fresh root lint/types, dependency **43**, mobile **478** and catalog **444** pass
+before Deno registry Connection refused (exit 1); no full root/fresh export pass.
+Local Docker/live advisors are unavailable (local54322
+connection refused); source/PGlite tests do not certify actual races or quality.
+
+Next resolve exact CI once, then prospective versioned OFF/STATIC/ORDERED quality
+and effective independent support/bootstrap/transfer/first-session evidence.
+Public reset UI/API, adaptive Taste/anonymous prerequisites, genuine #232F Shared,
+#306, #229 device/fresh-account, planned group/today flow and all release gates
+remain open. No main merge, hosted write, APK or account/history reset.
+
+## Native WorkingState numeric comparison repair — 2026-10-10
+
+PR #316 source `7593e7b397134778fb1ac041e2d312cbd321125d` fails CI #625
+validation only at a seeded SQL/JavaScript ordered-vector strict-equality check,
+with roughly 8e-17 last-digit roundoff. Platform/defaults passed; other native
+gates were in progress/skipped at the single inspection, not accepted. Scalar
+vector parity now requires exact keys, finite numbers and 1e-12 tolerance;
+state/provenance and genuine OFF scores/ranks/selection stay exact. The concrete
+CI pair passes and material differences, malformed numbers and missing/extra
+controls/features fail. Final affected **13/13** pass; full database
+**118/118** passes. Independent review and syntax/diff pass. All **70**
+migration files, runtime source and lockfile remain unchanged. STATUS/#229 own
+new exact-source CI and the gated next native reset lifecycle/control task.
+
+## Native Personal WorkingState capture and frozen controls — 2026-10-10
+
+Exact parent #315 source `523d8eb6eb45045da6f9b9c4327b96b3a5d036ea` passes
+all five required CI #624 jobs at the single continuation lookup. Current source
+is `feat/personal-working-bridge`; STATUS/#229 own publication and the one next
+task while preserving the complete September 30 checkpoint.
+
+The new CLI-generated forward freezes authorized Personal session/correction
+closure and current Item-tag features in one bounded MVCC statement. Both native
+rankers consume versioned capture/features with exact default OFF scores. Shared
+remains without this capture. The precise Personal policy suffix is accepted by
+V2 windows; copied continuation preserves the original source while V3 captures
+new evidence. Native no-session/empty/overflow or unsupported-source/precision
+captures remain inert, with no partial evidence or invented dimensions; portable
+input validation stays strict. Actual owner-only private immutable
+OFF/STATIC/ORDERED comparisons rescore frozen candidates with the original genome
+and final delivery policy, rerank/reselect and follow source/actor/Profile erasure.
+This is not new evaluation support, automatic admission, serving ON, reset or UI.
+
+Four guarded old-body edits preserve metadata and old rows; all 69 older
+migrations and lockfile remain unchanged. Existing CLI gates gain populated-upgrade
+and runtime capture/consumer probes. Validation: database **117/117**, engine **137/137** plus built ESM/import graphs, research **19 Python + 23 Node** and acceptance **6 + 5** pass.
+Tests cover all V2/V3/domain/mode combinations, copied continuation, 24 seeded
+prefixes/480 Events/72 numeric controls, source/precision/resource fallbacks,
+corrections and authorization/immutability/erasure. Independent reviews pass.
+Fresh root lint/types, dependency **43**, mobile **478**, catalog **444** pass before Deno registry
+connection refusal; no complete root/export/native/advisor pass is claimed.
+
+Continue exact-source CI once, then bounded native reset lifecycle/control with
+frozen-source, retry and scope tests. Prospective OFF/STATIC/ORDERED quality,
+effective independent support/bootstrap and real first-session usefulness follow. Anonymous prerequisites precede real adaptive Taste.
+Genuine #232F Shared consumption, #306, #229 configured-device/fresh-account,
+planned consent-based 2–5 group/five-option today flow and all release gates remain.
+No main merge, hosted write, APK or account/data reset.
+
+## Bounded Personal session state and next social planning — 2026-10-09
+
+Continue from exact #314 source `b822fcadf9b9c78eeeaf213ac2543dd52467810e`.
+CI #623 completed failure only in the CLI gate; the other four required jobs,
+including full validation/exports and native installation/upgrade, passed. The
+CLI fixture's five legitimate system Lists require an initialized full snapshot
+for active checks and the original full snapshot for owned-cleanup restoration.
+The correction preserves all 17 relation count/hash checks and race/cleanup rules.
+
+The owner queues compact consent-based 2–5-person creation under 16.2 and a bounded
+five-option Shared “watch/read today” session under 16.4 after round/rewatch
+evidence. Initial adaptive Taste remains required before release. Planned session
+veto/seen replacement neither rewrites history nor supplies confirmed group
+outcomes; all requirements remain open. Product/domain documents own semantics.
+
+The completed separate `./working-state` and `./adapters/kajo-working-state`
+source exports represent bounded ordered Personal session intent with independent
+latest Item support, complete correction closure, selective clear/UNDO, equal-time
+ambiguity and explicit reset/expiry. Default bounds are 128 records/32 Items/32
+features/256 invalidations, two distinct Items, four-hour session/30-minute idle
+and a ±0.25 uncalibrated component. Only selected-session Item-linked activity
+refreshes the clock; other-session corrections cannot import taste. OFF is default,
+with explicit STATIC/ORDERED controls. Stored creation is an availability proxy,
+not commit certification. Native serving, Shared algorithms and old E1/scalar/
+frozen traces remain unchanged; native admission and MVP-ALG-004 stay open.
+
+Database **105/105**, engine **137/137** plus built ESM/import graphs, research
+**19 Python + 23 Node** and acceptance **6 + 5** pass. New **60** unit tests,
+actual full-schema command bridge and
+full initialized/original canonical-snapshot regression pass, including final
+strengthened cross-session correction/UNDO and old Event/receipt/run preservation.
+Independent review, syntax/diff and **62 Markdown / 283 local-link / 89 heading**
+audits pass; all **69** migrations and the root lockfile retain bytes. Fresh root lint/typecheck, dependency **43**, mobile **478** and catalog
+**444** pass before Deno registry `Connection refused` (exit 1). No complete
+local root or fresh application-export pass is claimed; application source/build
+inputs are unchanged in this packet.
+STATUS/#229 own exact publication and one current handoff to a bounded native
+Personal capture/consumer bridge with versioned shadow/static/off admission.
+
+## Native memory/scoring parity and execution audit — 2026-10-09
+
+The owner requests continuation, a current-documentation audit and future-aware
+resequencing. Published #313 source `16e8e64a382fa07fd49b78815dc1339d0fa3d72a`
+is the exact parent; CI #622 remains in progress at the single continuation
+lookup. The audit finds no broken active local links, but corrects stale
+portable-foundation, publication, UI-disposition and anonymous-dependency
+summaries while preserving dated evidence and outstanding acceptance.
+
+ROADMAP prioritizes the Personal BOOK/MOVIE vertical slice through native memory/
+serving parity, ordered session/state policy and adaptive Taste/frozen challenge.
+Independent Shared/source/native/device work can proceed alongside it; the
+genuine #232F consumer and all first-release requirements remain queued gates.
+Anonymous identity and minimum retention/abuse/measurement precede real Taste
+acceptance. Advanced group models, optional public-data model admission and
+later engine generations do not serialize every Personal source increment.
+
+The completed source correction removes the serving-only native 365-day clamp
+through the shared private unclamped 180-day helper. New live metadata names
+`native-long-term-decay-v2` / `prediction-v0.5-native-decay`. Finite native
+Event/UNDO occurrence cutoffs exclude future/nonfinite inputs;
+`nativeEvidenceAsOf` discloses the existing distinct memory/base clocks, without
+claiming commit-time availability. Strengths, ShortTerm, bootstrap floor,
+structural features/genomes and old frozen replay remain preserved. The pinned
+CLI-generated forward SHA-256 is
+`fb1bdb933a287b4d2942cc821162a712ccb2669bf80e63fa72d93798bd0f6f98`.
+
+Full database **103/103**, final populated/frozen-parity target, engine **77**,
+research **19 Python + 23 Node**, acceptance **6 + 5**, independent review and
+syntax/diff checks pass. All 62 Markdown files / 279 local links resolve.
+Fresh root lint/types, dependency **43**, mobile **478** and catalog **444** pass
+before Deno registry connection refusal; separate application smoke fails closed
+without local production Supabase configuration. No complete root/export/native
+activation or measured-quality pass is claimed. The existing required CLI gate
+now includes populated upgrade and live math/serving/frozen-parity stages; Docker
+native execution remains CI evidence. All 68 earlier migrations and lockfile
+are unchanged. STATUS and #229 own the one exact publication/continuation;
+Phase 14 remains open.
+
+## Prepared pre-first-response prediction input — 2026-10-09 / #232F
+
+The continuation starts from published #312 source
+`6708f2a56ba61385898d8dd5ed823095a3d2b25b`, with CI #621 still in progress at
+the single continuation lookup. The next bounded input producer freezes the
+whole current enrollment and zero-response OPEN/RECONFIRM prefix before any
+answer in the target experience, plus explicit same-roster prior outcome
+captures. Unknown, clear and old-set answers reject a new first-response capture.
+Private immutable source dependencies remove whole copied inputs during source
+withdrawal, and guarded owner preparation covers current/former copied actors.
+`INPUT_CAPTURE_ONLY` keeps actual forecast consumption unrecorded and historical
+feature/learning/reward admission closed. Existing serving and ordinal behavior
+remain unchanged. Final source passes database **102/102**, engine **77/77**
+plus built ESM graph checks, research **19 Python + 23 Node** and acceptance
+**6 + 5**. Root lint/types, dependency **43**, mobile **478** and catalog **444**
+checks pass before Deno registry `Connection refused`; no complete local check
+or fresh application-export claim is made. Populated preservation negative
+controls and the complete enrollment/prefix/source/erasure matrix pass, including
+legacy UUID/numeric spellings and exact retries at stronger isolation.
+Independent source reviews pass; old migrations and root lockfile remain exact.
+Nine independent-session lock orders join the required native CLI gate, but
+Docker/native execution and live security advisors are unavailable locally.
+STATUS owns exact source publication, #229's preserved handoff and the genuine
+consumer lineage that follows. Source tests/probe implementation do not close
+native, measured-quality, learning, device or Phase 14 acceptance.
+
+## Portable exposed-outcome ordinal audit — 2026-10-08 / #232E
+
+The owner's long continuation advances from narrow #311 startup lifecycle source
+`c3b98bbaf1f4c7cb26b2a3f7c76ced6c6503e873`; its new #620 native CI acceptance
+remains open at publication. The separate portable pair/batch evaluator and strict
+Kajo snapshot adapter declare a complete exposed-vector Pareto target against
+both Items from one frozen production/shadow pool. Required scoped member/
+enrollment handles, own per-actor exposure, versions/windows, zero/ties/missing/
+disagreement, maturity and pre-OPEN stored-clock boundaries are executable guards.
+The owner-only offline command writes bounded private non-overlapping audit
+reports outside Git with fixed errors and no overwrite/network/database writes.
+
+Media and non-media generated fixtures supply zero observed quality labels;
+actual existing SQL producers feed a disposable PGlite adapter/CLI test, including
+new-capture correction identity and immutable earlier replay. Source/ESM checks
+preserve the independent root/ordinal graphs. This does not change SQL serving,
+weights, stored metrics, rewards or promotion. Membership/commit/selection remain
+historically unproven, independence unestablished, uncertainty unavailable and
+learning/historical feature admission closed. STATUS owns validation/publication
+and the prospective membership/prefix/consumer lineage gate that follows.
+Final source passes database 101/101, engine 77/77 with real ESM graph checks,
+adapter 21/21, core 12/12, combined CLI/SQL bridge 11/11 and research 19 Python +
+23 Node. Final engine lint/types and independent reviews pass. Root check again
+stops at Deno registry Connection refused after available earlier stages pass;
+no complete local pass, measured native quality, hosted activation or main merge
+is claimed. Parent application/four-export evidence and all migration/lockfile
+hashes remain intact.
+
+The owner explicitly authorized public publication on 2026-10-09 with
+**"Saat julkaista"**, resolving the previous automatic review block. The validated
+implementation remains `5235db39aacdca10913a13656a04c99d8199b425`; authorization/
+handoff follow-ups change documentation only. Publish #232E on the existing
+`Kajooja/Kajo` remote and record its exact resulting PR/source/tree/run in the
+single active #229 handoff. STATUS owns the subsequent required-gate inspection
+and bounded prospective evidence work; all completed validation remains unchanged.
+
+## Isolated CI startup lifecycle — 2026-10-08 / #232
+
+Completed #310 / CI #618 passes validate, platform/defaults, populated upgrade
+and CLI history/runtime, including actual independent worker/eraser races in
+both lock orders. Its first two-install stack startup fails before application
+SQL with the same mixed symptoms as #617. #310 remains an unmerged source packet
+with one failed required gate; its backend APK is intentionally skipped.
+
+The narrow helper repair adds sanitized terminal/process diagnostics and bounded
+owned-container/resource state, separates recovered pull warnings from exact
+pinned CLI fatal templates, rejects pre-existing labelled/named project resources
+before startup, verifies cleanup absence and preserves both primary and cleanup
+failures. Owned workspace removal still runs if CLI stop fails. No outer startup
+retry, image/version/port change or application SQL retry is introduced. Local
+process fixtures pass 24/24 plus a final 2/2 assertion recheck; the complete
+database sweep passes 97/97. Independent final review finds no blocker. Lint/
+types, locally available non-edge suites and all four production Hermes exports
+pass. Root check reaches Deno registry dependency retrieval, with no complete
+local pass claimed. The native startup cause remains unconfirmed; these fixtures
+are not native installation acceptance. A finite dependent-packet #619 inspection
+now confirms platform, validate and two clean installs pass, with populated upgrade
+failing before startup on unavailable container-list inventory and CLI still
+running. A follow-up uses a bounded 30-second operational inventory budget plus
+fixed process/phase/exit diagnostics; default diagnostic snapshots keep five-second
+reads. It does not retry or infer a confirmed root cause from missing state. Its
+required new run remains separate. Final startup/readiness tests pass 27/27 and
+the complete final database sweep passes 100/100. Independent review finds no
+blocker. Fresh root check stops at Deno registry Connection refused after
+available gates pass. STATUS owns the single
+active handoff; portable Shared ordinal evaluation follows separately without
+changing serving or admitting historical features/group reward.
+
+## Closed prediction-source preparation — 2026-10-08 / #232D
+
+The owner's continuation starts from #309 source
+`0d756feb78dfa6e7fab24108a3ec7b215d24c59b`. CI #617 passed four gates,
+including native #232C visibility/replay, while two-clean-installations failed
+in Supabase startup before application SQL. One failed-job rerun was requested
+without changing source; a single completed verification confirms all five
+#617 gates now pass. Mixed diagnostic
+symptoms are not an automatic-retry rule. No progress polling or backend APK
+request is added; main/hosted/device acceptance remains separate.
+
+The bounded forward adds closed owner source preparation and exact transaction/
+backend/row DELETE permissions, preserving ordinary immutability. Real page
+descendants, shadow dependencies, copied comparison traces and whole affected
+GLOBAL/shrunk PROFILE evaluation batches are erased atomically. Unresolved
+promotion/assignment/rollback influence blocks before writes. The first-lock
+lifecycle gate serializes declared source/evidence writers against preparation.
+Actual User/Profile roots remain for owner deletion in the same transaction;
+residual canonical Item-state restrictions are still atomic and explicit.
+Automatic account lifecycle and concurrent import/bootstrap integration are
+not activated. Final migration SHA-256:
+`d0a2de045fccf4fb5f1413ad3c24054f5c3c7a87f6cb186829ff39d1e7aab671`.
+The complete database sweep passes **90/90**, and the final combined focused
+recheck passes **2/2**, including the NULL promotion-allowance escape, copied
+orphan windows, all15 exact body changes, API/permit guards and residual root
+restrictions. Independent final review finds no blocker. Lint/types, locally
+available non-edge suites and all four production Hermes exports pass; local
+root check stops at Deno registry Connection refused. Native worker/eraser proof
+is in required CI, with no local native or all-writer race claim. Historical
+page-forward scorer preservation is asserted before later approved lifecycle
+changes, then current runtime still runs against the full chain. STATUS owns
+publication and the next metric gate; source erasure does not itself improve
+prediction quality or admit a joint reward.
+
+## Frozen observed Shared outcomes — 2026-10-08 / #232C
+
+The owner's continuation starts from exact #308 source
+`70891b757dca5d01d245b9fbaf4f6cd6e0e73288`. All five #616 gates pass, including
+independent-session commit visibility; its backend APK is deliberately skipped.
+Separate #306/#614 also completes its labelled APK. These remain source results,
+not main/hosted/device acceptance. The prior dated entries are preserved below.
+
+The additive capture freezes the outcome JSON actually observed, selected
+receipt/revision, cutoffs/maturity/versions and server observation time. Exact
+ID retries replay stored JSON; new commits/exposure/corrections need new IDs.
+An immutable receipt foreign key supports independent capture before a newer
+response commits and cascades successful source erasure into comparisons.
+The paired-support artifact freezes the same vector and common actor-specific
+support mask for production/shadow under an explicit evaluation window and
+strict matching frozen candidate metadata. Missing support remains diagnostic;
+metrics/advantage/group reward and learning remain unavailable.
+
+Final migration hash is
+`d018d6d5901e690991e7b3bd35b5f000d8ceec79739c51cf17abbb7a1a5a793e`.
+The full database sweep passes **89/89** and the final focused recheck adds
+explicit REPEATABLE READ/SERIALIZABLE allocation rejection with preserved exact
+retry/replay. Independent review finds no source blocker. Lint/types and all
+locally available suites plus four production Hermes exports pass; root check
+stops at Deno registry Connection refused. Native execution remains required CI.
+Native CLI proof must complete an older-prefix capture while the final response
+is still uncommitted, then show unchanged stored replay and an advancing new
+capture. Populated/rollback matrices preserve every old object/row/ACL and prove
+retry, correction, zero/unknown/N-member support, quotas and derived erasure.
+
+Review identifies an inherited blocker: processed SleepLayer shadow artifacts
+can prevent source User/Profile deletion through old foreign keys and immutable
+DELETE triggers. The new packet tests and records the rollback boundary rather
+than claiming full erasure. The next bounded source repairs that old dependency
+with authorized deletion, retained ordinary immutability and populated/native
+scope/rollback proof before any joint metric admission or hosted activation.
+The subsequent target/metric must use real exposed outcomes and these frozen
+vectors. Historical feature availability, #306 integration, Phase 16.3 UI and
+MVP acceptance stay separate and open; no external-data operation is repeated.
+
+## Receipt-prefix Shared round outcomes — 2026-10-08 / #232B
+
+The owner asks to continue. All five #307 / CI #615 gates pass, including native
+round races and the populated rehearsal; its unrequested backend APK is skipped
+intentionally. Separate #306 / CI #614 also passes all five gates, with its
+labelled APK still in progress at the one-time inspection. Those are source
+checks, not main/hosted/device acceptance.
+
+The next bounded source implements `shared-round-outcome-v1` over immutable
+command prefixes. Participant sets and individual 0–10/unknown/cleared/missing
+responses survive cutoff replay, corrections, cancellation and reconfirmation.
+Maturity is a declared elapsed window; late exposure remains per response and
+cannot borrow another actor's trace. Minimum/spread and coverage are descriptive;
+one round is one observation unit. No scalar reward, group satisfaction or
+learning activation follows from completion.
+
+Historical membership between commands and actual commit visibility are unknown.
+The reader explicitly withholds historical feature eligibility. An independent
+native reader/holder proof must demonstrate that the same acceptance-time cutoff
+can gain a receipt after commit, rather than falsely claim frozen replay from a
+timestamp. Populated upgrades preserve all existing rows/functions/ACLs/receipts;
+new matrices verify temporal and privacy boundaries without altering old readers.
+STATUS owns final source hashes, validation, publication and the exact next
+visible-prefix/evaluation-admission packet. Phase 16.3 UI and MVP gates stay open;
+no hosted deployment, history reset, external-data operation or model promotion
+is part of this packet.
+
+Final source SHA-256 is
+`2fbab2b59e796138d18895b2fe8c1213ff2c7e9cfa8df57bb8af79e85ca3a85f`.
+The complete final database sweep passes **88/88**, and independent review finds
+no blocker. Lint/types and all locally available dependency/mobile/catalog/
+engine/research/acceptance suites plus four production Hermes exports pass.
+Root check stops at Deno registry Connection refused; Docker/native visibility
+execution remains required CI evidence. No complete local root/native pass or
+hosted application is claimed.
+
+## Working APK and Shared evidence continuation — 2026-10-08 / #232
+
+CI #612 passed all five required gates and APK on #305 source `36a788d`,
+including the previously pending native cancellation/rollback, populated upgrade
+and concurrency checks. The owner reports the current APK works and selects
+continued roadmap implementation. DEVICE_TEST records positive acceptance of
+the exercised append/layout correction without inventing an installed checksum,
+device/OS or unreported subcase. Broader #229 and release gates stay open.
+
+The next distinct Phase 14.1 implementation is #232's SharedRatingRound evidence
+foundation: freeze participants, preserve each actor's response and prediction
+origin, and distinguish pending/completed/corrected/cancelled evidence without
+inventing group reward. Legacy one-actor Shared history is retained as legacy;
+no responses are backfilled. Coordinated UI belongs to Phase 16.3, while
+versioned joint outcome/eligibility and learning remain Phase 14 dependencies.
+STATUS owns the exact branch, validation and subsequent bounded action.
+
+Delivered source: `20261008122349_shared_rating_round_evidence.sql`, hash
+`4e80e0daadaa537e85bb14ce11fffb3f4fc263164e4db3ee7182f4be75514796`.
+The final 87-test database sweep passes, including populated preservation and
+the expanded participant/origin/retry/correction/deletion/capacity matrix.
+Independent review found no blocker; native observed-blocker races remain
+mandatory CI evidence. Lint/types and remaining locally available suites/four
+exports pass; Deno registry Connection refused prevents claiming a complete
+local root check. The next bounded algorithm dependency is the versioned as-of
+joint outcome/replay reader, before these response vectors enter learning.
+The independently found Shared overlay exclusion bypass has a separate narrow
+correction in #306; preserve both sets of CLI probes when integrating.
+
+## Shell-quote audit recovery after CI #611 — 2026-10-08 / #305
+
+CI #611 on `da376700fc24bae894383533f11e6168da74e36d` stopped at the fresh
+dependency audit: shell-quote 1.10.0 had one critical unmitigated finding,
+GHSA-pqg4-j6r4-53mv. Platform and two clean installations passed; CLI, populated
+upgrade and APK were skipped. The preceding timeout correction is still native
+acceptance work, not a newly reproduced timeout failure.
+
+The compatible lock leaf now uses upstream 1.11.0; React DevTools 6.1.5 accepts
+it under ^1.6.1 without changing the parent or framework graph. Line-terminator
+rejection after comment tokens and ordinary editor/argument parsing are covered
+against the actual installed consumer. The existing verified braces/forge fixes,
+raw advisory reporting and all five gates remain required. STATUS owns final
+validation, the dated exact-lock audit receipt and the one-time replacement-run
+handoff. No hosted migration/data reset, main merge or #229 acceptance is implied.
+
+## CLI command deadline after CI #610 — 2026-10-07 / #305
+
+The owner reported #610 failed on `b1c7ad`. Four mandatory jobs passed;
+CLI installation/history ended with Docker ETIMEDOUT after reset 15, before the
+new populated-chain upgrade completed, so APK was skipped. Unlabelled operation
+errors cannot distinguish the two following Docker inspections from SQL work;
+no native planner or deployed-forward cause is proven by that log.
+
+Fixed operation/stage labels, elapsed-time reporting, bounded named SQL budgets
+and server statement/lock limits now make the failure actionable. The native
+deadline canary must prove server cancellation and transaction rollback.
+Populated chain upgrade reuses the compact candidate-pool fixture while retaining
+all old receipt/window/page and row/OID/owner/ACL/function parity checks.
+Full 145/domain traversal, actual 1000 cap, provenance and real concurrency remain
+required. CLI's 25-minute outer job and all five APK gates remain unchanged.
+Deployed SQL bytes and existing hosted data are untouched. STATUS owns final
+verification/publication and one-time replacement-run handoff; no CI polling.
+
+## Catalog append, compact layout and later-page evidence — 2026-10-06 / #199
+
+CI #607 on `00f0bad` passed all five mandatory jobs and produced APK, resolving the
+recorded #304 transport/build failure. The owner reports phone 4–6 passed;
+BOOK/MOVIE end pull/button 1–3 still fail by resetting the same bounded search.
+No exact installed artifact/device identity was supplied.
+
+The owner requested all corrections now and a bounded next repository step.
+Protocol 3 adds server-owned prefix exclusion before bounded ranking admission,
+fresh immutable per-page runs, scoped cursor/receipt retries and distinct
+eligible-catalogue exhaustion versus reader-limit states. Legacy 1/2 and deployed
+SQL bytes stay unchanged. The mobile list appends without replacing its view,
+uses bottom-viewport downward gestures and keeps per-Item prediction origins.
+Header controls share one row and redundant nested bottom/grid space is removed;
+the actual dock/system safearea remains.
+
+Phase 14.1/14.2 acceptance extends to 120+ eligible Items per domain and later-page
+zero-rating/late exposure/frozen replay/evaluation. This is the next independent
+bounded task; no new catalogue acquisition or later-phase identity/social work.
+STATUS owns exact new-forward rollout, publication/check results and next APK.
+Phone acceptance and remaining #229 release gaps stay separate; preserve data.
+
+Validation/rollout: 478 mobile tests, root lint/typechecks, dependency/catalog/
+engine/research/acceptance suites and main/acceptance iOS/Android exports passed.
+The corrected catalogue-chain full-schema case passed after the sweep's actor
+error-classification correction; independent later-page provenance passed at
+both float settings. Deno registry access was refused locally; Docker/native
+Supabase/CLI/concurrency still require CI. All gates remain mandatory.
+
+Reviewed source `5089d0abb65965c669fa540de9a025e34f92f178` supplied the exact SQL
+SHA-256 `8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8`.
+Only the new forward was applied to preflighted project `mwrnvfosrzwygrunrltm` as
+provider `20261006143148/catalog_prediction_chain`; filename now matches tracking
+with unchanged bytes. Full prior function owners/ACLs and 152 unrelated bodies
+survived; only the private dispatcher changed, with five owner-only helpers and
+three RLS/API-denied tables added. Existing application row hashes stayed equal.
+Hosted rollback probe verified 80 distinct Items/four pages for each BOOK/MOVIE;
+57 old authorized receipts replay unchanged. Exact receipt:
+[rollout](../catalog-chain-rollout-2026-10-06.json). Main/#229 acceptance stays open.
+
+## CLI Data API recovery after CI #606 — 2026-10-06 / #304
+
+CI #606 passed validate (fresh security audit, Deno and four exports), platform,
+two clean installations and populated upgrade. CLI installation/history alone
+failed with `fetch failed` in its local catalog RPC transport, so its dependent
+APK was skipped. The old log cannot establish which RPC or transport cause;
+the source and runner-allocation failures from earlier attempts are distinct.
+
+Before each RPC, the isolated harness now requires a successful read-only Items
+query. Twenty bounded readiness attempts cover recognized temporary transport
+errors, owned timeouts and gateway 502/503/504; permission/schema/malformed
+responses fail immediately. IPv4 loopback and closed connections avoid resolver
+and pooled-socket dependencies across resets. The POST is sent exactly once,
+with its original response assertions retained. Fixed reset/RPC sequence labels
+and sanitized cause codes give actionable diagnostics without credentials.
+
+The full local database suite passed 81 tests; the final targeted suite passed
+15, including actual loopback socket failure and stalled-body timeout recovery.
+Root lint/typechecks, dependency/mobile/catalog tests passed, then Deno lockfile
+resolution failed on the local refused npm-registry connection.
+Local Docker is unavailable, so GitHub still owns actual Supabase stack/runtime
+verification. All five original gates remain mandatory before APK. STATUS owns
+the next labelled PR head and the owner's no-polling build handoff.
+
+## APK retry and dependency-script portability — 2026-10-06 / #304
+
+CI #605 attempt 1 failed in hosted-runner allocation before any steps ran.
+Attempt 2 passed platform and two-clean-installation gates, but validate again
+acquired no runner; the remaining dependent jobs, including APK, were skipped.
+GitHub's corresponding global Actions incident is resolved at this checkpoint.
+STATUS owns the exact source and owner handoff.
+
+The retry review corrected Windows postinstall path containment and direct
+`npm.cmd` execution. Native path-relative containment rejects root/sibling/other-
+drive escapes. npm-run audit invokes the CLI through Node without a shell;
+direct Windows invocation uses a fixed command via `cmd.exe`. Portable fixtures
+cover Windows/POSIX path rules and CLI filenames with spaces/metacharacters;
+no native Windows runtime is claimed.
+
+Fresh audit found two additional high advisory leaves, compression and
+source-map-js. Their published fixes 1.8.2 / 1.2.2 fit the existing Expo CLI /
+PostCSS ranges. Only those lock entries and compression's existing destroy edge
+are refreshed. Security regressions exercise aborted compression streams and
+bounded source-map offsets while preserving ordinary map use.
+
+Local validation: clean npm installation and the fresh verified audit passed.
+All 39 dependency tests, mobile/catalog suites, database/engine/research/acceptance
+suites, lint, typechecks and all four Hermes exports passed. `npm run check`
+stopped at the Deno registry connection refused by this local environment.
+The complete CI Deno check and all five native gates remain required; this
+checkpoint claims no completed CI/APK or physical-device acceptance.
+
+The owner requested another APK build without polling after launch. Publishing
+the new head of labelled PR #304 requests that run behind all five normal gates;
+build completion and the six-case configured-device round remain open.
+
+## APK audit recovery — 2026-10-05 / #238
+
+The owner-requested terminal-refresh APK dispatch CI #603 failed in the fresh npm
+audit: two upstream advisories produced 19 high-severity package findings. No APK
+was built. Latest published braces 3.0.3 and node-forge 1.4.0 remain affected.
+The owner requested correction and another APK run, with completion followed by
+the owner. STATUS owns the active source/run identity.
+
+The narrow correction installs hash-checked depth guards in braces parse/compile/
+expand/stringify and strict RSA DigestAlgorithm element count plus empty-NULL
+validation. Real negative controls reproduce both upstream defects; regression
+coverage preserves normal Metro matching, standard RSA signatures and PSS.
+A verified audit keeps raw upstream findings visible, verifies every locked copy
+and executes the security tests before classifying only those two corrected
+advisories. Unknown/new findings and verification/transport failures still block.
+No package alias, framework downgrade or blanket severity exception is introduced.
+
+The CI `build-android-apk` label explicitly requests a same-repository PR build
+behind all five existing gates; its artifact is bound to the PR merge checkout.
+This source leaves #301/#229 unmerged and all phone acceptance open. The six-case
+owner follow-up is recorded in DEVICE_TEST. No hosted/data changes are included.
+
+Local validation: clean installation, fresh verified audit and all 20 added
+security/audit regressions pass, including both distributed forge browser bundles.
+The root check passed lint, types, dependencies, mobile and catalog suites, then
+stopped at Deno's refused registry connection in this environment. Database,
+engine, research and acceptance suites passed separately, as did all four Hermes
+smoke exports. The complete Deno and isolated platform/installation gates remain
+mandatory in the new GitHub run; no completed CI or APK is claimed here.
+
+## Phone recovery result and terminal refresh — 2026-09-30 / #199 / #240
+
+The owner reports successful network loss/reconnection. The actual installed
+run/SHA, device/OS and page were not supplied; retain this basic positive result
+without claiming the remaining native/recovery/fresh-account gates. Issue #240
+records its scope. The existing CI #596 APK remains the requested test source.
+
+The BOOK end notice instructs pull-to-refresh but native refresh is only available
+at the top. #199 records this new defect. The focused source branch
+`fix/199-discovery-end-refresh` adds a terminal-notice downward gesture and
+accessible refresh button, reusing the same reader and Shared refresh boundary.
+Short/upward/sideways gestures are ignored, repeat triggers coalesce and unmounted
+footer callbacks cannot act on a changed Profile/request. Six focused component
+regressions cover these behaviors. Root checks/CI and physical gesture acceptance
+are separate; a corrected APK is needed for the new terminal repeat. No deployed
+migration, data, account or existing operation is changed. STATUS owns continuation
+and DEVICE_TEST records the owner-facing repeat; broader #199 UI work stays in
+its existing ROADMAP slot.
+
 ## Native document reconciliation and fixed APK source — 2026-09-30
 
 Security PR #299 is accepted on main `1c26e0d72d30662f70c3cf061790cd2672443f43`
@@ -33,6 +1044,7 @@ conclusion/artifact and that frozen SHA own binary identity; the document merge
 does not constitute a different application build or device observation.
 Configured-device #240 recovery and remaining native/fresh-account observations
 remain the single next packet after these source/build checks. #229 stays draft.
+
 
 ## Branch cleanup and standalone audit correction — 2026-09-30 / #229 / #238
 
@@ -114,6 +1126,65 @@ September 28 retrospective now agree on source versus runtime acceptance and
 execution ownership. Historical entries below remain dated evidence; their old
 next-task directives are superseded by current STATUS.
 
+Accepted handoff PR #298 is on main
+`70d78daa8d5e587f84a5802b986aefd1f9fa55ad` after all five CI #591 gates.
+This documentation-only integration preserves native source and its complete
+historical record. Native checkpoint `6ed685d` passed all five CI #590 gates,
+1,049 tests/four exports; the latest combined PR head requires its own checks.
+STATUS owns the current source/device continuation. No runtime, SQL or dependency
+change and no device acceptance follows from this merge.
+
+## Accepted dependency/native integration checkpoint — 2026-09-29 / #229
+
+PRs #294, #295 and #296 are accepted source on main. Native draft #229 separately
+passed all five CI #584 gates after reconciliation through #295 and bounded #240
+recovery. This continuation integrates accepted #296 into that native source.
+The combined lock has a fresh zero-advisory audit (571 production / 936 total
+dependencies), recorded under SHA256
+`cb30bd8bb84fb2d3dac65e751092bd10e877ea0c06cdc83c58f20f1cdc71f7b9`.
+Five fetch test mocks now declare one explicit transport signature for Vitest 4
+and retain SDK compatibility checks; 410 mobile and five dependency regressions
+pass. Exact-head five-gate CI remains required before source acceptance. Preserve native/fresh-account/device observations and historical SQL
+bytes. STATUS owns the current bounded next action; the dated deliveries below
+retain their original scopes. No new device observation or hosted rollout is
+inferred from the two predecessor CI runs.
+
+## Native reconciliation and reconnect correction — 2026-09-28 / #228 / #240
+
+Reconciled the older draft #229 against accepted main through PR #295, retaining
+current catalog attribution and cold canonical detail/history tests. The nine
+conflicts covered four app files, three canonical documents and two database
+probe runners. Both sets of independent concurrency/upgrade probes remain;
+already deployed SQL is byte-identical. Tests that previously addressed the
+removed global Item cache now exercise immutable delivered slates and canonical
+cold reads. Collection history keeps render-time ownership checks through rapid
+A → B → A, collection revisions and ItemType changes.
+
+#240 uses SDK-57 `expo-network` with focus and AppState lifecycle ownership.
+Recovery retains exact failed request/context/cursor, accepted prefix and timeout;
+coalescing and a three-attempt budget prevent a notification storm. The previous
+error stays through the pending retry and clears only on success. Expiry is still
+explicit new search. Focused tests cover first/next pages, backend failure, network
+flapping, deadlines/late responses, scope changes, stale initial reachability and
+background/unmount cancellation. No action/exposure queue is reset or synthesized.
+
+Local lint/typecheck, 410 mobile tests, 71 database tests and four Hermes exports
+pass. Root `npm run check` reached Deno dependency fetching but local registry
+access there stalled. Exact native head
+`e41f84475704223bb8994e0e49f3101be2d1122b`, tree
+`2c9d36532c8067e681b4577297f5d7ac84a3f889`, subsequently passed all five
+[CI #584 gates](https://github.com/Kajooja/Kajo/actions/runs/36481134174),
+1,044 tests/four exports.
+
+Remaining configured-device/fresh-account observations belong to #229/#240;
+prior #469 APK acceptance is not attributed to the new source.
+
+PR #295 was accepted on main `cd224d277f33b105e63cd83126d111b12b64ba10`,
+reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, exact tree
+`0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
+880 tests and four exports. Hosted configuration/function rollout remains
+separate from that source acceptance.
+
 ## Routing and tooling advisory remediation — 2026-09-28 / #238
 
 The fresh audit reproduced 15 moderate affected package paths from three
@@ -131,7 +1202,12 @@ clean `npm ci`, `npm ls`, real parser tests and a fresh zero-advisory audit veri
 it. The pinned lockfile is recorded in the dependency audit receipt. Five
 regressions join root check and CI runs the current-advisory check. Lint/typecheck,
 mobile/engine/companion tests and four platform exports pass. Root check's local
-Deno registry transport limitation remains, so exact remote CI is required.
+Deno registry transport limitation remained; all five exact-head
+[CI #585 gates](https://github.com/Kajooja/Kajo/actions/runs/36483069338)
+subsequently passed. PR #296 is accepted at main
+`8525ecf32a39757a1f660d41ffa788c7276f7bcc`, reviewed
+`7b0062e668bda1fb5e2b247e1225dd42175256eb`, tree
+`cadf4fe10cfe7d8296b761e69c39b7c3497b8c97`.
 Node-only URL checks do not assert installed/not-installed native link acceptance.
 
 PR #295 is accepted at `cd224d277f33b105e63cd83126d111b12b64ba10`,
@@ -139,7 +1215,8 @@ reviewed `aa7c2fc61ed99ea1e4ffcc39a07aaf6aa963d979`, tree
 `0fd3fd2e3bd5b95294799121c2730f27ea70d490`, all five CI #582 gates,
 880 tests/four exports including 32 Deno tests. Draft #229 was independently
 reconciled at `e41f84475704223bb8994e0e49f3101be2d1122b`; CI #584 validation
-passes 1,044 tests/four exports, with other source/device gates separately tracked.
+and all four database gates passed, with 1,044 tests/four exports. Device gates
+remain separately tracked.
 
 ## Production configuration and auth input guards — 2026-09-28 / #160
 
@@ -4498,3 +5575,1409 @@ merge number. Complete publication, then pause as requested by the owner.
 - CI #408 passed the prior handoff head. PR #227 owns the final filename/docs CI
   and merge result. Next is exact delivered provenance and durable exposure in
   14.1; DATA-003/004 and Sprint 014 remain open. Work continues in short checkpoints.
+
+
+### Delivered navigation first checkpoint — 2026-09-10 / #228
+
+- Continues merged #227 (`6dd1fec`), whose final CI #409 passed all five gates.
+- Grid captures the visible, already overlaid sequence and source/mode/run with
+  environment/actor/Profile scope and Event session. Detail pins the snapshot and
+  refuses mismatched scope/session or evicted navigation tokens. Ambient visuals
+  still follow global mode; event/action origin keeps the delivered mode.
+- Removed the latest-media-ranking cache fallback. Direct entries remain one Item
+  with fallback origin; query prediction IDs alone cannot establish correlation.
+- Six deterministic regressions cover reranking, source mutation, cross-scope/
+  session/Item rejection, missing hosted identity, eviction and token reuse.
+- The PR owns local/full CI validation results. No emulator/phone/runtime acceptance
+  is claimed. Shared item-specific overlay origin, async callback boundaries,
+  durable exposure and delayed action reconciliation remain open on #228. Keep
+  DATA-003/004 and the Issue open; resume this branch in the next short work period.
+
+
+### Durable Event queue checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Replaced the disposable memory Event map with the existing bounded SQLite outbox
+  mechanism under a separate environment/actor/Profile key. Each entry retains the
+  complete original Event and session; new sessions never rewrite older entries.
+- recordEvent acknowledges only successful durable enqueue. Impression dedup occurs
+  afterward, so a failed disk write can be retried. Provider layout lifecycle stops
+  old coordinators and rejects stale callbacks; delayed session completion checks
+  scope before starting Event delivery. No hosted schema/API change.
+- Seven queue regressions replace two old memory-coordinator tests: session ordering,
+  restart/lost reply, scope change during session persistence, namespace separation,
+  storage failure/recovery, payload/corruption checks and timeout/late acknowledgement.
+- PR owns full check/CI evidence. Physical process-death/device testing remains open.
+  Exposure/action queue coordination and late outcomes are explicitly not solved
+  by persisting a separate queue. Continue the same draft branch; do not merge or
+  close #228 until the remaining provenance/delivery gates are met.
+
+
+### Exposure/action ordering checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Prior durable Event head `2e0c068` passed all required CI #412 jobs.
+- Both Item and collection senders now check durable matching impressions before
+  RPC dispatch. The exact queued command remains pending until acknowledgement;
+  a restarted action can wait for its original older session's exposure.
+- Five regressions add delayed acknowledgement, both-queue restart/lost reply,
+  exact matching/no invented evidence, unreadable storage and stale coordinator
+  coverage. Unrelated/non-predicted actions are not globally blocked.
+- No hosted migration. Missing impressions and already-committed unattributed
+  outcomes are not retroactively manufactured/fixed. Next: Shared per-Item origin,
+  remaining async callback review and server late-outcome/runtime acceptance.
+  Keep #228 and PR #229 in progress; PR owns current full-check/CI evidence.
+
+
+### Shared per-Item origin checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Prior head `dd6d86b` passed CI #413. The snapshot now captures each Item's
+  ranking membership and Shared tier without private member/history payloads.
+  Overlay-injected Items carry no ranking Prediction; ranked Items preserve
+  the run even when the overlay changes their order.
+- Grid/detail evidence and Item/collection action origins use those descriptors.
+  Detail remains frozen through Shared updates. Dwell keeps its start-time
+  callback/mode/origin, and undo navigation no longer borrows an unrelated run.
+- Six new origin regressions cover injected pending/history, ranked reordering,
+  Shared mutation/reranking, unknown origins, fallback and defensive copying.
+  PR owns full-check/current CI evidence. No hosted migration or physical-device
+  acceptance. Remaining: async/session boundary review, late-outcome/server
+  verification and runtime acceptance. Keep #228/#229 in progress.
+
+
+### Async session admission checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Detail/picker origins capture a client-only session admission token. Event and
+  explicit Item/collection admission reject mismatched sessions; explicit actions
+  also reject another Item. Actual persisted session envelopes remain unchanged.
+- Action dispatch, hydration and receipt projection check layout-time session
+  identity. Lists/Shared completion tokens include session and unmount cleanup.
+  Direct Detail remounts on session change. Destination loading/saving belongs to
+  one open request, fixing close-during-save/reopen state leakage.
+- Five admission regressions cover session/Item mismatch, a deferred destination
+  completed through a new session, local-to-auth transition, fresh non-delivered
+  actions and omission of the guard token from persisted Events. PR owns the full
+  check/CI evidence. Interactive session switch, reopen and process-death checks
+  remain untested. No hosted migration or server reconciliation is claimed.
+- Next: missing/already-committed exposure and delayed outcome verification at
+  the server boundary, then representative runtime acceptance. Keep #228/#229 open.
+
+
+### Server delivery matrix / next APK checkpoint — 2026-09-10 / #228 / draft PR #229
+
+- Added `delivery-order-smoke.sql` to PGlite and required native CLI installation
+  acceptance. Fourteen cases exercise authenticated Item and collection RPCs with
+  old-session delayed-valid, absent, late-arriving, post-action, wrong-session,
+  wrong-mode and unselected exposure. Secondary collection Events agree with the
+  receipt, and retries/undo preserve accepted attribution.
+- Existing server behavior passes the targeted matrix. Late-arriving exposure
+  does not rewrite an immutable unattributed receipt. No new reconciliation or
+  schema migration is claimed. PR owns full-check/current native CI evidence.
+- Owner is ready to download and test the next APK when explicitly notified.
+  Next: exact-head native CI + standalone APK, then the checklist below. Do not
+  wait in a build-poll loop. Record build SHA, artifact URL and results here/PR.
+
+#### #228 device acceptance checklist (pending)
+
+Use the next explicitly identified #228 APK; bundle exports and older main APKs
+are not this acceptance build. Record phone/Android version, build SHA and test
+time. Use a few recognizable test Items/Lists. Report each row PASS/FAIL and any
+screenshots or exact unexpected behavior. The developer checks server evidence
+for these operations afterward; the owner need not inspect Event IDs or SQL.
+
+| Test | Actions | Expected visible behavior |
+|---|---|---|
+| Grid/detail/mode | Open a card, swipe forward/back, change global mode and reopen from grid | Stable opened sequence; the next newly opened sequence follows the new grid; no flash of another cached sequence |
+| Item action/undo | Rate an Item, mark another not interested, undo in order | State and undo target remain correct; no duplicate operations |
+| Lists | Create a test List, add/remove an Item and undo | One intended transition each time; consistent state on reopening |
+| Close while saving | Select a List, close promptly, reopen the same Item's picker | Picker recovers and responds; no stuck saving indicator or duplicate addition |
+| Offline/restart | Open online, disable network, make one action, force-close, reopen and restore network | Pending action remains visible and completes once; correct state after reload |
+| Profile switch with pending action | Queue an offline action in Profile A, switch to B, reconnect, then return to A | B never receives A's action; A's pending state eventually resolves correctly |
+| Shared | With an existing Shared Profile, inspect a pending suggestion, endorse, then complete consensus with the other member | Correct pending/consensus state and destination; no Personal Profile state leakage |
+| Background/session | Open Detail/picker, background/foreground; also sign out/in and switch Profiles while a picker is open | Old screen either recovers explicitly or reloads correctly; stale callbacks do not advance or save into the new context |
+
+The exact APK and all results remain pending. Dispatch limitation: the GitHub
+connector has no workflow-dispatch capability and the cloud browser is signed
+out. The owner can start CI using Run workflow on `feat/228-delivered-origin`.
+Its APK job already depends on all five validation jobs; do not bypass those
+gates or change workflow triggers merely to start a build. Keep #228/#229 and
+DATA-003/004 open.
+
+
+### Owner APK feedback and correction checkpoint — 2026-09-10 / #228
+
+Expected candidate: run #417 / `e7c84a7`. The owner reported results after receiving
+that download target; phone/Android/build confirmation was not supplied.
+
+| Report | Acceptance interpretation |
+|---|---|
+| Cards/order worked | Owner-observed pass |
+| Recommendations seemed to change after actions/undo, then did not change on repeat | Non-reproducible observation; do not invent a cause or close ranking quality |
+| List addition did not remove the Item from Discovery | Confirmed product failure; named List membership must suppress ordinary delivery |
+| Undo appeared to do nothing | Open; List-removal undo is not required, but retained undo must work |
+| Closing while saving worked | Owner-observed pass |
+| Offline/restart “seems to work” | Tentative pass; retain server evidence/device follow-up |
+| Rejection showed exposure-wait error; a new choice eventually worked despite it | Normal queue wait was incorrectly presented as failure; correcting below |
+| Background/login worked | Owner-observed pass |
+
+Correction in this checkpoint: `waitingForExposure` distinguishes a local queue
+dependency from an actual persistence error. The action remains pending with
+normal automatic backoff; no error snapshot prematurely settles collection
+waiters. Real network/storage/authorization failures remain visible. Tests verify
+silent pending state, automatic retry after exposure acknowledgement, and a real
+subsequent error. PR owns complete validation. No hosted migration in this part.
+
+Next bounded package: active named-list membership in resurfacing and immediate
+Discovery refresh; last-list removal/reappearance, multiple Lists, deletion and
+Shared behavior; review ineffective undo and omit List-removal undo from required
+UX. Preserve the existing bounded reminder interval/caps, without treating an
+Item still in another List as new. Do not mark device acceptance complete yet.
+
+Owner idea: “Mitä tänään” chooses from a saved List using the active Personal or
+Shared Profile and current context, with an explicitly distinct List-card browsing
+surface. Captured in FUTURE_PLAN; it is a product idea, not another reported defect.
+
+
+### Named List eligibility candidate — 2026-09-10 / #228 / draft PR #229
+
+- New forward `20260910110344_list_membership_resurfacing.sql` changes only the
+  existing private resurfacing decision. It includes current target-Profile List
+  entries in saved-like suppression and their latest added_at in reminder age.
+  Existing native/bootstrap/terminal precedence, reminder limits and ranking
+  order remain. Historical Events, receipts, tables and migration history are not
+  rewritten. Policy metadata gains `listMembershipPolicyVersion: active-list-v1`.
+- A collection revision changes the mobile grid request identity and forces a
+  current ranking even when LIKED/interaction fields are unchanged by removal.
+  Loading cannot reuse the prior grid; its late visible tokens cannot create new
+  impressions. Opened Detail retains its frozen delivery snapshot as before.
+- `list-membership-smoke.sql` runs in PGlite and required native CLI acceptance:
+  authenticated Personal add and public ranking suppression, two memberships,
+  last removal and public ranking return, List deletion, older reminder eligibility,
+  terminal precedence, Profile isolation and two-member Shared consensus.
+  PGlite also verifies the forward preserves function identity/ACL/security
+  metadata and every unrelated definition.
+- Shared nuance verified: deleting the named consensus destination leaves the
+  separate SYSTEM_SAVED membership, so suppression continues. Direct Personal-style
+  removal from Shared Tallennetut is rejected by existing consent rules. Do not
+  relabel that as a successful final Shared removal test; withdrawal/removal UX
+  still needs review together with the owner's ineffective undo report.
+- No hosted deployment, hosted advisor run or new-device acceptance yet. PR owns
+  current full-check/native CI. Next: exact-forward hosted rollout/verification,
+  remaining undo/Shared UX correction, then a focused replacement APK.
+
+
+### Hosted List eligibility rollout — 2026-09-10 / #228 / draft PR #229
+
+- Supersedes the preceding pending-hosted checkpoint. Exact candidate SQL SHA-256
+  `889e424c3ebefa4145534e2cca0a531d107947b187d7c225f6d355dcc9f26711`
+  deployed to `mwrnvfosrzwygrunrltm` as provider version `20260910110344` /
+  `list_membership_resurfacing`. Repository filename aligned; SQL bytes unchanged.
+- Captured the actual prior function and rehearsed its replacement in the full
+  isolated PGlite schema. The manual recovery file restores its original function
+  fingerprint `06da0244916a790932288371e71686a9`; recovery is a new forward migration,
+  not deletion of deployed history. No recovery was applied hosted.
+- Hosted metadata comparison: only the intended function definition changed;
+  its owner/ACL/security/search path, 128 unrelated functions, 21 application
+  triggers, default ACLs and all 46 old version/name rows remained unchanged.
+  No application records were exported or whole-data parity asserted.
+- The first hosted smoke rolled back on a fixture assumption: an eligible
+  synthetic book need not reach the top 20 of the populated catalog. Corrected
+  the probe to require exact return only with at most 20 discoverable books;
+  eligibility restoration is unconditional. The corrected rollback-only hosted
+  probe passed all Personal/List/reminder/terminal/isolation/Shared assertions,
+  with top20ReturnRequired=false and top20ReturnObserved=false.
+- Security advisors unchanged: 18 existing RLS-without-policy INFO findings and
+  existing leaked-password-protection WARN. No permissions or Auth setting changed.
+- Next: ineffective undo and Shared withdrawal/removal UX, then replacement APK
+  and owner device tests. Keep the PR draft and DATA-003/004 open.
+- Validation: full `npm run check` passed (241 mobile, 14 catalog, 61 database
+  tests; both platform exports). Separate captured-prior upgrade/recovery rehearsal
+  passed. Latest native CI and new device acceptance remain separate gates.
+
+
+### Undo availability and Shared removal review — 2026-09-10 / #228 / #229
+
+- Confirmed UI bug: canUndo used only stack length while the dispatch boundary
+  could refuse pending collection work. Availability now uses current-session
+  outbox readiness and zero pending commands; the handler also checks the current
+  queue synchronously. A refused start shows feedback. The original phone symptom
+  has not yet been reproduced/accepted on the replacement build.
+- No List-removal undo affordance: a changed removal discards same-Item undo entries
+  now behind its server head, while retaining other Items. List deletion clears
+  session history because the receipt does not enumerate affected Item IDs.
+  No-op receipts preserve history, and successful undo receipts do not repush it.
+  Added five deterministic history/readiness regressions; server RPC semantics
+  and immutable receipts are unchanged.
+- Reviewed Shared withdrawal: existing REVERSE_ENDORSEMENT only handles a pending
+  proposal. Completed consensus raises an explicit refusal. The Shared Saved view
+  now explains that completed removal is unavailable and omits the invalid direct
+  remove action. Custom Shared Lists retain direct removal; consent Saved survives.
+  This is honest UI, not implementation/acceptance of completed-consensus removal.
+- Next: required CI and a manually dispatched replacement APK from this branch;
+  focused owner device acceptance, without build polling. Keep PR draft. Full
+  completed-consensus removal needs a scoped lifecycle decision; keep it visible.
+- Validation: `npm run check` passed all 321 tests (246 mobile, 14 catalog,
+  61 database), TypeScript/lint and both exports. No emulator/phone test was
+  available in this workspace; native CI and owner device acceptance are pending.
+
+
+### Second owner device report and collection-source correction — 2026-09-10
+
+- Owner reports b51f962 List behavior, undo (List/rating/rejection) and reconnect
+  working; old choices still failed with “item not found”. This does not accept
+  historical navigation or close all DATA-003/004 gates.
+- Root causes found: Discovery's history tab filtered the serving recommendation
+  pool that intentionally excludes consumed Items; Lists/history opened only an
+  ID and Detail fell back to the mock catalog. History now uses the existing real
+  collection route; collection navigation carries loaded Item snapshots into Detail.
+- Collection transport is bound to Profile/session, has explicit COLLECTION origin
+  and no Prediction ID, keeps consumed Items in swipe browsing, and labels the
+  destination. History scope/revision keys prevent reuse across Profiles; interaction
+  changes reload current history. Added two transport/order regressions.
+- Pull refresh now works on Discovery, Lists and history. Green RYHMÄTILA appears
+  beneath the global mode selector only for a Shared Profile.
+- Remaining owner scope: multi-List addition before card advance; common cover
+  grid/card selector on all Lists/history; visible rating and explicit history
+  removal via atomic evidence; finish replacing ordinary retry UI. Completed Shared
+  consensus removal remains a distinct unresolved lifecycle boundary.
+- Owner authorizes all-Profile choice and Shared-group reset before the next test.
+  Preserve accounts/catalog, review derived evidence and local outbox handling;
+  reset has NOT run and no new APK is requested at this partial checkpoint.
+  STATUS owns exact order and all requirements. Continue short saved work periods.
+- Validation: full `npm run check` passed 323 tests (248 mobile, 14 catalog,
+  61 database), TypeScript/lint and iOS/Android exports. No new device or visual
+  runtime acceptance claimed; the next test waits for the remaining owner scope.
+
+
+### Personal multi-destination picker — 2026-09-10 / #228 / #229
+
+- A successful Personal List addition keeps the picker open, marks the membership,
+  and allows another destination. Valmis advances once and sends no duplicate
+  command/message. Each List addition is independently durable; failure on the
+  second destination does not reverse the first. Close keeps committed/queued work.
+- In-flight guards block repeated same-render taps. A new open request has distinct
+  saved/progress identity, and stale completions cannot close it. Collection revision
+  reloads no longer reset the user's message/create/expanded state. Optional messages
+  attach to acknowledged additions; Done does not send them again.
+- New-list creation also stays in the Personal picker after saving. Existing
+  memberships are marked and cannot be added twice through the same open picker.
+  Shared endorsement/proposal remains the existing single destination consent flow.
+- Added a durable regression: first destination acknowledges, second fails offline,
+  restart retries only the unchanged second command and preserves the first receipt.
+- Next: common cover-grid/swipe selector on Lists/history, canonical history-clear
+  action and remaining refresh UI. Then the already authorized all-Profile choice /
+  Shared-group reset and combined device test. No reset or new APK in this step.
+- Validation: full `npm run check` passed 324 tests (249 mobile, 14 catalog,
+  61 database), TypeScript/lint and both platform exports. New picker interaction
+  still needs the planned combined device test; no emulator/device was available.
+
+
+### Shared collection cover grid — 2026-09-10 / #228 / #229
+
+- Published the explicitly approved Personal multi-destination correction as
+  `4e8e301`; remote/local publication handoff is resolved.
+- Extracted DiscoveryItemCard without copying a parallel card design. Discovery,
+  named Lists, Saved and Luetut/Katsotut now reuse the cover presentation. Rating
+  badges render numeric zero as well as other ratings; consumed labels remain for
+  unrated entries. Collection dates and original Shared provenance remain visible.
+- CollectionGrid replaces ScrollView row maps with a bounded FlatList: six-cell
+  initial/batch rendering, two columns and near-visible image mounting. Both List
+  and history headers offer Ruudukko / Kortit; card mode opens the loaded collection
+  and preserves its Profile/session/collection origin. Return goes back to that grid.
+- List filters/sort, rename/delete and permitted entry removal remain available;
+  completed Shared Saved removal is still explicitly unavailable. Removed obsolete
+  row styles and the unused old LIST/GRID view type.
+- Next: canonical atomic history-clear action, final ordinary retry/refresh UX,
+  then the authorized choice/group reset and combined device test. No reset or new
+  APK here; new card layout has not been accepted on a phone/emulator.
+- Validation: `npm run check` passed all 324 tests, TypeScript/lint and both
+  platform exports. Existing collection-origin/order tests remain passing; visual
+  and gesture acceptance stays with the planned combined device checkpoint.
+
+
+### History-clear server candidate — 2026-09-10 / #228 / #229
+
+- Added atomic non-undoable CLEAR_HISTORY to the existing collection RPC; native
+  rating/consumed and terminal import evidence clear together with corrective
+  Events and the immutable receipt. Saved/List/interest/rejection state survives.
+- Exact corrections remove every active old rating/consumption Event from Memory
+  and outcome readers. No fabricated current-view attribution is attached.
+- Rollback-only full-schema acceptance covers actual Memory, retry after rerating,
+  no-op, stale undo, authorization, independent state and injected write failure.
+  Forward metadata checks preserve all function identities/ACLs and unrelated bodies.
+- Next: mobile durable command/UI wiring and reviewed hosted rollout, final
+  refresh UX, authorized choice/group reset immediately before combined device test.
+  Hosted database and accounts are unchanged; no APK/device acceptance claimed.
+- Validation: full `npm run check` passed all 324 tests, lint/TypeScript and
+  both platform exports (exit 0). Native CLI acceptance is wired for CI but was
+  not executed locally; no device/emulator was available.
+
+
+### History-clear mobile wiring — 2026-09-10 / #228 / #229
+
+- Luetut/Katsotut grid exposes Poista historiasta through the existing durable
+  collection action queue. Saved lists remain independent; copy explains this.
+- Synchronous duplicate-tap guard, acknowledgement-driven refresh and content
+  keyed by Profile/Event session protect against stale completion feedback.
+- Command/receipt validation requires uncorrelated, fully cleared history state.
+  Offline/restart regression verifies the exact persisted command reaches the RPC.
+- Next: reviewed hosted history-clear rollout, final refresh UX, then authorized
+  choice/group reset and combined device checkpoint. No hosted writes/reset/APK here.
+- Validation: `npm run check` passed 325 tests, lint/TypeScript and both platform
+  exports (exit 0). Phone/emulator interaction remains untested.
+
+
+### History-clear hosted rollout — 2026-09-10 / #228 / #229
+
+- Applied unchanged reviewed SQL as provider version 20260910134428; aligned the
+  candidate filename without editing SQL bytes or historical tracking.
+- Preflight matched the old function exactly; postflight matched the new body and
+  preserved all function identities/ACLs plus 128 unrelated definitions.
+- Rollback-only hosted acceptance passed Memory cancellation, import/state
+  preservation, retry/rerating and authorization. Failure injection stays isolated.
+- Security findings are unchanged. STATUS records hashes, recovery and exact
+  next task: final refresh UX, authorized reset, combined real-device acceptance.
+- Validation after filename alignment: full `npm run check` passed all 325 tests,
+  lint/TypeScript and both platform exports (exit 0). Device acceptance remains open.
+
+
+### Ordinary pull-refresh completion — 2026-09-10 / #228 / #229
+
+- Added native pull refresh to the List index and vertical overscroll support to
+  Discovery/collection grids. Shared refresh reflects both read requests.
+- Replaced ordinary load retry buttons with pull guidance in Discovery, Lists
+  and consumed history. Durable command recovery remains intact.
+- Next: authorized all-Profile choices/Shared-group reset with stale-client queue
+  protection, then combined device acceptance. No reset/APK performed here.
+- Validation: full `npm run check` passed 325 tests, lint/TypeScript and both
+  platform exports (exit 0); actual pull gestures remain device acceptance.
+
+
+### Reset rehearsal and portable device handoff — 2026-09-10 / #228 / #229
+
+- Runtime head 2cb204f passed CI #429. Prepared DEVICE_TEST.md with manual branch
+  APK instructions, reset prerequisite and eight owner scenarios; linked in docs map.
+- Rehearsed owner-device-reset.sql twice on hosted with ROLLBACK. Fresh Personal
+  IDs reject old rating/collection/Event-session writes while preserving accounts,
+  catalog and Personal custom List names; empty new Profiles can rate normally.
+- Permanent COMMIT was rejected by automatic approval review as broader than the
+  prior choices/groups permission. No data was reset. STATUS records exact scope
+  and next approval/action so another conversation can continue without chat.
+- No schema change, new app code, APK dispatch or device acceptance in this step.
+- Final handoff validation: full `npm run check` passed 325 tests, lint/TypeScript
+  and both platform exports (exit 0).
+
+
+### Approved reset committed — 2026-09-10 / #228 / #229
+
+- Owner explicitly approved the full identity/history/group reset; the earlier
+  automatic-review block is resolved. Ran the reviewed transaction with COMMIT.
+- Independent post-commit verification at 14:19:19 UTC: 2 Users, 2 new Personal
+  Profiles, no Shared groups/Events/interactions/List entries/imports/receipts/
+  Predictions. Accounts/catalog/Personal List names were preserved.
+- Old Profile-bound replay was denied and new Profile writes succeeded in the
+  transaction's rolled-back probe. No repeat reset; DEVICE_TEST.md and STATUS
+  now direct the next conversation to the manual branch APK and owner tests.
+- No app changes, APK dispatch/polling, merge or device acceptance in this step.
+
+
+### Owner device feedback, documentation only — 2026-09-10 / #228 / #229
+
+- Recorded numbered results in DEVICE_TEST.md; installed APK SHA/run unspecified.
+  Core flows work, including multi-list saving, history removal, refresh, durability
+  and scope switching. Initial-profiling ratings are missing from history and
+  appear in Shared cards; determine the actual tier/evidence semantics before fixes.
+- OnePlus destination picker overlaps bottom navigation. Fix after evidence parity;
+  preserve accepted list/history behavior and new test data (no additional reset).
+- Longer profiling proposal (~10 movies + 10 books with transition card) is recorded
+  in LAUNCH_LOOP/Phase 15.0, with current calibration impact to be evaluated.
+- Deferred invitation reveal/copy-link idea belongs to Phase 16, not this sprint fix.
+- User explicitly requested no implementation now. STATUS gives the next
+  “jatka reposta” order. No code/database changes, APK build, tests or merge performed
+  for this documentation-only feedback update; prior checks remain historical.
+
+### Initial-history and OnePlus correction — 2026-09-10 / #228 / #229
+
+- Continued the explicit next-conversation handoff. Both consumed history and
+  Shared member overlay omitted bootstrap evidence; a read-only hosted check
+  confirmed the missing-history case without resetting or altering user data.
+- Added one private native/terminal-bootstrap read projection and authorized
+  hydration RPC; reused it for history, List badges and accepted-member Shared
+  attribution. Native edits take display precedence, zero remains valid, and
+  reads never synthesize Events or Shared state. Existing clear/undo/Memory and
+  suppression contracts remain intact.
+- Added full-schema calibration/import/native/Shared/privacy/clear regression
+  and unchanged populated-forward rehearsal. Both are in required native CLI CI.
+  Hosted preflight matches all three old target definitions/owners/ACLs.
+- Fixed picker safe-area/dock clearance and keyboard/scroll behavior through a
+  shared dock constant; book member-history labels now say lukenut/lukeneet.
+- Evaluated the longer profiling request in LAUNCH_LOOP: current server supports
+  20 balanced opportunities, but progression/order/stop behavior needs its own
+  versioned Taste change in Phase 15.0. No forced repeat or higher known-rating
+  minimum is introduced in this correction.
+- `npm run check` passed 326 tests (251 mobile, 14 catalog, 61 database), lint,
+  TypeScript and both platform exports. No local phone/emulator; focused device
+  cases are in DEVICE_TEST. Publication, new-head native CI and hosted rollout
+  are pending at this checkpoint; STATUS owns their current state. Keep draft,
+  preserve new test data, and do not infer DATA-003/004 or phase acceptance.
+
+
+### Initial-history rollout verified — 2026-09-10 / #228 / #229
+
+- Published implementation `b8ff101` has the exact locally tested tree
+  `00c5872bc4b82580f8fa1f682f1b8042f46e405f`. All five required CI #434 jobs passed,
+  including native CLI calibration/history behavior and populated-forward checks.
+- Applied only the reviewed read-functions forward as actual provider version
+  `20260910153737`; SQL SHA-256 remains
+  `40a6e3b32fe6e1555acb2ac85293b8235484f737c08d50172ddf6d19272b24b9`.
+  Aligned the filename using the same SQL bytes; historical migration files remain
+  unchanged. The new mobile hydration RPC is now available.
+- Postflight preserved all 129 old function identities/owners/ACLs, 126 unrelated
+  definitions, inventoried triggers/defaults and 48 previous migration identities.
+  Three new functions and three replacement definitions match the source exactly.
+- Unmodified rollback-only hosted history probe passed; a separate read confirmed
+  initial history coverage and no fixture Item/Shared residue. Security advisor
+  findings are unchanged. Real user data was not reset; no whole-data parity claim.
+- STATUS owns the exact recovery procedure and next APK checkpoint. CI #434 skipped
+  APK building by design; no new APK was dispatched or polled. Draft/owner device
+  acceptance and full DATA-003/004 remain open.
+
+### Owner-requested repeat test reset — 2026-09-10 / #228 / #229
+
+- After the correction rollout, the owner explicitly requested the same full
+  reset again to rerun the tests. This supersedes the earlier preservation
+  instruction; it is not a reset caused automatically by the new app version.
+- Scoped the retained operational script to the current Profile identity digest,
+  added Auth-record preservation and both accounts' real calibration-API checks,
+  rehearsed with ROLLBACK, and committed the exact reviewed transaction.
+  The published script uses a blocking placeholder instead of the private digest;
+  any future authorized use requires an independently reviewed current scope.
+- Independent verification at 15:54:09 UTC: 2 accounts, 2 new PersonalProfiles,
+  zero choices/bootstrap evidence/Events/List entries/imports/receipts/Predictions/
+  Shared groups/invitations/messages. Both accounts can start calibration again.
+  Auth/nicknames/catalog and 2 Personal custom List names survive. Old Profile-bound
+  replay is denied; a new-Profile rating succeeds only in a rolled-back probe.
+- STATUS and DEVICE_TEST now start from this second reset. Preserve subsequent
+  legitimate test data unless the owner asks again. No schema/app change, APK
+  dispatch/polling, merge or additional device acceptance in this checkpoint.
+- Validation: `npm run check` logs confirm 326 passing tests, lint/TypeScript and
+  both platform exports; hosted reset rehearsal and independent app-API checks
+  passed. The two existing duplicate-import lint warnings remain unchanged.
+
+### Second device feedback and destination correction — 2026-09-10 / #228 / #229
+
+- Owner reports initial profiling/reset, initial history/edit/undo, history removal
+  and Shared attribution working. The requested source was `621a03c`; the installed
+  APK/run remains unspecified. OnePlus picker alignment and first-destination
+  creation remained failing cases; record the next exact build during retest.
+- Replaced the destination picker's separate native Modal with an overlay inside
+  the shell content bounds above the dock, matching Inbox's bottom gap. Retained
+  keyboard avoidance, scrolling and Back/close/confirmation controls.
+- Read-only action inspection confirmed create-List immediately triggered Shared
+  endorsement. Creation/selection now prepares a draft; sole/new destinations
+  select automatically, optional message requires a usable target, and explicit
+  Add/Propose is the only Item mutation. Shared failures keep the Item and draft;
+  acknowledgement precedes advancement. Personal multi-List addition remains
+  available; a message error is reported without undoing the successful List add.
+- Owner accepts equal-score variation. Existing 30-minute exposure cooldown also
+  explains refresh rotation; a bounded hosted trace read found expected descending
+  unequal-score order. Added SQL regressions for unchanged taste priorities,
+  exposure rotation/expiry and Profile isolation; serving SQL remains unchanged.
+- Added draft-selection regressions for no destination, sole/new selection,
+  refreshed ordering, already-saved Personal choices and creation/refresh races.
+- Added the always-available unknown action after wheel movement to LAUNCH_LOOP
+  and Phase 15.0 alongside longer Taste progression. Current calibration remains
+  unchanged. No reset, migration, APK dispatch/polling or merge in this correction.
+- STATUS/DEVICE_TEST own the next narrow APK gate. Physical layout/keyboard and
+  the full device create→message→proposal flow still need owner acceptance.
+- Local validation: `npm run check` passed 333 tests (256 mobile, 14 catalog,
+  63 database), lint/TypeScript and both platform exports. Existing duplicate-import
+  lint warnings remain unchanged. Publication/final-head CI belong to the PR.
+
+### Owner ideas and rating-position report — 2026-09-10 / #228 / #229
+
+- The owner reports the next APK is building and will test it when ready.
+  Runtime remains `07b12ea86f3952844d475de9e8f02670a8381ffb`; this entry and its
+  related canonical updates are documentation only.
+- Recorded personal category statistics as FUT-UX-001 / #230: drawer/Profile
+  destination, independent unlock, rated/mean/not-interest/List totals, working
+  thresholds of 30 initial reactions and five new reactions per category/week,
+  Monday countdown/snapshots, source deduplication and conditional comparisons.
+  The earlier suggested 50 remains a tunable alternative.
+- Recorded long-press multi-select as FUT-UX-002 / #231: upper-left checkbox,
+  Discovery reject/List-add and List move/remove, accessible selection, preserved
+  per-Item origin, atomic moves and partial/durable/Shared permission semantics.
+- ROADMAP places both as separately scoped Phase 17.0 candidates, with weekly
+  stats/comparisons dependent on 17.1/17.2. No new MVP blocker, future feature
+  implementation or change to the current Phase 14 dependency order.
+- Added the owner's current Katsotut card report to STATUS/DEVICE_TEST/UX: start
+  the rating handle at the saved value, including 8 and 0. Existing control/prop
+  initialization already expresses that rule; history versus Detail hydration
+  needs reproduction before asserting a root cause. The report remains open.
+- Local execution became unavailable (environment disconnected). Source inspection
+  and document consistency checks used the exact GitHub branch snapshot; no new
+  runtime test or npm check was run. The prior 333 tests apply to the unchanged
+  runtime only. No APK dispatch/polling, merge, migration or reset.
+
+## Third APK result and multi-destination correction — 2026-09-10 / #228
+
+The owner reports the APK tested with only multi-List selection missing; exact
+installed SHA/run was not supplied. Both Profile types now expose checkboxes and
+one confirmation. Personal uses existing durable per-List commands with retained
+unresolved choices. Shared binds the exact reviewed set, displays every target to
+approvers and atomically commits all memberships/Events at unanimity. Creating a
+List preserves earlier checks and never advances the card. Remaining messages
+stop if the scoped view unmounts.
+
+The new forward adds a private destination relation and six functions; four old
+function definitions are intentionally replaced with identities/owners/ACLs kept.
+Both legacy endorsement RPCs reject hidden multi-List consent. Full-schema tests
+cover second-List Event failure rollback, exact replay, unchanged old receipts,
+foreign/duplicate targets and whole pending cancellation when any target is deleted.
+The populated-upgrade rehearsal preserves existing data/old function boundaries.
+`npm run check`: 338 tests (261 mobile, 14 catalog, 63 database), lint/TypeScript
+and both exports. Native CI and hosted rollout belong to the live STATUS checkpoint;
+no local Docker/device runtime is claimed. DEVICE_TEST owns the next manual APK
+cases; preserve current test data and let the owner start its workflow.
+
+Issue #232 records required SharedRatingRound/rewatch semantics in the canonical
+domain, evidence, prediction, UX and launch documents and `MVP-SOCIAL-007..009`.
+Personal setup precedes joint responses; A’s rating is pending until the required
+others answer; only completion enters joint history. Individual responses and
+Personal history remain separate, and new experiences preserve earlier history.
+Strong member-seen recommendations and controlled rewatch require a versioned,
+validated policy. Phase 14 establishes correctness; Phase 16.3 delivers the full
+flow before beta. No round API/schema/UI or rewatch-policy change is implemented
+in this multi-List correction. Optional #230 statistics and #231 multi-Item actions
+retain their Phase 17 candidate status.
+
+### Publication gate — CI passed, hosted approval blocked
+
+Implementation `e4a28bfae6e9edaa507242e4374d4d9ca0dd971a`, exact locally tested tree
+`cd71b7035b31be4cac1daba1e8860fb3341bb573`, passed all five required jobs in
+[CI #442](https://github.com/Kajooja/Kajo/actions/runs/34515831721); APK skipped.
+Automatic approval review then rejected the exact hosted `shared_list_destinations`
+forward: it classified the table/security-sensitive function changes as a shared
+database mutation without explicit owner authorization, despite code publication
+being authorized. No alternative mutation path is allowed. The forward remains
+undeployed and needs a direct owner approval; the new app’s overlay v2 depends on
+it. Keep the PR draft, preserve current data and complete no new APK acceptance
+claim. STATUS records the exact SQL hash/target and post-approval continuation.
+
+### Owner approval and hosted multi-destination rollout — 2026-09-10
+
+The owner explicitly approved the previously blocked hosted migration. Applied the
+unchanged reviewed SQL on `mwrnvfosrzwygrunrltm`; provider version/name is
+`20260910190243_shared_list_destinations`, SHA-256
+`c6196e699b3720755652f6b61c7dc8776333be0ebce1df592e6487d828757b4f`.
+Aligned only this new filename to the provider record, without altering SQL or old
+history. Native CI #442 already passed the identical implementation/forward.
+After alignment, npm run check again passes all 338 tests, lint/TypeScript and
+both iOS/Android exports.
+
+Postflight preserves all 132 old function identities/owners/ACLs/security settings,
+128 unrelated definitions, 32 old table identities/ACLs/RLS and creator defaults.
+Four intended replacements plus six new bodies match source. Sixteen existing
+application/Auth/history/List data fingerprints and counts are identical before,
+after and after the rolled-back authenticated command probe. That probe passes
+exact consent, two-List atomic consensus, forced second-List Event failure/retry,
+old receipt replay, whole pending cancellation and outsider/legacy rejection.
+No fixture trigger or destination rows remain; new private data/internal-core
+access is denied and authorized overlay v2 works. Advisors report expected
+private-table RLS-without-policy INFO; the existing Auth password warning/old FK
+notices do not change this rollout’s access contract.
+
+The earlier approval block is resolved. The owner may start the manual APK workflow
+on the active branch and test the four DEVICE_TEST cases with both accounts on the
+new build. No reset or local Docker is required. No APK was dispatched/polled and
+no phone or merge acceptance is claimed. Retain server consent guards if reverting
+the client; prefer a narrow corrective forward over erasing pending/history data.
+
+### Late Outcome continuation while owner APK runs — 2026-09-10
+
+The owner started manual APK CI after the multi-destination deployment. Its
+requested source is `50bd1a8dd20f6ab617c266599be185d8b8d42412`; actual run/installed
+SHA and four-case device result have not been supplied. No APK dispatch/poll,
+account reset, hosted mutation, mobile edit or merge was performed in this step.
+
+Closed the next bounded Phase 14.1 source gap: already committed unattributed
+actions previously stayed absent from ScenarioMemory/SleepLayer even after their
+exact pre-action impression arrived. The new CLI-generated forward is
+`20260910192630_late_outcome_attribution.sql`, SHA-256
+`36cffca7490bc46ba94882de52def69c1d0618cea0e4a33175d70bccb5256d9b`.
+It adds one private invoker read helper and replaces only the serving/evaluation
+readers, preserving existing function identities/owners/ACLs. Exact private
+receipt ownership, original actor/Profile/Item/session/mode, selected run and
+actual impression are required. Raw Events/receipts and old evaluations stay
+unchanged. Both consumers use the same versioned attribution rule and existing
+reward/priority/undo semantics; evaluation records its separate evidence-read
+cutoff without modifying frozen prediction inputs.
+
+Validation: `npm run check` exits 0 with **338 tests** (261 mobile, 14 catalog,
+63 database), lint/TypeScript and both iOS/Android exports. Extended the existing
+14-case full-schema delivery matrix to verify effective attribution. The new
+`late-outcome-smoke.sql` exercises actual Shared serving and frozen-shadow labels
+before proof, after proof and after undo, including zero rating, occurrence/read
+cutoffs, wrong member/Profile/Item, duplicate impressions, forged receipt IDs and
+unchanged historical results. `late-outcome-upgrade.mjs` applies the unchanged
+forward over populated synthetic data including a real prior receipt, checks data
+and old function boundaries and rolls back. Open creator defaults do not expose
+the helper; a missing installed source anchor fails and rolls back partial DDL.
+Both full-schema acceptance and populated upgrade are wired into required native
+CLI CI. There is no local Docker, emulator or phone; native CI for this new source
+and its separate hosted rollout remain pending at publication.
+
+Continue the same #228/#229 handoff. Hosted stays on the accepted multi-destination
+forward while the owner completes that APK test. Then verify required native CI
+and prepare a separately reviewed exact-SQL rollout. Keep physical recovery and
+remaining Phase 14.1 gates open before Phase 14.2; no SharedRatingRound, Stats or
+multi-Item feature starts ahead of those dependencies.
+
+### One-confirmation Personal Lists and queue latency — 2026-09-10
+
+The fourth owner APK report says the rest is good but adding to two Lists feels
+frozen and Personal Add must save the entire selection and open the next card
+without Valmis. Requested prior source was `50bd1a8`; actual installed SHA/run and
+timed device measurements were not supplied. Preserve that distinction and the
+existing profiles/data; do not repeat account resets or dispatch/poll APK CI.
+
+`commitPersonalListDestinations` now freezes the user's choice, awaits the existing
+durable per-List acknowledgements and invokes completion once. The sheet removes
+Done, displays confirmed progress/activity and suppresses intermediate destination
+reloads. A partial failure keeps acknowledged saves and unresolved choices; only
+newly acknowledged destinations receive optional messages, and scope changes stop
+old callbacks/later commands. Shared continues through its existing exact-set
+proposal/consent path.
+
+The Event coordinator reuses a session only after its actual server acknowledgement,
+with a fresh confirmation after restart/new scope. Six impressions need seven
+session/Event writes instead of twelve. A scoped acknowledgement subscription wakes
+only actions waiting for exposure, including acknowledgement while the waiting
+result is still in flight. The guard rereads durable dependencies; network failures
+keep backoff and rejected/stopped actions do not resume. No Event/command identity,
+server API, migration or hosted data changed in this step.
+
+Validation: 44 focused tests pass; `npm run check` exits 0 with **347 tests**
+(270 mobile, 14 catalog, 63 database), clean lint, TypeScript and both platform exports. No
+Docker/phone/emulator or measured physical timing is claimed. DEVICE_TEST records
+the short one-confirmation/responsiveness/recovery/Shared regression for the next
+owner-started APK. Native CI for this client source remains a publication gate.
+
+Separately verified all five required CI jobs for algorithm commit
+`316bd0858972e2e7bc4abc2d3e2360c89c83a97f` at
+[run 34521599718](https://github.com/Kajooja/Kajo/actions/runs/34521599718), including
+the native CLI late-outcome serving/evaluation and populated-forward probes.
+That forward's tested SQL/hash is unchanged and still undeployed. Continue its
+own reviewed hosted rollout plus remaining Phase 14.1 device recovery gates
+before Phase 14.2. No merge, automatic APK action or distant feature work occurred.
+
+### Frozen serving/shadow replay while APK acceptance is deferred — 2026-09-10
+
+The owner explicitly deferred the Personal Add/latency APK regression and asked
+continued development. Required client CI is now verified on
+`1102d92e25ac973909b073fdcdaa8f2cdc9fcf22`,
+[run 34524399404](https://github.com/Kajooja/Kajo/actions/runs/34524399404), all five
+jobs successful. No APK dispatch/poll, reset, hosted mutation or merge occurred.
+This checkpoint prepares the independent Phase 14.2 correctness slice; Phase 14.1
+rollout and physical recovery gates remain open, and neither phase is accepted.
+
+The full-schema reproduction gave the baseline Shared candidate −1.0406 in
+serving and 0.1 in shadow because common-fit was omitted. Shadow also scored from
+rounded display features and ignored resurfacing eligibility/tier ordering. The
+CLI-generated forward `20260910202244_frozen_prediction_replay.sql` (SHA-256
+`4ff3feab61d522d4763a63c23c7da8454d32322c7326c5b833b4db52f768dd7a`)
+adds three private pure helpers and replaces five installed bodies with guarded
+anchors. It changes no table data, existing identities/ACLs or immutable genomes.
+The baseline generator, assigned scalar scorer, final serving and shadow share
+full-precision scoring, including frozen Scenario/common-fit inputs. The run's
+recorded genome controls both scalar and Scenario weights. Shared reminder-cap
+and delivery-tier helpers preserve ordinary-before-reminder order and suppress
+ineligible cards. The challenger recalculates its reminder choice from frozen
+pre-cap input and its scalar weights.
+
+Versioning is explicit: new raw inputs `prediction-features-v2`, serving policy
+`+frozen-replay-v2`, shadow/evaluation `shadow-replay-v2`, comparison scope
+`FROZEN_SOURCE_POOL`. Original traces/evaluations remain intact; pending legacy
+jobs fail diagnostically and new comparisons exclude incompatible old shadows.
+They are never reconstructed from later catalog/taste/member state. No automatic
+promotion or accuracy claim is introduced.
+
+The new full-schema `frozen-replay-smoke.sql` checks 18 Personal/Shared × three
+modes × three page sizes with exact score/rank/policy/selection equality, nonzero
+Scenario/common-fit, raw precision boundaries, deterministic ties, suppression,
+one-reminder cap, an actual challenger reminder flip and later-state isolation.
+An independent accepted-formula check uses 1e-12 arithmetic tolerance. The
+`frozen-replay-upgrade.mjs` rehearsal preserves populated data, durable receipts,
+old frozen shadows/evaluations, raw baseline scores across modes and all existing
+function identities/ACLs/unrelated bodies. It verifies closed helper access even
+with open creator defaults, diagnostic legacy-job failure and exclusion from a
+new evaluation. A divergent source anchor rolls back all changes. Both probes
+are wired into required native CLI CI; the prior late-attribution smoke accepts
+its version token with the added replay suffix.
+
+Repository gate: `EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **348 tests**
+(270 mobile, 14 catalog, 64 database), clean lint/TypeScript and both platform
+exports. New-head native CLI CI and the separate hosted rollout remain open gates.
+There is no local Docker, emulator or phone. Hosted remains on multi-destination
+`20260910190243`; the unchanged late-outcome forward must precede this new forward.
+
+Next source work is the bounded baseline-top-50 starvation/eligibility/refill
+reproduction and correction (`MVP-ALG-003`). This slice only proves parity on the
+frozen source pool; empty/refilled pools, zero-result worker behavior and rollout
+acceptance keep `MVP-ALG-002` open. Preserve Phase 14.1 recovery gates, the deferred
+APK cases and the same draft #228/#229 handoff.
+
+### Native replay precision correction — 2026-09-10
+
+CI on `99bdecc` passed four required gates but failed native populated-upgrade
+baseline-score equality in run 34527872429. The same failure is reproducible in
+PGlite with `extra_float_digits=0` or -1: JSON construction rounds float inputs,
+although the old direct scorer retains the binary value. V0 now pins
+`extra_float_digits=3` in its own function configuration, restoring the caller's
+setting on return. Existing identities/owners/ACLs and every other configuration
+remain unchanged. Exact baseline equality is retained, not replaced by tolerance.
+The complete upgrade/replay tests run with both rounded and precise callers;
+native CLI acceptance explicitly exercises a rounded caller as well.
+
+The still-undeployed replay migration was corrected in place; its current SHA-256
+is `22d42dce06240092faec75550adcf70de75846079ac48ade0a80231671511f4a`.
+The preceding checkpoint's hash identifies the earlier undeployed revision.
+`EXPO_OFFLINE=1 CI=1 npm run check` passes all **348 tests**, lint/TypeScript and
+both platform exports. Native CI for this correction is still required. No
+hosted mutation, APK action or phase acceptance is implied; candidate availability
+remains the active continuation.
+
+### Candidate admission and empty replay — 2026-09-10
+
+Owner instruction remains to continue development while the Personal Add/latency
+APK regression is deferred. Same branch `feat/228-delivered-origin`, draft #229 /
+Issue #228; accepted main `6dd1fec` and all hosted/device acceptance gates remain.
+
+The new full-schema fixture first reproduces the defect on preceding source:
+70 consumed high-fit Items fill raw baseline top-50 and public ranking returns
+zero although 24 ordinary alternatives exist. This occurs in all 12 Personal/
+Shared × BOOK/MOVIE × DiscoveryMode requests. The forward moves canonical
+admission before retention and reuses that decision during scalar scoring; all
+12 requests then deliver 20. Ordinary Items precede reminders and suppression;
+the genome still chooses at most one reminder from its frozen retained pool.
+
+CLI-created forward `20260910210520_eligibility_first_candidate_pool.sql` is
+**undeployed**, SHA-256
+`92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46`.
+It replaces five existing bodies through guarded anchors and permits zero in the
+shadow result-count constraint. It adds no tables/functions and preserves public
+signatures, genome weights and historical data. New source policy and admission metadata use
+`eligibility-first-v1`; counts/ranks identify the baseline-admission stage.
+V0 retains at most 50 and expensive Scenario/common-fit plus persisted traces
+retain at most `min(50, 3 × requested limit)`. All-suppressed and explicit empty
+source controls complete with zero hypothetical selections. Automatic challenger
+queueing still omits an empty pool. Pre-admission frozen v2 sources remain replayable.
+
+`candidate-pool-smoke.sql` checks 36 Profile/domain/mode/limit combinations, two
+mixed-domain pools, four exhausted and four empty controls. It verifies available
+Items below the old top-50, member-Personal consumption versus Shared eligibility,
+one-reminder limits, bounded traces, exact baseline scores/ranks/selection after
+later consumption/catalog changes and denied outsider/missing-actor calls. No
+synthetic Events or historical trace rewrites occur. The populated upgrade keeps
+application/Auth/receipt rows and old frozen results, every existing function
+identity/owner/ACL/configuration and unrelated constraint; old v2 replay remains
+exact. Unexpected source rolls back the constraint and all prior replacements.
+Both runtime and populated probes are wired into required native CLI CI.
+
+CI for the preceding precision correction `5b9efd3` passed four required gates;
+run 34529961511's native job completed the populated SQL but failed parsing a bare
+UUID emitted by fixture `SELECT set_config`. Setup now uses `DO` / `PERFORM` with
+no output. Both local probe adapters reject non-snapshot rows, closing the gap
+where PGlite silently filtered output that native CI rejected. The precise replay
+migration bytes and exact-score assertions remain unchanged.
+
+`EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **349 tests** (270 mobile,
+14 catalog, 65 database), clean lint/TypeScript and both platform exports.
+New-head required CI remains to be observed. No local Docker/phone/emulator,
+hosted mutation, reset, APK dispatch/poll or merge occurred. Hosted stays on
+`20260910190243`; rollout dependencies are late Outcome attribution → precise
+frozen replay → candidate admission, each still subject to its reviewed rollout.
+
+This is a suppression-admission correction, not completion of `MVP-ALG-002..003`.
+The existing full-catalog feature scan remains and admission now runs before the
+cutoff; bounded indexed retrieval, independent Shared/novelty/Scenario sources,
+cost/quality evidence and duplicate-free continuation remain open. Next source
+slice is the versioned server/client continuation and empty-result contract:
+the client currently treats an empty array as failure. Keep Phase 14.1 recovery
+and deferred Personal two-List APK gates; no release checkbox is closed here.
+
+A bounded local cost diagnostic also compared unchanged versus admitted full-schema
+Personal `FOR_YOU` calls with 100, 1,000 and 5,000 ordinary MOVIE Items and no taste
+history. Median of three warm PGlite samples after one warm-up: **50 → 47 ms**,
+**115 → 144 ms**, **387 → 609 ms**, respectively. Each returned 20 and rolled back
+its trace. This is a WASM fixture measurement, not hosted/device latency or a scale
+acceptance result. It confirms that evaluating admission across the entire catalog
+has a growing cost; indexed bounded sources remain necessary.
+
+### Native candidate/replay acceptance — 2026-09-10
+
+Implementation head `9fb48c286ecbcd6c706427819fadb61500dccb5c`, tested tree
+`06691e988bff49a51a5913410be9941c22dbd461`, passed all five required jobs in
+[CI run 34531767919](https://github.com/Kajooja/Kajo/actions/runs/34531767919).
+The native CLI job 103054841812 reports `KAJO CI CLI INSTALL PASS` on pinned
+Supabase Postgres `17.6.1.167`, image
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+This includes rounded-caller replay precision, populated replay/admission upgrades,
+runtime parity/admission/empty controls, repeated fresh installs, failed-migration
+atomicity, defaults and unchanged native platform boundaries. The two preceding
+native failures are resolved; no tolerance or gate was weakened.
+
+This follow-up changes documentation only. Source/SQL bytes match the accepted
+implementation head. Hosted rollout, physical device acceptance and the remaining
+`MVP-ALG-002..003` retrieval/continuation gates remain open. Continue from STATUS's
+versioned server/client continuation and empty-result slice on the same draft PR.
+
+
+### Owner acceptance update and continuation contract — 2026-09-11
+
+- Owner reports exercised tests working. Fresh/empty-account state could not be
+  tested because additional accounts are unavailable; no cause or exact APK SHA
+  is inferred. Future small-group reset/testing stays deferred; preserve data now.
+- Extended planned #231 to history long-press/multi-select/trash, replacing the
+  permanent removal label only after implementation. No selection code changed.
+- Specified the next Phase 14.2 result/continuation contract in PREDICTION_MODEL:
+  identifiable empty runs, immutable retry identity, bounded scoped cursors,
+  distinct source-window exhaustion and per-page Prediction origins. Acceptance
+  matrix is explicit; server/client implementation remains the next source task.
+- Documentation-only checkpoint; no new runtime tests, hosted rollout, reset, APK
+  polling or merge. Prior source 9fb48c2 passed 349 tests and all five CI gates.
+
+
+### Identified first-page source boundary — 2026-09-11
+
+Continued #228 / draft #229 on `feat/228-delivered-origin` after the owner’s
+positive report for exercised device cases. Fresh-account/empty-state device
+acceptance remains untested; current data is preserved.
+
+CLI-created, undeployed `20260911070959_identified_prediction_page.sql`, SHA-256
+`caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08`,
+adds a versioned first-page RPC. The prior scoring body is reused unchanged except
+for its server-supplied run identity; legacy public row responses remain unchanged.
+Private request receipts make exact retries immutable and reject changed payloads;
+current membership is checked and locked even for cached responses. Request-ID
+advisory locking serializes retries, and trace/receipt writes share a transaction.
+Empty results retain actual PredictionRun identity and distinguish suppression
+from a domain-empty catalog. Explicit `continuationSupported: false` advertises
+that this slice does not implement cursors or switch the mobile reader.
+
+Full-schema checks cover exact old scoring/public-wrapper preservation, guarded
+source rejection, ordered unique origins, retry after catalog mutation, malformed
+requests and changed payloads, six mode/domain suppressed empty runs, empty catalog,
+revoked/outsider authorization, private ACLs and rollback after an injected receipt
+write failure. `prediction-page.mjs` supplies the same rollback-only SQL probe to
+PGlite and required native CLI CI. `EXPO_OFFLINE=1 CI=1 npm run check` exits 0:
+**350 tests** (270 mobile, 14 catalog, 66 database), lint/TypeScript and iOS/Android
+exports. Native CI for this new source, a populated upgrade preservation probe
+and real multi-connection race validation remain open. No hosted deployment,
+reset, APK dispatch/poll, device test or merge occurred.
+
+Next: validate those native/populated gates, then implement the bounded immutable
+continuation window and captured-scope client contract in PREDICTION_MODEL. Deploy
+this fourth pending forward only after late Outcome attribution → frozen replay
+→ candidate admission. Keep Phase 14.1 recovery/device gates and scalable retrieval
+open. STATUS owns current branch/next action; CODEMAP includes the new paths.
+
+
+### First-page upgrade and concurrency verification — 2026-09-11
+
+Prior source `c7a4dddad31b54305a24fb0a71111d134e2ed191` passed all five required
+jobs in [CI run 34573673279](https://github.com/Kajooja/Kajo/actions/runs/34573673279),
+including native first-page behavior and CLI migration history. APK was skipped
+as expected; no device or hosted acceptance is inferred.
+
+This bounded follow-up changes test infrastructure only. The populated upgrade
+probe in `prediction-page.mjs` fingerprints every existing application/Auth-user
+table and preserves old function identities/owners/ACLs/configuration, unrelated
+bodies and constraints. It permits exactly three added function identities,
+checks no unsolicited receipts, and executes both public ranking contracts after
+upgrade. It runs in the existing full-schema PGlite test and in native CLI CI.
+
+`prediction-page-concurrency.mjs` uses independent native sessions through a new
+asynchronous SQL adapter in the already owned, image-verified CI stack. The adapter
+has 10-second statement and 30-second process timeouts, bounded output and no
+external database URL. Each of two cases requires observing an actual ungranted
+advisory lock for the waiting request: identical retry must return the same response;
+changed-payload reuse must reject. Two accepted requests must create exactly two
+receipts and two new runs. Synthetic committed fixture data is removed by the
+next existing CLI reset; the normal complete-snapshot comparison follows it.
+
+`EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **350 tests** (270 mobile,
+14 catalog, 66 database), lint/TypeScript and both exports. The expanded populated
+upgrade probe passes locally. New native concurrency and populated upgrade CI
+results remain pending; PGlite is not evidence of concurrent execution. No runtime
+migration bytes, hosted data, app behavior or APK were changed. All four pending
+forwards keep their existing order and hashes.
+
+Next: inspect this head’s required CI, fix any native probe failure, then continue
+bounded immutable continuation windows and the captured-scope mobile contract.
+Keep #229 draft; no merge, reset of hosted users or APK polling. STATUS remains
+the continuation authority.
+
+
+### Client first-page response validation — 2026-09-11
+
+The new verification source `1a07dd5` reached CI run 34574927760, but its platform
+stack failed at startup with `image-download,port-binding` diagnostic labels before
+application SQL. These are observed symptoms only. Native populated-upgrade and
+concurrent-retry acceptance remains pending; skipped downstream jobs are not passes.
+
+Continued the independent client boundary while preserving the undeployed server
+contract. `predictionPageOperations.ts` creates an immutable captured request/context
+for reuse across transport retries, normalizes UUID scope and consumes the server's
+identified first-page envelope. It verifies Profile/session/mode/domain/request/run,
+ordered unique Item origins, source counts, size, availability and explicit unsupported
+continuation. Valid empty responses preserve the server run ID; transport, auth and
+malformed responses remain errors. The helper does not fabricate Predictions or
+silently call another endpoint. The active legacy reader also now rejects duplicate
+Items/ranks, wrong-domain responses and over-limit results, and copies Item tags.
+
+Twenty-four new boundary tests cover normal/empty results, captured scope mismatches,
+malformed/ambiguous rows, counts/capabilities, immutable requests after caller mutation,
+exact retry and errors. Two legacy regressions cover duplicate origins/ranks and
+wrong scope/size. `EXPO_OFFLINE=1 CI=1 npm run check` exits 0 with **376 tests**
+(296 mobile, 14 catalog, 66 database), lint/TypeScript and both exports.
+
+No server migration bytes or hosted data changed. The new reader is not activated
+in `usePredictionRanking`; bare-empty legacy responses still error. No live runtime,
+phone/emulator, hosted rollout, APK dispatch/poll or merge occurred. This is client
+response parsing, not delivered pagination or empty-state UI. Next: clear native
+upgrade/race gates, implement bounded immutable server continuation windows and
+per-page runs, then activate captured-scope append/empty rendering and validate
+per-Item origins on device. STATUS owns exact continuation; #229 remains draft.
+
+
+### Bounded frozen continuation source — 2026-09-11
+
+Prepared CLI-created forward `20260911074543_prediction_continuation_windows.sql`,
+SHA-256 `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415`.
+It is the fifth undeployed forward, after the identified first-page boundary.
+Source `91d07ee` has four passed jobs in CI 34575684407; the CLI/native-race job was
+still running at this checkpoint. The preceding platform-start symptom did not
+recur, but the pending job must still be inspected before claiming acceptance.
+
+The new private derived cache retains a committed first-page source's exact run,
+ordered candidate rows, scope and initial seen Item IDs. Owner-only open/read
+helpers check actor and current Profile membership, reject expired/drifted sources,
+and reuse the same window without reranking or fabricating Events/PredictionRuns.
+No API grants, public endpoint, first-page receipt changes or mobile activation.
+
+Bounds: 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from source ranking and
+16 windows per actor/Profile. Scope advisory locking serializes creation. New
+requests reclaim expired cache rows only; receipt/run/Event history stays intact.
+Parent actor/Profile/run/receipt deletion cascades. No background cleanup job is
+claimed; dormant scopes retain at most 16 expired rows until reopen/parent removal.
+
+The rollback-only full-schema probe checks exact first-page seen IDs and source,
+idempotence, later catalog/taste state, historical trace drift, empty sources,
+expiry, capacity/reclamation, outsider/missing/revoked actor and API-role denial.
+The same SQL is wired into native CLI CI. `EXPO_OFFLINE=1 CI=1 npm run check` exits
+0 with **377 tests** (296 mobile, 14 catalog, 67 database), lint/TypeScript and both
+platform exports. New native CI, real concurrent window-cap behavior and populated
+window-forward acceptance remain open. No hosted mutation, reset, device test,
+APK dispatch/poll or merge occurred.
+
+Next: atomic page delivery against this frozen ledger, with current eligibility,
+captured-scope/cursor validation, seen-set advancement, independent page run/ranks
+and page-aware frozen/shadow replay. Raw cached candidates include suppressed and
+already selected alternatives: they are not a deliverable page. Keep the public
+first-page capability false until the whole page boundary is implemented and
+verified; then activate the prepared client. STATUS owns the continuation.
+
+
+## Active branch reconciliation — 2026-09-12
+
+The independent-engine architecture and repository audit from #233/#234 are
+reconciled into #229 while preserving every dated implementation/device record
+below the original sprint checkpoint. Current STATUS supersedes historical next
+actions: the corrected source `44b11b4` passed all five CI #458 jobs, so earlier
+pending or failed first-page CI notes are historical. Atomic next-page delivery,
+concurrent window-cap and populated-window upgrade tests, captured-session reader
+activation, five undeployed forwards and device acceptance remain open. This
+reconciliation changes documentation and carries the validated main hygiene fixes;
+it does not complete those feature gates or change hosted data.
+
+Reconciled local validation: `EXPO_OFFLINE=1 CI=1 npm run check` passed 377 tests
+(296 mobile, 14 catalog, 67 database), lint/TypeScript and iOS/Android exports.
+All 53 Markdown files passed local-target/heading-anchor checks. An independent
+310-file source/tooling comparison found no feature implementation or migration
+loss; differences are only the approved unused hook/wrapper removal, js-yaml patch
+and migration-history manifest extension. The entire feature sprint appendix and
+DEVICE_TEST are retained. Current published-head CI remains a separate gate.
+
+
+## Atomic next-page source — 2026-09-12
+
+Resume base: `e0eacb5` / PR #229; all five CI #462 jobs passed. Added CLI-created
+forward `20260912105528_atomic_prediction_pages.sql`, SHA-256
+`594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1`. This is the sixth undeployed forward, after the
+private continuation window. Existing SQL history is unchanged.
+
+Numeric request protocol 2 opts into bounded pages through the existing public
+endpoint; protocol 1 is preserved by an exact private first-page implementation.
+Each next page owns its immutable run, ranks, frozen feature/state/genome inputs,
+current eligibility snapshot and exact receipt. Request/scope locks serialize
+cursor consumption and cache capacity. Later pages exclude the observed seen
+prefix and enforce one reminder per window; the original source is unchanged.
+Expiry/reclamation removes cache/cursors but retains authorized retry receipts
+and historical page context. No arbitrary live candidate refill is introduced.
+
+Page shadow uses `shadow-page-replay-v1`; evaluation declares
+`FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`. Comparisons remain conditional on
+actual preceding production pages, not hypothetical whole-session outcomes.
+The matching version reaches mature evaluation, including a native 0 rating
+attributed to the page that delivered the Item.
+
+Local full check: **378 tests** (296 mobile, 14 catalog, 68 database), lint,
+TypeScript and iOS/Android exports. The focused page test additionally verifies
+12 Personal/Shared/domain/mode windows with 48 page runs, exact baseline replay,
+zero-rating evaluation, current state/catalog eligibility, actor/scope rejection,
+rollback, expiry/reclamation and protocol-1 retries. A populated pre-window
+upgrade preserves old data, first-page receipts, window snapshots and ACLs;
+source-anchor mismatch rolls the forward back without partial DDL.
+
+The required CLI CI runner now observes genuine native lock contention for
+same-request retries, competing cursor consumers and concurrent 16-window
+capacity, and runs the populated upgrade plus both page probes. Published-head
+CI is the native acceptance record; inspect it before advancing the client.
+
+First published head `19247e0` passed four jobs in
+[CI](https://github.com/Kajooja/Kajo/actions/runs/34690842376); the CLI job reached
+the final page-boundary probe and rejected its owner-side snapshot comparison.
+The probe used native `extra_float_digits=0` to compare with a snapshot produced
+inside protocol 2 at precision 3. The same failure was reproduced locally at 0.
+The corrected probe compares at the snapshot's full precision and restores the
+caller setting. Both page probes now run locally at 0 and 3, including caller-GUC
+restoration; no migration or stored-row behavior changed. The follow-up head's
+five CI jobs remain the acceptance gate.
+
+No hosted database change, user-data reset, manual APK dispatch or device
+acceptance is part of this source packet. PR #229 remains draft.
+
+Next: captured-scope protocol-2 validation/reader/cache/append, per-page grid and
+detail origins, then exact reviewed forward rollout and configured-device
+acceptance. STATUS owns this next unit; E1 → D1 → D2 remains the subsequent
+independent-engine research sequence.
+
+
+## Captured-scope mobile pages — 2026-09-12
+
+Resume source: `0a184a7` / PR #229, all five jobs accepted in
+[CI #464](https://github.com/Kajooja/Kajo/actions/runs/34691537142). This resolves
+the preceding atomic-page/native precision checkpoint. No SQL, migration history,
+package version or lockfile changed in this client packet.
+
+The active client now requests protocol 2. `predictionPageOperations.ts` validates
+first/next lineage, exact scoped envelopes, genuine empty identity and contiguous
+unique ranks; explicit protocol-1 compatibility remains. Requests and primitive
+Context attributes are frozen, with a conservative 8,000-byte client bound.
+
+`predictionPageReader.ts` owns one captured environment/actor/Profile/session/
+domain/mode/limit/evidence-revision controller. Retry keeps its exact request;
+refresh replaces the window. Later pages require the original source/time/count,
+next index/cursor and unseen Item/run/request identities. Accepted prefixes are
+immutable, including their per-Item page IDs and terminal empty-run identity.
+Scope/focus cleanup invalidates pending requests and catalog enrichment. Context
+is captured when the focused fetch begins; hidden feedback does not repeatedly
+open unused windows. First scope entry is immediate; subsequent evidence updates
+retain the 600 ms delay only after an earlier page was actually loaded.
+
+Discovery exposes initial/next loading, scoped failures/retry, explicit fresh
+search, empty catalog and bounded exhaustion. A request/view token keys the native
+list and guards its retained visibility/open callbacks with the captured session.
+Shared reordering, clicked detail/swipe and durable actions keep each Item's actual
+page origin. Appending/prefetching creates no impression. The eight-slate navigation
+handoff remains; the old global Item cache and unused row-RPC client were removed.
+Catalog enrichment cannot change a delivered Item's domain.
+
+Validation: `EXPO_OFFLINE=1 CI=1 npm run check` passed **420 tests** (338 mobile,
+14 catalog, 68 database), lint/TypeScript and iOS/Android Hermes exports. Focused
+regressions cover A → B → A, actor/environment/session/revision changes, delayed
+enrichment/error replies, hidden/cancelled activation, exact first/next retries,
+duplicate taps, interrupted/resumed delivery, refresh versus late append,
+lineage/cursor/duplicate rejection, terminal empty runs and mixed-page captured
+origins. Published-head CI remains the required independent gate.
+
+No native emulator/`adb` or React Native web renderer is available in this workspace;
+no configured-device/visual acceptance is claimed. Hosted state was not queried or
+changed, and no APK was dispatched or polled. This client requires all six pending
+forwards; it intentionally fails closed against an older endpoint. DEVICE_TEST
+contains the next configured flow checks. PR #229 and Sprint014 remain open.
+
+Next: exact existing-database six-forward preflight/rehearsal/rollout, then the
+identified configured client/device checks. STATUS is the authoritative next task;
+E1 → D1 → D2 retains its separate engine/public-data order.
+
+
+## Hosted Prediction preflight and compatibility — 2026-09-12
+
+Resume source: `8a1936c69e8f2dd2f0bd5b770177dcfb50aee9de` / PR #229,
+all five required jobs passed in [CI #465](https://github.com/Kajooja/Kajo/actions/runs/34693634630).
+The next packet was existing-target rollout preparation. No hosted DDL, data,
+migration-history repair, reset, APK dispatch or device acceptance was performed.
+The reviewed deployment below is the concrete next hosted action for owner approval.
+
+Read-only target: **Kajo `mwrnvfosrzwygrunrltm`**, PostgreSQL 17.6,
+ACTIVE_HEALTHY, eu-west-1. Actual tracking has 50 version/name rows, ending at
+`20260910190243_shared_list_destinations`. Metadata capture covers 138
+public/private functions, 33 table definition fingerprints, 25 application/Auth-user
+triggers, seven event triggers and 24 creator-default entries. It exports neither
+application/Auth rows nor row-derived counts/hashes. Raw metadata stays outside Git.
+
+Against the independently reconstructed source at that checkpoint, 112 of 137
+application functions match definition/owner/ACL exactly; all 137 owners/ACLs
+match. The 25 known definition differences fall within ADR-0006's previously
+reviewed formatting/alias/staging ledger. Hosted-only `private.rls_auto_enable()`
+is the existing platform trigger helper and must be preserved. This is not full
+hosted-to-source equivalence or migration-history equivalence.
+
+Three of the five functions touched by this packet match source exactly. The two
+SleepLayer functions retain their known compact bodies. Full source-body lexical
+review (strings/operators preserved, whitespace/comments ignored only as a review
+aid) found identical 1,329 evaluator and 669 worker tokens. Exact stored hashes
+remain distinct and are not normalized in metadata comparisons.
+
+Preflight fingerprints (`function-schema-snapshot.sql`, `search_path=pg_catalog`):
+
+| Function (existing exact signature in source) | Full definition SHA-256 |
+| --- | --- |
+| `private.rank_items_v0` | `a67bef2ff700c51831161bc16fb64b844e5480ec457b88e3c5a7276d19630aba` |
+| `private.rank_items_scalar_v1` | `50dca3c127be1fccf1abc611cfdc8f42997b4c5ea7abf97f2df631b02813e6d7` |
+| `private.rank_items_v1_internal` | `21b01bc3b8df88331e337bd127192d2a2d3ad9ff735553844bcfbf7e9326ab98` |
+| `private.process_shadow_prediction_jobs_v1` | `d8545db8c44201b67eb479d7a2595c194ee9baaa2acf87940a901fbaa01cce1c` |
+| `private.evaluate_shadow_genome_v1` | `50a6ba3ce029e6a1a4f2451f4f97c43455ed879136441e74e2d91b4a82426532` |
+
+**Reproduced blocker:** installing the unchanged first forward into an isolated
+populated source checkpoint containing those exact captured function bodies failed
+with `Late outcome forward: unexpected source anchor ... evaluate_shadow_genome_v1
+(expected 1, found 0)`. Fresh-lineage CI alone had not covered this hosted variant.
+
+Only the two still-undeployed late Outcome/replay files were corrected. Each
+recognizes its one exact compact full-definition SHA-256, places the already
+reviewed canonical function into the migration's local text variable, then applies
+the existing guarded feature patches. CREATE OR REPLACE preserves function
+identity/owner/ACL. No global text normalization, broad source replacement,
+additional migration or deployed-history edit is involved. The prior recorded
+hashes `36cffca7490bc46ba94882de52def69c1d0618cea0e4a33175d70bccb5256d9b`
+and `22d42dce06240092faec75550adcf70de75846079ac48ade0a80231671511f4a`
+are historical and must not be used for this deployment.
+
+Exact reviewed files, in dependency order:
+
+| Migration | Current SQL SHA-256 |
+| --- | --- |
+| `20260910192630_late_outcome_attribution.sql` | `6c724f941bd475f409a151841464f3e56d7a69023aaf72d521279f8c64586337` |
+| `20260910202244_frozen_prediction_replay.sql` | `1b471f7c894035a6154fbc98499ca7ee3dd499c9f4e6902cb72c35fdb7801d1c` |
+| `20260910210520_eligibility_first_candidate_pool.sql` | `92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46` |
+| `20260911070959_identified_prediction_page.sql` | `caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08` |
+| `20260911074543_prediction_continuation_windows.sql` | `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415` |
+| `20260912105528_atomic_prediction_pages.sql` | `594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1` |
+
+Validation: `EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile,
+14 catalog, 69 database), lint/TypeScript and iOS/Android exports.
+`prediction-hosted-source-fixture.sql` contains only the two checksum-pinned schema
+bodies. `prediction-hosted-upgrade.mjs` rehearses all six forwards with synthetic
+existing data, preserving every prior row, function identity/ACL, unrelated
+function body and unrelated constraint; private storage/helper checks also run
+under the open factory function default. A second rolled-back transaction runs
+the full 12-window/48-page Personal/Shared/domain/mode and frozen replay probe.
+The regression mutates a compact semantic token in either function and confirms
+rejection with no leftover DDL or fixture users. The same preservation/runtime SQL
+is now part of required native CLI CI and its metadata report. Inspect the
+published head's five jobs before any hosted mutation.
+
+Security advisor baseline: 19 `rls_enabled_no_policy` INFO findings for intentionally
+private, denied-direct-access tables, plus the existing Auth leaked-password
+protection WARN. See the [RLS advisory](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)
+and [password protection guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+No broad policy grants or Auth configuration changes are part of this packet.
+
+Deployment and partial-failure procedure:
+
+1. Confirm applicable owner authorization for this exact existing target and six
+   SQL files, refresh refs/current CI, actual version/name tracking and metadata.
+   Re-read the five fingerprints above; fail on unreviewed drift. Preserve the
+   full before function/table/trigger/default snapshots without exporting user data.
+2. Apply each reviewed file through `apply_migration` in the listed order, using
+   its exact SQL bytes. Verify provider success and the resulting function/ACL/
+   storage boundary before proceeding. Record actual provider version/name and
+   unchanged SQL hash. Never replay a migration whose commit already succeeded.
+3. Expected total change: twelve new private/public functions, four private RLS
+   tables and one immutable-context trigger; only the five old function bodies
+   above change. Existing identities/owners/ACLs, unrelated definitions/triggers,
+   defaults and the previous 50 tracking rows must remain. The one existing
+   `shadow_prediction_runs_counts_check` is deliberately relaxed to allow zero.
+   Metadata parity and isolated preservation proof are separate from live data checks.
+4. If an individual call fails or its result is ambiguous, stop the sequence and
+   re-read provider history/definitions. The migration transaction must either
+   commit completely or leave no partial DDL. Record the actual successful prefix
+   and prepare a narrow reviewed correction; never reset, drop historical evidence,
+   overwrite receipts or run whole-history `db push`/name-only repair. Preserve
+   source/provider identity mapping if execution pauses; once the chain is complete,
+   synchronize filenames/references in provider dependency order without changing SQL.
+5. Once protocol 2 is deployed, reverting the schema wholesale is not a safe
+   rollback: page receipts/runs/context may already exist. If service restoration
+   is needed, prepare a narrow forward that disables the affected public page
+   endpoint while retaining evidence and the existing row endpoint. No such
+   emergency write is implicitly executed by this preparation packet.
+6. Recheck final definitions/ACLs, private RLS/storage boundaries, unauthenticated
+   denial and advisors. Then perform the configured-client checklist in DEVICE_TEST
+   with the exact identified build. Existing data and fresh-account limitations
+   remain; no account reset or automatic APK dispatch is authorized here.
+
+Next: approval and refreshed preflight for this six-forward hosted rollout,
+then configured-device acceptance. PR #229 remains draft, full DATA/ALG and
+Sprint014 remain open, and E1 → D1 → D2 retains its independent engine order.
+
+
+## Approved hosted Prediction rollout — 2026-09-12
+
+The owner explicitly approved the exact six-forward packet on existing **Kajo
+`mwrnvfosrzwygrunrltm`**, preserving current data. This completes the preceding
+preflight's requested action; its old pending/approval instructions are historical.
+Do not repeat these migrations or request that same authorization again.
+
+Deployment source: `78217135897cbfe10c85a0b6610989272bdc87c8` / draft PR #229.
+All five required jobs passed in [CI #466](https://github.com/Kajooja/Kajo/actions/runs/34695947055):
+pinned platform, source validation, clean installations, native CLI lineage and
+populated upgrade. The native CLI log includes the compact-source six-forward
+preservation/runtime probe and ends with its install/rollback/runtime PASS.
+The initial read-only refresh matched the reviewed target, 50 migration rows and
+all captured function/table/trigger/default metadata exactly.
+
+Each approved SQL file was applied separately, in dependency order, with provider
+success and function/owner/ACL/history/private-storage checks before the next.
+All six committed successfully. The provider assigned these actual versions:
+
+| Reviewed source filename | Installed filename | Unchanged SQL SHA-256 |
+| --- | --- | --- |
+| `20260910192630_late_outcome_attribution.sql` | `20260912133402_late_outcome_attribution.sql` | `6c724f941bd475f409a151841464f3e56d7a69023aaf72d521279f8c64586337` |
+| `20260910202244_frozen_prediction_replay.sql` | `20260912133832_frozen_prediction_replay.sql` | `1b471f7c894035a6154fbc98499ca7ee3dd499c9f4e6902cb72c35fdb7801d1c` |
+| `20260910210520_eligibility_first_candidate_pool.sql` | `20260912133941_eligibility_first_candidate_pool.sql` | `92bf98666e22c62873d54a74c586b4deddbc0cc0daff168c8dcd0e65a40b7b46` |
+| `20260911070959_identified_prediction_page.sql` | `20260912134056_identified_prediction_page.sql` | `caf66c1e5558632e9dab78a538237d3e99594b41fa703b87f237b560445c4e08` |
+| `20260911074543_prediction_continuation_windows.sql` | `20260912134141_prediction_continuation_windows.sql` | `1dad709b42d2072ea93166dccd846f01a91f6435763f1687c95d0b676358e415` |
+| `20260912105528_atomic_prediction_pages.sql` | `20260912134224_atomic_prediction_pages.sql` | `594e293f91a8ec4493bcbac4f68e30e64e33bf2611d8c6d37b3801ba38a1c7a1` |
+
+The repository filenames and current canonical references now match those
+provider identities. Only the names changed; every SQL byte still matches the
+approved hash. Earlier dated sprint entries retain their original source names,
+with this mapping as the continuation authority. Previously protected source
+hashes and the accepted fresh-install baseline cutoff remain unchanged. These
+six deployed bodies are immutable; any subsequent correction requires a new
+reviewed forward.
+
+Final metadata verification:
+
+- Migration tracking: **50 → 56** rows, all original version/name pairs unchanged;
+  the exact six names appear in the approved sequence.
+- Public/private functions: **138 → 150**. Every stage's changed/new definition
+  matches the independently reconstructed source fingerprint. All 138 original
+  OIDs/signatures, owners and ACLs are preserved; only the five reviewed existing
+  ranking/evaluator/worker bodies changed. All unrelated definitions are unchanged.
+- Application tables: **33 → 37**. Four new private page receipt/window/context/
+  cursor tables have RLS and deny direct SELECT to anon, authenticated and
+  service_role. All 33 prior complete definition/structure fingerprints match
+  when the one changed `shadow_prediction_runs_counts_check` is virtually
+  substituted with its prior expression inside a read-only metadata query.
+  This isolates the intended zero-count relaxation without changing the database.
+- All **25** prior application/Auth-user triggers are identical; the one new
+  immutable page-context trigger brings the count to **26**. All **7** event
+  triggers, **24** creator-default entries, schemas, roles and memberships are
+  unchanged.
+- In an explicitly read-only transaction with empty JWT claims, both anon and
+  authenticated-without-actor calls to `public.rank_items_page_v1` reject with
+  `42501`. The probe rolls back and creates no users, fixtures or page data.
+- Security advisors: **23 RLS/no-policy INFO** findings, the prior 19 plus the four
+  intentionally private page tables; no new warnings. The existing Auth
+  leaked-password-protection WARN remains outside this packet. See the
+  [RLS advisory](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)
+  and [Auth protection guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+No application/Auth rows or row-derived counts/hashes were exported. Hosted
+metadata checks and the isolated populated-data preservation/runtime proof are
+separate evidence; this is not a live full-row equality claim. No reset,
+whole-history push, historical tracking repair, global-default migration,
+automatic promotion or Auth configuration change ran.
+`20260909131913_close_postgres_function_defaults.sql` remains undeployed.
+
+Before deployment and after filename alignment, local
+`EXPO_OFFLINE=1 CI=1 npm run check` passed **421 tests** (338 mobile, 14 catalog,
+69 database), lint/TypeScript and iOS/Android Hermes exports. All 53 Markdown files
+and 134 relative file/heading links were checked; none were broken. The PR owns
+verification of the published head. Neither filenames nor documentation change
+mobile behavior.
+
+Next bounded unit: record the exact configured client build/environment against
+server checkpoint `20260912134224_atomic_prediction_pages`, then execute the
+[protocol-2 device/recovery checklist](../DEVICE_TEST.md#protocol-2-configured-client-check--prepared-2026-09-12).
+No emulator/adb or React Native web renderer is available here; no exact newly
+installed build, device result or fresh-account acceptance is claimed. No APK was
+dispatched or polled, and existing account/test history was retained. Keep PR #229
+draft and DATA/ALG/Sprint014 gates open until their actual evidence is accepted.
+STATUS retains this single continuation; E1 → D1 → D2 remains the separately
+selected independent-engine/research sequence.
+
+## Bounded client recovery — 2026-09-12
+
+Resumed draft PR #229 at `7d47e44bb55ee7c5e5544fa92b0bcdc6f44a2401`; all five
+required jobs passed in [CI #467](https://github.com/Kajooja/Kajo/actions/runs/34697784410).
+A read-only migration-history query reconfirmed the six installed versions ending
+at `20260912134224_atomic_prediction_pages`. No deployment or data mutation ran.
+
+A new regression reproduced an unresolved first-page load remaining `loading`
+after 15 seconds. The reader now bounds each first/next attempt to 15 seconds
+across the ranking RPC and catalog enrichment. It sends one AbortSignal through
+both SDK requests and races cancellation even if the transport never settles.
+Scope/focus changes and explicit refresh cancel old attempts; timers/listeners
+are released on settlement. A failed append preserves the immutable prefix and
+its page origins; timeout/transport retry retains the original request/context/
+cursor, since client cancellation does not prove a server rollback.
+
+The configured loader preserves server error codes. Exact unusable-cursor errors
+select a fresh search, while capacity errors ask the user to wait and retry.
+Unknown/permission/transport errors use generic copy without exposing server
+details. Buttons and pull recovery follow the same action; no automatic refresh,
+mock downgrade, Event creation or SQL change is introduced. The injected SDK
+transport checks follow the documented
+[AbortSignal boundary](https://supabase.com/docs/reference/javascript/using-modifiers-abortsignal).
+
+Validation: the formerly failing regression passes; **91** focused page/reader/
+catalog tests pass. `EXPO_OFFLINE=1 CI=1 npm run check` passed **439 tests**
+(356 mobile, 14 catalog, 69 database), lint/TypeScript and iOS/Android Hermes
+exports. New cases cover hanging first/next loads, exact retry, late completion,
+blur/reactivation, replaced-attempt deadlines, immutable prefixes, expired cursor
+recovery, capacity and actual SDK signal/error-code propagation with injected HTTP
+fixtures. The published head still requires its own five CI jobs; CI #467 proves
+the resume baseline only.
+
+No native emulator/adb or web renderer is available here, and no new configured
+APK was installed, built or polled. DEVICE_TEST includes the new stalled-request
+and expiry checks; exact build identity, native callbacks, process-death/reconnect
+and fresh-account acceptance remain open. Preserve current test data and keep
+#229 draft. STATUS retains configured-device recovery as the default continuation;
+E1 → D1 → D2 can be explicitly selected while those device gates wait.
+
+## Owner device feedback and E1 selection — 2026-09-12
+
+The owner reports the protocol-2 test flows working, including Profile changes,
+expired cursor → new search and the reported persistence/restart checks. Manual
+CI #469 passed at `900dc2653e428bb1cbd27e4bdaa7ea0141e47b31` and produced its
+matching APK artifact; DEVICE_TEST records the verified artifact identity and
+limits of the self-reported device evidence. The remaining network-recovery
+button defect is #240 / MVP-UX-003 and stays open for a device-verified correction.
+
+Owner direction explicitly places application UI changes in a later required
+pre-MVP packet. #230 private statistics/progress/weekly tracking and #231 grid
+selection/List/history actions now map to MVP-UX-004/005. New #239 / MVP-UX-006
+covers star → default Tykätyt, header overflow → other Lists, bottom slider/actions
+and explicit Next after saving. UX_PRINCIPLES distinguishes this planned successor
+from today’s accepted automatic advancement; DATA_EVENTS retains existing Saved,
+Shared consent and no-implied-rating/Next semantics. No UI source was changed.
+
+The selected independent source packet is E1 #235 on
+`feat/235-portable-engine-contracts`, starting from accepted main. It supplies
+executable generic contracts and media/non-media fixtures before D1/D2. #229
+retains its native/remaining acceptance record, and no missing test or requirement
+is marked complete just to begin E1. No new DDL, APK dispatch/polling or reset ran.

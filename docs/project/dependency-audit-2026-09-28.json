@@ -2,7 +2,7 @@
   "format": "kajo-dependency-audit-v1",
   "date": "2026-09-28",
   "scope": "all root npm workspaces, production and development dependencies",
-  "packageLockSha256": "71efc6d856d538d810c25e2eeabb9a9c3628031a95061de9c47a5b0bcd7febdc",
+  "packageLockSha256": "cb30bd8bb84fb2d3dac65e751092bd10e877ea0c06cdc83c58f20f1cdc71f7b9",
   "result": {
     "auditReportVersion": 2,
     "vulnerabilities": {},
@@ -16,12 +16,12 @@
         "total": 0
       },
       "dependencies": {
-        "prod": 570,
+        "prod": 571,
         "dev": 338,
         "optional": 94,
         "peer": 17,
         "peerOptional": 0,
-        "total": 935
+        "total": 936
       }
     }
   },

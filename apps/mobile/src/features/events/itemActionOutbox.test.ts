@@ -39,6 +39,45 @@ function deferred<T>() {
 }
 
 describe('durable actor/Profile Item action outbox', () => {
+  it('does not lose exposure acknowledgement arriving while the waiting result is in flight', async () => {
+    vi.useFakeTimers();
+    const deferredResult = deferred<ItemActionResult>();
+    const send = vi.fn(async (command: ItemActionCommand) => success(command));
+    send.mockReturnValueOnce(deferredResult.promise);
+    const { queue } = setup(storage(), send);
+    queue.enqueue(entry(10)); await Promise.resolve();
+    queue.resumeAfterExposure();
+    deferredResult.resolve({ status: 'error', retryable: true, waitingForExposure: true, message: 'Wait' });
+    await queue.waitForIdle();
+    expect(send).toHaveBeenCalledTimes(2);
+    expect(queue.pending()).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it('exposure acknowledgement cannot bypass network backoff or a rejected action', async () => {
+    vi.useFakeTimers();
+    for (const retryable of [true, false]) {
+      const send = vi.fn(async (): Promise<ItemActionResult> => ({ status: 'error', retryable,
+        rejectedAction: !retryable, message: 'Actual failure' }));
+      const { queue } = setup(storage(), send);
+      queue.enqueue(entry(10)); await queue.waitForIdle();
+      queue.resumeAfterExposure(); await queue.waitForIdle();
+      expect(send).toHaveBeenCalledOnce();
+      expect(queue.snapshot().message).toBe('Actual failure');
+      queue.stop();
+    }
+  });
+
+  it('does not resume stopped exposure work when its old Event acknowledgement arrives', async () => {
+    const send = vi.fn(async (): Promise<ItemActionResult> => ({ status: 'error', retryable: true,
+      waitingForExposure: true, message: 'Wait' }));
+    const { queue } = setup(storage(), send);
+    queue.enqueue(entry(10)); await queue.waitForIdle(); queue.stop();
+    queue.resumeAfterExposure(); await queue.waitForIdle();
+    expect(send).toHaveBeenCalledOnce(); expect(queue.pending()).toHaveLength(1);
+  });
+
   it('persists before dispatch/optimistic acceptance and freezes the caller payload', async () => {
     const store = storage();
     const sent = deferred<ItemActionResult>();

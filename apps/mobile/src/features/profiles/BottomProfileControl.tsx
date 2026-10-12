@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getDockPanelBottomInset } from '../discovery/shellLayout';
 
 import { useActiveProfile } from './ActiveProfileContext';
 import { getBottomProfileControlAction } from './bottomProfileControlBehavior';
@@ -165,7 +166,7 @@ export function BottomProfileControl({
               {
                 backgroundColor: panelColor,
                 borderColor,
-                marginBottom: insets.bottom + 54,
+                marginBottom: getDockPanelBottomInset(insets.bottom),
               },
             ]}
           >

@@ -4,6 +4,120 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Source integration decision — 2026-10-12
+
+The owner explicitly authorized merging the complete #229 → #329 source stack
+into main after required CI. This supersedes the earlier device-based source
+merge hold. Configured-device/fresh-account evidence, hosted rollout, measured
+quality and every incomplete MVP gate retain their existing acceptance scope.
+After integration, start from main and connect the owned adaptive TasteSession
+and frozen challenge mobile flow. STATUS owns the exact publication receipt.
+Older dated sections below preserve their original decisions and evidence.
+
+## Prospective Personal source and evaluation order — 2026-10-10
+
+The active source successor now supplies bounded server declaration of actual OFF
+pairs and immutable latest-terminal outcome captures, with whole-source withdrawal
+and durable capture reservations. STATUS and #229 own exact publication and gates.
+The active successor consumes those actual receipts in a bounded private owner-run
+coverage report. Its source-only cohort protocol now fixes a future roster/window,
+complete supplied enrollment reconciliation, deterministic pairs, first reserved
+capture and exported-file lifecycle. No real authorized cohort is instantiated.
+The exact #322 source has all five CI #633 gates successful. Actual collection
+still requires native/operator access and an independently retained declaration.
+The October 12 continuation integrates the separate #306 eligibility source in
+#323 and implements a bounded portable Personal Taste selector plus the existing
+calibration's independent unknown/prefix/scope correction. The selector now has
+the #328 server SQL adapter; its mobile consumer remains open. The completed
+native distinct-Item base confidence correction
+preserves scores and frozen history while removing tag/action multiplicity from
+its uncalibrated support heuristic. Source/CI, hosted
+rollout and observed acceptance remain separate. #325 source now passes all five
+CI #637 gates; #324 CI #636 supplies a standalone test APK, with actual device
+acceptance still open. The completed #326 source corrects canonical Personal rating
+revision/source fusion and bootstrap forgetting: surviving native rating authority
+supersedes earlier same-Item ratings and bootstrap contribution; zero/neutral,
+exact Undo, selective clears, ambiguity and effective strong setup support now
+share the same resolver across memory and both kernels. Source clocks remain
+proxies. This preserves the existing six-strong native status and distinct
+known-rating Taste thresholds.
+The current own-Personal server successor supplies frozen policy/catalog and
+durable authorized presentation/response receipts, independent portable/SQL
+selection parity, rating-only bootstrap projection and removal. The current
+successor freezes canonical holdout forecasts before accepting evaluation-only
+answers, with descriptive same-domain ordinal agreement and explicit ties/missing
+support. Next connect the adaptive app flow to both authorized boundaries.
+The source does not invent a real roster,
+prove screen exposure or supply an anonymous session.
+Observed quality and canary claims remain separate. Stored
+clocks remain proxies, repeated source/subject-Item evidence remains dependent,
+and no local fixture admits learning or native activation. Preserve the existing
+bootstrap/transfer/first-session, genuine #232F, #306 and device/release order.
+
+The complete 51-part [capability map](ENGINE_BUILDOUT.md) from #303 is now
+reconciled into this current dependency-corrected source stack, with October 12
+state/evaluation/Taste foundations recorded below. Original #303 is closed as
+superseded; its integrated #327 replacement passes all five CI #641 gates.
+This does not mark a complete target capability delivered. The later source
+integration decision above separately authorizes the native stack merge.
+
+## Engine build-out commitment — 2026-10-05
+
+The complete [51-part Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md) is already the accepted target. The owner now requires explicit implementation traceability so that state, multi-space geometry, scenario/trajectory memory, future branches, dreams and evolution do not remain disconnected future ideas.
+
+[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md) maps every architecture section to twelve bounded capability/acceptance packets; [#302](https://github.com/Kajooja/Kajo/issues/302) tracks their delivery. The ledger owns completion evidence, while **this ROADMAP remains the only execution-order authority**. Existing MVP IDs and release gates are unchanged. E1/D1/D2 remain complete; their reference/research acceptance is not native serving integration or later-generation acceptance.
+
+| Capability packet | Execution placement and dependency |
+|---|---|
+| EB-01 — evidence and portable native integration | Existing evidence/parity work stays in 14.1–14.2. Inventory the E1/native mapping after that acceptance, then extract one parity-tested computation through the current boundary. Full extraction is separately scoped, not silently made an MVP blocker or canceled because an external prior loses. |
+| EB-02 — adaptive state | Existing Working/Short/Long, World/Belief and context foundations stay in 14.4; joint interaction behavior also follows the #232/16.3 contract. Later learned state extensions require supported observations and ablations. |
+| EB-03 — operating evaluation/replay | Existing bounded worker, frozen decisions, delayed outcomes and manual rollout/rollback stay in 14.5. This evaluation foundation precedes new learned-component admission. |
+| EB-04 — local scenario/trajectory recall | Retain the existing ScenarioMemory and 14.4 acceptance; extend to measured ordered-prefix/continuation recall after EB-01/02/03. A no-retrieval control and no-useful-match path are required. |
+| EB-05 — learned multi-space geometry | After useful EB-04 and permitted training evidence. Compare transparent and task-conditioned representations before optional ANN; version/rebuild/switch indexes safely. No new product domain or native global memory is a mandatory prerequisite. |
+| EB-06 — native global scenario memory | After local semantics plus consent/cohort/deletion/exposure and sufficient-evidence gates. ExternalTastePrior is separate. Scale or shared dreams cannot bypass those gates. |
+| EB-07 — world/outcome model and branches | After truthful state, evaluation and observable horizon-defined targets. Begin with a calibrated one-step experiment; no dependency on a global graph, ANN scale or a multistep dream system. |
+| EB-08 — policy and active learning | Existing modes remain in 14.4 and recognition-aware Taste in 15.0. Later distributional policies follow EB-07; stochastic policy evaluation requires truthful action/slate probabilities and support. |
+| EB-09 — consolidation and typed graph | After lineage/lifecycle and local retrieval. Compare one prototype/edge family with uncompressed/unlinked controls; a dedicated graph database is not required. |
+| EB-10 — dreams and synthetic memory | After supported EB-07 transitions and EB-03 evaluation. Begin with short real-anchored rollouts and real-only controls; expand only on independent real evidence with bounded synthetic influence. |
+| EB-11 — evolving geometry/models | Simple configuration challengers follow EB-03. Representation/model/dream families follow the acceptance of the components they vary. Keep bounded search, untouched final evaluation, admission and rollback; no automatic production mutation. |
+| EB-12 — real second-domain portability | E1's synthetic fixture is already complete. A separately selected real-domain study follows adequate core/data contracts; full-engine acceptance requires applicable EB evidence and an end-to-end runtime/rollback demonstration. No new dataset or service is selected by this documentation. |
+
+The October 12 integration preserves the current STATUS handoff and the Personal correctness → own-Personal server TasteSession dependency. #229's configured-device/fresh-account gate remains open. The capability ledger is not twelve new active tasks and does not restore the October 5 next-step instructions. Source, CI, hosted and device acceptance remain separate.
+
+Then complete remaining Phase 14 evidence/catalog, adaptive memory and operating evaluation in their existing dependency order, followed by the established Taste → Friend → Shared → beta → store → Share Link march. At the next engine-specific packet, use the ledger's first unmet applicable capability and create/reuse one narrow implementation issue under #302. Do not repeat accepted contracts or the rejected D2 experiment.
+
+After first release, the **engine has its own dependency-driven build-out path**, rather than waiting behind every later product feature. The normal progression is transparent native integration/state/evaluation → useful local trajectories → measured latent geometry and supported one-step world/outcome modeling → bounded dreams → wider model/geometry evolution and real portability evidence. Global memory and consolidation enter when their own gates pass; they are not invented prerequisites for unrelated one-step work. Music, events, feeds and dating are not mandatory predecessors. An independent pre-release research slice still requires explicit selection and must not displace release-critical work.
+
+Preserve all 51 target capabilities. A method may be rejected or a capability deferred with recorded evidence and a successor/owner decision; do not silently delete the capability, declare it delivered because documentation exists, or require a speculative technique to win before Kajo can release. The later-generation limits in FUTURE_PLAN/ADR-0008 remain valid; read their product ordering together with this explicit engine dependency path.
+
+## Personal correctness and first-session value — dependency audit, 2026-10-09
+
+The October 9 sequence first required the live native LongTerm decay divergence
+between memory snapshots and serving to be corrected. #314 supplies that source;
+#315–#326 add bounded state/evaluation, source-aware forgetting/support and the
+portable Taste selector. These source foundations do not establish recommendation
+quality. The own-Personal server TasteSession and frozen evaluation-only
+challenge now have source boundaries; next integrate their adaptive mobile flow.
+Use versioned
+components, fixed baselines and measured first-session usefulness; a new model
+family is not a prerequisite. This source-plan priority does not mark a
+component, main integration, rollout or device gate accepted.
+
+Personal source work can proceed alongside explicitly scoped Shared and native
+acceptance. Known Shared evidence/eligibility defects must still be resolved.
+The genuine consumer of #232F's prepared input remains queued: it must calculate
+from that exact input and atomically retain the resulting forecast lineage before
+joint learning/serving admission. Input preparation is not delivered consumption.
+#306 source is integrated in #323 with all five CI #634 gates passed; the duplicate
+#306 is closed after exact source comparison. Its guarded hosted rollout and
+device acceptance remain open. Keep #229 native/device/fresh-account acceptance,
+Phase 16.3 and every MVP requirement. STATUS owns exact source and acceptance.
+
+Before real anonymous Taste acceptance, provide server-backed anonymous state,
+minimum retention/deletion and abuse controls, and versioned measurement.
+Personal policy source work may start earlier on authorized fixtures; full
+conversion, operations, complete beta and Share Link acceptance remain required.
+
 ## Unfinished work disposition — 2026-09-29
 
 The owner explicitly permits scheduling unfinished work at its correct dependency
@@ -16,16 +130,16 @@ release requirements. Historical sprint plans do not override this order.
 
 | Work | Disposition and execution slot | Dependency and remaining acceptance |
 | --- | --- | --- |
-| #228 / draft #229 delivery | Critical current Sprint 014, 14.1–14.2. Reconciled source; native acceptance open. | Preserve immutable origins, trace, captured reader and deployed forwards. Integrate accepted dependency fixes and verify the resulting exact head; complete configured-device/fresh-account observations. No repeated DDL or account reset. |
+| #228 / #229 delivery | Critical current Sprint 014, 14.1–14.2. Reconciled source; native acceptance open. | Preserve immutable origins, trace, captured reader and deployed forwards. Integrate accepted dependency fixes and verify the resulting exact head; complete configured-device/fresh-account observations. No repeated DDL or account reset. |
 | #240 reconnect | Source implemented in #229 under 14.2; MVP-UX-003 remains open for acceptance. | Exact failed request/cursor/context, focused foreground scope, bounded/coalesced retry and backend success before error removal. Keep expiry and real-device regression; do not create a duplicate future implementation. |
 | #177 common fit | 14.1–14.2 acceptance only; scorer and hosted rollout already accepted. | Observe authorized Shared sparse/disagreement/trace behavior on the configured Android build. No replacement scorer or repeated deployment. |
 | #182 catalog | Critical catalog work, 14.3. Diagnostic/cleanup source accepted through #294. | Separate bounded operator/budget before new acquisition; then rights, fresh reconciliation and guarded writes. Eight old requests stay consumed. Six useful descriptions and actual text/link device observations remain. Completed MOVIE expansion is not repeated. |
 | #238 dependencies | Recorded source advisories resolved through #296; ongoing MVP-OPS-005 maintenance. | Accepted compatible decoder/UUID/Vitest fixes, audit receipt and required CI. Actual web/native link round-trips remain under 15.1 / MVP-ACQ-007; Node parser tests do not close them. |
 | #160 security | Immediate accepted-source deployment/platform follow-up; complete abuse/privacy gate in 17.2, production recheck in 19.0. | #295 fixes source configuration/input validation. Hosted verification, password protection, supported security upgrade and distributed abuse/anti-enumeration remain. Public-entry controls must pass before external users, even when built ahead of their numbered operations phase. |
-| #184 identity conversion | Scheduled 15.1 after 14 and adaptive Taste 15.0. | Same logical User/PersonalProfile, ownership-proved collisions, interruption/retry and real Google/Apple browser/app configuration. No email-only merge or duplicate taste state. |
-| #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred merely because UI is later. |
+| #184 identity conversion | Complete provider conversion in 15.1; server-backed anonymous identity is a prerequisite within 15.0. | Same logical User/PersonalProfile, ownership-proved collisions, interruption/retry and real Google/Apple browser/app configuration. Minimum anonymous retention/abuse/measurement precedes real Taste acceptance; no email-only merge or duplicate taste state. |
+| #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; genuine #232F consumer remains queued; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred; advanced Shared consumer/model enhancements are not a serial prerequisite to Personal source work. |
 | #200 history navigation | Scheduled 17.0, before visual browse refinements. | Discovery Katsotut/Luetut must use canonical active-Profile/ItemType history and contextual Lists, with cold entry, permission/error handling and real-origin return. Reuse #229 and accepted cold-history work. |
-| #199 grid | Scheduled 17.0 after accepted #229 pagination. | Density, coalesced continuous loading, stable order/deduplication, safe final rows and small-screen/large-text checks. Old poster/token/import defect is superseded by accepted catalog work, not grounds for another MOVIE acquisition. |
+| #199 grid | Owner-promoted append/compact-layout correction in the current native packet (2026-10-06); remaining broad UX stays 17.0 after accepted #229. | BOOK/MOVIE append must pass beyond the old 50-candidate window without recycling/resetting Items, preserve exact origins/order and report genuine eligible-catalogue exhaustion separately from limits/expiry. One-row ItemType/Löydä/history and unused bottom-space removal are included. Server forward, CI/APK and real gesture/small-screen/large-text acceptance remain separate. Old poster/token/import defect remains superseded; no new MOVIE acquisition. |
 | #239 cards | Scheduled 17.0, required MVP-UX-006. | Reuse Saved/Shared Endorsement, multi-destination commands and exact origins. Star/overflow/explicit Next, fit-aware description/credit and accessible Back; saving stays on card and Next adds no taste evidence. |
 | #231 selection | Scheduled 17.0, required MVP-UX-005, after DATA-003/004 and List/history correctness. | Canonical selected IDs/origins, durable partial results, atomic moves, Shared consent, retry/restart and membership changes. History list/poster views use the same collection; trash does not erase unrelated state. |
 | #230 statistics | Scheduled 17.0 private summaries; weekly work depends on 17.1/17.2 telemetry/privacy. | Source-aware distinct counts including rating zero, independent unlock, retry-safe weekly snapshots and Helsinki/DST boundaries, correction/deletion/isolation. Community comparisons remain conditional on cohort/privacy evidence. |
@@ -39,7 +153,8 @@ Requirements without one of these issue numbers remain in their phase: adaptive
 memory/cross-domain/mode behavior in 14.4; bounded SleepLayer/evaluation in 14.5;
 Taste/holdout/usefulness and continuation in 15; Friend safety and explicit Shared
 creation in 16; Lists/messages/accessibility, telemetry, retention/restore and
-operations in 17; complete beta in 18; production/stores in 19; Share Link Gate
+operations in 17, with minimum anonymous controls/measurement before real Taste
+acceptance; complete beta in 18; production/stores in 19; Share Link Gate
 in 20. The bounded E1/D1/D2 foundation is complete; optional further research and
 model admission are not new release blockers.
 
@@ -76,7 +191,7 @@ The [Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENGINE.md) is a
 
 Advance portable contracts and an honest MovieLens baseline experiment into Phase 14. This is not permission to treat external ratings as complete Kajo Scenarios, create external people as Kajo accounts, deploy a licensed artifact without review or turn on Kajo-wide PopulationMemory. No full neural world model, multistep DreamEngine, ANN index or automatic promotion is required for first release.
 
-The active #229 evidence/pagination packet keeps its own acceptance and rollout gates. E1/D1/D2 can proceed independently as explicitly named source/research work; E2 runtime integration cannot bypass Phase 14.1/14.2. STATUS identifies the exact active branch and next bounded unit.
+The active #229 evidence/pagination packet keeps its own acceptance and rollout gates. The bounded E1/D1/D2 foundation is accepted; it does not need repeating. Optional further research remains separate, and E2 runtime integration cannot bypass relevant Phase 14.1/14.2 gates. STATUS identifies the exact active branch and next bounded unit.
 
 Owner device feedback on 2026-09-12 accepts the exercised #229 flows with the
 reconnect retry-UI defect retained as #240. The owner places application UI work
@@ -195,6 +310,11 @@ Accepted work is not reopened merely because later release gates are stricter.
 ## Phase 14 — Make the algorithm trustworthy and the engine portable
 
 Taste Test must not hide algorithm defects behind attractive onboarding. Research is isolated from production; documentation and offline results are not rollout acceptance.
+
+Follow the dependency audit's Personal priority above while preserving the relevant
+evidence/parity dependencies and all Shared, catalog and operational exit gates.
+Independent source/acceptance packets may proceed in parallel; completing an
+advanced Shared model is not a blanket prerequisite for Personal implementation.
 
 ### 14.0 — Clean database/replay and bootstrap-ranking truth
 
@@ -379,6 +499,15 @@ Requirements: `MVP-ALG-004..007`, bootstrap requirements and E1 contracts.
 
 Exit: ordered session intent; source-aware Short/Long decay and effective support; native contradiction can supersede imports; one unusual session cannot erase durable taste; bounded/ablated cross-domain transfer; meaningful tested FOR_YOU/SURPRISE/RISK differences; informative recognition-aware cold start.
 
+Implement in bounded steps: first native decay parity, then ordered session/state
+policy, then the Personal Taste selector and frozen challenge under 15.0.
+The immediate parity correction leaves the retained bootstrap decay-floor
+hypothesis for its separately versioned source-aware acceptance; it does not
+silently claim all of ALG-004. State/policy work must test correction/removal,
+independent support, reset/expiry and static/WorkingState-off controls. Feature
+activation requires coordinated Memory/Scenario/Shared/serving-shadow versions
+and separation of metadata-driven novelty from demonstrated taste transfer.
+
 BeliefState may explicitly say uncalibrated/unknown. WorldState stays separate from durable personal memory. A future admitted ExternalTastePrior must be separately bounded and ablated, not double-counted as both bootstrap and native evidence.
 
 ### 14.5 — Operating SleepLayer and evaluation
@@ -389,25 +518,46 @@ Exit: bounded retry-safe scheduled worker; correct delayed/corrected outcomes; c
 
 Error diagnostics and consolidation operate on truthful evidence. Synthetic dreams stay separate; a model cannot validate itself against its own generated outcomes. Long-horizon simulation is not required here.
 
+Scoped Personal policy/holdout source work may proceed alongside these operational
+tasks. Correct outcome/evaluation semantics precede any quality or promotion
+claim; the scheduled worker, monitoring and rollback requirements remain gates
+before complete beta. No source fixture or external report supplies native value.
+
 ## Phase 15 — Taste-first acquisition foundation
 
 Canonical product contract: [LAUNCH_LOOP](../product/LAUNCH_LOOP.md). Architecture decision: ADR-0007. Build on useful, trustworthy Phase 14 behavior.
 
 ### 15.0 — Adaptive Taste Test + honest prediction challenge
 
-Requirements: `MVP-TASTE-001..005` plus preview/usefulness gates.
+Requirements: `MVP-TASTE-001..005` plus preview/usefulness gates; server-backed
+anonymous state and the minimum applicable `MVP-OPS-002/006` and
+`MVP-GROWTH-001..003` controls before real anonymous Taste acceptance.
+
+First establish stable authorized anonymous identity/PersonalProfile-compatible
+state, resumable server TasteSession, explicit retention/deletion and bounded
+creation/abuse controls. Record policy/model versions, presented opportunities,
+recognition/skips, completion and frozen challenge results separately from reward.
+Then evaluate the real adaptive flow; a logged-in prototype alone cannot close
+the anonymous requirement. Google/Apple conversion follows under 15.1 without
+replacing or duplicating this retained state.
 
 Exit: bounded 12–24-opportunity anonymous test; unknown Items do not poison taste; recognition/information/diversity balance; held-out predictions frozen before answers; documented metric/support; preview from canonical production ranking; useful first-session behavior against a fixed baseline.
 
 LAUNCH_LOOP retains the owner's roughly ten movies → transition → ten books
 proposal inside adaptive bounds, always-available unknown response even after
 rating-wheel movement, and preservation of already accepted Personal taste.
+The October 9 owner clarification reaffirms this initial adaptive Taste as a
+pre-release requirement; the planned social shortcuts do not replace it.
 
 External benchmark results cannot substitute for this real Kajo first-session acceptance.
 
 ### 15.1 — Anonymous identity and web/app continuation
 
 Requirements: `MVP-ACQ-001..004`, `MVP-AUTH-004` and identity continuity requirements.
+
+The anonymous identity/state foundation begins before 15.0's real acceptance.
+This phase completes provider conversion, browser/installed-app continuation,
+safe collisions and the required round trips on that same logical identity.
 
 Exit: browser-capable public Taste link; equivalent installed-app route; server-backed resumable anonymous state; Google/Apple link/upgrade without duplicate User/PersonalProfile; failed/abandoned auth preserves accepted taste inside retention; safe account collisions.
 
@@ -441,9 +591,23 @@ Exit: both users see the connection; remove/block/reinvite behavior is safe unde
 
 ### 16.2 — SharedProfile creation from Friends
 
-Requirements: `MVP-GROUP-001..003` and existing SharedProfile requirements.
+Requirements: `MVP-GROUP-001..004` and existing SharedProfile requirements.
 
-Exit: short explicit two-Friend creation; 3+ members still accept membership; invites never create a group automatically; canonical joint/common-fit predictor, not a second recommender; Friend removal does not rewrite Shared history/membership.
+Planned compact creation flow: **2–5 total people including the creator**, with
+the creator occupying one of at most five member slots. A `+` slot selects an
+authorized accepted Friend or generates an opaque invitation that can be shown,
+copied or shared through the OS share sheet, including WhatsApp where available.
+Friend invite/safety lifecycle under 16.0–16.1 comes first. The receiver follows
+the same app/Taste/link continuation and explicitly accepts the relevant Friend
+or group permissions; sending/opening a link never creates either relationship.
+Friendship grants no private Personal history access. The compact UI bound does
+not redefine existing generic 2-N SharedProfile storage.
+
+Exit: short explicit two-person creation; each additional participant accepts
+canonical membership; pending slots/invites are distinct from accepted members;
+expiry/revocation/retry and blocked/removed relationships remain safe. Use the
+canonical joint/common-fit predictor; Friend removal does not rewrite Shared
+history/membership. This October 9 plan is not delivered UI or acceptance.
 
 ### 16.3 — Shared experience rating and controlled rewatch
 
@@ -457,6 +621,34 @@ Personal/joint separation, atomic completion, corrections/retries/membership
 changes and truthful legacy provenance. A new joint rewatch is a new experience
 with retained history and a bounded versioned eligibility policy. Two-account and
 N-member server/CI/device cases must pass; completion alone is not satisfaction.
+
+### 16.4 — Bounded joint decision for today — planned before beta
+
+Requirements: `MVP-SOCIAL-010..012`. Implement after 16.3's evidence and controlled
+rewatch contracts and the Friend/membership foundations, before the complete beta.
+
+Offer an optional Shared session for “what should we watch/read today?” with at
+most five current canonical BOOK/MOVIE suggestions from the same Shared
+predictor and inherited `DiscoveryMode` (`FOR_YOU`, `SURPRISE`, `RISK`). An optional
+Tinder-like card sequence has accessible non-gesture controls. Proposed behavior:
+any participating member's session-level “not interested” vetoes the current
+option; confirm the exact veto rule when implementing. “Already seen/read”
+replaces the current suggestion for this session. Bound refill and preserve exact
+delivery origins, current eligibility and genuine exhaustion/expiry messages.
+
+Freeze the accepted participant roster for a bounded session, with explicit
+membership-change, expiry, cancellation, exact-retry and concurrent-action rules.
+Choices/exposure and minimal session telemetry retain actor/scope/version
+provenance. A session veto is not an ordinary durable `NOT_INTERESTED` command;
+replacement neither erases history nor permanently prohibits rewatch. Selection
+does not complete SharedRatingRound, confirm consumption or create group reward.
+Keep ordinary Shared discovery and the separately optional FUT-UX-003 List choice
+distinct. “Do today”/other domains remain future scope.
+
+Exit: two-person and N-member permission/race/refill/empty/expiry/retry/privacy
+cases and accessible device behavior pass without changing confirmed history or
+fabricating joint outcomes. This is queued product work, not the next Personal
+source component or a closed release gate.
 
 ## Phase 17 — Complete core product and operational quality
 
@@ -475,16 +667,15 @@ UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requireme
 are release gates. Weekly tracking requires the relevant 17.1/17.2 telemetry and
 privacy work before beta; community comparisons remain conditional.
 
-The owner explicitly queues the September 23 browse/detail refinements here:
-#200 canonical Katsotut/Luetut entry; #199/#200 one-row ItemType dropdown and
-collection navigation; #199 removal of unused grid space and continued loading;
-#231 list/poster-grid controls also for history; #239 fit-aware descriptions and
-arrow-only Back to the real origin. UX_PRINCIPLES owns the full contract. Address
-canonical navigation correctness before visual refinements; continuous loading
-depends on #228/#229's accepted server cursor/delivery path. These are deferred
-refinements of existing browse work, not a request to interrupt the current bounded
-BOOK enrichment or an automatic expansion of MVP gates. Later cast/director
-presentation stays under FUT-CAT-001, outside this immediate UI packet.
+The September 23 browse/detail queue retains #200 canonical Katsotut/Luetut
+entry, #231 list/poster-grid controls for history and #239 fit-aware descriptions
+and arrow-only Back to the real origin. The owner's October 6 promotion moved
+#199 append, one-row ItemType/Löydä/history and unused grid-space removal into
+the native correction packet; do not defer or reimplement that subset here.
+Its server/source, APK and gesture/small-screen/large-text acceptance remain
+separate. Remaining broad browse UX stays here. UX_PRINCIPLES owns the full
+contract; continuous loading depends on the accepted cursor/delivery path.
+Later cast/director presentation stays under FUT-CAT-001.
 
 ### 17.1 — Launch telemetry and experimentation
 

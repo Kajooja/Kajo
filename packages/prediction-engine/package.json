@@ -26,6 +26,42 @@
     "./research": {
       "types": "./dist/research.d.ts",
       "import": "./dist/research.js"
+    },
+    "./ordinal": {
+      "types": "./dist/ordinal.d.ts",
+      "import": "./dist/ordinal.js"
+    },
+    "./adapters/kajo-ordinal": {
+      "types": "./dist/adapters/kajo-ordinal.d.ts",
+      "import": "./dist/adapters/kajo-ordinal.js"
+    },
+    "./working-state": {
+      "types": "./dist/working-state.d.ts",
+      "import": "./dist/working-state.js"
+    },
+    "./adapters/kajo-working-state": {
+      "types": "./dist/adapters/kajo-working-state.d.ts",
+      "import": "./dist/adapters/kajo-working-state.js"
+    },
+    "./working-evaluation": {
+      "types": "./dist/working-evaluation.d.ts",
+      "import": "./dist/working-evaluation.js"
+    },
+    "./adapters/kajo-working-evaluation": {
+      "types": "./dist/adapters/kajo-working-evaluation.d.ts",
+      "import": "./dist/adapters/kajo-working-evaluation.js"
+    },
+    "./adapters/kajo-working-outcomes": {
+      "types": "./dist/adapters/kajo-working-outcomes.d.ts",
+      "import": "./dist/adapters/kajo-working-outcomes.js"
+    },
+    "./taste-selection": {
+      "types": "./dist/taste-selection.d.ts",
+      "import": "./dist/taste-selection.js"
+    },
+    "./adapters/kajo-taste-selection": {
+      "types": "./dist/adapters/kajo-taste-selection.d.ts",
+      "import": "./dist/adapters/kajo-taste-selection.js"
     }
   },
   "scripts": {

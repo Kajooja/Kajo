@@ -6,7 +6,7 @@ Update it when meaningful implementation areas are created, moved or renamed. Do
 
 ## Current repository
 
-Current implementation and acceptance state is maintained in [STATUS.md](../project/STATUS.md). The first table maps accepted-main source (implementation baseline `6dd1fec`); the second explicitly maps active #229 files that require its checkout. A path in the active table is not a claim that it exists on main. Hosted rollout, code acceptance and device acceptance are separate. Catalog counts and CI identities in baseline descriptions are dated evidence, not a live inventory.
+Current implementation and acceptance state is maintained in [STATUS.md](../project/STATUS.md). The first table retains the earlier implementation baseline (`6dd1fec`); the native #229 and subsequent sections describe its successors included in #329 integration. Read both tables from current main after that merge, rather than checking out an obsolete ancestor branch. Hosted rollout, code acceptance and device acceptance are separate. Catalog counts and CI identities in baseline descriptions are dated evidence, not a live inventory.
 
 Important current paths:
 
@@ -26,6 +26,152 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Prospective Personal evaluation evidence — active source only
+
+| Boundary | Meaningful paths |
+| --- | --- |
+| Private immutable enrollment, lifetime reservation, latest-terminal capture and erasure edges | `supabase/migrations/20261010225549_personal_working_prospective.sql` |
+| Native populated preservation, real SQL acceptance and independently connected lock races | `scripts/database/personal-working-prospective*.mjs`, `personal-working-prospective-fixture.sql`, existing `run-ci-cli-installation-probe.mjs` |
+| Authorized native receipt to scoped portable outcome | `packages/prediction-engine/src/adapters/kajo-working-outcomes.ts` and its optional package export |
+| Stored declaration and actual later read binding | Existing `adapters/kajo-working-evaluation.ts` / `working-evaluation.ts` |
+| Actual SQL producer → plan → outcomes → coverage regression | `scripts/database/working-outcomes-kajo.test.mjs` |
+| Private owner Working report, native identity guards and filesystem contract | `packages/prediction-engine/scripts/working-report.mjs`, shared `private-report-files.mjs`, `scripts/research/working-report.test.mjs`; root `engine:working` |
+| Future Working cohort declaration and complete supplied-inventory reconciliation | `packages/prediction-engine/scripts/working-cohort.mjs`, `scripts/research/working-cohort.test.mjs`; root `engine:working:cohort` |
+
+STATUS owns exact source/native acceptance. These private producers retain exact
+OFF and UNKNOWN commit availability; they add no serving API or quality admission.
+
+## Native memory/serving decay parity — active source only
+
+`20261009103214_personal_native_decay_parity.sql` introduces the versioned
+private `native_long_term_decay_v2(timestamptz,timestamptz)` contract and guarded
+updates to `build_profile_memory_state_v1`, `rank_items_v0`,
+`rank_items_catalog_base_v1` and their two identity wrappers. Current native
+Events/UNDOs have finite occurrence-time cutoffs; `nativeEvidenceAsOf` records
+the existing distinct memory/base clocks. New live metadata names
+`native-long-term-decay-v2` / `prediction-v0.5-native-decay`. It preserves existing immutable rows,
+frozen scalar feature vectors, permissions, function identities and lifecycle
+entry guards. Full-schema populated-upgrade, age-boundary, source/correction
+and frozen serving-shadow replay checks join the existing database/native CLI
+gates through `scripts/database/personal-native-decay.mjs`, its test/fixture/smoke
+files and the existing `run-ci-cli-installation-probe.mjs`. PREDICTION_MODEL owns interpretation and STATUS owns exact publication,
+tests and activation; the portable core and Shared forecast consumer are separate.
+
+## Reconciled delivery and recovery source — #229 / #240
+
+- `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts`:
+  preserved protocol-2 compatibility/recovery: captured scope, immutable pages and exact transport retry; one native
+  reachability listener per focused foreground reader, bounded reconnect attempts.
+- `predictionConnectivity.ts`: listener-first initial read, stale callback/blur/
+  background cancellation; `expo-network` is a declared SDK-57 native dependency.
+- `deliveredSlate.ts`, `useCollectionNavigation.ts`: immutable clicked Item origins
+  and separate collection provenance; the old unscoped Item cache is removed.
+- `ConsumedHistoryScreen.tsx`: canonical history ownership by request identity,
+  Profile/session/ItemType/revision plus collection navigation and atomic clear.
+- `run-ci-cli-installation-probe.mjs`: both immutable prediction forwards and later
+  catalog forwards, populated upgrades, runtime and concurrent-session assertions.
+
+## Shared rating-round evidence foundation — #232A, active source only
+
+`20261008122349_shared_rating_round_evidence.sql` adds private round evidence,
+participant enrollment generations, immutable response revisions and exact
+command receipts. The explicit `commit_shared_rating_round_v1` and
+`get_shared_rating_round_v1` APIs authorize the acting member and preserve the
+Shared target; they do not activate a mobile flow or write legacy Item Events/
+interactions. New membership bookkeeping distinguishes enrollment generations
+without changing historical member rows. Existing rankers/evaluators stay intact;
+the projection explicitly withholds a joint reward. `shared-rating-rounds.mjs`,
+its full-schema SQL/tests and native concurrency helper exercise pending/complete/
+corrected/cancelled evidence, access/origin/replay and populated preservation.
+The required CLI installation gate includes these probes. STATUS distinguishes
+source verification, CI and any future hosted rollout.
+
+## Shared round receipt-prefix outcomes — #232B, active source only
+
+`20261008132733_shared_round_outcomes.sql` adds the owner-only invoker
+`private.shared_rating_round_outcome_v1` and a receipt-prefix lookup index.
+It reads bounded immutable round acknowledgements with explicit command/evidence
+cutoffs, response-specific attribution and a caller-declared maturity interval.
+It reports vector readiness/coverage without a scalar reward or historical
+feature eligibility; no V1 ranker, Memory, Scenario or evaluator body is changed.
+`shared-round-outcomes.mjs`, its SQL fixture/matrix and full-schema test cover
+cutoff/correction/reconfirmation, legacy/privacy separation and populated
+preservation. `shared-round-outcomes-visibility.mjs` uses independent native
+sessions to prove an uncommitted receipt is hidden, then may appear under the
+same acceptance-time cutoffs after commit. The required CLI gate includes these
+probes; they do not assert that acceptance timestamps reconstruct commit history.
+DATA_EVENTS owns the interpretation; STATUS owns publication and rollout state.
+
+## Observed Shared outcome captures — #232C, active source only
+
+The additive `shared_round_outcome_captures` migration stores owner-only immutable
+captures and paired vector-support comparisons. Capture replay uses stored JSON
+and a selected-receipt cascade, including former-participant erasure; it does not
+rerun acceptance timestamps. Comparison freezes the evaluation window and both
+production/shadow sides on a common actor-specific support mask. The new
+`shared-round-outcome-captures.mjs` helper, SQL matrix/full-schema test and
+`shared-round-outcome-captures-concurrency.mjs` native helper verify populated
+preservation, retry/correction/coverage,
+strict frozen-pool compatibility and independent capture before a late commit.
+The existing required CLI gate includes these probes. DATA_EVENTS and
+PREDICTION_MODEL retain unavailable scalar metrics and historical feature
+admission; STATUS owns the exact migration name/hash and source/CI/rollout state.
+
+## Portable Shared ordinal diagnostic — #232E, active source only
+
+`packages/prediction-engine/src/ordinal.ts` exposes bounded pure pair/batch
+Pareto evaluation through `./ordinal`; `src/adapters/kajo-ordinal.ts` validates
+already-authorized frozen #232C snapshots and required scoped member handles.
+Their tests exercise media/non-media, zero/ties/disagreement/missing support,
+clocks/corrections, full enrollment, pool/version/provenance and private alias
+boundaries. Built ESM/import-graph checks keep both separate from the root
+numeric engine and all app/provider dependencies.
+`scripts/database/shared-ordinal-adapter.test.mjs` runs actual existing SQL
+serving, delivery, round, worker, capture and comparison functions in disposable
+PGlite before crossing the adapter, including new-capture correction replay.
+`packages/prediction-engine/scripts/ordinal-report.mjs` and
+`scripts/research/ordinal-report.test.mjs`, via `npm run engine:ordinal`, provide
+bounded offline private reports outside the repository without overwriting.
+PREDICTION_MODEL owns diagnostic/selection/alias semantics; no serving, schema,
+reward, historical feature admission or promotion is introduced. SQL fixtures
+use synthetic actors and do not measure native prediction quality.
+
+## Prepared Shared prediction inputs — #232F, active source only
+
+`20261009094421_shared_round_prediction_inputs.sql` adds private immutable input
+and reverse-source binding tables, the internal pre-first-response capture/getter,
+whole-parent source-deletion invalidation and a guarded #232D eraser extension.
+`shared-round-prediction-inputs.mjs`, its fixture/matrix/full-schema tests and
+`shared-round-prediction-inputs-concurrency.mjs` cover populated preservation,
+full roster/prefix, prior-response refusal, exact retries, isolation/caps and
+source/actor erasure. The existing native CLI gate exercises actual independent
+response/capture and source-delete/capture lock orders; implementation of that
+probe is separate from a passing native run. No ranking or portable-engine
+consumer is introduced. DATA_EVENTS owns capture-only semantics and
+PREDICTION_MODEL owns the required genuine forecast-consumption lineage.
+
+The native helper retains a full initialized canonical snapshot for active
+fixture checks and the full original snapshot for after-cleanup restoration.
+`shared-round-prediction-inputs-concurrency.test.mjs` executes the actual fixture,
+capture and cleanup SQL in a fresh full schema, proving the five automatic Saved
+Lists and detecting equal-count mutations to owned and unrelated Lists. No table
+or ownership exclusion relaxes the native race gate.
+
+## Closed shadow-source erasure — #232D, active source only
+
+`20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source
+eraser and an API-denied exact-row transaction permission relation. It retains
+ordinary immutable-artifact protection, invalidates entire affected evaluation
+batches and explicitly removes copied #232C comparison traces. A common first-lock
+lifecycle gate serializes worker/evaluator/canary/rollback/comparison writers
+against erasure; unresolved learned-policy lineage rejects preparation atomically.
+`shadow-source-erasure.mjs`, its fixture/matrix/full-schema test and
+`shadow-source-erasure-concurrency.mjs` join the existing CLI gate for populated
+preservation and actual worker/eraser race orders. User/Profile roots remain for
+owner deletion within that same transaction. DATA_EVENTS owns the contract;
+STATUS records source checks, actual worker/eraser native proof and remaining
+installation/integration acceptance.
+
 ## Dependency compatibility verification
 
 `package.json` pins the reviewed Vitest family, previous Vite line, and explicit
@@ -40,6 +186,27 @@ audit. `dependency-audit-2026-09-28.json` retains the exact lockfile checkpoint.
 bounded hostile-input parsing through all four actual minimatch consumer paths.
 The compatible 1.1.21/5.0.12 lock refresh and current advisory result are recorded
 in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
+
+`scripts/dependencies/security-patches.mjs` installs/verifies the exact October
+braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
+reproduces unpatched defects and tests corrected installed consumers.
+`audit-dependencies.mjs` / `audit-dependencies.test.mjs` preserve raw npm findings
+and fail on unmitigated advisories or unverifiable patches. The correction contract
+is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual
+native graph. CI's same-repository `build-android-apk` PR label opts into an APK
+behind the unchanged five mandatory jobs.
+`october-advisories.test.mjs` covers the compatible compression 1.8.2 /
+source-map-js 1.2.2 lock refresh: actual aborted-stream release, ordinary codec/map
+behavior and bounded indexed-map processing. The fresh updated-lock receipt is
+`dependency-audit-native-2026-10-06.json`; Windows installation/audit portability
+is exercised by the existing security-patch/audit test files.
+
+`shell-quote.test.mjs` resolves the actual React DevTools consumer and verifies
+the upstream 1.11.0 fix for line terminators after comment tokens, including
+parse/append/quote composition and ordinary editor/argument round trips.
+The compatible single-leaf lock refresh keeps its parent/framework versions and
+the audit's existing fail-closed correction rules. Exact lock and fresh audit:
+`dependency-audit-native-2026-10-08.json`.
 
 ## Implementation locations
 
@@ -87,13 +254,17 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 | Mobile catalog enrichment | `apps/mobile/src/features/discovery/catalogItemOperations.ts`, `predictionRankingCache.ts`, `usePredictionRanking.ts`, `mockDiscovery.ts`, `DiscoveryScreen.tsx` | Prediction V1 rank/trace stays authoritative; one `public.items` batch enriches delivered Items with image/creator/year/language and verified description credit; remembered-slate cache supplies detail/swipe, but exact Profile/prediction identity requires MVP-DATA-004 correction. Normal hosted delivery now uses real Items; mock code remains only as historical/offline fallback until later cleanup is proven safe |
 | Settings / Personal bootstrap UI | `apps/mobile/app/settings.tsx`, `apps/mobile/src/features/settings/SettingsScreen.tsx`, `historyImportParser.ts`, `historyImportOperations.ts` | #185/PR #190 merged: side-drawer `Asetukset` exposes PersonalProfile-only Letterboxd/IMDb/Goodreads/StoryGraph/generic CSV import, deterministic normalization, staged summary, ambiguous candidate correction/skip, commit/remove and persistent prior-import listing. SharedProfile import is locked and the user is routed back to the PersonalProfile boundary |
 | Profile bootstrap import backend | `20260904203000_profile_bootstrap_import_foundation.sql`, `20260904203200_harden_bootstrap_rating_constraints.sql`, `20260904210000_expand_profile_import_stage_limit.sql`, `20260904211000_profile_bootstrap_actor_index.sql`, `20260904212000_list_profile_import_jobs.sql`; private `profile_import_jobs`, `profile_import_rows`, `profile_bootstrap_evidence`; public `*_profile_import_*_v1` RPCs | Hosted #185 foundation: PersonalProfile-owner-only staged import, external-ID-first safe matching, reviewable ambiguous/unmatched rows, replaceable/idempotent dataset snapshots, removable source-tagged bootstrap evidence, max 5,000 rows and persistent import history. Imported evidence extends memory snapshots/reacted eligibility and, through the #207 forward correction below, direct Personal serving; MVP-ALG-001 technical acceptance is complete through #207/#208, while device/bootstrap usability and measured quality remain separate BOOT/CAT/TASTE gates. Bootstrap remains source-tagged without becoming native Events, ShortTerm or ScenarioMemory and is never copied into SharedProfile history |
-| No-import cold-start | `apps/mobile/src/features/settings/ProfileBootstrapGate.tsx`, `profileCalibrationOperations.ts`, `supabase/migrations/20260905010000_profile_cold_start_calibration.sql`; `ColdStartPrior` in `GLOSSARY.md` / `PREDICTION_MODEL.md` | #191 merged to main at `0cfa9e73d14f66e309bae937d66124b88c0477c2`: PersonalProfile bootstrap offers history import or bounded real-catalog profiling. `cold-start-v1` requires 6 known ratings, shows 12 popularity/recognition-led candidates first and deterministically expands to at most 24; unknown Items are skipped and completion is immediate at 6. `cold-start-prior-v1` now receives real Open Library provider popularity/vote metadata across hundreds of BOOK Items, while curated fallback remains explicit recognition-only. Calibration is source-tagged LongTerm bootstrap evidence only; no KAJO_MOCK, demographics, native Event, ShortTerm, ScenarioMemory or Shared write. Hosted rollback acceptance passed; configured-device acceptance remains open |
+| No-import cold-start | `apps/mobile/src/features/settings/ProfileBootstrapGate.tsx`, `ProfileBootstrapGate.test.tsx`, `profileCalibrationOperations.ts`, `supabase/migrations/20260905010000_profile_cold_start_calibration.sql`; `ColdStartPrior` in `GLOSSARY.md` / `PREDICTION_MODEL.md` | #191 merged to main at `0cfa9e73d14f66e309bae937d66124b88c0477c2`: PersonalProfile bootstrap offers history import or bounded real-catalog profiling. `cold-start-v1` requires 6 known ratings, shows 12 popularity/recognition-led candidates first and deterministically expands to at most 24. October 12 source adds independent unknown after wheel movement, preserves genuine zero and appends unique candidates without moving the presented prefix; profile changes cancel stale async work. This is separate from the new adaptive selector. Calibration is source-tagged LongTerm bootstrap evidence only; no KAJO_MOCK, demographics, native Event, ShortTerm, ScenarioMemory or Shared write. Hosted rollback acceptance passed; configured-device acceptance remains open |
+| Adaptive Taste opportunity source | `packages/prediction-engine/src/taste-selection.ts`, `src/adapters/kajo-taste-selection.ts`; `test/taste-selection.test.ts`, `test/taste-selection-kajo.test.ts`; package `./taste-selection` / `./adapters/kajo-taste-selection` | Pure immutable QUESTION/TRANSITION/STOP selection from trusted authorized frozen inputs. Bounded recognition/diversity/feature-coverage heuristics and fixed PRIOR_ONLY control, correction/withdrawal, stable ledger replay, distinct zero/unknown/not-interest and fail-open exhaustion. Kajo adapter validates owned Personal scope and real canonical Item provenance. Root estimator exports unchanged. Owned persistence/SQL adapter is provided by the following TasteSession source; anonymous foundation, frozen challenge, UI and measured usefulness remain open |
+| Durable own-Personal TasteSession | `supabase/migrations/20261012100043_personal_taste_session.sql`; `scripts/database/personal-taste-session*`; public `taste_session_v1` / private session-command tables | Authenticated owner-only frozen real catalog/policy, SQL/portable selector parity, durable opportunity/response revisions, exact retry/CAS, 10 MOVIE → acknowledgement → BOOK progression and 24 bound. Incremental zero/neutral rating bootstrap provenance; distinct unknown/not-interest/withdrawal; source removal clears retained copies, account cascade and live withdrawal guard. Native CLI smoke and independent-connection concurrency probes. Anonymous entry, frozen challenge, UI and observed usefulness remain open |
+| Frozen own-Personal Taste challenge | `supabase/migrations/20261012111935_personal_taste_challenge.sql`; `scripts/database/personal-taste-challenge*`; public `taste_challenge_v1` / private challenge-command tables | Pre-score unseen reservation, one canonical run and trace commitment, first-answer/retry/CAS, same-domain ordinal metric with missing/tie counts, evaluation-only semantics and source erasure; separate-connection native CLI gate. No mobile/anonymous/learning activation. |
 | Shared common-fit V1 | `supabase/migrations/20260905113000_shared_common_fit_v1.sql`, `20260905114500_harden_shared_common_fit_v1_1.sql`, `20260905115500_fix_shared_common_fit_personal_policy.sql`; private `shared_common_fit_*` helpers inside canonical `rank_items_v1` | #177 hosted/merged v1.1 through PR #194 at `5e1dc9cc993887ab19b943ac0f2a5943d53aa908`: SharedProfile Prediction V1 combines sparse `ColdStartPrior`, Shared joint state/ScenarioMemory and aggregate accepted-member Personal LongTerm + native ShortTerm fit with evidence shrinkage, minimum/consensus behavior and disagreement penalty. Shared prior weight decays as direct Shared evidence grows. Candidate trace exposes aggregate-only components and no member/raw-history identifiers. PersonalProfile path is explicit no-op with original policy preserved. Private helpers have no authenticated/anon EXECUTE; mobile still enters through `public.rank_items_v1`. Hosted agreement/sparse/disagreement + real two-member trace acceptance and PR CI passed; configured Android acceptance remains open |
 | Room feature | `apps/mobile/src/features/room/RoomScreen.tsx`, `apps/mobile/src/features/room/roomGeometry.ts`, Room assets | Accepted straight-on illustrated cabin; window/fireplace Kajo and TV/bookshelf targets remain the canonical Room vocabulary |
 | Theme engine | `apps/mobile/src/theme/` | Personal/Shared stable identity plus DiscoveryMode-driven AmbientPhase and centralized translucent surface tokens |
 | Discovery feature | `apps/mobile/src/features/discovery/` | Grid/detail/swipe, Prediction V1 wiring, catalog enrichment, impression/dwell evidence, rating/not-interested/save, undo/cooldown and Shared Endorsement overlay; provider integrations normalize to generic Items before reaching this layer |
+| Shared overlay exclusion guard — #306 source integration | `supabase/migrations/20261008122852_shared_overlay_eligibility.sql`; `scripts/database/shared-overlay-eligibility-smoke.sql`, `shared-overlay-eligibility.test.mjs`; `itemInteraction.ts` / `sharedEndorsement.test.ts` | Exact #306 correction prevents pending/member-history tiers from reintroducing withdrawn or Shared-rejected Items. Existing metadata/rows/function permissions survive; local not-interest is also suppressed without consumption. Its mandatory native CLI stage is retained alongside the later Shared/Working stages; STATUS owns exact integrated-source checks and separate hosted/device acceptance |
 | Interaction persistence | `apps/mobile/src/features/discovery/ItemInteractionContext.tsx` | Active-Profile hydration and optimistic rating/not-interest/undo through the durable command boundary; server acknowledgements reconcile state with remaining pending actions. Owns the shared Item/collection queue, confirmed List undo receipts and List/Shared refresh revisions; old whole-state writer removed |
-| Event Engine | `apps/mobile/src/features/events/` | `itemActionCommands.ts`, `itemActionPersistence.ts`, `itemActionOutbox.ts` implement the typed durable rating/not-interest/undo command path. `collectionActions.ts` provides collection intents/receipt validation and mutation adapters over the same queue. Accepted-main exposure tracking remains memory-only; active #229 supplies the separate durable successor below |
+| Event Engine | `apps/mobile/src/features/events/` | `itemActionCommands.ts`, `itemActionPersistence.ts`, `itemActionOutbox.ts` implement the typed durable rating/not-interest/undo command path. `collectionActions.ts` provides collection intents/receipt validation and mutation adapters over the same queue. The earlier baseline used memory-only exposure tracking; the integrated #229 durable successor is described below |
 | Atomic Item command | `*_atomic_item_actions.sql`; `public.commit_item_action_v1`; private `item_action_receipts` / `item_action_heads`; `scripts/database/item-action-smoke.sql`, `item-action-upgrade.mjs` | Actor-authorized atomic state/Event/receipt, exact retry, protected undo and trace guards. Full-schema regressions and populated old-schema rehearsal run in local tests and native CLI CI; rollout evidence is in Sprint 014 / #224 |
 | Atomic collection commands | `*_atomic_collection_actions.sql`; `public.commit_collection_action_v1`; `scripts/database/collection-action-smoke.sql`, `collection-action-upgrade.mjs` | List lifecycle/membership and unanimous Shared commit, exact retries/no-op receipts, mixed undo and correction of every affected Event. Native CI rehearses the forward with populated old Item receipts/Lists and verifies old columns/functions/ACLs |
 | Profiles | `apps/mobile/src/features/profiles/ActiveProfileContext.tsx`, `SharedProfilesScreen.tsx`, `sharedProfileOperations.ts` | One canonical Profile state/membership boundary for Personal identity, Shared create/invite/respond/leave and selection; quick access is local presentation ordering only |
@@ -105,7 +276,9 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 | Password auth boundary | `supabase/functions/password-auth/`, `supabase/functions/entrypoints.test.ts` | Closed JSON/action/field checks before privileged lookup, 8-KiB/8,192-chunk/five-second body limits and no-store responses. Existing email/nickname resolution retained; public-entry abuse/enumeration acceptance remains separately gated |
 | Auth email callback | `supabase/functions/auth-callback/` | HTTPS callback forwarding verification token hashes to mobile |
 | Bootstrap direct serving (#207, technically accepted) | `20260907155201_bootstrap_personal_ranking.sql`; `scripts/database/bootstrap-ranking.test.mjs`; `predictionRefresh.ts` | Forward `prediction-v0.4-bootstrap` scorer shares bootstrap selection/weight/decay with memory and versions V1 traces. Import/remove/calibration successes refresh mounted rankings. Isolated SQL tests run in npm test; PR #210 records bounded hosted public V1 smoke and PR #219 adds independent Supabase installation/runtime evidence. Adopted fresh local/CI lineage #208/#223 completes this technical gate. Historical chronology still fails unchanged; device/bootstrap usability and measured quality remain separate open gates |
-| Prediction V0 baseline | historical V0 migrations; current private `rank_items_v0` after `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` plus #182 discoverability rewrite and `20260907155201_bootstrap_personal_ranking.sql` | Current `prediction-v0.4-bootstrap` candidate generator retained privately; V0.3 is the earlier baseline. #182 adds `candidate.discoverable` to normal candidate eligibility; no provider-specific scorer. `public.rank_items_v0` remains non-serving and authenticated execution revoked |
+| Prediction V0 baseline | historical V0 migrations; current private `rank_items_v0` after `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` plus #182 discoverability rewrite and `20260907155201_bootstrap_personal_ranking.sql` | Inspected accepted-main `prediction-v0.4-bootstrap` candidate generator retained privately; V0.3 is the earlier baseline. #182 adds `candidate.discoverable` to normal candidate eligibility; no provider-specific scorer. `public.rank_items_v0` remains non-serving and authenticated execution revoked |
+| Native base confidence support | `supabase/migrations/20261011213431_native_item_support.sql`; `scripts/database/native-item-support.mjs`, `native-item-support.test.mjs`, `native-item-support-fixture.sql`, `native-item-support-smoke.sql`; CLI installation probe | Exact guarded forward changes only new native base confidence in ordinary/catalogue kernels. Distinct admitted matching native Items replace summed tag incidence for the existing uncalibrated /8 heuristic; legacy evidenceCount remains diagnostic. Versioned support metadata, private denied-API helper, populated row/receipt/function preservation, drift rollback and BOOK/MOVIE/mode/zero/repeat/UNDO/time/foreign/bootstrap controls. Scores/features/ranks and old trace bytes retained. Bootstrap fusion, true independence, hosted/device/quality acceptance remain open |
+| Personal rating source fusion | `supabase/migrations/20261012060821_personal_source_fusion.sql`; `scripts/database/personal-source-fusion.mjs`, `personal-source-fusion.test.mjs`, `personal-source-fusion-status.test.mjs`, `personal-source-fusion-fixture.sql`, `personal-source-fusion-smoke.sql`; CLI installation probe | Guarded memory/status/ordinary/catalogue/identity-wrapper forward and three private denied-API helpers. Finite owned prefixes, rating revision/bootstrap ownership including zero/five, scoped Undo/clear/ambiguity, explicit fallback and versioned unclamped 1460-day bootstrap decay. New Personal base/serving metadata retains structural feature/memory schemas and old frozen versions. Native six-strong status is distinct from known-rating Taste thresholds. Source/runtime/native/hosted/observed-quality gates remain separate |
 | Prediction V1 nervous system | `public.rank_items_v1`, private V1 helpers in `20260902223000_prediction_nervous_system_v1.sql`, forward fix `20260904120420_fix_prediction_v1_candidate_returning.sql`, resurfacing policy `20260904183000_reacted_item_resurfacing_policy_v1.sql`, bootstrap NULL fix `20260905003500_fix_resurfacing_null_bootstrap.sql`, Shared common-fit migrations `20260905113000_*`, `20260905114500_*`, `20260905115500_*`, mobile `predictionOperations.ts` | Hosted + configured-device accepted core with #174/#182/#185 extensions and hosted/main #177 Shared common-fit v1.1. Real-data acceptance exposed and fixed bootstrap NULL propagation that had marked untouched Items as saved-suppressed; ordinary Items remain eligible. Shared common-fit is one additional aggregate scoring component in V1, not a second ranker; Personal path remains unchanged |
 | Reacted-Item resurfacing V1 | `supabase/migrations/20260904183000_reacted_item_resurfacing_policy_v1.sql`, `20260905003500_fix_resurfacing_null_bootstrap.sql` | #174 policy remains: consumed/rated/not-interested terminal suppression; saved-only reminder after 30d; 30d cooldown; max 2 reminders/90d; max one reminder/candidate pool. Missing bootstrap evidence is explicitly boolean-false rather than SQL NULL |
 | SleepLayer / EvolutionEngine V1 | `supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql`, `20260904172000_sleep_layer_v1_fk_indexes.sql`, `20260904180000_sleep_layer_v1_serving_and_profile_canary.sql` | Accepted 13C: immutable scalar genomes, baseline Champion + three SHADOW Challengers, PolicyAssignment tagging, frozen shadow worker, mature exposed-outcome evaluation with Profile shrinkage, genome-aware V1 policy layer, evidence-gated service-only Profile canary and reversible rollback. Automatic/global Challenger promotion remains unavailable |
@@ -130,6 +303,9 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 | Unchanged-export upgrade proof | `scripts/database/run-export-upgrade-probe.mjs` | Optional checksum-gated PGlite-only CLI using the exact owner export plus Auth trigger/seeds/synthetic state. No function/ACL supplement; all 123 original functions and existing row hashes survive forward migration, rollback and reapplication. Does not introduce an attachment dependency into CI |
 | Canonical local/CI installation lineage | `scripts/database/fresh-installation.mjs`, `install-local-database.mjs`, `ci-supabase-stack.mjs`; `npm run database:install`; `run-ci-cli-installation-probe.mjs` | New local workspace only; same reviewed baseline plus unchanged forward files, exact image/hash/history/source/runtime verification and failure cleanup. Successful development stack remains running with a metadata manifest. Required CLI CI uses the same operational install, populated old-schema Item and collection forward rehearsals, two complete resets and failed-migration atomicity. New tables/functions join source snapshots. The original history diagnostic is unchanged; hosted deployment follows the separate ADR-0006 forward procedure |
 | CI image identity | `scripts/database/ci-supabase-stack.mjs`, `ci-supabase-stack.test.mjs` | Allows only observed Supabase ECR/GHCR references at 17.6.1.167 with the exact reviewed Linux x64 image ID; checks again after reset. Reports the actual registry, rejects changed content/version/registry. Fixes CI #391's same-content registry-label rejection; all five required jobs PASS in CI #392 |
+| Isolated CLI Data API readiness | `scripts/database/ci-supabase-stack.mjs`, `isolated-catalog-rpc.test.mjs` | After database reset, bounds retries of a localhost-only, read-only Items query before each catalog RPC. Uses IPv4/closed connections, keeps the original POST single-attempt and preserves HTTP/schema/permission assertions. Fixed stage labels and sanitized cause codes identify failures. Unit and actual loopback interruption/stalled-body tests do not replace the real CLI CI gate |
+| Isolated stack failure lifecycle | `scripts/database/ci-supabase-stack.mjs`, `.test.mjs` | Pinned CLI fatal templates separate from ambient symptoms; sanitized process labels and bounded owned-container/resource state. Exact project-label inventory plus canonical-name fallback rejects pre-existing resources and verifies cleanup absence. Primary/cleanup failures coexist and owned workspace removal runs even when stop fails. Operational preflight/cleanup inventory has a 30-second read budget; default diagnostic lists retain five seconds and fixed resource/phase/process/exit/deadline failure fields. No outer startup or SQL retry, port change, raw CLI/environment/health-log publication or image identity change; native runner acceptance remains CI |
+| Isolated SQL deadlines | `scripts/database/ci-supabase-stack.mjs`, `.test.mjs`; `run-ci-cli-installation-probe.mjs` | Fixed operation/stage diagnostics, elapsed times, explicit bounded proof budgets, PostgreSQL per-statement/lock limits and separate whole-script Docker deadline. Native cancellation canary proves rollback; SQL writes are never automatically replayed. Compact populated chain upgrade retains parity checks; full traversal/cap/provenance stay mandatory. |
 | Buffered SQL transport | `scripts/database/buffered-sql-command.mjs`, `buffered-sql-command.test.mjs`; Mac and CI runners | Consumes the entire SQL stream into a private temporary file before psql starts, retaining early ON_ERROR_STOP errors instead of stdin EPIPE. Removes the file on success/failure; test preserves multi-megabyte Unicode/literal payloads and exact failure status. SQL bytes never execute as shell code |
 | System-seed source | `scripts/database/system-seed-source.mjs` | Rejects source/seed checksum drift. Original-source CLI plus accepted deterministic empty-install supplement used by the local lineage; explicit IDs and logical cutoff epoch. Canonical semantic equivalence and exact row repeatability tested. No hosted reads; source output refuses overwrite |
 | Application trigger parity | `scripts/database/trigger-source.mjs` | Offline export diagnostic rebuilds protected source triggers in a rolled-back PGlite transaction and compares PostgreSQL definitions/enabled states for all 21 application triggers. Auth supplement separate; platform event triggers outside scope. CI tests require no conversation attachment |
@@ -146,19 +322,31 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 Do not create empty feature folders merely to match future architecture. Shared collaboration, Lists, SleepLayer, resurfacing, quick access, provider-backed catalogs, Personal bootstrap imports and Shared common-fit extend generic Profile/Item/Event/Prediction/Memory boundaries rather than creating media/provider-specific queues, duplicate group state or a second recommender. Deployed migrations are never rewritten after hosting.
 
 
-## Native #229 source — separate unmerged implementation
+## Native #229 source — integrated delivery foundation
 
-`feat/228-delivered-origin` / draft [PR #229](https://github.com/Kajooja/Kajo/pull/229)
-contains the newer delivered-origin, atomic continuation, captured-scope client,
-List/history and recovery code. That implementation remains separate from
-accepted main until #229's required gates pass.
-Its current [CODEMAP](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/architecture/CODEMAP.md)
-and [STATUS](https://github.com/Kajooja/Kajo/blob/feat/228-delivered-origin/docs/project/STATUS.md)
-own exact paths, deployed forward identities and remaining device gates. Owner
-feedback on the historical CI #469 build is positive except reconnect retry UI
-(#240); its current source correction still requires configured-device acceptance.
-Continue the named native branch rather than recreating its implementation or
-repeating installed migrations from main.
+[PR #229](https://github.com/Kajooja/Kajo/pull/229) supplies delivered-origin,
+atomic continuation, captured-scope client, List/history and recovery code.
+The complete successor stack is integrated through the owner-authorized #329.
+[STATUS](../project/STATUS.md) owns its merge receipt, deployed forward identities
+and remaining device gates. Earlier CI #469 feedback and later observations remain
+dated evidence in DEVICE_TEST. Continue from current main after integration; do
+not recreate this implementation or repeat installed migrations.
+
+The owner-promoted October 6 #199 correction adds catalogue-wide protocol 3 and
+compact navigation on `fix/199-discovery-catalog-append`:
+
+| Area | Source | Contract |
+| --- | --- | --- |
+| Compact header | `DiscoveryCollectionHeader.tsx`, `DiscoveryModeShell.tsx` and component tests | ItemType/Löydä/history row, supported type dropdown/canonical history, restrained shell chrome, preserved global dock/system safeareas. |
+| Grid append gesture | `discoveryAppendGesture.ts`, `useDiscoveryAppendGesture.ts`, `DiscoveryScreen.tsx` | Bottom-viewport downward pull and accessible append, coalesced page identity, inert obsolete callbacks, no nested bottom/grid inset. Automatic end loading never retries an error loop. |
+| Versioned client | `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts` and tests | Explicit protocol 3 chain/root/parent/prefix validation, stable list view and per-card origins, exact retry/deadline/cancellation; protocols 1/2 retained. |
+| Catalogue chain | `20261006143148_catalog_prediction_chain.sql`; private `prediction_catalog_chains`, `prediction_catalog_chain_pages`, `prediction_catalog_chain_cursors` | Delivered exclusion before bounded admission, independent immutable ranked page sources, scoped exact receipts, current eligibility, 1000-Item/15-minute/shared 16-reader bounds, truthful exhaustion/limit. |
+| Runtime/upgrade acceptance | `catalog-prediction-chain.mjs`, `.test.mjs`, fixture/smoke/boundaries SQL | 145 eligible Items per domain across Personal/Shared/modes, populated forward preservation, legacy retries and access boundaries; native CLI integration is a separate gate. |
+| Later-page evidence | `prediction-chain-provenance.mjs`, `.sql`, `.test.mjs` | Page after 80 prior Items retains rating 0/delayed exposure, effective outcome, frozen replay/mature evaluation and post-cache exact retries. |
+| Hosted rollback probe | `catalog-chain-hosted-smoke.sql` | Existing owned Profile and catalogue, aggregate-only BOOK/MOVIE append verification, full rollback, no reset/import. |
+
+This source is included in #329 integration. Hosted forward, CI/build and
+physical-device evidence remain distinct; STATUS owns the exact checkpoint.
 
 ## Portable engine — E1 #235
 
@@ -167,6 +355,18 @@ repeating installed migrations from main.
 | Generic typed contracts | `packages/prediction-engine/src/contracts.ts`, `src/index.ts` | Subject/actor, observations/raw scale/missingness, source versus access, versioned artifacts, state hypotheses and separate action/outcome/challenger identities |
 | Reference computation | `packages/prediction-engine/src/engine.ts` | Available-prefix state, bounded exact retrieval, numeric reference prediction, immutable forecast, constrained choice, original-outcome comparison and derived memory; no SQL parity claim |
 | Kajo adapter | `packages/prediction-engine/src/adapters/kajo.ts` | Structural Profile/User/Item/rating snapshots; Shared subject isolation; no app/provider imports |
+| Bounded session hypothesis | `packages/prediction-engine/src/working-state.ts`; `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; complete current-session/correction prefix, independent Item support, equal-time groups, finite cutoffs and resource/reset/expiry limits; no native admission |
+| Personal session normalizer | `packages/prediction-engine/src/adapters/kajo-working-state.ts`; `./adapters/kajo-working-state` | Authorized actual Event/session snapshots with strict Profile/actor/source semantics; corrections are resolved before session taste filtering; no database or app imports |
+| Bounded Working evaluation | `packages/prediction-engine/src/working-evaluation.ts`; `./working-evaluation`; `test/working-evaluation.test.ts` | Pure support-coefficient/concentration summary, immutable common-pool plan and OFF-exposed same-tier pair/batch rank diagnostic; <=50 Objects/25 disjoint planned pairs, abstention coverage, source-ID reuse and Subject/session clusters; no native enrollment/outcome writer, independence proof or quality admission |
+| Native Working evaluation adapter | `packages/prediction-engine/src/adapters/kajo-working-evaluation.ts`; `./adapters/kajo-working-evaluation`; `test/working-evaluation-kajo.test.ts`; `scripts/database/working-evaluation-kajo.test.mjs` | Strict frozen Personal source and three actual comparison-row mapping across matched v1/v2/v3, separate source/control/observation clocks and supplied scope references; v3 support reconstructs the full frozen prefix through scoped input-Item/Event/UNDO aliases and decodes bound compact binary vectors in captured dimension order, old v1/v2 support remains unavailable; no current tags/native outcome writer; actual full-schema interoperability remains synthetic source evidence |
+| Session verification | `packages/prediction-engine/test/working-state.test.ts`, `working-state-kajo.test.ts`; `scripts/database/working-state-kajo.test.mjs`; `test/exports.mjs` | Independent numeric/static/off, correction/expiry/bounds and synthetic non-media controls; actual full-schema Personal command/session interoperability and frozen existing run preservation; built separate ESM/import graphs |
+| Native Personal working capture | `supabase/migrations/20261010064104_personal_working_bridge.sql`, `20261010082558_personal_working_reset.sql`, `20261010160025_personal_working_candidate_features.sql`; private `capture_personal_working_state_v1` | One authorized MVCC snapshot of own Personal Event session/prefix/same-Item correction closure, binary current tags and reset controls; fresh `native-working-capture-v3` retains bounded controls/latest boundary and binds dense frozen candidate projections while old v1/v2 remain supported; no-session/empty/no-tag/overflow stays inert without truncation; unsupported legacy tags/UNDO/timestamp precision yields explicit `INPUT_UNAVAILABLE` without partial evidence while OFF pages remain available; portable validation stays strict; product reset integration and historical availability remain open |
+| Native working consumer/comparison | Capture/reset forwards, `20261010153638_personal_working_shadow_precision.sql` and `20261010160025_personal_working_candidate_features.sql`; private `prediction_candidate_score_working_v1`, `personal_working_explanation_v1`, `record_personal_working_shadow_v1`; private `personal_working_shadow_comparisons` | Shared canonical consumer for exact legacy-score OFF serving and frozen ±0.25 STATIC/ORDERED components; comparison writer retains function-local float JSON precision with caller restoration across all source generations and verifies v3 candidate bindings without copying vectors into receipts; prior rows/identity/ACL remain unchanged; source-cascade erasure and lifecycle-first budgeted dependencies; no genome/job/ON policy or quality admission |
+| Native working verification | `scripts/database/personal-working-bridge.mjs`, `personal-working-bridge.test.mjs`, `personal-working-bridge-fixture.sql`; `run-ci-cli-installation-probe.mjs` | Drift-guarded forward/body preservation, populated historical artifacts, actual command/portable numeric controls, ownership/correction/expiry/bounds, supported microsecond order and unavailable-input OFF compatibility, V2 inherited versus V3 fresh capture, exact OFF candidate/policy parity, private access and source/actor/Profile erasure; native CI remains distinct from source fixtures |
+| Frozen working candidate features | `20261010160025_personal_working_candidate_features.sql`; `scripts/database/personal-working-candidate-features.mjs`, `personal-working-candidate-features.test.mjs`, `personal-working-candidate-features-fixture.sql`; native CLI gate | Guarded existing-function v3 generation, compact schema/artifact references and dense binary arrays in original captured dimension order from actual ranking tags, unchanged 2-MiB protocol-2 window bound, explicit inert unavailability and ranking-statement/UNKNOWN availability; exact legacy OFF, old v1/v2 artifacts/page retries and approved function metadata preserved; source fixtures do not certify historical features, independence, native quality or activation |
+| Working comparison precision verification | `scripts/database/personal-working-shadow-precision.mjs`, `personal-working-shadow-precision.test.mjs`; native CLI gate | Genuine frozen v1/v2 source upgrade, exact OFF float8 bytes and delivery policy at caller -3/0/1, immutable prior rows/retries and full function metadata except the approved config; caller restoration on success/retry/error, injected row/body/ACL and score/rank/selection rejection; final native smoke challenges caller0 |
+| Private working reset | `20261010082558_personal_working_reset.sql`; private `personal_working_resets`, `commit_personal_working_reset_v1`, `guard_personal_working_reset_v1` | Immutable private canonical session control and server-clock receipt; current owner/member/session authorization on every retry, lifecycle-first locks, 128-control scope quota with retry first, new READ COMMITTED writes; at-or-before exclusion without taste/history/reward/TTL changes; forecast-only erasure retains raw controls and genuine parent cascades remove them; no public Event/API/UI or serving ON |
+| Reset verification | `scripts/database/personal-working-reset.mjs`, `personal-working-reset.test.mjs`, `personal-working-reset-fixture.sql`, `personal-working-reset-concurrency.mjs`, `personal-working-reset-concurrency.test.mjs`; native CLI gate | Populated old generation/object preservation, cutoff/control lineage, post-reset independent support and no pre-reset resurrection, unchanged prefix/control bounds, exact OFF/frozen V2/fresh V3, scope/authorization/immutability/parent erasure; independent-session retry/quota/lifecycle orders require native execution evidence |
 | Portable fixtures | `packages/prediction-engine/src/fixtures/maintenance.ts`, `cycles.ts`; `npm run engine:demo` | Same executable media and synthetic machine-energy cycle; no real data or cross-domain quality claim |
 | Verification and packaging | `packages/prediction-engine/test/`, package/TS/lint configs; root workspace/scripts | Contract tests, actual built ESM exports and independent core import graph; lint/typecheck/tests/build run in root check and existing CI |
 

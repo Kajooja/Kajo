@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
+  RefreshControl,
   StyleSheet,
   Text,
   TextInput,
@@ -69,7 +70,10 @@ function ListsContent() {
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <StatusBar style="light" />
       <InteractionPersistenceNotice theme={theme} />
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.content, { flexGrow: 1 }]} keyboardShouldPersistTaps="handled"
+        alwaysBounceVertical overScrollMode="always"
+        refreshControl={<RefreshControl refreshing={itemLists.status === 'loading'} onRefresh={itemLists.refresh}
+          tintColor={theme.base.textMuted} colors={[theme.base.textMuted]} />}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>‹</Text>
@@ -87,9 +91,7 @@ function ListsContent() {
         {itemLists.error ? (
           <View style={styles.notice}>
             <Text style={styles.error}>{itemLists.error}</Text>
-            <Pressable accessibilityRole="button" onPress={itemLists.refresh}>
-              <Text style={styles.link}>Yritä uudelleen</Text>
-            </Pressable>
+            <Text style={styles.link}>Päivitä vetämällä alaspäin.</Text>
           </View>
         ) : null}
 

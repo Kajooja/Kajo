@@ -1,6 +1,6 @@
 # Kajo UX Principles
 
-These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 remain on its active source branch until merged. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
+These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 are included in the owner-authorized #329 source integration. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
 
 ## Core feeling
 
@@ -24,6 +24,10 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 8. **Personal invites feel personal but remain consent-based.** An invite may identify the inviter in restrained copy after server authorization. Receiver explicitly accepts Friendship; opening a link never silently creates a social relationship.
 9. **Friendship is lightweight.** Accepted Friends appear on a simple Friends surface. Friendship does not create a joint Room/Profile automatically and does not expose private taste history.
 10. **Shared Kajo is intentional.** From Friends, creating `yhteinen Kajo` should be one short explicit flow. SharedProfile is a learned place/context, not a hidden side effect of a referral.
+
+The owner's October 9 clarification reaffirms the initial adaptive Taste as a
+pre-release requirement. Group invitation shortcuts preserve accepted Personal
+setup and never replace the planned Taste, frozen challenge or usefulness gates.
 
 ## Authenticated Kajo principles
 
@@ -101,10 +105,11 @@ Discovery may show a bounded contextual row of active Profile Lists. Catalog sea
 
 ### Owner browse refinements — planned, 2026-09-23
 
-The owner likes the current Discovery appearance and explicitly defers these
-refinements to the appropriate application UI packet. They are recorded work,
-not changes delivered by the catalog/native-acceptance packet. ROADMAP Phase
-17.0 owns scheduling; the existing issues below own implementation.
+The September 23 queue remains recorded product work. The owner's October 6
+promotion moves #199 continuous append, compact one-row header and unused
+bottom-space removal into the native correction packet described below;
+gesture/small-screen/large-text acceptance remains required. ROADMAP Phase 17.0
+retains the other broad browse refinements; the issues below own implementation.
 
 - **One consumed history (#200):** Discovery's Katsotut/Luetut opens the same
   canonical, active-Profile and ItemType-scoped history as the Lists entry. A
@@ -124,7 +129,7 @@ not changes delivered by the catalog/native-acceptance packet. ROADMAP Phase
   caching/virtualization.
 - **Continuous browsing (#199, dependent on #228/#229):** approaching the end
   loads the next server page, preserving order, existing rows and scroll. Reuse
-  the accepted cursor/delivery contract when that source packet is merged;
+  the versioned cursor/delivery contract with its separate source/native gates;
   coalesce requests, retain exact per-Item origins, avoid duplicate IDs and
   cancel obsolete Profile/domain/session reads. Errors allow the same request
   to recover. Exhaustion or expiry remains truthful; do not fabricate an endless
@@ -184,6 +189,17 @@ retain the gesture. Shared Discovery keeps its loading indicator active while
 either recommendations or Shared choices load. Durable mutation recovery remains
 a distinct action; refreshing never discards queued choices. Gesture behavior
 requires the combined real-device acceptance checkpoint.
+
+The 2026-10-06 owner correction supersedes the terminal fresh-search footer:
+Discovery downward pull at the bottom viewport or top and accessible **Näytä
+lisää** extend the current list. Approaching the end also appends through the
+scoped server cursor. Preserve existing order/scroll and per-Item origins;
+coalesce repeated gestures and discard obsolete scope callbacks. Show no more
+eligible books/movies only after server proof; report a reader limit or cursor
+expiry separately. An expired cursor requires explicit **Aloita uusi haku**.
+Selected **Löydä** does not reset the feed. Catalogue-wide append and compact
+header/bottom-space fixes are owner-promoted into the current native packet;
+physical gesture, small-screen and large-text acceptance remains required.
 
 
 Destination-picker panels must keep all action buttons above Android system
@@ -256,6 +272,36 @@ then “Pari!” and joint Katsotut/Luetut. Display whose ratings belong to that
 A new joint viewing uses a new round and retains the earlier experience. Existing
 Personal setup/history survives. This is a release requirement, not functionality
 delivered by the multi-destination picker.
+
+## Planned compact group creation and joint decision — 2026-10-09
+
+Deliver compact creation under ROADMAP 16.2 after Friend invite/safety lifecycle
+16.0–16.1. Show **2–5 total person slots including the creator**, already occupying
+one slot. A `+` selects an authorized accepted Friend or generates an opaque
+invitation that can be shown, copied or shared through the OS share sheet,
+including WhatsApp where available. Distinguish pending invitations from accepted
+members. Receiver continuation uses the same app/Taste/link route and explicit
+Friend/group consent; sending or opening a link creates no relationship or
+private Personal history access. This UI does not impose a new bound on existing
+generic 2-N SharedProfile storage.
+
+After 16.3's rating evidence/controlled rewatch, planned 16.4 offers an optional
+“what should we watch/read today?” Shared session with at most five current
+canonical BOOK/MOVIE suggestions. Reuse the same predictor and inherited
+DiscoveryMode/risk; optional Tinder-like cards retain accessible buttons and do
+not replace ordinary grid discovery or duplicate the global curtain control.
+“Do today”/other domains remain future work.
+
+Proposed any-participant session-level “not interested” veto removes the current
+option; confirm the exact veto rule at implementation. “Already seen/read”
+replaces the option within this session. Bound refill and give truthful exhaustion,
+expiry and retry states. Neither action silently submits a permanent dislike,
+erases history, permanently forbids rewatch, completes a SharedRatingRound or
+creates group reward. Freeze the accepted session roster with explicit expiry,
+membership-change, concurrency, lifecycle and minimal telemetry rules; choice
+alone is not confirmed consumption. The separate optional List-only FUT-UX-003
+is not promoted by this plan. MVP-GROUP-004 and MVP-SOCIAL-010..012 remain open;
+no current UI changes merely by recording these ideas.
 
 ## Required pre-MVP card controls — #239 / MVP-UX-006
 

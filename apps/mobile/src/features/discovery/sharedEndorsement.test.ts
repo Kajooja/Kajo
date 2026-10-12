@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { getDiscoverableItems, setItemNotInterested } from './itemInteraction';
+
 import {
   applySharedDiscoveryOverlay,
   formatMemberHistoryProvenance,
@@ -96,6 +98,23 @@ describe('Shared discovery collaboration overlay', () => {
     ).toEqual(['pending', 'ordinary', 'seen-high', 'seen-low']);
   });
 
+  it('cannot reintroduce locally rejected pending or member-history Items outside the ranked page', () => {
+    const interactions = setItemNotInterested(setItemNotInterested({}, 'pending', true), 'seen-high', true);
+    const overlaid = applySharedDiscoveryOverlay([ITEMS[0]!], 'MOVIE', STATE);
+
+    expect(getDiscoverableItems(overlaid, interactions).map(item => item.id)).toEqual(['ordinary', 'seen-low']);
+  });
+
+  it('honors server exclusions in both pending and member-history overlay tiers', () => {
+    const state: SharedDiscoveryStateMap = {
+      ...STATE,
+      pending: { ...STATE.pending!, ineligibleForDiscovery: true },
+      'seen-high': { ...STATE['seen-high']!, ineligibleForDiscovery: true },
+    };
+
+    expect(applySharedDiscoveryOverlay(ITEMS, 'MOVIE', state).map(item => item.id)).toEqual(['ordinary', 'seen-low']);
+  });
+
   it('names the proposer and target List in the pending approval banner', () => {
     const approval = getPendingListApproval(
       STATE.pending,
@@ -113,7 +132,7 @@ describe('Shared discovery collaboration overlay', () => {
       proposedByNickname: 'Mirri',
     });
     expect(formatPendingListApproval(approval)).toBe(
-      'Mirri lisäsi listaan Meidän illat',
+      'Mirri ehdottaa listoille: Meidän illat',
     );
     expect(
       getPendingListApproval(STATE['endorsed-by-me'], [
@@ -139,9 +158,13 @@ describe('Shared discovery collaboration overlay', () => {
     );
 
     expect(nicknames).toEqual(['Mirri']);
-    expect(formatMemberHistoryProvenance(nicknames)).toBe('Mirri nähnyt');
-    expect(formatMemberHistoryProvenance(['A', 'B'])).toBe(
+    expect(formatMemberHistoryProvenance(nicknames, 'MOVIE')).toBe('Mirri nähnyt');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'MOVIE')).toBe(
       'A ja B nähneet',
     );
+    expect(formatMemberHistoryProvenance(['A'], 'BOOK')).toBe('A lukenut');
+    expect(formatMemberHistoryProvenance(['A', 'B'], 'BOOK')).toBe('A ja B lukeneet');
+    expect(formatMemberHistoryProvenance(['A', 'B', 'C'], 'BOOK')).toBe('A ja 2 muuta lukeneet');
+    expect(formatMemberHistoryProvenance([], 'BOOK')).toBeNull();
   });
 });

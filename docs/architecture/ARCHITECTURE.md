@@ -2,7 +2,8 @@
 
 Status: **canonical implemented boundaries + first-release target architecture**  
 Architecture decisions: `docs/architecture/decisions/`  
-Taste-first decision: ADR-0007  
+Taste-first decision: ADR-0007
+
 Independent-engine refinement: [ADR-0008](decisions/0008-portable-predictive-memory-engine-and-external-priors.md)
 
 This file owns Kajo product/runtime boundaries. The complete reusable 51-part engine target is [PREDICTIVE_MEMORY_ENGINE](PREDICTIVE_MEMORY_ENGINE.md); Kajo-specific prediction/evidence semantics remain in [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). [DATA_ENRICHMENT](DATA_ENRICHMENT.md) owns isolated public-data research and artifact admission. Planned contracts are not claims of implemented packages or deployed models.
@@ -46,13 +47,25 @@ kajo/
 ├── supabase/
 │   ├── migrations/
 │   └── functions/
-├── packages/                    # executable reusable contracts/core when E1 begins
+├── packages/                    # implemented reusable engine contracts/core
 ├── scripts/                     # bounded research/operational tools when implemented
 ├── docs/
 └── .github/
 ```
 
-Do not create empty folders to match this diagram. E1 may create an actual tested engine-contract package; it does not force an immediate SQL-to-service rewrite. CODEMAP lists real code paths, not every conceptual module in the target design.
+Do not create empty folders to match this diagram. E1 delivered the tested
+`packages/prediction-engine` contract package; D1/D2 delivered isolated research
+intake/evaluation. This does not force a SQL-to-service rewrite or admit a serving
+model. CODEMAP lists real code paths, not every conceptual target module.
+
+The bounded `./working-state` export now adds a pure ordered-session intent
+hypothesis beside E1. Its separate `./adapters/kajo-working-state` export accepts
+already-authorized Personal Event/session snapshots; it owns no database reader,
+writer, authorization service or mobile state. Adjustment defaults to OFF and
+does not alter E1 state, native SQL serving, Shared scoring or frozen historical
+forecasts. [The package README](../../packages/prediction-engine/README.md#bounded-session-intent)
+owns its executable limits and controls. Native capture/consumer integration,
+versioned shadow comparison and admission remain explicit subsequent gates.
 
 ## 3. Clients
 
@@ -99,6 +112,12 @@ Provider linking must not create duplicate Kajo Users or PersonalProfiles.
 ### Anonymous Taste identity
 
 Taste Test starts without an account wall. Kajo therefore needs a server-backed anonymous identity/session boundary.
+
+This boundary, minimum retention/deletion and abuse controls, and versioned Taste
+measurement precede real anonymous Taste acceptance under ROADMAP 15.0. Provider
+linking and full browser/app continuity complete under 15.1; full launch operations
+remain later gates. Selection/challenge source work can use authorized fixtures
+before this runtime exists, without claiming an anonymous launch flow.
 
 Conceptual model:
 
@@ -243,11 +262,15 @@ The first release requires a bounded persistent mobile outbox for unacknowledged
 
 Implementation checkpoint, 2026-09-09 / #224: rating, not-interest and their undo use `commit_item_action_v1` plus a SQLite-backed command outbox. The server patches current state and appends one canonical Event and an immutable receipt in one transaction. Actor/membership checks precede cached replies. A per-Item undo head is invalidated by every legacy projection write; undo restores the server-recorded predecessor instead of accepting a client state snapshot. The public wrapper is SECURITY INVOKER; its private command implementation has explicit authorization and narrowly granted execution. Private receipt/head tables have RLS and no API-role table access.
 
-The mobile outbox persists before optimistic acknowledgement, preserves FIFO through lost replies/restarts and suspends stale actor/Profile/environment scopes. `DATA_EVENTS.md` owns retry/rejection and attribution details. #226 extends the same queue and receipt/head lineage to List lifecycle/membership and Shared Endorsement/consensus through `commit_collection_action_v1`. Collections wait for confirmed receipts; the old whole-state mobile writer and duplicate client mutation Events are removed. Zero-transition receipts need no Event, and List undo corrects every Event of its target command. Pending Endorsement withdrawal/List deletion cancels the original outcome evidence without impersonating the affected member. The exposure-only `EventTrackingContext.tsx` queue remains in memory. Full `MVP-DATA-003` (ROADMAP 14.1), device process-death acceptance and complete delivered-slate provenance remain open; rollout and CI state are recorded in the corresponding PR/Issue and Sprint 014.
+The mobile outbox persists before optimistic acknowledgement, preserves FIFO through lost replies/restarts and suspends stale actor/Profile/environment scopes. `DATA_EVENTS.md` owns retry/rejection and attribution details. #226 extends the same queue and receipt/head lineage to List lifecycle/membership and Shared Endorsement/consensus through `commit_collection_action_v1`. Collections wait for confirmed receipts; the old whole-state mobile writer and duplicate client mutation Events are removed. Zero-transition receipts need no Event, and List undo corrects every Event of its target command. Pending Endorsement withdrawal/List deletion cancels the original outcome evidence without impersonating the affected member. The #228 draft replaces the memory-only `EventTrackingContext.tsx` queue with immutable Event/session envelopes in SQLite, using the existing bounded outbox with a separate environment/actor/Profile identity. Replay retains the original session; deduplication follows durable acceptance. Exposure and explicit commands drain separately, but both Item and collection dispatch now check persisted matching impressions first. Correlated commands wait for their original actor/Profile/session/prediction/Item impression acknowledgement; normal exposure waiting stays pending without publishing a persistence error or prematurely settling collection callers; missing exposure is not invented and retrospective late-outcome reconciliation remains open. Full `MVP-DATA-003` (ROADMAP 14.1), device process-death acceptance and complete delivered-slate provenance remain open; rollout and CI state are recorded in the corresponding PR/Issue and Sprint 014.
+
+The #228 List correction extends the existing private resurfacing decision with active Profile-scoped List membership and entry age. Collection receipts invalidate mobile grid ranking identity even if interaction projection fields are unchanged. The correction preserves function identity/ACLs, historical evidence and Shared consensus boundaries. The exact server forward is deployed; mobile/device acceptance remains pending (STATUS owns rollout evidence).
 
 Recommendation delivery origin is frozen truthfully. A cached Item from another Profile/mode/run cannot inherit a hosted `predictionId`.
 
-The inspected main baseline still has fallback lookups across remembered runs in `predictionRankingCache.ts` without a Profile filter. Exact Profile/run/slate retrieval and overlay provenance remain release requirements under `MVP-DATA-004`; active #228/#229 source corrections are not accepted main by implication. Follow STATUS for the actual code/deployment/device gates.
+The inspected accepted-main runtime baseline (`6dd1fec`) has fallback lookups across remembered runs in `predictionRankingCache.ts` without a Profile filter. Exact Profile/run/slate retrieval and overlay provenance remain release requirements under `MVP-DATA-004`; the #228/#229 source corrections are now included in the owner-authorized #329 integration. Follow STATUS for the actual code/deployment/device gates.
+
+The active #228/#229 source replaces detail latest-pool guessing with a bounded, scope/session-checked delivered snapshot. Per-Item Shared tiers are frozen; injected pending/member-history Items cannot borrow the ranking Prediction. Detail actions and dwell use the captured descriptor, while live consensus controls remain current. Dwell retains its start-time recording callback. A client-only origin session/Item guard rejects stale Event/action admission; action dispatch and result projection invalidate at layout-time session changes. Lists/Shared async completion tokens expire on session changes and unmount, and destination loading/saving is specific to the current open request. Full `MVP-DATA-004` acceptance still requires late-outcome rollout and representative async/session runtime verification; this client snapshot does not replace server trace validation. Visible ranking/cache readiness also needs the separately recorded captured-session acceptance before the prepared identified reader is activated.
 
 Growth/acquisition telemetry has separate semantics and retention. Analytics failure must not roll back auth, Friendship, Taste or SharedProfile state. External research and synthetic observations use separate typed records, not new native Event variants introduced by this documentation change.
 
@@ -1962,6 +1985,90 @@ See `CODEMAP.md`, active sprint handoff and ADRs for implementation paths/detail
 
 ## 21. Incremental portability and research boundary
 
-E1 makes the engine contract executable with Kajo/media and small synthetic non-media fixtures. It does not move production scoring into the mobile app or bypass the trusted server. D1/D2 introduce an isolated external-data adapter and reproducible baselines. E2 may later replace one admitted component behind existing Kajo contracts with parity, fallback and rollback tests.
+E1 implements the executable engine contract with Kajo/media and small synthetic
+non-media fixtures. D1/D2 implement the isolated external-data adapter and
+reproducible baseline report; their bounded foundation is accepted. Production
+scoring remains server-owned. E2 may later replace one admitted component behind
+existing Kajo contracts with parity, fallback and rollback tests.
+
+The October 9 dependency audit prioritizes the native memory/serving
+decay divergence before bounded ordered Personal session/state policy and adaptive
+Taste/frozen challenge. Preserve the current server boundary and version actual
+features/interpretation; normalized-feature activation must coordinate every
+consumer. Known Shared evidence defects remain mandatory, while its queued
+genuine prepared-input consumer and advanced models are not a blanket prerequisite
+to Personal source work. ROADMAP owns order; STATUS owns exact acceptance.
 
 The complete source proposal is retained separately: transparent state/memory → latent representations → explicit outcome/next-state model → bounded multistep dreams → self-evolving geometry. Each generation needs its own suitable data and acceptance. Movie-only rating accuracy cannot close all of those gates.
+
+
+### Focused prediction reconnect recovery — #240
+
+The protocol-2 reader retains its failed request object, captured scope/context,
+cursor and immutable accepted prefix across transport recovery. `expo-network`
+provides advisory native connectivity, subscribed only while router-focused and
+application-foregrounded. Initial async state cannot override a newer native
+event; callbacks after cleanup have no effect. A reachable transition coalesces
+one retry, including a transition during a hung request, with at most three
+automatic attempts per pending request. Repeated online notifications do nothing.
+Manual retry remains available; a new page/new search resets the bounded budget.
+
+The 15-second abort/race deadline remains. An online event never acknowledges a
+backend response, clears an error or changes Event/Item/List queues. During
+recovery the prior failure stays visible with a disabled pending retry control.
+Only the current successful response clears it. Server-proven cursor expiry or
+other refresh-only recovery requires explicit new search. Scope/revision changes,
+blur, backgrounding and unmount invalidate prior work before it can publish.
+
+
+## Verified local dependency security corrections — #238
+
+When a published dependency has no fixed release, a local source correction must
+retain its real npm identity and the raw advisory result. It is not an upstream
+version upgrade or permission to suppress unrelated scanner findings.
+
+`scripts/dependencies/security-patches.mjs` binds the braces 3.0.3 and node-forge
+1.4.0 archives to their exact lockfile identities/integrities and original source
+SHA-256 hashes. Installation is idempotent and refuses unknown or partially
+patched source. Verification is read-only and checks every locked installed copy.
+Installed-directory containment uses native path-relative rules on Windows and
+POSIX. The audit launches npm's CLI through Node under `npm run`, falling back to
+a fixed command through `cmd.exe` for direct Windows execution; `.cmd` files
+cannot be directly spawned as native executables.
+
+- [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm):
+  bound brace/parenthesis parser nesting and all three recursive output walkers
+  at 128 levels, including direct AST calls. Depth rejection is a controlled
+  SyntaxError, analogous to the existing maximum input length. Escaped, quoted
+  and character-class braces remain literal. The upstream diagnosis is
+  [micromatch/braces#70](https://github.com/micromatch/braces/issues/70).
+- [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv):
+  require exactly the validated OID plus an optional, empty primitive NULL in
+  DigestAlgorithm, retaining the outer DigestInfo count check. Counting children
+  alone is insufficient: an unexpected second element or nonempty NULL must also
+  be rejected. The correction covers `lib/rsa.js` and both distributed browser
+  bundles; the same malformed-signature controls execute against all three.
+  The upstream diagnosis/proposal is
+  [digitalbazaar/forge#1149](https://github.com/digitalbazaar/forge/issues/1149)
+  / [#1152](https://github.com/digitalbazaar/forge/pull/1152).
+
+`audit-dependencies.mjs` first verifies those exact corrections and runs the
+installed security regressions (including pristine-upstream negative controls),
+then obtains fresh `npm audit --json`. It prints the complete raw report,
+verified source hashes, mitigated findings and unmitigated findings separately.
+Only the exact two advisory/package identities on verified copies qualify. Parent
+meta-vulnerabilities qualify only when all reachable advisory leaves qualify;
+cycles without a real leaf fail. New findings, unknown copies/source, missing
+patches, malformed/incomplete reports and scanner transport failure fail closed.
+Moderate/high/critical findings without verified corrections block CI. Published
+upstream findings are never described as zero vulnerabilities.
+
+The corrections are temporary compatibility backports. Review/remove each when
+a fixed upstream release is available; changed source/version fails until reviewed.
+All normal checks, actual APK build and owner device acceptance remain required.
+
+For October 6, compatible published fixes replace the compression 1.8.1 and
+source-map-js 1.2.1 lock leaves with 1.8.2 and 1.2.2. They fit the existing Expo
+CLI/PostCSS ranges and require no audit exception. The regression boundary covers
+compressed-response abort cleanup and validated/bounded indexed source-map
+offsets, with ordinary source-map and consumer behavior retained.

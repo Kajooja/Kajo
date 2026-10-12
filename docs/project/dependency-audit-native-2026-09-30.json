@@ -1,0 +1,45 @@
+{
+  "format": "kajo-dependency-audit-v1",
+  "date": "2026-09-30",
+  "scope": "draft PR #229 root npm workspaces, production and development dependencies",
+  "packageLockSha256": "c816babfe6311aaabc550c8e7b49bb225c472db50e07064447f30b3b279d0646",
+  "result": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 571,
+        "dev": 338,
+        "optional": 94,
+        "peer": 17,
+        "peerOptional": 0,
+        "total": 936
+      }
+    }
+  },
+  "resolved": {
+    "brace-expansion": "1.1.21 / 5.0.12 with all original minimatch parent ranges and decoder adapter unchanged"
+  },
+  "source": {
+    "predecessorNative": "c6509c6e17dd02aa77f5c48d56c789be0ff2ef13",
+    "integratedCorrection": "9a8b951ffefcbd53671f6046f3560f5a2ee33c5d",
+    "failedStandaloneRun": "https://github.com/Kajooja/Kajo/actions/runs/36681309205"
+  },
+  "validation": {
+    "cleanInstall": "npm ci --no-audit --no-fund",
+    "dependencyTests": "13 cases in the root test gate; includes the eight new ordinary/hostile-input consumer regressions"
+  },
+  "limitations": [
+    "Point-in-time npm advisory data; separate main receipt measures a different lock.",
+    "Native acceptance requires all five CI jobs and a successful standalone artifact for the current head, then actual configured-device observations.",
+    "Draft #229 remains unmerged; no hosted, SQL, account or consumed-request change."
+  ]
+}

@@ -1,9 +1,14 @@
 # Sprint 012 — Profile Messaging
 
-Status: **ACTIVE**
+Status: **historical delivery/device checkpoint, 2026-09-04**
 Milestone: **MVP 0.1**
 Started: **2026-09-02**
 Primary issue: **#138**
+
+The dated execution/verification/handoff below is retained as sprint history.
+Current continuation and remaining acceptance are owned by
+[STATUS](../STATUS.md), not this former active-sprint handoff. Its unaccepted
+device observations are not changed into completed acceptance by this wrapper.
 
 ## Goal
 

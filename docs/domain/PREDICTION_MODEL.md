@@ -41,6 +41,82 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 
 ## 3. The complete loop
 
+### Personal Taste opportunity source
+
+The source-only `taste-selection-v1` selector and Kajo adapter boundary live
+under the independent package's `./taste-selection` and
+`./adapters/kajo-taste-selection` exports. It chooses an immutable next question,
+explicit stage transition or bounded stop from caller-authorized, frozen catalog
+and response/presentation inputs. It performs no database access, clock read,
+random draw, native evidence write or production ranking activation.
+The [package contract](../../packages/prediction-engine/README.md#adaptive-taste-opportunity-selection)
+owns limits, normalization and formulas.
+
+ADAPTIVE uses recognition, diversity and a feature-coverage proxy; PRIOR_ONLY is
+the fixed diagnostic control. Feature coverage is not measured information gain,
+predicted rating, satisfaction probability or calibrated confidence. Unknown
+responses do not supply preference support; canonical negative responses and
+genuine zero remain distinct. The own-Personal `personal-taste-session-v1` source
+now persists the authorized frozen catalog, presentations and response revisions
+and consumes an independent SQL adapter of the same policy. Full-schema tests
+compare actual decisions/components with the portable implementation, including
+PRIOR_ONLY, correction/withdrawal and stage transitions. The bounded feature
+capture uses `taste-tags-frequency-64-v1`; this is an explicit dictionary selection,
+not a claim that omitted catalog dimensions do not exist. Public creation freezes
+ADAPTIVE; diagnostics cannot change the policy through the public request.
+
+Explicit ratings alone project to source-provenanced LongTerm bootstrap evidence.
+Unknown/not-interest/withdrawal stay distinguishable; see [Taste evidence](DATA_EVENTS.md#3-taste-evidence).
+Durable receipt issuance is not observed screen exposure. The own-Personal frozen
+challenge source is below; anonymous lifecycle, preview, app integration and
+usefulness evidence remain open.
+The root estimator, current mobile calibration policy/RPC and scorer are unchanged.
+
+### Frozen Personal Taste challenge
+
+`personal-taste-challenge-v1` reserves unseen holdouts before calling the existing
+`rank_items_with_identity_v1` once in cross-domain `FOR_YOU` mode, with a bounded
+50-Item pool. Selection is fixed to at most three real Items per domain by frozen
+recognition/ID, independently of the forecast score. Training presentations and
+all existing same-Item native/bootstrap records are excluded. The run's canonical
+state, source features, genome and full candidate trace remain the audit source;
+the challenge freezes their commitment and every reserved score or explicit
+missing result before accepting any answer. Later training corrections, metadata
+changes and answers never recompute those forecasts. Lifecycle withdrawal remains
+authoritative over replay. [DOMAIN_MODEL](DOMAIN_MODEL.md#own-personal-frozen-challenge-source)
+owns the bounded protocol, locking and erasure rules.
+
+The existing scalar is an **uncalibrated ranking score**, not a predicted 0–10
+rating or satisfaction probability. Therefore `taste-ordinal-agreement-v1`
+measures only **same-domain rating order**. It forms unordered pairs of reserved
+Items whose first responses are both ratings; BOOK/MOVIE cross-pairs are excluded.
+Pairs are partitioned in this order:
+
+| Pair condition | Count / treatment |
+|---|---|
+| Either forecast is unavailable | `missingForecastPairs`; no imputation. |
+| Actual ratings are equal | `ratingTiePairs`; no claimed ordering target. |
+| Absolute frozen score difference is at most `1e-9` | `forecastTiePairs`; stable ID rank is not a taste prediction. |
+| Both differences are nonzero and their signs agree | `concordantPairs`. |
+| Both differences are nonzero and their signs disagree | `discordantPairs`. |
+
+`comparablePairs = concordantPairs + discordantPairs`. The result separately reports
+reserved/answered Items, known ratings, unknown and not-interest counts. Unknown
+and not-interest are not invented numeric ratings. Pair counts share Items and
+are dependent: at most six known ratings do not become a larger independent sample.
+No comparable pairs yields `INSUFFICIENT_COMPARABLE_PAIRS`; otherwise the result is
+`DESCRIPTIVE_ONLY`. Both expose `UNAVAILABLE_SMALL_DEPENDENT_SAMPLE`, null
+`accuracyPercent` / `ratingError`, and `qualityAdmitted=false`. No confidence
+interval, MAE/RMSE or percentage is manufactured from these ranking scores.
+
+All scores and partial metrics stay hidden until all reserved answers are locked.
+The first answer is the measured answer; it cannot be retrospectively edited to
+improve the result. REMOVE withdraws the retained evaluation. These private
+answers are `EVALUATION_ONLY`, with no automatic bootstrap, Event, reward, learning
+or model promotion. Any later explicit taste projection must preserve the
+commitment and its removal lineage. The source proves protocol correctness, not
+first-session usefulness, representative population quality or screen exposure.
+
 ```mermaid
 flowchart TD
   A["Observe Events"] --> B["Update memory projections"]
@@ -75,6 +151,24 @@ Evidence:
 Lifetime: session-scoped; a new session starts after an intentional app/session boundary or prolonged inactivity. It can be reconstructed from Events and should not require model retraining.
 
 Example: three quick comedy skips followed by two long thriller detail views may change this session's candidate mix without rewriting the Profile's enduring identity.
+
+**Implemented source boundary:** `packages/prediction-engine` now provides a
+separate bounded `working-state-v1` / `working-policy-v1` hypothesis and strict
+Personal Kajo Event/session normalizer. It uses explicit native ratings and
+not-interest only; passive attention is retained as context and never invented
+satisfaction. At least two distinct current Items are required. It preserves
+correction/undo, equal-time ambiguity, known occurrence/availability cutoffs and
+caller-declared complete session prefix plus visible correction closure.
+Adjustment defaults to OFF; STATIC and ORDERED are explicit diagnostic controls.
+The [package README](../../packages/prediction-engine/README.md#bounded-session-intent)
+owns the exact formula, bounded support and portable reset/expiry rules. The
+[native Personal bridge](#native-personal-workingstate-capture-and-comparison)
+now freezes its own authorized capture into new PredictionRuns and consumes
+versioned candidate components with serving fixed to OFF. Explicit private
+STATIC/ORDERED comparisons use frozen features; they do not activate session
+ranking or complete MVP-ALG-004, usefulness, calibration or historical feature
+availability. The private reset-aware capture now accepts a canonical session
+control; product reset integration and quality/admission remain separate gates.
 
 ### 4.2 ShortTermState — lähimuisti
 
@@ -216,6 +310,85 @@ Before serving: demonstrate useful supported behavior, canonical Item mapping, c
 The generic target composes existing memory with explicit `BeliefState`, `WorldState` and, for Shared subjects, `GroupState`. These are responsibility/contract refinements, not newly implemented tables. World trends/availability are not durable personal taste; missing context is not invented mood.
 
 BeliefState reports estimate, support, uncertainty method and calibration status. Unsupported estimates remain unavailable. Existing V1 rank/confidence components must not be relabeled as calibrated probabilities. Section 20 maps these target concepts onto Kajo without changing the accepted scorer in this documentation delivery.
+
+### 4.8 Native base confidence support — distinct-Item correction
+
+The October 12 source forward `20261011213431_native_item_support.sql` corrects
+new base confidence in both `private.rank_items_v0` and its catalogue clone
+`private.rank_items_catalog_base_v1`. Previously, one admitted native Event on an
+Item with eight matching tags yielded `evidenceCount=8` and confidence 1. Repeated
+actions on that same Item also inflated this support. Legacy `evidenceCount`
+remains a tag-incidence diagnostic; it is not an independent sample count.
+
+New `nativeItemSupportCount` counts distinct matching native Items from the
+kernel's already admitted nonzero weighted rows. Existing Profile, as-of, UNDO
+and matching-tag filters remain authoritative. One Item contributes at most one
+unit regardless of tag/action count. When no matching admitted native Item exists,
+support is zero. The existing `min(1, count / 8)` confidence heuristic now uses that count.
+The distinct-Item union runs only after the existing rank/limit admission, over
+at most 50 returned candidates; it does not repeat for the full catalogue pool.
+Explanations record `nativeSupportVersion=native-item-support-v1`, basis
+`DISTINCT_MATCHING_NATIVE_ITEMS` and calibration `uncalibrated`. Item IDs remain
+internal to the private computation; only support metadata is exposed.
+
+The exact two-body guard preserves function identity/owner/ACL/configuration,
+every score/feature/version/ranking component and all old frozen rows/receipts.
+Bootstrap alone still supplies no native confidence. Distinct Items are a
+conservative support proxy, not proof of statistical independence or calibrated
+probability. Bootstrap/native same-Item additive influence, the retained bootstrap
+floor, memory/Scenario/Shared reliability and observed usefulness remain separate
+source-fusion/quality gates. Source tests and native CI do not themselves deploy
+or admit those semantics; STATUS owns exact acceptance.
+
+### 4.9 Personal source fusion and forgetting
+
+The new source forward `20261012060821_personal_source_fusion.sql` introduces
+`personal-source-fusion-v1` for current Personal memory and both ordinary/catalogue
+serving kernels. It resolves same-owner native Event authority from finite
+occurrence/creation prefixes before selecting weights. Exact owned canonical
+command receipt lineage governs revisions, including backdated/equal occurrence
+clocks; unsupported legacy raw Events retain explicit occurrence-time/ambiguity
+rules. A valid later revision replaces earlier same-Item native authority; zero
+and neutral five remain authoritative and supersede that Item's bootstrap
+contribution. Not-interest is a separate negative, not a
+fabricated rating. Exact scoped UNDO, selective interest/history clear, malformed
+replacement and ambiguous times must not revive superseded native preference.
+Retained authorized bootstrap can supply an explicitly labelled prior fallback
+when a current native value is unavailable or ambiguous; it is not a current
+native answer or a resolved ambiguity.
+
+Canonical receipt lineage must bind actor/Profile/Item, command/result and source
+Event identities within the eligible finite prefix. An absent, competing, cyclic,
+mixed or over-depth chain is explicit unavailable authority, never a guessed
+UUID winner. The bounded receipt depth is 512. Current active bootstrap withdrawal
+remains an authorization/source-lifecycle decision rather than historical replay.
+
+Receipt-bound history erasure remains distinct from an ordinary Undo. Weak
+attention/save/List actions do not themselves replace a durable rating. Strong
+setup status retains its existing six-strong-Item criterion and wire version;
+Saved/consumed/List alternatives are not known Taste ratings. Current effective
+support follows the same available source scope, rather than counting raw
+historical Events or accepting future display state as current evidence. Canonical
+Saved/List revisions use receipt depth instead of client occurrence order. A list
+deletion with an indistinguishable available clock conservatively withholds that
+list's support; an independent surviving List/rating still supports the Item.
+
+Personal bootstrap now uses separately versioned `bootstrap-decay-v2`,
+`exp(-ageDays / 1460)` without the old permanent 0.2 floor; future/nonfinite times
+are unavailable. Current active bootstrap withdrawal remains distinct from a
+historical cutoff replay. Native LongTerm retains its 180-day rule. New Personal base and
+bootstrap semantics identify `prediction-v0.6-personal-source-fusion` and
+`bootstrap-serving-v2-source-fusion`. Structural `memory-state-v1` and
+`prediction-features-v2` remain compatible; aggregate `sourceFusion` metadata
+records version/availability basis, unresolved native/fallback counts and unknown
+commit availability. Raw source IDs stay within private computation.
+
+Shared native calculations and old helper/frozen prediction/page/shadow/Working
+artifacts keep their earlier semantics and versions. Authorized Shared member
+summaries can still consume corrected Personal memory through the existing
+boundary. Stored clocks remain availability proxies; this source does not certify
+historical feature knowledge, statistical independence, calibrated confidence or
+observed usefulness. STATUS owns final implementation/test/CI/hosted acceptance.
 
 ## 5. Prediction trace: the system's causal spine
 
@@ -458,11 +631,23 @@ SharedProfile ranking
 
 Pending collaboration priority is not actor-specific taste modeling. Personal Events are not copied into Shared Event history.
 
+### Planned today-choice session — separate from Shared outcomes
+
+ROADMAP 16.4 / MVP-SOCIAL-010..012 queues an optional bounded BOOK/MOVIE choice
+session through the canonical Shared predictor and inherited DiscoveryMode.
+At most five current options retain exact delivery origins and a bounded accepted
+roster. Session-only veto or already-seen replacement is not completed joint
+experience, automatic negative group reward or permission to erase prior history.
+It must preserve ordinary discovery/controlled-rewatch semantics, bounded refill
+and honest exhaustion/expiry. Unknown/seen disclosure does not infer a member's
+private rating. The proposed any-member veto needs its final product threshold
+at implementation; no second recommender or current model activation is delivered.
+
 ### Shared consensus
 
 One Endorsement does not set Shared Saved state. Unanimity among currently accepted members produces durable SharedConsensus, system Saved state and the chosen custom List membership. Later membership changes do not revoke reached historical consensus.
 
-That paragraph describes the accepted-main single-destination baseline. The
+That paragraph preserves the earlier #226 single-destination baseline. The
 #229 successor records/reviews an exact destination set and atomically commits
 all approved memberships; DATA_EVENTS owns its evidence contract. Source merge,
 recorded hosted rollout and device acceptance are separately tracked in STATUS.
@@ -489,6 +674,182 @@ UI/server flow. Test pairs/N members, zero/disagreement, cancellation/edits,
 concurrent completion, membership changes, legacy history and separate rewatch
 rounds with Personal/Shared isolation. DOMAIN_MODEL and DATA_EVENTS own entities
 and command semantics; ROADMAP owns dependency order.
+
+The #232A source foundation now separates an explicit response vector from
+legacy single-actor Shared Item outcomes. Its current round projection can be
+COMPLETED only when every frozen participant has answered; membership-generation
+drift invalidates that current confirmation until reconfirmation with fresh
+answers. Corrections and cancellation retain immutable response/command history.
+`groupReward=null` and `learnable=false` are deliberate admission results, not
+missing ratings to replace with zero or a member average. The legacy V1
+Memory/Scenario/evaluation readers are unchanged and do not receive these new
+round records. The #232B source reader now supplies a versioned receipt-prefix
+vector, correction/reconfirmation boundaries, caller-declared maturity and
+per-response delivery reconciliation. DATA_EVENTS owns that exact contract.
+It preserves individual ratings, including zero, with descriptive minimum/spread
+and coverage; it defines no average or scalar joint reward.
+
+`READY_FOR_VECTOR_REVIEW` is a diagnostic outcome result, not a learned label.
+The acknowledged participant set is known at its command; intervening historical
+membership and transaction commit visibility remain unknown. Its explicit
+`historicalFeatureEligible=false` prevents accepted-at timestamps from being used
+as proof of a past prediction input. An outcome vector observed later may be used
+only under a separately frozen evaluation/admission contract. That contract must
+declare the horizon and maturity window, reconcile later corrections without
+overwriting frozen evaluations, compare production/shadow on identical supported
+vectors and report missing/unknown/unattributed coverage. Per-actor exposure never
+credits the entire group or an unexposed challenger. Group reward and learning
+remain unavailable until that admission is implemented and validated. No new
+Shared scorer, rewatch admission or outcome quality gain is claimed by these
+foundations. STATUS owns the current source/CI/rollout state.
+
+The #232C source implements the frozen outcome-evidence and paired-support
+boundary. An internal capture retains the actual reader result and observation
+time; replay by ID never recomputes a cutoff-only query. A new ID can reconcile
+later evidence or corrections without overwriting an earlier comparison.
+Production and shadow use that identical vector under an explicit existing
+evaluation window, with a single actor-specific support mask and frozen source/
+candidate/version metadata. Missing shadow, mismatched scope/pool/version or
+unsupported own exposure cannot be admitted by borrowing another coordinate.
+Complete support permits paired vector review only; it does not create a scalar
+`GenomEvaluation`, calibrated rating forecast, reward or automatic winner.
+
+Existing rank scores do not supply frozen per-member rating forecasts. The
+#232C storage boundary retains null production/challenger metrics and advantage;
+#232E below adds a separate retrospective ordinal diagnostic against distinct
+Item/experience outcomes from one frozen pool. It does not fill those stored
+scalar fields or turn a rank into a rating. Historical
+feature eligibility remains closed until a prospective prediction consumer
+records the capture it actually used; observation time alone cannot repair past
+availability. DATA_EVENTS owns the immutable storage/erasure contract, including
+the inherited old shadow dependency that can block source-account/Profile
+deletion. That deletion boundary must be repaired before outcome admission or
+hosted activation; the new derived cascades alone do not establish full erasure.
+
+The #232D source adds a closed owner preparation for PredictionRun/Profile/actor
+source erasure. It invalidates every GLOBAL and shrunk PROFILE evaluation batch
+in intersecting prediction windows because exact per-source contribution lineage
+is absent. Copied vector comparison traces are removed explicitly. Incomplete
+promotion/assignment/rollback influence lineage is a fail-closed prerequisite,
+not permission to retain learned influence after deleting inputs. Writer/eraser
+serialization prevents stale shadow evidence from being recreated after a waiter
+continues. This changes no serving weights, metric, reward or admission decision;
+automatic account erasure integration and prospective joint learning/serving
+admission remain open.
+
+One identified round/experience is one observation unit, regardless of member or
+receipt count. Coverage counts are diagnostics, not independent sample sizes.
+The private audit vector retains actor/enrollment identities only inside its
+authorized server boundary. A future portable adapter or aggregate report must
+use scoped member references and declared privacy rules; it must not export this
+raw vector or place it in candidate explanations. Unattributed completed ratings
+can describe an experience without establishing credit for a prediction.
+
+### Portable exposed-outcome ordinal diagnostic — #232E, active source only
+
+`group-ordinal-pair-v1` declares a partial-order target over two distinct Item,
+round and experience identities. The pure `./ordinal` engine subpath receives
+two complete exposed outcome vectors with the exact same actor/enrollment set,
+a target/raw scale and one explicitly selected frozen production/shadow anchor.
+For maximizing ratings, LEFT_DOMINATES means every member rated the left
+experience at least as highly and at least one rated it higher; RIGHT_DOMINATES
+is the reverse. A minimizing non-media target reverses that direction. All-member
+ties and opposing member preferences retain their vectors and coverage reasons
+without inventing a scalar order. Zero is an observed rating. Missing, unknown,
+cleared, unexposed, immature, future, unauthorized or incompatible coordinates
+leave the pair unscored; the evaluator never intersects away a missing member.
+
+Both Items must occur in the same anchor pool for both predictors. Unequal finite
+scores use that predictor's frozen rank order, including policy eligibility
+ordering; exact equal scores remain a neutral predicted tie despite the Item-ID
+rank tie-break. A directional observed pair yields agreement, disagreement or a
+predicted tie separately for production and shadow. Ranks from different requests
+are not compared, scores are not converted into member ratings, and the outcome
+vector is not averaged into group reward. One pair is one diagnostic observation
+unit, not one sample per member. The bounded batch rejects reused pair IDs,
+rounds, experiences and same-subject unordered Item pairs. Even disjoint units do
+not establish independence: uncertainty remains unavailable, with no confidence
+interval, accuracy percentage, scalar advantage or automatic winner/admission.
+
+The strict Kajo adapter accepts already-authorized immutable #232C comparison
+snapshots. Both require COMPLETE_VECTOR_SUPPORTED, identical frozen evaluation
+window/genome, the same DiscoveryMode and non-null Item domain, full actor masks,
+matching production/shadow pools and versions, and each member's own actual
+attributed exposure to each Item. Window prediction/input/outcome bounds,
+evidence cutoffs, maturity and comparison observation times are rechecked; both
+captures use the same evidence cutoff and elapsed maturity interval. The
+anchor must precede BOTH original OPEN `createdAt` timestamps, not merely a later
+corrected response. Current artifacts retain latest responses rather than a full
+first-answer certificate. Decimal milliseconds preserve representable receipt
+microseconds; a precision-collapsed equal boundary is conservatively rejected.
+The existing numeric reference estimator's integer-clock rules remain unchanged.
+
+That pre-OPEN rule is a stored-clock diagnostic, not proof of transaction commit
+availability or actual prospective consumption. Anchor-time membership generations
+are absent from the trace and remain HISTORICAL_MEMBERSHIP_UNKNOWN. Later complete
+captures cannot establish old feature availability. The report is conditional on
+Items production actually exposed and the group actually rated, with no causal
+shadow-policy benefit claim. `historicalFeatureEligible=false`, `learnable=false`,
+`commitVisibility=unknown`, `groupReward=null` and `advantage=null` remain explicit.
+Stored #232C comparison metrics remain null; no SQL schema/scorer/evaluator,
+GenomEvaluation, policy assignment or promotion changes.
+
+The owner supplies a required scope identifier and bijective subject/member/
+enrollment handles. Portable inputs and reports contain those scoped handles,
+not raw User/Profile/enrollment UUID vectors. This is data minimization, not
+anonymization: capture, round, Item, prediction, session and comparison lineage
+references remain sensitive private audit data. Authorization, immutable producer
+integrity and alias lifecycle belong to the owner. The owner must invalidate and
+remove or regenerate local manifests/reports when source consent, membership or
+evidence is withdrawn/erased; the SQL eraser does not discover offline files. The adapter checks declared
+digest formats/equalities and structural bindings; it does not recompute PostgreSQL
+JSONB digests or authenticate a supplied file. Reports retain target/version,
+evaluation time, round/experience/object/capture revisions and the one anchor for
+replay. A new capture/manifest reconciles corrections without changing an older
+report or counting another revision as an extra experience.
+
+`npm run engine:ordinal -- INPUT_MANIFEST OUTPUT_REPORT` is a bounded offline
+owner audit over explicitly selected non-overlapping pairs. Selection is caller-
+declared, not a prospective certificate. It writes a private exclusive report
+outside the repository on Linux/macOS, performs no network/database writes and
+leaves existing reports unchanged. Failed writes remove only an identified owned
+inode; persistent identity failure returns OUTPUT_CLEANUP and retains an empty
+private reservation without writing report bytes. Synthetic media and maintenance fixtures demonstrate execution
+and contribute zero observed evaluation labels; actual SQL-produced synthetic
+fixtures verify adapter interoperability, not product quality. Prospective
+membership/prefix capture, measured delayed native quality and serving admission
+remain separate release dependencies. STATUS owns exact source/CI acceptance.
+
+### Prepared prospective input boundary — #232F, active source only
+
+The private `shared-round-prediction-input-v1` producer prepares a future Shared
+prediction input while the target experience has never received any response.
+It locks current membership and the round, records the complete actor/enrollment
+vector and contiguous zero-response command prefix, and reads an explicit
+bounded set of immutable prior #232C captures. Unknown/clear and an answer in an
+older participant set count as earlier responses; reconfirmation cannot reset
+that first-experience boundary. No-answer reconfirmation remains supported.
+The input is identified by its target round/experience, current revision,
+selected receipt, source capture identities/digests and actual observation time.
+
+This establishes current enrollment and available statement-visible evidence
+at preparation. It does not establish membership at a previously ranked anchor,
+a global commit history, prospective outcome-sample selection or actual scorer
+consumption. Its use remains `INPUT_CAPTURE_ONLY`, predictor consumption is
+`NOT_RECORDED`, historical feature/learning admission stays false and reward
+remains null. No old PredictionRun or ordinal report gains new eligibility.
+Source statuses are preserved; input preparation is not quality measurement.
+
+The next consumer must genuinely read this exact immutable input, produce its
+versioned forecast from the declared features and atomically retain that input
+identity with the resulting PredictionRun. That consumer needs its own
+membership/correction/withdrawal/fallback tests and erasure of dependent
+forecasts. A registration beside an unchanged scorer is insufficient. Then
+predeclare authorized delayed outcomes, cohort/selection/overlap and uncertainty
+rules before quality comparison or any promotion/rollback admission. The current
+SQL scorer, root numeric engine and #232E ordinal diagnostics remain unchanged.
+DATA_EVENTS owns producer locks, replay, bounds and whole-artifact erasure;
+STATUS owns exact source/CI/native acceptance.
 
 ## 11. Cold start and external history
 
@@ -985,7 +1346,9 @@ Known V1 limits:
 - common-fit v1.1 coefficients are conservative hypotheses and require configured-device plus real Shared outcome calibration,
 - Context includes time/surface but not explicit mood/available-time input,
 - saved-reminder thresholds are first versioned heuristics and require real outcome calibration,
-- the new portable contracts/external-data plan is not an implemented engine package or trained prior.
+- accepted E1 supplies an executable independent engine package and D1/D2 supply
+  reproducible research intake/evaluation; they do not replace native SQL serving
+  or admit a trained external prior.
 
 ## 18. Required MVP algorithm completion contract
 
@@ -999,17 +1362,232 @@ Reuse canonical feature calculation and pure scoring/policy helpers rather than 
 
 A baseline shadow must match Personal and Shared production eligibility, final order and selected Items exactly; declare score tolerance for rounding. Tests cover common-fit, reminder tiers, suppression, ties and empty/refilled pools. A score-only match is insufficient.
 
+### Active #229 frozen replay, admission and page contracts
+
+The following #229 code is included in the owner-authorized #329 integration. The owner-approved six-forward server packet was installed and verified on 2026-09-12 from `7821713`, which passed all five CI #466 jobs. STATUS owns the exact deployed versions, current source verification and the remaining configured-device gate; this rollout does not merge the branch or establish device acceptance.
+
+#### Frozen replay parity — hosted 2026-09-12
+
+`20260912133832_frozen_prediction_replay.sql` shares pure private `prediction_candidate_score_v2` between serving and shadow. Candidate `scoringFeatures.version = prediction-features-v2` retains unrounded direct, LongTerm (including bootstrap), ShortTerm, novelty, exploration and both penalty inputs. V0 scopes `extra_float_digits=3` to its function so caller settings cannot erase binary precision; the caller setting is restored afterward. Rounded display fields and the accepted raw baseline formula remain compatible.
+
+Scalar and Scenario weights use the same immutable genome recorded on the run. Final scoring adds the frozen raw Scenario score with that weight and the frozen aggregate Shared common-fit contribution; Personal common-fit remains zero. `resurfacingInput` is retained before the reminder cap. Serving and replay share `finalize_resurfacing_policy_v1` and `prediction_delivery_tier_v1`: ordinary eligible Items, then the one eligible reminder, then suppressed Items; scores descend within tiers and Item ID breaks exact ties. Each genome chooses its reminder by scalar score before Scenario/common-fit, so a challenger may select a different reminder. Suppressed traced Items are never selected.
+
+New shadow metadata records `shadow-replay-v2`, `prediction-features-v2` and `comparisonScope = FROZEN_SOURCE_POOL`; serving appends `+frozen-replay-v2` after the preceding `+outcome-attribution-v1`. Registry genome versions remain unchanged; worker code/input schema versions identify actual replay separately. Old traces/evaluations are not rewritten. Pre-v2 queued sources fail diagnostically; new evaluations accept compatible shadows and retain version/scope even when no outcomes are comparable.
+
+Existing full-schema controls require exact double-precision score equality and exact rank/selection/policy across 18 Personal/Shared × mode × page-size cases. The independent accepted-formula check uses `1e-12` arithmetic tolerance. Reminder re-selection, precision boundaries, ties and later catalog/taste/member changes are covered. These are comparisons conditional on a frozen source pool, not evidence about independently generated live challenger pools or predictive usefulness.
+
+#### Candidate admission — hosted 2026-09-12
+
+`20260912133941_eligibility_first_candidate_pool.sql` fixes admission starvation: 70 consumed high-fit Items previously occupied top-50 despite 24 ordinary alternatives. V0 evaluates `resurfacing_policy_decision_v1` at one recorded time before retention; ordinary → aged reminder → suppressed ordering precedes the same baseline-score/Item-ID order. Scalar scoring reuses that frozen input, with each genome applying its reminder cap within the retained pool.
+
+The serving suffix is `+eligibility-first-v1`. Candidate `candidatePool` metadata records version, `eligibilityAt`, considered/ordinary/reminder/suppressed counts, retained limit/count, `baselineScoreRank` and `admissionRank`. V0 retains at most 50; expensive Scenario/common-fit work and persisted traces retain at most `min(50, 3 × requested limit)`. Admission counts are not impressions or additional evidence.
+
+Complete versioned zero-result sources are valid frozen comparisons. All-suppressed and explicit empty controls can have zero hypothetical selections; automatic challenger queueing still omits empty pools. Pre-admission frozen-v2 sources stay comparable; pre-v2 inputs fail diagnostically. Tests cover 36 Profile/domain/mode/limit combinations, mixed domains, empty/exhausted sources, reminder caps, exact baseline replay and populated preservation.
+
+The raw-feature/admission scan still covers the full catalog; only downstream expensive work is bounded. This corrects eligibility starvation without claiming indexed retrieval scale, independent source diversity or complete ALG-002/003 acceptance. The active client source uses the identified reader below; configured-device empty-result acceptance remains open.
+
+#### Versioned result/continuation contract — hosted 2026-09-12
+
+`20260912134056_identified_prediction_page.sql` adds `public.rank_items_page_v1(request jsonb)` over the same private ranking core as the unchanged public row RPC. It accepts numeric `version: 1`, UUID request/Profile/session IDs, DiscoveryMode, BOOK/MOVIE ItemType, integer limit 1–50 and object context. The envelope is at most 16 KiB; unknown keys and nested context session identity are rejected. In protocol 1 the optional cursor must be null; protocol 2 is defined below. Capturing session identity does not create or prove an Event session.
+
+The server generates the PredictionRun ID before ranking. Exact request/response JSON is retained in private RLS-protected receipts; request-ID reuse is serialized with an advisory lock. Current actor/Profile membership is checked and locked even on receipt replay. Changed payload or actor rejects reuse; original trace and receipt commit atomically. Later mutable state cannot rewrite a retry. Receipts cascade with actor/Profile/run; no time-based receipt-retention policy is implemented yet.
+
+Every response, including an empty one, retains version, request/run/Profile/session/mode/type identity and ordered rank rows. `source` records admission version, retained candidate/result counts and empty-catalog decision. Availability distinguishes `ITEMS`, `WINDOW_EXHAUSTED` and `CATALOG_EMPTY`; the last requires no discoverable Items in the requested domain. Suppression or exhaustion of bounded retained candidates cannot establish catalog emptiness. Protocol 1 `nextCursor: null` and `continuationSupported: false` mean paging is unavailable to that protocol, even if the first page returned Items; they do not prove all eligible Items were delivered.
+
+`predictionPageOperations.ts` retains explicit protocol-1 envelope validation and now defaults new requests to protocol 2. Both protocols validate scope, run identity, source counts, availability and contiguous unique ranks. The shared row mapper remains; the unused row-RPC client and its unscoped presentation cache were removed when the live client source adopted protocol 2. Hosted and device acceptance remain separate.
+
+`20260912134141_prediction_continuation_windows.sql` adds owner-only `frozen-window-v1` open/read helpers. They preserve the first receipt's exact immutable run, ordered candidates, scope and initially selected IDs without reranking, making Events, changing receipts or creating another run. Repeat open returns the same window; reads require the current actor/membership, valid source lifetime and unchanged original run/candidate rows. Later catalog/taste state cannot replace that source.
+
+Window limits are 50 candidates/seen IDs, 2 MiB snapshot, 15 minutes from original ranking and 16 retained windows per actor/Profile. Scope locking serializes creation. New opens reclaim expired derived rows only; source age prevents expired-run reopening as a fresh window. Actor/Profile/run/receipt deletion cascades. Dormant scopes may retain at most 16 expired rows until another open or parent deletion; no background cleanup worker is implemented. Helpers have no API-role execution grants.
+
+#### Atomic next pages — protocol 2 hosted 2026-09-12
+
+`20260912134224_atomic_prediction_pages.sql` adds numeric `version: 2` to the same
+`public.rank_items_page_v1` endpoint. Protocol 1 keeps its exact first-page body,
+false continuation capability and immutable old receipts; the legacy row RPC is
+unchanged. The September 12 client source opted into protocol 2; protocol-1 envelope compatibility
+remains explicitly tested. The recorded hosted rollout supplies this client contract;
+the exact configured build still needs device acceptance.
+
+Protocol 2 retains the 16 KiB envelope, UUID request/Profile/session identities,
+mode/domain, limit 1–50 and object context. A null/omitted cursor starts a new
+window; later requests supply an opaque random UUID cursor. Only request ID and
+cursor change within that window: actor/Profile/session/mode/domain/limit/context
+must match. Server-owned cursor rows bind the original window, predecessor run
+and page index. Request and actor/Profile scope locks serialize exact retries,
+competing consumers and the 16-window cap. Another request cannot reuse a consumed
+cursor, even when its payload would otherwise agree.
+
+Each later page copies the original model/genome, feature/Scenario/common-fit
+scores and state. It rechecks current catalog availability/type and the canonical
+native/bootstrap/List resurfacing policy, excludes already delivered IDs and
+permits at most one reminder across the whole observed window. These hard
+constraints are frozen into candidate `resurfacingInput` before the shared
+reminder/tier helper runs. Newly added catalog Items are outside the frozen pool;
+explicit refresh creates a new window and can legitimately repeat eligible Items.
+
+A single transaction commits the new PredictionRun, all frozen candidates with
+page-local ranks/selection, exact receipt, cursor consumption and once-only seen
+advancement. The original run/candidates never change. Each response Item has
+that page's own prediction ID. `prediction_page_contexts` retains original and
+parent run IDs, logical window ID, index, feature/eligibility times, seen prefix
+and reminder history. It survives derived-window/cursor expiry; actor/Profile/run
+lifecycle still owns evidence and receipt deletion. No time-based evidence
+retention policy is introduced by this forward.
+
+Protocol 2 returns `continuationSupported: true`; a next cursor indicates remaining
+unseen *source candidates*, which can still be suppressed. A terminal zero-result
+page is a real immutable run with `WINDOW_EXHAUSTED`. Only an initial zero-candidate
+request with a proven empty current domain may return `CATALOG_EMPTY`. Window
+exhaustion is not whole-catalog exhaustion. Exact authorized receipt retries work
+after cache expiry/reclamation, while an unused expired cursor fails. Empty first
+pages need no persisted window. The existing 50-candidate/seen, 2 MiB and 15-minute
+bounds remain; no background cleanup or unbounded candidate search is added.
+
+The existing frozen scorer also replays these page inputs. Page shadows use
+`shadow-page-replay-v1` and comparison scope
+`FROZEN_SOURCE_POOL_AND_OBSERVED_PAGE_PREFIX`. This comparison conditions on the
+*actual production prefix*, not hypothetical earlier challenger pages or unseen
+user responses. Missing page context fails closed; future catalog/taste changes
+cannot alter frozen replay. New evaluations accept the matching page replay
+version and record its prefix limitation; existing evaluations remain unchanged.
+
+Full-schema checks cover 12 Personal/Shared × domain × mode windows, 48 page runs,
+exact baseline score/rank/selection replay, zero-rating attribution/evaluation,
+current eligibility, scope/actor isolation, rollback, expiry and legacy retries.
+The native CI runner additionally observes real lock contention for same-request
+retry, competing cursor consumers and simultaneous sixteenth/seventeenth windows,
+and rehearses both new forwards over populated pre-window receipts. Read STATUS
+and current PR CI for acceptance; test definitions alone are not native results.
+
+#### Catalogue-wide append — protocol 3 source, 2026-10-06
+
+`20261006143148_catalog_prediction_chain.sql` extends the same page RPC with
+explicit version 3; existing row/protocol 1/2 bodies and historical receipts retain
+their contract. Its exact full-definition source hashes and unique patch anchors
+reject unknown ranker drift. Private clones add server-only delivered-prefix and
+reminder-budget arguments; API clients cannot supply their own exclusions.
+
+Every page ranks a fresh immutable source after excluding this chain's already
+delivered Items **before** top 50 candidate admission. It reuses current canonical
+hard eligibility and allows at most one reminder across the chain. No earlier
+run/order/origin is revised. New catalogue or eligibility changes can affect the
+next source; this is not a single frozen whole-catalogue ranking.
+
+The request retains version, actor/Profile/session/mode/domain/limit/context;
+only its request ID and opaque UUID cursor advance. The response source version
+is `catalog-chain-v1`. `sourcePredictionId` is the current page's run;
+`rootPredictionId`, `parentPredictionId`, `chainId` and contiguous `pageIndex`
+identify global lineage. `featureAt`, `candidateCount` and result count belong
+to the independent current source. `seenCount` counts cumulative delivered Items;
+`chainLimit` is 1000. Current-scope locks serialize retries/competing consumers.
+Exact authorized receipt retry precedes cache lookup and survives cache expiry.
+
+A next cursor and `continuationState: MORE` exist only while current unseen
+eligible Items remain. Final nonempty pages still report availability `ITEMS`;
+`CATALOG_EXHAUSTED` state proves no more currently eligible unseen Items under
+the same hard policy/reminder budget. A zero page reports availability
+`CATALOG_EXHAUSTED`; `CATALOG_EMPTY` is only an initial request with no discoverable
+Items in that domain. `READER_LIMIT` distinguishes reaching 1000 delivered Items
+while more eligible Items remain. Never label a resource limit or candidate
+cutoff as catalogue exhaustion. Expiry requires an explicit new search.
+
+Chains expire 15 minutes from their original source, and protocols 2/3 share a
+16-active-reader budget per actor/Profile. New starts reclaim expired derived
+chains; no background cleanup is introduced. Immutable chain-page evidence
+preserves the server prefix/reminder state after cache cleanup. New private
+tables have RLS and no API/service-role access; helper execution is owner-only.
+Actor/Profile/run lifecycle owns receipts/evidence deletion as before.
+
+Frozen replay/shadow/evaluation uses each page's own immutable admitted source,
+not a hypothetical challenger-wide catalogue sequence. Fetching/appending records
+no impression. Tests exercise 145 eligible Items per domain, Personal/Shared and
+all modes, suppression/reminders, legacy retries, prefix races/expiry/limits and
+populated upgrade. A later-page rating 0/delayed exposure test verifies the exact
+page outcome and mature matching-genome evaluation. Local synthetic proof,
+actual native CI, hosted rollout and phone acceptance remain separate facts.
+
+#### Captured-scope mobile pages — source, device acceptance pending
+
+`usePredictionRanking.ts` now explicitly reads protocol 3 through `predictionPageOperations.ts`
+and the tested `predictionPageReader.ts` controller. First requests capture an
+immutable allowlisted context when a focused fetch starts; the builder caps its
+serialized request at 8,000 UTF-8 bytes to remain inside the server's 16 KiB
+jsonb envelope after whitespace/cursor overhead. A next request changes only its
+request ID and opaque cursor. Transport retry reuses the exact request object;
+explicit refresh starts a new window and does not relabel its predecessor.
+
+The visible cache/readiness/controller identity includes environment, actor,
+Profile, Event session, domain, DiscoveryMode, limit and evidence revision.
+A → B → A creates a new reader on return. Scope cleanup invalidates old fetches
+and catalog enrichment during commit; focus cleanup prevents hidden detail
+feedback from repeatedly opening unused windows. First scope entry is immediate;
+subsequent evidence updates retain the 600 ms delay. Catalog enrichment preserves
+Item ID/order/domain and cannot replace a BOOK with later MOVIE metadata.
+
+Append requires the expected cursor, next index, unique page/run/request
+identities and unseen Items. Protocol2 additionally fixes its original source,
+feature time/count and total pool bound. Protocol 3 instead fixes chain/root and
+previous-page identity plus cumulative seen count, allowing independently ranked
+page sources/times/counts. The accepted prefix remains immutable; a failed
+append retains it only in its original scope/revision. A terminal empty page
+retains its own PredictionRun. Initial loading/error, proven empty catalog,
+loading the next page and bounded-window exhaustion have distinct UI states.
+Each active page attempt has a 15-second deadline covering both RPC and catalog
+enrichment. Scope/focus cleanup and explicit refresh abort the in-flight
+transport; a cancellation race also bounds waiting when a transport ignores its
+signal. Timers are released on settlement. Aborting a client does not prove the
+server rolled back: a retry retains the original request/context/cursor and can
+recover its immutable receipt. Late completion cannot publish or append.
+
+Exact server `22023` errors for an expired, unavailable, already consumed or
+changed continuation source select **Aloita uusi haku**; retrying that unusable
+cursor is disabled. Discovery pull appends or retries the exact request; starting
+a new search after expiry is an explicit action. Transport,
+authorization and unknown errors retain safe generic copy and exact-request
+retry; raw server details are not displayed. The explicit window-cap error asks
+the user to wait and retry, without automatically opening more windows. Metadata
+failure alone retains the identified ranking; cancellation cannot publish a
+partially loaded page. These are client changes, not new server limits or Events.
+
+Each Item's page run reaches grid/Shared-overlay origins and the clicked delivered
+slate. Detail/swipe/actions retain that captured sequence and per-Item map while
+new pages or rankings arrive. A new native list instance is keyed by the current
+request/view; callbacks retain that view token and session, so earlier visible
+Items cannot become impressions for a different request or scope. Fetching or
+prefetching a page creates no impression. Eight immutable navigation slates remain
+the bounded handoff; there is no global unscoped lookup of hosted Items.
+
+The configured protocol 3 source requires the deployed six-forward predecessor
+contract plus the new catalogue-chain forward and
+fails closed if it is absent. Protocol 1 and the server's legacy row RPC remain
+compatible for existing clients; this client does not downgrade after errors.
+Current CI, exact hosted rollout and configured-device acceptance are separate
+facts owned by STATUS and DEVICE_TEST. No new SQL forward is part of this client
+change.
+
+#### Late Outcome attribution — hosted 2026-09-12
+
+`20260912133402_late_outcome_attribution.sql` supplies the same private effective-Outcome reader to ScenarioMemory and mature evaluation. Exact immutable receipt membership and a real pre-action impression can make an earlier unattributed Outcome usable for its originally requested run; missing/mismatched proof contributes nothing. Raw Events/receipts, old evaluations and prediction-time inputs remain unchanged. Duplicate impressions do not multiply support; existing priority/Undo and zero-rating semantics remain authoritative.
+
+Serving appends `+outcome-attribution-v1`; evaluation records `outcomeAttributionVersion` and server-captured `evidenceCutoff`. Outcome occurrence must fit the mature window, while the recorded receipt/impression must be visible by the evidence-read cutoff. A new evaluation may include newly available proof without changing an older evaluation. This bounded reader test establishes neither authenticated arrival timestamps nor large-history performance. DATA_EVENTS owns exact proof membership and event-cutoff semantics.
+
+#### Active List membership — recorded hosted successor
+
+The active #229 `active-list-v1` successor uses current authorized memberships and their latest active added time for ordinary suppression/reminder age. Removing the final membership restores eligibility only when no independent Saved/bootstrap/terminal state suppresses the Item. Existing 30-day reminder minimum age/cooldown, frequency cap and ordinary-before-reminder order remain intact. Its recorded hosted forward is `20260910110344_list_membership_resurfacing.sql`; device acceptance remains separate. List removal need not offer Undo. The optional List-only “Mitä tänään” mode does not replace ordinary Discovery eligibility.
+
 ### Candidate generation and delivery
 
 Use bounded candidate sources for durable fit, recent/session fit, prior, novelty and Shared agreement, then deduplicate and apply hard eligibility with bounded refill. Trace source membership and considered alternatives. Do not restrict every policy to a fixed baseline top-50 before eligibility or Shared scoring.
 
 Bound request/slate size, memory and queries; support continuation through a frozen/versioned slate or explicit new PredictionRun. Never mutate an old run to explain a new order. Client detail/swipe must retrieve the exact Profile/prediction slate. Overlay/search/List/history origins and actual displayed ranks must not masquerade as ordinary selected candidates. Outcomes with no valid attributable exposure remain separate observations.
 
-### Active #229 successor source and remaining acceptance
+### Preserved September 12 #229 successor checkpoint and remaining acceptance
 
-These contracts are present in the unmerged `feat/228-delivered-origin` source,
-inspected at `44b11b4`. They are not claims that accepted main or hosted serving
-already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
+These contracts originated in the then-unmerged `feat/228-delivered-origin` source,
+including the protocol-2 page forward. The six server forwards were installed and
+verified on 2026-09-12. STATUS owns exact refs/CI/deployment versions; accepted-main
+source and configured-device acceptance remain separate.
 
 | Source contract | Meaning / remaining boundary |
 |---|---|
@@ -1019,19 +1597,20 @@ already uses the five pending forwards. STATUS owns exact refs/CI/rollout dates.
 | Identified first page | Immutable request/response receipt, exact actor/Profile/session/mode/domain identity and genuine empty-run identity. Retry payload mismatch fails; old row RPC remains for old clients. |
 | Private frozen window | At most 50 candidates/seen IDs, 2 MiB, 15 minutes and 16 windows per actor/Profile. Raw cached candidates include suppressed/already delivered entries and are not another page. |
 
-The next page transaction must recheck current authorization/eligibility, bind an
-opaque cursor and retry receipt to exact scope, advance seen IDs once and commit
-an independent immutable page PredictionRun/ranks. Old runs are never rewritten.
-Page-aware frozen/shadow replay, concurrent window-cap creation and populated
-pre-window-receipt upgrades remain acceptance requirements. Keep
-`continuationSupported: false` until real continuation passes its full boundary.
+At the September 12 checkpoint, the protocol-2 source committed independent
+pages, hard eligibility and seen advancement atomically, with page-aware frozen
+replay and dedicated native concurrency/upgrade checks. Protocol 1 still reports
+false capability. That checkpoint's client used protocol 2 with captured scope
+and per-Item page origins, and its hosted rollout was complete. The later
+catalogue-chain source requests protocol 3 as documented above; its deployment
+and configured-device acceptance are separate. STATUS owns current evidence.
 
 An empty identified result, exhausted bounded window and transport/authorization
 failure are distinct. Window exhaustion cannot claim global catalog exhaustion.
 Client readiness and visible cached ranking must match environment, actor,
 Profile, session, mode, domain and request/revision. Refetching after a session
 change does not make an older cached run current. Test rapid A → B → A return,
-delayed/error replies and scope changes before switching the prepared page reader.
+delayed/error replies and scope changes before accepting the configured page reader.
 
 Active-list membership participates in #229's bounded resurfacing successor;
 removing one membership cannot restore ordinary eligibility while another
@@ -1039,17 +1618,385 @@ membership or terminal reaction still suppresses the Item. The same versioned
 policy must govern serving and replay. Recorded branch rollout is not inferred
 from the existence of this specification.
 
+### Native Personal WorkingState capture and comparison
+
+The source forward `20261010064104_personal_working_bridge.sql` establishes a
+bounded native bridge beside the portable component. The reset-aware successor
+`20261010082558_personal_working_reset.sql` retains the same private helper
+identities and adds reset-aware capture. The candidate-feature successor
+`20261010160025_personal_working_candidate_features.sql` adds a third generation
+through guarded changes to the existing helpers. Ordinary and catalogue-chain
+Personal rank sources freeze state in `PredictionRun.state_snapshot.workingState`,
+working adjustments and versioned candidate projections in `workingIntent`, and
+the explicit serving suffix:
+
+| Captured source | Candidate intent | Serving suffix | Private comparison |
+| --- | --- | --- | --- |
+| `native-working-capture-v1` | `personal-working-features-v1` | `+personal-working-off-v1` | `personal-working-shadow-v1` |
+| `native-working-capture-v2` | `personal-working-features-v2` | `+personal-working-off-v2` | `personal-working-shadow-v2` |
+| `native-working-capture-v3` | `personal-working-features-v3` | `+personal-working-off-v3` | `personal-working-shadow-v3` |
+
+Fresh sources use v3; existing v1/v2 sources, candidate explanations, comparisons
+and copied pages remain supported without rewriting their bytes. Shared sources
+receive no Personal capture or WorkingState component. Existing scalar scorer/genome
+contracts, historical forecasts, receipts and Events retain their semantics.
+Exact source/native/hosted acceptance is recorded only in STATUS.
+
+`private.capture_personal_working_state_v1` requires the current acting identity
+to own the PersonalProfile. One MVCC statement captures the actual Event session,
+complete own Item-linked prefix and visible same-Item correction closure,
+including other-session replacements, selective clear and exact UNDO. A supplied
+ranking session ID does not create an Event session. Independent latest Items,
+equal-time ambiguity, valid zero, attention-only activity and four-hour/30-minute
+expiry follow the bounded source hypothesis. Another session may remove stale
+intent without supplying its own preference or renewing the activity clock.
+
+The native feature artifact is `native-binary-tags-v1`: binary current Item tags
+known in that capture, with no training or demonstrated semantic transfer. It
+freezes dimensions, Item features, source timestamps, configuration and cutoff.
+Stored Event creation time remains an availability proxy; commit availability
+is UNKNOWN and historical-feature/learning admission stays false. Bounds are
+128 records, 32 Items, 32 dimensions and 256 exact invalidations. Overflow
+sentinels produce an inert `BUDGET_EXCEEDED` envelope with
+`prefixComplete=false` and no retained partial evidence; truncation cannot
+produce active state. NO_SESSION, empty and no-tag captures also remain inert.
+Unsupported legacy tags (null, empty, over 256 UTF-16 code units or control characters),
+malformed UNDO sources or source timestamp precision collapse produce
+`INPUT_UNAVAILABLE` with an explicit reason, `prefixComplete=false` and no partial
+prefix/features. This inactive component preserves real V2/V3 OFF pages instead
+of making supported baseline serving depend on portable input compatibility.
+The portable core still requires a valid nonempty schema and rejects unsupported
+input; SQL/portable parity is scoped to accepted nonempty feature states rather
+than these native inert envelopes. Independent SQL/portable nonzero vector
+scalars use a finite 1e-12 numerical comparison with exact control/feature keys;
+actual OFF serving scores, ranks, selection and frozen receipts remain exact.
+The first capture generation has no reset control. The reset-aware generation
+freezes its visible private controls in the same MVCC capture and applies the
+latest `resetAt` boundary as specified below.
+
+For v3, each `workingIntent.candidateFeatures` envelope identifies
+`native-working-candidate-features-v1` and binds the exact capture ID and input
+`asOf`. The complete immutable schema/artifact is retained once in the capture.
+Each candidate uses a compact `featureSchemaRef` containing `id`, `version`,
+`artifactId`, `artifactVersion`, `representationVersion` and `dimensionCount`,
+plus `featureEncoding: 'CAPTURE_DIMENSION_ORDER_BINARY_V1'`. Its `features` is a
+dense numeric 0/1 array in the original `capture.featureSchema.dimensions` order,
+with exactly one entry per dimension. Binding the capture ID, input cutoff,
+compact reference and vector length binds that full frozen schema without copying
+dimension names or the complete artifact into every candidate. Readers must not
+sort or extend the dimension order. This compact representation preserves the
+existing 2-MiB protocol-2 window budget for a bounded 50-candidate pool.
+
+An ACTIVE, complete capture with a valid nonempty schema yields `AVAILABLE` and
+projects the candidate tags actually supplied to the ranking statement onto all
+frozen working dimensions. A candidate with no intersection therefore retains an
+all-zero vector, with genuine zero feature coverage. This projection is complete
+for the working schema, not a substitute for unrelated baseline features.
+Inactive, incomplete, empty or invalid schema captures instead retain
+`UNAVAILABLE`, `features:null` and an explicit reason; baseline OFF still works.
+
+Candidate tags can be read by a later READ COMMITTED statement than the input
+capture. Their availability basis is therefore
+`SOURCE_RANKING_STATEMENT_SNAPSHOT`, with `availableAt:null` and
+`commitAvailability:UNKNOWN`. Candidate `asOf` binds the input reference; it
+does not certify that the projection was historically available at that cutoff.
+The portable v3 plan retains this distinction in
+`sourceBinding.candidateFeatureSnapshot`: the ranking-statement availability
+basis, `availableAt:null` and `inputReferenceAt` equal to the source cutoff. The
+candidate Object's numeric `availableAt` is only that arithmetic input reference
+required by the working scorer; it supplies no availability certificate. Plan
+freezing validates and copies the explicit binding without changing scoring or
+adding this field to legacy plans.
+The artifact remains research-only, with historical-feature, learning and native
+activation flags false. Comparison validation requires matching bindings,
+encoding, vector length and binary entries; comparisons refer to the immutable source candidate
+projection rather than duplicating it into their bounded receipt. No current
+catalog lookup is permitted when later evaluating that source.
+
+One private `prediction_candidate_score_working_v1` consumes the frozen
+STATIC/ORDERED candidate adjustments bounded to ±0.25. Its serving control is
+fixed to OFF and returns the legacy scorer's exact number directly. This is
+actual versioned input consumption with zero serving adjustment; it adds no
+client control or ON policy. Protocol 2 later pages inherit the original capture
+and candidate features; protocol 3 captures each fresh page's own source. Current
+reauthorization precedes exact receipt replay, which cannot recapture or rewrite
+its old source.
+
+The owner-only `private.record_personal_working_shadow_v1(source, control)`
+actually scores frozen candidate features through the same consumer and retains
+an immutable source-generation-matched result for OFF, STATIC or ORDERED.
+`FROZEN_CANDIDATE_POOL_AND_FINAL_DELIVERY_POLICY` conditions on the source's
+admitted pool and final eligibility, delivery tiers and chosen reminder; it does
+not replay an independently changed admission/reminder policy or hypothetical
+earlier pages. OFF requires exact candidate set, scores, ranks and selections.
+No new genome, shadow job, propensity, observed outcome or quality/promotion
+input is created. These uncalibrated comparisons report unavailable uncertainty,
+zero observed evaluation labels and `nativeActivated=false`.
+
+The config-only precision forward
+`20261010153638_personal_working_shadow_precision.sql` pins the comparison
+writer's function-local `extra_float_digits=3`. Each new JSON score must
+round-trip to the same binary double as its frozen scorer output even when
+the caller requests rounded float output; the caller setting restores on return.
+This applies to all supported captured-source generations without changing the
+scorer, function body/identity/ACL or prior rows. Existing rounded comparison receipts
+remain immutable; an exact-OFF audit must still reject a mismatched old receipt
+rather than tolerate or rewrite it.
+
+The private RLS/API-denied comparison table has at most one result per source and
+control, at most 50 candidates and a 256-KiB result ceiling. Retries reauthorize
+and return stored bytes. Lifecycle-first locking and READ COMMITTED for new
+comparisons preserve source-erasure ordering; source FK deletion removes its
+comparisons and the existing owner eraser counts them in the same dependency
+budget. Direct comparison UPDATE/DELETE remains denied. There is no hosted
+activation, user API, mobile UI, APK or automatic promotion in this source packet.
+
+#### Private native session reset controls
+
+`private.personal_working_resets` stores canonical private lifecycle controls,
+with `personal-working-reset-v1` receipts. A reset affects WorkingState only; it
+is not taste, an UNDO, history deletion, a public Event or reward. The ledger and
+`private.commit_personal_working_reset_v1(reset_id, actor, profile, session)` are
+RLS/API-denied; the helper is SECURITY INVOKER and needs an existing own Personal
+session plus current owner/member authorization. It creates no public reset API
+or mobile control.
+
+The lifecycle gate precedes reset-ID, Profile/member and session locks. Every
+retry reauthorizes and returns its original receipt before quota or new-write
+checks. New controls require READ COMMITTED, at most 128 controls per exact
+actor/Profile/session scope, and one full-precision server clock sampled after
+the locks. The stored instant is an availability proxy with UNKNOWN commit
+availability; it neither certifies historical availability nor renews the
+session's start or lifetime. A 129th allocation rejects rather than evicting an
+earlier boundary.
+
+Reset-aware capture reads all visible controls at its cutoff in the same MVCC
+statement as the complete Event prefix/correction closure and current features.
+It retains their exact control/source references, the maximum `resetAt` and all
+source references tied at that maximum. Taste and selected-session Item activity
+at or before that boundary are excluded; later independent Items can rebuild
+temporary intent. Correction/UNDO cannot resurrect pre-reset taste. Reset adds
+no Item support or activity-clock renewal, and leaves LongTerm, ShortTerm,
+canonical Events, interactions and command receipts unchanged.
+
+The raw Event/correction budgets remain unchanged: reset cannot bypass an
+oversized old prefix. A 129-control sentinel produces inactive `BUDGET_EXCEEDED`
+with incomplete control/prefix declarations and no retained partial evidence.
+Unsupported control boundaries or unrepresentable timestamp precision also
+abstain through `INPUT_UNAVAILABLE`. Old v1 sources/comparisons and copied V2
+pages remain supported and frozen; a fresh V3 page sees the new control.
+Serving remains exact OFF for all supported generations.
+
+Forecast-only `PREDICTION_RUN`, `PROFILE` and `ACTOR` source erasure retains the
+raw control ledger alongside raw Events, so deleting derived forecasts cannot
+resurrect old intent. Actual User/Profile/session parent deletion cascades its
+controls. The immutable guard permits DELETE only after a required parent is
+gone; direct UPDATE/DELETE with live parents stays denied. No runtime quality,
+serving ON policy, user API, UI or hosted activation follows from this source.
+
+#### Private prospective WorkingState outcome source
+
+The active successor adds private `enroll_personal_working_evaluation_v1` and
+`capture_personal_working_outcomes_v1` producers. A fresh actual v3 receipt binds
+one immutable source to 1–25 disjoint same-tier eligible OFF-selected pairs and
+three actual frozen controls; prior own impressions/terminals reject declaration.
+Server clocks declare a 1-second–90-day horizon and 0–7-day maturity delay.
+Dedicated READ COMMITTED enrollment takes lifecycle EXCLUSIVE then Event SHARE
+before Profile/source/session locks, preventing label arrival during selection.
+Commit before exposure. A private deferred commit guard rejects newly visible
+own paired evidence in that same commit, including SAVEPOINT child transactions;
+capture in the declaration top transaction rejects too. Tuple xmin is additional
+defense and proves only tuple transaction identity. Limits are 128 actor/Profile plans and
+16 lifetime capture reservations, preserved across capture withdrawal.
+
+A mature capture uses one complete own relevant Event/correction snapshot through
+the fixed maturity cutoff (8,192 rows / 8 MiB); excess abstains without a partial
+prefix. `personal-latest-terminal-v1` uses latest surviving occurrence, valid
+0–10 integer ratings and exact own UNDO, with no UUID winner for terminal ties.
+Only an actual immutable-source/session/mode impression strictly after declaration
+and all controls supports an observed horizon label. Later unattributed own rating
+can replace an earlier attributed one: this is object-observation, not a causal
+reward. Clear, not-interest, missing, unresolved correction and out-of-horizon
+terminals remain unscored. Existing strongest-episode reward is untouched.
+
+Capture/Event bindings and sorted source KEY SHARE locks withdraw whole copied
+captures on raw Event or copied origin-forecast deletion. The guarded eraser adds
+all four new relations to its existing complete dependent-row budget; old rows,
+function metadata, source/pages/retries and exact OFF values retain bytes. Missing
+or foreign copied origin pointers make a later capture wholly unavailable; raw
+canonical Events cannot rebuild an already-withdrawn forecast-origin artifact.
+Different sources may reuse Items, but the batch must reject dependent repeated
+source-record/subject-Item pairs. No independence follows from a plan count.
+
+The pure outcome adapter aliases authorized receipts into the exact portable plan.
+An optional stored prospective declaration preserves server declaredAt and an
+honest later snapshotObservedAt, with UNKNOWN commit availability, rather than
+backdating the owner's read. Capture availableAt is the actual observed read
+proxy. Historical-feature eligibility, learning, native activation and quality
+admission remain false. Native CI, hosted/device, untouched observed cohort and
+real usefulness are separate gates owned by STATUS/#229.
+
+The private owner `engine:working` command now consumes these native receipts,
+reconstructing frozen plans through the existing adapters before batch evaluation.
+It retains every planned pair with missing-capture coverage, checks native
+identity and stable alias reuse across entries, and records actor/session as well
+as Subject/session clusters. Its explicit engineering-fixture basis contributes
+zero observed evidence units. A supplied owner-authorized snapshot basis is not
+authentication, current authorization or a certificate of untouched selection.
+The bounded exclusive mode-0600 report stays outside Git and requires owner
+retention/withdrawal handling. It performs no network/database writes and does
+not change quality, historical-feature, learning or activation admission.
+The [executable input contract](../../packages/prediction-engine/README.md#private-owner-working-report)
+owns limits and manifest fields. Declare the native cohort/report window and
+complete enrollment selection before observed-quality/canary work.
+
+The separate private Working cohort protocol now fixes an explicit existing-owner
+roster, future half-open enrollment window, horizon, settlement and report cutoff.
+Its checker reconciles every supplied inventory enrollment with the report, uses
+all adjacent same-tier eligible OFF pairs and the first reserved capture revision,
+and rejects omissions, altered windows, overlap, excess budgets or declared
+withdrawal. All support states and absent captures remain in descriptive coverage.
+Withdrawal invalidates the whole cohort; exported artifacts have a seven-day
+post-cutoff retention bound. The owner handles actual access and removal.
+A canonical digest is only file-integrity evidence: native authenticity, current
+authorization, inventory completeness and actual predeclaration remain
+unestablished. The [cohort input contract](../../packages/prediction-engine/README.md#private-working-cohort-protocol)
+does not instantiate a real cohort or grant quality/canary admission.
+
+#### Bounded offline WorkingState evaluation
+
+The separate portable `./working-evaluation` boundary evaluates immutable
+OFF/STATIC/ORDERED orders on one declared common pool of at most 50 Objects.
+The owner supplies a frozen plan with at most 25 nonoverlapping Item pairs,
+actor/Subject/session scope, source cutoffs, target and maturity horizon. Each control has
+explicit creation and availability boundaries, distinct from the historical
+source-input cutoff. A control may legitimately be computed after that input
+cutoff; the plan and controls must be fixed before the eligible OFF exposures
+and label occurrences. Earlier source timestamps cannot masquerade as earlier
+comparison creation or pair selection.
+
+The engine exposes pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`,
+`evaluateWorkingPlan` and `evaluateWorkingBatch`. It does not enroll sessions,
+select favorable pairs after seeing labels, capture outcomes or modify native
+forecast/comparison rows.
+
+Only both Items' actual OFF exposure can support an observed pair. Their delivery
+tier must match; the diagnostic does not compare an ordinary card with a reminder
+or pretend an alternative admission/delivery policy occurred. Inputs retain
+source/control/capture versions, exposure references, complete common-pool ranks
+and immutable reconciled labels. The capture binds the exact actor, Subject,
+forecast session and source; each label binds its own Object and original
+Prediction. A later rating may occur in another Event session without changing
+that forecast context. Labels must fall inside the declared horizon, be mature
+and available by the evaluation cutoff. Valid rating zero remains observed. Missing,
+unknown, cleared, immature, unexposed or unavailable labels stay unscored rather
+than becoming rejection. The adapter accepts supplied authorized captures; no
+server authorization or capture authenticity is inferred from their JSON shape.
+Declared `sourceIds` and `complete=true` do not grant current access. The trusted
+owner must reauthorize reads and invalidate or remove retained captures/plans/
+reports after source withdrawal; this pure boundary adds no native outcome
+producer or automatic withdrawal/erasure protection.
+
+Working adjustments are ranking components, not predicted ratings. The report
+therefore records conditional pairwise agreement, predictor ties and disagreement
+for each control rather than RMSE, calibrated confidence or counterfactual uplift.
+Observed target ties are reported without fabricating a winner. Every distinct
+planned pair remains in the coverage denominator even when unscored; this guards
+against retaining only favorable supported pairs. Source-record reuse is checked
+by stable source identity across revisions, so correction/replay cannot supply a
+second observation. Synthetic pairs are reported separately and contribute no
+observed quality evidence. Subject/session clusters are retained with independence
+not established; pair counts and repeated session actions are not statistical
+sample sizes.
+
+A separate support summary uses the actual candidate-specific Item coefficients
+for STATIC and ORDERED. Its weight concentration distinguishes many contributing
+Items from one heavily weighted Item. A Kish-style concentration count is a
+property of those weights, not proof of independent observations, calibrated
+uncertainty or a sufficient sample for admission. It does not change the working
+formula or the native capture budgets. Old native v1/v2 candidate explanations
+freeze only the two working adjustments; their candidate-specific support stays
+`FROZEN_CANDIDATE_FEATURES_UNAVAILABLE`. Captured input-closure Item features
+cannot substitute for every candidate. The v3 producer freezes the complete dense
+candidate projection described above, so its adapter can decode the compact
+vector against the exact captured dimension order and derive support from the
+actual frozen input prefix without reading current Item features. Inert v3 captures remain explicitly unavailable. An AVAILABLE all-zero
+projection instead reports zero feature coverage, not missing features.
+
+For active v3 support, caller-supplied `references.inputObjects` covers the exact
+captured input-Item set and `references.inputRecords` covers every raw Event ID
+and exact UNDO target, including targets outside retained raw rows. Input and
+ranked occurrences of the same Item must reuse one scoped Object alias; distinct
+Items and source records cannot share an alias. The adapter reconstructs the
+complete frozen Event/session/correction prefix through the existing Personal
+normalizer, replaces native Object and source-record IDs before deriving the
+portable state, and verifies its frozen schema/capture binding. Neither plans nor
+reports retain native actor/Profile/session/Item/Event/control identifiers.
+These supplied references do not prove authorization or authenticate the source.
+
+The native `normalizeKajoWorkingEvaluationPlan` adapter maps existing frozen
+Personal sources and all three actual comparison rows into a plan input; the
+pure audit adds no persistence schema, enrollment ledger or outcome-capture
+writer. The separate comparison precision forward above changes only function
+configuration.
+Stored `created_at` boundaries remain availability proxies with UNKNOWN commit
+visibility. An input passing structural cutoff checks is not a certified
+prospective native experiment. In particular, the existing V1 strongest-effective
+reward evaluator is unchanged: an eligible save is not silently relabeled as a
+post-consumption rating. Versioned frozen v3 candidate projections supply only
+descriptive support accounting. Truthful prospective enrollment, strict own-rating
+capture and observed exposure/label coverage remain explicit prerequisites for
+corresponding quality claims. Evaluation reports retain unavailable uncertainty,
+`descriptiveOnly=true`, `historicalFeatureEligible=false`, `learnable=false`,
+`nativeActivated=false` and `qualityAdmitted=false`; they cannot activate
+WorkingState or close MVP-ALG-004.
+The [package README](../../packages/prediction-engine/README.md#bounded-working-evaluation)
+owns the executable API and exact input limits.
+
+MVP-ALG-004 remains open: product reset integration, supported quality against STATIC/OFF,
+independent/effective support, source-aware forgetting/bootstrap-floor evaluation,
+normalized-feature transfer, real first-session usefulness and measured
+activation/rollback still require their own evidence. Shared #232F consumption
+and the device/privacy/release gates remain independent.
+
 ### Adaptive memory without unstable taste
 
 - WorkingState: ordered active-session actions and allowlisted current intent; reset/expire explicitly across session/Profile changes.
 - ShortTerm: recent independent evidence across useful time buckets; adapt rapidly but distinguish unknown/attention from negative preference.
 - LongTerm: weighted support by feature/source and repeat experience; adapt slowly to sustained contradiction. Imported history is an initial prior, not a permanent minimum weight.
 - Record effective support and uncertainty. Repeated taps or one Event joining many tags are not independent observations. Undo/removal/revised ratings invalidate or compensate prior evidence consistently.
-- Use one decay definition. The existing 365-day age clamp and bootstrap 20% floor require deliberate replacement or explicit evaluated justification; snapshots and serving cannot disagree.
+- Use one versioned decay definition. The active native-decay parity correction
+  removes the serving-only 365-day age clamp in favour of the existing unclamped
+  180-day native LongTerm rule. The bootstrap 20% floor remains a separately
+  retained hypothesis requiring deliberate evaluation/replacement; this packet
+  does not establish that heuristic's quality or complete adaptive memory.
 - Common normalized features allow BOOK/MOVIE transfer, while domain metadata and transfer reliability prevent false equivalence. Preserve evidence strengths, not only top-tag names. Missing features yield a neutral bounded fallback.
 - Begin with a transparent bounded context-dependent weighting rule over these states; compare it with a static baseline. Learned gating may later replace it behind the same versioned contract.
 - FOR_YOU optimizes supported fit; SURPRISE adds relevant novelty; RISK allocates bounded exploration to relevant uncertain candidates. Deterministic hash jitter alone is not evidence of epistemic uncertainty. Log propensities if stochastic selection is introduced.
 - The implemented logged-in `cold-start-v1` calibration uses six known ratings within a 12-to-24 slate. The planned anonymous adaptive Taste Test has its own versioned stopping/support rules and held-out challenge in [LAUNCH_LOOP.md](../product/LAUNCH_LOOP.md); do not transfer the six-rating gate or claim adaptive selection is already delivered. Measure recognizability, information gain, skips and completion, not just stored ratings.
+
+The 2026-10-09 dependency audit selects a native parity packet that makes current
+snapshots and ordinary/catalogue-chain kernels use the same unclamped decay
+formula, preserving evidence strengths and ShortTerm/bootstrap interpretation.
+`native-long-term-decay-v2` identifies that live extraction; new base runs use
+`prediction-v0.5-native-decay`. Structural `memory-state-v1` and
+`prediction-features-v2` remain compatible with unchanged scalar genomes. Old
+stored scalar feature vectors and frozen shadow/page replay retain their original
+numbers and versions. Native Events and UNDOs require finite occurrence times
+at or before the respective cutoff. `nativeEvidenceAsOf` records the actual
+clock: memory's explicit `state_as_of` and the base's transaction `now()`.
+The packet does not make those clocks equal or certify commit-time availability. Changing current
+calculation is not permission to rewrite a historical prediction. This source
+correction affects native direct evidence in both Personal and Shared bases,
+without changing common-fit/member aggregation or admitting a joint forecast.
+CODEMAP owns exact implementation paths and STATUS owns validation/activation.
+
+ROADMAP now advances bounded Personal state/session policy and adaptive Taste
+source work alongside independent Shared/native/device gates. Its genuine
+#232F consumer remains required for prospective Shared feature/learning
+admission; this Personal-first execution order does not relabel capture-only
+evidence as used by a forecast. Public anonymous Taste still requires stable
+server identity, retention/abuse and minimal measurement before acceptance.
 
 SharedProfile retains its own joint history and same-Profile Scenarios. Authorized member fit is a bounded aggregate input; leaving/deletion removes access and invalidates derived dependencies. Shared learned state is never merely the average of members or a copy of Personal Events.
 
@@ -1121,4 +2068,4 @@ later satisfaction may become separate heads; current V1 reward constants are
 not silently relabeled as those probabilities. Replay, simulation, consolidation
 and evolution require separate ablations before increased complexity is admitted.
 
-Documentation acceptance does not deploy any of these new components. [STATUS](../project/STATUS.md) retains #229's unmerged source and undeployed forwards, and [ROADMAP](../project/ROADMAP.md) starts engine-specific implementation with E1 → D1 → D2 while keeping native reliability gates intact.
+Documentation acceptance does not deploy any of these new engine components. [STATUS](../project/STATUS.md) records #329 source integration, dated server rollout and open device gates; [ROADMAP](../project/ROADMAP.md) preserves the completed E1 → D1 → D2 foundation and schedules remaining engine work without restarting it.

@@ -1,9 +1,9 @@
 # External taste data and enrichment
 
-Status: **D1 accepted; D2 real training/evaluation and independent replay complete,
-source CI/merge tracked in STATUS**, 2026-09-12 / #236/#237. E1 and D1 are accepted
-through #241/#242. D2's [development report](../../research/reports/movielens-small-d2.md)
-rejects challenger admission under the frozen selection rule and defers native
+Status: **bounded E1/D1/D2 foundation implemented and accepted** through
+#241/#242/#243. D2's
+[development report](../../research/reports/movielens-small-d2.md) retains the
+September 12 research checkpoint, rejects challenger admission under the frozen selection rule and defers native
 use; no serving model or native evidence changes.
 
 Architecture: [Predictive Memory Engine](PREDICTIVE_MEMORY_ENGINE.md). Kajo semantics: [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Order and acceptance: [ROADMAP](../project/ROADMAP.md), [MVP](../product/MVP.md).
@@ -302,7 +302,9 @@ A learned external prior is not required to win to complete the research packet.
 
 ## 10. Work packets and test matrix
 
-[ROADMAP](../project/ROADMAP.md) owns sequencing. The initial packets are:
+[ROADMAP](../project/ROADMAP.md) owns sequencing. E1/D1/D2 below are delivered
+bounded foundations, not work to repeat. D3/D4/D5 remain optional and E2 remains
+conditional on separate serving admission:
 
 | Packet | Deliverable | Acceptance |
 |---|---|---|

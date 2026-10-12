@@ -48,6 +48,29 @@ function setup(store: ReturnType<typeof storage>, send: (c: PendingProfileAction
 function client(rpc: unknown) { return { rpc } as SupabaseClient; }
 
 describe('atomic collection service and shared durable queue', () => {
+  it('persists exact Shared destination sets and rejects empty, duplicate or unrelated primary selections', () => {
+    const c = command(40, { kind: 'ENDORSE_SHARED_ITEM', itemId: id(6), listId: id(5), listIds: [id(5), id(7)] });
+    expect(isPendingProfileAction(JSON.parse(JSON.stringify({ command: c })), scope)).toBe(true);
+    for (const listIds of [[], [id(5), id(5)], [id(7)], ['invalid'], Array.from({ length: 33 }, (_, i) => id(i + 5))]) {
+      expect(isPendingProfileAction({ command: { ...c, listIds } }, scope)).toBe(false);
+    }
+    expect(isPendingProfileAction({ command: { ...c, listId: null } }, scope)).toBe(true);
+  });
+
+  it('refuses an acknowledgement that omits any confirmed Shared destination', async () => {
+    const c = command(41, { kind: 'ENDORSE_SHARED_ITEM', itemId: id(6), listId: id(5), listIds: [id(5), id(7)] });
+    const row = { profile_id: scope.profileId, item_id: id(6), actor_user_id: scope.actorUserId,
+      endorsement_created: true, endorsement_count: 1, required_member_count: 2,
+      consensus_reached: false, consensus_saved: false, proposal_list_id: id(5), proposal_list_name: 'First',
+      proposed_by_user_id: scope.actorUserId, list_entry_created: false };
+    const data = { ...receipt(c), undoable: false, result: [{ ...row,
+      proposal_lists: [{ id: id(5), name: 'First' }, { id: id(7), name: 'Second' }] }] };
+    const send = createProfileActionSender(client(vi.fn().mockResolvedValue({ data, error: null })));
+    expect((await send(c)).status).toBe('success');
+    const incomplete = { ...data, result: [row] };
+    const retry = createProfileActionSender(client(vi.fn().mockResolvedValue({ data: incomplete, error: null })));
+    expect((await retry(c)).status).not.toBe('success');
+  });
   it('accepts all command kinds and keeps old persisted Item payloads compatible', () => {
     const intents: CollectionActionIntent[] = [
       { kind: 'CREATE_LIST', itemId: null, name: 'Books' },
@@ -66,6 +89,31 @@ describe('atomic collection service and shared durable queue', () => {
     }
     expect(isPendingProfileAction({ command: command(10, { kind: 'SET_LIST_ENTRY', itemId: id(6), listId: id(5),
       present: true, positive: true }) }, scope)).toBe(false);
+  });
+
+  it('persists history clear across restart and accepts only a fully cleared uncorrelated receipt', async () => {
+    vi.useFakeTimers();
+    const c: CollectionActionCommand = { ...command(25, { kind: 'CLEAR_HISTORY', itemId: id(6) }),
+      source: 'LIST_DETAIL', predictionId: null, discoveryMode: null };
+    expect(isPendingProfileAction({ command: c }, scope)).toBe(true);
+    expect(isPendingProfileAction({ command: { ...c, predictionId: id(4) } }, scope)).toBe(false);
+    expect(isPendingProfileAction({ command: c }, { ...scope, profileId: id(99) })).toBe(false);
+    const store = storage();
+    const first = setup(store, async () => ({ status: 'error', retryable: true, message: 'offline' }));
+    first.queue.enqueue({ command: c }); await first.queue.waitForIdle(); first.queue.stop();
+    const ack: CollectionActionReceipt = { ...receipt(c), listId: null };
+    const rpc = vi.fn(async () => ({ data: ack, error: null }));
+    const send = createProfileActionSender(client(rpc));
+    const restarted = setup(store, send); await restarted.queue.waitForIdle();
+    expect(rpc).toHaveBeenCalledExactlyOnceWith('commit_collection_action_v1', { request: c });
+    expect(restarted.queue.pending()).toEqual([]);
+    expect(restarted.onCommitted).toHaveBeenCalled();
+    for (const invalid of [{ undoable: true }, { listId: id(5) }, { predictionId: id(4) },
+      { interaction: { ...EMPTY_ITEM_INTERACTION, rating: 8 } },
+      { interaction: { ...EMPTY_ITEM_INTERACTION, consumed: true } }]) {
+      rpc.mockResolvedValueOnce({ data: { ...ack, ...invalid }, error: null });
+      expect(await send(c)).toMatchObject({ status: 'error', retryable: false });
+    }
   });
 
   it('uses only the atomic RPC and validates metadata acknowledgements including their List/Profile', async () => {
@@ -178,5 +226,33 @@ describe('atomic collection service and shared durable queue', () => {
     const undo = { command: command(11, { kind: 'UNDO_LIST_ENTRY', itemId: id(6), reversesActionId: id(10) }),
       restoredInteraction: EMPTY_ITEM_INTERACTION };
     expect(projectPendingProfileActions(initial, [undo])[id(6)]).toEqual(EMPTY_ITEM_INTERACTION);
+  });
+});
+
+describe('multiple destinations with independent durable saves', () => {
+  it('keeps the first acknowledged List and retries only the second after restart', async () => {
+    const store = storage();
+    const firstCommand = command(80, { kind: 'SET_LIST_ENTRY', itemId: id(9), listId: id(5), present: true, positive: true });
+    const secondCommand = command(81, { kind: 'SET_LIST_ENTRY', itemId: id(9), listId: id(6), present: true, positive: true });
+    firstCommand.source = 'ITEM_DESTINATION_PICKER';
+    secondCommand.source = 'ITEM_DESTINATION_PICKER';
+    const send = vi.fn(async (c: PendingProfileAction['command']): Promise<ItemActionResult<ProfileActionReceipt>> =>
+      c.actionId === secondCommand.actionId
+        ? { status: 'error', retryable: true, message: 'offline' }
+        : { status: 'success', receipt: receipt(firstCommand) });
+    const first = setup(store, send);
+    expect(first.queue.enqueue({ command: firstCommand })).toBe(true);
+    await first.queue.waitForIdle();
+    expect(first.onCommitted).toHaveBeenCalledTimes(1);
+    expect(first.queue.enqueue({ command: secondCommand })).toBe(true);
+    await first.queue.waitForIdle();
+    expect(first.queue.pending().map(entry => entry.command.actionId)).toEqual([secondCommand.actionId]);
+    first.queue.stop();
+    const retry = vi.fn(async (): Promise<ItemActionResult<ProfileActionReceipt>> => ({ status: 'success', receipt: receipt(secondCommand) }));
+    const restarted = setup(store, retry);
+    await restarted.queue.waitForIdle();
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(retry.mock.calls[0]).toEqual([secondCommand]);
+    expect(restarted.queue.pending()).toEqual([]);
   });
 });

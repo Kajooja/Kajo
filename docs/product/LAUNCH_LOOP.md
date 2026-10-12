@@ -89,6 +89,12 @@ Properties:
 ### 3.3 SharedProfile/group invite
 
 Existing SharedProfile membership invitations remain a separate concept. A group invite grants no friendship automatically unless a later explicit product decision changes that rule.
+The planned compact creation flow can show/copy/share this opaque invitation
+through the OS share sheet or WhatsApp where available. A receiver uses the same
+app/Taste/link continuation, reusing accepted Personal setup where present, and
+explicitly accepts group membership. If Friendship is also offered, it requires
+its own clear consent; link delivery/opening grants no private Personal history
+access and creates no automatic Friend or group relationship.
 
 ## 4. Anonymous identity and conversion
 
@@ -103,6 +109,12 @@ anonymous identity
 permanent Kajo User
    + same PersonalProfile/taste history
 ```
+
+This server-backed foundation must exist before real anonymous Taste acceptance.
+It includes authorized resume, bounded creation, retention/deletion of abandoned
+state, redacted diagnostics and versioned opportunity/completion/challenge
+measurement. A logged-in policy prototype can test selection separately; it
+cannot stand in for anonymous identity or claim the complete launch flow.
 
 Conversion requirements:
 
@@ -149,9 +161,27 @@ visible and usable after the rating wheel has moved, including accidental touche
 Choosing unknown discards that Item's unsubmitted draft rating and advances or
 extends the opportunity sequence without creating rating/not-interest evidence.
 Cover accidental drag, deliberate zero rating, previous/next and the last-card
-extension/fail-open case. Deliver this with the longer Phase 15.0 Taste flow;
-the current six-rating calibration still switches its combined label after a
-draft rating and has not yet received this interaction correction.
+extension/fail-open case. The October 12 source correction gives the existing
+six-rating calibration independent Next and unknown actions, preserves genuine
+zero and the presented prefix on expansion, and cancels stale profile operations.
+Its longer adaptive progression and configured-device acceptance remain open.
+
+The October 12 portable `taste-selection-v1` source returns bounded immutable
+question/transition/stop decisions from an authorized frozen input and presentation
+ledger. Its provisional rule uses 12–24 opportunities, at least eight known
+ratings, and the proposed ten MOVIE → acknowledged transition → ten BOOK stages.
+Recognition, diversity and feature-coverage proxies are compared with a fixed
+PRIOR_ONLY control; they do not measure expected satisfaction or uncertainty.
+Unknown contributes no taste support, not-interest remains distinct, and a rating
+of zero remains known. Correction/withdrawal, current-question replay and genuine
+exhaustion are explicit. The existing native six-rating calibration does not
+consume this selector. The own-Personal server successor now provides durable
+catalog/policy/presentation/response storage and a parity-tested SQL selection
+adapter, with exact retries, corrections, removal and rating-only bootstrap
+provenance. The separate owned challenge now freezes canonical forecasts and
+evaluation-only first answers with an honest ordinal metric. Neither boundary is
+connected to that mobile gate. Anonymous prerequisites, preview, app integration
+and observed first-session usefulness remain required.
 
 The question-selection policy should optimize information gained about the Profile while retaining:
 
@@ -181,6 +211,18 @@ Challenge contract:
 Never display a fabricated “91% accuracy” number. User-facing metrics must correspond to a documented mathematical measure, sample size and uncertainty. With very few holdouts, prefer plain language such as “Kajo osui lähelle 2/3 arviossa” rather than false precision.
 
 Possible internal metrics include MAE/RMSE on 0–10 ratings, tolerance hit rate, rank correlation when enough items exist, calibration error and completion/recognition rate.
+
+The October 12 own-Personal source supports **ranking order**, not a calibrated
+rating estimate. It reserves up to three unseen Items per domain before one
+canonical forecast and hides scores until all first answers are locked. Its
+[taste-ordinal-agreement-v1 metric](../domain/PREDICTION_MODEL.md#frozen-personal-taste-challenge)
+reports same-domain pair agreement, ties, missing forecasts and known/unknown
+counts; dependent pairs are not independent observations. Percentage, rating
+error and statistical certainty are unavailable. UI must describe ordering
+agreement and sample size, never say “within N rating points” from these scores.
+These answers remain evaluation-only; automatic learning projection, mobile
+presentation, anonymous prerequisites and observed usefulness are separate gates.
+
 
 ## 7. Recommendation preview and conversion wall
 
@@ -255,7 +297,14 @@ Create yhteinen Kajo
 SharedProfile
 ```
 
-For 3+ people, the creator selects Friends and sends/collects explicit membership acceptance under the existing SharedProfile rules.
+Planned Phase 16.2 creation uses **2–5 total people including the creator**.
+Show at most five member slots, with the creator occupying one. Each `+` slot
+selects an authorized accepted Friend or generates an opaque invitation with
+show, copy and OS-share actions, including WhatsApp where available. For 3–5
+people, collect each person's explicit canonical membership acceptance; pending
+slots are not accepted members. Expiry, revocation, rate limits, replay and
+block/remove safety under 16.0–16.1 precede this UI. The compact creation bound
+does not replace existing generic 2-N SharedProfile membership support.
 
 Do not make every friendship a SharedProfile. This keeps the friend graph lightweight and makes joint learning intentional.
 
@@ -265,6 +314,30 @@ and the bounded recognition-aware cold-start exit; do not force a repeat test or
 (#232, ROADMAP 16.3): one member’s Shared score invites the others’ own responses,
 then the completed joint experience enters Shared history. Personal history stays
 separate. DOMAIN_MODEL and PREDICTION_MODEL own the round and rewatch contracts.
+The October 9 clarification reaffirms the initial adaptive Taste before release;
+the group shortcut is not a substitute for the planned Taste/usefulness gates.
+
+### Planned joint decision for today — ROADMAP 16.4
+
+After 16.3's evidence/rewatch delivery, offer an optional Shared session for
+“what should we watch/read today?” before the complete beta. At most five current
+BOOK/MOVIE options come from the same canonical Shared predictor and inherited
+DiscoveryMode/risk policy; an optional Tinder-like card sequence does not create
+a second recommender. “Do today”/other domains remain future scope.
+
+Proposed behavior is an any-participant session-level “not interested” veto;
+confirm its exact threshold when implemented. “Already seen/read” replaces that
+current option for this session. Refill is bounded, retains exact origins and
+explains genuine eligible exhaustion or expiry. Preserve prior history and
+controlled rewatch: these controls are not ordinary durable not-interest,
+history deletion, SharedRatingRound completion or automatic group reward.
+
+Freeze a bounded accepted roster, retain actor/session/scope/version provenance
+and define membership-change, expiry, cancellation, exact-retry, concurrency and
+deletion behavior. Session opening, options exposed and rejection/selection/end
+telemetry remain separate from confirmed outcomes. Ordinary Shared discovery
+and the separately optional List-only FUT-UX-003 remain distinct. All behavior
+here is planned; MVP-SOCIAL-010..012 own acceptance.
 
 ## 10. Funnel and event measurement
 
@@ -386,16 +459,22 @@ The launch loop begins only after the algorithm/data spine is reliable enough th
 
 Canonical order:
 
-1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics.
-2. Adaptive cold-start/Taste policy and trustworthy challenge evaluation.
-3. Anonymous identity + web Taste entry + identity conversion.
-4. Recommendation preview and conversion funnel.
+1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics; begin with the live native decay-parity correction, then bounded ordered Personal session/state policy.
+2. Server-backed anonymous identity/PersonalProfile-compatible state and TasteSession, minimal retention/deletion/abuse controls and versioned measurement before real Taste acceptance.
+3. Adaptive cold-start/Taste policy, trustworthy frozen challenge evaluation and canonical recommendation preview.
+4. Google/Apple identity conversion and browser/installed-app continuation preserving that state, plus the full conversion funnel.
 5. Personal Friend invite + friend lifecycle.
-6. Fast SharedProfile creation from Friends.
+6. Compact consent-based SharedProfile creation, individual Shared rounds/controlled rewatch, then the planned bounded joint decision session under ROADMAP 16.2–16.4.
 7. End-to-end funnel telemetry, experiments, privacy/abuse and operational gates.
 8. Closed external beta of the complete link-to-Kajo loop.
 9. Store/public release readiness.
 10. **Only after all release gates pass: share the Taste link with real acquisition traffic.**
+
+Personal source work may proceed alongside independent Shared/native acceptance.
+Known Shared evidence defects, the genuine #232F prepared-input consumer,
+#306 integration, #229 device/fresh-account acceptance and Phase 16.3 remain
+required. Advanced Shared model enhancements do not serialize every Personal
+source task; all relevant quality/privacy and complete-beta gates still apply.
 
 The project should not announce “now is the time to share the link” until the release readiness gate in the roadmap is explicitly satisfied.
 

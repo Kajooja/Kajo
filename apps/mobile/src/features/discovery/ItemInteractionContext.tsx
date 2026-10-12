@@ -1,3 +1,4 @@
+import { createExposureOrderedSender } from '../events/eventOutbox';
 import {
   createContext,
   useCallback,
@@ -15,7 +16,7 @@ import { AppState } from 'react-native';
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import { useEventTracking } from '@/features/events/EventTrackingContext';
-import { createUuidV7, type EventRecordInput } from '@/features/events/eventTracking';
+import { canUseEventOrigin, createUuidV7, type EventRecordInput } from '@/features/events/eventTracking';
 import { createItemActionOutbox, type ItemActionOutbox, type ItemActionOutboxSnapshot } from '@/features/events/itemActionOutbox';
 import { type ItemActionCommand, type ItemActionIntent, type PendingItemAction } from '@/features/events/itemActionCommands';
 import {
@@ -27,8 +28,9 @@ import {
 import type { EventId, ItemId, ProfileId, UserId } from '../../domain/contracts';
 import {
   commitItemInteractionAction,
+  applyCollectionUndoReceipt,
+  canUndoItemInteraction,
   EMPTY_ITEM_INTERACTION_STORE,
-  ITEM_INTERACTION_UNDO_LIMIT,
   getItemInteraction,
   getLatestUndoEntry,
   getLatestUndoItemId,
@@ -43,6 +45,7 @@ import {
   loadPersistedItemInteractions,
   type ItemInteractionPersistenceApi,
 } from './itemInteractionPersistence';
+import { subscribeToBootstrapEvidence } from './predictionRefresh';
 
 export type ItemInteractionPersistenceStatus =
   | 'inactive'
@@ -104,6 +107,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
+  const { subscribeToAcknowledgements } = eventTracking;
   const [localStore, setLocalStore] = useState<ItemInteractionStore>(
     EMPTY_ITEM_INTERACTION_STORE,
   );
@@ -118,8 +122,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const outbox = useRef<{ key: string; sessionId: string; coordinator: ItemActionOutbox<PendingProfileAction> } | null>(null);
   const collectionWaiters = useRef(new Map<string, { key: string; resolve: (result: CollectionSubmissionResult) => void }>());
   const [collectionRevision, setCollectionRevision] = useState(0);
-  const [outboxState, setOutboxState] = useState<(ItemActionOutboxSnapshot & { key: string }) | null>(null);
+  const [outboxState, setOutboxState] = useState<(ItemActionOutboxSnapshot & { key: string; sessionId: string }) | null>(null);
   const activeScopeKey = useRef<string | null>(null);
+  const activeSessionId = useRef<string | null>(null);
   const storeRef = useRef<ItemInteractionStore>(EMPTY_ITEM_INTERACTION_STORE);
 
   const persistenceApi = useMemo<ItemInteractionPersistenceApi | null>(
@@ -135,7 +140,11 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const actorUserId = configuredScope?.actorUserId ?? null;
   const outboxNamespace = connection.status === 'configured' ? connection.config.url : '';
   const currentScopeKey = profileId && actorUserId ? `${outboxNamespace}:${actorUserId}:${profileId}` : null;
-  useLayoutEffect(() => { activeScopeKey.current = currentScopeKey; }, [currentScopeKey]);
+  useLayoutEffect(() => {
+    activeScopeKey.current = currentScopeKey;
+    activeSessionId.current = eventTracking.sessionId;
+    return () => { activeScopeKey.current = null; activeSessionId.current = null; };
+  }, [currentScopeKey, eventTracking.sessionId]);
   const atomicSender = useMemo(() => connection.status === 'configured'
     ? createProfileActionSender(connection.client) : null, [connection]);
 
@@ -156,27 +165,25 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       }
     };
     const coordinator: ItemActionOutbox<PendingProfileAction> = createItemActionOutbox<PendingProfileAction, ProfileActionReceipt>({
-      namespace: outboxNamespace, scope: { actorUserId, profileId }, storage: Storage, send: atomicSender,
+      namespace: outboxNamespace, scope: { actorUserId, profileId }, storage: Storage,
+      send: createExposureOrderedSender(eventTracking.canSendAction, atomicSender,
+        () => active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId && outbox.current?.coordinator === coordinator),
       isPendingAction: isPendingProfileAction,
-      isCurrent: () => active && activeScopeKey.current === key && outbox.current?.coordinator === coordinator,
+      isCurrent: () => active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId && outbox.current?.coordinator === coordinator,
       onChange: (snapshot) => {
-        if (active && activeScopeKey.current === key) setOutboxState({ key, ...snapshot });
+        if (active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId) setOutboxState({ key, sessionId: activeSession.sessionId, ...snapshot });
         if (snapshot.message) settleWaiting(snapshot.message);
       },
       onCommitted: (receipt) => {
-        if (!active || activeScopeKey.current !== key) return;
+        if (!active || activeScopeKey.current !== key || activeSessionId.current !== activeSession.sessionId) return;
         const currentStore = storeRef.current;
-        const nextStore: ItemInteractionStore = { ...currentStore, interactions: projectPendingProfileActions(
+        let nextStore: ItemInteractionStore = { ...currentStore, interactions: projectPendingProfileActions(
           receipt.itemId && receipt.interaction
             ? { ...currentStore.interactions, [receipt.itemId]: receipt.interaction } : currentStore.interactions,
           coordinator.pending(),
         ) };
         if ('kind' in receipt) {
-          if (receipt.undoable && receipt.itemId && receipt.beforeInteraction) {
-            nextStore.undoStack = [...nextStore.undoStack, { itemId: receipt.itemId,
-              previousInteraction: receipt.beforeInteraction, eventId: receipt.actionId,
-              collectionActionId: receipt.actionId }].slice(-ITEM_INTERACTION_UNDO_LIMIT);
-          }
+          nextStore = applyCollectionUndoReceipt(nextStore, receipt);
           setCollectionRevision(revision => revision + 1);
           collectionWaiters.current.get(receipt.actionId)?.resolve({ status: 'success', receipt });
           collectionWaiters.current.delete(receipt.actionId);
@@ -188,7 +195,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     });
     const refreshAcknowledgedState = createAcknowledgedInteractionRefresh({
       load: () => loadPersistedItemInteractions(persistenceApi, profileId),
-      canApply: () => active && activeScopeKey.current === key
+      canApply: () => active && activeScopeKey.current === key && activeSessionId.current === activeSession.sessionId
         && outbox.current?.coordinator === coordinator && coordinator.pending().length === 0,
       onLoaded: (interactions) => {
         const nextStore = { ...storeRef.current, interactions };
@@ -197,10 +204,11 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       },
     });
     outbox.current = { key, sessionId: activeSession.sessionId, coordinator };
+    const unsubscribeExposure = subscribeToAcknowledgements(() => coordinator.resumeAfterExposure());
 
     void loadPersistedItemInteractions(persistenceApi, profileId).then(
       (result) => {
-        if (!active || activeScopeKey.current !== key) {
+        if (!active || activeScopeKey.current !== key || activeSessionId.current !== activeSession.sessionId) {
           return;
         }
 
@@ -224,17 +232,25 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       },
     );
 
+    const unsubscribeBootstrap = subscribeToBootstrapEvidence(() => {
+      void refreshAcknowledgedState();
+    });
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') coordinator.retry();
+      if (state === 'active') {
+        coordinator.retry();
+        void refreshAcknowledgedState();
+      }
     });
     return () => {
       active = false;
       coordinator.stop();
       settleWaiting('Profiili tai istunto vaihtui. Odottava valinta säilyy alkuperäisen profiilin jonossa.');
       subscription.remove();
+      unsubscribeBootstrap();
+      unsubscribeExposure();
       if (outbox.current?.coordinator === coordinator) outbox.current = null;
     };
-  }, [actorUserId, atomicSender, eventTracking.session, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
+  }, [actorUserId, atomicSender, eventTracking.canSendAction, eventTracking.session, subscribeToAcknowledgements, hydrationAttempt, outboxNamespace, persistenceApi, profileId]);
 
   const isLocalMode =
     connection.status === 'unconfigured' || activeProfile.status === 'disabled';
@@ -290,7 +306,8 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     const session = eventTracking.session;
     if (!configuredScope || !currentScopeKey || activeScopeKey.current !== currentScopeKey
       || current?.key !== currentScopeKey || !session || session.actorUserId !== actorUserId
-      || current.sessionId !== session.sessionId
+      || current.sessionId !== session.sessionId || activeSessionId.current !== session.sessionId
+      || !canUseEventOrigin(origin, session.sessionId, itemId)
       || session.profileId !== profileId
       || current.coordinator.pending().some(entry => isCollectionCommand(entry.command))) return false;
     const command: ItemActionCommand = {
@@ -311,7 +328,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     if (persistenceStatus !== 'ready' || !configuredScope || !currentScopeKey
       || activeScopeKey.current !== currentScopeKey || current?.key !== currentScopeKey
       || !session || session.actorUserId !== actorUserId || session.profileId !== profileId
-      || current.sessionId !== session.sessionId || current.coordinator.pending().length > 0) return null;
+      || current.sessionId !== session.sessionId || activeSessionId.current !== session.sessionId
+      || !canUseEventOrigin(origin, session.sessionId, 'itemId' in intent ? intent.itemId : null)
+      || current.coordinator.pending().length > 0) return null;
     const command: CollectionActionCommand = {
       version: 1, ...configuredScope, actionId: createUuidV7(), occurredAt: new Date().toISOString(),
       ...intent, source, session: { sessionId: session.sessionId, startedAt: session.startedAt, context: session.context },
@@ -372,9 +391,13 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     }
 
     if (activeScopeKey.current !== currentScopeKey) return null;
-    if (configuredScope && outbox.current?.sessionId !== eventTracking.session?.sessionId) return null;
+    if (configuredScope && (outbox.current?.sessionId !== eventTracking.session?.sessionId
+      || activeSessionId.current !== eventTracking.session?.sessionId)) return null;
     const currentStore = storeRef.current;
     const undoEntry = getLatestUndoEntry(currentStore);
+
+    if (configuredScope && (outbox.current?.key !== currentScopeKey
+      || !outbox.current || outbox.current.coordinator.pending().length > 0)) return null;
 
     if (!undoEntry) {
       return null;
@@ -443,7 +466,10 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     configuredScope && hydrationFailure?.profileId === configuredScope.profileId
       ? hydrationFailure.message
       : null;
-  const atomicState = outboxState?.key === currentScopeKey ? outboxState : null;
+  const atomicState = outboxState?.key === currentScopeKey && outboxState?.sessionId === eventTracking.sessionId ? outboxState : null;
+  const canUndo = canUndoItemInteraction(store,
+    isLocalMode || (persistenceStatus === 'ready' && atomicState?.ready === true),
+    atomicState?.pendingCount ?? 0);
   const persistenceError = atomicState?.message ?? (atomicState?.pendingCount
     ? `${atomicState.pendingCount} valintaa odottaa tallennusta. Valinnat säilyvät tällä laitteella.` : null);
 
@@ -452,7 +478,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       interactions: store.interactions,
       setRating,
       setNotInterested,
-      canUndo: store.undoStack.length > 0,
+      canUndo,
       undoTargetItemId,
       undo,
       persistenceStatus,
@@ -486,7 +512,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       setNotInterested,
       setRating,
       store.interactions,
-      store.undoStack.length,
+      canUndo,
       undo,
       undoTargetItemId,
     ],

@@ -1,6 +1,6 @@
 # Kajo Domain Model
 
-This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition and SharedRatingRound entities are not claims of implemented tables. The exact-set multi-List successor is on active #229 source with separately recorded hosted rollout; accepted-main code retains its earlier single-List boundary until that branch is accepted.
+This file defines canonical domain relationships and invariants. Detailed launch UX is in [LAUNCH_LOOP](../product/LAUNCH_LOOP.md); prediction math/evaluation remains in [PREDICTION_MODEL](PREDICTION_MODEL.md). Planned acquisition entities are not claims of implemented tables. #232A's round evidence and #229's exact-set multi-List implementation are included in the owner-authorized #329 source integration. The coordinated Shared user/learning flow, hosted rollout and device acceptance retain their separate gates in STATUS.
 
 ## Core model
 
@@ -111,6 +111,60 @@ status
 
 A TasteSession is not a second Profile and not a media-specific taste silo.
 
+### Own-Personal TasteSession source
+
+The `personal-taste-session-v1` source implements one bounded session per existing
+owned PersonalProfile. `public.taste_session_v1(request)` is an invoker wrapper
+over a privately owned authorization/transaction boundary. Private session and
+command tables have RLS, with no direct `anon`/`authenticated`/`service_role` access.
+Every operation rechecks the canonical owner; Shared, foreign and anonymous
+identities are rejected. This is not the anonymous launch entry or mobile rollout.
+
+| Operation | Required JSON fields besides `operation` | Behavior |
+|---|---|---|
+| `START` | `profileId`, `requestId` | Create/freeze once or resume the one existing session; never reset accepted setup. |
+| `RESUME` | `profileId`, `sessionId` | Return current authorized state without advancing. |
+| `ANSWER` | `profileId`, `sessionId`, `requestId`, `expectedRevision`, `questionIndex`, `answer` | Append a bounded response revision to a server-issued question; persist the next opportunity atomically. |
+| `ACK_TRANSITION` | `profileId`, `sessionId`, `requestId`, `expectedRevision` | Acknowledge the currently offered movie → book transition. |
+| `REMOVE` | `profileId`, `sessionId`, `requestId`, `expectedRevision` | Withdraw this session's bootstrap source, tombstone the session and clear retained answer/command copies. |
+
+IDs are UUIDs. Unknown/missing fields and malformed values are rejected; requests
+are bounded to 4 KiB. `answer` is `{kind:"RATING",value:0..10}` with an integer
+value, or `{kind:"UNKNOWN"}`, `{kind:"NOT_INTERESTED"}`, `{kind:"WITHDRAWN"}`.
+Each question accepts at most eight revisions. Server receipt time, not a client
+clock, orders them. The creation START and accepted ANSWER/ACK commands reserve their request IDs
+within the session: an identical ID/body replays the frozen result and a different
+body fails. Further START IDs act as unrecorded resume requests, so retries cannot
+allocate unbounded creation receipts. A stale session revision fails with
+SQLSTATE `40001`. A client must resume before constructing a new command; retries
+retain the original command. Profile/session row locks serialize concurrent work;
+transaction conflicts/deadlocks roll back completely and require bounded retry.
+
+The server freezes at most 128 real Items per domain plus a frequency-ranked,
+lexically tied 64-tag dictionary (`taste-tags-frequency-64-v1`). Catalog title,
+provider identities, recognition proxy and binary features come from canonical
+server records. These are capture-time features, not a claim of historical
+provider availability. Missing recognition remains `null`/`UNAVAILABLE`, distinct
+from an explicitly supplied zero; popularity alone is not recognition evidence.
+The selected snapshot cannot be supplied or replaced by
+a client. The policy is fixed to ADAPTIVE on public creation; private PRIOR_ONLY
+is a diagnostic comparator, not a client override.
+
+`CATALOG_UNAVAILABLE` means a retained catalog Item is no longer discoverable or
+has lost real provenance. No old request result or new answer is returned/applied;
+REMOVE remains available. This conservative version preserves the frozen session
+for explicit recovery rather than silently changing its candidate universe.
+`REMOVED` is terminal even for past request IDs and a new START. One logical
+session bounds creation; a future restart policy requires separate versioning.
+
+Import-source removal performs the same withdrawal atomically. Session/command
+copies cascade on account/Profile deletion. Existing bootstrap rows follow the
+canonical logical-removal/retention policy; this source does not claim complete
+anonymous retention or physical erasure. Server-issued opportunities are durable
+presentation receipts, not observed exposure. Existing native calibration is
+unchanged. The separate own-Personal challenge source is described below; public
+anonymous entry, app/UI integration and observed usefulness remain required.
+
 ### TasteResponse
 
 A `TasteResponse` records a canonical response to a real Item presented during Taste Test.
@@ -139,6 +193,64 @@ freeze Profile/taste snapshot
 ```
 
 A challenge Item cannot improve the prediction that is being scored.
+
+#### Own-Personal frozen challenge source
+
+`public.taste_challenge_v1(request)` implements one evaluation-only challenge per
+completed (`STOPPED`) own authenticated TasteSession. Shared, foreign and anonymous
+access is denied before any retained response can be replayed. Private challenge
+and command tables have RLS and no API table grants. No existing ranking function,
+historical prediction or mobile calibration behavior is replaced.
+The existing `taste_session_v1` response stays unchanged; the new consumer invokes
+this separate RPC after `STOPPED`.
+
+| Operation | Required JSON fields besides `operation` | Behavior |
+|---|---|---|
+| `START` | `profileId`, `sessionId`, `requestId` | Reserve and freeze once; further starts resume without allocating another run or resampling. |
+| `RESUME` | `profileId`, `sessionId`, `challengeId` | Read the current authorized challenge without changing it. |
+| `ANSWER` | `profileId`, `sessionId`, `challengeId`, `requestId`, `expectedRevision`, `itemId`, `answer` | Accept one first answer for a reserved Item; no retrospective correction of the measured answer. |
+| `REMOVE` | `profileId`, `sessionId`, `challengeId`, `requestId`, `expectedRevision` | Clear the retained forecast/answer/command copies and leave a terminal tombstone. |
+
+Requests are bounded to 4 KiB with exact fields and UUID identities. `answer` is an
+integer `{kind:"RATING",value:0..10}`, `{kind:"UNKNOWN"}` or
+`{kind:"NOT_INTERESTED"}`. Zero and neutral five remain actual ratings. A previously
+accepted Item cannot be answered again. The creation START and accepted ANSWER
+reserve their command IDs: identical ID/body replays the original response and
+conflicting reuse fails. Later START IDs are unrecorded resume requests, avoiding
+unbounded creation receipts. Stale revisions fail with `40001`;
+resume before constructing a new command, retaining the old command for retries.
+
+The server reserves up to three Items per domain from the frozen training catalog,
+ordered by recognition then stable Item ID, **before** running the scorer. All
+training presentations and every existing same-Profile Item Event/bootstrap row
+(including inactive evidence) exclude that Item. The client cannot choose the
+holdouts. One cross-domain `FOR_YOU` canonical PredictionRun freezes the complete
+bounded pool, state and model; a reserved Item outside its deliverable pool is
+explicitly unavailable. The challenge retains the Taste revision, model/base/
+policy versions, genome ID, state digest and a digest of the complete run, candidate
+pool, genome configuration and reserved forecasts. See the
+[ordinal metric](PREDICTION_MODEL.md#frozen-personal-taste-challenge).
+
+Items are presented in stable ID order. Scores, predicted order and partial metrics
+remain hidden until all reserved answers are locked; an initial commitment alone
+is visible. No new calibration, probability or observed exposure is implied.
+`UNAVAILABLE / NO_UNSEEN_HOLDOUTS` records an empty eligible set without resampling.
+`CATALOG_UNAVAILABLE / HOLDOUT_WITHDRAWN` blocks answers and old receipts if a
+reserved Item loses discoverability or real provenance; REMOVE remains available.
+
+Lock order is the canonical shared Prediction lifecycle gate, Profile, training
+session, then challenge. Native actions use the same Profile serialization; a
+post-scoring check rejects newly visible legacy Item evidence atomically. Source
+Prediction erasure clears every copied forecast/answer/receipt and leaves the
+challenge terminal. Taste/import removal does the same. Account/Profile deletion
+cascades the new tables. Existing canonical Prediction history follows its own
+retention/erasure lifecycle; logical challenge removal is not a physical-erasure
+claim for that history.
+
+`learningAdmission=EVALUATION_ONLY`: answers do not become native Events, bootstrap
+rows, impressions, training outcomes or model-promotion evidence. Explicit future
+projection must preserve this pre-answer freeze and source-removal lineage.
+App presentation, anonymous prerequisites and actual usefulness remain open.
 
 ### AcquisitionAttribution
 
@@ -194,6 +306,12 @@ Friend A + Friend B
 ```
 
 For 3+ users, selected Friends still pass through explicit Shared membership acceptance.
+
+The planned compact creation UX uses 2–5 total people including the creator,
+without replacing generic 2-N SharedProfile membership. Opaque link delivery
+and Friend selection remain distinct from accepted Friendship/ProfileMember;
+opening a link cannot create either relationship or grant private history access.
+LAUNCH_LOOP/UX_PRINCIPLES own the planned slot/share presentation under ROADMAP 16.2.
 
 Friend removal does not silently remove or rewrite existing SharedProfile history/membership. Any desired membership change uses SharedProfile lifecycle rules.
 
@@ -286,7 +404,20 @@ Deleting any destination of a pending proposal cancels the whole proposal and re
 real deleting actor and affected endorsing actor separately. Completed consensus
 and Saved survive List deletion.
 
-## SharedRatingRound — required first release, planned #232
+## Planned bounded joint decision for today
+
+ROADMAP 16.4 / MVP-SOCIAL-010..012 introduces a planned temporary Shared choice
+context, after the existing round/rewatch evidence foundations. It uses canonical
+BOOK/MOVIE Items and the same Shared predictor with at most five current options.
+A frozen accepted roster, actor/scope/version identity and explicit expiry,
+membership-change/retry/deletion rules precede interpretation of session actions.
+Session veto or already-seen replacement does not delete history, prohibit future
+rewatch, submit ordinary durable not-interest, complete a SharedRatingRound or
+create confirmed consumption/reward. The proposed any-member veto threshold is
+a product decision to confirm at implementation. Product documents own the UX;
+this plan creates no delivered entity/table or new production evidence stream.
+
+## SharedRatingRound — required first release, #232
 
 Personal Taste setup comes first; an existing completed setup is retained. Joint
 experience then learns in SharedProfile, without overwriting Personal history.
@@ -314,11 +445,93 @@ never fabricate other participants’ responses or silently treat them as comple
 new rounds. List Endorsement/SharedConsensus and a completed SharedRatingRound are
 separate decisions, even if the UI uses “Pari!” for both.
 
+### Phase 14.1 source foundation — #232A
+
+The #232A source foundation, included in #329 integration, supplies an explicit
+server round boundary independently of the legacy Item action path. A round
+binds one SharedProfile, Item and experience ID to a frozen participant set.
+Durable membership generation UUIDs distinguish leaving and rejoining from the
+original enrollment; physical database row placement is not participant identity.
+Membership drift requires explicit reconfirmation with fresh responses or
+cancellation. A current accepted member can recover a stale round even after
+all original participants have left; answering requires current membership in
+the frozen set.
+
+Ordinary membership departure preserves round history. Deleting a User removes
+affected new round roots and their response/receipt lineage, including that
+User's participation in an earlier reconfirmed snapshot. This prevents embedded
+participant identities from surviving deletion inside other actors' receipts.
+It does not alter legacy Shared data or establish a general retention policy.
+
+Round revisions serialize commands; response revisions and command receipts
+preserve each answer, unknown/clear, correction, cancellation and original
+delivery claim. The projection distinguishes PENDING, COMPLETED, CANCELLED and
+RECONFIRMATION_REQUIRED. Completion requires every frozen participant's actual
+integer rating, including valid zero; unknown is not a rating. This foundation
+returns `groupReward=null` and `learnable=false`. It does not update joint
+Katsotut/Luetut, ordinary Item state or Events. The coordinated flow and versioned
+joint outcome admission remain required before release; source/CI/hosted
+acceptance belong to STATUS.
+
+### Receipt-prefix outcome projection — #232B, source only
+
+The private versioned reader reconstructs one round from its immutable command
+receipts, retaining the acknowledged participant set and separate responses.
+Its basis is `COMMAND_RECEIPT_PREFIX`, with `SERVER_COMMAND_ACCEPTED_AT` times.
+Later corrections, cancellation and reconfirmation affect later prefixes; they
+do not change an earlier prefix or merge answers across participant-set versions.
+New experience IDs remain separate even for the same Item. Ordinary departure
+does not erase an already acknowledged experience; User/Profile/Item deletion
+removes the retained lineage rather than resurrecting it through replay.
+
+The projection does not reconstruct historical membership between commands or
+transaction commit visibility. It cannot use today's membership, current round
+head or Item state to fill those gaps. `historicalFeatureEligible=false` excludes
+it as proof of a past prediction-time feature snapshot. A complete, elapsed-window
+response vector can be reviewed as observed outcome evidence; that is separate
+from an admitted joint reward, current membership confirmation or predictor
+success. DATA_EVENTS owns cutoffs and attribution; PREDICTION_MODEL owns admission.
+
+The #232C source adds `SharedRoundOutcomeCapture`: the exact vector an internal
+consumer actually observed, with its receipt identity, interpretation/cutoffs,
+maturity, versions and observation time. Its replay remains fixed after a late
+commit or correction; a new capture represents the new interpretation. A paired
+production/shadow support artifact references the same capture and declared
+evaluation window, retaining each actor's own attribution and unsupported
+coordinates. Neither artifact defines a group reward or an independent sample
+per member. Erasing the retained receipt lineage erases these derived artifacts.
+Observation after a prediction does not establish historical feature availability.
+
+The #232D internal owner preparation removes PredictionRun sources, their shadow
+artifacts and copied comparison traces atomically, with whole affected evaluation
+batches invalidated. It preserves ordinary artifact immutability and rejects
+unresolved promoted-policy influence. User/Profile roots are deleted separately
+in the same owner transaction after preparation, rather than by an automatic
+Auth lifecycle hook. DATA_EVENTS owns scope, permission and concurrency semantics.
+
 Member-seen Items remain eligible for a strong, truthfully explained joint fit.
 Previously joint-consumed Items may reappear only through a versioned, bounded
 rewatch policy. Existing history stays intact. Exact eligibility, cooldown and
 frequency gates belong to PREDICTION_MODEL; neither a personal watch nor opening
 a new round is itself a positive joint outcome.
+
+### Prepared pre-first-response input — #232F, source only
+
+`SharedRoundPredictionInputCapture` prepares one identified Shared round for a
+future prediction consumer. It freezes the complete current accepted actor/
+enrollment generation set, the actual command prefix and explicitly selected
+earlier immutable outcome captures. Current roster and the round's acknowledged
+roster must match exactly. Any prior response in this experience, including
+unknown, clear or a response before participant reconfirmation, closes this
+first-response boundary. An unanswered reconfirmation can prepare a new input;
+it cannot relabel an answered experience as fresh.
+
+Membership is known at input capture, not at an earlier PredictionRun's ranking
+time. The use is `INPUT_CAPTURE_ONLY`, with predictor consumption unrecorded;
+this creates no new PredictionRun, response, Event, reward or learned influence.
+Target receipt deletion and selected source-capture deletion invalidate the
+whole copied input artifact. DATA_EVENTS owns storage/replay/erasure and
+PREDICTION_MODEL owns the future actual-consumer and admission gates.
 
 ## Event
 

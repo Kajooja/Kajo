@@ -78,6 +78,57 @@ WorkingState describes the ordered active session: recent observations, explicit
 
 It can alter immediate intent without converting one unusual session into permanent taste. Actor/Profile switches cannot reuse another scope's working state. Replay uses the captured sequence prefix, not the current session cache.
 
+The repository's separate `./working-state` component implements a bounded
+first hypothesis with independent latest Item support, equal-time groups,
+explicit correction closure, reset/expiry and STATIC/ORDERED/OFF controls.
+Its adjustment defaults to OFF, is uncalibrated and supplies no observed quality
+labels or learning admission. A separate Kajo normalizer consumes authorized
+Personal snapshots; an invented machine-domain fixture exercises the same core.
+The [native Personal bridge](../domain/PREDICTION_MODEL.md#native-personal-workingstate-capture-and-comparison)
+now freezes an authorized current Event/session/correction prefix and binary
+current-tag artifact into new Kajo PredictionRuns. A versioned consumer returns
+the exact legacy score with serving fixed to OFF; owner-only STATIC/ORDERED
+comparisons truly consume frozen components under the original pool and final
+delivery policy. No native ON policy, complete CurrentState composition,
+historical-feature eligibility, quality or learning admission follows. Native
+no-session/empty/no-tag/overflow envelopes are inert. Unsupported legacy tags,
+malformed UNDO or timestamp precision collapse yield `INPUT_UNAVAILABLE` with
+an explicit reason and no partial prefix, preserving baseline OFF pages. The
+portable core retains strict input/schema validation; parity is scoped to
+accepted nonempty schemas. Reset-aware native capture now includes a bounded
+private canonical lifecycle-control ledger in the same snapshot. Its latest
+server-owned boundary excludes at-or-before taste and Item activity without
+renewing expiry, deleting history or supplying preference/reward. New capture,
+feature, serving and comparison generations preserve old frozen sources.
+
+Forecast-only erasure retains raw controls; genuine parent deletion cascades
+them. Product reset integration, a public API/UI and quality/activation remain
+separate gates. [Executable semantics and limits](../../packages/prediction-engine/README.md#bounded-session-intent)
+remain distinct from the full target in this section.
+
+A separate bounded `./working-evaluation` diagnostic compares predeclared
+OFF/STATIC/ORDERED orders on one frozen common pool and explicit nonoverlapping
+pairs. Both actual OFF exposures, matching delivery tiers and immutable scoped,
+mature labels are required. It reports conditional rank agreement/ties/
+disagreement and planned-pair coverage, not rating RMSE or counterfactual uplift.
+Repeated source revisions cannot multiply support; synthetic evidence stays
+separate and Subject/session-cluster independence remains unestablished.
+Candidate-specific STATIC/ORDERED Item weights yield a concentration summary;
+its Kish-style count is not a statistical sample size. Old native v1/v2
+candidate explanations retain adjustment-only support as explicitly unavailable.
+Fresh v3 sources freeze compact dense binary candidate vectors in the original
+captured dimension order, bound to the full schema/artifact retained once in the
+capture. The adapter reconstructs the complete frozen input
+prefix with scoped Item/Event/UNDO aliases before deriving support. Current tags
+cannot replace either frozen input or candidate features. Candidate projections
+record their ranking-statement snapshot with unknown commit visibility and no
+historical availability certificate; source creation clocks also remain proxies.
+These descriptive support weights do not establish independent outcome N,
+confidence, quality or a prospective native experiment. Native prospective
+enrollment and strict label capture remain separate prerequisites. No enrollment/
+outcome writer, serving activation or learning admission follows. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#bounded-offline-workingstate-evaluation)
+owns the evidence and admission limits.
+
 ## 5. ShortTermState — recent memory
 
 ShortTermState represents temporary interests over days or weeks and can reverse faster than durable memory. A transparent starting family is `weight(age) = exp(-lambda * age)`; time scale and event strength are versioned hypotheses.
@@ -487,6 +538,19 @@ Engine:
 ```
 
 Time, randomness, storage and model loading are injected/versioned. Pure scoring/replay components do not acquire credentials or mutate production state. Kajo's trusted server boundary remains responsible for authorization, current membership/eligibility, atomic trace/receipt commit and exposure provenance.
+
+The #232E source adds a separate pure `./ordinal` evaluator and
+`./adapters/kajo-ordinal` snapshot normalizer; neither enters the numeric root
+import graph or native serving. It evaluates a complete exposed group vector's
+Pareto direction against both Items from one frozen production/shadow pool.
+Media/maintenance generated fixtures and a real SQL-producer interoperability
+fixture exercise the boundary. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md)
+owns the exact target, bounds, ties, clocks and unavailable learning/uncertainty.
+Caller-provided scoped member/enrollment handles replace raw audit identities;
+private lineage refs remain owner-only. The offline audit command trusts an
+already-authorized immutable snapshot and declared digest bindings, not supplied
+file authenticity or prospective feature availability. It writes no Events,
+memories, rewards, policies or promotion decisions.
 
 ## 43. Internal modularity
 

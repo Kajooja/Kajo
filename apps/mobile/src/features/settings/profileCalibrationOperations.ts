@@ -35,6 +35,22 @@ export type ProfileCalibrationResult =
   | { status: 'success'; ratingCount: number; version: string }
   | { status: 'error'; message: string };
 
+export function appendProfileCalibrationCandidates(
+  presented: readonly Item[],
+  candidates: readonly Item[],
+  maximumCandidateCount: number,
+): readonly Item[] {
+  const items = [...presented];
+  const seen = new Set(items.map((item) => item.id));
+  for (const item of candidates) {
+    if (items.length >= maximumCandidateCount) break;
+    if (seen.has(item.id)) continue;
+    items.push(item);
+    seen.add(item.id);
+  }
+  return items;
+}
+
 export function shouldOfferProfileCalibration(
   status: ProfileBootstrapStatus,
 ): boolean {

@@ -6,11 +6,83 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
+import { setTimeout as wait } from 'node:timers/promises';
 import { bufferedSqlCommand } from './buffered-sql-command.mjs';
 
 const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
 const imageId = 'sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f';
+
+const transientTransportCodes = new Set(['ECONNREFUSED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT',
+  'UND_ERR_SOCKET', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT']);
+function transportSignal(error, signal) {
+  // Undici may surface a timed-out response body as AbortError rather than
+  // TimeoutError. Only our own timeout signal makes that failure retryable.
+  if (signal?.aborted && signal.reason?.name === 'TimeoutError') return 'request-timeout';
+  const code = error?.cause?.code ?? error?.code;
+  if (transientTransportCodes.has(code)) return code;
+  return error?.name === 'TimeoutError' ? 'request-timeout' : 'unknown';
+}
+
+// db reset recreates Postgres; the local Data API can still be reconnecting.
+// Retry only a read-only query. A lost RPC acknowledgement never replays a POST.
+export async function requestIsolatedCatalogRpc({ apiUrl, readKey, rpcKey, body, stage,
+  fetchImpl = fetch, waitImpl = wait }) {
+  let url;
+  try { url = new URL(apiUrl); } catch { throw new Error('Invalid isolated Data API URL'); }
+  assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname)
+    && !url.username && !url.password && !url.search && !url.hash && url.pathname === '/',
+  'Data API must belong to the isolated localhost stack');
+  assert.match(stage, /^reset-\d+-rpc-\d+$/);
+  assert.ok([readKey, rpcKey].every(key => typeof key === 'string' && key.length > 20),
+    'Missing isolated Data API credential');
+  // Docker's local gateway is IPv4. Avoid localhost resolving to an IPv6 listener.
+  url.hostname = '127.0.0.1';
+  const headers = key => ({ apikey: key, Authorization: `Bearer ${key}`, Connection: 'close' });
+  const fail = (phase, detail) => new Error(`Isolated catalog RPC ${stage}: ${phase} failed (${detail}); POST not retried`);
+  let lastSignal;
+  for (let attempt = 1; attempt <= 20; attempt++) {
+    let response, rows;
+    const signal = AbortSignal.timeout(1500);
+    try {
+      response = await fetchImpl(new URL('/rest/v1/items?select=id&limit=0', url), {
+        method: 'GET', redirect: 'error', signal, headers: headers(readKey),
+      });
+      if (response.status === 200) rows = await response.json();
+    } catch (error) {
+      // Never echo arbitrary exceptions, response bodies, credentials or status.
+      if (error instanceof SyntaxError) throw fail('readiness', 'invalid JSON');
+      lastSignal = transportSignal(error, signal);
+      if (lastSignal === 'unknown') throw fail('readiness', 'unknown transport error');
+      response = undefined;
+    }
+    if (response?.status === 200) {
+      if (!Array.isArray(rows) || rows.length !== 0) throw fail('readiness', 'expected empty read-only result');
+      break;
+    }
+    if (response) {
+      const status = response.status;
+      try { await response.body?.cancel(); }
+      catch (error) { throw fail('readiness response', transportSignal(error, signal)); }
+      if (![502, 503, 504].includes(status)) throw fail('readiness', `HTTP ${status}`);
+      lastSignal = `HTTP ${status}`;
+    }
+    if (attempt === 20) throw fail('readiness', `20 attempts exhausted; ${lastSignal}`);
+    await waitImpl(500);
+  }
+  // Connection: close prevents reuse of a socket from an earlier reset. Preserve
+  // expected HTTP errors (404/400/permission denial) for the existing assertions.
+  const signal = AbortSignal.timeout(10000);
+  try {
+    const response = await fetchImpl(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
+      method: 'POST', redirect: 'error', signal,
+      headers: { ...headers(rpcKey), 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    return { status: response.status, body: await response.json() };
+  } catch (error) {
+    throw fail('POST', error instanceof SyntaxError ? 'invalid JSON' : transportSignal(error, signal));
+  }
+}
 
 // Return fixed diagnostic labels only: CLI output can include local credentials.
 // These are observed symptoms, not a claimed root cause or an automatic retry rule.
@@ -23,6 +95,115 @@ export function classifySupabaseStartFailure(output) {
     ['network', /connection refused|connection reset|network is unreachable|TLS handshake timeout|i\/o timeout|temporary failure in name resolution/i],
   ].filter(([, pattern]) => pattern.test(output)).map(([label]) => label);
   return signals.length ? signals : ['unclassified'];
+}
+
+const stackServices = new Set(['db', 'auth', 'realtime', 'storage', 'storage_api', 'rest', 'kong',
+  'inbucket', 'mailpit', 'studio', 'meta', 'edge_runtime', 'imgproxy', 'analytics', 'vector', 'pooler']);
+const ownedResource = (name, projectId) => name.startsWith('supabase_') && name.endsWith(`_${projectId}`);
+const processCodes = new Set(['ETIMEDOUT', 'ENOENT', 'EACCES', 'EPERM', 'EIO', 'EAGAIN', 'ENOMEM', 'ENOBUFS',
+  'EMFILE', 'ENFILE', 'EPIPE', 'ECONNREFUSED', 'ECONNRESET', 'E2BIG', 'EBADF', 'EINVAL']);
+const processCode = code => processCodes.has(code) ? code : 'PROCESS_ERROR';
+const exitCode = status => Number.isInteger(status) && status >= 0 && status <= 255 ? status : null;
+const processDiagnostic = (result, timeout) => ({
+  processCode: result.error ? processCode(result.error.code) : null,
+  exitCode: exitCode(result.status), deadlineMs: timeout,
+});
+
+// These are output observations, including potentially nonfatal pull warnings.
+// No label authorizes retry, port relocation or an unverified image change.
+function startFailureDiagnostic(result, timeout) {
+  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+  // Exact pinned CLI 2.117.0 fatal templates, distinct from earlier pull attempts:
+  // apps/cli/src/command-internal/legacy-docker-image-resolve.ts and
+  // apps/cli/src/command-internal/db-bootstrap/container-lifecycle.ts.
+  const terminalFailures = [
+    ...output.matchAll(/failed to pull docker image from all registries:[^\r\n]*/g),
+    ...output.matchAll(/failed to start docker container "[^"\r\n]+"(?::[^\r\n]*)?(?=\r?\n|$)/g),
+  ].map(match => ({ stage: match[0].startsWith('failed to pull') ? 'image-pull' : 'container-start',
+    condition: match[0].startsWith('failed to pull') ? 'all-registries-failed'
+      : /Bind for (.*) failed: port is already allocated/.test(match[0]) ? 'port-conflict' : 'unspecified' })).slice(0, 16);
+  return { cliVersion, attemptCount: 1, deadlineMs: timeout,
+    exitCode: Number.isInteger(result.status) ? result.status : null,
+    processCode: result.error ? processCode(result.error.code) : null,
+    signal: /^SIG[A-Z]{1,12}$/.test(result.signal ?? '') ? result.signal : null,
+    outputSignals: classifySupabaseStartFailure(output), terminalFailures,
+    terminalStatus: terminalFailures.length === 1 ? 'SINGLE' : terminalFailures.length ? 'MULTIPLE' : 'UNCLASSIFIED',
+    cause: 'UNCONFIRMED', recovery: 'NOT_RETRIED' };
+}
+
+// Inspect only resources of the newly owned project, before cleanup removes
+// useful state. Never copy Docker Env, raw State.Error, health logs or CLI output.
+export function inspectOwnedSupabaseStack(projectId, docker, { details = true, inventoryTimeoutMs = 5000 } = {}) {
+  assert.match(projectId, /^kajo_(?:ci_[a-z_]+|local_[a-f0-9]{12})$/);
+  assert.ok([5000, 30_000].includes(inventoryTimeoutMs), 'Expected a reviewed Docker inventory deadline');
+  const inspectionFailures = [];
+  const inspectionDiagnostics = [];
+  const failed = (stage, error, deadlineMs) => {
+    const diagnostic = error?.processDiagnostic;
+    inspectionDiagnostics.push({ stage,
+      processCode: diagnostic?.processCode === null ? null : processCode(diagnostic?.processCode ?? error?.code),
+      exitCode: exitCode(diagnostic?.exitCode), deadlineMs });
+  };
+  const list = (kind, args) => {
+    let stage = `${kind}-name-list`;
+    try {
+      const named = docker(args, { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/)
+        .filter(name => ownedResource(name, projectId));
+      // Pinned CLI stop selects by this label, including differently named
+      // resources. Mirror that ownership boundary before startup and after stop.
+      stage = `${kind}-label-list`;
+      const labelled = docker([...args, '--filter', `label=com.supabase.cli.project=${projectId}`],
+        { timeout: inventoryTimeoutMs }).trim().split(/\r?\n/).filter(Boolean);
+      return [...new Set([...named, ...labelled])];
+    } catch (error) { inspectionFailures.push(`${kind}-list`); failed(stage, error, inventoryTimeoutMs); return null; }
+  };
+  const names = list('container', ['ps', '-a', '--format', '{{.Names}}']);
+  const volumes = list('volume', ['volume', 'ls', '--format', '{{.Name}}']);
+  const networks = list('network', ['network', 'ls', '--format', '{{.Name}}']);
+  const containers = [];
+  if (details) for (const name of (names ?? []).slice(0, 24)) {
+    const label = name.slice('supabase_'.length, -`_${projectId}`.length);
+    const service = stackServices.has(label) ? label : 'unknown';
+    try {
+      const state = JSON.parse(docker(['inspect', '--format',
+        '{"status":{{json .State.Status}},"health":{{if .State.Health}}{{json .State.Health.Status}}{{else}}null{{end}},'
+          + '"exitCode":{{json .State.ExitCode}},"oomKilled":{{json .State.OOMKilled}},"error":{{json .State.Error}},'
+          + '"bindings":{{json .NetworkSettings.Ports}},"requestedBindings":{{json .HostConfig.PortBindings}}}',
+      name], { timeout: 1000 }));
+      const bindings = ports => Object.entries(ports ?? {}).flatMap(([key, values]) => {
+        const match = key.match(/^(\d{1,5})\/(tcp|udp)$/);
+        if (!match || !Array.isArray(values)) return [];
+        return values.flatMap(value => {
+          const hostPort = Number(value.HostPort), containerPort = Number(match[1]);
+          if (![hostPort, containerPort].every(port => Number.isInteger(port) && port > 0 && port <= 65535)) return [];
+          return [{ containerPort, protocol: match[2], hostPort,
+            hostAddress: ['127.0.0.1', '::1'].includes(value.HostIp) ? 'loopback'
+              : ['0.0.0.0', '::'].includes(value.HostIp) ? 'wildcard' : 'other' }];
+        });
+      }).slice(0, 24);
+      containers.push({ service,
+        status: ['created', 'running', 'paused', 'restarting', 'removing', 'exited', 'dead'].includes(state.status)
+          ? state.status : 'unknown',
+        health: state.health ? (['starting', 'healthy', 'unhealthy'].includes(state.health)
+          ? state.health : 'unknown') : 'none',
+        exitCode: Number.isInteger(state.exitCode) && state.exitCode >= 0 && state.exitCode <= 255 ? state.exitCode : null,
+        oomKilled: state.oomKilled === true,
+        errorSignals: state.error ? classifySupabaseStartFailure(String(state.error)) : [],
+        bindings: bindings(state.bindings), requestedBindings: bindings(state.requestedBindings) });
+    } catch (error) {
+      inspectionFailures.push('container-inspect'); failed('container-inspect', error, 1000);
+      containers.push({ service, status: 'unavailable' });
+    }
+  }
+  return { containerCount: names?.length ?? null, volumeCount: volumes?.length ?? null,
+    networkCount: networks?.length ?? null, containers, truncated: (names?.length ?? 0) > 24,
+    inspectionFailures, inspectionDiagnostics };
+}
+
+function assertStackAbsent(state, stage) {
+  assert.ok(state.containerCount === 0 && state.volumeCount === 0 && state.networkCount === 0
+    && state.inspectionFailures.length === 0,
+  `Isolated Supabase ${stage} resource check failed: ${JSON.stringify(state)}`);
 }
 
 export function verifyCiPostgresImage(image) {
@@ -38,6 +219,38 @@ export function verifyLocalPostgresImage(image, platform = process.platform, arc
     'darwin/arm64': 'sha256:6942962433a569e87f228b4d4ab7e11db5deca64e43babb3a038443ad6c4f1bb' }[`${platform}/${architecture}`];
   assert.ok(expected, 'No reviewed Postgres image for this platform/architecture');
   assert.equal(digest, expected, 'Postgres image content changed; review its actual digest before running application SQL');
+}
+
+function sqlProbeSettings({ stage = 'sql', timeoutMs = 120_000 } = {}) {
+  assert.match(stage, /^[a-z][a-z0-9-]{0,79}$/, 'Expected a fixed SQL probe stage label');
+  assert.ok(Number.isSafeInteger(timeoutMs) && timeoutMs >= 1000 && timeoutMs <= 600_000,
+    'SQL probe timeout must be between 1000 and 600000 milliseconds');
+  return { stage, timeoutMs, statementTimeoutMs: timeoutMs - Math.min(5000, Math.floor(timeoutMs / 2)) };
+}
+
+// Each server statement is bounded as well as the whole Docker invocation.
+// These are separate clocks: a late statement can outlive the aggregate client
+// deadline, but cannot run indefinitely if its client disconnects. Explicitly
+// named expensive proofs may opt into a bounded larger budget.
+export async function runIsolatedSqlProbe(docker, container, sql, options) {
+  const { stage, timeoutMs, statementTimeoutMs } = sqlProbeSettings(options);
+  const startedAt = Date.now();
+  console.log(`Checking isolated SQL ${stage} (deadline ${timeoutMs}ms)`);
+  let output;
+  try {
+    output = docker(['exec', '-i', '--env',
+      `PGOPTIONS=-c statement_timeout=${statementTimeoutMs} -c lock_timeout=30000`, container,
+      ...bufferedSqlCommand(['psql', '-X', '-qAt',
+        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql, timeout: timeoutMs });
+  } catch (error) {
+    if (error?.code === 'ETIMEDOUT') {
+      throw new Error(`Isolated SQL ${stage} exceeded Docker deadline ${timeoutMs}ms`, { cause: error });
+    }
+    throw new Error(`Isolated SQL ${stage} failed: ${error.message}`, { cause: error });
+  }
+  const snapshots = output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
+  console.log(`Completed isolated SQL ${stage} (${Date.now() - startedAt}ms)`);
+  return snapshots;
 }
 
 export async function withCiSupabaseStack(projectId, work) {
@@ -63,7 +276,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
     || (process.platform === 'darwin' && process.arch === 'arm64'), 'Requires Linux x64 or macOS arm64 with local Docker');
   const container = `supabase_db_${projectId}`;
   const environment = { ...process.env };
-  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID', 'SUPABASE_WORKDIR',
+  for (const name of ['SUPABASE_ACCESS_TOKEN', 'SUPABASE_DB_PASSWORD', 'SUPABASE_PROJECT_ID', 'SUPABASE_WORKDIR', 'SUPABASE_ENV',
     'PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'PGSERVICE', 'PGSERVICEFILE', 'PGPASSFILE',
     'DOCKER_HOST', 'DOCKER_CONTEXT', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']) delete environment[name];
   Object.assign(environment, { DOCKER_HOST: 'unix:///var/run/docker.sock',
@@ -71,25 +284,36 @@ async function withNewSupabaseStack(projectId, work, destination) {
   let directory;
   let started = false;
   let retained = false;
+  let primaryError;
   let dockerHost = 'unix:///var/run/docker.sock';
   function run(command, args, { input, timeout = 120_000 } = {}) {
     const result = spawnSync(command, args, { cwd: directory, env: environment,
       input, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout });
-    if (result.error) throw result.error;
+    const operation = command === 'docker'
+      ? (args.includes('psql') ? 'sql' : ['inspect', 'ps', 'volume', 'network', 'context'].find(name => args.includes(name)) ?? 'operation')
+      : ['start', 'stop', 'reset', 'migration', 'status', 'init'].find(name => args.includes(name)) ?? 'operation';
+    if (result.error) {
+      const code = processCode(result.error.code);
+      const error = new Error(`Isolated ${command} ${operation} failed: ${code} (deadline ${timeout}ms)`, { cause: result.error });
+      error.code = code;
+      error.processDiagnostic = processDiagnostic(result, timeout);
+      if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
+      throw error;
+    }
     if (result.status !== 0) {
       // SQL is repository-owned metadata/probe input. CLI output can contain
       // development keys/connection strings, so is never logged here.
       let detail = command === 'docker' && args.includes('psql') ? `: ${result.stderr.trim().slice(-3000)}` : '';
-      if (command === 'npx' && args.includes('start')) {
-        detail = `: start signals=${classifySupabaseStartFailure(result.stdout + '\n' + result.stderr).join(',')}; raw CLI output withheld`;
-      }
       if (command === 'npx' && (args.includes('reset') || args.includes('migration'))) {
         // Reset diagnostics include only SQL error/flag lines, not CLI status
         // output with development connection strings or keys.
         detail = ': ' + result.stderr.split('\n').filter(line => /ERROR:|SQLSTATE|unknown flag:/.test(line))
           .join('\n').replace(/postgres(?:ql)?:\/\/\S+/gi, '[local connection]').slice(-3000);
       }
-      throw new Error(`${command} ${args[0]} failed with exit ${result.status}${detail}`);
+      const error = new Error(`Isolated ${command} ${operation} failed with exit ${result.status}${detail}`);
+      error.processDiagnostic = processDiagnostic(result, timeout);
+      if (command === 'npx' && operation === 'start') error.startDiagnostic = startFailureDiagnostic(result, timeout);
+      throw error;
     }
     return result.stdout;
   }
@@ -102,10 +326,10 @@ async function withNewSupabaseStack(projectId, work, destination) {
       assert.ok(dockerHost?.startsWith('unix://'), 'Docker Desktop must use a local Unix socket');
       environment.DOCKER_HOST = dockerHost;
     }
-    const names = docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n');
-    assert.ok(!names.includes(container), 'Refusing to reuse an existing Supabase stack');
-    const volumes = docker(['volume', 'ls', '--format', '{{.Name}}']).trim().split('\n');
-    assert.ok(!volumes.some(name => name.endsWith(`_${projectId}`)), 'Refusing to restore an existing Supabase volume');
+    // Operational inventory must tolerate a cold/loaded daemon; failure-state
+    // diagnostics retain the separate 5s inventory and 24 x 1s detail budget.
+    assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+      { details: false, inventoryTimeoutMs: 30_000 }), 'preflight');
     if (destination) {
       await mkdir(destination, { mode: 0o700 }); // Exclusive: existing files/directories are never reused.
       directory = destination;
@@ -120,54 +344,64 @@ async function withNewSupabaseStack(projectId, work, destination) {
     await writeFile(configPath, config);
     console.log(`Starting isolated Supabase CLI ${cliVersion} stack ${projectId}`);
     started = true;
-    cli(['start', '--exclude', 'studio,postgres-meta,edge-runtime,imgproxy,logflare,vector,supavisor'], { timeout: 720_000 });
+    try {
+      cli(['start', '--exclude', 'studio,postgres-meta,edge-runtime,imgproxy,logflare,vector,supavisor'], { timeout: 720_000 });
+    } catch (error) {
+      const diagnostic = { ...error.startDiagnostic, projectId,
+        ownedDocker: inspectOwnedSupabaseStack(projectId, docker) };
+      const failure = new Error(`Isolated Supabase startup failed: ${JSON.stringify(diagnostic)}; raw CLI output withheld`, { cause: error });
+      failure.startDiagnostic = diagnostic;
+      throw failure;
+    }
     const image = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
     console.log(`Image: ${image}`);
     verifyLocalPostgresImage(image);
     const containerId = docker(['inspect', '--format', '{{.Id}}', container]).trim();
-    const execSnapshots = async sql => {
-      const output = docker(['exec', '-i', container, ...bufferedSqlCommand(['psql', '-X', '-qAt',
-        '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])], { input: sql });
-      return output.trim() ? output.trim().split('\n').map(line => JSON.parse(line)) : [];
-    };
+    const execSnapshots = (sql, options) => runIsolatedSqlProbe(docker, container, sql, options);
     // Independent sessions only on the newly owned CLI CI stack. This makes
     // actual row-lock waits observable without connecting to a hosted database.
-    const execConcurrentSql = sql => {
+    const execConcurrentSql = (sql, options) => {
       assert.equal(projectId, 'kajo_ci_cli_install');
+      const { stage, timeoutMs, statementTimeoutMs } = sqlProbeSettings({ stage: 'concurrent-sql', timeoutMs: 30_000, ...options });
       return new Promise((resolveSql, rejectSql) => {
-        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', container,
+        const startedAt = Date.now();
+        console.log(`Checking isolated SQL ${stage} (deadline ${timeoutMs}ms)`);
+        const child = spawn('docker', ['--host', dockerHost, 'exec', '-i', '--env',
+          `PGOPTIONS=-c statement_timeout=${statementTimeoutMs} -c lock_timeout=30000`, container,
           ...bufferedSqlCommand(['psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1', '--username=postgres', '--dbname=postgres'])],
         { cwd: directory, env: environment, stdio: ['pipe', 'pipe', 'pipe'] });
-        let stdout = '', stderr = '';
-        const timer = setTimeout(() => child.kill('SIGKILL'), 30000);
+        let stdout = '', stderr = '', timedOut = false;
+        const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutMs);
         child.stdout.on('data', data => { stdout += data; if (stdout.length > 16 * 1024 * 1024) child.kill('SIGKILL'); });
         child.stderr.on('data', data => { stderr = (stderr + data).slice(-3000); });
         child.on('error', error => { clearTimeout(timer); rejectSql(error); });
         child.on('close', code => {
           clearTimeout(timer);
-          if (code !== 0) return rejectSql(new Error('Isolated SQL session failed: '
+          if (timedOut) return rejectSql(new Error(`Isolated SQL ${stage} exceeded Docker deadline ${timeoutMs}ms`));
+          if (code !== 0) return rejectSql(new Error(`Isolated SQL ${stage} session failed: `
             + stderr.split('\n').filter(line => /ERROR:/.test(line)).join('\n')));
-          try { resolveSql(stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : []); }
-          catch { rejectSql(new Error('Invalid isolated SQL acknowledgement')); }
+          try {
+            const snapshots = stdout.trim() ? stdout.trim().split('\n').map(line => JSON.parse(line)) : [];
+            console.log(`Completed isolated SQL ${stage} (${Date.now() - startedAt}ms)`);
+            resolveSql(snapshots);
+          } catch { rejectSql(new Error(`Invalid isolated SQL ${stage} acknowledgement`)); }
         });
         child.stdin.on('error', error => { child.kill('SIGKILL'); rejectSql(error); });
         child.stdin.end(sql);
       });
     };
+    let resetCount = 0, rpcCount = 0;
     const catalogRpc = async (body, role = 'service_role') => {
       assert.equal(projectId, 'kajo_ci_cli_install');
       assert.ok(['service_role', 'anon'].includes(role));
       // Credentials belong only to this new local test stack; never log status.
       const status = JSON.parse(cli(['status', '--output', 'json']));
-      const url = new URL(status.API_URL);
-      assert.ok(url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname));
       const key = role === 'service_role' ? status.SERVICE_ROLE_KEY : status.ANON_KEY;
-      assert.ok(typeof key === 'string' && key.length > 20, 'Missing isolated Data API credential');
-      const response = await fetch(new URL('/rest/v1/rpc/upsert_catalog_batch_v1', url), {
-        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
-        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      const stage = `reset-${resetCount}-rpc-${++rpcCount}`;
+      console.log(`Checking isolated Data API ${stage}`);
+      return requestIsolatedCatalogRpc({ apiUrl: status.API_URL, readKey: status.SERVICE_ROLE_KEY,
+        rpcKey: key, body, stage,
       });
-      return { status: response.status, body: await response.json() };
     };
     let applied = false;
     const applyMigrations = async files => {
@@ -195,6 +429,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       await rm(path, { recursive: true, force: true });
       await mkdir(path);
       for (const file of files) await writeFile(join(path, file.name), file.sql, { flag: 'wx' });
+      console.log(`Resetting isolated CLI database ${++resetCount} with ${files.length} migrations`);
       cli(['db', 'reset', '--local', '--no-seed', '--yes'], { timeout: 360_000 });
       const resetImage = docker(['inspect', '--format', '{{.Config.Image}} {{.Image}}', container]).trim();
       verifyCiPostgresImage(resetImage);
@@ -209,15 +444,32 @@ async function withNewSupabaseStack(projectId, work, destination) {
       retained = true;
       return report;
     }
-    cli(['stop', '--no-backup'], { timeout: 120_000 });
-    started = false;
-    assert.ok(!docker(['ps', '-a', '--format', '{{.Names}}']).trim().split('\n').includes(container),
-      'Stopped project container still exists');
     return { result, cliVersion, image, architecture: process.arch, projectId, containerId,
       commit: process.env.GITHUB_SHA, cleanup: 'PASS',
       configSha256: createHash('sha256').update(config).digest('hex') };
+  } catch (error) {
+    primaryError = error;
+    throw error;
   } finally {
-    if (started && !retained) cli(['stop', '--no-backup'], { timeout: 120_000 });
-    if (directory && !retained) await rm(directory, { recursive: true, force: true });
+    const cleanupErrors = [];
+    if (started && !retained) {
+      try { cli(['stop', '--no-backup', '--project-id', projectId], { timeout: 120_000 }); }
+      catch (error) { cleanupErrors.push(error); }
+      // A successful stop exit is insufficient proof of container/volume cleanup.
+      try { assertStackAbsent(inspectOwnedSupabaseStack(projectId, docker,
+        { details: false, inventoryTimeoutMs: 30_000 }), 'cleanup'); }
+      catch (error) { cleanupErrors.push(error); }
+    }
+    // CLI/Docker cleanup failure must never prevent removing our owned workspace.
+    if (directory && !retained) {
+      try { await rm(directory, { recursive: true, force: true }); }
+      catch { cleanupErrors.push(new Error('Isolated Supabase workspace removal failed')); }
+    }
+    if (cleanupErrors.length) {
+      const errors = [...(primaryError ? [primaryError] : []), ...cleanupErrors];
+      throw new AggregateError(errors,
+        `Isolated Supabase lifecycle failed: ${errors.map((error, index) => `${index === 0 && primaryError ? 'primary' : 'cleanup'}=${error.message}`).join('; ')}`,
+        { cause: primaryError ?? cleanupErrors[0] });
+    }
   }
 }

@@ -168,6 +168,41 @@ test('bootstrap Personal ranking SQL regressions (isolated function fixtures)', 
         values($1,'ITEM_INTERACTION_UNDONE',$2)`, [profiles.a, JSON.stringify({reversedEventId:id(101)})]);
       assert.equal((await ranking(profiles.a))[0].explanation.shortTerm, 0);
     });
+    await run('refresh without new evidence preserves unequal taste priorities in every mode', async () => {
+      await bootstrap(profiles.a, 'KAJO_CALIBRATION');
+      for (const mode of ['FOR_YOU', 'SURPRISE', 'RISK']) {
+        const before = await ranking(profiles.a, mode);
+        const refreshed = await ranking(profiles.a, mode);
+        assert.ok(before[0].score > before[1].score);
+        assert.deepEqual(refreshed.map(row => [row.item_id, row.score]),
+          before.map(row => [row.item_id, row.score]));
+      }
+    });
+    await run('recent exposure can rotate equal-fit candidates without changing taste or another Profile', async () => {
+      const initial = await ranking(profiles.a);
+      assert.equal(initial[0].score, initial[1].score);
+      const exposed = initial[0].item_id;
+      await actor(users.b);
+      const other = await ranking(profiles.b);
+      await actor(users.a);
+      await db.query(`insert into public.events(profile_id,item_id,event_type)
+        values($1,$2,'ITEM_IMPRESSION')`, [profiles.a, exposed]);
+      const refreshed = await ranking(profiles.a);
+      assert.notEqual(refreshed[0].item_id, exposed);
+      const penalized = refreshed.find(row => row.item_id === exposed);
+      assert.ok(penalized.explanation.impressionCooldownPenalty > 0);
+      assert.equal(penalized.explanation.longTerm, initial[0].explanation.longTerm);
+      assert.equal(penalized.explanation.shortTerm, initial[0].explanation.shortTerm);
+      await actor(users.b);
+      assert.deepEqual((await ranking(profiles.b)).map(row => [row.item_id, row.score]),
+        other.map(row => [row.item_id, row.score]));
+      await actor(users.a);
+      await db.exec("update public.events set occurred_at=now()-interval '31 minutes'");
+      const expired = await ranking(profiles.a);
+      assert.ok(expired.every(row => row.explanation.impressionCooldownPenalty === 0));
+      assert.deepEqual(new Map(expired.map(row => [row.item_id, row.score])),
+        new Map(initial.map(row => [row.item_id, row.score])));
+    });
     await run('Shared base stays isolated from member Personal bootstrap', async () => {
       const before = await ranking(profiles.shared);
       await bootstrap(profiles.a);
