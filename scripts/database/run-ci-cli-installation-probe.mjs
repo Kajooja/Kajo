@@ -43,6 +43,7 @@ import { personalSourceFusionSmokeSql, personalSourceFusionUpgradeSql } from './
 import { personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
 import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
+import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
@@ -156,6 +157,10 @@ try {
     const roundsIndex = files.findIndex(file => file.name.endsWith('_shared_rating_round_evidence.sql'));
     assert.ok(roundsIndex > chainIndex);
     await resetFromMigrations(files.slice(0, roundsIndex));
+    const [hostedTasteUpgrade, hostedTasteChallenge] = await exec(await tasteHostedUpgradeSql(await loadTasteHostedForwards()),
+      { stage: 'catalog-to-owned-taste-populated-chain', timeoutMs: 180_000 });
+    assert.match(hostedTasteUpgrade?.hostedTasteUpgrade, /^PASS: complete reviewed chain/);
+    assert.match(hostedTasteChallenge?.personalTasteChallenge, /^PASS: canonical pre-answer freeze/);
     const [sharedRatingRoundsUpgrade] = await exec(await sharedRatingRoundsUpgradeSql(files[roundsIndex]),
       { stage: 'shared-rating-rounds-populated-upgrade', timeoutMs: 120_000 });
     assert.match(sharedRatingRoundsUpgrade?.sharedRatingRoundsUpgrade, /^PASS: every populated old row/);

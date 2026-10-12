@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — guarded owned mobile Taste acceptance / #238
+## Current packet — guarded hosted Taste upgrade / #333
 
 The owned mobile source is accepted through [#331](https://github.com/Kajooja/Kajo/pull/331),
 merge `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, tree `25ea91d280d407921cbc8a4678cdef58fa9970a4`.
@@ -18,8 +18,32 @@ Its final source `bebd53613a0bc10917feb36b87e9a221dcf2295b` passed all five
 [CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245).
 [#330](https://github.com/Kajooja/Kajo/issues/330) closes the source packet;
 actual matching-backend/APK/device acceptance stays open in #238 and DEVICE_TEST.
-This documentation successor changes no executable, dependency, migration or build inputs.
-Its PR receipt owns the exact documentation head/CI and later main build status.
+Accepted application/build main is `f5d9ce7b6f504075f2fb2edad5f15231f1cea465` through
+#332. All five [CI #653 gates](https://github.com/Kajooja/Kajo/actions/runs/38287730599)
+and its matching APK pass. The current source preparation is
+[#333](https://github.com/Kajooja/Kajo/issues/333), branch `feat/taste-hosted-upgrade`;
+its PR receipt owns publication/CI acceptance. It changes tooling/docs only;
+mobile, dependencies and all existing migration SQL bytes remain unchanged.
+
+The private operator preflight passed against the selected backend. Live project,
+provider-history and function-permission snapshots remain outside the repository.
+The preparation derives its approved catalog-generation reference directly from
+repository SQL in an isolated database, then compares the private checkpoint with
+that reference before emitting a read-only live recheck. Never commit the private
+input or the generated target-specific SQL. Source acceptance and actual hosted
+application remain separate; the new Taste runtime is not yet accepted on the backend.
+
+The [reviewed manifest](../../scripts/database/personal-taste-hosted-upgrade.json)
+fixes **16 unchanged new forwards** and their dependency order/SHA-256.
+The [preparation/rehearsal](../../scripts/database/personal-taste-hosted-upgrade.mjs)
+emits a read-only preflight and a disposable, rollback-only compound upgrade.
+Three local regressions cover missing/reordered/changed SQL; history/body/endpoint
+and security/configuration drift; existing-data denial; old populated rows, frozen evidence and function
+identities/ACLs; private storage/helper boundaries; and the canonical frozen challenge.
+The same populated chain is now included in the native CLI CI job.
+No live DDL or application-data change has occurred. Local root lint/typecheck,
+517 mobile tests and catalogue tests pass; Edge validation then fails on refused
+Deno npm-registry access. Complete final root/native CI belongs to #333's PR receipt.
 
 The earlier #329 main integration accepted all 27 original source PRs. All five
 CI #647/#648 gates and the #648 standalone APK pass. The owner's October 12
@@ -66,14 +90,20 @@ run encountered refused Deno npm-registry access; full local-root success is not
 claimed. No hosted migration, account reset, device round trip or quality admission
 is supplied by these automated results.
 
-**Next action:** verify the actual backend checkpoint and obtain the matching-source
-APK for guarded native acceptance. Reconcile actual hosted migration history before
-proposing any forward application; never replay deployed files or reset accounts.
-Exercise resume/lost reply/restart, movie-to-book transition, unknown after a draft,
-genuine zero, conflict, Profile/client changes, hidden challenge forecasts/results
-and source withdrawal. Record installed SHA/run, device and backend identity in
-DEVICE_TEST/[#238](https://github.com/Kajooja/Kajo/issues/238). Source #330/#331 is
-complete; do not restart its implementation or use the older #648 binary as new-flow evidence.
+**Next action:** complete #333 source verification and obtain authorization for the
+exact 16-forward hosted packet recorded in [#333](https://github.com/Kajooja/Kajo/issues/333). Then refresh its read-only
+preflight and apply only those new files individually in dependency order, recording
+actual provider version/name and unchanged SQL hash after each committed step.
+Stop on any failure or ambiguous acknowledgement; inspect the actual successful
+prefix before preparing recovery. Never replay deployed files, use whole-history
+`db push`/name-only repair, reset accounts or activate Working/cohort/model learning.
+
+After actual hosted acceptance, use the #653 matching APK for DEVICE_TEST/#238:
+resume/lost reply/restart, movie-to-book transition, unknown after a draft, genuine
+zero, conflict, Profile/client changes, hidden challenge forecasts/results and
+source withdrawal. Preserve completed setup and use an authorized eligible owner;
+do not reset existing taste to force this flow. Record installed SHA/run, device/OS
+and backend identity. Source #330/#331 is complete; do not restart its implementation.
 Canonical unseen preview follows this consumer. Anonymous identity/lifecycle/
 abuse/measurement still precede real anonymous entry; later answer projection,
 observed usefulness, genuine #232F, Shared rollout and all incomplete MVP gates remain open.
@@ -99,21 +129,19 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The #331 main push started [CI #651](https://github.com/Kajooja/Kajo/actions/runs/38287239357),
-including its automatic standalone APK stage after all five jobs. That new build
-is still running at this acceptance receipt; no matching new APK is claimed yet.
-The documentation PR receipt retains subsequent main CI/build status.
+Accepted main [CI #653](https://github.com/Kajooja/Kajo/actions/runs/38287730599)
+passed all five required gates and the standalone APK job. The binary's exact source
+is `f5d9ce7b6f504075f2fb2edad5f15231f1cea465`, tree
+`43a02e520c2caa465723211163484f50091e16a8`; it includes the owned mobile consumer.
+The #333 preparation changes no compiled mobile or dependency inputs.
 
-The latest verified binary at this checkpoint is accepted main [CI #648](https://github.com/Kajooja/Kajo/actions/runs/38262881349),
-source `9237b3814b2b408a43ec8abb664c3a6c0a57baca`, tree
-`80862d9b9a1e1cea5d062be3d1fddb237ff45658`. All five required gates and APK job passed.
-
-[APK artifact](https://github.com/Kajooja/Kajo/actions/runs/38262881349/artifacts/11755916831):
-49,239,510-byte ZIP, archive SHA-256
-`321329404a0ff9b99d0dc9c3bf37506c416379b033f26b1305f430d2c44285dc`,
-expires **2026-10-19 15:12:12 UTC**. This digest identifies the archive, not the extracted APK.
-It predates the #330 mobile consumer; do not attribute that new flow to this binary.
-The earlier #324 artifact remains historical source/build evidence.
+[APK artifact](https://github.com/Kajooja/Kajo/actions/runs/38287730599/artifacts/11767100629):
+49,258,173-byte ZIP, archive SHA-256
+`271f6860f58d817a76227d55c9f3a38e8983a4501bf3c6b282a07b3bb0050869`,
+expires **2026-10-19 18:34:20 UTC**. This identifies the archive, not the extracted APK.
+The older #648/#324 binaries are historical. Until the new backend RPCs are actually
+installed, this binary intentionally falls back to legacy calibration; that is not
+new adaptive-flow acceptance.
 
 [DEVICE_TEST](DEVICE_TEST.md) owns native acceptance. Record installed SHA/run,
 device and backend checkpoint. A successful source/build check is not an
