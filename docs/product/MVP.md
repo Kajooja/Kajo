@@ -22,9 +22,11 @@ The completed Personal source-fusion/forgetting source reconciles canonical
 rating revisions versus bootstrap, preserves zero/neutral and selective Undo/clear,
 and distinguishes effective native strong setup support from known Taste ratings.
 This is a correctness foundation, not measured first-session usefulness or a
-server-backed anonymous TasteSession. The current owned server TasteSession and
-frozen ordinal challenge are source foundations; app integration, anonymous entry
-and measured usefulness remain open. All release acceptance below remains required.
+server-backed anonymous TasteSession. The owned server TasteSession, frozen ordinal
+challenge and #331 owned mobile consumer are accepted source foundations;
+anonymous entry, device acceptance and measured usefulness remain open. All release
+acceptance below remains required. Guarded preparation and source compatibility
+are engineering prerequisites, not evidence closing a release requirement.
 
 ## MVP completion meaning
 
