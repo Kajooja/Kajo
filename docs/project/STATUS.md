@@ -22,7 +22,8 @@ Accepted application/build main is `f5d9ce7b6f504075f2fb2edad5f15231f1cea465` th
 #332. All five [CI #653 gates](https://github.com/Kajooja/Kajo/actions/runs/38287730599)
 and its matching APK pass. The guarded source preparation is accepted through
 [#334](https://github.com/Kajooja/Kajo/pull/334), tracked by
-[#333](https://github.com/Kajooja/Kajo/issues/333). The current source repair,
+[#333](https://github.com/Kajooja/Kajo/issues/333). The current source repair is
+[#335](https://github.com/Kajooja/Kajo/pull/335),
 branch `fix/taste-guard-compatibility`, adds an append-only compatibility bridge
 for the immutable Prediction artifact guard. All previously reviewed migration
 SQL and the original forward manifest remain unchanged; mobile and dependencies
