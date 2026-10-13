@@ -12,6 +12,13 @@ export const tasteHostedManifest = JSON.parse(await readFile(new URL('personal-t
 const quote = value => "'" + value.replaceAll("'", "''") + "'";
 const hash = value => createHash('sha256').update(value).digest('hex');
 
+// Exact source identities only. A compact body is recognized so preflight can
+// demand the separate append-only compatibility bridge, never normalize drift.
+const originalGuardSql=await readFile(new URL('../../supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql',import.meta.url),'utf8');
+export const tasteImmutableGuardCanonicalBody=originalGuardSql.match(/create or replace function private\.reject_immutable_prediction_artifact_change_v1\(\)[\s\S]*?as \$\$([\s\S]*?)\$\$;/i)?.[1];
+assert.ok(tasteImmutableGuardCanonicalBody,'Canonical immutable guard source missing');
+export const tasteImmutableGuardCompactBody=" begin raise exception '% is immutable; create a new versioned row instead', tg_table_name using errcode = '55000'; end; ";
+
 export function validateTasteHostedForwards(files) {
   assert.equal(files.length, tasteHostedManifest.forwards.length, 'Expected the exact reviewed forward chain');
   files.forEach((file, index) => {
@@ -70,7 +77,7 @@ export async function tasteHostedPreflightSql(checkpoint) {
   assert.deepEqual(functions,await tasteCatalogFunctionReference(),'Observed bodies/security must match the reviewed repository generation');
   return `begin read only;
     set local statement_timeout='10s';set local search_path=pg_catalog;
-    do $preflight$ declare history_digest text; history_count bigint; installed record; f jsonb;
+    do $preflight$ declare history_digest text; history_count bigint; installed record; f jsonb; guard pg_catalog.pg_proc%rowtype;
     begin
       if split_part(current_setting('server_version'),'.',1)::integer<>${target.postgresMajor} then
         raise exception 'Hosted Taste PostgreSQL generation changed';end if;
@@ -90,6 +97,19 @@ export async function tasteHostedPreflightSql(checkpoint) {
           or installed.proacl::text is distinct from f->>'acl' then
           raise exception 'Hosted Taste function security/configuration drift: %',f->>'signature';end if;
       end loop;
+      select p.* into guard from pg_catalog.pg_proc p
+        where p.oid=pg_catalog.to_regprocedure('private.reject_immutable_prediction_artifact_change_v1()');
+      if not found or guard.prosecdef or guard.prokind<>'f'
+        or guard.prorettype<>'pg_catalog.trigger'::pg_catalog.regtype
+        or guard.prolang<>(select oid from pg_catalog.pg_language where lanname='plpgsql')
+        or pg_catalog.pg_get_userbyid(guard.proowner)<>'postgres'
+        or guard.proconfig is distinct from array['search_path=""']::text[]
+        or guard.proacl::text is distinct from '{postgres=X/postgres}' then
+        raise exception 'Hosted Taste immutable guard security/configuration drift';end if;
+      if guard.prosrc=${quote(tasteImmutableGuardCompactBody)} then
+        raise exception 'Hosted Taste immutable guard requires the exact compatibility bridge before forwards';end if;
+      if guard.prosrc is distinct from ${quote(tasteImmutableGuardCanonicalBody)} then
+        raise exception 'Hosted Taste immutable guard source drift';end if;
       if to_regprocedure('public.get_profile_bootstrap_status_v1(uuid)') is null
         or to_regprocedure('public.taste_session_v1(jsonb)') is not null
         or to_regprocedure('public.taste_challenge_v1(jsonb)') is not null then

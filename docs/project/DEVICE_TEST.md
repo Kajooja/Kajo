@@ -6,11 +6,12 @@ Owned source #330 is accepted in [#331](https://github.com/Kajooja/Kajo/pull/331
 merge `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, tree `25ea91d280d407921cbc8a4678cdef58fa9970a4`,
 after all five [CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245).
 Use the matching accepted-main #653 APK recorded in [STATUS](STATUS.md); all five
-CI gates and the binary build pass. The privately checked backend has not yet accepted the new Taste runtime. #333
-prepares the exact source chain; target-specific metadata stays outside Git.
-Until that chain
-is authorized, applied and verified, legacy fallback is expected and cannot count
-as adaptive-flow acceptance. Install as an update preserving existing data;
+CI gates and the binary build pass. #333 owns the guarded source procedure and its
+separate append-only immutable-guard compatibility bridge. Operator-specific
+inputs and results stay outside Git. Run the adaptive-flow cases only after the
+operator verifies the required backend RPC versions for the exact installed
+binary. Legacy fallback cannot count as adaptive-flow acceptance.
+Install as an update preserving existing data;
 do not reset an account/Profile to force the test. Use an authorized eligible owner.
 
 Record actual acceptance here and in #238; #330's source packet is complete.
@@ -31,7 +32,8 @@ Record actual acceptance here and in #238; #330's source packet is complete.
 6. Confirm removal and source withdrawal. Challenge-only removal preserves training
    ratings; session removal withdraws its source. Past request IDs do not resurrect it.
 
-Record installed SHA/run, device/OS, backend history and actual observed cases.
+Record installed SHA/run, device/OS and actual observed cases. Retain the
+target-bound backend checkpoint privately.
 Automated screen/controller/SQL contract tests do not establish gesture or device acceptance.
 
 ## Source integration and current device scope — 2026-10-12
@@ -41,7 +43,9 @@ accepted through #329 and the owned mobile consumer through #331.
 The earlier instructions below to keep #229 draft are historical and superseded
 for source integration. No new phone observation is supplied by that approval.
 Current source/build identity belongs to [STATUS](STATUS.md); the latest verified
-accepted-main APK is #653, recorded there; it contains #331. Backend #333 and actual device gates remain open; older artifacts below are dated evidence.
+accepted-main APK is #653, recorded there; it contains #331. #333 owns backend
+preparation; actual device acceptance remains open. Older artifacts below are
+dated evidence.
 Keep unobserved reconnect/provenance/process-death, fresh-account and Shared cases
 open with #238. Record installed binary/run, device and backend checkpoint when
 exercising them. Preserve prior positive observations and existing account data.

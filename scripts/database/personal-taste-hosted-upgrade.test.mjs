@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { loadTasteHostedForwards, validateTasteHostedForwards, tasteHostedPreflightSql, tasteHostedUpgradeSql, tasteCatalogFunctionReference } from './personal-taste-hosted-upgrade.mjs';
+import { loadTasteHostedForwards, validateTasteHostedForwards, tasteHostedPreflightSql, tasteHostedUpgradeSql, tasteCatalogFunctionReference, tasteImmutableGuardCompactBody } from './personal-taste-hosted-upgrade.mjs';
 
 async function catalogDatabase() {
   const db=new PGlite();
@@ -61,6 +61,15 @@ test('read-only hosted preflight rejects history, body and endpoint drift (isola
       historyCount:0,historyMd5:'d751713988987e9331980363e24189ce'}});
     const result=(await db.exec(isolated)).flatMap(r=>r.rows.map(row=>row.snapshot));
     assert.match(result[0]?.hostedTastePreflight,/^PASS: observed history/);
+    const guard=(await db.query("select pg_get_functiondef(oid) definition,prosrc from pg_proc where oid='private.reject_immutable_prediction_artifact_change_v1()'::regprocedure")).rows[0];
+    await db.exec(guard.definition.replace(guard.prosrc,()=>tasteImmutableGuardCompactBody));
+    await assert.rejects(db.exec(isolated),/exact compatibility bridge before forwards/);await db.exec('rollback;');
+    await db.exec(guard.definition.replace(guard.prosrc,()=>guard.prosrc+'\n-- unreviewed immutable guard'));
+    await assert.rejects(db.exec(isolated),/immutable guard source drift/);await db.exec('rollback;');
+    await db.exec(guard.definition);
+    await db.exec('grant execute on function private.reject_immutable_prediction_artifact_change_v1() to authenticated;');
+    await assert.rejects(db.exec(isolated),/immutable guard security\/configuration drift/);await db.exec('rollback;');
+    await db.exec('revoke execute on function private.reject_immutable_prediction_artifact_change_v1() from authenticated;');
     const f=(await db.query("select pg_get_functiondef(oid) definition,prosrc from pg_proc where oid='private.rank_items_v0(uuid,text,text,integer,jsonb)'::regprocedure")).rows[0];
     await db.exec(f.definition.replace(f.prosrc,()=>f.prosrc+'\n-- unreviewed source'));
     await assert.rejects(db.exec(isolated),/source drift/);await db.exec('rollback;');
