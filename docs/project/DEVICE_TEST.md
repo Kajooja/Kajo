@@ -631,3 +631,25 @@ new card controls (#239) for later application work while development moves on.
 No fresh-account acceptance, measured 15-second latency or exhaustive native
 callback/exposure concurrency proof is invented from the general positive report.
 No reset is requested. E1 #235 is now the independent source continuation.
+
+
+## Committed-action Discovery refresh — #338 / 2026-10-15
+
+Source regression only; actual matching-build observation remains open. Record
+installed source/run, device/OS and the actual backend checkpoint before testing.
+
+1. In Personal Discovery, submit a meaningful rating and delay/block the write
+   response long enough for the optimistic refresh to occur. Retain the pending
+   command; do not reset the account or submit duplicate replacement commands.
+2. Restore the connection. After the same command is acknowledged, verify a new
+   recommendation request/origin uses the committed response even if the visible
+   rating does not change. Check zero/neutral and explicit not-interest/Undo with
+   appropriate existing Items. A new forecast may legitimately keep the same order.
+3. Switch Profile/session during a pending request. Its late acknowledgement must
+   not replace the currently active Profile's recommendations; return/retry stays
+   scoped to the original durable command.
+4. Confirm a rejected/pending write is still reported as pending, and List/history
+   commands retain their single acknowledged refresh and correct delivered origins.
+
+Automated provider/outbox and reader tests prove the source transition, not native
+network timing, actual prediction quality or full sequential Taste acceptance.

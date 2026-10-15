@@ -59,6 +59,10 @@ tests and activation; the portable core and Shared forecast consumer are separat
 
 ## Reconciled delivery and recovery source — #229 / #240
 
+- `ItemInteractionContext.tsx` invalidates ranking on each current-scope committed
+  Item/collection receipt, including an unchanged optimistic interaction; its
+  provider/outbox regression covers delayed 0/5/10 acknowledgements, rejection
+  and stale Profile responses (#338 source, device acceptance separate).
 - `predictionPageOperations.ts`, `predictionPageReader.ts`, `usePredictionRanking.ts`:
   preserved protocol-2 compatibility/recovery: captured scope, immutable pages and exact transport retry; one native
   reachability listener per focused foreground reader, bounded reconnect attempts.
