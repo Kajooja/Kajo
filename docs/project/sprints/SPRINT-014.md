@@ -7120,3 +7120,48 @@ Durable v2 commands still own revision/first-measurement/pending-pair/projected
 prefix/retry/withdrawal semantics, followed by mobile partial-readiness continuation
 into Discovery. No hosted migration, account reset, new model/Working/population
 activation or device observation is supplied. STATUS remains the one handoff.
+
+
+## Durable sequential Taste v2 — 2026-10-15 / #336
+
+Accepted predecessor #340 merged as `baf190fed5350e0323844518f483960dd5b2f73c`
+after all five final-source CI #663 gates (run `38714352914`); source
+`587ce886bb9fa5e7e987e5e208a56536f7b7a788`, tree
+`9b8606fe0ff4058f311fbbd9dc915c2452bf0656`. This closes the canonical explicit-pool
+scoring prerequisite, not #336 or native/mobile acceptance.
+
+`feat/durable-sequential-taste` adds the owned v2 session/panel/command boundary.
+Its separate committed forecast → measured first answer → evidence → NEXT loop
+consumes the accepted canonical evaluator. Receipt timestamp plus transaction
+identity closes same-transaction and older waiting-transaction leakage. Selection
+matches the portable numeric reference over actual canonical panels. Original
+measurements are immutable; later same-domain labels complete comparisons from
+one common earlier unseen pool. Exact retry/CAS, correction and source-withdrawal
+closure retain auditable learning without relabelling prior evaluations.
+
+Numeric ratings and explicit not-interest update canonical priors. Negative
+interest has its own null-rating kind restricted to this source and uses the
+existing bootstrap/native trust ratio; UNKNOWN remains recognition only. Three
+whole-body guarded helper extensions preserve all existing kind values and
+function metadata. Selective external bootstrap removal, Event reversal/erasure,
+import removal and Prediction erasure invalidate copied panels/replies. Whole
+removal is terminal; stale retries cannot restore it. Old v1/completed setup
+remains intact and a competing old writer is rejected.
+
+Readiness deliberately remains INSUFFICIENT in this continuous-learning source
+stage. Finite opportunity/command budgets prevent endless required testing;
+PAUSE/CONTINUE preserves the same Profile. Full readiness admission, mobile v2
+queue/navigation, anonymous entry and matching hosted/device/quality observations
+are not delivered by this packet. The owner's October 15 attention clarification
+is recorded in DATA_EVENTS/PREDICTION_MODEL: existing detail dwell is weak evidence;
+complete visible-item/stop/foreground timing and Scenario consumption remain
+separate work. The immediate priority is an evolving per-choice forecast.
+
+All 256 database tests (17 focused sequential tests), 522 mobile tests, 284 engine
+tests, lint/typecheck, catalog/research/acceptance suites and four native exports
+pass locally. The native CLI gate adds independent connection/observed-lock probes
+and exact fixture cleanup. Final-source CI is tracked in the successor PR; local
+Deno registry refusal is an environment limitation, not a passing gate. Updated canonical owners are STATUS,
+ROADMAP, MVP, DATA_EVENTS, PREDICTION_MODEL and CODEMAP. No release ID or complete
+EB-03/EB-08 capability closes, and no hosted/account/model activation occurs.
+STATUS owns the one continuation: finish this source acceptance, then mobile v2.
