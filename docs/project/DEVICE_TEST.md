@@ -1,5 +1,50 @@
 # Collection device checkpoint — #228 / #229
 
+## Sequential Taste v2 acceptance — #336 / #342 / 2026-10-15
+
+The mobile consumer is accepted through [#342](https://github.com/Kajooja/Kajo/pull/342),
+main `c776de5fcdb62c72216b25a955a8c4b8685b2580`.
+All five gates and the standalone APK pass in
+[CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140).
+[STATUS](STATUS.md) owns the matching APK artifact, archive digest and expiry.
+These are source/build receipts; no v2 phone observation is recorded here.
+
+The October 15 read-only backend check found v1 installed and v2 absent. The
+original 16-forward chain and immutable-guard bridge are already installed;
+do not replay them. Before testing v2, reconcile the private actual checkpoint
+with the separately reviewed sequential successor, then verify the installed
+`taste_session_v2(jsonb)` contract and canonical evaluation dependency. An APK
+running its deliberate v1 fallback does not accept the sequential flow.
+
+Install the matching APK as an update, preserving current accounts, Profiles,
+local pending commands and server sessions. Use an authorized eligible owner for
+a new v2 session; an existing completed setup or v1 session must stay preserved,
+not be reset to make it eligible. Cases needing a second client or controlled
+post-commit reply loss remain **NOT TESTED** unless those conditions are available.
+
+| Case | Required observation |
+|---|---|
+| 1 — preserved state | Updating/restarting preserves completed setup and an existing v1 session, pending command or frozen challenge. An eligible new session begins only after **Aloita makutesti** and uses v2. A preserved v1 flow retains its earlier semantics. |
+| 2 — response meaning | Deliberate 0, 5 and 10 save as distinct ratings. After moving the rating control, **En tunne** saves UNKNOWN without the draft rating; **Ei kiinnosta** remains explicit NOT_INTERESTED. Saved-answer progress follows acknowledgement. The pre-answer forecast stays server-owned. |
+| 3 — slow ANSWER | Delay an ANSWER acknowledgement. A second answer and **Jatka selaamaan** cannot bypass the pending command. Only after acknowledgement and a fresh current-state read may the separate NEXT select/forecast the next question. Confirm the later forecast uses the committed prefix; unchanged ordering is allowed. |
+| 4 — lost ANSWER | After the server commits ANSWER, lose its reply and terminate/restart the app. Recovery retries the identical request ID/body before NEXT, with one accepted answer/projection and no duplicate question. Ordinary disconnection alone does not prove post-commit reply loss. |
+| 5 — lost NEXT / multiple clients | Lose the reply after NEXT commits; let another authorized client answer that question before retry. The retained NEXT ID replays, then RESUME displays the server's current question. The cached card never returns as answerable; a further concurrent advance offers an explicit retry without an automatic loop. |
+| 6 — partial Taste → Discovery | Before full support, **Jatka selaamaan** commits PAUSE and persists dismissal before opening Discovery on the same PersonalProfile. Lose the PAUSE reply and restart: retry preserves the exact command, then dismissal survives another restart. A remotely paused session offers explicit **Jatka makutestiä**. |
+| 7 — continued learning | After case 6, verify accepted Taste evidence is still attached to the same Profile. Submit a meaningful Discovery choice with a delayed acknowledgement: the acknowledged commit causes a fresh recommendation request using committed evidence. Existing delivered origins remain immutable. Repeat for zero/neutral and explicit negative interest where appropriate; score/order need not change after every answer. |
+| 8 — conflict and scope | With two clients, submit a stale question/revision. **Lataa nykyinen vaihe** reloads explicitly; the old answer never rebases onto a new Item. Switch Profile/client or background/restart during a request: late callbacks cannot change another scope. |
+| 9 — source removal | With an authorized second client, withdraw/correct the source or remove the session while the first retains an old response. Reload/retry honors withdrawal or the terminal removal; no cached command revives the answer, forecast copies or bootstrap source. Session removal preserves the Profile and unrelated history. |
+| 10 — honest support and native controls | New v2 progress reports saved answers and provisional/INSUFFICIENT support. There is no fixed-answer success rule, fabricated accuracy/confidence percentage or mandatory extra v1 challenge. Check rating control, buttons, scrolling and error/retry copy on the installed device, including enlarged text. |
+
+Record the installed source/run and extracted APK checksum, device/OS, actual
+backend migration/protocol checkpoint and pass/fail/NOT TESTED per case in the
+private operator receipt; publish only redacted observations here and in #238.
+Do not substitute the ZIP digest for the installed APK checksum. Malformed replies,
+unwritable local storage and acknowledgement-write failure have automated coverage;
+record any controlled native exercise separately without claiming it from CI.
+Matching hosted/device acceptance and measured usefulness remain open. The
+historical v1 matrix and earlier positive device observations below retain their
+original scope.
+
 ## Owned mobile Taste consumer acceptance — #330 / 2026-10-12
 
 Owned source #330 is accepted in [#331](https://github.com/Kajooja/Kajo/pull/331),

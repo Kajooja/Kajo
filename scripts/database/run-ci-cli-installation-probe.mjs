@@ -46,6 +46,7 @@ import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
+import { loadSequentialTasteHostedForwards, sequentialTasteHostedUpgradeSql } from './personal-sequential-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
 import { verifyPersonalWorkingProspectiveConcurrency } from './personal-working-prospective-concurrency.mjs';
@@ -254,6 +255,17 @@ try {
     const [personalSourceFusionUpgrade] = await exec(await personalSourceFusionUpgradeSql(files[sourceFusionIndex]),
       { stage: 'personal-source-fusion-populated-upgrade', timeoutMs: 120_000 });
     assert.match(personalSourceFusionUpgrade?.personalSourceFusionUpgrade, /^PASS: old duplicate contribution/);
+    const evaluationIndex = files.findIndex(file => file.name.endsWith('_personal_evaluation_scoring.sql'));
+    assert.ok(evaluationIndex > sourceFusionIndex);
+    await resetFromMigrations(files.slice(0, evaluationIndex));
+    const [sequentialTasteHostedUpgrade] = await exec(
+      await sequentialTasteHostedUpgradeSql(await loadSequentialTasteHostedForwards()),
+      { stage: 'v1-to-sequential-taste-populated-upgrade', timeoutMs: 180_000 });
+    assert.match(sequentialTasteHostedUpgrade?.sequentialTasteHostedUpgrade, /^PASS: exact two-forward chain/);
+    const [sequentialTasteHostedCompactUpgrade] = await exec(
+      await sequentialTasteHostedUpgradeSql(await loadSequentialTasteHostedForwards(), { bootstrapVariant: 'COMPACT_V1' }),
+      { stage: 'v1-compact-to-sequential-taste-populated-upgrade', timeoutMs: 180_000 });
+    assert.match(sequentialTasteHostedCompactUpgrade?.sequentialTasteHostedUpgrade, /^PASS: exact two-forward chain/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -409,7 +421,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation,
-      personalSequentialTaste,
+      personalSequentialTaste, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
