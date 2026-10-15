@@ -165,7 +165,7 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   useLayoutEffect(() => { flow.start(); return () => flow.stop(); }, [flow]);
   const state = snapshot ?? flow.snapshot();
   const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));
-  const identity = `${state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.challenge?.revision ?? state.session?.revision ?? ''}:${challengeItem?.id ?? state.session?.item?.id ?? ''}`;
+  const identity = `${state.sequential?.sessionId ?? state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.sequential?.revision ?? state.challenge?.revision ?? state.session?.revision ?? ''}:${state.sequential?.questionId ?? challengeItem?.id ?? state.session?.item?.id ?? ''}`;
   const committedIdentity = useRef(identity);
   useLayoutEffect(() => { committedIdentity.current = identity; setDraftRating(null); setConfirmRemoval(false); }, [identity]);
   const current = () => committedIdentity.current === identity;
@@ -176,6 +176,8 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
     if (!current()) return;
     if (state.challenge && challengeItem && state.challenge.revision !== null) {
       flow.answerChallenge(challengeItem.id, answer, state.challenge.revision);
+    } else if (state.sequential?.item && state.sequential.revision !== null) {
+      flow.answerTraining(answer, state.sequential.item.id, state.sequential.revision);
     } else if (state.session?.item && state.session.revision !== null) {
       flow.answerTraining(answer, state.session.item.id, state.session.revision);
     }
@@ -186,9 +188,9 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
     onBooks={() => { if (current() && state.session?.revision !== null && state.session) flow.acknowledgeBooks(state.session.revision); }}
     onChallenge={() => { if (current()) flow.startChallenge(); }}
     onRetry={() => flow.retry()} onReload={() => flow.recoverConflict()} onOpenImport={onOpenImport}
-    onContinue={() => { if (!current() || state.busy) return; if (flow.dismiss()) onCompleted(); else onFailOpen(); }}
+    onContinue={() => { if (!current() || state.busy) return; if (flow.dismiss()) onCompleted(); }}
     onAskRemoval={() => setConfirmRemoval(true)} onCancelRemoval={() => setConfirmRemoval(false)}
-    onRemove={() => { const revision = state.challenge?.revision ?? state.session?.revision;
+    onRemove={() => { const revision = state.sequential?.revision ?? state.challenge?.revision ?? state.session?.revision;
       if (current() && revision !== undefined && revision !== null) flow.remove(revision); }} />;
 }
 

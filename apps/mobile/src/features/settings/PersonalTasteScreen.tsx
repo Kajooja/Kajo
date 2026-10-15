@@ -16,12 +16,12 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
   onCancelRemoval: () => void; onRemove: () => void;
 }) {
   const styles = createStyles(theme);
-  const { session, challenge } = state;
-  const current = challenge?.status === 'ACTIVE' ? challenge.items.find(i => !challenge.answers.some(a => a.itemId === i.id))
+  const { session, challenge, sequential } = state;
+  const current = sequential?.status === 'QUESTION' ? sequential.item : challenge?.status === 'ACTIVE' ? challenge.items.find(i => !challenge.answers.some(a => a.itemId === i.id))
     : !challenge && session?.status === 'ACTIVE' && session.decision?.kind === 'QUESTION' ? session.item : null;
   const intro = state.needsStart || !challenge && session?.status === 'ACTIVE' && !begun && session.counts?.answered === 0;
   const unavailable = challenge?.status === 'CATALOG_UNAVAILABLE' || session?.status === 'CATALOG_UNAVAILABLE';
-  const removed = challenge?.status === 'REMOVED' || session?.status === 'REMOVED';
+  const removed = sequential?.status === 'REMOVED' || challenge?.status === 'REMOVED' || session?.status === 'REMOVED';
   const disabled = state.busy || state.pending || state.blocked;
   function button(label: string, onPress: () => void, primary = false, blocked = disabled) {
     return <Pressable accessibilityRole="button" disabled={blocked} onPress={onPress}
@@ -34,7 +34,7 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
       <View style={styles.brand}><KajoMark /></View>
       <View style={styles.panel}>
         <Text style={styles.kicker}>{challenge ? 'KAJON ENNUSTEHAASTE' : 'OMA KAJO · MAKUTESTI'}</Text>
-        {!session && !challenge && !state.needsStart ? <>
+        {!sequential && !session && !challenge && !state.needsStart ? <>
           <Text style={styles.title}>Haetaan makutestin jatkoa</Text>
           <Text style={styles.body}>Kajo palauttaa palvelimelle tallennetun vaiheesi.</Text>
         </> : removed ? <>
@@ -48,12 +48,14 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
           {button('Jatka Kajoon', onContinue, true)}
         </> : intro ? <>
           <Text style={styles.title}>Anna Kajolle lähtötuntuma</Text>
-          <Text style={styles.body}>Ensin elokuvia, sitten kirjoja. Arvioi vain tuntemiasi teoksia asteikolla 0–10. Tuntemattoman voi aina ohittaa.</Text>
-          <Text style={styles.body}>Kajo valitsee seuraavan kortin vastaustesi perusteella. Kierros päättyy viimeistään 24 korttiin. Vastaukset tallentuvat yksi kerrallaan.</Text>
+          <Text style={styles.body}>Arvioi tuntemiasi elokuvia ja kirjoja asteikolla 0–10. Tuntemattoman voi aina ohittaa.</Text>
+          <Text style={styles.body}>{session ? 'Ensin elokuvia, sitten kirjoja. Tämä aiemmin aloitettu kierros päättyy viimeistään 24 korttiin.'
+            : 'Jokainen vastaus auttaa valitsemaan seuraavan kortin. Voit siirtyä selaamaan milloin vain; Kajo jatkaa oppimista samalla profiililla.'}</Text>
           {button('Tuo historia', onOpenImport)}
           {button('Aloita makutesti', onBegin, true)}
+          {!session ? button('Jatka selaamaan', onContinue) : null}
         </> : current ? <>
-          <Text style={styles.progress}>{challenge ? `${challenge.answers.length + 1}/${challenge.items.length} · ennuste on lukittu`
+          <Text style={styles.progress}>{sequential ? `Tallennettuja vastauksia: ${sequential.answered} · ennuste päivittyy` : challenge ? `${challenge.answers.length + 1}/${challenge.items.length} · ennuste on lukittu`
             : `${session?.counts?.presented ?? 0}/24 korttia · arvioita ${session?.counts?.knownRatings ?? 0}`}</Text>
           <Text style={styles.kicker}>{current.itemType === 'MOVIE' ? 'ELOKUVA' : 'KIRJA'}</Text>
           <Text style={styles.title}>{current.title}</Text>
@@ -62,7 +64,18 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
           {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
           {button('En tunne', () => onAnswer({ kind: 'UNKNOWN' }))}
           {button('Ei kiinnosta', () => onAnswer({ kind: 'NOT_INTERESTED' }))}
+          {sequential ? <>
+            <Text style={styles.help}>Ennuste on vielä alustava. Myös selaamisen aikana tekemäsi valinnat tarkentavat sitä.</Text>
+            {button('Jatka selaamaan', onContinue)}
+          </> : null}
           {challenge ? <Text style={styles.help}>Haasteen ensimmäinen vastaus lukitaan. Haaste ei lisää vastauksia makutestin oppimisaineistoon.</Text> : null}
+        </> : sequential ? <>
+          <Text style={styles.title}>{sequential.status === 'PAUSED' ? 'Makutesti on tauolla'
+            : sequential.status === 'STOPPED' ? 'Jatketaan tutustumista selaamalla' : 'Päivitetään seuraavaa kysymystä'}</Text>
+          <Text style={styles.body}>Ennuste on vielä alustava. Tallennetut vastaukset säilyvät, ja uudet valintasi tarkentavat ennustetta samalla profiililla.</Text>
+          {sequential.status === 'PAUSED' ? button('Jatka makutestiä', onBegin, true) : null}
+          {sequential.status === 'NEEDS_NEXT' ? button('Hae seuraava kysymys', onRetry, true) : null}
+          {button('Jatka selaamaan', onContinue, sequential.status === 'STOPPED')}
         </> : !challenge && session?.decision?.kind === 'TRANSITION' ? <>
           <Text style={styles.title}>Seuraavaksi kirjat</Text>
           <Text style={styles.body}>Elokuvavaihe on valmis. Jatketaan kirjoihin; tuntemattoman voi edelleen ohittaa.</Text>
@@ -84,12 +97,13 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
           <Text style={styles.body}>{state.message}</Text>
           {state.conflict ? button('Lataa nykyinen vaihe', onReload, true, state.busy)
             : button('Yritä uudelleen', onRetry, true, state.busy)}
-          {button('Jatka Kajoon', onContinue, false, state.busy)}
+          {button(sequential ? 'Jatka selaamaan' : 'Jatka Kajoon', onContinue, false, disabled)}
         </View> : null}
         {state.busy ? <ActivityIndicator accessibilityLabel="Tallennetaan makutestin vaihetta" color={theme.base.textPrimary} /> : null}
-        {!removed && (session?.revision !== null && session || challenge?.revision !== null && challenge) ?
+        {!removed && (sequential?.revision !== null && sequential || session?.revision !== null && session || challenge?.revision !== null && challenge) ?
           confirmRemoval ? <>
             <Text style={styles.body}>{challenge ? 'Poistetaanko haasteen vastaukset ja lukitut ennusteet? Makutestin arviot säilyvät.'
+              : sequential ? 'Poistetaanko makutestin vastaukset ja niiden vaikutus ennusteeseen? Tätä kierrosta ei voi aloittaa uudelleen.'
               : 'Poistetaanko makutestin arviot ja siihen liittyvä haaste? Tätä kierrosta ei voi aloittaa uudelleen.'}</Text>
             {button(challenge ? 'Vahvista haasteen poisto' : 'Vahvista makutestin poisto', onRemove)}
             {button('Peruuta poisto', onCancelRemoval)}

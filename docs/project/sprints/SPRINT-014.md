@@ -7165,3 +7165,47 @@ Deno registry refusal is an environment limitation, not a passing gate. Updated 
 ROADMAP, MVP, DATA_EVENTS, PREDICTION_MODEL and CODEMAP. No release ID or complete
 EB-03/EB-08 capability closes, and no hosted/account/model activation occurs.
 STATUS owns the one continuation: finish this source acceptance, then mobile v2.
+
+
+## Sequential Taste mobile consumer — 2026-10-15 / #336
+
+The #341 predecessor is accepted with the owner's explicit approval: source
+`e1451ba28745704efeb6d429a25a84f8e9e69e0e`, tree
+`84f2d319124b7a18d991141e8a40f5707a9ffcff`, merge
+`b55990d3a3f6b007b5c62a674022129d7a74d2b1`. All five CI #666 gates
+(run `38724558470`) passed, including native independent-connection probes.
+
+`feat/sequential-taste-mobile` extends the existing service/queue/screen/gate.
+New sessions use v2, with separate committed START/ANSWER/NEXT RPCs and a fresh
+RESUME after acknowledgement. Exact command IDs survive missing replies and
+SQLite acknowledgement failure. The next command is persisted only after a
+confirmed current state; conflicts do not rebase answers. A bounded automatic
+NEXT and explicit later retry prevent unbounded cross-device command loops.
+V1 local records upgrade in place while preserving pending payloads, sessions,
+frozen challenges and completed setup; only a missing first RPC or explicit
+legacy-preservation receipt permits the older protocol.
+
+The sequential screen uses saved-answer progress and honest initial support.
+**Jatka selaamaan** commits PAUSE and persists dismissal before releasing the
+same Profile's app, without a fixed quota or a required v1 challenge. A remote
+pause offers explicit continuation. Pending writes cannot escape through the
+old fail-open callback. Acknowledged evidence invalidates mounted predictions;
+server withdrawal/removal supersedes cached replies. No forecasts, histories or
+private evidence are copied to SQLite.
+
+Validation includes actual current-schema SQL/mobile RPC round trips with separate
+transactions, 0/5/10/unknown/not-interest, increasing committed forecast prefixes,
+exact retry, pause/continue, source withdrawal and terminal removal. Controlled
+component tests execute actual gate callbacks, including delayed PAUSE and the
+same-Profile handoff. Native gesture/layout/network round trips are unobserved;
+no emulator or real device is available. Local checks pass: 544 mobile, 257 database and 284 engine tests, full lint/typecheck,
+dependency/catalog/research/acceptance suites, and all four iOS/Android exports
+with non-live public-shaped fixture configuration. The PR owns the exact
+source/tree/final-CI receipt.
+
+Changed canonical owners: STATUS, ROADMAP, MVP, LAUNCH_LOOP, PREDICTION_MODEL and
+CODEMAP. No release ID or full EB capability closes. No schema/dependency change,
+hosted migration, account reset, model admission or attention sweep is included.
+Next after source acceptance: matching guarded backend/build/device continuation
+for acknowledged actions, offline retry, restart and partial Discovery freshness;
+full readiness and measured usefulness remain open before release acceptance.

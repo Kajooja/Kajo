@@ -165,9 +165,20 @@ learning. The same PersonalProfile keeps learning from canonical Discovery actio
 and its support/readiness remains revisable. Native continuation must be verified;
 the portable reference alone does not implement this user flow. Progress communicates
 those conditions instead of a fixed number of required answers. #336 supplies a
-bounded portable source foundation; SQL/mobile v2, native acceptance, calibrated
-grade predictions and measured usefulness remain open. This foundation precedes
+bounded portable source foundation; #341 supplies durable SQL v2 and the mobile
+successor consumes it. Native acceptance, calibrated grade predictions and
+measured usefulness remain open. This foundation precedes
 canonical preview because preview requires trustworthy state/evaluation evidence.
+
+The sequential mobile source offers **Jatka selaamaan** throughout the questions.
+After all pending commands are acknowledged, it records PAUSE and releases the
+same Profile into ordinary browsing. Dismissal survives app restart; a remotely
+paused session offers explicit continuation. Each accepted answer is followed by a
+separate current-state read and NEXT request. Interrupted writes retry their exact
+ID before another question. Progress describes saved answers and an initial,
+still-learning forecast without a quota or an extra mandatory v1 challenge.
+Existing v1 sessions/challenges keep their original flow. STATUS distinguishes
+source acceptance from matching hosted/device observations.
 
 ### Current v1 source and superseded count plan
 

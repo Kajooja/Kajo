@@ -3,6 +3,10 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getRoomTheme } from '../../theme/roomTheme';
 import { ProfileBootstrapGate, ProfileCalibrationScreen, PersonalTasteGate } from './ProfileBootstrapGate';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { PersonalTasteScreen } from './PersonalTasteScreen';
+import { id, profileId, sequentialResponse } from './personalTasteTestFixtures';
+import type { TasteCommand } from './personalTasteOperations';
 import type { ProfileBootstrapStatus, ProfileCalibrationRpc } from './profileCalibrationOperations';
 
 const hooks = vi.hoisted(() => ({
@@ -415,5 +419,47 @@ describe('calibration scope handlers with deferred RPCs', () => {
     await settle();
     expect(context.client.rpc).toHaveBeenCalledTimes(3);
     expect(screenElement().key).toBe(replacement.key);
+  });
+});
+
+
+describe('sequential Taste gate to the same Profile application', () => {
+  it('binds displayed answers and waits for PAUSE acknowledgement before releasing the application', async () => {
+    let data = sequentialResponse('NEEDS_NEXT', 1);
+    const calls: TasteCommand['request'][] = [];
+    let releasePause!: () => void;
+    const client = { rpc: (_name: string, { request }: { request: TasteCommand['request'] }) => ({ abortSignal: async () => {
+      calls.push(request);
+      if (request.operation === 'NEXT') data = sequentialResponse('QUESTION', data.revision + 1, data.answered);
+      if (request.operation === 'ANSWER') data = sequentialResponse('NEEDS_NEXT', data.revision + 1, data.answered + 1);
+      if (request.operation === 'PAUSE') {
+        await new Promise<void>(resolve => { releasePause = resolve; });
+        data = sequentialResponse('PAUSED', data.revision + 1, data.answered);
+      }
+      return { data, error: null };
+    } }) } as unknown as SupabaseClient;
+    const p = { profileId, actorUserId: id(1), namespace: 'https://gate.invalid', client, rpc,
+      theme: getRoomTheme('DAWN'), status, onOpenImport: vi.fn(), onFailOpen: failOpen, onCompleted: completed,
+      children: React.createElement('View', {}, 'SAME PROFILE APP') };
+    function renderPersonal() {
+      beginRender('personal'); const tree = PersonalTasteGate(p); flushEffects('personal'); return tree;
+    }
+    function screen() {
+      const tree = renderPersonal(); expect(React.isValidElement(tree) && tree.type).toBe(PersonalTasteScreen);
+      return (tree as ReactElement<React.ComponentProps<typeof PersonalTasteScreen>>).props;
+    }
+    async function drain() { for (let n = 0; n < 40; n++) await Promise.resolve(); }
+    renderPersonal(); screen().onBegin(); await drain();
+    expect(screen().state.sequential?.questionId).toBe(id(300));
+    screen().onAnswer({ kind: 'RATING', value: 5 }); await drain();
+    expect(calls.find(c => c.operation === 'ANSWER')).toMatchObject({ profileId, questionId: id(300), expectedRevision: 2, answer: { kind: 'RATING', value: 5 } });
+    expect(screen().state.sequential?.answered).toBe(1);
+    screen().onContinue(); await drain();
+    expect(screen().state.dismissed).toBe(false); expect(failOpen).not.toHaveBeenCalled();
+    expect(calls.at(-1)?.operation).toBe('PAUSE');
+    releasePause(); await drain();
+    expect(text(renderPersonal())).toBe('SAME PROFILE APP');
+    expect(calls.every(c => c.profileId === profileId)).toBe(true);
+    cleanup('personal');
   });
 });
