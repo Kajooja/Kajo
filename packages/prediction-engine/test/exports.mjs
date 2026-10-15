@@ -14,6 +14,7 @@ import { summarizeWorkingSupport, freezeWorkingEvaluationPlan, evaluateWorkingPl
 import { normalizeKajoWorkingOutcomeCapture } from '@kajo/prediction-engine/adapters/kajo-working-outcomes';
 import { normalizeKajoWorkingEvaluationPlan } from '@kajo/prediction-engine/adapters/kajo-working-evaluation';
 import { selectTasteOpportunity } from '@kajo/prediction-engine/taste-selection';
+import { createAdaptiveTaste, advanceAdaptiveTaste, inspectAdaptiveTaste } from '@kajo/prediction-engine/adaptive-taste';
 import { normalizeKajoTasteSelection, kajoTasteStages } from '@kajo/prediction-engine/adapters/kajo-taste-selection';
 
 assert.equal(typeof core.predict, 'function');
@@ -43,6 +44,10 @@ assert.equal(typeof selectTasteOpportunity, 'function');
 assert.equal(typeof normalizeKajoTasteSelection, 'function');
 assert.equal(kajoTasteStages.length, 2);
 assert.equal(core.selectTasteOpportunity, undefined);
+for (const fn of [createAdaptiveTaste, advanceAdaptiveTaste, inspectAdaptiveTaste]) assert.equal(typeof fn, 'function');
+assert.equal(core.createAdaptiveTaste, undefined);
+assert.equal(core.advanceAdaptiveTaste, undefined);
+assert.equal(core.inspectAdaptiveTaste, undefined);
 assert.equal(core.normalizeKajoTasteSelection, undefined);
 
 // Inspect the actual built core import graph: no app, adapter or provider dependency.
@@ -63,7 +68,7 @@ assert.ok((await readdir(root)).includes('index.d.ts'));
 // contain no app or provider runtime dependency.
 for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
   'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
-  'taste-selection.js', 'adapters/kajo-taste-selection.js']) {
+  'taste-selection.js', 'adapters/kajo-taste-selection.js', 'adaptive-taste.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
     'ordinal.js': ['./contracts.js'],
@@ -74,6 +79,7 @@ for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js'
     'working-evaluation.js': ['./contracts.js', './working-state.js'],
     'adapters/kajo-working-evaluation.js': ['../contracts.js', '../working-evaluation.js', '../working-state.js', './kajo-working-state.js'],
     'taste-selection.js': ['./contracts.js'],
+    'adaptive-taste.js': ['./contracts.js', './taste-selection.js'],
     'adapters/kajo-taste-selection.js': ['../contracts.js', '../taste-selection.js'],
   }[file];
   for (const match of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)) {
@@ -81,4 +87,4 @@ for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js'
   }
   assert.ok((await readFile(join(root, file.replace(/\.js$/, '.d.ts')), 'utf8')).length > 0);
 }
-console.log('Built ESM exports and independent core/ordinal/working-state/evaluation/Taste import graphs passed.');
+console.log('Built ESM exports and independent core/ordinal/working-state/evaluation/Taste/adaptive-Taste import graphs passed.');

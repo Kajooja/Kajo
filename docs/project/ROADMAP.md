@@ -4,6 +4,26 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Continuous-learning clarification — 2026-10-15
+
+The owner confirms the existing state/scenario architecture and continuous
+per-action learning in Taste and Discovery, individually and in Shared context.
+Finish #336's recovered reference packet, then the canonical explicit-candidate
+scoring/committed-prefix boundary, persistent sequential commands and mobile
+consumer **including partial-readiness continuation into Discovery** before the
+canonical preview. A bounded initial test may end with insufficient support;
+ordinary browsing must retain that evidence and keep refining predictions.
+Neither a response quota nor an endless mandatory test is the completion policy.
+
+The native consumer must prove post-action prediction freshness, immutable prior
+origins, source correction/withdrawal and Profile scope. EB-02 retains the full
+Working/Short/Long/Belief/Group/World/Context state direction. EB-04 then develops
+supported local scenario-prefix retrieval against a no-retrieval control; EB-06
+adds privacy-gated cross-Profile scenarios/prototypes after its own prerequisites.
+Their staged implementation is not claimed by the Taste reference and is not
+silently removed from the engine plan. Existing release/Shared/privacy gates stand.
+STATUS owns one exact active source packet.
+
 ## Source integration decision — 2026-10-12
 
 The owner explicitly authorized merging the complete #229 → #329 source stack
@@ -549,13 +569,26 @@ Then evaluate the real adaptive flow; a logged-in prototype alone cannot close
 the anonymous requirement. Google/Apple conversion follows under 15.1 without
 replacing or duplicating this retained state.
 
-Exit: bounded 12–24-opportunity anonymous test; unknown Items do not poison taste; recognition/information/diversity balance; held-out predictions frozen before answers; documented metric/support; preview from canonical production ranking; useful first-session behavior against a fixed baseline.
+Exit: a variable-length, bounded/resumable anonymous Taste loop with numeric-answer-sensitive next questions and a committed pre-answer forecast at every evaluated step; unknown Items do not poison taste; recognition/information/diversity balance; declared per-domain readiness or honest insufficiency; same-prefix prospective metrics/support; preview from canonical production ranking; useful first-session behavior against a fixed baseline.
 
-LAUNCH_LOOP retains the owner's roughly ten movies → transition → ten books
-proposal inside adaptive bounds, always-available unknown response even after
-rating-wheel movement, and preservation of already accepted Personal taste.
+The October 14 sequential refinement supersedes fixed 10+10/12–24/six-holdout
+completion quotas for the future runtime. [LAUNCH_LOOP](../product/LAUNCH_LOOP.md)
+retains visible domain transitions, always-available unknown even after wheel
+movement, and preservation of accepted Personal taste. Readiness needs supported
+differentiation, forecast coverage, prospective evidence/observed agreement and
+stability; an answer count or
+unchanging tied scores do not establish reliability. A safety budget pauses with
+explicit insufficiency rather than marking the test successful. The current v1
+source and completed sessions keep their original contract.
 The October 9 owner clarification reaffirms this initial adaptive Taste as a
 pre-release requirement; the planned social shortcuts do not replace it.
+
+[#336](https://github.com/Kajooja/Kajo/issues/336) owns the bounded portable
+sequential reference (EB-03/EB-08) and its native successors. Dependency order is
+reference/control conformance → shared canonical evaluation scoring and committed
+prefix/cutoff → persistent owned commands/projection/erasure → mobile resume and
+dynamic readiness → measured real usefulness and preview. Reference code is not
+native activation; anonymous identity prerequisites retain their earlier boundary.
 
 External benchmark results cannot substitute for this real Kajo first-session acceptance.
 

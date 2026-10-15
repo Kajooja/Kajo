@@ -85,6 +85,14 @@ device observations. Continue from fresh main after that integration; STATUS
 owns the current guarded backend upgrade/native acceptance and exact source receipt.
 The owned mobile Taste/challenge consumer is accepted through #331 after all five
 final-source CI #650 gates; do not repeat that source implementation.
+The October 14 #336 refinement selects numeric-aware sequential Taste reference
+conformance, then canonical evaluation scoring/committed-prefix capture, persistent
+commands and mobile consumption before preview. Preserve v1 sessions and measured
+first-answer forecasts; fixed quotas or stable tied scores never prove reliability.
+The October 15 clarification makes Taste a bounded entry to continuous Profile
+learning: insufficient Taste evidence must continue in Discovery without a reset
+or an endless mandatory test. Personal/Shared state and privacy-gated scenario
+retrieval retain their canonical scopes and separate implementation gates.
 Real anonymous Taste acceptance requires its server identity, minimum lifecycle/
 abuse controls and measurement first; complete conversion/operations and the
 remaining release requirements retain their ROADMAP slots.
@@ -140,7 +148,10 @@ Algorithm quality is the critical first-release dependency.
 - New learned components must be compared against a fixed baseline/ablation and may be rejected if they do not improve defined outcomes.
 - Serving and shadow semantics must remain versioned/comparable.
 - Complete Prediction trace/delivery provenance precedes learning from outcomes.
-- Taste challenge predictions are frozen before held-out answers enter learning.
+- Each Taste challenge prediction is frozen before its held-out answer enters
+  learning. Sequential answers may train later predictions, never their own.
+- Taste readiness is provisional; ordinary Discovery keeps updating the same
+  Profile evidence/state. Ending Taste does not certify certainty or stop learning.
 - Never fabricate an accuracy/confidence percentage.
 - Synthetic/counterfactual SleepLayer outcomes never become historical Events.
 - State hypotheses, alternative-action/stochastic future branches and model
