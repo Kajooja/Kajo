@@ -26,6 +26,22 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Sequential Taste rollout preparation — #336
+
+`scripts/database/personal-sequential-taste-hosted-upgrade.{json,mjs,test.mjs}`
+binds the accepted #342 application source to the two evaluation/v2 forwards after
+the preserved owned v1 chain and immutable-guard bridge. The separately pinned
+`20261015192129_sequential_bootstrap_compatibility.sql` prerequisite repairs only
+the observed exact compact bootstrap helper body; canonical pre-v2/final-v2
+shapes are no-ops, and security/source drift is rejected. It verifies a private
+observed target/history/function checkpoint, accepts only a contiguous reviewed
+installed prefix, and emits a read-only preflight rather than a hosted writer.
+Its populated disposable upgrade rehearsal preserves retained v1 sessions and
+frozen challenges. `run-ci-cli-installation-probe.mjs` runs that rehearsal on the
+native Supabase CLI generation before its full fresh install. The original
+`personal-taste-hosted-upgrade.*` manifest/guard remain immutable; STATUS owns the
+current source/build/rollout receipt and DEVICE_TEST the actual native acceptance.
+
 ## Prospective Personal evaluation evidence — active source only
 
 | Boundary | Meaningful paths |

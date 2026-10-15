@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "applicationSource": "c776de5fcdb62c72216b25a955a8c4b8685b2580",
+  "sourceCheckpoint": "20261013080259_taste_immutable_guard_compatibility.sql",
+  "predecessorManifest": "personal-taste-hosted-upgrade.json",
+  "prerequisite": {
+    "filename": "20261015192129_sequential_bootstrap_compatibility.sql",
+    "sha256": "3f172d0365a7534c0bcb32dfa414687ea3981df67a90565f2404cef06387f694",
+    "requiredFor": "COMPACT_V1"
+  },
+  "forwards": [
+    {
+      "filename": "20261015090018_personal_evaluation_scoring.sql",
+      "sha256": "8c0d945c2e531980e509232ccb46f6e442a16b878d68518370d12c801f65fa4f"
+    },
+    {
+      "filename": "20261015101752_durable_sequential_taste.sql",
+      "sha256": "29d0527a4f45ab3a12e1a88bfb4da9a9f9659d3aba0a58613d8f953b58f04056"
+    }
+  ]
+}

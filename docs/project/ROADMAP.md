@@ -9,10 +9,14 @@ This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` o
 The owner confirms the existing state/scenario architecture and continuous
 per-action learning in Taste and Discovery, individually and in Shared context.
 The reference (#337), committed Discovery refresh (#339) and canonical evaluation
-boundary (#340) and durable sequential commands (#341) are accepted source.
-Continue #336 with the mobile consumer **including partial-readiness continuation
-into Discovery**, then matching guarded backend/build/device acceptance before
-the canonical preview. A bounded initial test may end with insufficient support;
+boundary (#340), durable sequential commands (#341) and mobile consumer (#342)
+are accepted source, including partial-readiness continuation into Discovery.
+Continue #336 with matching guarded backend/build/device acceptance before
+the canonical preview. The additive post-v1 preparation must preserve the original
+16-forward manifest/bridge, verify the actual installed prefix and supply only the
+missing canonical-evaluation/sequential forwards after the separately pinned
+bootstrap compatibility prerequisite; existing accounts are preserved.
+A bounded initial test may end with insufficient support;
 ordinary browsing must retain that evidence and keep refining predictions.
 Neither a response quota nor an endless mandatory test is the completion policy.
 
@@ -43,8 +47,10 @@ The complete original source stack is accepted through #329 and main CI #648.
 The owned adaptive TasteSession/challenge mobile consumer is now accepted through
 #330/#331 after all five final-source CI #650 gates. Guarded matching-backend/APK/device
 acceptance is next; #333 prepares the exact 16-forward chain from the reviewed
-catalog-generation source checkpoint. Review that packet before live application; the #653
-matching APK is ready, while actual new-runtime deployment remains open.
+catalog-generation source checkpoint. That original chain is now installed in the
+observed operator target; its immutable manifest remains historical operational
+identity. The current #342 sequential source and #669 APK require the separate
+post-v1 delta preparation and actual backend/device acceptance in STATUS.
 Canonical unseen preview follows that consumer in its retained
 order. STATUS owns the exact source/build receipt and one current task. Automated
 source acceptance does not close the remaining anonymous, device or release gates.

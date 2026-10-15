@@ -7209,3 +7209,47 @@ hosted migration, account reset, model admission or attention sweep is included.
 Next after source acceptance: matching guarded backend/build/device continuation
 for acknowledged actions, offline retry, restart and partial Discovery freshness;
 full readiness and measured usefulness remain open before release acceptance.
+
+
+## Matching sequential Taste rollout preparation — 2026-10-15 / #336
+
+The interrupted conversation's #342 mobile packet is already accepted as main
+`c776de5fcdb62c72216b25a955a8c4b8685b2580`, identical to source tree
+`8ece8e164dfb4691737286340606e4ecd66de398`. All five final-source CI #668
+and accepted-main CI #669 gates passed; #669 also built the standalone APK.
+STATUS now records its source/run/artifact identity instead of directing a fresh
+agent to recreate or republish the completed mobile consumer.
+
+A new read-only actual-target metadata check finds owned v1 endpoints present and
+v2 absent. The earlier 16-forward chain and immutable-guard bridge are installed;
+their reviewed files remain immutable. The separate
+`personal-sequential-taste-hosted-upgrade.*` packet binds the accepted application
+to only the canonical-evaluation and durable-v2 delta, validates the observed
+installed prefix/history/function bodies/security and supplies a disposable
+populated-v1/frozen-challenge preservation rehearsal. It does not apply hosted SQL.
+The native CLI probe includes the same rehearsal before its fresh full install.
+The observed checkpoint also exposes an exact compact historical bootstrap
+helper body: its behavior is unchanged but the v2 source guard refuses it.
+CLI-created append-only `20261015192129_sequential_bootstrap_compatibility.sql`
+repairs only that exact body before the unchanged forwards, preserves complete
+function metadata, and is a no-op for canonical pre-v2/final-v2 fresh lineage.
+Unknown bodies/permissions remain rejected; the preparation records the bridge
+separately from the immutable two-forward delta.
+
+DEVICE_TEST leads with a matching v2 matrix: numeric and unknown/negative meaning,
+slow/lost acknowledgements, exact restart/current-state recovery, committed pause,
+partial Taste → same-Profile Discovery freshness, conflicts/scope, source removal
+and honest insufficient support. Existing device observations retain their scope;
+no new emulator, phone, gesture, installation or post-commit reply-loss observation
+is claimed. No account reset, model admission or release requirement closes.
+
+All five focused preparation tests pass, including full canonical/compact
+rehearsals, exact bridge semantics/metadata, provider-history drift and lifecycle
+trigger checks. Independent review exercises bridge source/security rejection.
+The real read-only preflight reports BRIDGE_REQUIRED and two missing forwards.
+No hosted mutation occurs. Existing lint/typecheck, 544 mobile and 284 engine
+checks pass; the successor PR owns final source/tree/full CI verification. Next is target-specific
+rollout authorization with a refreshed private checkpoint, only still-missing
+forwards and backend role/preservation verification, then the matching device
+matrix. Full readiness, quality, anonymous entry and remaining release gates stay
+open; canonical preview follows consumer acceptance. Sprint 014 remains open.
