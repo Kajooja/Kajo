@@ -4,10 +4,10 @@ export type TasteAnswer = { kind: 'RATING'; value: number } |
   { kind: 'UNKNOWN' | 'NOT_INTERESTED' | 'WITHDRAWN' };
 export type TasteItem = { id: string; itemType: 'MOVIE' | 'BOOK'; title: string };
 export type TasteCommand = {
-  functionName: 'taste_session_v1' | 'taste_challenge_v1';
-  request: { operation: 'START' | 'RESUME' | 'ANSWER' | 'ACK_TRANSITION' | 'REMOVE';
+  functionName: 'taste_session_v1' | 'taste_challenge_v1' | 'taste_session_v2';
+  request: { operation: 'START' | 'RESUME' | 'ANSWER' | 'ACK_TRANSITION' | 'REMOVE' | 'NEXT' | 'PAUSE' | 'CONTINUE';
     profileId: string; sessionId?: string; challengeId?: string; requestId?: string;
-    expectedRevision?: number; questionIndex?: number; itemId?: string; answer?: TasteAnswer };
+    expectedRevision?: number; questionIndex?: number; questionId?: string; itemId?: string; answer?: TasteAnswer };
 };
 export type TasteRpc = (name: string, args: { request: TasteCommand['request'] }, signal: AbortSignal) =>
   Promise<{ data: unknown; error: { code?: string; message: string } | null }>;
@@ -31,7 +31,14 @@ export type TasteChallenge = {
   items: readonly TasteItem[]; answers: readonly { itemId: string; answer: TasteAnswer }[];
   metric: TasteMetric | null;
 };
-export type TasteResponse = { kind: 'session'; value: TasteSession } | { kind: 'challenge'; value: TasteChallenge };
+export type SequentialTasteSession = {
+  sessionId: string; revision: number | null;
+  status: 'QUESTION' | 'NEEDS_NEXT' | 'PAUSED' | 'STOPPED' | 'REMOVED' | 'SOURCE_WITHDRAWN';
+  questionId: string | null; item: TasteItem | null; answered: number; presented: number;
+};
+export type TasteResponse = { kind: 'session'; value: TasteSession } | { kind: 'challenge'; value: TasteChallenge } |
+  { kind: 'sequential'; value: SequentialTasteSession } |
+  { kind: 'preserved'; legacySessionId: string | null };
 export type TasteResult = { status: 'success'; response: TasteResponse } |
   { status: 'error'; kind: 'unavailable' | 'conflict' | 'retry' | 'invalid'; message: string };
 
@@ -54,7 +61,7 @@ export async function sendTasteCommand(rpc: TasteRpc, command: TasteCommand, sig
         : kind === 'invalid' ? 'Vastausta ei voitu vahvistaa. Tarkista käyttöoikeus ja lataa nykyinen vaihe.'
         : 'Vahvistusta ei saatu. Sama vastaus säilyy odottamassa; yritä uudelleen.' };
     }
-    const response = command.functionName === 'taste_session_v1'
+    const response = command.functionName === 'taste_session_v2' ? mapSequentialTaste(data, command.request) : command.functionName === 'taste_session_v1'
       ? mapTasteSession(data, command.request) : mapTasteChallenge(data, command.request);
     return response ? { status: 'success', response } : { status: 'error', kind: 'retry',
       message: 'Palvelimen vahvistusta ei voitu tulkita. Sama vastaus säilyy odottamassa.' };
@@ -64,22 +71,24 @@ export async function sendTasteCommand(rpc: TasteRpc, command: TasteCommand, sig
 }
 
 export function isTasteCommand(value: unknown, profileId: string): value is TasteCommand {
-  if (!record(value) || (value.functionName !== 'taste_session_v1' && value.functionName !== 'taste_challenge_v1') ||
+  if (!record(value) || !['taste_session_v1', 'taste_challenge_v1', 'taste_session_v2'].includes(String(value.functionName)) ||
     !record(value.request) || value.request.profileId !== profileId || !uuid(profileId)) return false;
   const r = value.request;
+  const sequential = value.functionName === 'taste_session_v2';
   const challenge = value.functionName === 'taste_challenge_v1';
-  const operations = challenge ? ['START', 'RESUME', 'ANSWER', 'REMOVE'] : ['START', 'RESUME', 'ANSWER', 'ACK_TRANSITION', 'REMOVE'];
+  const operations = sequential ? ['START', 'RESUME', 'NEXT', 'ANSWER', 'PAUSE', 'CONTINUE', 'REMOVE'] : challenge ? ['START', 'RESUME', 'ANSWER', 'REMOVE'] : ['START', 'RESUME', 'ANSWER', 'ACK_TRANSITION', 'REMOVE'];
   if (!operations.includes(String(r.operation))) return false;
   const fields = ['operation', 'profileId'];
   if (challenge || r.operation !== 'START') { if (!uuid(r.sessionId)) return false; fields.push('sessionId'); }
   if (challenge && r.operation !== 'START') { if (!uuid(r.challengeId)) return false; fields.push('challengeId'); }
   if (r.operation !== 'RESUME') { if (!uuid(r.requestId)) return false; fields.push('requestId'); }
   if (r.operation !== 'START' && r.operation !== 'RESUME') {
-    if (!integer(r.expectedRevision, challenge ? 6 : 200)) return false; fields.push('expectedRevision');
+    if (!integer(r.expectedRevision, sequential ? 256 : challenge ? 6 : 200)) return false; fields.push('expectedRevision');
   }
   if (r.operation === 'ANSWER') {
-    if (!answer(r.answer, !challenge)) return false; fields.push('answer');
-    if (challenge) { if (!uuid(r.itemId)) return false; fields.push('itemId'); }
+    if (!answer(r.answer, !challenge && !sequential)) return false; fields.push('answer');
+    if (sequential) { if (!uuid(r.questionId)) return false; fields.push('questionId'); }
+    else if (challenge) { if (!uuid(r.itemId)) return false; fields.push('itemId'); }
     else { if (!integer(r.questionIndex, 23)) return false; fields.push('questionIndex'); }
   }
   return Object.keys(r).sort().join() === fields.sort().join() && JSON.stringify(value).length <= 4096;
@@ -212,4 +221,35 @@ function item(v: unknown): TasteItem | null {
   if (!record(v) || !uuid(v.id) || (v.itemType !== 'MOVIE' && v.itemType !== 'BOOK') ||
     typeof v.title !== 'string' || !v.title.trim() || v.title.length > 512) return null;
   return { id: v.id, itemType: v.itemType, title: v.title };
+}
+
+// Only display identity/progress crosses this boundary. Forecasts, evidence
+// prefixes and pair results are server-owned and never enter the local queue.
+function mapSequentialTaste(value: unknown, request: TasteCommand['request']): TasteResponse | null {
+  if (!record(value) || value.version !== 'personal-taste-session-v2' || value.profileId !== request.profileId) return null;
+  if (['LEGACY_V1_PRESERVED', 'EXISTING_COMPLETION'].includes(String(value.status))) {
+    if (request.operation !== 'START' || request.sessionId || value.canContinueDiscovery !== true ||
+      (value.status === 'LEGACY_V1_PRESERVED' && !uuid(value.legacySessionId))) return null;
+    return { kind: 'preserved', legacySessionId: value.status === 'LEGACY_V1_PRESERVED' ? value.legacySessionId as string : null };
+  }
+  if (!uuid(value.sessionId) || (request.sessionId && request.sessionId !== value.sessionId)) return null;
+  const base = { sessionId: value.sessionId, revision: null, questionId: null, item: null, answered: 0, presented: 0 };
+  if (value.status === 'REMOVED') return { kind: 'sequential', value: { ...base, status: 'REMOVED' } };
+  if (value.status === 'SOURCE_WITHDRAWN') return value.reloadRequired === true && request.operation !== 'RESUME'
+    ? { kind: 'sequential', value: { ...base, status: 'SOURCE_WITHDRAWN' } } : null;
+  if (!['QUESTION', 'NEEDS_NEXT', 'PAUSED', 'STOPPED'].includes(String(value.status)) || !integer(value.revision, 256) ||
+    value.anonymousEntry !== false || value.canContinueDiscovery !== true || value.profilePreserved !== true ||
+    value.ratingProjection !== 'TASTE_TEST_BOOTSTRAP_ONLY' || value.negativeProjection !== 'DISTINCT_TASTE_PRIOR_V2' ||
+    !integer(value.answered, 48) || !integer(value.presented, 48) || value.answered > value.presented || value.maximumOpportunities !== 48 ||
+    typeof value.acceptedAt !== 'string' || !Number.isFinite(Date.parse(value.acceptedAt)) ||
+    !record(value.readiness) || value.readiness.status !== 'INSUFFICIENT' || value.readiness.qualityAdmitted !== false ||
+    value.readiness.basis !== 'CONTINUOUS_LEARNING_SOURCE_V2' || value.readiness.reason !== 'FULL_READINESS_ADAPTER_NOT_ADMITTED' ||
+    value.readiness.uncertainty !== null || !record(value.evaluation) || value.evaluation.metric !== 'SAME_PREFIX_ORDINAL' ||
+    value.evaluation.accuracyPercent !== null || !Array.isArray(value.evaluation.pairs) || value.evaluation.pairs.length > 1128) return null;
+  const current = value.status === 'QUESTION' ? item(value.currentItem) : null;
+  if (value.status === 'QUESTION' ? !current || !uuid(value.questionId) || value.answered >= value.presented
+    : value.currentItem !== null || value.questionId !== null) return null;
+  return { kind: 'sequential', value: { sessionId: value.sessionId, revision: value.revision,
+    status: value.status as SequentialTasteSession['status'], questionId: current ? value.questionId as string : null,
+    item: current, answered: value.answered, presented: value.presented } };
 }

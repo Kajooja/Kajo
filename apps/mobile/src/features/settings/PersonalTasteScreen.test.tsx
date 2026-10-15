@@ -4,7 +4,7 @@ import { getRoomTheme } from '../../theme/roomTheme';
 import { PersonalTasteScreen } from './PersonalTasteScreen';
 import type { PersonalTasteSnapshot } from './personalTasteFlow';
 import { sendTasteCommand } from './personalTasteOperations';
-import { id, profileId, sessionId, sessionResponse, challengeResponse } from './personalTasteTestFixtures';
+import { id, profileId, sessionId, sessionResponse, challengeResponse, sequentialResponse } from './personalTasteTestFixtures';
 
 vi.mock('react-native', () => ({ ActivityIndicator: 'ActivityIndicator', Pressable: 'Pressable', SafeAreaView: 'SafeAreaView',
   ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: (v: unknown) => v } }));
@@ -23,13 +23,13 @@ function button(tree: ReactNode, label: string) {
   const found = elements(tree).find(e => e.type === 'Pressable' && text(e.props.children) === label);
   expect(found, `missing ${label}`).toBeDefined(); return found!.props;
 }
-async function state(data: unknown, challenge = false): Promise<PersonalTasteSnapshot> {
+async function state(data: unknown, challenge = false, sequential = false): Promise<PersonalTasteSnapshot> {
   const response = await sendTasteCommand(async () => ({ data, error: null }), {
-    functionName: challenge ? 'taste_challenge_v1' : 'taste_session_v1',
+    functionName: sequential ? 'taste_session_v2' : challenge ? 'taste_challenge_v1' : 'taste_session_v1',
     request: { operation: 'START', profileId, requestId: id(9), ...(challenge ? { sessionId } : {}) } }, new AbortController().signal);
   expect(response.status).toBe('success');
   if (response.status !== 'success') throw Error('Invalid test fixture');
-  return { session: response.response.kind === 'session' ? response.response.value : null,
+  return { sequential: response.response.kind === 'sequential' ? response.response.value : null, session: response.response.kind === 'session' ? response.response.value : null,
     challenge: response.response.kind === 'challenge' ? response.response.value : null,
     busy: false, pending: false, legacy: false, dismissed: false, conflict: false, blocked: false, needsStart: false, message: null };
 }
@@ -73,5 +73,30 @@ describe('owned Taste screen interactions', () => {
     p.state.pending = false; button(PersonalTasteScreen(p), 'Poista makutesti').onPress!(); expect(p.onAskRemoval).toHaveBeenCalledOnce();
     expect(p.onRemove).not.toHaveBeenCalled(); p.confirmRemoval = true;
     button(PersonalTasteScreen(p), 'Vahvista makutestin poisto').onPress!(); expect(p.onRemove).toHaveBeenCalledOnce();
+  });
+});
+
+
+describe('continuous Taste presentation', () => {
+  it('offers Discovery during a question with honest progress and no quota/challenge/confidence claim', async () => {
+    const p = props(await state(sequentialResponse('QUESTION', 10, 4), false, true));
+    const tree = PersonalTasteScreen(p); const copy = text(tree);
+    expect(copy).toContain('Tallennettuja vastauksia: 4'); expect(copy).toContain('Ennuste on vielä alustava');
+    expect(copy).not.toMatch(/24|48|ennustehaasteeseen|\d\s*%/);
+    button(tree, 'Jatka selaamaan').onPress!(); expect(p.onContinue).toHaveBeenCalledOnce();
+    p.state.pending = true; p.state.message = 'Yhteys katkesi';
+    expect(elements(PersonalTasteScreen(p)).filter(e => e.type === 'Pressable' && text(e.props.children) === 'Jatka selaamaan')
+      .every(e => e.props.disabled)).toBe(true);
+  });
+  it('keeps a concurrent server advance explicitly retryable', async () => {
+    const p = props(await state(sequentialResponse('NEEDS_NEXT', 3, 1), false, true));
+    button(PersonalTasteScreen(p), 'Hae seuraava kysymys').onPress!(); expect(p.onRetry).toHaveBeenCalledOnce();
+  });
+  it('offers explicit paused continuation and never calls an insufficient stop ready', async () => {
+    const paused = props(await state(sequentialResponse('PAUSED', 7, 2), false, true));
+    button(PersonalTasteScreen(paused), 'Jatka makutestiä').onPress!(); expect(paused.onBegin).toHaveBeenCalledOnce();
+    const stopped = PersonalTasteScreen(props(await state(sequentialResponse('STOPPED', 80, 40), false, true)));
+    expect(text(stopped)).toContain('Jatketaan tutustumista selaamalla'); expect(text(stopped)).not.toContain('Makutesti on valmis');
+    expect(text(stopped)).not.toContain('Jatka ennustehaasteeseen'); expect(button(stopped, 'Jatka selaamaan').disabled).toBe(false);
   });
 });

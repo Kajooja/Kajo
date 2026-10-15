@@ -123,8 +123,9 @@ This private scoring primitive is consumed by the
 boundary owns expected-prefix revisions, commit/freeze before first measurement,
 exact retry/conflict, rating projection and withdrawal. The scoring helper itself
 does not select questions, admit answers or determine readiness. The full native
-readiness adapter, mobile sequential consumer and partial Taste → Discovery
-handoff remain integration work; old v1 sessions are preserved.
+readiness adapter remains open. The mobile successor consumes this boundary and
+partial Taste → Discovery; exact source/hosted/device acceptance is owned by STATUS.
+Old v1 sessions are preserved.
 
 Ordinal evaluation compares only same-domain Items forecast under the **same
 committed prefix, model and declared panel**, with both first labels unseen at
@@ -200,9 +201,17 @@ an honest ability to continue Discovery. Numeric ratings and distinct negative
 interest update canonical priors; UNKNOWN only informs recognition/selection.
 The new negative kind uses the existing bootstrap/native trust ratio without
 changing old weights; see [evidence semantics](DATA_EVENTS.md#sequential-own-personal-v2-source).
-Full mobile navigation/queue integration, anonymous entry and hosted/device acceptance
-remain separately recorded work. No new serving model or population policy is
-activated by the protocol.
+The mobile successor uses separate acknowledged commands and reloads the current
+server snapshot before NEXT. SQLite retains one exact pending command with an
+explicit v1/v2 protocol, never copied forecasts or evidence histories. Retained v1
+queues/sessions and completed setup keep their original protocol. Only a confirmed
+missing first RPC or explicit server preservation receipt permits fallback.
+Acknowledged evidence invalidates Discovery predictions; a pending write does not.
+PAUSE commits before the same Profile enters Discovery, with local dismissal
+retained through restart. Conflicts require a current-state reload and a new user
+decision, not rebasing an old answer. Anonymous entry, hosted/device acceptance and
+measured quality remain separate gates. No new serving model or population policy
+is activated by this protocol.
 
 ### Continuous learning across Taste and Discovery
 

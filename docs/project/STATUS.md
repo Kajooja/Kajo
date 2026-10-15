@@ -10,67 +10,65 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — durable sequential Taste v2 / #336
+## Current packet — sequential Taste mobile / #336
 
-Accepted main is `baf190fed5350e0323844518f483960dd5b2f73c` through
-[#340](https://github.com/Kajooja/Kajo/pull/340). Its source
-`587ce886bb9fa5e7e987e5e208a56536f7b7a788`, tree
-`9b8606fe0ff4058f311fbbd9dc915c2452bf0656`, passed all five
-[CI #663](https://github.com/Kajooja/Kajo/actions/runs/38714352914) gates.
-The canonical explicit-candidate scoring/capture prerequisite is complete.
-The numeric sequential reference [#337](https://github.com/Kajooja/Kajo/pull/337)
-and committed Discovery refresh [#339](https://github.com/Kajooja/Kajo/pull/339)
-are also accepted; do not recreate these packets. Source acceptance is distinct
-from hosted rollout, device observations and measured recommendation quality.
+Accepted main is `b55990d3a3f6b007b5c62a674022129d7a74d2b1` through
+[#341](https://github.com/Kajooja/Kajo/pull/341), merged with the owner's explicit
+approval. Source `e1451ba28745704efeb6d429a25a84f8e9e69e0e`, tree
+`84f2d319124b7a18d991141e8a40f5707a9ffcff`, passed all five
+[CI #666](https://github.com/Kajooja/Kajo/actions/runs/38724558470) gates.
+The genuine independent PostgreSQL connection/observed-lock probes passed,
+including exact retries, earlier NEXT cutoff, source withdrawal and cleanup.
+The portable numeric reference #337, committed Discovery refresh #339 and canonical
+evaluation boundary #340 are also accepted; do not recreate those packets.
+Source acceptance is distinct from hosted rollout, device observations and measured quality.
 
-Current branch `feat/durable-sequential-taste` continues
-[#336](https://github.com/Kajooja/Kajo/issues/336) with
-`20261015101752_durable_sequential_taste.sql` and owned `taste_session_v2`.
-START/NEXT/ANSWER are separate committed transactions. The server freezes the
-canonical panel before a first answer, retains that original measurement, projects
-its evidence, and captures the next forecast from the updated receipt prefix.
-A transaction begun before the answer cannot become eligible by waiting on a lock.
-The actual numeric question selector is parity-tested against #337's reference.
-Same-domain ordinal pairs use scores from one earlier unseen pool, not scores
-from different learning prefixes. No evaluation panel becomes delivered exposure.
+Current branch `feat/sequential-taste-mobile` continues
+[#336](https://github.com/Kajooja/Kajo/issues/336) with the existing owned mobile
+consumer. New sessions prefer `taste_session_v2`. START, ANSWER and NEXT are
+separate acknowledged RPCs; a fresh RESUME after acknowledgement prevents a
+cached retry from resurrecting a question another device has already answered.
+NEXT receives its own durable ID only after the prior command is acknowledged
+and current state permits it. One automatic NEXT per operation bounds races;
+a later concurrent advance retains an explicit retry action. Stale answer callbacks
+and revision conflicts never silently rebase a response onto another question.
 
-Numeric 0/5/10 and distinct NOT_INTERESTED update canonical bootstrap priors;
-UNKNOWN affects recognition/question selection only. The new negative kind is
-restricted to this owned source, uses the existing bootstrap/native trust ratio,
-and creates no invented numeric rating, consumed Event or native confidence.
-Only three explicitly guarded helper bodies change; all old weights, function
-identities/ACLs and populated rows are preserved. Exact retries/CAS, immutable
-first measurements, corrections, dependency-closure withdrawal, external source
-erasure and terminal removal are covered. Existing v1 sessions/completed setup
-remain preserved; v1 cannot start a competing writer after v2 owns the Profile.
+The backend/actor/Profile SQLite record upgrades in place with an explicit protocol;
+old v1 pending commands, sessions, frozen challenges and completed setup remain
+usable. Only a confirmed missing first RPC or the server's legacy-preservation
+receipt permits the older protocol. Timeouts, malformed receipts, local write
+failure and retained-session outages keep the exact pending command.
+Server source withdrawal/removal wins over copied replies. Local storage retains
+IDs, dismissal and an unacknowledged command, not forecast/evidence histories.
 
-The owner explicitly prioritizes a continuously changing forecast at this stage.
-Readiness is honestly INSUFFICIENT while the full native per-domain readiness
-adapter is not admitted. The 48-opportunity/160-command budgets are safety bounds,
-not sufficient-answer quotas. PAUSE/CONTINUE preserves the Profile/evidence and
-allows partial Taste to continue Discovery. The current mobile client still uses
-v1; v2 navigation/queue consumption is the next source integration. Detail dwell
-already exists as weak attention; full visible-item/stop/foreground timing and
-Scenario consumption remain separate implementation gates. See the canonical
-[continuous-learning contract](../domain/PREDICTION_MODEL.md#continuous-learning-across-taste-and-discovery)
-and [evidence boundary](../domain/DATA_EVENTS.md#sequential-own-personal-v2-source).
+The UI offers **Jatka selaamaan** during the sequential test. It commits PAUSE
+before releasing the same Profile's application, and persists dismissal through
+restart. Pending/unacknowledged writes must recover first; failed dismissal cannot
+invoke the old fail-open bypass. A remotely paused session has explicit CONTINUE.
+The first forecast remains server-owned and pre-answer. Acknowledged evidence
+invalidates mounted Discovery predictions. Progress shows saved answers and
+honest insufficient support without a fixed completion quota, invented confidence
+or an extra mandatory v1 challenge.
 
-All 256 database tests (including 17 focused sequential tests), 522 mobile tests,
-284 engine tests, lint/typecheck, catalog/research/acceptance suites and four
-iOS/Android exports pass locally. The local root check reaches refused Deno
-npm-registry access; this limit must not be reported as a complete root pass.
-Independent PostgreSQL connections in the native CLI gate exercise same-ID
-START/NEXT/ANSWER, stale revisions, an earlier NEXT transaction and import removal.
-The PR owns final source/tree, all five CI gates and merge receipts.
+Local checks pass: 544 mobile, 257 database and 284 engine tests, full lint/typecheck,
+dependency/catalog/research/acceptance suites, and all four iOS/Android exports
+with non-live public-shaped fixture configuration. The PR owns the exact
+source/tree/final-CI receipt. The actual SQL/mobile contract probe checks separate committed
+transactions, 0/5/10, unknown versus explicit not-interest, increasing forecast
+prefixes, exact retries, pause/resume, withdrawal and terminal source removal.
+Controlled component tests exercise the actual gate/handlers; no Android emulator
+or real device is available here. Root Deno registry access remains an environment
+limit, not a passing root check; required final-source CI must still pass.
 
-**Next action:** finish checks and publish this prepared branch; accept only after
-all five final-source CI gates pass. Then integrate the mobile v2 consumer:
-acknowledged answer → separate NEXT, durable retry/restart, old-v1 preservation,
-and partial Taste → Discovery on the same Profile without claiming confidence.
-Record matching-device slow-write/offline retry and resumed-question observations
-separately. #336 remains open for that integration and full readiness/quality
-acceptance. No hosted migration, account reset or model/Working/population
-activation is part of this source packet.
+**Next action:** complete final-source checks and publish this mobile packet; accept
+only after all five required CI gates pass. Then prepare the matching guarded
+backend/build/device continuation: exercise slow ANSWER acknowledgement, lost
+ANSWER/NEXT/PAUSE replies, restart/current-question recovery, and partial Taste →
+Discovery freshness on the same Profile. Canonical recommendation preview follows
+that consumer acceptance. #336 remains open for full readiness/quality admission.
+Existing detail dwell is weak attention; full visibility/stop timing and authorized
+Scenario retrieval retain their separate architecture gates. No hosted migration,
+account reset or model/Working/population activation is part of this source packet.
 
 ## Sequential adaptive Taste reference / #336
 
@@ -79,8 +77,8 @@ Historical baseline before #337 is `419f3850378d04b4e2417852d6b9eb5c06b5d127` th
 `7a64762db300314e22fe23e5af1713e0b62131b2` passed all five
 [CI #657 gates](https://github.com/Kajooja/Kajo/actions/runs/38379100290).
 The immutable-guard compatibility repair is complete; do not repeat it.
-The current mobile consumer remains v1 as in the #653 APK below;
-this packet adds an isolated optional engine export without a mobile integration. Private operator
+At that reference checkpoint the mobile consumer remained v1, as in the #653 APK below;
+that packet added an isolated optional engine export without a mobile integration. Private operator
 receipts and account/device data remain outside the published source.
 
 The October 14 product direction replaces fixed completion quotas with a

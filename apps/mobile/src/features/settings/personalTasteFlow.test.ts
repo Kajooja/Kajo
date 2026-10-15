@@ -6,6 +6,9 @@ import { id, profileId, sessionId, challengeId, sessionResponse, challengeRespon
 const flows: PersonalTasteFlow[] = [];
 afterEach(() => { flows.forEach(f => f.stop()); flows.length = 0; });
 function setup(rpc: TasteRpc, rows = new Map<string, string>(), extras: Partial<Parameters<typeof createPersonalTasteFlow>[0]> = {}) {
+  // Retained v1 installation: migration must preserve the original writer/queue.
+  if (rows.size === 0) rows.set(`kajo:personal-taste:v1:${encodeURIComponent('https://test.invalid')}:${id(1)}:${profileId}`,
+    JSON.stringify({ version: 1, sessionId: null, challengeId: null, pending: null, dismissed: false }));
   let sequence = 1000;
   const storage = { getItemSync: (key: string) => rows.get(key) ?? null,
     setItemSync: (key: string, value: string) => { rows.set(key, value); } };
@@ -144,6 +147,24 @@ describe('durable owned mobile Taste flow', () => {
     expect(flow.startChallenge()).toBe(true); await flow.waitForIdle(); expect(flow.snapshot().challenge?.metric).toBeNull();
     flow.stop(); const next = setup(rpc, rows); next.flow.start(); await next.flow.waitForIdle();
     expect(rpc.mock.calls.at(-1)?.[1].request).toEqual({ operation: 'RESUME', profileId, sessionId, challengeId });
+  });
+  it('retains a removed v1 challenge across repeated restarts instead of reopening its training session', async () => {
+    let removed = false;
+    const rpc = vi.fn<TasteRpc>(async (name, { request }) => {
+      if (name !== 'taste_challenge_v1') return ok(sessionResponse([], 'STOP'));
+      if (request.operation === 'REMOVE') removed = true;
+      return ok(removed ? { version: 'personal-taste-challenge-v1', profileId, sessionId, challengeId, status: 'REMOVED' }
+        : challengeResponse());
+    });
+    const first = setup(rpc); first.flow.start(); await first.flow.waitForIdle();
+    first.flow.startChallenge(); await first.flow.waitForIdle(); first.flow.remove(0); await first.flow.waitForIdle(); first.flow.stop();
+    for (let n = 0; n < 2; n++) {
+      const resumed = setup(rpc, first.rows); resumed.flow.start(); await resumed.flow.waitForIdle();
+      expect(resumed.flow.snapshot().challenge?.status).toBe('REMOVED');
+      expect(JSON.parse([...first.rows.values()][0]!).challengeId).toBe(challengeId);
+      expect(rpc.mock.calls.at(-1)?.[1].request).toEqual({ operation: 'RESUME', profileId, sessionId, challengeId });
+      resumed.flow.stop();
+    }
   });
   it('removes the current source, clears retained local commands and never resurrects it', async () => {
     const rpc = vi.fn<TasteRpc>(async (_name, { request }) => request.operation === 'REMOVE'

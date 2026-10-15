@@ -9,9 +9,10 @@ This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` o
 The owner confirms the existing state/scenario architecture and continuous
 per-action learning in Taste and Discovery, individually and in Shared context.
 The reference (#337), committed Discovery refresh (#339) and canonical evaluation
-boundary (#340) are accepted source. Continue #336 with persistent sequential
-commands and the mobile consumer **including partial-readiness continuation into
-Discovery** before the canonical preview. A bounded initial test may end with insufficient support;
+boundary (#340) and durable sequential commands (#341) are accepted source.
+Continue #336 with the mobile consumer **including partial-readiness continuation
+into Discovery**, then matching guarded backend/build/device acceptance before
+the canonical preview. A bounded initial test may end with insufficient support;
 ordinary browsing must retain that evidence and keep refining predictions.
 Neither a response quota nor an endless mandatory test is the completion policy.
 
@@ -29,7 +30,7 @@ this stage. Complete attention-duration/stop/resume instrumentation and its
 state/Scenario consumption remain the existing EB-01/EB-02/EB-04 continuation,
 with passive attention weaker than explicit preference. The first sequential
 server source may retain honest insufficient readiness and voluntary pause while
-full native readiness and mobile integration follow; no acceptance gate is closed
+full native readiness and matching mobile runtime acceptance follow; no acceptance gate is closed
 by an uncalibrated confidence label.
 
 ## Source integration decision — 2026-10-12

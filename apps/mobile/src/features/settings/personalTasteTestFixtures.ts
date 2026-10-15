@@ -33,3 +33,16 @@ export function challengeResponse(answers: readonly TasteAnswer[] = []) {
       concordantPairs: 1, discordantPairs: 0, availability: 'DESCRIPTIVE_ONLY',
       uncertainty: 'UNAVAILABLE_SMALL_DEPENDENT_SAMPLE', accuracyPercent: null, ratingError: null, qualityAdmitted: false } : null };
 }
+
+export function sequentialResponse(status = 'QUESTION', revision = 2, answered = 0) {
+  return { version: 'personal-taste-session-v2', profileId, sessionId, revision, status,
+    stopReason: status === 'STOPPED' ? 'OPPORTUNITY_LIMIT_INSUFFICIENT' : status === 'PAUSED' ? 'VOLUNTARY_INSUFFICIENT' : null,
+    currentItem: status === 'QUESTION' ? { id: id(100 + answered), itemType: 'MOVIE', title: `Title ${answered + 1}` } : null,
+    questionId: status === 'QUESTION' ? id(300 + answered) : null,
+    acceptedAt: '2026-10-15T12:00:00.000001Z', canContinueDiscovery: true, profilePreserved: true,
+    answered, presented: answered + (status === 'QUESTION' ? 1 : 0), maximumOpportunities: 48,
+    readiness: { status: 'INSUFFICIENT', basis: 'CONTINUOUS_LEARNING_SOURCE_V2',
+      reason: 'FULL_READINESS_ADAPTER_NOT_ADMITTED', uncertainty: null, qualityAdmitted: false },
+    evaluation: { metric: 'SAME_PREFIX_ORDINAL', accuracyPercent: null, pairs: [] },
+    ratingProjection: 'TASTE_TEST_BOOTSTRAP_ONLY', negativeProjection: 'DISTINCT_TASTE_PRIOR_V2', anonymousEntry: false };
+}

@@ -30,8 +30,8 @@ are engineering prerequisites, not evidence closing a release requirement.
 The October 14 sequential refinement in
 [LAUNCH_LOOP](LAUNCH_LOOP.md#sequential-target--2026-10-14) supersedes fixed
 question-count completion for the new target. #336 is a bounded portable source
-foundation before preview; SQL/mobile v2, native acceptance and measured quality
-remain required. Existing v1 sessions/completed state are preserved.
+foundation before preview; #341 adds durable SQL v2 and the mobile successor
+consumes it. Native acceptance and measured quality remain required. Existing v1 sessions/completed state are preserved.
 
 The October 15 continuation requirement applies to `MVP-TASTE-002`,
 `MVP-TASTE-003` and ongoing adaptive-memory acceptance: a bounded or voluntarily
@@ -40,11 +40,12 @@ support. Preserve its PersonalProfile/evidence and continue learning after accep
 Discovery actions; readiness is revisable. The pure #336 reference does not yet
 supply this native handoff, current-state composition or cross-Profile retrieval.
 
-The owned sequential v2 server successor now targets committed per-answer
+The accepted owned sequential v2 server source supplies committed per-answer
 canonical forecasts, durable retries/corrections/withdrawal and a voluntary
 insufficient pause without changing Profile identity. Its first source stage
-keeps readiness explicitly insufficient; the full readiness adapter and mobile
-handoff remain open. The owner's October 15 priority is continuously updating
+keeps readiness explicitly insufficient. The mobile source now supplies the
+acknowledged per-answer queue and partial Taste → Discovery handoff; full readiness
+and matching hosted/device acceptance remain open. The owner's October 15 priority is continuously updating
 predictions from accepted choices. Full visible-time/stop/resume ingestion remains
 staged under the existing event/state/scenario requirements, not a new mandatory
 instrumentation sweep before this packet. No requirement below is closed by this
@@ -145,9 +146,9 @@ The owner's October 9 clarification reaffirms the initial adaptive Taste before
 release; a group invitation or decision session does not replace these gates.
 
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
-- [-] `MVP-TASTE-002` Taste selects a variable sequence of real canonical Items from the committed prefix, using rating magnitude, recognition and informative feature dispersion. Completion is not a six/twenty-answer or 12–24/10+10 count rule. A versioned readiness report declares per-domain support, forecast coverage, prospective evaluation and stability; readiness is provisional. Pause, poor recognition, exhaustion or safety budget with unmet criteria means insufficient evidence. No demographics are required. Existing portable/server/mobile v1 source remains preserved; #336 supplies the sequential source foundation. SQL/mobile v2, anonymous entry, native acceptance and measured selection value remain open.
+- [-] `MVP-TASTE-002` Taste selects a variable sequence of real canonical Items from the committed prefix, using rating magnitude, recognition and informative feature dispersion. Completion is not a six/twenty-answer or 12–24/10+10 count rule. A versioned readiness report declares per-domain support, forecast coverage, prospective evaluation and stability; readiness is provisional. Pause, poor recognition, exhaustion or safety budget with unmet criteria means insufficient evidence. No demographics are required. Existing portable/server/mobile v1 source remains preserved; #336 supplies the sequential source foundation. Durable SQL v2 and its mobile successor supply the command/continuation source; full readiness, anonymous entry, native acceptance and measured selection value remain open.
 - [-] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics. The sequential target retains the original forecast, first-answer measurement and available evaluation before projecting source-provenanced evidence for the next question; delayed comparisons use the original frozen pool. Genuine zero/neutral ratings affect preference by magnitude; UNKNOWN is recognition-only and explicit negative interest stays separate. #330/#331 supplies the preserved v1 response/retry boundary; sequential projection and its authorization/idempotency/erasure lifecycle remain to be integrated and accepted.
-- [-] `MVP-TASTE-004` Each sequential challenge forecast commits the authorized Profile/model/prefix before its first answer; original forecasts and first-answer measurements are immutable. Only afterward can the answer influence a later committed prefix. Pending ordinal comparisons may complete when another first label arrives, without rescoring the earlier panel. Corrections/withdrawals update future state and remove affected copied reports without rewriting old measurements. Existing v1 frozen batch forecasts and evaluation-only answers remain unchanged. #336's reference foundation does not supply SQL/mobile v2 or anonymous/native acceptance.
+- [-] `MVP-TASTE-004` Each sequential challenge forecast commits the authorized Profile/model/prefix before its first answer; original forecasts and first-answer measurements are immutable. Only afterward can the answer influence a later committed prefix. Pending ordinal comparisons may complete when another first label arrives, without rescoring the earlier panel. Corrections/withdrawals update future state and remove affected copied reports without rewriting old measurements. Existing v1 frozen batch forecasts and evaluation-only answers remain unchanged. #341 supplies the durable SQL contract and the mobile successor consumes it; anonymous/native/quality acceptance remains open.
 - [-] `MVP-TASTE-005` Evaluation uses documented metrics, sample size, missing coverage and uncertainty; no fabricated percentage or retroactively improved self-score. Ordinal comparisons require the same frozen prefix/panel; scalar scores across learned prefixes are incomparable. Per-domain provisional readiness is not statistical reliability or model admission. V1 ordering counts remain supported; calibrated grade prediction, sequential runtime and observed quality acceptance remain open.
 - [ ] `MVP-TASTE-006` After Taste ends, with provisional readiness or explicit insufficient support, Kajo reports the supported original prospective evaluations and shows a small unseen recommendation preview through the canonical production ranking boundary, with safe explanation and optional FOR_YOU/SURPRISE/RISK contrast. Insufficient evidence is disclosed rather than presented as a passed challenge; sequential source/runtime acceptance precedes preview.
 - [ ] `MVP-TASTE-007` A completed Taste session produces useful first-session recommendations compared with a fixed transparent baseline/reference set; if evidence does not show usefulness, public launch remains blocked.
