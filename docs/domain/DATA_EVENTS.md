@@ -138,6 +138,22 @@ properties?
 
 Meaningful dwell is weak attention evidence, not direct satisfaction.
 
+The October 15 owner clarification retains every meaningful choice and eventually
+measured visible attention (dwell, stops and resumptions) behind the active
+Profile, with actor, Item, session/context and original Prediction provenance.
+These observations contribute to available-at-time Profile state and observed
+Scenario continuations; they are not a separate fixed taste profile. Record
+bounded visible-duration intervals/aggregates in milliseconds, not an invented
+per-second preference label. Pause the clock when the app or surface is inactive;
+retain missing visibility, source identity and exact retry/deduplication. Multiple
+views of one interval are not independent support. Existing Item detail already
+records bounded `ITEM_DWELL` and stops on background/Item change/screen exit;
+complete grid/swipe pause instrumentation and its admitted state/Scenario consumer
+remain staged work. Passive duration is weaker than explicit preference, and
+absence of attention is not dislike. Retention/erasure follows the source.
+For the present packet the owner explicitly prioritizes predictions updating from
+accepted choices; exhaustive attention instrumentation is not required yet.
+
 ### Preference/discovery
 
 - `ITEM_LIKED`
@@ -257,6 +273,39 @@ unsubmitted rating draft and sends UNKNOWN, never a zero or negative rating.
 Server-owned state and the subsequent RESUME decide the next opportunity.
 SQLite keys include backend, actor and Profile; corrupt or stale-scope data is not
 dispatched/overwritten. Source/receipt issuance still does not prove screen exposure.
+
+### Sequential own-Personal v2 source
+
+The successor `public.taste_session_v2` separates START/NEXT/ANSWER transactions.
+NEXT commits an owned canonical non-delivery panel and one question. ANSWER retains
+its first server measurement and currently available same-prefix evaluation before
+projecting `TASTE_SESSION_V2` / `KAJO_CALIBRATION` evidence. Both the full-precision
+receipt and transaction identity precede a later NEXT; a lock wait alone cannot
+make a transaction that began before the answer eligible to score it.
+
+Numeric zero/five/ten remain genuine ratings. UNKNOWN changes recognition/history;
+NOT_INTERESTED also projects a distinct negative bootstrap prior with a null
+rating. It uses the existing native not-interest weight times the existing
+bootstrap/native rating trust ratio (`-5.5 × 0.75 / 1.2 = -3.4375`), under
+`taste-prior-v2`; this is an inspectable baseline, not measured quality admission.
+Existing bootstrap kinds retain their weights. Only this owned v2 source may
+write the new kind; it creates no consumed/native Event or native confidence.
+A later authoritative native rating/not-interest supersedes it through existing
+Personal source fusion. UNKNOWN supplies no preference weight.
+No question panel becomes an impression, delivered outcome origin or Scenario
+reward. Ordinary Discovery retains its existing canonical Item action writers.
+
+Command IDs retain canonical JSON hashes and exact sanitized replies. Corrections
+append response revisions; original first measurements and panels cannot be
+rewritten. Label withdrawal invalidates its dependent panel/question closure and
+removes those copied canonical evaluation runs; source-erasure retries return a
+redacted result. Whole session/import removal clears copies with a terminal
+session; account cascade clears ownership. External source erasure invalidates
+copied panels, and an Item rated elsewhere after freeze is no longer a valid first
+holdout. Existing v1 sessions and completed setup are preserved without conversion.
+PAUSE retains the same Profile/evidence and declares insufficient support for
+Discovery continuation; the mobile consumer and full readiness admission remain
+separate integration gates. See [the current source boundary](PREDICTION_MODEL.md#sequential-own-personal-v2-source).
 
 ## 4. TasteChallenge evaluation
 

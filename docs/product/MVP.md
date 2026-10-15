@@ -40,6 +40,16 @@ support. Preserve its PersonalProfile/evidence and continue learning after accep
 Discovery actions; readiness is revisable. The pure #336 reference does not yet
 supply this native handoff, current-state composition or cross-Profile retrieval.
 
+The owned sequential v2 server successor now targets committed per-answer
+canonical forecasts, durable retries/corrections/withdrawal and a voluntary
+insufficient pause without changing Profile identity. Its first source stage
+keeps readiness explicitly insufficient; the full readiness adapter and mobile
+handoff remain open. The owner's October 15 priority is continuously updating
+predictions from accepted choices. Full visible-time/stop/resume ingestion remains
+staged under the existing event/state/scenario requirements, not a new mandatory
+instrumentation sweep before this packet. No requirement below is closed by this
+source boundary alone.
+
 ## MVP completion meaning
 
 `MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.

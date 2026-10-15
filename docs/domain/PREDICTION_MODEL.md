@@ -118,13 +118,13 @@ an evaluation policy suffix: this capture is neither exposure nor a recommendati
 outcome origin. Existing source erasure owns these records. It is current-state
 capture, not an arbitrary historical-as-of reader or calibrated rating model.
 
-This is a private scoring primitive, not the persistent v2 Taste endpoint.
-Durable OFFER/ANSWER/NEXT commands must still enforce expected-prefix ownership,
-lock/freeze before first measurement, exact retry/conflict, projection and
-withdrawal, and retain the returned panel with the original question. The helper
-does not itself select questions, admit answers, determine readiness or expose a
-public RPC. The mobile sequential consumer and partial Taste → Discovery
-continuation remain the next integration work; old v1 sessions are preserved.
+This private scoring primitive is consumed by the
+[owned sequential v2 source](#sequential-own-personal-v2-source) below. That command
+boundary owns expected-prefix revisions, commit/freeze before first measurement,
+exact retry/conflict, rating projection and withdrawal. The scoring helper itself
+does not select questions, admit answers or determine readiness. The full native
+readiness adapter, mobile sequential consumer and partial Taste → Discovery
+handoff remain integration work; old v1 sessions are preserved.
 
 Ordinal evaluation compares only same-domain Items forecast under the **same
 committed prefix, model and declared panel**, with both first labels unseen at
@@ -160,6 +160,50 @@ Authorization, exact command idempotency, conflict handling and source lifecycle
 belong to the versioned server integration, not the pure selector. Existing v1
 sessions and completed setup must continue without reset or historical rewrites.
 
+### Sequential own-Personal v2 source
+
+The October 15 successor supplies `public.taste_session_v2` with private sessions,
+command hashes/replies and immutable canonical evaluation panels. START freezes
+at most 25 real Items/domain from the existing recognition/catalogue adapter;
+it returns NEEDS_NEXT rather than selecting inside the creation transaction.
+NEXT requires the retained receipt's strictly earlier timestamp and a different
+Postgres transaction, captures the exact canonical requested pool, stores its
+committed response prefix and chooses one question. ANSWER must likewise follow
+the committed question panel. A waiting transaction that began before the answer
+must retry NEXT in a new transaction even after its lock wait completes.
+
+The binary-tag SQL question policy is parity-tested against the portable numeric
+reference with actual canonical panel scores. Recognition, numeric-sensitive
+preference, feature diversity/coverage and per-domain progress determine choice;
+PRIOR_ONLY remains a private control. No client supplies candidates, clocks,
+features, scores or policy. Captured ranking tags remain the actual scorer input;
+the separately versioned fixed 64-tag dictionary is question-selection evidence.
+Both domain pools are explicitly BOUNDED_CANONICAL_POOL, never full catalogue
+coverage. Labels already known elsewhere cannot be new held-out measurements.
+
+The first response stores its original panel/prefix reference and available
+ordinal comparison counts before source-provenanced bootstrap projection. A
+later first label may complete an earlier same-domain pair from that one retained
+panel; scores from different prefixes are never subtracted. Corrections append
+revisions and invalidate affected evaluation rather than improving old results.
+Individual label withdrawal invalidates the dependent question/panel closure;
+canonical Prediction erasure, import/selective bootstrap removal and source Event erasure propagate
+to copied panels and sanitized retry results. Whole removal leaves a terminal
+session and clears copied data. The old v1 writer cannot start a competing session.
+
+In this bounded **continuous-learning source stage**, readiness remains explicitly
+INSUFFICIENT. The owner prioritizes an updating forecast now; full native
+per-domain readiness/stability admission and measured quality are not claimed.
+The 48-opportunity/160-command limits are safety stops, not sufficient-answer
+quotas. PAUSE/CONTINUE preserves the same Profile and projected evidence and exposes
+an honest ability to continue Discovery. Numeric ratings and distinct negative
+interest update canonical priors; UNKNOWN only informs recognition/selection.
+The new negative kind uses the existing bootstrap/native trust ratio without
+changing old weights; see [evidence semantics](DATA_EVENTS.md#sequential-own-personal-v2-source).
+Full mobile navigation/queue integration, anonymous entry and hosted/device acceptance
+remain separately recorded work. No new serving model or population policy is
+activated by the protocol.
+
 ### Continuous learning across Taste and Discovery
 
 The **2026-10-15 owner clarification** applies the existing complete architecture
@@ -171,6 +215,14 @@ readiness, the user can continue to Discovery with the actual evidence and expli
 per-domain insufficiency. Do not force an endless test or create another Profile.
 The current portable reference reports insufficient states but does not implement
 that native handoff, Discovery ingestion or a persistent Profile readiness store.
+
+The later October 15 clarification explicitly includes visible attention duration,
+stops and resumptions as eventual state/Scenario inputs alongside choices. Their
+[observation contract](DATA_EVENTS.md#exposure) preserves active visibility, bounded
+duration, scope, deduplication and source erasure. Existing detail dwell is an
+initial source; full attention instrumentation/admission remains staged. The
+immediate implementation priority is continuously updated predictions after
+accepted choices, without claiming that attention alone is satisfaction.
 
 For each accepted meaningful action, the server commits the canonical observation
 and correction/source lineage, recomputes eligible Working/Short/Long support,

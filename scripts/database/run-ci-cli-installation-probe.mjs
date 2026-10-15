@@ -44,6 +44,7 @@ import { personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
 import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
+import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
@@ -345,6 +346,8 @@ try {
     const [personalEvaluation] = await exec(await personalEvaluationSmokeSql(),
       { stage: 'personal-evaluation-canonical-candidates-cutoff-no-delivery', timeoutMs: 120_000 });
     assert.match(personalEvaluation?.personalEvaluation, /^PASS:/);
+    const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
+    assert.equal(personalSequentialTaste.status, 'PASS');
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -406,6 +409,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation,
+      personalSequentialTaste,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
