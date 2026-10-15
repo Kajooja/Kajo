@@ -7253,3 +7253,46 @@ rollout authorization with a refreshed private checkpoint, only still-missing
 forwards and backend role/preservation verification, then the matching device
 matrix. Full readiness, quality, anonymous entry and remaining release gates stay
 open; canonical preview follows consumer acceptance. Sprint 014 remains open.
+
+## Accepted sequential Taste hosted rollout — 2026-10-15 / #336 / #343
+
+The owner explicitly approved merging [#343](https://github.com/Kajooja/Kajo/pull/343)
+and applying its three reviewed hosted operations. All five final-source CI #671
+gates passed. Accepted merge is `799f1c850b989d1cfeef450946689224d9727359`,
+tested tree `211686d70bf33fe86c83191622e8b303a2d86ddc`.
+The preceding preparation-stage BRIDGE_REQUIRED/undeployed statements record that
+earlier checkpoint; the completed rollout below supersedes them.
+
+Exactly three new operations were acknowledged, in this dependency order:
+`20261015192129_sequential_bootstrap_compatibility.sql`,
+`20261015090018_personal_evaluation_scoring.sql`, then
+`20261015101752_durable_sequential_taste.sql`. The exact compact helper was
+canonicalized before the unchanged evaluation/v2 forwards, preserving function
+identity/security. The original 16-forward manifest and earlier guard bridge
+remain unchanged and installed. None of these operations should be replayed.
+
+The final actual-target read-only preflight passes the exact installed two-forward
+prefix/provider receipts, all 41 function snapshots and nine lifecycle triggers.
+V2 role denial and closed private storage checks pass. All 60 preexisting
+Auth/public/private tables retain identical row counts and full-row digests before
+and after deployment. A genuine existing owner's rolled-back catalogue smoke
+returned 80 distinct BOOK and 80 distinct MOVIE Items, with exact retries; the
+preservation check passed again afterward. The three new v2 tables remain empty.
+Target identity, provider-generated versions, history digests, row fingerprints
+and detailed operator receipts remain private.
+
+The #669 APK from `c776de5fcdb62c72216b25a955a8c4b8685b2580` remains the matching
+compiled app: #343 changes no compiled mobile inputs. STATUS owns its artifact
+and expiry; DEVICE_TEST owns the next actual phone observations. Install as an
+update preserving accounts, v1 sessions/pending commands and completed setup.
+Existing owners can verify preservation and committed Discovery behavior. A new
+v2 session requires an authorized eligible PersonalProfile without a prior v1
+session or completed setup; there is no app action to restart those preserved
+Profiles into v2. Do not reset an account to force this test.
+
+No genuine first-v2-session result, phone/emulator observation, account reset,
+model/Working activation, measured usefulness or release acceptance is claimed.
+Next is the matching device matrix, including slow/lost acknowledgement,
+restart/current-question recovery and partial Taste → same-Profile Discovery
+freshness. Canonical preview follows consumer acceptance; #336, full readiness,
+quality, anonymous entry and Sprint 014 remain open.

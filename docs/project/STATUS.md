@@ -10,15 +10,18 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — matching sequential Taste rollout / #336
+## Current packet — matching sequential Taste device acceptance / #336
 
-Accepted main is `c776de5fcdb62c72216b25a955a8c4b8685b2580` through
-[#342](https://github.com/Kajooja/Kajo/pull/342). Its source
-`82fd56505deb6448c2d9ded74155b0fa13a9ff72` and accepted merge have identical
-tree `8ece8e164dfb4691737286340606e4ecd66de398`. All five final-source
-[CI #668](https://github.com/Kajooja/Kajo/actions/runs/38738821177) gates passed;
-accepted-main [CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140)
-also passed all five gates and produced the matching standalone APK below.
+Accepted main is `799f1c850b989d1cfeef450946689224d9727359` through
+[#343](https://github.com/Kajooja/Kajo/pull/343), exact tested tree
+`211686d70bf33fe86c83191622e8b303a2d86ddc`. All five final-source CI #671
+gates passed; the owner explicitly approved its merge and the three hosted
+operations. The matching compiled mobile source remains
+`c776de5fcdb62c72216b25a955a8c4b8685b2580` through
+[#342](https://github.com/Kajooja/Kajo/pull/342), tree
+`8ece8e164dfb4691737286340606e4ecd66de398`.
+[CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140) passed all
+five gates and built the matching standalone APK; #343 changes no compiled inputs.
 The #337 reference, #339 Discovery refresh, #340 evaluation boundary and #341
 owned sequential server are accepted. Do not recreate these source packets.
 
@@ -31,60 +34,47 @@ writers. **Jatka selaamaan** commits PAUSE before releasing the same Profile to
 Discovery and preserves dismissal through restart. Saved-answer progress retains
 honest insufficient support; full readiness and measured quality remain open.
 
-Current branch `chore/sequential-taste-rollout` prepares the matching guarded
-backend/build/device continuation under [#336](https://github.com/Kajooja/Kajo/issues/336).
-A read-only October 15 operator check confirms the existing owned v1 endpoints
-are installed while `public.taste_session_v2(jsonb)` is absent. The original
-16-forward chain and immutable-guard bridge are already installed; do not replay
-them or use the old catalog-generation preflight for this later checkpoint.
-Target/history and observed function metadata remain in a private operator receipt.
+The owner-approved hosted rollout is complete. Exactly three new operations were
+acknowledged in dependency order: the exact bootstrap compatibility prerequisite
+`20261015192129_sequential_bootstrap_compatibility.sql`, canonical evaluation
+`20261015090018_personal_evaluation_scoring.sql`, then durable v2
+`20261015101752_durable_sequential_taste.sql`. The historical compact helper was
+bridged without changing its identity/security. The original 16-forward chain,
+earlier immutable-guard bridge and all accepted migration bytes remain unchanged.
+All three new operations are installed; do not replay them.
 
-The additive `scripts/database/personal-sequential-taste-hosted-upgrade.*`
-preparation binds accepted application source to a separate exact bootstrap
-compatibility prerequisite, then two missing forwards:
-`20261015090018_personal_evaluation_scoring.sql`, then
-`20261015101752_durable_sequential_taste.sql`. It validates the observed installed
-prefix, function bodies/security and target/history checkpoint, and rehearses
-preservation with populated v1 sessions and frozen challenges in a disposable
-transaction. The actual checkpoint exposed a historical compact
-`bootstrap_evidence_weight_v1` body. Its behavior matches the old canonical body,
-but v2's exact source guard correctly refuses that source shape. The append-only
-`20261015192129_sequential_bootstrap_compatibility.sql` bridges only that exact
-reviewed body into the required canonical pre-v2 shape, preserving OID/security;
-canonical pre-v2 and final-v2 shapes are no-ops. Unknown source or security drift
-remains rejected. Apply this prerequisite before the unchanged evaluation/v2
-forwards, despite its later chronological position for fresh installations.
-The preparation does not apply SQL to a hosted target. The original reviewed
-manifest and compatibility bridge retain their exact bytes.
+The final actual-target read-only preflight passes the exact two-forward installed
+prefix, provider/source receipts, all 41 function snapshots and nine lifecycle
+triggers. V2 role denial and closed private storage checks pass. All 60 preexisting
+Auth/public/private tables retain identical row counts and complete-row digests
+after deployment. An existing owner's rolled-back catalogue smoke returned 80
+distinct BOOK and 80 distinct MOVIE Items with exact retries; the same preservation
+checks passed afterward. The three new v2 tables remain empty. This verifies
+deployment and preserved existing serving, not an observed first v2 session,
+phone installation or recommendation quality.
 
-Preparation validation: all five focused tests pass, including exact compact
-bridge semantics/metadata, populated v1/completed setup/first-answer receipt
-preservation, helper/trigger permissions and provider-history drift. Independent
-review also verified canonical/final-v2 no-ops and rejection of owner, ACL, security,
-search-path and volatility changes. The actual target's read-only preflight reports
-**BRIDGE_REQUIRED**, with both application forwards missing. No hosted write occurred.
-Local lint/typecheck, 544 mobile and 284 engine tests pass; full final-source CI
-and the bounded native canonical/compact rehearsals belong to this packet's PR.
+The accepted preparation module remains read-only/disposable-only, with no hosted
+apply entry point. Its exact prerequisite and installed-forward receipts, target
+selection, history, raw function metadata and row fingerprints are retained
+privately. A future operator must refresh and reconcile that checkpoint instead
+of inferring provider versions from filenames. The earlier BRIDGE_REQUIRED result
+is historical and superseded by the final passing installed-prefix preflight.
 
-To prepare a private checkpoint, use the module's exported function snapshot SQL,
-actual provider history/digest and `bootstrapVariant`. Each installed forward needs
-its exact source hash and provider version/name/whole-statement digest receipt;
-never infer a provider timestamp from a source filename. Running the module with
-the private checkpoint emits read-only preflight SQL and `PREPARED_ONLY`. Verify
-project selection separately and refresh history/bodies after each acknowledged
-operation or ambiguous reply. Record each newly installed operation before continuing.
-
-**Next action:** verify this packet's final-source PR receipt has all five required
-CI gates; refresh the actual private checkpoint and apply only the still-missing
-reviewed forwards under the target-specific rollout authorization. Then verify the
-v2 role/ownership boundary and retained v1 data before using the matching APK for
+Current branch `docs/sequential-taste-rollout-receipt` records this completed
+rollout; it is documentation bookkeeping, not another runtime implementation.
+**Next action:** install the matching #669 APK as an update and execute
 [the sequential device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15).
-Exercise slow acknowledgement, lost ANSWER/NEXT/PAUSE replies, restart/current-question
-recovery and partial Taste → Discovery freshness on the same Profile. Actual
-hosted application, device observations and measured usefulness are not supplied
-by source CI. No account reset is required. Canonical preview follows this consumer
-acceptance; #336 remains open for full readiness/quality. Complete attention timing
-and authorized Scenario retrieval retain their existing architecture gates.
+Preserve existing v1 sessions, pending commands and completed setup. A genuine new
+v2 test requires an authorized eligible PersonalProfile without a prior v1 session
+or completed setup; the current app has no restart-v2 action for those preserved
+Profiles. Do not reset an account to force eligibility. Existing owners can test
+preservation and committed Discovery choices now. On an eligible v2 Profile,
+exercise slow/lost ANSWER/NEXT/PAUSE replies, restart/current-question recovery
+and partial Taste → same-Profile Discovery freshness. No device observation,
+account reset, model/Working activation or measured quality is claimed.
+Canonical preview follows consumer acceptance; #336 remains open for full
+readiness/quality. Complete attention timing and authorized Scenario retrieval
+retain their existing architecture gates.
 
 ## Sequential adaptive Taste reference / #336
 
@@ -222,8 +212,10 @@ is `c776de5fcdb62c72216b25a955a8c4b8685b2580`, tree
 expires **2026-10-22 14:04:16 UTC**. This identifies the archive, not the extracted APK.
 The earlier #653 v1 binary remains historical evidence. Installing this new APK
 against a confirmed missing initial v2 RPC permits the deliberate v1 fallback;
-that fallback cannot establish sequential acceptance. Verify the matching backend
-first. No new phone, emulator, gesture or installation observation is claimed.
+that fallback cannot establish sequential acceptance. The matching backend is now
+installed through the owner-approved #343 rollout above; #343 changes no compiled
+inputs. Existing v1/completed Profiles remain preserved. No new phone, emulator,
+gesture or installation observation is claimed.
 
 [DEVICE_TEST](DEVICE_TEST.md) owns native acceptance. Install as an update preserving
 existing data and record installed SHA/run, device and actual backend checkpoint.

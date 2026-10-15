@@ -7,19 +7,25 @@ main `c776de5fcdb62c72216b25a955a8c4b8685b2580`.
 All five gates and the standalone APK pass in
 [CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140).
 [STATUS](STATUS.md) owns the matching APK artifact, archive digest and expiry.
-These are source/build receipts; no v2 phone observation is recorded here.
-
-The October 15 read-only backend check found v1 installed and v2 absent. The
-original 16-forward chain and immutable-guard bridge are already installed;
-do not replay them. Before testing v2, reconcile the private actual checkpoint
-with the separately reviewed sequential successor, then verify the installed
-`taste_session_v2(jsonb)` contract and canonical evaluation dependency. An APK
-running its deliberate v1 fallback does not accept the sequential flow.
+The owner-approved [#343](https://github.com/Kajooja/Kajo/pull/343) source and
+three-operation hosted rollout are now accepted. Final installed-prefix,
+41-function/nine-trigger, role and private-storage checks pass; existing data is
+preserved. The bootstrap prerequisite, canonical evaluation and
+`taste_session_v2(jsonb)` are installed. Do not replay them or the earlier chain.
+#343 changes no compiled mobile inputs, so #669 remains the matching APK.
+No actual first v2 session, phone installation or device observation is recorded
+by these source/build/hosted receipts. A retained v1 flow cannot accept v2.
 
 Install the matching APK as an update, preserving current accounts, Profiles,
 local pending commands and server sessions. Use an authorized eligible owner for
 a new v2 session; an existing completed setup or v1 session must stay preserved,
-not be reset to make it eligible. Cases needing a second client or controlled
+not be reset to make it eligible. A new v2 Profile must have neither a previous
+v1 session nor completed setup; retained v1 pending commands also stay v1. This
+app has no new-v2 restart action for a preserved Profile. Existing completed users
+continue to Discovery, while retained v1 users can finish or choose **Jatka Kajoon**.
+They can check preserved ratings/Lists, restart recovery and committed Discovery
+choices without counting that as a v2 session test.
+Cases needing a second client or controlled
 post-commit reply loss remain **NOT TESTED** unless those conditions are available.
 
 | Case | Required observation |
@@ -41,7 +47,8 @@ private operator receipt; publish only redacted observations here and in #238.
 Do not substitute the ZIP digest for the installed APK checksum. Malformed replies,
 unwritable local storage and acknowledgement-write failure have automated coverage;
 record any controlled native exercise separately without claiming it from CI.
-Matching hosted/device acceptance and measured usefulness remain open. The
+Matching hosted rollout is accepted; device acceptance and measured usefulness
+remain open. The
 historical v1 matrix and earlier positive device observations below retain their
 original scope.
 

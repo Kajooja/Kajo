@@ -11,11 +11,14 @@ per-action learning in Taste and Discovery, individually and in Shared context.
 The reference (#337), committed Discovery refresh (#339) and canonical evaluation
 boundary (#340), durable sequential commands (#341) and mobile consumer (#342)
 are accepted source, including partial-readiness continuation into Discovery.
-Continue #336 with matching guarded backend/build/device acceptance before
-the canonical preview. The additive post-v1 preparation must preserve the original
-16-forward manifest/bridge, verify the actual installed prefix and supply only the
-missing canonical-evaluation/sequential forwards after the separately pinned
-bootstrap compatibility prerequisite; existing accounts are preserved.
+The owner-approved #343 source and matching three-operation hosted rollout are
+accepted after all five CI #671 gates and exact installed-prefix/security/data
+preservation checks. The original 16-forward manifest/bridge is unchanged; the
+separate bootstrap prerequisite and evaluation/v2 forwards are installed and must
+not be replayed. Continue #336 with the matching #669 APK and actual device
+acceptance before the canonical preview. Preserve existing v1/completed Profiles;
+a genuine new v2 session requires an authorized eligible PersonalProfile. No reset
+or positive first-v2-session observation is implied by deployment acceptance.
 A bounded initial test may end with insufficient support;
 ordinary browsing must retain that evidence and keep refining predictions.
 Neither a response quota nor an endless mandatory test is the completion policy.
@@ -49,8 +52,9 @@ The owned adaptive TasteSession/challenge mobile consumer is now accepted throug
 acceptance is next; #333 prepares the exact 16-forward chain from the reviewed
 catalog-generation source checkpoint. That original chain is now installed in the
 observed operator target; its immutable manifest remains historical operational
-identity. The current #342 sequential source and #669 APK require the separate
-post-v1 delta preparation and actual backend/device acceptance in STATUS.
+identity. The current #342 sequential source and #669 APK now have the accepted
+#343 post-v1 hosted delta; actual device and first-v2-session acceptance remain
+the current STATUS handoff.
 Canonical unseen preview follows that consumer in its retained
 order. STATUS owns the exact source/build receipt and one current task. Automated
 source acceptance does not close the remaining anonymous, device or release gates.
