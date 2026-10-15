@@ -10,41 +10,68 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — committed Discovery refresh / #338
+## Current packet — canonical evaluation scoring / #336
 
-The [#337 sequential reference](https://github.com/Kajooja/Kajo/pull/337) is
-accepted from source `7d81bb60f44dc286a890096d191e3d0acf174382`, tree
-`822818bb5ad4bc1526d73dc098d95189ecb9ef75`. All five final-source gates passed in
-[CI #659](https://github.com/Kajooja/Kajo/actions/runs/38694122310), and #337 merged
-as `8bdb1755ead9e877c5115e89985e8ae3238886e4`. Do not recreate that reference.
+Accepted main is `7ab47aa09b097d67fed06cfee3b225df88baf60d` through
+[#339](https://github.com/Kajooja/Kajo/pull/339). Its source
+`87fe584d9e3d92c95a2e6617f5fdc70b0fc03d57` passed all five
+[CI #661](https://github.com/Kajooja/Kajo/actions/runs/38701912202) gates.
+The committed Discovery refresh defect (#338) is closed. The sequential reference
+[#337](https://github.com/Kajooja/Kajo/pull/337) is also accepted: source
+`7d81bb60f44dc286a890096d191e3d0acf174382`, tree
+`822818bb5ad4bc1526d73dc098d95189ecb9ef75`, all five
+[CI #659](https://github.com/Kajooja/Kajo/actions/runs/38694122310) gates, merged as
+`8bdb1755ead9e877c5115e89985e8ae3238886e4`. Do not recreate either packet.
 
-The related [#338](https://github.com/Kajooja/Kajo/issues/338) source successor,
-branch `fix/discovery-committed-refresh`, fixes a concrete post-action gap:
-an optimistic rating could trigger a ranking request before the server committed
-it, then an identical confirmed interaction left the ranking revision unchanged.
-The provider now advances the existing invalidation revision after every
-current-scope committed action, including ordinary ratings/not-interest/Undo.
-Collection receipts still advance once. Pending/rejected writes and late old-scope
-callbacks do not become committed evidence; frozen delivery origins are unchanged.
+The current `feat/taste-evaluation-scoring` branch continues
+[#336](https://github.com/Kajooja/Kajo/issues/336) with the private
+`capture_personal_evaluation_v1` boundary and append-only
+`20261015090018_personal_evaluation_scoring.sql`. It shares base/scalar/identity
+scoring with ordinary and catalogue-chain serving and explicitly evaluates 1–50
+requested canonical Items. The global top-50 pool no longer defines the evaluation
+universe. Missing/withdrawn/mock-only/suppressed Items retain unavailability.
+Public signatures, old v1 Taste, assigned genomes and ordinary delivery semantics
+remain preserved; active request owners enter the common implementation directly.
 
-The regression executes the actual provider/outbox receipt path with a delayed
-response and identical optimistic/confirmed 0, 5 and 10 ratings. All three fail on
-the predecessor and pass after the fix; rejection and old-Profile callback cases
-also pass. All 76 focused coordination/reader/outbox tests and all 522 mobile
-tests pass, as do lint/typecheck and both mobile native exports. The root check
-reaches the existing refused Deno registry dependency; full GitHub CI remains
-required. No native device observation or hosted change is claimed.
+An owned internal caller supplies the actual retained response receipt cutoff.
+The helper rejects `now() <= required_after`, so ANSWER must commit before NEXT
+starts a new transaction. It freezes canonical state/score inputs and actual used
+Item type/tags, and records evaluation candidates with no selected delivery,
+exposure, Event or inferred accuracy. Existing source erasure owns the run/candidates.
+This private primitive does not implement v2 session commands or a public endpoint.
 
-**Next action:** inspect the #338 source successor on its named branch and accept
-only after its own five final-source CI gates pass. Its PR owns the
-final source/tree and merge receipt. After source acceptance, continue #336's
-canonical evaluation scoring/committed-prefix boundary described below. Verify
-slow-write/offline-retry → acknowledgement → refreshed recommendations on the
-matching device build; retain that observation separately from source acceptance.
+Validation includes populated row/function metadata preservation, old/new ordinary
+and catalogue scoring parity, global top-50 BOOK starvation, scope/ACL/bounds,
+unavailable candidates, frozen records/erasure, and genuine committed v1 Taste
+ratings 10/0/5 followed by new forecasts. The same-transaction NEXT case rejects.
+The 36-page Personal/Shared catalogue regression exposed an extra call-layer issue;
+serving now keeps its original call depth and the unchanged matrix passes.
+All 239 database tests, 522 mobile tests, 284 engine tests, lint/typecheck,
+research/acceptance suites and four native exports pass locally; 93 changed-doc
+links resolve. The root check still stops at refused Deno npm-registry access;
+the complete final-source GitHub validation remains mandatory.
+Native CLI smoke joins required CI; the PR owns exact final source/tree, test and
+merge receipts. Source acceptance does not establish hosted or device acceptance.
+
+Publication authorization: on October 15 the owner explicitly approved publishing
+this source/migration packet to public `Kajooja/Kajo` and merging after all five
+final-source CI gates pass. The earlier publication-review block is resolved by
+that approval. The PR owns its exact source, CI and merge receipts.
+
+**Next action:** publish this prepared branch and accept its PR only after all five
+final-source CI gates pass. Then continue #336 with **durable owned v2
+OFFER/ANSWER/NEXT commands** consuming the canonical evaluation primitive: expected
+revision and actual server receipt lineage, pre-first-answer freeze, same-prefix
+pending ordinal comparisons, projection/correction/withdrawal, exact retry and
+source erasure. Then integrate the mobile sequential consumer and partial Taste →
+Discovery continuation on the same Profile. Preserve completed v1 state. Confirm
+slow-write/offline-retry → acknowledgement → fresh predictions on the matching
+device build separately. No hosted rollout, account reset or model activation is
+part of this source packet.
 
 ## Sequential adaptive Taste reference / #336
 
-Accepted baseline before this packet is `419f3850378d04b4e2417852d6b9eb5c06b5d127` through
+Historical baseline before #337 is `419f3850378d04b4e2417852d6b9eb5c06b5d127` through
 [#335](https://github.com/Kajooja/Kajo/pull/335). Its final source
 `7a64762db300314e22fe23e5af1713e0b62131b2` passed all five
 [CI #657 gates](https://github.com/Kajooja/Kajo/actions/runs/38379100290).
@@ -62,8 +89,8 @@ improve or reveal uncertainty; improvement after every individual answer is not
 guaranteed. See [the canonical contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
 and [the product flow](../product/LAUNCH_LOOP.md).
 
-[#336](https://github.com/Kajooja/Kajo/issues/336), branch
-`feat/adaptive-taste-reference`, owns the first bounded source foundation:
+[#336](https://github.com/Kajooja/Kajo/issues/336) first supplied the accepted
+`feat/adaptive-taste-reference` source foundation:
 `packages/prediction-engine/src/adaptive-taste.ts`, its optional `./adaptive-taste`
 export and executable media/non-media conformance/control fixtures. This is a
 portable pure reference consuming supplied canonical forecast snapshots. It
@@ -93,18 +120,12 @@ Required reference invariants:
 - A fixed recognition-only control remains available. Synthetic comparisons
   establish behavior/provenance, not empirical first-session usefulness.
 
-After the current #338 source packet is accepted, do not
-reimplement either. Continue #336 with the **canonical evaluation-scoring
-and committed-prefix boundary**, then persistent owned SQL commands and the mobile
-consumer including partial-readiness continuation into Discovery and verified
-post-action fresh predictions on the same Profile. The existing global top-50 delivery pool is not a complete evaluation
-catalogue; provide per-domain coverage and a shared bounded explicit-candidate
-scorer/capture rather than inventing challenge scores. Do not infer a rating from
-an uncalibrated ranking score. The existing scorer's transaction-start cutoff
-requires separately committed answer/next calls or an explicit later cutoff
-throughout state, source fusion, decay and scoring. Preserve lifecycle/erasure,
-exact retry/conflict and old v1 completion before native rollout. No new rollout,
-reset, Working/cohort activation or model promotion is authorized by this handoff.
+The #337 reference and #339 Discovery refresh are accepted. After the current
+canonical evaluation-scoring packet, continue the persistent owned SQL commands
+and mobile consumer described in the current handoff above. Do not infer a rating
+from an uncalibrated ranking score. Preserve lifecycle/erasure, exact retry/conflict
+and old v1 completion before native rollout. Working/cohort activation and model
+promotion remain separate gates.
 
 The October 15 owner clarification is now recorded in the canonical
 [continuous-learning contract](../domain/PREDICTION_MODEL.md#continuous-learning-across-taste-and-discovery):

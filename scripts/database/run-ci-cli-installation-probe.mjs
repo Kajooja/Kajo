@@ -43,6 +43,7 @@ import { personalSourceFusionSmokeSql, personalSourceFusionUpgradeSql } from './
 import { personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
 import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
+import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
 import { verifyPersonalWorkingResetConcurrency } from './personal-working-reset-concurrency.mjs';
@@ -341,6 +342,9 @@ try {
     const [personalTasteChallenge] = await exec(await personalTasteChallengeSmokeSql(),
       { stage: 'personal-taste-challenge-canonical-frozen-holdout', timeoutMs: 120_000 });
     assert.match(personalTasteChallenge?.personalTasteChallenge, /^PASS: canonical pre-answer freeze/);
+    const [personalEvaluation] = await exec(await personalEvaluationSmokeSql(),
+      { stage: 'personal-evaluation-canonical-candidates-cutoff-no-delivery', timeoutMs: 120_000 });
+    assert.match(personalEvaluation?.personalEvaluation, /^PASS:/);
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -401,6 +405,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
+      personalEvaluation,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,
