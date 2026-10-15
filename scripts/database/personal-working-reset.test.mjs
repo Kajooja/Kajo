@@ -52,7 +52,6 @@ test('native private Working reset is bounded, prospective and scope-owned while
     const clock = Number((await db.query('select extract(epoch from now())*1000 value')).rows[0].value);
     const startedAt = new Date(clock - 300_000).toISOString();
     const iso = offset => new Date(clock + offset).toISOString();
-    const now = async () => (await db.query('select clock_timestamp()::text value')).rows[0].value;
     let actionNumber = 1000, requestNumber = 2000, resetNumber = 3000;
     const command = (item, at, payload, session = sessionId) => ({ version: 1, actionId: uuid(actionNumber++), actorUserId: actor,
       profileId: personal, itemId: item, occurredAt: at, discoveryMode: 'FOR_YOU', predictionId: null,
@@ -197,16 +196,21 @@ test('native private Working reset is bounded, prospective and scope-owned while
 
     await caseTest('post-reset independent Items regain intent while exact UNDO/clear cannot resurrect pre-reset taste', async () => {
       const receipt = await reset();
-      await actorCall('commit_item_action_v1', command(evidence[2], await now(), { kind: 'SET_RATING', rating: 0 }));
-      assert.equal((await capture()).status, 'INSUFFICIENT_SUPPORT');
-      const positive = command(evidence[3], await now(), { kind: 'SET_RATING', rating: 10 });
+      // Adjacent PGlite clock reads can tie. Preserve the exact reset precision
+      // with strictly later fixture occurrences and a cutoff covering them all.
+      const times = (await db.query(`select array_agg(($1::timestamptz+n*interval '1 millisecond')::text order by n) values
+        from generate_series(1,5) n`, [receipt.resetAt])).rows[0].values;
+      const postResetCapture = () => capture(sessionId, times[4]);
+      await actorCall('commit_item_action_v1', command(evidence[2], times[0], { kind: 'SET_RATING', rating: 0 }));
+      assert.equal((await postResetCapture()).status, 'INSUFFICIENT_SUPPORT');
+      const positive = command(evidence[3], times[1], { kind: 'SET_RATING', rating: 10 });
       await actorCall('commit_item_action_v1', positive);
-      const active = await capture();assert.equal(active.status, 'ACTIVE');assert.equal(active.support.distinctItems, 2);await oracle(active);
+      const active = await postResetCapture();assert.equal(active.status, 'ACTIVE');assert.equal(active.support.distinctItems, 2);await oracle(active);
       near(await adjustment(active), 0.25 * (1 - Math.SQRT1_2) / (1 + Math.SQRT1_2), 'Ordered post-reset two-group independent oracle');
-      await actorCall('commit_item_action_v1', command(evidence[3], await now(), { kind: 'UNDO', reversesActionId: positive.actionId }, otherSession));
-      assert.equal((await capture()).support.distinctItems, 1);await oracle(await capture());
-      await actorCall('commit_collection_action_v1', command(evidence[2], await now(), { kind: 'CLEAR_HISTORY', source: 'LISTS' }, otherSession));
-      const empty = await capture();assert.equal(empty.status, 'RESET_EMPTY');await oracle(empty);
+      await actorCall('commit_item_action_v1', command(evidence[3], times[2], { kind: 'UNDO', reversesActionId: positive.actionId }, otherSession));
+      assert.equal((await postResetCapture()).support.distinctItems, 1);await oracle(await postResetCapture());
+      await actorCall('commit_collection_action_v1', command(evidence[2], times[3], { kind: 'CLEAR_HISTORY', source: 'LISTS' }, otherSession));
+      const empty = await postResetCapture();assert.equal(empty.status, 'RESET_EMPTY');await oracle(empty);
       assert.equal(empty.resetControlCount, 1);assert.equal(empty.resetControls[0].resetId, receipt.resetId);
       const secondReset = await reset();assert.notEqual(secondReset.resetId, receipt.resetId);
       assert.deepEqual(await reset(receipt.resetId), receipt, 'A later reset cannot rewrite the earlier reset receipt');
