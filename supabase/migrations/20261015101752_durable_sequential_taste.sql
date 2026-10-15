@@ -169,7 +169,8 @@ begin
   if s.status='REMOVED' then return jsonb_build_object('version',s.version,'sessionId',s.id,'profileId',s.profile_id,'status','REMOVED');end if;
   p:=s.presentations->-1;
   if p is not null and jsonb_array_length(p->'responses')=0 and not (p->>'invalidated')::boolean then
-    select c-'tags'-'rawTags' into item from jsonb_array_elements(s.catalog) c where c->>'id'=p->>'objectId';
+    select jsonb_build_object('id',c->>'id','itemType',c->>'itemType','title',c->>'title')
+      into item from jsonb_array_elements(s.catalog) c where c->>'id'=p->>'objectId';
   end if;
   metrics:=private.sequential_taste_evaluations_v2(s.id,s.presentations);
   return jsonb_build_object('version',s.version,'sessionId',s.id,'profileId',s.profile_id,'revision',s.revision,

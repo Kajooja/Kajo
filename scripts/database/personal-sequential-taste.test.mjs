@@ -155,7 +155,8 @@ test('owned sequential Taste v2 / full current schema',async t=>{
       const accepted=await rpc(req);assert.equal(accepted.status,'NEEDS_NEXT');assert.deepEqual(await rpc(req),accepted);
       await assert.rejects(rpc({...req,answer:{kind:'RATING',value:10}}),/identity conflict/);
       await assert.rejects(rpc({...req,requestId:randomUUID()}),/revision conflict/);
-      assert.doesNotMatch(JSON.stringify(s),/"score"|"frozen"|"selectionComponents"|"rawTags"/);
+      assert.doesNotMatch(JSON.stringify(s),/"score"|"frozen"|"selectionComponents"|"rawTags"|"recognitionPrior"/);
+      assert.deepEqual(Object.keys(s.currentItem).sort(),['id','itemType','title']);
       assert.equal((await one('select count(*)::int n from private.profile_bootstrap_evidence where active')).n,1);
       assert.deepEqual(await start(),accepted);
       const retained=(await state(s.sessionId)).presentations[0].responses[0];
