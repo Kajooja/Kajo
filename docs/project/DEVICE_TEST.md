@@ -1,5 +1,32 @@
 # Collection device checkpoint — #228 / #229
 
+## Owner feed feedback and planned successor — 2026-10-15
+
+The owner reports that the Taste start/card flow showed the same films as another
+Profile, and requests the same artwork/card presentation as Discovery plus a
+vertical feed with **Ohita** on deliberate swipe-away. Installed APK checksum,
+session protocol, exact answer prefixes and post-answer ordering were not supplied
+with that report. It is not a full v2 acceptance result, proof of absent learning
+or a diagnosed server defect. Identical empty Profiles may share an opening.
+
+Source review confirms the current Taste card has no artwork payload, Discovery's
+detail pager is horizontal, and v2 question selection prioritizes domain coverage
+over utility without ranking by canonical forecast magnitude. ANSWER does update
+bootstrap/canonical forecasts; that alone does not close next-card usefulness.
+The following matrix is **planned / NOT IMPLEMENTED**, under the mandatory
+[near-term ROADMAP targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
+Do not expect these controls in the matching #669 APK or count the old matrix
+below as acceptance of this successor.
+
+| Planned case | Required observation |
+|---|---|
+| Shared feed and artwork | Taste and Discovery card mode use the same artwork, Item metadata and vertical gesture; missing art has a usable fallback. Grid remains available. First-use/Taste copy explains Ohita and an accessible equivalent works with large text/reduced motion. |
+| Deliberate neutral skip | Only a completed deliberate swipe-away or equivalent Ohita commits one contextual skip with the exact shown origin. Partial scroll, returning to a card, reflow/backgrounding and failed commands do not invent preference. A draft rating is not submitted by skipping. |
+| Suppression and eligible return | The skipped Item leaves this feed, does not loop back immediately, and may return only under the declared changed-context/cooldown rule. It is not marked consumed, rated zero, known/unknown or permanently disliked. Old UNKNOWN/NOT_INTERESTED records keep their original meaning. |
+| First-answer causality | On controlled eligible Profiles with the same catalogue/time/policy and first Item, compare supported 10, 0 and neutral prefixes. Inspect the committed prefix and next candidate utilities/choice; a meaningful supported counterexample must change the next selection, rather than merely incrementing a count or changing only the next forecast. Domain coverage must not always override that signal. Never require every ordinary answer to visibly reorder the feed. |
+| Same-Profile Discovery | After each acknowledged rating/save/skip, the next fresh delivery uses the correct committed state, including a partial Taste → Discovery continuation. An undelivered stale prefetched queue is invalidated; previously delivered origins/history stay immutable. Retry/restart/concurrent scope changes do not duplicate or misattribute evidence. |
+| Cold start and quality | Record prior/catalogue/policy time/version, support and sparse-data fallback. Compare the recent-supported prior and personalized continuation against declared controls. Interstellar/Inception is an illustrative similarity case, not a required hardcoded pair, and an ordinal score is not a rating-10 probability. Genuine usefulness remains a measured gate. |
+
 ## Sequential Taste v2 acceptance — #336 / #342 / 2026-10-15
 
 The mobile consumer is accepted through [#342](https://github.com/Kajooja/Kajo/pull/342),

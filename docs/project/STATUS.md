@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — matching sequential Taste device acceptance / #336
+## Current packet — sequential Taste acceptance and required feed successor / #336
 
 Accepted main is `799f1c850b989d1cfeef450946689224d9727359` through
 [#343](https://github.com/Kajooja/Kajo/pull/343), exact tested tree
@@ -49,7 +49,8 @@ triggers. V2 role denial and closed private storage checks pass. All 60 preexist
 Auth/public/private tables retain identical row counts and complete-row digests
 after deployment. An existing owner's rolled-back catalogue smoke returned 80
 distinct BOOK and 80 distinct MOVIE Items with exact retries; the same preservation
-checks passed afterward. The three new v2 tables remain empty. This verifies
+checks passed afterward. At deployment verification the three new v2 tables were
+empty. This verifies
 deployment and preserved existing serving, not an observed first v2 session,
 phone installation or recommendation quality.
 
@@ -60,21 +61,38 @@ privately. A future operator must refresh and reconcile that checkpoint instead
 of inferring provider versions from filenames. The earlier BRIDGE_REQUIRED result
 is historical and superseded by the final passing installed-prefix preflight.
 
-Current branch `docs/sequential-taste-rollout-receipt` records this completed
-rollout; it is documentation bookkeeping, not another runtime implementation.
-**Next action:** install the matching #669 APK as an update and execute
-[the sequential device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15).
+Current branch `docs/sequential-taste-rollout-receipt` / [#344](https://github.com/Kajooja/Kajo/pull/344)
+records this rollout and the owner's mandatory
+[near-term feed/first-answer targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
+It does not implement those new targets. **Next action:** finish this documentation
+packet, then correct canonical-forecast consumption in the next-question policy
+under #336 before the shared vertical feed/artwork/contextual-skip successor.
+The matching #669 APK remains available for
+[the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
+it does not yet contain the requested feed changes.
 Preserve existing v1 sessions, pending commands and completed setup. A genuine new
 v2 test requires an authorized eligible PersonalProfile without a prior v1 session
 or completed setup; the current app has no restart-v2 action for those preserved
 Profiles. Do not reset an account to force eligibility. Existing owners can test
 preservation and committed Discovery choices now. On an eligible v2 Profile,
 exercise slow/lost ANSWER/NEXT/PAUSE replies, restart/current-question recovery
-and partial Taste → same-Profile Discovery freshness. No device observation,
-account reset, model/Working activation or measured quality is claimed.
+and partial Taste → same-Profile Discovery freshness. No verified v2 device
+acceptance, account reset, model/Working activation or measured quality is claimed.
 Canonical preview follows consumer acceptance; #336 remains open for full
 readiness/quality. Complete attention timing and authorized Scenario retrieval
 retain their existing architecture gates.
+
+The October 15 owner feedback reports the same Taste films as on another Profile
+and requests shared Discovery/Taste artwork and vertical feed navigation. This is
+a reported observation, not a verified protocol/version diagnosis or completed
+device matrix. Identical cold-start openings can be legitimate. Source inspection
+does identify a narrower first-answer gap: the next-question selector ranks domain
+coverage before utility and does not rank by canonical forecast magnitude, even
+though ANSWER projects the rating and captures a new forecast. Taste currently
+has title-only cards; Discovery artwork lives in a separate horizontal pager.
+The planned neutral **Ohita** also needs a versioned command/evidence contract,
+not relabeling existing UNKNOWN/NOT_INTERESTED records. See ROADMAP for mandatory
+ordering and DEVICE_TEST for the reported/planned acceptance boundary.
 
 ## Sequential adaptive Taste reference / #336
 

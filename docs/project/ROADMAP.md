@@ -40,6 +40,52 @@ server source may retain honest insufficient readiness and voluntary pause while
 full native readiness and matching mobile runtime acceptance follow; no acceptance gate is closed
 by an uncalibrated confidence label.
 
+## Near-term feed and first-answer personalization — 2026-10-15
+
+The owner's device feedback makes the following **mandatory near-term targets**,
+not optional future polish. Deliver them in the current Sprint 014 / #336
+continuation before canonical preview and first-session usefulness acceptance.
+The shared card/feed part of #239 is advanced from 17.0; its remaining save/List
+and detail refinements retain their existing slot. This changes the card mode
+and Taste presentation, not the default Discovery grid.
+
+| Required target | Acceptance and scope |
+|---|---|
+| First-answer-sensitive selection — `MVP-ALG-010` | The first and every later committed rating, including its magnitude, enters the canonical state/forecast used to select the next Taste question and fresh Discovery cards. Selection must consume supported forecast differences; a rigid domain rotation must not discard all usable first-answer signal. Retain bounded BOOK/MOVIE coverage and explain active-learning/diversity decisions. Opposing supported rating prefixes must be able to change candidate utilities and the next selected Item in controlled cases. Refresh/refill the eligible pool under a new versioned forecast when needed; do not lock the entire future feed to a precomputed test slate. |
+| One vertical card feed — `MVP-UX-007` | Taste and Discovery card mode share artwork, metadata and card presentation. Deliberate upward swipe-away is **Ohita**, with an accessible equivalent and a short first-use/Taste explanation. Do not require separate En tunne / Ei kiinnosta choices for the new no-rating skip path. Ratings and save/List actions retain their explicit meanings. |
+| Contextual skip and return — `MVP-UX-007`, `MVP-DATA-001/003/004` | Remove a deliberately skipped Item from the current feed with an exact origin and retry-safe contextual skip receipt. It is not a numeric rating, confirmed lack of recognition or durable negative preference. Reconsider it only under a versioned cooldown/context/Scenario eligibility rule; it must not immediately loop back or disappear permanently by accident. Preserve legacy UNKNOWN/NOT_INTERESTED records and their original contracts. |
+| Current-scenario satisfaction objective — `MVP-ALG-010` | Rank for the best supported outcome for this Profile in its current state/Scenario, with the long-term calibrated target of a top-satisfaction / rating-10 outcome. The Interstellar-10 → stronger support for a similar eligible film such as Inception example is a feature/learning test, never a hardcoded title pair or guaranteed next card. Taste information acquisition and FOR_YOU/SURPRISE/RISK tradeoffs must remain explicit. Uncalibrated ordinal scores are not probabilities. |
+| Recent supported cold start — `MVP-ALG-011` | Empty/sparse Profiles use a versioned recent, supported prior with recognition/diversity and honest missing-data fallback. Evaluate recency, the complete rating distribution, sample support and exposure/source bias against the current baseline. An NPS-like net-preference score is a hypothesis to define and compare, not an automatic mapping of Item ratings or a lifetime count of tens. Licensed provider priors, external research and native cross-Profile PopulationMemory retain their separate rights/privacy/admission gates. |
+
+**Execution order:** first correct and regress the canonical-forecast → next-question
+selection gap under #336; then implement the neutral skip protocol and shared
+vertical feed/artwork together, with exact retry/restart/undo/lifecycle semantics.
+Define and compare the bounded recent cold-start policy before accepting the full
+first-session quality gate. Existing v1/completed Profiles stay preserved; no
+account reset, migration replay or model activation is authorized by this plan.
+Anonymous entry and the remaining release dependencies retain their existing gates.
+
+The current source updates bootstrap and captures a fresh canonical forecast after
+ANSWER, but its next-question policy prioritizes domain progress/presentation
+before utility and uses forecast availability rather than forecast magnitude.
+The START pool is also frozen at 25 Items per domain. Thus the immediately
+following card can remain the same after opposite ratings. A successor may
+refresh eligible pools while preserving every earlier frozen panel, comparison
+and delivered origin; it must not rewrite history to simulate adaptation.
+Taste also has a text-only card contract, while Discovery's detail pager is
+horizontal. These are implementation gaps, not delivered feed acceptance. Identical
+empty Profiles may legitimately share an opening Item; repeated post-answer
+sequences require a versioned prefix/selector investigation rather than randomizing
+titles to look personalized.
+
+Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
+[evidence](../domain/DATA_EVENTS.md), [UX](../product/UX_PRINCIPLES.md) and
+[Taste flow](../product/LAUNCH_LOOP.md). [DEVICE_TEST](DEVICE_TEST.md) records
+the reported observation separately from the planned successor matrix. Full
+attention timing, learned WorldState and privacy-gated Scenario retrieval retain
+their staged engine contracts; their unfinished scope does not excuse ignoring
+an already supported explicit rating now.
+
 ## Source integration decision — 2026-10-12
 
 The owner explicitly authorized merging the complete #229 → #329 source stack
@@ -187,7 +233,7 @@ release requirements. Historical sprint plans do not override this order.
 | #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; genuine #232F consumer remains queued; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred; advanced Shared consumer/model enhancements are not a serial prerequisite to Personal source work. |
 | #200 history navigation | Scheduled 17.0, before visual browse refinements. | Discovery Katsotut/Luetut must use canonical active-Profile/ItemType history and contextual Lists, with cold entry, permission/error handling and real-origin return. Reuse #229 and accepted cold-history work. |
 | #199 grid | Owner-promoted append/compact-layout correction in the current native packet (2026-10-06); remaining broad UX stays 17.0 after accepted #229. | BOOK/MOVIE append must pass beyond the old 50-candidate window without recycling/resetting Items, preserve exact origins/order and report genuine eligible-catalogue exhaustion separately from limits/expiry. One-row ItemType/Löydä/history and unused bottom-space removal are included. Server forward, CI/APK and real gesture/small-screen/large-text acceptance remain separate. Old poster/token/import defect remains superseded; no new MOVIE acquisition. |
-| #239 cards | Scheduled 17.0, required MVP-UX-006. | Reuse Saved/Shared Endorsement, multi-destination commands and exact origins. Star/overflow/explicit Next, fit-aware description/credit and accessible Back; saving stays on card and Next adds no taste evidence. |
+| #239 cards | Shared vertical feed/artwork and contextual Ohita advanced to the near-term #336 continuation above, required MVP-UX-007. Remaining MVP-UX-006 refinements stay 17.0. | Reuse Saved/Shared Endorsement, multi-destination commands and exact origins. New feed skip has its own neutral contextual contract; it supersedes the old planned explicit-Next-only card navigation. Star/overflow, fit-aware description/credit and accessible Back retain their scope; saving stays on card. |
 | #231 selection | Scheduled 17.0, required MVP-UX-005, after DATA-003/004 and List/history correctness. | Canonical selected IDs/origins, durable partial results, atomic moves, Shared consent, retry/restart and membership changes. History list/poster views use the same collection; trash does not erase unrelated state. |
 | #230 statistics | Scheduled 17.0 private summaries; weekly work depends on 17.1/17.2 telemetry/privacy. | Source-aware distinct counts including rating zero, independent unlock, retry-safe weekly snapshots and Helsinki/DST boundaries, correction/deletion/isolation. Community comparisons remain conditional on cohort/privacy evidence. |
 | #201 catalog search | Scheduled 17.0, MVP-DISC-009. | Canonical persisted Items, title/creator and normalized filters, bounded server pagination and honest provenance. Browse is not a second recommender; filters are not preference events. |
@@ -542,7 +588,7 @@ research, not downloads hidden inside D1 or automatic release blockers.
 
 ### 14.4 — Adaptive memory and discovery policy
 
-Requirements: `MVP-ALG-004..007`, bootstrap requirements and E1 contracts.
+Requirements: `MVP-ALG-004..007`, `MVP-ALG-010..011`, bootstrap requirements and E1 contracts.
 
 Exit: ordered session intent; source-aware Short/Long decay and effective support; native contradiction can supersede imports; one unusual session cannot erase durable taste; bounded/ablated cross-domain transfer; meaningful tested FOR_YOU/SURPRISE/RISK differences; informative recognition-aware cold start.
 
@@ -591,9 +637,12 @@ replacing or duplicating this retained state.
 Exit: a variable-length, bounded/resumable anonymous Taste loop with numeric-answer-sensitive next questions and a committed pre-answer forecast at every evaluated step; unknown Items do not poison taste; recognition/information/diversity balance; declared per-domain readiness or honest insufficiency; same-prefix prospective metrics/support; preview from canonical production ranking; useful first-session behavior against a fixed baseline.
 
 The October 14 sequential refinement supersedes fixed 10+10/12–24/six-holdout
-completion quotas for the future runtime. [LAUNCH_LOOP](../product/LAUNCH_LOOP.md)
-retains visible domain transitions, always-available unknown even after wheel
-movement, and preservation of accepted Personal taste. Readiness needs supported
+completion quotas for the future runtime. The October 15 near-term successor above
+adds the shared vertical feed and neutral **Ohita** path, including after a draft
+rating; the delivered legacy unknown/negative controls retain their original
+evidence meanings until that versioned successor ships.
+[LAUNCH_LOOP](../product/LAUNCH_LOOP.md) retains visible domain transitions and
+preservation of accepted Personal taste. Readiness needs supported
 differentiation, forecast coverage, prospective evidence/observed agreement and
 stability; an answer count or
 unchanging tied scores do not establish reliability. A safety budget pauses with
@@ -720,7 +769,10 @@ Exit: contextual Lists, search/filters and authorized Profile surfaces; accessib
 
 Owner decision 2026-09-12 promotes #230 private category statistics/weekly tracking
 and #231 multi-select/List moves/history trash to required pre-MVP work, with
-#239 star/overflow/explicit-Next card controls. #240 reconnect source is now part
+#239 star/overflow and card controls. The October 15 refinement advances its
+shared feed/artwork and contextual Ohita subset to the near-term #336 continuation;
+the older explicit-Next-only plan is superseded for that card mode.
+#240 reconnect source is now part
 of the Phase 14.2 native reader packet; its device acceptance remains required.
 Together these map to MVP-UX-003..006. FUT-UX-003 joint-list choice remains a separate candidate.
 UX_PRINCIPLES and FUTURE_PLAN own the detailed contracts. The promoted requirements

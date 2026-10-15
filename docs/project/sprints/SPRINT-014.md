@@ -7296,3 +7296,55 @@ Next is the matching device matrix, including slow/lost acknowledgement,
 restart/current-question recovery and partial Taste → same-Profile Discovery
 freshness. Canonical preview follows consumer acceptance; #336, full readiness,
 quality, anonymous entry and Sprint 014 remain open.
+
+## Required shared feed and first-answer personalization — 2026-10-15 / #336 / #239
+
+The owner reports the same Taste films as another Profile and requests the same
+artwork/card experience as Discovery, with vertical swipe-away instead of separate
+En tunne / Ei kiinnosta controls. This is scoped device feedback, not a verified
+installed-protocol diagnosis or completion of the existing acceptance matrix.
+
+The required successor uses deliberate **Ohita** as neutral contextual skipping,
+with accessible first-use guidance, temporary suppression and a versioned eligible
+return. It cannot infer a rating, recognition, consumption or permanent dislike.
+Partial scrolling/reflow is not an answer. Retained UNKNOWN/NOT_INTERESTED and
+v1/v2 commands/forecasts keep their original meaning. Ratings, save/List/Shared
+actions and exact origins remain distinct.
+
+Source inspection confirms that first answers already update bootstrap and the
+canonical forecast, while next-question selection gives domain progress priority
+over utility and does not rank by forecast magnitude. START freezes 25 candidates
+per domain. Taste's payload/card is title-only; Discovery has artwork but a
+separate horizontal pager. The first required source successor must consume the
+updated supported forecast for next selection; then supply the neutral protocol
+and shared vertical feed with versioned candidate refresh/refill. Previously
+frozen evaluations and delivered origins must not be rewritten. Identical empty
+Profiles may share an opener; supported opposite-answer prefixes must be capable
+of changing the next choice without promising a change after every answer.
+
+ROADMAP advances this card/feed subset from 17.0 into the near-term #336
+continuation before preview/usefulness acceptance. Open `MVP-UX-007` and
+`MVP-ALG-010/011` require shared feed/artwork, first-answer/continuous supported
+personalization and a defensible recent cold-start prior. Highest current-scenario
+satisfaction (ultimately ten) is the target, with honest ordinal/calibrated
+boundaries and explicit Taste information tradeoffs. Recent full-distribution,
+support, recency, uncertainty and source/exposure checks precede any NPS-like
+policy admission. No title pair, new dataset or native population model is
+automatically activated by this plan.
+
+Canonical UX/acquisition/evidence/prediction/glossary owners and the agent rule
+are reconciled in the existing #344 documentation PR. DEVICE_TEST separates
+reported feedback, the planned successor matrix and the older actual-source
+matrix. The #673 CI failure on the earlier docs head exposed an existing reset
+fixture's tied wall-clock readings: the fixture successor defines strictly
+post-reset occurrence times and a matching cutoff without changing production
+SQL, boundary rules or expected results. Its focused suite passes 9/9.
+
+The full local database suite passes 262/262. Lint, typecheck, mobile and catalogue
+checks pass. The full `npm run check` attempt stops at Deno's registry fetch with
+connection refused, before the remaining stages; it is not a complete local
+check or a native CI/device receipt. Final-source CI remains required.
+
+This packet changes requirements and that deterministic test fixture, not the
+APK, deployed migration bytes, recommendation policy or user data. Full feed
+implementation, actual v2/device observations and measured usefulness remain open.
