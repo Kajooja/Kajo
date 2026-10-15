@@ -7094,3 +7094,29 @@ the matching-build slow-write/reconnect cases; no device or hosted result is cla
 After acceptance, #336's canonical scoring/committed-prefix and sequential native
 Taste/Discovery work remains the next engine packet. #337's pure reference is a
 separate source foundation, not full native integration.
+
+
+## Canonical explicit-candidate evaluation — 2026-10-15 / #336
+
+After accepted #337 and #339, `feat/taste-evaluation-scoring` extracts common
+base/scalar/identity scoring and supplies an internal owned-Personal capture for
+1–50 requested canonical Items. Whole-function guards precede extraction; old
+identities/defaults/owners/ACLs and rows are preserved. Normal request owners call
+the shared implementation directly to retain serving depth. Existing public/v1
+behavior remains covered by ordinary/catalogue and long-chain regressions.
+
+The panel uses the assigned production genome, source fusion/decay, state,
+ScenarioMemory and eligibility. It freezes actual Item type/tags and scoring
+features, records requested IDs plus the receipt lower bound/transaction cutoff,
+and marks every candidate non-delivered. Missing or ineligible Items remain
+unavailable. Genuine committed Taste ratings 10/0/5 change subsequent forecasts;
+ANSWER followed by NEXT in the same transaction rejects. Global top-50 movie
+starvation no longer determines book evaluation coverage. Native CLI smoke is
+part of the five required final-source gates; the PR owns final test/merge evidence.
+
+This is an EB-03/EB-08 source prerequisite for architecture sections 30/32/33 and
+40–42. It does not close #336, those complete capabilities or any release gate.
+Durable v2 commands still own revision/first-measurement/pending-pair/projected
+prefix/retry/withdrawal semantics, followed by mobile partial-readiness continuation
+into Discovery. No hosted migration, account reset, new model/Working/population
+activation or device observation is supplied. STATUS remains the one handoff.

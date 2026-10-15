@@ -222,6 +222,12 @@ Corrections/withdrawals amend future source state and invalidate affected copied
 reports; original forecasts and measured first answers cannot be rewritten.
 Erasure clears retained copies and old retries cannot resurrect them. The bounded
 #336 reference does not supply a new native Event writer or SQL/mobile v2.
+Its subsequent private explicit-candidate scoring boundary freezes canonical
+PredictionRun/Candidate evidence with the server receipt lower bound and a new
+transaction cutoff. Evaluation-only candidates are never selected for delivery
+and create no Events or exposure. Persistent v2 commands still own prefix/retry,
+first-measurement/projection and copied-panel lifecycle; see the
+[scoring contract](PREDICTION_MODEL.md#sequential-adaptive-taste).
 
 The current own-Personal `personal-taste-session-v1` source records bounded server-time
 response revisions against its frozen session/question ledger. Its SQL policy

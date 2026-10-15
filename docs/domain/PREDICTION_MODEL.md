@@ -97,6 +97,35 @@ state and scoring reader, with equivalent inclusion/exclusion proof. Changing a
 clock in one helper alone does not prove committed-prefix visibility. The pure
 reference accepts caller-supplied snapshots and does not supply this server boundary.
 
+The next #336 source packet supplies the private
+`capture_personal_evaluation_v1` boundary for **1–50 explicit canonical Item IDs**.
+Ordinary, catalogue-chain and requested-panel scoring delegate to shared private
+base/scalar/identity implementations; the old public signatures and delivery
+behavior remain unchanged. The panel uses the assigned production genome,
+source fusion, decay, state, ScenarioMemory and hard eligibility. Real requested
+Items are considered before the retained-pool limit, so global MOVIE popularity
+cannot silently eliminate BOOK evaluation coverage. Missing, withdrawn, mock-only
+and suppressed Items remain explicitly unavailable; no proxy score is substituted.
+
+An internal owned caller must supply the **actual retained server receipt time**
+as `required_after`, never a client timestamp or an inferred revision. The helper
+requires a new transaction with `now() > required_after`, and freezes state,
+features and evaluation eligibility at that transaction cutoff. It preserves
+the requested panel and cutoff in the canonical PredictionRun and the actual
+used Item type/tags/scoring features in PredictionCandidate explanations. All
+evaluation candidates have `selected_for_delivery=false`, `result_count=0` and
+an evaluation policy suffix: this capture is neither exposure nor a recommendation
+outcome origin. Existing source erasure owns these records. It is current-state
+capture, not an arbitrary historical-as-of reader or calibrated rating model.
+
+This is a private scoring primitive, not the persistent v2 Taste endpoint.
+Durable OFFER/ANSWER/NEXT commands must still enforce expected-prefix ownership,
+lock/freeze before first measurement, exact retry/conflict, projection and
+withdrawal, and retain the returned panel with the original question. The helper
+does not itself select questions, admit answers, determine readiness or expose a
+public RPC. The mobile sequential consumer and partial Taste → Discovery
+continuation remain the next integration work; old v1 sessions are preserved.
+
 Ordinal evaluation compares only same-domain Items forecast under the **same
 committed prefix, model and declared panel**, with both first labels unseen at
 that prefix. Pair aggregation may finish after a later first label arrives; it
