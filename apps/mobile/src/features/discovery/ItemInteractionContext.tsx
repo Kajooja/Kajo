@@ -184,10 +184,13 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
         ) };
         if ('kind' in receipt) {
           nextStore = applyCollectionUndoReceipt(nextStore, receipt);
-          setCollectionRevision(revision => revision + 1);
           collectionWaiters.current.get(receipt.actionId)?.resolve({ status: 'success', receipt });
           collectionWaiters.current.delete(receipt.actionId);
         }
+        // An optimistic rating may already equal the acknowledged interaction.
+        // Invalidate the ranking after every committed action so a pre-commit
+        // fetch cannot remain current just because its visible value is unchanged.
+        setCollectionRevision(revision => revision + 1);
         storeRef.current = nextStore;
         setPersistedStore({ actorUserId, profileId, store: nextStore });
         if (coordinator.pending().length === 0) void refreshAcknowledgedState();

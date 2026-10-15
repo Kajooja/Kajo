@@ -10,7 +10,39 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — sequential adaptive Taste reference / #336
+## Current packet — committed Discovery refresh / #338
+
+The [#337 sequential reference](https://github.com/Kajooja/Kajo/pull/337) is
+accepted from source `7d81bb60f44dc286a890096d191e3d0acf174382`, tree
+`822818bb5ad4bc1526d73dc098d95189ecb9ef75`. All five final-source gates passed in
+[CI #659](https://github.com/Kajooja/Kajo/actions/runs/38694122310), and #337 merged
+as `8bdb1755ead9e877c5115e89985e8ae3238886e4`. Do not recreate that reference.
+
+The related [#338](https://github.com/Kajooja/Kajo/issues/338) source successor,
+branch `fix/discovery-committed-refresh`, fixes a concrete post-action gap:
+an optimistic rating could trigger a ranking request before the server committed
+it, then an identical confirmed interaction left the ranking revision unchanged.
+The provider now advances the existing invalidation revision after every
+current-scope committed action, including ordinary ratings/not-interest/Undo.
+Collection receipts still advance once. Pending/rejected writes and late old-scope
+callbacks do not become committed evidence; frozen delivery origins are unchanged.
+
+The regression executes the actual provider/outbox receipt path with a delayed
+response and identical optimistic/confirmed 0, 5 and 10 ratings. All three fail on
+the predecessor and pass after the fix; rejection and old-Profile callback cases
+also pass. All 76 focused coordination/reader/outbox tests and all 522 mobile
+tests pass, as do lint/typecheck and both mobile native exports. The root check
+reaches the existing refused Deno registry dependency; full GitHub CI remains
+required. No native device observation or hosted change is claimed.
+
+**Next action:** inspect the #338 source successor on its named branch and accept
+only after its own five final-source CI gates pass. Its PR owns the
+final source/tree and merge receipt. After source acceptance, continue #336's
+canonical evaluation scoring/committed-prefix boundary described below. Verify
+slow-write/offline-retry → acknowledgement → refreshed recommendations on the
+matching device build; retain that observation separately from source acceptance.
+
+## Sequential adaptive Taste reference / #336
 
 Accepted baseline before this packet is `419f3850378d04b4e2417852d6b9eb5c06b5d127` through
 [#335](https://github.com/Kajooja/Kajo/pull/335). Its final source
@@ -61,9 +93,8 @@ Required reference invariants:
 - A fixed recognition-only control remains available. Synthetic comparisons
   establish behavior/provenance, not empirical first-session usefulness.
 
-**Next action:** finish/review the named reference packet and integrate only after
-all five required final-source CI gates pass. Once its PR is accepted, do not
-reimplement the reference. Continue #336 with the **canonical evaluation-scoring
+After the current #338 source packet is accepted, do not
+reimplement either. Continue #336 with the **canonical evaluation-scoring
 and committed-prefix boundary**, then persistent owned SQL commands and the mobile
 consumer including partial-readiness continuation into Discovery and verified
 post-action fresh predictions on the same Profile. The existing global top-50 delivery pool is not a complete evaluation

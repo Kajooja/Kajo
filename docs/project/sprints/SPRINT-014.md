@@ -7074,3 +7074,23 @@ stops at refused Deno npm-registry access; final GitHub CI owns the complete
 required gate. The PR records remaining suite/build results and exact integration.
 No hosted change, device observation, reset, population activation or measured
 quality is claimed. Existing v1 remains preserved and Sprint 014 stays open.
+
+
+## Discovery committed-action refresh — #338 / 2026-10-15
+
+Continuous-learning inspection found that ordinary Item acknowledgements did not
+advance the collection/ranking revision. An earlier optimistic value could have
+already triggered a pre-commit fetch, leaving the exact same visible value after
+acknowledgement and no subsequent ranking request. The bounded source fix moves
+the existing revision increment to every current-scope successful receipt.
+It preserves collection completion, durable queues and immutable delivery origins.
+
+Three delayed-acknowledgement regressions for ratings 0/5/10 fail on the predecessor
+and pass with the fix. Actual provider/outbox tests also retain rejection and
+old-Profile safety; 76 focused tests and all 522 mobile tests pass. Lint/typecheck
+and iOS/Android exports pass. Local root reaches refused Deno registry access;
+the successor PR owns required final-source CI/merge acceptance. DEVICE_TEST adds
+the matching-build slow-write/reconnect cases; no device or hosted result is claimed.
+After acceptance, #336's canonical scoring/committed-prefix and sequential native
+Taste/Discovery work remains the next engine packet. #337's pure reference is a
+separate source foundation, not full native integration.
