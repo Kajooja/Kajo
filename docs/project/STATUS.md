@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-13**
+Last updated: **2026-10-15**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,123 +10,116 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — Taste immutable-guard source compatibility / #333
+## Current packet — sequential adaptive Taste reference / #336
 
-The owned mobile source is accepted through [#331](https://github.com/Kajooja/Kajo/pull/331),
-merge `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, tree `25ea91d280d407921cbc8a4678cdef58fa9970a4`.
-Its final source `bebd53613a0bc10917feb36b87e9a221dcf2295b` passed all five
-[CI #650 gates](https://github.com/Kajooja/Kajo/actions/runs/38284940245).
-[#330](https://github.com/Kajooja/Kajo/issues/330) closes the source packet;
-actual matching-backend/APK/device acceptance stays open in #238 and DEVICE_TEST.
-Accepted application/build main is `f5d9ce7b6f504075f2fb2edad5f15231f1cea465` through
-#332. All five [CI #653 gates](https://github.com/Kajooja/Kajo/actions/runs/38287730599)
-and its matching APK pass. The guarded source preparation is accepted through
-[#334](https://github.com/Kajooja/Kajo/pull/334), tracked by
-[#333](https://github.com/Kajooja/Kajo/issues/333). The current source repair is
-[#335](https://github.com/Kajooja/Kajo/pull/335),
-branch `fix/taste-guard-compatibility`, adds an append-only compatibility bridge
-for the immutable Prediction artifact guard. All previously reviewed migration
-SQL and the original forward manifest remain unchanged; mobile and dependencies
-are unchanged. Publication and required final-source CI belong to this repair's
-PR receipt.
+Accepted baseline before this packet is `419f3850378d04b4e2417852d6b9eb5c06b5d127` through
+[#335](https://github.com/Kajooja/Kajo/pull/335). Its final source
+`7a64762db300314e22fe23e5af1713e0b62131b2` passed all five
+[CI #657 gates](https://github.com/Kajooja/Kajo/actions/runs/38379100290).
+The immutable-guard compatibility repair is complete; do not repeat it.
+The current mobile consumer remains v1 as in the #653 APK below;
+this packet adds an isolated optional engine export without a mobile integration. Private operator
+receipts and account/device data remain outside the published source.
 
-The preparation derives its catalog-generation reference from repository SQL in
-an isolated database. Operator-specific input and generated target-bound SQL stay
-outside Git. Public source/test receipts do not substitute for the operator's
-private recheck, committed-prefix reconciliation or actual device observations.
+The October 14 product direction replaces fixed completion quotas with a
+**sequential adaptive Taste loop**: commit a pre-answer forecast, present one
+question, retain/evaluate the first answer, admit its defined taste meaning,
+then select and forecast the next question from the updated committed prefix.
+Rating magnitude must affect selection where supported. The next estimate may
+improve or reveal uncertainty; improvement after every individual answer is not
+guaranteed. See [the canonical contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
+and [the product flow](../product/LAUNCH_LOOP.md).
 
-The [reviewed manifest](../../scripts/database/personal-taste-hosted-upgrade.json)
-fixes **16 unchanged new forwards** and their dependency order/SHA-256.
-The [preparation/rehearsal](../../scripts/database/personal-taste-hosted-upgrade.mjs)
-emits a read-only preflight and a disposable, rollback-only compound upgrade.
-Three local regressions cover missing/reordered/changed SQL; history/body/endpoint
-and security/configuration drift; existing-data denial; old populated rows, frozen evidence and function
-identities/ACLs; private storage/helper boundaries; and the canonical frozen challenge.
-The same populated chain is now included in the native CLI CI job.
-The separate [append-only bridge](../../supabase/migrations/20261013080259_taste_immutable_guard_compatibility.sql)
-is a prerequisite only for its exact reviewed compact predecessor. Ordinary
-preflight rejects that body and requests the bridge; unknown bodies or metadata
-changes still fail closed. The bridge preserves function identity and other
-metadata, changes no application rows or trigger attachments, and is a no-op for
-the enumerated canonical/already-upgraded forms. Local compatibility regressions
-exercise the compact-source path, identity preservation and denial cases.
-Local validation passes all **230 database tests**, lint/typechecks, 517 mobile
-tests, dependency and catalogue suites. The root check stops at refused Deno
-npm-registry access; full local-root success is not claimed. All 280 local
-documentation links resolve. The owner explicitly authorized this repair's GitHub
-publication and main integration after passing CI on October 13. Continue from
-the named branch and its PR rather than recreating it; no additional source
-publication approval is needed. The compatibility PR receipt owns final CI and
-merge acceptance. Private operational receipts stay outside the published source.
+[#336](https://github.com/Kajooja/Kajo/issues/336), branch
+`feat/adaptive-taste-reference`, owns the first bounded source foundation:
+`packages/prediction-engine/src/adaptive-taste.ts`, its optional `./adaptive-taste`
+export and executable media/non-media conformance/control fixtures. This is a
+portable pure reference consuming supplied canonical forecast snapshots. It
+creates no native accounts, Events or predictions and changes no existing v1
+session, mobile client, migration or deployed scoring policy. Native activation,
+calibrated uncertainty/0–10 prediction and quality admission remain unavailable.
+The issue/PR receipt owns exact final-source validation and integration status.
 
-The earlier #329 main integration accepted all 27 original source PRs. All five
-CI #647/#648 gates and the #648 standalone APK pass. The owner's October 12
-instruction superseded the previous device-based source merge hold. Actual device,
-deployment and quality observations retain their own scope.
+The packet covers **EB-03 / EB-08** and architecture sections **30, 32, 33, 40–42**:
+forecast/evaluation lineage, numeric-aware question policy, bounded active
+learning, canonical evidence and portable/domain-adapter responsibilities. It does
+not close either complete capability or any release requirement.
 
-The owned mobile consumer now uses both `taste_session_v1` and
-`taste_challenge_v1` through a typed service boundary and a separate persistence/
-retry controller. Presentation does not select questions or score predictions.
+Required reference invariants:
 
-Delivered source behavior:
+- A supplied question forecast is frozen before its answer. Later labels can
+  improve future prefixes but cannot rewrite the original forecast or measured
+  first answer. Correction/withdrawal invalidates affected copied evaluations.
+- Same-domain ordinal comparisons use one earlier frozen pool in which both
+  labels were unseen. Scores from different learned prefixes are never subtracted.
+- Numeric ratings, unknown, not-interest and withdrawal have distinct meanings;
+  scope, feature/catalogue/version and available-at-time prefix are explicit.
+- Readiness inspects declared per-domain support, differentiating features,
+  forecast coverage, prospective comparisons/observed agreement and stability. Counts or a stable
+  all-tied forecast never imply reliability. Pause, poor recognition, exhaustion,
+  missing support and safety budgets retain explicit insufficiency.
+- A fixed recognition-only control remains available. Synthetic comparisons
+  establish behavior/provenance, not empirical first-session usefulness.
 
-- New cold-start creation waits for **Aloita makutesti**, allowing history import
-  first. Retained local sessions resume automatically. Completed setup is
-  preserved; a server START lookup can also recover a cross-device session whose
-  bootstrap has already reached six strong responses.
-- The server's retained question/transition/stop state controls progression.
-  Ten MOVIE opportunities lead to an explicit book acknowledgement; the longer
-  12–24 opportunity / eight-known policy does not stop at the native six-strong gate.
-- Each command is persisted before dispatch in backend/actor/Profile-scoped SQLite.
-  One pending command retains its exact ID/body across lost acknowledgements and
-  process restart. Confirmed conflicts require an explicit current-state reload;
-  the old answer is never silently rebased onto a different question.
-- Layout cleanup/generation guards cancel stale scope work and old callbacks.
-  Corrupt storage is not overwritten or dispatched. Full answer/forecast state
-  stays server-owned; local storage retains IDs, dismissal and one pending command.
-- Independent unknown discards an unsubmitted rating; genuine zero and neutral five
-  remain explicit ratings. Book transition and challenge start are explicit actions.
-- Forecasts/partial metrics remain hidden until all first challenge answers lock.
-  The result describes same-domain ordering, actual sample size, ties and missing
-  support, without a fabricated rating estimate, percentage or statistical certainty.
-- Confirmed removal uses the relevant RPC and renders its terminal result.
-  Only a positively missing first session RPC enables the retained legacy static
-  calibration. Once a new session exists, an outage never changes evidence writers.
+**Next action:** finish/review the named reference packet and integrate only after
+all five required final-source CI gates pass. Once its PR is accepted, do not
+reimplement the reference. Continue #336 with the **canonical evaluation-scoring
+and committed-prefix boundary**, then persistent owned SQL commands and the mobile
+consumer including partial-readiness continuation into Discovery and verified
+post-action fresh predictions on the same Profile. The existing global top-50 delivery pool is not a complete evaluation
+catalogue; provide per-domain coverage and a shared bounded explicit-candidate
+scorer/capture rather than inventing challenge scores. Do not infer a rating from
+an uncalibrated ranking score. The existing scorer's transaction-start cutoff
+requires separately committed answer/next calls or an explicit later cutoff
+throughout state, source fusion, decay and scoring. Preserve lifecycle/erasure,
+exact retry/conflict and old v1 completion before native rollout. No new rollout,
+reset, Working/cohort activation or model promotion is authorized by this handoff.
 
-Validation: 35 focused mobile regressions pass, including retained legacy scope
-cases. The shipped adapter also passes an actual full-current-schema SQL RPC probe
-through START, zero/five/unknown, the actual book transition, canonical frozen
-challenge completion and both removals. Final CI #650 passes the complete root
-check: 517 mobile tests, 225 database tests, 245 engine tests, the remaining suites
-and all four native exports. Platform/defaults, two clean installations, populated
-upgrade and native CLI installation/history/concurrency also pass. The local root
-run encountered refused Deno npm-registry access; full local-root success is not
-claimed. No hosted migration, account reset, device round trip or quality admission
-is supplied by these automated results.
+The October 15 owner clarification is now recorded in the canonical
+[continuous-learning contract](../domain/PREDICTION_MODEL.md#continuous-learning-across-taste-and-discovery):
+Taste may end with insufficient support and Discovery continues the same Profile's
+learning. Working/Short/Long, permitted Group/World/Context and local/global
+scenario-prefix retrieval remain the staged target; the current reference neither
+implements native Discovery ingestion nor activates cross-Profile learning.
 
-**Next action:** check the named compatibility PR's final CI and merge receipt.
-If it is accepted in main, continue directly to matching APK/native acceptance
-below rather than repeating this source repair. In the private operator workflow,
-refresh target-bound checks and reconcile the actual committed prefix before any
-apply; a complete verified prefix needs no further deployment. Continue only
-genuinely missing reviewed new files.
-Where the exact compact predecessor requires it, verify and apply the separate
-bridge before the unchanged source-erasure forward. Record each committed step
-privately and stop on failure or ambiguous acknowledgement. Never replay deployed
-files, rewrite historical SQL, use whole-history `db push`/name-only repair, reset
-accounts or activate Working/cohort/model learning.
+The requested adaptive runtime precedes the canonical unseen preview because its
+selection, learning and honest evaluation contract must be sound first. Anonymous
+identity/lifecycle/abuse/measurement still precede real anonymous entry. Genuine
+#232F, Shared rollout and all incomplete MVP/release gates retain ROADMAP slots.
 
-Runtime acceptance requires the operator's privately verified backend checkpoint
-and the matching #653 APK. Then run DEVICE_TEST/#238:
-resume/lost reply/restart, movie-to-book transition, unknown after a draft, genuine
-zero, conflict, Profile/client changes, hidden challenge forecasts/results and
-source withdrawal. Preserve completed setup and use an authorized eligible owner;
-do not reset existing taste to force this flow. Record installed SHA/run, device/OS
-and observed cases; retain the target-bound backend checkpoint privately.
-Source #330/#331 is complete; do not restart its implementation.
-Canonical unseen preview follows this consumer. Anonymous identity/lifecycle/
-abuse/measurement still precede real anonymous entry; later answer projection,
-observed usefulness, genuine #232F, Shared rollout and all incomplete MVP gates remain open.
+## Preserved v1 source and device acceptance
+
+The owned session/challenge mobile source is accepted through
+[#331](https://github.com/Kajooja/Kajo/pull/331), merge
+`b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`, after all five CI #650 gates.
+Its matching accepted application/build source is
+`f5d9ce7b6f504075f2fb2edad5f15231f1cea465` through #332 and CI #653.
+The source compatibility preparation/bridge in #333–#335 changes no compiled
+mobile inputs. The reviewed [16-forward manifest](../../scripts/database/personal-taste-hosted-upgrade.json)
+and its exact append-only bridge remain immutable. Reconcile private actual
+checkpoints before applying genuinely missing files; never replay installed SQL.
+
+Delivered **v1** retains the 12–24-opportunity/eight-known provisional rule,
+ten MOVIE opportunities followed by an acknowledged BOOK transition, rating-only
+Taste bootstrap and a separate fixed up-to-six-Item evaluation-only challenge.
+Its selector uses response kind and feature coverage, not rating magnitude.
+The challenge freezes one canonical forecast before all answers and exposes only
+same-domain ordinal agreement/ties/support afterward. These are preserved source
+facts, not the newly requested sequential runtime or measured reliability.
+
+New cold-start v1 START remains explicit so history can be imported first.
+Retained local commands preserve exact IDs/body through restart/lost acknowledgement;
+confirmed conflicts require reload rather than rebasing. Unknown after a draft
+clears that draft, while genuine zero and five remain ratings. Removal leaves a
+terminal server tombstone. A first positively missing session RPC permits the
+legacy fallback; once the owned session exists, an outage never changes writers.
+
+Current matching-backend/APK observations remain in
+[DEVICE_TEST](DEVICE_TEST.md) / [#238](https://github.com/Kajooja/Kajo/issues/238).
+Record only actual resume/restart/lost-reply, transition, zero/unknown, conflict,
+scope, hidden-forecast and withdrawal cases. Preserve old sessions/completed setup;
+do not reset taste or retrospectively relabel a fixed v1 result as sequential v2.
+Runtime, installation, quality and release acceptance remain separate from source CI.
 
 ## Source stack and integration gates
 

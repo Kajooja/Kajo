@@ -962,7 +962,7 @@ Supabase/CLI/concurrency still require CI. All gates remain mandatory.
 
 Reviewed source `5089d0abb65965c669fa540de9a025e34f92f178` supplied the exact SQL
 SHA-256 `8ef909c3dc1d6f933536216319978e4ae522d5db91509ec89289e977e54418e8`.
-Only the new forward was applied to preflighted project `mwrnvfosrzwygrunrltm` as
+Only the new forward was applied to preflighted project `operator-reviewed-project` as
 provider `20261006143148/catalog_prediction_chain`; filename now matches tracking
 with unchanged bytes. Full prior function owners/ACLs and 152 unrelated bodies
 survived; only the private dispatcher changed, with five owner-only helpers and
@@ -4515,7 +4515,7 @@ The three-file deployment was regenerated from accepted main and replayed all
 13 catalog HTTP cases with a fresh cache and npm/remote imports disabled. Its
 payload SHA-256 remains
 `3533d2bf02ebe02be9f8bb30c8ea7ccbd8b8090f455aaa5fcd8f357efd74f010`.
-It was deployed only to `catalog-import` on `mwrnvfosrzwygrunrltm`:
+It was deployed only to `catalog-import` on `operator-reviewed-project`:
 
 | Deployed property | Verified value |
 | --- | --- |
@@ -4578,7 +4578,7 @@ hosted evidence and a source deployment candidate; it does not record a deployme
 
 ### Hosted comparison
 
-Project `mwrnvfosrzwygrunrltm` (Kajo, eu-west-1) is ACTIVE_HEALTHY. The deployed
+Project `operator-reviewed-project` (Kajo, eu-west-1) is ACTIVE_HEALTHY. The deployed
 `catalog-import` is ACTIVE v2, `verify_jwt=false`, `import_map=false`, with ESZIP
 SHA-256 `8a85347f51f02dec066495263919f2d575d1b6b60e31d7faaf830c589c7cd2d1`.
 Its entrypoint still imports floating `npm:@supabase/supabase-js@2` and uses the old
@@ -4639,7 +4639,7 @@ import prevents payload publication. Preparation never reads credentials or send
 real provider/database requests. Output is regenerated from Git, not committed.
 
 ```sh
-npm run catalog:prepare-deployment -- --project-ref mwrnvfosrzwygrunrltm --output dist/catalog-deployment-182
+npm run catalog:prepare-deployment -- --project-ref operator-reviewed-project --output dist/catalog-deployment-182
 npm run catalog:tmdb-beta -- --pages 1 --pages-per-request 1 --dry-run
 ```
 
@@ -5499,7 +5499,7 @@ merge number. Complete publication, then pause as requested by the owner.
   [CI #403](https://github.com/Kajooja/Kajo/actions/runs/34402219263) passed at
   `55b025a0805e65a639295132026461a18057b020`, including the native populated forward
   rehearsal and full command smoke on the pinned Supabase stack.
-- Hosted rollout: Kajo `mwrnvfosrzwygrunrltm` accepted only the new forward under
+- Hosted rollout: Kajo `operator-reviewed-project` accepted only the new forward under
   actual version `20260909204512_atomic_item_actions.sql`. The CLI-created filename
   was synchronized to that provider identity without changing SQL bytes; SHA-256
   `81bc4304d24dc063b04fdd567b1b1c3cc8c2a0bda4ecaff286395701b84f1cdb`.
@@ -5573,7 +5573,7 @@ merge number. Complete publication, then pause as requested by the owner.
   was published by CI; a workspace download returned HTTP 403, so no local artifact
   digest inspection is claimed. Native job success/logs and exact tested tree were
   verified through GitHub. Local final check is 287 tests and both bundles.
-- Hosted preflight: Kajo `mwrnvfosrzwygrunrltm`, PostgreSQL 17.6; all 33 old
+- Hosted preflight: Kajo `operator-reviewed-project`, PostgreSQL 17.6; all 33 old
   application/Auth/receipt/head table hashes, 126 functions, 22 triggers, defaults
   and 45 tracking rows were stable. Object-key order was normalized when comparing
   connector JSON; the SQL fingerprints were identical. Existing receipt/head counts
@@ -5601,7 +5601,7 @@ merge number. Complete publication, then pause as requested by the owner.
 ### Approved collection deployment — 2026-09-10 / #226 / PR #227
 
 - Owner explicitly approved the exact hosted migration and subsequent verification/
-  merge. `apply_migration` succeeded on Kajo `mwrnvfosrzwygrunrltm` with actual
+  merge. `apply_migration` succeeded on Kajo `operator-reviewed-project` with actual
   version `20260910071110_atomic_collection_actions.sql`. SQL SHA-256 remains
   `fbe319423f4f935e87435f4101db71677fa958a02aa7a820f6a55ae68d6ab5ce`;
   the repository filename alone was synchronized. Do not deploy it again.
@@ -5819,7 +5819,7 @@ surface. Captured in FUTURE_PLAN; it is a product idea, not another reported def
 
 - Supersedes the preceding pending-hosted checkpoint. Exact candidate SQL SHA-256
   `889e424c3ebefa4145534e2cca0a531d107947b187d7c225f6d355dcc9f26711`
-  deployed to `mwrnvfosrzwygrunrltm` as provider version `20260910110344` /
+  deployed to `operator-reviewed-project` as provider version `20260910110344` /
   `list_membership_resurfacing`. Repository filename aligned; SQL bytes unchanged.
 - Captured the actual prior function and rehearsed its replacement in the full
   isolated PGlite schema. The manual recovery file restores its original function
@@ -6216,7 +6216,7 @@ claim. STATUS records the exact SQL hash/target and post-approval continuation.
 ### Owner approval and hosted multi-destination rollout — 2026-09-10
 
 The owner explicitly approved the previously blocked hosted migration. Applied the
-unchanged reviewed SQL on `mwrnvfosrzwygrunrltm`; provider version/name is
+unchanged reviewed SQL on `operator-reviewed-project`; provider version/name is
 `20260910190243_shared_list_destinations`, SHA-256
 `c6196e699b3720755652f6b61c7dc8776333be0ebce1df592e6487d828757b4f`.
 Aligned only this new filename to the provider record, without altering SQL or old
@@ -6770,7 +6770,7 @@ The next packet was existing-target rollout preparation. No hosted DDL, data,
 migration-history repair, reset, APK dispatch or device acceptance was performed.
 The reviewed deployment below is the concrete next hosted action for owner approval.
 
-Read-only target: **Kajo `mwrnvfosrzwygrunrltm`**, PostgreSQL 17.6,
+Read-only target: **Kajo `operator-reviewed-project`**, PostgreSQL 17.6,
 ACTIVE_HEALTHY, eu-west-1. Actual tracking has 50 version/name rows, ending at
 `20260910190243_shared_list_destinations`. Metadata capture covers 138
 public/private functions, 33 table definition fingerprints, 25 application/Auth-user
@@ -6886,7 +6886,7 @@ Sprint014 remain open, and E1 → D1 → D2 retains its independent engine order
 ## Approved hosted Prediction rollout — 2026-09-12
 
 The owner explicitly approved the exact six-forward packet on existing **Kajo
-`mwrnvfosrzwygrunrltm`**, preserving current data. This completes the preceding
+`operator-reviewed-project`**, preserving current data. This completes the preceding
 preflight's requested action; its old pending/approval instructions are historical.
 Do not repeat these migrations or request that same authorization again.
 
@@ -7032,3 +7032,45 @@ The selected independent source packet is E1 #235 on
 executable generic contracts and media/non-media fixtures before D1/D2. #229
 retains its native/remaining acceptance record, and no missing test or requirement
 is marked complete just to begin E1. No new DDL, APK dispatch/polling or reset ran.
+
+
+## Sequential adaptive Taste source foundation — 2026-10-14 / #336
+
+The new product contract requests one-question-at-a-time learning and evaluation
+from the updated committed prefix, numeric-sensitive selection and variable
+readiness rather than fixed response/holdout quotas. [STATUS](../STATUS.md) owns
+the one active `feat/adaptive-taste-reference` handoff; [the Prediction model](../../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
+owns chronology, same-prefix evaluation, insufficiency and native boundaries.
+The portable reference/control packet covers EB-03/EB-08 and architecture
+sections 30, 32, 33, 40–42. Existing v1 sessions and accepted foundations are retained.
+
+Source publication/integration and final CI are recorded in #336 and its PR.
+Canonical domain-aware evaluation scoring/committed cutoffs, persistent projection
+and erasure, mobile consumption, real usefulness and all anonymous/release gates
+remain open. No private account/device observations or operator receipts, native
+rollout, reset, trained-model admission or Working/cohort activation are supplied
+by this source packet. Sprint 014 is not closed.
+
+
+## Recovered sequential reference and continuous-learning clarification — 2026-10-15
+
+Recovered the uncommitted #336 work on `feat/adaptive-taste-reference` from the
+prior interrupted session; its base still matches accepted main `419f385`.
+The reference and media/non-media tests now also reject missing overlapping
+features as apparent separation and prevent feature support from crossing changed
+schema/representation versions. Original responses and forecasts remain retained.
+The full engine suite passes 284 tests, including 39 adaptive reference cases.
+
+The owner's clarification is recorded in PREDICTION_MODEL, LAUNCH_LOOP, MVP,
+ROADMAP and AGENTS: Taste can end before sufficient support; the same Profile
+continues learning in Discovery. Per-action freshness, immutable prior origins,
+recent/durable/context/world/group composition and local/privacy-gated global
+scenario retrieval retain distinct implementation and acceptance scopes.
+The current source is a pure reference; native sequential SQL/mobile/Discovery
+integration is the next packet, not a delivered result of these fixtures.
+
+Local lint/typecheck, mobile/catalogue and engine checks pass. The root check
+stops at refused Deno npm-registry access; final GitHub CI owns the complete
+required gate. The PR records remaining suite/build results and exact integration.
+No hosted change, device observation, reset, population activation or measured
+quality is claimed. Existing v1 remains preserved and Sprint 014 stays open.

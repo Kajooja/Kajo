@@ -168,6 +168,43 @@ No ranking score is converted to a 0–10 predicted rating and no challenge scor
 manufactured by this selector. Calibration/import answers must retain their
 canonical source semantics rather than becoming native/Working evidence.
 
+## Sequential adaptive Taste reference
+
+The optional `@kajo/prediction-engine/adaptive-taste` export provides
+`createAdaptiveTaste`, `advanceAdaptiveTaste` and `inspectAdaptiveTaste` for #336.
+It is a pure reference with synthetic media/non-media conformance fixtures, not
+an activated native scorer or a persistent mobile session API.
+
+A trusted caller supplies authorized, versioned canonical forecast pools with
+an exact committed response prefix. OFFER freezes one question; ANSWER retains
+its first measurement; only a later snapshot may consume that answer. CORRECT,
+WITHDRAW_SOURCE, PAUSE and RESUME preserve command identity, source dependencies
+and bounded state. The caller owns authentication, atomic compare-and-swap,
+persistence, actual evidence projection and complete erasure of copied data.
+
+Numeric rating magnitude affects the reference question policy. UNKNOWN is not
+a rating; explicit not-interest remains separate. Ordinal evaluations use one
+earlier same-domain pool in which both labels were unseen. Per-step scores never
+share a comparison scale. Corrections invalidate the affected evaluation rather
+than retroactively improving its first measurement.
+
+The declared readiness policy requires distinct supported feature patterns,
+full declared-domain coverage, prospective ordinal agreement and compatible
+ordering stability. Incompatible feature versions and missing overlapping values
+do not imply diversity or transferable support. All-tied forecasts may collect
+initial labels but cannot establish readiness. Bounds, pause and missing evidence
+return explicit insufficiency, never an automatic pass. All thresholds are
+provisional; uncertainty is unavailable, native activation and quality admission
+are false. Taste-to-Discovery continuation belongs to the native successor and
+must preserve the same Profile with its remaining uncertainty.
+
+Defaults cap 48 opportunities, 160 normal commands, 128 retained candidates per
+pool and 1 MiB state, with bounded first-answer/lifecycle reserves. The separate
+PRIOR_ONLY policy is a fixed recognition control. Reference fixtures demonstrate
+behavior and leakage protection, not empirical recommendation improvement.
+The [canonical contract](../../docs/domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
+owns native sequencing and acceptance.
+
 ## Bounded session intent
 
 `./working-state` is a separate source-only hypothesis, not a replacement for

@@ -209,7 +209,14 @@ Report proper probability/regression losses, calibration and unsupported-state b
 
 **Reuse/prerequisites:** Phase 14.4 modes and Phase 15.0 recognition-aware Taste; EB-07 is required only for later distributional policies, not to implement the existing bounded modes.
 
-**Next bounded slice:** compare one versioned FOR_YOU/SURPRISE/RISK policy difference or one question-selection rule with a fixed control, retaining user utility and hard constraints.
+**Selected bounded slice — 2026-10-14 / [#336](https://github.com/Kajooja/Kajo/issues/336):**
+a portable numeric-answer-sensitive sequential Taste reference with recognition-only
+control, pre-answer forecast commitments, same-prefix ordinal evaluation and
+provisional per-domain readiness. Architecture sections 30, 32, 33 and 40–42;
+EB-03 supplies its evaluation lineage. This does not close EB-03/EB-08 or activate
+a native model. STATUS owns source/native progression; ROADMAP 15.0 owns release
+placement. Persistent scoring/projection/erasure and mobile consumption follow
+reference conformance.
 
 **Exit evidence:** model predictions remain separate from action choice; constraints are not genome-mutable. Evaluate discovery satisfaction/choice, novelty, fatigue, learning efficiency and coverage where observable. Asking about a recognized past experience is not the same experiment as recommending a new one. Held-out challenge answers never enter their own prediction. Information gain is supported or explicitly unavailable, not random jitter with a scientific name.
 

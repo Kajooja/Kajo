@@ -417,7 +417,28 @@ Unknown information gain is not replaced by random noise and reported as a measu
 
 An action can trade a bounded amount of immediate expected utility for learning. The source's lower-reward/higher-information example is an architectural objective, not proof that a particular choice helps.
 
-Distinguish asking about a recognized past experience from recommending a new experience. Taste question selection must account for recognition, response cost and uncertainty reduction. Unknown answers are valid skips. Holdout challenge answers remain excluded until the frozen prediction has been scored.
+Distinguish asking about a recognized past experience from recommending a new experience. Taste question selection must account for recognition, response cost and supported uncertainty reduction. Unknown answers are valid skips. A held-out answer cannot enter the prefix of its own forecast.
+
+The October 14 [sequential Taste contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
+commits one pre-answer forecast and its immutable first-answer/measurement receipt
+before admitting that answer into a later prefix. Pending ordinal comparisons
+may complete when another label arrives, using an earlier frozen pool in which
+both labels were unseen; later learning never rescores that original pool. Numeric
+answer magnitude can inform the next question policy. Dynamic readiness must
+inspect supported differentiation, coverage and prospective evidence, while
+remaining distinct from calibrated reliability. More answers cannot distinguish
+Items encoded as identical features; richer versioned representations and
+measured benefit retain their own admission gates. The portable #336 reference
+is an EB-03/EB-08 source slice, not complete active-learning or native acceptance.
+
+The October 15 clarification makes this a continuous loop across initial Taste
+and later Discovery. A bounded questionnaire may end before supported readiness;
+the same subject state and unresolved uncertainty continue to learn from subsequent
+observations. Readiness can fall after contradiction, inactivity or source
+withdrawal. World and group context remain separate inputs, and scenario-prefix
+retrieval follows sections 16–25 rather than a second onboarding-only algorithm.
+The [native continuation contract](../domain/PREDICTION_MODEL.md#continuous-learning-across-taste-and-discovery)
+records the surface, freshness and partial-state acceptance requirements.
 
 Measure learning efficiency and downstream useful recommendations, not just question completion. Real recommendation exploration requires explicit policy limits and, when stochastic, truthful propensities appropriate to the actual action/slate design.
 

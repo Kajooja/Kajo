@@ -41,7 +41,149 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 
 ## 3. The complete loop
 
-### Personal Taste opportunity source
+### Sequential adaptive Taste
+
+The **2026-10-14 / [#336](https://github.com/Kajooja/Kajo/issues/336)** target
+replaces fixed-count completion with a variable prospective learning sequence.
+The [launch interaction](../product/LAUNCH_LOOP.md#sequential-target--2026-10-14)
+owns user-facing progression; this section owns forecast and evaluation semantics.
+The bounded portable reference is a source foundation, not delivered SQL/mobile
+v2, native acceptance, calibrated grade prediction or measured model usefulness.
+The existing v1 source sections below remain current implementation facts.
+
+The `./adaptive-taste` source subpath exposes `createAdaptiveTaste`,
+`advanceAdaptiveTaste` and `inspectAdaptiveTaste`. The caller supplies authorized
+canonical forecast pools; the reference creates no ranking score or grade. Its
+OFFER/ANSWER/correction/source-withdrawal/pause transitions retain prefix, pool and
+first-label provenance. A declared provisional readiness policy also requires
+observed ordinal agreement and supported feature separation, while missing or
+retained-only domain coverage stays explicit. These are inspectable source
+criteria, not measured reliability or deployed server commands.
+
+Each step must retain this order:
+
+1. Resolve an authorized, available-at-time committed response prefix and its
+   source/model/feature/policy versions. The target answer is absent from that input.
+2. Select a real canonical Item and commit its forecast or explicit unavailability,
+   with the prefix/state identity and evaluation metric, before accepting an answer.
+3. Accept exactly one measured first answer and persist its measurement receipt
+   plus any currently available evaluation against the original forecast. An
+   unavailable forecast is missing coverage, not a hit; a pending pair needs
+   another first label and is neither an accuracy result nor a failure.
+4. Project the answer as source-provenanced evidence for future state only after
+   that receipt/currently available evaluation. Numeric rating magnitude matters,
+   including genuine zero and
+   neutral five; UNKNOWN changes recognition only, and explicit not-interest is
+   a separate signal rather than an invented numeric rating.
+5. Select and predict the next question from the new committed prefix. New evidence
+   can improve a forecast or reveal uncertainty/contradiction; no monotonic
+   improvement is guaranteed.
+
+Selection and readiness must consume forecast support for their declared domain
+universe. The server therefore needs a **canonical evaluation scoring boundary
+for requested Items**, with the same eligibility, authorization, features and
+model lineage as production ranking. A global delivery top-50 pool can omit every
+BOOK target; it cannot stand in for this boundary or prove BOOK coverage. Do not
+impute missing scores, substitute a client scorer, or call an external/injected
+reference snapshot an observed native forecast. Unsupported domains stay explicit.
+
+The current native bootstrap path uses transaction `now()` while answer receipts
+may use `clock_timestamp()`. Updating and ranking within one transaction can
+therefore exclude its own newly written answer. The initial server integration
+must **commit ANSWER, then issue a separate NEXT request** and verify that the
+forecast consumed the resulting prefix. A future combined operation is acceptable
+only with an explicit later `asOf` propagated end to end through every evidence,
+state and scoring reader, with equivalent inclusion/exclusion proof. Changing a
+clock in one helper alone does not prove committed-prefix visibility. The pure
+reference accepts caller-supplied snapshots and does not supply this server boundary.
+
+Ordinal evaluation compares only same-domain Items forecast under the **same
+committed prefix, model and declared panel**, with both first labels unseen at
+that prefix. Pair aggregation may finish after a later first label arrives; it
+uses the retained earlier pool and original first labels even though intervening
+answers have already entered future learning. It never rescores that pool.
+Never compare an earlier
+question's scalar score with a later prefix's score; those learned states may
+have different scales. Reusing a fixed comparable panel can inspect ordering
+stability, but scalar drift across prefixes is not predictive improvement.
+Current uncalibrated rank scores support no 0–10 error, accuracy percentage or
+statistical reliability claim. Grade-error metrics need a separately validated
+grade predictor and calibration contract.
+
+Readiness declares **per-domain** distinct evidence support, forecast coverage,
+informative feature separation, prospective evaluation support and observed
+ordering agreement, and stability, with their versioned thresholds and actual
+missingness. A tied cold-start forecast can still collect informative first
+labels from distinct features; it cannot certify readiness. A transparent reference criterion
+may produce provisional readiness; that is not statistical reliability, calibrated
+confidence, transfer quality or model admission. Counts alone, repeated near-duplicate
+Items or many tags on one rating cannot establish it. Pause, poor recognition,
+catalog exhaustion or a safety budget with unmet criteria returns insufficient
+evidence and preserves resumable state rather than silently passing the test.
+
+Forecasts and measured first answers are immutable; later pair aggregation adds
+results from those retained measurements rather than replacing them.
+Later corrections/withdrawals
+change future source state and invalidate/remove affected copied reports under
+the lifecycle contract; they never rescore or relabel an old measurement. Session
+and account erasure must clear copied state and prevent retries from resurrection.
+Authorization, exact command idempotency, conflict handling and source lifecycle
+belong to the versioned server integration, not the pure selector. Existing v1
+sessions and completed setup must continue without reset or historical rewrites.
+
+### Continuous learning across Taste and Discovery
+
+The **2026-10-15 owner clarification** applies the existing complete architecture
+to every surface: Taste initializes the same PersonalProfile that ordinary
+Discovery continues to learn. Taste completion is an interaction boundary, not
+a final trained model or a permanent confidence flag. If the declared Taste
+budget, fatigue/skip policy or voluntary exit ends the questions before provisional
+readiness, the user can continue to Discovery with the actual evidence and explicit
+per-domain insufficiency. Do not force an endless test or create another Profile.
+The current portable reference reports insufficient states but does not implement
+that native handoff, Discovery ingestion or a persistent Profile readiness store.
+
+For each accepted meaningful action, the server commits the canonical observation
+and correction/source lineage, recomputes eligible Working/Short/Long support,
+combines permitted Group/World/Context inputs and obtains a new versioned forecast.
+Pending or failed client writes cannot become confirmed learning. UNKNOWN/skip,
+exposure, saving, explicit not-interest and consumed rating retain their distinct
+semantics; an unobserved outcome is not dislike. Current state/readiness may gain
+or lose support after contradiction, correction, withdrawal, inactivity or world
+change. The latest state drives later predictions, while every already-delivered
+PredictionRun and its delayed-outcome attribution remain immutable.
+
+The native continuation must prove that the first new ranking request after an
+acknowledged action consumes its committed prefix. A pre-action cached/slower
+response cannot replace the new scope/revision; frozen pagination cannot silently
+rescore an old page. Continue exact pending-request retries first, then request a
+new prediction with its own origin. This acceptance applies to grid and swipe,
+BOOK and MOVIE, and explicit changes of DiscoveryMode, session or Profile.
+
+PersonalProfile and SharedProfile are separate subjects. Shared learning needs
+actual actor/round provenance and permitted member inputs; personal likes do not
+fabricate a joint outcome or authorize reading another person's raw history.
+World/context changes can affect immediate suitability without rewriting durable
+taste. Missing world or human-state fields remain unavailable.
+
+Scenarios retain the decision-time state, context, eligible options and frozen
+forecast, then attach the actually observed continuation with its maturity and
+source lineage. A rebuildable prefix index retrieves comparable local episodes
+and, once admitted, protected cross-Profile scenarios/prototypes. Match both
+recent and durable state, task/domain, individual/group context, compatible world
+features and versions; query features never include the answer being predicted.
+Only a neighbor's already-available observed continuation may inform the estimate.
+No useful match falls back explicitly. Similarity alone does not establish quality.
+
+This is the existing EB-02/EB-04/EB-06/EB-08 direction, not a second recommender.
+EB-04 supplies local retrieval and no-retrieval controls; EB-06 supplies consent,
+minimum-cohort, authorization-before-search, deletion lineage and protected global
+aggregation before cross-Profile use. These capabilities remain required staged
+engine work, not delivered behavior of #336 or permission to activate population
+learning. ROADMAP owns their order; the native Taste/Discovery continuation is the
+immediate consumer contract.
+
+### Personal Taste opportunity source — current v1
 
 The source-only `taste-selection-v1` selector and Kajo adapter boundary live
 under the independent package's `./taste-selection` and
@@ -68,14 +210,18 @@ ADAPTIVE; diagnostics cannot change the policy through the public request.
 Explicit ratings alone project to source-provenanced LongTerm bootstrap evidence.
 Unknown/not-interest/withdrawal stay distinguishable; see [Taste evidence](DATA_EVENTS.md#3-taste-evidence).
 Durable receipt issuance is not observed screen exposure. The own-Personal frozen
-challenge source is below; anonymous lifecycle, preview, app integration and
-usefulness evidence remain open.
+challenge source is below; anonymous lifecycle, preview, actual device acceptance
+and usefulness evidence remain open.
 The root estimator and scorer are unchanged. The #330 owned mobile consumer uses
 the retained server selection policy rather than the legacy six-rating stop rule.
 Only a confirmed missing first session RPC permits legacy static calibration.
 Runtime/deployment/anonymous and measured usefulness acceptance remain separate.
 
 ### Frozen Personal Taste challenge
+
+This is the **current v1 batch contract**, preserved alongside the new
+[sequential target](#sequential-adaptive-taste). Its answers remain evaluation-only;
+new sequential projection must not change that existing source contract.
 
 `personal-taste-challenge-v1` reserves unseen holdouts before calling the existing
 `rank_items_with_identity_v1` once in cross-domain `FOR_YOU` mode, with a bounded
@@ -880,9 +1026,10 @@ The profiling candidate slate is ordered by a versioned non-personal Item prior:
 
 The curated beta fallback must never be labelled as live trend data. Provider aggregate popularity/trend is catalog metadata and may be used in MVP. A trend derived from aggregate Kajo Profile behaviour is different: that is future privacy-gated `PopulationMemory` and requires minimum-cohort, consent/deletion-lineage and exposure-bias controls before it may influence cold start.
 
-### Bounded no-import profiling
+### Bounded no-import profiling — retained legacy source
 
-MVP `cold-start-v1` rules:
+Current `cold-start-v1` implementation rules, preserved for existing setup and the
+guarded legacy fallback; these are not the new sequential readiness criteria:
 
 - PersonalProfile only,
 - minimum completion target: **6 ratings of known Items**,
@@ -1982,7 +2129,7 @@ and the device/privacy/release gates remain independent.
 - Common normalized features allow BOOK/MOVIE transfer, while domain metadata and transfer reliability prevent false equivalence. Preserve evidence strengths, not only top-tag names. Missing features yield a neutral bounded fallback.
 - Begin with a transparent bounded context-dependent weighting rule over these states; compare it with a static baseline. Learned gating may later replace it behind the same versioned contract.
 - FOR_YOU optimizes supported fit; SURPRISE adds relevant novelty; RISK allocates bounded exploration to relevant uncertain candidates. Deterministic hash jitter alone is not evidence of epistemic uncertainty. Log propensities if stochastic selection is introduced.
-- The implemented logged-in `cold-start-v1` calibration uses six known ratings within a 12-to-24 slate. The planned anonymous adaptive Taste Test has its own versioned stopping/support rules and held-out challenge in [LAUNCH_LOOP.md](../product/LAUNCH_LOOP.md); do not transfer the six-rating gate or claim adaptive selection is already delivered. Measure recognizability, information gain, skips and completion, not just stored ratings.
+- Retained logged-in `cold-start-v1` permits six known ratings within a 12-to-24 slate. The October 14 [sequential Taste target](#sequential-adaptive-taste) uses committed-prefix adaptation and explicit per-domain provisional readiness; do not transfer the six-rating/count gate or infer statistical reliability. Preserve existing v1 sessions and setup. Measure recognition, support, forecast coverage, prospective evaluation and stability, not just stored ratings.
 
 The 2026-10-09 dependency audit selects a native parity packet that makes current
 snapshots and ordinary/catalogue-chain kernels use the same unclamped decay

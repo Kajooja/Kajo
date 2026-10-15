@@ -15,9 +15,9 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Profile member | `ProfileMember` | Accepted User/Profile membership. Pending invitation is not membership. |
 | Friend invite | `FriendInvite` | Opaque server-owned expiring/revocable invitation; may start Taste and create Friendship after consent/identity conversion; not Shared membership. |
 | Friendship | `Friendship` | Reciprocal active social relationship between permanent Users; no private Personal evidence access or automatic SharedProfile. |
-| Taste session | `TasteSession` | Versioned real-Item acquisition/cold-start session and optional honest holdout challenge before registration. |
-| Taste response | `TasteResponse` | Canonical known/unknown/rating/not-interest answer; only defined recommendation semantics become taste evidence. |
-| Taste challenge | `TasteChallenge` | Held-out known-Item test with prediction/state/model frozen before the actual answer; answer joins future learning only afterward. |
+| Taste session | `TasteSession` | Versioned real-Item cold-start/acquisition sequence with safety budgets and pause/resume. Sequential target uses committed-prefix adaptation and provisional per-domain readiness; fixed counts do not certify reliability. Existing v1 sessions remain preserved. |
+| Taste response | `TasteResponse` | Canonical rating/unknown/not-interest answer. Numeric rating magnitude supplies preference, UNKNOWN recognition only, and negative interest remains separate; projection retains source provenance. |
+| Taste challenge | `TasteChallenge` | Prospective held-out-answer evaluation with prediction/state/model/prefix committed first, first-answer measurement immutable and future projection afterward. Delayed pairs use the unchanged earlier panel. Sequential target evaluates per question; existing v1 frozen batch remains evaluation-only. |
 | Acquisition attribution | `AcquisitionAttribution` | Bounded campaign/referral metadata for the funnel; not Item preference evidence. |
 | Item | `Item` | Any recommendable object/experience regardless of domain; maps to generic engine Object. |
 | Item type | `ItemType` | Domain classification such as BOOK/MOVIE; never a separate core Item model. |
@@ -121,6 +121,12 @@ external research subject != Kajo User/Profile
 ```
 
 FriendInvite is not Friendship; Friendship is not SharedProfile or ProfileMember; membership does not grant raw private Personal evidence access. TasteSession is not another media-specific Profile. AcquisitionAttribution is not taste evidence. ExternalTastePrior, native PopulationMemory and SyntheticScenarioMemory are not interchangeable.
+
+[Sequential Taste](PREDICTION_MODEL.md#sequential-adaptive-taste) readiness is
+provisional rather than statistical reliability or model admission. Ordinal
+metrics compare same-prefix forecasts; scores across learned prefixes are not a
+shared scale. Correction/withdrawal changes future evidence and copied-report
+lifecycle, never the original forecast or first measured answer.
 
 ## Forbidden synonym drift
 

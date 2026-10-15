@@ -1,8 +1,10 @@
 # Kajo Taste-first Launch Loop
 
-Status: **canonical MVP launch specification**  
-Product decision: **2026-09-07**  
-Tracking: **#215**
+Status: **canonical MVP launch specification**
+
+Product decision: **2026-09-07**, sequential Taste refinement **2026-10-14**
+
+Tracking: **#215**, adaptive source foundation **[#336](https://github.com/Kajooja/Kajo/issues/336)**
 
 This document defines how the first public Kajo acquires, activates and socially connects a new user. It is not a marketing appendix. The flow below is a release requirement and must be implemented only after the recommendation foundation is trustworthy enough to create a useful first-session experience.
 
@@ -17,11 +19,11 @@ Taste link / campaign link / personal invite
         ↓
 web or installed-app entry
         ↓
-anonymous Taste Test
+anonymous sequential Taste Test
         ↓
-first PersonalProfile taste state
+prospective prediction → answer evaluation → future taste update
         ↓
-holdout prediction challenge
+explicit provisional readiness or insufficient pause
         ↓
 small recommendation preview
         ↓
@@ -44,8 +46,8 @@ A release candidate must support all of the following:
 
 1. Open a public Taste link without an installed app.
 2. Start the Taste Test without registration.
-3. Learn a bounded initial taste state from real catalog Items.
-4. Evaluate that state against held-out known Items without contaminating the challenge.
+3. Learn initial taste through a variable sequence of real catalog Items within explicit safety budgets.
+4. Commit each forecast before its answer, evaluate the original, then let the answer inform later questions; report provisional readiness or insufficient evidence honestly.
 5. Show a small number of genuinely personalized unseen recommendations.
 6. Convert the anonymous visitor to the same canonical Kajo identity through Google or Apple without losing taste/history.
 7. Continue into the mobile product with the cold start already completed.
@@ -133,38 +135,49 @@ Taste Test is Kajo, not a conventional genre survey.
 
 The user reacts to recognizable real Items one at a time. Current rating semantics remain canonical: a 0–10 rating means consumed/read/watched; unknown can be skipped; not-interest is distinct from a rating.
 
-The test should normally remain within roughly **12–24 informative known-item opportunities**, adapting to recognition and information gain. Exact thresholds are versioned and must be measured rather than hard-coded forever.
+### Sequential target — 2026-10-14
 
-Owner device preference (2026-09-10): make initial profiling visibly longer,
-using approximately **10 movies followed by 10 books**, with a distinct transition
-card announcing book profiling. Treat this as the proposed default progression
-for Phase 15.0, compatible with the 12–24-opportunity adaptive range above, not a
-requirement to force 20 known ratings. Keep unknown-item skips, recognition-aware
-selection and honest progress. The current logged-in calibration flow also needs
-this proposal evaluated after its evidence/history defects are corrected.
+Question count is variable. Neither six answers, twenty answers, a 10 MOVIE +
+10 BOOK schedule nor the earlier 12–24 range establishes completion. Selection
+uses the committed response prefix, including numeric rating magnitude, to seek
+the next useful recognizable Item. UNKNOWN updates recognition only; explicit
+not-interest remains separate from both UNKNOWN and a low rating. A new answer
+may improve the next forecast or reveal uncertainty and contradiction; monotonically
+improving forecasts are not promised.
 
-Current-calibration evaluation (2026-09-10, #228/#229): the server already accepts
-6–24 known ratings and can select 20 balanced candidates, but currently returns
-an interleaved MOVIE/BOOK sequence and offers completion after six ratings. The
-proposed 10 MOVIE → transition → 10 BOOK progression therefore needs a versioned
-presentation/stop rule, not just a higher numeric minimum. Retain unknown skips,
-bounded extension to 24 opportunities, and fail-open behavior when recognition or
-catalog coverage is insufficient. Freeze the presented order when extending so
-already answered Items do not move or repeat. Existing completed profiles must
-not be forced through calibration again. Implement this progression in Phase 15.0
-with the adaptive Taste interaction; the current history correction does not
-change the six-rating completion rule or claim the longer flow is delivered.
+Each step commits a forecast before the answer, stores its first measurement and
+any available evaluation, projects the answer with source provenance, then
+selects/predicts from the next
+committed prefix. The [sequential prediction contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
+owns scoring, cutoff and comparison rules. The user can pause and resume without
+losing that order. An independent **“En tunne” / skip** remains usable after an
+accidental rating-wheel movement: it discards the unsubmitted draft; deliberate
+zero and neutral five remain ratings.
 
-Owner follow-up (2026-09-10): keep an independent **“En tunne” / skip** action
-visible and usable after the rating wheel has moved, including accidental touches.
-“Next” with a draft rating and “unknown” must be separate, unambiguous actions.
-Choosing unknown discards that Item's unsubmitted draft rating and advances or
-extends the opportunity sequence without creating rating/not-interest evidence.
-Cover accidental drag, deliberate zero rating, previous/next and the last-card
-extension/fail-open case. The October 12 source correction gives the existing
-six-rating calibration independent Next and unknown actions, preserves genuine
-zero and the presented prefix on expansion, and cancels stale profile operations.
-Its longer adaptive progression and configured-device acceptance remain open.
+Readiness must declare per-domain support, forecast coverage, informative feature
+dispersion, prospective evaluation and stability. Any readiness shown is
+**provisional**, not statistical reliability or admitted model quality. Poor
+recognition, exhausted eligible Items, a safety budget or a pause with unmet
+criteria yields insufficient evidence rather than a pass. The October 15
+clarification permits continuing to ordinary Discovery with that partial state:
+ending the questionnaire must neither block browsing indefinitely nor discard
+learning. The same PersonalProfile keeps learning from canonical Discovery actions,
+and its support/readiness remains revisable. Native continuation must be verified;
+the portable reference alone does not implement this user flow. Progress communicates
+those conditions instead of a fixed number of required answers. #336 supplies a
+bounded portable source foundation; SQL/mobile v2, native acceptance, calibrated
+grade predictions and measured usefulness remain open. This foundation precedes
+canonical preview because preview requires trustworthy state/evaluation evidence.
+
+### Current v1 source and superseded count plan
+
+The September 10 proposal for approximately 10 movies followed by 10 books,
+within 12–24 opportunities, is preserved as the earlier design. The October 12
+v1 source below implements its versioned stage/stop policy; those counts are
+current-source facts, not the sequential target's completion rule. Legacy
+`cold-start-v1` still permits completion after six known ratings within its bounded
+slate. Existing v1 sessions and completed setup must remain usable without reset,
+forced reprofiling or rewriting their forecasts/first evaluation answers.
 
 The October 12 portable `taste-selection-v1` source returns bounded immutable
 question/transition/stop decisions from an authorized frozen input and presentation
@@ -197,26 +210,33 @@ The question-selection policy should optimize information gained about the Profi
 - no repetitive near-duplicate Items,
 - fail-open behavior when the visitor does not recognize enough Items.
 
-The first production implementation may be transparent and heuristic. A learned active-learning policy is optional until it beats the transparent baseline under the same evaluation contract.
+The sequential target may begin with a transparent heuristic. Its feature and
+readiness proxies must be labelled as such; a learned active-learning policy is
+optional until it beats a transparent baseline under the same evaluation contract.
 
 ## 6. Prediction challenge
 
-After enough training responses, Kajo should demonstrate what it learned using **held-out known Items**.
+In the sequential target, prospective prediction evaluation occurs throughout
+Taste, before each answer joins future state. A question is held out relative to
+its own committed prediction prefix. A final summary may report those original
+measurements; it must not rescore old answers using the final learned state.
 
 Challenge contract:
 
-1. Items used for the challenge must not have been used as training responses for that Taste session.
-2. Kajo freezes the Profile/taste snapshot and model/policy version used for each prediction.
-3. Kajo predicts the user's rating/fit before revealing or accepting the actual answer.
-4. User submits the real answer.
-5. The error becomes evaluation evidence.
-6. Challenge responses may join the Profile's taste state only after their prediction has been frozen, so they cannot improve their own score retroactively.
+1. The answer must be absent from the prediction's authorized committed input prefix.
+2. Kajo commits that prefix, Profile state, model/policy versions and the supported forecast or explicit unavailability before accepting the answer.
+3. The first-answer measurement and currently available evaluation are stored against that exact forecast; a comparison needing another label remains pending, not a hit or failure.
+4. Only afterward is source-provenanced answer evidence projected for future predictions.
+5. Corrections/withdrawals change future state and remove affected copied reports under lifecycle rules; they cannot rewrite the original forecast or measured first answer.
+6. Ordinal comparisons use a retained same-prefix panel where both first labels were unseen. A later second label may finish the original comparison after intervening learning; it cannot rescore that panel. Scores from different learned prefixes never share one comparison scale.
 
-Never display a fabricated “91% accuracy” number. User-facing metrics must correspond to a documented mathematical measure, sample size and uncertainty. With very few holdouts, prefer plain language such as “Kajo osui lähelle 2/3 arviossa” rather than false precision.
+User-facing metrics must correspond to a documented measure, actual sample size,
+coverage and uncertainty. Never fabricate an accuracy percentage. MAE/RMSE or
+rating-point hits require a real grade predictor with an admitted calibration
+contract; ranking scores cannot supply those metrics. See the
+[evaluation boundary](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste).
 
-Possible internal metrics include MAE/RMSE on 0–10 ratings, tolerance hit rate, rank correlation when enough items exist, calibration error and completion/recognition rate.
-
-The October 12 own-Personal source supports **ranking order**, not a calibrated
+The current October 12 v1 own-Personal source supports **ranking order**, not a calibrated
 rating estimate. It reserves up to three unseen Items per domain before one
 canonical forecast and hides scores until all first answers are locked. Its
 [taste-ordinal-agreement-v1 metric](../domain/PREDICTION_MODEL.md#frozen-personal-taste-challenge)
@@ -224,14 +244,19 @@ reports same-domain pair agreement, ties, missing forecasts and known/unknown
 counts; dependent pairs are not independent observations. Percentage, rating
 error and statistical certainty are unavailable. UI must describe ordering
 agreement and sample size, never say “within N rating points” from these scores.
-These answers remain evaluation-only; automatic learning projection, anonymous prerequisites and observed usefulness
+These v1 answers remain evaluation-only; sequential projection is a new versioned
+target and does not alter existing v1 sessions. Anonymous prerequisites and observed usefulness
 remain separate gates. #330 supplies the owned mobile presentation, with actual
 hosted/device acceptance still required.
 
 
 ## 7. Recommendation preview and conversion wall
 
-After the challenge, Kajo returns a small preview of unseen candidates selected through the same production recommendation boundary used after registration.
+After explicit provisional readiness, Kajo may return a small preview of unseen
+candidates through the canonical production recommendation boundary. An
+insufficient pause/exhaustion result must explain its limitations and cannot
+claim that Taste or prediction quality passed. The current v1 consumer retains
+its separate post-test challenge; sequential v2 runtime acceptance is still open.
 
 The preview should communicate:
 
@@ -380,7 +405,7 @@ The launch loop is experimentable from the start.
 Version or assign at least:
 
 - Taste question-selection policy,
-- question count/stop rule,
+- readiness criteria, safety budget and pause/insufficient rule,
 - challenge metric/presentation,
 - recommendation preview policy,
 - CTA/copy variant where tested,
@@ -466,7 +491,7 @@ Canonical order:
 
 1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics; begin with the live native decay-parity correction, then bounded ordered Personal session/state policy.
 2. Server-backed anonymous identity/PersonalProfile-compatible state and TasteSession, minimal retention/deletion/abuse controls and versioned measurement before real Taste acceptance.
-3. Adaptive cold-start/Taste policy, trustworthy frozen challenge evaluation and canonical recommendation preview.
+3. Adaptive sequential Taste source/evaluation foundation (#336), then its versioned server/mobile integration and acceptance, then canonical recommendation preview.
 4. Google/Apple identity conversion and browser/installed-app continuation preserving that state, plus the full conversion funnel.
 5. Personal Friend invite + friend lifecycle.
 6. Compact consent-based SharedProfile creation, individual Shared rounds/controlled rewatch, then the planned bounded joint decision session under ROADMAP 16.2–16.4.

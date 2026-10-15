@@ -93,7 +93,8 @@ Invariants:
 
 ### TasteSession
 
-A `TasteSession` is a bounded/versioned cold-start/acquisition session.
+A `TasteSession` is a versioned cold-start/acquisition session with explicit
+safety budgets and pause/resume, not a fixed answer-count certificate.
 
 Conceptual fields:
 
@@ -110,10 +111,25 @@ status
 ```
 
 A TasteSession is not a second Profile and not a media-specific taste silo.
+Ending Taste with insufficient support retains the same PersonalProfile and its
+source evidence for continued Discovery learning. Readiness is revisable state,
+not a permanent completion/identity attribute.
+
+The October 14 [sequential target](PREDICTION_MODEL.md#sequential-adaptive-taste)
+retains a committed response-prefix revision, one pending question/forecast
+commitment, immutable first-answer measurement and a source-provenanced future
+projection. Delayed ordinal evaluation retains its earlier same-prefix pool;
+pending labels do not prevent that answer from informing later questions.
+Per-domain readiness reports support, forecast coverage, informative feature
+dispersion, prospective evaluation and stability. Readiness is provisional;
+unmet criteria at pause/exhaustion/budget mean insufficient evidence. Authorized
+server operations must own prefix consumption, exact retries, conflicts and
+erasure; #336's pure reference is not a new SQL/mobile protocol. Existing v1
+sessions and completed state are preserved without reset or forecast rewrites.
 
 ### Own-Personal TasteSession source
 
-The `personal-taste-session-v1` source implements one bounded session per existing
+The retained `personal-taste-session-v1` source implements one bounded session per existing
 owned PersonalProfile. `public.taste_session_v1(request)` is an invoker wrapper
 over a privately owned authorization/transaction boundary. Private session and
 command tables have RLS, with no direct `anon`/`authenticated`/`service_role` access.
@@ -177,7 +193,9 @@ Only responses with explicit taste semantics may enter bootstrap/Memory evidence
 
 ### TasteChallenge
 
-A `TasteChallenge` evaluates held-out known Items.
+A `TasteChallenge` evaluates Items whose answers are held out from their committed
+prediction input. In the sequential target this is prospective per-question
+evaluation; the current v1 source below retains its separate frozen batch.
 
 Invariant sequence:
 
@@ -191,6 +209,11 @@ freeze Profile/taste snapshot
 ```
 
 A challenge Item cannot improve the prediction that is being scored.
+The first measurement and available evaluation precede future source projection;
+delayed pair aggregation uses the unchanged earlier panel. Later corrections or
+withdrawals update future state and copied-report lifecycle, without replacing
+the original forecast/first measured answer. Pair evaluation requires a shared
+prediction prefix, as defined by [PREDICTION_MODEL](PREDICTION_MODEL.md#sequential-adaptive-taste).
 
 #### Own-Personal frozen challenge source
 
@@ -258,7 +281,8 @@ clears the rendered state. This does not establish observed screen exposure.
 `learningAdmission=EVALUATION_ONLY`: answers do not become native Events, bootstrap
 rows, impressions, training outcomes or model-promotion evidence. Explicit future
 projection must preserve this pre-answer freeze and source-removal lineage.
-App presentation, anonymous prerequisites and actual usefulness remain open.
+The owned mobile v1 presentation is accepted source; anonymous prerequisites,
+actual device/usefulness acceptance and sequential v2 integration remain open.
 
 ### AcquisitionAttribution
 

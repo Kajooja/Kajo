@@ -23,10 +23,22 @@ rating revisions versus bootstrap, preserves zero/neutral and selective Undo/cle
 and distinguishes effective native strong setup support from known Taste ratings.
 This is a correctness foundation, not measured first-session usefulness or a
 server-backed anonymous TasteSession. The owned server TasteSession, frozen ordinal
-challenge and #331 owned mobile consumer are accepted source foundations;
+challenge and #331 owned mobile consumer are accepted v1 source foundations;
 anonymous entry, device acceptance and measured usefulness remain open. All release
 acceptance below remains required. Guarded preparation and source compatibility
 are engineering prerequisites, not evidence closing a release requirement.
+The October 14 sequential refinement in
+[LAUNCH_LOOP](LAUNCH_LOOP.md#sequential-target--2026-10-14) supersedes fixed
+question-count completion for the new target. #336 is a bounded portable source
+foundation before preview; SQL/mobile v2, native acceptance and measured quality
+remain required. Existing v1 sessions/completed state are preserved.
+
+The October 15 continuation requirement applies to `MVP-TASTE-002`,
+`MVP-TASTE-003` and ongoing adaptive-memory acceptance: a bounded or voluntarily
+ended Taste session may continue into Discovery with insufficient per-domain
+support. Preserve its PersonalProfile/evidence and continue learning after accepted
+Discovery actions; readiness is revisable. The pure #336 reference does not yet
+supply this native handoff, current-state composition or cross-Profile retrieval.
 
 ## MVP completion meaning
 
@@ -123,11 +135,11 @@ The owner's October 9 clarification reaffirms the initial adaptive Taste before
 release; a group invitation or decision session does not replace these gates.
 
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
-- [-] `MVP-TASTE-002` Taste question selection uses only real canonical Items and adaptively balances recognition, diversity and information gain. The normal opportunity bound is approximately 12–24 recognized/unknown opportunities with a versioned stop/fail-open rule; no demographic profiling is required. A bounded portable selector and strict Kajo adapter now exist in source; owned server TasteSession persistence and a parity-tested SQL adapter now exist in source; the #330 owned mobile consumer follows retained server decisions; anonymous entry, hosted/device acceptance and measured selection value remain open.
-- [-] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics and initialize the visitor's PersonalProfile-compatible taste state without pretending campaign/auth behavior is recommendation evidence. #330 supplies the owned mobile response/retry boundary over source-provenanced server bootstrap; genuine zero, neutral and unknown remain distinct. Anonymous and hosted/device acceptance remain open.
-- [-] `MVP-TASTE-004` Kajo performs a holdout prediction challenge on known Items whose answers have not yet entered that Taste session's training state. Prediction/model/taste snapshot is frozen before answer capture and the challenge response can join taste only afterward. The owned server source now freezes one canonical run and reserved forecasts before first answers; answers remain evaluation-only. The #330 owned mobile consumer masks forecasts until all answers lock. Anonymous, hosted/device acceptance and explicit later projection remain open.
-- [-] `MVP-TASTE-005` User-facing challenge quality uses an explicitly documented mathematical metric, sample size and uncertainty; no fabricated percentage or retroactively improved self-score is permitted. The source now reports same-domain ordinal agreement, ties/missing support and unavailable small-sample uncertainty; The #330 owned mobile result now presents actual ordinal sample/tie/missing counts; anonymous, hosted/device and observed acceptance remain open.
-- [ ] `MVP-TASTE-006` After the challenge, Kajo shows a small unseen recommendation preview generated through the canonical production ranking boundary, including safe explanation and optional FOR_YOU/SURPRISE/RISK contrast.
+- [-] `MVP-TASTE-002` Taste selects a variable sequence of real canonical Items from the committed prefix, using rating magnitude, recognition and informative feature dispersion. Completion is not a six/twenty-answer or 12–24/10+10 count rule. A versioned readiness report declares per-domain support, forecast coverage, prospective evaluation and stability; readiness is provisional. Pause, poor recognition, exhaustion or safety budget with unmet criteria means insufficient evidence. No demographics are required. Existing portable/server/mobile v1 source remains preserved; #336 supplies the sequential source foundation. SQL/mobile v2, anonymous entry, native acceptance and measured selection value remain open.
+- [-] `MVP-TASTE-003` Taste responses reuse canonical rating/unknown/not-interest semantics. The sequential target retains the original forecast, first-answer measurement and available evaluation before projecting source-provenanced evidence for the next question; delayed comparisons use the original frozen pool. Genuine zero/neutral ratings affect preference by magnitude; UNKNOWN is recognition-only and explicit negative interest stays separate. #330/#331 supplies the preserved v1 response/retry boundary; sequential projection and its authorization/idempotency/erasure lifecycle remain to be integrated and accepted.
+- [-] `MVP-TASTE-004` Each sequential challenge forecast commits the authorized Profile/model/prefix before its first answer; original forecasts and first-answer measurements are immutable. Only afterward can the answer influence a later committed prefix. Pending ordinal comparisons may complete when another first label arrives, without rescoring the earlier panel. Corrections/withdrawals update future state and remove affected copied reports without rewriting old measurements. Existing v1 frozen batch forecasts and evaluation-only answers remain unchanged. #336's reference foundation does not supply SQL/mobile v2 or anonymous/native acceptance.
+- [-] `MVP-TASTE-005` Evaluation uses documented metrics, sample size, missing coverage and uncertainty; no fabricated percentage or retroactively improved self-score. Ordinal comparisons require the same frozen prefix/panel; scalar scores across learned prefixes are incomparable. Per-domain provisional readiness is not statistical reliability or model admission. V1 ordering counts remain supported; calibrated grade prediction, sequential runtime and observed quality acceptance remain open.
+- [ ] `MVP-TASTE-006` After Taste ends, with provisional readiness or explicit insufficient support, Kajo reports the supported original prospective evaluations and shows a small unseen recommendation preview through the canonical production ranking boundary, with safe explanation and optional FOR_YOU/SURPRISE/RISK contrast. Insufficient evidence is disclosed rather than presented as a passed challenge; sequential source/runtime acceptance precedes preview.
 - [ ] `MVP-TASTE-007` A completed Taste session produces useful first-session recommendations compared with a fixed transparent baseline/reference set; if evidence does not show usefulness, public launch remains blocked.
 
 ## Acquisition links, web continuation and conversion

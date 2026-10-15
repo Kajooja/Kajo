@@ -210,7 +210,20 @@ source = TASTE_TEST
 
 When a Taste response is projected into PersonalProfile bootstrap/Memory state, it remains distinguishable from native post-activation Kajo behavior and from imported history.
 
-The own-Personal `personal-taste-session-v1` source records bounded server-time
+The October 14 [sequential target](PREDICTION_MODEL.md#sequential-adaptive-taste)
+adds an explicit pre-answer forecast/evaluation lineage to each response:
+committed prefix and version, question/forecast identity, first measured answer,
+metric/result or pending/unavailable reason, projection source/revision and the next
+consumed prefix. Commit the forecast first, then the first measurement/available
+evaluation, then project
+the answer for future questions. Rating magnitude affects future preference;
+UNKNOWN is recognition-only and explicit negative interest remains distinct.
+Corrections/withdrawals amend future source state and invalidate affected copied
+reports; original forecasts and measured first answers cannot be rewritten.
+Erasure clears retained copies and old retries cannot resurrect them. The bounded
+#336 reference does not supply a new native Event writer or SQL/mobile v2.
+
+The current own-Personal `personal-taste-session-v1` source records bounded server-time
 response revisions against its frozen session/question ledger. Its SQL policy
 adapter consumes only that retained prefix. A zero rating is known; five is a
 neutral known rating; UNKNOWN supplies no taste support. WITHDRAWN removes the
@@ -243,7 +256,7 @@ dispatched/overwritten. Source/receipt issuance still does not prove screen expo
 
 A held-out challenge prediction must be frozen before the actual answer can influence the state being scored.
 
-Canonical order:
+Canonical order, applied per question for the sequential target:
 
 ```text
 1. freeze PersonalProfile/Taste state snapshot
@@ -251,11 +264,12 @@ Canonical order:
 3. persist challenge Prediction / expected rating or fit
 4. present held-out known Item
 5. collect actual answer
-6. persist evaluation result
+6. persist first measurement and any currently available evaluation
 7. only then allow answer to influence future Profile state
 ```
 
-Required challenge audit fields include:
+Conceptual challenge audit fields include the following. These do not introduce
+a new native wire contract or change the retained v1 response:
 
 ```text
 tasteChallengeId
@@ -263,19 +277,36 @@ tasteSessionId
 itemId
 predictionId / challengePredictionId
 stateSnapshotVersion
+committedPrefixRevision / source references
+forecastPanelIdentity
 modelVersion
 policyVersion
-predictedValue
-actualValue
+forecastAvailability / predictedValue?
+responseSemantic / actualValue?
+firstMeasurementReceiptId
 evaluationMetricVersion
-error / hit result
+evaluationStatus / result? / unavailableReason?
 predictedAt
 answeredAt
 ```
 
 A challenge prediction whose answer was already in training evidence is invalid and excluded from user-facing accuracy/evaluation.
+UNKNOWN/non-rating answers and unsupported forecasts retain their explicit
+semantics; nullable numeric fields must not be filled with invented values.
 
-The own-Personal `personal-taste-challenge-v1` implementation stores private first
+Each evaluation identifies the exact committed prediction prefix; ordinal pairs
+require the same domain, prefix/model and declared panel with both first labels
+unseen at that prefix. A delayed second label completes a comparison from that
+original panel, without rescoring after intervening learning. Pending comparison
+is neither an accuracy result nor a failure. Scalar scores from different learned
+prefixes are incomparable. Sequential projection follows the stored first
+measurement/available evaluation and declares its source revision. A later
+correction
+does not replace the original label; withdrawal invalidates/removes affected
+copied reports rather than retroactively improving their metrics. See the
+[scoring/cutoff boundary](PREDICTION_MODEL.md#sequential-adaptive-taste).
+
+The preserved v1 own-Personal `personal-taste-challenge-v1` implementation stores private first
 answers only after one canonical run and the entire reserved holdout slate have
 been committed. It excludes every training presentation and all existing native/
 bootstrap evidence on those Items, even inactive rows. It retains the actual run
@@ -817,6 +848,9 @@ Taste/acquisition paths require equivalent discipline:
 - idempotent response submission,
 - no duplicate response under browser retry,
 - server-owned question order/policy version sufficient for evaluation,
+- sequential forecast → first measurement/available evaluation → projection → committed next prefix,
+- separate committed ANSWER/NEXT cutoffs until an end-to-end later-as-of path is proven,
+- per-domain readiness/missingness and explicit insufficient pause/budget outcomes,
 - auth conversion cannot duplicate the PersonalProfile/taste evidence,
 - friend invite acceptance is idempotent,
 - revoked/expired/blocked invite cannot transition Friendship,
