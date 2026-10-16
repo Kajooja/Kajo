@@ -271,7 +271,9 @@ permits up to five minutes of future skew and supplies neither prefix ordering
 nor the cooldown clock; a slow client clock cannot invalidate a genuine earlier
 server-origin binding. Foreign/anonymous/service-role
 calls fail. Exact semantic-JSON retries retain the original receipt/time; any
-changed body conflicts. A different request ID cannot skip the same shown
+changed body conflicts. The trusted source's `acceptsNewSkip` must still be true
+for a new skip; a committed rating/save closes that opportunity. Exact retries
+and same-actor withdrawal remain available after it closes. A different request ID cannot skip the same shown
 opportunity again, even by changing contextRef or after withdrawal. Withdrawal
 belongs to the original actor and exact source and removes only that skip.
 An unavailable source blocks cached replay. The native erasure/tombstone writer

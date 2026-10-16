@@ -11,7 +11,7 @@ const command = (origin: KajoSkipOrigin = taste): KajoSkipCommand => ({ version:
 const authority = (c = command()): KajoSkipAuthority => ({ role: 'authenticated', isAnonymous: false, actorUserId: c.actorUserId,
   profile: { id: c.profileId, type: 'PERSONAL', ownerUserId: c.actorUserId, acceptedMemberIds: [c.actorUserId] },
   source: { actorUserId: c.actorUserId, profileId: c.profileId, itemId: c.itemId, origin: c.origin, contextRef: c.contextRef,
-    committedAt: '100', available: true }, acceptedAt: '102' });
+    committedAt: '100', available: true, acceptsNewSkip: true }, acceptedAt: '102' });
 const rejects = (fn: () => unknown, code: ContextualSkipError['code']) => {
   try { fn(); throw new Error('Unexpected acceptance'); } catch (error) {
     expect(error).toBeInstanceOf(ContextualSkipError); expect((error as ContextualSkipError).code).toBe(code);
@@ -72,6 +72,16 @@ describe('Kajo neutral skip command conformance reference', () => {
       expect(result.entries[0]?.command.occurredAt).toBe(occurredAt);
     }
     rejects(() => applyKajoContextualSkip([], { ...c, occurredAt: '300000103' }, a), 'INVALID_COMMAND');
+  });
+  it('cannot turn acknowledged positive-action advance into a fresh skip, while exact retries and withdrawal survive', () => {
+    const c = command(), a = authority(), first = applyKajoContextualSkip([], c, a);
+    const closed = { ...a, source: { ...a.source, acceptsNewSkip: false } };
+    rejects(() => applyKajoContextualSkip([], c, closed), 'ORIGIN_CONFLICT');
+    expect(applyKajoContextualSkip(first.entries, c, closed)).toEqual(first);
+    const withdraw: KajoSkipCommand = { ...c, kind: 'WITHDRAW_CONTEXTUAL_SKIP', actionId: id(21),
+      reversesActionId: c.actionId, occurredAt: '103' };
+    expect(applyKajoContextualSkip(first.entries, withdraw, { ...closed, acceptedAt: '104' }).receipt.semantic)
+      .toBe('WITHDRAW_CONTEXTUAL_SKIP');
   });
   it('withdraws only the exact actor-owned skip and never changes a rating or another skip', () => {
     const c = command(), a = authority(), first = applyKajoContextualSkip([], c, a);

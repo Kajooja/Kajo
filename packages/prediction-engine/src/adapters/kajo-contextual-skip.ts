@@ -49,7 +49,9 @@ export interface KajoSkipAuthority {
     readonly ownerUserId: string | null; readonly acceptedMemberIds: readonly string[] };
   readonly source: { readonly actorUserId: string; readonly profileId: string; readonly itemId: string;
     readonly origin: KajoSkipOrigin; readonly contextRef: string | null;
-    readonly committedAt: SkipInstant; readonly available: boolean };
+    readonly committedAt: SkipInstant; readonly available: boolean;
+    /** Current owned question/card remains open; a committed positive action closes it. */
+    readonly acceptsNewSkip: boolean };
   readonly acceptedAt: SkipInstant;
 }
 
@@ -163,6 +165,7 @@ export function applyKajoContextualSkip(entries: readonly KajoSkipEntry[], comma
     requireValue(target && target.kind === 'CONTEXTUAL_SKIP' && sameTarget(command, target)
       && !entries.some(e => e.command.reversesActionId === target.actionId), 'WITHDRAWAL_CONFLICT');
   } else {
+    requireValue(s.acceptsNewSkip === true, 'ORIGIN_CONFLICT');
     // A fresh request ID cannot count the same shown opportunity twice, even after withdrawal.
     requireValue(!entries.some(e => e.command.kind === 'CONTEXTUAL_SKIP' && sameOpportunity(command, e.command)), 'ORIGIN_CONFLICT');
   }

@@ -16,7 +16,8 @@ const command: KajoSkipCommand = { version: 'kajo-contextual-skip-v1', kind: 'CO
   origin: { surface: 'DISCOVERY', sessionId: id(5), predictionId: id(6), deliveryRequestId: id(7), impressionEventId: id(8) } };
 const authority: KajoSkipAuthority = { role: 'authenticated', isAnonymous: false, actorUserId: scope.actorUserId,
   profile: { id: scope.profileId, type: 'PERSONAL', ownerUserId: scope.actorUserId, acceptedMemberIds: [scope.actorUserId] },
-  source: { ...scope, itemId: command.itemId, origin: command.origin, contextRef: null, committedAt: '100', available: true }, acceptedAt: '102' };
+  source: { ...scope, itemId: command.itemId, origin: command.origin, contextRef: null, committedAt: '100',
+    available: true, acceptsNewSkip: true }, acceptedAt: '102' };
 const queues: ItemActionOutbox<Pending>[] = [];
 afterEach(() => { queues.splice(0).forEach(q => q.stop()); vi.useRealTimers(); });
 const store = (): ItemActionStorage & { rows: Map<string, string> } => {
