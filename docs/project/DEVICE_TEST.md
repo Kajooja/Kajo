@@ -1,5 +1,16 @@
 # Collection device checkpoint — #228 / #229
 
+## Current build pointer — 2026-10-16
+
+Use the verified [#677 APK](https://github.com/Kajooja/Kajo/actions/runs/38881582992/artifacts/12039373533)
+from source `8cd67af54765a2876f37e5db0deb66235ee3f0e9`; all five required
+checks and the APK job succeeded. [STATUS](STATUS.md#current-test-apk-and-device-work)
+owns its archive identity and expiry. #669 below remains a compatible historical
+build of the v2 consumer. Neither build contains the planned shared-feed/artwork/
+Ohita UI. The accepted #343/#345/#346 receipts record the matching hosted forwards
+as installed; the old #333 deployment task is complete and must not be replayed.
+Actual phone observations and every untested case below retain their own scope.
+
 ## Owner feed feedback and planned successor — 2026-10-15
 
 The owner reports that the Taste start/card flow showed the same films as another

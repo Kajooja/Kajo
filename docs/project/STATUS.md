@@ -12,10 +12,15 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current packet — neutral contextual skip protocol / #336
 
-Accepted main is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
+Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
 `a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five final-source
 [CI #676](https://github.com/Kajooja/Kajo/actions/runs/38878872616) gates passed.
+The accepted documentation receipt is [#346](https://github.com/Kajooja/Kajo/pull/346),
+merge `7eefa4da97634beadb73b6731ae6530d25e592e5`, reviewed tree
+`bdc98cc28c44ebfbc6f18be5388898cd6c142e36`; all five
+[CI #678](https://github.com/Kajooja/Kajo/actions/runs/38883462410) gates passed.
+Neither selector nor receipt integration remains pending.
 The requirement/receipt packet #344 and earlier #343 source/three owner-approved
 hosted operations remain accepted. #345's single additive hosted forward is also
 installed and verified as recorded below.
@@ -89,8 +94,8 @@ tracked in #160/#184. Target/provider identities and detailed fingerprints remai
 private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
-Current branch `docs/forecast-selection-acceptance` records this accepted outcome;
-it changes documentation only. **Next action:** implement the bounded neutral
+The merged #346 receipt records this accepted outcome.
+**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** implement the bounded neutral
 contextual skip command/Event contract, durable exact idempotency and
 cooldown/context/Scenario re-eligibility before presentation reuse. Retain the
 shown origin, restart/conflict/undo-withdrawal/lifecycle behavior and old
@@ -247,7 +252,7 @@ Runtime, installation, quality and release acceptance remain separate from sourc
 | #229, #301, #304, #305 | Native delivery, reconnect/end refresh, audit recovery and catalogue append source included in the owner-authorized #329 integration. Configured-device/fresh-account observations remain tracked in DEVICE_TEST and #238. |
 | #307–#313 | Shared round evidence, replay/captures, erasure and prepared prediction inputs. Genuine #232F prediction consumption and Phase 16.3 remain open. |
 | #314–#322 | Native decay, bounded Personal WorkingState, frozen controls/features, prospective enrollment and private report/cohort foundation. Serving stays OFF; no actual cohort or quality admission. |
-| #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its branch and guarded hosted/device gates remain preserved. |
+| #323 / earlier #306 | Reviewed Shared overlay eligibility integrated into the current stack; duplicate source PR #306 is closed after all six implementation/test/migration files matched exactly. Its immutable forward is part of the installed sixteen-forward manifest. Actual Shared device acceptance remains open; the obsolete source branch is eligible for retirement, with its PR/SHA receipt retained. |
 | #324 / #328 / #329 / #330 / #331 | Portable selector and legacy calibration correction, durable session/SQL parity and canonical frozen holdout evaluation are integrated. #330/#331 is accepted owned adaptive mobile source with a guarded legacy fallback; hosted/device and anonymous acceptance remain separate. |
 | #325 | Distinct native-Item base confidence support; all five [CI #637 gates](https://github.com/Kajooja/Kajo/actions/runs/38178201644) pass. The /8 support heuristic remains uncalibrated. |
 | #326 / #327 | Personal source fusion/forgetting and complete engine ledger/handoff; all five required gates pass for both. Full-engine tracker #302 remains open. |
@@ -260,6 +265,20 @@ an authorized existing-owner roster/native/operator scope and an independently
 retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
+
+The latest verified configured build is
+[CI #677](https://github.com/Kajooja/Kajo/actions/runs/38881582992), source
+`8cd67af54765a2876f37e5db0deb66235ee3f0e9`, tree
+`a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five required gates and
+the standalone APK job succeeded.
+[APK artifact](https://github.com/Kajooja/Kajo/actions/runs/38881582992/artifacts/12039373533):
+49,262,378-byte ZIP, GitHub-reported archive SHA-256
+`80f3d0d10d24441db448fda731472746cf56f965aaa62c7078e8053daa64102d`,
+expires **2026-10-23 10:13:46 UTC**. The archive was not downloaded in this audit;
+this is not the extracted APK checksum. It retains the existing v2 consumer and
+does not include the planned shared feed, artwork or neutral Ohita.
+
+The earlier compatible build remains a dated checkpoint:
 
 Accepted-main [CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140)
 passed all five required gates and the standalone APK job. The binary's exact source
@@ -302,14 +321,38 @@ the actual hosted checkpoint need their guarded deployment procedure.
 
 ## Repository hygiene and historical evidence
 
-The [October 12 branch audit](retros/branch-audit-2026-10-12.json) records **35 remote
-branches at its earlier source checkpoint**: then-accepted main, eight consumed
-operation identities and open source/documentation dependencies. That earlier
-audit did not delete branches. After #329 integration, check actual ancestry,
-fresh PR state, file references and active worktrees before retiring merged refs;
-the eight consumed catalogue operation identities remain retained.
-No tracked logs, APK/archive outputs,
-`.keep` placeholders, implementation TODO/FIXME or merge-conflict markers were found.
+The [October 16 audit](retros/branch-audit-2026-10-16.json) checked all **51 original
+remote branches** and found no open PR. Forty development heads are reachable
+from accepted main; two closed duplicate branches (#303 → #327 and #306 → #323)
+have their requirements/source preserved in accepted replacements. All 42 are
+eligible for retirement. Main and the eight consumed catalogue operation refs
+remain intentional; do not reactivate those operations.
+
+Remote deletion is **not completed**: command-line Git lacked write credentials,
+the connector has no branch-delete action, and the browser fallback timed out.
+Fresh remote readback confirms all original 51 SHAs are unchanged. The audit
+records exact candidates for a later authenticated, leased deletion after fresh
+PR/ref checks; it does not leave an unknown deletion outcome.
+
+Two old local change sets were already accepted: all nine staged terminal-refresh
+files exactly match #301, and an obsolete STATUS draft is superseded by #344/#346.
+They are reconciled without losing source. Seven orphaned historical worktrees
+were reattached only after their complete tracked contents matched accepted
+commits. All twelve pre-existing worktrees are clean, main is synchronized and
+no stash or unique unpublished source was found. Six obsolete local branches
+were retired. Historical snapshots remain detached, not active feature work.
+
+Issue #333's already installed upgrade is closed; #177/#182/#199/#228/#232/#238/#240
+now point at the current #336/#239 handoff instead of completed mobile/rollout
+work. Twenty issues remain open for explicit product, device, quality and release
+requirements; no device result is fabricated by closing a deployment tracker.
+No tracked logs, APK/archive outputs, `.keep` placeholders, implementation
+TODO/FIXME or merge-conflict markers were found. This audit changes no executable,
+migration, dependency or workflow inputs and performs no hosted operation.
+
+The [October 12 branch audit](retros/branch-audit-2026-10-12.json) remains a dated
+35-ref source checkpoint, superseded by the current audit rather than another
+active branch list.
 
 STATUS is now a current handoff rather than a 2,500-line collection of conflicting
 next-step instructions. Full historical checkpoints remain in [Sprint 014](sprints/SPRINT-014.md),
