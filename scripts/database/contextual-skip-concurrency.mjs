@@ -77,6 +77,7 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
     return [await finish(holder), await finish(waiter), proof];
   };
   const gateBeforeRows = async (name, nativeCommand, legacyCommand, rowProbes) => {
+    const stage = name.replaceAll('_', '-');
     const holder = launch(`${name}_holder`, nativeCommand, { hold: true });
     await observe(holder);
     const waiter = launch(`${name}_waiter`, legacyCommand, { actorUserId: legacyActor });
@@ -84,12 +85,12 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
     assert.notEqual(holder.pid, waiter.pid);
     const [lifecycleWait] = await exec(`select to_jsonb(exists(select 1 from pg_locks
       where pid=${waiter.pid} and locktype='advisory' and classid=1946841873::oid
-        and objid=232004::oid and mode='ExclusiveLock' and not granted));`, `${name}-lifecycle-wait`);
+        and objid=232004::oid and mode='ExclusiveLock' and not granted));`, `${stage}-lifecycle-wait`);
     assert.equal(lifecycleWait, true, 'Preserved writer must wait for the exclusive lifecycle gate');
     // A third independent connection must still be able to lock the waiter's
     // Profile and source rows. The former row-first entry fails with 55P03 here;
     // simply observing two serialized completed commands would miss inversion.
-    const rows = await exec(`begin; ${rowProbes.join('\n')} rollback;`, `${name}-rows-still-unlocked`);
+    const rows = await exec(`begin; ${rowProbes.join('\n')} rollback;`, `${stage}-rows-still-unlocked`);
     assert.equal(rows.length, rowProbes.length, 'Every preserved source row must exist and remain unlocked');
     await release(holder);
     return [await finish(holder), await finish(waiter), proof];
