@@ -64,6 +64,15 @@ idempotency and versioned Scenario eligibility before reusing presentation. Then
 deliver the shared vertical feed/artwork against that stable boundary, preserving
 exact retry/restart/conflict/undo-withdrawal/lifecycle semantics and old response
 contracts.
+
+The first #239 conformance packet now defines the pure command oracle and
+`contextual-skip-cooldown-v1` with independent disposable SQL and existing-outbox
+recovery tests. Native writers, source erasure, capability routing and complete
+cross-surface admission remain the next dependency. Its 24-hour server-clock
+fallback admits no early Context/Scenario-change shortcut until a trusted provider
+and separately versioned predicate exist. The reference does not activate Ohita
+or close the required native/device/quality targets above.
+
 Define and compare the bounded recent cold-start policy before accepting the full
 first-session quality gate. Existing v1/completed Profiles stay preserved; no
 account reset, migration replay or model activation is authorized by this plan.

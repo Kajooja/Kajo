@@ -63,6 +63,14 @@
       "types": "./dist/adaptive-taste.d.ts",
       "import": "./dist/adaptive-taste.js"
     },
+    "./contextual-skip": {
+      "types": "./dist/contextual-skip.d.ts",
+      "import": "./dist/contextual-skip.js"
+    },
+    "./adapters/kajo-contextual-skip": {
+      "types": "./dist/adapters/kajo-contextual-skip.d.ts",
+      "import": "./dist/adapters/kajo-contextual-skip.js"
+    },
     "./adapters/kajo-taste-selection": {
       "types": "./dist/adapters/kajo-taste-selection.d.ts",
       "import": "./dist/adapters/kajo-taste-selection.js"

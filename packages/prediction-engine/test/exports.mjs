@@ -16,6 +16,8 @@ import { normalizeKajoWorkingEvaluationPlan } from '@kajo/prediction-engine/adap
 import { selectTasteOpportunity } from '@kajo/prediction-engine/taste-selection';
 import { createAdaptiveTaste, advanceAdaptiveTaste, inspectAdaptiveTaste } from '@kajo/prediction-engine/adaptive-taste';
 import { normalizeKajoTasteSelection, kajoTasteStages } from '@kajo/prediction-engine/adapters/kajo-taste-selection';
+import { decideContextualSkip } from '@kajo/prediction-engine/contextual-skip';
+import { applyKajoContextualSkip, kajoContextualSkipRecords } from '@kajo/prediction-engine/adapters/kajo-contextual-skip';
 
 assert.equal(typeof core.predict, 'function');
 assert.equal(typeof createKajoAdapter, 'function');
@@ -49,6 +51,9 @@ assert.equal(core.createAdaptiveTaste, undefined);
 assert.equal(core.advanceAdaptiveTaste, undefined);
 assert.equal(core.inspectAdaptiveTaste, undefined);
 assert.equal(core.normalizeKajoTasteSelection, undefined);
+for (const fn of [decideContextualSkip, applyKajoContextualSkip, kajoContextualSkipRecords]) assert.equal(typeof fn, 'function');
+assert.equal(core.decideContextualSkip, undefined);
+assert.equal(core.applyKajoContextualSkip, undefined);
 
 // Inspect the actual built core import graph: no app, adapter or provider dependency.
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -68,7 +73,8 @@ assert.ok((await readdir(root)).includes('index.d.ts'));
 // contain no app or provider runtime dependency.
 for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
   'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
-  'taste-selection.js', 'adapters/kajo-taste-selection.js', 'adaptive-taste.js']) {
+  'taste-selection.js', 'adapters/kajo-taste-selection.js', 'adaptive-taste.js',
+  'contextual-skip.js', 'adapters/kajo-contextual-skip.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
     'ordinal.js': ['./contracts.js'],
@@ -81,6 +87,8 @@ for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js'
     'taste-selection.js': ['./contracts.js'],
     'adaptive-taste.js': ['./contracts.js', './taste-selection.js'],
     'adapters/kajo-taste-selection.js': ['../contracts.js', '../taste-selection.js'],
+    'contextual-skip.js': [],
+    'adapters/kajo-contextual-skip.js': ['../contextual-skip.js'],
   }[file];
   for (const match of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)) {
     assert.ok(allowed.includes(match[1]), `Unexpected isolated runtime import in ${file}`);
