@@ -57,19 +57,24 @@ and Taste presentation, not the default Discovery grid.
 | Current-scenario satisfaction objective — `MVP-ALG-010` | Rank for the best supported outcome for this Profile in its current state/Scenario, with the long-term calibrated target of a top-satisfaction / rating-10 outcome. The Interstellar-10 → stronger support for a similar eligible film such as Inception example is a feature/learning test, never a hardcoded title pair or guaranteed next card. Taste information acquisition and FOR_YOU/SURPRISE/RISK tradeoffs must remain explicit. Uncalibrated ordinal scores are not probabilities. |
 | Recent supported cold start — `MVP-ALG-011` | Empty/sparse Profiles use a versioned recent, supported prior with recognition/diversity and honest missing-data fallback. Evaluate recency, the complete rating distribution, sample support and exposure/source bias against the current baseline. An NPS-like net-preference score is a hypothesis to define and compare, not an automatic mapping of Item ratings or a lifetime count of tens. Licensed provider priors, external research and native cross-Profile PopulationMemory retain their separate rights/privacy/admission gates. |
 
-**Execution order:** first correct and regress the canonical-forecast → next-question
-selection gap under #336; then implement the neutral skip protocol and shared
-vertical feed/artwork together, with exact retry/restart/undo/lifecycle semantics.
+**Execution order:** the bounded canonical-forecast → next-question selector
+correction is accepted in #345 with its verified additive hosted forward. Next
+implement the neutral contextual skip command/Event protocol, durable exact
+idempotency and versioned Scenario eligibility before reusing presentation. Then
+deliver the shared vertical feed/artwork against that stable boundary, preserving
+exact retry/restart/conflict/undo-withdrawal/lifecycle semantics and old response
+contracts.
 Define and compare the bounded recent cold-start policy before accepting the full
 first-session quality gate. Existing v1/completed Profiles stay preserved; no
 account reset, migration replay or model activation is authorized by this plan.
 Anonymous entry and the remaining release dependencies retain their existing gates.
 
-The deployed numeric-v2 source updates bootstrap and captures a fresh canonical forecast after
-ANSWER, but its next-question policy prioritizes domain progress/presentation
-before utility and uses forecast availability rather than forecast magnitude.
-The START pool is also frozen at 25 Items per domain. Thus the immediately
-following card can remain the same after opposite ratings. A successor may
+At the pre-#345 checkpoint, deployed numeric-v2 source updated bootstrap and
+captured a fresh canonical forecast after ANSWER, but its next-question policy
+prioritized domain progress/presentation before utility and used forecast
+availability rather than forecast magnitude. The START pool is still frozen at
+25 Items per domain. At that checkpoint the immediately following card could
+remain the same after opposite ratings despite usable signal. A successor may
 refresh eligible pools while preserving every earlier frozen panel, comparison
 and delivered origin; it must not rewrite history to simulate adaptation.
 Taste also has a text-only card contract, while Discovery's detail pager is
@@ -78,15 +83,18 @@ empty Profiles may legitimately share an opening Item; repeated post-answer
 sequences require a versioned prefix/selector investigation rather than randomizing
 titles to look personalized.
 
-The October 16 bounded source successor `feat/forecast-aware-taste-selection`
-addresses this selector gap with a new-session-only immutable
+The October 16 bounded successor [#345](https://github.com/Kajooja/Kajo/pull/345)
+is accepted after all five final-source CI #676 gates and verified installation
+of its one exact additive forward. It addresses the selector gap with a
+new-session-only immutable
 `CANONICAL_FORECAST_V3` policy: current-panel within-domain ordinal preference,
 utility-first ranking and a traced domain-lead guard. Retained session policies,
-wire replies and frozen history stay unchanged. It is not yet a hosted or
-device/quality acceptance receipt. The START-time 25-per-type pool still needs
+wire replies and frozen history stay unchanged. Source and hosted acceptance do
+not establish an observed eligible-owner session, phone behavior or quality.
+The START-time 25-per-type pool still needs
 versioned refresh/refill; the neutral skip/shared feed/artwork and recent prior
-remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16)
-and STATUS for the current integration/rollout gate.
+remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
+and STATUS for the exact acceptance receipt and next neutral-protocol packet.
 
 Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
 [evidence](../domain/DATA_EVENTS.md), [UX](../product/UX_PRINCIPLES.md) and

@@ -7389,3 +7389,40 @@ Ohita, shared vertical feed/artwork, recent supported prior, full readiness,
 anonymous entry and remaining release/quality gates remain mandatory. Complete
 this selector's source integration and guarded actual-target acceptance before
 claiming the new policy in a real session; preserve old sessions throughout.
+
+## Accepted canonical-forecast selector and hosted forward — 2026-10-16 / #336 / #345
+
+[#345](https://github.com/Kajooja/Kajo/pull/345) is merged as
+`8cd67af54765a2876f37e5db0deb66235ee3f0e9`. Reviewed source head
+`743951ac1f69e3edf36f205e281c53d401ab8821` and accepted merge share tested tree
+`a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five required final-source
+[CI #676](https://github.com/Kajooja/Kajo/actions/runs/38878872616) gates succeeded.
+The preceding proposed/source-only statements describe that earlier checkpoint;
+this receipt records the completed source and hosted acceptance.
+
+Exactly one new forward was applied:
+`20261016073549_forecast_aware_taste_selection.sql`, SHA-256
+`ffaa9ba15a9836b879936480d8a4c3abbaf22132db62da041c148a81bad71a0d`.
+The prior migration-history prefix is exact and installed operations must not be
+replayed. Actual-target verification preserves all 63 existing ordinary
+Auth/public/private tables, all 228 existing function identities/non-body
+metadata and every body except the two reviewed exact replacements, all 57
+noninternal app-trigger attachments and all 62 app-table ACL/RLS snapshots.
+Exactly one new denied helper, the source policy default/check, seven security
+probes and four read-only selector cases pass. Detailed target/provider/history,
+function and row fingerprints remain private. Known advisors remain unchanged,
+including the existing Auth password warning tracked in #160/#184.
+
+Only new sessions receive immutable `CANONICAL_FORECAST_V3`; retained ADAPTIVE
+and PRIOR_ONLY sessions keep their policies, original evidence and exact replies.
+The v2 RPC/mobile queue is unchanged; #669 remains compatible with that boundary.
+This receipt includes no positive eligible-owner new-session or
+phone result, reset, fixture account, model/Working activation or quality claim.
+
+Next bounded source packet is the neutral contextual skip command/Event and
+durable idempotency/Scenario-eligibility contract, before shared presentation
+reuse. Preserve exact shown origins, retries/restart/conflict/undo-withdrawal/
+lifecycle and historical UNKNOWN/NOT_INTERESTED meanings. Shared vertical
+feed/artwork, versioned START-pool refresh, recent supported prior, full readiness,
+anonymous entry and actual device/measured-quality gates remain open. STATUS owns
+the exact current receipt branch and next task; Sprint 014 and #336 remain open.

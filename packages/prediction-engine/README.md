@@ -205,10 +205,13 @@ behavior and leakage protection, not empirical recommendation improvement.
 The [canonical contract](../../docs/domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
 owns native sequencing and acceptance.
 
-### Canonical forecast selection opt-in — proposed source
+### Canonical forecast selection opt-in — accepted source
 
-`feat/forecast-aware-taste-selection` adds an explicit portable opt-in, not an
-activated native policy or quality admission. For a caller's already-authorized
+[#345](https://github.com/Kajooja/Kajo/pull/345) adds this accepted explicit
+portable opt-in. All five final-source CI #676 gates pass; its companion SQL
+forward is installed/verified as recorded in [STATUS](../../docs/project/STATUS.md).
+The package remains a pure reference, without native activation or quality
+admission. For a caller's already-authorized
 initial scope, clock, declared domains and rating scale:
 
 ```ts
@@ -246,13 +249,13 @@ candidate count and coverage intervention/count/maximum-lead fields. Optional
 `control: 'PRIOR_ONLY'` in this new mode keeps recognition-only utility plus that
 declared guard. The default/retained control behavior is unchanged.
 
-The corresponding proposed SQL forward assigns only new sessions
+The corresponding accepted SQL forward assigns only new sessions
 `CANONICAL_FORECAST_V3` through the unchanged v2 wire/queue; it does not turn this
 package into the SQL ranker. This ordinal preference is neither a predicted
 grade nor a probability of a ten. START-time native pool refresh/refill, shared
-Ohita feed/artwork, recent prior, full readiness, hosted deployment, actual
+Ohita feed/artwork, recent prior, full readiness, actual
 device behavior and measured usefulness remain separate work. See the
-[source boundary](../../docs/domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16).
+[source boundary](../../docs/domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16).
 
 ## Bounded session intent
 
