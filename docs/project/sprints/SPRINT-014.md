@@ -7426,3 +7426,29 @@ lifecycle and historical UNKNOWN/NOT_INTERESTED meanings. Shared vertical
 feed/artwork, versioned START-pool refresh, recent supported prior, full readiness,
 anonymous entry and actual device/measured-quality gates remain open. STATUS owns
 the exact current receipt branch and next task; Sprint 014 and #336 remain open.
+
+## Repository hygiene reconciliation — 2026-10-16
+
+The interrupted conversation's #345 selector and #346 receipt are already
+accepted. #346 retains reviewed tree `bdc98cc28c44ebfbc6f18be5388898cd6c142e36`
+after five successful CI #678 gates. Configured #677 also passed all five gates
+and its APK build; STATUS now records its available artifact separately from the
+earlier #669 build. No new device observation is inferred.
+
+The dated [branch audit](../retros/branch-audit-2026-10-16.json) records all 51
+original remote refs: forty merged development heads, two accepted superseded
+paths, main and eight consumed operation identities. All original remote refs
+remain unchanged because Git write authentication is unavailable and the browser
+fallback timed out; the connector has no delete-ref action. The 42 exact retirement
+candidates remain explicitly tracked. No deletion is claimed.
+
+Two obsolete local change sets match accepted work, seven orphaned worktrees
+have their metadata repaired after full tracked-content comparisons, all twelve
+historical worktrees are clean and six local feature refs are retired. No unique
+unpublished source or stash was found. The completed #333 deployment issue is
+closed; seven still-open issues have stale active handoffs reconciled. Device,
+readiness, Shared, catalogue, quality and release criteria remain open.
+
+This is documentation/repository maintenance only. The next implementation is
+still #239 under #336: versioned neutral contextual skip, then shared vertical
+Taste/Discovery presentation. Preserve installed history and existing accounts.
