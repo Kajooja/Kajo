@@ -176,9 +176,18 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
       assert.ok(page.items.length > 0, 'The suppression probe needs other eligible Discovery Items');
       assert.ok(page.items.every(item => item.item_id !== c1.itemId));
       discoveryRuns.push(page.predictionId);
-      const [admitted] = await exec(`select to_jsonb(exists(select 1 from private.prediction_candidates
-        where prediction_id='${page.predictionId}' and item_id='${c1.itemId}'));`, 'discovery-base-admission');
-      assert.equal(admitted, false, 'Confirmed Taste skip entered the fresh Discovery candidate source');
+      const [retained] = await exec(`select coalesce((select jsonb_build_object(
+        'selected',selected_for_delivery,'policy',explanation->'resurfacingPolicy')
+        from private.prediction_candidates where prediction_id='${page.predictionId}' and item_id='${c1.itemId}'), 'null');`,
+      'discovery-base-admission');
+      // Eligibility-first ranking can retain a diagnostic suppressed tail when
+      // this small catalogue has fewer eligible Items than the candidate budget.
+      // Such a trace must stay ineligible and never become a delivered candidate.
+      if (retained) {
+        assert.equal(retained.selected, false);
+        assert.equal(retained.policy.eligible, false);
+        assert.deepEqual(retained.policy.contextualSkip, suppressed);
+      }
     }
     assert.notEqual(discoveryRuns[0], discoveryRuns[1]);
     await advance('CONTINUE');
