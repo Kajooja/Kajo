@@ -803,6 +803,53 @@ supported Scenario-based re-eligibility under the [event contract](DATA_EVENTS.m
 It must not use the existing explicit not-interest negative weight or terminal
 suppression rule, and must not reinterpret retained `resurfacing-v1` evidence.
 
+#### Neutral skip eligibility reference — 2026-10-16
+
+The bounded #239 reference supplies `contextual-skip-cooldown-v1`, independently
+of `resurfacing-v1` and permanent not-interest. It is not connected to serving.
+Inputs are the complete authorized, surviving confirmed skip/withdrawal prefix,
+target Profile/Item, exact trusted decision clock and the result of existing hard
+eligibility. The portable computation uses generic Subject/Object references;
+Kajo's adapter keeps the actual actor and either private Taste or Discovery origin.
+
+Initial thresholds are inspectable policy hypotheses, not measured usefulness:
+
+- A confirmed skip suppresses that **Profile/Item for 24 hours from server
+  acceptance**, across actors in that Profile, Taste → Discovery, app restart and
+  Event-session changes. Client occurrence time cannot backdate the cooldown.
+- `NO_TRUSTED_CONTEXT_CHANGE_V1` is the explicit initial Context predicate: no
+  currently admitted native source proves a semantic Scenario change. Missing
+  Context and changes to mode, surface, session or arbitrary context tokens all
+  retain the complete 24-hour cooldown. A genuine early-return predicate needs a
+  separately versioned trusted provider and conformance/quality acceptance.
+- At the exact expiry microsecond the Item is permitted to rank again; it is not
+  forced back, and current-chain seen exclusions still prevent a feed loop.
+- The latest surviving active skip controls the deadline. Withdrawing it reveals
+  any earlier active skip; it never clears another actor's skip or an independent
+  rating, consumption, negative-interest, block, availability or saved/reminder
+  constraint. Existing eligibility always wins when it denies delivery.
+- Inspectable reasons are `NO_ACTIVE_SKIP`, `SKIP_COOLDOWN`,
+  `SKIP_COOLDOWN_ELAPSED` and `OTHER_POLICY_SUPPRESSED`, with limiting source IDs,
+  reconsiderAt and both version identifiers. Equal deadlines retain all limiting
+  IDs in stable order. No source/withdrawal later than the supplied cutoff enters
+  a historical decision; erased sources must be removed by the trusted reader.
+
+The declared clock is nonnegative decimal Unix microseconds through the end of
+year 9999, avoiding JavaScript millisecond rounding at the SQL receipt boundary.
+Generic reference IDs use bounded ASCII identifiers; native adapter IDs are
+canonical lowercase UUIDs. Inputs are bounded at 256 records and reject overflow,
+duplicates and invalid clocks rather than treating incomplete evidence as empty.
+This fixture budget is not a native storage/retention design.
+
+The independent temporary SQL oracle covers boundary/withdrawal/scope behavior
+and deterministic mixed prefixes; it is not installed by application migrations.
+Actual native source adapters, bounded indexed retrieval, lifecycle/security,
+delivery-prefix admission and context-aware early return remain open. The required
+native tests must demonstrate immediate Taste PAUSE → same-Profile Discovery,
+later-page recheck, chain refill and genuine exhaustion before presentation reuse.
+This packet advances EB-01/EB-08 (architecture sections 30, 32–33, 40–42) only as
+protocol conformance; neither complete capability nor MVP requirement is closed.
+
 ### 8.2 Next-card satisfaction and prefix freshness — required target
 
 The owner's October 15 objective is to choose the eligible Item most likely to

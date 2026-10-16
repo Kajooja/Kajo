@@ -10,7 +10,25 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — neutral contextual skip protocol / #336
+## Current packet — neutral contextual skip reference / native writers next
+
+The first bounded [#239](https://github.com/Kajooja/Kajo/issues/239) source packet
+under #336 supplies the executable neutral-command and suppression conformance
+reference on `feat/239-contextual-skip-protocol`. It includes independent disposable
+SQL parity and recovery tests through the existing mobile outbox. Exact source,
+final CI and integration receipts belong to the matching PR/issue. This changes
+no native RPC, Event constraint, migration, serving policy, installed APK or UI.
+
+The [canonical protocol](../domain/DATA_EVENTS.md#neutral-skip-conformance-reference--2026-10-16)
+keeps Taste/private question origin separate from actual Discovery delivery;
+exact retry, source withdrawal, same-actor undo and scope are explicit. Its
+[eligibility policy](../domain/PREDICTION_MODEL.md#neutral-skip-eligibility-reference--2026-10-16)
+uses 24 hours from server acceptance across the same Profile's surfaces/sessions.
+There is no trusted native Context/Scenario-change provider, so version 1 admits
+no early context shortcut. These are testable initial policy hypotheses, not
+measured usefulness. Pending commands and legacy UNKNOWN/NOT_INTERESTED are never
+normalized into confirmed skips. Native persistence/concurrent locking and actual
+cross-surface admission remain unimplemented.
 
 Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
@@ -95,9 +113,16 @@ private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
 The merged #346 receipt records this accepted outcome.
-**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** implement the bounded neutral
-contextual skip command/Event contract, durable exact idempotency and
-cooldown/context/Scenario re-eligibility before presentation reuse. Retain the
+**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** implement the native
+writers/adapters against the new conformance contract: separate Taste question/
+prefix response and Discovery Event/command receipts, capability negotiation,
+exact retries under real transaction locks and source-erasure tombstones. Carry
+their confirmed union into base admission, page rechecks and catalogue-chain
+refill/exhaustion, retiring stale undelivered work. Demonstrate immediate Taste
+PAUSE → same-PersonalProfile Discovery and restart continuity with real SQL.
+Complete native security/old-history preservation and durable client routing
+before presentation reuse. Do not repeat the pure reference or claim its
+serialized tests prove native concurrency or a trusted Scenario provider. Retain the
 shown origin, restart/conflict/undo-withdrawal/lifecycle behavior and old
 UNKNOWN/NOT_INTERESTED/session/queued-command meanings. The new skip must remove
 an Item from this feed without a rating, consumption, asserted recognition or

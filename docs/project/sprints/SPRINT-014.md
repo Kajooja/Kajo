@@ -7452,3 +7452,45 @@ readiness, Shared, catalogue, quality and release criteria remain open.
 This is documentation/repository maintenance only. The next implementation is
 still #239 under #336: versioned neutral contextual skip, then shared vertical
 Taste/Discovery presentation. Preserve installed history and existing accounts.
+
+
+## Neutral contextual skip conformance — #239 / 2026-10-16
+
+Source parent: accepted hygiene main `c4f9d137309c1b86fa60354db5e553c98b5c73fe`.
+The bounded `feat/239-contextual-skip-protocol` packet advances EB-01/EB-08
+(architecture sections 30, 32–33, 40–42) with an executable protocol reference.
+It adds pure generic temporary eligibility and a separate Kajo command oracle,
+optional built exports, independent disposable SQL parity and existing-outbox
+lost-reply/restart/local-ack/scope/conflict recovery fixtures.
+
+`kajo-contextual-skip-v1` retains actor/Profile/Item and distinct private Taste
+question/panel/prefix versus actual Discovery delivery/impression origins.
+Semantic JSON equality keeps exact receipt identity; changed payloads and duplicate
+shown opportunities fail. Authenticated ownership/membership, source availability
+and exact same-actor withdrawal are checked by the reference against trusted
+inputs. This is serialized conformance, not real database authorization, native
+concurrency, an erasure implementation or an activated client RPC.
+
+The separate `contextual-skip-cooldown-v1` hypothesis suppresses the same
+Profile/Item for 24 hours from trusted acceptance, preserving microsecond clocks.
+V1 has no admitted semantic Context/Scenario-change provider; missing context,
+mode/surface/session changes and restart never bypass the cooldown. Withdrawal
+reveals any earlier active skip; independent terminal/save/reminder rules still
+win. Expiry permits ranking but never forces delivery. No recognition, negative
+preference, bootstrap, consumption, Outcome, impression or readiness support is
+inferred from a skip. Existing old meanings, policies, migrations and queued
+commands remain untouched.
+
+Canonical changed owners: DATA_EVENTS, PREDICTION_MODEL, GLOSSARY, CODEMAP,
+ROADMAP, STATUS and the engine package README. Exact final checks/CI/integration
+receipts belong to the matching source PR and #239; acceptance is not inferred
+from this dated implementation entry. No migration, native writer, hosted change,
+APK/UI activation, account reset, Working/model promotion or phone observation.
+
+Next: native additive writer/source-adapter/capability packet, exact transaction
+retry/withdrawal/erasure tests, then cross-surface base/page/chain admission and
+client routing. Prove immediate Taste PAUSE → same-Profile Discovery, new Event
+session/restart, stale undelivered work retirement, refill and genuine exhaustion.
+Only then enable shared vertical-feed/artwork controls. Genuine Scenario-based
+early re-entry, full pool/prior/readiness/usefulness and all release gates remain
+open. Do not implement another pure reference or relabel legacy answers.

@@ -673,3 +673,40 @@ already-retained object, so every read/report still needs current authorization
 and source withdrawal reconciliation. Complete planned-pair coverage and batch
 source/subject-Item reuse checks remain required. Local fixtures establish zero
 observed quality units; historical features, learning and activation stay false.
+
+## Neutral contextual skip conformance — #239
+
+Two optional exports supply an executable reference without changing the root
+estimator or native serving:
+
+```ts
+import { decideContextualSkip } from '@kajo/prediction-engine/contextual-skip';
+import {
+  applyKajoContextualSkip,
+  kajoContextualSkipRecords,
+} from '@kajo/prediction-engine/adapters/kajo-contextual-skip';
+```
+
+The pure command oracle consumes trusted authorization/source facts and a complete
+serialized receipt prefix. It distinguishes private Taste questions from actual
+Discovery delivery and validates exact retries, scope, unavailable sources and
+same-actor withdrawal. It is not a server writer, storage port, lock or client-side
+recommender. Native capability negotiation, persistence/security/lifecycle and
+serving integration remain required before activation.
+
+`decideContextualSkip` uses decimal Unix microseconds and a 24-hour server-acceptance
+cooldown, scoped to Subject/Object across surfaces and sessions. V1 admits no
+trusted semantic Context change, so changing session/mode or supplying an arbitrary
+Context token cannot shorten the cooldown. Existing hard eligibility takes
+precedence. Confirmed withdrawal removes only its own skip; expiry permits ranking
+rather than forcing resurfacing. No rating, recognition or reward is inferred.
+The 256-record reference bound rejects incomplete inputs; it is not a native
+lifetime quota. IDs in the generic policy use bounded ASCII references; the Kajo
+adapter uses canonical lowercase UUIDs.
+
+Canonical contracts: [evidence](../../docs/domain/DATA_EVENTS.md#neutral-skip-conformance-reference--2026-10-16)
+and [eligibility](../../docs/domain/PREDICTION_MODEL.md#neutral-skip-eligibility-reference--2026-10-16).
+Independent SQL parity runs from `scripts/database/contextual-skip-reference.sql`
+in a disposable temporary namespace, outside application migrations. The existing
+mobile durable outbox is tested against the oracle; no new production queue or RPC
+is introduced. Legacy UNKNOWN/NOT_INTERESTED and 0/5/10 behavior remain unchanged.

@@ -235,6 +235,68 @@ unchanged. The earlier planned #239 Next control only changed the viewed card;
 that neutral navigation design did not provide this contextual-skip
 observation/suppression contract and is superseded by this feed target.
 
+### Neutral skip conformance reference — 2026-10-16
+
+The first bounded #239 source packet defines an **executable reference**, not a
+native writer or mobile control. `kajo-contextual-skip-v1` separates
+`CONTEXTUAL_SKIP` and `WITHDRAW_CONTEXTUAL_SKIP` from every existing Taste answer,
+rating and Item action. The proposed Discovery Event names are
+`ITEM_CONTEXTUALLY_SKIPPED` / `ITEM_CONTEXTUAL_SKIP_WITHDRAWN`; neither is admitted
+by the current Event constraint or mobile EventType. Taste keeps a private
+question-bound response. No new Event, bootstrap contribution, recognition,
+consumption, readiness support, impression or reward is emitted by this reference.
+
+The strict command contains version/kind, actionId, actorUserId, profileId, itemId,
+decimal Unix-microsecond occurredAt, contextRef (an immutable server-bound snapshot
+reference or null), reversesActionId (null for a skip), and exactly one origin:
+
+| Adapter | Required origin |
+|---|---|
+| Taste | `surface=TASTE`, sessionId, questionId, panelId and committed prefixRevision |
+| Discovery | `surface=DISCOVERY`, Event sessionId, predictionId, deliveryRequestId and actual impressionEventId |
+
+These are required inputs to the future trusted adapters, not a claim that the
+native RPCs already return this envelope. The native Taste adapter must resolve
+the current question/panel/prefix; the Discovery adapter must resolve the actual
+delivered page and acknowledged impression. Neither accepts caller-invented
+origins or turns an evaluation panel into delivery. Context missingness remains
+explicit; the reference supplies no Context/Scenario database or resolver.
+
+The command oracle requires a permanent authenticated identity and currently accepted membership on every
+call, including retry. Taste is own-Personal only; Discovery also permits an
+accepted Shared member in that SharedProfile. Original actor, Profile, Item,
+origin and context must match the trusted source. The source must have committed
+before the server acceptance clock. Client-reported occurrence is retained,
+permits up to five minutes of future skew and supplies neither prefix ordering
+nor the cooldown clock; a slow client clock cannot invalidate a genuine earlier
+server-origin binding. Foreign/anonymous/service-role
+calls fail. Exact semantic-JSON retries retain the original receipt/time; any
+changed body conflicts. The trusted source's `acceptsNewSkip` must still be true
+for a new skip; a committed rating/save closes that opportunity. Exact retries
+and same-actor withdrawal remain available after it closes. A different request ID cannot skip the same shown
+opportunity again, even by changing contextRef or after withdrawal. Withdrawal
+belongs to the original actor and exact source and removes only that skip.
+An unavailable source blocks cached replay. The native erasure/tombstone writer
+must additionally remove all copied private payloads and prevent resurrection.
+
+`applyKajoContextualSkip` is a **serialized pure oracle**, not a concurrency lock,
+authorization service or durable store. Its caller must supply the complete
+authorized committed prefix. The 256-record reference bound fails closed on
+overflow; it is not an accepted lifetime product quota or permission to truncate.
+`kajoContextualSkipRecords` projects confirmed receipts only. The existing mobile
+outbox is tested against this oracle for lost replies, restart, local-ack failure,
+scope cancellation, blocked conflicts and corrupt/legacy queues. Production RPC
+routing, native concurrent-retry/withdrawal locks, source erasure and client
+capability negotiation still need their own implementation and acceptance.
+
+Suppression uses the separate
+[`contextual-skip-cooldown-v1` policy](PREDICTION_MODEL.md#neutral-skip-eligibility-reference--2026-10-16).
+Pending commands never enter that input. Native candidate admission, page rechecks,
+catalogue-chain refill/exhaustion and stale-undelivered-work retirement must all
+consume the same confirmed cross-surface source before Ohita can be enabled.
+Frozen panels, DeliveredSlates and old exact replies remain immutable. An
+acknowledged rating/save auto-advance must not also issue this command.
+
 ## 3. Taste evidence
 
 Taste Test must reuse canonical taste semantics rather than inventing a parallel marketing score.
