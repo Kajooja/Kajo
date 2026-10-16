@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-15**
+Last updated: **2026-10-16**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,13 +10,15 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — sequential Taste acceptance and required feed successor / #336
+## Current packet — first-answer-sensitive Taste selection / #336
 
-Accepted main is `799f1c850b989d1cfeef450946689224d9727359` through
-[#343](https://github.com/Kajooja/Kajo/pull/343), exact tested tree
-`211686d70bf33fe86c83191622e8b303a2d86ddc`. All five final-source CI #671
-gates passed; the owner explicitly approved its merge and the three hosted
-operations. The matching compiled mobile source remains
+Accepted main is `63682dab9e87094c43a50c05616b89acc5bc7079` through
+[#344](https://github.com/Kajooja/Kajo/pull/344), exact tested tree
+`01323436604411b7bf8526aaad107e8324bf2644`. All five final-source
+[CI #674](https://github.com/Kajooja/Kajo/actions/runs/38807437179) gates passed.
+That requirement/receipt packet changes no application runtime. The earlier
+#343 source and its three owner-approved hosted operations remain accepted.
+The matching compiled mobile source remains
 `c776de5fcdb62c72216b25a955a8c4b8685b2580` through
 [#342](https://github.com/Kajooja/Kajo/pull/342), tree
 `8ece8e164dfb4691737286340606e4ecd66de398`.
@@ -61,12 +63,20 @@ privately. A future operator must refresh and reconcile that checkpoint instead
 of inferring provider versions from filenames. The earlier BRIDGE_REQUIRED result
 is historical and superseded by the final passing installed-prefix preflight.
 
-Current branch `docs/sequential-taste-rollout-receipt` / [#344](https://github.com/Kajooja/Kajo/pull/344)
-records this rollout and the owner's mandatory
+Current branch `feat/forecast-aware-taste-selection` implements the first bounded
+selector part of the owner's mandatory
 [near-term feed/first-answer targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
-It does not implement those new targets. **Next action:** finish this documentation
-packet, then correct canonical-forecast consumption in the next-question policy
-under #336 before the shared vertical feed/artwork/contextual-skip successor.
+The additive `20261016073549_forecast_aware_taste_selection.sql` assigns only new
+sessions the immutable `CANONICAL_FORECAST_V3` question policy through the same
+v2 RPC/queue. It uses current-panel within-domain ordinal preference, utility-first
+selection and a traced two-presentation domain-lead guard. Retained ADAPTIVE and
+PRIOR_ONLY sessions keep their old selectors and exact records. No migration is
+applied by this source packet.
+**Next action:** finish final-source checks/review and integrate this selector,
+then reconcile its one additive forward against a fresh private actual checkpoint
+before guarded hosted acceptance. The shared feed/artwork/contextual Ohita,
+versioned pool refresh and recent prior remain the required successors; this
+bounded selector does not implement them or close MVP-ALG-010.
 The matching #669 APK remains available for
 [the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
 it does not yet contain the requested feed changes.
@@ -86,13 +96,21 @@ The October 15 owner feedback reports the same Taste films as on another Profile
 and requests shared Discovery/Taste artwork and vertical feed navigation. This is
 a reported observation, not a verified protocol/version diagnosis or completed
 device matrix. Identical cold-start openings can be legitimate. Source inspection
-does identify a narrower first-answer gap: the next-question selector ranks domain
-coverage before utility and does not rank by canonical forecast magnitude, even
-though ANSWER projects the rating and captures a new forecast. Taste currently
+identified a narrower gap in the deployed v2 policy: next-question selection ranks
+domain coverage before utility and does not rank by canonical forecast magnitude,
+even though ANSWER projects the rating and captures a new forecast. The proposed
+source above corrects that bounded selection gap for new-policy sessions. Taste currently
 has title-only cards; Discovery artwork lives in a separate horizontal pager.
 The planned neutral **Ohita** also needs a versioned command/evidence contract,
 not relabeling existing UNKNOWN/NOT_INTERESTED records. See ROADMAP for mandatory
 ordering and DEVICE_TEST for the reported/planned acceptance boundary.
+
+Independent pure/native fixtures verify canonical-score inversion rather than
+only a local similarity proxy, genuine separate-commit first 10/0/5 prefixes and
+their next selected Items, neutral/tied/missing support, bounded coverage and
+exact old-session preservation. They do not establish real-device usefulness or
+calibrated probability. The canonical [source contract](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16)
+and source PR own exact final validation/integration receipts.
 
 ## Sequential adaptive Taste reference / #336
 

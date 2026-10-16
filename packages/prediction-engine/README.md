@@ -205,6 +205,55 @@ behavior and leakage protection, not empirical recommendation improvement.
 The [canonical contract](../../docs/domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
 owns native sequencing and acceptance.
 
+### Canonical forecast selection opt-in — proposed source
+
+`feat/forecast-aware-taste-selection` adds an explicit portable opt-in, not an
+activated native policy or quality admission. For a caller's already-authorized
+initial scope, clock, declared domains and rating scale:
+
+```ts
+import {
+  adaptiveTasteCanonicalDefaults,
+  createAdaptiveTaste,
+} from '@kajo/prediction-engine/adaptive-taste';
+
+function createCanonicalTaste(
+  input: Omit<Parameters<typeof createAdaptiveTaste>[0], 'policy'>,
+) {
+  return createAdaptiveTaste({
+    ...input,
+    policy: { ...adaptiveTasteCanonicalDefaults, control: 'ADAPTIVE' },
+  });
+}
+```
+
+This sets `selectionMode: 'CANONICAL_ORDINAL_V3'` and policy version
+`adaptive-taste-canonical-ordinal-v3`. Keep using fresh authorized OFFER pools
+for the exact committed answer prefix; the reference does not fetch forecasts.
+Existing calls without this opt-in and retained states without `selectionMode`
+keep their original policy. Do not mutate retained state into the new mode.
+
+Preference becomes the tied midrank of each supported unseen informative
+candidate's **current same-domain canonical forecast**: equal scores are neutral
+`0.5`, with the configured tie tolerance. Scores from different domains or earlier
+prefixes are never compared, and the old local rating-similarity proxy is not
+added again. Default utility is `0.35 * recognition + 0.45 * preference +
+0.10 * diversity + 0.10 * coverage`, ordered before progress/count tie breakers.
+If selectable domains differ by at least two presentations, choose among the
+least-presented domains first; missing support never forces an invented question.
+Immutable `selectionTrace` records the current pool, ordinal basis, preference,
+candidate count and coverage intervention/count/maximum-lead fields. Optional
+`control: 'PRIOR_ONLY'` in this new mode keeps recognition-only utility plus that
+declared guard. The default/retained control behavior is unchanged.
+
+The corresponding proposed SQL forward assigns only new sessions
+`CANONICAL_FORECAST_V3` through the unchanged v2 wire/queue; it does not turn this
+package into the SQL ranker. This ordinal preference is neither a predicted
+grade nor a probability of a ten. START-time native pool refresh/refill, shared
+Ohita feed/artwork, recent prior, full readiness, hosted deployment, actual
+device behavior and measured usefulness remain separate work. See the
+[source boundary](../../docs/domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16).
+
 ## Bounded session intent
 
 `./working-state` is a separate source-only hypothesis, not a replacement for

@@ -7348,3 +7348,44 @@ check or a native CI/device receipt. Final-source CI remains required.
 This packet changes requirements and that deterministic test fixture, not the
 APK, deployed migration bytes, recommendation policy or user data. Full feed
 implementation, actual v2/device observations and measured usefulness remain open.
+
+## Canonical-forecast first-answer selector source — 2026-10-16 / #336
+
+The requirement/hosted-receipt packet #344 is merged as
+`63682dab9e87094c43a50c05616b89acc5bc7079`, tree
+`01323436604411b7bf8526aaad107e8324bf2644`, after all five final-source CI #674
+gates passed. The prior #343 hosted operations remain installed and must not be
+replayed. No account reset or new hosted operation occurred in this packet.
+
+`feat/forecast-aware-taste-selection` proposes the bounded selector correction
+before the shared feed successor. The CLI-created append-only
+`20261016073549_forecast_aware_taste_selection.sql` adds a denied private helper,
+new-session `CANONICAL_FORECAST_V3` default and exact source/security-guarded
+dispatch/evidence-version patches. Existing ADAPTIVE/PRIOR_ONLY policies remain
+immutable, with original catalogs, questions, panels, first measurements and
+cached command replies. Existing migration bytes and v2 wire/mobile queue stay
+unchanged.
+
+Actual current-panel within-domain tied midrank replaces the local similarity
+preference proxy. Utility now leads selection, with a traced two-presentation
+domain-lead guard preserving supported domain coverage. Equal scores stay neutral;
+missing/uninformative choices never manufacture support. Extreme finite scores
+use overflow-safe tie comparisons. The portable engine supplies the same optional
+`adaptiveTasteCanonicalDefaults`; old reference states retain their old path.
+Selection traces remain private and protected by existing immutable-history guards.
+
+New SQL fixtures pass 9/9, including genuine separate-commit first 10/0/5 answers:
+the supported fixture chooses a matching MOVIE, a contrasting MOVIE and a neutral
+BOOK respectively. Score inversion/affine and wide-finite controls prove actual
+forecast consumption. Populated upgrade, old paused/pending/lost-ack sessions,
+function metadata and source/ACL/search-path/definer drift rejection pass. The
+existing native sequential suite passes 17/17 against current SQL/portable parity;
+48 adaptive-reference cases, engine typecheck/lint/build and export smoke pass.
+Final-source full checks and native CI belong to the source PR; this is not a
+hosted, phone or measured-quality acceptance receipt.
+
+The START-time 25-per-domain pool still needs versioned refresh/refill. Neutral
+Ohita, shared vertical feed/artwork, recent supported prior, full readiness,
+anonymous entry and remaining release/quality gates remain mandatory. Complete
+this selector's source integration and guarded actual-target acceptance before
+claiming the new policy in a real session; preserve old sessions throughout.
