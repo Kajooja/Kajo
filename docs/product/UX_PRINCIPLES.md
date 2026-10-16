@@ -18,8 +18,8 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 2. **Taste-first is the public front door.** External Taste/Friend links open directly into the Taste experience, not a login screen, marketing landing page or empty Room.
 3. **Registration is continuation, not reset.** Google/Apple conversion happens only after useful Taste/challenge/preview value is visible, and the user enters the app with cold start already completed.
 4. **Do not fake intelligence.** Taste challenge scores, explanations and confidence language must reflect actual frozen predictions and documented metrics. Prefer understandable low-sample wording to false precision.
-5. **Taste Test is interaction, not a questionnaire.** Show recognizable real Items one at a time. Unknown must be easy to skip. Do not require genre forms, demographics or long preference surveys.
-6. **The test adapts quietly.** The next Item may be chosen for information gain/recognition, but UI should remain simple. Do not expose algorithm machinery unless it helps trust.
+5. **Taste Test is interaction, not a questionnaire.** Show recognizable real Items one at a time in the same vertical card feed as optional Discovery card browsing. An upward dismissal or accessible **Ohita** action skips without a rating. Do not require genre forms, demographics or long preference surveys. This required successor remains planned until its runtime/device acceptance.
+6. **The test adapts quietly.** Every committed response, including the first rating, enters the supported state before selecting the next fresh card. Information gain/recognition may guide Taste within the satisfaction objective; UI should remain simple. Do not expose algorithm machinery unless it helps trust.
 7. **Preview before CTA.** After the challenge, show a small unseen recommendation preview before the primary Apple/Google continuation action.
 8. **Personal invites feel personal but remain consent-based.** An invite may identify the inviter in restrained copy after server authorization. Receiver explicitly accepts Friendship; opening a link never silently creates a social relationship.
 9. **Friendship is lightweight.** Accepted Friends appear on a simple Friends surface. Friendship does not create a joint Room/Profile automatically and does not expose private taste history.
@@ -43,7 +43,7 @@ setup and never replace the planned Taste, frozen challenge or usefulness gates.
 20. **Curtain is the single global DiscoveryMode control.** Exactly `FOR_YOU`, `SURPRISE`, `RISK`; downstream screens inherit it rather than introducing duplicates.
 21. **DiscoveryMode is visible as restrained atmosphere.** FOR_YOU → dawn/day, SURPRISE → evening, RISK → night. AmbientPhase is presentation; DiscoveryMode is prediction policy.
 22. **Visual preference is not risk preference.** Dark aesthetic choice does not imply risky recommendations.
-23. **Grid first, swipe optional.** Grid is default discovery. Swipe is calibration/browsing tooling, not the product itself.
+23. **Grid first, card feed optional.** Grid remains default Discovery. Optional card browsing and Taste share the vertical feed contract below; this decision does not change the global default to cards.
 24. **Committed choices behave consistently.** Rating/not-interest/List actions give restrained confirmation and advance appropriately. List addition remains the positive/like action; no duplicate Like control.
 25. **Recent choices are reversible.** Undo restores prior state and exact Item/card when deterministic reversal exists. It waits for pending saves; List removals are not offered for undo. Shared Saved must explain unavailable completed-consensus removal instead of exposing a guaranteed failing action.
 26. **Copy is presentation, not domain semantics.** User-facing labels may change while canonical Event/state meanings remain stable.
@@ -319,20 +319,69 @@ pending choice is not a confirmed joint save, and unsupported consensus removal
 remains protected. The overflow reuses the exact multi-destination picker; create
 alone does not save. Final Add commits once without a separate Done confirmation.
 
-After a save/proposal, retain the card and show **Seuraava** as explicit navigation.
-This deliberately replaces current Personal save-and-auto-advance when #239 is
-implemented; it does not require another save confirmation. Keep **Ei kiinnosta**
-as the explicit negative action. Next alone is navigation, never an implied
-rating, dislike, save or consumed outcome. Preserve zero versus unknown and the
-rule that opening a slider never submits its starting value.
+The owner's October 15 feed decision supersedes the earlier planned separate
+**Ei kiinnosta / Seuraava** card controls. Keep the star/overflow/List contract
+above; saving or proposing is a positive action with its own acknowledgement,
+not a rating or consumption. Advancing after an acknowledged positive action
+must not additionally manufacture an Ohita response. An unfinished save/rating
+cannot be discarded by a gesture. Opening a slider never submits its starting
+value; zero and neutral five remain genuine numeric ratings.
 
-Place the rating slider and Ei kiinnosta/Seuraava controls together at the bottom
-of the card, above the persistent dock and system safe areas. Keep room for the
-introduction/description; long text can scroll without hiding controls. Verify
+Place the rating slider and accessible **Ohita** control at the bottom of the
+card, above the persistent dock and system safe areas. Keep room for the
+introduction/description; long text can scroll without dismissing the Item. Verify
 small screens, large text, keyboard/panels, screen-reader star/menu/state labels,
 Back and reduced motion, alongside offline/restart, multiple destinations,
 Shared pending/confirmed states and rapid Profile/session changes. No current
 card implementation changes merely by recording this decision.
+
+## Shared vertical card feed — required target, 2026-10-15
+
+Optional Discovery card browsing and **Aloita makutesti** must use the same
+reusable Item card/feed presentation: poster or cover, image fallback, title,
+metadata, description and permitted source credits. Taste is the initial use of
+the same experience rather than a visually separate questionnaire. Keep the
+existing grid as the default Discovery presentation. This is a required near-term
+successor, tracked by `MVP-UX-007` and ROADMAP, not delivered APK behavior.
+
+The deliberate upward gesture that completes moving the active card out of the
+feed means **Ohita**. A matching accessible button supports screen readers,
+keyboard/switch use and people who cannot swipe. Explain once on first relevant
+use, including Taste: **“Pyyhkäise ylöspäin ohittaaksesi. Ohitus ei anna arvosanaa;
+kohde voi palata myöhemmin.”** Guidance remains discoverable afterward. Replace
+the separate new-feed **En tunne** and **Ei kiinnosta** labels with this single
+action; the app must not infer which reason the user had for skipping.
+
+Ohita removes the Item from the current feed with bounded, context-scoped
+suppression. It gives no numeric grade, consumption, permanent dislike or
+unrecognized-item assertion. The Item may become eligible in a later appropriate
+Scenario under the versioned resurfacing policy, without an immediate loop.
+Keep earlier UNKNOWN and explicit NOT_INTERESTED history intact; changing copy
+does not merge those historical evidence types. The
+[canonical feed evidence contract](../domain/DATA_EVENTS.md#shared-feed-ohita--required-target-2026-10-15)
+owns event, retry, expiry and resurfacing meanings.
+
+Only a completed intentional card dismissal commits the skip. Partial scrolls,
+scrolling a long description, reflow, loading, rotating the screen, opening a
+menu, navigating Back, leaving the app and changing Profile/domain do not imply
+a response. Pending commands retain their exact actor/Profile/Item origin through
+restart/retry; they cannot be duplicated or retargeted. Gesture thresholds,
+cancel/recovery, large text, reduced motion and the accessible action require
+representative device acceptance.
+
+Ratings and acknowledged positive choices must refresh the supported serving
+prefix before the next fresh Taste/Discovery card is selected. Retire stale
+prefetch through the canonical server boundary while retaining old delivered
+origins and retry identity; do not shuffle locally or jump the card under the
+user's finger. Grid order follows the same committed-state freshness rules when
+a fresh ranking is requested. The
+[next-card prediction contract](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
+owns this timing. Repeated opening films across fresh Profiles is a diagnostic
+observation, not alone proof of a defect: identical empty prefixes may share a
+supported first card, while supported divergent ratings must affect later
+forecasts and selection. Never promise that Interstellar 10 guarantees Inception
+next, that each answer changes rank, or that an unsupported score is a calibrated
+probability of a future ten.
 
 ## Required reconnect recovery — #240 / MVP-UX-003
 

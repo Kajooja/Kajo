@@ -133,15 +133,32 @@ Google and Apple are the primary low-friction release providers. Email/password 
 
 Taste Test is Kajo, not a conventional genre survey.
 
-The user reacts to recognizable real Items one at a time. Current rating semantics remain canonical: a 0–10 rating means consumed/read/watched; unknown can be skipped; not-interest is distinct from a rating.
+The user reacts to recognizable real Items one at a time. A 0–10 rating means
+consumed/read/watched; zero and neutral five remain genuine ratings. The owner's
+October 15 successor requires the same upward-scrolling card feed and legally
+usable poster/cover, metadata and description presentation as optional Discovery
+cards. A deliberate completed upward dismissal, or accessible **Ohita**, replaces
+the separate new-feed **En tunne / Ei kiinnosta** controls. Explain the gesture
+once on first use/Taste, keeping help discoverable. Ohita is no rating: remove the
+Item from this feed and permit a later context-eligible return without inferring
+unknown, consumption or permanent dislike. Earlier UNKNOWN/NOT_INTERESTED
+responses retain their exact meanings and history. Ordinary scrolling, partial
+gestures or navigation must not create skip evidence. The
+[shared card-feed contract](UX_PRINCIPLES.md#shared-vertical-card-feed--required-target-2026-10-15)
+owns interaction/accessibility acceptance; [DATA_EVENTS](../domain/DATA_EVENTS.md#shared-feed-ohita--required-target-2026-10-15)
+owns versioned evidence/suppression. This records required successor behavior,
+not a completed change to existing sessions or the installed APK.
 
 ### Sequential target — 2026-10-14
 
 Question count is variable. Neither six answers, twenty answers, a 10 MOVIE +
 10 BOOK schedule nor the earlier 12–24 range establishes completion. Selection
 uses the committed response prefix, including numeric rating magnitude, to seek
-the next useful recognizable Item. UNKNOWN updates recognition only; explicit
-not-interest remains separate from both UNKNOWN and a low rating. A new answer
+the next useful recognizable Item. The first accepted rating must influence the
+next fresh forecast wherever supported, and the same boundary continues during
+Discovery on the same Profile. Preserve UNKNOWN's recognition-only meaning and
+explicit not-interest's distinct historical meaning; the new Ohita supplies only
+its declared contextual no-rating evidence. A new answer
 may improve the next forecast or reveal uncertainty and contradiction; monotonically
 improving forecasts are not promised.
 
@@ -150,9 +167,32 @@ any available evaluation, projects the answer with source provenance, then
 selects/predicts from the next
 committed prefix. The [sequential prediction contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
 owns scoring, cutoff and comparison rules. The user can pause and resume without
-losing that order. An independent **“En tunne” / skip** remains usable after an
-accidental rating-wheel movement: it discards the unsubmitted draft; deliberate
-zero and neutral five remain ratings.
+losing that order. An independent accessible **Ohita** remains usable after an
+accidental rating-wheel movement: it discards the unsubmitted draft, after any
+already pending command has been resolved. Deliberate zero and neutral five
+remain ratings. The shared successor does not reinterpret an old session's
+versioned response contract.
+
+The enduring recommendation objective is the Item most likely to produce this
+Profile's highest satisfaction, ultimately a ten, under its current authorized
+world/state/Scenario. Taste may select a recognizable informative question to
+improve future recommendations, rather than treating every question as a promised
+favorite. Interstellar 10 should increase supported fit for relevant similar
+Items; Inception is an illustration, not a required hardcoded next title.
+Recompute from the acknowledged prefix before fresh next-card selection; do not
+serve a precomputed fixed test order or retain stale prefetched cards after a
+supported answer. Exact retry/current-card origins remain frozen. The
+[next-card objective](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
+owns scoring, freshness and honest evaluation.
+
+An empty Profile may begin with a recognizable Item supported by recent
+population/provider evidence. The
+[recent cold-start prior](../domain/PREDICTION_MODEL.md#recent-supported-cold-start-prior--required-target)
+must consider declared support and recency with a defensible positive-versus-
+negative balance, not raw lifetime popularity, an unsupported NPS label or the
+largest count of tens. Same supported empty prefixes may share a first Item;
+different answers must affect later supported estimates. Publicly sourced and
+native population evidence keep their existing authorization/admission limits.
 
 Readiness must declare per-domain support, forecast coverage, informative feature
 dispersion, prospective evaluation and stability. Any readiness shown is

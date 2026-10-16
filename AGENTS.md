@@ -173,7 +173,10 @@ Algorithm quality is the critical first-release dependency.
   - SURPRISE → EVENING
   - RISK → NIGHT
 - Curtain is the signature global DiscoveryMode control.
-- Grid is default discovery; swipe is optional.
+- Grid is default discovery; optional card browsing and Taste share the required
+  vertical feed successor. A deliberate completed upward dismissal means the
+  contextual no-rating **Ohita**, not a permanent dislike; preserve historical
+  UNKNOWN/NOT_INTERESTED evidence. UX_PRINCIPLES owns gesture/accessibility rules.
 - Graphics may evolve without changing domain/Event/Prediction semantics.
 - Accessibility/reduced motion/error recovery are release requirements.
 

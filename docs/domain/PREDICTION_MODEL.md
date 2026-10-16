@@ -273,6 +273,14 @@ engine work, not delivered behavior of #336 or permission to activate population
 learning. ROADMAP owns their order; the native Taste/Discovery continuation is the
 immediate consumer contract.
 
+The later [near-term feed refinement](../project/ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15)
+requires one shared Taste/Discovery feed with the neutral contextual
+[Ohita contract](DATA_EVENTS.md#shared-feed-ohita--required-target-2026-10-15),
+[first-answer ranking acceptance](#82-next-card-satisfaction-and-prefix-freshness--required-target)
+and a [recent supported cold-start prior](#recent-supported-cold-start-prior--required-target).
+These remain required targets; current source/hosted acceptance does not deliver
+the new gesture semantics, selector behavior or measured recommendation quality.
+
 ### Personal Taste opportunity source — current v1
 
 The source-only `taste-selection-v1` selector and Kajo adapter boundary live
@@ -717,6 +725,7 @@ User-entered situational intent such as “together”, available time or desire
 |---|---|---|
 | Exposure | impression, rank, surface | denominator and bias correction |
 | Attention | open, meaningful dwell | weak intent/context evidence |
+| Contextual decision | planned Ohita | current-feed suppression/context; no negative rating or certain recognition |
 | Preference | rating, not interested, list, save, endorsement | direct taste/decision evidence |
 | Consumption | watched/read/attended, reversal | actual experience |
 | Delayed outcome | rating after consumption, repeat choice, later removal | satisfaction/correction |
@@ -788,6 +797,47 @@ MVP `resurfacing-v1` rules are:
 - explicit Lists/Saved/history views remain unaffected by discovery suppression.
 
 The thresholds are versioned hypotheses, not permanent truth. A future policy version may tune age/cooldown/frequency through measured outcomes, but a PredictorGenome cannot bypass hard authorization or terminal-consumption/suppression invariants. Personal `PredictionRun.policyVersion` records `scenario-memory-v1+resurfacing-v1`; Shared v1.1 appends `+shared-common-fit-v1.1`. `PredictionCandidate.explanation.resurfacingPolicy` makes the resurfacing decision reconstructable.
+
+The planned neutral Ohita successor has contextual suppression and versioned,
+supported Scenario-based re-eligibility under the [event contract](DATA_EVENTS.md#shared-feed-ohita--required-target-2026-10-15).
+It must not use the existing explicit not-interest negative weight or terminal
+suppression rule, and must not reinterpret retained `resurfacing-v1` evidence.
+
+### 8.2 Next-card satisfaction and prefix freshness — required target
+
+The owner's October 15 objective is to choose the eligible Item most likely to
+earn the Profile's highest satisfaction (expressed as a rating of **10**) in its
+current World/Context/Scenario. A probability needs a declared post-experience
+target/horizon, observed support and calibration. Until admitted, the current
+ranker supplies only a named, versioned ordinal proxy, never a fabricated chance
+of a ten, predicted grade or confidence percentage. Existing multi-objective,
+DiscoveryMode, privacy and hard-eligibility constraints still apply.
+
+Every committed rating's magnitude, including the **first** Taste answer, must
+enter the eligible state and canonical scoring prefix consumed for the next
+Taste or Discovery delivery. Capturing an updated forecast is insufficient if
+question selection ignores it. Compare otherwise equal prefixes with a rating
+of 10 versus 0 or 5: where supported candidate features differ, selection must
+consume the numeric-aware forecast rather than allowing a rigid domain rotation
+or fixed slate to override all first-answer information. Maintain bounded
+BOOK/MOVIE coverage and explicit missing support. A high Interstellar rating may
+raise supported similar candidates such as Inception; no title or visible rank
+change is guaranteed after every answer, and repeating a cold-start opening
+across empty Profiles is not alone a defect.
+
+Freeze the forecast before its answer; commit and acknowledge the answer before
+requesting its successor. A newly committed prefix invalidates undelivered queued
+feed candidates from an older prefix. Bounded eligible pools must support
+versioned refresh/refill as the current supported state changes, rather than
+locking the whole future feed to one START-time slate. Freeze each new scoring
+panel/pool and retain the original panels for historical same-prefix comparisons.
+Keep already-delivered origins immutable,
+finish exact retries, and obtain a new origin for new delivery rather than
+silently rescoring frozen pagination. Taste question policy may transparently
+trade immediate satisfaction for supported information acquisition; its versioned
+trace must state that objective/tradeoff rather than claim every question is the
+best pleasure recommendation. Discovery exploitation and Taste acquisition share
+state/forecast semantics without requiring identical selection policies.
 
 ## 9. DiscoveryMode policy
 
@@ -1115,6 +1165,27 @@ The profiling candidate slate is ordered by a versioned non-personal Item prior:
 4. only a weak freshness component.
 
 The curated beta fallback must never be labelled as live trend data. Provider aggregate popularity/trend is catalog metadata and may be used in MVP. A trend derived from aggregate Kajo Profile behaviour is different: that is future privacy-gated `PopulationMemory` and requires minimum-cohort, consent/deletion-lineage and exposure-bias controls before it may influence cold start.
+
+### Recent supported cold-start prior — required target
+
+The owner's October 15 refinement requires a versioned recent-population prior
+over eligible BOOK/MOVIE Items before useful personal support exists. Evaluate
+the full observed rating distribution, recency/window, distinct support and
+exposure/selection bias with uncertainty/shrinkage and diversity; neither a fixed
+cross-Profile slate, all-time popularity nor a count of tens alone defines it.
+Missing ratings remain unknown. Supported provider aggregates may supply a
+clearly labelled fallback; unavailable recent evidence must not become invented
+live trends. Declared windows and version/source cutoffs permit chronological
+replay and comparison against the retained recognition/popularity baseline.
+
+An NPS-like balance of favorable and unfavorable outcomes is a hypothesis to
+define and evaluate, not permission to copy survey NPS 0–10 thresholds onto
+Kajo satisfaction ratings or call an uncalibrated score a probability. The first
+admitted Personal rating begins personalizing serving from that prior on the same
+Profile; it does not update the population prior without its separately admitted
+aggregation contract.
+This plan admits no new dataset/model and does not activate cross-Profile native
+learning; PopulationMemory authorization, cohort, deletion and bias gates remain.
 
 ### Bounded no-import profiling — retained legacy source
 
@@ -1505,6 +1576,21 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 - exact replay test from stored traces,
 - no-evidence equivalence to base behavior,
 - query-prefix leakage, authorization-before-retrieval and artifact-version compatibility tests.
+
+### Feed and first-answer acceptance — required target
+
+- Opposing first-answer prefixes (0/5/10) over the same supported candidate pool
+  prove selector consumption of updated canonical scores, including the first
+  post-answer card, while preserving unavailable support and bounded domain coverage.
+- Taste and Discovery reject stale queued/slower responses after acknowledgement;
+  retry/restart and Profile switching preserve exact origins, prefixes and scope.
+- Completed Ohita gestures suppress contextually exactly once; partial/cancelled
+  scrolls do not. Versioned Scenario-based resurfacing preserves hard eligibility,
+  old UNKNOWN/NOT_INTERESTED semantics and absence of a fabricated dislike label.
+- Cold-start controls cover sparse/contradictory/outdated evidence, recency and
+  distribution changes, diversity and source/cohort withdrawal without future
+  leakage. Behavioral fixtures prove mechanics; measured usefulness/calibration
+  and actual feed/device acceptance remain separate evidence gates.
 
 ### Resurfacing-specific
 

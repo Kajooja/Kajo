@@ -198,6 +198,43 @@ Personal rating 0–10 implies consumed/read/watched. Current Shared SET_RATING 
 
 New recommendation event types require explicit semantics before broad use.
 
+### Shared feed Ohita — required target, 2026-10-15
+
+The owner's [near-term feed refinement](../project/ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15)
+requires the same **Ohita** interaction in Taste and Discovery. A deliberate,
+completed upward swipe dismisses the active card; the accessible Ohita control
+has the same meaning. It records a neutral/contextual skip and removes the Item
+from the current feed. It is neither rating zero, explicit negative preference,
+nor proof that the actor does not recognize the Item. It cannot count as a known
+rating or a definite recognition answer for readiness. Combining the former
+unknown/not-interest UI choices does not combine their historical evidence.
+Partial scrolling, cancelled gestures, layout/reflow, navigation or app backgrounding
+must not manufacture a skip, exposure or preference observation.
+
+The new versioned semantic boundary must retain the authorized actor/Profile,
+Item, Taste question or actual Discovery delivery origin, session/surface,
+occurrence and acknowledgement/availability times, original prediction/context
+and committed source prefix. Preserve unavailable context as unavailable. One
+logical gesture writes at most once: an exact retry keeps its command identity,
+body, origin and result; a failed or pending write is not confirmed learning.
+Question forecasts remain pre-answer and immutable. An evaluation-only Taste
+panel cannot be relabelled as a Discovery delivery or impression.
+
+Suppression is contextual rather than permanent dislike. A separately versioned
+policy must specify its scope/cooldown and evidence-supported Scenario change
+before the Item can become eligible again; log the skip and later eligibility
+reason without rewriting either origin. New eligibility is permission to rank,
+not a guaranteed repeat. Rated/consumed, blocked, unavailable and unauthorized
+Items retain their independent hard constraints. Existing UNKNOWN,
+NOT_INTERESTED, ratings and immutable command/forecast receipts retain their
+original semantics; no retroactive recognition or negative labels are guessed.
+
+This is a mandatory planned successor, not a new deployed Event type or writer.
+The v1/v2 source facts below and existing explicit negative-interest weights remain
+unchanged. The earlier planned #239 Next control only changed the viewed card;
+that neutral navigation design did not provide this contextual-skip
+observation/suppression contract and is superseded by this feed target.
+
 ## 3. Taste evidence
 
 Taste Test must reuse canonical taste semantics rather than inventing a parallel marketing score.
