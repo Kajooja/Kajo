@@ -10,20 +10,22 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — first-answer-sensitive Taste selection / #336
+## Current packet — neutral contextual skip protocol / #336
 
-Accepted main is `63682dab9e87094c43a50c05616b89acc5bc7079` through
-[#344](https://github.com/Kajooja/Kajo/pull/344), exact tested tree
-`01323436604411b7bf8526aaad107e8324bf2644`. All five final-source
-[CI #674](https://github.com/Kajooja/Kajo/actions/runs/38807437179) gates passed.
-That requirement/receipt packet changes no application runtime. The earlier
-#343 source and its three owner-approved hosted operations remain accepted.
-The matching compiled mobile source remains
+Accepted main is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
+[#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
+`a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five final-source
+[CI #676](https://github.com/Kajooja/Kajo/actions/runs/38878872616) gates passed.
+The requirement/receipt packet #344 and earlier #343 source/three owner-approved
+hosted operations remain accepted. #345's single additive hosted forward is also
+installed and verified as recorded below.
+The existing #669 mobile build source is
 `c776de5fcdb62c72216b25a955a8c4b8685b2580` through
 [#342](https://github.com/Kajooja/Kajo/pull/342), tree
 `8ece8e164dfb4691737286340606e4ecd66de398`.
 [CI #669](https://github.com/Kajooja/Kajo/actions/runs/38742567140) passed all
-five gates and built the matching standalone APK; #343 changes no compiled inputs.
+five gates and built the standalone APK. #669 remains compatible with the
+unchanged v2 RPC/mobile queue through #345.
 The #337 reference, #339 Discovery refresh, #340 evaluation boundary and #341
 owned sequential server are accepted. Do not recreate these source packets.
 
@@ -36,8 +38,8 @@ writers. **Jatka selaamaan** commits PAUSE before releasing the same Profile to
 Discovery and preserves dismissal through restart. Saved-answer progress retains
 honest insufficient support; full readiness and measured quality remain open.
 
-The owner-approved hosted rollout is complete. Exactly three new operations were
-acknowledged in dependency order: the exact bootstrap compatibility prerequisite
+The earlier owner-approved #343 hosted rollout is complete. Exactly three
+operations were acknowledged in dependency order: the exact bootstrap compatibility prerequisite
 `20261015192129_sequential_bootstrap_compatibility.sql`, canonical evaluation
 `20261015090018_personal_evaluation_scoring.sql`, then durable v2
 `20261015101752_durable_sequential_taste.sql`. The historical compact helper was
@@ -45,16 +47,16 @@ bridged without changing its identity/security. The original 16-forward chain,
 earlier immutable-guard bridge and all accepted migration bytes remain unchanged.
 All three new operations are installed; do not replay them.
 
-The final actual-target read-only preflight passes the exact two-forward installed
-prefix, provider/source receipts, all 41 function snapshots and nine lifecycle
-triggers. V2 role denial and closed private storage checks pass. All 60 preexisting
-Auth/public/private tables retain identical row counts and complete-row digests
-after deployment. An existing owner's rolled-back catalogue smoke returned 80
-distinct BOOK and 80 distinct MOVIE Items with exact retries; the same preservation
-checks passed afterward. At deployment verification the three new v2 tables were
-empty. This verifies
-deployment and preserved existing serving, not an observed first v2 session,
-phone installation or recommendation quality.
+That rollout's final actual-target read-only preflight passed the exact installed
+two-forward prefix, provider/source receipts, all 41 function snapshots and nine
+lifecycle triggers. V2 role denial and closed private storage checks passed.
+All 60 then-preexisting Auth/public/private tables retained identical row counts
+and complete-row digests after deployment. An existing owner's rolled-back
+catalogue smoke returned 80 distinct BOOK and 80 distinct MOVIE Items with exact
+retries; the same preservation checks passed afterward. At that deployment
+verification the three new v2 tables were empty. This verified deployment and
+preserved existing serving, not an observed first v2 session, phone installation
+or recommendation quality.
 
 The accepted preparation module remains read-only/disposable-only, with no hosted
 apply entry point. Its exact prerequisite and installed-forward receipts, target
@@ -63,21 +65,42 @@ privately. A future operator must refresh and reconcile that checkpoint instead
 of inferring provider versions from filenames. The earlier BRIDGE_REQUIRED result
 is historical and superseded by the final passing installed-prefix preflight.
 
-Current branch `feat/forecast-aware-taste-selection` implements the first bounded
-selector part of the owner's mandatory
+The accepted #345 source implements the first bounded selector part of the owner's
+mandatory
 [near-term feed/first-answer targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
 The additive `20261016073549_forecast_aware_taste_selection.sql` assigns only new
 sessions the immutable `CANONICAL_FORECAST_V3` question policy through the same
 v2 RPC/queue. It uses current-panel within-domain ordinal preference, utility-first
 selection and a traced two-presentation domain-lead guard. Retained ADAPTIVE and
-PRIOR_ONLY sessions keep their old selectors and exact records. No migration is
-applied by this source packet.
-**Next action:** finish final-source checks/review and integrate this selector,
-then reconcile its one additive forward against a fresh private actual checkpoint
-before guarded hosted acceptance. The shared feed/artwork/contextual Ohita,
-versioned pool refresh and recent prior remain the required successors; this
-bounded selector does not implement them or close MVP-ALG-010.
-The matching #669 APK remains available for
+PRIOR_ONLY sessions keep their old selectors and exact records.
+
+The single exact #345 forward is installed with SHA-256
+`ffaa9ba15a9836b879936480d8a4c3abbaf22132db62da041c148a81bad71a0d`.
+Actual-target verification preserved all 63 existing Auth/public/private ordinary
+tables' row counts and complete-row digests, all 228 existing function identities
+and non-body metadata, every body except the two approved exact replacements,
+all 57 noninternal app-trigger attachments and all 62 app-table ACL/RLS snapshots.
+Exactly one new denied selector exists; the default and validated policy check
+match the accepted source. Seven security probes and four read-only helper cases
+(canonical first choice, inversion, extreme scores and missing support) pass.
+Migration history retains its exact earlier prefix plus one receipt. Known
+security advisors are unchanged, including the existing Auth password warning
+tracked in #160/#184. Target/provider identities and detailed fingerprints remain
+private. Do not replay installed operations. No fixture account, reset, model or
+Working activation occurred.
+
+Current branch `docs/forecast-selection-acceptance` records this accepted outcome;
+it changes documentation only. **Next action:** implement the bounded neutral
+contextual skip command/Event contract, durable exact idempotency and
+cooldown/context/Scenario re-eligibility before presentation reuse. Retain the
+shown origin, restart/conflict/undo-withdrawal/lifecycle behavior and old
+UNKNOWN/NOT_INTERESTED/session/queued-command meanings. The new skip must remove
+an Item from this feed without a rating, consumption, asserted recognition or
+durable negative preference. Shared vertical feed/artwork follows that stable
+protocol; versioned pool refresh and recent prior remain required successors.
+This selector does not implement them or close MVP-ALG-010. No account reset or
+model activation is part of the next packet.
+The compatible #669 APK remains available for
 [the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
 it does not yet contain the requested feed changes.
 Preserve existing v1 sessions, pending commands and completed setup. A genuine new
@@ -96,10 +119,11 @@ The October 15 owner feedback reports the same Taste films as on another Profile
 and requests shared Discovery/Taste artwork and vertical feed navigation. This is
 a reported observation, not a verified protocol/version diagnosis or completed
 device matrix. Identical cold-start openings can be legitimate. Source inspection
-identified a narrower gap in the deployed v2 policy: next-question selection ranks
-domain coverage before utility and does not rank by canonical forecast magnitude,
-even though ANSWER projects the rating and captures a new forecast. The proposed
-source above corrects that bounded selection gap for new-policy sessions. Taste currently
+identified a narrower gap in the then-deployed numeric-v2 policy: next-question
+selection ranked domain coverage before utility and did not rank by canonical forecast magnitude,
+even though ANSWER projected the rating and captured a new forecast. The accepted
+#345 source/hosted forward corrects that bounded selection gap for new-policy
+sessions; retained policies keep their exact behavior. Taste currently
 has title-only cards; Discovery artwork lives in a separate horizontal pager.
 The planned neutral **Ohita** also needs a versioned command/evidence contract,
 not relabeling existing UNKNOWN/NOT_INTERESTED records. See ROADMAP for mandatory
@@ -109,7 +133,7 @@ Independent pure/native fixtures verify canonical-score inversion rather than
 only a local similarity proxy, genuine separate-commit first 10/0/5 prefixes and
 their next selected Items, neutral/tied/missing support, bounded coverage and
 exact old-session preservation. They do not establish real-device usefulness or
-calibrated probability. The canonical [source contract](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16)
+calibrated probability. The canonical [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
 and source PR own exact final validation/integration receipts.
 
 ## Sequential adaptive Taste reference / #336

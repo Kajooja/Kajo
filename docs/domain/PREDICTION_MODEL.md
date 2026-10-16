@@ -839,11 +839,14 @@ trace must state that objective/tradeoff rather than claim every question is the
 best pleasure recommendation. Discovery exploitation and Taste acquisition share
 state/forecast semantics without requiring identical selection policies.
 
-#### Proposed canonical-forecast selector source — 2026-10-16
+#### Canonical-forecast selector source — 2026-10-16
 
-`feat/forecast-aware-taste-selection` proposes a bounded first implementation of
-the selection part of this requirement. It is unmerged source, not a deployed
-policy or observed recommendation-quality result. The additive
+[#345](https://github.com/Kajooja/Kajo/pull/345) supplies the accepted bounded first
+implementation of the selection part of this requirement. All five final-source
+CI #676 gates pass, and its one exact additive hosted forward is installed and
+verified. [STATUS](../project/STATUS.md) owns the exact merge/source/hash and
+redacted preservation/security receipt. No eligible-owner new-session, phone or
+measured recommendation-quality result is inferred. The additive
 `20261016073549_forecast_aware_taste_selection.sql` assigns newly created sessions
 the immutable `CANONICAL_FORECAST_V3` policy. Retained `ADAPTIVE` and `PRIOR_ONLY`
 sessions keep their original selector, catalogue, questions, panels, first
@@ -879,7 +882,8 @@ changes the new-session constraint/default. It patches only the two exact
 reviewed dispatch/trace and evidence-version function bodies after source and
 security checks; unknown drift aborts. Existing function identity/owner/ACL,
 old rows, wire replies and previously accepted migration bytes are preserved.
-No hosted apply or actual target acceptance follows from this source receipt.
+Its actual-target preservation/security acceptance is recorded separately in
+STATUS; the source contract alone does not establish device behavior or quality.
 
 The optional portable reference offers the same ordinal policy through
 `adaptiveTasteCanonicalDefaults` / `selectionMode: 'CANONICAL_ORDINAL_V3'`.
@@ -887,7 +891,7 @@ It is explicit opt-in: the old default and retained states without that field
 keep their original behavior. A new-mode `PRIOR_ONLY` control retains
 recognition-only utility with the declared coverage guard; it does not change
 retained SQL `PRIOR_ONLY` sessions. See the
-[package usage](../../packages/prediction-engine/README.md#canonical-forecast-selection-opt-in--proposed-source).
+[package usage](../../packages/prediction-engine/README.md#canonical-forecast-selection-opt-in--accepted-source).
 
 This source addresses part of `MVP-ALG-010`, not its full acceptance. The native
 session pool remains frozen at START with the existing bounded 25-per-ItemType
