@@ -1,10 +1,20 @@
-import { notifyBootstrapEvidenceChanged } from '../discovery/predictionRefresh';
+import { notifyBootstrapEvidenceChanged, notifyContextualSkipChanged } from '../discovery/predictionRefresh';
 import { createUuidV7 } from '../events/eventTracking';
 import type { ItemActionStorage } from '../events/itemActionOutbox';
+import { CONTEXTUAL_SKIP_VERSION, isNativeContextualSkipCommand, sendContextualSkip,
+  type ContextualSkipRpc, type KajoSkipCommand } from '../events/contextualSkipOperations';
 import { isTasteCommand, sendTasteCommand, uuid, type TasteAnswer, type TasteChallenge,
   type TasteCommand, type TasteRpc, type TasteSession, type SequentialTasteSession } from './personalTasteOperations';
 
-type StoredFlow = { version: 2; protocol: 'v1' | 'v2'; sessionId: string | null; challengeId: string | null; pending: TasteCommand | null; dismissed: boolean };
+type StoredSkipCommand = { functionName: 'commit_taste_contextual_skip_v1'; command: KajoSkipCommand };
+type PendingTasteCommand = TasteCommand | StoredSkipCommand;
+type StoredFlow = { version: 2; protocol: 'v1' | 'v2'; sessionId: string | null; challengeId: string | null; pending: PendingTasteCommand | null; dismissed: boolean };
+function isStoredSkip(value: unknown): value is StoredSkipCommand {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const v = value as Record<string, unknown>;
+  return Object.keys(v).sort().join() === 'command,functionName' && v.functionName === 'commit_taste_contextual_skip_v1' &&
+    isNativeContextualSkipCommand(v.command) && v.command.origin.surface === 'TASTE';
+}
 export type PersonalTasteSnapshot = {
   sequential: SequentialTasteSession | null; session: TasteSession | null; challenge: TasteChallenge | null; busy: boolean; pending: boolean;
   legacy: boolean; dismissed: boolean; message: string | null; conflict: boolean; blocked: boolean;
@@ -18,7 +28,9 @@ const fresh = (): StoredFlow => ({ version: 2, protocol: 'v2', sessionId: null, 
 export function createPersonalTasteFlow(options: {
   namespace: string; actorUserId: string; profileId: string; storage: ItemActionStorage;
   rpc: TasteRpc; onChange: (snapshot: PersonalTasteSnapshot) => void;
+  contextualSkipRpc?: ContextualSkipRpc;
   createId?: () => string; timeoutMs?: number; autoStart?: boolean;
+  nowMicros?: () => string;
 }) {
   const key = `kajo:personal-taste:v1:${encodeURIComponent(options.namespace)}:${options.actorUserId}:${options.profileId}`;
   const owner = {};
@@ -52,12 +64,17 @@ export function createPersonalTasteFlow(options: {
         (!legacy && (r.version !== 2 || !['v1', 'v2'].includes(String(r.protocol)))) ||
         (r.sessionId !== null && !uuid(r.sessionId)) || (r.challengeId !== null && !uuid(r.challengeId)) ||
         (r.challengeId !== null && r.sessionId === null) || typeof r.dismissed !== 'boolean' ||
-        (r.pending !== null && !isTasteCommand(r.pending, options.profileId))) throw new Error('Invalid storage');
+        (r.pending !== null && !isTasteCommand(r.pending, options.profileId) && !isStoredSkip(r.pending))) throw new Error('Invalid storage');
       const next = { ...r, version: 2, protocol: legacy ? 'v1' : r.protocol } as StoredFlow;
       if (next.protocol === 'v2' && next.challengeId !== null) throw new Error('Wrong protocol');
-      if (next.pending && (next.pending.functionName === 'taste_session_v2') !== (next.protocol === 'v2')) throw new Error('Wrong protocol');
-      if (next.pending?.request.sessionId && next.pending.request.sessionId !== next.sessionId) throw new Error('Wrong session');
-      if (next.pending?.request.challengeId && next.pending.request.challengeId !== next.challengeId) throw new Error('Wrong challenge');
+      if (isStoredSkip(next.pending)) {
+        if (next.protocol !== 'v2' || next.pending.command.actorUserId !== options.actorUserId || next.pending.command.profileId !== options.profileId ||
+          next.pending.command.origin.sessionId !== next.sessionId) throw new Error('Wrong skip scope');
+      } else {
+        if (next.pending && (next.pending.functionName === 'taste_session_v2') !== (next.protocol === 'v2')) throw new Error('Wrong protocol');
+        if (next.pending?.request.sessionId && next.pending.request.sessionId !== next.sessionId) throw new Error('Wrong session');
+        if (next.pending?.request.challengeId && next.pending.request.challengeId !== next.challengeId) throw new Error('Wrong challenge');
+      }
       stored = next; loaded = true; return true;
     } catch {
       state = { ...state, busy: false, blocked: true, message: 'Makutestin paikallista jatkotietoa ei voitu avata. Mitään vastausta ei lähetetty.' };
@@ -113,6 +130,24 @@ export function createPersonalTasteFlow(options: {
     const startedGeneration = generation;
     const command = stored.pending;
     if (!command || !current()) return;
+    if (isStoredSkip(command)) {
+      if (!options.contextualSkipRpc) {
+        state = { ...state, blocked: true, message: 'Ohituksen tallennuspalvelu ei ole käytettävissä. Sama komento säilyy odottamassa.' }; return;
+      }
+      const controller = new AbortController(); abort = controller;
+      const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
+      let result: Awaited<ReturnType<typeof sendContextualSkip>>;
+      try { result = await sendContextualSkip(options.contextualSkipRpc, command.command, controller.signal); }
+      finally { clearTimeout(timer); if (abort === controller) abort = null; }
+      if (!current() || generation !== startedGeneration) return;
+      if (result.status === 'error') {
+        state = { ...state, message: result.message, conflict: result.rejectedAction === true, blocked: !result.retryable }; return;
+      }
+      if (!save({ ...stored, pending: null })) return;
+      notifyContextualSkipChanged();
+      await readCurrent();
+      return;
+    }
     const result = await invoke(command);
     if (!current() || !result) return;
     if (result.status === 'error') {
@@ -176,8 +211,10 @@ export function createPersonalTasteFlow(options: {
       sessionId: s.sessionId, requestId: id(), expectedRevision: revision,
       ...(operation === 'ANSWER' ? { questionId: s.questionId!, answer: answer! } : {}) } });
   }
-  function enqueue(command: TasteCommand): boolean {
-    if (!current() || flight || state.busy || stored.pending || state.blocked || !isTasteCommand(command, options.profileId)) return false;
+  function enqueue(command: PendingTasteCommand): boolean {
+    if (!current() || flight || state.busy || stored.pending || state.blocked ||
+      !(isStoredSkip(command) ? command.command.actorUserId === options.actorUserId && command.command.profileId === options.profileId &&
+        command.command.origin.sessionId === stored.sessionId && stored.protocol === 'v2' : isTasteCommand(command, options.profileId))) return false;
     if (!save({ ...stored, pending: command, dismissed: false })) return false;
     state = { ...state, needsStart: false };
     launch(run); return true;
@@ -241,6 +278,22 @@ export function createPersonalTasteFlow(options: {
     },
     answerTraining(answer: TasteAnswer, itemId: string, revision: number) {
       return state.sequential ? sequentialCommand('ANSWER', revision, answer, itemId) : sessionCommand('ANSWER', answer, itemId, revision);
+    },
+    // Controller capability only. Presentation does not call this until the
+    // shared feed's separate gesture/accessibility acceptance packet.
+    skipCurrent(itemId: string, revision: number) {
+      const s = state.sequential;
+      if (!options.contextualSkipRpc || !s || s.status !== 'QUESTION' || s.revision !== revision || s.item?.id !== itemId || !s.contextualSkip) return false;
+      return enqueue({ functionName: 'commit_taste_contextual_skip_v1', command: {
+        version: CONTEXTUAL_SKIP_VERSION, kind: 'CONTEXTUAL_SKIP', actionId: id(), actorUserId: options.actorUserId,
+        profileId: options.profileId, itemId, occurredAt: options.nowMicros?.() ?? (BigInt(Date.now()) * 1000n).toString(),
+        origin: { ...s.contextualSkip.origin }, contextRef: null, reversesActionId: null } });
+    },
+    withdrawContextualSkip(original: KajoSkipCommand) {
+      if (!options.contextualSkipRpc || !isNativeContextualSkipCommand(original) || original.kind !== 'CONTEXTUAL_SKIP' || original.origin.surface !== 'TASTE') return false;
+      return enqueue({ functionName: 'commit_taste_contextual_skip_v1', command: { ...original,
+        kind: 'WITHDRAW_CONTEXTUAL_SKIP', actionId: id(), reversesActionId: original.actionId,
+        occurredAt: options.nowMicros?.() ?? (BigInt(Date.now()) * 1000n).toString(), origin: { ...original.origin } } });
     },
     acknowledgeBooks(revision: number) { return sessionCommand('ACK_TRANSITION', undefined, undefined, revision); },
     startChallenge() {

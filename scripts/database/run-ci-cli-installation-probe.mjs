@@ -45,6 +45,7 @@ import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
+import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
 import { loadSequentialTasteHostedForwards, sequentialTasteHostedUpgradeSql } from './personal-sequential-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
@@ -360,6 +361,8 @@ try {
     assert.match(personalEvaluation?.personalEvaluation, /^PASS:/);
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
+    const contextualSkipConcurrency = await verifyContextualSkipConcurrency(execConcurrentSql);
+    assert.equal(contextualSkipConcurrency.status, 'PASS');
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
       { stage: 'personal-working-native-capture-frozen-consumer-parity', timeoutMs: 120_000 });
     assert.match(personalWorkingBridge?.personalWorkingBridge, /^PASS: actual canonical native Personal capture/);
@@ -421,7 +424,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation,
-      personalSequentialTaste, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
+      personalSequentialTaste, contextualSkipConcurrency, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

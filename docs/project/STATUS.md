@@ -10,25 +10,31 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — neutral contextual skip reference / native writers next
+## Current packet — native contextual skip / presentation wiring next
 
-The first bounded [#239](https://github.com/Kajooja/Kajo/issues/239) source packet
-under #336 supplies the executable neutral-command and suppression conformance
-reference on `feat/239-contextual-skip-protocol`. It includes independent disposable
-SQL parity and recovery tests through the existing mobile outbox. Exact source,
-final CI and integration receipts belong to the matching PR/issue. This changes
-no native RPC, Event constraint, migration, serving policy, installed APK or UI.
+The accepted [#348](https://github.com/Kajooja/Kajo/pull/348) reference is merged
+as `f7c29e750baa96b9e891ea68af63998dde0afb85` after all five CI #683 gates.
+The next [#239](https://github.com/Kajooja/Kajo/issues/239) source packet under
+#336 is `feat/239-native-contextual-skip`: separate native Taste and Discovery
+writers, exact persistent receipts, source-erasure tombstones and confirmed
+cross-surface eligibility. Its matching PR/issue owns final validation and
+integration receipts; a source implementation is not a hosted installation.
 
-The [canonical protocol](../domain/DATA_EVENTS.md#neutral-skip-conformance-reference--2026-10-16)
-keeps Taste/private question origin separate from actual Discovery delivery;
-exact retry, source withdrawal, same-actor undo and scope are explicit. Its
-[eligibility policy](../domain/PREDICTION_MODEL.md#neutral-skip-eligibility-reference--2026-10-16)
-uses 24 hours from server acceptance across the same Profile's surfaces/sessions.
-There is no trusted native Context/Scenario-change provider, so version 1 admits
-no early context shortcut. These are testable initial policy hypotheses, not
-measured usefulness. Pending commands and legacy UNKNOWN/NOT_INTERESTED are never
-normalized into confirmed skips. Native persistence/concurrent locking and actual
-cross-surface admission remain unimplemented.
+The [native protocol](../domain/DATA_EVENTS.md#native-contextual-skip-source--2026-10-16)
+keeps private Taste question/prefix responses separate from actual Discovery
+Event delivery. The independently versioned
+[eligibility rule](../domain/PREDICTION_MODEL.md#native-contextual-skip-admission--2026-10-16)
+uses the accepted 24-hour server clock across the same Profile's surfaces and
+sessions. No native Context/Scenario-change provider is admitted. Existing hard
+eligibility and current-chain seen exclusions still win; expiry permits ranking.
+
+Mobile source supplies strict native capability/receipt decoding, a separate
+Discovery durable queue service and Taste's existing single-pending-command
+routing. Presentation does not emit Ohita yet. Current APK, text-only Taste and
+horizontal Discovery cards remain unchanged. Shared feed/artwork, exact displayed
+Discovery origin/impression wiring and device acceptance remain required before
+activation. No account reset, hosted forward or model/Working activation belongs
+to this source packet.
 
 Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
@@ -113,23 +119,17 @@ private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
 The merged #346 receipt records this accepted outcome.
-**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** implement the native
-writers/adapters against the new conformance contract: separate Taste question/
-prefix response and Discovery Event/command receipts, capability negotiation,
-exact retries under real transaction locks and source-erasure tombstones. Carry
-their confirmed union into base admission, page rechecks and catalogue-chain
-refill/exhaustion, retiring stale undelivered work. Demonstrate immediate Taste
-PAUSE → same-PersonalProfile Discovery and restart continuity with real SQL.
-Complete native security/old-history preservation and durable client routing
-before presentation reuse. Do not repeat the pure reference or claim its
-serialized tests prove native concurrency or a trusted Scenario provider. Retain the
-shown origin, restart/conflict/undo-withdrawal/lifecycle behavior and old
-UNKNOWN/NOT_INTERESTED/session/queued-command meanings. The new skip must remove
-an Item from this feed without a rating, consumption, asserted recognition or
-durable negative preference. Shared vertical feed/artwork follows that stable
-protocol; versioned pool refresh and recent prior remain required successors.
-This selector does not implement them or close MVP-ALG-010. No account reset or
-model activation is part of the next packet.
+**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** after
+this native packet's five final-source CI gates and integration, wire the shared
+vertical feed/artwork to its separate adapters. Preserve
+page-local Prediction/request identity and the actual acknowledged impression;
+retire stale undelivered client work only after acknowledgement. Taste uses
+acknowledgement → fresh RESUME → separately committed NEXT. Do not recreate the
+reference or interpret missing capability as UNKNOWN/NOT_INTERESTED. Continue
+actual device/eligible-owner acceptance and the separately guarded additive
+backend installation; source CI alone does not prove either. Versioned pool
+refresh, recent supported prior, full readiness and measured usefulness retain
+their ROADMAP slots. Existing sessions, accounts and old queued commands survive.
 The compatible #669 APK remains available for
 [the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
 it does not yet contain the requested feed changes.

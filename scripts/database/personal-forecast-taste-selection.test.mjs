@@ -63,7 +63,9 @@ test('canonical-forecast Taste successor consumes actual frozen forecasts and pr
     const { files } = await buildFreshInstallation();
     const index = files.findIndex(file => file.name.endsWith('_forecast_aware_taste_selection.sql'));
     assert.ok(index > files.findIndex(file => file.name.endsWith('_durable_sequential_taste.sql')), 'Expected additive selector successor');
-    assert.equal(index, files.length - 1, 'This bounded verifier must apply the exact last selector successor');
+    // Exercise this historical upgrade in isolation even when newer additive
+    // migrations exist. Current-schema behavior is covered by successor suites.
+    assert.equal(files[index].name, '20261016073549_forecast_aware_taste_selection.sql');
     for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
     await db.exec(await personalTasteSessionFixtureSql());
 

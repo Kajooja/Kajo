@@ -58,3 +58,17 @@ export function notifyBootstrapEvidenceChanged() {
   bootstrapRevision += 1;
   bootstrapListeners.forEach((listener) => listener());
 }
+
+// Confirmed neutral suppression is independent of bootstrap/rating evidence.
+// No pending command enters this counter or a recommendation input.
+let contextualSkipRevision = 0;
+const contextualSkipListeners = new Set<() => void>();
+export function getContextualSkipRevision() { return contextualSkipRevision; }
+export function subscribeToContextualSkip(listener: () => void) {
+  contextualSkipListeners.add(listener);
+  return () => { contextualSkipListeners.delete(listener); };
+}
+export function notifyContextualSkipChanged() {
+  contextualSkipRevision += 1;
+  contextualSkipListeners.forEach(listener => listener());
+}

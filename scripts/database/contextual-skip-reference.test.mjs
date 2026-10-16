@@ -68,14 +68,17 @@ test('independent disposable SQL agrees with the contextual-skip policy referenc
   } finally { await db.close(); }
 });
 
-test('current native consumers stay neutral and old rating/not-interest meanings remain unchanged', async () => {
+test('pre-admission native consumers stay neutral and old rating/not-interest meanings remain unchanged', async () => {
   const db = new PGlite();
   try {
     await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
       create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       grant usage on schema public,auth to anon,authenticated,service_role;`);
-    for (const file of (await buildFreshInstallation()).files) await db.exec(`begin;${file.sql}commit;`);
+    // Preserve the accepted reference packet's historical boundary. The native
+    // successor tests its own Event admission and security on the current schema.
+    for (const file of (await buildFreshInstallation()).files.filter(file =>
+      file.name <= '20261016073549_forecast_aware_taste_selection.sql')) await db.exec(`begin;${file.sql}commit;`);
     const rows = (await db.query(`select event_type,private.event_evidence_weight_v1(event_type,'{}') weight,
       private.outcome_priority_v1(event_type) priority,private.outcome_reward_v1(event_type,'{}') reward
       from unnest(array['ITEM_CONTEXTUALLY_SKIPPED','ITEM_CONTEXTUAL_SKIP_WITHDRAWN']) event_type order by event_type`)).rows;

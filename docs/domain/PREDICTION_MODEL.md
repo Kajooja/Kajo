@@ -806,7 +806,7 @@ suppression rule, and must not reinterpret retained `resurfacing-v1` evidence.
 #### Neutral skip eligibility reference — 2026-10-16
 
 The bounded #239 reference supplies `contextual-skip-cooldown-v1`, independently
-of `resurfacing-v1` and permanent not-interest. It is not connected to serving.
+of `resurfacing-v1` and permanent not-interest. At the reference checkpoint it was not connected to serving.
 Inputs are the complete authorized, surviving confirmed skip/withdrawal prefix,
 target Profile/Item, exact trusted decision clock and the result of existing hard
 eligibility. The portable computation uses generic Subject/Object references;
@@ -843,12 +843,41 @@ This fixture budget is not a native storage/retention design.
 
 The independent temporary SQL oracle covers boundary/withdrawal/scope behavior
 and deterministic mixed prefixes; it is not installed by application migrations.
-Actual native source adapters, bounded indexed retrieval, lifecycle/security,
-delivery-prefix admission and context-aware early return remain open. The required
-native tests must demonstrate immediate Taste PAUSE → same-Profile Discovery,
-later-page recheck, chain refill and genuine exhaustion before presentation reuse.
-This packet advances EB-01/EB-08 (architecture sections 30, 32–33, 40–42) only as
-protocol conformance; neither complete capability nor MVP requirement is closed.
+At this reference checkpoint native adapters, indexed retrieval, lifecycle/
+security and delivery-prefix admission remained open; the successor below
+implements them with separate native acceptance. Its required tests demonstrate
+immediate Taste PAUSE → same-Profile Discovery, later-page recheck, chain refill
+and genuine exhaustion before presentation reuse. Context-aware early return
+still remains open. The reference advances EB-01/EB-08 (architecture sections
+30, 32–33, 40–42) only as protocol conformance; neither complete capability nor
+MVP requirement is closed.
+
+#### Native contextual skip admission — 2026-10-16
+
+The native #239 successor reads the confirmed surviving private Taste/Discovery
+command union for Profile/Item through indexed persistence. It uses
+`contextual-skip-cooldown-v1` and `NO_TRUSTED_CONTEXT_CHANGE_V1` with the reference's
+exact microsecond cutoff, latest-active-source/withdrawal rules and inspectable
+reasons. Pending mobile writes never enter eligibility. Source erasure removes
+the corresponding suppression; request tombstones prevent replay resurrection.
+A private run/source relation records the latest surviving sources at each run
+cutoff even when suppression excludes the Item before candidate insertion. This
+conservative same-Profile dependency set supports complete derived-copy erasure.
+
+The existing resurfacing decision composes this separate policy with terminal,
+bootstrap, saved/List and reminder constraints. That shared boundary governs base
+admission, later frozen-page rechecks and current catalogue-chain refill/exhaustion.
+A Taste skip therefore survives immediate PAUSE → same-Personal Discovery,
+a new Event session and app restart. Shared skips stay in that SharedProfile.
+Historical panels, delivered pages and exact old page receipts are not rewritten;
+current-chain seen sets keep preventing loops even after cooldown expiry.
+
+Neutral Events do not become value/recognition/outcome evidence or consume the
+Working input budget. The native transaction gate orders skip acceptance with
+serving/source erasure. The client must retire stale undelivered generations upon
+acknowledgement before activating a feed control. Presentation origin plumbing,
+phone usefulness and any real Scenario-based early return remain open; a passing
+native fixture is not quality, model admission or hosted deployment.
 
 ### 8.2 Next-card satisfaction and prefix freshness — required target
 

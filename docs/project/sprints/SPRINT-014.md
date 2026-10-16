@@ -7494,3 +7494,52 @@ session/restart, stale undelivered work retirement, refill and genuine exhaustio
 Only then enable shared vertical-feed/artwork controls. Genuine Scenario-based
 early re-entry, full pool/prior/readiness/usefulness and all release gates remain
 open. Do not implement another pure reference or relabel legacy answers.
+
+
+## Native contextual skip source — #239 / 2026-10-16
+
+Parent: accepted #348 merge `f7c29e750baa96b9e891ea68af63998dde0afb85`.
+Branch: `feat/239-native-contextual-skip`. The source successor advances
+EB-01/EB-08 (architecture sections 30, 32–33, 40–42) from pure conformance to
+separate authenticated native Taste and Discovery command writers. Its source
+PR/issue records exact final tree, checks, CI and integration acceptance.
+
+Two CLI-created additive forwards leave installed migration bytes unchanged.
+Private indexed receipts implement exact semantic-JSON retries, original server
+acceptance, same-actor withdrawal, duplicate-opportunity protection and erased
+source replay barriers. Taste records a private question/panel/prefix response
+and continues through a separately committed NEXT; it never fabricates a delivery,
+Event or numeric measurement. Discovery requires a real delivered page and
+acknowledged impression and admits its new neutral Event types only through the
+canonical writer. Existing ratings, interactions, bootstrap and historical
+UNKNOWN/NOT_INTERESTED meanings remain separate.
+
+The existing admission boundary consumes confirmed skips across the same Profile
+under the independently versioned 24-hour cooldown. Existing hard constraints,
+page rechecks and catalogue-chain seen/refill/exhaustion semantics remain in
+force. Source-lifecycle locking precedes scope locks; this first implementation
+serializes bounded skip/Taste operations for correctness. Finer contention and
+throughput acceptance remain future measured optimization.
+
+Mobile source supplies strict capability/source/receipt decoding, separately
+namespaced Discovery outbox services and the existing Taste single-command
+controller's new typed route. No presentation emits a skip yet. The next UI
+packet must preserve page-local delivery/impression identity and retire stale
+undelivered work only after acknowledgement, then reuse shared artwork and the
+vertical feed. Pending writes are not confirmed evidence. Old queues/sessions
+and completed setup remain preserved.
+
+Validation includes disposable SQL suites and a required real PostgreSQL CLI
+probe with seven observed separate-backend lock waits, exact retry/conflict/
+withdrawal, source-removal races and complete-row cleanup. Legacy v1 removal
+and Item Undo are checked for lifecycle-gate-before-row-lock ordering. Local PGlite is not native
+concurrency or hosted security-advisor evidence. Exact results belong to the PR.
+No hosted operation, reset, new APK/phone observation, model/Working activation,
+Scenario early-return provider or measured quality is inferred from source CI.
+Pool refresh, recent prior, full readiness/usefulness and release gates stay open.
+
+The working checkout's vanished external worktree metadata was restored from
+fresh origin/main; its entire tracked content exactly matched accepted #348
+before creating this branch. No local unpublished source was discarded. The
+previously recorded obsolete remote-ref retirement remains separately tracked;
+this packet does not claim those refs were deleted.

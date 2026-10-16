@@ -42,6 +42,17 @@ function createApi(): EventPersistenceApi {
 }
 
 describe('Event persistence serialization', () => {
+  it('requires native skip command writers instead of the generic Event transport', async () => {
+    const api = createApi();
+    const from = vi.fn();
+    const nativeApi = createSupabaseEventPersistenceApi({ from } as unknown as SupabaseClient);
+    for (const eventType of ['ITEM_CONTEXTUALLY_SKIPPED', 'ITEM_CONTEXTUAL_SKIP_WITHDRAWN'] as const) {
+      const skipped = { ...event, eventType };
+      expect(await persistEvent(api, skipped)).toMatchObject({ status: 'error' });
+      expect(await nativeApi.appendEvent(serializeEvent(skipped))).toMatchObject({ error: expect.any(Object) });
+    }
+    expect(api.appendEvent).not.toHaveBeenCalled(); expect(from).not.toHaveBeenCalled();
+  });
   it('maps a session to the database contract', () => {
     expect(serializeEventSession(session)).toEqual({
       id: 'session-1',

@@ -23,6 +23,7 @@ import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
 import { getRoomTheme } from '@/theme/roomTheme';
 import { createPersonalTasteFlow, type PersonalTasteSnapshot } from './personalTasteFlow';
 import { createPersonalTasteRpc, type TasteAnswer } from './personalTasteOperations';
+import { createContextualSkipRpc } from '../events/contextualSkipOperations';
 import { PersonalTasteScreen } from './PersonalTasteScreen';
 
 import {
@@ -161,7 +162,8 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   const [draftRating, setDraftRating] = useState<number | null>(null);
   const [confirmRemoval, setConfirmRemoval] = useState(false);
   const flow = useMemo(() => createPersonalTasteFlow({ namespace, actorUserId, profileId, storage: Storage,
-    rpc: createPersonalTasteRpc(client), onChange: setSnapshot, autoStart: !status.needsCalibration }), [actorUserId, client, namespace, profileId, status.needsCalibration]);
+    rpc: createPersonalTasteRpc(client), contextualSkipRpc: createContextualSkipRpc(client), onChange: setSnapshot,
+    autoStart: !status.needsCalibration }), [actorUserId, client, namespace, profileId, status.needsCalibration]);
   useLayoutEffect(() => { flow.start(); return () => flow.stop(); }, [flow]);
   const state = snapshot ?? flow.snapshot();
   const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { decodeTasteSkipCapability, type TasteSkipCapability } from '../events/contextualSkipOperations';
 
 export type TasteAnswer = { kind: 'RATING'; value: number } |
   { kind: 'UNKNOWN' | 'NOT_INTERESTED' | 'WITHDRAWN' };
@@ -35,6 +36,7 @@ export type SequentialTasteSession = {
   sessionId: string; revision: number | null;
   status: 'QUESTION' | 'NEEDS_NEXT' | 'PAUSED' | 'STOPPED' | 'REMOVED' | 'SOURCE_WITHDRAWN';
   questionId: string | null; item: TasteItem | null; answered: number; presented: number;
+  contextualSkip: TasteSkipCapability | null;
 };
 export type TasteResponse = { kind: 'session'; value: TasteSession } | { kind: 'challenge'; value: TasteChallenge } |
   { kind: 'sequential'; value: SequentialTasteSession } |
@@ -233,7 +235,7 @@ function mapSequentialTaste(value: unknown, request: TasteCommand['request']): T
     return { kind: 'preserved', legacySessionId: value.status === 'LEGACY_V1_PRESERVED' ? value.legacySessionId as string : null };
   }
   if (!uuid(value.sessionId) || (request.sessionId && request.sessionId !== value.sessionId)) return null;
-  const base = { sessionId: value.sessionId, revision: null, questionId: null, item: null, answered: 0, presented: 0 };
+  const base = { sessionId: value.sessionId, revision: null, questionId: null, item: null, answered: 0, presented: 0, contextualSkip: null };
   if (value.status === 'REMOVED') return { kind: 'sequential', value: { ...base, status: 'REMOVED' } };
   if (value.status === 'SOURCE_WITHDRAWN') return value.reloadRequired === true && request.operation !== 'RESUME'
     ? { kind: 'sequential', value: { ...base, status: 'SOURCE_WITHDRAWN' } } : null;
@@ -249,7 +251,10 @@ function mapSequentialTaste(value: unknown, request: TasteCommand['request']): T
   const current = value.status === 'QUESTION' ? item(value.currentItem) : null;
   if (value.status === 'QUESTION' ? !current || !uuid(value.questionId) || value.answered >= value.presented
     : value.currentItem !== null || value.questionId !== null) return null;
+  const contextualSkip = value.contextualSkip === undefined || value.contextualSkip === null ? null
+    : current && typeof value.questionId === 'string' ? decodeTasteSkipCapability(value.contextualSkip, value.sessionId, value.questionId) : null;
+  if (value.contextualSkip !== undefined && value.contextualSkip !== null && !contextualSkip) return null;
   return { kind: 'sequential', value: { sessionId: value.sessionId, revision: value.revision,
     status: value.status as SequentialTasteSession['status'], questionId: current ? value.questionId as string : null,
-    item: current, answered: value.answered, presented: value.presented } };
+    item: current, answered: value.answered, presented: value.presented, contextualSkip } };
 }

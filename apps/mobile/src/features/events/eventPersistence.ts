@@ -70,6 +70,7 @@ export function createSupabaseEventPersistenceApi(
       return { error: error ? { message: error.message } : null };
     },
     async appendEvent(row) {
+      if (isContextualSkipEvent(row.event_type)) return { error: { message: EVENT_PERSISTENCE_ERROR_MESSAGE } };
       const { error } = await client
         .from('events')
         .upsert(row, { onConflict: 'id', ignoreDuplicates: true });
@@ -90,7 +91,13 @@ export async function persistEvent(
   api: EventPersistenceApi,
   event: Event,
 ): Promise<EventPersistenceResult> {
+  // Native skip Events are created atomically by their command writer only.
+  if (isContextualSkipEvent(event.eventType)) return { status: 'error', message: EVENT_PERSISTENCE_ERROR_MESSAGE };
   return persist(() => api.appendEvent(serializeEvent(event)));
+}
+
+function isContextualSkipEvent(eventType: EventType) {
+  return eventType === 'ITEM_CONTEXTUALLY_SKIPPED' || eventType === 'ITEM_CONTEXTUAL_SKIP_WITHDRAWN';
 }
 
 export function serializeEventSession(
