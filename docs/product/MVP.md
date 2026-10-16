@@ -277,8 +277,19 @@ they do not describe delivered Shared discovery or SharedRatingRound behavior.
 - [ ] `MVP-ALG-007` Cold-start/Taste selection is recognizable, diverse and informative with measured completion/usefulness.
 - [ ] `MVP-ALG-008` SleepLayer has scheduled bounded retry-safe worker, mature-outcome evaluation, monitoring and tested manual canary/rollback; no tiny-sample promotion.
 - [-] `MVP-ALG-009` Clean database/replay and deterministic SQL regression tests cover bootstrap, parity, suppression/refill, time/undo/outcome reconciliation and authorization.
-- [ ] `MVP-ALG-010` Starting with the first accepted rating, supported numeric evidence must enter the same Profile's committed serving prefix before selecting the next fresh Taste or Discovery card/ranking. Contrast declared 0/5/10 and opposite-answer prefixes against an unchanged baseline; show the expected supported score/order differences without requiring every answer to change rank. Discard stale prefetch safely, preserve frozen evaluations/exact delivery origins and retry identity, and verify delayed acknowledgements, restart, withdrawals and scope changes on representative devices. Taste information gain remains within the highest-satisfaction objective; there is no fixed precomputed question order, hardcoded Interstellar→Inception pair, fabricated probability or claim that each observed rating will improve quality. PREDICTION_MODEL owns the objective/freshness contract; measured usefulness remains a separate release gate.
+- [-] `MVP-ALG-010` Starting with the first accepted rating, supported numeric evidence must enter the same Profile's committed serving prefix before selecting the next fresh Taste or Discovery card/ranking. Contrast declared 0/5/10 and opposite-answer prefixes against an unchanged baseline; show the expected supported score/order differences without requiring every answer to change rank. Discard stale prefetch safely, preserve frozen evaluations/exact delivery origins and retry identity, and verify delayed acknowledgements, restart, withdrawals and scope changes on representative devices. Taste information gain remains within the highest-satisfaction objective; there is no fixed precomputed question order, hardcoded Interstellar→Inception pair, fabricated probability or claim that each observed rating will improve quality. PREDICTION_MODEL owns the objective/freshness contract; measured usefulness remains a separate release gate.
 - [ ] `MVP-ALG-011` A sparse/empty Profile's first Item uses a versioned recognizable/diverse cold-start prior informed by eligible recent evidence, explicit minimum support, recency and positive-versus-negative balance. Declare source permissions, denominator/coverage, time cutoffs, decay, shrinkage and safe fallback; guard tiny samples and popularity/exposure bias. Compare recent-supported, lifetime/static and no-prior baselines under the same first-session contract. Neither raw ten counts nor a label such as NPS proves this target, and no unsupported native cohort/external model is admitted. Same empty prefixes may share an opener; source quality, actual usefulness and changing-prefix adaptation remain measurable requirements.
+
+Proposed source `feat/forecast-aware-taste-selection` partially addresses
+`MVP-ALG-010`: new-session `CANONICAL_FORECAST_V3` uses the actual current panel's
+within-domain ordinal preference, utility-first selection and a traced bounded
+domain-coverage guard. Retained session policies and v2 wire/queue remain intact;
+the portable reference exposes an explicit opt-in. This is unmerged source,
+not deployed or quality-accepted behavior. The fixed START-time 25-per-ItemType
+pool still needs refresh/refill. Shared feed/artwork/neutral Ohita, recent prior,
+full readiness, actual device behavior and observed usefulness remain open;
+`MVP-ALG-010`, `MVP-ALG-011` and `MVP-UX-007` are not complete. See the
+[bounded source contract](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16).
 
 ## Portable engine and external-data foundation — bounded completion contracts
 

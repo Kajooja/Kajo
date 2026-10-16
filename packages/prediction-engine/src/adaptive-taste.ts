@@ -8,6 +8,11 @@ export const adaptiveTasteDefaults = Object.freeze({
   scoreTieTolerance: 1e-9, minimumFeatureDistance: 0.10, maximumRetainedBytes: 1_048_576,
   weights: Object.freeze({ recognition: 0.35, preference: 0.45, diversity: 0.10, coverage: 0.10 }),
 });
+/** Explicit opt-in; retained reference states keep their original selection policy. */
+export const adaptiveTasteCanonicalDefaults = Object.freeze({
+  ...adaptiveTasteDefaults, version: 'adaptive-taste-canonical-ordinal-v3' as const,
+  selectionMode: 'CANONICAL_ORDINAL_V3' as const,
+});
 export interface AdaptiveTasteDomainRequirement {
   readonly domain: string;
   readonly minimumRatedItems: number;
@@ -20,6 +25,7 @@ export interface AdaptiveTasteDomainRequirement {
 }
 export interface AdaptiveTastePolicy {
   readonly version: string;
+  readonly selectionMode?: 'CANONICAL_ORDINAL_V3';
   readonly control: 'ADAPTIVE' | 'PRIOR_ONLY';
   readonly domains: readonly AdaptiveTasteDomainRequirement[];
   readonly maximumOpportunities: number;
@@ -68,7 +74,15 @@ export interface AdaptiveTasteQuestion {
   readonly id: string; readonly poolId: string; readonly objectId: string; readonly domain: string;
   readonly presentedAt: number;
   readonly components: Readonly<{ recognition: number; preference: number; diversity: number; coverage: number; utility: number }>;
+  readonly selectionTrace?: AdaptiveTasteSelectionTrace;
   readonly responses: readonly AdaptiveTasteResponse[];
+}
+export interface AdaptiveTasteSelectionTrace {
+  readonly version: 'canonical-ordinal-v3';
+  readonly scoreBasis: 'WITHIN_DOMAIN_CURRENT_PANEL_TIED_MIDRANK';
+  readonly poolId: string; readonly preference: number; readonly candidateCount: number;
+  readonly coverageIntervention: boolean; readonly minimumPresented: number; readonly maximumPresented: number;
+  readonly maximumDomainLead: 2;
 }
 export interface AdaptiveTasteState {
   readonly version: 'adaptive-taste-reference-v1';
@@ -202,6 +216,7 @@ function checkScope(scope: PredictionScope): void {
 }
 function checkPolicy(policy: AdaptiveTastePolicy): void {
   valid(policy && id(policy.version) && ['ADAPTIVE', 'PRIOR_ONLY'].includes(policy.control), 'invalid policy version/control');
+  valid(policy.selectionMode === undefined || policy.selectionMode === 'CANONICAL_ORDINAL_V3', 'unsupported selection mode');
   valid(Number.isInteger(policy.maximumOpportunities) && policy.maximumOpportunities >= 2 && policy.maximumOpportunities <= 64
     && Number.isInteger(policy.maximumCommands) && policy.maximumCommands >= policy.maximumOpportunities * 2 && policy.maximumCommands <= 256
     && Number.isInteger(policy.maximumPoolSize) && policy.maximumPoolSize >= 2 && policy.maximumPoolSize <= 128
@@ -375,13 +390,14 @@ function distinctive(state: AdaptiveTasteState, items: readonly AdaptiveTasteFor
 function featureDiscriminative(state: AdaptiveTasteState, items: readonly AdaptiveTasteForecastRow[]): boolean {
   return items.some((left, index) => items.slice(index + 1).some(right => separated(state, left.candidate, right.candidate)));
 }
-function components(state: AdaptiveTasteState, candidate: TasteCandidate, featureSchemaRef: string): AdaptiveTasteQuestion['components'] {
+function components(state: AdaptiveTasteState, candidate: TasteCandidate, featureSchemaRef: string,
+  forecastPreference?: number): AdaptiveTasteQuestion['components'] {
   const history = effectiveQuestions(state).filter(question => question.domain === candidate.domain
     && state.pools.find(pool => pool.id === question.poolId)!.provenance.featureSchemaRef === featureSchemaRef
     && questionCandidate(state, question).object.artifact.representationVersion === candidate.object.artifact.representationVersion);
   const mass = Object.values(candidate.object.features).reduce<number>((sum, value) => sum + (value ?? 0), 0);
   let numerator = 0, denominator = 0, coverage = 0;
-  for (const question of history) {
+  for (const question of forecastPreference === undefined ? history : []) {
     const answer = latest(question)?.answer;
     if (!answer || !['RATING', 'NOT_INTERESTED'].includes(answer.kind)) continue;
     const overlap = similarity(candidate, questionCandidate(state, question)) ?? 0;
@@ -398,7 +414,7 @@ function components(state: AdaptiveTasteState, candidate: TasteCandidate, featur
     coverage += mass ? value / mass / (1 + support) : 0;
   }
   const recognition = candidate.recognitionPrior ?? 0;
-  const preference = denominator ? 0.5 + 0.5 * numerator / denominator : 0.5;
+  const preference = forecastPreference ?? (denominator ? 0.5 + 0.5 * numerator / denominator : 0.5);
   const overlaps = history.map(question => similarity(candidate, questionCandidate(state, question)))
     .filter((value): value is number => value !== null);
   const diversity = featurePattern(candidate) && (!history.length || overlaps.length)
@@ -407,6 +423,23 @@ function components(state: AdaptiveTasteState, candidate: TasteCandidate, featur
   const utility = state.policy.control === 'PRIOR_ONLY' ? recognition
     : recognition * w.recognition + preference * w.preference + diversity * w.diversity + coverage * w.coverage;
   return { recognition, preference, diversity, coverage, utility };
+}
+
+// Scores are compared only inside one current domain panel. This ordinal
+// component is neither a predicted grade nor a cross-domain score comparison.
+function canonicalOrdinalPreference(item: AdaptiveTasteForecastRow, choices: readonly AdaptiveTasteForecastRow[],
+  tolerance: number): number {
+  if (choices.length <= 1) return 0.5;
+  valid(item.forecast.status === 'AVAILABLE', 'canonical selection requires a forecast');
+  const score = item.forecast.score;
+  let lower = 0, tied = 0;
+  for (const other of choices) {
+    valid(other.forecast.status === 'AVAILABLE', 'canonical selection requires supported choices');
+    const delta = other.forecast.score - score;
+    if (Math.abs(delta) <= tolerance) tied++;
+    else if (delta < 0) lower++;
+  }
+  return (lower + 0.5 * (tied - 1)) / (choices.length - 1);
 }
 
 /** Immutable first-label comparisons. A pair uses one earlier pool, never two per-step scalars. */
@@ -600,6 +633,7 @@ export function advanceAdaptiveTaste(state: AdaptiveTasteState, command: Adaptiv
       && state.receipts.length + 2 <= state.policy.maximumCommands) {
       const unasked = (pool: AdaptiveTastePool) => pool.rows.filter(item => item.candidate.eligible && !item.labelSeen
         && !state.questions.some(q => q.objectId === item.candidate.object.id));
+      const canonicalSelection = state.policy.selectionMode === 'CANONICAL_ORDINAL_V3';
       const choices = command.pools.flatMap(pool => {
         const supported = unasked(pool).filter(item => item.forecast.status === 'AVAILABLE');
         const items = supported.filter(item => supported.some(other => other !== item && featureDiscriminative(state, [item, other])));
@@ -608,14 +642,27 @@ export function advanceAdaptiveTaste(state: AdaptiveTasteState, command: Adaptiv
         const requirement = state.policy.domains.find(r => r.domain === pool.domain)!;
         const progress = Math.min(1, support.ratedItems / requirement.minimumRatedItems);
         const presented = state.questions.filter(question => question.domain === pool.domain).length;
-        return items.map(item => ({ pool, item, progress, presented, components: components(state, item.candidate, pool.provenance.featureSchemaRef) }));
-      }).sort((a, b) => a.progress - b.progress || a.presented - b.presented || b.components.utility - a.components.utility
+        return items.map(item => ({ pool, item, progress, presented, candidateCount: items.length,
+          components: components(state, item.candidate, pool.provenance.featureSchemaRef,
+            canonicalSelection ? canonicalOrdinalPreference(item, items, state.policy.scoreTieTolerance) : undefined) }));
+      });
+      const minimumPresented = choices.length ? Math.min(...choices.map(choice => choice.presented)) : 0;
+      const maximumPresented = choices.length ? Math.max(...choices.map(choice => choice.presented)) : 0;
+      const coverageIntervention = canonicalSelection && maximumPresented - minimumPresented >= 2;
+      const ordered = (coverageIntervention ? choices.filter(choice => choice.presented === minimumPresented) : choices)
+        .sort((a, b) => (canonicalSelection
+          ? b.components.utility - a.components.utility || a.progress - b.progress || a.presented - b.presented
+          : a.progress - b.progress || a.presented - b.presented || b.components.utility - a.components.utility)
         || (a.pool.domain < b.pool.domain ? -1 : a.pool.domain > b.pool.domain ? 1 : 0)
         || (a.item.candidate.object.id < b.item.candidate.object.id ? -1 : 1));
-      const selected = choices[0];
+      const selected = ordered[0];
       if (selected) next = { ...next, lastOfferStatus: 'OFFERED', questions: [...state.questions,
         { id: command.requestId, poolId: selected.pool.id, objectId: selected.item.candidate.object.id, domain: selected.pool.domain,
-          presentedAt: command.at, components: selected.components, responses: [] }] };
+          presentedAt: command.at, components: selected.components,
+          ...(canonicalSelection ? { selectionTrace: { version: 'canonical-ordinal-v3' as const,
+            scoreBasis: 'WITHIN_DOMAIN_CURRENT_PANEL_TIED_MIDRANK' as const, poolId: selected.pool.id,
+            preference: selected.components.preference, candidateCount: selected.candidateCount,
+            coverageIntervention, minimumPresented, maximumPresented, maximumDomainLead: 2 as const } } : {}), responses: [] }] };
       else next = { ...next, lastOfferStatus: command.pools.every(pool => !unasked(pool).length) ? 'CATALOG_EXHAUSTED'
         : command.pools.every(pool => !unasked(pool).some(item => item.forecast.status === 'AVAILABLE')) ? 'FORECAST_UNAVAILABLE' : 'NO_INFORMATION' };
     }

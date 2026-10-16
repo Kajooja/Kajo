@@ -65,7 +65,7 @@ first-session quality gate. Existing v1/completed Profiles stay preserved; no
 account reset, migration replay or model activation is authorized by this plan.
 Anonymous entry and the remaining release dependencies retain their existing gates.
 
-The current source updates bootstrap and captures a fresh canonical forecast after
+The deployed numeric-v2 source updates bootstrap and captures a fresh canonical forecast after
 ANSWER, but its next-question policy prioritizes domain progress/presentation
 before utility and uses forecast availability rather than forecast magnitude.
 The START pool is also frozen at 25 Items per domain. Thus the immediately
@@ -77,6 +77,16 @@ horizontal. These are implementation gaps, not delivered feed acceptance. Identi
 empty Profiles may legitimately share an opening Item; repeated post-answer
 sequences require a versioned prefix/selector investigation rather than randomizing
 titles to look personalized.
+
+The October 16 bounded source successor `feat/forecast-aware-taste-selection`
+addresses this selector gap with a new-session-only immutable
+`CANONICAL_FORECAST_V3` policy: current-panel within-domain ordinal preference,
+utility-first ranking and a traced domain-lead guard. Retained session policies,
+wire replies and frozen history stay unchanged. It is not yet a hosted or
+device/quality acceptance receipt. The START-time 25-per-type pool still needs
+versioned refresh/refill; the neutral skip/shared feed/artwork and recent prior
+remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16)
+and STATUS for the current integration/rollout gate.
 
 Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
 [evidence](../domain/DATA_EVENTS.md), [UX](../product/UX_PRINCIPLES.md) and

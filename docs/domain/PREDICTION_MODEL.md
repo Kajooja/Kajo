@@ -839,6 +839,64 @@ trace must state that objective/tradeoff rather than claim every question is the
 best pleasure recommendation. Discovery exploitation and Taste acquisition share
 state/forecast semantics without requiring identical selection policies.
 
+#### Proposed canonical-forecast selector source — 2026-10-16
+
+`feat/forecast-aware-taste-selection` proposes a bounded first implementation of
+the selection part of this requirement. It is unmerged source, not a deployed
+policy or observed recommendation-quality result. The additive
+`20261016073549_forecast_aware_taste_selection.sql` assigns newly created sessions
+the immutable `CANONICAL_FORECAST_V3` policy. Retained `ADAPTIVE` and `PRIOR_ONLY`
+sessions keep their original selector, catalogue, questions, panels, first
+measurements and exact command replies. The existing v2 public wire protocol,
+owned mobile queue and ANSWER → fresh RESUME → NEXT sequencing remain unchanged.
+
+For each supported, unseen, feature-informative choice, the new private helper
+uses its actual current canonical panel score. The preference component is a
+within-domain tied midrank over that panel's eligible informative choices:
+`(lowerCount + 0.5 * (tiedCount - 1)) / (candidateCount - 1)`, with a `1e-9`
+tie tolerance. Equal forecasts yield neutral `0.5`; missing/seen/uninformative
+choices supply no invented support. Raw scores from BOOK/MOVIE or earlier
+prefixes are never compared. This ordinal component replaces the selector's
+older local rating-similarity preference proxy; it does not count that proxy
+again on top of the canonical forecast.
+
+The versioned utility is `0.35 * recognition + 0.45 * canonicalOrdinalPreference
++ 0.10 * diversity + 0.10 * coverage`. Utility takes priority over rated-progress
+and presentation-count tie breakers, allowing a supported first answer to affect
+the immediate next choice instead of forcing an unconditional domain rotation.
+When currently selectable domains differ by at least two presentations, restrict
+the choice to the least-presented domains before applying that utility. The
+maximum domain lead of two applies among domains with actual supported choices;
+an unavailable domain never forces an invented question. A private per-question
+`selectionTrace` records `canonical-ordinal-v3`,
+`WITHIN_DOMAIN_CURRENT_PANEL_TIED_MIDRANK`, current pool/prediction binding,
+candidate count, preference and coverage-intervention/count/lead fields. The
+bootstrap evidence's `questionPolicyVersion` is `canonical-ordinal-v3` only for
+the new policy; old-session evidence keeps `sequential-taste-numeric-v2`.
+
+The migration adds the helper with direct execution denied to API roles and
+changes the new-session constraint/default. It patches only the two exact
+reviewed dispatch/trace and evidence-version function bodies after source and
+security checks; unknown drift aborts. Existing function identity/owner/ACL,
+old rows, wire replies and previously accepted migration bytes are preserved.
+No hosted apply or actual target acceptance follows from this source receipt.
+
+The optional portable reference offers the same ordinal policy through
+`adaptiveTasteCanonicalDefaults` / `selectionMode: 'CANONICAL_ORDINAL_V3'`.
+It is explicit opt-in: the old default and retained states without that field
+keep their original behavior. A new-mode `PRIOR_ONLY` control retains
+recognition-only utility with the declared coverage guard; it does not change
+retained SQL `PRIOR_ONLY` sessions. See the
+[package usage](../../packages/prediction-engine/README.md#canonical-forecast-selection-opt-in--proposed-source).
+
+This source addresses part of `MVP-ALG-010`, not its full acceptance. The native
+session pool remains frozen at START with the existing bounded 25-per-ItemType
+catalogue; current-state pool refresh/refill remains required. Neutral Ohita,
+the shared feed/artwork, recent supported cold-start prior, complete readiness,
+calibrated grade/probability, actual device observations and measured quality
+remain queued. Synthetic control and populated-upgrade fixtures establish
+selection/preservation behavior only.
+
 ## 9. DiscoveryMode policy
 
 ### FOR_YOU

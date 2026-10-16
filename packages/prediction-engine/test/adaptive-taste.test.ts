@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceAdaptiveTaste, createAdaptiveTaste, inspectAdaptiveTaste } from '../src/adaptive-taste.js';
+import { adaptiveTasteCanonicalDefaults, advanceAdaptiveTaste, createAdaptiveTaste, inspectAdaptiveTaste } from '../src/adaptive-taste.js';
 import type { AdaptiveTasteCommand, AdaptiveTasteDomainRequirement, AdaptiveTasteForecastRow, AdaptiveTastePool, AdaptiveTasteState } from '../src/adaptive-taste.js';
 import type { TasteAnswer } from '../src/taste-selection.js';
 
@@ -556,5 +556,152 @@ describe('sequential adaptive Taste reference', () => {
     state = correct(state, state.questions[0]!.id, { kind: 'WITHDRAWN' });
     expect(state.prefix).toEqual([]);
     expect(inspectAdaptiveTaste(state)).toMatchObject({ status: 'PAUSED_INSUFFICIENT', domains: [{ ratedItems: 0, ready: false }] });
+  });
+});
+
+describe('canonical ordinal question selection opt-in', () => {
+  const domains = [requirement('MOVIE'), requirement('BOOK')];
+  const initial = (control: 'ADAPTIVE' | 'PRIOR_ONLY' = 'ADAPTIVE') => createAdaptiveTaste({
+    scope, at: 100, ratingScale: { min: 0, max: 10 }, domains,
+    policy: { ...adaptiveTasteCanonicalDefaults, control },
+  });
+  const movies = (similar = 6, different = 2) => [
+    candidate('anchor', { warm: 1 }, 10, 'MOVIE', 1),
+    candidate('similar', { warm: 1 }, similar), candidate('different', { dark: 1 }, different),
+  ];
+  const books = () => [candidate('book-a', { pages: 1 }, 1e200, 'BOOK', 0.1),
+    candidate('book-b', { words: 1 }, -1e200, 'BOOK', 0.1)];
+  const pools = (state: AdaptiveTasteState, entries = movies()) => [pool(state, entries), pool(state, books(), 'BOOK')];
+
+  it('uses the first answer canonical forecast for the very next card before domain coverage intervenes', () => {
+    const first = offer(initial(), pools(initial()));
+    expect(first.questions[0]!.objectId).toBe('anchor');
+    const selections = [10, 0, 5].map(value => {
+      const answered = respond(first, { kind: 'RATING', value });
+      const entries = value === 10 ? movies(8, -2) : value === 0 ? movies(-2, 8) : movies(0, 0);
+      const next = offer(answered, pools(answered, entries));
+      expect(next.questions[0]).toEqual(answered.questions[0]);
+      expect(next.questions[0]!.selectionTrace).toEqual(first.questions[0]!.selectionTrace);
+      expect(first.questions[0]!.responses).toEqual([]);
+      expect(next.pools[0]).toEqual(first.pools[0]);
+      expect(next.questions.at(-1)!.selectionTrace).toMatchObject({ coverageIntervention: false,
+        minimumPresented: 0, maximumPresented: 1, candidateCount: 2 });
+      return next.questions.at(-1)!;
+    });
+    expect(selections.map(question => question.objectId)).toEqual(['similar', 'different', 'different']);
+    expect(selections.map(question => question.components.preference)).toEqual([1, 1, 0.5]);
+    expect(selections.every(question => question.domain === 'MOVIE')).toBe(true);
+    expect(inspectAdaptiveTaste(first)).toMatchObject({ qualityAdmitted: false, uncertainty: 'unavailable' });
+
+    // The retained selector continues the untouched BOOK domain first.
+    const legacy = create(domains);
+    const legacyFirst = offer(legacy, pools(legacy));
+    const legacyAnswered = respond(legacyFirst, { kind: 'RATING', value: 10 });
+    expect(offer(legacyAnswered, pools(legacyAnswered, movies(8, -2))).questions.at(-1)!.domain).toBe('BOOK');
+    expect(Object.hasOwn(legacy.policy, 'selectionMode')).toBe(false);
+    expect(Object.hasOwn(legacyFirst.questions[0]!, 'selectionTrace')).toBe(false);
+  });
+
+  it('consumes the supplied current panel instead of counting the old local rating proxy twice', () => {
+    const first = offer(initial(), pools(initial()));
+    const answered = respond(first, { kind: 'RATING', value: 10 });
+    const similar = offer(answered, pools(answered, movies(8, -2)));
+    const different = offer(answered, pools(answered, movies(-2, 8)));
+    expect(similar.questions.at(-1)!.objectId).toBe('similar');
+    expect(different.questions.at(-1)!.objectId).toBe('different');
+    expect(similar.prefix).toEqual(different.prefix);
+    expect(similar.questions.at(-1)!.components.preference).toBe(1);
+    expect(different.questions.at(-1)!.components.preference).toBe(1);
+    expect(different.questions.at(-1)!.selectionTrace).toEqual({ version: 'canonical-ordinal-v3',
+      scoreBasis: 'WITHIN_DOMAIN_CURRENT_PANEL_TIED_MIDRANK', poolId: different.pools.at(-2)!.id,
+      preference: 1, candidateCount: 2, coverageIntervention: false,
+      minimumPresented: 0, maximumPresented: 1, maximumDomainLead: 2 });
+  });
+
+  it('uses tied midranks over only eligible informative unseen rows in the same current domain panel', () => {
+    const state = createAdaptiveTaste({ scope, at: 100, ratingScale: { min: 0, max: 10 },
+      domains: [requirement()], initialKnownObjectIds: ['known'], policy: adaptiveTasteCanonicalDefaults });
+    const entries = [candidate('a', { a: 1 }, 1, 'MOVIE', 1), candidate('b', { b: 1 }, 1 + 5e-10),
+      candidate('missing', { missing: 1 }, null), candidate('known', { known: 1 }, 1e250),
+      { ...candidate('ineligible', { hidden: 1 }, 1e200), candidate: { ...candidate('ineligible', { hidden: 1 }, 1e200).candidate, eligible: false } }];
+    const selected = offer(state, [pool(state, entries)]).questions[0]!;
+    expect(selected.objectId).toBe('a');
+    expect(selected.components.preference).toBe(0.5);
+    expect(selected.selectionTrace).toMatchObject({ candidateCount: 2, preference: 0.5 });
+  });
+
+  it('does not compare raw scores across domain scales or reuse an earlier prefix score', () => {
+    const state = initial();
+    const ordinary = offer(state, pools(state));
+    const scaledBooks = books().map(entry => ({ ...entry, forecast: entry.forecast.status === 'AVAILABLE'
+      ? { ...entry.forecast, score: entry.forecast.score / 1e200 + 4000 } : entry.forecast }));
+    const scaled = offer(state, [pool(state, movies()), pool(state, scaledBooks, 'BOOK')]);
+    expect(scaled.questions).toEqual(ordinary.questions);
+    const answered = respond(ordinary, { kind: 'RATING', value: 10 });
+    const after = offer(answered, pools(answered, movies(-2, 8)));
+    expect(after.questions.at(-1)!.objectId).toBe('different');
+    expect(after.questions.at(-1)!.selectionTrace?.poolId).not.toBe(ordinary.questions[0]!.poolId);
+  });
+
+  it.each(['ADAPTIVE', 'PRIOR_ONLY'] as const)('bounds domain presentation lead for %s without rotating every first answer', control => {
+    let state = initial(control);
+    const entries = (domain: string, recognition: number) => Array.from({ length: 8 }, (_, index) =>
+      candidate(`${domain}-${index}`, { [`feature-${index}`]: 1 }, 8 - index, domain, recognition));
+    for (let index = 0; index < 6; index++) {
+      state = offer(state, [pool(state, entries('MOVIE', 1)), pool(state, entries('BOOK', 0), 'BOOK')]);
+      const question = state.questions.at(-1)!;
+      const movieCount = state.questions.filter(q => q.domain === 'MOVIE').length;
+      const bookCount = state.questions.filter(q => q.domain === 'BOOK').length;
+      expect(Math.abs(movieCount - bookCount)).toBeLessThanOrEqual(2);
+      if (index < 2) expect(question.domain).toBe('MOVIE');
+      if (index === 2) {
+        expect(question.domain).toBe('BOOK');
+        expect(question.selectionTrace).toMatchObject({ coverageIntervention: true, minimumPresented: 0, maximumPresented: 2 });
+      }
+      if (control === 'PRIOR_ONLY') expect(question.components.utility).toBe(question.components.recognition);
+      state = respond(state, { kind: 'UNKNOWN' });
+    }
+    expect(inspectAdaptiveTaste(state).domains.every(domain => domain.ratedItems === 0)).toBe(true);
+  });
+
+  it('does not force an unavailable domain or invent a question from missing or non-informative forecasts', () => {
+    const entries = Array.from({ length: 7 }, (_, index) => candidate(`movie-${index}`, { [`feature-${index}`]: 1 }, 7 - index));
+    let state = initial();
+    for (let index = 0; index < 4; index++) {
+      state = offer(state, [pool(state, entries), pool(state, books().map(entry => ({ ...entry,
+        forecast: { status: 'UNAVAILABLE', reason: 'NO_SUPPORT' } })), 'BOOK')]);
+      expect(state.questions.at(-1)!.domain).toBe('MOVIE');
+      expect(state.questions.at(-1)!.selectionTrace?.coverageIntervention).toBe(false);
+      state = respond(state, { kind: 'UNKNOWN' });
+    }
+    const missing = initial();
+    const unsupported = offer(missing, [pool(missing, [candidate('a', { a: 1 }, null), candidate('b', { b: 1 }, null)])]);
+    expect(unsupported.questions).toEqual([]);
+    expect(inspectAdaptiveTaste(unsupported).status).toBe('FORECAST_UNAVAILABLE_INSUFFICIENT');
+    const singleton = initial();
+    expect(offer(singleton, [pool(singleton, [candidate('only', { a: 1 }, 10)])]).questions).toEqual([]);
+  });
+
+  it('preserves immutable traces and exact retries, and keeps configured safety budgets', () => {
+    const state = createAdaptiveTaste({ scope, at: 100, ratingScale: { min: 0, max: 10 }, domains,
+      policy: { ...adaptiveTasteCanonicalDefaults, maximumOpportunities: 2 } });
+    const command: AdaptiveTasteCommand = { kind: 'OFFER', requestId: 'canonical-retry', expectedRevision: state.revision,
+      at: state.updatedAt + 2, pools: pools(state) };
+    const offered = advanceAdaptiveTaste(state, command).state;
+    expect(Object.isFrozen(offered.questions[0]!.selectionTrace)).toBe(true);
+    const accepted = respond(offered, { kind: 'RATING', value: 10 });
+    const retried = advanceAdaptiveTaste(accepted, command);
+    expect(retried.replay).toBe(true); expect(retried.state).toBe(accepted);
+    expect(retried.state.questions[0]).toEqual(accepted.questions[0]);
+    expect(retried.state.questions[0]!.selectionTrace).toEqual(offered.questions[0]!.selectionTrace);
+    const second = respond(offer(accepted, pools(accepted, movies(8, -2))), { kind: 'UNKNOWN' });
+    const stopped = offer(second, pools(second));
+    expect(stopped.questions).toHaveLength(2);
+    expect(inspectAdaptiveTaste(stopped).status).toBe('BUDGET_EXHAUSTED_INSUFFICIENT');
+  });
+
+  it('refuses unknown opt-in selection modes', () => {
+    expect(() => createAdaptiveTaste({ scope, at: 100, ratingScale: { min: 0, max: 10 }, domains,
+      policy: { selectionMode: 'UNREVIEWED' as 'CANONICAL_ORDINAL_V3' } })).toThrow(/selection mode/);
   });
 });

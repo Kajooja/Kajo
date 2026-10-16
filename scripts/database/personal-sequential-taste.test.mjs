@@ -91,7 +91,7 @@ test('owned sequential Taste v2 / full current schema',async t=>{
         evidence:{sourceIds:['catalog'],cohortIds:[],synthetic:'fixture-only'}};
       const domains=['MOVIE','BOOK'].map(domain=>({domain,minimumRatedItems:4,minimumFeaturePatterns:2,
         minimumForecastCoverage:.75,minimumComparablePairs:1,minimumConcordantFraction:.6,minimumStableComparisons:1,maximumOrderChangeRatio:0}));
-      let ref=reference.createAdaptiveTaste({scope,at:100,ratingScale:{min:0,max:10},domains});
+      let ref=reference.createAdaptiveTaste({scope,at:100,ratingScale:{min:0,max:10},domains,policy:reference.adaptiveTasteCanonicalDefaults});
       for(const value of [10,0,5,'UNKNOWN','NOT_INTERESTED',2,9,1,'WITHDRAW_FIRST',7]){
         if(value==='WITHDRAW_FIRST'){
           const questionId=ref.questions[0].id,requestId=randomUUID();

@@ -13,6 +13,14 @@ Source review confirms the current Taste card has no artwork payload, Discovery'
 detail pager is horizontal, and v2 question selection prioritizes domain coverage
 over utility without ranking by canonical forecast magnitude. ANSWER does update
 bootstrap/canonical forecasts; that alone does not close next-card usefulness.
+The proposed October 16 [selector source](../domain/PREDICTION_MODEL.md#proposed-canonical-forecast-selector-source--2026-10-16)
+adds current-panel ordinal selection only for new `CANONICAL_FORECAST_V3`
+sessions. Its separate-commit 10/0/5 fixtures demonstrate next-choice differences;
+this is source verification, not an observed phone result or hosted rollout.
+After matching backend acceptance, record the actual immutable session policy
+privately alongside the v2 wire version; an old retained v2 session keeps its old
+policy and cannot accept the successor just by updating the APK. No account reset
+is authorized. The shared feed/artwork/Ohita matrix below remains planned.
 The following matrix is **planned / NOT IMPLEMENTED**, under the mandatory
 [near-term ROADMAP targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
 Do not expect these controls in the matching #669 APK or count the old matrix
