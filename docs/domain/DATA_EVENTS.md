@@ -241,8 +241,8 @@ The first bounded #239 source packet defines an **executable reference**, not a
 native writer or mobile control. `kajo-contextual-skip-v1` separates
 `CONTEXTUAL_SKIP` and `WITHDRAW_CONTEXTUAL_SKIP` from every existing Taste answer,
 rating and Item action. The proposed Discovery Event names are
-`ITEM_CONTEXTUALLY_SKIPPED` / `ITEM_CONTEXTUAL_SKIP_WITHDRAWN`; neither is admitted
-by the current Event constraint or mobile EventType. Taste keeps a private
+`ITEM_CONTEXTUALLY_SKIPPED` / `ITEM_CONTEXTUAL_SKIP_WITHDRAWN`; neither was admitted
+by the Event constraint or mobile EventType at this reference checkpoint. Taste keeps a private
 question-bound response. No new Event, bootstrap contribution, recognition,
 consumption, readiness support, impression or reward is emitted by this reference.
 
@@ -287,7 +287,8 @@ overflow; it is not an accepted lifetime product quota or permission to truncate
 outbox is tested against this oracle for lost replies, restart, local-ack failure,
 scope cancellation, blocked conflicts and corrupt/legacy queues. Production RPC
 routing, native concurrent-retry/withdrawal locks, source erasure and client
-capability negotiation still need their own implementation and acceptance.
+capability negotiation were outside this reference checkpoint; the native
+successor below supplies their implementation and separate acceptance boundary.
 
 Suppression uses the separate
 [`contextual-skip-cooldown-v1` policy](PREDICTION_MODEL.md#neutral-skip-eligibility-reference--2026-10-16).
@@ -296,6 +297,58 @@ catalogue-chain refill/exhaustion and stale-undelivered-work retirement must all
 consume the same confirmed cross-surface source before Ohita can be enabled.
 Frozen panels, DeliveredSlates and old exact replies remain immutable. An
 acknowledged rating/save auto-advance must not also issue this command.
+
+### Native contextual skip source — 2026-10-16
+
+The native #239 successor implements the reference using separate authenticated
+`commit_taste_contextual_skip_v1(command)` and
+`commit_discovery_contextual_skip_v1(command)` RPCs. Both consume the exact
+`kajo-contextual-skip-v1` command and return the reference receipt. Only permanent
+own-Personal owners may write Taste; Discovery also accepts current Shared
+members. Server authority is rechecked on every retry. Native contextRef is
+explicitly null until a trusted snapshot provider exists.
+
+Private command storage retains exact semantic JSON, server acceptance and the
+original result. Request identity conflicts fail; a second ID cannot duplicate
+the same shown opportunity, including after withdrawal. An unavailable source
+blocks cached replay. Erasure clears copied payloads and retains minimal replay
+barriers. A private run/source relation records the latest surviving skip set at
+the run cutoff, including suppression before candidate insertion; erasure follows
+these dependencies and clears derived copies. The initial relation conservatively
+covers same-Profile Items, never a different Profile or future cutoff. Deleting an
+account/Profile removes its scoped records. Storage uses
+indexed native rows rather than the oracle's 256-entry fixture lifetime bound.
+
+Taste validates its actual session/question/panel/committed prefix and appends a
+neutral private response. It creates no Event, numeric first-answer measurement
+or bootstrap label. NEXT remains a separate committed operation. Legacy CORRECT
+cannot turn the neutral response into an old answer kind; withdrawal uses the
+new same-actor command. New snapshots advertise an optional exact current-question
+capability; old durable replies remain unchanged.
+
+Discovery resolves the exact delivered page/request, Prediction, Event session
+and acknowledged impression. The source read
+`discovery_contextual_skip_source_v1(request)` exposes that authorized binding.
+Only the dedicated writer admits `ITEM_CONTEXTUALLY_SKIPPED` and
+`ITEM_CONTEXTUAL_SKIP_WITHDRAWN`; generic Event insertion/update cannot forge them.
+No ItemInteraction, rating undo head, rating/consumption, recognition, outcome
+reward or negative evidence is produced. Neutral Events are excluded before
+Working-prefix budgets, not merely assigned zero weight afterward.
+
+Native writes acquire the source-lifecycle gate before scope/receipt locks, using
+READ COMMITTED. The initial implementation serializes these bounded operations
+with source erasure and serving; this is a correctness tradeoff, not a measured
+throughput claim. Legacy removal/history-clearing entries that reach these
+erasers also acquire the exclusive gate before existing row locks; other
+ordinary actions retain shared locking. Earlier frozen forecasts/delivered receipts remain historical.
+Client acknowledgement must retire old undelivered request generations.
+
+Mobile routing validates capabilities and every receipt identity before clearing
+a persisted command. Taste shares its existing one-command queue; Discovery has
+a separately namespaced durable service. Missing capability or an outage never
+maps a skip to an old answer or silently discards it. Feed/gesture emission,
+actual displayed-origin plumbing and phone acceptance remain separate work.
+The source PR/STATUS own the exact tests, CI and installation boundaries.
 
 ## 3. Taste evidence
 

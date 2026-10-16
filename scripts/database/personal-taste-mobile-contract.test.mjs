@@ -9,16 +9,19 @@ import { personalTasteSessionFixtureSql } from './personal-taste-session.mjs';
 
 // Execute the shipped mobile adapter against actual current RPC results, rather
 // than letting a hand-written mobile fixture become a second protocol truth.
+const moduleUrl = source => 'data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source,
+  { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText).toString('base64');
+const skipUrl = moduleUrl(await readFile(new URL('../../apps/mobile/src/features/events/contextualSkipOperations.ts', import.meta.url), 'utf8'));
+const { sendContextualSkip } = await import(skipUrl);
 const source = await readFile(new URL('../../apps/mobile/src/features/settings/personalTasteOperations.ts', import.meta.url), 'utf8');
-const { sendTasteCommand } = await import('data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source,
-  { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText).toString('base64'));
+const { sendTasteCommand } = await import(moduleUrl(source.replace("'../events/contextualSkipOperations'", JSON.stringify(skipUrl))));
 
 test('mobile Taste adapter consumes real session, transition, frozen challenge and removal RPC contracts', async () => {
   const db = new PGlite();
   const owner = 'ab157000-0000-4000-8000-000000000001';
   try {
     await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
-      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       grant usage on schema public,auth to anon,authenticated,service_role;`);
     const { files } = await buildFreshInstallation();
@@ -79,7 +82,7 @@ test('mobile consumes committed sequential forecasts, ratings, pause/resume and 
   const owner = 'ab157000-0000-4000-8000-000000000001';
   try {
     await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
-      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       grant usage on schema public,auth to anon,authenticated,service_role;`);
     for (const file of (await buildFreshInstallation()).files) await db.exec(`begin;${file.sql}commit;`);
@@ -127,6 +130,33 @@ test('mobile consumes committed sequential forecasts, ratings, pause/resume and 
     s = await call(cmd('NEXT')); const pendingQuestion = s.questionId;
     s = await call(cmd('PAUSE')); assert.equal(s.status, 'PAUSED'); assert.equal(s.item, null);
     s = await resume(); s = await call(cmd('CONTINUE')); assert.equal(s.questionId, pendingQuestion);
+    assert.ok(s.contextualSkip, 'the actual fresh snapshot decodes its native capability');
+    const skipCommand = { version: 'kajo-contextual-skip-v1', kind: 'CONTEXTUAL_SKIP', actionId: randomUUID(),
+      actorUserId: owner, profileId, itemId: s.item.id, occurredAt: String(BigInt(Date.now()) * 1000n),
+      origin: s.contextualSkip.origin, contextRef: null, reversesActionId: null };
+    let nativeError;
+    const nativeRpc = async (name, { command }) => {
+      assert.equal(name, 'commit_taste_contextual_skip_v1');
+      await db.exec('begin;');
+      try {
+        await db.query("select set_config('request.jwt.claim.sub',$1,true)", [owner]);
+        await db.exec('set local role authenticated;');
+        const data = (await db.query('select public.commit_taste_contextual_skip_v1($1) value', [command])).rows[0].value;
+        await db.exec('commit;'); return { data, error: null };
+      } catch (error) { await db.exec('rollback;'); nativeError = error; throw error; }
+    };
+    const skipped = await sendContextualSkip(nativeRpc, skipCommand);
+    assert.equal(skipped.status, 'success', nativeError?.message ?? 'the shipped sender consumes the actual native receipt');
+    assert.equal(skipped.receipt.evidence, 'PRIVATE_TASTE_RESPONSE');
+    assert.deepEqual(await sendContextualSkip(nativeRpc, skipCommand), skipped, 'exact mobile retry preserves the native receipt');
+    s = await resume(); assert.equal(s.status, 'NEEDS_NEXT');
+    assert.deepEqual((await db.query('select evidence_kind,rating from private.profile_bootstrap_evidence where profile_id=$1 and active order by rating nulls last', [profileId])).rows, priors);
+    assert.equal((await db.query('select count(*)::integer n from public.events where profile_id=$1', [profileId])).rows[0].n, 0);
+    const withdrawn = await sendContextualSkip(nativeRpc, { ...skipCommand, kind: 'WITHDRAW_CONTEXTUAL_SKIP',
+      actionId: randomUUID(), reversesActionId: skipCommand.actionId });
+    assert.equal(withdrawn.status, 'success');
+    assert.equal(withdrawn.receipt.semantic, 'WITHDRAW_CONTEXTUAL_SKIP');
+    s = await resume();
     // A revised source invalidates earlier cached replies; mobile must reload.
     await rpc('taste_session_v2', { request: cmd('CORRECT', { questionId: firstAnswer.questionId, answer: { kind: 'WITHDRAWN' } }) });
     assert.equal((await call(firstAnswer)).status, 'SOURCE_WITHDRAWN'); s = await resume();

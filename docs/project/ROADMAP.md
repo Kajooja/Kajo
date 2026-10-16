@@ -65,13 +65,15 @@ deliver the shared vertical feed/artwork against that stable boundary, preservin
 exact retry/restart/conflict/undo-withdrawal/lifecycle semantics and old response
 contracts.
 
-The first #239 conformance packet now defines the pure command oracle and
-`contextual-skip-cooldown-v1` with independent disposable SQL and existing-outbox
-recovery tests. Native writers, source erasure, capability routing and complete
-cross-surface admission remain the next dependency. Its 24-hour server-clock
-fallback admits no early Context/Scenario-change shortcut until a trusted provider
-and separately versioned predicate exist. The reference does not activate Ohita
-or close the required native/device/quality targets above.
+The accepted #348 conformance packet defines the pure command oracle and
+`contextual-skip-cooldown-v1`. The native #239 successor adds separate Taste/
+Discovery persistence, source erasure, capability routing and confirmed
+cross-surface admission; exact final CI/integration belongs to its PR/STATUS.
+Displayed-origin plumbing and shared presentation/device acceptance follow.
+The 24-hour server-clock fallback admits no early Context/Scenario-change
+shortcut until a trusted provider and separately versioned predicate exist.
+Source acceptance alone does not activate Ohita or close the required
+native/device/quality targets above.
 
 Define and compare the bounded recent cold-start policy before accepting the full
 first-session quality gate. Existing v1/completed Profiles stay preserved; no

@@ -14,7 +14,8 @@ import { getStaticMockItems } from './mockDiscovery';
 import { createPredictionPageRequest, loadCatalogPredictionPage, type PredictionAvailability, type PredictionContinuationState, type PredictionPageRecovery } from './predictionPageOperations';
 import { createPredictionPageReader, predictionReaderScopeKey, type PredictionReaderScope, type PredictionReaderSnapshot } from './predictionPageReader';
 import { watchFocusedPredictionReader } from './predictionConnectivity';
-import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay } from './predictionRefresh';
+import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteractionEvidenceKey, getPredictionRefreshDelay,
+  getContextualSkipRevision, subscribeToContextualSkip } from './predictionRefresh';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
 const EMPTY: PredictionReaderSnapshot = Object.freeze({ viewId: 'inactive', status: 'idle',
@@ -51,6 +52,8 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   const [fallbackSeed] = useState(() => createUuidV7());
   const bootstrapRevision = useSyncExternalStore(subscribeToBootstrapEvidence,
     getBootstrapEvidenceRevision, getBootstrapEvidenceRevision);
+  const contextualSkipRevision = useSyncExternalStore(subscribeToContextualSkip,
+    getContextualSkipRevision, getContextualSkipRevision);
   const evidenceKey = getInteractionEvidenceKey(interactions);
   const profileId = activeProfile.status === 'ready' ? activeProfile.activeProfile?.id ?? null : null;
   const actorUserId = activeProfile.status === 'ready' ? activeProfile.actorUserId : null;
@@ -59,7 +62,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   const client = connection.status === 'configured' ? connection.client : null;
   const environment = connection.status === 'configured' ? connection.config.url : null;
   const limit = activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20;
-  const revision = JSON.stringify([collectionRevision, bootstrapRevision, evidenceKey]);
+  const revision = JSON.stringify([collectionRevision, bootstrapRevision, contextualSkipRevision, evidenceKey]);
   const scope = useMemo<PredictionReaderScope | null>(() => environment && actorUserId && profileId && sessionId
     ? { environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision } : null,
   [environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision]);
