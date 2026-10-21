@@ -52,6 +52,7 @@ interface EventTrackingState {
   persistenceError: string | null;
   createEventId: () => EventId;
   recordEvent: (input: EventRecordInput, eventId?: EventId) => EventId | null;
+  recordImpression: (input: EventRecordInput) => EventId | null;
   retryPersistence: () => void;
 }
 
@@ -72,7 +73,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
   const [failure, setFailure] = useState<ScopedFailure | null>(null);
-  const impressionKeys = useRef(new Set<string>());
+  const impressionKeys = useRef(new Map<string, EventId>());
   const currentCoordinator = useRef<EventWriteCoordinator | null>(null);
   const namespace = connection.status === 'configured' ? connection.config.url : '';
   const defaultContext = useMemo(() => getRuntimeContext(), []);
@@ -170,12 +171,22 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
 
       if (!current.coordinator.enqueue(event)) return null;
       if (deduplicationKey) {
-        impressionKeys.current.add(deduplicationKey);
+        impressionKeys.current.set(deduplicationKey, eventId);
       }
       return eventId;
     },
     [defaultContext, scopedCoordinator],
   );
+
+  // Return the actual retained impression identity when grid and detail share
+  // one exposure. Never synthesize an acknowledged Event from a prediction ID.
+  const recordImpression = useCallback((input: EventRecordInput) => {
+    if (input.eventType !== 'ITEM_IMPRESSION' || !scopedCoordinator ||
+      currentCoordinator.current !== scopedCoordinator.coordinator ||
+      !canUseEventOrigin(input, scopedCoordinator.session.sessionId)) return null;
+    const key = getImpressionDeduplicationKey(input);
+    return (key ? impressionKeys.current.get(key) : null) ?? recordEvent(input);
+  }, [recordEvent, scopedCoordinator]);
 
   const canSendAction = useCallback((origin: EventActionOrigin) => {
     const coordinator = scopedCoordinator?.coordinator;
@@ -202,6 +213,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       persistenceError,
       createEventId,
       recordEvent,
+      recordImpression,
       retryPersistence,
     }),
     [
@@ -210,6 +222,7 @@ export function EventTrackingProvider({ children }: PropsWithChildren) {
       createEventId,
       persistenceError,
       recordEvent,
+      recordImpression,
       retryPersistence,
       scopedCoordinator?.session,
       status,

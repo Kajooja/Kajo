@@ -220,6 +220,15 @@ still-learning forecast without a quota or an extra mandatory v1 challenge.
 Existing v1 sessions/challenges keep their original flow. STATUS distinguishes
 source acceptance from matching hosted/device observations.
 
+The October 17 shared-feed source now presents sequential questions with the
+same poster/cover, metadata and credited-description card as canonical Discovery.
+It loads public Item presentation for the current owner/question/revision only;
+no panel or delivery identity is synthesized. Optional native capability enables
+neutral Ohita through the existing durable Taste controller, including clearing
+an unsubmitted rating draft. Old v1/challenge/calibration responses remain intact.
+The required hosted skip rollout and actual phone/acquisition acceptance are still
+open; this source does not create anonymous identity or certify readiness.
+
 ### Current v1 source and superseded count plan
 
 The September 10 proposal for approximately 10 movies followed by 10 books,

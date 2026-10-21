@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-16**
+Last updated: **2026-10-21**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,31 +10,61 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — native contextual skip / presentation wiring next
+## Current packet — shared vertical feed source / #239
 
-The accepted [#348](https://github.com/Kajooja/Kajo/pull/348) reference is merged
-as `f7c29e750baa96b9e891ea68af63998dde0afb85` after all five CI #683 gates.
-The next [#239](https://github.com/Kajooja/Kajo/issues/239) source packet under
-#336 is `feat/239-native-contextual-skip`: separate native Taste and Discovery
-writers, exact persistent receipts, source-erasure tombstones and confirmed
-cross-surface eligibility. Its matching PR/issue owns final validation and
-integration receipts; a source implementation is not a hosted installation.
+Accepted native skip [#349](https://github.com/Kajooja/Kajo/pull/349) is merged as
+`f3f90e3d2cdb55783584b48be6ecfaa5985a7c49`, exact tree
+`9fa56590dbecae4a2ea2cb80cf890072ddfa4cf0`. All five final-source CI #688 gates
+passed. Its separate Taste/private-response and Discovery/Event writers,
+24-hour Profile/Item suppression, source erasure and durable adapters are accepted
+source. The two new skip forwards are **not yet installed on the hosted target**;
+the existing installed selector checkpoint below remains authoritative.
 
-The [native protocol](../domain/DATA_EVENTS.md#native-contextual-skip-source--2026-10-16)
-keeps private Taste question/prefix responses separate from actual Discovery
-Event delivery. The independently versioned
-[eligibility rule](../domain/PREDICTION_MODEL.md#native-contextual-skip-admission--2026-10-16)
-uses the accepted 24-hour server clock across the same Profile's surfaces and
-sessions. No native Context/Scenario-change provider is admitted. Existing hard
-eligibility and current-chain seen exclusions still win; expiry permits ranking.
+The one current source branch is `feat/239-shared-vertical-feed`, under
+[#239](https://github.com/Kajooja/Kajo/issues/239) / #336. It connects sequential
+Taste and canonically delivered Discovery cards to the same poster/cover,
+metadata, credited description, first-use help and upward-dismissal presentation.
+Grid stays default. Retained v1/challenge/legacy calibration keeps its original
+answer semantics; collection and unranked Shared-overlay details retain their
+existing presentation because they have no canonical page to attribute a skip to.
 
-Mobile source supplies strict native capability/receipt decoding, a separate
-Discovery durable queue service and Taste's existing single-pending-command
-routing. Presentation does not emit Ohita yet. Current APK, text-only Taste and
-horizontal Discovery cards remain unchanged. Shared feed/artwork, exact displayed
-Discovery origin/impression wiring and device acceptance remain required before
-activation. No account reset, hosted forward or model/Working activation belongs
-to this source packet.
+Taste enriches only its current Item from public catalog data, cancels old
+question/revision/scope reads and keeps the frozen question identity/title.
+Neutral Ohita uses the exact optional question capability and existing one-command
+queue; acknowledgement → fresh RESUME → separate NEXT remains unchanged.
+Missing capability never becomes UNKNOWN/NOT_INTERESTED.
+
+Discovery carries each Item's actual page request through the navigation slate,
+reuses the actual recorded impression ID, and waits for the server's source check.
+The scope-level queue recovers the exact original command even after leaving the
+card or restarting with a new Event session. Pending writes hold the current card.
+After the exact rating/skip receipt or confirmed List/Shared action, the feed drops
+unshown siblings and requests one new canonical card from the committed prefix.
+An ambiguous page read retries the same request. No positive advance also skips.
+A partial/cancelled/multitouch/reversed gesture, description scroll, layout or
+backgrounding does not submit; accessible Ohita shares the deliberate boundary.
+
+Local implementation is committed through `9545719bcffd18965362f66b103aad5dcee84857`.
+The root `KAJO_BUILD_MODE=demo npm run check` passed, including demo iOS/Android
+exports; final mobile lint, typecheck and all 590 tests passed after the last
+source refinements. These are local checks, not configured CI or device evidence.
+On October 21 the owner requested continuation of the interrupted repository
+work. The preserved local branch was reconciled with fresh accepted main; no
+implementation was lost or repeated. GitHub accepted the first source blob
+publication under that renewed instruction. The earlier automatic publication
+hold is resolved; branch/PR publication and the five final-source CI gates still
+need their actual receipts. The PR owns those receipts once created.
+
+**Next action:** complete publication of this branch, run all
+five final-source CI gates and integrate the reviewed tree, then prepare a guarded installation of
+#349's two missing forwards and a matching configured Android build. Preserve all
+existing data/history; do not replay already installed operations. Actual phone
+layout, gestures, accessibility, restart and usefulness remain open in
+[DEVICE_TEST](DEVICE_TEST.md#shared-feed-source-acceptance--239--2026-10-17).
+Versioned Taste pool refill, recent supported prior, full readiness and measured
+quality follow in ROADMAP. No reset or model/Working activation is part of this
+packet. Once created, the PR owns final-source/check/integration receipts; do not infer acceptance
+from this branch's source description. Do not reimplement #348/#349.
 
 Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
@@ -119,17 +149,10 @@ private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
 The merged #346 receipt records this accepted outcome.
-**Next action under [#239](https://github.com/Kajooja/Kajo/issues/239):** after
-this native packet's five final-source CI gates and integration, wire the shared
-vertical feed/artwork to its separate adapters. Preserve
-page-local Prediction/request identity and the actual acknowledged impression;
-retire stale undelivered client work only after acknowledgement. Taste uses
-acknowledgement → fresh RESUME → separately committed NEXT. Do not recreate the
-reference or interpret missing capability as UNKNOWN/NOT_INTERESTED. Continue
-actual device/eligible-owner acceptance and the separately guarded additive
-backend installation; source CI alone does not prove either. Versioned pool
-refresh, recent supported prior, full readiness and measured usefulness retain
-their ROADMAP slots. Existing sessions, accounts and old queued commands survive.
+The shared feed source continuation is described at the top of this file.
+Actual device/eligible-owner acceptance and the separately guarded additive
+backend installation remain required; source CI alone does not prove either.
+Existing sessions, accounts and old queued commands survive.
 The compatible #669 APK remains available for
 [the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
 it does not yet contain the requested feed changes.
@@ -153,10 +176,9 @@ identified a narrower gap in the then-deployed numeric-v2 policy: next-question
 selection ranked domain coverage before utility and did not rank by canonical forecast magnitude,
 even though ANSWER projected the rating and captured a new forecast. The accepted
 #345 source/hosted forward corrects that bounded selection gap for new-policy
-sessions; retained policies keep their exact behavior. Taste currently
-has title-only cards; Discovery artwork lives in a separate horizontal pager.
-The planned neutral **Ohita** also needs a versioned command/evidence contract,
-not relabeling existing UNKNOWN/NOT_INTERESTED records. See ROADMAP for mandatory
+sessions; retained policies keep their exact behavior. At that reported checkpoint Taste had title-only cards and Discovery used a
+horizontal pager. #349 now supplies the separate neutral contract; the current
+branch supplies its shared presentation. Neither changes the installed APK yet. See ROADMAP for mandatory
 ordering and DEVICE_TEST for the reported/planned acceptance boundary.
 
 Independent pure/native fixtures verify canonical-score inversion rather than

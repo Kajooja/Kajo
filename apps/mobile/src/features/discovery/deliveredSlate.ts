@@ -3,6 +3,7 @@ import type { DiscoveryMode, Item } from '../../domain/contracts';
 
 export interface DeliveredItemOrigin {
   readonly predictionId?: string;
+  readonly deliveryRequestId?: string;
   readonly properties: {
     readonly predictionSource: 'hosted' | 'fallback' | 'shared_overlay' | 'unattributed' | 'collection';
     readonly deliveryTier: 'RANKED' | 'SHARED_PENDING' | 'SHARED_MEMBER_HISTORY' | 'UNATTRIBUTED' | 'COLLECTION';
@@ -22,6 +23,7 @@ export function getDeliveredItemOrigin(
 export function buildDeliveredItemOrigins(
   items: readonly Item[], rankedItems: readonly Item[], prediction: string | Readonly<Record<string, string>>,
   source: 'hosted' | 'fallback', shared: SharedDiscoveryStateMap,
+  deliveryRequestIds: Readonly<Record<string, string>> = {},
 ): Readonly<Record<string, DeliveredItemOrigin>> {
   const rankedIds = new Set(rankedItems.map(item => item.id));
   return Object.freeze(Object.fromEntries(items.map(item => {
@@ -33,6 +35,8 @@ export function buildDeliveredItemOrigins(
     const ranked = rankedIds.has(item.id) && Boolean(predictionId);
     return [item.id, Object.freeze({
       ...(ranked && predictionId ? { predictionId } : {}),
+      ...(ranked && source === 'hosted' && deliveryRequestIds[item.id]
+        ? { deliveryRequestId: deliveryRequestIds[item.id] } : {}),
       properties: Object.freeze({
         predictionSource: ranked ? source : deliveryTier === 'RANKED' ? 'unattributed' : 'shared_overlay',
         deliveryTier: !ranked && deliveryTier === 'RANKED' ? 'UNATTRIBUTED' : deliveryTier,

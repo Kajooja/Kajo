@@ -57,23 +57,20 @@ and Taste presentation, not the default Discovery grid.
 | Current-scenario satisfaction objective — `MVP-ALG-010` | Rank for the best supported outcome for this Profile in its current state/Scenario, with the long-term calibrated target of a top-satisfaction / rating-10 outcome. The Interstellar-10 → stronger support for a similar eligible film such as Inception example is a feature/learning test, never a hardcoded title pair or guaranteed next card. Taste information acquisition and FOR_YOU/SURPRISE/RISK tradeoffs must remain explicit. Uncalibrated ordinal scores are not probabilities. |
 | Recent supported cold start — `MVP-ALG-011` | Empty/sparse Profiles use a versioned recent, supported prior with recognition/diversity and honest missing-data fallback. Evaluate recency, the complete rating distribution, sample support and exposure/source bias against the current baseline. An NPS-like net-preference score is a hypothesis to define and compare, not an automatic mapping of Item ratings or a lifetime count of tens. Licensed provider priors, external research and native cross-Profile PopulationMemory retain their separate rights/privacy/admission gates. |
 
-**Execution order:** the bounded canonical-forecast → next-question selector
-correction is accepted in #345 with its verified additive hosted forward. Next
-implement the neutral contextual skip command/Event protocol, durable exact
-idempotency and versioned Scenario eligibility before reusing presentation. Then
-deliver the shared vertical feed/artwork against that stable boundary, preserving
-exact retry/restart/conflict/undo-withdrawal/lifecycle semantics and old response
-contracts.
+**Execution order:** #345's forecast-aware selector and its hosted forward are
+accepted. Neutral conformance #348 and native writers/admission #349 are accepted
+source with their five CI gates. The current `feat/239-shared-vertical-feed`
+packet connects actual question/page/impression origins and the shared card.
+Finish its source integration, then the exact missing #349 hosted forwards,
+configured build and representative device acceptance before preview/usefulness.
 
-The accepted #348 conformance packet defines the pure command oracle and
-`contextual-skip-cooldown-v1`. The native #239 successor adds separate Taste/
-Discovery persistence, source erasure, capability routing and confirmed
-cross-surface admission; exact final CI/integration belongs to its PR/STATUS.
-Displayed-origin plumbing and shared presentation/device acceptance follow.
-The 24-hour server-clock fallback admits no early Context/Scenario-change
-shortcut until a trusted provider and separately versioned predicate exist.
-Source acceptance alone does not activate Ohita or close the required
-native/device/quality targets above.
+The source shares artwork/metadata/description and deliberate upward or accessible
+Ohita, preserves v1/UNKNOWN/NOT_INTERESTED, recovers exact commands across restart,
+and replaces unshown Discovery work only after acknowledgement. Collection and
+unranked overlay detail remain outside the delivered-Event skip boundary. STATUS
+owns source/CI/install receipts and DEVICE_TEST the actual observation matrix.
+The 24-hour server-clock policy admits no early Context/Scenario-change shortcut.
+Source integration does not close full device/quality acceptance or MVP-UX-007.
 
 Define and compare the bounded recent cold-start policy before accepting the full
 first-session quality gate. Existing v1/completed Profiles stay preserved; no

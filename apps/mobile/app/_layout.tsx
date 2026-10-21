@@ -8,6 +8,7 @@ import { DiscoveryModeProvider } from '@/features/discovery/DiscoveryModeContext
 import { DiscoveryModeShell } from '@/features/discovery/DiscoveryModeShell';
 import { ItemInteractionProvider } from '@/features/discovery/ItemInteractionContext';
 import { SharedEndorsementProvider } from '@/features/discovery/SharedEndorsementContext';
+import { DiscoverySkipProvider } from '@/features/events/DiscoverySkipContext';
 import { EventTrackingProvider } from '@/features/events/EventTrackingContext';
 import { ItemListsProvider } from '@/features/lists/ItemListsContext';
 import { ProfileMessagesProvider } from '@/features/messages/ProfileMessagesContext';
@@ -36,6 +37,7 @@ export default function RootLayout() {
         <PersonalProfileProvider>
           <ActiveProfileProvider>
             <EventTrackingProvider>
+              <DiscoverySkipProvider>
               <ItemInteractionProvider>
                 <ItemListsProvider>
                   <ProfileMessagesProvider>
@@ -57,6 +59,7 @@ export default function RootLayout() {
                   </ProfileMessagesProvider>
                 </ItemListsProvider>
               </ItemInteractionProvider>
+              </DiscoverySkipProvider>
             </EventTrackingProvider>
           </ActiveProfileProvider>
         </PersonalProfileProvider>

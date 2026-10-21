@@ -383,6 +383,25 @@ forecasts and selection. Never promise that Interstellar 10 guarantees Inception
 next, that each answer changes rank, or that an unsupported score is a calibrated
 probability of a future ten.
 
+### Shared-feed source boundary — 2026-10-17
+
+The #239 source uses `FeedItemCard` for sequential Taste and canonical Discovery
+cards. Both use poster/cover fallback, metadata, verified description/credit and
+the same persistent first-use help. The image area accepts a deliberate upward
+drag (at least 96 points, vertical dominance, one finger); description and controls
+remain ordinary scroll/touch surfaces. A reversed, partial or cancelled gesture,
+layout or background event submits nothing. Accessible Ohita has the same writer
+and remains available after an unsubmitted rating draft. Reduced motion removes
+gesture translation. These thresholds remain subject to actual device acceptance.
+
+Pending writes retain the displayed Item and disable competing actions. Numeric
+rating uses an explicit save; zero/five remain valid. A fresh card follows only
+an exact server receipt, with stale unshown work retired. Scoped catalog enrichment
+cannot replace a later Taste question. V1/challenge/calibration and collections or
+unranked Shared-overlay detail keep their prior contracts. This is source behavior,
+not an installed APK or accepted native layout. Star/overflow and remaining
+MVP-UX-006 work stay in their ROADMAP slot.
+
 ## Required reconnect recovery — #240 / MVP-UX-003
 
 The 2026-09-12 device report found that Yritä uudelleen remains visible when the
