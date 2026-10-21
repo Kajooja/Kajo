@@ -52,10 +52,20 @@ On October 21 the owner requested continuation of the interrupted repository
 work. The preserved local branch was reconciled with fresh accepted main; no
 implementation was lost or repeated. GitHub accepted the first source blob
 publication under that renewed instruction. The earlier automatic publication
-hold is resolved; branch/PR publication and the five final-source CI gates still
-need their actual receipts. The PR owns those receipts once created.
+hold is resolved. [PR #350](https://github.com/Kajooja/Kajo/pull/350) owns final
+source/check/integration receipts. Its first CI run #690 found a newly reported
+Vite development-tool advisory; the bounded follow-up updates only the pinned
+Vite 7.3.6 dependency and lock entry to upstream's fixed 7.3.7. No audit exception
+or CI gate is weakened. All five gates must pass on that final source.
 
-**Next action:** complete publication of this branch, run all
+The October 21 local rerun passes lint/typecheck, 590 mobile tests, dependency and
+catalogue tests. Deno's npm registry connection is refused locally, so a complete
+root-check pass is not claimed for this environment. Separately run database,
+engine, research and acceptance suites plus all four demo exports pass. A fresh
+read-only hosted check confirms sequential Taste is installed and both new skip
+writers, their source endpoint and ledger are still absent.
+
+**Next action:** finish PR #350's dependency repair, run all
 five final-source CI gates and integrate the reviewed tree, then prepare a guarded installation of
 #349's two missing forwards and a matching configured Android build. Preserve all
 existing data/history; do not replay already installed operations. Actual phone
@@ -63,7 +73,7 @@ layout, gestures, accessibility, restart and usefulness remain open in
 [DEVICE_TEST](DEVICE_TEST.md#shared-feed-source-acceptance--239--2026-10-17).
 Versioned Taste pool refill, recent supported prior, full readiness and measured
 quality follow in ROADMAP. No reset or model/Working activation is part of this
-packet. Once created, the PR owns final-source/check/integration receipts; do not infer acceptance
+packet. PR #350 owns final-source/check/integration receipts; do not infer acceptance
 from this branch's source description. Do not reimplement #348/#349.
 
 Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
