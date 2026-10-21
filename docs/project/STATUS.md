@@ -10,71 +10,61 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — shared vertical feed source / #239
+## Current packet — guarded contextual skip rollout / #239 and #336
 
-Accepted native skip [#349](https://github.com/Kajooja/Kajo/pull/349) is merged as
-`f3f90e3d2cdb55783584b48be6ecfaa5985a7c49`, exact tree
-`9fa56590dbecae4a2ea2cb80cf890072ddfa4cf0`. All five final-source CI #688 gates
-passed. Its separate Taste/private-response and Discovery/Event writers,
-24-hour Profile/Item suppression, source erasure and durable adapters are accepted
-source. The two new skip forwards are **not yet installed on the hosted target**;
-the existing installed selector checkpoint below remains authoritative.
+The shared vertical Taste/Discovery feed is accepted through
+[PR #350](https://github.com/Kajooja/Kajo/pull/350), merge
+`637154d5e6eda1eb6ad87c3cdb792b6b8eda0929`, tree
+`03543ff23686783655f5ffd8e23c5ab7dd755a01`. All five final-source
+[CI #691 gates](https://github.com/Kajooja/Kajo/actions/runs/39585242416) passed,
+including full tests, configured exports, two clean installations, populated
+upgrade and native CLI/history/concurrency. Vite is pinned to 7.3.7 after the
+first run's dependency audit failure; no gate was weakened. No feed source merge
+or local recovery remains pending. Do not repeat #348/#349/#350.
 
-The one current source branch is `feat/239-shared-vertical-feed`, under
-[#239](https://github.com/Kajooja/Kajo/issues/239) / #336. It connects sequential
-Taste and canonically delivered Discovery cards to the same poster/cover,
-metadata, credited description, first-use help and upward-dismissal presentation.
-Grid stays default. Retained v1/challenge/legacy calibration keeps its original
-answer semantics; collection and unranked Shared-overlay details retain their
-existing presentation because they have no canonical page to attribute a skip to.
+The accepted source shares artwork/metadata/credited description, first-use help,
+deliberate upward dismissal and accessible Ohita. It binds Taste to the exact
+question/revision and Discovery to the actual page/Prediction/impression, preserves
+exact commands across restart and refreshes only after acknowledgement. Grid stays
+default; retained v1/challenge/legacy responses and collection/unranked overlay
+paths preserve their original semantics. Source acceptance is not hosted, APK,
+phone or recommendation-quality acceptance.
 
-Taste enriches only its current Item from public catalog data, cancels old
-question/revision/scope reads and keeps the frozen question identity/title.
-Neutral Ohita uses the exact optional question capability and existing one-command
-queue; acknowledgement → fresh RESUME → separate NEXT remains unchanged.
-Missing capability never becomes UNKNOWN/NOT_INTERESTED.
+**One active continuation:** `fix/239-skip-hosted-compatibility` prepares the exact
+missing hosted chain. The October 21 read-only check found sequential Taste and
+#345's selector installed, all new skip endpoints/ledger absent, and nine of ten
+required old function bodies matching. The retained compact
+`private.remove_profile_import_job_v1(uuid)` is the only mismatch. Its known
+format/alias difference must be bridged before the immutable Taste-skip forward;
+never loosen that forward's guard or replay installed history.
 
-Discovery carries each Item's actual page request through the navigation slate,
-reuses the actual recorded impression ID, and waits for the server's source check.
-The scope-level queue recovers the exact original command even after leaving the
-card or restarting with a new Event session. Pending writes hold the current card.
-After the exact rating/skip receipt or confirmed List/Shared action, the feed drops
-unshown siblings and requests one new canonical card from the committed prefix.
-An ambiguous page read retries the same request. No positive advance also skips.
-A partial/cancelled/multitouch/reversed gesture, description scroll, layout or
-backgrounding does not submit; accessible Ohita shares the deliberate boundary.
+The explicit order is pinned in
+`scripts/database/contextual-skip-hosted-upgrade.json`:
 
-Local implementation is committed through `9545719bcffd18965362f66b103aad5dcee84857`.
-The root `KAJO_BUILD_MODE=demo npm run check` passed, including demo iOS/Android
-exports; final mobile lint, typecheck and all 590 tests passed after the last
-source refinements. These are local checks, not configured CI or device evidence.
-On October 21 the owner requested continuation of the interrupted repository
-work. The preserved local branch was reconciled with fresh accepted main; no
-implementation was lost or repeated. GitHub accepted the first source blob
-publication under that renewed instruction. The earlier automatic publication
-hold is resolved. [PR #350](https://github.com/Kajooja/Kajo/pull/350) owns final
-source/check/integration receipts. Its first CI run #690 found a newly reported
-Vite development-tool advisory; the bounded follow-up updates only the pinned
-Vite 7.3.6 dependency and lock entry to upstream's fixed 7.3.7. No audit exception
-or CI gate is weakened. All five gates must pass on that final source.
+1. `20261021144932_contextual_skip_import_compatibility.sql`: exact compact-body
+   compatibility only; preserves identity/security/rows and refuses unknown drift.
+   Canonical pre-skip and exact final Taste bodies are no-ops for fresh installs.
+2. Unchanged `20261016161919_native_contextual_skip.sql` from #349.
+3. Unchanged `20261016162039_taste_contextual_skip.sql` from #349.
 
-The October 21 local rerun passes lint/typecheck, 590 mobile tests, dependency and
-catalogue tests. Deno's npm registry connection is refused locally, so a complete
-root-check pass is not claimed for this environment. Separately run database,
-engine, research and acceptance suites plus all four demo exports pass. A fresh
-read-only hosted check confirms sequential Taste is installed and both new skip
-writers, their source endpoint and ledger are still absent.
+The disposable populated rehearsal preserves old rows, v1 sessions/frozen
+challenges, v2 START receipts, function metadata and history. Actual committed
+v2 answers/neutral commands remain covered by the existing native skip tests.
+Both prerequisite-first and chronological fresh paths must reach identical final
+functions. The required native CLI gate also runs the compact-hosted rehearsal.
+These modules have no hosted apply entry point.
 
-**Next action:** finish PR #350's dependency repair, run all
-five final-source CI gates and integrate the reviewed tree, then prepare a guarded installation of
-#349's two missing forwards and a matching configured Android build. Preserve all
-existing data/history; do not replay already installed operations. Actual phone
-layout, gestures, accessibility, restart and usefulness remain open in
+**Next action:** inspect this continuation's PR for its exact source, five required
+CI gates and integration/rollout receipt. Until a verified hosted receipt exists,
+refresh target/history/object checks and install only the three reviewed operations
+in the explicit order above after source acceptance. Preserve all existing data.
+Then build a matching configured Android APK and record actual phone layout,
+gestures, accessibility, restart and usefulness in
 [DEVICE_TEST](DEVICE_TEST.md#shared-feed-source-acceptance--239--2026-10-17).
-Versioned Taste pool refill, recent supported prior, full readiness and measured
-quality follow in ROADMAP. No reset or model/Working activation is part of this
-packet. PR #350 owns final-source/check/integration receipts; do not infer acceptance
-from this branch's source description. Do not reimplement #348/#349.
+Do not infer installed state from migration filenames or reapply an acknowledged
+operation. Versioned pool refill, recent supported prior, full readiness and
+measured quality follow in ROADMAP. No reset or model/Working activation is part
+of this packet. #239/#336 and incomplete release gates remain open.
 
 Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
@@ -159,7 +149,7 @@ private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
 The merged #346 receipt records this accepted outcome.
-The shared feed source continuation is described at the top of this file.
+The accepted shared feed and guarded rollout continuation are described at the top of this file.
 Actual device/eligible-owner acceptance and the separately guarded additive
 backend installation remain required; source CI alone does not prove either.
 Existing sessions, accounts and old queued commands survive.
@@ -187,8 +177,7 @@ selection ranked domain coverage before utility and did not rank by canonical fo
 even though ANSWER projected the rating and captured a new forecast. The accepted
 #345 source/hosted forward corrects that bounded selection gap for new-policy
 sessions; retained policies keep their exact behavior. At that reported checkpoint Taste had title-only cards and Discovery used a
-horizontal pager. #349 now supplies the separate neutral contract; the current
-branch supplies its shared presentation. Neither changes the installed APK yet. See ROADMAP for mandatory
+horizontal pager. #349 now supplies the separate neutral contract; accepted #350 supplies its shared presentation. Neither changes the installed APK yet. See ROADMAP for mandatory
 ordering and DEVICE_TEST for the reported/planned acceptance boundary.
 
 Independent pure/native fixtures verify canonical-score inversion rather than
@@ -378,18 +367,19 @@ the actual hosted checkpoint need their guarded deployment procedure.
 
 ## Repository hygiene and historical evidence
 
-The [October 16 audit](retros/branch-audit-2026-10-16.json) checked all **51 original
-remote branches** and found no open PR. Forty development heads are reachable
-from accepted main; two closed duplicate branches (#303 → #327 and #306 → #323)
-have their requirements/source preserved in accepted replacements. All 42 are
-eligible for retirement. Main and the eight consumed catalogue operation refs
-remain intentional; do not reactivate those operations.
+The [October 21 audit](retros/branch-audit-2026-10-21.json) refreshes all **55
+remote branches** at accepted #350, with no open PR before this continuation.
+Forty-four development heads are reachable from main; the two closed duplicates
+(#303 → #327 and #306 → #323) retain accepted replacements. Those **46** refs can
+be retired after fresh PR/ref checks. Main and the eight consumed catalogue
+operation refs remain intentional and must not be reactivated.
 
-Remote deletion is **not completed**: command-line Git lacked write credentials,
-the connector has no branch-delete action, and the browser fallback timed out.
-Fresh remote readback confirms all original 51 SHAs are unchanged. The audit
-records exact candidates for a later authenticated, leased deletion after fresh
-PR/ref checks; it does not leave an unknown deletion outcome.
+Remote deletion remains **not completed**: the connector has no branch-delete
+operation and a non-mutating Git push probe confirms that command-line Git still
+has no write credentials. No remote ref was deleted or moved by the audit. The
+prior [October 16 audit](retros/branch-audit-2026-10-16.json) is historical evidence,
+not the active candidate count. This limitation must not be reported as completed
+hygiene or silently dropped from the next handoff.
 
 Two old local change sets were already accepted: all nine staged terminal-refresh
 files exactly match #301, and an obsolete STATUS draft is superseded by #344/#346.

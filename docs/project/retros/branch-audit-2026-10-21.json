@@ -1,0 +1,343 @@
+{
+  "auditDate": "2026-10-21",
+  "acceptedMain": "637154d5e6eda1eb6ad87c3cdb792b6b8eda0929",
+  "remoteBranchCountBefore": 55,
+  "remoteBranchCountAfter": 55,
+  "openPullRequestsBefore": 0,
+  "retirementCandidateCount": 46,
+  "remoteDeletion": "NOT_PERFORMED: connector has no branch-delete operation; non-mutating Git push probe confirms no command-line credentials. Fresh PR/ref readback is required before any later deletion.",
+  "branches": [
+    {
+      "branch": "catalog-acquisition/ol-20260831",
+      "sha": "4308943cf0157ec6648017a0bf7a25e5b0876c5a",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-conflicts",
+      "sha": "11bada2563374616cc8d014d787039c9235ea071",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-continuation",
+      "sha": "f2558795be45be17bd2632071cf25746e4ec82a2",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-framed",
+      "sha": "67b4a7480af41c1e664c6b80bbe7754530ec59b2",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-reviewed",
+      "sha": "4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831",
+      "sha": "bbc351eb9fa7eee0fb25f2183be3c1a729b59191",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-edition-prefix",
+      "sha": "be0ec18cdc968b5643e45c57c5ab9919f885e195",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-work-prefix",
+      "sha": "6a6dc390940db1b15d68a8d850dd08bfbb88bd4a",
+      "disposition": "retain",
+      "reason": "consumed-operation-identity"
+    },
+    {
+      "branch": "chore/repository-hygiene-20261016",
+      "sha": "9e1c4c6ca3b931190fc6ed103d0fe1d726b5fabc",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "chore/sequential-taste-rollout",
+      "sha": "27b7e85211d30ae359854f26f9858ca144b78134",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "docs/302-engine-buildout",
+      "sha": "ac7133fdda35d2b68b9dbc8bcab5f0e9fe8d7287",
+      "disposition": "retirement-pending-access",
+      "reason": "superseded-by-merged-PR",
+      "replacementPr": 327
+    },
+    {
+      "branch": "docs/326-engine-handoff",
+      "sha": "52d370946d0f60f89f328113849980924a1c4f53",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "docs/forecast-selection-acceptance",
+      "sha": "0801958552aa123f546a8352cd2da08fae2fd403",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "docs/sequential-taste-rollout-receipt",
+      "sha": "a2640edccbcc174acccdbdd60a964c8f4ac82c3f",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "docs/taste-mobile-acceptance",
+      "sha": "c02aec0de6866849c9120e091d5f8de09cdc519c",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/228-delivered-origin",
+      "sha": "9fac7ec772959465ea4b25bf8ad1b86de4fcef8e",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-pre-response-inputs",
+      "sha": "16e8e64a382fa07fd49b78815dc1339d0fa3d72a",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-shadow-source-erasure",
+      "sha": "02d45088c1e5c26e21bc3f1038fd247861e340bf",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-shared-ordinal-evaluation",
+      "sha": "6708f2a56ba61385898d8dd5ed823095a3d2b25b",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-shared-round-evidence",
+      "sha": "9e3c49a7398320f6473acd0fb36230d30056b7e6",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-shared-round-replay",
+      "sha": "70891b757dca5d01d245b9fbaf4f6cd6e0e73288",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/232-shared-vector-captures",
+      "sha": "0d756feb78dfa6e7fab24108a3ec7b215d24c59b",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/239-contextual-skip-protocol",
+      "sha": "6b0f5ffd119abb6d4012010d3d0358dc4919cefe",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/239-native-contextual-skip",
+      "sha": "8ad9a9641b780fb5b48ec077ecfbf49b2103fbc8",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/239-shared-vertical-feed",
+      "sha": "9d58104f2195fe98be17770407e7aa9a71cde5c0",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/adaptive-taste-reference",
+      "sha": "7d81bb60f44dc286a890096d191e3d0acf174382",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/durable-sequential-taste",
+      "sha": "e1451ba28745704efeb6d429a25a84f8e9e69e0e",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/forecast-aware-taste-selection",
+      "sha": "743951ac1f69e3edf36f205e281c53d401ab8821",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/kajo-first-session",
+      "sha": "9710f9cedf51bff12cbda0130d8fa4580b6d5c7a",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/mobile-personal-taste",
+      "sha": "bebd53613a0bc10917feb36b87e9a221dcf2295b",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/native-item-support",
+      "sha": "f017c089d8414a87fbb7168761019b471ee3dde6",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-session-state",
+      "sha": "523d8eb6eb45045da6f9b9c4327b96b3a5d036ea",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-source-fusion",
+      "sha": "70d4e48f8260bc3462fa40cbea221184e63c0bb3",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-taste-challenge",
+      "sha": "f2575a2b5a91bdd893e28e07d8d8a7c3235ec008",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-taste-session",
+      "sha": "b7dd4f799358ca167ec1d5a178d290608aacd9ed",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-bridge",
+      "sha": "0b98c3eaa2d7b6c44a6460d1de041d9cec782e5a",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-candidate-features",
+      "sha": "0103d941944cbf0b545686ad60d13b08bc068b9d",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-cohort",
+      "sha": "57c43dda3e9db205415dc6353c4ba22b649ca3e9",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-evaluation",
+      "sha": "9352e3e711e41e773d9092167eb58052c71156da",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-prospective",
+      "sha": "f68569b5c0545e5081fbc2b246ea27cacd33c572",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-report",
+      "sha": "963a3ab0ccf577d22cab02b2a5300f59d7eee9db",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/personal-working-reset",
+      "sha": "78a79dd0cfb5e49b400357443bf8d54de01cf6e7",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/sequential-taste-mobile",
+      "sha": "82fd56505deb6448c2d9ded74155b0fa13a9ff72",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/shared-overlay-integration",
+      "sha": "08efb7b8ad60e4dd857d0664bd0bbef6bec03455",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/taste-evaluation-scoring",
+      "sha": "587ce886bb9fa5e7e987e5e208a56536f7b7a788",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "feat/taste-hosted-upgrade",
+      "sha": "835098a4b69f1173a2f61b1c87d11b03647bb919",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/177-shared-overlay-eligibility",
+      "sha": "d14c705d33ff633f86d3bc133dd9b701b6f210cd",
+      "disposition": "retirement-pending-access",
+      "reason": "superseded-by-merged-PR",
+      "replacementPr": 323
+    },
+    {
+      "branch": "fix/199-discovery-catalog-append",
+      "sha": "36a788d1c5e97ac862f07cfd6a6470fa6c61b4e4",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/199-discovery-end-refresh",
+      "sha": "825ecc1c809008a0c312e0bfef2b901476b86808",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/232-ci-startup-lifecycle",
+      "sha": "c3b98bbaf1f4c7cb26b2a3f7c76ced6c6503e873",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/238-native-audit-october",
+      "sha": "00f0bad9ed35c8647b72f8dd584df039ae8d0f9e",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/discovery-committed-refresh",
+      "sha": "87fe584d9e3d92c95a2e6617f5fdc70b0fc03d57",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/personal-decay-parity",
+      "sha": "b822fcadf9b9c78eeeaf213ac2543dd52467810e",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "fix/taste-guard-compatibility",
+      "sha": "7a64762db300314e22fe23e5af1713e0b62131b2",
+      "disposition": "retirement-pending-access",
+      "reason": "reachable-from-main"
+    },
+    {
+      "branch": "main",
+      "sha": "637154d5e6eda1eb6ad87c3cdb792b6b8eda0929",
+      "disposition": "retain",
+      "reason": "accepted-main"
+    }
+  ]
+}

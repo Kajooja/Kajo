@@ -46,6 +46,7 @@ import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
+import { contextualSkipHostedManifest, contextualSkipHostedUpgradeSql } from './contextual-skip-hosted-upgrade.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
 import { loadSequentialTasteHostedForwards, sequentialTasteHostedUpgradeSql } from './personal-sequential-taste-hosted-upgrade.mjs';
 import { verifyPersonalTasteChallengeConcurrency } from './personal-taste-challenge-concurrency.mjs';
@@ -267,6 +268,12 @@ try {
       await sequentialTasteHostedUpgradeSql(await loadSequentialTasteHostedForwards(), { bootstrapVariant: 'COMPACT_V1' }),
       { stage: 'v1-compact-to-sequential-taste-populated-upgrade', timeoutMs: 180_000 });
     assert.match(sequentialTasteHostedCompactUpgrade?.sequentialTasteHostedUpgrade, /^PASS: exact two-forward chain/);
+    const skipCheckpoint = files.findIndex(file => file.name === contextualSkipHostedManifest.sourceCheckpoint);
+    assert.ok(skipCheckpoint > evaluationIndex);
+    await resetFromMigrations(files.slice(0, skipCheckpoint + 1));
+    const [contextualSkipHostedUpgrade] = await exec(await contextualSkipHostedUpgradeSql(),
+      { stage: 'contextual-skip-hosted-upgrade' });
+    assert.match(contextualSkipHostedUpgrade?.contextualSkipHostedUpgrade, /^PASS: exact compact prerequisite/);
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -424,7 +431,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation,
-      personalSequentialTaste, contextualSkipConcurrency, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
+      personalSequentialTaste, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

@@ -7595,3 +7595,30 @@ resolving the earlier automatic publication hold. Complete this same packet and
 its five final-source CI gates before integration. The PR owns the eventual
 branch/tree/check/merge receipts. Hosted forwards, matching configured APK and
 actual device/quality acceptance remain distinct subsequent work.
+
+
+### Shared feed accepted; guarded skip rollout preparation — 2026-10-21
+
+The interrupted source packet is integrated by #350 as
+`637154d5e6eda1eb6ad87c3cdb792b6b8eda0929`, exact tree
+`03543ff23686783655f5ffd8e23c5ab7dd755a01`, after all five CI #691 gates.
+The bounded Vite 7.3.7 repair resolves the newly reported dependency audit failure
+without an exception. No source recovery or feed merge remains pending.
+
+The next `fix/239-skip-hosted-compatibility` packet supplies an additive exact
+compact import-removal prerequisite and pinned three-operation order before the
+two unchanged #349 forwards. Source inspection and read-only hosted preflight
+found 9/10 old bodies matching; only the known compact removal body differs.
+The compatibility migration changes no user row, grant, identity or history.
+Tests reject unknown body/security variants and exercise real authorized import
+removal, outsider denial, full populated-chain preservation and final source
+parity for prerequisite-first versus chronological fresh installation. The
+required native CLI gate also runs the compact checkpoint rehearsal.
+
+STATUS, ROADMAP, MVP and CODEMAP now distinguish accepted #350 from this guarded
+rollout. The October 21 branch audit finds 55 remote refs: 46 retireable development
+refs and nine intentional main/consumed-operation refs. The deletion remains
+blocked by absent command-line credentials/connector delete capability, with no
+unknown deletion outcome. Existing device, algorithm quality, pool refill, prior,
+readiness and release requirements remain open; no reset or model activation.
+The source PR owns exact final checks, integration and any later hosted receipt.

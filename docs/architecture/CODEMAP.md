@@ -42,6 +42,21 @@ native Supabase CLI generation before its full fresh install. The original
 `personal-taste-hosted-upgrade.*` manifest/guard remain immutable; STATUS owns the
 current source/build/rollout receipt and DEVICE_TEST the actual native acceptance.
 
+## Contextual skip rollout preparation — #239 / #336
+
+`scripts/database/contextual-skip-hosted-upgrade.{json,mjs,test.mjs}` pins the
+explicit compatibility-prerequisite → native skip → Taste skip order. The new
+`20261021144932_contextual_skip_import_compatibility.sql` replaces only the exact
+reviewed compact import-removal body, preserving its OID, complete non-body
+metadata and direct grants. Unknown bodies/security fail closed; canonical and
+exact post-skip forms are no-ops. Deployed and accepted #349 files stay immutable.
+The disposable rehearsal verifies old rows, v1/challenge/v2 START receipts,
+function identity/security and migration history. Existing native skip tests own
+committed first-answer/command/concurrency behavior. The native CLI gate runs
+this retained compact path as well as chronological fresh installation. These
+helpers neither select a hosted target nor execute a hosted write; STATUS and
+the source PR own deployment acceptance and the next device gate.
+
 ## Prospective Personal evaluation evidence — active source only
 
 | Boundary | Meaningful paths |
