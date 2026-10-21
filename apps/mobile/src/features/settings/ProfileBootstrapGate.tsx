@@ -25,6 +25,7 @@ import { createPersonalTasteFlow, type PersonalTasteSnapshot } from './personalT
 import { createPersonalTasteRpc, type TasteAnswer } from './personalTasteOperations';
 import { createContextualSkipRpc } from '../events/contextualSkipOperations';
 import { PersonalTasteScreen } from './PersonalTasteScreen';
+import { useTasteItemPresentation } from './useTasteItemPresentation';
 
 import {
   appendProfileCalibrationCandidates,
@@ -168,6 +169,8 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   const state = snapshot ?? flow.snapshot();
   const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));
   const identity = `${state.sequential?.sessionId ?? state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.sequential?.revision ?? state.challenge?.revision ?? state.session?.revision ?? ''}:${state.sequential?.questionId ?? challengeItem?.id ?? state.session?.item?.id ?? ''}`;
+  const presentationItem = useTasteItemPresentation(client, `${namespace}:${actorUserId}:${profileId}:${identity}`,
+    state.sequential?.status === 'QUESTION' ? state.sequential.item : null);
   const committedIdentity = useRef(identity);
   useLayoutEffect(() => { committedIdentity.current = identity; setDraftRating(null); setConfirmRemoval(false); }, [identity]);
   const current = () => committedIdentity.current === identity;
@@ -185,6 +188,13 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
     }
   }
   return <PersonalTasteScreen state={state} theme={theme} begun={begun} draftRating={draftRating}
+    presentationItem={presentationItem} onSkip={() => {
+      const question = state.sequential;
+      if (!current() || !question?.item || question.revision === null) return false;
+      const accepted = flow.skipCurrent(question.item.id, question.revision);
+      if (accepted) setDraftRating(null);
+      return accepted;
+    }}
     confirmRemoval={confirmRemoval} onBegin={() => { if (current()) { setBegun(true); flow.begin(); } }}
     onDraftChange={rating => { if (current()) setDraftRating(rating); }} onAnswer={answer}
     onBooks={() => { if (current() && state.session?.revision !== null && state.session) flow.acknowledgeBooks(state.session.revision); }}

@@ -27,6 +27,7 @@ export interface VisiblePredictionRanking {
   items: readonly Item[];
   predictionId: PredictionId | null;
   predictionIds: Readonly<Record<string, PredictionId>>;
+  deliveryRequestIds?: Readonly<Record<string, string>>;
   viewId: string;
   source: 'hosted' | 'fallback';
   status: 'loading' | 'ready' | 'error';
@@ -104,6 +105,9 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
     return { predictionId, items, predictionIds: Object.fromEntries(items.map(item => [item.id, predictionId])) };
   }, [fallbackSeed, itemType, mode]);
 
+  const deliveryRequestIds = useMemo(() => Object.fromEntries(snapshot.pages.flatMap(page =>
+    page.ranking.items.map(item => [item.id, page.request.requestId]))), [snapshot.pages]);
+
   if (!client) return { ...fallback, viewId: fallback.predictionId, source: 'fallback', status: 'ready',
     message: null, availability: 'ITEMS', continuationState: null, hasNextPage: false, loadingNextPage: false, nextPageError: null,
     recovery: null, retrying: false, retry, refresh, loadMore };
@@ -111,6 +115,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   const first = snapshot.pages[0];
   const last = snapshot.pages.at(-1);
   return { items: snapshot.items, predictionIds: snapshot.predictionIds,
+    deliveryRequestIds,
     predictionId: first?.ranking.predictionId ?? null, viewId: snapshot.viewId, source: 'hosted',
     status: first ? 'ready' : snapshot.message ? 'error' : 'loading',
     message: first ? null : snapshot.message, availability: last?.availability ?? null,

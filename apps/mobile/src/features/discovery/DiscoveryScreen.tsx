@@ -85,7 +85,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const origins = useMemo(() => buildDeliveredItemOrigins(
     rankedItems, ranking.items, ranking.predictionIds, ranking.source,
     isSharedDiscovery ? sharedEndorsements.stateByItemId : {},
-  ), [rankedItems, ranking.items, ranking.predictionIds, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
+    ranking.deliveryRequestIds,
+  ), [rankedItems, ranking.items, ranking.predictionIds, ranking.deliveryRequestIds, ranking.source, isSharedDiscovery, sharedEndorsements.stateByItemId]);
   const items = useMemo(() => sharedOverlayReady
     ? getDiscoverableItems(rankedItems, interactions) : [], [sharedOverlayReady, rankedItems, interactions]);
   const predictionId = ranking.predictionId;

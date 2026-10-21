@@ -76,6 +76,7 @@ interface ItemInteractionState {
   canDiscardAction: boolean;
   discardRejectedAction: () => void;
   collectionRevision: number;
+  subscribeToCommittedActions: (listener: (receipt: ProfileActionReceipt) => void) => () => void;
   submitCollectionAction: (intent: CollectionActionIntent, source: CollectionActionSource,
     origin?: EventRecordInput) => Promise<CollectionSubmissionResult>;
   retryHydration: () => void;
@@ -122,6 +123,11 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const outbox = useRef<{ key: string; sessionId: string; coordinator: ItemActionOutbox<PendingProfileAction> } | null>(null);
   const collectionWaiters = useRef(new Map<string, { key: string; resolve: (result: CollectionSubmissionResult) => void }>());
   const [collectionRevision, setCollectionRevision] = useState(0);
+  const commitListeners = useRef(new Set<(receipt: ProfileActionReceipt) => void>());
+  const subscribeToCommittedActions = useCallback((listener: (receipt: ProfileActionReceipt) => void) => {
+    commitListeners.current.add(listener);
+    return () => { commitListeners.current.delete(listener); };
+  }, []);
   const [outboxState, setOutboxState] = useState<(ItemActionOutboxSnapshot & { key: string; sessionId: string }) | null>(null);
   const activeScopeKey = useRef<string | null>(null);
   const activeSessionId = useRef<string | null>(null);
@@ -193,6 +199,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
         setCollectionRevision(revision => revision + 1);
         storeRef.current = nextStore;
         setPersistedStore({ actorUserId, profileId, store: nextStore });
+        commitListeners.current.forEach(listener => listener(receipt));
         if (coordinator.pending().length === 0) void refreshAcknowledgedState();
       },
     });
@@ -494,6 +501,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       canDiscardAction: atomicState?.canDiscardAction ?? false,
       discardRejectedAction,
       collectionRevision,
+      subscribeToCommittedActions,
       submitCollectionAction,
       retryHydration,
       retryPersistence,
@@ -508,6 +516,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       atomicState?.canDiscardAction,
       discardRejectedAction,
       collectionRevision,
+      subscribeToCommittedActions,
       submitCollectionAction,
       persistenceStatus,
       retryHydration,

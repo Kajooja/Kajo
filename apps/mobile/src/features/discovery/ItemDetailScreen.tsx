@@ -70,6 +70,8 @@ import {
 } from './itemInteractionLabels';
 import { getMockItem } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
+import { FeedItemCard } from './FeedItemCard';
+import { useDiscoveryFeed } from './useDiscoveryFeed';
 import {
   formatMemberHistoryProvenance,
   formatPendingListApproval,
@@ -195,6 +197,7 @@ function ItemDetailContent({
     undoTargetItemId,
     undo,
     atomicPendingCount,
+    persistenceStatus,
   } = useItemInteractions();
   const theme = getRoomTheme(getAmbientPhase(currentMode), activeProfile.activeProfile);
   const styles = createStyles(theme);
@@ -219,8 +222,20 @@ function ItemDetailContent({
     }]))
     : buildDeliveredItemOrigins(items, items, recommendationTraceId, 'fallback', {})));
   const [originSessionId] = useState(() => slate?.sessionId ?? eventTracking.sessionId);
-  const originFor = useCallback((item: Item) => ({ ...getDeliveredItemOrigin(origins, item.id),
-    originSessionId }), [origins, originSessionId]);
+  const [initialFeed] = useState(() => {
+    const origin = selectedItem ? getDeliveredItemOrigin(origins, selectedItem.id) : null;
+    return slate?.source === 'hosted' && selectedItem && origin?.predictionId && origin.deliveryRequestId
+      ? { item: selectedItem, origin } : null;
+  });
+  const feed = useDiscoveryFeed(initialFeed, mode);
+  const [feedDraftState, setFeedDraftState] = useState<{ opportunity: string; rating: number | null } | null>(null);
+  const feedDelivery = feed.state?.delivery;
+  const feedOpportunity = `${feedDelivery?.item.id ?? ''}:${feedDelivery?.origin.deliveryRequestId ?? ''}`;
+  const feedDraft = feedDraftState?.opportunity === feedOpportunity ? feedDraftState.rating : null;
+  function setFeedDraft(rating: number | null) { setFeedDraftState({ opportunity: feedOpportunity, rating }); }
+  const originFor = useCallback((item: Item) => ({
+    ...(feedDelivery?.item.id === item.id ? feedDelivery.origin : getDeliveredItemOrigin(origins, item.id)),
+    originSessionId }), [feedDelivery, origins, originSessionId]);
   const listRef = useRef<FlatList<Item>>(null);
   const [exitAnimation] = useState(() => new Animated.Value(0));
   const [exitingItemId, setExitingItemId] = useState<ItemId | null>(null);
@@ -330,14 +345,22 @@ function ItemDetailContent({
   );
 
   useEffect(() => {
-    if (selectedItem && eventTracking.status === 'ready') {
+    if (!initialFeed && selectedItem && eventTracking.status === 'ready') {
       recordItemImpression(selectedItem);
     }
   }, [
     eventTracking.status,
+    initialFeed,
     recordItemImpression,
     selectedItem,
   ]);
+
+  useEffect(() => {
+    if (!initialFeed || !feedDelivery) return;
+    visibleDwellItem.current = feedDelivery.item;
+    finishDwell('ITEM_CHANGED'); startDwell(feedDelivery.item);
+    return () => { visibleDwellItem.current = null; finishDwell('ITEM_CHANGED'); };
+  }, [initialFeed, feedDelivery, finishDwell, startDwell]);
 
   useEffect(() => {
     let active = true;
@@ -362,6 +385,13 @@ function ItemDetailContent({
       }
     };
   }, [exitAnimation]);
+
+  function isCurrentFeedItem(item: Item) {
+    if (!initialFeed) return true;
+    const displayed = feed.flow?.snapshot().delivery;
+    return currentView.current && displayed?.item.id === item.id &&
+      displayed.origin.deliveryRequestId === feedDelivery?.origin.deliveryRequestId;
+  }
 
   function handleRating(
     item: Item,
@@ -391,7 +421,7 @@ function ItemDetailContent({
       RATING_COMMIT_FEEDBACK_DURATION_MS,
     );
 
-    if (committed) {
+    if (committed && !initialFeed) {
       setRatingConfirmation({ itemId: item.id, rating });
     }
   }
@@ -464,11 +494,12 @@ function ItemDetailContent({
     index: number,
     interaction: ItemInteraction,
   ) {
-    if (exitingItemId || endorsingItemId) return;
+    if (!isCurrentFeedItem(item) || exitingItemId || endorsingItemId || feed.state?.waitingActionId || feed.skips.pendingCount > 0) return;
     if (atomicPendingCount > 0) {
       setFeedback('Odota valintojen tallentumista ennen listamuutosta.');
       return;
     }
+    feed.flow?.hold(true);
     setListPickerTarget({ item, index, interaction, origin: { eventType: 'ITEM_LIKED',
       itemId: item.id, itemType: item.itemType, ...originFor(item), discoveryMode: mode } });
   }
@@ -481,9 +512,10 @@ function ItemDetailContent({
     origin?: EventRecordInput,
     confirmedListIds?: readonly string[],
   ): Promise<ListDestinationCommitResult> {
-    if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
-    if (exitingItemId || endorsingItemId) return { status: 'error', message: 'Odota nykyisen valinnan tallentumista.' };
+    if (!currentView.current || !isCurrentFeedItem(item)) return { status: 'error', message: 'Näkymä vaihtui. Avaa teos uudelleen.' };
+    if (exitingItemId || endorsingItemId || feed.state?.waitingActionId || feed.skips.pendingCount > 0) return { status: 'error', message: 'Odota nykyisen valinnan tallentumista.' };
 
+    feed.flow?.hold(true);
     setEndorsingItemId(item.id);
     const result = await sharedEndorsements.endorse(
       item.id,
@@ -494,6 +526,7 @@ function ItemDetailContent({
     );
     if (!currentView.current) return { status: 'error', message: 'Näkymä vaihtui. Tarkista ehdotuksen tila.' };
     if (result.status === 'error') {
+      feed.flow?.hold(false);
       setEndorsingItemId(null);
       setFeedback(result.message);
       return result;
@@ -537,7 +570,7 @@ function ItemDetailContent({
     eventProperties: Readonly<Record<string, unknown>> = {},
     advanceDelayMs = 0,
   ): boolean {
-    if (exitingItemId) {
+    if (!isCurrentFeedItem(item) || exitingItemId || feed.state?.waitingActionId || feed.skips.pendingCount > 0) {
       return false;
     }
 
@@ -554,8 +587,14 @@ function ItemDetailContent({
       discoveryMode: mode,
       properties: { source: 'ITEM_DETAIL', ...originFor(item).properties, ...eventProperties },
     };
+    if (initialFeed && eventId) feed.flow?.expectPositive(eventId);
     if (!commit(eventId, eventInput)) {
+      if (eventId) feed.flow?.cancelPositive(eventId);
       return false;
+    }
+    if (initialFeed) {
+      setFeedback('Tallennetaan arviota…');
+      return true;
     }
 
     if (eventId && action.type !== 'SET_RATING' && action.type !== 'SET_NOT_INTERESTED') {
@@ -573,6 +612,12 @@ function ItemDetailContent({
     delayMs = 0,
   ) {
     setFeedback(nextFeedback);
+    if (initialFeed) {
+      // Lists and Shared endorsements call this only with confirmed receipts.
+      feed.flow?.hold(false);
+      if (isCurrentFeedItem(item)) feed.flow?.positiveCommitted();
+      return;
+    }
 
     if (advanceTimerRef.current) {
       clearTimeout(advanceTimerRef.current);
@@ -637,7 +682,7 @@ function ItemDetailContent({
   }
 
   function handleUndo() {
-    if (!canUndo || !undoTargetItemId || exitingItemId) {
+    if (!canUndo || !undoTargetItemId || exitingItemId || feed.state?.waitingActionId || feed.skips.pendingCount || atomicPendingCount) {
       return;
     }
 
@@ -650,9 +695,11 @@ function ItemDetailContent({
     const targetIndex = items.findIndex(
       (item) => item.id === undoTargetItemId,
     );
+    feed.flow?.hold(true);
     const result = undo();
 
     if (!result) {
+      feed.flow?.hold(false);
       setFeedback('Kumoamista ei voitu aloittaa. Odota tallennusta ja yritä uudelleen.');
       return;
     }
@@ -678,6 +725,7 @@ function ItemDetailContent({
 
     setFeedback(ITEM_INTERACTION_LABELS.undoFeedback);
 
+    if (initialFeed) return; // The exact atomic receipt triggers the fresh reader.
     if (targetIndex >= 0) {
       listRef.current?.scrollToIndex({
         index: targetIndex,
@@ -737,6 +785,14 @@ function ItemDetailContent({
     );
   }
 
+  const feedItem = feedDelivery?.item;
+  const feedInteraction = feedItem ? getItemInteraction(interactions, feedItem.id) : null;
+  const feedSharedState = feedItem ? sharedEndorsements.stateByItemId[feedItem.id] : undefined;
+  const feedApproval = getPendingListApproval(feedSharedState, activeSharedMembership?.members ?? [], activeProfile.actorUserId);
+  const feedDisabled = Boolean(feed.state?.waitingActionId || feed.skips.pendingCount || !feed.skips.ready ||
+    atomicPendingCount || persistenceStatus !== 'ready' || endorsingItemId || listPickerTarget);
+  const canSkipFeed = !feedDisabled && feed.state?.source?.acceptsNewSkip === true;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <StatusBar style="light" />
@@ -754,7 +810,7 @@ function ItemDetailContent({
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={slate?.collectionTitle ? `Takaisin: ${slate.collectionTitle}` : 'Back to discovery'}
+          accessibilityLabel={slate?.collectionTitle ? `Takaisin: ${slate.collectionTitle}` : 'Takaisin'}
           onPress={() => router.back()}
           hitSlop={10}
           style={({ pressed }) => [
@@ -762,7 +818,7 @@ function ItemDetailContent({
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.backText}>← {slate?.collectionTitle ?? 'Discovery'}</Text>
+          <Text style={styles.backText}>← {initialFeed ? '' : slate?.collectionTitle ?? 'Discovery'}</Text>
         </Pressable>
         <View style={styles.topBarActions}>
           <Pressable
@@ -770,9 +826,9 @@ function ItemDetailContent({
             accessibilityLabel={ITEM_INTERACTION_LABELS.undo}
             accessibilityHint="Palauttaa viimeisimmän valinnan ja sen edellisen kortin"
             accessibilityState={{
-              disabled: !canUndo || Boolean(exitingItemId),
+              disabled: !canUndo || Boolean(exitingItemId || feed.state?.waitingActionId || feed.skips.pendingCount || atomicPendingCount),
             }}
-            disabled={!canUndo || Boolean(exitingItemId)}
+            disabled={!canUndo || Boolean(exitingItemId || feed.state?.waitingActionId || feed.skips.pendingCount || atomicPendingCount)}
             onPress={handleUndo}
             hitSlop={8}
             style={({ pressed }) => [
@@ -785,7 +841,7 @@ function ItemDetailContent({
               ↶ {ITEM_INTERACTION_LABELS.undo}
             </Text>
           </Pressable>
-          {items.length > 1 ? (
+          {!initialFeed && items.length > 1 ? (
             <Text style={styles.swipeHint}>Pyyhkäise →</Text>
           ) : null}
         </View>
@@ -793,7 +849,7 @@ function ItemDetailContent({
 
       <View style={styles.feedbackRow}>
         <InteractionPersistenceNotice theme={theme} />
-        {feedback ? (
+        {feedback && (!initialFeed || feed.state?.waitingActionId) ? (
           <Text
             accessibilityLiveRegion="polite"
             style={styles.feedbackText}
@@ -823,6 +879,38 @@ function ItemDetailContent({
         ) : null}
       </View>
 
+      {initialFeed ? <ScrollView key={feedOpportunity} contentContainerStyle={styles.content}>
+        {feed.skips.message ? <View accessibilityLiveRegion="polite">
+          <Text style={styles.feedbackText}>{feed.skips.message}</Text>
+          <Pressable accessibilityRole="button" onPress={feed.skips.retry} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Yritä uudelleen</Text></Pressable>
+          {feed.skips.canDiscardAction ? <Pressable accessibilityRole="button" style={styles.primaryButton}
+            onPress={() => { if (feed.skips.discardRejected()) feed.flow?.recoverRejected(); }}>
+            <Text style={styles.primaryButtonText}>Lataa nykyinen tilanne</Text></Pressable> : null}
+        </View> : null}
+        {feed.state?.message ? <View accessibilityLiveRegion="polite">
+          <Text style={styles.feedbackText}>{feed.state.message}</Text>
+          <Pressable accessibilityRole="button" style={styles.primaryButton} onPress={() => { eventTracking.retryPersistence(); feed.flow?.retry(); }}>
+            <Text style={styles.primaryButtonText}>Yritä uudelleen</Text></Pressable>
+        </View> : null}
+        {feed.state?.loading ? <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>Haetaan seuraavaa korttia…</Text> : null}
+        {feed.state?.exhausted ? <Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi. Voit palata ruudukkoon ja päivittää myöhemmin.</Text> : null}
+        {feedItem && feedInteraction ? <FeedItemCard key={feedOpportunity} item={feedItem} theme={theme} disabled={!canSkipFeed}
+            onSkip={() => { if (!canSkipFeed || !isCurrentFeedItem(feedItem)) return false; const accepted = feed.flow?.skip() === true;
+              if (accepted) { setFeedDraft(null); setFeedback('Tallennetaan ohitusta…'); } return accepted; }}>
+            {feedApproval ? <Pressable accessibilityRole="button" disabled={feedDisabled} style={styles.primaryButton}
+              onPress={() => void handleEndorsement(feedItem, 0, undefined, undefined, undefined, feedSharedState?.proposedLists?.map(list => list.id))}>
+              <Text style={styles.primaryButtonText}>Hyväksy {formatPendingListApproval(feedApproval)}</Text></Pressable> : null}
+            <RatingControl rating={feedDraft} disabled={feedDisabled} theme={theme} onRatingChange={setFeedDraft} />
+            <Pressable accessibilityRole="button" disabled={feedDisabled || feedDraft === null} style={[styles.primaryButton, (feedDisabled || feedDraft === null) && styles.disabled]}
+              onPress={() => { if (!feedDisabled && feedDraft !== null) handleRating(feedItem, 0, feedInteraction, feedDraft); }}>
+              <Text style={styles.primaryButtonText}>Tallenna arvio ja jatka</Text></Pressable>
+            {!feedApproval && !feedSharedState?.currentActorEndorsed && !feedSharedState?.consensusSaved ? <Pressable accessibilityRole="button"
+              disabled={feedDisabled} style={styles.primaryButton} onPress={() => openListPicker(feedItem, 0, feedInteraction)}>
+              <Text style={styles.primaryButtonText}>{ITEM_LIST_LABELS.addToList}</Text></Pressable> : null}
+            {feed.state?.waitingActionId || feed.skips.pendingCount ? <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>Odotetaan tallennuksen vahvistusta…</Text> : null}
+          </FeedItemCard> : null}
+
+      </ScrollView> : (
       <FlatList
         ref={listRef}
         data={items}
@@ -925,13 +1013,14 @@ function ItemDetailContent({
           );
         }}
       />
+      )}
       <ListDestinationSheet
         visible={Boolean(listPickerTarget)}
         item={listPickerTarget?.item ?? null}
         isSharedProfile={Boolean(activeSharedMembership)}
         origin={listPickerTarget?.origin}
         theme={theme}
-        onClose={() => setListPickerTarget(null)}
+        onClose={() => { feed.flow?.hold(false); setListPickerTarget(null); }}
         onCommitted={handleListDestinationCommit}
       />
     </SafeAreaView>

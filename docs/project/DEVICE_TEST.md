@@ -32,12 +32,14 @@ current-panel ordinal selection only for new `CANONICAL_FORECAST_V3` sessions.
 Its separate-commit 10/0/5 fixtures demonstrate next-choice differences; the
 hosted checks verify preservation/security and read-only selector behavior.
 Neither is an observed phone result or a positive eligible-owner new-session
-test. Artwork, vertical presentation and Ohita remain unimplemented.
+test. The shared-feed source now implements artwork, vertical presentation and
+Ohita; its integration, matching hosted forwards and actual device acceptance
+are tracked in STATUS and the shared-feed source matrix below.
 Record the actual immutable session policy
 privately alongside the v2 wire version; an old retained v2 session keeps its old
 policy and cannot accept the successor just by updating the APK. No account reset
-is authorized. The shared feed/artwork/Ohita matrix below remains planned.
-The following matrix is **planned / NOT IMPLEMENTED**, under the mandatory
+is authorized. The shared feed/artwork/Ohita device matrix below remains planned.
+The following matrix is **planned / NOT DEVICE-VERIFIED**, under the mandatory
 [near-term ROADMAP targets](ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15).
 Do not expect these controls in the matching #669 APK or count the old matrix
 below as acceptance of this successor.
@@ -756,3 +758,29 @@ installed source/run, device/OS and the actual backend checkpoint before testing
 
 Automated provider/outbox and reader tests prove the source transition, not native
 network timing, actual prediction quality or full sequential Taste acceptance.
+
+
+## Shared-feed source acceptance — #239 / 2026-10-17
+
+Source branch: `feat/239-shared-vertical-feed`, based on accepted #349. This is a
+**planned device matrix**, not an observation. The existing #677 APK lacks this
+UI. First install the two exact missing #349 forwards with preservation checks,
+then build the accepted feed source and record installed SHA/backend/device.
+Preserve current accounts/v1 sessions; do not reset to manufacture v2 eligibility.
+
+| Case | Required observation |
+|---|---|
+| Sequential Taste artwork | Correct question's cover/poster, fallback, title, metadata and verified description credits. Slow prior-question/other-Profile image reads cannot replace the visible question. |
+| Neutral controls | Deliberate upward image drag or accessible Ohita commits one neutral response. No En tunne / Ei kiinnosta replacement labels on the new flow; v1 retains old meanings. |
+| Cancellation | Short, sideways, reversed, multitouch, cancelled drag; long description scroll; reflow/rotation; Back and app background produce no skip. |
+| Draft and accessibility | Ohita clears only an unsubmitted draft. Explicit 0/5 saves stay ratings. Large text, screen reader, reduced motion, small screen and system/dock insets are usable. Help appears once and remains discoverable. |
+| Discovery origin | First and later page Items retain the actual page request, Prediction and acknowledged impression, including an Item first seen in the grid. No overlay/collection/evaluation origin is invented. |
+| Positive advance | Rating/List/Shared acknowledgement precedes the next fresh card; it emits no skip. Pending saves disable gesture. Failed/rejected writes keep recovery actionable. |
+| Lost reply / restart | Kill/reopen while skip pending, including leaving the card first. One exact original command resumes under the same actor/Profile; new session does not retarget it. Unknown acknowledgement is never discarded. |
+| Freshness and scope | After accepted skip/rating, unseen old siblings are retired and next ranking uses the new prefix. Late source/page completions cannot replace a newer card or another Profile. Exact failed page request retries unchanged. |
+| Compatibility | Missing capability gives honest unavailable/retry without negative/unknown fallback. Existing v1/completed sessions and collection/Shared-overlay detail stay usable. |
+| Cross-surface | Taste skip → acknowledged PAUSE → same Profile Discovery, restart/new Event session, suppression/refill/exhaustion and cooldown comply with accepted #349 policy. No early Context-change bypass. |
+
+Component/controller/SQL tests and mobile exports are engineering evidence only.
+Phone geometry, touch feel, genuine session observations and recommendation
+usefulness must be recorded separately before closing MVP-UX-007/#239/#336.

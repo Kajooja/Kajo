@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { KajoMark } from '../branding/KajoBrand';
+import type { Item } from '../../domain/contracts';
+import { FeedItemCard } from '../discovery/FeedItemCard';
 import { RatingControl } from '../discovery/RatingControl';
 import type { getRoomTheme } from '../../theme/roomTheme';
 import type { PersonalTasteSnapshot } from './personalTasteFlow';
@@ -7,7 +9,8 @@ import { challengeResultCopy, type TasteAnswer } from './personalTasteOperations
 
 export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmRemoval,
   onBegin, onDraftChange, onAnswer, onBooks, onChallenge, onRetry, onReload, onContinue,
-  onOpenImport, onAskRemoval, onCancelRemoval, onRemove }: {
+  onOpenImport, onAskRemoval, onCancelRemoval, onRemove, presentationItem, onSkip }: {
+  presentationItem?: Item | null; onSkip?: () => boolean;
   state: PersonalTasteSnapshot; theme: ReturnType<typeof getRoomTheme>; begun: boolean;
   draftRating: number | null; confirmRemoval: boolean;
   onBegin: () => void; onDraftChange: (rating: number) => void; onAnswer: (answer: TasteAnswer) => void;
@@ -30,7 +33,7 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
     </Pressable>;
   }
   return <SafeAreaView style={styles.safeArea}>
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView key={sequential ? `${sequential.sessionId}:${sequential.questionId}:${sequential.revision}` : 'legacy'} contentContainerStyle={styles.content}>
       <View style={styles.brand}><KajoMark /></View>
       <View style={styles.panel}>
         <Text style={styles.kicker}>{challenge ? 'KAJON ENNUSTEHAASTE' : 'OMA KAJO · MAKUTESTI'}</Text>
@@ -57,13 +60,22 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
         </> : current ? <>
           <Text style={styles.progress}>{sequential ? `Tallennettuja vastauksia: ${sequential.answered} · ennuste päivittyy` : challenge ? `${challenge.answers.length + 1}/${challenge.items.length} · ennuste on lukittu`
             : `${session?.counts?.presented ?? 0}/24 korttia · arvioita ${session?.counts?.knownRatings ?? 0}`}</Text>
-          <Text style={styles.kicker}>{current.itemType === 'MOVIE' ? 'ELOKUVA' : 'KIRJA'}</Text>
-          <Text style={styles.title}>{current.title}</Text>
-          <Text style={styles.body}>{challenge ? 'Ennusteet näytetään vasta, kun kaikki vastaukset on lukittu. Anna oma arviosi.' : 'Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.'}</Text>
-          <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
-          {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
-          {button('En tunne', () => onAnswer({ kind: 'UNKNOWN' }))}
-          {button('Ei kiinnosta', () => onAnswer({ kind: 'NOT_INTERESTED' }))}
+          {sequential ? <FeedItemCard key={`${sequential.sessionId}:${sequential.questionId}:${sequential.revision}`}
+            item={presentationItem?.id === current.id ? presentationItem : current} theme={theme} disabled={disabled}
+            {...(sequential.contextualSkip && onSkip ? { onSkip } : {})}>
+            <Text style={styles.body}>Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.</Text>
+            <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
+            {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
+            {!sequential.contextualSkip ? <Text style={styles.help}>Ohitus ei ole juuri nyt käytettävissä. Voit jatkaa selaamaan.</Text> : null}
+          </FeedItemCard> : <>
+            <Text style={styles.kicker}>{current.itemType === 'MOVIE' ? 'ELOKUVA' : 'KIRJA'}</Text>
+            <Text style={styles.title}>{current.title}</Text>
+            <Text style={styles.body}>{challenge ? 'Ennusteet näytetään vasta, kun kaikki vastaukset on lukittu. Anna oma arviosi.' : 'Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.'}</Text>
+            <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
+            {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
+            {button('En tunne', () => onAnswer({ kind: 'UNKNOWN' }))}
+            {button('Ei kiinnosta', () => onAnswer({ kind: 'NOT_INTERESTED' }))}
+          </>}
           {sequential ? <>
             <Text style={styles.help}>Ennuste on vielä alustava. Myös selaamisen aikana tekemäsi valinnat tarkentavat sitä.</Text>
             {button('Jatka selaamaan', onContinue)}

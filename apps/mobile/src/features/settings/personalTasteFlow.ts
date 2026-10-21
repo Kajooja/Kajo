@@ -279,8 +279,8 @@ export function createPersonalTasteFlow(options: {
     answerTraining(answer: TasteAnswer, itemId: string, revision: number) {
       return state.sequential ? sequentialCommand('ANSWER', revision, answer, itemId) : sessionCommand('ANSWER', answer, itemId, revision);
     },
-    // Controller capability only. Presentation does not call this until the
-    // shared feed's separate gesture/accessibility acceptance packet.
+    // Bind the shared feed to this exact private question/prefix; Discovery
+    // uses a separate Event writer and never enters this queue.
     skipCurrent(itemId: string, revision: number) {
       const s = state.sequential;
       if (!options.contextualSkipRpc || !s || s.status !== 'QUESTION' || s.revision !== revision || s.item?.id !== itemId || !s.contextualSkip) return false;

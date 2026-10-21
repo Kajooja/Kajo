@@ -5,6 +5,8 @@ import { getRoomTheme } from '../../theme/roomTheme';
 import { ProfileBootstrapGate, ProfileCalibrationScreen, PersonalTasteGate } from './ProfileBootstrapGate';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PersonalTasteScreen } from './PersonalTasteScreen';
+import { useTasteItemPresentation } from './useTasteItemPresentation';
+import type { Item } from '../../domain/contracts';
 import { id, profileId, sequentialResponse } from './personalTasteTestFixtures';
 import type { TasteCommand } from './personalTasteOperations';
 import type { ProfileBootstrapStatus, ProfileCalibrationRpc } from './profileCalibrationOperations';
@@ -461,5 +463,28 @@ describe('sequential Taste gate to the same Profile application', () => {
     expect(text(renderPersonal())).toBe('SAME PROFILE APP');
     expect(calls.every(c => c.profileId === profileId)).toBe(true);
     cleanup('personal');
+  });
+});
+
+
+describe('current-question public catalog presentation', () => {
+  it('drops late old revision/scope replies and never replaces the frozen question identity or title', async () => {
+    const pending: { resolve: (value: unknown) => void; signal: AbortSignal; itemId: string }[] = [];
+    const client = { from: () => ({ select: () => ({ in: (_key: string, ids: string[]) => ({
+      abortSignal: (signal: AbortSignal) => new Promise(resolve => { pending.push({ resolve, signal, itemId: ids[0]! }); }),
+    }) }) }) } as unknown as SupabaseClient;
+    const question: Item = { id: id(100), itemType: 'MOVIE', title: 'Frozen question' };
+    function Artwork(identity: string) { beginRender('artwork'); const value = useTasteItemPresentation(client, identity, question); flushEffects('artwork'); return value; }
+    const row = (image: string) => ({ data: [{ id: question.id, item_type: 'MOVIE', title: 'Updated catalog title',
+      description: null, tags: [], creators: ['Creator'], release_year: 2026, image_url: image, original_language: 'fi' }], error: null });
+    expect(Artwork('actor:profile:question:1')?.imageUrl).toBeUndefined();
+    expect(Artwork('actor:profile:question:2')?.imageUrl).toBeUndefined();
+    expect(pending[0]!.signal.aborted).toBe(true);
+    pending[1]!.resolve(row('https://example.invalid/new.jpg')); await settle();
+    expect(Artwork('actor:profile:question:2')).toMatchObject({ id: question.id, title: 'Frozen question', imageUrl: 'https://example.invalid/new.jpg' });
+    pending[0]!.resolve(row('https://example.invalid/old.jpg')); await settle();
+    expect(Artwork('actor:profile:question:2')?.imageUrl).toBe('https://example.invalid/new.jpg');
+    expect(Artwork('other-actor:profile:question:2')?.imageUrl).toBeUndefined();
+    cleanup('artwork'); expect(pending[2]!.signal.aborted).toBe(true);
   });
 });

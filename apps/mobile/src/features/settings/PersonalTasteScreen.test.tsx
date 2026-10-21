@@ -10,6 +10,7 @@ vi.mock('react-native', () => ({ ActivityIndicator: 'ActivityIndicator', Pressab
   ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: (v: unknown) => v } }));
 vi.mock('../branding/KajoBrand', () => ({ KajoMark: 'KajoMark' }));
 vi.mock('../discovery/RatingControl', () => ({ RatingControl: 'RatingControl' }));
+vi.mock('../discovery/FeedItemCard', () => ({ FeedItemCard: 'FeedItemCard' }));
 vi.stubGlobal('React', React);
 afterAll(() => vi.unstubAllGlobals());
 type Props = { children?: ReactNode; onPress?: () => void; disabled?: boolean };
@@ -98,5 +99,30 @@ describe('continuous Taste presentation', () => {
     const stopped = PersonalTasteScreen(props(await state(sequentialResponse('STOPPED', 80, 40), false, true)));
     expect(text(stopped)).toContain('Jatketaan tutustumista selaamalla'); expect(text(stopped)).not.toContain('Makutesti on valmis');
     expect(text(stopped)).not.toContain('Jatka ennustehaasteeseen'); expect(button(stopped, 'Jatka selaamaan').disabled).toBe(false);
+  });
+});
+
+
+describe('shared Taste feed boundary', () => {
+  it('uses the same artwork card and neutral adapter, including after a rating draft', async () => {
+    const data = { ...sequentialResponse('QUESTION', 2, 0), contextualSkip: {
+      version: 'kajo-contextual-skip-v1', policyVersion: 'contextual-skip-cooldown-v1', contextRef: null,
+      origin: { surface: 'TASTE', sessionId, questionId: id(300), panelId: id(500), prefixRevision: 2 } } };
+    const p = props(await state(data, false, true)); p.draftRating = 8; p.onSkip = vi.fn(() => true);
+    p.presentationItem = { ...p.state.sequential!.item!, imageUrl: 'https://example.invalid/cover.jpg' };
+    const tree = PersonalTasteScreen(p);
+    const card = elements(tree).find(e => e.type === 'FeedItemCard') as ReactElement<{ item: { imageUrl?: string }; disabled: boolean; onSkip: () => boolean }>;
+    expect(card.props.item.imageUrl).toBe(p.presentationItem.imageUrl); expect(card.props.onSkip()).toBe(true);
+    expect(p.onSkip).toHaveBeenCalledOnce(); expect(p.onAnswer).not.toHaveBeenCalled();
+    expect(text(tree)).not.toContain('En tunne'); expect(text(tree)).not.toContain('Ei kiinnosta');
+    p.state.pending = true;
+    expect((elements(PersonalTasteScreen(p)).find(e => e.type === 'FeedItemCard')!.props as { disabled: boolean }).disabled).toBe(true);
+  });
+  it('does not relabel missing new capability as legacy unknown or dislike', async () => {
+    const p = props(await state(sequentialResponse('QUESTION', 2, 0), false, true)); p.onSkip = vi.fn(() => true);
+    const tree = PersonalTasteScreen(p);
+    expect(text(tree)).toContain('Ohitus ei ole juuri nyt käytettävissä');
+    expect((elements(tree).find(e => e.type === 'FeedItemCard')!.props as { onSkip?: unknown }).onSkip).toBeUndefined();
+    expect(text(tree)).not.toContain('En tunne'); expect(text(tree)).not.toContain('Ei kiinnosta');
   });
 });

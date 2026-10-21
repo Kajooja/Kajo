@@ -7543,3 +7543,55 @@ fresh origin/main; its entire tracked content exactly matched accepted #348
 before creating this branch. No local unpublished source was discarded. The
 previously recorded obsolete remote-ref retirement remains separately tracked;
 this packet does not claim those refs were deleted.
+
+
+## Shared vertical feed source — #239 / 2026-10-17
+
+Parent is accepted #349 merge `f3f90e3d2cdb55783584b48be6ecfaa5985a7c49`.
+The one successor branch is `feat/239-shared-vertical-feed`. `FeedItemCard` and
+its deliberate-dismissal controller share cover/poster fallback, metadata,
+verified description/credit, first-use help, reduced motion and accessible Ohita
+between sequential Taste and canonical Discovery cards. Public catalog enrichment
+is question/revision/scope-cancelled and preserves the frozen question identity.
+Existing v1/challenge/calibration responses and collection/unranked overlay paths
+are preserved.
+
+The grid carries each Item's actual delivered request through the immutable slate.
+Discovery resolves that page, Prediction and the actual recorded impression before
+offering native skip. A scope-level persistent provider resumes exact commands
+across card exit/restart/new Event session. The current card remains during writes;
+matching skip/rating receipts or acknowledged List/Shared actions retire unshown
+siblings and fetch the next canonical prefix. Lost page replies reuse their exact
+request. Positive advance never emits skip; partial/cancelled/internal scrolling,
+reflow and backgrounding are not observations.
+
+Changed owners: STATUS, ROADMAP, MVP, UX_PRINCIPLES, LAUNCH_LOOP, DATA_EVENTS,
+GLOSSARY, CODEMAP and DEVICE_TEST. The source PR owns exact final validation/CI
+and integration receipts. Standard check uses explicit demo exports locally;
+configured CI and all five required gates remain the source integration gate.
+No migration bytes, workflow or dependency changes. No hosted installation,
+account reset, model/Working activation, new APK or phone/usefulness acceptance
+is claimed. Next is guarded installation of #349's two missing forwards and a
+matching build/device matrix; pool refill, recent prior and full readiness retain
+ROADMAP ordering. Remaining star/overflow work stays in MVP-UX-006.
+
+Local check receipt: the root `KAJO_BUILD_MODE=demo npm run check` passed, including
+demo platform exports. After final source refinements, mobile lint/typecheck and
+590 tests passed. Implementation head is `9545719bcffd18965362f66b103aad5dcee84857`.
+Automatic approval review rejected the first GitHub blob publication because it
+did not find explicit permission for this new public-repository payload. No new
+remote branch, PR or final-source CI run exists. Prior retrieved approvals concern
+earlier packets; publication approval is the immediate next gate. This local
+handoff preserves the completed work without treating it as accepted main.
+
+### Continuation recovered — 2026-10-21
+
+The owner requested continuation from the last interrupted conversation. Fresh
+remote metadata confirms accepted main is still #349, with no open PR. The
+preserved clean `feat/239-shared-vertical-feed` checkout contains all three local
+commits through `643fd9263ece6d2fa1504fcf99b39a0b16070847`; no source was lost.
+GitHub accepted the first source blob publication under the renewed instruction,
+resolving the earlier automatic publication hold. Complete this same packet and
+its five final-source CI gates before integration. The PR owns the eventual
+branch/tree/check/merge receipts. Hosted forwards, matching configured APK and
+actual device/quality acceptance remain distinct subsequent work.

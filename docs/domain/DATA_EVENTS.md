@@ -346,9 +346,16 @@ Client acknowledgement must retire old undelivered request generations.
 Mobile routing validates capabilities and every receipt identity before clearing
 a persisted command. Taste shares its existing one-command queue; Discovery has
 a separately namespaced durable service. Missing capability or an outage never
-maps a skip to an old answer or silently discards it. Feed/gesture emission,
-actual displayed-origin plumbing and phone acceptance remain separate work.
-The source PR/STATUS own the exact tests, CI and installation boundaries.
+maps a skip to an old answer or silently discards it. The October 17 shared-feed
+source wires Taste to the exact question capability and Discovery to the actual
+per-Item page request plus recorded impression ID. Source RPC validation precedes
+new skip admission. A scope-level queue resumes original commands independently
+of card navigation/new Event sessions. Only a matching acknowledged receipt retires
+unshown work; fresh Discovery reads retain exact retry identity and request a new
+committed prefix. Positive advances never also skip. Partial/terminated gestures,
+internal description scrolling, layout and backgrounding are inert. Actual hosted
+installation and phone acceptance remain separate. The source PR/STATUS own the
+exact tests, CI and installation boundaries.
 
 ## 3. Taste evidence
 

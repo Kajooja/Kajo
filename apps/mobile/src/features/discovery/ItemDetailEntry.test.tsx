@@ -34,6 +34,8 @@ vi.mock('react-native', () => ({
 }));
 
 // Expo supplies the JSX runtime; this Node-only entry test does not mount native views.
+vi.mock('./FeedItemCard', () => ({ FeedItemCard: 'FeedItemCard' }));
+vi.mock('./useDiscoveryFeed', () => ({ useDiscoveryFeed: vi.fn() }));
 vi.stubGlobal('React', React);
 afterAll(() => vi.unstubAllGlobals());
 beforeEach(() => { state.shared = false; state.scopeKey = 'test:actor:personal'; state.overlayStatus = 'ready'; });

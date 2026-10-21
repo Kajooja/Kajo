@@ -293,6 +293,13 @@ full readiness, actual device behavior and observed usefulness remain open;
 `MVP-ALG-010`, `MVP-ALG-011` and `MVP-UX-007` are not complete. See the
 [bounded source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16).
 
+Shared feed source continuation (#239, 2026-10-17) now connects the accepted
+#349 adapters to sequential Taste and canonical Discovery deliveries. It shares
+artwork/credited description, neutral upward/accessible Ohita, exact displayed
+origins and acknowledgement-before-next selection. V1/legacy and unranked
+collection/overlay semantics stay preserved. Source CI, hosted capability rollout
+and actual device/usefulness are separate acceptance; MVP-UX-007 remains in progress.
+
 ## Portable engine and external-data foundation — bounded completion contracts
 
 [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) and [ROADMAP Phase 14.3A](../project/ROADMAP.md#143a--portable-contracts-and-external-data-research) define the bounded foundation. E1/D1/D2 are implemented and accepted; architecture documentation alone did not deliver them. Native integration, model admission and later engine generations remain separate gates.
@@ -319,7 +326,7 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 - [ ] `MVP-UX-004` Personal BOOK/MOVIE statistics include source-aware counts, independent unlock/progress and retry-safe weekly summaries/countdowns before MVP. #230, Phase 17.0; community comparisons remain conditional on cohort/privacy evidence.
 - [ ] `MVP-UX-005` Accessible grid multi-selection supports Discovery List add/not-interest, same-Profile List move/removal and selected history clearing with exact origins, durable partial results and Shared consent. #231, Phase 17.0.
 - [ ] `MVP-UX-006` Cards have a default-save star (Tykätyt), header overflow for other Lists, and a bottom 0–10 rating slider with accessible actions above the dock and room for descriptions. Preserve existing Saved/Shared/List semantics and acknowledgement; an acknowledged positive action is not also a skip. The October 15 shared-feed decision supersedes the earlier planned separate Ei kiinnosta/Seuraava controls; `MVP-UX-007` owns the upward-dismissal/Ohita successor. #239 and UX_PRINCIPLES own the remaining card contract; ROADMAP owns sequencing.
-- [ ] `MVP-UX-007` Optional Discovery card mode and Taste use one reusable vertical Item feed with the same posters/covers, metadata, descriptions and source credits; grid remains default Discovery. A deliberate completed upward dismissal and its accessible Ohita alternative remove the Item from this feed without a rating, consumption, unknown assertion or permanent dislike. Explain once on first relevant use/Taste; keep help available. New-feed En tunne/Ei kiinnosta labels unify as Ohita while prior typed history remains intact. Versioned contextual suppression permits a justified later return without immediate recycling. Partial gestures, description scrolling, reflow and navigation never submit a skip. Numeric 0–10, save/List/Shared meanings and durable exact retries remain sound. Validate representative device, screen-reader, large-text, reduced-motion, pending-save/reconnect/restart and Profile-change cases. No runtime completion follows from documenting this target.
+- [-] `MVP-UX-007` Optional Discovery card mode and Taste use one reusable vertical Item feed with the same posters/covers, metadata, descriptions and source credits; grid remains default Discovery. A deliberate completed upward dismissal and its accessible Ohita alternative remove the Item from this feed without a rating, consumption, unknown assertion or permanent dislike. Explain once on first relevant use/Taste; keep help available. New-feed En tunne/Ei kiinnosta labels unify as Ohita while prior typed history remains intact. Versioned contextual suppression permits a justified later return without immediate recycling. Partial gestures, description scrolling, reflow and navigation never submit a skip. Numeric 0–10, save/List/Shared meanings and durable exact retries remain sound. Validate representative device, screen-reader, large-text, reduced-motion, pending-save/reconnect/restart and Profile-change cases. No runtime completion follows from documenting this target.
 
 ## Production services and data lifecycle
 

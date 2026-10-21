@@ -10,7 +10,7 @@ function isPendingDiscoverySkip(value: unknown, scope: ItemActionScope): value i
   return value.command.origin.surface === 'DISCOVERY' && value.command.actorUserId === scope.actorUserId && value.command.profileId === scope.profileId;
 }
 
-// Service foundation only: no UI/provider emits commands yet. A caller obtains
+// The scope-level provider recovers commands through restart. A caller obtains
 // the acknowledged native source before enqueueing and retains it on all retries.
 // Taste uses its own existing single-command controller, never this queue.
 export function createDiscoverySkipOutbox(options: {
