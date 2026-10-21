@@ -59,10 +59,11 @@ and Taste presentation, not the default Discovery grid.
 
 **Execution order:** #345's forecast-aware selector and its hosted forward are
 accepted. Neutral conformance #348 and native writers/admission #349 are accepted
-source with their five CI gates. The current `feat/239-shared-vertical-feed`
-packet connects actual question/page/impression origins and the shared card.
-Finish its source integration, then the exact missing #349 hosted forwards,
-configured build and representative device acceptance before preview/usefulness.
+source with their five CI gates. Shared feed #350 is now accepted after all five
+CI #691 gates. Next is the exact compact import-removal compatibility prerequisite,
+then the two unchanged #349 hosted forwards, a matching configured build and
+representative device acceptance before preview/usefulness. STATUS owns this
+one guarded rollout packet and its provider/source receipt.
 
 The source shares artwork/metadata/description and deliberate upward or accessible
 Ohita, preserves v1/UNKNOWN/NOT_INTERESTED, recovers exact commands across restart,
@@ -85,8 +86,9 @@ availability rather than forecast magnitude. The START pool is still frozen at
 remain the same after opposite ratings despite usable signal. A successor may
 refresh eligible pools while preserving every earlier frozen panel, comparison
 and delivered origin; it must not rewrite history to simulate adaptation.
-Taste also has a text-only card contract, while Discovery's detail pager is
-horizontal. These are implementation gaps, not delivered feed acceptance. Identical
+At that same pre-#345 checkpoint Taste had text-only cards and Discovery used a
+horizontal pager. Accepted #350 supplies their shared vertical successor; the
+matching hosted/build/device acceptance remains open. Identical
 empty Profiles may legitimately share an opening Item; repeated post-answer
 sequences require a versioned prefix/selector investigation rather than randomizing
 titles to look personalized.
@@ -100,9 +102,9 @@ utility-first ranking and a traced domain-lead guard. Retained session policies,
 wire replies and frozen history stay unchanged. Source and hosted acceptance do
 not establish an observed eligible-owner session, phone behavior or quality.
 The START-time 25-per-type pool still needs
-versioned refresh/refill; the neutral skip/shared feed/artwork and recent prior
-remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
-and STATUS for the exact acceptance receipt and next neutral-protocol packet.
+versioned refresh/refill; hosted/device acceptance of the accepted neutral
+skip/shared feed source and the recent prior remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
+and STATUS for the exact acceptance receipt and guarded rollout packet.
 
 Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
 [evidence](../domain/DATA_EVENTS.md), [UX](../product/UX_PRINCIPLES.md) and

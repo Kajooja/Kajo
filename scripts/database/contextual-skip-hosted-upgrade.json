@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "sourceCheckpoint": "20261016073549_forecast_aware_taste_selection.sql",
+  "order": "explicit prerequisite before the two unchanged forwards; not filename order",
+  "operations": [
+    {
+      "filename": "20261021144932_contextual_skip_import_compatibility.sql",
+      "sha256": "9e456ade261e618a60a560bac531fdef89c905db620f15526dc4ba1265e2cdad"
+    },
+    {
+      "filename": "20261016161919_native_contextual_skip.sql",
+      "sha256": "7b75d3bc4cc6bbcb4378b0a706d0263d02f49f27db691e79c9b161f2c7ecf1d3"
+    },
+    {
+      "filename": "20261016162039_taste_contextual_skip.sql",
+      "sha256": "6c2ae93e23c60bc7047ddf26bdb0e2eb8ee168c61433df9804de0a3d54ea913d"
+    }
+  ]
+}
