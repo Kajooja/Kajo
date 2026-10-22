@@ -3,10 +3,12 @@ import React from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedItemCard } from './FeedItemCard';
+import { RollingFeedCard } from './RollingFeedCard';
 import { getRoomTheme } from '../../theme/roomTheme';
 
 const fixture = vi.hoisted(() => ({
-  reduced: false, deferPreference: false,
+  reduced: false, deferPreference: false, deferAnimation: false,
+  resolvePreference: null as ((value: boolean) => void) | null,
   animations: [] as { kind: string; toValue: number; useNativeDriver: boolean }[],
   values: [] as { value: number; initial: number }[],
   app: null as (() => void) | null,
@@ -29,14 +31,16 @@ vi.mock('react-native', () => ({
       stopAnimation() {}
     },
     timing: (value: { setValue: (v: number) => void }, options: { toValue: number; useNativeDriver: boolean }) => ({
-      start() { fixture.animations.push({ kind: 'timing', ...options }); value.setValue(options.toValue); },
+      start(done?: () => void) { fixture.animations.push({ kind: 'timing', ...options });
+        if (!fixture.deferAnimation) { value.setValue(options.toValue); done?.(); } },
     }),
     spring: (value: { setValue: (v: number) => void }, options: { toValue: number; useNativeDriver: boolean }) => ({
-      start() { fixture.animations.push({ kind: 'spring', ...options }); value.setValue(options.toValue); },
+      start(done?: () => void) { fixture.animations.push({ kind: 'spring', ...options });
+        if (!fixture.deferAnimation) { value.setValue(options.toValue); done?.(); } },
     }),
   },
   PanResponder: { create: (handlers: unknown) => ({ panHandlers: handlers }) },
-  AccessibilityInfo: { isReduceMotionEnabled: () => fixture.deferPreference ? new Promise<boolean>(() => {}) : Promise.resolve(fixture.reduced),
+  AccessibilityInfo: { isReduceMotionEnabled: () => fixture.deferPreference ? new Promise<boolean>(resolve => { fixture.resolvePreference = resolve; }) : Promise.resolve(fixture.reduced),
     addEventListener: () => ({ remove() {} }) },
   AppState: { currentState: 'active', addEventListener: (_: string, callback: () => void) => {
     fixture.app = callback; return { remove() {} };
@@ -57,7 +61,8 @@ const release = (dy: number) => surface().props.onPanResponderRelease(null, { dx
 
 beforeEach(() => {
   vi.stubGlobal('React', React); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  fixture.reduced = false; fixture.deferPreference = false; fixture.animations = []; fixture.values = []; fixture.app = null;
+  fixture.reduced = false; fixture.deferPreference = false; fixture.resolvePreference = null;
+  fixture.deferAnimation = false; fixture.animations = []; fixture.values = []; fixture.app = null;
 });
 afterEach(async () => {
   if (renderer) await act(async () => renderer!.unmount());
@@ -66,7 +71,7 @@ afterEach(async () => {
 
 async function mount(props: Partial<React.ComponentProps<typeof FeedItemCard>> = {}) {
   const onSkip = vi.fn(() => true);
-  const all = { ...base, onSkip, ...props };
+  const all = { ...base, onSkip, initialReduceMotion: fixture.reduced, ...props };
   await act(async () => { renderer = create(<FeedItemCard {...all} />); });
   return all;
 }
@@ -116,10 +121,12 @@ describe('mounted feed card motion', () => {
 
   it('does not shift the card before the motion preference is known', async () => {
     fixture.deferPreference = true;
-    await mount({ entryDirection: 'forward' });
+    await mount({ entryDirection: 'forward', initialReduceMotion: null });
     const style = renderer!.root.findByType('AnimatedView' as never).props.style;
     expect(style.at(-1)).toEqual({ transform: [{ translateY: 0 }] });
     expect(fixture.animations).toEqual([]);
+    await act(async () => { fixture.resolvePreference!(false); });
+    expect(fixture.values[0]!.value).toBe(0); expect(fixture.animations).toEqual([]);
   });
 
   it('preserves reduced motion for entry, drag and pending acknowledgement', async () => {
@@ -129,5 +136,70 @@ describe('mounted feed card motion', () => {
     await act(async () => { drag(-120); release(-120); });
     expect(props.onSkip).toHaveBeenCalledOnce(); expect(fixture.values[0]!.value).toBe(0);
     expect(fixture.animations).toEqual([]);
+  });
+
+  it('moves an inert next-card preview with the drag and reports the exact continuation offset', async () => {
+    const onForwardOffset = vi.fn();
+    await mount({ nextCard: 'Next poster', onForwardOffset });
+    const preview = renderer!.root.findByProps({ testID: 'feed-next-preview' });
+    expect(preview.props).toMatchObject({ pointerEvents: 'none', accessibilityElementsHidden: true,
+      importantForAccessibility: 'no-hide-descendants' });
+    expect(preview.props.style).toContainEqual({ top: 600, height: 600 });
+    expect(preview.parent!.type).toBe('AnimatedView');
+    await act(async () => { drag(-210); });
+    expect(fixture.values[0]!.value).toBe(-210);
+    await act(async () => { release(-210); });
+    expect(fixture.values[0]!.value).toBe(-210);
+    expect(onForwardOffset).toHaveBeenCalledExactlyOnceWith(390);
+  });
+
+  it('promotes the prepared card from its visible offset with the outgoing card filling the space above', async () => {
+    const onSkip = vi.fn(() => true);
+    const next = { ...base.item, id: 'two', title: 'Two' };
+    await act(async () => { renderer = create(<RollingFeedCard {...base} opportunity="one" nextItem={next} onSkip={onSkip} />); });
+    const activeSurface = () => renderer!.root.findAllByProps({ testID: 'feed-dismiss-surface' })
+      .find(node => typeof node.props.onPanResponderGrant === 'function')!;
+    await act(async () => {
+      activeSurface().props.onPanResponderGrant();
+      activeSurface().props.onPanResponderMove(null, { dx: 0, dy: -210, numberActiveTouches: 1 });
+      activeSurface().props.onPanResponderRelease(null, { dx: 0, dy: -210 });
+    });
+    const valueCount = fixture.values.length;
+    await act(async () => { renderer!.update(<RollingFeedCard {...base} item={next} opportunity="two" onSkip={onSkip} />); });
+    expect(fixture.values[valueCount]!.initial).toBe(390);
+    expect(fixture.values[valueCount]!.value).toBe(0);
+    const previous = renderer!.root.findByProps({ testID: 'feed-previous-preview' });
+    expect(previous.props.style).toContainEqual({ top: -600, height: 600 });
+    expect(previous.props.pointerEvents).toBe('none');
+    expect(onSkip).toHaveBeenCalledOnce();
+    expect(renderer!.root.findAllByProps({ testID: 'feed-dismiss-surface' })
+      .filter(node => typeof node.props.onPanResponderGrant === 'function')).toHaveLength(1);
+  });
+
+  it('automatically rolls a fresh post-rating card up through the whole viewport', async () => {
+    await act(async () => { renderer = create(<RollingFeedCard {...base} opportunity="one" titleAction="★">Rating 8</RollingFeedCard>); });
+    const count = fixture.values.length;
+    await act(async () => { renderer!.update(<RollingFeedCard {...base} item={{ ...base.item, id: 'two' }} opportunity="two" entryDirection="forward" />); });
+    expect(fixture.values[count]!.initial).toBe(600);
+    expect(fixture.animations.at(-1)).toMatchObject({ kind: 'timing', toValue: 0, useNativeDriver: true });
+    const outgoing = renderer!.root.findByProps({ testID: 'feed-previous-preview' }).findByType(FeedItemCard);
+    expect(outgoing.props.children).toBe('Rating 8'); expect(outgoing.props.titleAction).toBe('★');
+  });
+
+  it('defers a second swipe while an entry is unfinished instead of snapping to its finger delta', async () => {
+    fixture.deferAnimation = true;
+    const props = await mount({ entryDirection: 'forward', entryOffset: 390 });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -20, numberActiveTouches: 1 })).toBe(false);
+    await act(async () => { drag(-130); release(-130); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(390);
+  });
+
+  it('discards a pending swipe offset from an old viewport size', async () => {
+    await act(async () => { renderer = create(<RollingFeedCard {...base} opportunity="one" onSkip={() => true} />); });
+    await act(async () => { drag(-210); release(-210); });
+    const count = fixture.values.length;
+    await act(async () => { renderer!.update(<RollingFeedCard {...base} viewportHeight={420}
+      item={{ ...base.item, id: 'two' }} opportunity="two" />); });
+    expect(fixture.values[count]!.initial).toBe(420);
   });
 });

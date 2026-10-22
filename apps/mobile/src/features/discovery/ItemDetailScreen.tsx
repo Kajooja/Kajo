@@ -70,7 +70,7 @@ import {
 } from './itemInteractionLabels';
 import { getMockItem } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
-import { FeedItemCard } from './FeedItemCard';
+import { RollingFeedCard } from './RollingFeedCard';
 import { useDiscoveryFeed } from './useDiscoveryFeed';
 import {
   formatMemberHistoryProvenance,
@@ -438,6 +438,8 @@ function ItemDetailContent({
 
     if (committed && !initialFeed) {
       setRatingConfirmation({ itemId: item.id, rating });
+    } else if (committed && initialFeed) {
+      setFeedDirection('forward');
     }
   }
 
@@ -920,10 +922,24 @@ function ItemDetailContent({
           {feed.state.canPrevious ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
         </View> : null}
         </View>
-        {feedItem && feedInteraction ? <FeedItemCard key={feedOpportunity} item={feedItem} theme={theme} disabled={feedDisabled}
+        {feedItem && feedInteraction ? <RollingFeedCard opportunity={feedOpportunity} item={feedItem} theme={theme} disabled={feedDisabled}
+            {...(feed.state?.upcoming?.[0] ? { nextItem: feed.state.upcoming[0].item } : {})}
+            previewTitleAction={<View style={styles.feedStar}><Text style={styles.feedStarGlyph}>☆</Text></View>}
+            previewControls={<View style={styles.feedActions}><View style={styles.feedRating}>
+              <RatingControl rating={null} disabled theme={theme} onRatingChange={() => {}} />
+            </View></View>}
             {...(activeProfile.actorUserId ? { helpScope: activeProfile.actorUserId } : {})} viewportHeight={feedHeight}
             {...(feedDirection ? { entryDirection: feedDirection } : {})}
             hasInteracted={feed.state?.positiveCommitted === true}
+            titleAction={
+              <Pressable accessibilityRole="button" accessibilityLabel={feedSaved ? 'Tallennettu listalle. Avaa listat' : membershipUnknown ? 'Avaa listat. Tallennustilaa tarkistetaan' : 'Lisää listaan'}
+                accessibilityState={{ disabled: feedDisabled, selected: Boolean(feedSaved) }}
+                accessibilityHint="Valitse yksi tai useampi lista"
+                disabled={feedDisabled} style={[styles.feedStar, feedDisabled && styles.disabled]}
+                onPress={() => openListPicker(feedItem, 0, feedInteraction)}>
+                <Text style={styles.feedStarGlyph}>{membershipUnknown ? '⋯' : feedSaved ? '★' : '☆'}</Text>
+              </Pressable>
+            }
             {...(feed.state?.canPrevious ? { onPrevious: () => {
               if (feedDisabled || !isCurrentFeedItem(feedItem)) return false;
               const accepted = feed.flow?.previous() === true;
@@ -938,16 +954,9 @@ function ItemDetailContent({
             <View style={styles.feedActions}>
               <View style={styles.feedRating}><RatingControl rating={feedDraft ?? feedInteraction.rating} disabled={feedDisabled} theme={theme}
                 onRatingChange={rating => { if (!feedDisabled) { setFeedDraft(rating); handleRating(feedItem, 0, feedInteraction, rating); } }} /></View>
-              <Pressable accessibilityRole="button" accessibilityLabel={feedSaved ? 'Tallennettu listalle. Avaa listat' : membershipUnknown ? 'Avaa listat. Tallennustilaa tarkistetaan' : 'Lisää listaan'}
-                accessibilityState={{ disabled: feedDisabled, selected: Boolean(feedSaved) }}
-                accessibilityHint="Valitse yksi tai useampi lista"
-                disabled={feedDisabled} style={[styles.feedStar, feedDisabled && styles.disabled]}
-                onPress={() => openListPicker(feedItem, 0, feedInteraction)}>
-                <Text style={styles.feedStarGlyph}>{membershipUnknown ? '⋯' : feedSaved ? '★' : '☆'}</Text>
-              </Pressable>
             </View>
             {feedSharedState?.currentActorEndorsed && !feedSaved ? <Text style={styles.feedbackText}>Odottaa ryhmän hyväksyntää</Text> : null}
-          </FeedItemCard> : null}
+          </RollingFeedCard> : null}
 
       </View> : (
 
@@ -1388,10 +1397,10 @@ function createStyles(theme: RoomTheme) {
     feedProgress: { color: theme.base.textPrimary, backgroundColor: theme.surface.raised,
       alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, fontSize: 12 },
     feedFeedback: { paddingHorizontal: 12 },
-    feedActions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-    feedRating: { flex: 1 },
-    feedStar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
-    feedStarGlyph: { color: '#ffffff', fontSize: 36, lineHeight: 42 },
+    feedActions: { width: '100%', alignSelf: 'center', paddingHorizontal: 8 },
+    feedRating: { width: '100%', minWidth: 0 },
+    feedStar: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+    feedStarGlyph: { color: '#ffffff', fontSize: 20, lineHeight: 24 },
     feedbackRow: {
       minHeight: 26,
       paddingHorizontal: 20,

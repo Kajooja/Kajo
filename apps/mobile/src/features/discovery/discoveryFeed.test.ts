@@ -58,9 +58,8 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     const f = fixture(); f.flow.displayed(id(4), id(6)); await flush();
     f.flow.expectPositive(id(80)); expect(f.flow.skip()).toBe(false);
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(4)); expect(f.load).not.toHaveBeenCalled();
-    f.flow.acknowledged(id(80)); await flush(); expect(f.load).not.toHaveBeenCalled();
-    expect(f.flow.snapshot().positiveCommitted).toBe(true);
-    expect(f.flow.advance()).toBe(true); await flush();
+    f.flow.acknowledged(id(80)); await flush();
+    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: false, delivery: { item: item(9) } });
     expect(f.load).toHaveBeenCalledOnce(); expect(f.submit).not.toHaveBeenCalled(); f.flow.stop();
   });
   it('retries an ambiguous page using the exact request and drops all pre-action siblings', async () => {
@@ -93,7 +92,6 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     f.flow.displayed(id(4), id(6)); f.flow.exposureAcknowledged();
     f.flow.expectPositive(id(90)); f.flow.positiveCommitted();
     f.flow.positiveReceipt({ actionId: id(91), itemId: id(4), undoable: true });
-    f.flow.recoveredAction(id(4));
     expect(f.recordImpression).toHaveBeenCalledOnce(); expect(f.load).toHaveBeenCalledOnce();
     expect(f.flow.snapshot()).toMatchObject({ waitingActionId: null, positiveCommitted: false });
     pending.resolve({ status: 'error', recovery: 'retry', message: 'connection lost' } as never); await flush();
@@ -132,10 +130,10 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
   });
   it('waits for every rating and List undo receipt and never adds skip to a positive card', async () => {
     const f = fixture(); f.flow.displayed(id(4), id(6)); await flush();
-    f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
-    f.flow.positiveReceipt({ actionId: id(81), itemId: id(4), undoable: true });
-    f.flow.positiveReceipt({ actionId: id(81), itemId: id(4), undoable: true });
-    expect(f.flow.skip()).toBe(false); expect(f.flow.advance()).toBe(true); await flush();
+    f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: true });
+    f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: true });
+    f.flow.expectPositive(id(81)); expect(f.flow.skip()).toBe(false);
+    f.flow.acknowledged(id(81)); await flush();
     expect(f.submit).not.toHaveBeenCalled();
     expect(f.flow.previous()).toBe(true);
     expect(f.undoPositive.mock.calls[0]![0].actionId).toBe(id(81));
@@ -149,7 +147,7 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
   });
   it('does not navigate back when guarded undo is unavailable; retry retains only unacknowledged work', async () => {
     const f = fixture();
-    f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
+    f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: true });
     f.flow.positiveReceipt({ actionId: id(81), itemId: id(4), undoable: true });
     f.flow.advance(); await flush();
     f.flow.previous();
@@ -166,7 +164,7 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
   it('undoes edits on the current card before undoing the previous card', async () => {
     const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
     f.flow.advance(); await flush();
-    f.flow.expectPositive(id(81)); f.flow.acknowledged(id(81));
+    f.flow.positiveReceipt({ actionId: id(81), itemId: id(9), undoable: true });
     f.flow.previous();
     expect(f.undoPositive.mock.calls[0]![0]).toMatchObject({ itemId: id(9), actionId: id(81) });
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]);
@@ -259,7 +257,7 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     const f = fixture(); const later = deferred<DiscoverySkipSource>();
     f.loadSource.mockImplementationOnce(() => later.promise);
     f.flow.displayed(id(4), id(6));
-    f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
+    f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: true });
     later.resolve(null as never); await flush();
     expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: true, message: null, delivery: initial });
     expect(f.flow.advance()).toBe(true); await flush();
@@ -271,8 +269,8 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(9) }, canPrevious: false });
     expect(f.submit).not.toHaveBeenCalled(); f.flow.stop();
   });
-  it('can undo a rating on the first card without an earlier history entry', async () => {
-    const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
+  it('can undo the first auto-advanced rating without an earlier browsing history', async () => {
+    const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80)); await flush();
     expect(f.flow.snapshot().canPrevious).toBe(true); expect(f.flow.previous()).toBe(true);
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]); await flush();
     expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(4) }, positiveCommitted: false, canPrevious: false });
@@ -282,7 +280,7 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     const f = fixture(); let reject!: (error: Error) => void;
     f.loadSource.mockImplementationOnce(() => new Promise((_resolve, fail) => { reject = fail; }));
     f.flow.displayed(id(4), id(6));
-    f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80)); reject(new Error('disconnected')); await flush();
+    f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: true }); reject(new Error('disconnected')); await flush();
     expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: true, message: null }); f.flow.stop();
   });
   it('does not classify an unmatched recovered atomic undo receipt as a new positive choice', async () => {
@@ -305,8 +303,8 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     receiveDiscoveryFeedAction(f.flow, { version: 1, actionId: id(80), profileId: scope.profileId,
       itemId: initial.item.id, interaction: { interest: null, saved: false, consumed: true, rating: 0, notInterested: false } });
     await flush();
-    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: true, delivery: initial });
-    expect(f.load).not.toHaveBeenCalled(); expect(f.flow.advance()).toBe(true); await flush();
+    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: false, delivery: { item: item(9) } });
+    expect(f.load).toHaveBeenCalledOnce();
     expect(f.submit).not.toHaveBeenCalled(); f.flow.stop();
   });
 });

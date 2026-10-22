@@ -60,7 +60,8 @@ vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: () => ({
 vi.mock('./useDiscoveryFeed', () => ({ useDiscoveryFeed: () => ({
   flow: fixture.flow, state: fixture.feedState, skips: { ready: true, pendingCount: 0, message: null },
 }) }));
-vi.mock('./FeedItemCard', () => ({ FeedItemCard: 'FeedItemCard' }));
+vi.mock('./FeedItemCard', () => ({ FeedItemCard: (props: { titleAction?: React.ReactNode; children?: React.ReactNode }) =>
+  React.createElement('FeedItemCard', props, props.titleAction, props.children) }));
 vi.mock('./RatingControl', () => ({ RatingControl: 'RatingControl' }));
 vi.mock('./InteractionPersistenceNotice', () => ({ InteractionPersistenceNotice: () => null }));
 vi.mock('../lists/ListDestinationSheet', () => ({ ListDestinationSheet: 'ListDestinationSheet' }));
@@ -120,7 +121,7 @@ beforeEach(() => {
 afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; vi.unstubAllGlobals(); });
 
 describe('mounted Discovery feed controls', () => {
-  it.each([0, 5, 10])('commits rating %i directly with the displayed origin and waits for a separate forward gesture', async rating => {
+  it.each([0, 5, 10])('commits rating %i with the displayed origin and prepares automatic forward motion after acknowledgement', async rating => {
     await mount();
     expect(fixture.setRating).not.toHaveBeenCalled();
     await act(async () => { host('RatingControl').props.onRatingChange(rating); });
@@ -131,11 +132,10 @@ describe('mounted Discovery feed controls', () => {
     expect(fixture.flow.advance).not.toHaveBeenCalled();
     expect(host('FeedItemCard').props.item.id).toBe('feed-item');
     expect(JSON.stringify(root!.toJSON())).not.toContain('Tallenna arvio ja jatka');
-    fixture.feedState.positiveCommitted = true;
-    fixture.feedState.source.acceptsNewSkip = false;
+    fixture.feedState.delivery = { item: { ...item, id: 'fresh-after-rating' }, origin: { ...origin, deliveryRequestId: 'fresh-page' } };
     await update();
-    await act(async () => { expect(host('FeedItemCard').props.onSkip()).toBe(true); });
-    expect(fixture.flow.advance).toHaveBeenCalledOnce();
+    expect(host('FeedItemCard').props.item.id).toBe('fresh-after-rating');
+    expect(fixture.flow.advance).not.toHaveBeenCalled();
     expect(host('FeedItemCard').props.entryDirection).toBe('forward');
     expect(fixture.setRating).toHaveBeenCalledTimes(1);
   });

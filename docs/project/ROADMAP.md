@@ -47,7 +47,10 @@ not optional future polish. Deliver them in the current Sprint 014 / #336
 continuation before canonical preview and first-session usefulness acceptance.
 The shared card/feed part of #239 is advanced from 17.0. The October 22 owner
 feedback additionally advances its compact viewport, direct slider rating,
-List-picker star and forward/backward navigation into the current packet. Broad
+List-picker star and forward/backward navigation into the current packet. Its
+latest refinement requires centered artwork/text/slider, the star beside the
+title, rating acknowledgement followed by automatic advance, and a five-card
+Discovery buffer with the next card visible during dragging. Broad
 collection/detail work retains its existing slot. The default Discovery grid is
 unchanged; UX_PRINCIPLES owns the superseding controls contract.
 
@@ -67,18 +70,23 @@ and the configured #695 APK is ready. The prerequisite and both unchanged #349
 hosted forwards are installed and verified; the two missing operations completed
 on 2026-10-22 through the owner-approved browser fallback with atomic SQL Editor
 history receipts. PR #353 repairs the subsequent Room → Movies/Books navigation
-blocker on #698. The owner reached the replacement feed and reported unavailable
-Ohita, oversized chrome and incomplete continuous navigation. Finish the dependent
-October 22 #239 correction (including smooth transitions and initial Room
-hydration, after the owner confirmed #700 navigation checks) and replacement-build/device matrix before preview or
-usefulness acceptance. Do not replay installed operations. STATUS owns exact
+blocker on #698. #354's compact feed/skip-clock/startup correction is accepted
+after all five CI #704 gates; the owner previously confirmed #700 navigation
+checks. Continue its new bounded five-card feed/rating/layout refinement on
+`feat/239-buffered-feed`, then the replacement-build/device matrix before preview
+or usefulness acceptance. The new reader lifecycle must preserve immutable page
+receipts while releasing obsolete derived readers after meaningful choices.
+Do not replay installed operations. STATUS owns exact
 source/rollout receipts; DEVICE_TEST owns the observation matrix.
 Versioned Taste candidate-pool refresh/refill under #336 follows this bounded feed packet;
 keep original frozen panels, first labels, session policies and retry origins.
 
 The source shares artwork/metadata/description and deliberate upward or accessible
 Ohita, preserves v1/UNKNOWN/NOT_INTERESTED, recovers exact commands across restart,
-and replaces unshown Discovery work only after acknowledgement. Collection and
+and replaces stale unshown Discovery work after meaningful-action acknowledgement.
+The explicit suppression-only neutral-skip exception permits unrelated prepared
+cards to remain; ratings, List changes and undo still require fresh selection.
+Collection and
 unranked overlay detail remain outside the delivered-Event skip boundary. STATUS
 owns source/CI/install receipts and DEVICE_TEST the actual observation matrix.
 The 24-hour server-clock policy admits no early Context/Scenario-change shortcut.
@@ -810,7 +818,8 @@ Exit: contextual Lists, search/filters and authorized Profile surfaces; accessib
 Owner decision 2026-09-12 promotes #230 private category statistics/weekly tracking
 and #231 multi-select/List moves/history trash to required pre-MVP work, with
 #239 card controls. The October 15 and October 22 refinements advance shared
-feed/artwork, contextual Ohita, compact viewport, direct rating, List-picker star
+feed/artwork, contextual Ohita, compact viewport, centered direct rating with
+acknowledged auto-advance, title-adjacent List star, five-card Discovery preparation
 and reverse undo to the current continuation. Earlier explicit-Next-only and
 default-save-star/separate-overflow plans are superseded for that feed mode.
 #240 reconnect source is now part

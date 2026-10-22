@@ -1,4 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Image } from 'react-native';
 import { useSupabaseConnection } from '../../data/SupabaseProvider';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useEventTracking } from '../events/EventTrackingContext';
@@ -7,7 +8,7 @@ import { createContextualSkipRpc, loadDiscoverySkipSourceResult } from '../event
 import { createUuidV7 } from '../events/eventTracking';
 import { useItemInteractions } from './ItemInteractionContext';
 import { createDiscoveryFeed, receiveDiscoveryFeedAction, type DiscoveryFeed, type DiscoveryFeedSnapshot, type FeedDelivery } from './discoveryFeed';
-import { createPredictionPageRequest, loadCatalogPredictionPage } from './predictionPageOperations';
+import { createFeedPredictionPageRequest, loadCatalogPredictionPage } from './predictionPageOperations';
 import type { DiscoveryMode } from '../../domain/contracts';
 
 export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMode) {
@@ -29,9 +30,9 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
     const rpc = createContextualSkipRpc(client);
     const controller: DiscoveryFeed = createDiscoveryFeed({ initial, scope: { actorUserId, profileId, sessionId, mode },
       createId: createUuidV7, nowMicros: () => (BigInt(Date.now()) * 1000n).toString(),
-      createRequest: () => createPredictionPageRequest({ version: 3, requestId: createUuidV7(), profileId, sessionId,
+      createRequest: replacesChainId => createFeedPredictionPageRequest({ replacesChainId, requestId: createUuidV7(), profileId, sessionId,
         mode, itemType: initial.item.itemType, limit: 1, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED' } } }),
-      createRestoreRequest: () => createPredictionPageRequest({ version: 3, requestId: createUuidV7(), profileId, sessionId,
+      createRestoreRequest: replacesChainId => createFeedPredictionPageRequest({ replacesChainId, requestId: createUuidV7(), profileId, sessionId,
         mode, itemType: initial.item.itemType, limit: 50, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
       load: (request, signal) => loadCatalogPredictionPage(client, request, signal),
       loadSource: (request, signal) => loadDiscoverySkipSourceResult(rpc, request, signal),
@@ -61,8 +62,18 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
   useLayoutEffect(() => {
     if (state?.delivery && skips.ready && skips.pendingCount === 0) {
       flow?.displayed(state.delivery.item.id, state.delivery.origin.deliveryRequestId!);
+      if (actions.persistenceStatus === 'ready' && actions.atomicPendingCount === 0) flow?.warm();
     }
-  }, [flow, state?.delivery, skips.ready, skips.pendingCount]);
+  }, [flow, state?.delivery, skips.ready, skips.pendingCount, actions.persistenceStatus, actions.atomicPendingCount]);
+  const prefetchedImages = useRef(new Set<string>());
+  useEffect(() => {
+    const urls = new Set(state?.upcoming.flatMap(entry => entry.item.imageUrl ? [entry.item.imageUrl] : []) ?? []);
+    for (const url of urls) {
+      if (!prefetchedImages.current.has(url)) void Image.prefetch(url).catch(() => undefined);
+    }
+    // Keep only the four upcoming assets; cache warming never creates exposure.
+    prefetchedImages.current = urls;
+  }, [scope, state?.upcoming]);
   const rejected = useRef(false);
   useLayoutEffect(() => {
     if (actions.canDiscardAction) rejected.current = true;

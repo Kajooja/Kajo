@@ -318,16 +318,20 @@ second Done confirmation, and creating a List alone does not save the Item.
 A deliberate slider release, track tap or accessible adjustment commits the
 selected integer rating immediately. Remove **Tallenna arvio ja jatka**. Merely
 opening the card or cancelling a drag never saves the initial value; zero and
-neutral five remain real ratings. The acknowledged rating/List choice stays
-visible until the next deliberate forward gesture. That advance must not also
-create Ohita. Pending writes block competing actions and keep exact retry identity. A vertical
+neutral five remain real ratings. A tap anywhere on the track or a deliberate
+horizontal drag commits the chosen rating once, then automatically advances after
+acknowledgement and fresh selection. A List choice retains its confirmed positive
+state until the next forward gesture. Neither positive advance creates Ohita.
+Pending writes block competing actions and keep exact retry identity. A vertical
 or diagonal drag over the rating handle and multitouch movement must not commit
 a rating; only deliberate horizontal slider intent does.
 
 The card fills the usable area between compact top and bottom navigation bars.
 Do not reserve empty feedback/help rows, duplicate safe-area padding or a large
-header/footer panel. Keep the List star and rating slider reachable above the
-bottom dock. Long descriptions have a separate scroll surface, so reading them
+header/footer panel. Center artwork and compact text with symmetric side margins.
+Center the bottom rating slider with small side margins; place the List star
+beside the title at the title's visual size while retaining an accessible touch
+target and independent focus. Long descriptions have a separate scroll surface, so reading them
 does not dismiss the Item; retain metadata, artwork fallback and source credits.
 Large text may require internal content scrolling rather than hiding controls.
 
@@ -337,8 +341,16 @@ the preceding card and reverses its exact eligible action through the existing
 canonical undo/withdrawal boundary. Restore only after acknowledgement; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
-mean infinite history or recycling an exhausted catalogue. Retain the outgoing card as an inert presentation while the acknowledged next
-delivery loads; errors retry the exact request without another choice. Avoid
+mean infinite history or recycling an exhausted catalogue. Discovery prepares up
+to five cards (active plus four successors), replenishing one in the background
+as browsing advances. The next card becomes visible during the upward drag, but
+its preview is inert and creates no impression or action capability. Activate it
+only after the outgoing action is acknowledged. Neutral contextual skip may
+retain unrelated prepared candidates under the suppression-only exception in
+the prediction contract; ratings, List changes and undo invalidate unseen work
+and select from the newly committed state. Retain the outgoing card as an inert
+presentation when its acknowledged fresh successor still needs to load; errors
+retry the exact request without another choice. Avoid
 snap-back/blank transitions, animate entry in the navigation direction and settle
 cancelled drags, respecting reduced motion. Ordinary data updates must not cancel
 a valid in-progress gesture. No separate visible
@@ -431,9 +443,10 @@ An unavailable target has retry/cancel recovery; cancellation starts a fresh fee
 instead of silently showing a substitute as the requested previous card. Shared
 consensus that cannot be undone is detected before reversing related actions.
 
-Sequential Taste now shares the compact viewport, direct slider commitment and
-account-scoped help. Its existing acknowledged-answer controller still advances
-automatically; numeric backward-question undo is not implemented. That gap remains
+Sequential Taste shares the compact viewport, direct slider commitment and
+account-scoped help. Its acknowledged-answer controller advances automatically;
+Discovery's five-card preparation does not precompute future adaptive Taste
+questions. Numeric backward-question undo is not implemented. That gap remains
 open before claiming full Taste/Discovery interaction parity. V1/challenge save
 controls and frozen first-answer measurement retain their established contracts.
 STATUS owns source/CI/hosted and device facts; these boundaries are not device

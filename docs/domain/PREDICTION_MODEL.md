@@ -902,8 +902,10 @@ change is guaranteed after every answer, and repeating a cold-start opening
 across empty Profiles is not alone a defect.
 
 Freeze the forecast before its answer; commit and acknowledge the answer before
-requesting its successor. A newly committed prefix invalidates undelivered queued
-feed candidates from an older prefix. Bounded eligible pools must support
+requesting its successor. A newly committed learning prefix invalidates undelivered
+queued feed candidates from an older prefix. Ratings, List changes and undo must
+retire unseen Discovery work before fresh selection; a late old response cannot
+enter the new generation. Bounded eligible pools must support
 versioned refresh/refill as the current supported state changes, rather than
 locking the whole future feed to one START-time slate. Freeze each new scoring
 panel/pool and retain the original panels for historical same-prefix comparisons.
@@ -914,6 +916,19 @@ trade immediate satisfaction for supported information acquisition; its versione
 trace must state that objective/tradeoff rather than claim every question is the
 best pleasure recommendation. Discovery exploitation and Taste acquisition share
 state/forecast semantics without requiring identical selection policies.
+
+The October 22 continuous Discovery refinement permits one narrow exception:
+acknowledged neutral contextual skip changes only the skipped Item's suppression,
+and is excluded from Working taste evidence. Other already prepared candidates
+in the same scoped feed may retain their frozen order and exact page origins.
+This permits a bounded active-plus-four buffer, with one background replacement
+after each advance. It does not authorize stale candidates after a rating, List
+change, withdrawal, scope change or recovery from an unrelated committed action.
+New background page requests still use the latest committed canonical state.
+Prefetch and an inert adjacent-card preview are not impressions; only activation
+of the actually displayed card admits its exposure and action capability. The
+exception is Discovery-specific and does not precompute future adaptive Taste
+questions or revise old PredictionRuns.
 
 #### Canonical-forecast selector source — 2026-10-16
 
@@ -1976,6 +1991,26 @@ all modes, suppression/reminders, legacy retries, prefix races/expiry/limits and
 populated upgrade. A later-page rating 0/delayed exposure test verifies the exact
 page outcome and mature matching-genome evaluation. Local synthetic proof,
 actual native CI, hosted rollout and phone acceptance remain separate facts.
+
+#### Continuous Discovery reader replacement — October 22 successor
+
+`rank_items_feed_v1(request jsonb)` is a root-only wrapper around unchanged
+protocol 3. Its envelope adds `replacesChainId`, either null for an initial feed
+root or the owned derived chain to replace. Replacement is atomic with fresh
+ranking and requires the same actor/Profile/session/mode/domain. A new root may
+choose a different page size; ordinary continuation still uses the immutable v3
+size/context contract. The feed uses one-Item pages to warm four successors and
+replace one after a neutral advance.
+
+A separate immutable receipt binds the full feed envelope. Its exact retry
+returns the original underlying v3 response, including after reader retirement;
+a different request cannot replace the same chain twice. Only derived chain and
+cursor state is retired, preserving PredictionRuns, candidates, page lineage and
+historical receipt/evaluation origins. This releases obsolete reader slots
+without removing the shared 16-active-reader bound or changing v1–v3 behavior.
+The additive forward is `20261022195553_discovery_feed_reader.sql`. STATUS owns
+source validation, hosted activation and device acceptance; this contract is not
+an installation receipt.
 
 #### Captured-scope mobile pages — source, device acceptance pending
 

@@ -343,7 +343,11 @@ with source erasure and serving; this is a correctness tradeoff, not a measured
 throughput claim. Legacy removal/history-clearing entries that reach these
 erasers also acquire the exclusive gate before existing row locks; other
 ordinary actions retain shared locking. Earlier frozen forecasts/delivered receipts remain historical.
-Client acknowledgement must retire old undelivered request generations.
+Client acknowledgement must retire old undelivered learning-prefix generations.
+The October 22 Discovery buffer permits a suppression-only exception for a
+neutral contextual skip: unrelated prepared cards in the same scope may remain
+because that command supplies no taste evidence. Ratings, List changes, undo,
+scope changes and unrelated recovered actions still invalidate unseen work.
 
 Mobile routing validates capabilities and every receipt identity before clearing
 a persisted command. Taste shares its existing one-command queue; Discovery has
@@ -352,9 +356,11 @@ maps a skip to an old answer or silently discards it. The October 17 shared-feed
 source wires Taste to the exact question capability and Discovery to the actual
 per-Item page request plus recorded impression ID. Source RPC validation precedes
 new skip admission. A scope-level queue resumes original commands independently
-of card navigation/new Event sessions. Only a matching acknowledged receipt retires
-unshown work; fresh Discovery reads retain exact retry identity and request a new
-committed prefix. Positive advances never also skip. Partial/terminated gestures,
+of card navigation/new Event sessions. Only a matching acknowledged receipt can
+advance the corresponding card. Fresh Discovery reads retain exact retry identity
+and request the current committed prefix; a retained neutral-skip buffer keeps
+each original per-Item page identity. A rating automatically advances after its
+receipt and fresh selection, never also submitting a skip. Partial/terminated gestures,
 internal description scrolling, layout and backgrounding are inert. Actual hosted
 installation and phone acceptance remain separate. The source PR/STATUS own the
 exact tests, CI and installation boundaries.
@@ -1144,7 +1150,11 @@ Preserve dataset/release namespaces, raw values/scales, occurrence time, availab
 
 Only information available at prediction time may form input state, retrieval keys, transforms and memory. Later observed labels can evaluate eligible targets at their declared maturity/cutoff. An unchosen alternative has no observed counterfactual outcome; missing or not-yet-mature feedback is not rejection. Synthetic branches never become native Events, observed evaluation labels or independent support for their generator. External artifacts retain lineage and admission/withdrawal rules instead of appearing as copied Scenario history.
 
-### Planned star, overflow and Next controls — owner decision 2026-09-12
+### Earlier star, overflow and Next controls — owner decision 2026-09-12
+
+This historical plan is superseded for Discovery feed mode by the October 22
+List-picker star and direct-rating contract in UX_PRINCIPLES. Retain its evidence
+boundaries; do not restore its default-save/Next controls.
 
 #239 maps the star to the existing default SYSTEM_SAVED/SAVED action; Tykätyt is
 presentation wording and does not imply a rating or consumption. Shared saves
@@ -1172,3 +1182,13 @@ before its delayed impression. Shadow and mature evaluation compare the actual
 page's frozen candidate source; they do not simulate unseen whole-chain actions.
 Exact receipt retries after cache cleanup add no duplicate run/action/outcome.
 Source/PGlite, native CI, hosted rollout and real visibility remain separate gates.
+
+The October 22 continuous-feed successor prepares at most four upcoming
+Discovery cards beside the active card. An adjacent preview remains inert and
+accessibility-hidden; it cannot record an impression or acquire skip capability.
+On activation, the card retains its original Prediction/page origin. Ratings,
+List changes and undo invalidate unseen work; neutral skip alone permits the
+scoped suppression-only exception above. `rank_items_feed_v1` atomically replaces
+owned derived reader state while retaining immutable page evidence and exact
+full-envelope retry receipts. Reader replacement introduces no taste Event or
+Outcome, and it does not alter adaptive Taste question ordering.

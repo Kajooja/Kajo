@@ -10,55 +10,87 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — continuous Discovery feed and skip repair / #239
+## Current packet — buffered Discovery feed and rating flow / #239
 
-**Owner device feedback — 2026-10-22:** after downloading the replacement APK,
-the owner reached the feed and reported oversized top/bottom areas, persistent
-help, redundant Save/Ohita controls and no continuous reverse navigation. Pressing
-Ohita shows “Ohitus ei ole juuri nyt käytettävissä. Tarkista yhteys ja yritä
-uudelleen.” This is a failing skip observation, not successful feed acceptance or
-proof of a network outage. Installed checksum and Android version remain unreported;
-the owner now confirms replacement APK #700 checks 1–3 pass: category navigation,
-Item/Lists/Settings navigation and reopening preserve access. This is reported
-device evidence, not a checksum-verified complete feed acceptance. The owner also
-reports Room flashing/reloading at app startup; the current packet repairs that
-separate initial-hydration remount.
+**Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
+merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the
+owner's explicit instruction. Its final source head is
+`95213d9c1455d7127c5908f6bc41387c2bea33d5`; all five mandatory checks and the
+standalone APK job passed in [CI #704](https://github.com/Kajooja/Kajo/actions/runs/39834255038).
+The tested merge checkout `f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9` and accepted
+main share tree `0820b4b34b6e0b4f3934abc02333a2ff7f413d86`. The APK receipt is
+[below](#current-test-apk-and-device-work). Earlier publication/CI blocks in the
+sprint are historical and do not reopen #354.
 
-The active successor is [PR #354](https://github.com/Kajooja/Kajo/pull/354),
-`feat/239-continuous-card-feed`, based on navigation repair
-[PR #353](https://github.com/Kajooja/Kajo/pull/353), head
-`bee39231fa984bb8fb39cc1d34bb1885be9c6d57`. #353 is now accepted through merge
-`611fa83ca70e74fd6f17e2a427ea808ff887f5e2` after all five required CI #700 checks
-and the owner's reported phone navigation acceptance. It fixes the route-dependent bootstrap parent
-key that remounted the navigator in APK #698. Preserve that repair and its mounted
-navigation regression rather than restoring the broken accepted #352 parent.
+#354 supplies compact bars, direct slider commitment, the List-picker star,
+exact forward/reverse history, restrained motion and stable initial Room
+hydration. Preserve its navigation dependency #353, accepted as
+`611fa83ca70e74fd6f17e2a427ea808ff887f5e2`; the owner reported #700 navigation
+checks 1–3 passed. That report does not establish complete feed/startup acceptance
+or an installed #704 checksum. The CI Docker Hub correction accepts only the
+verified pinned image content; it is not a database upgrade.
 
-The new owner-approved design supersedes the earlier #239 star/overflow and
-explicit-save controls: full compact bar-to-bar feed, rating on slider release,
-List-picker star with confirmed-membership fill, forward neutral skip only without
-a positive choice, backward exact undo, and account-scoped first-use help.
+**Latest owner refinement — 2026-10-22:** center artwork and compact text with
+matching gutters; center the rating slider with small side margins; move a
+title-sized List star beside the title. Prepare five Discovery cards and refill
+one in the background, showing the next card during an upward drag. The owner
+also reports that rating no longer feels smooth: either tapping a chosen point
+or dragging must commit that rating and automatically advance. This supersedes
+#354's rule that an acknowledged rating waits for a later forward gesture.
+
+The active successor is `feat/239-buffered-feed`, based on accepted #354 main.
+Its bounded implementation keeps the active card plus at most four successors,
+with exact page origins and no prefetch impressions. Neutral skip may retain
+unrelated prepared cards because it changes suppression only; ratings, List
+changes, undo and scope changes invalidate unseen work and select from the newly
+committed state. A new root-only `rank_items_feed_v1` wrapper releases obsolete
+derived reader state without changing immutable PredictionRuns or receipt retry.
+The new forward is `20261022195553_discovery_feed_reader.sql`. The completed
+source also retains an ambiguous root request until its exact receipt is resolved
+before replacement, gates warming on durable action recovery, and invalidates
+unseen work after recovered same-Profile actions on another Item. A proven
+unusable/expired cursor clears unseen work and waits for explicit retry; reaching
+the reader bound renews the owned reader rather than claiming catalogue exhaustion.
+`RollingFeedCard.tsx` preserves the outgoing visual controls, title action and
+expanded description during entry, with reduced-motion preference retained.
+
+Focused local reader validation passes: the additive populated-schema PGlite
+test preserves existing function/OID/ACL definitions and frozen runs, candidates,
+pages and receipts. It exercises 20 successive replacements while 15 unrelated
+readers keep the active total at 16, exact old root/continuation retries, failed
+replacement rollback, scope denial and new ACL/RLS.
+
+**Final local validation:** lint and mobile/engine/acceptance typechecks pass;
+692 mobile tests in 71 files, 318 database tests, 311 engine tests, 19 Python and
+43 Node research tests, plus 6 acceptance and 5 mobile-acceptance tests pass.
+Explicit demo-mode iOS and Android Expo exports pass. `npm run check` reaches
+the unchanged Edge dependency fetch and stops because `registry.npmjs.org`
+refuses the Deno `@supabase/auth-js` request. No complete local-root success or
+native device/emulator observation is claimed. Final-source CI and a configured
+replacement APK remain pending.
+
+**Publication authorized:** the owner explicitly replied **“saat julkaista”**
+to publishing reviewed local commit `06cd5eacfc4a52346e146d6f9ccb9530387d35fa`
+to `Kajooja/Kajo` branch `feat/239-buffered-feed` and opening its PR against
+`main`. This supersedes the earlier automatic approval rejection for this packet.
+The implementation is unchanged; this follow-up only records authorization.
+The branch's PR body owns the exact remote commit, CI and configured APK receipts.
+Publication approval does not establish source merge, hosted or device acceptance.
+
+**Hosted deployment blocked:** read-only preflight confirmed the required
+dependencies/RLS and installed clock receipt `20261022152530`. Both migration-API
+attempts failed with `McpServerError: Invalid or expired requestState`. Read-only
+verification after both attempts returns `feed_rpc = null` and `migration = null`.
+No hosted write succeeded, and the new feed reader is not installed. Resolve the
+connector failure and install only this new reviewed forward before configured
+feed acceptance; do not replay the existing clock migration.
+
 [UX_PRINCIPLES](../product/UX_PRINCIPLES.md#required-pre-mvp-card-controls--239--mvp-ux-006)
-owns the contract; [DEVICE_TEST](DEVICE_TEST.md#continuous-feed-feedback--239--2026-10-22)
-owns the new observation matrix. The active source now supplies these Discovery
-controls and guarded reverse navigation. History retains exact action identities
-within the mounted scope and the ten-native-action undo limit. After confirmed
-undo, it obtains a fresh canonical delivery of the same Item, searching at most
-three 50-Item pages; it never reuses a consumed/expired original delivery. An
-unavailable target offers explicit retry or cancellation back to fresh Discovery,
-without substituting a different Item. Nonundoable Shared consensus is rejected
-before beginning reversal rather than pretending to restore it.
-
-**Smooth-feed/startup continuation:** the outgoing card now remains visible and
-inert while the acknowledged next delivery loads, including retryable failures.
-The same page request is retried without another skip or impression; only a fresh
-mounted delivery becomes actionable. Directional entry and release/cancellation
-motion replace abrupt snapping; ordinary parent updates must not cancel a drag.
-Pending-save feedback overlays the viewport rather than changing its height.
-The rating slider rejects vertical/diagonal and multitouch movement. The bootstrap
-parent now exists before initial status resolves; the existing splash covers that
-hydration so Room mounts once. Errors or an eight-second initial-status deadline
-fail open, and late status cannot interrupt the navigator. These changes still
-require the successor APK and actual phone observation.
+owns the controls and continuous-feed contract; [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
+owns the narrow suppression-only buffer exception. [DEVICE_TEST](DEVICE_TEST.md#continuous-feed-feedback--239--2026-10-22)
+owns the actual phone matrix, including rating tap/drag auto-advance, adjacent-card
+motion, slow refill, fresh selection and repeated reader replacement. No device
+smoothness or complete startup success is inferred from source or CI.
 
 **Skip diagnosis and additive source repair:** read-only SQL confirms phone
 impression occurrence times 107/116 ms earlier than the server prediction request,
@@ -86,60 +118,23 @@ changed. These probes are not a full authenticated/device command success.
 Private target-bound evidence stays outside Git. Do not replay the installed clock
 forward. Actual phone success remains unobserved after this repair.
 
-**Taste boundary remains incomplete:** sequential Taste also has the compact
-viewport, direct rating and account-scoped help. Its existing controller still
-selects the next question automatically after acknowledgement and has no numeric
-backward-question undo UI. Do not claim identical manual-advance/reverse behavior
-across Taste and Discovery. Retained v1/challenge Save and frozen measurement
-contracts remain unchanged. These explicit gaps stay open under MVP-UX-007.
+**Preserved undo and Taste boundaries:** Discovery history retains exact actions
+within the mounted scope and ten-native-action undo limit. After confirmed undo,
+it reacquires the same Item through at most three 50-Item canonical pages; it
+never reuses an expired/consumed original delivery. Unavailable targets offer
+retry or cancellation, and nonundoable Shared consensus is rejected before
+partial reversal. Sequential Taste shares compact presentation, direct rating
+and account-scoped help, and advances after acknowledgement. It does not use
+Discovery's five-card buffer to precompute adaptive questions and still lacks
+numeric backward-question undo. Retained v1/challenge Save and frozen first-answer
+measurement remain unchanged; full interaction/device acceptance remains open.
 
-Final local lint/typecheck, all 668 mobile tests, 317 database tests, 311 engine tests,
-catalog/research/acceptance groups and explicit demo-mode iOS/Android exports
-passed. Final mobile exports used two Metro workers in explicit demo mode.
-The full root check stopped at Deno registry access (connection refused)
-before the unchanged Edge suite; no complete local-root success is claimed.
-Final-head CI and the configured replacement APK remain required. No new installed
-APK or phone success is claimed; hosted clock repair is verified independently.
-
-**Publication and integration authorized — 2026-10-22:** the owner explicitly
-approved publishing the complete prepared feed/skip/startup source and documents
-to `Kajooja/Kajo`, creating a configured test APK, and merging #353 plus this
-successor after all required final-source CI checks pass. This resolves the earlier
-automatic publication rejection; no alternate write mechanism was used to bypass
-it. The validated local implementation remains
-`2c22f7742c1a1aa6e5d9602cf8b8c89c77d3512a` (tested tree
-`8a0e77643297b06e340815f5e5063c2236b94279`); subsequent changes preserve mobile
-implementation bytes and add publication receipts plus the CI registry-reference
-correction below. #353 has been merged as recorded above.
-The `feat/239-continuous-card-feed` pull request owns the successor's exact final
-head, five CI gates, source integration and configured APK artifact/expiry receipt.
-Do not infer a built or device-accepted successor from local exports alone.
-
-**First publication CI receipt:** #354 head
-`2b6a76c2f0aec7a648fc10b9604e1be8e5b5b95c` started
-[CI #703](https://github.com/Kajooja/Kajo/actions/runs/39832956672) with the APK
-opt-in. Validation and platform/defaults passed, but the clean-installation job
-stopped before application SQL: pinned CLI 2.117.0 selected the official Docker
-Hub fallback `supabase/postgres:17.6.1.167`, absent from the local reference
-allowlist. Its Linux x64 content ID exactly matches the reviewed
-`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
-The bounded correction accepts only this additional exact reference and retains
-version, architecture and digest checks; changed content/tags/unknown registries
-still fail. ADR-0006 records the pinned upstream source and regression evidence.
-This is a CI environment-name correction, not a database upgrade or hosted write.
-All 16 isolated-stack regression tests pass locally after the correction.
-All five gates and the APK must pass on the corrected final source before merge.
-
-**One active continuation:** finish this authorized source publication and the
-configured test build, with all five required final-source CI gates before merge;
-then retest the compact feed and initial startup on the new APK. The prior #700
-APK establishes navigation only and does not include these new controls/motion.
-Use DEVICE_TEST's current matrix for actual phone results. Preserve accounts,
-ratings, List memberships and exact pending commands. Do not reset accounts or
-replay installed migrations. After source integration, do not recreate this packet
-because an earlier dated publication block appears in sprint history.
-Versioned Taste pool refresh/refill under #336 follows this packet; original frozen
-panels, first labels, session policies and retry origins remain protected.
+**One active continuation:** publish the completed bounded feed/rating successor,
+obtain final-source CI/configured-build and resolve the hosted deployment blocker
+with an exact forward receipt before the new phone matrix. Preserve accounts, ratings, List memberships
+and pending commands. Do not reset accounts or replay installed migrations.
+Versioned Taste pool refresh/refill under #336 follows this packet; original
+frozen panels, first labels, session policies and retry origins remain protected.
 
 ## Accepted contextual skip source and backend checkpoint
 
@@ -474,7 +469,23 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is [CI #698](https://github.com/Kajooja/Kajo/actions/runs/39746829966),
+The latest verified configured build is [CI #704](https://github.com/Kajooja/Kajo/actions/runs/39834255038),
+accepted #354 source head `95213d9c1455d7127c5908f6bc41387c2bea33d5` and tested
+merge checkout `f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9`. Its tree is identical
+to accepted main `99c21341c62eaae8dab3589944a434b06dc14258`. All five mandatory
+checks and the separate Android job passed.
+
+[APK artifact #704](https://github.com/Kajooja/Kajo/actions/runs/39834255038/artifacts/12451929109),
+`kajo-android-standalone-f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9`, expires
+**2026-10-29 19:27:41 UTC**. The downloaded ZIP is 49,293,137 bytes with SHA-256
+`351d815369a72e3d6949176457bfab641a1b5f17f97e13aab4c38604d091a9f7`.
+Its `app-release.apk` is 106,074,627 bytes with SHA-256
+`1c6488329a857c39f64ded2a6eba9617b3424acb52d0a337becddea25ae19839`.
+Archive/APK integrity and the embedded JavaScript bundle were verified. This is
+not an installed phone checksum or device acceptance. It contains #354's compact
+feed/startup repair, but not the active buffered-feed/rating successor above.
+
+The earlier verified configured build is [CI #698](https://github.com/Kajooja/Kajo/actions/runs/39746829966),
 source `5fb076c5b8dad2c4377dd3f8d33072d2f92fe860` (accepted #352).
 Its [APK artifact](https://github.com/Kajooja/Kajo/actions/runs/39746829966/artifacts/12415374749)
 is a 49,282,087-byte ZIP with reported archive SHA-256

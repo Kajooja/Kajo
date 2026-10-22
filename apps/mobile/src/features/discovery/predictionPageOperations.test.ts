@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
-import { createNextPredictionPageRequest, createPredictionPageRequest, loadCatalogPredictionPage, loadPredictionPage, mapPredictionPage, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
+import { createFeedPredictionPageRequest, createNextPredictionPageRequest, createPredictionPageRequest, loadCatalogPredictionPage, loadPredictionPage, mapPredictionPage, PREDICTION_FEED_V1_RPC, PREDICTION_PAGE_V1_RPC } from './predictionPageOperations';
 
 const id = (n: number) => `a2290000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const request = createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),
@@ -280,6 +280,32 @@ describe('Protocol 3 catalog-chain boundary', () => {
       prediction_id: id(205), item_id: id(index + 1000) })),
     source: { ...root().source, sourcePredictionId: id(205), parentPredictionId: rootPredictionId,
       pageIndex: 2, featureAt: '2026-10-06T13:01:00+00:00', candidateCount: 45, seenCount: 80 } });
+
+  it('binds replacement to exact feed root retries and leaves continuations on v3', async () => {
+    const feedRequest = createFeedPredictionPageRequest({ requestId: rootRequest.requestId,
+      profileId: rootRequest.profileId, sessionId: rootRequest.sessionId, mode: rootRequest.discoveryMode,
+      itemType: rootRequest.itemType, limit: rootRequest.limit, context: rootRequest.context, replacesChainId: id(900) });
+    const rpc = vi.fn().mockResolvedValueOnce({ data: null, error: { message: 'reply lost' } })
+      .mockResolvedValueOnce({ data: root(), error: null });
+    expect((await loadPredictionPage(rpc, feedRequest)).status).toBe('error');
+    const result = await loadPredictionPage(rpc, feedRequest);
+    expect(rpc.mock.calls[0]).toEqual(rpc.mock.calls[1]);
+    expect(rpc).toHaveBeenCalledWith(PREDICTION_FEED_V1_RPC, { request: feedRequest });
+    expect(Object.isFrozen(feedRequest)).toBe(true);
+    if (result.status !== 'success') throw new Error('Expected feed root');
+    const next = createNextPredictionPageRequest(result, id(204));
+    expect(next).not.toHaveProperty('replacesChainId');
+    const continueRpc = vi.fn().mockResolvedValue({ data: later(), error: null });
+    expect((await loadPredictionPage(continueRpc, next)).status).toBe('success');
+    expect(continueRpc).toHaveBeenCalledWith(PREDICTION_PAGE_V1_RPC, { request: next });
+  });
+
+  it('marks initial feed roots explicitly and rejects invalid replacement identities', () => {
+    const input = { requestId: id(1), profileId: id(2), sessionId: id(3),
+      mode: 'FOR_YOU' as const, itemType: 'BOOK' as const, limit: 1 };
+    expect(createFeedPredictionPageRequest(input)).toMatchObject({ version: 3, replacesChainId: null, cursor: null });
+    expect(() => createFeedPredictionPageRequest({ ...input, replacesChainId: 'invalid' })).toThrow();
+  });
 
   it('explicitly opts in and carries the original captured scope through the opaque cursor', async () => {
     expect(createPredictionPageRequest({ requestId: id(1), profileId: id(2), sessionId: id(3),

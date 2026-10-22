@@ -10,7 +10,12 @@ yritä uudelleen.” Do not label this a network outage without diagnostic evide
 The subsequent owner report confirms replacement APK #700 navigation checks 1–3
 pass (categories, Item/Lists/Settings, and reopening). The full feed matrix remains
 open. The exact installed checksum/Android version remain unreported. A separate
-startup Room flash/reload is now reported and repaired in the active source.
+startup Room flash/reload is reported and repaired in accepted #354 source.
+The subsequent owner refinement requests centered artwork/text and slider, a
+title-sized List star beside the title, five prepared Discovery cards and an
+adjacent-card reveal during dragging. The owner also reports the rating gesture
+is no longer smooth: deliberate tap or drag must rate and advance automatically.
+These new observations do not establish an installed #704 checksum or success.
 
 The active successor in STATUS must be tested as an update preserving user data.
 Run the category/navigation checks below, then this superseding feed matrix on
@@ -19,11 +24,12 @@ BOOK and MOVIE. It refines the earlier October 17 control expectations.
 | Case | Required observation |
 |---|---|
 | Startup | Cold-open and reopen with normal/slow/offline connectivity. The initial loading surface opens Room once, without Room → loading → Room flashing. Categories still remain open; late status cannot interrupt navigation. |
-| Viewport | Card fills the area between compact bars. No empty feedback/help bands or duplicate bottom safe inset; rating and star remain visible on OnePlus, small screen and large text. |
+| Viewport | Card fills the area between compact bars. Artwork/text are centered with symmetric gutters; slider is centered with small margins. The star sits beside the title at the title's visual size but remains an independently accessible touch target. No empty feedback/help bands or duplicate bottom safe inset. Verify OnePlus, small screen and large text. |
 | First-use help | New account sees one short overlay. Selvä or first successful interaction dismisses it; another card/category/Profile and app restart do not bring it back for the same account. Another account has its own first-use state; help can be requested accessibly. |
-| Direct rating | Slider release, track tap or accessible adjustment saves the selected 0–10 value once. No Save button; untouched/default/cancelled slider never saves. Verify 0 and 5, change a rating and reopen history. Vertical/diagonal movement starting on the slider and adding a second finger must not save a rating. |
+| Direct rating | Tap any track/handle position or drag horizontally and release; the selected 0–10 value saves once and the next card appears automatically after acknowledgement and fresh selection. No Save button; merely mounting/defaulting or cancelling never saves. Verify 0 and 5, change a rating and reopen history. Vertical/diagonal movement starting on the slider and adding a second finger must not save a rating. |
 | List star | Outline opens the multi-list picker. Only acknowledged active-Profile membership fills it white; pending/rejected Shared proposal does not. Add to two Lists and verify both; merely opening/creating a List changes no membership. |
-| Forward | Consecutive upward card swipes advance one Item at a time, with no snap-back or blank loading gap. The outgoing card remains inert until the fresh successor is ready. Cancelled gestures return smoothly; reduced motion avoids directional animation. No positive choice means one contextual skip. After rating/List acknowledgement, next swipe advances without another skip. No immediate recycling or false exhaustion of eligible server results. |
+| Forward | Up to five cards are prepared, one active and four upcoming; each neutral skip replenishes one in the background. The next card moves into view during the upward drag but remains inert until acknowledgement. Consecutive swipes advance one Item at a time without snap-back or blank gaps. Cancelled gestures settle; reduced motion avoids displacement. No positive choice means one contextual skip. Rating auto-advance and a forward gesture after List acknowledgement add no skip. No immediate recycling or false exhaustion. |
+| Buffer freshness | Rate while a refill is delayed; the old unseen queue/late reply must not become the next active card. Fresh post-acknowledgement selection preserves the new page origin. Repeat over 16 rating advances without exhausting abandoned-reader slots; rapid swipes, network loss and retry retain the same current card/request. Preview/preload alone creates no impression. |
 | Reverse | Downward swipe restores the exact preceding card only after its eligible action is undone. Repeat across mixed skips/ratings/List actions; existing unrelated memberships and history remain. Explain an unavailable/conflicted undo rather than target another Item. |
 | Gesture isolation | Short/reversed/cancelled/multitouch movement, description scrolling, slider dragging, star/picker use, rotation and app background never cause an unintended skip/undo. Accessible advance/reverse actions match gestures. |
 | Failure and restart | Lost source/skip/rating/undo replies keep a usable recovery state. Restore network or restart; the exact pending command completes once without switching actor/Profile/Item. Failed skip leaves the card available, not silently skipped. |
@@ -41,7 +47,8 @@ and its eight preservation/security postchecks passed, as recorded in STATUS.
 Retest the actual phone path; successful DDL is not a successful skip observation.
 
 For sequential Taste, test the compact viewport, account-scoped help and direct
-slider save separately. Current source advances automatically after acknowledgement
+slider save separately. Discovery's five-card buffer must not precompute future
+adaptive Taste questions. Current source advances automatically after acknowledgement
 and has no numeric backward-question undo; record that gap rather than marking
 full parity passed. Legacy v1/challenge keeps explicit Save and immutable first
 measurements. Preserve Shared consent and the exact-origin matrix below.

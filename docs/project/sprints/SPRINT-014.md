@@ -7928,3 +7928,89 @@ Hub tag. ADR-0006 records pinned upstream provenance. Mobile source remains the
 tested packet. All required final-source gates and the configured APK still must
 pass before source merge; phone acceptance remains separate. No hosted operation
 or account reset occurs.
+
+### Accepted #354 and buffered-feed successor — 2026-10-22 / #239
+
+The owner explicitly requested merging #354. All five mandatory CI #704 gates
+and the configured Android job passed for head
+`95213d9c1455d7127c5908f6bc41387c2bea33d5`; tested merge checkout
+`f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9` and accepted main
+`99c21341c62eaae8dab3589944a434b06dc14258` share tree
+`0820b4b34b6e0b4f3934abc02333a2ff7f413d86`. STATUS owns the verified downloadable
+APK #704 identity/expiry. This supersedes the earlier pending publication/CI
+statements without claiming phone installation, motion or startup acceptance.
+
+New owner feedback requests centered artwork and compact text, a centered slider
+with small side margins, and a title-sized List star beside the title. Either a
+tap at the selected rating position or a horizontal drag must commit once and
+automatically advance after acknowledgement. The owner also requests five
+prepared Discovery cards, background replenishment and the next card already
+visible during an upward drag. This is the active `feat/239-buffered-feed`
+successor based on accepted #354, not a reason to recreate its startup repair.
+
+The bounded design preserves current plus four exact deliveries. Preview/preload
+creates no impression and cannot accept actions. Neutral skip changes only its
+Item's suppression and may retain unrelated prepared candidates; ratings, List
+changes, undo and scope changes retire unseen work and select from the newly
+committed state. This narrow Discovery exception is recorded in PREDICTION_MODEL
+and DATA_EVENTS. Future adaptive Taste questions remain selected after their
+preceding answer, not precomputed as a five-question slate.
+
+The new `rank_items_feed_v1` root wrapper binds `replacesChainId` in an immutable
+receipt, atomically replacing owned derived reader state while preserving v3
+runs, page evidence and exact retries. Its additive forward is
+`20261022195553_discovery_feed_reader.sql`; v1–v3 continuation and the shared
+reader limit remain intact. No installation of this forward is established by
+this entry. STATUS owns the final source/CI/hosted/build receipts; DEVICE_TEST
+adds rating auto-advance, adjacent preview, refill/freshness and repeated-reader
+checks. Final-source CI, hosted installation and actual device acceptance remain
+separate from the completed local validation below.
+
+Focused local reader validation: the populated-schema PGlite test passes,
+including preservation of existing function identities/ACLs and historical
+runs/candidates/pages/receipts; 20 replacements with 15 unrelated active readers;
+historical root/continuation retry, rollback, scope denial and new ACL/RLS.
+Final local validation passes: lint; mobile/engine/acceptance typechecks;
+692 mobile tests in 71 files; 318 database tests; 311 engine tests; 19 Python and
+43 Node research tests; 6 acceptance and 5 mobile-acceptance tests; explicit
+demo-mode iOS/Android Expo exports. `npm run check` stops only at the unchanged
+Edge dependency fetch because `registry.npmjs.org` refuses Deno's
+`@supabase/auth-js` request. No complete local-root result or native
+device/emulator observation is claimed.
+
+The controller retains ambiguous root identity until exact recovery before
+replacement, delays warming until durable action recovery is ready, and
+invalidates unseen cards after same-Profile actions on other Items. Reader-limit
+renewal does not claim catalogue exhaustion. `RollingFeedCard` retains outgoing
+controls, title action and expanded description through the next entry, and
+caches the reduced-motion preference.
+
+Hosted preflight confirms required dependencies/RLS and existing clock receipt
+`20261022152530`, but two migration-API attempts failed with
+`McpServerError: Invalid or expired requestState`. Read-only verification after
+both attempts reports `feed_rpc = null` and `migration = null`; no hosted write
+succeeded. The new forward remains uninstalled. Resolve the connector blocker,
+then obtain its exact installation receipt alongside final-source CI/configured
+APK before the phone matrix. Do not replay already installed migrations.
+
+Changed boundaries: FeedItemCard/RollingFeedCard/RatingControl/ItemDetailScreen presentation,
+discoveryFeed/useDiscoveryFeed delivery lifecycle, predictionPageOperations and
+the additive feed reader; canonical UX, prediction/evidence, MVP, CODEMAP,
+ROADMAP and STATUS. The existing clock forward stays installed and must not be
+replayed. Preserve accounts, pending commands, exact undo and Shared consent.
+Versioned Taste pool refresh/refill under #336 remains the next packet.
+
+Publication checkpoint: GitHub branch `feat/239-buffered-feed` exists at accepted
+main, but automatic approval review rejected the new remote implementation
+commit because explicit authorization to publish this new private source packet
+to `Kajooja/Kajo` was absent. No successor PR or source commit was published.
+Retain the reviewed local branch and request explicit branch/PR publication
+approval; do not bypass this decision. The separate hosted connector failure
+above also remains unresolved.
+
+The owner subsequently replied **“saat julkaista”** to the explicit request to
+publish reviewed local commit `06cd5eacfc4a52346e146d6f9ccb9530387d35fa` to
+`Kajooja/Kajo`, branch `feat/239-buffered-feed`, and open a PR against `main`.
+That approval supersedes the publication hold above. Runtime source is unchanged;
+the PR body owns exact remote source/CI/build receipts. Hosted installation,
+source merge and phone acceptance remain separate outstanding gates.
