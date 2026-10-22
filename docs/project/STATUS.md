@@ -10,7 +10,31 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — contextual skip device acceptance / #239 and #336
+## Current packet — repair Discovery navigation blocker / #239
+
+**Owner device report — 2026-10-22:** after receiving APK #698, the owner can
+open Room but tapping either Movies or Books only flashes the screen and does
+not open Discovery. The feed/Ohita acceptance matrix is blocked, not passed.
+The installed checksum and Android version were not supplied.
+
+The bounded repair is on `fix/239-discovery-navigation-remount`, based on accepted
+#352 main `5fb076c5b8dad2c4377dd3f8d33072d2f92fe860`. A real React reconciliation
+regression reproduces loss of the navigator's selected route with the old source:
+`ProfileBootstrapGate` included route segments in the key of its navigator parent.
+The repair keeps that parent stable across routes and Settings/fail-open bypass,
+while retaining route-request cleanup and genuine Profile/client scope resets.
+The mounted regression covers retained v1/v2 dismissal, Movies, Books, detail,
+Lists/history, Settings and deferred/failed status refresh. Native Expo navigation,
+phone layout and gestures still need the replacement APK's device check.
+
+**One active continuation:** finish this repair's required checks, build a new
+configured APK and verify Room → Movies/Books first. Install as an update;
+preserve accounts, ratings, lists and pending commands. Only after opening works
+resume the existing feed/Ohita matrix. Versioned Taste pool refresh/refill under
+#336 remains the next source dependency after this blocker. No backend migration
+or account reset belongs to this repair.
+
+## Accepted contextual skip source and backend checkpoint
 
 The shared vertical Taste/Discovery feed is accepted through
 [PR #350](https://github.com/Kajooja/Kajo/pull/350), merge
@@ -76,16 +100,11 @@ intentional private-table no-policy informational notices. Detailed target-bound
 snapshots remain private. No account reset, valid user command or model/Working
 activation was used to verify deployment.
 
-**One active continuation:** use the existing #695 APK for actual phone layout,
-gesture, accessibility, restart and usefulness observations in
-[DEVICE_TEST](DEVICE_TEST.md#shared-feed-source-acceptance--239--2026-10-17).
-Install as an update preserving accounts, sessions and pending commands; record
-the installed checksum, device and the backend checkpoint above. No replacement
-build is needed for unchanged source. Versioned Taste candidate-pool refresh/refill
-under #336 is the next source dependency; preserve original frozen panels, first
-labels, session policies and retry origins. Recent supported prior, full readiness
-and measured quality retain their ROADMAP slots. #239/#336 and incomplete release
-gates remain open. Do not replay any installed migration.
+The earlier #695 device handoff is superseded by the #698 navigation blocker
+and active repair above. The installed backend checkpoint remains valid;
+do not replay any installed migration. Original frozen panels, first labels,
+session policies and retry origins remain preserved. #239/#336 and incomplete
+release gates stay open.
 
 **Documentation publication authorized — 2026-10-22:** the owner explicitly
 approved publishing these project documents to the public `Kajooja/Kajo`
@@ -348,7 +367,16 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is
+The latest verified configured build is [CI #698](https://github.com/Kajooja/Kajo/actions/runs/39746829966),
+source `5fb076c5b8dad2c4377dd3f8d33072d2f92fe860` (accepted #352).
+Its [APK artifact](https://github.com/Kajooja/Kajo/actions/runs/39746829966/artifacts/12415374749)
+is a 49,282,087-byte ZIP with reported archive SHA-256
+`c581ec84ea93212129cbdbd66df48899240b4030d77877cc757aeeb9f3739846`,
+expiring **2026-10-29 09:46:48 UTC**. This is not an installed APK checksum.
+The owner reports the navigation failure above; this build must be replaced for
+device acceptance. Passing its build and CI did not detect the navigator remount.
+
+The earlier verified configured build is
 [CI #695](https://github.com/Kajooja/Kajo/actions/runs/39626258645), source
 `71b5b2616241e746ff3f8681e75dc42c2ed4c17a`, tree
 `b8c16d3fa58b044ae8b7d8364b5b625c4ab033aa`. All five required gates and
