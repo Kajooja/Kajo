@@ -1,6 +1,29 @@
 # Collection device checkpoint — #228 / #229
 
-## Current build and backend pointer — 2026-10-22
+## Blocking navigation report — 2026-10-22
+
+After receiving configured APK #698 (accepted #352 source), the owner reports
+that Room opens but both Movies and Books only flash and return/stay at Room.
+No feed, gesture or Ohita acceptance can be inferred. Exact installed checksum
+and Android version are not yet recorded. STATUS owns the replacement build.
+
+A mounted React regression reproduces the navigator remount caused by the
+route-dependent bootstrap parent key. The repair keeps its identity stable
+across application routes, including Settings bypass. This is component/runtime
+evidence with native/router I/O substituted, not an observed repaired phone run.
+
+On the replacement APK, install as an update and check in this order:
+
+1. Room → Movies → back → Books: each destination remains open.
+2. Open an Item, Lists/history and Settings; return to Discovery without a flash
+   back to Room or an unexpected Taste restart.
+3. Close/reopen the app and repeat both category entries; confirm existing
+   ratings/list memberships are preserved.
+4. Resume the shared-feed/Ohita matrix below only after these checks pass.
+
+No reset or backend replay is required. Existing skip deployment remains valid.
+
+## Earlier build and backend pointer — 2026-10-22
 
 The verified [#695 APK](https://github.com/Kajooja/Kajo/actions/runs/39626258645/artifacts/12360202100)
 is built from accepted #351 source `71b5b2616241e746ff3f8681e75dc42c2ed4c17a`;

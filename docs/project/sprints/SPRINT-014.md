@@ -7754,3 +7754,29 @@ description-acceptance test consumers with their lockfile. Existing dependency
 patches, audit policy and application runtime source remain unchanged. The PR's
 final-head required checks own acceptance; the failed original run is not a
 waiver or a successful validation receipt.
+
+
+### Discovery navigation blocker after APK #698 — 2026-10-22
+
+The owner can reach Room but both category buttons only flash, blocking the
+planned device matrix. APK #698 packages accepted #352; build/CI success did not
+establish usable navigation. Device version/checksum remain unreported.
+
+The bounded `fix/239-discovery-navigation-remount` successor reproduces the
+failure with actual React reconciliation: changing the route changes the
+bootstrap parent's key and remounts its navigator. It removes route identity
+from that parent key, keeps Settings/fail-open bypass inside the same parent,
+and preserves async status-request cancellation and Profile/client resets.
+Bypassed Taste UI stops its flow and invalidates retained interaction callbacks;
+pending commands retain their existing durable resume behavior.
+
+A pinned development-only React renderer adds mounted navigation tests for
+persisted v1/v2 dismissal, both categories, Item detail, Lists/history, Settings,
+and slow/failed status refresh. Existing command/scope regressions remain required.
+The old source fails the new route-preservation assertions. Final local/CI checks
+and the replacement APK are recorded by this packet's PR; repaired native phone
+acceptance remains open. No migration, account reset or prediction policy changes.
+
+Next: deliver the replacement APK, verify both category entries first, then
+continue #239's feed/Ohita matrix. #336's versioned Taste pool refresh/refill keeps
+its dependency slot after the navigation blocker.

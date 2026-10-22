@@ -76,8 +76,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
     profileId: personalProfile?.id ?? null,
     activeIsPersonal,
     rpc,
-    routeKey,
-  }), [personalProfile?.id, activeIsPersonal, rpc, routeKey]);
+  }), [personalProfile?.id, activeIsPersonal, rpc]);
   const committedScope = useRef<typeof scope | null>(null);
   useLayoutEffect(() => {
     committedScope.current = scope;
@@ -116,12 +115,10 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
       : null;
 
   if (
-    isSettingsRoute ||
     !rpc ||
     !personalProfile ||
     !activeIsPersonal ||
-    !status ||
-    failedOpenProfileId === personalProfile.id
+    !status
   ) {
     return children;
   }
@@ -130,6 +127,8 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
 
   return (
     <PersonalTasteGate
+      // This boundary contains the navigator: route changes must not remount it.
+      // Route-specific status requests still cancel through their effect cleanup.
       key={scope.key}
       profileId={personalProfile.id}
       actorUserId={personalProfile.ownerUserId}
@@ -138,6 +137,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
       rpc={rpc}
       theme={theme}
       status={status}
+      bypass={isSettingsRoute || failedOpenProfileId === personalProfile.id}
       onOpenImport={() => router.push('/settings')}
       onFailOpen={() => {
         if (committedScope.current === scope) setFailedOpenProfileId(personalProfile.id);
@@ -151,11 +151,12 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   );
 }
 
-export function PersonalTasteGate({ children, profileId, actorUserId, namespace, client, rpc, theme, status,
+export function PersonalTasteGate({ children, profileId, actorUserId, namespace, client, rpc, theme, status, bypass = false,
   onOpenImport, onFailOpen, onCompleted }: PropsWithChildren<{
   profileId: string; actorUserId: string; namespace: string;
   client: SupabaseClient;
   rpc: ProfileCalibrationRpc; theme: ReturnType<typeof getRoomTheme>; status: ProfileBootstrapStatus;
+  bypass?: boolean;
   onOpenImport: () => void; onFailOpen: () => void; onCompleted: () => void;
 }>) {
   const [snapshot, setSnapshot] = useState<PersonalTasteSnapshot | null>(null);
@@ -165,16 +166,20 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   const flow = useMemo(() => createPersonalTasteFlow({ namespace, actorUserId, profileId, storage: Storage,
     rpc: createPersonalTasteRpc(client), contextualSkipRpc: createContextualSkipRpc(client), onChange: setSnapshot,
     autoStart: !status.needsCalibration }), [actorUserId, client, namespace, profileId, status.needsCalibration]);
-  useLayoutEffect(() => { flow.start(); return () => flow.stop(); }, [flow]);
+  useLayoutEffect(() => {
+    if (bypass) return;
+    flow.start();
+    return () => flow.stop();
+  }, [bypass, flow]);
   const state = snapshot ?? flow.snapshot();
   const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));
   const identity = `${state.sequential?.sessionId ?? state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.sequential?.revision ?? state.challenge?.revision ?? state.session?.revision ?? ''}:${state.sequential?.questionId ?? challengeItem?.id ?? state.session?.item?.id ?? ''}`;
   const presentationItem = useTasteItemPresentation(client, `${namespace}:${actorUserId}:${profileId}:${identity}`,
     state.sequential?.status === 'QUESTION' ? state.sequential.item : null);
-  const committedIdentity = useRef(identity);
-  useLayoutEffect(() => { committedIdentity.current = identity; setDraftRating(null); setConfirmRemoval(false); }, [identity]);
+  const committedIdentity = useRef<string | null>(identity);
+  useLayoutEffect(() => { committedIdentity.current = bypass ? null : identity; setDraftRating(null); setConfirmRemoval(false); }, [bypass, identity]);
   const current = () => committedIdentity.current === identity;
-  if (state.dismissed) return children;
+  if (bypass || state.dismissed) return children;
   if (state.legacy) return shouldOfferProfileCalibration(status) ? <ProfileCalibrationScreen profileId={profileId} rpc={rpc}
     theme={theme} status={status} onOpenImport={onOpenImport} onFailOpen={onFailOpen} onCompleted={onCompleted} /> : children;
   function answer(answer: TasteAnswer) {

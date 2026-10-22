@@ -64,8 +64,9 @@ CI #691 gates. Compatibility #351 is also merged after all five required gates,
 and the configured #695 APK is ready. The prerequisite and both unchanged #349
 hosted forwards are installed and verified; the two missing operations completed
 on 2026-10-22 through the owner-approved browser fallback with atomic SQL Editor
-history receipts. Representative device acceptance on #695 precedes
-preview/usefulness. Do not replay any installed operation. STATUS owns the exact
+history receipts. The owner subsequently reports a Room → Movies/Books navigation blocker on
+#698. Repair and replace that APK first (STATUS owns the exact packet), then
+resume representative device acceptance before preview/usefulness. Do not replay any installed operation. STATUS owns the exact
 completed rollout receipt and DEVICE_TEST owns the remaining observation matrix.
 Versioned Taste candidate-pool refresh/refill under #336 is the next source packet;
 keep original frozen panels, first labels, session policies and retry origins.
