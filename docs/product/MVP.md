@@ -157,7 +157,7 @@ release; a group invitation or decision session does not replace these gates.
 
 - [ ] `MVP-TASTE-001` An unauthenticated visitor can start a server-backed Taste session from a public link or personal Friend invite without an account wall; abandoned sessions follow a bounded retention policy.
 - [-] `MVP-TASTE-002` Taste selects a variable sequence of real canonical Items from the committed prefix, using rating magnitude, recognition and informative feature dispersion. Completion is not a six/twenty-answer or 12–24/10+10 count rule. A versioned readiness report declares per-domain support, forecast coverage, prospective evaluation and stability; readiness is provisional. Pause, poor recognition, exhaustion or safety budget with unmet criteria means insufficient evidence. No demographics are required. Existing portable/server/mobile v1 source remains preserved; #336 supplies the sequential source foundation. Durable SQL v2 and its mobile successor supply the command/continuation source; full readiness, anonymous entry, native acceptance and measured selection value remain open.
-- [-] `MVP-TASTE-003` Taste retains the original forecast, first-answer measurement and available evaluation before projecting source-provenanced evidence for the next question; delayed comparisons use the original frozen pool. Genuine zero/neutral ratings affect preference by magnitude. The shared-feed successor supplies contextual no-rating Ohita rather than separate new-feed unknown/not-interest controls; it does not infer a reason or rewrite old UNKNOWN/NOT_INTERESTED history. #330/#331 supplies the preserved v1 boundary and #341/#342 the durable v2 server/mobile boundary; the native #239 successor adds separate neutral writers and capability-aware durable routing. Shared presentation/origin wiring is accepted through #350; hosted/device acceptance and measured quality remain open. See `MVP-UX-007` and DATA_EVENTS.
+- [-] `MVP-TASTE-003` Taste retains the original forecast, first-answer measurement and available evaluation before projecting source-provenanced evidence for the next question; delayed comparisons use the original frozen pool. Genuine zero/neutral ratings affect preference by magnitude. The shared-feed successor supplies contextual no-rating Ohita rather than separate new-feed unknown/not-interest controls; it does not infer a reason or rewrite old UNKNOWN/NOT_INTERESTED history. #330/#331 supplies the preserved v1 boundary and #341/#342 the durable v2 server/mobile boundary; the native #239 successor adds separate neutral writers and capability-aware durable routing. Shared presentation/origin wiring is accepted through #350 and packaged in #695. Compatibility #351 and both hosted skip forwards are installed and verified as of 2026-10-22; actual device acceptance and measured quality remain open. See `MVP-UX-007` and DATA_EVENTS.
 - [-] `MVP-TASTE-004` Each sequential challenge forecast commits the authorized Profile/model/prefix before its first answer; original forecasts and first-answer measurements are immutable. Only afterward can the answer influence a later committed prefix. Pending ordinal comparisons may complete when another first label arrives, without rescoring the earlier panel. Corrections/withdrawals update future state and remove affected copied reports without rewriting old measurements. Existing v1 frozen batch forecasts and evaluation-only answers remain unchanged. #341 supplies the durable SQL contract and the mobile successor consumes it; anonymous/native/quality acceptance remains open.
 - [-] `MVP-TASTE-005` Evaluation uses documented metrics, sample size, missing coverage and uncertainty; no fabricated percentage or retroactively improved self-score. Ordinal comparisons require the same frozen prefix/panel; scalar scores across learned prefixes are incomparable. Per-domain provisional readiness is not statistical reliability or model admission. V1 ordering counts remain supported; calibrated grade prediction, sequential runtime and observed quality acceptance remain open.
 - [ ] `MVP-TASTE-006` After Taste ends, with provisional readiness or explicit insufficient support, Kajo reports the supported original prospective evaluations and shows a small unseen recommendation preview through the canonical production ranking boundary, with safe explanation and optional FOR_YOU/SURPRISE/RISK contrast. Insufficient evidence is disclosed rather than presented as a passed challenge; sequential source/runtime acceptance precedes preview.
@@ -288,8 +288,9 @@ the portable reference exposes an explicit opt-in. All five final-source CI #676
 gates pass and its single additive hosted forward is installed/verified; STATUS
 owns exact source and preservation/security receipts. No eligible-owner new-session,
 device or quality acceptance is claimed. The fixed START-time 25-per-ItemType
-pool still needs refresh/refill. Shared feed/artwork/neutral Ohita, recent prior,
-full readiness, actual device behavior and observed usefulness remain open;
+pool still needs versioned refresh/refill. Shared feed/artwork/neutral Ohita source
+is accepted, built and installed; actual device acceptance remains open, together
+with recent prior, full readiness and observed usefulness;
 `MVP-ALG-010`, `MVP-ALG-011` and `MVP-UX-007` are not complete. See the
 [bounded source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16).
 
@@ -297,8 +298,11 @@ Shared feed source continuation (#239, 2026-10-17) now connects the accepted
 #349 adapters to sequential Taste and canonical Discovery deliveries. It shares
 artwork/credited description, neutral upward/accessible Ohita, exact displayed
 origins and acknowledgement-before-next selection. V1/legacy and unranked
-collection/overlay semantics stay preserved. Source CI, hosted capability rollout
-and actual device/usefulness are separate acceptance; MVP-UX-007 remains in progress.
+collection/overlay semantics stay preserved. #350/#351 source CI and the #695 build
+are accepted. The compatibility prerequisite and both unchanged skip forwards
+are installed and verified through the 2026-10-22 hosted receipt in STATUS.
+Actual #695 device/usefulness acceptance remains open. MVP-UX-007 stays in progress;
+no release requirement is closed solely by source, build or deployment checks.
 
 ## Portable engine and external-data foundation — bounded completion contracts
 

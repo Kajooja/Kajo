@@ -1,0 +1,74 @@
+{
+  "auditDate": "2026-10-21",
+  "acceptedMain": "71b5b2616241e746ff3f8681e75dc42c2ed4c17a",
+  "previousAudit": "branch-audit-2026-10-21.json",
+  "scope": "Read-only remote audit after PR #351 integration and before publication of the new rollout-receipt branch; local historical metadata repair is recorded separately.",
+  "remoteBranchCountBeforeReceiptPublication": 56,
+  "openPullRequestsBeforeReceiptPublication": 0,
+  "retirementCandidateCountBeforeReceiptPublication": 47,
+  "reachableDevelopmentHeads": 45,
+  "supersededDevelopmentHeads": 2,
+  "unchangedPriorBranchHeads": 54,
+  "newRetirementCandidate": {
+    "branch": "fix/239-skip-hosted-compatibility",
+    "sha": "e1a43a2886965eeb02ab3af5c41d5b60de6c8748",
+    "disposition": "retirement-pending-access",
+    "reason": "reachable-from-main",
+    "mergedPr": 351
+  },
+  "retainedBranches": [
+    "catalog-acquisition/ol-20260831",
+    "catalog-acquisition/ol-20260831-conflicts",
+    "catalog-acquisition/ol-20260831-continuation",
+    "catalog-acquisition/ol-20260831-framed",
+    "catalog-acquisition/ol-20260831-reviewed",
+    "catalog-diagnostic/ol-20260831",
+    "catalog-diagnostic/ol-20260831-edition-prefix",
+    "catalog-diagnostic/ol-20260831-work-prefix",
+    "main"
+  ],
+  "activeReceiptBranch": "docs/239-skip-rollout-receipt",
+  "activeReceiptDisposition": "Retain while this receipt is active. This prospective publication is not included in the 56-ref/47-candidate pre-publication snapshot; refresh all refs and PRs before any later retirement.",
+  "remoteDeletion": "NOT_PERFORMED: connector has no branch-delete operation; the previously recorded CLI write-authentication limitation remains unresolved. This continuation did not repeat credential probes, delete a remote ref or move any existing remote branch.",
+  "localStateAtAudit": {
+    "acceptedMainClean": true,
+    "onlyLocalBranchBeforeReceipt": "main",
+    "stashCount": 0,
+    "trackedBuildArchiveLogOrKeepFiles": 0,
+    "diffWhitespace": "pass",
+    "openSourcePullRequests": 0
+  },
+  "localHistoricalRecovery": {
+    "reason": "Three historical checkout pointers referenced removed scratch Git metadata. Every tracked blob and mode was compared to its accepted commit before detached metadata was recreated; no source bytes or accepted commit changed.",
+    "snapshots": [
+      {
+        "label": "sequential-rollout",
+        "commit": "799f1c850b989d1cfeef450946689224d9727359",
+        "trackedEntriesCompared": 736,
+        "extraNonignoredFiles": 0,
+        "status": "clean detached snapshot"
+      },
+      {
+        "label": "forecast-selector",
+        "commit": "8cd67af54765a2876f37e5db0deb66235ee3f0e9",
+        "trackedEntriesCompared": 738,
+        "extraNonignoredFiles": 0,
+        "status": "clean detached snapshot"
+      },
+      {
+        "label": "forecast-rollout-receipt",
+        "commit": "7eefa4da97634beadb73b6731ae6530d25e592e5",
+        "trackedEntriesCompared": 738,
+        "extraNonignoredFiles": 0,
+        "status": "clean detached snapshot"
+      }
+    ],
+    "otherHistoricalCheckout": {
+      "commit": "825ecc1c809008a0c312e0bfef2b901476b86808",
+      "status": "clean; left unchanged"
+    },
+    "uniqueUnpublishedSourceFound": false,
+    "boundary": "Historical snapshots remain detached. They are not current implementation handoffs or authorization to replay their operational instructions."
+  },
+  "acceptanceBoundary": "No device result, recommendation quality, issue closure, account reset or model activation follows from repository hygiene. STATUS owns the verified rollout/build and exact next task."
+}
