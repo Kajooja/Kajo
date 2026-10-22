@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-21**
+Last updated: **2026-10-22**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — guarded contextual skip rollout / #239 and #336
+## Current packet — contextual skip device acceptance / #239 and #336
 
 The shared vertical Taste/Discovery feed is accepted through
 [PR #350](https://github.com/Kajooja/Kajo/pull/350), merge
@@ -30,43 +30,76 @@ default; retained v1/challenge/legacy responses and collection/unranked overlay
 paths preserve their original semantics. Source acceptance is not hosted, APK,
 phone or recommendation-quality acceptance.
 
-**One active continuation:** `fix/239-skip-hosted-compatibility` prepares the exact
-missing hosted chain. The October 21 read-only check found sequential Taste and
-#345's selector installed, all new skip endpoints/ledger absent, and nine of ten
-required old function bodies matching. The retained compact
-`private.remove_profile_import_job_v1(uuid)` is the only mismatch. Its known
-format/alias difference must be bridged before the immutable Taste-skip forward;
-never loosen that forward's guard or replay installed history.
+**Accepted compatibility source:** [PR #351](https://github.com/Kajooja/Kajo/pull/351)
+is merged as `71b5b2616241e746ff3f8681e75dc42c2ed4c17a`, exact tree
+`b8c16d3fa58b044ae8b7d8364b5b625c4ab033aa`, after all five
+[required CI gates](https://github.com/Kajooja/Kajo/actions/runs/39622170200).
+There is no pending compatibility source merge. The matching configured
+[#695 APK](https://github.com/Kajooja/Kajo/actions/runs/39626258645/artifacts/12360202100)
+is built; its exact archive receipt is below.
 
-The explicit order is pinned in
+**Hosted rollout completed — 2026-10-22:** after the owner approved browser
+fallback and completed login, the two unchanged #349 forwards were installed
+through the SQL Editor. Each operation executed the exact reviewed SQL and added
+its new history receipt in the same atomic transaction. The already installed
+compatibility prerequisite was not replayed. The earlier failed connector
+requests remain dated evidence in [Sprint 014](sprints/SPRINT-014.md); they are no
+longer a deployment blocker, and no successful connector retry is claimed.
+
+The immutable operation order remains pinned in
 `scripts/database/contextual-skip-hosted-upgrade.json`:
 
-1. `20261021144932_contextual_skip_import_compatibility.sql`: exact compact-body
-   compatibility only; preserves identity/security/rows and refuses unknown drift.
-   Canonical pre-skip and exact final Taste bodies are no-ops for fresh installs.
-2. Unchanged `20261016161919_native_contextual_skip.sql` from #349.
-3. Unchanged `20261016162039_taste_contextual_skip.sql` from #349.
+| Installed source | Recorded version | Receipt path |
+|---|---|---|
+| `20261021144932_contextual_skip_import_compatibility.sql` | `20261021153148` | Earlier provider receipt |
+| `20261016161919_native_contextual_skip.sql` | `20261022072353` | SQL Editor atomic receipt |
+| `20261016162039_taste_contextual_skip.sql` | `20261022072535` | SQL Editor atomic receipt |
 
-The disposable populated rehearsal preserves old rows, v1 sessions/frozen
-challenges, v2 START receipts, function metadata and history. Actual committed
-v2 answers/neutral commands remain covered by the existing native skip tests.
-Both prerequisite-first and chronological fresh paths must reach identical final
-functions. The required native CLI gate also runs the compact-hosted rehearsal.
-These modules have no hosted apply entry point.
+The two new history rows retain the exact source SQL in their statement arrays;
+source MD5 values are `9ce2ed5b7d92acb3b026e79bdb04cacb` and
+`bdc8d548401f8eabed31b805d980a4c1`, respectively. No prior history row was edited.
+Final inventory is **83 migration receipts, 256 functions, 72 triggers and 92
+tables** under the same inventory scope as the preflight. All **33 affected/new
+function body checks** pass. All 233 prior function OIDs/non-body metadata, all
+58 prior triggers and all 81 prior migration rows remain unchanged; only the
+reviewed ten existing function bodies changed.
 
-**Next action:** inspect this continuation's PR for its exact source, five required
-CI gates and integration/rollout receipt. Until a verified hosted receipt exists,
-refresh target/history/object checks and install only the three reviewed operations
-in the explicit order above after source acceptance. Preserve all existing data.
-Then build a matching configured Android APK and record actual phone layout,
-gestures, accessibility, restart and usefulness in
+Full-content digests of all **62 existing public/private tables** and row counts
+of all **89 prior tables** are unchanged. Auth tables were compared by counts;
+no fresh full-content Auth digest verification is claimed. The three new private
+tables are empty, have RLS enabled and deny direct access to anon, authenticated
+and service_role. The six writer/read entry points grant caller execution only
+to authenticated; other new helpers retain their denied boundaries. All nine
+read-only role/malformed-command probes pass. Security advisors retain the
+existing `auth_leaked_password_protection` warning tracked in #160/#184 and 51
+intentional private-table no-policy informational notices. Detailed target-bound
+snapshots remain private. No account reset, valid user command or model/Working
+activation was used to verify deployment.
+
+**One active continuation:** use the existing #695 APK for actual phone layout,
+gesture, accessibility, restart and usefulness observations in
 [DEVICE_TEST](DEVICE_TEST.md#shared-feed-source-acceptance--239--2026-10-17).
-Do not infer installed state from migration filenames or reapply an acknowledged
-operation. Versioned pool refill, recent supported prior, full readiness and
-measured quality follow in ROADMAP. No reset or model/Working activation is part
-of this packet. #239/#336 and incomplete release gates remain open.
+Install as an update preserving accounts, sessions and pending commands; record
+the installed checksum, device and the backend checkpoint above. No replacement
+build is needed for unchanged source. Versioned Taste candidate-pool refresh/refill
+under #336 is the next source dependency; preserve original frozen panels, first
+labels, session policies and retry origins. Recent supported prior, full readiness
+and measured quality retain their ROADMAP slots. #239/#336 and incomplete release
+gates remain open. Do not replay any installed migration.
 
-Accepted runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
+**Documentation publication authorized — 2026-10-22:** the owner explicitly
+approved publishing these project documents to the public `Kajooja/Kajo`
+repository. This receipt uses `docs/239-skip-rollout-receipt`; its pull request
+records the exact final checks and integration result. Detailed target-bound
+snapshots, authentication data and browser files remain outside Git. Publication
+does not close the actual device, recommendation-quality or release gates above.
+
+The first receipt CI run (#696) stopped at the dependency security audit on two
+newly reported `@vitest/mocker` advisories. The publication packet coordinates
+the three Vitest test consumers at patched 4.1.12 and retains the existing audit
+gate and application runtime source. Final-head CI must pass before integration.
+
+Earlier accepted selector runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
 `a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five final-source
 [CI #676](https://github.com/Kajooja/Kajo/actions/runs/38878872616) gates passed.
@@ -149,13 +182,14 @@ private. Do not replay installed operations. No fixture account, reset, model or
 Working activation occurred.
 
 The merged #346 receipt records this accepted outcome.
-The accepted shared feed and guarded rollout continuation are described at the top of this file.
-Actual device/eligible-owner acceptance and the separately guarded additive
-backend installation remain required; source CI alone does not prove either.
+The accepted shared feed, completed hosted rollout and device continuation are
+described at the top of this file. Actual device/eligible-owner acceptance remains
+required; source CI and deployment verification do not establish it.
 Existing sessions, accounts and old queued commands survive.
-The compatible #669 APK remains available for
-[the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15);
-it does not yet contain the requested feed changes.
+The older #669 APK is a historical build for
+[the existing device matrix](DEVICE_TEST.md#sequential-taste-v2-acceptance--336--342--2026-10-15).
+The current #695 build and both hosted skip forwards are ready for their
+remaining device acceptance matrix.
 Preserve existing v1 sessions, pending commands and completed setup. A genuine new
 v2 test requires an authorized eligible PersonalProfile without a prior v1 session
 or completed setup; the current app has no restart-v2 action for those preserved
@@ -177,8 +211,10 @@ selection ranked domain coverage before utility and did not rank by canonical fo
 even though ANSWER projected the rating and captured a new forecast. The accepted
 #345 source/hosted forward corrects that bounded selection gap for new-policy
 sessions; retained policies keep their exact behavior. At that reported checkpoint Taste had title-only cards and Discovery used a
-horizontal pager. #349 now supplies the separate neutral contract; accepted #350 supplies its shared presentation. Neither changes the installed APK yet. See ROADMAP for mandatory
-ordering and DEVICE_TEST for the reported/planned acceptance boundary.
+horizontal pager. #349 supplies the separate neutral contract and accepted #350
+supplies its shared presentation, now packaged in #695. Both hosted skip forwards
+are installed and verified; actual phone installation and acceptance remain open.
+See ROADMAP for mandatory ordering and DEVICE_TEST for the reported/planned boundary.
 
 Independent pure/native fixtures verify canonical-score inversion rather than
 only a local similarity proxy, genuine separate-commit first 10/0/5 prefixes and
@@ -313,7 +349,21 @@ retained pre-window declaration. Fixtures are not observed evidence.
 ## Current test APK and device work
 
 The latest verified configured build is
-[CI #677](https://github.com/Kajooja/Kajo/actions/runs/38881582992), source
+[CI #695](https://github.com/Kajooja/Kajo/actions/runs/39626258645), source
+`71b5b2616241e746ff3f8681e75dc42c2ed4c17a`, tree
+`b8c16d3fa58b044ae8b7d8364b5b625c4ab033aa`. All five required gates and
+the standalone APK job succeeded.
+[APK artifact](https://github.com/Kajooja/Kajo/actions/runs/39626258645/artifacts/12360202100):
+49,282,086-byte ZIP, GitHub-reported archive SHA-256
+`b3b24e5f8bb2610a3303479bc023201e64d603c2628de6bc1003462c3d962499`,
+expires **2026-10-28 16:15:34 UTC**. This is the archive digest, not an extracted
+or installed APK checksum. It includes shared artwork/vertical feed/Ohita source.
+The matching native/Taste skip hosted forwards are installed and verified as of
+2026-10-22. No phone or recommendation-quality observation is claimed; build and
+backend readiness do not close device acceptance. Preserve current accounts and
+pending commands when installing.
+
+The earlier [CI #677](https://github.com/Kajooja/Kajo/actions/runs/38881582992), source
 `8cd67af54765a2876f37e5db0deb66235ee3f0e9`, tree
 `a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five required gates and
 the standalone APK job succeeded.
@@ -322,7 +372,7 @@ the standalone APK job succeeded.
 `80f3d0d10d24441db448fda731472746cf56f965aaa62c7078e8053daa64102d`,
 expires **2026-10-23 10:13:46 UTC**. The archive was not downloaded in this audit;
 this is not the extracted APK checksum. It retains the existing v2 consumer and
-does not include the planned shared feed, artwork or neutral Ohita.
+does not include the shared feed, artwork or neutral Ohita now packaged in #695.
 
 The earlier compatible build remains a dated checkpoint:
 
@@ -367,27 +417,30 @@ the actual hosted checkpoint need their guarded deployment procedure.
 
 ## Repository hygiene and historical evidence
 
-The [October 21 audit](retros/branch-audit-2026-10-21.json) refreshes all **55
-remote branches** at accepted #350, with no open PR before this continuation.
-Forty-four development heads are reachable from main; the two closed duplicates
-(#303 → #327 and #306 → #323) retain accepted replacements. Those **46** refs can
-be retired after fresh PR/ref checks. Main and the eight consumed catalogue
-operation refs remain intentional and must not be reactivated.
+The [October 21 continuation audit](retros/branch-audit-2026-10-21-continuation.json)
+verifies **56 remote branches** at accepted #351 before publishing this receipt,
+with no open PR. Forty-five development heads are reachable from main; two closed
+duplicates (#303 → #327 and #306 → #323) retain accepted replacements. Those
+**47** refs are retirement candidates after fresh PR/ref checks. Main and eight
+consumed catalogue-operation refs remain intentional. The new active receipt
+branch must also be retained while its work is open; it is outside that 56-ref
+pre-publication snapshot. The [earlier October 21 audit](retros/branch-audit-2026-10-21.json)
+remains the dated 55-ref/#350 checkpoint.
 
 Remote deletion remains **not completed**: the connector has no branch-delete
-operation and a non-mutating Git push probe confirms that command-line Git still
-has no write credentials. No remote ref was deleted or moved by the audit. The
-prior [October 16 audit](retros/branch-audit-2026-10-16.json) is historical evidence,
-not the active candidate count. This limitation must not be reported as completed
-hygiene or silently dropped from the next handoff.
+operation and the previously recorded CLI write-authentication limitation is
+unresolved. No credential probe was repeated and no remote ref was deleted by
+this audit. This limitation must remain explicit in the next handoff.
 
-Two old local change sets were already accepted: all nine staged terminal-refresh
-files exactly match #301, and an obsolete STATUS draft is superseded by #344/#346.
-They are reconciled without losing source. Seven orphaned historical worktrees
-were reattached only after their complete tracked contents matched accepted
-commits. All twelve pre-existing worktrees are clean, main is synchronized and
-no stash or unique unpublished source was found. Six obsolete local branches
-were retired. Historical snapshots remain detached, not active feature work.
+The current main checkout was clean before this receipt branch, with no stash.
+Three surviving historical checkout pointers again referenced removed scratch
+Git metadata. All tracked contents and modes (736/738/738 entries) matched
+accepted #343/#345/#346 snapshots, with no extra nonignored source files. Their
+metadata was reattached as clean detached snapshots without changing source;
+the other surviving historical checkout is also clean. No unique unpublished
+source was found. These snapshots are not active implementation handoffs.
+The [October 16 audit](retros/branch-audit-2026-10-16.json) retains its historical
+local-recovery evidence and earlier branch counts.
 
 Issue #333's already installed upgrade is closed; #177/#182/#199/#228/#232/#238/#240
 now point at the current #336/#239 handoff instead of completed mobile/rollout

@@ -15,8 +15,8 @@ The owner-approved #343 source and matching three-operation hosted rollout are
 accepted after all five CI #671 gates and exact installed-prefix/security/data
 preservation checks. The original 16-forward manifest/bridge is unchanged; the
 separate bootstrap prerequisite and evaluation/v2 forwards are installed and must
-not be replayed. Continue #336 with the matching #669 APK and actual device
-acceptance before the canonical preview. Preserve existing v1/completed Profiles;
+not be replayed. Continue #336 from the current backend/build checkpoint in
+STATUS and actual device acceptance before the canonical preview. Preserve existing v1/completed Profiles;
 a genuine new v2 session requires an authorized eligible PersonalProfile. No reset
 or positive first-v2-session observation is implied by deployment acceptance.
 A bounded initial test may end with insufficient support;
@@ -60,10 +60,15 @@ and Taste presentation, not the default Discovery grid.
 **Execution order:** #345's forecast-aware selector and its hosted forward are
 accepted. Neutral conformance #348 and native writers/admission #349 are accepted
 source with their five CI gates. Shared feed #350 is now accepted after all five
-CI #691 gates. Next is the exact compact import-removal compatibility prerequisite,
-then the two unchanged #349 hosted forwards, a matching configured build and
-representative device acceptance before preview/usefulness. STATUS owns this
-one guarded rollout packet and its provider/source receipt.
+CI #691 gates. Compatibility #351 is also merged after all five required gates,
+and the configured #695 APK is ready. The prerequisite and both unchanged #349
+hosted forwards are installed and verified; the two missing operations completed
+on 2026-10-22 through the owner-approved browser fallback with atomic SQL Editor
+history receipts. Representative device acceptance on #695 precedes
+preview/usefulness. Do not replay any installed operation. STATUS owns the exact
+completed rollout receipt and DEVICE_TEST owns the remaining observation matrix.
+Versioned Taste candidate-pool refresh/refill under #336 is the next source packet;
+keep original frozen panels, first labels, session policies and retry origins.
 
 The source shares artwork/metadata/description and deliberate upward or accessible
 Ohita, preserves v1/UNKNOWN/NOT_INTERESTED, recovers exact commands across restart,
@@ -88,7 +93,8 @@ refresh eligible pools while preserving every earlier frozen panel, comparison
 and delivered origin; it must not rewrite history to simulate adaptation.
 At that same pre-#345 checkpoint Taste had text-only cards and Discovery used a
 horizontal pager. Accepted #350 supplies their shared vertical successor; the
-matching hosted/build/device acceptance remains open. Identical
+matching #695 build and hosted skip forwards are ready; actual device acceptance
+remains open. Identical
 empty Profiles may legitimately share an opening Item; repeated post-answer
 sequences require a versioned prefix/selector investigation rather than randomizing
 titles to look personalized.
@@ -102,9 +108,9 @@ utility-first ranking and a traced domain-lead guard. Retained session policies,
 wire replies and frozen history stay unchanged. Source and hosted acceptance do
 not establish an observed eligible-owner session, phone behavior or quality.
 The START-time 25-per-type pool still needs
-versioned refresh/refill; hosted/device acceptance of the accepted neutral
-skip/shared feed source and the recent prior remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
-and STATUS for the exact acceptance receipt and guarded rollout packet.
+versioned refresh/refill; device acceptance of the installed neutral skip/shared
+feed and the recent prior remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
+and STATUS for the exact acceptance receipt and device continuation.
 
 Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
 [evidence](../domain/DATA_EVENTS.md), [UX](../product/UX_PRINCIPLES.md) and

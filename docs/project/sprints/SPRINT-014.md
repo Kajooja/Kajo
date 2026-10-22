@@ -7622,3 +7622,135 @@ blocked by absent command-line credentials/connector delete capability, with no
 unknown deletion outcome. Existing device, algorithm quality, pool refill, prior,
 readiness and release requirements remain open; no reset or model activation.
 The source PR owns exact final checks, integration and any later hosted receipt.
+
+
+### Compatibility accepted; interrupted hosted continuation — 2026-10-21
+
+PR #351 is merged as `71b5b2616241e746ff3f8681e75dc42c2ed4c17a`, exact tree
+`b8c16d3fa58b044ae8b7d8364b5b625c4ab033aa`, after all five
+[required CI gates](https://github.com/Kajooja/Kajo/actions/runs/39622170200).
+This supersedes the preceding source-preparation handoff, not its preservation
+constraints. The matching configured [#695 build](https://github.com/Kajooja/Kajo/actions/runs/39626258645)
+passed all five gates and produced
+[APK artifact 12360202100](https://github.com/Kajooja/Kajo/actions/runs/39626258645/artifacts/12360202100).
+STATUS owns its archive digest, size and expiry; no phone result is implied.
+
+Only the exact compatibility prerequisite is installed, with provider receipt
+version `20261021153148`. Its source remains
+`20261021144932_contextual_skip_import_compatibility.sql`; do not replay it.
+The later native-skip tool request was aborted by the user after a prolonged wait.
+Fresh read-only history/object checks establish that it did not apply: native and
+Taste skip RPCs and the skip ledger remain absent. No automatic mutation retry
+followed. Both unchanged #349 forwards are still missing and require renewed
+authorization plus refreshed checks before one-at-a-time application.
+
+The read-only comparison preserves all 89 prior table contents and all 229
+existing application function identities/security/non-body metadata. Only the
+reviewed import-removal compatibility body changed. The pre-remaining inventory
+has 233 functions including four Auth functions and 58 triggers including one
+Auth trigger. Private target-bound snapshots retain detailed evidence. This is
+partial deployment preservation, not full rollout, runtime or device acceptance.
+
+The [hygiene continuation audit](../retros/branch-audit-2026-10-21-continuation.json)
+records 56 remote refs and 47 retirement candidates before this receipt's
+publication; nine main/consumed-operation refs remain intentional. Remote deletion
+is still blocked; no credential probe or deletion was repeated. Three historical
+checkout pointers were restored only after every tracked blob/mode matched
+accepted #343/#345/#346; all are clean detached snapshots, not active work.
+
+Next at that checkpoint: renew authorization and complete only the two missing
+skip forwards, verify them, then use existing #695 for the DEVICE_TEST matrix.
+Versioned Taste pool refresh/refill under #336 is the next source dependency. Recent prior, full
+readiness, device/quality and release gates remain open; no account reset or
+model/Working activation occurred.
+
+This continuation's documentation publication was rejected by automatic approval
+review for insufficient explicit authorization to disclose it to the public
+`Kajooja/Kajo` repository. The local six-file receipt is ready on
+`docs/239-skip-rollout-receipt`; no remote receipt branch/PR was created.
+Explicit publication approval is required before retrying that operation.
+
+### Renewed authorization; connector request-state failure — 2026-10-21
+
+The owner explicitly renewed authorization to continue the two missing hosted
+skip forwards. Two requests to apply the unchanged native-skip migration returned
+`McpServerError: Invalid or expired requestState`; neither response is an
+installation receipt. The final readback after the second request confirmed 81
+migration receipts, last version `20261021153148`, with native/Taste skip RPCs and
+the ledger absent. Read operations work and the plugin remains enabled; missing
+consent is no longer the hosted-operation blocker.
+
+The fresh preflight compared all 233 function body/metadata hashes unchanged
+against the preceding snapshot and captured 89 table row counts. The attempted
+fresh full-row digest check failed while parsing a non-JSON tool response and is not
+claimed complete. Earlier preservation evidence remains its dated checkpoint.
+
+Next: resolve the connector request-state failure, refresh exact installed state
+and appropriate preservation checks, then apply only the still-missing native
+and Taste forwards in order under the renewed authorization. Preserve the
+installed prerequisite. The separate documentation-publication rejection above
+is unchanged; no publication retry, reset, new build, model activation or device
+acceptance follows from this continuation.
+
+
+### Hosted contextual skip rollout completed — 2026-10-22
+
+A fresh connector retry again returned `Invalid or expired requestState`; readback
+confirmed no application. The owner then explicitly approved browser fallback
+and completed login. Each exact immutable #349 migration ran through the SQL
+Editor with its new history row in one atomic transaction. A disposable PGlite
+rehearsal had verified full multi-statement execution, exact statement bytes,
+rollback on an injected pre-history failure and refusal to replay. No successful
+MCP migration request is claimed, and no old history row was edited.
+
+| Source | SQL Editor receipt version | Exact stored source MD5 |
+|---|---|---|
+| `20261016161919_native_contextual_skip.sql` | `20261022072353` | `9ce2ed5b7d92acb3b026e79bdb04cacb` |
+| `20261016162039_taste_contextual_skip.sql` | `20261022072535` | `bdc8d548401f8eabed31b805d980a4c1` |
+
+The compatibility prerequisite remains the earlier provider receipt
+`20261021153148` and was not replayed. The manifest's three reviewed source hashes
+are unchanged. The final actual target has 83 migration receipts, 256 functions,
+72 triggers and 92 tables under the preflight inventory scope. All 33 source-derived
+new/affected function-body checks pass; all 233 prior function OIDs/non-body
+metadata, 58 prior triggers and 81 prior history rows remain unchanged. Only the
+ten reviewed existing bodies changed.
+
+All 62 prior public/private table full-content digests and all 89 prior table
+counts are unchanged. Auth comparison uses row counts only; no fresh full-content
+Auth digest verification is claimed. All three new private tables are empty,
+have RLS enabled and deny direct anon/authenticated/service_role access. The six
+public/private writer/read entry points allow caller execution only to
+authenticated; other new helpers remain denied. All nine read-only role and
+malformed-command rejection probes pass without a valid user command. The
+security advisor retains the existing `auth_leaked_password_protection` warning
+and 51 intentional private-table no-policy informational notices. #160/#184 retain
+the production-auth gate. Detailed target-bound evidence stays private.
+
+The existing #695 APK is unchanged and ready for the matching DEVICE_TEST matrix;
+no replacement build, installed-APK checksum, phone gesture or usefulness result
+is claimed. Preserve existing accounts, v1/v2/challenge history and pending
+commands. No reset or model/Working activation occurred. Versioned Taste
+candidate-pool refresh/refill under #336 is the next source dependency, preserving
+frozen panels, original first labels, session policies and retry origins. Recent
+prior, full readiness, device/quality and all incomplete release gates remain open.
+
+STATUS, ROADMAP, MVP and DEVICE_TEST now point to completed hosted deployment and
+actual device acceptance instead of retrying installed migrations. The owner
+explicitly approved publishing these project documents to the public
+`Kajooja/Kajo` repository on 2026-10-22, resolving the earlier publication hold.
+This receipt uses `docs/239-skip-rollout-receipt`; its pull request owns final CI
+and integration evidence. Detailed target-bound snapshots, authentication data
+and browser files remain outside Git. Device and release acceptance stay open.
+
+### Receipt publication and test dependency audit — 2026-10-22
+
+PR #352 publishes this receipt. Its initial CI #696 stopped at the existing
+dependency audit before lint/tests because `@vitest/mocker` 4.1.11 was affected by
+[GHSA-qxg6-89mg-rqv8](https://github.com/advisories/GHSA-qxg6-89mg-rqv8) and
+[GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp).
+The bounded correction pins Vitest 4.1.12 across mobile, prediction-engine and
+description-acceptance test consumers with their lockfile. Existing dependency
+patches, audit policy and application runtime source remain unchanged. The PR's
+final-head required checks own acceptance; the failed original run is not a
+waiver or a successful validation receipt.

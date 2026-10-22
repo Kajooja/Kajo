@@ -1,15 +1,21 @@
 # Collection device checkpoint — #228 / #229
 
-## Current build pointer — 2026-10-16
+## Current build and backend pointer — 2026-10-22
 
-Use the verified [#677 APK](https://github.com/Kajooja/Kajo/actions/runs/38881582992/artifacts/12039373533)
-from source `8cd67af54765a2876f37e5db0deb66235ee3f0e9`; all five required
-checks and the APK job succeeded. [STATUS](STATUS.md#current-test-apk-and-device-work)
-owns its archive identity and expiry. #669 below remains a compatible historical
-build of the v2 consumer. Neither build contains the planned shared-feed/artwork/
-Ohita UI. The accepted #343/#345/#346 receipts record the matching hosted forwards
-as installed; the old #333 deployment task is complete and must not be replayed.
-Actual phone observations and every untested case below retain their own scope.
+The verified [#695 APK](https://github.com/Kajooja/Kajo/actions/runs/39626258645/artifacts/12360202100)
+is built from accepted #351 source `71b5b2616241e746ff3f8681e75dc42c2ed4c17a`;
+all five required checks and the APK job succeeded. It includes shared feed,
+artwork and Ohita source. [STATUS](STATUS.md#current-test-apk-and-device-work)
+owns the archive identity and expiry. #677/#669 are older v2-consumer builds.
+
+The compatibility prerequisite and both unchanged native/Taste skip forwards
+are installed and verified. The two 2026-10-22 SQL Editor atomic receipts are
+`20261022072353` (native) and `20261022072535` (Taste); STATUS owns the exact source
+and preservation/security evidence. Use this backend with the existing #695 APK
+for the planned device matrix. Do not replay installed migrations or rebuild
+unchanged application source. Install as an update preserving current data;
+do not reset a Profile to force eligibility. No #695 phone installation, gesture
+or quality observation is recorded.
 
 ## Owner feed feedback and planned successor — 2026-10-15
 
@@ -33,8 +39,8 @@ Its separate-commit 10/0/5 fixtures demonstrate next-choice differences; the
 hosted checks verify preservation/security and read-only selector behavior.
 Neither is an observed phone result or a positive eligible-owner new-session
 test. The shared-feed source now implements artwork, vertical presentation and
-Ohita; its integration, matching hosted forwards and actual device acceptance
-are tracked in STATUS and the shared-feed source matrix below.
+Ohita and is packaged in #695. Its two hosted forwards are now installed; actual
+device acceptance remains tracked in the shared-feed source matrix below.
 Record the actual immutable session policy
 privately alongside the v2 wire version; an old retained v2 session keeps its old
 policy and cannot accept the successor just by updating the APK. No account reset
@@ -147,10 +153,10 @@ The owner authorized source integration after CI. The complete original stack is
 accepted through #329 and the owned mobile consumer through #331.
 The earlier instructions below to keep #229 draft are historical and superseded
 for source integration. No new phone observation is supplied by that approval.
-Current source/build identity belongs to [STATUS](STATUS.md); the latest verified
-accepted-main APK is #653, recorded there; it contains #331. #333 owns backend
-preparation; actual device acceptance remains open. Older artifacts below are
-dated evidence.
+At this October 12 checkpoint, the verified accepted-main APK was #653 and
+contained #331; #333 then owned backend preparation. Current source/build/backend
+identity belongs to [STATUS](STATUS.md). Actual device acceptance remains open;
+older artifacts below are dated evidence.
 Keep unobserved reconnect/provenance/process-death, fresh-account and Shared cases
 open with #238. Record installed binary/run, device and backend checkpoint when
 exercising them. Preserve prior positive observations and existing account data.
@@ -762,11 +768,12 @@ network timing, actual prediction quality or full sequential Taste acceptance.
 
 ## Shared-feed source acceptance — #239 / 2026-10-17
 
-Source branch: `feat/239-shared-vertical-feed`, based on accepted #349. This is a
-**planned device matrix**, not an observation. The existing #677 APK lacks this
-UI. First install the two exact missing #349 forwards with preservation checks,
-then build the accepted feed source and record installed SHA/backend/device.
-Preserve current accounts/v1 sessions; do not reset to manufacture v2 eligibility.
+Source #350 and compatibility #351 are merged; #695 now packages this UI. This
+remains a **planned device matrix**, not an observation. The compatibility
+prerequisite and both #349 forwards are installed and verified as of 2026-10-22.
+Use the existing #695 APK and record the installed checksum, device and exact
+backend checkpoint from STATUS. Preserve accounts/v1 sessions; do not reset
+to manufacture v2 eligibility. Missing capability/retry is not a passed skip flow.
 
 | Case | Required observation |
 |---|---|
