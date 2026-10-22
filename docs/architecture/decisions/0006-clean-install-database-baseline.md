@@ -1050,6 +1050,26 @@ explicit in the installation/acceptance procedure; neither a green experiment no
 a doc update silently changes the issue's contract. Existing hosted tracking stays
 untouched and needs its own ordinary forward-deployment procedure.
 
+### Docker Hub fallback reference — 2026-10-22 / #354
+
+[CI #703](https://github.com/Kajooja/Kajo/actions/runs/39832956672), clean-installation
+job `120014605999`, observed `supabase/postgres:17.6.1.167` with the already reviewed
+Linux x64 content ID
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+The reference allowlist rejected it before application SQL. CLI remains pinned to
+2.117.0; this is a registry-name difference, not changed database content.
+
+The pinned upstream
+[registry resolver](https://github.com/supabase/cli/blob/v2.117.0/apps/cli/src/command-internal/legacy-docker-registry.ts)
+(blob `e7f4051a93d2414c62897145409b7b783d82f397`) explicitly lists ECR, GHCR and
+the original Docker Hub image as fallback candidates. The local guard now also
+accepts only the observed exact `supabase/postgres:17.6.1.167` reference, still
+requiring its existing platform-specific content ID. Reports retain the actual
+reference. Regression coverage rejects changed content for all three references,
+changed tags and unknown registries. No digest, architecture, SQL assertion,
+cleanup requirement, deployed migration or hosted state is relaxed. The corrected
+final-source CI must still pass every normal platform/application gate.
+
 ## Alternatives considered
 
 - Rewrite the failed historical migration: violates immutable deployed history.

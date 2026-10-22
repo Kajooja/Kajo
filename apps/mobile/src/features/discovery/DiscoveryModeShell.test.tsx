@@ -6,15 +6,15 @@ import { BOTTOM_DOCK_HEIGHT, getDockPanelBottomInset } from './shellLayout';
 
 const context = vi.hoisted(() => ({
   profile: { id: 'personal', name: 'Oma Kajo', type: 'PERSONAL', ownerUserId: 'actor' } as Profile,
-  recordEvent: vi.fn(), setMode: vi.fn(), replace: vi.fn(),
+  recordEvent: vi.fn(), setMode: vi.fn(), replace: vi.fn(), back: vi.fn(), pathname: '/discovery/movies',
 }));
 vi.mock('react', async () => ({
   ...await vi.importActual<typeof import('react')>('react'),
   useRef: (initial: unknown) => ({ current: initial }),
   useState: (initial: unknown) => [typeof initial === 'function' ? initial() : initial, vi.fn()],
 }));
-vi.mock('expo-router', () => ({ usePathname: () => '/discovery/movies',
-  useRouter: () => ({ replace: context.replace, push: vi.fn() }) }));
+vi.mock('expo-router', () => ({ usePathname: () => context.pathname,
+  useRouter: () => ({ replace: context.replace, push: vi.fn(), back: context.back }) }));
 vi.mock('expo-blur', () => ({ BlurTargetView: 'BlurTargetView', BlurView: 'BlurView' }));
 vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }));
 vi.mock('react-native', () => ({
@@ -53,6 +53,7 @@ function ViewFixture() { return null; }
 
 beforeEach(() => {
   context.profile = { id: 'personal', name: 'Oma Kajo', type: 'PERSONAL', ownerUserId: 'actor' };
+  context.pathname = '/discovery/movies';
   vi.clearAllMocks();
 });
 
@@ -78,6 +79,20 @@ describe('compact Discovery shell preserves its controls and safe bounds', () =>
     expect(context.recordEvent).toHaveBeenCalledWith(expect.objectContaining({
       eventType: 'DISCOVERY_MODE_CHANGED', discoveryMode: 'SURPRISE',
     }));
+  });
+
+  it('puts item Back and the authoritative curtain in one compact header without a second brand row', () => {
+    context.pathname = '/discovery/item-123';
+    const all = nodes(render());
+    const header = all.find(node => node.type === 'SafeAreaView' && node.props.edges?.includes('top'))!;
+    const bar = React.Children.toArray(header.props.children)[0] as ReactElement<Props>;
+    expect(flatStyle(bar.props.style)).toMatchObject({ minHeight: 48, flexDirection: 'row' });
+    const headerNodes = nodes(header);
+    expect(headerNodes.some(node => node.type === 'KajoMark')).toBe(false);
+    expect(headerNodes.some(node => node.type === 'CurtainControl')).toBe(true);
+    headerNodes.find(node => node.props.accessibilityLabel === 'Takaisin')!.props.onPress!();
+    expect(context.back).toHaveBeenCalledOnce();
+    expect(context.replace).not.toHaveBeenCalled();
   });
 
   it('places the Shared indicator in the curtain label row without another header tier', () => {

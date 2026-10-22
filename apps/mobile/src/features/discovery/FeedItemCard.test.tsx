@@ -3,12 +3,14 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedItemCard, FEED_HELP } from './FeedItemCard';
 import { getRoomTheme } from '../../theme/roomTheme';
 
-const h = vi.hoisted(() => ({ states: [] as unknown[], memos: [] as unknown[], index: 0, memo: 0,
+const h = vi.hoisted(() => ({ states: [] as unknown[], memos: [] as unknown[], index: 0, memo: 0, refs: [] as { current: unknown }[], ref: 0,
   effects: [] as { deps: readonly unknown[]; cleanup?: () => void }[], effect: 0, pending: [] as (() => void)[],
   storage: new Map<string, string>(), app: null as ((state: string) => void) | null }));
 vi.mock('react', async () => ({ ...await vi.importActual<typeof import('react')>('react'),
   useState: (initial: unknown) => { const i = h.index++; if (!(i in h.states)) h.states[i] = typeof initial === 'function' ? initial() : initial;
     return [h.states[i], (v: unknown) => { h.states[i] = typeof v === 'function' ? v(h.states[i]) : v; }]; },
+  useCallback: (callback: unknown) => callback,
+  useRef: (initial: unknown) => { const i = h.ref++; if (!(i in h.refs)) h.refs[i] = { current: initial }; return h.refs[i]; },
   useMemo: (f: () => unknown) => { const i = h.memo++; if (!(i in h.memos)) h.memos[i] = f(); return h.memos[i]; },
   useLayoutEffect: (f: () => void | (() => void), deps: readonly unknown[]) => effect(f, deps),
   useEffect: (f: () => void | (() => void), deps: readonly unknown[]) => effect(f, deps),
@@ -21,9 +23,10 @@ function effect(f: () => void | (() => void), deps: readonly unknown[]) {
 vi.mock('expo-sqlite/kv-store', () => ({ default: { getItemSync: (key: string) => h.storage.get(key) ?? null,
   setItemSync: (key: string, value: string) => h.storage.set(key, value) } }));
 vi.mock('react-native', () => ({
-  View: 'View', Text: 'Text', Image: 'Image', Pressable: 'Pressable',
+  View: 'View', Text: 'Text', Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView',
   StyleSheet: { create: (value: unknown) => value },
-  Animated: { View: 'AnimatedView', Value: class { setValue = vi.fn(); } },
+  Animated: { View: 'AnimatedView', Value: class { setValue = vi.fn(); stopAnimation = vi.fn(); },
+    timing: () => ({ start: vi.fn() }), spring: () => ({ start: vi.fn() }) },
   PanResponder: { create: (handlers: unknown) => ({ panHandlers: handlers }) },
   AccessibilityInfo: { isReduceMotionEnabled: async () => true, addEventListener: () => ({ remove: vi.fn() }) },
   AppState: { currentState: 'active', addEventListener: (_: string, fn: (s: string) => void) => { h.app = fn; return { remove: vi.fn() }; } },
@@ -31,9 +34,12 @@ vi.mock('react-native', () => ({
 vi.mock('./ItemDescription', () => ({ ItemDescription: 'ItemDescription' }));
 vi.stubGlobal('React', React);
 afterAll(() => vi.unstubAllGlobals());
-beforeEach(() => { h.effects.forEach(e => e.cleanup?.()); h.states = []; h.memos = []; h.effects = []; h.pending = []; h.storage.clear(); });
+beforeEach(() => { h.effects.forEach(e => e.cleanup?.()); h.states = []; h.memos = []; h.refs = []; h.effects = []; h.pending = []; h.storage.clear(); });
 type Props = { children?: ReactNode; testID?: string; accessibilityLabel?: string; onPress?: () => void;
-  onError?: () => void; onLayout?: () => void; disabled?: boolean;
+  onError?: () => void; onLayout?: () => void; disabled?: boolean; style?: unknown; numberOfLines?: number;
+  accessibilityActions?: { name: string; label: string }[];
+  onAccessibilityAction?: (event: { nativeEvent: { actionName: string } }) => void;
+  onMoveShouldSetPanResponderCapture?: (event: unknown, gesture: object) => boolean;
   onPanResponderGrant?: () => void; onPanResponderRelease?: (e: unknown, g: object) => void;
   onPanResponderMove?: (e: unknown, g: object) => void; onPanResponderTerminate?: () => void };
 function nodes(tree: ReactNode): ReactElement<Props>[] {
@@ -43,10 +49,12 @@ function text(tree: ReactNode): string {
   return React.Children.toArray(tree).map(child => React.isValidElement<Props>(child) ? text(child.props.children) : String(child)).join(' ');
 }
 function render(props: React.ComponentProps<typeof FeedItemCard>) {
-  h.index = h.memo = h.effect = 0; const tree = FeedItemCard(props); h.pending.splice(0).forEach(fn => fn()); return tree;
+  h.index = h.memo = h.effect = h.ref = 0; const tree = FeedItemCard(props); h.pending.splice(0).forEach(fn => fn()); return tree;
 }
 const props = () => ({ item: { id: 'movie', itemType: 'MOVIE' as const, title: 'Frozen title', imageUrl: 'https://example.invalid/poster.jpg' },
   theme: getRoomTheme('DAWN'), disabled: false, onSkip: vi.fn(() => true) });
+
+function ViewProbe() { return null; }
 
 describe('shared native feed presentation wiring', () => {
   it('binds one completed hero drag to the same neutral accessible action without making description scrolling a dismissal', () => {
@@ -54,7 +62,7 @@ describe('shared native feed presentation wiring', () => {
     const surface = nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props;
     surface.onPanResponderGrant!(); surface.onPanResponderMove!(null, { dx: 0, dy: -120, numberActiveTouches: 1 });
     surface.onPanResponderRelease!(null, { dx: 0, dy: -120 });
-    nodes(tree).find(n => n.props.accessibilityLabel === 'Ohita')!.props.onPress!();
+    surface.onAccessibilityAction!({ nativeEvent: { actionName: 'increment' } });
     expect(p.onSkip).toHaveBeenCalledOnce();
     expect(nodes(tree).find(n => n.type === 'ItemDescription')!.props.onPanResponderRelease).toBeUndefined();
   });
@@ -65,8 +73,17 @@ describe('shared native feed presentation wiring', () => {
     if (kind === 'layout') surface.onLayout!(); else if (kind === 'background') h.app!('background'); else surface.onPanResponderTerminate!();
     surface.onPanResponderRelease!(null, { dx: 0, dy: -130 }); expect(p.onSkip).not.toHaveBeenCalled();
     p.disabled = true; tree = render(p);
-    const button = nodes(tree).find(n => n.props.accessibilityLabel === 'Ohita')!.props;
-    expect(button.disabled).toBe(true); button.onPress!(); expect(p.onSkip).not.toHaveBeenCalled();
+    const disabledSurface = nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props;
+    disabledSurface.onAccessibilityAction!({ nativeEvent: { actionName: 'increment' } }); expect(p.onSkip).not.toHaveBeenCalled();
+  });
+  it('keeps a deliberate drag active across a harmless callback refresh', () => {
+    const p = props(); const tree = render(p);
+    const surface = nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props;
+    surface.onPanResponderGrant!(); surface.onPanResponderMove!(null, { dx: 0, dy: -120, numberActiveTouches: 1 });
+    const nextCommit = vi.fn(() => true);
+    const rerendered = render({ ...p, onSkip: nextCommit });
+    nodes(rerendered).find(n => n.props.testID === 'feed-dismiss-surface')!.props.onPanResponderRelease!(null, { dx: 0, dy: -120 });
+    expect(p.onSkip).not.toHaveBeenCalled(); expect(nextCommit).toHaveBeenCalledOnce();
   });
   it('keeps image failure usable and preserves title/metadata/credit renderer', () => {
     const p = props(); let tree = render(p);
@@ -78,7 +95,60 @@ describe('shared native feed presentation wiring', () => {
     const p = props(); let tree = render(p); expect(text(tree)).toContain(FEED_HELP); expect(h.storage.size).toBe(0);
     nodes(tree).find(n => n.type === 'Pressable' && text(n.props.children) === 'Selvä')!.props.onPress!();
     tree = render(p); expect(text(tree)).not.toContain(FEED_HELP); expect(h.storage.size).toBe(1);
-    nodes(tree).find(n => n.props.accessibilityLabel === 'Ohittamisen ohje')!.props.onPress!();
+    nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props.onAccessibilityAction!({ nativeEvent: { actionName: 'showHelp' } });
     expect(text(render(p))).toContain(FEED_HELP);
+  });
+  it('reverses one completed downward gesture and exposes no visible skip or undo controls', () => {
+    const p = { ...props(), onPrevious: vi.fn(() => true) }; const tree = render(p);
+    const surface = nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props;
+    expect(surface.onMoveShouldSetPanResponderCapture!(null, { dx: 0, dy: 30, numberActiveTouches: 1 })).toBe(true);
+    surface.onPanResponderGrant!(); surface.onPanResponderMove!(null, { dx: 0, dy: 130, numberActiveTouches: 1 });
+    surface.onPanResponderRelease!(null, { dx: 0, dy: 130 });
+    surface.onAccessibilityAction!({ nativeEvent: { actionName: 'decrement' } });
+    expect(p.onPrevious).toHaveBeenCalledOnce(); expect(p.onSkip).not.toHaveBeenCalled();
+    expect(nodes(tree).filter(n => n.type === 'Pressable').map(n => text(n.props.children))).toEqual(['Selvä']);
+    expect(text(render(p))).not.toContain(FEED_HELP);
+  });
+  it('dismisses guidance after positive acknowledgement and scopes its receipt to the account', () => {
+    const p = { ...props(), helpScope: 'actor-a', hasInteracted: false };
+    render(p); p.hasInteracted = true; render(p);
+    expect(text(render(p))).not.toContain(FEED_HELP);
+    const q = { ...p, helpScope: 'actor-b', hasInteracted: false }; render(q);
+    expect(text(render(q))).toContain(FEED_HELP);
+    render({ ...q, helpScope: 'actor-a' });
+    expect(text(render({ ...q, helpScope: 'actor-a' }))).not.toContain(FEED_HELP);
+  });
+  it('allows explicit help after a rating acknowledgement and keeps automatic help dismissed', () => {
+    const p = { ...props(), helpScope: 'actor-a', hasInteracted: false };
+    render(p); p.hasInteracted = true; render(p); let tree = render(p);
+    expect(text(tree)).not.toContain(FEED_HELP);
+    nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!.props.onAccessibilityAction!({ nativeEvent: { actionName: 'showHelp' } });
+    tree = render(p); expect(text(tree)).toContain(FEED_HELP);
+    expect(text(render(p))).toContain(FEED_HELP);
+    nodes(tree).find(n => n.props.accessibilityLabel === 'Sulje selaamisen ohje')!.props.onPress!();
+    expect(text(render(p))).not.toContain(FEED_HELP);
+  });
+  it('bounds long metadata on a small viewport while retaining its full accessible text', () => {
+    const title = 'Very long title '.repeat(30); const creators = ['Long author name '.repeat(30)];
+    const tree = render({ ...props(), item: { ...props().item, title, creators }, viewportHeight: 240, children: <ViewProbe /> });
+    const surface = nodes(tree).find(n => n.props.testID === 'feed-dismiss-surface')!;
+    expect(surface.props.accessibilityLabel).toContain(title); expect(surface.props.accessibilityLabel).toContain(creators[0]);
+    expect(surface.props.style).toContainEqual(expect.objectContaining({ minHeight: 0, overflow: 'hidden' }));
+    expect(nodes(tree).find(n => n.props.testID === 'feed-title')!.props.numberOfLines).toBe(2);
+    expect(nodes(tree).find(n => n.props.testID === 'feed-creators')!.props.numberOfLines).toBe(1);
+    const controls = nodes(tree).find(n => React.Children.toArray(n.props.children).some(child => React.isValidElement(child) && child.type === ViewProbe))!;
+    expect(controls.props.style).toMatchObject({ flexShrink: 0 });
+  });
+  it('does not advertise undo or list gestures inside Taste', () => {
+    const tree = render({ ...props(), helpKind: 'taste' });
+    expect(text(tree)).toContain(FEED_HELP);
+    expect(text(tree)).not.toContain('Alaspäin'); expect(text(tree)).not.toContain('Tähti');
+  });
+  it('fills the supplied viewport while isolating the description scroll from feed gestures', () => {
+    const tree = render({ ...props(), viewportHeight: 620 });
+    expect(tree.props.style).toContainEqual({ height: 620 });
+    const scroll = nodes(tree).find(n => n.props.testID === 'feed-description-scroll')!;
+    expect(scroll.props.onPanResponderRelease).toBeUndefined();
+    expect(nodes(scroll.props.children).some(n => n.type === 'ItemDescription')).toBe(true);
   });
 });

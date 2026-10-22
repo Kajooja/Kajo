@@ -178,6 +178,8 @@ function ItemDetailContent({
   catalogItem,
 }: ItemDetailScreenProps & { slate?: DeliveredSlate; catalogItem?: Item }) {
   const { width } = useWindowDimensions();
+  const [feedHeight, setFeedHeight] = useState(0);
+  const itemLists = useItemLists();
   const { mode: currentMode } = useDiscoveryMode();
   const [mode] = useState(() => slate?.mode ?? currentMode);
   const activeProfile = useActiveProfile();
@@ -228,10 +230,22 @@ function ItemDetailContent({
       ? { item: selectedItem, origin } : null;
   });
   const feed = useDiscoveryFeed(initialFeed, mode);
+  const [feedDirection, setFeedDirection] = useState<'forward' | 'backward' | undefined>();
   const [feedDraftState, setFeedDraftState] = useState<{ opportunity: string; rating: number | null } | null>(null);
   const feedDelivery = feed.state?.delivery;
   const feedOpportunity = `${feedDelivery?.item.id ?? ''}:${feedDelivery?.origin.deliveryRequestId ?? ''}`;
   const feedDraft = feedDraftState?.opportunity === feedOpportunity ? feedDraftState.rating : null;
+  const [feedMembership, setFeedMembership] = useState<{ opportunity: string; saved: boolean; failed: boolean } | null>(null);
+  const { loadForItem: loadFeedMembership, revision: membershipRevision } = itemLists;
+  useEffect(() => {
+    if (!feedDelivery) return;
+    let active = true;
+    void loadFeedMembership(feedDelivery.item.id).then(result => {
+      if (!active) return;
+      setFeedMembership({ opportunity: feedOpportunity, saved: result.status === 'success' && result.lists.some(list => list.containsItem), failed: result.status !== 'success' });
+    });
+    return () => { active = false; };
+  }, [feedDelivery, feedOpportunity, loadFeedMembership, membershipRevision]);
   function setFeedDraft(rating: number | null) { setFeedDraftState({ opportunity: feedOpportunity, rating }); }
   const originFor = useCallback((item: Item) => ({
     ...(feedDelivery?.item.id === item.id ? feedDelivery.origin : getDeliveredItemOrigin(origins, item.id)),
@@ -389,7 +403,8 @@ function ItemDetailContent({
   function isCurrentFeedItem(item: Item) {
     if (!initialFeed) return true;
     const displayed = feed.flow?.snapshot().delivery;
-    return currentView.current && displayed?.item.id === item.id &&
+    const navigating = feed.flow?.snapshot();
+    return currentView.current && !navigating?.loading && !navigating?.navigationPending && displayed?.item.id === item.id &&
       displayed.origin.deliveryRequestId === feedDelivery?.origin.deliveryRequestId;
   }
 
@@ -471,6 +486,7 @@ function ItemDetailContent({
     }
 
     const { item, index } = target;
+    if (initialFeed && commit.lists.length) setFeedMembership({ opportunity: feedOpportunity, saved: true, failed: false });
     let notice: string | undefined;
     if (commit.message) {
       for (const list of commit.lists) {
@@ -789,12 +805,14 @@ function ItemDetailContent({
   const feedInteraction = feedItem ? getItemInteraction(interactions, feedItem.id) : null;
   const feedSharedState = feedItem ? sharedEndorsements.stateByItemId[feedItem.id] : undefined;
   const feedApproval = getPendingListApproval(feedSharedState, activeSharedMembership?.members ?? [], activeProfile.actorUserId);
-  const feedDisabled = Boolean(feed.state?.waitingActionId || feed.skips.pendingCount || !feed.skips.ready ||
+  const feedDisabled = Boolean(feed.state?.loading || feed.state?.navigationPending || feed.state?.waitingActionId || feed.skips.pendingCount || !feed.skips.ready ||
     atomicPendingCount || persistenceStatus !== 'ready' || endorsingItemId || listPickerTarget);
-  const canSkipFeed = !feedDisabled && feed.state?.source?.acceptsNewSkip === true;
+  const canAdvanceFeed = !feedDisabled && (feed.state?.positiveCommitted === true || feed.state?.source?.acceptsNewSkip === true);
+  const feedSaved = feedMembership?.opportunity === feedOpportunity && feedMembership.saved;
+  const membershipUnknown = feedMembership?.opportunity !== feedOpportunity || feedMembership.failed;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={initialFeed ? [] : ['bottom']}>
       <StatusBar style="light" />
       <View
         pointerEvents="none"
@@ -807,7 +825,7 @@ function ItemDetailContent({
         ]}
       />
 
-      <View style={styles.topBar}>
+      {!initialFeed ? <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={slate?.collectionTitle ? `Takaisin: ${slate.collectionTitle}` : 'Takaisin'}
@@ -845,11 +863,11 @@ function ItemDetailContent({
             <Text style={styles.swipeHint}>Pyyhkäise →</Text>
           ) : null}
         </View>
-      </View>
+      </View> : null}
 
-      <View style={styles.feedbackRow}>
+      <View style={initialFeed ? styles.feedFeedback : styles.feedbackRow}>
         <InteractionPersistenceNotice theme={theme} />
-        {feedback && (!initialFeed || feed.state?.waitingActionId) ? (
+        {feedback && !initialFeed ? (
           <Text
             accessibilityLiveRegion="polite"
             style={styles.feedbackText}
@@ -879,7 +897,8 @@ function ItemDetailContent({
         ) : null}
       </View>
 
-      {initialFeed ? <ScrollView key={feedOpportunity} contentContainerStyle={styles.content}>
+      {initialFeed ? <View style={styles.feedViewport} onLayout={event => setFeedHeight(event.nativeEvent.layout.height)}>
+        <View style={styles.feedNotices} pointerEvents="box-none">
         {feed.skips.message ? <View accessibilityLiveRegion="polite">
           <Text style={styles.feedbackText}>{feed.skips.message}</Text>
           <Pressable accessibilityRole="button" onPress={feed.skips.retry} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Yritä uudelleen</Text></Pressable>
@@ -891,26 +910,47 @@ function ItemDetailContent({
           <Text style={styles.feedbackText}>{feed.state.message}</Text>
           <Pressable accessibilityRole="button" style={styles.primaryButton} onPress={() => { eventTracking.retryPersistence(); feed.flow?.retry(); }}>
             <Text style={styles.primaryButtonText}>Yritä uudelleen</Text></Pressable>
+          {feed.state.canCancelPrevious ? <Pressable accessibilityRole="button" style={styles.primaryButton} onPress={() => feed.flow?.cancelPrevious()}>
+            <Text style={styles.primaryButtonText}>Jatka uusista suosituksista</Text></Pressable> : null}
         </View> : null}
-        {feed.state?.loading ? <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>Haetaan seuraavaa korttia…</Text> : null}
-        {feed.state?.exhausted ? <Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi. Voit palata ruudukkoon ja päivittää myöhemmin.</Text> : null}
-        {feedItem && feedInteraction ? <FeedItemCard key={feedOpportunity} item={feedItem} theme={theme} disabled={!canSkipFeed}
-            onSkip={() => { if (!canSkipFeed || !isCurrentFeedItem(feedItem)) return false; const accepted = feed.flow?.skip() === true;
-              if (accepted) { setFeedDraft(null); setFeedback('Tallennetaan ohitusta…'); } return accepted; }}>
+        {feed.state?.waitingActionId || feed.skips.pendingCount ? <Text accessibilityLiveRegion="polite" style={styles.feedProgress}>Odotetaan tallennuksen vahvistusta…</Text>
+          : feed.state?.loading ? <Text accessibilityLiveRegion="polite" style={styles.feedProgress}>Haetaan korttia…</Text> : null}
+        {feed.state?.exhausted ? <View><Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi.</Text>
+          <Pressable accessibilityRole="button" onPress={() => feed.flow?.retry()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Päivitä</Text></Pressable>
+          {feed.state.canPrevious ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
+        </View> : null}
+        </View>
+        {feedItem && feedInteraction ? <FeedItemCard key={feedOpportunity} item={feedItem} theme={theme} disabled={feedDisabled}
+            {...(activeProfile.actorUserId ? { helpScope: activeProfile.actorUserId } : {})} viewportHeight={feedHeight}
+            {...(feedDirection ? { entryDirection: feedDirection } : {})}
+            hasInteracted={feed.state?.positiveCommitted === true}
+            {...(feed.state?.canPrevious ? { onPrevious: () => {
+              if (feedDisabled || !isCurrentFeedItem(feedItem)) return false;
+              const accepted = feed.flow?.previous() === true;
+              if (accepted) setFeedDirection('backward');
+              return accepted;
+            } } : {})}
+            onSkip={() => { if (!canAdvanceFeed || !isCurrentFeedItem(feedItem)) return false; const accepted = feed.flow?.advance() === true;
+              if (accepted) { setFeedDirection('forward'); setFeedDraft(null); setFeedback(null); } return accepted; }}>
             {feedApproval ? <Pressable accessibilityRole="button" disabled={feedDisabled} style={styles.primaryButton}
               onPress={() => void handleEndorsement(feedItem, 0, undefined, undefined, undefined, feedSharedState?.proposedLists?.map(list => list.id))}>
               <Text style={styles.primaryButtonText}>Hyväksy {formatPendingListApproval(feedApproval)}</Text></Pressable> : null}
-            <RatingControl rating={feedDraft} disabled={feedDisabled} theme={theme} onRatingChange={setFeedDraft} />
-            <Pressable accessibilityRole="button" disabled={feedDisabled || feedDraft === null} style={[styles.primaryButton, (feedDisabled || feedDraft === null) && styles.disabled]}
-              onPress={() => { if (!feedDisabled && feedDraft !== null) handleRating(feedItem, 0, feedInteraction, feedDraft); }}>
-              <Text style={styles.primaryButtonText}>Tallenna arvio ja jatka</Text></Pressable>
-            {!feedApproval && !feedSharedState?.currentActorEndorsed && !feedSharedState?.consensusSaved ? <Pressable accessibilityRole="button"
-              disabled={feedDisabled} style={styles.primaryButton} onPress={() => openListPicker(feedItem, 0, feedInteraction)}>
-              <Text style={styles.primaryButtonText}>{ITEM_LIST_LABELS.addToList}</Text></Pressable> : null}
-            {feed.state?.waitingActionId || feed.skips.pendingCount ? <Text accessibilityLiveRegion="polite" style={styles.feedbackText}>Odotetaan tallennuksen vahvistusta…</Text> : null}
+            <View style={styles.feedActions}>
+              <View style={styles.feedRating}><RatingControl rating={feedDraft ?? feedInteraction.rating} disabled={feedDisabled} theme={theme}
+                onRatingChange={rating => { if (!feedDisabled) { setFeedDraft(rating); handleRating(feedItem, 0, feedInteraction, rating); } }} /></View>
+              <Pressable accessibilityRole="button" accessibilityLabel={feedSaved ? 'Tallennettu listalle. Avaa listat' : membershipUnknown ? 'Avaa listat. Tallennustilaa tarkistetaan' : 'Lisää listaan'}
+                accessibilityState={{ disabled: feedDisabled, selected: Boolean(feedSaved) }}
+                accessibilityHint="Valitse yksi tai useampi lista"
+                disabled={feedDisabled} style={[styles.feedStar, feedDisabled && styles.disabled]}
+                onPress={() => openListPicker(feedItem, 0, feedInteraction)}>
+                <Text style={styles.feedStarGlyph}>{membershipUnknown ? '⋯' : feedSaved ? '★' : '☆'}</Text>
+              </Pressable>
+            </View>
+            {feedSharedState?.currentActorEndorsed && !feedSaved ? <Text style={styles.feedbackText}>Odottaa ryhmän hyväksyntää</Text> : null}
           </FeedItemCard> : null}
 
-      </ScrollView> : (
+      </View> : (
+
       <FlatList
         ref={listRef}
         data={items}
@@ -1343,6 +1383,15 @@ function createStyles(theme: RoomTheme) {
       fontSize: 12,
       fontWeight: '700',
     },
+    feedViewport: { flex: 1, minHeight: 0, overflow: 'hidden' },
+    feedNotices: { position: 'absolute', top: 8, left: 12, right: 12, zIndex: 5, gap: 6 },
+    feedProgress: { color: theme.base.textPrimary, backgroundColor: theme.surface.raised,
+      alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, fontSize: 12 },
+    feedFeedback: { paddingHorizontal: 12 },
+    feedActions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+    feedRating: { flex: 1 },
+    feedStar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
+    feedStarGlyph: { color: '#ffffff', fontSize: 36, lineHeight: 42 },
     feedbackRow: {
       minHeight: 26,
       paddingHorizontal: 20,

@@ -16,6 +16,21 @@ describe('deliberate feed dismissal', () => {
     gesture.release(kind === 'sideways' ? 150 : 0, kind === 'partial' ? -50 : kind === 'down' ? 130 : -130);
     expect(commit).not.toHaveBeenCalled();
   });
+  it('commits reverse navigation once and rejects reversed or multitouch backward drags', () => {
+    const next = vi.fn(() => true); const previous = vi.fn(() => true);
+    const gesture = createFeedDismissal(next, previous);
+    gesture.begin(); gesture.move(0, 130, 1); gesture.release(0, 130); gesture.previous();
+    expect(previous).toHaveBeenCalledOnce(); expect(next).not.toHaveBeenCalled();
+    gesture.reset(); gesture.begin(); gesture.move(0, 130, 1); gesture.move(0, 50, 1); gesture.release(0, 130);
+    gesture.reset(); gesture.begin(); gesture.move(0, 130, 2); gesture.release(0, 130);
+    expect(previous).toHaveBeenCalledOnce();
+  });
+  it('does not switch gesture direction midway even if final movement is large', () => {
+    const next = vi.fn(() => true); const previous = vi.fn(() => true);
+    const gesture = createFeedDismissal(next, previous);
+    gesture.begin(); gesture.move(0, -20, 1); gesture.move(0, 130, 1); gesture.release(0, 130);
+    expect(next).not.toHaveBeenCalled(); expect(previous).not.toHaveBeenCalled();
+  });
   it('navigation or scroll release without an intentional gesture is inert; button needs no gesture', () => {
     const commit = vi.fn(() => true); const gesture = createFeedDismissal(commit);
     gesture.release(0, -800); expect(commit).not.toHaveBeenCalled();

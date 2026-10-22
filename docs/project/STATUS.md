@@ -10,29 +10,136 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — repair Discovery navigation blocker / #239
+## Current packet — continuous Discovery feed and skip repair / #239
 
-**Owner device report — 2026-10-22:** after receiving APK #698, the owner can
-open Room but tapping either Movies or Books only flashes the screen and does
-not open Discovery. The feed/Ohita acceptance matrix is blocked, not passed.
-The installed checksum and Android version were not supplied.
+**Owner device feedback — 2026-10-22:** after downloading the replacement APK,
+the owner reached the feed and reported oversized top/bottom areas, persistent
+help, redundant Save/Ohita controls and no continuous reverse navigation. Pressing
+Ohita shows “Ohitus ei ole juuri nyt käytettävissä. Tarkista yhteys ja yritä
+uudelleen.” This is a failing skip observation, not successful feed acceptance or
+proof of a network outage. Installed checksum and Android version remain unreported;
+the owner now confirms replacement APK #700 checks 1–3 pass: category navigation,
+Item/Lists/Settings navigation and reopening preserve access. This is reported
+device evidence, not a checksum-verified complete feed acceptance. The owner also
+reports Room flashing/reloading at app startup; the current packet repairs that
+separate initial-hydration remount.
 
-The bounded repair is on `fix/239-discovery-navigation-remount`, based on accepted
-#352 main `5fb076c5b8dad2c4377dd3f8d33072d2f92fe860`. A real React reconciliation
-regression reproduces loss of the navigator's selected route with the old source:
-`ProfileBootstrapGate` included route segments in the key of its navigator parent.
-The repair keeps that parent stable across routes and Settings/fail-open bypass,
-while retaining route-request cleanup and genuine Profile/client scope resets.
-The mounted regression covers retained v1/v2 dismissal, Movies, Books, detail,
-Lists/history, Settings and deferred/failed status refresh. Native Expo navigation,
-phone layout and gestures still need the replacement APK's device check.
+The active successor is [PR #354](https://github.com/Kajooja/Kajo/pull/354),
+`feat/239-continuous-card-feed`, based on navigation repair
+[PR #353](https://github.com/Kajooja/Kajo/pull/353), head
+`bee39231fa984bb8fb39cc1d34bb1885be9c6d57`. #353 is now accepted through merge
+`611fa83ca70e74fd6f17e2a427ea808ff887f5e2` after all five required CI #700 checks
+and the owner's reported phone navigation acceptance. It fixes the route-dependent bootstrap parent
+key that remounted the navigator in APK #698. Preserve that repair and its mounted
+navigation regression rather than restoring the broken accepted #352 parent.
 
-**One active continuation:** finish this repair's required checks, build a new
-configured APK and verify Room → Movies/Books first. Install as an update;
-preserve accounts, ratings, lists and pending commands. Only after opening works
-resume the existing feed/Ohita matrix. Versioned Taste pool refresh/refill under
-#336 remains the next source dependency after this blocker. No backend migration
-or account reset belongs to this repair.
+The new owner-approved design supersedes the earlier #239 star/overflow and
+explicit-save controls: full compact bar-to-bar feed, rating on slider release,
+List-picker star with confirmed-membership fill, forward neutral skip only without
+a positive choice, backward exact undo, and account-scoped first-use help.
+[UX_PRINCIPLES](../product/UX_PRINCIPLES.md#required-pre-mvp-card-controls--239--mvp-ux-006)
+owns the contract; [DEVICE_TEST](DEVICE_TEST.md#continuous-feed-feedback--239--2026-10-22)
+owns the new observation matrix. The active source now supplies these Discovery
+controls and guarded reverse navigation. History retains exact action identities
+within the mounted scope and the ten-native-action undo limit. After confirmed
+undo, it obtains a fresh canonical delivery of the same Item, searching at most
+three 50-Item pages; it never reuses a consumed/expired original delivery. An
+unavailable target offers explicit retry or cancellation back to fresh Discovery,
+without substituting a different Item. Nonundoable Shared consensus is rejected
+before beginning reversal rather than pretending to restore it.
+
+**Smooth-feed/startup continuation:** the outgoing card now remains visible and
+inert while the acknowledged next delivery loads, including retryable failures.
+The same page request is retried without another skip or impression; only a fresh
+mounted delivery becomes actionable. Directional entry and release/cancellation
+motion replace abrupt snapping; ordinary parent updates must not cancel a drag.
+Pending-save feedback overlays the viewport rather than changing its height.
+The rating slider rejects vertical/diagonal and multitouch movement. The bootstrap
+parent now exists before initial status resolves; the existing splash covers that
+hydration so Room mounts once. Errors or an eight-second initial-status deadline
+fail open, and late status cannot interrupt the navigator. These changes still
+require the successor APK and actual phone observation.
+
+**Skip diagnosis and additive source repair:** read-only SQL confirms phone
+impression occurrence times 107/116 ms earlier than the server prediction request,
+while the exact actor/Profile/Item/session/page/Prediction bindings are valid.
+The installed source incorrectly compared those independent clocks and rejected
+Ohita. CLI-created `20261022151705_contextual_skip_server_clock.sql` removes only
+that cross-clock predicate, preserving exact source binding, committed/MVCC and
+server-clock availability checks, function identity and security metadata.
+
+**Hosted clock repair completed — 2026-10-22:** the exact reviewed forward was
+applied through the migration API, provider receipt **`20261022152530`** named
+`contextual_skip_server_clock` (one exact statement, source MD5
+`e6cf3dff20275321532506720b4704d9`). Source SHA-256 is
+`1d3734bd62e01425d536d6d503d9934688016eafdab3567664b162949ba2a090`;
+the resulting reader body MD5 is `e77719864279323386fcd15dfd68e6e6`.
+All eight postchecks passed: metadata/OIDs/ACL/security of all 256 functions and
+the other 255 bodies remain unchanged; metadata for 92 tables and all 72 trigger
+hashes are unchanged; eight affected tables retain both row counts and complete
+row digests. The previous 83 migration receipts are unchanged, with exactly one
+new provider receipt. A bounded read-only helper probe finds both originally
+failing feed impressions, each bound to its unique exact page; with the original
+clock mismatch retained, both sources now validate with `acceptsNewSkip = true`.
+No account reset or valid skip command was used; only the reviewed helper definition
+changed. These probes are not a full authenticated/device command success.
+Private target-bound evidence stays outside Git. Do not replay the installed clock
+forward. Actual phone success remains unobserved after this repair.
+
+**Taste boundary remains incomplete:** sequential Taste also has the compact
+viewport, direct rating and account-scoped help. Its existing controller still
+selects the next question automatically after acknowledgement and has no numeric
+backward-question undo UI. Do not claim identical manual-advance/reverse behavior
+across Taste and Discovery. Retained v1/challenge Save and frozen measurement
+contracts remain unchanged. These explicit gaps stay open under MVP-UX-007.
+
+Final local lint/typecheck, all 668 mobile tests, 317 database tests, 311 engine tests,
+catalog/research/acceptance groups and explicit demo-mode iOS/Android exports
+passed. Final mobile exports used two Metro workers in explicit demo mode.
+The full root check stopped at Deno registry access (connection refused)
+before the unchanged Edge suite; no complete local-root success is claimed.
+Final-head CI and the configured replacement APK remain required. No new installed
+APK or phone success is claimed; hosted clock repair is verified independently.
+
+**Publication and integration authorized — 2026-10-22:** the owner explicitly
+approved publishing the complete prepared feed/skip/startup source and documents
+to `Kajooja/Kajo`, creating a configured test APK, and merging #353 plus this
+successor after all required final-source CI checks pass. This resolves the earlier
+automatic publication rejection; no alternate write mechanism was used to bypass
+it. The validated local implementation remains
+`2c22f7742c1a1aa6e5d9602cf8b8c89c77d3512a` (tested tree
+`8a0e77643297b06e340815f5e5063c2236b94279`); subsequent changes preserve mobile
+implementation bytes and add publication receipts plus the CI registry-reference
+correction below. #353 has been merged as recorded above.
+The `feat/239-continuous-card-feed` pull request owns the successor's exact final
+head, five CI gates, source integration and configured APK artifact/expiry receipt.
+Do not infer a built or device-accepted successor from local exports alone.
+
+**First publication CI receipt:** #354 head
+`2b6a76c2f0aec7a648fc10b9604e1be8e5b5b95c` started
+[CI #703](https://github.com/Kajooja/Kajo/actions/runs/39832956672) with the APK
+opt-in. Validation and platform/defaults passed, but the clean-installation job
+stopped before application SQL: pinned CLI 2.117.0 selected the official Docker
+Hub fallback `supabase/postgres:17.6.1.167`, absent from the local reference
+allowlist. Its Linux x64 content ID exactly matches the reviewed
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+The bounded correction accepts only this additional exact reference and retains
+version, architecture and digest checks; changed content/tags/unknown registries
+still fail. ADR-0006 records the pinned upstream source and regression evidence.
+This is a CI environment-name correction, not a database upgrade or hosted write.
+All 16 isolated-stack regression tests pass locally after the correction.
+All five gates and the APK must pass on the corrected final source before merge.
+
+**One active continuation:** finish this authorized source publication and the
+configured test build, with all five required final-source CI gates before merge;
+then retest the compact feed and initial startup on the new APK. The prior #700
+APK establishes navigation only and does not include these new controls/motion.
+Use DEVICE_TEST's current matrix for actual phone results. Preserve accounts,
+ratings, List memberships and exact pending commands. Do not reset accounts or
+replay installed migrations. After source integration, do not recreate this packet
+because an earlier dated publication block appears in sprint history.
+Versioned Taste pool refresh/refill under #336 follows this packet; original frozen
+panels, first labels, session policies and retry origins remain protected.
 
 ## Accepted contextual skip source and backend checkpoint
 
@@ -101,7 +208,7 @@ snapshots remain private. No account reset, valid user command or model/Working
 activation was used to verify deployment.
 
 The earlier #695 device handoff is superseded by the #698 navigation blocker
-and active repair above. The installed backend checkpoint remains valid;
+and the active replacement-feed correction above. The installed backend checkpoint remains valid;
 do not replay any installed migration. Original frozen panels, first labels,
 session policies and retry origins remain preserved. #239/#336 and incomplete
 release gates stay open.

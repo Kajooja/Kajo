@@ -176,7 +176,10 @@ Algorithm quality is the critical first-release dependency.
 - Grid is default discovery; optional card browsing and Taste share the required
   vertical feed successor. A deliberate completed upward dismissal means the
   contextual no-rating **Ohita**, not a permanent dislike; preserve historical
-  UNKNOWN/NOT_INTERESTED evidence. UX_PRINCIPLES owns gesture/accessibility rules.
+  UNKNOWN/NOT_INTERESTED evidence. The October 22 refinement uses the full area
+  between compact bars, direct slider commits, a List-picker star, forward advance
+  and backward undo with account-scoped first-use help. A positive choice must
+  never also become a skip. UX_PRINCIPLES owns gesture/accessibility rules.
 - Graphics may evolve without changing domain/Event/Prediction semantics.
 - Accessibility/reduced motion/error recovery are release requirements.
 
