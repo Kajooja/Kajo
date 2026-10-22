@@ -213,8 +213,11 @@ export function verifyCiPostgresImage(image) {
 export function verifyLocalPostgresImage(image, platform = process.platform, architecture = process.arch) {
   const [reference, digest, ...extra] = image.split(' ');
   assert.equal(extra.length, 0, 'Unexpected Docker image identity format');
+  // Pinned CLI 2.117.0 may fall back from ECR/GHCR to the source Docker Hub
+  // reference. Every alias must still match the reviewed content ID below.
   assert.ok(['public.ecr.aws/supabase/postgres:17.6.1.167',
-    'ghcr.io/supabase/postgres:17.6.1.167'].includes(reference), 'Unreviewed Postgres image reference');
+    'ghcr.io/supabase/postgres:17.6.1.167',
+    'supabase/postgres:17.6.1.167'].includes(reference), 'Unreviewed Postgres image reference');
   const expected = { 'linux/x64': imageId,
     'darwin/arm64': 'sha256:6942962433a569e87f228b4d4ab7e11db5deca64e43babb3a038443ad6c4f1bb' }[`${platform}/${architecture}`];
   assert.ok(expected, 'No reviewed Postgres image for this platform/architecture');

@@ -7913,3 +7913,18 @@ job succeeded for unchanged #353 head `bee39231fa984bb8fb39cc1d34bb1885be9c6d57`
 navigation checks remain distinct from the successor's pending motion/startup
 phone acceptance. The successor PR owns exact publication, final-head CI and APK
 receipts; source/build success does not close the outstanding device matrix.
+
+### Published feed packet and CI registry fallback — 2026-10-22 / #354
+
+The approved packet is published in PR #354, initial head
+`2b6a76c2f0aec7a648fc10b9604e1be8e5b5b95c`, with the configured APK label.
+CI #703 validation/platform gates pass, but clean installation rejects the exact
+official Docker Hub fallback `supabase/postgres:17.6.1.167` before application SQL.
+CLI 2.117.0 and Linux x64 content ID remain the reviewed versions; no image bytes
+changed. The minimal correction adds that observed reference to the ECR/GHCR
+allowlist while preserving exact version/digest/architecture checks. Regression
+coverage rejects changed content for every allowed reference and a moved Docker
+Hub tag. ADR-0006 records pinned upstream provenance. Mobile source remains the
+tested packet. All required final-source gates and the configured APK still must
+pass before source merge; phone acceptance remains separate. No hosted operation
+or account reset occurs.

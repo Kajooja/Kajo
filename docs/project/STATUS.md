@@ -24,7 +24,8 @@ device evidence, not a checksum-verified complete feed acceptance. The owner als
 reports Room flashing/reloading at app startup; the current packet repairs that
 separate initial-hydration remount.
 
-The active successor is `feat/239-continuous-card-feed`, based on navigation repair
+The active successor is [PR #354](https://github.com/Kajooja/Kajo/pull/354),
+`feat/239-continuous-card-feed`, based on navigation repair
 [PR #353](https://github.com/Kajooja/Kajo/pull/353), head
 `bee39231fa984bb8fb39cc1d34bb1885be9c6d57`. #353 is now accepted through merge
 `611fa83ca70e74fd6f17e2a427ea808ff887f5e2` after all five required CI #700 checks
@@ -107,11 +108,27 @@ successor after all required final-source CI checks pass. This resolves the earl
 automatic publication rejection; no alternate write mechanism was used to bypass
 it. The validated local implementation remains
 `2c22f7742c1a1aa6e5d9602cf8b8c89c77d3512a` (tested tree
-`8a0e77643297b06e340815f5e5063c2236b94279`); subsequent local changes are
-publication/acceptance receipts only. #353 has been merged as recorded above.
+`8a0e77643297b06e340815f5e5063c2236b94279`); subsequent changes preserve mobile
+implementation bytes and add publication receipts plus the CI registry-reference
+correction below. #353 has been merged as recorded above.
 The `feat/239-continuous-card-feed` pull request owns the successor's exact final
 head, five CI gates, source integration and configured APK artifact/expiry receipt.
 Do not infer a built or device-accepted successor from local exports alone.
+
+**First publication CI receipt:** #354 head
+`2b6a76c2f0aec7a648fc10b9604e1be8e5b5b95c` started
+[CI #703](https://github.com/Kajooja/Kajo/actions/runs/39832956672) with the APK
+opt-in. Validation and platform/defaults passed, but the clean-installation job
+stopped before application SQL: pinned CLI 2.117.0 selected the official Docker
+Hub fallback `supabase/postgres:17.6.1.167`, absent from the local reference
+allowlist. Its Linux x64 content ID exactly matches the reviewed
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`.
+The bounded correction accepts only this additional exact reference and retains
+version, architecture and digest checks; changed content/tags/unknown registries
+still fail. ADR-0006 records the pinned upstream source and regression evidence.
+This is a CI environment-name correction, not a database upgrade or hosted write.
+All 16 isolated-stack regression tests pass locally after the correction.
+All five gates and the APK must pass on the corrected final source before merge.
 
 **One active continuation:** finish this authorized source publication and the
 configured test build, with all five required final-source CI gates before merge;
