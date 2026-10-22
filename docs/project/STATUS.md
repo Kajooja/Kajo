@@ -94,6 +94,11 @@ records the exact final checks and integration result. Detailed target-bound
 snapshots, authentication data and browser files remain outside Git. Publication
 does not close the actual device, recommendation-quality or release gates above.
 
+The first receipt CI run (#696) stopped at the dependency security audit on two
+newly reported `@vitest/mocker` advisories. The publication packet coordinates
+the three Vitest test consumers at patched 4.1.12 and retains the existing audit
+gate and application runtime source. Final-head CI must pass before integration.
+
 Earlier accepted selector runtime is `8cd67af54765a2876f37e5db0deb66235ee3f0e9` through
 [#345](https://github.com/Kajooja/Kajo/pull/345), exact tested tree
 `a9a48b7dd37ce37538bc36e0cae7d0da856a9f90`. All five final-source

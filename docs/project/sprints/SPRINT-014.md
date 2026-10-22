@@ -7742,3 +7742,15 @@ explicitly approved publishing these project documents to the public
 This receipt uses `docs/239-skip-rollout-receipt`; its pull request owns final CI
 and integration evidence. Detailed target-bound snapshots, authentication data
 and browser files remain outside Git. Device and release acceptance stay open.
+
+### Receipt publication and test dependency audit — 2026-10-22
+
+PR #352 publishes this receipt. Its initial CI #696 stopped at the existing
+dependency audit before lint/tests because `@vitest/mocker` 4.1.11 was affected by
+[GHSA-qxg6-89mg-rqv8](https://github.com/advisories/GHSA-qxg6-89mg-rqv8) and
+[GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp).
+The bounded correction pins Vitest 4.1.12 across mobile, prediction-engine and
+description-acceptance test consumers with their lockfile. Existing dependency
+patches, audit policy and application runtime source remain unchanged. The PR's
+final-head required checks own acceptance; the failed original run is not a
+waiver or a successful validation receipt.
