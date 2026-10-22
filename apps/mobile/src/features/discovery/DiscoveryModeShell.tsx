@@ -71,6 +71,7 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   );
   const roomBlurTarget = useRef<View>(null);
   const roomIsHome = isRoomPathname(pathname);
+  const isItemDetail = /^\/discovery\/[^/]+$/.test(pathname) && !['/discovery/movies', '/discovery/books'].includes(pathname);
   const identityName =
     activeProfile?.type === 'SHARED'
       ? activeProfile.name
@@ -216,14 +217,14 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
         <View style={styles.bar}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
+            accessibilityLabel={isItemDetail ? 'Takaisin' : `Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
             hitSlop={8}
-            onPress={goHome}
-            style={({ pressed }) => [styles.brand, pressed && styles.brandPressed]}
+            onPress={isItemDetail ? () => router.back() : goHome}
+            style={({ pressed }) => [styles.brand, isItemDetail && styles.detailBack, pressed && styles.brandPressed]}
           >
-            <View style={styles.brandMark}>
+            {isItemDetail ? <Text style={[styles.backArrow, { color: theme.base.textPrimary }]}>←</Text> : <View style={styles.brandMark}>
               <KajoMark />
-            </View>
+            </View>}
           </Pressable>
 
           <View style={styles.control}>
@@ -1000,6 +1001,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'visible',
   },
+  detailBack: { width: 44 },
+  backArrow: { fontSize: 26 },
   brandMark: {
     top: 3,
     transform: [{ scale: 0.72 }],

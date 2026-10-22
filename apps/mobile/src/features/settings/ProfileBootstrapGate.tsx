@@ -16,7 +16,7 @@ import {
 import { useSupabaseConnection } from '@/data/SupabaseProvider';
 import type { Item } from '@/domain/contracts';
 import { getAmbientPhase } from '@/domain/discovery';
-import { KajoMark } from '@/features/branding/KajoBrand';
+import { KajoMark, StartupSplash } from '@/features/branding/KajoBrand';
 import { useDiscoveryMode } from '@/features/discovery/DiscoveryModeContext';
 import { RatingControl } from '@/features/discovery/RatingControl';
 import { useActiveProfile } from '@/features/profiles/ActiveProfileContext';
@@ -39,6 +39,7 @@ import {
 } from './profileCalibrationOperations';
 
 let nextCalibrationScopeKey = 0;
+const BOOTSTRAP_STATUS_TIMEOUT_MS = 8_000;
 
 export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
@@ -53,10 +54,10 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
     personalProfile && profiles.activeProfile?.id === personalProfile.id,
   );
   const [loadedStatus, setLoadedStatus] = useState<{
-    profileId: string;
+    scopeKey: number;
     value: ProfileBootstrapStatus;
   } | null>(null);
-  const [failedOpenProfileId, setFailedOpenProfileId] = useState<string | null>(null);
+  const [failedOpenScopeKey, setFailedOpenScopeKey] = useState<number | null>(null);
   const client = connection.status === 'configured' ? connection.client : null;
   const rpc = useMemo<ProfileCalibrationRpc | null>(
     () =>
@@ -78,6 +79,7 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
     rpc,
   }), [personalProfile?.id, activeIsPersonal, rpc]);
   const committedScope = useRef<typeof scope | null>(null);
+  const loadedScopeKey = useRef<number | null>(null);
   useLayoutEffect(() => {
     committedScope.current = scope;
     return () => {
@@ -88,10 +90,13 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
   const refreshStatus = useCallback(async () => {
     if (!rpc || !personalProfile || !activeIsPersonal || committedScope.current !== scope) return;
     const profileId = personalProfile.id;
-    const result = await loadProfileBootstrapStatus(rpc, profileId);
-    if (committedScope.current === scope && result.status === 'success') {
-      setLoadedStatus({ profileId, value: result.value });
-    }
+    try {
+      const result = await loadProfileBootstrapStatus(rpc, profileId);
+      if (committedScope.current === scope && result.status === 'success') {
+        loadedScopeKey.current = scope.key;
+        setLoadedStatus({ scopeKey: scope.key, value: result.value });
+      }
+    } catch { /* Keep the current gate/command state after a failed refresh. */ }
   }, [activeIsPersonal, personalProfile, rpc, scope]);
 
   useEffect(() => {
@@ -99,26 +104,38 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
 
     let active = true;
     const profileId = personalProfile.id;
-    void loadProfileBootstrapStatus(rpc, profileId).then((result) => {
-      if (active && committedScope.current === scope && result.status === 'success') {
-        setLoadedStatus({ profileId, value: result.value });
+    const failOpen = () => {
+      if (active && committedScope.current === scope && loadedScopeKey.current !== scope.key) {
+        setFailedOpenScopeKey(scope.key);
       }
-    });
+    };
+    // Hydration, not an artificial delay, releases the splash. Preserve bounded
+    // fail-open behavior when the status service is offline or never replies.
+    const timeout = setTimeout(failOpen, BOOTSTRAP_STATUS_TIMEOUT_MS);
+    void loadProfileBootstrapStatus(rpc, profileId).then((result) => {
+      if (active && committedScope.current === scope) {
+        if (result.status === 'success') {
+          loadedScopeKey.current = scope.key;
+          setLoadedStatus({ scopeKey: scope.key, value: result.value });
+        }
+        else failOpen();
+      }
+    }).catch(failOpen).finally(() => clearTimeout(timeout));
     return () => {
       active = false;
+      clearTimeout(timeout);
     };
   }, [activeIsPersonal, personalProfile, routeKey, rpc, scope]);
 
   const status =
-    personalProfile && loadedStatus?.profileId === personalProfile.id
+    loadedStatus?.scopeKey === scope.key
       ? loadedStatus.value
       : null;
 
   if (
     !rpc ||
     !personalProfile ||
-    !activeIsPersonal ||
-    !status
+    !activeIsPersonal
   ) {
     return children;
   }
@@ -137,14 +154,14 @@ export function ProfileBootstrapGate({ children }: PropsWithChildren) {
       rpc={rpc}
       theme={theme}
       status={status}
-      bypass={isSettingsRoute || failedOpenProfileId === personalProfile.id}
+      bypass={isSettingsRoute || failedOpenScopeKey === scope.key}
       onOpenImport={() => router.push('/settings')}
       onFailOpen={() => {
-        if (committedScope.current === scope) setFailedOpenProfileId(personalProfile.id);
+        if (committedScope.current === scope) setFailedOpenScopeKey(scope.key);
       }}
       onCompleted={() => {
         if (committedScope.current !== scope) return;
-        setFailedOpenProfileId(personalProfile.id);
+        setFailedOpenScopeKey(scope.key);
         void refreshStatus();
       }}
     >{children}</PersonalTasteGate>
@@ -155,7 +172,7 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   onOpenImport, onFailOpen, onCompleted }: PropsWithChildren<{
   profileId: string; actorUserId: string; namespace: string;
   client: SupabaseClient;
-  rpc: ProfileCalibrationRpc; theme: ReturnType<typeof getRoomTheme>; status: ProfileBootstrapStatus;
+  rpc: ProfileCalibrationRpc; theme: ReturnType<typeof getRoomTheme>; status: ProfileBootstrapStatus | null;
   bypass?: boolean;
   onOpenImport: () => void; onFailOpen: () => void; onCompleted: () => void;
 }>) {
@@ -163,14 +180,16 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   const [begun, setBegun] = useState(false);
   const [draftRating, setDraftRating] = useState<number | null>(null);
   const [confirmRemoval, setConfirmRemoval] = useState(false);
+  const autoStart = status !== null && !status.needsCalibration;
   const flow = useMemo(() => createPersonalTasteFlow({ namespace, actorUserId, profileId, storage: Storage,
     rpc: createPersonalTasteRpc(client), contextualSkipRpc: createContextualSkipRpc(client), onChange: setSnapshot,
-    autoStart: !status.needsCalibration }), [actorUserId, client, namespace, profileId, status.needsCalibration]);
+    autoStart }), [actorUserId, autoStart, client, namespace, profileId]);
+  const statusReady = status !== null;
   useLayoutEffect(() => {
-    if (bypass) return;
+    if (bypass || !statusReady) return;
     flow.start();
     return () => flow.stop();
-  }, [bypass, flow]);
+  }, [bypass, flow, statusReady]);
   const state = snapshot ?? flow.snapshot();
   const challengeItem = state.challenge?.items.find(i => !state.challenge?.answers.some(a => a.itemId === i.id));
   const identity = `${state.sequential?.sessionId ?? state.challenge?.challengeId ?? state.session?.sessionId ?? ''}:${state.sequential?.revision ?? state.challenge?.revision ?? state.session?.revision ?? ''}:${state.sequential?.questionId ?? challengeItem?.id ?? state.session?.item?.id ?? ''}`;
@@ -180,6 +199,7 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
   useLayoutEffect(() => { committedIdentity.current = bypass ? null : identity; setDraftRating(null); setConfirmRemoval(false); }, [bypass, identity]);
   const current = () => committedIdentity.current === identity;
   if (bypass || state.dismissed) return children;
+  if (!status) return <StartupSplash message="Palautetaan makuprofiiliasi…" />;
   if (state.legacy) return shouldOfferProfileCalibration(status) ? <ProfileCalibrationScreen profileId={profileId} rpc={rpc}
     theme={theme} status={status} onOpenImport={onOpenImport} onFailOpen={onFailOpen} onCompleted={onCompleted} /> : children;
   function answer(answer: TasteAnswer) {
@@ -192,7 +212,7 @@ export function PersonalTasteGate({ children, profileId, actorUserId, namespace,
       flow.answerTraining(answer, state.session.item.id, state.session.revision);
     }
   }
-  return <PersonalTasteScreen state={state} theme={theme} begun={begun} draftRating={draftRating}
+  return <PersonalTasteScreen state={state} theme={theme} begun={begun} draftRating={draftRating} helpScope={actorUserId}
     presentationItem={presentationItem} onSkip={() => {
       const question = state.sequential;
       if (!current() || !question?.item || question.revision === null) return false;

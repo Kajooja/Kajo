@@ -202,8 +202,10 @@ New recommendation event types require explicit semantics before broad use.
 
 The owner's [near-term feed refinement](../project/ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15)
 requires the same **Ohita** interaction in Taste and Discovery. A deliberate,
-completed upward swipe dismisses the active card; the accessible Ohita control
-has the same meaning. It records a neutral/contextual skip and removes the Item
+completed upward swipe dismisses the active card; the equivalent accessibility
+action has the same meaning. As refined on October 22, forward navigation after
+an acknowledged rating/List choice creates no additional skip. With no such choice,
+it records a neutral/contextual skip and removes the Item
 from the current feed. It is neither rating zero, explicit negative preference,
 nor proof that the actor does not recognize the Item. It cannot count as a known
 rating or a definite recognition answer for readiness. Combining the former

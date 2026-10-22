@@ -305,35 +305,47 @@ no current UI changes merely by recording these ideas.
 
 ## Required pre-MVP card controls — #239 / MVP-UX-006
 
-Owner decision 2026-09-12: replace the header’s current swipe label area with a
-three-dot overflow for **Lisää listaan**. Keep a separate star as the quick save
-to the default **Tykätyt** destination (liked movies/books). This uses the existing
-generic SYSTEM_SAVED/SAVED store; the label is not a new numeric rating, consumed
-state or parallel per-media collection model.
+**Owner refinement 2026-10-22 supersedes the September 12 quick-save star /
+separate overflow and explicit-save controls for the Discovery feed.** The star
+opens the existing multi-destination List picker. Its outline means no confirmed
+membership in any active-Profile List; solid white means at least one confirmed
+membership. Pending/failed writes and a pending Shared proposal are not confirmed
+membership. Use the existing Saved/List/Endorsement model; the glyph does not
+introduce a new rating, consumed state, group or collection. Shared unanimity and
+membership authorization remain unchanged. Final Add commits once without a
+second Done confirmation, and creating a List alone does not save the Item.
 
-A filled confirmed star means the active Profile’s default save was acknowledged;
-pending and failed commands have distinct presentation. Supported toggle-off
-removes only that default membership, preserving other Lists and rating/history.
-In Shared context a star still uses Endorsement/unanimous completion: one member’s
-pending choice is not a confirmed joint save, and unsupported consensus removal
-remains protected. The overflow reuses the exact multi-destination picker; create
-alone does not save. Final Add commits once without a separate Done confirmation.
+A deliberate slider release, track tap or accessible adjustment commits the
+selected integer rating immediately. Remove **Tallenna arvio ja jatka**. Merely
+opening the card or cancelling a drag never saves the initial value; zero and
+neutral five remain real ratings. The acknowledged rating/List choice stays
+visible until the next deliberate forward gesture. That advance must not also
+create Ohita. Pending writes block competing actions and keep exact retry identity. A vertical
+or diagonal drag over the rating handle and multitouch movement must not commit
+a rating; only deliberate horizontal slider intent does.
 
-The owner's October 15 feed decision supersedes the earlier planned separate
-**Ei kiinnosta / Seuraava** card controls. Keep the star/overflow/List contract
-above; saving or proposing is a positive action with its own acknowledgement,
-not a rating or consumption. Advancing after an acknowledged positive action
-must not additionally manufacture an Ohita response. An unfinished save/rating
-cannot be discarded by a gesture. Opening a slider never submits its starting
-value; zero and neutral five remain genuine numeric ratings.
+The card fills the usable area between compact top and bottom navigation bars.
+Do not reserve empty feedback/help rows, duplicate safe-area padding or a large
+header/footer panel. Keep the List star and rating slider reachable above the
+bottom dock. Long descriptions have a separate scroll surface, so reading them
+does not dismiss the Item; retain metadata, artwork fallback and source credits.
+Large text may require internal content scrolling rather than hiding controls.
 
-Place the rating slider and accessible **Ohita** control at the bottom of the
-card, above the persistent dock and system safe areas. Keep room for the
-introduction/description; long text can scroll without dismissing the Item. Verify
-small screens, large text, keyboard/panels, screen-reader star/menu/state labels,
-Back and reduced motion, alongside offline/restart, multiple destinations,
-Shared pending/confirmed states and rapid Profile/session changes. No current
-card implementation changes merely by recording this decision.
+Forward/upward card scrolling advances one Item at a time; without a confirmed
+positive choice it submits contextual Ohita. Backward/downward scrolling restores
+the preceding card and reverses its exact eligible action through the existing
+canonical undo/withdrawal boundary. Restore only after acknowledgement; unavailable
+or conflicted undo must explain the limitation instead of silently changing a
+different Item. Keep bounded session history explicit; feed continuity does not
+mean infinite history or recycling an exhausted catalogue. Retain the outgoing card as an inert presentation while the acknowledged next
+delivery loads; errors retry the exact request without another choice. Avoid
+snap-back/blank transitions, animate entry in the navigation direction and settle
+cancelled drags, respecting reduced motion. Ordinary data updates must not cancel
+a valid in-progress gesture. No separate visible
+Ohita or Kumoa button is needed in this feed. Screen-reader/accessibility actions
+provide equivalent advance, reverse and help without permanent control rows.
+Collection/legacy detail and retained Taste/challenge protocols preserve their
+existing evidence contracts until an explicit compatible successor is delivered.
 
 ## Shared vertical card feed — required target, 2026-10-15
 
@@ -345,10 +357,14 @@ existing grid as the default Discovery presentation. This is a required near-ter
 successor, tracked by `MVP-UX-007` and ROADMAP, not delivered APK behavior.
 
 The deliberate upward gesture that completes moving the active card out of the
-feed means **Ohita**. A matching accessible button supports screen readers,
-keyboard/switch use and people who cannot swipe. Explain once on first relevant
-use, including Taste: **“Pyyhkäise ylöspäin ohittaaksesi. Ohitus ei anna arvosanaa;
-kohde voi palata myöhemmin.”** Guidance remains discoverable afterward. Replace
+feed means **Ohita** when no acknowledged positive choice has already been made.
+Equivalent accessibility actions support people who cannot swipe without a
+permanent visible Ohita row. Show short overlay guidance on first use for each
+account, including Taste; dismiss it after acknowledgement or the first successful
+interaction, and preserve that dismissal across cards and restarts. Opening another
+Item, category or Profile under the same account does not show it again. Help remains
+discoverable on request. Explain forward advance, backward undo and direct rating;
+Ohita still gives no rating and the Item may return later. Replace
 the separate new-feed **En tunne** and **Ei kiinnosta** labels with this single
 action; the app must not infer which reason the user had for skipping.
 
@@ -385,6 +401,9 @@ probability of a future ten.
 
 ### Shared-feed source boundary — 2026-10-17
 
+This dated receipt describes #350/#351, before the October 22 controls refinement
+above. STATUS identifies the active successor and its unverified device gates.
+
 The #239 source uses `FeedItemCard` for sequential Taste and canonical Discovery
 cards. Both use poster/cover fallback, metadata, verified description/credit and
 the same persistent first-use help. The image area accepts a deliberate upward
@@ -399,8 +418,26 @@ rating uses an explicit save; zero/five remain valid. A fresh card follows only
 an exact server receipt, with stale unshown work retired. Scoped catalog enrichment
 cannot replace a later Taste question. V1/challenge/calibration and collections or
 unranked Shared-overlay detail keep their prior contracts. This is source behavior,
-not an installed APK or accepted native layout. Star/overflow and remaining
-MVP-UX-006 work stay in their ROADMAP slot.
+not acceptance of the October 22 successor or native layout. ROADMAP now advances
+the bounded star-picker/direct-rating/compact-feed work into the active packet.
+
+### October 22 implementation boundary — acceptance open
+
+Discovery's active source preserves exact history action IDs for the mounted
+scope, subject to the existing ten-native-action undo limit. After each required
+undo receipt, it requests fresh canonical pages for the same prior Item (50 per
+page, at most three pages). A consumed/expired original delivery is never reused.
+An unavailable target has retry/cancel recovery; cancellation starts a fresh feed
+instead of silently showing a substitute as the requested previous card. Shared
+consensus that cannot be undone is detected before reversing related actions.
+
+Sequential Taste now shares the compact viewport, direct slider commitment and
+account-scoped help. Its existing acknowledged-answer controller still advances
+automatically; numeric backward-question undo is not implemented. That gap remains
+open before claiming full Taste/Discovery interaction parity. V1/challenge save
+controls and frozen first-answer measurement retain their established contracts.
+STATUS owns source/CI/hosted and device facts; these boundaries are not device
+acceptance or permission to weaken exact provenance.
 
 ## Required reconnect recovery — #240 / MVP-UX-003
 

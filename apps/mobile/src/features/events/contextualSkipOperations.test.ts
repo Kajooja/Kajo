@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { decodeContextualSkipReceipt, decodeDiscoverySkipSource, decodeTasteSkipCapability, isNativeContextualSkipCommand,
-  loadDiscoverySkipSource, sendContextualSkip, type ContextualSkipRpc, type KajoSkipCommand, type KajoSkipReceipt } from './contextualSkipOperations';
+  loadDiscoverySkipSource, loadDiscoverySkipSourceResult, sendContextualSkip, type ContextualSkipRpc, type KajoSkipCommand, type KajoSkipReceipt } from './contextualSkipOperations';
 import { createDiscoverySkipOutbox } from './contextualSkipOutbox';
 import { getBootstrapEvidenceRevision, getContextualSkipRevision } from '../discovery/predictionRefresh';
 
@@ -82,6 +82,26 @@ describe('native contextual skip protocol boundary', () => {
       rpc.mockResolvedValueOnce({ data: null, error: { code, message: 'rejected' } });
       expect(await sendContextualSkip(rpc, command)).toMatchObject({ status: 'error', retryable: false, rejectedAction: true });
     }
+  });
+  it('distinguishes source rejection from connection failure without exposing server details', async () => {
+    const rpc = vi.fn<ContextualSkipRpc>();
+    for (const [code, reason, retryable] of [
+      ['KJ002', 'SOURCE_UNAVAILABLE', false], ['40001', 'SERVICE_UNAVAILABLE', true],
+      ['PGRST202', 'SERVICE_UNAVAILABLE', false], ['42501', 'AUTH_REQUIRED', false],
+      ['PGRST301', 'AUTH_REQUIRED', false],
+    ] as const) {
+      rpc.mockResolvedValueOnce({ data: null, error: { code, message: 'private server detail' } });
+      const result = await loadDiscoverySkipSourceResult(rpc, sourceRequest);
+      expect(result).toMatchObject({ status: 'error', reason, retryable });
+      expect(JSON.stringify(result)).not.toContain('private server detail');
+      if (code === 'KJ002') expect(JSON.stringify(result)).not.toContain('Tarkista yhteys');
+    }
+    rpc.mockRejectedValueOnce(new Error('offline'));
+    expect(await loadDiscoverySkipSourceResult(rpc, sourceRequest)).toMatchObject({ status: 'error', reason: 'CONNECTION', retryable: true });
+    rpc.mockResolvedValueOnce({ data: { ...source, itemId: id(99) }, error: null });
+    expect(await loadDiscoverySkipSourceResult(rpc, sourceRequest)).toMatchObject({ status: 'error', reason: 'INVALID_RESPONSE', retryable: false });
+    rpc.mockResolvedValueOnce({ data: { ...source, acceptsNewSkip: false }, error: null });
+    expect(await loadDiscoverySkipSourceResult(rpc, sourceRequest)).toMatchObject({ status: 'success', source: { acceptsNewSkip: false } });
   });
 });
 

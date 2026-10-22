@@ -61,7 +61,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Evening | `EVENING` | Visual phase mapped to SURPRISE. |
 | Night | `NIGHT` | Visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Experience actually consumed/read/watched/attended in its domain. |
-| Saved | `SAVED` | Profile-level intentionally stored state; planned star/Tykätyt UI reuses it, without implying a rating or consumption. Pending Shared Endorsement is not Shared Saved. |
+| Saved | `SAVED` | Profile-level intentionally stored state, without implying a rating or consumption. The feed star opens the existing List picker and displays confirmed membership as defined in UX_PRINCIPLES; it is not a separate state model. Pending Shared Endorsement is not Shared Saved. |
 | Rating | `rating` | Kajo integer 0–10 experience outcome; Personal rating implies consumed, while a planned SharedRatingRound response alone does not complete joint history. Research raw scales remain separately preserved. |
 | Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an unconsumed Item. |
 | Contextual skip / ohita | `ContextualSkip` | Deliberate no-rating feed advance with exact Taste-question or Discovery-delivery origin and temporary Profile/Item suppression. The executable #239 reference uses a separate 24-hour cooldown policy with no admitted early Context-change shortcut; the native source adds separate Taste/Discovery writers and temporary admission; the shared-feed source consumes those adapters; hosted/device acceptance remains pending. It does not establish recognition, consumption or durable dislike; legacy UNKNOWN/NOT_INTERESTED evidence is preserved. |

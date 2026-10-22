@@ -1,5 +1,51 @@
 # Collection device checkpoint — #228 / #229
 
+## Continuous feed feedback — #239 / 2026-10-22
+
+After downloading the replacement APK, the owner reached the feed and reported:
+large top/bottom reserved areas, help taking persistent space, unnecessary rating
+confirmation and Ohita buttons, and missing continuous forward/backward behavior.
+Pressing Ohita returns “Ohitus ei ole juuri nyt käytettävissä. Tarkista yhteys ja
+yritä uudelleen.” Do not label this a network outage without diagnostic evidence.
+The subsequent owner report confirms replacement APK #700 navigation checks 1–3
+pass (categories, Item/Lists/Settings, and reopening). The full feed matrix remains
+open. The exact installed checksum/Android version remain unreported. A separate
+startup Room flash/reload is now reported and repaired in the active source.
+
+The active successor in STATUS must be tested as an update preserving user data.
+Run the category/navigation checks below, then this superseding feed matrix on
+BOOK and MOVIE. It refines the earlier October 17 control expectations.
+
+| Case | Required observation |
+|---|---|
+| Startup | Cold-open and reopen with normal/slow/offline connectivity. The initial loading surface opens Room once, without Room → loading → Room flashing. Categories still remain open; late status cannot interrupt navigation. |
+| Viewport | Card fills the area between compact bars. No empty feedback/help bands or duplicate bottom safe inset; rating and star remain visible on OnePlus, small screen and large text. |
+| First-use help | New account sees one short overlay. Selvä or first successful interaction dismisses it; another card/category/Profile and app restart do not bring it back for the same account. Another account has its own first-use state; help can be requested accessibly. |
+| Direct rating | Slider release, track tap or accessible adjustment saves the selected 0–10 value once. No Save button; untouched/default/cancelled slider never saves. Verify 0 and 5, change a rating and reopen history. Vertical/diagonal movement starting on the slider and adding a second finger must not save a rating. |
+| List star | Outline opens the multi-list picker. Only acknowledged active-Profile membership fills it white; pending/rejected Shared proposal does not. Add to two Lists and verify both; merely opening/creating a List changes no membership. |
+| Forward | Consecutive upward card swipes advance one Item at a time, with no snap-back or blank loading gap. The outgoing card remains inert until the fresh successor is ready. Cancelled gestures return smoothly; reduced motion avoids directional animation. No positive choice means one contextual skip. After rating/List acknowledgement, next swipe advances without another skip. No immediate recycling or false exhaustion of eligible server results. |
+| Reverse | Downward swipe restores the exact preceding card only after its eligible action is undone. Repeat across mixed skips/ratings/List actions; existing unrelated memberships and history remain. Explain an unavailable/conflicted undo rather than target another Item. |
+| Gesture isolation | Short/reversed/cancelled/multitouch movement, description scrolling, slider dragging, star/picker use, rotation and app background never cause an unintended skip/undo. Accessible advance/reverse actions match gestures. |
+| Failure and restart | Lost source/skip/rating/undo replies keep a usable recovery state. Restore network or restart; the exact pending command completes once without switching actor/Profile/Item. Failed skip leaves the card available, not silently skipped. |
+| Honest limits | Actual catalogue exhaustion is explicit and recoverable; do not loop old cards. Bounded session undo does not pretend to restore erased, expired or unavailable actions. |
+
+These are required observations, not passed tests. Discovery undo is bounded by
+the mounted scope and ten native actions. Check fresh same-Item delivery after
+undo; when the target is unavailable within the bounded page search, retry/cancel
+must remain usable without an invented old origin or replacement Item. Unsupported
+Shared consensus reversal must be refused before any partial undo.
+
+Read-only diagnosis found 107/116 ms phone/server clock disagreement despite valid
+exact source bindings. The exact additive server-clock forward is now installed
+and its eight preservation/security postchecks passed, as recorded in STATUS.
+Retest the actual phone path; successful DDL is not a successful skip observation.
+
+For sequential Taste, test the compact viewport, account-scoped help and direct
+slider save separately. Current source advances automatically after acknowledgement
+and has no numeric backward-question undo; record that gap rather than marking
+full parity passed. Legacy v1/challenge keeps explicit Save and immutable first
+measurements. Preserve Shared consent and the exact-origin matrix below.
+
 ## Blocking navigation report — 2026-10-22
 
 After receiving configured APK #698 (accepted #352 source), the owner reports
@@ -10,7 +56,10 @@ and Android version are not yet recorded. STATUS owns the replacement build.
 A mounted React regression reproduces the navigator remount caused by the
 route-dependent bootstrap parent key. The repair keeps its identity stable
 across application routes, including Settings bypass. This is component/runtime
-evidence with native/router I/O substituted, not an observed repaired phone run.
+evidence with native/router I/O substituted. The later owner report confirms
+checks 1–3 below passed on the downloaded #700 replacement. The newly reported
+initial startup flash has a distinct pending repair; it does not invalidate those
+reported route checks or establish complete gesture acceptance.
 
 On the replacement APK, install as an update and check in this order:
 
@@ -794,8 +843,9 @@ network timing, actual prediction quality or full sequential Taste acceptance.
 Source #350 and compatibility #351 are merged; #695 now packages this UI. This
 remains a **planned device matrix**, not an observation. The compatibility
 prerequisite and both #349 forwards are installed and verified as of 2026-10-22.
-Use the existing #695 APK and record the installed checksum, device and exact
-backend checkpoint from STATUS. Preserve accounts/v1 sessions; do not reset
+Use the current replacement APK from STATUS and record its installed checksum,
+device and exact backend checkpoint. The October 22 matrix above supersedes
+older visible controls and draft-confirmation expectations. Preserve accounts/v1 sessions; do not reset
 to manufacture v2 eligibility. Missing capability/retry is not a passed skip flow.
 
 | Case | Required observation |

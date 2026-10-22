@@ -65,7 +65,7 @@ interface ItemInteractionState {
   ) => boolean;
   canUndo: boolean;
   undoTargetItemId: ItemId | null;
-  undo: () => ItemInteractionUndoResult | null;
+  undo: (expected?: { itemId: ItemId; actionId: string }, undoActionId?: string) => ItemInteractionUndoResult | null;
   persistenceStatus: ItemInteractionPersistenceStatus;
   hasHydratedCurrentActor: boolean;
   hydrationError: string | null;
@@ -84,6 +84,7 @@ interface ItemInteractionState {
 }
 
 export interface ItemInteractionUndoResult {
+  actionId: string | null;
   itemId: ItemId;
   reversedEventId: EventId | null;
   restoredInteraction: ReturnType<typeof getItemInteraction>;
@@ -332,7 +333,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   }, [actorUserId, configuredScope, currentScopeKey, eventTracking.session, profileId]);
 
   const queueCollection = useCallback((intent: CollectionActionIntent, source: CollectionActionSource,
-    origin?: EventRecordInput, restoredInteraction?: ReturnType<typeof getItemInteraction>) => {
+    origin?: EventRecordInput, restoredInteraction?: ReturnType<typeof getItemInteraction>, actionId = createUuidV7()) => {
     const current = outbox.current;
     const session = eventTracking.session;
     if (persistenceStatus !== 'ready' || !configuredScope || !currentScopeKey
@@ -342,7 +343,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       || !canUseEventOrigin(origin, session.sessionId, 'itemId' in intent ? intent.itemId : null)
       || current.coordinator.pending().length > 0) return null;
     const command: CollectionActionCommand = {
-      version: 1, ...configuredScope, actionId: createUuidV7(), occurredAt: new Date().toISOString(),
+      version: 1, ...configuredScope, actionId, occurredAt: new Date().toISOString(),
       ...intent, source, session: { sessionId: session.sessionId, startedAt: session.startedAt, context: session.context },
       predictionId: origin?.predictionId ?? null, discoveryMode: origin?.discoveryMode ?? null,
     };
@@ -395,7 +396,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     [commitAtomicAction],
   );
 
-  const undo = useCallback(() => {
+  const undo = useCallback((expected?: { itemId: ItemId; actionId: string }, undoActionId = createUuidV7()) => {
     if (persistenceStatus !== 'disabled' && persistenceStatus !== 'ready') {
       return null;
     }
@@ -409,7 +410,8 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     if (configuredScope && (outbox.current?.key !== currentScopeKey
       || !outbox.current || outbox.current.coordinator.pending().length > 0)) return null;
 
-    if (!undoEntry) {
+    if (!undoEntry || (expected && (undoEntry.itemId !== expected.itemId ||
+      (undoEntry.collectionActionId ?? undoEntry.atomicActionId) !== expected.actionId))) {
       return null;
     }
 
@@ -417,15 +419,16 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     const restoredInteraction = getItemInteraction(nextStore.interactions, undoEntry.itemId);
     if (undoEntry.collectionActionId) {
       if (!queueCollection({ kind: 'UNDO_LIST_ENTRY', itemId: undoEntry.itemId, reversesActionId: undoEntry.collectionActionId },
-        'ITEM_DESTINATION_PICKER', undefined, restoredInteraction)) return null;
+        'ITEM_DESTINATION_PICKER', undefined, restoredInteraction, undoActionId)) return null;
     } else if (undoEntry.atomicActionId) {
       if (!queueAtomic(undoEntry.itemId, { kind: 'UNDO', reversesActionId: undoEntry.atomicActionId },
-        createUuidV7(), undefined, restoredInteraction)) return null;
+        undoActionId, undefined, restoredInteraction)) return null;
     } else if (configuredScope) return null;
 
     replaceStore(nextStore);
 
     return {
+      actionId: undoEntry.atomicActionId || undoEntry.collectionActionId ? undoActionId : null,
       itemId: undoEntry.itemId,
       reversedEventId: undoEntry.eventId,
       atomic: Boolean(undoEntry.atomicActionId || undoEntry.collectionActionId),

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { KajoMark } from '../branding/KajoBrand';
 import type { Item } from '../../domain/contracts';
@@ -9,8 +10,8 @@ import { challengeResultCopy, type TasteAnswer } from './personalTasteOperations
 
 export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmRemoval,
   onBegin, onDraftChange, onAnswer, onBooks, onChallenge, onRetry, onReload, onContinue,
-  onOpenImport, onAskRemoval, onCancelRemoval, onRemove, presentationItem, onSkip }: {
-  presentationItem?: Item | null; onSkip?: () => boolean;
+  onOpenImport, onAskRemoval, onCancelRemoval, onRemove, presentationItem, onSkip, helpScope }: {
+  presentationItem?: Item | null; onSkip?: () => boolean; helpScope?: string;
   state: PersonalTasteSnapshot; theme: ReturnType<typeof getRoomTheme>; begun: boolean;
   draftRating: number | null; confirmRemoval: boolean;
   onBegin: () => void; onDraftChange: (rating: number) => void; onAnswer: (answer: TasteAnswer) => void;
@@ -19,6 +20,8 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
   onCancelRemoval: () => void; onRemove: () => void;
 }) {
   const styles = createStyles(theme);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const { session, challenge, sequential } = state;
   const current = sequential?.status === 'QUESTION' ? sequential.item : challenge?.status === 'ACTIVE' ? challenge.items.find(i => !challenge.answers.some(a => a.itemId === i.id))
     : !challenge && session?.status === 'ACTIVE' && session.decision?.kind === 'QUESTION' ? session.item : null;
@@ -31,6 +34,59 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
       style={({ pressed }) => [primary ? styles.primary : styles.secondary, blocked && styles.disabled, pressed && styles.pressed]}>
       <Text style={primary ? styles.primaryText : styles.buttonText}>{label}</Text>
     </Pressable>;
+  }
+  // The sequential question owns the whole available viewport. Recovery and
+  // account controls are overlays, so an idle header/help row cannot shrink it.
+  // Existing v1 and frozen challenge presentations keep their explicit contract.
+  if (sequential && current && !intro) {
+    const title = `Makutesti. Tallennettuja vastauksia: ${sequential.answered}. Ennuste on vielä alustava.`;
+    const feedDisabled = disabled || optionsOpen || confirmRemoval || Boolean(state.message);
+    return <SafeAreaView style={styles.safeArea}>
+      <View style={styles.feedHeader}>
+        <Text accessibilityRole="header" accessibilityLabel={title} style={styles.feedTitle}>Makutesti</Text>
+        <Pressable accessibilityRole="button" disabled={disabled} onPress={onContinue}
+          style={[styles.feedHeaderButton, disabled && styles.disabled]}>
+          <Text style={styles.buttonText}>Jatka selaamaan</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Makutestin valinnat"
+          accessibilityState={{ expanded: optionsOpen }} onPress={() => setOptionsOpen(value => !value)}
+          style={styles.feedOptionsButton}><Text style={styles.feedOptionsGlyph}>⋯</Text></Pressable>
+      </View>
+      <View testID="taste-feed-viewport" style={styles.feedViewport}
+        onLayout={event => setViewportHeight(event.nativeEvent.layout.height)}>
+        <FeedItemCard key={`${sequential.sessionId}:${sequential.questionId}:${sequential.revision}`}
+          item={presentationItem?.id === current.id ? presentationItem : current} theme={theme} disabled={feedDisabled}
+          {...(helpScope ? { helpScope } : {})} {...(viewportHeight > 0 ? { viewportHeight } : {})}
+          hasInteracted={sequential.answered > 0}
+          {...(sequential.contextualSkip && onSkip ? { onSkip: () => !feedDisabled && onSkip() } : {})}>
+          <RatingControl disabled={feedDisabled} rating={draftRating} theme={theme} onRatingChange={rating => {
+            if (feedDisabled) return;
+            onDraftChange(rating);
+            onAnswer({ kind: 'RATING', value: rating });
+          }} />
+          {!sequential.contextualSkip ? <Text style={styles.help}>Ohitus ei ole juuri nyt käytettävissä. Voit jatkaa selaamaan.</Text> : null}
+        </FeedItemCard>
+        {state.busy && !state.message ? <View pointerEvents="none" style={styles.feedBusy}>
+          <ActivityIndicator accessibilityLabel="Tallennetaan makutestin vaihetta" color={theme.base.textPrimary} />
+        </View> : null}
+        {state.message ? <View accessibilityLiveRegion="polite" style={[styles.feedOverlay, styles.message]}>
+          <Text style={styles.body}>{state.message}</Text>
+          {state.conflict ? button('Lataa nykyinen vaihe', onReload, true, state.busy)
+            : button('Yritä uudelleen', onRetry, true, state.busy)}
+        </View> : null}
+        {optionsOpen || confirmRemoval ? <View accessibilityViewIsModal style={styles.feedOverlay}>
+          {confirmRemoval ? <>
+            <Text style={styles.body}>Poistetaanko makutestin vastaukset ja niiden vaikutus ennusteeseen? Tätä kierrosta ei voi aloittaa uudelleen.</Text>
+            {button('Vahvista makutestin poisto', onRemove)}
+            {button('Peruuta poisto', onCancelRemoval)}
+          </> : <>
+            <Text style={styles.body}>Tallennettuja vastauksia: {sequential.answered}. Ennuste on vielä alustava.</Text>
+            {button('Poista makutesti', onAskRemoval)}
+            {button('Sulje valinnat', () => setOptionsOpen(false), false, false)}
+          </>}
+        </View> : null}
+      </View>
+    </SafeAreaView>;
   }
   return <SafeAreaView style={styles.safeArea}>
     <ScrollView key={sequential ? `${sequential.sessionId}:${sequential.questionId}:${sequential.revision}` : 'legacy'} contentContainerStyle={styles.content}>
@@ -60,26 +116,13 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
         </> : current ? <>
           <Text style={styles.progress}>{sequential ? `Tallennettuja vastauksia: ${sequential.answered} · ennuste päivittyy` : challenge ? `${challenge.answers.length + 1}/${challenge.items.length} · ennuste on lukittu`
             : `${session?.counts?.presented ?? 0}/24 korttia · arvioita ${session?.counts?.knownRatings ?? 0}`}</Text>
-          {sequential ? <FeedItemCard key={`${sequential.sessionId}:${sequential.questionId}:${sequential.revision}`}
-            item={presentationItem?.id === current.id ? presentationItem : current} theme={theme} disabled={disabled}
-            {...(sequential.contextualSkip && onSkip ? { onSkip } : {})}>
-            <Text style={styles.body}>Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.</Text>
-            <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
-            {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
-            {!sequential.contextualSkip ? <Text style={styles.help}>Ohitus ei ole juuri nyt käytettävissä. Voit jatkaa selaamaan.</Text> : null}
-          </FeedItemCard> : <>
-            <Text style={styles.kicker}>{current.itemType === 'MOVIE' ? 'ELOKUVA' : 'KIRJA'}</Text>
-            <Text style={styles.title}>{current.title}</Text>
-            <Text style={styles.body}>{challenge ? 'Ennusteet näytetään vasta, kun kaikki vastaukset on lukittu. Anna oma arviosi.' : 'Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.'}</Text>
-            <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
-            {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
-            {button('En tunne', () => onAnswer({ kind: 'UNKNOWN' }))}
-            {button('Ei kiinnosta', () => onAnswer({ kind: 'NOT_INTERESTED' }))}
-          </>}
-          {sequential ? <>
-            <Text style={styles.help}>Ennuste on vielä alustava. Myös selaamisen aikana tekemäsi valinnat tarkentavat sitä.</Text>
-            {button('Jatka selaamaan', onContinue)}
-          </> : null}
+          <Text style={styles.kicker}>{current.itemType === 'MOVIE' ? 'ELOKUVA' : 'KIRJA'}</Text>
+          <Text style={styles.title}>{current.title}</Text>
+          <Text style={styles.body}>{challenge ? 'Ennusteet näytetään vasta, kun kaikki vastaukset on lukittu. Anna oma arviosi.' : 'Arvioi vain, jos tunnet teoksen. Myös 0 ja 5 ovat oikeita arvioita.'}</Text>
+          <RatingControl disabled={disabled} rating={draftRating} theme={theme} onRatingChange={onDraftChange} />
+          {button('Tallenna arvio ja jatka', () => { if (draftRating !== null) onAnswer({ kind: 'RATING', value: draftRating }); }, true, disabled || draftRating === null)}
+          {button('En tunne', () => onAnswer({ kind: 'UNKNOWN' }))}
+          {button('Ei kiinnosta', () => onAnswer({ kind: 'NOT_INTERESTED' }))}
           {challenge ? <Text style={styles.help}>Haasteen ensimmäinen vastaus lukitaan. Haaste ei lisää vastauksia makutestin oppimisaineistoon.</Text> : null}
         </> : sequential ? <>
           <Text style={styles.title}>{sequential.status === 'PAUSED' ? 'Makutesti on tauolla'
@@ -128,6 +171,15 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
 function createStyles(theme: ReturnType<typeof getRoomTheme>) {
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: theme.base.appBackground },
+    feedHeader: { minHeight: 44, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8 },
+    feedTitle: { flex: 1, color: theme.base.textPrimary, fontSize: 14, fontWeight: '700' },
+    feedHeaderButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
+    feedOptionsButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+    feedOptionsGlyph: { color: theme.base.textPrimary, fontSize: 26, fontWeight: '700' },
+    feedViewport: { flex: 1, minHeight: 0, overflow: 'hidden' },
+    feedBusy: { position: 'absolute', top: 8, right: 12 },
+    feedOverlay: { position: 'absolute', top: 8, left: 12, right: 12, borderRadius: 14,
+      padding: 16, gap: 12, backgroundColor: theme.surface.panel, borderWidth: 1, borderColor: theme.base.border },
     content: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 22, paddingVertical: 28, gap: 16 },
     brand: { alignSelf: 'center', width: 122 },
     panel: { width: '100%', maxWidth: 520, alignSelf: 'center', gap: 14, padding: 20,

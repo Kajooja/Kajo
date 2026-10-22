@@ -68,7 +68,7 @@ vi.mock('expo-router', () => ({ useRouter: () => ({ push: vi.fn() }), useSegment
 vi.mock('expo-sqlite/kv-store', () => ({ default: { getItemSync: () => null, setItemSync: vi.fn() } }));
 vi.mock('@/data/SupabaseProvider', () => ({ useSupabaseConnection: () => ({ status: 'configured', client: context.client,
   config: { url: 'https://fixture.example.invalid' } }) }));
-vi.mock('@/features/branding/KajoBrand', () => ({ KajoMark: 'KajoMark' }));
+vi.mock('@/features/branding/KajoBrand', () => ({ KajoMark: 'KajoMark', StartupSplash: 'StartupSplash' }));
 vi.mock('@/features/discovery/DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
 vi.mock('@/features/discovery/RatingControl', () => ({ RatingControl: 'RatingControl' }));
 vi.mock('@/features/profiles/ActiveProfileContext', () => {
@@ -344,6 +344,7 @@ describe('calibration scope handlers with deferred RPCs', () => {
     expect(button('Aloita profilointi', renderElement(old)).disabled).toBe(true);
 
     context.client = { rpc: vi.fn().mockResolvedValue(statusResponse('personal')) };
+    renderGate(); await settle();
     const replacement = screenElement();
     expect(replacement.key).not.toBe(old.key);
     cleanup(`screen:${old.key}`);

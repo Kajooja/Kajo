@@ -136,6 +136,24 @@ describe('committed Discovery evidence refresh', () => {
     expect(fixture.send).toHaveBeenCalledOnce();
   });
 
+  it('guards feed undo by exact Item/action and returns the immutable undo ID', async () => {
+    fixture.send.mockImplementation(async (command: ItemActionCommand) => receipt(command));
+    const initial = await ready();
+    const ratingId = '00000000-0000-4000-8000-000000000080';
+    const undoId = '00000000-0000-4000-8000-000000000081';
+    expect(initial.setRating(itemId, 8, ratingId)).toBe(true); render();
+    await fixture.queues[0]!.waitForIdle();
+    const committed = render();
+    expect(committed.undo({ itemId, actionId: undoId }, undoId)).toBeNull();
+    expect(committed.undo({ itemId: fixture.profile, actionId: ratingId }, undoId)).toBeNull();
+    expect(fixture.send).toHaveBeenCalledOnce();
+    const result = committed.undo({ itemId, actionId: ratingId }, undoId);
+    expect(result).toMatchObject({ itemId, actionId: undoId, atomic: true });
+    await fixture.queues[0]!.waitForIdle();
+    expect(fixture.send.mock.calls[1]![0]).toMatchObject({ kind: 'UNDO', actionId: undoId,
+      itemId, reversesActionId: ratingId });
+  });
+
   it('does not advance committed evidence for a rejected write', async () => {
     fixture.send.mockResolvedValue({ status: 'error', retryable: false, message: 'Rejected' });
     const initial = await ready(); initial.setRating(itemId, 8);

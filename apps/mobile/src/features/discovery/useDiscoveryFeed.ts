@@ -3,10 +3,10 @@ import { useSupabaseConnection } from '../../data/SupabaseProvider';
 import { useActiveProfile } from '../profiles/ActiveProfileContext';
 import { useEventTracking } from '../events/EventTrackingContext';
 import { useDiscoverySkip } from '../events/DiscoverySkipContext';
-import { createContextualSkipRpc, loadDiscoverySkipSource } from '../events/contextualSkipOperations';
+import { createContextualSkipRpc, loadDiscoverySkipSourceResult } from '../events/contextualSkipOperations';
 import { createUuidV7 } from '../events/eventTracking';
 import { useItemInteractions } from './ItemInteractionContext';
-import { createDiscoveryFeed, type DiscoveryFeed, type DiscoveryFeedSnapshot, type FeedDelivery } from './discoveryFeed';
+import { createDiscoveryFeed, receiveDiscoveryFeedAction, type DiscoveryFeed, type DiscoveryFeedSnapshot, type FeedDelivery } from './discoveryFeed';
 import { createPredictionPageRequest, loadCatalogPredictionPage } from './predictionPageOperations';
 import type { DiscoveryMode } from '../../domain/contracts';
 
@@ -31,23 +31,25 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
       createId: createUuidV7, nowMicros: () => (BigInt(Date.now()) * 1000n).toString(),
       createRequest: () => createPredictionPageRequest({ version: 3, requestId: createUuidV7(), profileId, sessionId,
         mode, itemType: initial.item.itemType, limit: 1, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED' } } }),
+      createRestoreRequest: () => createPredictionPageRequest({ version: 3, requestId: createUuidV7(), profileId, sessionId,
+        mode, itemType: initial.item.itemType, limit: 50, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
       load: (request, signal) => loadCatalogPredictionPage(client, request, signal),
-      loadSource: (request, signal) => loadDiscoverySkipSource(rpc, request, signal),
+      loadSource: (request, signal) => loadDiscoverySkipSourceResult(rpc, request, signal),
       recordImpression: delivery => services.current.tracking.recordImpression({ eventType: 'ITEM_IMPRESSION', itemId: delivery.item.id,
         itemType: delivery.item.itemType, ...delivery.origin, originSessionId: sessionId, discoveryMode: mode,
         properties: { source: 'DISCOVERY_FEED', ...delivery.origin.properties } }),
       submit: command => services.current.skips.submit(command),
+      undoPositive: (receipt, actionId) => services.current.actions.undo(
+        { itemId: receipt.itemId, actionId: receipt.actionId }, actionId,
+      )?.actionId === actionId,
       onChange: snapshot => setChanged({ scope, flow: controller, snapshot }),
     });
     const flow = controller;
     const skip = services.current.skips.subscribe(receipt => {
-      if (flow.snapshot().waitingActionId) flow.acknowledged(receipt.actionId);
-      else flow.positiveCommitted();
+      if (flow.snapshot().waitingActionId === receipt.actionId) flow.acknowledged(receipt.actionId);
+      else flow.recoveredAction(receipt.itemId);
     });
-    const action = services.current.actions.subscribeToCommittedActions(receipt => {
-      if (flow.snapshot().waitingActionId) flow.acknowledged(receipt.actionId);
-      else flow.positiveCommitted();
-    });
+    const action = services.current.actions.subscribeToCommittedActions(receipt => receiveDiscoveryFeedAction(flow, receipt));
     const exposure = services.current.tracking.subscribeToAcknowledgements(() => flow.exposureAcknowledged());
     flow.start();
     return () => { flow.stop(); skip(); action(); exposure(); };

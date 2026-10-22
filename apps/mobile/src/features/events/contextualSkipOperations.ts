@@ -27,6 +27,10 @@ export interface DiscoverySkipSource extends DiscoverySkipSourceRequest {
   contextRef: null;
   acceptsNewSkip: boolean;
 }
+export type DiscoverySkipSourceResult =
+  | { status: 'success'; source: DiscoverySkipSource }
+  | { status: 'error'; reason: 'INVALID_REQUEST' | 'SOURCE_UNAVAILABLE' | 'SERVICE_UNAVAILABLE' | 'AUTH_REQUIRED' | 'INVALID_RESPONSE' | 'CONNECTION';
+      retryable: boolean; message: string };
 export type ContextualSkipRpc = (
   name: 'commit_taste_contextual_skip_v1' | 'commit_discovery_contextual_skip_v1' | 'discovery_contextual_skip_source_v1',
   args: { command: KajoSkipCommand } | { request: DiscoverySkipSourceRequest },
@@ -120,10 +124,28 @@ export async function sendContextualSkip(rpc: ContextualSkipRpc, command: KajoSk
     return { status: 'error', retryable: true, message: 'Yhteys katkesi. Sama ohitus säilyy odottamassa.' };
   }
 }
-export async function loadDiscoverySkipSource(rpc: ContextualSkipRpc, request: DiscoverySkipSourceRequest, signal?: AbortSignal): Promise<DiscoverySkipSource | null> {
-  if (!isSourceRequest(request)) return null;
+export async function loadDiscoverySkipSourceResult(rpc: ContextualSkipRpc, request: DiscoverySkipSourceRequest, signal?: AbortSignal): Promise<DiscoverySkipSourceResult> {
+  if (!isSourceRequest(request)) return { status: 'error', reason: 'INVALID_REQUEST', retryable: false,
+    message: 'Kortin näyttötieto oli virheellinen. Päivitä näkymä.' };
   try {
     const { data, error } = await rpc('discovery_contextual_skip_source_v1', { request }, signal);
-    return error ? null : decodeDiscoverySkipSource(data, request);
-  } catch { return null; }
+    if (error) {
+      if (error.code === 'KJ002') return { status: 'error', reason: 'SOURCE_UNAVAILABLE', retryable: false,
+        message: 'Kortin näyttötietoa ei voitu vahvistaa. Päivitä näkymä ja yritä uudelleen.' };
+      if (error.code === '42501' || /^PGRST30[123]$/.test(error.code ?? '')) return { status: 'error', reason: 'AUTH_REQUIRED', retryable: false,
+        message: 'Ohituksen käyttöoikeutta ei voitu vahvistaa. Tarkista kirjautuminen.' };
+      if (error.code === 'PGRST202' || /^(22|42)/.test(error.code ?? '')) return { status: 'error', reason: 'SERVICE_UNAVAILABLE', retryable: false,
+        message: 'Ohituksen palvelu ei ole käytettävissä. Yritä myöhemmin uudelleen.' };
+      return { status: 'error', reason: 'SERVICE_UNAVAILABLE', retryable: true,
+        message: 'Kortin vahvistus viipyy. Yritä uudelleen.' };
+    }
+    const source = decodeDiscoverySkipSource(data, request);
+    return source ? { status: 'success', source } : { status: 'error', reason: 'INVALID_RESPONSE', retryable: false,
+      message: 'Kortin vahvistus oli puutteellinen. Päivitä näkymä.' };
+  } catch { return { status: 'error', reason: 'CONNECTION', retryable: true,
+    message: 'Yhteyttä ei saatu. Tarkista yhteys ja yritä uudelleen.' }; }
+}
+export async function loadDiscoverySkipSource(rpc: ContextualSkipRpc, request: DiscoverySkipSourceRequest, signal?: AbortSignal): Promise<DiscoverySkipSource | null> {
+  const result = await loadDiscoverySkipSourceResult(rpc, request, signal);
+  return result.status === 'success' ? result.source : null;
 }

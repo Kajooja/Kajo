@@ -4,6 +4,8 @@ import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProfileBootstrapGate } from './ProfileBootstrapGate';
+import { PersonalTasteScreen } from './PersonalTasteScreen';
+import { StartupSplash } from '@/features/branding/KajoBrand';
 
 const fixture = vi.hoisted(() => ({
   client: { rpc: vi.fn() },
@@ -39,7 +41,7 @@ vi.mock('@/features/profiles/ActiveProfileContext', () => ({ useActiveProfile: (
   personalProfile: fixture.profile, activeProfile: fixture.profile,
 }) }));
 vi.mock('@/features/discovery/DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
-vi.mock('@/features/branding/KajoBrand', () => ({ KajoMark: 'KajoMark' }));
+vi.mock('@/features/branding/KajoBrand', () => ({ KajoMark: 'KajoMark', StartupSplash: 'StartupSplash' }));
 vi.mock('@/features/discovery/RatingControl', () => ({ RatingControl: 'RatingControl' }));
 vi.mock('@/domain/discovery', async () => await import('../../domain/discovery'));
 vi.mock('@/theme/roomTheme', async () => await import('../../theme/roomTheme'));
@@ -85,9 +87,58 @@ beforeEach(() => {
     JSON.stringify({ version: 2, protocol: 'v2', sessionId: null, challengeId: null, pending: null, dismissed: true }));
   fixture.client.rpc.mockReset().mockResolvedValue({ data: status, error: null });
 });
-afterEach(async () => { if (root) await act(async () => root.unmount()); vi.unstubAllGlobals(); });
+afterEach(async () => { if (root) await act(async () => root.unmount()); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe('mounted bootstrap navigation continuity', () => {
+  it('waits for initial bootstrap hydration before mounting Room exactly once', async () => {
+    let resolve!: (value: unknown) => void;
+    fixture.client.rpc.mockImplementationOnce(() => new Promise(done => { resolve = done; }));
+    await act(async () => { root = create(<Harness />); });
+    expect(mounts).toBe(0);
+    expect(root.root.findAllByType(StartupSplash)).toHaveLength(1);
+    await act(async () => { resolve({ data: status, error: null }); });
+    expect(root.root.findByType('div').props.route).toBe('index');
+    expect(mounts).toBe(1);
+    expect(unmounts).toBe(0);
+  });
+
+  it('shows first-use Taste without flashing Room before status arrives', async () => {
+    fixture.storage.clear();
+    fixture.client.rpc.mockResolvedValue({ data: { ...status, needsCalibration: true }, error: null });
+    await act(async () => { root = create(<Harness />); });
+    expect(root.root.findAllByType(PersonalTasteScreen)).toHaveLength(1);
+    expect(mounts).toBe(0);
+    expect(unmounts).toBe(0);
+    expect(fixture.client.rpc).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['error', 'rejected'])('fails open once on initial status %s without remounting after recovery', async (failure) => {
+    if (failure === 'error') fixture.client.rpc.mockResolvedValueOnce({ data: null, error: { message: 'Offline' } });
+    else fixture.client.rpc.mockRejectedValueOnce(new Error('Offline'));
+    await act(async () => { root = create(<Harness />); });
+    expect(mounts).toBe(1);
+    await navigate('discovery/movies');
+    expect(root.root.findByType('div').props.route).toBe('discovery/movies');
+    expect(mounts).toBe(1);
+    expect(unmounts).toBe(0);
+  });
+
+  it('bounds startup waiting and ignores a late response after fail-open', async () => {
+    vi.useFakeTimers();
+    let resolve!: (value: unknown) => void;
+    fixture.client.rpc.mockImplementationOnce(() => new Promise(done => { resolve = done; }));
+    await act(async () => { root = create(<Harness />); });
+    expect(mounts).toBe(0);
+    await act(async () => { await vi.advanceTimersByTimeAsync(8_000); });
+    expect(mounts).toBe(1);
+    await act(async () => { resolve({ data: { ...status, needsCalibration: true }, error: null }); });
+    expect(root.root.findByType('div').props.route).toBe('index');
+    await navigate('discovery/books');
+    expect(root.root.findByType('div').props.route).toBe('discovery/books');
+    expect(mounts).toBe(1);
+    expect(unmounts).toBe(0);
+  });
+
   it.each([1, 2])('keeps the same navigator across application routes with persisted v%s dismissal', async (version) => {
     if (version === 1) {
       for (const [key, raw] of fixture.storage) {
