@@ -12,18 +12,19 @@ export interface DiscoveryFeedSnapshot {
   loading: boolean; message: string | null; exhausted: boolean;
   waitingActionId: string | null; recovery: 'retry' | 'refresh';
   positiveCommitted: boolean; canPrevious: boolean; navigationPending: boolean; canCancelPrevious: boolean;
+  canSkip: boolean;
   upcoming: readonly FeedDelivery[]; refilling: boolean; refillError: string | null;
 }
 type FeedAction = { kind: 'skip'; command: KajoSkipCommand } | { kind: 'positive'; receipt: FeedPositiveReceipt };
 interface FeedEntry { delivery: FeedDelivery; sourceRequest: DiscoverySkipSourceRequest | null; actions: FeedAction[] }
 
-// History contains actual displayed deliveries and acknowledged actions, never a
-// precomputed ranking. Back withdraws those exact receipts before restoring the
-// card. Rating receipts advance automatically; List choices wait for a swipe.
+// Local admission is durable before navigation. Keep each action on its original
+// displayed delivery while its server receipt arrives in the background. Undo
+// waits for those receipts; prepared cards are never impressions.
 export function createDiscoveryFeed(options: {
   initial: FeedDelivery; scope: { actorUserId: string; profileId: string; sessionId: string; mode: DiscoveryMode };
   createId: () => string; nowMicros: () => string;
-  createRequest: (replacesChainId: string | null) => PredictionPageRequest;
+  createRequest: (replacesChainId: string | null, limit?: number) => PredictionPageRequest;
   createRestoreRequest: (replacesChainId: string | null) => PredictionPageRequest;
   load: (request: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>;
   recordImpression: (delivery: FeedDelivery) => string | null;
@@ -36,13 +37,15 @@ export function createDiscoveryFeed(options: {
   const controllers = { source: null as AbortController | null, page: null as AbortController | null };
   let state: DiscoveryFeedSnapshot = { delivery: options.initial, source: null, loading: false,
     message: null, exhausted: false, waitingActionId: null, recovery: 'retry', positiveCommitted: false,
-    canPrevious: false, navigationPending: false, canCancelPrevious: false, upcoming: [], refilling: false, refillError: null };
+    canPrevious: false, navigationPending: false, canCancelPrevious: false, canSkip: false, upcoming: [], refilling: false, refillError: null };
   let held = false; let advancing = false; let warmed = false;
   let sourceRequest: DiscoverySkipSourceRequest | null = null;
   let readingSource = false; let sourceAgain = false;
   let actions: FeedAction[] = [];
+  const pendingActions = new Map<string, FeedAction>();
+  const handledItems = new Set<string>();
   const history: FeedEntry[] = [];
-  let expected: { kind: 'skip'; command: KajoSkipCommand } | { kind: 'positive'; actionId: string } | null = null;
+  let expected: { kind: 'positive'; actionId: string } | null = null;
   type UndoState = { target: FeedEntry; remaining: FeedAction[]; actionId: string | null;
     restoreRequest: PredictionPageRequest | null; restorePageCount: number; fromHistory: boolean; acknowledgedCount: number };
   let undoing: UndoState | null = null;
@@ -58,7 +61,8 @@ export function createDiscoveryFeed(options: {
     const previousActions = [...(history.at(-1)?.actions ?? []), ...actions];
     state = { ...state, upcoming: [...upcoming], refilling: readingPage,
       loading: readingPage && (advancing || undoing !== null),
-      canPrevious: (history.length > 0 || actions.length > 0) && !advancing && !state.waitingActionId && !held && !undoing &&
+      canSkip: Boolean(sourceRequest) && state.source?.acceptsNewSkip !== false && !state.positiveCommitted,
+      canPrevious: (history.length > 0 || actions.length > 0) && pendingActions.size === 0 && !advancing && !state.waitingActionId && !held && !undoing &&
         previousActions.every(action => action.kind === 'skip' || action.receipt.undoable),
       navigationPending: undoing !== null || advancing,
       canCancelPrevious: undoing !== null && !readingPage && !state.waitingActionId };
@@ -68,8 +72,8 @@ export function createDiscoveryFeed(options: {
     sourceGeneration++; controllers.source?.abort(); readingSource = false; sourceAgain = false;
     sourceRequest = null; state = { ...state, source: null };
   };
-  function invalidateBuffer() {
-    rankingEpoch++; readerBlocked = false; upcoming = []; bufferPage = null; bufferEnded = false; duplicatePages = 0;
+  function invalidateBuffer(keepPrepared = false) {
+    rankingEpoch++; readerBlocked = false; if (!keepPrepared) upcoming = []; bufferPage = null; bufferEnded = false; duplicatePages = 0;
     state = { ...state, refillError: null };
     // Do not discard or abort an ambiguous page. A root may already have created
     // a server reader. Resolve its exact receipt before replacing that chain;
@@ -90,16 +94,15 @@ export function createDiscoveryFeed(options: {
     try {
       const result = await bounded('source', signal => options.loadSource(request, signal));
       if (!active || token !== sourceGeneration || sourceRequest !== request || state.positiveCommitted || state.waitingActionId) return;
-      const error = result && 'status' in result && result.status === 'error' ? result : null;
       const source = result && 'status' in result ? result.status === 'success' ? result.source : null : result;
-      state = { ...state, source, recovery: error?.reason === 'SOURCE_UNAVAILABLE' || source?.acceptsNewSkip === false ? 'refresh' : 'retry',
-        message: error?.message ?? (source?.acceptsNewSkip ? null : source
-          ? 'Kortilla on jo tallennettu valinta. Päivitä kortti ennen jatkamista.'
-          : 'Kortin vahvistusta odotetaan. Yritä uudelleen.') }; publish();
+      // This optional read can race our exposure outbox. It does not authorize
+      // the queued intent: the atomic writer validates the exact source after
+      // exposure acknowledgement. Normal source waiting must stay silent.
+      state = { ...state, source, recovery: source?.acceptsNewSkip === false ? 'refresh' : 'retry',
+        ...(source?.acceptsNewSkip === false ? { message: 'Kortilla on jo tallennettu valinta. Päivitä kortti ennen jatkamista.' } : {}) }; publish();
     } catch {
-      if (active && token === sourceGeneration && sourceRequest === request && !state.positiveCommitted && !state.waitingActionId) {
-        state = { ...state, message: 'Kortin vahvistus viipyy. Yritä uudelleen.' }; publish();
-      }
+      // A failed optional preflight must not flash retry text over a valid card.
+      // A submitted command retains its real failure in the durable outbox.
     } finally {
       if (active && token === sourceGeneration) {
         readingSource = false;
@@ -115,7 +118,7 @@ export function createDiscoveryFeed(options: {
       origin: { surface: 'DISCOVERY', sessionId: options.scope.sessionId, predictionId, deliveryRequestId, impressionEventId },
     } : null;
     if (!sourceRequest) { state = { ...state, message: 'Kortin näyttöä ei voitu vahvistaa. Yritä uudelleen.' }; publish(); }
-    else void readSource();
+    else { publish(); void readSource(); }
   }
   function deliveryFrom(result: PredictionPage, item: Item): FeedDelivery {
     return { item, origin: { predictionId: result.ranking.predictionId, deliveryRequestId: result.request.requestId,
@@ -136,9 +139,9 @@ export function createDiscoveryFeed(options: {
       undoing.restoreRequest ??= options.createRestoreRequest(chainId);
       return { kind: 'restore', epoch: rankingEpoch, request: undoing.restoreRequest, restoration: undoing };
     }
-    if ((!warmed && !advancing) || bufferEnded || upcoming.length >= 4) return null;
+    if ((!warmed && !advancing) || bufferEnded || upcoming.length >= 5) return null;
     const request = bufferPage?.nextCursor
-      ? createNextPredictionPageRequest(bufferPage, options.createId()) : options.createRequest(chainId);
+      ? createNextPredictionPageRequest(bufferPage, options.createId()) : options.createRequest(chainId, 5);
     return { kind: 'buffer', epoch: rankingEpoch, request };
   }
   function readerError(message: string) {
@@ -158,6 +161,7 @@ export function createDiscoveryFeed(options: {
         if (result.recovery === 'refresh') {
           // The server proved this cursor unusable; a new root is now permitted.
           pendingRead = null;
+          if (task.epoch !== rankingEpoch) return;
           if (task.kind === 'restore') { task.restoration.restoreRequest = null; task.restoration.restorePageCount = 0; }
           else { bufferPage = null; bufferEnded = false; upcoming = []; }
         }
@@ -198,10 +202,15 @@ export function createDiscoveryFeed(options: {
       // A reader's traversal budget is not catalogue exhaustion. Its next root
       // atomically replaces the known chain when the buffer has a free slot.
       bufferEnded = result.nextCursor === null && result.continuationState !== 'READER_LIMIT';
-      const item = result.ranking.items[0];
-      if (item && item.id !== state.delivery?.item.id && !upcoming.some(entry => entry.item.id === item.id)) {
-        upcoming.push(deliveryFrom(result, item)); duplicatePages = 0;
-      } else if (!bufferEnded && ++duplicatePages >= 8) {
+      let added = 0;
+      for (const item of result.ranking.items) {
+        if (upcoming.length >= 5) break;
+        if (item.id !== state.delivery?.item.id && !handledItems.has(item.id) && !upcoming.some(entry => entry.item.id === item.id)) {
+          upcoming.push(deliveryFrom(result, item)); added++;
+        }
+      }
+      if (added) duplicatePages = 0;
+      else if (!bufferEnded && ++duplicatePages >= 8) {
         readerError('Seuraavia kortteja valmistellaan. Yritä uudelleen.');
       }
       promoteBuffered();
@@ -237,7 +246,7 @@ export function createDiscoveryFeed(options: {
     publish(); void fillBuffer();
   }
   function positiveChanged() {
-    invalidateSource(); invalidateBuffer();
+    invalidateSource(); invalidateBuffer(true);
     state = { ...state, positiveCommitted: true, message: null }; publish();
     void fillBuffer();
   }
@@ -254,15 +263,15 @@ export function createDiscoveryFeed(options: {
     publish(); void fillBuffer();
   }
   function skip() {
-    const source = state.source;
-    if (!active || advancing || undoing || held || state.waitingActionId || state.positiveCommitted || !source?.acceptsNewSkip) return false;
+    const source = sourceRequest;
+    if (!active || advancing || undoing || held || state.waitingActionId || state.positiveCommitted || !source || state.source?.acceptsNewSkip === false) return false;
     const command: KajoSkipCommand = { version: CONTEXTUAL_SKIP_VERSION, kind: 'CONTEXTUAL_SKIP', actionId: options.createId(),
       actorUserId: source.actorUserId, profileId: source.profileId, itemId: source.itemId,
       origin: { ...source.origin }, contextRef: null, reversesActionId: null, occurredAt: options.nowMicros() };
-    expected = { kind: 'skip', command };
-    state = { ...state, waitingActionId: command.actionId, message: null }; publish();
-    if (options.submit(command)) return true;
-    expected = null; state = { ...state, waitingActionId: null }; publish(); return false;
+    if (!options.submit(command)) return false;
+    const action: FeedAction = { kind: 'skip', command };
+    pendingActions.set(command.actionId, action); actions.push(action); handledItems.add(command.itemId);
+    next(); return true;
   }
   function continueUndo(): boolean {
     if (!undoing) return false;
@@ -282,7 +291,19 @@ export function createDiscoveryFeed(options: {
     return false;
   }
   function acknowledged(actionId: string) {
-    if (!active || state.waitingActionId !== actionId) return;
+    if (!active) return;
+    const background = pendingActions.get(actionId);
+    if (background) {
+      pendingActions.delete(actionId);
+      if (background.kind === 'positive') {
+        invalidateBuffer(true);
+        // A fresh committed prefix can have new eligible candidates after the
+        // previous reader ended. There is no active card to preserve here.
+        if (!state.delivery && state.exhausted) advancing = true;
+      }
+      publish(); void fillBuffer(); return;
+    }
+    if (state.waitingActionId !== actionId) return;
     if (undoing?.actionId === actionId) {
       const undone = undoing.remaining.pop(); undoing.acknowledgedCount++;
       if (undone) {
@@ -294,13 +315,10 @@ export function createDiscoveryFeed(options: {
     }
     const completed = expected; expected = null;
     state = { ...state, waitingActionId: null };
-    if (completed?.kind === 'skip') {
-      // Contextual skip changes only this Item's suppression, not learned taste.
-      // Its unrelated prepared siblings remain valid under the explicit policy.
-      actions.push(completed); next();
-    } else if (completed?.kind === 'positive') {
+    if (completed?.kind === 'positive') {
       actions.push({ kind: 'positive', receipt: { actionId, itemId: state.delivery!.item.id, undoable: true } });
-      invalidateBuffer(); invalidateSource(); next(); // Rating auto-advances only from a post-ack root.
+      handledItems.add(state.delivery!.item.id);
+      invalidateBuffer(true); invalidateSource(); next();
     }
   }
   return {
@@ -310,7 +328,7 @@ export function createDiscoveryFeed(options: {
       if (active && !advancing && !undoing && !sourceRequest && state.delivery?.item.id === itemId && state.delivery.origin.deliveryRequestId === requestId)
         present(state.delivery);
     },
-    // Called after the active card mounts. Fetching the other four is never an
+    // Called after the active card mounts. Fetching the next five is never an
     // impression, a skip capability request, or a permission to write to them.
     warm() { if (active) { warmed = true; void fillBuffer(); } },
     stop() { active = false; invalidateSource(); controllers.page?.abort(); },
@@ -333,7 +351,7 @@ export function createDiscoveryFeed(options: {
       next(); return true;
     },
     previous() {
-      if (!active || advancing || held || state.waitingActionId) return false;
+      if (!active || advancing || held || state.waitingActionId || pendingActions.size > 0) return false;
       if (undoing) return continueUndo();
       const fromHistory = history.length > 0;
       const target = history.at(-1) ?? (state.delivery && actions.length
@@ -358,6 +376,14 @@ export function createDiscoveryFeed(options: {
         expected = null; state = { ...state, waitingActionId: null }; publish();
       }
     },
+    positiveQueued(actionId: string) {
+      if (!active || advancing || undoing || state.waitingActionId !== actionId || expected?.kind !== 'positive' || !state.delivery) return false;
+      const action: FeedAction = { kind: 'positive', receipt: { actionId, itemId: state.delivery.item.id, undoable: true } };
+      pendingActions.set(actionId, action); actions.push(action); handledItems.add(state.delivery.item.id);
+      expected = null; state = { ...state, waitingActionId: null };
+      next(); return true;
+    },
+    hasPendingAction(actionId: string) { return pendingActions.has(actionId); },
     acknowledged,
     recoveredAction,
     positiveReceipt(receipt: FeedPositiveReceipt) {
@@ -369,7 +395,14 @@ export function createDiscoveryFeed(options: {
     positiveCommitted() {
       if (active && !advancing && !undoing && !state.waitingActionId && !state.positiveCommitted) positiveChanged();
     },
-    recoverRejected() {
+    recoverRejected(kind?: 'skip' | 'positive', actionId?: string) {
+      if (kind) {
+        const rejected = actionId ? pendingActions.get(actionId) : undefined;
+        if (actionId && rejected?.kind === kind) {
+          pendingActions.delete(actionId);
+          handledItems.delete(rejected.kind === 'skip' ? rejected.command.itemId : rejected.receipt.itemId);
+        }
+      } else { pendingActions.clear(); handledItems.clear(); }
       expected = null; undoing = null; state = { ...state, waitingActionId: null };
       history.length = 0; readerBlocked = false; refresh();
     },
@@ -381,7 +414,7 @@ export type DiscoveryFeed = ReturnType<typeof createDiscoveryFeed>;
 // be a resumed rating OR undo; its interaction alone cannot establish a new
 // positive choice on this card. Reload the current committed prefix instead.
 export function receiveDiscoveryFeedAction(flow: DiscoveryFeed, receipt: ProfileActionReceipt) {
-  if (flow.snapshot().waitingActionId === receipt.actionId) {
+  if (flow.hasPendingAction(receipt.actionId) || flow.snapshot().waitingActionId === receipt.actionId) {
     flow.acknowledged(receipt.actionId);
     return;
   }

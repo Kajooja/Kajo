@@ -32,8 +32,8 @@ function fixture() {
   return { flow, load, loadSource, recordImpression, submit, undoPositive };
 }
 
-describe('Discovery displayed-origin and committed-prefix feed', () => {
-  it('requires a mounted card and real source capability; exact late-page/request/impression reach the command', async () => {
+describe('Discovery displayed origins, durable navigation and recovery', () => {
+  it('requires a mounted card and captures its exact page/request/impression before queuing a skip', async () => {
     const f = fixture();
     expect(f.flow.skip()).toBe(false); expect(f.recordImpression).not.toHaveBeenCalled();
     f.flow.displayed(initial.item.id, initial.origin.deliveryRequestId!); await flush();
@@ -41,8 +41,9 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     const command = f.submit.mock.calls[0]![0];
     expect(command).toMatchObject({ actorUserId: scope.actorUserId, profileId: scope.profileId, itemId: id(4),
       kind: 'CONTEXTUAL_SKIP', reversesActionId: null, origin: { sessionId: id(3), predictionId: id(5), deliveryRequestId: id(6), impressionEventId: id(7) } });
-    expect(f.load).not.toHaveBeenCalled();
-    f.flow.acknowledged(id(999)); expect(f.load).not.toHaveBeenCalled();
+    expect(f.load).toHaveBeenCalledOnce();
+    expect(f.flow.hasPendingAction(command.actionId)).toBe(true);
+    f.flow.acknowledged(id(999)); expect(f.load).toHaveBeenCalledOnce();
     f.flow.acknowledged(command.actionId); await flush();
     expect(f.load).toHaveBeenCalledOnce(); expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
     expect(f.recordImpression).toHaveBeenCalledOnce(); // Fetched is not yet displayed.
@@ -54,12 +55,16 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     f.flow.hold(true); expect(f.flow.skip()).toBe(false); expect(f.submit).not.toHaveBeenCalled();
     f.flow.hold(false); expect(f.flow.skip()).toBe(true); f.flow.stop();
   });
-  it('keeps a rating on the same card until its own receipt; positive advancement never emits skip', async () => {
+  it('advances a rating after durable local admission, before its receipt, without emitting a skip', async () => {
     const f = fixture(); f.flow.displayed(id(4), id(6)); await flush();
     f.flow.expectPositive(id(80)); expect(f.flow.skip()).toBe(false);
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(4)); expect(f.load).not.toHaveBeenCalled();
+    expect(f.flow.positiveQueued(id(80))).toBe(true); await flush();
+    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: false, delivery: { item: item(9) }, canPrevious: false });
+    expect(f.flow.hasPendingAction(id(80))).toBe(true);
     f.flow.acknowledged(id(80)); await flush();
-    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: false, delivery: { item: item(9) } });
+    expect(f.flow.snapshot()).toMatchObject({ positiveCommitted: false, delivery: { item: item(9) }, canPrevious: true });
+    expect(f.flow.hasPendingAction(id(80))).toBe(false);
     expect(f.load).toHaveBeenCalledOnce(); expect(f.submit).not.toHaveBeenCalled(); f.flow.stop();
   });
   it('retries an ambiguous page using the exact request and drops all pre-action siblings', async () => {
@@ -84,7 +89,7 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     const pending = deferred<PredictionPage>(); f.load.mockImplementationOnce(() => pending.promise);
     expect(f.flow.advance()).toBe(true);
     const skip = f.submit.mock.calls[0]![0];
-    expect(f.load).not.toHaveBeenCalled();
+    expect(f.load).toHaveBeenCalledOnce();
     f.flow.acknowledged(skip.actionId);
     const request = f.load.mock.calls[0]![0];
     expect(f.flow.snapshot()).toMatchObject({ delivery: initial, loading: true, navigationPending: true, canPrevious: false });
@@ -104,10 +109,21 @@ describe('Discovery displayed-origin and committed-prefix feed', () => {
     f.flow.displayed(id(9), request.requestId); await flush();
     expect(f.recordImpression).toHaveBeenCalledTimes(2); f.flow.stop();
   });
-  it('missing or not-yet-acknowledged exposure cannot become a skip; exposure ack retries only the source', async () => {
-    const f = fixture(); f.loadSource.mockResolvedValueOnce(null as never);
-    f.flow.displayed(id(4), id(6)); await flush(); expect(f.flow.skip()).toBe(false);
-    f.flow.exposureAcknowledged(); await flush(); expect(f.flow.skip()).toBe(true); expect(f.load).not.toHaveBeenCalled(); f.flow.stop();
+  it('queues a captured skip immediately while its optional source read is unresolved', async () => {
+    const f = fixture(); const pending = deferred<DiscoverySkipSource>();
+    f.loadSource.mockImplementationOnce(() => pending.promise);
+    expect(f.flow.snapshot().canSkip).toBe(false);
+    f.flow.displayed(id(4), id(6));
+    expect(f.flow.snapshot()).toMatchObject({ canSkip: true, source: null, message: null });
+    expect(f.flow.skip()).toBe(true);
+    expect(f.submit.mock.calls[0]![0]).toMatchObject({ itemId: id(4), origin: {
+      predictionId: id(5), deliveryRequestId: id(6), impressionEventId: id(7),
+    } });
+    pending.resolve(source({ ...scope, itemId: id(4), origin: { surface: 'DISCOVERY', sessionId: id(3),
+      predictionId: id(5), deliveryRequestId: id(6), impressionEventId: id(7) } }));
+    await flush();
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(9) }, source: null, message: null });
+    expect(f.submit).toHaveBeenCalledOnce(); f.flow.stop();
   });
   it('withdraws an exact acknowledged skip before restoring the previous card', async () => {
     const f = fixture(); f.flow.displayed(id(4), id(6)); await flush();

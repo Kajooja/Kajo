@@ -319,19 +319,25 @@ A deliberate slider release, track tap or accessible adjustment commits the
 selected integer rating immediately. Remove **Tallenna arvio ja jatka**. Merely
 opening the card or cancelling a drag never saves the initial value; zero and
 neutral five remain real ratings. A tap anywhere on the track or a deliberate
-horizontal drag commits the chosen rating once, then automatically advances after
-acknowledgement and fresh selection. A List choice retains its confirmed positive
-state until the next forward gesture. Neither positive advance creates Ohita.
-Pending writes block competing actions and keep exact retry identity. A vertical
+horizontal drag accepts the chosen rating once into durable local storage, then
+automatically advances to the prepared successor. Discovery forward skip follows
+the same durable-admission boundary; ordinary network acknowledgement does not
+block the next card. A failed local write cannot advance. A List choice retains
+its confirmed positive state until the next forward gesture; List/undo admission
+waits for pending commands to settle. Neither positive advance creates Ohita.
+Commands retain exact action and delivery identities, and later receipts cannot
+change whichever card is now active. A vertical
 or diagonal drag over the rating handle and multitouch movement must not commit
 a rating; only deliberate horizontal slider intent does.
 
 The card fills the usable area between compact top and bottom navigation bars.
 Do not reserve empty feedback/help rows, duplicate safe-area padding or a large
-header/footer panel. Center artwork and compact text with symmetric side margins.
+header/footer panel. Center artwork with the accepted symmetric side margins;
+align the card's title, metadata and description to the left within that column.
 Center the bottom rating slider with small side margins; place the List star
 beside the title at the title's visual size while retaining an accessible touch
-target and independent focus. The October 23 refinement makes the whole card
+target and independent focus. Leave a small gap between the rating controls and
+bottom dock without adding a reserved feedback band. The October 23 refinement makes the whole card
 follow a vertical drag started over artwork, metadata or description, including
 expanded text. Long descriptions extend the card rather than creating a separate
 nested scroll surface. Slow movement within that content reads the same Item and
@@ -341,22 +347,28 @@ and usable controls with large text. Horizontal slider input and ordinary contro
 taps keep their own meaning; metadata and title actions remain independently
 accessible.
 
-Forward/upward card scrolling advances one Item at a time; without a confirmed
-positive choice it submits contextual Ohita. Backward/downward scrolling restores
+Forward/upward card scrolling advances one Item at a time; without an already
+accepted positive action it submits contextual Ohita. Backward/downward scrolling restores
 the preceding card and reverses its exact eligible action through the existing
 canonical undo/withdrawal boundary. Restore only after acknowledgement; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
-mean infinite history or recycling an exhausted catalogue. Discovery prepares up
-to five cards (active plus four successors), replenishing one in the background
+mean infinite history or recycling an exhausted catalogue. Discovery prepares the
+active card plus up to five successors, replenishing one in the background
 as browsing advances. The next card becomes visible during the upward drag, but
 its preview is inert and creates no impression or action capability. Activate it
-only after the outgoing action is acknowledged. Neutral contextual skip may
-retain unrelated prepared candidates under the suppression-only exception in
-the prediction contract; ratings, List changes and undo invalidate unseen work
-and select from the newly committed state. Retain the outgoing card as an inert
-presentation when its acknowledged fresh successor still needs to load; errors
-retry the exact request without another choice. Avoid
+after successful durable local admission of the outgoing skip/rating, with its
+server acknowledgement handled in the background. Normal acknowledgements retain
+the prepared window: rating/List receipts renew future read work, while neutral
+skip receipts keep the existing reader because they add no learning evidence;
+new refills consume the latest committed state. Undo, scope/source invalidation
+and rejected-command discard still clear the window. The prediction contract
+owns this explicit bounded freshness tradeoff. Retain the outgoing card as an
+inert presentation only when no prepared successor is available; exact retries
+must not produce another choice. Normal save, impression-wait and refill progress
+are quiet: do not flash saving/wait/retry banners or briefly remount the rated
+card. Real persistence/rejection/conflict errors retain stable, accessible recovery
+until resolved; never hide or discard them to make the feed seem smooth. Avoid
 snap-back/blank transitions, animate entry in the navigation direction and settle
 cancelled drags, respecting reduced motion. Ordinary data updates must not cancel
 a valid in-progress gesture. No separate visible
@@ -388,7 +400,10 @@ existing grid as the default Discovery presentation. This is a required near-ter
 successor, tracked by `MVP-UX-007` and ROADMAP, not delivered APK behavior.
 
 The deliberate upward gesture that completes moving the active card out of the
-feed means **Ohita** when no acknowledged positive choice has already been made.
+feed means **Ohita** when no positive action has already been accepted for that
+card. In Discovery, a durably admitted rating cannot also produce a skip even
+before its server reply; confirmed List choices likewise advance without Ohita.
+Taste retains its pending-command gate and acknowledged-answer → fresh NEXT flow.
 Equivalent accessibility actions support people who cannot swipe without a
 permanent visible Ohita row. Show short overlay guidance on first use for each
 account, including Taste; dismiss it after acknowledgement or the first successful
@@ -417,10 +432,13 @@ cancel/recovery, large text, reduced motion and the accessible action require
 representative device acceptance.
 
 Ratings and acknowledged positive choices must refresh the supported serving
-prefix before the next fresh Taste/Discovery card is selected. Retire stale
-prefetch through the canonical server boundary while retaining old delivered
-origins and retry identity; do not shuffle locally or jump the card under the
-user's finger. Grid order follows the same committed-state freshness rules when
+prefix before the next Taste question or newly requested Discovery refill.
+Discovery retains at most five already prepared successors with their frozen
+origins across ordinary acknowledgements, so the next visible card may predate
+the latest rating. Rating/List acknowledgements retire old cursor/in-flight read
+generations; neutral skip retains its reader. Do not shuffle
+the retained window or jump the card under the user's finger. Grid order follows
+the same committed-state freshness rules when
 a fresh ranking is requested. The
 [next-card prediction contract](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
 owns this timing. Repeated opening films across fresh Profiles is a diagnostic
@@ -464,7 +482,8 @@ consensus that cannot be undone is detected before reversing related actions.
 
 Sequential Taste shares the compact viewport, direct slider commitment and
 account-scoped help. Its acknowledged-answer controller advances automatically;
-Discovery's five-card preparation does not precompute future adaptive Taste
+Discovery's preparation of the active card and five successors does not precompute
+future adaptive Taste
 questions. Numeric backward-question undo is not implemented. That gap remains
 open before claiming full Taste/Discovery interaction parity. V1/challenge save
 controls and frozen first-answer measurement retain their established contracts.

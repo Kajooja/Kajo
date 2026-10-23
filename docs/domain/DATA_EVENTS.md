@@ -203,8 +203,8 @@ New recommendation event types require explicit semantics before broad use.
 The owner's [near-term feed refinement](../project/ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15)
 requires the same **Ohita** interaction in Taste and Discovery. A deliberate,
 completed upward swipe dismisses the active card; the equivalent accessibility
-action has the same meaning. As refined on October 22, forward navigation after
-an acknowledged rating/List choice creates no additional skip. With no such choice,
+action has the same meaning. As refined on October 23, forward navigation after
+a durably accepted rating or confirmed List choice creates no additional skip. With no such choice,
 it records a neutral/contextual skip and removes the Item
 from the current feed. It is neither rating zero, explicit negative preference,
 nor proof that the actor does not recognize the Item. It cannot count as a known
@@ -343,24 +343,37 @@ with source erasure and serving; this is a correctness tradeoff, not a measured
 throughput claim. Legacy removal/history-clearing entries that reach these
 erasers also acquire the exclusive gate before existing row locks; other
 ordinary actions retain shared locking. Earlier frozen forecasts/delivered receipts remain historical.
-Client acknowledgement must retire old undelivered learning-prefix generations.
-The October 22 Discovery buffer permits a suppression-only exception for a
-neutral contextual skip: unrelated prepared cards in the same scope may remain
-because that command supplies no taste evidence. Ratings, List changes, undo,
-scope changes and unrelated recovered actions still invalidate unseen work.
+Learning-changing rating/List acknowledgement retires old read/cursor generations;
+neutral skip acknowledgement retains the reader. The October 23
+Discovery refinement retains the active card and at most five already prepared
+successors across ordinary rating/skip/List acknowledgements, with each frozen
+page origin intact. New refills use the latest committed prefix; this bounded
+latency/freshness tradeoff supersedes the earlier suppression-only exception.
+Undo, scope changes, source withdrawal and rejected-command discard still
+invalidate the prepared window and preserve canonical restoration requirements.
 
 Mobile routing validates capabilities and every receipt identity before clearing
 a persisted command. Taste shares its existing one-command queue; Discovery has
 a separately namespaced durable service. Missing capability or an outage never
 maps a skip to an old answer or silently discards it. The October 17 shared-feed
 source wires Taste to the exact question capability and Discovery to the actual
-per-Item page request plus recorded impression ID. Source RPC validation precedes
-new skip admission. A scope-level queue resumes original commands independently
-of card navigation/new Event sessions. Only a matching acknowledged receipt can
-advance the corresponding card. Fresh Discovery reads retain exact retry identity
-and request the current committed prefix; a retained neutral-skip buffer keeps
-each original per-Item page identity. A rating automatically advances after its
-receipt and fresh selection, never also submitting a skip. Partial/terminated gestures,
+per-Item page request plus recorded impression ID. Discovery may durably accept
+an exact displayed-origin skip intent before the impression reply. The sender
+waits for the actual impression acknowledgement, then the existing canonical
+writer validates source authority atomically. A separate source-read RPC is not
+a mandatory dispatch preflight: a lost-reply retry must reach its exact cached
+receipt even when that opportunity no longer accepts a new skip. Local intent is
+not a fabricated capability or exposure; optional source status stays quiet.
+A scope-level queue resumes original commands independently of card navigation
+or new Event sessions. Successful durable local skip/rating admission advances
+presentation immediately; failure to persist does not. Track each pending action
+ID with its frozen Item/delivery/origin, so a later receipt reconciles that action
+without retargeting the active card, clearing its prepared successor or recording
+a second response. A successful retry is not a discard. Recovery resets only
+after explicit confirmed discard of the exact known rejected action ID; an old
+or unknown head ID cannot discard a newly admitted pending command. New Discovery reads retain exact retry identity and request
+the current committed prefix; retained prepared cards keep their original page
+identities. Rating auto-advance never also submits a skip. Partial/terminated gestures,
 slow reading within the card's content extent, layout and backgrounding are inert.
 A qualifying deliberate flick or dismissal beyond the content boundary retains
 the same exact skip command; moving expanded text alone is not evidence. Actual hosted
@@ -1185,12 +1198,15 @@ page's frozen candidate source; they do not simulate unseen whole-chain actions.
 Exact receipt retries after cache cleanup add no duplicate run/action/outcome.
 Source/PGlite, native CI, hosted rollout and real visibility remain separate gates.
 
-The October 22 continuous-feed successor prepares at most four upcoming
+The October 23 continuous-feed refinement prepares at most five upcoming
 Discovery cards beside the active card. An adjacent preview remains inert and
 accessibility-hidden; it cannot record an impression or acquire skip capability.
-On activation, the card retains its original Prediction/page origin. Ratings,
-List changes and undo invalidate unseen work; neutral skip alone permits the
-scoped suppression-only exception above. `rank_items_feed_v1` atomically replaces
+On activation, the card retains its original Prediction/page origin. Ordinary
+rating/List acknowledgements renew future reads while neutral skip retains the
+reader; neither clears this prepared window. Undo/scope/source invalidation and rejected-command discard
+remain hard boundaries. Deduplicate new refills against current, queued,
+displayed and locally handled pending Item IDs while preserving server order.
+`rank_items_feed_v1` atomically replaces
 owned derived reader state while retaining immutable page evidence and exact
 full-envelope retry receipts. Reader replacement introduces no taste Event or
 Outcome, and it does not alter adaptive Taste question ordering.

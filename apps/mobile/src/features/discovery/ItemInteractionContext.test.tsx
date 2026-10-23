@@ -161,6 +161,24 @@ describe('committed Discovery evidence refresh', () => {
     expect(render().collectionRevision).toBe(initial.collectionRevision);
   });
 
+  it('returns only the exact durably discarded undo ID and keeps ordinary pending work out of failure state', async () => {
+    const reply = deferred<ItemActionResult>(); fixture.send.mockReturnValueOnce(reply.promise);
+    const initial = await ready();
+    expect(initial.discardRejectedAction()).toBeNull();
+    expect(initial.setRating(itemId, 8)).toBe(true);
+    expect(render()).toMatchObject({ atomicPendingCount: 1, persistenceFailure: null });
+    const rating = fixture.send.mock.calls[0]![0] as ItemActionCommand;
+    reply.resolve(receipt(rating)); await fixture.queues[0]!.waitForIdle();
+    fixture.send.mockResolvedValueOnce({ status: 'error', retryable: false, rejectedUndo: true, message: 'Conflicted undo' });
+    const undo = render().undo();
+    expect(undo).not.toBeNull(); await fixture.queues[0]!.waitForIdle();
+    const conflicted = render();
+    expect(conflicted).toMatchObject({ canDiscardUndo: true, persistenceFailure: 'Conflicted undo' });
+    expect(conflicted.discardRejectedAction()).toBe(undo!.actionId);
+    expect(conflicted.discardRejectedAction()).toBeNull();
+    expect([...fixture.rows.values()].flatMap(value => JSON.parse(value))).toEqual([]);
+  });
+
   it('does not let a late old-Profile receipt invalidate the new Profile', async () => {
     const reply = deferred<ItemActionResult>(); fixture.send.mockReturnValue(reply.promise);
     const initial = await ready(); initial.setRating(itemId, 8); render(); await Promise.resolve();

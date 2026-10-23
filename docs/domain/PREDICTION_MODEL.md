@@ -244,10 +244,12 @@ change. The latest state drives later predictions, while every already-delivered
 PredictionRun and its delayed-outcome attribution remain immutable.
 
 The native continuation must prove that the first new ranking request after an
-acknowledged action consumes its committed prefix. A pre-action cached/slower
-response cannot replace the new scope/revision; frozen pagination cannot silently
-rescore an old page. Continue exact pending-request retries first, then request a
-new prediction with its own origin. This acceptance applies to grid and swipe,
+acknowledged action consumes its committed prefix. A pre-action slower response
+cannot enter the new read generation; frozen pagination cannot silently rescore
+an old page. Discovery's bounded prepared window may retain already admitted
+frozen deliveries under section 8.2, without claiming they were freshly reranked.
+Continue exact pending-request retries first, then request a new prediction with
+its own origin. This acceptance applies to grid and swipe,
 BOOK and MOVIE, and explicit changes of DiscoveryMode, session or Profile.
 
 PersonalProfile and SharedProfile are separate subjects. Shared learning needs
@@ -891,7 +893,8 @@ DiscoveryMode, privacy and hard-eligibility constraints still apply.
 
 Every committed rating's magnitude, including the **first** Taste answer, must
 enter the eligible state and canonical scoring prefix consumed for the next
-Taste or Discovery delivery. Capturing an updated forecast is insufficient if
+Taste question or newly requested Discovery ranking/refill. Already prepared
+Discovery deliveries retain the bounded exception below. Capturing an updated forecast is insufficient if
 question selection ignores it. Compare otherwise equal prefixes with a rating
 of 10 versus 0 or 5: where supported candidate features differ, selection must
 consume the numeric-aware forecast rather than allowing a rigid domain rotation
@@ -901,11 +904,12 @@ raise supported similar candidates such as Inception; no title or visible rank
 change is guaranteed after every answer, and repeating a cold-start opening
 across empty Profiles is not alone a defect.
 
-Freeze the forecast before its answer; commit and acknowledge the answer before
-requesting its successor. A newly committed learning prefix invalidates undelivered
-queued feed candidates from an older prefix. Ratings, List changes and undo must
-retire unseen Discovery work before fresh selection; a late old response cannot
-enter the new generation. Bounded eligible pools must support
+Freeze the forecast before its answer. Taste commits and acknowledges that answer
+before requesting the next adaptive question. In Discovery, learning-changing
+rating/List acknowledgements advance the read generation and retire its old
+cursor; neutral skip acknowledgements retain the reader because they add no
+learning evidence. A superseded late response cannot
+append to the new generation. Bounded eligible pools must support
 versioned refresh/refill as the current supported state changes, rather than
 locking the whole future feed to one START-time slate. Freeze each new scoring
 panel/pool and retain the original panels for historical same-prefix comparisons.
@@ -917,18 +921,33 @@ trace must state that objective/tradeoff rather than claim every question is the
 best pleasure recommendation. Discovery exploitation and Taste acquisition share
 state/forecast semantics without requiring identical selection policies.
 
-The October 22 continuous Discovery refinement permits one narrow exception:
-acknowledged neutral contextual skip changes only the skipped Item's suppression,
-and is excluded from Working taste evidence. Other already prepared candidates
-in the same scoped feed may retain their frozen order and exact page origins.
-This permits a bounded active-plus-four buffer, with one background replacement
-after each advance. It does not authorize stale candidates after a rating, List
-change, withdrawal, scope change or recovery from an unrelated committed action.
-New background page requests still use the latest committed canonical state.
-Prefetch and an inert adjacent-card preview are not impressions; only activation
-of the actually displayed card admits its exposure and action capability. The
-exception is Discovery-specific and does not precompute future adaptive Taste
-questions or revise old PredictionRuns.
+The October 23 owner refinement after #709 supersedes the earlier suppression-only
+exception. Discovery keeps the active delivery plus at most **five prepared
+successors**, each with its original frozen Prediction/page origin. Background
+rating/List acknowledgement renews future reads while neutral skip retains its
+reader. Neither clears nor
+reorders that already prepared window, replaces the active/adjacent card or retargets
+an accepted command.
+Each newly started refill root uses the latest canonical committed prefix, then
+preserves server order while excluding current, queued, already displayed and
+locally handled pending Item IDs. Do not fill from a superseded in-flight response,
+locally rescore frozen candidates or expand the retained window beyond the bound.
+
+This is an explicit latency/freshness tradeoff: up to five prepared successors
+can predate a later acknowledgement. The next visible Discovery card is therefore
+not guaranteed to incorporate the immediately preceding rating; the first new
+refill after acknowledgement must. A successful local durable skip/rating admission
+may advance presentation before its server acknowledgement, but pending commands
+are not confirmed learning and cannot enter server state as if committed. Actual
+readiness, rejection, exact retry and source-erasure constraints remain authoritative.
+Undo, scope changes, source withdrawal and rejected-command discard still
+invalidate the entire prepared window; undo retains exact receipt reversal and
+same-Item reacquisition. List addition/undo admission waits for pending commands
+to settle, without turning ordinary forward browsing into an acknowledgement gate.
+Prefetch and an inert adjacent preview are not impressions; actual activation
+records exposure with the retained origin. This Discovery-only preparation policy
+does not change server scoring, precompute five future adaptive Taste questions,
+revise old PredictionRuns or prove recommendation-quality improvement.
 
 #### Canonical-forecast selector source — 2026-10-16
 
@@ -1733,10 +1752,13 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
 ### Feed and first-answer acceptance — required target
 
 - Opposing first-answer prefixes (0/5/10) over the same supported candidate pool
-  prove selector consumption of updated canonical scores, including the first
-  post-answer card, while preserving unavailable support and bounded domain coverage.
-- Taste and Discovery reject stale queued/slower responses after acknowledgement;
-  retry/restart and Profile switching preserve exact origins, prefixes and scope.
+  prove selector consumption of updated canonical scores in the next Taste
+  question and first newly requested Discovery refill after acknowledgement,
+  while preserving unavailable support and bounded domain coverage.
+- Taste rejects stale future questions; Discovery rejects superseded in-flight
+  replies but preserves at most five already prepared successors across later
+  acknowledgements. Verify this explicit freshness delay, exact frozen origins,
+  latest-prefix refill, retry/restart and Profile-scoped isolation.
 - Completed Ohita gestures suppress contextually exactly once; partial/cancelled
   scrolls do not. Versioned Scenario-based resurfacing preserves hard eligibility,
   old UNKNOWN/NOT_INTERESTED semantics and absence of a fabricated dislike label.
@@ -1999,8 +2021,12 @@ protocol 3. Its envelope adds `replacesChainId`, either null for an initial feed
 root or the owned derived chain to replace. Replacement is atomic with fresh
 ranking and requires the same actor/Profile/session/mode/domain. A new root may
 choose a different page size; ordinary continuation still uses the immutable v3
-size/context contract. The feed uses one-Item pages to warm four successors and
-replace one after a neutral advance.
+size/context contract. The feed uses bounded five-Item pages to warm/refill up to
+five successors, preserving server order after exclusions and admitting no extra
+staging window. Excess fetched candidates may remain unshown; page delivery is
+not exposure. Learning-changing rating/List acknowledgement retires future cursor
+work, not the immutable origins of already prepared or displayed cards. Neutral
+skip acknowledgement keeps the existing reader and suppression-only continuation.
 
 A separate immutable receipt binds the full feed envelope. Its exact retry
 returns the original underlying v3 response, including after reader retirement;

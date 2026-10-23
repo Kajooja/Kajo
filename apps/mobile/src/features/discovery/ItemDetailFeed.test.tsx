@@ -15,10 +15,14 @@ const fixture = vi.hoisted(() => ({
   interactions: {} as ItemInteractionMap,
   loadForItem: vi.fn(), setRating: vi.fn(), back: vi.fn(),
   recordEvent: vi.fn(), createEventId: vi.fn(),
+  atomicPendingCount: 0, skipsPendingCount: 0, persistenceFailure: null as string | null,
+  eventFailure: null as string | null, skipFailure: null as string | null,
+  canDiscardAction: false, canDiscardSkip: false, retryPersistence: vi.fn(), retryEvents: vi.fn(), retrySkips: vi.fn(),
+  discardRejectedAction: vi.fn(), discardRejectedSkip: vi.fn(),
   feedState: { delivery: null as FeedDelivery | null, source: { acceptsNewSkip: true },
-    loading: false, message: null, exhausted: false, waitingActionId: null as string | null,
+    canSkip: true, loading: false, message: null, exhausted: false, waitingActionId: null as string | null,
     positiveCommitted: false, canPrevious: false, navigationPending: false },
-  flow: { snapshot: vi.fn(), expectPositive: vi.fn(), cancelPositive: vi.fn(),
+  flow: { snapshot: vi.fn(), expectPositive: vi.fn(), positiveQueued: vi.fn(), cancelPositive: vi.fn(), retry: vi.fn(), recoverRejected: vi.fn(),
     advance: vi.fn(), previous: vi.fn(), hold: vi.fn(), positiveCommitted: vi.fn() },
 }));
 vi.mock('react', async () => {
@@ -31,7 +35,7 @@ vi.mock('expo-router', () => ({ router: { back: fixture.back, replace: vi.fn() }
 vi.mock('expo-status-bar', () => ({ StatusBar: 'StatusBar' }));
 vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }));
 vi.mock('react-native', () => ({
-  Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', FlatList: 'FlatList',
+  Image: 'Image', Modal: 'Modal', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', FlatList: 'FlatList',
   useWindowDimensions: () => ({ width: 390, height: 800 }),
   AccessibilityInfo: { isReduceMotionEnabled: () => Promise.resolve(false), addEventListener: () => ({ remove() {} }) },
   AppState: { currentState: 'active', addEventListener: () => ({ remove() {} }) },
@@ -52,19 +56,25 @@ vi.mock('../lists/ItemListsContext', () => ({ useItemLists: () => ({
 }) }));
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({
   status: 'ready', sessionId: 'test-session', recordEvent: fixture.recordEvent, createEventId: fixture.createEventId,
+  persistenceError: fixture.eventFailure, retryPersistence: fixture.retryEvents,
 }) }));
 vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: () => ({
   interactions: fixture.interactions, setRating: fixture.setRating, setNotInterested: vi.fn(),
-  canUndo: false, undoTargetItemId: null, undo: vi.fn(), atomicPendingCount: 0, persistenceStatus: 'ready',
+  canUndo: false, undoTargetItemId: null, undo: vi.fn(), atomicPendingCount: fixture.atomicPendingCount, persistenceStatus: 'ready',
+  persistenceError: fixture.atomicPendingCount ? 'Valintoja odottaa tallennusta.' : fixture.persistenceFailure,
+  persistenceFailure: fixture.persistenceFailure, canDiscardAction: fixture.canDiscardAction, canDiscardUndo: false,
+  retryPersistence: fixture.retryPersistence, discardRejectedAction: fixture.discardRejectedAction,
 }) }));
 vi.mock('./useDiscoveryFeed', () => ({ useDiscoveryFeed: () => ({
-  flow: fixture.flow, state: fixture.feedState, skips: { ready: true, pendingCount: 0, message: null },
+  flow: fixture.flow, state: fixture.feedState, skips: { ready: true, pendingCount: fixture.skipsPendingCount,
+    message: fixture.skipFailure, retry: fixture.retrySkips,
+    canDiscardAction: fixture.canDiscardSkip, discardRejected: fixture.discardRejectedSkip },
 }) }));
 vi.mock('./FeedItemCard', () => ({ getFeedCardHeight: (height: number | undefined) => height,
   FeedItemCard: (props: { titleAction?: React.ReactNode; children?: React.ReactNode }) =>
   React.createElement('FeedItemCard', props, props.titleAction, props.children) }));
 vi.mock('./RatingControl', () => ({ RatingControl: 'RatingControl' }));
-vi.mock('./InteractionPersistenceNotice', () => ({ InteractionPersistenceNotice: () => null }));
+vi.mock('./InteractionPersistenceNotice', () => ({ InteractionPersistenceNotice: 'InteractionPersistenceNotice' }));
 vi.mock('../lists/ListDestinationSheet', () => ({ ListDestinationSheet: 'ListDestinationSheet' }));
 vi.mock('./CatalogDetailEntry', () => ({ CatalogDetailEntry: 'CatalogDetailEntry' }));
 vi.mock('./ItemDescription', () => ({ ItemDescription: 'ItemDescription' }));
@@ -110,7 +120,12 @@ beforeEach(() => {
   fixture.profile = { id: 'personal', type: 'PERSONAL', name: 'Personal', ownerUserId: 'actor' };
   fixture.actorUserId = 'actor'; fixture.scopeKey = 'test:actor:personal'; fixture.revision = 0;
   fixture.interactions = {};
-  fixture.feedState = { delivery: { item, origin }, source: { acceptsNewSkip: true }, loading: false,
+  fixture.atomicPendingCount = 0; fixture.skipsPendingCount = 0;
+  fixture.persistenceFailure = null; fixture.eventFailure = null; fixture.skipFailure = null;
+  fixture.canDiscardAction = false; fixture.canDiscardSkip = false;
+  fixture.discardRejectedAction.mockReturnValue('discarded-positive'); fixture.discardRejectedSkip.mockReturnValue('discarded-skip');
+  fixture.flow.positiveQueued.mockReset();
+  fixture.feedState = { delivery: { item, origin }, source: { acceptsNewSkip: true }, canSkip: true, loading: false,
     message: null, exhausted: false, waitingActionId: null, positiveCommitted: false, canPrevious: false, navigationPending: false };
   fixture.flow.snapshot.mockImplementation(() => fixture.feedState);
   fixture.flow.advance.mockReturnValue(true); fixture.flow.previous.mockReturnValue(true);
@@ -122,7 +137,10 @@ beforeEach(() => {
 afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; vi.unstubAllGlobals(); });
 
 describe('mounted Discovery feed controls', () => {
-  it.each([0, 5, 10])('commits rating %i with the displayed origin and prepares automatic forward motion after acknowledgement', async rating => {
+  it.each([0, 5, 10])('queues rating %i with the displayed origin and immediately advances without waiting for its receipt', async rating => {
+    fixture.flow.positiveQueued.mockImplementation(() => {
+      fixture.feedState.delivery = { item: { ...item, id: 'prepared-next' }, origin: { ...origin, deliveryRequestId: 'prepared-page' } };
+    });
     await mount();
     expect(fixture.setRating).not.toHaveBeenCalled();
     await act(async () => { host('RatingControl').props.onRatingChange(rating); });
@@ -130,15 +148,87 @@ describe('mounted Discovery feed controls', () => {
       itemId: 'feed-item', predictionId: 'prediction', deliveryRequestId: 'page', originSessionId: 'test-session',
     }));
     expect(fixture.flow.expectPositive).toHaveBeenCalledExactlyOnceWith('rating-command');
+    expect(fixture.flow.positiveQueued).toHaveBeenCalledExactlyOnceWith('rating-command');
+    expect(fixture.flow.expectPositive.mock.invocationCallOrder[0]).toBeLessThan(fixture.setRating.mock.invocationCallOrder[0]!);
+    expect(fixture.setRating.mock.invocationCallOrder[0]).toBeLessThan(fixture.flow.positiveQueued.mock.invocationCallOrder[0]!);
     expect(fixture.flow.advance).not.toHaveBeenCalled();
-    expect(host('FeedItemCard').props.item.id).toBe('feed-item');
+    expect(host('FeedItemCard').props.item.id).toBe('prepared-next');
     expect(JSON.stringify(root!.toJSON())).not.toContain('Tallenna arvio ja jatka');
-    fixture.feedState.delivery = { item: { ...item, id: 'fresh-after-rating' }, origin: { ...origin, deliveryRequestId: 'fresh-page' } };
-    await update();
-    expect(host('FeedItemCard').props.item.id).toBe('fresh-after-rating');
+    expect(JSON.stringify(root!.toJSON())).not.toContain('Tallennetaan');
     expect(fixture.flow.advance).not.toHaveBeenCalled();
     expect(host('FeedItemCard').props.entryDirection).toBe('forward');
     expect(fixture.setRating).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the current card when durable rating admission fails', async () => {
+    fixture.setRating.mockReturnValue(false);
+    await mount();
+    await act(async () => { host('RatingControl').props.onRatingChange(7); });
+    expect(fixture.flow.cancelPositive).toHaveBeenCalledExactlyOnceWith('rating-command');
+    expect(fixture.flow.positiveQueued).not.toHaveBeenCalled();
+    expect(host('FeedItemCard').props.item.id).toBe(item.id);
+  });
+
+  it('allows forward and rating while earlier saves wait, but keeps List and undo behind their receipts', async () => {
+    fixture.atomicPendingCount = 2; fixture.skipsPendingCount = 2; fixture.feedState.canPrevious = true;
+    await mount();
+    expect(host('FeedItemCard').props.disabled).toBe(false);
+    expect(host('RatingControl').props.disabled).toBe(false);
+    expect(star().props.disabled).toBe(true);
+    expect(hosts('InteractionPersistenceNotice')).toHaveLength(0);
+    expect(hosts('Modal')).toHaveLength(0);
+    expect(JSON.stringify(root!.toJSON())).not.toMatch(/odottaa tallennusta|Odotetaan tallennuksen|Yritä uudelleen/);
+    await act(async () => {
+      expect(host('FeedItemCard').props.onPrevious()).toBe(false);
+      expect(host('FeedItemCard').props.onSkip()).toBe(true);
+      host('RatingControl').props.onRatingChange(5);
+    });
+    expect(fixture.flow.previous).not.toHaveBeenCalled();
+    expect(fixture.flow.advance).toHaveBeenCalledOnce();
+    expect(fixture.flow.positiveQueued).toHaveBeenCalledExactlyOnceWith('rating-command');
+  });
+
+  it('opens actual failures on demand without inserting progress or recovery rows above the card', async () => {
+    fixture.persistenceFailure = 'Tallennus epäonnistui.'; fixture.eventFailure = 'Näyttötiedon yhteys katkesi.';
+    fixture.skipFailure = 'Ohitus odottaa yhteyttä.'; fixture.canDiscardAction = true; fixture.canDiscardSkip = true;
+    await mount();
+    const before = host('FeedItemCard').props.viewportHeight;
+    expect(hosts('InteractionPersistenceNotice')).toHaveLength(0);
+    expect(hosts('Modal')).toHaveLength(0);
+    expect(JSON.stringify(root!.toJSON())).not.toContain('Tallennus epäonnistui.');
+    const recovery = hosts('Pressable').find(node => node.props.accessibilityLabel === 'Avaa tallennuksen ja yhteyden palautus')!;
+    expect(recovery.props.style).toMatchObject({ position: 'absolute', width: 44, height: 44 });
+    await act(async () => { recovery.props.onPress(); });
+    expect(hosts('Modal')).toHaveLength(1);
+    expect(JSON.stringify(root!.toJSON())).toContain('Tallennus epäonnistui.');
+    expect(host('FeedItemCard').props.viewportHeight).toBe(before);
+    const button = (label: string) => hosts('Pressable').find(node => node.findAll(child =>
+      child.type as unknown === 'Text' && child.props.children === label).length > 0)!;
+    await act(async () => { button('Yritä uudelleen').props.onPress(); });
+    expect(fixture.retryPersistence).toHaveBeenCalledOnce(); expect(fixture.retryEvents).toHaveBeenCalledOnce();
+    expect(fixture.retrySkips).toHaveBeenCalledOnce(); expect(fixture.flow.retry).toHaveBeenCalledOnce();
+    await act(async () => { button('Hylkää valinta').props.onPress(); button('Hylkää ohitus ja päivitä').props.onPress(); button('Sulje').props.onPress(); });
+    expect(fixture.discardRejectedAction).toHaveBeenCalledOnce(); expect(hosts('Modal')).toHaveLength(0);
+    expect(fixture.flow.recoverRejected.mock.calls).toEqual([
+      ['positive', 'discarded-positive'], ['skip', 'discarded-skip'],
+    ]);
+  });
+
+  it('retains the card and history when a rejected command could not be durably discarded', async () => {
+    fixture.persistenceFailure = 'Valintajonoa ei voitu päivittää.';
+    fixture.canDiscardAction = true; fixture.canDiscardSkip = true;
+    fixture.discardRejectedAction.mockReturnValue(null); fixture.discardRejectedSkip.mockReturnValue(null);
+    await mount();
+    const recovery = hosts('Pressable').find(node => node.props.accessibilityLabel === 'Avaa tallennuksen ja yhteyden palautus')!;
+    await act(async () => { recovery.props.onPress(); });
+    for (const label of ['Hylkää valinta', 'Hylkää ohitus ja päivitä']) {
+      const button = hosts('Pressable').find(node => node.findAll(child =>
+        child.type as unknown === 'Text' && child.props.children === label).length > 0)!;
+      await act(async () => { button.props.onPress(); });
+    }
+    expect(fixture.discardRejectedAction).toHaveBeenCalledOnce(); expect(fixture.discardRejectedSkip).toHaveBeenCalledOnce();
+    expect(fixture.flow.recoverRejected).not.toHaveBeenCalled();
+    expect(host('FeedItemCard').props.item.id).toBe(item.id);
   });
 
   it('wires backward undo, blocks pending controls, and gives the card the measured viewport without duplicate chrome', async () => {

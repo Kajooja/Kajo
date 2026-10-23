@@ -8071,3 +8071,64 @@ capture while leaving touch ownership with child controls. A child Pressable can
 consume the start bubble phase; the regression now proves that a new text swipe
 after horizontal slider use clears that session's navigation block. The earlier
 CI #708 source is superseded by this correction and is not its APK receipt.
+
+### #709 acceptance and quiet durable-navigation refinement — 2026-10-23 / #355
+
+The whole-card correction is published at
+`94f66d8900abb974bccd6bf4ed79029e6d7dd952`, tree
+`6aa97f876a24d6783986dde10fc73a986ff2a064`. All five required CI #709 gates and
+the standalone APK job passed on attempt 1; tested merge checkout
+`2ab3ed3c620809c6f2cfb65030792332f20729e0` has that same tree. STATUS/PR #355 own
+verified artifact `12485628575`, archive/APK/bundle hashes and expiry. PR #355 is
+still unmerged. This supersedes earlier pending #709 CI/build statements.
+
+The owner's #709 phone feedback accepts thumb feel and margins. Remaining work:
+left-align card text, leave a small controls-to-dock gap, keep the active card
+plus five warmed successors, and allow immediate browsing while saves remain
+durably queued. Normal saving/wait/retry messages and rated-card flashes should
+disappear. This is scoped gesture/margin acceptance, not a complete startup or
+device-matrix result. Continue the same PR before #336.
+
+The accepted design explicitly changes the earlier acknowledgement-gated
+Discovery policy. Successful local SQLite skip/rating admission advances to a
+prepared card immediately; failed local persistence does not. Each pending
+action ID retains its frozen delivery and original actor/Profile/Item/session.
+Background receipts reconcile that action without replacing the current or
+adjacent card. Learning-changing rating/List acknowledgements advance the read
+generation and retire cursor work without clearing the prepared window; neutral
+skip acknowledgement retains its reader because it adds no learning evidence. New refill roots
+use the latest committed canonical prefix and exclude current, queued, displayed
+and locally handled pending Items while preserving server order. Bounded
+five-Item pages avoid serial one-Item warming; admit at most five successors and
+never count excess fetched candidates or inert previews as impressions.
+
+PREDICTION_MODEL §8.2 records the explicit latency/freshness tradeoff: up to five
+already prepared successors may predate a later acknowledgement. They retain
+frozen origins and are not called freshly reranked. The first new refill after
+acknowledgement consumes the committed prefix. Undo, scope changes, source
+withdrawal and rejected-command discard still clear the window and preserve
+exact canonical restoration. List/undo admission waits for pending commands to
+settle; ordinary forward browsing does not. Taste remains strictly acknowledged
+ANSWER → fresh NEXT, without five precomputed questions. No engine-scoring or
+recommendation-quality improvement is claimed by this client policy change.
+
+Rapid skip stores an exact displayed-origin intent, not an invented capability.
+The sender waits for the real impression acknowledgement; the existing writer
+validates authority atomically. No mandatory source-read preflight may block a
+lost-reply retry from its exact cached receipt. Ordinary pending progress stays
+quiet, while real persistence/server rejection/conflict keeps stable accessible
+recovery until resolved. No action is silently discarded or retargeted.
+
+This continuation requires its own local/final-source CI, configured APK and
+device receipt. The feed-reader forward remains installed as provider receipt
+`20261023062034`; no new database change or replay is expected. Preserve accounts,
+pending commands, frozen predictions and the existing canonical server writers.
+
+Final local validation passes: 753 mobile tests in 74 files, mobile TypeScript,
+focused ESLint and explicit demo iOS/Android exports. Root lint/type/mobile/catalog
+checks pass; its unchanged Deno registry fetch is still refused. Regressions cover
+rapid queued choices and late receipts, exact exposure/restart/discard identity,
+successful retry without card replacement, resumed candidates after exhaustion,
+and a same-event rating/advance retaining the outgoing numeric value. The new
+source still needs its own CI/APK receipt and phone test; the PR body owns those
+superseding receipts without a documentation-only rebuild loop.

@@ -48,12 +48,12 @@ continuation before canonical preview and first-session usefulness acceptance.
 The shared card/feed part of #239 is advanced from 17.0. The October 22 owner
 feedback additionally advances its compact viewport, direct slider rating,
 List-picker star and forward/backward navigation into the current packet. Its
-latest refinement requires centered artwork/text/slider, the star beside the
-title, rating acknowledgement followed by automatic advance, and a five-card
-Discovery buffer with the next card visible during dragging. The October 23
-#707 phone feedback keeps this packet active for whole-card thumb tracking from
-text/expanded text and a deliberate short upward flick; complete that repair
-before #336. Broad
+latest refinement after #709 accepts thumb tracking and margins, aligns card text
+left, adds a small controls-to-dock gap and requires the active card plus five
+prepared successors. Skip/rating advances after durable local admission while
+ordinary acknowledgement/refill is quiet. Already prepared cards retain their
+frozen origins across later acknowledgements; new refills consume the latest
+committed prefix. Complete this bounded continuation before #336. Broad
 collection/detail work retains its existing slot. The default Discovery grid is
 unchanged; UX_PRINCIPLES owns the superseding controls contract.
 
@@ -75,11 +75,11 @@ on 2026-10-22 through the owner-approved browser fallback with atomic SQL Editor
 history receipts. PR #353 repairs the subsequent Room → Movies/Books navigation
 blocker on #698. #354's compact feed/skip-clock/startup correction is accepted
 after all five CI #704 gates; the owner previously confirmed #700 navigation
-checks. Continue its new bounded five-card feed/rating/layout refinement on
-`feat/239-buffered-feed` / PR #355, then its whole-card drag/flick repair and
-replacement-build/device matrix before preview or usefulness acceptance. CI #707
-and the exact feed-reader hosted installation passed; PR #355 remains unmerged,
-and its general positive phone feedback does not close smoothness acceptance. The new reader lifecycle must preserve immutable page
+checks. Continue the post-#709 durable-navigation/prepared-window refinement on
+`feat/239-buffered-feed` / PR #355 before the replacement-build/device matrix and
+preview/usefulness acceptance. CI #709 and the exact feed-reader hosted
+installation passed; PR #355 remains unmerged. The owner accepts thumb feel and
+margins, but requests continuous quiet navigation; the full matrix remains open. The new reader lifecycle must preserve immutable page
 receipts while releasing obsolete derived readers after meaningful choices.
 Do not replay installed operations. STATUS owns exact
 source/rollout receipts; DEVICE_TEST owns the observation matrix.
@@ -87,11 +87,12 @@ Versioned Taste candidate-pool refresh/refill under #336 follows this bounded fe
 keep original frozen panels, first labels, session policies and retry origins.
 
 The source shares artwork/metadata/description and deliberate upward or accessible
-Ohita, preserves v1/UNKNOWN/NOT_INTERESTED, recovers exact commands across restart,
-and replaces stale unshown Discovery work after meaningful-action acknowledgement.
-The explicit suppression-only neutral-skip exception permits unrelated prepared
-cards to remain; ratings, List changes and undo still require fresh selection.
-Collection and
+Ohita, preserves v1/UNKNOWN/NOT_INTERESTED and recovers exact commands across restart.
+The post-#709 Discovery contract advances on durable local skip/rating admission
+and retains at most five prepared successors across ordinary acknowledgements.
+Rating/List acknowledgements renew future read generations; neutral skip keeps
+its reader. New refills use the latest committed prefix. Undo, scope/source invalidation and rejected-command discard
+still clear the window. Taste retains strict acknowledgement-before-NEXT. Collection and
 unranked overlay detail remain outside the delivered-Event skip boundary. STATUS
 owns source/CI/install receipts and DEVICE_TEST the actual observation matrix.
 The 24-hour server-clock policy admits no early Context/Scenario-change shortcut.
@@ -286,7 +287,7 @@ release requirements. Historical sprint plans do not override this order.
 | #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; genuine #232F consumer remains queued; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred; advanced Shared consumer/model enhancements are not a serial prerequisite to Personal source work. |
 | #200 history navigation | Scheduled 17.0, before visual browse refinements. | Discovery Katsotut/Luetut must use canonical active-Profile/ItemType history and contextual Lists, with cold entry, permission/error handling and real-origin return. Reuse #229 and accepted cold-history work. |
 | #199 grid | Owner-promoted append/compact-layout correction in the current native packet (2026-10-06); remaining broad UX stays 17.0 after accepted #229. | BOOK/MOVIE append must pass beyond the old 50-candidate window without recycling/resetting Items, preserve exact origins/order and report genuine eligible-catalogue exhaustion separately from limits/expiry. One-row ItemType/Löydä/history and unused bottom-space removal are included. Server forward, CI/APK and real gesture/small-screen/large-text acceptance remain separate. Old poster/token/import defect remains superseded; no new MOVIE acquisition. |
-| #239 cards | Shared feed/Ohita plus the October 22 compact viewport, direct-rating, List-picker-star and reverse-undo refinements are current Sprint 014 work, required MVP-UX-006/007. Broader collection/detail polish stays 17.0. | Reuse Saved/Shared Endorsement, multi-destination commands and exact origins. Repair the unavailable skip path before device acceptance. Positive advance never adds Ohita; acknowledged undo restores the exact prior card. Account-scoped help, accessibility actions and usable controls/credits remain required. |
+| #239 cards | Shared feed/Ohita and the October 22–23 compact viewport, direct rating, List star, reverse undo and quiet durable-navigation refinements are current Sprint 014 work, required MVP-UX-006/007. Discovery retains the active card plus five prepared successors. Broader collection/detail polish stays 17.0. | Reuse Saved/Shared Endorsement, multi-destination commands, installed skip authority and exact origins. Validate forward advance after durable local admission, latest-prefix refill and stable recovery. Positive advance never adds Ohita; acknowledged undo restores the exact prior card. Account-scoped help, accessibility actions and usable controls/credits remain required. |
 | #231 selection | Scheduled 17.0, required MVP-UX-005, after DATA-003/004 and List/history correctness. | Canonical selected IDs/origins, durable partial results, atomic moves, Shared consent, retry/restart and membership changes. History list/poster views use the same collection; trash does not erase unrelated state. |
 | #230 statistics | Scheduled 17.0 private summaries; weekly work depends on 17.1/17.2 telemetry/privacy. | Source-aware distinct counts including rating zero, independent unlock, retry-safe weekly snapshots and Helsinki/DST boundaries, correction/deletion/isolation. Community comparisons remain conditional on cohort/privacy evidence. |
 | #201 catalog search | Scheduled 17.0, MVP-DISC-009. | Canonical persisted Items, title/creator and normalized filters, bounded server pagination and honest provenance. Browse is not a second recommender; filters are not preference events. |
@@ -822,10 +823,11 @@ Exit: contextual Lists, search/filters and authorized Profile surfaces; accessib
 
 Owner decision 2026-09-12 promotes #230 private category statistics/weekly tracking
 and #231 multi-select/List moves/history trash to required pre-MVP work, with
-#239 card controls. The October 15 and October 22 refinements advance shared
-feed/artwork, contextual Ohita, compact viewport, centered direct rating with
-acknowledged auto-advance, title-adjacent List star, five-card Discovery preparation
-and reverse undo to the current continuation. Earlier explicit-Next-only and
+#239 card controls. The October 15–23 refinements advance shared
+feed/artwork, contextual Ohita, compact viewport, centered direct rating,
+title-adjacent List star and reverse undo to the current continuation. Discovery
+additionally advances after durable local admission and prepares its active card
+plus five successors. Earlier explicit-Next-only and
 default-save-star/separate-overflow plans are superseded for that feed mode.
 #240 reconnect source is now part
 of the Phase 14.2 native reader packet; its device acceptance remains required.

@@ -70,11 +70,12 @@ interface ItemInteractionState {
   hasHydratedCurrentActor: boolean;
   hydrationError: string | null;
   persistenceError: string | null;
+  persistenceFailure: string | null;
   atomicPendingCount: number;
   canDiscardUndo: boolean;
   discardRejectedUndo: () => void;
   canDiscardAction: boolean;
-  discardRejectedAction: () => void;
+  discardRejectedAction: () => string | null;
   collectionRevision: number;
   subscribeToCommittedActions: (listener: (receipt: ProfileActionReceipt) => void) => () => void;
   submitCollectionAction: (intent: CollectionActionIntent, source: CollectionActionSource,
@@ -468,10 +469,14 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   }, [currentScopeKey, retryHydration]);
 
   const discardRejectedAction = useCallback(() => {
-    if (outbox.current?.key === currentScopeKey && outbox.current.coordinator.discardRejectedAction()) {
+    const coordinator = outbox.current?.key === currentScopeKey ? outbox.current.coordinator : null;
+    const actionId = coordinator?.pending()[0]?.command.actionId;
+    if (actionId && coordinator?.discardRejectedAction()) {
       setCollectionRevision(revision => revision + 1);
       retryHydration();
+      return actionId;
     }
+    return null;
   }, [currentScopeKey, retryHydration]);
 
   const undoTargetItemId = getLatestUndoItemId(store);
@@ -498,6 +503,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
+      persistenceFailure: atomicState?.message ?? hydrationError,
       atomicPendingCount: atomicState?.pendingCount ?? 0,
       canDiscardUndo: atomicState?.canDiscardUndo ?? false,
       discardRejectedUndo,
@@ -513,6 +519,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
+      atomicState?.message,
       atomicState?.pendingCount,
       atomicState?.canDiscardUndo,
       discardRejectedUndo,

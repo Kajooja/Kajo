@@ -38,7 +38,7 @@ afterAll(() => vi.unstubAllGlobals());
 beforeEach(() => { h.effects.forEach(e => e.cleanup?.()); h.states = []; h.memos = []; h.refs = []; h.effects = []; h.pending = []; h.storage.clear(); });
 type Props = { children?: ReactNode; testID?: string; accessibilityLabel?: string; onPress?: () => void;
   onError?: () => void; onLayout?: (event?: { nativeEvent: { layout: { height: number } } }) => void;
-  disabled?: boolean; style?: unknown; numberOfLines?: number; accessible?: boolean; expanded?: boolean;
+  disabled?: boolean; style?: unknown; numberOfLines?: number; accessible?: boolean; expanded?: boolean; compact?: boolean;
   onExpandedChange?: React.Dispatch<React.SetStateAction<boolean>>;
   accessibilityActions?: { name: string; label: string }[];
   onAccessibilityAction?: (event: { nativeEvent: { actionName: string } }) => void;
@@ -141,7 +141,7 @@ describe('shared native feed presentation wiring', () => {
     expect(nodes(tree).find(n => n.props.testID === 'feed-title')!.props.numberOfLines).toBe(2);
     expect(nodes(tree).find(n => n.props.testID === 'feed-creators')!.props.numberOfLines).toBe(1);
     const controls = nodes(tree).find(n => React.Children.toArray(n.props.children).some(child => React.isValidElement(child) && child.type === ViewProbe))!;
-    expect(controls.props.style).toMatchObject({ flexShrink: 0 });
+    expect(controls.props.style).toMatchObject({ flexShrink: 0, paddingBottom: 12, alignSelf: 'center' });
   });
   it('does not advertise undo or list gestures inside Taste', () => {
     const tree = render({ ...props(), helpKind: 'taste' });
@@ -153,6 +153,8 @@ describe('shared native feed presentation wiring', () => {
     expect(tree.props.style).toContainEqual({ height: 620 });
     const description = nodes(tree).find(n => n.props.testID === 'feed-description-content')!;
     expect(description.type).toBe('View');
+    expect(description.props.style).toMatchObject({ width: '100%', maxWidth: 340, alignSelf: 'center' });
+    expect(nodes(description.props.children).find(n => n.type === 'ItemDescription')!.props.compact).toBe(true);
     expect(nodes(tree).some(n => n.type === 'ScrollView')).toBe(false);
     expect(nodes(description.props.children).some(n => n.type === 'ItemDescription')).toBe(true);
     expect(tree.props.testID).toBe('feed-dismiss-surface');
@@ -164,6 +166,14 @@ describe('shared native feed presentation wiring', () => {
       titleAction: <Pressable accessibilityLabel="Avaa listat" onPress={onTitle}><Text>☆</Text></Pressable>,
       children: <Pressable accessibilityLabel="Kortin toiminto" onPress={onControl}><Text>Valitse</Text></Pressable> });
     expect(tree.props.accessible).toBe(false);
+    expect((tree.props.style as unknown[])[0]).toMatchObject({ paddingHorizontal: 20 });
+    const title = nodes(tree).find(n => n.props.testID === 'feed-title')!;
+    expect(title.props.style).toContainEqual(expect.objectContaining({ textAlign: 'left' }));
+    const titleRow = nodes(tree).find(n => React.Children.toArray(n.props.children)
+      .some(child => React.isValidElement<Props>(child) && child.props.testID === 'feed-title'))!;
+    expect(titleRow.props.style).toMatchObject({ justifyContent: 'flex-start', width: '100%', maxWidth: 340, alignSelf: 'center' });
+    expect(React.Children.toArray(titleRow.props.children)).toHaveLength(2);
+    expect(nodes(tree).find(n => n.props.testID === 'feed-creators')!.props.style).toMatchObject({ textAlign: 'left', maxWidth: 340 });
     expect(tree.props.onStartShouldSetPanResponder!(null, { numberActiveTouches: 1 })).toBe(false);
     expect(tree.props.onMoveShouldSetPanResponderCapture!(null, { dx: 60, dy: 8, numberActiveTouches: 1 })).toBe(false);
     const summary = nodes(tree).find(n => n.props.testID === 'feed-accessibility-summary')!;

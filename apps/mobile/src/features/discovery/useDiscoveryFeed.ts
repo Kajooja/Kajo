@@ -30,8 +30,8 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
     const rpc = createContextualSkipRpc(client);
     const controller: DiscoveryFeed = createDiscoveryFeed({ initial, scope: { actorUserId, profileId, sessionId, mode },
       createId: createUuidV7, nowMicros: () => (BigInt(Date.now()) * 1000n).toString(),
-      createRequest: replacesChainId => createFeedPredictionPageRequest({ replacesChainId, requestId: createUuidV7(), profileId, sessionId,
-        mode, itemType: initial.item.itemType, limit: 1, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED' } } }),
+      createRequest: (replacesChainId, limit = 5) => createFeedPredictionPageRequest({ replacesChainId, requestId: createUuidV7(), profileId, sessionId,
+        mode, itemType: initial.item.itemType, limit, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED' } } }),
       createRestoreRequest: replacesChainId => createFeedPredictionPageRequest({ replacesChainId, requestId: createUuidV7(), profileId, sessionId,
         mode, itemType: initial.item.itemType, limit: 50, context: { occurredAt: new Date().toISOString(), attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
       load: (request, signal) => loadCatalogPredictionPage(client, request, signal),
@@ -47,7 +47,7 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
     });
     const flow = controller;
     const skip = services.current.skips.subscribe(receipt => {
-      if (flow.snapshot().waitingActionId === receipt.actionId) flow.acknowledged(receipt.actionId);
+      if (flow.hasPendingAction(receipt.actionId) || flow.snapshot().waitingActionId === receipt.actionId) flow.acknowledged(receipt.actionId);
       else flow.recoveredAction(receipt.itemId);
     });
     const action = services.current.actions.subscribeToCommittedActions(receipt => receiveDiscoveryFeedAction(flow, receipt));
@@ -58,28 +58,22 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
   const flow = changed?.scope === scope ? changed.flow : null;
   const state = changed?.scope === scope ? changed.snapshot : null;
   // Do not create impressions for a fetched card until it has actually entered
-  // this mounted presentation. Pending recovery must finish before interaction.
+  // this mounted presentation. Earlier cards may still be saving in their own
+  // durable queues; they must not suppress this card's actual exposure.
   useLayoutEffect(() => {
-    if (state?.delivery && skips.ready && skips.pendingCount === 0) {
+    if (state?.delivery && skips.ready) {
       flow?.displayed(state.delivery.item.id, state.delivery.origin.deliveryRequestId!);
-      if (actions.persistenceStatus === 'ready' && actions.atomicPendingCount === 0) flow?.warm();
+      if (actions.persistenceStatus === 'ready') flow?.warm();
     }
-  }, [flow, state?.delivery, skips.ready, skips.pendingCount, actions.persistenceStatus, actions.atomicPendingCount]);
+  }, [flow, state?.delivery, skips.ready, actions.persistenceStatus]);
   const prefetchedImages = useRef(new Set<string>());
   useEffect(() => {
     const urls = new Set(state?.upcoming.flatMap(entry => entry.item.imageUrl ? [entry.item.imageUrl] : []) ?? []);
     for (const url of urls) {
       if (!prefetchedImages.current.has(url)) void Image.prefetch(url).catch(() => undefined);
     }
-    // Keep only the four upcoming assets; cache warming never creates exposure.
+    // Keep only the five upcoming assets; cache warming never creates exposure.
     prefetchedImages.current = urls;
   }, [scope, state?.upcoming]);
-  const rejected = useRef(false);
-  useLayoutEffect(() => {
-    if (actions.canDiscardAction) rejected.current = true;
-    else if (rejected.current && actions.atomicPendingCount === 0 && actions.persistenceStatus === 'ready') {
-      rejected.current = false; flow?.recoverRejected();
-    }
-  }, [flow, actions.canDiscardAction, actions.atomicPendingCount, actions.persistenceStatus]);
   return { flow, state, skips };
 }

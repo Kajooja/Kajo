@@ -271,7 +271,6 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       </View>
     </View>
     <View style={styles.titleRow}>
-      {titleAction ? <View style={styles.titleActionSlot} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" /> : null}
       <Text testID="feed-title" accessibilityRole="header" accessibilityLabel={item.title}
         numberOfLines={2} ellipsizeMode="tail" style={[styles.title, styles.titleInRow, bounded && styles.boundedTitle]}>{item.title}</Text>
       {titleAction ? <View style={styles.titleActionSlot}>{titleAction}</View> : null}
@@ -286,7 +285,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       <ItemDescription item={item} expanded={expanded} onExpandedChange={value => {
         const next = typeof value === 'function' ? value(expanded) : value;
         setExpanded(next); onDescriptionExpanded?.(next);
-      }} theme={theme} centered />
+      }} theme={theme} compact />
     </View>
     {children ? <View style={styles.controls}>{children}</View> : null}
     {help ? <View style={styles.help} testID="feed-first-use-help">
@@ -310,19 +309,19 @@ function createStyles(theme: RoomTheme) {
     heroFill: { flex: 1, height: undefined, minHeight: 0 },
     image: { width: '100%', height: '100%', alignSelf: 'center' },
     fallback: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, gap: 10 },
-    title: { color: theme.base.textPrimary, fontSize: 20, lineHeight: 24, fontWeight: '800', textAlign: 'center', width: '100%', maxWidth: 340, alignSelf: 'center' },
-    titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: 340, alignSelf: 'center', flexShrink: 0 },
+    title: { color: theme.base.textPrimary, fontSize: 20, lineHeight: 24, fontWeight: '800', textAlign: 'left', width: '100%', maxWidth: 340, alignSelf: 'center' },
+    titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', maxWidth: 340, alignSelf: 'center', flexShrink: 0 },
     titleInRow: { width: undefined, flexShrink: 1 },
     titleActionSlot: { width: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     boundedTitle: { flexShrink: 1 },
     type: { color: theme.base.textMuted, fontSize: 11, fontWeight: '800', letterSpacing: 1.2, textAlign: 'center' },
     text: { color: theme.base.textPrimary, fontSize: 14, fontWeight: '700' },
-    muted: { color: theme.base.textMuted, fontSize: 12, lineHeight: 16, textAlign: 'center', width: '100%', maxWidth: 340, alignSelf: 'center' },
+    muted: { color: theme.base.textMuted, fontSize: 12, lineHeight: 16, textAlign: 'left', width: '100%', maxWidth: 340, alignSelf: 'center' },
     description: { flexGrow: 0, flexShrink: 0, paddingBottom: 2, width: '100%', maxWidth: 340, alignSelf: 'center' },
     helpButton: { alignSelf: 'flex-end', paddingHorizontal: 12, minHeight: 44, justifyContent: 'center' },
     help: { position: 'absolute', top: 8, left: 8, right: 8, padding: 12, borderRadius: 12,
       backgroundColor: theme.surface.raised, borderWidth: 1, borderColor: theme.base.border, zIndex: 1 },
     helpText: { color: theme.base.textPrimary, fontSize: 13, lineHeight: 19 },
-    controls: { gap: 8, paddingBottom: 4, flexShrink: 0, width: '100%', maxWidth: 360, alignSelf: 'center' },
+    controls: { gap: 8, paddingBottom: 12, flexShrink: 0, width: '100%', maxWidth: 360, alignSelf: 'center' },
   });
 }

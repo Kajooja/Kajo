@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createDiscoveryFeed, receiveDiscoveryFeedAction, type FeedDelivery } from './discoveryFeed';
+import { createDiscoveryFeed, receiveDiscoveryFeedAction, type FeedDelivery, type FeedPositiveReceipt } from './discoveryFeed';
 import { createFeedPredictionPageRequest, type PredictionPage, type PredictionPageRequest, type PredictionPageResult } from './predictionPageOperations';
 import { CONTEXTUAL_SKIP_POLICY, CONTEXTUAL_SKIP_VERSION, type DiscoverySkipSource, type DiscoverySkipSourceRequest, type KajoSkipCommand } from '../events/contextualSkipOperations';
 
@@ -8,11 +8,11 @@ const scope = { actorUserId: id(1), profileId: id(2), sessionId: id(3), mode: 'F
 const item = (value: number) => ({ id: id(value), itemType: 'MOVIE' as const, title: `Item ${value}` });
 const initial: FeedDelivery = { item: item(4), origin: { predictionId: id(5), deliveryRequestId: id(6),
   properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } } };
-const flush = async () => { for (let count = 0; count < 20; count++) await Promise.resolve(); };
+const flush = async () => { for (let count = 0; count < 30; count++) await Promise.resolve(); };
 const cleanups: (() => void)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0)) cleanup(); await flush(); });
 
-function fixture() {
+function fixture(bulk = false) {
   let nextClientId = 1_000; let nextServerId = 100_000;
   const createId = () => id(nextClientId++);
   const serverId = () => id(nextServerId++);
@@ -28,14 +28,15 @@ function fixture() {
   }));
   const recordImpression = vi.fn((_delivery: FeedDelivery) => createId());
   const submit = vi.fn((_command: KajoSkipCommand) => true);
+  const undoPositive = vi.fn((_receipt: FeedPositiveReceipt, _actionId: string) => true);
   const flow = createDiscoveryFeed({ initial, scope, createId, nowMicros: () => '1000000',
-    createRequest: replacesChainId => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
-      itemType: 'MOVIE', limit: 1, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED' } } }),
+    createRequest: (replacesChainId, limit = 5) => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
+      itemType: 'MOVIE', limit: bulk ? limit : 1, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED' } } }),
     createRestoreRequest: replacesChainId => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
       itemType: 'MOVIE', limit: 50, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
-    load, loadSource, recordImpression, submit, undoPositive: vi.fn(() => true), onChange: vi.fn() });
-  // Commit independently of resolving transport, so a lost reply still has an
-  // immutable server receipt and an allocated reader to discover on exact retry.
+    load, loadSource, recordImpression, submit, undoPositive, onChange: vi.fn() });
+  // Commit independently of transport, preserving an allocated reader and an
+  // immutable exact retry even when the reply was lost.
   function commit(index: number, items: number[], more = true): PredictionPage {
     const request = reads[index]!.request;
     const previousReceipt = receipts.get(request.requestId);
@@ -49,7 +50,7 @@ function fixture() {
       ranking: { predictionId, items: items.map(item), predictions: [] },
       availability: items.length ? 'ITEMS' : 'CATALOG_EXHAUSTED', continuationSupported: true,
       nextCursor, candidateCount: items.length, sourcePredictionId: predictionId,
-      pageIndex: (parent?.pageIndex ?? 0) + 1, featureAt: '2026-10-22T20:00:00.000Z',
+      pageIndex: (parent?.pageIndex ?? 0) + 1, featureAt: '2026-10-23T08:00:00.000Z',
       chainId: parent?.chainId ?? serverId(), rootPredictionId: parent?.rootPredictionId ?? predictionId,
       parentPredictionId: parent?.ranking.predictionId ?? null,
       seenCount: (parent?.seenCount ?? 0) + items.length, chainLimit: 1000,
@@ -66,77 +67,161 @@ function fixture() {
   async function fail(index: number, message = 'Reply lost') {
     reads[index]!.resolve({ status: 'error', message, recovery: 'retry' }); await flush();
   }
-  async function mount() { flow.displayed(initial.item.id, initial.origin.deliveryRequestId!); await flush(); }
-  async function warm() { flow.warm(); for (let index = 0; index < 4; index++) await reply(index, [10 + index]); }
+  async function display() {
+    const delivery = flow.snapshot().delivery!;
+    flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!); await flush();
+  }
+  async function warm() { flow.warm(); for (let index = 0; index < 5; index++) await reply(index, [10 + index]); }
   cleanups.push(() => { flow.stop(); for (const read of reads) read.resolve({ status: 'error', message: 'Stopped', recovery: 'retry' }); });
   flow.start();
-  return { flow, reads, load, loadSource, recordImpression, submit, commit, reply, fail, mount, warm };
+  return { flow, reads, load, loadSource, recordImpression, submit, undoPositive, commit, reply, fail, display, warm };
 }
 
-describe('Discovery five-card buffer', () => {
-  it('prepares exactly four sequential v3 successors without exposing their origins as impressions or sources', async () => {
-    const f = fixture(); await f.mount(); f.flow.warm();
-    const pages: PredictionPage[] = [];
-    for (let index = 0; index < 4; index++) {
-      expect(f.reads).toHaveLength(index + 1);
-      const request = f.reads[index]!.request;
-      expect(request).toMatchObject({ version: 3, profileId: scope.profileId, sessionId: scope.sessionId, limit: 1 });
-      if (index === 0) expect(request).toMatchObject({ cursor: null, replacesChainId: null });
-      else {
-        expect(request.cursor).toBe(pages[index - 1]!.nextCursor);
-        expect(request).not.toHaveProperty('replacesChainId');
-      }
-      pages.push(await f.reply(index, [10 + index]));
-    }
-    expect(new Set(pages.map(page => page.chainId)).size).toBe(1);
-    expect(pages.map(page => page.pageIndex)).toEqual([1, 2, 3, 4]);
+describe('Discovery active card plus five prepared successors', () => {
+  it('warms five cards in one bulk read without recording their impressions or source capabilities', async () => {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    expect(f.reads).toHaveLength(1);
+    expect(f.reads[0]!.request).toMatchObject({ version: 3, cursor: null, limit: 5, replacesChainId: null });
+    const page = await f.reply(0, [10, 11, 12, 13, 14]);
     expect(f.flow.snapshot()).toMatchObject({ delivery: initial, refilling: false, loading: false });
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([10, 11, 12, 13].map(id));
-    for (const [index, delivery] of f.flow.snapshot().upcoming.entries()) {
-      expect(delivery.origin).toMatchObject({ predictionId: pages[index]!.ranking.predictionId,
-        deliveryRequestId: pages[index]!.request.requestId });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([10, 11, 12, 13, 14].map(id));
+    for (const delivery of f.flow.snapshot().upcoming) {
+      expect(delivery.origin).toMatchObject({ predictionId: page.ranking.predictionId, deliveryRequestId: page.request.requestId });
       f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!);
     }
     f.flow.warm(); await flush();
-    expect(f.load).toHaveBeenCalledTimes(4);
+    expect(f.load).toHaveBeenCalledOnce();
     expect(f.recordImpression).toHaveBeenCalledOnce();
     expect(f.loadSource).toHaveBeenCalledOnce();
     expect(f.loadSource.mock.calls[0]![0].itemId).toBe(initial.item.id);
   });
 
-  it('promotes the prepared card synchronously only on skip acknowledgement and retains siblings during refill', async () => {
-    const f = fixture(); await f.mount(); await f.warm();
+  it('also fills all five slots across one-item continuation pages with their particular frozen origins', async () => {
+    const f = fixture(); await f.display(); f.flow.warm();
+    const pages: PredictionPage[] = [];
+    for (let index = 0; index < 5; index++) {
+      expect(f.reads).toHaveLength(index + 1);
+      const request = f.reads[index]!.request;
+      if (index === 0) expect(request).toMatchObject({ cursor: null, replacesChainId: null });
+      else expect(request.cursor).toBe(pages[index - 1]!.nextCursor);
+      pages.push(await f.reply(index, [10 + index]));
+    }
+    expect(new Set(pages.map(page => page.chainId)).size).toBe(1);
+    expect(pages.map(page => page.pageIndex)).toEqual([1, 2, 3, 4, 5]);
+    expect(f.flow.snapshot().upcoming).toHaveLength(5);
+    f.flow.snapshot().upcoming.forEach((delivery, index) => expect(delivery.origin).toMatchObject({
+      predictionId: pages[index]!.ranking.predictionId, deliveryRequestId: pages[index]!.request.requestId,
+    }));
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+  });
+
+  it('promotes synchronously after durable skip admission and exposes the new card while the previous skip is pending', async () => {
+    const f = fixture(); await f.display(); await f.warm();
     const prepared = f.flow.snapshot().upcoming;
     expect(f.flow.advance()).toBe(true);
     const skip = f.submit.mock.calls[0]![0];
-    expect(skip.origin).toMatchObject({ predictionId: initial.origin.predictionId,
-      deliveryRequestId: initial.origin.deliveryRequestId });
-    expect(f.flow.snapshot().delivery).toBe(initial);
-    expect(f.flow.snapshot().upcoming).toEqual(prepared);
-    f.flow.acknowledged(skip.actionId);
-    expect(f.flow.snapshot()).toMatchObject({ delivery: prepared[0], navigationPending: false, loading: false, refilling: true });
+    expect(skip.origin).toMatchObject({ predictionId: initial.origin.predictionId, deliveryRequestId: initial.origin.deliveryRequestId });
+    expect(f.flow.hasPendingAction(skip.actionId)).toBe(true);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: prepared[0], navigationPending: false, loading: false, refilling: true, canPrevious: false });
     expect(f.flow.snapshot().upcoming).toEqual(prepared.slice(1));
-    expect(f.reads).toHaveLength(5);
+    expect(f.reads).toHaveLength(6);
     expect(f.recordImpression).toHaveBeenCalledOnce();
-    expect(f.flow.skip()).toBe(false);
-    const active = f.flow.snapshot().delivery!;
-    f.flow.displayed(active.item.id, active.origin.deliveryRequestId!); await flush();
-    const source = f.flow.snapshot().source;
-    expect(source?.origin).toMatchObject({ predictionId: active.origin.predictionId,
-      deliveryRequestId: active.origin.deliveryRequestId });
-    await f.reply(4, [14]);
-    expect(f.flow.snapshot().source).toBe(source);
-    expect(f.flow.snapshot().delivery).toBe(prepared[0]);
-    expect(f.flow.snapshot().upcoming.slice(0, 3)).toEqual(prepared.slice(1));
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14].map(id));
+    expect(f.flow.skip()).toBe(false); // Not yet mounted, so no real impression origin.
+    await f.display();
     expect(f.recordImpression).toHaveBeenCalledTimes(2);
+    expect(f.flow.snapshot().canSkip).toBe(true);
+    const active = f.flow.snapshot().delivery;
+    const source = f.flow.snapshot().source;
+    await f.reply(5, [15]);
+    f.flow.acknowledged(skip.actionId);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: active, source, canPrevious: true });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14, 15].map(id));
     expect(f.submit).toHaveBeenCalledOnce();
   });
 
-  it('resolves an ambiguous pre-rating root by exact retry before replacing its reader and auto-advancing fresh', async () => {
-    const f = fixture(); await f.mount(); f.flow.warm();
+  it('binds rapid ratings and late receipts to their original cards without replacing the current or prepared cards', async () => {
+    const f = fixture(); await f.display(); await f.warm();
+    const rated = [initial, ...f.flow.snapshot().upcoming.slice(0, 2)];
+    for (const [index, delivery] of rated.entries()) {
+      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!);
+      f.flow.expectPositive(id(80 + index));
+      expect(f.flow.positiveQueued(id(80 + index))).toBe(true);
+    }
+    const current = f.flow.snapshot().delivery;
+    const prepared = f.flow.snapshot().upcoming;
+    expect(current?.item.id).toBe(id(12));
+    expect(f.flow.snapshot().canPrevious).toBe(false);
+    expect(f.submit).not.toHaveBeenCalled();
+    for (const index of [1, 0, 2]) {
+      receiveDiscoveryFeedAction(f.flow, { version: 1, actionId: id(80 + index), profileId: scope.profileId,
+        itemId: rated[index]!.item.id, interaction: { interest: null, saved: false, consumed: true, rating: index * 5, notInterested: false } });
+      expect(f.flow.hasPendingAction(id(80 + index))).toBe(false);
+      expect(f.flow.snapshot()).toMatchObject({ delivery: current, upcoming: prepared, positiveCommitted: false });
+    }
+    expect(f.flow.snapshot().canPrevious).toBe(true);
+    expect(f.flow.previous()).toBe(true);
+    expect(f.undoPositive.mock.calls[0]![0]).toMatchObject({ actionId: id(82), itemId: rated[2]!.item.id });
+  });
+
+  it('accepts rapid skips from each newly displayed origin before any preceding skip or optional source reply', async () => {
+    const f = fixture(true);
+    const replies: { request: DiscoverySkipSourceRequest; resolve: (source: DiscoverySkipSource) => void }[] = [];
+    f.loadSource.mockImplementation(request => new Promise(resolve => replies.push({ request, resolve })));
+    await f.display(); f.flow.warm(); await f.reply(0, [10, 11, 12, 13, 14]);
+    const displayed: FeedDelivery[] = [];
+    for (let count = 0; count < 3; count++) {
+      const delivery = f.flow.snapshot().delivery!; displayed.push(delivery);
+      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!);
+      expect(f.flow.snapshot().canSkip).toBe(true);
+      expect(f.flow.advance()).toBe(true);
+    }
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(12) }, canPrevious: false });
+    expect(f.recordImpression).toHaveBeenCalledTimes(3);
+    expect(f.submit).toHaveBeenCalledTimes(3);
+    for (const [index, [command]] of f.submit.mock.calls.entries()) {
+      expect(command).toMatchObject({ itemId: displayed[index]!.item.id, origin: {
+        predictionId: displayed[index]!.origin.predictionId, deliveryRequestId: displayed[index]!.origin.deliveryRequestId,
+        impressionEventId: f.recordImpression.mock.results[index]!.value,
+      } });
+      expect(f.flow.hasPendingAction(command.actionId)).toBe(true);
+      f.flow.acknowledged(command.actionId);
+    }
+    const active = f.flow.snapshot().delivery;
+    for (const { request, resolve } of replies) resolve({ ...request, version: CONTEXTUAL_SKIP_VERSION,
+      policyVersion: CONTEXTUAL_SKIP_POLICY, contextChangePolicy: 'NO_TRUSTED_CONTEXT_CHANGE_V1', contextRef: null, acceptsNewSkip: true });
+    await flush();
+    expect(f.flow.snapshot()).toMatchObject({ delivery: active, source: null, message: null, canPrevious: true });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([13, 14].map(id));
+  });
+
+  it('does not advance or remember a command when the durable queue rejects admission', async () => {
+    const f = fixture(); await f.display(); await f.warm();
+    const before = f.flow.snapshot();
+    f.submit.mockReturnValueOnce(false);
+    expect(f.flow.advance()).toBe(false);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: before.delivery, upcoming: before.upcoming, canPrevious: false });
+    expect(f.flow.hasPendingAction(f.submit.mock.calls[0]![0].actionId)).toBe(false);
+    f.flow.expectPositive(id(80)); f.flow.cancelPositive(id(80));
+    expect(f.flow.positiveQueued(id(80))).toBe(false);
+    expect(f.flow.snapshot().delivery).toBe(initial);
+    expect(f.flow.advance()).toBe(true);
+  });
+
+  it('keeps only five eligible successors when a refill page contains duplicates and excess unseen rows', async () => {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    await f.reply(0, [10, 11, 12, 13, 14]);
+    f.flow.advance();
+    await f.reply(1, [4, 10, 11, 15, 16]);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14, 15].map(id));
+    expect(f.flow.snapshot().upcoming).toHaveLength(5);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    expect(f.flow.snapshot().upcoming.some(delivery => delivery.item.id === id(16))).toBe(false);
+  });
+
+  it('resolves an ambiguous pre-rating root exactly before replacing its reader from the acknowledged prefix', async () => {
+    const f = fixture(); await f.display(); f.flow.warm();
     const stale = f.commit(0, [20]);
-    f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
+    f.flow.expectPositive(id(80)); expect(f.flow.positiveQueued(id(80))).toBe(true); f.flow.acknowledged(id(80));
     expect(f.flow.snapshot()).toMatchObject({ delivery: initial, upcoming: [], navigationPending: true });
     expect(f.reads).toHaveLength(1);
     expect(f.reads[0]!.signal.aborted).toBe(false);
@@ -147,96 +232,161 @@ describe('Discovery five-card buffer', () => {
     await f.reply(1, [20]);
     expect(f.flow.snapshot().delivery).toBe(initial);
     expect(f.flow.snapshot().upcoming).toEqual([]);
-    expect(f.reads[2]!.request).toMatchObject({ cursor: null, limit: 1, replacesChainId: stale.chainId });
-    expect(f.reads[2]!.request.requestId).not.toBe(stale.request.requestId);
+    expect(f.reads[2]!.request).toMatchObject({ cursor: null, replacesChainId: stale.chainId });
     const fresh = await f.reply(2, [30]);
     expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(30), origin: {
       predictionId: fresh.ranking.predictionId, deliveryRequestId: fresh.request.requestId } }, navigationPending: false });
-    for (let index = 3; index < 7; index++) await f.reply(index, [28 + index]);
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([31, 32, 33, 34].map(id));
+    for (let index = 3; index < 8; index++) await f.reply(index, [28 + index]);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([31, 32, 33, 34, 35].map(id));
     expect(f.submit).not.toHaveBeenCalled();
     expect(f.recordImpression).toHaveBeenCalledOnce();
-    expect(f.flow.snapshot().refillError).toBeNull();
   });
 
-  it('keeps the active source usable after background failure and retries the exact continuation', async () => {
-    const f = fixture(); await f.mount(); f.flow.warm();
+  it('ignores an expired old-generation read without clearing the retained prepared window', async () => {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    await f.reply(0, [10, 11, 12, 13, 14]);
+    f.flow.expectPositive(id(80)); expect(f.flow.positiveQueued(id(80))).toBe(true);
+    const active = f.flow.snapshot().delivery;
+    const prepared = f.flow.snapshot().upcoming;
+    f.flow.acknowledged(id(80));
+    f.reads[1]!.resolve({ status: 'error', recovery: 'refresh', message: 'Expired previous cursor' });
+    await flush();
+    expect(f.flow.snapshot()).toMatchObject({ delivery: active, upcoming: prepared, message: null, refillError: null });
+    expect(f.reads[2]!.request).toMatchObject({ cursor: null, replacesChainId: f.commit(0, [10, 11, 12, 13, 14]).chainId });
+    await f.reply(2, [30, 31, 32, 33, 34]);
+    expect(f.flow.snapshot().delivery).toBe(active);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14, 30].map(id));
+  });
+
+  it('discards only the rejected lane head while retaining exact pending suffix receipts through fresh recovery', async () => {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    await f.reply(0, [10, 11, 12, 13, 14]);
+    for (const actionId of [id(80), id(81)]) {
+      await f.display(); f.flow.expectPositive(actionId); expect(f.flow.positiveQueued(actionId)).toBe(true);
+    }
+    await f.display(); expect(f.flow.skip()).toBe(true);
+    const pendingSkip = f.submit.mock.calls[0]![0];
+    f.flow.recoverRejected('positive', id(80));
+    expect(f.flow.hasPendingAction(id(80))).toBe(false);
+    expect(f.flow.hasPendingAction(id(81))).toBe(true);
+    expect(f.flow.hasPendingAction(pendingSkip.actionId)).toBe(true);
+    expect(f.flow.snapshot().upcoming).toEqual([]);
+    const outgoing = f.flow.snapshot().delivery;
+    f.flow.acknowledged(id(81)); f.flow.acknowledged(pendingSkip.actionId);
+    expect(f.flow.snapshot().delivery).toBe(outgoing);
+    await f.reply(1, [20, 21, 22, 23, 24]); // Resolve the superseded reader first.
+    await f.reply(2, [30, 31, 32, 33, 34]);
+    await f.reply(3, [35, 36, 37, 38, 39]);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(30) }, canPrevious: false });
+    await f.display(); expect(f.flow.skip()).toBe(true);
+    const freshSkip = f.submit.mock.calls.at(-1)![0];
+    f.flow.acknowledged(freshSkip.actionId);
+    expect(f.flow.snapshot().canPrevious).toBe(true);
+    expect(f.flow.previous()).toBe(true);
+    expect(f.submit.mock.calls.at(-1)![0]).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP',
+      itemId: id(30), reversesActionId: freshSkip.actionId, origin: freshSkip.origin });
+  });
+
+  it('does not remove fresh pending actions when an older outbox command is discarded by its exact ID', async () => {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    await f.reply(0, [10, 11, 12, 13, 14]);
+    for (const actionId of [id(80), id(81)]) {
+      await f.display(); f.flow.expectPositive(actionId); expect(f.flow.positiveQueued(actionId)).toBe(true);
+    }
+    f.flow.recoverRejected('positive', id(99)); // Recovered head from before this feed mounted.
+    expect(f.flow.hasPendingAction(id(80))).toBe(true);
+    expect(f.flow.hasPendingAction(id(81))).toBe(true);
+    f.flow.recoverRejected('positive', id(81));
+    expect(f.flow.hasPendingAction(id(80))).toBe(true);
+    expect(f.flow.hasPendingAction(id(81))).toBe(false);
+    f.flow.recoverRejected('skip', id(80)); // Another lane cannot discard this rating.
+    expect(f.flow.hasPendingAction(id(80))).toBe(true);
+  });
+
+  it('activates a newly eligible card when a late rating receipt renews an exhausted feed', async () => {
+    const f = fixture(true); await f.display();
+    f.flow.expectPositive(id(80)); expect(f.flow.positiveQueued(id(80))).toBe(true);
+    await f.reply(0, [], false);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: null, exhausted: true, navigationPending: false, canPrevious: false });
+    expect(f.flow.hasPendingAction(id(80))).toBe(true);
+    f.flow.acknowledged(id(80));
+    expect(f.reads).toHaveLength(2);
+    const fresh = await f.reply(1, [10, 11, 12, 13, 14], false);
+    expect(f.flow.snapshot()).toMatchObject({ exhausted: false, navigationPending: false, canPrevious: true,
+      delivery: { item: item(10), origin: { predictionId: fresh.ranking.predictionId, deliveryRequestId: fresh.request.requestId } } });
+    expect(f.flow.hasPendingAction(id(80))).toBe(false);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    await f.display(); expect(f.flow.skip()).toBe(true);
+    expect(f.submit.mock.calls[0]![0].origin).toMatchObject({ predictionId: fresh.ranking.predictionId,
+      deliveryRequestId: fresh.request.requestId });
+  });
+
+  it('keeps usable prepared cards through background failure and retries its exact continuation', async () => {
+    const f = fixture(); await f.display(); f.flow.warm();
     await f.reply(0, [10]); await f.reply(1, [11]);
     const failedRequest = f.reads[2]!.request;
-    const source = f.flow.snapshot().source;
     await f.fail(2);
-    expect(f.flow.snapshot()).toMatchObject({ delivery: initial, source, loading: false, navigationPending: false,
+    expect(f.flow.snapshot()).toMatchObject({ delivery: initial, loading: false, navigationPending: false,
       message: null, refillError: 'Reply lost' });
     expect(f.flow.advance()).toBe(true);
-    f.flow.acknowledged(f.submit.mock.calls[0]![0].actionId);
+    const skip = f.submit.mock.calls[0]![0];
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(10));
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([id(11)]);
-    expect(f.reads).toHaveLength(3);
+    f.flow.acknowledged(skip.actionId);
+    await f.display();
+    const active = f.flow.snapshot().delivery;
     f.flow.retryRefill();
     expect(f.reads[3]!.request).toBe(failedRequest);
-    expect(f.reads[3]!.request).not.toHaveProperty('replacesChainId');
-    await f.reply(3, [12]); await f.reply(4, [13]); await f.reply(5, [14]);
-    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(10) }, refilling: false, refillError: null });
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14].map(id));
+    for (let index = 3; index < 7; index++) await f.reply(index, [9 + index]);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: active, refilling: false, refillError: null });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([11, 12, 13, 14, 15].map(id));
+    expect(f.recordImpression).toHaveBeenCalledTimes(2);
     expect(f.submit).toHaveBeenCalledOnce();
-    expect(f.recordImpression).toHaveBeenCalledOnce();
   });
 
-  it('undoes the exact old origin, discards late refill, restores a fresh origin and replaces the restoration reader', async () => {
-    const f = fixture(); await f.mount(); await f.warm();
+  it('undoes the exact old action, discards a late refill, and restores a fresh origin', async () => {
+    const f = fixture(); await f.display(); await f.warm();
     f.flow.advance(); const skip = f.submit.mock.calls[0]![0]; f.flow.acknowledged(skip.actionId);
-    expect(f.flow.snapshot().delivery?.item.id).toBe(id(10));
     expect(f.flow.previous()).toBe(true);
     const withdrawal = f.submit.mock.calls[1]![0];
     expect(withdrawal).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP', itemId: initial.item.id,
       reversesActionId: skip.actionId, origin: skip.origin });
-    expect(withdrawal.actionId).not.toBe(skip.actionId);
     expect(f.flow.snapshot().upcoming).toEqual([]);
     f.flow.acknowledged(withdrawal.actionId);
-    expect(f.reads).toHaveLength(5);
-    const stale = await f.reply(4, [14]);
-    expect(f.reads[5]!.request).toMatchObject({ limit: 50, cursor: null, replacesChainId: stale.chainId });
-    expect(f.flow.snapshot().upcoming).toEqual([]);
-    const restoration = await f.reply(5, [4, 50, 51]);
+    const stale = await f.reply(5, [15]);
+    expect(f.reads[6]!.request).toMatchObject({ limit: 50, cursor: null, replacesChainId: stale.chainId });
+    const restoration = await f.reply(6, [4, 50, 51]);
     const restored = f.flow.snapshot().delivery!;
     expect(restored).toMatchObject({ item: initial.item, origin: { predictionId: restoration.ranking.predictionId,
       deliveryRequestId: restoration.request.requestId } });
     expect(restored.origin.deliveryRequestId).not.toBe(initial.origin.deliveryRequestId);
     expect(f.flow.snapshot()).toMatchObject({ source: null, canPrevious: false, navigationPending: false, upcoming: [] });
-    expect(f.reads[6]!.request).toMatchObject({ limit: 1, cursor: null, replacesChainId: restoration.chainId });
-    // A newly ranked root can include the already active Item. It is skipped,
-    // while restoration siblings never become feed cards or impressions.
-    await f.reply(6, [4]);
-    for (let index = 7; index < 11; index++) await f.reply(index, [13 + index]);
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23].map(id));
+    expect(f.reads[7]!.request).toMatchObject({ cursor: null, replacesChainId: restoration.chainId });
+    await f.reply(7, [4]);
+    for (let index = 8; index < 13; index++) await f.reply(index, [12 + index]);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23, 24].map(id));
     expect(f.recordImpression).toHaveBeenCalledOnce();
-    f.flow.displayed(restored.item.id, restored.origin.deliveryRequestId!); await flush();
-    expect(f.flow.advance()).toBe(true);
+    await f.display(); expect(f.flow.advance()).toBe(true);
     expect(f.submit.mock.calls[2]![0].origin).toMatchObject({ predictionId: restoration.ranking.predictionId,
       deliveryRequestId: restoration.request.requestId });
   });
 
-  it('replaces a full 1000-item reader while retaining its final queued cards and reports only true catalog exhaustion', async () => {
-    const f = fixture(); await f.mount(); await f.warm();
+  it('renews a full 1000-item reader without claiming catalogue exhaustion', async () => {
+    const f = fixture(); await f.display(); await f.warm();
     async function advance() {
-      const delivery = f.flow.snapshot().delivery!;
-      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!); await flush();
-      expect(f.flow.advance()).toBe(true);
+      await f.display(); expect(f.flow.advance()).toBe(true);
       f.flow.acknowledged(f.submit.mock.calls.at(-1)![0].actionId);
     }
-    // Exercise the real fixed server budget, not a smaller invented wire limit.
     let terminal: PredictionPage | undefined;
-    for (let index = 4; index < 1000; index++) {
+    for (let index = 5; index < 1000; index++) {
       await advance(); terminal = await f.reply(index, [10 + index], index !== 999, index === 999);
     }
     expect(terminal).toMatchObject({ pageIndex: 1000, seenCount: 1000, nextCursor: null, continuationState: 'READER_LIMIT' });
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([1006, 1007, 1008, 1009].map(id));
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([1005, 1006, 1007, 1008, 1009].map(id));
     expect(f.flow.snapshot().exhausted).toBe(false);
     await advance();
     expect(f.reads[1000]!.request).toMatchObject({ cursor: null, replacesChainId: terminal!.chainId });
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([1007, 1008, 1009].map(id));
     await f.reply(1000, [2000], false);
-    for (const next of [1007, 1008, 1009, 2000]) {
+    for (const next of [1006, 1007, 1008, 1009, 2000]) {
       await advance(); expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(next) }, exhausted: false });
     }
     await advance();
@@ -244,25 +394,24 @@ describe('Discovery five-card buffer', () => {
     expect(f.reads).toHaveLength(1001);
   });
 
-  it.each([10, null])('invalidates unseen cards for a recovered other-Item atomic receipt (rating %s) without changing active origin or history', async rating => {
-    const f = fixture(); await f.mount(); await f.warm();
-    f.flow.advance(); const skip = f.submit.mock.calls[0]![0]; f.flow.acknowledged(skip.actionId);
-    const previousPage = await f.reply(4, [14]);
-    const active = f.flow.snapshot().delivery!;
-    f.flow.displayed(active.item.id, active.origin.deliveryRequestId!); await flush();
+  it.each([10, null])('invalidates unseen cards for an unrelated recovered atomic receipt (rating %s)', async rating => {
+    const f = fixture(); await f.display(); await f.warm();
+    f.flow.advance(); f.flow.acknowledged(f.submit.mock.calls[0]![0].actionId);
+    const previousPage = await f.reply(5, [15]);
+    await f.display();
+    const active = f.flow.snapshot().delivery;
     const source = f.flow.snapshot().source;
     receiveDiscoveryFeedAction(f.flow, { version: 1, actionId: id(80), profileId: scope.profileId,
       itemId: id(99), interaction: { interest: null, saved: false, consumed: rating !== null, rating, notInterested: false } });
     expect(f.flow.snapshot()).toMatchObject({ delivery: active, source, upcoming: [], positiveCommitted: false,
       navigationPending: false, canPrevious: true });
-    expect(f.reads[5]!.request).toMatchObject({ cursor: null, replacesChainId: previousPage.chainId });
-    for (let index = 5; index < 9; index++) await f.reply(index, [15 + index]);
+    expect(f.reads[6]!.request).toMatchObject({ cursor: null, replacesChainId: previousPage.chainId });
+    for (let index = 6; index < 11; index++) await f.reply(index, [14 + index]);
     expect(f.flow.snapshot().delivery).toBe(active);
     expect(f.flow.snapshot().source).toBe(source);
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23].map(id));
-    expect(f.recordImpression).toHaveBeenCalledTimes(2);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23, 24].map(id));
     expect(f.flow.previous()).toBe(true);
     expect(f.submit.mock.calls[1]![0]).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP',
-      reversesActionId: skip.actionId, origin: skip.origin });
+      reversesActionId: f.submit.mock.calls[0]![0].actionId, origin: f.submit.mock.calls[0]![0].origin });
   });
 });

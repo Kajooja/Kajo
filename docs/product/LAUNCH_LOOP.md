@@ -155,8 +155,11 @@ Question count is variable. Neither six answers, twenty answers, a 10 MOVIE +
 10 BOOK schedule nor the earlier 12–24 range establishes completion. Selection
 uses the committed response prefix, including numeric rating magnitude, to seek
 the next useful recognizable Item. The first accepted rating must influence the
-next fresh forecast wherever supported, and the same boundary continues during
-Discovery on the same Profile. Preserve UNKNOWN's recognition-only meaning and
+next fresh Taste forecast wherever supported. Discovery continues learning on
+the same Profile and uses the committed prefix for its first new refill, while
+its active card plus at most five already prepared successors may retain older
+frozen origins under the [bounded preparation policy](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target).
+Preserve UNKNOWN's recognition-only meaning and
 explicit not-interest's distinct historical meaning; the new Ohita supplies only
 its declared contextual no-rating evidence. A new answer
 may improve the next forecast or reveal uncertainty and contradiction; monotonically
@@ -179,9 +182,13 @@ world/state/Scenario. Taste may select a recognizable informative question to
 improve future recommendations, rather than treating every question as a promised
 favorite. Interstellar 10 should increase supported fit for relevant similar
 Items; Inception is an illustration, not a required hardcoded next title.
-Recompute from the acknowledged prefix before fresh next-card selection; do not
-serve a precomputed fixed test order or retain stale prefetched cards after a
-supported answer. Exact retry/current-card origins remain frozen. The
+For Taste, recompute from the acknowledged prefix before the next question; do
+not serve a precomputed fixed test order or retain stale future questions after
+a supported answer. Discovery alone may advance after durable local admission
+and retain its bounded five-successor window across ordinary acknowledgements;
+the first new refill uses the latest committed prefix. This does not precompute
+future Taste questions or change account conversion. Exact retry/current-card
+and prepared Discovery origins remain frozen. The
 [next-card objective](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
 owns scoring, freshness and honest evaluation.
 
