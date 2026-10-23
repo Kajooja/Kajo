@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createDiscoveryFeed, receiveDiscoveryFeedAction, type FeedDelivery, type FeedPositiveReceipt } from './discoveryFeed';
-import { createPredictionPageRequest, type PredictionPage, type PredictionPageRequest } from './predictionPageOperations';
+import { createFeedPredictionPageRequest, createPredictionPageRequest, type PredictionPage, type PredictionPageRequest } from './predictionPageOperations';
 import { CONTEXTUAL_SKIP_POLICY, CONTEXTUAL_SKIP_VERSION, type DiscoverySkipSource, type DiscoverySkipSourceRequest, type KajoSkipCommand } from '../events/contextualSkipOperations';
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const scope = { actorUserId: id(1), profileId: id(2), sessionId: id(3), mode: 'FOR_YOU' as const };
@@ -17,16 +17,20 @@ function page(request: PredictionPageRequest, next = item(9)): PredictionPage {
   return { status: 'success', request, ranking: { predictionId: id(10), items: [next], predictions: [] }, availability: 'ITEMS',
     continuationSupported: true, nextCursor: null, candidateCount: 1, sourcePredictionId: id(10), pageIndex: 1, featureAt: null };
 }
-function fixture() {
+function fixture(bulk = false) {
   let sequence = 50;
   const createId = () => id(sequence++);
   const load = vi.fn(async (request: PredictionPageRequest) => page(request, request.limit === 50 ? item(4) : item(9)));
   const loadSource = vi.fn(async (request: DiscoverySkipSourceRequest) => source(request));
   const undoPositive = vi.fn((_receipt: FeedPositiveReceipt, _actionId: string) => true);
-  const recordImpression = vi.fn(() => id(7)); const submit = vi.fn((_command: KajoSkipCommand) => true);
+  const recordImpression = vi.fn((_delivery: FeedDelivery) => id(7)); const submit = vi.fn((_command: KajoSkipCommand) => true);
   const flow = createDiscoveryFeed({ initial, scope, createId, nowMicros: () => '1000000',
-    createRequest: () => createPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', version: 3, limit: 1 }),
-    createRestoreRequest: () => createPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', version: 3, limit: 50 }),
+    createRequest: replacesChainId => bulk
+      ? createFeedPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', limit: 5, replacesChainId })
+      : createPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', version: 3, limit: 1 }),
+    createRestoreRequest: replacesChainId => bulk
+      ? createFeedPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', limit: 50, replacesChainId })
+      : createPredictionPageRequest({ ...scope, requestId: createId(), itemType: 'MOVIE', version: 3, limit: 50 }),
     load, loadSource, recordImpression, submit, undoPositive, onChange: vi.fn() });
   flow.start();
   return { flow, load, loadSource, recordImpression, submit, undoPositive };
@@ -237,6 +241,120 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     expect(newSkip.origin).not.toEqual({ ...f.submit.mock.calls[0]![0].origin, deliveryRequestId: id(6) });
     f.flow.acknowledged(newSkip.actionId); await flush();
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(9)); f.flow.stop();
+  });
+  it('continues through the card after a restored skip while background pages are still filling', async () => {
+    const f = fixture(true);
+    const reads: { request: PredictionPageRequest; pending: ReturnType<typeof deferred<PredictionPage>> }[] = [];
+    f.load.mockImplementation(request => {
+      const pending = deferred<PredictionPage>(); reads.push({ request, pending }); return pending.promise;
+    });
+    async function reply(index: number, items: number[], more = true) {
+      const request = reads[index]!.request;
+      reads[index]!.pending.resolve({ ...page(request),
+        ranking: { predictionId: id(500 + index), items: items.map(item), predictions: [] },
+        candidateCount: items.length, nextCursor: more ? id(600 + index) : null,
+        chainId: id(700 + index) });
+      await flush();
+    }
+    async function display() {
+      const delivery = f.flow.snapshot().delivery!;
+      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!); await flush();
+    }
+    try {
+      await display(); f.flow.warm(); await reply(0, [10, 11, 12, 13, 14]);
+      for (const next of [10, 11, 12]) {
+        expect(f.flow.advance()).toBe(true);
+        f.flow.acknowledged(f.submit.mock.calls.at(-1)![0].actionId);
+        expect(f.flow.snapshot().delivery?.item.id).toBe(id(next)); await display();
+      }
+      // The first refill remains unresolved across several forward choices and Undo.
+      expect(reads).toHaveLength(2); expect(f.flow.previous()).toBe(true);
+      const withdrawal = f.submit.mock.calls.at(-1)![0];
+      expect(withdrawal).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP', itemId: id(11) });
+      f.flow.acknowledged(withdrawal.actionId);
+      await reply(1, [15, 16, 17, 18, 19]);
+      expect(reads[2]!.request.limit).toBe(50); await reply(2, [11]);
+      const restored = f.flow.snapshot().delivery!;
+      expect(restored.item.id).toBe(id(11));
+      expect(f.flow.snapshot()).toMatchObject({ restoringPresentation: null, loading: false,
+        navigationPending: false, refilling: true });
+      expect(reads[3]!.request).toMatchObject({ limit: 5, replacesChainId: id(702) });
+      await display();
+      expect(f.flow.snapshot().canSkip).toBe(true);
+      expect(f.flow.advance()).toBe(true);
+      const restoredSkip = f.submit.mock.calls.at(-1)![0];
+      expect(restoredSkip).toMatchObject({ kind: 'CONTEXTUAL_SKIP', itemId: id(11), origin: {
+        predictionId: restored.origin.predictionId, deliveryRequestId: restored.origin.deliveryRequestId } });
+      f.flow.acknowledged(restoredSkip.actionId);
+      expect(f.flow.snapshot()).toMatchObject({ loading: true, navigationPending: true });
+      // B was viewed before Undo but never chosen; it can enter the fresh feed again.
+      await reply(3, [12, 20, 21, 22, 23]);
+      const next = f.flow.snapshot().delivery!;
+      expect(next.item.id).toBe(id(12));
+      expect(f.flow.snapshot()).toMatchObject({ loading: false, navigationPending: false, refilling: true });
+      await display();
+      expect(f.flow.snapshot().canSkip).toBe(true); expect(f.flow.advance()).toBe(true);
+      expect(f.submit.mock.calls.at(-1)![0]).toMatchObject({ kind: 'CONTEXTUAL_SKIP', itemId: id(12), origin: {
+        predictionId: next.origin.predictionId, deliveryRequestId: next.origin.deliveryRequestId } });
+      expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(20) }, loading: false, navigationPending: false });
+      expect(f.recordImpression.mock.calls.map(([delivery]) => delivery.item.id)).toEqual([4, 10, 11, 12, 11, 12].map(id));
+    } finally {
+      f.flow.stop();
+      for (const read of reads) read.pending.resolve(page(read.request));
+      await flush();
+    }
+  });
+  it.each(['skip', 'rating'])('consumes one Undo after %s despite older history, and rearms after a new forward choice', async kind => {
+    const f = fixture(); let nextItem = -1;
+    f.load.mockImplementation(async request => ({ ...page(request, request.limit === 50 ? item(9) : item(nextItem += 10)),
+      nextCursor: request.limit === 50 ? null : id(900) }));
+    async function display() {
+      const delivery = f.flow.snapshot().delivery!;
+      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!); await flush();
+    }
+    async function choose(actionId: string) {
+      if (kind === 'skip') {
+        expect(f.flow.advance()).toBe(true);
+        f.flow.acknowledged(f.submit.mock.calls.at(-1)![0].actionId);
+      } else {
+        f.flow.expectPositive(actionId); expect(f.flow.positiveQueued(actionId)).toBe(true);
+        f.flow.acknowledged(actionId);
+      }
+      await flush();
+    }
+    try {
+      // Preserve an older entry so a second Undo would otherwise remain available.
+      await display(); await choose(id(80));
+      expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
+      await display(); await choose(id(81));
+      expect(f.flow.snapshot().delivery?.item.id).toBe(id(19));
+      expect(f.flow.previous()).toBe(true);
+      const undoId = kind === 'skip' ? f.submit.mock.calls.at(-1)![0].actionId : f.undoPositive.mock.calls.at(-1)![1];
+      f.flow.acknowledged(undoId); await flush();
+      expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(9) }, canPrevious: false,
+        restoringPresentation: null, navigationPending: false });
+      const submitted = f.submit.mock.calls.length; const undone = f.undoPositive.mock.calls.length;
+      expect(f.flow.previous()).toBe(false);
+      expect(f.submit).toHaveBeenCalledTimes(submitted); expect(f.undoPositive).toHaveBeenCalledTimes(undone);
+      await display(); await choose(id(82));
+      expect(f.flow.snapshot().canPrevious).toBe(true); expect(f.flow.previous()).toBe(true);
+      if (kind === 'skip') expect(f.submit.mock.calls.at(-1)![0]).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP', itemId: id(9) });
+      else expect(f.undoPositive.mock.calls.at(-1)![0]).toMatchObject({ itemId: id(9), actionId: id(82) });
+    } finally { f.flow.stop(); }
+  });
+  it('retains the one Undo when its first durable admission is refused', async () => {
+    const f = fixture();
+    try {
+      f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80)); await flush();
+      f.undoPositive.mockReturnValueOnce(false);
+      expect(f.flow.previous()).toBe(false);
+      expect(f.flow.snapshot()).toMatchObject({ canPrevious: true, navigationPending: false, restoringPresentation: null });
+      expect(f.flow.previous()).toBe(true);
+      expect(f.undoPositive).toHaveBeenCalledTimes(2);
+      f.flow.acknowledged(f.undoPositive.mock.calls.at(-1)![1]); await flush();
+      expect(f.flow.snapshot()).toMatchObject({ delivery: { item: initial.item }, canPrevious: false, navigationPending: false });
+      expect(f.flow.previous()).toBe(false);
+    } finally { f.flow.stop(); }
   });
   it('retries the exact ambiguous restoration read without repeating acknowledged undo', async () => {
     const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));

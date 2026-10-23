@@ -110,6 +110,11 @@ describe('mounted feed card motion', () => {
     await act(async () => { renderer!.update(<FeedItemCard {...props} disabled />); });
     await act(async () => { release(-120); });
     expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(0);
+    await act(async () => {
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(false);
+      drag(-120); release(-120);
+    });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(0);
   });
 
   it.each([['forward', 64], ['backward', -64]] as const)('enters from %s using native animation without issuing actions', async (entryDirection, offset) => {
@@ -187,12 +192,38 @@ describe('mounted feed card motion', () => {
     expect(outgoing.props.children).toBe('Rating 8'); expect(outgoing.props.titleAction).toBe('★');
   });
 
-  it('defers a second swipe while an entry is unfinished instead of snapping to its finger delta', async () => {
+  it('lets a native fling interrupt an unfinished entry without waiting for its animation callback', async () => {
     fixture.deferAnimation = true;
     const props = await mount({ entryDirection: 'forward', entryOffset: 390 });
-    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -20, numberActiveTouches: 1 })).toBe(false);
-    await act(async () => { drag(-130); release(-130); });
-    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(390);
+    expect(fixture.values[0]!.value).toBe(390);
+    await act(async () => {
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      expect(fixture.values[0]!.value).toBe(-32);
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce();
+  });
+
+  it('lets a fresh native fling interrupt a pending snap-back without submitting the cancelled drag', async () => {
+    const props = await mount(); fixture.deferAnimation = true;
+    await act(async () => {
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -20, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: 0 });
+    });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-20);
+    expect(fixture.animations.at(-1)).toMatchObject({ kind: 'spring', toValue: 0, useNativeDriver: true });
+    await act(async () => {
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      expect(fixture.values[0]!.value).toBe(-32);
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce();
   });
 
   it('discards a pending swipe offset from an old viewport size', async () => {
@@ -370,5 +401,75 @@ describe('mounted feed card motion', () => {
       renderer!.root.findByProps({ testID: 'feed-accessibility-summary' }).props.onAccessibilityAction({ nativeEvent: { actionName: 'increment' } });
     });
     expect(onSkip).toHaveBeenCalledOnce(); expect(onPrevious).not.toHaveBeenCalled();
+  });
+
+  it('continues native flings through Undo and the next card entry without allowing another Undo or duplicate forward', async () => {
+    const onSkip = vi.fn(() => true); const freshSkip = vi.fn(() => true); const onPrevious = vi.fn(() => true);
+    const nextSkip = vi.fn(() => true);
+    const previous = { ...base.item, id: 'previous', title: 'Previous' };
+    await act(async () => {
+      renderer = create(<RollingFeedCard {...base} opportunity="current-page" onSkip={onSkip} onPrevious={onPrevious} />);
+    });
+    await act(async () => {
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 32, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: 0.9 });
+    });
+    expect(onPrevious).toHaveBeenCalledOnce(); expect(onSkip).not.toHaveBeenCalled();
+    await act(async () => {
+      renderer!.update(<RollingFeedCard {...base} item={previous} opportunity="restore-previous" entryDirection="backward"
+        disabled onSkip={onSkip} onPrevious={onPrevious} />);
+    });
+    const restoredCard = renderer!.root.findByType(FeedItemCard);
+    const translation = surface().props.style.at(-1).transform[0].translateY;
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(false);
+    await act(async () => {
+      renderer!.update(<RollingFeedCard {...base} item={{ ...previous, creators: ['Fresh metadata'] }}
+        opportunity="restore-previous" entryDirection="backward" onSkip={freshSkip} />);
+    });
+    expect(renderer!.root.findByType(FeedItemCard)).toBe(restoredCard);
+    expect(surface().props.style.at(-1).transform[0].translateY).toBe(translation);
+    await act(async () => {
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 32, numberActiveTouches: 1 })).toBe(false);
+      renderer!.root.findByProps({ testID: 'feed-accessibility-summary' }).props
+        .onAccessibilityAction({ nativeEvent: { actionName: 'decrement' } });
+      surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      expect(translation.value).toBe(-32);
+      // Native PanResponder resets displacement on grant; the captured movement still counts toward the fling.
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(freshSkip).toHaveBeenCalledOnce(); expect(onSkip).not.toHaveBeenCalled();
+    expect(onPrevious).toHaveBeenCalledOnce();
+    // The next card must remain usable even if native animation completion is delayed.
+    fixture.deferAnimation = true;
+    const next = { ...base.item, id: 'next', title: 'Next' };
+    await act(async () => {
+      renderer!.update(<RollingFeedCard {...base} item={next} opportunity="next-fresh-page"
+        entryDirection="forward" onSkip={nextSkip} />);
+    });
+    const activeSurface = () => renderer!.root.findAllByProps({ testID: 'feed-dismiss-surface' })
+      .find(node => typeof node.props.onPanResponderGrant === 'function')!;
+    const nextTranslation = activeSurface().props.style.at(-1).transform[0].translateY;
+    expect(nextTranslation).toMatchObject({ initial: 568, value: 568 });
+    expect(fixture.animations.at(-1)).toMatchObject({ kind: 'timing', toValue: 0, useNativeDriver: true });
+    await act(async () => {
+      activeSurface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(activeSurface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+      activeSurface().props.onPanResponderGrant();
+      expect(nextTranslation.value).toBe(-32);
+      activeSurface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(nextSkip).toHaveBeenCalledOnce();
+    await act(async () => {
+      activeSurface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
+      expect(activeSurface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(false);
+      activeSurface().props.onPanResponderGrant();
+      activeSurface().props.onPanResponderRelease(null, { dx: 0, dy: -120, vx: 0, vy: -0.9 });
+    });
+    expect(nextSkip).toHaveBeenCalledOnce(); expect(nextTranslation.value).toBe(-32);
   });
 });

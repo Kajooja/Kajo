@@ -61,7 +61,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
   const [translation] = useState(() => new Animated.Value(preview || initialReduceMotion !== false ? 0 : entryOffset ?? (entryDirection === 'forward' ? 64 : entryDirection === 'backward' ? -64 : 0)));
   const gesture = useMemo(() => createFeedDismissal(), []);
   const [motion] = useState(() => {
-    let dragging = false; let accepted = false; let entryStarted = false; let settling = false;
+    let dragging = false; let accepted = false; let entryStarted = false;
     let readingOffset = 0; let dragOrigin = 0; let captureX = 0; let captureY = 0; let lastMoveAt = 0; let blocked = false;
     let settings: FeedMotionSettings = { disabled, canForward: Boolean(onSkip), canPrevious: Boolean(onPrevious),
       reduceMotion: null, viewportHeight, cardHeight, onForwardOffset, onReadingOffset };
@@ -69,7 +69,6 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       isDragging: () => dragging, isAccepted: () => accepted, hasEntered: () => entryStarted,
       setDragging: (value: boolean) => { dragging = value; },
       setAccepted: (value: boolean) => { accepted = value; },
-      isSettling: () => settling, setSettling: (value: boolean) => { settling = value; },
       readingOffset: () => readingOffset, setReadingOffset: (value: number) => { readingOffset = value; settings.onReadingOffset?.(value); },
       capture: (dx: number, dy: number) => { captureX = dx; captureY = dy; lastMoveAt = Date.now(); },
       begin: () => { dragOrigin = readingOffset; }, origin: () => dragOrigin,
@@ -113,11 +112,11 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     const changedMotion = (value: boolean) => {
       setReduceMotion(value);
       onMotionPreference?.(value);
-      if (value) { translation.stopAnimation(); translation.setValue(motion.readingOffset()); motion.setSettling(false); }
+      if (value) { translation.stopAnimation(); translation.setValue(motion.readingOffset()); }
     };
     const motionSubscription = AccessibilityInfo.addEventListener('reduceMotionChanged', changedMotion);
     const app = AppState.addEventListener('change', () => {
-      gesture.cancel(); motion.setDragging(false); motion.setSettling(false);
+      gesture.cancel(); motion.setDragging(false);
       motion.clearCapture(); motion.setReadingOffset(0);
       translation.stopAnimation(); translation.setValue(0);
     });
@@ -133,17 +132,15 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     // Unknown preference shows a stationary card and never replays its entry
     // after it has already appeared. RollingFeedCard carries known preferences.
     if (reduceMotion !== false || (!entryDirection && entryOffset === undefined)) { translation.setValue(0); return; }
-    motion.setSettling(true);
-    Animated.timing(translation, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => motion.setSettling(false));
+    Animated.timing(translation, { toValue: 0, duration: 180, useNativeDriver: true }).start();
   }, [entryDirection, entryOffset, reduceMotion, motion, translation]);
   const settle = useCallback((target: number, accepted: boolean) => {
     translation.stopAnimation();
-    if (motion.settings().reduceMotion !== false) { translation.setValue(accepted ? motion.readingOffset() : target); motion.setSettling(false); return; }
-    motion.setSettling(true);
+    if (motion.settings().reduceMotion !== false) { translation.setValue(accepted ? motion.readingOffset() : target); return; }
     if (accepted) {
-      Animated.timing(translation, { toValue: target, duration: 120, useNativeDriver: true }).start(() => motion.setSettling(false));
+      Animated.timing(translation, { toValue: target, duration: 120, useNativeDriver: true }).start();
     } else {
-      Animated.spring(translation, { toValue: target, speed: 24, bounciness: 0, useNativeDriver: true }).start(() => motion.setSettling(false));
+      Animated.spring(translation, { toValue: target, speed: 24, bounciness: 0, useNativeDriver: true }).start();
     }
   }, [motion, translation]);
   const lastDisabled = useRef(disabled);
@@ -165,7 +162,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     dimensions.current = { cardHeight, viewportHeight };
     gesture.cancel(); motion.setDragging(false); motion.clearCapture();
     const offset = Math.max(Math.min(0, (viewportHeight ?? 0) - (cardHeight ?? 0)), Math.min(0, motion.readingOffset()));
-    motion.setReadingOffset(offset); translation.stopAnimation(); translation.setValue(offset); motion.setSettling(false);
+    motion.setReadingOffset(offset); translation.stopAnimation(); translation.setValue(offset);
     if (motion.isAccepted() && cardHeight) motion.settings().onForwardOffset?.(cardHeight + offset);
   }, [cardHeight, viewportHeight, gesture, motion, translation]);
   const pan = useMemo(() => PanResponder.create({
@@ -177,15 +174,18 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       const settings = motion.settings();
       const minimum = (settings.viewportHeight ?? 500) - (settings.cardHeight ?? settings.viewportHeight ?? 500);
       const eligible = motion.observe(g.dx, g.dy, g.numberActiveTouches);
-      const allowed = eligible && !motion.isDragging() && !settings.disabled && !motion.isSettling() && AppState.currentState === 'active' && g.numberActiveTouches === 1 &&
+      const allowed = eligible && !motion.isDragging() && !settings.disabled && !motion.isAccepted() && AppState.currentState === 'active' && g.numberActiveTouches === 1 &&
         Math.abs(g.dy) > 12 && Math.abs(g.dy) > Math.abs(g.dx) * 1.5 &&
         (g.dy < 0 ? settings.canForward || motion.readingOffset() > minimum : settings.canPrevious || motion.readingOffset() < 0);
       if (allowed) motion.capture(g.dx, g.dy);
       return allowed;
     },
     onPanResponderGrant: () => {
-      if (motion.isSettling()) return;
-      translation.stopAnimation(); motion.setDragging(true); motion.setAccepted(false); motion.begin(); gesture.begin();
+      // Entry and snap-back are interruptible presentation. Their native
+      // completion callback must never hold the next card's input hostage.
+      // An already accepted outgoing card still cannot commit another choice.
+      if (motion.isAccepted() || motion.settings().disabled) return;
+      translation.stopAnimation(); motion.setDragging(true); motion.begin(); gesture.begin();
       // Native PanResponder resets dx/dy on grant. The captured displacement
       // already belongs to this finger's movement, including a one-move fling.
       const position = motion.coordinates(0, 0);

@@ -53,6 +53,7 @@ export function createDiscoveryFeed(options: {
   type UndoState = { target: FeedEntry; remaining: FeedAction[]; actionId: string | null;
     restoreRequest: PredictionPageRequest | null; restorePageCount: number; fromHistory: boolean; acknowledgedCount: number };
   let undoing: UndoState | null = null;
+  let previousConsumed = false;
   type ReadTask = { kind: 'buffer'; epoch: number; request: PredictionPageRequest }
     | { kind: 'restore'; epoch: number; request: PredictionPageRequest; restoration: UndoState };
   let pendingRead: ReadTask | null = null;
@@ -67,7 +68,7 @@ export function createDiscoveryFeed(options: {
     state = { ...state, upcoming: [...upcoming], refilling: readingPage,
       loading: readingPage && (advancing || undoing !== null),
       canSkip: Boolean(sourceRequest) && state.source?.acceptsNewSkip !== false && !state.positiveCommitted,
-      canPrevious: (history.length > 0 || actions.length > 0) && pendingActions.size === 0 && !advancing && !state.waitingActionId && !held && !undoing &&
+      canPrevious: !previousConsumed && (history.length > 0 || actions.length > 0) && pendingActions.size === 0 && !advancing && !state.waitingActionId && !held && !undoing &&
         previousActions.every(action => action.kind === 'skip' || action.receipt.undoable),
       navigationPending: undoing !== null || advancing,
       canCancelPrevious: undoing !== null && !readingPage && !state.waitingActionId };
@@ -260,6 +261,9 @@ export function createDiscoveryFeed(options: {
       history.shift();
   }
   function next() {
+    // A new accepted forward choice opens one reverse step. Retained history
+    // is not permission to keep walking backwards after a successful undo.
+    previousConsumed = false;
     remember(); advancing = true; invalidateSource(); actions = []; expected = null;
     state = { ...state, positiveCommitted: false, message: null, exhausted: false };
     promoteBuffered();
@@ -299,6 +303,7 @@ export function createDiscoveryFeed(options: {
     const restoration = undoing;
     const showRestoration = () => {
       if (undoing === restoration && !state.restoringPresentation) {
+        previousConsumed = true;
         state = { ...state, restoringPresentation: { item: restoration.target.delivery.item,
           visualKey: presentationKeyFor(restoration.target.delivery) } };
         publish();
@@ -380,8 +385,7 @@ export function createDiscoveryFeed(options: {
       next(); return true;
     },
     previous() {
-      if (!active || advancing || held || state.waitingActionId || pendingActions.size > 0) return false;
-      if (undoing) return continueUndo();
+      if (!active || previousConsumed || undoing || advancing || held || state.waitingActionId || pendingActions.size > 0) return false;
       const fromHistory = history.length > 0;
       const target = history.at(-1) ?? (state.delivery && actions.length
         ? { delivery: state.delivery, sourceRequest, actions: [] } : null);

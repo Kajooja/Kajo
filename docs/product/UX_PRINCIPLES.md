@@ -355,7 +355,15 @@ is durably admitted, show the cached prior Item immediately as a separate inert
 `restoringPresentation`. It has no actionable origin: mutation controls, impression
 and dwell remain blocked until every ordered acknowledgement and a fresh same-Item
 delivery arrive. Preserve the visual identity through activation, without another
-card flash. Failed local admission leaves the current card; unavailable
+card flash. The October 23 post-#711 refinement permits only one backward step
+between accepted forward choices. The first durable reversal admission consumes
+that opportunity; a failed first local admission does not. Retrying the remaining
+commands of that same partial reversal is recovery, not a second backward step.
+After restoration, forward browsing remains available; only a new accepted
+forward skip/rating or positive-card advance enables Undo again. Background
+acknowledgements, refills and rerenders do not re-enable it. Retain bounded exact
+history without allowing repeated backward traversal. Failed local admission
+leaves the current card; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
 mean infinite history or recycling an exhausted catalogue. Discovery prepares the
@@ -380,7 +388,10 @@ card. Real persistence/rejection/conflict errors retain stable, accessible recov
 until resolved; never hide or discard them to make the feed seem smooth. Avoid
 snap-back/blank transitions, animate entry in the navigation direction and settle
 cancelled drags, respecting reduced motion. Ordinary data updates must not cancel
-a valid in-progress gesture. No separate visible
+a valid in-progress gesture. A new native drag may immediately interrupt entry
+or snap-back animation and follow the thumb; waiting for an animation callback
+must not lock the next card. An accepted outgoing card still cannot commit twice.
+No separate visible
 Ohita or Kumoa button is needed in this feed. Screen-reader/accessibility actions
 provide equivalent advance, reverse and help without permanent control rows.
 A deliberate dismissal requires one-finger vertical intent: at least 96 points
@@ -484,7 +495,8 @@ the bounded star-picker/direct-rating/compact-feed work into the active packet.
 ### October 22 implementation boundary — acceptance open
 
 Discovery's active source preserves exact history action IDs for the mounted
-scope, subject to the existing ten-native-action undo limit. The post-#710
+scope, subject to the existing ten-native-action undo limit and the post-#711
+one-backward-step gate above. The post-#710
 refinement may show the cached prior Item after the first durable undo admission,
 but that originless presentation remains inert. After all required
 undo receipts, it requests fresh canonical pages for the same prior Item (50 per

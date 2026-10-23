@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — immediate undo presentation and continuous refill / #239
+## Current packet — uninterrupted continuation after one-step undo / #239
 
 **Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
 merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the
@@ -40,13 +40,13 @@ or dragging must commit that rating and automatically advance. This supersedes
 
 The active successor is [PR #355](https://github.com/Kajooja/Kajo/pull/355),
 `feat/239-buffered-feed`, based on accepted #354 main and still unmerged.
-Its published head `2adc68e5beebb0eb5827e1caf50e349496239926` passed all five
+Its published head `fe24b13f7b970cc42bb412ff8f3cac39d2112ce7` passed all five
 required gates and the standalone APK job in
-[CI #710](https://github.com/Kajooja/Kajo/actions/runs/39962736369).
-The tested merge checkout `6dc508199b2f4897b09e2d6f0e9654d3ae8dce59` shares source
-tree `47e34ec5f29263da6e28a9225b6e888154e5ca32`; its verified APK is
-[below](#current-test-apk-and-device-work). These receipts precede the new
-post-#710 undo/refill refinement and do not validate its final source.
+[CI #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391).
+The tested merge checkout `6a7bcad2a22acedfea6814ba257b4391caae19b6` shares source
+tree `2c3c5614faf49be9e8bd293ae8165077b5536cdf`; its verified APK is
+[below](#current-test-apk-and-device-work). These receipts validate the immediate
+undo/refill refinement, not the new post-#711 continuation correction.
 
 **Earlier phone feedback — 2026-10-23:** the owner says “Tämä on hyvä” about #707,
 accepting the general layout/rating direction, but scrolling is not smooth.
@@ -65,7 +65,7 @@ immediately while accepted saves persist in the durable queue, without normal
 saving/wait/retry flashes or a brief return to the rated card. This accepts the
 reported gesture/margin improvements, not the entire startup/device matrix.
 
-**Latest #710 phone feedback — 2026-10-23:** undo should feel nearly as fast as
+**Earlier #710 phone feedback — 2026-10-23:** undo should feel nearly as fast as
 forward scrolling. Keep the active card plus five successors; every consumption
 must refill the newly free slot in the background, allowing prediction to follow
 slightly behind browsing. The active design now shows a cached prior Item as
@@ -74,6 +74,27 @@ command is durably admitted. Mutations, impression and dwell stay blocked until
 all ordered acknowledgements and fresh same-Item delivery; activation preserves
 the visual identity. Undo still clears the prepared window, and existing exact
 origins, ordered reversal, rejection and cancellation remain authoritative.
+
+**Latest #711 phone feedback — 2026-10-23:** the owner accepts the overall feel
+(“Nyt toimii täydellisesti”), then reports that continuation after Undo freezes.
+They require one backward step only, with forward reel browsing continuing.
+This accepts the reported feel, not the remaining continuation/startup/device
+matrix. A bounded read-only hosted trace confirms the withdrawn Item was in its
+fresh restoration page, a new skip on that restored origin committed, and the
+following card recorded an impression. An unavailable restoration target is
+therefore not established as the cause of this particular report; the precise
+physical-device lock remains unverified.
+
+The superseding narrow policy consumes feed Undo after the first durable
+reversal admission and rejects another backward step until a new accepted
+forward skip/rating or positive-card advance. Failed first local admission keeps
+the opportunity; retrying remaining commands of the same partial reversal is
+still recovery. Exact bounded history remains, but background acknowledgements,
+refills and rerenders cannot re-enable Undo. Native drags must immediately
+interrupt entry or snap-back motion so an animation callback cannot keep the
+next card locked; an accepted outgoing card still cannot commit twice.
+The same PR #355 owns this correction. New final-source checks, CI, replacement
+APK and targeted phone continuation acceptance remain pending.
 
 The active design explicitly supersedes #709's acknowledgement-gated navigation
 and suppression-only buffer exception. Successful local SQLite admission of an
@@ -111,14 +132,15 @@ registry connection refusal. Final-source CI #710 and its configured APK passed
 all five gates plus the build. These published receipts precede the new
 post-#710 undo/refill refinement; no full device acceptance is inferred.
 
-**Post-#710 local source validation:** implementation is complete and independent
+**Published #711 source validation:** implementation is complete and independent
 review is clean. All 763 mobile tests in 74 files pass, as do the root check's
 lint, type, dependency and catalog stages. Explicit demo iOS and Android exports
 pass. The complete local root check remains blocked by the unchanged Deno
 `deno.lock` dependency request to `registry.npmjs.org/@supabase%2fauth-js`, which
 fails with `Connection refused`; it is not recorded as a full local pass.
-Final-source CI, a replacement configured APK and actual phone acceptance of
-immediate undo presentation and continuous refill remain pending.
+All five final-source CI #711 gates and its configured APK passed on attempt 1.
+The owner's subsequent scoped feedback and remaining continuation defect are
+recorded above. These receipts do not validate the new post-#711 correction.
 
 The published #709 baseline kept the active card plus at most four successors,
 with exact page origins and no prefetch impressions. Neutral skip may retain
@@ -222,7 +244,8 @@ Private target-bound evidence stays outside Git. Do not replay the installed clo
 forward. Actual phone success remains unobserved after this repair.
 
 **Preserved undo and Taste boundaries:** Discovery history retains exact actions
-within the mounted scope and ten-native-action undo limit. The new inert cached
+within the mounted scope and ten-native-action undo limit, with only one
+backward step between accepted forward choices. The new inert cached
 undo presentation may appear after durable admission; it is not a restored
 actionable delivery. After all required confirmed undo receipts,
 it reacquires the same Item through at most three 50-Item canonical pages; it
@@ -235,9 +258,10 @@ questions and still lacks
 numeric backward-question undo. Retained v1/challenge Save and frozen first-answer
 measurement remain unchanged; full interaction/device acceptance remains open.
 
-**One active continuation:** publish the completed immediate undo presentation
-and continuous-refill source in the same PR #355, validate its final-source CI
-and obtain a replacement configured APK for the superseding phone matrix.
+**One active continuation:** repair uninterrupted forward continuation after
+one-step Undo in the same PR #355, validate its final-source CI and obtain a
+replacement configured APK for the superseding phone matrix. The #711
+immediate-undo/continuous-refill source is already published and built.
 Source integration remains separate from build and
 device evidence and requires the final-source gates. No new backend migration
 is needed for this presentation correction. Preserve accounts, ratings, List memberships
@@ -578,7 +602,29 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is [CI #710](https://github.com/Kajooja/Kajo/actions/runs/39962736369),
+The latest verified configured build is [CI #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391),
+PR #355 head `fe24b13f7b970cc42bb412ff8f3cac39d2112ce7`, tested merge checkout
+`6a7bcad2a22acedfea6814ba257b4391caae19b6`, shared tree
+`2c3c5614faf49be9e8bd293ae8165077b5536cdf`. All five required gates and the
+standalone APK job passed on attempt 1; PR #355 remains unmerged.
+
+[APK artifact #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391/artifacts/12511484493),
+`kajo-android-standalone-6a7bcad2a22acedfea6814ba257b4391caae19b6`, expires
+**2026-10-30 15:28:45 UTC**. ZIP: 49,301,660 bytes, SHA-256
+`b6ae066f5b0db691f58b8d8faa111d55b7e4fd77d09831254a53c1f59e017690`.
+Extracted `app-release.apk`: 106,090,187 bytes, SHA-256
+`df27ce0082a1528c3fabf43f5167fab6af4b751e57bdf94a0ba278b2d4489f9e`.
+Archive/APK integrity and the 3,469,424-byte embedded bundle were verified; bundle
+SHA-256 `21f5d425682e444e6b641154c4ac08b09beea0fe0f230fbd191785f17c9dbe04`.
+The bundle contains the inert undo-presentation and feed-RPC/full-card markers;
+the obsolete nested description-scroll marker is absent. The owner accepts the
+overall feel but reports the post-Undo continuation defect above. The new
+one-step-Undo/interruptible-motion correction is not in #711. No installed
+checksum, signer comparison or complete physical-device acceptance is inferred.
+PR #355's final publication receipt will own the correction's exact source,
+checks and replacement artifact, superseding this frozen pre-build checkpoint.
+
+The earlier verified configured build is [CI #710](https://github.com/Kajooja/Kajo/actions/runs/39962736369),
 PR #355 head `2adc68e5beebb0eb5827e1caf50e349496239926`, tested merge checkout
 `6dc508199b2f4897b09e2d6f0e9654d3ae8dce59`, shared tree
 `47e34ec5f29263da6e28a9225b6e888154e5ca32`. All five required gates and the
