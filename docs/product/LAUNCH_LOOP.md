@@ -186,7 +186,9 @@ For Taste, recompute from the acknowledged prefix before the next question; do
 not serve a precomputed fixed test order or retain stale future questions after
 a supported answer. Discovery alone may advance after durable local admission
 and retain its bounded five-successor window across ordinary acknowledgements;
-the first new refill uses the latest committed prefix. This does not precompute
+an already started bounded refill may finish into free slots, with exact retries
+resolved before the next new refill renews from the latest committed prefix.
+This does not precompute
 future Taste questions or change account conversion. Exact retry/current-card
 and prepared Discovery origins remain frozen. The
 [next-card objective](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)

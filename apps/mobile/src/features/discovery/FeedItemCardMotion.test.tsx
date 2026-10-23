@@ -4,6 +4,7 @@ import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedItemCard } from './FeedItemCard';
 import { RollingFeedCard } from './RollingFeedCard';
+import { ItemDescription } from './ItemDescription';
 import { getRoomTheme } from '../../theme/roomTheme';
 
 const fixture = vi.hoisted(() => ({
@@ -321,5 +322,53 @@ describe('mounted feed card motion', () => {
     const previous = renderer!.root.findByProps({ testID: 'feed-previous-preview' });
     expect(previous.props.style).toContainEqual({ top: -932, height: 932 });
     expect(previous.findByType(FeedItemCard).props.initialDescriptionHeight).toBe(500);
+  });
+
+  it('keeps a historical return preview mounted when its fresh delivery becomes actionable, without replaying entry', async () => {
+    const onSkip = vi.fn(() => true); const onPrevious = vi.fn(() => true);
+    const previous = { ...base.item, id: 'previous', title: 'Previous' };
+    await act(async () => {
+      renderer = create(<RollingFeedCard {...base} opportunity="current-page" onSkip={onSkip} onPrevious={onPrevious} />);
+    });
+    const beforeEntry = fixture.animations.length;
+    await act(async () => {
+      renderer!.update(<RollingFeedCard {...base} item={previous} opportunity="restore-previous" entryDirection="backward"
+        disabled onSkip={onSkip} onPrevious={onPrevious} />);
+    });
+    const restoredCard = renderer!.root.findByType(FeedItemCard);
+    const translation = surface().props.style.at(-1).transform[0].translateY;
+    expect(translation).toMatchObject({ initial: -64, value: 0 });
+    expect(fixture.animations.slice(beforeEntry)).toEqual([
+      expect.objectContaining({ kind: 'timing', toValue: 0, useNativeDriver: true }),
+    ]);
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(false);
+    await act(async () => {
+      const summary = renderer!.root.findByProps({ testID: 'feed-accessibility-summary' });
+      summary.props.onAccessibilityAction({ nativeEvent: { actionName: 'increment' } });
+      summary.props.onAccessibilityAction({ nativeEvent: { actionName: 'decrement' } });
+      renderer!.root.findByType(ItemDescription).props.onExpandedChange(true);
+    });
+    await act(async () => {
+      renderer!.root.findByProps({ testID: 'feed-description-content' }).props.onLayout({ nativeEvent: { layout: { height: 500 } } });
+    });
+    expect(onSkip).not.toHaveBeenCalled(); expect(onPrevious).not.toHaveBeenCalled();
+    const valueCount = fixture.values.length; const animationCount = fixture.animations.length;
+    const fresh = { ...previous, creators: ['Fresh metadata'] };
+    await act(async () => {
+      renderer!.update(<RollingFeedCard {...base} item={fresh} opportunity="restore-previous" entryDirection="backward"
+        onSkip={onSkip} onPrevious={onPrevious} />);
+    });
+    expect(renderer!.root.findByType(FeedItemCard)).toBe(restoredCard);
+    expect(surface().props.style.at(-1).transform[0].translateY).toBe(translation);
+    expect(translation.value).toBe(0);
+    expect(fixture.values).toHaveLength(valueCount); expect(fixture.animations).toHaveLength(animationCount);
+    expect(renderer!.root.findByType(ItemDescription).props.expanded).toBe(true);
+    expect(surface().props.style).toContainEqual({ height: 932 });
+    expect(restoredCard.props.item).toBe(fresh);
+    expect(renderer!.root.findByProps({ testID: 'feed-accessibility-summary' }).props.accessibilityState.disabled).toBe(false);
+    await act(async () => {
+      renderer!.root.findByProps({ testID: 'feed-accessibility-summary' }).props.onAccessibilityAction({ nativeEvent: { actionName: 'increment' } });
+    });
+    expect(onSkip).toHaveBeenCalledOnce(); expect(onPrevious).not.toHaveBeenCalled();
   });
 });

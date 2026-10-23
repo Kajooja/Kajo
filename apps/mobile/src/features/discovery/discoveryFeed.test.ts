@@ -125,23 +125,29 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(9) }, source: null, message: null });
     expect(f.submit).toHaveBeenCalledOnce(); f.flow.stop();
   });
-  it('withdraws an exact acknowledged skip before restoring the previous card', async () => {
+  it('previews the exact previous Item after undo admission but grants no origin until fresh restoration', async () => {
     const f = fixture(); f.flow.displayed(id(4), id(6)); await flush();
     expect(f.flow.advance()).toBe(true);
     const skip = f.submit.mock.calls[0]![0]; f.flow.acknowledged(skip.actionId); await flush();
     expect(f.flow.snapshot().canPrevious).toBe(true);
+    const outgoing = f.flow.snapshot().delivery;
     expect(f.flow.previous()).toBe(true);
     const withdrawal = f.submit.mock.calls[1]![0];
     expect(withdrawal).toMatchObject({ ...skip, actionId: expect.any(String),
       kind: 'WITHDRAW_CONTEXTUAL_SKIP', reversesActionId: skip.actionId });
     expect(withdrawal.actionId).not.toBe(skip.actionId);
-    expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
+    const preview = f.flow.snapshot().restoringPresentation;
+    expect(preview).toMatchObject({ item: initial.item, visualKey: expect.any(String) });
+    expect(f.flow.snapshot()).toMatchObject({ delivery: outgoing, navigationPending: true, canSkip: false });
+    f.flow.displayed(initial.item.id, initial.origin.deliveryRequestId!);
+    f.flow.displayed(outgoing!.item.id, outgoing!.origin.deliveryRequestId!);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
     expect(f.flow.advance()).toBe(false); expect(f.flow.previous()).toBe(false);
     f.flow.acknowledged(id(999)); expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
     f.flow.acknowledged(withdrawal.actionId); await flush();
     expect(f.flow.snapshot().delivery?.item).toEqual(initial.item);
     expect(f.flow.snapshot().delivery?.origin.deliveryRequestId).not.toBe(initial.origin.deliveryRequestId);
-    expect(f.flow.snapshot().canPrevious).toBe(false);
+    expect(f.flow.snapshot()).toMatchObject({ canPrevious: false, restoringPresentation: null, presentationKey: preview!.visualKey });
     expect(f.recordImpression).toHaveBeenCalledOnce(); f.flow.stop();
   });
   it('waits for every rating and List undo receipt and never adds skip to a positive card', async () => {
@@ -167,15 +173,20 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     f.flow.positiveReceipt({ actionId: id(81), itemId: id(4), undoable: true });
     f.flow.advance(); await flush();
     f.flow.previous();
+    const preview = f.flow.snapshot().restoringPresentation;
+    expect(preview).toMatchObject({ item: initial.item, visualKey: expect.any(String) });
     f.undoPositive.mockReturnValueOnce(false);
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]);
     expect(f.flow.snapshot().waitingActionId).toBeNull();
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
+    expect(f.flow.snapshot().restoringPresentation).toEqual(preview);
     f.flow.retry();
+    expect(f.flow.snapshot().restoringPresentation).toEqual(preview);
     expect(f.undoPositive.mock.calls.map(([receipt]) => receipt.actionId)).toEqual([id(81), id(80), id(80)]);
     f.flow.acknowledged(f.undoPositive.mock.calls[2]![1]); await flush();
     expect(f.flow.snapshot().delivery?.item).toEqual(initial.item);
-    expect(f.flow.snapshot().delivery?.origin.deliveryRequestId).not.toBe(initial.origin.deliveryRequestId); f.flow.stop();
+    expect(f.flow.snapshot().delivery?.origin.deliveryRequestId).not.toBe(initial.origin.deliveryRequestId);
+    expect(f.flow.snapshot()).toMatchObject({ restoringPresentation: null, presentationKey: preview!.visualKey }); f.flow.stop();
   });
   it('undoes edits on the current card before undoing the previous card', async () => {
     const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
@@ -233,12 +244,15 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     f.load.mockResolvedValueOnce({ status: 'error', message: 'lost restoration reply', recovery: 'retry' } as never);
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]); await flush();
     const request = f.load.mock.calls.at(-1)![0];
+    const preview = f.flow.snapshot().restoringPresentation;
+    expect(preview).toMatchObject({ item: initial.item });
     expect(f.flow.snapshot()).toMatchObject({ navigationPending: true, canCancelPrevious: true });
     expect(f.flow.advance()).toBe(false);
     f.flow.retry(); await flush();
     expect(f.load.mock.calls.at(-1)![0]).toBe(request);
     expect(f.undoPositive).toHaveBeenCalledOnce();
-    expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, delivery: { item: initial.item } }); f.flow.stop();
+    expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, delivery: { item: initial.item },
+      restoringPresentation: null, presentationKey: preview!.visualKey }); f.flow.stop();
   });
   it('bounds absent-target restoration to three real pages and offers fresh-feed recovery', async () => {
     const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80));
@@ -247,20 +261,51 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]); await flush(); await flush();
     expect(f.load).toHaveBeenCalledTimes(4); // Forward + three restoration pages.
     expect(f.flow.snapshot()).toMatchObject({ navigationPending: true, canCancelPrevious: true, delivery: { item: item(9) } });
+    expect(f.flow.snapshot().restoringPresentation).toMatchObject({ item: initial.item });
     expect(f.flow.cancelPrevious()).toBe(true); await flush();
     expect(f.undoPositive).toHaveBeenCalledOnce();
-    expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, delivery: { item: item(99) } }); f.flow.stop();
+    expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, delivery: { item: item(99) }, restoringPresentation: null }); f.flow.stop();
   });
   it('declines nonreversible Shared actions before entering navigation and releases a failed first guard', async () => {
     const f = fixture(); f.flow.positiveReceipt({ actionId: id(80), itemId: id(4), undoable: false });
     f.flow.advance(); await flush();
     expect(f.flow.snapshot().canPrevious).toBe(false);
-    expect(f.flow.previous()).toBe(false); expect(f.flow.snapshot().navigationPending).toBe(false);
+    expect(f.flow.previous()).toBe(false); expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, restoringPresentation: null });
     f.flow.stop();
     const g = fixture(); g.flow.expectPositive(id(80)); g.flow.acknowledged(id(80)); g.flow.advance(); await flush();
+    const currentKey = g.flow.snapshot().presentationKey;
     g.undoPositive.mockReturnValue(false);
-    expect(g.flow.previous()).toBe(false); expect(g.flow.snapshot().navigationPending).toBe(false);
+    expect(g.flow.previous()).toBe(false);
+    expect(g.flow.snapshot()).toMatchObject({ navigationPending: false, restoringPresentation: null, presentationKey: currentKey });
     g.flow.positiveCommitted(); expect(g.flow.advance()).toBe(true); g.flow.stop();
+  });
+  it('clears a provisional undo presentation when its rejected command is explicitly discarded', async () => {
+    const f = fixture(); f.flow.displayed(initial.item.id, initial.origin.deliveryRequestId!); await flush();
+    expect(f.flow.advance()).toBe(true);
+    f.flow.acknowledged(f.submit.mock.calls[0]![0].actionId); await flush();
+    expect(f.flow.previous()).toBe(true);
+    const withdrawal = f.submit.mock.calls[1]![0];
+    expect(f.flow.snapshot().restoringPresentation).toMatchObject({ item: initial.item });
+    expect(f.flow.snapshot().waitingActionId).toBe(withdrawal.actionId);
+    f.flow.recoverRejected('skip', withdrawal.actionId);
+    expect(f.flow.snapshot().restoringPresentation).toBeNull();
+    expect(f.flow.snapshot().waitingActionId).toBeNull();
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    await flush(); f.flow.stop();
+  });
+  it('can preview a history entry with no undo command without manufacturing a new exposure', async () => {
+    const f = fixture(); f.flow.positiveCommitted(); expect(f.flow.advance()).toBe(true); await flush();
+    const outgoing = f.flow.snapshot().delivery;
+    expect(f.flow.previous()).toBe(true);
+    const preview = f.flow.snapshot().restoringPresentation;
+    expect(preview).toMatchObject({ item: initial.item, visualKey: expect.any(String) });
+    expect(f.flow.snapshot()).toMatchObject({ delivery: outgoing, navigationPending: true, canSkip: false });
+    expect(f.submit).not.toHaveBeenCalled(); expect(f.undoPositive).not.toHaveBeenCalled();
+    expect(f.recordImpression).not.toHaveBeenCalled();
+    await flush();
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: initial.item }, restoringPresentation: null,
+      presentationKey: preview!.visualKey, navigationPending: false });
+    expect(f.recordImpression).not.toHaveBeenCalled(); f.flow.stop();
   });
   it('ignores a restoration result after unmount', async () => {
     const f = fixture(); f.flow.expectPositive(id(80)); f.flow.acknowledged(id(80)); f.flow.advance(); await flush();
@@ -268,6 +313,7 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
     f.flow.acknowledged(f.undoPositive.mock.calls[0]![1]);
     const request = f.load.mock.calls.at(-1)![0]; f.flow.stop(); later.resolve(page(request, item(4))); await flush();
     expect(f.flow.snapshot().delivery?.item.id).toBe(id(9));
+    expect(f.flow.snapshot().restoringPresentation).toBeNull();
   });
   it('drops a source failure that arrives after a positive choice was acknowledged', async () => {
     const f = fixture(); const later = deferred<DiscoverySkipSource>();

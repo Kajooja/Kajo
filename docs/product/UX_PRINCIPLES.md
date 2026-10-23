@@ -350,18 +350,27 @@ accessible.
 Forward/upward card scrolling advances one Item at a time; without an already
 accepted positive action it submits contextual Ohita. Backward/downward scrolling restores
 the preceding card and reverses its exact eligible action through the existing
-canonical undo/withdrawal boundary. Restore only after acknowledgement; unavailable
+canonical undo/withdrawal boundary. After the first exact undo/withdrawal command
+is durably admitted, show the cached prior Item immediately as a separate inert
+`restoringPresentation`. It has no actionable origin: mutation controls, impression
+and dwell remain blocked until every ordered acknowledgement and a fresh same-Item
+delivery arrive. Preserve the visual identity through activation, without another
+card flash. Failed local admission leaves the current card; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
 mean infinite history or recycling an exhausted catalogue. Discovery prepares the
-active card plus up to five successors, replenishing one in the background
-as browsing advances. The next card becomes visible during the upward drag, but
+active card plus up to five successors, warming five initially and refilling
+free slots after every consumption. One free slot admits one replacement even
+though the immutable wire page size stays five; no extra staging window is kept.
+The next card becomes visible during the upward drag, but
 its preview is inert and creates no impression or action capability. Activate it
 after successful durable local admission of the outgoing skip/rating, with its
 server acknowledgement handled in the background. Normal acknowledgements retain
-the prepared window: rating/List receipts renew future read work, while neutral
-skip receipts keep the existing reader because they add no learning evidence;
-new refills consume the latest committed state. Undo, scope/source invalidation
+the prepared window: rating/List receipts mark future read work dirty, while
+an already started refill or exact retry may finish and fill only free slots.
+Renew the root from the latest committed prefix before the next new refill;
+coalesce repeated acknowledgements rather than repeatedly interrupt loading.
+Neutral skip keeps its reader because it adds no learning evidence. Undo, scope/source invalidation
 and rejected-command discard still clear the window. The prediction contract
 owns this explicit bounded freshness tradeoff. Retain the outgoing card as an
 inert presentation only when no prepared successor is available; exact retries
@@ -435,8 +444,10 @@ Ratings and acknowledged positive choices must refresh the supported serving
 prefix before the next Taste question or newly requested Discovery refill.
 Discovery retains at most five already prepared successors with their frozen
 origins across ordinary acknowledgements, so the next visible card may predate
-the latest rating. Rating/List acknowledgements retire old cursor/in-flight read
-generations; neutral skip retains its reader. Do not shuffle
+the latest rating. Rating/List acknowledgements schedule a renewed root before
+the next new refill without interrupting the already started bounded refill or
+its exact retry; neutral skip retains its reader. Hard invalidation still rejects
+late responses. Do not shuffle
 the retained window or jump the card under the user's finger. Grid order follows
 the same committed-state freshness rules when
 a fresh ranking is requested. The
@@ -473,8 +484,10 @@ the bounded star-picker/direct-rating/compact-feed work into the active packet.
 ### October 22 implementation boundary — acceptance open
 
 Discovery's active source preserves exact history action IDs for the mounted
-scope, subject to the existing ten-native-action undo limit. After each required
-undo receipt, it requests fresh canonical pages for the same prior Item (50 per
+scope, subject to the existing ten-native-action undo limit. The post-#710
+refinement may show the cached prior Item after the first durable undo admission,
+but that originless presentation remains inert. After all required
+undo receipts, it requests fresh canonical pages for the same prior Item (50 per
 page, at most three pages). A consumed/expired original delivery is never reused.
 An unavailable target has retry/cancel recovery; cancellation starts a fresh feed
 instead of silently showing a substitute as the requested previous card. Shared

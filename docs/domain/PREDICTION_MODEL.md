@@ -244,10 +244,12 @@ change. The latest state drives later predictions, while every already-delivered
 PredictionRun and its delayed-outcome attribution remain immutable.
 
 The native continuation must prove that the first new ranking request after an
-acknowledged action consumes its committed prefix. A pre-action slower response
-cannot enter the new read generation; frozen pagination cannot silently rescore
-an old page. Discovery's bounded prepared window may retain already admitted
-frozen deliveries under section 8.2, without claiming they were freshly reranked.
+acknowledged action consumes its committed prefix. Discovery may finish one already
+started bounded refill, including its exact retry, and admit only free successor
+slots under section 8.2. Ordinary acknowledgement marks the next new request for
+renewal; hard scope/source/undo/discard invalidation still rejects late replies.
+Frozen pagination cannot silently rescore an old page. Prepared deliveries retain
+their original forecasts without claiming they were freshly reranked.
 Continue exact pending-request retries first, then request a new prediction with
 its own origin. This acceptance applies to grid and swipe,
 BOOK and MOVIE, and explicit changes of DiscoveryMode, session or Profile.
@@ -876,8 +878,9 @@ current-chain seen sets keep preventing loops even after cooldown expiry.
 
 Neutral Events do not become value/recognition/outcome evidence or consume the
 Working input budget. The native transaction gate orders skip acceptance with
-serving/source erasure. The client must retire stale undelivered generations upon
-acknowledgement before activating a feed control. Presentation origin plumbing,
+serving/source erasure. Discovery's bounded preparation/admission rules in 8.2
+govern client activation and future-reader renewal; neutral skip alone does not
+invalidate its reader. Presentation origin plumbing,
 phone usefulness and any real Scenario-based early return remain open; a passing
 native fixture is not quality, model admission or hosted deployment.
 
@@ -906,10 +909,12 @@ across empty Profiles is not alone a defect.
 
 Freeze the forecast before its answer. Taste commits and acknowledges that answer
 before requesting the next adaptive question. In Discovery, learning-changing
-rating/List acknowledgements advance the read generation and retire its old
-cursor; neutral skip acknowledgements retain the reader because they add no
-learning evidence. A superseded late response cannot
-append to the new generation. Bounded eligible pools must support
+rating/List acknowledgements mark the future reader dirty without cancelling an
+already started bounded refill. Multiple acknowledgements coalesce; exact pending
+retries finish first, then the next new refill request renews the root from the
+latest committed prefix. Neutral skip retains the reader because it adds no
+learning evidence. Hard scope/source/undo/discard invalidation still rejects late
+responses. Bounded eligible pools must support
 versioned refresh/refill as the current supported state changes, rather than
 locking the whole future feed to one START-time slate. Freeze each new scoring
 panel/pool and retain the original panels for historical same-prefix comparisons.
@@ -924,14 +929,19 @@ state/forecast semantics without requiring identical selection policies.
 The October 23 owner refinement after #709 supersedes the earlier suppression-only
 exception. Discovery keeps the active delivery plus at most **five prepared
 successors**, each with its original frozen Prediction/page origin. Background
-rating/List acknowledgement renews future reads while neutral skip retains its
-reader. Neither clears nor
+rating/List acknowledgement schedules renewal before the next new read while
+neutral skip retains its reader. Neither clears nor
 reorders that already prepared window, replaces the active/adjacent card or retargets
 an accepted command.
 Each newly started refill root uses the latest canonical committed prefix, then
 preserves server order while excluding current, queued, already displayed and
-locally handled pending Item IDs. Do not fill from a superseded in-flight response,
-locally rescore frozen candidates or expand the retained window beyond the bound.
+locally handled pending Item IDs. An in-flight refill that crosses ordinary
+acknowledgements may fill only the currently free successor slots, retaining its
+frozen origin. Initially warm five successors; every consumption schedules a
+background refill, and one free slot admits one Item. The v3 wire page limit stays
+five for the chain; do not switch to one-Item pages, locally rescore candidates or
+create an extra staging window beyond the five successors. Replies invalidated
+by undo, scope/source change or explicit rejected-command discard cannot fill slots.
 
 This is an explicit latency/freshness tradeoff: up to five prepared successors
 can predate a later acknowledgement. The next visible Discovery card is therefore
@@ -942,7 +952,12 @@ are not confirmed learning and cannot enter server state as if committed. Actual
 readiness, rejection, exact retry and source-erasure constraints remain authoritative.
 Undo, scope changes, source withdrawal and rejected-command discard still
 invalidate the entire prepared window; undo retains exact receipt reversal and
-same-Item reacquisition. List addition/undo admission waits for pending commands
+same-Item reacquisition. Undo may show a separate cached `restoringPresentation`
+after the first exact undo/withdrawal command is durably admitted. It has no
+actionable delivery origin and cannot admit mutations, impression or dwell until
+all ordered undo receipts and a fresh same-Item delivery arrive; activation keeps
+the same visual identity. This presentation shortcut does not weaken server
+truth, exact retries or rejection/cancellation boundaries. List addition/undo admission waits for pending commands
 to settle, without turning ordinary forward browsing into an acknowledgement gate.
 Prefetch and an inert adjacent preview are not impressions; actual activation
 records exposure with the retained origin. This Discovery-only preparation policy
@@ -1755,9 +1770,11 @@ Random train/test splits are forbidden for sequential behavior. Use chronologica
   prove selector consumption of updated canonical scores in the next Taste
   question and first newly requested Discovery refill after acknowledgement,
   while preserving unavailable support and bounded domain coverage.
-- Taste rejects stale future questions; Discovery rejects superseded in-flight
-  replies but preserves at most five already prepared successors across later
-  acknowledgements. Verify this explicit freshness delay, exact frozen origins,
+- Taste rejects stale future questions; Discovery may finish its already started
+  bounded refill across ordinary acknowledgements, filling only free slots, and
+  preserves at most five prepared successors. The next new request uses a renewed
+  latest-prefix root; hard invalidation still rejects late replies. Verify this
+  explicit freshness delay, exact frozen origins,
   latest-prefix refill, retry/restart and Profile-scoped isolation.
 - Completed Ohita gestures suppress contextually exactly once; partial/cancelled
   scrolls do not. Versioned Scenario-based resurfacing preserves hard eligibility,
@@ -2024,9 +2041,18 @@ choose a different page size; ordinary continuation still uses the immutable v3
 size/context contract. The feed uses bounded five-Item pages to warm/refill up to
 five successors, preserving server order after exclusions and admitting no extra
 staging window. Excess fetched candidates may remain unshown; page delivery is
-not exposure. Learning-changing rating/List acknowledgement retires future cursor
-work, not the immutable origins of already prepared or displayed cards. Neutral
+not exposure. Learning-changing rating/List acknowledgement marks future cursor
+work dirty without aborting the active bounded refill or its exact retry. Before
+the next new request, coalesced renewal replaces the root from the latest prefix;
+prepared/displayed origins remain immutable. Neutral
 skip acknowledgement keeps the existing reader and suppression-only continuation.
+
+If that pending refill is proven expired/unusable (`recovery: refresh`) after
+ordinary acknowledgement already marked its reader dirty, retire the unusable
+request and continue the scheduled fresh root quietly, preserving prepared cards.
+No error response supplies candidates. An unusable cursor without pending renewal
+keeps explicit refresh/recovery; scope/source/undo/discard invalidation still
+rejects all late work. An ambiguous transport failure retains exact retry identity.
 
 A separate immutable receipt binds the full feed envelope. Its exact retry
 returns the original underlying v3 response, including after reader retirement;

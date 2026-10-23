@@ -343,14 +343,30 @@ with source erasure and serving; this is a correctness tradeoff, not a measured
 throughput claim. Legacy removal/history-clearing entries that reach these
 erasers also acquire the exclusive gate before existing row locks; other
 ordinary actions retain shared locking. Earlier frozen forecasts/delivered receipts remain historical.
-Learning-changing rating/List acknowledgement retires old read/cursor generations;
-neutral skip acknowledgement retains the reader. The October 23
+Learning-changing rating/List acknowledgement marks the future reader dirty;
+the already started bounded refill and its exact retries may finish and fill only
+free slots. Coalesce acknowledgements and renew the root from the latest committed
+prefix before the next new refill. Neutral skip acknowledgement retains the reader. The October 23
 Discovery refinement retains the active card and at most five already prepared
 successors across ordinary rating/skip/List acknowledgements, with each frozen
 page origin intact. New refills use the latest committed prefix; this bounded
 latency/freshness tradeoff supersedes the earlier suppression-only exception.
 Undo, scope changes, source withdrawal and rejected-command discard still
 invalidate the prepared window and preserve canonical restoration requirements.
+
+After successful durable admission of the first exact undo/withdrawal command,
+Discovery may immediately display the prior Item's cached appearance in a separate
+`restoringPresentation`. This is not a restored delivery and has no actionable
+origin. It cannot produce impression/dwell or accept mutations until all ordered
+undo receipts and fresh delivery of the same Item have been obtained. Keep its
+visual identity on activation. Exact action origins, partial-undo retry, rejection
+and cancellation remain authoritative; showing the preview is not undo success.
+
+A proven unusable/expired pending refill may retire quietly when ordinary
+acknowledgement already scheduled reader renewal, retaining the prepared window
+and continuing that fresh root without admitting the error response. Without
+scheduled renewal, existing explicit refresh/recovery remains. Ambiguous failures
+still retry their exact request; hard invalidation always rejects late results.
 
 Mobile routing validates capabilities and every receipt identity before clearing
 a persisted command. Taste shares its existing one-command queue; Discovery has
@@ -1202,8 +1218,10 @@ The October 23 continuous-feed refinement prepares at most five upcoming
 Discovery cards beside the active card. An adjacent preview remains inert and
 accessibility-hidden; it cannot record an impression or acquire skip capability.
 On activation, the card retains its original Prediction/page origin. Ordinary
-rating/List acknowledgements renew future reads while neutral skip retains the
-reader; neither clears this prepared window. Undo/scope/source invalidation and rejected-command discard
+rating/List acknowledgements mark future reads dirty without aborting the bounded
+refill already in flight; it may admit only currently free slots. Exact retries
+precede the next new latest-prefix root. Neutral skip retains the reader; neither
+clears this prepared window. Undo/scope/source invalidation and rejected-command discard
 remain hard boundaries. Deduplicate new refills against current, queued,
 displayed and locally handled pending Item IDs while preserving server order.
 `rank_items_feed_v1` atomically replaces

@@ -9,6 +9,7 @@ export interface FeedDelivery { item: Item; origin: DeliveredItemOrigin }
 export interface FeedPositiveReceipt { actionId: string; itemId: string; undoable: boolean }
 export interface DiscoveryFeedSnapshot {
   delivery: FeedDelivery | null; source: DiscoverySkipSource | null;
+  presentationKey: string; restoringPresentation: { item: Item; visualKey: string } | null;
   loading: boolean; message: string | null; exhausted: boolean;
   waitingActionId: string | null; recovery: 'retry' | 'refresh';
   positiveCommitted: boolean; canPrevious: boolean; navigationPending: boolean; canCancelPrevious: boolean;
@@ -20,7 +21,8 @@ interface FeedEntry { delivery: FeedDelivery; sourceRequest: DiscoverySkipSource
 
 // Local admission is durable before navigation. Keep each action on its original
 // displayed delivery while its server receipt arrives in the background. Undo
-// waits for those receipts; prepared cards are never impressions.
+// waits for those receipts before another actionable delivery, but can show its
+// cached Item immediately. Prepared cards and restoration visuals are not exposure.
 export function createDiscoveryFeed(options: {
   initial: FeedDelivery; scope: { actorUserId: string; profileId: string; sessionId: string; mode: DiscoveryMode };
   createId: () => string; nowMicros: () => string;
@@ -35,7 +37,9 @@ export function createDiscoveryFeed(options: {
 }) {
   let active = false; let sourceGeneration = 0; let rankingEpoch = 0;
   const controllers = { source: null as AbortController | null, page: null as AbortController | null };
-  let state: DiscoveryFeedSnapshot = { delivery: options.initial, source: null, loading: false,
+  const presentationKeyFor = (delivery: FeedDelivery) => `${delivery.item.id}:${delivery.origin.deliveryRequestId ?? ''}`;
+  let state: DiscoveryFeedSnapshot = { delivery: options.initial, source: null,
+    presentationKey: presentationKeyFor(options.initial), restoringPresentation: null, loading: false,
     message: null, exhausted: false, waitingActionId: null, recovery: 'retry', positiveCommitted: false,
     canPrevious: false, navigationPending: false, canCancelPrevious: false, canSkip: false, upcoming: [], refilling: false, refillError: null };
   let held = false; let advancing = false; let warmed = false;
@@ -55,6 +59,7 @@ export function createDiscoveryFeed(options: {
   let readingPage = false; let readerBlocked = false;
   let chainId: string | null = null;
   let bufferPage: PredictionPage | null = null; let bufferEnded = false; let duplicatePages = 0;
+  let readerNeedsRefresh = false;
   let upcoming: FeedDelivery[] = [];
   const snapshot = () => ({ ...state, upcoming: [...upcoming] });
   const publish = () => {
@@ -72,8 +77,8 @@ export function createDiscoveryFeed(options: {
     sourceGeneration++; controllers.source?.abort(); readingSource = false; sourceAgain = false;
     sourceRequest = null; state = { ...state, source: null };
   };
-  function invalidateBuffer(keepPrepared = false) {
-    rankingEpoch++; readerBlocked = false; if (!keepPrepared) upcoming = []; bufferPage = null; bufferEnded = false; duplicatePages = 0;
+  function invalidateBuffer() {
+    rankingEpoch++; readerNeedsRefresh = false; readerBlocked = false; upcoming = []; bufferPage = null; bufferEnded = false; duplicatePages = 0;
     state = { ...state, refillError: null };
     // Do not discard or abort an ambiguous page. A root may already have created
     // a server reader. Resolve its exact receipt before replacing that chain;
@@ -127,9 +132,13 @@ export function createDiscoveryFeed(options: {
   function promoteBuffered() {
     if (!advancing || state.waitingActionId || undoing) return;
     const delivery = upcoming.shift();
-    if (!delivery && !bufferEnded) return;
+    // An exhausted older prefix cannot end forward navigation while an
+    // acknowledged choice has already scheduled a fresh reader.
+    if (!delivery && (!bufferEnded || readerNeedsRefresh)) return;
     advancing = false; invalidateSource(); actions = []; expected = null;
-    state = { ...state, delivery: delivery ?? null, positiveCommitted: false, exhausted: !delivery,
+    state = { ...state, delivery: delivery ?? null,
+      ...(delivery ? { presentationKey: presentationKeyFor(delivery) } : {}), restoringPresentation: null,
+      positiveCommitted: false, exhausted: !delivery,
       waitingActionId: null, message: null, recovery: 'retry' }; publish();
   }
   function taskWanted(): ReadTask | null {
@@ -139,7 +148,13 @@ export function createDiscoveryFeed(options: {
       undoing.restoreRequest ??= options.createRestoreRequest(chainId);
       return { kind: 'restore', epoch: rankingEpoch, request: undoing.restoreRequest, restoration: undoing };
     }
-    if ((!warmed && !advancing) || bufferEnded || upcoming.length >= 5) return null;
+    if ((!warmed && !advancing) || upcoming.length >= 5) return null;
+    // Ordinary receipts never throw away a useful in-flight refill. Coalesce
+    // them until the next NEW request; exact pending retries finish first.
+    if (readerNeedsRefresh) {
+      readerNeedsRefresh = false; bufferPage = null; bufferEnded = false; duplicatePages = 0;
+    }
+    if (bufferEnded) return null;
     const request = bufferPage?.nextCursor
       ? createNextPredictionPageRequest(bufferPage, options.createId()) : options.createRequest(chainId, 5);
     return { kind: 'buffer', epoch: rankingEpoch, request };
@@ -162,6 +177,10 @@ export function createDiscoveryFeed(options: {
           // The server proved this cursor unusable; a new root is now permitted.
           pendingRead = null;
           if (task.epoch !== rankingEpoch) return;
+          // A refresh was already scheduled by an ordinary receipt. This cursor
+          // is now proven unusable, so proceed to that new root quietly without
+          // clearing the still-valid prepared presentation window.
+          if (task.kind === 'buffer' && readerNeedsRefresh) return;
           if (task.kind === 'restore') { task.restoration.restoreRequest = null; task.restoration.restorePageCount = 0; }
           else { bufferPage = null; bufferEnded = false; upcoming = []; }
         }
@@ -192,9 +211,11 @@ export function createDiscoveryFeed(options: {
         if (restoration.fromHistory) history.pop();
         undoing = null; advancing = false; actions = []; invalidateSource();
         // The restoration has a 50-item reader. The next warm root replaces it
-        // with the one-at-a-time feed reader; no old restoration sibling is shown.
+        // with the bounded feed reader; no old restoration sibling is shown.
         bufferPage = null; bufferEnded = false; upcoming = [];
-        state = { ...state, delivery: deliveryFrom(result, item), positiveCommitted: false,
+        state = { ...state, delivery: deliveryFrom(result, item),
+          presentationKey: state.restoringPresentation?.visualKey ?? presentationKeyFor(restoration.target.delivery),
+          restoringPresentation: null, positiveCommitted: false,
           exhausted: false, waitingActionId: null, message: null, recovery: 'retry' };
         return;
       }
@@ -227,7 +248,7 @@ export function createDiscoveryFeed(options: {
   function refresh() {
     if (!active || state.waitingActionId) return;
     held = false; advancing = true; invalidateSource(); invalidateBuffer(); actions = []; expected = null;
-    state = { ...state, exhausted: false, message: null, waitingActionId: null,
+    state = { ...state, exhausted: false, message: null, waitingActionId: null, restoringPresentation: null,
       positiveCommitted: false, recovery: 'retry' };
     publish(); void fillBuffer();
   }
@@ -246,7 +267,7 @@ export function createDiscoveryFeed(options: {
     publish(); void fillBuffer();
   }
   function positiveChanged() {
-    invalidateSource(); invalidateBuffer(true);
+    invalidateSource(); readerNeedsRefresh = true;
     state = { ...state, positiveCommitted: true, message: null }; publish();
     void fillBuffer();
   }
@@ -275,8 +296,16 @@ export function createDiscoveryFeed(options: {
   }
   function continueUndo(): boolean {
     if (!undoing) return false;
+    const restoration = undoing;
+    const showRestoration = () => {
+      if (undoing === restoration && !state.restoringPresentation) {
+        state = { ...state, restoringPresentation: { item: restoration.target.delivery.item,
+          visualKey: presentationKeyFor(restoration.target.delivery) } };
+        publish();
+      }
+    };
     const action = undoing.remaining.at(-1);
-    if (!action) { void fillBuffer(); return true; }
+    if (!action) { showRestoration(); void fillBuffer(); return true; }
     const actionId = options.createId();
     undoing.actionId = actionId;
     state = { ...state, waitingActionId: actionId, message: null }; publish();
@@ -284,7 +313,7 @@ export function createDiscoveryFeed(options: {
       ? options.submit({ ...action.command, kind: 'WITHDRAW_CONTEXTUAL_SKIP', actionId,
         reversesActionId: action.command.actionId, occurredAt: options.nowMicros() })
       : action.receipt.undoable && options.undoPositive?.(action.receipt, actionId) === true;
-    if (accepted) return true;
+    if (accepted) { showRestoration(); return true; }
     undoing.actionId = null;
     if (undoing.acknowledgedCount === 0) undoing = null;
     state = { ...state, waitingActionId: null, message: 'Edellistä valintaa ei voitu kumota. Yritä uudelleen.', recovery: 'retry' }; publish();
@@ -296,7 +325,7 @@ export function createDiscoveryFeed(options: {
     if (background) {
       pendingActions.delete(actionId);
       if (background.kind === 'positive') {
-        invalidateBuffer(true);
+        readerNeedsRefresh = true;
         // A fresh committed prefix can have new eligible candidates after the
         // previous reader ended. There is no active card to preserve here.
         if (!state.delivery && state.exhausted) advancing = true;
@@ -318,7 +347,7 @@ export function createDiscoveryFeed(options: {
     if (completed?.kind === 'positive') {
       actions.push({ kind: 'positive', receipt: { actionId, itemId: state.delivery!.item.id, undoable: true } });
       handledItems.add(state.delivery!.item.id);
-      invalidateBuffer(true); invalidateSource(); next();
+      readerNeedsRefresh = true; invalidateSource(); next();
     }
   }
   return {
@@ -331,7 +360,7 @@ export function createDiscoveryFeed(options: {
     // Called after the active card mounts. Fetching the next five is never an
     // impression, a skip capability request, or a permission to write to them.
     warm() { if (active) { warmed = true; void fillBuffer(); } },
-    stop() { active = false; invalidateSource(); controllers.page?.abort(); },
+    stop() { active = false; invalidateSource(); state = { ...state, restoringPresentation: null }; controllers.page?.abort(); },
     exposureAcknowledged() { if (!state.source) void readSource(); },
     retry() {
       if (state.waitingActionId || readingPage) return;

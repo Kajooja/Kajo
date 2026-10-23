@@ -59,7 +59,8 @@ function delivery(value: number): FeedDelivery {
 }
 const initial = delivery(4);
 function snapshot(active = initial, upcoming: readonly FeedDelivery[] = []): DiscoveryFeedSnapshot {
-  return { delivery: active, upcoming, source: null, canSkip: true, loading: false, message: null, exhausted: false,
+  return { delivery: active, upcoming, source: null, presentationKey: `${active.item.id}:${active.origin.deliveryRequestId}`,
+    restoringPresentation: null, canSkip: true, loading: false, message: null, exhausted: false,
     waitingActionId: null, recovery: 'retry', positiveCommitted: false, canPrevious: false,
     navigationPending: false, canCancelPrevious: false, refilling: false, refillError: null };
 }
@@ -108,6 +109,23 @@ beforeEach(() => {
 afterEach(async () => { await unmount(); vi.unstubAllGlobals(); });
 
 describe('mounted Discovery feed delivery lifecycle', () => {
+  it('does not expose or warm an undo visual before its fresh same-Item delivery activates', async () => {
+    const successor = delivery(10);
+    fixture.state = snapshot(successor);
+    await mount();
+    fixture.flow.displayed.mockClear(); fixture.flow.warm.mockClear();
+    const visualKey = `${initial.item.id}:${initial.origin.deliveryRequestId}`;
+    await publish({ ...snapshot(successor), navigationPending: true,
+      restoringPresentation: { item: initial.item, visualKey } });
+    expect(fixture.flow.displayed).not.toHaveBeenCalled();
+    expect(fixture.flow.warm).not.toHaveBeenCalled();
+    expect(fixture.tracking.recordImpression).not.toHaveBeenCalled();
+    const restored = { ...initial, origin: { ...initial.origin, deliveryRequestId: id(300), predictionId: id(301) } };
+    await publish({ ...snapshot(restored), presentationKey: visualKey });
+    expect(fixture.flow.displayed).toHaveBeenCalledExactlyOnceWith(restored.item.id, id(300));
+    expect(fixture.flow.warm).toHaveBeenCalledOnce();
+  });
+
   it('exposes and warms each actual new delivery while older skips and ratings remain pending, never its five previews', async () => {
     fixture.skips.pendingCount = 2; fixture.actions.atomicPendingCount = 3;
     const previews = [10, 11, 12, 13, 14].map(delivery);

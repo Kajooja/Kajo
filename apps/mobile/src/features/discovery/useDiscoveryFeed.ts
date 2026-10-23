@@ -61,11 +61,11 @@ export function useDiscoveryFeed(initial: FeedDelivery | null, mode: DiscoveryMo
   // this mounted presentation. Earlier cards may still be saving in their own
   // durable queues; they must not suppress this card's actual exposure.
   useLayoutEffect(() => {
-    if (state?.delivery && skips.ready) {
+    if (state?.delivery && !state.restoringPresentation && skips.ready) {
       flow?.displayed(state.delivery.item.id, state.delivery.origin.deliveryRequestId!);
       if (actions.persistenceStatus === 'ready') flow?.warm();
     }
-  }, [flow, state?.delivery, skips.ready, actions.persistenceStatus]);
+  }, [flow, state?.delivery, state?.restoringPresentation, skips.ready, actions.persistenceStatus]);
   const prefetchedImages = useRef(new Set<string>());
   useEffect(() => {
     const urls = new Set(state?.upcoming.flatMap(entry => entry.item.imageUrl ? [entry.item.imageUrl] : []) ?? []);

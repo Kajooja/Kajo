@@ -240,19 +240,22 @@ function ItemDetailContent({
   const [feedDirection, setFeedDirection] = useState<'forward' | 'backward' | undefined>();
   const [feedDraftState, setFeedDraftState] = useState<{ opportunity: string; rating: number | null } | null>(null);
   const feedDelivery = feed.state?.delivery;
+  const restoringPresentation = feed.state?.restoringPresentation;
+  const feedItem = restoringPresentation?.item ?? feedDelivery?.item;
   const feedOpportunity = `${feedDelivery?.item.id ?? ''}:${feedDelivery?.origin.deliveryRequestId ?? ''}`;
-  const feedDraft = feedDraftState?.opportunity === feedOpportunity ? feedDraftState.rating : null;
+  const feedPresentationKey = restoringPresentation?.visualKey ?? feed.state?.presentationKey ?? feedOpportunity;
+  const feedDraft = !restoringPresentation && feedDraftState?.opportunity === feedOpportunity ? feedDraftState.rating : null;
   const [feedMembership, setFeedMembership] = useState<{ opportunity: string; saved: boolean; failed: boolean } | null>(null);
   const { loadForItem: loadFeedMembership, revision: membershipRevision } = itemLists;
   useEffect(() => {
-    if (!feedDelivery) return;
+    if (!feedItem) return;
     let active = true;
-    void loadFeedMembership(feedDelivery.item.id).then(result => {
+    void loadFeedMembership(feedItem.id).then(result => {
       if (!active) return;
-      setFeedMembership({ opportunity: feedOpportunity, saved: result.status === 'success' && result.lists.some(list => list.containsItem), failed: result.status !== 'success' });
+      setFeedMembership({ opportunity: feedPresentationKey, saved: result.status === 'success' && result.lists.some(list => list.containsItem), failed: result.status !== 'success' });
     });
     return () => { active = false; };
-  }, [feedDelivery, feedOpportunity, loadFeedMembership, membershipRevision]);
+  }, [feedDelivery, feedItem, feedPresentationKey, loadFeedMembership, membershipRevision]);
   function setFeedDraft(rating: number | null) { setFeedDraftState({ opportunity: feedOpportunity, rating }); }
   const originFor = useCallback((item: Item) => ({
     ...(feedDelivery?.item.id === item.id ? feedDelivery.origin : getDeliveredItemOrigin(origins, item.id)),
@@ -284,9 +287,10 @@ function ItemDetailContent({
   } | null>(null);
   const visibleDwellItem = useRef<Item | null>(null);
   const startDwell = useCallback((item: Item) => {
+    if (initialFeed && feed.flow?.snapshot().restoringPresentation) return;
     dwellState.current = { item, startedAtMs: Date.now(), origin: originFor(item),
       recordEvent: eventTracking.recordEvent, discoveryMode: mode };
-  }, [eventTracking.recordEvent, mode, originFor]);
+  }, [eventTracking.recordEvent, mode, originFor, initialFeed, feed.flow]);
 
   const finishDwell = useCallback(
     (endReason: 'ITEM_CHANGED' | 'SCREEN_EXIT' | 'APP_BACKGROUND') => {
@@ -347,6 +351,7 @@ function ItemDetailContent({
       } else if (
         previousState !== 'active' &&
         nextState === 'active' &&
+        !(initialFeed && feed.flow?.snapshot().restoringPresentation) &&
         visibleDwellItem.current &&
         !dwellState.current
       ) {
@@ -357,7 +362,7 @@ function ItemDetailContent({
     });
 
     return () => subscription.remove();
-  }, [finishDwell, startDwell]);
+  }, [finishDwell, startDwell, initialFeed, feed.flow]);
 
   useEffect(
     () => () => {
@@ -378,11 +383,11 @@ function ItemDetailContent({
   ]);
 
   useEffect(() => {
-    if (!initialFeed || !feedDelivery) return;
+    if (!initialFeed || !feedDelivery || restoringPresentation) return;
     visibleDwellItem.current = feedDelivery.item;
     finishDwell('ITEM_CHANGED'); startDwell(feedDelivery.item);
     return () => { visibleDwellItem.current = null; finishDwell('ITEM_CHANGED'); };
-  }, [initialFeed, feedDelivery, finishDwell, startDwell]);
+  }, [initialFeed, feedDelivery, restoringPresentation, finishDwell, startDwell]);
 
   useEffect(() => {
     let active = true;
@@ -412,7 +417,7 @@ function ItemDetailContent({
     if (!initialFeed) return true;
     const displayed = feed.flow?.snapshot().delivery;
     const navigating = feed.flow?.snapshot();
-    return currentView.current && !navigating?.loading && !navigating?.navigationPending && displayed?.item.id === item.id &&
+    return currentView.current && !navigating?.restoringPresentation && !navigating?.loading && !navigating?.navigationPending && displayed?.item.id === item.id &&
       displayed.origin.deliveryRequestId === feedDelivery?.origin.deliveryRequestId;
   }
 
@@ -814,18 +819,17 @@ function ItemDetailContent({
     );
   }
 
-  const feedItem = feedDelivery?.item;
   const feedInteraction = feedItem ? getItemInteraction(interactions, feedItem.id) : null;
   const feedSharedState = feedItem ? sharedEndorsements.stateByItemId[feedItem.id] : undefined;
   const feedApproval = getPendingListApproval(feedSharedState, activeSharedMembership?.members ?? [], activeProfile.actorUserId);
-  const feedDisabled = Boolean(feed.state?.loading || feed.state?.navigationPending || feed.state?.waitingActionId || !feed.skips.ready ||
+  const feedDisabled = Boolean(restoringPresentation || feed.state?.loading || feed.state?.navigationPending || feed.state?.waitingActionId || !feed.skips.ready ||
     persistenceStatus !== 'ready' || canDiscardAction || feed.skips.canDiscardAction || endorsingItemId || listPickerTarget || feedRecoveryOpen);
   const feedDependentDisabled = feedDisabled || atomicPendingCount > 0 || feed.skips.pendingCount > 0;
   const canAdvanceFeed = !feedDisabled && (feed.state?.positiveCommitted === true || feed.state?.canSkip === true);
   const feedErrors = [...new Set([persistenceFailure, eventTracking.persistenceError, feed.skips.message,
     feed.state?.message, feed.state?.refillError, activeSharedMembership ? sharedEndorsements.error : null].filter((error): error is string => Boolean(error)))];
-  const feedSaved = feedMembership?.opportunity === feedOpportunity && feedMembership.saved;
-  const membershipUnknown = feedMembership?.opportunity !== feedOpportunity || feedMembership.failed;
+  const feedSaved = feedMembership?.opportunity === feedPresentationKey && feedMembership.saved;
+  const membershipUnknown = feedMembership?.opportunity !== feedPresentationKey || feedMembership.failed;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={initialFeed ? [] : ['bottom']}>
@@ -914,11 +918,11 @@ function ItemDetailContent({
       </View> : null}
 
       {initialFeed ? <View style={styles.feedViewport} onLayout={event => setFeedHeight(event.nativeEvent.layout.height)}>
-        {feed.state?.exhausted ? <View style={styles.feedEnd}><Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi.</Text>
+        {feed.state?.exhausted && !restoringPresentation ? <View style={styles.feedEnd}><Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi.</Text>
           <Pressable accessibilityRole="button" onPress={() => feed.flow?.retry()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Päivitä</Text></Pressable>
           {feed.state.canPrevious && !feedDependentDisabled ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
         </View> : null}
-        {feedItem && feedInteraction ? <RollingFeedCard opportunity={feedOpportunity} item={feedItem} theme={theme} disabled={feedDisabled}
+        {feedItem && feedInteraction ? <RollingFeedCard opportunity={feedPresentationKey} item={feedItem} theme={theme} disabled={feedDisabled}
             {...(feed.state?.upcoming?.[0] ? { nextItem: feed.state.upcoming[0].item } : {})}
             previewTitleAction={<View style={styles.feedStar}><Text style={styles.feedStarGlyph}>☆</Text></View>}
             previewControls={<View style={styles.feedActions}><View style={styles.feedRating}>
@@ -939,7 +943,7 @@ function ItemDetailContent({
             {...(feed.state?.canPrevious ? { onPrevious: () => {
               if (feedDependentDisabled || !isCurrentFeedItem(feedItem)) return false;
               const accepted = feed.flow?.previous() === true;
-              if (accepted) setFeedDirection('backward');
+              if (accepted) { setFeedDirection('backward'); setFeedDraftState(null); setFeedback(null); }
               return accepted;
             } } : {})}
             onSkip={() => { if (!canAdvanceFeed || !isCurrentFeedItem(feedItem)) return false; const accepted = feed.flow?.advance() === true;

@@ -8132,3 +8132,63 @@ successful retry without card replacement, resumed candidates after exhaustion,
 and a same-event rating/advance retaining the outgoing numeric value. The new
 source still needs its own CI/APK receipt and phone test; the PR body owns those
 superseding receipts without a documentation-only rebuild loop.
+
+### #710 receipt and immediate undo/refill refinement — 2026-10-23 / #355
+
+The durable-navigation source is published at
+`2adc68e5beebb0eb5827e1caf50e349496239926`, tree
+`47e34ec5f29263da6e28a9225b6e888154e5ca32`. All five required CI #710 gates and
+the standalone APK job passed on attempt 1; tested merge checkout
+`6dc508199b2f4897b09e2d6f0e9654d3ae8dce59` has the identical tree. STATUS/PR #355
+own verified artifact `12508616318`, its hashes and expiry. PR #355 remains
+unmerged. This receipt supersedes the earlier pending final-CI/build statements
+without claiming the new refinement or complete physical-device acceptance.
+
+The owner's #710 feedback requests undo nearly as fast as forward scrolling,
+with the active card plus five successors and background replacement after every
+consumption; prediction may follow browsing slightly behind. The narrow design
+is now reconciled before runtime edits in UX_PRINCIPLES, DATA_EVENTS and
+PREDICTION_MODEL §8.2, with MVP/LAUNCH_LOOP/ROADMAP/CODEMAP and DEVICE_TEST aligned.
+
+After the first exact undo/withdrawal command is successfully admitted to durable
+local storage, show a cached prior Item as separate `restoringPresentation`, with
+no actionable origin. All mutations, impression and dwell remain blocked until
+the ordered undo receipts and fresh same-Item delivery arrive. Keep the visual
+identity during activation. Failed local admission leaves the current card;
+partial undo, rejection, cancellation and exact remaining-command retry preserve
+their existing boundaries. Undo still hard-invalidates the prepared window; the
+cached appearance is not server undo success or permission to reuse an old origin.
+
+Ordinary rating/List acknowledgement now marks a coalesced future-reader-dirty
+state without cancelling the bounded refill already in progress. That request,
+including exact pending retries, may admit only the free successor slots; before
+the next new request, renew the root from the latest committed prefix. Neutral
+skip keeps its reader. Initially warm five successors, and schedule refill after
+every consumption: one vacancy admits one Item. Protocol 3 retains immutable wire
+page limit five; there is no one-Item page-size switch or staging beyond five
+successors. Frozen origins remain honest even when their forecasts predate later
+acknowledgements. Hard undo/scope/source/discard invalidation rejects late work.
+
+If an in-flight request is proven expired/unusable after ordinary acknowledgement
+already scheduled renewal, retire that request and continue the scheduled fresh
+root quietly with prepared cards intact. Never admit candidates from an error.
+Without scheduled renewal, retain explicit refresh/recovery; ambiguous failures
+still preserve exact retry identity. Repeated acknowledgement must not starve the
+buffer through repeated cancellation or reintroduce progress/retry flashes.
+
+Implementation of this refinement is complete and independent review is clean.
+Local validation passes all 763 mobile tests in 74 files, the root check's lint,
+type, dependency and catalog stages, and explicit demo iOS and Android exports.
+The complete local root check remains blocked by the unchanged Deno `deno.lock`
+dependency request to `registry.npmjs.org/@supabase%2fauth-js`, which fails with
+`Connection refused`; no full local root pass is claimed.
+
+Next publish the completed source in the same PR #355, obtain final-source CI and
+a replacement configured APK, then verify immediate undo presentation and
+continuous refill on the phone. These CI/build/device receipts remain pending.
+No server/API or database change is required; feed-reader provider receipt
+`20261023062034` remains installed and must not be replayed. Preserve the durable
+queues, exact server writers, ordered undo and strict Taste acknowledgement →
+fresh NEXT. After this bounded interaction correction and its new
+final-source/build/device receipts, continue #336's versioned Taste pool
+refresh/refill.
