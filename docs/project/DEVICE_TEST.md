@@ -17,6 +17,15 @@ adjacent-card reveal during dragging. The owner also reports the rating gesture
 is no longer smooth: deliberate tap or drag must rate and advance automatically.
 These new observations do not establish an installed #704 checksum or success.
 
+**Owner report on #707 — 2026-10-23:** “Tämä on hyvä” accepts the general
+layout/rating direction, but scrolling still feels unsmooth. The whole card must
+follow the thumb from every field, including text and expanded descriptions;
+a short fast upward flick should reveal the next card. This does not close the
+startup, precise rating values, gesture-isolation or full device matrix. PR #355
+remains unmerged; its #707 build and installed feed-reader forward are recorded
+in STATUS. The active continuation repairs whole-card drag/flick behavior on the
+same branch and requires a new build for the changed source.
+
 The active successor in STATUS must be tested as an update preserving user data.
 Run the category/navigation checks below, then this superseding feed matrix on
 BOOK and MOVIE. It refines the earlier October 17 control expectations.
@@ -29,9 +38,10 @@ BOOK and MOVIE. It refines the earlier October 17 control expectations.
 | Direct rating | Tap any track/handle position or drag horizontally and release; the selected 0–10 value saves once and the next card appears automatically after acknowledgement and fresh selection. No Save button; merely mounting/defaulting or cancelling never saves. Verify 0 and 5, change a rating and reopen history. Vertical/diagonal movement starting on the slider and adding a second finger must not save a rating. |
 | List star | Outline opens the multi-list picker. Only acknowledged active-Profile membership fills it white; pending/rejected Shared proposal does not. Add to two Lists and verify both; merely opening/creating a List changes no membership. |
 | Forward | Up to five cards are prepared, one active and four upcoming; each neutral skip replenishes one in the background. The next card moves into view during the upward drag but remains inert until acknowledgement. Consecutive swipes advance one Item at a time without snap-back or blank gaps. Cancelled gestures settle; reduced motion avoids displacement. No positive choice means one contextual skip. Rating auto-advance and a forward gesture after List acknowledgement add no skip. No immediate recycling or false exhaustion. |
+| Whole-card drag and flick | Start over poster, title, metadata, collapsed text and expanded text. The entire card follows the thumb continuously, including across native responder capture. Read a long card slowly and settle within its content without a skip; deliberately move beyond its bottom to advance. From any reading offset, a short fast upward flick advances once (minimum 24 points and vertical speed 0.6 points/ms); an ordinary slow dismissal requires 96 points beyond the reading extent. Verify expanded-content controls remain reachable. Reduced motion removes automatic entry/springs while direct reading still works. |
 | Buffer freshness | Rate while a refill is delayed; the old unseen queue/late reply must not become the next active card. Fresh post-acknowledgement selection preserves the new page origin. Repeat over 16 rating advances without exhausting abandoned-reader slots; rapid swipes, network loss and retry retain the same current card/request. Preview/preload alone creates no impression. |
-| Reverse | Downward swipe restores the exact preceding card only after its eligible action is undone. Repeat across mixed skips/ratings/List actions; existing unrelated memberships and history remain. Explain an unavailable/conflicted undo rather than target another Item. |
-| Gesture isolation | Short/reversed/cancelled/multitouch movement, description scrolling, slider dragging, star/picker use, rotation and app background never cause an unintended skip/undo. Accessible advance/reverse actions match gestures. |
+| Reverse | Downward swipe restores the exact preceding card only after its eligible action is undone. A fast downward flick reverses only when started at the readable top; inside long content it reads toward the top, with 96 points of excess past that edge required to undo. Repeat across mixed skips/ratings/List actions; existing unrelated memberships and history remain. Explain an unavailable/conflicted undo rather than target another Item. |
+| Gesture isolation | Small slow/reversed/cancelled/multitouch movement, slow reading inside expanded content, horizontal slider dragging, star/picker taps, rotation and app background never cause an unintended skip/undo. A deliberate qualifying fast flick is distinct from a small slow movement. Accessible advance/reverse actions match gestures; metadata and controls remain independently focusable. |
 | Failure and restart | Lost source/skip/rating/undo replies keep a usable recovery state. Restore network or restart; the exact pending command completes once without switching actor/Profile/Item. Failed skip leaves the card available, not silently skipped. |
 | Honest limits | Actual catalogue exhaustion is explicit and recoverable; do not loop old cards. Bounded session undo does not pretend to restore erased, expired or unavailable actions. |
 

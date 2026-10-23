@@ -66,7 +66,7 @@ beforeEach(() => {
 });
 afterEach(async () => {
   if (renderer) await act(async () => renderer!.unmount());
-  renderer = undefined; vi.unstubAllGlobals();
+  renderer = undefined; vi.unstubAllGlobals(); vi.restoreAllMocks();
 });
 
 async function mount(props: Partial<React.ComponentProps<typeof FeedItemCard>> = {}) {
@@ -123,7 +123,7 @@ describe('mounted feed card motion', () => {
     fixture.deferPreference = true;
     await mount({ entryDirection: 'forward', initialReduceMotion: null });
     const style = renderer!.root.findByType('AnimatedView' as never).props.style;
-    expect(style.at(-1)).toEqual({ transform: [{ translateY: 0 }] });
+    expect(style.at(-1).transform[0].translateY.value).toBe(0);
     expect(fixture.animations).toEqual([]);
     await act(async () => { fixture.resolvePreference!(false); });
     expect(fixture.values[0]!.value).toBe(0); expect(fixture.animations).toEqual([]);
@@ -201,5 +201,111 @@ describe('mounted feed card motion', () => {
     await act(async () => { renderer!.update(<RollingFeedCard {...base} viewportHeight={420}
       item={{ ...base.item, id: 'two' }} opportunity="two" />); });
     expect(fixture.values[count]!.initial).toBe(420);
+  });
+
+  it('retains native capture travel when grant resets dx/dy, so a one-move short fling advances', async () => {
+    const props = await mount();
+    await act(async () => {
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 1, dy: -32, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      expect(fixture.values[0]!.value).toBe(-32);
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce(); expect(fixture.values[0]!.value).toBe(-32);
+  });
+
+  it('reads expanded content with the whole card, then dismisses only after travelling past its bottom', async () => {
+    const props = await mount({ initialExpanded: true, initialDescriptionHeight: 500, nextCard: 'Next' });
+    expect(surface().props.style).toContainEqual({ height: 932 });
+    expect(renderer!.root.findByProps({ testID: 'feed-next-preview' }).props.style).toContainEqual({ top: 932, height: 600 });
+    await act(async () => { drag(-120); release(-120); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-120);
+    await act(async () => { drag(-300); release(-300); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-332);
+    await act(async () => { drag(-110); release(-110); });
+    expect(props.onSkip).toHaveBeenCalledOnce(); expect(fixture.values[0]!.value).toBe(-442);
+  });
+
+  it('allows a deliberate short upward fling from the middle of expanded content', async () => {
+    const props = await mount({ initialExpanded: true, initialDescriptionHeight: 500 });
+    await act(async () => { drag(-120); release(-120); });
+    await act(async () => {
+      drag(-32); surface().props.onPanResponderRelease(null, { dx: 0, dy: -32, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce();
+  });
+
+  it('reads back up through expanded content without undoing on a downward fling', async () => {
+    const onPrevious = vi.fn(() => true);
+    await mount({ initialExpanded: true, initialDescriptionHeight: 500, onPrevious });
+    await act(async () => { drag(-220); release(-220); });
+    await act(async () => {
+      drag(40); surface().props.onPanResponderRelease(null, { dx: 0, dy: 40, vx: 0, vy: 1 });
+    });
+    expect(onPrevious).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-180);
+  });
+
+  it('allows reading back toward the top even without previous-card navigation', async () => {
+    await mount({ initialExpanded: true, initialDescriptionHeight: 500 });
+    await act(async () => { drag(-120); release(-120); });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 20, numberActiveTouches: 1 })).toBe(true);
+  });
+
+  it('keeps direct reading usable under reduced motion and clamps it after collapse', async () => {
+    fixture.reduced = true;
+    await mount({ initialExpanded: true, initialDescriptionHeight: 500 });
+    await act(async () => { drag(-200); release(-200); });
+    expect(fixture.values[0]!.value).toBe(-200); expect(fixture.animations).toEqual([]);
+    await act(async () => { renderer!.root.findByProps({ testID: 'feed-description-content' }).props.onLayout({ nativeEvent: { layout: { height: 40 } } }); });
+    expect(fixture.values[0]!.value).toBe(0); expect(surface().props.style).toContainEqual({ height: 600 });
+  });
+
+  it('does not mistake a short move followed by a pause for a fling', async () => {
+    let now = 1000; vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const props = await mount();
+    await act(async () => { drag(-32); }); now = 1250;
+    await act(async () => { surface().props.onPanResponderRelease(null, { dx: 0, dy: -32, vx: 0, vy: -1 }); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(0);
+  });
+
+  it('keeps horizontal slider intent outside the parent responder', async () => {
+    await mount();
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 60, dy: 8, numberActiveTouches: 1 })).toBe(false);
+    expect(surface().props.accessible).toBe(false);
+    expect(renderer!.root.findByProps({ testID: 'feed-accessibility-summary' }).props.accessible).toBe(true);
+  });
+
+  it('keeps a slider-started gesture out of feed navigation after it turns vertical', async () => {
+    await mount();
+    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 30, dy: 2, numberActiveTouches: 1 })).toBe(false);
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 30, dy: -140, numberActiveTouches: 1 })).toBe(false);
+  });
+
+  it('lets a natural thumb arc become a vertical drag after small initial sideways movement', async () => {
+    await mount();
+    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 8, dy: 3, numberActiveTouches: 1 })).toBe(false);
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 8, dy: -32, numberActiveTouches: 1 })).toBe(true);
+  });
+
+  it('does not admit a two-finger gesture after one finger is lifted before capture', async () => {
+    await mount();
+    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 2 });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -140, numberActiveTouches: 1 })).toBe(false);
+    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+  });
+
+  it('retains the outgoing expanded extent and reading position when a rating promotes a fresh card', async () => {
+    await act(async () => { renderer = create(<RollingFeedCard {...base} opportunity="one" onSkip={() => true} />); });
+    await act(async () => { renderer!.root.findByProps({ testID: 'feed-description-content' }).props.onLayout({ nativeEvent: { layout: { height: 500 } } }); });
+    await act(async () => { drag(-120); release(-120); });
+    const count = fixture.values.length;
+    await act(async () => { renderer!.update(<RollingFeedCard {...base} item={{ ...base.item, id: 'two' }} opportunity="two" entryDirection="forward" />); });
+    expect(fixture.values[count]!.initial).toBe(812);
+    const previous = renderer!.root.findByProps({ testID: 'feed-previous-preview' });
+    expect(previous.props.style).toContainEqual({ top: -932, height: 932 });
+    expect(previous.findByType(FeedItemCard).props.initialDescriptionHeight).toBe(500);
   });
 });

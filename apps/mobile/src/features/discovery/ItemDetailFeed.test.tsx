@@ -60,7 +60,8 @@ vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: () => ({
 vi.mock('./useDiscoveryFeed', () => ({ useDiscoveryFeed: () => ({
   flow: fixture.flow, state: fixture.feedState, skips: { ready: true, pendingCount: 0, message: null },
 }) }));
-vi.mock('./FeedItemCard', () => ({ FeedItemCard: (props: { titleAction?: React.ReactNode; children?: React.ReactNode }) =>
+vi.mock('./FeedItemCard', () => ({ getFeedCardHeight: (height: number | undefined) => height,
+  FeedItemCard: (props: { titleAction?: React.ReactNode; children?: React.ReactNode }) =>
   React.createElement('FeedItemCard', props, props.titleAction, props.children) }));
 vi.mock('./RatingControl', () => ({ RatingControl: 'RatingControl' }));
 vi.mock('./InteractionPersistenceNotice', () => ({ InteractionPersistenceNotice: () => null }));

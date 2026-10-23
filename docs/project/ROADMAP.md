@@ -50,7 +50,10 @@ feedback additionally advances its compact viewport, direct slider rating,
 List-picker star and forward/backward navigation into the current packet. Its
 latest refinement requires centered artwork/text/slider, the star beside the
 title, rating acknowledgement followed by automatic advance, and a five-card
-Discovery buffer with the next card visible during dragging. Broad
+Discovery buffer with the next card visible during dragging. The October 23
+#707 phone feedback keeps this packet active for whole-card thumb tracking from
+text/expanded text and a deliberate short upward flick; complete that repair
+before #336. Broad
 collection/detail work retains its existing slot. The default Discovery grid is
 unchanged; UX_PRINCIPLES owns the superseding controls contract.
 
@@ -73,8 +76,10 @@ history receipts. PR #353 repairs the subsequent Room → Movies/Books navigatio
 blocker on #698. #354's compact feed/skip-clock/startup correction is accepted
 after all five CI #704 gates; the owner previously confirmed #700 navigation
 checks. Continue its new bounded five-card feed/rating/layout refinement on
-`feat/239-buffered-feed`, then the replacement-build/device matrix before preview
-or usefulness acceptance. The new reader lifecycle must preserve immutable page
+`feat/239-buffered-feed` / PR #355, then its whole-card drag/flick repair and
+replacement-build/device matrix before preview or usefulness acceptance. CI #707
+and the exact feed-reader hosted installation passed; PR #355 remains unmerged,
+and its general positive phone feedback does not close smoothness acceptance. The new reader lifecycle must preserve immutable page
 receipts while releasing obsolete derived readers after meaningful choices.
 Do not replay installed operations. STATUS owns exact
 source/rollout receipts; DEVICE_TEST owns the observation matrix.

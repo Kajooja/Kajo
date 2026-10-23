@@ -361,7 +361,9 @@ advance the corresponding card. Fresh Discovery reads retain exact retry identit
 and request the current committed prefix; a retained neutral-skip buffer keeps
 each original per-Item page identity. A rating automatically advances after its
 receipt and fresh selection, never also submitting a skip. Partial/terminated gestures,
-internal description scrolling, layout and backgrounding are inert. Actual hosted
+slow reading within the card's content extent, layout and backgrounding are inert.
+A qualifying deliberate flick or dismissal beyond the content boundary retains
+the same exact skip command; moving expanded text alone is not evidence. Actual hosted
 installation and phone acceptance remain separate. The source PR/STATUS own the
 exact tests, CI and installation boundaries.
 

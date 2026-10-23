@@ -8014,3 +8014,54 @@ publish reviewed local commit `06cd5eacfc4a52346e146d6f9ccb9530387d35fa` to
 That approval supersedes the publication hold above. Runtime source is unchanged;
 the PR body owns exact remote source/CI/build receipts. Hosted installation,
 source merge and phone acceptance remain separate outstanding gates.
+
+### #707 phone feedback and whole-card gesture refinement — 2026-10-23 / #355
+
+PR #355 is published at `65814a8bc0f8555e7ca0a1d558c461fe57748f63` and remains
+unmerged. All five mandatory CI #707 checks and the standalone Android job passed;
+tested merge checkout `3f6c9d89303b077c82a303dd5543db192863649d` matches source
+tree `e307094a6f7350e7e36f8c9092ac54d45eacd351`. STATUS/PR #355 own the verified
+APK artifact `12459699826`, expiry and archive/extracted-APK hashes.
+
+The owner explicitly authorized the feed-reader installation with “saat asentaa”.
+The exact reviewed forward is installed as provider receipt `20261023062034`,
+named `discovery_feed_reader`, source SHA-256
+`2a0af1827e2eb09bfc8c95e6c2eb7631c2d035c142e3a57439c102cbc838ca4b`.
+All prior function definitions/identities/security and migration receipts remain
+unchanged; new bodies, immutable receipt-table security and authenticated-only
+RPC grants match the reviewed source. The earlier connector errors and deployment
+hold above are resolved. Do not replay the installed feed or clock forward.
+
+After #707 the owner reports “Tämä on hyvä”, accepting the general layout/rating
+direction, but scrolling is still not smooth. The whole card must follow the
+thumb from all fields, including text and expanded descriptions; a short fast
+upward flick must advance. This is not complete startup, gesture or device
+acceptance. Continue the same `feat/239-buffered-feed` / PR #355 before #336.
+
+The presentation correction moves vertical capture to the outer card and makes
+expanded descriptions extend that card rather than scroll independently. Slow
+motion reads and settles within the content extent. Forward dismissal requires
+96 points beyond its bottom, or a deliberate upward flick of at least 24 points
+and vertical speed 0.6 points/ms from any reading offset. A fast downward flick
+can reverse only from the readable top; while inside long content, downward
+movement reads back and requires 96 points beyond the top to undo. One-finger
+vertical dominance, reversal/cancellation guards and exact receipt sequencing
+remain. Capture rebases native gesture coordinates so grant does not jump.
+Reduced motion preserves direct reading offsets without automatic entry/spring
+interpolation. Horizontal rating and control taps retain their meaning;
+metadata and title actions remain independently accessible.
+
+No backend change or account reset is needed. The existing buffered reader,
+learning-prefix invalidation, exact undo and adaptive Taste contracts remain.
+The new gesture source requires its own local/final-source validation and APK;
+#707's successful checks do not cover later edits. DEVICE_TEST owns the expanded
+whole-card/long-text/flick matrix. Preserve accounts, commands and installed
+migration history, then continue #336 after this bounded interaction correction.
+
+Local gesture validation now passes: 723 mobile tests in 71 files, mobile types,
+focused lint and demo iOS/Android Expo exports. Root lint/type/dependency/mobile/
+catalog stages pass; root completion is blocked by the unchanged Deno registry
+connection refusal. Tests cover the native grant-reset fling, readable long-card
+offsets and edge decisions, outgoing extent, reduced motion, natural thumb arcs,
+sticky multi-touch and horizontal slider intent. Final-source CI/configured APK
+and actual phone observations remain separate pending gates.

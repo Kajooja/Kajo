@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-22**
+Last updated: **2026-10-23**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — buffered Discovery feed and rating flow / #239
+## Current packet — whole-card Discovery drag and flick / #239
 
 **Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
 merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the
@@ -38,8 +38,26 @@ also reports that rating no longer feels smooth: either tapping a chosen point
 or dragging must commit that rating and automatically advance. This supersedes
 #354's rule that an acknowledged rating waits for a later forward gesture.
 
-The active successor is `feat/239-buffered-feed`, based on accepted #354 main.
-Its bounded implementation keeps the active card plus at most four successors,
+The active successor is [PR #355](https://github.com/Kajooja/Kajo/pull/355),
+`feat/239-buffered-feed`, based on accepted #354 main and still unmerged.
+Its published head `65814a8bc0f8555e7ca0a1d558c461fe57748f63` passed all five
+required gates and the standalone APK job in
+[CI #707](https://github.com/Kajooja/Kajo/actions/runs/39853355488).
+The tested merge checkout `3f6c9d89303b077c82a303dd5543db192863649d` shares source
+tree `e307094a6f7350e7e36f8c9092ac54d45eacd351`; its verified APK is
+[below](#current-test-apk-and-device-work). These receipts precede the new
+whole-card gesture changes and do not validate their final source.
+
+**Latest phone feedback — 2026-10-23:** the owner says “Tämä on hyvä” about #707,
+accepting the general layout/rating direction, but scrolling is not smooth.
+The entire card must follow the thumb from all fields, including collapsed and
+expanded text, and a short fast upward flick must advance. This is an explicit
+remaining interaction defect, not complete startup/gesture/device acceptance.
+Continue the same PR with outer-card gesture capture, full-content reading
+extent and deliberate drag/flick thresholds. Preserve horizontal rating intent,
+independent accessibility focus, exact command origins and reduced-motion reading.
+
+The existing bounded implementation keeps the active card plus at most four successors,
 with exact page origins and no prefetch impressions. Neutral skip may retain
 unrelated prepared cards because it changes suppression only; ratings, List
 changes, undo and scope changes invalidate unseen work and select from the newly
@@ -60,30 +78,46 @@ pages and receipts. It exercises 20 successive replacements while 15 unrelated
 readers keep the active total at 16, exact old root/continuation retries, failed
 replacement rollback, scope denial and new ACL/RLS.
 
-**Final local validation:** lint and mobile/engine/acceptance typechecks pass;
+**Buffered-feed validation before the October 23 gesture refinement:** lint and mobile/engine/acceptance typechecks pass;
 692 mobile tests in 71 files, 318 database tests, 311 engine tests, 19 Python and
 43 Node research tests, plus 6 acceptance and 5 mobile-acceptance tests pass.
 Explicit demo-mode iOS and Android Expo exports pass. `npm run check` reaches
 the unchanged Edge dependency fetch and stops because `registry.npmjs.org`
 refuses the Deno `@supabase/auth-js` request. No complete local-root success or
-native device/emulator observation is claimed. Final-source CI and a configured
-replacement APK remain pending.
+native device/emulator observation was claimed for these local checks. CI #707
+and its configured build subsequently passed; new gesture-source validation and
+its replacement build remain required.
+
+**Whole-card gesture source validation:** 723 mobile tests in 71 files pass,
+including native responder-grant displacement reset, short flicks, paused-release
+velocity, long-text reading/edge dismissal, reduced motion, readable backward
+movement, slider intent and outgoing expanded-card continuity. Mobile types and
+focused lint pass; the root lint/type/dependency/mobile/catalog stages pass.
+The root check again stops at the unchanged Deno registry connection refusal.
+Explicit demo iOS and Android Expo exports pass. No native emulator/device run
+is available here; the replacement CI/APK and superseding phone matrix remain
+required. This correction changes no hosted schema or installed migration.
 
 **Publication authorized:** the owner explicitly replied **“saat julkaista”**
 to publishing reviewed local commit `06cd5eacfc4a52346e146d6f9ccb9530387d35fa`
 to `Kajooja/Kajo` branch `feat/239-buffered-feed` and opening its PR against
 `main`. This supersedes the earlier automatic approval rejection for this packet.
-The implementation is unchanged; this follow-up only records authorization.
+The recorded authorization covered the buffered-feed source now published in #355.
 The branch's PR body owns the exact remote commit, CI and configured APK receipts.
 Publication approval does not establish source merge, hosted or device acceptance.
 
-**Hosted deployment blocked:** read-only preflight confirmed the required
-dependencies/RLS and installed clock receipt `20261022152530`. Both migration-API
-attempts failed with `McpServerError: Invalid or expired requestState`. Read-only
-verification after both attempts returns `feed_rpc = null` and `migration = null`.
-No hosted write succeeded, and the new feed reader is not installed. Resolve the
-connector failure and install only this new reviewed forward before configured
-feed acceptance; do not replay the existing clock migration.
+**Hosted feed reader installed — 2026-10-23:** the owner authorized installation
+with “saat asentaa”. The exact reviewed forward was installed through the
+migration API as provider receipt `20261023062034`, named `discovery_feed_reader`.
+Its source SHA-256 is
+`2a0af1827e2eb09bfc8c95e6c2eb7631c2d035c142e3a57439c102cbc838ca4b`.
+Postchecks preserve all 252 prior function bodies/OIDs/ACL/security/configuration
+and all 84 earlier migration receipts; two functions and one migration were added.
+New body digests, receipt-table RLS/constraints/immutable trigger and authenticated
+RPC-only grants match the reviewed source. An unauthenticated probe returns 42501
+before writing a receipt; no new security-warning category appears. PR #355 owns
+the complete exact digest receipt. The earlier request-state errors and deployment
+hold are resolved. Do not replay either this forward or the installed clock fix.
 
 [UX_PRINCIPLES](../product/UX_PRINCIPLES.md#required-pre-mvp-card-controls--239--mvp-ux-006)
 owns the controls and continuous-feed contract; [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
@@ -129,9 +163,11 @@ Discovery's five-card buffer to precompute adaptive questions and still lacks
 numeric backward-question undo. Retained v1/challenge Save and frozen first-answer
 measurement remain unchanged; full interaction/device acceptance remains open.
 
-**One active continuation:** publish the completed bounded feed/rating successor,
-obtain final-source CI/configured-build and resolve the hosted deployment blocker
-with an exact forward receipt before the new phone matrix. Preserve accounts, ratings, List memberships
+**One active continuation:** finish the owner-requested whole-card drag/flick fix
+in PR #355, validate its final source and obtain a replacement configured APK for
+the superseding phone matrix. Source integration remains separate from build and
+device evidence and requires the final-source gates. No new backend migration
+is needed for this presentation correction. Preserve accounts, ratings, List memberships
 and pending commands. Do not reset accounts or replay installed migrations.
 Versioned Taste pool refresh/refill under #336 follows this packet; original
 frozen panels, first labels, session policies and retry origins remain protected.
@@ -469,7 +505,25 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is [CI #704](https://github.com/Kajooja/Kajo/actions/runs/39834255038),
+The latest verified configured build is [CI #707](https://github.com/Kajooja/Kajo/actions/runs/39853355488),
+PR #355 head `65814a8bc0f8555e7ca0a1d558c461fe57748f63`, tested merge checkout
+`3f6c9d89303b077c82a303dd5543db192863649d`, shared tree
+`e307094a6f7350e7e36f8c9092ac54d45eacd351`. All five required gates and the
+standalone Android job passed; PR #355 remains unmerged.
+
+[APK artifact #707](https://github.com/Kajooja/Kajo/actions/runs/39853355488/artifacts/12459699826),
+`kajo-android-standalone-3f6c9d89303b077c82a303dd5543db192863649d`, expires
+**2026-10-29 21:41:07 UTC**. ZIP: 49,297,196 bytes, SHA-256
+`36924d9b817592e9e53d2e881c604b74dafadecd46973885af8e0c27a13dbde0`.
+Extracted `app-release.apk`: 106,079,855 bytes, SHA-256
+`b9063ce5e7c06bea58a12da1435e302c8bfbbe7687c0a9b7417a0211f6332e60`.
+Downloaded archive digest, ZIP/APK integrity and its 3,459,092-byte embedded
+bundle were verified; the bundle contains the new feed RPC. The owner reports
+the general layout/rating flow is good but whole-card scrolling remains unsmooth.
+This is not an installed checksum or complete startup/gesture acceptance. The
+active October 23 gesture correction is not included in #707.
+
+The earlier verified configured build is [CI #704](https://github.com/Kajooja/Kajo/actions/runs/39834255038),
 accepted #354 source head `95213d9c1455d7127c5908f6bc41387c2bea33d5` and tested
 merge checkout `f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9`. Its tree is identical
 to accepted main `99c21341c62eaae8dab3589944a434b06dc14258`. All five mandatory

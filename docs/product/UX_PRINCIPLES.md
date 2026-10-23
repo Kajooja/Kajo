@@ -331,9 +331,15 @@ Do not reserve empty feedback/help rows, duplicate safe-area padding or a large
 header/footer panel. Center artwork and compact text with symmetric side margins.
 Center the bottom rating slider with small side margins; place the List star
 beside the title at the title's visual size while retaining an accessible touch
-target and independent focus. Long descriptions have a separate scroll surface, so reading them
-does not dismiss the Item; retain metadata, artwork fallback and source credits.
-Large text may require internal content scrolling rather than hiding controls.
+target and independent focus. The October 23 refinement makes the whole card
+follow a vertical drag started over artwork, metadata or description, including
+expanded text. Long descriptions extend the card rather than creating a separate
+nested scroll surface. Slow movement within that content reads the same Item and
+settles within its extent; deliberately crossing its end or making a qualifying
+short upward flick advances. Retain metadata, artwork fallback, source credits
+and usable controls with large text. Horizontal slider input and ordinary control
+taps keep their own meaning; metadata and title actions remain independently
+accessible.
 
 Forward/upward card scrolling advances one Item at a time; without a confirmed
 positive choice it submits contextual Ohita. Backward/downward scrolling restores
@@ -356,6 +362,19 @@ cancelled drags, respecting reduced motion. Ordinary data updates must not cance
 a valid in-progress gesture. No separate visible
 Ohita or Kumoa button is needed in this feed. Screen-reader/accessibility actions
 provide equivalent advance, reverse and help without permanent control rows.
+A deliberate dismissal requires one-finger vertical intent: at least 96 points
+of dismissal travel, or at least 24 points with matching vertical release speed
+of 0.6 points/ms and vertical dominance over horizontal motion. A short fast
+upward flick may advance from any reading offset. A fast downward flick reverses
+only when it begins at the readable top; inside long content, downward motion
+reads back toward the top and only 96 points of deliberate excess beyond that
+edge can undo. Small slow movement, reversal,
+multitouch, responder termination, layout changes and backgrounding do not commit.
+Native responder capture must preserve the accumulated drag offset rather than
+jumping when its gesture coordinates reset on grant. These thresholds and
+whole-card behavior require the superseding device matrix.
+Reduced motion suppresses automatic entry and spring interpolation while
+preserving direct user-controlled reading offsets so long text remains readable.
 Collection/legacy detail and retained Taste/challenge protocols preserve their
 existing evidence contracts until an explicit compatible successor is delivered.
 
@@ -390,7 +409,7 @@ does not merge those historical evidence types. The
 owns event, retry, expiry and resurfacing meanings.
 
 Only a completed intentional card dismissal commits the skip. Partial scrolls,
-scrolling a long description, reflow, loading, rotating the screen, opening a
+slow reading within a long card, reflow, loading, rotating the screen, opening a
 menu, navigating Back, leaving the app and changing Profile/domain do not imply
 a response. Pending commands retain their exact actor/Profile/Item origin through
 restart/retry; they cannot be duplicated or retargeted. Gesture thresholds,
