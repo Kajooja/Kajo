@@ -27,7 +27,7 @@ export function createDiscoveryFeed(options: {
   initial: FeedDelivery; scope: { actorUserId: string; profileId: string; sessionId: string; mode: DiscoveryMode };
   createId: () => string; nowMicros: () => string;
   createRequest: (replacesChainId: string | null, limit?: number) => PredictionPageRequest;
-  createRestoreRequest: (replacesChainId: string | null) => PredictionPageRequest;
+  createRestoreRequest: (replacesChainId: string | null, limit: 5 | 50) => PredictionPageRequest;
   load: (request: PredictionPageRequest, signal: AbortSignal) => Promise<PredictionPageResult>;
   recordImpression: (delivery: FeedDelivery) => string | null;
   loadSource: (request: DiscoverySkipSourceRequest, signal: AbortSignal) => Promise<DiscoverySkipSource | DiscoverySkipSourceResult | null>;
@@ -51,7 +51,8 @@ export function createDiscoveryFeed(options: {
   const history: FeedEntry[] = [];
   let expected: { kind: 'positive'; actionId: string } | null = null;
   type UndoState = { target: FeedEntry; remaining: FeedAction[]; actionId: string | null;
-    restoreRequest: PredictionPageRequest | null; restorePageCount: number; fromHistory: boolean; acknowledgedCount: number };
+    restoreRequest: PredictionPageRequest | null; restoreStage: 'probe' | 'search'; restorePageCount: number;
+    fromHistory: boolean; acknowledgedCount: number };
   let undoing: UndoState | null = null;
   let previousConsumed = false;
   type ReadTask = { kind: 'buffer'; epoch: number; request: PredictionPageRequest }
@@ -156,7 +157,7 @@ export function createDiscoveryFeed(options: {
     if (pendingRead) return pendingRead;
     if (undoing) {
       if (undoing.actionId || undoing.remaining.length) return null;
-      undoing.restoreRequest ??= options.createRestoreRequest(chainId);
+      undoing.restoreRequest ??= options.createRestoreRequest(chainId, undoing.restoreStage === 'probe' ? 5 : 50);
       return { kind: 'restore', epoch: rankingEpoch, request: undoing.restoreRequest, restoration: undoing };
     }
     if ((!warmed && !advancing) || upcoming.length >= 5) return null;
@@ -192,7 +193,9 @@ export function createDiscoveryFeed(options: {
           // is now proven unusable, so proceed to that new root quietly without
           // clearing the still-valid prepared presentation window.
           if (task.kind === 'buffer' && readerNeedsRefresh) return;
-          if (task.kind === 'restore') { task.restoration.restoreRequest = null; task.restoration.restorePageCount = 0; }
+          if (task.kind === 'restore') {
+            task.restoration.restoreRequest = null; task.restoration.restoreStage = 'probe'; task.restoration.restorePageCount = 0;
+          }
           else { bufferPage = null; bufferEnded = false; upcoming = []; }
         }
         readerError(result.message); return;
@@ -208,13 +211,18 @@ export function createDiscoveryFeed(options: {
       if (task.kind === 'restore') {
         if (undoing !== task.restoration) return;
         const restoration = task.restoration;
-        restoration.restorePageCount++;
+        if (restoration.restoreStage === 'search') restoration.restorePageCount++;
         const item = result.ranking.items.find(candidate => candidate.id === restoration.target.delivery.item.id);
         if (!item) {
-          if (result.nextCursor && restoration.restorePageCount < 3) {
+          if (restoration.restoreStage === 'probe') {
+            // A successful small probe identifies the reader that the original
+            // bounded search can replace. Never resize its immutable cursor or
+            // use a missing-target page to prepare unrelated cards.
+            restoration.restoreStage = 'search'; restoration.restoreRequest = null;
+          } else if (result.nextCursor && restoration.restorePageCount < 3) {
             restoration.restoreRequest = createNextPredictionPageRequest(result, options.createId());
           } else {
-            restoration.restoreRequest = null; restoration.restorePageCount = 0;
+            restoration.restoreRequest = null; restoration.restoreStage = 'probe'; restoration.restorePageCount = 0;
             readerError('Valinta kumottiin, mutta edellistä teosta ei saatu takaisin syötteeseen. Yritä uudelleen.');
           }
           return;
@@ -224,7 +232,7 @@ export function createDiscoveryFeed(options: {
         // These siblings belong to the successful fresh restoration, not the
         // invalidated pre-Undo window. Reuse at most five without exposure so
         // the next gesture need not wait for another network roundtrip.
-        // The next NEW refill replaces this 50-item reader with a five-item root.
+        // The next NEW refill replaces this restoration reader with a five-item root.
         bufferPage = null; bufferEnded = false; upcoming = [];
         prepare(result, item.id);
         state = { ...state, delivery: deliveryFrom(result, item),
@@ -291,7 +299,7 @@ export function createDiscoveryFeed(options: {
     // Preserve the displayed opportunity and its history, but never reuse unseen
     // deliveries from before that acknowledgement.
     invalidateBuffer();
-    if (undoing) { undoing.restoreRequest = null; undoing.restorePageCount = 0; }
+    if (undoing) { undoing.restoreRequest = null; undoing.restoreStage = 'probe'; undoing.restorePageCount = 0; }
     publish(); void fillBuffer();
   }
   function skip() {
@@ -399,7 +407,7 @@ export function createDiscoveryFeed(options: {
       if (!target || [...target.actions, ...actions].some(action => action.kind === 'positive' && !action.receipt.undoable)) return false;
       invalidateBuffer(); invalidateSource();
       undoing = { target, remaining: [...target.actions, ...actions], actionId: null,
-        restoreRequest: null, restorePageCount: 0, fromHistory, acknowledgedCount: 0 };
+        restoreRequest: null, restoreStage: 'probe', restorePageCount: 0, fromHistory, acknowledgedCount: 0 };
       return continueUndo();
     },
     cancelPrevious() {

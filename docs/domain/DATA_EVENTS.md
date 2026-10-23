@@ -1218,7 +1218,10 @@ The October 23 continuous-feed refinement prepares at most five upcoming
 Discovery cards beside the active card. An adjacent preview remains inert and
 accessibility-hidden; it cannot record an impression or acquire skip capability.
 On activation, the card retains its original Prediction/page origin. Same-Item
-restoration may prepare up to five eligible siblings from the successful
+restoration first probes a fresh five-Item root after every ordered reversal
+receipt. A successful current-epoch missing-target probe may replace its known
+reader with the original bounded three-page, 50-Item search; ambiguous requests
+retain exact retry identity. Restoration may prepare up to five eligible siblings from the successful
 fresh page that contains the exact restored target, after all reversal receipts.
 Their original fresh-page origins remain immutable, and preparation creates no
 impression, dwell, skip capability or new choice. Missing-target, stale and error

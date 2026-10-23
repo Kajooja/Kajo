@@ -32,8 +32,8 @@ function fixture(bulk = false) {
   const flow = createDiscoveryFeed({ initial, scope, createId, nowMicros: () => '1000000',
     createRequest: (replacesChainId, limit = 5) => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
       itemType: 'MOVIE', limit: bulk ? limit : 1, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED' } } }),
-    createRestoreRequest: replacesChainId => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
-      itemType: 'MOVIE', limit: 50, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
+    createRestoreRequest: (replacesChainId, limit) => createFeedPredictionPageRequest({ ...scope, requestId: createId(),
+      itemType: 'MOVIE', limit, replacesChainId, context: { attributes: { surface: 'DISCOVERY_FEED_RETURN' } } }),
     load, loadSource, recordImpression, submit, undoPositive, onChange: vi.fn() });
   // Commit independently of transport, preserving an allocated reader and an
   // immutable exact retry even when the reply was lost.
@@ -420,7 +420,7 @@ describe('Discovery active card plus five prepared successors', () => {
     expect(f.flow.snapshot().upcoming).toEqual([]);
     f.flow.acknowledged(withdrawal.actionId);
     const stale = await f.reply(5, [15]);
-    expect(f.reads[6]!.request).toMatchObject({ limit: 50, cursor: null, replacesChainId: stale.chainId });
+    expect(f.reads[6]!.request).toMatchObject({ limit: 5, cursor: null, replacesChainId: stale.chainId });
     const restoration = await f.reply(6, [4, 50, 51]);
     const restored = f.flow.snapshot().delivery!;
     expect(restored).toMatchObject({ item: initial.item, origin: { predictionId: restoration.ranking.predictionId,
@@ -439,6 +439,104 @@ describe('Discovery active card plus five prepared successors', () => {
     await f.display(); expect(f.flow.advance()).toBe(true);
     expect(f.submit.mock.calls[2]![0].origin).toMatchObject({ predictionId: restoration.ranking.predictionId,
       deliveryRequestId: restoration.request.requestId });
+  });
+
+  async function beginUndoProbe() {
+    const f = fixture(true); await f.display(); f.flow.warm();
+    await f.reply(0, [10, 11, 12, 13, 14]);
+    expect(f.flow.advance()).toBe(true);
+    f.flow.acknowledged(f.submit.mock.calls[0]![0].actionId);
+    const previous = await f.reply(1, [15, 16, 17, 18, 19]);
+    expect(f.flow.previous()).toBe(true);
+    f.flow.acknowledged(f.submit.mock.calls[1]![0].actionId);
+    expect(f.reads[2]!.request).toMatchObject({ limit: 5, cursor: null, replacesChainId: previous.chainId });
+    expect(f.flow.snapshot()).toMatchObject({ restoringPresentation: { item: initial.item }, navigationPending: true });
+    return f;
+  }
+
+  it('activates a target found in the five-Item probe and refills its free slot without a wide search', async () => {
+    const f = await beginUndoProbe();
+    const probe = await f.reply(2, [4, 20, 21, 22, 23]);
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: initial.item, origin: {
+      predictionId: probe.ranking.predictionId, deliveryRequestId: probe.request.requestId,
+    } }, restoringPresentation: null, navigationPending: false, loading: false, refilling: true, canPrevious: false });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23].map(id));
+    expect(f.reads).toHaveLength(4);
+    expect(f.reads[3]!.request).toMatchObject({ limit: 5, cursor: null, replacesChainId: probe.chainId });
+    expect(f.reads.every(read => read.request.limit === 5)).toBe(true);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    await f.display();
+    expect(f.flow.advance()).toBe(true); // The next prepared card does not wait for the refill.
+    expect(f.submit.mock.calls[2]![0].origin).toMatchObject({
+      predictionId: probe.ranking.predictionId, deliveryRequestId: probe.request.requestId,
+    });
+    expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(20) }, loading: false, navigationPending: false });
+    await f.reply(3, [24, 25, 26, 27, 28]);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([21, 22, 23, 24, 25].map(id));
+    expect(f.recordImpression).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries an ambiguous five-Item probe exactly before replacing its confirmed missing-target reader', async () => {
+    const f = await beginUndoProbe();
+    const probe = f.commit(2, [20, 21, 22, 23, 24]);
+    await f.fail(2);
+    expect(f.reads).toHaveLength(3);
+    expect(f.flow.snapshot()).toMatchObject({ upcoming: [], navigationPending: true,
+      restoringPresentation: { item: initial.item }, refillError: 'Reply lost' });
+    f.flow.retry();
+    expect(f.reads[3]!.request).toBe(probe.request);
+    expect(f.reads).toHaveLength(4);
+    await f.reply(3, [20, 21, 22, 23, 24]);
+    expect(f.reads).toHaveLength(5);
+    expect(f.reads[4]!.request).toMatchObject({ limit: 50, cursor: null, replacesChainId: probe.chainId });
+    expect(f.reads[4]!.request.requestId).not.toBe(probe.request.requestId);
+    expect(f.flow.snapshot().upcoming).toEqual([]);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    const fresh = await f.reply(4, [4, 30, 31, 32, 33, 34]);
+    expect(f.flow.snapshot()).toMatchObject({ navigationPending: false, restoringPresentation: null, refillError: null });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([30, 31, 32, 33, 34].map(id));
+    for (const delivery of [f.flow.snapshot().delivery!, ...f.flow.snapshot().upcoming]) expect(delivery.origin).toMatchObject({
+      predictionId: fresh.ranking.predictionId, deliveryRequestId: fresh.request.requestId,
+    });
+    expect(f.submit).toHaveBeenCalledTimes(2); // The exact retry never repeats withdrawal.
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+  });
+
+  it.each([true, false])('rejects a stale probe with target present=%s without activating it or widening its search', async containsTarget => {
+    const f = await beginUndoProbe();
+    f.flow.recoveredAction(id(999));
+    const stale = await f.reply(2, containsTarget ? [4, 20, 21, 22, 23] : [20, 21, 22, 23, 24]);
+    expect(f.flow.snapshot()).toMatchObject({ upcoming: [], navigationPending: true,
+      restoringPresentation: { item: initial.item }, delivery: { item: item(10) } });
+    expect(f.reads).toHaveLength(4);
+    expect(f.reads[3]!.request).toMatchObject({ limit: 5, cursor: null, replacesChainId: stale.chainId });
+    expect(f.reads[3]!.request.requestId).not.toBe(stale.request.requestId);
+    expect(f.reads.every(read => read.request.limit === 5)).toBe(true);
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    const fresh = await f.reply(3, [4, 30, 31, 32, 33]);
+    expect(f.flow.snapshot().delivery?.origin).toMatchObject({
+      predictionId: fresh.ranking.predictionId, deliveryRequestId: fresh.request.requestId,
+    });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([30, 31, 32, 33].map(id));
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+  });
+
+  it('retains all three fifty-Item fallback pages after the separate small probe', async () => {
+    const f = await beginUndoProbe();
+    const probe = await f.reply(2, [20, 21, 22, 23, 24]);
+    expect(f.reads[3]!.request).toMatchObject({ limit: 50, cursor: null, replacesChainId: probe.chainId });
+    const first = await f.reply(3, Array.from({ length: 50 }, (_, offset) => 100 + offset));
+    expect(f.reads[4]!.request).toMatchObject({ limit: 50, cursor: first.nextCursor });
+    expect(f.reads[4]!.request.replacesChainId).toBeUndefined();
+    const second = await f.reply(4, Array.from({ length: 50 }, (_, offset) => 200 + offset));
+    expect(f.reads[5]!.request).toMatchObject({ limit: 50, cursor: second.nextCursor });
+    const third = await f.reply(5, Array.from({ length: 50 }, (_, offset) => 300 + offset));
+    expect(third.seenCount).toBe(150);
+    expect(f.reads).toHaveLength(6); // No fourth wide page or retry root without explicit recovery.
+    expect(f.flow.snapshot()).toMatchObject({ upcoming: [], navigationPending: true, canCancelPrevious: true,
+      restoringPresentation: { item: initial.item }, message: expect.stringContaining('edellistä teosta') });
+    expect(f.recordImpression).toHaveBeenCalledOnce();
+    expect(f.submit).toHaveBeenCalledTimes(2);
   });
 
   it('renews a full 1000-item reader without claiming catalogue exhaustion', async () => {

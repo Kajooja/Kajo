@@ -42,6 +42,18 @@ already running bounded refill finish across ordinary acknowledgements. These
 changes require a new source/build receipt; #710's five required checks and APK
 passed, but do not validate this later refinement.
 
+**Owner report on #713 — 2026-10-23, 22:39 Europe/Helsinki:** the rest of the
+feed works as requested, but Undo still loads too long and repeated forward/Undo
+cycles eventually show “Suositusten päivittäminen epäonnistui. Yritä uudelleen.”
+Read-only hosted logs confirm a canonical ranking statement timeout after
+8,184 ms, SQLSTATE 57014. This does not establish a second one-step/gesture defect
+or an active-reader leak. Retest at least 16 complete skip/Undo cycles and 16
+rating/Undo cycles on the successor, allowing each reversal to activate its fresh
+same-Item delivery. Include a target absent from the initial five-Item probe,
+delayed refills, retry/reconnection and unchanged one-step rearming. Record actual
+Undo-to-actionable timing and any recovery error; source/CI timings are not
+physical-phone measurements.
+
 The active successor in STATUS must be tested as an update preserving user data.
 Run the category/navigation checks below, then this superseding feed matrix on
 BOOK and MOVIE. It refines the earlier October 17 control expectations.

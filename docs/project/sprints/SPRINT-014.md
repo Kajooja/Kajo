@@ -14,6 +14,24 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Repeated Undo ranking timeout continuation — #239 / 2026-10-23
+
+The owner accepts the rest of #713's feed but reports long Undo loading and a
+recommendation-refresh error after repeated cycles. Hosted read-only logs show
+SQLSTATE 57014 in canonical scenario retrieval after 8,184 ms. This supersedes
+the earlier pending #711/#712 continuation handoff; #713's final CI/APK receipt
+is in STATUS and PR #355, which remains unmerged.
+
+The scoped continuation uses one five-Item restoration probe before the original
+bounded three-page, 50-Item search, retaining exact pending requests and fresh
+same-Item activation. The additive CLI-created performance forward changes only
+redundant evaluation of the same history/similarity, with exact scoring/evidence
+and function-identity parity required. Existing accounts, queues, installed
+migrations, frozen runs and release gates remain preserved. STATUS owns the
+current validation/hosted/build state; PR #355's final receipt supersedes this
+pre-publication checkpoint. Actual phone timing and repeated-cycle acceptance
+remain required after the correction.
+
 ## Owned mobile source accepted — #331 / 2026-10-12
 
 [#331](https://github.com/Kajooja/Kajo/pull/331) is merged as `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`,

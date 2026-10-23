@@ -956,13 +956,17 @@ same-Item reacquisition. Undo may show a separate cached `restoringPresentation`
 after the first exact undo/withdrawal command is durably admitted. It has no
 actionable delivery origin and cannot admit mutations, impression or dwell until
 all ordered undo receipts and a fresh same-Item delivery arrive; activation keeps
-the same visual identity. A successful current-epoch restoration page that
+the same visual identity. Reacquisition first probes a fresh five-Item root. Only
+a successful current-epoch missing-target response can replace that known reader
+with the original bounded search of at most three 50-Item pages. Keep exact
+requests across ambiguous failures; never resize an immutable continuation or
+shrink the fallback search. A successful current-epoch restoration page that
 contains the exact target may also prepare up to five of its eligible siblings,
 in response order, retaining that page's frozen Prediction/request origins and
 excluding the target, handled Items and duplicates. No earlier restoration page,
 missing-target response, stale reply or error contributes siblings. This replaces
 the empty-window roundtrip after restoration without reviving pre-Undo deliveries
-or adding a staging window. Do not continue the restoration reader's 50-Item
+or adding a staging window. Do not continue a restoration reader's 50-Item
 page size: the next new refill is a five-Item root that atomically replaces it.
 This presentation shortcut does not weaken server
 truth, exact retries or rejection/cancellation boundaries. List addition/undo admission waits for pending commands
@@ -971,6 +975,16 @@ Prefetch and an inert adjacent preview are not impressions; actual activation
 records exposure with the retained origin. This Discovery-only preparation policy
 does not change server scoring, precompute five future adaptive Taste questions,
 revise old PredictionRuns or prove recommendation-quality improvement.
+
+The repeated-Undo timeout continuation materializes the canonical scorer's
+unchanged historical outcome set once per ranking and prevents repeated
+evaluation of the same immutable scenario similarity per candidate/outcome pair.
+It retains the complete history, eligibility/reversal/priority rules, similarity
+threshold, existing tie ordering, top-30 retrieval, decay/reward expressions and
+frozen float values. This is an execution optimization, not a new scoring policy,
+history cap, timeout increase or model-quality claim. STATUS owns source, hosted
+installation and measured validation; a synthetic speed comparison is not a
+phone-latency measurement.
 
 #### Canonical-forecast selector source — 2026-10-16
 
@@ -2049,7 +2063,8 @@ choose a different page size; ordinary continuation still uses the immutable v3
 size/context contract. The feed uses bounded five-Item pages to warm/refill up to
 five successors, preserving server order after exclusions and admitting no extra
 staging window. Successful same-Item restoration may seed that bounded window
-from its fresh 50-Item page under the policy above; the next new refill returns
+from its successful fresh five-Item probe or 50-Item fallback page under the
+policy above; the next new refill returns
 to a five-Item root. Excess fetched candidates may remain unshown; page delivery is
 not exposure. Learning-changing rating/List acknowledgement marks future cursor
 work dirty without aborting the active bounded refill or its exact retry. Before

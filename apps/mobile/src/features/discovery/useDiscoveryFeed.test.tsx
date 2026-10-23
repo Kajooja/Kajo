@@ -178,22 +178,24 @@ describe('mounted Discovery feed delivery lifecycle', () => {
     expect(fixture.flow.recoveredAction).toHaveBeenCalledExactlyOnceWith(id(99));
   });
 
-  it('creates a five-successor root by default, a one-card refill when requested, and a separate restoration reader', async () => {
+  it('creates five-successor roots and explicit small/wide restoration roots with distinct immutable identities', async () => {
     await mount();
     const first = fixture.options!.createRequest(null);
     const refill = fixture.options!.createRequest(id(90), 1);
     const batch = fixture.options!.createRequest(id(91), 5);
-    const restoration = fixture.options!.createRestoreRequest(id(92));
-    expect([first.limit, refill.limit, batch.limit, restoration.limit]).toEqual([5, 1, 5, 50]);
-    expect([first.replacesChainId, refill.replacesChainId, batch.replacesChainId, restoration.replacesChainId])
-      .toEqual([null, id(90), id(91), id(92)]);
-    expect(new Set([first, refill, batch, restoration].map(request => request.requestId)).size).toBe(4);
-    for (const request of [first, refill, batch, restoration]) {
+    const probe = fixture.options!.createRestoreRequest(id(92), 5);
+    const restoration = fixture.options!.createRestoreRequest(id(93), 50);
+    expect([first.limit, refill.limit, batch.limit, probe.limit, restoration.limit]).toEqual([5, 1, 5, 5, 50]);
+    expect([first.replacesChainId, refill.replacesChainId, batch.replacesChainId, probe.replacesChainId, restoration.replacesChainId])
+      .toEqual([null, id(90), id(91), id(92), id(93)]);
+    expect(new Set([first, refill, batch, probe, restoration].map(request => request.requestId)).size).toBe(5);
+    for (const request of [first, refill, batch, probe, restoration]) {
       expect(request).toMatchObject({ version: 3, profileId: fixture.profiles.activeProfile.id,
         sessionId: fixture.tracking.sessionId, itemType: 'MOVIE', discoveryMode: 'FOR_YOU', cursor: null });
       expect(Object.isFrozen(request)).toBe(true);
     }
     expect(first.context.attributes?.surface).toBe('DISCOVERY_FEED');
+    expect(probe.context.attributes?.surface).toBe('DISCOVERY_FEED_RETURN');
     expect(restoration.context.attributes?.surface).toBe('DISCOVERY_FEED_RETURN');
   });
 

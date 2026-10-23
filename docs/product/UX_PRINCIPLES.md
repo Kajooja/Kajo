@@ -362,14 +362,20 @@ commands of that same partial reversal is recovery, not a second backward step.
 After restoration, forward browsing remains available; only a new accepted
 forward skip/rating or positive-card advance enables Undo again. Background
 acknowledgements, refills and rerenders do not re-enable it. Retain bounded exact
-history without allowing repeated backward traversal. Once the exact prior Item
+history without allowing repeated backward traversal. First try a fresh five-Item
+root after every ordered reversal receipt. If that successful current-epoch page
+does not contain the exact prior Item, replace its known reader with the original
+bounded search of at most three 50-Item pages. This small first probe does not
+shrink that fallback search, continue a five-Item cursor as a 50-Item request,
+reuse an old delivery or supply siblings when the target is absent. Ambiguous
+requests retain their exact retry identity before replacement. Once the exact prior Item
 is found in a successful fresh restoration page after all reversal receipts,
 prepare up to five eligible siblings from that same page in server order, with
 their fresh page origins and normal target/handled/duplicate exclusions. These
 are new deliveries, not the invalidated pre-Undo buffer. They remain inert until
 activation. Do not empty this fresh window and require another network roundtrip
 before forward browsing. The next new refill uses a five-Item root replacing the
-restoration reader; never continue its 50-Item page size for ordinary refills.
+restoration reader; never continue a 50-Item page size for ordinary refills.
 Missing-target, stale and error replies supply no prepared siblings.
 Failed local admission
 leaves the current card; unavailable
@@ -509,8 +515,10 @@ scope, subject to the existing ten-native-action undo limit and the post-#711
 one-backward-step gate above. The post-#710
 refinement may show the cached prior Item after the first durable undo admission,
 but that originless presentation remains inert. After all required
-undo receipts, it requests fresh canonical pages for the same prior Item (50 per
-page, at most three pages). A consumed/expired original delivery is never reused.
+undo receipts, it first requests a fresh five-Item root for the same prior Item,
+with a successful missing-target probe falling back to at most three fresh
+50-Item pages under the reader-replacement policy above. A consumed/expired
+original delivery is never reused.
 An unavailable target has retry/cancel recovery; cancellation starts a fresh feed
 instead of silently showing a substitute as the requested previous card. Shared
 consensus that cannot be undone is detected before reversing related actions.

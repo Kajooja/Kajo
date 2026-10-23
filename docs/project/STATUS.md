@@ -10,7 +10,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — uninterrupted continuation after one-step undo / #239
+## Current packet — repeated Undo latency and ranking timeout / #239
 
 **Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
 merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the
@@ -40,13 +40,14 @@ or dragging must commit that rating and automatically advance. This supersedes
 
 The active successor is [PR #355](https://github.com/Kajooja/Kajo/pull/355),
 `feat/239-buffered-feed`, based on accepted #354 main and still unmerged.
-Its published head `fe24b13f7b970cc42bb412ff8f3cac39d2112ce7` passed all five
+Its published head `f763701d7f72d5be64483cb28e7ecf7eec6a1e7d` passed all five
 required gates and the standalone APK job in
-[CI #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391).
-The tested merge checkout `6a7bcad2a22acedfea6814ba257b4391caae19b6` shares source
-tree `2c3c5614faf49be9e8bd293ae8165077b5536cdf`; its verified APK is
+[CI #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621).
+The tested merge checkout `4d61df3126d48428ef0e40eca0f44a06d896c317` shares source
+tree `feb8a3106580022bd0bedc4c86e71c5af247ca8c`; its verified APK is
 [below](#current-test-apk-and-device-work). These receipts validate the immediate
-undo/refill refinement, not the new post-#711 continuation correction.
+undo/refill and one-step/interruptible-motion corrections, not the new ranking
+performance continuation below.
 
 **Earlier phone feedback — 2026-10-23:** the owner says “Tämä on hyvä” about #707,
 accepting the general layout/rating direction, but scrolling is not smooth.
@@ -75,7 +76,7 @@ all ordered acknowledgements and fresh same-Item delivery; activation preserves
 the visual identity. Undo still clears the prepared window, and existing exact
 origins, ordered reversal, rejection and cancellation remain authoritative.
 
-**Latest #711 phone feedback — 2026-10-23:** the owner accepts the overall feel
+**Earlier #711 phone feedback — 2026-10-23:** the owner accepts the overall feel
 (“Nyt toimii täydellisesti”), then reports that continuation after Undo freezes.
 They require one backward step only, with forward reel browsing continuing.
 This accepts the reported feel, not the remaining continuation/startup/device
@@ -108,8 +109,43 @@ order with exact fresh origins and target/handled/duplicate exclusions. No
 pre-Undo buffer, missing-target page, stale reply or error is admitted. The next
 new refill replaces the restoration reader with a five-Item root. This removes
 the extra empty-window roundtrip without weakening reversal or exposure rules.
-New final-source checks, CI, replacement APK and targeted phone continuation
-acceptance remain pending; #712 does not validate this added refinement.
+Final-source CI #713 passed all five gates and the APK job with 770 mobile tests
+in 74 files. Its downloaded artifact and embedded bundle were independently
+verified; PR #355 owns the final hashes/expiry. #712 does not validate this added
+refinement, and the next owner observation below supersedes the pending test handoff.
+
+**Latest #713 phone feedback — 2026-10-23, 22:39 Europe/Helsinki:** the owner
+accepts the rest of the feed but reports long loading after Undo and, after
+repeated cycles, “Suositusten päivittäminen epäonnistui. Yritä uudelleen.”
+Read-only hosted logs identify an 8,184-ms HTTP 500 from `rank_items_feed_v1`
+and SQLSTATE 57014 inside `scenario_similarity_v1` / `text_array_jaccard` in
+the canonical candidate scorer. This is a server statement timeout, not evidence
+of an active-reader leak or a new gesture lock. Full repeated controller cycles
+remain a regression gate; no physical-device fix is claimed before retest.
+
+The same narrow PR now removes redundant history/similarity evaluation while
+preserving the scorer's complete history, formulas, thresholds, ordering,
+top-30 retrieval, exact floats and existing function/security identities.
+The client first probes a fresh five-Item restoration root after ordered Undo
+receipts. Only a successful current-epoch missing-target response replaces its
+known reader with the original bounded search of three 50-Item pages. Ambiguous
+requests retain exact retry identity, and missing-target pages supply no siblings.
+This reduces the common restoration workload without shrinking the fallback or
+making an old consumed delivery actionable. Canonical UX/model/Event documents
+were updated before this runtime change. Local validation passes 777 mobile tests
+in 74 files, all 322 database tests, lint/types/dependency/catalogue checks and
+explicit demo iOS/Android exports. The complete root check reaches the unchanged
+Deno npm-registry access limitation; full local-root success is not claimed.
+Full-schema parity includes more than 30 tied outcomes, reversal/priority rules,
+exact float bytes, old rows/receipt retries and unchanged function metadata.
+Similarity calls fall from 2,880 to 1,760 and from 4,000 to 2,000 in the declared
+fixtures; those are synthetic measurements, not hosted or phone timings.
+The CLI-created forward is `20261023194530_scenario_similarity_evaluation.sql`,
+SHA-256 `a5ab7b28ccd2ca34c2836b66e9ddff8827ddbfae2219292d169981f835297c4a`.
+It guards body MD5 `45f4f03f4a4fb99d84a02c83c472ae89`; the patched body must be
+`ea9bd681003796ae45261ee0fb6c1a05`, with all metadata preserved. Final-source CI,
+the additive hosted installation and replacement APK remain pending at this
+checkpoint; the final PR receipt owns their superseding results.
 
 The active design explicitly supersedes #709's acknowledgement-gated navigation
 and suppression-only buffer exception. Successful local SQLite admission of an
@@ -263,7 +299,8 @@ within the mounted scope and ten-native-action undo limit, with only one
 backward step between accepted forward choices. The new inert cached
 undo presentation may appear after durable admission; it is not a restored
 actionable delivery. After all required confirmed undo receipts,
-it reacquires the same Item through at most three 50-Item canonical pages; it
+it first probes a five-Item canonical root, with a successful missing-target
+response falling back to at most three 50-Item canonical pages; it
 never reuses an expired/consumed original delivery. Unavailable targets offer
 retry or cancellation, and nonundoable Shared consensus is rejected before
 partial reversal. Sequential Taste shares compact presentation, direct rating
@@ -273,13 +310,13 @@ questions and still lacks
 numeric backward-question undo. Retained v1/challenge Save and frozen first-answer
 measurement remain unchanged; full interaction/device acceptance remains open.
 
-**One active continuation:** repair uninterrupted forward continuation after
-one-step Undo in the same PR #355, validate its final-source CI and obtain a
-replacement configured APK for the superseding phone matrix. The #711
-immediate-undo/continuous-refill source is already published and built.
-Source integration remains separate from build and
-device evidence and requires the final-source gates. No new backend migration
-is needed for this presentation correction. Preserve accounts, ratings, List memberships
+**One active continuation:** repair the confirmed repeated-Undo ranking timeout
+and reduce the common restoration workload in the same PR #355. Validate final
+source CI, install the exact reviewed additive performance forward and obtain a
+replacement configured APK for the superseding phone matrix. #713's one-step
+Undo/interruptible-motion/fresh-sibling source is already published and built.
+Source integration remains separate from build, hosted and device evidence and
+requires the final-source gates. Preserve accounts, ratings, List memberships
 and pending commands. Do not reset accounts or replay installed migrations.
 Versioned Taste pool refresh/refill under #336 follows this packet; original
 frozen panels, first labels, session policies and retry origins remain protected.
@@ -617,26 +654,26 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is [CI #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391),
-PR #355 head `fe24b13f7b970cc42bb412ff8f3cac39d2112ce7`, tested merge checkout
-`6a7bcad2a22acedfea6814ba257b4391caae19b6`, shared tree
-`2c3c5614faf49be9e8bd293ae8165077b5536cdf`. All five required gates and the
+The latest verified configured build is [CI #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621),
+PR #355 head `f763701d7f72d5be64483cb28e7ecf7eec6a1e7d`, tested merge checkout
+`4d61df3126d48428ef0e40eca0f44a06d896c317`, shared tree
+`feb8a3106580022bd0bedc4c86e71c5af247ca8c`. All five required gates and the
 standalone APK job passed on attempt 1; PR #355 remains unmerged.
 
-[APK artifact #711](https://github.com/Kajooja/Kajo/actions/runs/39973249391/artifacts/12511484493),
-`kajo-android-standalone-6a7bcad2a22acedfea6814ba257b4391caae19b6`, expires
-**2026-10-30 15:28:45 UTC**. ZIP: 49,301,660 bytes, SHA-256
-`b6ae066f5b0db691f58b8d8faa111d55b7e4fd77d09831254a53c1f59e017690`.
-Extracted `app-release.apk`: 106,090,187 bytes, SHA-256
-`df27ce0082a1528c3fabf43f5167fab6af4b751e57bdf94a0ba278b2d4489f9e`.
-Archive/APK integrity and the 3,469,424-byte embedded bundle were verified; bundle
-SHA-256 `21f5d425682e444e6b641154c4ac08b09beea0fe0f230fbd191785f17c9dbe04`.
-The bundle contains the inert undo-presentation and feed-RPC/full-card markers;
-the obsolete nested description-scroll marker is absent. The owner accepts the
-overall feel but reports the post-Undo continuation defect above. The new
-one-step-Undo/interruptible-motion correction is not in #711. No installed
+[APK artifact #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621/artifacts/12521364384),
+`kajo-android-standalone-4d61df3126d48428ef0e40eca0f44a06d896c317`, expires
+**2026-10-30 18:05:50 UTC / 20:05:50 Europe/Helsinki**. ZIP: 49,301,565 bytes,
+SHA-256 `ea08fb4d606276d1a9b8852d1cf90917aa742477b3d31512967e0a404bd32779`.
+Extracted `app-release.apk`: 106,089,363 bytes, SHA-256
+`fd15ebf8873c00b1ad5a1385b760ef0f4e4acb090e21bf714fef7470376683db`.
+Archive/APK integrity and the 3,468,600-byte embedded bundle were verified; bundle
+SHA-256 `be5d01959980a7a9f6ec2ee5e87e3bf93dacb40f835500152abe762e1a25b05e`.
+The bundle contains the inert undo-presentation, feed-RPC/full-card and accepted-
+outgoing-card guard markers; the old animation input gate and nested description
+scroll marker are absent. The owner accepts the rest of the feed but reports the
+post-Undo latency and repeated ranking failure above. No installed
 checksum, signer comparison or complete physical-device acceptance is inferred.
-PR #355's final publication receipt will own the correction's exact source,
+PR #355's final publication receipt owns #713 and will own the correction's exact source,
 checks and replacement artifact, superseding this frozen pre-build checkpoint.
 
 The earlier verified configured build is [CI #710](https://github.com/Kajooja/Kajo/actions/runs/39962736369),
