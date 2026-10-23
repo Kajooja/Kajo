@@ -8,6 +8,7 @@ import { classifyAudit, npmAuditInvocation } from './audit-dependencies.mjs';
 import { corrections } from './security-patches.mjs';
 
 const verified = corrections.map(value => ({ ...value, path: `node_modules/${value.name}` }));
+const findingCount = corrections.length + 2;
 
 test('npm-run CLI execution preserves argument boundaries on Windows and POSIX', async () => {
   const temporary = await mkdtemp(join(tmpdir(), 'kajo-npm-invocation-'));
@@ -38,16 +39,16 @@ function fixture() {
     name: value.name, severity: 'high', nodes: [`node_modules/${value.name}`],
     via: [{ name: value.name, url: value.advisory }],
   }]));
-  vulnerabilities.expo = { name: 'expo', severity: 'high', nodes: ['node_modules/expo'], via: ['braces', 'node-forge', 'metro'] };
+  vulnerabilities.expo = { name: 'expo', severity: 'high', nodes: ['node_modules/expo'], via: ['braces', 'node-forge', 'zod', 'metro'] };
   vulnerabilities.metro = { name: 'metro', severity: 'high', nodes: ['node_modules/metro'], via: ['expo'] };
-  return { auditReportVersion: 2, vulnerabilities, metadata: { vulnerabilities: { info: 0, low: 0, moderate: 0, high: 4, critical: 0, total: 4 } } };
+  return { auditReportVersion: 2, vulnerabilities, metadata: { vulnerabilities: { info: 0, low: 0, moderate: 0, high: findingCount, critical: 0, total: findingCount } } };
 }
 
 test('audit preserves upstream findings and resolves only verified corrections through cyclic parents', () => {
   const report = fixture();
   const before = structuredClone(report);
   const result = classifyAudit(report, verified);
-  assert.equal(result.mitigated.length, 4);
+  assert.equal(result.mitigated.length, findingCount);
   assert.deepEqual(result.unmitigated, []);
   assert.deepEqual(report, before);
 });
@@ -59,11 +60,19 @@ test('a new advisory on an already corrected package still blocks its parents', 
 });
 
 test('missing, differently versioned and additional unverified copies block audit', () => {
-  assert.equal(classifyAudit(fixture(), []).unmitigated.length, 4);
+  assert.equal(classifyAudit(fixture(), []).unmitigated.length, findingCount);
   const report = fixture();
   report.vulnerabilities.braces.nodes.push('apps/mobile/node_modules/braces');
   assert.equal(classifyAudit(report, verified).unmitigated.length, 3);
-  assert.equal(classifyAudit(fixture(), verified.map(value => ({ ...value, version: 'unknown' }))).unmitigated.length, 4);
+  assert.equal(classifyAudit(fixture(), verified.map(value => ({ ...value, version: 'unknown' }))).unmitigated.length, findingCount);
+});
+
+test('Zod classification needs the exact reported copy and never borrows a fixed archive identity', () => {
+  const report = fixture();
+  report.vulnerabilities.zod.nodes.push('node_modules/@expo/cli/node_modules/zod');
+  assert.deepEqual(classifyAudit(report, verified).unmitigated.map(value => value.name), ['zod', 'expo', 'metro']);
+  const differentlyVersioned = verified.map(value => value.name === 'zod' ? { ...value, version: '4.6.7' } : value);
+  assert.deepEqual(classifyAudit(fixture(), differentlyVersioned).unmitigated.map(value => value.name), ['zod', 'expo', 'metro']);
 });
 
 test('audit refuses unknown graph edges, advisory shapes, severities and summary mismatches', () => {

@@ -1,5 +1,5 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useIsFocused } from 'expo-router';
 import * as Network from 'expo-network';
 import { AppState } from 'react-native';
 
@@ -18,6 +18,7 @@ import { getBootstrapEvidenceRevision, subscribeToBootstrapEvidence, getInteract
   getContextualSkipRevision, subscribeToContextualSkip } from './predictionRefresh';
 
 const INTERACTION_REFRESH_DELAY_MS = 600;
+const GRID_PAGE_LIMIT = 6;
 const EMPTY: PredictionReaderSnapshot = Object.freeze({ viewId: 'inactive', status: 'idle',
   pages: Object.freeze([]), items: Object.freeze([]), predictionIds: Object.freeze({}), message: null, recovery: null });
 const subscribeInactive = () => () => {};
@@ -45,7 +46,8 @@ export interface VisiblePredictionRanking {
 }
 
 export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
-  interactions: ItemInteractionMap): VisiblePredictionRanking {
+  interactions: ItemInteractionMap, enabled = true): VisiblePredictionRanking {
+  const focused = useIsFocused();
   const connection = useSupabaseConnection();
   const activeProfile = useActiveProfile();
   const eventTracking = useEventTracking();
@@ -62,7 +64,7 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
     eventTracking.session.actorUserId === actorUserId ? eventTracking.sessionId : null;
   const client = connection.status === 'configured' ? connection.client : null;
   const environment = connection.status === 'configured' ? connection.config.url : null;
-  const limit = activeProfile.activeProfile?.type === 'SHARED' ? 50 : 20;
+  const limit = GRID_PAGE_LIMIT;
   const revision = JSON.stringify([collectionRevision, bootstrapRevision, contextualSkipRevision, evidenceKey]);
   const scope = useMemo<PredictionReaderScope | null>(() => environment && actorUserId && profileId && sessionId
     ? { environment, actorUserId, profileId, sessionId, itemType, mode, limit, revision } : null,
@@ -78,27 +80,54 @@ export function usePredictionRanking(itemType: ItemType, mode: DiscoveryMode,
   const snapshot = useSyncExternalStore(reader?.subscribe ?? subscribeInactive,
     reader?.getSnapshot ?? inactiveSnapshot, reader?.getSnapshot ?? inactiveSnapshot);
   const lastActivation = useRef<{ identity: string; loaded: boolean } | null>(null);
-  // Scope invalidation happens during commit, before an old focus callback or
+  const activatedDuringCurrentFocus = useRef(false);
+  const activation = useMemo(() => ({ reader, enabled: focused && enabled }), [reader, focused, enabled]);
+  const currentActivation = useRef<typeof activation | null>(null);
+  // Scope invalidation happens during commit, before an old native callback or
   // delayed enrichment can publish into another actor/Profile/session's view.
-  useLayoutEffect(() => () => { reader?.deactivate(); }, [reader]);
-  useFocusEffect(useCallback(() => {
-    if (!reader) return;
+  useLayoutEffect(() => {
+    currentActivation.current = activation;
+    if (!activation.enabled) {
+      activatedDuringCurrentFocus.current = false;
+      reader?.deactivate();
+    }
+    return () => {
+      if (currentActivation.current === activation) currentActivation.current = null;
+      reader?.deactivate();
+    };
+  }, [activation, reader]);
+  // Activate only after the focused/settled render commits. A synchronous
+  // navigation focus listener could otherwise start work before layout has
+  // invalidated the preceding hidden activation, then be cancelled by it.
+  useEffect(() => {
+    if (!reader || !activation.enabled || currentActivation.current !== activation) return;
     const identity = predictionReaderScopeKey({ ...reader.scope, revision: '' });
+    const delay = getPredictionRefreshDelay(activatedDuringCurrentFocus.current &&
+      lastActivation.current?.identity === identity && lastActivation.current.loaded, INTERACTION_REFRESH_DELAY_MS);
+    activatedDuringCurrentFocus.current = true;
     const stopFocusedReader = watchFocusedPredictionReader(reader, {
       getState: Network.getNetworkStateAsync,
       subscribe: Network.addNetworkStateListener,
-    }, AppState, getPredictionRefreshDelay(
-      lastActivation.current?.identity === identity && lastActivation.current.loaded, INTERACTION_REFRESH_DELAY_MS));
+    }, AppState, delay);
     return () => {
       stopFocusedReader();
-      lastActivation.current = { identity, loaded: reader.getSnapshot().pages.length > 0 };
+      lastActivation.current = { identity, loaded: reader.getSnapshot().pages.length > 0 ||
+        (lastActivation.current?.identity === identity && lastActivation.current.loaded) };
       reader.deactivate();
     };
-  }, [reader]));
+  }, [reader, activation]);
 
-  const retry = useCallback(() => { reader?.retry(); }, [reader]);
-  const refresh = useCallback(() => { reader?.refresh(); }, [reader]);
-  const loadMore = useCallback(() => { reader?.loadMore(); }, [reader]);
+  // Native list callbacks may arrive after a page transition or scope change.
+  // Only callbacks captured by this settled activation may drive its reader.
+  const retry = useCallback(() => {
+    if (activation.enabled && currentActivation.current === activation) reader?.retry();
+  }, [activation, reader]);
+  const refresh = useCallback(() => {
+    if (activation.enabled && currentActivation.current === activation) reader?.refresh();
+  }, [activation, reader]);
+  const loadMore = useCallback(() => {
+    if (activation.enabled && currentActivation.current === activation) reader?.loadMore();
+  }, [activation, reader]);
   const fallback = useMemo(() => {
     const predictionId = createCorrelationId(fallbackSeed, `${itemType}:${mode}`);
     const items = getStaticMockItems(itemType, mode);

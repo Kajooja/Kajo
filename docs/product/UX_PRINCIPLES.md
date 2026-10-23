@@ -116,6 +116,20 @@ retains the other broad browse refinements; the issues below own implementation.
   filtered subset of the current recommendation slate is not that history.
   Membership, saved ratings, empty/loading/error behavior and authorization must
   agree regardless of entry. BOOK and MOVIE use the same generic route contract.
+- **Discovery page swipe — owner refinement, 2026-10-24:** Löydä and canonical
+  Katsotut/Luetut form two adjacent pages below the compact shared header. A
+  deliberate left drag reveals history with the finger; right returns to Löydä.
+  Header buttons select those same pages, and Android Back from embedded history
+  returns to Löydä. The standalone Lists history route retains its own back path.
+  Preserve each page's scroll on Item open/return. Only the settled selected page
+  accepts actions or records exposure; adjacent previews are inert and hidden
+  from accessibility. Vertical grid scrolling/append and the separate vertical
+  detail reel/rating gestures keep their existing behavior. Cancel ambiguous,
+  reversed, multitouch, obsolete-scope and backgrounded gestures without a page
+  action. Bound the two edges and respect reduced motion. Profile/actor/session,
+  ItemType or DiscoveryMode replacement cancels motion and selects fresh Löydä;
+  merely returning from an Item preserves the selected page. Read history lazily
+  for its first reveal, retain its snapshot and defer hidden dirty reloads.
 - **Compact header (#199/#200):** align the active ItemType title (Elokuvat),
   Löydä and Katsotut on one row at ordinary phone text sizes. The title is an
   accessible dropdown for Kirjat and other supported ItemTypes; future domains

@@ -5,11 +5,14 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ItemType } from '../../domain/contracts';
 import type { RoomTheme } from '../../theme/roomTheme';
 import { getConsumedItemLabels } from './itemInteractionLabels';
+import type { DiscoveryCollectionPage } from './discoveryCollectionGesture';
 
 interface DiscoveryCollectionHeaderProps {
   itemType: ItemType;
   title: string;
   theme: RoomTheme;
+  selected?: DiscoveryCollectionPage;
+  onSelect?: (page: DiscoveryCollectionPage) => void;
 }
 
 const CATEGORIES = [
@@ -17,7 +20,7 @@ const CATEGORIES = [
   { itemType: 'BOOK', label: 'Kirjat', route: '/discovery/books' },
 ] as const;
 
-export function DiscoveryCollectionHeader({ itemType, title, theme }: DiscoveryCollectionHeaderProps) {
+export function DiscoveryCollectionHeader({ itemType, title, theme, selected = 'discovery', onSelect }: DiscoveryCollectionHeaderProps) {
   // An old route's expanded selector must not follow the reader into a new domain.
   const [expandedItemType, setExpandedItemType] = useState<ItemType | null>(null);
   const expanded = expandedItemType === itemType;
@@ -43,23 +46,24 @@ export function DiscoveryCollectionHeader({ itemType, title, theme }: DiscoveryC
             style={[styles.arrow, { color: theme.base.textMuted }]}>{expanded ? '▴' : '▾'}</Text>
         </Pressable>
         <View style={styles.collections}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Löydä. Valittu näkymä."
-            accessibilityState={{ selected: true }}
-            onPress={() => setExpandedItemType(null)}
-            style={[styles.collectionButton, { borderBottomColor: theme.ambient.curtainHighlight }]}>
-            <Text style={[styles.collectionText, { color: theme.base.textPrimary }]}>Löydä</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel={selected === 'discovery' ? 'Löydä. Valittu näkymä.' : 'Avaa Löydä'}
+            accessibilityState={{ selected: selected === 'discovery' }}
+            onPress={() => { setExpandedItemType(null); onSelect?.('discovery'); }}
+            style={[styles.collectionButton, selected === 'discovery' && { borderBottomColor: theme.ambient.curtainHighlight }]}>
+            <Text style={[styles.collectionText, { color: selected === 'discovery' ? theme.base.textPrimary : theme.base.textMuted }]}>Löydä</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Avaa ${consumedLabel.toLowerCase()}`}
-            accessibilityState={{ selected: false }}
+            accessibilityLabel={selected === 'history' ? `${consumedLabel}. Valittu näkymä.` : `Avaa ${consumedLabel.toLowerCase()}`}
+            accessibilityState={{ selected: selected === 'history' }}
             onPress={() => {
               setExpandedItemType(null);
-              router.push({ pathname: '/lists/history', params: { itemType } });
+              if (onSelect) onSelect('history');
+              else router.push({ pathname: '/lists/history', params: { itemType } });
             }}
-            style={({ pressed }) => [styles.collectionButton, pressed && styles.pressed]}
+            style={({ pressed }) => [styles.collectionButton, selected === 'history' && { borderBottomColor: theme.ambient.curtainHighlight }, pressed && styles.pressed]}
           >
-            <Text style={[styles.collectionText, { color: theme.base.textMuted }]}>{consumedLabel}</Text>
+            <Text style={[styles.collectionText, { color: selected === 'history' ? theme.base.textPrimary : theme.base.textMuted }]}>{consumedLabel}</Text>
           </Pressable>
         </View>
       </View>

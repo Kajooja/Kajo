@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { lstat, readFile, writeFile } from 'node:fs/promises';
 import path, { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { zodSecurityCorrection } from './zod-security-correction.mjs';
 
 export const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -75,6 +76,7 @@ export const corrections = [
       },
     ],
   },
+  zodSecurityCorrection,
 ];
 
 function replaceExact(source, before, after, count) {
@@ -117,16 +119,22 @@ export async function securityPatches({ root = projectRoot, install = false } = 
     const nodes = Object.entries(lock.packages).filter(([path]) => path.endsWith(`/node_modules/${correction.name}`) || path === `node_modules/${correction.name}`);
     assert.ok(nodes.length > 0, `Review/remove the ${correction.name} correction after upgrading`);
     for (const [path, entry] of nodes) {
-      assert.equal(entry.version, correction.version, `Unreviewed ${correction.name} version`);
-      assert.equal(entry.integrity, correction.integrity, `Unreviewed ${correction.name} archive`);
-      assert.equal(entry.resolved, `https://registry.npmjs.org/${correction.name}/-/${correction.name}-${correction.version}.tgz`);
+      const expected = correction.variants?.find(value => value.version === entry.version) ?? correction;
+      assert.equal(entry.version, expected.version, `Unreviewed ${correction.name} version`);
+      assert.equal(entry.integrity, expected.integrity, `Unreviewed ${correction.name} archive`);
+      assert.equal(entry.resolved, `https://registry.npmjs.org/${correction.name}/-/${correction.name}-${expected.version}.tgz`);
       const directory = resolveDependencyDirectory(root, path);
       assert.ok((await lstat(directory)).isDirectory(), 'Dependency must be a real installed directory');
       const pkg = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
       assert.equal(pkg.name, correction.name);
-      assert.equal(pkg.version, correction.version);
+      assert.equal(pkg.version, expected.version);
+      for (const file of expected.unmodifiedFiles ?? []) {
+        const absolute = resolve(directory, file.path);
+        assert.ok((await lstat(absolute)).isFile(), 'Dependency source must be a regular file');
+        assert.equal(hash(await readFile(absolute)), file.sha256, `Unreviewed fixed dependency source: ${path}/${file.path}`);
+      }
       const files = [];
-      for (const file of correction.files) {
+      for (const file of expected.files) {
         const absolute = resolve(directory, file.path);
         assert.ok((await lstat(absolute)).isFile(), 'Dependency source must be a regular file');
         const source = await readFile(absolute, 'utf8');
@@ -135,7 +143,8 @@ export async function securityPatches({ root = projectRoot, install = false } = 
         else assert.equal(source, corrected, `Security correction missing: ${path}/${file.path}`);
         files.push({ path: file.path, originalSha256: file.sha256, correctedSha256: hash(corrected) });
       }
-      verified.push({ name: correction.name, version: correction.version, advisory: correction.advisory, path, files });
+      verified.push({ name: correction.name, version: expected.version, advisory: correction.advisory, path, files,
+        ...(expected.unmodifiedFiles ? { upstreamFixedFiles: expected.unmodifiedFiles } : {}) });
     }
   }
   return verified;
@@ -143,5 +152,5 @@ export async function securityPatches({ root = projectRoot, install = false } = 
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await securityPatches({ install: true });
-  console.log('Verified braces depth and node-forge DigestAlgorithm source corrections applied.');
+  console.log('Verified braces, node-forge and Zod compatibility source corrections applied.');
 }

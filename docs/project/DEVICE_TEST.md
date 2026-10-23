@@ -1,5 +1,23 @@
 # Collection device checkpoint — #228 / #229
 
+## Discovery horizontal history and return — #239 / 2026-10-24
+
+The owner reports #714 “Toimii”, accepting the reported feed/Undo correction.
+Discovery return after browsing still feels slow, and the new request is a
+finger-follow left swipe from Löydä to Katsotut/Luetut and right back. This is
+scoped feedback, not a passed startup or complete physical-device matrix.
+
+| Case | Required observation on the successor APK |
+|---|---|
+| Return | Browse/rate/skip and return repeatedly in BOOK and MOVIE. Unchanged ready pages retain scroll without a request; changed evidence starts a six-Item first page promptly and appends normally. Record actual return-to-visible timing under ordinary and slow connectivity. No stale actionable recommendation is shown to conceal a needed load. |
+| Horizontal pages | From poster, gap or text, drag left and see canonical history follow the thumb; right returns. Header buttons select the same pages. Both edges are bounded; short, reversed, vertical and multitouch gestures cancel without preference writes. Check reduced motion, small screen and large text. |
+| History identity | Katsotut/Luetut agrees with the standalone Lists entry, including saved rating 0, clear history, empty/error and active Personal/Shared Profile authorization. Open an Item and return to the same page/scroll. Android Back from embedded history returns to Löydä; standalone back follows its own route. |
+| Visibility and scope | Only the settled selected page accepts taps or accessibility focus. A partial preview, cancelled swipe or hidden list emits no impression/open. Change actor/Profile/session/domain/mode, rotate, blur or background during drag/settle; obsolete callbacks cannot select or mutate a new scope. |
+| Existing browsing | Vertical grid scrolling, end append and pull-to-load still work. Item detail retains its accepted whole-card vertical reading/flick, horizontal rating, five-successor buffer and one-step Undo behavior. Hidden history does not repeatedly reload while rating in the reel. |
+
+These are required device observations, not source-test or CI claims. STATUS and
+PR #355 own the successor source/build receipt.
+
 ## Continuous feed feedback — #239 / 2026-10-22
 
 After downloading the replacement APK, the owner reached the feed and reported:

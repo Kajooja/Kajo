@@ -12,6 +12,12 @@ import { corrections, correctedSource, originalSource, projectRoot, resolveDepen
 const require = createRequire(import.meta.url);
 const braces = require('braces');
 const forge = require('node-forge');
+const lock = JSON.parse(await readFile(resolve(projectRoot, 'package-lock.json'), 'utf8'));
+const installedCorrections = corrections.flatMap(correction => Object.entries(lock.packages)
+  .filter(([path]) => path === `node_modules/${correction.name}` || path.endsWith(`/node_modules/${correction.name}`))
+  .map(([path, entry]) => ({ ...correction,
+    ...(correction.variants?.find(value => value.version === entry.version) ?? {}),
+    directory: resolve(projectRoot, path) })));
 
 test('dependency containment accepts Windows/POSIX installs and rejects escapes', () => {
   for (const [pathApi, root] of [[posix, '/work/Kajo'], [win32, 'C:\\work\\Kajo']]) {
@@ -27,13 +33,13 @@ test('dependency containment accepts Windows/POSIX installs and rejects escapes'
 
 test('all locked instances contain the exact security corrections', async () => {
   const receipt = await securityPatches();
-  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['braces', 'node-forge']));
+  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['braces', 'node-forge', 'zod']));
 });
 
 test('source corrections are idempotent and reject unrelated edits or partial patches', async () => {
-  for (const correction of corrections) {
+  for (const correction of installedCorrections) {
     for (const file of correction.files) {
-      const source = await readFile(resolve(projectRoot, 'node_modules', correction.name, file.path), 'utf8');
+      const source = await readFile(resolve(correction.directory, file.path), 'utf8');
       const original = originalSource(source, file);
       assert.equal(correctedSource(original, file), source);
       assert.equal(correctedSource(source, file), source);
@@ -170,7 +176,7 @@ test('both distributed browser bundles reject the same malformed signatures', as
 test('negative controls reproduce both defects in pristine upstream source', async () => {
   const temporary = await mkdtemp(join(tmpdir(), 'kajo-security-controls-'));
   try {
-    for (const correction of corrections) {
+    for (const correction of corrections.filter(value => value.name !== 'zod')) {
       const directory = join(temporary, correction.name);
       await cp(resolve(projectRoot, 'node_modules', correction.name), directory, { recursive: true });
       for (const file of correction.files) {

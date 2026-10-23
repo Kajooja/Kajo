@@ -2056,7 +2056,7 @@ cannot be directly spawned as native executables.
 installed security regressions (including pristine-upstream negative controls),
 then obtains fresh `npm audit --json`. It prints the complete raw report,
 verified source hashes, mitigated findings and unmitigated findings separately.
-Only the exact two advisory/package identities on verified copies qualify. Parent
+Only the exact reviewed advisory/package identities on verified copies qualify. Parent
 meta-vulnerabilities qualify only when all reachable advisory leaves qualify;
 cycles without a real leaf fail. New findings, unknown copies/source, missing
 patches, malformed/incomplete reports and scanner transport failure fail closed.
@@ -2066,6 +2066,26 @@ upstream findings are never described as zero vulnerabilities.
 The corrections are temporary compatibility backports. Review/remove each when
 a fixed upstream release is available; changed source/version fails until reviewed.
 All normal checks, actual APK build and owner device acceptance remain required.
+
+The October 24 Discovery build also encounters
+[GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5).
+The compatible v4 lock leaf must use the published 4.6.7 fix; Expo CLI's declared
+v3 API stays at its real 3.25.76 identity. There is no published fixed v3 release.
+A local exact-archive backport may reject oversized arrays/sets before element
+parsing, following the [upstream v3 proposal](https://github.com/colinhacks/zod/issues/6653)
+and [accepted v4 correction](https://github.com/colinhacks/zod/pull/6652).
+The published 4.6.7 archive's bundled v3 API needs that same exact backport; its
+fixed v4 schema, utility and compiled execution files are hash-verified unchanged.
+All exported v3 and bundled v4 runtime formats must be covered, including async
+validation, custom check order, valid inputs and ordinary error behavior.
+Only leading upper bounds before a potentially value-rewriting check qualify for
+early rejection; bounds after overwrite/refinement preserve their original order.
+Unbounded collections remain unbounded, as in the upstream fix; callers handling
+untrusted collections must choose an upper bound. The raw audit and real package
+identities remain visible, and classification requires every affected locked
+copy's reviewed original/corrected hashes plus executable regressions. Unknown
+source, missing corrections and unrelated advisories still fail closed. Do not
+force Expo's v3 dependency to a v4 API or bypass the audit to obtain an APK.
 
 For October 6, compatible published fixes replace the compression 1.8.1 and
 source-map-js 1.2.1 lock leaves with 1.8.2 and 1.2.2. They fit the existing Expo

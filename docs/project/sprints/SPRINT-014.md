@@ -14,6 +14,19 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Discovery return and horizontal history — #239 / 2026-10-24
+
+The owner reports #714 works, accepting the reported feed/Undo correction after
+all six CI jobs and the single installed performance forward. STATUS/PR #355
+own its exact source/build/provider receipt; the PR remains unmerged. The new
+packet reduces changed-evidence grid return work to six Items and removes the
+refocus debounce, retaining focused revision coalescing and exact origins.
+Löydä and canonical Katsotut/Luetut become finger-follow horizontal pages below
+their shared header. Hidden previews are inert and create no exposure; the
+accepted vertical reel/rating/Undo and standalone history route stay intact.
+Canonical policies precede implementation. New source/CI/APK and actual phone
+acceptance are pending; do not replay installed migrations or reset accounts.
+
 ## Repeated Undo ranking timeout continuation — #239 / 2026-10-23
 
 The owner accepts the rest of #713's feed but reports long Undo loading and a

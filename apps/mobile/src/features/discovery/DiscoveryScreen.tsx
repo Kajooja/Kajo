@@ -1,5 +1,8 @@
 import { DiscoveryItemCard } from './DiscoveryItemCard';
 import { DiscoveryCollectionHeader } from './DiscoveryCollectionHeader';
+import { DiscoveryCollectionPager } from './DiscoveryCollectionPager';
+import { useDiscoveryCollectionPager } from './useDiscoveryCollectionPager';
+import { ConsumedHistoryScreen } from '../lists/ConsumedHistoryScreen';
 import { useDiscoveryAppendGesture } from './useDiscoveryAppendGesture';
 import { useItemLists } from '../lists/ItemListsContext';
 import { buildDeliveredItemOrigins, getDeliveredItemOrigin, rememberDeliveredSlate, type DeliveredItemOrigin } from './deliveredSlate';
@@ -59,10 +62,17 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const sharedEndorsements = useSharedEndorsements();
   const eventTracking = useEventTracking();
   const { scopeKey } = useItemLists();
+  const pagerScope = JSON.stringify([scopeKey, activeProfile.actorUserId, activeProfile.activeProfile?.id,
+    eventTracking.sessionId, itemType, mode]);
+  const pager = useDiscoveryCollectionPager(pagerScope, focused);
+  const discoveryActive = pager.active('discovery');
+  const isPagerActive = pager.isActive;
+  const discoveryLease = pager.getLease('discovery');
+  const historyLease = pager.getLease('history');
   const [imageWindow, setImageWindow] = useState({ viewId: '', first: 0, last: 7 });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const ranking = usePredictionRanking(itemType, mode, interactions);
+  const ranking = usePredictionRanking(itemType, mode, interactions, discoveryActive);
   const visibleImageWindow = imageWindow.viewId === ranking.viewId ? imageWindow : { first: 0, last: 7 };
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
@@ -104,11 +114,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
     const previous = currentView.current;
     const visible = previous?.token === view
       ? previous.visible.filter(item => items.some(current => current.id === item.id)) : [];
-    const context = focused && ranking.status === 'ready' && sharedOverlayReady
+    const context = discoveryActive && isPagerActive('discovery', discoveryLease) && ranking.status === 'ready' && sharedOverlayReady
       ? { mode, origins, originSessionId: eventTracking.sessionId, recordEvent: eventTracking.recordEvent } : null;
     currentView.current = { token: view, visible, items, context };
     if (context) recordVisibleImpressions(visible, context);
-  }, [view, items, focused, ranking.status, sharedOverlayReady, mode, origins,
+  }, [view, items, discoveryActive, discoveryLease, isPagerActive, ranking.status, sharedOverlayReady, mode, origins,
     eventTracking.sessionId, eventTracking.recordEvent]);
   useEffect(() => { prefetchDiscoveryImages(items.slice(0, INITIAL_IMAGE_PREFETCH_COUNT)); }, [items]);
 
@@ -122,7 +132,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<Item>[] }) => {
       const committed = currentView.current;
-      if (committed?.token !== view || !committed.context) return;
+      if (!isPagerActive('discovery', discoveryLease) || committed?.token !== view || !committed.context) return;
       const visibleTokens = viewableItems.filter(
         (token) => token.isViewable && token.index !== null && committed.items.some(item => item.id === token.item.id),
       );
@@ -156,12 +166,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 
       recordVisibleImpressions(visible, committed.context);
     },
-    [view],
+    [view, isPagerActive, discoveryLease],
   );
 
   function openItem(item: Item) {
     const committed = currentView.current;
-    if (committed?.token !== view || !committed.context || !committed.items.some(current => current.id === item.id)) return;
+    if (!isPagerActive('discovery', discoveryLease) || committed?.token !== view || !committed.context || !committed.items.some(current => current.id === item.id)) return;
     const origin = getDeliveredItemOrigin(committed.context.origins, item.id);
 
     committed.context.recordEvent({
@@ -193,14 +203,20 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 
   function appendDiscovery() {
     const committed = currentView.current;
-    if (!focused || committed?.token !== view) return;
+    if (!isPagerActive('discovery', discoveryLease) || committed?.token !== view) return;
     if ((ranking.status === 'error' || ranking.nextPageError) && ranking.recovery === 'retry') ranking.retry();
     else if (ranking.hasNextPage && committed.context) ranking.loadMore();
     if (isSharedDiscovery && sharedEndorsements.status !== 'ready') sharedEndorsements.retry();
   }
   const appendGesture = useDiscoveryAppendGesture(ranking.viewId,
-    `${ranking.viewId}:${ranking.items.length}`, focused && sharedOverlayReady && ranking.hasNextPage &&
+    `${ranking.viewId}:${ranking.items.length}:${discoveryLease}`, discoveryActive && sharedOverlayReady && ranking.hasNextPage &&
       !refreshing && !ranking.loadingNextPage && !ranking.nextPageError, appendDiscovery);
+  function runRankingAction(action: () => void) {
+    if (isPagerActive('discovery', discoveryLease)) action();
+  }
+  const appendPanHandlers = Object.fromEntries(Object.entries(appendGesture.panHandlers).map(([name, handler]) =>
+    [name, (...args: unknown[]) => isPagerActive('discovery', discoveryLease)
+      ? (handler as (...input: unknown[]) => unknown)(...args) : false]));
 
   return (
     <View style={styles.safeArea}>
@@ -218,8 +234,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
 
       <View style={styles.screen}>
         <View style={styles.headerContent}>
-          <DiscoveryCollectionHeader itemType={itemType} title={title} theme={theme} />
-
+          <DiscoveryCollectionHeader itemType={itemType} title={title} theme={theme}
+            selected={pager.selected} onSelect={pager.select} />
+        </View>
+        <DiscoveryCollectionPager pager={pager} discovery={<View style={styles.gridViewport}>
+        <View style={styles.headerContent}>
           <InteractionPersistenceNotice theme={theme} />
 
           {ranking.status === 'error' ? (
@@ -230,7 +249,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
               >
                 {ranking.message}
               </Text>
-              <Pressable accessibilityRole="button" onPress={ranking.recovery === 'refresh' ? ranking.refresh : ranking.retry}
+              <Pressable accessibilityRole="button" onPress={() => runRankingAction(ranking.recovery === 'refresh' ? ranking.refresh : ranking.retry)}
                 disabled={ranking.retrying} accessibilityState={{ disabled: ranking.retrying, busy: ranking.retrying }}
                 style={({ pressed }) => [styles.collectionButton, pressed && styles.pressed]}>
                 <Text accessibilityLiveRegion="polite" style={styles.collectionText}>{ranking.retrying ? 'Yritetään uudelleen…'
@@ -257,14 +276,14 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           ) : null}
         </View>
 
-        <View style={styles.gridViewport} {...appendGesture.panHandlers} onLayout={appendGesture.onLayout}>
+        <View style={styles.gridViewport} {...appendPanHandlers} onLayout={appendGesture.onLayout}>
         <FlatList
           key={ranking.viewId}
           alwaysBounceVertical
           overScrollMode="always"
           refreshing={refreshing}
           onRefresh={appendDiscovery}
-          onScroll={appendGesture.onScroll}
+          onScroll={event => { if (isPagerActive('discovery', discoveryLease)) appendGesture.onScroll(event); }}
           scrollEventThrottle={16}
           onContentSizeChange={appendGesture.onContentSizeChange}
           onEndReached={() => {
@@ -306,11 +325,11 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
             <View style={styles.pageFooter}>
               {ranking.nextPageError ? <>
                   <Text accessibilityLiveRegion="polite" style={styles.pageText}>{ranking.nextPageError}</Text>
-                  {ranking.recovery === 'retry' ? <Pressable accessibilityRole="button" onPress={ranking.retry} style={styles.collectionButton}
+                  {ranking.recovery === 'retry' ? <Pressable accessibilityRole="button" onPress={() => runRankingAction(ranking.retry)} style={styles.collectionButton}
                     disabled={ranking.retrying} accessibilityState={{ disabled: ranking.retrying, busy: ranking.retrying }}>
                     <Text accessibilityLiveRegion="polite" style={styles.collectionText}>{ranking.retrying ? 'Yritetään uudelleen…' : 'Yritä uudelleen'}</Text>
                   </Pressable> : null}
-                  {ranking.recovery === 'refresh' ? <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
+                  {ranking.recovery === 'refresh' ? <Pressable accessibilityRole="button" onPress={() => runRankingAction(ranking.refresh)} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Aloita uusi haku</Text>
                   </Pressable> : null}
                 </> : ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
@@ -318,8 +337,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                   <Text style={styles.pageText}>Vedä alaspäin listan lopussa nähdäksesi lisää.</Text>
                   <Pressable accessibilityRole="button" accessibilityLabel="Näytä lisää"
                     accessibilityHint="Lisää teoksia nykyisen listan loppuun"
-                    onPress={appendGesture.append} disabled={!focused || refreshing}
-                    accessibilityState={{ disabled: !focused || refreshing }} style={styles.collectionButton}>
+                    onPress={() => runRankingAction(appendGesture.append)} disabled={!discoveryActive || refreshing}
+                    accessibilityState={{ disabled: !discoveryActive || refreshing }} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Näytä lisää</Text>
                   </Pressable>
                 </> : ranking.status === 'ready' && ranking.source === 'hosted' && items.length > 0 ? <>
@@ -332,7 +351,7 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                         : 'Tämän haun suositukset on näytetty.'}
                   </Text>
                   {ranking.continuationState === 'READER_LIMIT' ?
-                    <Pressable accessibilityRole="button" onPress={ranking.refresh} style={styles.collectionButton}>
+                    <Pressable accessibilityRole="button" onPress={() => runRankingAction(ranking.refresh)} style={styles.collectionButton}>
                       <Text style={styles.collectionText}>Aloita uusi haku</Text>
                     </Pressable> : null}
                 </> : null}
@@ -386,6 +405,9 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           }}
         />
         </View>
+        </View>} history={<ConsumedHistoryScreen itemType={itemType} embedded
+          active={pager.active('history')} requested={pager.historyRequested}
+          isActive={() => isPagerActive('history', historyLease)} />} />
       </View>
     </View>
   );

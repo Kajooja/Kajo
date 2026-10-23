@@ -2053,6 +2053,21 @@ populated upgrade. A later-page rating 0/delayed exposure test verifies the exac
 page outcome and mature matching-genome evaluation. Local synthetic proof,
 actual native CI, hosted rollout and phone acceptance remain separate facts.
 
+#### Discovery grid return workload — October 24 refinement
+
+The October 24 return-latency refinement starts grid readers with six Items for
+both Personal and Shared Profiles, matching the first rendered grid batch.
+Continuation retains that immutable limit and its exact protocol-3 lineage;
+approaching the end appends the next current-source page normally. This is a
+bounded first-page workload change, not client ranking or a catalogue cutoff.
+Actual route refocus or selection of Löydä activates a needed reader immediately;
+the 600-ms coalescing delay applies only to evidence revisions while that page
+stays active. An unchanged ready reader retains its pages and scroll. Changed
+committed evidence still invalidates the previous scope, even while blurred;
+old origins cannot become actionable to conceal loading. Hidden/in-transition
+grid pages schedule no fresh ranking or exposure. A history preview is a
+canonical collection read and creates no Prediction or preference evidence.
+
 #### Continuous Discovery reader replacement — October 22 successor
 
 `rank_items_feed_v1(request jsonb)` is a root-only wrapper around unchanged

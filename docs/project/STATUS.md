@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-23**
+Last updated: **2026-10-24**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,7 +10,45 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — repeated Undo latency and ranking timeout / #239
+## Current packet — Discovery return latency and horizontal history / #239
+
+**Latest owner feedback — 2026-10-24 Europe/Helsinki:** “Toimii” accepts the
+reported #714 feed/Undo correction. Returning to Discovery after browsing still
+loads for too long. The owner requests a finger-follow horizontal transition
+from Löydä left to Katsotut/Luetut and right back, with the existing header
+buttons selecting the same pages. Continue the single unmerged PR #355; preserve
+the accepted vertical reel, rating/Undo, margins, scope and evidence contracts.
+
+The return path currently invalidates a blurred grid after acknowledged feed
+evidence, then adds 600 ms before requesting 20 Personal / 50 Shared Items.
+An unchanged ready reader already survives refocus. The scoped correction uses
+an immutable six-Item grid page and immediate activation on actual return, while
+retaining debounce for revisions while visibly focused. Hidden pages cannot
+rerank or record exposure; changed evidence cannot reuse actionable stale pages.
+Read-only hosted logs also show a 9,275-ms page HTTP 500 at 21:14 UTC, SQLSTATE
+57014 in canonical ranking, with a parallel contextual-skip lock wait. This is
+timeout evidence, not an established reader-cap leak. No new database forward,
+account reset or replay of installed migrations is planned for this packet.
+
+Horizontal pages share the compact header and actual canonical history, retain
+their scroll on Item return, and gate actions/exposure to the settled selected
+page. Canonical UX/model/Event policies were updated before implementation.
+The new source and deterministic regressions are implemented. Local lint/types,
+841 mobile tests in 77 files and all 50 dependency tests pass; independent
+Discovery review covers 147 focused tests. Both the working and isolated fresh
+installation pass the raw advisory audit with zero unmitigated findings; fresh
+`npm ci` applies the guarded corrections automatically. Remaining root stages,
+exports, complete CI and APK are pending at this pre-publication checkpoint;
+the final PR receipt owns their superseding identities and outcomes.
+Owner feedback remains scoped and does not close the full device/startup matrix.
+
+The mandatory fresh dependency audit additionally identifies newly published
+Zod `GHSA-mrhx-c7xc-m3w5`. This packet includes only its compatible v4 lock leaf
+and exact-archive compatibility guards for exported v3/older bundled v4 paths,
+under the existing fail-closed correction contract in ARCHITECTURE. Expo's
+declared v3 API and existing braces/node-forge corrections stay intact. The raw
+audit is retained, all runtime formats need regressions, and no audit bypass or
+broad dependency upgrade is authorized by this implementation choice.
 
 **Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
 merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the
@@ -40,14 +78,18 @@ or dragging must commit that rating and automatically advance. This supersedes
 
 The active successor is [PR #355](https://github.com/Kajooja/Kajo/pull/355),
 `feat/239-buffered-feed`, based on accepted #354 main and still unmerged.
-Its published head `f763701d7f72d5be64483cb28e7ecf7eec6a1e7d` passed all five
+Its accepted feed baseline `a8225b073d167d9c1015f121f33d101a923c2ce6` passed all five
 required gates and the standalone APK job in
-[CI #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621).
-The tested merge checkout `4d61df3126d48428ef0e40eca0f44a06d896c317` shares source
-tree `feb8a3106580022bd0bedc4c86e71c5af247ca8c`; its verified APK is
-[below](#current-test-apk-and-device-work). These receipts validate the immediate
-undo/refill and one-step/interruptible-motion corrections, not the new ranking
-performance continuation below.
+[CI #714](https://github.com/Kajooja/Kajo/actions/runs/40015633346).
+The tested merge checkout `00377dbbd9a5a145016228bd5fe5089a4eb8f2f3` shares source
+tree `44da4fc47ede33c9bde20a5b694cf974bf8b138c`. APK artifact `12531530158`
+has SHA-256 `9f2eef37cd084083a22833809f713b3e93dae5df6ce7bfadc35bb57d4481d1cb`;
+the downloaded archive and embedded bundle were independently verified.
+The provider installed `scenario_similarity_evaluation` once as receipt
+`20261023202605`, matching the reviewed source and body/metadata guards below.
+PR #355 owns the full #714 artifact/expiry and hosted receipt. These facts
+supersede the earlier frozen pending checkpoints; #714 does not validate the
+new horizontal-navigation/return-latency source.
 
 **Earlier phone feedback — 2026-10-23:** the owner says “Tämä on hyvä” about #707,
 accepting the general layout/rating direction, but scrolling is not smooth.
@@ -114,7 +156,7 @@ in 74 files. Its downloaded artifact and embedded bundle were independently
 verified; PR #355 owns the final hashes/expiry. #712 does not validate this added
 refinement, and the next owner observation below supersedes the pending test handoff.
 
-**Latest #713 phone feedback — 2026-10-23, 22:39 Europe/Helsinki:** the owner
+**Earlier #713 phone feedback — 2026-10-23, 22:39 Europe/Helsinki:** the owner
 accepts the rest of the feed but reports long loading after Undo and, after
 repeated cycles, “Suositusten päivittäminen epäonnistui. Yritä uudelleen.”
 Read-only hosted logs identify an 8,184-ms HTTP 500 from `rank_items_feed_v1`
@@ -143,9 +185,9 @@ fixtures; those are synthetic measurements, not hosted or phone timings.
 The CLI-created forward is `20261023194530_scenario_similarity_evaluation.sql`,
 SHA-256 `a5ab7b28ccd2ca34c2836b66e9ddff8827ddbfae2219292d169981f835297c4a`.
 It guards body MD5 `45f4f03f4a4fb99d84a02c83c472ae89`; the patched body must be
-`ea9bd681003796ae45261ee0fb6c1a05`, with all metadata preserved. Final-source CI,
-the additive hosted installation and replacement APK remain pending at this
-checkpoint; the final PR receipt owns their superseding results.
+`ea9bd681003796ae45261ee0fb6c1a05`, with all metadata preserved. The final #714 CI,
+single hosted installation and verified APK completed this earlier packet; the
+PR receipt and current accepted baseline above supersede its old pending notes.
 
 The active design explicitly supersedes #709's acknowledgement-gated navigation
 and suppression-only buffer exception. Successful local SQLite admission of an
@@ -654,7 +696,27 @@ retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
 
-The latest verified configured build is [CI #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621),
+The latest verified configured build is [CI #714](https://github.com/Kajooja/Kajo/actions/runs/40015633346),
+PR #355 source `a8225b073d167d9c1015f121f33d101a923c2ce6`, tested merge checkout
+`00377dbbd9a5a145016228bd5fe5089a4eb8f2f3`, shared tree
+`44da4fc47ede33c9bde20a5b694cf974bf8b138c`. All six jobs passed on attempt 1,
+completing at 2026-10-23 20:45:12 UTC. PR #355 remains unmerged.
+
+[APK artifact #714](https://github.com/Kajooja/Kajo/actions/runs/40015633346/artifacts/12531530158),
+`kajo-android-standalone-00377dbbd9a5a145016228bd5fe5089a4eb8f2f3`, expires
+**2026-10-30 20:45:06 UTC / 22:45:06 Europe/Helsinki (UTC+02)**. ZIP: 49,301,538
+bytes, SHA-256 `09cdac14ea73c4e1afbc501234e4ea75d3a4df9a4307ba8dbfc8b4bf2fbad819`.
+Extracted APK: 106,089,543 bytes, SHA-256
+`9f2eef37cd084083a22833809f713b3e93dae5df6ce7bfadc35bb57d4481d1cb`.
+The verified embedded bundle is 3,468,780 bytes, SHA-256
+`00361b73a20117091ef80af4e44d81d01c9ae78e296c28417b0a8946ba363a76`.
+Independent verification matched GitHub's ZIP digest, exact APK entry, bundle,
+source/test-merge tree and ordered parents. The owner now reports “Toimii” for
+the feed/Undo correction. Installed checksum, signer comparison and full device
+matrix remain unreported. The current horizontal-history/return source requires
+a successor build; its final PR receipt supersedes this pre-build checkpoint.
+
+The previous verified configured build is [CI #713](https://github.com/Kajooja/Kajo/actions/runs/39995144621),
 PR #355 head `f763701d7f72d5be64483cb28e7ecf7eec6a1e7d`, tested merge checkout
 `4d61df3126d48428ef0e40eca0f44a06d896c317`, shared tree
 `feb8a3106580022bd0bedc4c86e71c5af247ca8c`. All five required gates and the

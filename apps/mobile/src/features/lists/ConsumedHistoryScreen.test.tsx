@@ -1,9 +1,9 @@
 import React, { type ReactElement, type ReactNode } from 'react';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { router } from 'expo-router';
-import type { ItemType } from '../../domain/contracts';
+import type { DiscoveryMode, ItemType } from '../../domain/contracts';
 import type { ConsumedItemsResult } from './itemListOperations';
-import { ConsumedHistoryContent } from './ConsumedHistoryScreen';
+import { ConsumedHistoryContent, type ConsumedHistoryScreenProps } from './ConsumedHistoryScreen';
 import { CollectionGrid } from './CollectionGrid';
 import { getDeliveredSlate } from '../discovery/deliveredSlate';
 
@@ -12,12 +12,18 @@ const hooks = vi.hoisted(() => ({
   memos: [] as { deps: readonly unknown[]; value: unknown }[],
   effects: [] as { deps: readonly unknown[]; cleanup: (() => void) | undefined }[],
   pending: new Map<number, () => void>(),
+  layoutPending: new Map<number, () => void>(),
   stateIndex: 0, memoIndex: 0, effectIndex: 0,
 }));
 const context = vi.hoisted(() => ({
   scopeKey: 'test:actor:personal' as string | null,
   profileName: 'Personal',
+  mode: 'FOR_YOU' as DiscoveryMode,
   revision: 0,
+  sessionId: 'test-session',
+  deliveryId: 'history-navigation-test',
+  recordEvent: vi.fn(),
+  submitCollectionAction: vi.fn(),
   loadConsumed: vi.fn<(itemType: ItemType | null) => Promise<ConsumedItemsResult>>(),
 }));
 
@@ -47,6 +53,17 @@ vi.mock('react', async importOriginal => {
       if (!same(hooks.memos[index]?.deps, deps)) hooks.memos[index] = { deps, value: factory() };
       return hooks.memos[index]?.value;
     },
+    useLayoutEffect: (effect: () => void | (() => void), deps: readonly unknown[]) => {
+      const index = hooks.effectIndex++;
+      const previous = hooks.effects[index];
+      if (same(previous?.deps, deps)) return;
+      hooks.effects[index] = { deps, cleanup: previous?.cleanup };
+      hooks.layoutPending.set(index, () => {
+        previous?.cleanup?.();
+        const cleanup = effect();
+        hooks.effects[index]!.cleanup = typeof cleanup === 'function' ? cleanup : undefined;
+      });
+    },
     useEffect: (effect: () => void | (() => void), deps: readonly unknown[]) => {
       const index = hooks.effectIndex++;
       const previous = hooks.effects[index];
@@ -61,17 +78,17 @@ vi.mock('react', async importOriginal => {
   };
 });
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({
-  sessionId: 'test-session', createEventId: () => 'history-navigation-test',
+  sessionId: context.sessionId, createEventId: () => context.deliveryId, recordEvent: context.recordEvent,
 }) }));
 vi.mock('../discovery/ItemInteractionContext', () => ({ useItemInteractions: () => ({
-  submitCollectionAction: vi.fn(),
+  submitCollectionAction: context.submitCollectionAction,
 }) }));
 vi.mock('./CollectionGrid', () => ({ CollectionGrid: 'CollectionGrid' }));
 vi.mock('./ItemListsContext', () => ({ useItemLists: () => context }));
 vi.mock('../profiles/ActiveProfileContext', () => ({ useActiveProfile: () => ({
   activeProfile: { id: context.scopeKey, type: 'PERSONAL', name: context.profileName },
 }) }));
-vi.mock('../discovery/DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
+vi.mock('../discovery/DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: context.mode }) }));
 vi.mock('expo-router', () => ({ router: { back: vi.fn(), push: vi.fn() } }));
 vi.mock('expo-status-bar', () => ({ StatusBar: 'StatusBar' }));
 vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }));
@@ -91,11 +108,24 @@ function text(value: ReactNode): string {
   return React.Children.toArray(value).map(child => React.isValidElement<Props>(child)
     ? text(child.props.children) : String(child)).join(' ');
 }
-function render(itemType: ItemType = 'BOOK') {
+type HistoryOptions = Omit<ConsumedHistoryScreenProps, 'itemType'>;
+function renderScreen(itemType: ItemType = 'BOOK', options: HistoryOptions = {}) {
   hooks.stateIndex = hooks.memoIndex = hooks.effectIndex = 0;
-  const screen = ConsumedHistoryContent({ itemType });
+  const screen = ConsumedHistoryContent({ itemType, ...options });
+  // Native callbacks run after layout commit, before passive read effects.
+  const layouts = [...hooks.layoutPending.values()];
+  hooks.layoutPending.clear();
+  layouts.forEach(effect => effect());
+  return screen;
+}
+function renderGrid(itemType: ItemType = 'BOOK', options: HistoryOptions = {}) {
+  const screen = renderScreen(itemType, options);
   // Inspect the real collection props while leaving native virtualization to device tests.
   const grid = React.Children.toArray(screen.props.children).find(child => React.isValidElement(child) && child.type === CollectionGrid) as ReactElement<React.ComponentProps<typeof CollectionGrid>>;
+  return grid;
+}
+function render(itemType: ItemType = 'BOOK', options: HistoryOptions = {}) {
+  const grid = renderGrid(itemType, options);
   return React.createElement('View', {}, grid.props.header,
     React.createElement('Pressable', { onPress: grid.props.onRefresh }, 'Yritä uudelleen'),
     ...grid.props.entries.map(entry => React.createElement('Pressable', { key: entry.item.id,
@@ -137,10 +167,17 @@ function enterScope(scope: string | null, name = 'Selected profile') {
 
 beforeEach(() => {
   hooks.effects.forEach(effect => effect.cleanup?.());
-  hooks.states = []; hooks.memos = []; hooks.effects = []; hooks.pending.clear();
+  hooks.states = []; hooks.memos = []; hooks.effects = []; hooks.pending.clear(); hooks.layoutPending.clear();
   hooks.stateIndex = hooks.memoIndex = hooks.effectIndex = 0;
   context.scopeKey = 'test:actor:personal';
   context.profileName = 'Personal';
+  context.mode = 'FOR_YOU';
+  context.revision = 0;
+  context.sessionId = 'test-session';
+  context.deliveryId = 'history-navigation-test';
+  context.recordEvent.mockReset();
+  context.submitCollectionAction.mockReset();
+  context.submitCollectionAction.mockResolvedValue({ status: 'success' });
   context.loadConsumed.mockReset();
   context.loadConsumed.mockImplementation(() => new Promise(() => {}));
   vi.mocked(router.push).mockClear();
@@ -226,5 +263,213 @@ describe('consumed history read ownership', () => {
       source: 'collection', predictionId: null, collectionTitle: 'Katsotut' });
     expect(slate.items.map(item => item.title)).toEqual(['Watched movie']);
     expect(context.loadConsumed.mock.calls).toEqual([['BOOK'], ['MOVIE']]);
+  });
+});
+
+
+describe('embedded consumed history lifecycle', () => {
+  const hidden: HistoryOptions = { embedded: true, active: false, requested: false };
+  const preview: HistoryOptions = { embedded: true, active: false, requested: true };
+  const selected: HistoryOptions = { embedded: true, active: true, requested: true };
+
+  it('reads lazily on first reveal and keeps preview callbacks inert', async () => {
+    render('BOOK', hidden); flushEffects();
+    expect(context.loadConsumed).not.toHaveBeenCalled();
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical read title'));
+    render('BOOK', preview); flushEffects();
+    await Promise.resolve();
+    const grid = renderGrid('BOOK', preview);
+    expect(grid.props.entries.map(entry => entry.item.title)).toEqual(['Canonical read title']);
+    grid.props.onOpen(grid.props.entries[0]!.item);
+    grid.props.onRefresh();
+    const clear = grid.props.renderActions!(grid.props.entries[0]!.item) as ReactElement<Props>;
+    clear.props.onPress!();
+    render('BOOK', preview); flushEffects();
+    expect(context.loadConsumed.mock.calls).toEqual([['BOOK']]);
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+    expect(context.recordEvent).not.toHaveBeenCalled();
+  });
+
+  it('retains unchanged rows and defers hidden revision/callback reloads until reveal', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Retained title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    expect(text(render('BOOK', selected))).toContain('Retained title');
+    const originalLoader = context.loadConsumed;
+    render('BOOK', hidden); flushEffects();
+    context.revision++;
+    const updated = deferred();
+    context.loadConsumed = vi.fn().mockReturnValue(updated.promise);
+    expect(text(render('BOOK', hidden))).toContain('Retained title');
+    flushEffects();
+    expect(context.loadConsumed).not.toHaveBeenCalled();
+    expect(originalLoader).toHaveBeenCalledTimes(1);
+    const refreshing = renderGrid('BOOK', selected);
+    expect(refreshing.props.refreshing).toBe(true);
+    expect(refreshing.props.entries[0]!.item.title).toBe('Retained title');
+    refreshing.props.onOpen(refreshing.props.entries[0]!.item);
+    flushEffects();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.loadConsumed.mock.calls).toEqual([['BOOK']]);
+    updated.resolve(success('Updated canonical title')); await Promise.resolve();
+    expect(text(render('BOOK', selected))).toContain('Updated canonical title');
+    render('BOOK', hidden); flushEffects();
+    expect(text(render('BOOK', selected))).toContain('Updated canonical title');
+    flushEffects();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(1);
+  });
+
+  it('revokes retained open, refresh and clear immediately when pager starts moving', async () => {
+    let settled = true;
+    const options = { ...selected, isActive: () => settled };
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical title'));
+    render('BOOK', options); flushEffects(); await Promise.resolve();
+    const grid = renderGrid('BOOK', options);
+    const clear = grid.props.renderActions!(grid.props.entries[0]!.item) as ReactElement<Props>;
+    settled = false;
+    // The native callbacks can arrive before React renders the new active prop.
+    grid.props.onOpen(grid.props.entries[0]!.item);
+    grid.props.onRefresh();
+    clear.props.onPress!();
+    render('BOOK', options); flushEffects();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(1);
+    settled = true;
+    render('BOOK', hidden);
+    grid.props.onOpen(grid.props.entries[0]!.item);
+    grid.props.onRefresh();
+    clear.props.onPress!();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+  });
+
+  it.each(['scope', 'session', 'domain'] as const)('revokes old callbacks before effects after %s replacement', async kind => {
+    context.loadConsumed.mockResolvedValueOnce(success('Private title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    const old = renderGrid('BOOK', selected);
+    const clear = old.props.renderActions!(old.props.entries[0]!.item) as ReactElement<Props>;
+    if (kind === 'scope') enterScope('test:actor:shared');
+    if (kind === 'session') context.sessionId = 'replacement-session';
+    const next = renderGrid(kind === 'domain' ? 'MOVIE' : 'BOOK', hidden);
+    expect(next.props.entries).toEqual([]);
+    old.props.onOpen(old.props.entries[0]!.item);
+    old.props.onRefresh();
+    clear.props.onPress!();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+  });
+
+  it.each(['BOOK', 'MOVIE'] as const)('opens %s from the canonical collection without recommendation exposure', async itemType => {
+    context.deliveryId = `embedded-history-${itemType}`;
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical collection title', itemType));
+    render(itemType, selected); flushEffects(); await Promise.resolve();
+    const grid = renderGrid(itemType, selected);
+    grid.props.onOpen(grid.props.entries[0]!.item);
+    const slate = getDeliveredSlate(context.deliveryId)!;
+    expect(slate).toMatchObject({ source: 'collection', predictionId: null,
+      collectionTitle: itemType === 'BOOK' ? 'Luetut' : 'Katsotut',
+      scopeKey: context.scopeKey, sessionId: context.sessionId });
+    expect(slate.items.map(item => item.title)).toEqual(['Canonical collection title']);
+    expect(context.loadConsumed.mock.calls).toEqual([[itemType]]);
+    expect(context.recordEvent).not.toHaveBeenCalled();
+    const screen = renderScreen(itemType, selected);
+    expect(screen.props.edges).toEqual([]);
+    expect(text(grid.props.header)).not.toContain('Personal');
+    expect(nodes(grid.props.header).some(node => node.type === 'Pressable')).toBe(false);
+  });
+
+  it('does not revive pre-hide commands after showing the same unchanged read', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    const old = renderGrid('BOOK', selected);
+    const oldClear = old.props.renderActions!(old.props.entries[0]!.item) as ReactElement<Props>;
+    render('BOOK', hidden); flushEffects();
+    const current = renderGrid('BOOK', selected); flushEffects();
+    old.props.onOpen(old.props.entries[0]!.item);
+    old.props.onRefresh(); oldClear.props.onPress!();
+    render('BOOK', selected); flushEffects();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(1);
+    context.deliveryId = 'history-after-unchanged-return';
+    current.props.onOpen(current.props.entries[0]!.item);
+    expect(router.push).toHaveBeenCalledTimes(1);
+    const currentClear = current.props.renderActions!(current.props.entries[0]!.item) as ReactElement<Props>;
+    currentClear.props.onPress!();
+    await Promise.resolve();
+    expect(context.submitCollectionAction).toHaveBeenCalledWith({ kind: 'CLEAR_HISTORY', itemId: 'fixture-item' }, 'LIST_DETAIL');
+  });
+
+  it('blocks removal of retained rows until a dirty reveal read completes', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Retained title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    renderGrid('BOOK', selected);
+    render('BOOK', hidden); flushEffects();
+    context.revision++;
+    const reload = deferred();
+    context.loadConsumed.mockReturnValueOnce(reload.promise);
+    render('BOOK', hidden); flushEffects();
+    const dirty = renderGrid('BOOK', selected); flushEffects();
+    expect(dirty.props.refreshing).toBe(true);
+    const clear = dirty.props.renderActions!(dirty.props.entries[0]!.item) as ReactElement<Props & {
+      disabled: boolean; accessibilityState: { disabled: boolean };
+    }>;
+    expect(clear.props.disabled).toBe(true);
+    expect(clear.props.accessibilityState.disabled).toBe(true);
+    clear.props.onPress!();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+    reload.resolve(success('Fresh title')); await Promise.resolve();
+    const fresh = renderGrid('BOOK', selected);
+    const freshClear = fresh.props.renderActions!(fresh.props.entries[0]!.item) as ReactElement<Props>;
+    freshClear.props.onPress!(); await Promise.resolve();
+    expect(context.submitCollectionAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('revokes old-mode callbacks without inventing another canonical read', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    const old = renderGrid('BOOK', selected);
+    const oldClear = old.props.renderActions!(old.props.entries[0]!.item) as ReactElement<Props>;
+    context.mode = 'RISK';
+    const current = renderGrid('BOOK', selected); flushEffects();
+    old.props.onOpen(old.props.entries[0]!.item);
+    old.props.onRefresh(); oldClear.props.onPress!();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(1);
+    context.deliveryId = 'history-new-mode';
+    current.props.onOpen(current.props.entries[0]!.item);
+    expect(getDeliveredSlate(context.deliveryId)?.mode).toBe('RISK');
+  });
+
+  it('reconciles an admitted clear while hidden and defers its reload until return', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    let complete!: (result: { status: 'success' }) => void;
+    context.submitCollectionAction.mockReturnValueOnce(new Promise(resolve => { complete = resolve; }));
+    const current = renderGrid('BOOK', selected);
+    const clear = current.props.renderActions!(current.props.entries[0]!.item) as ReactElement<Props>;
+    clear.props.onPress!();
+    render('BOOK', hidden); flushEffects();
+    complete({ status: 'success' }); await Promise.resolve();
+    render('BOOK', hidden); flushEffects();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(1);
+    context.loadConsumed.mockResolvedValueOnce({ status: 'success', items: [] });
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    expect(context.loadConsumed).toHaveBeenCalledTimes(2);
+    expect(renderGrid('BOOK', selected).props.entries).toEqual([]);
+  });
+
+  it('revokes retained commands after unmount', async () => {
+    context.loadConsumed.mockResolvedValueOnce(success('Canonical title'));
+    render('BOOK', selected); flushEffects(); await Promise.resolve();
+    const grid = renderGrid('BOOK', selected);
+    const clear = grid.props.renderActions!(grid.props.entries[0]!.item) as ReactElement<Props>;
+    hooks.effects.forEach(effect => effect.cleanup?.());
+    grid.props.onOpen(grid.props.entries[0]!.item);
+    grid.props.onRefresh(); clear.props.onPress!();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(context.submitCollectionAction).not.toHaveBeenCalled();
   });
 });

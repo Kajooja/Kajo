@@ -1158,6 +1158,14 @@ The owner-approved six-forward rollout was verified on 2026-09-12. STATUS and
 Sprint014 record exact source/deployment identities and metadata preservation.
 Configured-device evidence and full DATA acceptance remain open.
 
+The October 24 Discovery/history pager creates no preference or membership Event
+when selecting, dragging or previewing a page. Only the settled selected and
+route-focused grid may record an actual visible impression or open with its
+exact per-Item origin. Hidden/dragging/settling pages are not actionable and their
+viewability callbacks cannot borrow a new scope. Embedded history retains the
+same authorized collection source and COLLECTION navigation as standalone history;
+it never borrows a recommendation Prediction from the adjacent grid.
+
 ### Collection/history corrections and exact destination sets
 
 The active branch records hosted rollout of membership resurfacing, history clear, bootstrap-history projection and Shared multi-destination forwards; recheck STATUS before deployment work. These source contracts are not proof of device acceptance.
