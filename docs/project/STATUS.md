@@ -93,8 +93,23 @@ still recovery. Exact bounded history remains, but background acknowledgements,
 refills and rerenders cannot re-enable Undo. Native drags must immediately
 interrupt entry or snap-back motion so an animation callback cannot keep the
 next card locked; an accepted outgoing card still cannot commit twice.
-The same PR #355 owns this correction. New final-source checks, CI, replacement
-APK and targeted phone continuation acceptance remain pending.
+The same PR #355 owns this correction. Its first continuation source
+`27feaef482b2d0e13884a4abb194bd345fead54d`, tree
+`e02f783ef12c4df7066781e608b6ccd3e26635df`, passed all five required
+[CI #712](https://github.com/Kajooja/Kajo/actions/runs/39988835313) gates with
+769 mobile tests/74 files; its intermediate APK is building. That tree covers
+the one-step gate and interruptible motion, not the following buffer refinement.
+
+Before final delivery, source review identified a separate deterministic wait:
+successful same-Item restoration discards every eligible sibling in its fresh
+50-Item response, then waits for a separate five-Item root. The superseding policy
+prepares up to five siblings from that successful current-epoch page, in response
+order with exact fresh origins and target/handled/duplicate exclusions. No
+pre-Undo buffer, missing-target page, stale reply or error is admitted. The next
+new refill replaces the restoration reader with a five-Item root. This removes
+the extra empty-window roundtrip without weakening reversal or exposure rules.
+New final-source checks, CI, replacement APK and targeted phone continuation
+acceptance remain pending; #712 does not validate this added refinement.
 
 The active design explicitly supersedes #709's acknowledgement-gated navigation
 and suppression-only buffer exception. Successful local SQLite admission of an

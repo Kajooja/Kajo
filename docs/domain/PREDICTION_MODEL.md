@@ -939,7 +939,7 @@ locally handled pending Item IDs. An in-flight refill that crosses ordinary
 acknowledgements may fill only the currently free successor slots, retaining its
 frozen origin. Initially warm five successors; every consumption schedules a
 background refill, and one free slot admits one Item. The v3 wire page limit stays
-five for the chain; do not switch to one-Item pages, locally rescore candidates or
+five for the ordinary refill chain; do not switch to one-Item pages, locally rescore candidates or
 create an extra staging window beyond the five successors. Replies invalidated
 by undo, scope/source change or explicit rejected-command discard cannot fill slots.
 
@@ -956,7 +956,15 @@ same-Item reacquisition. Undo may show a separate cached `restoringPresentation`
 after the first exact undo/withdrawal command is durably admitted. It has no
 actionable delivery origin and cannot admit mutations, impression or dwell until
 all ordered undo receipts and a fresh same-Item delivery arrive; activation keeps
-the same visual identity. This presentation shortcut does not weaken server
+the same visual identity. A successful current-epoch restoration page that
+contains the exact target may also prepare up to five of its eligible siblings,
+in response order, retaining that page's frozen Prediction/request origins and
+excluding the target, handled Items and duplicates. No earlier restoration page,
+missing-target response, stale reply or error contributes siblings. This replaces
+the empty-window roundtrip after restoration without reviving pre-Undo deliveries
+or adding a staging window. Do not continue the restoration reader's 50-Item
+page size: the next new refill is a five-Item root that atomically replaces it.
+This presentation shortcut does not weaken server
 truth, exact retries or rejection/cancellation boundaries. List addition/undo admission waits for pending commands
 to settle, without turning ordinary forward browsing into an acknowledgement gate.
 Prefetch and an inert adjacent preview are not impressions; actual activation
@@ -2040,7 +2048,9 @@ ranking and requires the same actor/Profile/session/mode/domain. A new root may
 choose a different page size; ordinary continuation still uses the immutable v3
 size/context contract. The feed uses bounded five-Item pages to warm/refill up to
 five successors, preserving server order after exclusions and admitting no extra
-staging window. Excess fetched candidates may remain unshown; page delivery is
+staging window. Successful same-Item restoration may seed that bounded window
+from its fresh 50-Item page under the policy above; the next new refill returns
+to a five-Item root. Excess fetched candidates may remain unshown; page delivery is
 not exposure. Learning-changing rating/List acknowledgement marks future cursor
 work dirty without aborting the active bounded refill or its exact retry. Before
 the next new request, coalesced renewal replaces the root from the latest prefix;

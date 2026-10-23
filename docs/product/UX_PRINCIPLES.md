@@ -362,14 +362,24 @@ commands of that same partial reversal is recovery, not a second backward step.
 After restoration, forward browsing remains available; only a new accepted
 forward skip/rating or positive-card advance enables Undo again. Background
 acknowledgements, refills and rerenders do not re-enable it. Retain bounded exact
-history without allowing repeated backward traversal. Failed local admission
+history without allowing repeated backward traversal. Once the exact prior Item
+is found in a successful fresh restoration page after all reversal receipts,
+prepare up to five eligible siblings from that same page in server order, with
+their fresh page origins and normal target/handled/duplicate exclusions. These
+are new deliveries, not the invalidated pre-Undo buffer. They remain inert until
+activation. Do not empty this fresh window and require another network roundtrip
+before forward browsing. The next new refill uses a five-Item root replacing the
+restoration reader; never continue its 50-Item page size for ordinary refills.
+Missing-target, stale and error replies supply no prepared siblings.
+Failed local admission
 leaves the current card; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
 mean infinite history or recycling an exhausted catalogue. Discovery prepares the
 active card plus up to five successors, warming five initially and refilling
 free slots after every consumption. One free slot admits one replacement even
-though the immutable wire page size stays five; no extra staging window is kept.
+though the ordinary refill chain's immutable wire page size stays five; no extra
+staging window is kept.
 The next card becomes visible during the upward drag, but
 its preview is inert and creates no impression or action capability. Activate it
 after successful durable local admission of the outgoing skip/rating, with its

@@ -426,11 +426,15 @@ describe('Discovery active card plus five prepared successors', () => {
     expect(restored).toMatchObject({ item: initial.item, origin: { predictionId: restoration.ranking.predictionId,
       deliveryRequestId: restoration.request.requestId } });
     expect(restored.origin.deliveryRequestId).not.toBe(initial.origin.deliveryRequestId);
-    expect(f.flow.snapshot()).toMatchObject({ source: null, canPrevious: false, navigationPending: false, upcoming: [] });
+    expect(f.flow.snapshot()).toMatchObject({ source: null, canPrevious: false, navigationPending: false });
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([50, 51].map(id));
+    for (const delivery of f.flow.snapshot().upcoming) expect(delivery.origin).toMatchObject({
+      predictionId: restoration.ranking.predictionId, deliveryRequestId: restoration.request.requestId,
+    });
     expect(f.reads[7]!.request).toMatchObject({ cursor: null, replacesChainId: restoration.chainId });
     await f.reply(7, [4]);
-    for (let index = 8; index < 13; index++) await f.reply(index, [12 + index]);
-    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([20, 21, 22, 23, 24].map(id));
+    for (let index = 8; index < 11; index++) await f.reply(index, [12 + index]);
+    expect(f.flow.snapshot().upcoming.map(delivery => delivery.item.id)).toEqual([50, 51, 20, 21, 22].map(id));
     expect(f.recordImpression).toHaveBeenCalledOnce();
     await f.display(); expect(f.flow.advance()).toBe(true);
     expect(f.submit.mock.calls[2]![0].origin).toMatchObject({ predictionId: restoration.ranking.predictionId,

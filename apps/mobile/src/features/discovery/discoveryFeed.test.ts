@@ -304,6 +304,76 @@ describe('Discovery displayed origins, durable navigation and recovery', () => {
       await flush();
     }
   });
+  it('prepares five fresh restoration siblings so forward resumes before another refill roundtrip', async () => {
+    const f = fixture(true);
+    const reads: { request: PredictionPageRequest; pending: ReturnType<typeof deferred<PredictionPage>> }[] = [];
+    f.load.mockImplementation(request => {
+      const pending = deferred<PredictionPage>(); reads.push({ request, pending }); return pending.promise;
+    });
+    async function reply(index: number, items: number[]) {
+      const request = reads[index]!.request;
+      reads[index]!.pending.resolve({ ...page(request),
+        ranking: { predictionId: id(500 + index), items: items.map(item), predictions: [] },
+        candidateCount: items.length, nextCursor: id(600 + index), chainId: id(700 + index) });
+      await flush();
+    }
+    async function display() {
+      const delivery = f.flow.snapshot().delivery!;
+      f.flow.displayed(delivery.item.id, delivery.origin.deliveryRequestId!); await flush();
+    }
+    try {
+      await display(); f.flow.warm(); await reply(0, [10, 11, 12, 13, 14]);
+      for (const next of [10, 11]) {
+        expect(f.flow.advance()).toBe(true);
+        f.flow.acknowledged(f.submit.mock.calls.at(-1)![0].actionId);
+        expect(f.flow.snapshot().delivery?.item.id).toBe(id(next)); await display();
+      }
+      const oldSuccessor = f.flow.snapshot().delivery!;
+      expect(reads).toHaveLength(2); expect(f.flow.previous()).toBe(true);
+      const withdrawal = f.submit.mock.calls.at(-1)![0];
+      expect(withdrawal).toMatchObject({ kind: 'WITHDRAW_CONTEXTUAL_SKIP', itemId: id(10) });
+      f.flow.acknowledged(withdrawal.actionId);
+      // Resolve the old epoch before the exact restoration reader can replace it.
+      await reply(1, [15, 16, 17, 18, 19]);
+      const restoreRequest = reads[2]!.request;
+      expect(restoreRequest).toMatchObject({ limit: 50, replacesChainId: id(701) });
+      const impressionsBeforeRestore = f.recordImpression.mock.calls.length;
+      // The fresh response includes handled Items, duplicates and more than five eligible siblings.
+      await reply(2, [4, 10, 11, 11, 20, 21, 10, 22, 23, 24]);
+      const restored = f.flow.snapshot();
+      expect(restored).toMatchObject({ delivery: { item: item(10) }, restoringPresentation: null,
+        canPrevious: false, navigationPending: false, loading: false, refilling: false });
+      expect(restored.upcoming.map(entry => entry.item.id)).toEqual([11, 20, 21, 22, 23].map(id));
+      for (const delivery of [restored.delivery!, ...restored.upcoming]) {
+        expect(delivery.origin).toMatchObject({ predictionId: id(502), deliveryRequestId: restoreRequest.requestId });
+      }
+      expect(restored.upcoming[0]!.origin).not.toEqual(oldSuccessor.origin);
+      expect(reads).toHaveLength(3); // The full window needs no extra feed5 read.
+      expect(f.recordImpression).toHaveBeenCalledTimes(impressionsBeforeRestore);
+      expect(f.flow.previous()).toBe(false);
+      await display();
+      expect(f.flow.advance()).toBe(true);
+      // The already prepared successor enters synchronously while its replacement is still loading.
+      expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(11) },
+        loading: false, navigationPending: false, refilling: true });
+      expect(reads).toHaveLength(4);
+      expect(reads[3]!.request).toMatchObject({ version: 3, limit: 5, cursor: null, replacesChainId: id(702) });
+      expect(f.submit.mock.calls.at(-1)![0]).toMatchObject({ kind: 'CONTEXTUAL_SKIP', itemId: id(10),
+        origin: { predictionId: id(502), deliveryRequestId: restoreRequest.requestId } });
+      f.flow.acknowledged(f.submit.mock.calls.at(-1)![0].actionId);
+      expect(f.recordImpression).toHaveBeenCalledTimes(impressionsBeforeRestore + 1);
+      await display();
+      expect(f.flow.advance()).toBe(true);
+      expect(f.submit.mock.calls.at(-1)![0]).toMatchObject({ kind: 'CONTEXTUAL_SKIP', itemId: id(11),
+        origin: { predictionId: id(502), deliveryRequestId: restoreRequest.requestId } });
+      expect(f.flow.snapshot()).toMatchObject({ delivery: { item: item(20) }, loading: false, navigationPending: false });
+      expect(reads).toHaveLength(4);
+    } finally {
+      f.flow.stop();
+      for (const read of reads) read.pending.resolve(page(read.request));
+      await flush();
+    }
+  });
   it.each(['skip', 'rating'])('consumes one Undo after %s despite older history, and rearms after a new forward choice', async kind => {
     const f = fixture(); let nextItem = -1;
     f.load.mockImplementation(async request => ({ ...page(request, request.limit === 50 ? item(9) : item(nextItem += 10)),

@@ -130,6 +130,16 @@ export function createDiscoveryFeed(options: {
     return { item, origin: { predictionId: result.ranking.predictionId, deliveryRequestId: result.request.requestId,
       properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } } };
   }
+  function prepare(result: PredictionPage, currentItemId: string | undefined) {
+    let added = 0;
+    for (const item of result.ranking.items) {
+      if (upcoming.length >= 5) break;
+      if (item.id !== currentItemId && !handledItems.has(item.id) && !upcoming.some(entry => entry.item.id === item.id)) {
+        upcoming.push(deliveryFrom(result, item)); added++;
+      }
+    }
+    return added;
+  }
   function promoteBuffered() {
     if (!advancing || state.waitingActionId || undoing) return;
     const delivery = upcoming.shift();
@@ -211,9 +221,12 @@ export function createDiscoveryFeed(options: {
         }
         if (restoration.fromHistory) history.pop();
         undoing = null; advancing = false; actions = []; invalidateSource();
-        // The restoration has a 50-item reader. The next warm root replaces it
-        // with the bounded feed reader; no old restoration sibling is shown.
+        // These siblings belong to the successful fresh restoration, not the
+        // invalidated pre-Undo window. Reuse at most five without exposure so
+        // the next gesture need not wait for another network roundtrip.
+        // The next NEW refill replaces this 50-item reader with a five-item root.
         bufferPage = null; bufferEnded = false; upcoming = [];
+        prepare(result, item.id);
         state = { ...state, delivery: deliveryFrom(result, item),
           presentationKey: state.restoringPresentation?.visualKey ?? presentationKeyFor(restoration.target.delivery),
           restoringPresentation: null, positiveCommitted: false,
@@ -224,13 +237,7 @@ export function createDiscoveryFeed(options: {
       // A reader's traversal budget is not catalogue exhaustion. Its next root
       // atomically replaces the known chain when the buffer has a free slot.
       bufferEnded = result.nextCursor === null && result.continuationState !== 'READER_LIMIT';
-      let added = 0;
-      for (const item of result.ranking.items) {
-        if (upcoming.length >= 5) break;
-        if (item.id !== state.delivery?.item.id && !handledItems.has(item.id) && !upcoming.some(entry => entry.item.id === item.id)) {
-          upcoming.push(deliveryFrom(result, item)); added++;
-        }
-      }
+      const added = prepare(result, state.delivery?.item.id);
       if (added) duplicatePages = 0;
       else if (!bufferEnded && ++duplicatePages >= 8) {
         readerError('Seuraavia kortteja valmistellaan. Yritä uudelleen.');
