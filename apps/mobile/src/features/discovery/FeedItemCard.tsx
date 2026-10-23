@@ -169,9 +169,10 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     if (motion.isAccepted() && cardHeight) motion.settings().onForwardOffset?.(cardHeight + offset);
   }, [cardHeight, viewportHeight, gesture, motion, translation]);
   const pan = useMemo(() => PanResponder.create({
-    onStartShouldSetPanResponder: (_, g) => {
+    onStartShouldSetPanResponderCapture: (_, g) => {
       if (!motion.isDragging()) motion.clearCapture(); motion.startTouches(g.numberActiveTouches); return false;
     },
+    onStartShouldSetPanResponder: () => false,
     onMoveShouldSetPanResponderCapture: (_, g) => {
       const settings = motion.settings();
       const minimum = (settings.viewportHeight ?? 500) - (settings.cardHeight ?? settings.viewportHeight ?? 500);

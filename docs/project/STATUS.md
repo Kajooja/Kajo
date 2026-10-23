@@ -88,10 +88,14 @@ native device/emulator observation was claimed for these local checks. CI #707
 and its configured build subsequently passed; new gesture-source validation and
 its replacement build remain required.
 
-**Whole-card gesture source validation:** 723 mobile tests in 71 files pass,
+**Whole-card gesture source validation:** 724 mobile tests in 71 files pass,
 including native responder-grant displacement reset, short flicks, paused-release
 velocity, long-text reading/edge dismissal, reduced motion, readable backward
-movement, slider intent and outgoing expanded-card continuity. Mobile types and
+movement, slider intent and outgoing expanded-card continuity. A final native
+responder review found that child Pressables can consume the start bubble phase;
+fresh-session reset now runs in start capture without claiming the touch, so a
+text swipe after horizontal slider use does not inherit the previous block.
+Mobile types and
 focused lint pass; the root lint/type/dependency/mobile/catalog stages pass.
 The root check again stops at the unchanged Deno registry connection refusal.
 Explicit demo iOS and Android Expo exports pass. No native emulator/device run

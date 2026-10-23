@@ -8058,10 +8058,16 @@ The new gesture source requires its own local/final-source validation and APK;
 whole-card/long-text/flick matrix. Preserve accounts, commands and installed
 migration history, then continue #336 after this bounded interaction correction.
 
-Local gesture validation now passes: 723 mobile tests in 71 files, mobile types,
+Local gesture validation now passes: 724 mobile tests in 71 files, mobile types,
 focused lint and demo iOS/Android Expo exports. Root lint/type/dependency/mobile/
 catalog stages pass; root completion is blocked by the unchanged Deno registry
 connection refusal. Tests cover the native grant-reset fling, readable long-card
 offsets and edge decisions, outgoing extent, reduced motion, natural thumb arcs,
 sticky multi-touch and horizontal slider intent. Final-source CI/configured APK
 and actual phone observations remain separate pending gates.
+
+Final native responder review also moved fresh-session initialization into start
+capture while leaving touch ownership with child controls. A child Pressable can
+consume the start bubble phase; the regression now proves that a new text swipe
+after horizontal slider use clears that session's navigation block. The earlier
+CI #708 source is superseded by this correction and is not its APK receipt.

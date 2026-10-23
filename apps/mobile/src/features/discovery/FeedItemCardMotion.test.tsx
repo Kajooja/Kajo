@@ -277,23 +277,37 @@ describe('mounted feed card motion', () => {
 
   it('keeps a slider-started gesture out of feed navigation after it turns vertical', async () => {
     await mount();
-    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 30, dy: 2, numberActiveTouches: 1 })).toBe(false);
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 30, dy: -140, numberActiveTouches: 1 })).toBe(false);
   });
 
+  it('resets horizontal intent for a fresh drag when a child owns the start responder', async () => {
+    const props = await mount();
+    expect(surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 })).toBe(false);
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 30, dy: 2, numberActiveTouches: 1 })).toBe(false);
+    // A child Pressable claims start, so the parent's start bubble callback never runs.
+    expect(surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 })).toBe(false);
+    expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
+    await act(async () => {
+      surface().props.onPanResponderGrant();
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce();
+  });
+
   it('lets a natural thumb arc become a vertical drag after small initial sideways movement', async () => {
     await mount();
-    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 8, dy: 3, numberActiveTouches: 1 })).toBe(false);
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 8, dy: -32, numberActiveTouches: 1 })).toBe(true);
   });
 
   it('does not admit a two-finger gesture after one finger is lifted before capture', async () => {
     await mount();
-    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 2 });
+    surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 2 });
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -140, numberActiveTouches: 1 })).toBe(false);
-    surface().props.onStartShouldSetPanResponder(null, { numberActiveTouches: 1 });
+    surface().props.onStartShouldSetPanResponderCapture(null, { numberActiveTouches: 1 });
     expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -32, numberActiveTouches: 1 })).toBe(true);
   });
 
