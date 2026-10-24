@@ -950,7 +950,7 @@ refill after acknowledgement must. A successful local durable skip/rating admiss
 may advance presentation before its server acknowledgement, but pending commands
 are not confirmed learning and cannot enter server state as if committed. Actual
 readiness, rejection, exact retry and source-erasure constraints remain authoritative.
-Undo, scope changes, source withdrawal and rejected-command discard still
+Server Undo, scope changes, source withdrawal and rejected-command discard still
 invalidate the entire prepared window; undo retains exact receipt reversal and
 same-Item reacquisition. Undo may show a separate cached `restoringPresentation`
 after the first exact undo/withdrawal command is durably admitted. It has no
@@ -969,12 +969,26 @@ the empty-window roundtrip after restoration without reviving pre-Undo deliverie
 or adding a staging window. Do not continue a restoration reader's 50-Item
 page size: the next new refill is a five-Item root that atomically replaces it.
 This presentation shortcut does not weaken server
-truth, exact retries or rejection/cancellation boundaries. List addition/undo admission waits for pending commands
+truth, exact retries or rejection/cancellation boundaries. List addition/server-undo admission waits for pending commands
 to settle, without turning ordinary forward browsing into an acknowledgement gate.
 Prefetch and an inert adjacent preview are not impressions; actual activation
 records exposure with the retained origin. This Discovery-only preparation policy
 does not change server scoring, precompute five future adaptive Taste questions,
 revise old PredictionRuns or prove recommendation-quality improvement.
+
+The October 24 local-cancellation refinement keeps the newest durably admitted
+feed skip/rating from dispatch until the next choice is durably admitted. This
+adds at most one intentionally held local choice; other network-pending commands
+retain their existing queue bounds. A → B holds A; B → C releases A and holds B.
+One-step reverse may atomically cancel a provably never-dispatched B and restore
+its still-valid original delivery under the same scope, retaining eligible
+successors. No canonical evidence for that choice has committed, so no server
+undo/re-ranking is required. Sent/uncertain commands and expired/invalid origins
+retain the ordered server reversal/fresh-delivery rules above. Holds release after 30 seconds idle or on
+exit, navigation blur, background or scope change; restart drains durable commands normally.
+This changes dispatch timing, not scoring, frozen forecast lineage, source
+authority or Taste's acknowledged ANSWER → NEXT policy. Only actual server
+acknowledgement advances the canonical learned prefix.
 
 The repeated-Undo timeout continuation materializes the canonical scorer's
 unchanged historical outcome set once per ranking and prevents repeated
@@ -2063,9 +2077,28 @@ bounded first-page workload change, not client ranking or a catalogue cutoff.
 Actual route refocus or selection of Löydä activates a needed reader immediately;
 the 600-ms coalescing delay applies only to evidence revisions while that page
 stays active. An unchanged ready reader retains its pages and scroll. Changed
-committed evidence still invalidates the previous scope, even while blurred;
-old origins cannot become actionable to conceal loading. Hidden/in-transition
-grid pages schedule no fresh ranking or exposure. A history preview is a
+committed evidence still invalidates the previous full grid, even while blurred.
+The October 24 device-feedback successor permits a narrower bounded handoff:
+on actual return, consume up to five still-valid, unhandled, already-prepared
+feed successors with their original per-Item Prediction/request origins. Match
+environment/actor/Profile/session/domain/mode and bootstrap revision, invalidate
+on hard source/Undo/discard changes, and expire within 60 seconds, also bounded
+by a conservative 14-minute age budget from the original root's local request
+clock. That budget is not a server-issued validity extension; unknown-age
+initial grid cards retain ordinary server reversal. The handoff is owner-bound,
+ephemeral and one-shot; it never
+revives the old full grid or invents fresh scores. These are the same bounded
+prepared deliveries already permitted to precede a later acknowledgement.
+They can be actionable once the grid is actually settled/visible. Pending local
+choices remain excluded; preparation/transfer alone emits no impression.
+
+Start a fresh six-Item root once both action queues have settled, coalescing
+their committed prefix rather than repeatedly cancelling ranking on each late
+receipt. Valid handoff cards remain available during that refresh; a real
+failure retains honest retry, not a false fresh-ranking claim. Expired or
+hard-invalidated handoffs cannot remain actionable. A successful fresh response
+owns its own origins. Hidden/in-transition grid pages schedule no fresh ranking
+or exposure. A history preview is a
 canonical collection read and creates no Prediction or preference evidence.
 
 #### Continuous Discovery reader replacement — October 22 successor

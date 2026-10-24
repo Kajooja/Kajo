@@ -11,7 +11,7 @@ import { rememberDeliveredSlate } from './deliveredSlate';
 
 const fixture = vi.hoisted(() => ({
   profile: { id: 'personal', type: 'PERSONAL', name: 'Personal', ownerUserId: 'actor' },
-  scopeKey: 'test:actor:personal', actorUserId: 'actor', revision: 0,
+  scopeKey: 'test:actor:personal', actorUserId: 'actor', revision: 0, membershipRevision: 0,
   interactions: {} as ItemInteractionMap,
   loadForItem: vi.fn(), setRating: vi.fn(), back: vi.fn(),
   recordEvent: vi.fn(), createEventId: vi.fn(),
@@ -24,7 +24,7 @@ const fixture = vi.hoisted(() => ({
     restoringPresentation: null as { item: Item; visualKey: string } | null, presentationKey: 'feed-item:page',
     canSkip: true, loading: false, message: null, exhausted: false, waitingActionId: null as string | null,
     positiveCommitted: false, canPrevious: false, navigationPending: false },
-  flow: { snapshot: vi.fn(), expectPositive: vi.fn(), positiveQueued: vi.fn(), cancelPositive: vi.fn(), retry: vi.fn(), recoverRejected: vi.fn(),
+  flow: { hasDeferredAction: vi.fn(), snapshot: vi.fn(), expectPositive: vi.fn(), positiveQueued: vi.fn(), cancelPositive: vi.fn(), retry: vi.fn(), recoverRejected: vi.fn(),
     advance: vi.fn(), previous: vi.fn(), hold: vi.fn(), positiveCommitted: vi.fn() },
 }));
 vi.mock('react', async () => {
@@ -56,7 +56,7 @@ vi.mock('./DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR
 vi.mock('./SharedEndorsementContext', () => ({ useSharedEndorsements: () => ({ status: 'ready', stateByItemId: {} }) }));
 vi.mock('../messages/ProfileMessagesContext', () => ({ useProfileMessages: () => ({ send: vi.fn() }) }));
 vi.mock('../lists/ItemListsContext', () => ({ useItemLists: () => ({
-  scopeKey: fixture.scopeKey, revision: fixture.revision, loadForItem: fixture.loadForItem,
+  scopeKey: fixture.scopeKey, revision: fixture.revision, membershipRevision: fixture.membershipRevision, loadForItem: fixture.loadForItem,
 }) }));
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({
   status: 'ready', sessionId: 'test-session', recordEvent: fixture.recordEvent, createEventId: fixture.createEventId,
@@ -121,8 +121,9 @@ beforeEach(() => {
   vi.stubGlobal('React', React);
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.clearAllMocks();
+  fixture.flow.hasDeferredAction.mockReturnValue(false);
   fixture.profile = { id: 'personal', type: 'PERSONAL', name: 'Personal', ownerUserId: 'actor' };
-  fixture.actorUserId = 'actor'; fixture.scopeKey = 'test:actor:personal'; fixture.revision = 0;
+  fixture.actorUserId = 'actor'; fixture.scopeKey = 'test:actor:personal'; fixture.revision = 0; fixture.membershipRevision = 0;
   fixture.interactions = {};
   fixture.atomicPendingCount = 0; fixture.skipsPendingCount = 0;
   fixture.persistenceFailure = null; fixture.eventFailure = null; fixture.skipFailure = null;
@@ -176,7 +177,7 @@ describe('mounted Discovery feed controls', () => {
     expect(host('FeedItemCard').props.item.id).toBe(item.id);
   });
 
-  it('allows forward and rating while earlier saves wait, but keeps List and undo behind their receipts', async () => {
+  it('allows forward and rating while earlier saves wait, with List gated and controller-owned Undo', async () => {
     fixture.atomicPendingCount = 2; fixture.skipsPendingCount = 2; fixture.feedState.canPrevious = true;
     await mount();
     expect(host('FeedItemCard').props.disabled).toBe(false);
@@ -186,11 +187,11 @@ describe('mounted Discovery feed controls', () => {
     expect(hosts('Modal')).toHaveLength(0);
     expect(JSON.stringify(root!.toJSON())).not.toMatch(/odottaa tallennusta|Odotetaan tallennuksen|Yritä uudelleen/);
     await act(async () => {
-      expect(host('FeedItemCard').props.onPrevious()).toBe(false);
+      expect(host('FeedItemCard').props.onPrevious()).toBe(true);
       expect(host('FeedItemCard').props.onSkip()).toBe(true);
       host('RatingControl').props.onRatingChange(5);
     });
-    expect(fixture.flow.previous).not.toHaveBeenCalled();
+    expect(fixture.flow.previous).toHaveBeenCalledOnce();
     expect(fixture.flow.advance).toHaveBeenCalledOnce();
     expect(fixture.flow.positiveQueued).toHaveBeenCalledExactlyOnceWith('rating-command');
   });
@@ -379,15 +380,30 @@ describe('mounted Discovery feed controls', () => {
     expect(star().props.accessibilityState.selected).toBe(false);
     await act(async () => { host('ListDestinationSheet').props.onClose(); });
     fixture.loadForItem.mockResolvedValue({ status: 'success', lists: [list(true)] });
-    fixture.revision++;
+    fixture.revision++; fixture.membershipRevision++;
     await update();
     expect(star().props.accessibilityState.selected).toBe(true);
     expect(star().find(node => node.type as unknown === 'Text').props.children).toBe('★');
     expect(star().find(node => node.type as unknown === 'Text').props.style.color).toBe('#ffffff');
     fixture.loadForItem.mockResolvedValue({ status: 'success', lists: [list(false)] });
-    fixture.revision++;
+    fixture.revision++; fixture.membershipRevision++;
     await update();
     expect(star().props.accessibilityState.selected).toBe(false);
+  });
+
+  it('does not reload the current star for earlier rating acknowledgements, but does after collection acknowledgement', async () => {
+    await mount();
+    expect(fixture.loadForItem).toHaveBeenCalledExactlyOnceWith(item.id);
+    for (let index = 0; index < 12; index++) {
+      fixture.revision++;
+      await update();
+    }
+    expect(fixture.loadForItem).toHaveBeenCalledTimes(1);
+    fixture.loadForItem.mockResolvedValue({ status: 'success', lists: [list(true)] });
+    fixture.revision++; fixture.membershipRevision++;
+    await update();
+    expect(fixture.loadForItem).toHaveBeenCalledTimes(2);
+    expect(star().props.accessibilityState.selected).toBe(true);
   });
 
   it('ignores a delayed membership result and retained rating callback after the displayed card changes', async () => {

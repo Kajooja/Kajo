@@ -70,9 +70,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   const discoveryLease = pager.getLease('discovery');
   const historyLease = pager.getLease('history');
   const [imageWindow, setImageWindow] = useState({ viewId: '', first: 0, last: 7 });
+  const [gridInteraction, setGridInteraction] = useState<{ scope: string; lease: number | null; active: boolean } | null>(null);
+  const gridMotion = useRef({ viewId: '', touching: false, scrolling: false });
   const theme = getRoomTheme(getAmbientPhase(mode), activeProfile.activeProfile);
   const styles = createStyles(theme);
-  const ranking = usePredictionRanking(itemType, mode, interactions, discoveryActive);
+  const gridInteracting = discoveryActive && gridInteraction?.scope === pagerScope && gridInteraction.lease === discoveryLease && gridInteraction.active;
+  const ranking = usePredictionRanking(itemType, mode, interactions, discoveryActive, Boolean(gridInteracting));
   const visibleImageWindow = imageWindow.viewId === ranking.viewId ? imageWindow : { first: 0, last: 7 };
   const activeSharedMembership =
     activeProfile.activeProfile?.type === 'SHARED'
@@ -214,6 +217,12 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
   function runRankingAction(action: () => void) {
     if (isPagerActive('discovery', discoveryLease)) action();
   }
+  function updateGridMotion(kind: 'touching' | 'scrolling', value: boolean) {
+    if (!isPagerActive('discovery', discoveryLease) || currentView.current?.token !== view) return;
+    if (gridMotion.current.viewId !== view.id) gridMotion.current = { viewId: view.id, touching: false, scrolling: false };
+    gridMotion.current[kind] = value;
+    setGridInteraction({ scope: pagerScope, lease: discoveryLease, active: gridMotion.current.touching || gridMotion.current.scrolling });
+  }
   const appendPanHandlers = Object.fromEntries(Object.entries(appendGesture.panHandlers).map(([name, handler]) =>
     [name, (...args: unknown[]) => isPagerActive('discovery', discoveryLease)
       ? (handler as (...input: unknown[]) => unknown)(...args) : false]));
@@ -285,6 +294,13 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
           onRefresh={appendDiscovery}
           onScroll={event => { if (isPagerActive('discovery', discoveryLease)) appendGesture.onScroll(event); }}
           scrollEventThrottle={16}
+          onTouchStart={() => updateGridMotion('touching', true)}
+          onTouchEnd={() => updateGridMotion('touching', false)}
+          onTouchCancel={() => updateGridMotion('touching', false)}
+          onScrollBeginDrag={() => updateGridMotion('scrolling', true)}
+          onScrollEndDrag={() => updateGridMotion('scrolling', false)}
+          onMomentumScrollBegin={() => updateGridMotion('scrolling', true)}
+          onMomentumScrollEnd={() => updateGridMotion('scrolling', false)}
           onContentSizeChange={appendGesture.onContentSizeChange}
           onEndReached={() => {
             if (ranking.status === 'ready' && !ranking.nextPageError && !ranking.loadingNextPage) appendDiscovery();
@@ -332,7 +348,8 @@ export function DiscoveryScreen({ itemType, title }: DiscoveryScreenProps) {
                   {ranking.recovery === 'refresh' ? <Pressable accessibilityRole="button" onPress={() => runRankingAction(ranking.refresh)} style={styles.collectionButton}>
                     <Text style={styles.collectionText}>Aloita uusi haku</Text>
                   </Pressable> : null}
-                </> : ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
+                </> : ranking.preparingFreshPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Päivitetään suosituksia…</Text>
+                : ranking.loadingNextPage ? <Text accessibilityLiveRegion="polite" style={styles.pageText}>Haetaan lisää suosituksia…</Text>
                 : ranking.hasNextPage ? <>
                   <Text style={styles.pageText}>Vedä alaspäin listan lopussa nähdäksesi lisää.</Text>
                   <Pressable accessibilityRole="button" accessibilityLabel="Näytä lisää"

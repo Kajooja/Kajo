@@ -10,6 +10,10 @@ import { useEventTracking } from './EventTrackingContext';
 
 interface DiscoverySkipState extends ItemActionOutboxSnapshot {
   submit: (command: KajoSkipCommand) => boolean;
+  reserve?: (actionId: string) => boolean;
+  release?: (actionId?: string) => void;
+  canCancelReserved?: (actionId: string) => boolean;
+  cancelReserved?: (actionId: string) => boolean;
   retry: () => void;
   discardRejected: () => string | null;
   subscribe: (listener: (receipt: KajoSkipReceipt) => void) => () => void;
@@ -57,7 +61,11 @@ export function DiscoverySkipProvider({ children }: PropsWithChildren) {
         if (!active || !pending.ready || pending.message) return false;
         return queue.enqueue({ command });
       },
-      retry() { if (active) queue.retry(); },
+      reserve(actionId: string) { return active && queue.reserve(actionId); },
+      release(actionId?: string) { if (active) queue.release(actionId); },
+      canCancelReserved(actionId: string) { return active && queue.canCancelReserved(actionId); },
+      cancelReserved(actionId: string) { return active && queue.cancelReserved(actionId); },
+      retry() { if (active) { queue.release(); queue.retry(); } },
       discardRejected() {
         if (!active) return null;
         const actionId = queue.pending()[0]?.command.actionId;
@@ -67,7 +75,7 @@ export function DiscoverySkipProvider({ children }: PropsWithChildren) {
     };
     queue.start();
     const unsubscribeExposure = subscribeToAcknowledgements(() => queue.resumeAfterExposure());
-    const subscription = AppState.addEventListener('change', state => { if (state === 'active') queue.retry(); });
+    const subscription = AppState.addEventListener('change', state => { if (state === 'active') queue.retry(); else queue.release(); });
     return () => { active = false; queue.stop(); subscription.remove(); unsubscribeExposure(); };
   }, [scope, subscribe, subscribeToAcknowledgements]);
   const value = snapshot?.scope === scope ? snapshot.value : { ...empty, subscribe };

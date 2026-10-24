@@ -26,6 +26,33 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Discovery latency successor — #239 / October 24
+
+- `features/discovery/discoveryReturnHandoff.ts` transfers at most five prepared,
+  scoped feed deliveries once to `usePredictionRanking.ts`; exact origins,
+  bounded age and producer ownership survive transfer. `DiscoveryScreen.tsx`
+  defers fresh-grid replacement while native touch/scroll is active. Both action
+  queues settle before a fresh six-Item root to avoid receipt-driven restart churn.
+- `features/events/itemActionOutbox.ts` owns reserve/release/cancel-before-send;
+  `DiscoverySkipContext.tsx` and `ItemInteractionContext.tsx` expose the scoped
+  operations. `discoveryFeed.ts` retains one newest durable choice for local
+  one-step cancellation and releases it on the next choice, 30-second idle
+  deadline, dependent operation or exit/background via `useDiscoveryFeed.ts`.
+  Already dispatched/uncertain choices retain server Undo and fresh delivery.
+- `FeedItemCard.tsx` stops a long-card reading gesture at the rating control and
+  requires a new bottom gesture to dismiss. Its help persistence is separated
+  from motion callbacks to avoid repeated synchronous writes while browsing.
+- `ItemInteractionContext.tsx` separates list-membership invalidation from its
+  existing every-ack ranking/history revision. `ItemListsContext.tsx` and the
+  detail star refresh only on actual collection changes; rating/history freshness
+  retains the original revision. Known fresh page deliveries avoid an optional
+  per-card source RPC; the canonical writer still checks exposure and authority.
+
+[ADR-0009](decisions/0009-discovery-local-choice-cancellation.md) owns the new
+boundary; STATUS/PR owns final validation and APK, DEVICE_TEST the actual phone
+observations. The dated rows below retain predecessor behavior unless refined
+here. No SQL or scoring policy changes in this successor.
+
 ## Sequential Taste rollout preparation — #336
 
 `scripts/database/personal-sequential-taste-hosted-upgrade.{json,mjs,test.mjs}`

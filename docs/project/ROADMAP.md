@@ -42,6 +42,26 @@ by an uncalibrated confidence label.
 
 ## Near-term feed and first-answer personalization — 2026-10-15
 
+**October 24 owner priority after APK #715:** complete the current #239 browsing
+latency packet first: stop long-description reading at the rating controls,
+locally cancel the newest never-dispatched durable feed choice for fast one-step
+reverse, and transfer a bounded valid prepared window on return to Löydä while
+coalescing queue-driven ranking. Preserve accepted horizontal navigation, direct
+rating and Lists/history. Startup/network recovery remains unverified by the
+owner. STATUS and DEVICE_TEST own exact implementation and observation receipts.
+
+**Separate subsequent recommendation-quality review:** the owner explicitly
+requests more precise recommendations and review of internal scoring after this
+latency work. Keep this in Sprint 014's existing algorithm-quality gate alongside
+#336/MVP-ALG-010/011: inspect per-signal contributions, explicit rating magnitude
+versus neutral skip, short/recent versus long-term preference, mode/diversity/
+cold-start tradeoffs, source support and uncertainty. Compare versioned baseline
+and alternatives with frozen prospective/holdout outcomes and ablations before
+changing or admitting scoring. Do not infer quality from smooth UI, tied ranks
+or a heuristic confidence number, and do not postpone a discovered correctness
+defect. This task records the requested review; the latency packet changes no
+scoring weights and claims no measured recommendation-quality improvement.
+
 The owner's device feedback makes the following **mandatory near-term targets**,
 not optional future polish. Deliver them in the current Sprint 014 / #336
 continuation before canonical preview and first-session usefulness acceptance.

@@ -5,11 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDiscoveryFeed } from './useDiscoveryFeed';
 import type { createDiscoveryFeed, DiscoveryFeedSnapshot, FeedDelivery } from './discoveryFeed';
 import type { KajoSkipReceipt } from '../events/contextualSkipOperations';
+import { takeDiscoveryReturnHandoff } from './discoveryReturnHandoff';
+import { getBootstrapEvidenceRevision } from './predictionRefresh';
 import type { ProfileActionReceipt } from '../events/collectionActions';
 
 type FeedOptions = Parameters<typeof createDiscoveryFeed>[0];
 const fixture = vi.hoisted(() => ({
-  sequence: 1000,
+  sequence: 1000, focused: true,
+  appStateListener: null as ((state: string) => void) | null,
+  removeAppState: vi.fn(),
   options: null as FeedOptions | null,
   state: null as DiscoveryFeedSnapshot | null,
   skipListener: null as ((receipt: KajoSkipReceipt) => void) | null,
@@ -25,7 +29,7 @@ const fixture = vi.hoisted(() => ({
   actions: { persistenceStatus: 'ready', atomicPendingCount: 0, canDiscardAction: false,
     undo: vi.fn(), subscribeToCommittedActions: vi.fn() },
   skips: { ready: true, pendingCount: 0, submit: vi.fn(), subscribe: vi.fn() },
-  flow: { start: vi.fn(), stop: vi.fn(), snapshot: vi.fn(), displayed: vi.fn(), warm: vi.fn(),
+  flow: { flushDeferred: vi.fn(), start: vi.fn(), stop: vi.fn(), snapshot: vi.fn(), displayed: vi.fn(), warm: vi.fn(),
     hasPendingAction: vi.fn(), positiveQueued: vi.fn(), acknowledged: vi.fn(), recoveredAction: vi.fn(),
     exposureAcknowledged: vi.fn(), recoverRejected: vi.fn() },
 }));
@@ -36,7 +40,9 @@ vi.mock('react', async () => {
   const react = createRequire(require.resolve('react-test-renderer'))('react');
   return { ...react, default: react };
 });
-vi.mock('react-native', () => ({ Image: { prefetch: fixture.prefetch } }));
+vi.mock('expo-router', () => ({ useIsFocused: () => fixture.focused }));
+vi.mock('react-native', () => ({ Image: { prefetch: fixture.prefetch },
+  AppState: { addEventListener: (_event: string, listener: (state: string) => void) => { fixture.appStateListener = listener; return { remove: fixture.removeAppState }; } } }));
 vi.mock('../../data/SupabaseProvider', () => ({ useSupabaseConnection: () => fixture.connection }));
 vi.mock('../profiles/ActiveProfileContext', () => ({ useActiveProfile: () => fixture.profiles }));
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => fixture.tracking }));
@@ -53,7 +59,7 @@ vi.mock('../events/contextualSkipOperations', async () => ({
 
 const id = (value: number) => `ab157000-0000-4000-8000-${String(value).padStart(12, '0')}`;
 function delivery(value: number): FeedDelivery {
-  return { item: { id: id(value), itemType: 'MOVIE', title: `Item ${value}`, imageUrl: `https://images.fixture.invalid/${value}.jpg` },
+  return { returnExpiresAt: Date.now() + 14 * 60_000, item: { id: id(value), itemType: 'MOVIE', title: `Item ${value}`, imageUrl: `https://images.fixture.invalid/${value}.jpg` },
     origin: { predictionId: id(100 + value), deliveryRequestId: id(200 + value),
       properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } } };
 }
@@ -86,7 +92,7 @@ async function unmount() { await act(async () => { renderer?.unmount(); renderer
 beforeEach(() => {
   vi.stubGlobal('React', React); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.clearAllMocks();
-  fixture.sequence = 1000; fixture.options = null; fixture.state = snapshot();
+  fixture.focused = true; fixture.sequence = 1000; fixture.options = null; fixture.state = snapshot();
   fixture.skipListener = null; fixture.actionListener = null; fixture.exposureListener = null;
   fixture.skips.ready = true; fixture.skips.pendingCount = 0;
   fixture.actions.persistenceStatus = 'ready'; fixture.actions.atomicPendingCount = 0; fixture.actions.canDiscardAction = false;
@@ -246,4 +252,47 @@ describe('mounted Discovery feed delivery lifecycle', () => {
     expect(fixture.unsubscribeAction).toHaveBeenCalledOnce();
     expect(fixture.unsubscribeExposure).toHaveBeenCalledOnce();
   });
+});
+
+
+describe('feed navigation handoff producer', () => {
+  const returnScope = () => ({ environment: fixture.connection.config.url, actorUserId: fixture.profiles.actorUserId,
+    profileId: fixture.profiles.activeProfile.id, sessionId: fixture.tracking.sessionId, itemType: 'MOVIE' as const,
+    mode: 'FOR_YOU' as const, bootstrapRevision: getBootstrapEvidenceRevision() });
+  it('releases prepared exact origins on normal detail exit for the grid to take once', async () => {
+    const prepared = [10, 11, 12, 13, 14].map(delivery);
+    fixture.state = snapshot(initial, prepared); await mount(); await unmount();
+    const handoff = takeDiscoveryReturnHandoff(returnScope());
+    expect(handoff?.deliveries).toEqual(prepared);
+    expect(handoff?.deliveries).not.toContain(initial);
+    expect(takeDiscoveryReturnHandoff(returnScope())).toBeNull();
+    fixture.options!.onChange(snapshot(initial, prepared));
+    expect(takeDiscoveryReturnHandoff(returnScope())).toBeNull();
+  });
+  it('clears the return window during server undo and flushes the held choice on background', async () => {
+    fixture.state = snapshot(initial, [10, 11, 12, 13, 14].map(delivery)); await mount();
+    await act(async () => { fixture.appStateListener!('background'); });
+    expect(fixture.flow.flushDeferred).toHaveBeenCalledOnce();
+    await publish({ ...fixture.state!, navigationPending: true, restoringPresentation: { item: initial.item, visualKey: 'old' } });
+    await unmount();
+    expect(takeDiscoveryReturnHandoff(returnScope())).toBeNull();
+    expect(fixture.removeAppState).toHaveBeenCalledOnce();
+  });
+});
+
+
+it('flushes on navigation blur while the detail remains mounted, preserving its existing controller', async () => {
+  await mount();
+  fixture.focused = false;
+  await act(async () => { renderer!.update(<Probe />); });
+  expect(fixture.flow.flushDeferred).toHaveBeenCalledOnce();
+  expect(fixture.flow.stop).not.toHaveBeenCalled();
+  expect(fixture.createController).toHaveBeenCalledOnce();
+  fixture.flow.displayed.mockClear();
+  await publish(snapshot(delivery(20)));
+  expect(fixture.flow.displayed).not.toHaveBeenCalled();
+  fixture.focused = true;
+  await act(async () => { renderer!.update(<Probe />); });
+  expect(fixture.createController).toHaveBeenCalledOnce();
+  expect(fixture.flow.displayed).toHaveBeenCalledExactlyOnceWith(id(20), id(220));
 });

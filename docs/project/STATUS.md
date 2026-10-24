@@ -10,45 +10,58 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — Discovery return latency and horizontal history / #239
+## Current packet — #715 device latency corrections / #239
 
-**Latest owner feedback — 2026-10-24 Europe/Helsinki:** “Toimii” accepts the
-reported #714 feed/Undo correction. Returning to Discovery after browsing still
-loads for too long. The owner requests a finger-follow horizontal transition
-from Löydä left to Katsotut/Luetut and right back, with the existing header
-buttons selecting the same pages. Continue the single unmerged PR #355; preserve
-the accepted vertical reel, rating/Undo, margins, scope and evidence contracts.
+**Latest owner feedback — 2026-10-24 Europe/Helsinki:** APK #715's horizontal
+Löydä ↔ Katsotut/Luetut navigation, direct rating and History/Lists work as
+requested. After longer browsing, returning to Löydä still takes too long;
+expanded-description scrolling can overshoot the rating control; Undo remains
+slow. The owner requests all feasible browsing/return improvements and proposes
+holding the newest choice until the next choice, so C → B can cancel B locally.
+Startup/network recovery was not properly tested and remains open. Recommendation
+precision/internal scoring is a separate later review in ROADMAP, not a passed
+quality result or a scoring change in this packet.
 
-The return path currently invalidates a blurred grid after acknowledged feed
-evidence, then adds 600 ms before requesting 20 Personal / 50 Shared Items.
-An unchanged ready reader already survives refocus. The scoped correction uses
-an immutable six-Item grid page and immediate activation on actual return, while
-retaining debounce for revisions while visibly focused. Hidden pages cannot
-rerank or record exposure; changed evidence cannot reuse actionable stale pages.
-Read-only hosted logs also show a 9,275-ms page HTTP 500 at 21:14 UTC, SQLSTATE
-57014 in canonical ranking, with a parallel contextual-skip lock wait. This is
-timeout evidence, not an established reader-cap leak. No new database forward,
-account reset or replay of installed migrations is planned for this packet.
+Continue the single unmerged `feat/239-buffered-feed` / [PR #355](https://github.com/Kajooja/Kajo/pull/355).
+The verified predecessor source is `eb447629a36a219f300aa61a520267ce1213916b`:
+all five mandatory gates and configured Android APK passed in
+[CI #715](https://github.com/Kajooja/Kajo/actions/runs/40029355874).
+Its [artifact 12536029267](https://github.com/Kajooja/Kajo/actions/runs/40029355874/artifacts/12536029267)
+contains APK SHA-256 `a3645ca6e696963b42c60bbaa735f78eb47b23a223f22a3c7693643e37278e27`.
+These are predecessor receipts; they do not validate this successor.
 
-Horizontal pages share the compact header and actual canonical history, retain
-their scroll on Item return, and gate actions/exposure to the settled selected
-page. Canonical UX/model/Event policies were updated before implementation.
-The new source and deterministic regressions are implemented. Local lint/types,
-841 mobile tests in 77 files and all 50 dependency tests pass; independent
-Discovery review covers 147 focused tests. Both the working and isolated fresh
-installation pass the raw advisory audit with zero unmitigated findings; fresh
-`npm ci` applies the guarded corrections automatically. Remaining root stages,
-exports, complete CI and APK are pending at this pre-publication checkpoint;
-the final PR receipt owns their superseding identities and outcomes.
-Owner feedback remains scoped and does not close the full device/startup matrix.
+The current bounded design is recorded in canonical UX, evidence, prediction
+and architecture owners before runtime edits:
 
-The mandatory fresh dependency audit additionally identifies newly published
-Zod `GHSA-mrhx-c7xc-m3w5`. This packet includes only its compatible v4 lock leaf
-and exact-archive compatibility guards for exported v3/older bundled v4 paths,
-under the existing fail-closed correction contract in ARCHITECTURE. Expo's
-declared v3 API and existing braces/node-forge corrections stay intact. The raw
-audit is retained, all runtime formats need regressions, and no audit bypass or
-broad dependency upgrade is authorized by this implementation choice.
+- A gesture beginning above a long card's readable bottom stops at its rating
+  controls; only a new deliberate bottom gesture can dismiss it. Compact flicks,
+  accepted horizontal navigation and direct rating remain unchanged.
+- Persist each selected skip/rating immediately, but hold the newest from server
+  dispatch until the next durable choice. A provably never-dispatched local
+  cancellation can restore its still-valid same-scope delivery immediately;
+  sent/ambiguous commands retain canonical server Undo/fresh delivery. Exit,
+  navigation blur, background, a 30-second idle deadline and scope changes release
+  holds; restart replays durable commands. Unknown-age initial grid cards keep
+  server reversal; prepared feed cards enable the fast local path.
+- On return, transfer at most five valid unhandled prepared feed successors with
+  exact frozen origins, one-shot and scope/age bounded, while a fresh six-Item
+  grid is obtained after pending commands settle. Avoid repeated rank restarts
+  from late acknowledgements; never revive the old full grid as fresh evidence.
+
+Implementation and independent review are complete. Root lint/type stages,
+all **898 mobile tests in 80 files**, all 50 dependency tests, all 322 database
+tests, all 311 engine tests, catalog/research/acceptance tests and all four demo
+mobile/description iOS/Android exports pass. Fresh dependency audit has zero
+unmitigated findings. All 162 local Markdown links in the changed documents were
+checked. The complete local root check stops at unchanged Deno dependency
+loading: `registry.npmjs.org/@supabase%2fauth-js` returns `Connection refused`;
+remaining root stages were run successfully separately. Full local-root success
+is not claimed. Final-source CI and a replacement configured APK remain required;
+PR #355 owns their superseding exact head/tree/run/artifact receipt without a
+documentation-only rebuild. Actual phone speed, process-death/reconnect safety
+and the new rating stop require the successor DEVICE_TEST matrix. Preserve accounts, pending commands and installed
+migrations. This packet requires no scoring, SQL or hosted deployment change.
+The full release/startup/quality gates remain open despite scoped owner acceptance.
 
 **Accepted predecessor:** [PR #354](https://github.com/Kajooja/Kajo/pull/354) is
 merged into `main` as `99c21341c62eaae8dab3589944a434b06dc14258` following the

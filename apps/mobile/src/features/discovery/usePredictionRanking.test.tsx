@@ -6,10 +6,11 @@ import { usePredictionRanking } from './usePredictionRanking';
 import type { DiscoveryMode, ItemType } from '../../domain/contracts';
 import type { ItemInteractionMap } from './itemInteraction';
 import type { PredictionPage, PredictionPageRequest, PredictionPageResult } from './predictionPageOperations';
-import { notifyContextualSkipChanged } from './predictionRefresh';
+import { getBootstrapEvidenceRevision, notifyBootstrapEvidenceChanged, notifyContextualSkipChanged } from './predictionRefresh';
+import { createDiscoveryReturnHandoff, type DiscoveryReturnScope } from './discoveryReturnHandoff';
 
 const fixture = vi.hoisted(() => ({
-  focused: true, enabled: true, sequence: 1000,
+  focused: true, enabled: true, deferReplacement: false, strictMode: false, sequence: 1000,
   focusListeners: new Set<(focused: boolean) => void>(),
   itemType: 'MOVIE' as ItemType, mode: 'FOR_YOU' as DiscoveryMode,
   interactions: {} as ItemInteractionMap,
@@ -21,7 +22,8 @@ const fixture = vi.hoisted(() => ({
     activeProfile: { id: 'ab239000-0000-4000-8000-000000000002', type: 'PERSONAL' } },
   tracking: { status: 'ready', sessionId: 'ab239000-0000-4000-8000-000000000003',
     session: { profileId: 'ab239000-0000-4000-8000-000000000002', actorUserId: 'ab239000-0000-4000-8000-000000000001' } },
-  actions: { collectionRevision: 0 },
+  actions: { collectionRevision: 0, atomicPendingCount: 0, persistenceFailure: null as string | null },
+  skips: { pendingCount: 0, message: null as string | null },
 }));
 
 vi.mock('react', async () => {
@@ -52,6 +54,7 @@ vi.mock('@/data/SupabaseProvider', () => ({ useSupabaseConnection: () => fixture
 vi.mock('@/features/profiles/ActiveProfileContext', () => ({ useActiveProfile: () => fixture.profiles }));
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => fixture.tracking }));
 vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: () => fixture.actions }));
+vi.mock('../events/DiscoverySkipContext', () => ({ useDiscoverySkip: () => fixture.skips }));
 vi.mock('../events/eventTracking', () => ({
   createUuidV7: () => `ab239000-0000-4000-8000-${String(fixture.sequence++).padStart(12, '0')}`,
   createCorrelationId: (_seed: string, key: string) => `fallback:${key}`,
@@ -91,14 +94,15 @@ function deferred<T>() {
 let renderer: ReactTestRenderer | null = null;
 let observed: ReturnType<typeof usePredictionRanking>;
 function Probe() {
-  const ranking = usePredictionRanking(fixture.itemType, fixture.mode, fixture.interactions, fixture.enabled);
+  const ranking = usePredictionRanking(fixture.itemType, fixture.mode, fixture.interactions, fixture.enabled, fixture.deferReplacement);
   React.useLayoutEffect(() => { observed = ranking; }, [ranking]);
   return null;
 }
 async function render() {
   await act(async () => {
-    if (renderer) renderer.update(<Probe />);
-    else renderer = create(<Probe />);
+    const element = fixture.strictMode ? <React.StrictMode><Probe /></React.StrictMode> : <Probe />;
+    if (renderer) renderer.update(element);
+    else renderer = create(element);
   });
 }
 async function advance(ms = 0) { await act(async () => { await vi.advanceTimersByTimeAsync(ms); }); }
@@ -109,14 +113,33 @@ async function setFocused(focused: boolean) {
 }
 async function setEnabled(enabled: boolean) { fixture.enabled = enabled; await render(); }
 async function commitRevision() { fixture.actions.collectionRevision += 1; await render(); }
+function publishReturnItems() {
+  const scope: DiscoveryReturnScope = { environment: fixture.connection.config.url,
+    actorUserId: fixture.profiles.actorUserId, profileId: fixture.profiles.activeProfile.id,
+    sessionId: fixture.tracking.sessionId, itemType: fixture.itemType, mode: fixture.mode,
+    bootstrapRevision: getBootstrapEvidenceRevision() };
+  const deliveries = Array.from({ length: 5 }, (_, index) => ({
+    item: { id: id(700 + index), itemType: fixture.itemType, title: `Prepared ${index}` },
+    returnExpiresAt: Date.now() + 840_000,
+    origin: { predictionId: id(800 + index), deliveryRequestId: id(900 + index),
+      properties: { predictionSource: 'hosted' as const, deliveryTier: 'RANKED' as const } },
+  }));
+  const publisher = createDiscoveryReturnHandoff(scope);
+  publisher.publish(deliveries); publisher.release();
+  return deliveries;
+}
 
 beforeEach(() => {
   vi.stubGlobal('React', React); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-24T10:00:00Z')); vi.clearAllMocks();
   fixture.focused = true; fixture.enabled = true; fixture.sequence = 1000;
+  fixture.deferReplacement = false;
+  fixture.strictMode = false;
   fixture.focusListeners.clear();
   fixture.itemType = 'MOVIE'; fixture.mode = 'FOR_YOU'; fixture.interactions = {};
   fixture.actions.collectionRevision = 0;
+  fixture.actions.atomicPendingCount = 0; fixture.actions.persistenceFailure = null;
+  fixture.skips.pendingCount = 0; fixture.skips.message = null;
   fixture.connection.config.url = 'https://ranking.fixture.invalid';
   fixture.profiles.actorUserId = id(1); fixture.profiles.activeProfile.id = id(2); fixture.profiles.activeProfile.type = 'PERSONAL';
   fixture.tracking.sessionId = id(3); fixture.tracking.session = { profileId: id(2), actorUserId: id(1) };
@@ -132,6 +155,119 @@ afterEach(async () => {
 });
 
 describe('mounted Discovery grid ranking lifecycle', () => {
+  it('retains the one-shot prepared return through StrictMode setup/cleanup replay', async () => {
+    fixture.strictMode = true; fixture.skips.pendingCount = 1;
+    const deliveries = publishReturnItems();
+    await render(); await advance();
+    expect(observed.items.map(item => item.id)).toEqual(deliveries.map(entry => entry.item.id));
+    expect(fixture.load).not.toHaveBeenCalled();
+    await advance(60_000);
+    expect(observed.items).toEqual([]);
+  });
+
+  it.each([true, false])('does not reopen a handled old grid before the first held skip receipt (prepared=%s)', async prepared => {
+    await render(); await advance();
+    const old = observed;
+    await setFocused(false);
+    const deliveries = prepared ? publishReturnItems() : [];
+    fixture.skips.pendingCount = 1; // no committed revision has changed yet
+    await setFocused(true); await advance(1000);
+    expect(observed.viewId).not.toBe(old.viewId);
+    expect(observed.items.map(item => item.id)).toEqual(deliveries.map(entry => entry.item.id));
+    expect(observed.status).toBe(prepared ? 'ready' : 'loading');
+    expect(fixture.load).toHaveBeenCalledOnce();
+    await act(async () => { old.loadMore(); old.refresh(); old.retry(); });
+    expect(fixture.load).toHaveBeenCalledOnce();
+    fixture.skips.pendingCount = 0;
+    await act(async () => { notifyContextualSkipChanged(); }); await render(); await advance();
+    expect(fixture.load).toHaveBeenCalledTimes(2);
+    expect(observed.items).toHaveLength(6);
+    expect(observed.viewId).not.toBe(old.viewId);
+  });
+
+  it('preserves an unchanged ready grid rather than consuming warmed cards when nothing was chosen', async () => {
+    await render(); await advance(); const old = observed;
+    await setFocused(false); publishReturnItems();
+    await setFocused(true); await advance();
+    expect(observed.viewId).toBe(old.viewId); expect(observed.items).toBe(old.items);
+    expect(fixture.load).toHaveBeenCalledOnce();
+  });
+
+  it('returns immediately through prepared feed origins while slow current ranking completes', async () => {
+    await render(); await advance();
+    await setFocused(false); await commitRevision();
+    const deliveries = publishReturnItems();
+    const fresh = deferred<PredictionPageResult>();
+    fixture.load.mockImplementationOnce(() => fresh.promise);
+    await setFocused(true);
+    const returned = observed;
+    expect(returned.status).toBe('ready');
+    expect(returned.items.map(item => item.id)).toEqual(deliveries.map(entry => entry.item.id));
+    expect(returned.predictionIds).toEqual(Object.fromEntries(deliveries.map(entry => [entry.item.id, entry.origin.predictionId])));
+    expect(returned.deliveryRequestIds).toEqual(Object.fromEntries(deliveries.map(entry => [entry.item.id, entry.origin.deliveryRequestId])));
+    expect(returned.preparingFreshPage).toBe(true);
+    await advance();
+    const request = fixture.load.mock.calls[1]![1];
+    fixture.deferReplacement = true; await render();
+    await act(async () => { fresh.resolve(success(request)); });
+    expect(observed.viewId).toBe(returned.viewId);
+    fixture.deferReplacement = false; await render();
+    expect(observed.items).toHaveLength(6);
+    expect(observed.viewId).not.toBe(returned.viewId);
+    fixture.deferReplacement = true; await render();
+    expect(observed.viewId).not.toBe(returned.viewId);
+    await setFocused(false); await commitRevision(); await setFocused(true);
+    expect(observed.items).toEqual([]); // the navigation handoff is one-shot
+  });
+
+  it('waits for long action/skip queues and their receipts before dispatching one current-prefix return root', async () => {
+    await render(); await advance(); await setFocused(false); await commitRevision();
+    const deliveries = publishReturnItems();
+    fixture.actions.atomicPendingCount = 3; fixture.skips.pendingCount = 2;
+    await setFocused(true); await advance(1000);
+    expect(observed.items.map(item => item.id)).toEqual(deliveries.map(entry => entry.item.id));
+    for (let remaining = 2; remaining >= 0; remaining--) {
+      fixture.actions.atomicPendingCount = remaining;
+      await commitRevision(); await advance(1000);
+    }
+    fixture.skips.pendingCount = 1;
+    await act(async () => { notifyContextualSkipChanged(); }); await render(); await advance(1000);
+    expect(fixture.load).toHaveBeenCalledOnce();
+    fixture.skips.pendingCount = 0;
+    await act(async () => { notifyContextualSkipChanged(); }); await render(); await advance();
+    expect(fixture.load).toHaveBeenCalledTimes(2);
+    expect(observed.items).toHaveLength(6);
+  });
+
+  it('retains prepared Items with explicit retry after fresh ranking fails, then activates exact successful retry', async () => {
+    await render(); await advance(); await setFocused(false); await commitRevision();
+    publishReturnItems();
+    fixture.load.mockResolvedValueOnce({ status: 'error', recovery: 'retry', message: 'Retry current request' });
+    await setFocused(true); await advance();
+    const failed = fixture.load.mock.calls[1]![1];
+    expect(observed.status).toBe('ready'); expect(observed.items).toHaveLength(5);
+    expect(observed.nextPageError).toBe('Retry current request');
+    await act(async () => { observed.retry(); });
+    expect(fixture.load.mock.calls[2]![1]).toBe(failed);
+    expect(observed.items).toHaveLength(6); expect(observed.nextPageError).toBeNull();
+  });
+
+  it.each(['bootstrap', 'failure', 'expiry', 'profile'] as const)('invalidates the prepared return for %s and never revives it', async invalidation => {
+    await render(); await advance(); await setFocused(false); await commitRevision();
+    publishReturnItems(); fixture.actions.atomicPendingCount = 1;
+    await setFocused(true); expect(observed.items).toHaveLength(5);
+    if (invalidation === 'bootstrap') await act(async () => { notifyBootstrapEvidenceChanged(); });
+    if (invalidation === 'failure') { fixture.actions.persistenceFailure = 'rejected'; await render(); }
+    if (invalidation === 'expiry') await advance(60_000);
+    if (invalidation === 'profile') {
+      fixture.profiles.activeProfile.id = id(42); fixture.tracking.session.profileId = id(42); await render();
+      fixture.profiles.activeProfile.id = id(2); fixture.tracking.session.profileId = id(2); await render();
+    }
+    expect(observed.items).toEqual([]);
+    fixture.actions.persistenceFailure = null; await render();
+    expect(observed.items).toEqual([]);
+  });
+
   it('waits for the focused render to commit after an imperative navigation focus event', async () => {
     fixture.focused = false;
     await render();

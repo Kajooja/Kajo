@@ -337,8 +337,9 @@ horizontal drag accepts the chosen rating once into durable local storage, then
 automatically advances to the prepared successor. Discovery forward skip follows
 the same durable-admission boundary; ordinary network acknowledgement does not
 block the next card. A failed local write cannot advance. A List choice retains
-its confirmed positive state until the next forward gesture; List/undo admission
-waits for pending commands to settle. Neither positive advance creates Ohita.
+its confirmed positive state until the next forward gesture; List/server-undo
+admission waits for pending commands to settle. The local cancellation exception
+below does not wait for an unrelated server receipt. Neither positive advance creates Ohita.
 Commands retain exact action and delivery identities, and later receipts cannot
 change whichever card is now active. A vertical
 or diagonal drag over the rating handle and multitouch movement must not commit
@@ -354,12 +355,30 @@ target and independent focus. Leave a small gap between the rating controls and
 bottom dock without adding a reserved feedback band. The October 23 refinement makes the whole card
 follow a vertical drag started over artwork, metadata or description, including
 expanded text. Long descriptions extend the card rather than creating a separate
-nested scroll surface. Slow movement within that content reads the same Item and
-settles within its extent; deliberately crossing its end or making a qualifying
-short upward flick advances. Retain metadata, artwork fallback, source credits
+nested scroll surface. The October 24 rating-stop refinement makes any upward
+gesture that starts above a long card's readable bottom reading-only: even a fast
+flick or overshooting drag stops at the rating controls and cannot dismiss the
+Item. A new deliberate upward gesture starting at that bottom may advance.
+Compact cards retain their direct upward flick. Retain metadata, artwork fallback, source credits
 and usable controls with large text. Horizontal slider input and ordinary control
 taps keep their own meaning; metadata and title actions remain independently
 accessible.
+
+**October 24 immediate one-step cancellation:** persist each feed skip/rating
+before advancing, but keep the newest such choice from server dispatch until the
+next choice is durably accepted. A → B holds A; B → C releases A and holds B.
+Reverse C → B may atomically cancel B only while the sender can prove it was
+never dispatched, restoring its still-valid exact delivery in the same mounted
+scope immediately and retaining eligible prepared successors. This is withdrawal
+of unsent local intent, not a successful server undo or new learning evidence.
+The one-step gate still applies. A sent, ambiguous, expired or otherwise invalid
+source uses the existing ordered server reversal and fresh-delivery path below.
+Failed cancellation preserves the queued command and recovery. Holds are
+runtime-only: a 30-second idle deadline, exit, navigation blur, background and
+scope change release them; restart drains the
+original durable commands without reconstructing a hold. No selected choice is
+lost merely because there is no later card. This supersedes the earlier universal
+queue-empty/clear-window rule only for proven never-dispatched local cancellation.
 
 Forward/upward card scrolling advances one Item at a time; without an already
 accepted positive action it submits contextual Ohita. Backward/downward scrolling restores
@@ -427,7 +446,9 @@ provide equivalent advance, reverse and help without permanent control rows.
 A deliberate dismissal requires one-finger vertical intent: at least 96 points
 of dismissal travel, or at least 24 points with matching vertical release speed
 of 0.6 points/ms and vertical dominance over horizontal motion. A short fast
-upward flick may advance from any reading offset. A fast downward flick reverses
+upward flick may advance a compact card or a long card only when the gesture
+starts at its readable bottom; the gesture that reaches that bottom never also
+submits Ohita. A fast downward flick reverses
 only when it begins at the readable top; inside long content, downward motion
 reads back toward the top and only 96 points of deliberate excess beyond that
 edge can undo. Small slow movement, reversal,

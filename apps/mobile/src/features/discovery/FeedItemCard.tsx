@@ -7,10 +7,20 @@ import { ItemDescription } from './ItemDescription';
 import { createFeedDismissal, FEED_DRAG_DISTANCE, isFeedFling } from './feedDismissal';
 
 const HELP_KEY = 'kajo:vertical-feed-help:v2';
-export const FEED_HELP = 'Selaa seuraavaan pyyhkäisemällä korttia ylöspäin mistä tahansa kohdasta. Ilman valintaa teos ohitetaan. Napauta tai vedä liukuria: arvosana tallentuu ja seuraava kortti avautuu.';
+export const FEED_HELP = 'Selaa seuraavaan pyyhkäisemällä korttia ylöspäin. Pitkää kuvausta lukiessa kortti pysähtyy arvosanaan. Uusi pyyhkäisy jatkaa seuraavaan. Ilman valintaa teos ohitetaan. Napauta tai vedä liukuria: arvosana tallentuu ja seuraava kortti avautuu.';
 type FeedMotionSettings = { disabled: boolean; canForward: boolean; canPrevious: boolean;
   reduceMotion: boolean | null; viewportHeight: number | undefined; cardHeight: number | undefined;
   onForwardOffset: ((offset: number) => void) | undefined; onReadingOffset: ((offset: number) => void) | undefined };
+function readingMinimum(settings: FeedMotionSettings) {
+  return Math.min(0, (settings.viewportHeight ?? 500) - (settings.cardHeight ?? settings.viewportHeight ?? 500));
+}
+function dragOffset(settings: FeedMotionSettings, origin: number, dy: number) {
+  const minimum = readingMinimum(settings);
+  // Reading the description and dismissing the Item require separate gestures.
+  // Clamp during tracking too, so the rating never moves past the bottom stop.
+  const lowerBound = dy < 0 && origin > minimum ? minimum : -(settings.cardHeight ?? 500);
+  return Math.max(lowerBound, Math.min(settings.viewportHeight ?? 500, origin + dy));
+}
 export function getFeedCardHeight(viewportHeight: number | undefined, descriptionHeight: number) {
   return viewportHeight && viewportHeight > 0
     ? viewportHeight + Math.max(0, descriptionHeight - Math.max(80, viewportHeight * 0.28)) : undefined;
@@ -86,8 +96,12 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
   useLayoutEffect(() => {
     callbacks.current = { disabled, onSkip, onPrevious, helpScope, hasInteracted, onForwardOffset };
     motion.configure({ disabled, canForward: Boolean(onSkip), canPrevious: Boolean(onPrevious), reduceMotion, viewportHeight, cardHeight, onForwardOffset, onReadingOffset });
+  }, [disabled, onSkip, onPrevious, helpScope, hasInteracted, onForwardOffset, onReadingOffset, motion, reduceMotion, viewportHeight, cardHeight]);
+  useLayoutEffect(() => {
+    // Acknowledgement/data/gesture callback refreshes must not synchronously
+    // rewrite SQLite while the feed is moving.
     if (hasInteracted && !preview) rememberHelp(helpScope);
-  }, [disabled, onSkip, onPrevious, helpScope, hasInteracted, onForwardOffset, onReadingOffset, motion, reduceMotion, viewportHeight, cardHeight, preview]);
+  }, [hasInteracted, helpScope, preview]);
   useLayoutEffect(() => {
     const accept = (direction: 'forward' | 'backward') => {
       const current = callbacks.current;
@@ -172,7 +186,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     onStartShouldSetPanResponder: () => false,
     onMoveShouldSetPanResponderCapture: (_, g) => {
       const settings = motion.settings();
-      const minimum = (settings.viewportHeight ?? 500) - (settings.cardHeight ?? settings.viewportHeight ?? 500);
+      const minimum = readingMinimum(settings);
       const eligible = motion.observe(g.dx, g.dy, g.numberActiveTouches);
       const allowed = eligible && !motion.isDragging() && !settings.disabled && !motion.isAccepted() && AppState.currentState === 'active' && g.numberActiveTouches === 1 &&
         Math.abs(g.dy) > 12 && Math.abs(g.dy) > Math.abs(g.dx) * 1.5 &&
@@ -190,14 +204,14 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       // already belongs to this finger's movement, including a one-move fling.
       const position = motion.coordinates(0, 0);
       gesture.move(position.dx, position.dy, 1);
-      translation.setValue(motion.origin() + position.dy);
+      translation.setValue(dragOffset(motion.settings(), motion.origin(), position.dy));
     },
     onPanResponderMove: (_, g) => {
       if (!motion.isDragging()) return;
       const position = motion.coordinates(g.dx, g.dy);
       gesture.move(position.dx, position.dy, g.numberActiveTouches); motion.moved();
       const settings = motion.settings();
-      if (Number.isFinite(position.dy)) translation.setValue(Math.max(-(settings.cardHeight ?? 500), Math.min(settings.viewportHeight ?? 500, motion.origin() + position.dy)));
+      if (Number.isFinite(position.dy)) translation.setValue(dragOffset(settings, motion.origin(), position.dy));
     },
     onPanResponderStart: (_, g) => {
       if (g.numberActiveTouches !== 1 && motion.isDragging()) {
@@ -210,13 +224,14 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
       const position = motion.coordinates(g.dx, g.dy);
       const vx = motion.freshVelocity() ? g.vx ?? 0 : 0;
       const vy = motion.freshVelocity() ? g.vy ?? 0 : 0;
-      const minimum = Math.min(0, (viewport ?? 500) - (height ?? viewport ?? 500));
+      const minimum = readingMinimum(motion.settings());
       const offset = motion.origin() + position.dy;
       const reading = Math.max(minimum, Math.min(0, Number.isFinite(offset) ? offset : motion.readingOffset()));
       const fling = isFeedFling(position.dx, position.dy, vx, vy) && (position.dy < 0 || motion.origin() === 0);
       const atEdge = position.dy < 0 ? minimum - offset >= FEED_DRAG_DISTANCE : offset >= FEED_DRAG_DISTANCE;
       gesture.move(position.dx, position.dy, 1);
-      const accepted = (fling || atEdge) && gesture.release(position.dx, position.dy, vx, vy);
+      const readingForward = position.dy < 0 && motion.origin() > minimum;
+      const accepted = !readingForward && (fling || atEdge) && gesture.release(position.dx, position.dy, vx, vy);
       if (!accepted) gesture.cancel();
       motion.setDragging(false);
       const target = accepted ? Math.max(-(height ?? 500), Math.min(viewport ?? 500, offset)) : reading;
@@ -229,7 +244,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
     },
     onPanResponderTerminationRequest: () => true,
   }), [gesture, motion, settle, translation]);
-  const styles = createStyles(theme);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const bounded = viewportHeight !== undefined && viewportHeight > 0;
   return <Animated.View {...(!preview ? pan.panHandlers : {})} testID="feed-dismiss-surface" accessible={false}
     onLayout={() => {

@@ -246,7 +246,7 @@ function ItemDetailContent({
   const feedPresentationKey = restoringPresentation?.visualKey ?? feed.state?.presentationKey ?? feedOpportunity;
   const feedDraft = !restoringPresentation && feedDraftState?.opportunity === feedOpportunity ? feedDraftState.rating : null;
   const [feedMembership, setFeedMembership] = useState<{ opportunity: string; saved: boolean; failed: boolean } | null>(null);
-  const { loadForItem: loadFeedMembership, revision: membershipRevision } = itemLists;
+  const { loadForItem: loadFeedMembership, membershipRevision } = itemLists;
   useEffect(() => {
     if (!feedItem) return;
     let active = true;
@@ -525,8 +525,9 @@ function ItemDetailContent({
     index: number,
     interaction: ItemInteraction,
   ) {
-    if (!isCurrentFeedItem(item) || exitingItemId || endorsingItemId || feed.state?.waitingActionId || feed.skips.pendingCount > 0) return;
-    if (atomicPendingCount > 0) {
+    const onlyDeferred = initialFeed && feed.flow?.hasDeferredAction() && atomicPendingCount + feed.skips.pendingCount === 1;
+    if (!isCurrentFeedItem(item) || exitingItemId || endorsingItemId || feed.state?.waitingActionId || (feed.skips.pendingCount > 0 && !onlyDeferred)) return;
+    if (atomicPendingCount > 0 && !onlyDeferred) {
       setFeedback('Odota valintojen tallentumista ennen listamuutosta.');
       return;
     }
@@ -824,7 +825,8 @@ function ItemDetailContent({
   const feedApproval = getPendingListApproval(feedSharedState, activeSharedMembership?.members ?? [], activeProfile.actorUserId);
   const feedDisabled = Boolean(restoringPresentation || feed.state?.loading || feed.state?.navigationPending || feed.state?.waitingActionId || !feed.skips.ready ||
     persistenceStatus !== 'ready' || canDiscardAction || feed.skips.canDiscardAction || endorsingItemId || listPickerTarget || feedRecoveryOpen);
-  const feedDependentDisabled = feedDisabled || atomicPendingCount > 0 || feed.skips.pendingCount > 0;
+  const onlyDeferred = feed.flow?.hasDeferredAction() && atomicPendingCount + feed.skips.pendingCount === 1;
+  const feedDependentDisabled = feedDisabled || (!onlyDeferred && (atomicPendingCount > 0 || feed.skips.pendingCount > 0));
   const canAdvanceFeed = !feedDisabled && (feed.state?.positiveCommitted === true || feed.state?.canSkip === true);
   const feedErrors = [...new Set([persistenceFailure, eventTracking.persistenceError, feed.skips.message,
     feed.state?.message, feed.state?.refillError, activeSharedMembership ? sharedEndorsements.error : null].filter((error): error is string => Boolean(error)))];
@@ -920,7 +922,7 @@ function ItemDetailContent({
       {initialFeed ? <View style={styles.feedViewport} onLayout={event => setFeedHeight(event.nativeEvent.layout.height)}>
         {feed.state?.exhausted && !restoringPresentation ? <View style={styles.feedEnd}><Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi.</Text>
           <Pressable accessibilityRole="button" onPress={() => feed.flow?.retry()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Päivitä</Text></Pressable>
-          {feed.state.canPrevious && !feedDependentDisabled ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
+          {feed.state.canPrevious && !feedDisabled ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
         </View> : null}
         {feedItem && feedInteraction ? <RollingFeedCard opportunity={feedPresentationKey} item={feedItem} theme={theme} disabled={feedDisabled}
             {...(feed.state?.upcoming?.[0] ? { nextItem: feed.state.upcoming[0].item } : {})}
@@ -941,7 +943,7 @@ function ItemDetailContent({
               </Pressable>
             }
             {...(feed.state?.canPrevious ? { onPrevious: () => {
-              if (feedDependentDisabled || !isCurrentFeedItem(feedItem)) return false;
+              if (feedDisabled || !isCurrentFeedItem(feedItem)) return false;
               const accepted = feed.flow?.previous() === true;
               if (accepted) { setFeedDirection('backward'); setFeedDraftState(null); setFeedback(null); }
               return accepted;

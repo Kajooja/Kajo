@@ -12,6 +12,7 @@ const fixture = vi.hoisted(() => ({
   resolvePreference: null as ((value: boolean) => void) | null,
   animations: [] as { kind: string; toValue: number; useNativeDriver: boolean }[],
   values: [] as { value: number; initial: number }[],
+  helpWrites: [] as { key: string; value: string }[],
   app: null as (() => void) | null,
 }));
 vi.mock('react', async () => {
@@ -47,7 +48,8 @@ vi.mock('react-native', () => ({
     fixture.app = callback; return { remove() {} };
   } },
 }));
-vi.mock('expo-sqlite/kv-store', () => ({ default: { getItemSync: () => 'seen', setItemSync() {} } }));
+vi.mock('expo-sqlite/kv-store', () => ({ default: { getItemSync: () => 'seen',
+  setItemSync(key: string, value: string) { fixture.helpWrites.push({ key, value }); } } }));
 vi.mock('./ItemDescription', () => ({ ItemDescription: () => null }));
 
 let renderer: ReactTestRenderer | undefined;
@@ -63,7 +65,7 @@ const release = (dy: number) => surface().props.onPanResponderRelease(null, { dx
 beforeEach(() => {
   vi.stubGlobal('React', React); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   fixture.reduced = false; fixture.deferPreference = false; fixture.resolvePreference = null;
-  fixture.deferAnimation = false; fixture.animations = []; fixture.values = []; fixture.app = null;
+  fixture.deferAnimation = false; fixture.animations = []; fixture.values = []; fixture.helpWrites = []; fixture.app = null;
 });
 afterEach(async () => {
   if (renderer) await act(async () => renderer!.unmount());
@@ -78,6 +80,24 @@ async function mount(props: Partial<React.ComponentProps<typeof FeedItemCard>> =
 }
 
 describe('mounted feed card motion', () => {
+  it('persists positive-interaction help once per scope transition rather than every motion refresh', async () => {
+    const props = await mount({ hasInteracted: true, helpScope: 'account-one' });
+    expect(fixture.helpWrites).toEqual([{ key: 'kajo:vertical-feed-help:v2:account-one', value: 'seen' }]);
+    await act(async () => {
+      renderer!.update(<FeedItemCard {...props} onSkip={() => true} onForwardOffset={() => undefined}
+        onReadingOffset={() => undefined} viewportHeight={420} />);
+    });
+    await act(async () => {
+      renderer!.update(<FeedItemCard {...props} onSkip={() => true} disabled />);
+    });
+    expect(fixture.helpWrites).toHaveLength(1);
+    await act(async () => { renderer!.update(<FeedItemCard {...props} helpScope="account-two" />); });
+    expect(fixture.helpWrites).toHaveLength(2);
+    expect(fixture.helpWrites[1]).toEqual({ key: 'kajo:vertical-feed-help:v2:account-two', value: 'seen' });
+    await act(async () => { renderer!.update(<FeedItemCard {...props} preview />); });
+    expect(fixture.helpWrites).toHaveLength(2);
+  });
+
   it('keeps an accepted swipe offset during acknowledgement and uses the latest harmless callback refresh', async () => {
     const props = await mount(); const latest = vi.fn(() => true);
     const responderMove = surface().props.onPanResponderMove;
@@ -258,13 +278,60 @@ describe('mounted feed card motion', () => {
     expect(props.onSkip).toHaveBeenCalledOnce(); expect(fixture.values[0]!.value).toBe(-442);
   });
 
-  it('allows a deliberate short upward fling from the middle of expanded content', async () => {
+  it('keeps a short upward fling inside expanded content as reading rather than skipping', async () => {
     const props = await mount({ initialExpanded: true, initialDescriptionHeight: 500 });
     await act(async () => { drag(-120); release(-120); });
     await act(async () => {
       drag(-32); surface().props.onPanResponderRelease(null, { dx: 0, dy: -32, vx: 0, vy: -0.9 });
     });
-    expect(props.onSkip).toHaveBeenCalledOnce();
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-152);
+  });
+
+  it.each([false, true])('stops an overshooting read at the rating before a separate dismissal (reduced motion: %s)', async reduced => {
+    fixture.reduced = reduced;
+    const onForwardOffset = vi.fn(); const onReadingOffset = vi.fn();
+    const props = await mount({ initialExpanded: true, initialDescriptionHeight: 500,
+      onForwardOffset, onReadingOffset, children: 'Rating control', nextCard: 'Next' });
+    await act(async () => { drag(-500); });
+    // The slider stays in reach during the gesture, not only after release.
+    expect(fixture.values[0]!.value).toBe(-332);
+    await act(async () => {
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: -500, vx: 0, vy: -1.2 });
+    });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(onForwardOffset).not.toHaveBeenCalled();
+    expect(onReadingOffset).toHaveBeenLastCalledWith(-332);
+    expect(fixture.values[0]!.value).toBe(-332);
+    // The next distinct gesture can intentionally reveal and skip to the successor.
+    await act(async () => {
+      drag(-32); surface().props.onPanResponderRelease(null, { dx: 0, dy: -32, vx: 0, vy: -0.9 });
+    });
+    expect(props.onSkip).toHaveBeenCalledOnce(); expect(onForwardOffset).toHaveBeenCalledExactlyOnceWith(568);
+    if (reduced) expect(fixture.animations).toEqual([]);
+  });
+
+  it('clamps a one-move native fling at the rating even when grant resets displacement', async () => {
+    const props = await mount({ initialExpanded: true, initialDescriptionHeight: 200 });
+    await act(async () => {
+      expect(surface().props.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: -160, numberActiveTouches: 1 })).toBe(true);
+      surface().props.onPanResponderGrant();
+      expect(fixture.values[0]!.value).toBe(-32);
+      surface().props.onPanResponderRelease(null, { dx: 0, dy: 0, vx: 0, vy: -1.1 });
+    });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-32);
+  });
+
+  it('requires a new bottom start after reading upward again or expanding more text', async () => {
+    const props = await mount({ initialExpanded: true, initialDescriptionHeight: 200 });
+    await act(async () => { drag(-160); release(-160); });
+    await act(async () => { drag(20); release(20); });
+    expect(fixture.values[0]!.value).toBe(-12);
+    await act(async () => { drag(-160); release(-160); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-32);
+    await act(async () => {
+      renderer!.root.findByProps({ testID: 'feed-description-content' }).props.onLayout({ nativeEvent: { layout: { height: 500 } } });
+    });
+    await act(async () => { drag(-500); release(-500); });
+    expect(props.onSkip).not.toHaveBeenCalled(); expect(fixture.values[0]!.value).toBe(-332);
   });
 
   it('reads back up through expanded content without undoing on a downward fling', async () => {

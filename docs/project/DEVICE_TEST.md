@@ -1,5 +1,45 @@
 # Collection device checkpoint — #228 / #229
 
+## APK #715 owner feedback and latency successor — 2026-10-24
+
+The owner tested the supplied #715 build and reports the following. This is
+owner-reported device evidence; no installed checksum or stopwatch measurement
+was supplied.
+
+| Check | Actual report |
+|---|---|
+| 1 — Return to Löydä | Still takes too long after enough browsing; correction required. |
+| 2 — Horizontal history navigation | Exactly as requested; accepted for the observed flow. |
+| 3 — Expanded description/rating access | Reading works, but reaching the low rating control often skips the card accidentally; must stop there first. |
+| 4 — Direct rating | Works in the observed flow. |
+| 5 — Undo | Still delayed. Owner proposes holding the newest choice so A commits after B is chosen and C → B can return quickly. |
+| 6 — History/Lists | Works in the observed flow. |
+| 7 — Startup/network recovery | Not properly tested yet; remains open. |
+| 8 — Recommendation quality | Review recommendation precision/internal scoring separately later; not an acceptance result. |
+
+Required successor tests in both BOOK and MOVIE:
+
+- Read expanded/large-text content with slow, fast and overshooting upward
+  gestures: the gesture reaching the rating control must stop without Ohita.
+  Rate there or use a new upward gesture to skip. Compact-card flicks, slider
+  isolation and downward reading remain unchanged.
+- Skip/rate A, then B, reach C and reverse to B immediately while network replies
+  are delayed. B's unsent choice cancels once and becomes actionable without a
+  ranking wait; A still commits exactly once. Repeat 16 mixed cycles and compare
+  Undo-to-actionable time. A sent/ambiguous/expired source must use honest normal
+  server reversal/recovery rather than an invalid old origin.
+- After short and long sessions return to Löydä: valid prepared successors appear
+  promptly and can open while the current-prefix grid is refreshed. Record
+  return-to-visible and return-to-actionable times; no rated/skipped duplicate,
+  lost scroll, tap during page transition or cross-Profile handoff is allowed.
+- Leave the feed/background/kill/restart after the final choice without another
+  swipe: it must eventually persist exactly once. Also retest true offline/error,
+  reconnect and explicit rejected-command recovery. Preserve current account data.
+
+These successor observations remain open until the new APK is tested. The older
+matrices below retain their dated history; this section supersedes their
+any-reading-offset flick and universal server-Undo assumptions for this packet.
+
 ## Discovery horizontal history and return — #239 / 2026-10-24
 
 The owner reports #714 “Toimii”, accepting the reported feed/Undo correction.

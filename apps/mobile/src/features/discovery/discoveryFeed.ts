@@ -5,7 +5,7 @@ import { CONTEXTUAL_SKIP_VERSION, type DiscoverySkipSource, type DiscoverySkipSo
 import { ITEM_INTERACTION_UNDO_LIMIT } from './itemInteraction';
 import type { ProfileActionReceipt } from '../events/collectionActions';
 
-export interface FeedDelivery { item: Item; origin: DeliveredItemOrigin }
+export interface FeedDelivery { item: Item; origin: DeliveredItemOrigin; returnExpiresAt?: number }
 export interface FeedPositiveReceipt { actionId: string; itemId: string; undoable: boolean }
 export interface DiscoveryFeedSnapshot {
   delivery: FeedDelivery | null; source: DiscoverySkipSource | null;
@@ -17,7 +17,7 @@ export interface DiscoveryFeedSnapshot {
   upcoming: readonly FeedDelivery[]; refilling: boolean; refillError: string | null;
 }
 type FeedAction = { kind: 'skip'; command: KajoSkipCommand } | { kind: 'positive'; receipt: FeedPositiveReceipt };
-interface FeedEntry { delivery: FeedDelivery; sourceRequest: DiscoverySkipSourceRequest | null; actions: FeedAction[] }
+interface FeedEntry { delivery: FeedDelivery; sourceRequest: DiscoverySkipSourceRequest | null; actions: FeedAction[]; validUntil?: number }
 
 // Local admission is durable before navigation. Keep each action on its original
 // displayed delivery while its server receipt arrives in the background. Undo
@@ -32,6 +32,10 @@ export function createDiscoveryFeed(options: {
   recordImpression: (delivery: FeedDelivery) => string | null;
   loadSource: (request: DiscoverySkipSourceRequest, signal: AbortSignal) => Promise<DiscoverySkipSource | DiscoverySkipSourceResult | null>;
   submit: (command: KajoSkipCommand) => boolean;
+  reserveAction?: (actionId: string, kind: 'skip' | 'positive') => boolean;
+  releaseAction?: (actionId: string, kind: 'skip' | 'positive') => void;
+  canCancelAction?: (actionId: string, kind: 'skip' | 'positive') => boolean;
+  cancelAction?: (actionId: string, kind: 'skip' | 'positive') => boolean;
   undoPositive?: (receipt: FeedPositiveReceipt, undoActionId: string) => boolean;
   onChange: (snapshot: DiscoveryFeedSnapshot) => void;
 }) {
@@ -49,7 +53,30 @@ export function createDiscoveryFeed(options: {
   const pendingActions = new Map<string, FeedAction>();
   const handledItems = new Set<string>();
   const history: FeedEntry[] = [];
-  let expected: { kind: 'positive'; actionId: string } | null = null;
+  let expected: { kind: 'positive'; actionId: string; reserved: boolean } | null = null;
+  let deferredAction: FeedAction | null = null;
+  let deferTimer: ReturnType<typeof setTimeout> | null = null;
+  const actionIdFor = (action: FeedAction) => action.kind === 'skip' ? action.command.actionId : action.receipt.actionId;
+  function releaseDeferred() {
+    if (deferTimer) clearTimeout(deferTimer);
+    deferTimer = null;
+    const action = deferredAction; deferredAction = null;
+    if (action) options.releaseAction?.(actionIdFor(action), action.kind);
+  }
+  function deferLatest(action: FeedAction, reserved: boolean) {
+    releaseDeferred();
+    if (!reserved) return;
+    deferredAction = action;
+    // An idle reader must not strand the final choice. Exit/background also
+    // release immediately; a process restart drains the normal durable queue.
+    deferTimer = setTimeout(() => { releaseDeferred(); publish(); }, 30_000);
+  }
+  function locallyCancelable() {
+    const target = history.at(-1);
+    return Boolean(deferredAction && target && actions.length === 0 && target.actions.length === 1
+      && target.actions[0] === deferredAction && pendingActions.has(actionIdFor(deferredAction))
+      && target.sourceRequest && (target.validUntil ?? 0) > Date.now() && options.canCancelAction?.(actionIdFor(deferredAction), deferredAction.kind));
+  }
   type UndoState = { target: FeedEntry; remaining: FeedAction[]; actionId: string | null;
     restoreRequest: PredictionPageRequest | null; restoreStage: 'probe' | 'search'; restorePageCount: number;
     fromHistory: boolean; acknowledgedCount: number };
@@ -69,7 +96,7 @@ export function createDiscoveryFeed(options: {
     state = { ...state, upcoming: [...upcoming], refilling: readingPage,
       loading: readingPage && (advancing || undoing !== null),
       canSkip: Boolean(sourceRequest) && state.source?.acceptsNewSkip !== false && !state.positiveCommitted,
-      canPrevious: !previousConsumed && (history.length > 0 || actions.length > 0) && pendingActions.size === 0 && !advancing && !state.waitingActionId && !held && !undoing &&
+      canPrevious: !previousConsumed && (history.length > 0 || actions.length > 0) && (pendingActions.size === 0 || locallyCancelable()) && !advancing && !state.waitingActionId && !held && !undoing &&
         previousActions.every(action => action.kind === 'skip' || action.receipt.undoable),
       navigationPending: undoing !== null || advancing,
       canCancelPrevious: undoing !== null && !readingPage && !state.waitingActionId };
@@ -80,6 +107,7 @@ export function createDiscoveryFeed(options: {
     sourceRequest = null; state = { ...state, source: null };
   };
   function invalidateBuffer() {
+    releaseDeferred();
     rankingEpoch++; readerNeedsRefresh = false; readerBlocked = false; upcoming = []; bufferPage = null; bufferEnded = false; duplicatePages = 0;
     state = { ...state, refillError: null };
     // Do not discard or abort an ambiguous page. A root may already have created
@@ -94,6 +122,10 @@ export function createDiscoveryFeed(options: {
     })]); } finally { if (deadline) clearTimeout(deadline); if (controllers[lane] === controller) controllers[lane] = null; }
   }
   async function readSource() {
+    // Fresh immutable page deliveries already carry their exact source. The
+    // writer still validates atomically after exposure ACK; avoid an extra
+    // per-card preflight competing with that write and the ranking refill.
+    if ((state.delivery?.returnExpiresAt ?? 0) > Date.now()) return;
     if (!active || advancing || undoing || !sourceRequest || state.source || state.waitingActionId || state.positiveCommitted) return;
     if (readingSource) { sourceAgain = true; return; }
     readingSource = true;
@@ -128,7 +160,9 @@ export function createDiscoveryFeed(options: {
     else { publish(); void readSource(); }
   }
   function deliveryFrom(result: PredictionPage, item: Item): FeedDelivery {
-    return { item, origin: { predictionId: result.ranking.predictionId, deliveryRequestId: result.request.requestId,
+    const occurredAt = Date.parse(result.request.context.occurredAt ?? '');
+    const returnExpiresAt = Number.isFinite(occurredAt) ? occurredAt + 14 * 60_000 : undefined;
+    return { item, ...(returnExpiresAt ? { returnExpiresAt } : {}), origin: { predictionId: result.ranking.predictionId, deliveryRequestId: result.request.requestId,
       properties: { predictionSource: 'hosted', deliveryTier: 'RANKED' } } };
   }
   function prepare(result: PredictionPage, currentItemId: string | undefined) {
@@ -270,7 +304,8 @@ export function createDiscoveryFeed(options: {
   }
   function remember() {
     if (!state.delivery) return;
-    history.push({ delivery: state.delivery, sourceRequest, actions: [...actions] });
+    history.push({ delivery: state.delivery, sourceRequest, actions: [...actions],
+      ...(state.delivery.returnExpiresAt ? { validUntil: state.delivery.returnExpiresAt } : {}) });
     while (history.length > ITEM_INTERACTION_UNDO_LIMIT ||
       history.reduce((count, entry) => count + entry.actions.filter(action => action.kind === 'positive').length, 0) > ITEM_INTERACTION_UNDO_LIMIT)
       history.shift();
@@ -308,9 +343,11 @@ export function createDiscoveryFeed(options: {
     const command: KajoSkipCommand = { version: CONTEXTUAL_SKIP_VERSION, kind: 'CONTEXTUAL_SKIP', actionId: options.createId(),
       actorUserId: source.actorUserId, profileId: source.profileId, itemId: source.itemId,
       origin: { ...source.origin }, contextRef: null, reversesActionId: null, occurredAt: options.nowMicros() };
-    if (!options.submit(command)) return false;
+    const reserved = (state.delivery?.returnExpiresAt ?? 0) > Date.now() && options.reserveAction?.(command.actionId, 'skip') === true;
+    if (!options.submit(command)) { if (reserved) options.releaseAction?.(command.actionId, 'skip'); return false; }
     const action: FeedAction = { kind: 'skip', command };
     pendingActions.set(command.actionId, action); actions.push(action); handledItems.add(command.itemId);
+    deferLatest(action, reserved);
     next(); return true;
   }
   function continueUndo(): boolean {
@@ -380,7 +417,7 @@ export function createDiscoveryFeed(options: {
     // Called after the active card mounts. Fetching the next five is never an
     // impression, a skip capability request, or a permission to write to them.
     warm() { if (active) { warmed = true; void fillBuffer(); } },
-    stop() { active = false; invalidateSource(); state = { ...state, restoringPresentation: null }; controllers.page?.abort(); },
+    stop() { releaseDeferred(); if (expected?.reserved) options.releaseAction?.(expected.actionId, 'positive'); active = false; invalidateSource(); state = { ...state, restoringPresentation: null }; controllers.page?.abort(); },
     exposureAcknowledged() { if (!state.source) void readSource(); },
     retry() {
       if (state.waitingActionId || readingPage) return;
@@ -392,7 +429,9 @@ export function createDiscoveryFeed(options: {
       else { bufferEnded = false; bufferPage = null; advancing = true; void fillBuffer(); }
     },
     retryRefill() { if (active && !readingPage) { readerBlocked = false; duplicatePages = 0; void fillBuffer(); } },
-    hold(value: boolean) { held = value; publish(); },
+    hold(value: boolean) { if (value) releaseDeferred(); held = value; publish(); },
+    flushDeferred() { releaseDeferred(); publish(); },
+    hasDeferredAction() { return deferredAction !== null && options.canCancelAction?.(actionIdFor(deferredAction), deferredAction.kind) === true; },
     skip,
     advance() {
       if (!active || advancing || held || state.waitingActionId || undoing || !state.delivery) return false;
@@ -400,7 +439,27 @@ export function createDiscoveryFeed(options: {
       next(); return true;
     },
     previous() {
-      if (!active || previousConsumed || undoing || advancing || held || state.waitingActionId || pendingActions.size > 0) return false;
+      if (!active || previousConsumed || undoing || advancing || held || state.waitingActionId) return false;
+      if (locallyCancelable() && deferredAction) {
+        const action = deferredAction; const target = history.at(-1)!;
+        const actionId = actionIdFor(action);
+        // Cancellation must durably succeed before changing any presentation.
+        // Once dispatch is released, this path can never retract an uncertain write.
+        if (!options.cancelAction?.(actionId, action.kind)) return false;
+        if (deferTimer) clearTimeout(deferTimer);
+        deferTimer = null; deferredAction = null; pendingActions.delete(actionId);
+        const current = state.delivery;
+        history.pop(); handledItems.delete(target.delivery.item.id);
+        if (current && current.item.id !== target.delivery.item.id) {
+          upcoming = [current, ...upcoming.filter(entry => entry.item.id !== current.item.id && entry.item.id !== target.delivery.item.id)].slice(0, 5);
+        }
+        invalidateSource(); sourceRequest = target.sourceRequest; previousConsumed = true;
+        actions = []; expected = null;
+        state = { ...state, delivery: target.delivery, presentationKey: presentationKeyFor(target.delivery),
+          restoringPresentation: null, positiveCommitted: false, exhausted: false, waitingActionId: null, message: null, recovery: 'retry' };
+        publish(); void readSource(); return true;
+      }
+      if (pendingActions.size > 0) return false;
       const fromHistory = history.length > 0;
       const target = history.at(-1) ?? (state.delivery && actions.length
         ? { delivery: state.delivery, sourceRequest, actions: [] } : null);
@@ -416,11 +475,12 @@ export function createDiscoveryFeed(options: {
     },
     expectPositive(actionId: string) {
       if (active && !advancing && !state.waitingActionId && !undoing) {
-        expected = { kind: 'positive', actionId }; state = { ...state, waitingActionId: actionId }; publish();
+        expected = { kind: 'positive', actionId, reserved: (state.delivery?.returnExpiresAt ?? 0) > Date.now() && options.reserveAction?.(actionId, 'positive') === true }; state = { ...state, waitingActionId: actionId }; publish();
       }
     },
     cancelPositive(actionId: string) {
       if (state.waitingActionId === actionId && expected?.kind === 'positive') {
+        if (expected.reserved) options.releaseAction?.(actionId, 'positive');
         expected = null; state = { ...state, waitingActionId: null }; publish();
       }
     },
@@ -428,6 +488,7 @@ export function createDiscoveryFeed(options: {
       if (!active || advancing || undoing || state.waitingActionId !== actionId || expected?.kind !== 'positive' || !state.delivery) return false;
       const action: FeedAction = { kind: 'positive', receipt: { actionId, itemId: state.delivery.item.id, undoable: true } };
       pendingActions.set(actionId, action); actions.push(action); handledItems.add(state.delivery.item.id);
+      deferLatest(action, expected.reserved);
       expected = null; state = { ...state, waitingActionId: null };
       next(); return true;
     },

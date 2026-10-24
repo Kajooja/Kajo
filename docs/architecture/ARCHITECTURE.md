@@ -81,6 +81,15 @@ Primary stack:
 
 The mobile client owns presentation, local cache/outbox and interaction state. It does **not** own recommendation truth, Friend authorization or SharedProfile membership rules.
 
+The October 24 Discovery latency refinement adds a bounded runtime dispatch hold
+around the newest durably stored feed skip/rating. The outbox, not presentation,
+must arbitrate reserve/release/cancel-before-send against dispatch. A cancellation
+is valid only when no attempt could have reached the server; uncertain sends
+retain ordinary exact retry and canonical reversal. Holds are not persistent:
+exit/background/scope cleanup releases them and process restart drains stored
+commands. Immediate local reverse restores only a valid same-scope delivery,
+retains the one-step gate and produces no fabricated receipt or learned evidence.
+
 ### Taste web entry
 
 The first public launch requires a browser-capable Taste route so a shared/ad link does not require app installation before value is visible.

@@ -10,7 +10,7 @@ import type { DiscoveryCollectionPagerState } from './useDiscoveryCollectionPage
 const context = vi.hoisted(() => ({
   focused: true, ranking: null as VisiblePredictionRanking | null,
   recordEvent: vi.fn(), createEventId: vi.fn(), loadMore: vi.fn(), retry: vi.fn(), refresh: vi.fn(),
-  scopeKey: 'fixture:actor:profile', sessionId: 'session', mode: 'FOR_YOU', rankingEnabled: vi.fn(),
+  scopeKey: 'fixture:actor:profile', sessionId: 'session', mode: 'FOR_YOU', rankingEnabled: vi.fn(), deferReplacement: vi.fn(),
 }));
 const hooks = vi.hoisted(() => ({
   states: [] as unknown[], memos: [] as { deps: readonly unknown[]; value: unknown }[],
@@ -85,7 +85,7 @@ vi.mock('./SharedEndorsementContext', () => ({ useSharedEndorsements: () => ({
 }) }));
 vi.mock('./DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: context.mode }) }));
 vi.mock('./usePredictionRanking', () => ({ usePredictionRanking: (...args: unknown[]) => {
-  context.rankingEnabled(args[3]); return context.ranking;
+  context.rankingEnabled(args[3]); context.deferReplacement(args[4]); return context.ranking;
 } }));
 vi.mock('./DiscoveryItemCard', () => ({ DiscoveryItemCard: 'DiscoveryItemCard' }));
 vi.mock('./DiscoveryCollectionHeader', () => ({ DiscoveryCollectionHeader: 'DiscoveryCollectionHeader' }));
@@ -100,6 +100,10 @@ type Props = { children?: ReactNode; discovery?: ReactNode; history?: ReactNode;
   onMoveShouldSetPanResponderCapture?: (event: unknown, gesture: Gesture) => boolean;
   onPanResponderRelease?: (event: unknown, gesture: Gesture) => void };
 type ListProps = Props & { data: readonly Item[]; contentContainerStyle: unknown[]; ListFooterComponent: ReactNode;
+  refreshing: boolean;
+  onTouchStart: () => void; onTouchEnd: () => void; onTouchCancel: () => void;
+  onScrollBeginDrag: () => void; onScrollEndDrag: () => void;
+  onMomentumScrollBegin: () => void; onMomentumScrollEnd: () => void;
   onRefresh: () => void; onEndReached: () => void; onContentSizeChange: (width: number, height: number) => void;
   onScroll: (event: { nativeEvent: { contentOffset: { y: number } } }) => void;
   onViewableItemsChanged: (event: { viewableItems: { item: Item; isViewable: boolean; index: number; key: string }[] }) => void;
@@ -151,6 +155,40 @@ beforeEach(() => {
 });
 
 describe('Discovery grid integration', () => {
+  it('opens a prepared return card with its exact feed origin while fresh recommendations load quietly', () => {
+    context.createEventId.mockReset().mockReturnValue('feed-return-navigation');
+    context.ranking = ranking({ viewId: 'feed-return:1', items: [item('prepared')], source: 'hosted',
+      predictionId: 'feed-prediction', predictionIds: { prepared: 'feed-prediction' },
+      deliveryRequestIds: { prepared: 'feed-request' }, preparingFreshPage: true, hasNextPage: false });
+    const { list } = render();
+    expect(list.props.refreshing).toBe(false);
+    expect(text(list.props.ListFooterComponent)).toContain('Päivitetään suosituksia');
+    expect(text(list.props.ListFooterComponent)).not.toContain('suositukset on näytetty');
+    const prepared = list.props.data[0]!;
+    list.props.onViewableItemsChanged({ viewableItems: [{ item: prepared, isViewable: true, index: 0, key: prepared.id }] });
+    list.props.renderItem({ item: prepared, index: 0 }).props.onOpen();
+    expect(context.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'ITEM_OPENED',
+      itemId: prepared.id, predictionId: 'feed-prediction', deliveryRequestId: 'feed-request' }));
+    expect(getDeliveredSlate('feed-return-navigation')!.origins.prepared).toMatchObject({
+      predictionId: 'feed-prediction', deliveryRequestId: 'feed-request' });
+  });
+
+  it('defers prepared-grid replacement throughout native touch and momentum, ignoring obsolete callbacks', () => {
+    let screen = render();
+    screen.list.props.onTouchStart(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onScrollBeginDrag(); screen.list.props.onTouchEnd(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onScrollEndDrag(); screen.list.props.onMomentumScrollBegin(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onMomentumScrollEnd(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(false);
+    const old = screen.list;
+    context.ranking = ranking({ viewId: 'replacement-view' }); render();
+    old.props.onTouchStart(); render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(false);
+  });
+
   it.each(['BOOK', 'MOVIE'] as const)('appends through top pull, end reach and accessible button without refreshing %s', itemType => {
     context.ranking = ranking({ items: [item('first', itemType), item('second', itemType)] });
     const first = render(itemType);

@@ -351,8 +351,21 @@ Discovery refinement retains the active card and at most five already prepared
 successors across ordinary rating/skip/List acknowledgements, with each frozen
 page origin intact. New refills use the latest committed prefix; this bounded
 latency/freshness tradeoff supersedes the earlier suppression-only exception.
-Undo, scope changes, source withdrawal and rejected-command discard still
+Server Undo, scope changes, source withdrawal and rejected-command discard still
 invalidate the prepared window and preserve canonical restoration requirements.
+
+The October 24 feed-local cancellation exception delays dispatch, never durable
+admission: the newest skip/rating is persisted under its exact frozen command
+and temporarily held. Admission of the next feed choice releases the preceding
+one. A sender-owned atomic cancel succeeds only before any dispatch attempt and
+removes that unsent command plus its local optimistic intent. Its valid original
+delivery may resume in the same scope without a server reversal or extra
+impression; eligible prepared successors survive. Sent/uncertain commands cannot
+use this path. Cancellation failure, expired origin, source invalidation or scope
+change preserves canonical recovery. Runtime holds release after 30 seconds idle or on navigation blur/exit/background/
+scope change and are not restored after process death; durable restart replays
+the original commands. Pending or cancelled local intent is never confirmed
+learning or a fabricated canonical receipt. One-step Undo remains bounded.
 
 After successful durable admission of the first exact undo/withdrawal command,
 Discovery may immediately display the prior Item's cached appearance in a separate
@@ -391,8 +404,10 @@ or unknown head ID cannot discard a newly admitted pending command. New Discover
 the current committed prefix; retained prepared cards keep their original page
 identities. Rating auto-advance never also submits a skip. Partial/terminated gestures,
 slow reading within the card's content extent, layout and backgrounding are inert.
-A qualifying deliberate flick or dismissal beyond the content boundary retains
-the same exact skip command; moving expanded text alone is not evidence. Actual hosted
+A gesture starting above a long card's reading bottom stops at its rating controls,
+even if fast or overshooting. Only a fresh deliberate upward gesture from that
+bottom can dismiss; compact-card flicks retain the same exact skip command.
+Moving expanded text alone is not evidence. Actual hosted
 installation and phone acceptance remain separate. The source PR/STATUS own the
 exact tests, CI and installation boundaries.
 
