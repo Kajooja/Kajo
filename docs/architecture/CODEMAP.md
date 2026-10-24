@@ -53,6 +53,32 @@ boundary; STATUS/PR owns final validation and APK, DEVICE_TEST the actual phone
 observations. The dated rows below retain predecessor behavior unless refined
 here. No SQL or scoring policy changes in this successor.
 
+## Versioned Taste pool rollout preparation — #336 / October 24
+
+`scripts/database/personal-taste-pool-hosted-upgrade.{mjs,test.mjs}` prepares the
+single accepted `20261024125357_versioned_taste_candidate_pools.sql` forward on
+`feat/336-taste-rollout-performance-plan`. It pins exact source bytes and validates
+an explicit private target/history/schema/function/row checkpoint against the
+reviewed predecessor. It emits read-only preflight/postflight and a single guarded
+payload for the provider's atomic transaction/receipt; it has no network executor
+or reset entry point. UTC-normalized `MD5_SORTED_ROW_MD5_V1` checkpoints retain
+complete-row hash multiplicity and counts without one enormous row-JSON aggregate.
+Only the explicitly observed SELECT-only provider-owned `auth.schema_migrations`
+uses ACCESS SHARE with owner/read and complete pre/post hash guards; every other
+captured table and application migration history retains SHARE. There is no
+automatic weaker-lock fallback. Bounded locks/timeouts and pre/post assertions
+reject drift, unexpected retained-row/security changes, mismatched receipts and
+replay. Four populated/disposable tests cover retained V3/exact replies, atomic
+rollback, timezone/digest/lock boundaries and metadata/history preservation.
+Operator checkpoints and account identities
+stay outside Git. [STATUS](../project/STATUS.md) owns actual validation,
+publication, verified hosted installation and the completed two-test-account reset
+receipt. The latter removes old account roots and requires fresh registration;
+it is an operator receipt, not a reset feature of this helper. The owner explicitly
+approved the completed eight-file helper/docs packet for GitHub publication on
+October 24; its PR owns the exact published head and CI receipts. The completed
+hosted operations and this publication approval do not close V4 device acceptance.
+
 ## Sequential Taste rollout preparation — #336
 
 `scripts/database/personal-sequential-taste-hosted-upgrade.{json,mjs,test.mjs}`

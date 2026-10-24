@@ -1,6 +1,38 @@
 # Collection device checkpoint — #228 / #229
 
-## APK #716 owner observation — 2026-10-24
+## APK #721 owner observations and next test boundary — 2026-10-24
+
+After receiving the GitHub link and six checks for the configured main APK #721,
+the owner reports the following. These scoped observations supersede the earlier
+general #716 report for those cases; do not ask for an unchanged repeat merely
+because an older checklist remains below.
+
+| Supplied check | Actual owner report |
+|---|---|
+| 1 — Offline/reconnect ratings | Works. |
+| 2 — Final choice after background/close/reopen | Works. |
+| 3 — Cold startup | Works. |
+| 4 — Return to Löydä after long browsing | Approximately 4–5 seconds; acceptable, faster preferred. |
+| 5 — Expanded description stops at rating | Works. |
+| 6 — Repeated immediate Undo | Works. |
+
+This report does not supply an installed checksum, device/OS, per-domain trial
+counts or separate visible/actionable/saved timings. Accept the reported cases
+without inferring the entire accessibility, scope, expiry or process-death matrix,
+V4 hosted acceptance or measured recommendation quality. Main CI #721 and its APK
+receipt are recorded in #356/STATUS; passing CI is separate from these observations.
+
+The owner's requested reset of the exact two test-account roots is complete on
+2026-10-24, independently verified after commit. Account/session roots and all 60
+checked test-state tables are empty; catalogue/source/model structure hashes,
+migration history and the installed V4 default are preserved. STATUS owns the
+aggregate receipt; exact private account/checkpoint details stay outside Git.
+Register the same two email addresses again using owner-chosen passwords to create
+fresh identities before the next Taste/adaptation test. Old login sessions and
+adaptation history are gone. The reset does not require repeating the six accepted
+unchanged cases and does not establish new device or quality acceptance.
+
+## Earlier APK #716 owner observation — 2026-10-24
 
 After receiving the GitHub download for supplied APK #716, the owner says
 “toimii hyvin” and asks to continue development. Record this as acceptance of the
@@ -8,7 +40,8 @@ observed general browsing behavior after the latency/rating-stop corrections.
 The report does not identify which individual cases below were exercised, provide
 installed checksum/timings, or explicitly pass startup, offline/reconnect,
 background/process-death or accessibility cases. Those detailed observations
-remain open; no complete device or recommendation-quality acceptance is inferred.
+were open at that checkpoint; the later six-case report above supplies scoped
+acceptance. No complete device or recommendation-quality acceptance is inferred.
 
 STATUS owns the exact #716 source/CI/artifact receipt. No new APK or account reset
 is required merely to repeat the already accepted general browsing observation.
@@ -18,10 +51,19 @@ not validate an unbuilt successor.
 
 ## Versioned Taste pool successor — planned device checks / #336
 
-These checks require the successor's accepted native backend and matching APK;
-APK #716 does not establish them. Use an authorized eligible new session without
-resetting an existing account to obtain V4. Retained V3/legacy sessions must keep
-their original policy and history.
+The accepted V4 native forward is installed and its metadata/security and
+retained-row preservation verified; #721 is the matching APK. The scoped reset
+above is complete. Start these checks only after fresh registration of the two
+test accounts; no old account session should resume. The reset is not a migration
+replay or a change to retained-policy semantics. Its fresh state enables the next
+test; it does not itself demonstrate adaptation or recommendation quality.
+
+The next owner check is deliberately small: create the new accounts, start a fresh
+Taste test, rate/skip and receive the next card, recover one interrupted response,
+resume the same unfinished question after reopening, then continue rating in
+Discovery and report observed recommendation direction and return time. Different
+ratings need not change every immediately following title. The detailed guards
+below remain the broader matrix; the accepted six-case feed checks are not reopened.
 
 - Rate or skip, await acknowledgement and the separate NEXT, then verify a usable
   next question; retry/lost-reply and restart must preserve the exact current
@@ -34,6 +76,34 @@ their original policy and history.
   sessions. Fresh candidate-pool identity and immutable prior-panel provenance
   require the SQL/native assertions; a visibly different title alone is not proof
   of freshness, correct evaluation or improved recommendation quality.
+
+## Performance diagnostic — planned measurement
+
+The owner requests duration measurement as a larger roadmap item. Follow
+[`MVP-UX-008` and the staged performance work package](ROADMAP.md#end-to-end-performance-measurement--2026-10-24)
+before further broad speed optimization. The accepted approximate 4–5-second
+return is the motivating observation, not a measured baseline or diagnosed cause.
+
+- Record initiation → visible → actionable, and local durability / server save
+  separately. Inert Undo previews and loading placeholders cannot count as usable.
+- Start with long-browse → Löydä and distinguish handoff hit/miss/reason, queue
+  drain, ranking RPC, catalogue RPC, rendering and images. Also cover cold/warm
+  startup/return, short/long sessions, BOOK/MOVIE, Taste ANSWER → NEXT and offline
+  recovery under declared ordinary/slow network and cache conditions.
+- Record exact build/backend/device/OS, session length, trial count and outcome;
+  compare p50/p95 only with explicit sample sizes and sparse-tail limitations.
+  Use bounded private correlation IDs to join stages, without copying ratings or
+  user content into logs or feeding timing into preference learning.
+- Establish the baseline, diagnose one bottleneck, calibrate targets and repeat
+  the same conditions after a bounded change. Record failures/missing traces and
+  sampling overhead as well as speed; retain exact origins, durable choices and
+  recovery behavior. This measurement does not reopen accepted functional cases
+  unless the tested implementation changes or a regression is observed.
+
+No instrumented timing distribution, improvement or performance budget has been
+accepted by this checklist. Actual results belong here when collected; operational
+privacy/retention/runbook acceptance remains in Phase 17 and recommendation
+quality remains a separate evaluation.
 
 ## APK #715 owner feedback and latency successor — 2026-10-24
 
@@ -71,8 +141,9 @@ Required successor tests in both BOOK and MOVIE:
   swipe: it must eventually persist exactly once. Also retest true offline/error,
   reconnect and explicit rejected-command recovery. Preserve current account data.
 
-APK #716 now has the general owner acceptance above. Unreported individual
-successor observations remain open. The older matrices below retain their dated
+APK #716 has the historical general owner acceptance above; the later #721 report
+accepts the six supplied cases. Unreported extended successor observations remain
+open. The older matrices below retain their dated
 history; this section supersedes their
 any-reading-offset flick and universal server-Undo assumptions for this packet.
 

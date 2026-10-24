@@ -10,14 +10,99 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — versioned Taste candidate pools / #336
+## Current packet — V4 rollout, two-account reset and timing plan / #336
+
+**Accepted source and device observations — 2026-10-24:** #355 and
+[#356](https://github.com/Kajooja/Kajo/pull/356) are merged. #356's final head
+`9f2f9c728bc0526219063116037a78ce2e03e3dd` passed all five CI #720 gates; accepted
+main `340d0da660fe02d6d9d47d468bee75e134546fa3`, tree
+`8af20e5aa44cf8ee203131cb629342b4085b3867`, passed all six
+[CI #721 jobs](https://github.com/Kajooja/Kajo/actions/runs/40124122391), including
+its configured Android APK. #356 owns the exact final source/build receipt.
+The owner reports all six supplied cases working: offline/reconnect, last-choice
+persistence after background/close/reopen, cold startup, Löydä return,
+expanded-description rating stop and repeated immediate Undo. Long-session
+return is approximately 4–5 seconds, acceptable with faster return desired.
+[DEVICE_TEST](DEVICE_TEST.md#apk-721-owner-observations-and-next-test-boundary--2026-10-24)
+owns these scoped observations; the entire device matrix and recommendation
+quality are not thereby accepted. Do not repeat these unchanged cases or reopen
+the completed #355/#356 source integration.
+
+**One current source packet:** `feat/336-taste-rollout-performance-plan` supplies
+the guarded matching V4 rollout helper and records the expanded duration work
+package. `scripts/database/personal-taste-pool-hosted-upgrade.{mjs,test.mjs}` pins
+the unchanged accepted migration, validates the private target checkpoint and
+emits read-only pre/postflight plus one guarded provider-transaction payload.
+It checks retained rows, function identity/security, schema and exact migration
+history, and rejects replay/drift. UTC capture and versioned sorted complete-row
+hashes/counts bound checkpoint work; only the observed SELECT-only provider Auth
+history uses ACCESS SHARE, while application tables/history retain SHARE locks.
+It has no hosted executor or account-reset entry point. Four focused helper tests
+pass. The local root check stops at the unchanged Deno registry connection refusal;
+remaining stages pass separately, not as a completed full-root run or new CI.
+
+**Hosted V4 installed and verified:** the one unchanged accepted
+`20261024125357_versioned_taste_candidate_pools.sql` forward was applied through
+the guarded provider transaction. History advanced from 86 to 87 receipts, the
+new-session default is `CANONICAL_FORECAST_POOL_V4`, and read-only postflight
+passed complete captured metadata/security and retained-row preservation checks.
+The earlier lock-permission attempt stopped before DDL; fresh readback confirmed
+the unchanged predecessor before the narrow provider-table lock correction and
+successful apply. Do not replay the installed forward. Private target/checkpoint
+and provider receipt details remain outside Git; actual V4 device acceptance is
+still separate.
+
+**New source publication approved — 2026-10-24:** after reviewing the completed
+eight-file helper/documentation packet, the owner explicitly approved its
+publication to GitHub. This resolves the earlier automatic approval rejection;
+no workaround or publication retry preceded that approval. The unchanged document
+histories match existing public main blobs, and the added-content audit found no
+real account IDs, emails, project references or credentials. Publish the approved
+packet from `feat/336-taste-rollout-performance-plan`; its PR owns the exact
+published head and CI receipts. This approval does not claim new CI success,
+source merge or V4 device acceptance, and is separate from the already completed
+hosted operation.
+
+**Two-account reset completed — 2026-10-24:** the exact two authorized test-account
+roots were removed after a successful rollback-only rehearsal. The committed
+reset and independent read-only postflight passed: Auth/app users, Profiles,
+identities, sessions and refresh tokens are empty, as are all 60 checked test-state
+tables including V4 pools. Catalogue/source, genome, promotion and assignment
+hashes are unchanged; there are no remaining erasure permits, migration history
+remains at 87 and the V4 new-session default is intact. Private identities and the
+exact reset receipt remain outside Git. This clears the requested test prerequisite;
+it is not a general reset policy. The owner must register the two accounts again
+with the same email addresses and owner-chosen passwords; the old account roots,
+login sessions and adaptation history are gone, and registration creates fresh
+identities. No new V4 device or recommendation-quality acceptance is implied.
+
+**Performance continuation:** [ROADMAP's work package](ROADMAP.md#end-to-end-performance-measurement--2026-10-24)
+and open `MVP-UX-008` now define visible/actionable/saved timings, handoff/queue/
+RPC/rendering diagnosis, representative p50/p95 baselines, calibrated budgets and
+bounded private diagnostics. Initial measurement precedes further broad speed
+optimization; it does not postpone fresh-account V4 testing. The approximate
+4–5 seconds is not a measured distribution or diagnosed bottleneck. Full UX/ops
+acceptance stays in Phase 17; scoring/usefulness remains a separate quality gate.
+
+**Next action:** after the owner registers the two test accounts again, run the
+fresh V4 device/adaptation checks with the matching #721 APK and begin the planned
+timing baseline before broad speed optimization. Hosted installation and the
+requested reset are complete. Publish the now-approved helper/docs packet and
+record its source/CI receipts in the PR. Do not repeat the reset, installed
+operations or accepted unchanged device cases. Sprint 014, full readiness and
+release gates remain open.
+
+## Predecessor checkpoint — versioned Taste candidate-pool integration / #336
+
+The following is the earlier pre-merge receipt; the current packet above
+supersedes its pending integration, latest-observation and next-action statements.
 
 **Latest owner observation — 2026-10-24 Europe/Helsinki:** after receiving the
 GitHub download for APK #716, the owner reports “toimii hyvin” and asks to
 continue development. This accepts the observed general browsing behavior of the
 supplied successor; it is not a timed benchmark, installed-checksum verification,
 per-case gesture report or startup/offline/process-death acceptance. The remaining
-matrix stays in [DEVICE_TEST](DEVICE_TEST.md#apk-716-owner-observation--2026-10-24).
+matrix stays in [DEVICE_TEST](DEVICE_TEST.md#earlier-apk-716-owner-observation--2026-10-24).
 Recommendation quality and internal scoring have not been accepted by this report.
 
 **Accepted feed source:** [PR #355](https://github.com/Kajooja/Kajo/pull/355)
