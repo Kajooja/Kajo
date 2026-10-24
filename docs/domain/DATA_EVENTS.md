@@ -203,8 +203,8 @@ New recommendation event types require explicit semantics before broad use.
 The owner's [near-term feed refinement](../project/ROADMAP.md#near-term-feed-and-first-answer-personalization--2026-10-15)
 requires the same **Ohita** interaction in Taste and Discovery. A deliberate,
 completed upward swipe dismisses the active card; the equivalent accessibility
-action has the same meaning. As refined on October 22, forward navigation after
-an acknowledged rating/List choice creates no additional skip. With no such choice,
+action has the same meaning. As refined on October 23, forward navigation after
+a durably accepted rating or confirmed List choice creates no additional skip. With no such choice,
 it records a neutral/contextual skip and removes the Item
 from the current feed. It is neither rating zero, explicit negative preference,
 nor proof that the actor does not recognize the Item. It cannot count as a known
@@ -343,19 +343,71 @@ with source erasure and serving; this is a correctness tradeoff, not a measured
 throughput claim. Legacy removal/history-clearing entries that reach these
 erasers also acquire the exclusive gate before existing row locks; other
 ordinary actions retain shared locking. Earlier frozen forecasts/delivered receipts remain historical.
-Client acknowledgement must retire old undelivered request generations.
+Learning-changing rating/List acknowledgement marks the future reader dirty;
+the already started bounded refill and its exact retries may finish and fill only
+free slots. Coalesce acknowledgements and renew the root from the latest committed
+prefix before the next new refill. Neutral skip acknowledgement retains the reader. The October 23
+Discovery refinement retains the active card and at most five already prepared
+successors across ordinary rating/skip/List acknowledgements, with each frozen
+page origin intact. New refills use the latest committed prefix; this bounded
+latency/freshness tradeoff supersedes the earlier suppression-only exception.
+Server Undo, scope changes, source withdrawal and rejected-command discard still
+invalidate the prepared window and preserve canonical restoration requirements.
+
+The October 24 feed-local cancellation exception delays dispatch, never durable
+admission: the newest skip/rating is persisted under its exact frozen command
+and temporarily held. Admission of the next feed choice releases the preceding
+one. A sender-owned atomic cancel succeeds only before any dispatch attempt and
+removes that unsent command plus its local optimistic intent. Its valid original
+delivery may resume in the same scope without a server reversal or extra
+impression; eligible prepared successors survive. Sent/uncertain commands cannot
+use this path. Cancellation failure, expired origin, source invalidation or scope
+change preserves canonical recovery. Runtime holds release after 30 seconds idle or on navigation blur/exit/background/
+scope change and are not restored after process death; durable restart replays
+the original commands. Pending or cancelled local intent is never confirmed
+learning or a fabricated canonical receipt. One-step Undo remains bounded.
+
+After successful durable admission of the first exact undo/withdrawal command,
+Discovery may immediately display the prior Item's cached appearance in a separate
+`restoringPresentation`. This is not a restored delivery and has no actionable
+origin. It cannot produce impression/dwell or accept mutations until all ordered
+undo receipts and fresh delivery of the same Item have been obtained. Keep its
+visual identity on activation. Exact action origins, partial-undo retry, rejection
+and cancellation remain authoritative; showing the preview is not undo success.
+
+A proven unusable/expired pending refill may retire quietly when ordinary
+acknowledgement already scheduled reader renewal, retaining the prepared window
+and continuing that fresh root without admitting the error response. Without
+scheduled renewal, existing explicit refresh/recovery remains. Ambiguous failures
+still retry their exact request; hard invalidation always rejects late results.
 
 Mobile routing validates capabilities and every receipt identity before clearing
 a persisted command. Taste shares its existing one-command queue; Discovery has
 a separately namespaced durable service. Missing capability or an outage never
 maps a skip to an old answer or silently discards it. The October 17 shared-feed
 source wires Taste to the exact question capability and Discovery to the actual
-per-Item page request plus recorded impression ID. Source RPC validation precedes
-new skip admission. A scope-level queue resumes original commands independently
-of card navigation/new Event sessions. Only a matching acknowledged receipt retires
-unshown work; fresh Discovery reads retain exact retry identity and request a new
-committed prefix. Positive advances never also skip. Partial/terminated gestures,
-internal description scrolling, layout and backgrounding are inert. Actual hosted
+per-Item page request plus recorded impression ID. Discovery may durably accept
+an exact displayed-origin skip intent before the impression reply. The sender
+waits for the actual impression acknowledgement, then the existing canonical
+writer validates source authority atomically. A separate source-read RPC is not
+a mandatory dispatch preflight: a lost-reply retry must reach its exact cached
+receipt even when that opportunity no longer accepts a new skip. Local intent is
+not a fabricated capability or exposure; optional source status stays quiet.
+A scope-level queue resumes original commands independently of card navigation
+or new Event sessions. Successful durable local skip/rating admission advances
+presentation immediately; failure to persist does not. Track each pending action
+ID with its frozen Item/delivery/origin, so a later receipt reconciles that action
+without retargeting the active card, clearing its prepared successor or recording
+a second response. A successful retry is not a discard. Recovery resets only
+after explicit confirmed discard of the exact known rejected action ID; an old
+or unknown head ID cannot discard a newly admitted pending command. New Discovery reads retain exact retry identity and request
+the current committed prefix; retained prepared cards keep their original page
+identities. Rating auto-advance never also submits a skip. Partial/terminated gestures,
+slow reading within the card's content extent, layout and backgrounding are inert.
+A gesture starting above a long card's reading bottom stops at its rating controls,
+even if fast or overshooting. Only a fresh deliberate upward gesture from that
+bottom can dismiss; compact-card flicks retain the same exact skip command.
+Moving expanded text alone is not evidence. Actual hosted
 installation and phone acceptance remain separate. The source PR/STATUS own the
 exact tests, CI and installation boundaries.
 
@@ -1121,6 +1173,14 @@ The owner-approved six-forward rollout was verified on 2026-09-12. STATUS and
 Sprint014 record exact source/deployment identities and metadata preservation.
 Configured-device evidence and full DATA acceptance remain open.
 
+The October 24 Discovery/history pager creates no preference or membership Event
+when selecting, dragging or previewing a page. Only the settled selected and
+route-focused grid may record an actual visible impression or open with its
+exact per-Item origin. Hidden/dragging/settling pages are not actionable and their
+viewability callbacks cannot borrow a new scope. Embedded history retains the
+same authorized collection source and COLLECTION navigation as standalone history;
+it never borrows a recommendation Prediction from the adjacent grid.
+
 ### Collection/history corrections and exact destination sets
 
 The active branch records hosted rollout of membership resurfacing, history clear, bootstrap-history projection and Shared multi-destination forwards; recheck STATUS before deployment work. These source contracts are not proof of device acceptance.
@@ -1144,7 +1204,11 @@ Preserve dataset/release namespaces, raw values/scales, occurrence time, availab
 
 Only information available at prediction time may form input state, retrieval keys, transforms and memory. Later observed labels can evaluate eligible targets at their declared maturity/cutoff. An unchosen alternative has no observed counterfactual outcome; missing or not-yet-mature feedback is not rejection. Synthetic branches never become native Events, observed evaluation labels or independent support for their generator. External artifacts retain lineage and admission/withdrawal rules instead of appearing as copied Scenario history.
 
-### Planned star, overflow and Next controls — owner decision 2026-09-12
+### Earlier star, overflow and Next controls — owner decision 2026-09-12
+
+This historical plan is superseded for Discovery feed mode by the October 22
+List-picker star and direct-rating contract in UX_PRINCIPLES. Retain its evidence
+boundaries; do not restore its default-save/Next controls.
 
 #239 maps the star to the existing default SYSTEM_SAVED/SAVED action; Tykätyt is
 presentation wording and does not imply a rating or consumption. Shared saves
@@ -1172,3 +1236,26 @@ before its delayed impression. Shadow and mature evaluation compare the actual
 page's frozen candidate source; they do not simulate unseen whole-chain actions.
 Exact receipt retries after cache cleanup add no duplicate run/action/outcome.
 Source/PGlite, native CI, hosted rollout and real visibility remain separate gates.
+
+The October 23 continuous-feed refinement prepares at most five upcoming
+Discovery cards beside the active card. An adjacent preview remains inert and
+accessibility-hidden; it cannot record an impression or acquire skip capability.
+On activation, the card retains its original Prediction/page origin. Same-Item
+restoration first probes a fresh five-Item root after every ordered reversal
+receipt. A successful current-epoch missing-target probe may replace its known
+reader with the original bounded three-page, 50-Item search; ambiguous requests
+retain exact retry identity. Restoration may prepare up to five eligible siblings from the successful
+fresh page that contains the exact restored target, after all reversal receipts.
+Their original fresh-page origins remain immutable, and preparation creates no
+impression, dwell, skip capability or new choice. Missing-target, stale and error
+replies supply no siblings; invalidated pre-Undo deliveries remain excluded.
+Ordinary rating/List acknowledgements mark future reads dirty without aborting the bounded
+refill already in flight; it may admit only currently free slots. Exact retries
+precede the next new latest-prefix root. Neutral skip retains the reader; neither
+clears this prepared window. Undo/scope/source invalidation and rejected-command discard
+remain hard boundaries. Deduplicate new refills against current, queued,
+displayed and locally handled pending Item IDs while preserving server order.
+`rank_items_feed_v1` atomically replaces
+owned derived reader state while retaining immutable page evidence and exact
+full-envelope retry receipts. Reader replacement introduces no taste Event or
+Outcome, and it does not alter adaptive Taste question ordering.

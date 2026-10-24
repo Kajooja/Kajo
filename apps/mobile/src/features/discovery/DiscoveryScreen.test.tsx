@@ -5,15 +5,18 @@ import type { Item, ItemType } from '../../domain/contracts';
 import type { VisiblePredictionRanking } from './usePredictionRanking';
 import { getDeliveredSlate } from './deliveredSlate';
 import { DiscoveryScreen } from './DiscoveryScreen';
+import type { DiscoveryCollectionPagerState } from './useDiscoveryCollectionPager';
 
 const context = vi.hoisted(() => ({
   focused: true, ranking: null as VisiblePredictionRanking | null,
   recordEvent: vi.fn(), createEventId: vi.fn(), loadMore: vi.fn(), retry: vi.fn(), refresh: vi.fn(),
+  scopeKey: 'fixture:actor:profile', sessionId: 'session', mode: 'FOR_YOU', rankingEnabled: vi.fn(), deferReplacement: vi.fn(),
 }));
 const hooks = vi.hoisted(() => ({
   states: [] as unknown[], memos: [] as { deps: readonly unknown[]; value: unknown }[],
   effects: [] as { deps: readonly unknown[] | undefined; cleanup: (() => void) | undefined }[],
   pending: new Map<number, () => void>(), stateIndex: 0, memoIndex: 0, effectIndex: 0,
+  changed: false,
 }));
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react');
@@ -24,7 +27,9 @@ vi.mock('react', async () => {
       const index = hooks.stateIndex++;
       if (!(index in hooks.states)) hooks.states[index] = typeof initial === 'function' ? initial() : initial;
       return [hooks.states[index], (next: unknown) => {
-        hooks.states[index] = typeof next === 'function' ? next(hooks.states[index]) : next;
+        const value = typeof next === 'function' ? next(hooks.states[index]) : next;
+        if (!Object.is(value, hooks.states[index])) hooks.changed = true;
+        hooks.states[index] = value;
       }];
     },
     useRef: (initial: unknown) => {
@@ -57,22 +62,31 @@ vi.mock('expo-status-bar', () => ({ StatusBar: 'StatusBar' }));
 vi.mock('react-native', () => ({
   FlatList: 'FlatList', View: 'View', Text: 'Text', Pressable: 'Pressable', Image: { prefetch: vi.fn() },
   PanResponder: { create: (handlers: unknown) => ({ panHandlers: handlers }) },
+  Animated: { Value: class { setValue() {} stopAnimation() {} addListener() { return 'listener'; } removeListener() {} },
+    timing: () => ({ start: (done: (result: { finished: boolean }) => void) => done({ finished: true }), stop() {} }) },
+  AppState: { currentState: 'active', addEventListener: () => ({ remove() {} }) },
+  BackHandler: { addEventListener: () => ({ remove() {} }) },
+  AccessibilityInfo: { isReduceMotionEnabled: async () => false, addEventListener: () => ({ remove() {} }) },
   StyleSheet: { create: (styles: unknown) => styles, absoluteFill: {}, hairlineWidth: 0.5 },
 }));
-vi.mock('../lists/ItemListsContext', () => ({ useItemLists: () => ({ scopeKey: 'fixture:actor:profile' }) }));
+vi.mock('../lists/ItemListsContext', () => ({ useItemLists: () => ({ scopeKey: context.scopeKey }) }));
+vi.mock('../lists/ConsumedHistoryScreen', () => ({ ConsumedHistoryScreen: 'ConsumedHistoryScreen' }));
+vi.mock('./DiscoveryCollectionPager', () => ({ DiscoveryCollectionPager: 'DiscoveryCollectionPager' }));
 vi.mock('../profiles/ActiveProfileContext', () => ({ useActiveProfile: () => ({
   activeProfile: { id: 'profile', name: 'Oma Kajo', type: 'PERSONAL', ownerUserId: 'actor' },
   actorUserId: 'actor', sharedProfiles: [],
 }) }));
 vi.mock('../events/EventTrackingContext', () => ({ useEventTracking: () => ({
-  sessionId: 'session', recordEvent: context.recordEvent, createEventId: context.createEventId,
+  sessionId: context.sessionId, recordEvent: context.recordEvent, createEventId: context.createEventId,
 }) }));
 vi.mock('./ItemInteractionContext', () => ({ useItemInteractions: () => ({ interactions: {} }) }));
 vi.mock('./SharedEndorsementContext', () => ({ useSharedEndorsements: () => ({
   status: 'ready', error: null, stateByItemId: {}, retry: vi.fn(),
 }) }));
-vi.mock('./DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: 'FOR_YOU' }) }));
-vi.mock('./usePredictionRanking', () => ({ usePredictionRanking: () => context.ranking }));
+vi.mock('./DiscoveryModeContext', () => ({ useDiscoveryMode: () => ({ mode: context.mode }) }));
+vi.mock('./usePredictionRanking', () => ({ usePredictionRanking: (...args: unknown[]) => {
+  context.rankingEnabled(args[3]); context.deferReplacement(args[4]); return context.ranking;
+} }));
 vi.mock('./DiscoveryItemCard', () => ({ DiscoveryItemCard: 'DiscoveryItemCard' }));
 vi.mock('./DiscoveryCollectionHeader', () => ({ DiscoveryCollectionHeader: 'DiscoveryCollectionHeader' }));
 vi.mock('./InteractionPersistenceNotice', () => ({ InteractionPersistenceNotice: 'InteractionPersistenceNotice' }));
@@ -80,19 +94,23 @@ vi.stubGlobal('React', React);
 afterAll(() => vi.unstubAllGlobals());
 
 type Gesture = { dx: number; dy: number };
-type Props = { children?: ReactNode; style?: unknown; onPress?: () => void; accessibilityLabel?: string;
+type Props = { children?: ReactNode; discovery?: ReactNode; history?: ReactNode; style?: unknown; onPress?: () => void; accessibilityLabel?: string;
   onLayout?: (event: { nativeEvent: { layout: { height: number } } }) => void;
   onStartShouldSetPanResponderCapture?: () => boolean;
   onMoveShouldSetPanResponderCapture?: (event: unknown, gesture: Gesture) => boolean;
   onPanResponderRelease?: (event: unknown, gesture: Gesture) => void };
 type ListProps = Props & { data: readonly Item[]; contentContainerStyle: unknown[]; ListFooterComponent: ReactNode;
+  refreshing: boolean;
+  onTouchStart: () => void; onTouchEnd: () => void; onTouchCancel: () => void;
+  onScrollBeginDrag: () => void; onScrollEndDrag: () => void;
+  onMomentumScrollBegin: () => void; onMomentumScrollEnd: () => void;
   onRefresh: () => void; onEndReached: () => void; onContentSizeChange: (width: number, height: number) => void;
   onScroll: (event: { nativeEvent: { contentOffset: { y: number } } }) => void;
   onViewableItemsChanged: (event: { viewableItems: { item: Item; isViewable: boolean; index: number; key: string }[] }) => void;
   renderItem: (input: { item: Item; index: number }) => ReactElement<{ onOpen: () => void }> };
 function nodes(tree: ReactNode): ReactElement<Props>[] {
   return React.Children.toArray(tree).flatMap(child => React.isValidElement<Props>(child)
-    ? [child, ...nodes(child.props.children)] : []);
+    ? [child, ...nodes(child.props.children), ...nodes(child.props.discovery), ...nodes(child.props.history)] : []);
 }
 function text(tree: ReactNode): string {
   return React.Children.toArray(tree).map(child => React.isValidElement<Props>(child)
@@ -107,22 +125,70 @@ function ranking(change: Partial<VisiblePredictionRanking> = {}): VisiblePredict
     retry: context.retry, refresh: context.refresh, loadMore: context.loadMore, ...change };
 }
 function render(itemType: ItemType = 'BOOK') {
-  hooks.stateIndex = hooks.memoIndex = hooks.effectIndex = 0;
-  const tree = DiscoveryScreen({ itemType, title: itemType === 'BOOK' ? 'Kirjat' : 'Elokuvat' });
-  const pending = [...hooks.pending.values()]; hooks.pending.clear(); pending.forEach(effect => effect());
+  let tree: ReactNode;
+  let attempts = 0;
+  do {
+    hooks.changed = false;
+    hooks.stateIndex = hooks.memoIndex = hooks.effectIndex = 0;
+    tree = DiscoveryScreen({ itemType, title: itemType === 'BOOK' ? 'Kirjat' : 'Elokuvat' });
+    const pending = [...hooks.pending.values()]; hooks.pending.clear(); pending.forEach(effect => effect());
+  } while (hooks.changed && ++attempts < 10);
   const list = nodes(tree).find(node => node.type === 'FlatList')! as ReactElement<ListProps>;
   return { tree, list };
+}
+function collectionPager(tree: ReactNode) {
+  return (nodes(tree).find(node => node.type === 'DiscoveryCollectionPager')!.props as unknown as { pager: DiscoveryCollectionPagerState }).pager;
+}
+function historyProps(tree: ReactNode) {
+  return nodes(tree).find(node => node.type === 'ConsumedHistoryScreen')!.props as unknown as {
+    itemType: ItemType; active: boolean; requested: boolean; embedded: boolean; isActive: () => boolean;
+  };
 }
 
 beforeEach(() => {
   hooks.effects.forEach(effect => effect.cleanup?.());
   hooks.states = []; hooks.memos = []; hooks.effects = []; hooks.pending.clear();
   context.focused = true; vi.clearAllMocks();
+  context.scopeKey = 'fixture:actor:profile'; context.sessionId = 'session'; context.mode = 'FOR_YOU';
   context.createEventId.mockReturnValueOnce('screen-navigation-fixture');
   context.ranking = ranking();
 });
 
 describe('Discovery grid integration', () => {
+  it('opens a prepared return card with its exact feed origin while fresh recommendations load quietly', () => {
+    context.createEventId.mockReset().mockReturnValue('feed-return-navigation');
+    context.ranking = ranking({ viewId: 'feed-return:1', items: [item('prepared')], source: 'hosted',
+      predictionId: 'feed-prediction', predictionIds: { prepared: 'feed-prediction' },
+      deliveryRequestIds: { prepared: 'feed-request' }, preparingFreshPage: true, hasNextPage: false });
+    const { list } = render();
+    expect(list.props.refreshing).toBe(false);
+    expect(text(list.props.ListFooterComponent)).toContain('Päivitetään suosituksia');
+    expect(text(list.props.ListFooterComponent)).not.toContain('suositukset on näytetty');
+    const prepared = list.props.data[0]!;
+    list.props.onViewableItemsChanged({ viewableItems: [{ item: prepared, isViewable: true, index: 0, key: prepared.id }] });
+    list.props.renderItem({ item: prepared, index: 0 }).props.onOpen();
+    expect(context.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'ITEM_OPENED',
+      itemId: prepared.id, predictionId: 'feed-prediction', deliveryRequestId: 'feed-request' }));
+    expect(getDeliveredSlate('feed-return-navigation')!.origins.prepared).toMatchObject({
+      predictionId: 'feed-prediction', deliveryRequestId: 'feed-request' });
+  });
+
+  it('defers prepared-grid replacement throughout native touch and momentum, ignoring obsolete callbacks', () => {
+    let screen = render();
+    screen.list.props.onTouchStart(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onScrollBeginDrag(); screen.list.props.onTouchEnd(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onScrollEndDrag(); screen.list.props.onMomentumScrollBegin(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(true);
+    screen.list.props.onMomentumScrollEnd(); screen = render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(false);
+    const old = screen.list;
+    context.ranking = ranking({ viewId: 'replacement-view' }); render();
+    old.props.onTouchStart(); render();
+    expect(context.deferReplacement).toHaveBeenLastCalledWith(false);
+  });
+
   it.each(['BOOK', 'MOVIE'] as const)('appends through top pull, end reach and accessible button without refreshing %s', itemType => {
     context.ranking = ranking({ items: [item('first', itemType), item('second', itemType)] });
     const first = render(itemType);
@@ -214,5 +280,51 @@ describe('Discovery grid integration', () => {
     expect(context.refresh).toHaveBeenCalledTimes(1);
     context.ranking = ranking({ continuationState: null, hasNextPage: false });
     expect(text(render().list.props.ListFooterComponent)).not.toContain('Kaikki tähän hakuun sopivat');
+  });
+
+  it.each(['BOOK', 'MOVIE'] as const)('retains %s grids but permits evidence and actions only in the current settled activation', itemType => {
+    context.createEventId.mockReset().mockReturnValue(`page-navigation-${itemType}`);
+    context.ranking = ranking({ items: [item('first', itemType), item('second', itemType)] });
+    const first = render(itemType);
+    const firstPager = collectionPager(first.tree);
+    firstPager.onLayout({ nativeEvent: { layout: { width: 320 } } } as never);
+    const oldOpen = first.list.props.renderItem({ item: first.list.props.data[0]!, index: 0 }).props.onOpen;
+    const visible = { viewableItems: [{ item: first.list.props.data[0]!, isViewable: true, index: 0, key: 'first' }] };
+    firstPager.select('history');
+    // Native callbacks retained before React commits are already revoked.
+    oldOpen(); first.list.props.onRefresh(); first.list.props.onViewableItemsChanged(visible);
+    expect(context.recordEvent).not.toHaveBeenCalled(); expect(context.loadMore).not.toHaveBeenCalled();
+    const history = render(itemType);
+    expect(context.rankingEnabled).toHaveBeenLastCalledWith(false);
+    expect(historyProps(history.tree)).toMatchObject({ itemType, embedded: true, active: true, requested: true });
+    expect(history.list.key).toBe(first.list.key);
+    expect(history.list.props.data).toEqual(first.list.props.data);
+    const oldHistory = historyProps(history.tree);
+    collectionPager(history.tree).select('discovery');
+    const returned = render(itemType);
+    expect(context.rankingEnabled).toHaveBeenLastCalledWith(true);
+    expect(oldHistory.isActive()).toBe(false);
+    oldOpen(); first.list.props.onRefresh(); first.list.props.onViewableItemsChanged(visible);
+    expect(context.recordEvent).not.toHaveBeenCalled(); expect(context.loadMore).not.toHaveBeenCalled();
+    returned.list.props.onViewableItemsChanged(visible);
+    expect(context.recordEvent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ eventType: 'ITEM_IMPRESSION', itemId: 'first' }));
+    returned.list.props.renderItem({ item: returned.list.props.data[0]!, index: 0 }).props.onOpen();
+    expect(context.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'ITEM_OPENED', itemId: 'first' }));
+  });
+
+  it('keeps the selected page on Item blur/return and returns fresh Find on hard scope replacement', () => {
+    let screen = render(); collectionPager(screen.tree).onLayout({ nativeEvent: { layout: { width: 320 } } } as never);
+    collectionPager(screen.tree).select('history'); screen = render();
+    context.focused = false; screen = render(); expect(collectionPager(screen.tree).selected).toBe('history');
+    context.focused = true; screen = render(); expect(historyProps(screen.tree).active).toBe(true);
+    const oldHistory = historyProps(screen.tree);
+    context.scopeKey = 'fixture:other-actor:other-profile'; screen = render();
+    expect(collectionPager(screen.tree).selected).toBe('discovery'); expect(oldHistory.isActive()).toBe(false);
+    collectionPager(screen.tree).select('history'); render();
+    context.sessionId = 'new-session'; screen = render(); expect(collectionPager(screen.tree).selected).toBe('discovery');
+    collectionPager(screen.tree).select('history'); render();
+    context.mode = 'RISK'; screen = render(); expect(collectionPager(screen.tree).selected).toBe('discovery');
+    collectionPager(screen.tree).select('history'); render();
+    screen = render('MOVIE'); expect(collectionPager(screen.tree).selected).toBe('discovery');
   });
 });

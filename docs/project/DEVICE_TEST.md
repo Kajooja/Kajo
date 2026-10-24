@@ -1,5 +1,63 @@
 # Collection device checkpoint — #228 / #229
 
+## APK #715 owner feedback and latency successor — 2026-10-24
+
+The owner tested the supplied #715 build and reports the following. This is
+owner-reported device evidence; no installed checksum or stopwatch measurement
+was supplied.
+
+| Check | Actual report |
+|---|---|
+| 1 — Return to Löydä | Still takes too long after enough browsing; correction required. |
+| 2 — Horizontal history navigation | Exactly as requested; accepted for the observed flow. |
+| 3 — Expanded description/rating access | Reading works, but reaching the low rating control often skips the card accidentally; must stop there first. |
+| 4 — Direct rating | Works in the observed flow. |
+| 5 — Undo | Still delayed. Owner proposes holding the newest choice so A commits after B is chosen and C → B can return quickly. |
+| 6 — History/Lists | Works in the observed flow. |
+| 7 — Startup/network recovery | Not properly tested yet; remains open. |
+| 8 — Recommendation quality | Review recommendation precision/internal scoring separately later; not an acceptance result. |
+
+Required successor tests in both BOOK and MOVIE:
+
+- Read expanded/large-text content with slow, fast and overshooting upward
+  gestures: the gesture reaching the rating control must stop without Ohita.
+  Rate there or use a new upward gesture to skip. Compact-card flicks, slider
+  isolation and downward reading remain unchanged.
+- Skip/rate A, then B, reach C and reverse to B immediately while network replies
+  are delayed. B's unsent choice cancels once and becomes actionable without a
+  ranking wait; A still commits exactly once. Repeat 16 mixed cycles and compare
+  Undo-to-actionable time. A sent/ambiguous/expired source must use honest normal
+  server reversal/recovery rather than an invalid old origin.
+- After short and long sessions return to Löydä: valid prepared successors appear
+  promptly and can open while the current-prefix grid is refreshed. Record
+  return-to-visible and return-to-actionable times; no rated/skipped duplicate,
+  lost scroll, tap during page transition or cross-Profile handoff is allowed.
+- Leave the feed/background/kill/restart after the final choice without another
+  swipe: it must eventually persist exactly once. Also retest true offline/error,
+  reconnect and explicit rejected-command recovery. Preserve current account data.
+
+These successor observations remain open until the new APK is tested. The older
+matrices below retain their dated history; this section supersedes their
+any-reading-offset flick and universal server-Undo assumptions for this packet.
+
+## Discovery horizontal history and return — #239 / 2026-10-24
+
+The owner reports #714 “Toimii”, accepting the reported feed/Undo correction.
+Discovery return after browsing still feels slow, and the new request is a
+finger-follow left swipe from Löydä to Katsotut/Luetut and right back. This is
+scoped feedback, not a passed startup or complete physical-device matrix.
+
+| Case | Required observation on the successor APK |
+|---|---|
+| Return | Browse/rate/skip and return repeatedly in BOOK and MOVIE. Unchanged ready pages retain scroll without a request; changed evidence starts a six-Item first page promptly and appends normally. Record actual return-to-visible timing under ordinary and slow connectivity. No stale actionable recommendation is shown to conceal a needed load. |
+| Horizontal pages | From poster, gap or text, drag left and see canonical history follow the thumb; right returns. Header buttons select the same pages. Both edges are bounded; short, reversed, vertical and multitouch gestures cancel without preference writes. Check reduced motion, small screen and large text. |
+| History identity | Katsotut/Luetut agrees with the standalone Lists entry, including saved rating 0, clear history, empty/error and active Personal/Shared Profile authorization. Open an Item and return to the same page/scroll. Android Back from embedded history returns to Löydä; standalone back follows its own route. |
+| Visibility and scope | Only the settled selected page accepts taps or accessibility focus. A partial preview, cancelled swipe or hidden list emits no impression/open. Change actor/Profile/session/domain/mode, rotate, blur or background during drag/settle; obsolete callbacks cannot select or mutate a new scope. |
+| Existing browsing | Vertical grid scrolling, end append and pull-to-load still work. Item detail retains its accepted whole-card vertical reading/flick, horizontal rating, five-successor buffer and one-step Undo behavior. Hidden history does not repeatedly reload while rating in the reel. |
+
+These are required device observations, not source-test or CI claims. STATUS and
+PR #355 own the successor source/build receipt.
+
 ## Continuous feed feedback — #239 / 2026-10-22
 
 After downloading the replacement APK, the owner reached the feed and reported:
@@ -10,7 +68,49 @@ yritä uudelleen.” Do not label this a network outage without diagnostic evide
 The subsequent owner report confirms replacement APK #700 navigation checks 1–3
 pass (categories, Item/Lists/Settings, and reopening). The full feed matrix remains
 open. The exact installed checksum/Android version remain unreported. A separate
-startup Room flash/reload is now reported and repaired in the active source.
+startup Room flash/reload is reported and repaired in accepted #354 source.
+The subsequent owner refinement requests centered artwork/text and slider, a
+title-sized List star beside the title, five prepared Discovery cards and an
+adjacent-card reveal during dragging. The owner also reports the rating gesture
+is no longer smooth: deliberate tap or drag must rate and advance automatically.
+These new observations do not establish an installed #704 checksum or success.
+
+**Owner report on #707 — 2026-10-23:** “Tämä on hyvä” accepts the general
+layout/rating direction, but scrolling still feels unsmooth. The whole card must
+follow the thumb from every field, including text and expanded descriptions;
+a short fast upward flick should reveal the next card. This does not close the
+startup, precise rating values, gesture-isolation or full device matrix. PR #355
+remains unmerged; its #707 build and installed feed-reader forward are recorded
+in STATUS. The active continuation repairs whole-card drag/flick behavior on the
+same branch and requires a new build for the changed source.
+
+**Owner report on #709 — 2026-10-23:** thumb tracking and margins are now accepted.
+The owner requests left-aligned text, a small controls-to-dock gap, the active
+card plus five warmed successors, and immediate browsing while saves remain in
+the durable queue. Ordinary saving/wait/retry messages and a brief rated-card
+flash must disappear. This supersedes the acknowledgement-gated forward rows
+below; it does not close startup or the complete device matrix. The new source
+continues PR #355 after its successful #709 build; no migration replay is needed.
+
+**Owner report on #710 — 2026-10-23:** undo should appear nearly as promptly as
+forward scrolling. Keep five successors and refill the free slot after every
+consumption; prediction may follow slightly behind browsing. The successor shows
+an inert cached prior Item after the first durable undo admission and lets an
+already running bounded refill finish across ordinary acknowledgements. These
+changes require a new source/build receipt; #710's five required checks and APK
+passed, but do not validate this later refinement.
+
+**Owner report on #713 — 2026-10-23, 22:39 Europe/Helsinki:** the rest of the
+feed works as requested, but Undo still loads too long and repeated forward/Undo
+cycles eventually show “Suositusten päivittäminen epäonnistui. Yritä uudelleen.”
+Read-only hosted logs confirm a canonical ranking statement timeout after
+8,184 ms, SQLSTATE 57014. This does not establish a second one-step/gesture defect
+or an active-reader leak. Retest at least 16 complete skip/Undo cycles and 16
+rating/Undo cycles on the successor, allowing each reversal to activate its fresh
+same-Item delivery. Include a target absent from the initial five-Item probe,
+delayed refills, retry/reconnection and unchanged one-step rearming. Record actual
+Undo-to-actionable timing and any recovery error; source/CI timings are not
+physical-phone measurements.
 
 The active successor in STATUS must be tested as an update preserving user data.
 Run the category/navigation checks below, then this superseding feed matrix on
@@ -19,15 +119,19 @@ BOOK and MOVIE. It refines the earlier October 17 control expectations.
 | Case | Required observation |
 |---|---|
 | Startup | Cold-open and reopen with normal/slow/offline connectivity. The initial loading surface opens Room once, without Room → loading → Room flashing. Categories still remain open; late status cannot interrupt navigation. |
-| Viewport | Card fills the area between compact bars. No empty feedback/help bands or duplicate bottom safe inset; rating and star remain visible on OnePlus, small screen and large text. |
+| Viewport | Card fills the area between compact bars. Preserve accepted centered artwork and symmetric gutters; title, metadata and description align left within the column. Slider remains centered, with a small gap above the dock. The star sits beside the title at the title's visual size but remains independently accessible. No empty feedback/help bands or duplicate bottom safe inset. Verify OnePlus, small screen and large text. |
 | First-use help | New account sees one short overlay. Selvä or first successful interaction dismisses it; another card/category/Profile and app restart do not bring it back for the same account. Another account has its own first-use state; help can be requested accessibly. |
-| Direct rating | Slider release, track tap or accessible adjustment saves the selected 0–10 value once. No Save button; untouched/default/cancelled slider never saves. Verify 0 and 5, change a rating and reopen history. Vertical/diagonal movement starting on the slider and adding a second finger must not save a rating. |
+| Direct rating | Tap any track/handle position or drag horizontally and release; the selected 0–10 value enters durable local storage once and the next prepared card appears immediately, before a delayed server reply. No Save button or rated-card flash. Merely mounting/defaulting or cancelling never saves; a failed local write cannot advance. Verify 0 and 5 and confirmed history after queue drain. Vertical/diagonal movement and adding a second finger must not save a rating. |
 | List star | Outline opens the multi-list picker. Only acknowledged active-Profile membership fills it white; pending/rejected Shared proposal does not. Add to two Lists and verify both; merely opening/creating a List changes no membership. |
-| Forward | Consecutive upward card swipes advance one Item at a time, with no snap-back or blank loading gap. The outgoing card remains inert until the fresh successor is ready. Cancelled gestures return smoothly; reduced motion avoids directional animation. No positive choice means one contextual skip. After rating/List acknowledgement, next swipe advances without another skip. No immediate recycling or false exhaustion of eligible server results. |
-| Reverse | Downward swipe restores the exact preceding card only after its eligible action is undone. Repeat across mixed skips/ratings/List actions; existing unrelated memberships and history remain. Explain an unavailable/conflicted undo rather than target another Item. |
-| Gesture isolation | Short/reversed/cancelled/multitouch movement, description scrolling, slider dragging, star/picker use, rotation and app background never cause an unintended skip/undo. Accessible advance/reverse actions match gestures. |
-| Failure and restart | Lost source/skip/rating/undo replies keep a usable recovery state. Restore network or restart; the exact pending command completes once without switching actor/Profile/Item. Failed skip leaves the card available, not silently skipped. |
-| Honest limits | Actual catalogue exhaustion is explicit and recoverable; do not loop old cards. Bounded session undo does not pretend to restore erased, expired or unavailable actions. |
+| Forward | Initially warm five successors. Every consumed card schedules background refill; one free slot admits one Item from a protocol-3 page whose immutable limit remains five, with no extra staging window. The next card moves into view during dragging and activates after successful durable local admission. Consecutive swipes advance without awaiting earlier server replies, snap-back or blank gaps. Cancelled gestures settle; reduced motion keeps reading usable. No already accepted positive action means one exact contextual skip. Rating auto-advance and forward after List acknowledgement add no skip. No immediate recycling or false exhaustion. |
+| Whole-card drag and flick | Start over poster, title, metadata, collapsed text and expanded text. The entire card follows the thumb continuously, including across native responder capture. Read a long card slowly and settle within its content without a skip; deliberately move beyond its bottom to advance. From any reading offset, a short fast upward flick advances once (minimum 24 points and vertical speed 0.6 points/ms); an ordinary slow dismissal requires 96 points beyond the reading extent. Verify expanded-content controls remain reachable. Reduced motion removes automatic entry/springs while direct reading still works. |
+| Buffer freshness | Rate while a refill is delayed. Ordinary acknowledgements mark the future reader dirty without cancelling that request/exact retry; its response fills only free slots and preserves its original forecast. Repeated receipts coalesce into renewal before the next new request, using the latest committed prefix and excluding current/queued/displayed/locally pending Items. Prepared order/active appearance stays stable. Hard undo/scope/source/discard invalidation rejects late replies and clears the window. Repeat over 16 advances without reader leaks. Preview/preload alone creates no impression. |
+| Refill recovery | Lose a refill reply, then acknowledge ratings; retry must retain the exact pending request before latest-prefix renewal. If a dirty reader's pending request is proven expired/unusable, continue its scheduled new root quietly without clearing prepared cards or admitting the error response. A non-dirty unusable cursor retains explicit refresh/recovery. |
+| Quiet durable queue | Delay skip/rating and impression replies while advancing several prepared cards. Ordinary saving/wait/retry notices do not flash, and late receipts reconcile only their frozen action/delivery. Each command commits once. List/undo waits for pending commands to settle; forward browsing remains available. A real persistence/server rejection yields stable accessible recovery rather than silent loss or an unrelated card replacement. |
+| Reverse | After the first exact undo/withdrawal command is durably admitted, immediately show the cached prior Item as originless restoring presentation. Keep mutations, impression and dwell blocked until all ordered receipts and fresh same-Item delivery arrive; activation preserves visual identity without a card flash. Failed local admission keeps the current card. Verify partial failure/retry/cancel never replays acknowledged reversals or enables an old origin. A fast downward flick reverses only from the readable top; inside long content it reads toward the top, with 96 points of excess past that edge required. Repeat mixed skips/ratings/List actions without changing unrelated history. |
+| Gesture isolation | Small slow/reversed/cancelled/multitouch movement, slow reading inside expanded content, horizontal slider dragging, star/picker taps, rotation and app background never cause an unintended skip/undo. A deliberate qualifying fast flick is distinct from a small slow movement. Accessible advance/reverse actions match gestures; metadata and controls remain independently focusable. |
+| Failure and restart | Lost skip/rating/undo replies keep exact durable recovery. Restart/restore network and confirm each command completes once under its original actor/Profile/Item/session/delivery, including a consumed source's cached receipt. No mandatory source-read preflight blocks exact replay. Failed local persistence leaves the current card; later server rejection remains accessible until explicitly resolved without retargeting the active card. Successful retry must not act as discard; only explicit discard of the exact known rejected action ID resets recovery, and an old/unknown ID cannot drop a fresh pending command. |
+| Honest limits | Actual catalogue exhaustion is explicit and recoverable; do not loop old cards. If a late rating/List acknowledgement triggers a fresh refill with an eligible card while the active delivery is empty, promote that card without trapping the feed in its earlier empty state. Bounded session undo does not pretend to restore erased, expired or unavailable actions. |
 
 These are required observations, not passed tests. Discovery undo is bounded by
 the mounted scope and ten native actions. Check fresh same-Item delivery after
@@ -41,7 +145,8 @@ and its eight preservation/security postchecks passed, as recorded in STATUS.
 Retest the actual phone path; successful DDL is not a successful skip observation.
 
 For sequential Taste, test the compact viewport, account-scoped help and direct
-slider save separately. Current source advances automatically after acknowledgement
+slider save separately. Discovery's five-successor buffer must not precompute future
+adaptive Taste questions. Current source advances automatically after acknowledgement
 and has no numeric backward-question undo; record that gap rather than marking
 full parity passed. Legacy v1/challenge keeps explicit Save and immutable first
 measurements. Preserve Shared consent and the exact-origin matrix below.
@@ -127,8 +232,8 @@ below as acceptance of this successor.
 | Shared feed and artwork | Taste and Discovery card mode use the same artwork, Item metadata and vertical gesture; missing art has a usable fallback. Grid remains available. First-use/Taste copy explains Ohita and an accessible equivalent works with large text/reduced motion. |
 | Deliberate neutral skip | Only a completed deliberate swipe-away or equivalent Ohita commits one contextual skip with the exact shown origin. Partial scroll, returning to a card, reflow/backgrounding and failed commands do not invent preference. A draft rating is not submitted by skipping. |
 | Suppression and eligible return | The skipped Item leaves this feed, does not loop back immediately, and may return only under the declared changed-context/cooldown rule. It is not marked consumed, rated zero, known/unknown or permanently disliked. Old UNKNOWN/NOT_INTERESTED records keep their original meaning. |
-| First-answer causality | On controlled eligible Profiles with the same catalogue/time/policy and first Item, compare supported 10, 0 and neutral prefixes. Inspect the committed prefix and next candidate utilities/choice; a meaningful supported counterexample must change the next selection, rather than merely incrementing a count or changing only the next forecast. Domain coverage must not always override that signal. Never require every ordinary answer to visibly reorder the feed. |
-| Same-Profile Discovery | After each acknowledged rating/save/skip, the next fresh delivery uses the correct committed state, including a partial Taste → Discovery continuation. An undelivered stale prefetched queue is invalidated; previously delivered origins/history stay immutable. Retry/restart/concurrent scope changes do not duplicate or misattribute evidence. |
+| First-answer causality | On controlled eligible Profiles with the same catalogue/time/policy and first Item, compare supported 10, 0 and neutral prefixes. Inspect the committed prefix and next Taste selection or first newly requested Discovery refill; a meaningful supported counterexample must change selection, rather than merely incrementing a count or changing only the forecast. Domain coverage must not always override that signal. Already prepared Discovery cards retain their bounded freshness delay; never require every ordinary answer to visibly reorder the feed. |
+| Same-Profile Discovery | After each acknowledged rating/save/skip, the first new refill uses the correct committed state, including partial Taste → Discovery continuation. The active card plus at most five prepared successors retain frozen origins/order across ordinary acknowledgements; an already running bounded refill may fill only free slots before the next new latest-prefix root. Undo/scope/source invalidation and rejected-command discard still clear the window. Retry/restart/concurrent scope changes do not duplicate or misattribute evidence. |
 | Cold start and quality | Record prior/catalogue/policy time/version, support and sparse-data fallback. Compare the recent-supported prior and personalized continuation against declared controls. Interstellar/Inception is an illustrative similarity case, not a required hardcoded pair, and an ordinal score is not a rating-10 probability. Genuine usefulness remains a measured gate. |
 
 ## Sequential Taste v2 acceptance — #336 / #342 / 2026-10-15

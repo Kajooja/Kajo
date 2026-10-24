@@ -18,7 +18,7 @@ export function npmAuditInvocation(platform = process.platform, environment = pr
 }
 
 // npm identifies published archives, not installed source patches. Retain the
-// complete raw report, and classify only these two *verified* source corrections.
+// complete raw report, and classify only the exact *verified* source corrections.
 // New advisories, missing patches, malformed reports and audit transport errors fail.
 export function classifyAudit(report, verified) {
   assert.equal(report.auditReportVersion, 2, 'Unsupported npm audit report');
@@ -74,7 +74,8 @@ export function classifyAudit(report, verified) {
 
 export async function auditDependencies() {
   const verified = await securityPatches();
-  const regression = spawnSync(process.execPath, ['--test', 'scripts/dependencies/security-patches.test.mjs'], {
+  const regression = spawnSync(process.execPath, ['--test', 'scripts/dependencies/security-patches.test.mjs',
+    'scripts/dependencies/zod-security.test.mjs'], {
     cwd: projectRoot, encoding: 'utf8', timeout: 30000, maxBuffer: 1024 * 1024,
   });
   assert.ifError(regression.error);

@@ -70,16 +70,22 @@ interface ItemInteractionState {
   hasHydratedCurrentActor: boolean;
   hydrationError: string | null;
   persistenceError: string | null;
+  persistenceFailure: string | null;
   atomicPendingCount: number;
   canDiscardUndo: boolean;
   discardRejectedUndo: () => void;
   canDiscardAction: boolean;
-  discardRejectedAction: () => void;
+  discardRejectedAction: () => string | null;
   collectionRevision: number;
+  listMembershipRevision: number;
   subscribeToCommittedActions: (listener: (receipt: ProfileActionReceipt) => void) => () => void;
   submitCollectionAction: (intent: CollectionActionIntent, source: CollectionActionSource,
     origin?: EventRecordInput) => Promise<CollectionSubmissionResult>;
   retryHydration: () => void;
+  reserveFeedAction?: (actionId: string) => boolean;
+  releaseFeedAction?: (actionId?: string) => void;
+  canCancelFeedAction?: (actionId: string) => boolean;
+  cancelFeedAction?: (actionId: string) => boolean;
   retryPersistence: () => void;
 }
 
@@ -124,6 +130,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   const outbox = useRef<{ key: string; sessionId: string; coordinator: ItemActionOutbox<PendingProfileAction> } | null>(null);
   const collectionWaiters = useRef(new Map<string, { key: string; resolve: (result: CollectionSubmissionResult) => void }>());
   const [collectionRevision, setCollectionRevision] = useState(0);
+  const [listMembershipRevision, setListMembershipRevision] = useState(0);
   const commitListeners = useRef(new Set<(receipt: ProfileActionReceipt) => void>());
   const subscribeToCommittedActions = useCallback((listener: (receipt: ProfileActionReceipt) => void) => {
     commitListeners.current.add(listener);
@@ -190,6 +197,9 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
           coordinator.pending(),
         ) };
         if ('kind' in receipt) {
+          // Rating/history evidence still refreshes ranking below, but only a
+          // collection receipt can change the List picker or its membership star.
+          setListMembershipRevision(revision => revision + 1);
           nextStore = applyCollectionUndoReceipt(nextStore, receipt);
           collectionWaiters.current.get(receipt.actionId)?.resolve({ status: 'success', receipt });
           collectionWaiters.current.delete(receipt.actionId);
@@ -247,6 +257,7 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       void refreshAcknowledgedState();
     });
     const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') coordinator.release();
       if (state === 'active') {
         coordinator.retry();
         void refreshAcknowledgedState();
@@ -457,8 +468,36 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
     setHydrationAttempt((current) => current + 1);
   }, [configuredScope]);
 
+  const reserveFeedAction = useCallback((actionId: string) => {
+    const current = outbox.current;
+    return Boolean(current && current.key === currentScopeKey && activeScopeKey.current === currentScopeKey
+      && current.sessionId === eventTracking.sessionId && activeSessionId.current === eventTracking.sessionId
+      && current.coordinator.reserve(actionId));
+  }, [currentScopeKey, eventTracking.sessionId]);
+  const releaseFeedAction = useCallback((actionId?: string) => {
+    if (outbox.current?.key === currentScopeKey) outbox.current.coordinator.release(actionId);
+  }, [currentScopeKey]);
+  const canCancelFeedAction = useCallback((actionId: string) => {
+    const current = outbox.current;
+    const latest = getLatestUndoEntry(storeRef.current);
+    return Boolean(current && current.key === currentScopeKey && activeScopeKey.current === currentScopeKey
+      && current.sessionId === eventTracking.sessionId && activeSessionId.current === eventTracking.sessionId
+      && latest?.atomicActionId === actionId && !latest.collectionActionId
+      && current.coordinator.canCancelReserved(actionId));
+  }, [currentScopeKey, eventTracking.sessionId]);
+  const cancelFeedAction = useCallback((actionId: string) => {
+    if (!canCancelFeedAction(actionId) || !outbox.current) return false;
+    const currentStore = storeRef.current;
+    const nextStore = undoLastItemInteractionAction(currentStore);
+    if (!outbox.current.coordinator.cancelReserved(actionId)) return false;
+    // The exact rating has never left this device. Removal is durable before
+    // its optimistic projection is restored; no server Undo/Event is invented.
+    replaceStore(nextStore);
+    return true;
+  }, [canCancelFeedAction, replaceStore]);
+
   const retryPersistence = useCallback(() => {
-    if (outbox.current?.key === currentScopeKey) outbox.current.coordinator.retry();
+    if (outbox.current?.key === currentScopeKey) { outbox.current.coordinator.release(); outbox.current.coordinator.retry(); }
   }, [currentScopeKey]);
 
   const discardRejectedUndo = useCallback(() => {
@@ -468,10 +507,15 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
   }, [currentScopeKey, retryHydration]);
 
   const discardRejectedAction = useCallback(() => {
-    if (outbox.current?.key === currentScopeKey && outbox.current.coordinator.discardRejectedAction()) {
+    const coordinator = outbox.current?.key === currentScopeKey ? outbox.current.coordinator : null;
+    const actionId = coordinator?.pending()[0]?.command.actionId;
+    if (actionId && coordinator?.discardRejectedAction()) {
       setCollectionRevision(revision => revision + 1);
+      setListMembershipRevision(revision => revision + 1);
       retryHydration();
+      return actionId;
     }
+    return null;
   }, [currentScopeKey, retryHydration]);
 
   const undoTargetItemId = getLatestUndoItemId(store);
@@ -498,31 +542,37 @@ export function ItemInteractionProvider({ children }: PropsWithChildren) {
       hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
+      persistenceFailure: atomicState?.message ?? hydrationError,
       atomicPendingCount: atomicState?.pendingCount ?? 0,
       canDiscardUndo: atomicState?.canDiscardUndo ?? false,
       discardRejectedUndo,
       canDiscardAction: atomicState?.canDiscardAction ?? false,
       discardRejectedAction,
       collectionRevision,
+      listMembershipRevision,
       subscribeToCommittedActions,
       submitCollectionAction,
       retryHydration,
+      reserveFeedAction, releaseFeedAction, canCancelFeedAction, cancelFeedAction,
       retryPersistence,
     }),
     [
       hasHydratedCurrentActor,
       hydrationError,
       persistenceError,
+      atomicState?.message,
       atomicState?.pendingCount,
       atomicState?.canDiscardUndo,
       discardRejectedUndo,
       atomicState?.canDiscardAction,
       discardRejectedAction,
       collectionRevision,
+      listMembershipRevision,
       subscribeToCommittedActions,
       submitCollectionAction,
       persistenceStatus,
       retryHydration,
+      reserveFeedAction, releaseFeedAction, canCancelFeedAction, cancelFeedAction,
       retryPersistence,
       setNotInterested,
       setRating,

@@ -14,6 +14,37 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Discovery return and horizontal history — #239 / 2026-10-24
+
+The owner reports #714 works, accepting the reported feed/Undo correction after
+all six CI jobs and the single installed performance forward. STATUS/PR #355
+own its exact source/build/provider receipt; the PR remains unmerged. The new
+packet reduces changed-evidence grid return work to six Items and removes the
+refocus debounce, retaining focused revision coalescing and exact origins.
+Löydä and canonical Katsotut/Luetut become finger-follow horizontal pages below
+their shared header. Hidden previews are inert and create no exposure; the
+accepted vertical reel/rating/Undo and standalone history route stay intact.
+Canonical policies precede implementation. New source/CI/APK and actual phone
+acceptance are pending; do not replay installed migrations or reset accounts.
+
+## Repeated Undo ranking timeout continuation — #239 / 2026-10-23
+
+The owner accepts the rest of #713's feed but reports long Undo loading and a
+recommendation-refresh error after repeated cycles. Hosted read-only logs show
+SQLSTATE 57014 in canonical scenario retrieval after 8,184 ms. This supersedes
+the earlier pending #711/#712 continuation handoff; #713's final CI/APK receipt
+is in STATUS and PR #355, which remains unmerged.
+
+The scoped continuation uses one five-Item restoration probe before the original
+bounded three-page, 50-Item search, retaining exact pending requests and fresh
+same-Item activation. The additive CLI-created performance forward changes only
+redundant evaluation of the same history/similarity, with exact scoring/evidence
+and function-identity parity required. Existing accounts, queues, installed
+migrations, frozen runs and release gates remain preserved. STATUS owns the
+current validation/hosted/build state; PR #355's final receipt supersedes this
+pre-publication checkpoint. Actual phone timing and repeated-cycle acceptance
+remain required after the correction.
+
 ## Owned mobile source accepted — #331 / 2026-10-12
 
 [#331](https://github.com/Kajooja/Kajo/pull/331) is merged as `b3d8a080882160305f2dda5d4e9b1f98fcd0cd3c`,
@@ -7928,3 +7959,267 @@ Hub tag. ADR-0006 records pinned upstream provenance. Mobile source remains the
 tested packet. All required final-source gates and the configured APK still must
 pass before source merge; phone acceptance remains separate. No hosted operation
 or account reset occurs.
+
+### Accepted #354 and buffered-feed successor — 2026-10-22 / #239
+
+The owner explicitly requested merging #354. All five mandatory CI #704 gates
+and the configured Android job passed for head
+`95213d9c1455d7127c5908f6bc41387c2bea33d5`; tested merge checkout
+`f3cdc6f2727a5c20bd3104004bf21f68f2f5c8f9` and accepted main
+`99c21341c62eaae8dab3589944a434b06dc14258` share tree
+`0820b4b34b6e0b4f3934abc02333a2ff7f413d86`. STATUS owns the verified downloadable
+APK #704 identity/expiry. This supersedes the earlier pending publication/CI
+statements without claiming phone installation, motion or startup acceptance.
+
+New owner feedback requests centered artwork and compact text, a centered slider
+with small side margins, and a title-sized List star beside the title. Either a
+tap at the selected rating position or a horizontal drag must commit once and
+automatically advance after acknowledgement. The owner also requests five
+prepared Discovery cards, background replenishment and the next card already
+visible during an upward drag. This is the active `feat/239-buffered-feed`
+successor based on accepted #354, not a reason to recreate its startup repair.
+
+The bounded design preserves current plus four exact deliveries. Preview/preload
+creates no impression and cannot accept actions. Neutral skip changes only its
+Item's suppression and may retain unrelated prepared candidates; ratings, List
+changes, undo and scope changes retire unseen work and select from the newly
+committed state. This narrow Discovery exception is recorded in PREDICTION_MODEL
+and DATA_EVENTS. Future adaptive Taste questions remain selected after their
+preceding answer, not precomputed as a five-question slate.
+
+The new `rank_items_feed_v1` root wrapper binds `replacesChainId` in an immutable
+receipt, atomically replacing owned derived reader state while preserving v3
+runs, page evidence and exact retries. Its additive forward is
+`20261022195553_discovery_feed_reader.sql`; v1–v3 continuation and the shared
+reader limit remain intact. No installation of this forward is established by
+this entry. STATUS owns the final source/CI/hosted/build receipts; DEVICE_TEST
+adds rating auto-advance, adjacent preview, refill/freshness and repeated-reader
+checks. Final-source CI, hosted installation and actual device acceptance remain
+separate from the completed local validation below.
+
+Focused local reader validation: the populated-schema PGlite test passes,
+including preservation of existing function identities/ACLs and historical
+runs/candidates/pages/receipts; 20 replacements with 15 unrelated active readers;
+historical root/continuation retry, rollback, scope denial and new ACL/RLS.
+Final local validation passes: lint; mobile/engine/acceptance typechecks;
+692 mobile tests in 71 files; 318 database tests; 311 engine tests; 19 Python and
+43 Node research tests; 6 acceptance and 5 mobile-acceptance tests; explicit
+demo-mode iOS/Android Expo exports. `npm run check` stops only at the unchanged
+Edge dependency fetch because `registry.npmjs.org` refuses Deno's
+`@supabase/auth-js` request. No complete local-root result or native
+device/emulator observation is claimed.
+
+The controller retains ambiguous root identity until exact recovery before
+replacement, delays warming until durable action recovery is ready, and
+invalidates unseen cards after same-Profile actions on other Items. Reader-limit
+renewal does not claim catalogue exhaustion. `RollingFeedCard` retains outgoing
+controls, title action and expanded description through the next entry, and
+caches the reduced-motion preference.
+
+Hosted preflight confirms required dependencies/RLS and existing clock receipt
+`20261022152530`, but two migration-API attempts failed with
+`McpServerError: Invalid or expired requestState`. Read-only verification after
+both attempts reports `feed_rpc = null` and `migration = null`; no hosted write
+succeeded. The new forward remains uninstalled. Resolve the connector blocker,
+then obtain its exact installation receipt alongside final-source CI/configured
+APK before the phone matrix. Do not replay already installed migrations.
+
+Changed boundaries: FeedItemCard/RollingFeedCard/RatingControl/ItemDetailScreen presentation,
+discoveryFeed/useDiscoveryFeed delivery lifecycle, predictionPageOperations and
+the additive feed reader; canonical UX, prediction/evidence, MVP, CODEMAP,
+ROADMAP and STATUS. The existing clock forward stays installed and must not be
+replayed. Preserve accounts, pending commands, exact undo and Shared consent.
+Versioned Taste pool refresh/refill under #336 remains the next packet.
+
+Publication checkpoint: GitHub branch `feat/239-buffered-feed` exists at accepted
+main, but automatic approval review rejected the new remote implementation
+commit because explicit authorization to publish this new private source packet
+to `Kajooja/Kajo` was absent. No successor PR or source commit was published.
+Retain the reviewed local branch and request explicit branch/PR publication
+approval; do not bypass this decision. The separate hosted connector failure
+above also remains unresolved.
+
+The owner subsequently replied **“saat julkaista”** to the explicit request to
+publish reviewed local commit `06cd5eacfc4a52346e146d6f9ccb9530387d35fa` to
+`Kajooja/Kajo`, branch `feat/239-buffered-feed`, and open a PR against `main`.
+That approval supersedes the publication hold above. Runtime source is unchanged;
+the PR body owns exact remote source/CI/build receipts. Hosted installation,
+source merge and phone acceptance remain separate outstanding gates.
+
+### #707 phone feedback and whole-card gesture refinement — 2026-10-23 / #355
+
+PR #355 is published at `65814a8bc0f8555e7ca0a1d558c461fe57748f63` and remains
+unmerged. All five mandatory CI #707 checks and the standalone Android job passed;
+tested merge checkout `3f6c9d89303b077c82a303dd5543db192863649d` matches source
+tree `e307094a6f7350e7e36f8c9092ac54d45eacd351`. STATUS/PR #355 own the verified
+APK artifact `12459699826`, expiry and archive/extracted-APK hashes.
+
+The owner explicitly authorized the feed-reader installation with “saat asentaa”.
+The exact reviewed forward is installed as provider receipt `20261023062034`,
+named `discovery_feed_reader`, source SHA-256
+`2a0af1827e2eb09bfc8c95e6c2eb7631c2d035c142e3a57439c102cbc838ca4b`.
+All prior function definitions/identities/security and migration receipts remain
+unchanged; new bodies, immutable receipt-table security and authenticated-only
+RPC grants match the reviewed source. The earlier connector errors and deployment
+hold above are resolved. Do not replay the installed feed or clock forward.
+
+After #707 the owner reports “Tämä on hyvä”, accepting the general layout/rating
+direction, but scrolling is still not smooth. The whole card must follow the
+thumb from all fields, including text and expanded descriptions; a short fast
+upward flick must advance. This is not complete startup, gesture or device
+acceptance. Continue the same `feat/239-buffered-feed` / PR #355 before #336.
+
+The presentation correction moves vertical capture to the outer card and makes
+expanded descriptions extend that card rather than scroll independently. Slow
+motion reads and settles within the content extent. Forward dismissal requires
+96 points beyond its bottom, or a deliberate upward flick of at least 24 points
+and vertical speed 0.6 points/ms from any reading offset. A fast downward flick
+can reverse only from the readable top; while inside long content, downward
+movement reads back and requires 96 points beyond the top to undo. One-finger
+vertical dominance, reversal/cancellation guards and exact receipt sequencing
+remain. Capture rebases native gesture coordinates so grant does not jump.
+Reduced motion preserves direct reading offsets without automatic entry/spring
+interpolation. Horizontal rating and control taps retain their meaning;
+metadata and title actions remain independently accessible.
+
+No backend change or account reset is needed. The existing buffered reader,
+learning-prefix invalidation, exact undo and adaptive Taste contracts remain.
+The new gesture source requires its own local/final-source validation and APK;
+#707's successful checks do not cover later edits. DEVICE_TEST owns the expanded
+whole-card/long-text/flick matrix. Preserve accounts, commands and installed
+migration history, then continue #336 after this bounded interaction correction.
+
+Local gesture validation now passes: 724 mobile tests in 71 files, mobile types,
+focused lint and demo iOS/Android Expo exports. Root lint/type/dependency/mobile/
+catalog stages pass; root completion is blocked by the unchanged Deno registry
+connection refusal. Tests cover the native grant-reset fling, readable long-card
+offsets and edge decisions, outgoing extent, reduced motion, natural thumb arcs,
+sticky multi-touch and horizontal slider intent. Final-source CI/configured APK
+and actual phone observations remain separate pending gates.
+
+Final native responder review also moved fresh-session initialization into start
+capture while leaving touch ownership with child controls. A child Pressable can
+consume the start bubble phase; the regression now proves that a new text swipe
+after horizontal slider use clears that session's navigation block. The earlier
+CI #708 source is superseded by this correction and is not its APK receipt.
+
+### #709 acceptance and quiet durable-navigation refinement — 2026-10-23 / #355
+
+The whole-card correction is published at
+`94f66d8900abb974bccd6bf4ed79029e6d7dd952`, tree
+`6aa97f876a24d6783986dde10fc73a986ff2a064`. All five required CI #709 gates and
+the standalone APK job passed on attempt 1; tested merge checkout
+`2ab3ed3c620809c6f2cfb65030792332f20729e0` has that same tree. STATUS/PR #355 own
+verified artifact `12485628575`, archive/APK/bundle hashes and expiry. PR #355 is
+still unmerged. This supersedes earlier pending #709 CI/build statements.
+
+The owner's #709 phone feedback accepts thumb feel and margins. Remaining work:
+left-align card text, leave a small controls-to-dock gap, keep the active card
+plus five warmed successors, and allow immediate browsing while saves remain
+durably queued. Normal saving/wait/retry messages and rated-card flashes should
+disappear. This is scoped gesture/margin acceptance, not a complete startup or
+device-matrix result. Continue the same PR before #336.
+
+The accepted design explicitly changes the earlier acknowledgement-gated
+Discovery policy. Successful local SQLite skip/rating admission advances to a
+prepared card immediately; failed local persistence does not. Each pending
+action ID retains its frozen delivery and original actor/Profile/Item/session.
+Background receipts reconcile that action without replacing the current or
+adjacent card. Learning-changing rating/List acknowledgements advance the read
+generation and retire cursor work without clearing the prepared window; neutral
+skip acknowledgement retains its reader because it adds no learning evidence. New refill roots
+use the latest committed canonical prefix and exclude current, queued, displayed
+and locally handled pending Items while preserving server order. Bounded
+five-Item pages avoid serial one-Item warming; admit at most five successors and
+never count excess fetched candidates or inert previews as impressions.
+
+PREDICTION_MODEL §8.2 records the explicit latency/freshness tradeoff: up to five
+already prepared successors may predate a later acknowledgement. They retain
+frozen origins and are not called freshly reranked. The first new refill after
+acknowledgement consumes the committed prefix. Undo, scope changes, source
+withdrawal and rejected-command discard still clear the window and preserve
+exact canonical restoration. List/undo admission waits for pending commands to
+settle; ordinary forward browsing does not. Taste remains strictly acknowledged
+ANSWER → fresh NEXT, without five precomputed questions. No engine-scoring or
+recommendation-quality improvement is claimed by this client policy change.
+
+Rapid skip stores an exact displayed-origin intent, not an invented capability.
+The sender waits for the real impression acknowledgement; the existing writer
+validates authority atomically. No mandatory source-read preflight may block a
+lost-reply retry from its exact cached receipt. Ordinary pending progress stays
+quiet, while real persistence/server rejection/conflict keeps stable accessible
+recovery until resolved. No action is silently discarded or retargeted.
+
+This continuation requires its own local/final-source CI, configured APK and
+device receipt. The feed-reader forward remains installed as provider receipt
+`20261023062034`; no new database change or replay is expected. Preserve accounts,
+pending commands, frozen predictions and the existing canonical server writers.
+
+Final local validation passes: 753 mobile tests in 74 files, mobile TypeScript,
+focused ESLint and explicit demo iOS/Android exports. Root lint/type/mobile/catalog
+checks pass; its unchanged Deno registry fetch is still refused. Regressions cover
+rapid queued choices and late receipts, exact exposure/restart/discard identity,
+successful retry without card replacement, resumed candidates after exhaustion,
+and a same-event rating/advance retaining the outgoing numeric value. The new
+source still needs its own CI/APK receipt and phone test; the PR body owns those
+superseding receipts without a documentation-only rebuild loop.
+
+### #710 receipt and immediate undo/refill refinement — 2026-10-23 / #355
+
+The durable-navigation source is published at
+`2adc68e5beebb0eb5827e1caf50e349496239926`, tree
+`47e34ec5f29263da6e28a9225b6e888154e5ca32`. All five required CI #710 gates and
+the standalone APK job passed on attempt 1; tested merge checkout
+`6dc508199b2f4897b09e2d6f0e9654d3ae8dce59` has the identical tree. STATUS/PR #355
+own verified artifact `12508616318`, its hashes and expiry. PR #355 remains
+unmerged. This receipt supersedes the earlier pending final-CI/build statements
+without claiming the new refinement or complete physical-device acceptance.
+
+The owner's #710 feedback requests undo nearly as fast as forward scrolling,
+with the active card plus five successors and background replacement after every
+consumption; prediction may follow browsing slightly behind. The narrow design
+is now reconciled before runtime edits in UX_PRINCIPLES, DATA_EVENTS and
+PREDICTION_MODEL §8.2, with MVP/LAUNCH_LOOP/ROADMAP/CODEMAP and DEVICE_TEST aligned.
+
+After the first exact undo/withdrawal command is successfully admitted to durable
+local storage, show a cached prior Item as separate `restoringPresentation`, with
+no actionable origin. All mutations, impression and dwell remain blocked until
+the ordered undo receipts and fresh same-Item delivery arrive. Keep the visual
+identity during activation. Failed local admission leaves the current card;
+partial undo, rejection, cancellation and exact remaining-command retry preserve
+their existing boundaries. Undo still hard-invalidates the prepared window; the
+cached appearance is not server undo success or permission to reuse an old origin.
+
+Ordinary rating/List acknowledgement now marks a coalesced future-reader-dirty
+state without cancelling the bounded refill already in progress. That request,
+including exact pending retries, may admit only the free successor slots; before
+the next new request, renew the root from the latest committed prefix. Neutral
+skip keeps its reader. Initially warm five successors, and schedule refill after
+every consumption: one vacancy admits one Item. Protocol 3 retains immutable wire
+page limit five; there is no one-Item page-size switch or staging beyond five
+successors. Frozen origins remain honest even when their forecasts predate later
+acknowledgements. Hard undo/scope/source/discard invalidation rejects late work.
+
+If an in-flight request is proven expired/unusable after ordinary acknowledgement
+already scheduled renewal, retire that request and continue the scheduled fresh
+root quietly with prepared cards intact. Never admit candidates from an error.
+Without scheduled renewal, retain explicit refresh/recovery; ambiguous failures
+still preserve exact retry identity. Repeated acknowledgement must not starve the
+buffer through repeated cancellation or reintroduce progress/retry flashes.
+
+Implementation of this refinement is complete and independent review is clean.
+Local validation passes all 763 mobile tests in 74 files, the root check's lint,
+type, dependency and catalog stages, and explicit demo iOS and Android exports.
+The complete local root check remains blocked by the unchanged Deno `deno.lock`
+dependency request to `registry.npmjs.org/@supabase%2fauth-js`, which fails with
+`Connection refused`; no full local root pass is claimed.
+
+Next publish the completed source in the same PR #355, obtain final-source CI and
+a replacement configured APK, then verify immediate undo presentation and
+continuous refill on the phone. These CI/build/device receipts remain pending.
+No server/API or database change is required; feed-reader provider receipt
+`20261023062034` remains installed and must not be replayed. Preserve the durable
+queues, exact server writers, ordered undo and strict Taste acknowledgement →
+fresh NEXT. After this bounded interaction correction and its new
+final-source/build/device receipts, continue #336's versioned Taste pool
+refresh/refill.

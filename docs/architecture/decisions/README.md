@@ -14,6 +14,11 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
+- [0009](0009-discovery-local-choice-cancellation.md) — newest durably stored
+  Discovery choice held from dispatch for bounded local cancellation; exact
+  outbox arbitration, restart drain and scoped prepared-window grid handoff.
+  Physical-device acceptance remains separate from this accepted design.
+
 - [0008](0008-portable-predictive-memory-engine-and-external-priors.md) — owner-approved independent Predictive Memory Engine, Kajo adapter, isolated public taste-data research and artifact admission, published through #233 / PR #234. Design acceptance is separate from implementation, training or serving admission. Advances early research, not private Kajo-wide PopulationMemory or automatic evolution.
 
 ## Format

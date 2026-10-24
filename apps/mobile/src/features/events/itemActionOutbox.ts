@@ -27,6 +27,10 @@ export interface ItemActionOutbox<TEntry extends PendingQueuedAction = PendingIt
   start(): void;
   stop(): void;
   enqueue(entry: TEntry): boolean;
+  reserve(actionId: string): boolean;
+  release(actionId?: string): void;
+  canCancelReserved(actionId: string): boolean;
+  cancelReserved(actionId: string): boolean;
   retry(): void;
   resumeAfterExposure(): void;
   discardRejectedUndo(): boolean;
@@ -39,6 +43,9 @@ export interface ItemActionOutbox<TEntry extends PendingQueuedAction = PendingIt
 const STORAGE_ERROR = 'Valintajonon avaaminen tai tallentaminen epäonnistui. Valintaa ei kuitattu; yritä uudelleen.';
 const MAX_PENDING = 256;
 const MAX_STORED_BYTES = 1_048_576;
+// A newly started coordinator can replay the same durable queue immediately.
+// Its predecessor therefore loses proof that a held command is still unsent.
+const reservationOwners = new Map<string, object>();
 
 export function createItemActionOutbox<TEntry extends PendingQueuedAction = PendingItemAction, TReceipt = ItemActionReceipt>(options: {
   namespace: string;
@@ -51,6 +58,7 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
   isPendingAction?: (value: unknown, scope: ItemActionScope) => value is TEntry;
 }): ItemActionOutbox<TEntry> {
   const key = `kajo:item-actions:v1:${encodeURIComponent(options.namespace)}:${options.scope.actorUserId}:${options.scope.profileId}`;
+  const reservationOwner = {};
   let active = false;
   let ready = true;
   let blocked = false;
@@ -62,6 +70,12 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
   let timer: ReturnType<typeof setTimeout> | null = null;
   let waitingForExposure = false;
   let exposureChangedDuringFlight = false;
+  // The command itself is already durable. Only its permission to dispatch is
+  // held in this coordinator, so a fresh process automatically replays it.
+  // A reservation can only precede a new admission; an uncertain write may
+  // never be converted back into a cancellable local-only choice.
+  const reservations = new Map<string, string | null>();
+  const knownActionIds = new Set<string>();
   const isValid = options.isPendingAction ?? (isPendingItemAction as unknown as
     (value: unknown, scope: ItemActionScope) => value is TEntry);
 
@@ -74,6 +88,7 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
       || new Set(parsed.map(entry => entry.command.actionId)).size !== parsed.length) {
       throw new Error('Invalid persisted action queue');
     }
+    parsed.forEach(entry => knownActionIds.add(entry.command.actionId));
     return parsed;
   }
 
@@ -106,6 +121,7 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
         reload();
         const entry = pending[0];
         if (!ready || !entry) break;
+        if (reservations.has(entry.command.actionId)) break;
         let result: ItemActionResult<TReceipt>;
         let deadline: ReturnType<typeof setTimeout> | undefined;
         try {
@@ -154,7 +170,7 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
       const resume = waitingForExposure && exposureChangedDuringFlight;
       exposureChangedDuringFlight = false;
       if (resume) resumeAfterExposure();
-      if (pending.length > 0) drain();
+      if (pending.length > 0 && !reservations.has(pending[0]!.command.actionId)) drain();
     });
   }
 
@@ -181,13 +197,27 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
     active = false;
     return true;
   }
+  function canCancelReserved(actionId: string) {
+    if (!active || options.isCurrent?.() === false || !ready || reservationOwners.get(key) !== reservationOwner ||
+      !reservations.has(actionId)) return false;
+    // This is a render-time hint, not cancellation authority. The mutation
+    // re-reads and verifies exact persisted bytes before removing anything.
+    return reservations.get(actionId) !== null && pending.some(entry => entry.command.actionId === actionId);
+  }
   return {
     snapshot,
-    start() { active = true; publish(); drain(); },
+    start() {
+      // Once another owner could have dispatched, restarting this instance
+      // cannot recover its earlier proof of an unsent command.
+      if (reservationOwners.get(key) !== reservationOwner) reservations.clear();
+      reservationOwners.set(key, reservationOwner); active = true; publish(); drain();
+    },
     stop() {
       active = false;
       if (timer) clearTimeout(timer);
       timer = null;
+      reservations.clear();
+      if (reservationOwners.get(key) === reservationOwner) reservationOwners.delete(key);
       // In-flight acknowledgements may remove their own delivered command;
       // queued work and callbacks stay suspended for this scope.
     },
@@ -199,8 +229,44 @@ export function createItemActionOutbox<TEntry extends PendingQueuedAction = Pend
         const current = read();
         const existing = current.find(row => row.command.actionId === copy.command.actionId);
         if (existing && JSON.stringify(existing) !== JSON.stringify(copy)) throw new Error('Action ID reused');
-        if (!existing) write([...current, copy]);
+        if (!existing) {
+          write([...current, copy]);
+          knownActionIds.add(copy.command.actionId);
+          if (reservations.has(copy.command.actionId)) reservations.set(copy.command.actionId, JSON.stringify(copy));
+        }
       } catch { ready = false; message = STORAGE_ERROR; publish(); return false; }
+      publish();
+      drain();
+      return true;
+    },
+    reserve(actionId) {
+      if (!active || options.isCurrent?.() === false || !ready || reservationOwners.get(key) !== reservationOwner ||
+        !actionId || actionId.length > 128 ||
+        reservations.size >= MAX_PENDING || reservations.has(actionId)) return false;
+      try {
+        // Include commands recovered/appended by another coordinator before
+        // deciding whether this is a genuinely new local admission.
+        read();
+        if (knownActionIds.has(actionId)) return false;
+        reservations.set(actionId, null);
+        return true;
+      } catch { ready = false; message = STORAGE_ERROR; publish(); return false; }
+    },
+    release(actionId) {
+      if (actionId === undefined) reservations.clear();
+      else reservations.delete(actionId);
+      drain();
+    },
+    canCancelReserved,
+    cancelReserved(actionId) {
+      if (!canCancelReserved(actionId)) return false;
+      try {
+        const current = read();
+        const admitted = current.find(entry => entry.command.actionId === actionId);
+        if (!admitted || JSON.stringify(admitted) !== reservations.get(actionId)) return false;
+        write(current.filter(entry => entry.command.actionId !== actionId));
+      } catch { ready = false; message = STORAGE_ERROR; publish(); return false; }
+      reservations.delete(actionId);
       publish();
       drain();
       return true;

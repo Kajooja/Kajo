@@ -4,6 +4,7 @@ import { enrichItemsFromCatalog, loadCatalogItems } from './catalogItemOperation
 import { mapPredictionRows, type PredictionRanking, type PredictionRpcResponse } from './predictionOperations';
 
 export const PREDICTION_PAGE_V1_RPC = 'rank_items_page_v1';
+export const PREDICTION_FEED_V1_RPC = 'rank_items_feed_v1';
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const isUuid = (value: unknown): value is string => typeof value === 'string' && uuidPattern.test(value);
 const record = (value: unknown): value is Record<string, unknown> =>
@@ -19,6 +20,9 @@ export interface PredictionPageRequest {
   readonly limit: number;
   readonly context: Readonly<Omit<Context, 'sessionId'>>;
   readonly cursor: string | null;
+  // Present (including null) only on a fresh feed root. Exact retries retain
+  // this identity; ordinary v3 continuations never retire a reader.
+  readonly replacesChainId?: string | null;
 }
 
 // Create once per logical request and retain this object across transport retries.
@@ -58,13 +62,23 @@ export function createPredictionPageRequest(input: {
   return request;
 }
 
+export function createFeedPredictionPageRequest(input: Omit<Parameters<typeof createPredictionPageRequest>[0], 'version'> & {
+  replacesChainId?: string | null;
+}): PredictionPageRequest {
+  const replacesChainId = input.replacesChainId ?? null;
+  if (replacesChainId !== null && !isUuid(replacesChainId)) throw new Error('Invalid feed reader identity');
+  const request = createPredictionPageRequest({ ...input, version: 3 });
+  return Object.freeze({ ...request, replacesChainId: replacesChainId?.toLowerCase() ?? null });
+}
+
 export function createNextPredictionPageRequest(page: PredictionPage, requestId: string): PredictionPageRequest {
   if ((page.request.version !== 2 && page.request.version !== 3) || !isUuid(page.nextCursor) || !isUuid(requestId) ||
     requestId.toLowerCase() === page.request.requestId) throw new Error('Invalid prediction continuation');
-  return Object.freeze({ ...page.request, requestId: requestId.toLowerCase(), cursor: page.nextCursor });
+  const { replacesChainId: _retiredReader, ...request } = page.request;
+  return Object.freeze({ ...request, requestId: requestId.toLowerCase(), cursor: page.nextCursor });
 }
 
-export type PredictionPageRpc = (name: typeof PREDICTION_PAGE_V1_RPC,
+export type PredictionPageRpc = (name: typeof PREDICTION_PAGE_V1_RPC | typeof PREDICTION_FEED_V1_RPC,
   arguments_: { request: PredictionPageRequest }) => Promise<PredictionRpcResponse>;
 
 export type PredictionAvailability = 'ITEMS' | 'WINDOW_EXHAUSTED' | 'CATALOG_EMPTY' | 'CATALOG_EXHAUSTED';
@@ -103,7 +117,7 @@ function rpcError(error: NonNullable<PredictionRpcResponse['error']>): Predictio
 
 export async function loadPredictionPage(rpc: PredictionPageRpc, request: PredictionPageRequest): Promise<PredictionPageResult> {
   try {
-    const response = await rpc(PREDICTION_PAGE_V1_RPC, { request });
+    const response = await rpc('replacesChainId' in request ? PREDICTION_FEED_V1_RPC : PREDICTION_PAGE_V1_RPC, { request });
     if (response.error) return rpcError(response.error);
     return mapPredictionPage(response.data, request);
   } catch { return pageError(); }
