@@ -287,12 +287,26 @@ domain-coverage guard. Retained session policies and v2 wire/queue remain intact
 the portable reference exposes an explicit opt-in. All five final-source CI #676
 gates pass and its single additive hosted forward is installed/verified; STATUS
 owns exact source and preservation/security receipts. No eligible-owner new-session,
-device or quality acceptance is claimed. The fixed START-time 25-per-ItemType
-pool still needs versioned refresh/refill. Shared feed/artwork/neutral Ohita source
+device or quality acceptance is claimed. Deployed V3 retains the fixed START-time
+25-per-ItemType pool; the V4 source successor and its remaining gates are below.
+Shared feed/artwork/neutral Ohita source
 is accepted, built and installed; actual device acceptance remains open, together
 with recent prior, full readiness and observed usefulness;
 `MVP-ALG-010`, `MVP-ALG-011` and `MVP-UX-007` are not complete. See the
 [bounded source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16).
+
+The 2026-10-24 source successor [#356](https://github.com/Kajooja/Kajo/pull/356)
+under #336 supplies new-session
+`CANONICAL_FORECAST_POOL_V4`: each fresh NEXT acquires an eligible bounded pool,
+captures one current canonical forecast, and binds the chosen question to that
+immutable pool. Previously asked/labelled/suppressed Items are excluded before
+the recognition bound. Retained policies, measurements and exact replies remain
+unchanged. This addresses START-pool exhaustion without changing scoring weights
+or demonstrating recommendation quality. Its implementation passed all five
+CI #718 gates, including native preservation/committed-RPC checks. The owner has
+authorized final-head verification and source integration; hosted installation
+and matching device acceptance remain separate. [STATUS](../project/STATUS.md)
+owns those gates; the requirements above remain open.
 
 Shared feed source continuation (#239, 2026-10-17) now connects the accepted
 #349 adapters to sequential Taste and canonical Discovery deliveries. It shares
@@ -334,10 +348,11 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 
 Published #710 supplies quiet durable-admission navigation, active-plus-five
 preparation, left-aligned text and a small controls-to-dock gap; thumb tracking
-and margins were accepted on #709. The active post-#710 continuation adds immediate
+and margins were accepted on #709. The post-#710 continuation adds immediate
 inert undo presentation and uninterrupted bounded refill across ordinary receipts.
-Its source implementation is complete; final-source CI, a replacement configured
-APK and device acceptance remain open. Discovery reverse navigation retains exact identities within the
+Its #355 source is now merged after all six CI #716 jobs passed, including the
+configured APK. The owner reports general good browsing behavior on #716;
+unreported device cases remain open. Discovery reverse navigation retains exact identities within the
 mounted scope/ten-native-action history and reacquires the same Item through a
 fresh canonical delivery after server Undo. Proven unsent local cancellation is the bounded exception in UX_PRINCIPLES. Its cached restoring presentation may appear after durable admission, but is never an actionable old delivery. It cannot reuse an expired origin or invent
 Shared consensus removal. Sequential Taste shares compact presentation, direct

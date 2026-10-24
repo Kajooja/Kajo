@@ -10,7 +10,118 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — #715 device latency corrections / #239
+## Current packet — versioned Taste candidate pools / #336
+
+**Latest owner observation — 2026-10-24 Europe/Helsinki:** after receiving the
+GitHub download for APK #716, the owner reports “toimii hyvin” and asks to
+continue development. This accepts the observed general browsing behavior of the
+supplied successor; it is not a timed benchmark, installed-checksum verification,
+per-case gesture report or startup/offline/process-death acceptance. The remaining
+matrix stays in [DEVICE_TEST](DEVICE_TEST.md#apk-716-owner-observation--2026-10-24).
+Recommendation quality and internal scoring have not been accepted by this report.
+
+**Accepted feed source:** [PR #355](https://github.com/Kajooja/Kajo/pull/355)
+is merged as `94beb27962c735582fa5eabf3db361be37e1255a`, preserving source
+`654f9fcf0ded841628c40d088a177d8baea14e86` and its exact tested tree
+`047496716bbb79b1fb4ab3f597e98f33e675ac35`. All six jobs passed in
+[CI #716, attempt 2](https://github.com/Kajooja/Kajo/actions/runs/40086800244),
+including all five required validation/native gates and the configured standalone
+Android build. The tested PR merge `65a1dd4cee3c85d523bd3758cbe59d9f8f0b7af5`
+has that identical tree. Attempt 1 was cancelled after the unchanged database
+test process produced no result for 17m57s; the same source passed on retry,
+without bypassing a gate.
+
+[APK artifact 12559127092](https://github.com/Kajooja/Kajo/actions/runs/40086800244/artifacts/12559127092)
+contains the sole `app-release.apk`, supplied as `kajo-android-ci-716.apk`:
+106,120,143 bytes, SHA-256
+`62a4ca8f128580d7adac9a11b1810266ff8b51c0cce99659a236f4bf73a7e5d2`.
+The downloaded archive matches GitHub's digest and both archive/APK CRC checks
+pass; the embedded JavaScript bundle is present. GitHub artifact expiry is
+2026-10-31 11:42:42 UTC (13:42:42 Europe/Helsinki). Physical installation and
+cryptographic APK signature verification were not performed by the agent.
+
+**Explicit integration approval — 2026-10-24:** the owner has now authorized
+merging #355 and then #356 after verification. This resolves the earlier automatic
+approval rejection; that rejection was not bypassed. #355 is merged as recorded
+above. Complete #356's authorized integration after all required checks pass on
+its final head. This source approval does not deploy the V4 forward, reset an
+account or close device/quality acceptance.
+
+**One current source packet:** versioned Taste candidate-pool refresh/refill on
+`feat/336-versioned-taste-pools`, published in
+[PR #356](https://github.com/Kajooja/Kajo/pull/356). The PR is ready for review and
+retargeted to main after #355's merge; it remains unmerged at this checkpoint.
+Its PR owns the eventual exact final head, required checks and merge receipt.
+This successor is not yet accepted main or a hosted deployment.
+CLI-created `20261024125357_versioned_taste_candidate_pools.sql` adds the
+new-session-only `CANONICAL_FORECAST_POOL_V4` policy and private immutable per-panel
+candidate storage. New questions refresh bounded eligible candidates from the
+latest committed Profile prefix; retained V3/legacy sessions keep their policy.
+Question lookup, answer projection, contextual skip and lifecycle consumers use
+the exact question's stored pool, preserving earlier panels, first measured labels,
+retries and source-withdrawal semantics. Discovery's prepared buffer does not
+precompute future adaptive Taste questions.
+
+The matching mobile recovery retains an exact pending command on `KJ002` until
+explicit reload. RESUME/existing START can stop a stale ACTIVE/PAUSED session
+without rewriting its question, pool, receipt or revision; Discovery continuation
+and REMOVE remain available. No silent command retargeting or account reset is
+used to manufacture a fresh session.
+
+**Local validation checkpoint:** independent review found no blocking issue.
+All 901 mobile, 335 database, 311 engine and 50 dependency tests pass, as do
+catalogue (3 contract + 441 script), research (19 Python + 43 Node) and acceptance
+(6 + 5) tests. The 40 focused SQL checks include 11 new pool tests. Lint,
+typecheck and all four explicit demo iOS/Android exports pass. The complete
+`npm run check` reaches the unchanged Deno dependency download and stops on npm
+registry `Connection refused`; the remaining stages passed separately, so no
+successful complete local root run is claimed. The implementation subsequently
+passed all five [CI #718 gates](https://github.com/Kajooja/Kajo/actions/runs/40098065673)
+at source `90c70343a64fe336391d8ae5c234bccd2d6a808a`, tree
+`aee918b92394342b6ad5cc9125203c29daf6502b`; tested merge
+`d2717dda6d2608828dea8f620746aec59195ca75` has that identical tree. Genuine
+PostgreSQL verification reports `personalTastePoolUpgrade: PASS` and
+`personalTastePools: PASS`: populated predecessor rows, V3 policy and exact replies
+are preserved; separate committed RPCs admit later candidates, preserve original
+pools and verify stale-source recovery and source erasure. The Android APK job
+was skipped. These native results supplement the local PGlite checks; they do not
+establish hosted installation or device acceptance. The approval/base-integration
+handoff reconciliation now needs its own final-head checks before #356 merges.
+
+**Publication and bounded performance follow-up:** #356 was first
+published at `707bdc7fbd99ad6904e97b3d34342dabe0e886ed`, tree
+`dd920c7f8885c0f4e034f2340daad13940f48346`.
+[Preliminary CI #717](https://github.com/Kajooja/Kajo/actions/runs/40096998050)
+was superseded and cancelled; #718 above is the completed implementation receipt.
+The bounded acquisition correction
+materializes potential skipped Item IDs once, delegates every potential source
+to the unchanged canonical skip helper, and projects provider details only for
+the retained pool. Full candidate JSON matches the frozen pre-optimization
+reference across six cutoff/lifecycle cases. The entire 335-test database suite
+passes after this correction. On a disposable 10,000-Item PGlite fixture with
+400 history rows, paired median acquisition time fell from 857 ms to 404 ms;
+complete first NEXT measured 584 ms. These shared-host synthetic WASM timings
+are query evidence, not phone or hosted performance measurements.
+
+**Next action:** finish the authorized #356 source integration after all five
+required checks pass on its final head. Record the exact final head/tree/CI and
+merge receipt in that PR; do not create another documentation-only rebuild merely
+to copy those receipts here. A fresh continuation must inspect #356: if already
+merged, continue from fresh main rather than reopening source work or requesting
+the same merge approval again. The next packet is guarded preparation of the
+matching V4 hosted forward, then installation and matching configured APK/device
+acceptance. Reconcile the actual installed prefix before any deployment and never
+replay installed operations. Preserve existing accounts, old policies and pending
+commands. Readiness and measured usefulness remain open. No hosted write, account
+reset, prior-forward replay or model/Working activation occurred in this packet.
+
+The subsequent recommendation-scoring review remains in ROADMAP, using fixed
+baselines and prospective/holdout comparisons. Numeric Taste reverse UI, recent
+supported prior, full readiness and release gates remain open. Sprint 014 is not
+closed. The dated feed checkpoints below preserve predecessor evidence; they do
+not replace this current source/integration boundary.
+
+## Predecessor packet — #715 device latency corrections / #239
 
 **Latest owner feedback — 2026-10-24 Europe/Helsinki:** APK #715's horizontal
 Löydä ↔ Katsotut/Luetut navigation, direct rating and History/Lists work as
@@ -22,7 +133,8 @@ Startup/network recovery was not properly tested and remains open. Recommendatio
 precision/internal scoring is a separate later review in ROADMAP, not a passed
 quality result or a scoring change in this packet.
 
-Continue the single unmerged `feat/239-buffered-feed` / [PR #355](https://github.com/Kajooja/Kajo/pull/355).
+At this predecessor checkpoint, the single active source was
+`feat/239-buffered-feed` / [PR #355](https://github.com/Kajooja/Kajo/pull/355).
 The verified predecessor source is `eb447629a36a219f300aa61a520267ce1213916b`:
 all five mandatory gates and configured Android APK passed in
 [CI #715](https://github.com/Kajooja/Kajo/actions/runs/40029355874).
@@ -56,10 +168,10 @@ unmitigated findings. All 162 local Markdown links in the changed documents were
 checked. The complete local root check stops at unchanged Deno dependency
 loading: `registry.npmjs.org/@supabase%2fauth-js` returns `Connection refused`;
 remaining root stages were run successfully separately. Full local-root success
-is not claimed. Final-source CI and a replacement configured APK remain required;
-PR #355 owns their superseding exact head/tree/run/artifact receipt without a
-documentation-only rebuild. Actual phone speed, process-death/reconnect safety
-and the new rating stop require the successor DEVICE_TEST matrix. Preserve accounts, pending commands and installed
+is not claimed. Final-source CI and the configured APK subsequently passed as
+recorded in the #716 receipt above. The owner's general good-behavior report does
+not supply measured phone timing or the complete process-death/reconnect/gesture
+matrix. Preserve accounts, pending commands and installed
 migrations. This packet requires no scoring, SQL or hosted deployment change.
 The full release/startup/quality gates remain open despite scoped owner acceptance.
 
@@ -89,8 +201,9 @@ also reports that rating no longer feels smooth: either tapping a chosen point
 or dragging must commit that rating and automatically advance. This supersedes
 #354's rule that an acknowledged rating waits for a later forward gesture.
 
-The active successor is [PR #355](https://github.com/Kajooja/Kajo/pull/355),
-`feat/239-buffered-feed`, based on accepted #354 main and still unmerged.
+At this predecessor checkpoint the active successor was
+[PR #355](https://github.com/Kajooja/Kajo/pull/355), `feat/239-buffered-feed`,
+based on accepted #354 main and then unmerged. Its later acceptance is above.
 Its accepted feed baseline `a8225b073d167d9c1015f121f33d101a923c2ce6` passed all five
 required gates and the standalone APK job in
 [CI #714](https://github.com/Kajooja/Kajo/actions/runs/40015633346).
@@ -708,6 +821,13 @@ an authorized existing-owner roster/native/operator scope and an independently
 retained pre-window declaration. Fixtures are not observed evidence.
 
 ## Current test APK and device work
+
+The current supplied build and scoped owner observation are APK #716 in the
+current packet above. #718 did not build a V4 successor APK; the authorized main
+integration starts its configured build after all five CI gates. Its actual build
+receipt and matching backend/device checks remain required. The following older
+receipts are historical and do not
+reopen completed build work or replace the current remaining DEVICE_TEST matrix.
 
 The latest verified configured build is [CI #714](https://github.com/Kajooja/Kajo/actions/runs/40015633346),
 PR #355 source `a8225b073d167d9c1015f121f33d101a923c2ce6`, tested merge checkout

@@ -14,6 +14,27 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Authorized feed integration and Taste pool continuation — 2026-10-24
+
+The owner explicitly authorized merging #355 and then #356 after verification,
+resolving the earlier automatic merge rejection. #355 is merged as
+`94beb27962c735582fa5eabf3db361be37e1255a`, preserving the tested #716 tree
+`047496716bbb79b1fb4ab3f597e98f33e675ac35` and scoped owner browsing acceptance.
+#356 is ready for review and targets main; it remains unmerged at this checkpoint.
+Its implementation source `90c70343a64fe336391d8ae5c234bccd2d6a808a`, tree
+`aee918b92394342b6ad5cc9125203c29daf6502b`, passed all five
+[CI #718 gates](https://github.com/Kajooja/Kajo/actions/runs/40098065673), including
+native populated-predecessor preservation and separately committed V4 pool RPCs.
+The APK job was skipped. Complete the current handoff head's required checks and
+authorized merge; #356 owns its exact final source/CI/merge receipt.
+
+[STATUS](../STATUS.md) owns the one continuation: inspect that receipt, continue
+from fresh main after integration, then prepare the guarded matching V4 hosted
+forward and configured APK/device acceptance. Preserve accounts, retained policies,
+frozen panels and exact commands; do not replay installed migrations. No hosted
+V4 deployment, successor device result, measured quality or Sprint 014 closure is
+claimed. Earlier dated pending-source entries below retain their historical scope.
+
 ## Discovery return and horizontal history — #239 / 2026-10-24
 
 The owner reports #714 works, accepting the reported feed/Undo correction after
