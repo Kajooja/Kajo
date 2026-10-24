@@ -52,6 +52,7 @@ interface ItemListsContextValue {
   status: ItemListsStatus;
   scopeKey: string | null;
   revision: number;
+  membershipRevision: number;
   lists: readonly ItemList[];
   error: string | null;
   refresh: () => void;
@@ -87,7 +88,7 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
   const connection = useSupabaseConnection();
   const client = connection.status === 'configured' ? connection.client : null;
   const profiles = useActiveProfile();
-  const { submitCollectionAction, collectionRevision } = useItemInteractions();
+  const { submitCollectionAction, collectionRevision, listMembershipRevision } = useItemInteractions();
   const [snapshot, setSnapshot] = useState<ListSnapshot | null>(null);
   const [attempt, setAttempt] = useState(0);
   const profileId = profiles.status === 'ready'
@@ -132,7 +133,7 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     });
 
     return () => { active = false; };
-  }, [attempt, collectionRevision, profileId, rpc, scopeKey, scopeToken]);
+  }, [attempt, listMembershipRevision, profileId, rpc, scopeKey, scopeToken]);
 
   const refresh = useCallback(() => setAttempt((current) => current + 1), []);
   const runForProfile = useCallback(
@@ -195,6 +196,7 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     status,
     scopeKey,
     revision: collectionRevision,
+    membershipRevision: listMembershipRevision,
     lists,
     error,
     refresh,
@@ -207,6 +209,7 @@ export function ItemListsProvider({ children }: PropsWithChildren) {
     loadConsumed,
   }), [
     collectionRevision,
+    listMembershipRevision,
     scopeKey,
     createList,
     deleteList,

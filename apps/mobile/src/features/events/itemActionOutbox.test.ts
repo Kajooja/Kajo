@@ -39,6 +39,182 @@ function deferred<T>() {
 }
 
 describe('durable actor/Profile Item action outbox', () => {
+  it('holds a durably admitted newest choice while older work drains in FIFO order', async () => {
+    const store = storage();
+    const wait = deferred<ItemActionResult>();
+    const send = vi.fn(async (command: ItemActionCommand) => success(command));
+    send.mockReturnValueOnce(wait.promise);
+    const { queue, onCommitted } = setup(store, send);
+    await queue.waitForIdle();
+    expect(queue.reserve(id(10))).toBe(true);
+    expect(queue.enqueue(entry(10))).toBe(true);
+    await queue.waitForIdle();
+    expect(send).not.toHaveBeenCalled();
+    expect([...store.rows.values()][0]).toContain(id(10));
+    expect(queue.snapshot()).toMatchObject({ ready: true, pendingCount: 1, message: null });
+    expect(queue.reserve(id(11))).toBe(true);
+    expect(queue.enqueue(entry(11))).toBe(true);
+    queue.release(id(10));
+    await Promise.resolve();
+    expect(send.mock.calls.map(([command]) => command.actionId)).toEqual([id(10)]);
+    expect(queue.canCancelReserved(id(11))).toBe(true);
+    wait.resolve(success(entry(10).command));
+    await queue.waitForIdle();
+    expect(onCommitted).toHaveBeenCalledOnce();
+    expect(queue.pending().map(row => row.command.actionId)).toEqual([id(11)]);
+    queue.release(id(11));
+    await queue.waitForIdle();
+    expect(send.mock.calls.map(([command]) => command.actionId)).toEqual([id(10), id(11)]);
+    expect(queue.pending()).toEqual([]);
+  });
+
+  it('cancels only an admitted held choice durably without sending or inventing a receipt', async () => {
+    const store = storage();
+    const { queue, send, onCommitted, onChange } = setup(store);
+    await queue.waitForIdle();
+    expect(queue.reserve(id(10))).toBe(true);
+    expect(queue.canCancelReserved(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    queue.enqueue(entry(10));
+    const readsAfterAdmission = store.getItemSync.mock.calls.length;
+    expect(queue.canCancelReserved(id(10))).toBe(true);
+    expect(queue.canCancelReserved(id(10))).toBe(true);
+    expect(store.getItemSync).toHaveBeenCalledTimes(readsAfterAdmission);
+    expect(queue.cancelReserved(id(10))).toBe(true);
+    await queue.waitForIdle();
+    expect(queue.pending()).toEqual([]);
+    expect([...store.rows.values()][0]).toBe('[]');
+    expect(send).not.toHaveBeenCalled();
+    expect(onCommitted).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ pendingCount: 0 }));
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    expect(queue.reserve(id(10))).toBe(false);
+  });
+
+  it('retains held bytes and refuses local cancellation when the durable removal fails', async () => {
+    const store = storage();
+    const { queue, send, onCommitted } = setup(store);
+    queue.reserve(id(10)); queue.enqueue(entry(10));
+    await queue.waitForIdle();
+    const admitted = [...store.rows.values()][0];
+    store.setItemSync.mockImplementationOnce(() => { throw new Error('disk full'); });
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    expect([...store.rows.values()][0]).toBe(admitted);
+    expect(queue.snapshot()).toMatchObject({ ready: false, pendingCount: 1 });
+    expect(send).not.toHaveBeenCalled(); expect(onCommitted).not.toHaveBeenCalled();
+    queue.stop();
+    const resumed = setup(store);
+    await resumed.queue.waitForIdle();
+    expect(resumed.send).toHaveBeenCalledWith(entry(10).command);
+    expect(resumed.queue.pending()).toEqual([]);
+  });
+
+  it('replays held commands unchanged after stop/restart or process recovery', async () => {
+    const store = storage();
+    const first = setup(store);
+    first.queue.reserve(id(10)); first.queue.enqueue(entry(10));
+    first.queue.reserve(id(11)); first.queue.enqueue(entry(11));
+    await first.queue.waitForIdle();
+    first.queue.stop();
+    expect(first.queue.canCancelReserved(id(10))).toBe(false);
+    expect(first.queue.reserve(id(12))).toBe(false);
+    first.queue.release();
+    expect(first.send).not.toHaveBeenCalled();
+    const resumed = setup(store);
+    await resumed.queue.waitForIdle();
+    expect(resumed.send.mock.calls.map(([command]) => command)).toEqual([entry(10).command, entry(11).command]);
+    expect(resumed.queue.pending()).toEqual([]);
+  });
+
+  it('cannot reserve or cancel dispatched, uncertain, rejected or previously acknowledged IDs', async () => {
+    vi.useFakeTimers();
+    const wait = deferred<ItemActionResult>();
+    const send = vi.fn(async (command: ItemActionCommand) => success(command));
+    send.mockReturnValueOnce(wait.promise);
+    const { queue } = setup(storage(), send);
+    queue.enqueue(entry(10)); await Promise.resolve();
+    expect(queue.reserve(id(10))).toBe(false);
+    expect(queue.canCancelReserved(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    wait.resolve({ status: 'error', retryable: true, message: 'lost reply' });
+    await queue.waitForIdle();
+    expect(queue.reserve(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    send.mockResolvedValueOnce({ status: 'error', retryable: false, rejectedAction: true, message: 'rejected' });
+    queue.retry(); await queue.waitForIdle();
+    expect(queue.reserve(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    queue.retry(); await queue.waitForIdle();
+    expect(queue.pending()).toEqual([]);
+    expect(queue.reserve(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+  });
+
+  it('does not let retry or exposure wakeups release held work or spin the drain', async () => {
+    vi.useFakeTimers();
+    const { queue, send } = setup();
+    queue.reserve(id(10)); queue.enqueue(entry(10));
+    await queue.waitForIdle();
+    queue.retry(); queue.resumeAfterExposure();
+    await queue.waitForIdle();
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(send).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+    queue.release(); await queue.waitForIdle();
+    expect(send).toHaveBeenCalledOnce();
+  });
+
+  it('checks current scope before reservation and cancellation', async () => {
+    let current = true;
+    const store = storage();
+    const send = vi.fn(async (command: ItemActionCommand) => success(command));
+    const queue = createItemActionOutbox({ namespace: 'test', scope, storage: store, send,
+      onChange: vi.fn(), onCommitted: vi.fn(), isCurrent: () => current });
+    queues.push(queue); queue.start();
+    queue.reserve(id(10)); queue.enqueue(entry(10));
+    await queue.waitForIdle(); current = false;
+    expect(queue.reserve(id(11))).toBe(false);
+    expect(queue.canCancelReserved(id(10))).toBe(false);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    queue.release(); await queue.waitForIdle();
+    expect(send).not.toHaveBeenCalled();
+    expect(queue.pending()).toEqual([entry(10)]);
+  });
+
+  it('revokes local cancellation proof when another coordinator starts the same durable queue', async () => {
+    const store = storage();
+    const first = setup(store);
+    first.queue.reserve(id(10)); first.queue.enqueue(entry(10));
+    await first.queue.waitForIdle();
+    const wait = deferred<ItemActionResult>();
+    const second = setup(store, vi.fn(async () => wait.promise));
+    await Promise.resolve();
+    expect(second.send).toHaveBeenCalledOnce();
+    expect(first.queue.canCancelReserved(id(10))).toBe(false);
+    expect(first.queue.cancelReserved(id(10))).toBe(false);
+    expect(first.queue.reserve(id(11))).toBe(false);
+    expect(first.queue.pending()).toEqual([entry(10)]);
+    first.queue.start();
+    expect(first.queue.cancelReserved(id(10))).toBe(false);
+    first.queue.stop();
+    wait.resolve(success(entry(10).command));
+    await second.queue.waitForIdle(); await first.queue.waitForIdle();
+    expect(second.queue.pending()).toEqual([]);
+  });
+
+  it('checks exact durable payload at cancellation even when the in-memory hint is still true', async () => {
+    const store = storage();
+    const { queue, send } = setup(store);
+    queue.reserve(id(10)); queue.enqueue(entry(10));
+    await queue.waitForIdle();
+    const key = [...store.rows.keys()][0]!;
+    store.rows.set(key, JSON.stringify([entry(10, 2)]));
+    expect(queue.canCancelReserved(id(10))).toBe(true);
+    expect(queue.cancelReserved(id(10))).toBe(false);
+    expect(store.rows.get(key)).toBe(JSON.stringify([entry(10, 2)]));
+    expect(send).not.toHaveBeenCalled();
+  });
+
   it('does not lose exposure acknowledgement arriving while the waiting result is in flight', async () => {
     vi.useFakeTimers();
     const deferredResult = deferred<ItemActionResult>();

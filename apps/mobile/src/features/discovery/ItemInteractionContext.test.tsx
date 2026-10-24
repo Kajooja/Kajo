@@ -5,6 +5,8 @@ import { getInteractionEvidenceKey } from './predictionRefresh';
 import { projectPendingItemActions, type ItemActionCommand } from '../events/itemActionCommands';
 import type { ItemActionResult } from '../events/itemActionPersistence';
 import type { ItemActionOutbox } from '../events/itemActionOutbox';
+import type { CollectionActionCommand, CollectionActionIntent, CollectionActionReceipt } from '../events/collectionActions';
+import { getItemInteraction } from './itemInteraction';
 
 const fixture = vi.hoisted(() => ({
   actor: '00000000-0000-4000-8000-000000000001', profile: '00000000-0000-4000-8000-000000000002',
@@ -115,6 +117,37 @@ afterEach(() => {
 });
 
 describe('committed Discovery evidence refresh', () => {
+  it.each<CollectionActionIntent>([
+    { kind: 'CREATE_LIST', itemId: null, name: 'Weekend' },
+    { kind: 'SET_LIST_ENTRY', itemId, listId: '00000000-0000-4000-8000-000000000077', present: true, positive: false },
+    { kind: 'ENDORSE_SHARED_ITEM', itemId, listId: null },
+    { kind: 'CLEAR_HISTORY', itemId },
+  ])('refreshes List membership only after a $kind receipt is acknowledged', async intent => {
+    const reply = deferred<ItemActionResult<CollectionActionReceipt>>();
+    fixture.send.mockReturnValue(reply.promise);
+    const initial = await ready();
+    const submitted = initial.submitCollectionAction(intent, 'LISTS');
+    const optimistic = render();
+    expect(optimistic.collectionRevision).toBe(initial.collectionRevision);
+    expect(optimistic.listMembershipRevision).toBe(initial.listMembershipRevision);
+    const command = fixture.send.mock.calls[0]![0] as CollectionActionCommand;
+    reply.resolve({ status: 'success', receipt: {
+      version: 1, actionId: command.actionId, profileId: fixture.profile,
+      kind: intent.kind, itemId: intent.itemId, listId: 'listId' in intent ? intent.listId : null,
+      result: true, eventIds: [command.actionId], changed: true, undoable: false,
+      interaction: intent.itemId ? getItemInteraction({}, intent.itemId) : null,
+      beforeInteraction: intent.itemId ? getItemInteraction({}, intent.itemId) : null,
+      predictionId: null, discoveryMode: null,
+    } });
+    await fixture.queues[0]!.waitForIdle(); await submitted;
+    const committed = render();
+    expect(committed.collectionRevision).toBe(initial.collectionRevision + 1);
+    expect(committed.listMembershipRevision).toBe(initial.listMembershipRevision + 1);
+    fixture.queues[0]!.retry(); await fixture.queues[0]!.waitForIdle();
+    expect(render().listMembershipRevision).toBe(committed.listMembershipRevision);
+    expect(fixture.send).toHaveBeenCalledOnce();
+  });
+
   it.each([0, 5, 10])('invalidates an earlier ranking when rating %s commits unchanged after optimistic refresh', async rating => {
     const reply = deferred<ItemActionResult>(); fixture.send.mockReturnValue(reply.promise);
     const initial = await ready();
@@ -131,6 +164,7 @@ describe('committed Discovery evidence refresh', () => {
     const committed = render();
     expect(getInteractionEvidenceKey(committed.interactions)).toBe(getInteractionEvidenceKey(optimistic.interactions));
     expect(committed.collectionRevision).toBe(initial.collectionRevision + 1);
+    expect(committed.listMembershipRevision).toBe(initial.listMembershipRevision);
     fixture.queues[0]!.retry(); await fixture.queues[0]!.waitForIdle();
     expect(render().collectionRevision).toBe(committed.collectionRevision);
     expect(fixture.send).toHaveBeenCalledOnce();
@@ -159,6 +193,25 @@ describe('committed Discovery evidence refresh', () => {
     const initial = await ready(); initial.setRating(itemId, 8);
     await fixture.queues[0]!.waitForIdle();
     expect(render().collectionRevision).toBe(initial.collectionRevision);
+    expect(render().listMembershipRevision).toBe(initial.listMembershipRevision);
+  });
+
+  it('returns only the exact durably discarded undo ID and keeps ordinary pending work out of failure state', async () => {
+    const reply = deferred<ItemActionResult>(); fixture.send.mockReturnValueOnce(reply.promise);
+    const initial = await ready();
+    expect(initial.discardRejectedAction()).toBeNull();
+    expect(initial.setRating(itemId, 8)).toBe(true);
+    expect(render()).toMatchObject({ atomicPendingCount: 1, persistenceFailure: null });
+    const rating = fixture.send.mock.calls[0]![0] as ItemActionCommand;
+    reply.resolve(receipt(rating)); await fixture.queues[0]!.waitForIdle();
+    fixture.send.mockResolvedValueOnce({ status: 'error', retryable: false, rejectedUndo: true, message: 'Conflicted undo' });
+    const undo = render().undo();
+    expect(undo).not.toBeNull(); await fixture.queues[0]!.waitForIdle();
+    const conflicted = render();
+    expect(conflicted).toMatchObject({ canDiscardUndo: true, persistenceFailure: 'Conflicted undo' });
+    expect(conflicted.discardRejectedAction()).toBe(undo!.actionId);
+    expect(conflicted.discardRejectedAction()).toBeNull();
+    expect([...fixture.rows.values()].flatMap(value => JSON.parse(value))).toEqual([]);
   });
 
   it('does not let a late old-Profile receipt invalidate the new Profile', async () => {
@@ -169,5 +222,35 @@ describe('committed Discovery evidence refresh', () => {
     const switched = render(); reply.resolve(receipt(command)); await fixture.queues[0]!.waitForIdle();
     expect(render().collectionRevision).toBe(switched.collectionRevision);
     expect(render().interactions[itemId]).toBeUndefined();
+  });
+});
+
+
+describe('never-dispatched feed rating cancellation', () => {
+  it('restores the preceding optimistic state without a server Event and keeps the next choice durable', async () => {
+    fixture.send.mockImplementation(async (command: ItemActionCommand) => receipt(command));
+    const initial = await ready();
+    const ratingId = '00000000-0000-4000-8000-000000000090';
+    expect(initial.reserveFeedAction!(ratingId)).toBe(true);
+    expect(initial.setRating(itemId, 9, ratingId)).toBe(true);
+    let current = render();
+    expect(current.interactions[itemId]?.rating).toBe(9);
+    expect(current.atomicPendingCount).toBe(1);
+    expect(fixture.send).not.toHaveBeenCalled();
+    expect(current.canCancelFeedAction!(ratingId)).toBe(true);
+    expect(current.cancelFeedAction!(ratingId)).toBe(true);
+    current = render();
+    expect(current.interactions[itemId]?.rating ?? null).toBeNull();
+    expect(current.atomicPendingCount).toBe(0);
+    expect(current.collectionRevision).toBe(initial.collectionRevision);
+    expect(fixture.send).not.toHaveBeenCalled();
+    expect(current.cancelFeedAction!(ratingId)).toBe(false);
+    const replacementId = '00000000-0000-4000-8000-000000000091';
+    expect(current.reserveFeedAction!(replacementId)).toBe(true);
+    expect(current.setRating(itemId, 5, replacementId)).toBe(true);
+    current = render(); current.releaseFeedAction!(replacementId);
+    await fixture.queues[0]!.waitForIdle();
+    expect(fixture.send).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ actionId: replacementId, kind: 'SET_RATING', rating: 5 }));
+    expect(render().canCancelFeedAction!(replacementId)).toBe(false);
   });
 });

@@ -5,11 +5,9 @@ import {
   AppState,
   Easing,
   PanResponder,
-  Pressable,
   StyleSheet,
   View,
   type AccessibilityActionEvent,
-  type GestureResponderEvent,
   type LayoutChangeEvent,
   type PanResponderGestureState,
   type PanResponderCallbacks,
@@ -19,7 +17,6 @@ import type { RoomTheme } from '../../theme/roomTheme';
 import {
   MAX_ITEM_RATING,
   clampRating,
-  getRatingForTrackPosition,
   getRatingPosition,
 } from './ratingState';
 
@@ -39,24 +36,14 @@ function horizontalIntent(dx: number, dy: number) {
 
 function createRatingDrag() {
   let active = false; let start = 0.5;
-  let trackTap = true; let touchStart: { x: number; y: number } | null = null;
   return {
-    begin(enabled: boolean) { active = enabled; },
-    setStart(value: number) { start = Math.min(1, Math.max(0, value)); },
+    begin(enabled: boolean, value: number) { active = enabled; start = value; },
     position(delta: number, travel: number) { return Math.min(1, Math.max(0, start + delta / travel)); },
     isActive() { return active; },
     move(dx: number, dy: number, touches: number) {
-      if (touches !== 1 || (Math.abs(dy) >= DRAG_THRESHOLD && !horizontalIntent(dx, dy))) active = false;
+      if (touches !== 1 || (Math.hypot(dx, dy) >= DRAG_THRESHOLD && Math.abs(dx) <= Math.abs(dy) * 1.5)) active = false;
       return active;
     },
-    beginTouch(x: number, y: number, touches: number) {
-      touchStart = { x, y }; trackTap = touches === 1;
-    },
-    moveTouch(x: number, y: number, touches: number) {
-      if (touches !== 1 || (touchStart && Math.hypot(x - touchStart.x, y - touchStart.y) >= DRAG_THRESHOLD)) trackTap = false;
-    },
-    cancelTap() { trackTap = false; },
-    takeTap() { const allowed = trackTap; trackTap = true; touchStart = null; return allowed; },
     finish() { const completed = active; active = false; return completed; },
     cancel() { active = false; },
   };
@@ -153,19 +140,13 @@ export function RatingControl({
     const completed = drag.finish();
     // Release normally has zero active touches. Any earlier second finger or
     // vertical turn has already cancelled the drag and cannot be undone here.
+    const isTap = Math.hypot(gesture.dx, gesture.dy) < DRAG_THRESHOLD;
     if (!completed || maxTravel <= 0 || gesture.numberActiveTouches > 1 ||
-      !horizontalIntent(gesture.dx, gesture.dy)) {
+      (!isTap && !horizontalIntent(gesture.dx, gesture.dy))) {
       animateTo(getRatingPosition(rating), 180);
       return;
     }
     selectRating(drag.position(gesture.dx, maxTravel) * MAX_ITEM_RATING);
-  }
-
-  function handleTrackPress(event: GestureResponderEvent) {
-    if (!drag.takeTap()) return;
-    selectRating(
-      getRatingForTrackPosition(event.nativeEvent.locationX, trackWidth),
-    );
   }
 
   function handleAccessibilityAction(event: AccessibilityActionEvent) {
@@ -177,16 +158,22 @@ export function RatingControl({
   }
 
   const gestureCallbacks = {
-    onStartShouldSetPanResponder: () => false,
+    // One owner for the whole track avoids Pressable/handle responder races.
+    // A tap is intentional even on the current handle; no value is submitted
+    // until release, and vertical feed gestures may take over and cancel it.
+    onStartShouldSetPanResponder: (_, gestureState) =>
+      !disabled && AppState.currentState === 'active' && maxTravel > 0 && gestureState.numberActiveTouches === 1,
     onMoveShouldSetPanResponder: (_, gestureState) =>
-      !disabled && AppState.currentState === 'active' && gestureState.numberActiveTouches === 1 &&
+      !disabled && AppState.currentState === 'active' && maxTravel > 0 && gestureState.numberActiveTouches === 1 &&
       horizontalIntent(gestureState.dx, gestureState.dy),
-    onPanResponderGrant: (_, gestureState) => {
-      drag.cancelTap();
-      drag.begin(!disabled && AppState.currentState === 'active' && gestureState.numberActiveTouches === 1);
-      position.stopAnimation((value) => {
-        drag.setStart(value);
-      });
+    onPanResponderGrant: (event, gestureState) => {
+      const location = event.nativeEvent.locationX;
+      drag.begin(!disabled && AppState.currentState === 'active' && maxTravel > 0 &&
+        gestureState.numberActiveTouches === 1 && Number.isFinite(location),
+      (location - TRACK_PADDING - HANDLE_WIDTH / 2) / maxTravel);
+      if (!drag.isActive()) return;
+      position.stopAnimation();
+      position.setValue(drag.position(0, maxTravel));
     },
     onPanResponderMove: (_, gestureState) => {
       if (!drag.isActive() || disabled || maxTravel <= 0) return;
@@ -259,26 +246,18 @@ export function RatingControl({
           })}
         </Animated.View>
       </View>
-      <Pressable
-        disabled={disabled}
+      <View
+        {...panResponder.panHandlers}
         onLayout={(event: LayoutChangeEvent) => {
+          if (event.nativeEvent.layout.width === trackWidth) return;
           drag.cancel();
           position.setValue(getRatingPosition(rating));
           setTrackWidth(event.nativeEvent.layout.width);
         }}
         hitSlop={12}
-        onStartShouldSetResponderCapture={event => {
-          const touch = event.nativeEvent;
-          drag.beginTouch(touch.pageX, touch.pageY, touch.touches.length);
-          return false;
-        }}
-        onTouchMove={event => {
-          const touch = event.nativeEvent;
-          drag.moveTouch(touch.pageX, touch.pageY, touch.touches.length);
-        }}
-        onTouchCancel={() => drag.cancelTap()}
-        onPress={handleTrackPress}
+        accessible
         accessibilityRole="adjustable"
+        accessibilityState={{ disabled }}
         accessibilityLabel="Arvosana"
         accessibilityHint="Napauta asteikkoa tai säädä vetämällä nollan ja kymmenen välillä"
         accessibilityValue={{
@@ -299,8 +278,7 @@ export function RatingControl({
         ]}
       >
         <Animated.View
-          {...panResponder.panHandlers}
-          onTouchStart={() => drag.cancelTap()}
+          pointerEvents="none"
           style={[
             styles.handle,
             {
@@ -316,7 +294,7 @@ export function RatingControl({
             ]}
           />
         </Animated.View>
-      </Pressable>
+      </View>
     </View>
   );
 }

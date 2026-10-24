@@ -7,18 +7,19 @@ import { DescriptionCredit, type DescriptionLinkOpener } from './DescriptionCred
 
 // Shared with the isolated native acceptance app: the same visibility boundary,
 // collapse controls, typography and credit renderer used in real Item details.
-export function ItemDescription({ item, expanded, onExpandedChange, theme, openLink }: {
+export function ItemDescription({ item, expanded, onExpandedChange, theme, openLink, compact = false }: {
   item: Item;
   expanded: boolean;
   onExpandedChange: Dispatch<SetStateAction<boolean>>;
   theme: RoomTheme;
   openLink?: DescriptionLinkOpener;
+  compact?: boolean;
 }) {
   const description = visibleItemDescription(item);
   if (!description.description) return null;
 
   return (
-    <View style={styles.block}>
+    <View style={[styles.block, compact && styles.compactBlock]}>
       <Pressable accessibilityRole="button"
         accessibilityLabel={expanded ? 'Tiivistä kuvaus' : 'Laajenna kuvaus'}
         accessibilityState={{ expanded }}
@@ -47,7 +48,8 @@ export function ItemDescription({ item, expanded, onExpandedChange, theme, openL
 
 const styles = StyleSheet.create({
   block: { marginTop: 10 },
-  description: { fontSize: 13, lineHeight: 18 },
+  compactBlock: { marginTop: 2 },
+  description: { fontSize: 13, lineHeight: 18, textAlign: 'left' },
   collapse: { alignSelf: 'flex-start', minHeight: 32, justifyContent: 'center', marginTop: 2 },
   collapseText: { fontSize: 12, fontWeight: '700' },
   pressed: { opacity: 0.7 },

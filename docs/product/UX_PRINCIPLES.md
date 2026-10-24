@@ -116,6 +116,20 @@ retains the other broad browse refinements; the issues below own implementation.
   filtered subset of the current recommendation slate is not that history.
   Membership, saved ratings, empty/loading/error behavior and authorization must
   agree regardless of entry. BOOK and MOVIE use the same generic route contract.
+- **Discovery page swipe — owner refinement, 2026-10-24:** Löydä and canonical
+  Katsotut/Luetut form two adjacent pages below the compact shared header. A
+  deliberate left drag reveals history with the finger; right returns to Löydä.
+  Header buttons select those same pages, and Android Back from embedded history
+  returns to Löydä. The standalone Lists history route retains its own back path.
+  Preserve each page's scroll on Item open/return. Only the settled selected page
+  accepts actions or records exposure; adjacent previews are inert and hidden
+  from accessibility. Vertical grid scrolling/append and the separate vertical
+  detail reel/rating gestures keep their existing behavior. Cancel ambiguous,
+  reversed, multitouch, obsolete-scope and backgrounded gestures without a page
+  action. Bound the two edges and respect reduced motion. Profile/actor/session,
+  ItemType or DiscoveryMode replacement cancels motion and selects fresh Löydä;
+  merely returning from an Item preserves the selected page. Read history lazily
+  for its first reveal, retain its snapshot and defer hidden dirty reloads.
 - **Compact header (#199/#200):** align the active ItemType title (Elokuvat),
   Löydä and Katsotut on one row at ordinary phone text sizes. The title is an
   accessible dropdown for Kirjat and other supported ItemTypes; future domains
@@ -318,32 +332,132 @@ second Done confirmation, and creating a List alone does not save the Item.
 A deliberate slider release, track tap or accessible adjustment commits the
 selected integer rating immediately. Remove **Tallenna arvio ja jatka**. Merely
 opening the card or cancelling a drag never saves the initial value; zero and
-neutral five remain real ratings. The acknowledged rating/List choice stays
-visible until the next deliberate forward gesture. That advance must not also
-create Ohita. Pending writes block competing actions and keep exact retry identity. A vertical
+neutral five remain real ratings. A tap anywhere on the track or a deliberate
+horizontal drag accepts the chosen rating once into durable local storage, then
+automatically advances to the prepared successor. Discovery forward skip follows
+the same durable-admission boundary; ordinary network acknowledgement does not
+block the next card. A failed local write cannot advance. A List choice retains
+its confirmed positive state until the next forward gesture; List/server-undo
+admission waits for pending commands to settle. The local cancellation exception
+below does not wait for an unrelated server receipt. Neither positive advance creates Ohita.
+Commands retain exact action and delivery identities, and later receipts cannot
+change whichever card is now active. A vertical
 or diagonal drag over the rating handle and multitouch movement must not commit
 a rating; only deliberate horizontal slider intent does.
 
 The card fills the usable area between compact top and bottom navigation bars.
 Do not reserve empty feedback/help rows, duplicate safe-area padding or a large
-header/footer panel. Keep the List star and rating slider reachable above the
-bottom dock. Long descriptions have a separate scroll surface, so reading them
-does not dismiss the Item; retain metadata, artwork fallback and source credits.
-Large text may require internal content scrolling rather than hiding controls.
+header/footer panel. Center artwork with the accepted symmetric side margins;
+align the card's title, metadata and description to the left within that column.
+Center the bottom rating slider with small side margins; place the List star
+beside the title at the title's visual size while retaining an accessible touch
+target and independent focus. Leave a small gap between the rating controls and
+bottom dock without adding a reserved feedback band. The October 23 refinement makes the whole card
+follow a vertical drag started over artwork, metadata or description, including
+expanded text. Long descriptions extend the card rather than creating a separate
+nested scroll surface. The October 24 rating-stop refinement makes any upward
+gesture that starts above a long card's readable bottom reading-only: even a fast
+flick or overshooting drag stops at the rating controls and cannot dismiss the
+Item. A new deliberate upward gesture starting at that bottom may advance.
+Compact cards retain their direct upward flick. Retain metadata, artwork fallback, source credits
+and usable controls with large text. Horizontal slider input and ordinary control
+taps keep their own meaning; metadata and title actions remain independently
+accessible.
 
-Forward/upward card scrolling advances one Item at a time; without a confirmed
-positive choice it submits contextual Ohita. Backward/downward scrolling restores
+**October 24 immediate one-step cancellation:** persist each feed skip/rating
+before advancing, but keep the newest such choice from server dispatch until the
+next choice is durably accepted. A → B holds A; B → C releases A and holds B.
+Reverse C → B may atomically cancel B only while the sender can prove it was
+never dispatched, restoring its still-valid exact delivery in the same mounted
+scope immediately and retaining eligible prepared successors. This is withdrawal
+of unsent local intent, not a successful server undo or new learning evidence.
+The one-step gate still applies. A sent, ambiguous, expired or otherwise invalid
+source uses the existing ordered server reversal and fresh-delivery path below.
+Failed cancellation preserves the queued command and recovery. Holds are
+runtime-only: a 30-second idle deadline, exit, navigation blur, background and
+scope change release them; restart drains the
+original durable commands without reconstructing a hold. No selected choice is
+lost merely because there is no later card. This supersedes the earlier universal
+queue-empty/clear-window rule only for proven never-dispatched local cancellation.
+
+Forward/upward card scrolling advances one Item at a time; without an already
+accepted positive action it submits contextual Ohita. Backward/downward scrolling restores
 the preceding card and reverses its exact eligible action through the existing
-canonical undo/withdrawal boundary. Restore only after acknowledgement; unavailable
+canonical undo/withdrawal boundary. After the first exact undo/withdrawal command
+is durably admitted, show the cached prior Item immediately as a separate inert
+`restoringPresentation`. It has no actionable origin: mutation controls, impression
+and dwell remain blocked until every ordered acknowledgement and a fresh same-Item
+delivery arrive. Preserve the visual identity through activation, without another
+card flash. The October 23 post-#711 refinement permits only one backward step
+between accepted forward choices. The first durable reversal admission consumes
+that opportunity; a failed first local admission does not. Retrying the remaining
+commands of that same partial reversal is recovery, not a second backward step.
+After restoration, forward browsing remains available; only a new accepted
+forward skip/rating or positive-card advance enables Undo again. Background
+acknowledgements, refills and rerenders do not re-enable it. Retain bounded exact
+history without allowing repeated backward traversal. First try a fresh five-Item
+root after every ordered reversal receipt. If that successful current-epoch page
+does not contain the exact prior Item, replace its known reader with the original
+bounded search of at most three 50-Item pages. This small first probe does not
+shrink that fallback search, continue a five-Item cursor as a 50-Item request,
+reuse an old delivery or supply siblings when the target is absent. Ambiguous
+requests retain their exact retry identity before replacement. Once the exact prior Item
+is found in a successful fresh restoration page after all reversal receipts,
+prepare up to five eligible siblings from that same page in server order, with
+their fresh page origins and normal target/handled/duplicate exclusions. These
+are new deliveries, not the invalidated pre-Undo buffer. They remain inert until
+activation. Do not empty this fresh window and require another network roundtrip
+before forward browsing. The next new refill uses a five-Item root replacing the
+restoration reader; never continue a 50-Item page size for ordinary refills.
+Missing-target, stale and error replies supply no prepared siblings.
+Failed local admission
+leaves the current card; unavailable
 or conflicted undo must explain the limitation instead of silently changing a
 different Item. Keep bounded session history explicit; feed continuity does not
-mean infinite history or recycling an exhausted catalogue. Retain the outgoing card as an inert presentation while the acknowledged next
-delivery loads; errors retry the exact request without another choice. Avoid
+mean infinite history or recycling an exhausted catalogue. Discovery prepares the
+active card plus up to five successors, warming five initially and refilling
+free slots after every consumption. One free slot admits one replacement even
+though the ordinary refill chain's immutable wire page size stays five; no extra
+staging window is kept.
+The next card becomes visible during the upward drag, but
+its preview is inert and creates no impression or action capability. Activate it
+after successful durable local admission of the outgoing skip/rating, with its
+server acknowledgement handled in the background. Normal acknowledgements retain
+the prepared window: rating/List receipts mark future read work dirty, while
+an already started refill or exact retry may finish and fill only free slots.
+Renew the root from the latest committed prefix before the next new refill;
+coalesce repeated acknowledgements rather than repeatedly interrupt loading.
+Neutral skip keeps its reader because it adds no learning evidence. Undo, scope/source invalidation
+and rejected-command discard still clear the window. The prediction contract
+owns this explicit bounded freshness tradeoff. Retain the outgoing card as an
+inert presentation only when no prepared successor is available; exact retries
+must not produce another choice. Normal save, impression-wait and refill progress
+are quiet: do not flash saving/wait/retry banners or briefly remount the rated
+card. Real persistence/rejection/conflict errors retain stable, accessible recovery
+until resolved; never hide or discard them to make the feed seem smooth. Avoid
 snap-back/blank transitions, animate entry in the navigation direction and settle
 cancelled drags, respecting reduced motion. Ordinary data updates must not cancel
-a valid in-progress gesture. No separate visible
+a valid in-progress gesture. A new native drag may immediately interrupt entry
+or snap-back animation and follow the thumb; waiting for an animation callback
+must not lock the next card. An accepted outgoing card still cannot commit twice.
+No separate visible
 Ohita or Kumoa button is needed in this feed. Screen-reader/accessibility actions
 provide equivalent advance, reverse and help without permanent control rows.
+A deliberate dismissal requires one-finger vertical intent: at least 96 points
+of dismissal travel, or at least 24 points with matching vertical release speed
+of 0.6 points/ms and vertical dominance over horizontal motion. A short fast
+upward flick may advance a compact card or a long card only when the gesture
+starts at its readable bottom; the gesture that reaches that bottom never also
+submits Ohita. A fast downward flick reverses
+only when it begins at the readable top; inside long content, downward motion
+reads back toward the top and only 96 points of deliberate excess beyond that
+edge can undo. Small slow movement, reversal,
+multitouch, responder termination, layout changes and backgrounding do not commit.
+Native responder capture must preserve the accumulated drag offset rather than
+jumping when its gesture coordinates reset on grant. These thresholds and
+whole-card behavior require the superseding device matrix.
+Reduced motion suppresses automatic entry and spring interpolation while
+preserving direct user-controlled reading offsets so long text remains readable.
 Collection/legacy detail and retained Taste/challenge protocols preserve their
 existing evidence contracts until an explicit compatible successor is delivered.
 
@@ -357,7 +471,10 @@ existing grid as the default Discovery presentation. This is a required near-ter
 successor, tracked by `MVP-UX-007` and ROADMAP, not delivered APK behavior.
 
 The deliberate upward gesture that completes moving the active card out of the
-feed means **Ohita** when no acknowledged positive choice has already been made.
+feed means **Ohita** when no positive action has already been accepted for that
+card. In Discovery, a durably admitted rating cannot also produce a skip even
+before its server reply; confirmed List choices likewise advance without Ohita.
+Taste retains its pending-command gate and acknowledged-answer → fresh NEXT flow.
 Equivalent accessibility actions support people who cannot swipe without a
 permanent visible Ohita row. Show short overlay guidance on first use for each
 account, including Taste; dismiss it after acknowledgement or the first successful
@@ -378,7 +495,7 @@ does not merge those historical evidence types. The
 owns event, retry, expiry and resurfacing meanings.
 
 Only a completed intentional card dismissal commits the skip. Partial scrolls,
-scrolling a long description, reflow, loading, rotating the screen, opening a
+slow reading within a long card, reflow, loading, rotating the screen, opening a
 menu, navigating Back, leaving the app and changing Profile/domain do not imply
 a response. Pending commands retain their exact actor/Profile/Item origin through
 restart/retry; they cannot be duplicated or retargeted. Gesture thresholds,
@@ -386,10 +503,15 @@ cancel/recovery, large text, reduced motion and the accessible action require
 representative device acceptance.
 
 Ratings and acknowledged positive choices must refresh the supported serving
-prefix before the next fresh Taste/Discovery card is selected. Retire stale
-prefetch through the canonical server boundary while retaining old delivered
-origins and retry identity; do not shuffle locally or jump the card under the
-user's finger. Grid order follows the same committed-state freshness rules when
+prefix before the next Taste question or newly requested Discovery refill.
+Discovery retains at most five already prepared successors with their frozen
+origins across ordinary acknowledgements, so the next visible card may predate
+the latest rating. Rating/List acknowledgements schedule a renewed root before
+the next new refill without interrupting the already started bounded refill or
+its exact retry; neutral skip retains its reader. Hard invalidation still rejects
+late responses. Do not shuffle
+the retained window or jump the card under the user's finger. Grid order follows
+the same committed-state freshness rules when
 a fresh ranking is requested. The
 [next-card prediction contract](../domain/PREDICTION_MODEL.md#82-next-card-satisfaction-and-prefix-freshness--required-target)
 owns this timing. Repeated opening films across fresh Profiles is a diagnostic
@@ -424,16 +546,23 @@ the bounded star-picker/direct-rating/compact-feed work into the active packet.
 ### October 22 implementation boundary — acceptance open
 
 Discovery's active source preserves exact history action IDs for the mounted
-scope, subject to the existing ten-native-action undo limit. After each required
-undo receipt, it requests fresh canonical pages for the same prior Item (50 per
-page, at most three pages). A consumed/expired original delivery is never reused.
+scope, subject to the existing ten-native-action undo limit and the post-#711
+one-backward-step gate above. The post-#710
+refinement may show the cached prior Item after the first durable undo admission,
+but that originless presentation remains inert. After all required
+undo receipts, it first requests a fresh five-Item root for the same prior Item,
+with a successful missing-target probe falling back to at most three fresh
+50-Item pages under the reader-replacement policy above. A consumed/expired
+original delivery is never reused.
 An unavailable target has retry/cancel recovery; cancellation starts a fresh feed
 instead of silently showing a substitute as the requested previous card. Shared
 consensus that cannot be undone is detected before reversing related actions.
 
-Sequential Taste now shares the compact viewport, direct slider commitment and
-account-scoped help. Its existing acknowledged-answer controller still advances
-automatically; numeric backward-question undo is not implemented. That gap remains
+Sequential Taste shares the compact viewport, direct slider commitment and
+account-scoped help. Its acknowledged-answer controller advances automatically;
+Discovery's preparation of the active card and five successors does not precompute
+future adaptive Taste
+questions. Numeric backward-question undo is not implemented. That gap remains
 open before claiming full Taste/Discovery interaction parity. V1/challenge save
 controls and frozen first-answer measurement retain their established contracts.
 STATUS owns source/CI/hosted and device facts; these boundaries are not device

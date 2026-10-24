@@ -28,8 +28,8 @@ function text(node: ReactNode): string {
   return React.Children.toArray(node).map(child => React.isValidElement<Props>(child)
     ? text(child.props.children) : String(child)).join(' ');
 }
-function render(itemType: ItemType = 'MOVIE') {
-  return DiscoveryCollectionHeader({ itemType, title: itemType === 'MOVIE' ? 'Elokuvat' : 'Kirjat', theme: getRoomTheme('DAWN') });
+function render(itemType: ItemType = 'MOVIE', extra: Partial<React.ComponentProps<typeof DiscoveryCollectionHeader>> = {}) {
+  return DiscoveryCollectionHeader({ itemType, title: itemType === 'MOVIE' ? 'Elokuvat' : 'Kirjat', theme: getRoomTheme('DAWN'), ...extra });
 }
 function button(tree: ReactNode, label: string) {
   return elements(tree).find(node => node.props.accessibilityLabel?.startsWith(label))!.props;
@@ -78,5 +78,18 @@ describe('compact Discovery category and collection navigation', () => {
     button(render('MOVIE'), 'Vaihda sisältölajia.').onPress!();
     expect(button(render('BOOK'), 'Vaihda sisältölajia.').accessibilityState).toEqual({ expanded: false });
     expect(elements(render('BOOK')).some(node => node.props.accessibilityLabel?.startsWith('Valitse'))).toBe(false);
+  });
+
+  it.each(['MOVIE', 'BOOK'] as const)('selects the same local page pair with accessible selected state for %s', itemType => {
+    const onSelect = vi.fn();
+    const historyLabel = itemType === 'MOVIE' ? 'Katsotut' : 'Luetut';
+    button(render(itemType, { onSelect }), `Avaa ${historyLabel.toLowerCase()}`).onPress!();
+    expect(onSelect).toHaveBeenLastCalledWith('history');
+    const history = render(itemType, { selected: 'history', onSelect });
+    expect(button(history, `${historyLabel}.`).accessibilityState).toEqual({ selected: true });
+    expect(button(history, 'Avaa Löydä').accessibilityState).toEqual({ selected: false });
+    button(history, 'Avaa Löydä').onPress!();
+    expect(onSelect).toHaveBeenLastCalledWith('discovery');
+    expect(router.push).not.toHaveBeenCalled(); expect(router.replace).not.toHaveBeenCalled();
   });
 });

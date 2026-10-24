@@ -15,6 +15,7 @@ vi.mock('react-native', () => ({
 }));
 
 type Props = { children?: ReactNode; onPress?: () => void; numberOfLines?: number;
+  style?: unknown;
   accessibilityState?: { expanded: boolean }; attribution?: unknown; openLink?: unknown };
 function elements(node: ReactNode): ReactElement<Props>[] {
   return React.Children.toArray(node).flatMap(child => React.isValidElement<Props>(child)
@@ -36,6 +37,7 @@ describe('the shared native Item description', () => {
       const nodes = elements(ItemDescription({ item, expanded, onExpandedChange, theme }));
       const paragraph = nodes.find(node => node.props.children === fixture.description)!;
       expect(paragraph.props.numberOfLines).toBe(expanded ? undefined : 2);
+      expect(paragraph.props.style).toContainEqual(expect.objectContaining({ textAlign: 'left' }));
       const credit = nodes.find(node => node.type === DescriptionCredit)!;
       expect(credit.props.attribution).toEqual(fixture.attribution);
       const toggle = nodes.find(node => node.props.accessibilityState)!;
@@ -49,6 +51,16 @@ describe('the shared native Item description', () => {
         expect(onExpandedChange).toHaveBeenLastCalledWith(false);
       }
     }
+  });
+
+  it('keeps compact feed descriptions and their collapse control left aligned', () => {
+    const tree = ItemDescription({ item, expanded: true, onExpandedChange: vi.fn(), theme, compact: true })!;
+    expect(tree.props.style).toContainEqual({ marginTop: 2 });
+    const nodes = elements(tree);
+    const collapse = nodes.filter(node => node.props.onPress).at(-1)!;
+    expect((collapse.props.style as (state: { pressed: boolean }) => unknown[])({ pressed: false }))
+      .toContainEqual(expect.objectContaining({ alignSelf: 'flex-start' }));
+    expect(nodes.find(node => node.type === DescriptionCredit)!.props.attribution).toEqual(fixture.attribution);
   });
 
   it('revalidates cached managed text and hides the entire invalid description block', () => {
