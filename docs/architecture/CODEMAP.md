@@ -26,6 +26,27 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Taste and Discovery card geometry — #336 / October 25
+
+`apps/mobile/src/features/discovery/FeedScreenFrame.tsx` owns the shared safe
+frame, compact header/dock, measured card viewport and rating side margins.
+`DiscoveryBackdrop.tsx` shares the Room blur/wash layers without Discovery action
+controllers. `DiscoveryModeShell.tsx` keeps its navigation/Profile controllers
+while using those components; `ItemDetailScreen.tsx` uses the viewport and rating
+wrapper for active and preview cards. `PersonalTasteScreen.tsx` uses the same
+boundaries outside Discovery controllers, including Android system insets. Its
+existing options action occupies the same title slot, and continuation stays in
+the dock outside the card viewport. Both retain `RatingControl.tsx`; Taste selects
+its own help copy and preserves exact sequential commands.
+`FeedItemCard.tsx` measures the non-artwork body as well as description height,
+keeping rating reachable on short viewports and with larger text without a nested
+scroll surface. `RollingFeedCard.tsx` retains that height in outgoing/previous
+visuals, preserving geometry through transitions.
+This replaces the standalone core SafeAreaView/oversized Taste viewport reported
+on APK #721. STATUS/PR own local validation and the pending corrected build;
+DEVICE_TEST owns phone acceptance. Current accounts and responses must not be
+reset for this presentation fix.
+
 ## Discovery latency successor — #239 / October 24
 
 - `features/discovery/discoveryReturnHandoff.ts` transfers at most five prepared,

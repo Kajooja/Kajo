@@ -1,5 +1,37 @@
 # Collection device checkpoint — #228 / #229
 
+## APK #721 Taste layout blocker — 2026-10-25
+
+During the fresh Taste test, the owner reports wrong margins, an oversized image
+and inability to reach the rating controls as in normal browsing. The explicit
+requirement is the same appearance as BOOK/MOVIE Discovery card mode. This is a
+failed Taste layout observation, not a new pass of the V4/adaptation checks below.
+The earlier six accepted Discovery cases retain their scope.
+
+Correct the shared viewport/card geometry and provide a new matching APK before
+asking the owner to continue this test. A server-only change cannot update the
+installed layout. The completed V4 rollout and October 24 two-account reset remain
+valid; preserve any accounts and answers created since then, and do not repeat
+either operation for this presentation fix.
+
+Required focused checks on the corrected build:
+
+- Compare Taste BOOK/MOVIE artwork size, side margins, text alignment and rating
+  position with normal Discovery card mode on the same device.
+- Reach and use rating controls with ordinary and expanded descriptions, small
+  available heights and larger text. Reading down to rating must not skip a card.
+- Rate or deliberately skip once, then verify the exact sequential continuation;
+  reopening or an interrupted response retains the current question/command.
+
+The source correction now shares `FeedScreenFrame` / `DiscoveryBackdrop` and
+measures non-artwork card content to keep rating reachable, including retained
+previews. Local mobile validation passes all 80 files / 904 tests, types and lint.
+All 24 Taste/reference native Yoga geometry fixtures match and keep controls
+reachable, using approximate text measurements; these are not phone observations.
+The broad root-check/export sequence was interrupted by tool quota. PR #357 owns
+final-source CI and the new matching APK receipts. Record the still-open focused
+phone results here; local geometry or CI alone does not close this blocker.
+
 ## APK #721 owner observations and next test boundary — 2026-10-24
 
 After receiving the GitHub link and six checks for the configured main APK #721,
@@ -27,9 +59,10 @@ The owner's requested reset of the exact two test-account roots is complete on
 checked test-state tables are empty; catalogue/source/model structure hashes,
 migration history and the installed V4 default are preserved. STATUS owns the
 aggregate receipt; exact private account/checkpoint details stay outside Git.
-Register the same two email addresses again using owner-chosen passwords to create
-fresh identities before the next Taste/adaptation test. Old login sessions and
-adaptation history are gone. The reset does not require repeating the six accepted
+At that checkpoint, the initial retest required registering the same email
+addresses with owner-chosen passwords and fresh identities. Preserve accounts
+and answers created since then; no additional reset or registration is required
+for the October 25 layout correction. The reset does not require repeating the six accepted
 unchanged cases and does not establish new device or quality acceptance.
 
 ## Earlier APK #716 owner observation — 2026-10-24
@@ -52,14 +85,16 @@ not validate an unbuilt successor.
 ## Versioned Taste pool successor — planned device checks / #336
 
 The accepted V4 native forward is installed and its metadata/security and
-retained-row preservation verified; #721 is the matching APK. The scoped reset
-above is complete. Start these checks only after fresh registration of the two
-test accounts; no old account session should resume. The reset is not a migration
-replay or a change to retained-policy semantics. Its fresh state enables the next
-test; it does not itself demonstrate adaptation or recommendation quality.
+retained-row preservation verified. #721 contains that protocol, but its Taste
+layout failed the October 25 check above; use the corrected matching APK before
+continuing. The scoped October 24 reset is complete. Its initial retest required
+fresh registration; preserve those new accounts and any subsequent answers. The
+reset was not a migration replay or a retained-policy change and did not itself
+demonstrate adaptation or recommendation quality.
 
-The next owner check is deliberately small: create the new accounts, start a fresh
-Taste test, rate/skip and receive the next card, recover one interrupted response,
+After the layout blocker is corrected, the owner check remains small: continue
+the new-account Taste test, rate/skip and receive the next card, recover one
+interrupted response,
 resume the same unfinished question after reopening, then continue rating in
 Discovery and report observed recommendation direction and return time. Different
 ratings need not change every immediately following title. The detailed guards

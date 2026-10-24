@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { KajoMark } from '../branding/KajoBrand';
 import type { Item } from '../../domain/contracts';
 import { FeedItemCard } from '../discovery/FeedItemCard';
+import { DiscoveryBackdrop } from '../discovery/DiscoveryBackdrop';
+import { FeedRatingFrame, FeedScreenDock, FeedScreenFrame, FeedScreenHeader, FeedScreenViewport } from '../discovery/FeedScreenFrame';
 import { RatingControl } from '../discovery/RatingControl';
 import type { getRoomTheme } from '../../theme/roomTheme';
 import type { PersonalTasteSnapshot } from './personalTasteFlow';
@@ -41,29 +44,26 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
   if (sequential && current && !intro) {
     const title = `Makutesti. Tallennettuja vastauksia: ${sequential.answered}. Ennuste on vielä alustava.`;
     const feedDisabled = disabled || optionsOpen || confirmRemoval || Boolean(state.message);
-    return <SafeAreaView style={styles.safeArea}>
-      <View style={styles.feedHeader}>
+    return <FeedScreenFrame theme={theme}>
+      <FeedScreenHeader theme={theme}>
         <Text accessibilityRole="header" accessibilityLabel={title} style={styles.feedTitle}>Makutesti</Text>
-        <Pressable accessibilityRole="button" disabled={disabled} onPress={onContinue}
-          style={[styles.feedHeaderButton, disabled && styles.disabled]}>
-          <Text style={styles.buttonText}>Jatka selaamaan</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel="Makutestin valinnat"
-          accessibilityState={{ expanded: optionsOpen }} onPress={() => setOptionsOpen(value => !value)}
-          style={styles.feedOptionsButton}><Text style={styles.feedOptionsGlyph}>⋯</Text></Pressable>
-      </View>
-      <View testID="taste-feed-viewport" style={styles.feedViewport}
+      </FeedScreenHeader>
+      <FeedScreenViewport testID="taste-feed-viewport"
         onLayout={event => setViewportHeight(event.nativeEvent.layout.height)}>
+        <DiscoveryBackdrop theme={theme} cardWash />
         <FeedItemCard key={`${sequential.sessionId}:${sequential.questionId}:${sequential.revision}`}
           item={presentationItem?.id === current.id ? presentationItem : current} theme={theme} disabled={feedDisabled}
           {...(helpScope ? { helpScope } : {})} {...(viewportHeight > 0 ? { viewportHeight } : {})}
-          hasInteracted={sequential.answered > 0}
+          hasInteracted={sequential.answered > 0} helpKind="taste"
+          titleAction={<Pressable accessibilityRole="button" accessibilityLabel="Makutestin valinnat"
+            accessibilityState={{ expanded: optionsOpen }} onPress={() => setOptionsOpen(value => !value)}
+            style={styles.feedOptionsButton}><Text style={styles.feedOptionsGlyph}>⋯</Text></Pressable>}
           {...(sequential.contextualSkip && onSkip ? { onSkip: () => !feedDisabled && onSkip() } : {})}>
-          <RatingControl disabled={feedDisabled} rating={draftRating} theme={theme} onRatingChange={rating => {
+          <FeedRatingFrame><RatingControl disabled={feedDisabled} rating={draftRating} theme={theme} onRatingChange={rating => {
             if (feedDisabled) return;
             onDraftChange(rating);
             onAnswer({ kind: 'RATING', value: rating });
-          }} />
+          }} /></FeedRatingFrame>
           {!sequential.contextualSkip ? <Text style={styles.help}>Ohitus ei ole juuri nyt käytettävissä. Voit jatkaa selaamaan.</Text> : null}
         </FeedItemCard>
         {state.busy && !state.message ? <View pointerEvents="none" style={styles.feedBusy}>
@@ -85,8 +85,15 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
             {button('Sulje valinnat', () => setOptionsOpen(false), false, false)}
           </>}
         </View> : null}
-      </View>
-    </SafeAreaView>;
+      </FeedScreenViewport>
+      <FeedScreenDock theme={theme}>
+        <Text style={styles.progress}>Vastauksia: {sequential.answered}</Text>
+        <Pressable accessibilityRole="button" disabled={disabled} onPress={onContinue}
+          style={[styles.feedHeaderButton, disabled && styles.disabled]}>
+          <Text style={styles.buttonText}>Jatka selaamaan</Text>
+        </Pressable>
+      </FeedScreenDock>
+    </FeedScreenFrame>;
   }
   return <SafeAreaView style={styles.safeArea}>
     <ScrollView key={sequential ? `${sequential.sessionId}:${sequential.questionId}:${sequential.revision}` : 'legacy'} contentContainerStyle={styles.content}>
@@ -171,12 +178,10 @@ export function PersonalTasteScreen({ state, theme, begun, draftRating, confirmR
 function createStyles(theme: ReturnType<typeof getRoomTheme>) {
   return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: theme.base.appBackground },
-    feedHeader: { minHeight: 44, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8 },
     feedTitle: { flex: 1, color: theme.base.textPrimary, fontSize: 14, fontWeight: '700' },
     feedHeaderButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
     feedOptionsButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
     feedOptionsGlyph: { color: theme.base.textPrimary, fontSize: 26, fontWeight: '700' },
-    feedViewport: { flex: 1, minHeight: 0, overflow: 'hidden' },
     feedBusy: { position: 'absolute', top: 8, right: 12 },
     feedOverlay: { position: 'absolute', top: 8, left: 12, right: 12, borderRadius: 14,
       padding: 16, gap: 12, backgroundColor: theme.surface.panel, borderWidth: 1, borderColor: theme.base.border },

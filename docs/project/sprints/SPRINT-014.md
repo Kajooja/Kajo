@@ -14,6 +14,25 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Taste card layout parity blocker — 2026-10-25
+
+The owner reports that #721 Taste has wrong margins, oversized artwork and
+inaccessible rating controls, and explicitly requires the same appearance as
+BOOK/MOVIE Discovery card mode. This blocks the fresh V4/adaptation device test.
+The source now uses shared `FeedScreenFrame` / `DiscoveryBackdrop` boundaries and
+measured non-artwork card height, retained through rolling previews. All 80 mobile
+files / 904 tests, mobile types and lint pass; 24/24 native Yoga Taste/reference
+fixtures match with reachable controls. Approximate text fixtures are not device
+acceptance. Broad root checks/exports were interrupted by tool quota; no full
+local root/export pass is claimed. PR #357 owns the final-source CI and matching
+APK receipts as they become available. The focused
+[device checks](../DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25)
+remain open until actual owner observations are recorded. The prior six
+Discovery observations retain their scope. V4 installation and the scoped
+October 24 reset remain complete; preserve new accounts/answers and do not replay
+either operation. [STATUS](../STATUS.md) and the active #357 PR own continuation
+and exact source/build receipts; UX_PRINCIPLES owns presentation parity.
+
 ## V4 hosted rollout, two-account reset and performance plan — 2026-10-24
 
 #355/#356 source integration is complete; #356's final head passed CI #720 and

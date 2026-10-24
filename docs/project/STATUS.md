@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-24**
+Last updated: **2026-10-25**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
 Last accepted sprint: **013**.
@@ -10,7 +10,31 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — V4 rollout, two-account reset and timing plan / #336
+## Current packet — Taste card layout parity / #336
+
+**Blocking owner feedback — 2026-10-25 Europe/Helsinki:** in the #721 Taste test,
+wrong margins and an oversized image prevent reaching the rating controls as in
+normal browsing. The owner requires the same appearance as BOOK/MOVIE Discovery
+card mode. Correct the shared usable viewport, artwork/margins and rating access,
+then supply a matching successor APK before continuing V4/adaptation acceptance.
+[DEVICE_TEST](DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25) owns the
+reported failure and focused retest. The source correction and local checks are
+recorded below; corrected-build/device acceptance remains pending. The six earlier
+Discovery observations retain their scope.
+
+**Taste layout source correction — local validation:** `FeedScreenFrame` and
+`DiscoveryBackdrop` now give Taste the same safe-area boundaries, compact header/
+dock, background, artwork column and rating margins as Discovery. `FeedItemCard`
+measures its non-artwork body so short viewports and larger text can reach the
+rating controls; `RollingFeedCard` preserves that measurement in retained previews.
+Taste's exact pending-command and acknowledged-answer → NEXT behavior is retained.
+All 80 mobile test files / 904 tests pass, and mobile typecheck/lint are clean.
+All 24 Taste/reference native Yoga geometry fixtures match and keep rating
+reachable; their approximate text measurements are not physical-device evidence.
+The broad root check and export sequence were interrupted by tool quota, so no
+completed local `npm run check` or new export pass is claimed. PR #357 owns the
+exact final-source CI and matching APK receipts as they become available; device
+acceptance remains open until the focused owner checks pass.
 
 **Accepted source and device observations — 2026-10-24:** #355 and
 [#356](https://github.com/Kajooja/Kajo/pull/356) are merged. #356's final head
@@ -28,8 +52,11 @@ owns these scoped observations; the entire device matrix and recommendation
 quality are not thereby accepted. Do not repeat these unchanged cases or reopen
 the completed #355/#356 source integration.
 
-**One current source packet:** `feat/336-taste-rollout-performance-plan` supplies
-the guarded matching V4 rollout helper and records the expanded duration work
+**Active source:** [PR #357](https://github.com/Kajooja/Kajo/pull/357) on
+`feat/336-taste-rollout-performance-plan` is published and remains unmerged. Its
+PR owns the exact current head and CI receipts. The Taste layout correction is
+the current continuation; the existing packet supplies the guarded matching V4
+rollout helper and records the expanded duration work
 package. `scripts/database/personal-taste-pool-hosted-upgrade.{mjs,test.mjs}` pins
 the unchanged accepted migration, validates the private target checkpoint and
 emits read-only pre/postflight plus one guarded provider-transaction payload.
@@ -38,8 +65,9 @@ history, and rejects replay/drift. UTC capture and versioned sorted complete-row
 hashes/counts bound checkpoint work; only the observed SELECT-only provider Auth
 history uses ACCESS SHARE, while application tables/history retain SHARE locks.
 It has no hosted executor or account-reset entry point. Four focused helper tests
-pass. The local root check stops at the unchanged Deno registry connection refusal;
-remaining stages pass separately, not as a completed full-root run or new CI.
+pass. In that earlier helper checkpoint, the local root check stopped at the
+unchanged Deno registry connection refusal and remaining stages passed separately.
+That checkpoint is not a complete root/CI result for the new UI correction above.
 
 **Hosted V4 installed and verified:** the one unchanged accepted
 `20261024125357_versioned_taste_candidate_pools.sql` forward was applied through
@@ -57,9 +85,9 @@ eight-file helper/documentation packet, the owner explicitly approved its
 publication to GitHub. This resolves the earlier automatic approval rejection;
 no workaround or publication retry preceded that approval. The unchanged document
 histories match existing public main blobs, and the added-content audit found no
-real account IDs, emails, project references or credentials. Publish the approved
-packet from `feat/336-taste-rollout-performance-plan`; its PR owns the exact
-published head and CI receipts. This approval does not claim new CI success,
+real account IDs, emails, project references or credentials. The approved
+packet is published in #357; its PR owns the exact published head and CI receipts.
+This approval does not claim new CI success,
 source merge or V4 device acceptance, and is separate from the already completed
 hosted operation.
 
@@ -71,10 +99,11 @@ tables including V4 pools. Catalogue/source, genome, promotion and assignment
 hashes are unchanged; there are no remaining erasure permits, migration history
 remains at 87 and the V4 new-session default is intact. Private identities and the
 exact reset receipt remain outside Git. This clears the requested test prerequisite;
-it is not a general reset policy. The owner must register the two accounts again
-with the same email addresses and owner-chosen passwords; the old account roots,
-login sessions and adaptation history are gone, and registration creates fresh
-identities. No new V4 device or recommendation-quality acceptance is implied.
+it is not a general reset policy. The initial retest required registering the
+same email addresses with owner-chosen passwords and fresh identities. Preserve
+any accounts and Taste state created since that reset; the layout correction
+must not repeat it. No new V4 device or recommendation-quality acceptance is
+implied.
 
 **Performance continuation:** [ROADMAP's work package](ROADMAP.md#end-to-end-performance-measurement--2026-10-24)
 and open `MVP-UX-008` now define visible/actionable/saved timings, handoff/queue/
@@ -84,13 +113,12 @@ optimization; it does not postpone fresh-account V4 testing. The approximate
 4–5 seconds is not a measured distribution or diagnosed bottleneck. Full UX/ops
 acceptance stays in Phase 17; scoring/usefulness remains a separate quality gate.
 
-**Next action:** after the owner registers the two test accounts again, run the
-fresh V4 device/adaptation checks with the matching #721 APK and begin the planned
-timing baseline before broad speed optimization. Hosted installation and the
-requested reset are complete. Publish the now-approved helper/docs packet and
-record its source/CI receipts in the PR. Do not repeat the reset, installed
-operations or accepted unchanged device cases. Sprint 014, full readiness and
-release gates remain open.
+**Next action:** verify required CI on the final Taste/Discovery layout source
+in PR #357 and provide its matching successor APK for the focused device checks. Continue V4/adaptation observations and the planned
+timing baseline after that blocker. Hosted installation and the requested reset
+are complete; preserve subsequent account/test state. Record exact source/CI/build
+receipts in the active PR. Do not repeat the reset, installed operations or
+accepted unchanged device cases. Sprint 014 and release gates remain open.
 
 ## Predecessor checkpoint — versioned Taste candidate-pool integration / #336
 

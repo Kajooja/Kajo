@@ -2,11 +2,13 @@ import React, { type ReactElement, type ReactNode } from 'react';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getRoomTheme } from '../../theme/roomTheme';
 import { PersonalTasteScreen } from './PersonalTasteScreen';
+import { FeedRatingFrame, FeedScreenDock, FeedScreenFrame, FeedScreenHeader, FeedScreenViewport } from '../discovery/FeedScreenFrame';
 import type { PersonalTasteSnapshot } from './personalTasteFlow';
 import { sendTasteCommand } from './personalTasteOperations';
 import { id, profileId, sessionId, sessionResponse, challengeResponse, sequentialResponse } from './personalTasteTestFixtures';
 
 const layout = vi.hoisted(() => ({ index: 0, values: [] as unknown[] }));
+vi.mock('../discovery/DiscoveryBackdrop', () => ({ DiscoveryBackdrop: 'DiscoveryBackdrop' }));
 vi.mock('react', async () => ({ ...await vi.importActual<typeof import('react')>('react'),
   useState: (initial: unknown) => {
     const index = layout.index++;
@@ -23,15 +25,19 @@ function render(p: React.ComponentProps<typeof PersonalTasteScreen>) {
 }
 
 vi.mock('react-native', () => ({ ActivityIndicator: 'ActivityIndicator', Pressable: 'Pressable', SafeAreaView: 'SafeAreaView',
-  ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: (v: unknown) => v } }));
+  ScrollView: 'ScrollView', Text: 'Text', View: 'View', StyleSheet: { create: (v: unknown) => v, hairlineWidth: 0.5 } }));
+vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }));
 vi.mock('../branding/KajoBrand', () => ({ KajoMark: 'KajoMark' }));
 vi.mock('../discovery/RatingControl', () => ({ RatingControl: 'RatingControl' }));
 vi.mock('../discovery/FeedItemCard', () => ({ FeedItemCard: 'FeedItemCard' }));
 vi.stubGlobal('React', React);
 afterAll(() => vi.unstubAllGlobals());
-type Props = { children?: ReactNode; onPress?: () => void; disabled?: boolean };
+type Props = { children?: ReactNode; titleAction?: ReactNode; onPress?: () => void; disabled?: boolean };
+const frameComponents = new Set<unknown>([FeedScreenFrame, FeedScreenHeader, FeedScreenDock, FeedScreenViewport, FeedRatingFrame]);
 function elements(node: ReactNode): ReactElement<Props>[] {
-  return React.Children.toArray(node).flatMap(child => React.isValidElement<Props>(child) ? [child, ...elements(child.props.children)] : []);
+  return React.Children.toArray(node).flatMap(child => React.isValidElement<Props>(child) ? [child, ...elements(
+    frameComponents.has(child.type) ? (child.type as (props: Props) => ReactNode)(child.props)
+      : [child.props.children, child.props.titleAction])] : []);
 }
 function text(node: ReactNode): string {
   return React.Children.toArray(node).map(child => React.isValidElement<Props>(child) ? text(child.props.children) : String(child)).join(' ').replace(/\s+/g, ' ').trim();
@@ -151,12 +157,31 @@ describe('shared Taste feed boundary', () => {
     }>;
     viewport.props.onLayout({ nativeEvent: { layout: { height: 620 } } });
     const card = elements(render(p)).find(e => e.type === 'FeedItemCard') as ReactElement<{
-      helpScope: string; viewportHeight: number; hasInteracted: boolean; onPrevious?: unknown;
+      helpScope: string; viewportHeight: number; hasInteracted: boolean; helpKind: string; onPrevious?: unknown;
     }>;
     expect(card.props.helpScope).toBe(id(1));
     expect(card.props.viewportHeight).toBe(620);
     expect(card.props.hasInteracted).toBe(true);
+    expect(card.props.helpKind).toBe('taste');
     expect(card.props.onPrevious).toBeUndefined();
+  });
+  it('uses the Discovery safe frame and keeps continuation outside the measured card viewport', async () => {
+    const p = props(await state(sequentialResponse('QUESTION', 10, 4), false, true));
+    const tree = render(p);
+    const all = elements(tree);
+    const safeAreas = all.filter(e => e.type === 'SafeAreaView') as ReactElement<{ edges: string[] }>[];
+    expect(safeAreas.map(e => e.props.edges)).toEqual([['left', 'right'], ['top'], ['bottom']]);
+    expect(tree.type).toBe(FeedScreenFrame);
+    const viewport = all.find(e => e.type === FeedScreenViewport)!;
+    expect(elements(viewport).some(e => e.type === FeedRatingFrame)).toBe(true);
+    expect(elements(viewport).some(e => e.type === 'Pressable' && text(e.props.children) === 'Jatka selaamaan')).toBe(false);
+    const dock = all.find(e => e.type === FeedScreenDock)!;
+    button(dock, 'Jatka selaamaan').onPress!();
+    expect(p.onContinue).toHaveBeenCalledOnce();
+    const card = all.find(e => e.type === 'FeedItemCard')!;
+    const options = elements(card.props.titleAction).find(e => e.type === 'Pressable')!;
+    expect((options.props as { accessibilityLabel: string }).accessibilityLabel).toBe('Makutestin valinnat');
+    expect((options.props as { style: unknown }).style).toMatchObject({ width: 44, height: 44 });
   });
   it('keeps removal behind compact options with explicit confirmation', async () => {
     const p = props(await state(sequentialResponse('QUESTION', 10, 4), false, true));

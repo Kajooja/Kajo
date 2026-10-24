@@ -470,6 +470,17 @@ the same experience rather than a visually separate questionnaire. Keep the
 existing grid as the default Discovery presentation. This is a required near-term
 successor, tracked by `MVP-UX-007` and ROADMAP, not delivered APK behavior.
 
+**Owner clarification — 2026-10-25:** active Taste cards must look the same as
+BOOK/MOVIE cards in Discovery, including the usable viewport, symmetric margins,
+poster/cover size, title/metadata/description column and rating-control placement.
+Use the actual visible card bounds and apply safe-area/navigation spacing once;
+a Taste-only oversized image or extra surrounding padding must not push rating
+controls out of reach. Long content and larger text remain readable through the
+same whole-card reading and rating-stop behavior. This is presentation parity;
+Taste retains its own pending-command and acknowledged-answer → fresh NEXT rules.
+The owner's #721 report exposes a device blocker, so shared source components
+alone do not establish this parity. STATUS/DEVICE_TEST own correction evidence.
+
 The deliberate upward gesture that completes moving the active card out of the
 feed means **Ohita** when no positive action has already been accepted for that
 card. In Discovery, a durably admitted rating cannot also produce a skip even

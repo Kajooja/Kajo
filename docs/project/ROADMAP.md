@@ -42,6 +42,14 @@ by an uncalibrated confidence label.
 
 ## Near-term feed and first-answer personalization — 2026-10-15
 
+**October 25 blocking device feedback:** #721 Taste has wrong margins, oversized
+artwork and inaccessible rating controls. Match the BOOK/MOVIE Discovery card
+appearance and usable viewport before continuing the V4/adaptation test with a
+corrected matching APK. [STATUS](STATUS.md) owns this immediate correction and
+[DEVICE_TEST](DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25) its focused
+acceptance. Earlier Discovery acceptance, installed V4 and the completed scoped
+reset remain valid; preserve accounts and answers created since the reset.
+
 **October 24 continuation after APK #721:** #355 and #356 are merged after the
 authorized final-source checks; main CI #721 passed all six jobs, including its
 configured APK. The owner reports all six supplied checks working: offline/
