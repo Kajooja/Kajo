@@ -55,9 +55,15 @@ export async function sendTasteCommand(rpc: TasteRpc, command: TasteCommand, sig
   try {
     const { data, error } = await rpc(command.functionName, { request: command.request }, signal);
     if (error) {
+      // The server rejected this attempt against a withdrawn question source.
+      // Keep the exact command until an explicit reload; this is not a network retry
+      // or confirmation that a previously lost answer receipt never committed.
+      const sourceWithdrawn = error.code === 'KJ002';
       const kind = error.code === 'PGRST202' ? 'unavailable' : error.code === '40001' ? 'conflict'
-        : /^(22|23|42)/.test(error.code ?? '') ? 'invalid' : 'retry';
-      return { status: 'error', kind, message: kind === 'conflict'
+        : sourceWithdrawn || /^(22|23|42)/.test(error.code ?? '') ? 'invalid' : 'retry';
+      return { status: 'error', kind, message: sourceWithdrawn
+        ? 'Kysymyksen lähtötiedot ovat muuttuneet. Lataa nykyinen vaihe ennen jatkamista.'
+        : kind === 'conflict'
         ? 'Makutesti muuttui toisessa näkymässä. Lataa nykyinen vaihe ennen uutta vastausta.'
         : kind === 'unavailable' ? 'Makutestin palvelu ei ole vielä saatavilla.'
         : kind === 'invalid' ? 'Vastausta ei voitu vahvistaa. Tarkista käyttöoikeus ja lataa nykyinen vaihe.'

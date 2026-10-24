@@ -45,6 +45,7 @@ import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
+import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
 import { contextualSkipHostedManifest, contextualSkipHostedUpgradeSql } from './contextual-skip-hosted-upgrade.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
@@ -274,6 +275,11 @@ try {
     const [contextualSkipHostedUpgrade] = await exec(await contextualSkipHostedUpgradeSql(),
       { stage: 'contextual-skip-hosted-upgrade' });
     assert.match(contextualSkipHostedUpgrade?.contextualSkipHostedUpgrade, /^PASS: exact compact prerequisite/);
+    const tastePoolIndex = files.findIndex(file => file.name.endsWith('_versioned_taste_candidate_pools.sql'));
+    assert.ok(tastePoolIndex > skipCheckpoint);
+    await resetFromMigrations(files.slice(0, tastePoolIndex));
+    const personalTastePoolUpgrade = await verifyPersonalTastePoolUpgrade(execConcurrentSql, files[tastePoolIndex]);
+    assert.equal(personalTastePoolUpgrade.status, 'PASS');
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -368,6 +374,8 @@ try {
     assert.match(personalEvaluation?.personalEvaluation, /^PASS:/);
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
+    const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
+    assert.equal(personalTastePools.status, 'PASS');
     const contextualSkipConcurrency = await verifyContextualSkipConcurrency(execConcurrentSql);
     assert.equal(contextualSkipConcurrency.status, 'PASS');
     const [personalWorkingBridge] = await exec(await personalWorkingPrecisionSmokeSql(),
@@ -431,7 +439,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation,
-      personalSequentialTaste, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
+      personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

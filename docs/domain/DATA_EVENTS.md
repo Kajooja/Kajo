@@ -520,6 +520,16 @@ PAUSE retains the same Profile/evidence and declares insufficient support for
 Discovery continuation; the mobile consumer and full readiness admission remain
 separate integration gates. See [the current source boundary](PREDICTION_MODEL.md#sequential-own-personal-v2-source).
 
+The [versioned pool successor](../architecture/decisions/0010-versioned-taste-candidate-pools.md)
+binds a fresh bounded candidate catalog to each new V4 question panel. Pool
+acquisition is neither an exposure nor a preference Event. Original panel/cutoff
+and first-label identities remain the evaluation source; later membership cannot
+rewrite earlier comparisons. Question display, answer projection and contextual
+skip resolve the exact original pool, including lost-reply retries. Panel/source
+invalidation redacts copied pool data and parent deletion cascades. Retained
+session policies keep their existing fixed-catalog behavior. STATUS distinguishes
+this successor's source and hosted acceptance.
+
 ## 4. TasteChallenge evaluation
 
 A held-out challenge prediction must be frozen before the actual answer can influence the state being scored.

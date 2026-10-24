@@ -148,6 +148,9 @@ test('native Taste contextual skip / preserved history and current schema',async
       await query(`insert into private.sequential_taste_panels(id,session_id,prediction_id,prefix_revision,prefix,frozen,captured_at,captured_transaction)
         select $1,session_id,prediction_id,prefix_revision,prefix,frozen,captured_at,captured_transaction
         from private.sequential_taste_panels where id=$2`,[panelId,q.contextualSkip.origin.panelId]);
+      await query(`insert into private.sequential_taste_candidate_pools_v4(panel_id,session_id,catalog_as_of,catalog)
+        select $1,session_id,catalog_as_of,catalog from private.sequential_taste_candidate_pools_v4 where panel_id=$2`,
+      [panelId,q.contextualSkip.origin.panelId]);
       await query('update private.sequential_taste_sessions set presentations=presentations||jsonb_build_array($1::jsonb) where id=$2',[question,s.sessionId]);
       const fresh=await resume(s),command=skip(fresh);await commit(command);
       const record=await one('select source_prediction_id from private.contextual_skip_commands where action_id=$1',[command.actionId]);

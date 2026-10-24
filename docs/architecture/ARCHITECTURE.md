@@ -255,6 +255,15 @@ The external-data workspace is separate from the production transactional databa
 
 ## 8. Event and command reliability
 
+The [versioned Taste pool design](decisions/0010-versioned-taste-candidate-pools.md)
+keeps fresh candidate acquisition behind the owned server command boundary.
+New-policy NEXT binds a bounded current candidate catalog to its exact canonical
+evaluation panel; it does not mutate the retained session START catalog. The
+mobile v2 receipt/outbox protocol remains unchanged. All historical question
+consumers resolve the original pool, and source-lifecycle redaction covers these
+additional private copies. Existing sessions retain their policy. Source, hosted
+installation and device/quality acceptance are separate receipts in STATUS.
+
 Recommendation evidence is append-only and actor/Profile separated. Mutable current-state tables are rebuildable/authorized projections.
 
 First-release completion strengthens this with:

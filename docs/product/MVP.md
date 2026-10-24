@@ -294,6 +294,15 @@ with recent prior, full readiness and observed usefulness;
 `MVP-ALG-010`, `MVP-ALG-011` and `MVP-UX-007` are not complete. See the
 [bounded source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16).
 
+The 2026-10-24 source successor under #336 supplies new-session
+`CANONICAL_FORECAST_POOL_V4`: each fresh NEXT acquires an eligible bounded pool,
+captures one current canonical forecast, and binds the chosen question to that
+immutable pool. Previously asked/labelled/suppressed Items are excluded before
+the recognition bound. Retained policies, measurements and exact replies remain
+unchanged. This addresses START-pool exhaustion without changing scoring weights
+or demonstrating recommendation quality. [STATUS](../project/STATUS.md) owns the
+source/CI and rollout gates; the requirements above remain open.
+
 Shared feed source continuation (#239, 2026-10-17) now connects the accepted
 #349 adapters to sequential Taste and canonical Discovery deliveries. It shares
 artwork/credited description, neutral upward/accessible Ohita, exact displayed

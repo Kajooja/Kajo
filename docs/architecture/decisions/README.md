@@ -14,6 +14,10 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
+- [0010](0010-versioned-taste-candidate-pools.md) — per-question immutable Taste
+  candidate pools for new versioned sessions; refreshed bounded acquisition with
+  retained-policy, exact-retry and source-erasure preservation.
+
 - [0009](0009-discovery-local-choice-cancellation.md) — newest durably stored
   Discovery choice held from dispatch for bounded local cancellation; exact
   outbox arbitration, restart drain and scoped prepared-window grid handoff.
