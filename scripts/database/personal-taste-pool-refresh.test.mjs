@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
@@ -311,6 +312,84 @@ test('versioned native Taste pools refresh after committed choices and preserve 
         assert.deepEqual((await pools(question))[0].catalog.map(c => c.id).sort(), [id(5000), id(5001), id(5005), id(5006)]);
         assert.deepEqual((await session(question)).catalog, [], 'Original empty snapshot stays immutable after a successful refill');
       } finally {
+        await query('update public.items set discoverable=true where id=any($1::uuid[])', [live]);
+      }
+    });
+
+    await t.test('acquisition optimization preserves complete frozen-reference JSON across skip and provider boundaries', async () => {
+      await db.exec('create temp table taste_pool_acquisition_reference_scope(id integer);');
+      await db.exec(await readFile(new URL('./personal-taste-pool-acquisition-reference.sql', import.meta.url), 'utf8'));
+      const actor = await freshActor(20), initial = await start(actor);
+      const live = (await query('select id from public.items where discoverable')).map(row => row.id);
+      await query('update public.items set discoverable=false where id=any($1::uuid[])', [live]);
+      await query("select set_config('request.jwt.claim.sub',$1,false)", [actor]);
+      try {
+        const otherProfile = (await one("select id from public.profiles where owner_user_id=$1 and profile_type='PERSONAL'", [other])).id;
+        const sharedProfile = (await one("insert into public.profiles(profile_type,name) values('SHARED','Pool parity shared') returning id")).id;
+        // Fewer than 25/domain means every eligibility difference appears in
+        // the result; the retention boundary cannot hide a bad fast path.
+        for (let n = 7000; n <= 7022; n++) await addItem(n, n % 3 ? 'MOVIE' : 'BOOK', .91 - (n - 7000) / 100,
+          [`parity-${n % 4}`, 'shared-feature']);
+        const cutoff = (await one('select clock_timestamp()::text value')).value;
+        const record = async (n, offset, patch = {}) => {
+          const actionId = randomUUID();
+          await query(`insert into private.contextual_skip_commands(action_id,actor_user_id,profile_id,item_id,
+            surface,kind,origin_hash,origin,command,result,accepted_at,reverses_action_id)
+            values($1::uuid,$2,$3,$4,'TASTE',$5,($1::uuid)::text,'{}','{}','{}',$6::timestamptz+$7::interval,$8)`,
+          [actionId, patch.actor ?? actor, patch.profile ?? initial.profileId, id(n),
+            patch.kind ?? 'CONTEXTUAL_SKIP', cutoff, offset, patch.reverses ?? null]);
+          if (patch.erased) await query(`update private.contextual_skip_commands set erased_at=$2,item_id=null,
+            origin=null,command=null,result=null,reverses_action_id=null where action_id=$1`, [actionId, cutoff]);
+          return actionId;
+        };
+        await record(7001, '-1 hour'); // Active.
+        await record(7002, '-25 hours'); // Expired.
+        await record(7003, '1 hour'); // Future original.
+        const withdrawn = await record(7004, '-1 hour');
+        await record(7004, '-30 minutes', { kind: 'WITHDRAW_CONTEXTUAL_SKIP', reverses: withdrawn });
+        await record(7005, '-1 hour', { erased: true });
+        await record(7006, '-1 hour', { actor: other, profile: otherProfile });
+        await record(7007, '-1 hour', { profile: sharedProfile });
+        const futureWithdrawal = await record(7008, '-1 hour');
+        await record(7008, '1 hour', { kind: 'WITHDRAW_CONTEXTUAL_SKIP', reverses: futureWithdrawal });
+        const erasedWithdrawal = await record(7009, '-1 hour');
+        await record(7009, '-30 minutes', { kind: 'WITHDRAW_CONTEXTUAL_SKIP', reverses: erasedWithdrawal, erased: true });
+        await record(7010, '-2 hours');
+        const partiallyWithdrawn = await record(7010, '-1 hour');
+        await record(7010, '-30 minutes', { kind: 'WITHDRAW_CONTEXTUAL_SKIP', reverses: partiallyWithdrawn });
+        await record(7017, '-24 hours'); // Exactly elapsed cooldown.
+        await record(7018, '-24 hours 1 microsecond'); // Still suppressed.
+        await record(7019, '-25 hours');
+        await record(7019, '1 hour'); // Future newest cannot hide an expired prefix.
+        await record(7020, '-1 hour', { kind: 'WITHDRAW_CONTEXTUAL_SKIP', reverses: randomUUID() });
+        await record(7022, '0 seconds'); // Exactly-cutoff original is active.
+
+        await query("update public.items set created_at=$2::timestamptz+interval '1 hour' where id=$1", [id(7012), cutoff]);
+        await query("update private.item_sources set created_at=$2::timestamptz+interval '1 hour' where item_id=$1", [id(7013), cutoff]);
+        await query("update private.item_sources set provider_key='kajo_mock' where item_id=$1", [id(7014)]);
+        await query('update private.item_sources set created_at=$2 where item_id=$1', [id(7016), cutoff]);
+        for (let n = 0; n < 20; n++) await query(`insert into private.item_sources(item_id,provider_key,provider_item_id,created_at)
+          values($1,$2,$3,$4)`, [id(7011), `parity_${String(n).padStart(2, '0')}`, `parity-${n}`, cutoff]);
+        await query(`insert into private.item_sources(item_id,provider_key,provider_item_id,created_at) values
+          ($1,'kajo_mock','parity-mock',$2),($1,'a_future','parity-future',$2::timestamptz+interval '1 hour'),
+          ($1,'a_infinite','parity-infinite','infinity'),($1,'a_negative_infinite','parity-negative-infinite','-infinity')`, [id(7011), cutoff]);
+
+        const compare = async offset => {
+          const result = await one(`select private.taste_candidate_catalog_v4($1,$2::timestamptz+$3::interval) actual,
+            pg_temp.taste_candidate_catalog_v4_reference($1,$2::timestamptz+$3::interval) expected`,
+          [initial.sessionId, cutoff, offset]);
+          assert.deepEqual(result.actual, result.expected, `Complete candidate JSON at ${offset}`);
+          return result.actual;
+        };
+        const atCutoff = await compare('0 seconds');
+        const excluded = new Set([7001, 7008, 7009, 7010, 7012, 7013, 7014, 7018, 7022]);
+        assert.deepEqual(atCutoff.map(c => c.id), Array.from({ length: 23 }, (_, i) => i + 7000)
+          .filter(n => !excluded.has(n)).map(id));
+        assert.deepEqual(atCutoff.find(c => c.id === id(7011)).providerKeys,
+          ['kajo_curated', ...Array.from({ length: 15 }, (_, n) => `parity_${String(n).padStart(2, '0')}`)]);
+        for (const offset of ['-1 microsecond', '1 microsecond', '1 hour', '24 hours', '25 hours']) await compare(offset);
+      } finally {
+        await query("select set_config('request.jwt.claim.sub','',false)");
         await query('update public.items set discoverable=true where id=any($1::uuid[])', [live]);
       }
     });

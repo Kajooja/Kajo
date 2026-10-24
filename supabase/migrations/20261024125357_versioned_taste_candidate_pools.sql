@@ -24,14 +24,17 @@ returns jsonb language sql stable set search_path='' as $$
   with session as materialized (
     select * from private.sequential_taste_sessions where id=target_session and policy='CANONICAL_FORECAST_POOL_V4'
       and status='ACTIVE' and actor_user_id=auth.uid()
+  ), potential_skips as materialized (
+    -- Absence of a retained pre-cutoff skip makes the canonical decision true.
+    -- Leave cooldown/reversal handling to that helper for every potential source.
+    select distinct item_id from private.contextual_skip_commands
+    where profile_id=(select profile_id from session) and kind='CONTEXTUAL_SKIP'
+      and erased_at is null and accepted_at<=cutoff and item_id is not null
   ), eligible as materialized (
     select i.id,i.item_type,i.title,i.tags,
       private.catalog_cold_start_prior_v1(i.id,cutoff) prior,
       (coalesce(i.metadata->>'coldStartRecognition','') ~ '^([0-9]+([.][0-9]+)?|[.][0-9]+)$'
-        or coalesce(i.metadata->>'voteCount','') ~ '^[0-9]+$') has_recognition,
-      array(select distinct src.provider_key from private.item_sources src where src.item_id=i.id
-        and src.provider_key<>'kajo_mock' and isfinite(src.created_at) and src.created_at<=cutoff
-        order by src.provider_key limit 16) providers
+        or coalesce(i.metadata->>'voteCount','') ~ '^[0-9]+$') has_recognition
     from session s cross join public.items i
     where i.item_type in('BOOK','MOVIE') and i.discoverable and isfinite(i.created_at) and i.created_at<=cutoff
       and exists(select 1 from private.item_sources src where src.item_id=i.id and src.provider_key<>'kajo_mock'
@@ -41,7 +44,8 @@ returns jsonb language sql stable set search_path='' as $$
       and not exists(select 1 from public.events e where e.profile_id=s.profile_id and e.item_id=i.id
         and e.event_type in('ITEM_RATED','ITEM_NOT_INTERESTED','ITEM_SAVED'))
       and not exists(select 1 from public.item_interactions a where a.profile_id=s.profile_id and a.item_id=i.id)
-      and (private.contextual_skip_decision_v1(s.profile_id,i.id,cutoff,true)->>'eligible')::boolean
+      and case when exists(select 1 from potential_skips potential where potential.item_id=i.id)
+        then (private.contextual_skip_decision_v1(s.profile_id,i.id,cutoff,true)->>'eligible')::boolean else true end
   ), bounded as materialized (
     select * from (select e.*,row_number() over(partition by item_type
       order by (prior->>'recognition')::double precision desc,id) n from eligible e) ranked where n<=128
@@ -50,7 +54,9 @@ returns jsonb language sql stable set search_path='' as $$
       where length(tag) between 1 and 256 and tag !~ '[[:cntrl:]]') tags
     group by tag order by count(*) desc,tag collate "C" limit 64
   ) select coalesce(jsonb_agg(jsonb_build_object('id',id,'itemType',item_type,'title',left(title,512),
-    'providerKeys',providers,'availableAt',floor(extract(epoch from cutoff)*1000)::bigint,
+    'providerKeys',array(select distinct src.provider_key from private.item_sources src where src.item_id=b.id
+      and src.provider_key<>'kajo_mock' and isfinite(src.created_at) and src.created_at<=cutoff
+      order by src.provider_key limit 16),'availableAt',floor(extract(epoch from cutoff)*1000)::bigint,
     'tags',array(select distinct tag from unnest(b.tags) tag where tag in(select tag from dimensions) order by tag),
     'rawTags',to_jsonb(b.tags),
     'recognitionPrior',case when has_recognition then (prior->>'recognition')::double precision else null end,

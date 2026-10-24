@@ -46,8 +46,9 @@ retry occurred. Request explicit #355 merge approval separately; do not treat th
 tested unmerged source as accepted main or bypass that rejection.
 
 **One current source packet:** versioned Taste candidate-pool refresh/refill on
-`feat/336-versioned-taste-pools`, stacked explicitly on the tested #355 head above.
-This successor is implemented locally, not accepted main or a hosted deployment.
+`feat/336-versioned-taste-pools`, published as stacked draft
+[PR #356](https://github.com/Kajooja/Kajo/pull/356) on the tested #355 head above.
+This successor is implemented source, not accepted main or a hosted deployment.
 CLI-created `20261024125357_versioned_taste_candidate_pools.sql` adds the
 new-session-only `CANONICAL_FORECAST_POOL_V4` policy and private immutable per-panel
 candidate storage. New questions refresh bounded eligible candidates from the
@@ -64,9 +65,9 @@ and REMOVE remain available. No silent command retargeting or account reset is
 used to manufacture a fresh session.
 
 **Local validation checkpoint:** independent review found no blocking issue.
-All 901 mobile, 334 database, 311 engine and 50 dependency tests pass, as do
+All 901 mobile, 335 database, 311 engine and 50 dependency tests pass, as do
 catalogue (3 contract + 441 script), research (19 Python + 43 Node) and acceptance
-(6 + 5) tests. The 39 focused SQL checks include 10 new pool tests. Lint,
+(6 + 5) tests. The 40 focused SQL checks include 11 new pool tests. Lint,
 typecheck and all four explicit demo iOS/Android exports pass. The complete
 `npm run check` reaches the unchanged Deno dependency download and stops on npm
 registry `Connection refused`; the remaining stages passed separately, so no
@@ -74,13 +75,28 @@ successful complete local root run is claimed. Native PostgreSQL concurrency/
 security/preservation and all five final-source CI gates remain required;
 PGlite adapter checks do not substitute for the genuine native gate.
 
-**Next action:** publish this exact source as a stacked draft successor, then
-record the exact final head/tree/PR/CI and native gate receipts in its PR body,
-without a documentation-only rebuild solely to copy those receipts here. #355's
-merge remains separately blocked as stated above. Matching hosted installation,
-configured device acceptance, readiness and measured usefulness remain later
-explicit gates. No hosted write, account reset, prior-forward replay or model/
-Working activation occurred in this packet.
+**Publication and bounded performance follow-up:** draft #356 was first
+published at `707bdc7fbd99ad6904e97b3d34342dabe0e886ed`, tree
+`dd920c7f8885c0f4e034f2340daad13940f48346`.
+[Preliminary CI #717](https://github.com/Kajooja/Kajo/actions/runs/40096998050)
+has passed the platform and two-clean-installation gates at this checkpoint;
+it is not a complete or final-source receipt. The bounded acquisition correction
+materializes potential skipped Item IDs once, delegates every potential source
+to the unchanged canonical skip helper, and projects provider details only for
+the retained pool. Full candidate JSON matches the frozen pre-optimization
+reference across six cutoff/lifecycle cases. The entire 335-test database suite
+passes after this correction. On a disposable 10,000-Item PGlite fixture with
+400 history rows, paired median acquisition time fell from 857 ms to 404 ms;
+complete first NEXT measured 584 ms. These shared-host synthetic WASM timings
+are query evidence, not phone or hosted performance measurements.
+
+**Next action:** publish this verified correction to existing draft #356 and
+complete all five final-source CI/native gates. Record exact final head/tree/CI and native gate receipts in that
+PR body without a documentation-only rebuild solely to copy the receipts here.
+#355's merge remains separately blocked as stated above. Matching hosted
+installation, configured device acceptance, readiness and measured usefulness
+remain later explicit gates. No hosted write, account reset, prior-forward replay
+or model/Working activation occurred in this packet.
 
 The subsequent recommendation-scoring review remains in ROADMAP, using fixed
 baselines and prospective/holdout comparisons. Numeric Taste reverse UI, recent
