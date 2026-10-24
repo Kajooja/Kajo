@@ -213,6 +213,26 @@ decision, not rebasing an old answer. Anonymous entry, hosted/device acceptance 
 measured quality remain separate gates. No new serving model or population policy
 is activated by this protocol.
 
+### Versioned candidate-pool successor — #336
+
+The October 24 design in [ADR-0010](../architecture/decisions/0010-versioned-taste-candidate-pools.md)
+adds `CANONICAL_FORECAST_POOL_V4` for newly created sessions only. Each fresh NEXT
+uses the current server cutoff, excludes previously asked/labelled and currently
+suppressed Items before the recognition source limit (up to 128 Items per domain),
+then retains at most 25 BOOK and 25 MOVIE candidates for one canonical evaluation
+capture. The V3 selector's ordinal preference, utility weights and coverage guard
+remain unchanged within that panel. This refresh admits candidates beyond START;
+it is not whole-catalog personalized retrieval or measured recommendation uplift.
+
+The exact acquired catalog belongs to its immutable question panel, not to a
+mutable session-wide catalog. Historical questions, answer metadata, neutral skip
+origins and exact retries resolve their retained panel pool. Original V1–V3
+policies, START catalogs, first measurements and prior forecasts remain intact.
+Source erasure must redact dependent copied pools and prevent replay resurrection.
+The current v2 mobile wire format and committed ANSWER → NEXT boundary remain.
+Readiness stays explicitly insufficient until its separate acceptance criteria
+are met. STATUS records implementation, CI and hosted acceptance independently.
+
 ### Continuous learning across Taste and Discovery
 
 The **2026-10-15 owner clarification** applies the existing complete architecture

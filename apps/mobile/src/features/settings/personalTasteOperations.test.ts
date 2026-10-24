@@ -59,7 +59,7 @@ describe('owned mobile Taste protocol', () => {
     expect(isTasteCommand(command, id(999))).toBe(false);
   });
   it('distinguishes missing RPC, confirmed revision conflict and ambiguous network failure', async () => {
-    for (const [code, kind] of [['PGRST202', 'unavailable'], ['40001', 'conflict'], ['42501', 'invalid'], ['', 'retry']]) {
+    for (const [code, kind] of [['PGRST202', 'unavailable'], ['40001', 'conflict'], ['42501', 'invalid'], ['KJ002', 'invalid'], ['KJ003', 'retry'], ['', 'retry']]) {
       expect(await sendTasteCommand(async () => ({ data: null, error: { code: code!, message: 'not user copy' } }), start, new AbortController().signal))
         .toMatchObject({ status: 'error', kind });
     }

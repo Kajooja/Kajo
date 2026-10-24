@@ -102,6 +102,52 @@ describe('sequential Taste mobile persistence and committed command ordering', (
     s.set(sequentialResponse('QUESTION', 4, 1)); flow.recoverConflict(); await flow.waitForIdle();
     expect(operations(s.rpc)).toEqual(['ANSWER', 'RESUME']); expect(flow.snapshot().sequential?.item?.id).toBe(id(101));
   });
+  it('keeps a source-rejected answer unchanged until explicit reload, then permits Discovery without acknowledging a rating', async () => {
+    const s = server(); const { flow, rows } = setup(s.rpc); flow.start(); await flow.waitForIdle(); s.rpc.mockClear();
+    const evidenceBefore = getBootstrapEvidenceRevision();
+    const originalQuestion = flow.snapshot().sequential;
+    s.rpc.mockRejectedValueOnce(Error('ambiguous connection loss'));
+    expect(flow.answerTraining({ kind: 'RATING', value: 5 }, id(100), 2)).toBe(true); await flow.waitForIdle();
+    const retained = [...rows.values()][0];
+    const originalCommand = s.rpc.mock.calls[0]?.[1].request;
+    s.rpc.mockResolvedValueOnce({ data: null, error: { code: 'KJ002', message: 'SOURCE_WITHDRAWN' } });
+    flow.retry(); await flow.waitForIdle();
+    expect(s.rpc.mock.calls[1]?.[1].request).toEqual(originalCommand);
+    expect([...rows.values()][0]).toBe(retained);
+    expect(flow.snapshot()).toMatchObject({ pending: true, conflict: true, blocked: true, sequential: originalQuestion });
+    expect(getBootstrapEvidenceRevision()).toBe(evidenceBefore);
+    flow.retry(); expect(flow.dismiss()).toBe(false); expect(flow.remove(2)).toBe(false);
+    expect(operations(s.rpc)).toEqual(['ANSWER', 'ANSWER']);
+
+    s.set(sequentialResponse('STOPPED', 2, 0)); flow.recoverConflict(); await flow.waitForIdle();
+    expect(operations(s.rpc)).toEqual(['ANSWER', 'ANSWER', 'RESUME']);
+    expect(flow.snapshot()).toMatchObject({ pending: false, conflict: false, blocked: false,
+      sequential: { status: 'STOPPED', revision: 2, item: null, answered: 0 } });
+    expect(getBootstrapEvidenceRevision()).toBe(evidenceBefore);
+    expect(flow.answerTraining({ kind: 'RATING', value: 5 }, id(100), 2)).toBe(false);
+    expect(flow.dismiss()).toBe(true);
+  });
+  it('reloads a source-rejected Continue into a stopped session with removal reachable', async () => {
+    const s = server(); s.set(sequentialResponse('PAUSED', 3)); const { flow } = setup(s.rpc);
+    flow.start(); await flow.waitForIdle(); s.rpc.mockClear();
+    s.rpc.mockResolvedValueOnce({ data: null, error: { code: 'KJ002', message: 'SOURCE_WITHDRAWN' } });
+    expect(flow.begin()).toBe(true); await flow.waitForIdle();
+    expect(flow.snapshot()).toMatchObject({ pending: true, conflict: true, blocked: true });
+    s.set(sequentialResponse('STOPPED', 3)); flow.recoverConflict(); await flow.waitForIdle();
+    s.rpc.mockResolvedValueOnce(ok({ version: 'personal-taste-session-v2', profileId, sessionId, status: 'REMOVED' }));
+    expect(flow.remove(3)).toBe(true); await flow.waitForIdle();
+    expect(operations(s.rpc)).toEqual(['CONTINUE', 'RESUME', 'REMOVE']);
+    expect(flow.snapshot()).toMatchObject({ pending: false, blocked: false, sequential: { status: 'REMOVED' } });
+  });
+  it('permits Discovery after a cold RESUME returns the stopped stale-source session', async () => {
+    const s = server(); const first = setup(s.rpc); first.flow.start(); await first.flow.waitForIdle(); first.flow.stop();
+    s.rpc.mockClear(); s.set(sequentialResponse('STOPPED', 2));
+    const resumed = setup(s.rpc, first.rows); resumed.flow.start(); await resumed.flow.waitForIdle();
+    expect(operations(s.rpc)).toEqual(['RESUME']);
+    expect(resumed.flow.snapshot()).toMatchObject({ pending: false, blocked: false, conflict: false,
+      sequential: { status: 'STOPPED', item: null, revision: 2 } });
+    expect(resumed.flow.dismiss()).toBe(true);
+  });
   it('acknowledges PAUSE before Discovery, retains the Profile and dismissal through restart, and recovers a lost pause reply', async () => {
     const s = server(); const { flow, rows } = setup(s.rpc); flow.start(); await flow.waitForIdle(); s.rpc.mockClear();
     s.rpc.mockImplementationOnce(async () => { s.set(sequentialResponse('PAUSED', 3)); throw Error('pause response lost'); });

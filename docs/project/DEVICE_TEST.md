@@ -1,5 +1,40 @@
 # Collection device checkpoint — #228 / #229
 
+## APK #716 owner observation — 2026-10-24
+
+After receiving the GitHub download for supplied APK #716, the owner says
+“toimii hyvin” and asks to continue development. Record this as acceptance of the
+observed general browsing behavior after the latency/rating-stop corrections.
+The report does not identify which individual cases below were exercised, provide
+installed checksum/timings, or explicitly pass startup, offline/reconnect,
+background/process-death or accessibility cases. Those detailed observations
+remain open; no complete device or recommendation-quality acceptance is inferred.
+
+STATUS owns the exact #716 source/CI/artifact receipt. No new APK or account reset
+is required merely to repeat the already accepted general browsing observation.
+Use the matrix below when collecting missing specific cases. A later Taste-pool
+source packet needs its own matching backend/build and device evidence; #716 does
+not validate an unbuilt successor.
+
+## Versioned Taste pool successor — planned device checks / #336
+
+These checks require the successor's accepted native backend and matching APK;
+APK #716 does not establish them. Use an authorized eligible new session without
+resetting an existing account to obtain V4. Retained V3/legacy sessions must keep
+their original policy and history.
+
+- Rate or skip, await acknowledgement and the separate NEXT, then verify a usable
+  next question; retry/lost-reply and restart must preserve the exact current
+  question rather than add another answer or silently replace its origin.
+- With a controlled catalogue/source change, a rejected `KJ002` command remains
+  pending until explicit reload. Reload must expose the stopped/recovery state
+  without rewriting earlier answers; continuation to Discovery and removal remain
+  available. Network retries alone must not retarget the old command.
+- Verify paused/current-question resume, actor/Profile changes and preserved old
+  sessions. Fresh candidate-pool identity and immutable prior-panel provenance
+  require the SQL/native assertions; a visibly different title alone is not proof
+  of freshness, correct evaluation or improved recommendation quality.
+
 ## APK #715 owner feedback and latency successor — 2026-10-24
 
 The owner tested the supplied #715 build and reports the following. This is
@@ -36,8 +71,9 @@ Required successor tests in both BOOK and MOVIE:
   swipe: it must eventually persist exactly once. Also retest true offline/error,
   reconnect and explicit rejected-command recovery. Preserve current account data.
 
-These successor observations remain open until the new APK is tested. The older
-matrices below retain their dated history; this section supersedes their
+APK #716 now has the general owner acceptance above. Unreported individual
+successor observations remain open. The older matrices below retain their dated
+history; this section supersedes their
 any-reading-offset flick and universal server-Undo assumptions for this packet.
 
 ## Discovery horizontal history and return — #239 / 2026-10-24

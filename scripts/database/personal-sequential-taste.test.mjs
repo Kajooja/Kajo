@@ -86,7 +86,8 @@ test('owned sequential Taste v2 / full current schema',async t=>{
     });
     for(const f of files.slice(index))await db.exec(`begin;${f.sql}commit;`);
     await sub('native question policy matches the portable numeric reference over actual canonical panels',async({start})=>{
-      let s=await start();const catalog=(await state(s.sessionId)).catalog;
+      let s=await start();
+      assert.equal((await state(s.sessionId)).policy,'CANONICAL_FORECAST_POOL_V4');
       const scope={subject:{id:s.profileId,kind:'individual'},actingIdentityRef:owner,sessionRef:s.sessionId,
         evidence:{sourceIds:['catalog'],cohortIds:[],synthetic:'fixture-only'}};
       const domains=['MOVIE','BOOK'].map(domain=>({domain,minimumRatedItems:4,minimumFeaturePatterns:2,
@@ -102,9 +103,11 @@ test('owned sequential Taste v2 / full current schema',async t=>{
         }
         s=await next(s);assert.equal(s.status,'QUESTION');
         const panel=await one('select * from private.sequential_taste_panels order by prefix_revision desc limit 1');
-        const pools=domains.map(({domain})=>({id:panel.id+domain,scope,domain,asOf:ref.updatedAt+1,catalogAsOf:10,prefix:ref.prefix,
+        const {catalog}=await one('select catalog from private.sequential_taste_candidate_pools_v4 where panel_id=$1',[panel.id]);
+        assert.deepEqual(catalog.map(c=>c.id).sort(),panel.frozen.items.map(i=>i.itemId).sort());
+        const pools=domains.map(({domain})=>({id:panel.id+domain,scope,domain,asOf:ref.updatedAt+1,catalogAsOf:ref.updatedAt+1,prefix:ref.prefix,
           provenance:{predictionId:panel.id,modelVersion:panel.frozen.modelVersion,baseModelVersion:'canonical',policyVersion:panel.frozen.policyVersion,
-            genomeRef:panel.frozen.genomeId,genomeConfigRef:'canonical',featureSchemaRef:'taste-tags-frequency-64-v2',stateRef:panel.id,traceRef:panel.id,sourceRefs:['catalog']},
+            genomeRef:panel.frozen.genomeId,genomeConfigRef:'canonical',featureSchemaRef:panel.frozen.featurePolicyVersion,stateRef:panel.id,traceRef:panel.id,sourceRefs:['catalog']},
           coverage:'BOUNDED_CANONICAL_POOL',consideredCount:catalog.filter(c=>c.itemType===domain).length,
           rows:catalog.filter(c=>c.itemType===domain).map(c=>{
             const f=panel.frozen.items.find(i=>i.itemId===c.id);
@@ -258,18 +261,34 @@ test('owned sequential Taste v2 / full current schema',async t=>{
       assert.equal((await one('select count(*)::int n from private.sequential_taste_sessions')).n,0);
       assert.equal((await one('select id from private.taste_sessions')).id,v1.sessionId);
     });
-    await sub('v2 prevents a competing v1 writer; catalog changes fail with an honest stop',async({profile,start})=>{
+    await sub('v2 prevents a competing v1 writer; V4 refreshes a changed START catalog without inventing support',async({profile,start})=>{
       let s=await start();await db.exec('begin;'+actorSql(owner));
       await assert.rejects(one('select public.taste_session_v1($1)',[{operation:'START',profileId:profile,requestId:randomUUID()}]),/v2 already owns/);await db.exec('rollback;');
+      const originalCatalog=(await state(s.sessionId)).catalog;
+      await db.exec("update public.items set tags=array['changed'] where id::text like 'ab157000-%';");
+      s=await next(s);assert.equal(s.status,'STOPPED');assert.equal(s.stopReason,'NO_SUPPORTED_INFORMATION_INSUFFICIENT');
+      assert.deepEqual((await state(s.sessionId)).catalog,originalCatalog,'The old START catalog is not rewritten');
+      assert.equal(s.readiness.status,'INSUFFICIENT');
+    });
+    await sub('retained V3 policy still stops when its frozen catalog changes',async({profile})=>{
+      // Create through the old server default, restoring the current default in
+      // the same transaction. Never rewrite a retained session's policy.
+      await db.exec("begin;alter table private.sequential_taste_sessions alter column policy set default 'CANONICAL_FORECAST_V3';"+actorSql(owner));
+      let s=(await one('select public.taste_session_v2($1) value',[
+        {operation:'START',profileId:profile,requestId:randomUUID()}])).value;
+      await db.exec("reset role;alter table private.sequential_taste_sessions alter column policy set default 'CANONICAL_FORECAST_POOL_V4';commit;");
+      const original=(await state(s.sessionId)).catalog;
       await db.exec("update public.items set tags=array['changed'] where id::text like 'ab157000-%';");
       s=await next(s);assert.equal(s.status,'STOPPED');assert.equal(s.stopReason,'CATALOG_CHANGED_INSUFFICIENT');
+      assert.equal((await state(s.sessionId)).policy,'CANONICAL_FORECAST_V3');
+      assert.deepEqual((await state(s.sessionId)).catalog,original);
     });
     await sub('first measurements and panels are immutable; live withdrawal beats cached replies',async({start})=>{
       let s=await start();const req=cmd(s,'NEXT');s=await rpc(req);s=await answer(s,0);
       await assert.rejects(query("update private.sequential_taste_sessions set presentations=jsonb_set(presentations,'{0,responses,0,answer,value}','10') where id=$1",[s.sessionId]),/first measurement is immutable/);
       await assert.rejects(query("update private.sequential_taste_panels set frozen=frozen||'{\"changed\":true}'"),/forecast is immutable/);
       await db.exec("update public.items set discoverable=false where id::text like 'ab157000-%';");
-      assert.equal((await rpc(req)).status,'STOPPED');
+      await assert.rejects(rpc(req),{code:'KJ002'});
       assert.equal((await rpc({operation:'RESUME',profileId:s.profileId,sessionId:s.sessionId})).currentItem,null);
       assert.equal((await rpc(cmd(s,'REMOVE'))).status,'REMOVED');
     });
