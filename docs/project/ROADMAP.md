@@ -45,16 +45,18 @@ by an uncalibrated confidence label.
 **October 24 continuation after APK #716:** the owner reports that the supplied
 latency successor works well and asks to continue. PR #355's browsing/return,
 local cancellation and rating-stop source passed all five required gates and its
-configured APK build; the source remains unmerged because automatic approval
-review blocked the exact merge. STATUS owns that integration boundary and the
-one stacked successor branch. The general phone report does not close the
+configured APK build. The owner subsequently explicitly authorized #355 and #356
+integration after verification; #355 is merged and #356 now targets main.
+STATUS owns the final-head integration checkpoint. The general phone report does not close the
 unreported startup/network/process-death matrix or recommendation-quality gate.
 The bounded #336 versioned Taste candidate-pool refresh/refill source now supplies
 a new-session-only V4 policy and pool helper, with matching question lookup,
 answer projection, contextual-skip and lifecycle consumers. Retained policies,
-immutable panels/first labels and exact retries remain preserved. It is locally
-implemented on the explicit stack; final-source CI and genuine native validation
-precede source acceptance. Native installation and full device/usefulness
+immutable panels/first labels and exact retries remain preserved. Its implementation
+passed all five CI #718 gates, including genuine native preservation and separate
+committed RPC validation. Complete the authorized #356 integration after its final
+handoff head passes required checks, then prepare the guarded matching hosted
+forward and configured APK/device acceptance. Native installation and full device/usefulness
 acceptance remain separate, and no hosted deployment is included. STATUS owns the
 exact validation/publication checkpoint and next action.
 
@@ -84,8 +86,8 @@ frozen origins across later acknowledgements; new refills consume the latest
 committed prefix. The earlier #710 feedback led to inert Undo presentation and
 uninterrupted bounded refill; the #716 successor adds safe local cancellation and
 prepared-grid return. That source is tested and the owner reports general good
-behavior, while PR #355 remains unmerged and unreported device cases stay open.
-Continue with the versioned #336 pool packet above. Broad collection/detail work
+behavior; #355 source is now merged while unreported device cases stay open.
+Continue with the versioned #336 integration/rollout packet above. Broad collection/detail work
 retains its existing slot. The default Discovery grid is unchanged;
 UX_PRINCIPLES owns the superseding controls contract.
 
@@ -110,10 +112,11 @@ after all five CI #704 gates; the owner previously confirmed #700 navigation
 checks. PR #355 subsequently supplies the continuous prepared feed and #716
 latency successor. All six CI #716 jobs passed and the owner reports general good
 behavior on the supplied APK; individual unreported device cases remain open.
-PR #355 is still unmerged following the automatic merge rejection recorded in
-STATUS. Preserve its tested source while preparing the explicitly stacked #336
-versioned Taste candidate-pool refresh/refill successor; merge approval is a
-separate unresolved integration step, not an instruction to bypass the block.
+The owner's explicit approval resolved the earlier merge block, and #355 is
+merged. Finish the authorized #356 final-head verification/integration, then its
+guarded hosted preparation and matching APK/device acceptance. If #356 is already
+merged, continue from its PR receipt and fresh main rather than repeating source
+implementation or the resolved approval request.
 Keep original frozen panels, first labels, session policies and retry origins.
 The reader lifecycle must preserve immutable page receipts while retiring only
 obsolete derived readers. Do not replay installed operations. STATUS owns exact
@@ -163,9 +166,11 @@ new-session-only immutable
 utility-first ranking and a traced domain-lead guard. Retained session policies,
 wire replies and frozen history stay unchanged. Source and hosted acceptance do
 not establish an observed eligible-owner session, phone behavior or quality.
-The START-time 25-per-type pool still needs
-versioned refresh/refill; device acceptance of the installed neutral skip/shared
-feed and the recent prior remain mandatory next work. See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
+Deployed V3 retains its START-time 25-per-type pool. #356 supplies the V4 refresh/
+refill source and passed implementation CI; its final integration, guarded hosted
+rollout and device acceptance follow the current packet above. Device acceptance
+of the installed neutral skip/shared feed and the recent prior remain mandatory.
+See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
 and STATUS for the exact acceptance receipt and device continuation.
 
 Canonical semantics: [prediction](../domain/PREDICTION_MODEL.md),
