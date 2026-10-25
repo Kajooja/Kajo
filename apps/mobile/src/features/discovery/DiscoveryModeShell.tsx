@@ -1,7 +1,7 @@
-import { useRef, useState, type PropsWithChildren } from 'react';
+import { useState, type PropsWithChildren } from 'react';
 import { usePathname, useRouter } from 'expo-router';
-import { BlurTargetView, BlurView } from 'expo-blur';
-import { BOTTOM_DOCK_HEIGHT } from './shellLayout';
+import { DiscoveryBackdrop } from './DiscoveryBackdrop';
+import { FeedScreenDock, FeedScreenFrame, FeedScreenHeader } from './FeedScreenFrame';
 import {
   ActivityIndicator,
   Alert,
@@ -12,10 +12,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getAmbientPhase } from '../../domain/discovery';
-import { getRoomTheme, withColorAlpha } from '../../theme/roomTheme';
+import { getRoomTheme } from '../../theme/roomTheme';
 import { useAuthSession } from '../auth/AuthSessionProvider';
 import { KajoMark } from '../branding/KajoBrand';
 import { useEventTracking } from '../events/EventTrackingContext';
@@ -28,7 +27,6 @@ import { selectDrawerQuickLists } from '../lists/listPresentation';
 import { useProfileMessages } from '../messages/ProfileMessagesContext';
 import { CurtainControl } from '../room/CurtainControl';
 import {
-  RoomBackdrop,
   RoomInteractionLayer,
 } from '../room/RoomScreen';
 import { getCurtainPositionForMode } from '../room/curtainState';
@@ -69,7 +67,6 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   const [position] = useState(
     () => new Animated.Value(getCurtainPositionForMode(mode)),
   );
-  const roomBlurTarget = useRef<View>(null);
   const roomIsHome = isRoomPathname(pathname);
   const isItemDetail = /^\/discovery\/[^/]+$/.test(pathname) && !['/discovery/movies', '/discovery/books'].includes(pathname);
   const identityName =
@@ -193,96 +190,43 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
   }
 
   return (
-    <View style={[styles.shell, { backgroundColor: theme.base.appBackground }]}>
-      <View
-        pointerEvents="none"
-        style={[
-          styles.shellAmbient,
-          {
-            backgroundColor: theme.ambient.wash,
-            opacity: theme.ambient.washOpacity * 1.2,
-          },
-        ]}
-      />
-      <SafeAreaView
-        edges={['top']}
-        style={[
-          styles.safeHeader,
-          {
-            backgroundColor: theme.surface.appChrome,
-            borderBottomColor: theme.base.border,
-          },
-        ]}
-      >
-        <View style={styles.bar}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={isItemDetail ? 'Takaisin' : `Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
-            hitSlop={8}
-            onPress={isItemDetail ? () => router.back() : goHome}
-            style={({ pressed }) => [styles.brand, isItemDetail && styles.detailBack, pressed && styles.brandPressed]}
-          >
-            {isItemDetail ? <Text style={[styles.backArrow, { color: theme.base.textPrimary }]}>←</Text> : <View style={styles.brandMark}>
-              <KajoMark />
-            </View>}
-          </Pressable>
+    <FeedScreenFrame theme={theme}>
+      <FeedScreenHeader theme={theme}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={isItemDetail ? 'Takaisin' : `Palaa huoneeseen. Aktiivinen Kajo ${identityName}.`}
+          hitSlop={8}
+          onPress={isItemDetail ? () => router.back() : goHome}
+          style={({ pressed }) => [styles.brand, isItemDetail && styles.detailBack, pressed && styles.brandPressed]}
+        >
+          {isItemDetail ? <Text style={[styles.backArrow, { color: theme.base.textPrimary }]}>←</Text> : <View style={styles.brandMark}>
+            <KajoMark />
+          </View>}
+        </Pressable>
 
-          <View style={styles.control}>
-            <View style={styles.labelRow} pointerEvents="none">
-              <Text style={[styles.label, { color: theme.base.textMuted }]}>LÖYTÖTILA</Text>
-              {activeProfile?.type === 'SHARED' ? (
-                <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
-                  style={styles.sharedModeLabel}>RYHMÄTILA</Text>
-              ) : null}
-              <Text style={[styles.value, { color: theme.base.textPrimary }]}>
-                {MODE_LABELS[mode]}
-              </Text>
-            </View>
-            <CurtainControl
-              mode={mode}
-              onModeChange={changeMode}
-              position={position}
-              baseTheme={theme.base}
-              ambientTheme={theme.ambient}
-            />
+        <View style={styles.control}>
+          <View style={styles.labelRow} pointerEvents="none">
+            <Text style={[styles.label, { color: theme.base.textMuted }]}>LÖYTÖTILA</Text>
+            {activeProfile?.type === 'SHARED' ? (
+              <Text accessibilityLabel={`Ryhmätila: ${activeProfile.name}`}
+                style={styles.sharedModeLabel}>RYHMÄTILA</Text>
+            ) : null}
+            <Text style={[styles.value, { color: theme.base.textPrimary }]}>
+              {MODE_LABELS[mode]}
+            </Text>
           </View>
+          <CurtainControl
+            mode={mode}
+            onModeChange={changeMode}
+            position={position}
+            baseTheme={theme.base}
+            ambientTheme={theme.ambient}
+          />
         </View>
-      </SafeAreaView>
+      </FeedScreenHeader>
 
       <View style={styles.content}>
-        <BlurTargetView
-          ref={roomBlurTarget}
-          pointerEvents="none"
-          style={styles.roomBackdrop}
-        >
-          <RoomBackdrop />
-        </BlurTargetView>
-
-        {!roomIsHome ? (
-          <>
-            <BlurView
-              blurTarget={roomBlurTarget}
-              blurMethod="dimezisBlurViewSdk31Plus"
-              blurReductionFactor={2}
-              intensity={72}
-              tint="dark"
-              pointerEvents="none"
-              style={styles.roomBlur}
-            />
-            <View
-              pointerEvents="none"
-              style={[
-                styles.roomVeil,
-                {
-                  backgroundColor: withColorAlpha(
-                    theme.base.appBackground,
-                    0.4,
-                  ),
-                },
-              ]}
-            />
-          </>
-        ) : null}
+        <DiscoveryBackdrop theme={theme} clear={roomIsHome} />
 
         <View style={styles.navigatorLayer}>{children}</View>
 
@@ -841,87 +785,76 @@ export function DiscoveryModeShell({ children }: PropsWithChildren) {
       </View>
 
       {profiles.status === 'ready' ? (
-        <SafeAreaView
-          edges={['bottom']}
-          style={[
-            styles.safeDock,
-            {
-              backgroundColor: theme.surface.appChrome,
-              borderTopColor: theme.base.border,
-            },
-          ]}
-        >
-          <View style={styles.bottomDock}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Avaa valikko"
-              accessibilityState={{ expanded: overlay === 'navigation' }}
-              hitSlop={8}
-              onPress={() => toggleOverlay('navigation')}
-              style={({ pressed }) => [
-                styles.dockButton,
-                pressed && styles.brandPressed,
-              ]}
-            >
-              <View style={styles.menuGlyph}>
-                <View
-                  style={[
-                    styles.menuLine,
-                    { backgroundColor: theme.base.textPrimary },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.menuLine,
-                    { backgroundColor: theme.base.textPrimary },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.menuLine,
-                    { backgroundColor: theme.base.textPrimary },
-                  ]}
-                />
+        <FeedScreenDock theme={theme}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Avaa valikko"
+            accessibilityState={{ expanded: overlay === 'navigation' }}
+            hitSlop={8}
+            onPress={() => toggleOverlay('navigation')}
+            style={({ pressed }) => [
+              styles.dockButton,
+              pressed && styles.brandPressed,
+            ]}
+          >
+            <View style={styles.menuGlyph}>
+              <View
+                style={[
+                  styles.menuLine,
+                  { backgroundColor: theme.base.textPrimary },
+                ]}
+              />
+              <View
+                style={[
+                  styles.menuLine,
+                  { backgroundColor: theme.base.textPrimary },
+                ]}
+              />
+              <View
+                style={[
+                  styles.menuLine,
+                  { backgroundColor: theme.base.textPrimary },
+                ]}
+              />
+            </View>
+          </Pressable>
+
+          <BottomProfileControl
+            borderColor={theme.base.border}
+            identityName={identityName}
+            onOpen={() => setOverlay(null)}
+            panelColor={theme.surface.panel}
+            textMuted={theme.base.textMuted}
+            textPrimary={theme.base.textPrimary}
+          />
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={
+              inboxUnreadCount > 0
+                ? `Avaa postilaatikko. ${inboxUnreadCount} uutta kutsua tai viestiä.`
+                : 'Avaa postilaatikko'
+            }
+            accessibilityState={{ expanded: overlay === 'inbox' }}
+            hitSlop={8}
+            onPress={() => toggleOverlay('inbox')}
+            style={({ pressed }) => [
+              styles.dockButton,
+              pressed && styles.brandPressed,
+            ]}
+          >
+            <MailGlyph color={theme.base.textPrimary} />
+            {inboxUnreadCount > 0 ? (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {inboxBadgeLabel}
+                </Text>
               </View>
-            </Pressable>
-
-            <BottomProfileControl
-              borderColor={theme.base.border}
-              identityName={identityName}
-              onOpen={() => setOverlay(null)}
-              panelColor={theme.surface.panel}
-              textMuted={theme.base.textMuted}
-              textPrimary={theme.base.textPrimary}
-            />
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={
-                inboxUnreadCount > 0
-                  ? `Avaa postilaatikko. ${inboxUnreadCount} uutta kutsua tai viestiä.`
-                  : 'Avaa postilaatikko'
-              }
-              accessibilityState={{ expanded: overlay === 'inbox' }}
-              hitSlop={8}
-              onPress={() => toggleOverlay('inbox')}
-              style={({ pressed }) => [
-                styles.dockButton,
-                pressed && styles.brandPressed,
-              ]}
-            >
-              <MailGlyph color={theme.base.textPrimary} />
-              {inboxUnreadCount > 0 ? (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.notificationBadgeText}>
-                    {inboxBadgeLabel}
-                  </Text>
-                </View>
-              ) : null}
-            </Pressable>
-          </View>
-        </SafeAreaView>
+            ) : null}
+          </Pressable>
+        </FeedScreenDock>
       ) : null}
-    </View>
+    </FeedScreenFrame>
   );
 }
 
@@ -977,23 +910,6 @@ function DrawerListLink({
 }
 
 const styles = StyleSheet.create({
-  shell: {
-    flex: 1,
-  },
-  shellAmbient: {
-    ...StyleSheet.absoluteFill,
-  },
-  safeHeader: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  bar: {
-    minHeight: 48,
-    paddingHorizontal: 10,
-    paddingVertical: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   brand: {
     width: 76,
     height: 44,
@@ -1041,15 +957,6 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     overflow: 'hidden',
-  },
-  roomBackdrop: {
-    ...StyleSheet.absoluteFill,
-  },
-  roomBlur: {
-    ...StyleSheet.absoluteFill,
-  },
-  roomVeil: {
-    ...StyleSheet.absoluteFill,
   },
   navigatorLayer: {
     flex: 1,
@@ -1310,16 +1217,6 @@ const styles = StyleSheet.create({
   rejectButtonText: {
     fontSize: 12,
     fontWeight: '600',
-  },
-  safeDock: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  bottomDock: {
-    minHeight: BOTTOM_DOCK_HEIGHT,
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   dockButton: {
     width: 46,

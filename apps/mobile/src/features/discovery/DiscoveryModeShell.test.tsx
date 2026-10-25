@@ -3,6 +3,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Profile } from '../../domain/contracts';
 import { DiscoveryModeShell } from './DiscoveryModeShell';
 import { BOTTOM_DOCK_HEIGHT, getDockPanelBottomInset } from './shellLayout';
+import { FeedScreenDock, FeedScreenFrame, FeedScreenHeader } from './FeedScreenFrame';
 
 const context = vi.hoisted(() => ({
   profile: { id: 'personal', name: 'Oma Kajo', type: 'PERSONAL', ownerUserId: 'actor' } as Profile,
@@ -43,7 +44,8 @@ type Props = { children?: ReactNode; edges?: string[]; accessibilityLabel?: stri
   onPress?: () => void; onModeChange?: (mode: string) => void; style?: Record<string, unknown> | Record<string, unknown>[] };
 function nodes(tree: ReactNode): ReactElement<Props>[] {
   return React.Children.toArray(tree).flatMap(child => React.isValidElement<Props>(child)
-    ? [child, ...nodes(child.props.children)] : []);
+    ? [child, ...nodes([FeedScreenFrame, FeedScreenHeader, FeedScreenDock].includes(child.type as typeof FeedScreenFrame)
+      ? (child.type as (props: Props) => ReactNode)(child.props) : child.props.children)] : []);
 }
 function flatStyle(style: Props['style']) {
   return Object.assign({}, ...[style].flat());
@@ -61,8 +63,8 @@ describe('compact Discovery shell preserves its controls and safe bounds', () =>
   it('uses one top inset and one bottom inset with the existing compact dock', () => {
     const all = nodes(render());
     const safeAreas = all.filter(node => node.type === 'SafeAreaView');
-    expect(safeAreas.map(node => node.props.edges)).toEqual([['top'], ['bottom']]);
-    const dock = React.Children.toArray(safeAreas[1]!.props.children)[0] as ReactElement<Props>;
+    expect(safeAreas.map(node => node.props.edges)).toEqual([['left', 'right'], ['top'], ['bottom']]);
+    const dock = React.Children.toArray(safeAreas.find(node => node.props.edges?.includes('bottom'))!.props.children)[0] as ReactElement<Props>;
     expect(flatStyle(dock.props.style)).toMatchObject({ minHeight: BOTTOM_DOCK_HEIGHT });
     expect(getDockPanelBottomInset(24)).toBe(24 + BOTTOM_DOCK_HEIGHT + 8);
     expect(all.some(node => node.type === 'BottomProfileControl')).toBe(true);

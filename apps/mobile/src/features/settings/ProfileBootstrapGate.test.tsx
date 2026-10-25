@@ -11,6 +11,9 @@ import { id, profileId, sequentialResponse } from './personalTasteTestFixtures';
 import type { TasteCommand } from './personalTasteOperations';
 import type { ProfileBootstrapStatus, ProfileCalibrationRpc } from './profileCalibrationOperations';
 
+vi.mock('../discovery/DiscoveryBackdrop', () => ({ DiscoveryBackdrop: 'DiscoveryBackdrop' }));
+vi.mock('react-native-safe-area-context', () => ({ SafeAreaView: 'SafeAreaView' }));
+
 const hooks = vi.hoisted(() => ({
   frames: new Map<string, {
     states: unknown[];

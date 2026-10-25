@@ -220,4 +220,24 @@ describe('shared native feed presentation wiring', () => {
     expect(onReadingOffset).toHaveBeenLastCalledWith(0);
     expect(p.onSkip).not.toHaveBeenCalled(); expect(onPrevious).not.toHaveBeenCalled();
   });
+  it('makes large text and rating controls readable on a short viewport even with a short description', () => {
+    const onContentHeight = vi.fn(); const onReadingOffset = vi.fn();
+    const p = { ...props(), viewportHeight: 217, initialDescriptionHeight: 40,
+      initialReduceMotion: true, onContentHeight, onReadingOffset };
+    let tree = render(p);
+    nodes(tree).find(n => n.props.testID === 'feed-card-content')!.props.onLayout!({ nativeEvent: { layout: { height: 310 } } });
+    tree = render(p);
+    expect(tree.props.style).toContainEqual({ height: 317 });
+    nodes(tree).find(n => n.props.testID === 'feed-card-content')!.props.onLayout!({ nativeEvent: { layout: { height: 310 } } });
+    expect(onContentHeight).toHaveBeenCalledExactlyOnceWith(310);
+    const summary = nodes(tree).find(n => n.props.testID === 'feed-accessibility-summary')!.props;
+    expect(summary.accessibilityActions).toContainEqual({ name: 'scrollForward', label: 'Lue kuvausta eteenpäin' });
+    summary.onAccessibilityAction!({ nativeEvent: { actionName: 'scrollForward' } });
+    expect(onReadingOffset).toHaveBeenLastCalledWith(-100);
+    expect(p.onSkip).not.toHaveBeenCalled();
+    tree = render({ ...p, viewportHeight: 620 });
+    expect(tree.props.style).toContainEqual({ height: 620 });
+    expect(onReadingOffset).toHaveBeenLastCalledWith(0);
+    expect(p.onSkip).not.toHaveBeenCalled();
+  });
 });

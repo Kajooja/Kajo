@@ -14,7 +14,68 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
-## Authorized feed integration and Taste pool continuation — 2026-10-24
+## Taste card layout parity blocker — 2026-10-25
+
+The owner reports that #721 Taste has wrong margins, oversized artwork and
+inaccessible rating controls, and explicitly requires the same appearance as
+BOOK/MOVIE Discovery card mode. This blocks the fresh V4/adaptation device test.
+The source now uses shared `FeedScreenFrame` / `DiscoveryBackdrop` boundaries and
+measured non-artwork card height, retained through rolling previews. All 80 mobile
+files / 904 tests, mobile types and lint pass; 24/24 native Yoga Taste/reference
+fixtures match with reachable controls. Approximate text fixtures are not device
+acceptance. Broad root checks/exports were interrupted by tool quota; no full
+local root/export pass is claimed. PR #357 owns the final-source CI and matching
+APK receipts as they become available. The focused
+[device checks](../DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25)
+remain open until actual owner observations are recorded. The prior six
+Discovery observations retain their scope. V4 installation and the scoped
+October 24 reset remain complete; preserve new accounts/answers and do not replay
+either operation. [STATUS](../STATUS.md) and the active #357 PR own continuation
+and exact source/build receipts; UX_PRINCIPLES owns presentation parity.
+
+## V4 hosted rollout, two-account reset and performance plan — 2026-10-24
+
+#355/#356 source integration is complete; #356's final head passed CI #720 and
+accepted main `340d0da660fe02d6d9d47d468bee75e134546fa3` passed all six CI #721 jobs,
+including the configured APK. The owner accepts the six supplied device cases;
+long-browse → Löydä takes approximately 4–5 seconds, acceptable with improvement
+desired. [DEVICE_TEST](../DEVICE_TEST.md#apk-721-owner-observations-and-next-test-boundary--2026-10-24)
+owns that scoped acceptance, not a measured latency distribution or full quality
+gate. #356 owns exact source/build receipts; no unchanged repeat is required.
+
+The current `feat/336-taste-rollout-performance-plan` packet adds
+`personal-taste-pool-hosted-upgrade.{mjs,test.mjs}`: a source-pinned, private
+checkpoint-bound single-forward preparation helper with read-only pre/postflight,
+atomic preservation assertions and replay/drift rejection. UTC row-digest capture
+and a narrow provider-owned Auth-history lock boundary retain full pre/post
+guards. Four focused helper tests pass; the full local root check stops at the
+unchanged Deno registry connection refusal, with remaining stages passed separately.
+The helper itself does not execute hosted writes or reset accounts. The one
+accepted V4 forward is now installed: history advanced 86 → 87, new sessions
+default to V4 and read-only metadata/security/row-preservation postflight passed.
+The owner-required reset of exactly two intended test-account roots is also
+complete, with independent read-only postflight: account/session roots and 60
+checked test-state tables are empty, while catalogue/source/model structure hashes,
+87 migration receipts and the V4 default are preserved. The owner must register
+the same two email addresses again with owner-chosen passwords, creating fresh
+identities before V4 device/adaptation testing. [STATUS](../STATUS.md) owns the
+aggregate receipt; exact private identities/checkpoints stay outside Git.
+The owner explicitly approved publication of this completed eight-file
+helper/docs packet on 2026-10-24, resolving the earlier automatic approval
+rejection. No workaround or publication retry preceded that approval. Publish
+the approved branch packet; its PR owns the exact published head and CI receipts.
+Publication approval does not establish new CI success, source merge or V4 device
+acceptance, and does not repeat the completed hosted rollout/reset.
+
+[ROADMAP's performance work package](../ROADMAP.md#end-to-end-performance-measurement--2026-10-24)
+and `MVP-UX-008` promote end-to-end measurement into near-term work: establish the
+visible/actionable/saved baseline, diagnose queue/handoff/RPC/rendering costs and
+remeasure bounded changes before broad optimization. Fresh-account device testing
+and the initial timing baseline are next; full measurement/operational acceptance
+stays in Phase 17 and scoring quality remains separate. No measured speed
+improvement, V4 device/quality acceptance or Sprint 014 closure is claimed.
+
+## Earlier authorized feed integration and Taste pool continuation — 2026-10-24
 
 The owner explicitly authorized merging #355 and then #356 after verification,
 resolving the earlier automatic merge rejection. #355 is merged as

@@ -7,6 +7,8 @@ import { ItemDescription } from './ItemDescription';
 import { createFeedDismissal, FEED_DRAG_DISTANCE, isFeedFling } from './feedDismissal';
 
 const HELP_KEY = 'kajo:vertical-feed-help:v2';
+const CARD_GAP = 5;
+const CARD_TOP_PADDING = 2;
 export const FEED_HELP = 'Selaa seuraavaan pyyhkäisemällä korttia ylöspäin. Pitkää kuvausta lukiessa kortti pysähtyy arvosanaan. Uusi pyyhkäisy jatkaa seuraavaan. Ilman valintaa teos ohitetaan. Napauta tai vedä liukuria: arvosana tallentuu ja seuraava kortti avautuu.';
 type FeedMotionSettings = { disabled: boolean; canForward: boolean; canPrevious: boolean;
   reduceMotion: boolean | null; viewportHeight: number | undefined; cardHeight: number | undefined;
@@ -21,9 +23,10 @@ function dragOffset(settings: FeedMotionSettings, origin: number, dy: number) {
   const lowerBound = dy < 0 && origin > minimum ? minimum : -(settings.cardHeight ?? 500);
   return Math.max(lowerBound, Math.min(settings.viewportHeight ?? 500, origin + dy));
 }
-export function getFeedCardHeight(viewportHeight: number | undefined, descriptionHeight: number) {
+export function getFeedCardHeight(viewportHeight: number | undefined, descriptionHeight: number, contentHeight = 0) {
   return viewportHeight && viewportHeight > 0
-    ? viewportHeight + Math.max(0, descriptionHeight - Math.max(80, viewportHeight * 0.28)) : undefined;
+    ? Math.max(viewportHeight + Math.max(0, descriptionHeight - Math.max(80, viewportHeight * 0.28)),
+      contentHeight + CARD_GAP + CARD_TOP_PADDING) : undefined;
 }
 function helpKey(scope: string) { return `${HELP_KEY}:${scope}`; }
 function helpUnseen(scope: string) {
@@ -41,7 +44,7 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
   hasInteracted = false, viewportHeight, helpKind = 'discovery', entryDirection, entryOffset,
   onForwardOffset, nextCard, previousCard, preview = false, initialReduceMotion, onMotionPreference,
   initialExpanded = false, onDescriptionExpanded, initialDescriptionHeight = 0, onDescriptionHeight,
-  onReadingOffset, previousCardHeight, titleAction, children }: PropsWithChildren<{
+  initialContentHeight = 0, onContentHeight, onReadingOffset, previousCardHeight, titleAction, children }: PropsWithChildren<{
   item: Item; theme: RoomTheme; disabled: boolean; onSkip?: () => boolean;
   onPrevious?: () => boolean; helpScope?: string; hasInteracted?: boolean; viewportHeight?: number | undefined;
   helpKind?: 'discovery' | 'taste'; entryDirection?: 'forward' | 'backward'; titleAction?: ReactNode;
@@ -50,12 +53,14 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
   initialReduceMotion?: boolean | null; onMotionPreference?: (value: boolean) => void;
   initialExpanded?: boolean; onDescriptionExpanded?: (value: boolean) => void;
   initialDescriptionHeight?: number; onDescriptionHeight?: (height: number) => void;
+  initialContentHeight?: number; onContentHeight?: (height: number) => void;
   onReadingOffset?: (offset: number) => void; previousCardHeight?: number | undefined;
 }>) {
   const [imageFailed, setImageFailed] = useState(false);
   const [expanded, setExpanded] = useState(initialExpanded);
   const [descriptionHeight, setDescriptionHeight] = useState(initialDescriptionHeight);
-  const cardHeight = getFeedCardHeight(viewportHeight, descriptionHeight);
+  const [contentHeight, setContentHeight] = useState(initialContentHeight);
+  const cardHeight = getFeedCardHeight(viewportHeight, descriptionHeight, contentHeight);
   const [helpState, setHelpState] = useState(() => ({ scope: helpScope, interacted: hasInteracted, visible: !preview && helpUnseen(helpScope) && !hasInteracted }));
   if (helpState.scope !== helpScope) {
     setHelpState({ scope: helpScope, interacted: hasInteracted, visible: helpUnseen(helpScope) && !hasInteracted });
@@ -285,24 +290,33 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
             <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>{item.title}</Text></View>}
       </View>
     </View>
-    <View style={styles.titleRow}>
-      <Text testID="feed-title" accessibilityRole="header" accessibilityLabel={item.title}
-        numberOfLines={2} ellipsizeMode="tail" style={[styles.title, styles.titleInRow, bounded && styles.boundedTitle]}>{item.title}</Text>
-      {titleAction ? <View style={styles.titleActionSlot}>{titleAction}</View> : null}
-    </View>
-    <Text testID="feed-creators" numberOfLines={1} ellipsizeMode="tail" style={styles.muted}>{[item.creators?.join(', '), item.releaseYear, item.originalLanguage].filter(Boolean).join(' · ')}</Text>
-    {item.tags?.length ? <Text numberOfLines={1} style={styles.muted}>{item.tags.slice(0, 5).join(' · ')}</Text> : null}
-    <View testID="feed-description-content" style={styles.description}
+    <View testID="feed-card-content" style={styles.content}
       onLayout={event => {
+        // Measure only the non-artwork content. Its intrinsic height is stable
+        // when the hero shrinks, and keeps large text/controls scrollable on
+        // short viewports without a nested scroll view or a synthetic choice.
         const height = Math.ceil(event.nativeEvent.layout.height);
-        if (height !== descriptionHeight) { setDescriptionHeight(height); onDescriptionHeight?.(height); }
+        if (height !== contentHeight) { setContentHeight(height); onContentHeight?.(height); }
       }}>
-      <ItemDescription item={item} expanded={expanded} onExpandedChange={value => {
-        const next = typeof value === 'function' ? value(expanded) : value;
-        setExpanded(next); onDescriptionExpanded?.(next);
-      }} theme={theme} compact />
+      <View style={styles.titleRow}>
+        <Text testID="feed-title" accessibilityRole="header" accessibilityLabel={item.title}
+          numberOfLines={2} ellipsizeMode="tail" style={[styles.title, styles.titleInRow, bounded && styles.boundedTitle]}>{item.title}</Text>
+        {titleAction ? <View style={styles.titleActionSlot}>{titleAction}</View> : null}
+      </View>
+      <Text testID="feed-creators" numberOfLines={1} ellipsizeMode="tail" style={styles.muted}>{[item.creators?.join(', '), item.releaseYear, item.originalLanguage].filter(Boolean).join(' · ')}</Text>
+      {item.tags?.length ? <Text numberOfLines={1} style={styles.muted}>{item.tags.slice(0, 5).join(' · ')}</Text> : null}
+      <View testID="feed-description-content" style={styles.description}
+        onLayout={event => {
+          const height = Math.ceil(event.nativeEvent.layout.height);
+          if (height !== descriptionHeight) { setDescriptionHeight(height); onDescriptionHeight?.(height); }
+        }}>
+        <ItemDescription item={item} expanded={expanded} onExpandedChange={value => {
+          const next = typeof value === 'function' ? value(expanded) : value;
+          setExpanded(next); onDescriptionExpanded?.(next);
+        }} theme={theme} compact />
+      </View>
+      {children ? <View style={styles.controls}>{children}</View> : null}
     </View>
-    {children ? <View style={styles.controls}>{children}</View> : null}
     {help ? <View style={styles.help} testID="feed-first-use-help">
       <Text style={styles.helpText}>{FEED_HELP}{helpKind === 'discovery' ? ' Alaspäin palaat ja kumoat. Tähti avaa listat.' : ''}</Text>
       <Pressable accessibilityRole="button" accessibilityLabel="Sulje selaamisen ohje" onPress={() => {
@@ -317,7 +331,8 @@ export function FeedItemCard({ item, theme, disabled, onSkip, onPrevious, helpSc
 }
 function createStyles(theme: RoomTheme) {
   return StyleSheet.create({
-    card: { gap: 5, width: '100%', maxWidth: 480, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 2 },
+    card: { gap: CARD_GAP, width: '100%', maxWidth: 480, alignSelf: 'center', paddingHorizontal: 20, paddingTop: CARD_TOP_PADDING },
+    content: { gap: CARD_GAP, flexShrink: 0 },
     adjacent: { position: 'absolute', left: 0, right: 0 },
     browse: { gap: 4 }, browseFill: { flex: 1, minHeight: 0, overflow: 'hidden' },
     hero: { height: 260, width: '100%', maxWidth: 340, alignSelf: 'center', borderRadius: 10, overflow: 'hidden', backgroundColor: theme.ambient.curtain },

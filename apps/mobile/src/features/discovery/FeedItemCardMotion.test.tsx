@@ -422,6 +422,22 @@ describe('mounted feed card motion', () => {
     expect(previous.findByType(FeedItemCard).props.initialDescriptionHeight).toBe(500);
   });
 
+  it('retains the measured large-text extent and stops at controls before dismissing a short viewport', async () => {
+    const onSkip = vi.fn(() => true);
+    await act(async () => { renderer = create(<RollingFeedCard {...base} viewportHeight={217} opportunity="one" onSkip={onSkip} />); });
+    await act(async () => { renderer!.root.findByProps({ testID: 'feed-card-content' }).props.onLayout({ nativeEvent: { layout: { height: 310 } } }); });
+    await act(async () => { drag(-140); release(-140); });
+    expect(fixture.animations.at(-1)?.toValue).toBe(-100);
+    expect(onSkip).not.toHaveBeenCalled();
+    const count = fixture.values.length;
+    await act(async () => { renderer!.update(<RollingFeedCard {...base} viewportHeight={217}
+      item={{ ...base.item, id: 'two' }} opportunity="two" entryDirection="forward" />); });
+    expect(fixture.values[count]!.initial).toBe(217);
+    const previous = renderer!.root.findByProps({ testID: 'feed-previous-preview' });
+    expect(previous.props.style).toContainEqual({ top: -317, height: 317 });
+    expect(previous.findByType(FeedItemCard).props.initialContentHeight).toBe(310);
+  });
+
   it('keeps a historical return preview mounted when its fresh delivery becomes actionable, without replaying entry', async () => {
     const onSkip = vi.fn(() => true); const onPrevious = vi.fn(() => true);
     const previous = { ...base.item, id: 'previous', title: 'Previous' };

@@ -73,6 +73,7 @@ import { getMockItem } from './mockDiscovery';
 import { RatingControl } from './RatingControl';
 import { FeedRatingControl } from './FeedRatingControl';
 import { RollingFeedCard } from './RollingFeedCard';
+import { FeedRatingFrame, FeedScreenViewport } from './FeedScreenFrame';
 import { useDiscoveryFeed } from './useDiscoveryFeed';
 import {
   formatMemberHistoryProvenance,
@@ -919,7 +920,7 @@ function ItemDetailContent({
         ) : null}
       </View> : null}
 
-      {initialFeed ? <View style={styles.feedViewport} onLayout={event => setFeedHeight(event.nativeEvent.layout.height)}>
+      {initialFeed ? <FeedScreenViewport onLayout={event => setFeedHeight(event.nativeEvent.layout.height)}>
         {feed.state?.exhausted && !restoringPresentation ? <View style={styles.feedEnd}><Text style={styles.feedbackText}>Kaikki tämän hetken suositukset on käyty läpi.</Text>
           <Pressable accessibilityRole="button" onPress={() => feed.flow?.retry()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Päivitä</Text></Pressable>
           {feed.state.canPrevious && !feedDisabled ? <Pressable accessibilityRole="button" onPress={() => feed.flow?.previous()} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Edellinen kortti</Text></Pressable> : null}
@@ -927,9 +928,9 @@ function ItemDetailContent({
         {feedItem && feedInteraction ? <RollingFeedCard opportunity={feedPresentationKey} item={feedItem} theme={theme} disabled={feedDisabled}
             {...(feed.state?.upcoming?.[0] ? { nextItem: feed.state.upcoming[0].item } : {})}
             previewTitleAction={<View style={styles.feedStar}><Text style={styles.feedStarGlyph}>☆</Text></View>}
-            previewControls={<View style={styles.feedActions}><View style={styles.feedRating}>
+            previewControls={<FeedRatingFrame>
               <RatingControl rating={null} disabled theme={theme} onRatingChange={() => {}} />
-            </View></View>}
+            </FeedRatingFrame>}
             {...(activeProfile.actorUserId ? { helpScope: activeProfile.actorUserId } : {})} viewportHeight={feedHeight}
             {...(feedDirection ? { entryDirection: feedDirection } : {})}
             hasInteracted={feed.state?.positiveCommitted === true}
@@ -953,10 +954,8 @@ function ItemDetailContent({
             {feedApproval ? <Pressable accessibilityRole="button" disabled={feedDependentDisabled} style={styles.primaryButton}
               onPress={() => void handleEndorsement(feedItem, 0, undefined, undefined, undefined, feedSharedState?.proposedLists?.map(list => list.id))}>
               <Text style={styles.primaryButtonText}>Hyväksy {formatPendingListApproval(feedApproval)}</Text></Pressable> : null}
-            <View style={styles.feedActions}>
-              <View style={styles.feedRating}><FeedRatingControl itemId={feedItem.id} draft={feedDraft} disabled={feedDisabled} theme={theme}
-                onRatingChange={rating => { if (!feedDisabled) { setFeedDraft(rating); handleRating(feedItem, 0, feedInteraction, rating); } }} /></View>
-            </View>
+            <FeedRatingFrame><FeedRatingControl itemId={feedItem.id} draft={feedDraft} disabled={feedDisabled} theme={theme}
+                onRatingChange={rating => { if (!feedDisabled) { setFeedDraft(rating); handleRating(feedItem, 0, feedInteraction, rating); } }} /></FeedRatingFrame>
             {feedSharedState?.currentActorEndorsed && !feedSaved ? <Text style={styles.feedbackText}>Odottaa ryhmän hyväksyntää</Text> : null}
           </RollingFeedCard> : null}
 
@@ -994,7 +993,7 @@ function ItemDetailContent({
           </View>
         </Modal> : null}
 
-      </View> : (
+      </FeedScreenViewport> : (
 
       <FlatList
         ref={listRef}
@@ -1428,7 +1427,6 @@ function createStyles(theme: RoomTheme) {
       fontSize: 12,
       fontWeight: '700',
     },
-    feedViewport: { flex: 1, minHeight: 0, overflow: 'hidden' },
     feedEnd: { position: 'absolute', top: 0, bottom: 0, left: 20, right: 20,
       zIndex: 5, justifyContent: 'center', alignItems: 'center', gap: 12 },
     feedRecoveryButton: { position: 'absolute', top: 8, right: 8, zIndex: 6, width: 44, height: 44,
@@ -1438,8 +1436,6 @@ function createStyles(theme: RoomTheme) {
     feedRecoveryPanel: { maxHeight: '85%', gap: 14, padding: 20, borderRadius: 20, backgroundColor: theme.surface.panel },
     feedRecoveryTitle: { color: theme.base.textPrimary, fontSize: 20, fontWeight: '700' },
     feedRecoveryMessages: { flexGrow: 0 },
-    feedActions: { width: '100%', alignSelf: 'center', paddingHorizontal: 8 },
-    feedRating: { width: '100%', minWidth: 0 },
     feedStar: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
     feedStarGlyph: { color: '#ffffff', fontSize: 20, lineHeight: 24 },
     feedbackRow: {

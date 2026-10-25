@@ -42,23 +42,39 @@ by an uncalibrated confidence label.
 
 ## Near-term feed and first-answer personalization — 2026-10-15
 
-**October 24 continuation after APK #716:** the owner reports that the supplied
-latency successor works well and asks to continue. PR #355's browsing/return,
-local cancellation and rating-stop source passed all five required gates and its
-configured APK build. The owner subsequently explicitly authorized #355 and #356
-integration after verification; #355 is merged and #356 now targets main.
-STATUS owns the final-head integration checkpoint. The general phone report does not close the
-unreported startup/network/process-death matrix or recommendation-quality gate.
+**October 25 blocking device feedback:** #721 Taste has wrong margins, oversized
+artwork and inaccessible rating controls. Match the BOOK/MOVIE Discovery card
+appearance and usable viewport before continuing the V4/adaptation test with a
+corrected matching APK. [STATUS](STATUS.md) owns this immediate correction and
+[DEVICE_TEST](DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25) its focused
+acceptance. Earlier Discovery acceptance, installed V4 and the completed scoped
+reset remain valid; preserve accounts and answers created since the reset.
+
+**October 24 continuation after APK #721:** #355 and #356 are merged after the
+authorized final-source checks; main CI #721 passed all six jobs, including its
+configured APK. The owner reports all six supplied checks working: offline/
+reconnect, final-choice persistence after background/close/reopen, cold startup,
+return to Löydä, expanded-description rating stop and repeated immediate Undo.
+Long-session return takes approximately 4–5 seconds, accepted for now with faster
+return desired. These are scoped owner observations, not a measured latency
+distribution or complete device/recommendation-quality acceptance.
 The bounded #336 versioned Taste candidate-pool refresh/refill source now supplies
 a new-session-only V4 policy and pool helper, with matching question lookup,
 answer projection, contextual-skip and lifecycle consumers. Retained policies,
 immutable panels/first labels and exact retries remain preserved. Its implementation
-passed all five CI #718 gates, including genuine native preservation and separate
-committed RPC validation. Complete the authorized #356 integration after its final
-handoff head passes required checks, then prepare the guarded matching hosted
-forward and configured APK/device acceptance. Native installation and full device/usefulness
-acceptance remain separate, and no hosted deployment is included. STATUS owns the
-exact validation/publication checkpoint and next action.
+passed all five final-head CI #720 gates, including genuine native preservation
+and separate committed RPC validation. The single matching hosted V4 forward is
+now installed with verified metadata/security and retained-row preservation.
+The owner's required reset of the exact two test-account roots is also complete
+and independently verified; catalogue/source/model structures and V4 installation
+remain intact. The owner must register the same two email addresses again with
+fresh identities before V4 device/adaptation acceptance. STATUS owns the source,
+rollout and scoped reset receipt; DEVICE_TEST owns reported cases and the new test
+boundary. The owner explicitly approved the completed eight-file helper/docs
+packet for GitHub publication on October 24, resolving the earlier automatic
+approval rejection. Publish that packet and record its exact source/CI receipts
+in its PR; publication approval does not itself establish CI or device acceptance.
+The measurement work package below is now explicit near-term work.
 
 **Separate subsequent recommendation-quality review:** the owner explicitly
 requests more precise recommendations and review of internal scoring after this
@@ -85,9 +101,9 @@ ordinary acknowledgement/refill is quiet. Already prepared cards retain their
 frozen origins across later acknowledgements; new refills consume the latest
 committed prefix. The earlier #710 feedback led to inert Undo presentation and
 uninterrupted bounded refill; the #716 successor adds safe local cancellation and
-prepared-grid return. That source is tested and the owner reports general good
-behavior; #355 source is now merged while unreported device cases stay open.
-Continue with the versioned #336 integration/rollout packet above. Broad collection/detail work
+prepared-grid return. That source is tested and the six later owner-reported
+cases are accepted; broader unreported device cases stay open.
+Continue with the versioned #336 rollout/test packet above. Broad collection/detail work
 retains its existing slot. The default Discovery grid is unchanged;
 UX_PRINCIPLES owns the superseding controls contract.
 
@@ -110,13 +126,13 @@ history receipts. PR #353 repairs the subsequent Room → Movies/Books navigatio
 blocker on #698. #354's compact feed/skip-clock/startup correction is accepted
 after all five CI #704 gates; the owner previously confirmed #700 navigation
 checks. PR #355 subsequently supplies the continuous prepared feed and #716
-latency successor. All six CI #716 jobs passed and the owner reports general good
-behavior on the supplied APK; individual unreported device cases remain open.
-The owner's explicit approval resolved the earlier merge block, and #355 is
-merged. Finish the authorized #356 final-head verification/integration, then its
-guarded hosted preparation and matching APK/device acceptance. If #356 is already
-merged, continue from its PR receipt and fresh main rather than repeating source
-implementation or the resolved approval request.
+latency successor. #355 and #356 are merged; final-head CI #720 and main CI #721
+passed, and the owner accepts the six reported #721 cases. Continue from the
+source/build, verified V4 installation and completed scoped two-account reset
+receipts with fresh registration and matching V4 device acceptance. Do not repeat
+accepted source work, the resolved approval request or the six unchanged device cases.
+Schedule the initial timing diagnostic below before further broad speed changes;
+the acceptable 4–5-second observation does not block the V4 continuation.
 Keep original frozen panels, first labels, session policies and retry origins.
 The reader lifecycle must preserve immutable page receipts while retiring only
 obsolete derived readers. Do not replay installed operations. STATUS owns exact
@@ -138,8 +154,10 @@ admits no early Context/Scenario-change shortcut. This source/observed UI progre
 does not close full device/quality acceptance or MVP-UX-007.
 
 Define and compare the bounded recent cold-start policy before accepting the full
-first-session quality gate. Existing v1/completed Profiles stay preserved; no
-account reset, migration replay or model activation is authorized by this plan.
+first-session quality gate. Existing v1/completed Profiles stay preserved except
+for the exact two test-account roots removed by the owner's verified pre-test
+reset. That instruction is
+not a global reset, migration replay or model-activation authorization.
 Anonymous entry and the remaining release dependencies retain their existing gates.
 
 At the pre-#345 checkpoint, deployed numeric-v2 source updated bootstrap and
@@ -166,10 +184,11 @@ new-session-only immutable
 utility-first ranking and a traced domain-lead guard. Retained session policies,
 wire replies and frozen history stay unchanged. Source and hosted acceptance do
 not establish an observed eligible-owner session, phone behavior or quality.
-Deployed V3 retains its START-time 25-per-type pool. #356 supplies the V4 refresh/
-refill source and passed implementation CI; its final integration, guarded hosted
-rollout and device acceptance follow the current packet above. Device acceptance
-of the installed neutral skip/shared feed and the recent prior remain mandatory.
+Retained V3 sessions keep their START-time 25-per-type pool. #356 supplies the V4
+refresh/refill source and is merged after final-source CI; its guarded hosted
+forward and scoped reset are complete, while fresh registration and device
+acceptance follow the current packet above. Device acceptance of the installed
+neutral skip/shared feed and the recent prior remain mandatory.
 See the [source contract](../domain/PREDICTION_MODEL.md#canonical-forecast-selector-source--2026-10-16)
 and STATUS for the exact acceptance receipt and device continuation.
 
@@ -180,6 +199,78 @@ the reported observation separately from the planned successor matrix. Full
 attention timing, learned WorldState and privacy-gated Scenario retrieval retain
 their staged engine contracts; their unfinished scope does not excuse ignoring
 an already supported explicit rating now.
+
+## End-to-end performance measurement — 2026-10-24
+
+**Owner priority and placement:** make duration measurement a substantial work
+package under `MVP-UX-008`, with operational acceptance in Phase 17.0/17.2 and
+`MVP-OPS-004`. The reported 4–5-second long-session return is acceptable to the
+owner; improvement is desired. It is one approximate observation, not a baseline,
+percentile, service-level objective or proof of a particular bottleneck. Complete
+an initial instrumented diagnostic before further broad speed optimization.
+Keep fresh-account V4 testing moving after the completed scoped reset; broad
+device/performance acceptance remains part of core UX/operations before beta.
+Recommendation scoring/usefulness stays in the separate algorithm-quality gate.
+
+**P1 — Define the trace and user milestones.** Time from the initiating tap,
+gesture/navigation or app launch to (a) first relevant content visible, (b) first
+valid actionable content and (c) durable local admission / confirmed server save
+where an action is involved. Separate these milestones: an inert Undo preview or
+loading skeleton is not actionable, and local durability is not server receipt.
+Use monotonic elapsed timings within each runtime and bounded correlation IDs
+across request/response stages; do not subtract unsynchronized client/server
+clocks. Tag build/backend/policy version, flow, domain, session-length band,
+network state and outcome without copying user content or preference values.
+
+The first diagnostic must make these potential costs distinguishable:
+
+| Flow/stage | Required diagnostic distinction |
+|---|---|
+| Feed → Löydä | Prepared handoff hit/miss with bounded reason codes, eligibility/expiry/invalidation, prepared-card visibility and actionability, plus fresh-grid completion. A miss is not by itself an error. |
+| Durable action/outbox | Local persistence, held/released choice, both queue drains, queue depth/oldest age, retries and acknowledgement. Separate queue waiting from network/server work. |
+| Fresh ranking/catalogue | Client request/network wait, ranking RPC and catalogue enrichment RPC as separate spans; server breakdown only where reliably observable. Report retries/timeouts and missing spans explicitly. |
+| Presentation | State-to-render/commit, first relevant image readiness and first usable controls; distinguish cached/uncached images and layout/interaction delay from backend delay. |
+| Taste and recovery | ANSWER acknowledgement → fresh NEXT → visible/actionable question, startup/bootstrap and offline-to-recovered usability; retain exact command identity across retry. |
+
+**P2 — Capture a reproducible baseline.** Start with the long-browse return that
+motivated the request, then cover cold and warm launch/return, short and long
+browsing, valid handoff and fallback, BOOK/MOVIE, ordinary/slow/offline/recovered
+connectivity, delayed acknowledgements and background/resume. Record the actual
+device/OS/build/backend, cache state, relevant queue state, elapsed session length
+and trial count. Define the minimum sample plan before measurement; publish p50
+and p95 with the successful/failed/cancelled denominators, missing-trace count and
+repeatability limits for each comparable cohort. Sparse trials remain exploratory
+observations, not a reliable tail estimate. Keep first visible, first actionable
+and saved timings separate, and preserve the already accepted functional cases.
+
+**P3 — Diagnose, change and remeasure.** Use the correlated critical path to select
+one bounded intervention, compare it with the same baseline conditions and report
+absolute timings plus the change, failures and resource cost. Set versioned
+per-flow targets/regression thresholds from the measured baseline and acceptable
+user experience before declaring an improvement accepted; no achieved SLA or
+arbitrary subsecond promise is assumed. Prefer verified savings in redundant work,
+queue scheduling, request composition, rendering or image delivery. Do not extend
+origin validity, expose stale actionable cards, bypass queue/receipt ordering,
+drop accepted choices or precompute adaptive Taste questions to make timings look
+better. If no safe improvement is supported, record that finding and the next
+diagnostic instead of changing cache/freshness rules speculatively.
+
+**P4 — Make measurement safe and maintainable.** Bound and version sampling,
+per-trace spans, buffers/export volume, retention and access; provide an off switch
+and measure instrumentation overhead against a disabled baseline. Correlation IDs
+must not expose account IDs, tokens, Item titles, ratings, raw gestures or other
+private content in public logs. Treat failed/export-dropped samples explicitly.
+Operational latency is separate from attention/dwell, acquisition telemetry and
+canonical recommendation Events: it does not update preference, reward, readiness
+or confidence. Apply the existing `MVP-OPS-002` deletion/retention boundary.
+
+**Exit evidence:** a versioned trace/milestone contract, representative baseline
+with sample counts and p50/p95 limitations, one evidence-based intervention or
+documented no-change conclusion, repeated comparison and calibrated regression
+budget, plus overhead/privacy checks and an operational diagnostic/runbook.
+[DEVICE_TEST](DEVICE_TEST.md#performance-diagnostic--planned-measurement) owns
+physical-device observations. Source/CI success, deployment, measured speed and
+recommendation quality remain separately evidenced acceptance claims.
 
 ## Source integration decision — 2026-10-12
 
@@ -858,7 +949,7 @@ source component or a closed release gate.
 
 ### 17.0 — Browse/core UX completion
 
-Requirements: `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, `MVP-UX-003..006`, Lists/messages/Room/device acceptance.
+Requirements: `MVP-DISC-008..009`, `MVP-NAV-005`, `MVP-UX-001`, `MVP-UX-003..008`, Lists/messages/Room/device acceptance.
 
 Exit: contextual Lists, search/filters and authorized Profile surfaces; accessibility/reduced motion/error/offline states; deferred device gates; graphics may evolve without changing domain contracts. Preserve planned #231 multi-select/trash work in its product scope rather than mixing it into engine extraction.
 
@@ -886,6 +977,14 @@ Its server/source, APK and gesture/small-screen/large-text acceptance remain
 separate. Remaining broad browse UX stays here. UX_PRINCIPLES owns the full
 contract; continuous loading depends on the accepted cursor/delivery path.
 Later cast/director presentation stays under FUT-CAT-001.
+
+The owner-promoted [end-to-end performance work package](#end-to-end-performance-measurement--2026-10-24)
+starts with a near-term diagnostic before broad speed optimization; it does not
+move all Phase 17 work ahead of the current V4 packet. Full `MVP-UX-008` acceptance
+here requires representative baseline and repeated measured results, calibrated
+budgets and unchanged durability/freshness/recovery behavior. Phase 17.2 supplies
+bounded private diagnostics, retention, overhead controls and latency runbooks;
+Phase 17.1 growth telemetry and algorithm-quality evaluation stay separate.
 
 ### 17.1 — Launch telemetry and experimentation
 
