@@ -14,6 +14,24 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Native cutoff parity and engine architecture checkpoint — 2026-10-25
+
+The owner requests a concrete architecture/status assessment and prioritizes the
+engine build-out now. ENGINE_BUILDOUT records the partial Generation 1 against
+actual SQL/reference code; ROADMAP owns the near-term state/WorldState/evaluation/
+recall/shared-serving order. Active short/long memories, OFF WorkingState and
+same-Profile recall are distinguished from missing calibrated readiness and
+unadmitted cross-Profile prediction. No later-generation capability is closed.
+
+The bounded source forward shares finite Item/source cutoff eligibility between
+V4 acquisition and explicit evaluation, fixing the latter's future-source gap.
+Ordinary Discovery acquisition and all score math remain unchanged. The native
+committed-answer regression adds 4/9 sensitivity, overlapping Discovery score
+parity at the native-evidence cutoff, prior-forecast preservation and Profile
+isolation. Full state/WorldState/as-of and candidate-selection parity still need
+the versioned successor. STATUS/current PR own exact validation receipts; this
+packet supplies no hosted migration, APK, reset or model/readiness activation.
+
 ## Verified curated BOOK cover implementation — 2026-10-25
 
 The first ADR-0011 foundation now supplies a reviewed 30-book Work/English

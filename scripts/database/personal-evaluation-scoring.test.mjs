@@ -146,33 +146,81 @@ test('canonical explicit-candidate evaluation / complete current schema',async t
       await query("select private.erase_prediction_sources_v1('PREDICTION_RUN',$1)",[r.predictionId]);
       assert.equal((await one('select count(*)::int n from private.prediction_candidates where prediction_id=$1',[r.predictionId])).n,0);
     });
-    await t.test('real committed Taste answers change later forecasts; same-transaction NEXT is rejected',async()=>{
+    await t.test('committed numeric Taste prefixes match Discovery at the same native-evidence cutoff without changing frozen forecasts or another Profile',async()=>{
       await db.exec('begin;');const profile=await setup();
+      const otherProfile=(await one("select id from public.profiles where owner_user_id=$1 and profile_type='PERSONAL'",[other])).id;
       const start=(await one('select public.taste_session_v1($1) value',[{operation:'START',profileId:profile,requestId:randomUUID()}])).value;
       const sessionId=start.sessionId;
       const startTime=(await one('select updated_at::text value from private.taste_sessions where id=$1',[sessionId])).value;
       await db.exec('commit;begin;');await query("select set_config('request.jwt.claim.sub',$1,true)",[owner]);
-      const target=(await one(`select candidate.id from public.items candidate join public.items answered on answered.id=$1
-        where candidate.id<>answered.id and candidate.tags&&answered.tags order by candidate.id limit 1`,[start.presentations[0].objectId])).id;
-      const first=await capture(profile,[target],startTime);await db.exec('commit;');
+      const targets=await query(`select candidate.id,candidate.item_type from public.items candidate join public.items answered on answered.id=$1
+        where candidate.id<>answered.id and candidate.item_type=answered.item_type and candidate.tags=answered.tags
+        order by candidate.id limit 2`,[start.presentations[0].objectId]);
+      assert.equal(targets.length,2,'two same-domain, same-tag continuation fixtures are required');
+      const ids=targets.map(item=>item.id),domain=targets[0].item_type;
+      const captureWithDiscoveryParity=async(targetProfile,requiredAfter)=>{
+        const result=await capture(targetProfile,ids,requiredAfter);
+        const discoveryId=randomUUID();
+        const discovery=await query("select * from private.rank_items_with_identity_v1($1,$2,'FOR_YOU',$3,50,'{}')",
+          [discoveryId,targetProfile,domain]);
+        const identity=await one(`select profile_id=$2::uuid same_profile,
+          requested_item_type=$3 same_domain from private.prediction_runs where id=$1`,
+          [discoveryId,targetProfile,domain]);
+        assert.deepEqual(identity,{same_profile:true,same_domain:true});
+        const discoveryCandidates=await query('select item_id,explanation from private.prediction_candidates where prediction_id=$1',[discoveryId]);
+        for(const item of result.items){
+          assert.equal(item.status,'AVAILABLE');
+          assert.equal(item.itemType,domain);
+          // Ordinary Discovery's run envelope uses clock_timestamp(); its native
+          // evidence reader and evaluation share now() within this transaction.
+          // This is local explicit-answer parity, not whole-state/asOf parity.
+          assert.equal(discoveryCandidates.find(candidate=>candidate.item_id===item.itemId)
+            ?.explanation.scoringFeatures.nativeEvidenceAsOf,result.evidenceCutoff);
+          assert.equal(item.score,discovery.find(candidate=>candidate.item_id===item.itemId)?.score,
+            'evaluation and overlapping Discovery candidate must have the exact same score');
+        }
+        return result;
+      };
+      const first=await captureWithDiscoveryParity(profile,startTime);
+      const firstFrozen=await query('select to_jsonb(c) body from private.prediction_candidates c where prediction_id=$1 order by item_id',[first.predictionId]);
+      await query("select set_config('request.jwt.claim.sub',$1,true)",[other]);
+      const otherFirst=await captureWithDiscoveryParity(otherProfile,startTime);
+      const otherScores=otherFirst.items.map(item=>item.score);
+      await db.exec('commit;');
       let state=start;
-      const traces=[];
-      for(const value of [10,0,5]){
+      const traces=new Map(),scores=new Map();
+      // These are synthetic local fixtures and committed corrections to one
+      // explicit answer, not population neighbors or predictive-quality evidence.
+      for(const value of [10,0,5,4,9]){
         await db.exec('begin;');await query("select set_config('request.jwt.claim.sub',$1,true)",[owner]);
         state=(await one('select public.taste_session_v1($1) value',[{operation:'ANSWER',profileId:profile,sessionId,
           requestId:randomUUID(),expectedRevision:state.revision,questionIndex:0,answer:{kind:'RATING',value}}])).value;
         const receiptTime=(await one('select updated_at::text value from private.taste_sessions where id=$1',[sessionId])).value;
-        await rejects(()=>capture(profile,[target],receiptTime),/Commit the required answer/);
+        await rejects(()=>capture(profile,ids,receiptTime),/Commit the required answer/);
         await db.exec('commit;begin;');await query("select set_config('request.jwt.claim.sub',$1,true)",[owner]);
-        const later=await capture(profile,[target],receiptTime);
-        const trace=await one('select explanation from private.prediction_candidates where prediction_id=$1',[later.predictionId]);
+        const later=await captureWithDiscoveryParity(profile,receiptTime);
+        const candidates=await query('select explanation from private.prediction_candidates where prediction_id=$1 order by item_id',[later.predictionId]);
         assert.ok(new Date(later.evidenceCutoff)>new Date(receiptTime));
-        assert.equal(trace.explanation.scoringFeatures.nativeEvidenceAsOf,later.evidenceCutoff);
-        assert.equal(trace.explanation.candidatePool.eligibilityAt,later.evidenceCutoff);
-        traces.push(trace.explanation.bootstrapLongTerm);await db.exec('commit;');
+        for(const {explanation} of candidates){
+          assert.equal(explanation.scoringFeatures.nativeEvidenceAsOf,later.evidenceCutoff);
+          assert.equal(explanation.candidatePool.eligibilityAt,later.evidenceCutoff);
+        }
+        traces.set(value,candidates.map(candidate=>candidate.explanation.bootstrapLongTerm));
+        scores.set(value,later.items.map(item=>item.score));
+        await query("select set_config('request.jwt.claim.sub',$1,true)",[other]);
+        const otherLater=await captureWithDiscoveryParity(otherProfile,receiptTime);
+        assert.deepEqual(otherLater.items.map(item=>item.score),otherScores,'Personal answer must not affect another Profile');
+        assert.deepEqual(await query('select to_jsonb(c) body from private.prediction_candidates c where prediction_id=$1 order by item_id',[first.predictionId]),firstFrozen);
+        await db.exec('commit;');
       }
-      assert.ok(traces[0]>0);assert.ok(traces[1]<0);assert.equal(traces[2],0);
-      assert.equal((await one('select final_score from private.prediction_candidates where prediction_id=$1',[first.predictionId])).final_score,first.items[0].score);
+      assert.ok(traces.get(10).every(value=>value>0));assert.ok(traces.get(0).every(value=>value<0));
+      assert.ok(traces.get(5).every(value=>value===0));
+      assert.ok(traces.get(4).every(value=>value<0));assert.ok(traces.get(9).every(value=>value>0));
+      for(let i=0;i<ids.length;i++){
+        assert.ok(scores.get(4)[i]<first.items[i].score,'rating 4 must lower each same-tag continuation score');
+        assert.ok(scores.get(9)[i]>first.items[i].score,'rating 9 must raise each same-tag continuation score');
+        assert.ok(scores.get(9)[i]>scores.get(4)[i],'later scores must distinguish 4 from 9');
+      }
     });
   }finally{await db.close();}
 });

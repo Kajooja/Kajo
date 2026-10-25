@@ -144,6 +144,28 @@ an evaluation policy suffix: this capture is neither exposure nor a recommendati
 outcome origin. Existing source erasure owns these records. It is current-state
 capture, not an arbitrary historical-as-of reader or calibrated rating model.
 
+**Available-at-cutoff correction — 2026-10-25 source:**
+`20261025192920_canonical_item_source_cutoff_parity.sql` supplies the common
+private Item/source availability predicate for V4 acquisition and explicit
+evaluation. Both require a finite cutoff, finite Item creation at or before it,
+and at least one non-mock source created at or before it. Previously the explicit
+scorer checked only that a non-mock source existed, permitting a future-dated
+Item/source that the V4 pool excluded. This correction changes no scoring weights,
+retained pool, frozen forecast, command reply or V4 selection policy.
+
+Ordinary Discovery's null-candidate-ID acquisition keeps its legacy rules in this
+bounded forward. Its request/eligibility envelope uses `clock_timestamp()` while
+explicit evaluation uses transaction `now()`; native evidence readers share
+`now()`. Tests of committed ratings 4 and 9 establish equal overlapping scores at
+that native-evidence cutoff in controlled same-tag fixtures, preservation of the
+earlier frozen candidates and isolation from another PersonalProfile. They do not
+establish complete WorldState/as-of parity, joint-cohort recall, cross-domain
+benefit or calibrated accuracy. These fixtures commit corrections to one existing
+v1 Taste answer through the shared scoring primitive; they do not execute or
+accept the current V4 sequential NEXT/device adaptation loop.
+Full acquisition, state/cutoff and selection
+parity remain the versioned guided-Discovery successor's acceptance contract.
+
 This private scoring primitive is consumed by the
 [owned sequential v2 source](#sequential-own-personal-v2-source) below. That command
 boundary owns expected-prefix revisions, commit/freeze before first measurement,

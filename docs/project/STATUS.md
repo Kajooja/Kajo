@@ -10,7 +10,58 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — verified curated BOOK covers / #336
+## Current packet — native input cutoff parity and engine checkpoint / #336, #302
+
+**Continuation — 2026-10-25 Europe/Helsinki:** the owner asks where the engine
+stands against its architecture and when detailed scoring/state/memory work starts.
+It is the current critical path, not a later post-UI project. The source audit in
+[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md#october-25-actual-source-architecture-checkpoint)
+records a partially implemented Generation 1: active SQL scoring and short/long
+tag memories, captured but OFF WorkingState, same-Profile Scenario recall, and
+frozen evaluation/Sleep foundations. Full WorldState, admitted conditional cohorts,
+calibrated readiness and later generations remain open. [ROADMAP](ROADMAP.md)
+owns the state/world/evaluation/recall/shared-serving sequence.
+
+`fix/336-catalog-cutoff-parity` continues from
+[PR #359](https://github.com/Kajooja/Kajo/pull/359) source
+`a01dc084ebf4a6adc9ef6de3dd3cade5a8b5ee07`. All five required
+[CI #726 gates](https://github.com/Kajooja/Kajo/actions/runs/40224235061) passed;
+APK generation was skipped. #357/#358/#359 remain open/unmerged and are not
+accepted main. The current PR owns exact final source and check receipts.
+
+**Bounded implementation:** a forward migration extracts one private finite
+Item/source availability predicate for V4 acquisition and explicit evaluation.
+It closes the explicit scorer's future-source/Item gap without changing score
+math, ordinary Discovery's legacy acquisition, V4 selection or retained records.
+Committed 4/9 answer regressions compare overlapping Discovery/evaluation scores
+at the same native-evidence cutoff, preserve the earlier forecast and isolate
+another Profile. This is not cohort quality or complete state/cutoff parity:
+ordinary Discovery still has a wall-clock request/eligibility envelope and V4
+still uses its recognition shortlist and separate question utility.
+
+**Validation:** all **344 database tests** pass, including the new complete-schema
+forward/preservation suite and the extended numeric-answer regression. The latter
+uses existing v1 answer corrections to exercise shared scoring, not the complete
+V4 NEXT/device loop. Lint, types, 50 dependency tests, 904 mobile tests, 3 catalogue
+contract tests and 448 catalogue script tests pass; 177 relative documentation
+links and whitespace checks pass. The required root check stops at the unchanged
+Deno registry connection refusal. No completed local root pass is claimed;
+the PR owns final-source CI/native PostgreSQL receipts.
+
+No hosted migration, account reset, readiness activation or new APK belongs to
+this packet. The installed V4 and October 24 reset remain complete; preserve all
+new answers and pending commands. Source/CI acceptance precedes a separately
+prepared preservation-checked hosted forward.
+
+**Next engine packet:** bind the shared versioned serving input/state and first
+dated WorldState catalogue-facts contract, with the prospective outcome/evaluation
+contract alongside it. Use the existing scorer and memory implementations.
+Then add supported same-Profile numeric-prefix recall and a versioned shared
+BOOK → MOVIE policy; admit the meter only with calibration/support evidence.
+WorkingState influence requires OFF/STATIC/ORDERED comparison. Sprint 014,
+device acceptance and first-release quality gates remain open.
+
+## Predecessor packet — verified curated BOOK covers / #336
 
 **Continuation — 2026-10-25 Europe/Helsinki:** implement the shared-input/cover
 foundation in ADR-0011/ROADMAP. `fix/336-curated-book-covers` continues from
