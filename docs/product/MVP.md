@@ -61,6 +61,15 @@ ROADMAP owns sequencing. The objective is highest supported satisfaction in the
 current Scenario, ultimately a ten, without asserting an uncalibrated probability
 or promising a different next card after every answer.
 
+The **October 25 guided-Discovery refinement** is part of the open
+`MVP-TASTE-002/003/004`, `MVP-ALG-010/011` and `MVP-UX-007` requirements:
+[ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) requires
+common retrieval/scoring/learning, BOOK → MOVIE phases, verified covers and a
+validated readiness meter with automatic phase advancement/completion. Conditional
+cohort recall and cross-domain transfer need actual admitted support. Current V4
+INSUFFICIENT output, the shared card and CI do not close these requirements. This
+advances substantive readiness/quality work; it does not certify a current model.
+
 ## MVP completion meaning
 
 `MVP 0.1` is the first **complete externally usable BOOK/MOVIE Kajo**. It is not a mock prototype and not merely a store build.

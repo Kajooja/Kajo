@@ -4,6 +4,40 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Guided Discovery and measured Taste readiness — 2026-10-25
+
+The owner's latest requirement makes full Taste/Discovery integration the next
+#336 algorithm packet. [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md)
+owns the contract. #357/#724 supply shared presentation and a tested APK, not
+readiness, calibrated probabilities or the requested ordered recommendation loop.
+This refinement supersedes interleaved domain balancing and advances readiness
+from the temporarily deferred continuous-learning stage. Keep the substantial
+[duration work package](#end-to-end-performance-measurement--2026-10-24), but place
+this correctness/first-session-quality work before further broad latency tuning.
+
+1. **Shared input and cover foundation:** repair the 30 curated BOOK rows with
+   absent image URLs through verified Work/Edition mappings; verify fetch/decode
+   and retain source credits. Audit canonical candidate retrieval, source-defined
+   averages, support and freshness. No title-only merge or account reset.
+2. **Supported prediction contract:** reuse EB-04/06 and external-prior governance
+   for conditional numeric-prefix recall; compare with no-recall/popularity
+   controls. Define the outcome/calibration and independent prospective evaluation
+   needed by readiness. Aggregate popularity cannot become a synthetic cohort.
+3. **Shared serving and staged policy:** implement a versioned successor using
+   Discovery's acquisition/scoring for the same inputs. Guide BOOK → MOVIE with
+   one Profile, cross-domain evidence, explicit insufficiency and retained command/
+   panel/old-policy preservation. Prove low/high first-answer and same-input parity.
+4. **Measured stopping and UI:** admit the server readiness report and compact
+   meter only under declared calibration/support/uncertainty criteria. Validate
+   phase transitions/completion, insufficient exit, correction/withdrawal, restart
+   and ordinary Discovery continuation. No fixed quota or fabricated percentage.
+5. **Hosted and phone acceptance:** verify a concrete preserved-state rollout and
+   the whole learning loop, not only geometry. Never silently promote an untested
+   external model, rewrite old predictions or repeat the completed account reset.
+
+STATUS names one active handoff. Existing first-public identity, Shared, privacy,
+quality and release gates remain; this plan reuses their evidence boundaries.
+
 ## Continuous-learning clarification — 2026-10-15
 
 The owner confirms the existing state/scenario architecture and continuous

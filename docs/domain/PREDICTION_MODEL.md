@@ -41,6 +41,32 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 
 ## 3. The complete loop
 
+### Guided Discovery and readiness — 2026-10-25
+
+[ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) refines the
+owner's required #336 behavior: common candidate acquisition/scoring/state across
+Taste and Discovery, BOOK → MOVIE guidance, conditional low/high-rating recall,
+and a measured per-domain readiness report that controls phase completion.
+BOOK/MOVIE are presentation/evaluation scopes within one Profile, not independent
+models. Same-input serving parity and supported cross-domain transfer are required.
+
+A recent, supported catalogue prior selects the recognizable opener. Later
+recommendations consume the committed numeric prefix and the same satisfaction
+objective as Discovery. Cohort-based “disliked A, liked B” requires eligible joint
+observations or an admitted preference model; provider averages do not supply
+that relationship. Preserve source permissions, no-match fallback, shrinkage and
+first-label temporal separation. Existing evaluation/prefix/lifecycle primitives
+are reused rather than bypassed by a client-side recommender.
+
+The native V4 implementation below still has recognition-bounded retrieval,
+35/45/10/10 Taste utility, a two-opportunity domain balancing guard and a hardcoded
+INSUFFICIENT readiness report. These are implementation facts, not accepted final
+behavior. Replace them through a versioned successor with retention/cutover proof.
+Current ordinal agreement can be reported only as ordinal agreement. A probability
+or rating-accuracy meter requires its own declared outcome, calibration scope,
+independent-support/uncertainty treatment and frozen stopping criterion; no
+numerical pass threshold is validated by this documentation change.
+
 ### Sequential adaptive Taste
 
 The **2026-10-14 / [#336](https://github.com/Kajooja/Kajo/issues/336)** target

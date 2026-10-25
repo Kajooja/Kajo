@@ -10,7 +10,61 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — Taste card layout parity / #336
+## Current packet — guided Discovery and measured Taste readiness / #336
+
+**Owner refinement — 2026-10-25 Europe/Helsinki:** Taste must be the guided start
+of the same prediction/learning loop as Discovery, not an independent test.
+Start BOOK, continue MOVIE after sufficient domain readiness, retain one shared
+PersonalProfile, and show a measured readiness indicator with automatic completion.
+Low/high numeric answers must affect supported conditional recall and the next
+fresh recommendation. Book covers must be present and correct. The explicit
+BOOK → MOVIE instruction governs the order; the film-A example describes learning.
+[ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) owns the
+contract, [ROADMAP](ROADMAP.md#guided-discovery-and-measured-taste-readiness--2026-10-25)
+the updated sequence. The initial timing plan remains recorded, but this engine/
+readiness work takes priority over further broad latency tuning.
+
+**Source/data audit:** V4 uses canonical evaluation and the same PersonalProfile,
+but still acquires a recognition-bounded pool and applies its own 35/45/10/10
+utility plus a maximum-two-opportunity domain lead. The native snapshot hardcodes
+INSUFFICIENT. A calibration-backed probability/readiness meter and full conditional
+cohort retrieval are not established by that source. The read-only hosted catalogue
+has 415 discoverable BOOK and 425 MOVIE Items. Thirty curated books have no image
+URL; all have only curated source identities and no exact title/author covered
+counterpart in this catalogue. The other 385 books have Open Library URLs and
+source-specific ratings/popularity fields; URL presence does not prove live image
+fetch/decode. Movie image URL coverage is 425/425. No private user histories were
+needed for this aggregate audit, and no hosted data was changed.
+
+**Current source packet:** `docs/336-unified-discovery-taste` is a documentation
+refinement stacked on #357 source `eda2e7b95772b60558845c86b5ea836302af58e2`.
+Its PR owns publication/check receipts. It records the required successor and
+actual gaps, not an installed selector, readiness model, cover repair or new APK.
+The predecessor [PR #357](https://github.com/Kajooja/Kajo/pull/357) is open and
+unmerged; all six [CI #724 jobs](https://github.com/Kajooja/Kajo/actions/runs/40134741086)
+passed on its exact source, and its corrected APK was supplied. The latest owner
+message adds algorithm/progression/cover requirements; it is not explicit acceptance
+of the four geometry/recovery device checks. Preserve that pending evidence.
+
+**Publication authorization — 2026-10-25 Europe/Helsinki:** the owner explicitly
+approved publishing this complete 11-file documentation packet (“Saat julkaista”).
+This resolves the automatic approval rejection that correctly distinguished it
+from the previously approved packet; no alternate publication path was used.
+Whitespace, 191 relative links and added-content privacy checks pass. Publish as
+a documentation-only PR stacked on #357; its PR owns exact publication/check
+receipts. Runtime code, hosted data and the current APK are unchanged. Publication
+approval does not close implementation, quality or device acceptance.
+
+**Next implementation packet:** bind verified covers for the 30 curated books and
+pin the shared-serving/conditional-evidence input contract, then implement the
+versioned guided policy and calibrated readiness under ADR-0011/ROADMAP. Reuse
+existing scoring, commands, evidence and research boundaries. Preserve current
+accounts, accepted answers, pending commands and historical policies; the installed
+V4 forward and October 24 scoped reset remain complete and must not be repeated.
+Neither arbitrary percentages nor shared-looking cards complete this requirement.
+Sprint 014 and the first-release quality gates remain open.
+
+## Predecessor packet — Taste card layout parity / #336
 
 **Blocking owner feedback — 2026-10-25 Europe/Helsinki:** in the #721 Taste test,
 wrong margins and an oversized image prevent reaching the rating controls as in

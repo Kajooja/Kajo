@@ -481,6 +481,17 @@ Taste retains its own pending-command and acknowledged-answer → fresh NEXT rul
 The owner's #721 report exposes a device blocker, so shared source components
 alone do not establish this parity. STATUS/DEVICE_TEST own correction evidence.
 
+**Guided-learning refinement — 2026-10-25:** visual parity must extend to the
+common prediction/learning loop under [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md).
+Show BOOK first, then MOVIE, without mixing cards across unfinished guided phases.
+A compact active-domain readiness indicator explains measured support and missing
+certainty without shrinking the shared artwork/rating viewport. Advance/end only
+when the server's validated criterion passes; voluntary continuation is visibly
+insufficient, not success. A fit probability for one Item and readiness of the
+model are different labels. A correct cover is part of new-card presentation;
+known missing images require canonical repair or an eligible covered replacement
+before question commitment, with honest recovery if a committed image later fails.
+
 The deliberate upward gesture that completes moving the active card out of the
 feed means **Ohita** when no positive action has already been accepted for that
 card. In Discovery, a durably admitted rating cannot also produce a skip even
