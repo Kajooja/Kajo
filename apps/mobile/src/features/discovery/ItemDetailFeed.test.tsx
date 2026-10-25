@@ -95,6 +95,11 @@ function host(type: string): ReactTestInstance {
 function hosts(type: string): ReactTestInstance[] {
   return root!.root.findAll(node => node.type as unknown === type);
 }
+// Inspect rendered text rather than React element props, whose owner Fibers can
+// contain cycles. Render-prop elements are already present in the child tree.
+function renderedText(node: ReactTestInstance = root!.root): string {
+  return node.children.map(child => typeof child === 'string' ? child : renderedText(child)).join(' ');
+}
 function star(): ReactTestInstance {
   return root!.root.find(node => node.type as unknown === 'Pressable' &&
     node.props.accessibilityHint === 'Valitse yksi tai useampi lista');
@@ -161,8 +166,8 @@ describe('mounted Discovery feed controls', () => {
     expect(fixture.setRating.mock.invocationCallOrder[0]).toBeLessThan(fixture.flow.positiveQueued.mock.invocationCallOrder[0]!);
     expect(fixture.flow.advance).not.toHaveBeenCalled();
     expect(host('FeedItemCard').props.item.id).toBe('prepared-next');
-    expect(JSON.stringify(root!.toJSON())).not.toContain('Tallenna arvio ja jatka');
-    expect(JSON.stringify(root!.toJSON())).not.toContain('Tallennetaan');
+    expect(renderedText()).not.toContain('Tallenna arvio ja jatka');
+    expect(renderedText()).not.toContain('Tallennetaan');
     expect(fixture.flow.advance).not.toHaveBeenCalled();
     expect(host('FeedItemCard').props.entryDirection).toBe('forward');
     expect(fixture.setRating).toHaveBeenCalledTimes(1);
@@ -185,7 +190,7 @@ describe('mounted Discovery feed controls', () => {
     expect(star().props.disabled).toBe(true);
     expect(hosts('InteractionPersistenceNotice')).toHaveLength(0);
     expect(hosts('Modal')).toHaveLength(0);
-    expect(JSON.stringify(root!.toJSON())).not.toMatch(/odottaa tallennusta|Odotetaan tallennuksen|Yritä uudelleen/);
+    expect(renderedText()).not.toMatch(/odottaa tallennusta|Odotetaan tallennuksen|Yritä uudelleen/);
     await act(async () => {
       expect(host('FeedItemCard').props.onPrevious()).toBe(true);
       expect(host('FeedItemCard').props.onSkip()).toBe(true);
@@ -203,12 +208,12 @@ describe('mounted Discovery feed controls', () => {
     const before = host('FeedItemCard').props.viewportHeight;
     expect(hosts('InteractionPersistenceNotice')).toHaveLength(0);
     expect(hosts('Modal')).toHaveLength(0);
-    expect(JSON.stringify(root!.toJSON())).not.toContain('Tallennus epäonnistui.');
+    expect(renderedText()).not.toContain('Tallennus epäonnistui.');
     const recovery = hosts('Pressable').find(node => node.props.accessibilityLabel === 'Avaa tallennuksen ja yhteyden palautus')!;
     expect(recovery.props.style).toMatchObject({ position: 'absolute', width: 44, height: 44 });
     await act(async () => { recovery.props.onPress(); });
     expect(hosts('Modal')).toHaveLength(1);
-    expect(JSON.stringify(root!.toJSON())).toContain('Tallennus epäonnistui.');
+    expect(renderedText()).toContain('Tallennus epäonnistui.');
     expect(host('FeedItemCard').props.viewportHeight).toBe(before);
     const button = (label: string) => hosts('Pressable').find(node => node.findAll(child =>
       child.type as unknown === 'Text' && child.props.children === label).length > 0)!;
@@ -258,7 +263,7 @@ describe('mounted Discovery feed controls', () => {
     expect(host('FeedItemCard').props.disabled).toBe(true);
     expect(host('RatingControl').props.disabled).toBe(true);
     expect(star().props.disabled).toBe(true);
-    expect(JSON.stringify(host('FeedItemCard').props.children)).not.toContain('Odotetaan tallennuksen vahvistusta');
+    expect(renderedText(host('FeedItemCard'))).not.toContain('Odotetaan tallennuksen vahvistusta');
     await act(async () => { host('RatingControl').props.onRatingChange(5); expect(host('FeedItemCard').props.onSkip()).toBe(false); });
     expect(fixture.setRating).not.toHaveBeenCalled();
     expect(fixture.flow.advance).not.toHaveBeenCalled();

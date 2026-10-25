@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **PLANNED — AFTER ACTIVE STACK CLOSURE AND HYGIENE**
+Status: **IN PROGRESS — shared native computation cutoff source packet**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -97,7 +97,26 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- Source / CI: not delivered by this plan.
+- First source packet: `feat/engine-shared-input-contract`, based on accepted
+  main #362. `20261025211014_shared_prediction_cutoff.sql` aligns existing
+  memory/Scenario arithmetic to the native evidence transaction cutoff and retains a private
+  `native-prediction-clocks-v1` envelope in fresh PredictionRuns. The actual
+  ordinary/catalogue Discovery and explicit Taste evaluation paths consume it;
+  frozen shadow continues to use its original source. This does not replace the
+  current scorer or change candidate selection. Hard eligibility, request/delivery
+  time and reset-aware Working capture retain their existing clocks.
+- Limits: a logical clock is not one MVCC snapshot or a certified committed
+  prefix. Current-row source/feature/state reads, the legacy versus explicit
+  candidate policies, native adapter/temporal runner and #232F consumer still
+  require their own bounded successors. Full four-consumer pool parity and
+  Sprint 015 acceptance remain open.
+- Source / CI: independent semantic review and local 351 database/904 mobile/311
+  engine tests pass, with dependency/catalogue/research/acceptance checks,
+  lint/types and four demo exports. Seven focused regressions prove the actual
+  prior numeric mismatch, frozen-record preservation and latest skip/reset
+  handling. A real lifecycle holder/waiter regression joins the native CLI gate.
+  Local root stops at the existing Deno registry refusal; all five required
+  final-source CI gates remain pending and are recorded by the PR.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.

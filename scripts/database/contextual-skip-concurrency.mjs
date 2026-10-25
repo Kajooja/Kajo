@@ -20,7 +20,7 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
   let snapshots;
   let original;
 
-  const launch = (name, expression, { hold = false, reject = null, actorUserId = actor } = {}) => {
+  const launch = (name, expression, { hold = false, holdBefore = false, reject = null, actorUserId = actor } = {}) => {
     const connection = { name: `kajo_skip_${runId}_${name}` };
     running.push(connection);
     const call = reject ? `do $reject$ declare observed text; begin
@@ -29,12 +29,16 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
       end; $reject$; select jsonb_build_object('sqlstate','${reject}');` : `select ${expression};`;
     // Cancel only this owned PgSleep after observing the waiter. Catching the
     // cancellation inside its subtransaction preserves the command and its locks.
-    const barrier = hold ? `do $hold$ begin
+    const barrier = hold || holdBefore ? `do $hold$ begin
       begin perform pg_sleep(20); exception when query_canceled then null; end;
       end; $hold$;` : '';
+    // Hold the real writer's lifecycle gate before it assigns accepted_at. This
+    // lets the waiting reader start its transaction before the new skip exists.
+    const before = holdBefore ? `do $gate$ begin
+      perform pg_advisory_xact_lock(1946841873,232004); end; $gate$; ${barrier}` : '';
     connection.promise = exec(`begin; set local application_name='${connection.name}';
       set local request.jwt.claim.sub='${actorUserId}'; set local role authenticated;
-      ${call} ${barrier} commit;`, name.replaceAll('_', '-'))
+      ${before} ${call} ${hold ? barrier : ''} commit;`, name.replaceAll('_', '-'))
       .then(rows => (connection.done = { rows }), error => (connection.done = { error }));
     return connection;
   };
@@ -153,8 +157,42 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
     // START, NEXT and the first skip are genuinely separate committed RPCs.
     const q1 = await advance('NEXT');
     const c1 = await skipCommand(q1);
+    const skipHolder = launch('admission_holder', skip(c1), { holdBefore: true });
+    await observe(skipHolder);
+    const admissionRequest = { version: 3, requestId: randomUUID(), profileId, sessionId: randomUUID(),
+      discoveryMode: 'FOR_YOU', itemType: q1.currentItem.itemType, limit: 50, context: {} };
+    const admissionWaiter = launch('admission_waiter', `public.rank_items_page_v1(${literal(admissionRequest)})`);
+    const admissionLock = await observe(admissionWaiter, skipHolder);
+    assert.notEqual(skipHolder.pid, admissionWaiter.pid);
+    const [waitingBeforeAcceptance] = await exec(`select jsonb_build_object(
+      'lifecycleSharedWait',exists(select 1 from pg_locks where pid=${admissionWaiter.pid}
+        and locktype='advisory' and classid=1946841873::oid and objid=232004::oid
+        and mode='ShareLock' and not granted),
+      'skipNotYetWritten',not exists(select 1 from private.contextual_skip_commands where action_id='${c1.actionId}'));`,
+    'admission-wait-before-acceptance');
+    assert.deepEqual(waitingBeforeAcceptance, { lifecycleSharedWait: true, skipNotYetWritten: true });
+    await release(skipHolder);
+    const firstSkipReceipt = await finish(skipHolder), admissionPage = await finish(admissionWaiter);
+    assertReceipt(firstSkipReceipt, c1);
+    assert.equal(admissionPage.version, 3);
+    assert.ok(admissionPage.items.length > 0, 'The waiting reader needs other eligible Items');
+    assert.ok(admissionPage.items.every(item => item.item_id !== c1.itemId),
+      'A committed skip must suppress delivery even when accepted after the reader transaction began');
+    const [admissionClocks] = await exec(`select jsonb_build_object(
+      'inputVersion',r.state_snapshot#>>'{predictionInput,version}',
+      'arithmeticBeforeAcceptance',(r.state_snapshot#>>'{predictionInput,nativeEvidenceAsOf}')::timestamptz<s.accepted_at,
+      'requestAfterAcceptance',r.requested_at>=s.accepted_at,
+      'eligibleSourceRows',(select count(*) from private.prediction_candidates c
+        where c.prediction_id=r.id and c.item_id=s.item_id and
+          (c.selected_for_delivery or coalesce((c.explanation#>>'{resurfacingPolicy,eligible}')::boolean,false))))
+      from private.prediction_runs r join private.contextual_skip_commands s on s.action_id='${c1.actionId}'
+      where r.id='${admissionPage.predictionId}';`, 'admission-frozen-clock-and-policy');
+    assert.deepEqual(admissionClocks, { inputVersion: 'native-prediction-clocks-v1',
+      arithmeticBeforeAcceptance: true, requestAfterAcceptance: true, eligibleSourceRows: 0 });
+    assert.deepEqual(await call(`public.rank_items_page_v1(${literal(admissionRequest)})`, 'admission-exact-page-retry'), admissionPage);
     const [r1, retry1, retryLock] = await pair('retry', skip(c1), skip(c1));
     assertReceipt(r1, c1);
+    assert.deepEqual(r1, firstSkipReceipt);
     assert.deepEqual(retry1, r1, 'Concurrent retry must retain the exact first receipt and server clock');
     const paused = await advance('PAUSE');
     assert.equal(paused.status, 'PAUSED');
@@ -297,9 +335,10 @@ export async function verifyContextualSkipConcurrency(execConcurrentSql) {
       changedBody: '22023', withdrawalRetry: 'EXACTLY_ONCE', competingWithdrawal: 'KJ003',
       sourceRemoval: 'KJ002_NO_REPLAY_OR_RESURRECTION', copiedPayloads: 'ERASED',
       pauseToDiscovery: 'SAME_PROFILE_SUPPRESSION_ACROSS_EVENT_SESSIONS', neutralTasteEvidence: true,
+      delayedServingAdmission: 'POST_LOCK_SKIP_VISIBILITY_WITH_OLDER_ARITHMETIC_CUTOFF',
       legacyV1Removal: 'LIFECYCLE_BEFORE_PROFILE_SESSION_JOB_ACCOUNT_PRESERVED',
       legacyItemUndo: 'LIFECYCLE_BEFORE_PROFILE_INTERACTION_RECEIPT_EXACT_RETRY',
-      independentLockProofs: [retryLock, withdrawalLock, conflictLock, competingLock, legacyRemoveLock, legacyUndoLock, erasureLock] };
+      independentLockProofs: [admissionLock, retryLock, withdrawalLock, conflictLock, competingLock, legacyRemoveLock, legacyUndoLock, erasureLock] };
   } finally {
     for (const connection of running) if (!connection.done && connection.pid) {
       await exec(`select to_jsonb(pg_cancel_backend(pid)) from pg_stat_activity

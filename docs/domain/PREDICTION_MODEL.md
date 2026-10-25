@@ -292,7 +292,7 @@ Item/source that the V4 pool excluded. This correction changes no scoring weight
 retained pool, frozen forecast, command reply or V4 selection policy.
 
 Ordinary Discovery's null-candidate-ID acquisition keeps its legacy rules in this
-bounded forward. Its request/eligibility envelope uses `clock_timestamp()` while
+bounded forward. At that checkpoint its request/eligibility envelope uses `clock_timestamp()` while
 explicit evaluation uses transaction `now()`; native evidence readers share
 `now()`. Tests of committed ratings 4 and 9 establish equal overlapping scores at
 that native-evidence cutoff in controlled same-tag fixtures, preservation of the
@@ -303,6 +303,39 @@ v1 Taste answer through the shared scoring primitive; they do not execute or
 accept the current V4 sequential NEXT/device adaptation loop.
 Full acquisition, state/cutoff and selection
 parity remain the versioned guided-Discovery successor's acceptance contract.
+
+**Declared native clocks — Sprint 015 source:**
+`20261025211014_shared_prediction_cutoff.sql` aligns memory snapshot and Scenario
+arithmetic in the existing common identity scorer to transaction `now()`, which
+already bounds native evidence in the base scorer. Ordinary Discovery,
+catalogue-chain Discovery and explicit evaluation consume the same correction.
+This removes the moving memory/Scenario reference from the native score boundary.
+
+Hard eligibility and request/delivery time retain their existing clocks. In
+particular, ordinary Discovery must respect a skip committed while its transaction
+was waiting for the lifecycle lock. Reset-aware Working capture also retains its
+post-lock request clock and remains an OFF diagnostic component. Cursor expiry
+and lifecycle checks still use wall time. Explicit evaluation keeps its existing
+server-owned `requiredAfter` guard and transaction-cutoff eligibility.
+
+Fresh run snapshots retain `predictionInput.version=native-prediction-clocks-v1`
+and declare the native evidence, memory/Scenario, request and Working reference
+clocks separately, along with acquisition path `LEGACY_DISCOVERY`, `CATALOG_CHAIN`
+or `EXPLICIT_CANONICAL`. This private envelope cannot be overridden by request
+Context. Existing scoring formulas, model identifiers, policy suffixes and retained
+source records remain unchanged; time-dependent numbers can change under the
+corrected reference.
+
+These are **logical arithmetic references**, not a historical database snapshot.
+VOLATILE functions may read current rows in different READ COMMITTED statements;
+transaction start may precede a lifecycle-lock wait. The envelope declares
+`dataSnapshot=CURRENT_STATEMENT_SNAPSHOTS`, `commitVisibility=UNKNOWN` and
+`historicalReconstruction=UNAVAILABLE`. It does not certify a complete acknowledged
+prefix or retroactive source/tag availability. Existing candidate-source rules,
+current-row evidence limitations and full acquisition/state parity remain open.
+Frozen shadows and protocol-2 continuation pages retain their original source
+clocks and features; a later page's delivery time does not make them fresh
+predictions. Catalogue-chain fresh computations receive their own new references.
 
 This private scoring primitive is consumed by the
 [owned sequential v2 source](#sequential-own-personal-v2-source) below. That command

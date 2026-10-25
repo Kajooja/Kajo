@@ -26,6 +26,20 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Shared native computation clock — Sprint 015
+
+`20261025211014_shared_prediction_cutoff.sql` updates the existing private
+`rank_items_candidate_with_identity_v1` through guarded body replacements.
+Memory/Scenario arithmetic uses the native evidence transaction cutoff; hard
+eligibility, request/delivery time and reset-aware Working capture retain their
+existing clocks. Fresh run snapshots retain the private
+`native-prediction-clocks-v1` envelope and declared acquisition path. The existing
+shared scorer and frozen shadow consumers remain authoritative.
+`scripts/database/shared-prediction-cutoff.{mjs,test.mjs}` owns the populated
+preservation/clock regressions and rollback-only SQL smoke; the native CLI
+installation gate runs the same smoke. This source does not certify a historical
+snapshot, change candidate policies or supply an expected-rating model.
+
 ## Curated BOOK cover repair — #336 / October 25
 
 `scripts/catalog/curated-book-covers.mjs` validates the reviewed 30-entry
