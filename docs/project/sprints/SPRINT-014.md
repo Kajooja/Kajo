@@ -1,18 +1,54 @@
 # Sprint 014 — Algorithm Reliability, Real Catalog & Portable Engine
 
-Status: **ACTIVE — PHASE 14 ACCEPTANCE OPEN; DELIVERED FOUNDATIONS ON MAIN**
+Status: **ACTIVE — CURRENT STACK CLOSURE; UNFINISHED CAPABILITIES HAVE EXPLICIT SUCCESSORS**
 
 ## Outcome and current scope
 
-Complete ROADMAP Phase 14: clean-database/bootstrap correctness, trustworthy action/delivery evidence, serving/shadow parity and candidate availability, real catalog/features, portable engine contracts and isolated public-data evaluation, adaptive memory/policy and operating bounded SleepLayer evaluation. Current requirements and acceptance belong to [MVP.md](../../product/MVP.md) and [ROADMAP.md](../ROADMAP.md).
+The original Phase 14 charter covered clean-database/bootstrap correctness,
+trustworthy evidence, serving/shadow parity, catalogue/features, portable
+contracts, public-data evaluation, adaptive memory and operating SleepLayer.
+The owner's 2026-10-25 decision bounds the current sprint to finishing the active
+source stack and recording its exact remaining acceptance, then a safe hygiene
+checkpoint. Unfinished engine capabilities are explicitly assigned to Sprints
+015–021 below; this is a handoff rather than a claim that those gates passed.
+Current requirements and execution order belong to
+[MVP.md](../../product/MVP.md) and [ROADMAP.md](../ROADMAP.md).
 
-The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 external-beta / Sprint 015 store-close schedule. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
+The historical 2026-09-07 Taste-first release decision superseded the old Sprint 014 external-beta / Sprint 015 store-close schedule. The current 2026-10-25 engine-first order supersedes that scheduling while preserving its release requirements. Taste acquisition is Phase 15, Friends/Shared is Phase 16, core UX/operations is Phase 17, complete-flow closed beta is Phase 18, production/stores are Phase 19 and owner acceptance is Phase 20. Monetization is outside MVP 0.1.
 
 [STATUS.md](../STATUS.md) owns the exact next task. #208/#207 are technically complete through #223. Delivery #224 / PR #225 implements the first Phase 14.1 atomic/durable Item actions; Delivery #226 implements List/Shared commands and their durable mobile path; exact delivered provenance follows. PR #219's source/platform experiments are completed evidence.
 
 ## How to read this record
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
+
+## Engine-first successor handoff — 2026-10-25
+
+The owner now prioritizes a useful Engine V1 maximizing each user's expected
+post-experience rating while learning their rating scale. Finish the active
+#357–#360 stack with its actual source/CI/deployment/device distinctions, then
+remove only verified obsolete branches. [ROADMAP](../ROADMAP.md) owns the new
+order and [ENGINE_BUILDOUT](../ENGINE_BUILDOUT.md#engine-v1-scope-and-sprint-ownership--2026-10-25)
+owns the bounded 51-section disposition.
+
+Do not grow this historical sprint indefinitely or mark missing quality/device
+results complete. Its remaining capability work transfers explicitly to
+[Sprint 015](SPRINT-015.md) (common evidence/serving),
+[016](SPRINT-016.md) (expected ratings/response style),
+[017](SPRINT-017.md) (state/transfer/Shared),
+[018](SPRINT-018.md) (conditional recall),
+[019](SPRINT-019.md) (readiness/policy),
+[020](SPRINT-020.md) (operating learning) and
+[021](SPRINT-021.md) (integrated quality/operations). Transfer is an open-work
+handoff, not technical acceptance. The old product Phase 15–20 labels remain
+historical/backlog references and do not assign the new sprint numbers.
+
+Current user actions are list saving, experienced-item numeric rating and
+contextual SKIP. No separate En tunne control is reintroduced; skipped reasons
+remain unknown and retained legacy evidence is preserved. Larger UX/acquisition
+work follows Engine V1, then visual UI and release; essential existing-client
+controls and known correctness defects needed to verify the engine stay in scope.
+All earlier dated receipts below retain their original meaning.
 
 ## Native cutoff parity and engine architecture checkpoint — 2026-10-25
 
