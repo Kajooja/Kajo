@@ -68,6 +68,36 @@ CI/build/hosted state belong only to STATUS and the referenced PR receipts. This
 integration replaces #303's obsolete dependency base, preserves every section
 mapping and keeps ROADMAP as the sole scheduling owner.
 
+## October 25 actual-source architecture checkpoint
+
+This source audit compares accepted main
+`340d0da660fe02d6d9d47d468bee75e134546fa3` with inspected active source
+`a01dc084ebf4a6adc9ef6de3dd3cade5a8b5ee07`. The active UI, guided-Taste design
+and cover-repair packets are not relabeled as accepted main. This is not a new
+hosted-runtime, model-admission or device receipt; STATUS owns those distinctions.
+
+Kajo has a **partially implemented Generation 1 Transparent Engine**, not only a
+design and not the complete five-generation architecture. Existing SQL and
+portable foundations should be connected and evaluated, not rebuilt wholesale.
+
+| Capability | Executable source foundation | Remaining boundary |
+|---|---|---|
+| Shared scoring — EB-01/08 | [Canonical candidate scoring](../../supabase/migrations/20261015090018_personal_evaluation_scoring.sql) extracts common native base, scalar and identity/trace functions for ordinary Discovery, catalogue chains and explicit evaluation candidates. | Taste question selection still has a separate utility. Common scoring is not a calibrated rating or probability. Guided Discovery requires the shared serving contract and outcome evidence. |
+| Short/Long memory — EB-02/09 | [Native memory/scoring](../../supabase/migrations/20260902223000_prediction_nervous_system_v1.sql), [decay parity](../../supabase/migrations/20261009103214_personal_native_decay_parity.sql) and [Personal source fusion](../../supabase/migrations/20261012060821_personal_source_fusion.sql) provide real weighted recent/durable tag evidence, bootstrap contribution and correction semantics. | A complete adaptive state, effective support, temporary-versus-durable interpretation and reliable cross-domain transfer still need explicit evaluation. Existing decay is an implemented hypothesis, not demonstrated optimal memory. |
+| WorkingState — EB-02 | [Native capture and comparison](../../supabase/migrations/20261010064104_personal_working_bridge.sql), reset and [candidate-feature successor](../../supabase/migrations/20261010160025_personal_working_candidate_features.sql) freeze ordered Personal session evidence and candidate projections. | Live control remains **OFF** (`nativeActivated=false`); STATIC/ORDERED are comparison controls. Capture does not establish a serving contribution or benefit. Activation requires lifecycle, quality and rollback evidence. |
+| Context / WorldState — EB-02 | Native `sanitize_prediction_context_v1` and `scenario_similarity_v1` use bounded time/surface/session context; catalogue sources provide object metadata and popularity inputs. | No complete versioned WorldState consumer exists. Trends require source, validity, availability time and staleness behavior; a provider popularity value alone does not establish a current trend or a personal taste change. |
+| Scenario recall — EB-04/06 | Native `scenario_similarity_v1` and ranking retrieve **same-Profile** historical situations and outcomes; the [portable engine](../../packages/prediction-engine/src/engine.ts) also exercises bounded exact recall. | No admitted native cross-subject conditional cohort supplies “disliked A, liked B.” Ordered-prefix usefulness, no-match fallback and authorized independent support remain acceptance work; external rating data is not complete GlobalScenarioMemory. |
+| Belief/readiness — EB-02/03/07/08 | [Durable sequential Taste](../../supabase/migrations/20261015101752_durable_sequential_taste.sql) retains pre-answer evaluations and descriptive same-prefix ordinal comparisons. | `sequential_taste_snapshot_v2` still returns `INSUFFICIENT`, unavailable uncertainty, `accuracyPercent=null` and `qualityAdmitted=false`. A portable `REFERENCE_READY` result is not calibrated probability or evidence to finish native Taste. |
+| Sleep/evolution — EB-03/11 | [SleepLayer foundation](../../supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql) includes immutable genomes, shadow jobs, a worker and evaluation; [serving/canary controls](../../supabase/migrations/20260904180000_sleep_layer_v1_serving_and_profile_canary.sql) provide manual Profile canary and rollback. | Structures do not prove an operating evaluation loop or a winning challenger. Automatic promotion, autonomous evolution, learned geometry and dream rollouts are not admitted by this checkpoint. |
+| Portable core / later generations — EB-01/05/07/10/12 | `engine.ts` implements the E1 reference cycle; its recalled/prefix mean explicitly reports uncalibrated estimates and unavailable uncertainty. D1/D2 preserve isolated external research and the rejected challenger. | It is not the native SQL scorer. Generations 2–5, including learned representations, validated next-state distributions, dreaming and self-evolving geometry, retain their own gates. The synthetic second-domain fixture is not real portability-quality evidence. |
+
+All complete-capability checkboxes and the 51-part mapping below remain unchanged.
+[ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) supplies a
+concrete consumer for the existing foundations; [ROADMAP](ROADMAP.md) alone owns
+the order of shared serving, outcome evaluation, conditional recall and readiness
+work. Later generations are not prerequisites for a useful first transparent
+engine, and this checkpoint authorizes no account reset or model promotion.
+
 ## Complete 51-part traceability
 
 Section numbers refer to the unchanged canonical architecture. Every section has at least one acceptance owner below; references describe the complete target, not delivered status.

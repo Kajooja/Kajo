@@ -15,7 +15,14 @@ from the temporarily deferred continuous-learning stage. Keep the substantial
 [duration work package](#end-to-end-performance-measurement--2026-10-24), but place
 this correctness/first-session-quality work before further broad latency tuning.
 
-1. **Shared input and cover foundation:** repair the 30 curated BOOK rows with
+**Engine work starts now.** This is the first-generation engine build-out under
+EB-01/02/03/04, not a UI prerequisite followed by a distant engine project.
+[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md#october-25-actual-source-architecture-checkpoint) records
+the actual active, inactive and missing capabilities. Reuse the shared SQL
+scorer and existing memories; do not build a second Taste scorer or treat the
+portable reference as an already integrated production core.
+
+1. **Shared input, state and cover foundation (EB-01/02):** repair the 30 curated BOOK rows with
    absent image URLs through verified Work/Edition mappings; verify fetch/decode
    and retain source credits. Audit canonical candidate retrieval, source-defined
    averages, support and freshness. No title-only merge or account reset.
@@ -23,10 +30,26 @@ this correctness/first-session-quality work before further broad latency tuning.
    415/415), with source/decoded-image verification and preserved identities and
    evidence. Phone rendering remains to observe. The shared-input/prior audit
    and subsequent serving work remain open; this completes only the cover slice.
-2. **Supported prediction contract:** reuse EB-04/06 and external-prior governance
-   for conditional numeric-prefix recall; compare with no-recall/popularity
-   controls. Define the outcome/calibration and independent prospective evaluation
-   needed by readiness. Aggregate popularity cannot become a synthetic cohort.
+   First close the finite Item/source availability-cutoff mismatch between V4
+   acquisition and explicit evaluation, with frozen-record and same-prefix score
+   parity tests. Ordinary Discovery's legacy acquisition remains a declared
+   difference until the versioned shared-serving successor.
+   Then bind Working/Short/Long state and Context to the same versioned input.
+   Build the first WorldState slice from dated catalogue facts with source,
+   rating scale/count semantics, availability, validity and unknown/stale handling.
+   A popularity value or release year alone is not a measured current trend.
+   Preserve the existing active short/long memories; compare OFF/STATIC/ORDERED
+   before admitting WorkingState influence. This work does not require the later
+   learned World Model or DreamEngine.
+2. **Supported prediction and evaluation contract (EB-03/04/07):** declare the
+   predicted outcome and prospective comparison alongside implementation, rather
+   than adding an accuracy label afterwards. Freeze predictions before first
+   answers; measure coverage, error, calibration and independent support against
+   the current baseline, no-recall and no-transfer controls. Implement supported
+   same-Profile conditional numeric-prefix recall first, including no useful match.
+   Privacy-gated cross-Profile recall (EB-06) and external models require their own
+   eligible evidence and admission. Aggregate popularity cannot become a synthetic
+   cohort; a local A=4/A=9 score change is not proof of other-user predictive quality.
 3. **Shared serving and staged policy:** implement a versioned successor using
    Discovery's acquisition/scoring for the same inputs. Guide BOOK → MOVIE with
    one Profile, cross-domain evidence, explicit insufficiency and retained command/
@@ -38,6 +61,10 @@ this correctness/first-session-quality work before further broad latency tuning.
 5. **Hosted and phone acceptance:** verify a concrete preserved-state rollout and
    the whole learning loop, not only geometry. Never silently promote an untested
    external model, rewrite old predictions or repeat the completed account reset.
+
+Broader learned representations, global associative indexing, multistep World
+Model, dreaming and autonomous evolution retain the dependency path below.
+They are not prerequisites for a useful, measurable first-generation engine.
 
 STATUS names one active handoff. Existing first-public identity, Shared, privacy,
 quality and release gates remain; this plan reuses their evidence boundaries.
