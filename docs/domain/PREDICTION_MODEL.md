@@ -6,7 +6,12 @@ The independent reusable 51-part target architecture is [PREDICTIVE_MEMORY_ENGIN
 
 ## 1. Thesis
 
-Kajo predicts the next experience that is likely to fit a `Profile` **in the current situation**. It does not build isolated “book taste” and “movie taste” systems.
+Kajo maximizes the **expected post-experience rating for the current Profile on
+that person's own learned response scale**, in the current situation and through
+time. It learns how the person uses ratings as well as what they prefer. The
+October 25 owner correction in [ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
+supersedes the earlier rating-ten/high-tail objective. It does not build isolated
+“book taste” and “movie taste” systems.
 
 A language model predicts a useful next token from an ordered context. Kajo's long-term direction is analogous:
 
@@ -22,6 +27,133 @@ next useful experience
 
 The analogy concerns sequence modeling, shared representations, memory retrieval and outcome learning. Kajo is not a chat model, and a general-purpose LLM is not automatically a reliable recommender.
 
+## 1.1 Personal expected rating and response behavior — Engine V1 target
+
+This is a required successor contract, not a description of the current scalar
+SQL score or an already admitted rating model. [ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
+owns the decision; ROADMAP and ENGINE_BUILDOUT own scheduling and capability
+acceptance. Retained source/reward versions below keep their original meaning.
+
+For integer ratings `r in 0..10`, define:
+
+```text
+q(r) = P(reported post-experience rating = r |
+         Item experienced, Profile, Item, state, context, available prefix)
+expectedRating = sum(r * q(r))
+FOR_YOU base objective = highest expectedRating among eligible Items
+```
+
+Keep `targetVersion`, conditioning, experience/label horizon where applicable,
+scale, state/prefix/model/response-model versions, support, observability and
+calibration status with the forecast. For known-Item Taste, the rating is a
+retrospective experience report with a forecast made before the report; that
+is distinct from a later rating of a newly recommended experience. Unknown
+consumption date remains unknown. Missing follow-up does not supply a low rating.
+Observed raters are a selected population; report coverage and selection limits
+before claiming prediction quality for all eligible experiences.
+
+The base objective has no `P(R=10)`, universal `P(R>=9)` or convex high-tail bonus.
+A certain 8 has greater expected rating than 70% at 10 plus 30% at 2 (7.6).
+Distribution spread/tails are retained diagnostics; novelty, exploration or
+uncertainty-conservative choices are declared bounded policy departures with
+measured tradeoffs, not alternate hidden rewards. Successful consumption and
+List interest remain separate heads/diagnostics. Multiplying expected rating by
+consumption probability changes the objective and is not the default.
+
+### Response-aware baseline and identifiability
+
+The first candidate model is a compact regularized hierarchical predictor with
+global/domain baseline, Profile response offset, Item/content fit and bounded
+recent/context/recall effects. Fit only supported terms; sparse personal terms
+shrink toward the shared/domain prior. Compare the response-aware version against
+the otherwise equivalent model without response adaptation. Preserve a measured
+simple baseline, rather than mandating a neural model or an untested equation.
+
+`RatingResponseModel` separates the *reported scale* from the preference/state
+representation. It may later use supported response spread or ordered thresholds
+to map fit into an own-scale rating distribution. An example ordinal link is
+`P(R<=k)=sigmoid(tau_profile,domain,k-eta_profile,item,time)`; threshold ordering,
+location/scale identifiability and regularization are mandatory. Do not fit a free
+Profile location twice through both unconstrained thresholds and an intercept.
+Model/feature/response artifacts and the information cutoff are versioned together.
+
+Train a point expectation with a mean-targeting loss such as justified squared
+error, or derive it from a validated distribution fitted with a proper scoring
+rule. Absolute-error-only fitting generally estimates a median and cannot be
+relabeled `expectedRating`; MAE remains a useful evaluation diagnostic.
+
+Rating style is not an inferred personality label. Sparse grades cannot identify
+absolute happiness separately from scale usage, nor establish that 8 is a person's
+maximum enjoyment or 4 means hatred. Preserve raw grades and source mappings;
+never force observed minima/maxima to 0/10 or divide by zero for constant raters.
+Retain a supported personal mean even for a constant rater; shrink/fall back only
+unsupported parameters and report missing preference differentiation.
+Domain-specific scale behavior and drift need support and uncertainty. Distinguish
+possible response-style drift from preference drift instead of automatically
+rewriting long-term taste.
+
+For the same person a positive affine scale transform preserves expected-rating
+ordering. An arbitrary monotone nonlinear transform does not generally preserve
+expected-utility ordering. Percentiles, standardized values and latent utilities
+may help fit/retrieve, but the served prediction must map back to the declared
+own-scale target; changing that target requires a versioned explicit decision.
+Raw scores or inferred latent utility are not comparable cardinal happiness
+across people. Cross-Profile retrieval and Shared aggregation need supported
+response-aware comparisons, uncertainty and their own declared target semantics.
+
+### Three-action learning boundary
+
+Current Taste/Discovery feed actions are **List saving, numeric rating and Ohita**.
+En tunne has already been removed from this interaction; do not add it back as an
+engine prerequisite. A List save is interest/intention; a numeric rating records
+the actor's experienced Item and own grade; Ohita is an ambiguous contextual skip
+covering unknown/not-interested situations. Its reason is unobserved. It supplies
+neither a numeric negative label nor confirmed recognition. Legacy stored
+UNKNOWN/NOT_INTERESTED semantics remain preserved, not emitted as inferred reasons
+for the combined skip. [DATA_EVENTS](DATA_EVENTS.md) owns the event lifecycle.
+
+One choice saving an Item to several Lists is one interest opportunity, not
+several independent satisfaction labels. A committed rating/List action creates
+no extra skip. A rating in Shared context does not imply every member consumed
+the Item; SharedRatingRound keeps actor and joint evidence distinct.
+
+### V1 computation and acceptance
+
+1. Resolve authorized canonical evidence and the available-at-time prefix.
+2. Assemble supported Working/Short/Long/Belief/World/Context and Item features;
+   keep unknown values explicit and avoid counting one source repeatedly.
+3. Acquire eligible candidates through the common Taste/Discovery boundary;
+   retrieve useful compatible local prefixes, or return an explicit no-match.
+4. Predict own-scale expected rating and supported uncertainty, with separate
+   interest/consumption targets only where labels justify them.
+5. Apply declared mode/slate constraints and freeze prediction, pool and versions.
+6. Measure the first eligible answer/outcome against that frozen forecast, then
+   update the common Profile state for future forecasts. Offline fitting of
+   shared model parameters remains separate from this fast state update.
+
+Train and evaluate chronological prefixes without own-answer leakage, later
+features or later response parameters. Keep training, model selection/calibration
+and final evaluation separate. Readiness uses a declared target, metric, coverage,
+varied support, uncertainty and versioned stopping rule per domain. Predeclare
+checkpoints or justify a sequential method; repeated checks cannot silently use
+fixed-sample guarantees. An admitted global calibration does not establish
+personal calibration in every sparse or shifted content slice.
+
+Require a predeclared mean-consistent primary loss such as own-scale MSE or a
+proper full-distribution score, with MAE as a supplementary readable diagnostic.
+Report distribution calibration where available, macro and traffic-weighted aggregates,
+and strict/generous/sparse/constant-rater slices. Compare current serving,
+population/domain and Profile-mean baselines plus no-response/no-recall/no-transfer
+ablations. Measure whether errors improve beyond predicting the person's mean.
+Novel recommendations need later experienced outcomes and declared experimental
+evidence; offline ordinal agreement alone does not establish recommendation uplift.
+
+Tests cover 7.6 versus 8, equivalent positive affine response scales, sparse and
+constant histories, numeric-prefix sensitivity, zero/corrections/withdrawal,
+multi-List support, neutral skip, frozen histories and Profile isolation. Those
+fixtures prove semantics, not learned predictive quality. Keep unsupported
+probabilities/readiness explicitly unavailable and continue learning in Discovery.
+
 ## 2. Non-negotiable invariants
 
 - Prediction targets `Profile`, never User directly.
@@ -33,6 +165,10 @@ The analogy concerns sequence modeling, shared representations, memory retrieval
 - A Prediction intended for learning records the complete candidate/slate trace and model/policy versions.
 - Exposure, engagement, preference, consumption and delayed satisfaction are different evidence classes.
 - Dwell is not equivalent to satisfaction.
+- The primary target is own-scale expected post-experience rating; rating response
+  behavior is learned with support, not replaced by a universal 9/10 threshold.
+- Current feed choices are List saving, numeric rating and ambiguous Ohita;
+  legacy unknown/not-interest evidence does not create separate new-feed controls.
 - Memory is evidence with age and confidence, not permanent identity.
 - Evolution never mutates the production champion without evaluation, rollout gates and rollback.
 - Restricted provider metadata is not used for ML/AI training without the necessary licence.
@@ -98,9 +234,11 @@ Each step must retain this order:
    another first label and is neither an accuracy result nor a failure.
 4. Project the answer as source-provenanced evidence for future state only after
    that receipt/currently available evaluation. Numeric rating magnitude matters,
-   including genuine zero and
-   neutral five; UNKNOWN changes recognition only, and explicit not-interest is
-   a separate signal rather than an invented numeric rating.
+   including genuine zero and five. Retained scalar versions treat five as
+   neutral; the response-aware successor has no universal personal neutral point.
+   Retained UNKNOWN changes recognition only, and explicit historical not-interest
+   is a separate signal rather than an invented numeric rating. Current Ohita
+   supplies neither legacy reason.
 5. Select and predict the next question from the new committed prefix. New evidence
    can improve a forecast or reveal uncertainty/contradiction; no monotonic
    improvement is guaranteed.
@@ -797,13 +935,15 @@ User-entered situational intent such as “together”, available time or desire
 |---|---|---|
 | Exposure | impression, rank, surface | denominator and bias correction |
 | Attention | open, meaningful dwell | weak intent/context evidence |
-| Contextual decision | planned Ohita | current-feed suppression/context; no negative rating or certain recognition |
-| Preference | rating, not interested, list, save, endorsement | direct taste/decision evidence |
+| Contextual decision | current combined Ohita | current-feed suppression/context; reason unobserved, no negative rating or certain recognition |
+| Experience preference | numeric rating | actor's experienced Item and own reported grade |
+| Interest/intention | List save; retained save/endorsement evidence | auxiliary intent; no fabricated satisfaction grade |
+| Legacy typed evidence | retained not-interested/unknown records | NOT_INTERESTED is explicit interest evidence; UNKNOWN is recognition evidence; no separate current En tunne control |
 | Consumption | watched/read/attended, reversal | actual experience |
 | Delayed outcome | rating after consumption, repeat choice, later removal | satisfaction/correction |
 | System | model/policy/version/experiment | reproducibility and evaluation |
 
-### MVP V1 scalar outcome
+### Retained MVP V1 scalar outcome
 
 The first scenario reward is deliberately bounded and inspectable:
 
@@ -819,13 +959,19 @@ The first scenario reward is deliberately bounded and inspectable:
 | saved | +0.50 |
 | unsaved | −0.35 |
 
-These are V1 hypotheses, not permanent product truth. Each future reward formula gets a version and is evaluated against delayed ratings/consumption, not tuned only to increase taps.
+These are retained implementation hypotheses, not the new Engine V1 objective.
+In particular, a universal neutral 5 and fixed save/List rewards do not model
+personal rating behavior. Preserve historical reward/forecast versions while a
+versioned response-aware successor is evaluated under section 1.1. Do not relabel
+these constants as expected ratings, utility anchors or probabilities.
 
-### Multi-objective target
+### Primary target and separate policy guardrails
 
-The EvolutionEngine must eventually optimize a vector, not one engagement number:
+The primary target is the current Profile's expected post-experience rating under
+section 1.1. Evaluate these additional outcomes and guardrails separately; they
+must not silently become a weighted reward that displaces that target:
 
-- expected post-consumption satisfaction,
+- own-scale expected post-experience rating and measured recommendation benefit,
 - successful choice/consumption rate,
 - long-term return and trust,
 - novelty/serendipity when requested,
@@ -954,13 +1100,14 @@ native fixture is not quality, model admission or hosted deployment.
 
 ### 8.2 Next-card satisfaction and prefix freshness — required target
 
-The owner's October 15 objective is to choose the eligible Item most likely to
-earn the Profile's highest satisfaction (expressed as a rating of **10**) in its
-current World/Context/Scenario. A probability needs a declared post-experience
-target/horizon, observed support and calibration. Until admitted, the current
-ranker supplies only a named, versioned ordinal proxy, never a fabricated chance
-of a ten, predicted grade or confidence percentage. Existing multi-objective,
-DiscoveryMode, privacy and hard-eligibility constraints still apply.
+The owner's October 25 correction supersedes the earlier rating-ten objective:
+choose the eligible Item with the greatest supported **expected post-experience
+rating on this Profile's learned response scale**, in its current World/Context/
+Scenario. Section 1.1 and ADR-0012 own the target. Probabilities need declared
+conditioning/horizons, observed support and calibration. Until a successor is
+admitted, the current ranker supplies only a named, versioned ordinal proxy, never
+a fabricated expected grade or confidence percentage. DiscoveryMode, privacy and
+hard-eligibility constraints still apply; tail probabilities are diagnostics.
 
 Every committed rating's magnitude, including the **first** Taste answer, must
 enter the eligible state and canonical scoring prefix consumed for the next
@@ -988,11 +1135,11 @@ locking the whole future feed to one START-time slate. Freeze each new scoring
 panel/pool and retain the original panels for historical same-prefix comparisons.
 Keep already-delivered origins immutable,
 finish exact retries, and obtain a new origin for new delivery rather than
-silently rescoring frozen pagination. Taste question policy may transparently
-trade immediate satisfaction for supported information acquisition; its versioned
-trace must state that objective/tradeoff rather than claim every question is the
-best pleasure recommendation. Discovery exploitation and Taste acquisition share
-state/forecast semantics without requiring identical selection policies.
+silently rescoring frozen pagination. Under ADR-0011, equal declared Profile/
+prefix/domain/mode/source/cutoff and eligibility must use the same acquisition and
+scoring on both surfaces. First-question recognition and BOOK → MOVIE progression
+are explicit guided-policy constraints. Any bounded information-seeking tradeoff
+is shared, versioned and evaluated; there is no separate hidden Taste utility.
 
 The October 23 owner refinement after #709 supersedes the earlier suppression-only
 exception. Discovery keeps the active delivery plus at most **five prepared
@@ -1134,22 +1281,24 @@ selection/preservation behavior only.
 
 ### FOR_YOU
 
-- maximize expected fit,
-- prefer confidence,
+- maximize supported own-scale expected post-experience rating,
+- retain uncertainty and support; declare conservative fallback rather than
+  treating confidence as a second satisfaction score,
 - use ScenarioMemory most strongly,
 - low but non-zero exploration.
 
 ### SURPRISE
 
-- preserve meaningful expected fit,
+- preserve meaningful expected rating with a declared novelty tradeoff,
 - increase novelty and indirect cross-domain relations,
 - accept moderate uncertainty,
 - scenario evidence guides but does not narrow the slate.
 
 ### RISK
 
-- deliberately accept high uncertainty/variance,
-- surface possible exceptional fits and clear misses,
+- accept a declared bounded exploration/uncertainty budget,
+- test relevant uncertain candidates while retaining expected-rating and
+  disappointment diagnostics; do not optimize a ten or deliberately seek misses,
 - use ScenarioMemory as a weak guardrail rather than an exploitation rule,
 - retain safety/availability/consumed constraints.
 
@@ -1755,14 +1904,21 @@ Promotion records the approving mechanism/person, evidence window, metrics, guar
 
 ### 13.11 Multi-objective comparison
 
-Challengers are compared on a Pareto frontier before a scalar tie-breaker. A candidate that gains clicks but harms delayed ratings, diversity or Shared fairness is dominated or rejected.
+Apply hard guardrails first, then compare eligible challengers under the declared
+primary target and precommitted admission rule. Numerical expected-rating models
+use a mean-consistent loss; claims of recommendation value require the separate
+eligible policy comparison. Pareto views are diagnostic, not an alternative
+scalar objective or a way to trade away expected rating for clicks. Novelty or
+exploration tradeoffs belong to explicit bounded mode policies. A click gain
+with a rating loss is not necessarily Pareto-dominated, but clicks cannot rescue
+a failed primary-target or guardrail test.
 
-Primary objectives:
-
-- delayed satisfaction and successful consumption,
-- calibrated fit/uncertainty,
-- mode-appropriate novelty,
-- long-term return/trust.
+Primary objective: personal expected post-experience rating with response behavior
+modeled under section 1.1/ADR-0012. For Shared, use its separately declared
+response-aware joint target and fairness constraints rather than averaging raw
+member grades as interpersonal utility. Report consumption, calibration,
+mode-appropriate novelty and return/trust separately; they cannot silently
+replace the primary objective or manufacture satisfaction labels.
 
 Hard guardrails:
 

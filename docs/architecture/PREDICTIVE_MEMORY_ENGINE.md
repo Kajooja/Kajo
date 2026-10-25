@@ -24,6 +24,7 @@ These are explicit review additions, not claims that the supplied proposal or ex
 | Distinguish hidden-state hypotheses, possible outcomes, alternative actions and model challengers | One observed action does not reveal what an unchosen action would have caused, or select a unique latent interpretation. Sections 7, 14–15, 30, 36. |
 | Make memory scope and evidence origin separate dimensions | Local/global governs access; observed/synthetic governs evidence. A shared dream is still synthetic. Section 16. |
 | Measure the four sleep functions independently | Replay, simulation, consolidation and evolution have separate controls, budgets and evaluation; research references are hypotheses for this engine. Sections 28–29, 34–38 and research appendix. |
+| Maximize personal expected rating and model response behavior | October 25 owner correction in ADR-0012 replaces Kajo's rating-ten objective with own-scale expectation, supported response modeling and a substantial Engine V1 build-out. Sections 1, 6–7, 15, 30, 32–33, 44. |
 
 ## 1. Goal
 
@@ -36,6 +37,15 @@ Its general predictive question is:
 The supplied `P(S_{t+1}, O_t | S_t, A_t)` is retained conceptually. `S_now` is a useful representation of information available now, not a claim that all relevant hidden state is observed or that a strict Markov property has been established.
 
 Kajo actions may recommend an experience; another adapter may propose a task, configuration or maintenance action. The core must not require movies, books, human accounts or any specific provider schema.
+
+For Kajo, [ADR-0012](decisions/0012-personal-expected-rating-engine-v1.md) makes the
+primary target the **expected post-experience rating for the current Profile on
+its own learned response scale**, rather than P(rating=10), a fixed high-rating
+threshold or a convex tail bonus. The adapter owns the response scale and target;
+the generic core predicts the declared outcome and optimizes its expectation.
+Learning rating response behavior is separate from claiming to identify absolute
+happiness or a person's psychology. [PREDICTION_MODEL section 1.1](../domain/PREDICTION_MODEL.md#11-personal-expected-rating-and-response-behavior--engine-v1-target)
+owns the precise Kajo conditioning, initial model and acceptance contract.
 
 ## 2. General cycle
 
@@ -138,6 +148,12 @@ Explicit evidence dominates passive attention. Unknown, unavailable and unexpose
 ## 6. LongTermState — durable memory
 
 LongTermState changes slowly through repeated independent evidence. Each feature retains `value`, `support`, `uncertainty`, `lastUpdated`, `sourceWeights` and provenance references.
+
+Where an adapter uses subjective ratings, retain a separately versioned response
+model with supported subject/domain effects and fallback. Rating-style parameters
+are derived from eligible evidence; do not count the same source again as an
+independent confirmation of taste. Apparent response-style and preference drift
+can remain unresolved hypotheses.
 
 One atypical session must not erase durable taste. Conversely, old imports cannot keep an unjustified permanent influence floor when native evidence repeatedly contradicts them. Correction/removal must invalidate the affected derivative and support count. Reliability is not established by assigning a plausible-looking confidence number.
 
@@ -244,6 +260,16 @@ Each output carries `targetDefinition`, `horizon`, `conditioning`, `estimateKind
 Generation 1 may return a scalar ranking score with probabilities unavailable. It must not relabel that score as a distribution. Additional heads enter only with real labels and evaluation. Satisfaction, intention, exposure and retention remain different targets; the adapter supplies their meaning.
 
 For Kajo, preserve separate estimates for interest/selection, eventual consumption and post-experience rating where labels support them. A high save rate is not automatically high satisfaction. Two rating distributions with the same mean can imply very different risks, so a later distributional model should retain its spread or quantiles rather than expose only the average. Missing follow-up stays censored/unknown. Every head defines its own observation opportunity, maturity deadline and conditional population; an outcome becoming observable for one head does not mature every other head.
+
+Kajo's Engine V1 target fits a supported `RatingResponseModel` alongside content/
+state preference. Start with hierarchical shrinkage and compare added response
+offset/spread/ordered-threshold flexibility against simpler controls. Preserve
+raw labels, point-in-time parameter versions, missingness and original source
+scales. Sparse/constant histories do not justify forced extrema or high certainty.
+An arbitrary monotone latent-score transformation does not preserve expected
+utility; the declared prediction maps back to the person's reported scale.
+Cross-person cardinal utility comparisons require assumptions not supplied by
+subjective grades alone. Shared aggregation has its own explicit contract.
 
 ## 16. ScenarioMemory
 
@@ -405,11 +431,14 @@ Initially these are **diagnostic hypotheses** supported by traces and controlled
 
 WorldModel predicts; PolicyEngine chooses. The domain adapter defines reward meaning and hard constraints; the policy combines supported estimates, utility, novelty and information gain within those constraints.
 
-Kajo policies remain:
+Kajo policies under ADR-0012 are:
 
-- `FOR_YOU`: supported expected fit with low bounded exploration.
-- `SURPRISE`: useful expected fit plus relevant novelty/diversity.
-- `RISK`: bolder but bounded relevant uncertainty/information-seeking, not unsafe or arbitrary actions.
+- `FOR_YOU`: maximize supported own-scale expected post-experience rating with
+  declared low bounded exploration and eligibility constraints.
+- `SURPRISE`: retain that expectation component with declared relevant novelty/
+  diversity tradeoffs.
+- `RISK`: bounded relevant information-seeking/uncertainty tradeoffs with expected
+  rating and disappointment diagnostics; no hidden P(ten) objective.
 
 Unknown information gain is not replaced by random noise and reported as a measurement. Authorization, terminal suppression, availability and consent are never genome-mutable. A slate action records the considered pool, final order and selection policy; it is not equivalent to independently choosing every item.
 
@@ -417,7 +446,7 @@ Unknown information gain is not replaced by random noise and reported as a measu
 
 An action can trade a bounded amount of immediate expected utility for learning. The source's lower-reward/higher-information example is an architectural objective, not proof that a particular choice helps.
 
-Distinguish asking about a recognized past experience from recommending a new experience. Taste question selection must account for recognition, response cost and supported uncertainty reduction. Unknown answers are valid skips. A held-out answer cannot enter the prefix of its own forecast.
+Distinguish asking about a recognized past experience from recommending a new experience. Taste question selection must account for recognition opportunity, response cost and supported uncertainty reduction. The current Kajo feed exposes List saving, numeric rating and combined Ohita; En tunne has already been removed. Ohita does not reveal whether the Item was unknown or uninteresting. Historical UNKNOWN remains source-typed legacy evidence. A held-out answer cannot enter the prefix of its own forecast.
 
 The October 14 [sequential Taste contract](../domain/PREDICTION_MODEL.md#sequential-adaptive-taste)
 commits one pre-answer forecast and its immutable first-answer/measurement receipt
@@ -597,6 +626,22 @@ Organize execution into four boundaries: generic computation/core, DomainAdapter
 ## 44. Generation 1 — Transparent Engine
 
 Generation 1 uses inspectable state, explicit evidence, deterministic features/retrieval, transparent scoring, frozen traces, outcome reconciliation and bounded evaluation. Existing PostgreSQL/SQL/TypeScript foundations are useful, not discarded.
+
+The October 25 Engine V1 commitment completes a useful subset of this generation
+before broad UX/acquisition expansion, UI polish and release. It requires shared
+serving inputs, response-aware expected-rating prediction, supported state/content
+and cross-domain components, local recall with no-match behavior, dated WorldState
+facts, honest uncertainty/readiness, real replay/comparison and operational
+admission/rollback. The [build-out ledger](../project/ENGINE_BUILDOUT.md) maps every
+architectural section to a V1 disposition and [ROADMAP](../project/ROADMAP.md) owns
+the substantial sprint sequence. Current SQL score/reward versions are retained
+baselines, not a claim that this new response-aware V1 already serves.
+
+Data-dependent capabilities have explicit admission or inactive/fallback evidence;
+their absence is not hidden by invented cohorts or synthetic successes. Sequence
+encoders, learned state-transition models, long dreams and automatic evolution
+remain research until their data and comparison gates justify complexity. The
+51-part architecture is preserved; its full research horizon is not renamed V1.
 
 Extract by a parity-tested boundary: capture fixtures from accepted SQL, define generic contracts, exercise a second small synthetic non-media adapter, then replace one component at a time behind the existing Kajo serving contract. Do not implement an independently drifting TypeScript copy of the whole SQL scorer and call it parity.
 

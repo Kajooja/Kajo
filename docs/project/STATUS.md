@@ -10,56 +10,92 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — native input cutoff parity and engine checkpoint / #336, #302
+## Current handoff — personal expected-rating Engine V1 / #361, #302, #336
 
-**Continuation — 2026-10-25 Europe/Helsinki:** the owner asks where the engine
-stands against its architecture and when detailed scoring/state/memory work starts.
-It is the current critical path, not a later post-UI project. The source audit in
-[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md#october-25-actual-source-architecture-checkpoint)
-records a partially implemented Generation 1: active SQL scoring and short/long
-tag memories, captured but OFF WorkingState, same-Profile Scenario recall, and
-frozen evaluation/Sleep foundations. Full WorldState, admitted conditional cohorts,
-calibrated readiness and later generations remain open. [ROADMAP](ROADMAP.md)
-owns the state/world/evaluation/recall/shared-serving sequence.
+**Owner decision — 2026-10-25:** maximize each Profile's expected post-experience
+rating on its own learned response scale. Do not maximize the chance of a ten or
+replace the objective with interest/engagement. Current actions are List saving
+(interest), numeric rating (experienced Item) and Ohita (unknown reason: unfamiliar
+or not interested). En tunne is already removed. Preserve legacy stored meanings;
+no skip is a numeric zero, inferred dislike or known non-recognition.
 
-`fix/336-catalog-cutoff-parity` continues from
-[PR #359](https://github.com/Kajooja/Kajo/pull/359) source
-`a01dc084ebf4a6adc9ef6de3dd3cade5a8b5ee07`. All five required
-[CI #726 gates](https://github.com/Kajooja/Kajo/actions/runs/40224235061) passed;
-APK generation was skipped. #357/#358/#359 remain open/unmerged and are not
-accepted main. The current PR owns exact final source and check receipts.
+[ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
+owns this decision; [ROADMAP](ROADMAP.md#engine-v1-first--owner-decision-2026-10-25)
+owns the new march: finish current work → hygiene → Engine V1 → UX/product flows
+→ UI → release. [Issue #361](https://github.com/Kajooja/Kajo/issues/361) tracks this
+documentation/priority packet. Its PR owns final-source publication/check receipts;
+closing it does not close Engine V1 implementation or #302/#336 quality gates.
 
-**Bounded implementation:** a forward migration extracts one private finite
-Item/source availability predicate for V4 acquisition and explicit evaluation.
-It closes the explicit scorer's future-source/Item gap without changing score
-math, ordinary Discovery's legacy acquisition, V4 selection or retained records.
-Committed 4/9 answer regressions compare overlapping Discovery/evaluation scores
-at the same native-evidence cutoff, preserve the earlier forecast and isolate
-another Profile. This is not cohort quality or complete state/cutoff parity:
-ordinary Discovery still has a wall-clock request/eligibility envelope and V4
-still uses its recognition shortlist and separate question utility.
+### Active source stack integrated
 
-**Validation:** all **344 database tests** pass, including the new complete-schema
-forward/preservation suite and the extended numeric-answer regression. The latter
-uses existing v1 answer corrections to exercise shared scoring, not the complete
-V4 NEXT/device loop. Lint, types, 50 dependency tests, 904 mobile tests, 3 catalogue
-contract tests and 448 catalogue script tests pass; 177 relative documentation
-links and whitespace checks pass. The required root check stops at the unchanged
-Deno registry connection refusal. No completed local root pass is claimed;
-the PR owns final-source CI/native PostgreSQL receipts.
+The four inherited PRs are merged in dependency order. Each final source passed
+all five required CI gates; subsequent stacked retargets were checked against
+identical reviewed merge trees. Accepted implementation main is
+`4e83ff749f85a64371a6175ac2d695326a7e4bfb`.
 
-No hosted migration, account reset, readiness activation or new APK belongs to
-this packet. The installed V4 and October 24 reset remain complete; preserve all
-new answers and pending commands. Source/CI acceptance precedes a separately
-prepared preservation-checked hosted forward.
+| PR | Accepted scope | Final-source CI | Merge commit |
+|---|---|---|---|
+| [#357](https://github.com/Kajooja/Kajo/pull/357) | Shared Taste/Discovery card geometry and existing timing plan | [#724](https://github.com/Kajooja/Kajo/actions/runs/40134741086), also Android APK | `4a7f80640a06b0c36066d49a824a8a1361d84f37` |
+| [#358](https://github.com/Kajooja/Kajo/pull/358) | Guided Discovery/readiness contract | [#725](https://github.com/Kajooja/Kajo/actions/runs/40195573073) | `a8b06b16cf837803ef7b958fa526b56dd349751c` |
+| [#359](https://github.com/Kajooja/Kajo/pull/359) | Verified curated BOOK cover operator and preservation tests | [#726](https://github.com/Kajooja/Kajo/actions/runs/40224235061) | `e01f99a1d149a1f411a55bf7efef06fe4a86a181` |
+| [#360](https://github.com/Kajooja/Kajo/pull/360) | Private finite Item/source-cutoff predicate shared by V4 acquisition and explicit evaluation | [#727](https://github.com/Kajooja/Kajo/actions/runs/40226814352) | `4e83ff749f85a64371a6175ac2d695326a7e4bfb` |
 
-**Next engine packet:** bind the shared versioned serving input/state and first
-dated WorldState catalogue-facts contract, with the prospective outcome/evaluation
-contract alongside it. Use the existing scorer and memory implementations.
-Then add supported same-Profile numeric-prefix recall and a versioned shared
-BOOK → MOVIE policy; admit the meter only with calibration/support evidence.
-WorkingState influence requires OFF/STATIC/ORDERED comparison. Sprint 014,
-device acceptance and first-release quality gates remain open.
+Independent final review also passed 18 focused database tests, seven cover tests
+and 82 mobile tests. Prior broader local receipts remain in predecessor history;
+the known local Deno registry refusal is not a completed root-check pass. The
+five required final-source CI gates are the full source acceptance evidence.
+
+### Hosted and runtime boundary
+
+The #360 guarded forward is now installed through the supported migration
+operation. Read-only postchecks passed for intended cutoff behavior, preservation
+of existing data and retention of the existing access boundary. See the
+[rollout outcome](retros/2026-10-25-catalog-cutoff-hosted.md). Detailed production
+environment and access metadata are not included in this repository receipt.
+
+The earlier 30-cover data repair remains installed: BOOK image URL coverage
+415/415 and MOVIE 425/425. Do not repeat it, V4 deployment, or the October 24
+reset. Preserve new answers and pending commands. Full state/time parity, native
+conditional cohorts and calibrated readiness are not delivered by #360.
+
+The four geometry/recovery phone observations for #357 and real cover rendering
+remain explicitly open in [DEVICE_TEST](DEVICE_TEST.md#apk-721-taste-layout-blocker--2026-10-25).
+The corrected APK was already supplied; no new APK is needed for this docs packet.
+These observations must pass before the affected UI is used as device acceptance
+evidence. They do not prevent independent engine work.
+
+### Repository hygiene and next packet
+
+[The branch audit](retros/branch-cleanup-2026-10-25.md) records deletion of **56**
+reviewed obsolete remote branches: 54 exact ancestors and two independently
+verified superseded heads. Postcheck confirms nine remote branches remain: main
+and eight consumed catalog operation branches with unchanged heads. Keep those;
+their pinned manifests remain referenced. Branch cleanup does not remove commit, PR or sprint history and does not certify
+engine quality.
+
+**Next implementation: [Sprint 015](sprints/SPRINT-015.md).** Bind one versioned
+native prediction input/candidate/scoring contract for Taste, Discovery, explicit
+evaluation and shadow; require the acknowledged answer prefix in fresh forecasts;
+freeze exposure/outcome identity and deliver the temporal evaluation runner.
+Use the existing SQL scorer, memories, native command/evidence paths and generic
+adapter boundary. Do not build a parallel scorer or start anonymous web/UI work.
+
+Then execute [Sprints 016–021](ROADMAP.md#stage-1--build-and-accept-practical-engine-v1):
+personal expected ratings/response style; temporal state/world/transfer; supported
+conditional memory; calibrated readiness/common policy; replay/consolidation/
+challenger/rollback; actual integrated usefulness acceptance. Each sprint defines
+controls, stop conditions and evidence. [ENGINE_BUILDOUT](ENGINE_BUILDOUT.md) maps
+all 51 architecture sections and EB-01…12 to required V1 slices or bounded later
+research. Numeric budgets are locked from development evidence before final tests.
+
+Sprint 014's unmet capability gates transfer to those named successors; original
+acceptance remains open and Sprint 013 is still the last accepted sprint. Passing
+source tests or adopting this plan does not establish forecast usefulness.
+
+## Historical predecessor receipts
+
+The entries below preserve what was true at their recorded checkpoint. Their
+open/unmerged/next-step wording is superseded by the current handoff above.
 
 ## Predecessor packet — verified curated BOOK covers / #336
 

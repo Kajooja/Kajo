@@ -4,6 +4,139 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Engine V1 first — owner decision 2026-10-25
+
+This is the current execution order. It supersedes older “next”, near-term and
+phase-order wording below; dated source receipts and unmet acceptance requirements
+remain valid. [ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
+owns the corrected optimization target. This is an owner-directed scheduling and
+scope decision, not evidence that the new engine is implemented.
+
+**Primary objective:** maximize the expected post-experience rating for each
+Profile in its current situation, learning that person's rating-response scale.
+Do not maximize `P(rating=10)`, use a universal 9/10 happiness threshold, or add
+hidden nonlinear high-tail rewards. A strict rater's eight can represent strong
+satisfaction. The predicted response and uncertainty remain on the declared
+personal/domain scale; interpersonal cardinal utility is not assumed.
+
+**Current action vocabulary:** list saves indicate interest; a numeric rating
+means the Item has been experienced; Ohita is a no-rating skip whose reason may
+be unfamiliarity or lack of current interest. There is no separate current
+En tunne action. Do not infer a skip reason, turn a skip into zero, or count a
+save as experienced satisfaction. Preserve historical UNKNOWN/NOT_INTERESTED
+records with their original meanings.
+
+### Stage 0 — finish active work, then repository hygiene
+
+1. Finish and integrate the existing #357 → #358 → #359 → #360 source chain in
+   dependency order after successful required checks and exact-head review.
+   Preserve the already installed V4 and cover operations and all current accounts,
+   responses, commands and frozen predictions. Record source, hosted and device
+   acceptance separately; unknown phone results cannot be marked passed.
+2. Close or explicitly transfer every remaining obligation to a named successor:
+   #360's guarded hosted forward is installed with the preservation receipt in
+   STATUS; #357's outstanding phone observations remain in DEVICE_TEST and
+   must be obtained before using the affected UI as acceptance evidence. Work
+   that requires owner/device input need not freeze independent authorized work.
+3. Refresh all remote heads and PR state. Delete exact merged branches using
+   head checks; retire a nonancestor only with explicit supersession evidence.
+   Keep operation-identity/recovery dependencies and genuinely unique work.
+   Record decisions and recovery commit/PR references. Never delete main, a
+   protected branch, an active PR head or an unreviewed unique branch.
+4. Reconcile STATUS to one active handoff and the canonical documents to this
+   order. Documentation and branch cleanup do not close Sprint 014 quality gates.
+
+### Stage 1 — build and accept practical Engine V1
+
+Complete Sprints **015–021** in order. These are delivery sprints, not the older
+product Phase 15–21 identifiers. Sprint 014 remains the inherited foundation;
+its unmet engine gates transfer explicitly and remain open until their successor
+evidence passes. Do not rename old sprint history or repeat accepted source work.
+
+| Sprint | Integrated outcome | Dependencies and acceptance |
+|---|---|---|
+| [015 — shared evidence and serving](sprints/SPRINT-015.md) | One versioned input/candidate/scoring path for Taste and Discovery, exact action/forecast lifecycle and a prospective evaluation foundation | Finish the active source chain and hygiene; preservation-checked rollout, same-input parity, first-answer sensitivity, zero/correction/skip/withdrawal and real exposure attribution |
+| [016 — personal expected rating](sprints/SPRINT-016.md) | An interpretable outcome predictor that learns preference and individual rating response with sparse-data shrinkage | 015; frozen later-label evaluation against user-mean, supported catalogue and existing ranking controls; improve the declared expected-rating prediction task with honest coverage |
+| [017 — adaptive state and transfer](sprints/SPRINT-017.md) | Working/Short/Long/Belief, dated WorldState and permitted context; useful content, bounded cross-domain and Shared state | 015–016; OFF/STATIC/ORDERED, no-transfer and world-off controls, incremental/rebuild parity, stale/missing/context-scope tests; activate only supported effects |
+| [018 — conditional memory](sprints/SPRINT-018.md) | Numeric-prefix local Scenario/Trajectory recall and assessed, separately admitted cohort/external-prior channels | 015–017; no-useful-match, no-recall controls, prefix-only time/rights/privacy checks; lack of native cohort support yields explicit nonadmission rather than fake neighbors |
+| [019 — readiness and common policy](sprints/SPRINT-019.md) | Calibrated supported uncertainty, shared expected-rating policy and BOOK → MOVIE guided readiness | 016–018; predeclared sequential evaluation/stopping, domain coverage and dependence handling, honest insufficient continuation, old-policy preservation |
+| [020 — operating learning lifecycle](sprints/SPRINT-020.md) | Real replay, evaluated consolidation, bounded challengers and deployable version/rollback lifecycle | 015–019; independent final evaluation, artifact/source deletion, failed-worker recovery, reproducibility and native fallback; synthetic outcomes never validate themselves |
+| [021 — integrated Engine V1 acceptance](sprints/SPRINT-021.md) | Useful BOOK/MOVIE predictions throughout actual owned-Profile Taste/Discovery/Shared operation, with operating evidence and portable boundaries | All required prior slices; fresh end-to-end hosted/device outcomes, temporal and category checks, quality/latency/coverage budgets and explicit owner acceptance of the evidence |
+
+Every sprint is a substantial deliverable with multiple narrow implementation
+PRs as needed. Its file specifies inputs, deliverables, non-goals, controls,
+failure/stop conditions, review evidence and successor. Do not reduce a sprint
+to a documentation stub or a large unreviewable all-at-once code PR.
+
+[ENGINE_BUILDOUT](ENGINE_BUILDOUT.md) owns the common acceptance protocol and
+maps all 51 architecture sections and EB-01…12 to required V1 slices or justified
+later research. Choose numerical minimum-gain, noninferiority, coverage, precision,
+latency and cost thresholds from development evidence **before** unlocking the
+declared final test. Report the actual thresholds and results. No arbitrary
+confidence percentage or successful source test can replace measured usefulness.
+
+V1 is complete only when its required prediction/evidence/state/policy/operating
+capabilities work together and their measured acceptance passes. Lack of evidence
+means insufficient acceptance and a concrete data/experiment task. An optional
+method can be rejected after its bounded comparison; a losing neural model or
+an unavailable native cohort does not force an endless research project.
+
+Keep the original full architecture: multiple interests/spaces, scenario and
+trajectory memory, one-step outcomes, uncertainty and independent core remain
+the design. Large neural sequence models, unsupported population retrieval,
+learned multistep transitions/dreams, autonomous promotion and extensive geometry
+search require data and incremental measured benefit. Their explicit deferral
+does not erase them or allow unresolved V1 correctness to be called research.
+
+Use the existing authorized authenticated flows for V1 validation. Minimal
+controls, instrumentation, provider lifecycle or UI fixes necessary to observe
+correct engine behavior belong to Stage 1. New public acquisition and broad
+visual polish do not. Authorization, privacy, retention, data rights, deletion
+and abuse controls remain prerequisites to the particular data use or external
+exposure, whatever their later product phase number.
+
+### Stage 2 — UX, acquisition and other product flows
+
+After Engine V1 acceptance, complete the retained functional backlog in this order:
+
+1. Core UX and measured end-to-end performance: navigation, Lists/history/search,
+   recovery, accessible actions and the duration work package below (Phase 17.0).
+2. Web/public Taste entry, server-backed anonymous identity, minimum retention/
+   abuse/measurement, browser/app continuation and Google/Apple conversion
+   (Phase 15). The engine and own-Profile guided policy are reused, not rebuilt.
+3. Preview, personal invites, Friends lifecycle, explicit Shared creation,
+   coordinated rating and bounded group decisions (Phase 16). Preserve the
+   existing distinction between friendship, membership and private history.
+4. Remaining telemetry, privacy, support and operating flows (Phase 17.1–17.2).
+
+Existing scopes, issue numbers and MVP gates below remain required. Publish/share
+links are implemented and tested in controlled conditions here; broad distribution
+still waits for the final Share Link Gate.
+
+### Stage 3 — UI completion
+
+Complete visual design, spacing, typography, artwork treatment, motion/reduced
+motion, responsive layouts and final accessibility verification after the
+functional flows are stable. This stage does not defer a blocking interaction or
+accessibility defect needed to validate Stage 1/2 behavior. No UI success is
+evidence of recommendation usefulness.
+
+### Stage 4 — beta, release and distribution
+
+Then execute the retained Phase 18 → 19 → 20 requirements: controlled complete-flow
+beta, security/privacy/recovery recheck, production authentication/signing/store
+candidate, installed update/device acceptance and finally the explicit Share Link
+Gate. Engine quality remains monitored and regressions reopen the affected gate.
+No existing launch requirement is removed by this reprioritization.
+
+### Reading the dated plans below
+
+The following dated sections retain source history, rationale and requirement
+details. Their old sequencing, “current” branch states and first-public priority
+wording are historical. Use the stage map above for scheduling and STATUS for
+the exact live source/CI/hosted/device boundary. Links to old phase headings remain
+valid to avoid duplicating or losing the retained backlog.
+
 ## Guided Discovery and measured Taste readiness — 2026-10-25
 
 The owner's latest requirement makes full Taste/Discovery integration the next
@@ -177,7 +310,7 @@ UX_PRINCIPLES owns the superseding controls contract.
 | First-answer-sensitive selection — `MVP-ALG-010` | The first and every later committed rating, including its magnitude, enters the canonical state/forecast used to select the next Taste question and fresh Discovery cards. Selection must consume supported forecast differences; a rigid domain rotation must not discard all usable first-answer signal. Retain bounded BOOK/MOVIE coverage and explain active-learning/diversity decisions. Opposing supported rating prefixes must be able to change candidate utilities and the next selected Item in controlled cases. Refresh/refill the eligible pool under a new versioned forecast when needed; do not lock the entire future feed to a precomputed test slate. |
 | One vertical card feed — `MVP-UX-007` | Taste and Discovery card mode share artwork, metadata and card presentation. Deliberate upward swipe-away is **Ohita**, with an accessible equivalent and a short first-use/Taste explanation. Do not require separate En tunne / Ei kiinnosta choices for the new no-rating skip path. Ratings and save/List actions retain their explicit meanings. |
 | Contextual skip and return — `MVP-UX-007`, `MVP-DATA-001/003/004` | Remove a deliberately skipped Item from the current feed with an exact origin and retry-safe contextual skip receipt. It is not a numeric rating, confirmed lack of recognition or durable negative preference. Reconsider it only under a versioned cooldown/context/Scenario eligibility rule; it must not immediately loop back or disappear permanently by accident. Preserve legacy UNKNOWN/NOT_INTERESTED records and their original contracts. |
-| Current-scenario satisfaction objective — `MVP-ALG-010` | Rank for the best supported outcome for this Profile in its current state/Scenario, with the long-term calibrated target of a top-satisfaction / rating-10 outcome. The Interstellar-10 → stronger support for a similar eligible film such as Inception example is a feature/learning test, never a hardcoded title pair or guaranteed next card. Taste information acquisition and FOR_YOU/SURPRISE/RISK tradeoffs must remain explicit. Uncalibrated ordinal scores are not probabilities. |
+| Current-scenario satisfaction objective — `MVP-ALG-010` | Rank by expected post-experience rating for this Profile in its current state/Scenario, learning the individual's rating-response scale under ADR-0012. High/low numeric-answer examples test conditional learning, never a literal-ten objective, hardcoded title pair or guaranteed next card. Shared policy exploration/mode tradeoffs remain declared and bounded; uncalibrated ordinal scores are not rating expectations or probabilities. |
 | Recent supported cold start — `MVP-ALG-011` | Empty/sparse Profiles use a versioned recent, supported prior with recognition/diversity and honest missing-data fallback. Evaluate recency, the complete rating distribution, sample support and exposure/source bias against the current baseline. An NPS-like net-preference score is a hypothesis to define and compare, not an automatic mapping of Item ratings or a lifetime count of tens. Licensed provider priors, external research and native cross-Profile PopulationMemory retain their separate rights/privacy/admission gates. |
 
 **Execution order:** #345's forecast-aware selector and its hosted forward are

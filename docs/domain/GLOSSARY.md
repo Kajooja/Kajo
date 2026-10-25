@@ -16,7 +16,7 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Friend invite | `FriendInvite` | Opaque server-owned expiring/revocable invitation; may start Taste and create Friendship after consent/identity conversion; not Shared membership. |
 | Friendship | `Friendship` | Reciprocal active social relationship between permanent Users; no private Personal evidence access or automatic SharedProfile. |
 | Taste session | `TasteSession` | Versioned real-Item cold-start/acquisition sequence with safety budgets and pause/resume. Sequential target uses committed-prefix adaptation and provisional per-domain readiness; fixed counts do not certify reliability. Existing v1 sessions remain preserved. |
-| Taste response | `TasteResponse` | Canonical rating/unknown/not-interest answer. Numeric rating magnitude supplies preference, UNKNOWN recognition only, and negative interest remains separate; projection retains source provenance. |
+| Taste response | `TasteResponse` | Versioned answer/command evidence. The current feed exposes List saving, numeric rating and combined Ohita; En tunne is removed. Retained UNKNOWN/NOT_INTERESTED responses keep their original meanings. An ambiguous skip does not reveal which old reason applies; projection retains source provenance. |
 | Taste challenge | `TasteChallenge` | Prospective held-out-answer evaluation with prediction/state/model/prefix committed first, first-answer measurement immutable and future projection afterward. Delayed pairs use the unchanged earlier panel. Sequential target evaluates per question; existing v1 frozen batch remains evaluation-only. |
 | Acquisition attribution | `AcquisitionAttribution` | Bounded campaign/referral metadata for the funnel; not Item preference evidence. |
 | Item | `Item` | Any recommendable object/experience regardless of domain; maps to generic engine Object. |
@@ -35,10 +35,13 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Memory | `Memory` | Evidence-grounded representations/retrieval; interpretations are revisable, original observation records remain distinct. |
 | Scenario | `Scenario` | Decision-time state/context/options/action/prediction plus observed transition, delayed outcomes and error, with missingness and provenance explicit. |
 | Scenario memory | `ScenarioMemory` | Retrieval of compatible authorized historical Scenarios. |
-| Population memory | `PopulationMemory` | Kajo-derived privacy-gated cross-Profile aggregate/collaborative evidence. Post-MVP until consent/cohort/deletion/exposure-bias gates; never raw cross-user exposure. |
+| Population memory | `PopulationMemory` | Kajo-derived cross-Profile aggregate/collaborative evidence, admitted only after consent/cohort/deletion/exposure-bias and predictive-value gates. Engine V1 records admitted use or an explicit inactive/fallback disposition; never raw cross-user exposure or invented cohorts. |
 | Cold-start prior / lähtöpriori | `ColdStartPrior` | Versioned non-personal Item prior while Profile evidence is sparse; existing provider/catalog recognition/trend prior is not a learned external taste model. |
 | External taste prior | `ExternalTastePrior` | Separately licensed/versioned preference artifact from external research data; not a Kajo User, native Scenario or permission to activate PopulationMemory. |
 | Prediction | `Prediction` | Estimated outcome/suitability for Profile + Item + Context; scores are not probabilities unless a supported calibrated target is defined. |
+| Expected personal rating | `ExpectedRating` | Target quantity: expectation of the reported post-experience rating on the current Profile's learned response scale. Primary Personal objective under ADR-0012; not P(ten), a fixed high-grade probability or current scalar serving score. |
+| Rating response model | `RatingResponseModel` | Target versioned mapping from supported preference/context representation to reported rating distribution, with subject/domain shrinkage and uncertainty. Models scale use without claiming absolute psychological utility; no matching runtime entity is implied. |
+| Prediction readiness | `PredictionReadiness` | Target-specific, per-domain decision using prospective forecast quality, coverage, support and declared uncertainty/stopping rules. Not a universal percentage of knowing the person; insufficient evidence may continue in Discovery. |
 | Prediction ID | `predictionId` | Identifier connecting the precise recommendation origin to eligible later observations/outcomes. |
 | Prediction run | `PredictionRun` | Immutable record of what was originally predicted, for one request/target/context and model/policy/state/artifact versions. |
 | Prediction candidate | `PredictionCandidate` | Considered Item with score/rank/delivery/explanation; selected for delivery is not proof of exposure. |
@@ -54,17 +57,17 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Evaluation window | `EvaluationWindow` | Frozen input/label-maturity scope and eligibility for evaluation. |
 | Discovery mode | `DiscoveryMode` | FOR_YOU, SURPRISE or RISK recommendation policy. |
 | Ambient phase | `AmbientPhase` | DAWN, EVENING or NIGHT presentation phase; separate from policy. |
-| For you | `FOR_YOU` | Supported expected fit with bounded exploration. |
-| Surprise | `SURPRISE` | Relevant novelty while retaining useful expected fit. |
-| Risk | `RISK` | Bolder relevant uncertainty/exploration inside hard constraints; not arbitrary unsafe behavior. |
+| For you | `FOR_YOU` | Supported own-scale expected post-experience rating with declared bounded exploration; current ordinal proxy is distinct from the target. |
+| Surprise | `SURPRISE` | Declared relevant novelty tradeoff while retaining expected-rating objective/component. |
+| Risk | `RISK` | Declared bounded relevant uncertainty/exploration tradeoff with expected-rating diagnostics inside hard constraints; no hidden ten-maximization objective. |
 | Dawn | `DAWN` | Visual phase mapped to FOR_YOU. |
 | Evening | `EVENING` | Visual phase mapped to SURPRISE. |
 | Night | `NIGHT` | Visual phase mapped to RISK. |
 | Consumed | `CONSUMED` | Experience actually consumed/read/watched/attended in its domain. |
 | Saved | `SAVED` | Profile-level intentionally stored state, without implying a rating or consumption. The feed star opens the existing List picker and displays confirmed membership as defined in UX_PRINCIPLES; it is not a separate state model. Pending Shared Endorsement is not Shared Saved. |
 | Rating | `rating` | Kajo integer 0–10 experience outcome; Personal rating implies consumed, while a planned SharedRatingRound response alone does not complete joint history. Research raw scales remain separately preserved. |
-| Not interested | `NOT_INTERESTED` | Explicit current irrelevance for an unconsumed Item. |
-| Contextual skip / ohita | `ContextualSkip` | Deliberate no-rating feed advance with exact Taste-question or Discovery-delivery origin and temporary Profile/Item suppression. The executable #239 reference uses a separate 24-hour cooldown policy with no admitted early Context-change shortcut; the native source adds separate Taste/Discovery writers and temporary admission; the shared-feed source consumes those adapters; hosted/device acceptance remains pending. It does not establish recognition, consumption or durable dislike; legacy UNKNOWN/NOT_INTERESTED evidence is preserved. |
+| Not interested | `NOT_INTERESTED` | Retained explicit irrelevance evidence for an unconsumed Item under its original version. Not a separate choice or inferred reason in the current combined-Ohita feed. |
+| Contextual skip / ohita | `ContextualSkip` | Deliberate no-rating feed advance with exact Taste-question or Discovery-delivery origin and temporary Profile/Item suppression. The executable #239 reference uses a separate 24-hour cooldown policy with no admitted early Context-change shortcut; the native source adds separate Taste/Discovery writers and temporary admission; the shared-feed source consumes those adapters; hosted compatibility forwards are installed; device acceptance remains open. It does not establish recognition, consumption or durable dislike; legacy UNKNOWN/NOT_INTERESTED evidence is preserved. |
 | Endorsement / yhteinen tykkäys | `Endorsement` | Actor-specific positive Shared decision to do an Item together. |
 | Pending endorsement | `PendingEndorsement` | At least one active Endorsement without unanimous accepted-member consensus. |
 | Shared list proposal / yhteislistan ehdotus | `SharedListProposal` | Pending `(profileId,itemId)` proposal. The #229 implementation binds an explicit destination set, confirmed by every member before unanimous commit; #329 integrates that source, with deployment/device acceptance tracked separately in STATUS. |

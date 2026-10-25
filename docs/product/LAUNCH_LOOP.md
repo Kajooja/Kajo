@@ -2,11 +2,20 @@
 
 Status: **canonical MVP launch specification**
 
-Product decision: **2026-09-07**, sequential Taste refinement **2026-10-14**
+Product decision: **2026-09-07**, sequential Taste refinement **2026-10-14**, engine-first priority and personal expected-rating objective **2026-10-25**
 
 Tracking: **#215**, adaptive source foundation **[#336](https://github.com/Kajooja/Kajo/issues/336)**
 
-This document defines how the first public Kajo acquires, activates and socially connects a new user. It is not a marketing appendix. The flow below is a release requirement and must be implemented only after the recommendation foundation is trustworthy enough to create a useful first-session experience.
+This document defines how the first public Kajo acquires, activates and socially connects a new user. It is not a marketing appendix. The flow below remains a release requirement.
+
+The October 25 owner decision makes practical **Engine V1 (Sprints 015–021)**
+the first development priority after the active source work and safe repository
+cleanup. The existing owned app can validate the common Taste/Discovery engine
+without first completing browser/anonymous acquisition. Full web Taste, identity
+conversion, sharing/Friends/Shared UX and general usability follow V1; UI polish
+then precedes beta/store/release. Anonymous identity, retention, abuse controls
+and conversion remain prerequisites for the public flow described here.
+[ROADMAP](../project/ROADMAP.md) owns that execution order.
 
 ## 1. Product thesis
 
@@ -133,21 +142,26 @@ Google and Apple are the primary low-friction release providers. Email/password 
 
 Taste Test is Kajo, not a conventional genre survey.
 
-The user reacts to recognizable real Items one at a time. A 0–10 rating means
-consumed/read/watched; zero and neutral five remain genuine ratings. The owner's
-October 15 successor requires the same upward-scrolling card feed and legally
-usable poster/cover, metadata and description presentation as optional Discovery
-cards. A deliberate completed upward dismissal, or accessible **Ohita**, replaces
-the separate new-feed **En tunne / Ei kiinnosta** controls. Explain the gesture
-once on first use/Taste, keeping help discoverable. Ohita is no rating: remove the
-Item from this feed and permit a later context-eligible return without inferring
-unknown, consumption or permanent dislike. Earlier UNKNOWN/NOT_INTERESTED
-responses retain their exact meanings and history. Ordinary scrolling, partial
-gestures or navigation must not create skip evidence. The
+The user reacts to real Items one at a time through the current shared feed.
+The owner confirms on October 25 that there are exactly three ordinary choices:
+List save indicates interest/intention; a 0–10 rating means seen/read/experienced;
+**Ohita** covers both "do not know" and "not interested" without identifying
+which reason applies. A numeric zero is a real rating, and the person's response
+style determines the meaning of other grades; five is not a universal neutral
+satisfaction label. There is no separate **En tunne / Ei kiinnosta** control.
+
+The shared feed uses legally usable poster/cover, metadata and description
+presentation. A deliberate completed upward dismissal, or accessible **Ohita**,
+removes the Item from this feed under the versioned return policy without
+inferring recognition, consumption, permanent dislike or a numeric rating.
+Explain the gesture once on first use/Taste, keeping help discoverable. Earlier
+UNKNOWN/NOT_INTERESTED responses retain their exact meanings and history.
+Ordinary scrolling, partial gestures or navigation must not create skip evidence. The
 [shared card-feed contract](UX_PRINCIPLES.md#shared-vertical-card-feed--required-target-2026-10-15)
 owns interaction/accessibility acceptance; [DATA_EVENTS](../domain/DATA_EVENTS.md#shared-feed-ohita--required-target-2026-10-15)
-owns versioned evidence/suppression. This records required successor behavior,
-not a completed change to existing sessions or the installed APK.
+owns versioned evidence/suppression. The three-action interaction is current;
+full guided progression, readiness and device acceptance retain their separate
+open gates. Retained sessions are not rewritten by this clarification.
 
 ### Guided Discovery refinement — 2026-10-25
 
@@ -156,14 +170,19 @@ in [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md).
 New guided Taste starts with **BOOK**, stays in that domain until supported
 readiness, then transitions to **MOVIE**. Both use the same PersonalProfile and
 shared Discovery prediction/retrieval service; there is no separate test model.
-After a rating, the next fresh recommendation uses that committed evidence.
+After a rating, the next fresh recommendation uses that committed evidence and
+the shared personal expected-rating objective. The model learns the person's
+rating response scale; it does not optimize the chance of ten or apply a hidden
+Taste-only high-grade bonus. List saves remain interest evidence and ambiguous
+skips remain no-rating observations.
 A compact active-domain meter exposes genuine measured readiness and its support.
 Automatic phase advancement/completion requires the declared validated criterion;
 answer count or an uncalibrated rank score cannot fill a probability meter.
 
 This supersedes interleaved domain balancing as the new target, without changing
-retained sessions. Poor recognition or voluntary exit preserves an explicit
-insufficient state and offers continuation; it never forces endless questions.
+retained sessions. Repeated skips, unavailable useful questions or voluntary exit
+preserve an explicit
+insufficient state and offer continuation; it never forces endless questions.
 Book-to-movie and movie-to-book evidence transfer is shared but does not certify
 untested domain accuracy. Covers must be correctly resolved for both surfaces.
 Current V4's always-insufficient readiness and separate selection utility do not
@@ -192,16 +211,20 @@ committed prefix. The [sequential prediction contract](../domain/PREDICTION_MODE
 owns scoring, cutoff and comparison rules. The user can pause and resume without
 losing that order. An independent accessible **Ohita** remains usable after an
 accidental rating-wheel movement: it discards the unsubmitted draft, after any
-already pending command has been resolved. Deliberate zero and neutral five
-remain ratings. The shared successor does not reinterpret an old session's
-versioned response contract.
+already pending command has been resolved. Deliberate zero and five
+remain ratings; five is not an assumed neutral satisfaction point for every
+person. The shared successor does not reinterpret an old session's versioned
+response contract.
 
-The enduring recommendation objective is the Item most likely to produce this
-Profile's highest satisfaction, ultimately a ten, under its current authorized
-world/state/Scenario. Taste may select a recognizable informative question to
-improve future recommendations, rather than treating every question as a promised
-favorite. Interstellar 10 should increase supported fit for relevant similar
-Items; Inception is an illustration, not a required hardcoded next title.
+The enduring recommendation objective is the highest supported **expected
+post-experience rating for this Profile**, under its current authorized
+world/state/Scenario and learned rating-response scale. The October 25 owner
+correction supersedes the earlier "ultimately a ten" objective. Taste uses the
+same acquisition/scoring and declared exploration policy as Discovery under equal
+inputs, with explicit opener/progression constraints. The magnitude and surprise
+of an answer update supported estimates; no fixed title pair or grade guarantees
+a particular next Item. Recognizable questions support learning without replacing
+the common objective with a private test-only utility.
 For Taste, recompute from the acknowledged prefix before the next question; do
 not serve a precomputed fixed test order or retain stale future questions after
 a supported answer. Discovery alone may advance after durable local admission
@@ -224,10 +247,12 @@ different answers must affect later supported estimates. Publicly sourced and
 native population evidence keep their existing authorization/admission limits.
 
 Readiness must declare per-domain support, forecast coverage, informative feature
-dispersion, prospective evaluation and stability. Any readiness shown is
-**provisional**, not statistical reliability or admitted model quality. Poor
-recognition, exhausted eligible Items, a safety budget or a pause with unmet
-criteria yields insufficient evidence rather than a pass. The October 15
+dispersion, prospective evaluation and stability. A provisional source diagnostic
+is not statistical reliability or admitted model quality. The V1 measured-readiness
+successor additionally requires the declared calibration/uncertainty and stopping
+contract; user-facing claims cannot exceed its admitted scope. Repeated skips,
+exhausted eligible Items, a safety budget or a pause with unmet
+criteria yield insufficient evidence rather than a pass. The October 15
 clarification permits continuing to ordinary Discovery with that partial state:
 ending the questionnaire must neither block browsing indefinitely nor discard
 learning. The same PersonalProfile keeps learning from canonical Discovery actions,
@@ -510,7 +535,7 @@ Primary launch-loop metrics:
 
 - Taste link → first response,
 - first response → completed Taste session,
-- known-item recognition rate,
+- recognized-experience answer coverage and ambiguous skip rate; true recognition rate only where a retained protocol actually observes it,
 - questions to useful confidence,
 - holdout prediction error / hit rate,
 - Taste completion → account conversion,
@@ -574,20 +599,24 @@ Release blockers include:
 
 ## 15. Build order
 
-The launch loop begins only after the algorithm/data spine is reliable enough that the first Taste session is meaningful.
+The October 25 owner priority supersedes earlier ordering that advanced public
+acquisition before the practical first engine was complete. The authoritative
+schedule and substantial engine sprint definitions are in [ROADMAP](../project/ROADMAP.md).
 
-Canonical order:
+1. Finish active source work, reconcile remaining acceptance and remove only verified obsolete branches.
+2. Deliver and evaluate practical Engine V1 through Sprints 015–021, including the shared owned-app Taste/Discovery loop, personal expected-rating/response-style model, useful state/memory, honest readiness and operating acceptance. Existing authenticated flows can provide this evidence; they do not certify anonymous/public readiness.
+3. Complete core UX and measured end-to-end performance: navigation, Lists/history/search, recovery, accessible actions and the general duration work package (Phase 17.0).
+4. Complete web/public acquisition: browser/installed-app Taste; server-backed anonymous identity, bounded retention/deletion/abuse controls and measurement; Google/Apple conversion preserving the same Profile; and the complete conversion funnel (Phase 15).
+5. Complete recommendation preview, personal Friend invite/safety lifecycle, compact explicit SharedProfile creation, Shared rounds/rewatch and bounded joint decisions (Phase 16).
+6. Complete remaining telemetry, privacy, support and operating flows (Phase 17.1–17.2).
+7. Complete UI/visual polish and representative accessibility/device verification against those working flows.
+8. Run the closed external beta of the complete link-to-Kajo loop, resolve failures, and complete store/public release acceptance.
+9. **Only after all release gates pass: share the Taste link with real acquisition traffic.**
 
-1. Algorithm correctness, evidence reliability, real catalog and stable serving/shadow semantics; begin with the live native decay-parity correction, then bounded ordered Personal session/state policy.
-2. Server-backed anonymous identity/PersonalProfile-compatible state and TasteSession, minimal retention/deletion/abuse controls and versioned measurement before real Taste acceptance.
-3. Adaptive sequential Taste source/evaluation foundation (#336), then its versioned server/mobile integration and acceptance, then canonical recommendation preview.
-4. Google/Apple identity conversion and browser/installed-app continuation preserving that state, plus the full conversion funnel.
-5. Personal Friend invite + friend lifecycle.
-6. Compact consent-based SharedProfile creation, individual Shared rounds/controlled rewatch, then the planned bounded joint decision session under ROADMAP 16.2–16.4.
-7. End-to-end funnel telemetry, experiments, privacy/abuse and operational gates.
-8. Closed external beta of the complete link-to-Kajo loop.
-9. Store/public release readiness.
-10. **Only after all release gates pass: share the Taste link with real acquisition traffic.**
+Minimum safety, privacy, accessibility and lifecycle behavior applies at every
+stage that handles the relevant data or user flow; later polish is not permission
+to defer a correctness defect. Engine V1 completion does not close the remaining
+launch requirements.
 
 Personal source work may proceed alongside independent Shared/native acceptance.
 Known Shared evidence defects, the genuine #232F prepared-input consumer,
