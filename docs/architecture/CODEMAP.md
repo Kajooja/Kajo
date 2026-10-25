@@ -26,6 +26,18 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Curated BOOK cover repair — #336 / October 25
+
+`scripts/catalog/curated-book-covers.mjs` validates the reviewed 30-entry
+`curated-book-covers.json` against exact provider records and decoded JPEGs, then
+prepares an atomic presentation-only SQL operation from fresh private Item
+snapshots. It has no network/database executor. Its tests exercise identity,
+creator/Edition mismatch, missing visual review, image corruption, stale-row
+rollback, inert replay and preservation on the full current application schema.
+`DATA_ENRICHMENT.md` owns operator inputs and provenance; STATUS/PR own actual
+hosted acceptance. Existing `loadCatalogItems` and `useTasteItemPresentation`
+consume the same canonical `image_url`; no separate Taste image catalogue exists.
+
 ## Taste and Discovery card geometry — #336 / October 25
 
 `apps/mobile/src/features/discovery/FeedScreenFrame.tsx` owns the shared safe

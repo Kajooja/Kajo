@@ -10,7 +10,53 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current packet — guided Discovery and measured Taste readiness / #336
+## Current packet — verified curated BOOK covers / #336
+
+**Continuation — 2026-10-25 Europe/Helsinki:** implement the shared-input/cover
+foundation in ADR-0011/ROADMAP. `fix/336-curated-book-covers` continues from
+[PR #358](https://github.com/Kajooja/Kajo/pull/358) source
+`10977331ed286418f5134a4c1e3aeddb4d11cc22`; #358's CI #725 passed, but #357 and
+#358 remain open/unmerged and are not accepted main. The current PR owns exact
+source, publication and check receipts.
+
+**Implemented cover packet:** all 30 missing curated BOOK covers now have
+reviewed Work/English Edition/creator mappings and downloaded, decoded, visually
+checked images. The operator validates pinned source bytes and prepares a guarded
+data-only transaction for the existing Item IDs. A revision-guide cover incorrectly
+linked by the provider, audio packaging and an Edition author-identity mismatch
+were rejected during review. Other title/year/source metadata, aliases, ratings,
+accounts and Taste commands remain outside the write set. Both surfaces already
+load canonical catalogue presentation; the source needs no new mobile build.
+
+Seven focused tests pass, including the complete current schema, rollback and
+idempotency. The complete 30-Item operation was replayed on a disposable current
+schema with all non-presentation fields unchanged. The hosted data-only repair
+is now applied: discoverable BOOK image-URL coverage is **415/415**, with all
+30 reviewed mappings installed; MOVIE remains **425/425**. All 13 guarded
+account/Profile/evidence/Taste/source/alias table digests and the complete
+non-target catalogue digest match before/after. Target rows retain all other
+JSONB field values. The raw target-core text digest changed through numeric
+serialization in the initial snapshot-based metadata assignment; full-field
+comparison confirms equal values. The final operator instead extends stored
+metadata directly, with a regression preserving numeric formatting. No schema,
+account reset, prediction or retained command changed. Phone reload/render
+acceptance remains open; the current PR owns exact operation/check receipts.
+
+Broader local checks pass mobile 904, database 339, engine 311, dependency 50,
+catalogue 3 contract plus 441 existing script tests, research and acceptance,
+lint/types and all four explicit-demo iOS/Android exports. Seven new cover tests
+pass separately on final source. The complete root check stops at the unchanged
+Deno dependency registry connection refusal; no full local root pass is claimed.
+
+**Next after cover acceptance:** pin and implement shared serving inputs and
+supported conditional numeric-prefix/outcome evaluation under ADR-0011, then the
+BOOK → MOVIE successor and calibrated readiness meter. V4's existing selector
+and always-INSUFFICIENT report are unchanged by this cover correction. Preserve
+the current accounts, answers, pending commands and old policies. Do not repeat
+the completed October 24 reset or V4 deployment. Broader timing work remains in
+ROADMAP after the current correctness/quality work; Sprint 014 stays open.
+
+## Predecessor definition — guided Discovery and measured Taste readiness / #336
 
 **Owner refinement — 2026-10-25 Europe/Helsinki:** Taste must be the guided start
 of the same prediction/learning loop as Discovery, not an independent test.

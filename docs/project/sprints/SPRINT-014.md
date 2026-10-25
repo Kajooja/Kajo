@@ -14,6 +14,25 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Verified curated BOOK cover implementation — 2026-10-25
+
+The first ADR-0011 foundation now supplies a reviewed 30-book Work/English
+Edition/creator/cover mapping and the guarded `curated-book-covers.mjs` operator.
+Actual downloaded JPEGs were decoded and visually checked; a provider-linked
+revision-guide cover, audio packaging and an Edition creator mismatch were
+rejected. Seven focused tests include full-schema preservation, stale-batch
+rollback, source mismatch, corrupt images and inert replay. The exact 30-Item
+operation also passes a disposable current-schema replay. The only intended
+write fields are canonical image URL, cover attribution and the existing update
+timestamp. The hosted repair is applied: all 30 mappings are installed and BOOK
+image-URL coverage is 415/415. All guarded account/evidence/source tables and
+non-target catalogue rows retain their digests; target non-presentation JSONB
+values match. STATUS records the numeric-formatting digest distinction and its
+operator regression. Phone rendering remains open. Exact source/check receipts
+belong to STATUS/current PR. No APK,
+account reset, new selector or calibrated readiness is delivered by this packet.
+Shared input/conditional prediction remains the next engine dependency.
+
 ## Guided Discovery and measured Taste readiness — 2026-10-25
 
 The owner reports that Taste still feels isolated, mixes BOOK/MOVIE cards and

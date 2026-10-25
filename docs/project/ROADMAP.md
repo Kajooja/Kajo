@@ -19,6 +19,10 @@ this correctness/first-session-quality work before further broad latency tuning.
    absent image URLs through verified Work/Edition mappings; verify fetch/decode
    and retain source credits. Audit canonical candidate retrieval, source-defined
    averages, support and freshness. No title-only merge or account reset.
+   The October 25 bounded cover repair is installed (30/30; BOOK image URLs
+   415/415), with source/decoded-image verification and preserved identities and
+   evidence. Phone rendering remains to observe. The shared-input/prior audit
+   and subsequent serving work remain open; this completes only the cover slice.
 2. **Supported prediction contract:** reuse EB-04/06 and external-prior governance
    for conditional numeric-prefix recall; compare with no-recall/popularity
    controls. Define the outcome/calibration and independent prospective evaluation

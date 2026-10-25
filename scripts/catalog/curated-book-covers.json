@@ -1,0 +1,884 @@
+{
+  "version": "curated-book-cover-v1",
+  "verifiedAt": "2026-10-25T14:17:28.148539Z",
+  "rows": [
+    {
+      "slug": "1984-1949",
+      "title": "Nineteen Eighty-Four",
+      "creators": [
+        "George Orwell"
+      ],
+      "releaseYear": 1949,
+      "workId": "OL1168083W",
+      "editionId": "OL61722366M",
+      "coverId": 15257423,
+      "workSha256": "0401099f8a0c4212e0dcd07dbdca3433356527596fcf83412eccd97ba31c22c6",
+      "editionSha256": "5b07007a516881074b993562c18b0e5d4e59b78cef565362bb8a155ccbef8e96",
+      "authors": [
+        {
+          "id": "OL15318546A",
+          "sha256": "0f869c675c184f85df72f2a22acf33cc1ef16746da9c8ac6c997995bfd1ef074"
+        }
+      ],
+      "imageSha256": "b94f7f609f96ae2241a5f0bb9d99cca70447d19ef633c51a88c3a30755dbc0a3",
+      "width": 314,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Nineteen Eighty-Four",
+        "editionTitle": "Nineteen Eighty-Four"
+      }
+    },
+    {
+      "slug": "animal-farm-1945",
+      "title": "Animal Farm",
+      "creators": [
+        "George Orwell"
+      ],
+      "releaseYear": 1945,
+      "workId": "OL1168007W",
+      "editionId": "OL23269355M",
+      "coverId": 11261770,
+      "workSha256": "fd0e2e3cafcca6691652a43e74ec2a37408ed0304df24570271b98ebd5be3c16",
+      "editionSha256": "da79d19e72082a6be8e57749c374ed28ca4b9b5a82672c889809523da298f859",
+      "authors": [
+        {
+          "id": "OL118077A",
+          "sha256": "2257feb7cb8657f268841ee2957d0bfac1fb6bb7d7611b190650f1f7510852b9"
+        }
+      ],
+      "imageSha256": "26ea9fe52fc1b2574706bb5be7e478c963764c80a18e04e15ea93200eb9b9551",
+      "width": 330,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Animal Farm",
+        "editionTitle": "Animal Farm"
+      }
+    },
+    {
+      "slug": "brave-new-world-1932",
+      "title": "Brave New World",
+      "creators": [
+        "Aldous Huxley"
+      ],
+      "releaseYear": 1932,
+      "workId": "OL64365W",
+      "editionId": "OL61332776M",
+      "coverId": 15170948,
+      "workSha256": "752ea36ed6e2c88001da919f6f5eb6a2c9249edd8d6a66f5f5f3a1d4dd0c5865",
+      "editionSha256": "47a0bec776d71d70eff34b4a0dc97911c7fd23af4ad0d4a6895c222050911279",
+      "authors": [
+        {
+          "id": "OL19767A",
+          "sha256": "9c56ec1adca205423c71bbc496d165b717c44ce7ffc3081943ec4ef476d98680"
+        }
+      ],
+      "imageSha256": "33117d290a860df12a7b810c6601d467f9b23d40e58b0b15ccf7e0190b9e2469",
+      "width": 296,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Brave New World",
+        "editionTitle": "Brave New World"
+      }
+    },
+    {
+      "slug": "catcher-rye-1951",
+      "title": "The Catcher in the Rye",
+      "creators": [
+        "J. D. Salinger"
+      ],
+      "releaseYear": 1951,
+      "workId": "OL3335245W",
+      "editionId": "OL49805302M",
+      "coverId": 15172466,
+      "workSha256": "b2993b6b90a4b01c74144611e693f15fc04493fdcf26d9d1315e022cd1e697ec",
+      "editionSha256": "ca01ae23c06645567cee5346e9caea777487044d8bf1311f4697a760969b9182",
+      "authors": [
+        {
+          "id": "OL540486A",
+          "sha256": "71e7f58b23af9b39d5b1778eb7e3911edfb41c7497122bc032922787491d974d"
+        },
+        {
+          "id": "OL7766520A",
+          "sha256": "2850bfe998af8fd9ffd5e0c441ccd3cd030b99849368865280aa0cd7a0038814"
+        }
+      ],
+      "imageSha256": "25f84903b9cd512219cb365367fdc25dc4676dca950f2a5e2a59383cf44ba650",
+      "width": 296,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Search publication year differs; existing Kajo year is preserved, not inferred from the cover. Provider Work has an additional credited name; the selected Edition retains the canonical novelist.",
+        "workTitle": "The Catcher in the Rye",
+        "editionTitle": "The Catcher in the Rye"
+      }
+    },
+    {
+      "slug": "dune-book-1965",
+      "title": "Dune",
+      "creators": [
+        "Frank Herbert"
+      ],
+      "releaseYear": 1965,
+      "workId": "OL893414W",
+      "editionId": "OL7524304M",
+      "coverId": 14565843,
+      "workSha256": "fad6e15ca7d7ed562eebbc759e845ccdeeb0b661cd301edfc91a0924d4855cea",
+      "editionSha256": "eff02128617fc8bbfcbeb4d5cd6e62654bd63801c710a0ba15f59af1326ce0af",
+      "authors": [
+        {
+          "id": "OL79034A",
+          "sha256": "4378ef78073702b8d5ffd380fc6564b27c27f66e0f6ee77b1a787e01e4dd3988"
+        }
+      ],
+      "imageSha256": "f094bcfac4614eb8700fe1a8a7cedc0d992f8e8956206c7861e9736c9a04803d",
+      "width": 333,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Dune",
+        "editionTitle": "Dune"
+      }
+    },
+    {
+      "slug": "fahrenheit-451-1953",
+      "title": "Fahrenheit 451",
+      "creators": [
+        "Ray Bradbury"
+      ],
+      "releaseYear": 1953,
+      "workId": "OL103123W",
+      "editionId": "OL40236195M",
+      "coverId": 12993656,
+      "workSha256": "17d273f2c151830d4a60c2b02164592712fd99505f57431decdea5d6ffd45685",
+      "editionSha256": "5e4bf9374ee3684abcb53ac86ceb374a958ad9f2a3effbab2ca1db08f30e1616",
+      "authors": [
+        {
+          "id": "OL24137A",
+          "sha256": "3fc90876bdb76ad6a8cfe7245a7fb8660da1af9c34b8b0e8769144d4bfaf407f"
+        }
+      ],
+      "imageSha256": "7dad5b635f43fb8a117e65e1f8f127441cd147f3c8029c645cf2190a61b23f50",
+      "width": 322,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Fahrenheit 451",
+        "editionTitle": "Fahrenheit 451"
+      }
+    },
+    {
+      "slug": "foundation-1951",
+      "title": "Foundation",
+      "creators": [
+        "Isaac Asimov"
+      ],
+      "releaseYear": 1951,
+      "workId": "OL46125W",
+      "editionId": "OL51565403M",
+      "coverId": 14612610,
+      "workSha256": "c232290a134613c0386f89c85889b39bb3525c2ed00944fa22283b5fd957fe42",
+      "editionSha256": "74a1cf81e83df6f771d342046bb064d157827bb9ad33f0db373b67b070388443",
+      "authors": [
+        {
+          "id": "OL34221A",
+          "sha256": "39109ccd2b83d3638ca795b989a6344eecb2c640a42e100107ab724f6b49535c"
+        }
+      ],
+      "imageSha256": "99dfd6bc6e83e4140bb2c018bd590ce2d570abe4a75b5fcdff79712be79c40e4",
+      "width": 307,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Foundation",
+        "editionTitle": "Foundation"
+      }
+    },
+    {
+      "slug": "goldfinch-2013",
+      "title": "The Goldfinch",
+      "creators": [
+        "Donna Tartt"
+      ],
+      "releaseYear": 2013,
+      "workId": "OL16809803W",
+      "editionId": "OL26917978M",
+      "coverId": 12727864,
+      "workSha256": "1f5e970f7c8f4af43afefe1220685c08b3727ffb6766c440e16c1f5c697bff31",
+      "editionSha256": "a16fde7ce31c23bc3c41d5b454fbc06a3f7cbd4b8823d39d9d6d879efc410224",
+      "authors": [
+        {
+          "id": "OL841112A",
+          "sha256": "45e75b732679889d2b1356140e5c4479ce98f0868f654a187a3edf08b86bed3b"
+        },
+        {
+          "id": "OL15020935A",
+          "sha256": "9ca552caaec57755471c22a4ff27c1ea46a989bb401911791a0c735b7846c7fe"
+        }
+      ],
+      "imageSha256": "b531bc5c650b8c3cf107a95dd9e97e845a740dce4859c7ac3f9ef073f810e499",
+      "width": 323,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Provider Work has an additional credited name; the selected Edition retains the canonical novelist.",
+        "workTitle": "The Goldfinch",
+        "editionTitle": "The goldfinch"
+      }
+    },
+    {
+      "slug": "gone-girl-book-2012",
+      "title": "Gone Girl",
+      "creators": [
+        "Gillian Flynn"
+      ],
+      "releaseYear": 2012,
+      "workId": "OL16239762W",
+      "editionId": "OL25651771M",
+      "coverId": 8368314,
+      "workSha256": "9eb80635e7605aa2a6cb4f17b570f465cbb65d76a621e66ee16c011f8ff0ca69",
+      "editionSha256": "b72512eed4b7c3e5f72d8cc1e211efd2d1f8aeb1f9fd6f5bea49316174b6ae83",
+      "authors": [
+        {
+          "id": "OL1433006A",
+          "sha256": "532cfb7c5a94e8c53f05d60830babe26749c665e8b0e3c724e7f417d86c788b3"
+        }
+      ],
+      "imageSha256": "2270b0b791634295a2a25ecf3d5ee17f59d440592ec8144c9e4d64f005de674f",
+      "width": 328,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Search publication year differs; existing Kajo year is preserved, not inferred from the cover.",
+        "workTitle": "Gone Girl",
+        "editionTitle": "Gone Girl"
+      }
+    },
+    {
+      "slug": "great-gatsby-1925",
+      "title": "The Great Gatsby",
+      "creators": [
+        "F. Scott Fitzgerald"
+      ],
+      "releaseYear": 1925,
+      "workId": "OL468431W",
+      "editionId": "OL22570129M",
+      "coverId": 10590366,
+      "workSha256": "ba05a3a86ea337935a2ab14b8c0b7fca754f365756597f931ba7f9b5cd5ccee3",
+      "editionSha256": "dc0371d345a20b9c43f62ec6f483116a419f5b2c39fd635c51a51547345ae61b",
+      "authors": [
+        {
+          "id": "OL27349A",
+          "sha256": "f9eecc4e8cb924c5f9800cac88e8f679cd5ce6c2c7cf34c381b53b56aaab5b86"
+        }
+      ],
+      "imageSha256": "774d0f98d5c79f600fe46fd454ac8e4b746dc740867fe1a646732d385a67da02",
+      "width": 324,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Search publication year differs; existing Kajo year is preserved, not inferred from the cover.",
+        "workTitle": "The Great Gatsby",
+        "editionTitle": "The great Gatsby"
+      }
+    },
+    {
+      "slug": "handmaids-tale-1985",
+      "title": "The Handmaid's Tale",
+      "creators": [
+        "Margaret Atwood"
+      ],
+      "releaseYear": 1985,
+      "workId": "OL675783W",
+      "editionId": "OL62675369M",
+      "coverId": 15265551,
+      "workSha256": "58d1a32b4ab2a6b595d8178cbcda2606e7fb52c24dd71a20c7739ba401588071",
+      "editionSha256": "6ad25bb7510b660c3aea21a4931f1b53d61fac48b11fff2b508897bc9b7f509d",
+      "authors": [
+        {
+          "id": "OL52922A",
+          "sha256": "3947bc2804911da1ab7989118c111d72785708bac73e10e0e7dbd0a588b9bc61"
+        }
+      ],
+      "imageSha256": "6e2c13d7d0228bcbd8cbadd01ebac65d33515c601430e103e5b58696f21dbd74",
+      "width": 325,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Handmaid's Tale",
+        "editionTitle": "The Handmaid's Tale"
+      }
+    },
+    {
+      "slug": "hobbit-1937",
+      "title": "The Hobbit",
+      "creators": [
+        "J. R. R. Tolkien"
+      ],
+      "releaseYear": 1937,
+      "workId": "OL27482W",
+      "editionId": "OL51711263M",
+      "coverId": 14627509,
+      "workSha256": "0465c2894c07cf8e165062b263d81083d13b4d3ed64ed2421ce269867aab501c",
+      "editionSha256": "d80fbfac3b353fadde5a64687573698a223b9459488f1f7ad381446c4ebe6a9a",
+      "authors": [
+        {
+          "id": "OL26320A",
+          "sha256": "9db26901b4baa89c22cf9395a627c0a7691775293c458b1fe517cbb71784f74e"
+        }
+      ],
+      "imageSha256": "94f3afe87ba4d1b6b18e35dcc1ad3cc2b69bcbcf68eaac7581af253a0f543d21",
+      "width": 301,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Hobbit",
+        "editionTitle": "The Hobbit"
+      }
+    },
+    {
+      "slug": "jane-eyre-1847",
+      "title": "Jane Eyre",
+      "creators": [
+        "Charlotte Brontë"
+      ],
+      "releaseYear": 1847,
+      "workId": "OL1095427W",
+      "editionId": "OL6969829M",
+      "coverId": 8235363,
+      "workSha256": "4ad4aef800243817f85dad83fdeeb7dc00bfbe4c4a117250c0640dbe066b8288",
+      "editionSha256": "a9e8a3bc34e8da4b1b26e772881d865ac7892f2abf256b3f4c3cf8d41a9dca79",
+      "authors": [
+        {
+          "id": "OL113362A",
+          "sha256": "736e6434537b0c37141f2a754366445854eb4fe52b101244747cf5fa30549c48"
+        }
+      ],
+      "imageSha256": "348f6192f3c80f1d6d60cc9a74cfe9426bf7f9f828dc6a999eaaba4ed789edd5",
+      "width": 306,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Jane Eyre",
+        "editionTitle": "Jane Eyre."
+      }
+    },
+    {
+      "slug": "kafka-shore-2002",
+      "title": "Kafka on the Shore",
+      "creators": [
+        "Haruki Murakami"
+      ],
+      "releaseYear": 2002,
+      "workId": "OL2625431W",
+      "editionId": "OL8364133M",
+      "coverId": 15259162,
+      "workSha256": "065463d794c45cdd3120a1df78d3f74fcaab5f2b9d75d5699d7e2270a4ec24a5",
+      "editionSha256": "9588c0c88e7fbe284eac40aa2e74a04e111a780c7d93925886099daa2b52244b",
+      "authors": [
+        {
+          "id": "OL382524A",
+          "sha256": "d1e2a2b8f13bf6584056310d259f48ee713c4a9c18ed7d004e96a1f9bf842590"
+        }
+      ],
+      "imageSha256": "fbeeecc0ffef82d9362c8a3fb752ea47b79f51aa9258f3ab046af52ce9b91296",
+      "width": 324,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Original-language Work title is linked to this English translation.",
+        "workTitle": "海辺のカフカ",
+        "editionTitle": "Kafka on the Shore"
+      }
+    },
+    {
+      "slug": "left-hand-darkness-1969",
+      "title": "The Left Hand of Darkness",
+      "creators": [
+        "Ursula K. Le Guin"
+      ],
+      "releaseYear": 1969,
+      "workId": "OL59800W",
+      "editionId": "OL31935740M",
+      "coverId": 10618463,
+      "workSha256": "9ac87d3c7165b0de25e6a562f32bcc9dfc5f61dccd13ae9b0bfca80bceaf0b52",
+      "editionSha256": "460af30a0e24cfc483d49a32847e5294bad1db33c0ce7a8be026cb18bcfbfcf8",
+      "authors": [
+        {
+          "id": "OL31353A",
+          "sha256": "d74ecf6ceae2bca89f0a216ef3ead25e82df5b5548a986ca1fbf40da4bfa47a2"
+        }
+      ],
+      "imageSha256": "9cf79ca3d0bb1a0047af834d2a7b673ae63413e94c292f4c04619a51f1787472",
+      "width": 302,
+      "height": 475,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Left Hand of Darkness",
+        "editionTitle": "The Left Hand of Darkness"
+      }
+    },
+    {
+      "slug": "lotr-fellowship-1954",
+      "title": "The Fellowship of the Ring",
+      "creators": [
+        "J. R. R. Tolkien"
+      ],
+      "releaseYear": 1954,
+      "workId": "OL27513W",
+      "editionId": "OL51708686M",
+      "coverId": 14627060,
+      "workSha256": "b9b8f9a1eac7457d6a5153196e6870c04203da5748aa68092ceba684ec530358",
+      "editionSha256": "d6239e735140b1fc8605022d474b8cded97ad7db52051b968fc3fe6e1bbd27fb",
+      "authors": [
+        {
+          "id": "OL26320A",
+          "sha256": "9db26901b4baa89c22cf9395a627c0a7691775293c458b1fe517cbb71784f74e"
+        }
+      ],
+      "imageSha256": "6f964e12b73db2f8cf7e9d467e870989d12c46626603dfb207e9bbc4562387d5",
+      "width": 301,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Fellowship of the Ring",
+        "editionTitle": "The Fellowship of the Ring"
+      }
+    },
+    {
+      "slug": "lotr-return-king-1955",
+      "title": "The Return of the King",
+      "creators": [
+        "J. R. R. Tolkien"
+      ],
+      "releaseYear": 1955,
+      "workId": "OL27455W",
+      "editionId": "OL51708706M",
+      "coverId": 14627062,
+      "workSha256": "58101acca943fab057117ca8317e1a8695a6b6d3724a50cc4d9d3c82ca25a189",
+      "editionSha256": "b14a1504ec4a7fc5511314336857ff15ac742e1182edf733694bdae6482ac8db",
+      "authors": [
+        {
+          "id": "OL26320A",
+          "sha256": "9db26901b4baa89c22cf9395a627c0a7691775293c458b1fe517cbb71784f74e"
+        }
+      ],
+      "imageSha256": "7dfa1d523d0f8b9b4e9003dc1242c0db80ac181dc0e800011530834cfdc32225",
+      "width": 301,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Search publication year differs; existing Kajo year is preserved, not inferred from the cover.",
+        "workTitle": "The Return of the King",
+        "editionTitle": "The Return of the King"
+      }
+    },
+    {
+      "slug": "lotr-two-towers-1954",
+      "title": "The Two Towers",
+      "creators": [
+        "J. R. R. Tolkien"
+      ],
+      "releaseYear": 1954,
+      "workId": "OL27479W",
+      "editionId": "OL51711454M",
+      "coverId": 14627564,
+      "workSha256": "8c8cc417c440be71c4be2c7ca2706c6dda790ef8c49a670fe21f3b5e6f792136",
+      "editionSha256": "399017a28ff3a672091e8b5fa1d965ffdf45cac47534daab1b7dbb44e62f9cf9",
+      "authors": [
+        {
+          "id": "OL26320A",
+          "sha256": "9db26901b4baa89c22cf9395a627c0a7691775293c458b1fe517cbb71784f74e"
+        }
+      ],
+      "imageSha256": "7beb806eba788ea930d6c8a84fed7d2d923ed5538c53365b8e6a6aced62f5a58",
+      "width": 307,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Two Towers",
+        "editionTitle": "The Two Towers"
+      }
+    },
+    {
+      "slug": "mockingbird-1960",
+      "title": "To Kill a Mockingbird",
+      "creators": [
+        "Harper Lee"
+      ],
+      "releaseYear": 1960,
+      "workId": "OL3140822W",
+      "editionId": "OL26467746M",
+      "coverId": 14351077,
+      "workSha256": "7d97469a706e147e6a6db603c1801281869bf14873419e72c0b754f7d57274a9",
+      "editionSha256": "dbfe88fe46eafd7a087cefdbf9d52b1ce7393aa53fc6d82ee4aec06ab6e45e1e",
+      "authors": [
+        {
+          "id": "OL498120A",
+          "sha256": "a8cd7884df3d8baa3a97d8c9dfe2bb85ac707887a180ae41f77787f7481c5971"
+        }
+      ],
+      "imageSha256": "21d1c574687768a6837bd979e502575eca0b460aa49affb268fa363614ec74de",
+      "width": 337,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "To Kill a Mockingbird",
+        "editionTitle": "To Kill a Mockingbird"
+      }
+    },
+    {
+      "slug": "name-of-rose-1980",
+      "title": "The Name of the Rose",
+      "creators": [
+        "Umberto Eco"
+      ],
+      "releaseYear": 1980,
+      "workId": "OL8996439W",
+      "editionId": "OL24594402M",
+      "coverId": 6700085,
+      "workSha256": "c10759c7b7d1f0edc93b468bdb9b4d0abd2f70971b3cc4a0fb0584d96848ccc2",
+      "editionSha256": "55b06414b9c6a9f777de881077b361de759710302600dddbeb83f2fa3f5aa0b4",
+      "authors": [
+        {
+          "id": "OL20735A",
+          "sha256": "9c48ca64260fba28303bd503c9f9799ca9cbb41942b7659a09fafad6c703ba10"
+        }
+      ],
+      "imageSha256": "0ad88e0539e753710306183abb07c2dd899980173f8b62caed2d4bead2d861c7",
+      "width": 299,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Original-language Work title is linked to this English translation.",
+        "workTitle": "Il nome della rosa",
+        "editionTitle": "The Name of the Rose"
+      }
+    },
+    {
+      "slug": "neuromancer-1984",
+      "title": "Neuromancer",
+      "creators": [
+        "William Gibson"
+      ],
+      "releaseYear": 1984,
+      "workId": "OL27258W",
+      "editionId": "OL27444262M",
+      "coverId": 8904053,
+      "workSha256": "3fe3e23111fa4d20a19fdb00ca68cb2f7f2ae872777b7637492437a7a2abb4fc",
+      "editionSha256": "abfa5fb93ede3f5947b0057cf735df260cb6c7a41dbab2dfb33e0aac601d1216",
+      "authors": [
+        {
+          "id": "OL26283A",
+          "sha256": "5ff7f432689ce137e00a29f3c5e754d44eeb8a3c9864ff4f5c8cc973808c3e61"
+        }
+      ],
+      "imageSha256": "db8cf51542cdc2ed9c96944483c46dc554a360c3ba2289fe43f8ef468882d080",
+      "width": 314,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed Work, English Edition, exact novelist identity and decoded cover. Replaced an Edition with a different author identifier.",
+        "workTitle": "Neuromancer",
+        "editionTitle": "Neuromancer"
+      }
+    },
+    {
+      "slug": "never-let-me-go-2005",
+      "title": "Never Let Me Go",
+      "creators": [
+        "Kazuo Ishiguro"
+      ],
+      "releaseYear": 2005,
+      "workId": "OL59038W",
+      "editionId": "OL27102480M",
+      "coverId": 8740419,
+      "workSha256": "241c00201b7dd3421351760bc33312e2e99cad648cf42d4c6df1f37361c84021",
+      "editionSha256": "04bd124707b4711df1ca65e125d8d3497283d99f65e4f2a44105f84185f56d50",
+      "authors": [
+        {
+          "id": "OL28493A",
+          "sha256": "3e8fe1d21287dd3b4c76e77a20413e695bc7559c20b094329011143dd9f5b753"
+        }
+      ],
+      "imageSha256": "94350a59d0f62d9d7fedd2e1253797487ae65b296d9465523b55419bac27177b",
+      "width": 326,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Rejected OL29348952M: revision-guide cover and different Edition authors.",
+        "workTitle": "Never Let Me Go",
+        "editionTitle": "Never Let Me Go"
+      }
+    },
+    {
+      "slug": "norwegian-wood-1987",
+      "title": "Norwegian Wood",
+      "creators": [
+        "Haruki Murakami"
+      ],
+      "releaseYear": 1987,
+      "workId": "OL2625457W",
+      "editionId": "OL36270797M",
+      "coverId": 14774777,
+      "workSha256": "d3cf5004558e94d21cb59df371f1cc5e0f43fd9c6989433114cbbb7b6a44fe34",
+      "editionSha256": "ae7f85b684627692bbfe799a69b9d45753f6fa2f962b1e1f375db5155478bfa2",
+      "authors": [
+        {
+          "id": "OL382524A",
+          "sha256": "d1e2a2b8f13bf6584056310d259f48ee713c4a9c18ed7d004e96a1f9bf842590"
+        }
+      ],
+      "imageSha256": "b73f2693304423c243da126a14402c37e2c578f101eaed65d433d07934b14fee",
+      "width": 248,
+      "height": 400,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Norwegian Wood",
+        "editionTitle": "Norwegian Wood"
+      }
+    },
+    {
+      "slug": "pride-prejudice-1813",
+      "title": "Pride and Prejudice",
+      "creators": [
+        "Jane Austen"
+      ],
+      "releaseYear": 1813,
+      "workId": "OL66554W",
+      "editionId": "OL47044678M",
+      "coverId": 14348537,
+      "workSha256": "558bd577a57250b220ba153f91208b716b892d86f841fb9221ee7d99a434ed1a",
+      "editionSha256": "5d0e96d4bdc89014429d9e6031963563af7c18ae7147f2acd2ee6f7a1a6002e0",
+      "authors": [
+        {
+          "id": "OL21594A",
+          "sha256": "d8d743e5ac99a365ddcbaca45a6bca00dd1f0a6b83504467abd35e554dc821b0"
+        }
+      ],
+      "imageSha256": "d470211cc519c266b23bb54db82f30c03da6e94c09f2c5d5bca20e34062610c2",
+      "width": 313,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "Pride and Prejudice",
+        "editionTitle": "Pride and Prejudice"
+      }
+    },
+    {
+      "slug": "remains-day-1989",
+      "title": "The Remains of the Day",
+      "creators": [
+        "Kazuo Ishiguro"
+      ],
+      "releaseYear": 1989,
+      "workId": "OL59048W",
+      "editionId": "OL62379734M",
+      "coverId": 15241866,
+      "workSha256": "3209c056392e3352b747c376b92af40c56d4fb673febe736f43510467d4dc8fa",
+      "editionSha256": "85d556fb37bb3e713098cad75547879d0ca186fb5e1c0607167aaf97973d03d3",
+      "authors": [
+        {
+          "id": "OL28493A",
+          "sha256": "3e8fe1d21287dd3b4c76e77a20413e695bc7559c20b094329011143dd9f5b753"
+        }
+      ],
+      "imageSha256": "828f55fa13c6a9c0e7afd719cb944177094dc0dfbcddef7e1d2e95031991682b",
+      "width": 336,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Remains of the Day",
+        "editionTitle": "The Remains of the Day"
+      }
+    },
+    {
+      "slug": "road-2006",
+      "title": "The Road",
+      "creators": [
+        "Cormac McCarthy"
+      ],
+      "releaseYear": 2006,
+      "workId": "OL40873W",
+      "editionId": "OL62234436M",
+      "coverId": 15235434,
+      "workSha256": "0eddb0d2165d180db9d9a3c19f1049d7375a7c97ac4f814d2ab2793382eb780c",
+      "editionSha256": "a53964ca70454abc9bd7a2210eb6c00876c1e88a1436941202f2cc7832eb7922",
+      "authors": [
+        {
+          "id": "OL28104A",
+          "sha256": "d0330ae183069bd1e90398e83acf3b821af56589d1e70e36593a71e854a26d6e"
+        }
+      ],
+      "imageSha256": "1b75ff027ae3acbadbe30930974d5f4aca67d2c7fbe19ebbb07f1882bd639100",
+      "width": 320,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Road",
+        "editionTitle": "The Road"
+      }
+    },
+    {
+      "slug": "secret-history-1992",
+      "title": "The Secret History",
+      "creators": [
+        "Donna Tartt"
+      ],
+      "releaseYear": 1992,
+      "workId": "OL4321141W",
+      "editionId": "OL3319855M",
+      "coverId": 744854,
+      "workSha256": "6c8c55d9469f486a1eab4783800127bdb72ecc2bedb1a98187d2f70405cd5028",
+      "editionSha256": "40cdbadd5bd22803b8b2983e5cf69b88d959726a24f000b2e6461e5895303037",
+      "authors": [
+        {
+          "id": "OL841112A",
+          "sha256": "45e75b732679889d2b1356140e5c4479ce98f0868f654a187a3edf08b86bed3b"
+        }
+      ],
+      "imageSha256": "119c8a5381b051ab43489880fac0df96c16f5436754843b52109e503da3fc3a2",
+      "width": 308,
+      "height": 475,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover.",
+        "workTitle": "The Secret History",
+        "editionTitle": "The secret history"
+      }
+    },
+    {
+      "slug": "shadow-wind-2001",
+      "title": "The Shadow of the Wind",
+      "creators": [
+        "Carlos Ruiz Zafón"
+      ],
+      "releaseYear": 2001,
+      "workId": "OL278437W",
+      "editionId": "OL24300551M",
+      "coverId": 11426065,
+      "workSha256": "07c1960d30fb53c127e95562036f3ad79832aec01c44cb173ddf02cba20b19fe",
+      "editionSha256": "dfbd5a3c6994bf1726705cc67ff671335ac4bd74a3ed0e4c202a7af09296fa44",
+      "authors": [
+        {
+          "id": "OL2632116A",
+          "sha256": "92209cb710573dcd570173c8749e3a5bafd9197181f126902650d06a078087d5"
+        }
+      ],
+      "imageSha256": "29a3926ffd47b7a5681243d19edd6a65b831d9ab7e26462e8f639b6eb08a5d9d",
+      "width": 319,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Original-language Work title is linked to this English translation.",
+        "workTitle": "La sombra del viento",
+        "editionTitle": "The Shadow of the Wind"
+      }
+    },
+    {
+      "slug": "wind-up-bird-1994",
+      "title": "The Wind-Up Bird Chronicle",
+      "creators": [
+        "Haruki Murakami"
+      ],
+      "releaseYear": 1994,
+      "workId": "OL2625412W",
+      "editionId": "OL26580863M",
+      "coverId": 8276773,
+      "workSha256": "c443cbb29dcc96ae24abe46c2212b718b1d5966514206d9c4d8b84523b1fce73",
+      "editionSha256": "8cd17030d6bd17df9df08adb23a72ffcf8ef03fe55ee2af296d9bd282dd8c4c7",
+      "authors": [
+        {
+          "id": "OL382524A",
+          "sha256": "d1e2a2b8f13bf6584056310d259f48ee713c4a9c18ed7d004e96a1f9bf842590"
+        }
+      ],
+      "imageSha256": "efbe08e9432ea832d355a0c113828ac4f8ef66184123fb3ccf1121903837757c",
+      "width": 377,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Original-language Work title is linked to this English translation.",
+        "workTitle": "ねじまき鳥クロニクル",
+        "editionTitle": "The Wind-Up Bird Chronicle"
+      }
+    },
+    {
+      "slug": "wuthering-heights-1847",
+      "title": "Wuthering Heights",
+      "creators": [
+        "Emily Brontë"
+      ],
+      "releaseYear": 1847,
+      "workId": "OL21177W",
+      "editionId": "OL38586477M",
+      "coverId": 12818862,
+      "workSha256": "bacc62a8a1b102acf377389eec96743cc4b8bde70404eacd0c233cc6e87296d3",
+      "editionSha256": "2a7a6441520e16e19025980c9619de73d9ec6784d2bf1124660e9e76e427d633",
+      "authors": [
+        {
+          "id": "OL24529A",
+          "sha256": "cbf2c70db8ccc180a0c222c1249691e8ca0921b06306d6800e30abc775a9af3b"
+        }
+      ],
+      "imageSha256": "f66b3578894f5e0234d77de5eac3ab8fea0c7e7bb3c34cc576f564854eeedf94",
+      "width": 309,
+      "height": 500,
+      "review": {
+        "identity": true,
+        "cover": true,
+        "notes": "Reviewed the linked Work, English Edition, creator and decoded cover. Search publication year differs; existing Kajo year is preserved, not inferred from the cover.",
+        "workTitle": "Wuthering Heights",
+        "editionTitle": "Wuthering Heights"
+      }
+    }
+  ]
+}
