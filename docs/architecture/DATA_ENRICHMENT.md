@@ -32,6 +32,26 @@ descriptions need no external people's ratings or new learned prior. Provider
 text/cover rights are reviewed for the intended use, separately from research
 artifact admission.
 
+### Guided Taste data requirements — 2026-10-25
+
+[ADR-0011](decisions/0011-taste-as-guided-discovery.md) requires a supported
+recognizable opener and conditional “low rating A → likely high rating B” recall
+through the common serving engine. Provider means/counts/popularity can inform
+an explicitly dated opener prior but cannot establish that conditional relation.
+External joint ratings need their existing rights, identity mapping, temporal
+validation and model admission; native cohort retrieval keeps its privacy gates.
+BOOK `ratingsAverage` and MOVIE `voteAverage` have source-specific scales; convert
+with declared provenance rather than assuming field-name/scale parity. The current
+Open Library adapter maps `readinglog_count` to popularity; it is not a verified
+current trend or an unqualified completed-read count.
+
+The October 25 read-only catalogue audit found 30 discoverable curated BOOK rows
+with no image URL. All have only a curated source identity; none has a unique
+exact title-plus-author covered counterpart in the current catalogue. Resolve
+Work/Edition/source identity before enrichment, preserve Item/history identities,
+and verify actual cover availability. This is presentation repair, independent
+of admitting preference data. STATUS owns dated counts and outstanding execution.
+
 ## 2. Source registry — verified documentation
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.

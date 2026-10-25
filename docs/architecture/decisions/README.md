@@ -14,6 +14,11 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
+- [0011](0011-taste-as-guided-discovery.md) — Taste as guided use of the shared
+  Discovery prediction loop; BOOK → MOVIE progression, measured readiness,
+  supported conditional recall and verified covers. Product direction is accepted;
+  runtime, calibration and data/model admission remain open.
+
 - [0010](0010-versioned-taste-candidate-pools.md) — per-question immutable Taste
   candidate pools for new versioned sessions; refreshed bounded acquisition with
   retained-policy, exact-retry and source-erasure preservation.

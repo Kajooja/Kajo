@@ -14,6 +14,22 @@ The 2026-09-07 Taste-first release decision supersedes the old Sprint 014 extern
 
 The 14A–14D sections below preserve earlier foundation deliveries and device evidence. Their labels are historical work packages, not the current numbered ROADMAP phases. Catalog counts and hosted evidence are dated checkpoints, not a live inventory. Dated continuation entries later in this file preserve what was pending then; the current STATUS overrides their old next-step instructions. The [2026-09-09 retro](../retros/2026-09-09.md) records the reconciliation.
 
+## Guided Discovery and measured Taste readiness — 2026-10-25
+
+The owner reports that Taste still feels isolated, mixes BOOK/MOVIE cards and
+shows some books without covers. The required successor is common Discovery
+prediction/learning, BOOK → MOVIE guidance and a genuine readiness meter that
+controls advancement/completion. [ADR-0011](../../architecture/decisions/0011-taste-as-guided-discovery.md)
+records the target and retained-state constraints. The current source audit
+confirms V4's separate utility/domain lead and always-INSUFFICIENT readiness.
+The read-only hosted audit finds 415 discoverable books, of which 30 curated
+rows have no image URL, and 425 discoverable movies with image URLs. No hosted
+writes or account resets occurred. This packet records the design, audited gaps
+and prioritized work; it does not deliver the new selection/readiness model.
+#357's UI source and successful #724 APK remain the predecessor checkpoint;
+this feedback is not a pass of its four requested device checks. STATUS owns the
+new single handoff; performance measurement remains in ROADMAP.
+
 ## Taste card layout parity blocker — 2026-10-25
 
 The owner reports that #721 Taste has wrong margins, oversized artwork and

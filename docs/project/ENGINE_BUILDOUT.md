@@ -22,6 +22,17 @@ Other application → another DomainAdapter → the same core contracts
 
 The deliverable is not permanently limited to a recommender with adjusted weights. It includes evolving multi-space representations, contextual similarity, scenario/trajectory recall, supported future branches, separate synthetic memory and controlled evolution. However, neither these metaphors nor acceptance of a design establishes predictive quality. A failed experiment must produce a recorded rejection and successor/defer decision; it must not silently erase the target capability or masquerade as successful implementation.
 
+## Guided Taste integration requirement — 2026-10-25
+
+[ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) makes the
+shared native serving path, conditional recall and measured readiness concrete
+#336 acceptance consumers of EB-01/02/03/04/06/07/08. Reuse existing native and
+research foundations. BOOK → MOVIE is Kajo guidance, not a domain-specific engine
+model. The meter needs genuine outcome/calibration evidence; shared cards or an
+always-insufficient native response do not deliver this capability. ROADMAP owns
+the updated near-term dependency order, while later engine capabilities retain
+their existing scope. No learned model is admitted by this refinement.
+
 ## Verified starting point
 
 This audit inspected accepted main `34d21704cafe21091a2369396c9bc61dce99c1e9`, dated 2026-09-30, and the separately open native follow-ups. It is a dated source assessment, not a new hosted inventory or phone test.

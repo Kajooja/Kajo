@@ -149,6 +149,26 @@ owns interaction/accessibility acceptance; [DATA_EVENTS](../domain/DATA_EVENTS.m
 owns versioned evidence/suppression. This records required successor behavior,
 not a completed change to existing sessions or the installed APK.
 
+### Guided Discovery refinement — 2026-10-25
+
+The owner requires one continuous recommendation/learning experience, specified
+in [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md).
+New guided Taste starts with **BOOK**, stays in that domain until supported
+readiness, then transitions to **MOVIE**. Both use the same PersonalProfile and
+shared Discovery prediction/retrieval service; there is no separate test model.
+After a rating, the next fresh recommendation uses that committed evidence.
+A compact active-domain meter exposes genuine measured readiness and its support.
+Automatic phase advancement/completion requires the declared validated criterion;
+answer count or an uncalibrated rank score cannot fill a probability meter.
+
+This supersedes interleaved domain balancing as the new target, without changing
+retained sessions. Poor recognition or voluntary exit preserves an explicit
+insufficient state and offers continuation; it never forces endless questions.
+Book-to-movie and movie-to-book evidence transfer is shared but does not certify
+untested domain accuracy. Covers must be correctly resolved for both surfaces.
+Current V4's always-insufficient readiness and separate selection utility do not
+fulfil this refinement; implementation and quality acceptance are still open.
+
 ### Sequential target — 2026-10-14
 
 Question count is variable. Neither six answers, twenty answers, a 10 MOVIE +
