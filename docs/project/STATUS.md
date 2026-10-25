@@ -2,7 +2,8 @@
 
 Last updated: **2026-10-25**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **014 — algorithm reliability / real catalog / portable engine**, acceptance open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, first source packet in progress.
+Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
 This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution order;
@@ -10,7 +11,53 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — personal expected-rating Engine V1 / #361, #302, #336
+## Current handoff — shared native computation cutoff / Sprint 015, #302, #336
+
+Continue on `feat/engine-shared-input-contract` from accepted main
+`8ea7aefa96fd8762ceed9e85071dfec5b60540d3` ([#362](https://github.com/Kajooja/Kajo/pull/362)).
+There were no open PRs at the initial continuation check. The first bounded
+Sprint 015 packet aligns memory/Scenario arithmetic in the shared identity
+scorer to the native evidence transaction cutoff and records a versioned private
+input-clock envelope.
+Ordinary Discovery, catalogue-chain Discovery and explicit evaluation (used by
+Taste) consume those same implementations. Existing scoring formulas, candidate
+acquisition/selection policies and frozen records are preserved.
+
+Hard eligibility, request/delivery time and the reset-aware Working capture keep
+their existing post-lock clocks so newly committed skips and resets remain
+respected. This is a bounded arithmetic-clock correction, not full historical-as-of
+or committed-prefix reconstruction. Current rows can be read in different READ
+COMMITTED statements, and the transaction reference may precede a lifecycle-lock
+wait. The envelope explicitly reports unknown commit visibility and unavailable
+historical reconstruction. Candidate-source rules still differ; no same-pool or
+measured-quality acceptance is claimed. Source/CI and hosted installation remain
+separate; the new forward has not been installed in the service.
+
+Local validation passes 351 database tests, 904 mobile tests, 311 engine tests,
+50 dependency tests, 451 catalogue tests, research and acceptance suites,
+lint/typechecks and all four explicit-demo Hermes exports. Seven focused
+database regressions reproduce the old numeric Scenario mismatch and verify the
+fix, retained data/function security/replies, frozen shadow/pages, and newest
+skip/reset visibility. The native CLI gate also includes a real holder/waiter
+skip-admission probe; its actual PostgreSQL execution requires CI. The inherited
+React test-only circular serialization failure is corrected by inspecting
+rendered text, without application changes. `npm run check` reaches the unchanged
+Deno npm-registry connection refusal locally; a full local root pass is not
+claimed. The PR owns the final-source five required CI conclusions.
+
+Publication is awaiting explicit owner approval for this reviewed ten-file
+packet. Automatic approval review rejected the Git tree upload because it did
+not recognize exact-packet publication authorization. No remote source branch or
+PR was created, and no hosted operation ran. Keep this local branch and publish
+its reviewed tree after approval; use existing #302/#336 tracking. A separately
+attempted new tracking Issue was also rejected and was not created.
+
+After this packet's source checks and review, complete the remaining Sprint 015
+shared candidate/evidence contract and native adapter/temporal evaluation work.
+Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
+frozen shadow, generic contracts or retained Taste implementations. #232F's real
+Shared prepared-input consumer remains required. Existing phone observations
+below remain open and do not block independent engine source work.
 
 **Owner decision — 2026-10-25:** maximize each Profile's expected post-experience
 rating on its own learned response scale. Do not maximize the chance of a ten or
@@ -73,7 +120,7 @@ and eight consumed catalog operation branches with unchanged heads. Keep those;
 their pinned manifests remain referenced. Branch cleanup does not remove commit, PR or sprint history and does not certify
 engine quality.
 
-**Next implementation: [Sprint 015](sprints/SPRINT-015.md).** Bind one versioned
+**Active implementation: [Sprint 015](sprints/SPRINT-015.md).** Bind one versioned
 native prediction input/candidate/scoring contract for Taste, Discovery, explicit
 evaluation and shadow; require the acknowledged answer prefix in fresh forecasts;
 freeze exposure/outcome identity and deliver the temporal evaluation runner.

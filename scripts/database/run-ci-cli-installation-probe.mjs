@@ -44,6 +44,7 @@ import { personalTasteSessionSmokeSql } from './personal-taste-session.mjs';
 import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-concurrency.mjs';
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
+import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -372,6 +373,9 @@ try {
     const [personalEvaluation] = await exec(await personalEvaluationSmokeSql(),
       { stage: 'personal-evaluation-canonical-candidates-cutoff-no-delivery', timeoutMs: 120_000 });
     assert.match(personalEvaluation?.personalEvaluation, /^PASS:/);
+    const [sharedPredictionCutoff] = await exec(await sharedPredictionCutoffSmokeSql(),
+      { stage: 'shared-prediction-cutoff-native-parity-frozen-input', timeoutMs: 120_000 });
+    assert.match(sharedPredictionCutoff?.sharedPredictionCutoff, /^PASS:/);
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
@@ -438,7 +442,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation,
+      personalEvaluation, sharedPredictionCutoff,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
