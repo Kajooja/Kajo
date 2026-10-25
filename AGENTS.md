@@ -56,20 +56,45 @@ separate from a successful benchmark.
 
 ## 3. Current release march is mandatory
 
-`ROADMAP.md` owns order. The first public Kajo follows this dependency direction:
+**Owner decision — 2026-10-25:** the following order supersedes earlier
+phase/near-term ordering, while preserving every applicable acceptance gate.
+`ROADMAP.md` owns order. Complete the already active source stack and record
+outstanding runtime observations; then perform evidence-based branch hygiene.
+Build and accept the practical first Predictive Memory Engine before broad UX,
+acquisition or visual work. The first public Kajo follows this direction:
 
 ```text
-trustworthy algorithm/evidence/catalog
-→ server-backed anonymous entry + minimum retention/abuse/measurement
-→ adaptive Taste Test + honest holdout challenge
-→ recommendation preview + Google/Apple continuity/funnel
-→ Friend invite + Friends safety lifecycle
-→ explicit Friends → SharedProfile
-→ core UX/telemetry/privacy/operations
+finish active work → repository hygiene
+→ useful, measured Engine V1 (Sprints 015–021)
+→ UX and product flows (web Taste, anonymous continuity, conversion, Friends,
+  Shared, sharing, broader performance and operations)
+→ UI completion and accessibility verification
 → closed beta of actual link-to-app flow
 → production/store acceptance
 → Share Link Gate
 ```
+
+Engine V1 includes common Taste/Discovery computation, outcome/evidence contracts,
+personalized expected-rating and rating-response modeling, supported temporal
+state and transfer, useful scenario recall, honest readiness and operating
+evaluation/replay/rollback. Follow the sprint acceptance ledger; do not equate
+source completion or successful CI with demonstrated recommendation usefulness.
+Use existing authorized owned-Profile paths for engine acceptance before public
+anonymous acquisition. Minimal UI or lifecycle work essential to correct engine
+observation/validation remains allowed. Public identity, abuse, privacy and
+consent gates still precede the exposure or data use they govern.
+
+The objective is maximum **expected post-experience rating for the target
+Profile**, accounting for that person's learned rating-response scale. Do not
+optimize the chance of a literal ten, impose global high-rating thresholds as
+satisfaction, or add hidden convex/tail bonuses. Read ADR-0012 and the canonical
+prediction target before changing score math. A list save is interest, a rating
+means experienced, and Ohita is an ambiguous no-rating skip; no separate current
+En tunne action or inferred skip reason is introduced. Legacy evidence retains
+its original semantics.
+
+The dated decisions below explain the inherited source and release boundaries;
+they do not override the engine-first order or reopen completed implementation.
 
 These are acceptance dependencies, not a requirement to finish every advanced
 Shared model before Personal source work. The owner-requested October 9 dependency
@@ -153,6 +178,10 @@ Algorithm quality is the critical first-release dependency.
 - Taste readiness is provisional; ordinary Discovery keeps updating the same
   Profile evidence/state. Ending Taste does not certify certainty or stop learning.
 - Never fabricate an accuracy/confidence percentage.
+- Learn rating style with sparse-data shrinkage and explicit identifiability
+  limits; evaluate each Profile on its own response scale. Separate preference,
+  response behavior and observation missingness. Numeric ratings, including zero,
+  must influence supported future predictions; a skip is not a numeric zero.
 - Synthetic/counterfactual SleepLayer outcomes never become historical Events.
 - State hypotheses, alternative-action/stochastic future branches and model
   Challengers are different objects. Unobserved alternatives are not failed
@@ -226,6 +255,10 @@ Keep repository minimal and intentional.
 - Git history is the archive; do not keep duplicate old/new code “just in case”,
 - verify references before deleting,
 - do not duplicate documentation truth across files.
+- Delete a remote branch only after its exact head is proven reachable from
+  accepted main, or unique work is explicitly reviewed as superseded. Inspect
+  open PRs, compare expected heads at deletion, and preserve recoverability in
+  Git/PR history. Age or a closed PR alone does not prove safe retirement.
 
 Canonical ownership:
 

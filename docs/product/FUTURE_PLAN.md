@@ -1,9 +1,16 @@
 # Kajo Complete Product and Research Backlog
 
 Status: **permanent long-term product memory**  
-Product direction consolidated: **2026-09-07**, refined **2026-09-12**
+Product direction consolidated: **2026-09-07**, refined **2026-09-12** and **2026-10-25**
 
-This file preserves Kajo's complete ambition without allowing distant ideas to displace the first public release.
+This file preserves Kajo's complete ambition. The October 25 owner decision
+prioritizes a useful practical Engine V1 (Sprints 015–021), after finishing active
+work and safe branch cleanup, before broad UX/acquisition, UI polish and release.
+[ROADMAP](../project/ROADMAP.md) owns that order; [ENGINE_BUILDOUT](../project/ENGINE_BUILDOUT.md)
+classifies every architecture capability as V1, conditional or deferred research.
+Distant simulation/scale ideas do not substitute for a measured first engine.
+The primary objective is personal expected post-experience rating with learned
+rating-response style, not the chance of ten or a universal high-grade threshold.
 
 Execution authority:
 
@@ -57,7 +64,7 @@ The following are **no longer future-only ideas**:
 - explicit Friends → SharedProfile creation,
 - complete acquisition/funnel telemetry,
 - one-million-user-compatible identity/taste/social contracts,
-- independent engine contracts and an isolated reproducible MovieLens baseline (E1 → D1 → D2),
+- practical Engine V1 across Sprints 015–021, retaining the independent contracts and reproducible E1 → D1 → D2 external-data foundation,
 - SharedRatingRound, separate Personal/joint history and controlled rewatch (#232).
 
 Their canonical product requirements are `MVP.md` and `LAUNCH_LOOP.md`. [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md), [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) and ADR-0008 own the independent engine and research boundary. Kajo is its first adapter; five-generation engine ambitions remain preserved without making every advanced module a first-release requirement.
@@ -260,7 +267,16 @@ Protect against brigading, fake reviews, popularity dominance and location/priva
 
 ## 13. FUT-ALG-001 — PopulationMemory — CONDITIONAL
 
-The first release learns from the Profile itself plus permitted provider/catalog priors. ADR-0008 adds early isolated public-data research and permits a separately admitted ExternalTastePrior if rights, evaluation and fallback gates pass. This is distinct from native Kajo cross-Profile PopulationMemory, which requires consent, data volume, deletion lineage, minimum-cohort privacy and exposure-bias correction.
+Practical Engine V1 includes an evaluated own-Profile scenario-recall baseline
+and a bounded decision about external/cross-Profile evidence in Sprint 018.
+It must implement truthful contracts and no-useful-match/fallback behavior;
+production PopulationMemory influence is conditional on sufficient eligible data,
+consent, deletion lineage, minimum-cohort privacy, exposure-bias treatment and
+measured usefulness. A failed or unsupported experiment may remain disabled with
+recorded evidence; it is not a reason to fabricate peers or silently remove the
+capability from the plan. ADR-0008's ExternalTastePrior remains a separately
+admitted source with its own rights, evaluation and fallback. Expansion after V1
+retains the requirements below.
 
 Potential components:
 
@@ -276,7 +292,14 @@ Acceptance requires fixed controls, cohort/privacy thresholds, deletion propagat
 
 ## 14. FUT-ALG-002 — Evidence-gated EvolutionEngine expansion — PLANNED / CONDITIONAL
 
-The first release requires trustworthy SleepLayer evaluation and controlled Challenger architecture. Public-data baselines and bounded representation/retrieval experiments can run earlier through E1/D1/D2; this section governs more advanced native production evolution. The full independent engine progression and module dependencies live in PREDICTIVE_MEMORY_ENGINE, rather than in a second algorithm specification here.
+Practical Engine V1 includes bounded real-experience replay, memory consolidation,
+error diagnostics and a tested manual Challenger/admission/rollback lifecycle in
+Sprint 020, followed by integrated acceptance in Sprint 021. Public-data baselines
+and bounded representation/retrieval experiments retain E1/D1/D2 controls. This
+section governs expansion beyond that V1 boundary: learned multistep simulation,
+unrestricted synthetic training, architecture/geometry search and automatic global
+promotion remain evidence-gated research. The complete technical definition lives
+in PREDICTIVE_MEMORY_ENGINE and ENGINE_BUILDOUT, not a second specification here.
 
 Possible Challenger families:
 
@@ -294,7 +317,7 @@ Owner metaphor:
 
 - dreams = bounded alternate simulations/shadows,
 - DNA = immutable PredictorGenome/artifact lineage,
-- subconscious = derived versioned state/policy.
+- subconscious = versioned associative retrieval over authorized evidence.
 
 Hard rule:
 
@@ -435,6 +458,11 @@ Do not delete a distant idea merely because it is not ready. Do not promote it i
 
 ## 22. Default long-term order
 
+The pre-release order is active-work completion → safe cleanup → Engine V1
+(Sprints 015–021) → UX/acquisition/social → UI → beta/release. The sequence below
+starts only after that first-public acceptance; PopulationMemory/evolution here
+means expansion beyond the bounded V1 contracts and experiments.
+
 Unless evidence changes priorities, the post-release sequence is:
 
 ```text
@@ -497,6 +525,14 @@ Shared choices use the existing SharedProfile model, never a simple member avera
   not as a new release blocker or authorization to bypass the roadmap.
 
 ## FUT-UX-001 — Personal category statistics — PLANNED / #230
+
+Current-action clarification, **2026-10-25**: the ordinary feed has no separate
+UNKNOWN/not-interest choice. **Ohita** has an unknown reason and must not be
+silently counted as the historical explicit not-interest reaction in the planned
+statistics/unlock rules below. Preserve historical versioned counts; define and
+validate any successor counter during the UX stage without using it as a rating
+label or engine-readiness threshold. List save indicates interest; numeric rating
+means experienced. The dated rules below preserve the earlier proposal.
 
 Owner idea recorded **2026-09-10**. Give the person a readable account of their
 taste and activity, with light progression and a reason to return. Open
@@ -613,9 +649,15 @@ so long-press is not the only entry.
 
 | Surface | Explicit bulk actions |
 | --- | --- |
-| Discovery grid | Ei kiinnosta; Lisää listaan |
+| Discovery grid | Ohita; Lisää listaan |
 | A List's grid | Siirrä toiselle listalle; Poista tältä listalta |
 | Luetut/Katsotut history grid | Poista historiasta (trash icon in selection mode) |
+
+The **2026-10-25** three-action contract supersedes the earlier planned bulk
+Ei kiinnosta choice. Each selected Item's Ohita uses its exact authorized origin
+and contextual skip contract, with unknown reason and no numeric rating,
+inferred dislike or confirmed non-recognition. Preserve historical explicit
+NOT_INTERESTED evidence; do not restore a separate En tunne/Ei kiinnosta control.
 
 Entering/toggling selection never opens a card, records a preference or hides it.
 Creating a destination only creates/selects the List; the sole/new usable

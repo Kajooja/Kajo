@@ -14,6 +14,11 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
+- [0012](0012-personal-expected-rating-engine-v1.md) — personal expected
+  post-experience rating with learned response-scale behavior; current List/rating/
+  Ohita semantics, evidence-gated Engine V1 completion and engine-first priority.
+  Supersedes rating-ten maximization; implementation/quality acceptance stays open.
+
 - [0011](0011-taste-as-guided-discovery.md) — Taste as guided use of the shared
   Discovery prediction loop; BOOK → MOVIE progression, measured readiness,
   supported conditional recall and verified covers. Product direction is accepted;

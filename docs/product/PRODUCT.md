@@ -2,6 +2,16 @@
 
 Status: **canonical product foundation**
 
+**Owner priority, 2026-10-25:** finish the active source packets, reconcile their
+remaining acceptance, and remove only verified obsolete branches. Then deliver
+the useful first predictive engine through Sprints 015–021 before broad UX and
+acquisition work, including browser Taste, conversion, sharing and social flows;
+UI polish follows those functional flows, then beta/store/release acceptance.
+[ROADMAP](../project/ROADMAP.md) owns execution order and
+[ENGINE_BUILDOUT](../project/ENGINE_BUILDOUT.md) owns the V1 capability boundary.
+Existing public-launch requirements remain required. Existing owned app flows
+can exercise the engine before anonymous/public acquisition is complete.
+
 ## 1. Value proposition
 
 Kajo learns what kind of experiences a person is likely to value and helps that person discover what to experience next—alone or together with others.
@@ -26,8 +36,9 @@ The independent [Predictive Memory Engine](../architecture/PREDICTIVE_MEMORY_ENG
 is a reusable technical system, with Kajo as its first DomainAdapter. Public
 preference data supports isolated non-commercial research before native user
 volume grows. E1/D1/D2 are required bounded foundations; a trained prior is admitted
-only with appropriate evidence, rights and fallback. The architecture is a target,
-not a claim that the portable package or trained model already exists.
+only with appropriate evidence, rights and fallback. The portable E1 package and E1/D1/D2 research foundation exist; full native
+Engine V1 and admission of a trained external model require their separate
+implementation and measured-usefulness gates.
 
 ## 3. Prediction targets Profile
 
@@ -89,13 +100,27 @@ one user
 
 ## 6. What Kajo predicts
 
-Kajo estimates how suitable and valuable an Item is for a Profile in current Context.
+Kajo maximizes the **Profile-specific expected post-experience rating** of an
+eligible Item in the current Context, using the person's own learned response
+scale. One person may express love with 8 and dislike with 4, another with 10
+and 0. The model must learn supported response-style differences alongside taste,
+with sparse-user shrinkage and uncertainty; it must not equate raw grades across
+people or infer rating style as a psychological personality label.
+
+The primary objective is `E[R | Profile, Item, current state, experienced]`, with
+its observation and missing-outcome conditions made explicit. A chance of ten,
+fixed high-grade threshold or convex bonus for extreme grades is not the primary
+objective. Keep the full outcome distribution for risk/uncertainty diagnostics.
+A save/choice/consumption estimate is a separate target, not a replacement rating
+label or an implicit reward for more app use. The
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md) owns the technical objective,
+response model and evaluation contract.
 
 User-facing DiscoveryModes:
 
-- `FOR_YOU`: high expected fit / safer choice.
-- `SURPRISE`: meaningful novelty while retaining expected fit.
-- `RISK`: greater uncertainty/variance and deliberately bolder discovery.
+- `FOR_YOU`: maximize supported personal expected rating under declared eligibility and risk safeguards.
+- `SURPRISE`: meaningful novelty with an explicit, evaluated tradeoff against that same expected-rating objective.
+- `RISK`: deliberately bolder discovery under a declared bounded policy, retaining the personal expected-rating forecast and risk diagnostics.
 
 Internally Kajo may estimate interest, selection, save, consumption, completion, rating, recommendation and return, but it must not optimize raw engagement at the expense of actual satisfaction.
 
@@ -127,7 +152,13 @@ A book may provide useful evidence for a movie only through shared features/repr
 
 Taste Test is not a genre questionnaire.
 
-It is an active cold-start/evaluation surface using real Items. Kajo selects recognizable and informative questions, learns from canonical taste responses and then predicts held-out known Items before seeing their answers.
+It is guided Discovery using the same Profile, candidate acquisition, state and
+scoring under equal declared inputs. Each first-answer forecast is frozen before
+that answer contributes to future learning. A recognizable opener and BOOK → MOVIE
+progression are explicit policy constraints; later questions pursue the same
+personal expected-rating objective with declared bounded exploration. The engine
+core and existing owned-app consumer are developed and evaluated before the public
+web/anonymous acquisition surface; the eventual public entry remains Taste-first.
 
 The test therefore serves four purposes at once:
 
@@ -147,6 +178,18 @@ Prefer explicit user-entered context over covert inference where possible.
 ## 11. Behavior data
 
 Kajo is event-driven. Meaningful exposures/actions/outcomes must be measurable so predictions can be evaluated against reality.
+
+The current ordinary Taste/Discovery feed has exactly three choice meanings:
+
+- List save: interest or intention; it does not assert experience or satisfaction.
+- Numeric rating: the person has seen/read/experienced the Item and supplies an evaluation on their own scale.
+- **Ohita**: a contextual no-rating skip covering both unfamiliarity and lack of interest; the reason is unknown.
+
+There is no separate **En tunne** or **Ei kiinnosta** choice in that feed. Do not
+infer recognition, permanent dislike, consumption or a numeric grade from a skip.
+Retained UNKNOWN/NOT_INTERESTED records keep their original versioned meaning.
+Shared membership/consensus and joint-experience completion remain separate from
+an individual member's rating.
 
 Growth telemetry such as link opens, auth clicks and invite conversion is separate from Item preference evidence unless a canonical event explicitly says otherwise.
 
@@ -198,7 +241,7 @@ Kajo succeeds when it helps people find experiences they actually value.
 
 Important measures include:
 
-- prediction error/calibration,
+- personal expected-rating error/calibration, measured with each person's response scale and declared macro-aggregation across people,
 - successful discoveries,
 - saves leading to consumption and later satisfaction,
 - number of recommendations required to find a choice,

@@ -2,6 +2,22 @@
 
 These are canonical UX requirements. Implementation and device acceptance are separate: owner corrections from #228/#229 are included in the owner-authorized #329 source integration. STATUS owns the exact source/deployment state; dated device observations below do not claim a verified installed build identity.
 
+## Delivery priority — owner decision, 2026-10-25
+
+After the current source work and safe repository cleanup, practical Engine V1
+(Sprints 015–021) takes priority. Existing owned-app flows provide its minimal
+usable integration. Broader UX, browser Taste, identity conversion, sharing/social
+and general performance work follow, then UI/visual polish and beta/release.
+[ROADMAP](../project/ROADMAP.md) owns order. All requirements below remain; their
+visual detail does not delay an engine packet unless needed for usable evidence,
+accessibility or correction of a current functional defect.
+
+The current ordinary Taste/Discovery feed has **List save, numeric rating and
+Ohita**. List save means interest; rating means seen/read/experienced; Ohita covers
+unfamiliarity or lack of interest with no known reason. **En tunne is already
+removed** and must not be restored as a separate required choice. A skip is no
+rating. Old UNKNOWN/NOT_INTERESTED records retain their original meanings.
+
 ## Core feeling
 
 Kajo should feel calm, personal, atmospheric and intelligent. It should not feel like a dashboard, analytics tool, casino UI, futuristic control panel, 3D game or registration funnel disguised as a product.
@@ -18,8 +34,8 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 2. **Taste-first is the public front door.** External Taste/Friend links open directly into the Taste experience, not a login screen, marketing landing page or empty Room.
 3. **Registration is continuation, not reset.** Google/Apple conversion happens only after useful Taste/challenge/preview value is visible, and the user enters the app with cold start already completed.
 4. **Do not fake intelligence.** Taste challenge scores, explanations and confidence language must reflect actual frozen predictions and documented metrics. Prefer understandable low-sample wording to false precision.
-5. **Taste Test is interaction, not a questionnaire.** Show recognizable real Items one at a time in the same vertical card feed as optional Discovery card browsing. An upward dismissal or accessible **Ohita** action skips without a rating. Do not require genre forms, demographics or long preference surveys. This required successor remains planned until its runtime/device acceptance.
-6. **The test adapts quietly.** Every committed response, including the first rating, enters the supported state before selecting the next fresh card. Information gain/recognition may guide Taste within the satisfaction objective; UI should remain simple. Do not expose algorithm machinery unless it helps trust.
+5. **Taste Test is interaction, not a questionnaire.** Show recognizable real Items one at a time in the same vertical card feed as optional Discovery card browsing. An upward dismissal or accessible **Ohita** action skips without a rating. Do not require genre forms, demographics or long preference surveys. The shared interaction is current; remaining guided-readiness and runtime/device acceptance are tracked separately.
+6. **The test adapts quietly.** Every committed response, including the first rating, enters the supported state before selecting the next fresh card. Recognition and bounded exploration may guide Taste within the common personal expected-rating objective; UI should remain simple. Do not expose algorithm machinery unless it helps trust.
 7. **Preview before CTA.** After the challenge, show a small unseen recommendation preview before the primary Apple/Google continuation action.
 8. **Personal invites feel personal but remain consent-based.** An invite may identify the inviter in restrained copy after server authorization. Receiver explicitly accepts Friendship; opening a link never silently creates a social relationship.
 9. **Friendship is lightweight.** Accepted Friends appear on a simple Friends surface. Friendship does not create a joint Room/Profile automatically and does not expose private taste history.
@@ -44,7 +60,7 @@ setup and never replace the planned Taste, frozen challenge or usefulness gates.
 21. **DiscoveryMode is visible as restrained atmosphere.** FOR_YOU → dawn/day, SURPRISE → evening, RISK → night. AmbientPhase is presentation; DiscoveryMode is prediction policy.
 22. **Visual preference is not risk preference.** Dark aesthetic choice does not imply risky recommendations.
 23. **Grid first, card feed optional.** Grid remains default Discovery. Optional card browsing and Taste share the vertical feed contract below; this decision does not change the global default to cards.
-24. **Committed choices behave consistently.** Rating/not-interest/List actions give restrained confirmation and advance appropriately. List addition remains the positive/like action; no duplicate Like control.
+24. **Committed choices behave consistently.** Rating/Ohita/List actions give restrained confirmation and advance appropriately. List addition indicates interest/intention; it is not a post-experience rating. No duplicate Like or En tunne control is needed.
 25. **Recent choices are reversible.** Undo restores prior state and exact Item/card when deterministic reversal exists. It waits for pending saves; List removals are not offered for undo. Shared Saved must explain unavailable completed-consensus removal instead of exposing a guaranteed failing action.
 26. **Copy is presentation, not domain semantics.** User-facing labels may change while canonical Event/state meanings remain stable.
 
@@ -332,7 +348,8 @@ second Done confirmation, and creating a List alone does not save the Item.
 A deliberate slider release, track tap or accessible adjustment commits the
 selected integer rating immediately. Remove **Tallenna arvio ja jatka**. Merely
 opening the card or cancelling a drag never saves the initial value; zero and
-neutral five remain real ratings. A tap anywhere on the track or a deliberate
+five remain real ratings. The engine learns personal use of the response scale;
+five is not a universal neutral satisfaction label. A tap anywhere on the track or a deliberate
 horizontal drag accepts the chosen rating once into durable local storage, then
 automatically advances to the prepared successor. Discovery forward skip follows
 the same durable-admission boundary; ordinary network acknowledgement does not

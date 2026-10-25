@@ -8,7 +8,7 @@ Status: **complete target architecture already recorded; staged implementation r
 
 [PREDICTIVE_MEMORY_ENGINE](../architecture/PREDICTIVE_MEMORY_ENGINE.md) is the single canonical 51-part technical specification. This ledger maps every part to bounded implementation and acceptance work; it does not replace or duplicate that specification. [ADR-0008](../architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) owns the reusable-engine decision. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md) owns the Kajo adapter's prediction semantics, and [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md) owns external research and artifact admission.
 
-[ROADMAP](ROADMAP.md#engine-build-out-commitment--2026-10-05) alone owns execution order and release placement. [STATUS](STATUS.md) owns one current task and actual source, deployment and device acceptance. [MVP](../product/MVP.md) alone owns first-release blockers. The EB identifiers below are capability/acceptance identifiers, not new MVP requirements or twelve concurrently active sprints.
+[ROADMAP](ROADMAP.md#engine-v1-first--owner-decision-2026-10-25) alone owns execution order and release placement. [STATUS](STATUS.md) owns one current task and actual source, deployment and device acceptance. [MVP](../product/MVP.md) alone owns first-release blockers. The EB identifiers below are capability/acceptance identifiers, not new MVP requirements or twelve concurrently active sprints.
 
 The owner's intended system is preserved in full:
 
@@ -21,6 +21,135 @@ Other application → another DomainAdapter → the same core contracts
 ```
 
 The deliverable is not permanently limited to a recommender with adjusted weights. It includes evolving multi-space representations, contextual similarity, scenario/trajectory recall, supported future branches, separate synthetic memory and controlled evolution. However, neither these metaphors nor acceptance of a design establishes predictive quality. A failed experiment must produce a recorded rejection and successor/defer decision; it must not silently erase the target capability or masquerade as successful implementation.
+
+## Engine V1 scope and sprint ownership — 2026-10-25
+
+The owner's current decision makes **maximizing the individual user's expected
+post-experience rating** the primary Kajo objective, with a supported model of
+that user's rating habits. A user's 8 can express stronger satisfaction than
+another user's 10; cross-user raw marks do not define a universal utility scale.
+The canonical target/conditioning and response-style contract is in
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md). Literal-ten maximization,
+universal 9+ success and convex high-tail bonuses are superseded. Interest,
+experience/label availability and rating outcomes remain distinct.
+
+Current actions are list saving (interest), numeric rating (the Item has been
+experienced), and a contextual SKIP with unknown reason. SKIP is neither a
+numeric negative nor observed non-recognition. Do not add a separate En tunne
+control, require another consumed action or reinterpret retained legacy records.
+
+The new sprint IDs are independent of the older product Phase 15–20 identifiers.
+ROADMAP owns this order: finish the active stack and preserve its acceptance
+limits; safely clean obsolete branches; complete bounded Engine V1; then UX and
+acquisition/social paths; then UI completion; then release. Sprint 014 retains
+its dated evidence, while its unresolved capability work has named successors.
+
+| Sprint | Coherent deliverable | EB ownership |
+|---|---|---|
+| [015](sprints/SPRINT-015.md) | Shared native input/serving and frozen evaluation foundation | EB-01/03, EB-12 integration |
+| [016](sprints/SPRINT-016.md) | Numerical expected ratings and shrunk, identifiable user rating style | EB-02/03/07/08 |
+| [017](sprints/SPRINT-017.md) | Multiscale state, content, dated world facts, bounded transfer and Shared state | EB-02, bounded EB-05/07/09 |
+| [018](sprints/SPRINT-018.md) | Conditional local recall and supported cohort/external-prior experiments | EB-04, bounded EB-05/06/09 |
+| [019](sprints/SPRINT-019.md) | Calibrated uncertainty/readiness and one guided selection policy | EB-03/07/08 |
+| [020](sprints/SPRINT-020.md) | Operating replay/consolidation and manual challenger lifecycle | EB-03/09/11; EB-10 boundary |
+| [021](sprints/SPRINT-021.md) | Native end-to-end usefulness, lifecycle and operational acceptance | EB-12 V1 integration; all admitted slices |
+
+These are substantial outcome sprints, each implemented through bounded reviewed
+issues/PRs rather than one enormous commit. `MVP-ALG-012` owns aggregate V1
+acceptance; existing requirements retain their IDs and individual evidence.
+An engine sprint includes only the minimal client controls needed to exercise
+its behavior. Public web Taste, acquisition/conversion, sharing and broad visual
+work remain in their later product stages.
+
+**Required V1:** a functioning own-scale expected-rating predictor; immediate
+committed-evidence/state updates; common Taste/Discovery serving; versioned
+state/features and lifecycle; useful local-memory capability or measured
+no-recall fallback; supported per-domain readiness; real evaluation/replay;
+controlled model comparison and rollback; and the integrated native quality gate.
+One complete evaluated simpler configuration can be accepted when an optional
+complex method loses. A generic rank score with no numerical target, missing
+outcome evidence or fabricated readiness cannot be renamed Engine V1.
+
+**Bounded by available evidence:** native population recall, external priors,
+learned geometry, Working/transfer/trend influence and prototype compression need
+feasibility and quality decisions. Implement their useful contracts/fallbacks,
+run the declared feasible comparison, and record ACCEPTED, REJECTED or
+INSUFFICIENT. Insufficient data/rights means the affected channel stays OFF with
+a re-entry criterion; it does not authorize an invented cohort or endless
+infrastructure work. A capability is not complete merely because one method was
+rejected.
+
+**Research after V1:** neural multistep world models, synthetic dream training,
+self-evolving geometry, custom ANN/graph infrastructure without measured need,
+automatic global promotion and usefulness in a second real non-media product.
+Their architecture/EB gates remain open. Existing deterministic non-media
+fixtures still verify the portable contract in V1.
+
+## Engine V1 quantitative protocol
+
+Every model/state/retrieval/policy experiment in Sprints 015–021 uses one
+versioned protocol. Numerical thresholds are selected from development data and
+operational needs **before** final outcomes are inspected; this planning document
+does not invent a universal accuracy percentage, sample count or latency SLA.
+A real experiment cannot start final evaluation with missing threshold values.
+
+1. **Declare the question and source.** Pin target/conditioning/horizon, permitted
+   data and available-at-time prefix, model/artifact versions, forecast coverage,
+   eligible first-label rules, exclusions, and analysis unit (Profile/session/
+   Item as appropriate). Familiar-item Taste and newly recommended experienced
+   Items are separate populations. Report no rating, no exposure, immature label,
+   correction and withdrawn source rather than filling them with zero.
+2. **Lock the controls and splits.** Retain the serving champion and relevant
+   user-mean, item/domain-prior, no-state/no-recall/no-transfer controls. Separate
+   training, selection/calibration and untouched final windows chronologically;
+   fit feature transforms and rating-style parameters within training prefixes.
+   Predeclare source/user/item dependence, cluster treatment and search budget.
+3. **Align loss with the mean objective.** Mean-prediction estimation uses squared
+   error or another declared mean-consistent procedure; MAE alone targets a
+   conditional median. Report user-macro MSE/RMSE, MAE as a diagnostic, conditional
+   mean bias and coverage by domain/history/rating-style slice. Proper losses and
+   calibration/interval coverage apply only to distributions actually supplied.
+   Ranking/order measures are secondary and never renamed grade accuracy.
+4. **Keep recommendation value distinct.** Report each subject's observed mean
+   rating and paired/balanced within-subject changes for new experiences; summarize
+   subjects without letting prolific or generous raters dominate. Raw own-scale
+   error remains visible. Any scale-standardized secondary comparison uses an
+   anchored, prefix-fitted transform and missingness/shrinkage, never ad hoc
+   sample min/max stretching. A shared latent satisfaction scale is not identified
+   merely by normalizing marks. Offline error/shadow evaluation cannot by itself
+   identify causal policy uplift; intervention claims require an eligible design.
+5. **Choose numerical acceptance before measurement.** A manifest contains the
+   primary loss/value metric, minimum useful improvement `delta`, optional-method
+   noninferiority margin, interval level/method, minimum forecast/outcome coverage,
+   per-slice guardrails, precision or justified sample-size rule, evaluation window
+   and p50/p95/resource budgets. Set these from baseline/development variability,
+   required decision precision and deployment costs; record rationale. For a loss
+   comparison, a possible locked rule is `upper_bound(L_new - L_control) < -delta`
+   at required coverage. Equivalent value rules reverse the direction. The chosen
+   rule and its dependence assumptions must be explicit, not selected post hoc.
+6. **Handle sequential checking.** Predeclare fixed checkpoints or a defensible
+   sequential procedure for readiness and ongoing experiments. Record what its
+   bound describes under adaptive questions/drift. Repeated ordinary confidence
+   intervals are not automatically valid stopping guarantees. Minimum distinct
+   Items alone, numerous shared pairs or a large number of derived tags do not
+   establish independent support.
+7. **Decide and stop honestly.** Accept a model only inside its supported scope
+   after quality, coverage, lifecycle and resource gates pass. Stop/revert on
+   predeclared regressions. An optional component may be retained only when it
+   meets its locked quality/cost criterion; an apparent average win cannot hide
+   a failed required domain/style slice. Reject losers, record insufficient
+   precision, and collect further evidence only under the declared continuation
+   rule. Once test results guide a redesign, obtain a new final window.
+8. **Separate completion layers.** Source tests prove mechanics; external data
+   proves only its declared research task; hosted/phone checks prove exercised
+   behavior; mature native outcomes support usefulness. Record each separately.
+   Sprint 021 cannot close the mandatory numerical-quality gate through a fixture,
+   an interest proxy, an unvalidated percentage or successful deployment alone.
+
+The protocol includes failed results, no-match/abstention coverage, cost and exact
+next dependencies. Permissions, hard constraints and truthful evidence are fixed
+boundaries rather than model-search parameters. Historical raw observations and
+frozen predictions are never rewritten to make a challenger appear better.
 
 ## Guided Taste integration requirement — 2026-10-25
 
@@ -91,7 +220,8 @@ portable foundations should be connected and evaluated, not rebuilt wholesale.
 | Sleep/evolution — EB-03/11 | [SleepLayer foundation](../../supabase/migrations/20260904170000_sleep_layer_v1_foundation.sql) includes immutable genomes, shadow jobs, a worker and evaluation; [serving/canary controls](../../supabase/migrations/20260904180000_sleep_layer_v1_serving_and_profile_canary.sql) provide manual Profile canary and rollback. | Structures do not prove an operating evaluation loop or a winning challenger. Automatic promotion, autonomous evolution, learned geometry and dream rollouts are not admitted by this checkpoint. |
 | Portable core / later generations — EB-01/05/07/10/12 | `engine.ts` implements the E1 reference cycle; its recalled/prefix mean explicitly reports uncalibrated estimates and unavailable uncertainty. D1/D2 preserve isolated external research and the rejected challenger. | It is not the native SQL scorer. Generations 2–5, including learned representations, validated next-state distributions, dreaming and self-evolving geometry, retain their own gates. The synthetic second-domain fixture is not real portability-quality evidence. |
 
-All complete-capability checkboxes and the 51-part mapping below remain unchanged.
+This dated checkpoint did not close any complete-capability checkbox. The current
+51-part table below additionally records the later owner-approved V1 disposition.
 [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) supplies a
 concrete consumer for the existing foundations; [ROADMAP](ROADMAP.md) alone owns
 the order of shared serving, outcome evaluation, conditional recall and readiness
@@ -102,63 +232,63 @@ engine, and this checkpoint authorizes no account reset or model promotion.
 
 Section numbers refer to the unchanged canonical architecture. Every section has at least one acceptance owner below; references describe the complete target, not delivered status.
 
-| Section | Architectural responsibility | Acceptance packets |
-|---|---|---|
-| 1 | General prediction goal | EB-01, EB-12 |
-| 2 | Complete observation-to-evolution cycle | EB-01, EB-03, EB-12 |
-| 3 | CurrentState and subject/acting-identity distinction | EB-01, EB-02 |
-| 4 | Ordered WorkingState | EB-02 |
-| 5 | ShortTermState | EB-02 |
-| 6 | LongTermState | EB-02 |
-| 7 | BeliefState, uncertainty and present-state hypotheses | EB-02, EB-07 |
-| 8 | Independent GroupState | EB-02 |
-| 9 | Versioned WorldState | EB-02 |
-| 10 | Allowlisted Context | EB-01, EB-02 |
-| 11 | Scenario as a partially observed transition | EB-01, EB-04, EB-07 |
-| 12 | Ordered Trajectory and available prefix | EB-04 |
-| 13 | Observed Reality Path | EB-01, EB-03 |
-| 14 | Branches, horizons and distinct hypothesis/action/model identities | EB-07 |
-| 15 | Outcome distributions and conditioning | EB-07 |
-| 16 | Local/global/synthetic memory and separate external priors | EB-04, EB-06, EB-10 |
-| 17 | Replaceable associative search layer | EB-04, EB-05 |
-| 18 | Multiple latent spaces and representation compatibility | EB-05 |
-| 19 | Cross-domain Human Space | EB-05, EB-12 |
-| 20 | Dynamic State Space | EB-02, EB-05 |
-| 21 | Outcome Space without future-label leakage | EB-05, EB-07 |
-| 22 | Context/task-dependent geometry | EB-05 |
-| 23 | Decision-prefix ScenarioEncoder | EB-04, EB-05 |
-| 24 | Similarity / MetricEngine | EB-04, EB-05 |
-| 25 | Retrieval, reranking and no useful match | EB-04, EB-05 |
-| 26 | Typed Scenario Graph | EB-09 |
-| 27 | One-step and later multistep WorldModel | EB-07, EB-10 |
-| 28 | DreamEngine and separate generated paths | EB-10 |
-| 29 | Error-driven replay/dreaming | EB-03, EB-10 |
-| 30 | Error against the frozen original forecast | EB-03, EB-07 |
-| 31 | Error-attribution hypotheses | EB-03, EB-10 |
-| 32 | Policy separated from prediction | EB-08 |
-| 33 | Bounded active learning | EB-08 |
-| 34 | Evidence-preserving consolidation | EB-09 |
-| 35 | Decay, retention, correction and deletion | EB-02, EB-09 |
-| 36 | Controlled EvolutionEngine | EB-03, EB-11 |
-| 37 | Immutable PredictorGenome and artifact lineage | EB-01, EB-11 |
-| 38 | Evolution of weights, representations and structure | EB-11 |
-| 39 | Champion/Challenger scope, admission and fallback | EB-03, EB-11 |
-| 40 | Canonical evidence versus derived intelligence | EB-01, EB-09 |
-| 41 | Portability beyond Kajo | EB-01, EB-12 |
-| 42 | DomainAdapter contracts | EB-01, EB-12 |
-| 43 | Replaceable internal modules and injected ports | EB-01, EB-12 |
-| 44 | Transparent Engine generation | EB-01, EB-02, EB-03, EB-04 |
-| 45 | Latent Memory Engine generation | EB-05, EB-06 |
-| 46 | Explicit World Model generation | EB-07 |
-| 47 | Dreaming Engine generation | EB-10 |
-| 48 | Self-evolving geometry generation | EB-11 |
-| 49 | Invariants across all modules | EB-01 through EB-12 |
-| 50 | Integrated end-to-end architecture | EB-12 |
-| 51 | Supported future estimates and tested improvement | EB-03, EB-12 |
+| Section | Architectural responsibility | Acceptance packets | Engine V1 disposition / sprint |
+|---|---|---|---|
+| 1 | General prediction goal | EB-01, EB-12 | V1 objective and integration — 015/016/021 |
+| 2 | Complete observation-to-evolution cycle | EB-01, EB-03, EB-12 | V1 real loop — 015/020/021; simulated loop later |
+| 3 | CurrentState and subject/acting-identity distinction | EB-01, EB-02 | V1 snapshot — 015/017 |
+| 4 | Ordered WorkingState | EB-02 | V1 lifecycle/comparison — 017; influence only if admitted |
+| 5 | ShortTermState | EB-02 | V1 recent memory — 017 |
+| 6 | LongTermState | EB-02 | V1 durable memory and rating style — 016/017 |
+| 7 | BeliefState, uncertainty and present-state hypotheses | EB-02, EB-07 | V1 uncertainty/readiness — 016/019; hidden-state ensembles later |
+| 8 | Independent GroupState | EB-02 | V1 bounded Shared state/evidence — 015/017/021 |
+| 9 | Versioned WorldState | EB-02 | V1 dated facts — 017; richer trends only with eligible data |
+| 10 | Allowlisted Context | EB-01, EB-02 | V1 allowlisted context — 015/017 |
+| 11 | Scenario as a partially observed transition | EB-01, EB-04, EB-07 | V1 partial scenario records — 015/018 |
+| 12 | Ordered Trajectory and available prefix | EB-04 | V1 exact prefix recall/comparison — 018; neural paths later |
+| 13 | Observed Reality Path | EB-01, EB-03 | V1 observed history — 015/020 |
+| 14 | Branches, horizons and distinct hypothesis/action/model identities | EB-07 | V1 typed horizons/output contract — 019; simulated branches later |
+| 15 | Outcome distributions and conditioning | EB-07 | V1 own-scale mean and supported uncertainty — 016/019; unsupported heads later |
+| 16 | Local/global/synthetic memory and separate external priors | EB-04, EB-06, EB-10 | V1 local plus gated peer/prior decisions — 018; synthetic channel research |
+| 17 | Replaceable associative search layer | EB-04, EB-05 | V1 exact retrieval — 018; ANN only after measured need |
+| 18 | Multiple latent spaces and representation compatibility | EB-05 | V1 representation compatibility — 017/018; learned multi-space research |
+| 19 | Cross-domain Human Space | EB-05, EB-12 | V1 bounded shared/category representation — 017; universal human space research |
+| 20 | Dynamic State Space | EB-02, EB-05 | V1 dynamic state — 017 |
+| 21 | Outcome Space without future-label leakage | EB-05, EB-07 | V1 target/label separation — 016/018; learned outcome geometry research |
+| 22 | Context/task-dependent geometry | EB-05 | V1 transparent contextual weights — 017/018; learned metric optional |
+| 23 | Decision-prefix ScenarioEncoder | EB-04, EB-05 | V1 versioned prefix encoder — 015/018; neural encoder optional later |
+| 24 | Similarity / MetricEngine | EB-04, EB-05 | V1 metric/support/fallback — 018 |
+| 25 | Retrieval, reranking and no useful match | EB-04, EB-05 | V1 retrieval/reranking/no-match — 018 |
+| 26 | Typed Scenario Graph | EB-09 | V1 minimal derivation/temporal links — 020; full graph/causality research |
+| 27 | One-step and later multistep WorldModel | EB-07, EB-10 | V1 one-step outcome prediction — 016/019; learned transitions later |
+| 28 | DreamEngine and separate generated paths | EB-10 | Research deferred; synthetic separation retained in 020/021 |
+| 29 | Error-driven replay/dreaming | EB-03, EB-10 | V1 real error-aware replay — 020; dreams later |
+| 30 | Error against the frozen original forecast | EB-03, EB-07 | V1 frozen-error evaluation — 015/016/019/020 |
+| 31 | Error-attribution hypotheses | EB-03, EB-10 | V1 trace-based diagnostic hypotheses — 020; causal attribution research |
+| 32 | Policy separated from prediction | EB-08 | V1 mean-rating policy — 016/019 |
+| 33 | Bounded active learning | EB-08 | V1 bounded shared exploration/guidance — 019; advanced policies later |
+| 34 | Evidence-preserving consolidation | EB-09 | V1 bounded consolidation comparison — 020; reject if no useful benefit |
+| 35 | Decay, retention, correction and deletion | EB-02, EB-09 | V1 decay/correction/deletion — 017/020/021 |
+| 36 | Controlled EvolutionEngine | EB-03, EB-11 | V1 manual bounded challenger process — 020; autonomous promotion later |
+| 37 | Immutable PredictorGenome and artifact lineage | EB-01, EB-11 | V1 immutable manifests/genomes — 015/020 |
+| 38 | Evolution of weights, representations and structure | EB-11 | V1 parameter search — 020; structural evolution research |
+| 39 | Champion/Challenger scope, admission and fallback | EB-03, EB-11 | V1 scoped admission/fallback/rollback — 020/021 |
+| 40 | Canonical evidence versus derived intelligence | EB-01, EB-09 | V1 canonical/derived separation — 015/020/021 |
+| 41 | Portability beyond Kajo | EB-01, EB-12 | V1 integrated core plus non-media contract test — 015/021; real second-task quality later |
+| 42 | DomainAdapter contracts | EB-01, EB-12 | V1 adapter mapping/parity — 015/021 |
+| 43 | Replaceable internal modules and injected ports | EB-01, EB-12 | V1 useful replaceable modules/ports — 015/021; no empty scaffolding |
+| 44 | Transparent Engine generation | EB-01, EB-02, EB-03, EB-04 | V1 required useful transparent configuration — 015–021 |
+| 45 | Latent Memory Engine generation | EB-05, EB-06 | Bounded representation/cohort decisions — 017/018; full generation remains open |
+| 46 | Explicit World Model generation | EB-07 | V1 outcome slice — 016/019; next-state model research |
+| 47 | Dreaming Engine generation | EB-10 | Research deferred until validated transitions and independent outcomes |
+| 48 | Self-evolving geometry generation | EB-11 | Research deferred until component quality/compute justify structural search |
+| 49 | Invariants across all modules | EB-01 through EB-12 | V1 all applicable invariants — 015–021; later scopes remain gated |
+| 50 | Integrated end-to-end architecture | EB-12 | V1 real runtime loop — 021; synthetic/full-generation integration later |
+| 51 | Supported future estimates and tested improvement | EB-03, EB-12 | V1 supported estimates and tested usefulness — 016/020/021 |
 
 ## Acceptance packets
 
-All complete-capability checkboxes remain open. Existing foundations are reused, not relabeled as absent. For each selected packet, create or reuse one narrow implementation issue under #302, with an explicit slice and its prerequisite evidence. ROADMAP determines when it becomes active.
+All complete-capability checkboxes remain open. Existing foundations are reused, not relabeled as absent. The V1 disposition above selects bounded sprint deliverables without falsely closing the broader EB capability. For each selected packet, create or reuse one narrow implementation issue under #302, with an explicit slice and its prerequisite evidence. ROADMAP determines when it becomes active.
 
 ### EB-01 — Frozen evidence and portable native integration
 

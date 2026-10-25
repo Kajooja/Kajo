@@ -6,6 +6,31 @@ STATUS owns source, hosted and device acceptance. The #229 source sections below
 
 Kajo must know not only what it predicted but what actually happened. Recommendation evidence, state reconstruction, evaluation and SleepLayer depend on trustworthy events. The Taste-first launch adds acquisition/funnel telemetry, but growth events must not silently become recommendation reward.
 
+### Current three-action semantics — owner clarification, 2026-10-25
+
+The current Taste/Discovery feed has **List saving, numeric rating and Ohita**.
+En tunne has already been removed; this is a clarification of existing interaction,
+not a request for a new recognition control. [ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
+defines the response-aware expected-rating objective that consumes this evidence.
+
+| Visible action | Recorded meaning | Learning boundary |
+|---|---|---|
+| Save to selected Lists | Interest/intention and exact membership destinations | No invented rating or consumption; one multi-List choice is not multiple independent preference observations |
+| Numeric rating 0–10 | Actor reports having experienced the Item and gives a grade | Learn own-scale post-experience preference; exact consumption time and causal recommendation success remain unknown unless separately observed |
+| Ohita | Deliberate contextual advance without a positive choice | Unknown/not-interested reasons are combined and unobserved; no numeric zero, certain recognition answer or durable dislike |
+
+A committed rating/List action must not also emit a skip. Shared actors' ratings
+remain individual responses until the existing SharedRatingRound conditions
+establish a joint outcome. Retain legacy UNKNOWN/NOT_INTERESTED records and
+negative-interest event types with their original meanings; never manufacture
+either from current Ohita. Partial scroll, backgrounding or an unexposed card
+does not establish a skip.
+
+Keep original grades, source-scale mappings, occurrence/availability clocks and
+correction/withdrawal lineage. Response-model estimates belong to derived state,
+not new observed Events, and cannot rewrite the grade or pre-answer forecast.
+The target's own-scale meaning is in [PREDICTION_MODEL](PREDICTION_MODEL.md#11-personal-expected-rating-and-response-behavior--engine-v1-target).
+
 The Personal source-fusion correction now resolves available same-owner native
 rating authority before assigning weights. Exact scoped canonical command
 receipt lineage governs revisions, including backdated/equal occurrence clocks;
@@ -231,9 +256,11 @@ Items retain their independent hard constraints. Existing UNKNOWN,
 NOT_INTERESTED, ratings and immutable command/forecast receipts retain their
 original semantics; no retroactive recognition or negative labels are guessed.
 
-This is a mandatory planned successor, not a new deployed Event type or writer.
-The v1/v2 source facts below and existing explicit negative-interest weights remain
-unchanged. The earlier planned #239 Next control only changed the viewed card;
+This paragraph records the October 15 target boundary; the dated source sections
+below record its implementation steps, and STATUS owns actual deployment/device
+acceptance. The October 25 clarification above confirms the current combined
+interaction without introducing a new Event type or changing retained weights.
+The earlier planned #239 Next control only changed the viewed card;
 that neutral navigation design did not provide this contextual-skip
 observation/suppression contract and is superseded by this feed target.
 
@@ -415,15 +442,21 @@ exact tests, CI and installation boundaries.
 
 Taste Test must reuse canonical taste semantics rather than inventing a parallel marketing score.
 
-A TasteSession response may become bootstrap evidence only when it expresses one of the defined recommendation meanings:
+A TasteSession action may become evidence only under its versioned meaning.
+Current visible actions are:
 
 ```text
 known Item + rating 0..10
-unknown/skip
-not-interest when explicitly offered and semantically valid
+save to selected Lists = interest
+Ohita = contextual skip, reason unobserved
 ```
 
-Unknown/skip is useful for recognition/question-selection analysis but is not negative preference.
+Retained explicit UNKNOWN is recognition evidence, and retained explicit
+NOT_INTERESTED keeps its original interest semantics. Current combined Ohita
+supports contextual/question-selection analysis but supplies no certain
+recognition or negative-preference label. List saving supplies interest, not a
+post-experience rating. Preserve the existing versioned writer/lifecycle boundary
+rather than adding fabricated bootstrap responses for either action.
 
 Taste evidence must retain at least:
 

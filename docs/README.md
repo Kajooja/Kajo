@@ -39,6 +39,16 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 
 ## Documentation boundaries
 
+The current execution authority is the [October 25 engine-first
+roadmap](project/ROADMAP.md#engine-v1-first--owner-decision-2026-10-25).
+[Sprints 015–021](project/sprints/SPRINT-015.md) deliver practical Engine V1;
+their individual contracts and [ENGINE_BUILDOUT](project/ENGINE_BUILDOUT.md)
+map the complete architecture to implemented, tested, rejected or deferred scope.
+The target is per-Profile expected post-experience rating with learned rating
+response, under [ADR-0012](architecture/decisions/0012-personal-expected-rating-engine-v1.md).
+Older numbered product phases retain their requirement identifiers but execute
+under the new stage map; a historical “next” is not another active task.
+
 Slow-changing truth belongs to product/domain/architecture documents. Execution order belongs to ROADMAP; fast-changing source, CI, deployment and device acceptance belong to STATUS and the active sprint/PR. Historical sprints and retrospectives retain dated evidence rather than acting as the current to-do list.
 
 The 2026-09-12 refinement advances **portable contracts and isolated external-preference research**. It does not turn external ratings into native Kajo Scenarios, approve model deployment or waive the later gates for Kajo PopulationMemory, multistep dreaming or autonomous evolution. Read older broad deferral language together with ADR-0008.
