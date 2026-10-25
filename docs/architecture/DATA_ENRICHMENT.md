@@ -52,6 +52,37 @@ Work/Edition/source identity before enrichment, preserve Item/history identities
 and verify actual cover availability. This is presentation repair, independent
 of admitting preference data. STATUS owns dated counts and outstanding execution.
 
+The bounded implementation is `scripts/catalog/curated-book-covers.mjs` with
+its reviewed `curated-book-covers.json` mapping. Thirty curated source slugs bind
+to exact Open Library Work/English Edition/author records and decoded JPEG hashes.
+Visual review is additional to provider linkage: a wrongly linked revision-guide
+Edition was rejected, as was audio packaging. The publisher's
+[Covers API](https://openlibrary.org/dev/docs/api/covers) supplies direct hosted
+image URLs with `default=false`; `metadata.coverAttribution` retains the Edition
+credit, verification time and bytes. These references are presentation provenance,
+not an admitted preference prior, new provider alias or proof of current trends.
+
+For a reviewed repair, capture the module's read-only `COVER_REPAIR_TARGETS_SQL`
+into a private JSON array. Keep original provider JSON and cover bytes outside Git
+as `WORK_ID.json`, `EDITION_ID.json`, `AUTHOR_ID.json` and `COVER_ID.jpg`. Re-fetch
+and review changed source bytes before a later repair; do not edit hashes merely
+to pass verification. Generate the exact operation with:
+
+```sh
+node scripts/catalog/curated-book-covers.mjs scripts/catalog/curated-book-covers.json TARGETS.json EVIDENCE_DIRECTORY NEW_REPAIR.sql
+```
+
+The command verifies identity, creator, language, Edition cover membership, source
+hashes, explicit visual review and actual JPEG decoding before writing a new SQL
+file; it has no credentials or hosted executor. Its transaction locks the exact
+Items/source rows, rejects stale full-row snapshots and changes only `image_url`,
+`metadata.coverAttribution` and the existing timestamp trigger's `updated_at`.
+An exact replay is inert; a conflict rolls back the whole batch. It preserves
+Item IDs, titles, years, other metadata, aliases, users and evidence. Shared
+catalogue enrichment exposes the repair on both surfaces when next loaded;
+already cached cards may require reopening. No schema migration or APK is needed.
+This does not guarantee a provider image will remain available indefinitely.
+
 ## 2. Source registry — verified documentation
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
