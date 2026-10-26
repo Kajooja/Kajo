@@ -38,7 +38,16 @@ begin
           if not exists(select 1 from private.prediction_runs r where r.id=page_id
             and r.profile_id=profile.profile_id and r.session_id=(request->>'sessionId')::uuid
             and r.result_count=cardinality(delivered) and r.genome_id=(snapshot#>>'{run,genome_id}')::uuid
-            and r.state_snapshot=snapshot#>'{run,state_snapshot}') then raise exception 'Page lost frozen state/genome/scope'; end if;
+            and r.state_snapshot-'finalScoringInput'=(snapshot#>'{run,state_snapshot}')-'finalScoringInput') then
+            raise exception 'Page lost frozen state/genome/scope'; end if;
+          -- The original state stays exact; only the new run binding changes.
+          -- Validate every candidate and independently assert fresh versus reuse.
+          if not private.validate_native_final_source_v1(page_id) or not exists(
+            select 1 from private.prediction_runs r where r.id=page_id
+              and r.state_snapshot#>>'{finalScoringInput,predictionId}'=page_id::text
+              and r.state_snapshot#>>'{finalScoringInput,featureSourcePredictionId}'=root_id::text
+              and r.state_snapshot#>>'{finalScoringInput,computation}'=case when step=1 then 'FRESH_FINAL' else 'FROZEN_PAGE_REUSE' end) then
+            raise exception 'Page lost FINAL input or reused-source binding'; end if;
           select count(*) into count_before from private.prediction_runs;
           perform set_config('role','authenticated',true);
           if public.rank_items_page_v1(request)<>response then raise exception 'Exact page retry changed receipt'; end if;
