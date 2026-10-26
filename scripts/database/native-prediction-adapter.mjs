@@ -372,6 +372,20 @@ function bindCaptureIdentity(ranking, reference) {
   return result;
 }
 
+// Both original captures must pass native receipt admission first. Keep the
+// complete comparison result: independently observed global snapshots need not
+// be equal even when the same exact receipt is visible in both. Do not rebind
+// either witness, or label that pair as full-input conformance. Every other
+// contract field, computation input, candidate and score must still match.
+function receiptComparisonBoundary(comparison) {
+  if (comparison.conforms) return 'EXACT_INPUT';
+  assert.deepEqual(comparison.mismatches, [
+    { kind: 'contract', path: '$.inputSnapshot.state_snapshot.finalScoringInput.nativeV4Receipt.entrySnapshot' },
+    { kind: 'contract', path: '$.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot' },
+  ], 'Independent evaluation may differ only in its two validated receipt witnesses');
+  return 'SCORING_INPUTS_MATCH_RECEIPT_WITNESSES_DIFFER';
+}
+
 // PGlite and the disposable native CLI stack execute the same verifier. START,
 // NEXT and ANSWER commit separately; no backdated receipts or clock overrides
 // can stand in for the current public V4 command path.
@@ -396,7 +410,7 @@ export async function verifyNativeTasteConsumer(execSql) {
     + "'pool',(select to_jsonb(p) from private.sequential_taste_candidate_pools_v4 p where p.panel_id=r.id))"
     + ' from private.prediction_runs r where r.id=' + sqlLiteral(predictionId) + ';rollback;', 'retained-source');
   let fixture = false, snapshots, original, failure;
-  const observations = [], comparisons = [], boundaries = [];
+  const observations = [], comparisons = [], boundaries = [], receiptComparisons = [];
   const capture = async (actor, state, label) => {
     const parent = await session(state), next = command(state, 'NEXT');
     const feed = { version: 3, requestId: randomUUID(), profileId: state.profileId, sessionId: state.sessionId,
@@ -449,7 +463,11 @@ export async function verifyNativeTasteConsumer(execSql) {
     }));
     const { actual: taste } = samples.taste, { actual: explicit } = samples.evaluation, { actual: delivery } = samples.discovery;
     const comparison = compareFrozenRankings(taste, bindCaptureIdentity(explicit, taste), tolerance);
-    assert.equal(comparison.conforms, true, label + ' independent evaluation: ' + JSON.stringify(comparison.mismatches));
+    const boundary = receiptComparisonBoundary(comparison);
+    receiptComparisons.push({ label, boundary, fullInputConforms: comparison.conforms,
+      tasteEntrySnapshot: taste.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot,
+      evaluationEntrySnapshot: explicit.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot,
+      mismatches: comparison.mismatches });
     comparisons.push(comparison);
     // Rebinding self-references must not hide a different scope, clock or input.
     for (const mutate of [
@@ -457,10 +475,28 @@ export async function verifyNativeTasteConsumer(execSql) {
       value => { value.scope.actingIdentityRef = id(999); },
       value => { value.candidates[0].score += 1e-6; },
       value => { value.candidates[0].inputs.explanation.scoringFeatures.longTerm += 1; },
+      value => { value.inputSnapshot.state_snapshot.nativeV4Receipt.receiptRevision += 1; },
     ]) {
       const invalid = bindCaptureIdentity(explicit, taste); mutate(invalid);
-      assert.equal(compareFrozenRankings(taste, invalid, tolerance).conforms, false);
+      assert.throws(() => receiptComparisonBoundary(compareFrozenRankings(taste, invalid, tolerance)),
+        /only in its two validated receipt witnesses/u);
     }
+    // Deterministic synthetic COPY controls exercise this boundary even when a
+    // quiet PGlite/native run happens to produce identical original snapshots.
+    // These copies never count as observations, forecasts or native witnesses.
+    const witnessCopy = structuredClone(samples.evaluation.sample);
+    const copiedState = witnessCopy.sourceRun.state_snapshot;
+    let cutoff = BigInt(copiedState.nativeV4Receipt.receiptTransaction) + 1n;
+    if (`${cutoff}:${cutoff}:` === taste.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot) cutoff++;
+    const compareWitnessCopy = witness => {
+      copiedState.nativeV4Receipt.entrySnapshot = copiedState.finalScoringInput.nativeV4Receipt.entrySnapshot = witness;
+      const admitted = normalizeKajoNativePrediction({ ...witnessCopy, source, snapshotObservedAt: snapshot.observedAt });
+      return compareFrozenRankings(taste, bindCaptureIdentity(admitted, taste), tolerance);
+    };
+    const differentWitness = compareWitnessCopy(`${cutoff}:${cutoff}:`);
+    assert.equal(differentWitness.conforms, false);
+    assert.equal(receiptComparisonBoundary(differentWitness), 'SCORING_INPUTS_MATCH_RECEIPT_WITNESSES_DIFFER');
+    assert.throws(() => compareWitnessCopy('1:1:'), /incompatible-snapshots/u);
     const retained = await frozen(taste.predictionId);
     assert.equal(retained.panel.session_id, state.sessionId);
     assert.equal(retained.panel.prefix_revision, state.revision);
@@ -622,10 +658,12 @@ export async function verifyNativeTasteConsumer(execSql) {
         preservedSources++;
       }
     }
-    return { status: 'PASS', version: 'native-taste-consumer-conformance-v1', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
+    return { status: 'PASS', version: 'native-taste-consumer-conformance-v2', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
       policy: 'CANONICAL_FORECAST_POOL_V4', transactions: 'SEPARATE_COMMITTED_START_NEXT_ANSWER_NEXT',
       consumers: ['TASTE_V4_RPC', 'EXPLICIT_CANONICAL_CAPTURE', 'DISCOVERY_FEED_RPC', 'FROZEN_BASELINE_REPLAY'],
-      captures: observations.length, independentSameInputEvaluations: observations.length,
+      captures: observations.length, independentSameInputEvaluations: receiptComparisons.filter(x => x.fullInputConforms).length,
+      independentReceiptAlignedEvaluations: observations.length, independentReceiptComparisons: receiptComparisons,
+      receiptWitnessControls: 'SYNTHETIC_COPY_ONLY_DIFFERENT_VALID_WITNESS_NOT_FULL_PARITY_INVISIBLE_WITNESS_REJECTED',
       independentCaptureBinding: 'ONLY_VALIDATED_PREDICTION_AND_WORKING_CAPTURE_SELF_REFERENCES_REBOUND',
       comparedCandidates: comparisons.reduce((sum, value) => sum + value.comparedCandidates, 0),
       absoluteTolerance: tolerance.absoluteTolerance,

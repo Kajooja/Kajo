@@ -101,6 +101,8 @@ try {
     assert.equal(nativeV4ReceiptUpgrade.status, 'PASS');
     assert.equal(nativeV4Receipt.status, 'PASS');
     assert.equal(nativeV4ReceiptConcurrency.status, 'PASS');
+    const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);
+    assert.equal(nativeTasteConsumer.status, 'PASS');
     const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
     assert.ok(acquisitionIndex > 0);
     await resetFromMigrations(files.slice(0, acquisitionIndex));
@@ -403,8 +405,6 @@ try {
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
-    const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);
-    assert.equal(nativeTasteConsumer.status, 'PASS');
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);

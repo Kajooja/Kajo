@@ -309,8 +309,17 @@ adapter fixture now exercises separately committed public START/NEXT/ANSWER/NEXT
 commands with real retained pools and server receipts. Each actual panel crosses
 the native adapter and frozen baseline comparison, plus an independent explicit
 evaluation at the same transaction cutoff and requested pool. Comparison rebinds
-only validated capture self-references; complete inputs, actual Profile/actor,
-clocks, source genome and exact eligibility/rank/selection remain mandatory.
+only validated capture self-references. Frozen-baseline complete inputs, actual
+Profile/actor, clocks, source genome and exact eligibility/rank/selection remain
+mandatory. Receipt-aware report v2 separately records complete-input conformance
+for each independent evaluation and receipt-aligned computation-input parity.
+Both actual receipt witnesses pass native adapter admission. If their global
+entry snapshots differ, the unchanged full comparator must report exactly those
+two state/FINAL witness paths; every other input, scope, clock, receipt field,
+candidate and score still must match. Such a pair is **not** full-input
+conformance. The witnesses are retained verbatim and never rebound. Deterministic
+synthetic-copy controls verify this distinction and reject invisible receipts;
+they are not recorded as native captures or observations.
 Committed 0/5/10 controls distinguish supported future scores in both Taste and
 the current Discovery RPC, preserve old sources and isolate another Profile's
 retained and fresh forecasts. The same verifier runs in local SQL and native
@@ -479,6 +488,12 @@ or make unlike acquisition/selection policies equivalent. Correction changes
 future inputs without rewriting old forecasts; withdrawal retains the existing
 dependent-source erasure. Historical unmarked sources, exact cached commands and
 non-V4 policies remain unchanged. STATUS owns source/CI and hosted acceptance.
+
+Two consecutive READ COMMITTED commands can retain different global snapshot
+texts while witnessing the same exact receipt. The actual-consumer report v2
+preserves and reports those differences, requires exact equality of all remaining
+computation inputs and separates that result from full-input conformance. It
+does not infer one global snapshot from receipt visibility.
 
 #### Frozen FINAL scoring input — Sprint 015 source
 

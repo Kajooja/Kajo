@@ -41,6 +41,10 @@ an answer whose receipt clock precedes NEXT but whose commit follows command
 entry; it also preserves a concurrent duplicate NEXT. The existing CLI gate runs
 these probes early. `kajo-native-prediction.ts` validates the frozen binding with
 exact transaction-ID precision. No portable or PGlite test is called a lock proof.
+The actual V4 verifier also runs early. Its report v2 separates full-input matches
+from receipt-aligned computation parity, preserving distinct valid entry witnesses
+and the full comparator's two mismatched paths. It never rebinds snapshots; every
+other input and score must match. Synthetic-copy controls are not observations.
 
 `20261026130243_frozen_final_scoring_input.sql` adds owner-only
 `native_final_candidate_input_v1`, `native_final_run_input_v1` and
