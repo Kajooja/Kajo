@@ -26,10 +26,27 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native candidate request — Sprint 015
+
+`20261026073031_native_candidate_request_contract.sql` extracts the existing
+private base/scalar/identity implementations into `rank_items_request_*_v1`.
+The old `rank_items_candidate_*_v1` identities remain compatibility adapters to
+the strict `native-candidate-request-v1` input. The existing legacy/first-page,
+catalogue-chain and evaluation request owners enter the new identity core directly
+to preserve serving call depth. Explicit acquisition and intent
+control the same existing branches, with validation before forecast writes and
+a private frozen `candidateRequest` on fresh runs. There is one scorer per layer;
+unsupported combinations are rejected and retained policies/records stay intact.
+`scripts/database/native-candidate-request.{mjs,test.mjs}` owns populated upgrade,
+parity, invalid-input and preservation checks. The rollback-only SQL smoke joins
+the native CLI installation gate. This is a bounded request contract, not full
+Taste/Discovery pool parity or an admitted expected-rating model.
+
 ## Shared native computation clock — Sprint 015
 
 `20261025211014_shared_prediction_cutoff.sql` updates the existing private
-`rank_items_candidate_with_identity_v1` through guarded body replacements.
+identity scorer through guarded body replacements (subsequently extracted into
+`rank_items_request_with_identity_v1` by the candidate-request forward above).
 Memory/Scenario arithmetic uses the native evidence transaction cutoff; hard
 eligibility, request/delivery time and reset-aware Working capture retain their
 existing clocks. Fresh run snapshots retain the private

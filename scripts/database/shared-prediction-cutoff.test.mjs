@@ -146,9 +146,10 @@ test('shared prediction cutoff / populated forward and complete current schema',
       // Negative control: replacing current hard eligibility with now() would
       // resurrect the newly skipped Item in the very same visible database.
       await db.exec('savepoint stale_eligibility;');
-      const base = (await functionRows()).find(row => row.proname === 'rank_items_candidate_base_v1');
-      await db.exec(base.definition.replace('eligibility_time timestamptz := case when _candidate_ids is null then clock_timestamp() else now() end;',
-        'eligibility_time timestamptz := now();'));
+      const base = (await functionRows()).find(row => row.proname === 'rank_items_request_base_v1');
+      const clock = "eligibility_time timestamptz := case when request_acquisition = 'EXPLICIT_CANONICAL' then now() else clock_timestamp() end;";
+      assert.equal(base.definition.split(clock).length - 1, 1, 'Mutate the actual current admission clock exactly once');
+      await db.exec(base.definition.replace(clock, 'eligibility_time timestamptz := now();'));
       const stale = await query("select * from private.rank_items_with_identity_v1($1,$2,'FOR_YOU','MOVIE',50,'{}')", [randomUUID(), profile]);
       assert.deepEqual(stale.map(row => row.item_id), [id(101)]);
       await db.exec('rollback to stale_eligibility;release stale_eligibility;');

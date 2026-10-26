@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, first bounded source packet accepted; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, second bounded source packet prepared locally; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,9 +11,52 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — shared prediction inputs / Sprint 015, #302, #336
+## Current handoff — explicit native candidate request / Sprint 015, #302, #336
 
-Continue from accepted main
+Continue on `feat/native-candidate-request-contract` from accepted main
+`9b5954a49cf58c00bf8b114c8a49f82c0507ce4c` ([#364](https://github.com/Kajooja/Kajo/pull/364)).
+The second bounded Sprint 015 packet places the existing base/scalar/identity
+scorer behind one validated `native-candidate-request-v1` contract, separating
+acquisition policy from delivery/evaluation intent. The old private signatures
+remain compatibility adapters; current public commands, policies and scores are
+preserved. Fresh runs freeze the validated request privately.
+
+The concrete correction rejects invalid internal requests before forecast writes:
+mixed explicit/catalogue controls, duplicate or malformed identities, missing or
+future evaluation prefixes and invalid evaluation ownership. The existing private
+`capture_personal_evaluation_v1` wrapper already guarded its callers; the common
+identity boundary now enforces that requirement too. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#explicit-native-candidate-request--sprint-015-source)
+and [CODEMAP](../architecture/CODEMAP.md#native-candidate-request--sprint-015)
+own the contract and implementation paths.
+
+Only the three existing acquisition/intent combinations are admitted. This does
+not enable a new Taste policy, combine candidate pools, establish historical-as-of
+reconstruction or close Sprint 015. Native adapter/temporal evaluation and #232F's
+real Shared prepared-input consumer remain required. The previous computation-
+cutoff forward is already installed; do not repeat it or reset accepted answers.
+
+**Local validation:** independent review and all 360 database tests pass. The
+populated upgrade compares 54 existing Personal/Shared mode/domain/acquisition
+cases, lower scoring layers and explicit evaluation, including exact score bytes,
+retained rows and function metadata. Invalid requests and source/security drift
+fail atomically. The unchanged 36-page catalogue/shadow smoke and 1000-Item
+boundary test pass with direct request-owner dispatch preserving call depth.
+Lint/typechecks, 904 mobile, 311 engine, 50 dependency, 451 catalogue, 62 research
+and 11 acceptance tests pass, as do four explicit-demo Hermes exports.
+`npm run check` stops at the unchanged Deno npm-registry connection refusal;
+no complete local root-check or native PostgreSQL CI pass is claimed.
+
+**Next:** publish the reviewed source packet and complete all five required
+final-source CI gates, including the new native rollback-only request smoke,
+before merge. Source/CI acceptance is still pending.
+`20261026073031_native_candidate_request_contract.sql` has not been installed
+in the hosted service. Its guarded rollout is separate from source acceptance.
+Then continue the remaining common candidate/evidence contract and native
+adapter/temporal evaluation work within Sprint 015.
+
+## Accepted predecessor — shared native computation cutoff / #363
+
+The accepted implementation checkpoint is
 `feae2b17251d8d233e1925c66664d114b50fa341` ([#363](https://github.com/Kajooja/Kajo/pull/363)).
 The first bounded Sprint 015 packet aligns memory/Scenario arithmetic in the shared identity
 scorer to the native evidence transaction cutoff and records a versioned private
@@ -66,7 +109,7 @@ Fresh hosted consumption remains unobserved: the postcheck found no naturally
 generated `native-prediction-clocks-v1` run yet. Installation verification does
 not close consumer, device or predictive-quality acceptance.
 
-**Next:** complete the remaining Sprint 015
+The current handoff above continues the remaining Sprint 015
 shared candidate/evidence contract and native adapter/temporal evaluation work.
 Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
 frozen shadow, generic contracts or retained Taste implementations. #232F's real

@@ -337,6 +337,45 @@ Frozen shadows and protocol-2 continuation pages retain their original source
 clocks and features; a later page's delivery time does not make them fresh
 predictions. Catalogue-chain fresh computations receive their own new references.
 
+#### Explicit native candidate request — Sprint 015 source
+
+`20261026073031_native_candidate_request_contract.sql` moves the existing base,
+scalar and identity implementations behind private `rank_items_request_*_v1`
+functions. The retained `rank_items_candidate_*_v1` signatures adapt their old
+arguments to the same consumed request. There is one implementation per scoring
+layer; this does not add another scorer or change retained policies. The existing
+request owners call the new identity core directly, preserving serving call depth.
+
+The strict `native-candidate-request-v1` object separates `acquisition` from
+`intent`, with `itemIds`, `seenItemIds`, `reminderSpent` and `requiredAfter`.
+Only the existing combinations are admitted: `LEGACY_DISCOVERY`/`DELIVERY`,
+`CATALOG_CHAIN`/`DELIVERY` and `EXPLICIT_CANONICAL`/`EVALUATION`. Unknown fields,
+versions, mixed acquisition controls, malformed or duplicate identities and
+out-of-budget arrays are rejected. Explicit `itemIds` contain 1–50 ordered,
+distinct UUIDs; `seenItemIds` contain 0–1000 ordered, distinct UUIDs. Candidate IDs
+no longer implicitly select delivery semantics inside the scorer. Acquisition owns source filtering and
+feature capture; intent owns delivery selection and the existing request clock.
+Clocks remain server-owned and the current skip/reset behavior is preserved.
+
+The identity layer additionally requires an owned PersonalProfile and a finite
+`requiredAfter` strictly before transaction start for evaluation, before writing
+any forecast. Direct JSON timestamps require explicit-offset ISO form, with at
+most six fractional-second digits; relative, date-only and locale-dependent text
+is rejected. The old score-only base/scalar signatures can omit that prefix;
+they do not create an evaluation forecast or prove acknowledged-prefix capture.
+The prefix check is a freshness guard, not independent receipt verification.
+This closes the internal path that previously accepted missing/future prefixes,
+duplicate candidate IDs and combined explicit/catalogue controls even though
+the private `capture_personal_evaluation_v1` wrapper rejected them.
+
+Fresh runs freeze the validated request under private
+`state_snapshot.candidateRequest`. Request Context cannot override it. Existing
+PredictionRuns, exact replies, frozen continuation pages and shadow records keep
+their original inputs. This packet makes current acquisition differences explicit
+and enforced; it does not unify the legacy catalogue with Taste's V4 recognition
+pool, introduce new delivery/evaluation combinations or certify full four-consumer
+input parity, historical reconstruction or predictive usefulness.
+
 This private scoring primitive is consumed by the
 [owned sequential v2 source](#sequential-own-personal-v2-source) below. That command
 boundary owns expected-prefix revisions, commit/freeze before first measurement,

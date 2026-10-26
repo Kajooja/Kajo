@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — first bounded source packet accepted**
+Status: **IN PROGRESS — explicit native candidate request source packet**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -97,6 +97,23 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
+- Active second source packet: `feat/native-candidate-request-contract`, based
+  on accepted main #364. `20261026073031_native_candidate_request_contract.sql`
+  moves the existing base/scalar/identity scorer behind one strict versioned
+  candidate request, retaining old signatures as adapters. It separates existing
+  acquisition policies from delivery/evaluation intent and rejects unsupported
+  combinations, malformed/duplicate identities and invalid evaluation prefixes
+  or ownership before forecast writes. Fresh runs freeze the private request;
+  existing policies, valid scores, rows and exact replies remain intact.
+  Independent review and all 360 database tests pass, including the populated
+  54-case parity matrix, seven-function source/security guards and unchanged
+  catalogue continuation/boundary smoke. Existing request owners enter the new
+  identity core directly to preserve serving call depth. Lint/types, other local
+  test suites and four demo exports pass; the local aggregate check still stops
+  at the unchanged Deno registry connection refusal. All five final-source CI
+  gates, including native PostgreSQL, remain pending; this forward is not installed
+  in the hosted service. Full same-pool
+  parity, the native adapter and temporal evaluation runner remain open.
 - First source packet: accepted through [PR #363](https://github.com/Kajooja/Kajo/pull/363),
   merge `feae2b17251d8d233e1925c66664d114b50fa341`.
   `20261025211014_shared_prediction_cutoff.sql` aligns existing
