@@ -13,39 +13,63 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — native admission in existing Personal temporal reports / Sprint 015, #302, #336
 
-Continue from accepted implementation checkpoint
-`3159c1959cbbe4edb0f2923eb1ee177b6a227642` ([#367](https://github.com/Kajooja/Kajo/pull/367)).
-Extend the existing Personal temporal reports with explicit versioned native-source
-admission (v2), preserving their v1 contracts and receipts. Keep `buildWorkingReport` in
-`packages/prediction-engine/scripts/working-report.mjs` and
-`createWorkingCohortDeclaration` / `buildWorkingCohortReport` in
-`packages/prediction-engine/scripts/working-cohort.mjs` as owners. Add the actual
-immutable `sourceGenome`, bound to `planSnapshot.sourceRun.genome_id`, to the
-existing actor/Profile, source run/candidates and `snapshotObservedAt` inputs;
-reuse `normalizeKajoNativePrediction`. Admit only `DELIVERY` sources and require
-full OFF-pool identity, eligibility, rank and selection conformance with a
-fixed predeclared absolute score tolerance of `1e-12`; no other field receives
-tolerance. Preserve the existing exact OFF checks and emit bounded aliased
-conformance/coverage summaries.
+Active source branch: `feat/working-native-admission-v2`, based on accepted main
+`286cc83b33ffc137c22e6605c54e88f66d492102`. The bounded packet extends the existing
+Personal temporal reports with explicit native-source admission (v2), preserving
+v1 contracts and receipts. Independent source review and local validation pass within the limits below;
+publication and all five required final-source CI gates are still pending.
 
-Pin the `candidateRequest`, `predictionInput` and adapter versions, clocks and
-precision preconditions in the v2 declaration digest/rules. Preserve existing
-roster, window, horizon, settlement, first-capture, withdrawal and privacy/alias
-guards. `FIRST_RESERVED_CAPTURE_REVISION_1` means first capture, not first label;
-retain `personal-latest-terminal-v1` label resolution and its correction semantics.
-The explicit Taste `EVALUATION` population remains separate future work, not a
-Working exposure cohort or a prerequisite for this bounded extension. No new
-runner, scorer, native I/O or SQL migration belongs to this packet. Keep ordinal
-ranking diagnostics separate from future grade-error evaluation, with honest
-prefix, exposure and label-availability limits.
+`buildWorkingReport` in `packages/prediction-engine/scripts/working-report.mjs`
+and `createWorkingCohortDeclaration` / `buildWorkingCohortReport` in
+`packages/prediction-engine/scripts/working-cohort.mjs` remain the owners.
+V2 requires the actual immutable `sourceGenome`, bound to
+`planSnapshot.sourceRun.genome_id`, and reuses `normalizeKajoNativePrediction`.
+Only fresh `DELIVERY` sources enter. The complete retained OFF pool must agree
+on identity, eligibility, tier, rank and selection; the additional generic score
+comparison fixes absolute tolerance at `1e-12`, while all existing exact OFF
+checks remain mandatory. This compares retained final-ranking records without
+independent rescoring. Reports expose bounded aliased summaries, not native rows.
+
+V2 declaration rules/digests pin native request/input/adapter contracts, clocks
+and precision preconditions. Matching v2 request/declaration/inventory/manifest/
+report versions are required, even for an empty inventory. V1 output and digest
+preservation, contradictory source rejection, complete candidate coverage and the
+actual SQL producer-to-report path are explicit regressions.
+
+Roster, half-open window, horizon, settlement, first-capture, withdrawal and
+privacy/alias guards remain unchanged. `FIRST_RESERVED_CAPTURE_REVISION_1`
+means first capture, not first label; `personal-latest-terminal-v1` still resolves
+eligible later ratings/corrections. Taste's `EVALUATION` population remains
+separate. No new runner, scorer, native I/O or SQL migration belongs to this
+packet. Keep ordinal diagnostics separate from future grade-error evaluation.
 
 Supplied files cannot establish authorization, complete inventory, commit
-visibility or historical availability. Native performance evidence remains open.
-Full four-consumer same-pool parity, certified committed-prefix/historical
+visibility or historical availability. Native performance evidence, full
+four-consumer same-pool parity, certified committed-prefix/historical
 reconstruction and the real #232F Shared prepared-input consumer remain open.
-This next packet does not close Sprint 015 or establish predictive quality.
-Neither installed forward below needs repeating; preserve accepted accounts,
-answers and frozen records.
+This packet does not close Sprint 015 or establish predictive quality. Neither
+installed forward below needs repeating; preserve accepted accounts, answers and
+frozen records. Finish review and required checks, publish this one source packet,
+then record its exact acceptance and one bounded successor here.
+
+**Local validation:** 30 focused report/cohort tests preserve v1 declaration/report
+bytes and digests, reject conflicting genomes and unsupported/mixed versions,
+and retain complete-pool and missing-label coverage. The existing full-schema
+PGlite producer-to-report fixture passes six tests, including real committed
+source/enrollment/capture, six retained candidates/four selected, exact
+microsecond clocks and zero OFF score difference. The first capture retains an
+eligible later 9→0 correction; first capture is not first label. Both private CLI
+output and whole-cohort withdrawal reject/retain the expected evidence. Existing
+native run/candidate/genome/comparison rows remain unchanged before intentional
+fixture erasure. This is SQL interoperability on PGlite, not a new native
+PostgreSQL v2-report execution or an observed quality cohort.
+
+All 362 database, 326 engine, 72 research, 904 mobile, 50 dependency,
+451 catalogue and 11 acceptance tests pass, with lint/types, ESM/import-graph
+checks and four explicit-demo iOS/Android Hermes exports. `npm run check` reaches
+the unchanged Deno npm-registry connection refusal; no complete local root pass
+is claimed. CI must independently complete the missing Edge gate and all five
+required source gates before merge.
 
 ## Accepted native prediction adapter — #367
 

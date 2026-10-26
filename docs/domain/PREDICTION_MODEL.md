@@ -2791,6 +2791,26 @@ authorization, inventory completeness and actual predeclaration remain
 unestablished. The [cohort input contract](../../packages/prediction-engine/README.md#private-working-cohort-protocol)
 does not instantiate a real cohort or grant quality/canary admission.
 
+The explicit Working report/cohort v2 adds native-source admission to those
+existing owners. It requires the actual immutable genome referenced by the
+source run and reuses the strict native prediction adapter for fresh DELIVERY
+sources. The complete native final ranking must match the retained OFF pool's
+identities, eligibility, tiers, ranks and selection. The additional generic
+comparison fixes absolute score tolerance at `1e-12`; the existing exact OFF
+score checks remain in force. This is a comparison of retained records, not an
+independent recomputation or proof of complete native inventory. Precision-losing
+captures remain unsupported and immutable. Only bounded aliased conformance and
+coverage summaries leave the report boundary.
+
+V2 declarations pin the native request/input/adapter contracts, clocks and
+precision requirements in their digest. V1 contracts, declaration digests and
+reports retain their original semantics. Both versions preserve roster, time,
+first-capture and withdrawal rules. `FIRST_RESERVED_CAPTURE_REVISION_1` selects
+the first capture; `personal-latest-terminal-v1` still resolves later eligible
+ratings and corrections. Taste's explicit EVALUATION population is separate.
+Neither version provides grade-error metrics, certified committed prefixes,
+historical reconstruction, current authorization or predictive-quality admission.
+
 #### Bounded offline WorkingState evaluation
 
 The separate portable `./working-evaluation` boundary evaluates immutable
@@ -3032,9 +3052,10 @@ Snapshot validation is not authentication, proof of complete historical input,
 or permission to access private records.
 
 This packet adds no scorer, serving activation, database migration or model
-admission. Full four-consumer same-pool parity, committed-prefix reconstruction,
-the temporal evaluation runner and the real Shared prepared-input consumer remain
-separate Sprint 015 acceptance work.
+admission. The existing Personal temporal report/cohort v2 now consumes this
+adapter under the bounded admission contract above. Full four-consumer same-pool
+parity, committed-prefix reconstruction, remaining temporal acceptance and the
+real Shared prepared-input consumer remain separate Sprint 015 work.
 
 ### External-data boundary
 

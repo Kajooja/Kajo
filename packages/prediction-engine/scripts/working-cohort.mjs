@@ -5,13 +5,18 @@ import { resolve } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { createPrivateReportFiles } from './private-report-files.mjs';
-import { buildWorkingReport, WorkingReportError } from './working-report.mjs';
+import { buildWorkingReport, WorkingReportError, WORKING_NATIVE_SOURCE_ADMISSION } from './working-report.mjs';
 
 const MAX_INPUT_BYTES = 16 * 1024 * 1024, MAX_OUTPUT_BYTES = 32 * 1024 * 1024;
 const DAY = 24 * 60 * 60 * 1000, MAX_UNITS = 128;
-const REQUEST = 'kajo-personal-working-cohort-request-v1';
-const DECLARATION = 'kajo-personal-working-cohort-declaration-v1';
-const INVENTORY = 'kajo-personal-working-cohort-inventory-v1';
+const contracts = Object.fromEntries(['v1', 'v2'].map(version => [version, {
+  request: `kajo-personal-working-cohort-request-${version}`,
+  declaration: `kajo-personal-working-cohort-declaration-${version}`,
+  inventory: `kajo-personal-working-cohort-inventory-${version}`,
+  manifest: `kajo-personal-working-manifest-${version}`,
+  report: `kajo-personal-working-cohort-report-${version}`,
+}]));
+const requestContract = version => Object.values(contracts).find(contract => contract.request === version);
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 const embeddedUuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu;
 const controls = ['OFF', 'STATIC', 'ORDERED'];
@@ -57,7 +62,8 @@ const digest = value => createHash('sha256').update(JSON.stringify(value), 'utf8
 /** A process clock proxy constrains the local request; it is no time certificate. */
 export function createWorkingCohortDeclaration(request, now) {
   shape(request, ['contractVersion', 'scopeId', 'cohortRef', 'roster', 'enrollmentWindow', 'horizonMs', 'settlementMs', 'evaluationAsOf']);
-  check(request.contractVersion === REQUEST && clock(now) && text(request.scopeId) && request.scopeId.length <= 128
+  const contract = requestContract(request.contractVersion);
+  check(contract && clock(now) && text(request.scopeId) && request.scopeId.length <= 128
     && !embeddedUuidPattern.test(request.scopeId));
   shape(request.enrollmentWindow, ['startAt', 'endAt']);
   const { startAt, endAt } = request.enrollmentWindow;
@@ -78,11 +84,13 @@ export function createWorkingCohortDeclaration(request, now) {
     actors.add(actorUserId); subjects.add(profileId); aliases.add(actorRef); aliases.add(subjectRef);
     return { actorUserId, profileId, actorRef, subjectRef };
   }).sort((a, b) => a.profileId < b.profileId ? -1 : a.profileId > b.profileId ? 1 : 0);
-  const normalized = { contractVersion: REQUEST, scopeId: request.scopeId, cohortRef: request.cohortRef, roster,
+  const normalized = { contractVersion: contract.request, scopeId: request.scopeId, cohortRef: request.cohortRef, roster,
     enrollmentWindow: { startAt, endAt }, horizonMs: request.horizonMs, settlementMs: request.settlementMs,
     evaluationAsOf: request.evaluationAsOf };
-  const body = { contractVersion: DECLARATION, createdAt: now,
-    clockBasis: 'PROCESS_OBSERVED_TIME_NOT_TRUSTED_CERTIFICATE', request: normalized, rules: structuredClone(rules),
+  const declarationRules = structuredClone(rules);
+  if (contract === contracts.v2) declarationRules.nativeSourceAdmission = structuredClone(WORKING_NATIVE_SOURCE_ADMISSION);
+  const body = { contractVersion: contract.declaration, createdAt: now,
+    clockBasis: 'PROCESS_OBSERVED_TIME_NOT_TRUSTED_CERTIFICATE', request: normalized, rules: declarationRules,
     retainUntil, integrityBasis: 'CANONICAL_SHA256_NOT_AUTHENTICATION',
     predeclarationAuthenticity: 'NOT_ESTABLISHED_BY_FILE', nativeInventoryCompleteness: 'NOT_ESTABLISHED_BY_FILE', ...flags };
   return immutable({ ...body, digest: digest(body) });
@@ -115,7 +123,8 @@ function reserveRosterAliases(entry, request) {
 }
 function validateInventory(declaration, inventory, now) {
   shape(inventory, ['contractVersion', 'declarationDigest', 'inventory', 'manifest'], 'INVENTORY_INVALID');
-  check(inventory.contractVersion === INVENTORY && inventory.declarationDigest === declaration.digest, 'DECLARATION_MISMATCH');
+  const contract = requestContract(declaration.request.contractVersion);
+  check(inventory.contractVersion === contract.inventory && inventory.declarationDigest === declaration.digest, 'DECLARATION_MISMATCH');
   const request = declaration.request;
   check(clock(now) && now >= request.evaluationAsOf, 'EVALUATION_NOT_READY');
   check(now <= declaration.retainUntil, 'EXPIRED');
@@ -123,6 +132,8 @@ function validateInventory(declaration, inventory, now) {
     && inventory.manifest.evaluationAsOf === request.evaluationAsOf && Array.isArray(inventory.manifest.entries)
     && inventory.manifest.entries.length <= MAX_UNITS && Array.isArray(inventory.inventory)
     && inventory.inventory.length <= MAX_UNITS, 'INVENTORY_INVALID');
+  // Even an empty census cannot downgrade the declaration's admission rules.
+  check(inventory.manifest.contractVersion === contract.manifest, 'DECLARATION_MISMATCH');
   const members = new Map(request.roster.map(member => [JSON.stringify([member.actorUserId, member.profileId]), member]));
   const summaries = new Map(); let totalPairs = 0;
   for (const summary of inventory.inventory) {
@@ -212,7 +223,7 @@ export async function buildWorkingCohortReport(declarationInput, inventory, now)
       counts.comparablePairUnits += report.comparablePairUnits; counts.unscoredPairUnits += report.unscoredPairUnits;
     }
   }
-  const report = { ...base, contractVersion: 'kajo-personal-working-cohort-report-v1', cohort: {
+  const report = { ...base, contractVersion: requestContract(request.contractVersion).report, cohort: {
     cohortRef: request.cohortRef, declarationDigest: declaration.digest, declaredAt: declaration.createdAt, reportObservedAt: now,
     clockBasis: declaration.clockBasis, integrityBasis: declaration.integrityBasis,
     predeclarationAuthenticity: 'NOT_ESTABLISHED_BY_FILE', nativeInventoryCompleteness: 'NOT_ESTABLISHED_BY_FILE',

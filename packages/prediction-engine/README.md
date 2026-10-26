@@ -395,7 +395,7 @@ The strict JSON manifest has these fields:
 
 | Field | Required value |
 | --- | --- |
-| `contractVersion` | `kajo-personal-working-manifest-v1` |
+| `contractVersion` | `kajo-personal-working-manifest-v1` or explicit `kajo-personal-working-manifest-v2` |
 | `selectionBasis` | `OWNER_DECLARED_NATIVE_ENROLLMENTS` |
 | `evidenceBasis` | `ENGINEERING_FIXTURE` or `OWNER_AUTHORIZED_NATIVE_SNAPSHOTS` |
 | `scopeId` | One stable opaque alias namespace for the batch |
@@ -409,6 +409,28 @@ Each entry contains `expectedScope` with native `actorUserId`, `profileId`,
 native capture and `KajoWorkingOutcomeSnapshots.references`. The command derives
 its native scope, enrollment and frozen plan rather than accepting a second
 caller-supplied portable plan. Input bytes are bounded to 16 MiB and report bytes to 32 MiB.
+
+Version 2 additionally requires `planSnapshot.sourceGenome`: the actual immutable
+registry row referenced by `sourceRun.genome_id`. It passes the supplied scope,
+source run, complete candidate pool, genome and observed read time through
+`normalizeKajoNativePrediction`. Only fresh `DELIVERY` sources are admitted;
+explicit Taste `EVALUATION` and copied protocol-2 continuation sources cannot
+enter this exposure cohort. Precision-preserving stored clocks and lossless
+numeric export are prerequisites. Unsupported older snapshots stay immutable.
+
+The native final ranking is compared with the retained OFF control across the
+complete pool, including candidates not selected for delivery. Identity,
+eligibility, tier, rank and selection are exact. The additional generic comparison
+uses a fixed absolute score tolerance of `1e-12`; the existing exact OFF score
+checks remain mandatory, so this does not admit a rounded old comparison.
+This binds two retained views; it does not independently rescore their inputs.
+Native source scores, source ranks and opaque inputs are validated and retained
+only in memory. Reports emit bounded aliased conformance summaries and existing
+coverage, never the raw native ranking, genome or frozen state.
+
+Version 1 retains its original input shape, output and semantics. A v1 manifest
+cannot add the v2 genome field, and v2 cannot omit it. The versioned report makes
+the stronger source admission explicit without silently upgrading old receipts.
 
 Every enrolled pair remains in coverage, including absent/unavailable captures.
 Canonical native identities and stable aliases prevent relabelled source,
@@ -440,7 +462,7 @@ The strict private declaration request contains:
 
 | Field | Contract |
 | --- | --- |
-| `contractVersion` | `kajo-personal-working-cohort-request-v1` |
+| `contractVersion` | `kajo-personal-working-cohort-request-v1` or explicit `kajo-personal-working-cohort-request-v2` |
 | `scopeId`, `cohortRef` | Opaque scoped aliases without embedded native UUIDs |
 | `roster` | 1–128 explicit `{actorUserId, profileId, actorRef, subjectRef}` records; stable, injective aliases in `scopeId` |
 | `enrollmentWindow` | Future `{startAt, endAt}` in milliseconds; selection is half-open `[startAt, endAt)` |
@@ -456,7 +478,7 @@ The report runs after the fixed evaluation cutoff, without backdating actual
 snapshot reads. Existing `snapshotObservedAt <= evaluationAsOf` still applies;
 the operator must export authorized snapshots by that cutoff.
 
-The strict inventory has `contractVersion:
+The version 1 strict inventory has `contractVersion:
 "kajo-personal-working-cohort-inventory-v1"`, `declarationDigest`, `inventory` and
 `manifest`. `manifest` is the complete existing Working v1 manifest. Every ledger
 row has `{enrollmentId, actorUserId, profileId, declaredAt, pairCount,
@@ -464,6 +486,14 @@ firstCaptureStatus}` and must belong to the declared roster/window. Ledger rows
 and manifest entries must correspond exactly; omitted/extra enrollments and
 excess budgets reject the entire report rather than truncate it. The supplied
 inventory's actual completeness remains unestablished by files.
+
+Version 2 uses matching `-v2` request, declaration, inventory, manifest and report
+contracts. Its declaration digest additionally pins native candidate-request,
+input-clock and adapter contracts, exact clock/precision requirements, DELIVERY
+intent and the fixed conformance tolerance. Cross-version combinations reject,
+including empty inventories. The v1 declaration bytes and digest remain unchanged.
+Both versions use the same roster, window, horizon, settlement, pair-selection,
+alias, withdrawal and private-file rules.
 
 All native enrollments in the declared roster/window are selected. Sources must
 be requested during that window. Enrollments must use exactly the fixed horizon
@@ -475,6 +505,9 @@ Registered owners with zero selected enrollments remain visible in roster counts
 Existing native identity, alias and input/outcome overlap guards still apply.
 
 Only the first reserved immutable capture, revision 1, is admitted.
+This selects the first **capture**, not the first rating. Its unchanged
+`personal-latest-terminal-v1` resolution includes later eligible own ratings and
+corrections within the declared horizon.
 `firstCaptureStatus: "AVAILABLE"` requires that capture; `"NOT_RESERVED"` requires
 a null capture and retains all planned pairs in coverage. `"WITHDRAWN"` invalidates
 the whole cohort, and revision 2 cannot replace it. Missing/unknown/incomplete

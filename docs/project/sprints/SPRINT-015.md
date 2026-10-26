@@ -97,6 +97,24 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Fourth source packet: in progress on `feat/working-native-admission-v2`, based
+  on accepted main `286cc83b33ffc137c22e6605c54e88f66d492102`. Existing Personal
+  Working report/cohort v2 consumes the native prediction adapter with an
+  immutable supplied genome and complete retained OFF final-ranking conformance.
+  Exact OFF checks remain mandatory alongside the fixed `1e-12` generic score
+  tolerance. Versioned declaration rules pin contracts/clocks/precision; v1
+  receipts, latest-terminal resolution, first-capture selection, coverage,
+  withdrawal and privacy boundaries remain unchanged. This is an EB-01/EB-03
+  and EB-12 integration slice (architecture sections 1–3, 10–13, 30, 37,
+  40–44 and 49–51). It adds no scorer, migration, serving activation or
+  predictive-quality claim. Independent review, 30 focused report/cohort tests
+  and the six-test actual SQL/PGlite producer-to-report path pass. The complete
+  six-candidate/four-selected fixture has zero OFF difference, preserves the
+  later 9→0 correction and rejects rounded clocks and withdrawal. All 362
+  database, 326 engine and 72 research tests pass; other local suites,
+  lint/types and four demo exports pass. Root check retains the unchanged Deno
+  registry refusal; publication and final-source CI remain pending.
+  [STATUS](../STATUS.md) owns the current checkpoint.
 - Design: planned by the owner's 2026-10-25 engine-first decision.
 - Third source packet: accepted through [PR #367](https://github.com/Kajooja/Kajo/pull/367),
   merge `3159c1959cbbe4edb0f2923eb1ee177b6a227642`. A strict Kajo adapter

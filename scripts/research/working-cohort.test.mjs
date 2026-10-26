@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdtemp, readFile, rm, stat, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -7,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { createWorkingCohortDeclaration, buildWorkingCohortReport, runWorkingCohortDeclaration,
   runWorkingCohortReport, WorkingCohortError } from '../../packages/prediction-engine/scripts/working-cohort.mjs';
-import { buildWorkingReport, runWorkingReport } from '../../packages/prediction-engine/scripts/working-report.mjs';
-import { workingReportFixtureEntry } from './working-report.fixture.mjs';
+import { buildWorkingReport, runWorkingReport, WORKING_NATIVE_SOURCE_ADMISSION } from '../../packages/prediction-engine/scripts/working-report.mjs';
+import { workingReportFixtureEntry, workingReportNativeFixtureEntry } from './working-report.fixture.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cli = fileURLToPath(new URL('../../packages/prediction-engine/scripts/working-cohort.mjs', import.meta.url));
@@ -21,10 +22,11 @@ function request(overrides = {}) {
       { actorUserId: id(1001), profileId: id(1002), actorRef: 'fixture:actor-1', subjectRef: 'fixture:subject-1' }],
     enrollmentWindow: { startAt: 1200, endAt: 3000 }, horizonMs: 1000, settlementMs: 0, evaluationAsOf: 6000, ...overrides };
 }
-function entry(index = 0) {
-  const result = workingReportFixtureEntry(index, false), seen = new Set();
+function entry(index = 0, native = false) {
+  const result = (native ? workingReportNativeFixtureEntry : workingReportFixtureEntry)(index, false), seen = new Set();
   const clocks = new Set(['cutoff', 'asOf', 'availableAt', 'created_at', 'requested_at', 'snapshotObservedAt',
-    'createdAt', 'declaredAt', 'startAt', 'endAt', 'matureAt', 'capturedAt', 'occurredAt', 'exposedAt', 'occurred_at']);
+    'createdAt', 'declaredAt', 'startAt', 'endAt', 'matureAt', 'capturedAt', 'occurredAt', 'exposedAt', 'occurred_at',
+    'nativeEvidenceAsOf', 'memoryStateAsOf', 'scenarioAsOf', 'requestAsOf', 'workingStateAsOf', 'eligibilityAt']);
   const scale = value => {
     if (!value || typeof value !== 'object' || seen.has(value)) return;
     seen.add(value);
@@ -37,12 +39,13 @@ function entry(index = 0) {
   result.planSnapshot.enrollment.matureAt = 3100; result.outcomeSnapshot.capture.matureAt = 3100;
   return result;
 }
-function inventory(declaration, entries = [entry()]) {
-  return { contractVersion: 'kajo-personal-working-cohort-inventory-v1', declarationDigest: declaration.digest,
+function inventory(declaration, entries = [entry(0, declaration.request.contractVersion.endsWith('-v2'))]) {
+  const version = declaration.request.contractVersion.endsWith('-v2') ? 'v2' : 'v1';
+  return { contractVersion: `kajo-personal-working-cohort-inventory-${version}`, declarationDigest: declaration.digest,
     inventory: entries.map(value => ({ enrollmentId: value.expectedScope.enrollmentId, actorUserId: value.expectedScope.actorUserId,
       profileId: value.expectedScope.profileId, declaredAt: value.planSnapshot.enrollment.declaredAt,
       pairCount: value.planSnapshot.enrollment.pairs.length, firstCaptureStatus: value.outcomeSnapshot === null ? 'NOT_RESERVED' : 'AVAILABLE' })),
-    manifest: { contractVersion: 'kajo-personal-working-manifest-v1', selectionBasis: 'OWNER_DECLARED_NATIVE_ENROLLMENTS',
+    manifest: { contractVersion: `kajo-personal-working-manifest-${version}`, selectionBasis: 'OWNER_DECLARED_NATIVE_ENROLLMENTS',
       evidenceBasis: 'ENGINEERING_FIXTURE', scopeId: 'fixture', evaluationAsOf: declaration.request.evaluationAsOf, entries } };
 }
 async function rejects(declaration, census, code, now = 6000) {
@@ -209,11 +212,114 @@ test('OFF pairs are adjacent within each tier, preserve odd tails, and reserve a
 
 test('existing v1 builder and CLI retain identical bytes and behavior after extraction', async () => {
   await workspace(async directory => {
-    const value = inventory(createWorkingCohortDeclaration(request(), 1000)).manifest;
+    const declaration = createWorkingCohortDeclaration(request(), 1000), census = inventory(declaration), value = census.manifest;
     const expected = await buildWorkingReport(value), input = join(directory, 'input.json'), output = join(directory, 'report.json');
+    const prettyHash = body => createHash('sha256').update(`${JSON.stringify(body, null, 2)}\n`).digest('hex');
+    // Captured from accepted main 286cc83 before adding the v2 branch. Comparing
+    // two current functions alone would miss a coordinated change to v1 bytes.
+    assert.equal(declaration.digest, '747a1065aca65723bf617c688f1a73210f7276ea94a62c040d30fa90fcac4616');
+    assert.equal(prettyHash(declaration), 'c7e333687baec14019e084c34e8254b210ee0a8d1f52017b03815481cfbe18dc');
+    assert.equal(prettyHash(expected), '137c38cf448b863d7a2dadf67fc2f6595862eef92042c7071bbcfe552cd1f28d');
+    assert.equal(prettyHash(await buildWorkingCohortReport(declaration, census, 6000)),
+      'aaa0c733f0f825afd8561f1d7ab8715a3e93652db240abe1fb55a11e8bcf3791');
     await writeFile(input, JSON.stringify(value)); assert.deepEqual(await runWorkingReport(input, output), expected);
     assert.equal(await readFile(output, 'utf8'), `${JSON.stringify(expected, null, 2)}\n`);
   });
+});
+
+test('v2 declaration pins native admission before outcomes and rejects edited or mixed generations even when empty', async () => {
+  const declarations = ['v1', 'v2'].map(version => createWorkingCohortDeclaration(request({
+    contractVersion: `kajo-personal-working-cohort-request-${version}` }), 1000));
+  const declaration = declarations[1];
+  assert.equal(declaration.contractVersion, 'kajo-personal-working-cohort-declaration-v2');
+  assert.deepEqual(declaration.rules.nativeSourceAdmission, WORKING_NATIVE_SOURCE_ADMISSION);
+  assert.equal(Object.isFrozen(declaration.rules.nativeSourceAdmission.clocks), true);
+  assert.equal(declarations[0].rules.nativeSourceAdmission, undefined);
+  assert.notEqual(declaration.digest, declarations[0].digest);
+  for (const declared of declarations) {
+    const version = declared.request.contractVersion.slice(-2);
+    for (const inventoryVersion of ['v1', 'v2', 'v3']) for (const manifestVersion of ['v1', 'v2', 'v3']) {
+      const census = inventory(declared, []);
+      census.contractVersion = `kajo-personal-working-cohort-inventory-${inventoryVersion}`;
+      census.manifest.contractVersion = `kajo-personal-working-manifest-${manifestVersion}`;
+      if (inventoryVersion === version && manifestVersion === version) {
+        const report = await buildWorkingCohortReport(declared, census, 6000);
+        assert.equal(report.contractVersion, `kajo-personal-working-cohort-report-${version}`);
+        assert.equal(report.result.plannedPairUnits, 0);
+        if (version === 'v2') assert.deepEqual(report.nativeSourceAdmission.sources, []);
+      } else await rejects(declared, census, 'DECLARATION_MISMATCH');
+    }
+  }
+  const changes = [
+    value => { value.rules.nativeSourceAdmission.absoluteScoreTolerance = 2e-12; },
+    value => { value.rules.nativeSourceAdmission.clocks.arithmetic = 'CURRENT_WALL_TIME'; },
+    value => { value.rules.nativeSourceAdmission.precision = 'ROUND_TO_MILLISECONDS'; },
+    value => { value.rules.nativeSourceAdmission.candidateRequest = 'native-candidate-request-v2'; },
+    value => { value.rules.nativeSourceAdmission.adapter.ranking = 'frozen-ranking-v2'; },
+    value => { value.rules.nativeSourceAdmission.intent = 'EVALUATION'; },
+    value => { value.rules.nativeSourceAdmission.comparedFields.pop(); },
+    value => { value.rules.sourceVersions.resolution = 'first-label-v1'; },
+    value => { value.contractVersion = 'kajo-personal-working-cohort-declaration-v1'; },
+    value => { value.request.contractVersion = 'kajo-personal-working-cohort-request-v1'; },
+  ];
+  for (const change of changes) {
+    const edited = structuredClone(declaration); change(edited);
+    const { digest: ignored, ...body } = edited; void ignored;
+    edited.digest = createHash('sha256').update(JSON.stringify(body)).digest('hex');
+    await rejects(edited, inventory(edited, []), 'DECLARATION_INVALID');
+  }
+  for (const extra of ['absoluteScoreTolerance', 'clocks', 'sourceVersions', 'nativeSourceAdmission']) {
+    assert.throws(() => createWorkingCohortDeclaration({ ...declaration.request, [extra]: {} }, 1000),
+      { message: 'WORKING_COHORT_PROTOCOL_INVALID' });
+  }
+});
+
+test('v2 admits complete native OFF pools while preserving coverage, first capture, windows, pair policy and withdrawal', async () => {
+  const declaration = createWorkingCohortDeclaration(request({ contractVersion: 'kajo-personal-working-cohort-request-v2' }), 1000);
+  const census = inventory(declaration), before = structuredClone(census);
+  const report = await buildWorkingCohortReport(declaration, census, 6000);
+  assert.deepEqual(census, before);
+  assert.equal(report.contractVersion, 'kajo-personal-working-cohort-report-v2');
+  assert.deepEqual(report.cohort.rules.nativeSourceAdmission, report.nativeSourceAdmission.rules);
+  assert.equal(report.nativeSourceAdmission.sources.length, 1);
+  assert.equal(report.nativeSourceAdmission.sources[0].comparedCandidates, 6);
+  assert.equal(report.nativeSourceAdmission.sources[0].selectedCandidates, 4);
+  assert.equal(report.nativeSourceAdmission.sources[0].maxAbsoluteScoreDifference, 0);
+  assert.equal(report.result.plannedPairUnits, 2); assert.equal(report.result.comparablePairUnits, 1);
+  assert.equal(report.result.unscoredPairUnits, 1); assert.equal(report.observedEvidencePairUnits, 0);
+  assert.equal(report.cohort.rosterCoverage[1].enrollmentUnits, 0);
+  assert.equal(report.cohort.rules.captureSelection, 'FIRST_RESERVED_CAPTURE_REVISION_1');
+  assert.equal(report.cohort.rules.sourceVersions.resolution, 'personal-latest-terminal-v1');
+  assert.doesNotMatch(JSON.stringify(report), /a9150000|actorUserId|profileId|sourceGenome|genome_id/u);
+  for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) assert.equal(report[key], false);
+  const all = inventory(declaration, [entry(0, true), entry(1, true)]), reordered = structuredClone(all);
+  reordered.inventory.reverse(); reordered.manifest.entries.reverse();
+  assert.deepEqual(await buildWorkingCohortReport(declaration, all, 6000), await buildWorkingCohortReport(declaration, reordered, 6000));
+  const missing = structuredClone(census); missing.manifest.entries[0].outcomeSnapshot = null;
+  missing.inventory[0].firstCaptureStatus = 'NOT_RESERVED';
+  const absent = await buildWorkingCohortReport(declaration, missing, 6000);
+  assert.equal(absent.result.unscoredPairUnits, 2); assert.equal(absent.nativeSourceAdmission.sources[0].comparedCandidates, 6);
+  const changedLabel = structuredClone(census); changedLabel.manifest.entries[0].outcomeSnapshot.capture.labels[0].rating = 10;
+  const corrected = await buildWorkingCohortReport(declaration, changedLabel, 6000);
+  assert.equal(corrected.result.reports[0].pairs[0].observedOrder, 'tie');
+  assert.deepEqual(corrected.nativeSourceAdmission, report.nativeSourceAdmission);
+  const variants = [
+    ['INVENTORY_MISMATCH', value => { value.manifest.entries = []; }],
+    ['INVENTORY_INVALID', value => { value.inventory[0].declaredAt = 3000; }],
+    ['HORIZON_MISMATCH', value => { value.manifest.entries[0].planSnapshot.enrollment.matureAt++; }],
+    ['CAPTURE_STATUS', value => { value.manifest.entries[0].outcomeSnapshot.capture.revision = 2; }],
+    ['WITHDRAWN', value => { value.inventory[0].firstCaptureStatus = 'WITHDRAWN'; }],
+    ['ROSTER_ALIASES', value => { value.manifest.entries[0].planSnapshot.references.objects[0].objectRef = 'fixture:actor-1'; }],
+    ['PAIR_POLICY', value => {
+      for (const pairs of [value.manifest.entries[0].planSnapshot.enrollment.pairs, value.manifest.entries[0].planSnapshot.planning.pairs]) {
+        [pairs[0].leftItemId, pairs[0].rightItemId] = [pairs[0].rightItemId, pairs[0].leftItemId];
+      }
+      value.manifest.entries[0].outcomeSnapshot = null; value.inventory[0].firstCaptureStatus = 'NOT_RESERVED';
+    }],
+  ];
+  for (const [code, change] of variants) { const changed = structuredClone(census); change(changed); await rejects(declaration, changed, code); }
+  await rejects(declaration, census, 'EVALUATION_NOT_READY', 5999.999);
+  await rejects(declaration, census, 'EXPIRED', declaration.retainUntil + 0.001);
 });
 
 test('owner CLI stamps only a future declaration, emits fixed private errors and reuses exclusive no-follow output outside Git', async () => {

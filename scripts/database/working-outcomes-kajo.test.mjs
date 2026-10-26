@@ -21,10 +21,11 @@ test('actual committed native enrollment and own latest-rating capture cross bot
     const { normalizeKajoWorkingEvaluationPlan } = await import('../../packages/prediction-engine/dist/adapters/kajo-working-evaluation.js');
     const { normalizeKajoWorkingOutcomeCapture } = await import('../../packages/prediction-engine/dist/adapters/kajo-working-outcomes.js');
     const { freezeWorkingEvaluationPlan, evaluateWorkingPlan } = await import('../../packages/prediction-engine/dist/working-evaluation.js');
+    const { buildWorkingReport, WorkingReportError } = await import('../../packages/prediction-engine/scripts/working-report.mjs');
     const { createWorkingCohortDeclaration, buildWorkingCohortReport } = await import('../../packages/prediction-engine/scripts/working-cohort.mjs');
     const db = new PGlite();
     const actor = uuid(1), sessionId = uuid(2), enrollmentId = uuid(3), nativePairIds = [4, 5].map(uuid);
-    const evidence = [20, 21].map(uuid), admitted = [30, 31, 32, 33].map(uuid);
+    const evidence = [20, 21].map(uuid), admitted = [30, 31, 32, 33, 34, 35].map(uuid);
     let sequence = 100;
     const next = () => uuid(sequence++);
     const scoped = suffix => `actual-native-outcomes:${suffix}`;
@@ -42,6 +43,16 @@ test('actual committed native enrollment and own latest-rating capture cross bot
       const { files } = await buildFreshInstallation();
       assert.ok(files.some(file => file.name.endsWith('_personal_working_prospective.sql')));
       for (const file of files) await db.exec(`begin;${file.sql}commit;`);
+      // Keep real transaction/wall-clock progression and committed lifecycle,
+      // while exercising microseconds that PGlite's clock normally lacks. The
+      // overrides exist only in this disposable database, never production SQL.
+      await db.exec(`create function pg_temp.native_clock_timestamp() returns timestamptz language internal volatile as 'clock_timestamp';
+        create function pg_temp.native_transaction_timestamp() returns timestamptz language internal stable as 'now';
+        create or replace function pg_catalog.clock_timestamp() returns timestamptz language sql volatile as $$
+          select date_trunc('milliseconds',pg_temp.native_clock_timestamp())+interval '0.000456 second'$$;
+        create or replace function pg_catalog.now() returns timestamptz language sql stable as $$
+          select date_trunc('milliseconds',pg_temp.native_transaction_timestamp())+interval '0.000123 second'$$;
+        set extra_float_digits=0;`);
       const transaction = async operation => {
         await db.exec('begin;');
         try {
@@ -66,13 +77,16 @@ test('actual committed native enrollment and own latest-rating capture cross bot
       const cohortDeclaredAt = await clock(), enrollmentStart = Math.ceil(cohortDeclaredAt) + 1;
       // The declaration precedes the actual source/enrollment. Its very short
       // window exists solely for this disposable engineering regression.
-      const cohortDeclaration = await createWorkingCohortDeclaration({
+      const cohortRequest = {
         contractVersion: 'kajo-personal-working-cohort-request-v1', scopeId: 'actual-native-outcomes',
         cohortRef: scoped('cohort'), roster: [{ actorUserId: actor, profileId,
           actorRef: scoped('actor'), subjectRef: scoped('subject') }],
         enrollmentWindow: { startAt: enrollmentStart, endAt: enrollmentStart + 10_000 },
         horizonMs: 1000, settlementMs: 0, evaluationAsOf: enrollmentStart + 11_000,
-      }, cohortDeclaredAt);
+      };
+      const cohortDeclaration = await createWorkingCohortDeclaration(cohortRequest, cohortDeclaredAt);
+      const nativeCohortDeclaration = await createWorkingCohortDeclaration({ ...cohortRequest,
+        contractVersion: 'kajo-personal-working-cohort-request-v2' }, cohortDeclaredAt);
       const startedAt = (await db.query("select (clock_timestamp()-interval '5 minutes')::text value")).rows[0].value;
       for (const [index, itemId] of evidence.entries()) await actorCall('commit_item_action_v1', {
         version: 1, actionId: next(), actorUserId: actor, profileId, itemId,
@@ -92,11 +106,24 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         'select private.enroll_personal_working_evaluation_v1($1,$2,$3::jsonb,1,0) value',
         [enrollmentId, sourcePredictionId, JSON.stringify(nativePairs)])).rows[0].value);
       // This is the real owner-observed read, after the declaration COMMIT.
-      const snapshot = (await db.query(`select to_jsonb(r) source_run,
+      const readSourceSnapshot = () => transaction(async () => {
+        // Capture owners already pin precision. Export retained float scores
+        // losslessly too, without changing the caller's rounded default.
+        await db.exec('set local extra_float_digits=3;');
+        return (await db.query(`select to_jsonb(r) source_run,
+        (select to_jsonb(g) from private.predictor_genomes g where g.id=r.genome_id) source_genome,
         (select jsonb_agg(to_jsonb(c) order by c.final_rank) from private.prediction_candidates c where c.prediction_id=r.id) source_candidates,
         (select jsonb_agg(to_jsonb(c) order by c.control) from private.personal_working_shadow_comparisons c where c.source_prediction_id=r.id) comparisons,
         extract(epoch from clock_timestamp())*1000 observed_at
         from private.prediction_runs r where r.id=$1`, [sourcePredictionId])).rows[0];
+      });
+      const snapshot = await readSourceSnapshot();
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, '0');
+      assert.equal(snapshot.source_genome.id, snapshot.source_run.genome_id);
+      assert.equal(snapshot.source_candidates.length, 6, 'The full retained pool includes two undelivered candidates');
+      assert.equal(snapshot.source_candidates.filter(candidate => !candidate.selected_for_delivery).length, 2);
+      assert.match(snapshot.source_run.state_snapshot.predictionInput.nativeEvidenceAsOf, /\d{3}123(?:Z|[+-])/u);
+      assert.match(snapshot.source_run.state_snapshot.predictionInput.requestAsOf, /\d{3}456(?:Z|[+-])/u);
       const observedAt = Number(snapshot.observed_at);
       assert.ok(observedAt > enrollment.declaredAt, 'Postcommit retrieval must not impersonate a predeclaration read');
       const nativeWorking = snapshot.source_run.state_snapshot.workingState;
@@ -189,8 +216,16 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         scopeId: 'actual-native-outcomes', evaluationAsOf,
         entries: [{ expectedScope: { actorUserId: actor, profileId, sessionId, sourcePredictionId, enrollmentId },
           planSnapshot: planInput, outcomeSnapshot: { capture: nativeCapture, references: outcomeInput.references } }] });
-      const cohortInventory = async manifest => ({ contractVersion: 'kajo-personal-working-cohort-inventory-v1',
-        declarationDigest: cohortDeclaration.digest,
+      const nativeManifest = evaluationAsOf => {
+        const manifest = structuredClone(workingManifest(evaluationAsOf));
+        manifest.contractVersion = 'kajo-personal-working-manifest-v2';
+        manifest.entries[0].planSnapshot.sourceGenome = structuredClone(snapshot.source_genome);
+        return manifest;
+      };
+      const cohortInventory = async (manifest, declaration = cohortDeclaration) => ({
+        contractVersion: declaration === nativeCohortDeclaration
+          ? 'kajo-personal-working-cohort-inventory-v2' : 'kajo-personal-working-cohort-inventory-v1',
+        declarationDigest: declaration.digest,
         inventory: (await db.query(`select jsonb_build_object(
           'enrollmentId',e.id,'actorUserId',e.actor_user_id,'profileId',e.profile_id,
           'declaredAt',extract(epoch from e.declared_at)*1000,'pairCount',jsonb_array_length(e.result->'pairs'),
@@ -282,6 +317,76 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         } finally { await rm(directory, { recursive: true, force: true }); }
       });
 
+      await t.test('v2 admits the complete actual OFF pool with immutable genome, exact microsecond clocks and private output', async () => {
+        const manifest = nativeManifest(nativeCapture.capturedAt + 1), before = JSON.stringify(manifest);
+        const nativeReport = await buildWorkingReport(manifest);
+        assert.equal(JSON.stringify(manifest), before);
+        assert.equal(nativeReport.contractVersion, 'kajo-personal-working-report-v2');
+        assert.deepEqual(nativeReport.result, (await buildWorkingReport(workingManifest(manifest.evaluationAsOf))).result,
+          'Native-source admission preserves existing outcome and missing-pair semantics');
+        assert.deepEqual(nativeReport.nativeSourceAdmission.sources, [{
+          sourcePredictionRef: scoped('source'), enrollmentRef: scoped('enrollment'),
+          acquisition: snapshot.source_run.state_snapshot.candidateRequest.acquisition,
+          status: 'PASS', comparedCandidates: 6, selectedCandidates: 4, maxAbsoluteScoreDifference: 0,
+        }]);
+        assert.equal(nativeReport.nativeSourceAdmission.rules.absoluteScoreTolerance, 1e-12);
+        assert.equal(nativeReport.nativeSourceAdmission.rules.existingOffCheck, 'EXACT');
+        assert.equal(nativeReport.nativeSourceAdmission.rules.precision, 'EXACT_STORED_CLOCKS_AND_LOSSLESS_NUMERIC_EXPORT');
+        assert.equal(nativeReport.nativeSourceAdmission.rules.computation, 'FROZEN_COMPARISON_NO_RESCORE');
+        assert.equal(nativeReport.result.plannedPairUnits, 2);
+        assert.equal(nativeReport.result.comparablePairUnits, 1);
+        assert.equal(nativeReport.result.unscoredPairUnits, 1);
+        assert.equal(nativeReport.observedEvidencePairUnits, 0);
+        for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) assert.equal(nativeReport[key], false);
+        assert.doesNotMatch(JSON.stringify(nativeReport), /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu);
+        assert.equal(nativeReport.result.reports[0].pairs[0].observedOrder, 'right',
+          'First capture retains the latest terminal 9-to-0 correction, not the first rating');
+
+        const missing = structuredClone(manifest); missing.entries[0].outcomeSnapshot = null;
+        const missingReport = await buildWorkingReport(missing);
+        assert.equal(missingReport.result.comparablePairUnits, 0);
+        assert.equal(missingReport.result.unscoredPairUnits, 2);
+        assert.deepEqual(missingReport.nativeSourceAdmission, nativeReport.nativeSourceAdmission,
+          'Candidate delivery does not manufacture exposure or a label');
+
+        const mutations = [
+          value => { value.sourceGenome.id = uuid(900); },
+          value => { delete value.sourceRun.state_snapshot.candidateRequest; },
+          value => { value.sourceRun.state_snapshot.candidateRequest.version = 'future-request'; },
+          value => { value.sourceRun.state_snapshot.candidateRequest.intent = 'EVALUATION'; },
+          value => { delete value.sourceRun.state_snapshot.predictionInput; },
+          value => { value.sourceRun.state_snapshot.predictionInput.commitVisibility = 'CERTIFIED'; },
+          value => { value.sourceRun.state_snapshot.workingState.asOf = Number(value.sourceRun.state_snapshot.workingState.asOf.toPrecision(15)); },
+          value => { value.sourceCandidates.splice(value.sourceCandidates.findIndex(candidate => !candidate.selected_for_delivery), 1); },
+          value => {
+            const off = value.comparisons.find(comparison => comparison.control === 'OFF');
+            off.result.candidates.splice(off.result.candidates.findIndex(candidate => !candidate.selected), 1);
+          },
+        ];
+        for (const mutate of mutations) {
+          const invalid = structuredClone(manifest); mutate(invalid.entries[0].planSnapshot);
+          const bytes = JSON.stringify(invalid);
+          await assert.rejects(buildWorkingReport(invalid), error => error instanceof WorkingReportError
+            && error.code === 'SNAPSHOT_REJECTED');
+          assert.equal(JSON.stringify(invalid), bytes, 'Rejected snapshots are never repaired in place');
+        }
+        const directory = await mkdtemp(join(tmpdir(), 'kajo-native-working-v2-report-'));
+        try {
+          const input = join(directory, 'manifest.json'), output = join(directory, 'report.json');
+          await writeFile(input, before, { mode: 0o600 });
+          const result = spawnSync(process.execPath, [fileURLToPath(new URL(
+            '../../packages/prediction-engine/scripts/working-report.mjs', import.meta.url)), input, output], {
+            cwd: fileURLToPath(new URL('../../', import.meta.url)), encoding: 'utf8', timeout: 10_000, maxBuffer: 64 * 1024,
+          });
+          assert.equal(result.status, 0, result.stderr);
+          assert.equal(result.stdout, 'WORKING_REPORT_CREATED\n'); assert.equal(result.stderr, '');
+          assert.equal(await readFile(output, 'utf8'), `${JSON.stringify(nativeReport, null, 2)}\n`);
+          assert.equal(await readFile(input, 'utf8'), before);
+          assert.equal((await stat(output)).mode & 0o777, 0o600);
+        } finally { await rm(directory, { recursive: true, force: true }); }
+        assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, '0');
+      });
+
       await t.test('cohort protocol binds actual first capture, fixed horizon and every adjacent OFF pair', async () => {
         const laterNativeCapture = await transaction(async () => (await db.query(
           'select private.capture_personal_working_outcomes_v1($1,$2) value', [next(), enrollmentId])).rows[0].value);
@@ -319,6 +424,25 @@ test('actual committed native enrollment and own latest-rating capture cross bot
         assert.equal(cohortReport.commitAvailability, 'UNKNOWN');
         for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) assert.equal(cohortReport[key], false);
         assert.doesNotMatch(JSON.stringify(cohortReport), /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu);
+
+        const nativeInventory = await cohortInventory(nativeManifest(evaluationAsOf), nativeCohortDeclaration);
+        const nativeBefore = JSON.stringify([nativeCohortDeclaration, nativeInventory]);
+        const nativeCohortReport = await buildWorkingCohortReport(nativeCohortDeclaration, nativeInventory, reportObservedAt);
+        assert.equal(nativeCohortReport.contractVersion, 'kajo-personal-working-cohort-report-v2');
+        assert.equal(JSON.stringify([nativeCohortDeclaration, nativeInventory]), nativeBefore);
+        assert.deepEqual(nativeCohortReport.result, cohortReport.result);
+        assert.deepEqual(nativeCohortReport.cohort.rosterCoverage, cohortReport.cohort.rosterCoverage);
+        assert.equal(nativeCohortReport.nativeSourceAdmission.sources[0].comparedCandidates, 6);
+        assert.equal(nativeCohortReport.nativeSourceAdmission.sources[0].selectedCandidates, 4);
+        assert.equal(nativeCohortReport.nativeSourceAdmission.sources[0].maxAbsoluteScoreDifference, 0);
+        assert.equal(nativeCohortReport.observedEvidencePairUnits, 0);
+        assert.notEqual(nativeCohortDeclaration.digest, cohortDeclaration.digest);
+        assert.doesNotMatch(JSON.stringify(nativeCohortReport), /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu);
+        const substitutedNative = structuredClone(nativeInventory);
+        substitutedNative.manifest.entries[0].outcomeSnapshot.capture = laterNativeCapture;
+        substitutedNative.manifest.entries[0].outcomeSnapshot.references.captureRef = scoped('outcomes-revision-2');
+        await assert.rejects(buildWorkingCohortReport(nativeCohortDeclaration, substitutedNative, reportObservedAt),
+          error => error.message === 'WORKING_COHORT_CAPTURE_STATUS');
 
         const substituted = structuredClone(inventory);
         substituted.manifest.entries[0].outcomeSnapshot.capture = laterNativeCapture;
@@ -360,6 +484,10 @@ test('actual committed native enrollment and own latest-rating capture cross bot
       });
 
       await t.test('source withdrawal removes whole native captures and requires fresh authorization despite retained pure values', async () => {
+        const preserved = await readSourceSnapshot();
+        for (const key of ['source_run', 'source_candidates', 'source_genome', 'comparisons']) {
+          assert.deepEqual(preserved[key], snapshot[key], 'Successful and rejected offline reports preserve retained native rows');
+        }
         await db.query('delete from public.events where id=$1', [superseded]);
         assert.equal((await db.query('select count(*)::integer value from private.personal_working_outcome_captures where id=$1',
           [nativeCapture.captureId])).rows[0].value, 0);
@@ -374,6 +502,11 @@ test('actual committed native enrollment and own latest-rating capture cross bot
           'The first reservation survives whole-capture withdrawal');
         await assert.rejects(buildWorkingCohortReport(cohortDeclaration, withdrawnInventory, await clock()),
           error => error.message === 'WORKING_COHORT_WITHDRAWN');
+        const withdrawnNativeManifest = nativeManifest(nativeCohortDeclaration.request.evaluationAsOf);
+        withdrawnNativeManifest.entries[0].outcomeSnapshot = null;
+        await assert.rejects(buildWorkingCohortReport(nativeCohortDeclaration,
+          await cohortInventory(withdrawnNativeManifest, nativeCohortDeclaration), await clock()),
+        error => error.message === 'WORKING_COHORT_WITHDRAWN');
         assert.equal(capture.labels.find(label => label.objectId === objectRef(selected[0])).observation.raw.value, 0,
           'Retained pure values carry no fresh native authorization');
         await transaction(() => db.query("select private.erase_prediction_sources_v1('PREDICTION_RUN',$1)", [sourcePredictionId]));

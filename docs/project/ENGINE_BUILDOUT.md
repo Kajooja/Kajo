@@ -307,6 +307,13 @@ prefixes, real exposure/outcome reconciliation and full four-consumer parity are
 not supplied by that mapping. STATUS records source/CI acceptance; this does not
 close EB-01 or activate another serving implementation.
 
+The bounded Personal report/cohort v2 extension consumes that adapter through
+the existing temporal evaluation owners. Its immutable-genome and complete OFF
+pool admission, versioned declaration rules and aliased diagnostics preserve v1
+receipts and existing coverage/withdrawal semantics. This advances EB-01/EB-03
+integration; it supplies neither certified input availability nor grade-error,
+native performance or observed predictive-quality acceptance.
+
 **Exit evidence:** the mapped cycle preserves Profile-as-Subject versus acting User, Personal/Shared scope, event occurrence/availability, candidate/slate order, frozen versions, late outcomes, idempotency and rollback. Extract one computation behind the current server boundary only after a same-input parity comparison; avoid a second drifting whole-scorer implementation. The eventual reusable integration must be exercised through the native boundary and another adapter, not merely imported into an unused package. Runtime acceptance and the E1 contract acceptance remain distinct.
 
 An optional externally trained prior is not a prerequisite for this core extraction. Conversely, rejecting that prior does not complete or cancel native-core integration. Full extraction is not silently added to MVP when existing requirements can be satisfied safely by the accepted SQL boundary.

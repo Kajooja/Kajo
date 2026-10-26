@@ -81,3 +81,55 @@ export function workingReportFixtureEntry(index = 0, sameScope = true) {
       experienceRef: scoped(`experience-${Number(label.exposureId.slice(-12))}`) })) } };
   return { expectedScope: { ...nativeScope, enrollmentId: native(70) }, planSnapshot, outcomeSnapshot };
 }
+
+// Additive current-native contract fixture. The v1 fixture/receipts above stay
+// unchanged; real SQL producer interoperability has a separate database gate.
+export function workingReportNativeFixtureEntry(index = 0, sameScope = true) {
+  const entry = workingReportFixtureEntry(index, sameScope), snapshot = entry.planSnapshot;
+  const source = snapshot.sourceRun, state = source.state_snapshot;
+  const native = number => id(number + index * 1000);
+  const policy = 'scenario-memory-v1+resurfacing-v1+outcome-attribution-v1+frozen-replay-v2+eligibility-first-v1+personal-working-off-v3';
+  const weights = { direct: 1, longTerm: 1, shortTerm: 1, novelty: 1, exploration: 1,
+    scenario: 1, reactionPenalty: 1, impressionCooldown: 1 };
+  snapshot.sourceGenome = { id: source.genome_id, genome_key: 'prediction-v1-baseline', model_family: 'PREDICTION_V1_BASELINE',
+    code_version: 'prediction-v1.0+sleep-layer-v1', feature_version: 'prediction-features-v1', memory_version: 'memory-state-v1',
+    outcome_version: 'outcome-precedence-v1', reward_version: 'outcome-reward-v1', created_at: 50,
+    config: { schemaVersion: 'scalar-genome-v1', modeWeights: { FOR_YOU: { ...weights }, SURPRISE: { ...weights }, RISK: { ...weights } } } };
+  Object.assign(source, { model_version: 'prediction-v1.0', base_model_version: 'prediction-v0.5-native-decay',
+    policy_version: policy, created_at: 90, candidate_count: 6 });
+  Object.assign(state, { asOf: 90,
+    candidateRequest: { version: 'native-candidate-request-v1', acquisition: 'LEGACY_DISCOVERY', intent: 'DELIVERY',
+      itemIds: null, seenItemIds: [], reminderSpent: false, requiredAfter: null },
+    predictionInput: { version: 'native-prediction-clocks-v1', nativeEvidenceAsOf: 90, memoryStateAsOf: 90, scenarioAsOf: 90,
+      requestAsOf: 120, workingStateAsOf: 100, arithmeticClock: 'TRANSACTION_START', eligibilityClock: 'CURRENT_WALL_TIME',
+      dataSnapshot: 'CURRENT_STATEMENT_SNAPSHOTS', historicalReconstruction: 'UNAVAILABLE', commitVisibility: 'UNKNOWN',
+      candidateAcquisition: 'LEGACY_DISCOVERY', requiredAfter: null } });
+  for (const rank of [5, 6]) {
+    const candidate = structuredClone(snapshot.sourceCandidates[0]);
+    Object.assign(candidate, { item_id: native(19 + rank), source_score: 0.8 - (rank - 1) * 0.1,
+      final_score: 0.8 - (rank - 1) * 0.1, source_rank: rank, final_rank: rank, selected_for_delivery: false });
+    candidate.explanation.resurfacingPolicy = { eligible: rank === 5, classification: rank === 5 ? 'UNSEEN' : 'SUPPRESSED' };
+    snapshot.sourceCandidates.push(candidate);
+    snapshot.references.objects.push({ itemId: candidate.item_id, objectRef: `fixture:object-${Number(candidate.item_id.slice(-12))}` });
+  }
+  for (const candidate of snapshot.sourceCandidates) {
+    Object.assign(candidate, { confidence: 0, scenario_score: 0, scenario_support: 0, scenario_max_similarity: 0, selection_probability: null });
+    Object.assign(candidate.explanation, { version: source.model_version, baseVersion: source.base_model_version, policyVersion: policy,
+      scalarGenome: { genomeId: source.genome_id, genomeKey: snapshot.sourceGenome.genome_key, baselineEquivalent: true },
+      scoringFeatures: { version: 'prediction-features-v2', nativeDecayVersion: 'native-long-term-decay-v2', nativeEvidenceAsOf: 90,
+        direct: 0, longTerm: 0, shortTerm: 0, novelty: 0, exploration: 0, reactionQueuePenalty: 0, impressionCooldownPenalty: 0 },
+      candidatePool: { version: 'eligibility-first-v1', eligibilityAt: 130, retainedLimit: 50, retainedCount: 6, consideredCount: 6,
+        ordinaryCount: 5, reminderEligibleCount: 0, suppressedCount: 1,
+        admissionRank: candidate.source_rank, baselineScoreRank: candidate.source_rank } });
+  }
+  for (const comparison of snapshot.comparisons) {
+    Object.assign(comparison.result, { sourceModelVersion: source.model_version, sourcePolicyVersion: policy, candidateCount: 6,
+      candidates: snapshot.sourceCandidates.map(candidate => ({ itemId: candidate.item_id,
+        eligible: candidate.explanation.resurfacingPolicy.eligible,
+        tier: candidate.explanation.resurfacingPolicy.eligible ? 0 : 2, selected: candidate.selected_for_delivery,
+        adjustment: 0, score: candidate.final_score, rank: candidate.final_rank })) });
+  }
+  // Only the four declared pair objects have outcome labels/exposure references.
+  entry.outcomeSnapshot.references.objects = snapshot.references.objects.slice(0, 4);
+  return entry;
+}

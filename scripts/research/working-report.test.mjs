@@ -1,13 +1,15 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtemp, open, readFile, rm, stat, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { assertWorkingReportPlatform, runWorkingReport, WorkingReportError } from '../../packages/prediction-engine/scripts/working-report.mjs';
+import { assertWorkingReportPlatform, buildWorkingReport, runWorkingReport, WorkingReportError,
+  WORKING_NATIVE_SOURCE_ADMISSION } from '../../packages/prediction-engine/scripts/working-report.mjs';
 import { createPrivateReportFiles } from '../../packages/prediction-engine/scripts/private-report-files.mjs';
-import { workingReportFixtureEntry as entry } from './working-report.fixture.mjs';
+import { workingReportFixtureEntry as entry, workingReportNativeFixtureEntry as nativeEntry } from './working-report.fixture.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cli = fileURLToPath(new URL('../../packages/prediction-engine/scripts/working-report.mjs', import.meta.url));
@@ -15,6 +17,7 @@ const id = number => `a9150000-0000-4000-8000-${String(number).padStart(12, '0')
 const manifest = overrides => ({ contractVersion: 'kajo-personal-working-manifest-v1',
   selectionBasis: 'OWNER_DECLARED_NATIVE_ENROLLMENTS', evidenceBasis: 'ENGINEERING_FIXTURE',
   scopeId: 'fixture', evaluationAsOf: 600, entries: [], ...overrides });
+const nativeManifest = overrides => manifest({ contractVersion: 'kajo-personal-working-manifest-v2', ...overrides });
 const command = (...args) => spawnSync(process.execPath, [cli, ...args], {
   cwd: root, encoding: 'utf8', timeout: 10_000, maxBuffer: 64 * 1024,
 });
@@ -73,6 +76,171 @@ test('empty and producer-shaped reports preserve zero fixture quality, zero rati
     }
     assert.doesNotMatch(JSON.stringify(first), /a9150000|actorUserId|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/iu);
   });
+});
+
+test('v1 empty and populated report bytes retain their accepted hashes', async () => {
+  const expected = ['10d6179ac569ee3c6f1664e5cc21f65cda3b5c8965d28390ce7b422bd8028ce5',
+    '15e9bd2255781255e51d53ffd41b2f46ccc69f7e31f83969ab21f4f1ff90d70d'];
+  for (const [index, entries] of [[], [entry()]].entries()) {
+    const report = await buildWorkingReport(manifest({ entries }));
+    assert.equal(createHash('sha256').update(`${JSON.stringify(report, null, 2)}\n`).digest('hex'), expected[index]);
+    assert.equal(Object.hasOwn(report, 'nativeSourceAdmission'), false);
+  }
+});
+
+test('v2 admits the complete retained OFF pool without exposing native inputs or altering pair denominators', async () => {
+  await workspace(async directory => {
+    const value = nativeManifest({ entries: [nativeEntry()] }), before = JSON.stringify(value);
+    const first = await runManifest(directory, value, 'native-first');
+    const second = await runManifest(directory, value, 'native-second');
+    assert.deepEqual(first, second); assert.equal(JSON.stringify(value), before);
+    assert.equal(await readFile(join(directory, 'native-first.json'), 'utf8'), await readFile(join(directory, 'native-second.json'), 'utf8'));
+    assert.equal(first.contractVersion, 'kajo-personal-working-report-v2');
+    assert.deepEqual(first.nativeSourceAdmission, { rules: WORKING_NATIVE_SOURCE_ADMISSION, sources: [{
+      sourcePredictionRef: 'fixture:source-0', enrollmentRef: 'fixture:enrollment-0', acquisition: 'LEGACY_DISCOVERY',
+      status: 'PASS', comparedCandidates: 6, selectedCandidates: 4, maxAbsoluteScoreDifference: 0 }] });
+    assert.equal(first.result.plannedPairUnits, 2); assert.equal(first.result.comparablePairUnits, 1);
+    assert.equal(first.result.unscoredPairUnits, 1); assert.equal(first.observedEvidencePairUnits, 0);
+    assert.equal(first.result.reports[0].plan.controls.OFF.candidates.length, 6);
+    assert.deepEqual(first.result.reports[0].plan.controls.OFF.candidates.slice(4).map(candidate => [candidate.eligible, candidate.selected]),
+      [[true, false], [false, false]]);
+    for (const key of ['historicalFeatureEligible', 'learnable', 'nativeActivated', 'qualityAdmitted']) assert.equal(first[key], false);
+    assert.doesNotMatch(JSON.stringify(first), /a9150000|sourceGenome|scoringFeatures|inputSnapshot|state_snapshot/u);
+    const empty = await buildWorkingReport(nativeManifest());
+    assert.deepEqual(empty.nativeSourceAdmission.sources, []); assert.equal(empty.result.plannedPairUnits, 0);
+    const owner = await buildWorkingReport(nativeManifest({ evidenceBasis: 'OWNER_AUTHORIZED_NATIVE_SNAPSHOTS', entries: [nativeEntry()] }));
+    assert.equal(owner.observedEvidencePairUnits, 1); assert.equal(owner.sourceAuthenticity, 'NOT_ESTABLISHED_BY_FILE');
+    assert.equal(owner.commitAvailability, 'UNKNOWN'); assert.equal(owner.qualityAdmitted, false);
+  });
+});
+
+test('v2 rules are fixed and nested-frozen, while sourceGenome and generation cannot cross manifest versions', async () => {
+  for (const value of [WORKING_NATIVE_SOURCE_ADMISSION, WORKING_NATIVE_SOURCE_ADMISSION.adapter,
+    WORKING_NATIVE_SOURCE_ADMISSION.clocks, WORKING_NATIVE_SOURCE_ADMISSION.acquisitions,
+    WORKING_NATIVE_SOURCE_ADMISSION.comparedFields]) assert.equal(Object.isFrozen(value), true);
+  assert.throws(() => { WORKING_NATIVE_SOURCE_ADMISSION.absoluteScoreTolerance = 1; }, TypeError);
+  assert.throws(() => { WORKING_NATIVE_SOURCE_ADMISSION.acquisitions.push('EXPLICIT_CANONICAL'); }, TypeError);
+  for (const value of [nativeManifest({ entries: [entry()] }), manifest({ entries: [nativeEntry()] }),
+    nativeManifest({ nativeSourceAdmission: { absoluteScoreTolerance: 1 } })]) {
+    await assert.rejects(buildWorkingReport(value), { code: 'MANIFEST_INVALID' });
+  }
+  const old = entry(); old.planSnapshot.sourceGenome = nativeEntry().planSnapshot.sourceGenome;
+  await assert.rejects(buildWorkingReport(nativeManifest({ entries: [old] })), { code: 'SNAPSHOT_REJECTED' });
+});
+
+test('v2 catalogue acquisition preserves its declared seen prefix and maps reordered aliases over the complete OFF pool', async () => {
+  const item = nativeEntry(), snapshot = item.planSnapshot, source = snapshot.sourceRun, state = source.state_snapshot;
+  source.policy_version = source.policy_version.replace('+personal-working', '+catalog-chain-v1+personal-working');
+  Object.assign(state.candidateRequest, { acquisition: 'CATALOG_CHAIN', seenItemIds: [id(999)], reminderSpent: true });
+  state.predictionInput.candidateAcquisition = 'CATALOG_CHAIN';
+  for (const candidate of snapshot.sourceCandidates) {
+    candidate.explanation.policyVersion = source.policy_version;
+    Object.assign(candidate.explanation.candidatePool, { catalogChainVersion: 'catalog-chain-v1', seenCount: 1,
+      reminderPreviouslyDelivered: true, seenPrefixHash: '0'.repeat(32) });
+  }
+  for (const comparison of snapshot.comparisons) comparison.result.sourcePolicyVersion = source.policy_version;
+  snapshot.sourceCandidates.reverse(); snapshot.references.objects.reverse();
+  snapshot.comparisons.reverse();
+  for (const comparison of snapshot.comparisons) comparison.result.candidates.reverse();
+  const report = await buildWorkingReport(nativeManifest({ entries: [item] }));
+  assert.equal(report.nativeSourceAdmission.sources[0].acquisition, 'CATALOG_CHAIN');
+  assert.equal(report.nativeSourceAdmission.sources[0].comparedCandidates, 6);
+  assert.equal(report.nativeSourceAdmission.sources[0].maxAbsoluteScoreDifference, 0);
+  assert.equal(report.result.plannedPairUnits, 2); assert.equal(report.observedEvidencePairUnits, 0);
+});
+
+test('v2 native admission retains missing, immature, unknown and tied label coverage', async () => {
+  for (const variant of ['missing', 'incomplete', 'future', 'unknown', 'tie']) {
+    const item = nativeEntry();
+    if (variant === 'missing') item.outcomeSnapshot = null;
+    if (variant === 'incomplete') item.outcomeSnapshot.capture.complete = false;
+    if (variant === 'future') item.outcomeSnapshot.capture.capturedAt = 650;
+    if (variant === 'unknown') Object.assign(item.outcomeSnapshot.capture.labels[0], { status: 'unknown', rating: null });
+    if (variant === 'tie') item.outcomeSnapshot.capture.labels[1].rating = 0;
+    const report = await buildWorkingReport(nativeManifest({ entries: [item] }));
+    assert.equal(report.nativeSourceAdmission.sources[0].comparedCandidates, 6);
+    assert.equal(report.result.plannedPairUnits, 2); assert.equal(report.result.comparablePairUnits, 0);
+    assert.equal(report.result.unscoredPairUnits, 2); assert.equal(report.observedEvidencePairUnits, 0);
+    const reason = { missing: 'malformed-capture', incomplete: 'incomplete-capture', future: 'capture-unavailable',
+      unknown: 'unknown-label', tie: 'all-tied' }[variant];
+    assert.equal(report.result.reports[0].pairs[0].reasons.includes(reason), true);
+  }
+});
+
+test('v2 rejects unsupported envelopes, clocks, genome bindings and malformed native rows before reporting', async () => {
+  const mutations = [
+    snapshot => { delete snapshot.sourceRun.state_snapshot.candidateRequest; },
+    snapshot => { delete snapshot.sourceRun.state_snapshot.predictionInput; },
+    snapshot => { snapshot.sourceRun.state_snapshot.candidateRequest.version = 'native-candidate-request-v2'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.version = 'native-prediction-clocks-v2'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.candidateRequest.intent = 'EVALUATION'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.candidateRequest.acquisition = 'EXPLICIT_CANONICAL'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.candidateRequest.requiredAfter = '1970-01-01T00:00:00Z'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.memoryStateAsOf = 91; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.nativeEvidenceAsOf = 121; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.requestAsOf = 121; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.workingStateAsOf = 100.001; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.eligibilityClock = 'TRANSACTION_START'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.commitVisibility = 'KNOWN'; },
+    snapshot => { snapshot.sourceRun.state_snapshot.predictionInput.historicalReconstruction = 'AVAILABLE'; },
+    snapshot => { snapshot.sourceGenome = null; },
+    snapshot => { snapshot.sourceGenome.id = id(999); },
+    snapshot => { snapshot.sourceGenome.created_at = 121; },
+    snapshot => { snapshot.sourceGenome.feature_version = 'prediction-features-v2'; },
+    snapshot => { snapshot.sourceCandidates[0].explanation.scalarGenome.genomeId = id(999); },
+    snapshot => { snapshot.sourceCandidates[0].explanation.scoringFeatures.nativeEvidenceAsOf = 91; },
+    snapshot => { snapshot.sourceCandidates[0].explanation.candidatePool.eligibilityAt = 119; },
+    snapshot => { snapshot.sourceCandidates[0].source_rank = 2; snapshot.sourceCandidates[1].source_rank = 1; },
+    snapshot => { snapshot.sourceCandidates[0].confidence = 2; },
+    snapshot => {
+      snapshot.sourceRun.policy_version += '+frozen-page-v1';
+      for (const candidate of snapshot.sourceCandidates) candidate.explanation.policyVersion = snapshot.sourceRun.policy_version;
+      for (const comparison of snapshot.comparisons) comparison.result.sourcePolicyVersion = snapshot.sourceRun.policy_version;
+    },
+  ];
+  for (const [index, mutate] of mutations.entries()) {
+    const value = nativeManifest({ entries: [nativeEntry()] }); mutate(value.entries[0].planSnapshot);
+    await assert.rejects(buildWorkingReport(value), { code: 'SNAPSHOT_REJECTED' }, `mutation ${index}`);
+  }
+  await workspace(async directory => {
+    const value = nativeManifest({ entries: [nativeEntry()] }); value.entries[0].planSnapshot.sourceGenome.id = id(999);
+    const input = join(directory, 'input.json'), output = join(directory, 'report.json');
+    await writeFile(input, JSON.stringify(value)); failure(command(input, output), 'SNAPSHOT_REJECTED'); await absent(output);
+  });
+});
+
+test('v2 preserves exact OFF checks even inside numeric tolerance and covers unselected, suppressed and unpaired rows', async () => {
+  const mutations = [
+    pool => { pool[0].score += 5e-13; },
+    pool => { pool[4].score += 5e-13; },
+    pool => { pool[5].score += 5e-13; },
+    pool => { pool.pop(); },
+    pool => { pool.push({ ...pool[5], itemId: id(999), rank: 7 }); },
+    pool => { pool[5].itemId = id(999); },
+    pool => { pool[4].rank = 6; pool[5].rank = 5; },
+    pool => { pool[5].eligible = true; },
+    pool => { pool[5].tier = 0; },
+    pool => { pool[4].selected = true; },
+  ];
+  for (const mutate of mutations) {
+    const value = nativeManifest({ entries: [nativeEntry()] });
+    mutate(value.entries[0].planSnapshot.comparisons.find(comparison => comparison.control === 'OFF').result.candidates);
+    await assert.rejects(buildWorkingReport(value), { code: 'SNAPSHOT_REJECTED' });
+  }
+  const remapped = nativeEntry(); remapped.planSnapshot.references.objects[5].objectRef = remapped.planSnapshot.references.objects[4].objectRef;
+  await assert.rejects(buildWorkingReport(nativeManifest({ entries: [remapped] })), { code: 'ALIASES_INVALID' });
+});
+
+test('v2 binds repeated immutable genome identities across otherwise distinct sources', async () => {
+  const first = nativeEntry(), second = nativeEntry(1);
+  second.planSnapshot.sourceGenome = structuredClone(first.planSnapshot.sourceGenome);
+  second.planSnapshot.sourceRun.genome_id = first.planSnapshot.sourceGenome.id;
+  for (const candidate of second.planSnapshot.sourceCandidates) candidate.explanation.scalarGenome.genomeId = first.planSnapshot.sourceGenome.id;
+  const value = nativeManifest({ entries: [first, second] });
+  const report = await buildWorkingReport(value);
+  assert.equal(report.nativeSourceAdmission.sources.length, 2); assert.equal(report.result.plannedPairUnits, 4);
+  second.planSnapshot.sourceGenome.config.modeWeights.FOR_YOU.longTerm = 2;
+  await assert.rejects(buildWorkingReport(value), { code: 'SNAPSHOT_REJECTED' });
 });
 
 test('missing, incomplete, future, tied and unknown captures retain every native planned pair', async () => {
