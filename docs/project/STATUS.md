@@ -13,18 +13,50 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — native prediction adapter / Sprint 015, #302, #336
 
-Continue from the accepted implementation checkpoint
-`8d1a786389318dcf41804f5009a9271156d81e1d` ([#365](https://github.com/Kajooja/Kajo/pull/365)).
-The next bounded packet connects one real native prediction computation to the
-existing generic/Kajo adapter boundary with an executable conformance fixture.
-Consume the declared `candidateRequest` and `predictionInput` together with the
-actual frozen candidates, score and provenance. Keep comparisons scoped to the
-declared acquisition policy and verify exact identity/eligibility plus explicit
-numeric tolerances; differing Taste/Discovery pools are not same-input parity.
-Reuse the existing adapters and native fixtures rather than creating another
-scorer. The temporal evaluation runner and real #232F Shared prepared-input
-consumer remain required within Sprint 015. Neither installed forward below
-needs repeating, and accepted accounts/answers remain intact.
+Active source branch: `feat/native-prediction-adapter`, based on accepted main
+`fde781395e60cb926f46ce03c55b409715b2fb1d` ([#366](https://github.com/Kajooja/Kajo/pull/366)).
+The packet connects actual native frozen computation to the existing generic/Kajo
+adapter boundary with executable conformance against the native baseline shadow
+replay. The source PR owns its exact head and final CI receipt; this branch is not
+accepted main merely because this implementation note exists.
+
+The adapter consumes `candidateRequest`, `predictionInput`, the complete retained
+candidate pool, native ranking scores and provenance. Exact scope, policy,
+identity, eligibility, ordering and selection remain distinct from the declared
+numeric score tolerance. Synthetic SQL fixtures remain synthetic. Current-row
+catalogue edits cannot rewrite the frozen source or its baseline replay. Copied
+protocol-2 continuation snapshots are outside this fresh-run adapter; delivery
+selection is not exposure, and a scalar ranking score is not an expected rating.
+
+The shared verifier is consumed by both the local full-schema test and the native
+PostgreSQL CLI installation gate. Existing SQL, serving policy and migration
+history are unchanged; this packet requires no hosted migration or account reset.
+
+**Local validation:** independent review passed, including 15 focused package
+tests and the full-schema conformance fixture: six cases, 69 retained candidates,
+37 nonzero Scenario contributions and maximum score difference zero under the
+predeclared `1e-12` tolerance. Four delivery cases execute the actual baseline
+shadow worker; two explicit evaluation cases use the existing frozen score helper.
+Metadata/input mutation controls fail, copied continuations are rejected, and
+all canonical tables remain unchanged after rollback. All 361 database and 326
+engine tests pass, with lint/types, 904 mobile, 50 dependency, 451 catalogue,
+62 research and 11 acceptance tests and four explicit-demo Hermes exports.
+`npm run check` reaches the unchanged Deno npm-registry connection refusal;
+no complete local root-check pass is claimed. Initial native CI exposed rounded
+caller serialization of microsecond Working clocks. The fixture now pins
+round-trip precision locally; a full-schema microsecond regression verifies both
+acceptance and rejection of rounded captures and restores the caller setting.
+The strict adapter is unchanged. Admission requires precision-preserving captures
+and lossless numeric export; unsupported old records are never rewritten.
+Final-source CI is pending.
+
+After source acceptance, continue a bounded Personal temporal evaluation
+manifest/report runner using these frozen inputs, with declared windows,
+denominators, exclusions and honest prefix/exposure/label-availability limits.
+Keep ordinal ranking diagnostics separate from future grade-error evaluation.
+Full four-consumer same-pool parity and
+the real #232F Shared prepared-input consumer remain required within Sprint 015.
+Neither installed forward below needs repeating.
 
 ## Accepted native candidate request — #365
 

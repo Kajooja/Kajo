@@ -15,6 +15,14 @@
       "types": "./dist/adapters/kajo.d.ts",
       "import": "./dist/adapters/kajo.js"
     },
+    "./ranking-conformance": {
+      "types": "./dist/ranking-conformance.d.ts",
+      "import": "./dist/ranking-conformance.js"
+    },
+    "./adapters/kajo-native-prediction": {
+      "types": "./dist/adapters/kajo-native-prediction.d.ts",
+      "import": "./dist/adapters/kajo-native-prediction.js"
+    },
     "./adapters/movielens": {
       "types": "./dist/adapters/movielens.d.ts",
       "import": "./dist/adapters/movielens.js"

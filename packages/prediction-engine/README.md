@@ -34,6 +34,8 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | Root `compare` | Error against the original forecast for the matching subject/object/target and actual action where required, within the declared horizon and observation cutoff |
 | Root `learn` | A new local derived Scenario from eligible evidence, or null; no source mutation, model training or write side effect |
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
+| `./ranking-conformance` | Compare complete frozen ranking snapshots with exact scope, policy, candidate identity and eligibility, and an explicit scalar tolerance; no scoring or outcome evaluation |
+| `./adapters/kajo-native-prediction` | Normalize actual private native run/candidate snapshots through the existing Kajo scope adapter; preserve declared candidate acquisition and input clocks; ranking scores remain uncalibrated |
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
 | `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
 | `./working-evaluation` | Pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`, `evaluateWorkingPlan` and `evaluateWorkingBatch`; conditional OFF-exposed pairwise comparison, planned coverage and Item weight concentration; no capture writer or admission |
@@ -49,6 +51,25 @@ authorization. Features are allowlisted/versioned inputs, not provider requests.
 The fixture maintenance adapter supplies machine/configuration/energy semantics.
 Target-specific rewards and hard constraints stay in the adapters; the reference
 policy uses the target's maximize/minimize direction.
+
+The native ranking conformance boundary consumes frozen `candidateRequest` and
+`predictionInput` together with the complete candidate trace. It does not map
+native ranking scores to the E1 rating estimator's `Estimate`, invent feature
+availability, or recompute the SQL scorer in TypeScript. The database fixture
+compares four delivery sources with the existing baseline shadow worker on the
+same frozen pools; two explicit evaluation cases use the existing frozen score
+helper and preserve non-delivery. The same JavaScript verifier runs in the native
+PostgreSQL CLI gate.
+Admission requires precision-preserving captures and lossless numeric export.
+Rounded legacy Working `asOf` values that disagree with their exact cutoff are
+rejected; the adapter never repairs them or grants clock tolerance. The fixture
+scopes `extra_float_digits=3` to its rollback transaction, matching existing
+precision-pinned page writers, and tests rejection under rounded serialization.
+Changing current catalogue rows must not change that replay. Delivery selection
+and hypothetical shadow selection never establish an impression or an outcome.
+Protocol-2 frozen continuation pages require a separate source-clock mapping and
+are rejected by this bounded adapter. See the canonical
+[native boundary](../../docs/domain/PREDICTION_MODEL.md#native-ranking-adapter-and-conformance--sprint-015).
 
 ## Time, evidence and uncertainty
 

@@ -298,6 +298,15 @@ All complete-capability checkboxes remain open. Existing foundations are reused,
 
 **Next bounded slice:** inventory one real native prediction cycle against E1 contracts. Record which state, candidate, eligibility, version, exposure and outcome fields have exact mappings and which are unavailable. Capture privacy-safe deterministic parity fixtures from the accepted semantics; synthetic fixtures must stay labeled synthetic. Do not copy live histories into Git.
 
+The Sprint 015 native adapter source packet supplies the bounded frozen-ranking
+mapping and executable native baseline replay comparison described in
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#native-ranking-adapter-and-conformance--sprint-015).
+It reuses the existing Kajo scope adapter while keeping native ranking scores
+separate from E1 rating estimates. State reconstruction, certified committed
+prefixes, real exposure/outcome reconciliation and full four-consumer parity are
+not supplied by that mapping. STATUS records source/CI acceptance; this does not
+close EB-01 or activate another serving implementation.
+
 **Exit evidence:** the mapped cycle preserves Profile-as-Subject versus acting User, Personal/Shared scope, event occurrence/availability, candidate/slate order, frozen versions, late outcomes, idempotency and rollback. Extract one computation behind the current server boundary only after a same-input parity comparison; avoid a second drifting whole-scorer implementation. The eventual reusable integration must be exercised through the native boundary and another adapter, not merely imported into an unused package. Runtime acceptance and the E1 contract acceptance remain distinct.
 
 An optional externally trained prior is not a prerequisite for this core extraction. Conversely, rejecting that prior does not complete or cancel native-core integration. Full extraction is not silently added to MVP when existing requirements can be satisfied safely by the accepted SQL boundary.

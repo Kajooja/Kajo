@@ -26,6 +26,24 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native ranking adapter and conformance — Sprint 015
+
+`packages/prediction-engine/src/ranking-conformance.ts` compares complete frozen
+ranking snapshots without recomputing scores. The separate
+`src/adapters/kajo-native-prediction.ts` consumes actual private PredictionRun and
+candidate rows, reuses `createKajoAdapter` for Profile/actor scope, and validates
+the frozen candidate request, input clocks and candidate provenance. Native
+ranking scores remain distinct from the reference estimator's rating target.
+The package tests and built ESM export checks keep these optional boundaries
+independent of application/provider code and the root estimator import graph.
+
+`scripts/database/native-prediction-adapter.{mjs,test.mjs}` exercises actual
+native scoring and baseline frozen shadow replay using the existing fixtures.
+The shared JavaScript verifier also runs in the Supabase CLI installation gate,
+so native PostgreSQL output reaches the same adapter and comparison code.
+Fixtures and snapshots are disposable; this packet changes no SQL, serving
+policy, public API, existing forecast, account or hosted migration.
+
 ## Native candidate request — Sprint 015
 
 `20261026073031_native_candidate_request_contract.sql` extracts the existing
