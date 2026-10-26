@@ -372,7 +372,8 @@ test('shared native acquisition preserves the populated V4/Discovery predecessor
     assert.ok(index > 0);
     for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
     const exec = async sql => {
-      try { return (await db.exec(sql)).flatMap(r => r.rows.map(row => Object.values(row)[0])); }
+      // Match psql's omitted blank SQL-NULL row as well as its JSON values.
+      try { return (await db.exec(sql)).flatMap(r => r.rows.map(row => Object.values(row)[0])).filter(value => value !== null); }
       catch (error) { await db.exec('rollback;'); t.diagnostic(JSON.stringify({ message: error.message, code: error.code, detail: error.detail, where: error.where })); throw error; }
     };
     const previous = (await db.query(`select oid::regprocedure::text signature,prosrc,pg_get_functiondef(oid) definition

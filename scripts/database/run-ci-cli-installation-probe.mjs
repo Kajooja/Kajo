@@ -89,6 +89,16 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    // Check the new populated forward/current paths before rehearsing older
+    // generations, so a new native-only failure is reported promptly.
+    const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
+    assert.ok(acquisitionIndex > 0);
+    await resetFromMigrations(files.slice(0, acquisitionIndex));
+    const nativeAcquisitionUpgrade = await verifyNativeAcquisitionUpgrade(execConcurrentSql, files[acquisitionIndex]);
+    assert.equal(nativeAcquisitionUpgrade.status, 'PASS');
+    const [nativeAcquisition] = await exec(await nativeAcquisitionSmokeSql(),
+      { stage: 'native-shared-acquisition-current-consumers', timeoutMs: 120_000 });
+    assert.equal(nativeAcquisition?.nativeAcquisition.status, 'PASS');
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
     assert.ok(actionIndex > 0);
     await resetFromMigrations(files.slice(0, actionIndex));
@@ -283,11 +293,6 @@ try {
     await resetFromMigrations(files.slice(0, tastePoolIndex));
     const personalTastePoolUpgrade = await verifyPersonalTastePoolUpgrade(execConcurrentSql, files[tastePoolIndex]);
     assert.equal(personalTastePoolUpgrade.status, 'PASS');
-    const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
-    assert.ok(acquisitionIndex > tastePoolIndex);
-    await resetFromMigrations(files.slice(0, acquisitionIndex));
-    const nativeAcquisitionUpgrade = await verifyNativeAcquisitionUpgrade(execConcurrentSql, files[acquisitionIndex]);
-    assert.equal(nativeAcquisitionUpgrade.status, 'PASS');
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -386,9 +391,6 @@ try {
     const [nativeCandidateRequest] = await exec(await nativeCandidateRequestSmokeSql(),
       { stage: 'native-candidate-request-contract-parity-and-rejection', timeoutMs: 120_000 });
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
-    const [nativeAcquisition] = await exec(await nativeAcquisitionSmokeSql(),
-      { stage: 'native-shared-acquisition-current-consumers', timeoutMs: 120_000 });
-    assert.equal(nativeAcquisition?.nativeAcquisition.status, 'PASS');
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
     const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);

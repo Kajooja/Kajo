@@ -99,7 +99,9 @@ export async function verifyNativeAcquisitionUpgrade(execSql, migration) {
   let snapshots, original, failure, fixture = false;
   try {
     assert.match(migration.name, /_shared_native_candidate_acquisition\.sql$/);
-    assert.equal(await one("select to_jsonb(to_regprocedure('private.acquire_native_candidates_v1(jsonb)'));", 'predecessor'), null);
+    // psql emits a blank row for SQL NULL, which the shared CLI transport omits.
+    // Assert a JSON boolean so both native psql and PGlite prove actual absence.
+    assert.equal(await one("select to_jsonb(to_regprocedure('private.acquire_native_candidates_v1(jsonb)') is null);", 'predecessor'), true);
     const tables = await one(`select jsonb_agg(format('%I.%I',n.nspname,c.relname) order by n.nspname,c.relname)
       from pg_class c join pg_namespace n on n.oid=c.relnamespace
       where c.relkind='r' and n.nspname in('public','private','auth');`, 'tables');
