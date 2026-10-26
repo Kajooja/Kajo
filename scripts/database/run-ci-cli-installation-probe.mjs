@@ -45,6 +45,7 @@ import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
+import { nativeCandidateRequestSmokeSql } from './native-candidate-request.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -376,6 +377,9 @@ try {
     const [sharedPredictionCutoff] = await exec(await sharedPredictionCutoffSmokeSql(),
       { stage: 'shared-prediction-cutoff-native-parity-frozen-input', timeoutMs: 120_000 });
     assert.match(sharedPredictionCutoff?.sharedPredictionCutoff, /^PASS:/);
+    const [nativeCandidateRequest] = await exec(await nativeCandidateRequestSmokeSql(),
+      { stage: 'native-candidate-request-contract-parity-and-rejection', timeoutMs: 120_000 });
+    assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
@@ -442,7 +446,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
