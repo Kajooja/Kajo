@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, five bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, five bounded source packets accepted; all three SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,33 +11,77 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — guarded frozen FINAL input rollout / Sprint 015, #302, #336
+## Current handoff — actual Taste consumer conformance / Sprint 015, #302, #336
 
-Continue from accepted [PR #371](https://github.com/Kajooja/Kajo/pull/371),
-merge `118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. Prepare and execute the preservation-checked
-hosted rollout of **only** `20261026130243_frozen_final_scoring_input.sql`.
-The reviewed SQL SHA-256 is
-`b4a81e386c6b9222df05d9645d7607f9132566c5e9da73a797b705bc7cc41f44`.
-The computation-cutoff and candidate-request forwards below are already installed;
-do not repeat them or reset accepted accounts, answers or pending commands.
+Continue from the five accepted source packets and three verified SQL forwards
+below. The next bounded source packet extends the existing native adapter fixture
+through the **actual V4 sequential Taste START/NEXT/ANSWER/NEXT path**, including
+its retained pool and acknowledged receipt, alongside current Discovery,
+explicit evaluation and frozen baseline replay. Reuse
+`scripts/database/native-prediction-adapter.{mjs,test.mjs}` and the existing
+`personal-taste-pool-native.mjs` / pool-refresh fixtures; do not add a parallel
+scorer or evaluation runner.
 
-First reconcile fresh provider history, exact four predecessor bodies, function
-ownership/security/configuration/ACLs and default privileges against the accepted
-source. Capture fixed existing run/candidate/receipt/shadow/Working rows and all
-existing function identities/metadata; detect unexpected drift before applying.
-Use the supported migration transaction with the unchanged reviewed SQL. Preserve
-the provider-issued history timestamp. Verify stored SQL bytes, the four changed
-bodies and three new owner-only helpers, unchanged unrelated bodies/metadata and
-all captured immutable records afterward. Keep private record identities and
-environment details outside public Git. Any mismatch blocks that rollout.
+Capture complete native request and FINAL inputs from those real owners. Pin
+Profile/actor, domain/mode/session, acquisition/intent, candidate IDs, declared
+clocks, source genome and policy; compare exact identity, eligibility and retained
+selection with the existing `1e-12` score tolerance only where the declared
+inputs are equivalent. Exercise low/high committed answers, unchanged old
+forecasts and other-Profile isolation. Run the shared verifier in both local
+SQL tests and the native PostgreSQL gate. Extend the existing conformance result
+with explicit non-comparable acquisition/selection cases and the exact remaining
+candidate-service dependency; V4 recognition, delivery and evaluation policies
+must not be silently relabeled identical. This packet exercises the missing
+current Taste consumer; it does not authorize changing retained policies or
+certifying a historical/committed database snapshot through a fixture.
 
-A READ ONLY postcheck may verify contract installation and count naturally created
-marked runs. Do not manufacture user answers or forecasts to claim observed
-consumption. Record installation and actual consumer observation separately;
-unknown observations stay unknown. Full four-consumer same-pool parity, certified
-prefix/historical availability, the real #232F Shared prepared-input consumer,
-native/hosted performance, predictive quality and Sprint 015 acceptance remain
-open. This is the one next bounded packet, not another model activation.
+The installed SQL is complete for its accepted scope; do not repeat migrations,
+reset accounts/answers/commands, or manufacture hosted observations. Full
+four-consumer same-pool serving, certified prefix/historical availability, the
+real #232F Shared prepared-input consumer, native/hosted performance, predictive
+quality and Sprint 015 acceptance remain open. Those remain separate successors,
+not additional active packets or evidence that this sprint has closed.
+
+## Hosted frozen FINAL input receipt — 2026-10-26
+
+The owner-authorized rollout installed only
+`20261026130243_frozen_final_scoring_input.sql`, accepted through
+[PR #371](https://github.com/Kajooja/Kajo/pull/371), source merge
+`118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. Provider history records it as
+`20261026151042_frozen_final_scoring_input`; the provider-issued timestamp is
+retained. Its one stored SQL statement matches the reviewed file byte for byte:
+SHA-256 `b4a81e386c6b9222df05d9645d7607f9132566c5e9da73a797b705bc7cc41f44`.
+
+Fresh READ ONLY preflight matched all 264 existing public/private function
+identities, bodies and metadata, 24 default-privilege records and 90 migration
+history records against the preceding verified hosted receipt. The four
+predecessors also passed the accepted body/security/configuration guards; none
+of the three new helper names existed. The unchanged migration was then applied
+through the supported migration transaction.
+
+READ ONLY postchecks verified the exact four patched bodies and three new
+owner-only INVOKER helper bodies/configurations. All 264 existing function
+identities and metadata, including ACLs, remained unchanged; the 260 unrelated
+bodies and all 24 default-privilege records were identical. Existing API access
+did not expand. The 90 preceding history records retained their complete-row
+digests, with exactly one new migration. Security-advisor findings were unchanged.
+
+All **6465 fixed existing rows** captured across the 67 public/private tables
+retained their full-row digests and identities, with zero missing/changed rows
+and zero additional rows at the postcheck. This includes 49 PredictionRuns,
+2386 candidates and the four stored page receipt/catalogue-page records, as well
+as existing account/Profile, event, source, policy, command and pool records.
+Empty shadow/Working tables are recorded as empty, not exercised consumers.
+Private row identities, snapshots and environment details remain outside Git.
+The new source validator returned the historical unmarked result for all 49 old
+runs without rewriting or backfilling them.
+
+Installation and observation remain separate: the postcheck found **zero**
+naturally created FINAL-input runs, including zero `FRESH_FINAL` and zero
+`FROZEN_PAGE_REUSE` runs. No user answer, forecast or replay job was created for
+this receipt. The accepted source tests/CI below prove mechanics; this rollout
+proves installation and preservation, not observed fresh serving, performance,
+predictive quality, a model activation or sprint acceptance.
 
 ## Accepted frozen FINAL scoring input — #371
 
@@ -96,9 +140,10 @@ and score arithmetic were unchanged by these test corrections. Full final-source
 checks above supersede the earlier attempts; the obsolete stalled #753 run was
 cancelled rather than accepted.
 
-This accepts the bounded source contract, not hosted installation, observed
-consumer behavior, performance, predictive quality or sprint close. No production
-migration, account reset or serving-model activation was performed in this packet.
+The source packet accepted the bounded contract and performed no hosted
+migration, account reset or serving-model activation. Its later guarded hosted
+installation is recorded separately above; fresh consumer observation,
+performance, predictive quality and sprint close remain open.
 
 ## Accepted native admission in Personal temporal reports — #369
 
