@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, five bounded source packets accepted; all three SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, six bounded source packets accepted; all three SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,54 +11,89 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — actual Taste consumer conformance / Sprint 015, #302, #336
+## Current handoff — shared candidate acquisition / Sprint 015, #302, #336
 
-The sixth bounded source candidate is on
-`test/native-taste-consumer-conformance`. Complete its final-source CI and source
-acceptance; the five accepted packets and three verified SQL forwards below
-remain the accepted baseline. The existing native adapter fixture now exercises
-the **actual V4 sequential Taste START/NEXT/ANSWER/NEXT path**, retained pool and
-acknowledged receipt, alongside the current Discovery RPC, independent explicit
-evaluation and frozen baseline replay. No scorer, runner or runtime policy changes
-belong to this packet.
+Continue from the six accepted source packets and three verified SQL forwards
+below. The next bounded source packet implements the **versioned shared
+candidate-acquisition contract and native owner** still missing between actual
+Taste and Discovery. Start from `private.taste_candidate_catalog_v4`,
+`private.rank_items_request_base_v1` and the consumed native candidate request
+contract; reuse their scorer and current adapter/conformance fixture.
 
-The candidate has seven real command-path captures and seven independent
-same-transaction/pool evaluations. Validated Prediction/Working capture
-self-references are rebound only in comparison copies; full actual scope,
-request/FINAL inputs, clocks, genome and exact eligibility/rank/selection remain
-checked. Local conformance reports **1095 candidate comparisons** (not unique
-Items), zero maximum score difference at `1e-12`, exact retries, 21 preserved
-sources and canonical full-row cleanup. Separately committed **0/5/10** answers
-distinguish 45 common Taste and 14 common Discovery candidates, with unchanged
-old forecasts and both retained and fresh other-Profile controls.
+Declare Profile/actor, domain/mode/session, committed receipt/prefix, acquisition
+policy, recognition constraints, seen/suppressed Items, source availability and
+request/eligibility clocks. Equal declared acquisition inputs must yield the same
+complete eligible candidate set before explicit question/delivery/evaluation
+selection. Keep unlike recognition and catalogue policies visible; do not turn
+the seven current non-comparable cases into a pass by relabeling their inputs.
+Consume the common owner through versioned native paths, not a disconnected
+helper or another scorer.
 
-All seven cases explicitly distinguish V4 recognition acquisition from Discovery
-catalogue acquisition: 25 retained MOVIE candidates versus 15 Discovery
-candidates, including one outside the Taste pool. Pool/domain, intent/selection,
-eligibility-clock and policy differences are not relabeled as same inputs.
-The shared verifier is wired into the existing native PostgreSQL CLI gate;
-native results and final-source CI remain pending in this source candidate.
-Local validation passes 370 database, 329 engine, 72 research and 11 acceptance
-tests. Root check passed lint/types, 50 dependency, 904 mobile and 451 catalogue
-tests before the existing Deno registry connection refusal; four explicit-demo
-Hermes exports also pass. No aggregate local pass is claimed. Synthetic source
-conformance establishes no device result,
-historical availability or predictive quality.
-
-After source acceptance, the next bounded packet must supply the **versioned
-shared candidate-acquisition contract and native owner** missing from these real
-consumer paths. Reuse the existing request/scoring core, keep recognition
-constraints and delivery/evaluation selection explicit, and preserve retained
-V4/Discovery policies, pools, commands and historical sources. Extend this same
-verifier to prove equal acquisition inputs produce equal eligible candidates;
-do not add another scorer or force unlike policies into an artificial parity pass.
+Preserve retained V4/Discovery policies, panels, catalogue chains, pages, commands,
+forecasts and historical replay. Extend the existing candidate-request and actual
+Taste consumer fixtures with populated-upgrade preservation and same-input pool
+checks in both PGlite and native PostgreSQL. Any serving-policy change needs an
+explicit version and its own acceptance evidence; this handoff does not authorize
+rewriting already retained policies or certifying historical state from a fixture.
 
 The installed SQL is complete for its accepted scope; do not repeat migrations,
 reset accounts/answers/commands, or manufacture hosted observations. Full
 four-consumer same-pool serving, certified prefix/historical availability, the
 real #232F Shared prepared-input consumer, native/hosted performance, predictive
-quality and Sprint 015 acceptance remain open. Those remain separate successors,
+quality and Sprint 015 acceptance remain open. These are separate successors,
 not additional active packets or evidence that this sprint has closed.
+
+## Accepted actual V4 Taste consumer conformance — #374
+
+The sixth bounded source packet is accepted through
+[PR #374](https://github.com/Kajooja/Kajo/pull/374), merge
+`96fcaf07e54fe3249c8b5bb570d4b9fefbfedf39`. It extends the existing native adapter fixture
+through actual separately committed V4 START/NEXT/ANSWER/NEXT commands, retained
+pools and acknowledged receipts, current authenticated Discovery, independent
+explicit evaluation and frozen baseline replay. No new scorer, runner, runtime
+policy, migration or hosted write belongs to this packet.
+
+Seven command-path captures and seven independent same-transaction/pool
+evaluations compare complete request/FINAL inputs, actual scope, clocks, immutable
+genome and exact eligibility/rank/selection at `1e-12` absolute score tolerance.
+Only validated Prediction/Working capture self-references are rebound in
+comparison copies; persisted inputs and source records remain untouched.
+
+Local and native PostgreSQL reports agree: **1095 candidate comparisons** (not
+unique Items), **zero** maximum score difference, exact retries, **21** unchanged
+sources and canonical full-row cleanup with precision-preserving serialization.
+Committed **0/5/10** answers distinguish all 45 common Taste and 14 common
+Discovery candidates. Old forecasts and another Profile's retained and fresh
+forecasts remain unchanged. The prior six-case replay proof also retains 69
+candidate comparisons, 37 nonzero Scenario contributions and zero score
+difference, with rollback cleanup.
+
+All seven cases explicitly retain the acquisition boundary: V4 has 25 MOVIE
+candidates while Discovery has 15, including one outside the Taste pool. Pool,
+domain, intent/selection, eligibility clock and policy differences remain
+`NOT_COMPARABLE_AS_SAME_INPUT`. This proves the current Taste consumer's input
+conformance; it does not claim four-consumer same-pool serving, historical
+reconstruction, device acceptance or predictive quality.
+
+**Source / CI:** all five required final-source gates passed in
+[CI #762](https://github.com/Kajooja/Kajo/actions/runs/40359790273), attempt 1,
+on `ee80fb9bd00aa9d147786bea7d52c83950a7583f`. The tested PR merge ref
+`5034aeab6079cb450cf9be87e6215e23eab6511e`, source and accepted merge preserve
+tree `b4f52bb2bd4f63f6986d0a1b01ec6ca1950315f5`. The downloaded native CLI report
+was independently checked; SHA-256
+`7c9d5ab7019e2318ac6934c902fe0d4fc590c540d3c6fb39340d9ace7d470023`.
+
+**Validation:** all 370 database, 329 engine, 72 research, 904 mobile,
+50 dependency, 451 catalogue and 11 acceptance tests pass, with lint/types,
+ESM/import-graph checks and four explicit-demo local Hermes exports. Final-source
+CI additionally passes all 32 Edge tests and its four configured exports.
+Local root check retains the Deno registry connection refusal; no complete local
+aggregate pass is claimed. The final precision-only fixture refinement passed
+the focused tests and complete 370-test database suite before the final CI receipt.
+
+The bounded source acceptance changes no hosted installation or serving model.
+All three earlier SQL forwards remain installed; their preservation receipts and
+unobserved runtime/quality gates below remain unchanged.
 
 ## Hosted frozen FINAL input receipt — 2026-10-26
 
