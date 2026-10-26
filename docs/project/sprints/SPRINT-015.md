@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — explicit native candidate request source packet**
+Status: **IN PROGRESS — two bounded source packets accepted and installed; native adapter/evaluation open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -97,8 +97,9 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- Active second source packet: `feat/native-candidate-request-contract`, based
-  on accepted main #364. `20261026073031_native_candidate_request_contract.sql`
+- Second source packet: accepted through [PR #365](https://github.com/Kajooja/Kajo/pull/365),
+  merge `8d1a786389318dcf41804f5009a9271156d81e1d`.
+  `20261026073031_native_candidate_request_contract.sql`
   moves the existing base/scalar/identity scorer behind one strict versioned
   candidate request, retaining old signatures as adapters. It separates existing
   acquisition policies from delivery/evaluation intent and rejects unsupported
@@ -107,13 +108,22 @@ does not become an invented pass.
   existing policies, valid scores, rows and exact replies remain intact.
   Independent review and all 360 database tests pass, including the populated
   54-case parity matrix, seven-function source/security guards and unchanged
-  catalogue continuation/boundary smoke. Existing request owners enter the new
-  identity core directly to preserve serving call depth. Lint/types, other local
+  catalogue continuation/boundary smoke. Four request owners enter the new
+  identity core directly to preserve their scoring call depth. Lint/types, other local
   test suites and four demo exports pass; the local aggregate check still stops
-  at the unchanged Deno registry connection refusal. All five final-source CI
-  gates, including native PostgreSQL, remain pending; this forward is not installed
-  in the hosted service. Full same-pool
-  parity, the native adapter and temporal evaluation runner remain open.
+  at the unchanged Deno registry connection refusal. All five final-source gates
+  passed in [CI #739](https://github.com/Kajooja/Kajo/actions/runs/40292194348),
+  attempt 2, on `c38ec5cd49adfd9c243983d0bca892e1c7f33af3`; the merge preserves
+  reviewed tree `b5a501420d8eb2f0e36009c426385c8e1b500e3f`. The native CLI report
+  verifies the new request smoke, exact migration bytes/history, retained
+  post-lock skip/reset behavior and cleanup. This forward was installed on
+  2026-10-26 with identical stored SQL bytes. All 2439 fixed existing prediction,
+  candidate and page records, 89 prior history entries and existing function
+  metadata/default privileges were preserved. The pure READ ONLY validator probe
+  passed; fresh hosted consumption remains unobserved. [STATUS](../STATUS.md)
+  owns the detailed scoped receipt and next native adapter/conformance packet.
+  Full same-pool parity, certified committed-prefix/historical reconstruction,
+  the native temporal evaluation runner and #232F remain open.
 - First source packet: accepted through [PR #363](https://github.com/Kajooja/Kajo/pull/363),
   merge `feae2b17251d8d233e1925c66664d114b50fa341`.
   `20261025211014_shared_prediction_cutoff.sql` aligns existing
