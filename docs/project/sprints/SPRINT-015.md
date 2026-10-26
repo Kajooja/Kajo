@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — five source packets accepted; three SQL forwards installed; current Taste consumer conformance and remaining acceptance open**
+Status: **IN PROGRESS — six source packets accepted; three SQL forwards installed; shared candidate acquisition and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet exercises the actual V4 sequential Taste consumer through the existing native adapter/conformance fixture; see [STATUS](../STATUS.md).
+The current bounded packet supplies the versioned shared candidate-acquisition owner consumed by native Taste and Discovery; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -97,20 +97,22 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Sixth source candidate: `test/native-taste-consumer-conformance` extends the
-  existing native adapter fixture through actual committed V4 commands, current
-  Discovery, independent same-input evaluation and frozen replay. Seven captures
-  yield 1095 candidate comparisons with zero score difference at `1e-12` locally;
+- Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
+  merge `96fcaf07e54fe3249c8b5bb570d4b9fefbfedf39`. Actual committed V4 commands,
+  current Discovery, independent same-input evaluation and frozen replay share
+  the existing native adapter verifier. Local and native PostgreSQL report seven
+  captures, 1095 candidate comparisons and zero score difference at `1e-12`;
   0/5/10 sensitivity, exact retries, 21 unchanged sources and retained/fresh
-  other-Profile controls pass with canonical cleanup. All 370 database, 329
-  engine, 72 research and 11 acceptance tests pass; root lint/types, dependency,
-  mobile and catalogue suites pass before the existing Deno registry refusal;
-  four explicit-demo Hermes exports also pass.
-  Native PostgreSQL and final-source CI remain pending. Actual recognition versus
-  catalogue acquisition, domain, clock and selection differences remain explicit;
-  the next source boundary is a versioned shared candidate-acquisition owner,
-  preserving retained policies and using the existing scorer. This test-only
-  candidate performs no SQL rollout, runtime activation or quality acceptance.
+  other-Profile controls pass with precision-preserving canonical cleanup.
+  All five final-source [CI #762](https://github.com/Kajooja/Kajo/actions/runs/40359790273)
+  gates passed on `ee80fb9bd00aa9d147786bea7d52c83950a7583f`, attempt 1,
+  tree `b4f52bb2bd4f63f6986d0a1b01ec6ca1950315f5`. The 370 database tests,
+  other suites and exports pass; CI also supplies all 32 Edge tests despite the
+  local registry refusal. STATUS owns exact source/native report receipts.
+  Recognition versus catalogue acquisition, domain, clocks and selection remain
+  explicitly non-comparable. The next packet supplies the versioned common
+  candidate-acquisition owner while preserving retained policies and the scorer.
+  This test/documentation packet performs no hosted rollout or quality acceptance.
 - Fifth source packet: accepted through [PR #371](https://github.com/Kajooja/Kajo/pull/371),
   merge `118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. One versioned FINAL input is prepared after
   Scenario enrichment and consumed by existing identity/shadow/Working owners
