@@ -37,8 +37,14 @@ research (72), acceptance (11), mobile (904), dependency (50) and catalogue
 (451) tests pass, as do lint/typecheck and all four explicit-demo Hermes exports.
 Root `npm run check` stops only at the Deno npm registry connection refusal;
 its Edge gate must pass in CI. Actual native lock-wait/late-commit verification
-and all five final-source CI gates remain pending. Continue those gates on this
-branch; do not publish a visibility claim based on PGlite alone.
+and all five final-source CI gates remain pending. [PR #379](https://github.com/Kajooja/Kajo/pull/379)
+is the active source. CI #773 passed validate (including all 32 Edge tests), both
+clean installs, platform and populated upgrade; the CLI probe passed the new
+forward/current receipt controls but stopped before concurrency because its
+phase label contained underscores. The fixture now normalizes only that log
+label to the runner's established format; database application names and gates
+are unchanged. Require all five gates on the corrected final head. Do not publish
+a visibility claim based on PGlite or the incomplete native attempt.
 
 Start from fresh main and audit the existing V4 command receipts/panel bindings,
 shared acquisition's exact receipt check, request/FINAL capture and native adapter

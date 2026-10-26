@@ -109,7 +109,10 @@ does not become an invented pass.
   four explicit-demo Hermes exports pass. Root check's Deno registry connection
   refusal remains for CI. Separate-connection PostgreSQL late-commit/duplicate
   tests join the early CLI gate; native evidence and all five final-source gates
-  are still pending.
+  are still pending. [PR #379](https://github.com/Kajooja/Kajo/pull/379) is active.
+  CI #773 passed four gates and native forward/current controls, but a test-stage
+  label mismatch stopped before concurrency. The logging label is corrected;
+  all five gates must pass on that corrected final source.
   The new forward is not hosted. [STATUS](../STATUS.md) owns the active source and
   acceptance receipt; no broader commit/history, policy or quality gate closes.
 

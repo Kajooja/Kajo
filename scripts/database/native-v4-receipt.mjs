@@ -15,7 +15,7 @@ const auth = `set local request.jwt.claim.sub='${actor}';`;
 // One disposable fixture is shared by local preservation/admission checks and
 // real PostgreSQL connections. Never run these mutating probes on hosted data.
 async function withFixture(execSql, run) {
-  const exec = (sql, stage) => execSql(sql, { stage: 'native-v4-receipt-' + stage, timeoutMs: 120_000 });
+  const exec = (sql, stage) => execSql(sql, { stage: 'native-v4-receipt-' + stage.replaceAll('_', '-'), timeoutMs: 120_000 });
   const one = async (sql, stage) => (await exec(sql, stage))[0];
   const tables = await one(`select jsonb_agg(format('%I.%I',n.nspname,c.relname) order by n.nspname,c.relname)
     from pg_class c join pg_namespace n on n.oid=c.relnamespace
