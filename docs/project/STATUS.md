@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, six bounded source packets accepted; all three SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, seven bounded source packets accepted; three SQL forwards installed, shared acquisition forward pending; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,34 +11,86 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — shared candidate acquisition / Sprint 015, #302, #336
+## Current handoff — guarded shared acquisition rollout / Sprint 015, #302, #336
 
-Active source candidate: `feat/shared-native-candidate-acquisition`, based on
-accepted #375 (`005228deabbfd80fdd037bf8b4151c4adb7a97d5`). Complete and validate
-this one packet before accepting or deploying it. Six source packets and three
-SQL forwards below remain the accepted baseline.
+Seven bounded source packets are accepted. The next single packet is the guarded
+hosted preservation rollout of `20261026172719_shared_native_candidate_acquisition.sql`
+from [PR #376](https://github.com/Kajooja/Kajo/pull/376), merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`.
+Its exact source SHA-256 is `a4b3cf0a05abb82e892c4c0b21337f15677ca680ef70b987731fe5c14284ed6e`.
+The three earlier SQL forwards below remain installed; this fourth forward is
+**not yet installed**. No hosted data or natural observations were changed by
+the source packet.
 
-`20261026172719_shared_native_candidate_acquisition.sql` supplies one versioned
-private owner consumed by the existing request base scorer and actual V4
-catalogue. The contract declares Profile/actor/session, mode/domain, evidence and
-eligibility clocks, source policy, the native request or exact V4 receipt and
-recognition bounds. Existing score formulas, retained policies and source rows
-remain unchanged. Current legacy Discovery source rules stay explicit rather
-than being silently changed to the canonical V4/evaluation rule.
+Start with fresh main and a read-only hosted inventory. Verify the actual installed
+prefix, the three guarded predecessor bodies/owners/configuration/grants and new
+helper absence. Preserve complete canonical rows, existing function identities,
+access/default privileges and retained sessions/pools/panels/commands/chains/pages/
+forecasts. Apply only this forward after its preservation preflight, verify the
+installed bodies and exact before/after preservation, and record the actual
+hosted history mapping and receipt. Stop on drift; never repeat older forwards,
+reset answers/accounts or manufacture hosted observations. Existing publication
+and guarded deployment authorization remains applicable.
 
-The existing candidate-request fixture owns populated-forward/current-consumer
-checks; the actual native Taste adapter keeps its independent equal-input replay,
-numeric-answer and immutable-source checks. Require all five final-source CI
-gates, including the native PostgreSQL forward matrix and current-consumer
-observer, before merging. Record the accepted source/CI/native report receipt
-here and in Sprint 015, then perform the separate guarded hosted preservation
-rollout of this new forward. No hosted write belongs to the source candidate.
+The common native acquisition owner is now implemented. Retained recognition and
+Discovery selection inputs intentionally remain different. Guided recognition/
+delivery policy alignment, certified prefix/historical availability, the real
+#232F Shared prepared-input consumer, native/hosted performance, predictive quality
+and Sprint 015 acceptance stay open; full four-consumer same-pool serving is not
+yet established. They are separate successors, not additional active packets.
 
-Do not repeat the three installed forwards, reset accounts/answers/commands or
-manufacture observations. Guided recognition/delivery policy alignment, certified
-prefix/historical availability, the real #232F Shared prepared-input consumer,
-native/hosted performance, predictive quality and Sprint 015 acceptance remain
-open. Full four-consumer same-pool serving is not established by this extraction.
+## Accepted shared native candidate acquisition — #376
+
+The seventh bounded source packet is accepted through
+[PR #376](https://github.com/Kajooja/Kajo/pull/376), merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`.
+One private INVOKER `acquire_native_candidates_v1` consumes the closed
+`native-candidate-acquisition-v1` contract through the actual V4 catalogue and
+existing request base scorer. Profile/actor/actual session, mode/domain, evidence
+and eligibility clocks, source policy, native request or exact V4 receipt and
+recognition bounds are explicit. Stored Context/request/FINAL formats, scoring
+formulas, selected policies, public APIs and retained records remain unchanged.
+
+The existing candidate-request fixture verifies the populated forward in both
+PGlite and native PostgreSQL: **54** Personal/Shared mode/domain/acquisition cases,
+explicit evaluation, complete V4 catalogue and exact score bytes. Complete old
+canonical rows, function metadata and default privileges remain unchanged, with
+exact retained V4 NEXT and Discovery chain retries and canonical cleanup.
+Current-path instrumentation verifies V4 catalogue, authenticated Discovery feed
+and explicit evaluation consume the shared owner with actual scope/session.
+Identical inputs preserve complete acquisition results; source availability,
+known/asked/interaction exclusion, **128/25 candidates per domain**, the **64-tag**
+dictionary, **37 invalid controls** and closed API grants remain enforced.
+
+The actual Taste verifier still reports **7** captures,
+**1095** candidate comparisons, maximum score difference
+**0** at `1e-12`, committed 0/5/10 sensitivity,
+**21** unchanged sources, exact retries and other-Profile
+isolation. All seven unlike recognition/Discovery policy cases remain explicitly
+non-comparable. The prior native adapter proof retains
+69 comparisons and 37
+nonzero Scenario contributions. No predictive-quality or historical-reconstruction
+claim is introduced.
+
+**Source / CI:** all five required final-source gates passed in
+[CI #767](https://github.com/Kajooja/Kajo/actions/runs/40377289217), completed
+attempt 2, on `527a18a1ee6205d907ef602c45a53b4c6a71a3dc`. The tested PR merge ref
+`f33606e43d7d84dca8b237cae72caf922010a490`, source and accepted merge preserve tree
+`08cebd1d9b649351b6deb8f8a5497cf24bc76ae3`. The downloaded final native CLI report was independently verified;
+SHA-256 `34dec728aff17dcc872797b87e940b6fc7921b617dc6e5eee35032b2023560d5`.
+
+**Validation:** 371 database, 329 engine, 72 research, 904 mobile, 50 dependency,
+451 catalogue and 11 acceptance tests pass, with lint/types, ESM/import-graph
+checks and four explicit-demo local exports. Final-source CI also passes all
+32 Edge tests and its four configured exports. Local root check still encounters
+the Deno npm-registry connection refusal; no complete local root-check pass is
+claimed. The first native attempt exposed a fixture SQL-NULL/psql blank-row
+transport mismatch before the new migration; an explicit JSON boolean and local
+transport control fixed it. CI #767 attempt 1 was cancelled after over 17 minutes
+without database results; unchanged-head attempt 2 completed the required gates.
+No gate or score tolerance was relaxed.
+
+The source is accepted; the guarded hosted forward above remains pending.
+Sprint 015, serving-policy alignment, runtime/performance and usefulness gates
+remain open.
 
 ## Accepted actual V4 Taste consumer conformance — #374
 
