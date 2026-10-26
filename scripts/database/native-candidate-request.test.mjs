@@ -358,3 +358,47 @@ test('versioned native candidate request / populated forward and current consume
     });
   } finally { await db.close(); }
 });
+
+test('shared native acquisition preserves the populated V4/Discovery predecessor and exact scores', async t => {
+  const { verifyNativeAcquisitionUpgrade } = await import('./native-candidate-request.mjs');
+  const db = new PGlite();
+  try {
+    await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+      grant usage on schema public,auth to anon,authenticated,service_role;`);
+    const { files } = await buildFreshInstallation();
+    const index = files.findIndex(f => f.name.endsWith('_shared_native_candidate_acquisition.sql'));
+    assert.ok(index > 0);
+    for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
+    const exec = async sql => {
+      // Match psql's omitted blank SQL-NULL row as well as its JSON values.
+      try { return (await db.exec(sql)).flatMap(r => r.rows.map(row => Object.values(row)[0])).filter(value => value !== null); }
+      catch (error) { await db.exec('rollback;'); t.diagnostic(JSON.stringify({ message: error.message, code: error.code, detail: error.detail, where: error.where })); throw error; }
+    };
+    const previous = (await db.query(`select oid::regprocedure::text signature,prosrc,pg_get_functiondef(oid) definition
+      from pg_proc where pronamespace='private'::regnamespace and proname in(
+        'rank_items_request_base_v1','rank_items_request_with_identity_v1','taste_candidate_catalog_v4')`)).rows;
+    for (const f of previous) for (const mutation of [f.definition.replace(f.prosrc, () => f.prosrc+'\n-- drift'),
+      `grant execute on function ${f.signature} to service_role;`, `alter function ${f.signature} set search_path='public';`]) {
+      await db.exec('begin;'+mutation);
+      await assert.rejects(db.exec(files[index].sql), /Native acquisition source\/security drift/);
+      await db.exec('rollback;');
+      assert.equal((await db.query("select to_regprocedure('private.acquire_native_candidates_v1(jsonb)') helper")).rows[0].helper, null);
+    }
+    await db.exec(`begin;create role acquisition_unexpected_reader;
+      alter default privileges for role postgres in schema private grant execute on functions to acquisition_unexpected_reader;`);
+    await assert.rejects(db.exec(files[index].sql), /Native acquisition new-function access drift/);
+    await db.exec('rollback;');
+    await db.exec('begin;create function private.acquire_native_candidates_v1(integer) returns integer language sql as $$select $1$$;');
+    await assert.rejects(db.exec(files[index].sql), /Native acquisition owner or target collision/);
+    await db.exec('rollback;');
+    const report = await verifyNativeAcquisitionUpgrade(exec, files[index]);
+    assert.equal(report.status, 'PASS');
+    t.diagnostic(JSON.stringify(report));
+    const { nativeAcquisitionSmokeSql } = await import('./native-candidate-request.mjs');
+    const [smoke] = await exec(await nativeAcquisitionSmokeSql());
+    assert.equal(smoke.nativeAcquisition.status, 'PASS');
+    t.diagnostic(JSON.stringify(smoke));
+  } finally { await db.close(); }
+});

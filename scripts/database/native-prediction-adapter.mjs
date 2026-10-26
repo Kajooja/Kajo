@@ -620,7 +620,8 @@ export async function verifyNativeTasteConsumer(execSql) {
       committedRatings: ratings, sensitivity, preservedSources,
       immutableOldForecasts: true, exactCommandRetries: true, otherProfileIsolation: 'RETAINED_AND_FRESH_FORECAST',
       nonComparableConsumers: boundaries,
-      remainingDependency: 'VERSIONED_SHARED_CANDIDATE_ACQUISITION_WITH_DECLARED_RECOGNITION_AND_DELIVERY_SELECTION',
+      acquisitionOwner: 'native-candidate-acquisition-v1',
+      remainingDependency: 'GUIDED_RECOGNITION_AND_DELIVERY_SELECTION_POLICY_ALIGNMENT',
       historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'CANONICAL_ROWS_RESTORED' };
   } catch (error) { failure = error; throw error; }
   finally {

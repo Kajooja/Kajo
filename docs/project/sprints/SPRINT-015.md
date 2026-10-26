@@ -97,6 +97,16 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Seventh source candidate: `feat/shared-native-candidate-acquisition` adds one
+  private versioned acquisition owner consumed by the actual V4 catalogue and
+  native request base scorer. Scope, clocks, source policy, exact V4 receipt,
+  recognition limits and native request controls are explicit. Existing scoring,
+  policies, records and unlike-policy boundaries remain intact. The existing
+  candidate-request fixture adds populated-forward/current-consumer proofs in
+  PGlite and the native CLI gate; the actual Taste verifier names the common
+  owner and retains its honest policy-alignment dependency. Source acceptance
+  requires all five final-source CI gates; hosted rollout remains separate.
+
 - Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
   merge `96fcaf07e54fe3249c8b5bb570d4b9fefbfedf39`. Actual committed V4 commands,
   current Discovery, independent same-input evaluation and frozen replay share

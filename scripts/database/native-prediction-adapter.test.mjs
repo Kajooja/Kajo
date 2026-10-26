@@ -69,6 +69,8 @@ test('actual committed V4 Taste commands reach native input conformance and pres
     assert.equal(report.preservedSources, 21);
     assert.equal(report.otherProfileIsolation, 'RETAINED_AND_FRESH_FORECAST');
     assert.equal(report.nonComparableConsumers.length, 7);
+    assert.equal(report.acquisitionOwner, 'native-candidate-acquisition-v1');
+    assert.equal(report.remainingDependency, 'GUIDED_RECOGNITION_AND_DELIVERY_SELECTION_POLICY_ALIGNMENT');
     assert.equal(report.cleanup, 'CANONICAL_ROWS_RESTORED');
     t.diagnostic(JSON.stringify(report));
   } finally { await db.close(); }

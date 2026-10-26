@@ -394,6 +394,52 @@ and enforced; it does not unify the legacy catalogue with Taste's V4 recognition
 pool, introduce new delivery/evaluation combinations or certify full four-consumer
 input parity, historical reconstruction or predictive usefulness.
 
+#### Shared native candidate acquisition — Sprint 015 source
+
+`20261026172719_shared_native_candidate_acquisition.sql` gives actual V4 Taste,
+Discovery and explicit evaluation one private INVOKER owner:
+`private.acquire_native_candidates_v1(jsonb)`. The existing request base scorer
+and V4 catalogue consume it; the identity scorer forwards its actual session ID
+only in the private call context. Stored sanitized Context, native candidate
+requests, FINAL inputs, score formulas and retained records remain unchanged.
+
+The closed `native-candidate-acquisition-v1` object declares `scope` (Profile,
+actor and nullable session), `mode`, nullable `itemType`, `nativeEvidenceAsOf`,
+`eligibilityAt`, `eligibilityClock`, `sourcePolicy`, `candidateRequest` and
+`tastePool`. Evidence time must equal transaction start; finite ISO timestamps
+require an explicit offset. Actor and Profile membership are checked. Discovery
+session is a bound request identity, not an independently certified receipt.
+The existing native request validates acquisition/intent, explicit IDs, seen IDs,
+spent-reminder exclusion and evaluation prefix. It is not supplied by public
+Context and cannot alter another Profile's scope.
+
+V4 instead declares its exact active owned session revision, receipt transaction
+and instant, plus `CANONICAL_FORECAST_POOL_V4`, 128 source candidates per domain,
+25 retained candidates per domain and the 64-tag selection dictionary. Stale
+receipts reject. Canonical source availability, known/asked/interaction and
+neutral-skip exclusions precede recognition bounds. The helper returns the
+bounded source rows with prior, source rank and retained flag; V4 renders its
+unchanged catalogue and tag dictionary from these rows. Question selection is
+still the existing V4 policy.
+
+Legacy and catalogue Discovery keep `LEGACY_DISCOVERABLE_ROWS` and their existing
+wall-clock eligibility. Explicit evaluation keeps canonical source availability
+at transaction start. Their shared acquisition returns all considered rows with
+canonical resurfacing input, including suppressed candidates needed for pool
+explanations; the scorer applies eligibility, rank, pool and delivery limits.
+Spent catalogue reminders and seen IDs are excluded before scoring. These
+explicitly different policies remain non-comparable as identical inputs; this
+forward does not activate a new guided recognition or delivery policy.
+
+The contract is consumed inside current server computation, not added to or
+backfilled into historical traces. Exact declared inputs produce identical full
+acquisition results within the same database snapshot. `now()` and a session
+receipt do not certify historical/current-row reconstruction, cross-statement
+commit visibility or full four-consumer same-pool serving. The existing FINAL
+and candidate-request snapshots remain the replay boundary. Private API grants
+stay closed; drift checks guard the three changed bodies/security metadata and
+reject unexpected inherited grants without editing default privileges.
+
 #### Frozen FINAL scoring input — Sprint 015 source
 
 `20261026130243_frozen_final_scoring_input.sql` prepares

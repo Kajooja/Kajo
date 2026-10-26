@@ -45,7 +45,7 @@ import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
-import { nativeCandidateRequestSmokeSql } from './native-candidate-request.mjs';
+import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
 import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -89,6 +89,16 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    // Check the new populated forward/current paths before rehearsing older
+    // generations, so a new native-only failure is reported promptly.
+    const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
+    assert.ok(acquisitionIndex > 0);
+    await resetFromMigrations(files.slice(0, acquisitionIndex));
+    const nativeAcquisitionUpgrade = await verifyNativeAcquisitionUpgrade(execConcurrentSql, files[acquisitionIndex]);
+    assert.equal(nativeAcquisitionUpgrade.status, 'PASS');
+    const [nativeAcquisition] = await exec(await nativeAcquisitionSmokeSql(),
+      { stage: 'native-shared-acquisition-current-consumers', timeoutMs: 120_000 });
+    assert.equal(nativeAcquisition?.nativeAcquisition.status, 'PASS');
     const actionIndex = files.findIndex(file => file.name.endsWith('_atomic_item_actions.sql'));
     assert.ok(actionIndex > 0);
     await resetFromMigrations(files.slice(0, actionIndex));
@@ -451,7 +461,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativePredictionAdapter, nativeTasteConsumer,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
