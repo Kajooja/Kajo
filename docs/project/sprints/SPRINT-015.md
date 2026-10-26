@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — six source packets accepted; three SQL forwards installed; shared candidate acquisition and remaining acceptance open**
+Status: **IN PROGRESS — seven source packets accepted; three SQL forwards installed; shared acquisition rollout and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet supplies the versioned shared candidate-acquisition owner consumed by native Taste and Discovery; see [STATUS](../STATUS.md).
+The next bounded packet is the guarded preservation rollout of the accepted shared native acquisition forward; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -97,15 +97,25 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Seventh source candidate: `feat/shared-native-candidate-acquisition` adds one
-  private versioned acquisition owner consumed by the actual V4 catalogue and
-  native request base scorer. Scope, clocks, source policy, exact V4 receipt,
-  recognition limits and native request controls are explicit. Existing scoring,
-  policies, records and unlike-policy boundaries remain intact. The existing
-  candidate-request fixture adds populated-forward/current-consumer proofs in
-  PGlite and the native CLI gate; the actual Taste verifier names the common
-  owner and retains its honest policy-alignment dependency. Source acceptance
-  requires all five final-source CI gates; hosted rollout remains separate.
+- Seventh source packet: accepted through [PR #376](https://github.com/Kajooja/Kajo/pull/376),
+  merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`. Actual V4 catalogue and request base scoring consume one
+  private versioned acquisition owner, with explicit scope, clocks, source rules,
+  native request or exact V4 receipt/recognition bounds. Retained scoring, policies,
+  traces and records remain unchanged. Local and native PostgreSQL preserve 54
+  populated-forward cases, explicit evaluation, V4 catalogue, score bytes,
+  canonical rows, function/default metadata and exact V4/Discovery retries.
+  Three real consumers use the owner; repeated identical acquisition requests
+  preserve complete pools, with closed grants and 37 invalid controls.
+  The actual Taste proof retains 1095 comparisons,
+  zero score difference, numeric-answer sensitivity and 21
+  unchanged sources; seven unlike policies remain non-comparable. All five
+  final-source [CI #767](https://github.com/Kajooja/Kajo/actions/runs/40377289217)
+  gates pass on `527a18a1ee6205d907ef602c45a53b4c6a71a3dc`, completed attempt 2,
+  tree `08cebd1d9b649351b6deb8f8a5497cf24bc76ae3`. All 371 database tests and other suites/exports pass;
+  CI supplies 32 Edge passes despite the local registry connection limitation.
+  STATUS records exact native artifact provenance and the corrected transport
+  assertion/cancelled-then-successful validation attempt. The new fourth SQL
+  forward is not hosted yet; its guarded rollout is the one next packet.
 
 - Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
   merge `96fcaf07e54fe3249c8b5bb570d4b9fefbfedf39`. Actual committed V4 commands,
