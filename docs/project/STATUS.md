@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, second bounded source packet prepared locally; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, two bounded source packets accepted and installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,10 +11,23 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — explicit native candidate request / Sprint 015, #302, #336
+## Current handoff — native prediction adapter / Sprint 015, #302, #336
 
-Continue on `feat/native-candidate-request-contract` from accepted main
-`9b5954a49cf58c00bf8b114c8a49f82c0507ce4c` ([#364](https://github.com/Kajooja/Kajo/pull/364)).
+Continue from the accepted implementation checkpoint
+`8d1a786389318dcf41804f5009a9271156d81e1d` ([#365](https://github.com/Kajooja/Kajo/pull/365)).
+The next bounded packet connects one real native prediction computation to the
+existing generic/Kajo adapter boundary with an executable conformance fixture.
+Consume the declared `candidateRequest` and `predictionInput` together with the
+actual frozen candidates, score and provenance. Keep comparisons scoped to the
+declared acquisition policy and verify exact identity/eligibility plus explicit
+numeric tolerances; differing Taste/Discovery pools are not same-input parity.
+Reuse the existing adapters and native fixtures rather than creating another
+scorer. The temporal evaluation runner and real #232F Shared prepared-input
+consumer remain required within Sprint 015. Neither installed forward below
+needs repeating, and accepted accounts/answers remain intact.
+
+## Accepted native candidate request — #365
+
 The second bounded Sprint 015 packet places the existing base/scalar/identity
 scorer behind one validated `native-candidate-request-v1` contract, separating
 acquisition policy from delivery/evaluation intent. The old private signatures
@@ -44,15 +57,40 @@ boundary test pass with direct request-owner dispatch preserving call depth.
 Lint/typechecks, 904 mobile, 311 engine, 50 dependency, 451 catalogue, 62 research
 and 11 acceptance tests pass, as do four explicit-demo Hermes exports.
 `npm run check` stops at the unchanged Deno npm-registry connection refusal;
-no complete local root-check or native PostgreSQL CI pass is claimed.
+no complete local root-check pass is claimed.
 
-**Next:** publish the reviewed source packet and complete all five required
-final-source CI gates, including the new native rollback-only request smoke,
-before merge. Source/CI acceptance is still pending.
-`20261026073031_native_candidate_request_contract.sql` has not been installed
-in the hosted service. Its guarded rollout is separate from source acceptance.
-Then continue the remaining common candidate/evidence contract and native
-adapter/temporal evaluation work within Sprint 015.
+**Source / CI:** all five required final-source gates passed in
+[CI #739](https://github.com/Kajooja/Kajo/actions/runs/40292194348), attempt 2,
+on `c38ec5cd49adfd9c243983d0bca892e1c7f33af3`. The first attempt was cancelled
+after its database test process stopped producing results; the same unchanged
+source passed the rerun. The reviewed source and merge retain tree
+`b5a501420d8eb2f0e36009c426385c8e1b500e3f`. The downloaded native CLI report
+verifies the new rollback-only request smoke, migration bytes/history, existing
+post-lock skip visibility and Working reset, with successful cleanup. Native
+contract checks and the populated PGlite byte-parity matrix remain distinct
+evidence; neither establishes full four-consumer pool parity or predictive quality.
+
+**Hosted rollout — 2026-10-26:** the owner-authorized
+`20261026073031_native_candidate_request_contract.sql` forward is installed.
+The provider's stored SQL SHA-256 matches the reviewed source exactly:
+`14226939b23dfc34d494745590557c9ad441dd106b425699297859a47701ef3c`.
+Retain the provider-issued migration timestamp; do not rewrite history to match
+the source filename. Postchecks verified the seven changed bodies and four new
+private functions, unchanged metadata for all 260 inventoried existing
+public/private functions, all 253 unrelated bodies and 24 default-privilege
+records. All 89 earlier migration-history records were preserved.
+
+All 2439 fixed existing rows checked were unchanged: 49 PredictionRuns, 2386
+candidates, two page receipts and two catalogue-chain pages. The snapshot
+contained no page-context/feed-receipt or shadow/comparison rows. Mutable
+continuation windows, chains and cursors were outside this immutable-row
+comparison. A pure READ ONLY validator probe passed without creating forecasts;
+no account or answer reset was performed. Detailed environment metadata and
+record identities stay outside this public receipt.
+
+Fresh hosted consumption remains unobserved: no naturally generated
+`native-candidate-request-v1` run was present at the postcheck. Installation
+verification does not close consumer, device or predictive-quality acceptance.
 
 ## Accepted predecessor — shared native computation cutoff / #363
 

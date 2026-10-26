@@ -343,8 +343,10 @@ predictions. Catalogue-chain fresh computations receive their own new references
 scalar and identity implementations behind private `rank_items_request_*_v1`
 functions. The retained `rank_items_candidate_*_v1` signatures adapt their old
 arguments to the same consumed request. There is one implementation per scoring
-layer; this does not add another scorer or change retained policies. The existing
-request owners call the new identity core directly, preserving serving call depth.
+layer; this does not add another scorer or change retained policies. Four
+request-owner functions — `rank_items_v1_internal`, `rank_items_first_page_v1`,
+`rank_items_catalog_chain_v1` and `capture_personal_evaluation_v1` — call the
+request identity core directly, preserving their existing scoring call depth.
 
 The strict `native-candidate-request-v1` object separates `acquisition` from
 `intent`, with `itemIds`, `seenItemIds`, `reminderSpent` and `requiredAfter`.
