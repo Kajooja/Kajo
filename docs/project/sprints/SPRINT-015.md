@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — three source packets accepted; two SQL forwards installed; temporal evaluation and remaining acceptance open**
+Status: **IN PROGRESS — four source packets accepted; two SQL forwards installed; shared scoring inputs and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet adds native admission to existing Personal temporal reports; see [STATUS](../STATUS.md).
+The current bounded packet binds frozen FINAL scoring inputs in existing native identity/shadow paths; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -97,8 +97,8 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Fourth source packet: in progress on `feat/working-native-admission-v2`, based
-  on accepted main `286cc83b33ffc137c22e6605c54e88f66d492102`. Existing Personal
+- Fourth source packet: accepted through [PR #369](https://github.com/Kajooja/Kajo/pull/369),
+  merge `53f84bbd2f487ec9460ee482425821d3830795b0`. Existing Personal
   Working report/cohort v2 consumes the native prediction adapter with an
   immutable supplied genome and complete retained OFF final-ranking conformance.
   Exact OFF checks remain mandatory alongside the fixed `1e-12` generic score
@@ -113,8 +113,14 @@ does not become an invented pass.
   later 9→0 correction and rejects rounded clocks and withdrawal. All 362
   database, 326 engine and 72 research tests pass; other local suites,
   lint/types and four demo exports pass. Root check retains the unchanged Deno
-  registry refusal; publication and final-source CI remain pending.
-  [STATUS](../STATUS.md) owns the current checkpoint.
+  registry refusal. All five source gates passed in [CI #748](https://github.com/Kajooja/Kajo/actions/runs/40317604029),
+  attempt 2, on `bfe9ffd7fcbcad8ab94d788b95ac5724e7b89d38`; merge preserves
+  tree `bfa0674601dbafdb41b5b2589de46503d6171495`. Attempt 1 hit an unchanged atomic-page
+  PGlite WASM trap; dependency identity and a targeted same-source pass supported
+  the unchanged-source retry. The root cause remains unproven. No hosted rollout
+  or new PostgreSQL v2-report execution is claimed. [STATUS](../STATUS.md) owns
+  the receipt and next frozen FINAL scoring-input packet; full four-consumer
+  parity, #232F, performance, predictive quality and Sprint 015 remain open.
 - Design: planned by the owner's 2026-10-25 engine-first decision.
 - Third source packet: accepted through [PR #367](https://github.com/Kajooja/Kajo/pull/367),
   merge `3159c1959cbbe4edb0f2923eb1ee177b6a227642`. A strict Kajo adapter
@@ -144,8 +150,8 @@ does not become an invented pass.
   `3af1d8b7d23ae79f21edac0ea1408d5648fbcc76`. The downloaded native report verifies the
   same six cases/69 candidates/37 Scenario contributions with zero score
   difference at `1e-12`, exact retained bindings and successful cleanup.
-  [STATUS](../STATUS.md) owns the detailed receipt and next bounded native-source
-  admission extension in the existing Personal temporal reports. Full same-pool
+  [STATUS](../STATUS.md) owns the detailed receipt and current bounded
+  frozen scoring-input handoff. Full same-pool
   parity, certified prefixes, exposure/label reconciliation and #232F remain open.
 - Second source packet: accepted through [PR #365](https://github.com/Kajooja/Kajo/pull/365),
   merge `8d1a786389318dcf41804f5009a9271156d81e1d`.
@@ -171,7 +177,7 @@ does not become an invented pass.
   candidate and page records, 89 prior history entries and existing function
   metadata/default privileges were preserved. The pure READ ONLY validator probe
   passed; fresh hosted consumption remains unobserved. [STATUS](../STATUS.md)
-  owns the detailed scoped receipt and current bounded evaluation handoff.
+  owns the detailed scoped receipt and current Sprint 015 handoff.
   Full same-pool parity, certified committed-prefix/historical reconstruction,
   full native temporal-evaluation integration and #232F remain open.
 - First source packet: accepted through [PR #363](https://github.com/Kajooja/Kajo/pull/363),
