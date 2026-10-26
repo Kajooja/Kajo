@@ -37,7 +37,7 @@ declare actor uuid:='ab157000-0000-4000-8000-000000000001'; personal uuid;
   session uuid:='ab157000-0000-4000-8000-000000000810';
   shared_session uuid:='ab157000-0000-4000-8000-000000000811';
   origin uuid:=gen_random_uuid(); prediction uuid; receipt jsonb; page jsonb; request jsonb;
-  replay jsonb;
+  replay jsonb; invalid_item uuid; invalid_case integer;
 begin
   perform set_config('request.jwt.claim.sub',actor::text,true);
   select id into strict personal from public.profiles where owner_user_id=actor and profile_type='PERSONAL';
@@ -52,6 +52,11 @@ begin
     and item_id='ab157000-0000-4000-8000-000000000106' and selected_for_delivery) then
     raise exception 'Native adapter Scenario fixture lacks actual delivered origin';end if;
   update private.prediction_runs set requested_at=now()-interval '3 hours',created_at=now()-interval '3 hours' where id=origin;
+  -- This disposable origin is deliberately backdated to seed Scenario history.
+  -- Keep its new marker consistent with that fixture clock; measured sources
+  -- below are never rewritten after capture.
+  update private.prediction_runs set state_snapshot=jsonb_set(state_snapshot,'{finalScoringInput,requestedAt}',to_jsonb(requested_at))
+    where id=origin and state_snapshot ? 'finalScoringInput';
   insert into public.events(id,actor_user_id,profile_id,item_id,item_type,event_type,properties,occurred_at,created_at,prediction_id)
     select gen_random_uuid(),actor,personal,'ab157000-0000-4000-8000-000000000106','MOVIE',kind,body,
       now()-interval '2 hours',now()-interval '2 hours',origin
@@ -90,6 +95,36 @@ begin
   if page->>'nextCursor' is null then raise exception 'Native adapter continuation fixture is exhausted';end if;
   page:=public.rank_items_page_v1(request||jsonb_build_object('requestId',gen_random_uuid(),'cursor',page->'nextCursor'));
   insert into adapter_continuation values((page->>'predictionId')::uuid);
+  for prediction in select prediction_id from adapter_sources union all select prediction_id from adapter_continuation loop
+    if not private.validate_native_final_source_v1(prediction) then
+      raise exception 'Native adapter source lacks the new FINAL input'; end if;
+  end loop;
+  -- Native PostgreSQL executes these same rollback-only invalid-source controls.
+  -- Include an unselected candidate: a valid delivered subset is insufficient.
+  select prediction_id into strict prediction from adapter_sources where name='personal-legacy';
+  select item_id into strict invalid_item from private.prediction_candidates
+    where prediction_id=prediction and not selected_for_delivery order by final_rank desc limit 1;
+  for invalid_case in 1..4 loop
+    begin
+      if invalid_case=1 then
+        update private.prediction_runs set state_snapshot=state_snapshot-'finalScoringInput' where id=prediction;
+      elsif invalid_case=2 then
+        update private.prediction_candidates set explanation=explanation-'finalScoringInput'
+          where prediction_id=prediction and item_id=invalid_item;
+      elsif invalid_case=3 then
+        update private.prediction_runs set state_snapshot=jsonb_set(state_snapshot,'{finalScoringInput,sourceGenome,config}','{}')
+          where id=prediction;
+      else
+        update private.prediction_candidates set explanation=jsonb_set(explanation,'{finalScoringInput,extra}',to_jsonb(repeat('x',2097153)))
+          where prediction_id=prediction and item_id=invalid_item;
+      end if;
+      begin
+        perform private.validate_native_final_source_v1(prediction);
+        raise exception 'Native FINAL input accepted invalid control %',invalid_case;
+      exception when invalid_parameter_value then null; end;
+      raise exception 'Rollback deliberate invalid source' using errcode='Z0001';
+    exception when sqlstate 'Z0001' then null; end;
+  end loop;
   insert into adapter_preserved select jsonb_build_object('runs',
     (select jsonb_agg(to_jsonb(r) order by r.id) from private.prediction_runs r join adapter_sources s on s.prediction_id=r.id),
     'candidates',(select jsonb_agg(to_jsonb(c) order by c.prediction_id,c.item_id)
@@ -108,6 +143,7 @@ begin
     raise exception 'Native adapter replay changed frozen source records';end if;
 end;$native_adapter$;
 select jsonb_build_object('observedAt',clock_timestamp(),'frozenPreserved',true,
+  'finalInputValidation',jsonb_build_object('version','native-final-scoring-input-v1','sources',7,'rejectionControls',4),
   'floatSerializationDigits',current_setting('extra_float_digits')::integer,
   'cases',(select jsonb_agg(jsonb_build_object('name',s.name,
     'scope',jsonb_build_object('profile',case when p.profile_type='PERSONAL' then
@@ -134,7 +170,8 @@ select jsonb_build_object('observedAt',clock_timestamp(),'frozenPreserved',true,
           'productionScore',c.final_score,'scenarioScore',c.scenario_score,'inputs',c.explanation,
           'tier',c.tier,'selected',false) order by c.rank),'[]'::jsonb)) from (
           select x.*,row_number() over(order by tier,score desc,item_id)::integer rank from (
-            select c.*,private.prediction_candidate_score_v2(r.discovery_mode,c.explanation,c.scenario_score,g.config) score,
+            select c.*,private.prediction_candidate_score_v2(r.discovery_mode,c.explanation#>'{finalScoringInput,explanation}',
+              (c.explanation#>>'{finalScoringInput,scenarioScore}')::double precision,g.config) score,
               (c.explanation#>>'{resurfacingPolicy,eligible}')::boolean eligible,
               private.prediction_delivery_tier_v1(c.explanation->'resurfacingPolicy') tier
             from private.prediction_candidates c where c.prediction_id=r.id) x) c) end
@@ -192,6 +229,7 @@ export async function verifyNativePredictionAdapter(exec) {
       allowedActionIds: candidates.filter(c => c.eligible).map(c => c.actionId) } };
   };
   assert.equal(fixture.frozenPreserved, true);
+  assert.deepEqual(fixture.finalInputValidation, { version: 'native-final-scoring-input-v1', sources: 7, rejectionControls: 4 });
   assert.equal(fixture.cases.length, 6);
   let comparedCandidates = 0, maxAbsoluteScoreDifference = 0, scenarioCandidates = 0;
   const normalized = [];
@@ -267,11 +305,13 @@ export async function verifyNativePredictionAdapter(exec) {
     mutated(x => { x.sourceGenome.id = 'ab157000-0000-4000-8000-000000000999'; }),
   ]) assert.throws(() => normalize(invalid));
   assert.match(fixture.continuation.sourceRun.policy_version, /frozen-page-v1/);
+  assert.equal(fixture.continuation.sourceRun.state_snapshot.finalScoringInput.computation, 'FROZEN_PAGE_REUSE');
   assert.throws(() => normalize({ ...sample, ...fixture.continuation }));
   assert.equal(fixture.floatSerializationDigits, 3);
   return { status: 'PASS', version: 'native-prediction-adapter-conformance-v1',
     scope: 'FROZEN_SAME_POLICY_BASELINE', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
     floatSerializationDigits: fixture.floatSerializationDigits, clockAdmission: 'EXACT_STORED_CLOCKS',
+    finalInputValidation: fixture.finalInputValidation,
     cases: fixture.cases.map(s => ({ name: s.name, replay: s.replay.kind,
       recomputed: s.replay.kind === 'BASELINE_SHADOW_WORKER' ? 'SCORE_RANK_ELIGIBILITY_SELECTION' : 'SCORE_RANK' })),
     comparedCandidates, scenarioCandidates, absoluteTolerance: options.absoluteTolerance, maxAbsoluteScoreDifference,

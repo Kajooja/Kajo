@@ -39,6 +39,9 @@ begin
       -- Age only this synthetic run: replay must use occurrence time, not receipt time.
       perform set_config('role','postgres',true);
       update private.prediction_runs set requested_at=started where id=prediction;
+      -- Keep the deliberately aged synthetic source's FINAL binding consistent.
+      update private.prediction_runs set state_snapshot=jsonb_set(state_snapshot,'{finalScoringInput,requestedAt}',to_jsonb(requested_at))
+        where id=prediction and state_snapshot ? 'finalScoringInput';
       if scenario='NOT_SELECTED' then
         update private.prediction_candidates set selected_for_delivery=false where prediction_id=prediction and item_id=item;
       end if;

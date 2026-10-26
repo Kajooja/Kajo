@@ -378,6 +378,49 @@ and enforced; it does not unify the legacy catalogue with Taste's V4 recognition
 pool, introduce new delivery/evaluation combinations or certify full four-consumer
 input parity, historical reconstruction or predictive usefulness.
 
+#### Frozen FINAL scoring input — Sprint 015 source
+
+`20261026130243_frozen_final_scoring_input.sql` prepares
+`native-final-scoring-input-v1` once between `scenario_enriched` and `rescored`
+in the existing request identity core. The materialized candidate input contains
+the full-precision scoring features, Scenario score, Shared common-fit contribution,
+frozen resurfacing input/final policy and optional Working projection. The same
+object feeds the existing Working/scalar arithmetic and is retained under
+`PredictionCandidate.explanation.finalScoringInput`. No formula, operation order,
+acquisition policy or delivery/evaluation combination changes.
+
+`PredictionRun.state_snapshot.finalScoringInput` binds FINAL stage, computation
+kind, source/run identity, actor/Profile/session, request Context/mode/domain,
+declared candidate request and clocks, model/policy versions, immutable source
+genome ID/config and the complete sorted retained Item IDs/count. Empty pools and
+suppressed/unselected candidates are included. The requested instant is serialized
+in UTC and remains valid across replay connection time zones. The native validator
+requires an exact, consistently versioned run/candidate binding before replay.
+Missing, mixed, unknown, contradictory or oversized marked inputs reject. SQL
+bounds the summed JSONB-text input envelope to 2 MiB; the portable adapter also
+bounds its compact UTF-8 export representation to 2 MiB. Existing whole-window
+payload, candidate-count, page-count and call-depth guards remain in force.
+
+The shadow worker and Personal Working comparison consume marked candidate inputs
+without reading current catalogue features. The immutable source genome remains
+distinct from the challenger genome. Challenger reminder order still uses scalar
+score with Scenario/common-fit removed, then the existing cap/reselection; it must
+not copy the source's chosen reminder. Working retries validate a marked source
+before returning a cached comparison. Unmarked historical sources retain their
+previous replay path and records; there is no backfill.
+
+Fresh runs declare `FRESH_FINAL`. Protocol-2 continuation retains the original
+numeric inputs/scores, rebinds the candidate ID to the new page run and records its
+refreshed frozen eligibility policy as `FROZEN_PAGE_REUSE`, with the original
+`featureSourcePredictionId`. It is not fresh computation. The native fresh-source
+adapter still excludes continuations. Old unmarked windows remain unmarked.
+
+These bindings assume trusted, authorized immutable source reads; they do not
+authenticate an arbitrary export or certify historical/committed-prefix
+availability. Full four-consumer same-pool parity, native/hosted performance,
+the real Shared prepared-input consumer and predictive quality remain open.
+STATUS records source/CI and hosted-installation acceptance separately.
+
 This private scoring primitive is consumed by the
 [owned sequential v2 source](#sequential-own-personal-v2-source) below. That command
 boundary owns expected-prefix revisions, commit/freeze before first measurement,
@@ -3051,8 +3094,10 @@ and unavailable historical reconstruction retain their declared meanings.
 Snapshot validation is not authentication, proof of complete historical input,
 or permission to access private records.
 
-This packet adds no scorer, serving activation, database migration or model
-admission. The existing Personal temporal report/cohort v2 now consumes this
+The original adapter packet added no scorer, serving activation, database migration
+or model admission. The frozen FINAL forward described above extends admission:
+marked fresh sources require the complete run/candidate input binding, while
+unmarked historical source support is preserved. The existing Personal temporal report/cohort v2 now consumes this
 adapter under the bounded admission contract above. Full four-consumer same-pool
 parity, committed-prefix reconstruction, remaining temporal acceptance and the
 real Shared prepared-input consumer remain separate Sprint 015 work.

@@ -13,6 +13,50 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — frozen FINAL scoring input / Sprint 015, #302, #336
 
+**Active implementation:** `feat/frozen-final-scoring-input`, based on accepted
+main `3610ed478da40c90a7f5a663eb1e3f5fb104e712`. The fifth bounded source
+packet is implemented and undergoing final checks; it is not yet accepted or
+installed. Continue this branch through complete source validation, all five
+required CI gates and a guarded merge. Then record the exact source/CI/merge
+receipt and make the new forward's preservation-checked hosted rollout the next
+bounded handoff. Do not repeat either already-installed forward below.
+
+`20261026130243_frozen_final_scoring_input.sql` adds the versioned candidate input
+and complete run binding, consumed by existing identity, shadow and Working
+owners. A fourth existing owner, protocol-2 frozen-page continuation, rebinds
+copied inputs and refreshed eligibility under `FROZEN_PAGE_REUSE`; fresh sources
+declare `FRESH_FINAL`. The native adapter retains its fresh-only admission.
+Unknown/mixed/missing bindings reject before replay, including a cached Working
+reply. No historical records are backfilled and no arithmetic is replaced.
+
+Local focused evidence includes complete pre/post trace and float8-byte equality
+for 54 Personal/Shared mode/domain/acquisition cases plus explicit evaluation;
+historical receipts/replay, empty and suppressed pools, malformed/nonfinite and
+oversized inputs, protocol-2 reuse, timezone-invariant run binding and atomic
+body/security/default-grant rejection. The existing 18-case frozen replay matrix
+retains an actual nonbaseline challenger reminder flip. The native adapter
+fixture compares 69 candidates, including 37 nonzero Scenario contributions,
+with zero score difference at `1e-12`; it additionally validates seven marked
+sources and four rollback-only rejection controls. Native PostgreSQL execution
+of the shared smoke remains a required source CI gate.
+
+The test fixtures deliberately age synthetic history seeds before measured
+replay. Their new run markers are updated alongside those setup clocks; measured
+source records and real accounts are not rewritten. This is synthetic engineering
+evidence, not observed predictive quality. Full local/CI results remain pending
+until recorded in the acceptance receipt.
+
+The initial CI #752 validation exposed an outdated atomic-page smoke assertion:
+it compared the whole run state even though the new per-page input binding must
+change. The smoke now preserves exact equality of all original state fields and
+separately validates the complete FINAL input, page identity, original feature
+source and fresh/reuse kind across all 48 pages. This is a corrected assertion,
+not an unchanged-source retry; all final-source gates must run again.
+The shared smoke also runs on the historical pre-FINAL hosted-upgrade prefix:
+unmarked sources retain the old equality check and must stay unmarked, without
+calling helpers that do not exist in that generation. Both current and historical
+full-schema smoke paths pass after this explicit generation distinction.
+
 Continue from accepted implementation checkpoint
 `53f84bbd2f487ec9460ee482425821d3830795b0` ([#369](https://github.com/Kajooja/Kajo/pull/369)).
 Introduce one versioned frozen FINAL-stage input at
