@@ -45,7 +45,7 @@ import { verifyPersonalTasteSessionConcurrency } from './personal-taste-session-
 import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
-import { nativeCandidateRequestSmokeSql } from './native-candidate-request.mjs';
+import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
 import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -283,6 +283,11 @@ try {
     await resetFromMigrations(files.slice(0, tastePoolIndex));
     const personalTastePoolUpgrade = await verifyPersonalTastePoolUpgrade(execConcurrentSql, files[tastePoolIndex]);
     assert.equal(personalTastePoolUpgrade.status, 'PASS');
+    const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
+    assert.ok(acquisitionIndex > tastePoolIndex);
+    await resetFromMigrations(files.slice(0, acquisitionIndex));
+    const nativeAcquisitionUpgrade = await verifyNativeAcquisitionUpgrade(execConcurrentSql, files[acquisitionIndex]);
+    assert.equal(nativeAcquisitionUpgrade.status, 'PASS');
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -381,6 +386,9 @@ try {
     const [nativeCandidateRequest] = await exec(await nativeCandidateRequestSmokeSql(),
       { stage: 'native-candidate-request-contract-parity-and-rejection', timeoutMs: 120_000 });
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
+    const [nativeAcquisition] = await exec(await nativeAcquisitionSmokeSql(),
+      { stage: 'native-shared-acquisition-current-consumers', timeoutMs: 120_000 });
+    assert.equal(nativeAcquisition?.nativeAcquisition.status, 'PASS');
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
     const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);
@@ -451,7 +459,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativePredictionAdapter, nativeTasteConsumer,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,

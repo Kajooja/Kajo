@@ -13,35 +13,32 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — shared candidate acquisition / Sprint 015, #302, #336
 
-Continue from the six accepted source packets and three verified SQL forwards
-below. The next bounded source packet implements the **versioned shared
-candidate-acquisition contract and native owner** still missing between actual
-Taste and Discovery. Start from `private.taste_candidate_catalog_v4`,
-`private.rank_items_request_base_v1` and the consumed native candidate request
-contract; reuse their scorer and current adapter/conformance fixture.
+Active source candidate: `feat/shared-native-candidate-acquisition`, based on
+accepted #375 (`005228deabbfd80fdd037bf8b4151c4adb7a97d5`). Complete and validate
+this one packet before accepting or deploying it. Six source packets and three
+SQL forwards below remain the accepted baseline.
 
-Declare Profile/actor, domain/mode/session, committed receipt/prefix, acquisition
-policy, recognition constraints, seen/suppressed Items, source availability and
-request/eligibility clocks. Equal declared acquisition inputs must yield the same
-complete eligible candidate set before explicit question/delivery/evaluation
-selection. Keep unlike recognition and catalogue policies visible; do not turn
-the seven current non-comparable cases into a pass by relabeling their inputs.
-Consume the common owner through versioned native paths, not a disconnected
-helper or another scorer.
+`20261026172719_shared_native_candidate_acquisition.sql` supplies one versioned
+private owner consumed by the existing request base scorer and actual V4
+catalogue. The contract declares Profile/actor/session, mode/domain, evidence and
+eligibility clocks, source policy, the native request or exact V4 receipt and
+recognition bounds. Existing score formulas, retained policies and source rows
+remain unchanged. Current legacy Discovery source rules stay explicit rather
+than being silently changed to the canonical V4/evaluation rule.
 
-Preserve retained V4/Discovery policies, panels, catalogue chains, pages, commands,
-forecasts and historical replay. Extend the existing candidate-request and actual
-Taste consumer fixtures with populated-upgrade preservation and same-input pool
-checks in both PGlite and native PostgreSQL. Any serving-policy change needs an
-explicit version and its own acceptance evidence; this handoff does not authorize
-rewriting already retained policies or certifying historical state from a fixture.
+The existing candidate-request fixture owns populated-forward/current-consumer
+checks; the actual native Taste adapter keeps its independent equal-input replay,
+numeric-answer and immutable-source checks. Require all five final-source CI
+gates, including the native PostgreSQL forward matrix and current-consumer
+observer, before merging. Record the accepted source/CI/native report receipt
+here and in Sprint 015, then perform the separate guarded hosted preservation
+rollout of this new forward. No hosted write belongs to the source candidate.
 
-The installed SQL is complete for its accepted scope; do not repeat migrations,
-reset accounts/answers/commands, or manufacture hosted observations. Full
-four-consumer same-pool serving, certified prefix/historical availability, the
-real #232F Shared prepared-input consumer, native/hosted performance, predictive
-quality and Sprint 015 acceptance remain open. These are separate successors,
-not additional active packets or evidence that this sprint has closed.
+Do not repeat the three installed forwards, reset accounts/answers/commands or
+manufacture observations. Guided recognition/delivery policy alignment, certified
+prefix/historical availability, the real #232F Shared prepared-input consumer,
+native/hosted performance, predictive quality and Sprint 015 acceptance remain
+open. Full four-consumer same-pool serving is not established by this extraction.
 
 ## Accepted actual V4 Taste consumer conformance — #374
 

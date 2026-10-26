@@ -69,6 +69,20 @@ Fixtures and snapshots are disposable. The original adapter packet changed no
 SQL; the separate FINAL-input forward above preserves existing formulas, public
 APIs, forecasts and accounts. STATUS owns actual hosted installation.
 
+`20261026172719_shared_native_candidate_acquisition.sql` introduces one private
+`acquire_native_candidates_v1` owner, consumed by the actual request base scorer
+and V4 catalogue. It declares scope, clocks, native request/source rules or the
+exact V4 session receipt and recognition bounds. The identity owner threads its
+actual session only through private call context. There is no parallel scorer,
+public API or trace backfill. `native-candidate-request.{mjs,test.mjs}` additionally
+owns the shared populated-forward verifier (54 Personal/Shared mode/domain/
+acquisition cases, explicit evaluation, exact V4 catalogue and retained retries)
+and current-consumer observation, same-input pools, invalid contracts, closed
+access and recognition/source boundaries. Both verifiers run in the existing
+Supabase CLI gate. The actual Taste conformance report now identifies this shared
+owner while retaining the seven honest unlike-policy comparisons; guided
+recognition/delivery policy alignment remains a successor.
+
 The existing `scripts/working-report.mjs` and `scripts/working-cohort.mjs` under
 `packages/prediction-engine` consume this adapter in their explicit v2 contracts.
 They bind an immutable supplied genome and complete DELIVERY pool to the retained
