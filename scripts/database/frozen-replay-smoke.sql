@@ -38,6 +38,10 @@ begin
     seed_prediction := ranked.prediction_id;
     perform set_config('role','postgres',true);
     update private.prediction_runs set requested_at=now()-interval '2 days' where id=seed_prediction;
+    -- Keep the disposable history seed's new run binding in sync with its
+    -- deliberate fixture clock. Tested replay_sources are never rewritten.
+    update private.prediction_runs set state_snapshot=jsonb_set(state_snapshot,'{finalScoringInput,requestedAt}',to_jsonb(requested_at))
+      where id=seed_prediction and state_snapshot ? 'finalScoringInput';
     insert into public.events(id,actor_user_id,profile_id,item_id,item_type,event_type,occurred_at,prediction_id,properties)
       values(gen_random_uuid(),actor,profile,seed,'BOOK','ITEM_IMPRESSION',now()-interval '25 hours',seed_prediction,'{}'),
         (gen_random_uuid(),actor,profile,seed,'BOOK','ITEM_RATED',now()-interval '23 hours',seed_prediction,'{"rating":9}');
@@ -66,6 +70,8 @@ begin
     end loop;
   end loop;
   if (select count(*) from pg_temp.replay_sources)<>18 then raise exception 'Missing replay matrix case'; end if;
+  if exists(select 1 from pg_temp.replay_sources s where not private.validate_native_final_source_v1(s.id)) then
+    raise exception 'Replay matrix must consume marked FINAL inputs'; end if;
   if not exists(select 1 from private.prediction_candidates c join pg_temp.replay_sources s on s.id=c.prediction_id
     where c.scenario_score<>0 and c.explanation#>>'{scoringFeatures,longTerm}'<>c.explanation->>'longTerm') then
     raise exception 'Fixture lacks nonzero ScenarioMemory and full-precision features';

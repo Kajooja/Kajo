@@ -64,10 +64,66 @@ function freeze<T>(value: T): T {
   return value;
 }
 
+function sameJson(left: unknown, right: unknown): boolean {
+  if (left === right) return true;
+  if (left === null || right === null || typeof left !== 'object' || typeof right !== 'object') return false;
+  if (Array.isArray(left) || Array.isArray(right)) return Array.isArray(left) && Array.isArray(right)
+    && left.length === right.length && left.every((value, index) => sameJson(value, right[index]));
+  const a = left as Row, b = right as Row;
+  return Object.keys(a).length === Object.keys(b).length
+    && Object.keys(a).every(key => Object.hasOwn(b, key) && sameJson(a[key], b[key]));
+}
+
+// Optional historical generation, mandatory complete binding when marked. This
+// validates the frozen input; the adapter still does not independently rescore.
+function validateFinalInput(source: Row, state: Row, genome: Row, candidates: readonly unknown[]): void {
+  if (!Object.hasOwn(state, 'finalScoringInput')) {
+    check(candidates.every(candidate => !Object.hasOwn(row(row(candidate).explanation), 'finalScoringInput')),
+      'incompatible-snapshots');
+    return;
+  }
+  const marker = row(state.finalScoringInput);
+  check(marker.version === 'native-final-scoring-input-v1' && marker.stage === 'FINAL'
+    && marker.computation === 'FRESH_FINAL', 'unsupported-contract');
+  check(instant(marker.requestedAt) === instant(source.requested_at), 'incompatible-snapshots');
+  // The database limits its JSONB text envelope to 2 MiB. Exported JSON uses
+  // compact UTF-8 encoding; independently bound that representation as well.
+  const encoder = new TextEncoder();
+  let inputBytes = encoder.encode(JSON.stringify(marker)).length;
+  const expected = {
+    version: 'native-final-scoring-input-v1', stage: 'FINAL', computation: 'FRESH_FINAL',
+    predictionId: source.id, featureSourcePredictionId: source.id,
+    actorUserId: source.actor_user_id, profileId: source.profile_id, sessionId: source.session_id,
+    requestedAt: marker.requestedAt, itemType: source.requested_item_type, mode: source.discovery_mode,
+    modelVersion: source.model_version, baseModelVersion: source.base_model_version, policyVersion: source.policy_version,
+    context: source.context, candidateRequest: state.candidateRequest, predictionInput: state.predictionInput,
+    sourceGenome: { id: source.genome_id, config: genome.config }, candidateCount: source.candidate_count,
+    candidateIds: candidates.map(candidate => uuid(row(candidate).item_id)).sort(),
+  };
+  check(sameJson(marker, expected), 'incompatible-snapshots');
+  for (const value of candidates) {
+    const candidate = row(value), explanation = row(candidate.explanation), input = row(explanation.finalScoringInput);
+    inputBytes += encoder.encode(JSON.stringify(input)).length;
+    check(input.version === marker.version && input.stage === 'FINAL', 'unsupported-contract');
+    const consumed: Row = {};
+    for (const key of ['scoringFeatures', 'sharedCommonFit', 'resurfacingInput', 'resurfacingPolicy']) {
+      consumed[key] = row(explanation[key]);
+    }
+    finite(row(consumed.sharedCommonFit).contribution);
+    check(typeof row(consumed.resurfacingInput).eligible === 'boolean');
+    if (Object.hasOwn(explanation, 'workingIntent')) consumed.workingIntent = row(explanation.workingIntent);
+    check(sameJson(input, { version: marker.version, stage: 'FINAL', predictionId: source.id,
+      itemId: candidate.item_id, sourceGenomeId: source.genome_id, scenarioScore: candidate.scenario_score,
+      explanation: consumed }), 'incompatible-snapshots');
+  }
+  check(inputBytes <= 2_097_152);
+}
+
 /** Normalize complete fresh native rows; frozen-page continuation is a different contract. */
 export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapshot): FrozenRanking {
   assertRankingJson(input);
   const source = row(input.sourceRun), genome = row(input.sourceGenome), state = row(source.state_snapshot);
+  validateFinalInput(source, state, genome, list(input.sourceCandidates, 50));
   const request = row(state.candidateRequest), clocks = row(state.predictionInput);
   keys(request, ['version', 'acquisition', 'intent', 'itemIds', 'seenItemIds', 'reminderSpent', 'requiredAfter']);
   keys(clocks, ['version', 'nativeEvidenceAsOf', 'memoryStateAsOf', 'scenarioAsOf', 'requestAsOf', 'workingStateAsOf',

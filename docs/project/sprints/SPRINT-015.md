@@ -97,6 +97,23 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Fifth source packet is implemented on `feat/frozen-final-scoring-input`, based
+  on main `3610ed478da40c90a7f5a663eb1e3f5fb104e712`; final source/CI
+  acceptance is pending. It freezes one FINAL input after Scenario enrichment,
+  consumes it in the existing scoring/shadow/Working paths and validates complete
+  marked sources in the native adapter. Source and challenger genomes remain
+  distinct, including scalar-first reminder reselection. Protocol-2 reuse has
+  its own marker and original feature-source reference. Historical sources,
+  score math, public APIs, candidate policies and accounts remain unchanged.
+  Populated pre/post coverage includes 54 Personal/Shared mode/domain/acquisition
+  cases plus explicit evaluation, complete old trace and float8-byte equality,
+  all four function/security guards, malformed/nonfinite/oversized/missing pool
+  controls, empty pools, historical retries and page reuse. The existing native
+  CLI verifier gains seven marked-source and four rejection controls; it remains
+  synthetic engineering evidence. [STATUS](../STATUS.md) owns final checks and
+  exact acceptance. Hosted installation, full four-consumer same-pool parity,
+  certified historical input, #232F, performance, quality and sprint close remain
+  open; neither already-installed forward is repeated.
 - Fourth source packet: accepted through [PR #369](https://github.com/Kajooja/Kajo/pull/369),
   merge `53f84bbd2f487ec9460ee482425821d3830795b0`. Existing Personal
   Working report/cohort v2 consumes the native prediction adapter with an

@@ -418,6 +418,15 @@ explicit Taste `EVALUATION` and copied protocol-2 continuation sources cannot
 enter this exposure cohort. Precision-preserving stored clocks and lossless
 numeric export are prerequisites. Unsupported older snapshots stay immutable.
 
+Fresh sources marked `native-final-scoring-input-v1` additionally require the
+complete run binding and every candidate's exact FINAL input, including suppressed
+and unselected candidates and empty pools. The adapter validates source genome,
+model/policy, scope, request/clocks and sorted retained identities; unknown/mixed
+markers reject. Its compact UTF-8 input envelope is bounded to 2 MiB. The native
+SQL producer independently bounds JSONB text. This does not add rescoring or
+authenticate supplied files. Unmarked historical admission remains supported;
+`FROZEN_PAGE_REUSE` remains outside this fresh-source adapter.
+
 The native final ranking is compared with the retained OFF control across the
 complete pool, including candidates not selected for delivery. Identity,
 eligibility, tier, rank and selection are exact. The additional generic comparison

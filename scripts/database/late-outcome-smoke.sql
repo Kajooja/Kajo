@@ -33,6 +33,9 @@ begin
   perform set_config('role','postgres',true);
   -- Only this synthetic run is aged, before its shadow is frozen.
   update private.prediction_runs set requested_at=started where id=prediction;
+  -- This synthetic source is deliberately aged before the measured replay.
+  update private.prediction_runs set state_snapshot=jsonb_set(state_snapshot,'{finalScoringInput,requestedAt}',to_jsonb(requested_at))
+    where id=prediction and state_snapshot ? 'finalScoringInput';
   result := private.process_shadow_prediction_jobs_v1(250);
   if (result->>'failed')::integer<>0 then raise exception 'Shadow fixture failed: %',result; end if;
   select genome_id into strict genome from private.shadow_prediction_runs

@@ -314,6 +314,17 @@ receipts and existing coverage/withdrawal semantics. This advances EB-01/EB-03
 integration; it supplies neither certified input availability nor grade-error,
 native performance or observed predictive-quality acceptance.
 
+The subsequent frozen FINAL input slice prepares one versioned bounded candidate
+input inside the existing native identity scorer, then consumes it in scoring,
+shadow, Working comparison and native snapshot admission. It binds the complete
+retained pool and immutable source genome, preserves challenger reminder
+reselection and distinguishes frozen page reuse from fresh computation. Populated
+pre/post parity and rejected mixed-source controls advance EB-01/EB-03 integration;
+they do not close four-consumer pool parity, #232F, certified historical input,
+performance or observed quality. Canonical contract details are in
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#frozen-final-scoring-input--sprint-015-source),
+and source/CI versus hosted acceptance remains in STATUS.
+
 **Exit evidence:** the mapped cycle preserves Profile-as-Subject versus acting User, Personal/Shared scope, event occurrence/availability, candidate/slate order, frozen versions, late outcomes, idempotency and rollback. Extract one computation behind the current server boundary only after a same-input parity comparison; avoid a second drifting whole-scorer implementation. The eventual reusable integration must be exercised through the native boundary and another adapter, not merely imported into an unused package. Runtime acceptance and the E1 contract acceptance remain distinct.
 
 An optional externally trained prior is not a prerequisite for this core extraction. Conversely, rejecting that prior does not complete or cancel native-core integration. Full extraction is not silently added to MVP when existing requirements can be satisfied safely by the accepted SQL boundary.

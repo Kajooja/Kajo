@@ -44,6 +44,31 @@ function fixture() {
         workingIntent: { version: 'personal-working-features-v3', captureVersion: 'native-working-capture-v3', captureId: capture, control: 'OFF' } } })) };
 }
 type Fixture = ReturnType<typeof fixture>;
+function markedFixture(input = fixture()) {
+  const source = input.sourceRun, state = source.state_snapshot;
+  const finalScoringInput = {
+    version: 'native-final-scoring-input-v1', stage: 'FINAL', computation: 'FRESH_FINAL',
+    predictionId: source.id, featureSourcePredictionId: source.id,
+    actorUserId: source.actor_user_id, profileId: source.profile_id, sessionId: source.session_id,
+    requestedAt: source.requested_at, itemType: source.requested_item_type, mode: source.discovery_mode,
+    context: {}, candidateRequest: structuredClone(state.candidateRequest), predictionInput: structuredClone(state.predictionInput),
+    sourceGenome: { id: source.genome_id, config: structuredClone(input.sourceGenome.config) },
+    modelVersion: source.model_version, baseModelVersion: source.base_model_version, policyVersion: source.policy_version,
+    candidateCount: source.candidate_count, candidateIds: input.sourceCandidates.map(candidate => candidate.item_id).sort(),
+  };
+  return { ...input, sourceRun: { ...source, context: {}, state_snapshot: { ...state, finalScoringInput } },
+    sourceCandidates: input.sourceCandidates.map(candidate => {
+      const explanation = { ...candidate.explanation, sharedCommonFit: { applicable: false, contribution: 0 },
+        resurfacingInput: { ...candidate.explanation.resurfacingPolicy } };
+      return { ...candidate, explanation: { ...explanation, finalScoringInput: {
+        version: 'native-final-scoring-input-v1', stage: 'FINAL', predictionId: source.id,
+        itemId: candidate.item_id, sourceGenomeId: source.genome_id, scenarioScore: candidate.scenario_score,
+        explanation: structuredClone({ scoringFeatures: explanation.scoringFeatures, sharedCommonFit: explanation.sharedCommonFit,
+          resurfacingInput: explanation.resurfacingInput, resurfacingPolicy: explanation.resurfacingPolicy,
+          workingIntent: explanation.workingIntent }),
+      } } };
+    }) };
+}
 function evaluationFixture(): Fixture {
   const input = fixture(), state = input.sourceRun.state_snapshot;
   const requested = [id(13), id(99), id(11), id(12)];
@@ -66,6 +91,56 @@ const rejected = (mutate: (input: Fixture) => void) => {
   const input = fixture(); mutate(input); expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
 };
 describe('native prediction snapshot adapter', () => {
+  it('admits a complete frozen FINAL input while retaining unmarked historical contracts', () => {
+    const old = fixture(), input = markedFixture();
+    expect(normalizeKajoNativePrediction(input).candidates.map(c => c.score))
+      .toEqual(normalizeKajoNativePrediction(old).candidates.map(c => c.score));
+    input.sourceCandidates.reverse();
+    expect(normalizeKajoNativePrediction(input).candidates).toHaveLength(3);
+    const empty = fixture(); empty.sourceCandidates = []; empty.sourceRun.candidate_count = 0; empty.sourceRun.result_count = 0;
+    expect(normalizeKajoNativePrediction(markedFixture(empty)).candidates).toEqual([]);
+    expect(normalizeKajoNativePrediction(markedFixture(evaluationFixture())).intent).toBe('EVALUATION');
+    const zoned = markedFixture();
+    zoned.sourceRun.requested_at = '2026-10-26T02:00:00.000120+02:00';
+    expect(normalizeKajoNativePrediction(zoned).candidates).toHaveLength(3);
+  });
+  it('bounds the marked UTF-8 input even when the surrounding snapshot fits its larger export budget', () => {
+    const input = markedFixture(), context = { detail: 'é'.repeat(1_048_577) };
+    Object.assign(input.sourceRun.context, context);
+    Object.assign(input.sourceRun.state_snapshot.finalScoringInput.context, context);
+    expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+  });
+  it('rejects missing, mixed, unsupported and contradictory marked source bindings including suppressed candidates', () => {
+    type Marked = ReturnType<typeof markedFixture>;
+    for (const mutate of [
+      (x: Marked) => { delete (x.sourceRun.state_snapshot as Record<string, unknown>).finalScoringInput; },
+      (x: Marked) => { delete (x.sourceCandidates[2]!.explanation as Record<string, unknown>).finalScoringInput; },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.version = 'future'; },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.version = 'future'; },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.computation = 'FROZEN_PAGE_REUSE'; },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.predictionId = id(999); },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.actorUserId = id(999); },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.profileId = id(999); },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.requestedAt = at(121); },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.predictionInput.scenarioAsOf = at(101); },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.candidateRequest.reminderSpent = true; },
+      (x: Marked) => { x.sourceRun.state_snapshot.finalScoringInput.sourceGenome.config.modeWeights.FOR_YOU.direct = 2; },
+      (x: Marked) => { x.sourceCandidates.pop(); x.sourceRun.candidate_count = 2; },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.itemId = id(999); },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.sourceGenomeId = id(999); },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.scenarioScore += 0.1; },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.explanation.scoringFeatures.direct += 0.1; },
+      (x: Marked) => { x.sourceCandidates[2]!.explanation.finalScoringInput.explanation.resurfacingPolicy.eligible = true; },
+      (x: Marked) => { Object.assign(x.sourceCandidates[2]!.explanation.finalScoringInput, { futureField: true }); },
+      (x: Marked) => { Object.assign(x.sourceRun.state_snapshot.finalScoringInput, { futureField: true }); },
+    ]) {
+      const input = markedFixture(); mutate(input);
+      expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+    }
+    const empty = fixture(); empty.sourceCandidates = []; empty.sourceRun.candidate_count = 0; empty.sourceRun.result_count = 0;
+    const input = markedFixture(empty); input.sourceRun.state_snapshot.finalScoringInput.candidateIds.push(id(999));
+    expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+  });
   it('preserves microsecond clocks, tier-first identities, immutable genome inputs and synthetic origin', () => {
     const input = fixture(), output = normalizeKajoNativePrediction(input);
     expect(output.scope.subject).toEqual({ id: profile, kind: 'individual' });

@@ -28,6 +28,19 @@ supabase/functions/password-auth/
 
 ## Native ranking adapter and conformance — Sprint 015
 
+`20261026130243_frozen_final_scoring_input.sql` adds owner-only
+`native_final_candidate_input_v1`, `native_final_run_input_v1` and
+`validate_native_final_source_v1`. Guarded body changes preserve the four existing
+identity scorer, shadow worker, Working comparison and protocol-2 page function
+identities/access. FINAL input is prepared once after Scenario enrichment and
+consumed by the unchanged arithmetic; complete marked sources are validated at
+replay boundaries. Frozen page reuse has a separate computation marker.
+`scripts/database/frozen-final-scoring-input.test.mjs` owns populated-upgrade,
+54-case complete-trace/score-byte parity, source rejection, historical retry,
+page reuse and migration-security controls. The existing native adapter verifier
+and frozen-replay smoke cover marked baseline/challenger replay in local and
+native CLI gates. There is no new scoring implementation or test runner.
+
 `packages/prediction-engine/src/ranking-conformance.ts` compares complete frozen
 ranking snapshots without recomputing scores. The separate
 `src/adapters/kajo-native-prediction.ts` consumes actual private PredictionRun and
@@ -41,8 +54,9 @@ independent of application/provider code and the root estimator import graph.
 native scoring and baseline frozen shadow replay using the existing fixtures.
 The shared JavaScript verifier also runs in the Supabase CLI installation gate,
 so native PostgreSQL output reaches the same adapter and comparison code.
-Fixtures and snapshots are disposable; this packet changes no SQL, serving
-policy, public API, existing forecast, account or hosted migration.
+Fixtures and snapshots are disposable. The original adapter packet changed no
+SQL; the separate FINAL-input forward above preserves existing formulas, public
+APIs, forecasts and accounts. STATUS owns actual hosted installation.
 
 The existing `scripts/working-report.mjs` and `scripts/working-cohort.mjs` under
 `packages/prediction-engine` consume this adapter in their explicit v2 contracts.
