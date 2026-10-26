@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, three bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, four bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,13 +11,46 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native admission in existing Personal temporal reports / Sprint 015, #302, #336
+## Current handoff — frozen FINAL scoring input / Sprint 015, #302, #336
 
-Active source branch: `feat/working-native-admission-v2`, based on accepted main
-`286cc83b33ffc137c22e6605c54e88f66d492102`. The bounded packet extends the existing
-Personal temporal reports with explicit native-source admission (v2), preserving
-v1 contracts and receipts. Independent source review and local validation pass within the limits below;
-publication and all five required final-source CI gates are still pending.
+Continue from accepted implementation checkpoint
+`53f84bbd2f487ec9460ee482425821d3830795b0` ([#369](https://github.com/Kajooja/Kajo/pull/369)).
+Introduce one versioned frozen FINAL-stage input at
+`private.rank_items_request_with_identity_v1`, between `scenario_enriched` and
+`rescored`, after existing acquisition and Scenario enrichment. Build the bounded
+input once, consume it for scoring and freeze that same input. Bind the run,
+actor/Profile, complete retained Item identities/count, request, clocks and
+immutable source genome, including suppressed/unselected candidates and empty
+pools. A marked run requires complete, consistently versioned candidate inputs;
+unknown, missing or mixed marked inputs fail closed. Preserve unmarked historical
+replay and frozen records without backfill.
+
+Reuse `prediction_candidate_score_v2` and existing Working arithmetic, preserving
+operation order. Consume the contract in `private.process_shadow_prediction_jobs_v1`,
+the native adapter and `private.record_personal_working_shadow_v1` where marked
+sources enter its replay. Keep the challenger genome separate from the source
+genome. Challenger reminder choice retains scalar-score ordering before
+Scenario/common-fit contributions, followed by the existing reminder cap and
+reselection. No new scorer or acquisition policy belongs to this packet.
+
+Preserve acquisition/shortlists, all three request combinations, Taste v1/V4
+policies, evaluation non-delivery, post-lock skip/reset clocks, function identities
+and access. Retain the 2-MiB payload, 36-page and serving call-depth budgets.
+Require pre/post valid score/trace parity across Personal/Shared modes and domains,
+complete-pool rejection controls, baseline/challenger replay and later-data
+mutation controls. Keep exact identity/tier/rank/selection alongside the declared
+`1e-12` baseline comparator. Native CLI rollback smoke and full source checks are
+required; any hosted rollout is a separate acceptance step.
+
+Full four-consumer same-pool parity, certified prefix/historical availability,
+the real #232F Shared prepared-input consumer, native/hosted performance,
+predictive quality and Sprint 015 acceptance remain open. Preserve accepted
+accounts and answers; neither installed forward below needs repeating.
+
+## Accepted native admission in Personal temporal reports — #369
+
+The fourth bounded source packet extends the existing Working report/cohort with
+versioned native-source admission while preserving v1 contracts and receipts.
 
 `buildWorkingReport` in `packages/prediction-engine/scripts/working-report.mjs`
 and `createWorkingCohortDeclaration` / `buildWorkingCohortReport` in
@@ -49,8 +82,7 @@ four-consumer same-pool parity, certified committed-prefix/historical
 reconstruction and the real #232F Shared prepared-input consumer remain open.
 This packet does not close Sprint 015 or establish predictive quality. Neither
 installed forward below needs repeating; preserve accepted accounts, answers and
-frozen records. Finish review and required checks, publish this one source packet,
-then record its exact acceptance and one bounded successor here.
+frozen records.
 
 **Local validation:** 30 focused report/cohort tests preserve v1 declaration/report
 bytes and digests, reject conflicting genomes and unsupported/mixed versions,
@@ -68,8 +100,26 @@ All 362 database, 326 engine, 72 research, 904 mobile, 50 dependency,
 451 catalogue and 11 acceptance tests pass, with lint/types, ESM/import-graph
 checks and four explicit-demo iOS/Android Hermes exports. `npm run check` reaches
 the unchanged Deno npm-registry connection refusal; no complete local root pass
-is claimed. CI must independently complete the missing Edge gate and all five
-required source gates before merge.
+is claimed.
+
+**Source / CI:** [PR #369](https://github.com/Kajooja/Kajo/pull/369) is merged at
+`53f84bbd2f487ec9460ee482425821d3830795b0`. All five required source gates passed in
+[CI #748](https://github.com/Kajooja/Kajo/actions/runs/40317604029), attempt 2, on unchanged source
+`bfe9ffd7fcbcad8ab94d788b95ac5724e7b89d38`; source and merge retain reviewed tree
+`bfa0674601dbafdb41b5b2589de46503d6171495`.
+
+The completed attempt-2 validate log confirms the suites above, 32 Edge tests
+and four Hermes exports. Log SHA-256: `6d77f08adbdf97ed34a79d117f82ae5dc429048f1f1ceb72120d714e84822f55`.
+
+Attempt 1 hit a WASM `memory access out of bounds` failure in the unchanged
+atomic-page PGlite test. An unchanged targeted local pass supported one
+exact-source CI retry; the same head passed attempt 2. The cause remains
+unestablished; neither out-of-memory nor flakiness is diagnosed.
+
+This accepts the bounded offline report/cohort source packet. No hosted
+deployment, production SQL change, account reset or serving activation was
+performed. Existing native CI gates do not establish a new PostgreSQL v2-report
+execution, an observed outcome cohort or predictive quality.
 
 ## Accepted native prediction adapter — #367
 
@@ -243,8 +293,8 @@ Fresh hosted consumption remains unobserved: the postcheck found no naturally
 generated `native-prediction-clocks-v1` run yet. Installation verification does
 not close consumer, device or predictive-quality acceptance.
 
-The current handoff above extends the existing native temporal evaluation
-infrastructure within Sprint 015; full common-input/evidence integration remains open.
+The current handoff above binds frozen FINAL scoring inputs in the existing
+native identity/shadow paths; full common-input/evidence integration remains open.
 Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
 frozen shadow, generic contracts or retained Taste implementations. #232F's real
 Shared prepared-input consumer remains required. Existing phone observations
@@ -314,11 +364,11 @@ engine quality.
 **Active implementation: [Sprint 015](sprints/SPRINT-015.md).** Bind one versioned
 native prediction input/candidate/scoring contract for Taste, Discovery, explicit
 evaluation and shadow; require the acknowledged answer prefix in fresh forecasts;
-freeze exposure/outcome identity and deliver the temporal evaluation runner.
+reconcile exposure/outcome identity and complete declared temporal-evaluation coverage.
 Use the existing SQL scorer, memories, native command/evidence paths and generic
 adapter boundary. Do not build a parallel scorer or start anonymous web/UI work.
 
-Then execute [Sprints 016–021](ROADMAP.md#stage-1--build-and-accept-practical-engine-v1):
+After Sprint 015 acceptance, execute [Sprints 016–021](ROADMAP.md#stage-1--build-and-accept-practical-engine-v1):
 personal expected ratings/response style; temporal state/world/transfer; supported
 conditional memory; calibrated readiness/common policy; replay/consolidation/
 challenger/rollback; actual integrated usefulness acceptance. Each sprint defines
