@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, seven bounded source packets accepted; four SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eight bounded source packets accepted; four SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,75 +11,137 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — owned V4 receipt-to-forecast binding / Sprint 015, #302, #336
+## Current handoff — guarded owned V4 receipt-forward rollout / Sprint 015, #302, #336
 
-Seven bounded source packets are accepted and all four SQL forwards are installed.
-The shared acquisition installation and preservation receipt is below; do not
-repeat any installed forward. The next single source packet is the owned V4
-acknowledged-receipt to fresh-forecast provenance boundary.
+Eight bounded source packets are accepted. Four SQL forwards are installed; the
+new owned V4 receipt forward is **not installed**. The accepted source and exact
+CI receipt are below. The one next packet is its preservation-checked hosted
+rollout, **awaiting explicit owner approval for this exact production migration**.
+Repository publication/merge approval has been used. The previously recorded
+broad deployment authorization was insufficient for automatic approval review of
+this specific write; do not retry or bypass that rejection without explicit approval.
+Do not repeat any of the four installed forwards or implement this source again.
 
-Active source branch: `feat/v4-receipt-forecast-binding`, based on accepted main
-`c9a4eb71f2b3c56af0644bcb5cf7e808ab9e6d0d`. The new forward is
-`20261026201946_native_v4_receipt_forecast_binding.sql`; it is **not installed**.
-It binds a before-lock command-entry snapshot and actual V4 server receipt into
-the consumed evaluation/identity input and retained FINAL source, with strict
-native/portable admission. Existing clock/request fields retain their stated
-current-row limits. The current source is not accepted until its required checks
-and actual native concurrency evidence pass.
+After that approval, start from fresh accepted main. Install only
+`20261026201946_native_v4_receipt_forecast_binding.sql`, SHA-256
+`a4ec8f5cf5215d65c9b2f65eb64fb66a3621662b9d20516d221db41fdc4fd2e3`, after fresh
+READ ONLY preflight. Match its four predecessor function body/security/configuration
+guards and require both new helper names to be absent. Inventory all current
+public/private canonical rows, function identities/bodies/metadata, default
+privileges, table/access metadata and migration history before any write. Reuse
+the previous guarded rollout procedure; keep private row identities and snapshots
+outside Git. Stop on drift, unknown grants, preservation or admission mismatch.
 
-Local focused checks preserve all old canonical rows and function/default
-metadata, exact old retries, correction and dependent-source withdrawal. Thirteen
-prewrite and seven frozen corruption controls pass. The actual V4 fixture retains
-seven captures, 1095 comparisons, zero score difference, 0/5/10 sensitivity and
-21 unchanged sources; independent receipt-aligned evaluation now precedes NEXT while
-the exact parent receipt is current. Full local database (381), engine (332),
-research (72), acceptance (11), mobile (904), dependency (50) and catalogue
-(451) tests pass, as do lint/typecheck and all four explicit-demo Hermes exports.
-Root `npm run check` stops only at the Deno npm registry connection refusal;
-its Edge gate must pass in CI. All five corrected-final-source CI gates remain
-pending. [PR #379](https://github.com/Kajooja/Kajo/pull/379)
-is the active source. CI #773 passed validate (including all 32 Edge tests), both
-clean installs, platform and populated upgrade; the CLI probe passed the new
-forward/current receipt controls but stopped before concurrency because its
-phase label contained underscores. The fixture now normalizes only that log
-label to the runner's established format; database application names and gates
-are unchanged. CI #774 then passed the real two-connection late-commit and
-exact-duplicate tests, but its later independent evaluation exposed different
-valid global entry snapshots. Report v2 now preserves the complete comparator's
-non-conformance for those two witness paths, admits each receipt independently,
-and requires every remaining input and score to match. It reports receipt-aligned
-evaluations separately from full-input matches; snapshots are never rebound.
-Synthetic-copy controls cover the distinction without creating observations.
-The actual V4 fixture now runs in the early native CLI phase. Require all five
-gates on this corrected final head; the source and hosted forward are not yet
-accepted.
+Apply the exact accepted SQL once through the supported migration transaction;
+record the provider-issued history version rather than inventing one. Postchecks
+must verify the four expected body changes and two private owner-only INVOKER
+helpers, unchanged existing function identities/metadata and unrelated bodies,
+closed API access, unchanged defaults, complete fixed-row preservation and prior
+history digests. Check retained historical replay and receipt admission using
+READ ONLY probes. Report any genuine concurrent/new rows separately; do not
+manufacture hosted answers, forecasts or observations to obtain a passing sample.
 
-Start from fresh main and audit the existing V4 command receipts/panel bindings,
-shared acquisition's exact receipt check, request/FINAL capture and native adapter
-admission. Reuse these owners. Bind the actual server-owned Profile, actor,
-session, receipt revision, receipt transaction and instant to the fresh forecast
-that consumes them, with validation at the consumed input boundary. A timestamp
-freshness check alone is not independent receipt verification. Do not duplicate
-the acquisition receipt check, introduce another scorer or merely attach an
-unconsumed certificate beside unchanged computation.
+Record installation and any naturally observed fresh marked runs separately.
+No observed fresh run means no fresh-serving claim. The source proves visibility
+of one owned V4 receipt at command entry; it does not establish a global database
+prefix, historical reconstruction or cross-statement snapshot consistency.
+Retained forecasts, pools, panels, cached commands and selected policies stay
+preserved. Discovery's existing post-lock skip/reset gates remain intact.
 
-Use actual separately committed V4 START/NEXT/ANSWER/NEXT commands and existing
-conformance fixtures. Cover 0/5/10, exact retries, stale/replaced receipts,
-correction/withdrawal, other-Profile isolation and a transaction started before a
-lock wait; visibility claims require real PostgreSQL concurrency evidence.
-Preserve old forecasts, pools, panels, commands, policies and all prior-source
-replay. Keep Discovery's post-lock skip/reset gates intact. Stop the affected
-admission on a receipt, scope, visibility or preservation mismatch.
+Sprint 015 stays open: real #232F Shared consumption, remaining four-consumer
+input parity, exposure/outcome reconciliation, native/hosted performance and
+predictive quality still require their own evidence. Unlike recognition and
+Discovery selection inputs remain non-comparable. Guided policy/readiness keeps
+its Sprint 019 dependencies; no source/installation result closes those gates.
 
-This packet concerns the current owned V4 acknowledged prefix. It must state
-what was actually observed; it cannot certify arbitrary historical reconstruction,
-a global database prefix or cross-statement snapshot consistency without evidence.
-Retained recognition and Discovery selection inputs intentionally differ. The
-real #232F Shared consumer, remaining four-consumer input parity, exposure/outcome
-reconciliation, native/hosted performance and predictive-quality gates remain open.
-Guided policy/readiness acceptance keeps its Sprint 019 dependencies. Existing
-publication and guarded deployment authorization remains applicable; a new source
-forward still requires its own accepted checks and preservation rollout.
+## Hosted receipt-forward attempt — blocked before execution, 2026-10-26
+
+Automatic approval review rejected the supported `apply_migration` call for
+`native_v4_receipt_forecast_binding`. Its stated reason was that user-authored
+evidence clearly authorized repository publication/merge but did not clearly
+authorize this exact hosted production database write. No alternate execution
+path was attempted. The exact accepted file and SHA above are the approval scope.
+
+READ ONLY preflight had verified all 268 existing function identities/bodies/
+metadata, 24 default-privilege records, 67 tables/access definitions and 92 prior
+history records against the preceding hosted receipt. Both new helper names
+were absent and the migration's own four predecessor guards passed.
+
+Independent READ ONLY post-rejection checks at `2026-10-26T22:06:02Z` confirmed
+all **6465 fixed rows**, all 268 existing function identities/bodies/metadata,
+24 defaults and all 92 history records unchanged. Neither new helper exists,
+and there is no history row for the rejected migration. No new native receipt,
+clock/request or FINAL-marked run was observed. The forward is **not installed**;
+four earlier forwards remain installed. Private identities/snapshots stay outside
+Git. Refresh the preflight after approval; do not repeat accepted source work.
+
+## Accepted owned V4 receipt-to-forecast binding — #379
+
+The eighth bounded source packet is accepted through
+[PR #379](https://github.com/Kajooja/Kajo/pull/379), merge
+`d95429be91c232867f56765ef19b75d99e8b8038`. Fresh V4 forecasts consume the
+actual owned Profile/actor/session, revision, receipt transaction/instant and
+before-lock command-entry snapshot through the existing evaluation/identity
+boundary. The receipt is retained in FINAL with strict SQL/portable admission.
+No scoring formula, selected policy or public API changes.
+
+The native PostgreSQL proof uses independent connections and observes both lock
+waits. An ANSWER timestamp older than NEXT's transaction is insufficient while
+that answer is still uncommitted at command entry: the waiting NEXT rejects with
+`40001`, creates no forecast and preserves its predecessor. A fresh retry of the
+same rejected request then binds the acknowledged receipt. Concurrent duplicate
+NEXT commands return one exact saved response and create exactly one forecast.
+Canonical full-row cleanup and stack cleanup both pass.
+
+Populated-forward checks preserve all old canonical rows, all **267** existing
+function identities/metadata and default privileges; exactly **four** bodies
+change and **two** private helpers are added. Historical FINAL replay and the old
+NEXT retry remain exact. Seven atomic body/security/default/collision controls,
+**13** prewrite receipt controls and **seven** frozen corruption controls pass.
+Correction leaves the old frozen source unchanged; withdrawal erases dependent
+sources and invalidates their pools. Portable controls include exact 64-bit
+transaction identities, incomplete/mixed markers and empty candidate pools.
+
+The actual V4 fixture retains **seven** captures and seven independent
+receipt-aligned evaluations, **1095** candidate comparisons, **zero** maximum score difference at
+`1e-12`, numeric **0/5/10** sensitivity, **21** unchanged sources, exact retries and
+other-Profile isolation. The independent capture precedes NEXT while its exact
+parent receipt is current. The final report records **7** complete-input matches
+and **0** pairs with distinct valid receipt witnesses. When witnesses differ,
+report v2 retains both raw values and the full comparator's non-conformance;
+every other input, receipt field,
+scope, clock, candidate and score must match. Synthetic-copy controls are not
+native observations. All seven unlike recognition/Discovery policy cases
+remain explicitly non-comparable. The previous six-case adapter proof retains
+69 comparisons and 37 nonzero Scenario contributions.
+
+**Source / CI:** all five required final-source gates pass in
+[CI #775](https://github.com/Kajooja/Kajo/actions/runs/40404748536),
+attempt 1, on `db0c43834efaf7fb51fbb97143717df876f59c75`. The tested PR merge
+`55d450f399cb2fefbd1dcc45975655a5d89e2d73`, source and accepted merge share tree
+`ff1fbcb3f69a670e6e9418a991d376b469600197`. The downloaded final native CLI
+report was independently checked; SHA-256
+`edf96c8ef2faa14a9c6e920e171d64a07097eb6fb92d377ae2071f04fa895d7b`. Its new migration SHA matches the
+accepted file, both independent lock proofs are present, and every new receipt
+proof reports canonical cleanup.
+
+**Validation:** 381 database, 332 engine, 904 mobile, 451 catalogue, 50 dependency,
+72 research and 11 acceptance tests pass, with lint/typecheck, ESM/import-graph
+checks and four local explicit-demo exports. Final-source CI also passes all
+32 Edge tests and its four configured exports. Local root check encountered the
+Deno npm-registry connection refusal; no complete local root pass is claimed.
+Initial CI #773 passed four gates and native forward/current controls, then
+stopped before concurrency because an application name with underscores was
+reused as a restricted test-stage label. Normalizing only that log label fixed
+the harness. CI #774 then passed the actual receipt concurrency proof but found
+different global snapshots in a later independent evaluation. Report v2 now
+separates full-input equality from receipt-aligned computation parity and never
+rebinds those witnesses. The complete V4 verifier runs in the early native phase.
+No production guard, database name, deadline or score tolerance was weakened.
+
+The source is accepted; its guarded hosted rollout awaits the approval above.
+Runtime usefulness, global commit visibility, historical reconstruction and
+Sprint 015 acceptance are not inferred from these source/native results.
 
 ## Hosted shared acquisition receipt — 2026-10-26
 

@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — seven source packets accepted; four SQL forwards installed; remaining acceptance open**
+Status: **IN PROGRESS — eight source packets accepted; four SQL forwards installed; remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The next bounded source packet is the owned V4 acknowledged-receipt to fresh-forecast binding; [STATUS](../STATUS.md) owns its exact scope and the completed shared acquisition rollout receipt.
+The next bounded packet is the guarded hosted rollout of the accepted owned V4 receipt-to-forecast forward, awaiting explicit approval after automatic review rejected the exact production write; [STATUS](../STATUS.md) owns the source/CI receipt, rejection and preservation gates.
 
 ## Evidence and completion rules
 
@@ -97,30 +97,36 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Eighth source packet is in progress on `feat/v4-receipt-forecast-binding`:
-  owned V4 command-entry visibility and actual acknowledged receipt are consumed
-  before forecast writes and bound into FINAL/native adapter admission. Historical
-  rows, cached replies, score math and selection policies remain preserved.
-  The local populated forward, malformed/stale receipt controls, correction and
-  dependent-source withdrawal pass; the actual V4 numeric/parity fixture retains
-  seven captures, 1095 comparisons, zero difference and 21 unchanged sources.
-  Full local database (381), engine (332), research (72), acceptance (11),
-  mobile (904), dependency (50) and catalogue (451) tests, lint/typecheck and
-  four explicit-demo Hermes exports pass. Root check's Deno registry connection
-  refusal remains for CI. Separate-connection PostgreSQL late-commit/duplicate
-  tests join the early CLI gate; all five corrected-final-source gates remain
-  pending. [PR #379](https://github.com/Kajooja/Kajo/pull/379) is active.
-  CI #773 passed four gates and native forward/current controls, but a test-stage
-  label mismatch stopped before concurrency. The logging label is corrected;
-  CI #774 then passed actual two-connection concurrency but exposed distinct
-  global entry snapshots in a later independent evaluation. Report v2 retains
-  the full comparator's witness differences, separates receipt-aligned input/
-  score parity from full-input conformance and rejects all other differences.
-  Both witnesses are independently admitted and never rebound; synthetic-copy
-  controls do not become observations. All five gates must pass on this corrected
-  final source, with the actual V4 fixture moved to the early native phase.
-  The new forward is not hosted. [STATUS](../STATUS.md) owns the active source and
-  acceptance receipt; no broader commit/history, policy or quality gate closes.
+- Eighth source packet: accepted through [PR #379](https://github.com/Kajooja/Kajo/pull/379),
+  merge `d95429be91c232867f56765ef19b75d99e8b8038`. Actual owned V4 receipt
+  scope/revision/transaction and before-lock visibility are consumed by the
+  evaluation/identity boundary and retained in FINAL/native adapter admission.
+  Native independent connections prove the older-timestamp/uncommitted-answer
+  rejection without a forecast, a successful fresh retry and exactly-once
+  duplicate NEXT. Full-row/default/function preservation, 13 prewrite and seven
+  frozen controls, correction/withdrawal and canonical cleanup pass. Existing
+  seven captures, 1095 comparisons, zero score difference, 0/5/10 sensitivity and
+  21 unchanged sources remain intact; scoring and selected policies are unchanged.
+  All five final-source [CI #775](https://github.com/Kajooja/Kajo/actions/runs/40404748536)
+  gates pass on `db0c43834efaf7fb51fbb97143717df876f59c75`, with 381 database,
+  332 engine, 904 mobile, 451 catalogue, 50 dependency, 72 research, 11 acceptance
+  and 32 Edge tests and four configured exports. Initial native CI stopped at a
+  logging-label constraint before concurrency; the next run proved concurrency
+  but exposed distinct global snapshot witnesses. Report v2 retains the full
+  comparator result for each pair and reports receipt-aligned computation parity
+  separately from full-input equality, with no snapshot rebinding. The final
+  source passes its declared gates. The new forward is **not hosted**. [STATUS](../STATUS.md)
+  owns the exact report receipt and one guarded rollout handoff. Global/history,
+  four-consumer policy, runtime/performance and predictive-quality gates stay open.
+
+- Automatic approval review rejected this forward's hosted `apply_migration`
+  call because prior user-authored approval did not clearly cover this exact
+  production database write. No bypass was attempted. READ ONLY post-rejection
+  checks confirm 6465 fixed rows, 268 function identities/bodies/metadata,
+  24 default-privilege records and 92 history rows unchanged, with neither new
+  helper nor migration history entry present. The new forward remains uninstalled.
+  [STATUS](../STATUS.md) records the exact file/SHA and one approval-dependent
+  rollout handoff; the accepted source and CI do not need to be repeated.
 
 - Seventh source packet: accepted through [PR #376](https://github.com/Kajooja/Kajo/pull/376),
   merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`. Actual V4 catalogue and request base scoring consume one
@@ -150,7 +156,7 @@ does not become an invented pass.
   their replay result. Security/performance findings are unchanged. No new marked
   run or synthetic observation was created. This completes installation and
   preservation, not fresh hosted serving, performance, quality or Sprint 015.
-  STATUS owns the next owned V4 receipt-to-forecast source packet; broader policy
+  STATUS owns the current guarded receipt-forward rollout; broader policy
   alignment, certified historical availability and the other sprint gates stay open.
 
 - Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
