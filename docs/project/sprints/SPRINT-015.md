@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — shared native computation cutoff source packet**
+Status: **IN PROGRESS — first bounded source packet accepted**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -97,8 +97,9 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- First source packet: `feat/engine-shared-input-contract`, based on accepted
-  main #362. `20261025211014_shared_prediction_cutoff.sql` aligns existing
+- First source packet: accepted through [PR #363](https://github.com/Kajooja/Kajo/pull/363),
+  merge `feae2b17251d8d233e1925c66664d114b50fa341`.
+  `20261025211014_shared_prediction_cutoff.sql` aligns existing
   memory/Scenario arithmetic to the native evidence transaction cutoff and retains a private
   `native-prediction-clocks-v1` envelope in fresh PredictionRuns. The actual
   ordinary/catalogue Discovery and explicit Taste evaluation paths consume it;
@@ -114,9 +115,21 @@ does not become an invented pass.
   engine tests pass, with dependency/catalogue/research/acceptance checks,
   lint/types and four demo exports. Seven focused regressions prove the actual
   prior numeric mismatch, frozen-record preservation and latest skip/reset
-  handling. A real lifecycle holder/waiter regression joins the native CLI gate.
-  Local root stops at the existing Deno registry refusal; all five required
-  final-source CI gates remain pending and are recorded by the PR.
+  handling. The real lifecycle holder/waiter regression passed on native
+  PostgreSQL. Local root stops at the existing Deno registry refusal; all five
+  required final-source CI gates passed in
+  [CI #735](https://github.com/Kajooja/Kajo/actions/runs/40235892151) on
+  `d07ce07c03953dfeb14163bef96728036c02faa2`. The merge preserves the exact
+  reviewed tree `ab1225364addbc9561c783b7e503d8d37649c28b`.
+- Hosted installation: the owner-authorized
+  `20261025211014_shared_prediction_cutoff.sql` forward was installed on
+  2026-10-26. Read-only postchecks verified the expected function, unchanged
+  identity/metadata/security boundary, migration receipt and prior history.
+  All 958 fixed existing records checked were unchanged: 20 PredictionRuns,
+  936 candidates and two page receipts; no shadow/comparison rows were present
+  in the sample. New answers and forecasts were excluded from the comparison.
+  Fresh hosted consumption remains unobserved. Do not repeat earlier deployments
+  or reset accepted answers.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
