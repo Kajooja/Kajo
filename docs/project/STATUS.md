@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, two bounded source packets accepted and installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, three bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,14 +11,48 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native prediction adapter / Sprint 015, #302, #336
+## Current handoff — native admission in existing Personal temporal reports / Sprint 015, #302, #336
 
-Active source branch: `feat/native-prediction-adapter`, based on accepted main
-`fde781395e60cb926f46ce03c55b409715b2fb1d` ([#366](https://github.com/Kajooja/Kajo/pull/366)).
-The packet connects actual native frozen computation to the existing generic/Kajo
-adapter boundary with executable conformance against the native baseline shadow
-replay. The source PR owns its exact head and final CI receipt; this branch is not
-accepted main merely because this implementation note exists.
+Continue from accepted implementation checkpoint
+`3159c1959cbbe4edb0f2923eb1ee177b6a227642` ([#367](https://github.com/Kajooja/Kajo/pull/367)).
+Extend the existing Personal temporal reports with explicit versioned native-source
+admission (v2), preserving their v1 contracts and receipts. Keep `buildWorkingReport` in
+`packages/prediction-engine/scripts/working-report.mjs` and
+`createWorkingCohortDeclaration` / `buildWorkingCohortReport` in
+`packages/prediction-engine/scripts/working-cohort.mjs` as owners. Add the actual
+immutable `sourceGenome`, bound to `planSnapshot.sourceRun.genome_id`, to the
+existing actor/Profile, source run/candidates and `snapshotObservedAt` inputs;
+reuse `normalizeKajoNativePrediction`. Admit only `DELIVERY` sources and require
+full OFF-pool identity, eligibility, rank and selection conformance with a
+fixed predeclared absolute score tolerance of `1e-12`; no other field receives
+tolerance. Preserve the existing exact OFF checks and emit bounded aliased
+conformance/coverage summaries.
+
+Pin the `candidateRequest`, `predictionInput` and adapter versions, clocks and
+precision preconditions in the v2 declaration digest/rules. Preserve existing
+roster, window, horizon, settlement, first-capture, withdrawal and privacy/alias
+guards. `FIRST_RESERVED_CAPTURE_REVISION_1` means first capture, not first label;
+retain `personal-latest-terminal-v1` label resolution and its correction semantics.
+The explicit Taste `EVALUATION` population remains separate future work, not a
+Working exposure cohort or a prerequisite for this bounded extension. No new
+runner, scorer, native I/O or SQL migration belongs to this packet. Keep ordinal
+ranking diagnostics separate from future grade-error evaluation, with honest
+prefix, exposure and label-availability limits.
+
+Supplied files cannot establish authorization, complete inventory, commit
+visibility or historical availability. Native performance evidence remains open.
+Full four-consumer same-pool parity, certified committed-prefix/historical
+reconstruction and the real #232F Shared prepared-input consumer remain open.
+This next packet does not close Sprint 015 or establish predictive quality.
+Neither installed forward below needs repeating; preserve accepted accounts,
+answers and frozen records.
+
+## Accepted native prediction adapter — #367
+
+The third bounded source packet connects actual native frozen computation to
+the existing generic/Kajo adapter boundary. Four delivery fixture cases use the
+native baseline shadow worker; two explicit evaluation cases use the existing
+frozen score helper.
 
 The adapter consumes `candidateRequest`, `predictionInput`, the complete retained
 candidate pool, native ranking scores and provenance. Exact scope, policy,
@@ -42,21 +76,27 @@ all canonical tables remain unchanged after rollback. All 361 database and 326
 engine tests pass, with lint/types, 904 mobile, 50 dependency, 451 catalogue,
 62 research and 11 acceptance tests and four explicit-demo Hermes exports.
 `npm run check` reaches the unchanged Deno npm-registry connection refusal;
-no complete local root-check pass is claimed. Initial native CI exposed rounded
-caller serialization of microsecond Working clocks. The fixture now pins
+no complete local root-check pass is claimed. The initial CI #743 native gate
+exposed rounded caller serialization of microsecond Working clocks. The fixture now pins
 round-trip precision locally; a full-schema microsecond regression verifies both
 acceptance and rejection of rounded captures and restores the caller setting.
 The strict adapter is unchanged. Admission requires precision-preserving captures
 and lossless numeric export; unsupported old records are never rewritten.
-Final-source CI is pending.
 
-After source acceptance, continue a bounded Personal temporal evaluation
-manifest/report runner using these frozen inputs, with declared windows,
-denominators, exclusions and honest prefix/exposure/label-availability limits.
-Keep ordinal ranking diagnostics separate from future grade-error evaluation.
-Full four-consumer same-pool parity and
-the real #232F Shared prepared-input consumer remain required within Sprint 015.
-Neither installed forward below needs repeating.
+**Source / CI:** [PR #367](https://github.com/Kajooja/Kajo/pull/367) is merged at
+`3159c1959cbbe4edb0f2923eb1ee177b6a227642`. All five required final-source gates passed in
+[CI #744](https://github.com/Kajooja/Kajo/actions/runs/40309955743) on
+`f3f7e86d7de8c30b7b5a8ac3efa62fd0ca60f18c`. Source and merge retain reviewed tree
+`3af1d8b7d23ae79f21edac0ea1408d5648fbcc76`. The downloaded native CLI artifact independently
+confirms the six cases, 69 retained candidates, 37 nonzero Scenario contributions
+and zero score difference under `1e-12`, exact retained metadata/input bindings,
+precision-preserving capture/export and successful rollback/runtime cleanup.
+Native report SHA-256: `b3640f0cbeff20f5bed9a1c757cfee086724d1951eccd78a5844d35d0a7dcc9f`.
+
+This accepts the bounded source/conformance packet. It performs no hosted
+deployment, production SQL change, account reset or serving activation. Fresh hosted
+consumption and device/predictive-quality acceptance are not established by
+these synthetic native fixtures.
 
 ## Accepted native candidate request — #365
 
@@ -76,9 +116,9 @@ own the contract and implementation paths.
 
 Only the three existing acquisition/intent combinations are admitted. This does
 not enable a new Taste policy, combine candidate pools, establish historical-as-of
-reconstruction or close Sprint 015. Native adapter/temporal evaluation and #232F's
-real Shared prepared-input consumer remain required. The previous computation-
-cutoff forward is already installed; do not repeat it or reset accepted answers.
+reconstruction or close Sprint 015. Full native-input integration, temporal
+evaluation and #232F's real Shared prepared-input consumer remain required.
+The previous computation-cutoff forward is already installed; do not repeat it or reset accepted answers.
 
 **Local validation:** independent review and all 360 database tests pass. The
 populated upgrade compares 54 existing Personal/Shared mode/domain/acquisition
@@ -179,8 +219,8 @@ Fresh hosted consumption remains unobserved: the postcheck found no naturally
 generated `native-prediction-clocks-v1` run yet. Installation verification does
 not close consumer, device or predictive-quality acceptance.
 
-The current handoff above continues the remaining Sprint 015
-shared candidate/evidence contract and native adapter/temporal evaluation work.
+The current handoff above extends the existing native temporal evaluation
+infrastructure within Sprint 015; full common-input/evidence integration remains open.
 Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
 frozen shadow, generic contracts or retained Taste implementations. #232F's real
 Shared prepared-input consumer remains required. Existing phone observations

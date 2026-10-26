@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — two bounded source packets accepted and installed; native adapter/evaluation open**
+Status: **IN PROGRESS — three source packets accepted; two SQL forwards installed; temporal evaluation and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -73,7 +73,8 @@ trusted input and comparison boundary.
 EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
-Next: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
+After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
+The current bounded packet adds native admission to existing Personal temporal reports; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -97,8 +98,8 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- Third source packet: in progress on `feat/native-prediction-adapter` from
-  accepted main `fde781395e60cb926f46ce03c55b409715b2fb1d`. A strict Kajo adapter
+- Third source packet: accepted through [PR #367](https://github.com/Kajooja/Kajo/pull/367),
+  merge `3159c1959cbbe4edb0f2923eb1ee177b6a227642`. A strict Kajo adapter
   maps actual frozen candidate requests, input clocks and complete native ranking
   traces into a separate generic conformance boundary. The shared SQL-fixture
   verifier compares the source against the existing native baseline shadow
@@ -108,20 +109,26 @@ does not become an invented pass.
   synthetic, and copied continuation pages are not relabeled fresh forecasts.
   This is an EB-01/EB-03 and EB-12 integration slice (architecture sections
   1–3, 10–13, 30, 37, 40–44 and 49–51), with no new scorer, SQL migration,
-  serving activation or quality claim. Independent review, all 361 database and
-  326 engine tests pass. The six-case real-SQL fixture compares 69 candidates,
+  serving activation or quality claim. Independent review, 15 focused package
+  tests, all 361 database and 326 engine tests pass. The six-case real-SQL
+  fixture compares 69 candidates,
   including 37 nonzero Scenario contributions, with zero score difference under
   `1e-12`; four delivery cases use the shadow worker and two explicit evaluation
   cases use the frozen score helper. Full table rollback equality passes.
   Other local suites and four demo exports pass; the aggregate check retains
-  the unchanged Deno registry refusal. The first native CI attempt exposed
+  the unchanged Deno registry refusal. The initial CI #743 native gate exposed
   rounded caller serialization; the rollback-only fixture now declares full
   float precision and tests microsecond capture rejection at rounded precision.
   Admission is limited to precision-preserving captures and lossless exports;
   existing lossy snapshots are not repaired or granted clock tolerance.
-  Final-source CI/merge remain pending;
-  STATUS and the source PR own those receipts. The temporal runner,
-  full same-pool parity and genuine #232F consumer remain open.
+  All five final-source gates passed in [CI #744](https://github.com/Kajooja/Kajo/actions/runs/40309955743)
+  on `f3f7e86d7de8c30b7b5a8ac3efa62fd0ca60f18c`; merge preserves tree
+  `3af1d8b7d23ae79f21edac0ea1408d5648fbcc76`. The downloaded native report verifies the
+  same six cases/69 candidates/37 Scenario contributions with zero score
+  difference at `1e-12`, exact retained bindings and successful cleanup.
+  [STATUS](../STATUS.md) owns the detailed receipt and next bounded native-source
+  admission extension in the existing Personal temporal reports. Full same-pool
+  parity, certified prefixes, exposure/label reconciliation and #232F remain open.
 - Second source packet: accepted through [PR #365](https://github.com/Kajooja/Kajo/pull/365),
   merge `8d1a786389318dcf41804f5009a9271156d81e1d`.
   `20261026073031_native_candidate_request_contract.sql`
@@ -146,9 +153,9 @@ does not become an invented pass.
   candidate and page records, 89 prior history entries and existing function
   metadata/default privileges were preserved. The pure READ ONLY validator probe
   passed; fresh hosted consumption remains unobserved. [STATUS](../STATUS.md)
-  owns the detailed scoped receipt and next native adapter/conformance packet.
+  owns the detailed scoped receipt and current bounded evaluation handoff.
   Full same-pool parity, certified committed-prefix/historical reconstruction,
-  the native temporal evaluation runner and #232F remain open.
+  full native temporal-evaluation integration and #232F remain open.
 - First source packet: accepted through [PR #363](https://github.com/Kajooja/Kajo/pull/363),
   merge `feae2b17251d8d233e1925c66664d114b50fa341`.
   `20261025211014_shared_prediction_cutoff.sql` aligns existing
@@ -160,8 +167,9 @@ does not become an invented pass.
   time and reset-aware Working capture retain their existing clocks.
 - Limits: a logical clock is not one MVCC snapshot or a certified committed
   prefix. Current-row source/feature/state reads, the legacy versus explicit
-  candidate policies, native adapter/temporal runner and #232F consumer still
-  require their own bounded successors. Full four-consumer pool parity and
+  candidate policies, full native-input integration, temporal evaluation and
+  #232F consumer still require their own bounded successors. Full four-consumer
+  pool parity and
   Sprint 015 acceptance remain open.
 - Source / CI: independent semantic review and local 351 database/904 mobile/311
   engine tests pass, with dependency/catalogue/research/acceptance checks,
