@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, seven bounded source packets accepted; three SQL forwards installed, shared acquisition forward pending; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, seven bounded source packets accepted; four SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,32 +11,86 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — guarded shared acquisition rollout / Sprint 015, #302, #336
+## Current handoff — owned V4 receipt-to-forecast binding / Sprint 015, #302, #336
 
-Seven bounded source packets are accepted. The next single packet is the guarded
-hosted preservation rollout of `20261026172719_shared_native_candidate_acquisition.sql`
-from [PR #376](https://github.com/Kajooja/Kajo/pull/376), merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`.
-Its exact source SHA-256 is `a4b3cf0a05abb82e892c4c0b21337f15677ca680ef70b987731fe5c14284ed6e`.
-The three earlier SQL forwards below remain installed; this fourth forward is
-**not yet installed**. No hosted data or natural observations were changed by
-the source packet.
+Seven bounded source packets are accepted and all four SQL forwards are installed.
+The shared acquisition installation and preservation receipt is below; do not
+repeat any installed forward. The next single source packet is the owned V4
+acknowledged-receipt to fresh-forecast provenance boundary.
 
-Start with fresh main and a read-only hosted inventory. Verify the actual installed
-prefix, the three guarded predecessor bodies/owners/configuration/grants and new
-helper absence. Preserve complete canonical rows, existing function identities,
-access/default privileges and retained sessions/pools/panels/commands/chains/pages/
-forecasts. Apply only this forward after its preservation preflight, verify the
-installed bodies and exact before/after preservation, and record the actual
-hosted history mapping and receipt. Stop on drift; never repeat older forwards,
-reset answers/accounts or manufacture hosted observations. Existing publication
-and guarded deployment authorization remains applicable.
+Start from fresh main and audit the existing V4 command receipts/panel bindings,
+shared acquisition's exact receipt check, request/FINAL capture and native adapter
+admission. Reuse these owners. Bind the actual server-owned Profile, actor,
+session, receipt revision, receipt transaction and instant to the fresh forecast
+that consumes them, with validation at the consumed input boundary. A timestamp
+freshness check alone is not independent receipt verification. Do not duplicate
+the acquisition receipt check, introduce another scorer or merely attach an
+unconsumed certificate beside unchanged computation.
 
-The common native acquisition owner is now implemented. Retained recognition and
-Discovery selection inputs intentionally remain different. Guided recognition/
-delivery policy alignment, certified prefix/historical availability, the real
-#232F Shared prepared-input consumer, native/hosted performance, predictive quality
-and Sprint 015 acceptance stay open; full four-consumer same-pool serving is not
-yet established. They are separate successors, not additional active packets.
+Use actual separately committed V4 START/NEXT/ANSWER/NEXT commands and existing
+conformance fixtures. Cover 0/5/10, exact retries, stale/replaced receipts,
+correction/withdrawal, other-Profile isolation and a transaction started before a
+lock wait; visibility claims require real PostgreSQL concurrency evidence.
+Preserve old forecasts, pools, panels, commands, policies and all prior-source
+replay. Keep Discovery's post-lock skip/reset gates intact. Stop the affected
+admission on a receipt, scope, visibility or preservation mismatch.
+
+This packet concerns the current owned V4 acknowledged prefix. It must state
+what was actually observed; it cannot certify arbitrary historical reconstruction,
+a global database prefix or cross-statement snapshot consistency without evidence.
+Retained recognition and Discovery selection inputs intentionally differ. The
+real #232F Shared consumer, remaining four-consumer input parity, exposure/outcome
+reconciliation, native/hosted performance and predictive-quality gates remain open.
+Guided policy/readiness acceptance keeps its Sprint 019 dependencies. Existing
+publication and guarded deployment authorization remains applicable; a new source
+forward still requires its own accepted checks and preservation rollout.
+
+## Hosted shared acquisition receipt — 2026-10-26
+
+The owner-authorized rollout installed only
+`20261026172719_shared_native_candidate_acquisition.sql`, accepted through
+[PR #376](https://github.com/Kajooja/Kajo/pull/376), source merge
+`1c9ff2aa6f37325c8d7214fe9a1e692f048da647`. Provider history records it as
+`20261026193802_shared_native_candidate_acquisition`; retain that provider-issued
+timestamp. Its one stored statement matches the accepted file byte for byte:
+SHA-256 `a4b3cf0a05abb82e892c4c0b21337f15677ca680ef70b987731fe5c14284ed6e`.
+
+Fresh READ ONLY preflight matched all 267 public/private function identities,
+bodies and metadata, 24 default-privilege records and 91 migration-history records
+against the preceding verified hosted receipt. All 67 canonical tables and primary
+keys matched. The new helper name was absent, and the migration's three predecessor
+body/owner/security/configuration guards passed before the unchanged SQL was
+applied through the supported migration transaction.
+
+READ ONLY postchecks verified the exact three patched bodies and new private
+owner-only INVOKER `acquire_native_candidates_v1(jsonb)`. All 267 existing function
+identities and metadata, including ACLs, remained unchanged; the 264 unrelated
+bodies, 24 default-privilege records and 67 tables' columns/owners/RLS/access
+metadata were identical. Existing API access did not expand. All 91 prior history
+records retained their complete-row digests, with exactly one new migration.
+
+All **6465 fixed existing rows** across the 67 public/private tables retained
+their full-row digests and identities: zero missing/changed rows and zero additional
+rows at the postcheck. This includes 49 PredictionRuns, 2386 candidates, 47 V4
+pools, 47 panels, 73 sequential commands and the four stored page receipt/catalogue
+page records. Empty tables remain empty, not exercised consumers. Private row
+identities, snapshots and environment details stay outside Git.
+
+A READ ONLY probe rejected an invalid acquisition contract and preserved the
+historical unmarked replay result for all 49 old runs. Security/performance advisor
+findings were unchanged: the existing [leaked-password protection warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection),
+53 [RLS-without-policy INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy),
+7 [unindexed-foreign-key INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys)
+and 58 [unused-index INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index)
+remain baseline findings, with no new finding introduced by this rollout. The
+existing password-protection warning remains tracked under #160/#184.
+
+No new native clock/request/FINAL-marked run was observed, including zero
+`FRESH_FINAL` and zero `FROZEN_PAGE_REUSE` runs. No answer, forecast, replay job or
+synthetic observation was created. This proves installation, closed access and
+preservation; actual fresh serving, latency/usefulness, historical reconstruction,
+model admission and Sprint 015 acceptance remain open. Source CI #767 below is
+the executable validation baseline; this receipt changes documentation only.
 
 ## Accepted shared native candidate acquisition — #376
 
@@ -88,7 +142,7 @@ transport control fixed it. CI #767 attempt 1 was cancelled after over 17 minute
 without database results; unchanged-head attempt 2 completed the required gates.
 No gate or score tolerance was relaxed.
 
-The source is accepted; the guarded hosted forward above remains pending.
+The source is accepted; its guarded hosted forward is installed with the receipt above.
 Sprint 015, serving-policy alignment, runtime/performance and usefulness gates
 remain open.
 

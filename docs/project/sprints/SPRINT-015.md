@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — seven source packets accepted; three SQL forwards installed; shared acquisition rollout and remaining acceptance open**
+Status: **IN PROGRESS — seven source packets accepted; four SQL forwards installed; remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The next bounded packet is the guarded preservation rollout of the accepted shared native acquisition forward; see [STATUS](../STATUS.md).
+The next bounded source packet is the owned V4 acknowledged-receipt to fresh-forecast binding; [STATUS](../STATUS.md) owns its exact scope and the completed shared acquisition rollout receipt.
 
 ## Evidence and completion rules
 
@@ -114,8 +114,19 @@ does not become an invented pass.
   tree `08cebd1d9b649351b6deb8f8a5497cf24bc76ae3`. All 371 database tests and other suites/exports pass;
   CI supplies 32 Edge passes despite the local registry connection limitation.
   STATUS records exact native artifact provenance and the corrected transport
-  assertion/cancelled-then-successful validation attempt. The new fourth SQL
-  forward is not hosted yet; its guarded rollout is the one next packet.
+  assertion/cancelled-then-successful validation attempt. The fourth SQL forward
+  was installed on 2026-10-26 as provider history
+  `20261026193802_shared_native_candidate_acquisition`, with identical stored SQL
+  bytes. READ ONLY pre/post checks preserve all 6465 fixed rows across 67 tables,
+  their schema/access metadata, 267 existing function identities/metadata, 264
+  unrelated function bodies, 24 default-privilege records and 91 prior migration
+  records. The three patched bodies and new owner-only INVOKER match the accepted
+  SQL exactly. Invalid acquisition input rejects; all 49 old unmarked runs retain
+  their replay result. Security/performance findings are unchanged. No new marked
+  run or synthetic observation was created. This completes installation and
+  preservation, not fresh hosted serving, performance, quality or Sprint 015.
+  STATUS owns the next owned V4 receipt-to-forecast source packet; broader policy
+  alignment, certified historical availability and the other sprint gates stay open.
 
 - Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
   merge `96fcaf07e54fe3249c8b5bb570d4b9fefbfedf39`. Actual committed V4 commands,
