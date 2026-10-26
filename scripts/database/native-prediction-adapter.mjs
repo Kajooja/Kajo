@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { nativeCandidateRequestFixtureSql } from './native-candidate-request.mjs';
+import { personalTasteSessionFixtureSql } from './personal-taste-session.mjs';
 
 let implementation;
 async function adapter() {
@@ -18,6 +20,74 @@ async function adapter() {
     ]).then(([native, generic]) => ({ ...native, ...generic }));
   }
   return implementation;
+}
+
+function nativeCasesSql(sourcesSql) {
+  return `(select jsonb_agg(jsonb_build_object('name',s.name,
+    'scope',jsonb_build_object('profile',case when p.profile_type='PERSONAL' then
+      jsonb_build_object('id',p.id,'type',p.profile_type,'ownerUserId',p.owner_user_id) else
+      jsonb_build_object('id',p.id,'type',p.profile_type,'memberUserIds',
+        (select jsonb_agg(m.user_id order by m.user_id) from public.profile_members m where m.profile_id=p.id)) end,
+      'user',jsonb_build_object('id',r.actor_user_id),'sessionId',coalesce(r.session_id::text,'')),
+    'sourceRun',to_jsonb(r),'sourceGenome',to_jsonb(g),
+    'sourceCandidates',(select coalesce(jsonb_agg(to_jsonb(c) order by c.final_rank),'[]'::jsonb) from private.prediction_candidates c where c.prediction_id=r.id),
+    'evaluationReceipt',s.evaluation_receipt,
+    'replay',case when r.result_count>0 then
+      (select jsonb_build_object('kind','BASELINE_SHADOW_WORKER','sourcePredictionId',sr.source_prediction_id,'run',to_jsonb(sr),
+        'rows',(select jsonb_agg(jsonb_build_object('itemId',c.item_id,'score',c.shadow_score,'rank',c.shadow_rank,
+          'sourceRank',c.source_rank,'sourceScore',c.source_score,'productionRank',c.production_final_rank,
+          'productionScore',c.production_final_score,'scenarioScore',c.scenario_score,
+          'inputs',c.explanation#>'{input,productionExplanation}',
+          'eligible',(c.explanation#>>'{resurfacingPolicy,eligible}')::boolean,
+          'tier',private.prediction_delivery_tier_v1(c.explanation->'resurfacingPolicy'),'selected',c.hypothetical_selected)
+          order by c.shadow_rank) from private.shadow_prediction_candidates c where c.shadow_prediction_id=sr.id))
+        from private.shadow_prediction_runs sr where sr.source_prediction_id=r.id and sr.genome_id=r.genome_id)
+      else (select jsonb_build_object('kind','FROZEN_SCORE_HELPER','sourcePredictionId',r.id,
+        'rows',coalesce(jsonb_agg(jsonb_build_object('itemId',c.item_id,'score',c.score,'rank',c.rank,'eligible',c.eligible,
+          'sourceRank',c.source_rank,'sourceScore',c.source_score,'productionRank',c.final_rank,
+          'productionScore',c.final_score,'scenarioScore',c.scenario_score,'inputs',c.explanation,
+          'tier',c.tier,'selected',false) order by c.rank),'[]'::jsonb)) from (
+          select x.*,row_number() over(order by tier,score desc,item_id)::integer rank from (
+            select c.*,private.prediction_candidate_score_v2(r.discovery_mode,c.explanation#>'{finalScoringInput,explanation}',
+              (c.explanation#>>'{finalScoringInput,scenarioScore}')::double precision,g.config) score,
+              (c.explanation#>>'{resurfacingPolicy,eligible}')::boolean eligible,
+              private.prediction_delivery_tier_v1(c.explanation->'resurfacingPolicy') tier
+            from private.prediction_candidates c where c.prediction_id=r.id) x) c) end
+    ) order by s.name) from (${sourcesSql}) s join private.prediction_runs r on r.id=s.prediction_id
+      join public.profiles p on p.id=r.profile_id join private.predictor_genomes g on g.id=r.genome_id)`;
+}
+
+function nativeReplayView(sample, actual) {
+  assert.equal(sample.replay.sourcePredictionId, sample.sourceRun.id);
+  assert.deepEqual(sample.replay.rows.map(r => r.itemId).sort(), actual.candidates.map(c => c.objectId).sort());
+  if (sample.replay.kind === 'BASELINE_SHADOW_WORKER') {
+    const run = sample.replay.run, original = sample.sourceRun;
+    for (const key of ['profile_id', 'actor_user_id', 'session_id', 'genome_id', 'requested_item_type',
+      'discovery_mode', 'context', 'state_snapshot', 'candidate_count']) assert.deepEqual(run[key], original[key], `Shadow run ${key}`);
+    assert.equal(run.as_of, original.requested_at);
+    assert.equal(run.source_model_version, original.model_version);
+    assert.equal(run.source_policy_version, original.policy_version);
+    assert.equal(run.hypothetical_result_count, original.result_count);
+    // The replay producer was versioned forward; the immutable baseline
+    // registry intentionally retains its original code/feature identifiers.
+    assert.equal(run.code_version, 'shadow-replay-v2');
+    assert.equal(run.feature_version, 'prediction-features-v2');
+    for (const key of ['memory_version', 'outcome_version', 'reward_version']) {
+      assert.equal(run[key], sample.sourceGenome[key], `Shadow artifact ${key}`);
+    }
+  }
+  const candidates = sample.replay.rows.map(row => {
+    const frozen = sample.sourceCandidates.find(c => c.item_id === row.itemId);
+    for (const [replayed, stored] of [['sourceRank', 'source_rank'], ['sourceScore', 'source_score'],
+      ['productionRank', 'final_rank'], ['productionScore', 'final_score'], ['scenarioScore', 'scenario_score']]) {
+      assert.equal(row[replayed], frozen[stored], `Shadow candidate ${stored}`);
+    }
+    assert.deepEqual(row.inputs, frozen.explanation, 'Replay must retain the exact frozen production inputs');
+    return { ...actual.candidates.find(c => c.objectId === row.itemId), sourceScore: row.sourceScore,
+      sourceRank: row.sourceRank, score: row.score, rank: row.rank, eligible: row.eligible, tier: row.tier, selected: row.selected };
+  });
+  return { ...actual, candidates, constraints: { ...actual.constraints,
+    allowedActionIds: candidates.filter(c => c.eligible).map(c => c.actionId) } };
 }
 
 // Real current SQL produces every source, feature, score and replay below. The
@@ -145,38 +215,7 @@ end;$native_adapter$;
 select jsonb_build_object('observedAt',clock_timestamp(),'frozenPreserved',true,
   'finalInputValidation',jsonb_build_object('version','native-final-scoring-input-v1','sources',7,'rejectionControls',4),
   'floatSerializationDigits',current_setting('extra_float_digits')::integer,
-  'cases',(select jsonb_agg(jsonb_build_object('name',s.name,
-    'scope',jsonb_build_object('profile',case when p.profile_type='PERSONAL' then
-      jsonb_build_object('id',p.id,'type',p.profile_type,'ownerUserId',p.owner_user_id) else
-      jsonb_build_object('id',p.id,'type',p.profile_type,'memberUserIds',
-        (select jsonb_agg(m.user_id order by m.user_id) from public.profile_members m where m.profile_id=p.id)) end,
-      'user',jsonb_build_object('id',r.actor_user_id),'sessionId',coalesce(r.session_id::text,'')),
-    'sourceRun',to_jsonb(r),'sourceGenome',to_jsonb(g),
-    'sourceCandidates',(select coalesce(jsonb_agg(to_jsonb(c) order by c.final_rank),'[]'::jsonb) from private.prediction_candidates c where c.prediction_id=r.id),
-    'evaluationReceipt',s.evaluation_receipt,
-    'replay',case when r.result_count>0 then
-      (select jsonb_build_object('kind','BASELINE_SHADOW_WORKER','sourcePredictionId',sr.source_prediction_id,'run',to_jsonb(sr),
-        'rows',(select jsonb_agg(jsonb_build_object('itemId',c.item_id,'score',c.shadow_score,'rank',c.shadow_rank,
-          'sourceRank',c.source_rank,'sourceScore',c.source_score,'productionRank',c.production_final_rank,
-          'productionScore',c.production_final_score,'scenarioScore',c.scenario_score,
-          'inputs',c.explanation#>'{input,productionExplanation}',
-          'eligible',(c.explanation#>>'{resurfacingPolicy,eligible}')::boolean,
-          'tier',private.prediction_delivery_tier_v1(c.explanation->'resurfacingPolicy'),'selected',c.hypothetical_selected)
-          order by c.shadow_rank) from private.shadow_prediction_candidates c where c.shadow_prediction_id=sr.id))
-        from private.shadow_prediction_runs sr where sr.source_prediction_id=r.id and sr.genome_id=r.genome_id)
-      else (select jsonb_build_object('kind','FROZEN_SCORE_HELPER','sourcePredictionId',r.id,
-        'rows',coalesce(jsonb_agg(jsonb_build_object('itemId',c.item_id,'score',c.score,'rank',c.rank,'eligible',c.eligible,
-          'sourceRank',c.source_rank,'sourceScore',c.source_score,'productionRank',c.final_rank,
-          'productionScore',c.final_score,'scenarioScore',c.scenario_score,'inputs',c.explanation,
-          'tier',c.tier,'selected',false) order by c.rank),'[]'::jsonb)) from (
-          select x.*,row_number() over(order by tier,score desc,item_id)::integer rank from (
-            select c.*,private.prediction_candidate_score_v2(r.discovery_mode,c.explanation#>'{finalScoringInput,explanation}',
-              (c.explanation#>>'{finalScoringInput,scenarioScore}')::double precision,g.config) score,
-              (c.explanation#>>'{resurfacingPolicy,eligible}')::boolean eligible,
-              private.prediction_delivery_tier_v1(c.explanation->'resurfacingPolicy') tier
-            from private.prediction_candidates c where c.prediction_id=r.id) x) c) end
-    ) order by s.name) from adapter_sources s join private.prediction_runs r on r.id=s.prediction_id
-      join public.profiles p on p.id=r.profile_id join private.predictor_genomes g on g.id=r.genome_id),
+  'cases',${nativeCasesSql('select * from adapter_sources')},
   'continuation',(select jsonb_build_object('sourceRun',to_jsonb(r),
     'sourceGenome',(select to_jsonb(g) from private.predictor_genomes g where g.id=r.genome_id),
     'sourceCandidates',(select jsonb_agg(to_jsonb(c) order by c.final_rank) from private.prediction_candidates c where c.prediction_id=r.id))
@@ -196,38 +235,7 @@ export async function verifyNativePredictionAdapter(exec) {
   const source = { kind: 'generator', id: 'native-prediction-adapter-fixture', version: '1', parentRefs: [] };
   const options = { absoluteTolerance: 1e-12 };
   const normalize = sample => normalizeKajoNativePrediction({ ...sample, source, snapshotObservedAt: fixture.observedAt });
-  const replayView = (sample, actual) => {
-    assert.equal(sample.replay.sourcePredictionId, sample.sourceRun.id);
-    assert.deepEqual(sample.replay.rows.map(r => r.itemId).sort(), actual.candidates.map(c => c.objectId).sort());
-    if (sample.replay.kind === 'BASELINE_SHADOW_WORKER') {
-      const run = sample.replay.run, original = sample.sourceRun;
-      for (const key of ['profile_id', 'actor_user_id', 'session_id', 'genome_id', 'requested_item_type',
-        'discovery_mode', 'context', 'state_snapshot', 'candidate_count']) assert.deepEqual(run[key], original[key], `Shadow run ${key}`);
-      assert.equal(run.as_of, original.requested_at);
-      assert.equal(run.source_model_version, original.model_version);
-      assert.equal(run.source_policy_version, original.policy_version);
-      assert.equal(run.hypothetical_result_count, original.result_count);
-      // The replay producer was versioned forward; the immutable baseline
-      // registry intentionally retains its original code/feature identifiers.
-      assert.equal(run.code_version, 'shadow-replay-v2');
-      assert.equal(run.feature_version, 'prediction-features-v2');
-      for (const key of ['memory_version', 'outcome_version', 'reward_version']) {
-        assert.equal(run[key], sample.sourceGenome[key], `Shadow artifact ${key}`);
-      }
-    }
-    const candidates = sample.replay.rows.map(row => {
-      const frozen = sample.sourceCandidates.find(c => c.item_id === row.itemId);
-      for (const [replayed, stored] of [['sourceRank', 'source_rank'], ['sourceScore', 'source_score'],
-        ['productionRank', 'final_rank'], ['productionScore', 'final_score'], ['scenarioScore', 'scenario_score']]) {
-        assert.equal(row[replayed], frozen[stored], `Shadow candidate ${stored}`);
-      }
-      assert.deepEqual(row.inputs, frozen.explanation, 'Replay must retain the exact frozen production inputs');
-      return { ...actual.candidates.find(c => c.objectId === row.itemId), sourceScore: row.sourceScore,
-        sourceRank: row.sourceRank, score: row.score, rank: row.rank, eligible: row.eligible, tier: row.tier, selected: row.selected };
-    });
-    return { ...actual, candidates, constraints: { ...actual.constraints,
-      allowedActionIds: candidates.filter(c => c.eligible).map(c => c.actionId) } };
-  };
+
   assert.equal(fixture.frozenPreserved, true);
   assert.deepEqual(fixture.finalInputValidation, { version: 'native-final-scoring-input-v1', sources: 7, rejectionControls: 4 });
   assert.equal(fixture.cases.length, 6);
@@ -237,7 +245,7 @@ export async function verifyNativePredictionAdapter(exec) {
     let actual;
     try { actual = normalize(sample); }
     catch (error) { throw new Error(`Native adapter fixture ${sample.name}: ${error.stack ?? error}`, { cause: error }); }
-    const replay = replayView(sample, actual);
+    const replay = nativeReplayView(sample, actual);
     const comparison = compareFrozenRankings(actual, replay, options);
     assert.equal(comparison.conforms, true, `${sample.name}: ${JSON.stringify(comparison.mismatches)}`);
     comparedCandidates += comparison.comparedCandidates;
@@ -286,7 +294,7 @@ export async function verifyNativePredictionAdapter(exec) {
     mutated(x => { x.replay.run.profile_id = 'ab157000-0000-4000-8000-000000000999'; }),
     mutated(x => { x.replay.rows[0].sourceScore += 1; }),
     mutated(x => { x.replay.rows[0].inputs.scoringFeatures.longTerm += 1; }),
-  ]) assert.throws(() => replayView(invalid, actual), assert.AssertionError);
+  ]) assert.throws(() => nativeReplayView(invalid, actual), assert.AssertionError);
   for (const invalid of [
     mutated(x => { x.sourceCandidates[0].prediction_id = 'ab157000-0000-4000-8000-000000000999'; }),
     mutated(x => { x.sourceCandidates[0].final_score = Infinity; }),
@@ -320,4 +328,317 @@ export async function verifyNativePredictionAdapter(exec) {
     evaluationUnavailableAndNonDelivery: true, emptyPoolAndAbsentSession: true,
     negativeControls: 'SCORE_ELIGIBILITY_POOL_RANK_SELECTION_SOURCE_CLOCK_VERSION_GENOME_CONTINUATION',
     historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'ROLLED_BACK' };
+}
+
+const sqlLiteral = value => "'" + String(value).replaceAll("'", "''") + "'";
+const jsonLiteral = value => sqlLiteral(JSON.stringify(value)) + '::jsonb';
+
+// Independent captures have distinct IDs. Rebind only validated self-references
+// for comparison, never scope, clocks, state, inputs, ranks or scores. The
+// persisted records and both original normalized captures remain untouched.
+function bindCaptureIdentity(ranking, reference) {
+  const predictionId = reference.predictionId;
+  const result = structuredClone(ranking), original = result.predictionId;
+  assert.notEqual(original, predictionId);
+  assert.equal(result.provenance.record.recordId, original);
+  assert.equal(result.inputSnapshot.id, original);
+  const marker = result.inputSnapshot.state_snapshot.finalScoringInput;
+  assert.equal(marker.computation, 'FRESH_FINAL');
+  assert.equal(marker.predictionId, original);
+  assert.equal(marker.featureSourcePredictionId, original);
+  result.predictionId = result.provenance.record.recordId = result.inputSnapshot.id = predictionId;
+  marker.predictionId = marker.featureSourcePredictionId = predictionId;
+  const working = result.inputSnapshot.state_snapshot.workingState;
+  const targetWorking = reference.inputSnapshot.state_snapshot.workingState;
+  const captureId = working.captureId;
+  for (const capture of [working, targetWorking]) {
+    assert.deepEqual(capture.refs, {
+      scopeId: 'native-working:' + capture.captureId, subjectRef: 'native-working:' + capture.captureId + ':subject',
+      actorRef: 'native-working:' + capture.captureId + ':actor', sessionRef: 'native-working:' + capture.captureId + ':session',
+    }, 'Working aliases must belong to their own validated capture');
+  }
+  working.captureId = targetWorking.captureId;
+  working.refs = structuredClone(targetWorking.refs);
+  for (const candidate of result.candidates) {
+    assert.equal(candidate.inputs.sourcePredictionId, original);
+    assert.equal(candidate.inputs.explanation.finalScoringInput.predictionId, original);
+    candidate.inputs.sourcePredictionId = candidate.inputs.explanation.finalScoringInput.predictionId = predictionId;
+    for (const explanation of [candidate.inputs.explanation, candidate.inputs.explanation.finalScoringInput.explanation]) {
+      assert.equal(explanation.workingIntent.captureId, captureId);
+      assert.equal(explanation.workingIntent.candidateFeatures.captureId, captureId);
+      explanation.workingIntent.captureId = explanation.workingIntent.candidateFeatures.captureId = targetWorking.captureId;
+    }
+  }
+  return result;
+}
+
+// PGlite and the disposable native CLI stack execute the same verifier. START,
+// NEXT and ANSWER commit separately; no backdated receipts or clock overrides
+// can stand in for the current public V4 command path.
+export async function verifyNativeTasteConsumer(execSql) {
+  const { normalizeKajoNativePrediction, compareFrozenRankings } = await adapter();
+  const exec = (sql, stage) => execSql(sql, { stage: 'native-taste-consumer-' + stage, timeoutMs: 120_000 });
+  const one = async (sql, stage) => (await exec(sql, stage))[0];
+  const id = n => 'ab157000-0000-4000-8000-' + String(n).padStart(12, '0');
+  const actors = [id(1), id(2), id(3)], controlActor = id(4);
+  const source = { kind: 'generator', id: 'native-taste-consumer-fixture', version: '1', parentRefs: [] };
+  const tolerance = { absoluteTolerance: 1e-12 };
+  const command = (s, operation, extra = {}) => ({ operation, profileId: s.profileId, sessionId: s.sessionId,
+    requestId: randomUUID(), expectedRevision: s.revision, ...extra });
+  const call = (actor, request) => one('begin;set local extra_float_digits=3;'
+    + 'set local request.jwt.claim.sub=' + sqlLiteral(actor) + ';set local role authenticated;'
+    + 'select public.taste_session_v2(' + jsonLiteral(request) + ');commit;', 'committed-command');
+  const session = state => one('select to_jsonb(s) from private.sequential_taste_sessions s where id='
+    + sqlLiteral(state.sessionId) + ';', 'session');
+  const frozen = predictionId => one("begin read only;set local extra_float_digits=3;select jsonb_build_object('run',to_jsonb(r),'candidates',"
+    + "(select jsonb_agg(to_jsonb(c) order by c.item_id) from private.prediction_candidates c where c.prediction_id=r.id),"
+    + "'panel',(select to_jsonb(p) from private.sequential_taste_panels p where p.id=r.id),"
+    + "'pool',(select to_jsonb(p) from private.sequential_taste_candidate_pools_v4 p where p.panel_id=r.id))"
+    + ' from private.prediction_runs r where r.id=' + sqlLiteral(predictionId) + ';rollback;', 'retained-source');
+  let fixture = false, snapshots, original, failure;
+  const observations = [], comparisons = [], boundaries = [];
+  const capture = async (actor, state, label) => {
+    const parent = await session(state), next = command(state, 'NEXT');
+    const feed = { version: 3, requestId: randomUUID(), profileId: state.profileId, sessionId: state.sessionId,
+      discoveryMode: 'FOR_YOU', itemType: 'MOVIE', limit: 5, context: {}, cursor: null, replacesChainId: null };
+    const output = await exec('begin;set local extra_float_digits=3;set local request.jwt.claim.sub=' + sqlLiteral(actor)
+      + ';set local role authenticated;select public.taste_session_v2(' + jsonLiteral(next) + ');reset role;'
+      + `select private.capture_personal_evaluation_v1(gen_random_uuid(),r.profile_id,
+          array(select value::uuid from jsonb_array_elements_text(r.state_snapshot#>'{candidateRequest,itemIds}')),
+          (r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz,
+          jsonb_build_object('sessionId',s.id))
+        from private.sequential_taste_sessions s join private.prediction_runs r
+          on r.id=(s.presentations#>>'{-1,poolId}')::uuid where s.id=` + sqlLiteral(state.sessionId) + ';'
+      + 'set local role authenticated;select public.rank_items_feed_v1(' + jsonLiteral(feed) + ');reset role;'
+      + `select jsonb_build_object('predictionId',p.prediction_id,
+          'receiptMatches',(r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz=`
+      + sqlLiteral(parent.receipt_at) + `::timestamptz,
+          'separateTransaction',p.captured_transaction<>` + sqlLiteral(parent.receipt_transaction) + `::text,
+          'afterReceipt',p.captured_at>` + sqlLiteral(parent.receipt_at) + `::timestamptz)
+        from private.sequential_taste_sessions s join private.sequential_taste_panels p
+          on p.id=(s.presentations#>>'{-1,poolId}')::uuid
+        join private.prediction_runs r on r.id=p.prediction_id where s.id=` + sqlLiteral(state.sessionId) + ';commit;',
+    label + '-next-and-controls');
+    assert.equal(output.length, 4);
+    const [question, evaluation, discovery, binding] = output;
+    assert.equal(question.status, 'QUESTION');
+    assert.deepEqual(binding, { predictionId: binding.predictionId,
+      receiptMatches: true, separateTransaction: true, afterReceipt: true });
+    const refs = [['taste', binding.predictionId], ['evaluation', evaluation.predictionId], ['discovery', discovery.predictionId]];
+    assert.equal(new Set(refs.map(([, predictionId]) => predictionId)).size, 3);
+    const rows = refs.map(([name, predictionId]) => 'select ' + sqlLiteral(name) + ' name,'
+      + sqlLiteral(predictionId) + '::uuid prediction_id,null::jsonb evaluation_receipt').join(' union all ');
+    const replayed = await exec(`begin;set local extra_float_digits=3;
+      insert into private.shadow_prediction_jobs(source_prediction_id,genome_id)
+        select id,genome_id from private.prediction_runs where id=` + sqlLiteral(discovery.predictionId) + ` on conflict do nothing;
+      select private.process_shadow_prediction_jobs_v1(250);
+      select jsonb_build_object('observedAt',clock_timestamp(),'cases',` + nativeCasesSql(rows) + ');commit;',
+    label + '-frozen-replay');
+    assert.equal(replayed[0].failed, 0);
+    const snapshot = replayed[1];
+    assert.equal(snapshot.cases.length, 3);
+    const samples = Object.fromEntries(snapshot.cases.map(sample => {
+      const actual = normalizeKajoNativePrediction({ ...sample, source, snapshotObservedAt: snapshot.observedAt });
+      const comparison = compareFrozenRankings(actual, nativeReplayView(sample, actual), tolerance);
+      assert.equal(comparison.conforms, true, label + '/' + sample.name + ': ' + JSON.stringify(comparison.mismatches));
+      comparisons.push(comparison);
+      return [sample.name, { sample, actual }];
+    }));
+    const { actual: taste } = samples.taste, { actual: explicit } = samples.evaluation, { actual: delivery } = samples.discovery;
+    const comparison = compareFrozenRankings(taste, bindCaptureIdentity(explicit, taste), tolerance);
+    assert.equal(comparison.conforms, true, label + ' independent evaluation: ' + JSON.stringify(comparison.mismatches));
+    comparisons.push(comparison);
+    // Rebinding self-references must not hide a different scope, clock or input.
+    for (const mutate of [
+      value => { value.clocks.evidenceAsOf += 1; },
+      value => { value.scope.actingIdentityRef = id(999); },
+      value => { value.candidates[0].score += 1e-6; },
+      value => { value.candidates[0].inputs.explanation.scoringFeatures.longTerm += 1; },
+    ]) {
+      const invalid = bindCaptureIdentity(explicit, taste); mutate(invalid);
+      assert.equal(compareFrozenRankings(taste, invalid, tolerance).conforms, false);
+    }
+    const retained = await frozen(taste.predictionId);
+    assert.equal(retained.panel.session_id, state.sessionId);
+    assert.equal(retained.panel.prefix_revision, state.revision);
+    assert.equal(retained.panel.frozen.requiredReceiptRevision, state.revision);
+    assert.equal(String(retained.panel.frozen.requiredReceiptTransaction), String(parent.receipt_transaction));
+    assert.deepEqual(retained.pool.catalog.map(item => item.id).sort(), [...taste.acquisition.requestedObjectIds].sort());
+    assert.equal(retained.pool.invalidated, false);
+    assert.equal(retained.panel.invalidated, false);
+    const currentSession = await session(question);
+    assert.equal(currentSession.policy, 'CANONICAL_FORECAST_POOL_V4');
+    assert.ok(taste.candidates.some(candidate => candidate.objectId === question.currentItem.id));
+    assert.ok(taste.candidates.every(candidate => !candidate.selected));
+    for (const item of retained.panel.frozen.items) {
+      const candidate = taste.candidates.find(value => value.objectId === item.itemId);
+      assert.equal(item.status === 'AVAILABLE', candidate?.eligible === true);
+      if (item.status === 'AVAILABLE') {
+        assert.equal(item.score, candidate.score);
+        assert.equal(item.rank, candidate.rank);
+      }
+    }
+    assert.equal(taste.intent, 'EVALUATION');
+    assert.equal(delivery.intent, 'DELIVERY');
+    assert.equal(taste.acquisition.policy, 'EXPLICIT_CANONICAL');
+    assert.equal(delivery.acquisition.policy, 'CATALOG_CHAIN');
+    assert.equal(taste.clocks.eligibilityClock, 'TRANSACTION_START');
+    assert.equal(delivery.clocks.eligibilityClock, 'CURRENT_WALL_TIME');
+    assert.equal(taste.itemType, null);
+    assert.equal(delivery.itemType, 'MOVIE');
+    assert.equal(delivery.clocks.evidenceAsOf, taste.clocks.evidenceAsOf);
+    assert.deepEqual(delivery.scope, taste.scope);
+    assert.deepEqual(delivery.scoringArtifact, taste.scoringArtifact);
+    assert.equal(compareFrozenRankings(taste, delivery, tolerance).conforms, false);
+    const tasteMovies = retained.pool.catalog.filter(item => item.itemType === 'MOVIE').map(item => item.id);
+    const discoveryOnly = delivery.candidates.filter(candidate => !tasteMovies.includes(candidate.objectId));
+    assert.equal(tasteMovies.length, 25);
+    assert.ok(!tasteMovies.includes(id(99)), 'Low-recognition Item must fall outside the retained V4 recognition pool');
+    assert.ok(discoveryOnly.some(candidate => candidate.objectId === id(99)), 'Actual Discovery must expose the acquisition gap');
+    boundaries.push({ case: label, status: 'NOT_COMPARABLE_AS_SAME_INPUT',
+      differences: ['ACQUISITION', 'CANDIDATE_POOL', 'DOMAIN_SCOPE', 'INTENT_SELECTION', 'ELIGIBILITY_CLOCK', 'POLICY_VERSION'],
+      tasteMovieCandidates: tasteMovies.length, discoveryCandidates: delivery.candidates.length,
+      discoveryOutsideTastePool: discoveryOnly.length });
+    assert.deepEqual(await call(actor, next), question, 'Lost NEXT reply changed its committed question');
+    const result = { actor, label, question, parent, samples, retained, currentSession };
+    observations.push(result);
+    return result;
+  };
+  try {
+    assert.deepEqual(await one(`select jsonb_build_object(
+      'users',(select count(*) from auth.users where id::text like 'ab157000-%'),
+      'items',(select count(*) from public.items where id::text like 'ab157000-%'));`, 'reserved-scope'), { users: 0, items: 0 });
+    const tables = await one(`select jsonb_agg(format('%I.%I',n.nspname,c.relname) order by n.nspname,c.relname)
+      from pg_class c join pg_namespace n on n.oid=c.relnamespace
+      where c.relkind='r' and n.nspname in('public','private','auth');`, 'canonical-tables');
+    snapshots = 'begin read only;set local extra_float_digits=3;select jsonb_object_agg(name,value) from (' + tables.map(name => 'select ' + sqlLiteral(name)
+      + ` name,encode(sha256(convert_to(coalesce(jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text),'[]')::text,'UTF8')),'hex') value
+        from ` + name + ' r').join(' union all ') + ') s;rollback;';
+    original = await one(snapshots, 'canonical-before');
+    fixture = true;
+    await exec('begin;' + await personalTasteSessionFixtureSql() + `
+      insert into auth.users(id,email,raw_user_meta_data) values
+        ('${id(3)}','taste-native-high@example.invalid','{"kajo_nickname":"Native high"}'),
+        ('${id(4)}','taste-native-control@example.invalid','{"kajo_nickname":"Native control"}');
+      update public.items set tags=array['shared-feature','taste-'||right(id::text,1)]
+        where id::text like 'ab157000-%';
+      insert into public.items(id,item_type,title,tags,metadata)
+        select ('ab157000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid,'MOVIE','Consumer fixture '||n,
+          array['shared-feature','additional-feature'],
+          jsonb_build_object('coldStartRecognition',case when n=99 then 0 else 0.1 end,
+            'coldStartPriorSource','KAJO_CURATED_RECOGNITION')
+        from generate_series(99,219) n where n=99 or n>=200;
+      insert into private.item_sources(item_id,provider_key,provider_item_id)
+        select id,'kajo_curated',id::text from public.items where title like 'Consumer fixture %';commit;`, 'fixture');
+    const starters = [];
+    for (const actor of [...actors, controlActor]) {
+      const profileId = await one('select to_jsonb(id) from public.profiles where owner_user_id='
+        + sqlLiteral(actor) + " and profile_type='PERSONAL';", 'profile');
+      starters.push(await call(actor, { operation: 'START', profileId, requestId: randomUUID() }));
+    }
+    const initial = [];
+    for (const [index, actor] of [...actors, controlActor].entries()) {
+      initial.push(await capture(actor, starters[index], 'before-' + index));
+    }
+    assert.equal(new Set(initial.map(value => value.question.currentItem.id)).size, 1, 'Counterfactuals need the same first Item');
+    const ratings = [0, 5, 10], after = [];
+    for (const [index, actor] of actors.entries()) {
+      const prior = initial[index];
+      const answer = command(prior.question, 'ANSWER', {
+        questionId: prior.question.questionId, answer: { kind: 'RATING', value: ratings[index] } });
+      const accepted = await call(actor, answer);
+      assert.deepEqual(await call(actor, answer), accepted, 'Duplicate ANSWER must be an exact retry');
+      after.push(await capture(actor, accepted, 'after-rating-' + ratings[index]));
+      assert.deepEqual(await frozen(prior.samples.taste.actual.predictionId), prior.retained, 'Answer rewrote its own forecast or pool');
+      const prefix = after[index].retained.panel.prefix;
+      assert.equal(prefix.length, 1);
+      assert.equal(prefix[0].questionId, prior.question.questionId);
+      const projection = await one(`select jsonb_build_object('rows',count(*),'rating',min(rating))
+        from private.profile_bootstrap_evidence where profile_id=` + sqlLiteral(accepted.profileId)
+        + ' and item_id=' + sqlLiteral(prior.question.currentItem.id) + ';', 'numeric-projection');
+      assert.deepEqual(projection, { rows: 1, rating: ratings[index] });
+    }
+    const control = initial.at(-1);
+    assert.deepEqual(await frozen(control.samples.taste.actual.predictionId), control.retained, 'Other Profile forecast changed');
+    assert.deepEqual(await session(control.question), control.currentSession, 'Other Profile session changed');
+    const controlReceipt = await one('begin;set local extra_float_digits=3;set local request.jwt.claim.sub='
+      + sqlLiteral(controlActor) + `;select private.capture_personal_evaluation_v1(gen_random_uuid(),r.profile_id,
+        array(select value::uuid from jsonb_array_elements_text(r.state_snapshot#>'{candidateRequest,itemIds}')),
+        (r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz,jsonb_build_object('sessionId',r.session_id))
+        from private.prediction_runs r where r.id=` + sqlLiteral(control.samples.taste.actual.predictionId) + ';commit;',
+    'fresh-other-profile');
+    const controlSnapshot = await one("begin read only;set local extra_float_digits=3;select jsonb_build_object('observedAt',clock_timestamp(),'cases',"
+      + nativeCasesSql("select 'control' name," + sqlLiteral(controlReceipt.predictionId)
+        + '::uuid prediction_id,null::jsonb evaluation_receipt') + ');rollback;', 'fresh-other-profile-snapshot');
+    const controlSample = controlSnapshot.cases[0];
+    const freshControl = normalizeKajoNativePrediction({ ...controlSample, source, snapshotObservedAt: controlSnapshot.observedAt });
+    const controlComparison = compareFrozenRankings(freshControl, nativeReplayView(controlSample, freshControl), tolerance);
+    assert.equal(controlComparison.conforms, true);
+    comparisons.push(controlComparison);
+    const numeric = ranking => ranking.candidates.map(candidate => ({ id: candidate.objectId,
+      score: candidate.score, sourceScore: candidate.sourceScore, rank: candidate.rank,
+      eligible: candidate.eligible, tier: candidate.tier, selected: candidate.selected,
+      longTerm: candidate.inputs.explanation.scoringFeatures.longTerm }));
+    assert.deepEqual(numeric(freshControl), numeric(control.samples.taste.actual),
+      'Other Profiles answers leaked into a fresh unmodified Profile forecast');
+    const sensitivity = {};
+    for (const consumer of ['taste', 'discovery']) {
+      for (const value of initial.slice(1)) assert.deepEqual(numeric(value.samples[consumer].actual),
+        numeric(initial[0].samples[consumer].actual), 'Unequal cold-start ' + consumer + ' controls');
+      const common = after[0].samples[consumer].actual.candidates.filter(candidate => after.every(value =>
+        value.samples[consumer].actual.candidates.some(other => other.objectId === candidate.objectId)));
+      let sensitive = 0;
+      for (const candidate of common) {
+        const values = after.map(value => value.samples[consumer].actual.candidates.find(other => other.objectId === candidate.objectId));
+        if (values[2].score - values[0].score > 1e-6) {
+          assert.ok(values[0].score < values[1].score && values[1].score < values[2].score);
+          sensitive++;
+        }
+      }
+      assert.ok(sensitive > 0, 'Real committed 0/5/10 answers must distinguish supported subsequent ' + consumer + ' scores');
+      sensitivity[consumer] = { commonCandidates: common.length, numericallySensitiveCandidates: sensitive };
+    }
+    let preservedSources = 0;
+    for (const observation of observations) {
+      for (const [name, { sample }] of Object.entries(observation.samples)) {
+        assert.deepEqual(await frozen(sample.sourceRun.id), {
+          run: sample.sourceRun, candidates: [...sample.sourceCandidates].sort((a, b) => a.item_id.localeCompare(b.item_id)),
+          panel: name === 'taste' ? observation.retained.panel : null,
+          pool: name === 'taste' ? observation.retained.pool : null,
+        }, 'Later consumer changed a retained ' + name + ' source');
+        preservedSources++;
+      }
+    }
+    return { status: 'PASS', version: 'native-taste-consumer-conformance-v1', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
+      policy: 'CANONICAL_FORECAST_POOL_V4', transactions: 'SEPARATE_COMMITTED_START_NEXT_ANSWER_NEXT',
+      consumers: ['TASTE_V4_RPC', 'EXPLICIT_CANONICAL_CAPTURE', 'DISCOVERY_FEED_RPC', 'FROZEN_BASELINE_REPLAY'],
+      captures: observations.length, independentSameInputEvaluations: observations.length,
+      independentCaptureBinding: 'ONLY_VALIDATED_PREDICTION_AND_WORKING_CAPTURE_SELF_REFERENCES_REBOUND',
+      comparedCandidates: comparisons.reduce((sum, value) => sum + value.comparedCandidates, 0),
+      absoluteTolerance: tolerance.absoluteTolerance,
+      maxAbsoluteScoreDifference: Math.max(...comparisons.map(value => value.maxAbsoluteScoreDifference)),
+      committedRatings: ratings, sensitivity, preservedSources,
+      immutableOldForecasts: true, exactCommandRetries: true, otherProfileIsolation: 'RETAINED_AND_FRESH_FORECAST',
+      nonComparableConsumers: boundaries,
+      remainingDependency: 'VERSIONED_SHARED_CANDIDATE_ACQUISITION_WITH_DECLARED_RECOGNITION_AND_DELIVERY_SELECTION',
+      historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'CANONICAL_ROWS_RESTORED' };
+  } catch (error) { failure = error; throw error; }
+  finally {
+    if (fixture) {
+      try {
+        await exec(`begin;
+          do $cleanup$ declare actor uuid;begin
+            for actor in select id from public.users where id::text like 'ab157000-%' loop
+              perform private.erase_prediction_sources_v1('ACTOR',actor);
+            end loop;
+          end;$cleanup$;
+          delete from auth.users where id::text like 'ab157000-%';
+          delete from private.item_sources where item_id::text like 'ab157000-%';
+          delete from public.items where id::text like 'ab157000-%';commit;`, 'cleanup');
+        assert.deepEqual(await one(snapshots, 'canonical-after'), original, 'Native Taste fixture leaked canonical rows');
+      } catch (error) {
+        throw new AggregateError(failure ? [failure, error] : [error], 'Native Taste proof and cleanup failures are retained');
+      }
+    }
+  }
 }

@@ -97,6 +97,20 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Sixth source candidate: `test/native-taste-consumer-conformance` extends the
+  existing native adapter fixture through actual committed V4 commands, current
+  Discovery, independent same-input evaluation and frozen replay. Seven captures
+  yield 1095 candidate comparisons with zero score difference at `1e-12` locally;
+  0/5/10 sensitivity, exact retries, 21 unchanged sources and retained/fresh
+  other-Profile controls pass with canonical cleanup. All 370 database, 329
+  engine, 72 research and 11 acceptance tests pass; root lint/types, dependency,
+  mobile and catalogue suites pass before the existing Deno registry refusal;
+  four explicit-demo Hermes exports also pass.
+  Native PostgreSQL and final-source CI remain pending. Actual recognition versus
+  catalogue acquisition, domain, clock and selection differences remain explicit;
+  the next source boundary is a versioned shared candidate-acquisition owner,
+  preserving retained policies and using the existing scorer. This test-only
+  candidate performs no SQL rollout, runtime activation or quality acceptance.
 - Fifth source packet: accepted through [PR #371](https://github.com/Kajooja/Kajo/pull/371),
   merge `118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. One versioned FINAL input is prepared after
   Scenario enrichment and consumed by existing identity/shadow/Working owners

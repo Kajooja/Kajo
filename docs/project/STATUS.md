@@ -13,27 +13,45 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — actual Taste consumer conformance / Sprint 015, #302, #336
 
-Continue from the five accepted source packets and three verified SQL forwards
-below. The next bounded source packet extends the existing native adapter fixture
-through the **actual V4 sequential Taste START/NEXT/ANSWER/NEXT path**, including
-its retained pool and acknowledged receipt, alongside current Discovery,
-explicit evaluation and frozen baseline replay. Reuse
-`scripts/database/native-prediction-adapter.{mjs,test.mjs}` and the existing
-`personal-taste-pool-native.mjs` / pool-refresh fixtures; do not add a parallel
-scorer or evaluation runner.
+The sixth bounded source candidate is on
+`test/native-taste-consumer-conformance`. Complete its final-source CI and source
+acceptance; the five accepted packets and three verified SQL forwards below
+remain the accepted baseline. The existing native adapter fixture now exercises
+the **actual V4 sequential Taste START/NEXT/ANSWER/NEXT path**, retained pool and
+acknowledged receipt, alongside the current Discovery RPC, independent explicit
+evaluation and frozen baseline replay. No scorer, runner or runtime policy changes
+belong to this packet.
 
-Capture complete native request and FINAL inputs from those real owners. Pin
-Profile/actor, domain/mode/session, acquisition/intent, candidate IDs, declared
-clocks, source genome and policy; compare exact identity, eligibility and retained
-selection with the existing `1e-12` score tolerance only where the declared
-inputs are equivalent. Exercise low/high committed answers, unchanged old
-forecasts and other-Profile isolation. Run the shared verifier in both local
-SQL tests and the native PostgreSQL gate. Extend the existing conformance result
-with explicit non-comparable acquisition/selection cases and the exact remaining
-candidate-service dependency; V4 recognition, delivery and evaluation policies
-must not be silently relabeled identical. This packet exercises the missing
-current Taste consumer; it does not authorize changing retained policies or
-certifying a historical/committed database snapshot through a fixture.
+The candidate has seven real command-path captures and seven independent
+same-transaction/pool evaluations. Validated Prediction/Working capture
+self-references are rebound only in comparison copies; full actual scope,
+request/FINAL inputs, clocks, genome and exact eligibility/rank/selection remain
+checked. Local conformance reports **1095 candidate comparisons** (not unique
+Items), zero maximum score difference at `1e-12`, exact retries, 21 preserved
+sources and canonical full-row cleanup. Separately committed **0/5/10** answers
+distinguish 45 common Taste and 14 common Discovery candidates, with unchanged
+old forecasts and both retained and fresh other-Profile controls.
+
+All seven cases explicitly distinguish V4 recognition acquisition from Discovery
+catalogue acquisition: 25 retained MOVIE candidates versus 15 Discovery
+candidates, including one outside the Taste pool. Pool/domain, intent/selection,
+eligibility-clock and policy differences are not relabeled as same inputs.
+The shared verifier is wired into the existing native PostgreSQL CLI gate;
+native results and final-source CI remain pending in this source candidate.
+Local validation passes 370 database, 329 engine, 72 research and 11 acceptance
+tests. Root check passed lint/types, 50 dependency, 904 mobile and 451 catalogue
+tests before the existing Deno registry connection refusal; four explicit-demo
+Hermes exports also pass. No aggregate local pass is claimed. Synthetic source
+conformance establishes no device result,
+historical availability or predictive quality.
+
+After source acceptance, the next bounded packet must supply the **versioned
+shared candidate-acquisition contract and native owner** missing from these real
+consumer paths. Reuse the existing request/scoring core, keep recognition
+constraints and delivery/evaluation selection explicit, and preserve retained
+V4/Discovery policies, pools, commands and historical sources. Extend this same
+verifier to prove equal acquisition inputs produce equal eligible candidates;
+do not add another scorer or force unlike policies into an artificial parity pass.
 
 The installed SQL is complete for its accepted scope; do not repeat migrations,
 reset accounts/answers/commands, or manufacture hosted observations. Full
