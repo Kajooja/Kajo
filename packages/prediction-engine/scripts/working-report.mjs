@@ -1,5 +1,6 @@
 // Ephemeral owner diagnostic: supplied native snapshots, no reads or writes to Kajo.
 import { resolve } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { createPrivateReportFiles } from './private-report-files.mjs';
 
@@ -13,6 +14,24 @@ const embeddedUuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = value => typeof value === 'string' && value.length > 0 && value.length <= 256 && !/[\u0000-\u001f]/u.test(value);
 const clock = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= Number.MAX_SAFE_INTEGER;
+
+function immutable(value) {
+  if (value !== null && typeof value === 'object') { Object.values(value).forEach(immutable); Object.freeze(value); }
+  return value;
+}
+
+// The cohort declaration hashes these fixed rules before its enrollment window.
+export const WORKING_NATIVE_SOURCE_ADMISSION = immutable({
+  version: 'working-native-source-admission-v1', scope: 'RETAINED_OFF_FINAL_RANKING',
+  adapter: { scope: 'kajo-snapshot-v1', ranking: 'frozen-ranking-v1' },
+  candidateRequest: 'native-candidate-request-v1', predictionInput: 'native-prediction-clocks-v1',
+  intent: 'DELIVERY', acquisitions: ['LEGACY_DISCOVERY', 'CATALOG_CHAIN'],
+  clocks: { arithmetic: 'TRANSACTION_START', eligibility: 'CURRENT_WALL_TIME',
+    snapshot: 'CURRENT_STATEMENT_SNAPSHOTS', commitVisibility: 'UNKNOWN', historicalReconstruction: 'UNAVAILABLE' },
+  precision: 'EXACT_STORED_CLOCKS_AND_LOSSLESS_NUMERIC_EXPORT', absoluteScoreTolerance: 1e-12,
+  existingOffCheck: 'EXACT', comparedFields: ['objectId', 'score', 'rank', 'eligible', 'tier', 'selected'],
+  computation: 'FROZEN_COMPARISON_NO_RESCORE',
+});
 
 export class WorkingReportError extends Error {
   constructor(code) { super(`WORKING_REPORT_${code}`); this.code = code; }
@@ -34,7 +53,8 @@ function uuid(value) {
 }
 function validateManifest(value) {
   shape(value, ['contractVersion', 'selectionBasis', 'evidenceBasis', 'scopeId', 'evaluationAsOf', 'entries']);
-  if (value.contractVersion !== 'kajo-personal-working-manifest-v1' || value.selectionBasis !== SELECTION
+  if (!['kajo-personal-working-manifest-v1', 'kajo-personal-working-manifest-v2'].includes(value.contractVersion)
+    || value.selectionBasis !== SELECTION
     || !['ENGINEERING_FIXTURE', 'OWNER_AUTHORIZED_NATIVE_SNAPSHOTS'].includes(value.evidenceBasis)
     || !text(value.scopeId) || value.scopeId.length > 128 || embeddedUuidPattern.test(value.scopeId)
     || !clock(value.evaluationAsOf) || !Array.isArray(value.entries) || value.entries.length > MAX_PLANS) reject('MANIFEST_INVALID');
@@ -43,7 +63,8 @@ function validateManifest(value) {
     shape(entry, ['expectedScope', 'planSnapshot', 'outcomeSnapshot']);
     shape(entry.expectedScope, ['actorUserId', 'profileId', 'sessionId', 'sourcePredictionId', 'enrollmentId']);
     shape(entry.planSnapshot, ['actorUserId', 'profile', 'sourceRun', 'sourceCandidates', 'comparisons',
-      'enrollment', 'snapshotObservedAt', 'planning', 'references']);
+      'enrollment', 'snapshotObservedAt', 'planning', 'references',
+      ...(value.contractVersion === 'kajo-personal-working-manifest-v2' ? ['sourceGenome'] : [])]);
     if (!record(entry.planSnapshot.planning) || !Array.isArray(entry.planSnapshot.planning.pairs)
       || entry.planSnapshot.planning.pairs.length < 1 || entry.planSnapshot.planning.pairs.length > 25) reject('MANIFEST_INVALID');
     totalPairs += entry.planSnapshot.planning.pairs.length;
@@ -56,6 +77,7 @@ function validateManifest(value) {
 function validateNativeBatch(manifest) {
   const claimed = new Set(), nativeAliases = new Map(), aliasIdentities = new Map();
   const inputRecords = new Map(), outcomeRecords = new Map();
+  const genomes = new Map();
   const claim = (kind, ...ids) => {
     const key = JSON.stringify([kind, ...ids]);
     if (claimed.has(key)) reject('SOURCE_REUSE');
@@ -90,6 +112,12 @@ function validateNativeBatch(manifest) {
     if (!record(enrollment) || !record(source) || !record(snapshot.profile) || !record(refs)
       || !record(source.state_snapshot) || !record(source.state_snapshot.workingState)
       || !record(refs.controlRefs) || !record(planning) || refs.scopeId !== manifest.scopeId) reject('SNAPSHOT_REJECTED');
+    if (manifest.contractVersion === 'kajo-personal-working-manifest-v2') {
+      const genome = snapshot.sourceGenome;
+      if (!record(genome) || uuid(genome.id) !== uuid(source.genome_id)
+        || (genomes.has(genome.id) && !isDeepStrictEqual(genomes.get(genome.id), genome))) reject('SNAPSHOT_REJECTED');
+      genomes.set(genome.id, genome);
+    }
     for (const key of ['actorUserId', 'profileId', 'sessionId', 'sourcePredictionId', 'enrollmentId']) {
       if (uuid(enrollment[key]) !== uuid(expected[key])) reject('SCOPE_MISMATCH');
     }
@@ -164,19 +192,67 @@ function validateNativeBatch(manifest) {
   for (const id of outcomeRecords.keys()) if (inputRecords.has(id)) reject('SOURCE_REUSE');
 }
 
+function nativeAdmission(entry, plan, evidenceBasis, normalizeNative, compareRankings) {
+  const snapshot = entry.planSnapshot;
+  const native = normalizeNative({ scope: { profile: snapshot.profile, user: { id: snapshot.actorUserId },
+    sessionId: snapshot.sourceRun.session_id }, sourceRun: snapshot.sourceRun,
+  sourceCandidates: snapshot.sourceCandidates, sourceGenome: snapshot.sourceGenome,
+  snapshotObservedAt: snapshot.snapshotObservedAt,
+  source: evidenceBasis === 'ENGINEERING_FIXTURE'
+    ? { kind: 'generator', id: 'working-report-engineering-fixture', version: '2', parentRefs: [] }
+    : { kind: 'native', id: 'kajo' } });
+  const rules = WORKING_NATIVE_SOURCE_ADMISSION;
+  if (native.intent !== rules.intent || native.scope.subject.kind !== 'individual' || native.version !== rules.adapter.ranking
+    || native.acquisition.version !== rules.candidateRequest || !rules.acquisitions.includes(native.acquisition.policy)
+    || native.clocks.version !== rules.predictionInput || native.clocks.arithmeticClock !== rules.clocks.arithmetic
+    || native.clocks.eligibilityClock !== rules.clocks.eligibility || native.clocks.dataSnapshot !== rules.clocks.snapshot
+    || native.clocks.commitVisibility !== rules.clocks.commitVisibility
+    || native.clocks.historicalReconstruction !== rules.clocks.historicalReconstruction) reject('SNAPSHOT_REJECTED');
+  // normalizePlan already validates the exact, complete alias bijection and
+  // native OFF score/rank/selection. Compare every retained row, including rows
+  // outside the exposed pairs. The OFF control owns only these final fields;
+  // source scores, input/provenance and clocks stay bound to the one native source.
+  const identities = new Map(snapshot.references.objects.map(ref => [ref.objectRef, ref.itemId]));
+  const original = new Map(native.candidates.map(candidate => [candidate.objectId, candidate]));
+  const offCandidates = plan.controls.OFF.candidates.map(candidate => {
+    const objectId = identities.get(candidate.objectId), source = original.get(objectId);
+    if (!source) reject('SNAPSHOT_REJECTED');
+    return { ...source, objectId, score: candidate.score, rank: candidate.rank,
+      eligible: candidate.eligible, tier: candidate.tier, selected: candidate.selected };
+  }).sort((a, b) => a.rank - b.rank);
+  const conformance = compareRankings(native, { ...native, candidates: offCandidates },
+    { absoluteTolerance: WORKING_NATIVE_SOURCE_ADMISSION.absoluteScoreTolerance });
+  if (!conformance.conforms) reject('SNAPSHOT_REJECTED');
+  return { sourcePredictionRef: snapshot.references.sourcePredictionRef, enrollmentRef: snapshot.planning.id,
+    acquisition: native.acquisition.policy, status: 'PASS', comparedCandidates: conformance.comparedCandidates,
+    selectedCandidates: native.candidates.filter(candidate => candidate.selected).length,
+    maxAbsoluteScoreDifference: conformance.maxAbsoluteScoreDifference };
+}
+
 /** Pure snapshot builder; filesystem authorization remains the owner's duty. */
 export async function buildWorkingReport(manifest) {
   validateManifest(manifest); validateNativeBatch(manifest);
-  let normalizePlan, normalizeCapture, freezePlan, evaluateBatch;
+  const v2 = manifest.contractVersion === 'kajo-personal-working-manifest-v2';
+  let normalizePlan, normalizeCapture, freezePlan, evaluateBatch, normalizeNative, compareRankings;
   try {
     ({ normalizeKajoWorkingEvaluationPlan: normalizePlan } = await import('@kajo/prediction-engine/adapters/kajo-working-evaluation'));
     ({ normalizeKajoWorkingOutcomeCapture: normalizeCapture } = await import('@kajo/prediction-engine/adapters/kajo-working-outcomes'));
     ({ freezeWorkingEvaluationPlan: freezePlan, evaluateWorkingBatch: evaluateBatch } = await import('@kajo/prediction-engine/working-evaluation'));
+    if (v2) {
+      const { createKajoAdapter } = await import('@kajo/prediction-engine/adapters/kajo');
+      if (createKajoAdapter().version !== WORKING_NATIVE_SOURCE_ADMISSION.adapter.scope) reject('ENGINE_UNAVAILABLE');
+      ({ normalizeKajoNativePrediction: normalizeNative } = await import('@kajo/prediction-engine/adapters/kajo-native-prediction'));
+      ({ compareFrozenRankings: compareRankings } = await import('@kajo/prediction-engine/ranking-conformance'));
+    }
   } catch { reject('ENGINE_UNAVAILABLE'); }
   let inputs;
+  const nativeSources = [];
   try {
     inputs = manifest.entries.map(entry => {
-      const plan = freezePlan(normalizePlan(entry.planSnapshot));
+      let planSnapshot = entry.planSnapshot;
+      if (v2) { planSnapshot = { ...planSnapshot }; delete planSnapshot.sourceGenome; }
+      const plan = freezePlan(normalizePlan(planSnapshot));
+      if (v2) nativeSources.push(nativeAdmission(entry, plan, manifest.evidenceBasis, normalizeNative, compareRankings));
       const capture = entry.outcomeSnapshot === null ? null : normalizeCapture({
         native: { actorUserId: entry.expectedScope.actorUserId, profileId: entry.expectedScope.profileId,
           sessionId: entry.expectedScope.sessionId, sourcePredictionId: entry.expectedScope.sourcePredictionId },
@@ -193,7 +269,7 @@ export async function buildWorkingReport(manifest) {
     actors.add(actor); sessions.add(session);
     if (report.observed.nativePairUnits) { observedActors.add(actor); observedSessions.add(session); }
   }
-  const report = { contractVersion: 'kajo-personal-working-report-v1', selectionBasis: SELECTION,
+  const report = { contractVersion: `kajo-personal-working-report-${v2 ? 'v2' : 'v1'}`, selectionBasis: SELECTION,
     evidenceBasis: manifest.evidenceBasis, evaluationAsOf: manifest.evaluationAsOf,
     sourceAuthenticity: 'NOT_ESTABLISHED_BY_FILE', cohortSelectionWasPredeclared: 'NOT_ESTABLISHED',
     cohortWindowPreregistered: 'NOT_ESTABLISHED', commitAvailability: 'UNKNOWN',
@@ -202,6 +278,7 @@ export async function buildWorkingReport(manifest) {
     qualityAdmitted: false, independence: 'not-established', uncertainty: 'unavailable',
     actorClusters: { actors: actors.size, actorSessions: sessions.size,
       observedActors: observedActors.size, observedActorSessions: observedSessions.size }, result };
+  if (v2) report.nativeSourceAdmission = { rules: WORKING_NATIVE_SOURCE_ADMISSION, sources: nativeSources };
   const serialized = JSON.stringify(report);
   if (embeddedUuidPattern.test(serialized)) reject('SNAPSHOT_REJECTED');
   return report;

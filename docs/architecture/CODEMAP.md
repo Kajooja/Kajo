@@ -44,6 +44,14 @@ so native PostgreSQL output reaches the same adapter and comparison code.
 Fixtures and snapshots are disposable; this packet changes no SQL, serving
 policy, public API, existing forecast, account or hosted migration.
 
+The existing `scripts/working-report.mjs` and `scripts/working-cohort.mjs` under
+`packages/prediction-engine` consume this adapter in their explicit v2 contracts.
+They bind an immutable supplied genome and complete DELIVERY pool to the retained
+OFF final ranking, preserve the exact OFF checks and emit aliased summaries.
+V1 receipts remain supported unchanged. Existing research report/cohort tests
+and `scripts/database/working-outcomes-kajo.test.mjs` cover the version boundary
+and actual SQL producer-to-report path; no second temporal runner is introduced.
+
 ## Native candidate request — Sprint 015
 
 `20261026073031_native_candidate_request_contract.sql` extracts the existing
