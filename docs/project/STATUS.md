@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-10-25**
+Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, first source packet in progress.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, first bounded source packet accepted; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,12 +11,11 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — shared native computation cutoff / Sprint 015, #302, #336
+## Current handoff — shared prediction inputs / Sprint 015, #302, #336
 
-Continue on `feat/engine-shared-input-contract` from accepted main
-`8ea7aefa96fd8762ceed9e85071dfec5b60540d3` ([#362](https://github.com/Kajooja/Kajo/pull/362)).
-There were no open PRs at the initial continuation check. The first bounded
-Sprint 015 packet aligns memory/Scenario arithmetic in the shared identity
+Continue from accepted main
+`feae2b17251d8d233e1925c66664d114b50fa341` ([#363](https://github.com/Kajooja/Kajo/pull/363)).
+The first bounded Sprint 015 packet aligns memory/Scenario arithmetic in the shared identity
 scorer to the native evidence transaction cutoff and records a versioned private
 input-clock envelope.
 Ordinary Discovery, catalogue-chain Discovery and explicit evaluation (used by
@@ -31,28 +30,43 @@ COMMITTED statements, and the transaction reference may precede a lifecycle-lock
 wait. The envelope explicitly reports unknown commit visibility and unavailable
 historical reconstruction. Candidate-source rules still differ; no same-pool or
 measured-quality acceptance is claimed. Source/CI and hosted installation remain
-separate; the new forward has not been installed in the service.
+separate. The reviewed `20261025211014_shared_prediction_cutoff.sql` forward
+is now installed in the hosted service.
 
 Local validation passes 351 database tests, 904 mobile tests, 311 engine tests,
 50 dependency tests, 451 catalogue tests, research and acceptance suites,
 lint/typechecks and all four explicit-demo Hermes exports. Seven focused
 database regressions reproduce the old numeric Scenario mismatch and verify the
 fix, retained data/function security/replies, frozen shadow/pages, and newest
-skip/reset visibility. The native CLI gate also includes a real holder/waiter
-skip-admission probe; its actual PostgreSQL execution requires CI. The inherited
+skip/reset visibility. The real holder/waiter skip-admission probe passed on
+native PostgreSQL in the final-source CLI gate. The inherited
 React test-only circular serialization failure is corrected by inspecting
 rendered text, without application changes. `npm run check` reaches the unchanged
 Deno npm-registry connection refusal locally; a full local root pass is not
-claimed. The PR owns the final-source five required CI conclusions.
+claimed. All five required final-source CI gates passed in
+[CI #735](https://github.com/Kajooja/Kajo/actions/runs/40235892151).
 
-Publication is awaiting explicit owner approval for this reviewed ten-file
-packet. Automatic approval review rejected the Git tree upload because it did
-not recognize exact-packet publication authorization. No remote source branch or
-PR was created, and no hosted operation ran. Keep this local branch and publish
-its reviewed tree after approval; use existing #302/#336 tracking. A separately
-attempted new tracking Issue was also rejected and was not created.
+The owner approved publication of the exact reviewed ten-file packet and merge
+after all five gates. [PR #363](https://github.com/Kajooja/Kajo/pull/363) is merged
+at the accepted main above. Final source
+`d07ce07c03953dfeb14163bef96728036c02faa2` and the merge have the same reviewed
+tree `ab1225364addbc9561c783b7e503d8d37649c28b`. Existing #302/#336 tracking
+continues; no separate tracking Issue was created.
 
-After this packet's source checks and review, complete the remaining Sprint 015
+**Hosted rollout — 2026-10-26:** the owner-authorized supported migration operation
+succeeded. Read-only postchecks verified the expected installed function,
+unchanged function identity/metadata/access boundary, the migration receipt and
+preserved preceding migration history. All 958 checked pre-existing records
+were unchanged: 20 PredictionRuns, 936 candidates and two page receipts. The
+sample contained no shadow/comparison records. The comparison used fixed existing
+identities and excluded new answers and forecasts. No account reset or earlier
+deployment was repeated. Detailed environment metadata stays outside this receipt.
+
+Fresh hosted consumption remains unobserved: the postcheck found no naturally
+generated `native-prediction-clocks-v1` run yet. Installation verification does
+not close consumer, device or predictive-quality acceptance.
+
+**Next:** complete the remaining Sprint 015
 shared candidate/evidence contract and native adapter/temporal evaluation work.
 Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
 frozen shadow, generic contracts or retained Taste implementations. #232F's real
@@ -77,7 +91,7 @@ closing it does not close Engine V1 implementation or #302/#336 quality gates.
 
 The four inherited PRs are merged in dependency order. Each final source passed
 all five required CI gates; subsequent stacked retargets were checked against
-identical reviewed merge trees. Accepted implementation main is
+identical reviewed merge trees. That earlier stack's accepted merge checkpoint was
 `4e83ff749f85a64371a6175ac2d695326a7e4bfb`.
 
 | PR | Accepted scope | Final-source CI | Merge commit |
