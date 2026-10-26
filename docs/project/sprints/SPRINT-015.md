@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — five source packets accepted; two SQL forwards installed; FINAL-input rollout and remaining acceptance open**
+Status: **IN PROGRESS — five source packets accepted; three SQL forwards installed; current Taste consumer conformance and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet is the guarded hosted rollout of the accepted frozen FINAL input forward; see [STATUS](../STATUS.md).
+The current bounded packet exercises the actual V4 sequential Taste consumer through the existing native adapter/conformance fixture; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -113,10 +113,18 @@ does not become an invented pass.
   final-source gates passed in [CI #755](https://github.com/Kajooja/Kajo/actions/runs/40338320909)
   on `9cc8db296fa7bdd0c5bf7a1366713984f3146333`, with tree
   `a82570d756f873c6f3ebccfdd9e83bac5944c1b5`. [STATUS](../STATUS.md) owns
-  the native report receipt and next guarded hosted rollout. This advances
+  the native report receipt and next actual-Taste conformance packet. This advances
   EB-01/EB-03 integration without replacing arithmetic or admitting a model.
-  Hosted installation, full four-consumer same-pool parity, certified historical
-  input, #232F, performance, quality and sprint close remain open.
+  The guarded forward was installed on 2026-10-26 as provider history
+  `20261026151042_frozen_final_scoring_input`, with identical stored SQL bytes.
+  All 6465 fixed rows across 67 public/private tables, 90 prior migration records,
+  264 existing function identities/metadata and 24 default-privilege records were
+  preserved. The four changed bodies and three new owner-only helpers matched
+  the accepted SQL; all 260 unrelated function bodies remained unchanged.
+  READ ONLY validation preserved all 49 historical unmarked runs. No fresh marked
+  run was observed and none was manufactured. [STATUS](../STATUS.md) owns the
+  full scoped receipt. Actual fresh serving, full four-consumer same-pool parity,
+  certified historical input, #232F, performance, quality and sprint close remain open.
 - Fourth source packet: accepted through [PR #369](https://github.com/Kajooja/Kajo/pull/369),
   merge `53f84bbd2f487ec9460ee482425821d3830795b0`. Existing Personal
   Working report/cohort v2 consumes the native prediction adapter with an
