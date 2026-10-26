@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — four source packets accepted; two SQL forwards installed; shared scoring inputs and remaining acceptance open**
+Status: **IN PROGRESS — five source packets accepted; two SQL forwards installed; FINAL-input rollout and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet binds frozen FINAL scoring inputs in existing native identity/shadow paths; see [STATUS](../STATUS.md).
+The current bounded packet is the guarded hosted rollout of the accepted frozen FINAL input forward; see [STATUS](../STATUS.md).
 
 ## Evidence and completion rules
 
@@ -97,23 +97,26 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Fifth source packet is implemented on `feat/frozen-final-scoring-input`, based
-  on main `3610ed478da40c90a7f5a663eb1e3f5fb104e712`; final source/CI
-  acceptance is pending. It freezes one FINAL input after Scenario enrichment,
-  consumes it in the existing scoring/shadow/Working paths and validates complete
-  marked sources in the native adapter. Source and challenger genomes remain
-  distinct, including scalar-first reminder reselection. Protocol-2 reuse has
-  its own marker and original feature-source reference. Historical sources,
-  score math, public APIs, candidate policies and accounts remain unchanged.
-  Populated pre/post coverage includes 54 Personal/Shared mode/domain/acquisition
-  cases plus explicit evaluation, complete old trace and float8-byte equality,
-  all four function/security guards, malformed/nonfinite/oversized/missing pool
-  controls, empty pools, historical retries and page reuse. The existing native
-  CLI verifier gains seven marked-source and four rejection controls; it remains
-  synthetic engineering evidence. [STATUS](../STATUS.md) owns final checks and
-  exact acceptance. Hosted installation, full four-consumer same-pool parity,
-  certified historical input, #232F, performance, quality and sprint close remain
-  open; neither already-installed forward is repeated.
+- Fifth source packet: accepted through [PR #371](https://github.com/Kajooja/Kajo/pull/371),
+  merge `118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. One versioned FINAL input is prepared after
+  Scenario enrichment and consumed by existing identity/shadow/Working owners
+  and native adapter admission. Complete pool/source-genome binding, scalar-first
+  challenger reminder reselection, historical replay and separately marked
+  protocol-2 reuse are preserved. All 369 database, 329 engine and 72 research
+  tests, other local suites, lint/types and four demo exports pass. Root check
+  retains the unchanged local Deno registry refusal. The 54-case populated matrix
+  preserves complete old traces and exact score bytes; native CLI verifies seven
+  marked sources/four rejection controls and zero baseline difference across
+  69 candidates with 37 Scenario contributions. The 48-page matrix preserves all
+  36 continuation shadows. Corrected shared page/Working smoke checks distinguish per-page
+  bindings and pre-FINAL prefixes; the local Working test covers both generations. All five
+  final-source gates passed in [CI #755](https://github.com/Kajooja/Kajo/actions/runs/40338320909)
+  on `9cc8db296fa7bdd0c5bf7a1366713984f3146333`, with tree
+  `a82570d756f873c6f3ebccfdd9e83bac5944c1b5`. [STATUS](../STATUS.md) owns
+  the native report receipt and next guarded hosted rollout. This advances
+  EB-01/EB-03 integration without replacing arithmetic or admitting a model.
+  Hosted installation, full four-consumer same-pool parity, certified historical
+  input, #232F, performance, quality and sprint close remain open.
 - Fourth source packet: accepted through [PR #369](https://github.com/Kajooja/Kajo/pull/369),
   merge `53f84bbd2f487ec9460ee482425821d3830795b0`. Existing Personal
   Working report/cohort v2 consumes the native prediction adapter with an
