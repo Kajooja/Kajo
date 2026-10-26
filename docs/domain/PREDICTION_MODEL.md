@@ -2980,6 +2980,53 @@ The generic engine contracts and all 51 conceptual parts are defined once in [PR
 
 E1 creates executable contracts and media/non-media fixtures without moving credentials, provider schemas, React Native or Kajo BOOK/MOVIE enums into the core. Current SQL remains the serving baseline. A component is extracted/replaced only with parity, absence/failure fallback, scope and rollback tests; no second independently drifting full ranker is introduced.
 
+### Native ranking adapter and conformance — Sprint 015
+
+The optional native adapter consumes already-authorized frozen PredictionRun and
+complete PredictionCandidate snapshots. It reuses the existing Kajo
+Profile-to-Subject/actor mapping and validates the declared `candidateRequest`
+and `predictionInput` together with candidate identity, score and provenance.
+The generic comparison boundary preserves acquisition/intent, policy, clocks,
+candidate order, eligibility and selection as exact comparison dimensions;
+numeric score comparison requires an explicit tolerance. The native fixture fixes
+the absolute score tolerance at `1e-12` before comparison; ranks, eligibility and
+identities have no tolerance. A different acquisition policy or candidate pool
+is not same-input parity. Completeness means all stored candidates for the run,
+not the full catalogue or an earlier acquisition stage's larger pool.
+
+Native `final_score` remains an uncalibrated ranking score. It is not converted
+into an expected 0–10 rating, a probability, a learned feature artifact or an
+E1 `Estimate`. Candidate eligibility is separate from delivery selection, and
+neither delivery nor hypothetical shadow selection proves exposure. Evaluation
+runs retain their zero delivered-result count. Missing requested explicit Items
+must not be invented as candidates with zero scores.
+
+The executable fixture passes actual SQL-produced snapshots through the adapter
+and compares four delivery cases with the existing native baseline shadow worker
+on the same frozen candidate pool. Two explicit evaluation cases, including an
+empty pool, use the existing frozen score helper and preserve non-delivery.
+Full frozen run Context/state and candidate inputs remain part of the comparison.
+It checks that subsequent catalogue edits do not alter
+the frozen source or replay. The same JavaScript verification runs against
+PGlite and the native PostgreSQL CLI installation. Test inputs remain synthetic
+fixtures, not observed user outcomes or a production quality evaluation.
+
+This bounded adapter accepts fresh request-owner runs. Protocol-2 frozen-page
+continuations retain original input clocks under a later delivery timestamp and
+need a separate source mapping; their envelope is not treated as fresh input.
+`created_at` may precede a delivery's wall-clock `requested_at` because the former
+uses transaction time. Current-statement snapshots, unknown commit visibility
+and unavailable historical reconstruction retain their declared meanings.
+Snapshot validation is not authentication, proof of complete historical input,
+or permission to access private records.
+
+This packet adds no scorer, serving activation, database migration or model
+admission. Full four-consumer same-pool parity, committed-prefix reconstruction,
+the temporal evaluation runner and the real Shared prepared-input consumer remain
+separate Sprint 015 acceptance work.
+
+### External-data boundary
+
 D1/D2 operate in isolated research storage. Keep source-local people and ratings distinct from Kajo accounts/Events, preserve original scales/timestamp semantics and never fabricate missing exposures, alternatives, mood, consumption time or group state. D3 Tag Genome, D4 Beliefs and D5 KuaiRand remain optional after D2; they are independent follow-up studies. Detailed manifests/schema rules/metrics live in DATA_ENRICHMENT, not a duplicate specification here.
 
 A future admitted ExternalTastePrior uses canonical Item mapping and compatible immutable artifacts. It is separately source-weighted/ablated, shrinks with relevant native support and transfers across domains only with evidence. Data/rights withdrawal propagates through jointly trained or distilled dependencies; raw-file removal alone is not proof of influence removal.

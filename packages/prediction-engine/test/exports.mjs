@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import * as core from '@kajo/prediction-engine';
 import { createKajoAdapter } from '@kajo/prediction-engine/adapters/kajo';
+import { compareFrozenRankings } from '@kajo/prediction-engine/ranking-conformance';
+import { normalizeKajoNativePrediction } from '@kajo/prediction-engine/adapters/kajo-native-prediction';
 import { runFixtures } from '@kajo/prediction-engine/fixtures';
 import { evaluateOrdinalPair, evaluateOrdinalBatch } from '@kajo/prediction-engine/ordinal';
 import { normalizeKajoOrdinalPair } from '@kajo/prediction-engine/adapters/kajo-ordinal';
@@ -22,6 +24,10 @@ import { applyKajoContextualSkip, kajoContextualSkipRecords } from '@kajo/predic
 assert.equal(typeof core.predict, 'function');
 assert.equal(typeof createKajoAdapter, 'function');
 assert.equal(core.createKajoAdapter, undefined);
+assert.equal(typeof compareFrozenRankings, 'function');
+assert.equal(typeof normalizeKajoNativePrediction, 'function');
+assert.equal(core.compareFrozenRankings, undefined);
+assert.equal(core.normalizeKajoNativePrediction, undefined);
 assert.equal(runFixtures().length, 2);
 assert.equal(typeof evaluateOrdinalPair, 'function');
 assert.equal(typeof evaluateOrdinalBatch, 'function');
@@ -72,11 +78,14 @@ assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
 // contain no app or provider runtime dependency.
 for (const file of ['ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
+  'ranking-conformance.js', 'adapters/kajo-native-prediction.js',
   'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
   'taste-selection.js', 'adapters/kajo-taste-selection.js', 'adaptive-taste.js',
   'contextual-skip.js', 'adapters/kajo-contextual-skip.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
+    'ranking-conformance.js': ['./contracts.js'],
+    'adapters/kajo-native-prediction.js': ['../contracts.js', '../ranking-conformance.js', './kajo.js'],
     'ordinal.js': ['./contracts.js'],
     'adapters/kajo-ordinal.js': ['../contracts.js', '../ordinal.js'],
     'working-state.js': ['./contracts.js'],

@@ -97,6 +97,26 @@ does not become an invented pass.
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
+- Third source packet: in progress on `feat/native-prediction-adapter` from
+  accepted main `fde781395e60cb926f46ce03c55b409715b2fb1d`. A strict Kajo adapter
+  maps actual frozen candidate requests, input clocks and complete native ranking
+  traces into a separate generic conformance boundary. The shared SQL-fixture
+  verifier compares the source against the existing native baseline shadow
+  replay in both PGlite and native PostgreSQL, retaining policy-specific scope,
+  exact identity/eligibility/order/selection and explicit score tolerances.
+  Native scores remain uncalibrated ranking scores, generated fixtures remain
+  synthetic, and copied continuation pages are not relabeled fresh forecasts.
+  This is an EB-01/EB-03 and EB-12 integration slice (architecture sections
+  1–3, 10–13, 30, 37, 40–44 and 49–51), with no new scorer, SQL migration,
+  serving activation or quality claim. Independent review, all 361 database and
+  325 engine tests pass. The six-case real-SQL fixture compares 69 candidates,
+  including 37 nonzero Scenario contributions, with zero score difference under
+  `1e-12`; four delivery cases use the shadow worker and two explicit evaluation
+  cases use the frozen score helper. Full table rollback equality passes.
+  Other local suites and four demo exports pass; the aggregate check retains
+  the unchanged Deno registry refusal. Final-source CI/merge remain pending;
+  STATUS and the source PR own those receipts. The temporal runner,
+  full same-pool parity and genuine #232F consumer remain open.
 - Second source packet: accepted through [PR #365](https://github.com/Kajooja/Kajo/pull/365),
   merge `8d1a786389318dcf41804f5009a9271156d81e1d`.
   `20261026073031_native_candidate_request_contract.sql`
