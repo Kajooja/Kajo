@@ -42,12 +42,17 @@ begin
             raise exception 'Page lost frozen state/genome/scope'; end if;
           -- The original state stays exact; only the new run binding changes.
           -- Validate every candidate and independently assert fresh versus reuse.
-          if not private.validate_native_final_source_v1(page_id) or not exists(
-            select 1 from private.prediction_runs r where r.id=page_id
-              and r.state_snapshot#>>'{finalScoringInput,predictionId}'=page_id::text
-              and r.state_snapshot#>>'{finalScoringInput,featureSourcePredictionId}'=root_id::text
-              and r.state_snapshot#>>'{finalScoringInput,computation}'=case when step=1 then 'FRESH_FINAL' else 'FROZEN_PAGE_REUSE' end) then
-            raise exception 'Page lost FINAL input or reused-source binding'; end if;
+          if (snapshot#>'{run,state_snapshot}') ? 'finalScoringInput' then
+            if not private.validate_native_final_source_v1(page_id) or not exists(
+              select 1 from private.prediction_runs r where r.id=page_id
+                and r.state_snapshot#>>'{finalScoringInput,predictionId}'=page_id::text
+                and r.state_snapshot#>>'{finalScoringInput,featureSourcePredictionId}'=root_id::text
+                and r.state_snapshot#>>'{finalScoringInput,computation}'=case when step=1 then 'FRESH_FINAL' else 'FROZEN_PAGE_REUSE' end) then
+              raise exception 'Page lost FINAL input or reused-source binding'; end if;
+          elsif exists(select 1 from private.prediction_runs r where r.id=page_id and r.state_snapshot ? 'finalScoringInput') then
+            -- The same smoke also runs on the historical pre-FINAL upgrade.
+            raise exception 'Unmarked historical page acquired a FINAL binding';
+          end if;
           select count(*) into count_before from private.prediction_runs;
           perform set_config('role','authenticated',true);
           if public.rank_items_page_v1(request)<>response then raise exception 'Exact page retry changed receipt'; end if;

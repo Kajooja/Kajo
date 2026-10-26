@@ -52,6 +52,10 @@ change. The smoke now preserves exact equality of all original state fields and
 separately validates the complete FINAL input, page identity, original feature
 source and fresh/reuse kind across all 48 pages. This is a corrected assertion,
 not an unchanged-source retry; all final-source gates must run again.
+The shared smoke also runs on the historical pre-FINAL hosted-upgrade prefix:
+unmarked sources retain the old equality check and must stay unmarked, without
+calling helpers that do not exist in that generation. Both current and historical
+full-schema smoke paths pass after this explicit generation distinction.
 
 Continue from accepted implementation checkpoint
 `53f84bbd2f487ec9460ee482425821d3830795b0` ([#369](https://github.com/Kajooja/Kajo/pull/369)).
