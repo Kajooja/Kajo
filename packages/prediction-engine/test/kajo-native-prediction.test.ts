@@ -90,7 +90,75 @@ function evaluationFixture(): Fixture {
 const rejected = (mutate: (input: Fixture) => void) => {
   const input = fixture(); mutate(input); expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
 };
+function receiptFixture() {
+  const input = evaluationFixture();
+  Object.assign(input.sourceRun, { requested_item_type: null });
+  input.sourceRun.policy_version += '+v4-receipt-input-v1';
+  for (const c of input.sourceCandidates) c.explanation.policyVersion = input.sourceRun.policy_version;
+  const marked = markedFixture(input);
+  const nativeV4Receipt = { version: 'native-v4-receipt-v1', policy: 'CANONICAL_FORECAST_POOL_V4',
+    profileId: profile, actorUserId: actor, sessionId: session, receiptRevision: 3,
+    receiptTransaction: '9007199254740993', receiptAt: at(50),
+    forecastTransaction: '9007199254740995', forecastAsOf: at(100),
+    entrySnapshot: '9007199254740992:9007199254740995:9007199254740992,9007199254740994' };
+  return { ...marked, sourceRun: { ...marked.sourceRun, state_snapshot: { ...marked.sourceRun.state_snapshot,
+    nativeV4Receipt, finalScoringInput: { ...marked.sourceRun.state_snapshot.finalScoringInput,
+      nativeV4Receipt: structuredClone(nativeV4Receipt) } } } };
+}
 describe('native prediction snapshot adapter', () => {
+  it('binds owned V4 receipt visibility with exact 64-bit transaction identities and retained microseconds', () => {
+    const input = receiptFixture();
+    expect(normalizeKajoNativePrediction(input).intent).toBe('EVALUATION');
+    const empty = receiptFixture(); empty.sourceCandidates = [];
+    empty.sourceRun.candidate_count = 0; empty.sourceRun.state_snapshot.finalScoringInput.candidateCount = 0;
+    empty.sourceRun.state_snapshot.finalScoringInput.candidateIds = [];
+    expect(normalizeKajoNativePrediction(empty).candidates).toEqual([]);
+    expect(normalizeKajoNativePrediction(markedFixture(evaluationFixture())).intent).toBe('EVALUATION');
+  });
+  it('rejects receipt corruption even when the FINAL copy is changed to match', () => {
+    type Receipt = ReturnType<typeof receiptFixture>['sourceRun']['state_snapshot']['nativeV4Receipt'];
+    for (const mutate of [
+      (r: Receipt) => { r.version = 'future'; },
+      (r: Receipt) => { r.policy = 'CANONICAL_FORECAST_V3'; },
+      (r: Receipt) => { r.profileId = id(99); },
+      (r: Receipt) => { r.actorUserId = id(99); },
+      (r: Receipt) => { r.sessionId = id(99); },
+      (r: Receipt) => { r.receiptRevision = 256; },
+      (r: Receipt) => { r.receiptRevision = 0.5; },
+      (r: Receipt) => { Object.assign(r, { receiptRevision: '3' }); },
+      (r: Receipt) => { r.receiptAt = at(51); },
+      (r: Receipt) => { r.receiptAt = 'infinity'; },
+      (r: Receipt) => { r.forecastAsOf = at(101); },
+      (r: Receipt) => { r.receiptTransaction = r.forecastTransaction; },
+      (r: Receipt) => { r.receiptTransaction = '9007199254740994'; },
+      (r: Receipt) => { r.receiptTransaction = '9007199254740996'; },
+      (r: Receipt) => { r.receiptTransaction = '18446744073709551616'; },
+      (r: Receipt) => { r.receiptTransaction = 'not-a-transaction'; },
+      (r: Receipt) => { r.entrySnapshot = '10:5:'; },
+      (r: Receipt) => { r.entrySnapshot = '10:20:15,14'; },
+      (r: Receipt) => { r.entrySnapshot = '10:20:10,10'; },
+      (r: Receipt) => { r.entrySnapshot = '10:20:21'; },
+      (r: Receipt) => { r.entrySnapshot = 'broken'; },
+      (r: Receipt) => { Object.assign(r, { futureField: true }); },
+      (r: Receipt) => { delete (r as Record<string, unknown>).receiptAt; },
+    ]) {
+      const input = receiptFixture(), state = input.sourceRun.state_snapshot;
+      mutate(state.nativeV4Receipt);
+      state.finalScoringInput.nativeV4Receipt = structuredClone(state.nativeV4Receipt);
+      expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+    }
+  });
+  it('rejects incomplete receipt markers and their FINAL binding', () => {
+    for (const mutate of [
+      (x: ReturnType<typeof receiptFixture>) => { delete (x.sourceRun.state_snapshot as Record<string, unknown>).nativeV4Receipt; },
+      (x: ReturnType<typeof receiptFixture>) => { delete (x.sourceRun.state_snapshot as Record<string, unknown>).finalScoringInput; },
+      (x: ReturnType<typeof receiptFixture>) => { delete (x.sourceRun.state_snapshot.finalScoringInput as Record<string, unknown>).nativeV4Receipt; },
+      (x: ReturnType<typeof receiptFixture>) => { x.sourceRun.policy_version = x.sourceRun.policy_version.replace('+v4-receipt-input-v1', ''); },
+    ]) {
+      const input = receiptFixture(); mutate(input);
+      expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+    }
+  });
   it('admits a complete frozen FINAL input while retaining unmarked historical contracts', () => {
     const old = fixture(), input = markedFixture();
     expect(normalizeKajoNativePrediction(input).candidates.map(c => c.score))

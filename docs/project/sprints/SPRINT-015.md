@@ -97,6 +97,22 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Eighth source packet is in progress on `feat/v4-receipt-forecast-binding`:
+  owned V4 command-entry visibility and actual acknowledged receipt are consumed
+  before forecast writes and bound into FINAL/native adapter admission. Historical
+  rows, cached replies, score math and selection policies remain preserved.
+  The local populated forward, malformed/stale receipt controls, correction and
+  dependent-source withdrawal pass; the actual V4 numeric/parity fixture retains
+  seven captures, 1095 comparisons, zero difference and 21 unchanged sources.
+  Full local database (381), engine (332), research (72), acceptance (11),
+  mobile (904), dependency (50) and catalogue (451) tests, lint/typecheck and
+  four explicit-demo Hermes exports pass. Root check's Deno registry connection
+  refusal remains for CI. Separate-connection PostgreSQL late-commit/duplicate
+  tests join the early CLI gate; native evidence and all five final-source gates
+  are still pending.
+  The new forward is not hosted. [STATUS](../STATUS.md) owns the active source and
+  acceptance receipt; no broader commit/history, policy or quality gate closes.
+
 - Seventh source packet: accepted through [PR #376](https://github.com/Kajooja/Kajo/pull/376),
   merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`. Actual V4 catalogue and request base scoring consume one
   private versioned acquisition owner, with explicit scope, clocks, source rules,

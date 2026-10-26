@@ -28,6 +28,20 @@ supabase/functions/password-auth/
 
 ## Native ranking adapter and conformance — Sprint 015
 
+`20261026201946_native_v4_receipt_forecast_binding.sql` adds private INVOKER
+`capture_native_v4_receipt_v1` and `validate_native_v4_receipt_v1`. The existing
+V4 command captures its entry snapshot before the lifecycle lock, and the identity
+scorer validates the actual acknowledged receipt before writing a fresh forecast.
+The optional receipt and policy marker are bound into FINAL and checked on frozen
+admission. Old records and score/selection math remain unchanged.
+`scripts/database/native-v4-receipt.{mjs,test.mjs}` owns populated preservation,
+guards, prewrite/frozen rejection, correction/withdrawal and exact retry checks.
+Its native-only concurrency verifier observes separate PostgreSQL blockers and
+an answer whose receipt clock precedes NEXT but whose commit follows command
+entry; it also preserves a concurrent duplicate NEXT. The existing CLI gate runs
+these probes early. `kajo-native-prediction.ts` validates the frozen binding with
+exact transaction-ID precision. No portable or PGlite test is called a lock proof.
+
 `20261026130243_frozen_final_scoring_input.sql` adds owner-only
 `native_final_candidate_input_v1`, `native_final_run_input_v1` and
 `validate_native_final_source_v1`. Guarded body changes preserve the four existing

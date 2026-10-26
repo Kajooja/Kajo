@@ -402,13 +402,16 @@ export async function verifyNativeTasteConsumer(execSql) {
     const feed = { version: 3, requestId: randomUUID(), profileId: state.profileId, sessionId: state.sessionId,
       discoveryMode: 'FOR_YOU', itemType: 'MOVIE', limit: 5, context: {}, cursor: null, replacesChainId: null };
     const output = await exec('begin;set local extra_float_digits=3;set local request.jwt.claim.sub=' + sqlLiteral(actor)
-      + ';set local role authenticated;select public.taste_session_v2(' + jsonLiteral(next) + ');reset role;'
-      + `select private.capture_personal_evaluation_v1(gen_random_uuid(),r.profile_id,
-          array(select value::uuid from jsonb_array_elements_text(r.state_snapshot#>'{candidateRequest,itemIds}')),
-          (r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz,
-          jsonb_build_object('sessionId',s.id))
-        from private.sequential_taste_sessions s join private.prediction_runs r
-          on r.id=(s.presentations#>>'{-1,poolId}')::uuid where s.id=` + sqlLiteral(state.sessionId) + ';'
+      + ';do $assign$ begin perform pg_current_xact_id();end;$assign$;'
+      // Independent fresh capture precedes NEXT, while the exact parent receipt
+      // is still current. Both consume their own command-entry visibility input.
+      + `select private.capture_personal_evaluation_v1(gen_random_uuid(),` + sqlLiteral(state.profileId) + `,
+          array(select (c->>'id')::uuid from jsonb_array_elements(private.taste_candidate_catalog_v4(`
+      + sqlLiteral(state.sessionId) + `,now())) c order by c->>'id'),`
+      + sqlLiteral(parent.receipt_at) + `::timestamptz,
+          jsonb_build_object('sessionId',` + sqlLiteral(state.sessionId) + `::uuid,
+            'nativeV4Receipt',private.capture_native_v4_receipt_v1(` + sqlLiteral(state.sessionId) + `,pg_current_snapshot())));`
+      + 'set local role authenticated;select public.taste_session_v2(' + jsonLiteral(next) + ');reset role;'
       + 'set local role authenticated;select public.rank_items_feed_v1(' + jsonLiteral(feed) + ');reset role;'
       + `select jsonb_build_object('predictionId',p.prediction_id,
           'receiptMatches',(r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz=`
@@ -420,7 +423,7 @@ export async function verifyNativeTasteConsumer(execSql) {
         join private.prediction_runs r on r.id=p.prediction_id where s.id=` + sqlLiteral(state.sessionId) + ';commit;',
     label + '-next-and-controls');
     assert.equal(output.length, 4);
-    const [question, evaluation, discovery, binding] = output;
+    const [evaluation, question, discovery, binding] = output;
     assert.equal(question.status, 'QUESTION');
     assert.deepEqual(binding, { predictionId: binding.predictionId,
       receiptMatches: true, separateTransaction: true, afterReceipt: true });
@@ -461,6 +464,16 @@ export async function verifyNativeTasteConsumer(execSql) {
     const retained = await frozen(taste.predictionId);
     assert.equal(retained.panel.session_id, state.sessionId);
     assert.equal(retained.panel.prefix_revision, state.revision);
+    const receiptInput = retained.run.state_snapshot.nativeV4Receipt;
+    assert.equal(receiptInput.version, 'native-v4-receipt-v1');
+    assert.equal(receiptInput.profileId, state.profileId);
+    assert.equal(receiptInput.actorUserId, actor);
+    assert.equal(receiptInput.sessionId, state.sessionId);
+    assert.equal(receiptInput.receiptRevision, state.revision);
+    assert.equal(receiptInput.receiptTransaction, parent.receipt_transaction);
+    assert.equal(Date.parse(receiptInput.receiptAt), Date.parse(parent.receipt_at));
+    assert.equal(receiptInput.forecastTransaction, retained.panel.captured_transaction);
+    assert.deepEqual(retained.run.state_snapshot.finalScoringInput.nativeV4Receipt, receiptInput);
     assert.equal(retained.panel.frozen.requiredReceiptRevision, state.revision);
     assert.equal(String(retained.panel.frozen.requiredReceiptTransaction), String(parent.receipt_transaction));
     assert.deepEqual(retained.pool.catalog.map(item => item.id).sort(), [...taste.acquisition.requestedObjectIds].sort());
@@ -620,7 +633,7 @@ export async function verifyNativeTasteConsumer(execSql) {
       committedRatings: ratings, sensitivity, preservedSources,
       immutableOldForecasts: true, exactCommandRetries: true, otherProfileIsolation: 'RETAINED_AND_FRESH_FORECAST',
       nonComparableConsumers: boundaries,
-      acquisitionOwner: 'native-candidate-acquisition-v1',
+      acquisitionOwner: 'native-candidate-acquisition-v1', receiptBinding: 'native-v4-receipt-v1',
       remainingDependency: 'GUIDED_RECOGNITION_AND_DELIVERY_SELECTION_POLICY_ALIGNMENT',
       historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'CANONICAL_ROWS_RESTORED' };
   } catch (error) { failure = error; throw error; }

@@ -440,6 +440,46 @@ and candidate-request snapshots remain the replay boundary. Private API grants
 stay closed; drift checks guard the three changed bodies/security metadata and
 reject unexpected inherited grants without editing default privileges.
 
+#### Owned V4 receipt-to-forecast binding — Sprint 015 source
+
+`20261026201946_native_v4_receipt_forecast_binding.sql` binds a current owned V4
+acknowledgement to the existing evaluation/identity computation. The V4 command
+captures `pg_current_snapshot()` before waiting for its lifecycle lock. Its
+server receipt's top-level transaction must be visible in that entry snapshot,
+different from the forecast transaction, and have a finite receipt instant before
+the forecast's transaction cutoff. A receipt timestamp alone does not prove that
+its transaction had committed when NEXT entered. A late commit fails with `40001`
+and no forecast; a separate fresh retry may then consume the acknowledged receipt.
+
+The private INVOKER `capture_native_v4_receipt_v1` reads the actual active V4
+session and PersonalProfile owner. The command passes its resulting closed
+`native-v4-receipt-v1` object privately to evaluation. The existing identity scorer
+revalidates the current server receipt and requires exact Profile/actor/session,
+revision, transaction, instant and entry snapshot binding before a forecast write.
+Its `requiredAfter` must equal that receipt instant. Existing acquisition receipt
+checks, canonical pools, score arithmetic and V4 selection remain their current
+owners; public delivery Context cannot claim this evaluation-only binding.
+
+Fresh V4 captures retain the object at `state_snapshot.nativeV4Receipt` and inside
+their FINAL run input, with the policy provenance suffix `v4-receipt-input-v1`.
+Fields are version, V4 policy, Profile/actor/session, receipt revision/transaction/
+instant, forecast transaction/cutoff and command-entry snapshot. The snapshot text
+is bounded to 64 KiB; the complete receipt is bounded to 128 KiB and remains
+within the existing FINAL input budget. Missing/mixed markers, wrong scope,
+incompatible clocks or impossible receipt visibility reject in native frozen
+admission and the portable adapter, including empty candidate pools. Transaction
+identities retain exact 64-bit precision. The source validator runs before replay
+consumers; its checks use the frozen receipt, not today's changed session.
+
+This establishes visibility of the **specific owned V4 receipt at command entry**.
+The consumed input still uses current statement snapshots; global commit
+visibility remains `UNKNOWN` and historical reconstruction `UNAVAILABLE`. The
+receipt does not authenticate an arbitrary export, certify all mutable features
+or make unlike acquisition/selection policies equivalent. Correction changes
+future inputs without rewriting old forecasts; withdrawal retains the existing
+dependent-source erasure. Historical unmarked sources, exact cached commands and
+non-V4 policies remain unchanged. STATUS owns source/CI and hosted acceptance.
+
 #### Frozen FINAL scoring input — Sprint 015 source
 
 `20261026130243_frozen_final_scoring_input.sql` prepares

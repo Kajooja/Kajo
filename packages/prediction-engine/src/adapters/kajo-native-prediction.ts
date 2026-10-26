@@ -74,6 +74,44 @@ function sameJson(left: unknown, right: unknown): boolean {
     && Object.keys(a).every(key => Object.hasOwn(b, key) && sameJson(a[key], b[key]));
 }
 
+// Validate the producer's retained command-entry visibility fact. This is not
+// authentication of an export, a historical reconstruction or a global prefix.
+function validateV4Receipt(source: Row, state: Row): void {
+  const marked = text(source.policy_version).split('+').includes('v4-receipt-input-v1');
+  if (!Object.hasOwn(state, 'nativeV4Receipt')) { check(!marked, 'incompatible-snapshots'); return; }
+  check(marked && Object.hasOwn(state, 'finalScoringInput'), 'incompatible-snapshots');
+  const receipt = row(state.nativeV4Receipt);
+  keys(receipt, ['version', 'policy', 'profileId', 'actorUserId', 'sessionId', 'receiptRevision',
+    'receiptTransaction', 'receiptAt', 'forecastTransaction', 'forecastAsOf', 'entrySnapshot']);
+  check(receipt.version === 'native-v4-receipt-v1' && receipt.policy === 'CANONICAL_FORECAST_POOL_V4', 'unsupported-contract');
+  check(uuid(receipt.profileId) === source.profile_id && uuid(receipt.actorUserId) === source.actor_user_id
+    && uuid(receipt.sessionId) === source.session_id, 'incompatible-snapshots');
+  integer(receipt.receiptRevision, 255);
+  const xid = (value: unknown): bigint => {
+    const raw = text(value, 20); check(/^[1-9][0-9]{0,19}$/u.test(raw));
+    const result = BigInt(raw); check(result <= 18_446_744_073_709_551_615n); return result;
+  };
+  const receiptXid = xid(receipt.receiptTransaction), forecastXid = xid(receipt.forecastTransaction);
+  const snapshot = text(receipt.entrySnapshot, 65_536);
+  const match = /^([1-9][0-9]{0,19}):([1-9][0-9]{0,19}):((?:[1-9][0-9]{0,19})(?:,[1-9][0-9]{0,19})*)?$/u.exec(snapshot);
+  check(match);
+  const xmin = xid(match[1]), xmax = xid(match[2]), active = match[3]?.split(',').map(xid) ?? [];
+  check(xmin <= xmax && active.every((value, i) => value >= xmin && value < xmax
+    && (i === 0 || value > active[i - 1]!)));
+  check(receiptXid !== forecastXid && receiptXid < xmax && !active.includes(receiptXid), 'incompatible-snapshots');
+  for (const key of ['receiptAt', 'forecastAsOf']) {
+    check(typeof receipt[key] === 'string' && receipt[key].length <= 32
+      && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/u.test(receipt[key]));
+  }
+  const accepted = instant(receipt.receiptAt), forecast = instant(receipt.forecastAsOf);
+  const request = row(state.candidateRequest), clocks = row(state.predictionInput);
+  check(request.intent === 'EVALUATION' && request.acquisition === 'EXPLICIT_CANONICAL'
+    && source.discovery_mode === 'FOR_YOU' && source.requested_item_type === null
+    && accepted < forecast && forecast === instant(source.requested_at)
+    && forecast === instant(clocks.nativeEvidenceAsOf) && accepted === instant(request.requiredAfter)
+    && accepted === instant(clocks.requiredAfter), 'incompatible-snapshots');
+}
+
 // Optional historical generation, mandatory complete binding when marked. This
 // validates the frozen input; the adapter still does not independently rescore.
 function validateFinalInput(source: Row, state: Row, genome: Row, candidates: readonly unknown[]): void {
@@ -99,6 +137,7 @@ function validateFinalInput(source: Row, state: Row, genome: Row, candidates: re
     context: source.context, candidateRequest: state.candidateRequest, predictionInput: state.predictionInput,
     sourceGenome: { id: source.genome_id, config: genome.config }, candidateCount: source.candidate_count,
     candidateIds: candidates.map(candidate => uuid(row(candidate).item_id)).sort(),
+    ...(Object.hasOwn(state, 'nativeV4Receipt') ? { nativeV4Receipt: state.nativeV4Receipt } : {}),
   };
   check(sameJson(marker, expected), 'incompatible-snapshots');
   for (const value of candidates) {
@@ -123,6 +162,7 @@ function validateFinalInput(source: Row, state: Row, genome: Row, candidates: re
 export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapshot): FrozenRanking {
   assertRankingJson(input);
   const source = row(input.sourceRun), genome = row(input.sourceGenome), state = row(source.state_snapshot);
+  validateV4Receipt(source, state);
   validateFinalInput(source, state, genome, list(input.sourceCandidates, 50));
   const request = row(state.candidateRequest), clocks = row(state.predictionInput);
   keys(request, ['version', 'acquisition', 'intent', 'itemIds', 'seenItemIds', 'reminderSpent', 'requiredAfter']);
@@ -211,7 +251,8 @@ export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapsho
   const expectedPolicy = `scenario-memory-v1+resurfacing-v1${sharedFit ? '+shared-common-fit-v1.1' : ''}`
     + '+outcome-attribution-v1+frozen-replay-v2+eligibility-first-v1'
     + (acquisition === 'CATALOG_CHAIN' ? '+catalog-chain-v1' : '')
-    + (evaluation ? '+evaluation-candidates-v1' : '') + (workingAt !== null ? '+personal-working-off-v3' : '');
+    + (evaluation ? '+evaluation-candidates-v1' : '') + (workingAt !== null ? '+personal-working-off-v3' : '')
+    + (Object.hasOwn(state, 'nativeV4Receipt') ? '+v4-receipt-input-v1' : '');
   check(policy === expectedPolicy, 'unsupported-contract');
   const mode = text(source.discovery_mode); check(['FOR_YOU', 'SURPRISE', 'RISK'].includes(mode));
   const itemType = source.requested_item_type; check(itemType === null || itemType === 'BOOK' || itemType === 'MOVIE');
