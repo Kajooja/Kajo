@@ -304,6 +304,22 @@ accept the current V4 sequential NEXT/device adaptation loop.
 Full acquisition, state/cutoff and selection
 parity remain the versioned guided-Discovery successor's acceptance contract.
 
+**Current V4 consumer conformance — Sprint 015 source:** the existing native
+adapter fixture now exercises separately committed public START/NEXT/ANSWER/NEXT
+commands with real retained pools and server receipts. Each actual panel crosses
+the native adapter and frozen baseline comparison, plus an independent explicit
+evaluation at the same transaction cutoff and requested pool. Comparison rebinds
+only validated capture self-references; complete inputs, actual Profile/actor,
+clocks, source genome and exact eligibility/rank/selection remain mandatory.
+Committed 0/5/10 controls distinguish supported future scores in both Taste and
+the current Discovery RPC, preserve old sources and isolate another Profile's
+retained and fresh forecasts. The same verifier runs in local SQL and native
+PostgreSQL CI. This is synthetic source conformance, not device adaptation or
+predictive quality. Actual V4 recognition acquisition and Discovery catalogue
+acquisition still differ in pool, domain scope, eligibility clock and intent/
+selection policy; the report declares them non-comparable as identical inputs.
+No runtime policy changes or historical reconstruction follow from this fixture.
+
 **Declared native clocks — Sprint 015 source:**
 `20261025211014_shared_prediction_cutoff.sql` aligns memory snapshot and Scenario
 arithmetic in the existing common identity scorer to transaction `now()`, which

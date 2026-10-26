@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { nativePredictionAdapterFixtureSql, verifyNativePredictionAdapter } from './native-prediction-adapter.mjs';
+import { nativePredictionAdapterFixtureSql, verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
 
 test('actual native sources and independent frozen replay cross the Kajo adapter and generic conformance boundary', async t => {
   const db = new PGlite();
@@ -44,6 +44,32 @@ test('actual native sources and independent frozen replay cross the Kajo adapter
     await assert.rejects(verifyNativePredictionAdapter(async () => (await db.exec(lowPrecisionSql))
       .flatMap(result => result.rows.map(row => row.snapshot))), /incompatible-snapshots/);
     assert.deepEqual(await snapshot(), before, 'Native/portable conformance must leave every canonical table unchanged');
+    t.diagnostic(JSON.stringify(report));
+  } finally { await db.close(); }
+});
+
+test('actual committed V4 Taste commands reach native input conformance and preserve numeric-prefix isolation', async t => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+      grant usage on schema public,auth to anon,authenticated,service_role;`);
+    for (const file of (await buildFreshInstallation()).files) await db.exec(`begin;${file.sql}commit;`);
+    const report = await verifyNativeTasteConsumer(async sql => {
+      try { return (await db.exec(sql)).flatMap(result => result.rows.map(row => Object.values(row)[0])); }
+      catch (error) { await db.exec('rollback;'); throw error; }
+    });
+    assert.equal(report.status, 'PASS');
+    assert.equal(report.captures, 7);
+    assert.equal(report.independentSameInputEvaluations, 7);
+    assert.deepEqual(report.committedRatings, [0, 5, 10]);
+    assert.ok(report.sensitivity.taste.numericallySensitiveCandidates > 0);
+    assert.ok(report.sensitivity.discovery.numericallySensitiveCandidates > 0);
+    assert.equal(report.preservedSources, 21);
+    assert.equal(report.otherProfileIsolation, 'RETAINED_AND_FRESH_FORECAST');
+    assert.equal(report.nonComparableConsumers.length, 7);
+    assert.equal(report.cleanup, 'CANONICAL_ROWS_RESTORED');
     t.diagnostic(JSON.stringify(report));
   } finally { await db.close(); }
 });

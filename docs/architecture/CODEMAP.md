@@ -54,6 +54,17 @@ independent of application/provider code and the root estimator import graph.
 native scoring and baseline frozen shadow replay using the existing fixtures.
 The shared JavaScript verifier also runs in the Supabase CLI installation gate,
 so native PostgreSQL output reaches the same adapter and comparison code.
+Its `verifyNativeTasteConsumer` additionally commits actual V4
+START/NEXT/ANSWER/NEXT commands and compares each retained panel with an
+independent same-transaction explicit evaluation and frozen baseline replay.
+Authenticated Discovery feed captures keep their actual catalogue acquisition,
+eligibility clock and delivery intent. Only validated Prediction/Working capture
+self-references are rebound between independent equal-input captures; complete
+scope, clocks, inputs, genome, eligibility, ranks and selection remain checked.
+Committed 0/5/10 answers, exact retries, immutable old sources and retained/fresh
+other-Profile controls share this verifier across PGlite and native PostgreSQL.
+The report explicitly exposes the V4 recognition-pool versus Discovery
+acquisition/selection boundary; it does not claim four-consumer same-pool serving.
 Fixtures and snapshots are disposable. The original adapter packet changed no
 SQL; the separate FINAL-input forward above preserves existing formulas, public
 APIs, forecasts and accounts. STATUS owns actual hosted installation.
