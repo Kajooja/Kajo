@@ -171,7 +171,8 @@ begin
   continued_page:=public.rank_items_page_v1(continued_request);perform set_config('role','postgres',true);
   continued_source:=(continued_page->>'predictionId')::uuid;
   perform pg_temp.candidate_feature_assert(continued_source<>root_source and
-    (select continued.state_snapshot=original.state_snapshot and continued.policy_version like '%+personal-working-off-v3+frozen-page-v1'
+    (select continued.state_snapshot-'finalScoringInput'=original.state_snapshot-'finalScoringInput'
+      and continued.policy_version like '%+personal-working-off-v3+frozen-page-v1'
       from private.prediction_runs continued join private.prediction_runs original on original.id=root_source where continued.id=continued_source)
     and not exists(select 1 from (select * from private.prediction_candidates where prediction_id=root_source) original
       full join (select * from private.prediction_candidates where prediction_id=continued_source) continued using(item_id)
@@ -179,6 +180,24 @@ begin
         or float8send(original.final_score) is distinct from float8send(continued.final_score)
         or original.explanation->'workingIntent' is distinct from continued.explanation->'workingIntent'),
     'actual V2 cursor inherits the complete original v3 capture/candidate features and exact source score bytes');
+  -- This fixture also runs on the historical candidate-feature prefix. Preserve
+  -- every original state field; new FINAL bindings identify each independent page.
+  if (select state_snapshot ? 'finalScoringInput' from private.prediction_runs where id=root_source) then
+    perform pg_temp.candidate_feature_assert(private.validate_native_final_source_v1(root_source)
+      and private.validate_native_final_source_v1(continued_source)
+      and (select state_snapshot#>>'{finalScoringInput,predictionId}'=root_source::text
+        and state_snapshot#>>'{finalScoringInput,featureSourcePredictionId}'=root_source::text
+        and state_snapshot#>>'{finalScoringInput,computation}'='FRESH_FINAL'
+        from private.prediction_runs where id=root_source)
+      and (select state_snapshot#>>'{finalScoringInput,predictionId}'=continued_source::text
+        and state_snapshot#>>'{finalScoringInput,featureSourcePredictionId}'=root_source::text
+        and state_snapshot#>>'{finalScoringInput,computation}'='FROZEN_PAGE_REUSE'
+        from private.prediction_runs where id=continued_source),
+      'actual V2 source and continuation retain complete, independently bound FINAL inputs');
+  else
+    perform pg_temp.candidate_feature_assert((select not (state_snapshot ? 'finalScoringInput')
+      from private.prediction_runs where id=continued_source),'historical V2 continuation remains unmarked');
+  end if;
   perform pg_temp.candidate_feature_assert((select not c.selected_for_delivery
     and c.explanation#>'{resurfacingPolicy,eligible}'='false'::jsonb from private.prediction_candidates c
       where c.prediction_id=continued_source and c.item_id=blocked_item),

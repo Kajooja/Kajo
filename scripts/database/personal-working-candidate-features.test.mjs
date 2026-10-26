@@ -58,5 +58,13 @@ test('native candidate feature forward preserves genuine v1/v2 sources and freez
       await db.exec('set extra_float_digits=3;');
       await db.exec(await personalWorkingBridgeSmokeSql());
       await db.exec(await personalWorkingResetSmokeSql());
+      // Native CLI also runs this same fixture after all later forwards. Exercise
+      // that generation locally as well, including fresh/reused FINAL bindings.
+      for(const file of files.slice(feature+1)) await db.exec(`begin;${file.sql}commit;`);
+      await db.exec('set extra_float_digits=-3;');
+      const latestSmoke=(await db.exec(await personalWorkingCandidateFeaturesSmokeSql()))
+        .flatMap(row=>row.rows.map(item=>item.snapshot));
+      assert.match(latestSmoke[0]?.personalWorkingCandidateFeatures,/^PASS: actual BOOK\/MOVIE/);
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits,'-3');
     } finally {await db.close();}
   });
