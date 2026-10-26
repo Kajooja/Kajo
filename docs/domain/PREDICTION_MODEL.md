@@ -309,8 +309,17 @@ adapter fixture now exercises separately committed public START/NEXT/ANSWER/NEXT
 commands with real retained pools and server receipts. Each actual panel crosses
 the native adapter and frozen baseline comparison, plus an independent explicit
 evaluation at the same transaction cutoff and requested pool. Comparison rebinds
-only validated capture self-references; complete inputs, actual Profile/actor,
-clocks, source genome and exact eligibility/rank/selection remain mandatory.
+only validated capture self-references. Frozen-baseline complete inputs, actual
+Profile/actor, clocks, source genome and exact eligibility/rank/selection remain
+mandatory. Receipt-aware report v2 separately records complete-input conformance
+for each independent evaluation and receipt-aligned computation-input parity.
+Both actual receipt witnesses pass native adapter admission. If their global
+entry snapshots differ, the unchanged full comparator must report exactly those
+two state/FINAL witness paths; every other input, scope, clock, receipt field,
+candidate and score still must match. Such a pair is **not** full-input
+conformance. The witnesses are retained verbatim and never rebound. Deterministic
+synthetic-copy controls verify this distinction and reject invisible receipts;
+they are not recorded as native captures or observations.
 Committed 0/5/10 controls distinguish supported future scores in both Taste and
 the current Discovery RPC, preserve old sources and isolate another Profile's
 retained and fresh forecasts. The same verifier runs in local SQL and native
@@ -439,6 +448,52 @@ commit visibility or full four-consumer same-pool serving. The existing FINAL
 and candidate-request snapshots remain the replay boundary. Private API grants
 stay closed; drift checks guard the three changed bodies/security metadata and
 reject unexpected inherited grants without editing default privileges.
+
+#### Owned V4 receipt-to-forecast binding — Sprint 015 source
+
+`20261026201946_native_v4_receipt_forecast_binding.sql` binds a current owned V4
+acknowledgement to the existing evaluation/identity computation. The V4 command
+captures `pg_current_snapshot()` before waiting for its lifecycle lock. Its
+server receipt's top-level transaction must be visible in that entry snapshot,
+different from the forecast transaction, and have a finite receipt instant before
+the forecast's transaction cutoff. A receipt timestamp alone does not prove that
+its transaction had committed when NEXT entered. A late commit fails with `40001`
+and no forecast; a separate fresh retry may then consume the acknowledged receipt.
+
+The private INVOKER `capture_native_v4_receipt_v1` reads the actual active V4
+session and PersonalProfile owner. The command passes its resulting closed
+`native-v4-receipt-v1` object privately to evaluation. The existing identity scorer
+revalidates the current server receipt and requires exact Profile/actor/session,
+revision, transaction, instant and entry snapshot binding before a forecast write.
+Its `requiredAfter` must equal that receipt instant. Existing acquisition receipt
+checks, canonical pools, score arithmetic and V4 selection remain their current
+owners; public delivery Context cannot claim this evaluation-only binding.
+
+Fresh V4 captures retain the object at `state_snapshot.nativeV4Receipt` and inside
+their FINAL run input, with the policy provenance suffix `v4-receipt-input-v1`.
+Fields are version, V4 policy, Profile/actor/session, receipt revision/transaction/
+instant, forecast transaction/cutoff and command-entry snapshot. The snapshot text
+is bounded to 64 KiB; the complete receipt is bounded to 128 KiB and remains
+within the existing FINAL input budget. Missing/mixed markers, wrong scope,
+incompatible clocks or impossible receipt visibility reject in native frozen
+admission and the portable adapter, including empty candidate pools. Transaction
+identities retain exact 64-bit precision. The source validator runs before replay
+consumers; its checks use the frozen receipt, not today's changed session.
+
+This establishes visibility of the **specific owned V4 receipt at command entry**.
+The consumed input still uses current statement snapshots; global commit
+visibility remains `UNKNOWN` and historical reconstruction `UNAVAILABLE`. The
+receipt does not authenticate an arbitrary export, certify all mutable features
+or make unlike acquisition/selection policies equivalent. Correction changes
+future inputs without rewriting old forecasts; withdrawal retains the existing
+dependent-source erasure. Historical unmarked sources, exact cached commands and
+non-V4 policies remain unchanged. STATUS owns source/CI and hosted acceptance.
+
+Two consecutive READ COMMITTED commands can retain different global snapshot
+texts while witnessing the same exact receipt. The actual-consumer report v2
+preserves and reports those differences, requires exact equality of all remaining
+computation inputs and separates that result from full-input conformance. It
+does not infer one global snapshot from receipt visibility.
 
 #### Frozen FINAL scoring input — Sprint 015 source
 

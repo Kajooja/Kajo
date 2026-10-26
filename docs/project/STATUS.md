@@ -18,6 +18,42 @@ The shared acquisition installation and preservation receipt is below; do not
 repeat any installed forward. The next single source packet is the owned V4
 acknowledged-receipt to fresh-forecast provenance boundary.
 
+Active source branch: `feat/v4-receipt-forecast-binding`, based on accepted main
+`c9a4eb71f2b3c56af0644bcb5cf7e808ab9e6d0d`. The new forward is
+`20261026201946_native_v4_receipt_forecast_binding.sql`; it is **not installed**.
+It binds a before-lock command-entry snapshot and actual V4 server receipt into
+the consumed evaluation/identity input and retained FINAL source, with strict
+native/portable admission. Existing clock/request fields retain their stated
+current-row limits. The current source is not accepted until its required checks
+and actual native concurrency evidence pass.
+
+Local focused checks preserve all old canonical rows and function/default
+metadata, exact old retries, correction and dependent-source withdrawal. Thirteen
+prewrite and seven frozen corruption controls pass. The actual V4 fixture retains
+seven captures, 1095 comparisons, zero score difference, 0/5/10 sensitivity and
+21 unchanged sources; independent receipt-aligned evaluation now precedes NEXT while
+the exact parent receipt is current. Full local database (381), engine (332),
+research (72), acceptance (11), mobile (904), dependency (50) and catalogue
+(451) tests pass, as do lint/typecheck and all four explicit-demo Hermes exports.
+Root `npm run check` stops only at the Deno npm registry connection refusal;
+its Edge gate must pass in CI. All five corrected-final-source CI gates remain
+pending. [PR #379](https://github.com/Kajooja/Kajo/pull/379)
+is the active source. CI #773 passed validate (including all 32 Edge tests), both
+clean installs, platform and populated upgrade; the CLI probe passed the new
+forward/current receipt controls but stopped before concurrency because its
+phase label contained underscores. The fixture now normalizes only that log
+label to the runner's established format; database application names and gates
+are unchanged. CI #774 then passed the real two-connection late-commit and
+exact-duplicate tests, but its later independent evaluation exposed different
+valid global entry snapshots. Report v2 now preserves the complete comparator's
+non-conformance for those two witness paths, admits each receipt independently,
+and requires every remaining input and score to match. It reports receipt-aligned
+evaluations separately from full-input matches; snapshots are never rebound.
+Synthetic-copy controls cover the distinction without creating observations.
+The actual V4 fixture now runs in the early native CLI phase. Require all five
+gates on this corrected final head; the source and hosted forward are not yet
+accepted.
+
 Start from fresh main and audit the existing V4 command receipts/panel bindings,
 shared acquisition's exact receipt check, request/FINAL capture and native adapter
 admission. Reuse these owners. Bind the actual server-owned Profile, actor,

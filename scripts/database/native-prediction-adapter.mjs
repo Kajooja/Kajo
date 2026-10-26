@@ -372,6 +372,20 @@ function bindCaptureIdentity(ranking, reference) {
   return result;
 }
 
+// Both original captures must pass native receipt admission first. Keep the
+// complete comparison result: independently observed global snapshots need not
+// be equal even when the same exact receipt is visible in both. Do not rebind
+// either witness, or label that pair as full-input conformance. Every other
+// contract field, computation input, candidate and score must still match.
+function receiptComparisonBoundary(comparison) {
+  if (comparison.conforms) return 'EXACT_INPUT';
+  assert.deepEqual(comparison.mismatches, [
+    { kind: 'contract', path: '$.inputSnapshot.state_snapshot.finalScoringInput.nativeV4Receipt.entrySnapshot' },
+    { kind: 'contract', path: '$.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot' },
+  ], 'Independent evaluation may differ only in its two validated receipt witnesses');
+  return 'SCORING_INPUTS_MATCH_RECEIPT_WITNESSES_DIFFER';
+}
+
 // PGlite and the disposable native CLI stack execute the same verifier. START,
 // NEXT and ANSWER commit separately; no backdated receipts or clock overrides
 // can stand in for the current public V4 command path.
@@ -396,19 +410,22 @@ export async function verifyNativeTasteConsumer(execSql) {
     + "'pool',(select to_jsonb(p) from private.sequential_taste_candidate_pools_v4 p where p.panel_id=r.id))"
     + ' from private.prediction_runs r where r.id=' + sqlLiteral(predictionId) + ';rollback;', 'retained-source');
   let fixture = false, snapshots, original, failure;
-  const observations = [], comparisons = [], boundaries = [];
+  const observations = [], comparisons = [], boundaries = [], receiptComparisons = [];
   const capture = async (actor, state, label) => {
     const parent = await session(state), next = command(state, 'NEXT');
     const feed = { version: 3, requestId: randomUUID(), profileId: state.profileId, sessionId: state.sessionId,
       discoveryMode: 'FOR_YOU', itemType: 'MOVIE', limit: 5, context: {}, cursor: null, replacesChainId: null };
     const output = await exec('begin;set local extra_float_digits=3;set local request.jwt.claim.sub=' + sqlLiteral(actor)
-      + ';set local role authenticated;select public.taste_session_v2(' + jsonLiteral(next) + ');reset role;'
-      + `select private.capture_personal_evaluation_v1(gen_random_uuid(),r.profile_id,
-          array(select value::uuid from jsonb_array_elements_text(r.state_snapshot#>'{candidateRequest,itemIds}')),
-          (r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz,
-          jsonb_build_object('sessionId',s.id))
-        from private.sequential_taste_sessions s join private.prediction_runs r
-          on r.id=(s.presentations#>>'{-1,poolId}')::uuid where s.id=` + sqlLiteral(state.sessionId) + ';'
+      + ';do $assign$ begin perform pg_current_xact_id();end;$assign$;'
+      // Independent fresh capture precedes NEXT, while the exact parent receipt
+      // is still current. Both consume their own command-entry visibility input.
+      + `select private.capture_personal_evaluation_v1(gen_random_uuid(),` + sqlLiteral(state.profileId) + `,
+          array(select (c->>'id')::uuid from jsonb_array_elements(private.taste_candidate_catalog_v4(`
+      + sqlLiteral(state.sessionId) + `,now())) c order by c->>'id'),`
+      + sqlLiteral(parent.receipt_at) + `::timestamptz,
+          jsonb_build_object('sessionId',` + sqlLiteral(state.sessionId) + `::uuid,
+            'nativeV4Receipt',private.capture_native_v4_receipt_v1(` + sqlLiteral(state.sessionId) + `,pg_current_snapshot())));`
+      + 'set local role authenticated;select public.taste_session_v2(' + jsonLiteral(next) + ');reset role;'
       + 'set local role authenticated;select public.rank_items_feed_v1(' + jsonLiteral(feed) + ');reset role;'
       + `select jsonb_build_object('predictionId',p.prediction_id,
           'receiptMatches',(r.state_snapshot#>>'{candidateRequest,requiredAfter}')::timestamptz=`
@@ -420,7 +437,7 @@ export async function verifyNativeTasteConsumer(execSql) {
         join private.prediction_runs r on r.id=p.prediction_id where s.id=` + sqlLiteral(state.sessionId) + ';commit;',
     label + '-next-and-controls');
     assert.equal(output.length, 4);
-    const [question, evaluation, discovery, binding] = output;
+    const [evaluation, question, discovery, binding] = output;
     assert.equal(question.status, 'QUESTION');
     assert.deepEqual(binding, { predictionId: binding.predictionId,
       receiptMatches: true, separateTransaction: true, afterReceipt: true });
@@ -446,7 +463,11 @@ export async function verifyNativeTasteConsumer(execSql) {
     }));
     const { actual: taste } = samples.taste, { actual: explicit } = samples.evaluation, { actual: delivery } = samples.discovery;
     const comparison = compareFrozenRankings(taste, bindCaptureIdentity(explicit, taste), tolerance);
-    assert.equal(comparison.conforms, true, label + ' independent evaluation: ' + JSON.stringify(comparison.mismatches));
+    const boundary = receiptComparisonBoundary(comparison);
+    receiptComparisons.push({ label, boundary, fullInputConforms: comparison.conforms,
+      tasteEntrySnapshot: taste.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot,
+      evaluationEntrySnapshot: explicit.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot,
+      mismatches: comparison.mismatches });
     comparisons.push(comparison);
     // Rebinding self-references must not hide a different scope, clock or input.
     for (const mutate of [
@@ -454,13 +475,41 @@ export async function verifyNativeTasteConsumer(execSql) {
       value => { value.scope.actingIdentityRef = id(999); },
       value => { value.candidates[0].score += 1e-6; },
       value => { value.candidates[0].inputs.explanation.scoringFeatures.longTerm += 1; },
+      value => { value.inputSnapshot.state_snapshot.nativeV4Receipt.receiptRevision += 1; },
     ]) {
       const invalid = bindCaptureIdentity(explicit, taste); mutate(invalid);
-      assert.equal(compareFrozenRankings(taste, invalid, tolerance).conforms, false);
+      assert.throws(() => receiptComparisonBoundary(compareFrozenRankings(taste, invalid, tolerance)),
+        /only in its two validated receipt witnesses/u);
     }
+    // Deterministic synthetic COPY controls exercise this boundary even when a
+    // quiet PGlite/native run happens to produce identical original snapshots.
+    // These copies never count as observations, forecasts or native witnesses.
+    const witnessCopy = structuredClone(samples.evaluation.sample);
+    const copiedState = witnessCopy.sourceRun.state_snapshot;
+    let cutoff = BigInt(copiedState.nativeV4Receipt.receiptTransaction) + 1n;
+    if (`${cutoff}:${cutoff}:` === taste.inputSnapshot.state_snapshot.nativeV4Receipt.entrySnapshot) cutoff++;
+    const compareWitnessCopy = witness => {
+      copiedState.nativeV4Receipt.entrySnapshot = copiedState.finalScoringInput.nativeV4Receipt.entrySnapshot = witness;
+      const admitted = normalizeKajoNativePrediction({ ...witnessCopy, source, snapshotObservedAt: snapshot.observedAt });
+      return compareFrozenRankings(taste, bindCaptureIdentity(admitted, taste), tolerance);
+    };
+    const differentWitness = compareWitnessCopy(`${cutoff}:${cutoff}:`);
+    assert.equal(differentWitness.conforms, false);
+    assert.equal(receiptComparisonBoundary(differentWitness), 'SCORING_INPUTS_MATCH_RECEIPT_WITNESSES_DIFFER');
+    assert.throws(() => compareWitnessCopy('1:1:'), /incompatible-snapshots/u);
     const retained = await frozen(taste.predictionId);
     assert.equal(retained.panel.session_id, state.sessionId);
     assert.equal(retained.panel.prefix_revision, state.revision);
+    const receiptInput = retained.run.state_snapshot.nativeV4Receipt;
+    assert.equal(receiptInput.version, 'native-v4-receipt-v1');
+    assert.equal(receiptInput.profileId, state.profileId);
+    assert.equal(receiptInput.actorUserId, actor);
+    assert.equal(receiptInput.sessionId, state.sessionId);
+    assert.equal(receiptInput.receiptRevision, state.revision);
+    assert.equal(receiptInput.receiptTransaction, parent.receipt_transaction);
+    assert.equal(Date.parse(receiptInput.receiptAt), Date.parse(parent.receipt_at));
+    assert.equal(receiptInput.forecastTransaction, retained.panel.captured_transaction);
+    assert.deepEqual(retained.run.state_snapshot.finalScoringInput.nativeV4Receipt, receiptInput);
     assert.equal(retained.panel.frozen.requiredReceiptRevision, state.revision);
     assert.equal(String(retained.panel.frozen.requiredReceiptTransaction), String(parent.receipt_transaction));
     assert.deepEqual(retained.pool.catalog.map(item => item.id).sort(), [...taste.acquisition.requestedObjectIds].sort());
@@ -609,10 +658,12 @@ export async function verifyNativeTasteConsumer(execSql) {
         preservedSources++;
       }
     }
-    return { status: 'PASS', version: 'native-taste-consumer-conformance-v1', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
+    return { status: 'PASS', version: 'native-taste-consumer-conformance-v2', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
       policy: 'CANONICAL_FORECAST_POOL_V4', transactions: 'SEPARATE_COMMITTED_START_NEXT_ANSWER_NEXT',
       consumers: ['TASTE_V4_RPC', 'EXPLICIT_CANONICAL_CAPTURE', 'DISCOVERY_FEED_RPC', 'FROZEN_BASELINE_REPLAY'],
-      captures: observations.length, independentSameInputEvaluations: observations.length,
+      captures: observations.length, independentSameInputEvaluations: receiptComparisons.filter(x => x.fullInputConforms).length,
+      independentReceiptAlignedEvaluations: observations.length, independentReceiptComparisons: receiptComparisons,
+      receiptWitnessControls: 'SYNTHETIC_COPY_ONLY_DIFFERENT_VALID_WITNESS_NOT_FULL_PARITY_INVISIBLE_WITNESS_REJECTED',
       independentCaptureBinding: 'ONLY_VALIDATED_PREDICTION_AND_WORKING_CAPTURE_SELF_REFERENCES_REBOUND',
       comparedCandidates: comparisons.reduce((sum, value) => sum + value.comparedCandidates, 0),
       absoluteTolerance: tolerance.absoluteTolerance,
@@ -620,7 +671,7 @@ export async function verifyNativeTasteConsumer(execSql) {
       committedRatings: ratings, sensitivity, preservedSources,
       immutableOldForecasts: true, exactCommandRetries: true, otherProfileIsolation: 'RETAINED_AND_FRESH_FORECAST',
       nonComparableConsumers: boundaries,
-      acquisitionOwner: 'native-candidate-acquisition-v1',
+      acquisitionOwner: 'native-candidate-acquisition-v1', receiptBinding: 'native-v4-receipt-v1',
       remainingDependency: 'GUIDED_RECOGNITION_AND_DELIVERY_SELECTION_POLICY_ALIGNMENT',
       historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'CANONICAL_ROWS_RESTORED' };
   } catch (error) { failure = error; throw error; }

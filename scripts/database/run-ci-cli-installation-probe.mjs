@@ -47,6 +47,7 @@ import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
 import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
+import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -91,6 +92,17 @@ try {
       rollback: 'owned test table absent after server statement cancellation' };
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const receiptIndex = files.findIndex(file => file.name.endsWith('_native_v4_receipt_forecast_binding.sql'));
+    assert.ok(receiptIndex > 0);
+    await resetFromMigrations(files.slice(0, receiptIndex));
+    const nativeV4ReceiptUpgrade = await verifyNativeV4ReceiptUpgrade(execConcurrentSql, files[receiptIndex]);
+    const nativeV4Receipt = await verifyNativeV4Receipt(execConcurrentSql);
+    const nativeV4ReceiptConcurrency = await verifyNativeV4ReceiptConcurrency(execConcurrentSql);
+    assert.equal(nativeV4ReceiptUpgrade.status, 'PASS');
+    assert.equal(nativeV4Receipt.status, 'PASS');
+    assert.equal(nativeV4ReceiptConcurrency.status, 'PASS');
+    const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);
+    assert.equal(nativeTasteConsumer.status, 'PASS');
     const acquisitionIndex = files.findIndex(file => file.name.endsWith('_shared_native_candidate_acquisition.sql'));
     assert.ok(acquisitionIndex > 0);
     await resetFromMigrations(files.slice(0, acquisitionIndex));
@@ -393,8 +405,6 @@ try {
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
-    const nativeTasteConsumer = await verifyNativeTasteConsumer(execConcurrentSql);
-    assert.equal(nativeTasteConsumer.status, 'PASS');
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
@@ -462,6 +472,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
+      nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,

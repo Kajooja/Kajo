@@ -62,7 +62,17 @@ test('actual committed V4 Taste commands reach native input conformance and pres
     });
     assert.equal(report.status, 'PASS');
     assert.equal(report.captures, 7);
-    assert.equal(report.independentSameInputEvaluations, 7);
+    assert.equal(report.version, 'native-taste-consumer-conformance-v2');
+    assert.equal(report.independentReceiptAlignedEvaluations, 7);
+    assert.equal(report.independentSameInputEvaluations,
+      report.independentReceiptComparisons.filter(x => x.fullInputConforms).length);
+    assert.equal(report.independentReceiptComparisons.length, 7);
+    for (const comparison of report.independentReceiptComparisons) {
+      assert.equal(comparison.boundary, comparison.fullInputConforms
+        ? 'EXACT_INPUT' : 'SCORING_INPUTS_MATCH_RECEIPT_WITNESSES_DIFFER');
+      assert.equal(comparison.mismatches.length, comparison.fullInputConforms ? 0 : 2);
+    }
+    assert.match(report.receiptWitnessControls, /SYNTHETIC_COPY_ONLY/u);
     assert.deepEqual(report.committedRatings, [0, 5, 10]);
     assert.ok(report.sensitivity.taste.numericallySensitiveCandidates > 0);
     assert.ok(report.sensitivity.discovery.numericallySensitiveCandidates > 0);
