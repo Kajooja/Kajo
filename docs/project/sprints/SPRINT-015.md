@@ -109,12 +109,17 @@ does not become an invented pass.
   This is an EB-01/EB-03 and EB-12 integration slice (architecture sections
   1–3, 10–13, 30, 37, 40–44 and 49–51), with no new scorer, SQL migration,
   serving activation or quality claim. Independent review, all 361 database and
-  325 engine tests pass. The six-case real-SQL fixture compares 69 candidates,
+  326 engine tests pass. The six-case real-SQL fixture compares 69 candidates,
   including 37 nonzero Scenario contributions, with zero score difference under
   `1e-12`; four delivery cases use the shadow worker and two explicit evaluation
   cases use the frozen score helper. Full table rollback equality passes.
   Other local suites and four demo exports pass; the aggregate check retains
-  the unchanged Deno registry refusal. Final-source CI/merge remain pending;
+  the unchanged Deno registry refusal. The first native CI attempt exposed
+  rounded caller serialization; the rollback-only fixture now declares full
+  float precision and tests microsecond capture rejection at rounded precision.
+  Admission is limited to precision-preserving captures and lossless exports;
+  existing lossy snapshots are not repaired or granted clock tolerance.
+  Final-source CI/merge remain pending;
   STATUS and the source PR own those receipts. The temporal runner,
   full same-pool parity and genuine #232F consumer remain open.
 - Second source packet: accepted through [PR #365](https://github.com/Kajooja/Kajo/pull/365),

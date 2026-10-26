@@ -86,6 +86,25 @@ describe('native prediction snapshot adapter', () => {
     const output = normalizeKajoNativePrediction(input);
     expect(output.candidates).toEqual([]); expect(output.sessionBinding).toBeNull(); expect(output.scope.sessionRef).toBe('');
   });
+  it('accepts an exact numeric microsecond Working clock and rejects its lossy 15-digit serialization', () => {
+    const input = fixture(), state = input.sourceRun.state_snapshot;
+    const cutoff = at(123), exact = Date.parse('2026-10-26T00:00:00Z') + 0.123;
+    input.sourceRun.requested_at = cutoff;
+    state.predictionInput.requestAsOf = cutoff; state.predictionInput.workingStateAsOf = cutoff;
+    state.workingState.cutoff = cutoff;
+    Object.assign(state.workingState, { asOf: exact });
+    const normalized = normalizeKajoNativePrediction(input);
+    expect(normalized.clocks.workingAsOf).toBe(exact);
+    expect(state.workingState.cutoff).toBe(cutoff);
+    // PostgreSQL extra_float_digits=0 can retain only 15 significant decimal
+    // digits. The immutable cutoff does not repair that rounded numeric field.
+    const rounded = Number(exact.toPrecision(15));
+    expect(rounded).not.toBe(exact);
+    Object.assign(state.workingState, { asOf: rounded });
+    expect(() => normalizeKajoNativePrediction(input)).toThrow(KajoNativePredictionSnapshotError);
+    expect(state.workingState.cutoff).toBe(cutoff);
+    expect(state.workingState.asOf).toBe(rounded);
+  });
   it('retains a requested session reference when the owned Working session was unavailable', () => {
     const input = fixture(); input.sourceRun.state_snapshot.workingState.session = null;
     Object.assign(input.sourceRun.state_snapshot.workingState, { status: 'NO_SESSION' });

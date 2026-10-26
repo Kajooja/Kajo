@@ -32,17 +32,23 @@ The shared verifier is consumed by both the local full-schema test and the nativ
 PostgreSQL CLI installation gate. Existing SQL, serving policy and migration
 history are unchanged; this packet requires no hosted migration or account reset.
 
-**Local validation:** independent review passed, including 14 focused package
+**Local validation:** independent review passed, including 15 focused package
 tests and the full-schema conformance fixture: six cases, 69 retained candidates,
 37 nonzero Scenario contributions and maximum score difference zero under the
 predeclared `1e-12` tolerance. Four delivery cases execute the actual baseline
 shadow worker; two explicit evaluation cases use the existing frozen score helper.
 Metadata/input mutation controls fail, copied continuations are rejected, and
-all canonical tables remain unchanged after rollback. All 361 database and 325
+all canonical tables remain unchanged after rollback. All 361 database and 326
 engine tests pass, with lint/types, 904 mobile, 50 dependency, 451 catalogue,
 62 research and 11 acceptance tests and four explicit-demo Hermes exports.
 `npm run check` reaches the unchanged Deno npm-registry connection refusal;
-no complete local root-check pass is claimed. Final-source CI is pending.
+no complete local root-check pass is claimed. Initial native CI exposed rounded
+caller serialization of microsecond Working clocks. The fixture now pins
+round-trip precision locally; a full-schema microsecond regression verifies both
+acceptance and rejection of rounded captures and restores the caller setting.
+The strict adapter is unchanged. Admission requires precision-preserving captures
+and lossless numeric export; unsupported old records are never rewritten.
+Final-source CI is pending.
 
 After source acceptance, continue a bounded Personal temporal evaluation
 manifest/report runner using these frozen inputs, with declared windows,

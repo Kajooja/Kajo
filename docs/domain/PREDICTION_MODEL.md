@@ -3011,7 +3011,18 @@ the frozen source or replay. The same JavaScript verification runs against
 PGlite and the native PostgreSQL CLI installation. Test inputs remain synthetic
 fixtures, not observed user outcomes or a production quality evaluation.
 
-This bounded adapter accepts fresh request-owner runs. Protocol-2 frozen-page
+This bounded adapter admits precision-preserving fresh request-owner runs and
+requires lossless export of their floating-point columns. Existing page writers
+pin `extra_float_digits=3`; the rollback-only fixture declares the same setting
+for capture and export, restoring the caller afterward. Native private calls
+under a rounded caller setting can retain a numeric Working `asOf` that disagrees
+with its exact timestamp cutoff. Such old snapshots remain immutable and are
+rejected, not repaired or admitted through a clock tolerance. A real-SQL
+microsecond regression reproduces that rejection under `extra_float_digits=0`.
+Admission of lossy legacy captures would require a separately declared policy;
+this packet does not establish parity for every existing native record.
+
+Protocol-2 frozen-page
 continuations retain original input clocks under a later delivery timestamp and
 need a separate source mapping; their envelope is not treated as fresh input.
 `created_at` may precede a delivery's wall-clock `requested_at` because the former

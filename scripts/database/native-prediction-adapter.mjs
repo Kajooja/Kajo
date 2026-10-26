@@ -24,6 +24,9 @@ async function adapter() {
 // data are synthetic and the entire exercise rolls back, including replay jobs.
 export async function nativePredictionAdapterFixtureSql() {
   return `begin;
+-- Match precision-preserving page owners; rounded legacy captures are rejected.
+-- Scope this to the rollback-only fixture and restore the caller on exit.
+set local extra_float_digits=3;
 ${await nativeCandidateRequestFixtureSql()}
 create temp table adapter_sources(name text primary key, prediction_id uuid, evaluation_receipt jsonb) on commit drop;
 create temp table adapter_preserved(body jsonb) on commit drop;
@@ -105,6 +108,7 @@ begin
     raise exception 'Native adapter replay changed frozen source records';end if;
 end;$native_adapter$;
 select jsonb_build_object('observedAt',clock_timestamp(),'frozenPreserved',true,
+  'floatSerializationDigits',current_setting('extra_float_digits')::integer,
   'cases',(select jsonb_agg(jsonb_build_object('name',s.name,
     'scope',jsonb_build_object('profile',case when p.profile_type='PERSONAL' then
       jsonb_build_object('id',p.id,'type',p.profile_type,'ownerUserId',p.owner_user_id) else
@@ -192,7 +196,9 @@ export async function verifyNativePredictionAdapter(exec) {
   let comparedCandidates = 0, maxAbsoluteScoreDifference = 0, scenarioCandidates = 0;
   const normalized = [];
   for (const sample of fixture.cases) {
-    const actual = normalize(sample);
+    let actual;
+    try { actual = normalize(sample); }
+    catch (error) { throw new Error(`Native adapter fixture ${sample.name}: ${error.stack ?? error}`, { cause: error }); }
     const replay = replayView(sample, actual);
     const comparison = compareFrozenRankings(actual, replay, options);
     assert.equal(comparison.conforms, true, `${sample.name}: ${JSON.stringify(comparison.mismatches)}`);
@@ -262,8 +268,10 @@ export async function verifyNativePredictionAdapter(exec) {
   ]) assert.throws(() => normalize(invalid));
   assert.match(fixture.continuation.sourceRun.policy_version, /frozen-page-v1/);
   assert.throws(() => normalize({ ...sample, ...fixture.continuation }));
+  assert.equal(fixture.floatSerializationDigits, 3);
   return { status: 'PASS', version: 'native-prediction-adapter-conformance-v1',
     scope: 'FROZEN_SAME_POLICY_BASELINE', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
+    floatSerializationDigits: fixture.floatSerializationDigits, clockAdmission: 'EXACT_STORED_CLOCKS',
     cases: fixture.cases.map(s => ({ name: s.name, replay: s.replay.kind,
       recomputed: s.replay.kind === 'BASELINE_SHADOW_WORKER' ? 'SCORE_RANK_ELIGIBILITY_SELECTION' : 'SCORE_RANK' })),
     comparedCandidates, scenarioCandidates, absoluteTolerance: options.absoluteTolerance, maxAbsoluteScoreDifference,

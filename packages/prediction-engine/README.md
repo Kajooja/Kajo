@@ -60,6 +60,11 @@ compares four delivery sources with the existing baseline shadow worker on the
 same frozen pools; two explicit evaluation cases use the existing frozen score
 helper and preserve non-delivery. The same JavaScript verifier runs in the native
 PostgreSQL CLI gate.
+Admission requires precision-preserving captures and lossless numeric export.
+Rounded legacy Working `asOf` values that disagree with their exact cutoff are
+rejected; the adapter never repairs them or grants clock tolerance. The fixture
+scopes `extra_float_digits=3` to its rollback transaction, matching existing
+precision-pinned page writers, and tests rejection under rounded serialization.
 Changing current catalogue rows must not change that replay. Delivery selection
 and hypothetical shadow selection never establish an impression or an outcome.
 Protocol-2 frozen continuation pages require a separate source-clock mapping and
