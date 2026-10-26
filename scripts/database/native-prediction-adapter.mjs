@@ -511,9 +511,9 @@ export async function verifyNativeTasteConsumer(execSql) {
     const tables = await one(`select jsonb_agg(format('%I.%I',n.nspname,c.relname) order by n.nspname,c.relname)
       from pg_class c join pg_namespace n on n.oid=c.relnamespace
       where c.relkind='r' and n.nspname in('public','private','auth');`, 'canonical-tables');
-    snapshots = 'select jsonb_object_agg(name,value) from (' + tables.map(name => 'select ' + sqlLiteral(name)
+    snapshots = 'begin read only;set local extra_float_digits=3;select jsonb_object_agg(name,value) from (' + tables.map(name => 'select ' + sqlLiteral(name)
       + ` name,encode(sha256(convert_to(coalesce(jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text),'[]')::text,'UTF8')),'hex') value
-        from ` + name + ' r').join(' union all ') + ') s;';
+        from ` + name + ' r').join(' union all ') + ') s;rollback;';
     original = await one(snapshots, 'canonical-before');
     fixture = true;
     await exec('begin;' + await personalTasteSessionFixtureSql() + `
