@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-26**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, four bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, five bounded source packets accepted; the first two SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,85 +11,94 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — frozen FINAL scoring input / Sprint 015, #302, #336
+## Current handoff — guarded frozen FINAL input rollout / Sprint 015, #302, #336
 
-**Active implementation:** `feat/frozen-final-scoring-input`, based on accepted
-main `3610ed478da40c90a7f5a663eb1e3f5fb104e712`. The fifth bounded source
-packet is implemented and undergoing final checks; it is not yet accepted or
-installed. Continue this branch through complete source validation, all five
-required CI gates and a guarded merge. Then record the exact source/CI/merge
-receipt and make the new forward's preservation-checked hosted rollout the next
-bounded handoff. Do not repeat either already-installed forward below.
+Continue from accepted [PR #371](https://github.com/Kajooja/Kajo/pull/371),
+merge `118099a72a4ab2ec6d4b96e74aa9b9562ab78801`. Prepare and execute the preservation-checked
+hosted rollout of **only** `20261026130243_frozen_final_scoring_input.sql`.
+The reviewed SQL SHA-256 is
+`b4a81e386c6b9222df05d9645d7607f9132566c5e9da73a797b705bc7cc41f44`.
+The computation-cutoff and candidate-request forwards below are already installed;
+do not repeat them or reset accepted accounts, answers or pending commands.
 
-`20261026130243_frozen_final_scoring_input.sql` adds the versioned candidate input
-and complete run binding, consumed by existing identity, shadow and Working
-owners. A fourth existing owner, protocol-2 frozen-page continuation, rebinds
-copied inputs and refreshed eligibility under `FROZEN_PAGE_REUSE`; fresh sources
-declare `FRESH_FINAL`. The native adapter retains its fresh-only admission.
-Unknown/mixed/missing bindings reject before replay, including a cached Working
-reply. No historical records are backfilled and no arithmetic is replaced.
+First reconcile fresh provider history, exact four predecessor bodies, function
+ownership/security/configuration/ACLs and default privileges against the accepted
+source. Capture fixed existing run/candidate/receipt/shadow/Working rows and all
+existing function identities/metadata; detect unexpected drift before applying.
+Use the supported migration transaction with the unchanged reviewed SQL. Preserve
+the provider-issued history timestamp. Verify stored SQL bytes, the four changed
+bodies and three new owner-only helpers, unchanged unrelated bodies/metadata and
+all captured immutable records afterward. Keep private record identities and
+environment details outside public Git. Any mismatch blocks that rollout.
 
-Local focused evidence includes complete pre/post trace and float8-byte equality
-for 54 Personal/Shared mode/domain/acquisition cases plus explicit evaluation;
-historical receipts/replay, empty and suppressed pools, malformed/nonfinite and
-oversized inputs, protocol-2 reuse, timezone-invariant run binding and atomic
-body/security/default-grant rejection. The existing 18-case frozen replay matrix
-retains an actual nonbaseline challenger reminder flip. The native adapter
-fixture compares 69 candidates, including 37 nonzero Scenario contributions,
-with zero score difference at `1e-12`; it additionally validates seven marked
-sources and four rollback-only rejection controls. Native PostgreSQL execution
-of the shared smoke remains a required source CI gate.
+A READ ONLY postcheck may verify contract installation and count naturally created
+marked runs. Do not manufacture user answers or forecasts to claim observed
+consumption. Record installation and actual consumer observation separately;
+unknown observations stay unknown. Full four-consumer same-pool parity, certified
+prefix/historical availability, the real #232F Shared prepared-input consumer,
+native/hosted performance, predictive quality and Sprint 015 acceptance remain
+open. This is the one next bounded packet, not another model activation.
 
-The test fixtures deliberately age synthetic history seeds before measured
-replay. Their new run markers are updated alongside those setup clocks; measured
-source records and real accounts are not rewritten. This is synthetic engineering
-evidence, not observed predictive quality. Full local/CI results remain pending
-until recorded in the acceptance receipt.
+## Accepted frozen FINAL scoring input — #371
 
-The initial CI #752 validation exposed an outdated atomic-page smoke assertion:
-it compared the whole run state even though the new per-page input binding must
-change. The smoke now preserves exact equality of all original state fields and
-separately validates the complete FINAL input, page identity, original feature
-source and fresh/reuse kind across all 48 pages. This is a corrected assertion,
-not an unchanged-source retry; all final-source gates must run again.
-The shared smoke also runs on the historical pre-FINAL hosted-upgrade prefix:
-unmarked sources retain the old equality check and must stay unmarked, without
-calling helpers that do not exist in that generation. Both current and historical
-full-schema smoke paths pass after this explicit generation distinction.
+The fifth bounded source packet prepares `native-final-scoring-input-v1` once
+after Scenario enrichment in the existing request identity core, consumes it in
+the unchanged scoring arithmetic and freezes that exact object. The complete run
+binding covers scope, request/clocks, model/policy, immutable source genome and
+all retained Item IDs/count, including empty and suppressed/unselected pools.
+Marked missing, mixed, unknown, contradictory or oversized inputs reject before
+shadow/Working/native adapter consumption, including cached Working replies.
+Unmarked historical sources retain their existing replay and records.
 
-Continue from accepted implementation checkpoint
-`53f84bbd2f487ec9460ee482425821d3830795b0` ([#369](https://github.com/Kajooja/Kajo/pull/369)).
-Introduce one versioned frozen FINAL-stage input at
-`private.rank_items_request_with_identity_v1`, between `scenario_enriched` and
-`rescored`, after existing acquisition and Scenario enrichment. Build the bounded
-input once, consume it for scoring and freeze that same input. Bind the run,
-actor/Profile, complete retained Item identities/count, request, clocks and
-immutable source genome, including suppressed/unselected candidates and empty
-pools. A marked run requires complete, consistently versioned candidate inputs;
-unknown, missing or mixed marked inputs fail closed. Preserve unmarked historical
-replay and frozen records without backfill.
+The challenger genome stays separate from the source genome; scalar-first
+reminder reselection and the existing cap remain unchanged. Protocol-2 pages
+retain numeric inputs/scores and rebind refreshed frozen eligibility under
+`FROZEN_PAGE_REUSE` with the original feature-source ID. Fresh runs declare
+`FRESH_FINAL`, and the native fresh-source adapter still excludes continuations.
+The canonical contract and implementation owners are
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#frozen-final-scoring-input--sprint-015-source)
+and [CODEMAP](../architecture/CODEMAP.md#native-ranking-adapter-and-conformance--sprint-015).
 
-Reuse `prediction_candidate_score_v2` and existing Working arithmetic, preserving
-operation order. Consume the contract in `private.process_shadow_prediction_jobs_v1`,
-the native adapter and `private.record_personal_working_shadow_v1` where marked
-sources enter its replay. Keep the challenger genome separate from the source
-genome. Challenger reminder choice retains scalar-score ordering before
-Scenario/common-fit contributions, followed by the existing reminder cap and
-reselection. No new scorer or acquisition policy belongs to this packet.
+**Local validation:** all 369 database, 329 engine, 72 research, 904 mobile,
+50 dependency, 451 catalogue and 11 acceptance tests pass, with lint/types,
+ESM/import-graph checks and four explicit-demo Hermes exports. Root check reaches
+the unchanged Deno registry connection refusal; no complete local aggregate pass
+is claimed. CI executes the Edge suite as well.
 
-Preserve acquisition/shortlists, all three request combinations, Taste v1/V4
-policies, evaluation non-delivery, post-lock skip/reset clocks, function identities
-and access. Retain the 2-MiB payload, 36-page and serving call-depth budgets.
-Require pre/post valid score/trace parity across Personal/Shared modes and domains,
-complete-pool rejection controls, baseline/challenger replay and later-data
-mutation controls. Keep exact identity/tier/rank/selection alongside the declared
-`1e-12` baseline comparator. Native CLI rollback smoke and full source checks are
-required; any hosted rollout is a separate acceptance step.
+The populated pre/post matrix preserves complete old traces and exact float8
+bytes across 54 Personal/Shared mode/domain/acquisition cases plus explicit
+evaluation. Atomic body/security/default-grant rejection, malformed/nonfinite and
+oversized inputs, empty and omitted/suppressed candidates, cached comparison
+admission, timezone changes, old retries and later-data mutation are covered.
+The 18-case replay matrix preserves an actual challenger reminder flip; the
+48-page matrix retains all 36 continuation shadows and the existing bounds.
+Synthetic backdated history seeds keep their new marker consistent during setup;
+measured sources and real accounts are not rewritten.
 
-Full four-consumer same-pool parity, certified prefix/historical availability,
-the real #232F Shared prepared-input consumer, native/hosted performance,
-predictive quality and Sprint 015 acceptance remain open. Preserve accepted
-accounts and answers; neither installed forward below needs repeating.
+**Source / CI:** all five required final-source gates passed in
+[CI #755](https://github.com/Kajooja/Kajo/actions/runs/40338320909), attempt 1,
+on `9cc8db296fa7bdd0c5bf7a1366713984f3146333`. The tested PR merge ref
+`e8ee42b53d49dbf20039e9fd1ee8cba36c68330d`, source and accepted merge preserve
+tree `a82570d756f873c6f3ebccfdd9e83bac5944c1b5`.
+The native CLI report independently verifies seven marked sources, four rejection
+controls and the six-case native adapter comparison: 69 candidates, 37 nonzero
+Scenario contributions and zero score difference at `1e-12`, with exact
+identity/eligibility/tier/rank/selection and rollback cleanup. Report SHA-256:
+`9d62e1c306e94c351759a6c304992dacbde32fd180a2a3beeb4159d4cfff8d3a`.
+
+Initial local and CI checks exposed old whole-state equality and historical-prefix
+helper assumptions in page and Working candidate-feature smoke. Both shared
+fixtures now keep all original state fields exact, validate independent marked
+page bindings and preserve unmarked historical pages without nonexistent helpers.
+The local Working candidate test also executes the same fixture after every later
+forward; both generations and the full 369-test database suite pass. Runtime SQL
+and score arithmetic were unchanged by these test corrections. Full final-source
+checks above supersede the earlier attempts; the obsolete stalled #753 run was
+cancelled rather than accepted.
+
+This accepts the bounded source contract, not hosted installation, observed
+consumer behavior, performance, predictive quality or sprint close. No production
+migration, account reset or serving-model activation was performed in this packet.
 
 ## Accepted native admission in Personal temporal reports — #369
 
@@ -337,8 +346,8 @@ Fresh hosted consumption remains unobserved: the postcheck found no naturally
 generated `native-prediction-clocks-v1` run yet. Installation verification does
 not close consumer, device or predictive-quality acceptance.
 
-The current handoff above binds frozen FINAL scoring inputs in the existing
-native identity/shadow paths; full common-input/evidence integration remains open.
+The current handoff above installs the accepted frozen FINAL input forward with
+preservation checks; full common-input/evidence integration remains open.
 Do not skip directly to Sprint 016 or restart the existing Working report/cohort,
 frozen shadow, generic contracts or retained Taste implementations. #232F's real
 Shared prepared-input consumer remains required. Existing phone observations
