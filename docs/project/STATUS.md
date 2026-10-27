@@ -53,20 +53,23 @@ Metrics/reward/learning remain unavailable. Future quality sampling must predecl
 eligible cohort, horizon/maturity, overlap and a comparable forecast target before
 examining test outcomes. The earlier ordinal diagnostic remains unchanged.
 
-**Publication checkpoint:** the complete ten-file change is committed locally on
-the branch above. Automatic approval review rejected the public GitHub tree write
-because it did not recognize authorization for this exact payload. No remote
-branch/PR or production write was created. Publication needs the owner's explicit
-approval of this packet; do not retry through an alternative transport.
+**Publication checkpoint:** the owner explicitly approved publication of this
+ten-file packet and its merge after successful required CI on October 27. This
+resolves the earlier automatic-review rejection; the exact approved tree
+`73b6597af5450aca66731d6f3a5a8ede9633f12e` is published as source commit
+`9a3bec58abe4fcaf2bac294957beaebdd977ec49`. The approval receipt changes only
+STATUS; executable source remains byte-identical to the approved packet.
+Required final-head GitHub/native CI must pass before integration. The new
+production forward is not installed.
 Local lint/typecheck, 391 database, 332 engine, 904 mobile, 451 catalogue,
 50 dependency, 72 research and 11 acceptance tests pass. Root `npm run check`
 stopped at the Deno npm-registry connection refusal, so no full local pass is
 claimed. All four explicitly labelled local demo exports pass; these are not
 configured production exports. Required GitHub/native CI and configured exports
-await publication.
+remain separate acceptance gates.
 
-**Next action:** obtain the exact-packet publication approval, publish this branch,
-and integrate only after all five required CI gates pass. Then prepare the guarded
+**Next action:** run required final-head CI and integrate only after all five gates
+pass. Then prepare the guarded
 single-file rollout of
 [`20261027171145_shared_forecast_outcome_reconciliation.sql`](../../supabase/migrations/20261027171145_shared_forecast_outcome_reconciliation.sql)
 with fresh predecessor/security and full-row/function/default/history preservation
@@ -77,8 +80,7 @@ claimed by source tests.
 
 The earlier hosted consumption receipt closes that installation/preservation gate. It
 does not establish fresh hosted consumption, measured quality or a session flow.
-Earlier repository publication/merge approvals remain recorded, but automatic
-review requires exact-packet approval for the current write above. A later production
+The exact-packet repository publication/merge approval is recorded above. A later production
 write requires its own exact scope and preservation checks; no repeat approval
 or deployment is needed for the completed forward below.
 
