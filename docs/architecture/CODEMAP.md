@@ -26,6 +26,20 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native prediction performance — Sprint 015
+
+`scripts/database/native-prediction-performance.{mjs,test.mjs}` owns the bounded
+synthetic PostgreSQL baseline and its PGlite contract-only tests. It reuses the
+existing candidate fixture and authenticated feed/Taste RPCs, validates exact
+retries and retained sources, reports execution/buffer/WAL distributions with
+failure denominators, and restores every canonical row. The fixed protocol and
+unmeasured boundaries are in [Sprint 015](../project/sprints/SPRINT-015.md#native-database-performance-protocol).
+`run-ci-prediction-performance.mjs` composes the existing fresh installer and
+CI-only owned-stack lifecycle. The separate `database-prediction-performance`
+job keeps collection outside the long historical migration probe. All original
+five gates plus this completeness/cleanup gate precede the Android artifact;
+there is no performance SLO, model admission or hosted load-test command.
+
 ## Native ranking adapter and conformance — Sprint 015
 
 `20261026201946_native_v4_receipt_forecast_binding.sql` adds private INVOKER

@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — ten preceding accepted source packets plus current parity coverage packet; seven SQL forwards installed; final-source, performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — eleven accepted source packets; current native performance baseline packet; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -18,7 +18,9 @@ SharedProfile memory context. The bounded #232F consumer is accepted source
 on the existing full-Profile enrollment basis; its exact hosted forward is installed
 and preservation-verified. The tenth packet's prospective outcome reconciliation
 is also accepted and installed; fresh hosted outcomes and quality remain separate
-acceptance gates. Continue with remaining supported native four-consumer parity.
+acceptance gates. Supported native four-consumer parity is accepted through
+#387; continue with measured native/hosted performance and separately declared
+quality targets.
 Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
 generations and source withdrawal. Same-set reuse cannot restore revoked or
 erased lineage. Do not invent a session ID or claim existing fixtures prove the
@@ -89,13 +91,71 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
 The private read-only prospective Shared forecast-to-outcome join through
 #232C/#232F is accepted and its guarded rollout complete. Continue remaining
-supported four-consumer parity through the existing owners. #232E's exposed
+native performance through the existing owners. #232E's exposed
 same-pool pair diagnostic stays unchanged because
 these single-target EVALUATION runs are not comparable rating forecasts or exposed
 policy choices. Maturity, selection, experience units and nonadmitted cohorts are
 explicit; first-response identities, corrections and withdrawal are preserved.
-[STATUS](../STATUS.md) owns the single handoff. Four-consumer parity, runtime/
-performance and separately predeclared predictive-quality acceptance remain open.
+[STATUS](../STATUS.md) owns the single handoff. Supported four-consumer parity is
+accepted; runtime/performance and separately predeclared predictive-quality
+acceptance remain open.
+
+## Native database performance protocol
+
+`native-prediction-performance-v1` is an exploratory synthetic baseline, declared
+before native measurement. The existing empty-install guard and CI-only owned
+Supabase lifecycle isolate it from hosted/user data. The protocol, its SHA-256,
+measurement source/fixture hashes, exact migration manifest, tested commit,
+pinned image/CLI and selected PostgreSQL settings travel with the report.
+
+The fixed matrix is 40 and 1000 Items (half BOOK, half MOVIE), Personal MOVIE
+Discovery / two-member Shared MOVIE Discovery / Personal Taste NEXT, and fresh
+request / exact retry: 12 cohorts. Existing synthetic provider-shaped fixtures
+supply two differing Personal ratings and three list/consumption interactions;
+Taste starts from an empty committed prefix. Discovery uses FOR_YOU, five Items
+and an empty catalogue cursor. Other domains/modes, later prefixes, explicit
+evaluation and shadow worker performance are not covered by these measurements.
+
+Each cohort runs serially with two excluded warmups followed by exactly 20
+planned measurements; catalogues run ascending, then operation, then fresh/retry.
+Every native trial uses a new database connection. There is no cache flush or
+concurrent workload. Each cohort recreates its fixture; fixture and Taste START
+commit separately before trials;
+each measured command and its verification roll back. Retry trials create the
+original response in a separate committed transaction outside measurement, then
+measure that same command against its committed receipt in every trial.
+Retained source hashes and repeated responses must remain equal. Rollbacks can
+leave physical dead tuples/cache/WAL effects: logical equality is not a reset of
+physical storage. The larger catalogue and later cohorts are not cold-cache
+measurements or independent production populations.
+
+`EXPLAIN (ANALYZE, BUFFERS, WAL, TIMING OFF, SUMMARY ON, FORMAT JSON)` executes
+the real authenticated RPC. Its whole-statement Execution Time is the latency
+boundary; Planning Time is separate. Root buffer/WAL counters already include
+children, so they are never summed through the plan tree. This diagnostic
+excludes output serialization, network, PostgREST, commit fsync, app rendering
+and user-action acknowledgement. EXPLAIN still has instrumentation overhead;
+no subtraction or uninstrumented equivalence is claimed. Buffer reads are not
+proof of physical disk reads, and the report does not claim peak process memory.
+These boundaries follow [PostgreSQL 17 EXPLAIN](https://www.postgresql.org/docs/17/sql-explain.html).
+
+Reports retain raw numeric samples and per-cohort planned/attempted/succeeded/
+failed/cancelled/missing denominators. Nearest-rank quantiles use `ceil(n*p)`;
+20 trials make p95 exploratory, with no precision interval or latency SLO.
+Missing samples have null metrics, never zero latency. A failed warmup/sample
+stops collection, retains missing denominators and fails the CI job. No query
+text, plan tree, response, actor/Item identity or rating label enters the artifact.
+Artifacts expire after seven days; the reviewed acceptance receipt must retain
+the report identity and essential measurements in repository/PR history.
+
+The gate accepts completeness, actual RPC/source correctness and cleanup, not
+speed, recommendation quality or phone performance. Compare independent native
+runs first, then predeclare a supported effect/budget and repeat the same
+conditions before accepting a performance intervention. Hosted cumulative
+statistics are separate observations; absent current-generation samples cannot
+be replaced by this synthetic distribution. The wider action-to-visible,
+actionable, locally durable and server-acknowledged protocol remains owned by
+[ROADMAP](../ROADMAP.md#end-to-end-performance-measurement--2026-10-24).
 
 ## Evidence and completion rules
 
