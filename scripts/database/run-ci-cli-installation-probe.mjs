@@ -50,6 +50,7 @@ import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './nati
 import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
 import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
+import { verifySharedForecastOutcomes } from './shared-forecast-outcomes.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -94,6 +95,11 @@ try {
       rollback: 'owned test table absent after server statement cancellation' };
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const reconciliationIndex = files.findIndex(file => file.name.endsWith('_shared_forecast_outcome_reconciliation.sql'));
+    assert.ok(reconciliationIndex > 0);
+    await resetFromMigrations(files.slice(0, reconciliationIndex));
+    const sharedForecastOutcomes = await verifySharedForecastOutcomes(execConcurrentSql, files[reconciliationIndex]);
+    assert.equal(sharedForecastOutcomes.status, 'PASS');
     const preparedIndex = files.findIndex(file => file.name.endsWith('_shared_prepared_input_consumption.sql'));
     assert.ok(preparedIndex > 0);
     await resetFromMigrations(files.slice(0, preparedIndex));
@@ -486,6 +492,7 @@ try {
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
+      sharedForecastOutcomes,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
