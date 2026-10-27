@@ -22,10 +22,47 @@ const owners = ['shared_prepared_feature_input_v1', 'prepare_shared_consumption_
   'consume_shared_round_prediction_input_v1', 'deny_detached_shared_consumption_v1',
   'deny_retained_shared_forecasts_v1', 'erase_shared_prepared_evidence_v1'];
 
+// Reproduce only the reviewed comment/format variant from canonical source.
+// No hosted rows, environment configuration or arbitrary body normalization.
+export const sharedPreparedHostedVariantSql = `do $variant$
+declare original text; definition text; body text;
+begin
+  select prosrc,pg_get_functiondef(oid) into strict original,definition from pg_proc
+    where oid='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'::regprocedure;
+  if md5(original)<>'73c6709dbf19527c67a121fd2c83bfaf' then raise exception 'Unexpected variant fixture source';end if;
+  body:=replace(original,E'\\n    -- Sparse Personal evidence shrinks toward the same neutral catalog prior.\\n','');
+  body:=replace(body,E'  -- Only the neutral prior decays with Shared joint evidence. Accepted-member\\n  -- Personal fit remains useful even for a mature SharedProfile.\\n','');
+  body:=replace(body,E'prior_component\\n      + member_component\\n      + consensus_component\\n      - disagreement_penalty',
+    'prior_component + member_component + consensus_component - disagreement_penalty');
+  if md5(body)<>'9e1777a5034f482b781db3b1eb6008dc' then raise exception 'Unexpected reviewed variant';end if;
+  execute replace(definition,original,body);
+end;$variant$;`;
+
+export async function verifySharedPreparedHostedVariant(execSql, migration) {
+  const rows = await execSql(`begin;
+    create temp table shared_variant_before on commit drop as select p.* from pg_proc p
+      where oid='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'::regprocedure;
+    ${sharedPreparedHostedVariantSql}
+    ${migration.sql}
+    select jsonb_build_object('body',md5(p.prosrc),'metadataPreserved',
+      (to_jsonb(p)-'prosrc')=(select to_jsonb(b)-'prosrc' from shared_variant_before b))
+      from pg_proc p where oid='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'::regprocedure;
+    rollback;
+    select jsonb_build_object('body',md5(prosrc),'tableAbsent',to_regclass('private.shared_round_prediction_consumptions') is null)
+      from pg_proc where oid='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'::regprocedure;`,
+  { stage: 'shared-prepared-reviewed-format-variant', timeoutMs: 180_000 });
+  assert.deepEqual(rows, [
+    { body: 'd85f9a17165793a33421e1eb4b6434ae', metadataPreserved: true },
+    { body: '73c6709dbf19527c67a121fd2c83bfaf', tableAbsent: true },
+  ]);
+  return { status: 'PASS', predecessor: '9e1777a5034f482b781db3b1eb6008dc',
+    patched: rows[0].body, metadata: 'UNCHANGED', cleanup: 'ROLLBACK_RESTORED' };
+}
+
 // Disposable database only. Fixtures deliberately start from an empty account/
 // catalog state, use real commands, commit preparation, then consume in a new TX.
 export async function withSharedPreparedFixture(execSql, run) {
-  const exec = (sql, stage) => execSql(sql, { stage: 'shared-prepared-' + stage, timeoutMs: 180_000 });
+  const exec = (sql, stage) => execSql(sql, { stage: 'shared-prepared-' + stage.replaceAll('_', '-'), timeoutMs: 180_000 });
   const one = async (sql, stage) => (await exec(sql, stage))[0];
   const tables = await one(`select jsonb_agg(format('%I.%I',n.nspname,c.relname) order by n.nspname,c.relname)
     from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -186,7 +223,7 @@ export async function verifySharedPreparedConsumption(execSql) {
           raise exception 'Missing Shared consumption rejection' using errcode='ZX999';
         exception when others then
           if not(SQLSTATE=any(${literal('{' + codes.join(',') + '}')}::text[])) then raise;end if;
-        end;end;$reject$;select true;rollback;`, 'rejection');
+        end;end;$reject$;select to_jsonb(true);rollback;`, 'rejection');
       assert.equal(result, true);
     };
     const reject = (sql, ...codes) => rejects(sql, codes);
@@ -229,7 +266,7 @@ export async function verifySharedPreparedConsumption(execSql) {
       assert.equal(await one(`begin isolation level ${isolation};${auth(f.actor)}
         do $isolation$ begin begin perform ${consume(forecasts.consensus, f.consensus)};
           raise exception 'Stale-snapshot consumption retry was accepted' using errcode='ZX999';
-        exception when sqlstate '25001' then null;end;end;$isolation$;select true;rollback;`, 'isolation'), true);
+        exception when sqlstate '25001' then null;end;end;$isolation$;select to_jsonb(true);rollback;`, 'isolation'), true);
     }
     const access = await one(`select jsonb_build_object('functions',not exists(select 1 from pg_proc p
       cross join lateral aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a

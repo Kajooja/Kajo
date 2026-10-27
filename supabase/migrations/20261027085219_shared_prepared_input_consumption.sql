@@ -17,7 +17,11 @@ begin
     ('private.erase_prediction_sources_v1(text,uuid)','26533f72b112439dd3183631f0ed095c',false,'v','plpgsql',array['search_path=""','TimeZone=UTC']::text[])
   ) v(signature,hash,definer,volatility,language_name,configuration) loop
     select * into strict actual from pg_proc where oid=expected.signature::regprocedure;
-    if md5(actual.prosrc)<>expected.hash or actual.proowner<>'postgres'::regrole
+    -- The reviewed hosted common-fit body differs only in comments/line breaks.
+    -- Accept those exact bytes, never arbitrary normalized or semantic variants.
+    if (md5(actual.prosrc)<>expected.hash and not (
+        expected.signature='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'
+        and md5(actual.prosrc)='9e1777a5034f482b781db3b1eb6008dc')) or actual.proowner<>'postgres'::regrole
       or actual.proconfig is distinct from expected.configuration or actual.prosecdef is distinct from expected.definer
       or actual.provolatile::text<>expected.volatility or actual.prolang<>(select oid from pg_language where lanname=expected.language_name)
       or actual.proleakproof or actual.proisstrict or actual.proparallel<>'u'

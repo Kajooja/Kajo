@@ -48,7 +48,7 @@ import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
 import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
 import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
-import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption } from './shared-prepared-consumption.mjs';
+import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -97,6 +97,7 @@ try {
     const preparedIndex = files.findIndex(file => file.name.endsWith('_shared_prepared_input_consumption.sql'));
     assert.ok(preparedIndex > 0);
     await resetFromMigrations(files.slice(0, preparedIndex));
+    const sharedPreparedHostedVariant = await verifySharedPreparedHostedVariant(execConcurrentSql, files[preparedIndex]);
     const sharedPreparedUpgrade = await verifySharedPreparedUpgrade(execConcurrentSql, files[preparedIndex]);
     const sharedPreparedConsumption = await verifySharedPreparedConsumption(execConcurrentSql);
     const sharedPreparedConcurrency = await verifySharedPreparedConcurrency(execConcurrentSql);
@@ -484,7 +485,7 @@ try {
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
-      sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency,
+      sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,

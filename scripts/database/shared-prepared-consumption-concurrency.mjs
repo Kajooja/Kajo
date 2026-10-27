@@ -85,7 +85,7 @@ export async function verifySharedPreparedConcurrency(execSql) {
         perform 1 from public.profiles where id=${literal(f.pair)} for update;
         delete from public.profile_members where profile_id=${literal(f.pair)} and user_id=${literal(f.partner)};
         insert into public.profile_members(profile_id,user_id) values(${literal(f.pair)},${literal(f.partner)});
-        end;$membership$;select true;` },
+        end;$membership$;select to_jsonb(true);` },
       { expression: consume(changedEnrollment, f.raceInputs[3]), reject: '42501' });
       const absence = await one(`select jsonb_build_object('rejectedRuns',(select count(*) from private.prediction_runs where id=any(
         array[${[afterAnswer, corrected, withdrawn, beforeWithdrawal, changedEnrollment].map(literal).join(',')}]::uuid[])),

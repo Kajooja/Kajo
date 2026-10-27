@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption } from './shared-prepared-consumption.mjs';
+import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption,
+  verifySharedPreparedHostedVariant, sharedPreparedHostedVariantSql } from './shared-prepared-consumption.mjs';
 
 test('genuine Shared prepared-input consumer preserves old rows and consumes relative evidence through common FINAL', async t => {
   const db = new PGlite();
@@ -24,6 +25,12 @@ test('genuine Shared prepared-input consumer preserves old rows and consumes rel
       ['definer', `alter function private.rank_items_request_with_identity_v1(jsonb,uuid,uuid,text,text,integer,jsonb) security invoker;`],
       ['public grant', `grant execute on function private.native_final_run_input_v1(jsonb,jsonb,jsonb,uuid) to public;`],
       ['owner collision', `create function private.validate_shared_consumption_v1(jsonb) returns boolean language sql as $$select true$$;`],
+      ['unknown semantic variant', `${sharedPreparedHostedVariantSql}
+        do $drift$ declare body text;definition text;begin
+          select prosrc,pg_get_functiondef(oid) into body,definition from pg_proc
+            where oid='private.shared_common_fit_candidate_v1_1(jsonb,uuid,timestamp with time zone)'::regprocedure;
+          execute replace(definition,body,replace(body,'personal_fit := 0.5 +','personal_fit := 0.6 +'));
+        end;$drift$;`],
       ['unknown default grant', `create role prepared_unreviewed;
         alter default privileges for role postgres grant execute on functions to prepared_unreviewed;`],
     ]) await t.test('atomic migration rejects ' + label, async () => {
@@ -32,6 +39,7 @@ test('genuine Shared prepared-input consumer preserves old rows and consumes rel
       await db.exec('rollback;');
       assert.equal((await db.query("select to_regclass('private.shared_round_prediction_consumptions') is null absent")).rows[0].absent, true);
     });
+    t.diagnostic(JSON.stringify(await verifySharedPreparedHostedVariant(exec, files[index])));
     const upgrade = await verifySharedPreparedUpgrade(exec, files[index]);
     assert.equal(upgrade.status, 'PASS');
     t.diagnostic(JSON.stringify(upgrade));
