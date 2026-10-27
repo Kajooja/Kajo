@@ -48,6 +48,8 @@ import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
 import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
 import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
+import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
+import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -92,6 +94,16 @@ try {
       rollback: 'owned test table absent after server statement cancellation' };
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const preparedIndex = files.findIndex(file => file.name.endsWith('_shared_prepared_input_consumption.sql'));
+    assert.ok(preparedIndex > 0);
+    await resetFromMigrations(files.slice(0, preparedIndex));
+    const sharedPreparedHostedVariant = await verifySharedPreparedHostedVariant(execConcurrentSql, files[preparedIndex]);
+    const sharedPreparedUpgrade = await verifySharedPreparedUpgrade(execConcurrentSql, files[preparedIndex]);
+    const sharedPreparedConsumption = await verifySharedPreparedConsumption(execConcurrentSql);
+    const sharedPreparedConcurrency = await verifySharedPreparedConcurrency(execConcurrentSql);
+    assert.equal(sharedPreparedUpgrade.status, 'PASS');
+    assert.equal(sharedPreparedConsumption.status, 'PASS');
+    assert.equal(sharedPreparedConcurrency.status, 'PASS');
     const receiptIndex = files.findIndex(file => file.name.endsWith('_native_v4_receipt_forecast_binding.sql'));
     assert.ok(receiptIndex > 0);
     await resetFromMigrations(files.slice(0, receiptIndex));
@@ -473,6 +485,7 @@ try {
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
+      sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,

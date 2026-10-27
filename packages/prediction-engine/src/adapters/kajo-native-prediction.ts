@@ -112,6 +112,35 @@ function validateV4Receipt(source: Row, state: Row): void {
     && accepted === instant(clocks.requiredAfter), 'incompatible-snapshots');
 }
 
+// This is a trusted native producer binding, not authentication of arbitrary
+// JSON or a claim that its source vector was available at a historical anchor.
+function validateSharedConsumption(source: Row, state: Row): boolean {
+  const marked = text(source.policy_version).split('+').includes('shared-prepared-input-v1');
+  if (!Object.hasOwn(state, 'sharedPreparedInput')) { check(!marked, 'incompatible-snapshots'); return false; }
+  check(marked && Object.hasOwn(state, 'finalScoringInput') && !Object.hasOwn(state, 'nativeV4Receipt'), 'incompatible-snapshots');
+  const input = row(state.sharedPreparedInput), request = row(state.candidateRequest);
+  keys(input, ['version', 'inputCaptureId', 'inputDigest', 'targetRoundId', 'targetExperienceId', 'targetItemId',
+    'targetSourceCommandId', 'targetRevision', 'targetPrefixDigest', 'profileId', 'actorUserId', 'inputObservedAt',
+    'consumedAt', 'featureVersion', 'featureInputDigest', 'fallback', 'predictorConsumption', 'forecastKind',
+    'membershipValidity', 'commitVisibility']);
+  check(input.version === 'shared-prepared-consumption-v1' && input.featureVersion === 'shared-prepared-ordinal-tags-v1'
+    && input.predictorConsumption === 'RECORDED' && input.forecastKind === 'UNCALIBRATED_ORDINAL'
+    && input.membershipValidity === 'CURRENT_FULL_ENROLLMENT_AT_CONSUMPTION'
+    && input.commitVisibility === 'OWN_TRANSACTION_MVCC_VISIBLE_NOT_COMMIT_TIME'
+    && ['SUPPORTED_ORDINAL_TAGS', 'NEUTRAL_COLD_START'].includes(text(input.fallback)), 'unsupported-contract');
+  for (const key of ['inputCaptureId', 'targetRoundId', 'targetExperienceId', 'targetItemId', 'targetSourceCommandId']) uuid(input[key]);
+  for (const key of ['inputDigest', 'targetPrefixDigest', 'featureInputDigest']) check(/^[0-9a-f]{32}$/u.test(text(input[key], 32)));
+  integer(input.targetRevision, 4096, 1);
+  check(uuid(input.profileId) === source.profile_id && uuid(input.actorUserId) === source.actor_user_id
+    && source.session_id === null && source.discovery_mode === 'FOR_YOU' && source.requested_item_type === null
+    && request.intent === 'EVALUATION' && request.acquisition === 'EXPLICIT_CANONICAL'
+    && sameJson(request.itemIds, [input.targetItemId])
+    && instant(input.inputObservedAt) === instant(request.requiredAfter)
+    && instant(input.inputObservedAt) < instant(source.requested_at)
+    && instant(input.consumedAt) >= instant(source.requested_at), 'incompatible-snapshots');
+  return true;
+}
+
 // Optional historical generation, mandatory complete binding when marked. This
 // validates the frozen input; the adapter still does not independently rescore.
 function validateFinalInput(source: Row, state: Row, genome: Row, candidates: readonly unknown[]): void {
@@ -138,6 +167,7 @@ function validateFinalInput(source: Row, state: Row, genome: Row, candidates: re
     sourceGenome: { id: source.genome_id, config: genome.config }, candidateCount: source.candidate_count,
     candidateIds: candidates.map(candidate => uuid(row(candidate).item_id)).sort(),
     ...(Object.hasOwn(state, 'nativeV4Receipt') ? { nativeV4Receipt: state.nativeV4Receipt } : {}),
+    ...(Object.hasOwn(state, 'sharedPreparedInput') ? { sharedPreparedInput: state.sharedPreparedInput } : {}),
   };
   check(sameJson(marker, expected), 'incompatible-snapshots');
   for (const value of candidates) {
@@ -163,6 +193,7 @@ export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapsho
   assertRankingJson(input);
   const source = row(input.sourceRun), genome = row(input.sourceGenome), state = row(source.state_snapshot);
   validateV4Receipt(source, state);
+  const sharedPrepared = validateSharedConsumption(source, state);
   validateFinalInput(source, state, genome, list(input.sourceCandidates, 50));
   const request = row(state.candidateRequest), clocks = row(state.predictionInput);
   keys(request, ['version', 'acquisition', 'intent', 'itemIds', 'seenItemIds', 'reminderSpent', 'requiredAfter']);
@@ -204,7 +235,9 @@ export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapsho
   check(input.scope.profile.type === 'PERSONAL' || input.scope.profile.type === 'SHARED');
   if (input.scope.profile.type === 'PERSONAL') uuid(input.scope.profile.ownerUserId);
   else ids(input.scope.profile.memberUserIds, 1000);
-  check(!evaluation || input.scope.profile.type === 'PERSONAL', 'unauthorized-scope');
+  check(sharedPrepared ? input.scope.profile.type === 'SHARED'
+    : !evaluation || input.scope.profile.type === 'PERSONAL', 'unauthorized-scope');
+  if (sharedPrepared) check(instant(row(state.sharedPreparedInput).consumedAt) <= observedAt, 'incompatible-snapshots');
   if (workingAt !== null) {
     const working = row(state.workingState), profile = row(working.profile);
     check(working.version === 'native-working-capture-v3' && uuid(working.captureId)
@@ -252,21 +285,30 @@ export function normalizeKajoNativePrediction(input: KajoNativePredictionSnapsho
     + '+outcome-attribution-v1+frozen-replay-v2+eligibility-first-v1'
     + (acquisition === 'CATALOG_CHAIN' ? '+catalog-chain-v1' : '')
     + (evaluation ? '+evaluation-candidates-v1' : '') + (workingAt !== null ? '+personal-working-off-v3' : '')
+    + (sharedPrepared ? '+shared-prepared-input-v1' : '')
     + (Object.hasOwn(state, 'nativeV4Receipt') ? '+v4-receipt-input-v1' : '');
   check(policy === expectedPolicy, 'unsupported-contract');
   const mode = text(source.discovery_mode); check(['FOR_YOU', 'SURPRISE', 'RISK'].includes(mode));
   const itemType = source.requested_item_type; check(itemType === null || itemType === 'BOOK' || itemType === 'MOVIE');
   const count = integer(source.candidate_count, 50), delivered = integer(source.result_count, count);
   check(!evaluation || delivered === 0, 'incompatible-snapshots');
+  if (sharedPrepared) check(count === 1, 'incompatible-snapshots');
   if (evaluation) {
     const evaluationInput = row(state.evaluationInput);
-    check(evaluationInput.version === 'personal-evaluation-v1' && evaluationInput.scope === 'REQUESTED_CANDIDATES'
+    check(evaluationInput.version === (sharedPrepared ? 'shared-round-evaluation-v1' : 'personal-evaluation-v1')
+      && evaluationInput.scope === 'REQUESTED_CANDIDATES'
       && evaluationInput.calibration === 'UNCALIBRATED_ORDINAL'
       && instant(evaluationInput.evidenceCutoff) === evidenceAt && instant(evaluationInput.requiredAfter) === requiredAfter
       && JSON.stringify(ids(evaluationInput.candidateIds, 50)) === JSON.stringify(requestedIds), 'incompatible-snapshots');
   }
   const candidates: FrozenRankingCandidate[] = list(input.sourceCandidates, 50).map(value => {
     const candidate = row(value), objectId = uuid(candidate.item_id), explanation = row(candidate.explanation);
+    if (sharedPrepared) {
+      const prepared = row(state.sharedPreparedInput), fit = row(explanation.sharedCommonFit);
+      check(objectId === prepared.targetItemId && fit.sourceBasis === 'SHARED_PREPARED_ORDINAL_TAGS_V1'
+        && fit.preparedInputDigest === prepared.inputDigest && fit.featureInputDigest === prepared.featureInputDigest
+        && fit.fallback === prepared.fallback, 'incompatible-snapshots');
+    }
     check(uuid(candidate.prediction_id) === predictionId && instant(candidate.created_at) <= observedAt
       && explanation.policyVersion === policy && explanation.version === model && explanation.baseVersion === baseModel,
     'incompatible-snapshots');

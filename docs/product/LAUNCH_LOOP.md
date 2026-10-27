@@ -643,7 +643,7 @@ to defer a correctness defect. Engine V1 completion does not close the remaining
 launch requirements.
 
 Personal source work may proceed alongside independent Shared/native acceptance.
-Known Shared evidence defects, the genuine #232F prepared-input consumer,
+Known Shared evidence defects, remaining #232F prepared-input consumer acceptance,
 #306 integration, #229 device/fresh-account acceptance and Phase 16.3 remain
 required. Advanced Shared model enhancements do not serialize every Personal
 source task; all relevant quality/privacy and complete-beta gates still apply.

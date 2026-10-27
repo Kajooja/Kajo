@@ -100,7 +100,7 @@ These are acceptance dependencies, not a requirement to finish every advanced
 Shared model before Personal source work. The owner-requested October 9 dependency
 review prioritizes the live native LongTerm snapshot/serving decay mismatch, then bounded
 ordered session/state policy and adaptive Personal Taste with a frozen challenge.
-Known Shared evidence defects remain mandatory; the genuine #232F input consumer,
+Known Shared evidence defects remain mandatory; remaining #232F consumer acceptance,
 #306's guarded hosted/device acceptance (source integrated through #323),
 #229 native/device acceptance and Phase 16.3 remain open gates.
 On October 12 the owner explicitly authorized the complete #229 → #329 source

@@ -535,7 +535,7 @@ adapter still excludes continuations. Old unmarked windows remain unmarked.
 These bindings assume trusted, authorized immutable source reads; they do not
 authenticate an arbitrary export or certify historical/committed-prefix
 availability. Full four-consumer same-pool parity, native/hosted performance,
-the real Shared prepared-input consumer and predictive quality remain open.
+remaining Shared prepared-input acceptance and predictive quality remain open.
 STATUS records source/CI and hosted-installation acceptance separately.
 
 This private scoring primitive is consumed by the
@@ -1560,8 +1560,8 @@ with sparse fallback, not copied Personal history or an average of all Friends.
 Session end is not forgetting, a completed outcome or learning admission.
 
 The current #232F v1 input has only its truthful full-Profile enrollment basis.
-Continue the genuine consumer on that existing authorized native boundary and
-preserve its exact actor/source/cutoff controls; do not invent a SharedSession
+The bounded consumer uses that authorized native boundary and preserves its
+exact actor/source/cutoff controls; do not invent a SharedSession
 or treat a capture as a consumed forecast. The later session producer/adapter
 requires a versioned compatibility boundary and fresh authorization/race/erasure
 tests. Neither this design nor legacy Profile fixtures prove the new session UI.
@@ -1833,22 +1833,49 @@ consumption. Its use remains `INPUT_CAPTURE_ONLY`, predictor consumption is
 remains null. No old PredictionRun or ordinal report gains new eligibility.
 Source statuses are preserved; input preparation is not quality measurement.
 
-The next consumer must genuinely read this exact immutable input, produce its
-versioned forecast from the declared features and atomically retain that input
-identity with the resulting PredictionRun. That consumer needs its own
-membership/correction/withdrawal/fallback tests and erasure of dependent
-forecasts. A registration beside an unchanged scorer is insufficient. Then
-predeclare authorized delayed outcomes, cohort/selection/overlap and uncertainty
-rules before quality comparison or any promotion/rollback admission. The current
-SQL scorer, root numeric engine and #232E ordinal diagnostics remain unchanged.
-DATA_EVENTS owns producer locks, replay, bounds and whole-artifact erasure;
-STATUS owns exact source/CI/native acceptance.
+The private consumer now uses this exact immutable input to prepare supported
+Shared common-fit features and compute a new identified forecast through the
+existing candidate/identity/FINAL owners. A separate immutable consumption row
+binds its input identity and feature digest atomically to the resulting run.
+Membership/correction/withdrawal/fallback controls and dependent-run erasure are
+part of that boundary. The old captures and #232E diagnostics retain their
+original interpretation. Predeclare authorized delayed outcomes, cohort/selection/
+overlap and uncertainty rules before quality comparison or promotion/rollback
+admission. DATA_EVENTS owns locks, replay, bounds and whole-artifact erasure;
+STATUS owns exact source/CI/native/hosted acceptance.
 
 The October 27 session direction adds an exact-set isolation control to this
 packet: an overlapping A–B–Z enrollment must never consume A–B–C input/sources.
 Input identity includes actual enrollment generations, not just a sorted list
 of user IDs. Reusing an eligible same-set context cannot revive erased/revoked
 source lineage. Dynamic Friend/session UI remains Phase 16 product work.
+
+**Bounded consumer policy — `shared-prepared-ordinal-tags-v1`:**
+the private prospective evaluation requests only the never-answered target Item,
+through the existing explicit candidate, identity and frozen FINAL owners. It
+does not deliver a recommendation or infer an expected numeric rating. Complete,
+mature, individually attributed source vectors supply within-actor comparisons
+between distinct Items. For repeated Items, the latest selected supported capture
+wins by observation time and capture ID. Each strict preference casts positive
+votes for the preferred Item's tags and negative votes for the other Item's tags;
+ties supply no direction. The sign of each actor/tag vote sum supplies the
+existing common-fit owner's LongTerm tag inputs. Support counts distinct
+experiences participating in comparisons, not pairs or participant coordinates.
+No absolute rating threshold or comparison of different actors' raw scales is
+introduced. ShortTerm tags remain empty because this policy fits no temporal model.
+
+The common-fit owner retains its existing sparse shrinkage, consensus and
+disagreement terms. This prepared policy shrinks relative preferences toward
+the neutral fit `0.5`; no catalog-recognition metadata is evidence of low
+satisfaction. Legacy callers retain their existing catalog prior. Fewer than two comparable supported
+Items, constant ratings, missing tags and unsupported/missing responses provide
+no directional member evidence. Other native score features remain their declared
+baseline inputs; frozen FINAL records retain the actual combined arithmetic.
+This is an inspectable ordinal baseline, not evidence of recommendation quality
+or admission of a learned numerical model. New forecasts reject a source head
+changed after preparation. Existing forecasts remain immutable after corrections;
+source withdrawal erases dependent forecasts. The input capture itself retains
+`INPUT_CAPTURE_ONLY`; a separate atomic consumption binding records actual use.
 
 ## 11. Cold start and external history
 
@@ -3131,8 +3158,8 @@ CODEMAP owns exact implementation paths and STATUS owns validation/activation.
 
 ROADMAP now advances bounded Personal state/session policy and adaptive Taste
 source work alongside independent Shared/native/device gates. Its genuine
-#232F consumer remains required for prospective Shared feature/learning
-admission; this Personal-first execution order does not relabel capture-only
+#232F consumer's hosted and feature/learning admission gates remain required;
+this Personal-first execution order does not relabel capture-only
 evidence as used by a forecast. Public anonymous Taste still requires stable
 server identity, retention/abuse and minimal measurement before acceptance.
 
@@ -3246,8 +3273,8 @@ or model admission. The frozen FINAL forward described above extends admission:
 marked fresh sources require the complete run/candidate input binding, while
 unmarked historical source support is preserved. The existing Personal temporal report/cohort v2 now consumes this
 adapter under the bounded admission contract above. Full four-consumer same-pool
-parity, committed-prefix reconstruction, remaining temporal acceptance and the
-real Shared prepared-input consumer remain separate Sprint 015 work.
+parity, committed-prefix reconstruction, remaining temporal acceptance and
+Shared prepared-input hosted/quality acceptance remain separate Sprint 015 work.
 
 ### External-data boundary
 

@@ -90,6 +90,42 @@ function nativeReplayView(sample, actual) {
     allowedActionIds: candidates.filter(c => c.eligible).map(c => c.actionId) } };
 }
 
+export async function verifyNativeSharedPreparedCases(execSql, sourcesSql) {
+  const { normalizeKajoNativePrediction, compareFrozenRankings } = await adapter();
+  const [fixture] = await execSql(`begin read only;set local extra_float_digits=3;
+    select jsonb_build_object('observedAt',clock_timestamp(),'cases',${nativeCasesSql(sourcesSql)});rollback;`,
+  { stage: 'shared-prepared-native-adapter' });
+  const normalize = sample => normalizeKajoNativePrediction({ ...sample, snapshotObservedAt: fixture.observedAt,
+    source: { kind: 'generator', id: 'shared-prepared-native', version: '1', parentRefs: [] } });
+  let comparedCandidates = 0, maxAbsoluteScoreDifference = 0;
+  for (const sample of fixture.cases) {
+    const actual = normalize(sample);
+    const replay = nativeReplayView(sample, actual);
+    const comparison = compareFrozenRankings(actual, replay, { absoluteTolerance: 1e-12 });
+    assert.equal(comparison.conforms, true, JSON.stringify(comparison.mismatches));
+    assert.equal(actual.candidates.length, 1);
+    assert.equal(actual.candidates[0].selected, false);
+    comparedCandidates += comparison.comparedCandidates;
+    maxAbsoluteScoreDifference = Math.max(maxAbsoluteScoreDifference, comparison.maxAbsoluteScoreDifference);
+    for (const mutate of [
+      x => { delete x.sourceRun.state_snapshot.sharedPreparedInput; },
+      x => { x.sourceRun.state_snapshot.sharedPreparedInput.inputCaptureId = randomUUID(); },
+      x => { x.sourceRun.state_snapshot.finalScoringInput.sharedPreparedInput.featureInputDigest = '0'.repeat(32); },
+      x => { x.sourceRun.state_snapshot.sharedPreparedInput.targetItemId = randomUUID(); },
+      x => { x.sourceRun.state_snapshot.sharedPreparedInput.predictorConsumption = 'NOT_RECORDED'; },
+      x => { x.scope.profile.id = randomUUID(); },
+      x => { x.scope.profile.memberUserIds = [randomUUID(), randomUUID()]; },
+    ]) {
+      const invalid = structuredClone(sample); mutate(invalid); assert.throws(() => normalize(invalid));
+    }
+    const changed = structuredClone(replay); changed.candidates[0].score += 1e-6;
+    assert.equal(compareFrozenRankings(actual, changed, { absoluteTolerance: 1e-12 }).conforms, false);
+  }
+  return { status: 'PASS', version: 'shared-prepared-native-conformance-v1', cases: fixture.cases.length,
+    comparedCandidates, maxAbsoluteScoreDifference, absoluteTolerance: 1e-12,
+    identityEligibilityRanksSelection: 'EXACT', predictiveQuality: 'NOT_EVALUATED' };
+}
+
 // Real current SQL produces every source, feature, score and replay below. The
 // data are synthetic and the entire exercise rolls back, including replay jobs.
 export async function nativePredictionAdapterFixtureSql() {
