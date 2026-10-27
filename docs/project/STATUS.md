@@ -39,14 +39,17 @@ overhead is not subtracted. PGlite checks contracts only; its timings are not a
 native baseline. Complete canonical-row restoration and owned-stack cleanup
 are required even on failed collection.
 
-**Read-only hosted observation — 2026-10-27 23:23 UTC:** authenticated top-level
-`pg_stat_statements` contained no matching `taste_session_v2`, `rank_items_feed_v1`
-or `rank_items_page_v1` statements in the retained statistics (reset October 24).
-The separate inventory still had 49 historical PredictionRuns and zero marked
-FINAL/V4-receipt runs. These are absence-of-observation boundaries, not zero
-latency or proof that no user ever called an endpoint. Cumulative statement
-statistics cannot supply per-request p50/p95 or distinguish source generations.
-No statistics were reset and no hosted fixture/load was created.
+**Read-only hosted observation — 2026-10-27 23:51 UTC:** endpoint matching in
+authenticated top-level `pg_stat_statements` includes quoted PostgREST identifiers.
+Since the October 24 statistics reset, the retained aggregate has 169
+`taste_session_v2` calls (weighted mean execution 154.682 ms, min 2.340 ms, max
+578.563 ms) and two `rank_items_page_v1` calls (mean 200.092 ms, min 173.989 ms,
+max 226.196 ms); no matching feed statement is retained. These cumulative
+observations mix command kinds, cache states and potentially source generations;
+they are neither a Taste NEXT cohort nor per-request p50/p95. The separate
+inventory still had 49 historical PredictionRuns and zero marked FINAL/V4-receipt
+runs. Missing retained statements are not proof that no user ever called an
+endpoint. No statistics were reset and no hosted fixture/load was created.
 
 **Next action:** require the original five final-source CI gates plus the new
 native performance job, inspect its complete 240-trial report and source/runtime
