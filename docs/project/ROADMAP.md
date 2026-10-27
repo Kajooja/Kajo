@@ -601,8 +601,11 @@ acceptance. Known Shared evidence/eligibility defects must still be resolved.
 The bounded consumer of #232F's prepared input is accepted source and its exact
 hosted forward is installed with verified preservation: it calculates from that
 input and atomically retains the resulting forecast lineage. STATUS owns the
-final-source/native/hosted receipts and the next bounded prospective Shared
-forecast-to-outcome reconciliation packet through existing owners. Fresh hosted
+final-source/native/hosted receipts. The next source packet adds the read-only
+prospective Shared forecast-to-outcome join through existing owners, retaining
+first-response lineage and explicit non-comparability of unexposed single-target
+ordinal evaluations. Finish its source acceptance and guarded single-function
+rollout before the remaining four-consumer/performance acceptance. Fresh hosted
 consumption, joint learning/serving admission and measured quality remain distinct
 later gates.
 #306 source is integrated in #323 with all five CI #634 gates passed; the duplicate

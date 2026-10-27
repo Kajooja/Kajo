@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — nine source packets accepted; six SQL forwards installed; remaining acceptance open**
+Status: **IN PROGRESS — ten source packets; six SQL forwards installed; reconciliation rollout and remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -16,7 +16,8 @@ The October 27 [session direction](../../architecture/decisions/0013-friend-netw
 makes joint browsing temporary and Friend-based while keeping an internal
 SharedProfile memory context. The bounded #232F consumer is accepted source
 on the existing full-Profile enrollment basis; its exact hosted forward is installed
-and preservation-verified. Prospective outcome reconciliation is the next packet.
+and preservation-verified. The next source packet supplies prospective outcome
+reconciliation; its source/native acceptance and guarded rollout remain distinct.
 Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
 generations and source withdrawal. Same-set reuse cannot restore revoked or
 erased lineage. Do not invent a session ID or claim existing fixtures prove the
@@ -85,11 +86,14 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The active bounded packet is prospective Shared forecast-to-outcome reconciliation
-through the existing #232C/#232E/#232F owners. Predeclare eligibility, selection,
-maturity and cohort boundaries; preserve frozen first-answer lineage and distinguish
-evaluation from real exposure. [STATUS](../STATUS.md) owns its exact handoff and
-the completed source/CI/hosted receipts.
+The current bounded packet supplies the private read-only prospective Shared
+forecast-to-outcome join through #232C/#232F; finish source acceptance and its
+guarded rollout. #232E's exposed same-pool pair diagnostic stays unchanged because
+these single-target EVALUATION runs are not comparable rating forecasts or exposed
+policy choices. Maturity, selection, experience units and nonadmitted cohorts are
+explicit; first-response identities, corrections and withdrawal are preserved.
+[STATUS](../STATUS.md) owns the single handoff. Four-consumer parity, runtime/
+performance and separately predeclared predictive-quality acceptance remain open.
 
 ## Evidence and completion rules
 
@@ -111,6 +115,17 @@ quality gate stays open. A missing physical-device observation is recorded and
 does not become an invented pass.
 
 ## Delivery record
+
+- Tenth source packet: `shared-forecast-outcome-v1` reconciles a consumed frozen
+  forecast with one immutable outcome capture for the exact experience/enrollment.
+  It adds one closed STABLE INVOKER reader and no copied table or scorer. Tests
+  cover missing/partial/mature/immature outcomes, 0/5/10, first UNKNOWN before a
+  later numeric answer, corrections, clear/cancel, leave/rejoin, wrong context,
+  closed grants and input/outcome withdrawal. The populated forward preserves
+  every previous function body/metadata, default and canonical row; the same
+  verifier runs in the native CLI gate. No exposed-policy quality, numeric-rating
+  accuracy, cohort admission or hosted execution is inferred. STATUS and the PR
+  receipt own final CI/native/merge evidence and the guarded single-file rollout.
 
 - Ninth source packet: accepted through [PR #383](https://github.com/Kajooja/Kajo/pull/383).
   Private #232F consumption computes from the prepared vectors through existing

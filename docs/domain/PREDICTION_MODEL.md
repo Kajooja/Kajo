@@ -1877,6 +1877,26 @@ changed after preparation. Existing forecasts remain immutable after corrections
 source withdrawal erases dependent forecasts. The input capture itself retains
 `INPUT_CAPTURE_ONLY`; a separate atomic consumption binding records actual use.
 
+**Prospective outcome reconciliation — `shared-forecast-outcome-v1`:** a private
+read-only owner now binds an actually consumed frozen forecast to a subsequent
+immutable outcome capture for the same experience and full enrollment generation.
+It retains the original first response and first numeric answer beside the latest
+captured response, preserving zero, corrections, clear and missing evidence.
+No later label changes the original forecast, and revisions/actors do not create
+extra independent experiences. DATA_EVENTS owns exact prefix, maturity, withdrawal
+and current-enrollment checks and the fixed selection/admission boundary.
+
+This closes the engineering join, not the quality comparison. This consumer
+forecasts only one target Item per evaluation request and produces an uncalibrated
+ordinal score. Different request scores cannot become a same-pool ordinal pair,
+and there is no frozen per-member numeric rating forecast to score as rating
+error. EVALUATION has no delivery/exposure evidence. Reconciliation therefore
+reports labels/coverage and non-comparability with null metrics/reward and no
+learning or cohort admission. A future quality packet must independently declare
+eligible sampling, horizon/maturity, overlap and baseline/target semantics before
+observing its test outcomes. It must use an actually comparable prediction target;
+the existing #232E exposed-pair diagnostic is neither relabeled nor weakened.
+
 ## 11. Cold start and external history
 
 A sparse Profile must not start from random Items or from fabricated demographic certainty. MVP bootstrap has two explicit PersonalProfile paths:

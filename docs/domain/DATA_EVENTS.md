@@ -1058,6 +1058,43 @@ the selected evidence. Row triggers never acquire that gate late or recurse into
 source erasure. Whole-account automation, joint outcome-sample admission,
 predictive quality and real SharedSession consent remain separate gates.
 
+### Prospective forecast-to-outcome reconciliation — #232F
+
+`private.reconcile_shared_forecast_outcome_v1(prediction_id, capture_id,
+minimum_maturity_seconds)` is a closed, STABLE owner-invoker reader. It joins an
+actual consumption binding and validated frozen FINAL source to one retained
+#232C capture for that exact Profile, round, experience and Item. The captured
+receipt prefix must remain complete and extend the prepared input prefix. Both
+the capture and current full enrollment must match the consumed generation;
+leave/rejoin does not restore eligibility merely because user IDs match.
+
+The reader keeps the first response command and first numeric response for each
+actor alongside the latest captured label. UNKNOWN/CLEARED remain null; zero
+remains numeric. The original first-response boundary is checked against actual
+consumption, not a correction's later timestamp. New captures reconcile edits
+without rewriting earlier results or the frozen forecast. Membership drift,
+incomplete/cancelled/immature vectors and an insufficient declared maturity
+interval produce explicit statuses. Missing or withdrawn sources are unavailable.
+
+Selection is one explicit forecast/capture pair, with no admitted cohort. The
+observation unit is Profile/round/experience, never a member, capture revision or
+another forecast of the same experience. The immutable capture supplies outcome
+and evidence cutoffs and elapsed maturity; callers additionally declare the
+minimum interval. This engineering reconciliation is not prospective sample
+enrollment, a predeclared quality test or a calibrated rating comparison. An
+EVALUATION run has no exposure: even a complete unranked response vector can be
+linked, but it gains no recommendation credit. Raw score, individual responses,
+first-answer identities and original attribution stay private; `metric` and
+`groupReward` remain null, `qualityComparable` and `learnable` remain false.
+
+One statement snapshot resolves the existing owners without writes or a new
+copied table. Source erasure therefore needs no additional persisted cascade;
+subsequent reads return unavailable. A previously exported private result still
+requires its owner's withdrawal/deletion handling. Historical global commit
+visibility, a SharedSession receipt, between-request score comparability and
+quality/cohort admission remain unestablished. The old #232E exposed-pair
+diagnostic is unchanged and cannot accept this single-Item evaluation as exposure.
+
 ### Closed prediction-source erasure preparation — #232D, source only
 
 `private.erase_prediction_sources_v1(scope, id)` is an internal owner-only,

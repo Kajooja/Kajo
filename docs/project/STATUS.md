@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, nine bounded source packets accepted; six SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten bounded source packets; six SQL forwards installed; reconciliation rollout and remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,13 +11,14 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — prospective Shared outcome reconciliation / Sprint 015, #232F
+## Current handoff — Shared reconciliation acceptance and guarded rollout / Sprint 015, #232F
 
-The ninth bounded source packet is accepted through
-[PR #383](https://github.com/Kajooja/Kajo/pull/383), and its exact approved Shared
-consumption forward is installed and preservation-verified below. All six SQL
-forwards are installed. Continue the remaining evaluation boundary without
-repeating the producer, V4 receipt binding, consumer or hosted migration.
+The tenth bounded source packet adds a read-only prospective forecast/outcome
+join through the existing #232C/#232F owners. Its branch is
+`feat/232f-shared-outcome-reconciliation`. The first nine packets, including
+[PR #383](https://github.com/Kajooja/Kajo/pull/383), and all six earlier hosted
+forwards remain accepted. The new single-function forward is not installed.
+Do not repeat the producer, V4 receipt binding, consumer or earlier migrations.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group
@@ -35,19 +36,49 @@ frozen FINAL owners. A separate immutable binding records actual input/feature
 use; producer artifacts keep `INPUT_CAPTURE_ONLY` / `NOT_RECORDED`.
 The ordinal baseline is not a calibrated expected-rating model or public delivery.
 
-**Next action:** audit the existing #232C immutable outcome captures, #232E ordinal
-diagnostics/reports and #232F consumed-input bindings, then implement one bounded
-prospective Shared forecast-to-outcome reconciliation packet through those owners.
-Join subsequently matured individual responses to the actual frozen, never-answered
-forecast while preserving first-answer identity, corrections, withdrawal and the
-real full-Profile enrollment generation. Declare eligibility, selection, maturity,
-cohort and non-comparable cases before quality reporting or model admission.
-An `EVALUATION` forecast has no delivery/exposure proof; keep that distinction and
-never retrospectively mark an input-only producer artifact as consumed.
+The new `shared-forecast-outcome-v1` reader joins the actual frozen consumed
+forecast to the exact captured experience. It retains first-response and first-
+numeric-answer identities alongside corrected labels; zero, missing, unknown,
+clear, cancellation, maturity, enrollment generations and source withdrawal have
+explicit outcomes. It adds no table, scorer, public RPC or copied artifact.
+The same proof runs in disposable PostgreSQL and the mandatory native CLI gate,
+including populated row/function/default preservation and full canonical cleanup.
 
-The hosted receipt closes this single-file installation/preservation gate. It
+The audit found that #232E cannot supply quality metrics for this join: it needs
+two Items from one exposed frozen pool, while this consumer forecasts one target
+per EVALUATION request. There is neither exposure nor a per-member calibrated
+rating forecast. Selection is an explicit pair with no admitted cohort; experience
+identity prevents revisions/member counts from becoming independent samples.
+Metrics/reward/learning remain unavailable. Future quality sampling must predeclare
+eligible cohort, horizon/maturity, overlap and a comparable forecast target before
+examining test outcomes. The earlier ordinal diagnostic remains unchanged.
+
+**Publication checkpoint:** the complete ten-file change is committed locally on
+the branch above. Automatic approval review rejected the public GitHub tree write
+because it did not recognize authorization for this exact payload. No remote
+branch/PR or production write was created. Publication needs the owner's explicit
+approval of this packet; do not retry through an alternative transport.
+Local lint/typecheck, 391 database, 332 engine, 904 mobile, 451 catalogue,
+50 dependency, 72 research and 11 acceptance tests pass. Root `npm run check`
+stopped at the Deno npm-registry connection refusal, so no full local pass is
+claimed. All four explicitly labelled local demo exports pass; these are not
+configured production exports. Required GitHub/native CI and configured exports
+await publication.
+
+**Next action:** obtain the exact-packet publication approval, publish this branch,
+and integrate only after all five required CI gates pass. Then prepare the guarded
+single-file rollout of
+[`20261027171145_shared_forecast_outcome_reconciliation.sql`](../../supabase/migrations/20261027171145_shared_forecast_outcome_reconciliation.sql)
+with fresh predecessor/security and full-row/function/default/history preservation
+checks. Follow with remaining four-consumer parity and performance acceptance;
+quality cohorts need the separately supported target above. No old input-only
+artifact is retrospectively marked consumed and no fresh hosted observation is
+claimed by source tests.
+
+The earlier hosted consumption receipt closes that installation/preservation gate. It
 does not establish fresh hosted consumption, measured quality or a session flow.
-Repository publication/merge authorization remains applicable. A later production
+Earlier repository publication/merge approvals remain recorded, but automatic
+review requires exact-packet approval for the current write above. A later production
 write requires its own exact scope and preservation checks; no repeat approval
 or deployment is needed for the completed forward below.
 

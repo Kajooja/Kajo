@@ -434,6 +434,19 @@ compare actual SQL forecasts with the existing frozen replay at `1e-12` toleranc
 These fixtures measure contract conformance, not prediction quality. STATUS owns
 the exact final-source/native and separate hosted acceptance receipts.
 
+### Prospective forecast outcome reader
+
+`20261027171145_shared_forecast_outcome_reconciliation.sql` adds only the closed
+STABLE INVOKER `reconcile_shared_forecast_outcome_v1`. It reads the existing
+consumption/FINAL, input, immutable outcome and receipt owners; no scorer, public
+RPC or derived table changes. `shared-forecast-outcomes.{mjs,test.mjs}` exercise
+the real producer/consumer/answer/capture chain, first-answer/correction/maturity,
+generation/scope rejection, closed grants, withdrawal and full canonical cleanup.
+The same populated-preservation/reader proof runs in the mandatory native CLI
+installation gate and appears as `sharedForecastOutcomes` in its report.
+This is an engineering evidence join with explicit non-comparability, not an
+extension of #232E's exposed-pair metrics or acceptance of predictive quality.
+
 ## Closed shadow-source erasure — #232D, active source only
 
 `20261008185216_shadow_source_erasure.sql` adds an owner-only prediction-source
